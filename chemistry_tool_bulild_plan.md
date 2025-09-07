@@ -37,6 +37,18 @@ Create pydantic models for I/O and implement no-op stubs so the API surface is s
 
 ## 2) SMILES normalizer (robust parsing)
 
+Status: Completed
+
+Implementation:
+
+- `chemtools/smiles.py` (functions `normalize` and `normalize_reaction`)
+- `scripts/smiles_tester.py` (manual tester CLI)
+
+Notes:
+
+- Handles salts/solvents splitting, largest organic fragment selection, neutralization/standardization, and canonical output.
+- Provides graceful fallback when RDKit is unavailable and returns `INVALID_SMILES` when parsing fails with RDKit present.
+
 **Function:** `smiles.normalize(smiles: str) -> {smiles_norm, fragments, largest_smiles}`
 
 **Steps:**
@@ -54,6 +66,19 @@ Create pydantic models for I/O and implement no-op stubs so the API surface is s
 ---
 
 ## 3) Registry resolver
+
+Status: Completed
+
+Implementation:
+- `chemtools/registry.py` exposing `resolve(query)` and `resolve_all([...])`
+- Uses `data/cas_registry_merged.jsonl` (streamed JSONL) to build an alias index in-memory.
+- UIDs use bare CAS numbers (e.g., `108-88-3`).
+- Roles normalized to enum: `CATALYST|LIGAND|BASE|SOLVENT|ADDITIVE` via `compound_type`/`category_hint` mapping.
+- Returns `{uid, role, name, aliases, props}`; `props` enriched via `chemtools.properties.lookup` when available.
+
+Notes:
+- Alias matching is case-insensitive and punctuation-insensitive (name, abbreviation, token, generic_core, CAS). Accepts digits-only CAS best-effort.
+- No on-disk index is required; lookup builds a cached in-memory index on first use.
 
 **Function:** `registry.resolve(query:str|cas|uid) -> {uid, role, name, aliases, props}`
 
@@ -257,4 +282,3 @@ Run this both **before** and **after** tail retrieval.
 - **Week 2:** core normalizer, properties service, precedent.kNN (bin + features), constraints.filter.
 - **Week 3:** explain.precedents, API wiring & caching, golden tests, perf pass.
 - **Week 4:** expand tests, add SNAr featurizer, docs; handoff to recommender pipeline.
- 

@@ -5,3 +5,6 @@ description = "Chemistry tools for condition recommendation (FastAPI)"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
+
+[project.scripts]
+chem-registry = "chemtools.cli.registry:main"
