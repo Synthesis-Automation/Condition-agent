@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Dict, Any, List, Optional, Tuple
+import os
 
 try:  # avoid hard dependency at import time
     from .contracts import Reagent  # type: ignore
@@ -21,6 +22,14 @@ def _best_str(*vals: Optional[str]) -> str:
     return ""
 
 
+def _as_bool_env(name: str, default: bool = False) -> bool:
+    v = os.environ.get(name)
+    if v is None:
+        return default
+    v = v.strip().lower()
+    return v in ("1", "true", "yes", "on")
+
+
 def _read_dataset_aliases() -> Tuple[Dict[str, str], Dict[str, str]]:
     """Derive ligand alias maps from Ullmann dataset, if present.
 
@@ -28,10 +37,17 @@ def _read_dataset_aliases() -> Tuple[Dict[str, str], Dict[str, str]]:
     """
     import json, os
 
+    # Allow tests or fast-start modes to skip dataset scanning entirely
+    if _as_bool_env("CHEMTOOLS_SKIP_DATASET_ALIASES") or _as_bool_env("CHEMTOOLS_FAST_TEST"):
+        return {}, {}
+
     by_cas: Dict[str, str] = {}
     by_name: Dict[str, str] = {}
     root = os.path.dirname(os.path.dirname(__file__))
-    path = os.path.join(root, "data", "reaction_dataset", "Ullman-C-N.jsonl")
+    # Allow overriding dataset path via env for flexibility
+    path = os.environ.get(
+        "CHEMTOOLS_LIGAND_ALIAS_PATH",
+    ) or os.path.join(root, "data", "reaction_dataset", "Ullman-C-N.jsonl")
     if not os.path.exists(path):
         return by_cas, by_name
     try:
