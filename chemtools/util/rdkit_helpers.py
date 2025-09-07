@@ -1,6 +1,10 @@
 from typing import Optional, List
+import os
 
 def _import_rdkit():
+    # Allow tests or deployments to disable RDKit via env for speed/portability
+    if os.environ.get("CHEMTOOLS_DISABLE_RDKIT", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return None, None
     try:
         from rdkit import Chem  # type: ignore
         from rdkit.Chem import rdMolStandardize  # type: ignore

@@ -1,0 +1,84 @@
+- **Solvents**: KT (Kamletâ€“Taft Î±/Î²/Ï€\*), DN/AN, dielectric, bp, safety flags (chlorinated, peroxide-former).
+- **Ligands**: %V_bur, TEP (if library available), denticity family (bidentate diamine, phenanthroline).
+
+**Use:**
+
+- Featurizer augment (e.g., polar solvent flag), ranker features, constraints filter (green, hazard).
+
+---
+
+## 8) Precedent finder (kNN)
+
+**Function:** `precedent.knn(family, features, k=50, relax:dict) -> {prototype_id, support, precedents[]}`
+
+**Steps:**
+
+1. Build coarse **bin key** (e.g., `LG:Br|NUC:aniline|ortho:0|para_EWG:1`) to retrieve candidates fast.
+2. Compute similarity in feature space (Hamming + small numeric distances).
+3. Weight neighbors by yield and recency; output:
+   - `prototype_id` (cache key for averaged condition vector)
+   - `support` (n)
+   - top 10 precedents `{reaction_id, yield, core, base_uid, solvent_uid, T, t}`
+
+**Tests:**
+
+- Returns empty with `NO_PRECEDENTS` if none; otherwise consistent ranking.
+
+---
+
+## 9) Constraints filter
+
+**Function:** `constraints.filter(candidates, rules) -> {allowed, blocked[{id, reason}]}`
+
+**Rules:**
+
+- Inventory whitelist/blacklist (UIDs)
+- Environmental/green flags (no HMPA, no chlorinated, bp > X, etc.)
+- Operational: `max_T`, glovebox/no-glovebox, aqueous-only.
+
+Run this both **before** and **after** tail retrieval.
+
+---
+
+## 10) Explain precedents
+
+**Function:** `explain.precedents(pack, features) -> {reasons[], precedents[]}`
+
+**Compose:**
+
+- 2â€? closest matches (substrates, conditions, yields, dataset_id/DOI).
+- Short reasons: â€œBrâ€“aniline; ortho=0; para-EWG present; core & KOH/H2O frequent high yield.â€?
+
+---
+
+## 11) Packaging as services
+
+- Wire all tools behind FastAPI with clear routes.
+- Add request/response logging (PII-free), latency histograms, error rate dashboards.
+- Add simple **LRU cache** on `featurize` and `knn`.
+
+---
+
+## 12) QA & golden tests
+
+- Build a **golden set** (â‰?00 reactions) across families with expected outputs:
+  - Family classification
+  - Featurizer dict
+  - Core normalization
+- Unit tests for each SMARTS; fuzz tests with random substitutions.
+- Regression tests: lock JSON outputs with approvals (e.g., `pytest-approvaltests`).
+
+---
+
+## 13) Performance & robustness
+
+- Benchmarks on 10k reactions: total ETL + featurize throughput â‰?500 rps on a single node.
+- Guardrails:
+  - If **router** low-confidence â†?return top-2 families.
+  - If **knn support** < threshold â†?tell caller to switch to **plate design**.
+  - Always return **machine-parsable error codes**.
+
+---
+
+## 14) Documentation & examples
+

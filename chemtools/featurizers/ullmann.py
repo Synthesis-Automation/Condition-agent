@@ -1,4 +1,5 @@
 from typing import Dict, Any
+from functools import lru_cache
 import re
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
@@ -214,7 +215,8 @@ def _nucleophile_features(mol, text: str) -> Dict[str, Any]:
     return {"nuc_class": nuc_class, "n_basicity": n_basicity, "steric_alpha": steric_alpha}
 
 
-def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
+@lru_cache(maxsize=1024)
+def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     # Parse molecules if RDKit available
     emol = parse_smiles(electrophile)
     nmol = parse_smiles(nucleophile)
@@ -244,3 +246,9 @@ def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
         **nuc,
         "bin": bin_key,
     }
+
+
+def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
+    # Wrapper around cached implementation; returns a copy to avoid accidental mutation of cache entry
+    feat = _featurize_cached(electrophile, nucleophile)
+    return dict(feat)

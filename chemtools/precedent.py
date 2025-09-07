@@ -31,6 +31,20 @@ def _family_text(family: str) -> str:
     return f
 
 
+def _proto_family_id(family_txt: str) -> str:
+    """Normalize family text for use in prototype_id.
+    Replaces spaces with underscores, normalizes dash characters to '-', and '/' to '_'.
+    """
+    return (
+        str(family_txt)
+        .replace(" ", "_")
+        .replace("–", "-")  # en dash
+        .replace("—", "-")  # em dash
+        .replace("−", "-")  # minus sign
+        .replace("/", "_")
+    )
+
+
 def _parse_bin(bin_str: str) -> Dict[str, str]:
     out: Dict[str, str] = {}
     if not bin_str:
@@ -129,7 +143,27 @@ def _similarity(a: Dict[str, Any], b: Dict[str, Any]) -> float:
     return max(0.0, min(1.0, score / total))
 
 
+def _as_kv(obj: Dict[str, Any] | None) -> Tuple[Tuple[str, Any], ...]:
+    if not obj:
+        return tuple()
+    # Convert dict to a stable, hashable key
+    return tuple(sorted((str(k), obj[k]) for k in obj))
+
+
+@lru_cache(maxsize=512)
+def _knn_cached(family: str, features_kv: Tuple[Tuple[str, Any], ...], k: int, relax_kv: Tuple[Tuple[str, Any], ...]) -> Dict[str, Any]:
+    features = {k: v for k, v in features_kv}
+    relax = {k: v for k, v in relax_kv}
+    return _knn_impl(family, features, k, relax)
+
+
 def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    # Public entrypoint; wrap cached implementation. Return a copy to avoid shared-state mutations.
+    out = _knn_cached(family, _as_kv(features or {}), int(k), _as_kv(relax or {}))
+    return {**out}
+
+
+def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
     """
     Retrieve precedents by coarse-bin candidate selection followed by similarity ranking.
 
@@ -143,7 +177,7 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
     # Build candidate set
     cands = _candidate_pool(rows, family_txt, features, k, relax)
     if not cands:
-        proto = f"proto_{family_txt.replace(' ', '_').replace('–','-').replace('/','_')}_none_0"
+        proto = f"proto_{_proto_family_id(family_txt)}_none_0"
         return {"prototype_id": proto, "support": 0, "precedents": [], "error": "NO_PRECEDENTS"}
 
     # Score by similarity and yield-weighting
@@ -166,7 +200,7 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
         scored.append((neighbor_score, r))
 
     if not scored:
-        proto = f"proto_{family_txt.replace(' ', '_').replace('–','-').replace('/','_')}_none_0"
+        proto = f"proto_{_proto_family_id(family_txt)}_none_0"
         return {"prototype_id": proto, "support": 0, "precedents": [], "error": "NO_PRECEDENTS"}
 
     scored.sort(key=lambda x: (-(x[0]), -((x[1].get("yield_value") or 0))))
@@ -174,7 +208,7 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
     support = len(scored)
 
     # Prototype id is a stable-ish hash of family+bin
-    family_norm = family_txt.replace(" ", "_").replace("–", "-").replace("/", "_")
+    family_norm = _proto_family_id(family_txt)
     bin_key = str(features.get("bin") or f"LG:{target_feat.get('LG','?')}|NUC:{target_feat.get('nuc_class','?')}")
     proto = f"proto_{family_norm}_{abs(hash(bin_key)) % 100000}"
 

@@ -245,6 +245,8 @@ Notes:
 
 ## 8) Precedent finder (kNN)
 
+Status: Completed
+
 **Function:** `precedent.knn(family, features, k=50, relax:dict) -> {prototype_id, support, precedents[]}`
 
 **Steps:**
