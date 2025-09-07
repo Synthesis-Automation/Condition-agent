@@ -76,6 +76,12 @@ Implementation:
 - Roles normalized to enum: `CATALYST|LIGAND|BASE|SOLVENT|ADDITIVE` via `compound_type`/`category_hint` mapping.
 - Returns `{uid, role, name, aliases, props}`; `props` enriched via `chemtools.properties.lookup` when available.
 
+Deliverables:
+- CLI: console script `chem-registry` (pyproject) and module `chemtools/cli/registry.py`.
+- Script: `scripts/registry_resolver.py` thin wrapper.
+- Tester: `scripts/registry_tester.py` with `--data` override via `CHEMTOOLS_REGISTRY_PATH`.
+- Tests: `tests/test_registry.py` with fixture dataset `tests/data/registry_tiny.jsonl`.
+
 Notes:
 - Alias matching is case-insensitive and punctuation-insensitive (name, abbreviation, token, generic_core, CAS). Accepts digits-only CAS best-effort.
 - No on-disk index is required; lookup builds a cached in-memory index on first use.
@@ -97,7 +103,18 @@ Notes:
 
 ## 4) Reaction-family router (deterministic first)
 
-**Function:** `router.detect_family(reactants:[smiles]) -> {family:str, confidence:float, hits:[rule_ids]}`
+Status: Completed
+
+Implementation:
+- `chemtools/router.py` with RDKit SMARTS-based detection (when available) and robust text fallback.
+- Families: `Ullmann_CN`, `Suzuki_CC`, `Sonogashira_CC`, `Amide_Coupling` (+ hint `Ullmann_O`).
+- Returns `{family, confidence, hits}`; `hits` includes `aryl_halide`, `vinyl_halide`, `triflate`, `boron`, `nucleophile_n`, `nucleophile_o`, `terminal_alkyne`, `acid`.
+
+Notes:
+- Confidence: 0.9 for strong single-rule matches (e.g., aryl halide + boron for Suzuki); 0.8–0.85 for others; 0.75 for Ullmann_O hint.
+- Falls back to heuristic substring checks if RDKit is absent.
+
+**Function:** `router.detect_family(reactants:[smiles]) -> {family:str, confidence:float, hits:dict}`
 
 **Tier A – SMARTS rules (fast):**
 
