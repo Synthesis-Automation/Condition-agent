@@ -110,6 +110,10 @@ Implementation:
 - Families: `Ullmann_CN`, `Suzuki_CC`, `Sonogashira_CC`, `Amide_Coupling` (+ hint `Ullmann_O`).
 - Returns `{family, confidence, hits}`; `hits` includes `aryl_halide`, `vinyl_halide`, `triflate`, `boron`, `nucleophile_n`, `nucleophile_o`, `terminal_alkyne`, `acid`.
 
+Deliverables:
+- Tester CLI: `scripts/router_tester.py` (reactants or reaction SMILES; `--demo`, `--jsonl`, `--pretty`).
+- Test: `tests/test_router.py` (sanity check; SMARTS/text fallback covered by suite).
+
 Notes:
 - Confidence: 0.9 for strong single-rule matches (e.g., aryl halide + boron for Suzuki); 0.8–0.85 for others; 0.75 for Ullmann_O hint.
 - Falls back to heuristic substring checks if RDKit is absent.
@@ -137,6 +141,29 @@ Notes:
 
 ## 5) Featurizer plugins (start with Ullmann C–N)
 
+Status: Completed (Ullmann C–N v1)
+
+Implementation:
+- `chemtools/featurizers/ullmann.py` with RDKit-powered features and text fallback.
+- Fields produced:
+  - `LG` ∈ {I, Br, Cl, OTf, UNK}
+  - `elec_class` ∈ {aryl, vinyl, alkyl}
+  - `ortho_count` ∈ {0, 1, 2+} (6‑ring approx)
+  - `para_EWG`: bool (NO2/CF3/CN/C=O anywhere on ring; approx)
+  - `heteroaryl`: bool (ring contains heteroatom)
+  - `nuc_class` ∈ {aniline, indole, amine_primary, amine_secondary, phenol, amide_deactivated, amine}
+  - `n_basicity` ∈ {aromatic_primary, aliphatic_primary, secondary, deactivated, unknown}
+  - `steric_alpha` ∈ {low, med, high}
+  - `bin`: coarse key `LG:<LG>|NUC:<nuc_class>`
+
+Deliverables:
+- Code: `chemtools/featurizers/ullmann.py`
+- Test: `tests/test_featurize_ullmann.py`
+
+Notes:
+- Uses SMARTS when RDKit is available; otherwise heuristics ensure stable outputs.
+- Ortho/para are approximations focused on 6‑member arene ipso context.
+
 **Function:** `featurize.substrates(family, electrophile, nucleophile) -> dict`
 
 **Ullmann v1 fields (SMARTS + ring neighborhood):**
@@ -162,11 +189,28 @@ Notes:
 **Tests:**
 
 - Deterministic outputs on golden SMILES (e.g., Brc1ccc(F)cc1 + aniline).
-- Timing p95 < 25 ms.
+- Timing p95 < 25 ms (target).
 
 ---
 
 ## 6) ConditionCore normalizer
+
+Status: Completed (Ullmann-focused v1)
+
+Implementation:
+- `chemtools/condition_core.py` exposes `parse(reagents, text?) -> {core, metal_source_uid, ligand_uid?, precatalyst?}`.
+- Uses `data/reaction_dataset/Ullman-C-N.jsonl` to build ligand alias maps (CAS ↔ canonical ligand; name ↔ canonical ligand).
+- Integrates `chemtools.registry.resolve` to infer metal symbols (via `generic_core`) and detect preformed complexes.
+- Core format: "{MetalSymbol}/{LigandCanonical}" when ligand present (e.g., "Cu/DMEDA"); otherwise "{MetalSymbol}" (e.g., "Cu").
+
+Deliverables:
+- Code: `chemtools/condition_core.py`
+- Tests: `tests/test_condition_core.py` (Cu/DMEDA, Cu-only, Pd(PPh3)4 precatalyst)
+- Tester CLI: `scripts/condition_core_tester.py` (accepts tokens, JSON, or dataset JSONL)
+
+Notes:
+- Recognizes common Ullmann ligands (DMEDA, TMEDA, Phenanthroline) via dataset aliases and text/registry hints.
+- `precatalyst=true` when registry marks the catalyst as a preformed metal–ligand complex; core normalizes to the metal symbol.
 
 **Function:** `condition_core.parse(reagents:[{uid, role}], text?:str) -> {core:str, metal_source_uid, ligand_uid?, ratio?:float, precatalyst?:bool}`
 
@@ -174,7 +218,7 @@ Notes:
 
 1. From participants, pick `metal_source` (CuX, Pd(OAc)2…), `ligand` (phen, XPhos, DMEDA).
 2. Normalize to `"{MetalSymbol}/{LigandCanonical}"` (e.g., `"Cu/Phenanthroline"`).
-3. If a named precatalyst (e.g., “XPhos Pd G3”) is used, set `precatalyst=true`, also resolve to same canonical core string.
+3. If a named preformed metal-ligand catalyst (e.g., “XPhos Pd G3”) is used, set `preformed_catalyst=true`, also resolve to same canonical core string.
 
 **Tests:**
 
