@@ -1,0 +1,20 @@
+from pydantic import BaseModel
+from typing import List, Optional, Dict, Any
+
+class NormalizeRequest(BaseModel): smiles: str
+class DetectFamilyRequest(BaseModel): reactants: List[str]
+class FeaturizeUllmannRequest(BaseModel): electrophile: str; nucleophile: str
+
+class Reagent(BaseModel):
+    uid: str; role: str
+    name: Optional[str] = None; token: Optional[str] = None
+
+class ConditionCoreParseRequest(BaseModel):
+    reagents: List[Reagent]; text: Optional[str] = None
+
+class PropertiesLookupRequest(BaseModel): query: str
+class PrecedentKNNRequest(BaseModel):
+    family: str; features: Dict[str, Any]; k: int = 50; relax: Optional[Dict[str, Any]] = None
+class ConstraintsFilterRequest(BaseModel):
+    candidates: List[str]; rules: Optional[Dict[str, Any]] = None
+class ExplainPrecedentsRequest(BaseModel): pack: Dict[str, Any]; features: Dict[str, Any]

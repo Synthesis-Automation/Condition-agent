@@ -1,0 +1,3 @@
+{"reaction_id":"ull_001","rxn_type":"Ullmann C–N","condition_core":"Cu/Phenanthroline","base_uid":"1310-58-3","solvent_uid":"7732-18-5","yield_value":92,"T_C":100,"time_h":8,"features":{"bin":"LG:Br|NUC:aniline","LG":"Br","nuc_class":"aniline"}}
+{"reaction_id":"ull_002","rxn_type":"Ullmann C–N","condition_core":"Cu/DMEDA","base_uid":"7778-53-2","solvent_uid":"7732-18-5","yield_value":85,"T_C":95,"time_h":10,"features":{"bin":"LG:Br|NUC:aniline","LG":"Br","nuc_class":"aniline"}}
+{"reaction_id":"ull_003","rxn_type":"Ullmann C–N","condition_core":"Cu/TMEDA","base_uid":"1310-58-3","solvent_uid":"7732-18-5","yield_value":78,"T_C":90,"time_h":6,"features":{"bin":"LG:Cl|NUC:aniline","LG":"Cl","nuc_class":"aniline"}}
