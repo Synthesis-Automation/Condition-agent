@@ -52,3 +52,7 @@ run-drfp:
 	else \
 	  echo "No DRFP NPZ found. Build with 'make drfp-index-4096' or 'make drfp-index' first."; exit 1; \
 	fi
+
+# Launch Gradio UI (auto-loads dataset if present)
+ui:
+	python scripts/ui_gradio.py

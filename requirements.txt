@@ -5,3 +5,4 @@ numpy==1.26.4
 pandas==2.2.2
 scikit-learn==1.4.2
 rdkit-pypi==2022.9.5
+gradio==4.44.0
