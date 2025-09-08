@@ -6,7 +6,7 @@ This plan distills everything we discussed into a concrete, buildable roadmap. I
 
 ## 0) Goals & Success Criteria
 
-**Primary goal:** Ship a **reliable, explainable, constraints-aware** condition recommender for Ullmann C–N that returns:  
+**Primary goal:** Ship a **reliable, explainable, constraints-aware** condition recommender for Ullmann C–N and other reaction (later) that returns:  
 `ConditionCore + Base + Solvent (+ Additive) + T/t`, with top-N alternates, precedents, confidence, and plate fallback.
 
 **Success by V1 (Ullmann-only):**

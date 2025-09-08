@@ -68,7 +68,19 @@ def main(argv: List[str] | None = None) -> int:
         features = feat_ullmann.featurize(elec, nuc)
 
     # 4) Run kNN
-    relax = {"strict_bin": bool(args.strict_bin), "min_candidates": int(args.min_candidates)}
+    # Pass normalized reaction SMILES and enable DRFP re-ranking when available
+    relax = {
+        "strict_bin": bool(args.strict_bin),
+        "min_candidates": int(args.min_candidates),
+        "reaction_smiles": norm.get("normalized") or args.reaction,
+        "use_drfp": True,  # best-effort; falls back gracefully if DRFP not installed
+        "precompute_drfp": True,
+        "precompute_scope": "candidates",  # or "dataset" to warm all rows (slower)
+        # Optional tuning knobs (defaults applied in backend):
+        # "drfp_weight": 0.4,
+        # "drfp_n_bits": 4096,
+        # "drfp_radius": 3,
+    }
     result = knn(family=fam, features=features, k=int(args.k), relax=relax)
 
     payload = {

@@ -18,6 +18,17 @@ class PrecedentKNNRequest(BaseModel):
 class ConstraintsFilterRequest(BaseModel):
     candidates: List[str]; rules: Optional[Dict[str, Any]] = None
 class ExplainPrecedentsRequest(BaseModel): pack: Dict[str, Any]; features: Dict[str, Any]
+class RecommendFromReactionRequest(BaseModel):
+    reaction: str
+    k: int = 25
+    relax: Optional[Dict[str, Any]] = None
+    constraints: Optional[Dict[str, Any]] = None
+
+class PlateDesignRequest(BaseModel):
+    reaction: str
+    plate_size: int = 24
+    relax: Optional[Dict[str, Any]] = None
+    constraints: Optional[Dict[str, Any]] = None
 
 # Dev/validation: validate ConditionCore normalization on a JSONL dataset
 class ConditionCoreValidateRequest(BaseModel):

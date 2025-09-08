@@ -2,9 +2,10 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from chemtools.contracts import (
     NormalizeRequest, DetectFamilyRequest, FeaturizeUllmannRequest,
     ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
-    ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest
+    ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest,
+    RecommendFromReactionRequest, PlateDesignRequest,
 )
-from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain
+from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain, recommend
 import logging, time
 
 # Optional Prometheus metrics
@@ -164,5 +165,31 @@ async def warm_startup_caches() -> None:
         # Touch module-level caches to force initialization
         _ = _cc._LIG_BY_CAS  # type: ignore[attr-defined]
         _ = _cc._LIG_BY_NAME  # type: ignore[attr-defined]
+    except Exception:
+        pass
+    try:
+        # Optional: load DRFP precomputed vectors is handled above; nothing else here
+        pass
+    except Exception:
+        pass
+
+
+@app.post("/api/v1/recommend")
+def api_recommend(req: RecommendFromReactionRequest):
+    return recommend.recommend_from_reaction(req.reaction, k=req.k, relax=req.relax or {}, constraint_rules=req.constraints or {})
+
+
+@app.post("/api/v1/design_plate")
+def api_design_plate(req: PlateDesignRequest):
+    return recommend.design_plate_from_reaction(req.reaction, plate_size=req.plate_size, relax=req.relax or {}, constraint_rules=req.constraints or {})
+    # Optionally preload DRFP fingerprints from NPZ bundle if provided via env
+    try:
+        import os
+        from chemtools.reaction_similarity import load_precomputed_npz  # type: ignore
+        path = os.environ.get("CHEMTOOLS_DRFPPATH", "").strip()
+        if path and os.path.exists(path):
+            res = load_precomputed_npz(path)
+            # Silent on failure to avoid impacting startup
+            _ = res
     except Exception:
         pass

@@ -2,7 +2,7 @@ from typing import Dict, Any, List, Tuple, Optional
 import os, json
 from functools import lru_cache
 from .featurizers import ullmann as feat_ullmann
-from . import reaction_similarity as rs
+from .reaction_similarity import drfp_available, encode_drfp_cached, tanimoto
 
 # Local helper to pick electrophile vs nucleophile from reactants list
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
@@ -154,9 +154,9 @@ def _proto_family_id(family_txt: str) -> str:
     return (
         str(family_txt)
         .replace(" ", "_")
-        .replace("â€“", "-")  # en dash
-        .replace("â€”", "-")  # em dash
-        .replace("âˆ’", "-")  # minus sign
+        .replace("â€?, "-")  # en dash
+        .replace("â€?, "-")  # em dash
+        .replace("âˆ?, "-")  # minus sign
         .replace("/", "_")
     )
 
@@ -189,7 +189,7 @@ def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str,
 
     # Exact bin matches
     cands = [r for r in fam_rows if (r.get("features", {}).get("bin") or "") == target_bin]
-    if len(cands) >= min_candidates:
+    if len(cands) >= min_candidates or strict_bin:
         return cands
 
     # Fallbacks
@@ -311,18 +311,18 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
     drfp_bits = int(relax.get("drfp_n_bits", 4096))
     drfp_radius = int(relax.get("drfp_radius", 3))
     q_fp = None
-    if use_drfp and rsmi_query and rs.drfp_available():
+    if use_drfp and rsmi_query and drfp_available():
         # Optionally precompute fingerprints for entire dataset to warm cache
         if bool(relax.get("precompute_drfp", False)):
             try:
                 # Touch encode cache for all rows to speed subsequent scoring
                 for _r in cands if relax.get("precompute_scope") == "candidates" else rows:
-                    rsmi_val = _r.get("reaction_smiles")
-                    if rsmi_val:
-                        _ = rs.encode_drfp_cached(rsmi_val, n_bits=drfp_bits, radius=drfp_radius)
+                    rs = _r.get("reaction_smiles")
+                    if rs:
+                        _ = encode_drfp_cached(rs, n_bits=drfp_bits, radius=drfp_radius)
             except Exception:
                 pass
-        q_fp = rs.encode_drfp_cached(rsmi_query, n_bits=drfp_bits, radius=drfp_radius)
+        q_fp = encode_drfp_cached(rsmi_query, n_bits=drfp_bits, radius=drfp_radius)
 
     scored: List[Tuple[float, Dict[str, Any]]] = []
     for r in cands:
@@ -332,19 +332,19 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
             # still allow DRFP to rescue a bit if enabled
             pass
         sim_total = sim_cat
-        # DRFP component when available for both
-        if q_fp is not None:
-            r_rsmi = r.get("reaction_smiles")
-            if r_rsmi:
-                r_fp = rs.encode_drfp_cached(r_rsmi, n_bits=drfp_bits, radius=drfp_radius)
-                if r_fp is not None:
-                    sim_fp = rs.tanimoto(q_fp, r_fp)
-                    try:
-                        sim_fp = float(sim_fp)  # coerce in case implementation returns non-float
-                    except Exception:
-                        sim_fp = 0.0
-                    # Blend: convex combination of categorical and DRFP
-                    sim_total = max(0.0, min(1.0, (1.0 - drfp_w) * sim_cat + drfp_w * sim_fp))
+            # DRFP component when available for both
+            if q_fp is not None:
+                r_rsmi = r.get("reaction_smiles")
+                if r_rsmi:
+                    r_fp = encode_drfp_cached(r_rsmi, n_bits=drfp_bits, radius=drfp_radius)
+                    if r_fp is not None:
+                        sim_fp = tanimoto(q_fp, r_fp)
+                        try:
+                            sim_fp = float(sim_fp)  # coerce in case implementation returns non-float
+                        except Exception:
+                            sim_fp = 0.0
+                        # Blend: convex combination of categorical and DRFP
+                        sim_total = max(0.0, min(1.0, (1.0 - drfp_w) * sim_cat + drfp_w * sim_fp))
         if sim_total <= 0:
             continue
         y = r.get("yield_value")
@@ -378,3 +378,4 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
         for r in top[:10]
     ]
     return {"prototype_id": proto, "support": support, "precedents": precedents}
+
