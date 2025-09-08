@@ -18,3 +18,10 @@ class PrecedentKNNRequest(BaseModel):
 class ConstraintsFilterRequest(BaseModel):
     candidates: List[str]; rules: Optional[Dict[str, Any]] = None
 class ExplainPrecedentsRequest(BaseModel): pack: Dict[str, Any]; features: Dict[str, Any]
+
+# Dev/validation: validate ConditionCore normalization on a JSONL dataset
+class ConditionCoreValidateRequest(BaseModel):
+    path: str
+    limit: int = 0
+    show_mismatches: int = 10
+    metal_only_ok: bool = True

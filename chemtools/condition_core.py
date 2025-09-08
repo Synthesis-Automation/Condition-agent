@@ -44,44 +44,80 @@ def _read_dataset_aliases() -> Tuple[Dict[str, str], Dict[str, str]]:
     by_cas: Dict[str, str] = {}
     by_name: Dict[str, str] = {}
     root = os.path.dirname(os.path.dirname(__file__))
-    # Allow overriding dataset path via env for flexibility
-    path = os.environ.get(
-        "CHEMTOOLS_LIGAND_ALIAS_PATH",
-    ) or os.path.join(root, "data", "reaction_dataset", "Ullman-C-N.jsonl")
-    if not os.path.exists(path):
+    # Allow overriding dataset path via env for flexibility; accept file or directory and scan *.jsonl
+    env_path = os.environ.get("CHEMTOOLS_LIGAND_ALIAS_PATH")
+    paths: List[str] = []
+    if env_path:
+        if os.path.isdir(env_path):
+            for fn in os.listdir(env_path):
+                if fn.lower().endswith(".jsonl"):
+                    paths.append(os.path.join(env_path, fn))
+        elif os.path.isfile(env_path):
+            paths.append(env_path)
+    else:
+        ds_dir = os.path.join(root, "data", "reaction_dataset")
+        if os.path.isdir(ds_dir):
+            for fn in os.listdir(ds_dir):
+                if fn.lower().endswith(".jsonl"):
+                    paths.append(os.path.join(ds_dir, fn))
+    if not paths:
         return by_cas, by_name
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    rec = json.loads(line)
-                except Exception:
-                    continue
-                core = rec.get("condition_core") or ""
-                if "/" not in core:
-                    continue
-                metal, ligand = core.split("/", 1)
-                ligand = (ligand or "").strip()
-                if not ligand or ligand.lower() == "none":
-                    continue
-                # Normalize canonical ligand token capitalization
-                canonical = ligand
-                # Gather aliases from catalyst.core and enriched names if present
-                cat = rec.get("catalyst") or {}
-                for lst_key in ("core", "full_system"):
-                    for item in (cat.get(lst_key) or []):
-                        cas = (item.get("cas") or "").strip()
-                        nm = (item.get("name") or "").strip()
-                        if cas:
-                            by_cas.setdefault(cas, canonical)
-                        if nm:
-                            by_name.setdefault(_text_norm(nm), canonical)
-                enr = (rec.get("raw_data") or {}).get("enriched_names") or {}
-                for nm in (enr.get("catalysts") or []):
-                    by_name.setdefault(_text_norm(str(nm)), canonical)
+        for path in paths:
+            with open(path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except Exception:
+                        continue
+                    core = rec.get("condition_core") or ""
+                    if "/" not in core:
+                        continue
+                    metal, ligand = core.split("/", 1)
+                    ligand = (ligand or "").strip()
+                    if not ligand or ligand.lower() == "none":
+                        continue
+                    # Normalize canonical ligand token capitalization
+                    canonical = ligand
+                    canonical_norm = _text_norm(canonical)
+                    metal_norm = _text_norm(metal)
+
+                    def _is_metal_name(n: str) -> bool:
+                        t = _text_norm(n)
+                        if not t:
+                            return False
+                        return (
+                            (metal_norm and metal_norm in t)
+                            or ("copper" in t)
+                            or ("palladium" in t)
+                            or ("nickel" in t)
+                            or ("ruthenium" in t)
+                        )
+
+                    # Gather aliases from catalyst.core and enriched names if present
+                    cat = rec.get("catalyst") or {}
+                    for lst_key in ("core", "full_system"):
+                        for item in (cat.get(lst_key) or []):
+                            cas = (item.get("cas") or "").strip()
+                            nm = (item.get("name") or "").strip()
+                            nm_norm = _text_norm(nm)
+                            looks_like_ligand = (
+                                canonical_norm
+                                and (nm_norm == canonical_norm or canonical_norm in nm_norm or nm_norm in canonical_norm)
+                                and not _is_metal_name(nm)
+                            )
+                            if looks_like_ligand:
+                                if cas:
+                                    by_cas.setdefault(cas, canonical)
+                                if nm:
+                                    by_name.setdefault(nm_norm, canonical)
+                    enr = (rec.get("raw_data") or {}).get("enriched_names") or {}
+                    for nm in (enr.get("catalysts") or []):
+                        if not _is_metal_name(str(nm)):
+                            by_name.setdefault(_text_norm(str(nm)), canonical)
     except Exception:
         # Be resilient if dataset is malformed
         pass
@@ -192,6 +228,12 @@ def parse(reagents: List[Reagent], text: str | None = None) -> Dict[str, Any]:
                 ctype = (res.get("record") or {}).get("compound_type") or res.get("compound_type")
             if ctype and isinstance(ctype, str) and "preformed" in ctype.lower():
                 precatalyst = True
+            # Some datasets list the ligand under catalyst/core; attempt to pick ligand too
+            if not ligand:
+                lig = _pick_ligand_canonical(nm, uid)
+                if lig:
+                    ligand = lig
+                    ligand_uid = uid
         if role == "LIGAND" and not ligand:
             lig = _pick_ligand_canonical(nm, uid)
             if lig:

@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from chemtools.contracts import (
     NormalizeRequest, DetectFamilyRequest, FeaturizeUllmannRequest,
     ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
-    ConstraintsFilterRequest, ExplainPrecedentsRequest
+    ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest
 )
 from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain
 import logging, time
@@ -77,6 +77,68 @@ def api_constraints_filter(req: ConstraintsFilterRequest): return constraints.ap
 def api_explain_precedents(req: ExplainPrecedentsRequest): return explain.for_pack(req.pack, req.features)
 
 
+@app.post("/api/v1/condition-core/validate-dataset")
+def api_condition_core_validate(req: ConditionCoreValidateRequest):
+    import json, os
+    path = req.path
+    limit = int(req.limit or 0)
+    if not os.path.exists(path):
+        raise HTTPException(status_code=400, detail=f"Dataset not found: {path}")
+
+    total = 0
+    ok = 0
+    mismatches = []
+
+    def _norm_core(s: str) -> str:
+        s = (s or "").strip()
+        return s[:-5] if s.endswith("/none") else s
+
+    def _metal_part(s: str) -> str:
+        s = (s or "").strip()
+        return s.split("/", 1)[0] if s else ""
+
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+            except Exception:
+                continue
+            cat = rec.get("catalyst") or {}
+            reagents = []
+            for item in (cat.get("full_system") or cat.get("core") or []):
+                reagents.append({"name": item.get("name"), "uid": item.get("cas"), "role": "CATALYST"})
+            for item in (rec.get("reagents") or []):
+                reagents.append({"name": item.get("name"), "uid": item.get("cas"), "role": item.get("role") or "ADDITIVE"})
+            for item in (rec.get("solvents") or []):
+                reagents.append({"name": item.get("name"), "uid": item.get("cas"), "role": "SOLVENT"})
+
+            out = condition_core.parse(reagents, "")
+            truth = (rec.get("condition_core") or "").strip()
+            pred = (out.get("core") or "").strip()
+
+            t = _norm_core(truth)
+            p = _norm_core(pred)
+            ok_flag = (t == p) or (req.metal_only_ok and _metal_part(t) and _metal_part(t) == _metal_part(p))
+
+            total += 1
+            if ok_flag:
+                ok += 1
+            elif len(mismatches) < int(req.show_mismatches or 0):
+                mismatches.append({
+                    "reaction_id": rec.get("reaction_id"),
+                    "truth": truth,
+                    "pred": pred,
+                })
+            if limit and total >= limit:
+                break
+
+    acc = (ok / total) * 100.0 if total else 0.0
+    return {"records": total, "matches": ok, "accuracy": round(acc, 2), "mismatches": mismatches}
+
+
 @app.get("/metrics")
 def metrics():
     if _PROM:
@@ -87,3 +149,20 @@ def metrics():
         "ok": True,
         "note": "prometheus_client not installed; exposing minimal metrics only",
     }
+
+
+@app.on_event("startup")
+async def warm_startup_caches() -> None:
+    # Preload registry and dataset-derived aliases to reduce first-request latency
+    try:
+        from chemtools import registry as _reg
+        _reg._load_registry()  # type: ignore[attr-defined]
+    except Exception:
+        pass
+    try:
+        from chemtools import condition_core as _cc
+        # Touch module-level caches to force initialization
+        _ = _cc._LIG_BY_CAS  # type: ignore[attr-defined]
+        _ = _cc._LIG_BY_NAME  # type: ignore[attr-defined]
+    except Exception:
+        pass
