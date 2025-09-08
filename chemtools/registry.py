@@ -204,7 +204,8 @@ def _enrich_props(uid: str, name: Optional[str] = None) -> Dict[str, Any]:
         if not q:
             continue
         try:
-            res = _properties.lookup(q)
+            # Avoid recursive calls back into registry.resolve while enriching
+            res = _properties.lookup(q, allow_registry=False)
         except Exception:
             continue
         if res and res.get("found") and res.get("record"):
@@ -274,3 +275,57 @@ def resolve(query: str) -> Dict[str, Any]:
 # Convenience: simple multi-lookup
 def resolve_all(queries: List[str]) -> List[Dict[str, Any]]:
     return [resolve(q) for q in queries]
+
+
+# Simple in-memory search over the loaded registry. Useful for filtering
+# by role or by the source "compound_type" field from the JSONL.
+def search(
+    q: Optional[str] = None,
+    *,
+    role: Optional[str] = None,
+    compound_type: Optional[str] = None,
+    limit: int = 50,
+) -> List[Dict[str, Any]]:
+    """Search registry records.
+
+    - q: optional substring (case-insensitive) matched against name/token/abbreviation/generic_core/uid.
+    - role: one of CATALYST|LIGAND|BASE|SOLVENT|ADDITIVE (case-insensitive).
+    - compound_type: substring match against the JSONL's compound_type field (case-insensitive).
+    - limit: cap number of returned items.
+
+    Returns a list of minimal records: {uid, role, name, compound_type?}
+    """
+    idx = _load_registry()
+    ql = (q or "").strip().lower()
+    role_u = (role or "").strip().upper()
+    ct_sub = (compound_type or "").strip().lower()
+
+    out: List[Dict[str, Any]] = []
+    for uid, rec in idx.by_uid.items():
+        if role_u and rec.get("role") != role_u:
+            continue
+        if ct_sub and ct_sub not in str(rec.get("compound_type") or "").lower():
+            continue
+        if ql:
+            hay = " ".join(
+                [
+                    str(rec.get("name") or ""),
+                    str(rec.get("token") or ""),
+                    str(rec.get("abbreviation") or ""),
+                    str(rec.get("generic_core") or ""),
+                    str(uid or ""),
+                ]
+            ).lower()
+            if ql not in hay:
+                continue
+        out.append(
+            {
+                "uid": uid,
+                "role": rec.get("role"),
+                "name": rec.get("name"),
+                "compound_type": rec.get("compound_type"),
+            }
+        )
+        if len(out) >= int(limit):
+            break
+    return out

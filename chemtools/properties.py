@@ -74,8 +74,12 @@ def _props() -> Dict[str, Dict[str, Any]]:
     return merged
 
 
-def lookup(query: str) -> Dict[str, Any]:
+def lookup(query: str, *, allow_registry: bool = True) -> Dict[str, Any]:
     """Lookup properties by CAS or alias.
+
+    - allow_registry: when True, may consult `chemtools.registry.resolve` to
+      map names/aliases to a CAS before checking properties. Set to False to
+      avoid recursion when `registry.resolve` is enriching results.
 
     Returns {found, record}. When found, record contains at least {uid, role?, token?, name?, ...props}
     """
@@ -89,12 +93,14 @@ def lookup(query: str) -> Dict[str, Any]:
         rec = {"uid": q, **props[q]}
         return {"found": True, "record": rec}
 
-    # Try case-insensitive match on token/name via registry
-    try:
-        from .registry import resolve as registry_resolve  # lazy import to avoid cycles at import time
-        res = registry_resolve(q)
-    except Exception:
-        res = None
+    # Try case-insensitive match on token/name via registry, unless disabled to avoid recursion
+    res = None
+    if allow_registry:
+        try:
+            from .registry import resolve as registry_resolve  # lazy import to avoid cycles at import time
+            res = registry_resolve(q)
+        except Exception:
+            res = None
 
     if isinstance(res, dict) and res.get("uid") and res.get("uid") in props:
         uid = str(res["uid"])
