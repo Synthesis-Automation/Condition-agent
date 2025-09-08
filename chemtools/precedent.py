@@ -116,9 +116,17 @@ def _load() -> List[Dict[str, Any]]:
                         pass
         except Exception:
             pass
-    # 2) Optional: load local dataset directory (transformed) when explicitly enabled
+    # 2) Auto-load local dataset directory (transformed) when available, unless disabled.
+    #    - Explicit override via CHEMTOOLS_LOAD_DATASET (1/true/on to enable; 0/false/off to disable)
+    #    - During pytest (PYTEST_CURRENT_TEST set), default to disabled to keep unit tests deterministic
     import os as _os
-    use_dataset = str(_os.environ.get("CHEMTOOLS_LOAD_DATASET", "")).strip().lower() in {"1", "true", "yes", "on"}
+    _flag = str(_os.environ.get("CHEMTOOLS_LOAD_DATASET", "")).strip().lower()
+    if _flag in {"0", "false", "no", "off"}:
+        use_dataset = False
+    elif _flag in {"1", "true", "yes", "on"}:
+        use_dataset = True
+    else:
+        use_dataset = ("PYTEST_CURRENT_TEST" not in _os.environ)
     if not rows and use_dataset and os.path.isdir(DATASET_DIR):
         for path in _iter_dataset_files():
             try:
