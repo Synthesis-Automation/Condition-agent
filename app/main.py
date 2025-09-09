@@ -152,6 +152,25 @@ def api_role_aware_fields(roles: str | None = None):
         "registry": ROLE_REGISTRY,
     }
 
+
+@app.post("/api/v1/featurize/molecule")
+def api_featurize_molecule(req: RoleAwareMolRequest):
+    """Convenience alias to role-aware featurizer.
+
+    If roles is omitted/null, returns global/basic features only (roles=[]).
+    Pass roles=[...] to include role-specific blocks.
+    """
+    if not _HAS_ROLE_FEATS:
+        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
+    roles = req.roles if req.roles is not None else []  # default to globals-only
+    out = role_featurize_mol(req.smiles, roles=roles)
+    vec = out.get("vector")
+    try:
+        out["vector"] = vec.tolist()  # type: ignore
+    except Exception:
+        pass
+    return out
+
 @app.post("/api/v1/condition-core/parse")
 def api_condition_core(req: ConditionCoreParseRequest): return condition_core.parse_core(req.reagents, req.text or "")
 

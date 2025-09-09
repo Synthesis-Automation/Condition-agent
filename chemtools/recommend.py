@@ -79,6 +79,12 @@ def recommend_from_reaction(
         features = feat_molecular.featurize(elec, nuc)
     else:
         features = feat_molecular.featurize(elec, nuc)
+    # Ensure features are hashable for caching (drop nested role-aware block)
+    if isinstance(features, dict) and "role_aware" in features:
+        try:
+            features = {k: v for k, v in features.items() if k != "role_aware"}
+        except Exception:
+            features.pop("role_aware", None)  # type: ignore
 
     # 4) Retrieve precedents (enable DRFP unless explicitly disabled)
     relax.setdefault("reaction_smiles", norm.get("normalized") or reaction)

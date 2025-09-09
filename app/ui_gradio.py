@@ -22,6 +22,11 @@ if ROOT not in sys.path:
 import gradio as gr
 
 from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
+# Optional role-aware single-molecule featurizer
+try:
+    from chem_feats import featurize_mol as role_feat_mol  # type: ignore
+except Exception:
+    role_feat_mol = None  # type: ignore
 
 
 def _safe_json_loads(s: str) -> Dict[str, Any]:
@@ -142,6 +147,12 @@ def ui_precedent_search(
     elec, nuc, reactants = _pick_elec_nuc_from_reaction(reaction or "")
     fam = router.detect_family(reactants).get("family") or "Unknown"
     feat = featurizers.molecular.featurize(elec, nuc)
+    # Drop nested role_aware to keep features hashable for caching
+    if isinstance(feat, dict) and "role_aware" in feat:
+        try:
+            feat = {k: v for k, v in feat.items() if k != "role_aware"}
+        except Exception:
+            feat.pop("role_aware", None)  # type: ignore
 
     relax: Dict[str, Any] = {
         "reaction_smiles": reaction or "",
@@ -230,6 +241,69 @@ def build_demo() -> gr.Blocks:
             feat_btn = gr.Button("Featurize")
             feat_out = gr.JSON(label="Features")
             feat_btn.click(ui_featurize_molecular, inputs=[elec_in, nuc_in], outputs=[feat_out])
+
+        with gr.Tab("Single Molecule (basic)"):
+            smi_in = gr.Textbox(label="SMILES", value="Clc1ccccc1")
+            roles_in = gr.CheckboxGroup(
+                choices=["amine", "alcohol", "aryl_halide"],
+                label="Roles (optional; leave empty for globals-only)",
+                value=[],
+            )
+            show_full = gr.Checkbox(value=False, label="Show full fields list (unchecked shows preview)")
+            with gr.Row():
+                smi_btn = gr.Button("Featurize molecule")
+                dl_btn = gr.DownloadButton(label="Download CSV")
+            smi_out = gr.JSON(label="Result (vector length, masks, fields)")
+            csv_code = gr.Code(label="CSV preview")
+
+            def _ui_single_molecule(smi: str, roles: list[str], show_full_fields: bool) -> dict:
+                if role_feat_mol is None:
+                    return {"error": "role-aware featurizer unavailable"}
+                roles = roles or []
+                out = role_feat_mol(smi or "", roles=roles)
+                vec = out.get("vector")
+                try:
+                    out["vector"] = vec.tolist()  # type: ignore
+                except Exception:
+                    pass
+                out["length"] = len(out.get("vector") or [])
+                # fields handling
+                flds = out.get("fields") or []
+                if not show_full_fields:
+                    out["fields_preview"] = flds[:12]
+                    try:
+                        del out["fields"]
+                    except Exception:
+                        pass
+                return out
+
+            def _to_csv(smi: str, roles: list[str]):
+                if role_feat_mol is None:
+                    return b"error,role-aware featurizer unavailable\n"
+                roles = roles or []
+                out = role_feat_mol(smi or "", roles=roles)
+                vec = out.get("vector")
+                try:
+                    vec_list = vec.tolist()  # type: ignore
+                except Exception:
+                    vec_list = list(vec or [])  # type: ignore
+                fields = out.get("fields") or []
+                # Build CSV: field,value
+                lines = ["field,value"]
+                n = min(len(fields), len(vec_list))
+                for i in range(n):
+                    name = str(fields[i]).replace('"', '""')
+                    val = vec_list[i]
+                    lines.append(f'"{name}",{val}')
+                csv_text = "\n".join(lines) + "\n"
+                return csv_text.encode("utf-8")
+
+            smi_btn.click(_ui_single_molecule, inputs=[smi_in, roles_in, show_full], outputs=[smi_out])
+            # Update CSV preview and download
+            def _update_csv_preview(smi: str, roles: list[str]) -> str:
+                return _to_csv(smi, roles)
+            smi_btn.click(_update_csv_preview, inputs=[smi_in, roles_in], outputs=[csv_code])
+            dl_btn.click(_to_csv, inputs=[smi_in, roles_in], outputs=[dl_btn])
 
         with gr.Tab("Properties Lookup"):
             prop_in = gr.Textbox(label="Query (name, CAS, token)", value="Water")

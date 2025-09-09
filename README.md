@@ -1,6 +1,6 @@
-# chemtools-project (v2)
+Ôªø# chemtools-project (v2)
 
-Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition recommendation. Focuses on Ullmann C‚ÄìN first, with simple hooks for more families.
+Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition recommendation. Focuses on Ullmann CÈà•Êèò first, with simple hooks for more families.
 
 ## Quickstart
 - Create a virtualenv and install deps:
@@ -54,6 +54,7 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
   - SMILES Normalize: normalize a single SMILES.
   - Detect Family: infer reaction family from reactants (dot or newline separated).
   - Molecular Featurizer: inspect LG/nucleophile class/bin features.
+  - Single Molecule (basic): globals-only vector by default; optionally add roles (amine/alcohol/aryl_halide).
   - Properties Lookup: query by name/CAS/token (e.g., "Water", "7778-53-2").
   - Recommend Conditions: runs the recommender over a reaction SMILES.
   - Design Plate: proposes a plate CSV across top cores.
@@ -73,39 +74,39 @@ Tips
 
 ## Endpoints
 - `GET /health`: health probe.
-- `POST /api/v1/smiles/normalize` ‚Ä?Normalize SMILES.
+- `POST /api/v1/smiles/normalize` Èà•?Normalize SMILES.
   - In: `{ "smiles": "Brc1ccc(F)cc1.O" }`
   - Out: `{ "input", "fragments", "largest_smiles", "smiles_norm" }`
-- `POST /api/v1/router/detect-family` ‚Ä?Detect reaction family.
+- `POST /api/v1/router/detect-family` Èà•?Detect reaction family.
   - In: `{ "reactants": ["Brc1ccc(F)cc1", "Nc1ccccc1"] }`
   - Out: `{ "family", "confidence", "hits" }`
-- `POST /api/v1/featurize/molecular` (alias: `/api/v1/featurize/ullmann`) ‚Ä?Substrate features for Ullmann C‚ÄìN.
+- `POST /api/v1/featurize/molecular` (alias: `/api/v1/featurize/ullmann`) Èà•?Substrate features for Ullmann CÈà•Êèò.
   - In: `{ "electrophile": "...", "nucleophile": "..." }`
-  - Out: feature dict including `LG`, `nuc_class`, `bin`, ‚Ä?
-- `POST /api/v1/condition-core/parse` ‚Ä?Parse ConditionCore from reagents/text.
+  - Out: feature dict including `LG`, `nuc_class`, `bin`, Èà•?
+- `POST /api/v1/condition-core/parse` Èà•?Parse ConditionCore from reagents/text.
   - In: `{ "reagents": [{"uid":"7681-65-4","role":"CATALYST","name":"CuI"}, {"uid":"72-52-8","role":"LIGAND","name":"Phenanthroline"}], "text": "optional free text" }`
   - Out: `{ "core": "Cu/Phenanthroline", ... }`
-- `POST /api/v1/properties/lookup` ‚Ä?Minimal properties by UID/token.
+- `POST /api/v1/properties/lookup` Èà•?Minimal properties by UID/token.
   - In: `{ "query": "K3PO4" }` or `{ "query": "7778-53-2" }`
-- `POST /api/v1/precedent/knn` ‚Ä?Retrieve similar precedents.
+- `POST /api/v1/precedent/knn` Èà•?Retrieve similar precedents.
   - In: `{ "family": "Ullmann_CN", "features": {"bin":"LG:Br|NUC:aniline"}, "k": 50 }`
-- `POST /api/v1/constraints/filter` ‚Ä?Inventory/blacklist filtering of candidate IDs.
-- `POST /api/v1/explain/precedents` ‚Ä?Short reasons and example precedents.
+- `POST /api/v1/constraints/filter` Èà•?Inventory/blacklist filtering of candidate IDs.
+- `POST /api/v1/explain/precedents` Èà•?Short reasons and example precedents.
 
 Notes:
 - RDKit is optional at runtime; if unavailable, SMILES normalization falls back to simple heuristics.
 - Sample data lives under `data/` and is used by the precedent demo.
 
 ## Project Structure
-- `app/main.py` ‚Ä?FastAPI app and routes.
-- `chemtools/` ‚Ä?Deterministic tool implementations:
+- `app/main.py` Èà•?FastAPI app and routes.
+- `chemtools/` Èà•?Deterministic tool implementations:
   - `smiles.py`, `router.py`, `properties.py`, `precedent.py`, `constraints.py`, `explain.py`
-  - `condition_core.py` ‚Ä?normalizes ConditionCore
-  - `featurizers/molecular.py` (alias kept: `featurizers/ullmann.py`) ‚Ä?Ullmann C‚ÄìN featurizer
-  - `util/rdkit_helpers.py` ‚Ä?RDKit helpers (safe import)
-- `tests/` ‚Ä?Lightweight unit tests
-- `data/` ‚Ä?Small JSONL samples for precedents
-- `chemistry_tool_bulild_plan.md` ‚Ä?Build plan and roadmap
+  - `condition_core.py` Èà•?normalizes ConditionCore
+  - `featurizers/molecular.py` (alias kept: `featurizers/ullmann.py`) Èà•?Ullmann CÈà•Êèò featurizer
+  - `util/rdkit_helpers.py` Èà•?RDKit helpers (safe import)
+- `tests/` Èà•?Lightweight unit tests
+- `data/` Èà•?Small JSONL samples for precedents
+- `chemistry_tool_bulild_plan.md` Èà•?Build plan and roadmap
 
 ## Development Notes
 - API surfaces match the contracts in `chemtools/contracts.py`.
@@ -150,3 +151,26 @@ Internal project scaffold. Add a LICENSE if distributing.
   - Use this to align downstream models to a stable field order.
 
 
+
+### Convenience: Single-Molecule Featurization
+- POST `/api/v1/featurize/molecule`
+  - Default (globals-only): roles omitted ‚Üí roles=[]
+  - In: `{ "smiles": "Clc1ccccc1" }` ‚Üí returns only global descriptors
+  - With types: include role blocks
+    - In: `{ "smiles": "Nc1ccccc1", "roles": ["amine"] }`
+    - In: `{ "smiles": "Clc1ccccc1", "roles": ["aryl_halide"] }`
+- Field schema: `GET /api/v1/featurize/role-aware/fields?roles=amine` or `?roles=` (globals only)
+
+Examples
+- Globals-only curl:
+  ```bash
+  curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/molecule \
+    -H "Content-Type: application/json" \
+    -d '{"smiles":"Clc1ccccc1"}' | jq '{len: (.vector|length), fields: .fields[0:8], masks: .masks}'
+  ```
+- Amine-only curl:
+  ```bash
+  curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/molecule \
+    -H "Content-Type: application/json" \
+    -d '{"smiles":"Nc1ccccc1","roles":["amine"]}' | jq '{len: (.vector|length), masks: .masks}'
+  ```
