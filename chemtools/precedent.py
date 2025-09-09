@@ -83,6 +83,8 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         elec, nuc = _pick_electrophile_nucleophile(reactants_list)
         features = feat_ullmann.featurize(elec, nuc)
         # Build uniform row
+        catalyst_obj = rec.get("catalyst") or {}
+        full_system = catalyst_obj.get("full_system") if isinstance(catalyst_obj, dict) else None
         return {
             "reaction_id": rxn_id,
             "rxn_type": fam_txt,
@@ -92,6 +94,12 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "condition_core": core,
             "base_uid": base_uid,
             "solvent_uid": solvent_uid,
+            "reagents": rec.get("reagents") or [],
+            "solvents": rec.get("solvents") or [],
+            "reference": rec.get("reference") or {},
+            "conditions": cond,
+            "catalyst": catalyst_obj,
+            "full_system": full_system,
             "features": features,
             "reaction_smiles": rxn_smiles,
         }
@@ -373,16 +381,39 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
     bin_key = str(features.get("bin") or f"LG:{target_feat.get('LG','?')}|NUC:{target_feat.get('nuc_class','?')}")
     proto = f"proto_{family_norm}_{abs(hash(bin_key)) % 100000}"
 
-    precedents = [
-        {
+    # Include reaction SMILES and parsed sides for UI/consumers
+    try:
+        from .smiles import _split_reaction_smiles as _split_rxn  # type: ignore
+    except Exception:
+        def _split_rxn(rsmi: str):
+            parts = (rsmi or "").split(">")
+            if len(parts) == 2 and ">>" in (rsmi or ""):
+                return parts[0], "", parts[1]
+            if len(parts) == 3:
+                return parts[0], parts[1], parts[2]
+            return rsmi, "", ""
+
+    precedents = []
+    for r in top[:10]:
+        rsmi = r.get("reaction_smiles") or ""
+        reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
+        precedents.append({
             "reaction_id": r.get("reaction_id"),
+            "reaction_smiles": rsmi,
+            "reactants_smiles": reactants_smi,
+            "products_smiles": products_smi,
+            "condition_core": r.get("condition_core"),
             "yield": r.get("yield_value"),
             "core": r.get("condition_core"),
             "base_uid": r.get("base_uid"),
             "solvent_uid": r.get("solvent_uid"),
+            "reagents": r.get("reagents"),
+            "solvents": r.get("solvents"),
+            "reference": r.get("reference"),
+            "conditions": r.get("conditions"),
+            "catalyst": r.get("catalyst"),
+            "full_system": r.get("full_system"),
             "T_C": r.get("T_C"),
             "time_h": r.get("time_h"),
-        }
-        for r in top[:10]
-    ]
+        })
     return {"prototype_id": proto, "support": support, "precedents": precedents}

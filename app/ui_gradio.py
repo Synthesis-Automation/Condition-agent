@@ -20,7 +20,7 @@ if ROOT not in sys.path:
 
 import gradio as gr
 
-from chemtools import smiles, router, properties, featurizers, recommend
+from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
 
 
 def _safe_json_loads(s: str) -> Dict[str, Any]:
@@ -108,6 +108,101 @@ def ui_design_plate(
     return out.get("csv", ""), table, meta
 
 
+def _pick_elec_nuc_from_reaction(rsmi: str) -> Tuple[str, str, list[str]]:
+    from chemtools.smiles import normalize_reaction
+    norm = normalize_reaction(rsmi or "")
+    reactants = [
+        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
+        for r in (norm.get("reactants") or [])
+    ]
+    def is_electrophile(s: str) -> bool:
+        t = (s or "").lower()
+        return ("br" in t) or ("cl" in t) or (" i" in t) or ("os(=o)(=o)c(f)(f)f" in t) or ("otf" in t)
+    elec, nuc = "", ""
+    if reactants:
+        if len(reactants) == 1:
+            elec, nuc = reactants[0], ""
+        else:
+            r0, r1 = reactants[0], reactants[1]
+            elec, nuc = (r0, r1) if is_electrophile(r0) else ((r1, r0) if is_electrophile(r1) else (r0, r1))
+    return elec, nuc, reactants
+
+
+def ui_precedent_search(
+    reaction: str,
+    k: int,
+    use_drfp: bool,
+    drfp_weight: float,
+    drfp_bits: int,
+    drfp_radius: int,
+    precompute_scope: str,
+) -> Tuple[Dict[str, Any], List[List[Any]]]:
+    # Detect family and featurize from reaction
+    elec, nuc, reactants = _pick_elec_nuc_from_reaction(reaction or "")
+    fam = router.detect_family(reactants).get("family") or "Unknown"
+    feat = featurizers.ullmann.featurize(elec, nuc)
+
+    relax: Dict[str, Any] = {
+        "reaction_smiles": reaction or "",
+        "use_drfp": bool(use_drfp),
+        "drfp_weight": float(drfp_weight),
+        "drfp_n_bits": int(drfp_bits),
+        "drfp_radius": int(drfp_radius),
+    }
+    if precompute_scope in {"candidates", "all"}:
+        relax["precompute_drfp"] = True
+        relax["precompute_scope"] = precompute_scope
+    else:
+        relax["precompute_drfp"] = False
+
+    pack = precedent.knn(fam, feat, k=int(k or 25), relax=relax)
+
+    # Build neighbors table (header + rows)
+    header = [
+        "reaction_id",
+        "reaction_smiles",
+        "reactants_smiles",
+        "products_smiles",
+        "yield",
+        "core",
+        "base_uid",
+        "solvent_uid",
+        "T_C",
+        "time_h",
+    ]
+    precs = list(pack.get("precedents") or [])
+    table: List[List[Any]] = [header]
+    for p in precs:
+        table.append([
+            p.get("reaction_id", ""),
+            p.get("reaction_smiles", ""),
+            p.get("reactants_smiles", ""),
+            p.get("products_smiles", ""),
+            p.get("yield", ""),
+            p.get("core", ""),
+            p.get("base_uid", ""),
+            p.get("solvent_uid", ""),
+            p.get("T_C", ""),
+            p.get("time_h", ""),
+        ])
+    return pack, table
+
+
+def ui_similarity_tanimoto(q: str, r: str, n_bits: int, radius: int) -> Dict[str, Any]:
+    if not q or not r:
+        return {"ok": False, "error": "provide two reaction SMILES"}
+    if not rs.drfp_available():
+        return {"ok": False, "error": "drfp/numpy not available in this environment"}
+    a = rs.encode_drfp_cached(q, n_bits=int(n_bits or 4096), radius=int(radius or 3))
+    b = rs.encode_drfp_cached(r, n_bits=int(n_bits or 4096), radius=int(radius or 3))
+    sim = rs.tanimoto(a, b)
+    try:
+        sim = float(sim)
+    except Exception:
+        sim = 0.0
+    return {"ok": True, "tanimoto": round(sim, 4)}
+
+
 def build_demo() -> gr.Blocks:
     with gr.Blocks(title="ChemTools UI") as demo:
         gr.Markdown("""
@@ -164,6 +259,34 @@ def build_demo() -> gr.Blocks:
                 inputs=[plate_in, plate_n, plate_relax, plate_constraints],
                 outputs=[plate_csv, plate_tbl, plate_meta],
             )
+
+        with gr.Tab("Precedent Search"):
+            ps_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
+            ps_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=200, value=50, step=1)
+            with gr.Row():
+                ps_use_drfp = gr.Checkbox(label="Use DRFP re-ranking", value=True)
+                ps_drfp_w = gr.Slider(label="DRFP weight", minimum=0.0, maximum=1.0, value=0.4, step=0.05)
+            with gr.Row():
+                ps_bits = gr.Number(label="DRFP bits", value=4096, precision=0)
+                ps_radius = gr.Number(label="DRFP radius", value=3, precision=0)
+                ps_prec_scope = gr.Radio(label="Precompute scope", choices=["none", "candidates", "all"], value="candidates")
+            ps_btn = gr.Button("Search")
+            ps_pack = gr.JSON(label="Pack (prototype, support, precedents)")
+            ps_tbl = gr.Dataframe(label="Top precedents", interactive=False)
+            ps_btn.click(
+                ui_precedent_search,
+                inputs=[ps_in, ps_k, ps_use_drfp, ps_drfp_w, ps_bits, ps_radius, ps_prec_scope],
+                outputs=[ps_pack, ps_tbl],
+            )
+
+        with gr.Tab("DRFP Similarity"):
+            s_q = gr.Textbox(label="Query reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
+            s_r = gr.Textbox(label="Reference reaction SMILES", value="Clc1ccccc1.Nc1ccccc1>>")
+            s_bits = gr.Number(label="DRFP bits", value=4096, precision=0)
+            s_radius = gr.Number(label="DRFP radius", value=3, precision=0)
+            s_btn = gr.Button("Compute Tanimoto")
+            s_out = gr.JSON(label="Result")
+            s_btn.click(ui_similarity_tanimoto, inputs=[s_q, s_r, s_bits, s_radius], outputs=[s_out])
 
     return demo
 

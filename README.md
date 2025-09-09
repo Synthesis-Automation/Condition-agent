@@ -28,6 +28,49 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
   ```
   Or with Makefile shortcuts: `make install`, `make run`, `make test`.
 
+## How to Test
+
+### 1) Unit tests (fast, deterministic)
+- Run all: `pytest -q`
+- Notes: tests disable heavy RDKit paths automatically; no extra setup needed.
+
+### 2) Exercise the API via Swagger
+- Start: `uvicorn app.main:app --reload --port 8000`
+- Open: http://127.0.0.1:8000/docs
+- Try endpoints:
+  - POST `/api/v1/smiles/normalize` with `{ "smiles": "c1ccccc1O" }`
+  - POST `/api/v1/router/detect-family` with `{ "reactants": ["Clc1ccccc1","Nc1ccccc1"] }`
+  - POST `/api/v1/featurize/ullmann` with `{ "electrophile": "Clc1ccccc1", "nucleophile": "Nc1ccccc1" }`
+
+### 3) Quick Python one-liners
+- Normalize: `python -c "from chemtools.smiles import normalize; print(normalize('c1ccccc1O')['smiles_norm'])"`
+- Detect family: `python -c "from chemtools.router import detect_family; print(detect_family(['Clc1ccccc1','Nc1ccccc1']))"`
+- Featurize: `python -c "from chemtools.featurizers.ullmann import featurize; print(featurize('Clc1ccccc1','Nc1ccccc1'))"`
+
+### 4) Gradio UI (no-code testing)
+- Launch: `python app/ui_gradio.py`
+- Open: http://127.0.0.1:7860
+- Tabs included:
+  - SMILES Normalize: normalize a single SMILES.
+  - Detect Family: infer reaction family from reactants (dot or newline separated).
+  - Ullmann Featurizer: inspect LG/nucleophile class/bin features.
+  - Properties Lookup: query by name/CAS/token (e.g., "Water", "7778-53-2").
+  - Recommend Conditions: runs the recommender over a reaction SMILES.
+  - Design Plate: proposes a plate CSV across top cores.
+  - Precedent Search: retrieves similar precedents (optionally DRFP re-ranking).
+  - DRFP Similarity: Tanimoto between two reaction SMILES (if DRFP installed).
+
+Optional: install DRFP to enable similarity re-ranking and the similarity tab
+```
+pip install drfp==0.4.0 numpy
+```
+
+Tips
+- Speed up or run without RDKit: set `CHEMTOOLS_DISABLE_RDKIT=1`
+  - macOS/Linux: `export CHEMTOOLS_DISABLE_RDKIT=1`
+  - Windows (PowerShell): `$env:CHEMTOOLS_DISABLE_RDKIT='1'`
+- If running `python app/ui_gradio.py` outside the repo root, prefer module mode: `python -m app.ui_gradio`
+
 ## Endpoints
 - `GET /health`: health probe.
 - `POST /api/v1/smiles/normalize` — Normalize SMILES.
