@@ -156,8 +156,8 @@ def build_demo() -> gr.Blocks:
             plate_relax = gr.Textbox(label="Relax (JSON)", value="")
             plate_constraints = gr.Textbox(label="Constraints (JSON)", value="")
             plate_btn = gr.Button("Design")
-            plate_csv = gr.Code(label="CSV", language="csv")
-            plate_tbl = gr.Dataframe(label="Preview", wrap=True, interactive=False)
+            plate_csv = gr.Code(label="CSV")
+            plate_tbl = gr.Dataframe(label="Preview", interactive=False)
             plate_meta = gr.JSON(label="Meta")
             plate_btn.click(
                 ui_design_plate,
