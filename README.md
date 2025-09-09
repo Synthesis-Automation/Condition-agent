@@ -152,6 +152,24 @@ Internal project scaffold. Add a LICENSE if distributing.
 
 
 
+
+## Performance & Tuning
+- First run can be slow (60–120s) because it loads and parses the reaction dataset under `data/reaction_dataset/`, runs RDKit parsing/heuristics, and warms in‑memory caches. Subsequent calls are much faster.
+- Keep the server/UI running to reuse caches instead of restarting between calls.
+
+Speed tips
+- Disable heavy RDKit paths (fast demo mode):
+  - macOS/Linux: `export CHEMTOOLS_DISABLE_RDKIT=1`
+  - Windows (PowerShell): `$env:CHEMTOOLS_DISABLE_RDKIT='1'`
+- Skip loading the large dataset (for quick dev/testing):
+  - macOS/Linux: `export CHEMTOOLS_LOAD_DATASET=0`
+  - Windows (PowerShell): `$env:CHEMTOOLS_LOAD_DATASET='0'`
+  - Note: recommendation/precedent features depend on precedents; disabling the dataset may reduce results.
+- Turn off DRFP re‑ranking if installed (saves fingerprinting time):
+  - API: send `{"relax": {"use_drfp": false}}` in `/api/v1/recommend` or Precedent Search.
+  - UI: uncheck “Use DRFP re‑ranking” (Precedent Search tab).
+- Avoid “precompute all” for DRFP: keep precompute scope to `candidates` (default) or disable precompute to prevent warming all rows.
+- Role‑aware vectors are attached for inspection but not used for candidate caching/scoring; computation still costs time. If you only need basic features, use the Single Molecule (basic) tab or the convenience endpoint `/api/v1/featurize/molecule` (roles omitted → globals only).
 ### Convenience: Single-Molecule Featurization
 - POST `/api/v1/featurize/molecule`
   - Default (globals-only): roles omitted → roles=[]
