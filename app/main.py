@@ -4,8 +4,15 @@ from chemtools.contracts import (
     ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
     ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest,
     RecommendFromReactionRequest, PlateDesignRequest,
+    RoleAwareMolRequest, RoleAwareReactionRequest,
 )
 from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain, recommend
+try:
+    from chem_feats import featurize_mol as role_featurize_mol, featurize_reaction as role_featurize_reaction  # type: ignore
+    from chem_feats.registry import REGISTRY as ROLE_REGISTRY  # type: ignore
+    _HAS_ROLE_FEATS = True
+except Exception:
+    _HAS_ROLE_FEATS = False
 import logging, time
 
 # Optional Prometheus metrics
@@ -60,7 +67,84 @@ def api_smiles_normalize(req: NormalizeRequest): return smiles.normalize(req.smi
 def api_router_detect(req: DetectFamilyRequest): return router.detect_family(req.reactants)
 
 @app.post("/api/v1/featurize/ullmann")
-def api_featurize_ullmann(req: FeaturizeUllmannRequest): return featurizers.ullmann.featurize(req.electrophile, req.nucleophile)
+def api_featurize_ullmann(req: FeaturizeUllmannRequest):
+    # Backwards-compatible alias; prefer /api/v1/featurize/molecular
+    return featurizers.molecular.featurize(req.electrophile, req.nucleophile)
+
+@app.post("/api/v1/featurize/molecular")
+def api_featurize_molecular(req: FeaturizeUllmannRequest):
+    return featurizers.molecular.featurize(req.electrophile, req.nucleophile)
+
+@app.post("/api/v1/featurize/role-aware/molecule")
+def api_featurize_role_molecule(req: RoleAwareMolRequest):
+    if not _HAS_ROLE_FEATS:
+        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
+    out = role_featurize_mol(req.smiles, roles=req.roles or None)
+    vec = out.get("vector")
+    try:
+        out["vector"] = vec.tolist()  # type: ignore
+    except Exception:
+        pass
+    return out
+
+@app.post("/api/v1/featurize/role-aware/reaction")
+def api_featurize_role_reaction(req: RoleAwareReactionRequest):
+    if not _HAS_ROLE_FEATS:
+        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
+    out = role_featurize_reaction(req.reaction)
+    # Ensure vectors are JSON-serializable lists
+    try:
+        for item in out.get("reactants") or []:  # type: ignore[union-attr]
+            vec = item.get("vector")
+            try:
+                item["vector"] = vec.tolist()  # type: ignore
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return out
+
+
+@app.get("/api/v1/featurize/role-aware/fields")
+def api_role_aware_fields(roles: str | None = None):
+    """Describe role-aware field order and registry.
+
+    Query param `roles` can be a comma-separated list; defaults to amine,alcohol,aryl_halide.
+    """
+    if not _HAS_ROLE_FEATS:
+        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
+    # Parse and normalize roles
+    default_roles = ["amine", "alcohol", "aryl_halide"]
+    if roles is None or not str(roles).strip():
+        use_roles = default_roles
+    else:
+        use_roles = [r.strip() for r in str(roles).split(",") if r.strip()]
+        # Keep only known roles, preserve order
+        known = {"amine", "alcohol", "aryl_halide"}
+        use_roles = [r for r in use_roles if r in known]
+        if not use_roles:
+            use_roles = default_roles
+
+    # Assemble fields: global -> role fields (in order) -> fingerprints per role
+    fields: list[str] = []
+    fields.extend([f.get("name", "") for f in ROLE_REGISTRY.get("global", [])])
+    for r in use_roles:
+        fields.extend([f.get("name", "") for f in ROLE_REGISTRY.get(r, [])])
+    for r in use_roles:
+        bits = int(ROLE_REGISTRY.get("fingerprints", {}).get(r, {}).get("bits", 512))
+        fields.extend([f"fp.{r}.{i}" for i in range(bits)])
+
+    counts = {
+        "global": len(ROLE_REGISTRY.get("global", [])),
+        "by_role": {r: len(ROLE_REGISTRY.get(r, [])) for r in use_roles},
+        "fingerprints": {r: int(ROLE_REGISTRY.get("fingerprints", {}).get(r, {}).get("bits", 512)) for r in use_roles},
+    }
+    return {
+        "roles": use_roles,
+        "fields": fields,
+        "counts": {**counts, "total": len(fields)},
+        "registry": ROLE_REGISTRY,
+    }
 
 @app.post("/api/v1/condition-core/parse")
 def api_condition_core(req: ConditionCoreParseRequest): return condition_core.parse_core(req.reagents, req.text or "")

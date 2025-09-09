@@ -4,6 +4,13 @@ import re
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
 
+# Optional role-aware featurization (graceful fallback if package missing)
+try:
+    from chem_feats import featurize_mol as _role_feat
+    _HAS_ROLE_FEATS = True
+except Exception:
+    _HAS_ROLE_FEATS = False
+
 
 def _guess_lg_text(s: str) -> str:
     t = (s or "").lower()
@@ -251,4 +258,17 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
 def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     # Wrapper around cached implementation; returns a copy to avoid accidental mutation of cache entry
     feat = _featurize_cached(electrophile, nucleophile)
-    return dict(feat)
+    out = dict(feat)
+    # Attach role-aware vectors for downstream models/UI if available
+    if _HAS_ROLE_FEATS:
+        try:
+            elec_ra = _role_feat(electrophile, roles=["aryl_halide"])  # type: ignore[arg-type]
+            # nucleophile may be amine or alcohol; compute both roles
+            nuc_ra = _role_feat(nucleophile, roles=["amine", "alcohol"])  # type: ignore[arg-type]
+            out["role_aware"] = {
+                "electrophile": elec_ra,
+                "nucleophile": nuc_ra,
+            }
+        except Exception:
+            pass
+    return out

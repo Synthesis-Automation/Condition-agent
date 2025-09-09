@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Tuple, Optional
 import os, json
 from functools import lru_cache
-from .featurizers import ullmann as feat_ullmann
+from .featurizers import molecular as feat_molecular
 from . import reaction_similarity as rs
 
 # Local helper to pick electrophile vs nucleophile from reactants list
@@ -81,7 +81,7 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # Coarse features for candidate binning (Ullmann currently)
         reactants_list = [p for p in (rcts.split('.') if rcts else []) if p]
         elec, nuc = _pick_electrophile_nucleophile(reactants_list)
-        features = feat_ullmann.featurize(elec, nuc)
+        features = feat_molecular.featurize(elec, nuc)
         # Build uniform row
         catalyst_obj = rec.get("catalyst") or {}
         full_system = catalyst_obj.get("full_system") if isinstance(catalyst_obj, dict) else None

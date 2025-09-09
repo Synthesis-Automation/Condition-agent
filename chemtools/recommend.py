@@ -5,7 +5,7 @@ from collections import Counter
 
 from .smiles import normalize_reaction
 from .router import detect_family
-from .featurizers import ullmann as feat_ullmann
+from .featurizers import molecular as feat_molecular
 from . import precedent, constraints, explain
 
 
@@ -76,9 +76,9 @@ def recommend_from_reaction(
     elec, nuc = _pick_electrophile_nucleophile(reactants)
     features: Dict[str, Any] = {}
     if fam == "Ullmann_CN":
-        features = feat_ullmann.featurize(elec, nuc)
+        features = feat_molecular.featurize(elec, nuc)
     else:
-        features = feat_ullmann.featurize(elec, nuc)
+        features = feat_molecular.featurize(elec, nuc)
 
     # 4) Retrieve precedents (enable DRFP unless explicitly disabled)
     relax.setdefault("reaction_smiles", norm.get("normalized") or reaction)

@@ -36,3 +36,11 @@ class ConditionCoreValidateRequest(BaseModel):
     limit: int = 0
     show_mismatches: int = 10
     metal_only_ok: bool = True
+
+# Role-aware featurization
+class RoleAwareMolRequest(BaseModel):
+    smiles: str
+    roles: Optional[List[str]] = None  # e.g., ["amine", "aryl_halide"]
+
+class RoleAwareReactionRequest(BaseModel):
+    reaction: str

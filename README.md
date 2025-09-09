@@ -40,12 +40,12 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
 - Try endpoints:
   - POST `/api/v1/smiles/normalize` with `{ "smiles": "c1ccccc1O" }`
   - POST `/api/v1/router/detect-family` with `{ "reactants": ["Clc1ccccc1","Nc1ccccc1"] }`
-  - POST `/api/v1/featurize/ullmann` with `{ "electrophile": "Clc1ccccc1", "nucleophile": "Nc1ccccc1" }`
+  - POST `/api/v1/featurize/molecular` with `{ "electrophile": "Clc1ccccc1", "nucleophile": "Nc1ccccc1" }` (alias: `/api/v1/featurize/ullmann`)
 
 ### 3) Quick Python one-liners
 - Normalize: `python -c "from chemtools.smiles import normalize; print(normalize('c1ccccc1O')['smiles_norm'])"`
 - Detect family: `python -c "from chemtools.router import detect_family; print(detect_family(['Clc1ccccc1','Nc1ccccc1']))"`
-- Featurize: `python -c "from chemtools.featurizers.ullmann import featurize; print(featurize('Clc1ccccc1','Nc1ccccc1'))"`
+- Featurize: `python -c "from chemtools.featurizers.molecular import featurize; print(featurize('Clc1ccccc1','Nc1ccccc1'))"`
 
 ### 4) Gradio UI (no-code testing)
 - Launch: `python app/ui_gradio.py`
@@ -53,7 +53,7 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
 - Tabs included:
   - SMILES Normalize: normalize a single SMILES.
   - Detect Family: infer reaction family from reactants (dot or newline separated).
-  - Ullmann Featurizer: inspect LG/nucleophile class/bin features.
+  - Molecular Featurizer: inspect LG/nucleophile class/bin features.
   - Properties Lookup: query by name/CAS/token (e.g., "Water", "7778-53-2").
   - Recommend Conditions: runs the recommender over a reaction SMILES.
   - Design Plate: proposes a plate CSV across top cores.
@@ -114,3 +114,37 @@ Notes:
 
 ## License
 Internal project scaffold. Add a LICENSE if distributing.
+
+## Role-Aware Featurization (API)
+- POST `/api/v1/featurize/role-aware/molecule`
+  - In: `{ "smiles": "Clc1ccccc1", "roles": ["aryl_halide"] }` (roles optional; default `["amine","alcohol","aryl_halide"]`)
+  - Out: `{ vector: [float...], fields: [str...], masks: {amine|alcohol|aryl_halide}, meta: {centers, roles} }`
+- POST `/api/v1/featurize/role-aware/reaction`
+  - In: `{ "reaction": "Brc1ccccc1.Nc1ccccc1>>" }`
+  - Out: `{ reactants: [ {smiles, vector, fields, masks, meta}, ... ] }`
+- GET `/api/v1/featurize/role-aware/fields?roles=amine,alcohol,aryl_halide`
+  - Out: `{ roles: [...], fields: [...], counts: {global, by_role, fingerprints, total}, registry: {...} }`
+
+### Examples
+- Molecule (aryl halide):
+  - Request:
+    ```bash
+    curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/role-aware/molecule \
+      -H "Content-Type: application/json" \
+      -d '{"smiles":"Clc1ccccc1","roles":["aryl_halide"]}' | jq '{fields: .fields[0:8], vector: .vector[0:8], masks: .masks}'
+    ```
+  - Output (sample):
+    `{"fields":["global.MW","global.logP",...], "vector":[112.56,2.93,...], "masks":{"aryl_halide":1,"amine":0,"alcohol":0}}`
+- Reaction (default roles for all reactants):
+  - Request:
+    ```bash
+    curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/role-aware/reaction \
+      -H "Content-Type: application/json" \
+      -d '{"reaction":"Brc1ccccc1.Nc1ccccc1>>"}' | jq '.reactants[0] | {smiles, len: (.vector|length), masks}'
+    ```
+- Field list for specific roles:
+  - Request:
+    ```bash
+    curl -s "http://127.0.0.1:8000/api/v1/featurize/role-aware/fields?roles=amine,aryl_halide" | jq '.counts, (.fields[0:10])'
+    ```
+  - Use this to align downstream models to a stable field order.

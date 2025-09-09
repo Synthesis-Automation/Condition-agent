@@ -52,8 +52,8 @@ def ui_detect_family(reactants_text: str) -> Dict[str, Any]:
     return router.detect_family(reactants)
 
 
-def ui_featurize_ullmann(electrophile: str, nucleophile: str) -> Dict[str, Any]:
-    return featurizers.ullmann.featurize(electrophile or "", nucleophile or "")
+def ui_featurize_molecular(electrophile: str, nucleophile: str) -> Dict[str, Any]:
+    return featurizers.molecular.featurize(electrophile or "", nucleophile or "")
 
 
 def ui_properties_lookup(query: str) -> Dict[str, Any]:
@@ -223,12 +223,12 @@ def build_demo() -> gr.Blocks:
             react_out = gr.JSON(label="Family Result")
             react_btn.click(ui_detect_family, inputs=[react_in], outputs=[react_out])
 
-        with gr.Tab("Ullmann Featurizer"):
+        with gr.Tab("Molecular Featurizer"):
             elec_in = gr.Textbox(label="Electrophile", value="Clc1ccccc1")
             nuc_in = gr.Textbox(label="Nucleophile", value="Nc1ccccc1")
             feat_btn = gr.Button("Featurize")
             feat_out = gr.JSON(label="Features")
-            feat_btn.click(ui_featurize_ullmann, inputs=[elec_in, nuc_in], outputs=[feat_out])
+            feat_btn.click(ui_featurize_molecular, inputs=[elec_in, nuc_in], outputs=[feat_out])
 
         with gr.Tab("Properties Lookup"):
             prop_in = gr.Textbox(label="Query (name, CAS, token)", value="Water")
