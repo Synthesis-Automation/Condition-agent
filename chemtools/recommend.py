@@ -150,6 +150,167 @@ def recommend_from_reaction(
         "solvents": solv_counts.most_common(3),
     }
 
+    # 10) Build formatted output similar to tests/format_of_recommended_reactions.json
+    def _nice_family_text(f: str) -> str:
+        t = (f or "").lower()
+        if t.startswith("ullmann"):
+            return "Ullmann"
+        if t.startswith("suzuki"):
+            return "Suzuki"
+        if t.startswith("amide"):
+            return "Amide"
+        return f or "Unknown"
+
+    def _lookup(uid: str) -> Dict[str, Any]:
+        try:
+            from .properties import lookup  # lazy import
+            res = lookup(uid)
+            if isinstance(res, dict) and res.get("found") and isinstance(res.get("record"), dict):
+                return res["record"]
+        except Exception:
+            pass
+        return {"uid": uid}
+
+    # Reactant chemicals (starting materials)
+    reactants_chems: List[Dict[str, Any]] = []
+    for r in (norm.get("reactants") or []):
+        smi = r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or ""
+        reactants_chems.append({
+            "name": None,
+            "cas": None,
+            "smiles": smi or None,
+            "equivalents": None,
+            "role": "starting_material",
+        })
+
+    # Catalyst system from precedents of chosen core (if available)
+    def _cat_items() -> List[Dict[str, Any]]:
+        items: List[Dict[str, Any]] = []
+        src = next((p for p in group if p.get("catalyst") or p.get("full_system")), None)
+        fs = None
+        if src:
+            cat = src.get("catalyst") or {}
+            fs = src.get("full_system") or (cat.get("full_system") if isinstance(cat, dict) else None)
+        # Fallback: empty
+        if not isinstance(fs, list):
+            return items
+        def role_for(name: str) -> str:
+            n = (name or "").lower()
+            if any(tok in n for tok in ["pd", "palladium", "cu", "copper", "ni", "nickel", "ru", "ruthenium", "co", "cobalt"]):
+                return "metal_precursor"
+            return "ligand"
+        for it in fs:
+            nm = (it or {}).get("name")
+            cs = (it or {}).get("cas")
+            items.append({
+                "name": nm,
+                "cas": cs,
+                "smiles": None,
+                "equivalents": None,
+                "role": role_for(str(nm or "")),
+            })
+        return items
+
+    # Base and solvent chemicals using lookups
+    base_rec = _lookup(base_pick) if base_pick else {}
+    solv_rec = _lookup(solv_pick) if solv_pick else {}
+    base_item = ({
+        "name": base_rec.get("name") or base_rec.get("token") or base_rec.get("uid") or None,
+        "cas": base_rec.get("uid") or None,
+        "smiles": None,
+        "equivalents": None,
+        "role": "base",
+    } if base_pick else None)
+    solv_item = ({
+        "name": solv_rec.get("name") or solv_rec.get("token") or solv_rec.get("uid") or None,
+        "abbreviation": solv_rec.get("token") or None,
+        "cas": solv_rec.get("uid") or None,
+        "smiles": None,
+        "equivalents": None,
+        "role": "solvent",
+    } if solv_pick else None)
+
+    # Compose a few recommended condition variants using top solvent/base alternatives
+    def _top_list(pairs: List[Tuple[str, int]]) -> List[str]:
+        return [p for p, _ in pairs if p]
+
+    alt_bases = _top_list(base_counts.most_common(3))
+    alt_solvs = _top_list(solv_counts.most_common(3))
+
+    variants: List[Dict[str, Any]] = []
+    # Always include the primary pick
+    cat_items = _cat_items()
+    primary_chems = list(reactants_chems) + cat_items
+    if base_item:
+        primary_chems.append(base_item)
+    if solv_item:
+        primary_chems.append(solv_item)
+    cond_text = {
+        "temperature": (f"{int(T_med)} °C" if isinstance(T_med, (int, float)) else None),
+        "time": (f"{t_med} h" if isinstance(t_med, (int, float)) else None),
+        "atmosphere": None,
+    }
+    variants.append({
+        "reaction": {"smiles": norm.get("normalized") or reaction},
+        "chemicals": primary_chems,
+        "conditions": cond_text,
+    })
+
+    # Add up to two alternative solvent/base variants
+    tried: set[tuple] = set()
+    tried.add((base_pick or "", solv_pick or ""))
+    for b in alt_bases[:3]:
+        for s in alt_solvs[:3]:
+            if (b or "", s or "") in tried:
+                continue
+            tried.add((b or "", s or ""))
+            b_rec = _lookup(b) if b else {}
+            s_rec = _lookup(s) if s else {}
+            b_item = ({
+                "name": b_rec.get("name") or b_rec.get("token") or b_rec.get("uid") or None,
+                "cas": b_rec.get("uid") or None,
+                "smiles": None,
+                "equivalents": None,
+                "role": "base",
+            } if b else None)
+            s_item = ({
+                "name": s_rec.get("name") or s_rec.get("token") or s_rec.get("uid") or None,
+                "abbreviation": s_rec.get("token") or None,
+                "cas": s_rec.get("uid") or None,
+                "smiles": None,
+                "equivalents": None,
+                "role": "solvent",
+            } if s else None)
+            chems = list(reactants_chems) + cat_items
+            if b_item:
+                chems.append(b_item)
+            if s_item:
+                chems.append(s_item)
+            variants.append({
+                "reaction": {"smiles": norm.get("normalized") or reaction},
+                "chemicals": chems,
+                "conditions": cond_text,
+            })
+            if len(variants) >= 3:
+                break
+        if len(variants) >= 3:
+            break
+
+    from datetime import datetime
+    formatted = {
+        "meta": {
+            "generated_at": datetime.utcnow().replace(microsecond=0).isoformat(),
+            "analysis_type": "recommendation",
+            "status": "success",
+        },
+        "input": {
+            "reaction_smiles": norm.get("normalized") or reaction,
+            "selected_reaction_type": f"C-N Coupling - {_nice_family_text(fam)}" if fam else None,
+        },
+        "detection": {"reaction_type": _nice_family_text(fam)},
+        "recommended_conditions": variants,
+    }
+
     return {
         "input_reaction": reaction,
         "family": fam,
@@ -160,6 +321,7 @@ def recommend_from_reaction(
         "precedent_pack": pack,
         "reasons": reasons_pack.get("reasons"),
         "filters": {"base": base_filter, "solvent": solv_filter},
+        "formatted": formatted,
     }
 
 
