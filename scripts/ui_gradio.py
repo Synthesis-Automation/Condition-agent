@@ -90,6 +90,13 @@ def ui_download_csv(csv_text: str | None):
     txt = csv_text or ""
     if not txt.strip():
         return None
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".csv", mode="w", encoding="utf-8") as f:
+            f.write(txt)
+            path = f.name
+        return Path(path)
+    except Exception:
+        return None
 
 
 def ui_download_json(json_text: str | None):
@@ -103,13 +110,6 @@ def ui_download_json(json_text: str | None):
         return Path(path)
     except Exception:
         return None
-    try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".csv", mode="w", encoding="utf-8") as f:
-            f.write(txt)
-            path = f.name
-        return Path(path)
-    except Exception:
-        return None
 
 
 def ui_precedents(reaction: str, k: int, use_drfp: bool, drfp_weight: float):
@@ -117,20 +117,31 @@ def ui_precedents(reaction: str, k: int, use_drfp: bool, drfp_weight: float):
     out = recommend_from_reaction(reaction, k=int(k), relax=relax, constraint_rules={})
     pack = out.get("precedent_pack") or {}
     precs = list(pack.get("precedents") or [])
-    # Build CSV
+    # Build rows for the Dataframe and CSV
     header = ["reaction_id","yield","core","base_uid","solvent_uid","T_C","time_h"]
+    rows = []
+    for p in precs:
+        rows.append([
+            p.get("reaction_id"),
+            p.get("yield"),
+            p.get("core"),
+            p.get("base_uid"),
+            p.get("solvent_uid"),
+            p.get("T_C"),
+            p.get("time_h"),
+        ])
     def esc(v: Any) -> str:
         s = "" if v is None else str(v)
         return ('"' + s.replace('"','""') + '"') if ("," in s or '"' in s) else s
     lines = [",".join(header)]
-    for p in precs:
-        row = [p.get("reaction_id"), p.get("yield"), p.get("core"), p.get("base_uid"), p.get("solvent_uid"), p.get("T_C"), p.get("time_h")]
+    for r in rows:
         lines.append(
-            ",".join(esc(x) for x in row)
+            ",".join(esc(x) for x in r)
         )
     csv_text = "\n".join(lines) + ("\n" if lines else "")
     json_text = json.dumps(precs, ensure_ascii=False, indent=2)
-    return precs, csv_text, json_text
+    # Return a 2D list for the Dataframe component instead of list-of-dicts
+    return rows, csv_text, json_text
 
 
 with gr.Blocks(title="Condition Recommender") as demo:
