@@ -1,4 +1,5 @@
 from typing import Dict, Any
+import warnings, logging
 from functools import lru_cache
 import re
 
@@ -259,6 +260,17 @@ def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     # Wrapper around cached implementation; returns a copy to avoid accidental mutation of cache entry
     feat = _featurize_cached(electrophile, nucleophile)
     out = dict(feat)
+    try:
+        warnings.warn(
+            "chemtools.featurizers.ullmann.featurize is deprecated; use chemtools.featurizers.molecular.featurize",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        logging.getLogger("chemtools.featurizers").warning(
+            "Deprecated featurizer used: ullmann; prefer chemtools.featurizers.molecular"
+        )
+    except Exception:
+        pass
     # Attach role-aware vectors for downstream models/UI if available
     if _HAS_ROLE_FEATS:
         try:

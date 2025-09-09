@@ -73,39 +73,39 @@ Tips
 
 ## Endpoints
 - `GET /health`: health probe.
-- `POST /api/v1/smiles/normalize` â€” Normalize SMILES.
+- `POST /api/v1/smiles/normalize` â€?Normalize SMILES.
   - In: `{ "smiles": "Brc1ccc(F)cc1.O" }`
   - Out: `{ "input", "fragments", "largest_smiles", "smiles_norm" }`
-- `POST /api/v1/router/detect-family` â€” Detect reaction family.
+- `POST /api/v1/router/detect-family` â€?Detect reaction family.
   - In: `{ "reactants": ["Brc1ccc(F)cc1", "Nc1ccccc1"] }`
   - Out: `{ "family", "confidence", "hits" }`
-- `POST /api/v1/featurize/ullmann` â€” Substrate features for Ullmann Câ€“N.
+- `POST /api/v1/featurize/molecular` (alias: `/api/v1/featurize/ullmann`) â€?Substrate features for Ullmann Câ€“N.
   - In: `{ "electrophile": "...", "nucleophile": "..." }`
-  - Out: feature dict including `LG`, `nuc_class`, `bin`, â€¦
-- `POST /api/v1/condition-core/parse` â€” Parse ConditionCore from reagents/text.
+  - Out: feature dict including `LG`, `nuc_class`, `bin`, â€?
+- `POST /api/v1/condition-core/parse` â€?Parse ConditionCore from reagents/text.
   - In: `{ "reagents": [{"uid":"7681-65-4","role":"CATALYST","name":"CuI"}, {"uid":"72-52-8","role":"LIGAND","name":"Phenanthroline"}], "text": "optional free text" }`
   - Out: `{ "core": "Cu/Phenanthroline", ... }`
-- `POST /api/v1/properties/lookup` â€” Minimal properties by UID/token.
+- `POST /api/v1/properties/lookup` â€?Minimal properties by UID/token.
   - In: `{ "query": "K3PO4" }` or `{ "query": "7778-53-2" }`
-- `POST /api/v1/precedent/knn` â€” Retrieve similar precedents.
+- `POST /api/v1/precedent/knn` â€?Retrieve similar precedents.
   - In: `{ "family": "Ullmann_CN", "features": {"bin":"LG:Br|NUC:aniline"}, "k": 50 }`
-- `POST /api/v1/constraints/filter` â€” Inventory/blacklist filtering of candidate IDs.
-- `POST /api/v1/explain/precedents` â€” Short reasons and example precedents.
+- `POST /api/v1/constraints/filter` â€?Inventory/blacklist filtering of candidate IDs.
+- `POST /api/v1/explain/precedents` â€?Short reasons and example precedents.
 
 Notes:
 - RDKit is optional at runtime; if unavailable, SMILES normalization falls back to simple heuristics.
 - Sample data lives under `data/` and is used by the precedent demo.
 
 ## Project Structure
-- `app/main.py` â€” FastAPI app and routes.
-- `chemtools/` â€” Deterministic tool implementations:
+- `app/main.py` â€?FastAPI app and routes.
+- `chemtools/` â€?Deterministic tool implementations:
   - `smiles.py`, `router.py`, `properties.py`, `precedent.py`, `constraints.py`, `explain.py`
-  - `condition_core.py` â€” normalizes ConditionCore
-  - `featurizers/ullmann.py` â€” Ullmann Câ€“N featurizer
-  - `util/rdkit_helpers.py` â€” RDKit helpers (safe import)
-- `tests/` â€” Lightweight unit tests
-- `data/` â€” Small JSONL samples for precedents
-- `chemistry_tool_bulild_plan.md` â€” Build plan and roadmap
+  - `condition_core.py` â€?normalizes ConditionCore
+  - `featurizers/molecular.py` (alias kept: `featurizers/ullmann.py`) â€?Ullmann Câ€“N featurizer
+  - `util/rdkit_helpers.py` â€?RDKit helpers (safe import)
+- `tests/` â€?Lightweight unit tests
+- `data/` â€?Small JSONL samples for precedents
+- `chemistry_tool_bulild_plan.md` â€?Build plan and roadmap
 
 ## Development Notes
 - API surfaces match the contracts in `chemtools/contracts.py`.
@@ -148,3 +148,5 @@ Internal project scaffold. Add a LICENSE if distributing.
     curl -s "http://127.0.0.1:8000/api/v1/featurize/role-aware/fields?roles=amine,aryl_halide" | jq '.counts, (.fields[0:10])'
     ```
   - Use this to align downstream models to a stable field order.
+
+

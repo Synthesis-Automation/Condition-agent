@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 """
 Gradio UI to interactively test chemtools functions.
 
@@ -108,7 +109,7 @@ def ui_design_plate(
     return out.get("csv", ""), table, meta
 
 
-def _pick_elec_nuc_from_reaction(rsmi: str) -> Tuple[str, str, list[str]]:
+def _pick_elec_nuc_from_reaction(rsmi: str) -> Tuple[str, str, List[str]]:
     from chemtools.smiles import normalize_reaction
     norm = normalize_reaction(rsmi or "")
     reactants = [
@@ -140,7 +141,7 @@ def ui_precedent_search(
     # Detect family and featurize from reaction
     elec, nuc, reactants = _pick_elec_nuc_from_reaction(reaction or "")
     fam = router.detect_family(reactants).get("family") or "Unknown"
-    feat = featurizers.ullmann.featurize(elec, nuc)
+    feat = featurizers.molecular.featurize(elec, nuc)
 
     relax: Dict[str, Any] = {
         "reaction_smiles": reaction or "",
@@ -206,7 +207,7 @@ def ui_similarity_tanimoto(q: str, r: str, n_bits: int, radius: int) -> Dict[str
 def build_demo() -> gr.Blocks:
     with gr.Blocks(title="ChemTools UI") as demo:
         gr.Markdown("""
-        # ChemTools – Interactive UI
+        # ChemTools - Interactive UI
         Try common chemistry tools without writing code. Use the tabs below.
         """)
 
@@ -217,7 +218,7 @@ def build_demo() -> gr.Blocks:
             smi_btn.click(ui_normalize_smiles, inputs=[smi_in], outputs=[smi_out])
 
         with gr.Tab("Detect Family"):
-            gr.Markdown("""Enter reactants separated by '.' or new lines.""")
+            gr.Markdown("Enter reactants separated by '.' or new lines.")
             react_in = gr.Textbox(label="Reactants", value="Clc1ccccc1.Nc1ccccc1")
             react_btn = gr.Button("Detect")
             react_out = gr.JSON(label="Family Result")

@@ -67,8 +67,14 @@ def api_smiles_normalize(req: NormalizeRequest): return smiles.normalize(req.smi
 def api_router_detect(req: DetectFamilyRequest): return router.detect_family(req.reactants)
 
 @app.post("/api/v1/featurize/ullmann")
-def api_featurize_ullmann(req: FeaturizeUllmannRequest):
+def api_featurize_ullmann(req: FeaturizeUllmannRequest, response: Response):
     # Backwards-compatible alias; prefer /api/v1/featurize/molecular
+    logger.warning("DEPRECATED endpoint /api/v1/featurize/ullmann; use /api/v1/featurize/molecular")
+    try:
+        response.headers["X-Deprecated"] = "true"
+        response.headers["Link"] = "</api/v1/featurize/molecular>; rel=\"successor-version\""
+    except Exception:
+        pass
     return featurizers.molecular.featurize(req.electrophile, req.nucleophile)
 
 @app.post("/api/v1/featurize/molecular")
