@@ -87,6 +87,46 @@ def ui_recommend(
     )
 
 
+def ui_recommend_both(
+    reaction: str,
+    k: int,
+    relax_json: str,
+    constraints_json: str,
+) -> Tuple[Dict[str, Any], List[List[Any]], str]:
+    out = ui_recommend(reaction, k, relax_json, constraints_json)
+    # Build a compact 1-row table for the main recommendation
+    hdr = ["core", "base_uid", "solvent_uid", "T_C", "time_h", "confidence"]
+    rec = out.get("recommendation") or {}
+    row = [
+        rec.get("core", ""),
+        rec.get("base_uid", ""),
+        rec.get("solvent_uid", ""),
+        rec.get("T_C", ""),
+        rec.get("time_h", ""),
+        rec.get("confidence", ""),
+    ]
+    # Human-readable summary using names/tokens looked up from registry/properties
+    def _resolve_name(uid: str) -> str:
+        if not uid:
+            return ""
+        try:
+            res = properties.lookup(uid)
+            if isinstance(res, dict) and res.get("found") and isinstance(res.get("record"), dict):
+                recp = res["record"]
+                return str(recp.get("token") or recp.get("name") or recp.get("uid") or uid)
+        except Exception:
+            pass
+        return str(uid)
+    core_txt = str(rec.get("core") or "")
+    # strip trailing /none if present
+    if core_txt.endswith("/none"):
+        core_txt = core_txt[:-5]
+    base_txt = _resolve_name(str(rec.get("base_uid") or ""))
+    solv_txt = _resolve_name(str(rec.get("solvent_uid") or ""))
+    human = "/".join([s for s in [core_txt, base_txt, solv_txt] if s]) or ""
+    return out, [hdr, row], human
+
+
 def ui_design_plate(
     reaction: str,
     plate_size: int,
@@ -198,8 +238,8 @@ def ui_precedent_search(
         "<th style='text-align:left'>reaction_smiles</th>"
         "<th style='text-align:left'>yield</th>"
         "<th style='text-align:left'>core</th>"
-        "<th style='text-align:left'>base_uid</th>"
-        "<th style='text-align:left'>solvent_uid</th>"
+        "<th style='text-align:left'>base</th>"
+        "<th style='text-align:left'>solvent</th>"
         "<th style='text-align:left'>T_C</th>"
         "<th style='text-align:left'>time_h</th>"
         "</tr>"
@@ -261,8 +301,24 @@ def ui_precedent_search(
                 return f"<img src='{uri}' width='320'/>" if uri else ""
         except Exception:
             return ""
+    def _resolve_name(uid: str) -> str:
+        if not uid:
+            return ""
+        try:
+            res = properties.lookup(uid)
+            if isinstance(res, dict) and res.get("found") and isinstance(res.get("record"), dict):
+                recp = res["record"]
+                return str(recp.get("token") or recp.get("name") or recp.get("uid") or uid)
+        except Exception:
+            pass
+        return str(uid)
+
     for p in precs:
         img_html = _render_img(p.get("reactants_smiles", ""), p.get("products_smiles", ""))
+        base_uid = str(p.get("base_uid") or "")
+        solv_uid = str(p.get("solvent_uid") or "")
+        base_name = _resolve_name(base_uid)
+        solv_name = _resolve_name(solv_uid)
         html_rows.append(
             "<tr>"
             f"<td style='vertical-align:top'>{img_html}</td>"
@@ -270,8 +326,8 @@ def ui_precedent_search(
             f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('reaction_smiles','')}</td>"
             f"<td style='vertical-align:top; white-space:nowrap'>{p.get('yield','')}</td>"
             f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('core','')}</td>"
-            f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('base_uid','')}</td>"
-            f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('solvent_uid','')}</td>"
+            f"<td title='{base_uid}' style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{base_name}</td>"
+            f"<td title='{solv_uid}' style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{solv_name}</td>"
             f"<td style='vertical-align:top; white-space:nowrap'>{p.get('T_C','')}</td>"
             f"<td style='vertical-align:top; white-space:nowrap'>{p.get('time_h','')}</td>"
             "</tr>"
@@ -477,7 +533,9 @@ def build_demo() -> gr.Blocks:
             rec_constraints = gr.Textbox(label="Constraints (JSON)", value="")
             rec_btn = gr.Button("Recommend")
             rec_out = gr.JSON(label="Recommendation Pack")
-            rec_btn.click(ui_recommend, inputs=[rec_in, rec_k, rec_relax, rec_constraints], outputs=[rec_out])
+            rec_tbl = gr.Dataframe(label="Recommendation (table)", interactive=False)
+            rec_human = gr.Textbox(label="Recommended (human‑readable core/base/solvent)", interactive=False)
+            rec_btn.click(ui_recommend_both, inputs=[rec_in, rec_k, rec_relax, rec_constraints], outputs=[rec_out, rec_tbl, rec_human])
 
         with gr.Tab("Design Plate"):
             plate_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
