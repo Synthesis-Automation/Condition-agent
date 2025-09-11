@@ -194,6 +194,27 @@ def _load_registry() -> _RegistryIndex:
     return idx
 
 
+def categories() -> Dict[str, List[str]]:
+    """List distinct roles and compound types present in the registry.
+
+    Returns {roles: [...], compound_types: [...]} with sorted unique values.
+    """
+    idx = _load_registry()
+    roles: set[str] = set()
+    ctypes: set[str] = set()
+    for _, rec in idx.by_uid.items():
+        r = (rec.get("role") or "").strip().upper()
+        if r:
+            roles.add(r)
+        ct = (rec.get("compound_type") or "").strip()
+        if ct:
+            ctypes.add(ct)
+    return {
+        "roles": sorted(roles),
+        "compound_types": sorted(ctypes),
+    }
+
+
 def _enrich_props(uid: str, name: Optional[str] = None) -> Dict[str, Any]:
     props: Dict[str, Any] = {}
     if _properties is None:

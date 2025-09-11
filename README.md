@@ -53,7 +53,6 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
 - Tabs included:
   - SMILES Normalize: normalize a single SMILES.
   - Detect Family: infer reaction family from reactants (dot or newline separated).
-  - Molecular Featurizer: inspect LG/nucleophile class/bin features.
   - Single Molecule (basic): globals-only vector by default; optionally add roles (amine/alcohol/aryl_halide).
   - Properties Lookup: query by name/CAS/token (e.g., "Water", "7778-53-2").
   - Recommend Conditions: runs the recommender over a reaction SMILES.

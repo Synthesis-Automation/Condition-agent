@@ -7,10 +7,14 @@ def _import_rdkit():
         return None, None
     try:
         from rdkit import Chem  # type: ignore
-        from rdkit.Chem import rdMolStandardize  # type: ignore
-        return Chem, rdMolStandardize
     except Exception:
         return None, None
+    # rdMolStandardize is optional across RDKit builds; degrade gracefully
+    try:
+        from rdkit.Chem import rdMolStandardize  # type: ignore
+    except Exception:
+        rdMolStandardize = None  # type: ignore
+    return Chem, rdMolStandardize
 
 def rdkit_available() -> bool:
     Chem, _ = _import_rdkit()

@@ -21,7 +21,11 @@ if ROOT not in sys.path:
 
 import gradio as gr
 
+# Enable RDKit by default unless explicitly disabled by the environment
+os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
+
 from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
+from chemtools.util.rdkit_helpers import rdkit_available
 # Optional role-aware single-molecule featurizer
 try:
     from chem_feats import featurize_mol as role_feat_mol  # type: ignore
@@ -270,12 +274,8 @@ def build_demo() -> gr.Blocks:
             react_out = gr.JSON(label="Family Result")
             react_btn.click(ui_detect_family, inputs=[react_in], outputs=[react_out])
 
-        with gr.Tab("Molecular Featurizer"):
-            elec_in = gr.Textbox(label="Electrophile", value="Clc1ccccc1")
-            nuc_in = gr.Textbox(label="Nucleophile", value="Nc1ccccc1")
-            feat_btn = gr.Button("Featurize")
-            feat_out = gr.JSON(label="Features")
-            feat_btn.click(ui_featurize_molecular, inputs=[elec_in, nuc_in], outputs=[feat_out])
+        # Removed the legacy multi-molecule featurizer tab to keep only
+        # the single-molecule (basic) featurizer in the UI.
 
         with gr.Tab("Single Molecule (basic)"):
             smi_in = gr.Textbox(label="SMILES", value="Clc1ccccc1")
@@ -289,11 +289,12 @@ def build_demo() -> gr.Blocks:
                 smi_btn = gr.Button("Featurize molecule")
                 dl_btn = gr.DownloadButton(label="Download CSV")
             smi_out = gr.JSON(label="Result (vector length, masks, fields)")
+            rdkit_status = gr.Markdown(label="Status")
             csv_code = gr.Code(label="CSV preview")
 
-            def _ui_single_molecule(smi: str, roles: list[str], show_full_fields: bool) -> dict:
+            def _ui_single_molecule(smi: str, roles: list[str], show_full_fields: bool):
                 if role_feat_mol is None:
-                    return {"error": "role-aware featurizer unavailable"}
+                    return {"error": "role-aware featurizer unavailable"}, ""
                 roles = roles or []
                 out = role_feat_mol(smi or "", roles=roles)
                 vec = out.get("vector")
@@ -310,7 +311,17 @@ def build_demo() -> gr.Blocks:
                         del out["fields"]
                     except Exception:
                         pass
-                return out
+                # RDKit status hint
+                status_msg = ""
+                if not rdkit_available():
+                    status_msg = (
+                        "⚠️ RDKit is not available or disabled. Global descriptors, role-specific details, "
+                        "and fingerprints default to 0. Set `CHEMTOOLS_DISABLE_RDKIT=0` (or unset it) and install RDKit "
+                        "to enable numeric features."
+                    )
+                else:
+                    status_msg = "RDKit detected ✓"
+                return out, status_msg
 
             def _to_csv(smi: str, roles: list[str]):
                 if role_feat_mol is None:
@@ -333,10 +344,14 @@ def build_demo() -> gr.Blocks:
                 csv_text = "\n".join(lines) + "\n"
                 return csv_text.encode("utf-8")
 
-            smi_btn.click(_ui_single_molecule, inputs=[smi_in, roles_in, show_full], outputs=[smi_out])
+            smi_btn.click(_ui_single_molecule, inputs=[smi_in, roles_in, show_full], outputs=[smi_out, rdkit_status])
             # Update CSV preview and download
             def _update_csv_preview(smi: str, roles: list[str]) -> str:
-                return _to_csv(smi, roles)
+                data = _to_csv(smi, roles)
+                try:
+                    return data.decode("utf-8") if isinstance(data, (bytes, bytearray)) else str(data)
+                except Exception:
+                    return str(data)
             smi_btn.click(_update_csv_preview, inputs=[smi_in, roles_in], outputs=[csv_code])
             dl_btn.click(_to_csv, inputs=[smi_in, roles_in], outputs=[dl_btn])
 

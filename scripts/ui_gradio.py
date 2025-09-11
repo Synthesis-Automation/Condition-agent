@@ -14,6 +14,9 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
+# Ensure RDKit enabled by default for UI runs (respect explicit disable via env)
+os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", os.environ.get("CHEMTOOLS_DISABLE_RDKIT", "0") or "0")
+
 # Ensure dataset auto-load for UI runs (respects explicit disable via env)
 os.environ.setdefault("CHEMTOOLS_LOAD_DATASET", os.environ.get("CHEMTOOLS_LOAD_DATASET", "1"))
 

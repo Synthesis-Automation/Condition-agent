@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request, Response
+import os
 from chemtools.contracts import (
     NormalizeRequest, DetectFamilyRequest, FeaturizeUllmannRequest,
     ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
@@ -7,7 +8,11 @@ from chemtools.contracts import (
     CoreSearchRequest,
     RoleAwareMolRequest, RoleAwareReactionRequest,
 )
+# Enable RDKit by default unless explicitly disabled
+os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
+
 from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain, recommend
+from chemtools import registry as creg
 try:
     from chem_feats import featurize_mol as role_featurize_mol, featurize_reaction as role_featurize_reaction  # type: ignore
     from chem_feats.registry import REGISTRY as ROLE_REGISTRY  # type: ignore
@@ -177,6 +182,14 @@ def api_condition_core(req: ConditionCoreParseRequest): return condition_core.pa
 
 @app.post("/api/v1/properties/lookup")
 def api_properties(req: PropertiesLookupRequest): return properties.lookup(req.query)
+
+@app.get("/api/v1/registry/categories")
+def api_registry_categories():
+    return creg.categories()
+
+@app.get("/api/v1/registry/search")
+def api_registry_search(q: str | None = None, role: str | None = None, compound_type: str | None = None, limit: int = 50):
+    return creg.search(q=q, role=role, compound_type=compound_type, limit=int(limit or 50))
 
 @app.post("/api/v1/precedent/knn")
 def api_precedent_knn(req: PrecedentKNNRequest): return precedent.knn(req.family, req.features, req.k, req.relax or {})

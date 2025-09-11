@@ -24,7 +24,15 @@ _CACHE: Optional[Dict[str, Dict[str, Any]]] = None
 
 
 def _load_external() -> Dict[str, Dict[str, Any]]:
+    # Prefer explicit override, else fall back to bundled registry JSONL
     path = os.environ.get("CHEMTOOLS_PROPERTIES_PATH")
+    if not path:
+        # Default to the same merged CAS registry used by chemtools.registry
+        try:
+            base = os.path.dirname(os.path.dirname(__file__))
+            path = os.path.join(base, "data", "cas_registry_merged.jsonl")
+        except Exception:
+            path = None  # type: ignore
     if not path:
         return {}
     if not os.path.exists(path):
@@ -91,6 +99,19 @@ def lookup(query: str, *, allow_registry: bool = True) -> Dict[str, Any]:
     # Direct CAS hit
     if q in props:
         rec = {"uid": q, **props[q]}
+        # Best-effort role from compound_type if missing
+        if "role" not in rec and rec.get("compound_type"):
+            ct = str(rec.get("compound_type") or "").strip().lower()
+            role_map = {
+                "ligand": "LIGAND",
+                "base": "BASE",
+                "solvent": "SOLVENT",
+                "catalyst_core": "CATALYST",
+                "metal": "CATALYST",
+                "catalyst": "CATALYST",
+                # default other types to ADDITIVE
+            }
+            rec["role"] = role_map.get(ct, "ADDITIVE")
         return {"found": True, "record": rec}
 
     # Try case-insensitive match on token/name via registry, unless disabled to avoid recursion
