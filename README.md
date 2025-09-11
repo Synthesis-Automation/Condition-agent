@@ -60,11 +60,18 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
   - Design Plate: proposes a plate CSV across top cores.
   - Precedent Search: retrieves similar precedents (optionally DRFP re-ranking).
   - DRFP Similarity: Tanimoto between two reaction SMILES (if DRFP installed).
+  - Core Search: find dataset reactions by condition core (e.g., `Pd/XPhos` or `XPhos`). Enter a core token, optionally select a family (e.g., "Suzuki_CC", "Ullmann C–N"), keep "Fuzzy" on to match ligand names in catalyst systems, then click Search.
 
 Optional: install DRFP to enable similarity re-ranking and the similarity tab
 ```
 pip install drfp==0.4.0 numpy
 ```
+
+Gradio Core Search quick demo
+- Start Gradio: `python app/ui_gradio.py`
+- Open the "Core Search" tab.
+- Try core `Pd/XPhos` (or just `XPhos`) and click Search.
+- Optionally set Family to `Suzuki_CC` or `Amide_Coupling` to narrow results.
 
 Tips
 - Speed up or run without RDKit: set `CHEMTOOLS_DISABLE_RDKIT=1`
@@ -92,6 +99,10 @@ Tips
   - In: `{ "family": "Ullmann_CN", "features": {"bin":"LG:Br|NUC:aniline"}, "k": 50 }`
 - `POST /api/v1/constraints/filter` 鈥?Inventory/blacklist filtering of candidate IDs.
 - `POST /api/v1/explain/precedents` 鈥?Short reasons and example precedents.
+
+- `POST /api/v1/core/search` – Find reactions by condition core (exact or fuzzy match).
+  - In: `{ "core": "Pd/XPhos", "family": null, "fuzzy": true, "limit": 25 }`
+  - Out: `{ "query": {..}, "count": 2, "results": [ {"reaction_id": "...", "condition_core": "Pd/XPhos", ...}, ... ] }`
 
 Notes:
 - RDKit is optional at runtime; if unavailable, SMILES normalization falls back to simple heuristics.

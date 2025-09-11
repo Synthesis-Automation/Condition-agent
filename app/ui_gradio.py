@@ -215,6 +215,41 @@ def ui_similarity_tanimoto(q: str, r: str, n_bits: int, radius: int) -> Dict[str
     return {"ok": True, "tanimoto": round(sim, 4)}
 
 
+def ui_core_search(core: str, family: str, fuzzy: bool, limit: int):
+    fam = (family or "").strip() or None
+    rows = precedent.find_reactions_by_core(core or "", family=fam, fuzzy=bool(fuzzy), limit=int(limit or 25))
+    payload = {
+        "query": {"core": core, "family": fam, "fuzzy": bool(fuzzy), "limit": int(limit or 25)},
+        "count": len(rows),
+    }
+    # Build table (header + rows)
+    header = [
+        "reaction_id",
+        "rxn_type",
+        "condition_core",
+        "yield_value",
+        "base_uid",
+        "solvent_uid",
+        "T_C",
+        "time_h",
+        "reaction_smiles",
+    ]
+    table: List[List[Any]] = [header]
+    for r in rows:
+        table.append([
+            r.get("reaction_id", ""),
+            r.get("rxn_type", ""),
+            r.get("condition_core", ""),
+            r.get("yield_value", ""),
+            r.get("base_uid", ""),
+            r.get("solvent_uid", ""),
+            r.get("T_C", ""),
+            r.get("time_h", ""),
+            r.get("reaction_smiles", ""),
+        ])
+    return payload, table
+
+
 def build_demo() -> gr.Blocks:
     with gr.Blocks(title="ChemTools UI") as demo:
         gr.Markdown("""
@@ -362,6 +397,21 @@ def build_demo() -> gr.Blocks:
             s_btn = gr.Button("Compute Tanimoto")
             s_out = gr.JSON(label="Result")
             s_btn.click(ui_similarity_tanimoto, inputs=[s_q, s_r, s_bits, s_radius], outputs=[s_out])
+
+        with gr.Tab("Core Search"):
+            cs_core = gr.Textbox(label="Condition core (e.g., Pd/XPhos or XPhos)", value="Pd/XPhos")
+            cs_family = gr.Dropdown(
+                label="Family (optional)",
+                choices=["", "Ullmann C–N", "Buchwald C–N", "Suzuki_CC", "Amide_Coupling"],
+                value="",
+            )
+            with gr.Row():
+                cs_fuzzy = gr.Checkbox(label="Fuzzy ligand matching", value=True)
+                cs_limit = gr.Slider(label="Limit", minimum=1, maximum=200, value=25, step=1)
+            cs_btn = gr.Button("Search")
+            cs_json = gr.JSON(label="Summary")
+            cs_tbl = gr.Dataframe(label="Matches", interactive=False)
+            cs_btn.click(ui_core_search, inputs=[cs_core, cs_family, cs_fuzzy, cs_limit], outputs=[cs_json, cs_tbl])
 
     return demo
 

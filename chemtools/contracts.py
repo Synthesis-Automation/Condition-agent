@@ -44,3 +44,11 @@ class RoleAwareMolRequest(BaseModel):
 
 class RoleAwareReactionRequest(BaseModel):
     reaction: str
+
+
+# Core search (by condition core, e.g., 'Pd/XPhos')
+class CoreSearchRequest(BaseModel):
+    core: str
+    family: Optional[str] = None
+    fuzzy: bool = True
+    limit: int = 50

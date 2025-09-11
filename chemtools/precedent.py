@@ -417,3 +417,84 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
             "time_h": r.get("time_h"),
         })
     return {"prototype_id": proto, "support": support, "precedents": precedents}
+
+
+def _parse_core_tokens(core_text: str) -> Tuple[str, str]:
+    """Parse a condition_core string like 'Pd/XPhos' into (metal, ligand) tokens (lowercased).
+
+    Returns (metal, ligand) where any missing part is an empty string.
+    """
+    t = (core_text or "").strip()
+    if not t:
+        return "", ""
+    if "/" in t:
+        a, b = t.split("/", 1)
+        return (a or "").strip().lower(), (b or "").strip().lower()
+    return (t.strip().lower(), "")
+
+
+def _norm_family(fam: Optional[str]) -> Optional[str]:
+    if fam is None:
+        return None
+    f = (fam or "").strip()
+    if not f:
+        return None
+    return _family_text(f)
+
+
+def find_reactions_by_core(
+    core_query: str,
+    *,
+    family: Optional[str] = None,
+    fuzzy: bool = True,
+    limit: int = 50,
+) -> List[Dict[str, Any]]:
+    """Find dataset reactions that use the same or similar condition core.
+
+    - core_query: e.g., 'Pd/XPhos', 'Pd', or 'XPhos'.
+    - family: optional reaction family text (e.g., 'Ullmann C–N', 'Suzuki_CC').
+    - fuzzy: if True, also match ligand names from catalyst/full_system entries.
+    - limit: maximum number of results.
+
+    Returns a list of dataset rows in the normalized precedent format
+    (see _make_row_from_dataset), possibly truncated to `limit`.
+    """
+    q_metal, q_lig = _parse_core_tokens(core_query)
+    fam_norm = _norm_family(family)
+
+    rows = _load()
+    out: List[Dict[str, Any]] = []
+
+    def match_row(r: Dict[str, Any]) -> bool:
+        if fam_norm and (r.get("rxn_type") or "") != fam_norm:
+            return False
+        rc = r.get("condition_core") or ""
+        rm, rl = _parse_core_tokens(rc)
+        # Basic matching rules
+        m_ok = (not q_metal) or (rm == q_metal or q_metal in rm)
+        l_ok = (not q_lig) or (rl == q_lig or (q_lig and q_lig in rl))
+        if m_ok and l_ok:
+            return True
+        if not fuzzy:
+            return False
+        # Fuzzy ligand check against catalyst/full_system names
+        if q_lig:
+            fs = r.get("full_system")
+            if isinstance(fs, list):
+                for it in fs:
+                    nm = str((it or {}).get("name") or "").strip().lower()
+                    if nm and q_lig in nm:
+                        # Respect metal if provided
+                        if not q_metal or m_ok:
+                            return True
+        return False
+
+    for row in rows:
+        try:
+            if match_row(row):
+                out.append(row)
+                if len(out) >= int(limit):
+                    break
+        except Exception:
+            continue
+    return out

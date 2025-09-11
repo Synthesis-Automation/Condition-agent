@@ -4,6 +4,7 @@ from chemtools.contracts import (
     ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
     ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest,
     RecommendFromReactionRequest, PlateDesignRequest,
+    CoreSearchRequest,
     RoleAwareMolRequest, RoleAwareReactionRequest,
 )
 from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain, recommend
@@ -302,3 +303,18 @@ def api_design_plate(req: PlateDesignRequest):
             _ = res
     except Exception:
         pass
+
+
+@app.post("/api/v1/core/search")
+def api_core_search(req: CoreSearchRequest):
+    rows = precedent.find_reactions_by_core(
+        req.core,
+        family=req.family,
+        fuzzy=bool(req.fuzzy),
+        limit=int(req.limit or 50),
+    )
+    return {
+        "query": {"core": req.core, "family": req.family, "fuzzy": bool(req.fuzzy), "limit": int(req.limit or 50)},
+        "count": len(rows),
+        "results": rows,
+    }
