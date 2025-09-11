@@ -25,6 +25,7 @@ import gradio as gr
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 
 from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
+from chemtools import registry as creg
 from chemtools.util.rdkit_helpers import rdkit_available
 # Optional role-aware single-molecule featurizer
 try:
@@ -146,7 +147,7 @@ def ui_precedent_search(
     drfp_bits: int,
     drfp_radius: int,
     precompute_scope: str,
-) -> Tuple[Dict[str, Any], List[List[Any]]]:
+) -> Tuple[Dict[str, Any], str]:
     # Detect family and featurize from reaction
     elec, nuc, reactants = _pick_elec_nuc_from_reaction(reaction or "")
     fam = router.detect_family(reactants).get("family") or "Unknown"
@@ -173,35 +174,111 @@ def ui_precedent_search(
 
     pack = precedent.knn(fam, feat, k=int(k or 25), relax=relax)
 
-    # Build neighbors table (header + rows)
-    header = [
-        "reaction_id",
-        "reaction_smiles",
-        "reactants_smiles",
-        "products_smiles",
-        "yield",
-        "core",
-        "base_uid",
-        "solvent_uid",
-        "T_C",
-        "time_h",
-    ]
+    # Build HTML table with embedded reaction images; omit reactant/product SMILES columns
     precs = list(pack.get("precedents") or [])
-    table: List[List[Any]] = [header]
+    html_rows: List[str] = []
+    html_rows.append('<table style="border-collapse:collapse; width:100%; table-layout:fixed">')
+    html_rows.append(
+        "<colgroup>"
+        "<col style='width:340px'/>"   # image
+        "<col style='width:110px'/>"   # reaction_id
+        "<col/>"                        # reaction_smiles (flex)
+        "<col style='width:70px'/>"    # yield
+        "<col style='width:160px'/>"   # core
+        "<col style='width:120px'/>"   # base_uid
+        "<col style='width:120px'/>"   # solvent_uid
+        "<col style='width:70px'/>"    # T_C
+        "<col style='width:70px'/>"    # time_h
+        "</colgroup>"
+    )
+    html_rows.append(
+        "<tr>"
+        "<th style='text-align:left'>image</th>"
+        "<th style='text-align:left'>reaction_id</th>"
+        "<th style='text-align:left'>reaction_smiles</th>"
+        "<th style='text-align:left'>yield</th>"
+        "<th style='text-align:left'>core</th>"
+        "<th style='text-align:left'>base_uid</th>"
+        "<th style='text-align:left'>solvent_uid</th>"
+        "<th style='text-align:left'>T_C</th>"
+        "<th style='text-align:left'>time_h</th>"
+        "</tr>"
+    )
+    # Image helpers
+    def _img_data_uri(img_obj: Any) -> str | None:
+        try:
+            import base64, io
+            buf = io.BytesIO()
+            img_obj.save(buf, format="PNG")  # type: ignore[attr-defined]
+            b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+            return f"data:image/png;base64,{b64}"
+        except Exception:
+            return None
+    def _render_img(reactants_smi: str, products_smi: str) -> str:
+        try:
+            from chemtools.util.rdkit_helpers import rdkit_available as _rd_avail
+            if not _rd_avail():
+                return ""
+            from rdkit import Chem  # type: ignore
+            from rdkit.Chem import Draw  # type: ignore
+            def _grid(smi: str):
+                ms = []
+                for s in [x for x in (smi or '').split('.') if x]:
+                    try:
+                        m = Chem.MolFromSmiles(s)
+                        if m is not None:
+                            ms.append(m)
+                    except Exception:
+                        continue
+                if not ms:
+                    return None
+                return Draw.MolsToGridImage(ms, molsPerRow=min(3, len(ms)), subImgSize=(220,220))
+            l = _grid(reactants_smi)
+            r = _grid(products_smi)
+            if l is None and r is None:
+                return ""
+            if l is None:
+                uri = _img_data_uri(r)
+                return f"<img src='{uri}' width='320'/>" if uri else ""
+            if r is None:
+                uri = _img_data_uri(l)
+                return f"<img src='{uri}' width='320'/>" if uri else ""
+            try:
+                from PIL import Image as _Image, ImageDraw as _ImageDraw  # type: ignore
+                w = l.width + r.width + 60
+                h = max(l.height, r.height)
+                canvas = _Image.new("RGB", (w, h), (255,255,255))
+                canvas.paste(l, (0, (h - l.height)//2))
+                canvas.paste(r, (l.width + 60, (h - r.height)//2))
+                dr = _ImageDraw.Draw(canvas)
+                y = h//2
+                dr.line((l.width + 10, y, l.width + 50, y), fill=(0,0,0), width=3)
+                dr.polygon([(l.width + 50, y), (l.width + 38, y - 6), (l.width + 38, y + 6)], fill=(0,0,0))
+                uri = _img_data_uri(canvas)
+                return f"<img src='{uri}' width='320'/>" if uri else ""
+            except Exception:
+                uri = _img_data_uri(l)
+                return f"<img src='{uri}' width='320'/>" if uri else ""
+        except Exception:
+            return ""
     for p in precs:
-        table.append([
-            p.get("reaction_id", ""),
-            p.get("reaction_smiles", ""),
-            p.get("reactants_smiles", ""),
-            p.get("products_smiles", ""),
-            p.get("yield", ""),
-            p.get("core", ""),
-            p.get("base_uid", ""),
-            p.get("solvent_uid", ""),
-            p.get("T_C", ""),
-            p.get("time_h", ""),
-        ])
-    return pack, table
+        img_html = _render_img(p.get("reactants_smiles", ""), p.get("products_smiles", ""))
+        html_rows.append(
+            "<tr>"
+            f"<td style='vertical-align:top'>{img_html}</td>"
+            f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('reaction_id','')}</td>"
+            f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('reaction_smiles','')}</td>"
+            f"<td style='vertical-align:top; white-space:nowrap'>{p.get('yield','')}</td>"
+            f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('core','')}</td>"
+            f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('base_uid','')}</td>"
+            f"<td style='vertical-align:top; white-space:normal; word-break:break-word; overflow-wrap:anywhere'>{p.get('solvent_uid','')}</td>"
+            f"<td style='vertical-align:top; white-space:nowrap'>{p.get('T_C','')}</td>"
+            f"<td style='vertical-align:top; white-space:nowrap'>{p.get('time_h','')}</td>"
+            "</tr>"
+        )
+    html_rows.append("</table>")
+    html = "\n".join(html_rows)
+    return pack, html
 
 
 def ui_similarity_tanimoto(q: str, r: str, n_bits: int, radius: int) -> Dict[str, Any]:
@@ -361,6 +438,38 @@ def build_demo() -> gr.Blocks:
             prop_out = gr.JSON(label="Record")
             prop_btn.click(ui_properties_lookup, inputs=[prop_in], outputs=[prop_out])
 
+            gr.Markdown("""
+            ### Registry Categories and Listing
+            Use the controls below to list items by role or compound type (e.g., solvents).
+            """)
+            # Handlers for categories and search
+            def ui_registry_categories() -> Dict[str, Any]:
+                try:
+                    return creg.categories()
+                except Exception as e:
+                    return {"error": str(e)}
+
+            def ui_registry_search(q: str, role: str, compound_type: str, limit: int) -> List[List[Any]]:
+                rows = creg.search(q=(q or None), role=(role or None), compound_type=(compound_type or None), limit=int(limit or 50))
+                header = ["uid", "role", "name", "compound_type"]
+                table: List[List[Any]] = [header]
+                for r in rows:
+                    table.append([r.get("uid", ""), r.get("role", ""), r.get("name", ""), r.get("compound_type", "")])
+                return table
+
+            with gr.Row():
+                cat_btn = gr.Button("List categories")
+                cat_json = gr.JSON(label="Categories (roles, compound_types)")
+                cat_btn.click(ui_registry_categories, outputs=[cat_json])
+            with gr.Row():
+                rs_q = gr.Textbox(label="Filter (optional substring)", value="")
+                rs_role = gr.Dropdown(label="Role", choices=["", "CATALYST", "LIGAND", "BASE", "SOLVENT", "ADDITIVE"], value="")
+                rs_ct = gr.Textbox(label="Compound type (exact; see categories)", value="")
+                rs_limit = gr.Slider(label="Limit", minimum=1, maximum=500, value=50, step=1)
+            rs_btn = gr.Button("List by filter")
+            rs_tbl = gr.Dataframe(label="Registry items", interactive=False)
+            rs_btn.click(ui_registry_search, inputs=[rs_q, rs_role, rs_ct, rs_limit], outputs=[rs_tbl])
+
         with gr.Tab("Recommend Conditions"):
             rec_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
             rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=25, step=1)
@@ -397,7 +506,7 @@ def build_demo() -> gr.Blocks:
                 ps_prec_scope = gr.Radio(label="Precompute scope", choices=["none", "candidates", "all"], value="candidates")
             ps_btn = gr.Button("Search")
             ps_pack = gr.JSON(label="Pack (prototype, support, precedents)")
-            ps_tbl = gr.Dataframe(label="Top precedents", interactive=False)
+            ps_tbl = gr.HTML(label="Top precedents")
             ps_btn.click(
                 ui_precedent_search,
                 inputs=[ps_in, ps_k, ps_use_drfp, ps_drfp_w, ps_bits, ps_radius, ps_prec_scope],
@@ -427,6 +536,29 @@ def build_demo() -> gr.Blocks:
             cs_json = gr.JSON(label="Summary")
             cs_tbl = gr.Dataframe(label="Matches", interactive=False)
             cs_btn.click(ui_core_search, inputs=[cs_core, cs_family, cs_fuzzy, cs_limit], outputs=[cs_json, cs_tbl])
+
+            gr.Markdown("""
+            ### List Available Cores
+            List unique condition cores present in the loaded reaction dataset (optionally by family).
+            """)
+            def ui_list_cores(family: str, limit: int) -> List[List[Any]]:
+                fam = (family or "").strip() or None
+                rows = precedent.list_cores(family=fam, top_n=int(limit or 200), include_counts=True)  # type: ignore[arg-type]
+                header = ["core", "count"]
+                table: List[List[Any]] = [header]
+                for item in rows:  # type: ignore[assignment]
+                    table.append([item.get("core", ""), item.get("count", 0)])  # type: ignore[union-attr]
+                return table
+            with gr.Row():
+                lc_family = gr.Dropdown(
+                    label="Family (optional)",
+                    choices=["", "Ullmann C�CN", "Buchwald C�CN", "Suzuki_CC", "Amide_Coupling"],
+                    value="",
+                )
+                lc_limit = gr.Slider(label="Top N", minimum=5, maximum=500, value=200, step=5)
+                lc_btn = gr.Button("List cores")
+            lc_tbl = gr.Dataframe(label="Cores", interactive=False)
+            lc_btn.click(ui_list_cores, inputs=[lc_family, lc_limit], outputs=[lc_tbl])
 
     return demo
 

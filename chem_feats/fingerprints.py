@@ -21,7 +21,20 @@ def centered_ecfp(mol_or_smiles: Any, center_atoms: List[int], bits: int = 512, 
     except Exception:
         return [0.0] * int(bits)
     try:
-        bv = AllChem.GetMorganFingerprintAsBitVect(mol, int(radius), nBits=int(bits), useFeatures=False, fromAtoms=[int(i) for i in center_atoms])
+        # Prefer the modern generator API from rdFingerprintGenerator
+        try:
+            from rdkit.Chem import rdFingerprintGenerator as FG  # type: ignore
+            gen = FG.GetMorganGenerator(radius=int(radius), fpSize=int(bits))
+            bv = gen.GetFingerprint(mol, fromAtoms=[int(i) for i in center_atoms])
+        except Exception:
+            # Fallback to legacy API on older RDKit versions
+            bv = AllChem.GetMorganFingerprintAsBitVect(
+                mol,
+                int(radius),
+                nBits=int(bits),
+                useFeatures=False,
+                fromAtoms=[int(i) for i in center_atoms],
+            )
         arr = np.zeros((int(bits),), dtype=int) if np is not None else [0] * int(bits)
         if np is not None:
             from rdkit import DataStructs  # type: ignore
@@ -31,4 +44,3 @@ def centered_ecfp(mol_or_smiles: Any, center_atoms: List[int], bits: int = 512, 
         return [1.0 if bv.GetBit(i) else 0.0 for i in range(int(bits))]
     except Exception:
         return [0.0] * int(bits)
-

@@ -71,6 +71,7 @@ Gradio Core Search quick demo
 - Open the "Core Search" tab.
 - Try core `Pd/XPhos` (or just `XPhos`) and click Search.
 - Optionally set Family to `Suzuki_CC` or `Amide_Coupling` to narrow results.
+ - To browse cores, pick a Family (optional) and click "List cores" to see unique cores with counts.
 
 Tips
 - Speed up or run without RDKit: set `CHEMTOOLS_DISABLE_RDKIT=1`
@@ -171,6 +172,10 @@ Speed tips
 - Disable heavy RDKit paths (fast demo mode):
   - macOS/Linux: `export CHEMTOOLS_DISABLE_RDKIT=1`
   - Windows (PowerShell): `$env:CHEMTOOLS_DISABLE_RDKIT='1'`
+- Skip attaching role‑aware vectors during dataset loading (faster Core Search/Precedents):
+  - Default is off. Enable only when needed with:
+    - macOS/Linux: `export CHEMTOOLS_ATTACH_ROLE_AWARE=1`
+    - Windows (PowerShell): `$env:CHEMTOOLS_ATTACH_ROLE_AWARE='1'`
 - Skip loading the large dataset (for quick dev/testing):
   - macOS/Linux: `export CHEMTOOLS_LOAD_DATASET=0`
   - Windows (PowerShell): `$env:CHEMTOOLS_LOAD_DATASET='0'`

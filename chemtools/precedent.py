@@ -3,6 +3,7 @@ import os, json
 from functools import lru_cache
 from .featurizers import molecular as feat_molecular
 from . import reaction_similarity as rs
+from collections import Counter
 
 # Local helper to pick electrophile vs nucleophile from reactants list
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
@@ -498,3 +499,32 @@ def find_reactions_by_core(
         except Exception:
             continue
     return out
+
+
+def list_cores(
+    *,
+    family: Optional[str] = None,
+    top_n: Optional[int] = None,
+    include_counts: bool = True,
+) -> List[Dict[str, Any]] | List[str]:
+    """List unique condition cores from the loaded reaction dataset.
+
+    - family: optional reaction family text to filter (e.g., 'Ullmann C–N', 'Suzuki_CC').
+    - top_n: optional cap on number of items returned (by frequency desc).
+    - include_counts: when True, return list of {core, count}; else list of core strings.
+    """
+    fam_norm = _norm_family(family)
+    rows = _load()
+    ctr: Counter[str] = Counter()
+    for r in rows:
+        if fam_norm and (r.get("rxn_type") or "") != fam_norm:
+            continue
+        c = (r.get("condition_core") or "").strip()
+        if c:
+            ctr[c] += 1
+    items = ctr.most_common()
+    if top_n is not None:
+        items = items[: int(top_n)]
+    if include_counts:
+        return [{"core": c, "count": n} for c, n in items]
+    return [c for c, _ in items]

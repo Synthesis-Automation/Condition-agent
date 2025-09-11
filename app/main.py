@@ -191,6 +191,11 @@ def api_registry_categories():
 def api_registry_search(q: str | None = None, role: str | None = None, compound_type: str | None = None, limit: int = 50):
     return creg.search(q=q, role=role, compound_type=compound_type, limit=int(limit or 50))
 
+@app.get("/api/v1/cores")
+def api_core_list(family: str | None = None, limit: int = 200, counts: bool = True):
+    data = precedent.list_cores(family=family, top_n=int(limit or 200), include_counts=bool(counts))
+    return {"cores": data}
+
 @app.post("/api/v1/precedent/knn")
 def api_precedent_knn(req: PrecedentKNNRequest): return precedent.knn(req.family, req.features, req.k, req.relax or {})
 

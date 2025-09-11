@@ -13,7 +13,7 @@ if ROOT not in sys.path:
 
 from chemtools.smiles import normalize_reaction
 from chemtools.router import detect_family
-from chemtools.featurizers import ullmann as feat_ullmann
+from chemtools.featurizers import molecular as feat_molecular
 from chemtools.precedent import knn
 
 
@@ -61,11 +61,9 @@ def main(argv: List[str] | None = None) -> int:
     # 3) Pick electrophile/nucleophile and featurize (Ullmann C–N supported)
     elec, nuc = _pick_electrophile_nucleophile(reactants)
     features: Dict[str, Any] = {}
-    if fam == "Ullmann_CN":
-        features = feat_ullmann.featurize(elec, nuc)
-    else:
-        # Best-effort: still use Ullmann featurizer heuristics; router may misclassify or multiple families may apply.
-        features = feat_ullmann.featurize(elec, nuc)
+    # Use the general molecular featurizer entry; router may misclassify,
+    # but features remain valid across supported families.
+    features = feat_molecular.featurize(elec, nuc)
 
     # 4) Run kNN
     # Pass normalized reaction SMILES and enable DRFP re-ranking when available
