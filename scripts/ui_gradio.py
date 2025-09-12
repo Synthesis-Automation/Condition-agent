@@ -9,8 +9,23 @@ import json
 
 import gradio as gr
 
-# Theme: emphasize action buttons with a distinct primary hue
-THEME = gr.themes.Soft(primary_hue="indigo", secondary_hue="amber", neutral_hue="slate")
+# Theme: professional, compact spacing, subtle radius, readable fonts
+THEME = gr.themes.Soft(
+    primary_hue="slate",
+    secondary_hue="zinc",
+    neutral_hue="slate",
+    font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui", "-apple-system"],
+    font_mono=[gr.themes.GoogleFont("JetBrains Mono"), "ui-monospace", "SFMono-Regular"],
+    radius_size="sm",
+    spacing_size="sm",
+)
+
+# Constrain overall width for a cleaner layout
+CSS = """
+.gradio-container{max-width:1600px !important;margin:0 auto !important;}
+.gradio-container [role='tablist']{flex-wrap:wrap;overflow-x:auto;gap:0.25rem;}
+.gradio-container [role='tab']{white-space:nowrap;}
+"""
 
 # Ensure project root on sys.path for local execution
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -150,7 +165,7 @@ def ui_precedents(reaction: str, k: int, use_drfp: bool, drfp_weight: float):
     return rows, csv_text, json_text
 
 
-with gr.Blocks(title="Condition Recommender", theme=THEME) as demo:
+with gr.Blocks(title="Condition Recommender", theme=THEME, css=CSS) as demo:
     gr.Markdown("""
     # Condition Recommendation (Ullmann-first)
     Enter a reaction SMILES (reactants>>products). The app recommends Core/Base/Solvent/T/time and can design a 24‑well plate diversified across cores.

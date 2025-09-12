@@ -21,8 +21,23 @@ if ROOT not in sys.path:
 
 import gradio as gr
 
-# Theme with a more prominent primary color for action buttons
-THEME = gr.themes.Soft(primary_hue="indigo", secondary_hue="amber", neutral_hue="slate")
+# Theme: professional, compact spacing, subtle radius, readable fonts
+THEME = gr.themes.Soft(
+    primary_hue="slate",
+    secondary_hue="zinc",
+    neutral_hue="slate",
+    font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui", "-apple-system"],
+    font_mono=[gr.themes.GoogleFont("JetBrains Mono"), "ui-monospace", "SFMono-Regular"],
+    radius_size="sm",
+    spacing_size="sm",
+)
+
+# Constrain overall width for a cleaner layout
+CSS = """
+.gradio-container{max-width:1600px !important;margin:0 auto !important;}
+.gradio-container [role='tablist']{flex-wrap:wrap;overflow-x:auto;gap:0.25rem;}
+.gradio-container [role='tab']{white-space:nowrap;}
+"""
 
 # Enable RDKit by default unless explicitly disabled by the environment
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
@@ -391,7 +406,7 @@ def ui_core_search(core: str, family: str, fuzzy: bool, limit: int):
 
 
 def build_demo() -> gr.Blocks:
-    with gr.Blocks(title="ChemTools UI", theme=THEME) as demo:
+    with gr.Blocks(title="ChemTools UI", theme=THEME, css=CSS) as demo:
         gr.Markdown("""
         # ChemTools - Interactive UI
         Try common chemistry tools without writing code. Use the tabs below.
@@ -407,7 +422,7 @@ def build_demo() -> gr.Blocks:
             gr.Markdown("Enter reactants separated by '.' or new lines.")
             react_in = gr.Textbox(label="Reactants", value="Clc1ccccc1.Nc1ccccc1")
             react_btn = gr.Button("Detect", variant="primary")
-            react_out = gr.JSON(label="Family Result")
+            react_out = gr.JSON(label="Detected Family")
             react_btn.click(ui_detect_family, inputs=[react_in], outputs=[react_out])
 
         # Removed the legacy multi-molecule featurizer tab to keep only
@@ -613,7 +628,7 @@ def build_demo() -> gr.Blocks:
             with gr.Row():
                 lc_family = gr.Dropdown(
                     label="Family (optional)",
-                    choices=["", "Ullmann C�CN", "Buchwald C�CN", "Suzuki_CC", "Amide_Coupling"],
+                choices=["", "Ullmann C–N", "Buchwald C–N", "Suzuki_CC", "Amide_Coupling"],
                     value="",
                 )
                 lc_limit = gr.Slider(label="Top N", minimum=5, maximum=500, value=200, step=5)
