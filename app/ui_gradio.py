@@ -21,6 +21,9 @@ if ROOT not in sys.path:
 
 import gradio as gr
 
+# Theme with a more prominent primary color for action buttons
+THEME = gr.themes.Soft(primary_hue="indigo", secondary_hue="amber", neutral_hue="slate")
+
 # Enable RDKit by default unless explicitly disabled by the environment
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 
@@ -388,7 +391,7 @@ def ui_core_search(core: str, family: str, fuzzy: bool, limit: int):
 
 
 def build_demo() -> gr.Blocks:
-    with gr.Blocks(title="ChemTools UI") as demo:
+    with gr.Blocks(title="ChemTools UI", theme=THEME) as demo:
         gr.Markdown("""
         # ChemTools - Interactive UI
         Try common chemistry tools without writing code. Use the tabs below.
@@ -396,14 +399,14 @@ def build_demo() -> gr.Blocks:
 
         with gr.Tab("SMILES Normalize"):
             smi_in = gr.Textbox(label="SMILES", value="c1ccccc1O")
-            smi_btn = gr.Button("Normalize")
+            smi_btn = gr.Button("Normalize", variant="primary")
             smi_out = gr.JSON(label="Result")
             smi_btn.click(ui_normalize_smiles, inputs=[smi_in], outputs=[smi_out])
 
         with gr.Tab("Detect Family"):
             gr.Markdown("Enter reactants separated by '.' or new lines.")
             react_in = gr.Textbox(label="Reactants", value="Clc1ccccc1.Nc1ccccc1")
-            react_btn = gr.Button("Detect")
+            react_btn = gr.Button("Detect", variant="primary")
             react_out = gr.JSON(label="Family Result")
             react_btn.click(ui_detect_family, inputs=[react_in], outputs=[react_out])
 
@@ -419,7 +422,7 @@ def build_demo() -> gr.Blocks:
             )
             show_full = gr.Checkbox(value=False, label="Show full fields list (unchecked shows preview)")
             with gr.Row():
-                smi_btn = gr.Button("Featurize molecule")
+                smi_btn = gr.Button("Featurize molecule", variant="primary")
                 dl_btn = gr.DownloadButton(label="Download CSV")
             smi_out = gr.JSON(label="Result (vector length, masks, fields)")
             rdkit_status = gr.Markdown(label="Status")
@@ -490,7 +493,7 @@ def build_demo() -> gr.Blocks:
 
         with gr.Tab("Properties Lookup"):
             prop_in = gr.Textbox(label="Query (name, CAS, token)", value="Water")
-            prop_btn = gr.Button("Lookup")
+            prop_btn = gr.Button("Lookup", variant="primary")
             prop_out = gr.JSON(label="Record")
             prop_btn.click(ui_properties_lookup, inputs=[prop_in], outputs=[prop_out])
 
@@ -514,7 +517,7 @@ def build_demo() -> gr.Blocks:
                 return table
 
             with gr.Row():
-                cat_btn = gr.Button("List categories")
+                cat_btn = gr.Button("List categories", variant="secondary")
                 cat_json = gr.JSON(label="Categories (roles, compound_types)")
                 cat_btn.click(ui_registry_categories, outputs=[cat_json])
             with gr.Row():
@@ -522,7 +525,7 @@ def build_demo() -> gr.Blocks:
                 rs_role = gr.Dropdown(label="Role", choices=["", "CATALYST", "LIGAND", "BASE", "SOLVENT", "ADDITIVE"], value="")
                 rs_ct = gr.Textbox(label="Compound type (exact; see categories)", value="")
                 rs_limit = gr.Slider(label="Limit", minimum=1, maximum=500, value=50, step=1)
-            rs_btn = gr.Button("List by filter")
+            rs_btn = gr.Button("List by filter", variant="secondary")
             rs_tbl = gr.Dataframe(label="Registry items", interactive=False)
             rs_btn.click(ui_registry_search, inputs=[rs_q, rs_role, rs_ct, rs_limit], outputs=[rs_tbl])
 
@@ -531,7 +534,7 @@ def build_demo() -> gr.Blocks:
             rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=25, step=1)
             rec_relax = gr.Textbox(label="Relax (JSON)", value="")
             rec_constraints = gr.Textbox(label="Constraints (JSON)", value="")
-            rec_btn = gr.Button("Recommend")
+            rec_btn = gr.Button("Recommend", variant="primary")
             rec_out = gr.JSON(label="Recommendation Pack")
             rec_tbl = gr.Dataframe(label="Recommendation (table)", interactive=False)
             rec_human = gr.Textbox(label="Recommended (human‑readable core/base/solvent)", interactive=False)
@@ -542,7 +545,7 @@ def build_demo() -> gr.Blocks:
             plate_n = gr.Slider(label="Plate size", minimum=6, maximum=96, value=24, step=1)
             plate_relax = gr.Textbox(label="Relax (JSON)", value="")
             plate_constraints = gr.Textbox(label="Constraints (JSON)", value="")
-            plate_btn = gr.Button("Design")
+            plate_btn = gr.Button("Design", variant="primary")
             plate_csv = gr.Code(label="CSV")
             plate_tbl = gr.Dataframe(label="Preview", interactive=False)
             plate_meta = gr.JSON(label="Meta")
@@ -562,7 +565,7 @@ def build_demo() -> gr.Blocks:
                 ps_bits = gr.Number(label="DRFP bits", value=4096, precision=0)
                 ps_radius = gr.Number(label="DRFP radius", value=3, precision=0)
                 ps_prec_scope = gr.Radio(label="Precompute scope", choices=["none", "candidates", "all"], value="candidates")
-            ps_btn = gr.Button("Search")
+            ps_btn = gr.Button("Search", variant="primary")
             ps_pack = gr.JSON(label="Pack (prototype, support, precedents)")
             ps_tbl = gr.HTML(label="Top precedents")
             ps_btn.click(
@@ -576,7 +579,7 @@ def build_demo() -> gr.Blocks:
             s_r = gr.Textbox(label="Reference reaction SMILES", value="Clc1ccccc1.Nc1ccccc1>>")
             s_bits = gr.Number(label="DRFP bits", value=4096, precision=0)
             s_radius = gr.Number(label="DRFP radius", value=3, precision=0)
-            s_btn = gr.Button("Compute Tanimoto")
+            s_btn = gr.Button("Compute Tanimoto", variant="primary")
             s_out = gr.JSON(label="Result")
             s_btn.click(ui_similarity_tanimoto, inputs=[s_q, s_r, s_bits, s_radius], outputs=[s_out])
 
@@ -590,7 +593,7 @@ def build_demo() -> gr.Blocks:
             with gr.Row():
                 cs_fuzzy = gr.Checkbox(label="Fuzzy ligand matching", value=True)
                 cs_limit = gr.Slider(label="Limit", minimum=1, maximum=200, value=25, step=1)
-            cs_btn = gr.Button("Search")
+            cs_btn = gr.Button("Search", variant="primary")
             cs_json = gr.JSON(label="Summary")
             cs_tbl = gr.Dataframe(label="Matches", interactive=False)
             cs_btn.click(ui_core_search, inputs=[cs_core, cs_family, cs_fuzzy, cs_limit], outputs=[cs_json, cs_tbl])
@@ -614,7 +617,7 @@ def build_demo() -> gr.Blocks:
                     value="",
                 )
                 lc_limit = gr.Slider(label="Top N", minimum=5, maximum=500, value=200, step=5)
-                lc_btn = gr.Button("List cores")
+                lc_btn = gr.Button("List cores", variant="secondary")
             lc_tbl = gr.Dataframe(label="Cores", interactive=False)
             lc_btn.click(ui_list_cores, inputs=[lc_family, lc_limit], outputs=[lc_tbl])
 

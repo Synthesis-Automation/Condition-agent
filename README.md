@@ -27,6 +27,7 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
 
 - Run tests:
   ```bash
+  pip install -r requirements-dev.txt
   pytest -q
   ```
   Or with Makefile shortcuts: `make install`, `make run`, `make test`.

@@ -9,6 +9,9 @@ import json
 
 import gradio as gr
 
+# Theme: emphasize action buttons with a distinct primary hue
+THEME = gr.themes.Soft(primary_hue="indigo", secondary_hue="amber", neutral_hue="slate")
+
 # Ensure project root on sys.path for local execution
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT not in sys.path:
@@ -147,7 +150,7 @@ def ui_precedents(reaction: str, k: int, use_drfp: bool, drfp_weight: float):
     return rows, csv_text, json_text
 
 
-with gr.Blocks(title="Condition Recommender") as demo:
+with gr.Blocks(title="Condition Recommender", theme=THEME) as demo:
     gr.Markdown("""
     # Condition Recommendation (Ullmann-first)
     Enter a reaction SMILES (reactants>>products). The app recommends Core/Base/Solvent/T/time and can design a 24‑well plate diversified across cores.
@@ -165,13 +168,13 @@ with gr.Blocks(title="Condition Recommender") as demo:
             no_hmpa = gr.Checkbox(True, label="No HMPA")
             aq_only = gr.Checkbox(False, label="Aqueous only")
             min_bp = gr.Slider(0, 200, value=0, step=5, label="Min solvent bp (C)")
-        btn = gr.Button("Recommend")
+        btn = gr.Button("Recommend", variant="primary")
         summary = gr.JSON(label="Recommendation")
         reasons = gr.Markdown()
         json_state = gr.State("")
         btn.click(ui_recommend, [rxn, k, use_drfp, drfp_w, no_chloro, no_hmpa, aq_only, min_bp], [summary, reasons, json_state])
         with gr.Row():
-            btn_json = gr.Button("Download JSON")
+            btn_json = gr.Button("Download JSON", variant="secondary")
             file_json = gr.File(label="recommendation.json")
         btn_json.click(ui_download_json, [json_state], [file_json])
 
@@ -186,7 +189,7 @@ with gr.Blocks(title="Condition Recommender") as demo:
             no_hmpa2 = gr.Checkbox(True, label="No HMPA")
             aq_only2 = gr.Checkbox(False, label="Aqueous only")
             min_bp2 = gr.Slider(0, 200, value=0, step=5, label="Min solvent bp (C)")
-        btn2 = gr.Button("Design Plate")
+        btn2 = gr.Button("Design Plate", variant="primary")
         grid = gr.Dataframe(headers=["well_id","core","base_uid","solvent_uid","additive_uids","T_C","time_h"],
                             datatype=["str","str","str","str","str","str","str"],
                             interactive=False, wrap=True)
@@ -194,7 +197,7 @@ with gr.Blocks(title="Condition Recommender") as demo:
         csv_state = gr.State("")
         btn2.click(ui_plate, [rxn2, use_drfp2, drfp_w2, no_chloro2, no_hmpa2, aq_only2, min_bp2], [grid, csv_box, csv_state])
         with gr.Row():
-            btn_dl = gr.Button("Download CSV")
+            btn_dl = gr.Button("Download CSV", variant="secondary")
             file_out = gr.File(label="plate.csv")
         btn_dl.click(ui_download_csv, [csv_state], [file_out])
 
@@ -204,7 +207,7 @@ with gr.Blocks(title="Condition Recommender") as demo:
         with gr.Row():
             use_drfp3 = gr.Checkbox(True, label="Use DRFP re‑ranking")
             drfp_w3 = gr.Slider(0.0, 1.0, value=0.4, step=0.05, label="DRFP weight")
-        btn3 = gr.Button("Fetch Precedents")
+        btn3 = gr.Button("Fetch Precedents", variant="primary")
         tbl = gr.Dataframe(headers=["reaction_id","yield","core","base_uid","solvent_uid","T_C","time_h"],
                            datatype=["str","number","str","str","str","number","number"],
                            interactive=False, wrap=True)
@@ -212,9 +215,9 @@ with gr.Blocks(title="Condition Recommender") as demo:
         prec_json_state = gr.State("")
         btn3.click(ui_precedents, [rxn3, k3, use_drfp3, drfp_w3], [tbl, prec_csv_state, prec_json_state])
         with gr.Row():
-            btn_prec_csv = gr.Button("Download CSV")
+            btn_prec_csv = gr.Button("Download CSV", variant="secondary")
             file_prec_csv = gr.File(label="precedents.csv")
-            btn_prec_json = gr.Button("Download JSON")
+            btn_prec_json = gr.Button("Download JSON", variant="secondary")
             file_prec_json = gr.File(label="precedents.json")
         btn_prec_csv.click(ui_download_csv, [prec_csv_state], [file_prec_csv])
         btn_prec_json.click(ui_download_json, [prec_json_state], [file_prec_json])
