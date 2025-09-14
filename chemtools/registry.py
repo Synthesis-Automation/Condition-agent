@@ -1,9 +1,21 @@
 from __future__ import annotations
+"""
+chemtools.registry
+
+Lightweight in-memory registry built from the compound taxonomy (data/compound_taxonomy).
+
+- Default source: taxonomy JSON files (ligand, base, solvent, coupling_reagent, catalysts_precursor)
+- Override path: set CHEMTOOLS_TAXONOMY_DIR to an alternate taxonomy directory
+- Optional custom registry: set CHEMTOOLS_REGISTRY_PATH to a JSON/JSONL to load instead
+
+No dependency on a merged CAS registry JSONL by default.
+"""
 
 import json
 import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
+import json as _json
 
 # Local optional properties enrichment
 try:
@@ -120,6 +132,187 @@ def _role_from_record(r: Dict[str, Any]) -> str:
     return ROLE_MAP.get(ctype, "ADDITIVE" if ctype else "ADDITIVE")
 
 
+def _taxonomy_dir() -> Optional[str]:
+    env = os.environ.get("CHEMTOOLS_TAXONOMY_DIR")
+    if env and os.path.isdir(env):
+        return env
+    try:
+        base = os.path.dirname(os.path.dirname(__file__))
+        d = os.path.join(base, "data", "compound_taxonomy")
+        return d if os.path.isdir(d) else None
+    except Exception:
+        return None
+
+
+def _add_alias(idx: _RegistryIndex, uid: str, text: Optional[str]) -> None:
+    if not text:
+        return
+    # Route via add_record’s alias path by appending to record later; for indexing, update alias_to_uid directly here
+    na = _normalize_alias(str(text))
+    if na:
+        idx.alias_to_uid.setdefault(na, uid)
+
+
+def _load_registry_from_taxonomy() -> _RegistryIndex:
+    idx = _RegistryIndex()
+
+    def load(rel: str) -> Dict[str, Any] | None:
+        d = _taxonomy_dir()
+        if not d:
+            return None
+        p = os.path.join(d, rel)
+        if not os.path.exists(p):
+            return None
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                return _json.load(f)
+        except Exception:
+            return None
+
+    # Ligands
+    lig = load("taxonomy_ligand.json")
+    if lig:
+        for fam in lig.get("families", []) or []:
+            fam_label = fam.get("label")
+            fam_id = fam.get("family_id")
+            for em in fam.get("example_members", []) or []:
+                uid = (em.get("cas") or "").strip()
+                if not uid:
+                    continue
+                name = (em.get("name") or uid).strip()
+                abbr = (em.get("abbr") or None)
+                token = (abbr or name or uid)
+                rec = {
+                    "uid": uid,
+                    "cas": uid,
+                    "role": "LIGAND",
+                    "name": name,
+                    "abbreviation": abbr,
+                    "token": token,
+                    "generic_core": None,
+                    "compound_type": "ligand",
+                    "aliases": (em.get("synonyms") or []),
+                }
+                idx.add_record(rec)
+                _add_alias(idx, uid, fam_label)
+                _add_alias(idx, uid, fam_id)
+
+    # Bases
+    bas = load("taxonomy_base.json")
+    if bas:
+        for fam in bas.get("families", []) or []:
+            fam_label = fam.get("label")
+            fam_id = fam.get("family_id")
+            for em in fam.get("example_members", []) or []:
+                uid = (em.get("cas") or "").strip()
+                if not uid:
+                    continue
+                name = (em.get("name") or uid).strip()
+                abbr = (em.get("abbr") or None)
+                token = (abbr or name or uid)
+                rec = {
+                    "uid": uid,
+                    "cas": uid,
+                    "role": "BASE",
+                    "name": name,
+                    "abbreviation": abbr,
+                    "token": token,
+                    "generic_core": None,
+                    "compound_type": "base",
+                    "aliases": (em.get("synonyms") or []),
+                }
+                idx.add_record(rec)
+                _add_alias(idx, uid, fam_label)
+                _add_alias(idx, uid, fam_id)
+
+    # Solvents
+    solv = load("taxonomy_solvent.json")
+    if solv:
+        for fam in solv.get("families", []) or []:
+            fam_label = fam.get("label")
+            fam_id = fam.get("family_id")
+            for em in fam.get("example_members", []) or []:
+                uid = (em.get("cas") or "").strip()
+                if not uid:
+                    continue
+                name = (em.get("name") or uid).strip()
+                abbr = (em.get("abbr") or None)
+                token = (abbr or name or uid)
+                rec = {
+                    "uid": uid,
+                    "cas": uid,
+                    "role": "SOLVENT",
+                    "name": name,
+                    "abbreviation": abbr,
+                    "token": token,
+                    "generic_core": None,
+                    "compound_type": "solvent",
+                    "aliases": (em.get("synonyms") or []),
+                }
+                idx.add_record(rec)
+                _add_alias(idx, uid, fam_label)
+                _add_alias(idx, uid, fam_id)
+
+    # Coupling reagents -> ADDITIVE role, explicit type
+    cou = load("taxonomy_coupling_reagent.json")
+    if cou:
+        for fam in cou.get("families", []) or []:
+            fam_label = fam.get("label")
+            fam_id = fam.get("family_id")
+            for em in fam.get("example_members", []) or []:
+                uid = (em.get("cas") or "").strip()
+                if not uid:
+                    continue
+                name = (em.get("name") or uid).strip()
+                abbr = (em.get("abbr") or None)
+                token = (abbr or name or uid)
+                rec = {
+                    "uid": uid,
+                    "cas": uid,
+                    "role": "ADDITIVE",
+                    "name": name,
+                    "abbreviation": abbr,
+                    "token": token,
+                    "generic_core": None,
+                    "compound_type": "coupling_reagent",
+                    "aliases": (em.get("synonyms") or []),
+                }
+                idx.add_record(rec)
+                _add_alias(idx, uid, fam_label)
+                _add_alias(idx, uid, fam_id)
+
+    # Catalysts precursors -> CATALYST, generic_core from family metal
+    cat = load("taxonomy_catalysts_precursor.json")
+    if cat:
+        for fam in cat.get("families", []) or []:
+            fam_label = fam.get("label")
+            fam_id = fam.get("family_id")
+            metal = (fam.get("metal") or "").strip()
+            for em in fam.get("example_members", []) or []:
+                uid = (em.get("cas") or "").strip()
+                if not uid:
+                    continue
+                name = (em.get("name") or uid).strip()
+                abbr = (em.get("abbr") or None)
+                token = (abbr or name or uid)
+                rec = {
+                    "uid": uid,
+                    "cas": uid,
+                    "role": "CATALYST",
+                    "name": name,
+                    "abbreviation": abbr,
+                    "token": token,
+                    "generic_core": metal or None,
+                    "compound_type": "catalyst_core",
+                    "aliases": (em.get("synonyms") or []),
+                }
+                idx.add_record(rec)
+                _add_alias(idx, uid, fam_label)
+                _add_alias(idx, uid, fam_id)
+
+    return idx
+
+
 def _load_registry() -> _RegistryIndex:
     global _INDEX
     if _INDEX is not None:
@@ -127,71 +320,64 @@ def _load_registry() -> _RegistryIndex:
     idx = _RegistryIndex()
     # Allow override via environment variable for testing/alternate datasets
     env_path = os.environ.get("CHEMTOOLS_REGISTRY_PATH")
-    if env_path:
-        data_path = env_path
-    else:
-        data_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            "data",
-            "cas_registry_merged.jsonl",
-        )
-    if not os.path.exists(data_path):
-        # Empty index; resolver will return NOT_FOUND
-        _INDEX = idx
-        return idx
-    # Stream JSONL
-    with open(data_path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                raw = json.loads(line)
-            except Exception:
-                continue
-            cas = (raw.get("cas") or "").strip()
-            uid_raw = (raw.get("uid") or "").strip()
-            # Prefer CAS as UID when available, otherwise accept provided uid
-            if cas:
-                uid = cas
-            elif uid_raw:
-                uid = uid_raw
+    if env_path and os.path.exists(env_path):
+        # JSON/JSONL fallback path if explicitly provided
+        try:
+            if env_path.lower().endswith(".json"):
+                with open(env_path, "r", encoding="utf-8") as f:
+                    data = _json.load(f)
+                if isinstance(data, list):
+                    items = data
+                elif isinstance(data, dict):
+                    # assume {uid: rec}
+                    items = [dict(v, uid=k) for k, v in data.items()]
+                else:
+                    items = []
             else:
-                continue
-            # Role selection: explicit "role" field, else map from compound_type/hint
-            role_raw = (raw.get("role") or "").strip().upper()
-            if role_raw in {"CATALYST", "LIGAND", "BASE", "SOLVENT", "ADDITIVE"}:
-                role = role_raw
-            else:
-                role = _role_from_record(raw)
-            name = raw.get("name") or cas or uid
-            rec: Dict[str, Any] = {
-                "uid": uid,
-                "cas": cas,
-                "role": role,
-                "name": name,
-                "abbreviation": raw.get("abbreviation") or None,
-                "token": raw.get("token") or None,
-                "generic_core": raw.get("generic_core") or None,
-                "compound_type": raw.get("compound_type") or None,
-                "smiles": raw.get("smile") or None,
-                # Aliases stored here are only for indexing convenience; final list is assembled later
-                "aliases": [],
-            }
-            # Seed aliases set for lookup
-            aliases: List[str] = []
-            for k in ("name", "abbreviation", "token", "generic_core"):
-                v = raw.get(k)
-                if v:
-                    aliases.append(str(v))
-            # Add UID and CAS (if present and distinct)
-            for extra in (uid, cas):
-                if extra:
-                    aliases.append(extra)
-            rec["aliases"] = aliases
-            idx.add_record(rec)
-    _INDEX = idx
-    return idx
+                items = []
+                with open(env_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        s = line.strip()
+                        if not s:
+                            continue
+                        try:
+                            items.append(_json.loads(s))
+                        except Exception:
+                            continue
+            for raw in items:
+                cas = (raw.get("cas") or "").strip()
+                uid = cas or (raw.get("uid") or "").strip()
+                if not uid:
+                    continue
+                role_raw = (raw.get("role") or "").strip().upper()
+                role = role_raw if role_raw in {"CATALYST", "LIGAND", "BASE", "SOLVENT", "ADDITIVE"} else _role_from_record(raw)
+                name = raw.get("name") or uid
+                rec: Dict[str, Any] = {
+                    "uid": uid,
+                    "cas": cas or None,
+                    "role": role,
+                    "name": name,
+                    "abbreviation": raw.get("abbreviation") or None,
+                    "token": raw.get("token") or None,
+                    "generic_core": raw.get("generic_core") or None,
+                    "compound_type": raw.get("compound_type") or None,
+                    "aliases": [],
+                }
+                aliases: List[str] = []
+                for k in ("name", "abbreviation", "token", "generic_core", "uid", "cas"):
+                    v = raw.get(k)
+                    if v:
+                        aliases.append(str(v))
+                rec["aliases"] = aliases
+                idx.add_record(rec)
+            _INDEX = idx
+            return idx
+        except Exception:
+            # Fall through to taxonomy
+            pass
+    # Default: taxonomy-based registry
+    _INDEX = _load_registry_from_taxonomy()
+    return _INDEX
 
 
 def categories() -> Dict[str, List[str]]:

@@ -1,4 +1,11 @@
 from __future__ import annotations
+"""
+chem-registry CLI
+
+Resolves CAS/name/alias using the taxonomy-backed registry (data/compound_taxonomy).
+Set CHEMTOOLS_TAXONOMY_DIR to point at an alternate taxonomy folder.
+You may also set CHEMTOOLS_REGISTRY_PATH to a custom JSON/JSONL to override.
+"""
 
 import argparse
 import json
@@ -86,4 +93,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
-

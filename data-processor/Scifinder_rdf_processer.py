@@ -29,220 +29,425 @@ else:  # pragma: no cover
 
 # Import processing functions from the existing modules
 try:
-    from process_reactions import parse_rdf, assemble_rows, load_cas_maps
+    from process_reactions import parse_rdf, assemble_rows, load_cas_maps, build_condkey, build_condsig, build_famsig
 except Exception as e:
     print(f"Error: Cannot import processing helpers: {e}")
     sys.exit(1)
 
 try:
-    from reaction_markdown_generator import ReactionMarkdownGenerator
-except Exception as e:
-    # Fall back to a minimal generator that produces a simple Markdown summary
-    # and a JSONL with fields compatible with chemtools dataset ingestion.
-    print(f"Warning: Cannot import ReactionMarkdownGenerator: {e}. Using minimal generator.")
+    # We import but will prefer our taxonomy-aware generator for this GUI tool.
+    from reaction_markdown_generator import ReactionMarkdownGenerator as _ExternalReactionMarkdownGenerator  # type: ignore
+except Exception:
+    _ExternalReactionMarkdownGenerator = None  # type: ignore
 
-    class ReactionMarkdownGenerator:  # type: ignore
-        def __init__(self) -> None:
+
+# ---------------------------- Taxonomy integration ----------------------------
+
+import json as _json
+
+
+class _TaxonomyIndex:
+    """Load compound taxonomies and expose simple lookup utilities.
+
+    Builds a lightweight CAS map compatible with assemble_rows(), plus name/synonym
+    indices for role assignment and tokenization.
+    """
+
+    def __init__(self, base_dir: str) -> None:
+        self.base_dir = base_dir
+        self.cas_map: Dict[str, Dict[str, str]] = {}
+        self.name_to_cas: Dict[str, str] = {}
+        self.name_to_role: Dict[str, str] = {}
+        self.cas_to_family: Dict[str, str] = {}
+        self.family_metal: Dict[str, str] = {}
+        self._load_all()
+
+    @staticmethod
+    def _norm_name(s: str) -> str:
+        import re
+        if not s:
+            return ""
+        t = s.strip().lower()
+        t = re.sub(r"\s+", " ", t)
+        t = re.sub(r"[^a-z0-9\+\-\.\(\)\[\]/']", "", t)  # keep common chem punctuation
+        return t
+
+    def _index_member(
+        self,
+        *,
+        cas: str | None,
+        name: str | None,
+        abbr: str | None,
+        synonyms: List[str] | None,
+        role: str,
+        category_hint: str,
+        generic_core: str = "",
+        family_id: str | None = None,
+    ) -> None:
+        cas = (cas or "").strip()
+        name = (name or "").strip()
+        abbr = (abbr or "").strip()
+        synonyms = list(synonyms or [])
+
+        token = (abbr or name).strip().replace(" ", "")
+        rec = {
+            "Name": name or abbr or cas,
+            "Abbreviation": abbr,
+            "Token": token,
+            "Role": role,
+            "CategoryHint": category_hint,
+            "GenericCore": generic_core,
+        }
+        if family_id:
+            rec["FamilyID"] = family_id
+        if cas:
+            self.cas_map[cas] = rec
+        # Names -> CAS and role indices
+        keys = [name, abbr] + synonyms
+        for k in keys:
+            k_norm = self._norm_name(k)
+            if not k_norm:
+                continue
+            if cas and k_norm not in self.name_to_cas:
+                self.name_to_cas[k_norm] = cas
+            # prefer stable role labels; do not override existing
+            self.name_to_role.setdefault(k_norm, role)
+        if family_id and cas:
+            self.cas_to_family[cas] = family_id
+        # family metal map set elsewhere for catalysts
+
+    def _load_json(self, rel: str) -> Dict[str, Any] | None:
+        p = os.path.join(self.base_dir, rel)
+        if not os.path.exists(p):
+            return None
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                return _json.load(f)
+        except Exception:
+            return None
+
+    def _load_all(self) -> None:
+        # Ligands
+        lig = self._load_json("taxonomy_ligand.json")
+        if lig:
+            for fam in lig.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="LIG",
+                        category_hint="ligand",
+                    )
+
+        # Bases
+        bas = self._load_json("taxonomy_base.json")
+        if bas:
+            for fam in bas.get("families", []) or []:
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="BASE",
+                        category_hint="base",
+                    )
+
+        # Coupling reagents / activators (amidation)
+        cou = self._load_json("taxonomy_coupling_reagent.json")
+        if cou:
+            for fam in cou.get("families", []) or []:
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="COUPLING_REAGENT",
+                        category_hint="coupling_reagent",
+                    )
+
+        # Solvents
+        solv = self._load_json("taxonomy_solvent.json")
+        if solv:
+            for fam in solv.get("families", []) or []:
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="SOLVENT",
+                        category_hint="solvent",
+                    )
+
+        # Catalyst precursors (metals)
+        cat = self._load_json("taxonomy_catalysts_precursor.json")
+        if cat:
+            for fam in cat.get("families", []) or []:
+                fam_id = fam.get("family_id")
+                metal = (fam.get("metal") or "").strip()
+                if fam_id and metal:
+                    self.family_metal[fam_id] = metal
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="CAT",
+                        category_hint="catalyst_precursor",
+                        generic_core=metal,
+                        family_id=fam_id,
+                    )
+
+    # ---- Public helpers ----
+
+    def cas_lookup(self, cas: str) -> Dict[str, str]:
+        return self.cas_map.get((cas or "").strip(), {})
+
+    def role_for(self, name: str | None, cas: str | None) -> str:
+        cas = (cas or "").strip()
+        if cas:
+            role = (self.cas_map.get(cas, {}).get("Role") or "").strip().upper()
+            if role:
+                return role
+        n = self._norm_name(name or "")
+        if n:
+            role = (self.name_to_role.get(n) or "").strip().upper()
+            if role:
+                return role
+        return "UNK"
+
+    def ligand_token_for(self, name: str | None, cas: str | None) -> str:
+        cas = (cas or "").strip()
+        if cas and cas in self.cas_map:
+            tok = (self.cas_map[cas].get("Token") or self.cas_map[cas].get("Abbreviation") or self.cas_map[cas].get("Name") or "").strip()
+            return tok.replace(" ", "")
+        n = (name or "").strip()
+        if n:
+            nn = self._norm_name(n)
+            cas2 = self.name_to_cas.get(nn)
+            if cas2 and cas2 in self.cas_map:
+                tok = (self.cas_map[cas2].get("Token") or self.cas_map[cas2].get("Abbreviation") or self.cas_map[cas2].get("Name") or "").strip()
+                return tok.replace(" ", "")
+            return n.replace(" ", "")
+        return ""
+
+    def metal_token_from_core_pairs(self, core_pairs: List[str], fallback_generic: List[str]) -> str:
+        # Inspect core name|cas pairs to find a catalyst precursor, else use generic
+        for p in core_pairs or []:
+            nm, _, cs = p.partition("|")
+            cs = cs.strip()
+            if cs and cs in self.cas_map:
+                gen = (self.cas_map[cs].get("GenericCore") or "").strip()
+                if gen:
+                    return gen
+        # fallback to generic tag already computed
+        for g in fallback_generic or []:
+            if g:
+                return g
+        return ""
+
+
+class ReactionMarkdownGenerator:  # taxonomy-aware local generator
+    def __init__(self, taxonomy: _TaxonomyIndex | None = None) -> None:
+        self.taxonomy = taxonomy or None
+        # For backward compatibility with existing code path
+        self.cas_map = (taxonomy.cas_map if taxonomy else {})
+
+    def _safe_json_list(self, val: str):
+        try:
+            return _json.loads(val or "[]")
+        except Exception:
+            return []
+
+    def _pair_to_obj(self, item: str):
+        if "|" in item:
+            name, cas = item.split("|", 1)
+            return {"name": name.strip(), "cas": cas.strip()}
+        return {"name": item.strip(), "cas": ""}
+
+    def _join_names(self, arr):
+        if not arr:
+            return ""
+        out = []
+        for it in arr:
+            if isinstance(it, dict):
+                nm = (it.get("name") or "").strip()
+            elif isinstance(it, str):
+                nm = it.split("|", 1)[0].strip()
+            else:
+                nm = str(it)
+            if nm:
+                out.append(nm)
+        return ", ".join(out)
+
+    def _compute_condition_core(self, row: Dict[str, Any]) -> str:
+        core_gen = self._safe_json_list(row.get("CatalystCoreGeneric", "[]"))
+        core_pairs = self._safe_json_list(row.get("CatalystCoreDetail", "[]"))
+        lig_list = self._safe_json_list(row.get("Ligand", "[]"))
+
+        metal = ""
+        if self.taxonomy:
+            metal = self.taxonomy.metal_token_from_core_pairs(core_pairs, core_gen)
+        if not metal:
+            metal = (core_gen[0] if core_gen else "").strip()
+
+        lig_tok = ""
+        if lig_list:
+            first = lig_list[0]
+            cas = ""
+            nm = ""
+            if "|" in first:
+                nm, cas = (first.split("|", 1) + [""])[:2]
+            else:
+                nm = first
+            if self.taxonomy:
+                lig_tok = self.taxonomy.ligand_token_for(nm, cas)
+            else:
+                rec = (getattr(self, "cas_map", {}) or {}).get((cas or "").strip()) or {}
+                lig_tok = (rec.get("Token") or rec.get("Abbreviation") or rec.get("Name") or nm).strip()
+            lig_tok = lig_tok.replace(" ", "")
+
+        # If no ligand but a metal core is present, try suggestion via PairingHelper
+        if not lig_tok and metal and self.taxonomy:
+            # Try to identify catalyst family from core CAS
+            fam_id = None
+            for p in core_pairs or []:
+                _, _, cs = p.partition("|")
+                cs = cs.strip()
+                if cs and cs in self.taxonomy.cas_to_family:
+                    fam_id = self.taxonomy.cas_to_family.get(cs)
+                    break
+            try:
+                from conditioncore_pairing_helper_for_ref_only import PairingHelper  # type: ignore
+                cat_path = os.path.join(self.taxonomy.base_dir, "taxonomy_catalysts_precursor.json")
+                ph = PairingHelper(cat_path)
+                if fam_id:
+                    hint = (row.get("ReactionType") or "").strip() or None
+                    pick = ph.suggest_for(fam_id, None, hint)
+                    if pick and pick.get("ligand", {}).get("abbr"):
+                        lig_tok = (pick["ligand"]["abbr"] or "").strip().replace(" ", "")
+            except Exception:
+                pass
+
+        return (f"{metal}/{lig_tok}" if metal and lig_tok else metal or lig_tok)
+
+    def generate_markdown_report(self, rows, output_path: str, source_folder: str):
+        try:
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(f"# Reactions Report ({source_folder})\n\n")
+                f.write(f"Total reactions: {len(rows)}\n\n")
+                for row in rows:
+                    rid = row.get("ReactionID", "")
+                    rtype = row.get("ReactionType", "")
+                    reag_list = self._safe_json_list(row.get("Reagent", "[]"))
+                    role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
+                    solv_list = self._safe_json_list(row.get("Solvent", "[]"))
+
+                    disp_core = self._compute_condition_core(row)
+
+                    T = row.get("Temperature_C", "")
+                    t = row.get("Time_h", "")
+                    y = row.get("Yield_%", "")
+
+                    reag_out = []
+                    for i, item in enumerate(reag_list):
+                        obj = self._pair_to_obj(item)
+                        role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
+                        seg = obj.get("name") or obj.get("cas") or "?"
+                        if obj.get("cas"):
+                            seg += f" ({obj['cas']})"
+                        reag_out.append(f"{seg} [{role}]")
+
+                    solv_out = []
+                    for item in solv_list:
+                        obj = self._pair_to_obj(item)
+                        seg = obj.get("name") or obj.get("cas") or "?"
+                        if obj.get("cas"):
+                            seg += f" ({obj['cas']})"
+                        solv_out.append(seg)
+
+                    r_smi = row.get("ReactantSMILES", "")
+                    p_smi = row.get("ProductSMILES", "")
+
+                    f.write(f"## Reaction {rid}\n\n")
+                    if rtype:
+                        f.write(f"- Type: {rtype}\n")
+                    if disp_core:
+                        f.write(f"- Condition Core: {disp_core}\n")
+                    if y != "":
+                        f.write(f"- Yield %: {y}\n")
+                    if T != "":
+                        f.write(f"- Temperature (C): {T}\n")
+                    if t != "":
+                        f.write(f"- Time (h): {t}\n")
+                    if reag_out:
+                        f.write(f"- Reagents: {', '.join(reag_out)}\n")
+                    if solv_out:
+                        f.write(f"- Solvents: {', '.join(solv_out)}\n")
+                    if r_smi or p_smi:
+                        f.write(f"- SMILES: {r_smi} >> {p_smi}\n")
+                    f.write("\n")
+        except Exception:
             pass
 
-        def _safe_json_list(self, val: str):
-            import json
-            try:
-                return json.loads(val or "[]")
-            except Exception:
-                return []
+    def generate_jsonl_export(self, rows, output_path: str, source_folder: str):
+        out_lines = []
+        for row in rows:
+            rid = row.get("ReactionID", "")
+            rtype = row.get("ReactionType", "")
+            condition_core = self._compute_condition_core(row)
 
-        def _pair_to_obj(self, item: str):
-            # Parse "name|cas" into {name, cas}
-            if "|" in item:
-                name, cas = item.split("|", 1)
-                return {"name": name.strip(), "cas": cas.strip()}
-            return {"name": item.strip(), "cas": ""}
+            reag_list = self._safe_json_list(row.get("Reagent", "[]"))
+            role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
+            reagents = []
+            for i, item in enumerate(reag_list):
+                obj = self._pair_to_obj(item)
+                role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
+                obj["role"] = role
+                reagents.append(obj)
 
-        def _join_names(self, arr):
-            if not arr:
-                return ""
-            out = []
-            for it in arr:
-                if isinstance(it, dict):
-                    nm = (it.get("name") or "").strip()
-                elif isinstance(it, str):
-                    nm = it.split("|", 1)[0].strip()
-                else:
-                    nm = str(it)
-                if nm:
-                    out.append(nm)
-            return ", ".join(out)
+            solv_list = self._safe_json_list(row.get("Solvent", "[]"))
+            solvents = [self._pair_to_obj(x) for x in solv_list]
 
-        def generate_markdown_report(self, rows, output_path: str, source_folder: str):
-            try:
-                with open(output_path, "w", encoding="utf-8") as f:
-                    # Header
-                    f.write(f"# Reactions Report ({source_folder})\n\n")
-                    f.write(f"Total reactions: {len(rows)}\n\n")
+            def _num(x):
+                try:
+                    return float(x)
+                except Exception:
+                    return None
+            conditions = {
+                "temperature_c": _num(row.get("Temperature_C")),
+                "time_h": _num(row.get("Time_h")),
+                "yield_pct": _num(row.get("Yield_%")),
+            }
 
-                    # Per-reaction details (compact)
-                    for row in rows:
-                        rid = row.get("ReactionID", "")
-                        rtype = row.get("ReactionType", "")
-                        core_gen = self._safe_json_list(row.get("CatalystCoreGeneric", "[]"))
-                        lig_list = self._safe_json_list(row.get("Ligand", "[]"))
-                        reag_list = self._safe_json_list(row.get("Reagent", "[]"))
-                        role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
-                        solv_list = self._safe_json_list(row.get("Solvent", "[]"))
+            smiles = {
+                "reactants": row.get("ReactantSMILES", ""),
+                "products": row.get("ProductSMILES", ""),
+            }
 
-                        # Compute a display core using metal token and ligand token from CAS map when available
-                        metal = (core_gen[0] if core_gen else "").strip()
-                        lig_tok = ""
-                        if lig_list:
-                            first = lig_list[0]
-                            cas = ""
-                            nm = ""
-                            if "|" in first:
-                                nm, cas = (first.split("|", 1) + [""])[:2]
-                            else:
-                                nm = first
-                            try:
-                                cmap = getattr(self, "cas_map", {}) or {}
-                                rec = cmap.get((cas or "").strip()) or {}
-                                lig_tok = (rec.get("Token") or rec.get("Abbreviation") or rec.get("Name") or nm).strip()
-                            except Exception:
-                                lig_tok = (nm or "").strip()
-                            lig_tok = lig_tok.replace(" ", "")
-                        disp_core = (f"{metal}/{lig_tok}" if metal and lig_tok else metal or lig_tok)
+            analysis_record = {
+                "reaction_id": rid,
+                "reaction_type": rtype,
+                "condition_core": condition_core,
+                "reagents": reagents,
+                "solvents": solvents,
+                "conditions": conditions,
+                "smiles": smiles,
+                "reference": row.get("Reference") or {},
+            }
+            out_lines.append(_json.dumps(analysis_record, ensure_ascii=False))
 
-                        # Conditions
-                        T = row.get("Temperature_C", "")
-                        t = row.get("Time_h", "")
-                        y = row.get("Yield_%", "")
-
-                        # Build reagents with roles
-                        reag_out = []
-                        for i, item in enumerate(reag_list):
-                            obj = self._pair_to_obj(item)
-                            role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
-                            seg = obj.get("name") or obj.get("cas") or "?"
-                            if obj.get("cas"):
-                                seg += f" ({obj['cas']})"
-                            reag_out.append(f"{seg} [{role}]")
-
-                        # Solvents
-                        solv_out = []
-                        for item in solv_list:
-                            obj = self._pair_to_obj(item)
-                            seg = obj.get("name") or obj.get("cas") or "?"
-                            if obj.get("cas"):
-                                seg += f" ({obj['cas']})"
-                            solv_out.append(seg)
-
-                        # SMILES
-                        r_smi = row.get("ReactantSMILES", "")
-                        p_smi = row.get("ProductSMILES", "")
-
-                        f.write(f"## Reaction {rid}\n\n")
-                        if rtype:
-                            f.write(f"- Type: {rtype}\n")
-                        if disp_core:
-                            f.write(f"- Condition Core: {disp_core}\n")
-                        if y != "":
-                            f.write(f"- Yield %: {y}\n")
-                        if T != "":
-                            f.write(f"- Temperature (C): {T}\n")
-                        if t != "":
-                            f.write(f"- Time (h): {t}\n")
-                        if reag_out:
-                            f.write(f"- Reagents: {', '.join(reag_out)}\n")
-                        if solv_out:
-                            f.write(f"- Solvents: {', '.join(solv_out)}\n")
-                        if r_smi or p_smi:
-                            f.write(f"- SMILES: {r_smi} >> {p_smi}\n")
-                        f.write("\n")
-            except Exception:
-                pass
-
-        def generate_jsonl_export(self, rows, output_path: str, source_folder: str):
-            import json as _json
-            out_lines = []
-            for row in rows:
-                # Basic identifiers
-                rid = row.get("ReactionID", "")
-                rtype = row.get("ReactionType", "")
-
-                # Catalyst core label (tokenized metal/ligand)
-                core_gen = self._safe_json_list(row.get("CatalystCoreGeneric", "[]"))
-                lig_list = self._safe_json_list(row.get("Ligand", "[]"))
-                metal = (core_gen[0] if core_gen else "").strip()
-                lig_tok = ""
-                if lig_list:
-                    first = lig_list[0]
-                    cas = ""
-                    nm = ""
-                    if "|" in first:
-                        nm, cas = (first.split("|", 1) + [""])[:2]
-                    else:
-                        nm = first
-                    try:
-                        cmap = getattr(self, "cas_map", {}) or {}
-                        rec = cmap.get((cas or "").strip()) or {}
-                        lig_tok = (rec.get("Token") or rec.get("Abbreviation") or rec.get("Name") or nm).strip()
-                    except Exception:
-                        lig_tok = (nm or "").strip()
-                    lig_tok = lig_tok.replace(" ", "")
-                condition_core = (f"{metal}/{lig_tok}" if metal and lig_tok else metal or lig_tok)
-
-                # Reagents + roles
-                reag_list = self._safe_json_list(row.get("Reagent", "[]"))
-                role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
-                reagents = []
-                base_uid = None
-                for i, item in enumerate(reag_list):
-                    obj = self._pair_to_obj(item)
-                    role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
-                    obj["role"] = role
-                    reagents.append(obj)
-                    if role == "BASE" and not base_uid:
-                        base_uid = obj.get("cas") or obj.get("name")
-
-                # Solvents
-                solv_list = self._safe_json_list(row.get("Solvent", "[]"))
-                solvents = [self._pair_to_obj(x) for x in solv_list]
-                solvent_uid = solvents[0].get("cas") if solvents else None
-
-                # Conditions
-                def _num(x):
-                    try:
-                        return float(x)
-                    except Exception:
-                        return None
-                conditions = {
-                    "temperature_c": _num(row.get("Temperature_C")),
-                    "time_h": _num(row.get("Time_h")),
-                    "yield_pct": _num(row.get("Yield_%")),
-                }
-
-                # SMILES
-                smiles = {
-                    "reactants": row.get("ReactantSMILES", ""),
-                    "products": row.get("ProductSMILES", ""),
-                }
-
-                analysis_record = {
-                    "reaction_id": rid,
-                    "reaction_type": rtype,
-                    "condition_core": condition_core,
-                    "reagents": reagents,
-                    "solvents": solvents,
-                    "conditions": conditions,
-                    "smiles": smiles,
-                    "reference": row.get("Reference") or {},
-                }
-                out_lines.append(_json.dumps(analysis_record, ensure_ascii=False))
-
-            try:
-                with open(output_path, "w", encoding="utf-8") as f:
-                    f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
-            except Exception:
-                pass
+        try:
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
+        except Exception:
+            pass
 
 # Detect RDKit availability
 try:
@@ -288,21 +493,141 @@ class RDFWorker(QtCore.QObject):
         return sorted(rdf_files)
 
     def _load_default_cas_maps(self) -> Dict[str, Dict[str, str]]:
-        """Load default CAS mapping files"""
+        """Deprecated in this GUI workflow: use taxonomy-based mapping instead."""
+        return {}
+
+    def _load_taxonomy(self) -> _TaxonomyIndex:
+        """Load compound taxonomies and build a CAS/name map for roles and tokens."""
+        # Default base dir relative to repo
         here = os.path.dirname(os.path.abspath(__file__))
-        paths: List[str] = []
-        
-        # Try merged registry first, then individual files
-        merged = os.path.join(here, 'cas_registry_merged.jsonl')
-        if os.path.exists(merged):
-            paths.append(merged)
-        else:
-            for cand in ['cas_dictionary.jsonl', 'comprehensive_cas_registry.jsonl']:
-                p = os.path.join(here, cand)
-                if os.path.exists(p):
-                    paths.append(p)
-        
-        return load_cas_maps(paths) if paths else {}
+        tax_dir = os.path.join(os.path.dirname(here), 'data', 'compound_taxonomy')
+        if not os.path.exists(tax_dir):
+            # fallback to local data/compound_taxonomy relative to this file
+            tax_dir = os.path.join(here, 'data', 'compound_taxonomy')
+        try:
+            idx = _TaxonomyIndex(tax_dir)
+            return idx
+        except Exception as e:
+            raise RuntimeError(f"Failed to load taxonomy from {tax_dir}: {e}")
+
+    def _reassign_reagent_roles_via_taxonomy(self, rows: List[Dict[str, Any]], taxonomy: _TaxonomyIndex) -> None:
+        """Ensure ReagentRole aligns with Reagent list using taxonomy role lookup when possible."""
+        for row in rows or []:
+            try:
+                reag_json = row.get('Reagent') or '[]'
+                reag_list = []
+                try:
+                    reag_list = _json.loads(reag_json)
+                except Exception:
+                    reag_list = []
+                roles: List[str] = []
+                for item in reag_list:
+                    name, cas = '', ''
+                    if isinstance(item, str):
+                        if '|' in item:
+                            name, cas = (item.split('|', 1) + [''])[:2]
+                            name = (name or '').strip()
+                            cas = (cas or '').strip()
+                        else:
+                            name = item.strip()
+                    elif isinstance(item, dict):
+                        name = (item.get('name') or '').strip()
+                        cas = (item.get('cas') or '').strip()
+                    role = taxonomy.role_for(name, cas)
+                    if not role or role == 'UNK':
+                        # retain prior heuristic role if any
+                        role = 'UNK'
+                    roles.append(role)
+                # Only write back if we can align 1:1
+                if roles and (len(roles) == len(reag_list)):
+                    row['ReagentRole'] = _json.dumps(roles, ensure_ascii=False)
+            except Exception:
+                continue
+
+    def _inject_suggested_ligands_via_taxonomy(self, rows: List[Dict[str, Any]], taxonomy: _TaxonomyIndex) -> int:
+        """Populate suggested ligand into row['Ligand'] (and FullCatalyticSystem) when missing.
+
+        Returns the count of rows updated.
+        """
+        updated = 0
+        # Build PairingHelper once
+        try:
+            from conditioncore_pairing_helper_for_ref_only import PairingHelper  # type: ignore
+            cat_path = os.path.join(taxonomy.base_dir, 'taxonomy_catalysts_precursor.json')
+            ph = PairingHelper(cat_path)
+        except Exception:
+            ph = None  # type: ignore
+
+        for row in rows or []:
+            try:
+                # Skip if ligand already present
+                lig_list = []
+                try:
+                    lig_list = _json.loads(row.get('Ligand') or '[]')
+                except Exception:
+                    lig_list = []
+                if lig_list:
+                    continue
+
+                # Determine catalyst family from core CAS
+                core_pairs = []
+                try:
+                    core_pairs = _json.loads(row.get('CatalystCoreDetail') or '[]')
+                except Exception:
+                    core_pairs = []
+                fam_id = None
+                for p in core_pairs or []:
+                    if not isinstance(p, str):
+                        continue
+                    _, _, cs = p.partition('|')
+                    cs = cs.strip()
+                    if cs and cs in taxonomy.cas_to_family:
+                        fam_id = taxonomy.cas_to_family.get(cs)
+                        if fam_id:
+                            break
+
+                if not fam_id or not ph:
+                    continue
+
+                # Use reaction type as hint
+                hint = (row.get('ReactionType') or '').strip() or None
+                pick = ph.suggest_for(fam_id, None, hint)
+                if not pick:
+                    continue
+                abbr = ((pick.get('ligand') or {}).get('abbr') or '').strip()
+                if not abbr:
+                    continue
+
+                # Map abbr to CAS via taxonomy; fall back to name-only pair
+                cas = taxonomy.name_to_cas.get(taxonomy._norm_name(abbr), '')
+                pair = f"{abbr}|{cas}"
+
+                # Update Ligand list
+                new_lig = [pair]
+                row['Ligand'] = _json.dumps(new_lig, ensure_ascii=False)
+
+                # Update FullCatalyticSystem
+                full = []
+                try:
+                    full = _json.loads(row.get('FullCatalyticSystem') or '[]')
+                except Exception:
+                    full = []
+                if pair not in full:
+                    full.append(pair)
+                row['FullCatalyticSystem'] = _json.dumps(full, ensure_ascii=False)
+
+                # Recompute keys
+                try:
+                    row['CondKey'] = build_condkey(row)
+                    row['CondSig'] = build_condsig(row)
+                    row['FamSig'] = build_famsig(row)
+                except Exception:
+                    pass
+
+                updated += 1
+            except Exception:
+                continue
+        return updated
 
     def _create_minimal_txt_map(self, rdf_map: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
         """Create a minimal TXT map from RDF data (since we only have RDF)"""
@@ -494,9 +819,10 @@ class RDFWorker(QtCore.QObject):
         """Generate Markdown and JSONL outputs using ReactionMarkdownGenerator"""
         self._emit("Generating Markdown report...")
         
-        # Create generator instance
-        generator = ReactionMarkdownGenerator()
-        generator.cas_map = cas_map
+        # Create taxonomy-aware generator instance
+        taxonomy = getattr(self, '_taxonomy_index', None)
+        generator = ReactionMarkdownGenerator(taxonomy=taxonomy)
+        generator.cas_map = cas_map or (taxonomy.cas_map if taxonomy else {})
         
         # Generate markdown report
         source_name = f"RDF_Folder_{os.path.basename(self.folder_path)}"
@@ -564,8 +890,10 @@ class RDFWorker(QtCore.QObject):
             self._emit(f"RDKit available: {RDKIT_AVAILABLE}")
             
             # Load CAS mappings
-            self._emit("Loading CAS mappings...")
-            cas_map = self._load_default_cas_maps()
+            self._emit("Loading compound taxonomy (roles, ligands, catalysts)...")
+            taxonomy = self._load_taxonomy()
+            self._taxonomy_index = taxonomy
+            cas_map = taxonomy.cas_map
             
             # Create minimal TXT map (since we only have RDF)
             self._emit("Creating minimal TXT mapping...")
@@ -575,6 +903,18 @@ class RDFWorker(QtCore.QObject):
             self._emit("Assembling reaction rows...")
             rows = assemble_rows(txt_map, combined_rdf_map, cas_map, txt_preferred=False)
             self._emit(f"Assembled {len(rows)} rows")
+
+            # Post-process reagent roles using taxonomy to improve role assignment
+            self._emit("Assigning reagent roles via taxonomy...")
+            self._reassign_reagent_roles_via_taxonomy(rows, taxonomy)
+
+            # Inject suggested ligands into rows where Ligand list is empty
+            self._emit("Suggesting and adding ligands for catalyst families lacking ligands...")
+            try:
+                n = self._inject_suggested_ligands_via_taxonomy(rows, taxonomy)
+                self._emit(f"Added suggested ligands to {n} reactions.")
+            except Exception as e:
+                self._emit(f"Ligand suggestion phase skipped due to error: {e}")
 
             # Override Temperature_C and Time_h from dataset/temp_time.md when available
             here = os.path.dirname(os.path.abspath(__file__))

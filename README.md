@@ -62,7 +62,7 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
   - SMILES Normalize: normalize a single SMILES.
   - Detect Family: infer reaction family from reactants (dot or newline separated).
   - Single Molecule (basic): globals-only vector by default; optionally add roles (amine/alcohol/aryl_halide).
-  - Properties Lookup: query by name/CAS/token (e.g., "Water", "7778-53-2").
+  - Properties Lookup: query by name/CAS/token (e.g., "Water", "7778-53-2"). Uses the compound taxonomy under `data/compound_taxonomy` as the default source (no dependency on a merged CAS registry).
   - Recommend Conditions: runs the recommender over a reaction SMILES.
   - Design Plate: proposes a plate CSV across top cores.
   - Precedent Search: retrieves similar precedents (optionally DRFP re-ranking).
@@ -89,6 +89,11 @@ Tips
   - macOS/Linux: `export CHEMTOOLS_DISABLE_RDKIT=1`
   - Windows (PowerShell): `$env:CHEMTOOLS_DISABLE_RDKIT='1'`
 - If running `python app/ui_gradio.py` outside the repo root, prefer module mode: `python -m app.ui_gradio`
+
+### Data Sources (Registry/Properties)
+
+- By default, chemtools loads compound roles, names, and tokens from the taxonomy under `data/compound_taxonomy` (ligands, bases, solvents, coupling reagents, catalyst precursors). The merged CAS registry JSONL is not required for Properties Lookup or name resolution in the UI/API.
+- To point to an alternate taxonomy location, set `CHEMTOOLS_TAXONOMY_DIR`.
 
 ## Endpoints
 
