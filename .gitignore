@@ -145,16 +145,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Minimal Environment Build Files
-zbs_software_updater_minimal.py
-updater_minimal.spec
-build_minimal_updater.py
-setup_minimal_env.ps1
-requirements_minimal.txt
-MINIMAL_ENVIRONMENT_SETUP_COMPLETE.md
-test_*.py
 
-# Balance Fix Test Files
-test_balance_exception_handling.py
-test_comprehensive_balance_fix.py
-BALANCE_FREEZE_FIX_COMPLETE.md
+
+
