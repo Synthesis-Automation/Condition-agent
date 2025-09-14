@@ -34,6 +34,8 @@ if ROOT not in sys.path:
 
 # Ensure RDKit enabled by default for UI runs (respect explicit disable via env)
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", os.environ.get("CHEMTOOLS_DISABLE_RDKIT", "0") or "0")
+# Prefer rxn-insight enabled by default unless explicitly disabled via env
+os.environ.setdefault("CHEMTOOLS_DISABLE_RXN_INSIGHT", os.environ.get("CHEMTOOLS_DISABLE_RXN_INSIGHT", "0") or "0")
 
 # Ensure dataset auto-load for UI runs (respects explicit disable via env)
 os.environ.setdefault("CHEMTOOLS_LOAD_DATASET", os.environ.get("CHEMTOOLS_LOAD_DATASET", "1"))
@@ -129,9 +131,9 @@ def ui_recommend(reaction: str, k: int, use_rxn_insight: bool, use_drfp: bool, d
     return summary, detection_md, "\n\n".join(md), json_text
 
 
-def ui_plate(reaction: str, use_drfp: bool, drfp_weight: float,
+def ui_plate(reaction: str, use_rxn_insight: bool, use_drfp: bool, drfp_weight: float,
              no_chloro: bool, no_hmpa: bool, aqueous_only: bool, min_bp: float | None):
-    relax = _build_relax(use_drfp, drfp_weight)
+    relax = _build_relax(use_drfp, drfp_weight, use_rxn_insight)
     rules = _build_constraints(no_chloro, no_hmpa, aqueous_only, min_bp)
     out = design_plate_from_reaction(reaction, plate_size=24, relax=relax, constraint_rules=rules)
     rows = out.get("rows") or []
@@ -165,8 +167,8 @@ def ui_download_json(json_text: str | None):
         return None
 
 
-def ui_precedents(reaction: str, k: int, use_drfp: bool, drfp_weight: float):
-    relax = _build_relax(use_drfp, drfp_weight)
+def ui_precedents(reaction: str, k: int, use_rxn_insight: bool, use_drfp: bool, drfp_weight: float):
+    relax = _build_relax(use_drfp, drfp_weight, use_rxn_insight)
     out = recommend_from_reaction(reaction, k=int(k), relax=relax, constraint_rules={})
     pack = out.get("precedent_pack") or {}
     precs = list(pack.get("precedents") or [])

@@ -25,6 +25,20 @@ Returned dict (best-effort):
 
 from typing import Any, Dict, Optional
 
+try:
+    # Optional classifier path available in newer rxn_insight builds
+    from rxn_insight.classification import ReactionClassifier  # type: ignore
+    _HAS_RC = True
+except Exception:
+    _HAS_RC = False
+try:
+    # Use our own helpers to parse reactants and apply simple functional-group hits
+    from .smiles import normalize_reaction as _norm_rxn  # type: ignore
+    from .router import _rule_hits as _hits  # type: ignore
+except Exception:
+    _norm_rxn = None  # type: ignore
+    _hits = None  # type: ignore
+
 
 def is_available() -> bool:
     try:
@@ -164,6 +178,44 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
     rxn_class, rxn_name, conf = _extract_fields(raw)
     mapped = _map_to_family(rxn_class, rxn_name)
 
+    # If no mapping yet, try ReactionClassifier + lightweight heuristics
+    if not mapped and _HAS_RC:
+        try:
+            rc = ReactionClassifier(reaction_smiles)  # type: ignore[call-arg]
+            # Populate internal flags
+            try:
+                rc.classify_reaction()
+            except Exception:
+                pass
+            # Derive broad class
+            if getattr(rc, 'is_cc_coupling')() if hasattr(rc, 'is_cc_coupling') else False:  # type: ignore[misc]
+                rxn_class = rxn_class or 'C-C Coupling'
+                # Use boron presence to identify Suzuki when possible
+                boron = False
+                try:
+                    if _norm_rxn and _hits:
+                        norm = _norm_rxn(reaction_smiles)
+                        reactants = [
+                            (r.get('smiles_norm') or r.get('largest_smiles') or r.get('input') or '')
+                            for r in (norm.get('reactants') or [])
+                        ]
+                        reactants = [s for s in reactants if s]
+                        h = _hits(reactants)
+                        boron = bool(h.get('boron'))
+                except Exception:
+                    boron = False
+                if boron:
+                    rxn_name = rxn_name or 'Suzuki coupling with boronic acids'
+                    mapped = mapped or 'Suzuki_CC'
+            elif getattr(rc, 'is_heteroatom_alkylation')() if hasattr(rc, 'is_heteroatom_alkylation') else False:  # type: ignore[misc]
+                rxn_class = rxn_class or 'Heteroatom Alkylation and Arylation'
+                mapped = mapped or 'Ullmann_CN'
+            elif getattr(rc, 'is_acylation')() if hasattr(rc, 'is_acylation') else False:  # type: ignore[misc]
+                rxn_class = rxn_class or 'Acylation'
+                mapped = mapped or 'Amide_Coupling'
+        except Exception:
+            pass
+
     success = bool(rxn_class or rxn_name or mapped)
     return {
         "available": True,
@@ -174,4 +226,3 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         "confidence": conf,
         "raw": raw,
     }
-

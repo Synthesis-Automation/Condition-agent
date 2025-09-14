@@ -1,6 +1,7 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from .util.rdkit_helpers import rdkit_available, parse_smiles
+from .smiles import normalize_reaction as _normalize_reaction
 
 
 def _compile_smarts():
@@ -105,3 +106,77 @@ def detect_family(reactants: List[str]) -> Dict[str, Any]:
         fam, conf = "Ullmann_O", 0.75
 
     return {"family": fam, "confidence": float(conf), "hits": h}
+
+
+def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool = True) -> Dict[str, Any]:
+    """Detect reaction family from a reaction SMILES string.
+
+    - If ``use_rxn_insight`` and the optional rxn_insight integration is available,
+      try it first and map to our family labels; otherwise fall back to rule-based
+      detection over reactant SMARTS.
+    - Always returns a dict with keys: family, confidence, hits, auto (optional).
+    """
+    rsmi = (reaction_smiles or "").strip()
+    norm = _normalize_reaction(rsmi)
+    reactants = [
+        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
+        for r in (norm.get("reactants") or [])
+    ]
+    reactants = [s for s in reactants if s]
+
+    # Base rule-based detection (deterministic, no network)
+    base = detect_family(reactants)
+    fam_rule = base.get("family") or "Unknown"
+    conf_rule: float = float(base.get("confidence") or 0.3)
+    hits = base.get("hits") or _rule_hits(reactants)
+
+    auto: Optional[Dict[str, Any]] = None
+    fam_rxn: Optional[str] = None
+    conf_rxn: Optional[float] = None
+    if use_rxn_insight:
+        try:
+            from .reaction_type_detector import detect_reaction_type as _rxn_detect, is_available as _rxn_avail  # type: ignore
+        except Exception:
+            _rxn_detect = None  # type: ignore
+            _rxn_avail = lambda: False  # type: ignore
+        if _rxn_detect is not None and _rxn_avail():
+            try:
+                auto = _rxn_detect(norm.get("normalized") or rsmi)  # type: ignore[misc]
+            except Exception:
+                auto = None
+            if isinstance(auto, dict) and auto.get("success") and auto.get("mapped_family"):
+                fam_rxn = str(auto.get("mapped_family") or "Unknown")
+                aconf = auto.get("confidence")
+                try:
+                    conf_rxn = float(aconf) if aconf is not None else None
+                except Exception:
+                    conf_rxn = None
+
+    # Choose final family preferring rxn-insight mapping when present
+    fam_final = fam_rxn or fam_rule
+    conf_final = conf_rxn if (conf_rxn is not None) else conf_rule
+    agreement = (fam_rxn is not None) and (str(fam_rxn) == str(fam_rule))
+
+    out: Dict[str, Any] = {
+        "family": fam_final,
+        "confidence": float(conf_final),
+        "hits": hits,
+        "agreement": bool(agreement),
+        "status": ("consistent" if agreement else ("conflict" if fam_rxn else "rule_only")),
+    }
+    if auto is not None:
+        out["auto"] = auto
+    # Attach both results for comparison
+    out["rule"] = {"family": fam_rule, "confidence": conf_rule, "hits": hits}
+    if fam_rxn or auto is not None:
+        out["rxn"] = {
+            "family": fam_rxn,
+            "confidence": conf_rxn,
+            **({} if auto is None else {
+                "available": bool(auto.get("available")),
+                "success": bool(auto.get("success")),
+                "rxn_class": auto.get("rxn_class"),
+                "rxn_name": auto.get("rxn_name"),
+            }),
+        }
+    return out

@@ -41,6 +41,8 @@ CSS = """
 
 # Enable RDKit by default unless explicitly disabled by the environment
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
+# Prefer rxn-insight enabled by default (can be disabled via env or UI toggle)
+os.environ.setdefault("CHEMTOOLS_DISABLE_RXN_INSIGHT", "0")
 
 from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
 from chemtools import registry as creg
@@ -93,29 +95,108 @@ def ui_normalize_smiles(smi: str) -> Dict[str, Any]:
     return smiles.normalize(t)
 
 
-def ui_detect_family(reactants_text: str) -> Dict[str, Any]:
+def _detect_family_md(use_rxi_requested: bool, out: Dict[str, Any]) -> str:
+    lines: list[str] = []
+    # Comparison of rule-based vs rxn-insight
+    rule = out.get("rule") if isinstance(out, dict) else None
+    rxn = out.get("rxn") if isinstance(out, dict) else None
+    rf = (rule or {}).get("family") if isinstance(rule, dict) else None
+    rxf = (rxn or {}).get("family") if isinstance(rxn, dict) else None
+    agree = bool(rf and rxf and (str(rf) == str(rxf)))
+    if agree and rf:
+        lines.append(f"Detected family: {rf}")
+    elif rf and rxf:
+        lines.append(f"Conflict: rule-based={rf} vs rxn-insight={rxf}")
+    fam = out.get("family")
+    if fam and not agree:
+        lines.append(f"final choice: {fam}")
+    # Details
+    if isinstance(rule, dict) and rf:
+        rc = rule.get("confidence")
+        try:
+            lines.append(f"rule-based: {rf} (conf {float(rc):.3f})")
+        except Exception:
+            lines.append(f"rule-based: {rf} (conf {rc})")
+    if isinstance(rxn, dict) and rxf:
+        rxc = rxn.get("confidence")
+        try:
+            lines.append(f"rxn-insight mapped: {rxf} (conf {float(rxc):.3f} if present)")
+        except Exception:
+            lines.append(f"rxn-insight mapped: {rxf}")
+    if rf and rxf:
+        lines.append(f"agreement: {'yes' if agree else 'no'}")
+    auto = out.get("auto") if isinstance(out, dict) else None
+    if isinstance(auto, dict):
+        avail = bool(auto.get("available"))
+        status = "success" if auto.get("success") else "fallback"
+        name = auto.get("rxn_name")
+        klass = auto.get("rxn_class")
+        conf = auto.get("confidence")
+        lines.append(f"rxn-insight available: {avail}")
+        lines.append(f"auto-detection status: {status}")
+        if name:
+            lines.append(f"rxn-insight name: {name}")
+        if klass:
+            lines.append(f"rxn-insight class: {klass}")
+        if conf is not None:
+            try:
+                lines.append(f"rxn-insight confidence: {float(conf):.3f}")
+            except Exception:
+                lines.append(f"rxn-insight confidence: {conf}")
+    else:
+        if use_rxi_requested:
+            lines.append("rxn-insight: not available; using rule-based fallback")
+        else:
+            lines.append("rxn-insight: disabled; using rule-based detection")
+    return "\n".join(f"- {x}" for x in lines) if lines else "- No detection details"
+
+
+def ui_detect_family(reactants_text: str, use_rxn_insight: bool) -> Tuple[Dict[str, Any], str]:
     # Accept either a dot-separated list of reactant SMILES or a full reaction SMILES.
-    # If a reaction arrow is present, extract only the reactants side before detection.
+    # If a reaction arrow is present, prefer the rxn-insight path when enabled.
     t = (reactants_text or "").strip()
     if not t:
         return {"family": "Unknown", "confidence": 0.0, "hits": {}}
-    reactants: list[str] = []
     if ">" in t:
         try:
-            norm = smiles.normalize_reaction(t)
-            reactants = [
-                (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "").strip()
-                for r in (norm.get("reactants") or [])
-            ]
-            reactants = [s for s in reactants if s]
+            out = router.detect_family_from_reaction(t, use_rxn_insight=bool(use_rxn_insight))
+            # If both methods are present and disagree, set family to CONFLICT
+            rule = out.get("rule") if isinstance(out, dict) else None
+            rxn = out.get("rxn") if isinstance(out, dict) else None
+            rf = (rule or {}).get("family") if isinstance(rule, dict) else None
+            rxf = (rxn or {}).get("family") if isinstance(rxn, dict) else None
+            if rf and rxf and str(rf) != str(rxf):
+                out = dict(out)
+                out["family"] = "CONFLICT"
+                out["conflict_between"] = {"rule": rf, "rxn": rxf}
+                out["status"] = "conflict"
+            return out, _detect_family_md(bool(use_rxn_insight), out)
         except Exception:
-            reactants = []
-    if not reactants:
-        if "\n" in t:
-            reactants = [s.strip() for s in t.splitlines() if s.strip()]
-        else:
-            reactants = [s.strip() for s in t.split(".") if s.strip()]
-    return router.detect_family(reactants)
+            pass
+    # Split reactants by '.' or newlines
+    if "\n" in t:
+        reactants = [s.strip() for s in t.splitlines() if s.strip()]
+    else:
+        reactants = [s.strip() for s in t.split(".") if s.strip()]
+    if use_rxn_insight:
+        # Build a reaction string with empty products to enable rxn-insight route
+        rxn_text = ".".join(reactants) + ">>"
+        try:
+            out = router.detect_family_from_reaction(rxn_text, use_rxn_insight=True)
+            rule = out.get("rule") if isinstance(out, dict) else None
+            rxn = out.get("rxn") if isinstance(out, dict) else None
+            rf = (rule or {}).get("family") if isinstance(rule, dict) else None
+            rxf = (rxn or {}).get("family") if isinstance(rxn, dict) else None
+            if rf and rxf and str(rf) != str(rxf):
+                out = dict(out)
+                out["family"] = "CONFLICT"
+                out["conflict_between"] = {"rule": rf, "rxn": rxf}
+                out["status"] = "conflict"
+            return out, _detect_family_md(True, out)
+        except Exception:
+            pass
+    out = router.detect_family(reactants)
+    return out, _detect_family_md(False, out)
 
 
 def ui_featurize_molecular(electrophile: str, nucleophile: str) -> Dict[str, Any]:
@@ -492,11 +573,13 @@ def build_demo() -> gr.Blocks:
             smi_btn.click(ui_normalize_smiles, inputs=[smi_in], outputs=[smi_out])
 
         with gr.Tab("Detect Family"):
-            gr.Markdown("Enter reactants separated by '.' or new lines.")
-            react_in = gr.Textbox(label="Reactants", value="Clc1ccccc1.Nc1ccccc1")
+            gr.Markdown("Enter reactants separated by '.' or new lines, or a full reaction SMILES.")
+            react_in = gr.Textbox(label="Reactants or Reaction", value="Clc1ccccc1.OB(O)c1ccccc1>>")
+            react_use_rxi = gr.Checkbox(value=True, label="Use rxn-insight auto-detect (if available)")
             react_btn = gr.Button("Detect", variant="primary")
             react_out = gr.JSON(label="Detected Family")
-            react_btn.click(ui_detect_family, inputs=[react_in], outputs=[react_out])
+            react_md = gr.Markdown(label="Auto-Detection")
+            react_btn.click(ui_detect_family, inputs=[react_in, react_use_rxi], outputs=[react_out, react_md])
 
         # Removed the legacy multi-molecule featurizer tab to keep only
         # the single-molecule (basic) featurizer in the UI.
