@@ -1,0 +1,1001 @@
+{
+  "version": "1.0",
+  "updated": "2025-09-13",
+  "schema": {
+    "family_id": "stable identifier for the reagent family",
+    "label": "human-readable name",
+    "activation_mode": "how the carboxylic acid is activated (e.g., O-acylurea → OBt ester; acyl fluoride; mixed anhydride)",
+    "leaving_group": "typical formal leaving group(s) in the key step",
+    "byproducts": "salts/ureas/phosphonates etc. typically formed",
+    "typical_bases": "representative bases used with the family",
+    "typical_solvents": "representative solvents",
+    "scaffold": "one-line description of structural motif or reagent class",
+    "example_members": "array of {name, abbr, cas} items (abbr/cas optional)",
+    "aliases": "alternative labels used in literature (optional)",
+    "notes": "free-text cautions, epimerization tendencies, EHS/green notes (optional)"
+  },
+  "families": [
+    {
+      "family_id": "carbodiimides",
+      "label": "Carbodiimides (→ O‑acylurea / active ester with additive)",
+      "activation_mode": "Carboxylate adds to carbodiimide to give O‑acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester",
+      "leaving_group": [
+        "OBt/HOAt/Oxyma",
+        "O‑acylurea"
+      ],
+      "byproducts": [
+        "ureas (e.g., DCU)"
+      ],
+      "typical_bases": [
+        "None",
+        "DIPEA (optional)"
+      ],
+      "typical_solvents": [
+        "DCM",
+        "DMF"
+      ],
+      "scaffold": "RN=C=NR′ reagents that form O‑acylureas; additive suppresses N‑acylurea/oxazolone",
+      "example_members": [
+        {
+          "name": "Dicyclohexylcarbodiimide",
+          "abbr": "DCC",
+          "cas": "538-75-0",
+          "synonyms": [
+            "DCC",
+            "Dicyclohexylcarbodiimide"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 2,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Carbodiimides (→ O‑acylurea / active ester with additive) (carbodiimides) | name: Dicyclohexylcarbodiimide | abbr: DCC | CAS: 538-75-0 | activation: Carboxylate adds to carbodiimide to give O‑acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | leaving_group: OBt/HOAt/Oxyma, O‑acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | reactivity: medium | racemization_risk: medium (lower with HOBt/HOAt/Oxyma) | water_compatibility: low (EDCI moderate) | use_cases: General small-molecule amidation; Bioconjugation with additives | best_for: Low-cost couplings; EDCI: easy aqueous workups | avoid_when: Alpha-stereocenter prone to oxazolone (use additive); Need water-rich media without additives | ehs: sensitizer_possible"
+        },
+        {
+          "name": "Diisopropylcarbodiimide",
+          "abbr": "DIC",
+          "cas": "693-13-0",
+          "synonyms": [
+            "DIC",
+            "Diisopropylcarbodiimide"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 2,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Carbodiimides (→ O‑acylurea / active ester with additive) (carbodiimides) | name: Diisopropylcarbodiimide | abbr: DIC | CAS: 693-13-0 | activation: Carboxylate adds to carbodiimide to give O‑acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | leaving_group: OBt/HOAt/Oxyma, O‑acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | reactivity: medium | racemization_risk: medium (lower with HOBt/HOAt/Oxyma) | water_compatibility: low (EDCI moderate) | use_cases: General small-molecule amidation; Bioconjugation with additives | best_for: Low-cost couplings; EDCI: easy aqueous workups | avoid_when: Alpha-stereocenter prone to oxazolone (use additive); Need water-rich media without additives | ehs: sensitizer_possible"
+        },
+        {
+          "name": "EDC·HCl (1‑ethyl‑3‑(3‑dimethylaminopropyl)carbodiimide hydrochloride)",
+          "abbr": "EDCI·HCl",
+          "cas": "25952-53-8",
+          "synonyms": [
+            "EDCHCl1ethyl33dimethylaminopropylcarbodiimidehydrochloride",
+            "EDCI·HCl"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 2,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Carbodiimides (→ O‑acylurea / active ester with additive) (carbodiimides) | name: EDC·HCl (1‑ethyl‑3‑(3‑dimethylaminopropyl)carbodiimide hydrochloride) | abbr: EDCI·HCl | CAS: 25952-53-8 | activation: Carboxylate adds to carbodiimide to give O‑acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | leaving_group: OBt/HOAt/Oxyma, O‑acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | reactivity: medium | racemization_risk: medium (lower with HOBt/HOAt/Oxyma) | water_compatibility: low (EDCI moderate) | use_cases: General small-molecule amidation; Bioconjugation with additives | best_for: Low-cost couplings; EDCI: easy aqueous workups | avoid_when: Alpha-stereocenter prone to oxazolone (use additive); Need water-rich media without additives | ehs: sensitizer_possible"
+        }
+      ],
+      "aliases": [
+        "Carbodiimide couplers"
+      ],
+      "notes": "Risk of racemization via oxazolone without additive; EDCI urea is water‑soluble; DCU from DCC is insoluble/filterable.",
+      "use_cases": [
+        "General small-molecule amidation",
+        "Bioconjugation with additives"
+      ],
+      "best_for": [
+        "Low-cost couplings",
+        "EDCI: easy aqueous workups"
+      ],
+      "avoid_when": [
+        "Alpha-stereocenter prone to oxazolone (use additive)",
+        "Need water-rich media without additives"
+      ],
+      "relative_reactivity_band": "medium",
+      "racemization_risk_band": "medium (lower with HOBt/HOAt/Oxyma)",
+      "water_compatibility": "low (EDCI moderate)",
+      "green_workup_note": "EDCI urea water-soluble; DCC gives insoluble DCU",
+      "ehs_green": {
+        "sensitizer_possible": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–1.5",
+        "temp_C": "0–25"
+      }
+    },
+    {
+      "family_id": "aminium_uronium_guanidinium",
+      "label": "Aminium/uronium/guanidinium (Bt/At/Oxyma-based)",
+      "activation_mode": "In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer",
+      "leaving_group": [
+        "OBt",
+        "HOAt",
+        "Oxyma"
+      ],
+      "byproducts": [
+        "guanidinium/urea salts (from reagent core)"
+      ],
+      "typical_bases": [
+        "DIPEA",
+        "Et3N"
+      ],
+      "typical_solvents": [
+        "DMF",
+        "MeCN"
+      ],
+      "scaffold": "Preactivated aminium/uronium salts delivering OBt/HOAt/Oxyma esters; SPPS workhorses",
+      "example_members": [
+        {
+          "name": "HATU",
+          "abbr": "HATU",
+          "cas": "148893-10-1",
+          "synonyms": [
+            "HATU"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) (aminium_uronium_guanidinium) | name: HATU | abbr: HATU | CAS: 148893-10-1 | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | leaving_group: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Hindered amide couplings; SPPS | best_for: Fast couplings with low epimerization | avoid_when: Strict Bt/At EHS policies (prefer Oxyma/COMU) | ehs: bt_at_flag"
+        },
+        {
+          "name": "HBTU",
+          "abbr": "HBTU",
+          "cas": "94790-37-1",
+          "synonyms": [
+            "HBTU"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) (aminium_uronium_guanidinium) | name: HBTU | abbr: HBTU | CAS: 94790-37-1 | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | leaving_group: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Hindered amide couplings; SPPS | best_for: Fast couplings with low epimerization | avoid_when: Strict Bt/At EHS policies (prefer Oxyma/COMU) | ehs: bt_at_flag"
+        },
+        {
+          "name": "TBTU",
+          "abbr": "TBTU",
+          "cas": "125700-67-6",
+          "synonyms": [
+            "TBTU"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) (aminium_uronium_guanidinium) | name: TBTU | abbr: TBTU | CAS: 125700-67-6 | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | leaving_group: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Hindered amide couplings; SPPS | best_for: Fast couplings with low epimerization | avoid_when: Strict Bt/At EHS policies (prefer Oxyma/COMU) | ehs: bt_at_flag"
+        },
+        {
+          "name": "HCTU",
+          "abbr": "HCTU",
+          "cas": "330795-65-4",
+          "synonyms": [
+            "HCTU"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) (aminium_uronium_guanidinium) | name: HCTU | abbr: HCTU | CAS: 330795-65-4 | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | leaving_group: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Hindered amide couplings; SPPS | best_for: Fast couplings with low epimerization | avoid_when: Strict Bt/At EHS policies (prefer Oxyma/COMU) | ehs: bt_at_flag"
+        },
+        {
+          "name": "COMU (Oxyma‑based uronium)",
+          "abbr": "COMU",
+          "cas": "1075198-30-9",
+          "synonyms": [
+            "COMU",
+            "COMUOxymabaseduronium"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) (aminium_uronium_guanidinium) | name: COMU (Oxyma‑based uronium) | abbr: COMU | CAS: 1075198-30-9 | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | leaving_group: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Hindered amide couplings; SPPS | best_for: Fast couplings with low epimerization | avoid_when: Strict Bt/At EHS policies (prefer Oxyma/COMU) | ehs: bt_at_flag"
+        }
+      ],
+      "aliases": [
+        "Uronium reagents",
+        "Aminium reagents"
+      ],
+      "notes": "Fast; low epimerization vs carbodiimides; HOBt/HOAt have EHS flags—Oxyma/COMU are modern alternatives.",
+      "use_cases": [
+        "Hindered amide couplings",
+        "SPPS"
+      ],
+      "best_for": [
+        "Fast couplings with low epimerization"
+      ],
+      "avoid_when": [
+        "Strict Bt/At EHS policies (prefer Oxyma/COMU)"
+      ],
+      "relative_reactivity_band": "high",
+      "racemization_risk_band": "low",
+      "water_compatibility": "low",
+      "green_workup_note": "Efficient, but Bt/At energetic content flagged; COMU is safer alt",
+      "ehs_green": {
+        "bt_at_flag": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–1.5",
+        "temp_C": "0–25"
+      }
+    },
+    {
+      "family_id": "phosphonium_bt_at",
+      "label": "Phosphonium (Bt/At variants)",
+      "activation_mode": "OBt/HOAt active‑ester transfer from phosphonium salts",
+      "leaving_group": [
+        "OBt",
+        "HOAt"
+      ],
+      "byproducts": [
+        "phosphonium salts → phosphine oxides/byproducts"
+      ],
+      "typical_bases": [
+        "DIPEA",
+        "Et3N"
+      ],
+      "typical_solvents": [
+        "DCM",
+        "DMF"
+      ],
+      "scaffold": "Phosphonium salts bearing Bt/At leaving groups; high reactivity for hindered partners",
+      "example_members": [
+        {
+          "name": "PyBOP",
+          "abbr": "PyBOP",
+          "cas": "128625-52-5",
+          "synonyms": [
+            "PyBOP"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Phosphonium (Bt/At variants) (phosphonium_bt_at) | name: PyBOP | abbr: PyBOP | CAS: 128625-52-5 | activation: OBt/HOAt active‑ester transfer from phosphonium salts | leaving_group: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Difficult anilide formations; Late-stage amidations | best_for: Hindered partners needing strong activation | avoid_when: Legacy BOP (HMPA concern) | ehs: bt_at_flag"
+        },
+        {
+          "name": "PyAOP",
+          "abbr": "PyAOP",
+          "cas": "128251-48-7",
+          "synonyms": [
+            "PyAOP"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Phosphonium (Bt/At variants) (phosphonium_bt_at) | name: PyAOP | abbr: PyAOP | CAS: 128251-48-7 | activation: OBt/HOAt active‑ester transfer from phosphonium salts | leaving_group: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Difficult anilide formations; Late-stage amidations | best_for: Hindered partners needing strong activation | avoid_when: Legacy BOP (HMPA concern) | ehs: bt_at_flag"
+        },
+        {
+          "name": "BOP (legacy)",
+          "abbr": "BOP",
+          "cas": "56602-33-6",
+          "synonyms": [
+            "BOP",
+            "BOPlegacy"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Phosphonium (Bt/At variants) (phosphonium_bt_at) | name: BOP (legacy) | abbr: BOP | CAS: 56602-33-6 | activation: OBt/HOAt active‑ester transfer from phosphonium salts | leaving_group: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | reactivity: high | racemization_risk: low | water_compatibility: low | use_cases: Difficult anilide formations; Late-stage amidations | best_for: Hindered partners needing strong activation | avoid_when: Legacy BOP (HMPA concern) | ehs: bt_at_flag"
+        }
+      ],
+      "notes": "Avoid BOP due to HMPA‑related concerns; PyBOP/PyAOP are standard modern choices.",
+      "use_cases": [
+        "Difficult anilide formations",
+        "Late-stage amidations"
+      ],
+      "best_for": [
+        "Hindered partners needing strong activation"
+      ],
+      "avoid_when": [
+        "Legacy BOP (HMPA concern)"
+      ],
+      "relative_reactivity_band": "high",
+      "racemization_risk_band": "low",
+      "water_compatibility": "low",
+      "green_workup_note": "Powerful; avoid BOP; prefer PyBOP/PyAOP",
+      "ehs_green": {
+        "bt_at_flag": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–1.5",
+        "temp_C": "0–25"
+      }
+    },
+    {
+      "family_id": "triazine_non_halide",
+      "label": "Triazine-based (do not generate acid halides)",
+      "activation_mode": "Triazinylammonium salts (e.g., DMTMM) form reactive carboxonium in situ",
+      "leaving_group": [
+        "triazinyloxy (leaving group on activated carboxyl)"
+      ],
+      "byproducts": [
+        "morpholinium salts"
+      ],
+      "typical_bases": [
+        "None",
+        "DIPEA (optional)"
+      ],
+      "typical_solvents": [
+        "Water",
+        "MeOH",
+        "MeCN"
+      ],
+      "scaffold": "1,3,5‑Triazine cations promote amidation in aqueous/alcoholic media without ester formation",
+      "example_members": [
+        {
+          "name": "DMTMM·Cl",
+          "abbr": "DMTMM",
+          "cas": null,
+          "synonyms": [
+            "DMTMM",
+            "DMTMMCl"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": null,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Triazine-based (do not generate acid halides) (triazine_non_halide) | name: DMTMM·Cl | abbr: DMTMM | activation: Triazinylammonium salts (e.g., DMTMM) form reactive carboxonium in situ | leaving_group: triazinyloxy (leaving group on activated carboxyl) | bases: None, DIPEA (optional) | solvents: Water, MeOH, MeCN | reactivity: high | racemization_risk: low | water_compatibility: very high | use_cases: Aqueous amidation; Bioconjugation | best_for: Water/alcohol media; Low epimerization needs | avoid_when: Very acid-sensitive substrates | ehs: halide_free"
+        },
+        {
+          "name": "CDMT (triazine additive/activator)",
+          "abbr": "CDMT",
+          "cas": "126851-73-0",
+          "synonyms": [
+            "CDMT",
+            "CDMTtriazineadditiveactivator"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": null,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Triazine-based (do not generate acid halides) (triazine_non_halide) | name: CDMT (triazine additive/activator) | abbr: CDMT | CAS: 126851-73-0 | activation: Triazinylammonium salts (e.g., DMTMM) form reactive carboxonium in situ | leaving_group: triazinyloxy (leaving group on activated carboxyl) | bases: None, DIPEA (optional) | solvents: Water, MeOH, MeCN | reactivity: high | racemization_risk: low | water_compatibility: very high | use_cases: Aqueous amidation; Bioconjugation | best_for: Water/alcohol media; Low epimerization needs | avoid_when: Very acid-sensitive substrates | ehs: halide_free"
+        }
+      ],
+      "aliases": [
+        "DMTMM reagents"
+      ],
+      "notes": "Often faster than HATU/TBTU in benchmarks; useful for bioconjugation and water‑rich media.",
+      "use_cases": [
+        "Aqueous amidation",
+        "Bioconjugation"
+      ],
+      "best_for": [
+        "Water/alcohol media",
+        "Low epimerization needs"
+      ],
+      "avoid_when": [
+        "Very acid-sensitive substrates"
+      ],
+      "relative_reactivity_band": "high",
+      "racemization_risk_band": "low",
+      "water_compatibility": "very high",
+      "green_workup_note": "Salt byproducts; minimal hazardous waste",
+      "ehs_green": {
+        "halide_free": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–1.5",
+        "temp_C": "0–25"
+      }
+    },
+    {
+      "family_id": "imidazolide_formers",
+      "label": "Imidazolide-forming reagents",
+      "activation_mode": "Carbonyldiimidazole (CDI) forms acyl imidazolides that react with amines",
+      "leaving_group": [
+        "imidazole"
+      ],
+      "byproducts": [
+        "imidazole/urea from CDI"
+      ],
+      "typical_bases": [
+        "None",
+        "DIPEA (optional)"
+      ],
+      "typical_solvents": [
+        "THF",
+        "DMF"
+      ],
+      "scaffold": "Neutral coupling via acyl imidazolide; halide‑free, mild",
+      "example_members": [
+        {
+          "name": "1,1′‑Carbonyldiimidazole",
+          "abbr": "CDI",
+          "cas": "530-62-1",
+          "synonyms": [
+            "11Carbonyldiimidazole",
+            "CDI"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Imidazolide-forming reagents (imidazolide_formers) | name: 1,1′‑Carbonyldiimidazole | abbr: CDI | CAS: 530-62-1 | activation: Carbonyldiimidazole (CDI) forms acyl imidazolides that react with amines | leaving_group: imidazole | bases: None, DIPEA (optional) | solvents: THF, DMF | reactivity: medium | racemization_risk: low | water_compatibility: low | use_cases: Weinreb amide formation; Halide-free couplings | best_for: Mild conditions; Avoiding acid chlorides | avoid_when: Very hindered partners (slow) | ehs: halide_free"
+        }
+      ],
+      "notes": "Great for Weinreb amides and less sensitive substrates; can be slower for very hindered systems.",
+      "use_cases": [
+        "Weinreb amide formation",
+        "Halide-free couplings"
+      ],
+      "best_for": [
+        "Mild conditions",
+        "Avoiding acid chlorides"
+      ],
+      "avoid_when": [
+        "Very hindered partners (slow)"
+      ],
+      "relative_reactivity_band": "medium",
+      "racemization_risk_band": "low",
+      "water_compatibility": "low",
+      "green_workup_note": "No halides; imidazole/urea byproducts",
+      "ehs_green": {
+        "halide_free": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–2.0",
+        "temp_C": "0–40"
+      }
+    },
+    {
+      "family_id": "organophosphorus_anhydrides",
+      "label": "Organophosphorus anhydrides",
+      "activation_mode": "Propylphosphonic anhydride (T3P) generates mixed anhydrides for acyl transfer",
+      "leaving_group": [
+        "propylphosphonate (leaving as acid)"
+      ],
+      "byproducts": [
+        "propylphosphonic acid"
+      ],
+      "typical_bases": [
+        "DIPEA",
+        "Et3N"
+      ],
+      "typical_solvents": [
+        "EtOAc",
+        "2‑MeTHF",
+        "DMF"
+      ],
+      "scaffold": "Dehydrative coupling via propylphosphonic anhydride; greener workup",
+      "example_members": [
+        {
+          "name": "T3P (50% in EtOAc)",
+          "abbr": "T3P",
+          "cas": "68957-94-8",
+          "synonyms": [
+            "T3P",
+            "T3P50inEtOAc"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 2,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Organophosphorus anhydrides (organophosphorus_anhydrides) | name: T3P (50% in EtOAc) | abbr: T3P | CAS: 68957-94-8 | activation: Propylphosphonic anhydride (T3P) generates mixed anhydrides for acyl transfer | leaving_group: propylphosphonate (leaving as acid) | bases: DIPEA, Et3N | solvents: EtOAc, 2‑MeTHF, DMF | reactivity: medium | racemization_risk: low | water_compatibility: medium | use_cases: Green amidations; Scale-up with easy workup | best_for: Low-epi, easy aqueous quench; With Oxyma for tough couplings | avoid_when: Strongly water-sensitive partners during workup | ehs: green_workup"
+        }
+      ],
+      "aliases": [
+        "Propylphosphonic anhydride reagents"
+      ],
+      "notes": "Non‑flammable solutions; easy aqueous workups; often paired with Oxyma.",
+      "use_cases": [
+        "Green amidations",
+        "Scale-up with easy workup"
+      ],
+      "best_for": [
+        "Low-epi, easy aqueous quench",
+        "With Oxyma for tough couplings"
+      ],
+      "avoid_when": [
+        "Strongly water-sensitive partners during workup"
+      ],
+      "relative_reactivity_band": "medium",
+      "racemization_risk_band": "low",
+      "water_compatibility": "medium",
+      "green_workup_note": "Propylphosphonic acid aqueous waste; non-flammable solutions",
+      "ehs_green": {
+        "green_workup": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–2.0",
+        "temp_C": "0–40"
+      }
+    },
+    {
+      "family_id": "organophosphorus_chlorides_azides",
+      "label": "Organophosphorus chlorides/azides",
+      "activation_mode": "Mixed anhydride or acyl azide pathways via phosphoryl reagents",
+      "leaving_group": [
+        "phosphoryloxy",
+        "azide"
+      ],
+      "byproducts": [
+        "phosphates",
+        "N2 (for azides)"
+      ],
+      "typical_bases": [
+        "Et3N",
+        "Pyridine",
+        "DIPEA"
+      ],
+      "typical_solvents": [
+        "DCM",
+        "Toluene",
+        "DMF"
+      ],
+      "scaffold": "Classical diphenylphosphoryl reagents for amidations",
+      "example_members": [
+        {
+          "name": "Diphenylphosphoryl chloride",
+          "abbr": "DPP‑Cl",
+          "cas": "1499-21-4",
+          "synonyms": [
+            "DPP‑Cl",
+            "Diphenylphosphorylchloride"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 2,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Organophosphorus chlorides/azides (organophosphorus_chlorides_azides) | name: Diphenylphosphoryl chloride | abbr: DPP‑Cl | CAS: 1499-21-4 | activation: Mixed anhydride or acyl azide pathways via phosphoryl reagents | leaving_group: phosphoryloxy, azide | bases: Et3N, Pyridine, DIPEA | solvents: DCM, Toluene, DMF | reactivity: high | racemization_risk: medium | water_compatibility: low | use_cases: Mixed anhydride route; Acyl azide chemistry | best_for: Robust activations; Problem substrates (careful EHS) | avoid_when: Azide-restricted facilities; Corrosive P–Cl handling limits | ehs: corrosive, azide_hazard"
+        },
+        {
+          "name": "Diphenylphosphoryl azide",
+          "abbr": "DPPA",
+          "cas": "26386-88-9",
+          "synonyms": [
+            "DPPA",
+            "Diphenylphosphorylazide"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 3,
+            "racemization_risk_rank": 2,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Organophosphorus chlorides/azides (organophosphorus_chlorides_azides) | name: Diphenylphosphoryl azide | abbr: DPPA | CAS: 26386-88-9 | activation: Mixed anhydride or acyl azide pathways via phosphoryl reagents | leaving_group: phosphoryloxy, azide | bases: Et3N, Pyridine, DIPEA | solvents: DCM, Toluene, DMF | reactivity: high | racemization_risk: medium | water_compatibility: low | use_cases: Mixed anhydride route; Acyl azide chemistry | best_for: Robust activations; Problem substrates (careful EHS) | avoid_when: Azide-restricted facilities; Corrosive P–Cl handling limits | ehs: corrosive, azide_hazard"
+        }
+      ],
+      "aliases": [
+        "Phosphoryl couplers"
+      ],
+      "use_cases": [
+        "Mixed anhydride route",
+        "Acyl azide chemistry"
+      ],
+      "best_for": [
+        "Robust activations",
+        "Problem substrates (careful EHS)"
+      ],
+      "avoid_when": [
+        "Azide-restricted facilities",
+        "Corrosive P–Cl handling limits"
+      ],
+      "relative_reactivity_band": "high",
+      "racemization_risk_band": "medium",
+      "water_compatibility": "low",
+      "green_workup_note": "Corrosive/azide hazards; strong activation",
+      "ehs_green": {
+        "corrosive": true,
+        "azide_hazard": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–1.5",
+        "temp_C": "0–25"
+      }
+    },
+    {
+      "family_id": "acyl_halide_fluoride_generators",
+      "label": "Acyl halide/fluoride generators (halo‑uronium/imidazolium)",
+      "activation_mode": "In situ acyl halide/fluoride or acyl imidazolium; then aminolysis",
+      "leaving_group": [
+        "F− (acyl fluoride)",
+        "Cl− (acyl chloride)",
+        "imidazole (acyl imidazolium)"
+      ],
+      "byproducts": [
+        "HF salts / imidazolium salts (depending on system)"
+      ],
+      "typical_bases": [
+        "DIPEA",
+        "NMI",
+        "NMM"
+      ],
+      "typical_solvents": [
+        "DCM",
+        "MeCN"
+      ],
+      "scaffold": "Halo‑uronium (TFFH/BTFFH) and chloro‑iminium (TCFH) systems",
+      "example_members": [
+        {
+          "name": "TFFH",
+          "abbr": "TFFH",
+          "cas": null,
+          "synonyms": [
+            "TFFH"
+          ],
+          "numeric_features": {
+            "reactivity_rank": null,
+            "racemization_risk_rank": null,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Acyl halide/fluoride generators (halo‑uronium/imidazolium) (acyl_halide_fluoride_generators) | name: TFFH | abbr: TFFH | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | leaving_group: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | reactivity: very high | racemization_risk: very low | water_compatibility: low | use_cases: Low-epi amidations; Hindered amines via acyl fluoride/imidazolium | best_for: Minimal racemization; High reactivity | avoid_when: Fluoride/halide restrictions; Moisture present | ehs: halide_generating"
+        },
+        {
+          "name": "BTFFH",
+          "abbr": "BTFFH",
+          "cas": null,
+          "synonyms": [
+            "BTFFH"
+          ],
+          "numeric_features": {
+            "reactivity_rank": null,
+            "racemization_risk_rank": null,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Acyl halide/fluoride generators (halo‑uronium/imidazolium) (acyl_halide_fluoride_generators) | name: BTFFH | abbr: BTFFH | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | leaving_group: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | reactivity: very high | racemization_risk: very low | water_compatibility: low | use_cases: Low-epi amidations; Hindered amines via acyl fluoride/imidazolium | best_for: Minimal racemization; High reactivity | avoid_when: Fluoride/halide restrictions; Moisture present | ehs: halide_generating"
+        },
+        {
+          "name": "TCFH (+ NMI)",
+          "abbr": "TCFH+NMI",
+          "cas": null,
+          "synonyms": [
+            "TCFH+NMI",
+            "TCFHNMI"
+          ],
+          "numeric_features": {
+            "reactivity_rank": null,
+            "racemization_risk_rank": null,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Acyl halide/fluoride generators (halo‑uronium/imidazolium) (acyl_halide_fluoride_generators) | name: TCFH (+ NMI) | abbr: TCFH+NMI | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | leaving_group: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | reactivity: very high | racemization_risk: very low | water_compatibility: low | use_cases: Low-epi amidations; Hindered amines via acyl fluoride/imidazolium | best_for: Minimal racemization; High reactivity | avoid_when: Fluoride/halide restrictions; Moisture present | ehs: halide_generating"
+        }
+      ],
+      "notes": "Acyl fluorides/imidazoliums often give low racemization and high reactivity with hindered amines.",
+      "use_cases": [
+        "Low-epi amidations",
+        "Hindered amines via acyl fluoride/imidazolium"
+      ],
+      "best_for": [
+        "Minimal racemization",
+        "High reactivity"
+      ],
+      "avoid_when": [
+        "Fluoride/halide restrictions",
+        "Moisture present"
+      ],
+      "relative_reactivity_band": "very high",
+      "racemization_risk_band": "very low",
+      "water_compatibility": "low",
+      "green_workup_note": "Potent; manage halide/fluoride salts",
+      "ehs_green": {
+        "halide_generating": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–1.5",
+        "temp_C": "0–25"
+      }
+    },
+    {
+      "family_id": "mixed_anhydrides_chloroformates",
+      "label": "Mixed anhydrides / chloroformates",
+      "activation_mode": "Carboxylate + chloroformate → mixed carbonic anhydride → amide",
+      "leaving_group": [
+        "ROCO2− (carbonic anhydride)"
+      ],
+      "byproducts": [
+        "alcohols/CO2 derivatives"
+      ],
+      "typical_bases": [
+        "DIPEA",
+        "NMM"
+      ],
+      "typical_solvents": [
+        "THF",
+        "DCM"
+      ],
+      "scaffold": "Classic activation via i‑BuOCOCl or sec‑BuOCOCl",
+      "example_members": [
+        {
+          "name": "Isobutyl chloroformate",
+          "abbr": "i‑BuOCOCl",
+          "cas": "543-27-1",
+          "synonyms": [
+            "Isobutylchloroformate",
+            "i‑BuOCOCl"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 2,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Mixed anhydrides / chloroformates (mixed_anhydrides_chloroformates) | name: Isobutyl chloroformate | abbr: i‑BuOCOCl | CAS: 543-27-1 | activation: Carboxylate + chloroformate → mixed carbonic anhydride → amide | leaving_group: ROCO2− (carbonic anhydride) | bases: DIPEA, NMM | solvents: THF, DCM | reactivity: medium | racemization_risk: medium | water_compatibility: low | use_cases: Classical carbonic anhydride route; Process-friendly systems | best_for: Simple scale-up; Low-cost activation | avoid_when: HCl-sensitive substrates; Need ultra-low epi | ehs: acid_chloride"
+        },
+        {
+          "name": "sec‑Butyl chloroformate",
+          "abbr": "s‑BuOCOCl",
+          "cas": "2837-76-5",
+          "synonyms": [
+            "secButylchloroformate",
+            "s‑BuOCOCl"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 2,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Mixed anhydrides / chloroformates (mixed_anhydrides_chloroformates) | name: sec‑Butyl chloroformate | abbr: s‑BuOCOCl | CAS: 2837-76-5 | activation: Carboxylate + chloroformate → mixed carbonic anhydride → amide | leaving_group: ROCO2− (carbonic anhydride) | bases: DIPEA, NMM | solvents: THF, DCM | reactivity: medium | racemization_risk: medium | water_compatibility: low | use_cases: Classical carbonic anhydride route; Process-friendly systems | best_for: Simple scale-up; Low-cost activation | avoid_when: HCl-sensitive substrates; Need ultra-low epi | ehs: acid_chloride"
+        }
+      ],
+      "notes": "Simple and scalable; watch for symmetrical anhydrides and HCl generation; run cold to minimize side reactions.",
+      "use_cases": [
+        "Classical carbonic anhydride route",
+        "Process-friendly systems"
+      ],
+      "best_for": [
+        "Simple scale-up",
+        "Low-cost activation"
+      ],
+      "avoid_when": [
+        "HCl-sensitive substrates",
+        "Need ultra-low epi"
+      ],
+      "relative_reactivity_band": "medium",
+      "racemization_risk_band": "medium",
+      "water_compatibility": "low",
+      "green_workup_note": "Generates HCl; run cold; symmetrical anhydride side reaction",
+      "ehs_green": {
+        "acid_chloride": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–2.0",
+        "temp_C": "0–40"
+      }
+    },
+    {
+      "family_id": "activated_esters_isolable",
+      "label": "Activated esters (isolable)",
+      "activation_mode": "Pre‑form activated ester (NHS, Pfp, OBt, etc.) then aminolyze",
+      "leaving_group": [
+        "NHS",
+        "Pfp",
+        "OBt/ODhbt"
+      ],
+      "byproducts": [
+        "phenols (NHS, Pfp)"
+      ],
+      "typical_bases": [
+        "Et3N",
+        "DMAP (cat.)"
+      ],
+      "typical_solvents": [
+        "DCM",
+        "DMF"
+      ],
+      "scaffold": "Two‑step route via isolable active esters",
+      "example_members": [
+        {
+          "name": "N‑Hydroxysuccinimide esters",
+          "abbr": "NHS esters",
+          "cas": null,
+          "synonyms": [
+            "NHS esters",
+            "NHydroxysuccinimideesters"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 2,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Activated esters (isolable) (activated_esters_isolable) | name: N‑Hydroxysuccinimide esters | abbr: NHS esters | activation: Pre‑form activated ester (NHS, Pfp, OBt, etc.) then aminolyze | leaving_group: NHS, Pfp, OBt/ODhbt | bases: Et3N, DMAP (cat.) | solvents: DCM, DMF | reactivity: medium | racemization_risk: low | water_compatibility: medium | use_cases: Conjugation chemistry; Two-step amidations | best_for: Isolable intermediates; Bioconjugation workflows | avoid_when: Shortest-route synthesis pressure | ehs: halide_free"
+        },
+        {
+          "name": "Pentafluorophenyl esters",
+          "abbr": "Pfp esters",
+          "cas": null,
+          "synonyms": [
+            "Pentafluorophenylesters",
+            "Pfp esters"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 2,
+            "racemization_risk_rank": 1,
+            "water_compat_rank": 2,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Activated esters (isolable) (activated_esters_isolable) | name: Pentafluorophenyl esters | abbr: Pfp esters | activation: Pre‑form activated ester (NHS, Pfp, OBt, etc.) then aminolyze | leaving_group: NHS, Pfp, OBt/ODhbt | bases: Et3N, DMAP (cat.) | solvents: DCM, DMF | reactivity: medium | racemization_risk: low | water_compatibility: medium | use_cases: Conjugation chemistry; Two-step amidations | best_for: Isolable intermediates; Bioconjugation workflows | avoid_when: Shortest-route synthesis pressure | ehs: halide_free"
+        }
+      ],
+      "notes": "Stable intermediates useful for conjugations; adds an extra step.",
+      "use_cases": [
+        "Conjugation chemistry",
+        "Two-step amidations"
+      ],
+      "best_for": [
+        "Isolable intermediates",
+        "Bioconjugation workflows"
+      ],
+      "avoid_when": [
+        "Shortest-route synthesis pressure"
+      ],
+      "relative_reactivity_band": "medium",
+      "racemization_risk_band": "low",
+      "water_compatibility": "medium",
+      "green_workup_note": "Phenol byproducts; stable intermediates",
+      "ehs_green": {
+        "halide_free": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.1–2.0",
+        "temp_C": "0–40"
+      }
+    },
+    {
+      "family_id": "specialty_low_racemization",
+      "label": "Specialty: carbonic anhydride route",
+      "activation_mode": "Slow formation/fast consumption of carbonic anhydride minimizes epimerization",
+      "leaving_group": [
+        "quinoline‑oxyl"
+      ],
+      "byproducts": [
+        "quinoline derivatives"
+      ],
+      "typical_bases": [
+        "None"
+      ],
+      "typical_solvents": [
+        "DCM",
+        "MeCN"
+      ],
+      "scaffold": "Quinolinium reagents (EEDQ/IIDQ) that avoid guanidinium byproducts",
+      "example_members": [
+        {
+          "name": "EEDQ",
+          "abbr": "EEDQ",
+          "cas": "4584-49-0",
+          "synonyms": [
+            "EEDQ"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 1,
+            "racemization_risk_rank": null,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Specialty: carbonic anhydride route (specialty_low_racemization) | name: EEDQ | abbr: EEDQ | CAS: 4584-49-0 | activation: Slow formation/fast consumption of carbonic anhydride minimizes epimerization | leaving_group: quinoline‑oxyl | bases: None | solvents: DCM, MeCN | reactivity: low | racemization_risk: very low | water_compatibility: low | use_cases: Very low-epi couplings; Delicate stereocenters | best_for: Low epimerization; No guanidinium byproducts | avoid_when: Need fast/hindered couplings"
+        },
+        {
+          "name": "IIDQ",
+          "abbr": "IIDQ",
+          "cas": "18747-60-1",
+          "synonyms": [
+            "IIDQ"
+          ],
+          "numeric_features": {
+            "reactivity_rank": 1,
+            "racemization_risk_rank": null,
+            "water_compat_rank": 1,
+            "green_workup_rank": 2
+          },
+          "embedding_text": "type: COUPLING_REAGENT | family: Specialty: carbonic anhydride route (specialty_low_racemization) | name: IIDQ | abbr: IIDQ | CAS: 18747-60-1 | activation: Slow formation/fast consumption of carbonic anhydride minimizes epimerization | leaving_group: quinoline‑oxyl | bases: None | solvents: DCM, MeCN | reactivity: low | racemization_risk: very low | water_compatibility: low | use_cases: Very low-epi couplings; Delicate stereocenters | best_for: Low epimerization; No guanidinium byproducts | avoid_when: Need fast/hindered couplings"
+        }
+      ],
+      "aliases": [
+        "Diethoxy/Isopropoxy dihydroquinolin-oxyl reagents"
+      ],
+      "notes": "Often low epimerization; slower than uronium/phosphonium; useful niche.",
+      "use_cases": [
+        "Very low-epi couplings",
+        "Delicate stereocenters"
+      ],
+      "best_for": [
+        "Low epimerization",
+        "No guanidinium byproducts"
+      ],
+      "avoid_when": [
+        "Need fast/hindered couplings"
+      ],
+      "relative_reactivity_band": "low",
+      "racemization_risk_band": "very low",
+      "water_compatibility": "low",
+      "green_workup_note": "Slower but gentle",
+      "ehs_green": {},
+      "operational_envelope": {
+        "typical_equiv": "1.1–1.5",
+        "temp_C": "0–25"
+      }
+    }
+  ],
+  "schema_extensions": {
+    "example_members[*].synonyms": "alternative names/abbr (including punctuation-stripped forms)",
+    "example_members[*].embedding_text": "compact deterministic text used to compute embeddings",
+    "example_members[*].numeric_features": "pre-vectorized ranks {reactivity_rank, racemization_risk_rank, water_compat_rank, green_workup_rank}",
+    "use_cases": "typical scenarios where this family excels",
+    "best_for": "positive selection cues",
+    "avoid_when": "contraindications",
+    "ehs_green": "safety/green flags at family or member level",
+    "operational_envelope": "typical equivalents/temp windows (non-binding)"
+  },
+  "vectorization_hints": {
+    "rank_maps": {
+      "relative_reactivity_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "racemization_risk_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "water_compatibility→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "green_workup→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      }
+    },
+    "embedding_field_preference": [
+      "example_members[*].embedding_text",
+      "example_members[*].name",
+      "example_members[*].abbr",
+      "example_members[*].synonyms"
+    ]
+  }
+}

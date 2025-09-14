@@ -1,0 +1,987 @@
+{
+  "version": "1.0",
+  "updated": "2025-09-13",
+  "schema": {
+    "family_id": "stable identifier",
+    "label": "family name",
+    "acid_base_type": "Brønsted or Lewis/Brønsted-Lewis",
+    "strength_band": "very weak / weak / moderate / strong / superbase (anchored to MeCN pKaH scale)",
+    "nucleophilicity_band": "low / medium / high (qualitative)",
+    "steric_profile": "unhindered / hindered / bulky / planar",
+    "moisture_sensitivity": "low / medium / high / pyrophoric",
+    "example_members": "array of {name, abbr, cas, aliases[]}",
+    "strength_reference": "MeCN pKaH scale (Kaljurand/Leito et al.) and DMSO (Bordwell/Reich)"
+  },
+  "families": [
+    {
+      "family_id": "inorg_carbonates_bicarbonate",
+      "label": "Inorganic carbonates & bicarbonate",
+      "acid_base_type": "Brønsted",
+      "strength_band": "weak–moderate",
+      "nucleophilicity_band": "low",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "amides_dipolar_aprotic",
+        "sulfoxides_dipolar_aprotic",
+        "alcohols_secondary",
+        "alcohols_primary"
+      ],
+      "example_members": [
+        {
+          "name": "Potassium carbonate",
+          "abbr": "K2CO3",
+          "cas": "584-08-7",
+          "synonyms": [
+            "K2CO3",
+            "Potassiumcarbonate"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Inorganic carbonates & bicarbonate (inorg_carbonates_bicarbonate) | name: Potassium carbonate | abbr: K2CO3 | CAS: 584-08-7 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, sulfoxides_dipolar_aprotic, alcohols_secondary, alcohols_primary | use_cases: Pd/Ni cross-coupling (mild base); SNAr with activated aryl halides; Halide scavenging | best_for: Low nucleophilicity; Salt-tolerant media; Scale-friendly | avoid_when: Need strong deprotonation; Poor solubility limits rate | synonyms: K2CO3"
+        },
+        {
+          "name": "Cesium carbonate",
+          "abbr": "Cs2CO3",
+          "cas": "534-17-8",
+          "synonyms": [
+            "Cesiumcarbonate",
+            "Cs2CO3"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Inorganic carbonates & bicarbonate (inorg_carbonates_bicarbonate) | name: Cesium carbonate | abbr: Cs2CO3 | CAS: 534-17-8 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, sulfoxides_dipolar_aprotic, alcohols_secondary, alcohols_primary | use_cases: Pd/Ni cross-coupling (mild base); SNAr with activated aryl halides; Halide scavenging | best_for: Low nucleophilicity; Salt-tolerant media; Scale-friendly | avoid_when: Need strong deprotonation; Poor solubility limits rate | synonyms: Cs2CO3"
+        },
+        {
+          "name": "Sodium carbonate",
+          "abbr": "Na2CO3",
+          "cas": "497-19-8",
+          "synonyms": [
+            "Na2CO3",
+            "Sodiumcarbonate"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Inorganic carbonates & bicarbonate (inorg_carbonates_bicarbonate) | name: Sodium carbonate | abbr: Na2CO3 | CAS: 497-19-8 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, sulfoxides_dipolar_aprotic, alcohols_secondary, alcohols_primary | use_cases: Pd/Ni cross-coupling (mild base); SNAr with activated aryl halides; Halide scavenging | best_for: Low nucleophilicity; Salt-tolerant media; Scale-friendly | avoid_when: Need strong deprotonation; Poor solubility limits rate | synonyms: Na2CO3"
+        },
+        {
+          "name": "Sodium hydrogen carbonate",
+          "abbr": "NaHCO3",
+          "cas": "144-55-8",
+          "aliases": [
+            "Sodium bicarbonate"
+          ],
+          "synonyms": [
+            "NaHCO3",
+            "Sodium bicarbonate",
+            "Sodiumhydrogencarbonate"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Inorganic carbonates & bicarbonate (inorg_carbonates_bicarbonate) | name: Sodium hydrogen carbonate | abbr: NaHCO3 | CAS: 144-55-8 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, sulfoxides_dipolar_aprotic, alcohols_secondary, alcohols_primary | use_cases: Pd/Ni cross-coupling (mild base); SNAr with activated aryl halides; Halide scavenging | best_for: Low nucleophilicity; Salt-tolerant media; Scale-friendly | avoid_when: Need strong deprotonation; Poor solubility limits rate | synonyms: NaHCO3; Sodium bicarbonate"
+        }
+      ],
+      "notes": "M2CO3 / MHCO3 bases used widely in cross-coupling and substitutions; mild, low nucleophilicity; generate HCO3−/CO3^2−.",
+      "use_cases": [
+        "Pd/Ni cross-coupling (mild base)",
+        "SNAr with activated aryl halides",
+        "Halide scavenging"
+      ],
+      "best_for": [
+        "Low nucleophilicity",
+        "Salt-tolerant media",
+        "Scale-friendly"
+      ],
+      "avoid_when": [
+        "Need strong deprotonation",
+        "Poor solubility limits rate"
+      ],
+      "operational_envelope": {
+        "typical_equiv": "1–2",
+        "temp_C": "0–80",
+        "notes": "adjust per substrate and solvent"
+      }
+    },
+    {
+      "family_id": "inorg_phosphates",
+      "label": "Inorganic phosphates",
+      "acid_base_type": "Brønsted",
+      "strength_band": "moderate",
+      "nucleophilicity_band": "low",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "amides_dipolar_aprotic",
+        "nitriles",
+        "ketones",
+        "ethers_cyclic_glymes"
+      ],
+      "example_members": [
+        {
+          "name": "Tripotassium phosphate",
+          "abbr": "K3PO4",
+          "cas": "7778-53-2",
+          "aliases": [
+            "Potassium phosphate (tribasic)"
+          ],
+          "synonyms": [
+            "K3PO4",
+            "Potassium phosphate (tribasic)",
+            "Tripotassiumphosphate"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Inorganic phosphates (inorg_phosphates) | name: Tripotassium phosphate | abbr: K3PO4 | CAS: 7778-53-2 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, nitriles, ketones, ethers_cyclic_glymes | use_cases: Pd/Ni cross-coupling; Aryl C–N/C–O couplings | best_for: Robust, non-nucleophilic base; Wide solvent tolerance | avoid_when: Low solubility in nonpolar media | synonyms: K3PO4; Potassium phosphate (tribasic)"
+        }
+      ],
+      "notes": "Ternary phosphates (e.g., K3PO4) are robust, relatively non-nucleophilic bases common in Pd/Ni cross-couplings.",
+      "use_cases": [
+        "Pd/Ni cross-coupling",
+        "Aryl C–N/C–O couplings"
+      ],
+      "best_for": [
+        "Robust, non-nucleophilic base",
+        "Wide solvent tolerance"
+      ],
+      "avoid_when": [
+        "Low solubility in nonpolar media"
+      ],
+      "operational_envelope": {
+        "typical_equiv": "1–2",
+        "temp_C": "0–80",
+        "notes": "adjust per substrate and solvent"
+      }
+    },
+    {
+      "family_id": "hydroxides",
+      "label": "Hydroxides (alkali)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "strong (aq.)",
+      "nucleophilicity_band": "medium",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "water",
+        "alcohols_primary",
+        "alcohols_secondary",
+        "amides_dipolar_aprotic"
+      ],
+      "example_members": [
+        {
+          "name": "Potassium hydroxide",
+          "abbr": "KOH",
+          "cas": "1310-58-3",
+          "synonyms": [
+            "KOH",
+            "Potassiumhydroxide"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | name: Potassium hydroxide | abbr: KOH | CAS: 1310-58-3 | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water, alcohols_primary, alcohols_secondary, amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | synonyms: KOH"
+        },
+        {
+          "name": "Sodium hydroxide",
+          "abbr": "NaOH",
+          "cas": "1310-73-2",
+          "synonyms": [
+            "NaOH",
+            "Sodiumhydroxide"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | name: Sodium hydroxide | abbr: NaOH | CAS: 1310-73-2 | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water, alcohols_primary, alcohols_secondary, amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | synonyms: NaOH"
+        },
+        {
+          "name": "Lithium hydroxide",
+          "abbr": "LiOH",
+          "cas": "1310-66-3",
+          "synonyms": [
+            "LiOH",
+            "Lithiumhydroxide"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | name: Lithium hydroxide | abbr: LiOH | CAS: 1310-66-3 | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water, alcohols_primary, alcohols_secondary, amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | synonyms: LiOH"
+        }
+      ],
+      "notes": "NaOH/KOH/LiOH; strong in water and polar protic media; nucleophilic and can hydrolyze sensitive substrates.",
+      "use_cases": [
+        "Hydrolysis/saponification",
+        "Phase-transfer alkylations (with PTC)"
+      ],
+      "best_for": [
+        "Aqueous or protic media",
+        "Workup deprotections"
+      ],
+      "avoid_when": [
+        "Base-sensitive substrates",
+        "SN1-prone solvolysis"
+      ],
+      "ehs_green": {
+        "corrosive_or_caustic": true
+      }
+    },
+    {
+      "family_id": "hydrides",
+      "label": "Hydrides (alkali)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "superbase (in aprotic)",
+      "nucleophilicity_band": "high",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "amides_dipolar_aprotic",
+        "hydrocarbons_aliphatic_linear"
+      ],
+      "example_members": [
+        {
+          "name": "Sodium hydride (60% dispersion in mineral oil)",
+          "abbr": "NaH",
+          "cas": "7646-69-7",
+          "aliases": [
+            "Sodium hydride"
+          ],
+          "synonyms": [
+            "NaH",
+            "Sodium hydride",
+            "Sodiumhydride60dispersioninmineraloil"
+          ],
+          "numeric_features": {
+            "strength_rank": 4,
+            "nucleophilicity_rank": 3,
+            "steric_rank": 1,
+            "moisture_rank": 3
+          },
+          "embedding_text": "type: BASE | family: Hydrides (alkali) (hydrides) | name: Sodium hydride (60% dispersion in mineral oil) | abbr: NaH | CAS: 7646-69-7 | acid_base_type: Brønsted | strength_band: superbase (in aprotic) | nucleophilicity: high | steric: unhindered | moisture: high | compatible_solvent_classes: ethers_cyclic_glymes, amides_dipolar_aprotic, hydrocarbons_aliphatic_linear | use_cases: Deprotonation in aprotic solvents; Desilylation (selected) | best_for: Strong base without nucleophilic substitution; Generating enolates from acidic C–H | avoid_when: Moisture present; Protic solvents | synonyms: NaH; Sodium hydride"
+        }
+      ],
+      "notes": "NaH: very strong base in aprotic media; H− is a poor nucleophile yet can add to strong electrophiles; gas evolution with protic reagents.",
+      "use_cases": [
+        "Deprotonation in aprotic solvents",
+        "Desilylation (selected)"
+      ],
+      "best_for": [
+        "Strong base without nucleophilic substitution",
+        "Generating enolates from acidic C–H"
+      ],
+      "avoid_when": [
+        "Moisture present",
+        "Protic solvents",
+        "Gas evolution issues"
+      ],
+      "ehs_green": {
+        "air_moisture_sensitive": true,
+        "corrosive_or_caustic": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.0–1.5",
+        "temp_C": "-78–25",
+        "notes": "strictly anhydrous/inert"
+      }
+    },
+    {
+      "family_id": "alkoxides_primary",
+      "label": "Alkoxides (primary)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "strong",
+      "nucleophilicity_band": "high",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "alcohols_primary",
+        "ethers_cyclic_glymes",
+        "ketones"
+      ],
+      "example_members": [
+        {
+          "name": "Sodium methoxide",
+          "abbr": "NaOMe",
+          "cas": "124-41-4",
+          "aliases": [
+            "Sodium methylate"
+          ],
+          "synonyms": [
+            "NaOMe",
+            "Sodium methylate",
+            "Sodiummethoxide"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 3,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "embedding_text": "type: BASE | family: Alkoxides (primary) (alkoxides_primary) | name: Sodium methoxide | abbr: NaOMe | CAS: 124-41-4 | acid_base_type: Brønsted | strength_band: strong | nucleophilicity: high | steric: unhindered | moisture: medium | compatible_solvent_classes: alcohols_primary, ethers_cyclic_glymes, ketones | use_cases: Transesterification; E2 eliminations; Knoevenagel/Claisen variants | best_for: Strong base + nucleophile | avoid_when: SN2-sensitive electrophiles (side reactions) | synonyms: NaOMe; Sodium methylate"
+        }
+      ],
+      "notes": "RONa/ROK (e.g., NaOMe): strong bases and competent nucleophiles; transesterifications, eliminations.",
+      "use_cases": [
+        "Transesterification",
+        "E2 eliminations",
+        "Knoevenagel/Claisen variants"
+      ],
+      "best_for": [
+        "Strong base + nucleophile"
+      ],
+      "avoid_when": [
+        "SN2-sensitive electrophiles (side reactions)"
+      ],
+      "operational_envelope": {
+        "typical_equiv": "1–3",
+        "temp_C": "0–100"
+      }
+    },
+    {
+      "family_id": "alkoxides_hindered",
+      "label": "Alkoxides (tertiary, hindered)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "strong",
+      "nucleophilicity_band": "medium",
+      "steric_profile": "bulky",
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "hydrocarbons_aromatic",
+        "ketones"
+      ],
+      "example_members": [
+        {
+          "name": "Potassium tert-butoxide",
+          "abbr": "KOtBu",
+          "cas": "865-47-4",
+          "aliases": [
+            "t-BuOK",
+            "Potassium t-butoxide"
+          ],
+          "synonyms": [
+            "KOtBu",
+            "Potassium t-butoxide",
+            "Potassiumtertbutoxide",
+            "t-BuOK"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 3,
+            "moisture_rank": 2
+          },
+          "embedding_text": "type: BASE | family: Alkoxides (tertiary, hindered) (alkoxides_hindered) | name: Potassium tert-butoxide | abbr: KOtBu | CAS: 865-47-4 | acid_base_type: Brønsted | strength_band: strong | nucleophilicity: medium | steric: bulky | moisture: medium | compatible_solvent_classes: ethers_cyclic_glymes, hydrocarbons_aromatic, ketones | use_cases: E2 eliminations (Hoffmann); Non-nucleophilic base needs | best_for: Suppress SN2; β-Elimination on hindered systems | avoid_when: Need nucleophilic catalysis | synonyms: KOtBu; Potassium t-butoxide; t-BuOK"
+        },
+        {
+          "name": "Sodium tert-butoxide",
+          "abbr": "NaOtBu",
+          "cas": "865-48-5",
+          "aliases": [
+            "t-BuONa",
+            "Sodium t-butoxide"
+          ],
+          "synonyms": [
+            "NaOtBu",
+            "Sodium t-butoxide",
+            "Sodiumtertbutoxide",
+            "t-BuONa"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 3,
+            "moisture_rank": 2
+          },
+          "embedding_text": "type: BASE | family: Alkoxides (tertiary, hindered) (alkoxides_hindered) | name: Sodium tert-butoxide | abbr: NaOtBu | CAS: 865-48-5 | acid_base_type: Brønsted | strength_band: strong | nucleophilicity: medium | steric: bulky | moisture: medium | compatible_solvent_classes: ethers_cyclic_glymes, hydrocarbons_aromatic, ketones | use_cases: E2 eliminations (Hoffmann); Non-nucleophilic base needs | best_for: Suppress SN2; β-Elimination on hindered systems | avoid_when: Need nucleophilic catalysis | synonyms: NaOtBu; Sodium t-butoxide; t-BuONa"
+        }
+      ],
+      "notes": "tBuO− salts (KOtBu/NaOtBu): strong, hindered bases; favor E2 over SN2 and suppress nucleophilic attack.",
+      "use_cases": [
+        "E2 eliminations (Hoffmann)",
+        "Non-nucleophilic base needs"
+      ],
+      "best_for": [
+        "Suppress SN2",
+        "β-Elimination on hindered systems"
+      ],
+      "avoid_when": [
+        "Need nucleophilic catalysis"
+      ],
+      "operational_envelope": {
+        "typical_equiv": "1–3",
+        "temp_C": "0–100"
+      }
+    },
+    {
+      "family_id": "metal_amides_silylamides",
+      "label": "Metal amides / silylamides",
+      "acid_base_type": "Brønsted",
+      "strength_band": "superbase (aprotic)",
+      "nucleophilicity_band": "low",
+      "steric_profile": "bulky",
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "hydrocarbons_aromatic",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "Lithium hexamethyldisilazide",
+          "abbr": "LiHMDS",
+          "cas": "4039-32-1",
+          "aliases": [
+            "LiN(SiMe3)2"
+          ],
+          "synonyms": [
+            "LiHMDS",
+            "LiN(SiMe3)2",
+            "Lithiumhexamethyldisilazide"
+          ],
+          "numeric_features": {
+            "strength_rank": 4,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 3,
+            "moisture_rank": 3
+          },
+          "embedding_text": "type: BASE | family: Metal amides / silylamides (metal_amides_silylamides) | name: Lithium hexamethyldisilazide | abbr: LiHMDS | CAS: 4039-32-1 | acid_base_type: Brønsted | strength_band: superbase (aprotic) | nucleophilicity: low | steric: bulky | moisture: high | compatible_solvent_classes: ethers_cyclic_glymes, hydrocarbons_aromatic, nitriles | use_cases: Enolate generation; Directed metallations; Deprotection of acidic N–H/O–H | best_for: Non-nucleophilic superbase in aprotic solvent | avoid_when: Moisture/air exposure; Protic media | synonyms: LiHMDS; LiN(SiMe3)2"
+        }
+      ],
+      "notes": "LiHMDS: strong, non-nucleophilic amidinate-like base; excellent for deprotonation of weak C–H acids; moisture sensitive.",
+      "use_cases": [
+        "Enolate generation",
+        "Directed metallations",
+        "Deprotection of acidic N–H/O–H"
+      ],
+      "best_for": [
+        "Non-nucleophilic superbase in aprotic solvent"
+      ],
+      "avoid_when": [
+        "Moisture/air exposure",
+        "Protic media"
+      ],
+      "ehs_green": {
+        "air_moisture_sensitive": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.0–1.5",
+        "temp_C": "-78–25",
+        "notes": "strictly anhydrous/inert"
+      }
+    },
+    {
+      "family_id": "organolithiums",
+      "label": "Organolithiums",
+      "acid_base_type": "Brønsted/Lewis",
+      "strength_band": "superbase",
+      "nucleophilicity_band": "high",
+      "steric_profile": "variable",
+      "moisture_sensitivity": "pyrophoric",
+      "typical_solvent_classes": [
+        "hydrocarbons_aromatic",
+        "hydrocarbons_aliphatic_linear",
+        "ethers_cyclic_glymes"
+      ],
+      "example_members": [
+        {
+          "name": "n-Butyllithium (in hexanes)",
+          "abbr": "n-BuLi",
+          "cas": "109-72-8",
+          "aliases": [
+            "n-Butyl lithium"
+          ],
+          "synonyms": [
+            "n-BuLi",
+            "n-Butyl lithium",
+            "nButyllithiuminhexanes"
+          ],
+          "numeric_features": {
+            "strength_rank": 4,
+            "nucleophilicity_rank": 3,
+            "steric_rank": 2,
+            "moisture_rank": 4
+          },
+          "embedding_text": "type: BASE | family: Organolithiums (organolithiums) | name: n-Butyllithium (in hexanes) | abbr: n-BuLi | CAS: 109-72-8 | acid_base_type: Brønsted/Lewis | strength_band: superbase | nucleophilicity: high | steric: variable | moisture: pyrophoric | compatible_solvent_classes: hydrocarbons_aromatic, hydrocarbons_aliphatic_linear, ethers_cyclic_glymes | use_cases: Lithiation; Halogen–lithium exchange; Strong base metallations | best_for: Extreme basicity; Low-temp metallation | avoid_when: Scale-up without quench controls; Functional group incompatibilities | synonyms: n-BuLi; n-Butyl lithium"
+        }
+      ],
+      "notes": "n-BuLi: extremely strong bases and nucleophiles; also strong Lewis acids via Li+; require rigorously dry, inert conditions.",
+      "use_cases": [
+        "Lithiation",
+        "Halogen–lithium exchange",
+        "Strong base metallations"
+      ],
+      "best_for": [
+        "Extreme basicity",
+        "Low-temp metallation"
+      ],
+      "avoid_when": [
+        "Scale-up without quench controls",
+        "Functional group incompatibilities"
+      ],
+      "ehs_green": {
+        "air_moisture_sensitive": true,
+        "pyrophoric": true,
+        "corrosive_or_caustic": true
+      },
+      "operational_envelope": {
+        "typical_equiv": "1.0–1.5",
+        "temp_C": "-78–25",
+        "notes": "strictly anhydrous/inert"
+      }
+    },
+    {
+      "family_id": "tertiary_amines_aliphatic",
+      "label": "Tertiary amines (aliphatic)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "moderate",
+      "nucleophilicity_band": "medium",
+      "steric_profile": "hindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "esters_anhydrides",
+        "hydrocarbons_aromatic",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "Triethylamine",
+          "abbr": "Et3N",
+          "cas": "121-44-8",
+          "aliases": [
+            "TEA"
+          ],
+          "synonyms": [
+            "Et3N",
+            "TEA",
+            "Triethylamine"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: Triethylamine | abbr: Et3N | CAS: 121-44-8 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: Et3N; TEA"
+        },
+        {
+          "name": "N,N-Diisopropylethylamine",
+          "abbr": "DIPEA",
+          "cas": "7087-68-5",
+          "aliases": [
+            "Hünig's base",
+            "i-Pr2NEt",
+            "DIEA"
+          ],
+          "synonyms": [
+            "DIEA",
+            "DIPEA",
+            "Hünig's base",
+            "NNDiisopropylethylamine",
+            "i-Pr2NEt"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: N,N-Diisopropylethylamine | abbr: DIPEA | CAS: 7087-68-5 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: DIEA; DIPEA; Hünig's base; i-Pr2NEt"
+        }
+      ],
+      "notes": "Et3N, DIPEA: non-nucleophilic to moderately nucleophilic; common acid scavengers and base components.",
+      "use_cases": [
+        "Acid scavenger",
+        "Amide couplings (HATU/HBTU/EDC)",
+        "Micro-Azeotropic reactions"
+      ],
+      "best_for": [
+        "Non-nucleophilic base in polar aprotic solvents"
+      ],
+      "avoid_when": [
+        "Need very strong base",
+        "Acylation where base capture is undesirable"
+      ],
+      "operational_envelope": {
+        "typical_equiv": "1–2",
+        "temp_C": "0–80",
+        "notes": "adjust per substrate and solvent"
+      }
+    },
+    {
+      "family_id": "aromatic_tertiary_amines",
+      "label": "Aromatic tertiary amines (pyridines/lutidines)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "weak–moderate",
+      "nucleophilicity_band": "low",
+      "steric_profile": "hindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "hydrocarbons_aromatic",
+        "esters_anhydrides"
+      ],
+      "example_members": [
+        {
+          "name": "Pyridine",
+          "abbr": "Py",
+          "cas": "110-86-1",
+          "synonyms": [
+            "Py",
+            "Pyridine"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Aromatic tertiary amines (pyridines/lutidines) (aromatic_tertiary_amines) | name: Pyridine | abbr: Py | CAS: 110-86-1 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, hydrocarbons_aromatic, esters_anhydrides | use_cases: Acylation catalysis (as base); HX scavenging; Mitsunobu workups | best_for: Hindered, less nucleophilic base needs | avoid_when: High basicity required | synonyms: Py"
+        },
+        {
+          "name": "2,6-Lutidine",
+          "abbr": "2,6-Lut",
+          "cas": "108-48-5",
+          "aliases": [
+            "2,6-dimethylpyridine"
+          ],
+          "synonyms": [
+            "2,6-Lut",
+            "2,6-dimethylpyridine",
+            "26Lutidine"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Aromatic tertiary amines (pyridines/lutidines) (aromatic_tertiary_amines) | name: 2,6-Lutidine | abbr: 2,6-Lut | CAS: 108-48-5 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, hydrocarbons_aromatic, esters_anhydrides | use_cases: Acylation catalysis (as base); HX scavenging; Mitsunobu workups | best_for: Hindered, less nucleophilic base needs | avoid_when: High basicity required | synonyms: 2,6-Lut; 2,6-dimethylpyridine"
+        },
+        {
+          "name": "4-Methylmorpholine (N-methylmorpholine)",
+          "abbr": "NMM",
+          "cas": "109-02-4",
+          "aliases": [
+            "4-Methylmorpholine"
+          ],
+          "synonyms": [
+            "4-Methylmorpholine",
+            "4MethylmorpholineNmethylmorpholine",
+            "NMM"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Aromatic tertiary amines (pyridines/lutidines) (aromatic_tertiary_amines) | name: 4-Methylmorpholine (N-methylmorpholine) | abbr: NMM | CAS: 109-02-4 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, hydrocarbons_aromatic, esters_anhydrides | use_cases: Acylation catalysis (as base); HX scavenging; Mitsunobu workups | best_for: Hindered, less nucleophilic base needs | avoid_when: High basicity required | synonyms: 4-Methylmorpholine; NMM"
+        }
+      ],
+      "notes": "Pyridine, 2,6-lutidine: weaker bases; lutidines are hindered and less nucleophilic.",
+      "use_cases": [
+        "Acylation catalysis (as base)",
+        "HX scavenging",
+        "Mitsunobu workups"
+      ],
+      "best_for": [
+        "Hindered, less nucleophilic base needs"
+      ],
+      "avoid_when": [
+        "High basicity required"
+      ],
+      "operational_envelope": {
+        "typical_equiv": "1–3",
+        "temp_C": "0–100"
+      }
+    },
+    {
+      "family_id": "secondary_amines_cyclic",
+      "label": "Secondary amines (cyclic)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "moderate–strong",
+      "nucleophilicity_band": "high",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "ketones",
+        "ethers_cyclic_glymes",
+        "hydrocarbons_aromatic"
+      ],
+      "example_members": [
+        {
+          "name": "Piperidine",
+          "abbr": "Pip",
+          "cas": "110-89-4",
+          "synonyms": [
+            "Pip",
+            "Piperidine"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 3,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Secondary amines (cyclic) (secondary_amines_cyclic) | name: Piperidine | abbr: Pip | CAS: 110-89-4 | acid_base_type: Brønsted | strength_band: moderate–strong | nucleophilicity: high | steric: unhindered | moisture: low | compatible_solvent_classes: ketones, ethers_cyclic_glymes, hydrocarbons_aromatic | use_cases: E2 eliminations; Enamine formation; Reductive aminations (as base) | best_for: Stronger, nucleophilic base | avoid_when: When nucleophilicity causes side reactions | synonyms: Pip"
+        }
+      ],
+      "notes": "Piperidine: stronger and more nucleophilic than tertiary analogs; common in E2, enamine formation.",
+      "use_cases": [
+        "E2 eliminations",
+        "Enamine formation",
+        "Reductive aminations (as base)"
+      ],
+      "best_for": [
+        "Stronger, nucleophilic base"
+      ],
+      "avoid_when": [
+        "When nucleophilicity causes side reactions"
+      ],
+      "operational_envelope": {
+        "typical_equiv": "1–3",
+        "temp_C": "0–100"
+      }
+    },
+    {
+      "family_id": "amidine_guanidine_bases",
+      "label": "Bicyclic amidines/guanidines",
+      "acid_base_type": "Brønsted",
+      "strength_band": "strong (MeCN pKaH ~ 24 band)",
+      "nucleophilicity_band": "low",
+      "steric_profile": "hindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "amides_dipolar_aprotic",
+        "nitriles",
+        "sulfoxides_dipolar_aprotic"
+      ],
+      "example_members": [
+        {
+          "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+          "abbr": "DBU",
+          "cas": "6674-22-2",
+          "synonyms": [
+            "18Diazabicyclo540undec7ene",
+            "DBU"
+          ],
+          "numeric_features": {
+            "strength_rank": 0,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Bicyclic amidines/guanidines (amidine_guanidine_bases) | name: 1,8-Diazabicyclo[5.4.0]undec-7-ene | abbr: DBU | CAS: 6674-22-2 | acid_base_type: Brønsted | strength_band: strong (MeCN pKaH ~ 24 band) | nucleophilicity: low | steric: hindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, nitriles, sulfoxides_dipolar_aprotic | use_cases: Eliminations; Strong non-nucleophilic base in MeCN/DMF | best_for: Strong base with low nucleophilicity | avoid_when: Acylation-prone systems (rare but possible) | synonyms: DBU"
+        },
+        {
+          "name": "1,5-Diazabicyclo[4.3.0]non-5-ene",
+          "abbr": "DBN",
+          "cas": "3001-72-7",
+          "synonyms": [
+            "15Diazabicyclo430non5ene",
+            "DBN"
+          ],
+          "numeric_features": {
+            "strength_rank": 0,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Bicyclic amidines/guanidines (amidine_guanidine_bases) | name: 1,5-Diazabicyclo[4.3.0]non-5-ene | abbr: DBN | CAS: 3001-72-7 | acid_base_type: Brønsted | strength_band: strong (MeCN pKaH ~ 24 band) | nucleophilicity: low | steric: hindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, nitriles, sulfoxides_dipolar_aprotic | use_cases: Eliminations; Strong non-nucleophilic base in MeCN/DMF | best_for: Strong base with low nucleophilicity | avoid_when: Acylation-prone systems (rare but possible) | synonyms: DBN"
+        }
+      ],
+      "notes": "DBU/DBN: strong, relatively non-nucleophilic organic bases; widely used in eliminations and anion generation.",
+      "use_cases": [
+        "Eliminations",
+        "Strong non-nucleophilic base in MeCN/DMF"
+      ],
+      "best_for": [
+        "Strong base with low nucleophilicity"
+      ],
+      "avoid_when": [
+        "Acylation-prone systems (rare but possible)"
+      ]
+    },
+    {
+      "family_id": "nucleophilic_catalyst_bases",
+      "label": "Nucleophilic catalyst-bases (DMAP, etc.)",
+      "acid_base_type": "Brønsted/Lewis",
+      "strength_band": "moderate",
+      "nucleophilicity_band": "high",
+      "steric_profile": "planar",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "esters_anhydrides",
+        "amides_dipolar_aprotic",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "4-(Dimethylamino)pyridine",
+          "abbr": "DMAP",
+          "cas": "1122-58-3",
+          "synonyms": [
+            "4Dimethylaminopyridine",
+            "DMAP"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 3,
+            "steric_rank": 0,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Nucleophilic catalyst-bases (DMAP, etc.) (nucleophilic_catalyst_bases) | name: 4-(Dimethylamino)pyridine | abbr: DMAP | CAS: 1122-58-3 | acid_base_type: Brønsted/Lewis | strength_band: moderate | nucleophilicity: high | steric: planar | moisture: low | compatible_solvent_classes: esters_anhydrides, amides_dipolar_aprotic, nitriles | use_cases: Acylation catalysis (Steglich); Activated ester chemistry | best_for: Rate acceleration in acyl transfers | avoid_when: Highly electrophilic acylating conditions without control | synonyms: DMAP"
+        }
+      ],
+      "notes": "DMAP: highly nucleophilic, basic catalyst for acylation, Steglich-type reactions.",
+      "use_cases": [
+        "Acylation catalysis (Steglich)",
+        "Activated ester chemistry"
+      ],
+      "best_for": [
+        "Rate acceleration in acyl transfers"
+      ],
+      "avoid_when": [
+        "Highly electrophilic acylating conditions without control"
+      ]
+    },
+    {
+      "family_id": "ammonia_aqueous",
+      "label": "Ammonia / ammonium hydroxide (aq)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "weak (aq.)",
+      "nucleophilicity_band": "low",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "water"
+      ],
+      "example_members": [
+        {
+          "name": "Ammonium hydroxide (aqueous ammonia)",
+          "abbr": "NH4OH",
+          "cas": "1336-21-6",
+          "aliases": [
+            "Aqueous ammonia",
+            "NH3(aq)"
+          ],
+          "synonyms": [
+            "Ammoniumhydroxideaqueousammonia",
+            "Aqueous ammonia",
+            "NH3(aq)",
+            "NH4OH"
+          ],
+          "numeric_features": {
+            "strength_rank": 0,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Ammonia / ammonium hydroxide (aq) (ammonia_aqueous) | name: Ammonium hydroxide (aqueous ammonia) | abbr: NH4OH | CAS: 1336-21-6 | acid_base_type: Brønsted | strength_band: weak (aq.) | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: water | use_cases: SNAr ammonolysis; Amide formation in water (activated esters) | best_for: Aqueous systems; Bioconjugation workups | avoid_when: Hydrolysis-sensitive functionalities | synonyms: Aqueous ammonia; NH3(aq); NH4OH"
+        }
+      ],
+      "notes": "Aqueous ammonia: weak base in water; sometimes used in SNAr, ammonolysis, and workups.",
+      "use_cases": [
+        "SNAr ammonolysis",
+        "Amide formation in water (activated esters)"
+      ],
+      "best_for": [
+        "Aqueous systems",
+        "Bioconjugation workups"
+      ],
+      "avoid_when": [
+        "Hydrolysis-sensitive functionalities"
+      ]
+    }
+  ],
+  "schema_extensions": {
+    "example_members[*].synonyms": "array of alternative names (abbr, common names, non-English)",
+    "example_members[*].smiles": "optional SMILES for structure-aware models",
+    "example_members[*].inchi_key": "optional InChIKey",
+    "example_members[*].embedding_text": "deterministic compact text used to compute embeddings",
+    "example_members[*].numeric_features": "pre-vectorized numeric ranks {strength_rank, nucleophilicity_rank, steric_rank, moisture_rank}",
+    "use_cases": "list of typical applications per family",
+    "best_for": "phrases capturing ideal scenarios",
+    "avoid_when": "phrases capturing contraindications",
+    "ehs_green": "EHS/green flags at family level",
+    "operational_envelope": "typical guidance (temperature, equivalents) where non-controversial"
+  },
+  "vectorization_hints": {
+    "rank_maps": {
+      "strength_band→rank": {
+        "very weak": 0,
+        "weak": 1,
+        "weak–moderate": 2,
+        "moderate": 2,
+        "moderate–strong": 3,
+        "strong": 3,
+        "strong (aq.)": 3,
+        "strong (MeCN pKaH ~ 24 band)": 3,
+        "superbase": 4,
+        "superbase (aprotic)": 4,
+        "superbase (in aprotic)": 4
+      },
+      "nucleophilicity_band→rank": {
+        "low": 1,
+        "medium": 2,
+        "high": 3
+      },
+      "steric_profile→rank": {
+        "planar": 0,
+        "unhindered": 1,
+        "hindered": 2,
+        "bulky": 3,
+        "variable": 2
+      },
+      "moisture_sensitivity→rank": {
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "pyrophoric": 4
+      }
+    },
+    "embedding_field_preference": [
+      "example_members[*].embedding_text",
+      "example_members[*].name",
+      "example_members[*].abbr",
+      "example_members[*].synonyms"
+    ],
+    "filter_recipes": {
+      "non_nucleophilic": {
+        "nucleophilicity_rank_max": 1
+      },
+      "superbase": {
+        "strength_rank_min": 4
+      }
+    }
+  }
+}

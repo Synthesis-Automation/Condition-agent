@@ -37,8 +37,212 @@ except Exception as e:
 try:
     from reaction_markdown_generator import ReactionMarkdownGenerator
 except Exception as e:
-    print(f"Error: Cannot import ReactionMarkdownGenerator: {e}")
-    sys.exit(1)
+    # Fall back to a minimal generator that produces a simple Markdown summary
+    # and a JSONL with fields compatible with chemtools dataset ingestion.
+    print(f"Warning: Cannot import ReactionMarkdownGenerator: {e}. Using minimal generator.")
+
+    class ReactionMarkdownGenerator:  # type: ignore
+        def __init__(self) -> None:
+            pass
+
+        def _safe_json_list(self, val: str):
+            import json
+            try:
+                return json.loads(val or "[]")
+            except Exception:
+                return []
+
+        def _pair_to_obj(self, item: str):
+            # Parse "name|cas" into {name, cas}
+            if "|" in item:
+                name, cas = item.split("|", 1)
+                return {"name": name.strip(), "cas": cas.strip()}
+            return {"name": item.strip(), "cas": ""}
+
+        def _join_names(self, arr):
+            if not arr:
+                return ""
+            out = []
+            for it in arr:
+                if isinstance(it, dict):
+                    nm = (it.get("name") or "").strip()
+                elif isinstance(it, str):
+                    nm = it.split("|", 1)[0].strip()
+                else:
+                    nm = str(it)
+                if nm:
+                    out.append(nm)
+            return ", ".join(out)
+
+        def generate_markdown_report(self, rows, output_path: str, source_folder: str):
+            try:
+                with open(output_path, "w", encoding="utf-8") as f:
+                    # Header
+                    f.write(f"# Reactions Report ({source_folder})\n\n")
+                    f.write(f"Total reactions: {len(rows)}\n\n")
+
+                    # Per-reaction details (compact)
+                    for row in rows:
+                        rid = row.get("ReactionID", "")
+                        rtype = row.get("ReactionType", "")
+                        core_gen = self._safe_json_list(row.get("CatalystCoreGeneric", "[]"))
+                        lig_list = self._safe_json_list(row.get("Ligand", "[]"))
+                        reag_list = self._safe_json_list(row.get("Reagent", "[]"))
+                        role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
+                        solv_list = self._safe_json_list(row.get("Solvent", "[]"))
+
+                        # Compute a display core using metal token and ligand token from CAS map when available
+                        metal = (core_gen[0] if core_gen else "").strip()
+                        lig_tok = ""
+                        if lig_list:
+                            first = lig_list[0]
+                            cas = ""
+                            nm = ""
+                            if "|" in first:
+                                nm, cas = (first.split("|", 1) + [""])[:2]
+                            else:
+                                nm = first
+                            try:
+                                cmap = getattr(self, "cas_map", {}) or {}
+                                rec = cmap.get((cas or "").strip()) or {}
+                                lig_tok = (rec.get("Token") or rec.get("Abbreviation") or rec.get("Name") or nm).strip()
+                            except Exception:
+                                lig_tok = (nm or "").strip()
+                            lig_tok = lig_tok.replace(" ", "")
+                        disp_core = (f"{metal}/{lig_tok}" if metal and lig_tok else metal or lig_tok)
+
+                        # Conditions
+                        T = row.get("Temperature_C", "")
+                        t = row.get("Time_h", "")
+                        y = row.get("Yield_%", "")
+
+                        # Build reagents with roles
+                        reag_out = []
+                        for i, item in enumerate(reag_list):
+                            obj = self._pair_to_obj(item)
+                            role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
+                            seg = obj.get("name") or obj.get("cas") or "?"
+                            if obj.get("cas"):
+                                seg += f" ({obj['cas']})"
+                            reag_out.append(f"{seg} [{role}]")
+
+                        # Solvents
+                        solv_out = []
+                        for item in solv_list:
+                            obj = self._pair_to_obj(item)
+                            seg = obj.get("name") or obj.get("cas") or "?"
+                            if obj.get("cas"):
+                                seg += f" ({obj['cas']})"
+                            solv_out.append(seg)
+
+                        # SMILES
+                        r_smi = row.get("ReactantSMILES", "")
+                        p_smi = row.get("ProductSMILES", "")
+
+                        f.write(f"## Reaction {rid}\n\n")
+                        if rtype:
+                            f.write(f"- Type: {rtype}\n")
+                        if disp_core:
+                            f.write(f"- Condition Core: {disp_core}\n")
+                        if y != "":
+                            f.write(f"- Yield %: {y}\n")
+                        if T != "":
+                            f.write(f"- Temperature (C): {T}\n")
+                        if t != "":
+                            f.write(f"- Time (h): {t}\n")
+                        if reag_out:
+                            f.write(f"- Reagents: {', '.join(reag_out)}\n")
+                        if solv_out:
+                            f.write(f"- Solvents: {', '.join(solv_out)}\n")
+                        if r_smi or p_smi:
+                            f.write(f"- SMILES: {r_smi} >> {p_smi}\n")
+                        f.write("\n")
+            except Exception:
+                pass
+
+        def generate_jsonl_export(self, rows, output_path: str, source_folder: str):
+            import json as _json
+            out_lines = []
+            for row in rows:
+                # Basic identifiers
+                rid = row.get("ReactionID", "")
+                rtype = row.get("ReactionType", "")
+
+                # Catalyst core label (tokenized metal/ligand)
+                core_gen = self._safe_json_list(row.get("CatalystCoreGeneric", "[]"))
+                lig_list = self._safe_json_list(row.get("Ligand", "[]"))
+                metal = (core_gen[0] if core_gen else "").strip()
+                lig_tok = ""
+                if lig_list:
+                    first = lig_list[0]
+                    cas = ""
+                    nm = ""
+                    if "|" in first:
+                        nm, cas = (first.split("|", 1) + [""])[:2]
+                    else:
+                        nm = first
+                    try:
+                        cmap = getattr(self, "cas_map", {}) or {}
+                        rec = cmap.get((cas or "").strip()) or {}
+                        lig_tok = (rec.get("Token") or rec.get("Abbreviation") or rec.get("Name") or nm).strip()
+                    except Exception:
+                        lig_tok = (nm or "").strip()
+                    lig_tok = lig_tok.replace(" ", "")
+                condition_core = (f"{metal}/{lig_tok}" if metal and lig_tok else metal or lig_tok)
+
+                # Reagents + roles
+                reag_list = self._safe_json_list(row.get("Reagent", "[]"))
+                role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
+                reagents = []
+                base_uid = None
+                for i, item in enumerate(reag_list):
+                    obj = self._pair_to_obj(item)
+                    role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
+                    obj["role"] = role
+                    reagents.append(obj)
+                    if role == "BASE" and not base_uid:
+                        base_uid = obj.get("cas") or obj.get("name")
+
+                # Solvents
+                solv_list = self._safe_json_list(row.get("Solvent", "[]"))
+                solvents = [self._pair_to_obj(x) for x in solv_list]
+                solvent_uid = solvents[0].get("cas") if solvents else None
+
+                # Conditions
+                def _num(x):
+                    try:
+                        return float(x)
+                    except Exception:
+                        return None
+                conditions = {
+                    "temperature_c": _num(row.get("Temperature_C")),
+                    "time_h": _num(row.get("Time_h")),
+                    "yield_pct": _num(row.get("Yield_%")),
+                }
+
+                # SMILES
+                smiles = {
+                    "reactants": row.get("ReactantSMILES", ""),
+                    "products": row.get("ProductSMILES", ""),
+                }
+
+                analysis_record = {
+                    "reaction_id": rid,
+                    "reaction_type": rtype,
+                    "condition_core": condition_core,
+                    "reagents": reagents,
+                    "solvents": solvents,
+                    "conditions": conditions,
+                    "smiles": smiles,
+                    "reference": row.get("Reference") or {},
+                }
+                out_lines.append(_json.dumps(analysis_record, ensure_ascii=False))
+
+            try:
+                with open(output_path, "w", encoding="utf-8") as f:
+                    f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
+            except Exception:
+                pass
 
 # Detect RDKit availability
 try:
@@ -622,8 +826,34 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         self.log_msg("Starting RDF processing...")
         
         # Calculate output paths
-        output_md = self.output_md_edit.text().strip()
-        output_jsonl = os.path.splitext(output_md)[0] + '.jsonl'
+        # Name JSONL using upper folder names, e.g., Buchwald/2021-2025 -> Buchwald2021-2025.jsonl
+        try:
+            folder_path = self.folder_edit.text().strip()
+            norm_folder = os.path.normpath(folder_path)
+            parent_dir = os.path.basename(os.path.dirname(norm_folder)) or ""
+            current_dir = os.path.basename(norm_folder) or ""
+            import re as _re
+            def _safe(s: str) -> str:
+                s = _re.sub(r"\s+", "", s or "")  # remove spaces
+                s = _re.sub(r"[^A-Za-z0-9_-]+", "", s)  # keep only safe chars
+                return s
+            base_name_no_ext = (_safe(parent_dir) + _safe(current_dir)) or "dataset"
+            # Prefer to save next to the user-chosen Markdown directory; if none, use CWD
+            md_hint = self.output_md_edit.text().strip()
+            jsonl_dir = os.path.dirname(md_hint) if md_hint else os.getcwd()
+            output_jsonl = os.path.join(jsonl_dir, base_name_no_ext + ".jsonl")
+            # Ensure Markdown shares the same basename and location
+            output_md = os.path.join(jsonl_dir, base_name_no_ext + ".md")
+            try:
+                # Reflect the computed Markdown path back into the UI
+                self.output_md_edit.setText(output_md)
+            except Exception:
+                pass
+        except Exception:
+            # Fallback: derive both from any provided Markdown hint
+            md_hint = self.output_md_edit.text().strip() or os.path.join(os.getcwd(), "dataset.md")
+            output_md = os.path.splitext(md_hint)[0] + '.md'
+            output_jsonl = os.path.splitext(output_md)[0] + '.jsonl'
         
         # Create worker and thread
         self.worker = RDFWorker(

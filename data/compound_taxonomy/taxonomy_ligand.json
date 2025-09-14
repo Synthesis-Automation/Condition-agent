@@ -1,0 +1,3163 @@
+{
+  "version": "1.2",
+  "updated": "2025-09-13",
+  "schema": {
+    "family_id": "stable identifier for the family",
+    "label": "human-readable name",
+    "donor_set": "list of donor atoms in the coordinating set",
+    "denticity": "typical denticity values (list)",
+    "scaffold": "one-line description of structural motif",
+    "example_members": "array of {name, abbr, cas} items (abbr optional)",
+    "aliases": "alternative family labels used in literature (optional)",
+    "notes": "free text (optional)"
+  },
+  "families": [
+    {
+      "family_id": "dialkylbiaryl_phosphines",
+      "label": "Dialkylbiaryl phosphines (biaryl monophosphines)",
+      "donor_set": [
+        "P"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics",
+      "aliases": [
+        "Buchwald-type monophosphines",
+        "biaryl monophosphines"
+      ],
+      "example_members": [
+        {
+          "name": "SPhos",
+          "abbr": "SPhos",
+          "cas": "657408-07-6",
+          "synonyms": [
+            "SPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: SPhos | abbr: SPhos | CAS: 657408-07-6 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: SPhos"
+        },
+        {
+          "name": "XPhos",
+          "abbr": "XPhos",
+          "cas": "564483-18-7",
+          "synonyms": [
+            "XPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: XPhos | abbr: XPhos | CAS: 564483-18-7 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: XPhos"
+        },
+        {
+          "name": "RuPhos",
+          "abbr": "RuPhos",
+          "cas": "787618-22-8",
+          "synonyms": [
+            "RuPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: RuPhos | abbr: RuPhos | CAS: 787618-22-8 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: RuPhos"
+        },
+        {
+          "name": "BrettPhos",
+          "abbr": "BrettPhos",
+          "cas": "1070663-78-3",
+          "synonyms": [
+            "BrettPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: BrettPhos | abbr: BrettPhos | CAS: 1070663-78-3 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: BrettPhos"
+        },
+        {
+          "name": "tBuXPhos",
+          "abbr": "tBuXPhos",
+          "cas": "564483-19-8",
+          "synonyms": [
+            "tBuXPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: tBuXPhos | abbr: tBuXPhos | CAS: 564483-19-8 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: tBuXPhos"
+        },
+        {
+          "name": "JohnPhos",
+          "abbr": "JohnPhos",
+          "cas": "145052-34-0",
+          "synonyms": [
+            "JohnPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: JohnPhos | abbr: JohnPhos | CAS: 145052-34-0 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: JohnPhos"
+        },
+        {
+          "name": "DavePhos",
+          "abbr": "DavePhos",
+          "cas": "213697-53-1",
+          "synonyms": [
+            "DavePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: DavePhos | abbr: DavePhos | CAS: 213697-53-1 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: DavePhos"
+        },
+        {
+          "name": "MePhos",
+          "abbr": "MePhos",
+          "cas": "251320-86-2",
+          "synonyms": [
+            "MePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: MePhos | abbr: MePhos | CAS: 251320-86-2 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: MePhos"
+        },
+        {
+          "name": "QPhos",
+          "abbr": "QPhos",
+          "cas": "384347-21-1",
+          "synonyms": [
+            "QPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: QPhos | abbr: QPhos | CAS: 384347-21-1 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: QPhos"
+        },
+        {
+          "name": "CyJohnPhos",
+          "abbr": "CyJohnPhos",
+          "cas": "200001-74-9",
+          "synonyms": [
+            "CyJohnPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: CyJohnPhos | abbr: CyJohnPhos | CAS: 200001-74-9 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: CyJohnPhos"
+        },
+        {
+          "name": "AlPhos",
+          "abbr": "AlPhos",
+          "cas": "1447953-76-7",
+          "synonyms": [
+            "AlPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: AlPhos | abbr: AlPhos | CAS: 1447953-76-7 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: AlPhos"
+        },
+        {
+          "name": "Me4tBuXPhos",
+          "abbr": "Me4tBuXPhos",
+          "cas": "857356-94-6",
+          "synonyms": [
+            "Me4tBuXPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: Me4tBuXPhos | abbr: Me4tBuXPhos | CAS: 857356-94-6 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: Me4tBuXPhos"
+        },
+        {
+          "name": "AdBrettPhos",
+          "abbr": "AdBrettPhos",
+          "cas": "1160861-59-5",
+          "synonyms": [
+            "AdBrettPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: AdBrettPhos | abbr: AdBrettPhos | CAS: 1160861-59-5 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: AdBrettPhos"
+        },
+        {
+          "name": "tBuBrettPhos",
+          "abbr": "tBuBrettPhos",
+          "cas": "1160861-53-9",
+          "synonyms": [
+            "tBuBrettPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: tBuBrettPhos | abbr: tBuBrettPhos | CAS: 1160861-53-9 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: tBuBrettPhos"
+        },
+        {
+          "name": "Ph-XPhos",
+          "abbr": "Ph-XPhos",
+          "cas": "1185098-04-7",
+          "synonyms": [
+            "Ph-XPhos",
+            "PhXPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: Ph-XPhos | abbr: Ph-XPhos | CAS: 1185098-04-7 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: Ph-XPhos; PhXPhos"
+        },
+        {
+          "name": "MorDalPhos",
+          "abbr": "MorDalPhos",
+          "cas": "1447952-32-2",
+          "synonyms": [
+            "MorDalPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: MorDalPhos | abbr: MorDalPhos | CAS: 1447952-32-2 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: MorDalPhos"
+        },
+        {
+          "name": "AmplPhos",
+          "abbr": "AmplPhos",
+          "cas": "1374640-42-8",
+          "synonyms": [
+            "AmplPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: AmplPhos | abbr: AmplPhos | CAS: 1374640-42-8 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: AmplPhos"
+        },
+        {
+          "name": "SSPhos",
+          "abbr": "SSPhos",
+          "cas": "1049726-96-6",
+          "synonyms": [
+            "SSPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: SSPhos | abbr: SSPhos | CAS: 1049726-96-6 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: SSPhos"
+        },
+        {
+          "name": "Cyclohexyl JohnPhos",
+          "abbr": "Cyclohexyl JohnPhos",
+          "cas": "247940-06-3",
+          "synonyms": [
+            "Cyclohexyl JohnPhos",
+            "CyclohexylJohnPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: Cyclohexyl JohnPhos | abbr: Cyclohexyl JohnPhos | CAS: 247940-06-3 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: Cyclohexyl JohnPhos; CyclohexylJohnPhos"
+        },
+        {
+          "name": "PhDavePhos",
+          "abbr": "PhDavePhos",
+          "cas": "240417-00-9",
+          "synonyms": [
+            "PhDavePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: PhDavePhos | abbr: PhDavePhos | CAS: 240417-00-9 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: PhDavePhos"
+        },
+        {
+          "name": "JackiePhos",
+          "abbr": "JackiePhos",
+          "cas": "1160861-60-8",
+          "synonyms": [
+            "JackiePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: JackiePhos | abbr: JackiePhos | CAS: 1160861-60-8 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: JackiePhos"
+        },
+        {
+          "name": "tBuMePhos",
+          "abbr": "tBuMePhos",
+          "cas": "255837-19-5",
+          "synonyms": [
+            "tBuMePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: tBuMePhos | abbr: tBuMePhos | CAS: 255837-19-5 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: tBuMePhos"
+        },
+        {
+          "name": "tBuDavePhos",
+          "abbr": "tBuDavePhos",
+          "cas": "224311-49-3",
+          "synonyms": [
+            "tBuDavePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: tBuDavePhos | abbr: tBuDavePhos | CAS: 224311-49-3 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: tBuDavePhos"
+        },
+        {
+          "name": "2,4,6-Trimethoxy-2'-dicyclohexylphosphino biphenyl",
+          "abbr": "TMXPhos",
+          "cas": "1000171-05-0",
+          "synonyms": [
+            "246Trimethoxy2dicyclohexylphosphinobiphenyl",
+            "TMXPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: 2,4,6-Trimethoxy-2'-dicyclohexylphosphino biphenyl | abbr: TMXPhos | CAS: 1000171-05-0 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: 246Trimethoxy2dicyclohexylphosphinobiphenyl; TMXPhos"
+        },
+        {
+          "name": "Me3(OMe)tBuXPhos",
+          "abbr": "Me3(OMe)tBuXPhos",
+          "cas": null,
+          "synonyms": [
+            "Me3(OMe)tBuXPhos",
+            "Me3OMetBuXPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: Me3(OMe)tBuXPhos | abbr: Me3(OMe)tBuXPhos | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: Me3(OMe)tBuXPhos; Me3OMetBuXPhos"
+        },
+        {
+          "name": "Di-1-adamantylphosphino biphenyl",
+          "abbr": "DiAdPhos",
+          "cas": "224311-55-1",
+          "synonyms": [
+            "Di1adamantylphosphinobiphenyl",
+            "DiAdPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: Di-1-adamantylphosphino biphenyl | abbr: DiAdPhos | CAS: 224311-55-1 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: Di1adamantylphosphinobiphenyl; DiAdPhos"
+        },
+        {
+          "name": "RockPhos",
+          "abbr": "RockPhos",
+          "cas": "1262046-34-3",
+          "synonyms": [
+            "RockPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: RockPhos | abbr: RockPhos | CAS: 1262046-34-3 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: RockPhos"
+        },
+        {
+          "name": "CPhos",
+          "abbr": "CPhos",
+          "cas": "1160556-64-8",
+          "synonyms": [
+            "CPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: CPhos | abbr: CPhos | CAS: 1160556-64-8 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: CPhos"
+        },
+        {
+          "name": "TrixiePhos",
+          "abbr": "TrixiePhos",
+          "cas": "255836-67-0",
+          "synonyms": [
+            "TrixiePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Dialkylbiaryl phosphines (biaryl monophosphines) (dialkylbiaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Sterically demanding biaryl P(Ar)(R) ligands with dialkyl phosphine; strong tunable sterics/electronics | name: TrixiePhos | abbr: TrixiePhos | CAS: 255836-67-0 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Buchwald–Hartwig C–N; Aryl chloride couplings; Difficult cross-couplings | best_for: Hindered aryl electrophiles; Low Pd loadings; Fast reductive elimination | avoid_when: Very soft-metal catalysis preferring π-acceptors | ehs: air_sensitive | synonyms: TrixiePhos"
+        }
+      ],
+      "steric_bulk_band": "very high",
+      "electron_donor_band": "high",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Buchwald–Hartwig C–N",
+        "Aryl chloride couplings",
+        "Difficult cross-couplings"
+      ],
+      "best_for": [
+        "Hindered aryl electrophiles",
+        "Low Pd loadings",
+        "Fast reductive elimination"
+      ],
+      "avoid_when": [
+        "Very soft-metal catalysis preferring π-acceptors"
+      ],
+      "ehs_green": {
+        "air_sensitive": true
+      }
+    },
+    {
+      "family_id": "trialkyl_triaryl_phosphines",
+      "label": "Trialkyl/Triaryl phosphines (monodentate)",
+      "donor_set": [
+        "P"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents",
+      "example_members": [
+        {
+          "name": "Triphenylphosphine",
+          "abbr": "PPh3",
+          "cas": "603-35-0",
+          "synonyms": [
+            "PPh3",
+            "Triphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triphenylphosphine | abbr: PPh3 | CAS: 603-35-0 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PPh3; Triphenylphosphine"
+        },
+        {
+          "name": "Tricyclohexylphosphine",
+          "abbr": "PCy3",
+          "cas": "2622-14-2",
+          "synonyms": [
+            "PCy3",
+            "Tricyclohexylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tricyclohexylphosphine | abbr: PCy3 | CAS: 2622-14-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PCy3; Tricyclohexylphosphine"
+        },
+        {
+          "name": "Tri-tert-butylphosphine",
+          "abbr": "PtBu3",
+          "cas": "13716-12-6",
+          "synonyms": [
+            "PtBu3",
+            "Tritertbutylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tri-tert-butylphosphine | abbr: PtBu3 | CAS: 13716-12-6 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PtBu3; Tritertbutylphosphine"
+        },
+        {
+          "name": "Tris(o-tolyl)phosphine",
+          "abbr": "P(o-tol)3",
+          "cas": "6163-58-2",
+          "synonyms": [
+            "P(o-tol)3",
+            "Trisotolylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(o-tolyl)phosphine | abbr: P(o-tol)3 | CAS: 6163-58-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(o-tol)3; Trisotolylphosphine"
+        },
+        {
+          "name": "Tris(p-tolyl)phosphine",
+          "abbr": "P(p-tol)3",
+          "cas": "1038-95-5",
+          "synonyms": [
+            "P(p-tol)3",
+            "Trisptolylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-tolyl)phosphine | abbr: P(p-tol)3 | CAS: 1038-95-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-tol)3; Trisptolylphosphine"
+        },
+        {
+          "name": "Tris(p-fluorophenyl)phosphine",
+          "abbr": "P(p-F-Ph)3",
+          "cas": "18437-78-2",
+          "synonyms": [
+            "P(p-F-Ph)3",
+            "Trispfluorophenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-fluorophenyl)phosphine | abbr: P(p-F-Ph)3 | CAS: 18437-78-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-F-Ph)3; Trispfluorophenylphosphine"
+        },
+        {
+          "name": "Tris(p-chlorophenyl)phosphine",
+          "abbr": "P(p-Cl-Ph)3",
+          "cas": "1159-54-2",
+          "synonyms": [
+            "P(p-Cl-Ph)3",
+            "Trispchlorophenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-chlorophenyl)phosphine | abbr: P(p-Cl-Ph)3 | CAS: 1159-54-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-Cl-Ph)3; Trispchlorophenylphosphine"
+        },
+        {
+          "name": "Tris(p-trifluoromethylphenyl)phosphine",
+          "abbr": "P(p-CF3-Ph)3",
+          "cas": "1160-71-4",
+          "synonyms": [
+            "P(p-CF3-Ph)3",
+            "Trisptrifluoromethylphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-trifluoromethylphenyl)phosphine | abbr: P(p-CF3-Ph)3 | CAS: 1160-71-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-CF3-Ph)3; Trisptrifluoromethylphenylphosphine"
+        },
+        {
+          "name": "Methyldiphenylphosphine",
+          "abbr": "PMePh2",
+          "cas": "1486-28-8",
+          "synonyms": [
+            "Methyldiphenylphosphine",
+            "PMePh2"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Methyldiphenylphosphine | abbr: PMePh2 | CAS: 1486-28-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: Methyldiphenylphosphine; PMePh2"
+        },
+        {
+          "name": "Dimethylphenylphosphine",
+          "abbr": "PMe2Ph",
+          "cas": "672-66-2",
+          "synonyms": [
+            "Dimethylphenylphosphine",
+            "PMe2Ph"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Dimethylphenylphosphine | abbr: PMe2Ph | CAS: 672-66-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: Dimethylphenylphosphine; PMe2Ph"
+        },
+        {
+          "name": "Trimethylphosphine",
+          "abbr": "PMe3",
+          "cas": "594-09-2",
+          "synonyms": [
+            "PMe3",
+            "Trimethylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Trimethylphosphine | abbr: PMe3 | CAS: 594-09-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PMe3; Trimethylphosphine"
+        },
+        {
+          "name": "Triethylphosphine",
+          "abbr": "PEt3",
+          "cas": "554-70-1",
+          "synonyms": [
+            "PEt3",
+            "Triethylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triethylphosphine | abbr: PEt3 | CAS: 554-70-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PEt3; Triethylphosphine"
+        },
+        {
+          "name": "Tri-n-butylphosphine",
+          "abbr": "P(nBu)3",
+          "cas": "998-40-3",
+          "synonyms": [
+            "P(nBu)3",
+            "Trinbutylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tri-n-butylphosphine | abbr: P(nBu)3 | CAS: 998-40-3 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(nBu)3; Trinbutylphosphine"
+        },
+        {
+          "name": "Triisopropylphosphine",
+          "abbr": "P(iPr)3",
+          "cas": "6476-36-4",
+          "synonyms": [
+            "P(iPr)3",
+            "Triisopropylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triisopropylphosphine | abbr: P(iPr)3 | CAS: 6476-36-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(iPr)3; Triisopropylphosphine"
+        },
+        {
+          "name": "Tris(2-furyl)phosphine",
+          "abbr": "P(2-furyl)3",
+          "cas": "5518-52-5",
+          "synonyms": [
+            "P(2-furyl)3",
+            "Tris2furylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(2-furyl)phosphine | abbr: P(2-furyl)3 | CAS: 5518-52-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(2-furyl)3; Tris2furylphosphine"
+        },
+        {
+          "name": "Tris(pentafluorophenyl)phosphine",
+          "abbr": "P(C6F5)3",
+          "cas": "1757-50-8",
+          "synonyms": [
+            "P(C6F5)3",
+            "Trispentafluorophenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(pentafluorophenyl)phosphine | abbr: P(C6F5)3 | CAS: 1757-50-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(C6F5)3; Trispentafluorophenylphosphine"
+        },
+        {
+          "name": "Tris(p-methoxyphenyl)phosphine",
+          "abbr": "P(p-MeO-Ph)3",
+          "cas": "855-38-9",
+          "synonyms": [
+            "P(p-MeO-Ph)3",
+            "Trispmethoxyphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-methoxyphenyl)phosphine | abbr: P(p-MeO-Ph)3 | CAS: 855-38-9 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-MeO-Ph)3; Trispmethoxyphenylphosphine"
+        },
+        {
+          "name": "Tris(o-methoxyphenyl)phosphine",
+          "abbr": "P(o-MeO-Ph)3",
+          "cas": "4731-65-1",
+          "synonyms": [
+            "P(o-MeO-Ph)3",
+            "Trisomethoxyphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(o-methoxyphenyl)phosphine | abbr: P(o-MeO-Ph)3 | CAS: 4731-65-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(o-MeO-Ph)3; Trisomethoxyphenylphosphine"
+        },
+        {
+          "name": "Tris(mesityl)phosphine",
+          "abbr": "P(mes)3",
+          "cas": "23897-15-6",
+          "synonyms": [
+            "P(mes)3",
+            "Trismesitylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(mesityl)phosphine | abbr: P(mes)3 | CAS: 23897-15-6 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(mes)3; Trismesitylphosphine"
+        },
+        {
+          "name": "Tris(n-octyl)phosphine",
+          "abbr": "P(nOct)3",
+          "cas": "4731-53-7",
+          "synonyms": [
+            "P(nOct)3",
+            "Trisnoctylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(n-octyl)phosphine | abbr: P(nOct)3 | CAS: 4731-53-7 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(nOct)3; Trisnoctylphosphine"
+        },
+        {
+          "name": "Tricyclohexylphosphine tetrafluoroborate",
+          "abbr": "PCy3·HBF4",
+          "cas": "58656-04-5",
+          "synonyms": [
+            "PCy3·HBF4",
+            "Tricyclohexylphosphinetetrafluoroborate"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tricyclohexylphosphine tetrafluoroborate | abbr: PCy3·HBF4 | CAS: 58656-04-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PCy3·HBF4; Tricyclohexylphosphinetetrafluoroborate"
+        }
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "low",
+      "use_cases": [
+        "General Pd couplings",
+        "Hydrosilylation (Pt)",
+        "Ligand screening baselines"
+      ],
+      "best_for": [
+        "Versatile, available PR3 series"
+      ],
+      "avoid_when": [
+        "Strong air sensitivity (some PR3)",
+        "Need extreme sterics/electronics"
+      ],
+      "ehs_green": {
+        "air_sensitive": true
+      }
+    },
+    {
+      "family_id": "bidentate_diphosphines",
+      "label": "Diphosphines (bidentate P^P)",
+      "donor_set": [
+        "P",
+        "P"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination)",
+      "aliases": [
+        "P^P chelates"
+      ],
+      "example_members": [
+        {
+          "name": "BINAP",
+          "abbr": "BINAP",
+          "cas": "2250-01-3",
+          "synonyms": [
+            "BINAP"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: BINAP | abbr: BINAP | CAS: 2250-01-3 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: BINAP"
+        },
+        {
+          "name": "Tol-BINAP",
+          "abbr": "Tol-BINAP",
+          "cas": "99646-27-4",
+          "synonyms": [
+            "Tol-BINAP",
+            "TolBINAP"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: Tol-BINAP | abbr: Tol-BINAP | CAS: 99646-27-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: Tol-BINAP; TolBINAP"
+        },
+        {
+          "name": "H8-BINAP",
+          "abbr": "H8-BINAP",
+          "cas": "117016-01-8",
+          "synonyms": [
+            "H8-BINAP",
+            "H8BINAP"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: H8-BINAP | abbr: H8-BINAP | CAS: 117016-01-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: H8-BINAP; H8BINAP"
+        },
+        {
+          "name": "BIPHEP",
+          "abbr": "BIPHEP",
+          "cas": "58467-99-1",
+          "synonyms": [
+            "BIPHEP"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: BIPHEP | abbr: BIPHEP | CAS: 58467-99-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: BIPHEP"
+        },
+        {
+          "name": "MeO-BIPHEP",
+          "abbr": "MeO-BIPHEP",
+          "cas": "52364-71-3",
+          "synonyms": [
+            "MeO-BIPHEP",
+            "MeOBIPHEP"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: MeO-BIPHEP | abbr: MeO-BIPHEP | CAS: 52364-71-3 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: MeO-BIPHEP; MeOBIPHEP"
+        },
+        {
+          "name": "SEGPHOS",
+          "abbr": "SEGPHOS",
+          "cas": "145854-69-9",
+          "synonyms": [
+            "SEGPHOS"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: SEGPHOS | abbr: SEGPHOS | CAS: 145854-69-9 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: SEGPHOS"
+        },
+        {
+          "name": "DM-SEGPHOS",
+          "abbr": "DM-SEGPHOS",
+          "cas": "196868-63-0",
+          "synonyms": [
+            "DM-SEGPHOS",
+            "DMSEGPHOS"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DM-SEGPHOS | abbr: DM-SEGPHOS | CAS: 196868-63-0 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DM-SEGPHOS; DMSEGPHOS"
+        },
+        {
+          "name": "DTBM-SEGPHOS",
+          "abbr": "DTBM-SEGPHOS",
+          "cas": "243984-11-4",
+          "synonyms": [
+            "DTBM-SEGPHOS",
+            "DTBMSEGPHOS"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DTBM-SEGPHOS | abbr: DTBM-SEGPHOS | CAS: 243984-11-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DTBM-SEGPHOS; DTBMSEGPHOS"
+        },
+        {
+          "name": "C3-TunePhos",
+          "abbr": "C3-TunePhos",
+          "cas": "150992-96-0",
+          "synonyms": [
+            "C3-TunePhos",
+            "C3TunePhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: C3-TunePhos | abbr: C3-TunePhos | CAS: 150992-96-0 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: C3-TunePhos; C3TunePhos"
+        },
+        {
+          "name": "DifluorPhos",
+          "abbr": "DifluorPhos",
+          "cas": "156707-92-7",
+          "synonyms": [
+            "DifluorPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DifluorPhos | abbr: DifluorPhos | CAS: 156707-92-7 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DifluorPhos"
+        },
+        {
+          "name": "SynPhos",
+          "abbr": "SynPhos",
+          "cas": "205319-91-7",
+          "synonyms": [
+            "SynPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: SynPhos | abbr: SynPhos | CAS: 205319-91-7 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: SynPhos"
+        },
+        {
+          "name": "DPPE",
+          "abbr": "DPPE",
+          "cas": "1663-45-2",
+          "synonyms": [
+            "DPPE"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DPPE | abbr: DPPE | CAS: 1663-45-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DPPE"
+        },
+        {
+          "name": "DPPP",
+          "abbr": "DPPP",
+          "cas": "6737-42-4",
+          "synonyms": [
+            "DPPP"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DPPP | abbr: DPPP | CAS: 6737-42-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DPPP"
+        },
+        {
+          "name": "DPPB",
+          "abbr": "DPPB",
+          "cas": "7688-25-7",
+          "synonyms": [
+            "DPPB"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DPPB | abbr: DPPB | CAS: 7688-25-7 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DPPB"
+        },
+        {
+          "name": "DPPF",
+          "abbr": "DPPF",
+          "cas": "12150-46-8",
+          "synonyms": [
+            "DPPF"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DPPF | abbr: DPPF | CAS: 12150-46-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DPPF"
+        },
+        {
+          "name": "Xantphos",
+          "abbr": "XantPhos",
+          "cas": "161265-03-8",
+          "synonyms": [
+            "XantPhos",
+            "Xantphos"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: Xantphos | abbr: XantPhos | CAS: 161265-03-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: XantPhos; Xantphos"
+        },
+        {
+          "name": "DPEphos",
+          "abbr": "DPEPhos",
+          "cas": "166330-10-5",
+          "synonyms": [
+            "DPEPhos",
+            "DPEphos"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diphosphines (bidentate P^P) (bidentate_diphosphines) | donor_set: P,P | denticity: 2 | scaffold: Chelating diphosphines; bite angle and sterics tune key steps (oxidative addition/reductive elimination) | name: DPEphos | abbr: DPEPhos | CAS: 166330-10-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: medium | bite angle band: medium | use_cases: Hydrogenations (Rh/Ru); Cross-couplings (DPPF, Xantphos); Asymmetric catalysis (BINAP/SEGPHOS) | best_for: Chelation control; Tuning bite angle (wide with Xantphos) | avoid_when: Very bulky monodentate regime required | synonyms: DPEPhos; DPEphos"
+        }
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "medium",
+      "bite_angle_band": "medium",
+      "use_cases": [
+        "Hydrogenations (Rh/Ru)",
+        "Cross-couplings (DPPF, Xantphos)",
+        "Asymmetric catalysis (BINAP/SEGPHOS)"
+      ],
+      "best_for": [
+        "Chelation control",
+        "Tuning bite angle (wide with Xantphos)"
+      ],
+      "avoid_when": [
+        "Very bulky monodentate regime required"
+      ]
+    },
+    {
+      "family_id": "phosphites",
+      "label": "Phosphites (P(OR)3)",
+      "donor_set": [
+        "P"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Electron-poor P(OR)3 ligands; good π-acceptors; often increase electrophilicity at metal",
+      "example_members": [
+        {
+          "name": "Triphenyl phosphite",
+          "abbr": "P(OPh)3",
+          "synonyms": [
+            "P(OPh)3",
+            "Triphenylphosphite"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 3,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Phosphites (P(OR)3) (phosphites) | donor_set: P | denticity: 1 | scaffold: Electron-poor P(OR)3 ligands; good π-acceptors; often increase electrophilicity at metal | name: Triphenyl phosphite | abbr: P(OPh)3 | steric bulk band: low | electron donor band: low | pi acceptor band: high | rigidity band: low | use_cases: Hydroformylation (Rh); Electrophilic metal catalysis | best_for: Increase metal electrophilicity; Stabilize low-coordinate cationic species | avoid_when: Need strong σ-donation | ehs: air_sensitive | synonyms: P(OPh)3; Triphenylphosphite"
+        },
+        {
+          "name": "Trimethyl phosphite",
+          "abbr": "P(OMe)3",
+          "synonyms": [
+            "P(OMe)3",
+            "Trimethylphosphite"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 3,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Phosphites (P(OR)3) (phosphites) | donor_set: P | denticity: 1 | scaffold: Electron-poor P(OR)3 ligands; good π-acceptors; often increase electrophilicity at metal | name: Trimethyl phosphite | abbr: P(OMe)3 | steric bulk band: low | electron donor band: low | pi acceptor band: high | rigidity band: low | use_cases: Hydroformylation (Rh); Electrophilic metal catalysis | best_for: Increase metal electrophilicity; Stabilize low-coordinate cationic species | avoid_when: Need strong σ-donation | ehs: air_sensitive | synonyms: P(OMe)3; Trimethylphosphite"
+        },
+        {
+          "name": "Triisopropyl phosphite",
+          "abbr": "P(OiPr)3",
+          "synonyms": [
+            "P(OiPr)3",
+            "Triisopropylphosphite"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 3,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Phosphites (P(OR)3) (phosphites) | donor_set: P | denticity: 1 | scaffold: Electron-poor P(OR)3 ligands; good π-acceptors; often increase electrophilicity at metal | name: Triisopropyl phosphite | abbr: P(OiPr)3 | steric bulk band: low | electron donor band: low | pi acceptor band: high | rigidity band: low | use_cases: Hydroformylation (Rh); Electrophilic metal catalysis | best_for: Increase metal electrophilicity; Stabilize low-coordinate cationic species | avoid_when: Need strong σ-donation | ehs: air_sensitive | synonyms: P(OiPr)3; Triisopropylphosphite"
+        }
+      ],
+      "steric_bulk_band": "low",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "high",
+      "rigidity_band": "low",
+      "use_cases": [
+        "Hydroformylation (Rh)",
+        "Electrophilic metal catalysis"
+      ],
+      "best_for": [
+        "Increase metal electrophilicity",
+        "Stabilize low-coordinate cationic species"
+      ],
+      "avoid_when": [
+        "Need strong σ-donation"
+      ],
+      "ehs_green": {
+        "air_sensitive": true
+      }
+    },
+    {
+      "family_id": "phosphoramidites",
+      "label": "Phosphoramidites (P(OR)(NR2)R')",
+      "donor_set": [
+        "P"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Monodentate P with NR substituent; privileged in asymmetric catalysis (BINOL/TADDOL-derived)",
+      "example_members": [
+        {
+          "name": "BINOL-derived phosphoramidite",
+          "abbr": "BINOL-Phosamidite",
+          "synonyms": [
+            "BINOL-Phosamidite",
+            "BINOLderivedphosphoramidite"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 3,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Phosphoramidites (P(OR)(NR2)R') (phosphoramidites) | donor_set: P | denticity: 1 | scaffold: Monodentate P with NR substituent; privileged in asymmetric catalysis (BINOL/TADDOL-derived) | name: BINOL-derived phosphoramidite | abbr: BINOL-Phosamidite | steric bulk band: medium | electron donor band: low | pi acceptor band: high | rigidity band: medium | use_cases: Asymmetric catalysis; Hydroformylation | best_for: Chiral induction; Fine-tuned π-acceptor strength | avoid_when: Harsh basic conditions | ehs: air_sensitive | synonyms: BINOL-Phosamidite; BINOLderivedphosphoramidite"
+        },
+        {
+          "name": "TADDOL-derived phosphoramidite",
+          "abbr": "TADDOL-Phosamidite",
+          "synonyms": [
+            "TADDOL-Phosamidite",
+            "TADDOLderivedphosphoramidite"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 3,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Phosphoramidites (P(OR)(NR2)R') (phosphoramidites) | donor_set: P | denticity: 1 | scaffold: Monodentate P with NR substituent; privileged in asymmetric catalysis (BINOL/TADDOL-derived) | name: TADDOL-derived phosphoramidite | abbr: TADDOL-Phosamidite | steric bulk band: medium | electron donor band: low | pi acceptor band: high | rigidity band: medium | use_cases: Asymmetric catalysis; Hydroformylation | best_for: Chiral induction; Fine-tuned π-acceptor strength | avoid_when: Harsh basic conditions | ehs: air_sensitive | synonyms: TADDOL-Phosamidite; TADDOLderivedphosphoramidite"
+        }
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "high",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Asymmetric catalysis",
+        "Hydroformylation"
+      ],
+      "best_for": [
+        "Chiral induction",
+        "Fine-tuned π-acceptor strength"
+      ],
+      "avoid_when": [
+        "Harsh basic conditions"
+      ],
+      "ehs_green": {
+        "air_sensitive": true
+      }
+    },
+    {
+      "family_id": "nhc_imidazolylidenes",
+      "label": "N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)",
+      "donor_set": [
+        "C(carbene)"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor",
+      "example_members": [
+        {
+          "name": "IPr",
+          "abbr": "IPr",
+          "cas": "246047-72-3",
+          "synonyms": [
+            "IPr"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: IPr | abbr: IPr | CAS: 246047-72-3 | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: IPr"
+        },
+        {
+          "name": "IMes",
+          "abbr": "IMes",
+          "cas": "141556-45-8",
+          "synonyms": [
+            "IMes"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: IMes | abbr: IMes | CAS: 141556-45-8 | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: IMes"
+        },
+        {
+          "name": "SIPr",
+          "abbr": "SIPr",
+          "cas": "343970-73-8",
+          "synonyms": [
+            "SIPr"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: SIPr | abbr: SIPr | CAS: 343970-73-8 | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: SIPr"
+        },
+        {
+          "name": "SIMes",
+          "abbr": "SIMes",
+          "cas": "141556-44-7",
+          "synonyms": [
+            "SIMes"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: SIMes | abbr: SIMes | CAS: 141556-44-7 | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: SIMes"
+        },
+        {
+          "name": "IPrCl",
+          "abbr": "IPrCl",
+          "cas": "250285-32-6",
+          "synonyms": [
+            "IPrCl"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: IPrCl | abbr: IPrCl | CAS: 250285-32-6 | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: IPrCl"
+        },
+        {
+          "name": "1,3-Dicyclohexylimidazol-2-ylidene",
+          "abbr": "ICy",
+          "synonyms": [
+            "13Dicyclohexylimidazol2ylidene",
+            "ICy"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: 1,3-Dicyclohexylimidazol-2-ylidene | abbr: ICy | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: 13Dicyclohexylimidazol2ylidene; ICy"
+        },
+        {
+          "name": "1,3-Di-tert-butylimidazol-2-ylidene",
+          "abbr": "ItBu",
+          "synonyms": [
+            "13Ditertbutylimidazol2ylidene",
+            "ItBu"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: 1,3-Di-tert-butylimidazol-2-ylidene | abbr: ItBu | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: 13Ditertbutylimidazol2ylidene; ItBu"
+        },
+        {
+          "name": "1,3-Di-1-adamantylimidazol-2-ylidene",
+          "abbr": "IAd",
+          "synonyms": [
+            "13Di1adamantylimidazol2ylidene",
+            "IAd"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) (nhc_imidazolylidenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Neutral σ-donor carbenes; strong σ-donor/weak π-acceptor | name: 1,3-Di-1-adamantylimidazol-2-ylidene | abbr: IAd | steric bulk band: high | electron donor band: very high | pi acceptor band: low | rigidity band: high | use_cases: Aryl chloride activation; C–N/C–O couplings; Olefin metathesis (as NHCs) | best_for: Strong σ-donation; Stabilize low-oxidation states | avoid_when: Prefer π-acceptor ligands | synonyms: 13Di1adamantylimidazol2ylidene; IAd"
+        }
+      ],
+      "aliases": [
+        "imidazolinylidene",
+        "imidazolylidene",
+        "nhc"
+      ],
+      "steric_bulk_band": "high",
+      "electron_donor_band": "very high",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "high",
+      "use_cases": [
+        "Aryl chloride activation",
+        "C–N/C–O couplings",
+        "Olefin metathesis (as NHCs)"
+      ],
+      "best_for": [
+        "Strong σ-donation",
+        "Stabilize low-oxidation states"
+      ],
+      "avoid_when": [
+        "Prefer π-acceptor ligands"
+      ]
+    },
+    {
+      "family_id": "caac_carbenes",
+      "label": "CAAC/BICAAC carbenes",
+      "donor_set": [
+        "C(carbene)"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Cyclic(alkyl)(amino)carbenes; stronger σ-donor and better π-acceptor balance vs NHCs",
+      "example_members": [
+        {
+          "name": "CAAC (generic)",
+          "abbr": "CAAC",
+          "synonyms": [
+            "CAAC",
+            "CAACgeneric"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: CAAC/BICAAC carbenes (caac_carbenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Cyclic(alkyl)(amino)carbenes; stronger σ-donor and better π-acceptor balance vs NHCs | name: CAAC (generic) | abbr: CAAC | steric bulk band: high | electron donor band: very high | pi acceptor band: medium | rigidity band: high | use_cases: Cross-electrophile couplings (Ni); Catalysis needing very strong donors | best_for: Difficult oxidative additions; Stabilize radical manifolds | avoid_when: Cost/availability constraints | synonyms: CAAC; CAACgeneric"
+        },
+        {
+          "name": "BICAAC (generic)",
+          "abbr": "BICAAC",
+          "synonyms": [
+            "BICAAC",
+            "BICAACgeneric"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 4,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 3,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: CAAC/BICAAC carbenes (caac_carbenes) | donor_set: C(carbene) | denticity: 1 | scaffold: Cyclic(alkyl)(amino)carbenes; stronger σ-donor and better π-acceptor balance vs NHCs | name: BICAAC (generic) | abbr: BICAAC | steric bulk band: high | electron donor band: very high | pi acceptor band: medium | rigidity band: high | use_cases: Cross-electrophile couplings (Ni); Catalysis needing very strong donors | best_for: Difficult oxidative additions; Stabilize radical manifolds | avoid_when: Cost/availability constraints | synonyms: BICAAC; BICAACgeneric"
+        }
+      ],
+      "steric_bulk_band": "high",
+      "electron_donor_band": "very high",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "high",
+      "use_cases": [
+        "Cross-electrophile couplings (Ni)",
+        "Catalysis needing very strong donors"
+      ],
+      "best_for": [
+        "Difficult oxidative additions",
+        "Stabilize radical manifolds"
+      ],
+      "avoid_when": [
+        "Cost/availability constraints"
+      ]
+    },
+    {
+      "family_id": "bipyridines",
+      "label": "2,2'-Bipyridines (bpy family)",
+      "donor_set": [
+        "N",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Chelating diimine ligands (aryl-bridged pyridines)",
+      "example_members": [
+        {
+          "name": "2,2'-Bipyridine",
+          "abbr": "bpy",
+          "cas": "366-18-7",
+          "synonyms": [
+            "22Bipyridine",
+            "bpy"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 2,2'-Bipyridines (bpy family) (bipyridines) | donor_set: N,N | denticity: 2 | scaffold: Chelating diimine ligands (aryl-bridged pyridines) | name: 2,2'-Bipyridine | abbr: bpy | CAS: 366-18-7 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: medium | use_cases: Ni/Fe cross-couplings; Electro/photoredox catalysis | best_for: Base-metal stabilization; α-diimine-like behavior | avoid_when: Need strong σ-donation | synonyms: 22Bipyridine; bpy"
+        },
+        {
+          "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+          "abbr": "dtbbpy",
+          "cas": "72914-19-3",
+          "synonyms": [
+            "44ditertButyl22bipyridine",
+            "dtbbpy"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 2,2'-Bipyridines (bpy family) (bipyridines) | donor_set: N,N | denticity: 2 | scaffold: Chelating diimine ligands (aryl-bridged pyridines) | name: 4,4'-di-tert-Butyl-2,2'-bipyridine | abbr: dtbbpy | CAS: 72914-19-3 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: medium | use_cases: Ni/Fe cross-couplings; Electro/photoredox catalysis | best_for: Base-metal stabilization; α-diimine-like behavior | avoid_when: Need strong σ-donation | synonyms: 44ditertButyl22bipyridine; dtbbpy"
+        },
+        {
+          "name": "6,6'-Dimethyl-2,2'-bipyridine",
+          "abbr": "dmbpy",
+          "synonyms": [
+            "66Dimethyl22bipyridine",
+            "dmbpy"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 2,2'-Bipyridines (bpy family) (bipyridines) | donor_set: N,N | denticity: 2 | scaffold: Chelating diimine ligands (aryl-bridged pyridines) | name: 6,6'-Dimethyl-2,2'-bipyridine | abbr: dmbpy | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: medium | use_cases: Ni/Fe cross-couplings; Electro/photoredox catalysis | best_for: Base-metal stabilization; α-diimine-like behavior | avoid_when: Need strong σ-donation | synonyms: 66Dimethyl22bipyridine; dmbpy"
+        },
+        {
+          "name": "5,5'-Dimethyl-2,2'-bipyridine",
+          "abbr": "5,5'-dmbpy",
+          "cas": "1762-34-1",
+          "synonyms": [
+            "5,5'-dmbpy",
+            "55Dimethyl22bipyridine"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 2,2'-Bipyridines (bpy family) (bipyridines) | donor_set: N,N | denticity: 2 | scaffold: Chelating diimine ligands (aryl-bridged pyridines) | name: 5,5'-Dimethyl-2,2'-bipyridine | abbr: 5,5'-dmbpy | CAS: 1762-34-1 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: medium | use_cases: Ni/Fe cross-couplings; Electro/photoredox catalysis | best_for: Base-metal stabilization; α-diimine-like behavior | avoid_when: Need strong σ-donation | synonyms: 5,5'-dmbpy; 55Dimethyl22bipyridine"
+        }
+      ],
+      "aliases": [
+        "2,2'-bipyridine",
+        "bipy",
+        "bipyridine",
+        "bpy"
+      ],
+      "steric_bulk_band": "low",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Ni/Fe cross-couplings",
+        "Electro/photoredox catalysis"
+      ],
+      "best_for": [
+        "Base-metal stabilization",
+        "α-diimine-like behavior"
+      ],
+      "avoid_when": [
+        "Need strong σ-donation"
+      ]
+    },
+    {
+      "family_id": "phenanthrolines",
+      "label": "1,10-Phenanthrolines",
+      "donor_set": [
+        "N",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Chelating diimine (fused aromatic)",
+      "example_members": [
+        {
+          "name": "1,10-Phenanthroline",
+          "abbr": "phen",
+          "cas": "66-71-7",
+          "synonyms": [
+            "110Phenanthroline",
+            "phen"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 1,10-Phenanthrolines (phenanthrolines) | donor_set: N,N | denticity: 2 | scaffold: Chelating diimine (fused aromatic) | name: 1,10-Phenanthroline | abbr: phen | CAS: 66-71-7 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: high | use_cases: Ni photoredox; Oxidation catalysis | best_for: Rigid chelation; Backbonding modulation | avoid_when: Strong σ-donor regime | synonyms: 110Phenanthroline; phen"
+        },
+        {
+          "name": "Neocuproine (2,9-dimethyl-1,10-phenanthroline)",
+          "abbr": "neocuproine",
+          "cas": "484-11-7",
+          "synonyms": [
+            "Neocuproine29dimethyl110phenanthroline",
+            "neocuproine"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 1,10-Phenanthrolines (phenanthrolines) | donor_set: N,N | denticity: 2 | scaffold: Chelating diimine (fused aromatic) | name: Neocuproine (2,9-dimethyl-1,10-phenanthroline) | abbr: neocuproine | CAS: 484-11-7 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: high | use_cases: Ni photoredox; Oxidation catalysis | best_for: Rigid chelation; Backbonding modulation | avoid_when: Strong σ-donor regime | synonyms: Neocuproine29dimethyl110phenanthroline; neocuproine"
+        },
+        {
+          "name": "Bathophenanthroline",
+          "abbr": "batho-phen",
+          "cas": "1662-01-7",
+          "synonyms": [
+            "Bathophenanthroline",
+            "batho-phen"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 1,10-Phenanthrolines (phenanthrolines) | donor_set: N,N | denticity: 2 | scaffold: Chelating diimine (fused aromatic) | name: Bathophenanthroline | abbr: batho-phen | CAS: 1662-01-7 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: high | use_cases: Ni photoredox; Oxidation catalysis | best_for: Rigid chelation; Backbonding modulation | avoid_when: Strong σ-donor regime | synonyms: Bathophenanthroline; batho-phen"
+        }
+      ],
+      "aliases": [
+        "1,10-phenanthroline",
+        "phen",
+        "phenanthroline"
+      ],
+      "steric_bulk_band": "low",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "high",
+      "use_cases": [
+        "Ni photoredox",
+        "Oxidation catalysis"
+      ],
+      "best_for": [
+        "Rigid chelation",
+        "Backbonding modulation"
+      ],
+      "avoid_when": [
+        "Strong σ-donor regime"
+      ]
+    },
+    {
+      "family_id": "terpyridines",
+      "label": "2,2':6',2''-Terpyridines (terpy)",
+      "donor_set": [
+        "N",
+        "N",
+        "N"
+      ],
+      "denticity": [
+        2,
+        3
+      ],
+      "scaffold": "Meridional/tridentate polypyridyls",
+      "example_members": [
+        {
+          "name": "2,2':6',2''-Terpyridine",
+          "abbr": "terpy",
+          "synonyms": [
+            "2262Terpyridine",
+            "terpy"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 3,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: 2,2':6',2''-Terpyridines (terpy) (terpyridines) | donor_set: N,N,N | denticity: 2,3 | scaffold: Meridional/tridentate polypyridyls | name: 2,2':6',2''-Terpyridine | abbr: terpy | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: high | use_cases: Fe/Co catalysis; Electro/photo settings | best_for: Meridional N3 binding | avoid_when: Monodentate needed | synonyms: 2262Terpyridine; terpy"
+        },
+        {
+          "name": "4,4',4''-Tri-tert-butyl-2,2':6',2''-terpyridine",
+          "abbr": "tBu3-terpy",
+          "cas": "115091-29-7",
+          "synonyms": [
+            "444Tritertbutyl2262terpyridine",
+            "tBu3-terpy"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 3,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: 2,2':6',2''-Terpyridines (terpy) (terpyridines) | donor_set: N,N,N | denticity: 2,3 | scaffold: Meridional/tridentate polypyridyls | name: 4,4',4''-Tri-tert-butyl-2,2':6',2''-terpyridine | abbr: tBu3-terpy | CAS: 115091-29-7 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: high | use_cases: Fe/Co catalysis; Electro/photo settings | best_for: Meridional N3 binding | avoid_when: Monodentate needed | synonyms: 444Tritertbutyl2262terpyridine; tBu3-terpy"
+        }
+      ],
+      "aliases": [
+        "2,2':6',2''-terpyridine",
+        "terpy",
+        "terpyridine",
+        "terpyridyl"
+      ],
+      "steric_bulk_band": "low",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "high",
+      "denticity_hint": 3,
+      "use_cases": [
+        "Fe/Co catalysis",
+        "Electro/photo settings"
+      ],
+      "best_for": [
+        "Meridional N3 binding"
+      ],
+      "avoid_when": [
+        "Monodentate needed"
+      ]
+    },
+    {
+      "family_id": "bisoxazolines_BOX",
+      "label": "Bis(oxazoline) ligands (BOX)",
+      "donor_set": [
+        "N",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "C2-symmetric bis(oxazoline) on CH2 or aromatic spacers",
+      "example_members": [
+        {
+          "name": "iPr-BOX",
+          "abbr": "iPr-BOX",
+          "synonyms": [
+            "iPr-BOX",
+            "iPrBOX"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor_set: N,N | denticity: 2 | scaffold: C2-symmetric bis(oxazoline) on CH2 or aromatic spacers | name: iPr-BOX | abbr: iPr-BOX | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: high | use_cases: Cu-catalyzed asymmetric catalysis; Cycloadditions; Enantioselective oxidations | best_for: C2 symmetry control | avoid_when: Non-chelating environment needed | synonyms: iPr-BOX; iPrBOX"
+        },
+        {
+          "name": "tBu-BOX",
+          "abbr": "tBu-BOX",
+          "synonyms": [
+            "tBu-BOX",
+            "tBuBOX"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor_set: N,N | denticity: 2 | scaffold: C2-symmetric bis(oxazoline) on CH2 or aromatic spacers | name: tBu-BOX | abbr: tBu-BOX | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: high | use_cases: Cu-catalyzed asymmetric catalysis; Cycloadditions; Enantioselective oxidations | best_for: C2 symmetry control | avoid_when: Non-chelating environment needed | synonyms: tBu-BOX; tBuBOX"
+        },
+        {
+          "name": "PyBOX (pyridine-bis(oxazoline))",
+          "abbr": "PyBOX",
+          "synonyms": [
+            "PyBOX",
+            "PyBOXpyridinebisoxazoline"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor_set: N,N | denticity: 2 | scaffold: C2-symmetric bis(oxazoline) on CH2 or aromatic spacers | name: PyBOX (pyridine-bis(oxazoline)) | abbr: PyBOX | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: high | use_cases: Cu-catalyzed asymmetric catalysis; Cycloadditions; Enantioselective oxidations | best_for: C2 symmetry control | avoid_when: Non-chelating environment needed | synonyms: PyBOX; PyBOXpyridinebisoxazoline"
+        },
+        {
+          "name": "Pyridine-bis(oxazoline), iPr-substituted",
+          "abbr": "iPr-PyBOX",
+          "synonyms": [
+            "PyridinebisoxazolineiPrsubstituted",
+            "iPr-PyBOX"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor_set: N,N | denticity: 2 | scaffold: C2-symmetric bis(oxazoline) on CH2 or aromatic spacers | name: Pyridine-bis(oxazoline), iPr-substituted | abbr: iPr-PyBOX | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: high | use_cases: Cu-catalyzed asymmetric catalysis; Cycloadditions; Enantioselective oxidations | best_for: C2 symmetry control | avoid_when: Non-chelating environment needed | synonyms: PyridinebisoxazolineiPrsubstituted; iPr-PyBOX"
+        },
+        {
+          "name": "Pyridine-bis(oxazoline), tBu-substituted",
+          "abbr": "tBu-PyBOX",
+          "synonyms": [
+            "PyridinebisoxazolinetBusubstituted",
+            "tBu-PyBOX"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor_set: N,N | denticity: 2 | scaffold: C2-symmetric bis(oxazoline) on CH2 or aromatic spacers | name: Pyridine-bis(oxazoline), tBu-substituted | abbr: tBu-PyBOX | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: high | use_cases: Cu-catalyzed asymmetric catalysis; Cycloadditions; Enantioselective oxidations | best_for: C2 symmetry control | avoid_when: Non-chelating environment needed | synonyms: PyridinebisoxazolinetBusubstituted; tBu-PyBOX"
+        }
+      ],
+      "aliases": [
+        "bis(oxazoline)",
+        "bisoxazoline",
+        "box",
+        "pybox (tridentate)"
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "high",
+      "use_cases": [
+        "Cu-catalyzed asymmetric catalysis",
+        "Cycloadditions",
+        "Enantioselective oxidations"
+      ],
+      "best_for": [
+        "C2 symmetry control"
+      ],
+      "avoid_when": [
+        "Non-chelating environment needed"
+      ]
+    },
+    {
+      "family_id": "phox_pn",
+      "label": "PHOX ligands (phosphino-oxazoline, P^N)",
+      "donor_set": [
+        "P",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Hemilabile P,N chelates with chiral oxazoline",
+      "example_members": [
+        {
+          "name": "tBu-PHOX",
+          "abbr": "tBuPHOX",
+          "synonyms": [
+            "tBuPHOX"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: PHOX ligands (phosphino-oxazoline, P^N) (phox_pn) | donor_set: P,N | denticity: 2 | scaffold: Hemilabile P,N chelates with chiral oxazoline | name: tBu-PHOX | abbr: tBuPHOX | steric bulk band: medium | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Pd asymmetric allylic substitution; Hydrogenations (Rh) | best_for: Hemilabile P,N chelation | avoid_when: Harsh basic media hydrolyzing oxazoline | synonyms: tBuPHOX"
+        },
+        {
+          "name": "iPr-PHOX",
+          "abbr": "iPrPHOX",
+          "synonyms": [
+            "iPrPHOX"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: PHOX ligands (phosphino-oxazoline, P^N) (phox_pn) | donor_set: P,N | denticity: 2 | scaffold: Hemilabile P,N chelates with chiral oxazoline | name: iPr-PHOX | abbr: iPrPHOX | steric bulk band: medium | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Pd asymmetric allylic substitution; Hydrogenations (Rh) | best_for: Hemilabile P,N chelation | avoid_when: Harsh basic media hydrolyzing oxazoline | synonyms: iPrPHOX"
+        }
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Pd asymmetric allylic substitution",
+        "Hydrogenations (Rh)"
+      ],
+      "best_for": [
+        "Hemilabile P,N chelation"
+      ],
+      "avoid_when": [
+        "Harsh basic media hydrolyzing oxazoline"
+      ]
+    },
+    {
+      "family_id": "phosphine_pyridine_PN",
+      "label": "Phosphine–pyridine (P,N) hemilabile ligands",
+      "donor_set": [
+        "P",
+        "N"
+      ],
+      "denticity": [
+        1,
+        2
+      ],
+      "scaffold": "2-(diphenylphosphino)pyridine and analogues (hemilabile P,N)",
+      "example_members": [
+        {
+          "name": "2-(Diphenylphosphino)pyridine",
+          "abbr": "PPh2Py",
+          "synonyms": [
+            "2Diphenylphosphinopyridine",
+            "PPh2Py"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Phosphine–pyridine (P,N) hemilabile ligands (phosphine_pyridine_PN) | donor_set: P,N | denticity: 1,2 | scaffold: 2-(diphenylphosphino)pyridine and analogues (hemilabile P,N) | name: 2-(Diphenylphosphino)pyridine | abbr: PPh2Py | steric bulk band: medium | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Ni/Pd cross-couplings; CO insertions | best_for: Hemilability; Stabilize multiple oxidation states | synonyms: 2Diphenylphosphinopyridine; PPh2Py"
+        },
+        {
+          "name": "Diphenyl-2-pyridylphosphine",
+          "abbr": "PPh2Py",
+          "cas": "37943-90-1",
+          "synonyms": [
+            "Diphenyl2pyridylphosphine",
+            "PPh2Py"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Phosphine–pyridine (P,N) hemilabile ligands (phosphine_pyridine_PN) | donor_set: P,N | denticity: 1,2 | scaffold: 2-(diphenylphosphino)pyridine and analogues (hemilabile P,N) | name: Diphenyl-2-pyridylphosphine | abbr: PPh2Py | CAS: 37943-90-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Ni/Pd cross-couplings; CO insertions | best_for: Hemilability; Stabilize multiple oxidation states | synonyms: Diphenyl2pyridylphosphine; PPh2Py"
+        },
+        {
+          "name": "APhos",
+          "abbr": "APhos",
+          "cas": "932710-63-9",
+          "synonyms": [
+            "APhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Phosphine–pyridine (P,N) hemilabile ligands (phosphine_pyridine_PN) | donor_set: P,N | denticity: 1,2 | scaffold: 2-(diphenylphosphino)pyridine and analogues (hemilabile P,N) | name: APhos | abbr: APhos | CAS: 932710-63-9 | steric bulk band: medium | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Ni/Pd cross-couplings; CO insertions | best_for: Hemilability; Stabilize multiple oxidation states | synonyms: APhos"
+        }
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Ni/Pd cross-couplings",
+        "CO insertions"
+      ],
+      "best_for": [
+        "Hemilability",
+        "Stabilize multiple oxidation states"
+      ]
+    },
+    {
+      "family_id": "pincers_PNP_PCP_PNN_CNN",
+      "label": "Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.)",
+      "donor_set": [
+        "varies"
+      ],
+      "denticity": [
+        3
+      ],
+      "scaffold": "Rigid tridentate 'pincer' motif on arene/heteroarene core",
+      "example_members": [
+        {
+          "name": "Milstein PNP-iPr",
+          "abbr": "PNP-iPr",
+          "synonyms": [
+            "MilsteinPNPiPr",
+            "PNP-iPr"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 4,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.) (pincers_PNP_PCP_PNN_CNN) | donor_set: varies | denticity: 3 | scaffold: Rigid tridentate 'pincer' motif on arene/heteroarene core | name: Milstein PNP-iPr | abbr: PNP-iPr | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: very high | use_cases: Dehydrogenations; Borrowing-hydrogen; Base-metal catalysis | best_for: Robust tridentate binding | avoid_when: Ligand dissociation required | synonyms: MilsteinPNPiPr; PNP-iPr"
+        },
+        {
+          "name": "PCP-tBu (Buchwald-type pincer)",
+          "abbr": "PCP-tBu",
+          "synonyms": [
+            "PCP-tBu",
+            "PCPtBuBuchwaldtypepincer"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 4,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.) (pincers_PNP_PCP_PNN_CNN) | donor_set: varies | denticity: 3 | scaffold: Rigid tridentate 'pincer' motif on arene/heteroarene core | name: PCP-tBu (Buchwald-type pincer) | abbr: PCP-tBu | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: very high | use_cases: Dehydrogenations; Borrowing-hydrogen; Base-metal catalysis | best_for: Robust tridentate binding | avoid_when: Ligand dissociation required | synonyms: PCP-tBu; PCPtBuBuchwaldtypepincer"
+        },
+        {
+          "name": "NCN pincer",
+          "abbr": "NCN",
+          "synonyms": [
+            "NCN",
+            "NCNpincer"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 4,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.) (pincers_PNP_PCP_PNN_CNN) | donor_set: varies | denticity: 3 | scaffold: Rigid tridentate 'pincer' motif on arene/heteroarene core | name: NCN pincer | abbr: NCN | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: very high | use_cases: Dehydrogenations; Borrowing-hydrogen; Base-metal catalysis | best_for: Robust tridentate binding | avoid_when: Ligand dissociation required | synonyms: NCN; NCNpincer"
+        }
+      ],
+      "steric_bulk_band": "high",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "very high",
+      "denticity_hint": 3,
+      "use_cases": [
+        "Dehydrogenations",
+        "Borrowing-hydrogen",
+        "Base-metal catalysis"
+      ],
+      "best_for": [
+        "Robust tridentate binding"
+      ],
+      "avoid_when": [
+        "Ligand dissociation required"
+      ]
+    },
+    {
+      "family_id": "salen_salophen",
+      "label": "Salen/Salophen (N2O2 chelates)",
+      "donor_set": [
+        "N",
+        "N",
+        "O",
+        "O"
+      ],
+      "denticity": [
+        2,
+        4
+      ],
+      "scaffold": "Schiff-base ligands forming square-planar/tetradentate complexes",
+      "example_members": [
+        {
+          "name": "Jacobsen's salen",
+          "abbr": "salen*",
+          "synonyms": [
+            "Jacobsenssalen",
+            "salen*"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 4,
+            "denticity_rank": 4
+          },
+          "embedding_text": "type: LIGAND | family: Salen/Salophen (N2O2 chelates) (salen_salophen) | donor_set: N,N,O,O | denticity: 2,4 | scaffold: Schiff-base ligands forming square-planar/tetradentate complexes | name: Jacobsen's salen | abbr: salen* | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: very high | use_cases: Epoxidations (Jacobsen); Asymmetric catalysis | best_for: Square-planar/tetradentate complexes | avoid_when: Highly reducing conditions | synonyms: Jacobsenssalen; salen*"
+        },
+        {
+          "name": "Salophen",
+          "abbr": "salophen",
+          "synonyms": [
+            "Salophen",
+            "salophen"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 4,
+            "denticity_rank": 4
+          },
+          "embedding_text": "type: LIGAND | family: Salen/Salophen (N2O2 chelates) (salen_salophen) | donor_set: N,N,O,O | denticity: 2,4 | scaffold: Schiff-base ligands forming square-planar/tetradentate complexes | name: Salophen | abbr: salophen | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: very high | use_cases: Epoxidations (Jacobsen); Asymmetric catalysis | best_for: Square-planar/tetradentate complexes | avoid_when: Highly reducing conditions | synonyms: Salophen; salophen"
+        }
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "very high",
+      "use_cases": [
+        "Epoxidations (Jacobsen)",
+        "Asymmetric catalysis"
+      ],
+      "best_for": [
+        "Square-planar/tetradentate complexes"
+      ],
+      "avoid_when": [
+        "Highly reducing conditions"
+      ]
+    },
+    {
+      "family_id": "diamines",
+      "label": "Diamines (aliphatic/cycloaliphatic N,N)",
+      "donor_set": [
+        "N",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Flexible bidentate amines; often serve as both ligands and bases",
+      "example_members": [
+        {
+          "name": "TMEDA",
+          "abbr": "TMEDA",
+          "cas": "110-18-9",
+          "synonyms": [
+            "TMEDA"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N,N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | name: TMEDA | abbr: TMEDA | CAS: 110-18-9 | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | synonyms: TMEDA"
+        },
+        {
+          "name": "DMEDA",
+          "abbr": "DMEDA",
+          "synonyms": [
+            "DMEDA"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N,N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | name: DMEDA | abbr: DMEDA | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | synonyms: DMEDA"
+        },
+        {
+          "name": "trans-1,2-diaminocyclohexane",
+          "abbr": "DACH",
+          "synonyms": [
+            "DACH",
+            "trans12diaminocyclohexane"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N,N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | name: trans-1,2-diaminocyclohexane | abbr: DACH | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | synonyms: DACH; trans12diaminocyclohexane"
+        }
+      ],
+      "steric_bulk_band": "low",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "low",
+      "use_cases": [
+        "Ni cross-couplings (additive)",
+        "Organolithium mediation (TMEDA)"
+      ],
+      "best_for": [
+        "Cheap, flexible chelation"
+      ],
+      "avoid_when": [
+        "High thermal stability requirement"
+      ]
+    },
+    {
+      "family_id": "ligandless",
+      "label": "Ligandless",
+      "donor_set": [],
+      "denticity": [
+        0
+      ],
+      "scaffold": "No added ancillary ligand",
+      "example_members": [],
+      "steric_bulk_band": "very low",
+      "electron_donor_band": "very low",
+      "pi_acceptor_band": "very low",
+      "rigidity_band": "very low",
+      "use_cases": [
+        "Heck",
+        "Some Ni couplings"
+      ],
+      "best_for": [
+        "Simple systems where ligand inhibits"
+      ],
+      "avoid_when": [
+        "Need stability/selectivity from ligand"
+      ]
+    },
+    {
+      "family_id": "catacxium_monophosphines",
+      "label": "cataCXium® monodentate phosphines",
+      "donor_set": [
+        "P"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Bulky di-adamantyl and pyrrolyl-phosphine ligands; electron-rich; used in Pd-catalyzed cross couplings with low catalyst loadings",
+      "example_members": [
+        {
+          "name": "cataCXium A",
+          "abbr": "cataCXium A",
+          "cas": "321921-71-5",
+          "synonyms": [
+            "cataCXium A",
+            "cataCXiumA"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: cataCXium® monodentate phosphines (catacxium_monophosphines) | donor_set: P | denticity: 1 | scaffold: Bulky di-adamantyl and pyrrolyl-phosphine ligands; electron-rich; used in Pd-catalyzed cross couplings with low catalyst loadings | name: cataCXium A | abbr: cataCXium A | CAS: 321921-71-5 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Suzuki/Buchwald–Hartwig; Low Pd loading | best_for: Bulky, electron-rich regime like dialkylbiaryl | avoid_when: Strong π-acceptor required | ehs: air_sensitive | synonyms: cataCXium A; cataCXiumA"
+        },
+        {
+          "name": "cataCXium AHI",
+          "abbr": "cataCXium AHI",
+          "cas": "714951-87-8",
+          "synonyms": [
+            "cataCXium AHI",
+            "cataCXiumAHI"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: cataCXium® monodentate phosphines (catacxium_monophosphines) | donor_set: P | denticity: 1 | scaffold: Bulky di-adamantyl and pyrrolyl-phosphine ligands; electron-rich; used in Pd-catalyzed cross couplings with low catalyst loadings | name: cataCXium AHI | abbr: cataCXium AHI | CAS: 714951-87-8 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Suzuki/Buchwald–Hartwig; Low Pd loading | best_for: Bulky, electron-rich regime like dialkylbiaryl | avoid_when: Strong π-acceptor required | ehs: air_sensitive | synonyms: cataCXium AHI; cataCXiumAHI"
+        },
+        {
+          "name": "cataCXium PtB",
+          "abbr": "cataCXium PtB",
+          "cas": "672937-61-0",
+          "synonyms": [
+            "cataCXium PtB",
+            "cataCXiumPtB"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: cataCXium® monodentate phosphines (catacxium_monophosphines) | donor_set: P | denticity: 1 | scaffold: Bulky di-adamantyl and pyrrolyl-phosphine ligands; electron-rich; used in Pd-catalyzed cross couplings with low catalyst loadings | name: cataCXium PtB | abbr: cataCXium PtB | CAS: 672937-61-0 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Suzuki/Buchwald–Hartwig; Low Pd loading | best_for: Bulky, electron-rich regime like dialkylbiaryl | avoid_when: Strong π-acceptor required | ehs: air_sensitive | synonyms: cataCXium PtB; cataCXiumPtB"
+        },
+        {
+          "name": "cataCXium PIntB",
+          "abbr": "cataCXium PIntB",
+          "cas": "740815-37-6",
+          "synonyms": [
+            "cataCXium PIntB",
+            "cataCXiumPIntB"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: cataCXium® monodentate phosphines (catacxium_monophosphines) | donor_set: P | denticity: 1 | scaffold: Bulky di-adamantyl and pyrrolyl-phosphine ligands; electron-rich; used in Pd-catalyzed cross couplings with low catalyst loadings | name: cataCXium PIntB | abbr: cataCXium PIntB | CAS: 740815-37-6 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Suzuki/Buchwald–Hartwig; Low Pd loading | best_for: Bulky, electron-rich regime like dialkylbiaryl | avoid_when: Strong π-acceptor required | ehs: air_sensitive | synonyms: cataCXium PIntB; cataCXiumPIntB"
+        },
+        {
+          "name": "cataCXium PCy",
+          "abbr": "cataCXium PCy",
+          "cas": "672937-60-9",
+          "synonyms": [
+            "cataCXium PCy",
+            "cataCXiumPCy"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: cataCXium® monodentate phosphines (catacxium_monophosphines) | donor_set: P | denticity: 1 | scaffold: Bulky di-adamantyl and pyrrolyl-phosphine ligands; electron-rich; used in Pd-catalyzed cross couplings with low catalyst loadings | name: cataCXium PCy | abbr: cataCXium PCy | CAS: 672937-60-9 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Suzuki/Buchwald–Hartwig; Low Pd loading | best_for: Bulky, electron-rich regime like dialkylbiaryl | avoid_when: Strong π-acceptor required | ehs: air_sensitive | synonyms: cataCXium PCy; cataCXiumPCy"
+        },
+        {
+          "name": "cataCXium POMetB",
+          "abbr": "cataCXium POMetB",
+          "cas": "1053658-91-5",
+          "synonyms": [
+            "cataCXium POMetB",
+            "cataCXiumPOMetB"
+          ],
+          "numeric_features": {
+            "steric_rank": 4,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: cataCXium® monodentate phosphines (catacxium_monophosphines) | donor_set: P | denticity: 1 | scaffold: Bulky di-adamantyl and pyrrolyl-phosphine ligands; electron-rich; used in Pd-catalyzed cross couplings with low catalyst loadings | name: cataCXium POMetB | abbr: cataCXium POMetB | CAS: 1053658-91-5 | steric bulk band: very high | electron donor band: high | pi acceptor band: low | rigidity band: medium | use_cases: Suzuki/Buchwald–Hartwig; Low Pd loading | best_for: Bulky, electron-rich regime like dialkylbiaryl | avoid_when: Strong π-acceptor required | ehs: air_sensitive | synonyms: cataCXium POMetB; cataCXiumPOMetB"
+        }
+      ],
+      "notes": "Highly effective ligands for palladium-catalyzed cross-coupling reactions; di-adamantyl phosphines (cataCXium A) used for Heck, Suzuki, Buchwald-Hartwig, and α-arylation; N-aryl pyrrole phosphino-ligands (cataCXium P) show high catalyst turnover numbers for Suzuki couplings【511597533090864†L1243-L1252】.",
+      "steric_bulk_band": "very high",
+      "electron_donor_band": "high",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Suzuki/Buchwald–Hartwig",
+        "Low Pd loading"
+      ],
+      "best_for": [
+        "Bulky, electron-rich regime like dialkylbiaryl"
+      ],
+      "avoid_when": [
+        "Strong π-acceptor required"
+      ],
+      "ehs_green": {
+        "air_sensitive": true
+      }
+    },
+    {
+      "family_id": "dalphos_PN",
+      "label": "DalPhos P,N chelates",
+      "donor_set": [
+        "P",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Chelating phosphine–amine ligands based on di(1-adamantyl)phosphine with pendant amine; used in Pd-catalyzed C–N and C–C bond formation",
+      "example_members": [
+        {
+          "name": "Me-DalPhos",
+          "abbr": "Me-DalPhos",
+          "cas": "1219080-77-9",
+          "synonyms": [
+            "Me-DalPhos",
+            "MeDalPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: DalPhos P,N chelates (dalphos_PN) | donor_set: P,N | denticity: 2 | scaffold: Chelating phosphine–amine ligands based on di(1-adamantyl)phosphine with pendant amine; used in Pd-catalyzed C–N and C–C bond formation | name: Me-DalPhos | abbr: Me-DalPhos | CAS: 1219080-77-9 | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: C–N couplings incl. ammonia; Arylations under mild conditions | best_for: Difficult aminations | avoid_when: Need very π-accepting ligands | synonyms: Me-DalPhos; MeDalPhos"
+        },
+        {
+          "name": "Mor-DalPhos",
+          "abbr": "Mor-DalPhos",
+          "cas": "1237588-12-3",
+          "synonyms": [
+            "Mor-DalPhos",
+            "MorDalPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: DalPhos P,N chelates (dalphos_PN) | donor_set: P,N | denticity: 2 | scaffold: Chelating phosphine–amine ligands based on di(1-adamantyl)phosphine with pendant amine; used in Pd-catalyzed C–N and C–C bond formation | name: Mor-DalPhos | abbr: Mor-DalPhos | CAS: 1237588-12-3 | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: C–N couplings incl. ammonia; Arylations under mild conditions | best_for: Difficult aminations | avoid_when: Need very π-accepting ligands | synonyms: Mor-DalPhos; MorDalPhos"
+        },
+        {
+          "name": "Di(1-adamantyl)-1-piperidinylphenylphosphine",
+          "abbr": "Ad2P-pip-Ph",
+          "cas": "1237588-13-4",
+          "synonyms": [
+            "Ad2P-pip-Ph",
+            "Di1adamantyl1piperidinylphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: DalPhos P,N chelates (dalphos_PN) | donor_set: P,N | denticity: 2 | scaffold: Chelating phosphine–amine ligands based on di(1-adamantyl)phosphine with pendant amine; used in Pd-catalyzed C–N and C–C bond formation | name: Di(1-adamantyl)-1-piperidinylphenylphosphine | abbr: Ad2P-pip-Ph | CAS: 1237588-13-4 | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: C–N couplings incl. ammonia; Arylations under mild conditions | best_for: Difficult aminations | avoid_when: Need very π-accepting ligands | synonyms: Ad2P-pip-Ph; Di1adamantyl1piperidinylphenylphosphine"
+        }
+      ],
+      "notes": "DalPhos ligands contain a di(1-adamantyl)phosphino fragment; these P,N chelating ligands enable Pd-catalyzed C–N/C–C bond formation and allow coupling of ammonia, hydrazine, and acetone at mild conditions【511597533090864†L1348-L1354】.",
+      "steric_bulk_band": "high",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "C–N couplings incl. ammonia",
+        "Arylations under mild conditions"
+      ],
+      "best_for": [
+        "Difficult aminations"
+      ],
+      "avoid_when": [
+        "Need very π-accepting ligands"
+      ]
+    },
+    {
+      "family_id": "water_soluble_phosphines",
+      "label": "Water-soluble phosphines",
+      "donor_set": [
+        "P"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Phosphine ligands bearing sulfonate or triaza-phosphaadamantane functional groups; soluble in water, enabling aqueous-phase catalysis",
+      "example_members": [
+        {
+          "name": "1,3,5-Triaza-7-phosphaadamantane",
+          "abbr": "PTA",
+          "cas": "53597-69-6",
+          "synonyms": [
+            "135Triaza7phosphaadamantane",
+            "PTA"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Water-soluble phosphines (water_soluble_phosphines) | donor_set: P | denticity: 1 | scaffold: Phosphine ligands bearing sulfonate or triaza-phosphaadamantane functional groups; soluble in water, enabling aqueous-phase catalysis | name: 1,3,5-Triaza-7-phosphaadamantane | abbr: PTA | CAS: 53597-69-6 | steric bulk band: low | electron donor band: medium | pi acceptor band: low | rigidity band: low | use_cases: Aqueous-phase catalysis; Micellar catalysis | best_for: Water-soluble systems | avoid_when: Water-intolerant substrates | ehs: green | synonyms: 135Triaza7phosphaadamantane; PTA"
+        },
+        {
+          "name": "Bis(p-sulfonatophenyl)phenylphosphine dipotassium dihydrate",
+          "abbr": "BSPP",
+          "cas": "151888-20-9",
+          "synonyms": [
+            "BSPP",
+            "Bispsulfonatophenylphenylphosphinedipotassiumdihydrate"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Water-soluble phosphines (water_soluble_phosphines) | donor_set: P | denticity: 1 | scaffold: Phosphine ligands bearing sulfonate or triaza-phosphaadamantane functional groups; soluble in water, enabling aqueous-phase catalysis | name: Bis(p-sulfonatophenyl)phenylphosphine dipotassium dihydrate | abbr: BSPP | CAS: 151888-20-9 | steric bulk band: low | electron donor band: medium | pi acceptor band: low | rigidity band: low | use_cases: Aqueous-phase catalysis; Micellar catalysis | best_for: Water-soluble systems | avoid_when: Water-intolerant substrates | ehs: green | synonyms: BSPP; Bispsulfonatophenylphenylphosphinedipotassiumdihydrate"
+        }
+      ],
+      "notes": "PTA and BSPP are water-soluble phosphines used for reactions such as Morita–Baylis–Hillman, hydrogenations, olefin hydroformylations and other aqueous-phase transformations【511597533090864†L650-L657】【511597533090864†L669-L676】.",
+      "steric_bulk_band": "low",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "low",
+      "use_cases": [
+        "Aqueous-phase catalysis",
+        "Micellar catalysis"
+      ],
+      "best_for": [
+        "Water-soluble systems"
+      ],
+      "avoid_when": [
+        "Water-intolerant substrates"
+      ],
+      "ehs_green": {
+        "green": true
+      }
+    },
+    {
+      "family_id": "tridentate_triphos",
+      "label": "Tridentate phosphines (Triphos family)",
+      "donor_set": [
+        "P",
+        "P",
+        "P"
+      ],
+      "denticity": [
+        3
+      ],
+      "scaffold": "Flexible tridentate phosphine ligands used in hydroformylation and other homogeneous catalysis",
+      "example_members": [
+        {
+          "name": "Triphos",
+          "abbr": "Triphos",
+          "cas": "22031-12-5",
+          "synonyms": [
+            "Triphos"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Tridentate phosphines (Triphos family) (tridentate_triphos) | donor_set: P,P,P | denticity: 3 | scaffold: Flexible tridentate phosphine ligands used in hydroformylation and other homogeneous catalysis | name: Triphos | abbr: Triphos | CAS: 22031-12-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Hydroformylation; Multidentate catalysis | best_for: Tridentate P3 binding | synonyms: Triphos"
+        }
+      ],
+      "notes": "Triphos (P[CH2CH2PPh2]2) acts as a tridentate ligand for transition metals and is used to form complexes and in hydroformylation【511597533090864†L580-L587】.",
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "denticity_hint": 3,
+      "use_cases": [
+        "Hydroformylation",
+        "Multidentate catalysis"
+      ],
+      "best_for": [
+        "Tridentate P3 binding"
+      ]
+    },
+    {
+      "family_id": "triazine_pnn_phosphines",
+      "label": "Triazine P,N,N ligands (BippyPhos family)",
+      "donor_set": [
+        "P",
+        "N",
+        "N"
+      ],
+      "denticity": [
+        3
+      ],
+      "scaffold": "Phosphine ligands containing a triazine core with two nitrogen donor sites; strong electron donation and steric bulk",
+      "example_members": [
+        {
+          "name": "BippyPhos",
+          "abbr": "BippyPhos",
+          "cas": "894086-00-1",
+          "synonyms": [
+            "BippyPhos"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Triazine P,N,N ligands (BippyPhos family) (triazine_pnn_phosphines) | donor_set: P,N,N | denticity: 3 | scaffold: Phosphine ligands containing a triazine core with two nitrogen donor sites; strong electron donation and steric bulk | name: BippyPhos | abbr: BippyPhos | CAS: 894086-00-1 | steric bulk band: high | electron donor band: high | pi acceptor band: low | rigidity band: high | use_cases: Challenging amide formations (as ligands); C–N/C–O couplings | best_for: Bulky, electron-rich P,N,N | avoid_when: Need small ligand footprint | synonyms: BippyPhos"
+        },
+        {
+          "name": "6-DPPon",
+          "abbr": "6-DPPon",
+          "cas": "64741-28-2",
+          "synonyms": [
+            "6-DPPon",
+            "6DPPon"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 3,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Triazine P,N,N ligands (BippyPhos family) (triazine_pnn_phosphines) | donor_set: P,N,N | denticity: 3 | scaffold: Phosphine ligands containing a triazine core with two nitrogen donor sites; strong electron donation and steric bulk | name: 6-DPPon | abbr: 6-DPPon | CAS: 64741-28-2 | steric bulk band: high | electron donor band: high | pi acceptor band: low | rigidity band: high | use_cases: Challenging amide formations (as ligands); C–N/C–O couplings | best_for: Bulky, electron-rich P,N,N | avoid_when: Need small ligand footprint | synonyms: 6-DPPon; 6DPPon"
+        }
+      ],
+      "notes": "BippyPhos and related triazine-based P,N,N ligands enable amidation and coupling of hydroxylamines with aryl halides【511597533090864†L618-L626】.",
+      "steric_bulk_band": "high",
+      "electron_donor_band": "high",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "high",
+      "use_cases": [
+        "Challenging amide formations (as ligands)",
+        "C–N/C–O couplings"
+      ],
+      "best_for": [
+        "Bulky, electron-rich P,N,N"
+      ],
+      "avoid_when": [
+        "Need small ligand footprint"
+      ]
+    },
+    {
+      "family_id": "secondary_phosphines",
+      "label": "Secondary phosphines (R2PH)",
+      "donor_set": [
+        "P"
+      ],
+      "denticity": [
+        1
+      ],
+      "scaffold": "Dialkyl- or diarylphosphines bearing one P–H bond; used as ligands or precursors",
+      "example_members": [
+        {
+          "name": "Dicyclohexylphosphine",
+          "abbr": "HPCy2",
+          "cas": "829-84-5",
+          "synonyms": [
+            "Dicyclohexylphosphine",
+            "HPCy2"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Secondary phosphines (R2PH) (secondary_phosphines) | donor_set: P | denticity: 1 | scaffold: Dialkyl- or diarylphosphines bearing one P–H bond; used as ligands or precursors | name: Dicyclohexylphosphine | abbr: HPCy2 | CAS: 829-84-5 | steric bulk band: low | electron donor band: medium | pi acceptor band: low | rigidity band: low | use_cases: Ligand precursors; Ni-catalyzed couplings | best_for: In situ ligand generation | avoid_when: Air exposure (P–H oxidation) | ehs: air_sensitive | synonyms: Dicyclohexylphosphine; HPCy2"
+        },
+        {
+          "name": "Diphenylphosphine",
+          "abbr": "HPPh2",
+          "cas": "829-85-6",
+          "synonyms": [
+            "Diphenylphosphine",
+            "HPPh2"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Secondary phosphines (R2PH) (secondary_phosphines) | donor_set: P | denticity: 1 | scaffold: Dialkyl- or diarylphosphines bearing one P–H bond; used as ligands or precursors | name: Diphenylphosphine | abbr: HPPh2 | CAS: 829-85-6 | steric bulk band: low | electron donor band: medium | pi acceptor band: low | rigidity band: low | use_cases: Ligand precursors; Ni-catalyzed couplings | best_for: In situ ligand generation | avoid_when: Air exposure (P–H oxidation) | ehs: air_sensitive | synonyms: Diphenylphosphine; HPPh2"
+        },
+        {
+          "name": "Di-tert-butylphosphine",
+          "abbr": "HP(t-Bu)2",
+          "cas": "819-19-2",
+          "synonyms": [
+            "Ditertbutylphosphine",
+            "HP(t-Bu)2"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Secondary phosphines (R2PH) (secondary_phosphines) | donor_set: P | denticity: 1 | scaffold: Dialkyl- or diarylphosphines bearing one P–H bond; used as ligands or precursors | name: Di-tert-butylphosphine | abbr: HP(t-Bu)2 | CAS: 819-19-2 | steric bulk band: low | electron donor band: medium | pi acceptor band: low | rigidity band: low | use_cases: Ligand precursors; Ni-catalyzed couplings | best_for: In situ ligand generation | avoid_when: Air exposure (P–H oxidation) | ehs: air_sensitive | synonyms: Ditertbutylphosphine; HP(t-Bu)2"
+        }
+      ],
+      "notes": "Secondary phosphines such as HPCy2, HPPh2 and HP(t-Bu)2 can act as ligands or precursors; they serve as sources of phosphine for synthesis and sometimes as ligands in catalysis【511597533090864†L260-L266】【511597533090864†L270-L276】【511597533090864†L305-L315】.",
+      "steric_bulk_band": "low",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "low",
+      "use_cases": [
+        "Ligand precursors",
+        "Ni-catalyzed couplings"
+      ],
+      "best_for": [
+        "In situ ligand generation"
+      ],
+      "avoid_when": [
+        "Air exposure (P–H oxidation)"
+      ],
+      "ehs_green": {
+        "air_sensitive": true
+      }
+    },
+    {
+      "family_id": "bis_imino_pyridines_PDI",
+      "label": "Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)",
+      "donor_set": [
+        "N",
+        "N",
+        "N"
+      ],
+      "denticity": [
+        3
+      ],
+      "scaffold": "Tridentate bis(imine) on 2,6-pyridyl core",
+      "aliases": [
+        "PDI",
+        "BIP",
+        "bis(imino)pyridine",
+        "bis(iminopyridine)"
+      ],
+      "example_members": [
+        {
+          "name": "2,6-Bis[(2,6-diisopropylphenyl)imino]pyridine",
+          "abbr": "DIPP-PDI",
+          "synonyms": [
+            "26Bis26diisopropylphenyliminopyridine",
+            "DIPP-PDI"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) (bis_imino_pyridines_PDI) | donor_set: N,N,N | denticity: 3 | scaffold: Tridentate bis(imine) on 2,6-pyridyl core | name: 2,6-Bis[(2,6-diisopropylphenyl)imino]pyridine | abbr: DIPP-PDI | steric bulk band: medium | electron donor band: low | pi acceptor band: medium | rigidity band: medium | use_cases: Ni polymerization; Cross-electrophile couplings | best_for: Stabilize Ni(I/III) states | synonyms: 26Bis26diisopropylphenyliminopyridine; DIPP-PDI"
+        },
+        {
+          "name": "2,6-Bis(arylimino)pyridine (generic)",
+          "abbr": "PDI",
+          "synonyms": [
+            "26Bisaryliminopyridinegeneric",
+            "PDI"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 3
+          },
+          "embedding_text": "type: LIGAND | family: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) (bis_imino_pyridines_PDI) | donor_set: N,N,N | denticity: 3 | scaffold: Tridentate bis(imine) on 2,6-pyridyl core | name: 2,6-Bis(arylimino)pyridine (generic) | abbr: PDI | steric bulk band: medium | electron donor band: low | pi acceptor band: medium | rigidity band: medium | use_cases: Ni polymerization; Cross-electrophile couplings | best_for: Stabilize Ni(I/III) states | synonyms: 26Bisaryliminopyridinegeneric; PDI"
+        }
+      ],
+      "notes": "Common in Ni polymerization and cross-electrophile couplings; stabilizes low-coordinate Ni.",
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Ni polymerization",
+        "Cross-electrophile couplings"
+      ],
+      "best_for": [
+        "Stabilize Ni(I/III) states"
+      ]
+    },
+    {
+      "family_id": "beta_diketiminates_NacNac",
+      "label": "β-Diketiminates (nacnac/BDI; anionic N,N)",
+      "donor_set": [
+        "N",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Monoanionic β-diketiminate supporting two N donors",
+      "aliases": [
+        "BDI",
+        "nacnac",
+        "beta-diketiminate",
+        "β-diketiminate"
+      ],
+      "example_members": [
+        {
+          "name": "HC[(CMeNAr)]2 (Ar = 2,6-iPr2C6H3)",
+          "abbr": "Dipp-NacNac",
+          "synonyms": [
+            "Dipp-NacNac",
+            "HCCMeNAr2Ar26iPr2C6H3"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: β-Diketiminates (nacnac/BDI; anionic N,N) (beta_diketiminates_NacNac) | donor_set: N,N | denticity: 2 | scaffold: Monoanionic β-diketiminate supporting two N donors | name: HC[(CMeNAr)]2 (Ar = 2,6-iPr2C6H3) | abbr: Dipp-NacNac | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Ni(I/III) chemistry; Base-metal catalysis | best_for: Anionic N,N support | synonyms: Dipp-NacNac; HCCMeNAr2Ar26iPr2C6H3"
+        },
+        {
+          "name": "β-Diketiminate (generic)",
+          "abbr": "NacNac",
+          "synonyms": [
+            "Diketiminategeneric",
+            "NacNac"
+          ],
+          "numeric_features": {
+            "steric_rank": 3,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: β-Diketiminates (nacnac/BDI; anionic N,N) (beta_diketiminates_NacNac) | donor_set: N,N | denticity: 2 | scaffold: Monoanionic β-diketiminate supporting two N donors | name: β-Diketiminate (generic) | abbr: NacNac | steric bulk band: high | electron donor band: medium | pi acceptor band: low | rigidity band: medium | use_cases: Ni(I/III) chemistry; Base-metal catalysis | best_for: Anionic N,N support | synonyms: Diketiminategeneric; NacNac"
+        }
+      ],
+      "notes": "Stabilizes Ni(I/III) manifolds; tune sterics via aryl groups.",
+      "steric_bulk_band": "high",
+      "electron_donor_band": "medium",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Ni(I/III) chemistry",
+        "Base-metal catalysis"
+      ],
+      "best_for": [
+        "Anionic N,N support"
+      ]
+    },
+    {
+      "family_id": "pyridine_oxazolines_PyOx",
+      "label": "Pyridine-oxazolines (PyOx; N,N bidentate)",
+      "donor_set": [
+        "N",
+        "N"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Bidentate pyridyl-oxazoline ligands (distinct from tridentate PyBOX)",
+      "aliases": [
+        "PyOx",
+        "pyridine-oxazoline"
+      ],
+      "example_members": [
+        {
+          "name": "tBu-substituted PyOx",
+          "abbr": "tBu-PyOx",
+          "synonyms": [
+            "tBu-PyOx",
+            "tBusubstitutedPyOx"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Pyridine-oxazolines (PyOx; N,N bidentate) (pyridine_oxazolines_PyOx) | donor_set: N,N | denticity: 2 | scaffold: Bidentate pyridyl-oxazoline ligands (distinct from tridentate PyBOX) | name: tBu-substituted PyOx | abbr: tBu-PyOx | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: high | use_cases: Asymmetric catalysis (Ni/Cu); C(sp3)–H functionalization (selected) | best_for: Chiral induction with hemilabile N,O | synonyms: tBu-PyOx; tBusubstitutedPyOx"
+        },
+        {
+          "name": "iPr-substituted PyOx",
+          "abbr": "iPr-PyOx",
+          "synonyms": [
+            "iPr-PyOx",
+            "iPrsubstitutedPyOx"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 3,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Pyridine-oxazolines (PyOx; N,N bidentate) (pyridine_oxazolines_PyOx) | donor_set: N,N | denticity: 2 | scaffold: Bidentate pyridyl-oxazoline ligands (distinct from tridentate PyBOX) | name: iPr-substituted PyOx | abbr: iPr-PyOx | steric bulk band: medium | electron donor band: low | pi acceptor band: low | rigidity band: high | use_cases: Asymmetric catalysis (Ni/Cu); C(sp3)–H functionalization (selected) | best_for: Chiral induction with hemilabile N,O | synonyms: iPr-PyOx; iPrsubstitutedPyOx"
+        }
+      ],
+      "steric_bulk_band": "medium",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "high",
+      "use_cases": [
+        "Asymmetric catalysis (Ni/Cu)",
+        "C(sp3)–H functionalization (selected)"
+      ],
+      "best_for": [
+        "Chiral induction with hemilabile N,O"
+      ]
+    },
+    {
+      "family_id": "tris_2pyridylmethyl_amine_TPMA",
+      "label": "Tris(2-pyridylmethyl)amine (TPMA; N4 tripodal)",
+      "donor_set": [
+        "N",
+        "N",
+        "N",
+        "N"
+      ],
+      "denticity": [
+        3,
+        4
+      ],
+      "scaffold": "Tripodal aminomethylpyridine; facial N3 or N4 binding",
+      "aliases": [
+        "TPMA",
+        "tris(2-pyridylmethyl)amine",
+        "tris(pyridin-2-ylmethyl)amine"
+      ],
+      "example_members": [
+        {
+          "name": "Tris(2-pyridylmethyl)amine",
+          "abbr": "TPMA",
+          "cas": "16858-01-8",
+          "synonyms": [
+            "TPMA",
+            "Tris2pyridylmethylamine"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 2,
+            "denticity_rank": 4
+          },
+          "embedding_text": "type: LIGAND | family: Tris(2-pyridylmethyl)amine (TPMA; N4 tripodal) (tris_2pyridylmethyl_amine_TPMA) | donor_set: N,N,N,N | denticity: 3,4 | scaffold: Tripodal aminomethylpyridine; facial N3 or N4 binding | name: Tris(2-pyridylmethyl)amine | abbr: TPMA | CAS: 16858-01-8 | steric bulk band: low | electron donor band: low | pi acceptor band: medium | rigidity band: medium | use_cases: Cu/Ni radical couplings; Photoredox hybrid catalysis | best_for: Tripodal N-donor sets | synonyms: TPMA; Tris2pyridylmethylamine"
+        }
+      ],
+      "steric_bulk_band": "low",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "medium",
+      "rigidity_band": "medium",
+      "denticity_hint": 3,
+      "use_cases": [
+        "Cu/Ni radical couplings",
+        "Photoredox hybrid catalysis"
+      ],
+      "best_for": [
+        "Tripodal N-donor sets"
+      ]
+    },
+    {
+      "family_id": "quinolinol_NO_chelates",
+      "label": "8-Quinolinol (oxine) N,O chelates",
+      "donor_set": [
+        "N",
+        "O"
+      ],
+      "denticity": [
+        2
+      ],
+      "scaffold": "Bidentate N,O chelation based on 8-hydroxyquinoline",
+      "aliases": [
+        "oxine",
+        "8-hydroxyquinoline",
+        "quinolinolate",
+        "8-quinolinol"
+      ],
+      "example_members": [
+        {
+          "name": "8-Hydroxyquinoline",
+          "abbr": "Oxine",
+          "cas": "148-24-3",
+          "synonyms": [
+            "8Hydroxyquinoline",
+            "Oxine"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 8-Quinolinol (oxine) N,O chelates (quinolinol_NO_chelates) | donor_set: N,O | denticity: 2 | scaffold: Bidentate N,O chelation based on 8-hydroxyquinoline | name: 8-Hydroxyquinoline | abbr: Oxine | CAS: 148-24-3 | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: medium | use_cases: Al/Sc catalysis; Analytical chelation | best_for: N,O bidentate binding | synonyms: 8Hydroxyquinoline; Oxine"
+        },
+        {
+          "name": "Sulfonated 8-hydroxyquinoline (generic)",
+          "abbr": "SO3-Oxine",
+          "synonyms": [
+            "SO3-Oxine",
+            "Sulfonated8hydroxyquinolinegeneric"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 2,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: 8-Quinolinol (oxine) N,O chelates (quinolinol_NO_chelates) | donor_set: N,O | denticity: 2 | scaffold: Bidentate N,O chelation based on 8-hydroxyquinoline | name: Sulfonated 8-hydroxyquinoline (generic) | abbr: SO3-Oxine | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: medium | use_cases: Al/Sc catalysis; Analytical chelation | best_for: N,O bidentate binding | synonyms: SO3-Oxine; Sulfonated8hydroxyquinolinegeneric"
+        }
+      ],
+      "steric_bulk_band": "low",
+      "electron_donor_band": "low",
+      "pi_acceptor_band": "low",
+      "rigidity_band": "medium",
+      "use_cases": [
+        "Al/Sc catalysis",
+        "Analytical chelation"
+      ],
+      "best_for": [
+        "N,O bidentate binding"
+      ]
+    }
+  ],
+  "schema_extensions": {
+    "example_members[*].synonyms": "aliases + abbr + punctuation-stripped canonical name",
+    "example_members[*].embedding_text": "deterministic compact text for embeddings",
+    "example_members[*].numeric_features": "ranks {steric_rank, donor_rank, pi_acceptor_rank, rigidity_rank, denticity_rank}",
+    "steric_bulk_band": "qualitative sterics at family level (very low..very high)",
+    "electron_donor_band": "qualitative σ-donor strength (very low..very high)",
+    "pi_acceptor_band": "qualitative π-acceptor strength (very low..very high)",
+    "rigidity_band": "qualitative scaffold rigidity (very low..very high)",
+    "bite_angle_band": "for P^P families (low/medium/high)",
+    "use_cases": "typical applications",
+    "best_for": "positive selection cues",
+    "avoid_when": "contraindications",
+    "ehs_green": "EHS/green flags at family or member level"
+  },
+  "vectorization_hints": {
+    "rank_maps": {
+      "steric_bulk_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "electron_donor_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "pi_acceptor_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "rigidity_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "bite_angle_band→rank": {
+        "low": 1,
+        "medium": 2,
+        "high": 3
+      }
+    },
+    "embedding_field_preference": [
+      "example_members[*].embedding_text",
+      "example_members[*].name",
+      "example_members[*].abbr",
+      "example_members[*].synonyms"
+    ]
+  }
+}
