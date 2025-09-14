@@ -3,6 +3,7 @@ from typing import List, Optional, Dict, Any
 
 class NormalizeRequest(BaseModel): smiles: str
 class DetectFamilyRequest(BaseModel): reactants: List[str]
+class DetectTypeRequest(BaseModel): reaction: str
 class FeaturizeUllmannRequest(BaseModel): electrophile: str; nucleophile: str
 
 class Reagent(BaseModel):

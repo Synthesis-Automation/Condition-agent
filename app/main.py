@@ -7,12 +7,18 @@ from chemtools.contracts import (
     RecommendFromReactionRequest, PlateDesignRequest,
     CoreSearchRequest,
     RoleAwareMolRequest, RoleAwareReactionRequest,
+    DetectTypeRequest,
 )
 # Enable RDKit by default unless explicitly disabled
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 
 from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain, recommend
 from chemtools import registry as creg
+try:
+    from chemtools.reaction_type_detector import detect_reaction_type as rxn_detect_type, is_available as rxn_insight_available  # type: ignore
+    _HAS_RXN_INSIGHT = True
+except Exception:
+    _HAS_RXN_INSIGHT = False
 try:
     from chem_feats import featurize_mol as role_featurize_mol, featurize_reaction as role_featurize_reaction  # type: ignore
     from chem_feats.registry import REGISTRY as ROLE_REGISTRY  # type: ignore
@@ -71,6 +77,38 @@ def api_smiles_normalize(req: NormalizeRequest): return smiles.normalize(req.smi
 
 @app.post("/api/v1/router/detect-family")
 def api_router_detect(req: DetectFamilyRequest): return router.detect_family(req.reactants)
+
+@app.post("/api/v1/reaction/detect-type")
+def api_detect_type(req: DetectTypeRequest):
+    """Detect reaction type using rxn-insight when available, with router fallback.
+
+    Returns a combined payload including rxn-insight results, router fallback, and the selected family.
+    """
+    rxn = req.reaction
+    norm = smiles.normalize_reaction(rxn)
+    reactants = [
+        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
+        for r in (norm.get("reactants") or [])
+    ]
+    fallback = router.detect_family(reactants)
+    auto = None
+    if _HAS_RXN_INSIGHT:
+        try:
+            auto = rxn_detect_type(norm.get("normalized") or rxn)
+        except Exception:
+            auto = None
+    selected = None
+    if isinstance(auto, dict) and (auto.get("mapped_family") or auto.get("success")):
+        selected = auto.get("mapped_family") or fallback.get("family")
+    else:
+        selected = fallback.get("family")
+    return {
+        "input": {"reaction_smiles": norm.get("normalized") or rxn},
+        "rxn_insight_available": bool(_HAS_RXN_INSIGHT),
+        "rxn_insight": auto,
+        "router_fallback": fallback,
+        "selected_family": selected,
+    }
 
 @app.post("/api/v1/featurize/ullmann")
 def api_featurize_ullmann(req: FeaturizeUllmannRequest, response: Response):

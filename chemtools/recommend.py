@@ -5,6 +5,12 @@ from collections import Counter
 
 from .smiles import normalize_reaction
 from .router import detect_family
+try:
+    # Optional rxn-insight integration
+    from .reaction_type_detector import detect_reaction_type as _rxn_detect  # type: ignore
+    _HAS_RXN_INSIGHT = True
+except Exception:
+    _HAS_RXN_INSIGHT = False
 from .featurizers import molecular as feat_molecular
 from . import precedent, constraints, explain
 
@@ -69,8 +75,26 @@ def recommend_from_reaction(
         for r in (norm.get("reactants") or [])
     ]
 
-    # 2) Detect family
-    fam = detect_family(reactants).get("family") or "Unknown"
+    # 2) Detect family (try rxn-insight first when available; fallback to rules)
+    fam = "Unknown"
+    rxn_auto: Dict[str, Any] | None = None
+    rxn_smiles_norm = norm.get("normalized") or reaction
+    # Allow callers to disable rxn-insight via relax['use_rxn_insight']=False
+    # or globally via CHEMTOOLS_DISABLE_RXN_INSIGHT=1
+    use_rxn_insight = relax.get("use_rxn_insight") if isinstance(relax, dict) else None
+    if use_rxn_insight is None:
+        import os as _os
+        env_off = (_os.environ.get("CHEMTOOLS_DISABLE_RXN_INSIGHT", "").strip().lower() in {"1", "true", "yes", "on"})
+        use_rxn_insight = not env_off
+    if bool(use_rxn_insight) and _HAS_RXN_INSIGHT:
+        try:
+            rxn_auto = _rxn_detect(rxn_smiles_norm)  # type: ignore[misc]
+        except Exception:
+            rxn_auto = None
+    if rxn_auto and rxn_auto.get("success") and rxn_auto.get("mapped_family"):
+        fam = str(rxn_auto.get("mapped_family") or "Unknown")
+    else:
+        fam = detect_family(reactants).get("family") or "Unknown"
 
     # 3) Featurize substrates (Ullmann featurizer also used as fallback)
     elec, nuc = _pick_electrophile_nucleophile(reactants)
@@ -313,7 +337,20 @@ def recommend_from_reaction(
             "reaction_smiles": norm.get("normalized") or reaction,
             "selected_reaction_type": f"C-N Coupling - {_nice_family_text(fam)}" if fam else None,
         },
-        "detection": {"reaction_type": _nice_family_text(fam)},
+        "detection": {
+            "reaction_type": _nice_family_text(fam),
+            "auto": (
+                {
+                    "rxn_insight_available": bool(rxn_auto.get("available")) if isinstance(rxn_auto, dict) else False,
+                    "rxn_insight_class": (rxn_auto.get("rxn_class") if isinstance(rxn_auto, dict) else None),
+                    "rxn_insight_name": (rxn_auto.get("rxn_name") if isinstance(rxn_auto, dict) else None),
+                    "rxn_insight_confidence": (rxn_auto.get("confidence") if isinstance(rxn_auto, dict) else None),
+                    "status": ("success" if (isinstance(rxn_auto, dict) and rxn_auto.get("success")) else "fallback"),
+                }
+                if rxn_auto is not None
+                else None
+            ),
+        },
         "recommended_conditions": variants,
     }
 

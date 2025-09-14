@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Gradio UI to interactively test chemtools functions.
 
@@ -45,6 +45,24 @@ os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
 from chemtools import registry as creg
 from chemtools.util.rdkit_helpers import rdkit_available
+
+# Optionally silence RDKit console logs (parse errors, warnings) to keep UI clean.
+# Enabled by default; set CHEMTOOLS_RDKIT_QUIET=0 to show RDKit logs.
+if os.environ.get("CHEMTOOLS_RDKIT_QUIET", "1").strip().lower() not in {"0", "false", "no", "off"}:
+    try:
+        from rdkit import RDLogger  # type: ignore
+        # Prefer strict level; also disable common channels for wider compatibility
+        try:
+            RDLogger.logger().setLevel(RDLogger.CRITICAL)
+        except Exception:
+            pass
+        for channel in ("rdApp.error", "rdApp.warning", "rdApp.info"):
+            try:
+                RDLogger.DisableLog(channel)
+            except Exception:
+                pass
+    except Exception:
+        pass
 # Optional role-aware single-molecule featurizer
 try:
     from chem_feats import featurize_mol as role_feat_mol  # type: ignore
@@ -66,18 +84,37 @@ def _safe_json_loads(s: str) -> Dict[str, Any]:
 # --- Handlers for tabs ---
 
 def ui_normalize_smiles(smi: str) -> Dict[str, Any]:
-    return smiles.normalize(smi or "")
+    # If input looks like a reaction (contains '>' or '>>'), route to reaction normalizer.
+    # Do not fall back to single-molecule parsing on failure, to avoid RDKit
+    # attempting to parse reaction strings like 'A>>B' as molecule SMILES.
+    t = (smi or "").strip()
+    if ">" in t:
+        return smiles.normalize_reaction(t)
+    return smiles.normalize(t)
 
 
 def ui_detect_family(reactants_text: str) -> Dict[str, Any]:
-    # Split reactants by '.' (common SMILES fragment separator) or newlines
+    # Accept either a dot-separated list of reactant SMILES or a full reaction SMILES.
+    # If a reaction arrow is present, extract only the reactants side before detection.
     t = (reactants_text or "").strip()
     if not t:
         return {"family": "Unknown", "confidence": 0.0, "hits": {}}
-    if "\n" in t:
-        reactants = [s.strip() for s in t.splitlines() if s.strip()]
-    else:
-        reactants = [s.strip() for s in t.split(".") if s.strip()]
+    reactants: list[str] = []
+    if ">" in t:
+        try:
+            norm = smiles.normalize_reaction(t)
+            reactants = [
+                (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "").strip()
+                for r in (norm.get("reactants") or [])
+            ]
+            reactants = [s for s in reactants if s]
+        except Exception:
+            reactants = []
+    if not reactants:
+        if "\n" in t:
+            reactants = [s.strip() for s in t.splitlines() if s.strip()]
+        else:
+            reactants = [s.strip() for s in t.split(".") if s.strip()]
     return router.detect_family(reactants)
 
 
@@ -92,10 +129,12 @@ def ui_properties_lookup(query: str) -> Dict[str, Any]:
 def ui_recommend(
     reaction: str,
     k: int,
+    use_rxn_insight: bool,
     relax_json: str,
     constraints_json: str,
 ) -> Dict[str, Any]:
     relax = _safe_json_loads(relax_json)
+    relax["use_rxn_insight"] = bool(use_rxn_insight)
     constraints = _safe_json_loads(constraints_json)
     return recommend.recommend_from_reaction(
         reaction=reaction or "",
@@ -108,10 +147,11 @@ def ui_recommend(
 def ui_recommend_both(
     reaction: str,
     k: int,
+    use_rxn_insight: bool,
     relax_json: str,
     constraints_json: str,
-) -> Tuple[Dict[str, Any], List[List[Any]], str]:
-    out = ui_recommend(reaction, k, relax_json, constraints_json)
+) -> Tuple[Dict[str, Any], List[List[Any]], str, str]:
+    out = ui_recommend(reaction, k, use_rxn_insight, relax_json, constraints_json)
     # Build a compact 1-row table for the main recommendation
     hdr = ["core", "base_uid", "solvent_uid", "T_C", "time_h", "confidence"]
     rec = out.get("recommendation") or {}
@@ -142,16 +182,49 @@ def ui_recommend_both(
     base_txt = _resolve_name(str(rec.get("base_uid") or ""))
     solv_txt = _resolve_name(str(rec.get("solvent_uid") or ""))
     human = "/".join([s for s in [core_txt, base_txt, solv_txt] if s]) or ""
-    return out, [hdr, row], human
+
+    # Detection markdown (rxn-insight and fallback details)
+    det = (out.get("formatted") or {}).get("detection") or {}
+    auto = det.get("auto") if isinstance(det, dict) else None
+    det_lines: list[str] = []
+    if isinstance(det, dict):
+        rt = det.get("reaction_type")
+        if rt:
+            det_lines.append(f"Detected family: {rt}")
+    if isinstance(auto, dict):
+        avail = bool(auto.get("rxn_insight_available"))
+        name = auto.get("rxn_insight_name")
+        klass = auto.get("rxn_insight_class")
+        conf = auto.get("rxn_insight_confidence")
+        status = auto.get("status")
+        det_lines.append(f"rxn-insight available: {avail}")
+        if status:
+            det_lines.append(f"auto-detection status: {status}")
+        if name:
+            det_lines.append(f"rxn-insight name: {name}")
+        if klass:
+            det_lines.append(f"rxn-insight class: {klass}")
+        if conf is not None:
+            try:
+                det_lines.append(f"rxn-insight confidence: {float(conf):.3f}")
+            except Exception:
+                det_lines.append(f"rxn-insight confidence: {conf}")
+    elif det and not auto:
+        det_lines.append("rxn-insight: not available; using rule-based fallback")
+    detection_md = "\n".join(f"- {x}" for x in det_lines) if det_lines else "- No detection details"
+
+    return out, [hdr, row], human, detection_md
 
 
 def ui_design_plate(
     reaction: str,
     plate_size: int,
+    use_rxn_insight: bool,
     relax_json: str,
     constraints_json: str,
 ) -> Tuple[str, List[List[Any]], Dict[str, Any]]:
     relax = _safe_json_loads(relax_json)
+    relax["use_rxn_insight"] = bool(use_rxn_insight)
     constraints = _safe_json_loads(constraints_json)
     out = recommend.design_plate_from_reaction(
         reaction=reaction or "",
@@ -466,12 +539,12 @@ def build_demo() -> gr.Blocks:
                 status_msg = ""
                 if not rdkit_available():
                     status_msg = (
-                        "⚠️ RDKit is not available or disabled. Global descriptors, role-specific details, "
+                        "?? RDKit is not available or disabled. Global descriptors, role-specific details, "
                         "and fingerprints default to 0. Set `CHEMTOOLS_DISABLE_RDKIT=0` (or unset it) and install RDKit "
                         "to enable numeric features."
                     )
                 else:
-                    status_msg = "RDKit detected ✓"
+                    status_msg = "RDKit detected ?"
                 return out, status_msg
 
             def _to_csv(smi: str, roles: list[str]):
@@ -547,17 +620,20 @@ def build_demo() -> gr.Blocks:
         with gr.Tab("Recommend Conditions"):
             rec_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
             rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=25, step=1)
+            rec_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
             rec_relax = gr.Textbox(label="Relax (JSON)", value="")
             rec_constraints = gr.Textbox(label="Constraints (JSON)", value="")
             rec_btn = gr.Button("Recommend", variant="primary")
             rec_out = gr.JSON(label="Recommendation Pack")
             rec_tbl = gr.Dataframe(label="Recommendation (table)", interactive=False)
-            rec_human = gr.Textbox(label="Recommended (human‑readable core/base/solvent)", interactive=False)
-            rec_btn.click(ui_recommend_both, inputs=[rec_in, rec_k, rec_relax, rec_constraints], outputs=[rec_out, rec_tbl, rec_human])
+            rec_human = gr.Textbox(label="Recommended (human?readable core/base/solvent)", interactive=False)
+            rec_detect = gr.Markdown(label="Auto-Detection")
+            rec_btn.click(ui_recommend_both, inputs=[rec_in, rec_k, rec_use_rxi, rec_relax, rec_constraints], outputs=[rec_out, rec_tbl, rec_human, rec_detect])
 
         with gr.Tab("Design Plate"):
             plate_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
             plate_n = gr.Slider(label="Plate size", minimum=6, maximum=96, value=24, step=1)
+            plate_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
             plate_relax = gr.Textbox(label="Relax (JSON)", value="")
             plate_constraints = gr.Textbox(label="Constraints (JSON)", value="")
             plate_btn = gr.Button("Design", variant="primary")
@@ -566,7 +642,7 @@ def build_demo() -> gr.Blocks:
             plate_meta = gr.JSON(label="Meta")
             plate_btn.click(
                 ui_design_plate,
-                inputs=[plate_in, plate_n, plate_relax, plate_constraints],
+                inputs=[plate_in, plate_n, plate_use_rxi, plate_relax, plate_constraints],
                 outputs=[plate_csv, plate_tbl, plate_meta],
             )
 
@@ -602,7 +678,7 @@ def build_demo() -> gr.Blocks:
             cs_core = gr.Textbox(label="Condition core (e.g., Pd/XPhos or XPhos)", value="Pd/XPhos")
             cs_family = gr.Dropdown(
                 label="Family (optional)",
-                choices=["", "Ullmann C–N", "Buchwald C–N", "Suzuki_CC", "Amide_Coupling"],
+                choices=["", "Ullmann C-N", "Buchwald C-N", "Suzuki_CC", "Amide_Coupling"],
                 value="",
             )
             with gr.Row():
@@ -628,7 +704,7 @@ def build_demo() -> gr.Blocks:
             with gr.Row():
                 lc_family = gr.Dropdown(
                     label="Family (optional)",
-                choices=["", "Ullmann C–N", "Buchwald C–N", "Suzuki_CC", "Amide_Coupling"],
+                choices=["", "Ullmann C-N", "Buchwald C-N", "Suzuki_CC", "Amide_Coupling"],
                     value="",
                 )
                 lc_limit = gr.Slider(label="Top N", minimum=5, maximum=500, value=200, step=5)
@@ -642,4 +718,10 @@ def build_demo() -> gr.Blocks:
 if __name__ == "__main__":
     demo = build_demo()
     # Bind to localhost; use share=True if you need a public link
-    demo.launch(server_name="127.0.0.1", server_port=7860)
+    host = os.environ.get("GRADIO_SERVER_NAME", "127.0.0.1")
+    try:
+        port = int(os.environ.get("GRADIO_SERVER_PORT", "7860"))
+    except Exception:
+        port = 7860
+    demo.launch(server_name=host, server_port=port)
+

@@ -41,13 +41,16 @@ os.environ.setdefault("CHEMTOOLS_LOAD_DATASET", os.environ.get("CHEMTOOLS_LOAD_D
 from chemtools.recommend import recommend_from_reaction, design_plate_from_reaction
 
 
-def _build_relax(use_drfp: bool, drfp_weight: float) -> Dict[str, Any]:
-    return {
+def _build_relax(use_drfp: bool, drfp_weight: float, use_rxn_insight: bool | None = None) -> Dict[str, Any]:
+    relax = {
         "use_drfp": bool(use_drfp),
         "drfp_weight": float(drfp_weight),
         "precompute_drfp": True,
         "precompute_scope": "candidates",
     }
+    if use_rxn_insight is not None:
+        relax["use_rxn_insight"] = bool(use_rxn_insight)
+    return relax
 
 
 def _build_constraints(no_chloro: bool, no_hmpa: bool, aqueous_only: bool, min_bp: float | None) -> Dict[str, Any]:
@@ -64,14 +67,16 @@ def _build_constraints(no_chloro: bool, no_hmpa: bool, aqueous_only: bool, min_b
     return rules
 
 
-def ui_recommend(reaction: str, k: int, use_drfp: bool, drfp_weight: float,
+def ui_recommend(reaction: str, k: int, use_rxn_insight: bool, use_drfp: bool, drfp_weight: float,
                  no_chloro: bool, no_hmpa: bool, aqueous_only: bool, min_bp: float | None):
-    relax = _build_relax(use_drfp, drfp_weight)
+    relax = _build_relax(use_drfp, drfp_weight, use_rxn_insight)
     rules = _build_constraints(no_chloro, no_hmpa, aqueous_only, min_bp)
     out = recommend_from_reaction(reaction, k=int(k), relax=relax, constraint_rules=rules)
     rec = out.get("recommendation") or {}
     alt = out.get("alternatives") or {}
     reasons = out.get("reasons") or []
+    det = (out.get("formatted") or {}).get("detection") or {}
+    auto = det.get("auto") if isinstance(det, dict) else None
     # Format a compact summary
     summary = {
         "core": rec.get("core"),
@@ -84,6 +89,33 @@ def ui_recommend(reaction: str, k: int, use_drfp: bool, drfp_weight: float,
         "family": out.get("family"),
         "precedent_support": (out.get("precedent_pack") or {}).get("support"),
     }
+    # Detection markdown (rxn-insight and fallback details)
+    det_lines = []
+    if isinstance(det, dict):
+        rt = det.get("reaction_type")
+        if rt:
+            det_lines.append(f"Detected family: {rt}")
+    if isinstance(auto, dict):
+        avail = bool(auto.get("rxn_insight_available"))
+        name = auto.get("rxn_insight_name")
+        klass = auto.get("rxn_insight_class")
+        conf = auto.get("rxn_insight_confidence")
+        status = auto.get("status")
+        det_lines.append(f"rxn-insight available: {avail}")
+        if status:
+            det_lines.append(f"auto-detection status: {status}")
+        if name:
+            det_lines.append(f"rxn-insight name: {name}")
+        if klass:
+            det_lines.append(f"rxn-insight class: {klass}")
+        if conf is not None:
+            try:
+                det_lines.append(f"rxn-insight confidence: {float(conf):.3f}")
+            except Exception:
+                det_lines.append(f"rxn-insight confidence: {conf}")
+    elif det and not auto:
+        det_lines.append("rxn-insight: not available; using rule-based fallback")
+    detection_md = "\n".join(f"- {x}" for x in det_lines) if det_lines else "- No detection details"
     # Render top alternatives as markdown
     md = []
     if reasons:
@@ -94,7 +126,7 @@ def ui_recommend(reaction: str, k: int, use_drfp: bool, drfp_weight: float,
         solv = ", ".join(f"{s} ({n})" for s, n in (alt.get("solvents") or []) if s)
         md.append(f"Alternatives — cores: {cores or 'n/a'}; bases: {bases or 'n/a'}; solvents: {solv or 'n/a'}")
     json_text = json.dumps(out, ensure_ascii=False, indent=2)
-    return summary, "\n\n".join(md), json_text
+    return summary, detection_md, "\n\n".join(md), json_text
 
 
 def ui_plate(reaction: str, use_drfp: bool, drfp_weight: float,
@@ -175,6 +207,7 @@ with gr.Blocks(title="Condition Recommender", theme=THEME, css=CSS) as demo:
         rxn = gr.Textbox(label="Reaction SMILES", placeholder="Brc1ccc(F)cc1.Nc1ccccc1>>Nc1ccc(F)cc1")
         k = gr.Slider(5, 200, value=25, step=1, label="Neighbors (k)")
         with gr.Row():
+            use_rxi = gr.Checkbox(True, label="Use rxn‑insight auto‑detect (if available)")
             use_drfp = gr.Checkbox(True, label="Use DRFP re‑ranking")
             drfp_w = gr.Slider(0.0, 1.0, value=0.4, step=0.05, label="DRFP weight")
         gr.Markdown("Constraints")
@@ -185,9 +218,10 @@ with gr.Blocks(title="Condition Recommender", theme=THEME, css=CSS) as demo:
             min_bp = gr.Slider(0, 200, value=0, step=5, label="Min solvent bp (C)")
         btn = gr.Button("Recommend", variant="primary")
         summary = gr.JSON(label="Recommendation")
-        reasons = gr.Markdown()
+        detection = gr.Markdown(label="Auto-Detection")
+        reasons = gr.Markdown(label="Notes & Alternatives")
         json_state = gr.State("")
-        btn.click(ui_recommend, [rxn, k, use_drfp, drfp_w, no_chloro, no_hmpa, aq_only, min_bp], [summary, reasons, json_state])
+        btn.click(ui_recommend, [rxn, k, use_rxi, use_drfp, drfp_w, no_chloro, no_hmpa, aq_only, min_bp], [summary, detection, reasons, json_state])
         with gr.Row():
             btn_json = gr.Button("Download JSON", variant="secondary")
             file_json = gr.File(label="recommendation.json")
@@ -196,6 +230,7 @@ with gr.Blocks(title="Condition Recommender", theme=THEME, css=CSS) as demo:
     with gr.Tab("Design 24‑well Plate"):
         rxn2 = gr.Textbox(label="Reaction SMILES", placeholder="Brc1ccc(F)cc1.Nc1ccccc1>>Nc1ccc(F)cc1")
         with gr.Row():
+            use_rxi2 = gr.Checkbox(True, label="Use rxn‑insight auto‑detect (if available)")
             use_drfp2 = gr.Checkbox(True, label="Use DRFP re‑ranking")
             drfp_w2 = gr.Slider(0.0, 1.0, value=0.4, step=0.05, label="DRFP weight")
         gr.Markdown("Constraints")
@@ -210,7 +245,7 @@ with gr.Blocks(title="Condition Recommender", theme=THEME, css=CSS) as demo:
                             interactive=False, wrap=True)
         csv_box = gr.Textbox(label="CSV", lines=10)
         csv_state = gr.State("")
-        btn2.click(ui_plate, [rxn2, use_drfp2, drfp_w2, no_chloro2, no_hmpa2, aq_only2, min_bp2], [grid, csv_box, csv_state])
+        btn2.click(ui_plate, [rxn2, use_rxi2, use_drfp2, drfp_w2, no_chloro2, no_hmpa2, aq_only2, min_bp2], [grid, csv_box, csv_state])
         with gr.Row():
             btn_dl = gr.Button("Download CSV", variant="secondary")
             file_out = gr.File(label="plate.csv")
@@ -220,6 +255,7 @@ with gr.Blocks(title="Condition Recommender", theme=THEME, css=CSS) as demo:
         rxn3 = gr.Textbox(label="Reaction SMILES", placeholder="Brc1ccc(F)cc1.Nc1ccccc1>>Nc1ccc(F)cc1")
         k3 = gr.Slider(5, 200, value=25, step=1, label="Neighbors (k)")
         with gr.Row():
+            use_rxi3 = gr.Checkbox(True, label="Use rxn‑insight auto‑detect (if available)")
             use_drfp3 = gr.Checkbox(True, label="Use DRFP re‑ranking")
             drfp_w3 = gr.Slider(0.0, 1.0, value=0.4, step=0.05, label="DRFP weight")
         btn3 = gr.Button("Fetch Precedents", variant="primary")
@@ -228,7 +264,7 @@ with gr.Blocks(title="Condition Recommender", theme=THEME, css=CSS) as demo:
                            interactive=False, wrap=True)
         prec_csv_state = gr.State("")
         prec_json_state = gr.State("")
-        btn3.click(ui_precedents, [rxn3, k3, use_drfp3, drfp_w3], [tbl, prec_csv_state, prec_json_state])
+        btn3.click(ui_precedents, [rxn3, k3, use_rxi3, use_drfp3, drfp_w3], [tbl, prec_csv_state, prec_json_state])
         with gr.Row():
             btn_prec_csv = gr.Button("Download CSV", variant="secondary")
             file_prec_csv = gr.File(label="precedents.csv")

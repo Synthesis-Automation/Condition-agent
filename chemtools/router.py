@@ -34,12 +34,28 @@ _SMARTS = _compile_smarts()
 
 
 def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
-    # RDKit SMARTS matching when available
+    # Text fallback heuristic (used when RDKit unavailable, or to augment matches when some tokens fail to parse)
+    rs = " ".join(reactants).lower()
+    def has(pattern: str) -> bool:
+        return pattern in rs
+    text_hits = {
+        "aryl_halide": (has("cl") or has("br") or has(" i")) and ("c1" in rs or "c2" in rs or "c[" in rs),
+        "vinyl_halide": (has("c=ccl") or has("c=cbr") or has("c=ci")),
+        "triflate": has("os(=o)(=o)c(f)(f)f") or has("otf"),
+        # Accept both common orders: 'b(o)o' and 'ob(o)' (RDKit canonicalization may reorder)
+        "boron": has("b(") or has("b[") or has("b(o)o") or has("ob(o)"),
+        "nucleophile_n": has("n") or has("nh"),
+        "nucleophile_o": has("o") or has("oh"),
+        "terminal_alkyne": has("c#c") or has("c#cc"),
+        "acid": has("c(=o)oh") or has("c(=o)o") or has("oc(=o)"),
+    }
+
+    # RDKit SMARTS matching when available; OR with text_hits to be robust to parse failures
     if _SMARTS is not None and rdkit_available():
         try:
             from rdkit import Chem  # type: ignore
         except Exception:
-            pass
+            Chem = None  # type: ignore
         mols = [parse_smiles(s) for s in reactants]
         mols = [m for m in mols if m is not None]
         def any_match(key: str) -> bool:
@@ -53,7 +69,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
                 except Exception:
                     continue
             return False
-        return {
+        rdkit_hits = {
             "aryl_halide": any_match("aryl_halide"),
             "vinyl_halide": any_match("vinyl_halide"),
             "triflate": any_match("triflate"),
@@ -63,21 +79,10 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
             "terminal_alkyne": any_match("terminal_alkyne"),
             "acid": any_match("acid"),
         }
+        # Combine conservatively (logical OR)
+        return {k: bool(rdkit_hits.get(k) or text_hits.get(k)) for k in text_hits.keys()}
 
-    # Text fallback heuristic when RDKit not available
-    rs = " ".join(reactants).lower()
-    def has(pattern: str) -> bool:
-        return pattern in rs
-    return {
-        "aryl_halide": (has("cl") or has("br") or has(" i")) and ("c1" in rs or "c2" in rs or "c[" in rs),
-        "vinyl_halide": (has("c=ccl") or has("c=cbr") or has("c=ci")),
-        "triflate": has("os(=o)(=o)c(f)(f)f") or has("otf"),
-        "boron": has("b(") or has("b[") or has("b(o)o"),
-        "nucleophile_n": has("n") or has("nh"),
-        "nucleophile_o": has("o") or has("oh"),
-        "terminal_alkyne": has("c#c") or has("c#cc"),
-        "acid": has("c(=o)oh") or has("c(=o)o") or has("oc(=o)"),
-    }
+    return text_hits
 
 
 def detect_family(reactants: List[str]) -> Dict[str, Any]:

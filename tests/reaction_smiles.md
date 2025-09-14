@@ -4,13 +4,6 @@ This file lists diverse reaction SMILES for common transformations. Format: `rea
 
 ## Suzuki (C–C)
 
-```
-Brc1ccccc1.B(OH)2c1ccccc1>>c1ccc(cc1)c2ccccc2
-Brc1ccc(Cl)cc1.B(OH)2c1ccc(F)cc1>>Clc1ccc(cc1)c2ccc(F)cc2
-Ic1ccncc1.B(OH)2c1ccccc1>>c1ccc(cc1)c2ccncc2
-Brc1ccsc1.B(OH)2c1ccc(OC)cc1>>c1ccc(OC)cc1-c2ccsc2
-Brc1ccc(C)cc1.B(OH)2c1cc(C)ccc1>>c1ccc(C)cc1-c2ccc(C)cc2
-```
 
 ## Buchwald–Hartwig C–N
 
