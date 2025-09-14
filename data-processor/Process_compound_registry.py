@@ -734,6 +734,14 @@ def main(argv: list[str] | None = None) -> int:
         default=1,
         help="Start processing from this row number (1-indexed, default: 1)",
     )
+    p.add_argument(
+        "--export-chemtools",
+        action="store_true",
+        help=(
+            "Also copy the (possibly updated) registry JSONL to chemtools' data path "
+            "(CHEMTOOLS_REGISTRY_PATH or ../data/cas_registry_merged.jsonl)"
+        ),
+    )
     args = p.parse_args(argv)
 
     try:
@@ -757,6 +765,17 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError as e:
         print(str(e), file=sys.stderr)
         return 2
+
+    # Optional: export to chemtools registry path for direct consumption
+    export_note = None
+    if args.export_chemtools and not args.dry_run:
+        try:
+            from chemtools_sink import export_registry_for_chemtools  # type: ignore
+        except Exception:
+            export_registry_for_chemtools = None  # type: ignore
+        if export_registry_for_chemtools:
+            ok, msg = export_registry_for_chemtools(args.file)
+            export_note = msg if ok else f"export failed: {msg}"
 
     # Compact report
     print(
@@ -783,6 +802,7 @@ def main(argv: list[str] | None = None) -> int:
                 "iupac_name_updated": stats.get("iupac_name_updated", 0),
                 "mw_updated": stats.get("mw_updated", 0),
                 "exact_mass_updated": stats.get("exact_mass_updated", 0),
+                **({"chemtools_registry": export_note} if export_note else {}),
             },
             ensure_ascii=False,
         )

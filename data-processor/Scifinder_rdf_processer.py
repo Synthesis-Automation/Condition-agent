@@ -301,6 +301,33 @@ class RDFWorker(QtCore.QObject):
         # Generate JSONL export
         self._emit("Generating JSONL export...")
         generator.generate_jsonl_export(rows, self.output_jsonl_path, source_name)
+        # Best-effort: copy JSONL to chemtools dataset dir for direct consumption
+        export_jsonl_for_chemtools = None
+        try:
+            # Try plain import when running from this folder
+            from chemtools_sink import export_jsonl_for_chemtools  # type: ignore
+        except Exception:
+            try:
+                # Fallback: load via file path without requiring a package
+                import importlib.util as _ilu, os as _os
+                _p = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'chemtools_sink.py')
+                _spec = _ilu.spec_from_file_location('chemtools_sink', _p)
+                if _spec and _spec.loader:
+                    _mod = _ilu.module_from_spec(_spec)
+                    _spec.loader.exec_module(_mod)  # type: ignore
+                    export_jsonl_for_chemtools = getattr(_mod, 'export_jsonl_for_chemtools', None)
+            except Exception:
+                export_jsonl_for_chemtools = None  # type: ignore
+        if export_jsonl_for_chemtools:
+            try:
+                ok, msg = export_jsonl_for_chemtools(self.output_jsonl_path)
+                if ok:
+                    self._emit(f"Exported dataset JSONL for chemtools: {msg}")
+                else:
+                    self._emit(f"Note: could not export to chemtools dataset dir: {msg}")
+            except Exception:
+                # Silent failure to avoid blocking the primary outputs
+                pass
 
     @Slot() if Slot else (lambda f: f)
     def run(self):

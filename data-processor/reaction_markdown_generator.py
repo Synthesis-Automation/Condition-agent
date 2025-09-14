@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Standalone Reaction Markdown Generator
 
@@ -357,7 +357,7 @@ class ReactionMarkdownGenerator:
         import re
         s2 = s.lower().strip()
         # Replace unicode primes and quotes with nothing
-        s2 = s2.replace("′", "").replace("’", "").replace("'", "")
+        s2 = s2.replace("鈥?, "").replace("鈥?, "").replace("'", "")
         # Remove brackets and commas
         s2 = re.sub(r"[\[\]\(\),]", " ", s2)
         # Collapse hyphens to spaces
@@ -402,7 +402,7 @@ class ReactionMarkdownGenerator:
             "n n diisopropylethylamine": "7087-68-5",
             "dicyclohexylcarbodiimide": "538-75-0",  # DCC / DIC? (DCC is 538-75-0)
             "edc": "1892-57-5",  # EDCI free base
-            "edci": "25952-53-8", # EDCI·HCl
+            "edci": "25952-53-8", # EDCI路HCl
             # Tripotassium phosphate
             "k3po4": "7778-53-2",
             "tripotassium phosphate": "7778-53-2",
@@ -609,7 +609,7 @@ class ReactionMarkdownGenerator:
                         if norm_name not in seen_names:
                             seen_names.add(norm_name)
                             lines.append(f"  - {name} (CAS: unknown)")
-                            self.validation_warnings.append(f"{title}: No valid CAS for '{name}' — kept as name-only")
+                            self.validation_warnings.append(f"{title}: No valid CAS for '{name}' 鈥?kept as name-only")
                     continue
 
                 norm_name = self._norm(corrected_name)
@@ -667,7 +667,7 @@ class ReactionMarkdownGenerator:
                         if norm_name not in seen_names:
                             seen_names.add(norm_name)
                             lines.append(f"  - {name} (CAS: unknown)")
-                            self.validation_warnings.append(f"{title}: No CAS for '{name}' — kept as name-only")
+                            self.validation_warnings.append(f"{title}: No CAS for '{name}' 鈥?kept as name-only")
                     # otherwise drop entry
                     continue
 
@@ -682,7 +682,7 @@ class ReactionMarkdownGenerator:
         
         temp = row.get('Temperature_C', '')
         if temp:
-            conditions.append(f"Temperature: {temp}°C")
+            conditions.append(f"Temperature: {temp}掳C")
         
         time = row.get('Time_h', '')
         if time:
@@ -749,7 +749,7 @@ class ReactionMarkdownGenerator:
             # Canonicalize CAS using direct CAS alias mapping
             cas = self.canonicalize_cas(cas) or cas
 
-            # If we have a CAS, prefer the registry compound_type → role mapping
+            # If we have a CAS, prefer the registry compound_type 鈫?role mapping
             reg_role = ""
             if cas:
                 ctype = self.cas_registry.get_compound_type(cas)
@@ -959,7 +959,7 @@ class ReactionMarkdownGenerator:
         if self.validation_warnings:
             markdown += "**Data Quality Warnings:**\n"
             for warning in self.validation_warnings:
-                markdown += f"  - ⚠️ {warning}\n"
+                markdown += f"  - 鈿狅笍 {warning}\n"
             markdown += "\n"
         
         # Add separator
@@ -1158,7 +1158,7 @@ class ReactionMarkdownGenerator:
         markdown += "  - CAS number validation and correction enabled\n"
         markdown += "  - Compound name/CAS mismatches are automatically flagged\n"
         markdown += "  - Manual corrections applied for known common compounds\n"
-        markdown += "  - Look for ⚠️ warnings in individual reactions for data quality issues\n\n"
+        markdown += "  - Look for 鈿狅笍 warnings in individual reactions for data quality issues\n\n"
         
         return markdown
     
@@ -1255,6 +1255,26 @@ class ReactionMarkdownGenerator:
                 
                 # Write as single line JSON
                 f.write(json.dumps(analysis_record, ensure_ascii=False) + '\n')
+        # Best-effort: copy JSONL to chemtools dataset dir for direct consumption
+        try:
+            try:
+                from chemtools_sink import export_jsonl_for_chemtools
+            except Exception:
+                import importlib.util as _ilu, os as _os
+                _p = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'chemtools_sink.py')
+                _spec = _ilu.spec_from_file_location('chemtools_sink', _p)
+                export_jsonl_for_chemtools = None
+                if _spec and _spec.loader:
+                    _mod = _ilu.module_from_spec(_spec)
+                    _spec.loader.exec_module(_mod)  # type: ignore
+                    export_jsonl_for_chemtools = getattr(_mod, 'export_jsonl_for_chemtools', None)
+        except Exception:
+            export_jsonl_for_chemtools = None
+        if export_jsonl_for_chemtools:
+            try:
+                ok, _dst = export_jsonl_for_chemtools(output_path)
+            except Exception:
+                pass
     
     def prepare_analysis_record(self, row: Dict[str, Any]) -> Dict[str, Any]:
         """Prepare a reaction record optimized for analysis and ML."""

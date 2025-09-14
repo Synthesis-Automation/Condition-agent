@@ -25,8 +25,13 @@ def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
     return r0, r1
 
 # Path to small demo dataset used for precedents retrieval
-DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "reactions_sample.jsonl")
-DATASET_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "reaction_dataset")
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "data", "reactions_sample.jsonl")
+# Allow overriding the dataset directory so data-processor can save directly there
+_ENV_DIR = os.environ.get("CHEMTOOLS_DATASET_DIR", "").strip()
+DATASET_DIR = (
+    os.path.abspath(_ENV_DIR) if _ENV_DIR else os.path.join(BASE_DIR, "data", "reaction_dataset")
+)
 
 
 def _iter_dataset_files() -> List[str]:
