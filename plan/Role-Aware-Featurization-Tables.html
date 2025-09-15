@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Role-Aware Featurization — Tables</title>
+<style>
+:root {
+  --bg: #0b0d10;
+  --fg: #e7ecf3;
+  --muted: #94a3b8;
+  --card: #11161c;
+  --border: #243244;
+  --accent: #7aa2f7;
+}
+html, body { background: var(--bg); color: var(--fg); font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji"; margin: 0; }
+.container { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+h1 { font-size: 26px; margin: 0 0 16px; }
+h2 { font-size: 20px; margin: 0; }
+p, li { color: var(--muted); }
+.header { position: sticky; top: 0; background: linear-gradient(180deg, rgba(11,13,16,.95), rgba(11,13,16,.75)); backdrop-filter: blur(6px); z-index: 10; border-bottom: 1px solid var(--border); }
+.header .container { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+.header a { color: var(--accent); text-decoration: none; }
+.toc { margin: 16px 0 24px; padding: 12px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+.toc h3 { margin: 0 0 8px; font-size: 16px; }
+.toc ul { margin: 0; padding: 0 0 0 16px; columns: 2; column-gap: 24px; }
+.toc li { margin: 4px 0; break-inside: avoid; }
+.toc .meta { color: var(--muted); font-size: 12px; margin-left: 6px; }
+.table-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; margin: 20px 0; }
+.section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.section-header .actions { display: flex; align-items: center; gap: 12px; }
+.section-header input[type="search"] { background: #0b0f14; color: var(--fg); border: 1px solid var(--border); padding: 6px 8px; border-radius: 8px; }
+.section-header .download { color: var(--accent); text-decoration: none; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; }
+.table-wrap { overflow: auto; }
+table.data-table { width: 100%; border-collapse: collapse; }
+table.data-table thead th { position: sticky; top: 0; background: #10151c; color: var(--fg); border-bottom: 1px solid var(--border); padding: 8px; text-align: left; white-space: nowrap; cursor: pointer; }
+table.data-table tbody td { border-top: 1px solid var(--border); padding: 8px; vertical-align: top; }
+table.data-table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.02); }
+.sort-indicator { margin-left: 6px; color: var(--muted); font-size: 12px; }
+.footer { color: var(--muted); margin: 16px 0 40px; text-align: center; }
+kbd { background:#0b0f14; border:1px solid var(--border); border-bottom-color:#1e293b; border-radius:6px; padding:1px 5px; font-size:12px; }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="container">
+    <h1>Role-Aware Featurization — Tables</h1>
+    <a href="sandbox:/mnt/data/Role-Aware-Featurization-Tables.xlsx" download>Download Excel</a>
+  </div>
+</header>
+<main class="container">
+  <section class="toc">
+    <h3>Table of Contents</h3>
+    <ul>
+      <li><a href="#n-based-nucleophiles">N‑Based Nucleophiles</a> <span class="meta">(8 × 6)</span></li><li><a href="#c-nucleophiles-polar">C‑Nucleophiles (Polar)</a> <span class="meta">(5 × 6)</span></li><li><a href="#electrophiles-beyond-halides">Electrophiles Beyond Halides</a> <span class="meta">(6 × 6)</span></li><li><a href="#radical-redox-precursors">Radical / Redox Precursors</a> <span class="meta">(5 × 6)</span></li><li><a href="#c-h-partners-as-starting-materials">C–H Partners (as Starting Materials)</a> <span class="meta">(4 × 6)</span></li>
+    </ul>
+    <p>Tip: click a column header to sort. Use the search box above each table to filter rows. Press <kbd>Esc</kbd> to clear the active search.</p>
+  </section>
+  
+    <section id="n-based-nucleophiles" class="table-section">
+      <div class="section-header">
+        <h2>N‑Based Nucleophiles</h2>
+        <div class="actions">
+          <label>Search: <input type="search" class="table-search" placeholder="Filter rows…"></label>
+          <a class="download" href="sandbox:/mnt/data/role_tables_csv/n-based-nucleophiles.csv">Download CSV</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Role ID</th>
+      <th>Short Name</th>
+      <th>Canonical Examples</th>
+      <th>Seed SMARTS (indicative)</th>
+      <th>Key Role‑Specific Features</th>
+      <th>Typical Reaction Families</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>amine</td>
+      <td>Aliphatic amine (1°/2°/3°)</td>
+      <td>nBuNH2, i‑Pr2NH, Et3N</td>
+      <td>`[NX3;H2,H1,H0;!$(N=*)]`</td>
+      <td>degree(1/2/3); basicity_est; α‑branch; steric_map</td>
+      <td>Buchwald–Hartwig (aliphatic), SN2, reductive amination</td>
+    </tr>
+    <tr>
+      <td>aniline</td>
+      <td>Aromatic amine</td>
+      <td>aniline, p‑toluidine</td>
+      <td>`c[NH2,NH,NR]`</td>
+      <td>aniline_flag; para/meta directors; ortho_block</td>
+      <td>Buchwald–Hartwig (aryl)</td>
+    </tr>
+    <tr>
+      <td>sulfonamide</td>
+      <td>Sulfonamide N–H</td>
+      <td>TsNH2, NsNH2</td>
+      <td>`S(=O)(=O)[NH]`</td>
+      <td>acidity_est; N‑substitution; hardness</td>
+      <td>Buchwald–Hartwig (sulfonamide), S_NAr</td>
+    </tr>
+    <tr>
+      <td>amide_anion</td>
+      <td>Deprotonated amide/carbamate</td>
+      <td>NaNHAc, BocNH−</td>
+      <td>`N-` with adjacent `C(=O)`</td>
+      <td>resonance_strength; charge; counterion</td>
+      <td>N‑acylation; metalations; amidations</td>
+    </tr>
+    <tr>
+      <td>hydrazine</td>
+      <td>Hydrazines</td>
+      <td>N2H4, BnNHNH2</td>
+      <td>`NN`</td>
+      <td>degree; bifunctional_flag</td>
+      <td>Buchwald–Hartwig to hydrazines; Wolff–Kishner precursors</td>
+    </tr>
+    <tr>
+      <td>hydroxylamine</td>
+      <td>Hydroxylamine &amp; derivatives</td>
+      <td>NH2OH, H2NOAc</td>
+      <td>`NO` with N‑H</td>
+      <td>oxidation_state; O‑acylated_flag</td>
+      <td>O/N‑acylations; oxime formation</td>
+    </tr>
+    <tr>
+      <td>imine_oxime</td>
+      <td>Imines/oximes</td>
+      <td>R2C=NH, R2C=NOH</td>
+      <td>`C=N[*]`</td>
+      <td>E/Z; electrophilicity_index</td>
+      <td>Reductive amination, additions</td>
+    </tr>
+    <tr>
+      <td>azole_NH</td>
+      <td>NH‑azole donors</td>
+      <td>imidazole, pyrazole</td>
+      <td>`n1[c,n]...N` (NH in azole)</td>
+      <td>pKa_est; ring_basicity</td>
+      <td>N‑arylation (SNAr/Buchwald), N‑acylation</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+    </section>
+    
+    <section id="c-nucleophiles-polar" class="table-section">
+      <div class="section-header">
+        <h2>C‑Nucleophiles (Polar)</h2>
+        <div class="actions">
+          <label>Search: <input type="search" class="table-search" placeholder="Filter rows…"></label>
+          <a class="download" href="sandbox:/mnt/data/role_tables_csv/c-nucleophiles-polar.csv">Download CSV</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Role ID</th>
+      <th>Short Name</th>
+      <th>Canonical Examples</th>
+      <th>Seed SMARTS</th>
+      <th>Key Features</th>
+      <th>Typical Families</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1_3_dicarbonyl</td>
+      <td>1,3‑Dicarbonyl donor</td>
+      <td>malonate, acetoacetate</td>
+      <td>`C(=O)C[CH2]C(=O)`</td>
+      <td>pKa_alpha; substituent_class; chelation_sites</td>
+      <td>Alkylation; Michael; Knoevenagel</td>
+    </tr>
+    <tr>
+      <td>nitroalkane</td>
+      <td>Nitroalkane (Henry)</td>
+      <td>nitromethane, nitroethane</td>
+      <td>`C[N+](=O)[O-]`</td>
+      <td>pKa_alpha; β‑branch</td>
+      <td>Henry; Michael</td>
+    </tr>
+    <tr>
+      <td>enolate_equiv</td>
+      <td>Silyl enol ether/enol carbonate</td>
+      <td>TMS‑enol ether; enol‑OTf/OPiv</td>
+      <td>`C=C[O;Si]` / `C(=C)OP(=O)`</td>
+      <td>E/Z; substitution; leaving_group</td>
+      <td>Mukaiyama aldol; α‑arylation</td>
+    </tr>
+    <tr>
+      <td>cyanide_source</td>
+      <td>CN donor</td>
+      <td>TMSCN, KCN</td>
+      <td>`C#N` (ionic or silyl)</td>
+      <td>counterion; safety_flag</td>
+      <td>Cyanation of carbocations/carbonyls</td>
+    </tr>
+    <tr>
+      <td>ylides_phosphorane</td>
+      <td>Phosphonium ylide</td>
+      <td>Ph3P=CH2</td>
+      <td>`P(Ph)3=C`</td>
+      <td>ylide_basicity; substituent_class</td>
+      <td>Wittig/HWE olefination</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+    </section>
+    
+    <section id="electrophiles-beyond-halides" class="table-section">
+      <div class="section-header">
+        <h2>Electrophiles Beyond Halides</h2>
+        <div class="actions">
+          <label>Search: <input type="search" class="table-search" placeholder="Filter rows…"></label>
+          <a class="download" href="sandbox:/mnt/data/role_tables_csv/electrophiles-beyond-halides.csv">Download CSV</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Role ID</th>
+      <th>Short Name</th>
+      <th>Canonical Examples</th>
+      <th>Seed SMARTS</th>
+      <th>Key Features</th>
+      <th>Typical Families</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>alkyl_sulfonate</td>
+      <td>Alkyl OTs/OMs/ONs</td>
+      <td>MeOTs, nBuOMs</td>
+      <td>`C-OS(=O)(=O)[Cl,F,O-]`</td>
+      <td>LG_class; degree_123</td>
+      <td>SN1/SN2; Ni cross‑coupling (OTs)</td>
+    </tr>
+    <tr>
+      <td>enol_triflate</td>
+      <td>Enol/vinyl triflate</td>
+      <td>R2C=CR‑OTf</td>
+      <td>`C=C-OS(=O)(=O)C(F)(F)F`</td>
+      <td>E/Z; substitution_degree</td>
+      <td>Suzuki/Negishi; C–N</td>
+    </tr>
+    <tr>
+      <td>acyl_imidazole</td>
+      <td>Acyl‑Imidazole</td>
+      <td>R‑C(=O)‑N(imid)</td>
+      <td>`C(=O)N1C=NC=N1`</td>
+      <td>acyl_electrophilicity; stability</td>
+      <td>Amide/ester formation, decarboxylative couplings</td>
+    </tr>
+    <tr>
+      <td>activated_carbonate</td>
+      <td>p‑NP / PFP carbonates</td>
+      <td>RO‑C(=O)O‑Ar(NO2)</td>
+      <td>`C(=O)OAr` (strong EWG)</td>
+      <td>LG_strength</td>
+      <td>Carbamate/urethane formation</td>
+    </tr>
+    <tr>
+      <td>isocyanate</td>
+      <td>Isocyanate</td>
+      <td>R‑N=C=O</td>
+      <td>`N=C=O`</td>
+      <td>N‑electrophilicity; hazard_flag</td>
+      <td>Urea/Carbamate formation</td>
+    </tr>
+    <tr>
+      <td>isothiocyanate</td>
+      <td>Isothiocyanate</td>
+      <td>R‑N=C=S</td>
+      <td>`N=C=S`</td>
+      <td>S/N selectivity</td>
+      <td>Thiourea formation</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+    </section>
+    
+    <section id="radical-redox-precursors" class="table-section">
+      <div class="section-header">
+        <h2>Radical / Redox Precursors</h2>
+        <div class="actions">
+          <label>Search: <input type="search" class="table-search" placeholder="Filter rows…"></label>
+          <a class="download" href="sandbox:/mnt/data/role_tables_csv/radical-redox-precursors.csv">Download CSV</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Role ID</th>
+      <th>Short Name</th>
+      <th>Canonical Examples</th>
+      <th>Seed SMARTS</th>
+      <th>Key Features</th>
+      <th>Typical Families</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>nhp_ester</td>
+      <td>N‑hydroxyphthalimide ester (RAE)</td>
+      <td>R‑C(=O)‑ONPhth</td>
+      <td>`C(=O)ON1C(=O)ccc(=O)c1`</td>
+      <td>radical_class(alkyl/benzyl/α‑oxy); decarbox_rate</td>
+      <td>Decarboxylative arylation/amination/borylation</td>
+    </tr>
+    <tr>
+      <td>pyridinium_salt</td>
+      <td>Katritzky pyridinium</td>
+      <td>R‑Py+</td>
+      <td>`n1cccc1` with `C(sp3)` on N</td>
+      <td>alkyl_class; counterion</td>
+      <td>Alkyl radical generation; C–N/C–B</td>
+    </tr>
+    <tr>
+      <td>sulfonylate</td>
+      <td>Sulfinate salts</td>
+      <td>R‑SO2− M+</td>
+      <td>`S(=O)(=O)[O-]`</td>
+      <td>radical_persistence; EWG_score</td>
+      <td>Minisci; aryl/alkenyl sulfones</td>
+    </tr>
+    <tr>
+      <td>diazo</td>
+      <td>α‑Diazocarbonyl</td>
+      <td>R‑CO‑CHN2</td>
+      <td>`N#N` adjacent to carbonyl</td>
+      <td>carbene_type (donor/acceptor); safety_flag</td>
+      <td>Carbene insertions, cyclopropanations</td>
+    </tr>
+    <tr>
+      <td>oxime_ester</td>
+      <td>O‑Acyl oxime</td>
+      <td>R‑C(=NOAc)‑OAc</td>
+      <td>`C(=NOC(=O))`</td>
+      <td>N–O BDE; alkyl vs aryl</td>
+      <td>N‑centred or alkyl radical generation</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+    </section>
+    
+    <section id="c-h-partners-as-starting-materials" class="table-section">
+      <div class="section-header">
+        <h2>C–H Partners (as Starting Materials)</h2>
+        <div class="actions">
+          <label>Search: <input type="search" class="table-search" placeholder="Filter rows…"></label>
+          <a class="download" href="sandbox:/mnt/data/role_tables_csv/c-h-partners-as-starting-materials.csv">Download CSV</a>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Role ID</th>
+      <th>Short Name</th>
+      <th>Canonical Examples</th>
+      <th>Seed SMARTS</th>
+      <th>Key Features</th>
+      <th>Typical Families</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>aryl_CH</td>
+      <td>Arene C–H partner</td>
+      <td>anisole, toluene</td>
+      <td>`cH` with directing group</td>
+      <td>dg_class (pyridyl, amide, oxazoline); ortho_sites</td>
+      <td>Direct arylation (C–H), borylation</td>
+    </tr>
+    <tr>
+      <td>benzylic_CH</td>
+      <td>Benzylic C–H</td>
+      <td>ethylbenzene</td>
+      <td>`c-CH2-`</td>
+      <td>BDE_est; radical_stability</td>
+      <td>Benzylic oxidation/amination</td>
+    </tr>
+    <tr>
+      <td>allylic_CH</td>
+      <td>Allylic C–H</td>
+      <td>cyclohexene</td>
+      <td>`C=C-CH2-`</td>
+      <td>BDE_est; substitution_degree</td>
+      <td>Allylic oxidation/amination</td>
+    </tr>
+    <tr>
+      <td>aliphatic_CH</td>
+      <td>Unactivated C–H</td>
+      <td>cyclohexane</td>
+      <td>`CH` without activation</td>
+      <td>BDE_est; site_count</td>
+      <td>Late‑stage C–H functionalization</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+    </section>
+    
+  <p class="footer">Generated from <code>Role-Aware-Featurization-Implementation-Plan.md</code></p>
+</main>
+<script>
+// Simple sorter & filter for all tables
+function detectType(val) {
+  // Try numeric
+  if (val === null) return 'text';
+  const v = val.trim();
+  if (v === '') return 'text';
+  const num = Number(v.replace(/[,\s]/g, ''));
+  if (!isNaN(num)) return 'number';
+  // date-ish?
+  if (!isNaN(Date.parse(v))) return 'date';
+  return 'text';
+}
+
+function getCellValue(td) {
+  return (td?.innerText || td?.textContent || '').trim();
+}
+
+function compareValues(a, b, type, asc) {
+  if (type === 'number') {
+    const na = Number(a.replace(/[,\s]/g, ''));
+    const nb = Number(b.replace(/[,\s]/g, ''));
+    return (na - nb) * (asc ? 1 : -1);
+  } else if (type === 'date') {
+    return (new Date(a) - new Date(b)) * (asc ? 1 : -1);
+  }
+  return a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true }) * (asc ? 1 : -1);
+}
+
+function makeSortable(table) {
+  const ths = table.tHead?.rows[0]?.cells || [];
+  for (let i=0; i<ths.length; i++) {
+    const th = ths[i];
+    let asc = true;
+    let lastIndex = -1;
+    const indicator = document.createElement('span');
+    indicator.className = 'sort-indicator';
+    th.appendChild(indicator);
+    th.addEventListener('click', () => {
+      const tbody = table.tBodies[0];
+      if (!tbody) return;
+      const rows = Array.from(tbody.rows);
+      // Determine type from first non-empty cell
+      let type = 'text';
+      for (const r of rows) {
+        const val = getCellValue(r.cells[i]);
+        if (val) { type = detectType(val); break; }
+      }
+      if (lastIndex === i) asc = !asc; else asc = true;
+      lastIndex = i;
+      rows.sort((r1, r2) => compareValues(getCellValue(r1.cells[i]), getCellValue(r2.cells[i]), type, asc));
+      // Reattach
+      for (const r of rows) tbody.appendChild(r);
+      indicator.textContent = asc ? '▲' : '▼';
+      // Clear indicators on other headers
+      for (let j=0; j<ths.length; j++) if (j!==i) ths[j].querySelector('.sort-indicator').textContent = '';
+    });
+  }
+}
+
+function makeFilter(section) {
+  const input = section.querySelector('.table-search');
+  const table = section.querySelector('table');
+  if (!input || !table) return;
+  const tbody = table.tBodies[0];
+  input.addEventListener('input', () => {
+    const q = input.value.toLowerCase().trim();
+    for (const row of tbody.rows) {
+      let visible = !q;
+      if (q) {
+        for (const td of row.cells) {
+          if (td.innerText.toLowerCase().includes(q)) { visible = true; break; }
+        }
+      }
+      row.style.display = visible ? '' : 'none';
+    }
+  });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Escape') input.value = ''; input.dispatchEvent(new Event('input')); });
+}
+
+document.querySelectorAll('table.data-table').forEach(makeSortable);
+document.querySelectorAll('.table-section').forEach(makeFilter);
+</script>
+</body>
+</html>
