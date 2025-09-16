@@ -1,6 +1,6 @@
 {
   "version": "1.5.0",
-  "updated": "2025-09-14",
+  "updated": "2025-09-16",
   "schema": {
     "family_id": "stable identifier for the catalyst/precursor family",
     "label": "human-readable family name",
@@ -331,32 +331,18 @@
       "ehs_green": {},
       "example_members": [
         {
-          "name": "Palladium(II) chloride",
-          "abbr": "PdCl2",
-          "cas": "7647-10-1",
+          "name": "Dichloro-bis(acetonitrile)palladium(II)",
+          "abbr": "Pd(MeCN)2Cl2",
+          "cas": "14592-56-4",
           "synonyms": [
-            "PdCl2",
-            "palladium dichloride"
+            "(CH3CN)2PdCl2",
+            "dichloro-bis(acetonitrile)palladium(II)"
           ],
           "properties": {
-            "color": "red-brown",
+            "color": "dark orange",
             "air_stable": true
           },
-          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) chloride | abbr: PdCl2 | CAS: 7647-10-1 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
-        },
-        {
-          "name": "Palladium(II) bromide",
-          "abbr": "PdBr2",
-          "cas": "13444-94-5",
-          "synonyms": [
-            "PdBr2",
-            "palladium dibromide"
-          ],
-          "properties": {
-            "color": "dark brown",
-            "air_stable": true
-          },
-          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) bromide | abbr: PdBr2 | CAS: 13444-94-5 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
+          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Dichloro-bis(acetonitrile)palladium(II) | abbr: Pd(MeCN)2Cl2 | CAS: 14592-56-4 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
         },
         {
           "name": "Palladium(II) acetate",
@@ -373,20 +359,6 @@
           "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) acetate | abbr: Pd(OAc)2 | CAS: 3375-31-3 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
         },
         {
-          "name": "Palladium(II) trifluoroacetate",
-          "abbr": "Pd(TFA)2",
-          "cas": "42196-31-6",
-          "synonyms": [
-            "Pd(TFA)2",
-            "palladium(II) trifluoroacetate"
-          ],
-          "properties": {
-            "color": "brown",
-            "air_stable": true
-          },
-          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) trifluoroacetate | abbr: Pd(TFA)2 | CAS: 42196-31-6 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
-        },
-        {
           "name": "Palladium(II) acetylacetonate",
           "abbr": "Pd(acac)2",
           "cas": "14024-61-4",
@@ -401,19 +373,48 @@
           "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) acetylacetonate | abbr: Pd(acac)2 | CAS: 14024-61-4 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
         },
         {
-          "name": "Dichloro-bis(acetonitrile)palladium(II)",
-          "abbr": "Pd(MeCN)2Cl2",
-          "cas": "14592-56-4",
+          "name": "Palladium(II) bromide",
+          "abbr": "PdBr2",
+          "cas": "13444-94-5",
           "synonyms": [
-            "(CH3CN)2PdCl2",
-            "dichloro-bis(acetonitrile)palladium(II)"
+            "PdBr2",
+            "palladium dibromide"
           ],
           "properties": {
-            "color": "dark orange",
+            "color": "dark brown",
             "air_stable": true
           },
-          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Dichloro-bis(acetonitrile)palladium(II) | abbr: Pd(MeCN)2Cl2 | CAS: 14592-56-4 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
+          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) bromide | abbr: PdBr2 | CAS: 13444-94-5 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
         },
+        {
+          "name": "Palladium(II) chloride",
+          "abbr": "PdCl2",
+          "cas": "7647-10-1",
+          "synonyms": [
+            "PdCl2",
+            "palladium dichloride"
+          ],
+          "properties": {
+            "color": "red-brown",
+            "air_stable": true
+          },
+          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) chloride | abbr: PdCl2 | CAS: 7647-10-1 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
+        },
+        {
+          "name": "Palladium(II) trifluoroacetate",
+          "abbr": "Pd(TFA)2",
+          "cas": "42196-31-6",
+          "synonyms": [
+            "Pd(TFA)2",
+            "palladium(II) trifluoroacetate"
+          ],
+          "properties": {
+            "color": "brown",
+            "air_stable": true
+          },
+          "embedding_text": "type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) trifluoroacetate | abbr: Pd(TFA)2 | CAS: 42196-31-6 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: "
+        },
+
         {
           "name": "Tetrakis(acetonitrile)palladium(II) bis(tetrafluoroborate)",
           "abbr": "Pd(MeCN)4(BF4)2",
