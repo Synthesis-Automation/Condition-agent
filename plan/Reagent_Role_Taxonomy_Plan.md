@@ -5,6 +5,7 @@
 ---
 
 ## Architecture (pipeline per reagent)
+
 **ingest (CAS)** → **resolve identity** → **role inference** → **type‑specific enrichment** → **validate** → **persist to taxonomies** → **emit KG edges** → **(optional) human review**
 
 ---
@@ -12,6 +13,7 @@
 ## 1) Identify the reagent role/type
 
 ### 1.1 Identity resolution (deterministic first)
+
 - **Normalize CAS**: regex check, strip spaces, zero‑pad segments.
 - **Lookups (ordered)**: internal registry → cached resolver DB → (when online) PubChem/CompTox/Cactus → vendor dumps.
 - **Persist**: `cas`, `inchikey`, `smiles`, `name`, `aliases[]`, `sources[]`, `resolution_confidence`.
@@ -19,6 +21,7 @@
 ### 1.2 Signals for role inference (priority order)
 
 **A. Structure/name rules (hard)**
+
 - d‑block metal + anions (`Cl`, `Br`, `OAc`, `acac`, `BF4`, `PF6`, `OTf`) → `metal_precursor`.
 - P(III) trivalent phosphorus or known phosphine name (`XPhos`, `SPhos`, `tBuBrettPhos`, `PPh3`, …) → `ligand:phosphine`.
 - `bpy|phen|terpy|dtbbpy` in name or N–N chelate SMARTS → `ligand:diimine`.
@@ -29,22 +32,29 @@
 - Supported catalysts (`Pd/C`, `Pd(OH)₂/C`, `SiliaCat…`) → `supported_precatalyst`.
 
 **B. Context signals (from reaction row, if available)**
+
 - `mol% ≤ 20` & co‑used with a metal salt → **ligand**.
 - `eq ≥ 0.5` & not volumetric → **base**.
 - Appears in “solvent” column or the **largest volume** → **solvent**.
-- Co‑occurs strongly with *known cores/families* (KG lift/support) → boost that role.
+- Co‑occurs strongly with _known cores/families_ (KG lift/support) → boost that role.
 
 **C. ML disambiguation (multi‑label)**
+
 - Features: name text, Morgan FP, descriptors (donors, charge, metal flags), context (eq, mol%, family), KG stats.
 - Model: one‑vs‑rest gradient boosting + **conformal prediction** to abstain OOD.
 
 **Output example**
+
 ```json
 {
   "primary_role": "ligand",
   "subrole": "phosphine_monodentate",
   "confidence": 0.89,
-  "evidence": {"rules":["R_P_MONO"],"context":["mol%≤10 with Pd"],"stats":{"lift_BH_N_1.9":true}}
+  "evidence": {
+    "rules": ["R_P_MONO"],
+    "context": ["mol%≤10 with Pd"],
+    "stats": { "lift_BH_N_1.9": true }
+  }
 }
 ```
 
@@ -53,6 +63,7 @@
 ## 2) Type‑specific enrichment (taxonomy fields)
 
 ### 2.1 Ligands
+
 - **Structural**: donor type (P/N/C‑carbene), denticity, chelate ring size, **bite angle** (if bidentate), **cone angle** (Tolman; table lookup), **%V_bur** (Sterimol/%V_bur pipeline), heteroatoms, MW.
 - **Families & aliases**: Buchwald class (XPhos/SPhos/etc.), biaryl vs chelating diphosphine vs NHC/diimine; common abbreviations.
 - **Electronic**: approximate TEP (if available), HOMO/LUMO (if you keep a computed table).
@@ -61,25 +72,34 @@
 - **Cross‑links**: known pre‑ligated complexes (e.g., `PdCl2(dppf)`).
 
 ### 2.2 Metal precursors
+
 - **Metal/oxidation state**, counter‑anions, **pre‑ligated?**, **requires_added_ligand?**, activation protocol hint (e.g., Pd(II)‑phosphine needs base; `Pd₂(dba)₃` → add phosphine).
 - **Solubility class** (qualitative), air/moisture sensitivity, support (if any).
 - **Preferred families** and typical ligand partners (from KG co‑occurrence).
 
 ### 2.3 Bases
+
 - **Category**: alkoxide / amide / carbonate / phosphate / fluoride / hydride / organic superbase.
 - **Basicity**: conjugate‑acid **pKₐ (DMSO)** and water; Brønsted vs Lewis; **nucleophilicity class**.
 - **Coordination tendency** (binds metals low/moderate/high), **hygroscopicity**, **bp/mp**, **solubility hints**.
 - **Compatibility flags**: “avoid with acid chlorides in DMSO”, “forms hemiaminal with aldehydes”, etc.
 
 ### 2.4 Solvents
+
 - **Physical**: DN/AN, **E_T(30)/E_T(N)**, dielectric, Hansen (δD/δP/δH), viscosity, bp, mp, water miscibility.
 - **Protic/aprotic**, coordinating/non‑coordinating, peroxide risk, **ESG/safety** class.
 
-### 2.5 Additives / coupling reagents / salts
+### coupling reagents
+
+- e.g. DCC for amine formation
+
+### 2.5 Additives // salts
+
 - **Function** (halide scavenger, fluoride source, phase‑transfer, oxidant/reductant).
 - **Strength/scale**: typical eq range; common pairings.
 
 **Populating the fields**
+
 - Compute from `SMILES` (RDKit descriptors, donor counts, metal presence).
 - Join to **reference tables** (cone angles, %V_bur, pKₐ, DN/AN, E_T(30)).
 - Attach **provenance** for each field: `computed|table|literature` with `source_id`.
@@ -138,8 +158,9 @@ class RegistryEntry(BaseModel):
     sources: list[dict] = []
     status: str = "provisional"
 ```
-  
+
 ### 3.2 Stores & file layout
+
 - `registry/registry.jsonl` (all compounds, 1 row per CAS)
 - `taxonomies/ligands.jsonl`
 - `taxonomies/bases.jsonl`
@@ -150,6 +171,7 @@ class RegistryEntry(BaseModel):
 All as **JSONL or Parquet**, versioned with CI schema checks.
 
 ### 3.3 Merge policy
+
 - If CAS exists → **update** fields only if:
   - the new value has higher confidence, or
   - the field was previously missing.
@@ -157,7 +179,9 @@ All as **JSONL or Parquet**, versioned with CI schema checks.
 - Conflict (e.g., two distinct InChIKeys for same CAS) → set `status="needs_review"` and open a review ticket; do **not** overwrite.
 
 ### 3.4 KG emission
+
 On write, create/update nodes and relations:
+
 - `(:Compound {cas})-[:HAS_ROLE {role, subrole, confidence}]->(:ReactionFamily)` (aggregated later)
 - If ligand: `(:Ligand {cas})-[:IS]->(:Compound {cas})`
 - If metal precursor: `(:MetalPrecursor {cas})-[:IS]->(:Compound {cas})`
@@ -167,34 +191,41 @@ On write, create/update nodes and relations:
 
 ## ETL pipeline (modules & flow)
 
-1) `resolve.py`
+1. `resolve.py`
+
    - `normalize_cas`, `resolve_identity(cas) → Identity` (with caching)
 
-2) `role_rules.yml` + `role_infer.py`
+2. `role_rules.yml` + `role_infer.py`
+
    - Stage‑1 rules (SMARTS + regex + lists)
    - Stage‑2 heuristic scorer
    - Stage‑3 ML (optional) + conformal wrapper
 
-3) `enrich_<role>.py`
+3. `enrich_<role>.py`
+
    - `enrich_ligand(identity) → LigandEntry`
    - `enrich_base(identity) → BaseEntry`
    - `enrich_metal_precursor(identity) → MetalPrecursorEntry`
    - Uses RDKit + your reference tables (cone angle, %V_bur, pKₐ, solvent properties)
 
-4) `validate.py`
+4. `validate.py`
+
    - Pydantic/SHACL checks; mandatory fields per role
 
-5) `persist.py`
+5. `persist.py`
+
    - Upserts into `registry.jsonl` and the specific `taxonomies/*.jsonl`
    - Writes provenance; bumps dataset/model versions
 
-6) `kg_writer.py`
+6. `kg_writer.py`
+
    - Upserts nodes/edges in Neo4j (or your graph store)
 
-7) `qa_eval.py`
+7. `qa_eval.py`
    - Batch metrics (precision@1, abstention rate), sample reports for human QA
 
 **Batch driver sketch**
+
 ```python
 for cas in new_cas_list:
     ident = resolve_identity(cas)
@@ -214,6 +245,7 @@ for cas in new_cas_list:
 ---
 
 ## Guardrails & promotion
+
 - **Abstain** if confidence < 0.5 → stash in `staging/` for review.
 - **Promote** `provisional → curated` when: consistent role in ≥N precedents, no conflicts for a period, passes spot QA.
 - **Auto‑learn**: retrain role classifier monthly using curated entries; refresh co‑occurrence stats.
@@ -221,6 +253,7 @@ for cas in new_cas_list:
 ---
 
 ## Deliverables checklist
+
 - [ ] `role_rules.yml` (≈60 starter rules: Pd/Ni/Cu + phosphines/NHC/bpy + common bases/solvents/additives)
 - [ ] `role_infer.py` (rules → heuristic → ML + conformal)
 - [ ] `schemas.py` (pydantic models above)
