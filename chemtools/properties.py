@@ -142,6 +142,36 @@ def _load_taxonomy_props() -> Tuple[Dict[str, Dict[str, Any]], Dict[str, str]]:
             for em in fam.get("example_members", []) or []:
                 add_member("ADDITIVE", "coupling_reagent", fam, em, extra={})
 
+    # Reductants (treated as ADDITIVE role)
+    red = load_json(os.path.join(d, "taxonomy_reductant.json"))
+    if red:
+        for fam in red.get("families", []) or []:
+            extra: Dict[str, Any] = {}
+            fam_class = fam.get("class")
+            if fam_class:
+                extra["reductant_class"] = fam_class
+            mechanism = fam.get("mechanism")
+            if mechanism:
+                extra["mechanism"] = mechanism
+            strength = fam.get("strength_index")
+            if strength is not None:
+                extra["strength_index"] = strength
+            recommended = fam.get("recommended_pairs")
+            if recommended:
+                extra["family_recommended_pairs"] = recommended
+            for em in fam.get("example_members", []) or []:
+                uid = (em.get("cas") or "").strip()
+                add_member("ADDITIVE", "reductant", fam, em, extra=extra)
+                if not uid or uid not in props:
+                    continue
+                entry = props[uid]
+                if em.get("properties"):
+                    entry["properties"] = em["properties"]
+                if em.get("recommended_pairs"):
+                    entry["recommended_pairs"] = em["recommended_pairs"]
+                if em.get("embedding_text") and "embedding_text" not in entry:
+                    entry["embedding_text"] = em["embedding_text"]
+
     # Catalyst precursors (metal) → provide generic_core from family metal
     cat = load_json(os.path.join(d, "taxonomy_catalysts_precursor.json"))
     if cat:

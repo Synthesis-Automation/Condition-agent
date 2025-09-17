@@ -1,0 +1,302 @@
+{
+  "kind": "reductant",
+  "version": "1.0.0",
+  "updated": "2025-09-16",
+  "schema": {
+    "family_id": "stable identifier",
+    "label": "human-readable family name",
+    "class": "reductant family class",
+    "mechanism": "primary mode(s): SET, hydride transfer, HAT, PCET",
+    "strength_index": "coarse scale 1–5 within class (contextual)",
+    "aliases": "synonyms/abbreviations",
+    "use_cases": "typical reactions this family serves",
+    "best_for": "positive selector cues",
+    "avoid_when": "contraindications",
+    "ehs_green": "EHS/green flags",
+    "recommended_pairs": "see catalysts schema",
+    "example_members": "array of examples"
+  },
+  "schema_extensions": {
+    "example_members[*].properties": "{state, concentration, air_stable?, moisture_sensitive?}",
+    "example_members[*].recommended_pairs": "member-level guidance"
+  },
+  "families": [
+    {
+      "family_id": "metal_powders",
+      "label": "Metal Powders (Zn, Mn, Fe)",
+      "class": "metal reductants",
+      "mechanism": [
+        "SET"
+      ],
+      "strength_index": 3,
+      "aliases": [],
+      "use_cases": [
+        "Reductive cross-electrophile couplings (Ni)",
+        "Debrominations"
+      ],
+      "best_for": [
+        "Aryl–alkyl couplings under Ni catalysis"
+      ],
+      "avoid_when": [
+        "Acidic media with H2 evolution"
+      ],
+      "ehs_green": {},
+      "recommended_pairs": [
+        {
+          "for_reactions": [
+            "Reductive cross-electrophile coupling"
+          ],
+          "with_ligand": {
+            "family_id": "bipyridines",
+            "examples": [
+              "dtbbpy"
+            ]
+          },
+          "co_reagents": {
+            "salt": [
+              "NaI",
+              "TBAB"
+            ]
+          },
+          "solvents": [
+            "DMA",
+            "DMF"
+          ],
+          "temp_C": [
+            25,
+            80
+          ]
+        }
+      ],
+      "example_members": [
+        {
+          "name": "Zinc dust",
+          "abbr": "Zn",
+          "cas": "7440-66-6",
+          "synonyms": [
+            "Zn powder"
+          ],
+          "properties": {
+            "state": "solid",
+            "air_stable": true
+          },
+          "embedding_text": "type: REDUCTANT | family: Metal Powders (Zn, Mn, Fe) (metal_powders) | name: Zinc dust | abbr: Zn | CAS: 7440-66-6 | use_cases: Cross-electrophile"
+        },
+        {
+          "name": "Manganese powder",
+          "abbr": "Mn",
+          "cas": "7439-96-5",
+          "synonyms": [
+            "Mn powder"
+          ],
+          "properties": {
+            "state": "solid",
+            "air_stable": true
+          },
+          "embedding_text": "type: REDUCTANT | family: Metal Powders (Zn, Mn, Fe) (metal_powders) | name: Manganese powder | abbr: Mn | CAS: 7439-96-5 | use_cases: Cross-electrophile"
+        }
+      ]
+    },
+    {
+      "family_id": "hydrosilanes",
+      "label": "Hydrosilanes",
+      "class": "Si–H donors",
+      "mechanism": [
+        "Hydride transfer",
+        "Radical HAT"
+      ],
+      "strength_index": 2,
+      "aliases": [],
+      "use_cases": [
+        "Hydrosilylation",
+        "Reductive couplings",
+        "O-demethylation"
+      ],
+      "best_for": [
+        "Reducing metal centers or carbonyls under mild conditions"
+      ],
+      "avoid_when": [
+        "Strong acids (decompose)"
+      ],
+      "ehs_green": {},
+      "recommended_pairs": [],
+      "example_members": [
+        {
+          "name": "Polymethylhydrosiloxane",
+          "abbr": "PMHS",
+          "cas": "63148-57-2",
+          "synonyms": [
+            "PMHS"
+          ],
+          "properties": {
+            "state": "liquid",
+            "air_stable": true
+          },
+          "embedding_text": "type: REDUCTANT | family: Hydrosilanes (hydrosilanes) | name: Polymethylhydrosiloxane | abbr: PMHS | CAS: 63148-57-2 | use_cases: Hydrosilylation"
+        },
+        {
+          "name": "1,1,3,3-Tetramethyldisiloxane",
+          "abbr": "TMDS",
+          "cas": "3277-26-7",
+          "synonyms": [
+            "TMDS"
+          ],
+          "properties": {
+            "state": "liquid",
+            "air_stable": true
+          },
+          "embedding_text": "type: REDUCTANT | family: Hydrosilanes (hydrosilanes) | name: 1,1,3,3-Tetramethyldisiloxane | abbr: TMDS | CAS: 3277-26-7 | use_cases: Hydrosilylation"
+        }
+      ]
+    },
+    {
+      "family_id": "complex_hydrides",
+      "label": "Complex Hydrides (Borohydrides/Al hydrides)",
+      "class": "H- donors",
+      "mechanism": [
+        "Hydride transfer"
+      ],
+      "strength_index": 4,
+      "aliases": [],
+      "use_cases": [
+        "Carbonyl reductions",
+        "Reductive aminations"
+      ],
+      "best_for": [
+        "Chemoselective reductions at lab scale"
+      ],
+      "avoid_when": [
+        "Incompatible functionalities (LiAlH4 with esters/acid chlorides exothermic)"
+      ],
+      "ehs_green": {},
+      "recommended_pairs": [],
+      "example_members": [
+        {
+          "name": "Sodium borohydride",
+          "abbr": "NaBH4",
+          "cas": "16940-66-2",
+          "synonyms": [
+            "sodium tetrahydroborate"
+          ],
+          "properties": {
+            "state": "solid",
+            "air_stable": false
+          },
+          "embedding_text": "type: REDUCTANT | family: Complex Hydrides (Borohydrides/Al hydrides) (complex_hydrides) | name: Sodium borohydride | abbr: NaBH4 | CAS: 16940-66-2 | use_cases: Carbonyl reduction"
+        },
+        {
+          "name": "Lithium aluminum hydride",
+          "abbr": "LiAlH4",
+          "cas": "16853-85-3",
+          "synonyms": [
+            "LAH"
+          ],
+          "properties": {
+            "state": "solid",
+            "air_stable": false,
+            "moisture_sensitive": true
+          },
+          "embedding_text": "type: REDUCTANT | family: Complex Hydrides (Borohydrides/Al hydrides) (complex_hydrides) | name: Lithium aluminum hydride | abbr: LiAlH4 | CAS: 16853-85-3 | use_cases: Strong reductions"
+        }
+      ]
+    },
+    {
+      "family_id": "organic_reductants",
+      "label": "Organic Reductants (Hantzsch ester, TDAE, ascorbate)",
+      "class": "organic electron/hydride donors",
+      "mechanism": [
+        "SET",
+        "Hydride transfer"
+      ],
+      "strength_index": 2,
+      "aliases": [],
+      "use_cases": [
+        "Photoredox reductive couplings",
+        "Organocatalytic reductions"
+      ],
+      "best_for": [
+        "Mild, functional-group-tolerant reductions"
+      ],
+      "avoid_when": [
+        "Air/O2 sensitive (TDAE)"
+      ],
+      "ehs_green": {},
+      "recommended_pairs": [],
+      "example_members": [
+        {
+          "name": "Hantzsch ester",
+          "abbr": "HEH",
+          "cas": "13063-86-4",
+          "synonyms": [
+            "diethyl 1,4-dihydro-2,6-dimethyl-3,5-pyridinedicarboxylate"
+          ],
+          "properties": {
+            "state": "solid",
+            "air_stable": true
+          },
+          "embedding_text": "type: REDUCTANT | family: Organic Reductants (organic_reductants) | name: Hantzsch ester | abbr: HEH | CAS: 13063-86-4 | use_cases: Photoredox"
+        }
+      ]
+    },
+    {
+      "family_id": "hydrogen_gas",
+      "label": "Hydrogen Gas",
+      "class": "H2",
+      "mechanism": [
+        "H2 transfer (catalytic)"
+      ],
+      "strength_index": 3,
+      "aliases": [],
+      "use_cases": [
+        "Hydrogenation",
+        "Hydrogenolysis"
+      ],
+      "best_for": [
+        "Clean reductions with minimal byproducts"
+      ],
+      "avoid_when": [
+        "Explosive with air"
+      ],
+      "ehs_green": {},
+      "recommended_pairs": [],
+      "example_members": [
+        {
+          "name": "Hydrogen (g)",
+          "abbr": "H2",
+          "cas": "1333-74-0",
+          "synonyms": [
+            "dihydrogen"
+          ],
+          "properties": {
+            "state": "gas",
+            "air_stable": false
+          },
+          "embedding_text": "type: REDUCTANT | family: Hydrogen Gas (hydrogen_gas) | name: Hydrogen (g) | abbr: H2 | CAS: 1333-74-0 | use_cases: Hydrogenation"
+        }
+      ]
+    }
+  ],
+  "vectorization_hints": {
+    "rank_maps": {
+      "strength_index": {
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5
+      }
+    },
+    "bag_of_terms_fields": [
+      "mechanism",
+      "use_cases",
+      "best_for",
+      "avoid_when"
+    ],
+    "embedding_field_preference": [
+      "example_members[*].embedding_text",
+      "example_members[*].name",
+      "example_members[*].abbr",
+      "example_members[*].synonyms"
+    ]
+  }
+}

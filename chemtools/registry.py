@@ -281,6 +281,48 @@ def _load_registry_from_taxonomy() -> _RegistryIndex:
                 _add_alias(idx, uid, fam_label)
                 _add_alias(idx, uid, fam_id)
 
+    # Reductants -> ADDITIVE role with reductant compound_type
+    red = load("taxonomy_reductant.json")
+    if red:
+        for fam in red.get("families", []) or []:
+            fam_label = fam.get("label")
+            fam_id = fam.get("family_id")
+            fam_class = fam.get("class")
+            mechanism = fam.get("mechanism")
+            strength_index = fam.get("strength_index")
+            for em in fam.get("example_members", []) or []:
+                uid = (em.get("cas") or "").strip()
+                if not uid:
+                    continue
+                name = (em.get("name") or uid).strip()
+                abbr = (em.get("abbr") or None)
+                token = (abbr or name or uid)
+                rec = {
+                    "uid": uid,
+                    "cas": uid,
+                    "role": "ADDITIVE",
+                    "name": name,
+                    "abbreviation": abbr,
+                    "token": token,
+                    "generic_core": None,
+                    "compound_type": "reductant",
+                    "aliases": (em.get("synonyms") or []),
+                }
+                if fam_class:
+                    rec["reductant_class"] = fam_class
+                if mechanism:
+                    rec["mechanism"] = mechanism
+                if strength_index is not None:
+                    rec["strength_index"] = strength_index
+                if em.get("recommended_pairs"):
+                    rec["recommended_pairs"] = em["recommended_pairs"]
+                if em.get("properties"):
+                    rec["properties"] = em["properties"]
+                idx.add_record(rec)
+                _add_alias(idx, uid, fam_label)
+                _add_alias(idx, uid, fam_id)
+                _add_alias(idx, uid, fam_class)
+
     # Catalysts precursors -> CATALYST, generic_core from family metal
     cat = load("taxonomy_catalysts_precursor.json")
     if cat:

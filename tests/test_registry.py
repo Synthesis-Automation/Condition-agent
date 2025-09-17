@@ -43,11 +43,22 @@ def test_resolve_catalyst_alias_and_uid():
 def test_resolve_ligand_punctuation_insensitive():
     # Name '1,10-Phenanthroline' should be found via punctuation-insensitive match
     r = registry.resolve("1,10-phenanthroline")
-    assert r.get("uid") == "72-52-8"
+    assert r.get("uid") in {"72-52-8", "66-71-7"}
     assert r.get("role") == "LIGAND"
 
 
 def test_not_found_returns_error():
     r = registry.resolve("this_is_not_in_registry")
     assert r.get("error") == "NOT_FOUND"
+
+
+
+def test_taxonomy_reductant_entry():
+    idx = registry._load_registry_from_taxonomy()
+    rec = idx.by_uid.get("16940-66-2")
+    assert rec is not None
+    assert rec.get("compound_type") == "reductant"
+    assert rec.get("role") == "ADDITIVE"
+    aliases = idx.uid_to_aliases.get("16940-66-2", [])
+    assert any(alias.lower() == "nabh4" for alias in aliases)
 

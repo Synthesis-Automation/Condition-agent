@@ -26,6 +26,7 @@ ROLE_FILES: Dict[str, str] = {
     "solvent": "taxonomy_solvent.json",
     "coupling_reagent": "taxonomy_coupling_reagent.json",
     "metal_precursor": "taxonomy_catalysts_precursor.json",
+    "reductant": "taxonomy_reductant.json",
 }
 
 DEFAULT_FAMILY_BY_ROLE: Dict[str, str] = {
@@ -34,6 +35,7 @@ DEFAULT_FAMILY_BY_ROLE: Dict[str, str] = {
     "solvent": "hydrocarbons_aromatic",
     "coupling_reagent": "carbodiimides",
     "metal_precursor": "pd_ii_salts",
+    "reductant": "metal_powders",
 }
 
 ROLE_PRIORITY: Dict[str, int] = {
@@ -42,6 +44,7 @@ ROLE_PRIORITY: Dict[str, int] = {
     "base": 2,
     "coupling_reagent": 3,
     "solvent": 4,
+    "reductant": 5,
 }
 
 ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
@@ -97,6 +100,16 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
         r"iron",
         r"precatalyst",
     ],
+    "reductant": [
+        r"reductant",
+        r"reducing agent",
+        r"borohydride",
+        r"hydride",
+        r"silane",
+        r"heh",
+        r"nabh4",
+        r"lialh4",
+    ],
 }
 
 MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
@@ -108,6 +121,9 @@ MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
     r"\bcdi\b": ("coupling_reagent", "imidazolide_formers"),
     r"\bdbu\b": ("base", "amidine_guanidine_bases"),
     r"\bdbn\b": ("base", "amidine_guanidine_bases"),
+    r"\bnabh4\b": ("reductant", "complex_hydrides"),
+    r"\blialh4\b": ("reductant", "complex_hydrides"),
+    r"\bhantzsch\b": ("reductant", "organic_reductants"),
 }
 
 for _stream in ("stdout", "stderr"):
@@ -500,6 +516,16 @@ EMBEDDING_FIELD_MAP: Dict[str, Sequence[Tuple[str, str]]] = {
         ("avoid_when", "avoid_when"),
         ("handling", "handling"),
         ("additional_ligand", "additional_ligand"),
+        ("recommended_pairs", "recommended_pairs"),
+        ("ehs_green", "ehs"),
+    ),
+    "reductant": (
+        ("class", "class"),
+        ("mechanism", "mechanism"),
+        ("strength_index", "strength"),
+        ("use_cases", "use_cases"),
+        ("best_for", "best_for"),
+        ("avoid_when", "avoid_when"),
         ("recommended_pairs", "recommended_pairs"),
         ("ehs_green", "ehs"),
     ),

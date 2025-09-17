@@ -37,6 +37,7 @@ def _make_test_cas(digits: str) -> str:
     [
         ("XPhos", ["XPhos"], "dialkylbiaryl_phosphines"),
         ("Potassium tert-butoxide", ["KOtBu"], "alkoxides_hindered"),
+        ("Sodium borohydride", ["NaBH4"], "complex_hydrides"),
     ],
 )
 def test_infer_family_from_tokens(tmp_path, name, synonyms, expected_family):
@@ -123,3 +124,18 @@ def test_auto_resolve_populates_name(monkeypatch, tmp_path, capsys):
     entry_preview = payload.get("entry_preview")
     assert entry_preview
     assert entry_preview["synonyms"][0] == "StubLigand"
+
+
+def test_default_family_for_reductant(tmp_path):
+    taxonomy_dir = _copy_taxonomy(Path(tmp_path))
+    store = rrg.TaxonomyStore(taxonomy_dir)
+    heuristics = rrg.RoleHeuristics(store)
+    assert heuristics.default_family_for_role("reductant") == "metal_powders"
+
+def test_list_families_includes_reductant(tmp_path):
+    taxonomy_dir = _copy_taxonomy(Path(tmp_path))
+    store = rrg.TaxonomyStore(taxonomy_dir)
+    families = [fid for role, fid, _ in store.list_families("reductant")]
+    assert "metal_powders" in families
+    assert len(families) >= 1
+
