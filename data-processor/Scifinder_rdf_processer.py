@@ -2,7 +2,6 @@
 """
 Simple Qt6 GUI wrapper for processing RDF files only.
 Lets the user pick a folder containing RDF files and processes all RDF files in the folder.
-Generates Markdown and JSONL outputs similar to combined_md_to_rich_report.py.
 Works with PySide6 (preferred) or PyQt6 if installed.
 """
 from __future__ import annotations
