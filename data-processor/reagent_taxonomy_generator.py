@@ -121,6 +121,8 @@ MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
     r"\bcdi\b": ("coupling_reagent", "imidazolide_formers"),
     r"\bdbu\b": ("base", "amidine_guanidine_bases"),
     r"\bdbn\b": ("base", "amidine_guanidine_bases"),
+    r"\b(?:potassium|sodium|cesium|caesium|lithium|rubidium|ammonium)\s+acetate\b": ("base", "inorg_carboxylates"),
+    r"\b(?:k|na|cs|li|rb|nh4)oa?c\b": ("base", "inorg_carboxylates"),
     r"\bnabh4\b": ("reductant", "complex_hydrides"),
     r"\blialh4\b": ("reductant", "complex_hydrides"),
     r"\bhantzsch\b": ("reductant", "organic_reductants"),

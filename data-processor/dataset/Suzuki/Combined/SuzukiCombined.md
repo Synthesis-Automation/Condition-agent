@@ -883,7 +883,7 @@ Total reactions: 17173
 - Yield %: 84
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
-- SMILES: O=[N+]([O-])c1ccc(Br)cc1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C.O=Cc1ccc(Br)o1 >> O=Cc1ccc(-c2ccc(-c3ccc([N+](=O)[O-])cc3)s2)o1
+- SMILES: O=[N+]([O-])c1ccc(Br)cc1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C.O=Cc1ccc(Br)o1 >> O=Cc1ccc(-c2ccc(-c3ccc([N+](=O)[O-])cc3)s2)o1
 
 ## Reaction 31-130-CAS-1129577
 
@@ -891,7 +891,7 @@ Total reactions: 17173
 - Condition Core: Pd/XPhos
 - Yield %: 81
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: Brc1ccc(I)nc1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(Br)cn3)s2)OC1(C)C
+- SMILES: Brc1ccc(I)nc1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(Br)cn3)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-12282836
 
@@ -899,7 +899,7 @@ Total reactions: 17173
 - Condition Core: Pd/SPhos
 - Yield %: 76
 - Solvents: Toluene (108-88-3)
-- SMILES: COC(=O)c1ccc(Br)o1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> COC(=O)c1ccc(-c2ccc(B3OC(C)(C)C(C)(C)O3)s2)o1
+- SMILES: COC(=O)c1ccc(Br)o1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> COC(=O)c1ccc(-c2ccc(B3OC(C)(C)C(C)(C)O3)s2)o1
 
 ## Reaction 31-130-CAS-13267330
 
@@ -908,7 +908,7 @@ Total reactions: 17173
 - Yield %: 70
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
-- SMILES: COc1cccc(Br)c1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C.O=Cc1ccc(Br)o1 >> COc1cccc(-c2ccc(-c3ccc(C=O)o3)s2)c1
+- SMILES: COc1cccc(Br)c1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C.O=Cc1ccc(Br)o1 >> COc1cccc(-c2ccc(-c3ccc(C=O)o3)s2)c1
 
 ## Reaction 31-130-CAS-14142373
 
@@ -916,7 +916,7 @@ Total reactions: 17173
 - Condition Core: Pd/SPhos
 - Yield %: 81
 - Solvents: Toluene (108-88-3)
-- SMILES: Brc1cccnc1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3cccnc3)s2)OC1(C)C
+- SMILES: Brc1cccnc1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3cccnc3)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-1455221
 
@@ -924,7 +924,7 @@ Total reactions: 17173
 - Condition Core: Pd/XPhos
 - Yield %: 89
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: Brc1ccc(I)s1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(Br)s3)s2)OC1(C)C
+- SMILES: Brc1ccc(I)s1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(Br)s3)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-14853545
 
@@ -933,7 +933,7 @@ Total reactions: 17173
 - Yield %: 7
 - Time (h): 0.333
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: CCCCCCc1cc(I)sc1Br.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CCCCCCc1cc(I)sc1-c1ccc(B2OC(C)(C)C(C)(C)O2)s1.CCCCCCc1cc(Br)sc1-c1ccc(B2OC(C)(C)C(C)(C)O2)s1
+- SMILES: CCCCCCc1cc(I)sc1Br.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CCCCCCc1cc(I)sc1-c1ccc(B2OC(C)(C)C(C)(C)O2)s1.CCCCCCc1cc(Br)sc1-c1ccc(B2OC(C)(C)C(C)(C)O2)s1
 
 ## Reaction 31-130-CAS-16579979
 
@@ -941,7 +941,7 @@ Total reactions: 17173
 - Condition Core: Pd/XPhos
 - Yield %: 88
 - Solvents: Toluene (108-88-3)
-- SMILES: O=Cc1ccc(Br)s1.Cc1cc(C)c(B(c2ccc(-c3cc[c]([Sn]([CH3])([CH3])[CH3])s3)s2)c2c(C)cc(C)cc2C)c(C)c1 >> Cc1cc(C)c(B(c2ccc(-c3ccc(-c4ccc(C=O)s4)s3)s2)c2c(C)cc(C)cc2C)c(C)c1
+- SMILES: O=Cc1ccc(Br)s1.Cc1cc(C)c(B(c2ccc(-c3ccc([Sn](C)(C)C)s3)s2)c2c(C)cc(C)cc2C)c(C)c1 >> Cc1cc(C)c(B(c2ccc(-c3ccc(-c4ccc(C=O)s4)s3)s2)c2c(C)cc(C)cc2C)c(C)c1
 
 ## Reaction 31-130-CAS-20333833
 
@@ -949,7 +949,7 @@ Total reactions: 17173
 - Condition Core: Pd/XPhos
 - Yield %: 89
 - Solvents: Toluene (108-88-3)
-- SMILES: CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[c]1cccc(Cl)n1.CC1(C)OB(c2cc(Br)nc(Br)c2)OC1(C)C >> CC1(C)OB(c2cc(-c3cccc(Cl)n3)nc(-c3cccc(Cl)n3)c2)OC1(C)C
+- SMILES: CCCC[Sn](CCCC)(CCCC)c1cccc(Cl)n1.CC1(C)OB(c2cc(Br)nc(Br)c2)OC1(C)C >> CC1(C)OB(c2cc(-c3cccc(Cl)n3)nc(-c3cccc(Cl)n3)c2)OC1(C)C
 
 ## Reaction 31-130-CAS-22493127
 
@@ -966,7 +966,7 @@ Total reactions: 17173
 - Condition Core: Pd/XPhos
 - Yield %: 89
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
-- SMILES: [CH3][Sn]([CH3])([CH3])[c]1ccc(-c2ccc(-c3cc[c]([Sn]([CH3])([CH3])[CH3])s3)s2)s1.Cc1cc(C)c(B(c2ccc(Br)s2)c2c(C)cc(C)cc2C)c(C)c1 >> Cc1cc(C)c(B(c2ccc(-c3ccc(-c4ccc(-c5ccc(-c6ccc(B(c7c(C)cc(C)cc7C)c7c(C)cc(C)cc7C)s6)s5)s4)s3)s2)c2c(C)cc(C)cc2C)c(C)c1
+- SMILES: C[Sn](C)(C)c1ccc(-c2ccc(-c3ccc([Sn](C)(C)C)s3)s2)s1.Cc1cc(C)c(B(c2ccc(Br)s2)c2c(C)cc(C)cc2C)c(C)c1 >> Cc1cc(C)c(B(c2ccc(-c3ccc(-c4ccc(-c5ccc(-c6ccc(B(c7c(C)cc(C)cc7C)c7c(C)cc(C)cc7C)s6)s5)s4)s3)s2)c2c(C)cc(C)cc2C)c(C)c1
 
 ## Reaction 31-130-CAS-3253145
 
@@ -975,7 +975,7 @@ Total reactions: 17173
 - Yield %: 78
 - Reagents: 1003-09-4 (1003-09-4) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: Ic1cccs1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3cccs3)s2)OC1(C)C
+- SMILES: Ic1cccs1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3cccs3)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-3599002
 
@@ -983,7 +983,7 @@ Total reactions: 17173
 - Condition Core: Pd/XPhos
 - Yield %: 79
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: Brc1ccsc1I.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3sccc3Br)s2)OC1(C)C
+- SMILES: Brc1ccsc1I.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3sccc3Br)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-6001976
 
@@ -991,7 +991,7 @@ Total reactions: 17173
 - Condition Core: Pd/XPhos
 - Yield %: 82
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: O=S(=O)(Oc1ccc(I)nc1Br)C(F)(F)F.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(OS(=O)(=O)C(F)(F)F)c(Br)n3)s2)OC1(C)C
+- SMILES: O=S(=O)(Oc1ccc(I)nc1Br)C(F)(F)F.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(OS(=O)(=O)C(F)(F)F)c(Br)n3)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-736312
 
@@ -999,7 +999,7 @@ Total reactions: 17173
 - Condition Core: Pd/SPhos
 - Yield %: 95
 - Solvents: Toluene (108-88-3)
-- SMILES: O=Cc1ccc(Br)o1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(C=O)o3)s2)OC1(C)C
+- SMILES: O=Cc1ccc(Br)o1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccc(C=O)o3)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-7522837
 
@@ -1008,7 +1008,7 @@ Total reactions: 17173
 - Yield %: 89
 - Reagents: 109-04-6 (109-04-6) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: Ic1ccccn1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccccn3)s2)OC1(C)C
+- SMILES: Ic1ccccn1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C >> CC1(C)OB(c2ccc(-c3ccccn3)s2)OC1(C)C
 
 ## Reaction 31-130-CAS-9017366
 
@@ -1017,7 +1017,7 @@ Total reactions: 17173
 - Yield %: 76
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
-- SMILES: Brc1ccccc1.CC1(C)OB(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)OC1(C)C.O=Cc1ccc(Br)o1 >> O=Cc1ccc(-c2ccc(-c3ccccc3)s2)o1
+- SMILES: Brc1ccccc1.CC1(C)OB(c2ccc([Sn](C)(C)C)s2)OC1(C)C.O=Cc1ccc(Br)o1 >> O=Cc1ccc(-c2ccc(-c3ccccc3)s2)o1
 
 ## Reaction 31-141-CAS-22401855
 
@@ -5720,7 +5720,7 @@ Total reactions: 17173
 - Yield %: 51
 - Reagents: Cesium carbonate (534-17-8) [BASE], 7647-01-0 (7647-01-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Water (7732-18-5)
-- SMILES: CCOC(=O)c1cn([C@@H]2O[C@H](COC(=O)c3ccccc3)[C@@H](OC(=O)c3ccccc3)[C@H]2OC(=O)c2ccccc2)c2ccc(Br)cc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4[n]5->[Zn+2]67<-[n]8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(C2OC(COC(=O)c3ccccc3)C(OC(=O)c3ccccc3)C2OC(=O)c2ccccc2)c2ccc(-c3cc4c(-c5ccccc5)c5[n]6->[Zn+2]78<-[n]9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)cc2c1=O
+- SMILES: CCOC(=O)c1cn([C@@H]2O[C@H](COC(=O)c3ccccc3)[C@@H](OC(=O)c3ccccc3)[C@H]2OC(=O)c2ccccc2)c2ccc(Br)cc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4n5->[Zn+2]67<-n8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(C2OC(COC(=O)c3ccccc3)C(OC(=O)c3ccccc3)C2OC(=O)c2ccccc2)c2ccc(-c3cc4c(-c5ccccc5)c5n6->[Zn+2]78<-n9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)cc2c1=O
 
 ## Reaction 31-177-CAS-11108078
 
@@ -5746,7 +5746,7 @@ Total reactions: 17173
 - Yield %: 82
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(Br)ccc(c6ccc(c2c36)C1=O)c54.CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(-c6c7[n]8->[Zn+2]9%10<-[n]%11c(cc%12ccc(c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc6[n-]->%107)ccc(c6ccc(c2c36)C1=O)c54
+- SMILES: CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(Br)ccc(c6ccc(c2c36)C1=O)c54.CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(-c6c7n8->[Zn+2]9%10<-n%11c(cc%12ccc(c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc6[n-]->%107)ccc(c6ccc(c2c36)C1=O)c54
 
 ## Reaction 31-177-CAS-11255374
 
@@ -5755,7 +5755,7 @@ Total reactions: 17173
 - Yield %: 75
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: Cc1cc(C)c(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c(C)c1.CC(C)(C)c1ccc(-c2cc3c4c5c2cccc5c2cccc5c(Br)cc(c4c52)n3Cc2cc(C(C)(C)C)cc(C(C)(C)C)c2)cc1 >> Cc1cc(C)c(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(-c5cc7c8c9c5cccc9c5cccc9c(-c%10ccc(C(C)(C)C)cc%10)cc(c8c95)n7Cc5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)c(C)c1
+- SMILES: Cc1cc(C)c(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c(C)c1.CC(C)(C)c1ccc(-c2cc3c4c5c2cccc5c2cccc5c(Br)cc(c4c52)n3Cc2cc(C(C)(C)C)cc(C(C)(C)C)c2)cc1 >> Cc1cc(C)c(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(-c5cc7c8c9c5cccc9c5cccc9c(-c%10ccc(C(C)(C)C)cc%10)cc(c8c95)n7Cc5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)c(C)c1
 
 ## Reaction 31-177-CAS-1127801
 
@@ -5922,7 +5922,7 @@ Total reactions: 17173
 - Yield %: 86
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: Clc1sccc1Br.CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccsc5Cl)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: Clc1sccc1Br.CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccsc5Cl)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-177-CAS-11937154
 
@@ -6105,7 +6105,7 @@ Total reactions: 17173
 - Yield %: 50
 - Reagents: Cesium carbonate (534-17-8) [BASE], 7647-01-0 (7647-01-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Water (7732-18-5)
-- SMILES: CCOC(=O)c1cn([C@@H]2O[C@H](COC(=O)c3ccccc3)[C@@H](OC(=O)c3ccccc3)[C@H]2OC(=O)c2ccccc2)c2cc(Br)ccc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4[n]5->[Zn+2]67<-[n]8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(C2OC(COC(=O)c3ccccc3)C(OC(=O)c3ccccc3)C2OC(=O)c2ccccc2)c2cc(-c3cc4c(-c5ccccc5)c5[n]6->[Zn+2]78<-[n]9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)ccc2c1=O
+- SMILES: CCOC(=O)c1cn([C@@H]2O[C@H](COC(=O)c3ccccc3)[C@@H](OC(=O)c3ccccc3)[C@H]2OC(=O)c2ccccc2)c2cc(Br)ccc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4n5->[Zn+2]67<-n8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(C2OC(COC(=O)c3ccccc3)C(OC(=O)c3ccccc3)C2OC(=O)c2ccccc2)c2cc(-c3cc4c(-c5ccccc5)c5n6->[Zn+2]78<-n9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)ccc2c1=O
 
 ## Reaction 31-177-CAS-12997721
 
@@ -6330,7 +6330,7 @@ Total reactions: 17173
 - Yield %: 58
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)[Si](C#Cc1c2[n]3->[Ni+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(C#C[Si](C(C)C)(C(C)C)C(C)C)c1ccc(c(Br)c3C=C2)[n-]->51)(C(C)C)C(C)C.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)[Si](C#Cc1c2[n]3->[Ni+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(C#C[Si](C(C)C)(C(C)C)C(C)C)c1ccc(c(-c4c6[n]7->[Ni+2]89<-[n]%10c(c(-c%11ccccc%11)c%11ccc(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c7C=C6)[n-]->8%11)C=Cc%10c(-c6cc(C(C)(C)C)cc(C(C)(C)C)c6)c6ccc4[n-]->96)c3C=C2)[n-]->51)(C(C)C)C(C)C
+- SMILES: CC(C)[Si](C#Cc1c2n3->[Ni+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(C#C[Si](C(C)C)(C(C)C)C(C)C)c1ccc(c(Br)c3C=C2)[n-]->51)(C(C)C)C(C)C.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)[Si](C#Cc1c2n3->[Ni+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(C#C[Si](C(C)C)(C(C)C)C(C)C)c1ccc(c(-c4c6n7->[Ni+2]89<-n%10c(c(-c%11ccccc%11)c%11ccc(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c7C=C6)[n-]->8%11)C=Cc%10c(-c6cc(C(C)(C)C)cc(C(C)(C)C)c6)c6ccc4[n-]->96)c3C=C2)[n-]->51)(C(C)C)C(C)C
 
 ## Reaction 31-177-CAS-14291187
 
@@ -6339,7 +6339,7 @@ Total reactions: 17173
 - Yield %: 76
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK], Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CCn1c2ccc(Br)cc2c2cc(Br)ccc21.CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CCn1c2ccc(Br)cc2c2cc(C3=Cc4c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c5ccc6c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7[n]8->[Zn+2]9(<-[n]4c3cc3c(-c4ccc%10c(c4)c4cc(Br)ccc4n%10CC)cc(c(-c4cc(C(C)(C)C)cc(C(C)(C)C)c4)c8C=C7)[n-]->93)<-[n-]56)ccc21
+- SMILES: CCn1c2ccc(Br)cc2c2cc(Br)ccc21.CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CCn1c2ccc(Br)cc2c2cc(C3=Cc4c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c5ccc6c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7n8->[Zn+2]9(<-n4c3cc3c(-c4ccc%10c(c4)c4cc(Br)ccc4n%10CC)cc(c(-c4cc(C(C)(C)C)cc(C(C)(C)C)c4)c8C=C7)[n-]->93)<-[n-]56)ccc21
 
 ## Reaction 31-177-CAS-14326078
 
@@ -7636,7 +7636,7 @@ Total reactions: 17173
 - Yield %: 98
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CCOC(=O)c1ccsc1Br.CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(c(B7OC(C)(C)C(C)(C)O7)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(N(c4ccc(CCCCCC)cc4)c4ccc(CCCCCC)cc4)c3C=C2)[n-]->51 >> CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(c(-c7sccc7C(=O)OCC)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(N(c4ccc(CCCCCC)cc4)c4ccc(CCCCCC)cc4)c3C=C2)[n-]->51
+- SMILES: CCOC(=O)c1ccsc1Br.CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(c(B7OC(C)(C)C(C)(C)O7)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(N(c4ccc(CCCCCC)cc4)c4ccc(CCCCCC)cc4)c3C=C2)[n-]->51 >> CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(c(-c7sccc7C(=O)OCC)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(N(c4ccc(CCCCCC)cc4)c4ccc(CCCCCC)cc4)c3C=C2)[n-]->51
 
 ## Reaction 31-177-CAS-22532874
 
@@ -7645,7 +7645,7 @@ Total reactions: 17173
 - Yield %: 54
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CCOC(=O)c1ccsc1Br.CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(c(C#C[Si](C(C)C)(C(C)C)C(C)C)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(B4OC(C)(C)C(C)(C)O4)c3C=C2)[n-]->51 >> CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(c(C#C[Si](C(C)C)(C(C)C)C(C)C)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(-c4sccc4C(=O)OCC)c3C=C2)[n-]->51
+- SMILES: CCOC(=O)c1ccsc1Br.CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(c(C#C[Si](C(C)C)(C(C)C)C(C)C)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(B4OC(C)(C)C(C)(C)O4)c3C=C2)[n-]->51 >> CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(c(C#C[Si](C(C)C)(C(C)C)C(C)C)c7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(c(-c4sccc4C(=O)OCC)c3C=C2)[n-]->51
 
 ## Reaction 31-177-CAS-22759681
 
@@ -7759,7 +7759,7 @@ Total reactions: 17173
 - Yield %: 65
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Toluene (108-88-3)
-- SMILES: Cc1cc(C)c(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c(C)c1.CC(C)(C)c1cc(Br)c2c(c1)C(C)(C)c1cc(C(C)(C)C)cc(N(Cc3ccccn3)Cc3ccccn3)c1O2 >> Cc1cc(C)c(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(-c5cc(C(C)(C)C)cc7c5Oc5c(N(Cc8ccccn8)Cc8ccccn8)cc(C(C)(C)C)cc5C7(C)C)c4C=C3)[n-]->62)c(C)c1
+- SMILES: Cc1cc(C)c(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c(C)c1.CC(C)(C)c1cc(Br)c2c(c1)C(C)(C)c1cc(C(C)(C)C)cc(N(Cc3ccccn3)Cc3ccccn3)c1O2 >> Cc1cc(C)c(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(-c5cc(C(C)(C)C)cc7c5Oc5c(N(Cc8ccccn8)Cc8ccccn8)cc(C(C)(C)C)cc5C7(C)C)c4C=C3)[n-]->62)c(C)c1
 
 ## Reaction 31-177-CAS-2743269
 
@@ -7967,7 +7967,7 @@ Total reactions: 17173
 - Yield %: 76
 - Reagents: Cesium carbonate (534-17-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC1(C)OB(c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8ccccc8)c8ccc2[n-]->58)C=Cc7c(-c2ccccc2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)OC1(C)C.Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(Br)c4C=C3)[n-]->62)cc1 >> Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5c7[n]8->[Zn+2]9%10<-[n]%11c(c(-c%12ccccc%12)c%12ccc(c(-c%13ccccc%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7ccccc7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)cc1
+- SMILES: CC1(C)OB(c2c3n4->[Zn+2]56<-n7c(c(-c8ccccc8)c8ccc2[n-]->58)C=Cc7c(-c2ccccc2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)OC1(C)C.Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(Br)c4C=C3)[n-]->62)cc1 >> Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5c7n8->[Zn+2]9%10<-n%11c(c(-c%12ccccc%12)c%12ccc(c(-c%13ccccc%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7ccccc7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)cc1
 
 ## Reaction 31-177-CAS-3798882
 
@@ -8309,7 +8309,7 @@ Total reactions: 17173
 - Yield %: 56
 - Reagents: Cesium carbonate (534-17-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: COc1cccc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(Br)c4C=C3)[n-]->62)c1.COc1cccc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)c1 >> COc1cccc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5c7[n]8->[Zn+2]9%10<-[n]%11c(c(-c%12ccccc%12)c%12ccc(c(-c%13cccc(OC)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cccc(OC)c7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)c1
+- SMILES: COc1cccc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(Br)c4C=C3)[n-]->62)c1.COc1cccc(-c2c3n4->[Zn+2]56<-n7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)c1 >> COc1cccc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5c7n8->[Zn+2]9%10<-n%11c(c(-c%12ccccc%12)c%12ccc(c(-c%13cccc(OC)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cccc(OC)c7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)c1
 
 ## Reaction 31-177-CAS-6002461
 
@@ -8352,7 +8352,7 @@ Total reactions: 17173
 - Yield %: 89
 - Reagents: Cesium carbonate (534-17-8) [BASE], 7647-01-0 (7647-01-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Water (7732-18-5)
-- SMILES: CCOC(=O)c1cn(CC)c2ccc(Br)cc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4[n]5->[Zn+2]67<-[n]8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(CC)c2ccc(-c3cc4c(-c5ccccc5)c5[n]6->[Zn+2]78<-[n]9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)cc2c1=O
+- SMILES: CCOC(=O)c1cn(CC)c2ccc(Br)cc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4n5->[Zn+2]67<-n8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(CC)c2ccc(-c3cc4c(-c5ccccc5)c5n6->[Zn+2]78<-n9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)cc2c1=O
 
 ## Reaction 31-177-CAS-6623306
 
@@ -8361,7 +8361,7 @@ Total reactions: 17173
 - Yield %: 69
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1ccc(-c2cc3c4c5c2cccc5c2cccc5c(Br)cc(c4c52)n3Cc2cc(C(C)(C)C)cc(C(C)(C)C)c2)cc1.CCCCCCCCCCCCOc1cccc(OCCCCCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCCCCCC)cccc1OCCCCCCCCCCCC)c1ccc(c(B4OC(C)(C)C(C)(C)O4)c3C=C2)[n-]->51 >> CCCCCCCCCCCCOc1cccc(OCCCCCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCCCCCC)cccc1OCCCCCCCCCCCC)c1ccc(c(-c4cc6c7c8c4cccc8c4cccc8c(-c9ccc(C(C)(C)C)cc9)cc(c7c84)n6Cc4cc(C(C)(C)C)cc(C(C)(C)C)c4)c3C=C2)[n-]->51
+- SMILES: CC(C)(C)c1ccc(-c2cc3c4c5c2cccc5c2cccc5c(Br)cc(c4c52)n3Cc2cc(C(C)(C)C)cc(C(C)(C)C)c2)cc1.CCCCCCCCCCCCOc1cccc(OCCCCCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCCCCCC)cccc1OCCCCCCCCCCCC)c1ccc(c(B4OC(C)(C)C(C)(C)O4)c3C=C2)[n-]->51 >> CCCCCCCCCCCCOc1cccc(OCCCCCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(-c1c(OCCCCCCCCCCCC)cccc1OCCCCCCCCCCCC)c1ccc(c(-c4cc6c7c8c4cccc8c4cccc8c(-c9ccc(C(C)(C)C)cc9)cc(c7c84)n6Cc4cc(C(C)(C)C)cc(C(C)(C)C)c4)c3C=C2)[n-]->51
 
 ## Reaction 31-177-CAS-6632965
 
@@ -8449,7 +8449,7 @@ Total reactions: 17173
 - Yield %: 79
 - Reagents: Cesium carbonate (534-17-8) [BASE], Trifluoroacetic acid (76-05-1) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Nickel(II) acetylacetonate (3264-82-2) [CAT]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Dichloromethane (75-09-2), Water (7732-18-5)
-- SMILES: CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(Br)ccc(c6ccc(c2c36)C1=O)c54.CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(-c6c7[n]8->[Ni+2]9%10<-[n]%11c(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc(c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc6[n-]->%107)ccc(c6ccc(c2c36)C1=O)c54
+- SMILES: CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(Br)ccc(c6ccc(c2c36)C1=O)c54.CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(-c6c7n8->[Ni+2]9%10<-n%11c(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc(c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc6[n-]->%107)ccc(c6ccc(c2c36)C1=O)c54
 
 ## Reaction 31-177-CAS-7225484
 
@@ -8721,7 +8721,7 @@ Total reactions: 17173
 - Yield %: 77
 - Reagents: Cesium carbonate (534-17-8) [BASE], 557-34-6 (557-34-6) [UNK]
 - Solvents: Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(Cn2c3cc(Br)c4cccc5c6cccc7c(Br)cc2c(c76)c3c45)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(Cn2c3cc(-c4c5[n]6->[Zn+2]78<-[n]9c(c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c5ccc4[n-]->85)c4cccc5c6cccc7c(-c8c9[n]%10->[Zn+2]%11%12<-[n]%13c(c(-c%14cc(C(C)(C)C)cc(C(C)(C)C)c%14)c%14ccc(c(-c%15cc(C(C)(C)C)cc(C(C)(C)C)c%15)c%10C=C9)[n-]->%11%14)C=Cc%13c(-c9cc(C(C)(C)C)cc(C(C)(C)C)c9)c9ccc8[n-]->%129)cc2c(c76)c3c45)cc(C(C)(C)C)c1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(Cn2c3cc(Br)c4cccc5c6cccc7c(Br)cc2c(c76)c3c45)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(Cn2c3cc(-c4c5n6->[Zn+2]78<-n9c(c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c5ccc4[n-]->85)c4cccc5c6cccc7c(-c8c9n%10->[Zn+2]%11%12<-n%13c(c(-c%14cc(C(C)(C)C)cc(C(C)(C)C)c%14)c%14ccc(c(-c%15cc(C(C)(C)C)cc(C(C)(C)C)c%15)c%10C=C9)[n-]->%11%14)C=Cc%13c(-c9cc(C(C)(C)C)cc(C(C)(C)C)c9)c9ccc8[n-]->%129)cc2c(c76)c3c45)cc(C(C)(C)C)c1
 
 ## Reaction 31-177-CAS-8551126
 
@@ -8757,7 +8757,7 @@ Total reactions: 17173
 - Yield %: 82
 - Reagents: Cesium carbonate (534-17-8) [BASE], 7647-01-0 (7647-01-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Water (7732-18-5)
-- SMILES: CCOC(=O)c1cn(CC)c2cc(Br)ccc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4[n]5->[Zn+2]67<-[n]8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(CC)c2cc(-c3cc4c(-c5ccccc5)c5[n]6->[Zn+2]78<-[n]9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)ccc2c1=O
+- SMILES: CCOC(=O)c1cn(CC)c2cc(Br)ccc2c1=O.CC1(C)OB(c2cc3c(-c4ccccc4)c4n5->[Zn+2]67<-n8c(c(-c9ccccc9)c9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c2[n-]->73)OC1(C)C >> CCOC(=O)c1cn(CC)c2cc(-c3cc4c(-c5ccccc5)c5n6->[Zn+2]78<-n9c(c(-c%10ccccc%10)c%10ccc(c(-c%11ccccc%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5ccccc5)c3[n-]->84)ccc2c1=O
 
 ## Reaction 31-177-CAS-8737580
 
@@ -18342,7 +18342,7 @@ Total reactions: 17173
 - Yield %: 57
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: OB(O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.Brc1ccc(-c2nc(-c3ccc(Br)s3)nc(-c3ccc(Br)s3)n2)s1 >> Brc1ccc(-c2nc(-c3ccc(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)s3)nc(-c3ccc(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)s3)n2)s1
+- SMILES: OB(O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.Brc1ccc(-c2nc(-c3ccc(Br)s3)nc(-c3ccc(Br)s3)n2)s1 >> BrC1=CC=C(C2=NC(C3=CC=C([C-]45->[Fe+2]6789%10%11%12(<-[CH-]%13[CH]6=[CH]7[CH]8=[CH]%139)[CH](=[CH]4%10)[CH]%11=[CH]5%12)S3)=NC(C3=CC=C([C-]45->[Fe+2]6789%10%11%12(<-[CH-]%13[CH]6=[CH]7[CH]8=[CH]%139)[CH](=[CH]4%10)[CH]%11=[CH]5%12)S3)=N2)S1
 
 ## Reaction 31-179-CAS-13617362
 
@@ -19332,7 +19332,7 @@ Total reactions: 17173
 - Yield %: 59
 - Reagents: Cesium carbonate (534-17-8) [BASE], 557-34-6 (557-34-6) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Methanol (67-56-1)
-- SMILES: CCCCC(CC)Cn1c2cc(B3OC(C)(C)C(C)(C)O3)c3cccc4c5cccc6c(-c7ccc(C(C)(C)C)cc7)cc1c(c65)c2c34.CC(C)CCCC(C)Cc1c2nc(c(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)c3ccc([nH]3)c(CC(C)CCCC(C)C)c3nc(c(Br)c4ccc1[nH]4)C=C3)C=C2 >> CCCCC(CC)Cn1c2cc(-c3ccc(C(C)(C)C)cc3)c3cccc4c5cccc6c(-c7c8[n]9->[Zn+2]%10%11<-[n]%12c(c(CC(C)CCCC(C)C)c%13ccc7[n-]->%10%13)C=Cc%12c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc(c(CC(C)CCCC(C)C)c9C=C8)[n-]->%117)cc1c(c65)c2c34
+- SMILES: CCCCC(CC)Cn1c2cc(B3OC(C)(C)C(C)(C)O3)c3cccc4c5cccc6c(-c7ccc(C(C)(C)C)cc7)cc1c(c65)c2c34.CC(C)CCCC(C)Cc1c2nc(c(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)c3ccc([nH]3)c(CC(C)CCCC(C)C)c3nc(c(Br)c4ccc1[nH]4)C=C3)C=C2 >> CCCCC(CC)Cn1c2cc(-c3ccc(C(C)(C)C)cc3)c3cccc4c5cccc6c(-c7c8n9->[Zn+2]%10%11<-n%12c(c(CC(C)CCCC(C)C)c%13ccc7[n-]->%10%13)C=Cc%12c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc(c(CC(C)CCCC(C)C)c9C=C8)[n-]->%117)cc1c(c65)c2c34
 
 ## Reaction 31-179-CAS-13994491
 
@@ -19465,7 +19465,7 @@ Total reactions: 17173
 - Yield %: 60
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: I[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.Cc1sc(B(O)O)cc1Br >> Cc1sc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1Br
+- SMILES: I[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.Cc1sc(B(O)O)cc1Br >> CC1=C(Br)C=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)S1
 
 ## Reaction 31-179-CAS-14044237
 
@@ -20985,7 +20985,7 @@ Total reactions: 17173
 - Yield %: 51
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
-- SMILES: OB(O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.O=[N+]([O-])c1ccc(/C=C/c2ccc(Br)s2)s1 >> O=[N+]([O-])c1ccc(C=Cc2ccc(-[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)s2)s1
+- SMILES: OB(O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.O=[N+]([O-])c1ccc(/C=C/c2ccc(Br)s2)s1 >> O=[N+]([O-])C1=CC=C(C=CC2=CC=C([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)S2)S1
 
 ## Reaction 31-179-CAS-1460717
 
@@ -22295,7 +22295,7 @@ Total reactions: 17173
 - Yield %: 68
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CN(C)c1ccc(B(O)O)cn1.CCCCCCN1C(=O)c2c(C)c3cc4[n]5->[Ni+2]67<-[n]8c(c(Br)c9c(C)c(CC)c(cc5C(C)=C4CC)[n-]->69)C(C)C(CCC(=O)OC)c8c(c2[n-]->73)C1=O >> CCCCCCN1C(=O)c2c(C)c3cc4[n]5->[Ni+2]67<-[n]8c(c(-c9ccc(N(C)C)nc9)c9c(C)c(CC)c(cc5C(C)=C4CC)[n-]->69)C(C)C(CCC(=O)OC)c8c(c2[n-]->73)C1=O
+- SMILES: CN(C)c1ccc(B(O)O)cn1.CCCCCCN1C(=O)c2c(C)c3cc4n5->[Ni+2]67<-n8c(c(Br)c9c(C)c(CC)c(cc5C(C)=C4CC)[n-]->69)C(C)C(CCC(=O)OC)c8c(c2[n-]->73)C1=O >> CCCCCCN1C(=O)c2c(C)c3cc4n5->[Ni+2]67<-n8c(c(-c9ccc(N(C)C)nc9)c9c(C)c(CC)c(cc5C(C)=C4CC)[n-]->69)C(C)C(CCC(=O)OC)c8c(c2[n-]->73)C1=O
 
 ## Reaction 31-179-CAS-15117234
 
@@ -24859,7 +24859,7 @@ Total reactions: 17173
 - Yield %: 89
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC1(C)OB(c2ccc(B3OC(C)(C)C(C)(C)O3)[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9ccc(-c%10cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12[n]%13->[Ni+2]%14%15<-[n]%16c(cc%10[n-]->%14%11)C=Cc%16c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%13C=C%12)[n-]->%15%10)[nH]9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC1(C)OB(c2ccc(B3OC(C)(C)C(C)(C)O3)[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9ccc(-c%10cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12n%13->[Ni+2]%14%15<-n%16c(cc%10[n-]->%14%11)C=Cc%16c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%13C=C%12)[n-]->%15%10)[nH]9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-15991421
 
@@ -24877,7 +24877,7 @@ Total reactions: 17173
 - Yield %: 70
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC1(C)OB(c2ccc[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(Br)cc2[n-]->58)C(Br)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9ccc[nH]9)cc2[n-]->58)C(c2ccc[nH]2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC1(C)OB(c2ccc[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(Br)cc2[n-]->58)C(Br)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9ccc[nH]9)cc2[n-]->58)C(c2ccc[nH]2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-15991425
 
@@ -24895,7 +24895,7 @@ Total reactions: 17173
 - Yield %: 84
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC1(C)OB(c2ccc[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9ccc[nH]9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC1(C)OB(c2ccc[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9ccc[nH]9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-15991429
 
@@ -25683,7 +25683,7 @@ Total reactions: 17173
 - Yield %: 71
 - Reagents: Potassium carbonate (584-08-7) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: 123-91-1 (123-91-1), Water (7732-18-5)
-- SMILES: OB(O)c1ccncc1.Clc1ccc2c(NCCn3nnc(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)c3I)ccnc2c1 >> Clc1ccc2c(NCCn3nnc(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)c3-c3ccncc3)ccnc2c1
+- SMILES: OB(O)c1ccncc1.ClC1=CC2=C(C=C1)C(NCCN1N=NC([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=C1I)=CC=N2 >> ClC1=CC2=C(C=C1)C(NCCN1N=NC([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=C1C1=CC=NC=C1)=CC=N2
 
 ## Reaction 31-179-CAS-16136546
 
@@ -25692,7 +25692,7 @@ Total reactions: 17173
 - Yield %: 90
 - Reagents: Potassium carbonate (584-08-7) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: 123-91-1 (123-91-1), Water (7732-18-5)
-- SMILES: OB(O)c1ccsc1.Clc1ccc2c(NCCn3nnc(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)c3I)ccnc2c1 >> Clc1ccc2c(NCCn3nnc(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)c3-c3ccsc3)ccnc2c1
+- SMILES: OB(O)c1ccsc1.ClC1=CC2=C(C=C1)C(NCCN1N=NC([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=C1I)=CC=N2 >> ClC1=CC2=C(C=C1)C(NCCN1N=NC([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=C1C1=CSC=C1)=CC=N2
 
 ## Reaction 31-179-CAS-16139209
 
@@ -47641,7 +47641,7 @@ Total reactions: 17173
 - Yield %: 55
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: COB(OC)c1ccc2c(c1)OCCOCCOCCOCCOCCO2.CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(I)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccc7c(c5)OCCOCCOCCOCCOCCO7)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: COB(OC)c1ccc2c(c1)OCCOCCOCCOCCOCCO2.CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(I)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccc7c(c5)OCCOCCOCCOCCOCCO7)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-2182941
 
@@ -55980,7 +55980,7 @@ Total reactions: 17173
 - Yield %: 82
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
-- SMILES: CCCCCCOc1csc(B(O)O)c1.Brc1cc(C=Cc2c3[n]4->[Cu+2]56<-[n]7c(cc8ccc(c(-c9ccccc9)c4C=C3)[n-]->58)C=Cc7c(-c3ccccc3)c3ccc2[n-]->63)c(Br)s1 >> CCCCCCOc1csc(-c2cc(C=Cc3c4[n]5->[Cu+2]67<-[n]8c(cc9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c4ccc3[n-]->74)c(-c3cc(OCCCCCC)cs3)s2)c1
+- SMILES: CCCCCCOc1csc(B(O)O)c1.Brc1cc(C=Cc2c3n4->[Cu+2]56<-n7c(cc8ccc(c(-c9ccccc9)c4C=C3)[n-]->58)C=Cc7c(-c3ccccc3)c3ccc2[n-]->63)c(Br)s1 >> CCCCCCOc1csc(-c2cc(C=Cc3c4n5->[Cu+2]67<-n8c(cc9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c4ccc3[n-]->74)c(-c3cc(OCCCCCC)cs3)s2)c1
 
 ## Reaction 31-179-CAS-3170319
 
@@ -56455,7 +56455,7 @@ Total reactions: 17173
 - Yield %: 66
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: O=Cc1ccc(B(O)O)s1.CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(Br)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccc(C=O)s5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: O=Cc1ccc(B(O)O)s1.CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(Br)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccc(C=O)s5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-3318661
 
@@ -58425,7 +58425,7 @@ Total reactions: 17173
 - Yield %: 59
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: O=Cc1ccc(B(O)O)s1.CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(Br)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(-c5ccc(C=O)s5)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: O=Cc1ccc(B(O)O)s1.CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(Br)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(-c5ccc(C=O)s5)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-4068094
 
@@ -60254,7 +60254,7 @@ Total reactions: 17173
 - Yield %: 72
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CCCCCCCCn1c2ccc(B3OC(C)(C)C(C)(C)O3)cc2c2cc(B3OC(C)(C)C(C)(C)O3)ccc21.CC(C)(C)OC(=O)NC(Cc1ccccc1)c1c2[n]3->[Zn+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(C(Cc1ccccc1)NC(=O)OC(C)(C)C)c1ccc(c(Br)c3C=C2)[n-]->51 >> CCCCCCCCn1c2ccc(-c3c4[n]5->[Zn+2]67<-[n]8c(cc9ccc(c(C(Cc%10ccccc%10)NC(=O)OC(C)(C)C)c5C=C4)[n-]->69)C=Cc8c(C(Cc4ccccc4)NC(=O)OC(C)(C)C)c4ccc3[n-]->74)cc2c2cc(-c3c4[n]5->[Zn+2]67<-[n]8c(cc9ccc(c(C(Cc%10ccccc%10)NC(=O)OC(C)(C)C)c5C=C4)[n-]->69)C=Cc8c(C(Cc4ccccc4)NC(=O)OC(C)(C)C)c4ccc3[n-]->74)ccc21
+- SMILES: CCCCCCCCn1c2ccc(B3OC(C)(C)C(C)(C)O3)cc2c2cc(B3OC(C)(C)C(C)(C)O3)ccc21.CC(C)(C)OC(=O)NC(Cc1ccccc1)c1c2n3->[Zn+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(C(Cc1ccccc1)NC(=O)OC(C)(C)C)c1ccc(c(Br)c3C=C2)[n-]->51 >> CCCCCCCCn1c2ccc(-c3c4n5->[Zn+2]67<-n8c(cc9ccc(c(C(Cc%10ccccc%10)NC(=O)OC(C)(C)C)c5C=C4)[n-]->69)C=Cc8c(C(Cc4ccccc4)NC(=O)OC(C)(C)C)c4ccc3[n-]->74)cc2c2cc(-c3c4n5->[Zn+2]67<-n8c(cc9ccc(c(C(Cc%10ccccc%10)NC(=O)OC(C)(C)C)c5C=C4)[n-]->69)C=Cc8c(C(Cc4ccccc4)NC(=O)OC(C)(C)C)c4ccc3[n-]->74)ccc21
 
 ## Reaction 31-179-CAS-4800972
 
@@ -61245,7 +61245,7 @@ Total reactions: 17173
 - Yield %: 51
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
-- SMILES: OB(O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.O=[N+]([O-])c1ccc(-c2ccc(Br)s2)s1 >> O=[N+]([O-])c1ccc(-c2ccc(-[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)s2)s1
+- SMILES: OB(O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.O=[N+]([O-])c1ccc(-c2ccc(Br)s2)s1 >> O=[N+]([O-])C1=CC=C(C2=CC=C([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)S2)S1
 
 ## Reaction 31-179-CAS-5176651
 
@@ -61407,7 +61407,7 @@ Total reactions: 17173
 - Yield %: 60
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: COC(=O)c1ccc(Br)o1.OB(O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92 >> COC(=O)c1ccc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)o1
+- SMILES: COC(=O)c1ccc(Br)o1.OB(O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29 >> COC(=O)C1=CC=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)O1
 
 ## Reaction 31-179-CAS-5233361
 
@@ -66086,7 +66086,7 @@ Total reactions: 17173
 - Yield %: 88
 - Reagents: 298-14-6 (298-14-6) [UNK], 7647-14-5 (7647-14-5) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
-- SMILES: OB(O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.O=C(c1ccccc1)c1c(-c2ccccc2)ncc(I)c1-c1ccccc1 >> O=C(c1ccccc1)c1c(-c2ccccc2)ncc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)c1-c1ccccc1
+- SMILES: OB(O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.O=C(c1ccccc1)c1c(-c2ccccc2)ncc(I)c1-c1ccccc1 >> O=C(C1=CC=CC=C1)C1=C(C2=CC=CC=C2)C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)=CN=C1C1=CC=CC=C1
 
 ## Reaction 31-179-CAS-7066220
 
@@ -66421,7 +66421,7 @@ Total reactions: 17173
 - Yield %: 64
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
-- SMILES: CCCCCCOc1csc(B(O)O)c1.Brc1cc(C=Cc2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc(c(-c9ccccc9)c4C=C3)[n-]->58)C=Cc7c(-c3ccccc3)c3ccc2[n-]->63)c(Br)s1 >> CCCCCCOc1csc(-c2cc(C=Cc3c4[n]5->[Zn+2]67<-[n]8c(cc9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c4ccc3[n-]->74)c(-c3cc(OCCCCCC)cs3)s2)c1
+- SMILES: CCCCCCOc1csc(B(O)O)c1.Brc1cc(C=Cc2c3n4->[Zn+2]56<-n7c(cc8ccc(c(-c9ccccc9)c4C=C3)[n-]->58)C=Cc7c(-c3ccccc3)c3ccc2[n-]->63)c(Br)s1 >> CCCCCCOc1csc(-c2cc(C=Cc3c4n5->[Zn+2]67<-n8c(cc9ccc(c(-c%10ccccc%10)c5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c4ccc3[n-]->74)c(-c3cc(OCCCCCC)cs3)s2)c1
 
 ## Reaction 31-179-CAS-7180269
 
@@ -66895,7 +66895,7 @@ Total reactions: 17173
 - Yield %: 85
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 123-91-1 (123-91-1), Water (7732-18-5)
-- SMILES: CC(C)(C)[Si](C)(C)n1ccc2c(B(O)O)cccc21.[CH3][Sn]([CH3])([CH3])[c]1cc(Cl)cc2c1cnn2S(=O)(=O)c1ccccc1 >> CC(C)(C)[Si](C)(C)n1ccc2c(-c3c[c]([Sn]([CH3])([CH3])[CH3])c4cnn(S(=O)(=O)c5ccccc5)c4c3)cccc21
+- SMILES: CC(C)(C)[Si](C)(C)n1ccc2c(B(O)O)cccc21.C[Sn](C)(C)c1cc(Cl)cc2c1cnn2S(=O)(=O)c1ccccc1 >> CC(C)(C)[Si](C)(C)n1ccc2c(-c3cc([Sn](C)(C)C)c4cnn(S(=O)(=O)c5ccccc5)c4c3)cccc21
 
 ## Reaction 31-179-CAS-7336204
 
@@ -67146,7 +67146,7 @@ Total reactions: 17173
 - Yield %: 82
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1cccs1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(Cl)c2c(Cl)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cccs2)c2c(-c5cccs5)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: OB(O)c1cccs1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(Cl)c2c(Cl)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cccs2)c2c(-c5cccs5)cc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-7439811
 
@@ -68421,7 +68421,7 @@ Total reactions: 17173
 - Yield %: 55
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(Br)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.O=Cc1ccc(-c2ccc(B(O)O)s2)s1 >> CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccc(-c7ccc(C=O)s7)s5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(Br)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.O=Cc1ccc(-c2ccc(B(O)O)s2)s1 >> CC(C)(C)c1cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5ccc(-c7ccc(C=O)s7)s5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-179-CAS-7888761
 
@@ -72241,7 +72241,7 @@ Total reactions: 17173
 - Yield %: 59
 - Reagents: Cesium carbonate (534-17-8) [BASE], Nickel(II) acetylacetonate (3264-82-2) [CAT]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(B6OC(C)(C)C(C)(C)O6)ccc(c6ccc(c2c36)C1=O)c54.CC(C)CCCC(C)Cc1c2nc(c(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)c3ccc([nH]3)c(CC(C)CCCC(C)C)c3nc(c(Br)c4ccc1[nH]4)C=C3)C=C2 >> CC(C)CCCC(C)Cc1c2[n]3->[Ni+2]45<-[n]6c(c(CC(C)CCCC(C)C)c7ccc(c(-c8ccc9c%10ccc%11c%12c(ccc(c%13cccc8c%139)c%12%10)C(=O)N(c8c(C(C)C)cccc8C(C)C)C%11=O)c3C=C2)[n-]->47)C=Cc6c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc1[n-]->52
+- SMILES: CC(C)c1cccc(C(C)C)c1N1C(=O)c2ccc3c4cccc5c(B6OC(C)(C)C(C)(C)O6)ccc(c6ccc(c2c36)C1=O)c54.CC(C)CCCC(C)Cc1c2nc(c(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)c3ccc([nH]3)c(CC(C)CCCC(C)C)c3nc(c(Br)c4ccc1[nH]4)C=C3)C=C2 >> CC(C)CCCC(C)Cc1c2n3->[Ni+2]45<-n6c(c(CC(C)CCCC(C)C)c7ccc(c(-c8ccc9c%10ccc%11c%12c(ccc(c%13cccc8c%139)c%12%10)C(=O)N(c8c(C(C)C)cccc8C(C)C)C%11=O)c3C=C2)[n-]->47)C=Cc6c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc1[n-]->52
 
 ## Reaction 31-179-CAS-9300038
 
@@ -73733,7 +73733,7 @@ Total reactions: 17173
 - Yield %: 80
 - Reagents: Sodium hydroxide (1310-73-2) [BASE], 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
-- SMILES: OB(O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.Ic1cc2c(I)cc1OCCCCCCCCCO2 >> c1c2c(-[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)cc(c1-[c-]13->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->91)[cH]->%103)OCCCCCCCCCO2
+- SMILES: OB(O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.Ic1cc2c(I)cc1OCCCCCCCCCO2 >> C1=C2OCCCCCCCCCOC(=C1[C-]13->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]18)[CH]9=[CH]3%10)C=C2[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-179-CAS-9844317
 
@@ -73909,7 +73909,7 @@ Total reactions: 17173
 - Yield %: 22
 - Reagents: 17194-00-2 (17194-00-2) [UNK]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
-- SMILES: CC(C)(C)c1ccc(-c2c3nc(c(-c4ccc(C(C)(C)C)cc4)c4cc(B5OC(C)(C)C(C)(C)O5)c([nH]4)c(-c4ccc(C(C)(C)C)cc4)c4nc(c(-c5ccc(C(C)(C)C)cc5)c5ccc2[nH]5)C=C4)C=C3)cc1.Cc1cc2c(C)cc1COc1ccccc1-c1c3[n]4->[Zn+2]56<-[n]7c(c(Br)c8ccc1[n-]->58)C=Cc7c(c1ccc(c(Br)c4C=C3)[n-]->61)-c1ccccc1OC2 >> Cc1cc2c(C)cc1COc1ccccc1-c1c3[n]4->[Zn+2]56<-[n]7c(cc8ccc1[n-]->58)C=Cc7c(c1ccc(c(-c5cc7[nH]c5c(-c5ccc(C(C)(C)C)cc5)c5nc(c(-c8ccc(C(C)(C)C)cc8)c8ccc([nH]8)c(-c8ccc(C(C)(C)C)cc8)c8nc(c7-c7ccc(C(C)(C)C)cc7)C=C8)C=C5)c4C=C3)[n-]->61)-c1ccccc1OC2.Cc1cc2c(C)cc1COc1ccccc1-c1c3[n]4->[Zn+2]56<-[n]7c(c(c8ccc(c(-c9cc%10[nH]c9c(-c9ccc(C(C)(C)C)cc9)c9nc(c(-c%11ccc(C(C)(C)C)cc%11)c%11ccc([nH]%11)c(-c%11ccc(C(C)(C)C)cc%11)c%11nc(c%10-c%10ccc(C(C)(C)C)cc%10)C=C%11)C=C9)c4C=C3)[n-]->58)-c3ccccc3OC2)C=Cc7c(-c2cc3[nH]c2c(-c2ccc(C(C)(C)C)cc2)c2nc(c(-c4ccc(C(C)(C)C)cc4)c4ccc([nH]4)c(-c4ccc(C(C)(C)C)cc4)c4nc(c3-c3ccc(C(C)(C)C)cc3)C=C4)C=C2)c2ccc1[n-]->62
+- SMILES: CC(C)(C)c1ccc(-c2c3nc(c(-c4ccc(C(C)(C)C)cc4)c4cc(B5OC(C)(C)C(C)(C)O5)c([nH]4)c(-c4ccc(C(C)(C)C)cc4)c4nc(c(-c5ccc(C(C)(C)C)cc5)c5ccc2[nH]5)C=C4)C=C3)cc1.Cc1cc2c(C)cc1COc1ccccc1-c1c3n4->[Zn+2]56<-n7c(c(Br)c8ccc1[n-]->58)C=Cc7c(c1ccc(c(Br)c4C=C3)[n-]->61)-c1ccccc1OC2 >> Cc1cc2c(C)cc1COc1ccccc1-c1c3n4->[Zn+2]56<-n7c(cc8ccc1[n-]->58)C=Cc7c(c1ccc(c(-c5cc7[nH]c5c(-c5ccc(C(C)(C)C)cc5)c5nc(c(-c8ccc(C(C)(C)C)cc8)c8ccc([nH]8)c(-c8ccc(C(C)(C)C)cc8)c8nc(c7-c7ccc(C(C)(C)C)cc7)C=C8)C=C5)c4C=C3)[n-]->61)-c1ccccc1OC2.Cc1cc2c(C)cc1COc1ccccc1-c1c3n4->[Zn+2]56<-n7c(c(c8ccc(c(-c9cc%10[nH]c9c(-c9ccc(C(C)(C)C)cc9)c9nc(c(-c%11ccc(C(C)(C)C)cc%11)c%11ccc([nH]%11)c(-c%11ccc(C(C)(C)C)cc%11)c%11nc(c%10-c%10ccc(C(C)(C)C)cc%10)C=C%11)C=C9)c4C=C3)[n-]->58)-c3ccccc3OC2)C=Cc7c(-c2cc3[nH]c2c(-c2ccc(C(C)(C)C)cc2)c2nc(c(-c4ccc(C(C)(C)C)cc4)c4ccc([nH]4)c(-c4ccc(C(C)(C)C)cc4)c4nc(c3-c3ccc(C(C)(C)C)cc3)C=C4)C=C2)c2ccc1[n-]->62
 
 ## Reaction 31-179-CAS-9906316
 
@@ -74210,7 +74210,7 @@ Total reactions: 17173
 - Yield %: 61
 - Reagents: Cesium carbonate (534-17-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc1.COc1cccc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)c1 >> COc1cccc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8ccccc8)c8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5c7[n]8->[Zn+2]9%10<-[n]%11c(cc%12ccc(c(-c%13ccc(C)cc%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7ccc(C)cc7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)c1.Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5c7[n]8->[Zn+2]9%10<-[n]%11c(cc%12ccc(c(-c%13ccc(C)cc%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7ccc(C)cc7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)cc1
+- SMILES: Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc1.COc1cccc(-c2c3n4->[Zn+2]56<-n7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)c1 >> COc1cccc(-c2c3n4->[Zn+2]56<-n7c(c(-c8ccccc8)c8ccc2[n-]->58)C=Cc7c(-c2cccc(OC)c2)c2ccc(c(-c5c7n8->[Zn+2]9%10<-n%11c(cc%12ccc(c(-c%13ccc(C)cc%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7ccc(C)cc7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)c1.Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5c7n8->[Zn+2]9%10<-n%11c(cc%12ccc(c(-c%13ccc(C)cc%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7ccc(C)cc7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)cc1
 
 ## Reaction 31-246-CAS-18500754
 
@@ -74457,28 +74457,28 @@ Total reactions: 17173
 - Yield %: 78
 - Reagents: 27607-77-8 (27607-77-8) [UNK]
 - Solvents: Diethyl ether (60-29-7), Tetrahydrofuran (109-99-9), Toluene (108-88-3), n-Hexane (110-54-3)
-- SMILES: [CH3][Mg][Br].CC(C)(C)C1=CC=[C]23->[Zr+4]456789%10%11([Cl-])([Cl-])<-[CH]%12=[CH]->4[C-]->5(C(C4=CC=CC=C4)(C4=CC=CC=C4)[C-]->6([C]->72=C1)[C]->81=CC(C(C)(C)C)=CC=[C]->931)[CH]->%10=[CH]->%11%12.C[C-](C)C(=O)OC(C)C.[Li+].FC1=C(F)C(F)=[C-]([B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)O2CCCC2)C(F)=C1F >> CC(C)=C(OC(C)C)[O-]->[Zr+4]123456789(<-[CH]%10=[CH]->1[C-]->2(C(C1=CC=CC=C1)(C1=CC=CC=C1)[C-]->31[C]->42=CC(C(C)(C)C)=CC=[C]->52[C]->62=CC=C(C(C)(C)C)C=[C]->721)[CH]->8=[CH]->9%10)<-[O]1CCCC1.[CH3-][B+3]([C-]1=C(F)C(F)=C(F)C(F)=C1F)([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F
+- SMILES: C[Mg]Br.CC(C)(C)C1=CC=C23C45=CC=C(C(C)(C)C)C=C46[C-]47->[Zr+4]25689%10%11([Cl-])([Cl-])(<-[C-]2([CH]8=[CH]9[CH]%10=[CH]2%11)C4(C2=CC=CC=C2)C2=CC=CC=C2)C37=C1.C[C-](C)C(=O)OC(C)C.[Li+].FC1=C(F)C(F)=[C-]([B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)O2CCCC2)C(F)=C1F >> CC(C)=C(OC(C)C)[O-]->[Zr+4]123456789(<-O%10CCCC%10)<-[C-]%10([CH]1=[CH]2[CH]3=[CH]%104)C(C1=CC=CC=C1)(C1=CC=CC=C1)[C-]->51C62=CC(C(C)(C)C)=CC=C27C82=CC=C(C(C)(C)C)C=C219.[CH3-][B+3]([C-]1=C(F)C(F)=C(F)C(F)=C1F)([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F
 
 ## Reaction 31-562-CAS-18336980
 
 - Type: Suzuki
 - Yield %: 62
 - Solvents: Toluene (108-88-3), Tetrahydrofuran (109-99-9)
-- SMILES: CC(C)[C]12->[Ru+2]34567([Cl-])(<-[CH](=[CH]->31)[C]->4(C)=[CH]->5[CH]->6=2)[Cl-][Ru+2]12345([Cl-])(<-[CH]6=[CH]->1[C]->2(C(C)C)=[CH]->3[CH]->4=[C]->56C)[Cl-]7.[H-][B+3]([H-])([H-])[N-]1C2=CC=CC=C2SC1=NC1=NC2=CC=CC=C2S1.[Na+] >> CC(C)[C]12->[Ru+2]34567([Cl-])(<-[CH](=[CH]->31)[C]->4(C)=[CH]->5[CH]->6=2)<-[N]1=C(N=C2SC3=CC=CC=C3[N-]->72)SC2=CC=CC=C21.CC(C)[c]12->[Ru]345678(<-[BH](N(c9nc%10ccccc%10s9)c9sc%10ccccc%10[n]->39)n3c(=[N]->4c4nc9ccccc9s4)sc4ccccc43)<-[cH]([cH]->51)[c]->6(C)[cH]->7[cH]->82
+- SMILES: CC(C)C12=[CH]3[CH]4=C5(C)[CH]6=[CH]1[Ru+2]643521([Cl-])[Cl-][Ru+2]23456([Cl-])([Cl-]1)[CH]1=[CH]2C3(C(C)C)=[CH]4[CH]5=C16C.[H-][B+3]([H-])([H-])[N-]1C2=CC=CC=C2SC1=NC1=NC2=CC=CC=C2S1.[Na+] >> CC(C)C12=[CH]3[CH]4=C5(C)[CH]6=[CH]1[Ru+2]643521([Cl-])<-N2=C(N=C3SC4=CC=CC=C4[N-]->13)SC1=CC=CC=C12.CC(C)C12=[CH]3[CH]4=C5(C)[CH]6=[CH]1[Ru]6435217<-B(N(C2=NC3=CC=CC=C3S2)C2=N->1C1=CC=CC=C1S2)N1C2=CC=CC=C2SC1=N->7C1=NC2=CC=CC=C2S1
 
 ## Reaction 31-562-CAS-18359113
 
 - Type: Suzuki
 - Yield %: 62
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: [C-]#[O+].CC(C)c1cccc(C(C)C)c1N1C=CN(c2c(C(C)C)cccc2C(C)C)[B-]1[Li+](<-[O]1CCCC1)<-[O]1CCCC1.CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)[B-]1[Sm+3]1([Cl-])(<-[O]2CCCC2)(<-[O]2CCCC2)[Cl-][Li+](<-[O]2CCCC2)(<-[O]2CCCC2)[Cl-]1 >> CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)B1C1=[O]->[Sm+3]([Cl-])([Cl-])(<-[O]=C(B2N(C3=C(C(C)C)C=CC=C3C(C)C)C=CN2C2=C(C(C)C)C=CC=C2C(C)C)[C-]1[O-]->[Li+](<-[O]1CCCC1)<-[O]1CCCC1)(<-[O]1CCCC1)<-[O]1CCCC1
+- SMILES: [C-]#[O+].CC(C)c1cccc(C(C)C)c1N1C=CN(c2c(C(C)C)cccc2C(C)C)[B-]1[Li+](<-O1CCCC1)<-O1CCCC1.CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)[B-]1[Sm+3]1([Cl-])(<-O2CCCC2)(<-O2CCCC2)[Cl-][Li+](<-O2CCCC2)(<-O2CCCC2)[Cl-]1 >> CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)B1C1=O->[Sm+3]([Cl-])([Cl-])(<-O=C(B2N(C3=C(C(C)C)C=CC=C3C(C)C)C=CN2C2=C(C(C)C)C=CC=C2C(C)C)[C-]1[O-]->[Li+](<-O1CCCC1)<-O1CCCC1)(<-O1CCCC1)<-O1CCCC1
 
 ## Reaction 31-562-CAS-18359114
 
 - Type: Suzuki
 - Yield %: 57
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: [C-]#[O+].CC(C)c1cccc(C(C)C)c1N1C=CN(c2c(C(C)C)cccc2C(C)C)[B-]1[Li+](<-[O]1CCCC1)<-[O]1CCCC1.CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)B1[C-]1=[O]->[Sm+3]<-12([Cl-])(<-[O]1CCCC1)(<-[O]1CCCC1)[Cl-][Li+](<-[O]1CCCC1)(<-[O]1CCCC1)[Cl-]2 >> CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)B1C1=[O]->[Sm+3]([Cl-])([Cl-])(<-[O]=C(B2N(C3=C(C(C)C)C=CC=C3C(C)C)C=CN2C2=C(C(C)C)C=CC=C2C(C)C)[C-]1[O-]->[Li+](<-[O]1CCCC1)<-[O]1CCCC1)(<-[O]1CCCC1)<-[O]1CCCC1
+- SMILES: [C-]#[O+].CC(C)c1cccc(C(C)C)c1N1C=CN(c2c(C(C)C)cccc2C(C)C)[B-]1[Li+](<-O1CCCC1)<-O1CCCC1.CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)B1[C-]1=O->[Sm+3]<-12([Cl-])(<-O1CCCC1)(<-O1CCCC1)[Cl-][Li+](<-O1CCCC1)(<-O1CCCC1)[Cl-]2 >> CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)B1C1=O->[Sm+3]([Cl-])([Cl-])(<-O=C(B2N(C3=C(C(C)C)C=CC=C3C(C)C)C=CN2C2=C(C(C)C)C=CC=C2C(C)C)[C-]1[O-]->[Li+](<-O1CCCC1)<-O1CCCC1)(<-O1CCCC1)<-O1CCCC1
 
 ## Reaction 31-562-CAS-23142305
 
@@ -74486,7 +74486,7 @@ Total reactions: 17173
 - Yield %: 68
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1cccs1.[Br-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cccs2)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1cccs1.[Br-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cccs2)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23142448
 
@@ -74494,7 +74494,7 @@ Total reactions: 17173
 - Yield %: 87
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1ccoc1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccoc2)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1ccoc1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccoc2)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23143246
 
@@ -74502,7 +74502,7 @@ Total reactions: 17173
 - Yield %: 89
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1ccc2c(c1)OCCO2.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccc4c(c2)OCCO4)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1ccc2c(c1)OCCO2.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccc4c(c2)OCCO4)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23143600
 
@@ -74510,7 +74510,7 @@ Total reactions: 17173
 - Yield %: 75
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1cccs1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cccs2)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1cccs1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cccs2)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23143734
 
@@ -74518,7 +74518,7 @@ Total reactions: 17173
 - Yield %: 91
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1ccsc1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccsc2)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1ccsc1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccsc2)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23144474
 
@@ -74526,7 +74526,7 @@ Total reactions: 17173
 - Yield %: 85
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1cc2ccccc2o1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cc4ccccc4o2)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1cc2ccccc2o1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cc4ccccc4o2)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23146042
 
@@ -74534,7 +74534,7 @@ Total reactions: 17173
 - Yield %: 68
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1cc2ccccc2s1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cc4ccccc4s2)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1cc2ccccc2s1.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cc4ccccc4s2)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23146108
 
@@ -74542,7 +74542,7 @@ Total reactions: 17173
 - Yield %: 51
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1cccs1.[I-][Sb+3]12<-[c-]3ccccc3C[N]->1(Cc1cccc[c-]->21)c1ccccc1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cccs2)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1cccs1.[I-][Sb+3]12<-[c-]3ccccc3CN->1(Cc1cccc[c-]->21)c1ccccc1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2cccs2)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23713748
 
@@ -74550,7 +74550,7 @@ Total reactions: 17173
 - Yield %: 84
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1ccc2c(c1)OCCO2.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc([N]23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccc4c(c2)OCCO4)<-[c-]2ccccc2C3)cc1
+- SMILES: OB(O)c1ccc2c(c1)OCCO2.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> c1ccc(N23Cc4cccc[c-]4->[Sb+3]<-2(<-[c-]2ccc4c(c2)OCCO4)<-[c-]2ccccc2C3)cc1
 
 ## Reaction 31-562-CAS-23714783
 
@@ -74558,7 +74558,7 @@ Total reactions: 17173
 - Yield %: 71
 - Reagents: Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Toluene (108-88-3)
-- SMILES: Cn1ccc2cc(B(O)O)ccc21.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3C[N]->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> Cn1ccc2c[c-](->[Sb+3]34<-[c-]5ccccc5C[N]->3(Cc3cccc[c-]->43)c3ccccc3)ccc21
+- SMILES: Cn1ccc2cc(B(O)O)ccc21.[Cl-][Sb+3]12<-[C-]3=CC=CC=C3CN->1(CC1=CC=CC=[C-]->21)C1=CC=CC=C1 >> Cn1ccc2c[c-](->[Sb+3]34<-[c-]5ccccc5CN->3(Cc3cccc[c-]->43)c3ccccc3)ccc21
 
 ## Reaction 31-562-CAS-5721279
 
@@ -74566,14 +74566,14 @@ Total reactions: 17173
 - Yield %: 76
 - Reagents: 16941-11-0 (16941-11-0) [UNK]
 - Solvents: Ethanol (64-17-5)
-- SMILES: CC(C)[C]12->[Ru+2]34567([Cl-])(<-[CH](=[CH]->31)[C]->4(C)=[CH]->5[CH]->6=2)[Cl-][Ru+2]12345([Cl-])(<-[CH]6=[CH]->1[C]->2(C(C)C)=[CH]->3[CH]->4=[C]->56C)[Cl-]7.CN1C=C[N-]([B+3](N2=C3CCCN3CCC2)([N-]2C=CN(C)C2=S)[N-]2C=CN(C)C2=S)C1=S >> CC(C)[C]12->[Ru+2]345678(<-[CH](=[CH]->31)[C]->4(C)=[CH]->5[CH]->6=2)/[S]=C1\N(C)C=C[N-]1[B+3](N1=C2CCCN2CCC1)([N-]1C=CN(C)/C1=[S]\7)[N-]1C=CN(C)/C1=[S]/8.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: CC(C)C12=[CH]3[CH]4=C5(C)[CH]6=[CH]1[Ru+2]643521([Cl-])[Cl-][Ru+2]23456([Cl-])([Cl-]1)[CH]1=[CH]2C3(C(C)C)=[CH]4[CH]5=C16C.CN1C=C[N-]([B+3](N2=C3CCCN3CCC2)([N-]2C=CN(C)C2=S)[N-]2C=CN(C)C2=S)C1=S >> CC(C)C12=[CH]3[CH]4=C5(C)[CH]6=[CH]1[Ru+2]6435217/S=C2\N(C)C=C[N-]2[B+3](N2=C3CCCN3CCC2)([N-]2C=CN(C)/C2=S\1)[N-]1C=CN(C)/C1=S/7.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-562-CAS-9383606
 
 - Type: Suzuki
 - Yield %: 98
 - Solvents: Dichloromethane (75-09-2)
-- SMILES: CC[P](CC)(CC)[Pt+2]1([Cl-])[Cl-][Pt+2]([Cl-])([P](CC)(CC)CC)[Cl-]1.Cc1cccc(B2C=CN(C)c3ccccc32)n1 >> CC[P](CC)(CC)[Pt+2]([Cl-])([Cl-])<-[N]1=C(C)C=CC=C1B1C=CN(C)C2=CC=CC=C12
+- SMILES: CCP(CC)(CC)[Pt+2]1([Cl-])[Cl-][Pt+2]([Cl-])(P(CC)(CC)CC)[Cl-]1.Cc1cccc(B2C=CN(C)c3ccccc32)n1 >> CCP(CC)(CC)[Pt+2]([Cl-])([Cl-])<-N1=C(C)C=CC=C1B1C=CN(C)C2=CC=CC=C12
 
 ## Reaction 31-563-CAS-16045740
 
@@ -74581,7 +74581,7 @@ Total reactions: 17173
 - Yield %: 69
 - Reagents: 917-54-4 (917-54-4) [UNK]
 - Solvents: Diethyl ether (60-29-7)
-- SMILES: CC(C)[P]1(C(C)C)CC2=CC(N3CCCC3)=CC3=[N]2->[Co+]1([Cl-])[P](C(C)C)(C(C)C)C3.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CC(C)[P]1(C(C)C)Cc2cc(N3CCCC3)cc3[n]2->[Co+]1(<-[N]#N)([B-]1OC(C)(C)C(C)(C)O1)[P](C(C)C)(C(C)C)C3
+- SMILES: CC(C)P1(C(C)C)CC2=CC(N3CCCC3)=CC3=N2->[Co+]1([Cl-])P(C(C)C)(C(C)C)C3.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CC(C)[P]1(C(C)C)Cc2cc(N3CCCC3)cc3n2->[Co+]1(<-N#N)([B-]1OC(C)(C)C(C)(C)O1)[P](C(C)C)(C(C)C)C3
 
 ## Reaction 31-614-CAS-23925048
 
@@ -75770,7 +75770,7 @@ Total reactions: 17173
 - Yield %: 90
 - Reagents: 13400-13-0 (13400-13-0) [UNK]
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: Cc1sc(-c2ccncc2)nc1B1OC(C)(C)C(C)(C)O1.Brc1nc(-c2ccc(-[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)cc2)sc1Br >> Cc1sc(-c2ccncc2)nc1-c1nc(-c2ccc(-[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)cc2)sc1-c1nc(-c2ccncc2)sc1C
+- SMILES: Cc1sc(-c2ccncc2)nc1B1OC(C)(C)C(C)(C)O1.BrC1=C(Br)SC(C2=CC=C([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=C2)=N1 >> CC1=C(C2=C(C3=C(C)SC(C4=CC=NC=C4)=N3)SC(C3=CC=C([C-]45->[Fe+2]6789%10%11%12(<-[CH-]%13[CH]6=[CH]7[CH]8=[CH]%139)[CH](=[CH]4%10)[CH]%11=[CH]5%12)C=C3)=N2)N=C(C2=CC=NC=C2)S1
 
 ## Reaction 31-614-CAS-24319391
 
@@ -78307,7 +78307,7 @@ Total reactions: 17173
 - Type: Suzuki
 - Yield %: 81
 - Solvents: Toluene (108-88-3)
-- SMILES: I[B]1234->[Fe-]56789%10%11(<-[BH]%12%13%14[BH]%15%16%17[BH]%18%19%20[BH]%15%12%21[BH]%18%12%15[BH]%19%18%22[BH]%20%16%19[BH]->5%17%13[CH]->6%19%18[CH]->7%12%22[BH]->8%21%15%14)<-[BH]156[BH]178[BH]%12%13%14[BH]%15%16%17[BH]%121%18[CH]->975[CH]->%10%15%18[BH]->%11%162[BH]%13%173[BH]%14864.[Cs+].C1=CC(C2=CC=[N+]([B]3456->[Co-]789%10%11%12%13(<-[BH]%14%15%16[BH]%17%18%19[BH]%20%21%22[BH]%17%14%23[BH]%20%14%17[BH]%21%20%24[BH]%22%18%21[BH]->7%19%15[CH]->8%21%20[CH]->9%14%24[BH]->%10%23%17%16)<-[BH]378[BH]39%10[BH]%14%15%16[BH]%17%18%19[BH]%143%20[CH]->%1197[CH]->%12%17%20[BH]->%13%184[BH]%15%195[BH]%16%1086)C=C2)=CC=N1 >> C1=C[N+]([B]2345->[Fe-]6789%10%11%12(<-[BH]%13%14%15[BH]%16%17%18[BH]%19%20%21[BH]%16%13%22[BH]%19%13%16[BH]%20%19%23[BH]%21%17%20[BH]->6%18%14[CH]->7%20%19[CH]->8%13%23[BH]->9%22%16%15)<-[BH]267[BH]289[BH]%13%14%15[BH]%16%17%18[BH]%132%19[CH]->%1086[CH]->%11%16%19[BH]->%12%173[BH]%14%184[BH]%15975)=CC=C1C1=CC=[N+]([B]2345->[Co-]6789%10%11%12(<-[BH]%13%14%15[BH]%16%17%18[BH]%19%20%21[BH]%16%13%22[BH]%19%13%16[BH]%20%19%23[BH]%21%17%20[BH]->6%18%14[CH]->7%20%19[CH]->8%13%23[BH]->9%22%16%15)<-[BH]267[BH]289[BH]%13%14%15[BH]%16%17%18[BH]%132%19[CH]->%1086[CH]->%11%16%19[BH]->%12%173[BH]%14%184[BH]%15975)C=C1
+- SMILES: IB1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]%1452[CH]%11%135[BH]%1273[Fe-]15243678[BH]124[BH]59%10[BH]%11%12%13[BH]51%14[BH]%1115[BH]%12%11%15[BH]%139%12[BH]%1023[CH]%12%116[CH]1%157[BH]%14548.[Cs+].C1=CC(C2=CC=[N+](B3456[BH]789[BH]%10%11%12[BH]7%13%14[BH]%107%15[BH]%11%10%16[BH]%1283[BH]%1043[CH]%1674[CH]%13%157[BH]%1495[Co-]3746589%10[BH]346[BH]7%11%12[BH]%13%14%15[BH]73%16[BH]%1337[BH]%14%13%17[BH]%15%11%14[BH]%1245[CH]%14%138[CH]3%179[BH]%1676%10)C=C2)=CC=N1 >> C1=C[N+](B2345[BH]678[BH]9%10%11[BH]6%12%13[BH]96%14[BH]%109%15[BH]%1172[BH]932[CH]%1563[CH]%12%146[BH]%1384[Fe-]26354789[BH]235[BH]6%10%11[BH]%12%13%14[BH]62%15[BH]%1226[BH]%13%12%16[BH]%14%10%13[BH]%1134[CH]%13%127[CH]2%168[BH]%15659)=CC=C1C1=CC=[N+](B2345[BH]678[BH]9%10%11[BH]6%12%13[BH]96%14[BH]%109%15[BH]%1172[BH]932[CH]%1563[CH]%12%146[BH]%1384[Co-]26354789[BH]235[BH]6%10%11[BH]%12%13%14[BH]62%15[BH]%1226[BH]%13%12%16[BH]%14%10%13[BH]%1134[CH]%13%127[CH]2%168[BH]%15659)C=C1
 
 ## Reaction 31-614-CAS-25475350
 
@@ -79006,7 +79006,7 @@ Total reactions: 17173
 - Yield %: 80
 - Reagents: 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: Brc1cccc(Br)n1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9cccc(Br)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9cccc(-c%10cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12[n]%13->[Ni+2]%14%15<-[n]%16c(cc%10[n-]->%14%11)C(c%10cccc(Br)n%10)=Cc%16c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%13C=C%12)[n-]->%15%10)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9cccc(C%10=Cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc%13c(-c%14cc(C(C)(C)C)cc(C(C)(C)C)c%14)c%14[n]%15->[Ni+2]%16(<-[n]%11c%10cc%10c(-c%11cccc(-c%17cc%18c(-c%19cc(C(C)(C)C)cc(C(C)(C)C)c%19)c%19[n]%20->[Ni+2]%21%22<-[n]%23c(cc%17[n-]->%21%18)C(c%17cccc(Br)n%17)=Cc%23c(-c%17cc(C(C)(C)C)cc(C(C)(C)C)c%17)c%17ccc(c(-c%18cc(C(C)(C)C)cc(C(C)(C)C)c%18)c%20C=C%19)[n-]->%22%17)n%11)cc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%15C=C%14)[n-]->%16%10)<-[n-]%12%13)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: Brc1cccc(Br)n1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9cccc(Br)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9cccc(-c%10cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12n%13->[Ni+2]%14%15<-n%16c(cc%10[n-]->%14%11)C(c%10cccc(Br)n%10)=Cc%16c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%13C=C%12)[n-]->%15%10)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9cccc(C%10=Cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc%13c(-c%14cc(C(C)(C)C)cc(C(C)(C)C)c%14)c%14n%15->[Ni+2]%16(<-n%11c%10cc%10c(-c%11cccc(-c%17cc%18c(-c%19cc(C(C)(C)C)cc(C(C)(C)C)c%19)c%19n%20->[Ni+2]%21%22<-n%23c(cc%17[n-]->%21%18)C(c%17cccc(Br)n%17)=Cc%23c(-c%17cc(C(C)(C)C)cc(C(C)(C)C)c%17)c%17ccc(c(-c%18cc(C(C)(C)C)cc(C(C)(C)C)c%18)c%20C=C%19)[n-]->%22%17)n%11)cc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%15C=C%14)[n-]->%16%10)<-[n-]%12%13)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-26002124
 
@@ -79201,7 +79201,7 @@ Total reactions: 17173
 - Type: Suzuki
 - Yield %: 76
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CC(C)[P]1(C(C)C)CC2=CC=CC3=[N]2->[Co+]1([Cl-])[P](C(C)C)(C(C)C)C3.CC(C)[P]1(C(C)C)Cc2cc(N3CCCC3)cc3[n]2->[CoH2+3]1([B-]1OC(C)(C)C(C)(C)O1)[P](C(C)C)(C(C)C)C3 >> CC(C)[P]1(C(C)C)CC2=CC(B3OC(C)(C)C(C)(C)O3)=CC3=[N]2->[Co+]1([Cl-])[P](C(C)C)(C(C)C)C3
+- SMILES: CC(C)P1(C(C)C)CC2=CC=CC3=N2->[Co+]1([Cl-])P(C(C)C)(C(C)C)C3.CC(C)[P]1(C(C)C)Cc2cc(N3CCCC3)cc3n2->[CoH2+3]1([B-]1OC(C)(C)C(C)(C)O1)[P](C(C)C)(C(C)C)C3 >> CC(C)P1(C(C)C)CC2=CC(B3OC(C)(C)C(C)(C)O3)=CC3=N2->[Co+]1([Cl-])P(C(C)C)(C(C)C)C3
 
 ## Reaction 31-614-CAS-26209677
 
@@ -79625,7 +79625,7 @@ Total reactions: 17173
 - Yield %: 66
 - Reagents: 127-08-2 (127-08-2) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.Fc1c(F)c(F)c(-c2c3[n]4->[Zn+2]56<-[n]7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F >> CC1(C)OB(c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8c(F)c(F)c(F)c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)OC1(C)C
+- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.Fc1c(F)c(F)c(-c2c3n4->[Zn+2]56<-n7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F >> CC1(C)OB(c2c3n4->[Zn+2]56<-n7c(c(-c8c(F)c(F)c(F)c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)OC1(C)C
 
 ## Reaction 31-614-CAS-26538635
 
@@ -79668,7 +79668,7 @@ Total reactions: 17173
 - Yield %: 50
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Water (7732-18-5)
-- SMILES: CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(Br)c1ccc(cc3C=C2)[n-]->51.CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(B1OC(C)(C)C(C)(C)O1)c1ccc(cc3C=C2)[n-]->51 >> CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2[n]3->[Zn+2]45<-[n]6c(cc7ccc1[n-]->47)C=Cc6c(-c1c4[n]6->[Zn+2]78<-[n]9c(cc%10ccc1[n-]->7%10)C=Cc9c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(cc6C=C4)[n-]->81)c1ccc(cc3C=C2)[n-]->51
+- SMILES: CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(Br)c1ccc(cc3C=C2)[n-]->51.CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(B1OC(C)(C)C(C)(C)O1)c1ccc(cc3C=C2)[n-]->51 >> CCCCCCCCOc1cccc(OCCCCCCCC)c1-c1c2n3->[Zn+2]45<-n6c(cc7ccc1[n-]->47)C=Cc6c(-c1c4n6->[Zn+2]78<-n9c(cc%10ccc1[n-]->7%10)C=Cc9c(-c1c(OCCCCCCCC)cccc1OCCCCCCCC)c1ccc(cc6C=C4)[n-]->81)c1ccc(cc3C=C2)[n-]->51
 
 ## Reaction 31-614-CAS-26574767
 
@@ -79807,7 +79807,7 @@ Total reactions: 17173
 - Yield %: 75
 - Reagents: Cesium carbonate (534-17-8) [BASE], 128-08-5 (128-08-5) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Chloroform (67-66-3)
-- SMILES: Cc1cc(C)c(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c(C)c1.CC(C)(C)c1ccc(-c2cc3c4c5c2cccc5c2cccc5c(Br)cc(c4c52)n3Cc2cc(C(C)(C)C)cc(C(C)(C)C)c2)cc1 >> Cc1cc(C)c(-c2c3[n]4->[Zn+2]56<-[n]7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(-c5cc7c8c9c5cccc9c5cccc9c(-c%10ccc(C(C)(C)C)cc%10)cc(c8c95)n7Cc5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)c(C)c1
+- SMILES: Cc1cc(C)c(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c(C)c1.CC(C)(C)c1ccc(-c2cc3c4c5c2cccc5c2cccc5c(Br)cc(c4c52)n3Cc2cc(C(C)(C)C)cc(C(C)(C)C)c2)cc1 >> Cc1cc(C)c(-c2c3n4->[Zn+2]56<-n7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2c(C)cc(C)cc2C)c2ccc(c(-c5cc7c8c9c5cccc9c5cccc9c(-c%10ccc(C(C)(C)C)cc%10)cc(c8c95)n7Cc5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)c(C)c1
 
 ## Reaction 31-614-CAS-26772434
 
@@ -80109,7 +80109,7 @@ Total reactions: 17173
 - Type: Suzuki
 - Yield %: 98
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Br[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.CC(C)[O-][B+3]([O-]C(C)C)([O-]C(C)C)[C-]1=COC=C1.[Li+] >> c1cc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)co1
+- SMILES: Br[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.CC(C)[O-][B+3]([O-]C(C)C)([O-]C(C)C)[C-]1=COC=C1.[Li+] >> C1=CC([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)=CO1
 
 ## Reaction 31-614-CAS-27042448
 
@@ -80930,7 +80930,7 @@ Total reactions: 17173
 - Yield %: 52
 - Reagents: Cesium carbonate (534-17-8) [BASE], 7681-82-5 (7681-82-5) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CN(CCCN(C)Cc1ccc(Br)cn1)Cc1ccc(Br)cn1.Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)cc1 >> Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8ccccc8)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccc(CN(C)CCCN(C)Cc7ccc(-c8c9[n]%10->[Zn+2]%11%12<-[n]%13c(c(-c%14ccccc%14)c%14ccc(c(-c%15ccc(C)cc%15)c%10C=C9)[n-]->%11%14)C=Cc%13c(-c9ccc(C)cc9)c9ccc8[n-]->%129)cn7)nc5)c4C=C3)[n-]->62)cc1
+- SMILES: CN(CCCN(C)Cc1ccc(Br)cn1)Cc1ccc(Br)cn1.Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccccc5)c4C=C3)[n-]->62)cc1 >> Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(c(-c8ccccc8)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccc(CN(C)CCCN(C)Cc7ccc(-c8c9n%10->[Zn+2]%11%12<-n%13c(c(-c%14ccccc%14)c%14ccc(c(-c%15ccc(C)cc%15)c%10C=C9)[n-]->%11%14)C=Cc%13c(-c9ccc(C)cc9)c9ccc8[n-]->%129)cn7)nc5)c4C=C3)[n-]->62)cc1
 
 ## Reaction 31-614-CAS-27759258
 
@@ -81073,7 +81073,7 @@ Total reactions: 17173
 - Yield %: 73
 - Reagents: 17341-93-4 (17341-93-4) [UNK], Sodium hydroxide (1310-73-2) [BASE], 7722-84-1 (7722-84-1) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Methanol (67-56-1), Water (7732-18-5)
-- SMILES: [Li][c]1ccncc1F.CC(C)(C)OC(=O)N1CC(B2OC(C)(C)C(C)(C)O2)(C2CCCCC2)C1 >> CC(C)(C)OC(=O)N1CC(c2ccncc2F)(C2CCCCC2)C1
+- SMILES: [Li]c1ccncc1F.CC(C)(C)OC(=O)N1CC(B2OC(C)(C)C(C)(C)O2)(C2CCCCC2)C1 >> CC(C)(C)OC(=O)N1CC(c2ccncc2F)(C2CCCCC2)C1
 
 ## Reaction 31-614-CAS-27884505
 
@@ -81219,7 +81219,7 @@ Total reactions: 17173
 - Yield %: 56
 - Reagents: Copper(I) thiophene-2-carboxylate (68986-76-5) [CAT]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: OB(O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.CSC1=C2C=C(C3=C[N-]4C(=C3)C(C3=C(C)C=C(C)C=C3C)=C3C=CC=N3[B+3]4([F-])[F-])C(C)=N2[B+3]([F-])([F-])[N-]2C(C)=CC=C12 >> CC1=CC(C)=C(C2=C3C=CC=N3[B+3]([F-])([F-])[N-]3C=C(C4=CC5=C([C-]67->[Fe+2]89%10%11%12%13%14(<-[CH]%15=[CH]->8[CH-]->9[CH]->%10=[CH]->%11%15)<-[CH](=[CH]->%126)[CH]->%13=[CH]->%147)C6=CC=C(C)[N-]6[B+3]([F-])([F-])N5=C4C)C=C23)C(C)=C1
+- SMILES: OB(O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.CSC1=C2C=C(C3=C[N-]4C(=C3)C(C3=C(C)C=C(C)C=C3C)=C3C=CC=N3[B+3]4([F-])[F-])C(C)=N2[B+3]([F-])([F-])[N-]2C(C)=CC=C12 >> CC1=CC(C)=C(C2=C3C=CC=N3[B+3]([F-])([F-])[N-]3C=C(C4=CC5=C([C-]67->[Fe+2]89%10%11%12%13%14(<-[CH-]%15[CH]8=[CH]9[CH]%10=[CH]%15%11)[CH](=[CH]6%12)[CH]%13=[CH]7%14)C6=CC=C(C)[N-]6[B+3]([F-])([F-])N5=C4C)C=C23)C(C)=C1
 
 ## Reaction 31-614-CAS-27979463
 
@@ -81528,7 +81528,7 @@ Total reactions: 17173
 - Yield %: 88
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9cc%10c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%11[n]%12->[Ni+2]%13%14<-[n]%15c(cc9[n-]->%13%10)C=Cc%15c(-c9cc(C(C)(C)C)cc(C(C)(C)C)c9)c9ccc(c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%12C=C%11)[n-]->%149)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9cc%10c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%11n%12->[Ni+2]%13%14<-n%15c(cc9[n-]->%13%10)C=Cc%15c(-c9cc(C(C)(C)C)cc(C(C)(C)C)c9)c9ccc(c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%12C=C%11)[n-]->%149)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-28246814
 
@@ -81681,7 +81681,7 @@ Total reactions: 17173
 - Yield %: 50
 - Reagents: 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9cccc(Br)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9cccc(C%10=Cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc%13c(-c%14cc(C(C)(C)C)cc(C(C)(C)C)c%14)c%14[n]%15->[Ni+2]%16(<-[n]%11c%10cc%10c(-c%11cccc(-c%17cc%18c(-c%19cc(C(C)(C)C)cc(C(C)(C)C)c%19)c%19[n]%20->[Ni+2]%21%22<-[n]%23c(cc%17[n-]->%21%18)C(c%17cccc(Br)n%17)=Cc%23c(-c%17cc(C(C)(C)C)cc(C(C)(C)C)c%17)c%17ccc(c(-c%18cc(C(C)(C)C)cc(C(C)(C)C)c%18)c%20C=C%19)[n-]->%22%17)n%11)cc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%15C=C%14)[n-]->%16%10)<-[n-]%12%13)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9cccc(Br)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9cccc(C%10=Cc%11c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc%13c(-c%14cc(C(C)(C)C)cc(C(C)(C)C)c%14)c%14n%15->[Ni+2]%16(<-n%11c%10cc%10c(-c%11cccc(-c%17cc%18c(-c%19cc(C(C)(C)C)cc(C(C)(C)C)c%19)c%19n%20->[Ni+2]%21%22<-n%23c(cc%17[n-]->%21%18)C(c%17cccc(Br)n%17)=Cc%23c(-c%17cc(C(C)(C)C)cc(C(C)(C)C)c%17)c%17ccc(c(-c%18cc(C(C)(C)C)cc(C(C)(C)C)c%18)c%20C=C%19)[n-]->%22%17)n%11)cc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%15C=C%14)[n-]->%16%10)<-[n-]%12%13)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-28346500
 
@@ -81787,7 +81787,7 @@ Total reactions: 17173
 - Yield %: 52
 - Reagents: Cesium carbonate (534-17-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC1(C)OB(c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc(c(-c9ccccc9)c4C=C3)[n-]->58)C=Cc7c(-c3ccccc3)c3ccc2[n-]->63)OC1(C)C.CCCCCCc1c2[n]3->[Zn+2]45<-[n]6c(c(Br)c7ccc1[n-]->47)C=Cc6c(CCCCCC)c1ccc(c(CCCCCC)c3C=C2)[n-]->51 >> CCCCCCc1c2[n]3->[Zn+2]45<-[n]6c(c(CCCCCC)c7ccc1[n-]->47)C=Cc6c(-c1c4[n]6->[Zn+2]78<-[n]9c(cc%10ccc(c(-c%11ccccc%11)c6C=C4)[n-]->7%10)C=Cc9c(-c4ccccc4)c4ccc1[n-]->84)c1ccc(c(CCCCCC)c3C=C2)[n-]->51
+- SMILES: CC1(C)OB(c2c3n4->[Zn+2]56<-n7c(cc8ccc(c(-c9ccccc9)c4C=C3)[n-]->58)C=Cc7c(-c3ccccc3)c3ccc2[n-]->63)OC1(C)C.CCCCCCc1c2n3->[Zn+2]45<-n6c(c(Br)c7ccc1[n-]->47)C=Cc6c(CCCCCC)c1ccc(c(CCCCCC)c3C=C2)[n-]->51 >> CCCCCCc1c2n3->[Zn+2]45<-n6c(c(CCCCCC)c7ccc1[n-]->47)C=Cc6c(-c1c4n6->[Zn+2]78<-n9c(cc%10ccc(c(-c%11ccccc%11)c6C=C4)[n-]->7%10)C=Cc9c(-c4ccccc4)c4ccc1[n-]->84)c1ccc(c(CCCCCC)c3C=C2)[n-]->51
 
 ## Reaction 31-614-CAS-28478888
 
@@ -82012,7 +82012,7 @@ Total reactions: 17173
 - Yield %: 50
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: Brc1cccc(Br)n1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2cc(B5OC(C)(C)C(C)(C)O5)c(cc4C(B4OC(C)(C)C(C)(C)O4)=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(-c9cccc(Br)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2cc(-c5cccc(Br)n5)c(cc4C(c4cccc(Br)n4)=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: Brc1cccc(Br)n1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2cc(B5OC(C)(C)C(C)(C)O5)c(cc4C(B4OC(C)(C)C(C)(C)O4)=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(-c9cccc(Br)n9)cc2[n-]->58)C(c2cccc(Br)n2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2cc(-c5cccc(Br)n5)c(cc4C(c4cccc(Br)n4)=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-28737208
 
@@ -82108,7 +82108,7 @@ Total reactions: 17173
 - Yield %: 79
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8ccc2[n-]->58)C(c2c5[n]8->[Ni+2]9%10<-[n]%11c(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc2[n-]->9%12)C=Cc%11c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c9cc(C(C)(C)C)cc(C(C)(C)C)c9)c8C=C5)[n-]->%102)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8ccc2[n-]->58)C(c2c5n8->[Ni+2]9%10<-n%11c(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc2[n-]->9%12)C=Cc%11c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c9cc(C(C)(C)C)cc(C(C)(C)C)c9)c8C=C5)[n-]->%102)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-28881720
 
@@ -82644,7 +82644,7 @@ Total reactions: 17173
 - Yield %: 75
 - Reagents: 13400-13-0 (13400-13-0) [UNK]
 - Solvents: 1693-74-9 (1693-74-9)
-- SMILES: CC1(C)OB(c2nc(F)c(F)c(F)c2F)OC1(C)C.CCOC(=O)C(CC1=CC=[C-](->[Pd+2]([Br-])([P](C(C)C)(C(C)C)C(C)C)[P](C(C)C)(C(C)C)C(C)C)C=C1)NC(C)=O >> CCOC(=O)C(Cc1ccc(-c2nc(F)c(F)c(F)c2F)cc1)NC(C)=O.CC1(C)[O-][B+3]([F-])([C-]2=C(F)C(F)=C(F)C(F)=N2)[O-]C1(C)C.[Cs+]
+- SMILES: CC1(C)OB(c2nc(F)c(F)c(F)c2F)OC1(C)C.CCOC(=O)C(CC1=CC=[C-](->[Pd+2]([Br-])(P(C(C)C)(C(C)C)C(C)C)P(C(C)C)(C(C)C)C(C)C)C=C1)NC(C)=O >> CCOC(=O)C(Cc1ccc(-c2nc(F)c(F)c(F)c2F)cc1)NC(C)=O.CC1(C)[O-][B+3]([F-])([C-]2=C(F)C(F)=C(F)C(F)=N2)[O-]C1(C)C.[Cs+]
 
 ## Reaction 31-614-CAS-29414496
 
@@ -82653,7 +82653,7 @@ Total reactions: 17173
 - Yield %: 51
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccc(C)cc5)c4C=C3)[n-]->62)cc1 >> Cc1ccc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccc(C)cc5)c4C=C3)[n-]->62)cc1
+- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccc(C)cc5)c4C=C3)[n-]->62)cc1 >> Cc1ccc(-c2c3n4->[Zn+2]56<-n7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2ccc(C)cc2)c2ccc(c(-c5ccc(C)cc5)c4C=C3)[n-]->62)cc1
 
 ## Reaction 31-614-CAS-29423262
 
@@ -82727,7 +82727,7 @@ Total reactions: 17173
 - Type: Suzuki
 - Yield %: 78
 - Solvents: Toluene (108-88-3)
-- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.CC(C)[P]1(C(C)C)C2=CC=CC3=C2[O]2->[Rh+]1([Cl-])[P](C(C)C)(C(C)C)C1=CC=CC(=C12)C3(C)C >> [H-][Rh+3]12([Cl-])([B-]3OC(C)(C)C(C)(C)O3)<-[O]3C4=C(C=CC=C4[P]1(C(C)C)C(C)C)C(C)(C)C1=C3C(=CC=C1)[P]2(C(C)C)C(C)C
+- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.CC(C)P1(C(C)C)C2=CC=CC3=C2O2->[Rh+]1([Cl-])P(C(C)C)(C(C)C)C1=CC=CC(=C12)C3(C)C >> [H-][Rh+3]12([Cl-])([B-]3OC(C)(C)C(C)(C)O3)<-O3C4=C(C=CC=C4P1(C(C)C)C(C)C)C(C)(C)C1=C3C(=CC=C1)P2(C(C)C)C(C)C
 
 ## Reaction 31-614-CAS-29544938
 
@@ -83457,7 +83457,7 @@ Total reactions: 17173
 - Yield %: 54
 - Reagents: Sodium methoxide (124-41-4) [BASE], 7553-56-2 (7553-56-2) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CCCC[O-][B+3]([O-]CCCC)([C-]1=CCCCO1)[C-]1=C(C)N=C(Cl)C=C1.CCCC[O][Mg][Br].[Li+] >> Cc1nc(Cl)ccc1C1=CCCCO1
+- SMILES: CCCCO[Mg]Br.CCCC[O-][B+3]([O-]CCCC)([C-]1=CCCCO1)[C-]1=C(C)N=C(Cl)C=C1.[Li+] >> Cc1nc(Cl)ccc1C1=CCCCO1
 
 ## Reaction 31-614-CAS-30116950
 
@@ -83534,7 +83534,7 @@ Total reactions: 17173
 - Condition Core: Pd
 - Yield %: 92
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: Brc1cccnc1.CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)[B-]1[Zn+2]1(<-[O]2CCCC2)[Br-][Zn+2]([B-]2N(C3=C(C(C)C)C=CC=C3C(C)C)C=CN2C2=C(C(C)C)C=CC=C2C(C)C)(<-[O]2CCCC2)[Br-]1 >> CC(C)c1cccc(C(C)C)c1N1C=CN(c2c(C(C)C)cccc2C(C)C)B1c1cccnc1
+- SMILES: Brc1cccnc1.CC(C)C1=CC=CC(C(C)C)=C1N1C=CN(C2=C(C(C)C)C=CC=C2C(C)C)[B-]1[Zn+2]1(<-O2CCCC2)[Br-][Zn+2]([B-]2N(C3=C(C(C)C)C=CC=C3C(C)C)C=CN2C2=C(C(C)C)C=CC=C2C(C)C)(<-O2CCCC2)[Br-]1 >> CC(C)c1cccc(C(C)C)c1N1C=CN(c2c(C(C)C)cccc2C(C)C)B1c1cccnc1
 
 ## Reaction 31-614-CAS-30214321
 
@@ -83837,7 +83837,7 @@ Total reactions: 17173
 - Yield %: 57
 - Reagents: 54663-78-4 (54663-78-4) [UNK], 1003-09-4 (1003-09-4) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CCCCCCCCC(CCCCCC)CN1C(=O)C2=C(c3ccc(Br)cn3)N(CC(CCCCCC)CCCCCCCC)C(=O)C2=C1c1ccc(Br)cn1.[CH3][Sn]([CH3])([CH3])[c]1ccc(B(c2cc[c]([Sn]([CH3])([CH3])[CH3])s2)c2c(C(F)(F)F)cc(C(F)(F)F)cc2C(F)(F)F)s1 >> *C1=C2C(=O)N(CC(CCCCCC)CCCCCCCC)C(c3ccc(-c4ccc(B(c5ccc(-c6ccc(*)nc6)s5)c5c(C(F)(F)F)cc(C(F)(F)F)cc5C(F)(F)F)s4)cn3)=C2C(=O)N1CC(CCCCCC)CCCCCCCC
+- SMILES: CCCCCCCCC(CCCCCC)CN1C(=O)C2=C(c3ccc(Br)cn3)N(CC(CCCCCC)CCCCCCCC)C(=O)C2=C1c1ccc(Br)cn1.C[Sn](C)(C)c1ccc(B(c2ccc([Sn](C)(C)C)s2)c2c(C(F)(F)F)cc(C(F)(F)F)cc2C(F)(F)F)s1 >> *C1=C2C(=O)N(CC(CCCCCC)CCCCCCCC)C(c3ccc(-c4ccc(B(c5ccc(-c6ccc(*)nc6)s5)c5c(C(F)(F)F)cc(C(F)(F)F)cc5C(F)(F)F)s4)cn3)=C2C(=O)N1CC(CCCCCC)CCCCCCCC
 
 ## Reaction 31-614-CAS-30558898
 
@@ -83899,7 +83899,7 @@ Total reactions: 17173
 - Yield %: 50
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(C9=Cc%10c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%11ccc%12c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c%13[n]%14->[Ni+2]%15(<-[n]%10c9cc9c(-c%10cc%16c(-c%17cc(C(C)(C)C)cc(C(C)(C)C)c%17)c%17[n]%18->[Ni+2]%19%20<-[n]%21c(cc%10[n-]->%19%16)C=Cc%21c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%16cc(C(C)(C)C)cc(C(C)(C)C)c%16)c%18C=C%17)[n-]->%20%10)cc(c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%14C=C%13)[n-]->%159)<-[n-]%11%12)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C(B2OC(C)(C)C(C)(C)O2)=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(Br)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(C9=Cc%10c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c%11ccc%12c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c%13n%14->[Ni+2]%15(<-n%10c9cc9c(-c%10cc%16c(-c%17cc(C(C)(C)C)cc(C(C)(C)C)c%17)c%17n%18->[Ni+2]%19%20<-n%21c(cc%10[n-]->%19%16)C=Cc%21c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%16cc(C(C)(C)C)cc(C(C)(C)C)c%16)c%18C=C%17)[n-]->%20%10)cc(c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%14C=C%13)[n-]->%159)<-[n-]%11%12)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-30675990
 
@@ -93293,7 +93293,7 @@ Total reactions: 17173
 - Yield %: 88
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: Acetonitrile (75-05-8), Water (7732-18-5)
-- SMILES: CC#N.OB(O)c1cncnc1.CC(C)(C)C1=CC=[N]2->[Ru+2]34(<-[N]5=CC=C(C(C)(C)C)C=C5C2=C1)(<-[N]1=CC=C(C(C)(C)C)C=C1C1=CC(C(C)(C)C)=CC=[N]->31)<-[N]1=CC=CC2=C1C1=C(C=CC=[N]->41)C(Br)=C2Br.[F-][P+5]([F-])([F-])([F-])([F-])[F-] >> CC#N.CC(C)(C)C1=CC=[N]2->[Ru+2]34(<-[N]5=CC=C(C(C)(C)C)C=C5C2=C1)(<-[N]1=CC=C(C(C)(C)C)C=C1C1=CC(C(C)(C)C)=CC=[N]->31)<-[N]1=CC=CC2=C1C1=C(C=CC=[N]->41)C(C1=CN=CN=C1)=C2C1=CN=CN=C1.O.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: CC#N.OB(O)c1cncnc1.CC(C)(C)C1=CC=N2->[Ru+2]34(<-N5=CC=C(C(C)(C)C)C=C5C2=C1)(<-N1=CC=C(C(C)(C)C)C=C1C1=CC(C(C)(C)C)=CC=N->31)<-N1=CC=CC2=C1C1=C(C=CC=N->41)C(Br)=C2Br.[F-][P+5]([F-])([F-])([F-])([F-])[F-] >> CC#N.CC(C)(C)C1=CC=N2->[Ru+2]34(<-N5=CC=C(C(C)(C)C)C=C5C2=C1)(<-N1=CC=C(C(C)(C)C)C=C1C1=CC(C(C)(C)C)=CC=N->31)<-N1=CC=CC2=C1C1=C(C=CC=N->41)C(C1=CN=CN=C1)=C2C1=CN=CN=C1.O.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-614-CAS-34513935
 
@@ -94754,7 +94754,7 @@ Total reactions: 17173
 - Yield %: 71
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(Br)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1 >> CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(C2=C5C=CC6=C(C7=CC(C(C)(C)C)=CC(C(C)(C)C)=C7)C7=[N]8->[Ni+2]9(<-[N]%10=C2C=CC%10=C(C2=CC(C(C)(C)C)=CC(C(C)(C)C)=C2)C2=CC=C(C(C%10=CC(C(C)(C)C)=CC(C(C)(C)C)=C%10)=C8C=C7)[N-]->92)<-[N-]65)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(Br)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1 >> CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(C2=C5C=CC6=C(C7=CC(C(C)(C)C)=CC(C(C)(C)C)=C7)C7=N8->[Ni+2]9(<-N%10=C2C=CC%10=C(C2=CC(C(C)(C)C)=CC(C(C)(C)C)=C2)C2=CC=C(C(C%10=CC(C(C)(C)C)=CC(C(C)(C)C)=C%10)=C8C=C7)[N-]->92)<-[N-]65)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1
 
 ## Reaction 31-614-CAS-34709470
 
@@ -94763,7 +94763,7 @@ Total reactions: 17173
 - Yield %: 75
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(Br)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1 >> CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(C2=CC5=[N]6->[Ni+2]78<-[N]9=C(C=CC9=C(C9=CC(C(C)(C)C)=CC(C(C)(C)C)=C9)C9=CC=C(C=C26)[N-]->79)C(C2=CC(C(C)(C)C)=CC(C(C)(C)C)=C2)=C2C=CC(=C5C5=CC(C(C)(C)C)=CC(C(C)(C)C)=C5)[N-]->82)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(Br)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1 >> CC1=CC(C)=C(C2=C3C=CC4=N3[B+3]([F-])([F-])[N-]3C2=CC(C2=CC5=N6->[Ni+2]78<-N9=C(C=CC9=C(C9=CC(C(C)(C)C)=CC(C(C)(C)C)=C9)C9=CC=C(C=C26)[N-]->79)C(C2=CC(C(C)(C)C)=CC(C(C)(C)C)=C2)=C2C=CC(=C5C5=CC(C(C)(C)C)=CC(C(C)(C)C)=C5)[N-]->82)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1
 
 ## Reaction 31-614-CAS-34709472
 
@@ -94772,7 +94772,7 @@ Total reactions: 17173
 - Yield %: 53
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC1=CC(C)=C(C2=C3C=C(Br)C4=N3[B+3]([F-])([F-])[N-]3C2=CC(Br)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1 >> CC1=CC(C)=C(C2=C3C=C(C4=CC5=[N]6->[Ni+2]78<-[N]9=C(C=CC9=C(C9=CC(C(C)(C)C)=CC(C(C)(C)C)=C9)C9=CC=C(C=C46)[N-]->79)C(C4=CC(C(C)(C)C)=CC(C(C)(C)C)=C4)=C4C=CC(=C5C5=CC(C(C)(C)C)=CC(C(C)(C)C)=C5)[N-]->84)C4=N3[B+3]([F-])([F-])[N-]3C2=CC(C2=CC5=[N]6->[Ni+2]78<-[N]9=C(C=CC9=C(C9=CC(C(C)(C)C)=CC(C(C)(C)C)=C9)C9=CC=C(C=C26)[N-]->79)C(C2=CC(C(C)(C)C)=CC(C(C)(C)C)=C2)=C2C=CC(=C5C5=CC(C(C)(C)C)=CC(C(C)(C)C)=C5)[N-]->82)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8c(B9OC(C)(C)C(C)(C)O9)cc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC1=CC(C)=C(C2=C3C=C(Br)C4=N3[B+3]([F-])([F-])[N-]3C2=CC(Br)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1 >> CC1=CC(C)=C(C2=C3C=C(C4=CC5=N6->[Ni+2]78<-N9=C(C=CC9=C(C9=CC(C(C)(C)C)=CC(C(C)(C)C)=C9)C9=CC=C(C=C46)[N-]->79)C(C4=CC(C(C)(C)C)=CC(C(C)(C)C)=C4)=C4C=CC(=C5C5=CC(C(C)(C)C)=CC(C(C)(C)C)=C5)[N-]->84)C4=N3[B+3]([F-])([F-])[N-]3C2=CC(C2=CC5=N6->[Ni+2]78<-N9=C(C=CC9=C(C9=CC(C(C)(C)C)=CC(C(C)(C)C)=C9)C9=CC=C(C=C26)[N-]->79)C(C2=CC(C(C)(C)C)=CC(C(C)(C)C)=C2)=C2C=CC(=C5C5=CC(C(C)(C)C)=CC(C(C)(C)C)=C5)[N-]->82)=C3C2=CC=C(N2)/C(C2=C(C)C=C(C)C=C2C)=C2/C=C/C(=C(\C3=C(C)C=C(C)C=C3C)C3=CC=C4N3)N2)C(C)=C1
 
 ## Reaction 31-614-CAS-34713693
 
@@ -100438,7 +100438,7 @@ Total reactions: 17173
 - Yield %: 75
 - Reagents: 7440-09-7 (7440-09-7) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: [BH3]->[Ge+2]1([Cl-])<-[C-]2=C(C(C)(C)C)C=C(C(C)(C)C)C=C2C[N]->1(CC)CC >> [BH3]->[Ge+]1(<-[C-]2=C(C(C)(C)C)C=C(C(C)(C)C)C=C2C[N]->1(CC)CC)[Ge+]1(<-[BH3])<-[C-]2=C(C(C)(C)C)C=C(C(C)(C)C)C=C2C[N]->1(CC)CC
+- SMILES: B->[Ge+2]1([Cl-])<-[C-]2=C(C(C)(C)C)C=C(C(C)(C)C)C=C2CN->1(CC)CC >> B->[Ge+]1(<-[C-]2=C(C(C)(C)C)C=C(C(C)(C)C)C=C2CN->1(CC)CC)[Ge+]1(<-B)<-[C-]2=C(C(C)(C)C)C=C(C(C)(C)C)C=C2CN->1(CC)CC
 
 ## Reaction 31-614-CAS-35924570
 
@@ -101181,7 +101181,7 @@ Total reactions: 17173
 - Yield %: 54
 - Time (h): 48.0
 - Solvents: Xylenes (mixed isomers) (1330-20-7)
-- SMILES: CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[c]1cc[c]([Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC)s1.FC(F)(F)c1cc(C(F)(F)F)c(B(c2ccc(I)s2)c2ccc(I)s2)c(C(F)(F)F)c1 >> *B(c1ccc(-c2ccc(-c3ccc(*)s3)s2)s1)c1c(C(F)(F)F)cc(C(F)(F)F)cc1C(F)(F)F
+- SMILES: CCCC[Sn](CCCC)(CCCC)c1ccc([Sn](CCCC)(CCCC)CCCC)s1.FC(F)(F)c1cc(C(F)(F)F)c(B(c2ccc(I)s2)c2ccc(I)s2)c(C(F)(F)F)c1 >> *B(c1ccc(-c2ccc(-c3ccc(*)s3)s2)s1)c1c(C(F)(F)F)cc(C(F)(F)F)cc1C(F)(F)F
 
 ## Reaction 31-614-CAS-36171073
 
@@ -101189,7 +101189,7 @@ Total reactions: 17173
 - Condition Core: Pd/PtBu3
 - Yield %: 94
 - Solvents: Toluene (108-88-3)
-- SMILES: CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[c]1cc[c]([Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC)s1.CC(C)(C)c1cc(C(C)(C)C)c(B(c2ccc(Br)s2)c2ccc(Br)s2)c(C(C)(C)C)c1 >> *B(c1ccc(-c2ccc(-c3ccc(*)s3)s2)s1)c1c(C(C)(C)C)cc(C(C)(C)C)cc1C(C)(C)C
+- SMILES: CCCC[Sn](CCCC)(CCCC)c1ccc([Sn](CCCC)(CCCC)CCCC)s1.CC(C)(C)c1cc(C(C)(C)C)c(B(c2ccc(Br)s2)c2ccc(Br)s2)c(C(C)(C)C)c1 >> *B(c1ccc(-c2ccc(-c3ccc(*)s3)s2)s1)c1c(C(C)(C)C)cc(C(C)(C)C)cc1C(C)(C)C
 
 ## Reaction 31-614-CAS-36171076
 
@@ -101197,7 +101197,7 @@ Total reactions: 17173
 - Condition Core: Pd/PtBu3
 - Yield %: 90
 - Solvents: Toluene (108-88-3)
-- SMILES: CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[c]1cc[c]([Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC)s1.CC(C)(C)c1cc(C(C)(C)C)c(B(c2csc(Br)c2)c2csc(Br)c2)c(C(C)(C)C)c1 >> *B(c1csc(-c2ccc(-c3cc(*)cs3)s2)c1)c1c(C(C)(C)C)cc(C(C)(C)C)cc1C(C)(C)C
+- SMILES: CCCC[Sn](CCCC)(CCCC)c1ccc([Sn](CCCC)(CCCC)CCCC)s1.CC(C)(C)c1cc(C(C)(C)C)c(B(c2csc(Br)c2)c2csc(Br)c2)c(C(C)(C)C)c1 >> *B(c1csc(-c2ccc(-c3cc(*)cs3)s2)c1)c1c(C(C)(C)C)cc(C(C)(C)C)cc1C(C)(C)C
 
 ## Reaction 31-614-CAS-36171077
 
@@ -101205,7 +101205,7 @@ Total reactions: 17173
 - Condition Core: Pd/PtBu3
 - Yield %: 78
 - Solvents: Toluene (108-88-3)
-- SMILES: CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[c]1cc[c]([Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC)s1.FC(F)(F)c1cc(C(F)(F)F)c(B(c2ccc(Br)s2)c2ccc(Br)s2)c(C(F)(F)F)c1 >> *B(c1ccc(-c2ccc(-c3ccc(*)s3)s2)s1)c1c(C(F)(F)F)cc(C(F)(F)F)cc1C(F)(F)F
+- SMILES: CCCC[Sn](CCCC)(CCCC)c1ccc([Sn](CCCC)(CCCC)CCCC)s1.FC(F)(F)c1cc(C(F)(F)F)c(B(c2ccc(Br)s2)c2ccc(Br)s2)c(C(F)(F)F)c1 >> *B(c1ccc(-c2ccc(-c3ccc(*)s3)s2)s1)c1c(C(F)(F)F)cc(C(F)(F)F)cc1C(F)(F)F
 
 ## Reaction 31-614-CAS-36171371
 
@@ -103687,7 +103687,7 @@ Total reactions: 17173
 - Yield %: 85
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CCCCCCCCOc1cc(OCCCCCCCC)cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(OCCCCCCCC)cc(OCCCCCCCC)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c1.CCCCCC[Si](CCCCCC)(CCCCCC)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2ccc(Cl)cc2)c2ccc(c(Br)c4C=C3)[n-]->62)cc([Si](CCCCCC)(CCCCCC)CCCCCC)c1 >> CCCCCCCCOc1cc(OCCCCCCCC)cc(-c2c3[n]4->[Zn+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(OCCCCCCCC)cc(OCCCCCCCC)c2)c2ccc(c(-c5c7[n]8->[Ni+2]9%10<-[n]%11c(c(-c%12ccc(Cl)cc%12)c%12ccc5[n-]->9%12)C=Cc%11c(-c5c9[n]%11->[Zn+2]%12%13<-[n]%14c(cc%15ccc(c(-c%16cc(OCCCCCCCC)cc(OCCCCCCCC)c%16)c%11C=C9)[n-]->%12%15)C=Cc%14c(-c9cc(OCCCCCCCC)cc(OCCCCCCCC)c9)c9ccc5[n-]->%139)c5ccc(c(-c9cc([Si](CCCCCC)(CCCCCC)CCCCCC)cc([Si](CCCCCC)(CCCCCC)CCCCCC)c9)c8C=C7)[n-]->%105)c4C=C3)[n-]->62)c1
+- SMILES: CCCCCCCCOc1cc(OCCCCCCCC)cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(OCCCCCCCC)cc(OCCCCCCCC)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)c1.CCCCCC[Si](CCCCCC)(CCCCCC)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2ccc(Cl)cc2)c2ccc(c(Br)c4C=C3)[n-]->62)cc([Si](CCCCCC)(CCCCCC)CCCCCC)c1 >> CCCCCCCCOc1cc(OCCCCCCCC)cc(-c2c3n4->[Zn+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(OCCCCCCCC)cc(OCCCCCCCC)c2)c2ccc(c(-c5c7n8->[Ni+2]9%10<-n%11c(c(-c%12ccc(Cl)cc%12)c%12ccc5[n-]->9%12)C=Cc%11c(-c5c9n%11->[Zn+2]%12%13<-n%14c(cc%15ccc(c(-c%16cc(OCCCCCCCC)cc(OCCCCCCCC)c%16)c%11C=C9)[n-]->%12%15)C=Cc%14c(-c9cc(OCCCCCCCC)cc(OCCCCCCCC)c9)c9ccc5[n-]->%139)c5ccc(c(-c9cc([Si](CCCCCC)(CCCCCC)CCCCCC)cc([Si](CCCCCC)(CCCCCC)CCCCCC)c9)c8C=C7)[n-]->%105)c4C=C3)[n-]->62)c1
 
 ## Reaction 31-614-CAS-36683383
 
@@ -110312,7 +110312,7 @@ Total reactions: 17173
 - Yield %: 81
 - Reagents: Sodium carbonate (497-19-8) [BASE], 12125-02-9 (12125-02-9) [UNK], 77-76-9 (77-76-9) [UNK], Sodium hydroxide (1310-73-2) [BASE]
 - Solvents: Ethanol (64-17-5), Tetrahydrofuran (109-99-9), Water (7732-18-5), Dichloromethane (75-09-2)
-- SMILES: OB(O)c1ccccc1.O=Cc1ccc2ccccc2c1Br.C[CH](C)[Mg][Br] >> C=C(C)C(=O)c1ccc2ccccc2c1-c1ccccc1
+- SMILES: OB(O)c1ccccc1.O=Cc1ccc2ccccc2c1Br.CC(C)[Mg]Br >> C=C(C)C(=O)c1ccc2ccccc2c1-c1ccccc1
 
 ## Reaction 31-614-CAS-37642581
 
@@ -114703,7 +114703,7 @@ Total reactions: 17173
 - Yield %: 76
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Fc1cnc2c(cnn2C2CCCCO2)c1I.[2H]C([2H])([2H])C1(C([2H])([2H])[2H])Cn2nc(-c3ccc(F)cn3)c(B3OC(C)(C)C(C)(C)O3)c2CO1.[Li][OH] >> [2H]C([2H])([2H])C1(C([2H])([2H])[2H])Cn2nc(-c3ccc(F)cn3)c(-c3c(F)cnc4[nH]ncc34)c2CO1
+- SMILES: Fc1cnc2c(cnn2C2CCCCO2)c1I.[2H]C([2H])([2H])C1(C([2H])([2H])[2H])Cn2nc(-c3ccc(F)cn3)c(B3OC(C)(C)C(C)(C)O3)c2CO1.[Li]O >> [2H]C([2H])([2H])C1(C([2H])([2H])[2H])Cn2nc(-c3ccc(F)cn3)c(-c3c(F)cnc4[nH]ncc34)c2CO1
 
 ## Reaction 31-614-CAS-38455428
 
@@ -119870,7 +119870,7 @@ Total reactions: 17173
 - Yield %: 82
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: 123-91-1 (123-91-1), Water (7732-18-5)
-- SMILES: OB(O)c1ccccc1F.Cc1cccc(Br)c1C(=O)NC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92 >> Cc1cccc(-c2ccccc2F)c1C(=O)NC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: OB(O)c1ccccc1F.CC1=CC=CC(Br)=C1C(=O)NC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29 >> CC1=CC=CC(C2=C(F)C=CC=C2)=C1C(=O)NC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-39078064
 
@@ -128921,7 +128921,7 @@ Total reactions: 17173
 - Yield %: 58
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Water (7732-18-5)
-- SMILES: [Li][CH2]CCC.Clc1ccc(C#Cc2cc(Cl)cc3cccnc23)cc1.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CCCCC1C=Cc2cc(Cl)cc3c2N1B(O)C(c1ccc(Cl)cc1)=C3B1OC(C)(C)C(C)(C)O1
+- SMILES: [Li]CCCC.Clc1ccc(C#Cc2cc(Cl)cc3cccnc23)cc1.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CCCCC1C=Cc2cc(Cl)cc3c2N1B(O)C(c1ccc(Cl)cc1)=C3B1OC(C)(C)C(C)(C)O1
 
 ## Reaction 31-614-CAS-40330911
 
@@ -128929,7 +128929,7 @@ Total reactions: 17173
 - Yield %: 58
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Water (7732-18-5)
-- SMILES: [Li][CH2]CCC.Fc1ccc(C#Cc2ccc(Cl)cc2)c2ncccc12.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CCCCC1C=Cc2c(F)ccc3c2N1B(O)C(c1ccc(Cl)cc1)=C3B1OC(C)(C)C(C)(C)O1
+- SMILES: [Li]CCCC.Fc1ccc(C#Cc2ccc(Cl)cc2)c2ncccc12.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CCCCC1C=Cc2c(F)ccc3c2N1B(O)C(c1ccc(Cl)cc1)=C3B1OC(C)(C)C(C)(C)O1
 
 ## Reaction 31-614-CAS-40331081
 
@@ -131220,7 +131220,7 @@ Total reactions: 17173
 - Yield %: 64
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Toluene (108-88-3)
-- SMILES: OB(O)c1cc2ccccc2o1.C[OH]->[Rh+2]1234<-[O]=C5[O-]->[Rh+2]16(<-[O]=C([O-]->2)C(C)(C)Cc1cc(Br)cc(CC(C)(C)C(=[O]->6)[O-]->3)c1Cl)(<-[O-]C(=[O]->4)C(C)(C)Cc1cc(Br)cc(CC5(C)C)c1Cl)<-[OH]C >> CC1(C)Cc2cc(-c3cc4ccccc4o3)cc(CC(C)(C)C3=[O]->[Rh+2]456<-[O]=C1[O-]->[Rh+2]41(<-[O]=C([O-]->5)C(C)(C)Cc4cc(-c5cc7ccccc7o5)cc(CC(C)(C)C(=[O]->1)[O-]->6)c4Cl)<-[O-]3)c2Cl
+- SMILES: OB(O)c1cc2ccccc2o1.CO->[Rh+2]1234<-O=C5[O-]->[Rh+2]16(<-O=C([O-]->2)C(C)(C)Cc1cc(Br)cc(CC(C)(C)C(=O->6)[O-]->3)c1Cl)(<-[O-]C(=O->4)C(C)(C)Cc1cc(Br)cc(CC5(C)C)c1Cl)<-OC >> CC1(C)Cc2cc(-c3cc4ccccc4o3)cc(CC(C)(C)C3=O->[Rh+2]456<-O=C1[O-]->[Rh+2]41(<-O=C([O-]->5)C(C)(C)Cc4cc(-c5cc7ccccc7o5)cc(CC(C)(C)C(=O->1)[O-]->6)c4Cl)<-[O-]3)c2Cl
 
 ## Reaction 31-614-CAS-40732950
 
@@ -142007,7 +142007,7 @@ Total reactions: 17173
 - Yield %: 93
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: OB(O)c1ccccc1.Brc1cc(Br)cc([C@]2(C3=[O]->[Rh+2]456<-[O]=C([O-]->[Rh+2]4(<-[O]=C([O-]->5)[C@@]4(c5cc(Br)cc(Br)c5)CC4(c4ccccc4)c4ccccc4)(<-[O]=C([O-]->6)[C@@]4(c5cc(Br)cc(Br)c5)CC4(c4ccccc4)c4ccccc4)<-[O-]3)[C@@]3(c4cc(Br)cc(Br)c4)CC3(c3ccccc3)c3ccccc3)CC2(c2ccccc2)c2ccccc2)c1 >> c1ccc(-c2cc(-c3ccccc3)cc([C@]3(C4=[O]->[Rh+2]567<-[O]=C([O-]->[Rh+2]5(<-[O]=C([O-]->6)[C@@]5(c6cc(-c8ccccc8)cc(-c8ccccc8)c6)CC5(c5ccccc5)c5ccccc5)(<-[O]=C([O-]->7)[C@@]5(c6cc(-c7ccccc7)cc(-c7ccccc7)c6)CC5(c5ccccc5)c5ccccc5)<-[O-]4)[C@@]4(c5cc(-c6ccccc6)cc(-c6ccccc6)c5)CC4(c4ccccc4)c4ccccc4)CC3(c3ccccc3)c3ccccc3)c2)cc1
+- SMILES: OB(O)c1ccccc1.Brc1cc(Br)cc([C@]2(C3=O->[Rh+2]456<-O=C([O-]->[Rh+2]4(<-O=C([O-]->5)[C@@]4(c5cc(Br)cc(Br)c5)CC4(c4ccccc4)c4ccccc4)(<-O=C([O-]->6)[C@@]4(c5cc(Br)cc(Br)c5)CC4(c4ccccc4)c4ccccc4)<-[O-]3)[C@@]3(c4cc(Br)cc(Br)c4)CC3(c3ccccc3)c3ccccc3)CC2(c2ccccc2)c2ccccc2)c1 >> c1ccc(-c2cc(-c3ccccc3)cc([C@]3(C4=O->[Rh+2]567<-O=C([O-]->[Rh+2]5(<-O=C([O-]->6)[C@@]5(c6cc(-c8ccccc8)cc(-c8ccccc8)c6)CC5(c5ccccc5)c5ccccc5)(<-O=C([O-]->7)[C@@]5(c6cc(-c7ccccc7)cc(-c7ccccc7)c6)CC5(c5ccccc5)c5ccccc5)<-[O-]4)[C@@]4(c5cc(-c6ccccc6)cc(-c6ccccc6)c5)CC4(c4ccccc4)c4ccccc4)CC3(c3ccccc3)c3ccccc3)c2)cc1
 
 ## Reaction 31-614-CAS-43156582
 
@@ -144247,7 +144247,7 @@ Total reactions: 17173
 - Yield %: 57
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC1(C)OB(c2ccc[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(Br)c(Br)c(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(-c5ccc[nH]5)c(-c5ccc[nH]5)c(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC1(C)OB(c2ccc[nH]2)OC1(C)C.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(Br)c(Br)c(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(-c8cc(C(C)(C)C)cc(C(C)(C)C)c8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2c(-c5ccc[nH]5)c(-c5ccc[nH]5)c(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-43881048
 
@@ -144265,7 +144265,7 @@ Total reactions: 17173
 - Yield %: 61
 - Reagents: Potassium carbonate (584-08-7) [BASE], 7446-08-4 (7446-08-4) [UNK], 7647-14-5 (7647-14-5) [UNK], 12125-02-9 (12125-02-9) [UNK], Triethylamine (121-44-8) [SOLVENT], Sodium hydrogen carbonate (144-55-8) [BASE]
 - Solvents: 123-91-1 (123-91-1), Water (7732-18-5), Tetrahydrofuran (109-99-9), Dichloromethane (75-09-2)
-- SMILES: Cc1ccc2cc(Br)ccc2n1.OB(O)c1cccs1.[Br][Mg][c]1ccccc1.CC(=O)OC(C)=O >> CC(=O)OC(c1ccccc1)c1ccc2cc(-c3cccs3)ccc2n1
+- SMILES: Cc1ccc2cc(Br)ccc2n1.OB(O)c1cccs1.Br[Mg]c1ccccc1.CC(=O)OC(C)=O >> CC(=O)OC(c1ccccc1)c1ccc2cc(-c3cccs3)ccc2n1
 
 ## Reaction 31-614-CAS-43931362
 
@@ -148763,7 +148763,7 @@ Total reactions: 17173
 - Yield %: 73
 - Reagents: Cesium carbonate (534-17-8) [BASE], 13400-13-0 (13400-13-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3)
-- SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3[n]4->[Ni+2]56<-[n]7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5c7[n]8->[Ni+2]9%10<-[n]%11c(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc(c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
+- SMILES: CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(c(Br)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(B5OC(C)(C)C(C)(C)O5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1 >> CC(C)(C)c1cc(-c2c3n4->[Ni+2]56<-n7c(cc8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5c7n8->[Ni+2]9%10<-n%11c(c(-c%12cc(C(C)(C)C)cc(C(C)(C)C)c%12)c%12ccc(c(-c%13cc(C(C)(C)C)cc(C(C)(C)C)c%13)c8C=C7)[n-]->9%12)C=Cc%11c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc5[n-]->%107)c4C=C3)[n-]->62)cc(C(C)(C)C)c1
 
 ## Reaction 31-614-CAS-45379308
 
@@ -148861,7 +148861,7 @@ Total reactions: 17173
 - Condition Core: Ir/dtbbpy
 - Yield %: 80
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(Cl)[CH]->6=2 >> CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[C]->3(Cl)[CH]->4=1)[C]->5(B1OC(C)(C)C(C)(C)O1)=[CH]->62
+- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.COC12=[CH]3C4(Cl)=[CH]5[CH]6=[CH]1[Cr]65342(C#O)(C#O)C#O >> COC12=[CH]3C4(Cl)=[CH]5C6(B7OC(C)(C)C(C)(C)O7)=[CH]1[Cr]53426(C#O)(C#O)C#O
 
 ## Reaction 31-614-CAS-45383571
 
@@ -148869,7 +148869,7 @@ Total reactions: 17173
 - Condition Core: Ir/dtbbpy
 - Yield %: 75
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: C[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->3[C]->4(Cl)=[CH]->51)[CH]->6=2.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CC1(C)OB([C]23->[Cr]4567([C]#O)([C]#O)([C]#O)<-[CH](=[C]->4(C)[CH]->5=2)[C]->6(Cl)=[CH]->73)OC1(C)C
+- SMILES: CC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Cr]45326(C#O)(C#O)C#O.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CC1(C)OB(C23=[CH]4C5(C)=[CH]6C7(Cl)=[CH]2[Cr]64573(C#O)(C#O)C#O)OC1(C)C
 
 ## Reaction 31-614-CAS-45383578
 
@@ -148877,7 +148877,7 @@ Total reactions: 17173
 - Condition Core: Ir/dtbbpy
 - Yield %: 90
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[C]->4(F)=[CH]->5[CH]->6=2.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]=1[C]->3(B1OC(C)(C)C(C)(C)O1)=[C]->4(F)[C]->5(B1OC(C)(C)C(C)(C)O1)=[CH]->62
+- SMILES: COC12=[CH]3[CH]4=C5(F)[CH]6=[CH]1[Cr]64352(C#O)(C#O)C#O.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C >> COC12=[CH]3C4(B5OC(C)(C)C(C)(C)O5)=C5(F)C6(B7OC(C)(C)C(C)(C)O7)=[CH]1[Cr]32645(C#O)(C#O)C#O
 
 ## Reaction 31-614-CAS-45383581
 
@@ -148885,7 +148885,7 @@ Total reactions: 17173
 - Condition Core: Ir/dtbbpy
 - Yield %: 76
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.C[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->3[C]->4(C)=[C]->51Cl)[CH]->6=2 >> CC1(C)OB([C]23->[Cr]4567([C]#O)([C]#O)([C]#O)<-[CH]=2[C]->4(C)=[C]->5(Cl)[C]->6(C)=[CH]->73)OC1(C)C
+- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(Cl)[Cr]45326(C#O)(C#O)C#O >> CC1(C)OB(C23=[CH]4C5(C)=C6(Cl)C7(C)=[CH]2[Cr]43756(C#O)(C#O)C#O)OC1(C)C
 
 ## Reaction 31-614-CAS-45383583
 
@@ -148893,7 +148893,7 @@ Total reactions: 17173
 - Condition Core: Ir/dtbbpy
 - Yield %: 85
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.C[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->3[C]->4(C)=[C]->51F)[CH]->6=2 >> CC1(C)OB([C]23->[Cr]4567([C]#O)([C]#O)([C]#O)<-[CH]=2[C]->4(C)=[C]->5(F)[C]->6(C)=[CH]->73)OC1(C)C
+- SMILES: CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(F)[Cr]45326(C#O)(C#O)C#O >> CC1(C)OB(C23=[CH]4C5(C)=C6(F)C7(C)=[CH]2[Cr]43756(C#O)(C#O)C#O)OC1(C)C
 
 ## Reaction 31-614-CAS-45383620
 

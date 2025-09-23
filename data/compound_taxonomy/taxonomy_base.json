@@ -119,6 +119,67 @@
       }
     },
     {
+      "family_id": "inorg_carboxylates",
+      "label": "Inorganic carboxylates (acetates, etc.)",
+      "acid_base_type": "Brønsted",
+      "strength_band": "weak–moderate",
+      "nucleophilicity_band": "low",
+      "steric_profile": "unhindered",
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "amides_dipolar_aprotic",
+        "sulfoxides_dipolar_aprotic",
+        "alcohols_secondary",
+        "alcohols_primary"
+      ],
+      "example_members": [
+        {
+          "name": "Potassium acetate",
+          "abbr": "KOAc",
+          "cas": "127-08-2",
+          "synonyms": [
+            "Potassium acetate",
+            "KOAc"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Inorganic carboxylates (acetates, etc.) (inorg_carboxylates) | name: Potassium acetate | abbr: KOAc | CAS: 127-08-2 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, sulfoxides_dipolar_aprotic, alcohols_secondary, alcohols_primary | use_cases: Ligandless coupling (OAc); Salt additives; Acetate-assisted reactions | best_for: Mild deprotonation; Salt-tolerant media | avoid_when: Need strong superbase | synonyms: Potassium acetate; KOAc"
+        },
+        {
+          "name": "Sodium acetate",
+          "abbr": "NaOAc",
+          "cas": "127-09-3",
+          "synonyms": [
+            "Sodium acetate",
+            "NaOAc"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Inorganic carboxylates (acetates, etc.) (inorg_carboxylates) | name: Sodium acetate | abbr: NaOAc | CAS: 127-09-3 | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic, sulfoxides_dipolar_aprotic, alcohols_secondary, alcohols_primary | use_cases: Ligandless coupling (OAc); Salt additives; Acetate-assisted reactions | best_for: Mild deprotonation; Salt-tolerant media | avoid_when: Need strong superbase | synonyms: Sodium acetate; NaOAc"
+        }
+      ],
+      "notes": "Inorganic acetate salts used as mild bases or additives (e.g., KOAc, NaOAc).",
+      "use_cases": [
+        "Ligandless coupling (OAc)",
+        "Acetate-assisted condensations"
+      ],
+      "best_for": [
+        "Mild deprotonation",
+        "Salt-tolerant media"
+      ],
+      "avoid_when": [
+        "Requires strong, non-coordinating base"
+      ]
+    },
+    {
       "family_id": "inorg_phosphates",
       "label": "Inorganic phosphates",
       "acid_base_type": "Brønsted",
