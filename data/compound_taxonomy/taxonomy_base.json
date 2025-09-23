@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2025-09-13",
+  "updated": "2025-09-23",
   "schema": {
     "family_id": "stable identifier",
     "label": "family name",
@@ -573,26 +573,6 @@
       ],
       "example_members": [
         {
-          "name": "Triethylamine",
-          "abbr": "Et3N",
-          "cas": "121-44-8",
-          "aliases": [
-            "TEA"
-          ],
-          "synonyms": [
-            "Et3N",
-            "TEA",
-            "Triethylamine"
-          ],
-          "numeric_features": {
-            "strength_rank": 2,
-            "nucleophilicity_rank": 2,
-            "steric_rank": 2,
-            "moisture_rank": 1
-          },
-          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: Triethylamine | abbr: Et3N | CAS: 121-44-8 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: Et3N; TEA"
-        },
-        {
           "name": "N,N-Diisopropylethylamine",
           "abbr": "DIPEA",
           "cas": "7087-68-5",
@@ -615,6 +595,73 @@
             "moisture_rank": 1
           },
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: N,N-Diisopropylethylamine | abbr: DIPEA | CAS: 7087-68-5 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: DIEA; DIPEA; Hünig's base; i-Pr2NEt"
+        },
+        {
+          "name": "Sodium trimethylsilanolate",
+          "abbr": "Sodium trimethylsilanolate",
+          "cas": "18027-10-6",
+          "synonyms": [
+            "Sodium trimethylsilanolate",
+            "18027-10-6",
+            "Trimethylsilanol sodium salt",
+            "EINECS 241-939-8",
+            "Silanol, 1,1,1-trimethyl-, sodium salt (1:1)",
+            "DTXSID7066302",
+            "RefChem:887971",
+            "Silanol, trimethyl, sodium salt",
+            "DTXCID2035724",
+            "Silanol, 1,1,1trimethyl, sodium salt (1:1)",
+            "241-939-8",
+            "sodium;trimethyl(oxido)silane",
+            "C3H9NaOSi",
+            "Sodium trimethyl silanolate",
+            "MFCD00013926",
+            "Silanol, trimethyl-, sodium salt"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "18027-10-6",
+            "Trimethylsilanol sodium salt",
+            "EINECS 241-939-8",
+            "Silanol, 1,1,1-trimethyl-, sodium salt (1:1)",
+            "DTXSID7066302",
+            "RefChem:887971",
+            "Silanol, trimethyl, sodium salt",
+            "DTXCID2035724",
+            "Silanol, 1,1,1trimethyl, sodium salt (1:1)",
+            "241-939-8",
+            "sodium;trimethyl(oxido)silane",
+            "C3H9NaOSi",
+            "Sodium trimethyl silanolate",
+            "MFCD00013926",
+            "Silanol, trimethyl-, sodium salt"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Sodium trimethylsilanolate | abbr: Sodium trimethylsilanolate | CAS: 18027-10-6 | synonyms: Sodium trimethylsilanolate; 18027-10-6; Trimethylsilanol sodium salt; EINECS 241-939-8; Silanol, 1,1,1-trimethyl-, sodium salt (1:1); DTXSID7066302; RefChem:887971; Silanol, trimethyl, sodium salt; DTXCID2035724; Silanol, 1,1,1trimethyl, sodium salt (1:1); 241-939-8; sodium;trimethyl(oxido)silane; C3H9NaOSi; Sodium trimethyl silanolate; MFCD00013926; Silanol, trimethyl-, sodium salt"
+        },
+        {
+          "name": "Triethylamine",
+          "abbr": "Et3N",
+          "cas": "121-44-8",
+          "aliases": [
+            "TEA"
+          ],
+          "synonyms": [
+            "Et3N",
+            "TEA",
+            "Triethylamine"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: Triethylamine | abbr: Et3N | CAS: 121-44-8 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: Et3N; TEA"
         }
       ],
       "notes": "Et3N, DIPEA: non-nucleophilic to moderately nucleophilic; common acid scavengers and base components.",
