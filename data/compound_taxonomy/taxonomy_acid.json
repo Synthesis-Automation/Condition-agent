@@ -1,0 +1,1114 @@
+{
+  "version": "1.0",
+  "updated": "2025-09-24",
+  "schema": {
+    "family_id": "stable identifier",
+    "label": "family name",
+    "functional_roles": "tags such as proton_donor, lewis_acid, dehydrating_agent, noncoordinating_acid, solid_acid, silylating_agent, halophile",
+    "effect_bands": {
+      "bronsted_acidity_band": "very weak / weak / medium / strong / very strong",
+      "lewis_acidity_band": "very low / low / medium / high / very high",
+      "counteranion_coordinating_band": "very low / low / medium / high / very high (lower is 'more weakly coordinating')",
+      "hydrolytic_instability_band": "very low / low / medium / high / very high",
+      "hygroscopicity_band": "very low / low / medium / high / very high",
+      "oxidizing_power_band": "very low / low / medium / high / very high"
+    },
+    "moisture_sensitivity": "low / medium / high / extreme",
+    "typical_solvent_classes": "array of solvent-class identifiers (e.g., halogenated, ethers_cyclic_glymes, amides_dipolar_aprotic)",
+    "example_members": "array of {name, abbr, cas?, counteranion?, synonyms[], numeric_features{}, embedding_text}",
+    "notes": "free text (optional)",
+    "use_cases": "typical applications per family",
+    "best_for": "phrases capturing ideal scenarios",
+    "avoid_when": "phrases capturing contraindications",
+    "ehs_green": "EHS/green flags at family or member level",
+    "operational_envelope": "typical guidance (loading, temp) where non-controversial"
+  },
+  "families": [
+    {
+      "family_id": "mineral_acids",
+      "label": "Mineral acids (H2SO4/HCl/H3PO4)",
+      "functional_roles": [
+        "proton_donor",
+        "dehydrating_agent"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "strong",
+        "lewis_acidity_band": "low",
+        "counteranion_coordinating_band": "medium",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "water_polar_protic",
+        "alcohols_primary",
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "Sulfuric acid",
+          "abbr": "H2SO4",
+          "cas": "7664-93-9",
+          "counteranion": "HSO4−/SO4^2−",
+          "synonyms": [
+            "Sulfuric acid",
+            "Oil of vitriol"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 1,
+            "counteranion_coordinating_rank": 2,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 2
+          },
+          "embedding_text": "type: ACID | family: Mineral acids (mineral_acids) | roles: proton_donor, dehydrating_agent | name: Sulfuric acid | abbr: H2SO4 | counteranion: HSO4−/SO4^2− | acidity: strong | hygroscopicity: high"
+        },
+        {
+          "name": "Hydrochloric acid",
+          "abbr": "HCl",
+          "cas": "7647-01-0",
+          "counteranion": "Cl−",
+          "synonyms": [
+            "Hydrogen chloride (aq)"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 1,
+            "counteranion_coordinating_rank": 3,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 3,
+            "oxidizing_power_rank": 1
+          },
+          "embedding_text": "type: ACID | family: Mineral acids (mineral_acids) | roles: proton_donor | name: Hydrochloric acid | abbr: HCl | counteranion: Cl− | acidity: strong"
+        },
+        {
+          "name": "Phosphoric acid",
+          "abbr": "H3PO4",
+          "cas": "7664-38-2",
+          "counteranion": "H2PO4−/HPO4^2−",
+          "synonyms": [
+            "Orthophosphoric acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 2,
+            "lewis_acidity_rank": 1,
+            "counteranion_coordinating_rank": 2,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 3,
+            "oxidizing_power_rank": 1
+          },
+          "embedding_text": "type: ACID | family: Mineral acids (mineral_acids) | roles: proton_donor | name: Phosphoric acid | abbr: H3PO4 | counteranion: phosphate | acidity: medium"
+        }
+      ],
+      "use_cases": [
+        "Aqueous acid catalysis",
+        "Esterifications (with dehydrating assistance)",
+        "Deprotection of acid-labile groups"
+      ],
+      "best_for": [
+        "Substrates tolerant of water",
+        "Cost-sensitive processes"
+      ],
+      "avoid_when": [
+        "Water-sensitive intermediates",
+        "Strongly coordinating anions problematic in metal catalysis"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.01–2.0",
+        "temp_C": "0–120"
+      }
+    },
+    {
+      "family_id": "sulfonic_acids",
+      "label": "Aryl/alkyl sulfonic acids (p‑TsOH/MsOH)",
+      "functional_roles": [
+        "proton_donor"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "strong",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "low",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "esters_anhydrides",
+        "halogenated",
+        "alcohols_secondary"
+      ],
+      "example_members": [
+        {
+          "name": "p-Toluenesulfonic acid monohydrate",
+          "abbr": "p‑TsOH·H2O",
+          "cas": "6192-52-5",
+          "counteranion": "TsO−",
+          "synonyms": [
+            "p-TsOH",
+            "PTSA"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Sulfonic acids (sulfonic_acids) | roles: proton_donor | name: p-Toluenesulfonic acid | abbr: p‑TsOH | counteranion: TsO− | acidity: strong"
+        },
+        {
+          "name": "Methanesulfonic acid",
+          "abbr": "MsOH",
+          "cas": "75-75-2",
+          "counteranion": "MsO−",
+          "synonyms": [
+            "Mesylic acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 3,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Sulfonic acids (sulfonic_acids) | roles: proton_donor | name: Methanesulfonic acid | abbr: MsOH | counteranion: MsO− | acidity: strong"
+        }
+      ],
+      "use_cases": [
+        "Fischer esterification",
+        "Acetalization",
+        "Protecting group chemistry"
+      ],
+      "best_for": [
+        "Non-aqueous acid catalysis with non-coordinating anions"
+      ],
+      "avoid_when": [
+        "Strong base present; sulfonate formation unwanted"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–20",
+        "temp_C": "0–120"
+      }
+    },
+    {
+      "family_id": "superacids",
+      "label": "Superacids (non‑nucleophilic acids)",
+      "functional_roles": [
+        "proton_donor",
+        "noncoordinating_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very strong",
+        "lewis_acidity_band": "low",
+        "counteranion_coordinating_band": "very low",
+        "hydrolytic_instability_band": "medium",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "low"
+      },
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "halogenated",
+        "sulfoxides_dipolar_aprotic",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "Trifluoromethanesulfonic acid",
+          "abbr": "TfOH",
+          "cas": "1493-13-6",
+          "counteranion": "OTf−",
+          "synonyms": [
+            "Triflic acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 5,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 2,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Superacids (superacids) | roles: proton_donor, noncoordinating_acid | name: Triflic acid | abbr: TfOH | counteranion: OTf− | acidity: very strong"
+        },
+        {
+          "name": "Fluorosulfuric acid",
+          "abbr": "FSO3H",
+          "cas": "7789-21-1",
+          "counteranion": "FSO3−",
+          "synonyms": [
+            "Fluorosulphonic acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 5,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 3,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Superacids (superacids) | roles: proton_donor, noncoordinating_acid | name: Fluorosulfuric acid | abbr: FSO3H | counteranion: FSO3− | acidity: very strong"
+        }
+      ],
+      "use_cases": [
+        "Carbocation chemistry",
+        "Alkylations/isomerizations requiring very low nucleophilicity"
+      ],
+      "best_for": [
+        "Highly deactivated substrates needing extreme protonation"
+      ],
+      "avoid_when": [
+        "Water present; extreme corrosivity and materials compatibility issues"
+      ],
+      "ehs_green": {
+        "extreme_corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "0.1–10",
+        "temp_C": "−20–60"
+      }
+    },
+    {
+      "family_id": "halogenated_carboxylic_acids",
+      "label": "Halogenated carboxylic acids (TFA/TCA)",
+      "functional_roles": [
+        "proton_donor"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "medium",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "low",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "halogenated",
+        "ethers_cyclic_glymes",
+        "esters_anhydrides"
+      ],
+      "example_members": [
+        {
+          "name": "Trifluoroacetic acid",
+          "abbr": "TFA",
+          "cas": "76-05-1",
+          "counteranion": "TFA−",
+          "synonyms": [
+            "Trifluoroethanoic acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 3,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Halogenated carboxylic acids (halogenated_carboxylic_acids) | roles: proton_donor | name: Trifluoroacetic acid | abbr: TFA | counteranion: TFA− | acidity: medium"
+        },
+        {
+          "name": "Trichloroacetic acid",
+          "abbr": "TCA",
+          "cas": "76-03-9",
+          "counteranion": "TCA−",
+          "synonyms": [
+            "Trichloroethanoic acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 3,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Halogenated carboxylic acids (halogenated_carboxylic_acids) | roles: proton_donor | name: Trichloroacetic acid | abbr: TCA | counteranion: TCA− | acidity: medium"
+        }
+      ],
+      "use_cases": [
+        "Mild acidolysis/deprotection",
+        "Catalysis where non-nucleophilic carboxylate is preferred"
+      ],
+      "best_for": [
+        "Acid-sensitive systems needing moderate strength with weakly coordinating anion"
+      ],
+      "avoid_when": [
+        "Base-labile α-halogenated byproduct risks"
+      ],
+      "ehs_green": {
+        "volatile_acid": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–30",
+        "temp_C": "0–100"
+      }
+    },
+    {
+      "family_id": "simple_carboxylic_acids",
+      "label": "Simple carboxylic acids (AcOH/PivOH/Benzoic acid)",
+      "functional_roles": [
+        "proton_donor",
+        "proton_shuttle"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "weak",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "medium",
+        "hydrolytic_instability_band": "very low",
+        "hygroscopicity_band": "low",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "esters_anhydrides",
+        "ethers_cyclic_glymes",
+        "hydrocarbons_aromatic"
+      ],
+      "example_members": [
+        {
+          "name": "Acetic acid",
+          "abbr": "AcOH",
+          "cas": "64-19-7",
+          "counteranion": "AcO−",
+          "synonyms": [
+            "Ethanoic acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 1,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 2,
+            "hydrolytic_instability_rank": 0,
+            "hygroscopicity_rank": 1,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Simple carboxylic acids (simple_carboxylic_acids) | roles: proton_donor, proton_shuttle | name: Acetic acid | abbr: AcOH | counteranion: AcO− | acidity: weak"
+        },
+        {
+          "name": "Pivalic acid",
+          "abbr": "PivOH",
+          "cas": "75-98-9",
+          "counteranion": "PivO−",
+          "synonyms": [
+            "tBuCO2H"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 1,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 2,
+            "hydrolytic_instability_rank": 0,
+            "hygroscopicity_rank": 1,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Simple carboxylic acids (simple_carboxylic_acids) | roles: proton_donor, proton_shuttle | name: Pivalic acid | abbr: PivOH | counteranion: PivO− | acidity: weak"
+        }
+      ],
+      "use_cases": [
+        "CMD-type C–H activation as additives",
+        "Buffering/proton shuttle in metal catalysis"
+      ],
+      "best_for": [
+        "C–H activation with Pd/Ag systems",
+        "Mild acid catalysis"
+      ],
+      "avoid_when": [
+        "Need for non-coordinating anion"
+      ],
+      "ehs_green": {
+        "green_preference": "AcOH"
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.1–2.0",
+        "temp_C": "50–140"
+      }
+    },
+    {
+      "family_id": "solid_acid_resins",
+      "label": "Solid acid resins and perfluorinated polymers",
+      "functional_roles": [
+        "proton_donor",
+        "solid_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "strong",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "low",
+        "hydrolytic_instability_band": "very low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "hydrocarbons_aromatic",
+        "ethers_cyclic_glymes",
+        "esters_anhydrides"
+      ],
+      "example_members": [
+        {
+          "name": "Amberlyst-15 (H+ form)",
+          "abbr": "Amberlyst-15(H+)",
+          "synonyms": [
+            "A15-H"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 0,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Solid acid resins (solid_acid_resins) | roles: proton_donor, solid_acid | name: Amberlyst-15 (H+) | acidity: strong"
+        },
+        {
+          "name": "Nafion-H",
+          "abbr": "Nafion-H",
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 0,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Solid acid resins (solid_acid_resins) | roles: proton_donor, solid_acid | name: Nafion-H | acidity: strong"
+        }
+      ],
+      "use_cases": [
+        "Heterogeneous acid catalysis",
+        "Easy separation/reuse"
+      ],
+      "best_for": [
+        "Moisture-tolerant acid reactions",
+        "Green alternatives to mineral acids"
+      ],
+      "avoid_when": [
+        "Substrates that foul resins"
+      ],
+      "ehs_green": {
+        "recyclable": true
+      },
+      "operational_envelope": {
+        "typical_loading_wt_percent": "1–50",
+        "temp_C": "20–120"
+      }
+    },
+    {
+      "family_id": "pyridinium_acids",
+      "label": "Pyridinium salts (e.g., PPTS)",
+      "functional_roles": [
+        "proton_donor"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "medium",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "low",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "alcohols_secondary",
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "Pyridinium p-toluenesulfonate",
+          "abbr": "PPTS",
+          "cas": "24057-28-1",
+          "counteranion": "TsO−",
+          "synonyms": [
+            "Pyridinium tosylate"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 3,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Pyridinium acids (pyridinium_acids) | roles: proton_donor | name: PPTS | counteranion: TsO− | acidity: medium"
+        }
+      ],
+      "use_cases": [
+        "Mild acid-catalyzed deprotections (acetals)",
+        "Water-sensitive substrates"
+      ],
+      "best_for": [
+        "Selective acidolysis without strong mineral acids"
+      ],
+      "avoid_when": [
+        "Need very low nucleophilicity"
+      ],
+      "ehs_green": {
+        "corrosive": "mild"
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–20",
+        "temp_C": "0–80"
+      }
+    },
+    {
+      "family_id": "boron_lewis_acids",
+      "label": "Boron Lewis acids",
+      "functional_roles": [
+        "lewis_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very weak",
+        "lewis_acidity_band": "high",
+        "counteranion_coordinating_band": "very low",
+        "hydrolytic_instability_band": "high",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "halogenated",
+        "ethers_cyclic_glymes",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "Boron trifluoride diethyl etherate",
+          "abbr": "BF3·OEt2",
+          "cas": "109-63-7",
+          "synonyms": [
+            "BF3 etherate"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 4,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 4,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Boron Lewis acids (boron_lewis_acids) | roles: lewis_acid | name: BF3·OEt2 | acidity: Lewis very high"
+        },
+        {
+          "name": "Tris(pentafluorophenyl)borane",
+          "abbr": "B(C6F5)3",
+          "cas": "1109-15-5",
+          "synonyms": [
+            "BCF"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 4,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 3,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Boron Lewis acids (boron_lewis_acids) | roles: lewis_acid | name: B(C6F5)3 | acidity: Lewis very high"
+        }
+      ],
+      "use_cases": [
+        "Hydrosilylation activation (Frustrated Lewis Pairs)",
+        "Friedel–Crafts"
+      ],
+      "best_for": [
+        "Systems needing very non-coordinating Lewis acids"
+      ],
+      "avoid_when": [
+        "Moisture present; sensitive functional groups prone to complexation"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–10",
+        "temp_C": "−20–60"
+      }
+    },
+    {
+      "family_id": "aluminum_halides",
+      "label": "Aluminum halides",
+      "functional_roles": [
+        "lewis_acid",
+        "halophile"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very weak",
+        "lewis_acidity_band": "very high",
+        "counteranion_coordinating_band": "high",
+        "hydrolytic_instability_band": "very high",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "extreme",
+      "typical_solvent_classes": [
+        "halogenated",
+        "hydrocarbons_aromatic"
+      ],
+      "example_members": [
+        {
+          "name": "Aluminum chloride",
+          "abbr": "AlCl3",
+          "cas": "12138-52-0",
+          "synonyms": [
+            "Aluminium chloride"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 5,
+            "counteranion_coordinating_rank": 4,
+            "hydrolytic_instability_rank": 5,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Aluminum halides (aluminum_halides) | roles: lewis_acid, halophile | name: AlCl3 | acidity: Lewis very high"
+        },
+        {
+          "name": "Aluminum bromide",
+          "abbr": "AlBr3",
+          "cas": "7727-15-3",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 5,
+            "counteranion_coordinating_rank": 4,
+            "hydrolytic_instability_rank": 5,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Aluminum halides (aluminum_halides) | roles: lewis_acid, halophile | name: AlBr3 | acidity: Lewis very high"
+        }
+      ],
+      "use_cases": [
+        "Friedel–Crafts acylations/alkylations",
+        "Heteroatom activation"
+      ],
+      "best_for": [
+        "Highly activated electrophile generation"
+      ],
+      "avoid_when": [
+        "Water present; over-activation causes rearrangements/polymerization"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "5–100 (stoichiometric)",
+        "temp_C": "−20–80"
+      }
+    },
+    {
+      "family_id": "titanium_halides",
+      "label": "Titanium halides",
+      "functional_roles": [
+        "lewis_acid",
+        "halophile"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very weak",
+        "lewis_acidity_band": "very high",
+        "counteranion_coordinating_band": "high",
+        "hydrolytic_instability_band": "very high",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "low"
+      },
+      "moisture_sensitivity": "extreme",
+      "typical_solvent_classes": [
+        "halogenated",
+        "ethers_cyclic_glymes"
+      ],
+      "example_members": [
+        {
+          "name": "Titanium tetrachloride",
+          "abbr": "TiCl4",
+          "cas": "7550-45-0",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 5,
+            "counteranion_coordinating_rank": 4,
+            "hydrolytic_instability_rank": 5,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 1
+          },
+          "embedding_text": "type: ACID | family: Titanium halides (titanium_halides) | roles: lewis_acid, halophile | name: TiCl4 | acidity: Lewis very high"
+        }
+      ],
+      "use_cases": [
+        "Diels–Alder activation",
+        "Carbonyl activation",
+        "Glycosylation"
+      ],
+      "best_for": [
+        "Strong Lewis acid demand in anhydrous systems"
+      ],
+      "avoid_when": [
+        "Presence of water; sensitive functional groups (e.g., acid chlorides)"
+      ],
+      "ehs_green": {
+        "fuming": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "5–100 (stoichiometric)",
+        "temp_C": "−78–25"
+      }
+    },
+    {
+      "family_id": "tin_halides",
+      "label": "Tin halides",
+      "functional_roles": [
+        "lewis_acid",
+        "halophile"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very weak",
+        "lewis_acidity_band": "high",
+        "counteranion_coordinating_band": "high",
+        "hydrolytic_instability_band": "high",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "halogenated",
+        "ethers_cyclic_glymes"
+      ],
+      "example_members": [
+        {
+          "name": "Tin tetrachloride",
+          "abbr": "SnCl4",
+          "cas": "7646-78-8",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 4,
+            "counteranion_coordinating_rank": 4,
+            "hydrolytic_instability_rank": 4,
+            "hygroscopicity_rank": 3,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Tin halides (tin_halides) | roles: lewis_acid, halophile | name: SnCl4 | acidity: Lewis high"
+        }
+      ],
+      "use_cases": [
+        "Acetalization, esterification, heteroatom activation"
+      ],
+      "best_for": [
+        "Strong Lewis acid demand with less oxidation risk than FeCl3"
+      ],
+      "avoid_when": [
+        "Toxicity constraints; hydrolysis risk"
+      ],
+      "ehs_green": {
+        "toxic": true,
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "5–50",
+        "temp_C": "−20–80"
+      }
+    },
+    {
+      "family_id": "zinc_iron_halides",
+      "label": "Zinc/iron halides",
+      "functional_roles": [
+        "lewis_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very weak",
+        "lewis_acidity_band": "medium",
+        "counteranion_coordinating_band": "medium",
+        "hydrolytic_instability_band": "medium",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "medium"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "Zinc chloride",
+          "abbr": "ZnCl2",
+          "cas": "7646-85-7",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 3,
+            "counteranion_coordinating_rank": 3,
+            "hydrolytic_instability_rank": 3,
+            "hygroscopicity_rank": 3,
+            "oxidizing_power_rank": 1
+          },
+          "embedding_text": "type: ACID | family: Zinc/iron halides (zinc_iron_halides) | roles: lewis_acid | name: ZnCl2 | acidity: Lewis medium"
+        },
+        {
+          "name": "Iron(III) chloride",
+          "abbr": "FeCl3",
+          "cas": "7705-08-0",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 3,
+            "counteranion_coordinating_rank": 3,
+            "hydrolytic_instability_rank": 3,
+            "hygroscopicity_rank": 3,
+            "oxidizing_power_rank": 3
+          },
+          "embedding_text": "type: ACID | family: Zinc/iron halides (zinc_iron_halides) | roles: lewis_acid | name: FeCl3 | acidity: Lewis medium, oxidizing: medium"
+        }
+      ],
+      "use_cases": [
+        "Friedel–Crafts alkylation/acylation",
+        "Carbonyl/heteroatom activation"
+      ],
+      "best_for": [
+        "Robust, inexpensive Lewis acid catalysis"
+      ],
+      "avoid_when": [
+        "Strong oxidation-sensitive substrates (FeCl3)"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "5–50",
+        "temp_C": "0–100"
+      }
+    },
+    {
+      "family_id": "rare_earth_triflates",
+      "label": "Rare‑earth/metal triflates (Sc(OTf)3, Yb(OTf)3, Zn(OTf)2, Cu(OTf)2)",
+      "functional_roles": [
+        "lewis_acid",
+        "noncoordinating_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very weak",
+        "lewis_acidity_band": "high",
+        "counteranion_coordinating_band": "very low",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "low"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "nitriles",
+        "ethers_cyclic_glymes",
+        "halogenated",
+        "alcohols_secondary"
+      ],
+      "example_members": [
+        {
+          "name": "Scandium triflate",
+          "abbr": "Sc(OTf)3",
+          "cas": "42164-05-2",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 4,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 2,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Rare‑earth/metal triflates (rare_earth_triflates) | roles: lewis_acid, noncoordinating_acid | name: Sc(OTf)3 | acidity: Lewis high"
+        },
+        {
+          "name": "Ytterbium triflate",
+          "abbr": "Yb(OTf)3",
+          "cas": "52093-26-6",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 4,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 2,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Rare‑earth/metal triflates (rare_earth_triflates) | roles: lewis_acid, noncoordinating_acid | name: Yb(OTf)3 | acidity: Lewis high"
+        },
+        {
+          "name": "Zinc triflate",
+          "abbr": "Zn(OTf)2",
+          "cas": "54010-75-2",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 3,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 2,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Rare‑earth/metal triflates (rare_earth_triflates) | roles: lewis_acid, noncoordinating_acid | name: Zn(OTf)2 | acidity: Lewis medium"
+        }
+      ],
+      "use_cases": [
+        "Water-tolerant Lewis acid catalysis",
+        "Glycosylations, aldol reactions, acetalizations"
+      ],
+      "best_for": [
+        "Reactions needing weakly coordinating anion (OTf−)"
+      ],
+      "avoid_when": [
+        "Anion-sensitive catalysts (triflate binding)"
+      ],
+      "ehs_green": {
+        "heavy_metal": "lanthanides (Sc/Yb)"
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–20",
+        "temp_C": "0–120"
+      }
+    },
+    {
+      "family_id": "silyl_triflates",
+      "label": "Silyl triflates (TMSOTf/TBSOTf/TIPSOTf)",
+      "functional_roles": [
+        "lewis_acid",
+        "silylating_agent"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very weak",
+        "lewis_acidity_band": "high",
+        "counteranion_coordinating_band": "very low",
+        "hydrolytic_instability_band": "high",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "halogenated",
+        "ethers_cyclic_glymes",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "Trimethylsilyl triflate",
+          "abbr": "TMSOTf",
+          "cas": "27607-77-8",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 4,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 4,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Silyl triflates (silyl_triflates) | roles: lewis_acid, silylating_agent | name: TMSOTf"
+        },
+        {
+          "name": "tert‑Butyldimethylsilyl triflate",
+          "abbr": "TBSOTf",
+          "cas": "25561-30-2",
+          "numeric_features": {
+            "bronsted_acidity_rank": 0,
+            "lewis_acidity_rank": 4,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 4,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Silyl triflates (silyl_triflates) | roles: lewis_acid, silylating_agent | name: TBSOTf"
+        }
+      ],
+      "use_cases": [
+        "Activate carbonyls/acetals",
+        "In situ silylation to drive equilibria"
+      ],
+      "best_for": [
+        "Mukaiyama aldol, Sakurai allylation, glycosylations"
+      ],
+      "avoid_when": [
+        "Adventitious water; nucleophile-sensitive silylation"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–20",
+        "temp_C": "−78–25"
+      }
+    }
+  ],
+  "schema_extensions": {
+    "example_members[*].counteranion": "string like OTf−, BF4−, Cl−, etc.",
+    "example_members[*].synonyms": "array of alternative names",
+    "example_members[*].embedding_text": "deterministic compact text for embeddings",
+    "example_members[*].numeric_features": "ranked numeric features {bronsted_acidity_rank, lewis_acidity_rank, counteranion_coordinating_rank, hydrolytic_instability_rank, hygroscopicity_rank, oxidizing_power_rank}"
+  },
+  "vectorization_hints": {
+    "rank_maps": {
+      "bronsted_acidity_band→rank": {
+        "very weak": 0,
+        "weak": 1,
+        "medium": 2,
+        "strong": 3,
+        "very strong": 5
+      },
+      "lewis_acidity_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4,
+        "extreme": 5
+      },
+      "counteranion_coordinating_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "hydrolytic_instability_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "hygroscopicity_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "oxidizing_power_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      }
+    },
+    "embedding_field_preference": [
+      "example_members[*].embedding_text",
+      "example_members[*].name",
+      "example_members[*].abbr",
+      "example_members[*].synonyms"
+    ],
+    "filter_recipes": {
+      "noncoordinating_bronsted": {
+        "bronsted_acidity_rank_min": 3,
+        "counteranion_coordinating_rank_max": 1
+      },
+      "water_tolerant_lewis": {
+        "lewis_acidity_rank_min": 2,
+        "hydrolytic_instability_rank_max": 2
+      },
+      "solid_acid": {
+        "family_id_in": [
+          "solid_acid_resins"
+        ]
+      }
+    }
+  }
+}

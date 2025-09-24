@@ -1,0 +1,352 @@
+{
+  "kind": "oxidant",
+  "version": "1.0.0",
+  "updated": "2025-09-24",
+  "schema": {
+    "family_id": "stable identifier",
+    "label": "human-readable family name",
+    "class": "oxidant family class",
+    "mechanism": "primary mode(s): SET, OAT (oxygen atom transfer), 2e- reoxidation, HAT, PCET",
+    "strength_index": "coarse scale 1–5 within class (contextual)",
+    "aliases": "synonyms/abbreviations",
+    "use_cases": "typical reactions this family serves",
+    "best_for": "positive selector cues",
+    "avoid_when": "contraindications",
+    "ehs_green": "EHS/green flags",
+    "recommended_pairs": "see catalysts schema",
+    "example_members": "array of examples"
+  },
+  "schema_extensions": {
+    "example_members[*].properties": "{state, concentration, air_stable?, moisture_sensitive?}",
+    "example_members[*].recommended_pairs": "member-level guidance"
+  },
+  "families": [
+    {
+      "family_id": "o2_gas",
+      "label": "Molecular Oxygen",
+      "class": "gas oxidant",
+      "mechanism": ["SET", "OAT (with mediators)"],
+      "strength_index": 2,
+      "aliases": [],
+      "use_cases": ["Aerobic oxidations", "Reoxidation of Pd(0) to Pd(II)", "TEMPO-mediated alcohol oxidation"],
+      "best_for": ["Green terminal oxidant; low-cost"],
+      "avoid_when": ["Radical polymerization-prone substrates; flammability; mass-transfer limited"],
+      "ehs_green": {"flammable": true, "green": true},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Pd-catalyzed aerobic oxidation", "alcohol → aldehyde (TEMPO)"],
+          "co_reagents": {"mediator": ["TEMPO"], "cocatalyst": ["Cu(OAc)2 (optional)"]},
+          "solvents": ["MeCN", "toluene"],
+          "temp_C": [25, 80],
+          "notes": "Ensure O2 delivery (balloon/pressure). Avoid ignition sources."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "Oxygen (g)",
+          "abbr": "O2",
+          "cas": "7782-44-7",
+          "synonyms": ["dioxygen"],
+          "properties": {"state": "gas", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Molecular Oxygen (o2_gas) | name: Oxygen (g) | abbr: O2 | CAS: 7782-44-7 | use_cases: Aerobic oxidations"
+        }
+      ]
+    },
+    {
+      "family_id": "hypervalent_iodine",
+      "label": "Hypervalent Iodine Reagents",
+      "class": "iodine(V/III) reagents",
+      "mechanism": ["2e- OAT", "SET"],
+      "strength_index": 3,
+      "aliases": [],
+      "use_cases": ["Oxidative dearomatization", "Lactonizations", "C–N/C–O oxidative couplings", "Alcohol oxidation"],
+      "best_for": ["Selective 2e- oxidations with benign byproducts"],
+      "avoid_when": ["Strongly nucleophilic bases; metal-sensitive systems where acetate/trifluoroacetate interfere"],
+      "ehs_green": {},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Alcohol oxidation"],
+          "co_reagents": {"base": ["NaHCO3 (buffer)"]},
+          "solvents": ["CH2Cl2"],
+          "temp_C": [0, 25],
+          "notes": "Avoid high heat; add in portions to manage exotherm."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "(Diacetoxy)iodobenzene",
+          "abbr": "PIDA",
+          "cas": "3240-34-4",
+          "synonyms": ["PhI(OAc)2", "Iodobenzene diacetate"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Hypervalent Iodine Reagents (hypervalent_iodine) | name: (Diacetoxy)iodobenzene | abbr: PIDA | CAS: 3240-34-4 | use_cases: Oxidative coupling, Alcohol oxidation"
+        },
+        {
+          "name": "(Bis(trifluoroacetoxy)iodo)benzene",
+          "abbr": "PIFA",
+          "cas": "65212-12-2",
+          "synonyms": ["PhI(OTFA)2", "Iodobenzene bis(trifluoroacetate)"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Hypervalent Iodine Reagents (hypervalent_iodine) | name: (Bis(trifluoroacetoxy)iodo)benzene | abbr: PIFA | CAS: 65212-12-2 | use_cases: Oxidative coupling"
+        },
+        {
+          "name": "Dess–Martin periodinane",
+          "abbr": "DMP",
+          "cas": "87413-09-0",
+          "synonyms": ["Dess–Martin oxidant"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Hypervalent Iodine Reagents (hypervalent_iodine) | name: Dess–Martin periodinane | abbr: DMP | CAS: 87413-09-0 | use_cases: Alcohol oxidation"
+        }
+      ]
+    },
+    {
+      "family_id": "peroxides_hydroperoxides",
+      "label": "Peroxides and Hydroperoxides",
+      "class": "ROOR / ROOH",
+      "mechanism": ["Radical initiation", "OAT"],
+      "strength_index": 4,
+      "aliases": [],
+      "use_cases": ["Radical initiations", "Oxidations", "Metal reoxidation"],
+      "best_for": ["Initiating radical chains; oxygen transfer"],
+      "avoid_when": ["Explosion sensitivity; avoid concentration/heat"],
+      "ehs_green": {"peroxidizable": true, "explosive": true},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Aerobic-like oxidations under inert atmosphere", "Photoredox oxidative quench"],
+          "solvents": ["toluene", "MeCN"],
+          "temp_C": [25, 80],
+          "notes": "Use small excess; monitor for exotherm. Select aqueous vs decane grade per solvent."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "tert-Butyl hydroperoxide (neat / in solution)",
+          "abbr": "TBHP",
+          "cas": "75-91-2",
+          "synonyms": ["t-BuOOH", "TBHP (aq/decane)"],
+          "properties": {"state": "solution", "moisture_sensitive": false},
+          "embedding_text": "type: OXIDANT | family: Peroxides and Hydroperoxides (peroxides_hydroperoxides) | name: tert-Butyl hydroperoxide (neat / in solution) | abbr: TBHP | CAS: 75-91-2 | use_cases: Radical oxidations, Metal reoxidation"
+        }
+      ]
+    },
+    {
+      "family_id": "persulfates",
+      "label": "Persulfate Oxidants",
+      "class": "S2O8^2- salts",
+      "mechanism": ["SET", "Radical sulfate"],
+      "strength_index": 4,
+      "aliases": [],
+      "use_cases": ["C–H functionalization", "Photoredox oxidative quench", "Minisci"],
+      "best_for": ["Strong one-electron oxidation under aqueous or polar media"],
+      "avoid_when": ["Base-sensitive substrates (acidic media often used)"],
+      "ehs_green": {},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Photoredox oxidative quench", "Minisci"],
+          "co_reagents": {"acid": ["H2SO4 (cat.)"]},
+          "solvents": ["MeCN/H2O", "DMSO/H2O"],
+          "temp_C": [20, 60],
+          "notes": "Commonly paired with Ru(bpy)3 or Ir PCs; control acidity."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "Potassium persulfate",
+          "abbr": "K2S2O8",
+          "cas": "7727-21-1",
+          "synonyms": ["potassium peroxydisulfate"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Persulfate Oxidants (persulfates) | name: Potassium persulfate | abbr: K2S2O8 | CAS: 7727-21-1 | use_cases: Photoredox, Minisci"
+        },
+        {
+          "name": "Ammonium persulfate",
+          "abbr": "(NH4)2S2O8",
+          "cas": "7727-54-0",
+          "synonyms": ["ammonium peroxydisulfate"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Persulfate Oxidants (persulfates) | name: Ammonium persulfate | abbr: (NH4)2S2O8 | CAS: 7727-54-0 | use_cases: Photoredox, Minisci"
+        }
+      ]
+    },
+    {
+      "family_id": "metal_salt_reoxidants",
+      "label": "Metal-Salt Reoxidants (Cu/Ag)",
+      "class": "Cu(II), Ag(I) salts",
+      "mechanism": ["2e- reoxidation", "Halide abstraction"],
+      "strength_index": 3,
+      "aliases": [],
+      "use_cases": ["Pd(II)/Pd(0) catalytic cycles (C–H activation)", "Wacker-type oxidations"],
+      "best_for": ["Reoxidation of Pd under mild conditions"],
+      "avoid_when": ["Ag salts with sulfur/thiols (precipitation); halide-sensitive substrates"],
+      "ehs_green": {},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Pd-catalyzed C–H activation"],
+          "co_reagents": {"carboxylate": ["PivOH"]},
+          "solvents": ["DMSO", "AcOH"],
+          "temp_C": [80, 120],
+          "notes": "Carboxylate promotes CMD; Ag salts can abstract halide if needed."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "Copper(II) acetate",
+          "abbr": "Cu(OAc)2",
+          "cas": "142-71-2",
+          "synonyms": ["cupric acetate"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Metal-Salt Reoxidants (Cu/Ag) (metal_salt_reoxidants) | name: Copper(II) acetate | abbr: Cu(OAc)2 | CAS: 142-71-2 | use_cases: Reoxidation"
+        },
+        {
+          "name": "Silver(I) carbonate",
+          "abbr": "Ag2CO3",
+          "cas": "534-16-7",
+          "synonyms": ["silver carbonate"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Metal-Salt Reoxidants (Cu/Ag) (metal_salt_reoxidants) | name: Silver(I) carbonate | abbr: Ag2CO3 | CAS: 534-16-7 | use_cases: Halide abstraction, Reoxidation"
+        }
+      ]
+    },
+    {
+      "family_id": "oxone",
+      "label": "Oxone® (potassium peroxymonosulfate triple salt)",
+      "class": "KHSO5·KHSO4·K2SO4",
+      "mechanism": ["OAT", "SET"],
+      "strength_index": 3,
+      "aliases": ["potassium peroxymonosulfate"],
+      "use_cases": ["Epoxidations", "Baeyer–Villiger", "Alcohol oxidations", "Oxidative cleavage"],
+      "best_for": ["Aqueous/green oxidations"],
+      "avoid_when": ["Base-sensitive substrates (acidic)", "Incompatible with strong bases"],
+      "ehs_green": {},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Baeyer–Villiger"],
+          "co_reagents": {"acid": ["H2SO4 (cat.)"]},
+          "solvents": ["MeCN/H2O"],
+          "temp_C": [20, 40],
+          "notes": "Control pH and temperature to avoid over-oxidation."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "Oxone (2KHSO5·KHSO4·K2SO4)",
+          "abbr": "Oxone",
+          "cas": "37222-66-5",
+          "synonyms": ["potassium peroxymonosulfate"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Oxone® (potassium peroxymonosulfate triple salt) (oxone) | name: Oxone (2KHSO5·KHSO4·K2SO4) | abbr: Oxone | CAS: 37222-66-5 | use_cases: Epoxidation, Baeyer–Villiger"
+        }
+      ]
+    },
+    {
+      "family_id": "nitroxyl_radical_catalysts",
+      "label": "Nitroxyl Radical Oxidation Systems (TEMPO family)",
+      "class": "N-oxyl mediators",
+      "mechanism": ["SET", "OAT (via oxoammonium intermediates)"],
+      "strength_index": 2,
+      "aliases": ["N-oxyl radicals"],
+      "use_cases": ["Alcohol → aldehyde/ketone oxidations", "Aerobic or bleach-mediated oxidations"],
+      "best_for": ["Selective alcohol oxidation under mild conditions"],
+      "avoid_when": ["Acid-sensitive substrates with NaOCl; amine oxidation side reactions"],
+      "ehs_green": {"green": true},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["TEMPO/NaOCl alcohol oxidation"],
+          "co_reagents": {"co_oxidant": ["NaOCl", "NaBr"], "base": ["NaHCO3"]},
+          "solvents": ["CH2Cl2/H2O", "MeCN/H2O"],
+          "temp_C": [0, 25],
+          "notes": "Buffered biphasic conditions; careful addition of bleach."
+        },
+        {
+          "for_reactions": ["Aerobic TEMPO/Cu oxidation"],
+          "co_reagents": {"cocatalyst": ["Cu(I/II) salts"]},
+          "solvents": ["MeCN"],
+          "temp_C": [20, 60],
+          "notes": "O2 as terminal oxidant; bpy-type ligands for Cu often helpful."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "TEMPO (2,2,6,6-tetramethylpiperidine-1-oxyl)",
+          "abbr": "TEMPO",
+          "cas": "2564-83-2",
+          "synonyms": ["TEMPO radical"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Nitroxyl Radical Oxidation Systems (TEMPO family) (nitroxyl_radical_catalysts) | name: TEMPO (2,2,6,6-tetramethylpiperidine-1-oxyl) | abbr: TEMPO | CAS: 2564-83-2 | use_cases: Alcohol oxidation"
+        }
+      ]
+    },
+    {
+      "family_id": "quinone_oxidants",
+      "label": "Quinone Oxidants",
+      "class": "benzoquinone derivatives",
+      "mechanism": ["2e- transfer", "SET"],
+      "strength_index": 3,
+      "aliases": [],
+      "use_cases": ["Benzylic/allylic oxidations", "Dehydrogenations", "Pd reoxidation (Wacker variants)"],
+      "best_for": ["Dehydrogenative couplings and benzylic oxidations"],
+      "avoid_when": ["Electron-rich substrates prone to over-oxidation"],
+      "ehs_green": {},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Dehydrogenation / benzylic oxidation"],
+          "co_reagents": {"acid": ["H2SO4 (cat.)", "AcOH"]},
+          "solvents": ["CH2Cl2", "AcOH"],
+          "temp_C": [20, 80]
+        }
+      ],
+      "example_members": [
+        {
+          "name": "DDQ (2,3-dichloro-5,6-dicyano-1,4-benzoquinone)",
+          "abbr": "DDQ",
+          "cas": "84-58-2",
+          "synonyms": ["DDQ"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Quinone Oxidants (quinone_oxidants) | name: DDQ (2,3-dichloro-5,6-dicyano-1,4-benzoquinone) | abbr: DDQ | CAS: 84-58-2 | use_cases: Dehydrogenation"
+        }
+      ]
+    },
+    {
+      "family_id": "mno2",
+      "label": "Manganese Dioxide",
+      "class": "MnO2",
+      "mechanism": ["HAT/OAT (allylic alcohol oxidation)"],
+      "strength_index": 2,
+      "aliases": [],
+      "use_cases": ["Allylic/alcohol oxidations"],
+      "best_for": ["Hindered allylic alcohol → carbonyl"],
+      "avoid_when": ["Acid-sensitive functionalities (acidic surface)"],
+      "ehs_green": {},
+      "recommended_pairs": [
+        {
+          "for_reactions": ["Allylic alcohol oxidation"],
+          "solvents": ["CH2Cl2", "toluene"],
+          "temp_C": [20, 40],
+          "notes": "Use excess solid and filter off."
+        }
+      ],
+      "example_members": [
+        {
+          "name": "Activated manganese dioxide",
+          "abbr": "MnO2",
+          "cas": "1313-13-9",
+          "synonyms": ["manganese(IV) oxide"],
+          "properties": {"state": "solid", "air_stable": true},
+          "embedding_text": "type: OXIDANT | family: Manganese Dioxide (mno2) | name: Activated manganese dioxide | abbr: MnO2 | CAS: 1313-13-9 | use_cases: Allylic oxidation"
+        }
+      ]
+    }
+  ],
+  "vectorization_hints": {
+    "rank_maps": {
+      "strength_index": { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5 }
+    },
+    "bag_of_terms_fields": ["mechanism", "use_cases", "best_for", "avoid_when"],
+    "embedding_field_preference": [
+      "example_members[*].embedding_text",
+      "example_members[*].name",
+      "example_members[*].abbr",
+      "example_members[*].synonyms"
+    ]
+  }
+}

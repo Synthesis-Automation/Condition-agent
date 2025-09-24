@@ -1,0 +1,987 @@
+{
+  "version": "1.0",
+  "updated": "2025-09-24",
+  "schema": {
+    "family_id": "stable identifier",
+    "label": "family name",
+    "functional_roles": "list of tags describing roles, e.g., phase_transfer, halide_promoter, halide_scavenger, water_scavenger, carboxylate_promoter, fluoride_source, iodide_source, weakly_coordinating_anion, crown_ether, radical_suppressor, lewis_acid_promoter",
+    "effect_bands": {
+      "phase_transfer_power": "very low / low / medium / high / very high",
+      "water_scavenging_power": "very low / low / medium / high / very high",
+      "halide_promotion_power": "very low / low / medium / high / very high",
+      "halide_scavenging_power": "very low / low / medium / high / very high",
+      "lewis_acidity_band": "very low / low / medium / high / very high",
+      "hygroscopicity_band": "very low / low / medium / high / very high"
+    },
+    "moisture_sensitivity": "low / medium / high / pyrophoric (if applicable)",
+    "typical_solvent_classes": "array of solvent-class identifiers used elsewhere (e.g., amides_dipolar_aprotic, ethers_cyclic_glymes)",
+    "example_members": "array of {name, abbr, cas?, synonyms[], numeric_features{}, embedding_text}",
+    "notes": "free text (optional)",
+    "use_cases": "typical applications per family",
+    "best_for": "phrases capturing ideal scenarios",
+    "avoid_when": "phrases capturing contraindications",
+    "ehs_green": "EHS/green flags at family or member level",
+    "operational_envelope": "typical guidance (loading, temp) where non-controversial"
+  },
+  "families": [
+    {
+      "family_id": "quaternary_ammonium_ptc",
+      "label": "Quaternary ammonium phase-transfer catalysts (PTC)",
+      "functional_roles": [
+        "phase_transfer"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "high",
+        "water_scavenging_power": "low",
+        "halide_promotion_power": "medium",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "very low",
+        "hygroscopicity_band": "medium"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "hydrocarbons_aromatic",
+        "hydrocarbons_aliphatic_linear",
+        "ethers_cyclic_glymes"
+      ],
+      "example_members": [
+        {
+          "name": "Tetrabutylammonium bromide",
+          "abbr": "TBAB",
+          "cas": "1643-19-2",
+          "synonyms": [
+            "TBAB",
+            "Tetrabutylammoniumbromide"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 3,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 2,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium bromide | abbr: TBAB | CAS: 1643-19-2 | PT power: high | halide promotion: medium | hygroscopicity: medium | use_cases: Biphasic alkylations; Nucleophilic substitutions; Anion shuttling"
+        },
+        {
+          "name": "Tetrabutylammonium iodide",
+          "abbr": "TBAI",
+          "cas": "311-89-7",
+          "synonyms": [
+            "TBAI",
+            "Tetrabutylammoniumiodide"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 3,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 3,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium iodide | abbr: TBAI | CAS: 311-89-7 | PT power: high | halide promotion: high | hygroscopicity: medium | use_cases: Finkelstein-type halide exchange; Pd/Ni couplings (iodide promoter)"
+        },
+        {
+          "name": "Tetrabutylammonium chloride",
+          "abbr": "TBACl",
+          "cas": "1112-67-0",
+          "synonyms": [
+            "TBACl",
+            "Tetrabutylammoniumchloride"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 3,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium chloride | abbr: TBACl | CAS: 1112-67-0 | PT power: high | halide promotion: low | hygroscopicity: medium | use_cases: Phase-transfer catalysis; Ion pairing"
+        }
+      ],
+      "use_cases": [
+        "Biphasic substitutions",
+        "Alkylations under heterogeneous conditions",
+        "Anion shuttling in polar/aprotic media"
+      ],
+      "best_for": [
+        "Poorly soluble inorganic salts",
+        "Biphasic systems"
+      ],
+      "avoid_when": [
+        "Halide-sensitive catalysts (Cl−/Br− binding)"
+      ],
+      "ehs_green": {
+        "aquatic_toxicity": "possible",
+        "hygroscopic": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–20",
+        "temp_C": "0–120"
+      }
+    },
+    {
+      "family_id": "crown_ethers",
+      "label": "Crown ethers (K+/Na+/Li+ complexants)",
+      "functional_roles": [
+        "phase_transfer",
+        "ion_pair_disruption"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "high",
+        "water_scavenging_power": "very low",
+        "halide_promotion_power": "low",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "very low",
+        "hygroscopicity_band": "medium"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "hydrocarbons_aromatic",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "18-Crown-6",
+          "abbr": "18C6",
+          "cas": "17455-13-9",
+          "synonyms": [
+            "18C6",
+            "18Crown6"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 4,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Crown ethers (crown_ethers) | roles: phase_transfer, ion_pair_disruption | name: 18-Crown-6 | abbr: 18C6 | CAS: 17455-13-9 | PT power: very high | use_cases: Solubilize K+ salts; Promote SNAr & E2 with K2CO3/KF"
+        },
+        {
+          "name": "15-Crown-5",
+          "abbr": "15C5",
+          "cas": "33100-27-5",
+          "synonyms": [
+            "15C5",
+            "15Crown5"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 3,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Crown ethers (crown_ethers) | roles: phase_transfer, ion_pair_disruption | name: 15-Crown-5 | abbr: 15C5 | CAS: 33100-27-5 | PT power: high | use_cases: Solubilize Na+ salts; Promote substitutions and eliminations"
+        },
+        {
+          "name": "12-Crown-4",
+          "abbr": "12C4",
+          "cas": "287-15-8",
+          "synonyms": [
+            "12C4",
+            "12Crown4"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 2,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Crown ethers (crown_ethers) | roles: phase_transfer, ion_pair_disruption | name: 12-Crown-4 | abbr: 12C4 | CAS: 287-15-8 | PT power: medium | use_cases: Solubilize Li+ salts"
+        }
+      ],
+      "use_cases": [
+        "Solubilize inorganic salts",
+        "Enhance nucleophilicity of anions (KF, K2CO3)"
+      ],
+      "best_for": [
+        "Promoting anionic reactions in aprotic solvents"
+      ],
+      "avoid_when": [
+        "Strongly Lewis acidic metals present that bind crown oxygen donors"
+      ],
+      "ehs_green": {
+        "sensitizer": "possible",
+        "waste_concern": "chelator"
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–20",
+        "temp_C": "0–120"
+      }
+    },
+    {
+      "family_id": "iodide_promoters",
+      "label": "Iodide promoters (Finkelstein/oxidative addition accelerants)",
+      "functional_roles": [
+        "halide_promoter"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "low",
+        "water_scavenging_power": "very low",
+        "halide_promotion_power": "very high",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "very low",
+        "hygroscopicity_band": "low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "amides_dipolar_aprotic",
+        "sulfoxides_dipolar_aprotic",
+        "ethers_cyclic_glymes",
+        "alcohols_secondary"
+      ],
+      "example_members": [
+        {
+          "name": "Sodium iodide",
+          "abbr": "NaI",
+          "cas": "7681-82-5",
+          "synonyms": [
+            "NaI",
+            "Sodiumiodide"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 1,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 4,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Iodide promoters (iodide_promoters) | roles: halide_promoter | name: Sodium iodide | abbr: NaI | CAS: 7681-82-5 | halide promotion: very high | use_cases: Finkelstein reaction; Facilitate oxidative addition for aryl chlorides/bromides"
+        },
+        {
+          "name": "Potassium iodide",
+          "abbr": "KI",
+          "cas": "7681-11-0",
+          "synonyms": [
+            "KI",
+            "Potassiumiodide"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 1,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 4,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Iodide promoters (iodide_promoters) | roles: halide_promoter | name: Potassium iodide | abbr: KI | CAS: 7681-11-0 | halide promotion: very high | use_cases: Halide exchange; Pd/Ni-catalyzed couplings"
+        }
+      ],
+      "use_cases": [
+        "Accelerate oxidative addition",
+        "Promote SN2/Finkelstein halide exchange"
+      ],
+      "best_for": [
+        "Less reactive aryl halides",
+        "Alkyl bromide/chloride substitutions"
+      ],
+      "avoid_when": [
+        "Iodide poisons catalyst or forms inactive metal iodides"
+      ],
+      "ehs_green": {
+        "iodide_handling": true
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.05–1.0",
+        "temp_C": "20–120"
+      }
+    },
+    {
+      "family_id": "fluoride_sources_activators",
+      "label": "Fluoride sources / silyl activators",
+      "functional_roles": [
+        "fluoride_source"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "low",
+        "water_scavenging_power": "low",
+        "halide_promotion_power": "medium",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "very low",
+        "hygroscopicity_band": "high"
+      },
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "amides_dipolar_aprotic"
+      ],
+      "example_members": [
+        {
+          "name": "Tetrabutylammonium fluoride (anhydrous)",
+          "abbr": "TBAF",
+          "cas": "429-41-4",
+          "synonyms": [
+            "TBAF",
+            "Tetrabutylammoniumfluoride"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 1,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 2,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 4
+          },
+          "embedding_text": "type: ADDITIVE | family: Fluoride sources / silyl activators (fluoride_sources_activators) | roles: fluoride_source | name: Tetrabutylammonium fluoride | abbr: TBAF | CAS: 429-41-4 | hygroscopicity: very high | use_cases: Desilylation; Activate silyl nucleophiles"
+        },
+        {
+          "name": "Cesium fluoride",
+          "abbr": "CsF",
+          "cas": "13400-13-0",
+          "synonyms": [
+            "CsF",
+            "Cesiumfluoride"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 1,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 2,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 3
+          },
+          "embedding_text": "type: ADDITIVE | family: Fluoride sources / silyl activators (fluoride_sources_activators) | roles: fluoride_source | name: Cesium fluoride | abbr: CsF | CAS: 13400-13-0 | use_cases: Desilylation; Promote Hiyama/allylsilane reactions"
+        }
+      ],
+      "use_cases": [
+        "Desilylation",
+        "Activate silyl reagents (Hiyama, Brook)"
+      ],
+      "best_for": [
+        "Silyl-protected substrates",
+        "Hiyama couplings"
+      ],
+      "avoid_when": [
+        "Water present; strongly basic fluoride can trigger eliminations"
+      ],
+      "ehs_green": {
+        "corrosive": true,
+        "hygroscopic": true
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.1–2.0",
+        "temp_C": "0–100"
+      }
+    },
+    {
+      "family_id": "silver_salts_halide_scavengers",
+      "label": "Silver salts (halide scavengers / promoter salts)",
+      "functional_roles": [
+        "halide_scavenger",
+        "weakly_coordinating_anion"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "very low",
+        "water_scavenging_power": "very low",
+        "halide_promotion_power": "low",
+        "halide_scavenging_power": "very high",
+        "lewis_acidity_band": "medium",
+        "hygroscopicity_band": "low"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "nitriles",
+        "ethers_cyclic_glymes",
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "Silver carbonate",
+          "abbr": "Ag2CO3",
+          "cas": "534-16-7",
+          "synonyms": [
+            "Ag2CO3",
+            "Silvercarbonate"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 4,
+            "lewis_acidity_rank": 2,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger | name: Silver carbonate | abbr: Ag2CO3 | CAS: 534-16-7 | halide scavenging: very high | use_cases: Halide abstraction; Promote C–H activation"
+        },
+        {
+          "name": "Silver oxide",
+          "abbr": "Ag2O",
+          "cas": "20667-12-3",
+          "synonyms": [
+            "Ag2O",
+            "Silveroxide"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 4,
+            "lewis_acidity_rank": 2,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger | name: Silver oxide | abbr: Ag2O | CAS: 20667-12-3 | halide scavenging: very high"
+        },
+        {
+          "name": "Silver tetrafluoroborate",
+          "abbr": "AgBF4",
+          "cas": "7775-27-1",
+          "synonyms": [
+            "AgBF4",
+            "Silver tetrafluoroborate"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 4,
+            "lewis_acidity_rank": 2,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger, weakly_coordinating_anion | name: Silver tetrafluoroborate | abbr: AgBF4 | CAS: 7775-27-1 | halide scavenging: very high"
+        },
+        {
+          "name": "Silver hexafluoroantimonate",
+          "abbr": "AgSbF6",
+          "cas": "17026-41-2",
+          "synonyms": [
+            "AgSbF6",
+            "Silverhexafluoroantimonate"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 4,
+            "lewis_acidity_rank": 2,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger, weakly_coordinating_anion | name: Silver hexafluoroantimonate | abbr: AgSbF6 | CAS: 17026-41-2 | halide scavenging: very high"
+        }
+      ],
+      "use_cases": [
+        "Halide abstraction from metal complexes",
+        "Promote cationic catalysis",
+        "C–H activation with carboxylate co-additives"
+      ],
+      "best_for": [
+        "Generating cationic catalysts from chloride precursors"
+      ],
+      "avoid_when": [
+        "Halide-sensitive organometallic intermediates prone to over-oxidation",
+        "Cost/EHS constraints"
+      ],
+      "ehs_green": {
+        "toxic": true,
+        "heavy_metal": true
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.1–2.0",
+        "temp_C": "20–120"
+      }
+    },
+    {
+      "family_id": "carboxylate_promoters_ch_activation",
+      "label": "Carboxylic acid promoters for C–H activation",
+      "functional_roles": [
+        "carboxylate_promoter",
+        "proton_shuttle"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "very low",
+        "water_scavenging_power": "low",
+        "halide_promotion_power": "very low",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "very low",
+        "hygroscopicity_band": "low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "amides_dipolar_aprotic",
+        "halogenated",
+        "esters_anhydrides"
+      ],
+      "example_members": [
+        {
+          "name": "Pivalic acid",
+          "abbr": "PivOH",
+          "cas": "75-98-9",
+          "synonyms": [
+            "PivOH",
+            "Pivalicacid",
+            "tBuCO2H"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Carboxylate promoters for C–H activation (carboxylate_promoters_ch_activation) | roles: carboxylate_promoter | name: Pivalic acid | abbr: PivOH | CAS: 75-98-9 | use_cases: Pd-catalyzed C–H activation; Proton shuttle"
+        },
+        {
+          "name": "2,4,6-Trimethylbenzoic acid",
+          "abbr": "MesCO2H",
+          "cas": "576-26-1",
+          "synonyms": [
+            "MesCO2H",
+            "Mesitylenecarboxylicacid"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Carboxylate promoters for C–H activation (carboxylate_promoters_ch_activation) | roles: carboxylate_promoter | name: 2,4,6-Trimethylbenzoic acid | abbr: MesCO2H | CAS: 576-26-1"
+        },
+        {
+          "name": "1-Adamantane carboxylic acid",
+          "abbr": "1-AdCO2H",
+          "cas": "3111-27-3",
+          "synonyms": [
+            "1AdCO2H",
+            "Adamantanecarboxylicacid"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Carboxylate promoters for C–H activation (carboxylate_promoters_ch_activation) | roles: carboxylate_promoter | name: 1-Adamantane carboxylic acid | abbr: 1-AdCO2H | CAS: 3111-27-3"
+        }
+      ],
+      "use_cases": [
+        "Pd-catalyzed C–H activation as CMD promoters",
+        "Proton shuttling to accelerate C–H cleavage"
+      ],
+      "best_for": [
+        "Arenes with weakly directing groups",
+        "Alkyl C–H activation under Pd catalysis"
+      ],
+      "avoid_when": [
+        "Acid-sensitive substrates"
+      ],
+      "ehs_green": {
+        "corrosive": "mild"
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.1–2.0",
+        "temp_C": "60–140"
+      }
+    },
+    {
+      "family_id": "molecular_sieves",
+      "label": "Molecular sieves (water scavengers)",
+      "functional_roles": [
+        "water_scavenger"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "very low",
+        "water_scavenging_power": "very high",
+        "halide_promotion_power": "very low",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "low",
+        "hygroscopicity_band": "very high"
+      },
+      "moisture_sensitivity": "n/a",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "esters_anhydrides",
+        "hydrocarbons_aromatic",
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "3 Å molecular sieves",
+          "abbr": "MS 3Å",
+          "synonyms": [
+            "Molecularsieves3A",
+            "MS3A"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 4,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 4
+          },
+          "embedding_text": "type: ADDITIVE | family: Molecular sieves (molecular_sieves) | roles: water_scavenger | name: 3 Å molecular sieves | abbr: MS 3Å | water scavenging: very high | use_cases: Remove water; Drive equilibria (acetalization, coupling)"
+        },
+        {
+          "name": "4 Å molecular sieves",
+          "abbr": "MS 4Å",
+          "synonyms": [
+            "Molecularsieves4A",
+            "MS4A"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 4,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 4
+          },
+          "embedding_text": "type: ADDITIVE | family: Molecular sieves (molecular_sieves) | roles: water_scavenger | name: 4 Å molecular sieves | abbr: MS 4Å | water scavenging: very high"
+        }
+      ],
+      "use_cases": [
+        "Remove adventitious moisture",
+        "Equilibrium-shifting reactions (esterifications, imine formation)"
+      ],
+      "best_for": [
+        "Water-sensitive couplings",
+        "Silyl chemistry"
+      ],
+      "avoid_when": [
+        "Strongly basic slurries (can degrade sieves)"
+      ],
+      "ehs_green": {
+        "solid_waste": true
+      },
+      "operational_envelope": {
+        "typical_loading_wt_percent": "5–50",
+        "temp_C": "ambient–150"
+      }
+    },
+    {
+      "family_id": "lithium_halide_accelerants",
+      "label": "Lithium/alkaline halide accelerants",
+      "functional_roles": [
+        "halide_promoter",
+        "ion_pair_disruption"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "low",
+        "water_scavenging_power": "very low",
+        "halide_promotion_power": "medium",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "low",
+        "hygroscopicity_band": "medium"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "amides_dipolar_aprotic",
+        "THF_like"
+      ],
+      "example_members": [
+        {
+          "name": "Lithium chloride",
+          "abbr": "LiCl",
+          "cas": "7447-41-8",
+          "synonyms": [
+            "LiCl",
+            "Lithiumchloride"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 1,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 2,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Lithium/alkaline halide accelerants (lithium_halide_accelerants) | roles: halide_promoter | name: Lithium chloride | abbr: LiCl | CAS: 7447-41-8 | use_cases: Accelerate transmetalation (Negishi/Kumada); Stabilize organometallics"
+        },
+        {
+          "name": "Lithium bromide",
+          "abbr": "LiBr",
+          "cas": "7550-35-8",
+          "synonyms": [
+            "LiBr",
+            "Lithiumbromide"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 1,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 2,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 3
+          },
+          "embedding_text": "type: ADDITIVE | family: Lithium/alkaline halide accelerants (lithium_halide_accelerants) | roles: halide_promoter | name: Lithium bromide | abbr: LiBr | CAS: 7550-35-8"
+        },
+        {
+          "name": "Magnesium chloride",
+          "abbr": "MgCl2",
+          "cas": "7786-30-3",
+          "synonyms": [
+            "MgCl2",
+            "Magnesiumchloride"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 1,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 2,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 3
+          },
+          "embedding_text": "type: ADDITIVE | family: Lithium/alkaline halide accelerants (lithium_halide_accelerants) | roles: halide_promoter | name: Magnesium chloride | abbr: MgCl2 | CAS: 7786-30-3"
+        }
+      ],
+      "use_cases": [
+        "Rate enhancement in metal-catalyzed cross-couplings",
+        "Salt effects on transmetalation"
+      ],
+      "best_for": [
+        "Negishi, Kumada couplings with sluggish transmetalation"
+      ],
+      "avoid_when": [
+        "Water present (salts are hygroscopic)"
+      ],
+      "ehs_green": {
+        "hygroscopic": true
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.5–5.0",
+        "temp_C": "20–110"
+      }
+    },
+    {
+      "family_id": "lewis_acid_promoters",
+      "label": "Mild Lewis-acid promoters",
+      "functional_roles": [
+        "lewis_acid_promoter"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "very low",
+        "water_scavenging_power": "low",
+        "halide_promotion_power": "low",
+        "halide_scavenging_power": "low",
+        "lewis_acidity_band": "medium",
+        "hygroscopicity_band": "medium"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "halogenated",
+        "ethers_cyclic_glymes",
+        "nitriles"
+      ],
+      "example_members": [
+        {
+          "name": "Zinc chloride",
+          "abbr": "ZnCl2",
+          "cas": "7646-85-7",
+          "synonyms": [
+            "ZnCl2",
+            "Zincchloride"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 3,
+            "hygroscopicity_rank": 3
+          },
+          "embedding_text": "type: ADDITIVE | family: Mild Lewis-acid promoters (lewis_acid_promoters) | roles: lewis_acid_promoter | name: Zinc chloride | abbr: ZnCl2 | CAS: 7646-85-7 | use_cases: Activate electrophiles; Promote acylations and substitutions"
+        },
+        {
+          "name": "Lithium perchlorate",
+          "abbr": "LiClO4",
+          "cas": "7791-03-9",
+          "synonyms": [
+            "LiClO4",
+            "Lithiumperchlorate"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 1,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 2,
+            "hygroscopicity_rank": 3
+          },
+          "embedding_text": "type: ADDITIVE | family: Mild Lewis-acid promoters (lewis_acid_promoters) | roles: lewis_acid_promoter | name: Lithium perchlorate | abbr: LiClO4 | CAS: 7791-03-9 | use_cases: Accelerate Diels–Alder and SN1/ionization by ion pairing"
+        }
+      ],
+      "use_cases": [
+        "Electrophile activation",
+        "Cation stabilization/ion pairing"
+      ],
+      "best_for": [
+        "Lewis-basic substrates needing activation"
+      ],
+      "avoid_when": [
+        "Perchlorate safety constraints (oxidizer)",
+        "Water present"
+      ],
+      "ehs_green": {
+        "oxidizer": true,
+        "explosive_salts": "risk when dry/organic media"
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.1–2.0",
+        "temp_C": "0–80"
+      }
+    },
+    {
+      "family_id": "radical_suppressors",
+      "label": "Radical suppressors / scavengers",
+      "functional_roles": [
+        "radical_suppressor"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "very low",
+        "water_scavenging_power": "very low",
+        "halide_promotion_power": "very low",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "very low",
+        "hygroscopicity_band": "low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "hydrocarbons_aromatic",
+        "ethers_cyclic_glymes",
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "TEMPO",
+          "abbr": "TEMPO",
+          "cas": "2564-83-2",
+          "synonyms": [
+            "TEMPO",
+            "2,2,6,6-Tetramethylpiperidin-1-yl oxyl"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Radical suppressors (radical_suppressors) | roles: radical_suppressor | name: TEMPO | abbr: TEMPO | CAS: 2564-83-2 | use_cases: Probe radical pathways; Inhibit radical chains"
+        },
+        {
+          "name": "Butylated hydroxytoluene",
+          "abbr": "BHT",
+          "cas": "128-37-0",
+          "synonyms": [
+            "BHT",
+            "2,6-di-tert-butyl-4-methylphenol"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Radical suppressors (radical_suppressors) | roles: radical_suppressor | name: Butylated hydroxytoluene | abbr: BHT | CAS: 128-37-0"
+        }
+      ],
+      "use_cases": [
+        "Shut down radical side-reactions",
+        "Mechanistic probes"
+      ],
+      "best_for": [
+        "Screening to discern radical vs polar pathways"
+      ],
+      "avoid_when": [
+        "Processes reliant on radical steps"
+      ],
+      "ehs_green": {
+        "antioxidant": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "1–20",
+        "temp_C": "0–120"
+      }
+    }
+  ],
+  "schema_extensions": {
+    "example_members[*].synonyms": "array of alternative names (abbr, common names, punctuation-stripped)",
+    "example_members[*].embedding_text": "deterministic compact text used to compute embeddings",
+    "example_members[*].numeric_features": "pre-vectorized numeric ranks {phase_transfer_rank, water_scavenging_rank, halide_promotion_rank, halide_scavenging_rank, lewis_acidity_rank, hygroscopicity_rank}",
+    "use_cases": "list of typical applications per family",
+    "best_for": "phrases capturing ideal scenarios",
+    "avoid_when": "phrases capturing contraindications",
+    "ehs_green": "EHS/green flags at family level",
+    "operational_envelope": "typical guidance (loading, temperature) where non-controversial"
+  },
+  "vectorization_hints": {
+    "rank_maps": {
+      "phase_transfer_power→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "water_scavenging_power→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "halide_promotion_power→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "halide_scavenging_power→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "lewis_acidity_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      },
+      "hygroscopicity_band→rank": {
+        "very low": 0,
+        "low": 1,
+        "medium": 2,
+        "high": 3,
+        "very high": 4
+      }
+    },
+    "embedding_field_preference": [
+      "example_members[*].embedding_text",
+      "example_members[*].name",
+      "example_members[*].abbr",
+      "example_members[*].synonyms"
+    ],
+    "filter_recipes": {
+      "desiccating": {
+        "water_scavenging_rank_min": 3
+      },
+      "halide_promotion": {
+        "halide_promotion_rank_min": 2
+      },
+      "non_hygroscopic": {
+        "hygroscopicity_rank_max": 2
+      }
+    }
+  }
+}
