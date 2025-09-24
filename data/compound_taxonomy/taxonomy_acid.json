@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "updated": "2025-09-24",
   "schema": {
     "family_id": "stable identifier",
@@ -21,7 +21,8 @@
     "best_for": "phrases capturing ideal scenarios",
     "avoid_when": "phrases capturing contraindications",
     "ehs_green": "EHS/green flags at family or member level",
-    "operational_envelope": "typical guidance (loading, temp) where non-controversial"
+    "operational_envelope": "typical guidance (loading, temp) where non-controversial",
+    "condition_links": "array of {reaction_family, core_id_hint, link_strength (weak/medium/strong), synergizes_with[], conflicts_with[], notes}"
   },
   "families": [
     {
@@ -121,7 +122,35 @@
       "operational_envelope": {
         "typical_loading_equiv": "0.01–2.0",
         "temp_C": "0–120"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "esterification_fischer",
+          "core_id_hint": "mineral_acids",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "azeotropic_water_removal",
+            "molecular_sieves"
+          ],
+          "conflicts_with": [
+            "strong_bases"
+          ],
+          "notes": "Classical mineral-acid catalysis; water removal shifts equilibrium."
+        },
+        {
+          "reaction_family": "acetalization",
+          "core_id_hint": "mineral_acids",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "Dean_Stark",
+            "molecular_sieves"
+          ],
+          "conflicts_with": [
+            "acetal_sensitive_substrates"
+          ],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "sulfonic_acids",
@@ -200,7 +229,43 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "1–20",
         "temp_C": "0–120"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "esterification_fischer",
+          "core_id_hint": "p_TsOH_or_MsOH",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "acetic_anhydride",
+            "molecular_sieves"
+          ],
+          "conflicts_with": [
+            "strong_bases"
+          ],
+          "notes": "Non-oxidizing, organic-soluble acids."
+        },
+        {
+          "reaction_family": "acetalization",
+          "core_id_hint": "p_TsOH",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "azeotrope",
+            "sieves"
+          ],
+          "conflicts_with": [],
+          "notes": ""
+        },
+        {
+          "reaction_family": "protecting_group_deprotection",
+          "core_id_hint": "p_TsOH",
+          "link_strength": "medium",
+          "synergizes_with": [
+            "alcohol_solvent"
+          ],
+          "conflicts_with": [],
+          "notes": "e.g., deprotect THP/Acetal in alcohols."
+        }
+      ]
     },
     {
       "family_id": "superacids",
@@ -277,7 +342,32 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "0.1–10",
         "temp_C": "−20–60"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "carbocation_chemistry",
+          "core_id_hint": "TfOH_or_FSO3H",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "low_nucleophilicity_solvents"
+          ],
+          "conflicts_with": [
+            "water",
+            "base_sensitive_equipment"
+          ],
+          "notes": "Isomerizations, rearrangements, alkylations."
+        },
+        {
+          "reaction_family": "friedel_crafts_alkylation",
+          "core_id_hint": "TfOH",
+          "link_strength": "medium",
+          "synergizes_with": [],
+          "conflicts_with": [
+            "strong_nucleophiles"
+          ],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "halogenated_carboxylic_acids",
@@ -353,7 +443,31 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "1–30",
         "temp_C": "0–100"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "Boc_deprotection",
+          "core_id_hint": "TFA",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "DCM_solvent"
+          ],
+          "conflicts_with": [
+            "base"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "amide_coupling_additive",
+          "core_id_hint": "TFA_catalysis",
+          "link_strength": "weak",
+          "synergizes_with": [
+            "DCC_or_EDC"
+          ],
+          "conflicts_with": [],
+          "notes": "Occasional catalytic role in carbodiimide couplings."
+        }
+      ]
     },
     {
       "family_id": "simple_carboxylic_acids",
@@ -431,7 +545,22 @@
       "operational_envelope": {
         "typical_loading_equiv": "0.1–2.0",
         "temp_C": "50–140"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "pd_ch_activation_cmd",
+          "core_id_hint": "PivOH_or_BenzoicAcid",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "Ag_salts",
+            "Pd(II)_catalyst"
+          ],
+          "conflicts_with": [
+            "strong_bases_excess"
+          ],
+          "notes": "Carboxylate-assisted C–H activation (CMD)."
+        }
+      ]
     },
     {
       "family_id": "solid_acid_resins",
@@ -502,7 +631,29 @@
       "operational_envelope": {
         "typical_loading_wt_percent": "1–50",
         "temp_C": "20–120"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "esterification_fischer",
+          "core_id_hint": "Amberlyst15_H+",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "molecular_sieves"
+          ],
+          "conflicts_with": [
+            "resin_fouling_substrates"
+          ],
+          "notes": "Heterogeneous, recyclable."
+        },
+        {
+          "reaction_family": "acetalization",
+          "core_id_hint": "Amberlyst15_H+",
+          "link_strength": "strong",
+          "synergizes_with": [],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "pyridinium_acids",
@@ -560,7 +711,19 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "1–20",
         "temp_C": "0–80"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "acetal_deprotection_mild",
+          "core_id_hint": "PPTS",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "alcohol_solvents"
+          ],
+          "conflicts_with": [],
+          "notes": "Milder than mineral acids."
+        }
+      ]
     },
     {
       "family_id": "boron_lewis_acids",
@@ -634,7 +797,29 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "1–10",
         "temp_C": "−20–60"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "mukaiyama_aldol",
+          "core_id_hint": "BF3_OEt2_or_BCF",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "silyl_enol_ethers"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "friedel_crafts_acylation",
+          "core_id_hint": "BF3_OEt2",
+          "link_strength": "medium",
+          "synergizes_with": [],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "aluminum_halides",
@@ -705,7 +890,35 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "5–100 (stoichiometric)",
         "temp_C": "−20–80"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "friedel_crafts_acylation",
+          "core_id_hint": "AlCl3",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "acid_chlorides",
+            "acyl_anhydrides"
+          ],
+          "conflicts_with": [
+            "water",
+            "Lewis_basic_solvents"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "friedel_crafts_alkylation",
+          "core_id_hint": "AlCl3",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "alkyl_halides"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "titanium_halides",
@@ -760,7 +973,31 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "5–100 (stoichiometric)",
         "temp_C": "−78–25"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "mukaiyama_aldol",
+          "core_id_hint": "TiCl4",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "silyl_enol_ethers"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "glycosylation",
+          "core_id_hint": "TiCl4",
+          "link_strength": "medium",
+          "synergizes_with": [
+            "silyl_triflates"
+          ],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "tin_halides",
@@ -814,7 +1051,21 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "5–50",
         "temp_C": "−20–80"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "acetalization",
+          "core_id_hint": "SnCl4",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "alcohols"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "zinc_iron_halides",
@@ -881,7 +1132,29 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "5–50",
         "temp_C": "0–100"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "friedel_crafts_alkylation",
+          "core_id_hint": "ZnCl2_or_FeCl3",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "alkyl_halides"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "carbonyl_activation",
+          "core_id_hint": "ZnCl2",
+          "link_strength": "medium",
+          "synergizes_with": [],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "rare_earth_triflates",
@@ -965,7 +1238,29 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "1–20",
         "temp_C": "0–120"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "water_tolerant_lewis_acid_catalysis",
+          "core_id_hint": "Sc(OTf)3_or_Yb(OTf)3",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "alcohol_solvents"
+          ],
+          "conflicts_with": [],
+          "notes": ""
+        },
+        {
+          "reaction_family": "glycosylation",
+          "core_id_hint": "Yb(OTf)3",
+          "link_strength": "medium",
+          "synergizes_with": [
+            "silyl_donors"
+          ],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
     },
     {
       "family_id": "silyl_triflates",
@@ -1034,7 +1329,477 @@
       "operational_envelope": {
         "typical_loading_mol_percent": "1–20",
         "temp_C": "−78–25"
-      }
+      },
+      "condition_links": [
+        {
+          "reaction_family": "mukaiyama_aldol",
+          "core_id_hint": "TMSOTf",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "silyl_enol_ethers"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "sakurai_allylation",
+          "core_id_hint": "TMSOTf",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "allylsilanes"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "glycosylation",
+          "core_id_hint": "TMSOTf",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "trichloroacetimidate_donors"
+          ],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "family_id": "perfluorosulfonimide_acids",
+      "label": "Perfluorosulfonimide acids (e.g., HNTf2)",
+      "functional_roles": [
+        "proton_donor",
+        "noncoordinating_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very strong",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "very low",
+        "hydrolytic_instability_band": "medium",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "high",
+      "typical_solvent_classes": [
+        "halogenated",
+        "nitriles",
+        "sulfoxides_dipolar_aprotic"
+      ],
+      "example_members": [
+        {
+          "name": "Bis(trifluoromethanesulfonyl)imide acid",
+          "abbr": "HNTf2",
+          "cas": "82113-65-3",
+          "counteranion": "NTf2−",
+          "synonyms": [
+            "Triflimidic acid",
+            "HTFSI"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 5,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 2,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Perfluorosulfonimide acids (perfluorosulfonimide_acids) | roles: proton_donor, noncoordinating_acid | name: HNTf2 | counteranion: NTf2− | acidity: very strong"
+        }
+      ],
+      "use_cases": [
+        "Carbocation chemistry with extremely non‑nucleophilic anion",
+        "Catalyst activation (anion exchange)"
+      ],
+      "best_for": [
+        "Highly acid-demanding yet nucleophile-sensitive systems"
+      ],
+      "avoid_when": [
+        "Water present; cost constraints"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "0.5–10",
+        "temp_C": "−20–60"
+      },
+      "condition_links": [
+        {
+          "reaction_family": "isomerization_carbocation",
+          "core_id_hint": "HNTf2",
+          "link_strength": "strong",
+          "synergizes_with": [
+            "low_nucleophilicity_solvents"
+          ],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "metal_catalyst_ionization",
+          "core_id_hint": "acid_exchange_to_NTf2",
+          "link_strength": "medium",
+          "synergizes_with": [
+            "silver_salts"
+          ],
+          "conflicts_with": [],
+          "notes": "Generate cationic catalysts with weakly coordinating anion."
+        }
+      ]
+    },
+    {
+      "family_id": "magic_acid_systems",
+      "label": "Magic-acid systems (HSO3F/SbF5 mixtures)",
+      "functional_roles": [
+        "proton_donor",
+        "noncoordinating_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "very strong",
+        "lewis_acidity_band": "medium",
+        "counteranion_coordinating_band": "very low",
+        "hydrolytic_instability_band": "very high",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "low"
+      },
+      "moisture_sensitivity": "extreme",
+      "typical_solvent_classes": [
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "HSO3F/SbF5 (Magic acid)",
+          "abbr": "HSO3F·SbF5",
+          "numeric_features": {
+            "bronsted_acidity_rank": 5,
+            "lewis_acidity_rank": 2,
+            "counteranion_coordinating_rank": 0,
+            "hydrolytic_instability_rank": 5,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 1
+          },
+          "embedding_text": "type: ACID | family: Magic-acid systems (magic_acid_systems) | roles: proton_donor, noncoordinating_acid | name: Magic acid"
+        }
+      ],
+      "use_cases": [
+        "Generate superelectrophiles; rearrangements"
+      ],
+      "best_for": [
+        "Fundamental studies; specialized transformations"
+      ],
+      "avoid_when": [
+        "General process use; handling risk high"
+      ],
+      "ehs_green": {
+        "extreme_corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "0.1–10",
+        "temp_C": "−78–25"
+      },
+      "condition_links": [
+        {
+          "reaction_family": "carbocation_chemistry",
+          "core_id_hint": "Magic_acid",
+          "link_strength": "strong",
+          "synergizes_with": [],
+          "conflicts_with": [
+            "water"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "family_id": "hydrogen_halide_donors",
+      "label": "Hydrogen halide donors (HCl/dioxane, HBr/AcOH)",
+      "functional_roles": [
+        "proton_donor"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "strong",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "high",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "ethers_cyclic_glymes",
+        "halogenated",
+        "alcohols_secondary"
+      ],
+      "example_members": [
+        {
+          "name": "HCl in dioxane (4 M)",
+          "abbr": "HCl/dioxane",
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 4,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Hydrogen halide donors (hydrogen_halide_donors) | roles: proton_donor | name: HCl/dioxane"
+        }
+      ],
+      "use_cases": [
+        "Amine salt formation; Boc deprotection alternative to TFA; Ether cleavage (HBr)"
+      ],
+      "best_for": [
+        "When halide counterion is beneficial (SN1/SN2)"
+      ],
+      "avoid_when": [
+        "Halide-sensitive catalysts"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "0.5–5.0",
+        "temp_C": "0–60"
+      },
+      "condition_links": [
+        {
+          "reaction_family": "Boc_deprotection",
+          "core_id_hint": "HCl_dioxane",
+          "link_strength": "strong",
+          "synergizes_with": [],
+          "conflicts_with": [
+            "halide_sensitive_metal_catalysts"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "ether_cleavage",
+          "core_id_hint": "HBr_AcOH",
+          "link_strength": "strong",
+          "synergizes_with": [],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "family_id": "polyphosphoric_acids",
+      "label": "Polyphosphoric/Eaton’s reagents",
+      "functional_roles": [
+        "proton_donor",
+        "dehydrating_agent"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "strong",
+        "lewis_acidity_band": "low",
+        "counteranion_coordinating_band": "medium",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "high",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "neat_or_sulfoxides"
+      ],
+      "example_members": [
+        {
+          "name": "Eaton’s reagent (P2O5 in MsOH)",
+          "abbr": "Eaton",
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 1,
+            "counteranion_coordinating_rank": 2,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Polyphosphoric/Eaton’s reagents (polyphosphoric_acids) | roles: proton_donor, dehydrating_agent | name: Eaton’s reagent"
+        }
+      ],
+      "use_cases": [
+        "Cyclodehydrations; Friedel–Crafts acylations (intramolecular); N‑acylations"
+      ],
+      "best_for": [
+        "Water‑sensitive cyclizations; high‑boiling acidic medium"
+      ],
+      "avoid_when": [
+        "Base‑sensitive neighboring groups"
+      ],
+      "ehs_green": {
+        "corrosive": true
+      },
+      "operational_envelope": {
+        "typical_loading_equiv": "stoichiometric",
+        "temp_C": "60–120"
+      },
+      "condition_links": [
+        {
+          "reaction_family": "intramolecular_acylation",
+          "core_id_hint": "Eaton_or_PPA",
+          "link_strength": "strong",
+          "synergizes_with": [],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "family_id": "fluorinated_alcohol_media",
+      "label": "Fluorinated alcohol media (HFIP/TFE)",
+      "functional_roles": [
+        "protic_medium",
+        "weak_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "weak",
+        "lewis_acidity_band": "very low",
+        "counteranion_coordinating_band": "low",
+        "hydrolytic_instability_band": "very low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "fluorinated_alcohols"
+      ],
+      "example_members": [
+        {
+          "name": "Hexafluoroisopropanol",
+          "abbr": "HFIP",
+          "cas": "920-66-1",
+          "numeric_features": {
+            "bronsted_acidity_rank": 1,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 0,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Fluorinated alcohol media (fluorinated_alcohol_media) | roles: protic_medium, weak_acid | name: HFIP"
+        },
+        {
+          "name": "Trifluoroethanol",
+          "abbr": "TFE",
+          "cas": "75-89-8",
+          "numeric_features": {
+            "bronsted_acidity_rank": 1,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 0,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Fluorinated alcohol media (fluorinated_alcohol_media) | roles: protic_medium, weak_acid | name: TFE"
+        }
+      ],
+      "use_cases": [
+        "Polarity‑enhanced cationic pathways; electrochemical media",
+        "Stabilize radical cations"
+      ],
+      "best_for": [
+        "Cationic cyclizations; oxidative couplings where HFIP boosts rate/selectivity"
+      ],
+      "avoid_when": [
+        "Base‑sensitive reagents that react with alcohols"
+      ],
+      "ehs_green": {
+        "volatile": true
+      },
+      "operational_envelope": {
+        "typical_loading_solvent_fraction": "10–100%",
+        "temp_C": "−20–80"
+      },
+      "condition_links": [
+        {
+          "reaction_family": "electrophilic_arene_functionalization",
+          "core_id_hint": "HFIP_solvent",
+          "link_strength": "medium",
+          "synergizes_with": [
+            "superstoichiometric_acids"
+          ],
+          "conflicts_with": [
+            "basic_additives"
+          ],
+          "notes": ""
+        },
+        {
+          "reaction_family": "oxidative_coupling",
+          "core_id_hint": "HFIP",
+          "link_strength": "medium",
+          "synergizes_with": [
+            "electrocatalysis"
+          ],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "family_id": "acidic_clays_zeolites",
+      "label": "Acidic clays and zeolites (K‑10, H‑Beta, H‑ZSM‑5)",
+      "functional_roles": [
+        "solid_acid"
+      ],
+      "effect_bands": {
+        "bronsted_acidity_band": "medium",
+        "lewis_acidity_band": "low",
+        "counteranion_coordinating_band": "low",
+        "hydrolytic_instability_band": "low",
+        "hygroscopicity_band": "medium",
+        "oxidizing_power_band": "very low"
+      },
+      "moisture_sensitivity": "low",
+      "typical_solvent_classes": [
+        "hydrocarbons_aromatic",
+        "halogenated"
+      ],
+      "example_members": [
+        {
+          "name": "Montmorillonite K‑10",
+          "abbr": "K‑10",
+          "numeric_features": {
+            "bronsted_acidity_rank": 2,
+            "lewis_acidity_rank": 1,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Acidic clays and zeolites (acidic_clays_zeolites) | roles: solid_acid | name: Montmorillonite K‑10"
+        }
+      ],
+      "use_cases": [
+        "Heterogeneous acid catalysis; solvent‑free grinding reactions"
+      ],
+      "best_for": [
+        "Green, reusable acid media; selectivity via confinement"
+      ],
+      "avoid_when": [
+        "Substrates prone to strong adsorption"
+      ],
+      "ehs_green": {
+        "recyclable": true
+      },
+      "operational_envelope": {
+        "typical_loading_wt_percent": "5–100",
+        "temp_C": "20–150"
+      },
+      "condition_links": [
+        {
+          "reaction_family": "acetalization",
+          "core_id_hint": "K10",
+          "link_strength": "medium",
+          "synergizes_with": [
+            "azeotropic_water_removal"
+          ],
+          "conflicts_with": [],
+          "notes": ""
+        }
+      ]
     }
   ],
   "schema_extensions": {
