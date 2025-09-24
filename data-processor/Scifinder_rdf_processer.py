@@ -145,6 +145,7 @@ class _TaxonomyIndex:
         bas = self._load_json("taxonomy_base.json")
         if bas:
             for fam in bas.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
                 for em in fam.get("example_members", []) or []:
                     self._index_member(
                         cas=em.get("cas"),
@@ -153,12 +154,30 @@ class _TaxonomyIndex:
                         synonyms=em.get("synonyms") or [],
                         role="BASE",
                         category_hint="base",
+                        family_id=fam_id,
+                    )
+
+        # Acids
+        acid = self._load_json("taxonomy_acid.json")
+        if acid:
+            for fam in acid.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="ACID",
+                        category_hint="acid",
+                        family_id=fam_id,
                     )
 
         # Coupling reagents / activators (amidation)
         cou = self._load_json("taxonomy_coupling_reagent.json")
         if cou:
             for fam in cou.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
                 for em in fam.get("example_members", []) or []:
                     self._index_member(
                         cas=em.get("cas"),
@@ -167,12 +186,14 @@ class _TaxonomyIndex:
                         synonyms=em.get("synonyms") or [],
                         role="COUPLING_REAGENT",
                         category_hint="coupling_reagent",
+                        family_id=fam_id,
                     )
 
         # Solvents
         solv = self._load_json("taxonomy_solvent.json")
         if solv:
             for fam in solv.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
                 for em in fam.get("example_members", []) or []:
                     self._index_member(
                         cas=em.get("cas"),
@@ -181,6 +202,7 @@ class _TaxonomyIndex:
                         synonyms=em.get("synonyms") or [],
                         role="SOLVENT",
                         category_hint="solvent",
+                        family_id=fam_id,
                     )
 
         # Catalyst precursors (metals)
@@ -200,6 +222,54 @@ class _TaxonomyIndex:
                         role="CAT",
                         category_hint="catalyst_precursor",
                         generic_core=metal,
+                        family_id=fam_id,
+                    )
+
+        # Additives (phase transfer, scavengers, etc.)
+        additive = self._load_json("taxonomy_additive.json")
+        if additive:
+            for fam in additive.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="ADDITIVE",
+                        category_hint="additive",
+                        family_id=fam_id,
+                    )
+
+        # Oxidants
+        oxidant = self._load_json("taxonomy_oxidant.json")
+        if oxidant:
+            for fam in oxidant.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="OXIDANT",
+                        category_hint="oxidant",
+                        family_id=fam_id,
+                    )
+
+        # Reductants
+        reductant = self._load_json("taxonomy_reductant.json")
+        if reductant:
+            for fam in reductant.get("families", []) or []:
+                fam_id = fam.get("family_id") or None
+                for em in fam.get("example_members", []) or []:
+                    self._index_member(
+                        cas=em.get("cas"),
+                        name=em.get("name"),
+                        abbr=em.get("abbr"),
+                        synonyms=em.get("synonyms") or [],
+                        role="REDUCTANT",
+                        category_hint="reductant",
                         family_id=fam_id,
                     )
 
@@ -334,7 +404,46 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             except Exception:
                 pass
 
-        return (f"{metal}/{lig_tok}" if metal and lig_tok else metal or lig_tok)
+        if metal and lig_tok:
+            return f"{metal}/{lig_tok}"
+        if metal or lig_tok:
+            return metal or lig_tok
+
+        # Fallback: highlight prominent reagents (acid/additive/base/etc.) when no metal/ligand core exists
+        reag_list = self._safe_json_list(row.get("Reagent", "[]"))
+        role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
+
+        def _token_from_item(item_obj: Dict[str, Any]) -> str:
+            cas = (item_obj.get("cas") or "").strip()
+            name = (item_obj.get("name") or "").strip()
+            token = ""
+            if self.taxonomy and cas:
+                rec = self.taxonomy.cas_map.get(cas, {})
+                token = (rec.get("Token") or rec.get("Abbreviation") or rec.get("Name") or "").strip()
+            if not token:
+                token = name or cas
+            return token.replace(" ", "")
+
+        fallback_roles = (
+            ("ACID", "Acid"),
+            ("BASE", "Base"),
+            ("ADDITIVE", "Additive"),
+            ("COUPLING_REAGENT", "Coupling reagent"),
+            ("OXIDANT", "Oxidant"),
+            ("REDUCTANT", "Reductant"),
+        )
+
+        for role_key, label in fallback_roles:
+            for idx, item in enumerate(reag_list or []):
+                role = (role_list[idx] if idx < len(role_list) else "").upper()
+                if role != role_key:
+                    continue
+                obj = item if isinstance(item, dict) else self._pair_to_obj(item)
+                token = _token_from_item(obj)
+                if token:
+                    return f"{label}: {token}"
+
+        return ""
 
     def generate_markdown_report(self, rows, output_path: str, source_folder: str):
         try:
@@ -390,7 +499,7 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     if solv_out:
                         f.write(f"- Solvents: {', '.join(solv_out)}\n")
                     if r_smi or p_smi:
-                        f.write(f"- SMILES: {r_smi} >> {p_smi}\n")
+                        f.write(f"- SMILES: {r_smi}>>{p_smi}\n")
                     f.write("\n")
         except Exception:
             pass

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2025-09-13",
+  "updated": "2025-09-24",
   "schema": {
     "family_id": "stable identifier for the solvent family",
     "label": "human-readable family name",
@@ -748,27 +748,50 @@
       "scaffold": "HO–(CH2CH2–O)n–R and related; high HBA, high bp.",
       "example_members": [
         {
-          "name": "2-Methoxyethanol",
-          "abbr": "Methyl cellosolve",
-          "cas": "109-86-4",
-          "aliases": [
-            "ME",
-            "2-ME",
-            "Methoxyethanol"
-          ],
+          "name": "1,4-Dioxane",
+          "abbr": "1,4-Dioxane",
+          "cas": "123-91-1",
           "synonyms": [
-            "2-ME",
-            "2Methoxyethanol",
-            "ME",
-            "Methoxyethanol",
-            "Methyl cellosolve"
+            "1,4-Dioxane",
+            "Dioxane",
+            "123-91-1",
+            "p-Dioxane",
+            "Diethylene ether",
+            "1,4-Diethylene dioxide",
+            "Dioxan",
+            "1,4-Dioxacyclohexane",
+            "Tetrahydro-p-dioxin",
+            "Di(ethylene oxide)",
+            "Dioxanne",
+            "Tetrahydro-1,4-dioxin",
+            "Dioxane-1,4",
+            "1,4-Dioxan",
+            "Diethylene dioxide",
+            "Glycol ethylene ether"
           ],
           "numeric_features": {
             "polarity_rank": 2,
             "coordination_rank": 3,
             "proticity_rank": 0
           },
-          "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: 2-Methoxyethanol | abbr: Methyl cellosolve | CAS: 109-86-4 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: 2-ME; 2Methoxyethanol; ME; Methoxyethanol; Methyl cellosolve"
+          "aliases": [
+            "Dioxane",
+            "123-91-1",
+            "p-Dioxane",
+            "Diethylene ether",
+            "1,4-Diethylene dioxide",
+            "Dioxan",
+            "1,4-Dioxacyclohexane",
+            "Tetrahydro-p-dioxin",
+            "Di(ethylene oxide)",
+            "Dioxanne",
+            "Tetrahydro-1,4-dioxin",
+            "Dioxane-1,4",
+            "1,4-Dioxan",
+            "Diethylene dioxide",
+            "Glycol ethylene ether"
+          ],
+          "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | name: 1,4-Dioxane | abbr: 1,4-Dioxane | CAS: 123-91-1 | synonyms: 1,4-Dioxane; Dioxane; 123-91-1; p-Dioxane; Diethylene ether; 1,4-Diethylene dioxide; Dioxan; 1,4-Dioxacyclohexane; Tetrahydro-p-dioxin; Di(ethylene oxide); Dioxanne; Tetrahydro-1,4-dioxin; Dioxane-1,4; 1,4-Dioxan; Diethylene dioxide; Glycol ethylene ether"
         },
         {
           "name": "2-Ethoxyethanol",
@@ -796,19 +819,27 @@
           "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: 2-Ethoxyethanol | abbr: Ethyl cellosolve | CAS: 110-80-5 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: 2-EE; 2Ethoxyethanol; EE; Ethoxyethanol; Ethyl cellosolve; Glycol monoethyl ether"
         },
         {
-          "name": "Ethylene glycol",
-          "abbr": "EG",
-          "cas": "107-21-1",
+          "name": "2-Methoxyethanol",
+          "abbr": "Methyl cellosolve",
+          "cas": "109-86-4",
+          "aliases": [
+            "ME",
+            "2-ME",
+            "Methoxyethanol"
+          ],
           "synonyms": [
-            "EG",
-            "Ethyleneglycol"
+            "2-ME",
+            "2Methoxyethanol",
+            "ME",
+            "Methoxyethanol",
+            "Methyl cellosolve"
           ],
           "numeric_features": {
             "polarity_rank": 2,
             "coordination_rank": 3,
             "proticity_rank": 0
           },
-          "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: Ethylene glycol | abbr: EG | CAS: 107-21-1 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: EG; Ethyleneglycol"
+          "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: 2-Methoxyethanol | abbr: Methyl cellosolve | CAS: 109-86-4 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: 2-ME; 2Methoxyethanol; ME; Methoxyethanol; Methyl cellosolve"
         },
         {
           "name": "Diethylene glycol",
@@ -824,6 +855,21 @@
             "proticity_rank": 0
           },
           "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: Diethylene glycol | abbr: DEG | CAS: 111-46-6 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: DEG; Diethyleneglycol"
+        },
+        {
+          "name": "Ethylene glycol",
+          "abbr": "EG",
+          "cas": "107-21-1",
+          "synonyms": [
+            "EG",
+            "Ethyleneglycol"
+          ],
+          "numeric_features": {
+            "polarity_rank": 2,
+            "coordination_rank": 3,
+            "proticity_rank": 0
+          },
+          "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: Ethylene glycol | abbr: EG | CAS: 107-21-1 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: EG; Ethyleneglycol"
         },
         {
           "name": "Poly(ethylene glycol) 400",
