@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
+from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QApplication,
     QCheckBox,
@@ -34,6 +34,7 @@ if str(MODULE_DIR) not in sys.path:
 from reagent_taxonomy_generator import (  # type: ignore
     DEFAULT_RESOLVER_TIMEOUT,
     ROLE_FILES,
+    ROLE_PRIORITY,
     RoleHeuristics,
     TaxonomyStore,
     build_entry,
@@ -43,6 +44,27 @@ from reagent_taxonomy_generator import (  # type: ignore
 )
 
 DEFAULT_TAXONOMY_DIR = (MODULE_DIR.parent / "data" / "compound_taxonomy").resolve()
+
+ROLE_LABEL_OVERRIDES: Dict[str, str] = {
+    "acid": "Acid (Brønsted/Lewis)",
+    "additive": "Additive / Modulator",
+    "metal_precursor": "Metal precursor",
+    "coupling_reagent": "Coupling reagent",
+    "oxidant": "Oxidant",
+    "reductant": "Reductant",
+}
+
+ROLE_HINTS: Dict[str, str] = {
+    "acid": "Mineral, sulfonic, and superacids used as activators or promoters.",
+    "additive": "Phase-transfer agents, halide scavengers, fluoride sources, and related modifiers.",
+    "ligand": "Ligands including phosphines, NHCs, diimines, and ancillary donor sets.",
+    "metal_precursor": "Metal salts/complexes that generate the catalytically active species.",
+    "base": "Brønsted/Lewis bases spanning amides, alkoxides, carbonates, superbases.",
+    "coupling_reagent": "Carbodiimides, uronium/phosphonium activators, and similar condensers.",
+    "oxidant": "Terminal and co-oxidants (peroxides, hypervalent iodine, oxone, O₂).",
+    "reductant": "Hydrides, silanes, metal reductants, and organic electron donors.",
+    "solvent": "Reaction media categorized by polarity, coordinating ability, and safety profile.",
+}
 
 
 class TaxonomyGenerationError(RuntimeError):
@@ -232,9 +254,17 @@ class TaxonomyGeneratorWindow(QMainWindow):
 
         self.role_combo = QComboBox()
         self.role_combo.addItem("Select role", userData=None)
-        for role_key in sorted(ROLE_FILES.keys()):
-            label = role_key.replace("_", " ").title()
+        role_keys = sorted(
+            ROLE_FILES.keys(),
+            key=lambda key: (ROLE_PRIORITY.get(key, 99), key),
+        )
+        for role_key in role_keys:
+            label = ROLE_LABEL_OVERRIDES.get(role_key, role_key.replace("_", " ").title())
+            index = self.role_combo.count()
             self.role_combo.addItem(label, userData=role_key)
+            hint = ROLE_HINTS.get(role_key)
+            if hint:
+                self.role_combo.setItemData(index, hint, Qt.ItemDataRole.ToolTipRole)
         form_layout.addRow("Reagent role", self.role_combo)
 
         path_layout = QHBoxLayout()

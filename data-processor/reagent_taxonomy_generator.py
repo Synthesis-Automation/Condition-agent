@@ -21,30 +21,39 @@ except Exception:  # pragma: no cover
 DEFAULT_RESOLVER_TIMEOUT = 6.0
 
 ROLE_FILES: Dict[str, str] = {
+    "acid": "taxonomy_acid.json",
+    "additive": "taxonomy_additive.json",
     "ligand": "taxonomy_ligand.json",
-    "base": "taxonomy_base.json",
-    "solvent": "taxonomy_solvent.json",
-    "coupling_reagent": "taxonomy_coupling_reagent.json",
     "metal_precursor": "taxonomy_catalysts_precursor.json",
+    "base": "taxonomy_base.json",
+    "coupling_reagent": "taxonomy_coupling_reagent.json",
+    "oxidant": "taxonomy_oxidant.json",
     "reductant": "taxonomy_reductant.json",
+    "solvent": "taxonomy_solvent.json",
 }
 
 DEFAULT_FAMILY_BY_ROLE: Dict[str, str] = {
+    "acid": "mineral_acids",
+    "additive": "quaternary_ammonium_ptc",
     "ligand": "trialkyl_triaryl_phosphines",
-    "base": "tertiary_amines_aliphatic",
-    "solvent": "hydrocarbons_aromatic",
-    "coupling_reagent": "carbodiimides",
     "metal_precursor": "pd_ii_salts",
+    "base": "tertiary_amines_aliphatic",
+    "coupling_reagent": "carbodiimides",
+    "oxidant": "o2_gas",
     "reductant": "metal_powders",
+    "solvent": "hydrocarbons_aromatic",
 }
 
 ROLE_PRIORITY: Dict[str, int] = {
     "ligand": 0,
     "metal_precursor": 1,
     "base": 2,
-    "coupling_reagent": 3,
-    "solvent": 4,
-    "reductant": 5,
+    "acid": 3,
+    "coupling_reagent": 4,
+    "oxidant": 5,
+    "reductant": 6,
+    "additive": 7,
+    "solvent": 8,
 }
 
 ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
@@ -68,6 +77,17 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
         r"\bdbu\b",
         r"\bdbn\b",
         r"organolithium",
+    ],
+    "acid": [
+        r"\bacid\b",
+        r"triflic",
+        r"trifluoracetic",
+        r"\btfa\b",
+        r"\btfoh\b",
+        r"sulfonic",
+        r"camphorsulfonic",
+        r"\bhbf4\b",
+        r"boric\s+acid",
     ],
     "solvent": [
         r"solvent",
@@ -106,9 +126,32 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
         r"borohydride",
         r"hydride",
         r"silane",
-        r"heh",
-        r"nabh4",
-        r"lialh4",
+        r"\bheh\b",
+        r"\bnabh4\b",
+        r"\blialh4\b",
+    ],
+    "additive": [
+        r"additive",
+        r"phase[- ]?transfer",
+        r"\bptc\b",
+        r"crown\s+ether",
+        r"\bcrown\b",
+        r"\btbaf\b",
+        r"\btbab\b",
+        r"\bquaternary\s+ammonium\b",
+        r"silver\s+triflate",
+        r"fluoride\s+source",
+    ],
+    "oxidant": [
+        r"oxidant",
+        r"peroxide",
+        r"hypervalent",
+        r"oxone",
+        r"persulfate",
+        r"permanganate",
+        r"selectfluor",
+        r"\bozone\b",
+        r"\bo2\b",
     ],
 }
 
@@ -126,6 +169,18 @@ MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
     r"\bnabh4\b": ("reductant", "complex_hydrides"),
     r"\blialh4\b": ("reductant", "complex_hydrides"),
     r"\bhantzsch\b": ("reductant", "organic_reductants"),
+    r"\btfoh\b": ("acid", "superacids"),
+    r"\btriflic\b": ("acid", "superacids"),
+    r"\btfa\b": ("acid", "halogenated_carboxylic_acids"),
+    r"\btrifluoroacetic\b": ("acid", "halogenated_carboxylic_acids"),
+    r"\btsoh\b": ("acid", "sulfonic_acids"),
+    r"\bp-toluenesulfonic\b": ("acid", "sulfonic_acids"),
+    r"\btbaf\b": ("additive", "fluoride_sources_activators"),
+    r"\btbab\b": ("additive", "quaternary_ammonium_ptc"),
+    r"\btetrabutylammonium\s+bromide\b": ("additive", "quaternary_ammonium_ptc"),
+    r"\bcrown-?6\b": ("additive", "crown_ethers"),
+    r"\boxone\b": ("oxidant", "oxone"),
+    r"\bselectfluor\b": ("oxidant", "hypervalent_iodine"),
 }
 
 for _stream in ("stdout", "stderr"):
@@ -486,6 +541,16 @@ EMBEDDING_FIELD_MAP: Dict[str, Sequence[Tuple[str, str]]] = {
         ("avoid_when", "avoid_when"),
         ("ehs_green", "ehs"),
     ),
+    "acid": (
+        ("functional_roles", "functional_roles"),
+        ("effect_bands", "effect_bands"),
+        ("moisture_sensitivity", "moisture"),
+        ("typical_solvent_classes", "solvent_classes"),
+        ("use_cases", "use_cases"),
+        ("best_for", "best_for"),
+        ("avoid_when", "avoid_when"),
+        ("ehs_green", "ehs"),
+    ),
     "solvent": (
         ("proticity", "proticity"),
         ("polarity_band", "polarity"),
@@ -522,6 +587,26 @@ EMBEDDING_FIELD_MAP: Dict[str, Sequence[Tuple[str, str]]] = {
         ("ehs_green", "ehs"),
     ),
     "reductant": (
+        ("class", "class"),
+        ("mechanism", "mechanism"),
+        ("strength_index", "strength"),
+        ("use_cases", "use_cases"),
+        ("best_for", "best_for"),
+        ("avoid_when", "avoid_when"),
+        ("recommended_pairs", "recommended_pairs"),
+        ("ehs_green", "ehs"),
+    ),
+    "additive": (
+        ("functional_roles", "functional_roles"),
+        ("effect_bands", "effect_bands"),
+        ("moisture_sensitivity", "moisture"),
+        ("typical_solvent_classes", "solvent_classes"),
+        ("use_cases", "use_cases"),
+        ("best_for", "best_for"),
+        ("avoid_when", "avoid_when"),
+        ("ehs_green", "ehs"),
+    ),
+    "oxidant": (
         ("class", "class"),
         ("mechanism", "mechanism"),
         ("strength_index", "strength"),
@@ -775,6 +860,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-
