@@ -8,3 +8,8 @@ dependencies = []
 
 [project.scripts]
 chem-registry = "chemtools.cli.registry:main"
+
+[project.optional-dependencies]
+molpipeline = [
+    "molpipeline>=0.10.3",
+]

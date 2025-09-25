@@ -1,9 +1,16 @@
-from typing import Dict, Any, List, Tuple, Optional
+﻿from typing import Dict, Any, List, Tuple, Optional, Mapping, Sequence
 import os, json
 from functools import lru_cache
 from .featurizers import molecular as feat_molecular
 from . import reaction_similarity as rs
 from collections import Counter
+
+try:
+    from .integrations import molpipeline as molpipe_integration
+    _HAS_MOLPIPELINE = molpipe_integration.is_available()
+except Exception:
+    molpipe_integration = None  # type: ignore
+    _HAS_MOLPIPELINE = False
 
 # Local helper to pick electrophile vs nucleophile from reactants list
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
@@ -48,9 +55,9 @@ def _dataset_family_map(raw: str) -> str:
     # Normalize dataset reaction_type to API family text
     tl = t.lower()
     if tl in {"ullman", "ullmann", "ullman-c-n", "ullmann-c-n", "ullmann c-n"}:
-        return "Ullmann C–N"
+        return "Ullmann C鈥揘"
     if tl in {"buchwald", "buchwald-c-n", "buchwald c-n"}:
-        return "Buchwald C–N"
+        return "Buchwald C鈥揘"
     if tl in {"suzuki", "suzuki-miyaura", "suzuki cc", "suzuki_cc"}:
         return "Suzuki_CC"
     if tl in {"amide-formation", "amide", "amide coupling", "amide_coupling"}:
@@ -164,26 +171,28 @@ def _load() -> List[Dict[str, Any]]:
 def _family_text(family: str) -> str:
     # Map API family tokens to dataset labels
     f = (family or "").strip()
-    if f.lower() in {"ullmann_cn", "ullmann c–n", "ullmann c-n", "ullmann"}:
-        return "Ullmann C–N"
+    if f.lower() in {"ullmann_cn", "ullmann c鈥搉", "ullmann c-n", "ullmann"}:
+        return "Ullmann C鈥揘"
     return f
 
 
 def _proto_family_id(family_txt: str) -> str:
-    """Normalize family text for use in prototype_id.
-    Replaces spaces with underscores, normalizes dash characters to '-', and '/' to '_'.
-    """
-    return (
-        str(family_txt)
-        .replace(" ", "_")
-        .replace("–", "-")  # en dash
-        .replace("—", "-")  # em dash
-        .replace("−", "-")  # minus sign
-        .replace("/", "_")
-    )
+    """Normalize family text for use in prototype_id."""
+    txt = str(family_txt).replace(' ', '_')
+    for old in ('–', '—', '−'):
+        txt = txt.replace(old, '-')
+    return txt.replace('/', '_')
 
 
 def _parse_bin(bin_str: str) -> Dict[str, str]:
+    out: Dict[str, str] = {}
+    if not bin_str:
+        return out
+    for part in str(bin_str).split('|'):
+        if ':' in part:
+            k, v = part.split(':', 1)
+            out[k.strip()] = v.strip()
+    return out
     out: Dict[str, str] = {}
     if not bin_str:
         return out
@@ -296,9 +305,13 @@ def _knn_cached(family: str, features_kv: Tuple[Tuple[str, Any], ...], k: int, r
 
 
 def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
-    # Public entrypoint; wrap cached implementation. Return a copy to avoid shared-state mutations.
-    out = _knn_cached(family, _as_kv(features or {}), int(k), _as_kv(relax or {}))
-    return {**out}
+    relax_dict = dict(relax or {})
+    molpipeline_cfg = relax_dict.pop('molpipeline', None)
+    out = _knn_cached(family, _as_kv(features or {}), int(k), _as_kv(relax_dict))
+    pack = {**out}
+    if molpipeline_cfg:
+        pack = _attach_molpipeline_features(pack, molpipeline_cfg)
+    return pack
 
 
 def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
@@ -458,7 +471,7 @@ def find_reactions_by_core(
     """Find dataset reactions that use the same or similar condition core.
 
     - core_query: e.g., 'Pd/XPhos', 'Pd', or 'XPhos'.
-    - family: optional reaction family text (e.g., 'Ullmann C–N', 'Suzuki_CC').
+    - family: optional reaction family text (e.g., 'Ullmann C鈥揘', 'Suzuki_CC').
     - fuzzy: if True, also match ligand names from catalyst/full_system entries.
     - limit: maximum number of results.
 
@@ -514,7 +527,7 @@ def list_cores(
 ) -> List[Dict[str, Any]] | List[str]:
     """List unique condition cores from the loaded reaction dataset.
 
-    - family: optional reaction family text to filter (e.g., 'Ullmann C–N', 'Suzuki_CC').
+    - family: optional reaction family text to filter (e.g., 'Ullmann C鈥揘', 'Suzuki_CC').
     - top_n: optional cap on number of items returned (by frequency desc).
     - include_counts: when True, return list of {core, count}; else list of core strings.
     """
@@ -533,3 +546,62 @@ def list_cores(
     if include_counts:
         return [{"core": c, "count": n} for c, n in items]
     return [c for c, _ in items]
+
+
+def _attach_molpipeline_features(pack: Dict[str, Any], cfg: Any) -> Dict[str, Any]:
+    if not isinstance(pack, dict):
+        return pack
+    if not isinstance(cfg, Mapping):
+        return pack
+    if not _HAS_MOLPIPELINE or molpipe_integration is None:
+        return pack
+    suppress = bool(cfg.get('suppress_errors', True))
+    try:
+        aggregator = cfg.get('aggregator') if isinstance(cfg, Mapping) else None
+        if aggregator is None:
+            roles = cfg.get('roles') if isinstance(cfg.get('roles'), Sequence) else None
+            aggregator = molpipe_integration.build_default_role_aggregator(
+                roles=roles,
+                aggregate=str(cfg.get('aggregate', 'mean')),
+                missing_strategy=str(cfg.get('missing_strategy', 'zeros')),
+                n_jobs=int(cfg.get('n_jobs', 1)),
+                ligand_n_bits=int(cfg.get('ligand_n_bits', 512)),
+                ligand_radius=int(cfg.get('ligand_radius', 2)),
+            )
+    except Exception as exc:
+        if suppress:
+            pack.setdefault('molpipeline_warnings', []).append(str(exc))
+            return pack
+        raise
+    include_role = bool(cfg.get('include_role_features', True))
+    include_concat = bool(cfg.get('include_concat', True))
+    role_key = str(cfg.get('role_features_key', 'molpipeline_role_features'))
+    concat_key = str(cfg.get('concat_key', 'molpipeline_feature_vector'))
+    precedents = pack.get('precedents')
+    if isinstance(precedents, list):
+        for row in precedents:
+            if not isinstance(row, dict):
+                continue
+            try:
+                role_feats = aggregator.featurize_roles(reaction=row)
+                if include_role:
+                    row[role_key] = {r: (vec.tolist() if hasattr(vec, 'tolist') else vec) if vec is not None else None for r, vec in role_feats.items()}
+                if include_concat:
+                    row[concat_key] = aggregator.concatenate(reaction=row).tolist()
+            except Exception as exc:
+                if suppress:
+                    row.setdefault('molpipeline_error', str(exc))
+                else:
+                    raise
+    try:
+        query_role_smiles = cfg.get('query_role_smiles') if isinstance(cfg, Mapping) else None
+        if query_role_smiles is None and isinstance(cfg.get('query_reaction'), Mapping):
+            query_role_smiles = molpipe_integration.collect_role_smiles(cfg['query_reaction'])
+        if query_role_smiles:
+            pack['molpipeline_query_vector'] = aggregator.concatenate(role_smiles=query_role_smiles).tolist()
+    except Exception as exc:
+        if suppress:
+            pack.setdefault('molpipeline_warnings', []).append(str(exc))
+        else:
+            raise
+    return pack

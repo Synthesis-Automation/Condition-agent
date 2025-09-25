@@ -1,4 +1,4 @@
-"""Chemtools package.
+﻿"""Chemtools package.
 
 Keep package import light. Submodules are available via explicit imports, e.g.:
 
@@ -18,4 +18,5 @@ __all__ = [
     "constraints",
     "explain",
     "registry",
+    "integrations",
 ]
