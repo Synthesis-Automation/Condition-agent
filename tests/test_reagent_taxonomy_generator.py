@@ -139,3 +139,148 @@ def test_list_families_includes_reductant(tmp_path):
     assert "metal_powders" in families
     assert len(families) >= 1
 
+
+
+def test_resolver_prefers_pubchem_cas_match():
+    cas = "2592-95-2"
+
+    class FakeResponse:
+        def __init__(self, payload):
+            self.status_code = 200
+            self._payload = payload
+            self.text = ""
+
+        def json(self):
+            return self._payload
+
+    property_payload = {
+        "PropertyTable": {
+            "Properties": [
+                {
+                    "CID": 807,
+                    "Title": "Iodine",
+                    "CanonicalSMILES": "II",
+                },
+                {
+                    "CID": 75771,
+                    "Title": "1-Hydroxybenzotriazole",
+                    "IsomericSMILES": "C1=CC=C2C(=C1)N=NN2O",
+                },
+            ]
+        }
+    }
+    synonyms_payload = {
+        "InformationList": {
+            "Information": [
+                {"CID": 807, "Synonym": ["iodine", "7553-56-2"]},
+                {"CID": 75771, "Synonym": ["1-Hydroxybenzotriazole", cas, "HOBt"]},
+            ]
+        }
+    }
+
+    class FakeSession:
+        def __init__(self):
+            self.headers = {}
+
+        def get(self, url, timeout):
+            if url.endswith('/property/Title,IUPACName,IsomericSMILES,CanonicalSMILES/JSON'):
+                return FakeResponse(property_payload)
+            if url.endswith('/synonyms/JSON'):
+                return FakeResponse(synonyms_payload)
+            raise AssertionError(f"Unexpected URL requested: {url}")
+
+    identity = rrg.resolve_identity_from_cas(cas, timeout=1.0, session=FakeSession())
+    assert identity is not None
+    assert identity.get("source") == "pubchem"
+    assert identity["name"] == "1-Hydroxybenzotriazole"
+    assert cas in identity["synonyms"]
+    assert "iodine" not in [syn.lower() for syn in identity["synonyms"]]
+    assert identity["smiles"] == "C1=CC=C2C(=C1)N=NN2O"
+
+
+
+def test_resolver_falls_back_when_pubchem_ambiguous(monkeypatch):
+    cas = "2592-95-2"
+
+    class FakeResponse:
+        def __init__(self, payload):
+            self.status_code = 200
+            self._payload = payload
+            self.text = ""
+
+        def json(self):
+            return self._payload
+
+    property_payload = {
+        "PropertyTable": {
+            "Properties": [
+                {"CID": 807, "Title": "Iodine", "CanonicalSMILES": "II"},
+                {"CID": 75771, "Title": "1-Hydroxybenzotriazole", "IsomericSMILES": "C1=CC=C2C(=C1)N=NN2O"},
+            ]
+        }
+    }
+
+    class FakeSession:
+        def __init__(self):
+            self.headers = {}
+
+        def get(self, url, timeout):
+            if url.endswith('/property/Title,IUPACName,IsomericSMILES,CanonicalSMILES/JSON'):
+                return FakeResponse(property_payload)
+            if url.endswith('/synonyms/JSON'):
+                raise RuntimeError('timeout')
+            raise AssertionError(f"Unexpected URL requested: {url}")
+
+    def fake_cactus(_session, cas_value, timeout):
+        assert cas_value == cas
+        return {"name": "CactusName", "synonyms": ["CactusName"], "smiles": "C"}
+
+    monkeypatch.setattr(rrg, '_resolve_via_cactus', fake_cactus)
+
+    identity = rrg.resolve_identity_from_cas(cas, timeout=1.0, session=FakeSession())
+    assert identity is not None
+    assert identity.get("source") == "cactus"
+    assert identity["name"] == "CactusName"
+    assert identity["synonyms"] == ["CactusName"]
+
+
+
+
+def test_additive_family_inference_for_hobt(tmp_path):
+    taxonomy_dir = _copy_taxonomy(Path(tmp_path))
+    store = rrg.TaxonomyStore(taxonomy_dir)
+    heuristics = rrg.RoleHeuristics(store)
+    name = "1-Hydroxybenzotriazole"
+    synonyms = ["HOBt", "1-Hydroxybenzotriazole"]
+    inferred = heuristics.infer_family(name, synonyms)
+    assert inferred is not None
+    role, family_id, matches = inferred
+    assert role == "additive"
+    assert family_id == "amide_coupling_additives"
+    assert any(token in matches for token in {"hobt", "1hydroxybenzotriazole", "hydroxybenzotriazole"})
+
+
+
+def test_additive_default_requires_overlap(tmp_path):
+    taxonomy_dir = _copy_taxonomy(Path(tmp_path))
+    cas = _make_test_cas("987654")
+    cmd = [
+        "python",
+        str(MODULE_PATH),
+        "--cas",
+        cas,
+        "--name",
+        "MysteryXYZ1234",
+        "--role",
+        "additive",
+        "--taxonomy-dir",
+        str(taxonomy_dir),
+        "--allow-default-family",
+        "--dry-run",
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    assert result.returncode != 0
+    message = (result.stderr or result.stdout).lower()
+    assert "default family" in message
+    assert "rejected" in message
+

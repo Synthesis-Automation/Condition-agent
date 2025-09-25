@@ -41,6 +41,7 @@ from reagent_taxonomy_generator import (  # type: ignore
     dedupe_synonyms,
     normalize_cas,
     resolve_identity_from_cas,
+    tokenize_all,
 )
 
 DEFAULT_TAXONOMY_DIR = (MODULE_DIR.parent / "data" / "compound_taxonomy").resolve()
@@ -103,6 +104,7 @@ def generate_taxonomy_entry(
     abbr = name
     resolved_synonyms: Sequence[str] = resolved_identity.get("synonyms", []) if resolved_identity else []
     synonyms = dedupe_synonyms([name, abbr, *resolved_synonyms])
+    input_tokens = tokenize_all([name, *synonyms])
 
     family_id: Optional[str] = None
     family_reason: Optional[List[str]] = None
@@ -139,13 +141,22 @@ def generate_taxonomy_entry(
         if allow_default_family:
             default_family = heuristics.default_family_for_role(role)
             if default_family:
-                family_id = default_family
-                used_default = True
+                if store.family_token_overlap(role, default_family, input_tokens):
+                    family_id = default_family
+                    used_default = True
+                else:
+                    tokens_sample = ', '.join(sorted(input_tokens)[:6]) or 'none'
+                    family_tokens = store.family_tokens.get((role, default_family), set())
+                    family_sample = ', '.join(sorted(family_tokens)[:6]) or 'none'
+                    debug_log.append(
+                        f"Skipped default family '{default_family}' due to missing token overlap "
+                        f"(input tokens: {tokens_sample}; family tokens sample: {family_sample})"
+                    )
         if not family_id:
-            raise TaxonomyGenerationError(
-                "Unable to determine a family for this reagent. Enable default family fallback "
-                "or provide a more specific CAS number."
-            )
+            message = "Unable to determine a family for this reagent."
+            if allow_default_family and debug_log:
+                message += " Automatic fallback was skipped for safety; select a family manually."
+            raise TaxonomyGenerationError(message)
 
     family_role = store.role_for_family(family_id)
     if family_role and family_role != role:

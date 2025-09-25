@@ -122,6 +122,107 @@
       }
     },
     {
+      "family_id": "amide_coupling_additives",
+      "label": "Amide coupling additives (benzotriazole / Oxyma)",
+      "functional_roles": [
+        "coupling_additive",
+        "active_ester_additive"
+      ],
+      "effect_bands": {
+        "phase_transfer_power": "very low",
+        "water_scavenging_power": "very low",
+        "halide_promotion_power": "very low",
+        "halide_scavenging_power": "very low",
+        "lewis_acidity_band": "low",
+        "hygroscopicity_band": "low"
+      },
+      "moisture_sensitivity": "medium",
+      "typical_solvent_classes": [
+        "amides_dipolar_aprotic",
+        "halogenated",
+        "ethers_cyclic_glymes"
+      ],
+      "example_members": [
+        {
+          "name": "1-Hydroxybenzotriazole",
+          "abbr": "HOBt",
+          "cas": "2592-95-2",
+          "synonyms": [
+            "HOBt",
+            "1-Hydroxybenzotriazole",
+            "1H-Benzotriazole, 1-hydroxy-",
+            "1-benzotriazoleol"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Amide coupling additives (amide_coupling_additives) | roles: coupling_additive | name: 1-Hydroxybenzotriazole | abbr: HOBt | CAS: 2592-95-2 | mode: OBt active ester co-additive with carbodiimides; suppresses racemization | solvents: DMF; DCM; NMP | cautions: impact_sensitive (anhydrous) | use_cases: Carbodiimide couplings; Peptide activation"
+        },
+        {
+          "name": "1-Hydroxy-7-azabenzotriazole",
+          "abbr": "HOAt",
+          "cas": "39968-33-7",
+          "synonyms": [
+            "HOAt",
+            "1-Hydroxy-7-azabenzotriazole",
+            "1H-1,2,3-Triazolo[4,5-b]pyridin-1-ol"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Amide coupling additives (amide_coupling_additives) | roles: coupling_additive | name: 1-Hydroxy-7-azabenzotriazole | abbr: HOAt | CAS: 39968-33-7 | mode: HOAt additive accelerates peptide couplings and lowers racemization | solvents: DMF; NMP | cautions: energetic_benzotriazole | use_cases: Challenging amide couplings"
+        },
+        {
+          "name": "Oxyma Pure",
+          "abbr": "Oxyma",
+          "cas": "3849-21-6",
+          "synonyms": [
+            "Oxyma",
+            "Ethyl cyano(hydroxyimino)acetate",
+            "Oxyma Pure"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 0,
+            "water_scavenging_rank": 0,
+            "halide_promotion_rank": 0,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 1,
+            "hygroscopicity_rank": 1
+          },
+          "embedding_text": "type: ADDITIVE | family: Amide coupling additives (amide_coupling_additives) | roles: coupling_additive | name: Oxyma Pure | abbr: Oxyma | CAS: 3849-21-6 | mode: Oxyma additive forms safer active esters versus OBt/HOAt | solvents: DMF; MeCN | cautions: avoid strong base excess | use_cases: Bt-free peptide couplings"
+        }
+      ],
+      "use_cases": [
+        "Stabilize active esters in carbodiimide couplings",
+        "Peptide coupling additives"
+      ],
+      "best_for": [
+        "Minimizing racemization in amide bond formation",
+        "Difficult peptide couplings"
+      ],
+      "avoid_when": [
+        "Processes forbidding benzotriazole-class additives"
+      ],
+      "notes": "Benzotriazole and Oxyma additives pair with carbodiimide or uronium reagents to lower epimerization and boost rates.",
+      "ehs_green": {
+        "benzotriazole_flag": true
+      },
+      "operational_envelope": {
+        "typical_loading_mol_percent": "5-50",
+        "temp_C": "0-50"
+      }
+    },
+    {
       "family_id": "crown_ethers",
       "label": "Crown ethers (K+/Na+/Li+ complexants)",
       "functional_roles": [

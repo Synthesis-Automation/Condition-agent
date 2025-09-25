@@ -191,6 +191,7 @@ for _stream in ("stdout", "stderr"):
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]{3,}")
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
+CAS_INLINE_PATTERN = re.compile(r"\d{2,7}-\d{2}-\d")
 
 def _sanitize_text(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", (text or "").lower())
@@ -262,37 +263,87 @@ def _http_get_text(session: Any, url: str, timeout: float) -> Optional[str]:
     return response.text
 
 
+def _normalized_cas_tokens(synonyms: Sequence[str]) -> Set[str]:
+    """Return normalized CAS numbers detected within the provided synonyms."""
+    tokens: Set[str] = set()
+    for synonym in synonyms:
+        if not synonym:
+            continue
+        inline_matches = CAS_INLINE_PATTERN.findall(synonym)
+        if inline_matches:
+            for match in inline_matches:
+                try:
+                    tokens.add(normalize_cas(match))
+                except ValueError:
+                    continue
+            continue
+        try:
+            normalized = normalize_cas(synonym)
+        except ValueError:
+            continue
+        tokens.add(normalized)
+    return tokens
+
+
 def _resolve_via_pubchem(session: Any, cas: str, timeout: float) -> Optional[Dict[str, Any]]:
     base = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/xref/RN/{quote(cas)}"
     props_url = base + "/property/Title,IUPACName,IsomericSMILES,CanonicalSMILES/JSON"
     props = _http_get_json(session, props_url, timeout)
-    name: Optional[str] = None
-    smiles: Optional[str] = None
-    if props:
-        entries = props.get("PropertyTable", {}).get("Properties", [])
-        if entries:
-            record = entries[0]
-            smiles = record.get("IsomericSMILES") or record.get("CanonicalSMILES")
-            name = record.get("Title") or record.get("IUPACName")
-    synonyms: List[str] = []
+    entries = props.get("PropertyTable", {}).get("Properties", []) if props else []
+    if not entries:
+        return None
+
     syn_url = base + "/synonyms/JSON"
     syn_data = _http_get_json(session, syn_url, timeout)
+    synonyms_by_cid: Dict[Any, List[str]] = {}
     if syn_data:
         info = syn_data.get("InformationList", {}).get("Information", [])
         for block in info:
-            synonyms.extend(block.get("Synonym", []) or [])
-    raw = []
-    if name:
-        raw.append(name)
-    raw.extend(synonyms)
+            cid = block.get("CID")
+            synonyms = block.get("Synonym", []) or []
+            deduped_synonyms = dedupe_synonyms([syn for syn in synonyms if syn])
+            if cid is not None:
+                synonyms_by_cid[cid] = deduped_synonyms
+
+    try:
+        normalized_query = normalize_cas(cas)
+    except ValueError:
+        normalized_query = None
+
+    selected_record = entries[0]
+    selected_synonyms = synonyms_by_cid.get(selected_record.get("CID"), [])
+    match_found = False
+    if normalized_query:
+        for record in entries:
+            cid = record.get("CID")
+            record_synonyms = synonyms_by_cid.get(cid, [])
+            if not record_synonyms:
+                continue
+            if normalized_query in _normalized_cas_tokens(record_synonyms):
+                selected_record = record
+                selected_synonyms = record_synonyms
+                match_found = True
+                break
+        if len(entries) > 1 and not match_found:
+            return None
+
+    smiles = selected_record.get("IsomericSMILES") or selected_record.get("CanonicalSMILES")
+    primary_name = selected_record.get("Title") or selected_record.get("IUPACName")
+
+    raw: List[str] = []
+    if primary_name:
+        raw.append(primary_name)
+    raw.extend(selected_synonyms)
     deduped = dedupe_synonyms(raw)
-    if deduped:
-        name = name or deduped[0]
-    if not name:
+    if not deduped and primary_name:
+        deduped = [primary_name]
+    if not deduped:
         return None
-    if deduped and len(deduped) > 16:
+    if len(deduped) > 16:
         deduped = deduped[:16]
-    return {"name": name, "synonyms": deduped or [name], "smiles": smiles}
+
+    name = primary_name or deduped[0]
+    return {"name": name, "synonyms": deduped, "smiles": smiles}
 
 
 def _resolve_via_cactus(session: Any, cas: str, timeout: float) -> Optional[Dict[str, Any]]:
@@ -449,6 +500,14 @@ class TaxonomyStore:
             add(member.get("synonyms", []))
             add(member.get("aliases", []))
         return tokens
+
+    def family_token_overlap(self, role: str, family_id: str, tokens: Set[str]) -> bool:
+        if not tokens:
+            return False
+        family_tokens = self.family_tokens.get((role, family_id))
+        if not family_tokens:
+            return False
+        return bool(family_tokens & tokens)
 
     def list_families(self, role: Optional[str] = None) -> List[Tuple[str, str, str]]:
         roles = [role] if role else ROLE_FILES.keys()
@@ -768,9 +827,11 @@ def main() -> None:
     abbr = args.abbr or name
     resolved_synonyms = resolved_identity.get("synonyms", []) if resolved_identity else []
     synonyms = dedupe_synonyms([name, abbr, *args.synonym, *resolved_synonyms])
+    input_tokens = tokenize_all([name, *synonyms])
     role = args.role
     family_id = args.family
     used_default = False
+    default_rejection_reason: Optional[str] = None
     family_reason: Optional[List[str]] = None
     role_reason: Optional[str] = None
     auto_resolve_source = resolved_identity.get("source") if resolved_identity else None
@@ -800,10 +861,24 @@ def main() -> None:
         if role:
             default_family = heuristics.default_family_for_role(role)
             if default_family and args.allow_default_family:
-                family_id = default_family
-                used_default = True
+                if store.family_token_overlap(role, default_family, input_tokens):
+                    family_id = default_family
+                    used_default = True
+                else:
+                    tokens_sample = ', '.join(sorted(input_tokens)[:6]) or 'none'
+                    family_tokens = store.family_tokens.get((role, default_family), set())
+                    family_sample = ', '.join(sorted(family_tokens)[:6]) or 'none'
+                    default_rejection_reason = (
+                        f"default family '{default_family}' rejected: no token overlap "
+                        f"(input tokens: {tokens_sample}; family tokens sample: {family_sample})"
+                    )
         if not family_id:
-            raise SystemExit("Unable to determine family. Provide --family explicitly or use --allow-default-family.")
+            message = (
+                "Unable to determine family. Provide --family explicitly or use --allow-default-family."
+            )
+            if default_rejection_reason:
+                message += f" Automatic fallback was skipped because {default_rejection_reason}."
+            raise SystemExit(message)
 
     if not role:
         role = store.role_for_family(family_id)
