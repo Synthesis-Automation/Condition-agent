@@ -576,6 +576,15 @@ class RDFWorker(QtCore.QObject):
         self.output_md_path = output_md_path
         self.output_jsonl_path = output_jsonl_path
         self.rdf_files = []
+        self._undetermined_loaded = False
+        self._undetermined_existing_entries: List[Dict[str, Any]] = []
+        self._undetermined_existing_map: Dict[str, Dict[str, Any]] = {}
+        self._undetermined_new_map: Dict[str, Dict[str, Any]] = {}
+        self._registry_loaded = False
+        self._registry_by_cas: Dict[str, Dict[str, Any]] = {}
+        self._registry_by_name: Dict[str, Dict[str, Any]] = {}
+        self._undetermined_file_path_cache: Optional[str] = None
+        self._registry_path: Optional[str] = None
 
     def _emit(self, msg: str):
         """Emit progress message"""
@@ -618,8 +627,190 @@ class RDFWorker(QtCore.QObject):
         except Exception as e:
             raise RuntimeError(f"Failed to load taxonomy from {tax_dir}: {e}")
 
+    @staticmethod
+    def _normalize_name(value: str) -> str:
+        """Normalize a compound name for lookups."""
+        import re as _re
+        if not value:
+            return ""
+        normalized = value.strip().lower()
+        normalized = _re.sub(r"\s+", " ", normalized)
+        normalized = _re.sub(r"[^a-z0-9\+\-\.\(\)\[\]/']", "", normalized)
+        return normalized
+
+    def _undetermined_file_path(self) -> str:
+        if self._undetermined_file_path_cache:
+            return self._undetermined_file_path_cache
+        here = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(here, "not_determined_reagents.json")
+        self._undetermined_file_path_cache = path
+        return path
+
+    def _ensure_undetermined_cache_loaded(self) -> None:
+        if self._undetermined_loaded:
+            return
+        self._undetermined_loaded = True
+        self._undetermined_existing_entries = []
+        self._undetermined_existing_map = {}
+        path = self._undetermined_file_path()
+        if not os.path.exists(path):
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = _json.load(f)
+        except Exception as exc:
+            self._emit(f"Note: could not load existing not_determined_reagents.json: {exc}")
+            return
+        if isinstance(data, list):
+            for entry in data:
+                if not isinstance(entry, dict):
+                    continue
+                cas = str(entry.get("cas") or "").strip()
+                name = str(entry.get("name") or "").strip()
+                key = self._make_undetermined_key(cas, name)
+                if not key:
+                    continue
+                self._undetermined_existing_entries.append(entry)
+                self._undetermined_existing_map[key] = entry
+
+    def _make_undetermined_key(self, cas: str, name: str, taxonomy: Optional[_TaxonomyIndex] = None) -> str:
+        cas_norm = (cas or "").strip()
+        if cas_norm:
+            return f"CAS::{{cas_norm}}"
+        basis = ""
+        if taxonomy is not None:
+            basis = taxonomy._norm_name(name or "")
+        else:
+            basis = self._normalize_name(name)
+        if not basis:
+            return ""
+        return f"NAME::{{basis}}"
+
+    def _find_registry_path(self) -> Optional[str]:
+        if self._registry_path:
+            return self._registry_path
+        here = os.path.dirname(os.path.abspath(__file__))
+        candidates = [
+            os.path.join(here, "cas_registry_merged.jsonl"),
+            os.path.join(os.path.dirname(here), "data", "cas_registry_merged.jsonl"),
+        ]
+        for candidate in candidates:
+            if os.path.exists(candidate):
+                self._registry_path = candidate
+                return candidate
+        return None
+
+    def _ensure_registry_loaded(self) -> None:
+        if self._registry_loaded:
+            return
+        self._registry_loaded = True
+        self._registry_by_cas = {}
+        self._registry_by_name = {}
+        path = self._find_registry_path()
+        if not path:
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        entry = _json.loads(line)
+                    except Exception:
+                        continue
+                    if not isinstance(entry, dict):
+                        continue
+                    cas = str(entry.get("cas") or "").strip()
+                    if cas and cas not in self._registry_by_cas:
+                        self._registry_by_cas[cas] = entry
+                    name = str(entry.get("name") or "").strip()
+                    if name:
+                        key = self._normalize_name(name)
+                        if key and key not in self._registry_by_name:
+                            self._registry_by_name[key] = entry
+                    abbr = str(entry.get("abbreviation") or "").strip()
+                    if abbr:
+                        key = self._normalize_name(abbr)
+                        if key and key not in self._registry_by_name:
+                            self._registry_by_name[key] = entry
+                    for syn in entry.get("synonyms") or []:
+                        key = self._normalize_name(syn)
+                        if key and key not in self._registry_by_name:
+                            self._registry_by_name[key] = entry
+        except Exception as exc:
+            self._emit(f"Note: could not load CAS registry for undetermined reagents: {exc}")
+            self._registry_by_cas = {}
+            self._registry_by_name = {}
+
+    def _lookup_registry_info(self, cas: str, name: str) -> Dict[str, Any]:
+        self._ensure_registry_loaded()
+        cas_norm = (cas or "").strip()
+        if cas_norm and cas_norm in self._registry_by_cas:
+            return self._registry_by_cas[cas_norm]
+        name_key = self._normalize_name(name)
+        if name_key and name_key in self._registry_by_name:
+            return self._registry_by_name[name_key]
+        return {}
+
+    def _is_missing_from_taxonomy(self, name: str, cas: str, taxonomy: _TaxonomyIndex) -> bool:
+        cas_norm = (cas or "").strip()
+        if cas_norm and cas_norm in taxonomy.cas_map:
+            return False
+        norm_name = taxonomy._norm_name(name or "")
+        if norm_name and norm_name in taxonomy.name_to_cas:
+            return False
+        return True
+
+    def _record_undetermined_reagent(self, *, name: str, cas: str, taxonomy: _TaxonomyIndex) -> None:
+        cas = (cas or "").strip()
+        name = (name or "").strip()
+        if not cas and not name:
+            return
+        key = self._make_undetermined_key(cas, name, taxonomy)
+        if not key:
+            return
+        self._ensure_undetermined_cache_loaded()
+        if key in self._undetermined_existing_map or key in self._undetermined_new_map:
+            return
+        info = self._lookup_registry_info(cas, name)
+        smiles = (info.get("smiles") or info.get("smile") or "").strip() if isinstance(info, dict) else ""
+        entry = {
+            "cas": cas,
+            "name": name,
+            "smiles": smiles,
+            "role": "UNK",
+        }
+        self._undetermined_new_map[key] = entry
+
+    def _persist_undetermined_reagents(self) -> None:
+        if not self._undetermined_new_map:
+            return
+        path = self._undetermined_file_path()
+        entries = list(self._undetermined_existing_entries)
+        new_entries = sorted(self._undetermined_new_map.values(), key=lambda e: ((e.get("cas") or "").strip(), (e.get("name") or "").strip()))
+        entries.extend(new_entries)
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                _json.dump(entries, f, ensure_ascii=False, indent=2)
+        except Exception as exc:
+            self._emit(f"Note: failed to write undetermined reagents: {exc}")
+            return
+        self._undetermined_existing_entries = entries
+        self._undetermined_existing_map = {}
+        for entry in entries:
+            cas = str(entry.get("cas") or "").strip()
+            name = str(entry.get("name") or "").strip()
+            key = self._make_undetermined_key(cas, name)
+            if key:
+                self._undetermined_existing_map[key] = entry
+        added = len(new_entries)
+        self._undetermined_new_map = {}
+        self._emit(f"Captured {added} undetermined reagents in {path}")
+
     def _reassign_reagent_roles_via_taxonomy(self, rows: List[Dict[str, Any]], taxonomy: _TaxonomyIndex) -> None:
         """Ensure ReagentRole aligns with Reagent list using taxonomy role lookup when possible."""
+        self._ensure_undetermined_cache_loaded()
         for row in rows or []:
             try:
                 reag_json = row.get('Reagent') or '[]'
@@ -643,7 +834,8 @@ class RDFWorker(QtCore.QObject):
                         cas = (item.get('cas') or '').strip()
                     role = taxonomy.role_for(name, cas)
                     if not role or role == 'UNK':
-                        # retain prior heuristic role if any
+                        if self._is_missing_from_taxonomy(name, cas, taxonomy):
+                            self._record_undetermined_reagent(name=name, cas=cas, taxonomy=taxonomy)
                         role = 'UNK'
                     roles.append(role)
                 # Only write back if we can align 1:1
@@ -1015,6 +1207,7 @@ class RDFWorker(QtCore.QObject):
             # Post-process reagent roles using taxonomy to improve role assignment
             self._emit("Assigning reagent roles via taxonomy...")
             self._reassign_reagent_roles_via_taxonomy(rows, taxonomy)
+            self._persist_undetermined_reagents()
 
             # Inject suggested ligands into rows where Ligand list is empty
             self._emit("Suggesting and adding ligands for catalyst families lacking ligands...")
