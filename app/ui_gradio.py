@@ -11,6 +11,7 @@ Then open the URL printed by Gradio (default http://127.0.0.1:7860).
 from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
+from functools import lru_cache
 import json
 import os, sys
 
@@ -70,6 +71,58 @@ try:
     from chem_feats import featurize_mol as role_feat_mol  # type: ignore
 except Exception:
     role_feat_mol = None  # type: ignore
+
+
+@lru_cache(maxsize=512)
+def _registry_resolve_cached(query: str) -> Dict[str, Any]:
+    q = (query or "").strip()
+    if not q:
+        return {"error": "EMPTY_QUERY"}
+    try:
+        res = creg.resolve(q)
+        if isinstance(res, dict):
+            return res
+    except Exception as exc:  # pragma: no cover - UI helper
+        return {"error": str(exc)}
+    return {"error": "NOT_FOUND"}
+
+
+@lru_cache(maxsize=512)
+def _compound_display_label(value: str) -> str:
+    candidate = (value or "").strip()
+    if not candidate:
+        return ""
+    try:
+        prop_res = properties.lookup(candidate)
+        if isinstance(prop_res, dict) and prop_res.get("found"):
+            rec = prop_res.get("record")
+            if isinstance(rec, dict):
+                for key in ("token", "name", "uid"):
+                    val = rec.get(key)
+                    if isinstance(val, str) and val.strip():
+                        return val.strip()
+    except Exception:  # pragma: no cover - defensive UI helper
+        pass
+    detail = _registry_resolve_cached(candidate)
+    if isinstance(detail, dict) and not detail.get("error"):
+        props = detail.get("props") if isinstance(detail.get("props"), dict) else {}
+        if isinstance(props, dict):
+            for key in ("token", "abbreviation", "name", "generic_core"):
+                val = props.get(key)
+                if isinstance(val, str) and val.strip():
+                    return val.strip()
+        for key in ("name", "uid"):
+            val = detail.get(key)
+            if isinstance(val, str) and val.strip():
+                return val.strip()
+        aliases = detail.get("aliases")
+        if isinstance(aliases, list):
+            for alias in aliases:
+                if isinstance(alias, str):
+                    alias = alias.strip()
+                    if alias:
+                        return alias
+    return candidate
 
 
 def _safe_json_loads(s: str) -> Dict[str, Any]:
@@ -204,7 +257,30 @@ def ui_featurize_molecular(electrophile: str, nucleophile: str) -> Dict[str, Any
 
 
 def ui_properties_lookup(query: str) -> Dict[str, Any]:
-    return properties.lookup(query or "")
+    q = (query or "").strip()
+    result: Dict[str, Any] = {"query": q}
+    props_out = properties.lookup(q)
+    result["properties"] = props_out
+    registry_out = None
+    lookup_keys: List[str] = []
+    if isinstance(props_out, dict):
+        rec = props_out.get("record")
+        if isinstance(rec, dict) and rec.get("uid"):
+            lookup_keys.append(str(rec["uid"]))
+    if q:
+        lookup_keys.append(q)
+    for key in lookup_keys:
+        detail = _registry_resolve_cached(key)
+        if isinstance(detail, dict) and not detail.get("error"):
+            registry_out = detail
+            break
+    if registry_out is not None:
+        result["registry"] = registry_out
+    elif q:
+        result["registry"] = {"error": "NOT_FOUND"}
+    else:
+        result["registry"] = {"error": "EMPTY_QUERY"}
+    return result
 
 
 def ui_recommend(
@@ -246,16 +322,7 @@ def ui_recommend_both(
     ]
     # Human-readable summary using names/tokens looked up from registry/properties
     def _resolve_name(uid: str) -> str:
-        if not uid:
-            return ""
-        try:
-            res = properties.lookup(uid)
-            if isinstance(res, dict) and res.get("found") and isinstance(res.get("record"), dict):
-                recp = res["record"]
-                return str(recp.get("token") or recp.get("name") or recp.get("uid") or uid)
-        except Exception:
-            pass
-        return str(uid)
+        return _compound_display_label(str(uid or ""))
     core_txt = str(rec.get("core") or "")
     # strip trailing /none if present
     if core_txt.endswith("/none"):
@@ -474,16 +541,7 @@ def ui_precedent_search(
         except Exception:
             return ""
     def _resolve_name(uid: str) -> str:
-        if not uid:
-            return ""
-        try:
-            res = properties.lookup(uid)
-            if isinstance(res, dict) and res.get("found") and isinstance(res.get("record"), dict):
-                recp = res["record"]
-                return str(recp.get("token") or recp.get("name") or recp.get("uid") or uid)
-        except Exception:
-            pass
-        return str(uid)
+        return _compound_display_label(str(uid or ""))
 
     for p in precs:
         img_html = _render_img(p.get("reactants_smiles", ""), p.get("products_smiles", ""))
@@ -560,6 +618,25 @@ def ui_core_search(core: str, family: str, fuzzy: bool, limit: int):
 
 
 def build_demo() -> gr.Blocks:
+    default_roles = ["ADDITIVE", "BASE", "CATALYST", "LIGAND", "SOLVENT"]
+    roles = list(default_roles)
+    compound_types: List[str] = []
+    try:
+        cats = creg.categories()
+        if isinstance(cats, dict):
+            role_list = cats.get("roles")
+            if isinstance(role_list, list) and role_list:
+                roles = [str(r) for r in role_list if isinstance(r, str)] or roles
+            ct_list = cats.get("compound_types")
+            if isinstance(ct_list, list):
+                compound_types = [str(c) for c in ct_list if isinstance(c, str)]
+    except Exception:  # pragma: no cover - UI helper
+        pass
+    # Preserve order while removing duplicates
+    roles = list(dict.fromkeys(roles))
+    compound_types = list(dict.fromkeys(compound_types))
+    role_choices = [""] + roles
+    compound_type_choices = [""] + compound_types
     with gr.Blocks(title="ChemTools UI", theme=THEME, css=CSS) as demo:
         gr.Markdown("""
         # ChemTools - Interactive UI
@@ -675,16 +752,53 @@ def build_demo() -> gr.Blocks:
             # Handlers for categories and search
             def ui_registry_categories() -> Dict[str, Any]:
                 try:
-                    return creg.categories()
+                    cats = creg.categories()
                 except Exception as e:
                     return {"error": str(e)}
+                if not isinstance(cats, dict):
+                    cats = {}
+                result: Dict[str, Any] = dict(cats)
+                try:
+                    if "taxonomy_dir" not in result:
+                        env_dir = os.environ.get("CHEMTOOLS_TAXONOMY_DIR")
+                        if env_dir and os.path.isdir(env_dir):
+                            result["taxonomy_dir"] = env_dir
+                        else:
+                            fallback = os.path.join(ROOT, "data", "compound_taxonomy")
+                            if os.path.isdir(fallback):
+                                result["taxonomy_dir"] = fallback
+                except Exception:
+                    pass
+                return result
 
             def ui_registry_search(q: str, role: str, compound_type: str, limit: int) -> List[List[Any]]:
                 rows = creg.search(q=(q or None), role=(role or None), compound_type=(compound_type or None), limit=int(limit or 50))
-                header = ["uid", "role", "name", "compound_type"]
+                header = ["uid", "role", "name", "compound_type", "token", "generic_core", "aliases (sample)"]
                 table: List[List[Any]] = [header]
                 for r in rows:
-                    table.append([r.get("uid", ""), r.get("role", ""), r.get("name", ""), r.get("compound_type", "")])
+                    uid = str(r.get("uid") or "")
+                    token = ""
+                    generic = ""
+                    alias_text = ""
+                    if uid:
+                        detail = _registry_resolve_cached(uid)
+                        if isinstance(detail, dict) and not detail.get("error"):
+                            props = detail.get("props") if isinstance(detail.get("props"), dict) else {}
+                            if isinstance(props, dict):
+                                token = str(props.get("token") or props.get("abbreviation") or props.get("name") or "").strip()
+                                generic = str(props.get("generic_core") or "").strip()
+                            aliases = detail.get("aliases") if isinstance(detail.get("aliases"), list) else []
+                            if aliases:
+                                alias_parts: List[str] = []
+                                for alias in aliases:
+                                    if isinstance(alias, str):
+                                        alias = alias.strip()
+                                        if alias:
+                                            alias_parts.append(alias)
+                                    if len(alias_parts) >= 5:
+                                        break
+                                alias_text = ", ".join(alias_parts)
+                    table.append([uid, r.get("role", ""), r.get("name", ""), r.get("compound_type", ""), token, generic, alias_text])
                 return table
 
             with gr.Row():
@@ -693,8 +807,8 @@ def build_demo() -> gr.Blocks:
                 cat_btn.click(ui_registry_categories, outputs=[cat_json])
             with gr.Row():
                 rs_q = gr.Textbox(label="Filter (optional substring)", value="")
-                rs_role = gr.Dropdown(label="Role", choices=["", "CATALYST", "LIGAND", "BASE", "SOLVENT", "ADDITIVE"], value="")
-                rs_ct = gr.Textbox(label="Compound type (exact; see categories)", value="")
+                rs_role = gr.Dropdown(label="Role", choices=role_choices, value="", allow_custom_value=True)
+                rs_ct = gr.Dropdown(label="Compound type (optional)", choices=compound_type_choices, value="", allow_custom_value=True)
                 rs_limit = gr.Slider(label="Limit", minimum=1, maximum=500, value=50, step=1)
             rs_btn = gr.Button("List by filter", variant="secondary")
             rs_tbl = gr.Dataframe(label="Registry items", interactive=False)
