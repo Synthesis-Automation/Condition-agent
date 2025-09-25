@@ -661,22 +661,30 @@ class RDFWorker(QtCore.QObject):
         except Exception as exc:
             self._emit(f"Note: could not load existing not_determined_reagents.json: {exc}")
             return
+        self._ensure_registry_loaded()
+        taxonomy = getattr(self, "_taxonomy_index", None)
         if isinstance(data, list):
             for entry in data:
                 if not isinstance(entry, dict):
                     continue
                 cas = str(entry.get("cas") or "").strip()
                 name = str(entry.get("name") or "").strip()
-                key = self._make_undetermined_key(cas, name)
-                if not key:
+                base_key = self._make_undetermined_key(cas, name, taxonomy)
+                upgraded = self._upgrade_undetermined_entry(entry, taxonomy)
+                self._undetermined_existing_entries.append(upgraded)
+                new_cas = str(upgraded.get("cas") or "").strip()
+                new_name = str(upgraded.get("name") or "").strip()
+                new_key = self._make_undetermined_key(new_cas, new_name, taxonomy)
+                keys = {k for k in (base_key, new_key) if k}
+                if not keys:
                     continue
-                self._undetermined_existing_entries.append(entry)
-                self._undetermined_existing_map[key] = entry
+                for k in keys:
+                    self._undetermined_existing_map[k] = upgraded
 
     def _make_undetermined_key(self, cas: str, name: str, taxonomy: Optional[_TaxonomyIndex] = None) -> str:
         cas_norm = (cas or "").strip()
         if cas_norm:
-            return f"CAS::{{cas_norm}}"
+            return f"CAS::{cas_norm}"
         basis = ""
         if taxonomy is not None:
             basis = taxonomy._norm_name(name or "")
@@ -684,7 +692,7 @@ class RDFWorker(QtCore.QObject):
             basis = self._normalize_name(name)
         if not basis:
             return ""
-        return f"NAME::{{basis}}"
+        return f"NAME::{basis}"
 
     def _find_registry_path(self) -> Optional[str]:
         if self._registry_path:
@@ -753,6 +761,140 @@ class RDFWorker(QtCore.QObject):
             return self._registry_by_name[name_key]
         return {}
 
+    def _sanitize_registry_value(self, value: Any):
+        if isinstance(value, str):
+            val = value.strip()
+            return val or None
+        if isinstance(value, (int, float, bool)):
+            return value
+        if isinstance(value, list):
+            cleaned = []
+            for item in value:
+                cleaned_item = self._sanitize_registry_value(item)
+                if cleaned_item not in (None, "", [], {}):
+                    cleaned.append(cleaned_item)
+            return cleaned or None
+        if isinstance(value, tuple):
+            cleaned = []
+            for item in value:
+                cleaned_item = self._sanitize_registry_value(item)
+                if cleaned_item not in (None, "", [], {}):
+                    cleaned.append(cleaned_item)
+            return cleaned or None
+        if isinstance(value, set):
+            cleaned = []
+            for item in value:
+                cleaned_item = self._sanitize_registry_value(item)
+                if cleaned_item not in (None, "", [], {}):
+                    cleaned.append(cleaned_item)
+            return cleaned or None
+        if isinstance(value, dict):
+            cleaned_dict = {}
+            for k, v in value.items():
+                cleaned_val = self._sanitize_registry_value(v)
+                if cleaned_val not in (None, "", [], {}):
+                    cleaned_dict[str(k)] = cleaned_val
+            return cleaned_dict or None
+        return value
+
+    def _build_undetermined_entry(self, *, cas: str, reported_name: str, role: str, info: Dict[str, Any], taxonomy: Optional[_TaxonomyIndex]) -> Dict[str, Any]:
+        entry: Dict[str, Any] = {}
+        cas_clean = (cas or "").strip()
+        reported = (reported_name or "").strip()
+        role_clean = (role or "UNK").strip().upper()
+        canonical_name = str(info.get("name") or "").strip()
+        display_name = canonical_name or reported or cas_clean
+        if cas_clean:
+            entry["cas"] = cas_clean
+        if display_name:
+            entry["name"] = display_name
+        if reported and reported != display_name:
+            entry["reported_name"] = reported
+        if role_clean:
+            entry["role"] = role_clean
+        abbr = info.get("abbreviation") or info.get("abbr")
+        if isinstance(abbr, str):
+            abbr = abbr.strip()
+        if abbr:
+            entry["abbreviation"] = abbr
+        synonyms = info.get("synonyms") or []
+        if isinstance(synonyms, (list, tuple, set)):
+            cleaned_syns = sorted({str(s).strip() for s in synonyms if str(s).strip()})
+            if cleaned_syns:
+                entry["synonyms"] = cleaned_syns
+        copy_keys = [
+            "compound_type",
+            "category_hint",
+            "generic_core",
+            "token",
+            "notes",
+            "usage",
+            "typical_usage",
+            "data_sources",
+            "sources",
+        ]
+        for key in copy_keys:
+            if key not in info:
+                continue
+            sanitized = self._sanitize_registry_value(info.get(key))
+            if sanitized not in (None, "", [], {}):
+                entry[key] = sanitized
+        smiles = info.get("smiles") or info.get("smile")
+        if isinstance(smiles, str):
+            smiles = smiles.strip()
+        if smiles:
+            entry["smiles"] = smiles
+        typical_usage = entry.get("typical_usage") or entry.get("usage")
+        if isinstance(typical_usage, list):
+            typical_usage = ", ".join(str(x).strip() for x in typical_usage if str(x).strip())
+        elif isinstance(typical_usage, dict):
+            typical_usage = ", ".join(f"{k}: {v}" for k, v in typical_usage.items() if v not in (None, "", [], {}))
+        if not typical_usage:
+            fallback = [entry.get("category_hint"), entry.get("compound_type"), role_clean if role_clean and role_clean != "UNK" else None]
+            typical_usage = next((str(val).strip() for val in fallback if isinstance(val, str) and val.strip()), "")
+        if typical_usage:
+            entry["typical_usage"] = typical_usage
+        if entry.get("usage") == entry.get("typical_usage"):
+            entry.pop("usage", None)
+        if info and self._registry_path:
+            entry["registry_source"] = self._registry_path
+        cleaned_entry: Dict[str, Any] = {}
+        for key, value in entry.items():
+            if key in {"cas", "name", "role"}:
+                cleaned_entry[key] = value
+                continue
+            if value in (None, "", [], {}):
+                continue
+            cleaned_entry[key] = value
+        if "reported_name" in entry and entry["reported_name"]:
+            cleaned_entry["reported_name"] = entry["reported_name"]
+        return cleaned_entry
+
+    def _upgrade_undetermined_entry(self, entry: Dict[str, Any], taxonomy: Optional[_TaxonomyIndex]) -> Dict[str, Any]:
+        cas = str(entry.get("cas") or "").strip()
+        reported = str(entry.get("reported_name") or entry.get("raw_name") or entry.get("name") or "").strip()
+        lookup_name = str(entry.get("name") or reported).strip()
+        role = (entry.get("role") or "UNK").strip().upper()
+        info = self._lookup_registry_info(cas, lookup_name)
+        if not cas:
+            cas_candidate = str((info or {}).get("cas") or "").strip()
+            if cas_candidate:
+                cas = cas_candidate
+        built = self._build_undetermined_entry(
+            cas=cas,
+            reported_name=reported or lookup_name,
+            role=role or "UNK",
+            info=info or {},
+            taxonomy=taxonomy
+        )
+        for key, value in entry.items():
+            if key in {"cas", "name", "role"}:
+                continue
+            if value in (None, "", [], {}):
+                continue
+            built.setdefault(key, value)
+        return built
+
     def _is_missing_from_taxonomy(self, name: str, cas: str, taxonomy: _TaxonomyIndex) -> bool:
         cas_norm = (cas or "").strip()
         if cas_norm and cas_norm in taxonomy.cas_map:
@@ -762,33 +904,52 @@ class RDFWorker(QtCore.QObject):
             return False
         return True
 
-    def _record_undetermined_reagent(self, *, name: str, cas: str, taxonomy: _TaxonomyIndex) -> None:
+    def _record_undetermined_reagent(self, *, name: str, cas: str, taxonomy: _TaxonomyIndex, role: str) -> None:
         cas = (cas or "").strip()
-        name = (name or "").strip()
-        if not cas and not name:
+        reported = (name or "").strip()
+        if not cas and not reported:
             return
-        key = self._make_undetermined_key(cas, name, taxonomy)
-        if not key:
+        info = self._lookup_registry_info(cas, reported)
+        if not cas:
+            cas_candidate = str((info or {}).get("cas") or "").strip()
+            if cas_candidate:
+                cas = cas_candidate
+        canonical_name = str((info or {}).get("name") or reported).strip()
+        candidate_keys = {
+            self._make_undetermined_key(cas, reported, taxonomy),
+            self._make_undetermined_key(cas, canonical_name, taxonomy),
+        }
+        candidate_keys = {k for k in candidate_keys if k}
+        if not candidate_keys:
             return
         self._ensure_undetermined_cache_loaded()
-        if key in self._undetermined_existing_map or key in self._undetermined_new_map:
-            return
-        info = self._lookup_registry_info(cas, name)
-        smiles = (info.get("smiles") or info.get("smile") or "").strip() if isinstance(info, dict) else ""
-        entry = {
-            "cas": cas,
-            "name": name,
-            "smiles": smiles,
-            "role": "UNK",
-        }
-        self._undetermined_new_map[key] = entry
+        for key in candidate_keys:
+            if key in self._undetermined_existing_map or key in self._undetermined_new_map:
+                return
+        chosen_key = sorted(candidate_keys)[0]
+        entry = self._build_undetermined_entry(
+            cas=cas,
+            reported_name=reported,
+            role=role or "UNK",
+            info=info or {},
+            taxonomy=taxonomy
+        )
+        self._undetermined_new_map[chosen_key] = entry
+        for key in candidate_keys:
+            if key != chosen_key:
+                self._undetermined_new_map.setdefault(key, entry)
 
     def _persist_undetermined_reagents(self) -> None:
         if not self._undetermined_new_map:
             return
         path = self._undetermined_file_path()
         entries = list(self._undetermined_existing_entries)
-        new_entries = sorted(self._undetermined_new_map.values(), key=lambda e: ((e.get("cas") or "").strip(), (e.get("name") or "").strip()))
+        unique_new: Dict[tuple[str, str], Dict[str, Any]] = {}
+        for entry in self._undetermined_new_map.values():
+            cas_key = str(entry.get("cas") or "").strip()
+            name_key = str(entry.get("name") or "").strip()
+            unique_new.setdefault((cas_key, name_key), entry)
+        new_entries = sorted(unique_new.values(), key=lambda e: ((e.get("cas") or "").strip(), (e.get("name") or "").strip()))
         entries.extend(new_entries)
         try:
             with open(path, "w", encoding="utf-8") as f:
@@ -798,12 +959,18 @@ class RDFWorker(QtCore.QObject):
             return
         self._undetermined_existing_entries = entries
         self._undetermined_existing_map = {}
+        taxonomy = getattr(self, "_taxonomy_index", None)
         for entry in entries:
-            cas = str(entry.get("cas") or "").strip()
-            name = str(entry.get("name") or "").strip()
-            key = self._make_undetermined_key(cas, name)
-            if key:
-                self._undetermined_existing_map[key] = entry
+            cas_val = str(entry.get("cas") or "").strip()
+            name_val = str(entry.get("name") or "").strip()
+            reported_val = str(entry.get("reported_name") or "").strip()
+            keys = {
+                self._make_undetermined_key(cas_val, name_val, taxonomy),
+                self._make_undetermined_key(cas_val, reported_val, taxonomy),
+            }
+            for key in keys:
+                if key:
+                    self._undetermined_existing_map[key] = entry
         added = len(new_entries)
         self._undetermined_new_map = {}
         self._emit(f"Captured {added} undetermined reagents in {path}")
@@ -835,7 +1002,7 @@ class RDFWorker(QtCore.QObject):
                     role = taxonomy.role_for(name, cas)
                     if not role or role == 'UNK':
                         if self._is_missing_from_taxonomy(name, cas, taxonomy):
-                            self._record_undetermined_reagent(name=name, cas=cas, taxonomy=taxonomy)
+                            self._record_undetermined_reagent(name=name, cas=cas, taxonomy=taxonomy, role=role or 'UNK')
                         role = 'UNK'
                     roles.append(role)
                 # Only write back if we can align 1:1
