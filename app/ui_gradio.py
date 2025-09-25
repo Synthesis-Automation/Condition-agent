@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
 from functools import lru_cache
+from types import SimpleNamespace
 import json
 import os, sys
 
@@ -48,6 +49,16 @@ os.environ.setdefault("CHEMTOOLS_DISABLE_RXN_INSIGHT", "0")
 from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
 from chemtools import registry as creg
 from chemtools.util.rdkit_helpers import rdkit_available
+
+try:
+    from chemtools.integrations import molpipeline as molpipe
+
+    _MOLPIPELINE_ENV = molpipe.environment_snapshot()
+    _HAS_MOLPIPELINE = _MOLPIPELINE_ENV.available
+except Exception:
+    molpipe = None  # type: ignore
+    _MOLPIPELINE_ENV = SimpleNamespace(available=False, version=None, rdkit_version=None, sklearn_version=None, shap_version=None, import_error=None)  # type: ignore
+    _HAS_MOLPIPELINE = False
 
 # Optionally silence RDKit console logs (parse errors, warnings) to keep UI clean.
 # Enabled by default; set CHEMTOOLS_RDKIT_QUIET=0 to show RDKit logs.
@@ -426,7 +437,10 @@ def ui_precedent_search(
     drfp_bits: int,
     drfp_radius: int,
     precompute_scope: str,
-) -> Tuple[Dict[str, Any], str]:
+    use_molpipeline: bool,
+    molpipeline_cfg_json: str,
+    molpipeline_query_json: str,
+) -> Tuple[Dict[str, Any], str, Dict[str, Any]]:
     # Detect family and featurize from reaction
     elec, nuc, reactants = _pick_elec_nuc_from_reaction(reaction or "")
     fam = router.detect_family(reactants).get("family") or "Unknown"
@@ -451,7 +465,114 @@ def ui_precedent_search(
     else:
         relax["precompute_drfp"] = False
 
+    molpipeline_summary: Dict[str, Any] = {
+        "available": bool(_HAS_MOLPIPELINE),
+    }
+    if _MOLPIPELINE_ENV is not None:
+        molpipeline_summary.update(
+            {
+                "version": getattr(_MOLPIPELINE_ENV, "version", None),
+                "rdkit": getattr(_MOLPIPELINE_ENV, "rdkit_version", None),
+                "sklearn": getattr(_MOLPIPELINE_ENV, "sklearn_version", None),
+                "shap": getattr(_MOLPIPELINE_ENV, "shap_version", None),
+            }
+        )
+
+    if use_molpipeline:
+        if not _HAS_MOLPIPELINE:
+            molpipeline_summary["enabled"] = False
+            molpipeline_summary["error"] = "MolPipeline integration not available."
+        else:
+            cfg = _safe_json_loads(molpipeline_cfg_json)
+            if not isinstance(cfg, dict):
+                cfg = {}
+            sanitized_cfg: Dict[str, Any] = {}
+            roles = cfg.get("roles")
+            if isinstance(roles, list):
+                clean_roles = []
+                for role in roles:
+                    if isinstance(role, str) and role.strip():
+                        clean_roles.append(role.strip().upper())
+                if clean_roles:
+                    sanitized_cfg["roles"] = clean_roles
+            include_role = cfg.get("include_role_features")
+            sanitized_cfg["include_role_features"] = bool(True if include_role is None else include_role)
+            include_concat = cfg.get("include_concat")
+            sanitized_cfg["include_concat"] = bool(True if include_concat is None else include_concat)
+            sanitized_cfg["suppress_errors"] = bool(cfg.get("suppress_errors", True))
+            if isinstance(cfg.get("aggregate"), str) and cfg["aggregate"].strip():
+                sanitized_cfg["aggregate"] = cfg["aggregate"].strip()
+            if isinstance(cfg.get("missing_strategy"), str) and cfg["missing_strategy"].strip():
+                sanitized_cfg["missing_strategy"] = cfg["missing_strategy"].strip()
+            for key in ("n_jobs", "ligand_n_bits", "ligand_radius"):
+                if key in cfg:
+                    try:
+                        sanitized_cfg[key] = int(cfg[key])
+                    except Exception:
+                        continue
+            query_raw = _safe_json_loads(molpipeline_query_json)
+            if isinstance(query_raw, dict) and query_raw:
+                query_map: Dict[str, List[str]] = {}
+                for role, value in query_raw.items():
+                    if not isinstance(role, str):
+                        continue
+                    role_norm = role.strip().upper()
+                    if not role_norm:
+                        continue
+                    smiles_list: List[str] = []
+                    if isinstance(value, str):
+                        trimmed = value.strip()
+                        if trimmed:
+                            smiles_list = [trimmed]
+                    elif isinstance(value, (list, tuple, set)):
+                        for item in value:
+                            if isinstance(item, str) and item.strip():
+                                smiles_list.append(item.strip())
+                    if smiles_list:
+                        query_map[role_norm] = smiles_list
+                if query_map:
+                    sanitized_cfg["query_role_smiles"] = query_map
+            molpipeline_summary.update(
+                {
+                    "enabled": True,
+                    "config": {
+                        key: sanitized_cfg[key]
+                        for key in (
+                            "roles",
+                            "include_role_features",
+                            "include_concat",
+                            "aggregate",
+                            "missing_strategy",
+                            "n_jobs",
+                            "ligand_n_bits",
+                            "ligand_radius",
+                        )
+                        if key in sanitized_cfg
+                    },
+                }
+            )
+            if "query_role_smiles" in sanitized_cfg:
+                molpipeline_summary.setdefault("config", {})["query_roles"] = sorted(sanitized_cfg["query_role_smiles"].keys())
+            relax["molpipeline"] = sanitized_cfg
+    else:
+        molpipeline_summary["enabled"] = False
+
     pack = precedent.knn(fam, feat, k=int(k or 25), relax=relax)
+
+    if use_molpipeline and _HAS_MOLPIPELINE:
+        if pack.get("molpipeline_warnings"):
+            molpipeline_summary["warnings"] = pack.get("molpipeline_warnings")
+        if pack.get("molpipeline_query_vector"):
+            vector = pack["molpipeline_query_vector"]
+            molpipeline_summary["query_vector_length"] = len(vector) if isinstance(vector, list) else None
+        first_vec = None
+        for row in pack.get("precedents") or []:
+            vec = row.get("molpipeline_feature_vector")
+            if isinstance(vec, list):
+                first_vec = vec
+                break
+        if first_vec is not None:
+            molpipeline_summary["feature_length"] = len(first_vec)
 
     # Build HTML table with embedded reaction images; omit reactant/product SMILES columns
     precs = list(pack.get("precedents") or [])
@@ -564,7 +685,7 @@ def ui_precedent_search(
         )
     html_rows.append("</table>")
     html = "\n".join(html_rows)
-    return pack, html
+    return pack, html, molpipeline_summary
 
 
 def ui_similarity_tanimoto(q: str, r: str, n_bits: int, radius: int) -> Dict[str, Any]:
@@ -853,13 +974,52 @@ def build_demo() -> gr.Blocks:
                 ps_bits = gr.Number(label="DRFP bits", value=4096, precision=0)
                 ps_radius = gr.Number(label="DRFP radius", value=3, precision=0)
                 ps_prec_scope = gr.Radio(label="Precompute scope", choices=["none", "candidates", "all"], value="candidates")
+            if _HAS_MOLPIPELINE:
+                env_lines = ["MolPipeline detected."]
+                if getattr(_MOLPIPELINE_ENV, "version", None):
+                    env_lines.append(f"version: {_MOLPIPELINE_ENV.version}")
+                extras = []
+                for attr, label in (("rdkit_version", "rdkit"), ("sklearn_version", "sklearn"), ("shap_version", "shap")):
+                    val = getattr(_MOLPIPELINE_ENV, attr, None)
+                    if val:
+                        extras.append(f"{label}: {val}")
+                if extras:
+                    env_lines.extend(extras)
+                molpipe_status_md = "\n".join(env_lines)
+            else:
+                molpipe_status_md = ("MolPipeline extras not installed. Run `pip install chemtools-project[molpipeline]` to enable role features.")
+            with gr.Accordion("MolPipeline (optional)", open=False):
+                gr.Markdown(molpipe_status_md)
+                ps_use_molpipe = gr.Checkbox(label="Attach MolPipeline role features", value=False)
+                ps_mol_cfg = gr.Textbox(
+                    label="MolPipeline config (JSON)",
+                    placeholder="{\"roles\": [\"LIGAND\", \"BASE\", \"SOLVENT\"], \"aggregate\": \"mean\"}",
+                    lines=4,
+                )
+                ps_mol_query = gr.Textbox(
+                    label="Query role SMILES override (JSON)",
+                    placeholder="{\"LIGAND\": [\"PPh3\"], \"BASE\": [\"K3PO4\"]}",
+                    lines=3,
+                )
             ps_btn = gr.Button("Search", variant="primary")
             ps_pack = gr.JSON(label="Pack (prototype, support, precedents)")
             ps_tbl = gr.HTML(label="Top precedents")
+            ps_mol_summary = gr.JSON(label="MolPipeline summary")
             ps_btn.click(
                 ui_precedent_search,
-                inputs=[ps_in, ps_k, ps_use_drfp, ps_drfp_w, ps_bits, ps_radius, ps_prec_scope],
-                outputs=[ps_pack, ps_tbl],
+                inputs=[
+                    ps_in,
+                    ps_k,
+                    ps_use_drfp,
+                    ps_drfp_w,
+                    ps_bits,
+                    ps_radius,
+                    ps_prec_scope,
+                    ps_use_molpipe,
+                    ps_mol_cfg,
+                    ps_mol_query,
+                ],
+                outputs=[ps_pack, ps_tbl, ps_mol_summary],
             )
 
         with gr.Tab("DRFP Similarity"):

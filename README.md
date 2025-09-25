@@ -75,6 +75,15 @@ Optional: install DRFP to enable similarity re-ranking and the similarity tab
 pip install drfp==0.4.0 numpy
 ```
 
+## MolPipeline Integration
+
+- Optional: `pip install chemtools-project[molpipeline]` to pull MolPipeline, RDKit, and friends on demand. Without it the app keeps running, but MolPipeline-specific toggles stay disabled.
+- The Precedent Search tab exposes a MolPipeline accordion; enable it to attach per-role fingerprints/physchem descriptors to each precedent and to inspect environment metadata or warnings returned by `ui_precedent_search`.
+- API callers can pass a `molpipeline` block inside the `/api/v1/precedent/knn` relax payload (roles, aggregation strategy, query role overrides) to get the same feature vectors programmatically.
+- The CLI helper `scripts/precedent_from_rxn.py` mirrors the UI via `--molpipeline`, `--molpipeline-config`, and `--molpipeline-query`, echoing availability, applied config, and vector lengths in the output.
+- All entry points rely on `chemtools.integrations.molpipeline.environment_snapshot()` so they degrade gracefully and can report version info when the extra stack is present.
+
+
 Gradio Core Search quick demo
 
 - Start Gradio: `python app/ui_gradio.py`

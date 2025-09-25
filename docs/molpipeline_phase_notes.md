@@ -20,3 +20,21 @@
 - Optional extras (`pip install chemtools-project[molpipeline]`) wire MolPipeline into the install flow.
 
 - The `precedent.knn` relax dict now accepts a `molpipeline` block (e.g., `{"molpipeline": {"include_role_features": True}}`) to attach aggregated per-role MolPipeline vectors to each returned precedent and an optional `molpipeline_query_vector` for the input reaction.
+
+# Reaction-Centric Feature Engineering (Phase 2)
+
+- Hooked MolPipeline aggregation into `chemtools.precedent._attach_molpipeline_features`, wiring per-role feature vectors and concatenated embeddings onto each precedent row when a `molpipeline` relax block is present.
+- Normalise incoming config (roles, aggregator strategy, job counts, fingerprint sizes) and propagate `query_role_smiles` so the query reaction can emit its own feature vector alongside precedent candidates.
+- Surface integration warnings instead of hard failures by default (`suppress_errors`), keeping precedent search deterministic even when MolPipeline raises.
+
+# Optional Dependency Packaging (Phase 3)
+
+- Registered a `molpipeline` optional extra in `pyproject.toml` so `pip install chemtools-project[molpipeline]` pulls the RDKit/MolPipeline stack on demand.
+- Added `tests/test_molpipeline_integration.py` and `tests/test_precedent_molpipeline.py` behind `pytest.importorskip("molpipeline")` to exercise the new aggregator while staying green when the extra is absent.
+- Gate every public entry point through `chemtools.integrations.molpipeline.environment_snapshot()` so downstream callers can report availability/versions without importing optional binaries eagerly.
+
+# UI & CLI Exposure (Phase 4)
+
+- Updated `app/ui_gradio.py` precedent tab with a MolPipeline accordion: toggle attachment, edit JSON config/query snippets, and render a live summary (env metadata, warnings, feature lengths) returned from `ui_precedent_search`.
+- Extended `ui_precedent_search` to accept MolPipeline toggles/config from the UI, sanitise them, forward into the precedent relax dict, and return a structured status payload for display.
+- Expanded `scripts/precedent_from_rxn.py` with `--molpipeline`, `--molpipeline-config`, and `--molpipeline-query` flags; CLI runs now inject the config into the relax dict and emit a `molpipeline` summary block (availability, config echo, vector lengths, warnings) alongside the precedent pack.
