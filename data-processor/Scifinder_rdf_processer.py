@@ -970,7 +970,7 @@ class RDFWorker(QtCore.QObject):
             entry["abbreviation"] = abbr
         synonyms = info.get("synonyms") or []
         if isinstance(synonyms, (list, tuple, set)):
-            cleaned_syns = sorted({str(s).strip() for s in synonyms if str(s).strip()})
+            cleaned_syns = sorted({str(s).strip() for s in synonyms if str(s).strip()})[:5]
             if cleaned_syns:
                 entry["synonyms"] = cleaned_syns
         copy_keys = [
