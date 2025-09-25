@@ -10,7 +10,11 @@ import os
 import sys
 import traceback
 import tempfile
-from typing import List, Optional, Dict, Any
+import re
+import urllib.request
+import urllib.error
+import urllib.parse
+from typing import List, Optional, Dict, Any, Set, Tuple
 
 from PyQt6 import QtWidgets, QtCore
 QtBinding = 'PyQt6'
@@ -43,6 +47,12 @@ except Exception:
 # ---------------------------- Taxonomy integration ----------------------------
 
 import json as _json
+
+PUBCHEM_PUG_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
+PUBCHEM_VIEW_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound"
+PUBCHEM_USER_AGENT = "ConditionAgent/1.0 (SciFinder RDF Processor)"
+PUBCHEM_TIMEOUT = 10
+CAS_NUMBER_RE = re.compile(r'\d{2,7}-\d{2}-\d')
 
 
 class _TaxonomyIndex:
@@ -580,11 +590,14 @@ class RDFWorker(QtCore.QObject):
         self._undetermined_existing_entries: List[Dict[str, Any]] = []
         self._undetermined_existing_map: Dict[str, Dict[str, Any]] = {}
         self._undetermined_new_map: Dict[str, Dict[str, Any]] = {}
-        self._registry_loaded = False
-        self._registry_by_cas: Dict[str, Dict[str, Any]] = {}
-        self._registry_by_name: Dict[str, Dict[str, Any]] = {}
         self._undetermined_file_path_cache: Optional[str] = None
-        self._registry_path: Optional[str] = None
+        self._pubchem_cache_by_cas: Dict[str, Dict[str, Any]] = {}
+        self._pubchem_cache_by_name: Dict[str, Dict[str, Any]] = {}
+        self._pubchem_cache_by_cid: Dict[int, Dict[str, Any]] = {}
+        self._pubchem_failed_keys: Set[str] = set()
+        self._pubchem_error_count = 0
+        self._pubchem_offline = False
+        self._pubchem_last_error = ""
 
     def _emit(self, msg: str):
         """Emit progress message"""
@@ -642,9 +655,14 @@ class RDFWorker(QtCore.QObject):
         if self._undetermined_file_path_cache:
             return self._undetermined_file_path_cache
         here = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(here, "not_determined_reagents.json")
-        self._undetermined_file_path_cache = path
-        return path
+        repo_root = os.path.dirname(here)
+        target_dir = os.path.join(repo_root, "data", "compound_taxonomy")
+        target_path = os.path.join(target_dir, "not_determined_reagents.json")
+        legacy_path = os.path.join(here, "not_determined_reagents.json")
+        if not os.path.exists(target_path) and os.path.exists(legacy_path):
+            self._emit("Note: using legacy not_determined_reagents.json from data-processor directory; it will be rewritten to data/compound_taxonomy on save.")
+        self._undetermined_file_path_cache = target_path
+        return target_path
 
     def _ensure_undetermined_cache_loaded(self) -> None:
         if self._undetermined_loaded:
@@ -652,16 +670,26 @@ class RDFWorker(QtCore.QObject):
         self._undetermined_loaded = True
         self._undetermined_existing_entries = []
         self._undetermined_existing_map = {}
-        path = self._undetermined_file_path()
-        if not os.path.exists(path):
+        primary_path = self._undetermined_file_path()
+        load_paths = [primary_path]
+        here = os.path.dirname(os.path.abspath(__file__))
+        legacy_path = os.path.join(here, "not_determined_reagents.json")
+        if primary_path != legacy_path and os.path.exists(legacy_path):
+            load_paths.append(legacy_path)
+        data = None
+        for candidate in load_paths:
+            if not os.path.exists(candidate):
+                continue
+            try:
+                with open(candidate, "r", encoding="utf-8") as f:
+                    data = _json.load(f)
+                break
+            except Exception as exc:
+                self._emit(f"Note: could not load existing not_determined_reagents.json from {candidate}: {exc}")
+                data = None
+        if data is None:
             return
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = _json.load(f)
-        except Exception as exc:
-            self._emit(f"Note: could not load existing not_determined_reagents.json: {exc}")
-            return
-        self._ensure_registry_loaded()
+
         taxonomy = getattr(self, "_taxonomy_index", None)
         if isinstance(data, list):
             for entry in data:
@@ -694,74 +722,197 @@ class RDFWorker(QtCore.QObject):
             return ""
         return f"NAME::{basis}"
 
-    def _find_registry_path(self) -> Optional[str]:
-        if self._registry_path:
-            return self._registry_path
-        here = os.path.dirname(os.path.abspath(__file__))
-        candidates = [
-            os.path.join(here, "cas_registry_merged.jsonl"),
-            os.path.join(os.path.dirname(here), "data", "cas_registry_merged.jsonl"),
-        ]
-        for candidate in candidates:
-            if os.path.exists(candidate):
-                self._registry_path = candidate
-                return candidate
+    def _record_pubchem_success(self) -> None:
+        self._pubchem_last_error = ""
+
+    def _record_pubchem_error(self, reason: str) -> None:
+        self._pubchem_error_count += 1
+        self._pubchem_last_error = reason
+        if self._pubchem_error_count >= 3 and not self._pubchem_offline:
+            self._pubchem_offline = True
+            self._emit(
+                f"Notice: PubChem service appears unavailable (last error: {reason}). Skipping further lookups for this run."
+            )
+
+    def _pubchem_json(self, url: str) -> Optional[Dict[str, Any]]:
+        if self._pubchem_offline:
+            return None
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": PUBCHEM_USER_AGENT})
+            with urllib.request.urlopen(req, timeout=PUBCHEM_TIMEOUT) as resp:
+                payload = resp.read()
+            self._record_pubchem_success()
+            return _json.loads(payload.decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                self._record_pubchem_success()
+                return None
+            self._emit(f"Note: PubChem request failed ({exc.code}): {url}")
+            self._record_pubchem_error(f"HTTP {exc.code}")
+        except Exception as exc:
+            self._emit(f"Note: PubChem request error: {exc}: {url}")
+            self._record_pubchem_error(str(exc))
         return None
 
-    def _ensure_registry_loaded(self) -> None:
-        if self._registry_loaded:
-            return
-        self._registry_loaded = True
-        self._registry_by_cas = {}
-        self._registry_by_name = {}
-        path = self._find_registry_path()
-        if not path:
-            return
-        try:
-            with open(path, "r", encoding="utf-8") as fh:
-                for line in fh:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    try:
-                        entry = _json.loads(line)
-                    except Exception:
-                        continue
-                    if not isinstance(entry, dict):
-                        continue
-                    cas = str(entry.get("cas") or "").strip()
-                    if cas and cas not in self._registry_by_cas:
-                        self._registry_by_cas[cas] = entry
-                    name = str(entry.get("name") or "").strip()
-                    if name:
-                        key = self._normalize_name(name)
-                        if key and key not in self._registry_by_name:
-                            self._registry_by_name[key] = entry
-                    abbr = str(entry.get("abbreviation") or "").strip()
-                    if abbr:
-                        key = self._normalize_name(abbr)
-                        if key and key not in self._registry_by_name:
-                            self._registry_by_name[key] = entry
-                    for syn in entry.get("synonyms") or []:
-                        key = self._normalize_name(syn)
-                        if key and key not in self._registry_by_name:
-                            self._registry_by_name[key] = entry
-        except Exception as exc:
-            self._emit(f"Note: could not load CAS registry for undetermined reagents: {exc}")
-            self._registry_by_cas = {}
-            self._registry_by_name = {}
+    def _extract_cas_from_synonyms(self, synonyms: List[str]) -> str:
+        for syn in synonyms or []:
+            syn_stripped = (syn or "").strip()
+            if CAS_NUMBER_RE.fullmatch(syn_stripped):
+                return syn_stripped
+        return ""
 
-    def _lookup_registry_info(self, cas: str, name: str) -> Dict[str, Any]:
-        self._ensure_registry_loaded()
+    def _choose_abbreviation(self, synonyms: List[str], canonical_name: str) -> str:
+        candidates = []
+        for syn in synonyms or []:
+            s = (syn or "").strip()
+            if not s:
+                continue
+            if CAS_NUMBER_RE.fullmatch(s):
+                continue
+            if len(s) <= 20:
+                candidates.append(s)
+        if candidates:
+            return candidates[0]
+        canonical = (canonical_name or "").strip()
+        if canonical and len(canonical) <= 24:
+            return canonical
+        return ""
+
+    def _extract_use_notes(self, record: Dict[str, Any]) -> str:
+        def walk_sections(sections: List[Dict[str, Any]]) -> List[str]:
+            snippets: List[str] = []
+            for section in sections or []:
+                heading = (section.get("TOCHeading") or "").lower()
+                if "use" in heading or "application" in heading or "function" in heading:
+                    for info in section.get("Information") or []:
+                        val = info.get("Value") or {}
+                        for item in val.get("StringWithMarkup") or []:
+                            txt = (item.get("String") or "").strip()
+                            if txt:
+                                snippets.append(txt)
+                child = walk_sections(section.get("Section") or [])
+                if child:
+                    snippets.extend(child)
+            return snippets
+        record_sections = record.get("Record", {}).get("Section") or []
+        pieces = walk_sections(record_sections)
+        unique: List[str] = []
+        seen: Set[str] = set()
+        for piece in pieces:
+            if piece in seen:
+                continue
+            seen.add(piece)
+            unique.append(piece)
+            if len(unique) >= 3:
+                break
+        return " ".join(unique)
+
+    def _fetch_pubchem_uses(self, cid: int) -> str:
+        url = f"{PUBCHEM_VIEW_BASE}/{cid}/JSON"
+        data = self._pubchem_json(url)
+        if not data:
+            return ""
+        return self._extract_use_notes(data)
+
+    def _fetch_pubchem_compound(self, *, cas: str = "", name: str = "") -> Dict[str, Any]:
+        cas = (cas or "").strip()
+        name = (name or "").strip()
+        if not cas and not name:
+            return {}
+        cid = None
+        if cas:
+            data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/xref/RN/{urllib.parse.quote(cas)}/JSON")
+            if data and data.get("PC_Compounds"):
+                cid = data["PC_Compounds"][0].get("id", {}).get("id", {}).get("cid")
+        if cid is None and name:
+            data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/name/{urllib.parse.quote(name)}/cids/JSON")
+            if data:
+                cid_list = data.get("IdentifierList", {}).get("CID") or []
+                if cid_list:
+                    cid = cid_list[0]
+        if cid is None:
+            return {}
+        if cid in self._pubchem_cache_by_cid:
+            return self._pubchem_cache_by_cid[cid]
+        prop_data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/cid/{cid}/property/IUPACName,MolecularFormula,MolecularWeight,CanonicalSMILES,IsomericSMILES/JSON")
+        synonyms_data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/cid/{cid}/synonyms/JSON")
+        synonyms = []
+        if synonyms_data:
+            info_list = synonyms_data.get("InformationList", {}).get("Information") or []
+            if info_list:
+                synonyms = list(info_list[0].get("Synonym") or [])
+
+        props = {}
+        if prop_data:
+            prop_list = prop_data.get("PropertyTable", {}).get("Properties") or []
+            if prop_list:
+                props = prop_list[0]
+        canonical_name = str(props.get("IUPACName") or "").strip()
+        synonyms = [s for s in synonyms if s]
+        cas_candidate = cas or self._extract_cas_from_synonyms(synonyms)
+        abbreviation = self._choose_abbreviation(synonyms, canonical_name)
+        uses_text = self._fetch_pubchem_uses(cid)
+        info = {
+            "pubchem_cid": cid,
+            "cas": cas_candidate,
+            "name": canonical_name or (synonyms[1] if len(synonyms) > 1 else (synonyms[0] if synonyms else name or cas_candidate)),
+            "canonical_smiles": props.get("CanonicalSMILES"),
+            "isomeric_smiles": props.get("IsomericSMILES"),
+            "molecular_formula": props.get("MolecularFormula"),
+            "molecular_weight": props.get("MolecularWeight"),
+            "iupac_name": props.get("IUPACName"),
+            "synonyms": synonyms,
+            "abbreviation": abbreviation,
+            "typical_usage": uses_text,
+            "data_source": "PubChem",
+            "pubchem_url": f"https://pubchem.ncbi.nlm.nih.gov/compound/{cid}",
+        }
+        self._pubchem_cache_by_cid[cid] = info
+        if cas_candidate:
+            self._pubchem_cache_by_cas[cas_candidate] = info
+        if name:
+            norm_name = self._normalize_name(name)
+            if norm_name:
+                self._pubchem_cache_by_name[norm_name] = info
+        for syn in synonyms:
+            norm_syn = self._normalize_name(syn)
+            if norm_syn:
+                self._pubchem_cache_by_name.setdefault(norm_syn, info)
+        return info
+
+    def _lookup_compound_info(self, cas: str, name: str) -> Dict[str, Any]:
         cas_norm = (cas or "").strip()
-        if cas_norm and cas_norm in self._registry_by_cas:
-            return self._registry_by_cas[cas_norm]
-        name_key = self._normalize_name(name)
-        if name_key and name_key in self._registry_by_name:
-            return self._registry_by_name[name_key]
+        name_norm = (name or "").strip()
+        if cas_norm and cas_norm in self._pubchem_cache_by_cas:
+            return self._pubchem_cache_by_cas[cas_norm]
+        name_key = self._normalize_name(name_norm)
+        if name_key and name_key in self._pubchem_cache_by_name:
+            return self._pubchem_cache_by_name[name_key]
+        fail_keys = []
+        if cas_norm:
+            fail_key = f"cas:{cas_norm}"
+            if fail_key in self._pubchem_failed_keys:
+                cas_norm = ""
+            else:
+                fail_keys.append(fail_key)
+        if name_key:
+            fail_name = f"name:{name_key}"
+            if fail_name in self._pubchem_failed_keys:
+                name_key = ""
+            else:
+                fail_keys.append(fail_name)
+        info: Dict[str, Any] = {}
+        if cas_norm:
+            info = self._fetch_pubchem_compound(cas=cas_norm)
+        if not info and name_norm:
+            info = self._fetch_pubchem_compound(name=name_norm)
+        if info:
+            return info
+        for key in fail_keys:
+            self._pubchem_failed_keys.add(key)
         return {}
 
-    def _sanitize_registry_value(self, value: Any):
+    def _sanitize_compound_value(self, value: Any):
         if isinstance(value, str):
             val = value.strip()
             return val or None
@@ -770,28 +921,28 @@ class RDFWorker(QtCore.QObject):
         if isinstance(value, list):
             cleaned = []
             for item in value:
-                cleaned_item = self._sanitize_registry_value(item)
+                cleaned_item = self._sanitize_compound_value(item)
                 if cleaned_item not in (None, "", [], {}):
                     cleaned.append(cleaned_item)
             return cleaned or None
         if isinstance(value, tuple):
             cleaned = []
             for item in value:
-                cleaned_item = self._sanitize_registry_value(item)
+                cleaned_item = self._sanitize_compound_value(item)
                 if cleaned_item not in (None, "", [], {}):
                     cleaned.append(cleaned_item)
             return cleaned or None
         if isinstance(value, set):
             cleaned = []
             for item in value:
-                cleaned_item = self._sanitize_registry_value(item)
+                cleaned_item = self._sanitize_compound_value(item)
                 if cleaned_item not in (None, "", [], {}):
                     cleaned.append(cleaned_item)
             return cleaned or None
         if isinstance(value, dict):
             cleaned_dict = {}
             for k, v in value.items():
-                cleaned_val = self._sanitize_registry_value(v)
+                cleaned_val = self._sanitize_compound_value(v)
                 if cleaned_val not in (None, "", [], {}):
                     cleaned_dict[str(k)] = cleaned_val
             return cleaned_dict or None
@@ -832,14 +983,22 @@ class RDFWorker(QtCore.QObject):
             "typical_usage",
             "data_sources",
             "sources",
+            "canonical_smiles",
+            "isomeric_smiles",
+            "molecular_formula",
+            "molecular_weight",
+            "iupac_name",
+            "pubchem_cid",
+            "pubchem_url",
+            "data_source",
         ]
         for key in copy_keys:
             if key not in info:
                 continue
-            sanitized = self._sanitize_registry_value(info.get(key))
+            sanitized = self._sanitize_compound_value(info.get(key))
             if sanitized not in (None, "", [], {}):
                 entry[key] = sanitized
-        smiles = info.get("smiles") or info.get("smile")
+        smiles = info.get("smiles") or info.get("smile") or info.get("canonical_smiles") or info.get("isomeric_smiles")
         if isinstance(smiles, str):
             smiles = smiles.strip()
         if smiles:
@@ -856,8 +1015,8 @@ class RDFWorker(QtCore.QObject):
             entry["typical_usage"] = typical_usage
         if entry.get("usage") == entry.get("typical_usage"):
             entry.pop("usage", None)
-        if info and self._registry_path:
-            entry["registry_source"] = self._registry_path
+        if info:
+            entry["data_source"] = info.get("data_source") or "PubChem"
         cleaned_entry: Dict[str, Any] = {}
         for key, value in entry.items():
             if key in {"cas", "name", "role"}:
@@ -875,7 +1034,10 @@ class RDFWorker(QtCore.QObject):
         reported = str(entry.get("reported_name") or entry.get("raw_name") or entry.get("name") or "").strip()
         lookup_name = str(entry.get("name") or reported).strip()
         role = (entry.get("role") or "UNK").strip().upper()
-        info = self._lookup_registry_info(cas, lookup_name)
+        if entry.get("data_source"):
+            info = dict(entry)
+        else:
+            info = self._lookup_compound_info(cas, lookup_name)
         if not cas:
             cas_candidate = str((info or {}).get("cas") or "").strip()
             if cas_candidate:
@@ -909,7 +1071,7 @@ class RDFWorker(QtCore.QObject):
         reported = (name or "").strip()
         if not cas and not reported:
             return
-        info = self._lookup_registry_info(cas, reported)
+        info = self._lookup_compound_info(cas, reported)
         if not cas:
             cas_candidate = str((info or {}).get("cas") or "").strip()
             if cas_candidate:
@@ -944,7 +1106,7 @@ class RDFWorker(QtCore.QObject):
             return
         path = self._undetermined_file_path()
         entries = list(self._undetermined_existing_entries)
-        unique_new: Dict[tuple[str, str], Dict[str, Any]] = {}
+        unique_new: Dict[Tuple[str, str], Dict[str, Any]] = {}
         for entry in self._undetermined_new_map.values():
             cas_key = str(entry.get("cas") or "").strip()
             name_key = str(entry.get("name") or "").strip()
@@ -952,6 +1114,7 @@ class RDFWorker(QtCore.QObject):
         new_entries = sorted(unique_new.values(), key=lambda e: ((e.get("cas") or "").strip(), (e.get("name") or "").strip()))
         entries.extend(new_entries)
         try:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, "w", encoding="utf-8") as f:
                 _json.dump(entries, f, ensure_ascii=False, indent=2)
         except Exception as exc:

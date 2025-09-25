@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2025-09-23",
+  "updated": "2025-09-25",
   "schema": {
     "family_id": "stable identifier",
     "label": "family name",
@@ -656,6 +656,53 @@
             "moisture_rank": 1
           },
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: N,N-Diisopropylethylamine | abbr: DIPEA | CAS: 7087-68-5 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: DIEA; DIPEA; Hünig's base; i-Pr2NEt"
+        },
+        {
+          "name": "Potassium phenoxide",
+          "abbr": "Potassium phenoxide",
+          "cas": "100-67-4",
+          "synonyms": [
+            "Potassium phenoxide",
+            "100-67-4",
+            "potassium phenate",
+            "UNII-9CQ00ODF3U",
+            "EINECS 202-877-7",
+            "9CQ00ODF3U",
+            "POTASSIUM CARBOLATE",
+            "POTASSIUM PHENOXIDE [MI]",
+            "DTXSID30881405",
+            "RefChem:175576",
+            "DTXCID801022661",
+            "POTASSIUM PHENOXIDE [INCI]",
+            "202-877-7",
+            "Potassium phenolate",
+            "potassium benzenolate",
+            "potassium;phenoxide"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "100-67-4",
+            "potassium phenate",
+            "UNII-9CQ00ODF3U",
+            "EINECS 202-877-7",
+            "9CQ00ODF3U",
+            "POTASSIUM CARBOLATE",
+            "POTASSIUM PHENOXIDE [MI]",
+            "DTXSID30881405",
+            "RefChem:175576",
+            "DTXCID801022661",
+            "POTASSIUM PHENOXIDE [INCI]",
+            "202-877-7",
+            "Potassium phenolate",
+            "potassium benzenolate",
+            "potassium;phenoxide"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Potassium phenoxide | abbr: Potassium phenoxide | CAS: 100-67-4 | synonyms: Potassium phenoxide; 100-67-4; potassium phenate; UNII-9CQ00ODF3U; EINECS 202-877-7; 9CQ00ODF3U; POTASSIUM CARBOLATE; POTASSIUM PHENOXIDE [MI]; DTXSID30881405; RefChem:175576; DTXCID801022661; POTASSIUM PHENOXIDE [INCI]; 202-877-7; Potassium phenolate; potassium benzenolate; potassium;phenoxide"
         },
         {
           "name": "Sodium trimethylsilanolate",
