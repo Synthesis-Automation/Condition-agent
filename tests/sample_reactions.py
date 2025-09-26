@@ -98,7 +98,6 @@ SAMPLE_REACTIONS = [
     
     # Secondary aliphatic amines
     "Brc1ccccc1.CCN(CC)CC>>CCN(CC)c1ccccc1 (C-N - Ph-Br + diethylamine)",
-    "Brc1ccccc1.CN(C)Cc1ccccc1>>CN(Cc1ccccc1)c2ccccc2 (C-N - Ph-Br + N,N-dimethylbenzylamine)",
     
     # Cyclic amines (heterocycles)
     "Brc1ccccc1.N1CCCC1>>c1ccc(N2CCCC2)cc1 (C-N - Ph-Br + pyrrolidine)",

@@ -60,7 +60,7 @@ def _dataset_family_map(raw: str) -> str:
         return "Buchwald C鈥揘"
     if tl in {"suzuki", "suzuki-miyaura", "suzuki cc", "suzuki_cc"}:
         return "Suzuki_CC"
-    if tl in {"amide-formation", "amide", "amide coupling", "amide_coupling"}:
+    if tl in {"amide-formation", "amide formation", "amideformation", "amide", "amide coupling", "amide_coupling"}:
         return "Amide_Coupling"
     return t
 
