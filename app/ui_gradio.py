@@ -34,6 +34,16 @@ THEME = gr.themes.Soft(
     spacing_size="sm",
 )
 
+RECOMMEND_FAMILY_DISPLAY = [
+    ('Auto-detect (default)', ''),
+    ('Suzuki (Suzuki_CC)', 'Suzuki_CC'),
+    ('Ullmann C?N', 'Ullmann C?N'),
+    ('Buchwald C?N', 'Buchwald C?N'),
+    ('Amide Coupling', 'Amide_Coupling'),
+]
+RECOMMEND_FAMILY_OPTIONS = [label for label, _ in RECOMMEND_FAMILY_DISPLAY]
+RECOMMEND_FAMILY_VALUE_MAP = {label: value for label, value in RECOMMEND_FAMILY_DISPLAY}
+
 # Constrain overall width for a cleaner layout
 CSS = """
 .gradio-container{max-width:1600px !important;margin:0 auto !important;}
@@ -345,6 +355,12 @@ def ui_recommend(
     relax_json: str,
     constraints_json: str,
 ) -> Dict[str, Any]:
+    family_override = reaction_type
+    if isinstance(family_override, str):
+        family_override = RECOMMEND_FAMILY_VALUE_MAP.get(family_override, family_override)
+        if isinstance(family_override, str) and not family_override.strip():
+            family_override = None
+
     relax = _safe_json_loads(relax_json)
     relax["use_rxn_insight"] = bool(use_rxn_insight)
     constraints = _safe_json_loads(constraints_json)
@@ -416,20 +432,30 @@ def ui_recommend_structured(
         relax_json = legacy_relax
         constraints_json = legacy_constraints
 
+    family_override = reaction_type
+    if isinstance(family_override, str):
+        family_override = RECOMMEND_FAMILY_VALUE_MAP.get(family_override, family_override)
+        if isinstance(family_override, str) and not family_override.strip():
+            family_override = None
+
     relax = _safe_json_loads(relax_json)
     if not isinstance(relax, dict):
         relax = {}
     if not bool(use_rxn_insight):
         relax["use_rxn_insight"] = False
     constraints = _safe_json_loads(constraints_json)
+    if not isinstance(constraints, dict):
+        constraints = {}
+
     data = recommend.recommend_conditions_structured(
         reaction=reaction or "",
-        reaction_type=(reaction_type or None),
+        reaction_type=family_override,
         k=int(k or 50),
         limit=int(limit or 5),
         relax=relax,
         constraints=constraints or None,
     )
+
     recs = data.get("recommendations") or []
     rows: List[List[Any]] = []
     human_parts: List[str] = []
@@ -1021,7 +1047,12 @@ def build_demo() -> gr.Blocks:
 
         with gr.Tab("Recommend Conditions"):
             rec_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
-            rec_type = gr.Textbox(label="Reaction Type (optional override)", value="")
+            rec_type = gr.Dropdown(
+                label="Reaction Type (optional override)",
+                choices=RECOMMEND_FAMILY_OPTIONS,
+                value=RECOMMEND_FAMILY_OPTIONS[0],
+                interactive=True,
+            )
             rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=50, step=1)
             rec_limit = gr.Slider(label="Number of recommendations", minimum=1, maximum=10, value=5, step=1)
             rec_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
