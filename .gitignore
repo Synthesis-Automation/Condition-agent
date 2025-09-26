@@ -147,4 +147,10 @@ dmypy.json
 
 dataset_combined.*
 
+# Large dataset artifacts (keep out of git history)
+# Explicitly ignore RDF outputs and archives under data-processor/dataset
+data-processor/dataset/*.rdf
+data-processor/dataset/*.zip
+data-processor/dataset/*.gz
+
 
