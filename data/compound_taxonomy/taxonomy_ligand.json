@@ -1,6 +1,6 @@
 {
   "version": "1.2",
-  "updated": "2025-09-13",
+  "updated": "2025-09-26",
   "schema": {
     "family_id": "stable identifier for the family",
     "label": "human-readable name",
@@ -530,12 +530,26 @@
       "scaffold": "Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents",
       "example_members": [
         {
-          "name": "Triphenylphosphine",
-          "abbr": "PPh3",
-          "cas": "603-35-0",
+          "name": "Binap, (A+-)-",
+          "abbr": "Binap, (A+-)-",
+          "cas": "76189-55-4",
           "synonyms": [
-            "PPh3",
-            "Triphenylphosphine"
+            "Binap, (A+-)-",
+            "2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL",
+            "rac-BINAP",
+            "RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL",
+            "(1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine)",
+            "970O8508MB",
+            "DTXSID40913327",
+            "Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-",
+            "RefChem:1079872",
+            "DTXCID701020048",
+            "98327-87-8",
+            "76189-55-4",
+            "76189-56-5",
+            "(R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl",
+            "BINAP",
+            "(S)-BINAP"
           ],
           "numeric_features": {
             "steric_rank": 2,
@@ -544,15 +558,46 @@
             "rigidity_rank": 1,
             "denticity_rank": 1
           },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triphenylphosphine | abbr: PPh3 | CAS: 603-35-0 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PPh3; Triphenylphosphine"
+          "aliases": [
+            "2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL",
+            "rac-BINAP",
+            "RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL",
+            "(1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine)",
+            "970O8508MB",
+            "DTXSID40913327",
+            "Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-",
+            "RefChem:1079872",
+            "DTXCID701020048",
+            "98327-87-8",
+            "76189-55-4",
+            "76189-56-5",
+            "(R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl",
+            "BINAP",
+            "(S)-BINAP"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: Binap, (A+-)- | abbr: Binap, (A+-)- | CAS: 76189-55-4 | synonyms: Binap, (A+-)-; 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL; rac-BINAP; RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL; (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine); 970O8508MB; DTXSID40913327; Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-; RefChem:1079872; DTXCID701020048; 98327-87-8; 76189-55-4; 76189-56-5; (R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl; BINAP; (S)-BINAP"
         },
         {
-          "name": "Tricyclohexylphosphine",
-          "abbr": "PCy3",
-          "cas": "2622-14-2",
+          "name": "Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane",
+          "abbr": "Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane",
+          "cas": "742103-27-1",
           "synonyms": [
-            "PCy3",
-            "Tricyclohexylphosphine"
+            "Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane",
+            "DTXSID30619922",
+            "RefChem:1083259",
+            "DTXCID40570676",
+            "cBRIDP",
+            "742103-27-1",
+            "cBRIDP(regR)",
+            "di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphine",
+            "MFCD09753012",
+            "Phosphine,bis(1,1-dimethylethyl)(1-methyl-2,2-diphenylcyclopropyl)-",
+            "ditert-butyl-(1-methyl-2,2-diphenylcyclopropyl)phosphane",
+            "Di-tert-butyl(2,2-diphenyl-1-methyl-1-cyclopropyl)phosphine",
+            "SCHEMBL377365",
+            "C24H33P",
+            "AKOS025295684",
+            "AS-72221"
           ],
           "numeric_features": {
             "steric_rank": 2,
@@ -561,126 +606,24 @@
             "rigidity_rank": 1,
             "denticity_rank": 1
           },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tricyclohexylphosphine | abbr: PCy3 | CAS: 2622-14-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PCy3; Tricyclohexylphosphine"
-        },
-        {
-          "name": "Tri-tert-butylphosphine",
-          "abbr": "PtBu3",
-          "cas": "13716-12-6",
-          "synonyms": [
-            "PtBu3",
-            "Tritertbutylphosphine"
+          "aliases": [
+            "DTXSID30619922",
+            "RefChem:1083259",
+            "DTXCID40570676",
+            "cBRIDP",
+            "742103-27-1",
+            "cBRIDP(regR)",
+            "di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphine",
+            "MFCD09753012",
+            "Phosphine,bis(1,1-dimethylethyl)(1-methyl-2,2-diphenylcyclopropyl)-",
+            "ditert-butyl-(1-methyl-2,2-diphenylcyclopropyl)phosphane",
+            "Di-tert-butyl(2,2-diphenyl-1-methyl-1-cyclopropyl)phosphine",
+            "SCHEMBL377365",
+            "C24H33P",
+            "AKOS025295684",
+            "AS-72221"
           ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tri-tert-butylphosphine | abbr: PtBu3 | CAS: 13716-12-6 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PtBu3; Tritertbutylphosphine"
-        },
-        {
-          "name": "Tris(o-tolyl)phosphine",
-          "abbr": "P(o-tol)3",
-          "cas": "6163-58-2",
-          "synonyms": [
-            "P(o-tol)3",
-            "Trisotolylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(o-tolyl)phosphine | abbr: P(o-tol)3 | CAS: 6163-58-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(o-tol)3; Trisotolylphosphine"
-        },
-        {
-          "name": "Tris(p-tolyl)phosphine",
-          "abbr": "P(p-tol)3",
-          "cas": "1038-95-5",
-          "synonyms": [
-            "P(p-tol)3",
-            "Trisptolylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-tolyl)phosphine | abbr: P(p-tol)3 | CAS: 1038-95-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-tol)3; Trisptolylphosphine"
-        },
-        {
-          "name": "Tris(p-fluorophenyl)phosphine",
-          "abbr": "P(p-F-Ph)3",
-          "cas": "18437-78-2",
-          "synonyms": [
-            "P(p-F-Ph)3",
-            "Trispfluorophenylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-fluorophenyl)phosphine | abbr: P(p-F-Ph)3 | CAS: 18437-78-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-F-Ph)3; Trispfluorophenylphosphine"
-        },
-        {
-          "name": "Tris(p-chlorophenyl)phosphine",
-          "abbr": "P(p-Cl-Ph)3",
-          "cas": "1159-54-2",
-          "synonyms": [
-            "P(p-Cl-Ph)3",
-            "Trispchlorophenylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-chlorophenyl)phosphine | abbr: P(p-Cl-Ph)3 | CAS: 1159-54-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-Cl-Ph)3; Trispchlorophenylphosphine"
-        },
-        {
-          "name": "Tris(p-trifluoromethylphenyl)phosphine",
-          "abbr": "P(p-CF3-Ph)3",
-          "cas": "1160-71-4",
-          "synonyms": [
-            "P(p-CF3-Ph)3",
-            "Trisptrifluoromethylphenylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-trifluoromethylphenyl)phosphine | abbr: P(p-CF3-Ph)3 | CAS: 1160-71-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-CF3-Ph)3; Trisptrifluoromethylphenylphosphine"
-        },
-        {
-          "name": "Methyldiphenylphosphine",
-          "abbr": "PMePh2",
-          "cas": "1486-28-8",
-          "synonyms": [
-            "Methyldiphenylphosphine",
-            "PMePh2"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Methyldiphenylphosphine | abbr: PMePh2 | CAS: 1486-28-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: Methyldiphenylphosphine; PMePh2"
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane | abbr: Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane | CAS: 742103-27-1 | synonyms: Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane; DTXSID30619922; RefChem:1083259; DTXCID40570676; cBRIDP; 742103-27-1; cBRIDP(regR); di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphine; MFCD09753012; Phosphine,bis(1,1-dimethylethyl)(1-methyl-2,2-diphenylcyclopropyl)-; ditert-butyl-(1-methyl-2,2-diphenylcyclopropyl)phosphane; Di-tert-butyl(2,2-diphenyl-1-methyl-1-cyclopropyl)phosphine; SCHEMBL377365; C24H33P; AKOS025295684; AS-72221"
         },
         {
           "name": "Dimethylphenylphosphine",
@@ -700,12 +643,12 @@
           "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Dimethylphenylphosphine | abbr: PMe2Ph | CAS: 672-66-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: Dimethylphenylphosphine; PMe2Ph"
         },
         {
-          "name": "Trimethylphosphine",
-          "abbr": "PMe3",
-          "cas": "594-09-2",
+          "name": "Methyldiphenylphosphine",
+          "abbr": "PMePh2",
+          "cas": "1486-28-8",
           "synonyms": [
-            "PMe3",
-            "Trimethylphosphine"
+            "Methyldiphenylphosphine",
+            "PMePh2"
           ],
           "numeric_features": {
             "steric_rank": 2,
@@ -714,15 +657,29 @@
             "rigidity_rank": 1,
             "denticity_rank": 1
           },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Trimethylphosphine | abbr: PMe3 | CAS: 594-09-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PMe3; Trimethylphosphine"
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Methyldiphenylphosphine | abbr: PMePh2 | CAS: 1486-28-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: Methyldiphenylphosphine; PMePh2"
         },
         {
-          "name": "Triethylphosphine",
-          "abbr": "PEt3",
-          "cas": "554-70-1",
+          "name": "Tetrabutylammonium Tetrafluoroborate",
+          "abbr": "Tetrabutylammonium Tetrafluoroborate",
+          "cas": "429-42-5",
           "synonyms": [
-            "PEt3",
-            "Triethylphosphine"
+            "Tetrabutylammonium Tetrafluoroborate",
+            "429-42-5",
+            "1-Butanaminium, N,N,N-tributyl-, tetrafluoroborate(1-)",
+            "DTXSID7059983",
+            "RefChem:188417",
+            "NBu4 BF4",
+            "DTXCID4040183",
+            "207-058-8",
+            "tetra-n-Butylammonium tetrafluoroborate",
+            "Tetrabutylammonium fluoroborate",
+            "tetrabutylammoniumtetrafluoroborate",
+            "tetrabutylazanium;tetrafluoroborate",
+            "Tetrabutylammonium fluoborate",
+            "MFCD00011634",
+            "tetrabutyl-ammonium tetrafluoroborate",
+            "tetrabutylazanium; tetrafluoroboranuide"
           ],
           "numeric_features": {
             "steric_rank": 2,
@@ -731,7 +688,24 @@
             "rigidity_rank": 1,
             "denticity_rank": 1
           },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triethylphosphine | abbr: PEt3 | CAS: 554-70-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PEt3; Triethylphosphine"
+          "aliases": [
+            "429-42-5",
+            "1-Butanaminium, N,N,N-tributyl-, tetrafluoroborate(1-)",
+            "DTXSID7059983",
+            "RefChem:188417",
+            "NBu4 BF4",
+            "DTXCID4040183",
+            "207-058-8",
+            "tetra-n-Butylammonium tetrafluoroborate",
+            "Tetrabutylammonium fluoroborate",
+            "tetrabutylammoniumtetrafluoroborate",
+            "tetrabutylazanium;tetrafluoroborate",
+            "Tetrabutylammonium fluoborate",
+            "MFCD00011634",
+            "tetrabutyl-ammonium tetrafluoroborate",
+            "tetrabutylazanium; tetrafluoroboranuide"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: Tetrabutylammonium Tetrafluoroborate | abbr: Tetrabutylammonium Tetrafluoroborate | CAS: 429-42-5 | synonyms: Tetrabutylammonium Tetrafluoroborate; 429-42-5; 1-Butanaminium, N,N,N-tributyl-, tetrafluoroborate(1-); DTXSID7059983; RefChem:188417; NBu4 BF4; DTXCID4040183; 207-058-8; tetra-n-Butylammonium tetrafluoroborate; Tetrabutylammonium fluoroborate; tetrabutylammoniumtetrafluoroborate; tetrabutylazanium;tetrafluoroborate; Tetrabutylammonium fluoborate; MFCD00011634; tetrabutyl-ammonium tetrafluoroborate; tetrabutylazanium; tetrafluoroboranuide"
         },
         {
           "name": "Tri-n-butylphosphine",
@@ -751,6 +725,122 @@
           "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tri-n-butylphosphine | abbr: P(nBu)3 | CAS: 998-40-3 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(nBu)3; Trinbutylphosphine"
         },
         {
+          "name": "Tri-tert-butylphosphine",
+          "abbr": "PtBu3",
+          "cas": "13716-12-6",
+          "synonyms": [
+            "PtBu3",
+            "Tritertbutylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tri-tert-butylphosphine | abbr: PtBu3 | CAS: 13716-12-6 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PtBu3; Tritertbutylphosphine"
+        },
+        {
+          "name": "Tri-tert-butylphosphine tetrafluoroborate",
+          "abbr": "Tri-tert-butylphosphine tetrafluoroborate",
+          "cas": "131274-22-1",
+          "synonyms": [
+            "Tri-tert-butylphosphine tetrafluoroborate",
+            "131274-22-1",
+            "B68XS9MF5T",
+            "RefChem:899007",
+            "672-603-2",
+            "Tri-tert-butylphosphonium tetrafluoroborate",
+            "tritert-butylphosphanium;tetrafluoroborate",
+            "MFCD04039975",
+            "Phosphine, tris(1,1-dimethylethyl)-, tetrafluoroborate(1-) (1:1)",
+            "TRI-T-BUTYLPHOSPHONIUM TETRAFLUOROBORATE",
+            "[(t-Bu)3PH]BF4",
+            "tetrafluoroboranuide; tri-tert-butylphosphanium",
+            "Tri-tert-butylphosphoniumTetrafluoroborate",
+            "TRIS(TERT-BUTYL)PHOSPHONIUM TETRAFLUOROBORATE",
+            "Tri-tert-butylphosphine Tetrafluoroborate; Tris(tert-butyl)phosphine Tetrafluoroborate; Tris(tert-butyl)phosphonium Tetrafluoroborate;",
+            "tri-t-butylphosphoniumtetrafluoroborate"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "aliases": [
+            "131274-22-1",
+            "B68XS9MF5T",
+            "RefChem:899007",
+            "672-603-2",
+            "Tri-tert-butylphosphonium tetrafluoroborate",
+            "tritert-butylphosphanium;tetrafluoroborate",
+            "MFCD04039975",
+            "Phosphine, tris(1,1-dimethylethyl)-, tetrafluoroborate(1-) (1:1)",
+            "TRI-T-BUTYLPHOSPHONIUM TETRAFLUOROBORATE",
+            "[(t-Bu)3PH]BF4",
+            "tetrafluoroboranuide; tri-tert-butylphosphanium",
+            "Tri-tert-butylphosphoniumTetrafluoroborate",
+            "TRIS(TERT-BUTYL)PHOSPHONIUM TETRAFLUOROBORATE",
+            "Tri-tert-butylphosphine Tetrafluoroborate; Tris(tert-butyl)phosphine Tetrafluoroborate; Tris(tert-butyl)phosphonium Tetrafluoroborate;",
+            "tri-t-butylphosphoniumtetrafluoroborate"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: Tri-tert-butylphosphine tetrafluoroborate | abbr: Tri-tert-butylphosphine tetrafluoroborate | CAS: 131274-22-1 | synonyms: Tri-tert-butylphosphine tetrafluoroborate; 131274-22-1; B68XS9MF5T; RefChem:899007; 672-603-2; Tri-tert-butylphosphonium tetrafluoroborate; tritert-butylphosphanium;tetrafluoroborate; MFCD04039975; Phosphine, tris(1,1-dimethylethyl)-, tetrafluoroborate(1-) (1:1); TRI-T-BUTYLPHOSPHONIUM TETRAFLUOROBORATE; [(t-Bu)3PH]BF4; tetrafluoroboranuide; tri-tert-butylphosphanium; Tri-tert-butylphosphoniumTetrafluoroborate; TRIS(TERT-BUTYL)PHOSPHONIUM TETRAFLUOROBORATE; Tri-tert-butylphosphine Tetrafluoroborate; Tris(tert-butyl)phosphine Tetrafluoroborate; Tris(tert-butyl)phosphonium Tetrafluoroborate;; tri-t-butylphosphoniumtetrafluoroborate"
+        },
+        {
+          "name": "Tricyclohexylphosphine",
+          "abbr": "PCy3",
+          "cas": "2622-14-2",
+          "synonyms": [
+            "PCy3",
+            "Tricyclohexylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tricyclohexylphosphine | abbr: PCy3 | CAS: 2622-14-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PCy3; Tricyclohexylphosphine"
+        },
+        {
+          "name": "Tricyclohexylphosphine tetrafluoroborate",
+          "abbr": "PCy3·HBF4",
+          "cas": "58656-04-5",
+          "synonyms": [
+            "PCy3·HBF4",
+            "Tricyclohexylphosphinetetrafluoroborate"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tricyclohexylphosphine tetrafluoroborate | abbr: PCy3·HBF4 | CAS: 58656-04-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PCy3·HBF4; Tricyclohexylphosphinetetrafluoroborate"
+        },
+        {
+          "name": "Triethylphosphine",
+          "abbr": "PEt3",
+          "cas": "554-70-1",
+          "synonyms": [
+            "PEt3",
+            "Triethylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triethylphosphine | abbr: PEt3 | CAS: 554-70-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PEt3; Triethylphosphine"
+        },
+        {
           "name": "Triisopropylphosphine",
           "abbr": "P(iPr)3",
           "cas": "6476-36-4",
@@ -768,6 +858,40 @@
           "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triisopropylphosphine | abbr: P(iPr)3 | CAS: 6476-36-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(iPr)3; Triisopropylphosphine"
         },
         {
+          "name": "Trimethylphosphine",
+          "abbr": "PMe3",
+          "cas": "594-09-2",
+          "synonyms": [
+            "PMe3",
+            "Trimethylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Trimethylphosphine | abbr: PMe3 | CAS: 594-09-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PMe3; Trimethylphosphine"
+        },
+        {
+          "name": "Triphenylphosphine",
+          "abbr": "PPh3",
+          "cas": "603-35-0",
+          "synonyms": [
+            "PPh3",
+            "Triphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Triphenylphosphine | abbr: PPh3 | CAS: 603-35-0 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PPh3; Triphenylphosphine"
+        },
+        {
           "name": "Tris(2-furyl)phosphine",
           "abbr": "P(2-furyl)3",
           "cas": "5518-52-5",
@@ -783,57 +907,6 @@
             "denticity_rank": 1
           },
           "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(2-furyl)phosphine | abbr: P(2-furyl)3 | CAS: 5518-52-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(2-furyl)3; Tris2furylphosphine"
-        },
-        {
-          "name": "Tris(pentafluorophenyl)phosphine",
-          "abbr": "P(C6F5)3",
-          "cas": "1757-50-8",
-          "synonyms": [
-            "P(C6F5)3",
-            "Trispentafluorophenylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(pentafluorophenyl)phosphine | abbr: P(C6F5)3 | CAS: 1757-50-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(C6F5)3; Trispentafluorophenylphosphine"
-        },
-        {
-          "name": "Tris(p-methoxyphenyl)phosphine",
-          "abbr": "P(p-MeO-Ph)3",
-          "cas": "855-38-9",
-          "synonyms": [
-            "P(p-MeO-Ph)3",
-            "Trispmethoxyphenylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-methoxyphenyl)phosphine | abbr: P(p-MeO-Ph)3 | CAS: 855-38-9 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-MeO-Ph)3; Trispmethoxyphenylphosphine"
-        },
-        {
-          "name": "Tris(o-methoxyphenyl)phosphine",
-          "abbr": "P(o-MeO-Ph)3",
-          "cas": "4731-65-1",
-          "synonyms": [
-            "P(o-MeO-Ph)3",
-            "Trisomethoxyphenylphosphine"
-          ],
-          "numeric_features": {
-            "steric_rank": 2,
-            "donor_rank": 2,
-            "pi_acceptor_rank": 2,
-            "rigidity_rank": 1,
-            "denticity_rank": 1
-          },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(o-methoxyphenyl)phosphine | abbr: P(o-MeO-Ph)3 | CAS: 4731-65-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(o-MeO-Ph)3; Trisomethoxyphenylphosphine"
         },
         {
           "name": "Tris(mesityl)phosphine",
@@ -870,12 +943,12 @@
           "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(n-octyl)phosphine | abbr: P(nOct)3 | CAS: 4731-53-7 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(nOct)3; Trisnoctylphosphine"
         },
         {
-          "name": "Tricyclohexylphosphine tetrafluoroborate",
-          "abbr": "PCy3·HBF4",
-          "cas": "58656-04-5",
+          "name": "Tris(o-methoxyphenyl)phosphine",
+          "abbr": "P(o-MeO-Ph)3",
+          "cas": "4731-65-1",
           "synonyms": [
-            "PCy3·HBF4",
-            "Tricyclohexylphosphinetetrafluoroborate"
+            "P(o-MeO-Ph)3",
+            "Trisomethoxyphenylphosphine"
           ],
           "numeric_features": {
             "steric_rank": 2,
@@ -884,7 +957,126 @@
             "rigidity_rank": 1,
             "denticity_rank": 1
           },
-          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tricyclohexylphosphine tetrafluoroborate | abbr: PCy3·HBF4 | CAS: 58656-04-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: PCy3·HBF4; Tricyclohexylphosphinetetrafluoroborate"
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(o-methoxyphenyl)phosphine | abbr: P(o-MeO-Ph)3 | CAS: 4731-65-1 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(o-MeO-Ph)3; Trisomethoxyphenylphosphine"
+        },
+        {
+          "name": "Tris(o-tolyl)phosphine",
+          "abbr": "P(o-tol)3",
+          "cas": "6163-58-2",
+          "synonyms": [
+            "P(o-tol)3",
+            "Trisotolylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(o-tolyl)phosphine | abbr: P(o-tol)3 | CAS: 6163-58-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(o-tol)3; Trisotolylphosphine"
+        },
+        {
+          "name": "Tris(p-chlorophenyl)phosphine",
+          "abbr": "P(p-Cl-Ph)3",
+          "cas": "1159-54-2",
+          "synonyms": [
+            "P(p-Cl-Ph)3",
+            "Trispchlorophenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-chlorophenyl)phosphine | abbr: P(p-Cl-Ph)3 | CAS: 1159-54-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-Cl-Ph)3; Trispchlorophenylphosphine"
+        },
+        {
+          "name": "Tris(p-fluorophenyl)phosphine",
+          "abbr": "P(p-F-Ph)3",
+          "cas": "18437-78-2",
+          "synonyms": [
+            "P(p-F-Ph)3",
+            "Trispfluorophenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-fluorophenyl)phosphine | abbr: P(p-F-Ph)3 | CAS: 18437-78-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-F-Ph)3; Trispfluorophenylphosphine"
+        },
+        {
+          "name": "Tris(p-methoxyphenyl)phosphine",
+          "abbr": "P(p-MeO-Ph)3",
+          "cas": "855-38-9",
+          "synonyms": [
+            "P(p-MeO-Ph)3",
+            "Trispmethoxyphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-methoxyphenyl)phosphine | abbr: P(p-MeO-Ph)3 | CAS: 855-38-9 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-MeO-Ph)3; Trispmethoxyphenylphosphine"
+        },
+        {
+          "name": "Tris(p-tolyl)phosphine",
+          "abbr": "P(p-tol)3",
+          "cas": "1038-95-5",
+          "synonyms": [
+            "P(p-tol)3",
+            "Trisptolylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-tolyl)phosphine | abbr: P(p-tol)3 | CAS: 1038-95-5 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-tol)3; Trisptolylphosphine"
+        },
+        {
+          "name": "Tris(p-trifluoromethylphenyl)phosphine",
+          "abbr": "P(p-CF3-Ph)3",
+          "cas": "1160-71-4",
+          "synonyms": [
+            "P(p-CF3-Ph)3",
+            "Trisptrifluoromethylphenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(p-trifluoromethylphenyl)phosphine | abbr: P(p-CF3-Ph)3 | CAS: 1160-71-4 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(p-CF3-Ph)3; Trisptrifluoromethylphenylphosphine"
+        },
+        {
+          "name": "Tris(pentafluorophenyl)phosphine",
+          "abbr": "P(C6F5)3",
+          "cas": "1757-50-8",
+          "synonyms": [
+            "P(C6F5)3",
+            "Trispentafluorophenylphosphine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Tris(pentafluorophenyl)phosphine | abbr: P(C6F5)3 | CAS: 1757-50-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: P(C6F5)3; Trispentafluorophenylphosphine"
         }
       ],
       "steric_bulk_band": "medium",

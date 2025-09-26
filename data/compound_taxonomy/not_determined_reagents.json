@@ -1,0 +1,811 @@
+[
+
+  {
+    "cas": "108-18-9",
+    "name": "N-propan-2-ylpropan-2-amine",
+    "reported_name": "108-18-9",
+    "role": "UNK",
+    "abbreviation": "DIISOPROPYLAMINE",
+    "synonyms": [
+      "(i-Pr)2NH",
+      "(iPr)2NH",
+      "(iso-C3H7)2NH",
+      "108-18-9",
+      "2-Propanamine, N-(1-methylethyl)-"
+    ],
+    "typical_usage": "Antihypertensive Agents; Indicators and Reagents EXPTL USE: BLOOD PRESSURE IN RENAL HYPERTENSIVE DOGS WAS LOWERED AND NORMALIZED AFTER GASTRIC INFUSION OF 50-100 MG DIISOPROPYLAMINE SALICYLATE FOR 2 WK. /DIISOPRPPYLINE SALICYLATE/ EXPTL USE: DIISOPROPYLAMINE HYDROCHLORIDE DECR BLOOD PRESSURE OF PT WITH HYPERTENSION FOR 6 HR @ DOSES GREATER THAN OR EQUAL TO 12.5 MG IV. /DIISOPROPYLAMINE HYDROCHLORIDE/",
+    "molecular_formula": "C6H15N",
+    "molecular_weight": "101.19",
+    "iupac_name": "N-propan-2-ylpropan-2-amine",
+    "pubchem_cid": 7912,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/7912",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "108-95-2",
+    "name": "phenol",
+    "reported_name": "108-95-2",
+    "role": "UNK",
+    "abbreviation": "phenol",
+    "synonyms": [
+      "(14C)Phenol",
+      "108-95-2",
+      "17442-59-0",
+      "1ai7",
+      "1li2"
+    ],
+    "typical_usage": "Anti-Infective Agents, Local; Disinfectants; Sclerosing Solutions; Sympatholytics Medication (Vet): Antiseptic caustic. Topical anesthetic in pruritic skin conditions. Has been used internally and externally as an antiseptic. MEDICATION (VET): PHENOL HAS BEEN USED INTERNALLY AS ANTISEPTIC & GASTRIC ANESTHETIC ...",
+    "molecular_formula": "C6H6O",
+    "molecular_weight": "94.11",
+    "iupac_name": "phenol",
+    "pubchem_cid": 996,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/996",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "12125-02-9",
+    "name": "Chloramide",
+    "reported_name": "12125-02-9",
+    "role": "UNK",
+    "abbreviation": "CHLORAMINE",
+    "synonyms": [
+      "10599-90-3",
+      "12190-75-9",
+      "234-217-9",
+      "AKOS015904329",
+      "C19359"
+    ],
+    "typical_usage": "Used as a chemical intermediate for organic synthesis; [HSDB] Formed when household bleach (sodium hypochlorite) mixed with ammonia or when bleach is added to septic systems and reacts with urinary nitrogenous compounds; [Goldfrank, p. 1647] Chloramine is an intermediate in the manufacturing of hydrazine. Chemical intermediate (unisolated) for hydrazine and its derivatives, for organic synthesis, eg, primary amines; disinfectant for drinking water (formed in situ).",
+    "molecular_formula": "ClH2N",
+    "molecular_weight": "51.47",
+    "pubchem_cid": 25423,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/25423",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "123-75-1",
+    "name": "pyrrolidine",
+    "reported_name": "123-75-1",
+    "role": "UNK",
+    "abbreviation": "PYRROLIDINE",
+    "synonyms": [
+      "(s)-pyrrolidine",
+      "1-Azacyclopentane",
+      "1-Pyrrolidinobutyronitrile",
+      "123-75-1",
+      "14-pyrrolidine"
+    ],
+    "typical_usage": "Used as an intermediate in chemical production and as a curing agent in epoxy resin systems; [HSDB] Plastic Composites Manufacturing [Category: Industry] Intermediate for pharmaceuticals, fungicides, insecticides, rubber accelerators, citrus decay control, curing agent for epoxy resins, inhibitor.",
+    "molecular_formula": "C4H9N",
+    "molecular_weight": "71.12",
+    "iupac_name": "pyrrolidine",
+    "pubchem_cid": 31268,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/31268",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "124-63-0",
+    "name": "methanesulfonyl chloride",
+    "reported_name": "124-63-0",
+    "role": "UNK",
+    "abbreviation": "Mesyl chloride",
+    "synonyms": [
+      "124-63-0",
+      "204-706-1",
+      "AI3-52234",
+      "AKOS000269070",
+      "B17EWY1R7Q"
+    ],
+    "typical_usage": "Used as an intermediate in the production of drugs, flame retardants, and other chemicals; Also used as a stabilizer, catalyst, curing agent, and chlorinating agent; Has been detected in air samples at a pulp mill that used chlorine-containing bleaching agents; [HSDB] Pulp and Paper Processing [Category: Industry] Plastic Composites Manufacturing [Category: Industry]",
+    "molecular_formula": "CH3ClO2S",
+    "molecular_weight": "114.55",
+    "iupac_name": "methanesulfonyl chloride",
+    "pubchem_cid": 31297,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/31297",
+    "data_source": "PubChem"
+  },
+
+
+  {
+    "cas": "16731-55-8",
+    "name": "16731-55-8",
+    "role": "UNK",
+    "abbreviation": "Potassium disulfite",
+    "synonyms": [
+      "16731-55-8",
+      "240-795-3",
+      "65OE787Q7W",
+      "AKOS015912829",
+      "CCRIS 1427"
+    ],
+    "typical_usage": "CIR ingredient: Potassium Metabisulfite Sodium and potassium metabisulfite are used as antioxidants in photographic film development. [Kanerva, p. 1637] Photographic Processing [Category: Other]",
+    "molecular_formula": "K2O5S2",
+    "molecular_weight": "222.33",
+    "pubchem_cid": 28019,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/28019",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "19533-24-5",
+    "name": "19533-24-5",
+    "role": "UNK"
+  },
+  {
+    "cas": "258278-25-0",
+    "name": "1,3-bis[2,6-di(propan-2-yl)phenyl]-4,5-dihydroimidazol-1-ium chloride",
+    "reported_name": "258278-25-0",
+    "role": "UNK",
+    "abbreviation": "RefChem:413930",
+    "synonyms": [
+      "1,3-Bis(2,6-bis(isopropyl)phenyl)imidazolin-3-ium chloride",
+      "1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-1H-imidazol-3-ium chloride",
+      "1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-1H-imidazol-3-ium chloride...",
+      "1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-1H-imidazol-3-iumchloride",
+      "1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-3-imidazolium Chloride"
+    ],
+    "molecular_formula": "C27H39ClN2",
+    "molecular_weight": "427.1",
+    "iupac_name": "1,3-bis[2,6-di(propan-2-yl)phenyl]-4,5-dihydroimidazol-1-ium chloride",
+    "pubchem_cid": 2734918,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/2734918",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "2625446-11-7",
+    "name": "2625446-11-7",
+    "role": "UNK"
+  },
+  {
+    "cas": "311-28-4",
+    "name": "tetrabutylazanium iodide",
+    "reported_name": "311-28-4",
+    "role": "UNK",
+    "abbreviation": "NSC-10414",
+    "synonyms": [
+      "(Bu)4NI",
+      "(n-Bu)4NI",
+      "1-Butanaminium, N,N,N-tributyl-, iodide",
+      "1-Butanaminium, N,N,N-tributyl-, iodide (1:1)",
+      "1-Butanaminium,N,N-tributyl-, iodide"
+    ],
+    "molecular_formula": "C16H36IN",
+    "molecular_weight": "369.37",
+    "iupac_name": "tetrabutylazanium iodide",
+    "pubchem_cid": 67553,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/67553",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "35895-70-6",
+    "name": "tetrabutylazanium;trifluoromethanesulfonic acid",
+    "reported_name": "35895-70-6",
+    "role": "UNK",
+    "abbreviation": "SCHEMBL160606",
+    "synonyms": [
+      "SCHEMBL160606",
+      "Tetrabutylammonium trifluoromethanesulfonate, >=99.0% (T)"
+    ],
+    "molecular_formula": "C17H37F3NO3S+",
+    "molecular_weight": "392.5",
+    "iupac_name": "tetrabutylazanium;trifluoromethanesulfonic acid",
+    "pubchem_cid": 617967,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/617967",
+    "data_source": "PubChem"
+  },
+
+
+  {
+    "cas": "590-29-4",
+    "name": "formic acid",
+    "reported_name": "590-29-4",
+    "role": "UNK",
+    "abbreviation": "formic acid",
+    "synonyms": [
+      "0YIW783RG1",
+      "200-579-1",
+      "64-18-6",
+      "82069-14-5",
+      "A834666"
+    ],
+    "typical_usage": "Medication (vet): appears to prevent candida growth in partridges exposed to candida after receiving treated feed (20 mL of 6% solution/100 g feed for 1 week and then 2% soln). Similarly, a 15% solution can be used to control an outbreak of candida albicans. THERAPEUTIC CATEGORY: Caustic CIR ingredient: Formic Acid",
+    "molecular_formula": "CH2O2",
+    "molecular_weight": "46.025",
+    "iupac_name": "formic acid",
+    "pubchem_cid": 284,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/284",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "64-18-6",
+    "name": "formate",
+    "reported_name": "64-18-6",
+    "role": "UNK",
+    "abbreviation": "formate",
+    "synonyms": [
+      "71-47-6",
+      "BDAGIHXWWSANSR-UHFFFAOYSA-M",
+      "BDBM50155538",
+      "CHEBI:15740",
+      "CHEBI:35757"
+    ],
+    "molecular_formula": "CHO2-",
+    "molecular_weight": "45.017",
+    "iupac_name": "formate",
+    "pubchem_cid": 283,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/283",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "7429-90-5",
+    "name": "aluminum",
+    "reported_name": "7429-90-5",
+    "role": "UNK",
+    "abbreviation": "ALUMINUM",
+    "synonyms": [
+      "04 - Metals (Preserved in 0.5% Nitric Acid)",
+      "04G - Metals in Groundwater (in 0.5% Nitric Acid)",
+      "12 - Metals (Preserved in 0.5% Nitric Acid)",
+      "12011-61-9",
+      "13Al"
+    ],
+    "typical_usage": "Medicinally, aluminum and its salts are used in antacids, antidiarrheals, and protective dermatological pastes. It is also found in cosmetics and deodorants. /Aluminum and its salts/ Aluminum foil has been used as a dressing for burns. Aluminum powder has been used for dusting the skin around an ileostomy, caecostomy, or colostomy to prevent irritation due to proteolytic or irritant discharges. The skin is dried and freed from grease and repeated applications of the powder made until a thick film adheres. Alternatively, Compound Aluminum Paste may be employed; the paste is applied thickly round the fistula or sinus in order to prevent the discharge from coming in contact with the skin. Aluminum powder has been used as a dressing for burns, /topical/ ulcers, and indolent wounds. /Aluminum powder/",
+    "molecular_formula": "Al",
+    "molecular_weight": "26.981538",
+    "iupac_name": "aluminum",
+    "pubchem_cid": 5359268,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/5359268",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "75-16-1",
+    "name": "magnesium;carbanide;bromide",
+    "reported_name": "75-16-1",
+    "role": "UNK",
+    "abbreviation": "Bromomethylmagnesium",
+    "synonyms": [
+      "200-844-1",
+      "22CW9773DF",
+      "75-16-1",
+      "AKOS015902931",
+      "AVFUHBJCUUTGCD-UHFFFAOYSA-M"
+    ],
+    "typical_usage": "Used as alkylating agent in organic synthesis and as a Grignard reagent; [HSDB] ALKYLATING AGENT IN ORG SYNTHESIS; GRIGNARD REAGENT",
+    "molecular_formula": "CH3BrMg",
+    "molecular_weight": "119.24",
+    "iupac_name": "magnesium;carbanide;bromide",
+    "pubchem_cid": 6349,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/6349",
+    "data_source": "PubChem"
+  },
+
+
+  {
+    "cas": "7631-86-9",
+    "name": "dihydroxy(oxo)silane",
+    "reported_name": "7631-86-9",
+    "role": "UNK",
+    "abbreviation": "Metasilicic acid",
+    "synonyms": [
+      "(H2SiO3)n",
+      "-(-Si(OH)2O-)-n",
+      "231-716-3",
+      "4OI8D3YOH1",
+      "7699-41-4"
+    ],
+    "typical_usage": "Not Known or Reasonably Ascertainable",
+    "molecular_formula": "H2O3Si",
+    "molecular_weight": "78.099",
+    "iupac_name": "dihydroxy(oxo)silane",
+    "pubchem_cid": 14768,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/14768",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "77-92-9",
+    "name": "2-hydroxypropane-1,2,3-tricarboxylic acid",
+    "reported_name": "77-92-9",
+    "role": "UNK",
+    "abbreviation": "citric acid",
+    "synonyms": [
+      ".beta.-Hydroxytricarballylic acid",
+      "1,2,3-PROPANETRICARBOXYLIC ACID,2-HYDROXY  (CITRIC ACID)",
+      "1,2,3-Propanetricarboxylic acid, 2-hydroxy-",
+      "1,2,3-Propanetricarboxylic acid, 2-hydroxy- (9CI)",
+      "1,2,3-Propanetricarboxylio acid, 2-hydroxy-"
+    ],
+    "typical_usage": "Mesh Heading: Anticoagulants, chelating Agents /EXPL THER/ Regional citrate anticoagulation (RCA) is an effective form of anticoagulation for continuous renal replacement therapy (CRRT) in patients with contraindications to heparin. Its use has been very limited, possibly because of the need for special infusion solutions and difficult monitoring of the metabolic effects./The objective of this study was/ to investigate the safety and the feasibility of an RCA method for continuous veno-venous hemofiltration (CVVH) using commercially available replacement fluid. We evaluated 11 patients at high risk of bleeding, requiring CVVH. RCA was performed using commercially available replacement fluid solutions to maintain adequate acid-base balance. We adjusted the rate of citrate infusion to achieve a post-filter ionized calcium concentration [iCa] <0.4 mmol/L when blood flow was <250 mL/min, or <0.6 mmol/L when blood flow was >250 mL/min. When needed, we infused calcium gluconate to maintain systemic plasma [iCa] within the normal range. Twenty-nine filters ran for a total of 965.5 hr. Average filter life was 33.6+/-20.5 hr. Asymptomatic hypocalcemia was detected in 6.9% of all samples. No [iCa] values <0.9 mmol/L were observed. Hypercalcemia (1.39+/-0.05 mmol/L) occurred in 2.5% of all samples. /The authors/ observed hypernatremia (threshold 153 mmol/L) and alkalosis (threshold 7.51) in only 9.3% and 9.4% respectively of all samples, mostly concomitantly. No patient showed any signs of citrate toxicity. /They/ developed a protocol for RCA during CVVH using commercially available replacement fluid that proved safe, flexible and applicable in an Intensive Care Unit (ICU) setting. It has ... been used to dissolve urinary bladder calculi, & as mild astringent.",
+    "molecular_formula": "C6H8O7",
+    "molecular_weight": "192.12",
+    "iupac_name": "2-hydroxypropane-1,2,3-tricarboxylic acid",
+    "pubchem_cid": 311,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/311",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7772-98-7",
+    "name": "disodium;dioxido-oxo-sulfanylidene-lambda6-sulfane",
+    "reported_name": "7772-98-7",
+    "role": "UNK",
+    "abbreviation": "SODIUM THIOSULFATE",
+    "synonyms": [
+      "231-867-5",
+      "7772-98-7",
+      "AI3-01237",
+      "AKOS015856704",
+      "AKOS016372312"
+    ],
+    "typical_usage": "Antidotes; Antitubercular Agents; Antioxidants; Chelating Agents SODIUM THIOSULFATE, USP, IS INTENDED FOR PARENTERAL USE IN TREATMENT OF CYANIDE POISONING, BUT IT MAY BE APPLIED TO SKIN IN VARIOUS FORMS. CUTANEOUS INFECTIONS CAUSED BY STAPH AUREUS & STAPH EPIDERMIDIS MAY RESPOND TO CONCN AS LOW AS 0.5%. CONCN OF 2-8%...USED TO TREAT ACNE; THEY ARE ALSO ANTIFUNGAL. /SODIUM THIOSULFATE USP/...IS USEFUL IN TOPICAL TREATMENT OF TINEA VERSICOLOR, TINEA CRURIS, & POSSIBLY MOST OTHER DERMATOPHYTOSES.",
+    "molecular_formula": "Na2O3S2",
+    "molecular_weight": "158.11",
+    "iupac_name": "disodium;dioxido-oxo-sulfanylidene-lambda6-sulfane",
+    "pubchem_cid": 24477,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/24477",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7789-48-2",
+    "name": "magnesium dibromide",
+    "reported_name": "7789-48-2",
+    "role": "UNK",
+    "abbreviation": "Magnesium bromide",
+    "synonyms": [
+      "232-170-9",
+      "2VC6P60SLN",
+      "7789-48-2",
+      "AKOS015832996",
+      "Br2Mg"
+    ],
+    "typical_usage": "Used in organic syntheses; Has been used as a therapeutic sedative and anticonvulsant; [Merck Index] Cosmetics -> Viscosity controlling",
+    "molecular_formula": "Br2Mg",
+    "molecular_weight": "184.11",
+    "iupac_name": "magnesium dibromide",
+    "pubchem_cid": 82241,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/82241",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "92-52-4",
+    "name": "1,1'-biphenyl",
+    "reported_name": "92-52-4",
+    "role": "UNK",
+    "abbreviation": "Biphenyl",
+    "synonyms": [
+      "1, 1'-Diphenyl",
+      "1,1''-biphenyl",
+      "1,1'-Biphenyl",
+      "1,1'-Biphenyl, 9CI",
+      "1,1'-Diphenyl"
+    ],
+    "typical_usage": "Biphenyl is used in organic syntheses, heat transfer fluids, dye carriers, food preservatives, as an intermediate for polychlorinated biphenyls, and as a fungistat in the packaging of citrus fruits. Used as a heat transfer fluid, intermediate for organic chemicals, and fungicide; [ACGIH] Also used as a dye carrier and a mold retardant in food; Low levels present in creosote and coal tar; [CHEMINFO] Pulp and Paper Processing [Category: Industry]",
+    "molecular_formula": "C12H10",
+    "molecular_weight": "154.21",
+    "iupac_name": "1,1'-biphenyl",
+    "pubchem_cid": 7095,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/7095",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "98327-87-8",
+    "name": "1H-imidazole",
+    "reported_name": "98327-87-8",
+    "role": "UNK",
+    "abbreviation": "imidazole",
+    "synonyms": [
+      "1,3-Dia-zole",
+      "1,3-Diaza-2,4-cyclopentadiene",
+      "1,3-Diaza-2,4-cyclopentadiene-",
+      "1,3-Diazole",
+      "1,4-cyclopentadiene"
+    ],
+    "typical_usage": "Used as an intermediate (pharmaceuticals, pesticides, dye intermediates, auxiliaries for textile dyeing and finishing, photographic chemicals, and corrosion inhibitors) and hardener for epoxy resins; Also used in process regulators, anti-freeze agents, photographic applications, laboratory applications, glues/adhesives, cement fillers or sealing compounds, paints, varnishes, lacquers, consumer cleaning and washing agents, swimming pool applications, and in publishing, printing, and reproduction of recorded media; [OECD SIDS] Textiles (Fiber & Fabric Manufacturing) [Category: Industry] Painting (Pigments, Binders, and Biocides) [Category: Paint]",
+    "molecular_formula": "C3H4N2",
+    "molecular_weight": "68.08",
+    "iupac_name": "1H-imidazole",
+    "pubchem_cid": 795,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/795",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "10294-26-5",
+    "name": "2-amino-2-methylpropane-1,3-diol",
+    "reported_name": "10294-26-5",
+    "role": "UNK",
+    "abbreviation": "AMPD",
+    "synonyms": [
+      "1, 2-amino-2-methyl-",
+      "1,1-Di(hydroxymethyl)ethylamine",
+      "1,3-Dihydroxy-2-amino-2-methylpropane",
+      "1,3-Dihydroxy-2-methyl-2-propylamine",
+      "1,3-Propanediol, 2-amino-2-methyl-"
+    ],
+    "typical_usage": "CIR ingredient: Aminomethyl Propanediol CIR ingredient: Aminomethylpropanediol Used to make surfactants, vulcanization accelerators, and pharmaceuticals; Also used as a biological buffer, absorbent for acidic gases, and emulsifying agent (cosmetics, mineral oil, leather dressings, textile specialties, and cleaning compounds; Also used in hair sprays and wave sets; [Merck Index]",
+    "molecular_formula": "C4H11NO2",
+    "molecular_weight": "105.14",
+    "iupac_name": "2-amino-2-methylpropane-1,3-diol",
+    "pubchem_cid": 1531,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/1531",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1184-88-9",
+    "name": "2,5-diacetyloxybenzoic acid",
+    "reported_name": "1184-88-9",
+    "role": "UNK",
+    "abbreviation": "NSC2807",
+    "synonyms": [
+      "1084-96-4",
+      "2,5-DIACETOXYBENZOIC ACID",
+      "2,5-bis(acetyloxy)benzoic acid",
+      "2,5-diacetyloxybenzoic acid",
+      "Benzoic acid,2,5-bis(acetyloxy)-"
+    ],
+    "molecular_formula": "C11H10O6",
+    "molecular_weight": "238.19",
+    "iupac_name": "2,5-diacetyloxybenzoic acid",
+    "pubchem_cid": 220285,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/220285",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "14314-42-2",
+    "name": "oxidane",
+    "reported_name": "14314-42-2",
+    "role": "UNK",
+    "abbreviation": "water",
+    "synonyms": [
+      "059QF0KO0R",
+      "1,3-epoxy-",
+      "231-791-2",
+      "686-299-4",
+      "7732-18-5"
+    ],
+    "typical_usage": "The most universal solvent; [Merck Index] Used as a solvent, suspending agent, industrial coolant, diluent, moderator in nuclear reactors, nutrient, power source, hydration of lime, paper coatings, textile processing, debarking logs, filtration, washing and scouring, sulfur mining, hydrolysis, Portland cement, hydraulic systems, steam generation, and in foods and beverages; [NTP] Permitted for use as an inert ingredient in non-food pesticide products; [EPA] Steel Producing [Category: Industry] Electroplating [Category: Plate]",
+    "molecular_formula": "H2O",
+    "molecular_weight": "18.015",
+    "iupac_name": "oxidane",
+    "pubchem_cid": 962,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/962",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "24388-23-6",
+    "name": "2,2-dimethyl-N-(4-methylphenyl)propanamide",
+    "reported_name": "24388-23-6",
+    "role": "UNK",
+    "abbreviation": "RefChem:440670",
+    "synonyms": [
+      "2,2,2-Trimethyl-N-(4-methylphenyl)acetamide",
+      "2,2,4'-TRIMETHYLPROPIONANILIDE",
+      "2,2-Dimethyl-N-(4-methylphenyl)propanamide",
+      "2,2-Dimethyl-N-(4-methylphenyl)propanamide #",
+      "21354-40-5"
+    ],
+    "molecular_formula": "C12H17NO",
+    "molecular_weight": "191.27",
+    "iupac_name": "2,2-dimethyl-N-(4-methylphenyl)propanamide",
+    "pubchem_cid": 256612,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/256612",
+    "data_source": "PubChem"
+  },
+
+
+  {
+    "cas": "2923-18-4",
+    "name": "sodium 2,2,2-trifluoroacetate",
+    "reported_name": "2923-18-4",
+    "role": "UNK",
+    "abbreviation": "EINECS 220-879-6",
+    "synonyms": [
+      "2,2,2-trifluoroacetic acid, sodium salt",
+      "220-879-6",
+      "255JUV5YVI",
+      "2923-18-4",
+      "AKOS015852669"
+    ],
+    "typical_usage": "Used in acid catalyzed reactions; [ChemIDplus]",
+    "molecular_formula": "C2F3NaO2",
+    "molecular_weight": "136.00",
+    "iupac_name": "sodium 2,2,2-trifluoroacetate",
+    "pubchem_cid": 517019,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/517019",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "29536-33-2",
+    "name": "dibutyl phosphate;tetrabutylazanium",
+    "reported_name": "29536-33-2",
+    "role": "UNK",
+    "abbreviation": "SCHEMBL6382222",
+    "synonyms": [
+      "29536-33-2",
+      "F556775",
+      "G67457",
+      "SCHEMBL6382222",
+      "Tetrabutylammonium dibutyl phosphate"
+    ],
+    "molecular_formula": "C24H54NO4P",
+    "molecular_weight": "451.7",
+    "iupac_name": "dibutyl phosphate;tetrabutylazanium",
+    "pubchem_cid": 21224710,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/21224710",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "302-01-2",
+    "name": "hydrazine",
+    "reported_name": "302-01-2",
+    "role": "UNK",
+    "abbreviation": "HYDRAZINE",
+    "synonyms": [
+      "119775-10-9",
+      "206-114-9",
+      "27RFH0GB4R",
+      "302-01-2",
+      "302-01-2(Ethanol)"
+    ],
+    "typical_usage": "/EXPL THER/ The response of red cells from patients with sickle cell disease to hydrazine treatment in vitro is to inhibit the sickled morphology, while the metabolic characteristics and osmotic fragility of the cells remain unaltered. However, the oxygen affinity of the sickle cell hemoglobin is decreased. Hydrazine is used in agricultural chemicals (pesticides), chemical blowing agents, pharmaceutical intermediates, photography chemicals, boiler water treatment for corrosion protection, textile dyes, and as fuel for rockets and spacecraft. Used as a rocket fuel, reducing agent, and additive to boiler water; [ACGIH] Hydrazine sulfate is used as a flux for soldering; [Marks, p. 318] Skin sensitization to hydrazine has also been reported in an explosives factory. [Kanerva, p. 1568] Hydrazine sulfate is used in photographic developers. [Kanerva, p. 1637] Hydrazine is used as a reducing agent in a nickel plating method that does not use electrodes. It is also used to treat water and to plate metal on glass, plastics, and fuel cells. Hydrazine sulfate is used in rare metal refining and as a biocide for fungi and mold. [NTP]",
+    "molecular_formula": "H4N2",
+    "molecular_weight": "32.046",
+    "iupac_name": "hydrazine",
+    "pubchem_cid": 9321,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/9321",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "34443-12-4",
+    "name": "2-ethylhexyl (2-methylpropan-2-yl)oxy carbonate",
+    "reported_name": "34443-12-4",
+    "role": "UNK",
+    "abbreviation": "Trigonox 117",
+    "synonyms": [
+      "2-ETHYLHEXYL TERT-BUTYL PEROXY CARBONATE",
+      "2-ethylhexyl (2-methylpropan-2-yl)oxy carbonate",
+      "2H9JK72OB3",
+      "34443-12-4",
+      "BRQMAAFGEXNUOL-UHFFFAOYSA-N"
+    ],
+    "typical_usage": "Chemical reaction regulator Plasticizer Process regulators",
+    "molecular_formula": "C13H26O4",
+    "molecular_weight": "246.34",
+    "iupac_name": "2-ethylhexyl (2-methylpropan-2-yl)oxy carbonate",
+    "pubchem_cid": 61931,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/61931",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "4271-96-9",
+    "name": "1,2-dimethyl-5,6-dihydro-4H-pyrimidine",
+    "reported_name": "4271-96-9",
+    "role": "UNK",
+    "abbreviation": "F4M3LG4PSU",
+    "synonyms": [
+      "1,2-Dimethyl-1,4,5,6-tetrahydropyrimidine",
+      "1,2-Dimethyl-1,4,5,6-tetrahydropyrimidine #",
+      "1,2-dimethyl-5,6-dihydro-4H-pyrimidine",
+      "1,4,5,6-Tetrahydro-1,2-dimethylpyrimidine",
+      "1,4,5,6-Tetrahydro-1,2-dimethylpyrimidine; 1,2-Dimethyl-1,4,5,6-tetrahydropyrimidine; 2,3-Dimethyl-3,4,5,6-tetrahydropyrimidine; Pyrantel Embonate Imp. D (EP)"
+    ],
+    "molecular_formula": "C6H12N2",
+    "molecular_weight": "112.17",
+    "iupac_name": "1,2-dimethyl-5,6-dihydro-4H-pyrimidine",
+    "pubchem_cid": 77953,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/77953",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "556-91-2",
+    "name": "aluminum tris(2-methylpropan-2-olate)",
+    "reported_name": "556-91-2",
+    "role": "UNK",
+    "abbreviation": "aluminum t-butoxide",
+    "synonyms": [
+      "2-Propanol, 2-methyl-, aluminum salt",
+      "2-Propanol, 2-methyl-, aluminum salt (3:1)",
+      "209-146-1",
+      "26-DIHYDROXYNICOTINAMIDE95",
+      "556-91-2"
+    ],
+    "molecular_formula": "C12H27AlO3",
+    "molecular_weight": "246.32",
+    "iupac_name": "aluminum tris(2-methylpropan-2-olate)",
+    "pubchem_cid": 68399,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/68399",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "61075-37-4",
+    "name": "61075-37-4",
+    "role": "UNK"
+  },
+
+  {
+    "cas": "7631-90-5",
+    "name": "sodium sulfite",
+    "reported_name": "7631-90-5",
+    "role": "UNK",
+    "abbreviation": "SCHEMBL27848886",
+    "synonyms": [
+      "DWAQJAXMDSEUJJ-UHFFFAOYSA-L",
+      "SCHEMBL27848886"
+    ],
+    "molecular_formula": "NaO3S-",
+    "molecular_weight": "103.06",
+    "iupac_name": "sodium sulfite",
+    "pubchem_cid": 6399220,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/6399220",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7704-34-9",
+    "name": "sulfane",
+    "reported_name": "7704-34-9",
+    "role": "UNK",
+    "abbreviation": "hydrogen sulfide",
+    "synonyms": [
+      "\"ASTM D2622, Sulfur Set A in Diesel: S @ 0, 5, 10, 100, 250, 500, 750, 1000 microg/g\"",
+      "\"ASTM D2622, Sulfur Set A in Heavy Oil (75 cSt): S @ 0, 5, 10, 100, 250, 500, 750, 1000 microg/g\"",
+      "\"ASTM D2622, Sulfur Set A in Light Oil (20 cSt): S @ 0, 5, 10, 100, 250, 500, 750, 1000 microg/g\"",
+      "\"ASTM D2622, Sulfur Set B in Heavy Oil (75 cSt): S @ 1000, 2500, 5000, 10000 microg/g\"",
+      "\"ASTM D2622, Sulfur Set B in Light Oil (20 cSt): S @ 1000, 2500, 5000, 10000 microg/g\""
+    ],
+    "typical_usage": "Hydrogen sulfide is produced naturally by decaying organic matter and is released from sewage sludge, liquid manure, sulfur hot springs, and natural gas. It is a byproduct of many industrial processes including petroleum refining, tanning, mining, wood pulp processing, rayon manufacturing, sugar beet processing, and hot asphalt paving. Hydrogen sulfide is used to produce elemental sulfur, sulfuric acid, and heavy water for nuclear reactors. [ATSDR Medical Management] Steel Producing [Category: Industry] Petroleum Production and Refining [Category: Industry]",
+    "molecular_formula": "H2S",
+    "molecular_weight": "34.08",
+    "iupac_name": "sulfane",
+    "pubchem_cid": 402,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/402",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7757-82-6",
+    "name": "disodium;sulfate",
+    "reported_name": "7757-82-6",
+    "role": "UNK",
+    "abbreviation": "SODIUM SULFATE",
+    "synonyms": [
+      "0YPR65R21J",
+      "13759-07-4",
+      "15124-09-1",
+      "231-820-9",
+      "36KCS0R750"
+    ],
+    "typical_usage": "Cathartics EXPL THER /The purpose of the study was/ to evaluate the early bone response to a nanotextured dental implant treated with sodium sulfate (Na2SO4), using a rabbit model. Twelve animals were randomly divided into group 1 (Control) - machined implants and group 2 (Test) - nanotextured implants. Extra-oral incision was performed to provide access to intended surgical site where the dental implant was inserted immediately after the extraction of the mandibular first premolar. Implant surface characterization was performed by scanning electron microscopy attached to energy dispersive spectroscopy and interferometry. Three weeks after surgery, the animals were induced to death and undecalcified sections of the samples were prepared for histological and histomorphometrical analysis. Surface characterization of the implant demonstrated enhanced surface area of anodized group compared to Control group with 19.2% +/- 6.2 versus 1.6 +/- 0.7, respectively. Histological evaluation demonstrated new bone formation starting from the buccal and lingual cortical walls on both groups. After three weeks, significant higher bone contact of 27% (p<0.05) was observed to nanotextured compared to machined implants (Control group). The anodization with sodium sulfate nanostructures to the implant surface that resulted in faster osseointegration. /EXPL THER/ ... 2-16 mmol/kg of sodium sulfate and sulfur-containing amino acids (cysteine or methionine) were infused intravenously for 2 hr into pentobarbital-anesthetized rats. ... Hepatic 3'-phosphoadenosine 5'-phosphosulfate concentrations increased significantly (30-35%) only when infused with the higher doses (8 or 16 mmol/kg/2 hr) of sodium sulfate.",
+    "molecular_formula": "Na2O4S",
+    "molecular_weight": "142.04",
+    "iupac_name": "disodium;sulfate",
+    "pubchem_cid": 24436,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/24436",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7761-88-8",
+    "name": "silver",
+    "reported_name": "7761-88-8",
+    "role": "UNK",
+    "abbreviation": "SILVER",
+    "synonyms": [
+      "231-131-3",
+      "3M4G523W1G",
+      "47Ag",
+      "628-860-8",
+      "7440-22-4"
+    ],
+    "typical_usage": "Currently approved \"nano-scale\"devices:.Silver nanoparticles(anti-bacterial wound dressing) Acticoat *7 /containing silver nanocrystals is a/ technology that provides a new class of silver antimicrobial barrier to prevent and reduce infection. It provides an antimicrobial barrier layer over partial and full thickness wounds such as: pressure ulcers, venous ulcers, diabetic ulcers, burns and donor and recipient graft sites. The authors report the use of nanocrystalline silver (Acticoat 7) in an acute surgical wound to prevent localized skin necrosis due to infection, thereby avoiding skin grafting as a secondary procedure. Two patients were successfully treated with Acticoat 7 dressings without using systemic antimicrobials after developing methicillin-resistant Staphylococcus aureus infection in the surgical site. Despite a history of smoking and incision through scar tissues, the wound did not progress into deep infection nor was there recurrence of infection at 2 years follow-up...",
+    "molecular_formula": "Ag",
+    "molecular_weight": "107.868",
+    "iupac_name": "silver",
+    "pubchem_cid": 23954,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/23954",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7782-49-2",
+    "name": "selane",
+    "reported_name": "7782-49-2",
+    "role": "UNK",
+    "abbreviation": "Hydrogen selenide",
+    "synonyms": [
+      "(SeH2)",
+      "231-978-9",
+      "7783-07-5",
+      "C01528",
+      "CHEBI:16503"
+    ],
+    "typical_usage": "Used in semiconductor preparation and in organic synthesis; a product of the reaction of acids and inorganic selenides; [ACGIH] Semiconductor Manufacturing [Category: Industry] Preparation of metallic selenides and organoselenium compounds; in doping as mix for preparation of semiconductor materials containing controlled amounts of significant impurities.",
+    "molecular_formula": "H2Se",
+    "molecular_weight": "80.99",
+    "iupac_name": "selane",
+    "pubchem_cid": 533,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/533",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7783-20-2",
+    "name": "molecular hydrogen",
+    "reported_name": "7783-20-2",
+    "role": "UNK",
+    "abbreviation": "Hydrogen",
+    "synonyms": [
+      "1-Butanol, titanium(4+) salt, monohydrate, homopolymer (9CI)",
+      "1-Butanol,titanium(4+)salt,monohydrate,homopolymer(9ci)",
+      "1333-74-0",
+      "1H",
+      "215-605-7"
+    ],
+    "typical_usage": "/EXPL THER/ Hydrogen-rich saline (HRS) is a novel protection against various oxidative disorders and almost all types of inflammation. Moreover, its toxicity and side effects are rarely reported. We sought to clarify the protective effect of HRS against the oxygen-induced retinopathy (OIR) in C57BL/6 J model. The OIR in the HRS treated mice and the untreated controls were systematically compared. The retinas of both groups were analyzed using high-molecular-weight FITC-dextran staining of flat-mount preparations, hematoxylin and eosin (H&E) staining of cross-sections. The distribution and expression of the vascular endothelial growth factor (VEGF) were also evaluated by the immunohistochemical measurements between postnatal days 17 (P17) and P21. The leakage and non-perfusion areas of retinal blood vessels were not alleviated in the HRS treatment group. Moreover, the number of preretinal vascular endothelial cell in the HRS treatment group was similar to that in the untreated group after exposure to hyperoxia (P>0.05). The degree of OIR was positively correlated with the expression level of VEGF. Intriguingly, the preretinal vascular endothelial cell count in the retinas of pups reared in room air with HRS treatment was 15.21+/-2.98. The preretinal vascular endothelial cell count of the HRS treated mice was significantly higher than that of the untreated group reared in room air. In summary, HRS therapy (at the dose of 10mL/day, applied between P12 and P17) did not inhibit retinal neovascularization in OIR; On the contrary, it would induce the retinal neovascularization during the development of normal retinas. /Hydrogen-rich saline/ /EXPL THER/ Acute pancreatitis (AP) is an inflammatory disease mediated by damage to acinar cells and pancreatic inflammation. In patients with AP, subsequent systemic inflammatory responses and multiple organs dysfunction commonly occur. Interactions between cytokines and oxidative stress greatly contribute to the amplification of uncontrolled inflammatory responses. Molecular hydrogen (H2) is a potent free radical scavenger that not only ameliorates oxidative stress but also lowers cytokine levels. The aim of the present study was to investigate the protective effects of H2 gas on AP both in vitro and in vivo. For the in vitro assessment, AR42J cells were treated with cerulein and then incubated in H2-rich or normal medium for 24 hr, and for the in vivo experiment, AP was induced through a retrograde infusion of 5% sodium taurocholate into the pancreatobiliary duct (0.1 mL/100 g body weight). Wistar rats were treated with inhaled air or 2% H2 gas and sacrificed 12 hr following the induction of pancreatitis. Specimens were collected and processed to measure the amylase and lipase activity levels; the myeloperoxidase activity and production levels; the cytokine mRNA expression levels; the 8-hydroxydeoxyguanosine, malondialdehyde, and glutathione levels; and the cell survival rate. Histological examinations and immunohistochemical analyses were then conducted. The results revealed significant reductions in inflammation and oxidative stress both in vitro and in vivo. Furthermore, the beneficial effects of H2 gas were associated with reductions in AR42J cell and pancreatic tissue damage. In conclusion, our results suggest that H2 gas is capable of ameliorating damage to the pancreas and AR42J cells and that H2 exerts protective effects both in vitro and in vivo on subjects with AP. Thus, the results obtained indicate that this gas may represent a novel therapy agent in the management of AP. /EXPL THER/ Hydrogen gas inhalation (HI) ameliorates cerebral and cardiac dysfunction in animal models of post-cardiac arrest syndrome (PCAS). HI for human patients with PCAS has never been studied. Between January 2014 and January 2015, 21 of 107 patients with out-of-hospital cardiac arrest achieved spontaneous return of circulation. After excluding 16 patients with specific criteria, 5 patients underwent HI together with target temperature management (TTM). No undesirable effects attributable to HI were observed and 4 patients survived 90 days with a favorable neurological outcome. HI in combination with TTM is a feasible therapy for patients with PCAS.",
+    "molecular_formula": "H2",
+    "molecular_weight": "2.016",
+    "iupac_name": "molecular hydrogen",
+    "pubchem_cid": 783,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/783",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7784-09-0",
+    "name": "1-(chloromethyl)-3,5-dinitrobenzene",
+    "reported_name": "7784-09-0",
+    "role": "UNK",
+    "abbreviation": "CCRIS 3134",
+    "synonyms": [
+      "1-(CHLOROMETHYL)-3,5-DINITRO-BENZENE",
+      "1-(Chloromethyl)-3,5-dinitrobenzene",
+      "1-(Chloromethyl)-3,5-dinitrobenzene #",
+      "1-Chloromethyl-3,5-dinitrobenzene",
+      "3,5-Dinitrobenzyl chloride"
+    ],
+    "molecular_formula": "C7H5ClN2O4",
+    "molecular_weight": "216.58",
+    "iupac_name": "1-(chloromethyl)-3,5-dinitrobenzene",
+    "pubchem_cid": 94673,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/94673",
+    "data_source": "PubChem"
+  },
+
+  {
+    "cas": "84030-20-6",
+    "name": "1-methyl-2,3,4,6,7,8-hexahydropyrimido[1,2-a]pyrimidine",
+    "reported_name": "84030-20-6",
+    "role": "UNK",
+    "abbreviation": "EINECS 281-791-1",
+    "synonyms": [
+      "1,3,4,6,7,8-Hexahydro-1-methyl-2H-pyrimido(1,2-a)pyrimidine",
+      "1,3,4,6,7,8-Hexahydro-1-methyl-2H-pyrimido[1,2-a]pyrimidine",
+      "1-Methyl-1,3,4,6,7,8-hexahydro-2H-pyrimido[1,2-a]pyrimidine",
+      "1-Methyl-1,3,4,6,7,8-hexahydro-2H-pyrimido[1,2-a]pyrimidine #",
+      "1-Methyl-2,3,4,6,7,8-hexahydro-1H-pyrimido[1,2-a]pyrimidine"
+    ],
+    "molecular_formula": "C8H15N3",
+    "molecular_weight": "153.22",
+    "iupac_name": "1-methyl-2,3,4,6,7,8-hexahydropyrimido[1,2-a]pyrimidine",
+    "pubchem_cid": 123583,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/123583",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "87-85-4",
+    "name": "1,2,3,4,5,6-hexamethylbenzene",
+    "reported_name": "87-85-4",
+    "role": "UNK",
+    "abbreviation": "HEXAMETHYLBENZENE",
+    "synonyms": [
+      "1,2,3,4,5,6-Hexamethyl-benzene",
+      "1,2,3,4,5,6-Hexamethylbenzene",
+      "1,2,3,4,5,6-Hexamethylbenzene #",
+      "201-777-0",
+      "87-85-4"
+    ],
+    "molecular_formula": "C12H18",
+    "molecular_weight": "162.27",
+    "iupac_name": "1,2,3,4,5,6-hexamethylbenzene",
+    "pubchem_cid": 6908,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/6908",
+    "data_source": "PubChem"
+  }
+]

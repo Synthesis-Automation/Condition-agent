@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "updated": "2025-09-24",
+  "updated": "2025-09-26",
   "schema": {
     "family_id": "stable identifier",
     "label": "family name",
@@ -48,25 +48,6 @@
       ],
       "example_members": [
         {
-          "name": "Sulfuric acid",
-          "abbr": "H2SO4",
-          "cas": "7664-93-9",
-          "counteranion": "HSO4−/SO4^2−",
-          "synonyms": [
-            "Sulfuric acid",
-            "Oil of vitriol"
-          ],
-          "numeric_features": {
-            "bronsted_acidity_rank": 4,
-            "lewis_acidity_rank": 1,
-            "counteranion_coordinating_rank": 2,
-            "hydrolytic_instability_rank": 1,
-            "hygroscopicity_rank": 4,
-            "oxidizing_power_rank": 2
-          },
-          "embedding_text": "type: ACID | family: Mineral acids (mineral_acids) | roles: proton_donor, dehydrating_agent | name: Sulfuric acid | abbr: H2SO4 | counteranion: HSO4−/SO4^2− | acidity: strong | hygroscopicity: high"
-        },
-        {
           "name": "Hydrochloric acid",
           "abbr": "HCl",
           "cas": "7647-01-0",
@@ -101,6 +82,74 @@
             "oxidizing_power_rank": 1
           },
           "embedding_text": "type: ACID | family: Mineral acids (mineral_acids) | roles: proton_donor | name: Phosphoric acid | abbr: H3PO4 | counteranion: phosphate | acidity: medium"
+        },
+        {
+          "name": "Potassium Formate",
+          "abbr": "Potassium Formate",
+          "cas": "590-29-4",
+          "synonyms": [
+            "Potassium Formate",
+            "590-29-4",
+            "Formic acid potassium salt",
+            "Formic acid, potassium salt",
+            "FORMIC ACID, K SALT",
+            "Mravencan draselny",
+            "DTXSID6029626",
+            "CHEBI:63316",
+            "25I90B156L",
+            "DTXCID109626",
+            "NSC-4846",
+            "DTXSID2029745",
+            "RefChem:175477",
+            "DTXCID509745",
+            "209-677-9",
+            "HCOOK"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 1,
+            "counteranion_coordinating_rank": 2,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 2
+          },
+          "aliases": [
+            "590-29-4",
+            "Formic acid potassium salt",
+            "Formic acid, potassium salt",
+            "FORMIC ACID, K SALT",
+            "Mravencan draselny",
+            "DTXSID6029626",
+            "CHEBI:63316",
+            "25I90B156L",
+            "DTXCID109626",
+            "NSC-4846",
+            "DTXSID2029745",
+            "RefChem:175477",
+            "DTXCID509745",
+            "209-677-9",
+            "HCOOK"
+          ],
+          "embedding_text": "type: ACID | family: Mineral acids (H2SO4/HCl/H3PO4) (mineral_acids) | functional_roles: proton_donor; dehydrating_agent | effect_bands: bronsted_acidity_band: strong; lewis_acidity_band: low; counteranion_coordinating_band: medium; hydrolytic_instability_band: low; hygroscopicity_band: high; oxidizing_power_band: low | moisture: low | solvent_classes: water_polar_protic; alcohols_primary; halogenated | use_cases: Aqueous acid catalysis; Esterifications (with dehydrating assistance); Deprotection of acid-labile groups | best_for: Substrates tolerant of water; Cost-sensitive processes | avoid_when: Water-sensitive intermediates; Strongly coordinating anions problematic in metal catalysis | ehs: corrosive | name: Potassium Formate | abbr: Potassium Formate | CAS: 590-29-4 | synonyms: Potassium Formate; 590-29-4; Formic acid potassium salt; Formic acid, potassium salt; FORMIC ACID, K SALT; Mravencan draselny; DTXSID6029626; CHEBI:63316; 25I90B156L; DTXCID109626; NSC-4846; DTXSID2029745; RefChem:175477; DTXCID509745; 209-677-9; HCOOK"
+        },
+        {
+          "name": "Sulfuric acid",
+          "abbr": "H2SO4",
+          "cas": "7664-93-9",
+          "counteranion": "HSO4−/SO4^2−",
+          "synonyms": [
+            "Sulfuric acid",
+            "Oil of vitriol"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 1,
+            "counteranion_coordinating_rank": 2,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 4,
+            "oxidizing_power_rank": 2
+          },
+          "embedding_text": "type: ACID | family: Mineral acids (mineral_acids) | roles: proton_donor, dehydrating_agent | name: Sulfuric acid | abbr: H2SO4 | counteranion: HSO4−/SO4^2− | acidity: strong | hygroscopicity: high"
         }
       ],
       "use_cases": [
@@ -175,6 +224,73 @@
       ],
       "example_members": [
         {
+          "name": "Methanesulfonic acid",
+          "abbr": "MsOH",
+          "cas": "75-75-2",
+          "counteranion": "MsO−",
+          "synonyms": [
+            "Mesylic acid"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 3,
+            "oxidizing_power_rank": 0
+          },
+          "embedding_text": "type: ACID | family: Sulfonic acids (sulfonic_acids) | roles: proton_donor | name: Methanesulfonic acid | abbr: MsOH | counteranion: MsO− | acidity: strong"
+        },
+        {
+          "name": "p-Toluenesulfonic acid",
+          "abbr": "p-Toluenesulfonic acid",
+          "cas": "104-15-4",
+          "synonyms": [
+            "p-Toluenesulfonic acid",
+            "4-Methylbenzenesulfonic acid",
+            "104-15-4",
+            "4-Toluenesulfonic acid",
+            "p-Toluenesulphonic acid",
+            "Tosic acid",
+            "Toluene-4-sulfonic acid",
+            "p-Tolylsulfonic acid",
+            "Benzenesulfonic acid, 4-methyl-",
+            "Tosylic acid",
+            "Toluenesulfonic acid",
+            "p-Methylbenzenesulfonic acid",
+            "p-Methylphenylsulfonic acid",
+            "Eltesol",
+            "Methylbenzenesulfonic acid",
+            "Cyclophil P T S A"
+          ],
+          "numeric_features": {
+            "bronsted_acidity_rank": 4,
+            "lewis_acidity_rank": 0,
+            "counteranion_coordinating_rank": 1,
+            "hydrolytic_instability_rank": 1,
+            "hygroscopicity_rank": 2,
+            "oxidizing_power_rank": 0
+          },
+          "aliases": [
+            "4-Methylbenzenesulfonic acid",
+            "104-15-4",
+            "4-Toluenesulfonic acid",
+            "p-Toluenesulphonic acid",
+            "Tosic acid",
+            "Toluene-4-sulfonic acid",
+            "p-Tolylsulfonic acid",
+            "Benzenesulfonic acid, 4-methyl-",
+            "Tosylic acid",
+            "Toluenesulfonic acid",
+            "p-Methylbenzenesulfonic acid",
+            "p-Methylphenylsulfonic acid",
+            "Eltesol",
+            "Methylbenzenesulfonic acid",
+            "Cyclophil P T S A"
+          ],
+          "embedding_text": "type: ACID | family: Aryl/alkyl sulfonic acids (p‑TsOH/MsOH) (sulfonic_acids) | functional_roles: proton_donor | effect_bands: bronsted_acidity_band: strong; lewis_acidity_band: very low; counteranion_coordinating_band: low; hydrolytic_instability_band: low; hygroscopicity_band: medium; oxidizing_power_band: very low | moisture: low | solvent_classes: ethers_cyclic_glymes; esters_anhydrides; halogenated; alcohols_secondary | use_cases: Fischer esterification; Acetalization; Protecting group chemistry | best_for: Non-aqueous acid catalysis with non-coordinating anions | avoid_when: Strong base present; sulfonate formation unwanted | ehs: corrosive | name: p-Toluenesulfonic acid | abbr: p-Toluenesulfonic acid | CAS: 104-15-4 | synonyms: p-Toluenesulfonic acid; 4-Methylbenzenesulfonic acid; 104-15-4; 4-Toluenesulfonic acid; p-Toluenesulphonic acid; Tosic acid; Toluene-4-sulfonic acid; p-Tolylsulfonic acid; Benzenesulfonic acid, 4-methyl-; Tosylic acid; Toluenesulfonic acid; p-Methylbenzenesulfonic acid; p-Methylphenylsulfonic acid; Eltesol; Methylbenzenesulfonic acid; Cyclophil P T S A"
+        },
+        {
           "name": "p-Toluenesulfonic acid monohydrate",
           "abbr": "p‑TsOH·H2O",
           "cas": "6192-52-5",
@@ -192,24 +308,6 @@
             "oxidizing_power_rank": 0
           },
           "embedding_text": "type: ACID | family: Sulfonic acids (sulfonic_acids) | roles: proton_donor | name: p-Toluenesulfonic acid | abbr: p‑TsOH | counteranion: TsO− | acidity: strong"
-        },
-        {
-          "name": "Methanesulfonic acid",
-          "abbr": "MsOH",
-          "cas": "75-75-2",
-          "counteranion": "MsO−",
-          "synonyms": [
-            "Mesylic acid"
-          ],
-          "numeric_features": {
-            "bronsted_acidity_rank": 4,
-            "lewis_acidity_rank": 0,
-            "counteranion_coordinating_rank": 1,
-            "hydrolytic_instability_rank": 1,
-            "hygroscopicity_rank": 3,
-            "oxidizing_power_rank": 0
-          },
-          "embedding_text": "type: ACID | family: Sulfonic acids (sulfonic_acids) | roles: proton_donor | name: Methanesulfonic acid | abbr: MsOH | counteranion: MsO− | acidity: strong"
         }
       ],
       "use_cases": [

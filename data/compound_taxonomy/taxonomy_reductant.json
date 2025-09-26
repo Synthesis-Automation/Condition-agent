@@ -1,7 +1,7 @@
 {
   "kind": "reductant",
   "version": "1.0.0",
-  "updated": "2025-09-16",
+  "updated": "2025-09-26",
   "schema": {
     "family_id": "stable identifier",
     "label": "human-readable family name",
@@ -235,6 +235,47 @@
             "air_stable": true
           },
           "embedding_text": "type: REDUCTANT | family: Organic Reductants (organic_reductants) | name: Hantzsch ester | abbr: HEH | CAS: 13063-86-4 | use_cases: Photoredox"
+        },
+        {
+          "name": "Hantzsch ester",
+          "abbr": "Hantzsch ester",
+          "cas": "1149-23-1",
+          "synonyms": [
+            "Hantzsch ester",
+            "1149-23-1",
+            "Diethyl 1,4-dihydro-2,6-dimethyl-3,5-pyridinedicarboxylate",
+            "Etidin",
+            "Diethone",
+            "Hantzsch's dihydropyridine",
+            "3,5-Pyridinedicarboxylic acid, 1,4-dihydro-2,6-dimethyl-, diethyl ester",
+            "diludin",
+            "GWN6123BUG",
+            "2,6-Dimethyl-3,5-diethoxycarbonyl-1,4-dihydropyridine",
+            "DTXSID80150895",
+            "2,6-dimethyl-3,5-dicarbethoxy-1,4-dihydropyridine",
+            "ethidin",
+            "DM-DEOC-DHP",
+            "RefChem:139231",
+            "DTXCID4073386"
+          ],
+          "aliases": [
+            "1149-23-1",
+            "Diethyl 1,4-dihydro-2,6-dimethyl-3,5-pyridinedicarboxylate",
+            "Etidin",
+            "Diethone",
+            "Hantzsch's dihydropyridine",
+            "3,5-Pyridinedicarboxylic acid, 1,4-dihydro-2,6-dimethyl-, diethyl ester",
+            "diludin",
+            "GWN6123BUG",
+            "2,6-Dimethyl-3,5-diethoxycarbonyl-1,4-dihydropyridine",
+            "DTXSID80150895",
+            "2,6-dimethyl-3,5-dicarbethoxy-1,4-dihydropyridine",
+            "ethidin",
+            "DM-DEOC-DHP",
+            "RefChem:139231",
+            "DTXCID4073386"
+          ],
+          "embedding_text": "type: REDUCTANT | family: Organic Reductants (Hantzsch ester, TDAE, ascorbate) (organic_reductants) | class: organic electron/hydride donors | mechanism: SET; Hydride transfer | strength: 2 | use_cases: Photoredox reductive couplings; Organocatalytic reductions | best_for: Mild, functional-group-tolerant reductions | avoid_when: Air/O2 sensitive (TDAE) | ehs: none | name: Hantzsch ester | abbr: Hantzsch ester | CAS: 1149-23-1 | synonyms: Hantzsch ester; 1149-23-1; Diethyl 1,4-dihydro-2,6-dimethyl-3,5-pyridinedicarboxylate; Etidin; Diethone; Hantzsch's dihydropyridine; 3,5-Pyridinedicarboxylic acid, 1,4-dihydro-2,6-dimethyl-, diethyl ester; diludin; GWN6123BUG; 2,6-Dimethyl-3,5-diethoxycarbonyl-1,4-dihydropyridine; DTXSID80150895; 2,6-dimethyl-3,5-dicarbethoxy-1,4-dihydropyridine; ethidin; DM-DEOC-DHP; RefChem:139231; DTXCID4073386"
         }
       ]
     },

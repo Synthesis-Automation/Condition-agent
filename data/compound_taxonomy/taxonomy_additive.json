@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2025-09-24",
+  "updated": "2025-09-26",
   "schema": {
     "family_id": "stable identifier",
     "label": "family name",
@@ -46,6 +46,55 @@
       ],
       "example_members": [
         {
+          "name": "Sodium Chloride",
+          "abbr": "Sodium Chloride",
+          "cas": "7647-14-5",
+          "synonyms": [
+            "Sodium Chloride",
+            "7647-14-5",
+            "Table salt",
+            "Common salt",
+            "Dendritis",
+            "Purex",
+            "Sodium chloric",
+            "Iodized salt",
+            "Top flake",
+            "NaCl",
+            "Sodium chloride (NaCl)",
+            "Flexivial",
+            "Gingivyl",
+            "Hyposaline",
+            "Sodium monochloride",
+            "Slow Sodium"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 3,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 2,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "aliases": [
+            "7647-14-5",
+            "Table salt",
+            "Common salt",
+            "Dendritis",
+            "Purex",
+            "Sodium chloric",
+            "Iodized salt",
+            "Top flake",
+            "NaCl",
+            "Sodium chloride (NaCl)",
+            "Flexivial",
+            "Gingivyl",
+            "Hyposaline",
+            "Sodium monochloride",
+            "Slow Sodium"
+          ],
+          "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | functional_roles: phase_transfer | effect_bands: phase_transfer_power: high; water_scavenging_power: low; halide_promotion_power: medium; halide_scavenging_power: very low; lewis_acidity_band: very low; hygroscopicity_band: medium | moisture: low | solvent_classes: hydrocarbons_aromatic; hydrocarbons_aliphatic_linear; ethers_cyclic_glymes | use_cases: Biphasic substitutions; Alkylations under heterogeneous conditions; Anion shuttling in polar/aprotic media | best_for: Poorly soluble inorganic salts; Biphasic systems | avoid_when: Halide-sensitive catalysts (Cl−/Br− binding) | ehs: aquatic_toxicity, hygroscopic | name: Sodium Chloride | abbr: Sodium Chloride | CAS: 7647-14-5 | synonyms: Sodium Chloride; 7647-14-5; Table salt; Common salt; Dendritis; Purex; Sodium chloric; Iodized salt; Top flake; NaCl; Sodium chloride (NaCl); Flexivial; Gingivyl; Hyposaline; Sodium monochloride; Slow Sodium"
+        },
+        {
           "name": "Tetrabutylammonium bromide",
           "abbr": "TBAB",
           "cas": "1643-19-2",
@@ -64,24 +113,6 @@
           "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium bromide | abbr: TBAB | CAS: 1643-19-2 | PT power: high | halide promotion: medium | hygroscopicity: medium | use_cases: Biphasic alkylations; Nucleophilic substitutions; Anion shuttling"
         },
         {
-          "name": "Tetrabutylammonium iodide",
-          "abbr": "TBAI",
-          "cas": "311-89-7",
-          "synonyms": [
-            "TBAI",
-            "Tetrabutylammoniumiodide"
-          ],
-          "numeric_features": {
-            "phase_transfer_rank": 3,
-            "water_scavenging_rank": 1,
-            "halide_promotion_rank": 3,
-            "halide_scavenging_rank": 0,
-            "lewis_acidity_rank": 0,
-            "hygroscopicity_rank": 2
-          },
-          "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium iodide | abbr: TBAI | CAS: 311-89-7 | PT power: high | halide promotion: high | hygroscopicity: medium | use_cases: Finkelstein-type halide exchange; Pd/Ni couplings (iodide promoter)"
-        },
-        {
           "name": "Tetrabutylammonium chloride",
           "abbr": "TBACl",
           "cas": "1112-67-0",
@@ -98,6 +129,24 @@
             "hygroscopicity_rank": 2
           },
           "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium chloride | abbr: TBACl | CAS: 1112-67-0 | PT power: high | halide promotion: low | hygroscopicity: medium | use_cases: Phase-transfer catalysis; Ion pairing"
+        },
+        {
+          "name": "Tetrabutylammonium iodide",
+          "abbr": "TBAI",
+          "cas": "311-89-7",
+          "synonyms": [
+            "TBAI",
+            "Tetrabutylammoniumiodide"
+          ],
+          "numeric_features": {
+            "phase_transfer_rank": 3,
+            "water_scavenging_rank": 1,
+            "halide_promotion_rank": 3,
+            "halide_scavenging_rank": 0,
+            "lewis_acidity_rank": 0,
+            "hygroscopicity_rank": 2
+          },
+          "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium iodide | abbr: TBAI | CAS: 311-89-7 | PT power: high | halide promotion: high | hygroscopicity: medium | use_cases: Finkelstein-type halide exchange; Pd/Ni couplings (iodide promoter)"
         }
       ],
       "use_cases": [

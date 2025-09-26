@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2025-09-25",
+  "updated": "2025-09-26",
   "schema": {
     "family_id": "stable identifier",
     "label": "family name",
@@ -249,6 +249,116 @@
       ],
       "example_members": [
         {
+          "name": "Lithium hydroxide",
+          "abbr": "LiOH",
+          "cas": "1310-66-3",
+          "synonyms": [
+            "LiOH",
+            "Lithiumhydroxide"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | name: Lithium hydroxide | abbr: LiOH | CAS: 1310-66-3 | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water, alcohols_primary, alcohols_secondary, amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | synonyms: LiOH"
+        },
+        {
+          "name": "Lithium Hydroxide",
+          "abbr": "Lithium Hydroxide",
+          "cas": "1310-65-2",
+          "synonyms": [
+            "Lithium Hydroxide",
+            "1310-65-2",
+            "Lithium hydrate",
+            "Lithium hydroxide anhydrous",
+            "Lithium hydroxide (Li(OH))",
+            "903YL31JAS",
+            "CHEBI:33979",
+            "DTXSID70893845",
+            "215-183-4",
+            "RefChem:5957",
+            "DTXCID801323885",
+            "G51XLP968G",
+            "lithium;hydroxide",
+            "LiOH",
+            "Lithiumhydroxid",
+            "Lithium hydroxide, anhydrous"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "aliases": [
+            "1310-65-2",
+            "Lithium hydrate",
+            "Lithium hydroxide anhydrous",
+            "Lithium hydroxide (Li(OH))",
+            "903YL31JAS",
+            "CHEBI:33979",
+            "DTXSID70893845",
+            "215-183-4",
+            "RefChem:5957",
+            "DTXCID801323885",
+            "G51XLP968G",
+            "lithium;hydroxide",
+            "LiOH",
+            "Lithiumhydroxid",
+            "Lithium hydroxide, anhydrous"
+          ],
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water; alcohols_primary; alcohols_secondary; amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | ehs: corrosive_or_caustic | name: Lithium Hydroxide | abbr: Lithium Hydroxide | CAS: 1310-65-2 | synonyms: Lithium Hydroxide; 1310-65-2; Lithium hydrate; Lithium hydroxide anhydrous; Lithium hydroxide (Li(OH)); 903YL31JAS; CHEBI:33979; DTXSID70893845; 215-183-4; RefChem:5957; DTXCID801323885; G51XLP968G; lithium;hydroxide; LiOH; Lithiumhydroxid; Lithium hydroxide, anhydrous"
+        },
+        {
+          "name": "Monosodium phosphate",
+          "abbr": "Monosodium phosphate",
+          "cas": "7558-80-7",
+          "synonyms": [
+            "Monosodium phosphate",
+            "7558-80-7",
+            "SODIUM DIHYDROGEN PHOSPHATE",
+            "Sodium acid phosphate",
+            "Sodium phosphate, monobasic",
+            "Sodium primary phosphate",
+            "Acid sodium phosphate",
+            "Monosodium dihydrogen orthophosphate",
+            "Monosodium monophosphate",
+            "Monobasic sodium phosphate",
+            "Monosodium phosphate, anhydrous",
+            "Monosodium orthophosphate",
+            "Monosorb XP-4",
+            "Primary sodium phosphate",
+            "Sodium dihydrogen phosphate, anhydrous",
+            "Sodium phosphate (Na(H2PO4))"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "aliases": [
+            "7558-80-7",
+            "SODIUM DIHYDROGEN PHOSPHATE",
+            "Sodium acid phosphate",
+            "Sodium phosphate, monobasic",
+            "Sodium primary phosphate",
+            "Acid sodium phosphate",
+            "Monosodium dihydrogen orthophosphate",
+            "Monosodium monophosphate",
+            "Monobasic sodium phosphate",
+            "Monosodium phosphate, anhydrous",
+            "Monosodium orthophosphate",
+            "Monosorb XP-4",
+            "Primary sodium phosphate",
+            "Sodium dihydrogen phosphate, anhydrous",
+            "Sodium phosphate (Na(H2PO4))"
+          ],
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water; alcohols_primary; alcohols_secondary; amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | ehs: corrosive_or_caustic | name: Monosodium phosphate | abbr: Monosodium phosphate | CAS: 7558-80-7 | synonyms: Monosodium phosphate; 7558-80-7; SODIUM DIHYDROGEN PHOSPHATE; Sodium acid phosphate; Sodium phosphate, monobasic; Sodium primary phosphate; Acid sodium phosphate; Monosodium dihydrogen orthophosphate; Monosodium monophosphate; Monobasic sodium phosphate; Monosodium phosphate, anhydrous; Monosodium orthophosphate; Monosorb XP-4; Primary sodium phosphate; Sodium dihydrogen phosphate, anhydrous; Sodium phosphate (Na(H2PO4))"
+        },
+        {
           "name": "Potassium hydroxide",
           "abbr": "KOH",
           "cas": "1310-58-3",
@@ -281,12 +391,26 @@
           "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | name: Sodium hydroxide | abbr: NaOH | CAS: 1310-73-2 | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water, alcohols_primary, alcohols_secondary, amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | synonyms: NaOH"
         },
         {
-          "name": "Lithium hydroxide",
-          "abbr": "LiOH",
-          "cas": "1310-66-3",
+          "name": "Trimethylamine",
+          "abbr": "Trimethylamine",
+          "cas": "75-50-3",
           "synonyms": [
-            "LiOH",
-            "Lithiumhydroxide"
+            "Trimethylamine",
+            "N,N-dimethylmethanamine",
+            "75-50-3",
+            "Methanamine, N,N-dimethyl-",
+            "N-Trimethylamine",
+            "Dimethylmethaneamine",
+            "(CH3)3N",
+            "FEMA No. 3241",
+            "DTXSID2026238",
+            "LHH7G8O305",
+            "CHEBI:18139",
+            "Trimethylamine, anhydrous",
+            "DTXCID106238",
+            "RefChem:6328",
+            "200-875-0",
+            "Trimethylamine anhydrous"
           ],
           "numeric_features": {
             "strength_rank": 3,
@@ -294,7 +418,24 @@
             "steric_rank": 1,
             "moisture_rank": 2
           },
-          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | name: Lithium hydroxide | abbr: LiOH | CAS: 1310-66-3 | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water, alcohols_primary, alcohols_secondary, amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | synonyms: LiOH"
+          "aliases": [
+            "N,N-dimethylmethanamine",
+            "75-50-3",
+            "Methanamine, N,N-dimethyl-",
+            "N-Trimethylamine",
+            "Dimethylmethaneamine",
+            "(CH3)3N",
+            "FEMA No. 3241",
+            "DTXSID2026238",
+            "LHH7G8O305",
+            "CHEBI:18139",
+            "Trimethylamine, anhydrous",
+            "DTXCID106238",
+            "RefChem:6328",
+            "200-875-0",
+            "Trimethylamine anhydrous"
+          ],
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water; alcohols_primary; alcohols_secondary; amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | ehs: corrosive_or_caustic | name: Trimethylamine | abbr: Trimethylamine | CAS: 75-50-3 | synonyms: Trimethylamine; N,N-dimethylmethanamine; 75-50-3; Methanamine, N,N-dimethyl-; N-Trimethylamine; Dimethylmethaneamine; (CH3)3N; FEMA No. 3241; DTXSID2026238; LHH7G8O305; CHEBI:18139; Trimethylamine, anhydrous; DTXCID106238; RefChem:6328; 200-875-0; Trimethylamine anhydrous"
         }
       ],
       "notes": "NaOH/KOH/LiOH; strong in water and polar protic media; nucleophilic and can hydrolyze sensitive substrates.",
@@ -634,6 +775,241 @@
       ],
       "example_members": [
         {
+          "name": "1,1,3,3-Tetramethylguanidine",
+          "abbr": "1,1,3,3-Tetramethylguanidine",
+          "cas": "80-70-6",
+          "synonyms": [
+            "1,1,3,3-Tetramethylguanidine",
+            "80-70-6",
+            "N,N,N',N'-Tetramethylguanidine",
+            "Guanidine, N,N,N',N'-tetramethyl-",
+            "VEZ101E7ZU",
+            "NSC-148309",
+            "DTXSID2058835",
+            "RefChem:70941",
+            "DTXCID7048168",
+            "201-302-7",
+            "Tetramethylguanidine",
+            "MFCD00008323",
+            "Guanidine, 1,1,3,3-tetramethyl-",
+            "N,N-1,1,3,3-TETRAMETHYLGUANIDINE",
+            "UNII-VEZ101E7ZU",
+            "CCRIS 6689"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "80-70-6",
+            "N,N,N',N'-Tetramethylguanidine",
+            "Guanidine, N,N,N',N'-tetramethyl-",
+            "VEZ101E7ZU",
+            "NSC-148309",
+            "DTXSID2058835",
+            "RefChem:70941",
+            "DTXCID7048168",
+            "201-302-7",
+            "Tetramethylguanidine",
+            "MFCD00008323",
+            "Guanidine, 1,1,3,3-tetramethyl-",
+            "N,N-1,1,3,3-TETRAMETHYLGUANIDINE",
+            "UNII-VEZ101E7ZU",
+            "CCRIS 6689"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: 1,1,3,3-Tetramethylguanidine | abbr: 1,1,3,3-Tetramethylguanidine | CAS: 80-70-6 | synonyms: 1,1,3,3-Tetramethylguanidine; 80-70-6; N,N,N',N'-Tetramethylguanidine; Guanidine, N,N,N',N'-tetramethyl-; VEZ101E7ZU; NSC-148309; DTXSID2058835; RefChem:70941; DTXCID7048168; 201-302-7; Tetramethylguanidine; MFCD00008323; Guanidine, 1,1,3,3-tetramethyl-; N,N-1,1,3,3-TETRAMETHYLGUANIDINE; UNII-VEZ101E7ZU; CCRIS 6689"
+        },
+        {
+          "name": "2-Propanol, 2-methyl-, lithium salt (1:1)",
+          "abbr": "2-Propanol, 2-methyl-, lithium salt (1:1)",
+          "cas": "1907-33-1",
+          "synonyms": [
+            "2-Propanol, 2-methyl-, lithium salt (1:1)",
+            "1907-33-1",
+            "Lithium 2-methylpropan-2-olate",
+            "Lithium tert-butylate",
+            "tert-Butoxylithium",
+            "Lithium tert-butanolate",
+            "tert-Butyl alcohol, lithium salt",
+            "2-Methyl-2-propanol lithium salt",
+            "EINECS 217-611-5",
+            "2-Propanol, 2-methyl-, lithium salt",
+            "DTXSID9051828",
+            "RefChem:265966",
+            "DTXCID4030384",
+            "217-611-5",
+            "Lithium tert-butoxide",
+            "lithium;2-methylpropan-2-olate"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "1907-33-1",
+            "Lithium 2-methylpropan-2-olate",
+            "Lithium tert-butylate",
+            "tert-Butoxylithium",
+            "Lithium tert-butanolate",
+            "tert-Butyl alcohol, lithium salt",
+            "2-Methyl-2-propanol lithium salt",
+            "EINECS 217-611-5",
+            "2-Propanol, 2-methyl-, lithium salt",
+            "DTXSID9051828",
+            "RefChem:265966",
+            "DTXCID4030384",
+            "217-611-5",
+            "Lithium tert-butoxide",
+            "lithium;2-methylpropan-2-olate"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: 2-Propanol, 2-methyl-, lithium salt (1:1) | abbr: 2-Propanol, 2-methyl-, lithium salt (1:1) | CAS: 1907-33-1 | synonyms: 2-Propanol, 2-methyl-, lithium salt (1:1); 1907-33-1; Lithium 2-methylpropan-2-olate; Lithium tert-butylate; tert-Butoxylithium; Lithium tert-butanolate; tert-Butyl alcohol, lithium salt; 2-Methyl-2-propanol lithium salt; EINECS 217-611-5; 2-Propanol, 2-methyl-, lithium salt; DTXSID9051828; RefChem:265966; DTXCID4030384; 217-611-5; Lithium tert-butoxide; lithium;2-methylpropan-2-olate"
+        },
+        {
+          "name": "2-tert-Butyl-1,1,3,3-tetramethylguanidine",
+          "abbr": "2-tert-Butyl-1,1,3,3-tetramethylguanidine",
+          "cas": "29166-72-1",
+          "synonyms": [
+            "2-tert-Butyl-1,1,3,3-tetramethylguanidine",
+            "29166-72-1",
+            "DTXSID10393758",
+            "RefChem:89401",
+            "DTXCID00344618",
+            "629-522-2",
+            "2-(tert-Butyl)-1,1,3,3-tetramethylguanidine",
+            "Guanidine, N''-(1,1-dimethylethyl)-N,N,N',N'-tetramethyl-",
+            "MFCD01862972",
+            "N''-TERT-BUTYL-N,N,N',N'-TETRAMETHYLGUANIDINE",
+            "Tetramethyl-2-tert-butylguanidine",
+            "2-Tert-butyl-1,1,3,3-tetramethyl-guanidine",
+            "N''-(1,1-dimethylethyl)-N,N,N',N'-tetramethylguanidine",
+            "Barton base",
+            "BTMG",
+            "((CH3)2N)2C=N(t-C4H9)"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "29166-72-1",
+            "DTXSID10393758",
+            "RefChem:89401",
+            "DTXCID00344618",
+            "629-522-2",
+            "2-(tert-Butyl)-1,1,3,3-tetramethylguanidine",
+            "Guanidine, N''-(1,1-dimethylethyl)-N,N,N',N'-tetramethyl-",
+            "MFCD01862972",
+            "N''-TERT-BUTYL-N,N,N',N'-TETRAMETHYLGUANIDINE",
+            "Tetramethyl-2-tert-butylguanidine",
+            "2-Tert-butyl-1,1,3,3-tetramethyl-guanidine",
+            "N''-(1,1-dimethylethyl)-N,N,N',N'-tetramethylguanidine",
+            "Barton base",
+            "BTMG",
+            "((CH3)2N)2C=N(t-C4H9)"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: 2-tert-Butyl-1,1,3,3-tetramethylguanidine | abbr: 2-tert-Butyl-1,1,3,3-tetramethylguanidine | CAS: 29166-72-1 | synonyms: 2-tert-Butyl-1,1,3,3-tetramethylguanidine; 29166-72-1; DTXSID10393758; RefChem:89401; DTXCID00344618; 629-522-2; 2-(tert-Butyl)-1,1,3,3-tetramethylguanidine; Guanidine, N''-(1,1-dimethylethyl)-N,N,N',N'-tetramethyl-; MFCD01862972; N''-TERT-BUTYL-N,N,N',N'-TETRAMETHYLGUANIDINE; Tetramethyl-2-tert-butylguanidine; 2-Tert-butyl-1,1,3,3-tetramethyl-guanidine; N''-(1,1-dimethylethyl)-N,N,N',N'-tetramethylguanidine; Barton base; BTMG; ((CH3)2N)2C=N(t-C4H9)"
+        },
+        {
+          "name": "Calcium Carbonate",
+          "abbr": "Calcium Carbonate",
+          "cas": "471-34-1",
+          "synonyms": [
+            "Calcium Carbonate",
+            "471-34-1",
+            "Aeromatt",
+            "Calcium carbonate (1:1)",
+            "Carbonic acid calcium salt (1:1)",
+            "Calofort U",
+            "Albaglos",
+            "Calcicoll",
+            "Calseeds",
+            "Caltrate",
+            "Calwhite",
+            "Chemcarb",
+            "Duramite",
+            "Hydrocarb",
+            "Kotamite",
+            "Microcarb"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "471-34-1",
+            "Aeromatt",
+            "Calcium carbonate (1:1)",
+            "Carbonic acid calcium salt (1:1)",
+            "Calofort U",
+            "Albaglos",
+            "Calcicoll",
+            "Calseeds",
+            "Caltrate",
+            "Calwhite",
+            "Chemcarb",
+            "Duramite",
+            "Hydrocarb",
+            "Kotamite",
+            "Microcarb"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Calcium Carbonate | abbr: Calcium Carbonate | CAS: 471-34-1 | synonyms: Calcium Carbonate; 471-34-1; Aeromatt; Calcium carbonate (1:1); Carbonic acid calcium salt (1:1); Calofort U; Albaglos; Calcicoll; Calseeds; Caltrate; Calwhite; Chemcarb; Duramite; Hydrocarb; Kotamite; Microcarb"
+        },
+        {
+          "name": "Dabco",
+          "abbr": "Dabco",
+          "cas": "280-57-9",
+          "synonyms": [
+            "Dabco",
+            "1,4-Diazabicyclo[2.2.2]octane",
+            "Triethylenediamine",
+            "280-57-9",
+            "1,4-DIAZABICYCLO(2.2.2)OCTANE",
+            "1,4-Ethylenepiperazine",
+            "Dabco 33LV",
+            "Dabco crystal",
+            "TEDA",
+            "Texacat TD 100",
+            "Dabco EG",
+            "N,N'-endo-Ethylenepiperazine",
+            "1,4-Diazabicyclo-octane",
+            "D 33LV",
+            "Thancat TD 33",
+            "DTXSID0022016"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "1,4-Diazabicyclo[2.2.2]octane",
+            "Triethylenediamine",
+            "280-57-9",
+            "1,4-DIAZABICYCLO(2.2.2)OCTANE",
+            "1,4-Ethylenepiperazine",
+            "Dabco 33LV",
+            "Dabco crystal",
+            "TEDA",
+            "Texacat TD 100",
+            "Dabco EG",
+            "N,N'-endo-Ethylenepiperazine",
+            "1,4-Diazabicyclo-octane",
+            "D 33LV",
+            "Thancat TD 33",
+            "DTXSID0022016"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Dabco | abbr: Dabco | CAS: 280-57-9 | synonyms: Dabco; 1,4-Diazabicyclo[2.2.2]octane; Triethylenediamine; 280-57-9; 1,4-DIAZABICYCLO(2.2.2)OCTANE; 1,4-Ethylenepiperazine; Dabco 33LV; Dabco crystal; TEDA; Texacat TD 100; Dabco EG; N,N'-endo-Ethylenepiperazine; 1,4-Diazabicyclo-octane; D 33LV; Thancat TD 33; DTXSID0022016"
+        },
+        {
           "name": "N,N-Diisopropylethylamine",
           "abbr": "DIPEA",
           "cas": "7087-68-5",
@@ -656,6 +1032,53 @@
             "moisture_rank": 1
           },
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: N,N-Diisopropylethylamine | abbr: DIPEA | CAS: 7087-68-5 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: DIEA; DIPEA; Hünig's base; i-Pr2NEt"
+        },
+        {
+          "name": "Potassium Bicarbonate",
+          "abbr": "Potassium Bicarbonate",
+          "cas": "298-14-6",
+          "synonyms": [
+            "Potassium Bicarbonate",
+            "298-14-6",
+            "Potassium hydrogen carbonate",
+            "Potassium hydrogencarbonate",
+            "Potassium acid carbonate",
+            "Monopotassium carbonate",
+            "CARBONIC ACID, MONOPOTASSIUM SALT",
+            "Armicarb",
+            "KHCO3",
+            "Kafylox",
+            "Kaligreen",
+            "Milstop",
+            "Purple k",
+            "HM5Z15LEBN",
+            "CHEBI:81862",
+            "INS-501(II)"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "298-14-6",
+            "Potassium hydrogen carbonate",
+            "Potassium hydrogencarbonate",
+            "Potassium acid carbonate",
+            "Monopotassium carbonate",
+            "CARBONIC ACID, MONOPOTASSIUM SALT",
+            "Armicarb",
+            "KHCO3",
+            "Kafylox",
+            "Kaligreen",
+            "Milstop",
+            "Purple k",
+            "HM5Z15LEBN",
+            "CHEBI:81862",
+            "INS-501(II)"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Potassium Bicarbonate | abbr: Potassium Bicarbonate | CAS: 298-14-6 | synonyms: Potassium Bicarbonate; 298-14-6; Potassium hydrogen carbonate; Potassium hydrogencarbonate; Potassium acid carbonate; Monopotassium carbonate; CARBONIC ACID, MONOPOTASSIUM SALT; Armicarb; KHCO3; Kafylox; Kaligreen; Milstop; Purple k; HM5Z15LEBN; CHEBI:81862; INS-501(II)"
         },
         {
           "name": "Potassium phenoxide",
@@ -705,6 +1128,53 @@
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Potassium phenoxide | abbr: Potassium phenoxide | CAS: 100-67-4 | synonyms: Potassium phenoxide; 100-67-4; potassium phenate; UNII-9CQ00ODF3U; EINECS 202-877-7; 9CQ00ODF3U; POTASSIUM CARBOLATE; POTASSIUM PHENOXIDE [MI]; DTXSID30881405; RefChem:175576; DTXCID801022661; POTASSIUM PHENOXIDE [INCI]; 202-877-7; Potassium phenolate; potassium benzenolate; potassium;phenoxide"
         },
         {
+          "name": "Quinuclidine",
+          "abbr": "Quinuclidine",
+          "cas": "100-76-5",
+          "synonyms": [
+            "Quinuclidine",
+            "1-Azabicyclo[2.2.2]octane",
+            "1,4-Ethanopiperidine",
+            "1,4-Ethylenepiperidine",
+            "Chinuclidin",
+            "1-Azabicyclo(2.2.2)octane",
+            "4-Azabicyclo[2.2.2]octane",
+            "UNII-XFX99FC5VI",
+            "XFX99FC5VI",
+            "EINECS 202-887-1",
+            "DTXSID2057607",
+            "CHEBI:38420",
+            "QUINUCLIDINE [MI]",
+            "DTXCID0031396",
+            "NSC-168431",
+            "4-Azabicyclo(2.2.2)octane"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "1-Azabicyclo[2.2.2]octane",
+            "1,4-Ethanopiperidine",
+            "1,4-Ethylenepiperidine",
+            "Chinuclidin",
+            "1-Azabicyclo(2.2.2)octane",
+            "4-Azabicyclo[2.2.2]octane",
+            "UNII-XFX99FC5VI",
+            "XFX99FC5VI",
+            "EINECS 202-887-1",
+            "DTXSID2057607",
+            "CHEBI:38420",
+            "QUINUCLIDINE [MI]",
+            "DTXCID0031396",
+            "NSC-168431",
+            "4-Azabicyclo(2.2.2)octane"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Quinuclidine | abbr: Quinuclidine | CAS: 100-76-5 | synonyms: Quinuclidine; 1-Azabicyclo[2.2.2]octane; 1,4-Ethanopiperidine; 1,4-Ethylenepiperidine; Chinuclidin; 1-Azabicyclo(2.2.2)octane; 4-Azabicyclo[2.2.2]octane; UNII-XFX99FC5VI; XFX99FC5VI; EINECS 202-887-1; DTXSID2057607; CHEBI:38420; QUINUCLIDINE [MI]; DTXCID0031396; NSC-168431; 4-Azabicyclo(2.2.2)octane"
+        },
+        {
           "name": "Sodium trimethylsilanolate",
           "abbr": "Sodium trimethylsilanolate",
           "cas": "18027-10-6",
@@ -750,6 +1220,53 @@
             "Silanol, trimethyl-, sodium salt"
           ],
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Sodium trimethylsilanolate | abbr: Sodium trimethylsilanolate | CAS: 18027-10-6 | synonyms: Sodium trimethylsilanolate; 18027-10-6; Trimethylsilanol sodium salt; EINECS 241-939-8; Silanol, 1,1,1-trimethyl-, sodium salt (1:1); DTXSID7066302; RefChem:887971; Silanol, trimethyl, sodium salt; DTXCID2035724; Silanol, 1,1,1trimethyl, sodium salt (1:1); 241-939-8; sodium;trimethyl(oxido)silane; C3H9NaOSi; Sodium trimethyl silanolate; MFCD00013926; Silanol, trimethyl-, sodium salt"
+        },
+        {
+          "name": "Tributylamine",
+          "abbr": "Tributylamine",
+          "cas": "102-82-9",
+          "synonyms": [
+            "Tributylamine",
+            "102-82-9",
+            "Tri-n-butylamine",
+            "1-Butanamine, N,N-dibutyl-",
+            "N,N-dibutylbutan-1-amine",
+            "Tributilamina",
+            "N,N-Dibutyl-1-butanamine",
+            "Tris-n-butylamine",
+            "C3TZB2W0R7",
+            "DTXSID4026183",
+            "CHEBI:38905",
+            "DTXCID406183",
+            "Amine, tributyl",
+            "RefChem:190913",
+            "203-058-7",
+            "Tris[N-butylamine]"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "102-82-9",
+            "Tri-n-butylamine",
+            "1-Butanamine, N,N-dibutyl-",
+            "N,N-dibutylbutan-1-amine",
+            "Tributilamina",
+            "N,N-Dibutyl-1-butanamine",
+            "Tris-n-butylamine",
+            "C3TZB2W0R7",
+            "DTXSID4026183",
+            "CHEBI:38905",
+            "DTXCID406183",
+            "Amine, tributyl",
+            "RefChem:190913",
+            "203-058-7",
+            "Tris[N-butylamine]"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Tributylamine | abbr: Tributylamine | CAS: 102-82-9 | synonyms: Tributylamine; 102-82-9; Tri-n-butylamine; 1-Butanamine, N,N-dibutyl-; N,N-dibutylbutan-1-amine; Tributilamina; N,N-Dibutyl-1-butanamine; Tris-n-butylamine; C3TZB2W0R7; DTXSID4026183; CHEBI:38905; DTXCID406183; Amine, tributyl; RefChem:190913; 203-058-7; Tris[N-butylamine]"
         },
         {
           "name": "Triethylamine",

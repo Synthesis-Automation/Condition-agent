@@ -331,6 +331,47 @@
       "ehs_green": {},
       "example_members": [
         {
+          "name": "Bis(tri-tert-butylphosphine)palladium(0)",
+          "abbr": "Bis(tri-tert-butylphosphine)palladium(0)",
+          "cas": "53199-31-8",
+          "synonyms": [
+            "Bis(tri-tert-butylphosphine)palladium(0)",
+            "53199-31-8",
+            "DTXSID80370359",
+            "RefChem:329913",
+            "DTXCID10321394",
+            "640-284-9",
+            "BIS(TRI-TERT-BUTYLPHOSPHINE)PALLADIUM",
+            "palladium;tritert-butylphosphane",
+            "Bis(tri-t-butylphosphine)palladium(0)",
+            "MFCD03094580",
+            "bis(tri-tert-butylphosphane) palladium",
+            "Bis(tri-t-butylphosphine)palladium (0)",
+            "PD(T-BU3P)2",
+            "pd(p(tbu)3)2",
+            "BIS(TRI-T-BUTYLPHOSPHINE)PALLADIUM",
+            "C24H54P2Pd"
+          ],
+          "aliases": [
+            "53199-31-8",
+            "DTXSID80370359",
+            "RefChem:329913",
+            "DTXCID10321394",
+            "640-284-9",
+            "BIS(TRI-TERT-BUTYLPHOSPHINE)PALLADIUM",
+            "palladium;tritert-butylphosphane",
+            "Bis(tri-t-butylphosphine)palladium(0)",
+            "MFCD03094580",
+            "bis(tri-tert-butylphosphane) palladium",
+            "Bis(tri-t-butylphosphine)palladium (0)",
+            "PD(T-BU3P)2",
+            "pd(p(tbu)3)2",
+            "BIS(TRI-T-BUTYLPHOSPHINE)PALLADIUM",
+            "C24H54P2Pd"
+          ],
+          "embedding_text": "type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | oxidation_states: 2 | class: Pd(II) salt | preferred_reactions: Suzuki; Heck | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | handling: notes: Air-stable solids; some are hygroscopic. | additional_ligand: usage: required; typical: PPh3, dppf, XPhos, tBuXPhos, RuPhos, BrettPhos, NHC (IMes/IPr/SIPr); notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}; {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'} | ehs: none | name: Bis(tri-tert-butylphosphine)palladium(0) | abbr: Bis(tri-tert-butylphosphine)palladium(0) | CAS: 53199-31-8 | synonyms: Bis(tri-tert-butylphosphine)palladium(0); 53199-31-8; DTXSID80370359; RefChem:329913; DTXCID10321394; 640-284-9; BIS(TRI-TERT-BUTYLPHOSPHINE)PALLADIUM; palladium;tritert-butylphosphane; Bis(tri-t-butylphosphine)palladium(0); MFCD03094580; bis(tri-tert-butylphosphane) palladium; Bis(tri-t-butylphosphine)palladium (0); PD(T-BU3P)2; pd(p(tbu)3)2; BIS(TRI-T-BUTYLPHOSPHINE)PALLADIUM; C24H54P2Pd"
+        },
+        {
           "name": "Dichloro-bis(acetonitrile)palladium(II)",
           "abbr": "Pd(MeCN)2Cl2",
           "cas": "14592-56-4",
