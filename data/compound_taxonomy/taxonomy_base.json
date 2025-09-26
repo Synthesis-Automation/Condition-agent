@@ -134,6 +134,53 @@
       ],
       "example_members": [
         {
+          "name": "Lithium acetate",
+          "abbr": "Lithium acetate",
+          "cas": "546-89-4",
+          "synonyms": [
+            "Lithium acetate",
+            "546-89-4",
+            "Lithium ethanate",
+            "Quilone",
+            "Quilonorm",
+            "ACETIC ACID, LITHIUM SALT",
+            "Acetic acid, lithium salt (1:1)",
+            "H4278O5FLV",
+            "CHEBI:63045",
+            "DTXSID00883436",
+            "RefChem:153690",
+            "DTXCID501022967",
+            "208-914-3",
+            "lithiumacetate",
+            "lithium;acetate",
+            "Acetic acid lithium salt"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 1,
+            "steric_rank": 1,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "546-89-4",
+            "Lithium ethanate",
+            "Quilone",
+            "Quilonorm",
+            "ACETIC ACID, LITHIUM SALT",
+            "Acetic acid, lithium salt (1:1)",
+            "H4278O5FLV",
+            "CHEBI:63045",
+            "DTXSID00883436",
+            "RefChem:153690",
+            "DTXCID501022967",
+            "208-914-3",
+            "lithiumacetate",
+            "lithium;acetate",
+            "Acetic acid lithium salt"
+          ],
+          "embedding_text": "type: BASE | family: Inorganic carboxylates (acetates, etc.) (inorg_carboxylates) | acid_base_type: Brønsted | strength_band: weak–moderate | nucleophilicity: low | steric: unhindered | moisture: low | compatible_solvent_classes: amides_dipolar_aprotic; sulfoxides_dipolar_aprotic; alcohols_secondary; alcohols_primary | use_cases: Ligandless coupling (OAc); Acetate-assisted condensations | best_for: Mild deprotonation; Salt-tolerant media | avoid_when: Requires strong, non-coordinating base | name: Lithium acetate | abbr: Lithium acetate | CAS: 546-89-4 | synonyms: Lithium acetate; 546-89-4; Lithium ethanate; Quilone; Quilonorm; ACETIC ACID, LITHIUM SALT; Acetic acid, lithium salt (1:1); H4278O5FLV; CHEBI:63045; DTXSID00883436; RefChem:153690; DTXCID501022967; 208-914-3; lithiumacetate; lithium;acetate; Acetic acid lithium salt"
+        },
+        {
           "name": "Potassium acetate",
           "abbr": "KOAc",
           "cas": "127-08-2",
@@ -248,6 +295,53 @@
         "amides_dipolar_aprotic"
       ],
       "example_members": [
+        {
+          "name": "Barium hydroxide",
+          "abbr": "Barium hydroxide",
+          "cas": "17194-00-2",
+          "synonyms": [
+            "Barium hydroxide",
+            "17194-00-2",
+            "Caustic baryta",
+            "Barium dihydroxide",
+            "Bariumhydroxid",
+            "Aetzbaryt",
+            "Barium Hydroxide (Ba(OH)2)",
+            "barium(II) hydroxide",
+            "barium(2+) hydroxide",
+            "1OHB71MYBK",
+            "Ba(OH)2",
+            "Barium hydroxide lime (USP)",
+            "CHEBI:32592",
+            "DTXSID10892155",
+            "RefChem:5583",
+            "barium(2+) ion dihydroxide"
+          ],
+          "numeric_features": {
+            "strength_rank": 3,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 1,
+            "moisture_rank": 2
+          },
+          "aliases": [
+            "17194-00-2",
+            "Caustic baryta",
+            "Barium dihydroxide",
+            "Bariumhydroxid",
+            "Aetzbaryt",
+            "Barium Hydroxide (Ba(OH)2)",
+            "barium(II) hydroxide",
+            "barium(2+) hydroxide",
+            "1OHB71MYBK",
+            "Ba(OH)2",
+            "Barium hydroxide lime (USP)",
+            "CHEBI:32592",
+            "DTXSID10892155",
+            "RefChem:5583",
+            "barium(2+) ion dihydroxide"
+          ],
+          "embedding_text": "type: BASE | family: Hydroxides (alkali) (hydroxides) | acid_base_type: Brønsted | strength_band: strong (aq.) | nucleophilicity: medium | steric: unhindered | moisture: medium | compatible_solvent_classes: water; alcohols_primary; alcohols_secondary; amides_dipolar_aprotic | use_cases: Hydrolysis/saponification; Phase-transfer alkylations (with PTC) | best_for: Aqueous or protic media; Workup deprotections | avoid_when: Base-sensitive substrates; SN1-prone solvolysis | ehs: corrosive_or_caustic | name: Barium hydroxide | abbr: Barium hydroxide | CAS: 17194-00-2 | synonyms: Barium hydroxide; 17194-00-2; Caustic baryta; Barium dihydroxide; Bariumhydroxid; Aetzbaryt; Barium Hydroxide (Ba(OH)2); barium(II) hydroxide; barium(2+) hydroxide; 1OHB71MYBK; Ba(OH)2; Barium hydroxide lime (USP); CHEBI:32592; DTXSID10892155; RefChem:5583; barium(2+) ion dihydroxide"
+        },
         {
           "name": "Lithium hydroxide",
           "abbr": "LiOH",
@@ -963,6 +1057,53 @@
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Calcium Carbonate | abbr: Calcium Carbonate | CAS: 471-34-1 | synonyms: Calcium Carbonate; 471-34-1; Aeromatt; Calcium carbonate (1:1); Carbonic acid calcium salt (1:1); Calofort U; Albaglos; Calcicoll; Calseeds; Caltrate; Calwhite; Chemcarb; Duramite; Hydrocarb; Kotamite; Microcarb"
         },
         {
+          "name": "Cesium hydroxide",
+          "abbr": "Cesium hydroxide",
+          "cas": "35103-79-8",
+          "synonyms": [
+            "Cesium hydroxide",
+            "21351-79-1",
+            "Caesium hydroxide",
+            "12182-83-1",
+            "Cesium hydroxide (Cs(OH))",
+            "Cesium hydroxide dimer",
+            "UN2681",
+            "UN2682",
+            "EINECS 244-344-1",
+            "458ZFZ6235",
+            "NSC 121987",
+            "NSC-121987",
+            "CESIUM HYDROXIDE [MI]",
+            "DTXSID7066699",
+            "UNII-458ZFZ6235",
+            "CHEBI:33988"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "21351-79-1",
+            "Caesium hydroxide",
+            "12182-83-1",
+            "Cesium hydroxide (Cs(OH))",
+            "Cesium hydroxide dimer",
+            "UN2681",
+            "UN2682",
+            "EINECS 244-344-1",
+            "458ZFZ6235",
+            "NSC 121987",
+            "NSC-121987",
+            "CESIUM HYDROXIDE [MI]",
+            "DTXSID7066699",
+            "UNII-458ZFZ6235",
+            "CHEBI:33988"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Cesium hydroxide | abbr: Cesium hydroxide | CAS: 35103-79-8 | synonyms: Cesium hydroxide; 21351-79-1; Caesium hydroxide; 12182-83-1; Cesium hydroxide (Cs(OH)); Cesium hydroxide dimer; UN2681; UN2682; EINECS 244-344-1; 458ZFZ6235; NSC 121987; NSC-121987; CESIUM HYDROXIDE [MI]; DTXSID7066699; UNII-458ZFZ6235; CHEBI:33988"
+        },
+        {
           "name": "Dabco",
           "abbr": "Dabco",
           "cas": "280-57-9",
@@ -1034,6 +1175,53 @@
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | name: N,N-Diisopropylethylamine | abbr: DIPEA | CAS: 7087-68-5 | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes, esters_anhydrides, hydrocarbons_aromatic, nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | synonyms: DIEA; DIPEA; Hünig's base; i-Pr2NEt"
         },
         {
+          "name": "N-Iodosuccinimide",
+          "abbr": "N-Iodosuccinimide",
+          "cas": "516-12-1",
+          "synonyms": [
+            "N-Iodosuccinimide",
+            "516-12-1",
+            "1-Iodopyrrolidine-2,5-dione",
+            "Succiniodimide",
+            "2,5-Pyrrolidinedione, 1-iodo-",
+            "1-iodo-2,5-pyrrolidinedione",
+            "3COS3X3N4P",
+            "CHEBI:53204",
+            "DTXSID10199550",
+            "RefChem:163587",
+            "DTXCID70122041",
+            "208-221-6",
+            "MFCD00005512",
+            "N-Iodosuccinimide (NIS)",
+            "C4H4INO2",
+            "NIS"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "516-12-1",
+            "1-Iodopyrrolidine-2,5-dione",
+            "Succiniodimide",
+            "2,5-Pyrrolidinedione, 1-iodo-",
+            "1-iodo-2,5-pyrrolidinedione",
+            "3COS3X3N4P",
+            "CHEBI:53204",
+            "DTXSID10199550",
+            "RefChem:163587",
+            "DTXCID70122041",
+            "208-221-6",
+            "MFCD00005512",
+            "N-Iodosuccinimide (NIS)",
+            "C4H4INO2",
+            "NIS"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: N-Iodosuccinimide | abbr: N-Iodosuccinimide | CAS: 516-12-1 | synonyms: N-Iodosuccinimide; 516-12-1; 1-Iodopyrrolidine-2,5-dione; Succiniodimide; 2,5-Pyrrolidinedione, 1-iodo-; 1-iodo-2,5-pyrrolidinedione; 3COS3X3N4P; CHEBI:53204; DTXSID10199550; RefChem:163587; DTXCID70122041; 208-221-6; MFCD00005512; N-Iodosuccinimide (NIS); C4H4INO2; NIS"
+        },
+        {
           "name": "Potassium Bicarbonate",
           "abbr": "Potassium Bicarbonate",
           "cas": "298-14-6",
@@ -1079,6 +1267,49 @@
             "INS-501(II)"
           ],
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Potassium Bicarbonate | abbr: Potassium Bicarbonate | CAS: 298-14-6 | synonyms: Potassium Bicarbonate; 298-14-6; Potassium hydrogen carbonate; Potassium hydrogencarbonate; Potassium acid carbonate; Monopotassium carbonate; CARBONIC ACID, MONOPOTASSIUM SALT; Armicarb; KHCO3; Kafylox; Kaligreen; Milstop; Purple k; HM5Z15LEBN; CHEBI:81862; INS-501(II)"
+        },
+        {
+          "name": "Potassium hydride",
+          "abbr": "Potassium hydride",
+          "cas": "7693-26-7",
+          "synonyms": [
+            "Potassium hydride",
+            "Potassiumhydride",
+            "7693-26-7",
+            "potassium;hydride",
+            "Potassium hydride (KH)",
+            "Kaliumhydrid",
+            "EINECS 231-704-8",
+            "SCHEMBL266",
+            "SCHEMBL3334",
+            "[KH]",
+            "CHEBI:32589",
+            "DTXSID10894770",
+            "AKOS015833247",
+            "Q6036"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "Potassiumhydride",
+            "7693-26-7",
+            "potassium;hydride",
+            "Potassium hydride (KH)",
+            "Kaliumhydrid",
+            "EINECS 231-704-8",
+            "SCHEMBL266",
+            "SCHEMBL3334",
+            "[KH]",
+            "CHEBI:32589",
+            "DTXSID10894770",
+            "AKOS015833247",
+            "Q6036"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Potassium hydride | abbr: Potassium hydride | CAS: 7693-26-7 | synonyms: Potassium hydride; Potassiumhydride; 7693-26-7; potassium;hydride; Potassium hydride (KH); Kaliumhydrid; EINECS 231-704-8; SCHEMBL266; SCHEMBL3334; [KH]; CHEBI:32589; DTXSID10894770; AKOS015833247; Q6036"
         },
         {
           "name": "Potassium phenoxide",
