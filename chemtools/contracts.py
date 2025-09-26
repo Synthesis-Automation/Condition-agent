@@ -25,6 +25,14 @@ class RecommendFromReactionRequest(BaseModel):
     relax: Optional[Dict[str, Any]] = None
     constraints: Optional[Dict[str, Any]] = None
 
+class RecommendConditionsRequest(BaseModel):
+    reaction: str
+    reaction_type: Optional[str] = None
+    k: int = 50
+    limit: int = 5
+    relax: Optional[Dict[str, Any]] = None
+    constraints: Optional[Dict[str, Any]] = None
+
 class PlateDesignRequest(BaseModel):
     reaction: str
     plate_size: int = 24

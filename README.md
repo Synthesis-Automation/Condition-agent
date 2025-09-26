@@ -232,8 +232,9 @@ Speed tips
 
 Where it lives
 
-- Core function: `chemtools/recommend.py:recommend_from_reaction` (API: `POST /api/v1/recommend`).
-- UI: Gradio tab “Recommend Conditions” shows both JSON and a compact table, plus a human‑readable summary `core/base/solvent` (names resolved via the registry/properties).
+- Core function: `chemtools/recommend.py:recommend_from_reaction` (legacy API: `POST /api/v1/recommend`).
+- Structured API: `chemtools/recommend.py:recommend_conditions_structured` (`POST /api/v1/recommend/conditions`) returns top‑N condition sets (default 5) with metadata for clients.
+- UI: Gradio tab “Recommend Conditions” now surfaces the structured JSON, a table of the top 5 core/base/solvent combos, detection notes, and accepts an optional reaction-type override.
 
 Tuning knobs (relax/constraints)
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from collections import Counter
 
 from .smiles import normalize_reaction
@@ -61,12 +61,17 @@ def recommend_from_reaction(
     k: int = 25,
     relax: Dict[str, Any] | None = None,
     constraint_rules: Dict[str, Any] | None = None,
+    *,
+    family_override: Optional[str] = None,
+    max_variants: int = 3,
 ) -> Dict[str, Any]:
     """Recommend conditions from a reaction SMILES.
 
     Returns dict with keys: input, family, features, bin, recommendation, alternatives, pack, reasons.
     """
     relax = dict(relax or {})
+    max_variants = max(1, int(max_variants or 1))
+    fam_override_clean = (family_override.strip() if family_override else None)
 
     # 1) Normalize and extract reactants
     norm = normalize_reaction(reaction)
@@ -76,7 +81,8 @@ def recommend_from_reaction(
     ]
 
     # 2) Detect family (try rxn-insight first when available; fallback to rules)
-    fam = "Unknown"
+    detection_source = "user_supplied" if fam_override_clean else "auto"
+    fam = fam_override_clean or "Unknown"
     rxn_auto: Dict[str, Any] | None = None
     rxn_smiles_norm = norm.get("normalized") or reaction
     # Allow callers to disable rxn-insight via relax['use_rxn_insight']=False
@@ -91,10 +97,17 @@ def recommend_from_reaction(
             rxn_auto = _rxn_detect(rxn_smiles_norm)  # type: ignore[misc]
         except Exception:
             rxn_auto = None
+    auto_family = None
     if rxn_auto and rxn_auto.get("success") and rxn_auto.get("mapped_family"):
-        fam = str(rxn_auto.get("mapped_family") or "Unknown")
+        auto_family = str(rxn_auto.get("mapped_family") or "Unknown")
+
+    rule_info = detect_family(reactants)
+    rule_family = rule_info.get("family") or "Unknown"
+
+    if not fam_override_clean:
+        fam = auto_family or rule_family or "Unknown"
     else:
-        fam = detect_family(reactants).get("family") or "Unknown"
+        fam = fam_override_clean or auto_family or rule_family or "Unknown"
 
     # 3) Featurize substrates (Ullmann featurizer also used as fallback)
     elec, nuc = _pick_electrophile_nucleophile(reactants)
@@ -242,89 +255,118 @@ def recommend_from_reaction(
         return items
 
     # Base and solvent chemicals using lookups
-    base_rec = _lookup(base_pick) if base_pick else {}
-    solv_rec = _lookup(solv_pick) if solv_pick else {}
-    base_item = ({
-        "name": base_rec.get("name") or base_rec.get("token") or base_rec.get("uid") or None,
-        "cas": base_rec.get("uid") or None,
-        "smiles": None,
-        "equivalents": None,
-        "role": "base",
-    } if base_pick else None)
-    solv_item = ({
-        "name": solv_rec.get("name") or solv_rec.get("token") or solv_rec.get("uid") or None,
-        "abbreviation": solv_rec.get("token") or None,
-        "cas": solv_rec.get("uid") or None,
-        "smiles": None,
-        "equivalents": None,
-        "role": "solvent",
-    } if solv_pick else None)
+    def _chemical_payload(uid: Optional[str], role: str) -> Dict[str, Any] | None:
+        if not uid:
+            return None
+        rec = _lookup(uid)
+        return {
+            "name": rec.get("name") or rec.get("token") or rec.get("uid") or uid,
+            "abbreviation": rec.get("token") or None,
+            "cas": rec.get("uid") or uid,
+            "smiles": rec.get("smiles"),
+            "equivalents": None,
+            "role": role,
+        }
 
-    # Compose a few recommended condition variants using top solvent/base alternatives
-    def _top_list(pairs: List[Tuple[str, int]]) -> List[str]:
-        return [p for p, _ in pairs if p]
+    base_item = _chemical_payload(base_pick, "base")
+    solv_item = _chemical_payload(solv_pick, "solvent")
 
-    alt_bases = _top_list(base_counts.most_common(3))
-    alt_solvs = _top_list(solv_counts.most_common(3))
+    combo_counts = Counter((str(p.get("base_uid") or ""), str(p.get("solvent_uid") or "")) for p in group)
+    overall_combo_counts = Counter((str(p.get("base_uid") or ""), str(p.get("solvent_uid") or "")) for p in precs)
 
-    variants: List[Dict[str, Any]] = []
-    # Always include the primary pick
+    def _matching_precedents(b_key: str, s_key: str, src: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        return [
+            p for p in src
+            if str(p.get("base_uid") or "") == b_key and str(p.get("solvent_uid") or "") == s_key
+        ]
+
     cat_items = _cat_items()
-    primary_chems = list(reactants_chems) + cat_items
-    if base_item:
-        primary_chems.append(base_item)
-    if solv_item:
-        primary_chems.append(solv_item)
     cond_text = {
         "temperature": (f"{int(T_med)} °C" if isinstance(T_med, (int, float)) else None),
         "time": (f"{t_med} h" if isinstance(t_med, (int, float)) else None),
         "atmosphere": None,
     }
-    variants.append({
-        "reaction": {"smiles": norm.get("normalized") or reaction},
-        "chemicals": primary_chems,
-        "conditions": cond_text,
-    })
 
-    # Add up to two alternative solvent/base variants
-    tried: set[tuple] = set()
-    tried.add((base_pick or "", solv_pick or ""))
-    for b in alt_bases[:3]:
-        for s in alt_solvs[:3]:
-            if (b or "", s or "") in tried:
-                continue
-            tried.add((b or "", s or ""))
-            b_rec = _lookup(b) if b else {}
-            s_rec = _lookup(s) if s else {}
-            b_item = ({
-                "name": b_rec.get("name") or b_rec.get("token") or b_rec.get("uid") or None,
-                "cas": b_rec.get("uid") or None,
-                "smiles": None,
-                "equivalents": None,
-                "role": "base",
-            } if b else None)
-            s_item = ({
-                "name": s_rec.get("name") or s_rec.get("token") or s_rec.get("uid") or None,
-                "abbreviation": s_rec.get("token") or None,
-                "cas": s_rec.get("uid") or None,
-                "smiles": None,
-                "equivalents": None,
-                "role": "solvent",
-            } if s else None)
-            chems = list(reactants_chems) + cat_items
-            if b_item:
-                chems.append(b_item)
-            if s_item:
-                chems.append(s_item)
-            variants.append({
-                "reaction": {"smiles": norm.get("normalized") or reaction},
-                "chemicals": chems,
-                "conditions": cond_text,
-            })
-            if len(variants) >= 3:
-                break
-        if len(variants) >= 3:
+    core_group_size = len(group) if group else 0
+
+    def _build_variant(b_uid: Optional[str], s_uid: Optional[str], rank: int) -> Dict[str, Any]:
+        b_key = b_uid or ""
+        s_key = s_uid or ""
+        chems = list(reactants_chems) + list(cat_items)
+        base_payload = _chemical_payload(b_uid, "base")
+        solvent_payload = _chemical_payload(s_uid, "solvent")
+        if base_payload:
+            chems.append(base_payload)
+        if solvent_payload:
+            chems.append(solvent_payload)
+        support_count = combo_counts.get((b_key, s_key), 0)
+        if support_count == 0:
+            support_count = overall_combo_counts.get((b_key, s_key), 0)
+        denom = core_group_size if core_group_size else len(precs)
+        support_fraction = (support_count / denom) if denom else 0.0
+        matched = _matching_precedents(b_key, s_key, group or precs)
+        precedent_examples = [
+            {
+                "reaction_id": p.get("reaction_id"),
+                "reference": p.get("reference"),
+                "yield_pct": p.get("yield_pct"),
+                "core": p.get("core"),
+            }
+            for p in matched[:3]
+            if p.get("reaction_id")
+        ]
+        summary = {
+            "rank": rank,
+            "core": chosen_core,
+            "base": base_payload,
+            "solvent": solvent_payload,
+            "confidence": round(float(conf), 3),
+            "support": {
+                "count": support_count,
+                "fraction_core": round(float(support_fraction), 3) if support_fraction else 0.0,
+                "reference_population": core_group_size if core_group_size else len(precs),
+            },
+            "precedents": precedent_examples,
+        }
+        variant = {
+            "rank": rank,
+            "reaction": {"smiles": norm.get("normalized") or reaction},
+            "chemicals": chems,
+            "conditions": cond_text,
+            "summary": summary,
+            "combo": {"base_uid": b_uid, "solvent_uid": s_uid},
+        }
+        return variant
+
+    combos: List[Tuple[str, str]] = []
+    seen_combos: set[Tuple[str, str]] = set()
+
+    def _add_combo(b: Optional[str], s: Optional[str]) -> None:
+        key = (b or "", s or "")
+        if key in seen_combos:
+            return
+        seen_combos.add(key)
+        combos.append(key)
+
+    _add_combo(base_pick, solv_pick)
+    for combo, _ in combo_counts.most_common():
+        _add_combo(combo[0], combo[1])
+    for combo, _ in overall_combo_counts.most_common():
+        _add_combo(combo[0], combo[1])
+    for b, _ in base_counts.most_common():
+        _add_combo(b, solv_pick)
+    for s, _ in solv_counts.most_common():
+        _add_combo(base_pick, s)
+    if not combos:
+        _add_combo(None, None)
+
+    variants: List[Dict[str, Any]] = []
+    for combo in combos:
+        if len(variants) >= max_variants:
             break
+        b_key, s_key = combo
+        variants.append(_build_variant(b_key or None, s_key or None, len(variants) + 1))
+
 
     from datetime import datetime
     formatted = {
@@ -335,10 +377,13 @@ def recommend_from_reaction(
         },
         "input": {
             "reaction_smiles": norm.get("normalized") or reaction,
-            "selected_reaction_type": f"C-N Coupling - {_nice_family_text(fam)}" if fam else None,
+            "provided_reaction_type": fam_override_clean,
+            "selected_reaction_type": _nice_family_text(fam),
         },
         "detection": {
             "reaction_type": _nice_family_text(fam),
+            "source": detection_source,
+            "provided_reaction_type": fam_override_clean,
             "auto": (
                 {
                     "rxn_insight_available": bool(rxn_auto.get("available")) if isinstance(rxn_auto, dict) else False,
@@ -346,10 +391,15 @@ def recommend_from_reaction(
                     "rxn_insight_name": (rxn_auto.get("rxn_name") if isinstance(rxn_auto, dict) else None),
                     "rxn_insight_confidence": (rxn_auto.get("confidence") if isinstance(rxn_auto, dict) else None),
                     "status": ("success" if (isinstance(rxn_auto, dict) and rxn_auto.get("success")) else "fallback"),
+                    "reaction_type": _nice_family_text(auto_family) if auto_family else None,
                 }
                 if rxn_auto is not None
                 else None
             ),
+            "rule_based": {
+                "reaction_type": _nice_family_text(rule_family),
+                "raw": rule_info,
+            },
         },
         "recommended_conditions": variants,
     }
@@ -366,6 +416,78 @@ def recommend_from_reaction(
         "filters": {"base": base_filter, "solvent": solv_filter},
         "formatted": formatted,
     }
+
+
+def recommend_conditions_structured(
+    reaction: str,
+    reaction_type: Optional[str] = None,
+    *,
+    k: int = 50,
+    limit: int = 5,
+    relax: Optional[Dict[str, Any]] = None,
+    constraints: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Structured condition recommendations for API/UI consumers."""
+    limit = max(1, int(limit or 1))
+    cfg_relax = dict(relax or {})
+    result = recommend_from_reaction(
+        reaction=reaction,
+        k=int(k or 50),
+        relax=cfg_relax,
+        constraint_rules=constraints or {},
+        family_override=reaction_type,
+        max_variants=limit,
+    )
+
+    formatted = dict(result.get("formatted") or {})
+    recommendations = list(formatted.get("recommended_conditions") or [])
+    recommendations = recommendations[:limit]
+    for idx, rec in enumerate(recommendations, start=1):
+        rec.setdefault("rank", idx)
+        summary = rec.get("summary")
+        if isinstance(summary, dict):
+            summary.setdefault("rank", idx)
+
+    detection = dict(formatted.get("detection") or {})
+    if reaction_type and not detection.get("source"):
+        detection["source"] = "user_supplied"
+    detection.setdefault("source", detection.get("source") or "auto")
+    detection.setdefault("provided_reaction_type", reaction_type)
+
+    meta = dict(formatted.get("meta") or {})
+    meta.setdefault("strategy", "precedent_knn")
+    meta["result_count"] = len(recommendations)
+
+    pack = result.get("precedent_pack") or {}
+    precedents = list(pack.get("precedents") or [])
+    top_precedents = [
+        {
+            "reaction_id": p.get("reaction_id"),
+            "core": p.get("core"),
+            "yield_pct": p.get("yield_pct"),
+        }
+        for p in precedents[:10]
+        if p.get("reaction_id")
+    ]
+    core_family = result.get("family")
+    core_support = len([p for p in precedents if p.get("core") == core_family])
+    precedent_summary = {
+        "total_considered": len(precedents),
+        "core_family": core_family,
+        "core_support": core_support,
+        "top_precedents": top_precedents,
+    }
+
+    return {
+        "meta": meta,
+        "input": formatted.get("input"),
+        "detection": detection,
+        "recommendations": recommendations,
+        "alternatives": result.get("alternatives"),
+        "precedents": precedent_summary,
+        "filters": result.get("filters"),
+    }
+
 
 
 def _well_ids(n: int) -> List[str]:

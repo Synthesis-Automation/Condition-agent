@@ -367,7 +367,7 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
             # still allow DRFP to rescue a bit if enabled
             pass
         sim_total = sim_cat
-        # DRFP component when available for both
+        # DRFP component when available for both; prefer whole-reaction similarity
         if q_fp is not None:
             r_rsmi = r.get("reaction_smiles")
             if r_rsmi:
@@ -375,13 +375,15 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
                 if r_fp is not None:
                     sim_fp = rs.tanimoto(q_fp, r_fp)
                     try:
-                        sim_fp = float(sim_fp)  # coerce in case implementation returns non-float
+                        sim_fp = float(sim_fp)
                     except Exception:
                         sim_fp = 0.0
-                    # Blend: convex combination of categorical and DRFP
-                    sim_total = max(0.0, min(1.0, (1.0 - drfp_w) * sim_cat + drfp_w * sim_fp))
+                    sim_total = max(0.0, min(1.0, sim_fp))
         if sim_total <= 0:
-            continue
+            if sim_cat > 0:
+                sim_total = sim_cat
+            else:
+                continue
         y = r.get("yield_value")
         y_norm = (float(y) / 100.0) if isinstance(y, (int, float)) else 0.0
         neighbor_score = sim_total * (0.5 + 0.5 * y_norm)

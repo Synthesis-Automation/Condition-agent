@@ -4,7 +4,7 @@ from chemtools.contracts import (
     NormalizeRequest, DetectFamilyRequest, FeaturizeUllmannRequest,
     ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
     ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest,
-    RecommendFromReactionRequest, PlateDesignRequest,
+    RecommendFromReactionRequest, RecommendConditionsRequest, PlateDesignRequest,
     CoreSearchRequest,
     RoleAwareMolRequest, RoleAwareReactionRequest,
     DetectTypeRequest,
@@ -338,6 +338,20 @@ async def warm_startup_caches() -> None:
         pass
     except Exception:
         pass
+
+
+@app.post("/api/v1/recommend/conditions")
+def api_recommend_conditions(req: RecommendConditionsRequest):
+    return recommend.recommend_conditions_structured(
+        reaction=req.reaction,
+        reaction_type=req.reaction_type,
+        k=req.k,
+        limit=req.limit,
+        relax=req.relax or {},
+        constraints=req.constraints or {},
+    )
+
+
 
 
 @app.post("/api/v1/recommend")

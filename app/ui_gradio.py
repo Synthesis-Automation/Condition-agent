@@ -10,7 +10,7 @@ Then open the URL printed by Gradio (default http://127.0.0.1:7860).
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional
 from functools import lru_cache
 from types import SimpleNamespace
 import json
@@ -145,6 +145,50 @@ def _safe_json_loads(s: str) -> Dict[str, Any]:
         return obj if isinstance(obj, dict) else {}
     except Exception:
         return {}
+
+
+def _format_detection_details(det: Dict[str, Any] | None) -> str:
+    if not isinstance(det, dict):
+        return '- No detection details'
+    lines: List[str] = []
+    rt = det.get('reaction_type') if isinstance(det, dict) else None
+    if rt:
+        lines.append(f'Detected family: {rt}')
+    source = det.get('source') if isinstance(det, dict) else None
+    if source:
+        lines.append(f'Source: {source}')
+    provided = det.get('provided_reaction_type') if isinstance(det, dict) else None
+    if provided:
+        lines.append(f'Provided reaction type: {provided}')
+    auto = det.get('auto') if isinstance(det, dict) else None
+    if isinstance(auto, dict):
+        lines.append(f"rxn-insight available: {bool(auto.get('rxn_insight_available'))}")
+        status = auto.get('status')
+        if status:
+            lines.append(f"rxn-insight status: {status}")
+        auto_rt = auto.get('reaction_type')
+        if auto_rt:
+            lines.append(f"rxn-insight family: {auto_rt}")
+        auto_name = auto.get('rxn_insight_name')
+        if auto_name:
+            lines.append(f"rxn-insight name: {auto_name}")
+        auto_class = auto.get('rxn_insight_class')
+        if auto_class:
+            lines.append(f"rxn-insight class: {auto_class}")
+        auto_conf = auto.get('rxn_insight_confidence')
+        if auto_conf is not None:
+            try:
+                lines.append(f"rxn-insight confidence: {float(auto_conf):.3f}")
+            except Exception:
+                lines.append(f"rxn-insight confidence: {auto_conf}")
+    rule = det.get('rule_based') if isinstance(det, dict) else None
+    if isinstance(rule, dict):
+        rule_rt = rule.get('reaction_type')
+        if rule_rt:
+            lines.append(f"Rule-based family: {rule_rt}")
+    if not lines:
+        return '- No detection details'
+    return '\n'.join(f'- {line}' for line in lines)
 
 
 # --- Handlers for tabs ---
@@ -343,36 +387,76 @@ def ui_recommend_both(
     human = "/".join([s for s in [core_txt, base_txt, solv_txt] if s]) or ""
 
     # Detection markdown (rxn-insight and fallback details)
-    det = (out.get("formatted") or {}).get("detection") or {}
-    auto = det.get("auto") if isinstance(det, dict) else None
-    det_lines: list[str] = []
-    if isinstance(det, dict):
-        rt = det.get("reaction_type")
-        if rt:
-            det_lines.append(f"Detected family: {rt}")
-    if isinstance(auto, dict):
-        avail = bool(auto.get("rxn_insight_available"))
-        name = auto.get("rxn_insight_name")
-        klass = auto.get("rxn_insight_class")
-        conf = auto.get("rxn_insight_confidence")
-        status = auto.get("status")
-        det_lines.append(f"rxn-insight available: {avail}")
-        if status:
-            det_lines.append(f"auto-detection status: {status}")
-        if name:
-            det_lines.append(f"rxn-insight name: {name}")
-        if klass:
-            det_lines.append(f"rxn-insight class: {klass}")
-        if conf is not None:
-            try:
-                det_lines.append(f"rxn-insight confidence: {float(conf):.3f}")
-            except Exception:
-                det_lines.append(f"rxn-insight confidence: {conf}")
-    elif det and not auto:
-        det_lines.append("rxn-insight: not available; using rule-based fallback")
-    detection_md = "\n".join(f"- {x}" for x in det_lines) if det_lines else "- No detection details"
+    det = (out.get("formatted") or {}).get("detection")
+    detection_md = _format_detection_details(det)
 
     return out, [hdr, row], human, detection_md
+
+
+
+def ui_recommend_structured(
+    reaction: str,
+    reaction_type: Optional[str] = None,
+    k: int = 50,
+    limit: int = 5,
+    use_rxn_insight: bool = True,
+    relax_json: str = "",
+    constraints_json: str = "",
+) -> Tuple[Dict[str, Any], List[List[Any]], str, str]:
+    # Back-compat for legacy UI signature without reaction_type/limit.
+    if isinstance(reaction_type, (int, float)) and isinstance(k, bool):
+        legacy_k = int(reaction_type)
+        legacy_use = bool(k)
+        legacy_relax = limit if isinstance(limit, str) else ""
+        legacy_constraints = use_rxn_insight if isinstance(use_rxn_insight, str) else ""
+        reaction_type = None
+        k = legacy_k
+        limit = 5
+        use_rxn_insight = legacy_use
+        relax_json = legacy_relax
+        constraints_json = legacy_constraints
+
+    relax = _safe_json_loads(relax_json)
+    if not isinstance(relax, dict):
+        relax = {}
+    if not bool(use_rxn_insight):
+        relax["use_rxn_insight"] = False
+    constraints = _safe_json_loads(constraints_json)
+    data = recommend.recommend_conditions_structured(
+        reaction=reaction or "",
+        reaction_type=(reaction_type or None),
+        k=int(k or 50),
+        limit=int(limit or 5),
+        relax=relax,
+        constraints=constraints or None,
+    )
+    recs = data.get("recommendations") or []
+    rows: List[List[Any]] = []
+    human_parts: List[str] = []
+    for rec in recs:
+        summary = rec.get("summary") or {}
+        base = summary.get("base") or {}
+        solvent = summary.get("solvent") or {}
+        support = summary.get("support") or {}
+        rows.append([
+            rec.get("rank"),
+            summary.get("core"),
+            base.get("name") or base.get("cas"),
+            solvent.get("name") or solvent.get("cas"),
+            summary.get("confidence"),
+            support.get("count"),
+        ])
+        label_parts = [
+            str(summary.get("core") or ""),
+            str(base.get("name") or base.get("cas") or ""),
+            str(solvent.get("name") or solvent.get("cas") or ""),
+        ]
+        label = "/".join(part for part in label_parts if part)
+        if label:
+            human_parts.append(label)
+    human = "; ".join(human_parts) if human_parts else ""
+    detection_md = _format_detection_details(data.get("detection"))
+    return data, rows, human or "n/a", detection_md
 
 
 def ui_design_plate(
@@ -937,16 +1021,23 @@ def build_demo() -> gr.Blocks:
 
         with gr.Tab("Recommend Conditions"):
             rec_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
-            rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=25, step=1)
+            rec_type = gr.Textbox(label="Reaction Type (optional override)", value="")
+            rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=50, step=1)
+            rec_limit = gr.Slider(label="Number of recommendations", minimum=1, maximum=10, value=5, step=1)
             rec_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
             rec_relax = gr.Textbox(label="Relax (JSON)", value="")
             rec_constraints = gr.Textbox(label="Constraints (JSON)", value="")
             rec_btn = gr.Button("Recommend", variant="primary")
-            rec_out = gr.JSON(label="Recommendation Pack")
-            rec_tbl = gr.Dataframe(label="Recommendation (table)", interactive=False)
-            rec_human = gr.Textbox(label="Recommended (human?readable core/base/solvent)", interactive=False)
-            rec_detect = gr.Markdown(label="Auto-Detection")
-            rec_btn.click(ui_recommend_both, inputs=[rec_in, rec_k, rec_use_rxi, rec_relax, rec_constraints], outputs=[rec_out, rec_tbl, rec_human, rec_detect])
+            rec_out = gr.JSON(label="Structured Recommendations")
+            rec_tbl = gr.Dataframe(headers=["rank", "core", "base", "solvent", "confidence", "support"], label="Recommendation Summary", interactive=False)
+            rec_human = gr.Textbox(label="Top recommended (core/base/solvent)", interactive=False)
+            rec_detect = gr.Markdown(label="Detection Details")
+            rec_btn.click(
+                ui_recommend_structured,
+                inputs=[rec_in, rec_type, rec_k, rec_limit, rec_use_rxi, rec_relax, rec_constraints],
+                outputs=[rec_out, rec_tbl, rec_human, rec_detect],
+            )
+
 
         with gr.Tab("Design Plate"):
             plate_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
