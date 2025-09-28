@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2025-09-26",
+  "updated": "2025-09-28",
   "schema": {
     "family_id": "stable identifier",
     "label": "family name",
@@ -1055,6 +1055,53 @@
             "Microcarb"
           ],
           "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Calcium Carbonate | abbr: Calcium Carbonate | CAS: 471-34-1 | synonyms: Calcium Carbonate; 471-34-1; Aeromatt; Calcium carbonate (1:1); Carbonic acid calcium salt (1:1); Calofort U; Albaglos; Calcicoll; Calseeds; Caltrate; Calwhite; Chemcarb; Duramite; Hydrocarb; Kotamite; Microcarb"
+        },
+        {
+          "name": "Cesium bicarbonate",
+          "abbr": "Cesium bicarbonate",
+          "cas": "15519-28-5",
+          "synonyms": [
+            "Cesium bicarbonate",
+            "15519-28-5",
+            "EINECS 239-554-5",
+            "DTXSID70165852",
+            "RefChem:124633",
+            "DTXCID4088343",
+            "239-554-5",
+            "29703-01-3",
+            "cesium hydrogen carbonate",
+            "cesium;hydrogen carbonate",
+            "caesium bicarbonate",
+            "CHCsO3",
+            "Cesium hydrogencarbonate",
+            "MFCD00010961",
+            "CESIUM BICARBONATE, PURE, 99.9per cent",
+            "Carbonic acid, cesium salt (1:1)"
+          ],
+          "numeric_features": {
+            "strength_rank": 2,
+            "nucleophilicity_rank": 2,
+            "steric_rank": 2,
+            "moisture_rank": 1
+          },
+          "aliases": [
+            "15519-28-5",
+            "EINECS 239-554-5",
+            "DTXSID70165852",
+            "RefChem:124633",
+            "DTXCID4088343",
+            "239-554-5",
+            "29703-01-3",
+            "cesium hydrogen carbonate",
+            "cesium;hydrogen carbonate",
+            "caesium bicarbonate",
+            "CHCsO3",
+            "Cesium hydrogencarbonate",
+            "MFCD00010961",
+            "CESIUM BICARBONATE, PURE, 99.9per cent",
+            "Carbonic acid, cesium salt (1:1)"
+          ],
+          "embedding_text": "type: BASE | family: Tertiary amines (aliphatic) (tertiary_amines_aliphatic) | acid_base_type: Brønsted | strength_band: moderate | nucleophilicity: medium | steric: hindered | moisture: low | compatible_solvent_classes: ethers_cyclic_glymes; esters_anhydrides; hydrocarbons_aromatic; nitriles | use_cases: Acid scavenger; Amide couplings (HATU/HBTU/EDC); Micro-Azeotropic reactions | best_for: Non-nucleophilic base in polar aprotic solvents | avoid_when: Need very strong base; Acylation where base capture is undesirable | name: Cesium bicarbonate | abbr: Cesium bicarbonate | CAS: 15519-28-5 | synonyms: Cesium bicarbonate; 15519-28-5; EINECS 239-554-5; DTXSID70165852; RefChem:124633; DTXCID4088343; 239-554-5; 29703-01-3; cesium hydrogen carbonate; cesium;hydrogen carbonate; caesium bicarbonate; CHCsO3; Cesium hydrogencarbonate; MFCD00010961; CESIUM BICARBONATE, PURE, 99.9per cent; Carbonic acid, cesium salt (1:1)"
         },
         {
           "name": "Cesium hydroxide",

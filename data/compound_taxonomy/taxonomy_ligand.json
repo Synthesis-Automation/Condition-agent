@@ -1,6 +1,6 @@
 {
   "version": "1.2",
-  "updated": "2025-09-26",
+  "updated": "2025-09-28",
   "schema": {
     "family_id": "stable identifier for the family",
     "label": "human-readable name",
@@ -530,6 +530,150 @@
       "scaffold": "Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents",
       "example_members": [
         {
+          "name": "1,2-Benzenediamine, N1,N1-dimethyl-",
+          "abbr": "1,2-Benzenediamine, N1,N1-dimethyl-",
+          "cas": "2836-03-5",
+          "synonyms": [
+            "1,2-Benzenediamine, N1,N1-dimethyl-",
+            "2836-03-5",
+            "2-Amino-N,N-dimethylaniline",
+            "1,2-Benzenediamine, N,N-dimethyl-",
+            "o-(Dimethylamino)aniline",
+            "N,N-Dimethyl-o-phenylenediamine",
+            "2-Dimethylaminoaniline",
+            "N,N-Dimethyl-1,2-benzenediamine",
+            "o-Phenylenediamine, N,N-dimethyl-",
+            "BRN 1817293",
+            "N1,N1-dimethyl-1,2-benzenediamine",
+            "DTXSID7062663",
+            "RefChem:411081",
+            "DTXCID5037812",
+            "835-853-5",
+            "N1,N1-Dimethylbenzene-1,2-diamine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "aliases": [
+            "2836-03-5",
+            "2-Amino-N,N-dimethylaniline",
+            "1,2-Benzenediamine, N,N-dimethyl-",
+            "o-(Dimethylamino)aniline",
+            "N,N-Dimethyl-o-phenylenediamine",
+            "2-Dimethylaminoaniline",
+            "N,N-Dimethyl-1,2-benzenediamine",
+            "o-Phenylenediamine, N,N-dimethyl-",
+            "BRN 1817293",
+            "N1,N1-dimethyl-1,2-benzenediamine",
+            "DTXSID7062663",
+            "RefChem:411081",
+            "DTXCID5037812",
+            "835-853-5",
+            "N1,N1-Dimethylbenzene-1,2-diamine"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: 1,2-Benzenediamine, N1,N1-dimethyl- | abbr: 1,2-Benzenediamine, N1,N1-dimethyl- | CAS: 2836-03-5 | synonyms: 1,2-Benzenediamine, N1,N1-dimethyl-; 2836-03-5; 2-Amino-N,N-dimethylaniline; 1,2-Benzenediamine, N,N-dimethyl-; o-(Dimethylamino)aniline; N,N-Dimethyl-o-phenylenediamine; 2-Dimethylaminoaniline; N,N-Dimethyl-1,2-benzenediamine; o-Phenylenediamine, N,N-dimethyl-; BRN 1817293; N1,N1-dimethyl-1,2-benzenediamine; DTXSID7062663; RefChem:411081; DTXCID5037812; 835-853-5; N1,N1-Dimethylbenzene-1,2-diamine"
+        },
+        {
+          "name": "1,7-Phenanthroline",
+          "abbr": "1,7-Phenanthroline",
+          "cas": "12678-01-2",
+          "synonyms": [
+            "1,7-Phenanthroline",
+            "230-46-6",
+            "5Y778HQU2S",
+            "CHEBI:36418",
+            "DTXSID50870492",
+            "NSC-35679",
+            "RefChem:73719",
+            "DTXCID70818210",
+            "MFCD00004971",
+            "MLS000738106",
+            "NSC35679",
+            "12678-01-2",
+            "SMR000393870",
+            "pyridino[2,3-f]quinoline",
+            "Phenanthrolines",
+            "m-Phenanthrolin"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "aliases": [
+            "230-46-6",
+            "5Y778HQU2S",
+            "CHEBI:36418",
+            "DTXSID50870492",
+            "NSC-35679",
+            "RefChem:73719",
+            "DTXCID70818210",
+            "MFCD00004971",
+            "MLS000738106",
+            "NSC35679",
+            "12678-01-2",
+            "SMR000393870",
+            "pyridino[2,3-f]quinoline",
+            "Phenanthrolines",
+            "m-Phenanthrolin"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: 1,7-Phenanthroline | abbr: 1,7-Phenanthroline | CAS: 12678-01-2 | synonyms: 1,7-Phenanthroline; 230-46-6; 5Y778HQU2S; CHEBI:36418; DTXSID50870492; NSC-35679; RefChem:73719; DTXCID70818210; MFCD00004971; MLS000738106; NSC35679; 12678-01-2; SMR000393870; pyridino[2,3-f]quinoline; Phenanthrolines; m-Phenanthrolin"
+        },
+        {
+          "name": "2,2,6,6-Tetramethyl-3,5-heptanedione",
+          "abbr": "2,2,6,6-Tetramethyl-3,5-heptanedione",
+          "cas": "1118-71-4",
+          "synonyms": [
+            "2,2,6,6-Tetramethyl-3,5-heptanedione",
+            "1118-71-4",
+            "Dipivaloylmethane",
+            "3,5-Heptanedione, 2,2,6,6-tetramethyl-",
+            "DTXSID7049396",
+            "R8UI909HOY",
+            "NSC-174296",
+            "2,2,6,6,-tetramethyl-3,5-heptanedione",
+            "DTXCID4029355",
+            "RefChem:134758",
+            "214-268-3",
+            "2,2,6,6-Tetramethylheptane-3,5-dione",
+            "MFCD00008848",
+            "2,2,6,6-tetramethyl-heptane-3,5-dione",
+            "2,2,6,6-Tetramethyl-3,5-heptanedione (Dipivaloylmethane)",
+            "UNII-R8UI909HOY"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "aliases": [
+            "1118-71-4",
+            "Dipivaloylmethane",
+            "3,5-Heptanedione, 2,2,6,6-tetramethyl-",
+            "DTXSID7049396",
+            "R8UI909HOY",
+            "NSC-174296",
+            "2,2,6,6,-tetramethyl-3,5-heptanedione",
+            "DTXCID4029355",
+            "RefChem:134758",
+            "214-268-3",
+            "2,2,6,6-Tetramethylheptane-3,5-dione",
+            "MFCD00008848",
+            "2,2,6,6-tetramethyl-heptane-3,5-dione",
+            "2,2,6,6-Tetramethyl-3,5-heptanedione (Dipivaloylmethane)",
+            "UNII-R8UI909HOY"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: 2,2,6,6-Tetramethyl-3,5-heptanedione | abbr: 2,2,6,6-Tetramethyl-3,5-heptanedione | CAS: 1118-71-4 | synonyms: 2,2,6,6-Tetramethyl-3,5-heptanedione; 1118-71-4; Dipivaloylmethane; 3,5-Heptanedione, 2,2,6,6-tetramethyl-; DTXSID7049396; R8UI909HOY; NSC-174296; 2,2,6,6,-tetramethyl-3,5-heptanedione; DTXCID4029355; RefChem:134758; 214-268-3; 2,2,6,6-Tetramethylheptane-3,5-dione; MFCD00008848; 2,2,6,6-tetramethyl-heptane-3,5-dione; 2,2,6,6-Tetramethyl-3,5-heptanedione (Dipivaloylmethane); UNII-R8UI909HOY"
+        },
+        {
           "name": "Binap, (A+-)-",
           "abbr": "Binap, (A+-)-",
           "cas": "76189-55-4",
@@ -643,6 +787,54 @@
           "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Dimethylphenylphosphine | abbr: PMe2Ph | CAS: 672-66-2 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: Dimethylphenylphosphine; PMe2Ph"
         },
         {
+          "name": "L-Proline",
+          "abbr": "L-Proline",
+          "cas": "147-85-3",
+          "synonyms": [
+            "L-Proline",
+            "147-85-3",
+            "proline",
+            "L-(-)-Proline",
+            "(2S)-pyrrolidine-2-carboxylic acid",
+            "(S)-Pyrrolidine-2-carboxylic acid",
+            "2-pyrrolidinecarboxylic acid",
+            "(-)-Proline",
+            "(-)-(S)-Proline",
+            "prolina",
+            "Prolinum",
+            "(S)-2-Pyrrolidinecarboxylic acid",
+            "(-)-2-Pyrrolidinecarboxylic acid",
+            "(S)-Proline",
+            "L-Prolin",
+            "L-alpha-Pyrrolidinecarboxylic acid"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "aliases": [
+            "147-85-3",
+            "proline",
+            "L-(-)-Proline",
+            "(2S)-pyrrolidine-2-carboxylic acid",
+            "(S)-Pyrrolidine-2-carboxylic acid",
+            "2-pyrrolidinecarboxylic acid",
+            "(-)-Proline",
+            "(-)-(S)-Proline",
+            "prolina",
+            "Prolinum",
+            "(S)-2-Pyrrolidinecarboxylic acid",
+            "(-)-2-Pyrrolidinecarboxylic acid",
+            "(S)-Proline",
+            "L-Prolin",
+            "L-alpha-Pyrrolidinecarboxylic acid"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: L-Proline | abbr: L-Proline | CAS: 147-85-3 | synonyms: L-Proline; 147-85-3; proline; L-(-)-Proline; (2S)-pyrrolidine-2-carboxylic acid; (S)-Pyrrolidine-2-carboxylic acid; 2-pyrrolidinecarboxylic acid; (-)-Proline; (-)-(S)-Proline; prolina; Prolinum; (S)-2-Pyrrolidinecarboxylic acid; (-)-2-Pyrrolidinecarboxylic acid; (S)-Proline; L-Prolin; L-alpha-Pyrrolidinecarboxylic acid"
+        },
+        {
           "name": "Methyldiphenylphosphine",
           "abbr": "PMePh2",
           "cas": "1486-28-8",
@@ -658,6 +850,102 @@
             "denticity_rank": 1
           },
           "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | name: Methyldiphenylphosphine | abbr: PMePh2 | CAS: 1486-28-8 | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | synonyms: Methyldiphenylphosphine; PMePh2"
+        },
+        {
+          "name": "N,N-Dimethylethylenediamine",
+          "abbr": "N,N-Dimethylethylenediamine",
+          "cas": "108-00-9",
+          "synonyms": [
+            "N,N-Dimethylethylenediamine",
+            "108-00-9",
+            "(2-Aminoethyl)Dimethylamine",
+            "1,2-Ethanediamine, N,N-dimethyl-",
+            "Unsym-dimethylethylenediamine",
+            "1,2-Ethanediamine, N1,N1-dimethyl-",
+            "EINECS 203-541-2",
+            "1-Amino-2-dimethylaminoethane",
+            "AI3-26641",
+            "DTXSID7059357",
+            "RefChem:161297",
+            "DTXCID0033097",
+            "DILRJUIACXKSQE-UHFFFAOYSA-N",
+            "2-Dimethylaminoethylamine",
+            "2-(Dimethylamino)ethylamine",
+            "N,N-Dimethylethanediamine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "aliases": [
+            "108-00-9",
+            "(2-Aminoethyl)Dimethylamine",
+            "1,2-Ethanediamine, N,N-dimethyl-",
+            "Unsym-dimethylethylenediamine",
+            "1,2-Ethanediamine, N1,N1-dimethyl-",
+            "EINECS 203-541-2",
+            "1-Amino-2-dimethylaminoethane",
+            "AI3-26641",
+            "DTXSID7059357",
+            "RefChem:161297",
+            "DTXCID0033097",
+            "DILRJUIACXKSQE-UHFFFAOYSA-N",
+            "2-Dimethylaminoethylamine",
+            "2-(Dimethylamino)ethylamine",
+            "N,N-Dimethylethanediamine"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: N,N-Dimethylethylenediamine | abbr: N,N-Dimethylethylenediamine | CAS: 108-00-9 | synonyms: N,N-Dimethylethylenediamine; 108-00-9; (2-Aminoethyl)Dimethylamine; 1,2-Ethanediamine, N,N-dimethyl-; Unsym-dimethylethylenediamine; 1,2-Ethanediamine, N1,N1-dimethyl-; EINECS 203-541-2; 1-Amino-2-dimethylaminoethane; AI3-26641; DTXSID7059357; RefChem:161297; DTXCID0033097; DILRJUIACXKSQE-UHFFFAOYSA-N; 2-Dimethylaminoethylamine; 2-(Dimethylamino)ethylamine; N,N-Dimethylethanediamine"
+        },
+        {
+          "name": "N,N-Dimethylglycine",
+          "abbr": "N,N-Dimethylglycine",
+          "cas": "1118-68-9",
+          "synonyms": [
+            "N,N-Dimethylglycine",
+            "1118-68-9",
+            "dimethylglycine",
+            "2-(dimethylamino)acetic acid",
+            "(Dimethylamino)acetic acid",
+            "glycine, N,N-dimethyl-",
+            "N-Methylsarcosine",
+            "N,N-Dimethylaminoacetic acid",
+            "7797M4CPPA",
+            "CHEBI:17724",
+            "DTXSID6074336",
+            "RefChem:57349",
+            "DTXCID1033244",
+            "214-267-8",
+            "2-(dimethylazaniumyl)acetate",
+            "N,N-Dimethyl Glycine"
+          ],
+          "numeric_features": {
+            "steric_rank": 2,
+            "donor_rank": 2,
+            "pi_acceptor_rank": 2,
+            "rigidity_rank": 1,
+            "denticity_rank": 1
+          },
+          "aliases": [
+            "1118-68-9",
+            "dimethylglycine",
+            "2-(dimethylamino)acetic acid",
+            "(Dimethylamino)acetic acid",
+            "glycine, N,N-dimethyl-",
+            "N-Methylsarcosine",
+            "N,N-Dimethylaminoacetic acid",
+            "7797M4CPPA",
+            "CHEBI:17724",
+            "DTXSID6074336",
+            "RefChem:57349",
+            "DTXCID1033244",
+            "214-267-8",
+            "2-(dimethylazaniumyl)acetate",
+            "N,N-Dimethyl Glycine"
+          ],
+          "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor_set: P | denticity: 1 | scaffold: Classical PR3 / PAr3 ligands; cone angle and electronics tuned by substituents | steric bulk band: medium | electron donor band: medium | pi acceptor band: medium | rigidity band: low | use_cases: General Pd couplings; Hydrosilylation (Pt); Ligand screening baselines | best_for: Versatile, available PR3 series | avoid_when: Strong air sensitivity (some PR3); Need extreme sterics/electronics | ehs: air_sensitive | name: N,N-Dimethylglycine | abbr: N,N-Dimethylglycine | CAS: 1118-68-9 | synonyms: N,N-Dimethylglycine; 1118-68-9; dimethylglycine; 2-(dimethylamino)acetic acid; (Dimethylamino)acetic acid; glycine, N,N-dimethyl-; N-Methylsarcosine; N,N-Dimethylaminoacetic acid; 7797M4CPPA; CHEBI:17724; DTXSID6074336; RefChem:57349; DTXCID1033244; 214-267-8; 2-(dimethylazaniumyl)acetate; N,N-Dimethyl Glycine"
         },
         {
           "name": "Tetrabutylammonium Tetrafluoroborate",
@@ -2436,11 +2724,26 @@
       "scaffold": "Flexible bidentate amines; often serve as both ligands and bases",
       "example_members": [
         {
-          "name": "TMEDA",
-          "abbr": "TMEDA",
-          "cas": "110-18-9",
+          "name": "1,2-Diaminocyclohexane",
+          "abbr": "1,2-Diaminocyclohexane",
+          "cas": "694-83-7",
           "synonyms": [
-            "TMEDA"
+            "1,2-Diaminocyclohexane",
+            "1,2-Cyclohexanediamine",
+            "cyclohexane-1,2-diamine",
+            "694-83-7",
+            "Cyclohex-1,2-ylenediamine",
+            "DACH",
+            "DTXSID0027301",
+            "C82TX76BHH",
+            "DTXCID707301",
+            "Dytek DCH 99",
+            "RefChem:411436",
+            "1,2-DACH",
+            "211-776-7",
+            "(rel)-Oxaliplatin",
+            "MFCD00001491",
+            "1,2-Cylohexanediamine"
           ],
           "numeric_features": {
             "steric_rank": 1,
@@ -2449,7 +2752,120 @@
             "rigidity_rank": 1,
             "denticity_rank": 2
           },
-          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N,N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | name: TMEDA | abbr: TMEDA | CAS: 110-18-9 | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | synonyms: TMEDA"
+          "aliases": [
+            "1,2-Cyclohexanediamine",
+            "cyclohexane-1,2-diamine",
+            "694-83-7",
+            "Cyclohex-1,2-ylenediamine",
+            "DACH",
+            "DTXSID0027301",
+            "C82TX76BHH",
+            "DTXCID707301",
+            "Dytek DCH 99",
+            "RefChem:411436",
+            "1,2-DACH",
+            "211-776-7",
+            "(rel)-Oxaliplatin",
+            "MFCD00001491",
+            "1,2-Cylohexanediamine"
+          ],
+          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N; N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | name: 1,2-Diaminocyclohexane | abbr: 1,2-Diaminocyclohexane | CAS: 694-83-7 | synonyms: 1,2-Diaminocyclohexane; 1,2-Cyclohexanediamine; cyclohexane-1,2-diamine; 694-83-7; Cyclohex-1,2-ylenediamine; DACH; DTXSID0027301; C82TX76BHH; DTXCID707301; Dytek DCH 99; RefChem:411436; 1,2-DACH; 211-776-7; (rel)-Oxaliplatin; MFCD00001491; 1,2-Cylohexanediamine"
+        },
+        {
+          "name": "1,2-Diaminocyclohexane, (+)-",
+          "abbr": "1,2-Diaminocyclohexane, (+)-",
+          "cas": "21436-03-3",
+          "synonyms": [
+            "1,2-Diaminocyclohexane, (+)-",
+            "21436-03-3",
+            "(1S,2S)-(+)-1,2-Diaminocyclohexane",
+            "(1S,2S)-Cyclohexane-1,2-diamine",
+            "trans-(+)-1,2-diaminocyclohexane",
+            "(1S,2S)-1,2-CYCLOHEXANEDIAMINE",
+            "RefChem:411504",
+            "(1S)trans1,2Cyclohexanediamine",
+            "(1S)trans1,2Diaminocyclohexane",
+            "606-765-2",
+            "MFCD00062986",
+            "(1S,2S)-(+)-1,2-Cyclohexanediamine",
+            "(+/-)-trans-1,2-Diaminocyclohexane",
+            "(1s,2s)-1,2-diaminocyclohexane",
+            "1,2-CYCLOHEXANEDIAMINE, (1S,2S)-",
+            "MFCD00063747"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 2
+          },
+          "aliases": [
+            "21436-03-3",
+            "(1S,2S)-(+)-1,2-Diaminocyclohexane",
+            "(1S,2S)-Cyclohexane-1,2-diamine",
+            "trans-(+)-1,2-diaminocyclohexane",
+            "(1S,2S)-1,2-CYCLOHEXANEDIAMINE",
+            "RefChem:411504",
+            "(1S)trans1,2Cyclohexanediamine",
+            "(1S)trans1,2Diaminocyclohexane",
+            "606-765-2",
+            "MFCD00062986",
+            "(1S,2S)-(+)-1,2-Cyclohexanediamine",
+            "(+/-)-trans-1,2-Diaminocyclohexane",
+            "(1s,2s)-1,2-diaminocyclohexane",
+            "1,2-CYCLOHEXANEDIAMINE, (1S,2S)-",
+            "MFCD00063747"
+          ],
+          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N; N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | name: 1,2-Diaminocyclohexane, (+)- | abbr: 1,2-Diaminocyclohexane, (+)- | CAS: 21436-03-3 | synonyms: 1,2-Diaminocyclohexane, (+)-; 21436-03-3; (1S,2S)-(+)-1,2-Diaminocyclohexane; (1S,2S)-Cyclohexane-1,2-diamine; trans-(+)-1,2-diaminocyclohexane; (1S,2S)-1,2-CYCLOHEXANEDIAMINE; RefChem:411504; (1S)trans1,2Cyclohexanediamine; (1S)trans1,2Diaminocyclohexane; 606-765-2; MFCD00062986; (1S,2S)-(+)-1,2-Cyclohexanediamine; (+/-)-trans-1,2-Diaminocyclohexane; (1s,2s)-1,2-diaminocyclohexane; 1,2-CYCLOHEXANEDIAMINE, (1S,2S)-; MFCD00063747"
+        },
+        {
+          "name": "1,2-Diaminocyclohexane, trans-",
+          "abbr": "1,2-Diaminocyclohexane, trans-",
+          "cas": "1121-22-8",
+          "synonyms": [
+            "1,2-Diaminocyclohexane, trans-",
+            "(1R,2R)-(-)-1,2-Diaminocyclohexane",
+            "1121-22-8",
+            "trans-1,2-Diaminocyclohexane",
+            "1,2-Cyclohexanediamine, (1R,2R)-rel-",
+            "(-)-trans-1,2-Diaminocyclohexane",
+            "DTXSID60883654",
+            "TRANS-N,N'-1,2-CYCLOHEXANEDIAMINE",
+            "1,2-DIAMINOCYCLOHEXANE, TRANS-(-)-",
+            "RefChem:411507",
+            "trans1,2Cyclohexanediamine",
+            "DTXCID901766844",
+            "1,2Cyclohexanediamine, (1R,2R)rel",
+            "606-556-6",
+            "20439-47-8",
+            "(1R,2R)-cyclohexane-1,2-diamine"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 2
+          },
+          "aliases": [
+            "(1R,2R)-(-)-1,2-Diaminocyclohexane",
+            "1121-22-8",
+            "trans-1,2-Diaminocyclohexane",
+            "1,2-Cyclohexanediamine, (1R,2R)-rel-",
+            "(-)-trans-1,2-Diaminocyclohexane",
+            "DTXSID60883654",
+            "TRANS-N,N'-1,2-CYCLOHEXANEDIAMINE",
+            "1,2-DIAMINOCYCLOHEXANE, TRANS-(-)-",
+            "RefChem:411507",
+            "trans1,2Cyclohexanediamine",
+            "DTXCID901766844",
+            "1,2Cyclohexanediamine, (1R,2R)rel",
+            "606-556-6",
+            "20439-47-8",
+            "(1R,2R)-cyclohexane-1,2-diamine"
+          ],
+          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N; N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | name: 1,2-Diaminocyclohexane, trans- | abbr: 1,2-Diaminocyclohexane, trans- | CAS: 1121-22-8 | synonyms: 1,2-Diaminocyclohexane, trans-; (1R,2R)-(-)-1,2-Diaminocyclohexane; 1121-22-8; trans-1,2-Diaminocyclohexane; 1,2-Cyclohexanediamine, (1R,2R)-rel-; (-)-trans-1,2-Diaminocyclohexane; DTXSID60883654; TRANS-N,N'-1,2-CYCLOHEXANEDIAMINE; 1,2-DIAMINOCYCLOHEXANE, TRANS-(-)-; RefChem:411507; trans1,2Cyclohexanediamine; DTXCID901766844; 1,2Cyclohexanediamine, (1R,2R)rel; 606-556-6; 20439-47-8; (1R,2R)-cyclohexane-1,2-diamine"
         },
         {
           "name": "DMEDA",
@@ -2465,6 +2881,22 @@
             "denticity_rank": 2
           },
           "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N,N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | name: DMEDA | abbr: DMEDA | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | synonyms: DMEDA"
+        },
+        {
+          "name": "TMEDA",
+          "abbr": "TMEDA",
+          "cas": "110-18-9",
+          "synonyms": [
+            "TMEDA"
+          ],
+          "numeric_features": {
+            "steric_rank": 1,
+            "donor_rank": 1,
+            "pi_acceptor_rank": 1,
+            "rigidity_rank": 1,
+            "denticity_rank": 2
+          },
+          "embedding_text": "type: LIGAND | family: Diamines (aliphatic/cycloaliphatic N,N) (diamines) | donor_set: N,N | denticity: 2 | scaffold: Flexible bidentate amines; often serve as both ligands and bases | name: TMEDA | abbr: TMEDA | CAS: 110-18-9 | steric bulk band: low | electron donor band: low | pi acceptor band: low | rigidity band: low | use_cases: Ni cross-couplings (additive); Organolithium mediation (TMEDA) | best_for: Cheap, flexible chelation | avoid_when: High thermal stability requirement | synonyms: TMEDA"
         },
         {
           "name": "trans-1,2-diaminocyclohexane",

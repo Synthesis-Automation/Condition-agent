@@ -2731,7 +2731,6 @@
     "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/248655",
     "data_source": "PubChem"
   },
-
   {
     "cas": "17341-93-4",
     "name": "2,2,2-trichloroethyl carbonochloridate",
@@ -3804,7 +3803,6 @@
     "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/11390177",
     "data_source": "PubChem"
   },
-
   {
     "cas": "352275-00-4",
     "name": "(1E)-N-[4-(dimethylamino)pyridin-1-ium-1-yl]sulfonyl-1-[(2-methylpropan-2-yl)oxy]methanimidate",
@@ -4490,7 +4488,6 @@
     "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/4891",
     "data_source": "PubChem"
   },
-
   {
     "cas": "54663-78-4",
     "name": "tributyl(thiophen-2-yl)stannane",
@@ -4572,7 +4569,6 @@
     "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/11185",
     "data_source": "PubChem"
   },
-
   {
     "cas": "558-37-2",
     "name": "3,3-dimethylbut-1-ene",
@@ -7090,6 +7086,1302 @@
     "iupac_name": "manganese(3+) triacetate",
     "pubchem_cid": 160554,
     "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/160554",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "10028-15-6",
+    "name": "ozone",
+    "reported_name": "10028-15-6",
+    "role": "UNK",
+    "abbreviation": "OZONE",
+    "synonyms": [
+      "10028-15-6",
+      "233-069-2",
+      "629-936-3",
+      "66H7ZZK23N",
+      "CCRIS 4503"
+    ],
+    "typical_usage": "Occupational exposure from welding fumes; Also used as a disinfectant in water treatment and as a bleaching agent  in food, textile, and paper processing; [Levy, p. 409] . . . Gas metal arc and gas tungsten arc welding produce the highest ozone concentrations, especially when aluminum is used as a base metal. [Welding, Brazing  and Thermal Cutting. NIOSH Criteria for a Recommended Standard. Publication No. 88-110:33,1988] TWA ozone concentrations exceeded the ACGIH TLV at a pulp and paper plant construction site. The source was the electrostatic precipitators on the operating boiler stacks located upwind from the construction site. [Appl Occup Environ Hyg. 1999 Apr;14(4):203-7] Welding [Category: Weld] Metal Thermal Spraying [Category: Plate]",
+    "molecular_formula": "O3",
+    "molecular_weight": "47.998",
+    "iupac_name": "ozone",
+    "pubchem_cid": 24823,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/24823",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "10043-52-4",
+    "name": "calcium(2+)",
+    "reported_name": "10043-52-4",
+    "role": "UNK",
+    "abbreviation": "calcium ion",
+    "synonyms": [
+      "11079-03-1",
+      "125302-08-1",
+      "14127-61-8",
+      "2M83C4R6ZB",
+      "45Ca2+"
+    ],
+    "molecular_formula": "Ca+2",
+    "molecular_weight": "40.08",
+    "iupac_name": "calcium(2+)",
+    "pubchem_cid": 271,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/271",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "10544-50-0",
+    "name": "octathiocane",
+    "reported_name": "10544-50-0",
+    "role": "UNK",
+    "abbreviation": "Octathiocane",
+    "synonyms": [
+      ".alpha.-sulfur",
+      "10544-50-0",
+      "70FD1KFU70",
+      "AKOS015903681",
+      "CHEBI:29385"
+    ],
+    "molecular_formula": "S8",
+    "molecular_weight": "256.5",
+    "iupac_name": "octathiocane",
+    "pubchem_cid": 66348,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/66348",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "108-00-9",
+    "name": "N',N'-dimethylethane-1,2-diamine",
+    "reported_name": "108-00-9",
+    "role": "UNK",
+    "abbreviation": "EINECS 203-541-2",
+    "synonyms": [
+      "(2-Aminoethyl)Dimethylamine",
+      "(2-aminoethyl) dimethylamine",
+      "(N,N-dimethyl)ethylenediamine",
+      ".beta.-(Dimethylamino)ethylamine",
+      "1,2-Ethanediamine, N,N-dimethyl-"
+    ],
+    "molecular_formula": "C4H12N2",
+    "molecular_weight": "88.15",
+    "iupac_name": "N',N'-dimethylethane-1,2-diamine",
+    "pubchem_cid": 66053,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/66053",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "109-73-9",
+    "name": "butan-1-amine",
+    "reported_name": "109-73-9",
+    "role": "UNK",
+    "abbreviation": "Butylamine",
+    "synonyms": [
+      "1-AMINO-BUTANE",
+      "1-Amino-butaan",
+      "1-Amino-butaan [Dutch]",
+      "1-Aminobutan",
+      "1-Aminobutan [German]"
+    ],
+    "typical_usage": "Used as an intermediate in the synthesis of dyes, drugs, rubber additives, emulsifiers, tanning agents, and insecticides; also used as a vulcanizing accelerator for rubber and as a curing agent for polymers; [NIOSH Guidelines for Chemical Hazards] Plastic Composites Manufacturing [Category: Industry] Monobutylamine is an intermediate for the production of plasticizers (e.g., the rubber accelerator dibutylthiourea), agrochemicals (e.g., DuPont's fungicide benomyl), pharmaceuticals (e.g., the antidiabetic tolbutamide), emulsifying agents, dyes, and UV absorbers.",
+    "molecular_formula": "C4H11N",
+    "molecular_weight": "73.14",
+    "iupac_name": "butan-1-amine",
+    "pubchem_cid": 8007,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/8007",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "109-74-0",
+    "name": "butanenitrile",
+    "reported_name": "109-74-0",
+    "role": "UNK",
+    "abbreviation": "Butyronitrile",
+    "synonyms": [
+      "1-Cyanopropane",
+      "109-74-0",
+      "203-700-6",
+      "4-02-00-00806 (Beilstein Handbook Reference)",
+      "A802081"
+    ],
+    "typical_usage": "Used as an intermediate in the chemical and pharmaceutical industries; [HSDB] Basic material in indust, chemical and pharmaceutical intermediates and products; poultry medicines CHEM INT FOR BUTYRIC ACID, BUTYRAMIDE AND PHARMACEUTICALS, OTHER ORGANICS (EG, KETONES, ESTERS)",
+    "molecular_formula": "C4H7N",
+    "molecular_weight": "69.11",
+    "iupac_name": "butanenitrile",
+    "pubchem_cid": 8008,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/8008",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "109-89-7",
+    "name": "N-ethylethanamine",
+    "reported_name": "109-89-7",
+    "role": "UNK",
+    "abbreviation": "DIETHYLAMINE",
+    "synonyms": [
+      "(C2H5)2NH",
+      "(CH3CH2)2 NH",
+      "109-89-7",
+      "203-716-3",
+      "5-Oxo-L-prolyl-L-glutaminyl-L-alpha-aspartyl-O-sulfo-L-tyrosyl-L-threonylglycyl-L-tryptophyl-L-methionyl-L-alpha-aspartyl-L-phenylalaninamideN-ethylethanamine (1/1)"
+    ],
+    "typical_usage": "Used in the manufacture of rubber, petroleum products, resins, dyes, and pharmaceuticals; [Merck Index] Used as a corrosion inhibitor, rubber accelerator, and polymerization inhibitor; Also used in electroplating and as an organic intermediate; A metabolite of the drug disulfiram used in the treatment of alcohol abuse; [ACGIH] Electroplating [Category: Plate] Plastic Composites Manufacturing [Category: Industry]",
+    "molecular_formula": "C4H11N",
+    "molecular_weight": "73.14",
+    "iupac_name": "N-ethylethanamine",
+    "pubchem_cid": 8021,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/8021",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "110-05-4",
+    "name": "2-tert-butylperoxy-2-methylpropane",
+    "reported_name": "110-05-4",
+    "role": "UNK",
+    "abbreviation": "tert-Butyl peroxide",
+    "synonyms": [
+      "(CH3)3CO-OC(CH3)3",
+      "(Tributyl)peroxide",
+      "(tert-C4H9O)2",
+      "110-05-4",
+      "2,2'-dioxybis(2-methylpropane)"
+    ],
+    "typical_usage": "Used as an initiator for high-temperature, high-pressure polymerizations of ethylene and halogenated ethylenes; in the synthesis of polyketones; as a finishing catalyst for polystyrene; as a polymerization catalyst for acrylonitrile polymers and resins (including olefins, styrene, styrenated alkyds, and silicones); as curing agent for styrenated alkyds and silicone rubbers; as ignition accelerator for diesel fuels; and as a cross-linking agent (rubber and resins); [HSDB] Petroleum Production and Refining [Category: Industry] Plastic Composites Manufacturing [Category: Industry]",
+    "molecular_formula": "C8H18O2",
+    "molecular_weight": "146.23",
+    "iupac_name": "2-tert-butylperoxy-2-methylpropane",
+    "pubchem_cid": 8033,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/8033",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1118-68-9",
+    "name": "2-(dimethylamino)acetic acid",
+    "reported_name": "1118-68-9",
+    "role": "UNK",
+    "abbreviation": "N,N-dimethylglycine",
+    "synonyms": [
+      "(Dimethylamino)acetate",
+      "(Dimethylamino)acetic acid",
+      "(Dimethylamino)acetic acid #",
+      "1118-68-9",
+      "18D689"
+    ],
+    "molecular_formula": "C4H9NO2",
+    "molecular_weight": "103.12",
+    "iupac_name": "2-(dimethylamino)acetic acid",
+    "pubchem_cid": 673,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/673",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1118-71-4",
+    "name": "2,2,6,6-tetramethylheptane-3,5-dione",
+    "reported_name": "1118-71-4",
+    "role": "UNK",
+    "abbreviation": "Dipivaloylmethane",
+    "synonyms": [
+      "(CH3)3CCOCH2COC(CH3)3",
+      "1,3-Di-tert-butyl-1,3-propanedione; Dipivaloylmethane; NSC 174296",
+      "1118-71-4",
+      "2, 2, 6, 6-tetramethylheptane-3,5-dione",
+      "2,2,6,6 tetramethyl 3,5 heptanedione"
+    ],
+    "typical_usage": "Used as a chelating agent for cadmium; [ChemIDplus]",
+    "molecular_formula": "C11H20O2",
+    "molecular_weight": "184.27",
+    "iupac_name": "2,2,6,6-tetramethylheptane-3,5-dione",
+    "pubchem_cid": 70700,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/70700",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1121-22-8",
+    "name": "cyclohexane-1,2-diamine",
+    "reported_name": "1121-22-8",
+    "role": "UNK",
+    "abbreviation": "DACH",
+    "synonyms": [
+      "(' inverted exclamation markA)-trans-1,2-Diaminocyclohexan",
+      "(+)-S,S-1,2-Diaminocyclohexane",
+      "(+/-)-1,2-trans-diaminocyclohexane",
+      "(+/-)-trans-1,2-Diaminocyclohexane",
+      "(1R,2R)-(-)- 1,2-Diaminocyclohexane"
+    ],
+    "typical_usage": "MALONATO-, HYDROXYMALONATO-, DINITRO-, HYDROXONITRATO-, & SULFATO(1,2-DIAMINOCYCLOHEXANE) PLATINUM(II), PREPARED FROM DICHLORO(1,2-DIAMINOCYCLOHEXANE WERE MORE EFFECTIVE THAN DICHLORO (1,2-DIAMINOCYCLOHEXANE)PLATINUM(II) IN THE TREATMENT OF L1210 LEUKEMIA IN MICE, BOTH ALONE & IN COMBINATION WITH CYCLOPHOSPHAMIDE OR YOSHI 864. Used to make bicyclic pyrazine derivatives; [HSDB] SYNTHESIS OF BICYCLIC PYRAZINE DERIVATIVES",
+    "molecular_formula": "C6H14N2",
+    "molecular_weight": "114.19",
+    "iupac_name": "cyclohexane-1,2-diamine",
+    "pubchem_cid": 4610,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/4610",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1207294-91-4",
+    "name": "1207294-91-4",
+    "role": "UNK"
+  },
+  {
+    "cas": "12678-01-2",
+    "name": "1,10-phenanthroline",
+    "reported_name": "12678-01-2",
+    "role": "UNK",
+    "abbreviation": "1,10-phenanthroline",
+    "synonyms": [
+      "(OP)2Cu(I)",
+      ".beta.-Phenanthroline",
+      "011P678",
+      "1,1 0-phenanthroline",
+      "1,10 phenanthroline"
+    ],
+    "typical_usage": "Used as an analytical reagent, metal chelator, and in organic synthesis; [Merck Index] Permitted for use as an inert ingredient in non-food pesticide products; [EPA] Paint additives and coating additives not described by other categories",
+    "molecular_formula": "C12H8N2",
+    "molecular_weight": "180.20",
+    "iupac_name": "1,10-phenanthroline",
+    "pubchem_cid": 1318,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/1318",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "13494-80-9",
+    "name": "tellane",
+    "reported_name": "13494-80-9",
+    "role": "UNK",
+    "abbreviation": "Hydrogen telluride",
+    "synonyms": [
+      "(TeH2)",
+      "7783-09-7",
+      "7F4735942K",
+      "CHEBI:36649",
+      "CHEBI:49907"
+    ],
+    "molecular_formula": "H2Te",
+    "molecular_weight": "129.6",
+    "iupac_name": "tellane",
+    "pubchem_cid": 21765,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/21765",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "139139-80-3",
+    "name": "bis(2,4,6-trimethylphenyl)iodanium;trifluoromethanesulfonate",
+    "reported_name": "139139-80-3",
+    "role": "UNK",
+    "abbreviation": "RefChem:568599",
+    "synonyms": [
+      "139139-80-3",
+      "802-729-7",
+      "AKOS040768152",
+      "B5260",
+      "BS-30809"
+    ],
+    "molecular_formula": "C19H22F3IO3S",
+    "molecular_weight": "514.3",
+    "iupac_name": "bis(2,4,6-trimethylphenyl)iodanium;trifluoromethanesulfonate",
+    "pubchem_cid": 10625620,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/10625620",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "140681-55-6",
+    "name": "1-(chloromethyl)-4-fluoro-1,4-diazoniabicyclo[2.2.2]octane ditetrafluoroborate",
+    "reported_name": "140681-55-6",
+    "role": "UNK",
+    "abbreviation": "selectfluor",
+    "synonyms": [
+      "1,4-DIAZONIABICYCLO(2.2.2)OCTANE, 1-(CHLOROMETHYL)-4-FLUORO-, TETRAFLUOROBORATE(1-)",
+      "1,4-Diazoniabicyclo(2.2.2)octane, 1-(chloromethyl)-4-fluoro-, bis(tetrafluoroborate(1-))",
+      "1,4-Diazoniabicyclo[2.2.2]octane, 1-(chloromethyl)-4-fluoro-, bis[tetrafluoroborate(1-)]",
+      "1-( chloromethyl)-4-fluoro-1,4-diazoniabicyclo[2.2.2]octane bis(tetrafluoroborate)",
+      "1-(Chloromethyl)-4-fluoro-1,4-diazabicyclo[2.2.2]octane-1,4-diium tetrafluoroborate"
+    ],
+    "molecular_formula": "C7H14B2ClF9N2",
+    "molecular_weight": "354.3",
+    "iupac_name": "1-(chloromethyl)-4-fluoro-1,4-diazoniabicyclo[2.2.2]octane ditetrafluoroborate",
+    "pubchem_cid": 2724933,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/2724933",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "143174-36-1",
+    "name": "sodium",
+    "reported_name": "143174-36-1",
+    "role": "UNK",
+    "abbreviation": "SODIUM",
+    "synonyms": [
+      "116001-96-8",
+      "11Na",
+      "231-132-9",
+      "23Na (isotope)",
+      "23Na isotope"
+    ],
+    "typical_usage": "MFR OF SODIUM CMPD, SUCH AS CYANIDE, AZIDE, PEROXIDE, ETC; IN MFR OF TETRAETHYL LEAD; IN ORG SYNTHESES; FOR PHOTOELECTRIC CELLS; IN SODIUM LAMPS; ALLOYED WITH POTASSIUM IN HEAT TRANSFER MEDIA. IMPROVE STRUCTURE OF CERTAIN ALLOYS, TO DESCALE METAL, TO PURIFY MOLTEN METALS, IN REDUCTION OF ORG ESTERS. CHEM INT FOR SODIUM HYDRIDE; CHEMICAL INT & CATALYST IN NUMEROUS MISC APPLICATIONS; REDUCING AGENT FOR METALS.",
+    "molecular_formula": "Na",
+    "molecular_weight": "22.9897693",
+    "iupac_name": "sodium",
+    "pubchem_cid": 5360545,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/5360545",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "147-85-3",
+    "name": "pyrrolidine-2-carboxylic acid",
+    "reported_name": "147-85-3",
+    "role": "UNK",
+    "abbreviation": "Proline, DL-",
+    "synonyms": [
+      "(+-)-proline",
+      "(+/-)-Pyrrolidine-2-carboxylic acid",
+      "(+/-)-proline",
+      "(R,S)-Pyrrolidine-2-carboxylic acid",
+      "10-proline"
+    ],
+    "typical_usage": "Proline is a non-essential amino acid; [Merck Index] Flavouring Agent -> FLAVOURING_AGENT;  -> JECFA Functional Classes Information on 32 consumer products that contain Proline in the following categories is provided:",
+    "molecular_formula": "C5H9NO2",
+    "molecular_weight": "115.13",
+    "iupac_name": "pyrrolidine-2-carboxylic acid",
+    "pubchem_cid": 614,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/614",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "155-30-6",
+    "name": "(3R,5R,6S)-2-(hydroxymethyl)-6-methylsulfanyloxane-3,4,5-triol",
+    "reported_name": "155-30-6",
+    "role": "UNK",
+    "abbreviation": "RefChem:189562",
+    "synonyms": [
+      "(3R,5R,6S)-2-(HYDROXYMETHYL)-6-(METHYLSULFANYL)OXANE-3,4,5-TRIOL",
+      "(3R,5R,6S)-2-(hydroxymethyl)-6-(methylthio)oxane-3,4,5-triol",
+      "(3R,5R,6S)-2-(hydroxymethyl)-6-methylsulfanyloxane-3,4,5-triol",
+      "DB-222990",
+      "EINECS 205-842-4"
+    ],
+    "molecular_formula": "C7H14O5S",
+    "molecular_weight": "210.25",
+    "iupac_name": "(3R,5R,6S)-2-(hydroxymethyl)-6-methylsulfanyloxane-3,4,5-triol",
+    "pubchem_cid": 92102,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/92102",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "15519-28-5",
+    "name": "cesium hydrogen carbonate",
+    "reported_name": "15519-28-5",
+    "role": "UNK",
+    "abbreviation": "Cesium bicarbonate",
+    "synonyms": [
+      "15519-28-5",
+      "239-554-5",
+      "29703-01-3",
+      "AKOS025295078",
+      "CESIUM BICARBONATE, PURE, 99.9%"
+    ],
+    "molecular_formula": "CHCsO3",
+    "molecular_weight": "193.922",
+    "iupac_name": "cesium hydrogen carbonate",
+    "pubchem_cid": 2734983,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/2734983",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "161118-67-8",
+    "name": "tert-butylimino(tripyrrolidin-1-yl)-lambda5-phosphane",
+    "reported_name": "161118-67-8",
+    "role": "UNK",
+    "abbreviation": "RefChem:896573",
+    "synonyms": [
+      "(2,2-dimethyl-1-azapropylidene)tripyrrolidinylphosphine",
+      "(tert-Butylimino)tris(pyrrolidino)phosphorane",
+      "1-[N-(2-methylpropan-2-yl)-P,P-di(pyrrolidin-1-yl)phosphorimidoyl]-pyrrolidine",
+      "1-[N-(2-methylpropan-2-yl)-P,P-di(pyrrolidin-1-yl)phosphorimidoyl]pyrrolidine",
+      "1-[N-(tert-butyl)-P,P-di(pyrrolidin-1-yl)phosphorimidoyl]-pyrrolidine"
+    ],
+    "molecular_formula": "C16H33N4P",
+    "molecular_weight": "312.43",
+    "iupac_name": "tert-butylimino(tripyrrolidin-1-yl)-lambda5-phosphane",
+    "pubchem_cid": 3856267,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/3856267",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1632-83-3",
+    "name": "6,10-dimethylundecan-2-one",
+    "reported_name": "1632-83-3",
+    "role": "UNK",
+    "abbreviation": "UNII-91TGG00357",
+    "synonyms": [
+      "(1)-6,10-Dimethylundecan-2-one",
+      "1604-34-8",
+      "2,6-DIMETHYLUNDECANE-10-ONE",
+      "2-Undecanone, 6,10-dimethyl-",
+      "2-Undecanone,10-dimethyl-"
+    ],
+    "molecular_formula": "C13H26O",
+    "molecular_weight": "198.34",
+    "iupac_name": "6,10-dimethylundecan-2-one",
+    "pubchem_cid": 95495,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/95495",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "16872-11-0",
+    "name": "tetrafluoroborate",
+    "reported_name": "16872-11-0",
+    "role": "UNK",
+    "abbreviation": "Tetrafluoroborate",
+    "synonyms": [
+      "14874-70-5",
+      "4YCF3545OY",
+      "61674-41-7",
+      "BDBM26993",
+      "BF4"
+    ],
+    "molecular_formula": "BF4-",
+    "molecular_weight": "86.81",
+    "iupac_name": "tetrafluoroborate",
+    "pubchem_cid": 26255,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/26255",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1809-20-7",
+    "name": "2-propan-2-yloxyphosphonoyloxypropane",
+    "reported_name": "1809-20-7",
+    "role": "UNK",
+    "abbreviation": "RefChem:920277",
+    "synonyms": [
+      "1809-20-7",
+      "217-317-7",
+      "676G4RQ6ND",
+      "Diisopropyl hydrogen phosphite",
+      "Diisopropyl hydrogen phosphonate"
+    ],
+    "molecular_formula": "C6H15O3P",
+    "molecular_weight": "166.16",
+    "iupac_name": "2-propan-2-yloxyphosphonoyloxypropane",
+    "pubchem_cid": 3072,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/3072",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "189114-61-2",
+    "name": "silver",
+    "reported_name": "189114-61-2",
+    "role": "UNK",
+    "abbreviation": "SILVER",
+    "synonyms": [
+      "231-131-3",
+      "3M4G523W1G",
+      "47Ag",
+      "628-860-8",
+      "7440-22-4"
+    ],
+    "typical_usage": "Currently approved \"nano-scale\"devices:.Silver nanoparticles(anti-bacterial wound dressing) Acticoat *7 /containing silver nanocrystals is a/ technology that provides a new class of silver antimicrobial barrier to prevent and reduce infection. It provides an antimicrobial barrier layer over partial and full thickness wounds such as: pressure ulcers, venous ulcers, diabetic ulcers, burns and donor and recipient graft sites. The authors report the use of nanocrystalline silver (Acticoat 7) in an acute surgical wound to prevent localized skin necrosis due to infection, thereby avoiding skin grafting as a secondary procedure. Two patients were successfully treated with Acticoat 7 dressings without using systemic antimicrobials after developing methicillin-resistant Staphylococcus aureus infection in the surgical site. Despite a history of smoking and incision through scar tissues, the wound did not progress into deep infection nor was there recurrence of infection at 2 years follow-up...",
+    "molecular_formula": "Ag",
+    "molecular_weight": "107.868",
+    "iupac_name": "silver",
+    "pubchem_cid": 23954,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/23954",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "1941-30-6",
+    "name": "tetrapropylazanium",
+    "reported_name": "1941-30-6",
+    "role": "UNK",
+    "abbreviation": "Tetrapropylammonium",
+    "synonyms": [
+      "1-Propanaminium, N,N,N-tripropyl-",
+      "13010-31-6",
+      "BDBM50420179",
+      "CHEBI:55319",
+      "CHEMBL2074857"
+    ],
+    "molecular_formula": "C12H28N+",
+    "molecular_weight": "186.36",
+    "iupac_name": "tetrapropylazanium",
+    "pubchem_cid": 9559,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/9559",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "21436-03-3",
+    "name": "cyclohexane-1,2-diamine",
+    "reported_name": "21436-03-3",
+    "role": "UNK",
+    "abbreviation": "DACH",
+    "synonyms": [
+      "(' inverted exclamation markA)-trans-1,2-Diaminocyclohexan",
+      "(+)-S,S-1,2-Diaminocyclohexane",
+      "(+/-)-1,2-trans-diaminocyclohexane",
+      "(+/-)-trans-1,2-Diaminocyclohexane",
+      "(1R,2R)-(-)- 1,2-Diaminocyclohexane"
+    ],
+    "typical_usage": "MALONATO-, HYDROXYMALONATO-, DINITRO-, HYDROXONITRATO-, & SULFATO(1,2-DIAMINOCYCLOHEXANE) PLATINUM(II), PREPARED FROM DICHLORO(1,2-DIAMINOCYCLOHEXANE WERE MORE EFFECTIVE THAN DICHLORO (1,2-DIAMINOCYCLOHEXANE)PLATINUM(II) IN THE TREATMENT OF L1210 LEUKEMIA IN MICE, BOTH ALONE & IN COMBINATION WITH CYCLOPHOSPHAMIDE OR YOSHI 864. Used to make bicyclic pyrazine derivatives; [HSDB] SYNTHESIS OF BICYCLIC PYRAZINE DERIVATIVES",
+    "molecular_formula": "C6H14N2",
+    "molecular_weight": "114.19",
+    "iupac_name": "cyclohexane-1,2-diamine",
+    "pubchem_cid": 4610,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/4610",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "2206-27-1",
+    "name": "methylsulfinylmethane",
+    "reported_name": "2206-27-1",
+    "role": "UNK",
+    "abbreviation": "dimethyl sulfoxide",
+    "synonyms": [
+      "(CH3)2SO",
+      "(DMSO)",
+      "(methanesulfinyl)methane",
+      "(methanesulfinyl)methanedimethyl sulfoxide",
+      "(methylsulfinyl)methane"
+    ],
+    "typical_usage": "Cryoprotective Agents; Free Radical Scavengers; Solvents DMSO may have anti-inflammatory, antioxidant and analgesic activities. DMSO also readily penetrates cellular membranes. EXPL THER OBJECTIVE: To evaluate the discomfort and long-term efficacy associated with instillation of dimethyl sulfoxide (DMSO).  MATERIAL AND METHODS: A total of 28 patients, 13 (11 females, 2 males) with classic interstitial cystitis (IC) and 15 (13 females, two males) with non-ulcer disease, who had received at least one series of six instillations of DMSO were studied. In addition to studying micturition diaries before and after the treatment, the evaluation included assessments of pain using a visual analog scale and of side-effects after each instillation in every series. Data were obtained by surveying the clinical records. A follow-up telephone interview was conducted for those patients who were treated with DMSO and in whom the treatment was considered successful. DMSO instillations were considered successful if the patient reported symptom amelioration and chose to continue with the treatment.  RESULTS: Side-effects were not more common or pronounced in patients with classic compared to non-ulcer IC. For classic IC a significant difference could be seen when comparing side-effects experienced during the first three instillations and the three subsequent instillations. After DMSO instillations, a residual treatment effect lasting 16-72 months could be seen.  CONCLUSIONS: Intravesical instillation therapy with DMSO appears to be a feasible treatment option for both subtypes of IC and is associated with a reasonably low degree of discomfort.",
+    "molecular_formula": "C2H6OS",
+    "molecular_weight": "78.14",
+    "iupac_name": "methylsulfinylmethane",
+    "pubchem_cid": 679,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/679",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "2451224-01-2",
+    "name": "N-tris(trimethylsilyl)silyladamantan-1-amine",
+    "reported_name": "2451224-01-2",
+    "role": "UNK",
+    "abbreviation": "AMINOSUPERSILANE",
+    "synonyms": [
+      "2451224-01-2",
+      "AMINOSUPERSILANE",
+      "C19H43NSi4",
+      "E71132",
+      "MFCD32857305"
+    ],
+    "molecular_formula": "C19H43NSi4",
+    "molecular_weight": "397.9",
+    "iupac_name": "N-tris(trimethylsilyl)silyladamantan-1-amine",
+    "pubchem_cid": 155930602,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/155930602",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "2491-06-7",
+    "name": "2-(dimethylamino)acetic acid;hydrochloride",
+    "reported_name": "2491-06-7",
+    "role": "UNK",
+    "abbreviation": "YXK75EAE92",
+    "synonyms": [
+      "(Dimethylamino)acetic acid hydrochloride",
+      "2-(dimethylamino)acetic acid hydrochloride",
+      "2-(dimethylamino)acetic acid, chloride",
+      "2-(dimethylamino)acetic acid;hydrochloride",
+      "219-648-2"
+    ],
+    "molecular_formula": "C4H10ClNO2",
+    "molecular_weight": "139.58",
+    "iupac_name": "2-(dimethylamino)acetic acid;hydrochloride",
+    "pubchem_cid": 75605,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/75605",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "2615-25-0",
+    "name": "cyclohexane-1,4-diamine",
+    "reported_name": "2615-25-0",
+    "role": "UNK",
+    "abbreviation": "DTXSID30185071",
+    "synonyms": [
+      "(1r,4r)-cyclohexane-1,4-diamine",
+      "(1s,4s)-cyclohexane-1,4-diamine",
+      "(4-aminocyclohexyl)amine",
+      "(trans)-cyclohexane-1,4-diamine",
+      "1,4-CYCLOHEXANEDIAMINE"
+    ],
+    "molecular_formula": "C6H14N2",
+    "molecular_weight": "114.19",
+    "iupac_name": "cyclohexane-1,4-diamine",
+    "pubchem_cid": 18374,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/18374",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "26937-01-9",
+    "name": "ethane-1,2-diamine;methyl prop-2-enoate",
+    "reported_name": "26937-01-9",
+    "role": "UNK",
+    "abbreviation": "DTXSID50949718",
+    "synonyms": [
+      "CS-0435532",
+      "DTXCID301377899",
+      "DTXSID50949718",
+      "Methyl acrylate compound with ethane-1,2-diamine (1:1)",
+      "Methyl prop-2-enoate--ethane-1,2-diamine (1/1)"
+    ],
+    "molecular_formula": "C6H14N2O2",
+    "molecular_weight": "146.19",
+    "iupac_name": "ethane-1,2-diamine;methyl prop-2-enoate",
+    "pubchem_cid": 161547,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/161547",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "2712-78-9",
+    "name": "[phenyl-(2,2,2-trifluoroacetyl)oxy-lambda3-iodanyl] 2,2,2-trifluoroacetate",
+    "reported_name": "2712-78-9",
+    "role": "UNK",
+    "abbreviation": "659SFV27XS",
+    "synonyms": [
+      "(Bis(trifluoroacetoxy)iodo)benzene",
+      "(Bis(trifluoroacetoxy)iodo)benzene (PIFA)",
+      "220-308-0",
+      "2712-78-9",
+      "659SFV27XS"
+    ],
+    "molecular_formula": "C10H5F6IO4",
+    "molecular_weight": "430.04",
+    "iupac_name": "[phenyl-(2,2,2-trifluoroacetyl)oxy-lambda3-iodanyl] 2,2,2-trifluoroacetate",
+    "pubchem_cid": 102317,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/102317",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "2836-03-5",
+    "name": "2-N,2-N-dimethylbenzene-1,2-diamine",
+    "reported_name": "2836-03-5",
+    "role": "UNK",
+    "abbreviation": "BRN 1817293",
+    "synonyms": [
+      "(2-Aminophenyl)dimethylamine",
+      "1,2-Benzenediamine, N,N-dimethyl-",
+      "1,2-Benzenediamine, N1,N1-dimethyl-",
+      "1-Amino-2-(dimethylamino)benzene",
+      "2-(N,N-Dimethylamino)-aniline"
+    ],
+    "molecular_formula": "C8H12N2",
+    "molecular_weight": "136.19",
+    "iupac_name": "2-N,2-N-dimethylbenzene-1,2-diamine",
+    "pubchem_cid": 76083,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/76083",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "3425-46-5",
+    "name": "potassium selenocyanate",
+    "reported_name": "3425-46-5",
+    "role": "UNK",
+    "abbreviation": "CCRIS 7063",
+    "synonyms": [
+      "222-320-1",
+      "3425-46-5",
+      "AKOS015833667",
+      "CCRIS 7063",
+      "CHEMBL4087109"
+    ],
+    "molecular_formula": "CKNSe",
+    "molecular_weight": "144.09",
+    "iupac_name": "potassium selenocyanate",
+    "pubchem_cid": 76960,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/76960",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "354-38-1",
+    "name": "2,2,2-trifluoroacetamide",
+    "reported_name": "354-38-1",
+    "role": "UNK",
+    "abbreviation": "Trifluoroacetamide",
+    "synonyms": [
+      "2,2,2 trifluoroacetamide",
+      "2,2,2-Trifluoro-acetamide",
+      "2,2,2-Trifluoroacetamide",
+      "2,2,2-trifluoro acetamide",
+      "2,2-Trifluoroacetamide"
+    ],
+    "typical_usage": "Used as an intermediate in fine chemical manufacture and in scientific research and development; [ECHA REACH Registrations]",
+    "molecular_formula": "C2H2F3NO",
+    "molecular_weight": "113.04",
+    "iupac_name": "2,2,2-trifluoroacetamide",
+    "pubchem_cid": 67717,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/67717",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "39809-93-3",
+    "name": "39809-93-3",
+    "role": "UNK"
+  },
+  {
+    "cas": "41769-06-6",
+    "name": "potassium 2-tert-butylphenolate",
+    "reported_name": "41769-06-6",
+    "role": "UNK",
+    "abbreviation": "EINECS 255-545-9",
+    "synonyms": [
+      "255-545-9",
+      "41769-06-6",
+      "DTXCID60117082",
+      "DTXSID20194591",
+      "EINECS 255-545-9"
+    ],
+    "molecular_formula": "C10H13KO",
+    "molecular_weight": "188.31",
+    "iupac_name": "potassium 2-tert-butylphenolate",
+    "pubchem_cid": 23663693,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/23663693",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "4214-76-0",
+    "name": "1H-pyrimidine-2,4-dione",
+    "reported_name": "4214-76-0",
+    "role": "UNK",
+    "abbreviation": "uracil",
+    "synonyms": [
+      "(4-Hydroxypyrimidin-2-yl)oxidanyl",
+      "1,2,3,4-tetrahydropyrimidine-2,4-dione",
+      "1,3-dihydropyrimidine-2,4-dione",
+      "144104-68-7",
+      "1H-Pyrimidine-2,4-dione"
+    ],
+    "typical_usage": "Produced by hydrolysis of nucleic acids; Used in biochemical research; [Merck Index] Use (kg; approx.) in Germany (2009): >10 Consumption (g per capita; approx.) in Germany (2009): 0.000122",
+    "molecular_formula": "C4H4N2O2",
+    "molecular_weight": "112.09",
+    "iupac_name": "1H-pyrimidine-2,4-dione",
+    "pubchem_cid": 1174,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/1174",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "43148-65-8",
+    "name": "1-N,1-N,2-N,2-N-tetramethylcyclohexane-1,2-diamine",
+    "reported_name": "43148-65-8",
+    "role": "UNK",
+    "abbreviation": "RefChem:831236",
+    "synonyms": [
+      "(1R,2R)-N,N,N'',N''-Tetramethyl-1,2-cyclohexanediamine",
+      "(1R,2R)-rel-N1,N1,N2,N2-Tetramethylcyclohexane-1,2-diamine",
+      "(1S,2S)-1-N,1-N,2-N,2-N-tetramethylcyclohexane-1,2-diamine",
+      "(1S,2S)-N,N,N'',N''-Tetramethyl-1,2-cyclohexanediamine",
+      "1,2-Cyclohexanediamine, N,N,N',N'-tetramethyl-"
+    ],
+    "molecular_formula": "C10H22N2",
+    "molecular_weight": "170.30",
+    "iupac_name": "1-N,1-N,2-N,2-N-tetramethylcyclohexane-1,2-diamine",
+    "pubchem_cid": 551456,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/551456",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "480-63-7",
+    "name": "2,4,6-trimethylbenzoic acid",
+    "reported_name": "480-63-7",
+    "role": "UNK",
+    "abbreviation": "beta-Isodurylic acid",
+    "synonyms": [
+      ".beta.-Isodurylic acid",
+      "2, 4, 6-trimethyl benzoic acid",
+      "2,4,6-TRIMETHYLBENZOIC ACID",
+      "2,4,6-Trimethylbenzoic Acid; Mesitylenecarboxylic Acid; NSC 1119; NSC 203160;NSC 407983; beta-Isodurylic Acid",
+      "2,4,6-Trimethylbenzoic acid Solution in Toluene, 1000ug/mL"
+    ],
+    "molecular_formula": "C10H12O2",
+    "molecular_weight": "164.20",
+    "iupac_name": "2,4,6-trimethylbenzoic acid",
+    "pubchem_cid": 10194,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/10194",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "50-81-7",
+    "name": "4-N-cyclopropyl-6-(difluoromethylsulfanyl)-2-N-propan-2-yl-1,3,5-triazine-2,4-diamine",
+    "reported_name": "50-81-7",
+    "role": "UNK",
+    "abbreviation": "DTXSID80908398",
+    "synonyms": [
+      "1,3,5-Triazine-2,4-diamine, N-cyclopropyl-6-((difluoromethyl)thio)-N'-(1-methylethyl)-",
+      "103427-86-7",
+      "DTXSID80908398",
+      "N~2~-Cyclopropyl-6-[(difluoromethyl)sulfanyl]-N~4~-(propan-2-yl)-1,3,5-triazine-2,4(1H,3H)-diimine"
+    ],
+    "molecular_formula": "C10H15F2N5S",
+    "molecular_weight": "275.32",
+    "iupac_name": "4-N-cyclopropyl-6-(difluoromethylsulfanyl)-2-N-propan-2-yl-1,3,5-triazine-2,4-diamine",
+    "pubchem_cid": 190531,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/190531",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "532-31-0",
+    "name": "silver benzoate",
+    "reported_name": "532-31-0",
+    "role": "UNK",
+    "abbreviation": "Silver benzoate",
+    "synonyms": [
+      "208-533-2",
+      "532-31-0",
+      "AKL351M7YF",
+      "AKOS015839083",
+      "AMY11769"
+    ],
+    "molecular_formula": "C7H5AgO2",
+    "molecular_weight": "228.98",
+    "iupac_name": "silver benzoate",
+    "pubchem_cid": 164649,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/164649",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "546-93-0",
+    "name": "magnesium carbonate",
+    "reported_name": "546-93-0",
+    "role": "UNK",
+    "abbreviation": "MAGNESIUM CARBONATE",
+    "synonyms": [
+      "0E53J927NA",
+      "0IHC698356",
+      "13717-00-5",
+      "208-915-9",
+      "231-851-8"
+    ],
+    "typical_usage": "THE CARBONATE ... /SALT/ OF MAGNESIUM /IS/ USED AS /ANTACID/, USUALLY IN COMBINATION WITH ALUMINUM HYDROXIDE. ALTHOUGH 1 G CONTAINS APPROX 20 MEQ ONLY FRACTION MAY BE AVAILABLE FOR NEUTRALIZATION IN VIVO. USUAL ANTACID DOSE OF 500 MG TO 2 G MAY BE INADEQUATE MEDICATION (VET): WHEN INSOL IN DIGESTIVE TRACT IT IS ANTIDIARRHEAL & COATS MUCOSAE; WHEN SLIGHTLY SOL FORM IS USED IT CAN BE AS LAXATIVE AS MAGNESIUM OXIDE. ... COMMERCIALLY AVAILABLE COSMETIC GRADES EXIST FOR RARE USE AS TOPICAL PROTECTANT, MOISTURE & FAT ABSORBENT.",
+    "molecular_formula": "CMgO3",
+    "molecular_weight": "84.31",
+    "iupac_name": "magnesium carbonate",
+    "pubchem_cid": 11029,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/11029",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "582-25-2",
+    "name": "benzoic acid",
+    "reported_name": "582-25-2",
+    "role": "UNK",
+    "abbreviation": "benzoic acid",
+    "synonyms": [
+      "0BE368DC-6DE6-4927-AECF-E4BB2968A4A0",
+      "14322-82-8",
+      "1gyx",
+      "1kqb",
+      "2-BENZOYL-5-METHOXYBENZOQUINONE_met032"
+    ],
+    "typical_usage": "Antifungal Agents; Food Preservatives Benzoic acid ... has a long history of use as an antifungal agent in topical therapeutic preparations such as Whitfield's ointment (benzoic acid 6% and salicylic acid 3%). ... It is used especially in the treatment of athlete's foot and to lesser extent for management of ringworm.",
+    "molecular_formula": "C7H6O2",
+    "molecular_weight": "122.12",
+    "iupac_name": "benzoic acid",
+    "pubchem_cid": 243,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/243",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "616-47-7",
+    "name": "1-methylimidazole",
+    "reported_name": "616-47-7",
+    "role": "UNK",
+    "abbreviation": "1-methylimidazole",
+    "synonyms": [
+      "1-Methyl-1H-imidazole",
+      "1-Methyl-1H-imidazole #",
+      "1-Methyl-1H-imidazole; Thiamazole Imp. B (EP); Thiamazole Impurity B",
+      "1-Methyl-1H-imidazole;N-Methylimidazole;1H-Imidazole, 1-methyl-",
+      "1-Methylimidazole, >=99%, purified by redistillation"
+    ],
+    "typical_usage": "Other Paint additives and coating additives not described by other categories Viscosity adjustors",
+    "molecular_formula": "C4H6N2",
+    "molecular_weight": "82.10",
+    "iupac_name": "1-methylimidazole",
+    "pubchem_cid": 1390,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/1390",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "61798-24-1",
+    "name": "1-N,2-N-dimethylcyclohexane-1,2-diamine",
+    "reported_name": "61798-24-1",
+    "role": "UNK",
+    "abbreviation": "RefChem:434700",
+    "synonyms": [
+      "(1R,2R)-N,N\\'-Dimethyl-1,2-cyclohexanediamine",
+      "(1R,2S)-N1,N2-Dimethyl-1,2-cyclohexanediamine",
+      "(1RS,2RS)-N,N'-dimethylcyclohexane-1,2-diamine",
+      "(1S)-TRANS-1,2-BIS(METHYLAMINO)CYCLOHEXANE",
+      "(1S,2S)-N,N'-Dimethyl-1,2-cyclohexanediamine"
+    ],
+    "molecular_formula": "C8H18N2",
+    "molecular_weight": "142.24",
+    "iupac_name": "1-N,2-N-dimethylcyclohexane-1,2-diamine",
+    "pubchem_cid": 551074,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/551074",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "626-39-1",
+    "name": "1,3,5-tribromobenzene",
+    "reported_name": "626-39-1",
+    "role": "UNK",
+    "abbreviation": "DTXSID3052307",
+    "synonyms": [
+      "1,3,5-TRIBROMOBENZENE",
+      "1,3,5-Tribromobenzene, 98%",
+      "1,3,5-Tribromobenzene, purum, >=98.0% (AT)",
+      "1,3,5-Tribromobenzene; NSC 62439",
+      "1,3,5-tribromo-benzene"
+    ],
+    "molecular_formula": "C6H3Br3",
+    "molecular_weight": "314.80",
+    "iupac_name": "1,3,5-tribromobenzene",
+    "pubchem_cid": 12279,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/12279",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "638-38-0",
+    "name": "manganese(2+) diacetate",
+    "reported_name": "638-38-0",
+    "role": "UNK",
+    "abbreviation": "Manganese acetate",
+    "synonyms": [
+      "(acetyloxy)manganio acetate",
+      "0V6E9Q2I0Y",
+      "2180-18-9",
+      "638-38-0",
+      "68836-53-3"
+    ],
+    "typical_usage": "Used as a dye mordant and varnish drier; [Merck Index] Used in fertilizers, food packaging, and feed additives; [Hawley] Textiles (Printing, Dyeing, or Finishing) [Category: Industry] Farming (Feed Additives) [Category: Industry]",
+    "molecular_formula": "C4H6MnO4",
+    "molecular_weight": "173.03",
+    "iupac_name": "manganese(2+) diacetate",
+    "pubchem_cid": 12525,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/12525",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "67579-81-1",
+    "name": "1-N,2-N-dimethylcyclohexane-1,2-diamine",
+    "reported_name": "67579-81-1",
+    "role": "UNK",
+    "abbreviation": "RefChem:434700",
+    "synonyms": [
+      "(1R,2R)-N,N\\'-Dimethyl-1,2-cyclohexanediamine",
+      "(1R,2S)-N1,N2-Dimethyl-1,2-cyclohexanediamine",
+      "(1RS,2RS)-N,N'-dimethylcyclohexane-1,2-diamine",
+      "(1S)-TRANS-1,2-BIS(METHYLAMINO)CYCLOHEXANE",
+      "(1S,2S)-N,N'-Dimethyl-1,2-cyclohexanediamine"
+    ],
+    "molecular_formula": "C8H18N2",
+    "molecular_weight": "142.24",
+    "iupac_name": "1-N,2-N-dimethylcyclohexane-1,2-diamine",
+    "pubchem_cid": 551074,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/551074",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "694-83-7",
+    "name": "cyclohexane-1,2-diamine",
+    "reported_name": "694-83-7",
+    "role": "UNK",
+    "abbreviation": "DACH",
+    "synonyms": [
+      "(' inverted exclamation markA)-trans-1,2-Diaminocyclohexan",
+      "(+)-S,S-1,2-Diaminocyclohexane",
+      "(+/-)-1,2-trans-diaminocyclohexane",
+      "(+/-)-trans-1,2-Diaminocyclohexane",
+      "(1R,2R)-(-)- 1,2-Diaminocyclohexane"
+    ],
+    "typical_usage": "MALONATO-, HYDROXYMALONATO-, DINITRO-, HYDROXONITRATO-, & SULFATO(1,2-DIAMINOCYCLOHEXANE) PLATINUM(II), PREPARED FROM DICHLORO(1,2-DIAMINOCYCLOHEXANE WERE MORE EFFECTIVE THAN DICHLORO (1,2-DIAMINOCYCLOHEXANE)PLATINUM(II) IN THE TREATMENT OF L1210 LEUKEMIA IN MICE, BOTH ALONE & IN COMBINATION WITH CYCLOPHOSPHAMIDE OR YOSHI 864. Used to make bicyclic pyrazine derivatives; [HSDB] SYNTHESIS OF BICYCLIC PYRAZINE DERIVATIVES",
+    "molecular_formula": "C6H14N2",
+    "molecular_weight": "114.19",
+    "iupac_name": "cyclohexane-1,2-diamine",
+    "pubchem_cid": 4610,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/4610",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7428-60-6",
+    "name": "hydroxy-tris(trimethylsilyl)silane",
+    "reported_name": "7428-60-6",
+    "role": "UNK",
+    "abbreviation": "DTXSID70402456",
+    "synonyms": [
+      "1,1,1,3,3,3-HEXAMETHYL-2-(TRIMETHYLSILYL)TRISILAN-2-OL",
+      "2-Trisilanol, 1,1,1,3,3,3-hexamethyl-2-(trimethylsilyl)-",
+      "7428-60-6",
+      "AKOS024338791",
+      "AT27208"
+    ],
+    "molecular_formula": "C9H28OSi4",
+    "molecular_weight": "264.66",
+    "iupac_name": "hydroxy-tris(trimethylsilyl)silane",
+    "pubchem_cid": 4367908,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/4367908",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7440-50-8",
+    "name": "nitric acid",
+    "reported_name": "7440-50-8",
+    "role": "UNK",
+    "abbreviation": "NITRIC ACID",
+    "synonyms": [
+      "(NO2(OH))",
+      "122392-03-4",
+      "2,3,9,10,16,17-Hexachlorinated boron subphthalocyanine",
+      "231-714-2",
+      "3088A493-74F8-4D19-8ABC-E572420B5F29"
+    ],
+    "typical_usage": "To be used for acute self-limiting conditions according to standard homeopathic indications /for warts/. In a double blind study, the response of superficial skin tumors to topical treatment with a nitric acid preparation (6.2 N) or Solcoderm solution was compared in 33 patients. Treatment with the Solcoderm solution yielded superior results and less reaction in the surrounding normal skin than the plain nitric acid. It was suggested that the nitrate reduction products generated in the Solcoderm preparation contribute to the improved clinical effects by enhancing the speed and intensity of tissue fixation, but not tissue erosion. (VET): Cauterizing agent (for warts).",
+    "molecular_formula": "HNO3",
+    "molecular_weight": "63.013",
+    "iupac_name": "nitric acid",
+    "pubchem_cid": 944,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/944",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7447-40-7",
+    "name": "potassium chloride",
+    "reported_name": "7447-40-7",
+    "role": "UNK",
+    "abbreviation": "potassium chloride",
+    "synonyms": [
+      "14336-88-0",
+      "1992AH",
+      "231-211-8",
+      "660YQ98I10",
+      "682-118-8"
+    ],
+    "typical_usage": "The oral dose of 10% potassium chloride elixir (Kay Ciel) required to reverse thiazide-induced hypokalemia was determined in 15 patients with essential hypertension who were taking Esidrix (hydrochlorothiazide) in a dose of 50 mg. twice daily. Each patient had maintained a serum potassium concentration of at least 0.5 meq./l. less than duplicate control values (mean decreases, 0.62 meq./l.) for at least 2 months during therapy with hydrochlorothiazide, 50 mg. twice daily. Potassium chloride 10% elixir was administered in a total daily dose of 40 mg. with bimonthly increments to 60 mg., 80 mg. and 100 mg. while the thiazide administration was maintained. The serum potassium deficit was repleted to 75% in 12 of the 15 patients. In 8 of the 12, this was accomplished with 40 mg. potassium chloride daily, and in 4, with 60 mg. daily. The latter dose is recommended in patients with thiazide-induced hypokalemia. Thirty-six adult patients with cardiovascular disorders were enrolled in an open 12 week study to evaluate the efficacy, safety and patient acceptance of sustained-release potassium chloride (Klotrix; I) tablets, at a dosage of 1.8 g daily. These patients were on an established regimen of potassium wasting diuretics as part of their treatment for hypertension or arteriosclerotic heart disease, and all were receiving an oral potassium supplement. On the first day of the study, the previously used oral potassium supplement was discontinued and I substituted. Serum potassium levels remained normal and other laboratory parameters did not change significantly as a result of the changeover from the previous potassium supplement to I. However, side effects occurred less frequently with I, and while more than half the patients commented on the bad taste or bad aftertaste of their previous supplement, no such comments were recorded for I. Patient acceptance of I was high, and 87% of the patients who completed the study expressed a preference for I over their previous oral potassium supplement. Medication (vet): as oral or parenteral source of potassium... in cattle it has been successfully used iv for \"creeper cows\"...& in cases of debilitating diarrhea. 1% Level in feed reduces incidence of urolithiasis in lambs, & orally...for...feeder calves...as electrolyle source.",
+    "molecular_formula": "ClK",
+    "molecular_weight": "74.55",
+    "iupac_name": "potassium chloride",
+    "pubchem_cid": 4873,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/4873",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "75-22-9",
+    "name": "(trimethylazaniumyl)boranuide",
+    "reported_name": "75-22-9",
+    "role": "UNK",
+    "abbreviation": "SCHEMBL29522668",
+    "synonyms": [
+      "(Trimethylammonio)trihydroborate",
+      "(trimethylammonio)boranuide",
+      "(trimethylazaniumyl)boranuide",
+      "F14005",
+      "SCHEMBL29522668"
+    ],
+    "molecular_formula": "C3H12BN",
+    "molecular_weight": "72.95",
+    "iupac_name": "(trimethylazaniumyl)boranuide",
+    "pubchem_cid": 407898,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/407898",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "75-76-3",
+    "name": "tetramethylsilane",
+    "reported_name": "75-76-3",
+    "role": "UNK",
+    "abbreviation": "TETRAMETHYLSILANE",
+    "synonyms": [
+      "(CH3)4Si",
+      "200-899-1",
+      "41Y0RBG14Q",
+      "75-76-3",
+      "AKOS009156489"
+    ],
+    "typical_usage": "Used as NMR reference standard, in semiconductor chemical vapor deposition, and for silylation of samples for GC analysis; [Merck Index] Used as an aviation fuel; [CAMEO] Used in semiconductor processing; [Air Products MSDS] Semiconductor Manufacturing [Category: Industry] In aviation fuel",
+    "molecular_formula": "C4H12Si",
+    "molecular_weight": "88.22",
+    "iupac_name": "tetramethylsilane",
+    "pubchem_cid": 6396,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/6396",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "75851-49-9",
+    "name": "2-iodosyl-1,3,5-trimethylbenzene",
+    "reported_name": "75851-49-9",
+    "role": "UNK",
+    "abbreviation": "DTXSID20623038",
+    "synonyms": [
+      "2-Iodosyl-1,3,5-trimethylbenzene",
+      "75851-49-9",
+      "DTXCID30573792",
+      "DTXSID20623038",
+      "RefChem:262284"
+    ],
+    "molecular_formula": "C9H11IO",
+    "molecular_weight": "262.09",
+    "iupac_name": "2-iodosyl-1,3,5-trimethylbenzene",
+    "pubchem_cid": 22159622,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/22159622",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7722-76-1",
+    "name": "azanium dihydrogen phosphate",
+    "reported_name": "7722-76-1",
+    "role": "UNK",
+    "abbreviation": "Ammonium biphosphate",
+    "synonyms": [
+      "09254QB17T",
+      "231-764-5",
+      "7722-76-1",
+      "ACID AMMONIUM PHOSPHATE",
+      "AI3-26062"
+    ],
+    "typical_usage": "Used in fertilizer, matches, baking powder, and fireproofing of paper and wood products; [HSDB] Pulp and Paper Processing [Category: Industry] As baking powder with sodium bicarbonate; in fermentations (yeast cultures, etc.); fireproofing of paper, wood, fiberboard, etc.",
+    "molecular_formula": "H6NO4P",
+    "molecular_weight": "115.03",
+    "iupac_name": "azanium dihydrogen phosphate",
+    "pubchem_cid": 24402,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/24402",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "7775-41-9",
+    "name": "fluorosilver",
+    "reported_name": "7775-41-9",
+    "role": "UNK",
+    "abbreviation": "silver(I)fluoride",
+    "synonyms": [
+      "AKOS017344338",
+      "CS-0015954",
+      "Caswell No. 736",
+      "EINECS 231-895-8",
+      "EPA Pesticide Chemical Code 072502"
+    ],
+    "molecular_formula": "AgF",
+    "molecular_weight": "126.867",
+    "iupac_name": "fluorosilver",
+    "pubchem_cid": 62656,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/62656",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "867-44-7",
+    "name": "methyl carbamimidothioate",
+    "reported_name": "867-44-7",
+    "role": "UNK",
+    "abbreviation": "2-methylisothiourea",
+    "synonyms": [
+      "((amino(imino)methyl)-sulfanyl)methane",
+      "(methylsulfanyl)methanimidamide",
+      "2-Methyl-2-thiopseudourea hemisulfate salt",
+      "2-Methyl-isothiourea",
+      "2-Methylisothio urea"
+    ],
+    "molecular_formula": "C2H6N2S",
+    "molecular_weight": "90.15",
+    "iupac_name": "methyl carbamimidothioate",
+    "pubchem_cid": 5142,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/5142",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "87583-89-9",
+    "name": "1-N,2-N-dimethylcyclohexane-1,2-diamine",
+    "reported_name": "87583-89-9",
+    "role": "UNK",
+    "abbreviation": "RefChem:434700",
+    "synonyms": [
+      "(1R,2R)-N,N\\'-Dimethyl-1,2-cyclohexanediamine",
+      "(1R,2S)-N1,N2-Dimethyl-1,2-cyclohexanediamine",
+      "(1RS,2RS)-N,N'-dimethylcyclohexane-1,2-diamine",
+      "(1S)-TRANS-1,2-BIS(METHYLAMINO)CYCLOHEXANE",
+      "(1S,2S)-N,N'-Dimethyl-1,2-cyclohexanediamine"
+    ],
+    "molecular_formula": "C8H18N2",
+    "molecular_weight": "142.24",
+    "iupac_name": "1-N,2-N-dimethylcyclohexane-1,2-diamine",
+    "pubchem_cid": 551074,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/551074",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "88-18-6",
+    "name": "2-tert-butylphenol",
+    "reported_name": "88-18-6",
+    "role": "UNK",
+    "abbreviation": "2-TERT-BUTYLPHENOL",
+    "synonyms": [
+      "1-TERT.BUTYL,2-HYDRXY-BENZENE  (1-TERT.BUTYL-PHENOL)",
+      "2-(1,1-Dimethylethyl)phenol",
+      "2-(1,1-dimethylethyl)-phenol",
+      "2-(tert-butyl)phenol",
+      "2-TERT-BUTYLPHENOL"
+    ],
+    "typical_usage": "Used as a chemical intermediate for synthetic resins, plasticizers, surface-active agents, perfumes, antioxidants, and agrochemicals; Also used as an antioxidant for aviation gasoline; [HSDB] Petroleum Production and Refining [Category: Industry] CHEMICAL INTERMEDIATE FOR SYNTHETIC RESINS, PLASTICIZERS, SURFACE-ACTIVE AGENTS, PERFUMES, & OTHER PRODUCTS",
+    "molecular_formula": "C10H14O",
+    "molecular_weight": "150.22",
+    "iupac_name": "2-tert-butylphenol",
+    "pubchem_cid": 6923,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/6923",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "94-67-7",
+    "name": "2-(hydroxyiminomethyl)phenol",
+    "reported_name": "94-67-7",
+    "role": "UNK",
+    "abbreviation": "DTXSID9052638",
+    "synonyms": [
+      "(E)-2-hydroxybenzaldehyde oxime",
+      "2-(hydroxyiminomethyl)phenol",
+      "2-hydroxybenzaldehyde-oxime",
+      "AKOS025243587",
+      "DB-057519"
+    ],
+    "molecular_formula": "C7H7NO2",
+    "molecular_weight": "137.14",
+    "iupac_name": "2-(hydroxyiminomethyl)phenol",
+    "pubchem_cid": 7200,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/7200",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "95-14-7",
+    "name": "2H-benzotriazole",
+    "reported_name": "95-14-7",
+    "role": "UNK",
+    "abbreviation": "1H-Benzotriazole",
+    "synonyms": [
+      "0CT",
+      "1 h-benzotriazole",
+      "1,2,-Aminozophenylene",
+      "1,2,3-1h-benzotriazole",
+      "1,2,3-BENZOTRIAZOLE"
+    ],
+    "typical_usage": "Used as an anti-corrosion agent and an anti-fogging agent in developing photographs; also used as a chemical intermediate; [HSDB] Being used less often as an anti-corrosion agent in metalworking fluids because it is a known skin sensitizer; [Kanerva, p. 717] Metal Machining [Category: Heat or Machine] Photographic Processing [Category: Other]",
+    "molecular_formula": "C6H5N3",
+    "molecular_weight": "119.12",
+    "iupac_name": "2H-benzotriazole",
+    "pubchem_cid": 7220,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/7220",
+    "data_source": "PubChem"
+  },
+  {
+    "cas": "99-76-3",
+    "name": "methyl 4-hydroxybenzoate",
+    "reported_name": "99-76-3",
+    "role": "UNK",
+    "abbreviation": "METHYLPARABEN",
+    "synonyms": [
+      "(Methyl Paraben)",
+      "202-785-7",
+      "4-(Methoxycarbonyl)phenol",
+      "4-HYDROXY-BENZOIC ACID METHYL ESTER",
+      "4-Hydroxybenzoic acid methyl ester"
+    ],
+    "typical_usage": "CIR ingredient: Methylparaben Used as a preservative in foods, cosmetics, and medicines; [HSDB] The parabens (methyl, ethyl, propyl, and butyl) were the most widely used preservatives in cosmetics (0.1% to 0.8%) until their sensitizing potential was recognized; [Marks, p. 115] For methylparaben (USEPA/OPP Pesticide Code: 061201) there are 0 labels match. /SRP: Not registered for current use in the U.S., but approved pesticide uses may change periodically and so federal, state and local authorities must be consulted for currently approved uses./",
+    "molecular_formula": "C8H8O3",
+    "molecular_weight": "152.15",
+    "iupac_name": "methyl 4-hydroxybenzoate",
+    "pubchem_cid": 7456,
+    "pubchem_url": "https://pubchem.ncbi.nlm.nih.gov/compound/7456",
     "data_source": "PubChem"
   }
 ]
