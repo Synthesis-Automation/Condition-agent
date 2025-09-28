@@ -1237,82 +1237,85 @@ def build_demo() -> gr.Blocks:
             rs_btn.click(ui_registry_search, inputs=[rs_q, rs_role, rs_ct, rs_limit], outputs=[rs_tbl])
 
         with gr.Tab("Recommend Conditions"):
-            rec_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
-            rec_type = gr.Dropdown(
-                label="Reaction Type (optional override)",
-                choices=RECOMMEND_FAMILY_OPTIONS,
-                value=RECOMMEND_FAMILY_OPTIONS[0],
-                interactive=True,
-            )
-            rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=50, step=1)
-            rec_limit = gr.Slider(label="Number of recommendations", minimum=1, maximum=10, value=5, step=1)
-            rec_cat = gr.Dropdown(
-                label="Catalyst class (optional filter)",
-                choices=CATALYST_CLASS_OPTIONS,
-                value=CATALYST_CLASS_OPTIONS[0],
-                interactive=True,
-            )
-            rec_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
-            rec_relax = gr.Textbox(label="Relax (JSON)", value="")
-            rec_constraints = gr.Textbox(label="Constraints (JSON)", value="")
-            rec_btn = gr.Button("Recommend", variant="primary")
-            rec_out = gr.JSON(label="Structured Recommendations")
-            rec_tbl = gr.Dataframe(headers=["rank", "core", "base", "solvent", "confidence", "support"], label="Recommendation Summary", interactive=False)
-            rec_human = gr.Textbox(label="Top recommended (core/base/solvent)", interactive=False)
-            rec_detect = gr.Markdown(label="Detection Details")
-            rec_btn.click(
-                ui_recommend_structured,
-                inputs=[rec_in, rec_type, rec_k, rec_limit, rec_cat, rec_use_rxi, rec_relax, rec_constraints],
-                outputs=[rec_out, rec_tbl, rec_human, rec_detect],
-            )
-
-            if CONDITION_RULE_FAMILIES:
-                rule_initial_family = CONDITION_RULE_FAMILIES[0]
-                rule_feat_default, rule_job_default = _rule_default_payloads(rule_initial_family)
-                with gr.Accordion("Rule-based tester (Condition Rule Library)", open=False):
-                    gr.Markdown(
-                        "Use the rule library to score playbooks based on substrate features. "
-                        "Edit the JSON payloads to explore guard and prior behavior."
-                    )
-                    rule_family = gr.Dropdown(
-                        label="Rule family",
-                        choices=CONDITION_RULE_FAMILIES,
-                        value=rule_initial_family,
+            gr.Markdown("### Recommendation modes\nSelect between data-driven suggestions and rule-based playbooks.")
+            with gr.Tabs():
+                with gr.Tab("Structured (ML)"):
+                    rec_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
+                    rec_type = gr.Dropdown(
+                        label="Reaction Type (optional override)",
+                        choices=RECOMMEND_FAMILY_OPTIONS,
+                        value=RECOMMEND_FAMILY_OPTIONS[0],
                         interactive=True,
                     )
-                    rule_features = gr.Textbox(
-                        label="Features (JSON)",
-                        value=rule_feat_default,
-                        lines=10,
+                    rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=50, step=1)
+                    rec_limit = gr.Slider(label="Number of recommendations", minimum=1, maximum=10, value=5, step=1)
+                    rec_cat = gr.Dropdown(
+                        label="Catalyst class (optional filter)",
+                        choices=CATALYST_CLASS_OPTIONS,
+                        value=CATALYST_CLASS_OPTIONS[0],
+                        interactive=True,
                     )
-                    rule_job_ctx = gr.Textbox(
-                        label="Job context (JSON, optional)",
-                        value=rule_job_default,
-                        lines=6,
+                    rec_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
+                    rec_relax = gr.Textbox(label="Relax (JSON)", value="")
+                    rec_constraints = gr.Textbox(label="Constraints (JSON)", value="")
+                    rec_btn = gr.Button("Recommend", variant="primary")
+                    rec_out = gr.JSON(label="Structured Recommendations")
+                    rec_tbl = gr.Dataframe(headers=["rank", "core", "base", "solvent", "confidence", "support"], label="Recommendation Summary", interactive=False)
+                    rec_human = gr.Textbox(label="Top recommended (core/base/solvent)", interactive=False)
+                    rec_detect = gr.Markdown(label="Detection Details")
+                    rec_btn.click(
+                        ui_recommend_structured,
+                        inputs=[rec_in, rec_type, rec_k, rec_limit, rec_cat, rec_use_rxi, rec_relax, rec_constraints],
+                        outputs=[rec_out, rec_tbl, rec_human, rec_detect],
                     )
-                    rule_topn = gr.Slider(
-                        label="Top playbooks",
-                        minimum=1,
-                        maximum=10,
-                        value=3,
-                        step=1,
-                    )
-                    rule_btn = gr.Button("Run rule-based recommender", variant="secondary")
-                    rule_json = gr.JSON(label="Rule recommendations")
-                    rule_table = gr.Dataframe(label="Playbook summary", interactive=False)
-                    rule_md = gr.Markdown(label="Details")
-                    rule_btn.click(
-                        ui_condition_rule_recommend,
-                        inputs=[rule_family, rule_features, rule_job_ctx, rule_topn],
-                        outputs=[rule_json, rule_table, rule_md],
-                    )
-                    rule_family.change(
-                        _rule_default_payloads,
-                        inputs=[rule_family],
-                        outputs=[rule_features, rule_job_ctx],
-                    )
-            else:
-                gr.Markdown("⚠️ Rule-based condition library not available in this build.")
+
+                with gr.Tab("Rule-based (CRL)"):
+                    if CONDITION_RULE_FAMILIES:
+                        rule_initial_family = CONDITION_RULE_FAMILIES[0]
+                        rule_feat_default, rule_job_default = _rule_default_payloads(rule_initial_family)
+                        gr.Markdown(
+                            "Use the Condition Rule Library for deterministic playbooks. "
+                            "Edit the JSON payloads to explore guard and prior behavior."
+                        )
+                        rule_family = gr.Dropdown(
+                            label="Rule family",
+                            choices=CONDITION_RULE_FAMILIES,
+                            value=rule_initial_family,
+                            interactive=True,
+                        )
+                        rule_features = gr.Textbox(
+                            label="Features (JSON)",
+                            value=rule_feat_default,
+                            lines=12,
+                        )
+                        rule_job_ctx = gr.Textbox(
+                            label="Job context (JSON, optional)",
+                            value=rule_job_default,
+                            lines=6,
+                        )
+                        rule_topn = gr.Slider(
+                            label="Top playbooks",
+                            minimum=1,
+                            maximum=10,
+                            value=3,
+                            step=1,
+                        )
+                        rule_btn = gr.Button("Run rule-based recommender", variant="secondary")
+                        rule_json = gr.JSON(label="Rule recommendations")
+                        rule_table = gr.Dataframe(label="Playbook summary", interactive=False)
+                        rule_md = gr.Markdown(label="Details")
+                        rule_btn.click(
+                            ui_condition_rule_recommend,
+                            inputs=[rule_family, rule_features, rule_job_ctx, rule_topn],
+                            outputs=[rule_json, rule_table, rule_md],
+                        )
+                        rule_family.change(
+                            _rule_default_payloads,
+                            inputs=[rule_family],
+                            outputs=[rule_features, rule_job_ctx],
+                        )
+                    else:
+                        gr.Markdown("⚠️ Rule-based condition library not available in this build.")
 
 
         with gr.Tab("Design Plate"):
