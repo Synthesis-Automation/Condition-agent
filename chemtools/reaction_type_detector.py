@@ -19,11 +19,12 @@ Returned dict (best-effort):
   "rxn_name": str | None,        # Specific name (e.g., "Suzuki coupling with boronic acids")
   "mapped_family": str | None,   # Mapped to chemtools family (e.g., "Suzuki_CC")
   "confidence": float | None,    # If provided or inferred
-  "raw": any                     # Raw object from rxn_insight for debugging
+    "raw": any,                    # Raw object from rxn_insight for debugging
+    "catalysts": list[str]         # Metals inferred from agents (if any)
 }
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Set
 
 try:
     # Optional classifier path available in newer rxn_insight builds
@@ -34,10 +35,11 @@ except Exception:
 try:
     # Use our own helpers to parse reactants and apply simple functional-group hits
     from .smiles import normalize_reaction as _norm_rxn  # type: ignore
-    from .router import _rule_hits as _hits  # type: ignore
+    from .router import _rule_hits as _hits, _detect_agent_metals as _agent_metals  # type: ignore
 except Exception:
     _norm_rxn = None  # type: ignore
     _hits = None  # type: ignore
+    _agent_metals = None  # type: ignore
 
 
 def is_available() -> bool:
@@ -164,6 +166,35 @@ def _map_to_family(rxn_class: Optional[str], rxn_name: Optional[str]) -> Optiona
     return None
 
 
+def _refine_cn_family(
+    mapped: Optional[str],
+    rxn_name: Optional[str],
+    rxn_class: Optional[str],
+    catalysts: Set[str],
+) -> tuple[Optional[str], Optional[str]]:
+    if not catalysts:
+        return mapped, rxn_name
+
+    cn_related = bool(
+        (mapped in {"Ullmann_CN", "Buchwald_CN"})
+        or (rxn_class and "heteroatom" in rxn_class.lower())
+        or (rxn_name and any(token in rxn_name.lower() for token in ("buchwald", "hartwig", "ullmann", "amination")))
+    )
+    if not cn_related:
+        return mapped, rxn_name
+
+    if "Pd" in catalysts:
+        mapped = "Buchwald_CN"
+        if not rxn_name or "buchwald" not in rxn_name.lower():
+            rxn_name = (rxn_name or "Buchwald-Hartwig C–N coupling")
+    elif "Cu" in catalysts and (mapped in {None, "Unknown", "Ullmann_CN"}):
+        mapped = "Ullmann_CN"
+        if not rxn_name or "ullmann" not in rxn_name.lower():
+            rxn_name = rxn_name or "Ullmann/Golberg C–N coupling"
+
+    return mapped, rxn_name
+
+
 def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
     """Detect reaction type using rxn_insight, mapping to chemtools family.
 
@@ -173,6 +204,14 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
     avail = is_available()
     if not avail:
         return {"available": False, "success": False, "rxn_class": None, "rxn_name": None, "mapped_family": None, "confidence": None, "raw": None}
+
+    norm = _norm_rxn(reaction_smiles) if _norm_rxn else None
+    catalysts: Set[str] = set()
+    if norm is not None and _agent_metals is not None:
+        try:
+            catalysts = _agent_metals(norm.get("agents") or [])  # type: ignore[arg-type]
+        except Exception:
+            catalysts = set()
 
     raw = _call_insight(reaction_smiles)
     rxn_class, rxn_name, conf = _extract_fields(raw)
@@ -193,8 +232,9 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
                 # Use boron presence to identify Suzuki when possible
                 boron = False
                 try:
-                    if _norm_rxn and _hits:
+                    if norm is None and _norm_rxn:
                         norm = _norm_rxn(reaction_smiles)
+                    if norm and _hits:
                         reactants = [
                             (r.get('smiles_norm') or r.get('largest_smiles') or r.get('input') or '')
                             for r in (norm.get('reactants') or [])
@@ -216,6 +256,9 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         except Exception:
             pass
 
+    if catalysts:
+        mapped, rxn_name = _refine_cn_family(mapped, rxn_name, rxn_class, catalysts)
+
     success = bool(rxn_class or rxn_name or mapped)
     return {
         "available": True,
@@ -225,4 +268,5 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         "mapped_family": mapped,
         "confidence": conf,
         "raw": raw,
+        "catalysts": sorted(catalysts) if catalysts else [],
     }

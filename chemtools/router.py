@@ -1,4 +1,6 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set
+
+import re
 
 from .util.rdkit_helpers import rdkit_available, parse_smiles
 from .smiles import normalize_reaction as _normalize_reaction
@@ -32,6 +34,79 @@ def _compile_smarts():
 
 
 _SMARTS = _compile_smarts()
+
+_METAL_ATOMIC_NUMBERS = {
+    29: "Cu",
+    46: "Pd",
+    28: "Ni",
+    27: "Co",
+}
+
+_METAL_NAME_TOKENS = {
+    "palladium": "Pd",
+    "copper": "Cu",
+    "nickel": "Ni",
+    "cobalt": "Co",
+}
+
+_METAL_REGEXES = {
+    "Pd": re.compile(r"(?<![A-Za-z])[Pp][dD](?![a-z])"),
+    "Cu": re.compile(r"(?<![A-Za-z])[Cc][uU](?![a-z])"),
+    "Ni": re.compile(r"(?<![A-Za-z])[Nn][iI](?![a-z])"),
+    "Co": re.compile(r"(?<![A-Za-z])[Cc][oO](?![a-z])"),
+}
+
+
+def _detect_agent_metals(agents: List[Dict[str, Any]]) -> Set[str]:
+    """Detect metal catalysts from normalized agent block."""
+
+    metals: Set[str] = set()
+    seen_smiles: Set[str] = set()
+    for agent in agents or []:
+        snippets: List[str] = []
+        for key in ("smiles_norm", "largest_smiles", "input"):
+            value = agent.get(key)
+            if not value:
+                continue
+            text = str(value).strip()
+            if not text or text in seen_smiles:
+                continue
+            seen_smiles.add(text)
+            snippets.append(text)
+
+        for snippet in snippets:
+            mol = parse_smiles(snippet)
+            if mol is not None:
+                try:
+                    for atom in mol.GetAtoms():
+                        label = _METAL_ATOMIC_NUMBERS.get(atom.GetAtomicNum())
+                        if label:
+                            metals.add(label)
+                except Exception:
+                    pass
+
+        joined = " ".join(snippets)
+        if joined:
+            lower = joined.lower()
+            for token, label in _METAL_NAME_TOKENS.items():
+                if token in lower:
+                    metals.add(label)
+            for label, pattern in _METAL_REGEXES.items():
+                if pattern.search(joined):
+                    metals.add(label)
+
+    return metals
+
+
+def _apply_catalyst_override(family: str, metals: Set[str], *, is_cn_coupling: bool) -> str:
+    if not metals or not is_cn_coupling:
+        return family
+    # Prioritise Pd systems (Buchwald-Hartwig) over Cu-based Ullmann pathways.
+    if "Pd" in metals:
+        return "Buchwald_CN"
+    if family in {"Unknown", "Ullmann_CN", None} and "Cu" in metals:
+        return "Ullmann_CN"
+    return family
 
 
 def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
@@ -123,12 +198,29 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
         for r in (norm.get("reactants") or [])
     ]
     reactants = [s for s in reactants if s]
+    agent_metals = _detect_agent_metals(norm.get("agents") or [])
 
     # Base rule-based detection (deterministic, no network)
     base = detect_family(reactants)
     fam_rule = base.get("family") or "Unknown"
     conf_rule: float = float(base.get("confidence") or 0.3)
     hits = base.get("hits") or _rule_hits(reactants)
+    if agent_metals:
+        hits = dict(hits)
+        hits["catalyst_pd"] = "Pd" in agent_metals
+        hits["catalyst_cu"] = "Cu" in agent_metals
+        hits["catalyst_ni"] = "Ni" in agent_metals
+        hits["catalyst_co"] = "Co" in agent_metals
+
+    has_cn_signature = bool(
+        (hits.get("nucleophile_n") and (hits.get("aryl_halide") or hits.get("vinyl_halide") or hits.get("triflate")))
+        or fam_rule in {"Ullmann_CN", "Buchwald_CN"}
+    )
+    fam_rule = _apply_catalyst_override(fam_rule, agent_metals, is_cn_coupling=has_cn_signature)
+    if fam_rule == "Buchwald_CN":
+        conf_rule = max(conf_rule, 0.9 if hits.get("aryl_halide") else 0.85)
+    elif fam_rule == "Ullmann_CN" and "Cu" in agent_metals:
+        conf_rule = max(conf_rule, 0.85)
 
     auto: Optional[Dict[str, Any]] = None
     fam_rxn: Optional[str] = None
@@ -151,6 +243,11 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
                     conf_rxn = float(aconf) if aconf is not None else None
                 except Exception:
                     conf_rxn = None
+
+    if fam_rxn:
+        fam_rxn = _apply_catalyst_override(fam_rxn, agent_metals, is_cn_coupling=has_cn_signature or fam_rxn in {"Ullmann_CN", "Buchwald_CN"})
+        if fam_rxn == "Buchwald_CN" and (conf_rxn or 0) < 0.85:
+            conf_rxn = 0.85
 
     # Choose final family preferring rxn-insight mapping when present
     fam_final = fam_rxn or fam_rule
@@ -178,5 +275,10 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
                 "rxn_class": auto.get("rxn_class"),
                 "rxn_name": auto.get("rxn_name"),
             }),
+        }
+    if agent_metals:
+        out["catalysts"] = {
+            "metals": sorted(agent_metals),
+            "source": "agents",
         }
     return out
