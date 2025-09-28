@@ -202,10 +202,116 @@ def _parse_bin(bin_str: str) -> Dict[str, str]:
             out[k.strip()] = v.strip()
     return out
 
+###############################################
+# Catalyst class helpers and filtering
+###############################################
+
+_METAL_NAME_TO_SYMBOL = {
+    # common transition metals and aliases
+    "palladium": "Pd", "pd": "Pd",
+    "nickel": "Ni", "ni": "Ni",
+    "cobalt": "Co", "co": "Co",
+    "copper": "Cu", "cu": "Cu",
+    "iron": "Fe", "fe": "Fe",
+    "ruthenium": "Ru", "ru": "Ru",
+    "rhodium": "Rh", "rh": "Rh",
+    "iridium": "Ir", "ir": "Ir",
+    "gold": "Au", "au": "Au",
+    "silver": "Ag", "ag": "Ag",
+    "zinc": "Zn", "zn": "Zn",
+    "magnesium": "Mg", "mg": "Mg",
+    "manganese": "Mn", "mn": "Mn",
+    "chromium": "Cr", "cr": "Cr",
+    "vanadium": "V", "v": "V",
+    "titanium": "Ti", "ti": "Ti",
+    "zirconium": "Zr", "zr": "Zr",
+    "molybdenum": "Mo", "mo": "Mo",
+    "tungsten": "W", "w": "W",
+    "rhenium": "Re", "re": "Re",
+    "osmium": "Os", "os": "Os",
+    "platinum": "Pt", "pt": "Pt",
+}
+
+_METAL_SYMBOLS = set(_METAL_NAME_TO_SYMBOL.values())
+_ENZYME_KEYWORDS = {"enzyme", "protein", "lipase", "oxidase", "dehydrogenase", "transferase"}
+
+def _normalize_symbol(token: str) -> Optional[str]:
+    t = (token or "").strip()
+    if not t:
+        return None
+    lo = t.lower()
+    if lo in _METAL_NAME_TO_SYMBOL:
+        return _METAL_NAME_TO_SYMBOL[lo]
+    # Try exact symbol match case-insensitively
+    up = t[0].upper() + t[1:].lower()
+    if up in _METAL_SYMBOLS:
+        return up
+    return None
+
+def _row_catalyst_class(row: Dict[str, Any]) -> str:
+    """Heuristically classify a precedent row into a catalyst class.
+
+    Returns one of metal symbols (e.g., 'Pd', 'Ni', ...), 'enzyme', 'organo_catalyst', or 'other'.
+    """
+    # 1) Use condition_core like 'Pd/XPhos'
+    core = (row.get("condition_core") or "").strip()
+    if core:
+        head = core.split("/", 1)[0].strip()
+        sym = _normalize_symbol(head)
+        if sym:
+            return sym
+    # 2) Scan full_system names for explicit metal names
+    fs = row.get("full_system")
+    if isinstance(fs, list):
+        names = [str((it or {}).get("name") or "") for it in fs]
+        text = " ".join(names).lower()
+        # enzyme detection first
+        if any(k in text for k in _ENZYME_KEYWORDS):
+            return "enzyme"
+        # metal names
+        for key, sym in _METAL_NAME_TO_SYMBOL.items():
+            if len(key) <= 2:  # skip symbol aliases here; handled below
+                continue
+            if key in text:
+                return sym
+        # symbol occurrence as word-ish
+        for sym in _METAL_SYMBOLS:
+            if f" {sym.lower()}" in text or f"({sym.lower()}" in text or f"[{sym.lower()}" in text:
+                return sym
+    # 3) Fallback enzyme detection in catalyst dict
+    cat = row.get("catalyst") or {}
+    if isinstance(cat, dict):
+        nm = str(cat.get("name") or "").lower()
+        if any(k in nm for k in _ENZYME_KEYWORDS):
+            return "enzyme"
+    # 4) If no metal detected, assume organocatalyst when there is any catalyst/ligand info
+    if core or (isinstance(fs, list) and fs):
+        return "organo_catalyst"
+    return "other"
+
+def _match_catalyst_class(selected: str, row_cls: str) -> bool:
+    sel = (selected or "").strip().lower()
+    if not sel:
+        return True
+    if sel in {"organo_catalyst", "enzyme", "other"}:
+        return row_cls == sel
+    sym = _normalize_symbol(sel)
+    if sym:
+        return row_cls == sym
+    return True  # unknown filter -> do not exclude
+
 
 def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str, Any], k: int, relax: Dict[str, Any]) -> List[Dict[str, Any]]:
     # Filter rows to family first
     fam_rows = [r for r in rows if (r.get("rxn_type") or "") == family_txt]
+    # Optional catalyst class filter
+    cat_filter = None
+    try:
+        cat_filter = str(relax.get("catalyst_class")) if isinstance(relax, dict) and relax.get("catalyst_class") is not None else None
+    except Exception:
+        cat_filter = None
+    if cat_filter:
+        fam_rows = [r for r in fam_rows if _match_catalyst_class(str(cat_filter), _row_catalyst_class(r))]
     if not fam_rows:
         return []
 

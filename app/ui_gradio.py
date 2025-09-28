@@ -44,6 +44,27 @@ RECOMMEND_FAMILY_DISPLAY = [
 RECOMMEND_FAMILY_OPTIONS = [label for label, _ in RECOMMEND_FAMILY_DISPLAY]
 RECOMMEND_FAMILY_VALUE_MAP = {label: value for label, value in RECOMMEND_FAMILY_DISPLAY}
 
+# Catalyst class options (optional filter)
+CATALYST_CLASS_DISPLAY = [
+    ("Any (no filter)", ""),
+    ("Pd (palladium)", "Pd"),
+    ("Ni (nickel)", "Ni"),
+    ("Co (cobalt)", "Co"),
+    ("Cu (copper)", "Cu"),
+    ("Ru (ruthenium)", "Ru"),
+    ("Rh (rhodium)", "Rh"),
+    ("Ir (iridium)", "Ir"),
+    ("Fe (iron)", "Fe"),
+    ("Ag (silver)", "Ag"),
+    ("Au (gold)", "Au"),
+    ("Zn (zinc)", "Zn"),
+    ("Organo catalyst", "organo_catalyst"),
+    ("Enzyme", "enzyme"),
+    ("Other", "other"),
+]
+CATALYST_CLASS_OPTIONS = [label for label, _ in CATALYST_CLASS_DISPLAY]
+CATALYST_CLASS_VALUE_MAP = {label: value for label, value in CATALYST_CLASS_DISPLAY}
+
 # Constrain overall width for a cleaner layout
 CSS = """
 .gradio-container{max-width:1600px !important;margin:0 auto !important;}
@@ -355,12 +376,6 @@ def ui_recommend(
     relax_json: str,
     constraints_json: str,
 ) -> Dict[str, Any]:
-    family_override = reaction_type
-    if isinstance(family_override, str):
-        family_override = RECOMMEND_FAMILY_VALUE_MAP.get(family_override, family_override)
-        if isinstance(family_override, str) and not family_override.strip():
-            family_override = None
-
     relax = _safe_json_loads(relax_json)
     relax["use_rxn_insight"] = bool(use_rxn_insight)
     constraints = _safe_json_loads(constraints_json)
@@ -415,6 +430,7 @@ def ui_recommend_structured(
     reaction_type: Optional[str] = None,
     k: int = 50,
     limit: int = 5,
+    catalyst_class: Optional[str] = None,
     use_rxn_insight: bool = True,
     relax_json: str = "",
     constraints_json: str = "",
@@ -441,6 +457,11 @@ def ui_recommend_structured(
     relax = _safe_json_loads(relax_json)
     if not isinstance(relax, dict):
         relax = {}
+    # Thread catalyst_class filter (optional)
+    if isinstance(catalyst_class, str) and catalyst_class.strip():
+        cc_val = CATALYST_CLASS_VALUE_MAP.get(catalyst_class, catalyst_class).strip()
+        if cc_val:
+            relax["catalyst_class"] = cc_val
     if not bool(use_rxn_insight):
         relax["use_rxn_insight"] = False
     constraints = _safe_json_loads(constraints_json)
@@ -488,12 +509,17 @@ def ui_recommend_structured(
 def ui_design_plate(
     reaction: str,
     plate_size: int,
+    catalyst_class: Optional[str],
     use_rxn_insight: bool,
     relax_json: str,
     constraints_json: str,
 ) -> Tuple[str, List[List[Any]], Dict[str, Any]]:
     relax = _safe_json_loads(relax_json)
     relax["use_rxn_insight"] = bool(use_rxn_insight)
+    if isinstance(catalyst_class, str) and catalyst_class.strip():
+        cc_val = CATALYST_CLASS_VALUE_MAP.get(catalyst_class, catalyst_class).strip()
+        if cc_val:
+            relax["catalyst_class"] = cc_val
     constraints = _safe_json_loads(constraints_json)
     out = recommend.design_plate_from_reaction(
         reaction=reaction or "",
@@ -542,6 +568,7 @@ def _pick_elec_nuc_from_reaction(rsmi: str) -> Tuple[str, str, List[str]]:
 def ui_precedent_search(
     reaction: str,
     k: int,
+    catalyst_class: Optional[str],
     use_drfp: bool,
     drfp_weight: float,
     drfp_bits: int,
@@ -569,6 +596,10 @@ def ui_precedent_search(
         "drfp_n_bits": int(drfp_bits),
         "drfp_radius": int(drfp_radius),
     }
+    if isinstance(catalyst_class, str) and catalyst_class.strip():
+        cc_val = CATALYST_CLASS_VALUE_MAP.get(catalyst_class, catalyst_class).strip()
+        if cc_val:
+            relax["catalyst_class"] = cc_val
     if precompute_scope in {"candidates", "all"}:
         relax["precompute_drfp"] = True
         relax["precompute_scope"] = precompute_scope
@@ -1055,6 +1086,12 @@ def build_demo() -> gr.Blocks:
             )
             rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=50, step=1)
             rec_limit = gr.Slider(label="Number of recommendations", minimum=1, maximum=10, value=5, step=1)
+            rec_cat = gr.Dropdown(
+                label="Catalyst class (optional filter)",
+                choices=CATALYST_CLASS_OPTIONS,
+                value=CATALYST_CLASS_OPTIONS[0],
+                interactive=True,
+            )
             rec_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
             rec_relax = gr.Textbox(label="Relax (JSON)", value="")
             rec_constraints = gr.Textbox(label="Constraints (JSON)", value="")
@@ -1065,7 +1102,7 @@ def build_demo() -> gr.Blocks:
             rec_detect = gr.Markdown(label="Detection Details")
             rec_btn.click(
                 ui_recommend_structured,
-                inputs=[rec_in, rec_type, rec_k, rec_limit, rec_use_rxi, rec_relax, rec_constraints],
+                inputs=[rec_in, rec_type, rec_k, rec_limit, rec_cat, rec_use_rxi, rec_relax, rec_constraints],
                 outputs=[rec_out, rec_tbl, rec_human, rec_detect],
             )
 
@@ -1073,6 +1110,12 @@ def build_demo() -> gr.Blocks:
         with gr.Tab("Design Plate"):
             plate_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
             plate_n = gr.Slider(label="Plate size", minimum=6, maximum=96, value=24, step=1)
+            plate_cat = gr.Dropdown(
+                label="Catalyst class (optional filter)",
+                choices=CATALYST_CLASS_OPTIONS,
+                value=CATALYST_CLASS_OPTIONS[0],
+                interactive=True,
+            )
             plate_use_rxi = gr.Checkbox(label="Use rxn-insight auto-detect (if available)", value=True)
             plate_relax = gr.Textbox(label="Relax (JSON)", value="")
             plate_constraints = gr.Textbox(label="Constraints (JSON)", value="")
@@ -1082,13 +1125,19 @@ def build_demo() -> gr.Blocks:
             plate_meta = gr.JSON(label="Meta")
             plate_btn.click(
                 ui_design_plate,
-                inputs=[plate_in, plate_n, plate_use_rxi, plate_relax, plate_constraints],
+                inputs=[plate_in, plate_n, plate_cat, plate_use_rxi, plate_relax, plate_constraints],
                 outputs=[plate_csv, plate_tbl, plate_meta],
             )
 
         with gr.Tab("Precedent Search"):
             ps_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
             ps_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=200, value=50, step=1)
+            ps_cat = gr.Dropdown(
+                label="Catalyst class (optional filter)",
+                choices=CATALYST_CLASS_OPTIONS,
+                value=CATALYST_CLASS_OPTIONS[0],
+                interactive=True,
+            )
             with gr.Row():
                 ps_use_drfp = gr.Checkbox(label="Use DRFP re-ranking", value=True)
                 ps_drfp_w = gr.Slider(label="DRFP weight", minimum=0.0, maximum=1.0, value=0.4, step=0.05)
@@ -1132,6 +1181,7 @@ def build_demo() -> gr.Blocks:
                 inputs=[
                     ps_in,
                     ps_k,
+                    ps_cat,
                     ps_use_drfp,
                     ps_drfp_w,
                     ps_bits,
