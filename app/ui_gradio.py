@@ -65,6 +65,33 @@ CATALYST_CLASS_DISPLAY = [
 CATALYST_CLASS_OPTIONS = [label for label, _ in CATALYST_CLASS_DISPLAY]
 CATALYST_CLASS_VALUE_MAP = {label: value for label, value in CATALYST_CLASS_DISPLAY}
 
+CONDITION_RULE_FAMILIES: List[str] = []
+
+_RULE_SAMPLE_FEATURES: Dict[str, Dict[str, Any]] = {
+    "Buchwald_CN": {
+        "electrophile": {
+            "class": "aryl chloride",
+            "electronics": "electron-poor",
+            "ortho_sub_count": 1,
+        },
+        "nucleophile": {
+            "class": "primary aniline",
+        },
+        "solvent": "DMF",
+    }
+}
+
+_RULE_SAMPLE_JOB_CTX: Dict[str, Dict[str, Any]] = {
+    "Buchwald_CN": {"base": "DBU", "mode": "batch"}
+}
+
+_RULE_SAMPLE_FEATURES_TEXT: Dict[str, str] = {
+    key: json.dumps(value, indent=2, sort_keys=True) for key, value in _RULE_SAMPLE_FEATURES.items()
+}
+_RULE_SAMPLE_JOB_CTX_TEXT: Dict[str, str] = {
+    key: json.dumps(value, indent=2, sort_keys=True) for key, value in _RULE_SAMPLE_JOB_CTX.items()
+}
+
 # Constrain overall width for a cleaner layout
 CSS = """
 .gradio-container{max-width:1600px !important;margin:0 auto !important;}
@@ -77,9 +104,20 @@ os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 # Prefer rxn-insight enabled by default (can be disabled via env or UI toggle)
 os.environ.setdefault("CHEMTOOLS_DISABLE_RXN_INSIGHT", "0")
 
-from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs
+from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs, condition_rules
 from chemtools import registry as creg
 from chemtools.util.rdkit_helpers import rdkit_available
+
+try:
+    from condition_rule_library import api as crl_api
+except Exception:  # pragma: no cover - optional dependency guard
+    crl_api = None  # type: ignore
+else:
+    try:
+        _CRL_DEFAULT = crl_api.load_default_crl()
+        CONDITION_RULE_FAMILIES = sorted(list((_CRL_DEFAULT.get("families") or {}).keys()))
+    except Exception:  # pragma: no cover - defensive fallback
+        CONDITION_RULE_FAMILIES = []
 
 try:
     from chemtools.integrations import molpipeline as molpipe
@@ -176,6 +214,16 @@ def _safe_json_loads(s: str) -> Dict[str, Any]:
         return obj if isinstance(obj, dict) else {}
     except Exception:
         return {}
+
+
+def _rule_default_payloads(family: str) -> Tuple[str, str]:
+    feat = _RULE_SAMPLE_FEATURES_TEXT.get(family)
+    if feat is None:
+        feat = json.dumps({"TODO": "provide features"}, indent=2, sort_keys=True)
+    job = _RULE_SAMPLE_JOB_CTX_TEXT.get(family)
+    if job is None:
+        job = json.dumps({}, indent=2)
+    return feat, job
 
 
 def _format_detection_details(det: Dict[str, Any] | None) -> str:
@@ -504,6 +552,118 @@ def ui_recommend_structured(
     human = "; ".join(human_parts) if human_parts else ""
     detection_md = _format_detection_details(data.get("detection"))
     return data, rows, human or "n/a", detection_md
+
+
+def ui_condition_rule_recommend(
+    family: str,
+    features_json: str,
+    job_ctx_json: str,
+    top_n: int,
+) -> Tuple[Dict[str, Any], List[List[Any]], str]:
+    fam = (family or "").strip()
+    header = [
+        "rank",
+        "playbook",
+        "name",
+        "score",
+        "ok",
+        "ligand",
+        "pd_source",
+        "base",
+        "solvent",
+        "temperature_C",
+    ]
+    if not fam:
+        return {"error": "Select a reaction family."}, [header], "- No family selected -"
+
+    features = _safe_json_loads(features_json)
+    if not isinstance(features, dict) or not features:
+        return {
+            "error": "Features payload must be a non-empty JSON object.",
+            "family": fam,
+        }, [header], "- Provide features to evaluate rules -"
+
+    job_ctx = _safe_json_loads(job_ctx_json)
+
+    try:
+        recs = condition_rules.recommend_rule_based(
+            fam,
+            features,
+            job_ctx=job_ctx or None,
+            top_n=max(1, int(top_n or 3)),
+        )
+    except Exception as exc:  # pragma: no cover - UI error path
+        return {
+            "error": str(exc),
+            "family": fam,
+        }, [header], f"⚠️ {exc}"
+
+    result_payload: Dict[str, Any] = {
+        "family": fam,
+        "input_features": features,
+        "job_ctx": job_ctx or {},
+        "recommendations": recs,
+    }
+
+    table: List[List[Any]] = [header]
+    md_lines: List[str] = []
+
+    defaults: Dict[str, Any] = {}
+    try:
+        defaults = condition_rules.get_family_defaults(fam)
+    except Exception:
+        defaults = {}
+
+    if defaults:
+        result_payload["family_defaults"] = defaults
+        defaults_preview = {
+            key: defaults[key]
+            for key in list(defaults.keys())[:6]
+        }
+        md_lines.append("**Family defaults (truncated preview)**")
+        md_lines.append("```json")
+        md_lines.append(json.dumps(defaults_preview, indent=2, sort_keys=True))
+        md_lines.append("```")
+
+    if not recs:
+        md_lines.append("No rule-based playbooks matched the provided features.")
+        return result_payload, table, "\n".join(md_lines) if md_lines else "No results"
+
+    for idx, rec in enumerate(recs, start=1):
+        suggestion = rec.get("suggested_recipe") or {}
+        lig = suggestion.get("ligands") or suggestion.get("ligand") or ""
+        pd_src = suggestion.get("pd_source") or suggestion.get("pd_source_uid") or ""
+        base = suggestion.get("base") or suggestion.get("base_uid") or ""
+        solv = suggestion.get("solvent") or suggestion.get("solvent_uid") or ""
+        temp = suggestion.get("temperature_C") or suggestion.get("temperature") or ""
+
+        table.append([
+            idx,
+            rec.get("playbook_id", ""),
+            rec.get("name", ""),
+            rec.get("score", ""),
+            "✅" if rec.get("ok", True) else "⚠️",
+            lig,
+            pd_src,
+            base,
+            solv,
+            temp,
+        ])
+
+        breakdown = rec.get("score_breakdown") or {}
+        guard_msgs = rec.get("guard_messages") or []
+        md_lines.append(
+            f"**{rec.get('playbook_id', rec.get('name', 'Playbook'))}** — score {rec.get('score', '?')} (guards {breakdown.get('guard_adjust', 0)}, priors {breakdown.get('prior', 0)})"
+        )
+        if guard_msgs:
+            for gm in guard_msgs:
+                action = str(gm.get("action", "")).upper()
+                rationale = gm.get("rationale") or ""
+                md_lines.append(f"- `{action}` {rationale}")
+        else:
+            md_lines.append("- No guard messages.")
+
+    return result_payload, table, "\n".join(md_lines)
 
 
 def ui_design_plate(
@@ -1105,6 +1265,54 @@ def build_demo() -> gr.Blocks:
                 inputs=[rec_in, rec_type, rec_k, rec_limit, rec_cat, rec_use_rxi, rec_relax, rec_constraints],
                 outputs=[rec_out, rec_tbl, rec_human, rec_detect],
             )
+
+            if CONDITION_RULE_FAMILIES:
+                rule_initial_family = CONDITION_RULE_FAMILIES[0]
+                rule_feat_default, rule_job_default = _rule_default_payloads(rule_initial_family)
+                with gr.Accordion("Rule-based tester (Condition Rule Library)", open=False):
+                    gr.Markdown(
+                        "Use the rule library to score playbooks based on substrate features. "
+                        "Edit the JSON payloads to explore guard and prior behavior."
+                    )
+                    rule_family = gr.Dropdown(
+                        label="Rule family",
+                        choices=CONDITION_RULE_FAMILIES,
+                        value=rule_initial_family,
+                        interactive=True,
+                    )
+                    rule_features = gr.Textbox(
+                        label="Features (JSON)",
+                        value=rule_feat_default,
+                        lines=10,
+                    )
+                    rule_job_ctx = gr.Textbox(
+                        label="Job context (JSON, optional)",
+                        value=rule_job_default,
+                        lines=6,
+                    )
+                    rule_topn = gr.Slider(
+                        label="Top playbooks",
+                        minimum=1,
+                        maximum=10,
+                        value=3,
+                        step=1,
+                    )
+                    rule_btn = gr.Button("Run rule-based recommender", variant="secondary")
+                    rule_json = gr.JSON(label="Rule recommendations")
+                    rule_table = gr.Dataframe(label="Playbook summary", interactive=False)
+                    rule_md = gr.Markdown(label="Details")
+                    rule_btn.click(
+                        ui_condition_rule_recommend,
+                        inputs=[rule_family, rule_features, rule_job_ctx, rule_topn],
+                        outputs=[rule_json, rule_table, rule_md],
+                    )
+                    rule_family.change(
+                        _rule_default_payloads,
+                        inputs=[rule_family],
+                        outputs=[rule_features, rule_job_ctx],
+                    )
+            else:
+                gr.Markdown("⚠️ Rule-based condition library not available in this build.")
 
 
         with gr.Tab("Design Plate"):

@@ -19,4 +19,5 @@ __all__ = [
     "explain",
     "registry",
     "integrations",
+    "condition_rules",
 ]
