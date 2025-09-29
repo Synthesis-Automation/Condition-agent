@@ -1,0 +1,44 @@
+from __future__ import annotations
+
+from condition_rule_library import api
+
+
+def test_load_crl_resolves_buchwald_reference() -> None:
+    crl = api.load_default_crl()
+
+    assert "Buchwald_CN" in crl.get("families", {})
+    buchwald = crl["families"]["Buchwald_CN"]
+
+    assert "defaults" in buchwald
+    assert buchwald["defaults"]["pd_source"] == "Pd2(dba)3"
+
+    playbook_ids = {pb.get("id") for pb in buchwald.get("playbooks", [])}
+    assert "BH-ARCL-PRIM-ANILINE-GENERAL" in playbook_ids
+
+
+def test_load_crl_includes_amide_formation() -> None:
+    crl = api.load_default_crl()
+
+    assert "Amide_Formation" in crl.get("families", {})
+    amide = crl["families"]["Amide_Formation"]
+
+    playbooks = amide.get("playbooks", [])
+    assert playbooks, "Expected amide formation playbooks"
+
+    ids = {pb.get("id") for pb in playbooks}
+    assert "AM-EDCI-OXYMA" in ids
+    assert "AM-BORON-B-C6F5-3" in ids
+
+
+def test_load_crl_includes_suzuki_coupling() -> None:
+    crl = api.load_default_crl()
+
+    assert "Suzuki_Coupling" in crl.get("families", {})
+    suzuki = crl["families"]["Suzuki_Coupling"]
+
+    playbooks = suzuki.get("playbooks", [])
+    assert len(playbooks) >= 10
+
+    ids = {pb.get("id") for pb in playbooks}
+    assert "SUZ-ARYL-I-BR-GENERAL-PPH3" in ids
+    assert "SUZ-PROCESS-NI-MICELLAR" in ids

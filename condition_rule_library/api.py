@@ -57,6 +57,48 @@ def _merge_nested(base: Dict[str, Any], extra: Optional[Dict[str, Any]]) -> Dict
     return result
 
 
+def _load_family_from_ref(base_dir: Path, ref: str) -> Dict[str, Any]:
+    ref_clean = str(ref).strip()
+    if not ref_clean:
+        raise ValueError("Empty family reference path")
+    ref_path = (base_dir / ref_clean).resolve()
+    if not ref_path.exists():
+        raise FileNotFoundError(f"Condition rule family reference not found: {ref_path}")
+    return json.loads(ref_path.read_text(encoding="utf-8"))
+
+
+def _resolve_family_references(data: Dict[str, Any], base_dir: Path) -> Dict[str, Any]:
+    families = data.get("families")
+    if not isinstance(families, dict):
+        return data
+
+    resolved: Dict[str, Any] = {}
+    pointer_keys = {"$ref", "source", "path"}
+
+    for name, entry in families.items():
+        if isinstance(entry, dict):
+            ref = None
+            for key in pointer_keys:
+                if key in entry and entry[key]:
+                    ref = entry[key]
+                    break
+            if ref:
+                loaded = _load_family_from_ref(base_dir, str(ref))
+                overrides = {k: v for k, v in entry.items() if k not in pointer_keys}
+                if overrides:
+                    loaded = _merge_nested(loaded, overrides)
+                resolved[name] = loaded
+            else:
+                resolved[name] = entry
+        elif isinstance(entry, str):
+            resolved[name] = _load_family_from_ref(base_dir, entry)
+        else:
+            resolved[name] = entry
+
+    data["families"] = resolved
+    return data
+
+
 def _augment_features(features: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     ctx: Dict[str, Any] = _merge_nested({}, features or {})
 
@@ -205,6 +247,7 @@ def load_crl(
     schema = Path(schema_path or DEFAULT_SCHEMA_PATH)
 
     data = json.loads(crl_path.read_text(encoding="utf-8"))
+    data = _resolve_family_references(data, crl_path.parent)
     if validate_schema and validate is not None and schema.exists():
         schema_data = json.loads(schema.read_text(encoding="utf-8"))
         validate(instance=data, schema=schema_data)  # type: ignore[arg-type]

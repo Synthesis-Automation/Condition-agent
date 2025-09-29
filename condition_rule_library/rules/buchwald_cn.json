@@ -1,0 +1,562 @@
+{
+  "reaction": "Buchwald–Hartwig C–N amination",
+  "version": "2025-09-28",
+  "schema_version": "1.1",
+  "defaults": {
+    "concentration_M": 0.1,
+    "temperature_C": 100,
+    "time_h": 18,
+    "stoichiometry": {
+      "aryl_halide_eq": 1.0,
+      "amine_eq": 1.2,
+      "base_eq": 2.0
+    },
+    "pd_source": "Pd2(dba)3",
+    "ligand_loading_mol%": 10,
+    "pd_loading_mol%": 1.5,
+    "notes": [
+      "Key levers (halide, ligand, solvent) are interdependent.",
+      "For DBU screens, 0.1 M, 100 °C, 18 h, 2.0 eq base were used as fixed settings.",
+      "Prefer glovebox or drybox when using NaOtBu; moisture ruins reproducibility.",
+      "If inorganic base is heterogeneous in toluene, switch to dioxane or add 5–10% t-BuOH for wetting."
+    ],
+    "concentration_M_range": [
+      0.05,
+      0.25
+    ],
+    "temperature_C_range": [
+      80,
+      120
+    ],
+    "agitation": {
+      "rpm_min": 600,
+      "note": "Ensure suspension of inorganic bases in toluene."
+    },
+    "solvent_priority": [
+      "1,4-dioxane",
+      "toluene",
+      "t-BuOH",
+      "DMF",
+      "DMA"
+    ]
+  },
+  "playbooks": [
+    {
+      "id": "BH-ARCL-PRIM-ANILINE-GENERAL",
+      "name": "ArCl + primary aniline",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl chloride"},
+        "nucleophile": {"class": "primary aniline"}
+      },
+      "recipe": {
+        "ligands": ["JohnPhos", "CyJohnPhos"],
+        "pd_source": ["Pd2(dba)3", "[Pd(cinnamyl)Cl]2"],
+        "base": ["NaOtBu", "K2CO3"],
+        "solvent": ["toluene", "1,4-dioxane"],
+        "temperature_C": [80, 110],
+        "mode": "batch"
+      }
+    },
+    {
+      "id": "BH-ARCL-PRIM-AMINE-MONO",
+      "name": "ArCl + primary alkyl amine (mono)",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl chloride"},
+        "nucleophile": {"class": "primary alkyl amine"},
+        "selectivity": "mono-arylation"
+      },
+      "recipe": {
+        "ligands": ["BrettPhos"],
+        "pd_source": ["Pd2(dba)3"],
+        "base": ["NaOtBu", "K3PO4"],
+        "solvent": ["toluene", "1,4-dioxane"],
+        "temperature_C": [80, 110],
+        "mode": "batch"
+      }
+    },
+    {
+      "id": "BH-ARCL-SEC-AMINE",
+      "name": "ArCl + secondary amine",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl chloride"},
+        "nucleophile": {"class": "secondary amine"}
+      },
+      "recipe": {
+        "ligands": ["RuPhos"],
+        "pd_source": ["Pd2(dba)3"],
+        "base": ["NaOtBu", "K3PO4"],
+        "solvent": ["toluene", "1,4-dioxane"],
+        "temperature_C": [90, 110],
+        "mode": "batch"
+      }
+    },
+    {
+      "id": "BH-ARCL-AMIDES-ENHANCED",
+      "name": "ArCl + amide/sulfonamide",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl chloride"},
+        "nucleophile": {"class": "amide/sulfonamide/urea/lactam"}
+      },
+      "recipe": {
+        "ligands": ["tBuBrettPhos", "BippyPhos", "XantPhos"],
+        "pd_source": ["[Pd(cinnamyl)Cl]2", "Pd2(dba)3"],
+        "base": ["K2CO3", "K3PO4", "DBU"],
+        "solvent": ["toluene", "t-BuOH", "DMF"],
+        "temperature_C": [95, 120],
+        "mode": "batch"
+      }
+    },
+    {
+      "id": "BH-ARCL-PRIM-ANILINE-ORTHO",
+      "name": "ArCl (ortho) + primary aniline",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl chloride", "ortho_sub_count": {">=": 1}},
+        "nucleophile": {"class": "primary aniline"}
+      },
+      "recipe": {
+        "ligands": ["tBuBrettPhos", "XPhos", "RuPhos"],
+        "pd_source": ["Pd2(dba)3", "XPhos Pd G3", "tBuBrettPhos Pd G3"],
+        "base": ["K3PO4", "Cs2CO3"],
+        "solvent": ["1,4-dioxane", "toluene"],
+        "temperature_C": [95, 110],
+        "mode": "batch"
+      },
+      "diagnostics": [
+        {
+          "if": "low_conversion",
+          "do": [
+            "raise_temp_to: 110",
+            "switch_base_to: Cs2CO3",
+            "increase_Pd_to: 2.0 mol%"
+          ]
+        },
+        {
+          "if": "precipitation",
+          "do": [
+            "switch_to: 1,4-dioxane",
+            "add: t-BuOH 5%"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BH-ARBR-PRIM-ANILINE",
+      "name": "ArBr + primary aniline",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl bromide"},
+        "nucleophile": {"class": "primary aniline"}
+      },
+      "recipe": {
+        "ligands": ["SPhos", "XPhos", "JohnPhos"],
+        "pd_source": ["Pd2(dba)3", "XPhos Pd G3"],
+        "base": ["K2CO3", "K3PO4"],
+        "solvent": ["toluene", "1,4-dioxane"],
+        "temperature_C": [80, 100],
+        "mode": "batch"
+      }
+    },
+    {
+      "id": "BH-HETEROARYL-CLBR-ANILINE",
+      "name": "heteroaryl halide + aniline",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "heteroaryl chloride/bromide"},
+        "nucleophile": {"class": "aniline"}
+      },
+      "recipe": {
+        "ligands": ["RuPhos", "BrettPhos", "XPhos"],
+        "base": ["K3PO4", "Cs2CO3"],
+        "solvent": ["1,4-dioxane", "toluene", "DMA"],
+        "temperature_C": [90, 110],
+        "mode": "batch",
+        "notes": [
+          "Watch for coordination to heteroatom; bulky electron-rich ligand helps."
+        ]
+      }
+    },
+    {
+      "id": "BH-ARX-HETEROARYL-SECONDARY",
+      "name": "heteroaryl + secondary amine",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "heteroaryl chloride/bromide"},
+        "nucleophile": {"class": "secondary amine"}
+      },
+      "recipe": {
+        "ligands": ["RuPhos", "XPhos"],
+        "base": ["NaOtBu", "K3PO4"],
+        "solvent": ["toluene", "1,4-dioxane"],
+        "temperature_C": [90, 110],
+        "mode": "batch"
+      }
+    },
+    {
+      "id": "BH-SEC-ALIPHATIC-ARCL",
+      "name": "ArCl + secondary aliphatic amine",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl chloride"},
+        "nucleophile": {"class": "secondary aliphatic amine"}
+      },
+      "recipe": {
+        "ligands": ["RuPhos", "XPhos"],
+        "base": ["K3PO4", "K2CO3"],
+        "solvent": ["toluene", "1,4-dioxane"],
+        "temperature_C": [85, 105]
+      },
+      "diagnostics": [
+        {
+          "if": "elimination/byproducts",
+          "do": [
+            "lower_temp_by: 10",
+            "switch_solvent_to: 1,4-dioxane"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BH-SULFONATES",
+      "name": "aryl sulfonates",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl sulfonate", "subclass": "OMs/OTf/FSO2O–Ar"},
+        "nucleophile": {"class": "aniline/amide"}
+      },
+      "recipe": {
+        "ligands": ["BrettPhos (OMs)", "XPhos (OTf/FSO2O–Ar)", "XantPhos"],
+        "base": ["DBU", "K2CO3"],
+        "solvent": ["toluene", "DMF"],
+        "temperature_C": [95, 110],
+        "mode": "batch_or_flow"
+      }
+    },
+    {
+      "id": "BH-ARX-DBU-XANTPHOS-ANILINE",
+      "name": "DBU + XantPhos screen",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": {"in": ["aryl halide", "aryl chloride", "aryl bromide"]}, "electronics": "electron-poor"},
+        "nucleophile": {"class": {"in": ["aniline", "benzamide"]}},
+        "base": "DBU"
+      },
+      "recipe": {
+        "ligands": ["XantPhos"],
+        "pd_source": ["[Pd(cinnamyl)Cl]2"],
+        "base": ["DBU"],
+        "solvent": ["DMF", "toluene"],
+        "temperature_C": [95, 105],
+        "mode": "batch",
+        "fixed_screen_defaults": {
+          "time_h": 18,
+          "concentration_M": 0.1,
+          "base_eq": 2.0
+        }
+      }
+    },
+    {
+      "id": "BH-ARX-DBU-XANTPHOS-FLOW",
+      "name": "DBU flow homogeneity",
+      "status": "candidate",
+      "when": {
+        "mode": "flow",
+        "base": "DBU"
+      },
+      "recipe": {
+        "ligands": ["XantPhos"],
+        "precatalyst": "XantPhos-Pd G3",
+        "solvent": ["MeCN:toluene (mix)"],
+        "temperature_C": 140,
+        "residence_time_min": 60,
+        "concentration_M": 0.25,
+        "notes": [
+          "Homogeneous; avoids salt precipitation/clogging"
+        ]
+      }
+    },
+    {
+      "id": "BH-ARX-DBU-ALT-LIGANDS",
+      "name": "DBU fallback ligand screen",
+      "status": "candidate",
+      "when": {
+        "base": "DBU",
+        "outcome": "low_conversion"
+      },
+      "recipe": {
+        "ligands": ["AlPhos", "tBuBrettPhos", "Josiphos"],
+        "additives": ["NaTFA (with Josiphos/tBuBrettPhos)"],
+        "action": "retry_same_temperature"
+      }
+    },
+    {
+      "id": "BH-ARX-VS-HALIDE-PREF",
+      "name": "DBU halide preference guidance",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "aryl halide"},
+        "base": "DBU"
+      },
+      "recipe": {
+        "halide_preference": ["Cl", "Br", "I"],
+        "note": "Under DBU/XantPhos, several I analogs gave lower yields than Br/Cl."
+      }
+    },
+    {
+      "id": "BH-ALKENYL-HALIDE-TRIFLATE",
+      "name": "alkenyl halide/triflate coupling",
+      "status": "candidate",
+      "when": {
+        "electrophile": {"class": "alkenyl halide/triflate"}
+      },
+      "recipe": {
+        "ligands": ["XantPhos", "BINAP-type"],
+        "nucleophile_classes": ["amine", "amide"],
+        "products": ["enamines", "imines", "enamides"],
+        "mode": "batch",
+        "temperature_C": [80, 110]
+      }
+    },
+    {
+      "id": "BH-AMMONIA-DI-TRIARYLAMINES",
+      "name": "Ammonia to diaryl/triarylamines",
+      "status": "candidate",
+      "when": {
+        "nucleophile": {"class": "ammonia"},
+        "goal": "di/triarylation"
+      },
+      "recipe": {
+        "ligands": ["XPhos"],
+        "base": ["NaOtBu", "K3PO4"],
+        "solvent": ["toluene", "1,4-dioxane"],
+        "mode": "batch"
+      }
+    },
+    {
+      "id": "BH-FLOW-HOMOGENEITY-CHECK",
+      "name": "Flow homogeneity check",
+      "status": "candidate",
+      "when": {
+        "mode": "flow"
+      },
+      "recipe": {
+        "precatalyst": ["XPhos Pd G3", "SPhos Pd G3", "tBuBrettPhos Pd G3"],
+        "base": ["DBU", "DIPEA"],
+        "solvent": ["MeCN:toluene (mix)", "DMA"],
+        "temperature_C": [120, 150],
+        "residence_time_min": [30, 90],
+        "notes": [
+          "Keep Base·HX molten or dissolved; avoid salt precipitation."
+        ]
+      }
+    },
+    {
+      "id": "buchwald_cn_steric_aniline_arcl_v1",
+      "name": "steric_aniline_ArCl",
+      "status": "candidate",
+      "when": {
+        "substrate_class": "steric_aniline_ArCl"
+      },
+      "recipe": {
+        "catalyst": "Pd/tBuBrettPhos",
+        "ligand": "tBuBrettPhos",
+        "base": "K3PO4",
+        "solvent": "1,4-dioxane",
+        "temperature_C": 100,
+        "time_h": 12,
+        "loadings": {
+          "Pd_mol%": 1.5,
+          "ligand_mol%": 3.0,
+          "base_eq": 2.0
+        }
+      },
+      "fallbacks": [
+        {"ligand": "XPhos"},
+        {"base": "Cs2CO3"}
+      ],
+      "metrics": {
+        "n_runs": 0
+      }
+    },
+    {
+      "id": "buchwald_cn_primary_aniline_arbr_v1",
+      "name": "primary_aniline_ArBr",
+      "status": "candidate",
+      "when": {
+        "substrate_class": "aniline_ArBr"
+      },
+      "recipe": {
+        "catalyst": "Pd/SPhos",
+        "ligand": "SPhos",
+        "base": "K2CO3",
+        "solvent": "toluene",
+        "temperature_C": 90,
+        "time_h": 8,
+        "loadings": {
+          "Pd_mol%": 1.5,
+          "ligand_mol%": 3.0,
+          "base_eq": 2.0
+        }
+      },
+      "fallbacks": [
+        {"ligand": "XPhos"},
+        {"solvent": "1,4-dioxane"}
+      ],
+      "metrics": {
+        "n_runs": 0
+      }
+    }
+  ],
+  "guards": [
+    {
+      "id": "GUARD-SNAR-KOTBU",
+      "if": {
+        "electrophile_electronics": "electron-poor",
+        "base": "KOtBu"
+      },
+      "action": "avoid_or_penalize",
+      "rationale": "SNAr by tert-butoxide observed; switch to DBU or milder base."
+    },
+    {
+      "id": "GUARD-FLOW-T-ABOVE-IL-MP",
+      "if": {
+        "mode": "flow",
+        "base": "DBU"
+      },
+      "action": "enforce",
+      "params": {
+        "min_temperature_C": 70
+      },
+      "rationale": "Keep T above mp of Base·HX (e.g., DBU·HCl ~66 °C) for homogeneity."
+    },
+    {
+      "id": "GUARD-AVOID-IODIDE",
+      "if": {
+        "halide": "I"
+      },
+      "action": "penalize",
+      "rationale": "Under DBU/XantPhos conditions, some I substrates underperform vs Br/Cl."
+    },
+    {
+      "id": "GUARD-PREFER-G3",
+      "if": {
+        "precatalyst_family": "G3"
+      },
+      "action": "boost",
+      "rationale": "Faster activation and reliable start-up in batch/flow."
+    },
+    {
+      "id": "GUARD-ORTHO-STERICS-BULKY-LIGAND",
+      "if": {
+        "electrophile": {
+          "class": "aryl chloride",
+          "ortho_sub_count": {">=": 1}
+        },
+        "nucleophile": {
+          "class": "aniline"
+        }
+      },
+      "action": "enforce",
+      "params": {
+        "require_ligand_in": [
+          "tBuBrettPhos",
+          "XPhos",
+          "RuPhos",
+          "BrettPhos"
+        ]
+      },
+      "rationale": "Ortho congestion benefits from bulky biaryl phosphines."
+    },
+    {
+      "id": "GUARD-BASE-SOLVENT-COMPAT",
+      "if": {
+        "base": {"in": ["K2CO3", "K3PO4", "Cs2CO3"]},
+        "solvent": "toluene"
+      },
+      "action": "warn",
+      "rationale": "Inorganic carbonates poorly suspend in toluene; prefer 1,4-dioxane or add co-solvent (t-BuOH 5–10%)."
+    },
+    {
+      "id": "GUARD-BETA-H-ELIM-SEC-ALIPHATIC",
+      "if": {
+        "nucleophile": {
+          "class": "secondary aliphatic amine"
+        },
+        "temperature_C": {">": 105}
+      },
+      "action": "penalize",
+      "rationale": "High temperatures with secondary aliphatic amines can cause β-H elimination / side reactions; keep ≤105 °C."
+    },
+    {
+      "id": "GUARD-DBU-POLAR-APROTIC",
+      "if": {
+        "base": "DBU",
+        "solvent": {"not_in": ["DMF", "DMA", "NMP", "MeCN", "toluene"]}
+      },
+      "action": "warn",
+      "rationale": "DBU protocols are usually tuned for polar aprotic (DMF/DMA) or toluene; outside these, expect re-optimization."
+    }
+  ],
+  "priors": [
+    {
+      "feature": "electrophile_electronics=electron-poor",
+      "effect": "boost",
+      "targets": ["DBU+XantPhos"],
+      "comment": "Higher hit rate in HTE with electron-deficient halides."
+    },
+    {
+      "feature": "nucleophile_class in [aniline, benzamide]",
+      "effect": "boost",
+      "targets": ["DBU+XantPhos"],
+      "comment": "Higher hit rate vs morpholine/benzylamine in DBU screen."
+    },
+    {
+      "feature": "solvent=DMF (for DBU screens)",
+      "effect": "slight_boost",
+      "targets": ["DBU+XantPhos"],
+      "comment": "Slightly more hits than toluene in HTE."
+    },
+    {
+      "feature": "electrophile=aryl chloride & ortho_sub_count>=1",
+      "effect": "boost",
+      "targets": ["Pd/tBuBrettPhos + K3PO4 + 1,4-dioxane"],
+      "comment": "Bulky ligand + strong inorganic base for congested ArCl."
+    },
+    {
+      "feature": "nucleophile=amide/sulfonamide",
+      "effect": "boost",
+      "targets": [
+        "Pd/tBuBrettPhos + K3PO4",
+        "Pd/BippyPhos + K2CO3",
+        "DBU + XantPhos (DMF)"
+      ],
+      "comment": "Harder N–H benefit from stronger donor ligand or DBU regime."
+    },
+    {
+      "feature": "electrophile=aryl bromide & aniline (primary)",
+      "effect": "boost",
+      "targets": ["Pd/SPhos", "Pd/XPhos"],
+      "comment": "Less activation required; smaller ligands often suffice."
+    }
+  ],
+  "repairs": [
+    {
+      "id": "BH-REPAIR-LOW-CONVERSION",
+      "if": {"outcome": "low_conversion"},
+      "then": {
+        "action": "sequential_retry",
+        "steps": [
+          "raise_temp_by: 10",
+          "switch_base: K2CO3→K3PO4 or K3PO4→Cs2CO3",
+          "ligand_hop: SPhos↔XPhos↔tBuBrettPhos↔RuPhos",
+          "increase_Pd_loading_to: 2.0 mol%",
+          "switch_solvent: toluene→1,4-dioxane→DMA"
+        ]
+      }
+    }
+  ]
+}
