@@ -86,11 +86,49 @@ _RULE_SAMPLE_FEATURES: Dict[str, Dict[str, Any]] = {
             "class": "primary aniline",
         },
         "solvent": "DMF",
-    }
+    },
+    "Amide_Formation": {
+        "reaction_family": "amide_formation",
+        "category": "direct_dehydrative_boron_catalysis",
+        "substrate_class": "Aliphatic/aromatic carboxylic acids with primary/secondary amines",
+        "electrophile": {
+            "class": "carboxylic acid",
+            "state": "liquid",
+        },
+        "nucleophile": {
+            "class": "primary amine",
+        },
+        "solvent": "toluene",
+        "water_management": "Dean-Stark",
+    },
+    "Suzuki_Coupling": {
+        "reaction_family": "suzuki_coupling",
+        "category": "aryl_halides",
+        "substrate_class": "Unhindered aryl iodides and bromides",
+        "electrophile": {
+            "class": "aryl halide",
+            "halide": "Br",
+            "electronics": "neutral",
+        },
+        "boron_partner": {
+            "class": "aryl boron",
+            "identity": "aryl-Bpin",
+        },
+        "base": "K2CO3",
+        "solvent": "1,4-dioxane/H2O",
+    },
 }
 
 _RULE_SAMPLE_JOB_CTX: Dict[str, Dict[str, Any]] = {
-    "Buchwald_CN": {"base": "DBU", "mode": "batch"}
+    "Buchwald_CN": {"base": "DBU", "mode": "batch"},
+    "Amide_Formation": {
+        "mode": "Dean-Stark",
+        "water_removal": "molecular_sieves",
+    },
+    "Suzuki_Coupling": {
+        "mode": "batch",
+        "base": "K2CO3",
+    },
 }
 
 _RULE_SAMPLE_FEATURES_TEXT: Dict[str, str] = {
