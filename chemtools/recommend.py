@@ -14,6 +14,215 @@ except Exception:
 from .featurizers import molecular as feat_molecular
 from . import precedent, constraints, explain
 
+try:  # Optional role-aware featurization
+    from chem_feats import featurize_mol as _role_featurize_mol  # type: ignore
+    _HAS_ROLE_FEATS = True
+except Exception:  # pragma: no cover - optional dependency may be absent
+    _role_featurize_mol = None  # type: ignore
+    _HAS_ROLE_FEATS = False
+
+
+_FAMILY_ROLE_EXPECTATIONS: Dict[str, List[Dict[str, Any]]] = {
+    "Ullmann_CN": [
+        {"label": "electrophile", "role": "aryl_halide", "required": True},
+        {"label": "nucleophile", "role": "amine", "required": True},
+    ],
+    "Buchwald_CN": [
+        {"label": "electrophile", "role": "aryl_halide", "required": True},
+        {"label": "nucleophile", "role": "amine", "required": True},
+    ],
+    "Ullmann_O": [
+        {"label": "electrophile", "role": "aryl_halide", "required": True},
+        {"label": "nucleophile", "role": "alcohol", "required": True},
+    ],
+}
+
+
+def _expected_roles_for_family(family: str | None) -> List[Dict[str, Any]]:
+    fam = (family or "").strip()
+    if not fam:
+        return []
+    return list(_FAMILY_ROLE_EXPECTATIONS.get(fam, []))
+
+
+def _role_featurization_for_reactants(
+    family: str,
+    reactants: List[str],
+) -> Dict[str, Any] | None:
+    if not _HAS_ROLE_FEATS or _role_featurize_mol is None:
+        return None
+
+    entries: List[Dict[str, Any]] = []
+    for smi in reactants:
+        if not smi:
+            continue
+        try:
+            data = _role_featurize_mol(smi)
+        except Exception:
+            continue
+        entry = dict(data)
+        entry["smiles"] = smi
+        vec = entry.get("vector")
+        try:
+            if hasattr(vec, "tolist"):
+                entry["vector"] = vec.tolist()  # type: ignore[attr-defined]
+        except Exception:
+            pass
+        entries.append(entry)
+
+    expected = _expected_roles_for_family(family)
+    assignments: Dict[str, Dict[str, Any]] = {}
+    unused = list(range(len(entries)))
+
+    for spec in expected:
+        label = str(spec.get("label") or "")
+        role_token = spec.get("role")
+        assigned_idx: Optional[int] = None
+        matched_via_mask = False
+        if role_token:
+            for idx in list(unused):
+                masks = entries[idx].get("masks") or {}
+                try:
+                    present = bool(masks.get(role_token))
+                except Exception:
+                    present = False
+                if present:
+                    assigned_idx = idx
+                    matched_via_mask = True
+                    break
+        if assigned_idx is None and unused:
+            assigned_idx = unused[0]
+        if assigned_idx is not None:
+            try:
+                unused.remove(assigned_idx)
+            except ValueError:
+                pass
+        assignments[label] = {
+            "role": role_token,
+            "index": assigned_idx,
+            "matched_via_mask": matched_via_mask,
+        }
+        if assigned_idx is not None and 0 <= assigned_idx < len(entries):
+            entries[assigned_idx] = dict(entries[assigned_idx])
+            entries[assigned_idx]["assigned_label"] = label or None
+            entries[assigned_idx]["assigned_role"] = role_token
+            entries[assigned_idx]["assignment_reason"] = "mask" if matched_via_mask else "fallback"
+
+    # Ensure every entry has explicit assignment metadata
+    for idx, entry in enumerate(entries):
+        entry.setdefault("assigned_label", None)
+        entry.setdefault("assigned_role", None)
+        entry.setdefault("assignment_reason", "unassigned")
+        entry.setdefault("index", idx)
+
+    return {
+        "available": True,
+        "family": family,
+        "roles": expected,
+        "reactants": entries,
+        "assignments": assignments,
+    }
+
+
+def _electrophile_class_text(lg: str, elec_class: str) -> str:
+    lg_norm = (lg or "").strip().upper()
+    eclass = (elec_class or "").strip().lower()
+    if eclass == "aryl":
+        if lg_norm == "CL":
+            return "aryl chloride"
+        if lg_norm == "BR":
+            return "aryl bromide"
+        if lg_norm == "I":
+            return "aryl iodide"
+        if lg_norm in {"OTF", "OTS", "OMES", "OSF"}:
+            return "aryl sulfonate"
+        if lg_norm == "UNK":
+            return "aryl electrophile"
+    if eclass in {"alkyl", "aliphatic"}:
+        if lg_norm == "CL":
+            return "alkyl chloride"
+        if lg_norm == "BR":
+            return "alkyl bromide"
+        if lg_norm == "I":
+            return "alkyl iodide"
+        return "alkyl electrophile"
+    if eclass == "alkenyl" or eclass == "vinyl":
+        if lg_norm == "OTF":
+            return "vinyl triflate"
+        if lg_norm:
+            return f"vinyl {lg_norm.lower()}"
+        return "vinyl electrophile"
+    if lg_norm:
+        return f"electrophile ({lg_norm})"
+    return "unknown electrophile"
+
+
+def _nucleophile_class_text(nuc_class: str) -> str:
+    cls = (nuc_class or "").strip().lower()
+    mapping = {
+        "aniline": "primary aniline",
+        "amine_primary": "primary amine",
+        "amine_secondary": "secondary amine",
+        "amine": "amine",
+        "phenol": "phenol",
+        "indole": "indole",
+        "amide_deactivated": "amide",
+    }
+    if cls in mapping:
+        return mapping[cls]
+    if not cls:
+        return "unknown nucleophile"
+    return cls.replace("_", " ")
+
+
+def _compose_rule_features(
+    family: str,
+    features: Dict[str, Any],
+    role_pack: Dict[str, Any] | None,
+) -> Dict[str, Any]:
+    lg = features.get("LG")
+    elec_class = features.get("elec_class")
+    nuc_class = features.get("nuc_class")
+    rule_feats: Dict[str, Any] = {
+        "family": family,
+        "bin": features.get("bin"),
+        "LG": lg,
+        "elec_class": elec_class,
+        "nuc_class": nuc_class,
+        "n_basicity": features.get("n_basicity"),
+        "steric_alpha": features.get("steric_alpha"),
+        "ortho_count": features.get("ortho_count"),
+        "para_EWG": features.get("para_EWG"),
+        "heteroaryl": features.get("heteroaryl"),
+        "electrophile": {
+            "class": _electrophile_class_text(str(lg or ""), str(elec_class or "")),
+            "lg": lg,
+            "type": elec_class,
+        },
+        "nucleophile": {
+            "class": _nucleophile_class_text(str(nuc_class or "")),
+            "basicity": features.get("n_basicity"),
+            "steric_alpha": features.get("steric_alpha"),
+        },
+    }
+    if isinstance(role_pack, dict):
+        assignments = role_pack.get("assignments") or {}
+        reactants = role_pack.get("reactants") or []
+        role_summary: Dict[str, Any] = {}
+        for label, info in assignments.items():
+            idx = info.get("index")
+            smi: Optional[str] = None
+            if isinstance(idx, int) and 0 <= idx < len(reactants):
+                smi = reactants[idx].get("smiles")
+            role_summary[label] = {
+                "role": info.get("role"),
+                "smiles": smi,
+                "matched_via_mask": info.get("matched_via_mask"),
+            }
+        if role_summary:
+            rule_feats["role_assignments"] = role_summary
+    return rule_feats
+
 
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
     def is_electrophile(s: str) -> bool:
@@ -116,6 +325,9 @@ def recommend_from_reaction(
         features = feat_molecular.featurize(elec, nuc)
     else:
         features = feat_molecular.featurize(elec, nuc)
+
+    role_pack = _role_featurization_for_reactants(fam, reactants)
+    rule_features = _compose_rule_features(fam, features, role_pack)
     # Ensure features are hashable for caching (drop nested role-aware block)
     if isinstance(features, dict) and "role_aware" in features:
         try:
@@ -368,10 +580,10 @@ def recommend_from_reaction(
         variants.append(_build_variant(b_key or None, s_key or None, len(variants) + 1))
 
 
-    from datetime import datetime
+    from datetime import datetime, timezone
     formatted = {
         "meta": {
-            "generated_at": datetime.utcnow().replace(microsecond=0).isoformat(),
+            "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
             "analysis_type": "recommendation",
             "status": "success",
         },
@@ -404,6 +616,11 @@ def recommend_from_reaction(
         "recommended_conditions": variants,
     }
 
+    formatted["starting_materials"] = {
+        "role_featurization": role_pack,
+        "rule_features": rule_features,
+    }
+
     return {
         "input_reaction": reaction,
         "family": fam,
@@ -415,6 +632,8 @@ def recommend_from_reaction(
         "reasons": reasons_pack.get("reasons"),
         "filters": {"base": base_filter, "solvent": solv_filter},
         "formatted": formatted,
+        "role_featurization": role_pack,
+        "rule_features": rule_features,
     }
 
 
@@ -486,6 +705,9 @@ def recommend_conditions_structured(
         "alternatives": result.get("alternatives"),
         "precedents": precedent_summary,
         "filters": result.get("filters"),
+        "role_featurization": result.get("role_featurization"),
+        "rule_features": result.get("rule_features"),
+        "starting_materials": formatted.get("starting_materials"),
     }
 
 

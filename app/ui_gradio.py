@@ -196,6 +196,16 @@ CSS = """
 .gradio-container{max-width:1600px !important;margin:0 auto !important;}
 .gradio-container [role='tablist']{flex-wrap:wrap;overflow-x:auto;gap:0.25rem;}
 .gradio-container [role='tab']{white-space:nowrap;}
+.gradio-container [role='tab'][aria-selected='true']{
+    background-color:#ea580c !important;
+    color:#fff !important;
+    border-color:#ea580c !important;
+    box-shadow:0 0 0 1px #ea580c inset;
+}
+.gradio-container [role='tab'][aria-selected='true'] svg{
+    color:#fff !important;
+    fill:#fff !important;
+}
 """
 
 CONDITION_SET_SCHEMA_PATH = Path(ROOT) / "condition_mcp" / "resources" / "schemas" / "condition_set.json"
@@ -372,6 +382,40 @@ def _format_detection_details(det: Dict[str, Any] | None) -> str:
     if not lines:
         return '- No detection details'
     return '\n'.join(f'- {line}' for line in lines)
+
+
+def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
+    if not isinstance(starting, dict):
+        return ''
+
+    lines: List[str] = []
+    role_pack = starting.get('role_featurization')
+    if isinstance(role_pack, dict):
+        assignments = role_pack.get('assignments') or {}
+        reactants = role_pack.get('reactants') or []
+        for label, info in assignments.items():
+            idx = info.get('index')
+            smi = None
+            if isinstance(idx, int) and 0 <= idx < len(reactants):
+                smi = reactants[idx].get('smiles')
+            role_token = info.get('role') or 'unspecified'
+            reason = 'mask' if info.get('matched_via_mask') else 'fallback'
+            summary = smi or 'n/a'
+            lines.append(f"- {label}: {summary} ({role_token}; {reason})")
+
+    rule_feats = starting.get('rule_features')
+    if isinstance(rule_feats, dict):
+        elec = rule_feats.get('electrophile') or {}
+        nuc = rule_feats.get('nucleophile') or {}
+        lines.append(f"- Electrophile class: {elec.get('class') or 'unknown'}")
+        lines.append(f"- Nucleophile class: {nuc.get('class') or 'unknown'}")
+        if rule_feats.get('ortho_count') is not None:
+            lines.append(f"- ortho substitution: {rule_feats.get('ortho_count')}")
+        if rule_feats.get('para_EWG') is not None:
+            lines.append(f"- para EWG: {rule_feats.get('para_EWG')}")
+        if rule_feats.get('n_basicity') is not None:
+            lines.append(f"- nucleophile basicity: {rule_feats.get('n_basicity')}")
+    return '\n'.join(lines)
 
 
 CONDITION_RULE_FAMILY_SET = set(CONDITION_RULE_FAMILIES)
@@ -768,6 +812,10 @@ def ui_recommend_structured(
             human_parts.append(label)
     human = "; ".join(human_parts) if human_parts else ""
     detection_md = _format_detection_details(data.get("detection"))
+    starting_md = _format_starting_materials_summary(data.get("starting_materials"))
+    if starting_md:
+        block = f"**Starting materials**\n{starting_md}"
+        detection_md = f"{detection_md}\n\n{block}" if detection_md else block
     return data, rows, human or "n/a", detection_md
 
 
