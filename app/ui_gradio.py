@@ -15,6 +15,7 @@ from functools import lru_cache
 from types import SimpleNamespace
 import json
 import os, sys
+from pathlib import Path
 
 # Ensure project root is importable when running as a script
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -22,6 +23,13 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 import gradio as gr
+
+from condition_mcp import DEFAULT_SCHEMA_VERSION
+from condition_mcp.tools import (
+    detect_family as mcp_detect_family,
+    featurize_substrates as mcp_featurize_substrates,
+    normalize_reaction as mcp_normalize_reaction,
+)
 
 # Theme: professional, compact spacing, subtle radius, readable fonts
 THEME = gr.themes.Soft(
@@ -99,6 +107,8 @@ CSS = """
 .gradio-container [role='tab']{white-space:nowrap;}
 """
 
+CONDITION_SET_SCHEMA_PATH = Path(ROOT) / "condition_mcp" / "resources" / "schemas" / "condition_set.json"
+
 # Enable RDKit by default unless explicitly disabled by the environment
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 # Prefer rxn-insight enabled by default (can be disabled via env or UI toggle)
@@ -107,6 +117,8 @@ os.environ.setdefault("CHEMTOOLS_DISABLE_RXN_INSIGHT", "0")
 from chemtools import smiles, router, properties, featurizers, recommend, precedent, reaction_similarity as rs, condition_rules
 from chemtools import registry as creg
 from chemtools.util.rdkit_helpers import rdkit_available
+
+_CRL_DEFAULT: Dict[str, Any] | None = None
 
 try:
     from condition_rule_library import api as crl_api
@@ -117,6 +129,7 @@ else:
         _CRL_DEFAULT = crl_api.load_default_crl()
         CONDITION_RULE_FAMILIES = sorted(list((_CRL_DEFAULT.get("families") or {}).keys()))
     except Exception:  # pragma: no cover - defensive fallback
+        _CRL_DEFAULT = None
         CONDITION_RULE_FAMILIES = []
 
 try:
@@ -388,6 +401,81 @@ def ui_detect_family(reactants_text: str, use_rxn_insight: bool) -> Tuple[Dict[s
 
 def ui_featurize_molecular(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     return featurizers.molecular.featurize(electrophile or "", nucleophile or "")
+
+
+def _split_reactant_block(text: str) -> List[str]:
+    t = (text or "").replace("\r\n", "\n").strip()
+    if not t:
+        return []
+    if "\n" in t:
+        return [s.strip() for s in t.splitlines() if s.strip()]
+    return [s.strip() for s in t.split(".") if s.strip()]
+
+
+def ui_mcp_normalize(smiles_rxn: str, include_agents: bool) -> Tuple[Dict[str, Any], str]:
+    rsmi = (smiles_rxn or "").strip()
+    if not rsmi:
+        return {"error": "Provide a reaction SMILES string."}, ""
+    try:
+        out = mcp_normalize_reaction({"smiles_rxn": rsmi, "include_agents": bool(include_agents)})
+    except Exception as exc:  # pragma: no cover - UI surface
+        return {"error": str(exc)}, ""
+    reactants = out.get("reactants") if isinstance(out, dict) else []
+    reactant_text = "\n".join(str(r) for r in (reactants or []) if r)
+    return out, reactant_text
+
+
+def ui_mcp_detect(reactants_text: str) -> Dict[str, Any]:
+    reactants = _split_reactant_block(reactants_text)
+    if not reactants:
+        return {"error": "Provide one or more reactant SMILES (separate with new lines or '.')."}
+    try:
+        return mcp_detect_family({"reactants": reactants})
+    except Exception as exc:  # pragma: no cover
+        return {"error": str(exc)}
+
+
+def ui_mcp_featurize(reactants_text: str) -> Dict[str, Any]:
+    reactants = _split_reactant_block(reactants_text)
+    if not reactants:
+        return {"error": "Provide reactant SMILES first (one per line or separated by '.')."}
+    try:
+        return mcp_featurize_substrates({"reactants": reactants})
+    except Exception as exc:  # pragma: no cover
+        return {"error": str(exc)}
+
+
+def ui_mcp_condition_set_schema() -> Dict[str, Any]:
+    try:
+        text = CONDITION_SET_SCHEMA_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return {
+            "error": "ConditionSet schema not found",
+            "path": str(CONDITION_SET_SCHEMA_PATH),
+        }
+    except Exception as exc:  # pragma: no cover
+        return {"error": f"Failed to read schema: {exc}"}
+    try:
+        return json.loads(text)
+    except Exception as exc:  # pragma: no cover
+        return {"error": f"Failed to parse schema JSON: {exc}"}
+
+
+def ui_mcp_rule_resource(family: str) -> Dict[str, Any]:
+    if not crl_api or not _CRL_DEFAULT:
+        return {"error": "Condition Rule Library not available in this environment."}
+    fam = (family or "").strip()
+    if not fam:
+        return {"error": "Choose a rule family."}
+    families = _CRL_DEFAULT.get("families") if isinstance(_CRL_DEFAULT, dict) else None
+    entry = (families or {}).get(fam)
+    if entry is None:
+        return {"error": f"No rule entry found for family '{fam}'."}
+    return {
+        "family": fam,
+        "metadata": {k: v for k, v in entry.items() if k != "rules"},
+        "rules": entry.get("rules"),
+    }
 
 
 def ui_properties_lookup(query: str) -> Dict[str, Any]:
@@ -1082,6 +1170,64 @@ def build_demo() -> gr.Blocks:
 
         # Removed the legacy multi-molecule featurizer tab to keep only
         # the single-molecule (basic) featurizer in the UI.
+
+        with gr.Tab("Condition MCP"):
+            gr.Markdown(
+                f"""
+                ### Condition MCP playground
+                Exercise the thin MCP tool wrappers and inspect read-only resources.
+                Current schema baseline: `{DEFAULT_SCHEMA_VERSION}`.
+                """
+            )
+            with gr.Row():
+                with gr.Column():
+                    gr.Markdown("#### Tool wrappers")
+                    mcp_rxn = gr.Textbox(
+                        label="Reaction SMILES",
+                        value="Brc1ccccc1.Nc1ccccc1>>",
+                        lines=3,
+                    )
+                    mcp_agents = gr.Checkbox(label="Include agents in normalize output", value=True)
+                    mcp_norm_btn = gr.Button("Normalize reaction", variant="primary")
+                    mcp_norm_json = gr.JSON(label="normalize_reaction output")
+                    mcp_reactants = gr.Textbox(
+                        label="Reactant SMILES (auto-filled)",
+                        value="",
+                        lines=4,
+                    )
+                    mcp_norm_btn.click(
+                        ui_mcp_normalize,
+                        inputs=[mcp_rxn, mcp_agents],
+                        outputs=[mcp_norm_json, mcp_reactants],
+                    )
+
+                    with gr.Row():
+                        mcp_detect_btn = gr.Button("Detect family", variant="secondary")
+                        mcp_feat_btn = gr.Button("Featurize substrates", variant="secondary")
+                    mcp_detect_json = gr.JSON(label="detect_family output")
+                    mcp_feat_json = gr.JSON(label="featurize_substrates output")
+                    mcp_detect_btn.click(ui_mcp_detect, inputs=[mcp_reactants], outputs=[mcp_detect_json])
+                    mcp_feat_btn.click(ui_mcp_featurize, inputs=[mcp_reactants], outputs=[mcp_feat_json])
+
+                with gr.Column():
+                    gr.Markdown("#### Resources")
+                    mcp_schema_btn = gr.Button("Show ConditionSet schema", variant="secondary")
+                    mcp_schema_json = gr.JSON(label="doc://schemas/condition_set.json")
+                    mcp_schema_btn.click(ui_mcp_condition_set_schema, outputs=[mcp_schema_json])
+
+                    if CONDITION_RULE_FAMILIES:
+                        mcp_rule_family = gr.Dropdown(
+                            label="Condition Rule Library family",
+                            choices=CONDITION_RULE_FAMILIES,
+                            value=CONDITION_RULE_FAMILIES[0],
+                            interactive=True,
+                        )
+                        mcp_rule_btn = gr.Button("Show rule resource", variant="secondary")
+                        mcp_rule_json = gr.JSON(label="cond://rules/<family>.json")
+                        mcp_rule_btn.click(ui_mcp_rule_resource, inputs=[mcp_rule_family], outputs=[mcp_rule_json])
+                        mcp_rule_family.change(ui_mcp_rule_resource, inputs=[mcp_rule_family], outputs=[mcp_rule_json])
+                    else:
+                        gr.Markdown("⚠️ Condition Rule Library not available; install `condition-rule-library` data bundle.")
 
         with gr.Tab("Single Molecule (basic)"):
             smi_in = gr.Textbox(label="SMILES", value="Clc1ccccc1")
