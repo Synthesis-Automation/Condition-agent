@@ -20,6 +20,9 @@
     },
     "Suzuki_Coupling": {
       "$ref": "rules/suzuki_coupling.json"
+    },
+    "Ullmann_CN": {
+      "$ref": "rules/ullmann_cn.json"
     }
   }
 }

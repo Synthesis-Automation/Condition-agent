@@ -42,3 +42,19 @@ def test_load_crl_includes_suzuki_coupling() -> None:
     ids = {pb.get("id") for pb in playbooks}
     assert "SUZ-ARYL-I-BR-GENERAL-PPH3" in ids
     assert "SUZ-PROCESS-NI-MICELLAR" in ids
+
+
+def test_load_crl_includes_ullmann_cn() -> None:
+    crl = api.load_default_crl()
+
+    assert "Ullmann_CN" in crl.get("families", {})
+    ullmann = crl["families"]["Ullmann_CN"]
+
+    defaults = ullmann.get("defaults", {})
+    assert defaults.get("cu_source") == "CuI"
+
+    playbook_ids = {pb.get("id") for pb in ullmann.get("playbooks", [])}
+    assert "UL-ARBRI-PRIM-ANILINE-GENERAL" in playbook_ids
+
+    guard_ids = {guard.get("id") for guard in ullmann.get("guards", [])}
+    assert "UL-GUARD-ARCL-REQUIRES-2G-LIG" in guard_ids

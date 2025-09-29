@@ -117,6 +117,21 @@ _RULE_SAMPLE_FEATURES: Dict[str, Dict[str, Any]] = {
         "base": "K2CO3",
         "solvent": "1,4-dioxane/H2O",
     },
+    "Ullmann_CN": {
+        "reaction_family": "ullmann_cn",
+        "electrophile": {
+            "class": "aryl bromide or iodide",
+            "halide": "Br",
+        },
+        "nucleophile": {
+            "class": "primary aniline",
+        },
+        "base": "K3PO4",
+        "ligand": "N,N-dimethylglycine",
+        "cu_source": "CuI",
+        "solvent": "DMSO",
+        "temperature_C": 90,
+    },
 }
 
 _RULE_SAMPLE_JOB_CTX: Dict[str, Dict[str, Any]] = {
@@ -128,6 +143,12 @@ _RULE_SAMPLE_JOB_CTX: Dict[str, Dict[str, Any]] = {
     "Suzuki_Coupling": {
         "mode": "batch",
         "base": "K2CO3",
+    },
+    "Ullmann_CN": {
+        "mode": "batch",
+        "temperature_C": 100,
+        "base": "K3PO4",
+        "cu_source": "CuI",
     },
 }
 
