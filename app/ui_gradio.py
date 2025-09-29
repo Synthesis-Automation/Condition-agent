@@ -386,7 +386,7 @@ def _format_detection_details(det: Dict[str, Any] | None) -> str:
 
 def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
     if not isinstance(starting, dict):
-        return ''
+        return '- Starting-material featurization unavailable.'
 
     lines: List[str] = []
     role_pack = starting.get('role_featurization')
@@ -402,6 +402,10 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
             reason = 'mask' if info.get('matched_via_mask') else 'fallback'
             summary = smi or 'n/a'
             lines.append(f"- {label}: {summary} ({role_token}; {reason})")
+        if not assignments:
+            lines.append('- Role-aware vectors present but no assignments matched.')
+    else:
+        lines.append('- Role-aware vectors unavailable (install `chem-feats` to enable).')
 
     rule_feats = starting.get('rule_features')
     if isinstance(rule_feats, dict):
@@ -415,6 +419,9 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
             lines.append(f"- para EWG: {rule_feats.get('para_EWG')}")
         if rule_feats.get('n_basicity') is not None:
             lines.append(f"- nucleophile basicity: {rule_feats.get('n_basicity')}")
+    else:
+        lines.append('- Rule-based substrate features missing from response.')
+
     return '\n'.join(lines)
 
 
@@ -812,11 +819,16 @@ def ui_recommend_structured(
             human_parts.append(label)
     human = "; ".join(human_parts) if human_parts else ""
     detection_md = _format_detection_details(data.get("detection"))
-    starting_md = _format_starting_materials_summary(data.get("starting_materials"))
-    if starting_md:
-        block = f"**Starting materials**\n{starting_md}"
-        detection_md = f"{detection_md}\n\n{block}" if detection_md else block
-    return data, rows, human or "n/a", detection_md
+    starting_payload = data.get("starting_materials")
+    starting_md = _format_starting_materials_summary(starting_payload)
+    return (
+        data,
+        rows,
+        human or "n/a",
+        detection_md,
+        starting_md,
+        starting_payload or {},
+    )
 
 
 def ui_condition_rule_recommend(
@@ -1601,11 +1613,14 @@ def build_demo() -> gr.Blocks:
                     rec_out = gr.JSON(label="Structured Recommendations")
                     rec_tbl = gr.Dataframe(headers=["rank", "core", "base", "solvent", "confidence", "support"], label="Recommendation Summary", interactive=False)
                     rec_human = gr.Textbox(label="Top recommended (core/base/solvent)", interactive=False)
-                    rec_detect = gr.Markdown(label="Detection Details")
+                    with gr.Row():
+                        rec_detect = gr.Markdown(label="Detection Details")
+                        rec_starting_md = gr.Markdown(label="Starting materials summary")
+                    rec_starting_json = gr.JSON(label="Starting materials featurization")
                     rec_btn.click(
                         ui_recommend_structured,
                         inputs=[rec_in, rec_type, rec_k, rec_limit, rec_cat, rec_use_rxi, rec_relax, rec_constraints],
-                        outputs=[rec_out, rec_tbl, rec_human, rec_detect],
+                        outputs=[rec_out, rec_tbl, rec_human, rec_detect, rec_starting_md, rec_starting_json],
                     )
 
                 with gr.Tab("Rule-based (CRL)"):
