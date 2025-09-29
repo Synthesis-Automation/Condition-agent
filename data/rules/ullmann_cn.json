@@ -1,0 +1,518 @@
+{
+  "reaction": "Ullmann–Ma C–N coupling (Cu-catalyzed aryl amination)",
+  "version": "0.1.0",
+  "schema_version": "1.1",
+  "defaults": {
+    "concentration_M": 0.2,
+    "concentration_M_range": [
+      0.1,
+      0.5
+    ],
+    "temperature_C": 80,
+    "temperature_C_range": [
+      60,
+      120
+    ],
+    "time_h": 18,
+    "cu_loading_mol%": 5,
+    "ligand_loading_mol%": 10,
+    "cu_source": "CuI",
+    "solvent_priority": [
+      "DMSO",
+      "EtOH",
+      "DMF",
+      "toluene"
+    ],
+    "stoichiometry": {
+      "amine_eq": 1.5,
+      "aryl_halide_eq": 1.0,
+      "base_eq": 2.0
+    },
+    "agitation": {
+      "rpm_min": 600,
+      "note": "Maintain suspension with inorganic bases; ensure good heat transfer for ≥100 °C."
+    },
+    "notes": [
+      "General trend of halide reactivity: I > Br >> Cl; aryl chlorides typically require second‑generation ligands and/or higher temperature.",
+      "K3PO4 and K2CO3 are broadly effective bases; Cs2CO3 can rescue difficult cases.",
+      "For greener setups, EtOH is viable when the reactivity allows; DMSO often maximizes performance for challenging substrates.",
+      "Use dry conditions; water can slow some Cu/ligand systems."
+    ]
+  },
+  "playbooks": [
+    {
+      "id": "UL-ARBRI-PRIM-ANILINE-GENERAL",
+      "name": "ArBr/ArI + primary aniline (amino acid ligands)",
+      "status": "candidate",
+      "when": {
+        "electrophile": {
+          "class": "aryl bromide or iodide"
+        },
+        "nucleophile": {
+          "class": "primary aniline"
+        }
+      },
+      "recipe": {
+        "cu_source": [
+          "CuI",
+          "CuBr"
+        ],
+        "ligands": [
+          "N-methylglycine (sarcosine)",
+          "N,N-dimethylglycine (DMG)",
+          "L-proline",
+          "4-hydroxy-L-proline",
+          "1,10-phenanthroline"
+        ],
+        "base": [
+          "K3PO4",
+          "K2CO3"
+        ],
+        "solvent": [
+          "DMSO",
+          "EtOH",
+          "toluene"
+        ],
+        "temperature_C": [
+          60,
+          110
+        ],
+        "cu_loading_mol%": [
+          2,
+          10
+        ],
+        "ligand_loading_mol%": [
+          5,
+          20
+        ]
+      },
+      "diagnostics": [
+        {
+          "if": "precipitation",
+          "do": [
+            "switch_to: DMSO",
+            "add: small co-solvent DMF (5–10%)"
+          ]
+        },
+        {
+          "if": "electron-poor_electrophile",
+          "do": [
+            "lower_base_basicity_if_SNAr",
+            "prefer: DMG or proline ligands"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UL-ARCL-ANILINE-2G-LIGANDS",
+      "name": "ArCl + aniline/heteroaniline (second‑generation ligands)",
+      "status": "candidate",
+      "when": {
+        "electrophile": {
+          "class": "aryl chloride"
+        },
+        "nucleophile": {
+          "class": "aniline or heteroaromatic amine"
+        }
+      },
+      "recipe": {
+        "cu_source": [
+          "CuI",
+          "Cu2O"
+        ],
+        "ligands": [
+          "DMPAO (oxalic diamide)",
+          "MNAO (oxalic diamide)",
+          "DBO (benzoxazolinone)",
+          "TMHD (2,2,6,6-tetramethyl-3,5-heptanedione)"
+        ],
+        "base": [
+          "K3PO4",
+          "Cs2CO3"
+        ],
+        "solvent": [
+          "DMSO"
+        ],
+        "temperature_C": [
+          100,
+          120
+        ],
+        "cu_loading_mol%": [
+          5,
+          20
+        ],
+        "ligand_loading_mol%": [
+          10,
+          30
+        ]
+      },
+      "diagnostics": [
+        {
+          "if": "low_conversion",
+          "do": [
+            "raise_temp_to: 120",
+            "switch_base_to: Cs2CO3",
+            "increase_cu_to: 10–20 mol%",
+            "switch_ligand_to: oxalic_diamide_family"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UL-HETARBR-HINDERED-PYRAZINE-PRIM-AMINE-BO",
+      "name": "Hindered heteroaryl bromide (pyrazine) + primary amine (BO‑guided)",
+      "status": "candidate",
+      "when": {
+        "electrophile": {
+          "class": "heteroaryl bromide",
+          "subclass": "sterically hindered pyrazine"
+        },
+        "nucleophile": {
+          "class": "primary amine"
+        }
+      },
+      "recipe": {
+        "cu_source": [
+          "CuI",
+          "CuBr",
+          "Cu2O"
+        ],
+        "ligands": [
+          "TMHD (2,2,6,6-tetramethyl-3,5-heptanedione)",
+          "DMPAO (oxalic diamide)",
+          "MNAO (oxalic diamide)"
+        ],
+        "base": [
+          "K3PO4",
+          "K2CO3"
+        ],
+        "solvent": [
+          "EtOH",
+          "DMSO"
+        ],
+        "temperature_C": [
+          80,
+          100
+        ],
+        "cu_loading_mol%": [
+          5,
+          10
+        ],
+        "ligand_loading_mol%": [
+          5,
+          20
+        ],
+        "mode": "batch"
+      },
+      "diagnostics": [
+        {
+          "if": "need_greener_setup",
+          "do": [
+            "prefer: EtOH",
+            "choose: CuBr 5 mol% + TMHD + K3PO4",
+            "keep_temp: 80"
+          ]
+        },
+        {
+          "if": "low_conversion",
+          "do": [
+            "switch_to: DMSO",
+            "try_ligand: oxalic_diamide_family",
+            "increase_temp_to: 90–100"
+          ]
+        },
+        {
+          "if": "base_sensitive_nucleophile",
+          "do": [
+            "use: K2CO3",
+            "lower_temp_by: 5–10"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UL-ARI-TO-ANILINE-AMMONIA",
+      "name": "Aryl halide + ammonia to (hetero)anilines",
+      "status": "candidate",
+      "when": {
+        "electrophile": {
+          "class": "aryl iodide or bromide"
+        },
+        "nucleophile": {
+          "class": "ammonia (aq or gas)"
+        }
+      },
+      "recipe": {
+        "cu_source": [
+          "Cu2O",
+          "CuI"
+        ],
+        "ligands": [
+          "specialized ligand (L19/L20 class)",
+          "amino acid ligand"
+        ],
+        "base": [
+          "KOH",
+          "K3PO4"
+        ],
+        "solvent": [
+          "EtOH",
+          "DMSO"
+        ],
+        "temperature_C": [
+          60,
+          110
+        ],
+        "cu_loading_mol%": [
+          0.1,
+          10
+        ],
+        "ligand_loading_mol%": [
+          5,
+          20
+        ]
+      },
+      "diagnostics": [
+        {
+          "if": "using_iodide",
+          "do": [
+            "lower_temp_to: 60–80",
+            "prefer: Cu2O + L19/L20 in EtOH"
+          ]
+        },
+        {
+          "if": "using_chloride",
+          "do": [
+            "prefer: amino_acid_ligand + CuI in DMSO at 110–120"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UL-ARBRI-SEC-ALIPHATIC-AMINE",
+      "name": "ArBr/ArI + secondary aliphatic amine",
+      "status": "candidate",
+      "when": {
+        "electrophile": {
+          "class": "aryl bromide or iodide"
+        },
+        "nucleophile": {
+          "class": "secondary aliphatic amine"
+        }
+      },
+      "recipe": {
+        "cu_source": [
+          "CuI"
+        ],
+        "ligands": [
+          "DMPAO (oxalic diamide)"
+        ],
+        "base": [
+          "K3PO4"
+        ],
+        "solvent": [
+          "DMSO"
+        ],
+        "temperature_C": [
+          60,
+          110
+        ],
+        "cu_loading_mol%": [
+          1,
+          10
+        ],
+        "ligand_loading_mol%": [
+          2,
+          20
+        ]
+      },
+      "diagnostics": [
+        {
+          "if": "low_conversion",
+          "do": [
+            "raise_temp_by: 10",
+            "increase_cu_to: 10 mol%",
+            "extend_time_by_h: 6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "UL-ARX-AMIDE-SULFONAMIDE",
+      "name": "(Hetero)aryl halide + amide/sulfonamide",
+      "status": "candidate",
+      "when": {
+        "electrophile": {
+          "class": "aryl or heteroaryl halide"
+        },
+        "nucleophile": {
+          "class": "amide or sulfonamide"
+        }
+      },
+      "recipe": {
+        "cu_source": [
+          "CuI",
+          "Cu2O"
+        ],
+        "ligands": [
+          "DBO (benzoxazolinone)",
+          "BTMO-like (oxime/benzotriazole family)",
+          "oxalic diamide (DMPAO/MNAO)"
+        ],
+        "base": [
+          "K3PO4",
+          "Cs2CO3"
+        ],
+        "solvent": [
+          "DMSO",
+          "DMF"
+        ],
+        "temperature_C": [
+          100,
+          120
+        ],
+        "cu_loading_mol%": [
+          5,
+          20
+        ],
+        "ligand_loading_mol%": [
+          10,
+          30
+        ]
+      },
+      "diagnostics": [
+        {
+          "if": "heteroaryl_chloride",
+          "do": [
+            "prefer: DBO",
+            "use: Cs2CO3",
+            "keep_temp: 110–120"
+          ]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    {
+      "id": "UL-GUARD-ARCL-REQUIRES-2G-LIG",
+      "action": "enforce",
+      "if": {
+        "electrophile": {
+          "class": "aryl chloride"
+        }
+      },
+      "params": {
+        "must_include_one_ligand_from": [
+          "oxalic diamide (DMPAO/MNAO)",
+          "DBO",
+          "TMHD"
+        ]
+      },
+      "rationale": "Aryl chlorides typically require second-generation ligands and higher temperatures in Ullmann–Ma couplings."
+    },
+    {
+      "id": "UL-GUARD-BO-PYRAZINE-BASE",
+      "action": "enforce",
+      "if": {
+        "electrophile": {
+          "subclass": "sterically hindered pyrazine"
+        }
+      },
+      "params": {
+        "allowed_bases": [
+          "K3PO4",
+          "K2CO3"
+        ],
+        "amine_eq_min": 1.5,
+        "temperature_C": 80
+      },
+      "rationale": "Bayesian optimization indicates K3PO4/K2CO3, 1.5 eq amine, and ~80 °C give best outcomes for hindered pyrazines in green media."
+    },
+    {
+      "id": "UL-GUARD-ETOH-TMAX",
+      "action": "warn",
+      "if": {
+        "solvent": "EtOH",
+        "temperature_C": {
+          ">": 85
+        }
+      },
+      "rationale": "Ethanol boils at ~78–80 °C; higher temperatures require sealed vessels or switching to DMSO."
+    },
+    {
+      "id": "UL-GUARD-AVOID-STRONG-ALKOXIDE",
+      "action": "avoid_or_penalize",
+      "if": {
+        "base": {
+          "in": [
+            "t-BuONa",
+            "t-BuOK"
+          ]
+        }
+      },
+      "rationale": "Strong alkoxides often underperform versus K3PO4/K2CO3 in Cu-catalyzed C–N Ullmann–Ma variants; prefer milder inorganic bases or K3PO4."
+    }
+  ],
+  "priors": [
+    {
+      "feature": "electrophile=heteroaryl bromide (sterically hindered pyrazine)",
+      "effect": "boost",
+      "targets": [
+        "CuBr/TMHD + K3PO4 + EtOH @80 °C"
+      ],
+      "comment": "BO case study found high yields with 5 mol% CuBr, TMHD (L7), K3PO4, EtOH at 80 °C; scalable and cost‑efficient."
+    },
+    {
+      "feature": "base in [K3PO4, K2CO3]",
+      "effect": "boost",
+      "targets": [
+        "All Ullmann–Ma playbooks"
+      ],
+      "comment": "Frequently best-performing bases across surveys and BO runs."
+    },
+    {
+      "feature": "electrophile=aryl chloride",
+      "effect": "boost",
+      "targets": [
+        "CuI + oxalic diamide (DMPAO/MNAO) + DMSO @110–120 °C",
+        "Cu2O + DBO + DMSO @110–120 °C"
+      ],
+      "comment": "Second-generation ligands markedly improve ArCl coupling."
+    },
+    {
+      "feature": "nucleophile=secondary aliphatic amine",
+      "effect": "boost",
+      "targets": [
+        "CuI + DMPAO (oxalic diamide) + K3PO4 + DMSO"
+      ],
+      "comment": "Oxalic diamide ligands excel for challenging secondary amines."
+    },
+    {
+      "feature": "need_greener_conditions",
+      "effect": "slight_boost",
+      "targets": [
+        "EtOH as solvent when compatible"
+      ],
+      "comment": "EtOH preferred for sustainability; performance may be slightly lower vs DMSO—use diagnostics to compensate."
+    }
+  ],
+  "repairs": [
+    {
+      "id": "UL-REPAIR-LOW-CONVERSION",
+      "if": {
+        "outcome": "low_conversion"
+      },
+      "then": {
+        "action": "sequential_retry",
+        "steps": [
+          "raise_temp_by: 10 (cap at 120)",
+          "switch_base: K2CO3→K3PO4 or K3PO4→Cs2CO3",
+          "ligand_hop: amino_acid↔TMHD↔oxalic_diamide↔DBO",
+          "increase_cu_loading_to: 10 mol%",
+          "switch_solvent: EtOH→DMSO",
+          "extend_time_by_h: 6"
+        ]
+      }
+    }
+  ]
+}
