@@ -42,15 +42,47 @@ THEME = gr.themes.Soft(
     spacing_size="sm",
 )
 
-RECOMMEND_FAMILY_DISPLAY = [
-    ('Auto-detect (default)', ''),
-    ('Suzuki (Suzuki_CC)', 'Suzuki_CC'),
-    ('Ullmann C?N', 'Ullmann C?N'),
-    ('Buchwald C?N', 'Buchwald C?N'),
-    ('Amide Coupling', 'Amide_Coupling'),
+# Unified mapping between UI labels, structured datasets, and rule families.
+# Each entry ensures the Structured (ML) and Rule-based recommenders operate on
+# the same reaction family definition.
+RECOMMEND_REACTION_TYPE_CONFIGS: List[Dict[str, str]] = [
+    {
+        "label": "Auto-detect (default)",
+        "structured_family": "",
+        "rule_family": "",
+        "dataset_label": "Auto-detect via router",
+    },
+    {
+        "label": "Suzuki (Suzuki_CC)",
+        "structured_family": "Suzuki_CC",
+        "rule_family": "Suzuki_Coupling",
+        "dataset_label": "Suzuki_CC",
+    },
+    {
+        "label": "Ullmann C–N",
+        "structured_family": "Ullmann C?N",
+        "rule_family": "Ullmann_CN",
+        "dataset_label": "Ullmann C?N",
+    },
+    {
+        "label": "Buchwald C–N",
+        "structured_family": "Buchwald C?N",
+        "rule_family": "Buchwald_CN",
+        "dataset_label": "Buchwald C?N",
+    },
+    {
+        "label": "Amide Coupling",
+        "structured_family": "Amide_Coupling",
+        "rule_family": "Amide_Formation",
+        "dataset_label": "Amide_Coupling",
+    },
 ]
-RECOMMEND_FAMILY_OPTIONS = [label for label, _ in RECOMMEND_FAMILY_DISPLAY]
-RECOMMEND_FAMILY_VALUE_MAP = {label: value for label, value in RECOMMEND_FAMILY_DISPLAY}
+
+RECOMMEND_FAMILY_OPTIONS = [cfg["label"] for cfg in RECOMMEND_REACTION_TYPE_CONFIGS]
+RECOMMEND_FAMILY_VALUE_MAP = {cfg["label"]: cfg["structured_family"] for cfg in RECOMMEND_REACTION_TYPE_CONFIGS}
+RECOMMEND_RULE_FAMILY_MAP = {cfg["label"]: cfg["rule_family"] for cfg in RECOMMEND_REACTION_TYPE_CONFIGS}
+RECOMMEND_DATASET_LABEL_MAP = {cfg["label"]: cfg.get("dataset_label", cfg["structured_family"]) for cfg in RECOMMEND_REACTION_TYPE_CONFIGS}
+RECOMMEND_REACTION_TYPE_CONFIG_MAP = {cfg["label"]: cfg for cfg in RECOMMEND_REACTION_TYPE_CONFIGS}
 
 # Catalyst class options (optional filter)
 CATALYST_CLASS_DISPLAY = [
@@ -340,6 +372,44 @@ def _format_detection_details(det: Dict[str, Any] | None) -> str:
     if not lines:
         return '- No detection details'
     return '\n'.join(f'- {line}' for line in lines)
+
+
+CONDITION_RULE_FAMILY_SET = set(CONDITION_RULE_FAMILIES)
+
+
+def _get_reaction_type_config(label: str) -> Dict[str, str]:
+    return RECOMMEND_REACTION_TYPE_CONFIG_MAP.get(label or "", {})
+
+
+def ui_recommend_reaction_type_meta(label: str) -> Tuple[str, str, str, str]:
+    cfg = _get_reaction_type_config(label)
+    structured_family = cfg.get("structured_family", "")
+    dataset_label = cfg.get("dataset_label") or structured_family or "Auto-detect via router"
+    rule_family = cfg.get("rule_family", "")
+
+    summary_lines: List[str] = []
+    if structured_family:
+        if dataset_label and dataset_label != structured_family:
+            summary_lines.append(f"- **Structured dataset**: `{structured_family}` ({dataset_label})")
+        else:
+            summary_lines.append(f"- **Structured dataset**: `{structured_family}`")
+    else:
+        summary_lines.append(f"- **Structured dataset**: {dataset_label}")
+
+    if rule_family:
+        availability = "available" if rule_family in CONDITION_RULE_FAMILY_SET else "missing"
+        summary_lines.append(f"- **Rule family**: `{rule_family}` ({availability})")
+    else:
+        summary_lines.append("- **Rule family**: none (rule recommender disabled)")
+
+    if structured_family and rule_family:
+        summary_lines.append(f"- Mapping: `{structured_family}` ↔ `{rule_family}`")
+
+    features_text, job_ctx_text = "{}", "{}"
+    if rule_family:
+        features_text, job_ctx_text = _rule_default_payloads(rule_family)
+
+    return "\n".join(summary_lines), rule_family, features_text, job_ctx_text
 
 
 # --- Handlers for tabs ---
@@ -1443,15 +1513,31 @@ def build_demo() -> gr.Blocks:
 
         with gr.Tab("Recommend Conditions"):
             gr.Markdown("### Recommendation modes\nSelect between data-driven suggestions and rule-based playbooks.")
+
+            default_reaction_type = RECOMMEND_FAMILY_OPTIONS[0] if RECOMMEND_FAMILY_OPTIONS else ""
+            default_summary, default_rule_family, default_rule_features, default_rule_job_ctx = ui_recommend_reaction_type_meta(default_reaction_type)
+
+            with gr.Row():
+                rec_in = gr.Textbox(
+                    label="Reaction SMILES",
+                    value="Brc1ccccc1.Nc1ccccc1>>",
+                    lines=3,
+                )
+                rec_type = gr.Dropdown(
+                    label="Reaction Type",
+                    choices=RECOMMEND_FAMILY_OPTIONS,
+                    value=default_reaction_type,
+                    interactive=True,
+                )
+
+            rec_type_summary = gr.Markdown(default_summary or "- No reaction type selected -", label="Reaction family mapping")
+
+            rule_family_component = None
+            rule_features_component = None
+            rule_job_component = None
+
             with gr.Tabs():
                 with gr.Tab("Structured (ML)"):
-                    rec_in = gr.Textbox(label="Reaction SMILES", value="Brc1ccccc1.Nc1ccccc1>>")
-                    rec_type = gr.Dropdown(
-                        label="Reaction Type (optional override)",
-                        choices=RECOMMEND_FAMILY_OPTIONS,
-                        value=RECOMMEND_FAMILY_OPTIONS[0],
-                        interactive=True,
-                    )
                     rec_k = gr.Slider(label="k (neighbors)", minimum=5, maximum=100, value=50, step=1)
                     rec_limit = gr.Slider(label="Number of recommendations", minimum=1, maximum=10, value=5, step=1)
                     rec_cat = gr.Dropdown(
@@ -1476,26 +1562,23 @@ def build_demo() -> gr.Blocks:
 
                 with gr.Tab("Rule-based (CRL)"):
                     if CONDITION_RULE_FAMILIES:
-                        rule_initial_family = CONDITION_RULE_FAMILIES[0]
-                        rule_feat_default, rule_job_default = _rule_default_payloads(rule_initial_family)
                         gr.Markdown(
-                            "Use the Condition Rule Library for deterministic playbooks. "
+                            "Use the shared reaction inputs above, then inspect deterministic playbooks for the mapped rule family. "
                             "Edit the JSON payloads to explore guard and prior behavior."
                         )
-                        rule_family = gr.Dropdown(
-                            label="Rule family",
-                            choices=CONDITION_RULE_FAMILIES,
-                            value=rule_initial_family,
-                            interactive=True,
+                        rule_family_component = gr.Textbox(
+                            label="Rule family (auto-mapped)",
+                            value=default_rule_family,
+                            interactive=False,
                         )
-                        rule_features = gr.Textbox(
+                        rule_features_component = gr.Textbox(
                             label="Features (JSON)",
-                            value=rule_feat_default,
+                            value=default_rule_features,
                             lines=12,
                         )
-                        rule_job_ctx = gr.Textbox(
+                        rule_job_component = gr.Textbox(
                             label="Job context (JSON, optional)",
-                            value=rule_job_default,
+                            value=default_rule_job_ctx,
                             lines=6,
                         )
                         rule_topn = gr.Slider(
@@ -1511,16 +1594,24 @@ def build_demo() -> gr.Blocks:
                         rule_md = gr.Markdown(label="Details")
                         rule_btn.click(
                             ui_condition_rule_recommend,
-                            inputs=[rule_family, rule_features, rule_job_ctx, rule_topn],
+                            inputs=[rule_family_component, rule_features_component, rule_job_component, rule_topn],
                             outputs=[rule_json, rule_table, rule_md],
-                        )
-                        rule_family.change(
-                            _rule_default_payloads,
-                            inputs=[rule_family],
-                            outputs=[rule_features, rule_job_ctx],
                         )
                     else:
                         gr.Markdown("⚠️ Rule-based condition library not available in this build.")
+
+            if CONDITION_RULE_FAMILIES and rule_family_component and rule_features_component and rule_job_component:
+                rec_type.change(
+                    ui_recommend_reaction_type_meta,
+                    inputs=[rec_type],
+                    outputs=[rec_type_summary, rule_family_component, rule_features_component, rule_job_component],
+                )
+            else:
+                def _meta_summary_only(selection: str) -> str:
+                    summary, _, _, _ = ui_recommend_reaction_type_meta(selection)
+                    return summary or "- No reaction type selected -"
+
+                rec_type.change(_meta_summary_only, inputs=[rec_type], outputs=[rec_type_summary])
 
 
         with gr.Tab("Design Plate"):
