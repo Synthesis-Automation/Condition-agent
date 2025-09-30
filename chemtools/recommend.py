@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, List, Tuple, Optional, Callable
+from dataclasses import dataclass
 from collections import Counter
 
 from .smiles import normalize_reaction
@@ -13,6 +14,7 @@ except Exception:
     _HAS_RXN_INSIGHT = False
 from .featurizers import molecular as feat_molecular
 from . import precedent, constraints, explain
+from .util.rdkit_helpers import rdkit_available, parse_smiles
 
 
 _FAMILY_ALIASES: Dict[str, str] = {
@@ -201,16 +203,259 @@ def _nucleophile_class_text(nuc_class: str) -> str:
     return cls.replace("_", " ")
 
 
-def _compose_rule_features(
-    family: str,
+@dataclass
+class _RuleFeatureContext:
+    family: str
+    features: Dict[str, Any]
+    role_pack: Dict[str, Any] | None
+    reactants: List[str]
+    detection: Optional[Dict[str, Any]] = None
+
+
+RuleFeatureBuilder = Callable[[_RuleFeatureContext], Dict[str, Any]]
+
+
+def _role_pack_assignments(role_pack: Dict[str, Any] | None) -> Dict[str, Dict[str, Any]]:
+    if isinstance(role_pack, dict):
+        raw = role_pack.get("assignments")
+        if isinstance(raw, dict):
+            return {str(label): info for label, info in raw.items() if isinstance(info, dict)}
+    return {}
+
+
+def _role_reactant_entries(role_pack: Dict[str, Any] | None, reactants: List[str]) -> List[Dict[str, Any]]:
+    if isinstance(role_pack, dict):
+        entries = role_pack.get("reactants")
+        if isinstance(entries, list):
+            normalized: List[Dict[str, Any]] = []
+            for entry in entries:
+                if isinstance(entry, dict):
+                    normalized.append(entry)
+                else:
+                    normalized.append({"smiles": entry})
+            return normalized
+    return [{"smiles": smi} for smi in reactants]
+
+
+def _build_role_summary(role_pack: Dict[str, Any] | None, entries: List[Dict[str, Any]]) -> Dict[str, Any]:
+    summary: Dict[str, Any] = {}
+    assignments = _role_pack_assignments(role_pack)
+    for label, info in assignments.items():
+        idx = info.get("index")
+        smi = None
+        if isinstance(idx, int) and 0 <= idx < len(entries):
+            smi = entries[idx].get("smiles") or entries[idx].get("input")
+        summary[label] = {
+            "role": info.get("role"),
+            "smiles": smi,
+            "matched_via_mask": info.get("matched_via_mask"),
+        }
+    return summary
+
+
+def _resolve_role_entry(
+    ctx: _RuleFeatureContext,
+    label: str,
+    fallback_idx: Optional[int] = None,
+) -> Tuple[Optional[int], Optional[Dict[str, Any]]]:
+    entries = _role_reactant_entries(ctx.role_pack, ctx.reactants)
+    assignments = _role_pack_assignments(ctx.role_pack)
+    idx = assignments.get(label, {}).get("index")
+    if not isinstance(idx, int):
+        if fallback_idx is not None and 0 <= fallback_idx < len(entries):
+            idx = fallback_idx
+        else:
+            idx = None
+    if isinstance(idx, int) and 0 <= idx < len(entries):
+        return idx, entries[idx]
+    return idx, None
+
+
+def _analyze_carboxylic_acid(smiles: Optional[str]) -> Dict[str, Any]:
+    info: Dict[str, Any] = {
+        "class": "carboxylic acid" if smiles else "unknown electrophile",
+        "smiles": smiles or "",
+        "aromatic": False,
+        "heteroaromatic": False,
+        "aliphatic": False,
+        "alpha_branching": "unknown",
+        "carbon_count": None,
+        "state": "unknown",
+        "description": "carboxylic acids",
+        "amino_acid_like": False,
+        "present": False,
+    }
+    if not smiles:
+        return info
+    s_lower = smiles.lower()
+    info["present"] = any(pattern in s_lower for pattern in ("c(=o)o", "c(=o)[o", "c(=o)oh", "c(=o)oo"))
+    used_rdkit = False
+    if rdkit_available():
+        try:
+            from rdkit import Chem  # type: ignore
+        except Exception:
+            Chem = None  # type: ignore
+        if Chem is not None:
+            mol = parse_smiles(smiles)
+            if mol is not None:
+                used_rdkit = True
+                acid_smarts = Chem.MolFromSmarts("C(=O)[O;H1,-1]")
+                matches = mol.GetSubstructMatches(acid_smarts)
+                info["present"] = info["present"] or bool(matches)
+                for match in matches:
+                    carbon_idx = match[0]
+                    carbon_atom = mol.GetAtomWithIdx(carbon_idx)
+                    neighbors = [nbr for nbr in carbon_atom.GetNeighbors() if nbr.GetIdx() not in match[1:]]
+                    aromatic_neighbors = [nbr for nbr in neighbors if nbr.GetIsAromatic()]
+                    if aromatic_neighbors:
+                        info["aromatic"] = True
+                        if any(nbr.GetAtomicNum() not in {6, 1} for nbr in aromatic_neighbors):
+                            info["heteroaromatic"] = True
+                    else:
+                        info["aliphatic"] = True
+                    carbon_degrees = [nbr.GetDegree() for nbr in neighbors if nbr.GetAtomicNum() == 6]
+                    if carbon_degrees:
+                        max_deg = max(carbon_degrees)
+                        if max_deg >= 3:
+                            info["alpha_branching"] = "branched"
+                        elif max_deg == 2:
+                            info["alpha_branching"] = "secondary"
+                        else:
+                            info["alpha_branching"] = "primary"
+                carbon_count = sum(1 for atom in mol.GetAtoms() if atom.GetAtomicNum() == 6)
+                info["carbon_count"] = carbon_count
+                if carbon_count <= 8:
+                    info["state"] = "liquid"
+                elif carbon_count >= 12:
+                    info["state"] = "solid"
+                else:
+                    info["state"] = "wax"
+                try:
+                    amine_smarts = Chem.MolFromSmarts("[NX3;H2,H1,H0+;!$([NX3](=O))]")
+                    info["amino_acid_like"] = bool(mol.HasSubstructMatch(amine_smarts))
+                except Exception:
+                    pass
+    if not used_rdkit:
+        if "c" in s_lower:
+            info["aromatic"] = True
+            info["heteroaromatic"] = info["heteroaromatic"] or any(tok in s_lower for tok in ("n", "o", "s", "p"))
+        else:
+            info["aliphatic"] = True
+        if info["alpha_branching"] == "unknown":
+            if "C(C)(C" in smiles or "c(c)(c" in s_lower:
+                info["alpha_branching"] = "branched"
+            elif "C(C" in smiles:
+                info["alpha_branching"] = "secondary"
+            else:
+                info["alpha_branching"] = "primary"
+        if not info["carbon_count"]:
+            carbon_count = sum(1 for ch in s_lower if ch in {"c", "C"})
+            info["carbon_count"] = carbon_count if carbon_count else None
+            if info["carbon_count"]:
+                if info["carbon_count"] <= 8:
+                    info["state"] = "liquid"
+                elif info["carbon_count"] >= 12:
+                    info["state"] = "solid"
+        info["amino_acid_like"] = info["amino_acid_like"] or ("n" in s_lower and "c(=o)o" in s_lower)
+    if info["heteroaromatic"]:
+        info["description"] = "heteroaromatic carboxylic acids"
+    elif info["aromatic"]:
+        info["description"] = "aromatic carboxylic acids"
+    elif info["aliphatic"]:
+        info["description"] = "aliphatic carboxylic acids"
+    else:
+        info["description"] = "carboxylic acids"
+    return info
+
+
+def _analyze_amine(smiles: Optional[str], features: Dict[str, Any]) -> Dict[str, Any]:
+    cls_text = _nucleophile_class_text(str(features.get("nuc_class") or ""))
+    info: Dict[str, Any] = {
+        "class": cls_text,
+        "type": features.get("nuc_class"),
+        "basicity": features.get("n_basicity"),
+        "steric_alpha": features.get("steric_alpha"),
+        "smiles": smiles or "",
+        "aromatic": False,
+        "heteroaromatic": False,
+    }
+    if not smiles:
+        return info
+    used_rdkit = False
+    if rdkit_available():
+        try:
+            from rdkit import Chem  # type: ignore
+        except Exception:
+            Chem = None  # type: ignore
+        if Chem is not None:
+            mol = parse_smiles(smiles)
+            if mol is not None:
+                used_rdkit = True
+                info["aromatic"] = info["aromatic"] or any(
+                    atom.GetIsAromatic() and atom.GetAtomicNum() == 7 for atom in mol.GetAtoms()
+                )
+                info["heteroaromatic"] = info["heteroaromatic"] or any(
+                    atom.GetIsAromatic() and atom.GetAtomicNum() not in {6, 1}
+                    for atom in mol.GetAtoms()
+                )
+    if not used_rdkit:
+        s_lower = smiles.lower()
+        if "c" in s_lower and "n" in s_lower:
+            info["aromatic"] = True
+        if info["aromatic"]:
+            info["heteroaromatic"] = info["heteroaromatic"] or any(tok in s_lower for tok in ("n", "o", "s", "p"))
+    return info
+
+
+def _amide_substrate_class(acid_info: Dict[str, Any], amine_info: Dict[str, Any]) -> str:
+    acid_desc = str(acid_info.get("description") or acid_info.get("class") or "carboxylic acids")
+    amine_desc = str(amine_info.get("class") or "amines")
+    return f"{acid_desc} with {amine_desc}"
+
+
+def _infer_amide_category(
+    acid_info: Dict[str, Any],
+    amine_info: Dict[str, Any],
     features: Dict[str, Any],
-    role_pack: Dict[str, Any] | None,
-) -> Dict[str, Any]:
+    detection: Optional[Dict[str, Any]],
+) -> str:
+    amine_class = str((amine_info.get("class") or "")).lower()
+    steric = str((amine_info.get("steric_alpha") or features.get("steric_alpha") or "")).lower()
+    basicity = str((amine_info.get("basicity") or features.get("n_basicity") or "")).lower()
+    carbon_count = acid_info.get("carbon_count") or 0
+    if "tertiary" in amine_class or "tertiary" in basicity:
+        return "reagent_based_coupling"
+    if steric in {"high", "very_high"}:
+        return "reagent_based_coupling"
+    if "aniline" in amine_class:
+        return "reagent_based_coupling"
+    if acid_info.get("amino_acid_like"):
+        return "biocatalytic_amidation"
+    if carbon_count and carbon_count >= 14:
+        return "process_and_sustainability"
+    if acid_info.get("heteroaromatic") and steric in {"medium", "secondary"}:
+        return "triarylsilanol_catalysis"
+    return "direct_dehydrative_boron_catalysis"
+
+
+def _water_management_for_category(category: str) -> Optional[str]:
+    mapping = {
+        "direct_dehydrative_boron_catalysis": "Dean-Stark or molecular sieves",
+        "triarylsilanol_catalysis": "Dean-Stark",
+        "biocatalytic_amidation": "Aqueous buffer",
+        "reagent_based_coupling": "Anhydrous conditions",
+        "process_and_sustainability": "Continuous water removal",
+    }
+    return mapping.get(category)
+
+
+def _default_rule_feature_builder(ctx: _RuleFeatureContext) -> Dict[str, Any]:
+    features = ctx.features or {}
     lg = features.get("LG")
     elec_class = features.get("elec_class")
     nuc_class = features.get("nuc_class")
     rule_feats: Dict[str, Any] = {
-        "family": family,
+        "family": ctx.family,
         "bin": features.get("bin"),
         "LG": lg,
         "elec_class": elec_class,
@@ -231,23 +476,69 @@ def _compose_rule_features(
             "steric_alpha": features.get("steric_alpha"),
         },
     }
-    if isinstance(role_pack, dict):
-        assignments = role_pack.get("assignments") or {}
-        reactants = role_pack.get("reactants") or []
-        role_summary: Dict[str, Any] = {}
-        for label, info in assignments.items():
-            idx = info.get("index")
-            smi: Optional[str] = None
-            if isinstance(idx, int) and 0 <= idx < len(reactants):
-                smi = reactants[idx].get("smiles")
-            role_summary[label] = {
-                "role": info.get("role"),
-                "smiles": smi,
-                "matched_via_mask": info.get("matched_via_mask"),
-            }
-        if role_summary:
-            rule_feats["role_assignments"] = role_summary
+    entries = _role_reactant_entries(ctx.role_pack, ctx.reactants)
+    role_summary = _build_role_summary(ctx.role_pack, entries)
+    if role_summary:
+        rule_feats["role_assignments"] = role_summary
     return rule_feats
+
+
+def _amide_rule_feature_builder(ctx: _RuleFeatureContext) -> Dict[str, Any]:
+    base = _default_rule_feature_builder(ctx)
+    _, elec_entry = _resolve_role_entry(ctx, "electrophile", fallback_idx=0)
+    _, nuc_entry = _resolve_role_entry(ctx, "nucleophile", fallback_idx=1)
+    acid_info = _analyze_carboxylic_acid((elec_entry or {}).get("smiles"))
+    amine_info = _analyze_amine((nuc_entry or {}).get("smiles"), ctx.features)
+    base["reaction_family"] = "amide_formation"
+    base["electrophile"] = {**base.get("electrophile", {}), **acid_info}
+    base["nucleophile"] = {**base.get("nucleophile", {}), **amine_info}
+    base["substrate_class"] = _amide_substrate_class(acid_info, amine_info)
+    category = _infer_amide_category(acid_info, amine_info, ctx.features, ctx.detection)
+    base["category"] = category
+    water_plan = _water_management_for_category(category)
+    if water_plan:
+        base["water_management"] = water_plan
+    role_summary = dict(base.get("role_assignments") or {})
+    if elec_entry:
+        record = dict(role_summary.get("electrophile") or {})
+        record.setdefault("role", record.get("role") or "electrophile")
+        record["smiles"] = acid_info.get("smiles") or elec_entry.get("smiles") or record.get("smiles")
+        role_summary["electrophile"] = record
+    if nuc_entry:
+        record = dict(role_summary.get("nucleophile") or {})
+        record.setdefault("role", record.get("role") or "nucleophile")
+        record["smiles"] = amine_info.get("smiles") or nuc_entry.get("smiles") or record.get("smiles")
+        role_summary["nucleophile"] = record
+    if role_summary:
+        base["role_assignments"] = role_summary
+    return base
+
+
+_RULE_FEATURE_BUILDERS: Dict[str, RuleFeatureBuilder] = {
+    "Amide_Formation": _amide_rule_feature_builder,
+}
+
+
+def _compose_rule_features(
+    family: str,
+    features: Dict[str, Any],
+    role_pack: Dict[str, Any] | None,
+    reactants: Optional[List[str]] = None,
+    detection: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    fam = _canonical_family(family)
+    ctx = _RuleFeatureContext(
+        family=fam,
+        features=features or {},
+        role_pack=role_pack,
+        reactants=list(reactants or []),
+        detection=detection,
+    )
+    builder = _RULE_FEATURE_BUILDERS.get(fam, _default_rule_feature_builder)
+    try:
+        return builder(ctx)
+    except Exception:
+        return _default_rule_feature_builder(ctx)
 
 
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
@@ -353,7 +644,18 @@ def recommend_from_reaction(
         features = feat_molecular.featurize(elec, nuc)
 
     role_pack = _role_featurization_for_reactants(fam, reactants)
-    rule_features = _compose_rule_features(fam, features, role_pack)
+    detection_meta = {
+        "auto_family": auto_family,
+        "rule_family": rule_family,
+        "source": detection_source,
+    }
+    rule_features = _compose_rule_features(
+        fam,
+        features,
+        role_pack,
+        reactants=reactants,
+        detection=detection_meta,
+    )
     # Ensure features are hashable for caching (drop nested role-aware block)
     if isinstance(features, dict) and "role_aware" in features:
         try:

@@ -431,14 +431,36 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
     if isinstance(rule_feats, dict):
         elec = rule_feats.get('electrophile') or {}
         nuc = rule_feats.get('nucleophile') or {}
+        if rule_feats.get('reaction_family'):
+            lines.append(f"- Reaction family: {rule_feats.get('reaction_family')}")
+        if rule_feats.get('category'):
+            lines.append(f"- Rule category: {rule_feats.get('category')}")
+        if rule_feats.get('substrate_class'):
+            lines.append(f"- Substrate class: {rule_feats.get('substrate_class')}")
         lines.append(f"- Electrophile class: {elec.get('class') or 'unknown'}")
+        if elec.get('description'):
+            lines.append(f"  • detail: {elec.get('description')}")
+        if elec.get('alpha_branching'):
+            lines.append(f"  • alpha branching: {elec.get('alpha_branching')}")
+        if elec.get('state'):
+            lines.append(f"  • state: {elec.get('state')}")
+        if elec.get('smiles'):
+            lines.append(f"  • electrophile smiles: {elec.get('smiles')}")
         lines.append(f"- Nucleophile class: {nuc.get('class') or 'unknown'}")
+        if nuc.get('basicity'):
+            lines.append(f"  • basicity: {nuc.get('basicity')}")
+        if nuc.get('steric_alpha'):
+            lines.append(f"  • steric alpha: {nuc.get('steric_alpha')}")
+        if nuc.get('smiles'):
+            lines.append(f"  • nucleophile smiles: {nuc.get('smiles')}")
         if rule_feats.get('ortho_count') is not None:
             lines.append(f"- ortho substitution: {rule_feats.get('ortho_count')}")
         if rule_feats.get('para_EWG') is not None:
             lines.append(f"- para EWG: {rule_feats.get('para_EWG')}")
         if rule_feats.get('n_basicity') is not None:
             lines.append(f"- nucleophile basicity: {rule_feats.get('n_basicity')}")
+        if rule_feats.get('water_management'):
+            lines.append(f"- Water management: {rule_feats.get('water_management')}")
     else:
         lines.append('- Rule-based substrate features missing from response.')
 
@@ -1073,7 +1095,13 @@ def ui_featurize_reactants_only(
             nuc = reactants[1] if len(reactants) > 1 else ""
         features = recommend.feat_molecular.featurize(elec, nuc)
         role_pack = recommend._role_featurization_for_reactants(fam, reactants)
-        rule_features = recommend._compose_rule_features(fam, features, role_pack)
+        rule_features = recommend._compose_rule_features(
+            fam,
+            features,
+            role_pack,
+            reactants=reactants,
+            detection=detection,
+        )
         starting_payload = {
             "role_featurization": role_pack,
             "rule_features": rule_features,
