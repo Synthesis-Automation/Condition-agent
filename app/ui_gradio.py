@@ -260,11 +260,16 @@ if os.environ.get("CHEMTOOLS_RDKIT_QUIET", "1").strip().lower() not in {"0", "fa
                 pass
     except Exception:
         pass
-# Optional role-aware single-molecule featurizer
+# Optional role-aware featurizers
 try:
     from chem_feats import featurize_mol as role_feat_mol  # type: ignore
 except Exception:
     role_feat_mol = None  # type: ignore
+
+try:
+    from chem_feats import featurize_reaction as role_feat_rxn  # type: ignore
+except Exception:
+    role_feat_rxn = None  # type: ignore
 
 
 @lru_cache(maxsize=512)
@@ -423,6 +428,109 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
         lines.append('- Rule-based substrate features missing from response.')
 
     return '\n'.join(lines)
+
+
+_STARTING_TABLE_HEADERS: List[str] = [
+    "reactant",
+    "smiles",
+    "assigned_roles",
+    "amine.present",
+    "amine.class_ps3",
+    "amine.aniline_flag",
+    "amine.alpha_branch",
+    "amine.h_count_on_N",
+    "aryl_halide.present",
+    "aryl_halide.halide",
+    "aryl_halide.ortho_block",
+    "aryl_halide.ipso_degree",
+    "aryl_halide.para_EWG",
+    "aryl_halide.heteroaryl",
+]
+
+
+def _starting_materials_table(starting: Dict[str, Any] | None) -> List[List[Any]]:
+    rows: List[List[Any]] = []
+    if not isinstance(starting, dict):
+        return rows
+
+    role_pack = starting.get('role_featurization') if isinstance(starting.get('role_featurization'), dict) else None
+    if not isinstance(role_pack, dict):
+        return rows
+
+    reactants = role_pack.get('reactants')
+    if not isinstance(reactants, list):
+        return rows
+
+    assignments = role_pack.get('assignments') if isinstance(role_pack.get('assignments'), dict) else {}
+    idx_roles: Dict[int, List[str]] = {}
+    if isinstance(assignments, dict):
+        for info in assignments.values():
+            if not isinstance(info, dict):
+                continue
+            idx = info.get('index')
+            role = info.get('role') or info.get('label')
+            if isinstance(idx, int):
+                idx_roles.setdefault(idx, []).append(str(role or ''))
+
+    feature_keys = [
+        'amine.present',
+        'amine.class_ps3',
+        'amine.aniline_flag',
+        'amine.alpha_branch',
+        'amine.h_count_on_N',
+        'aryl_halide.present',
+        'aryl_halide.halide',
+        'aryl_halide.ortho_block',
+        'aryl_halide.ipso_degree',
+        'aryl_halide.para_EWG',
+        'aryl_halide.heteroaryl',
+    ]
+
+    for idx, react in enumerate(reactants):
+        if not isinstance(react, dict):
+            continue
+        smi = react.get('smiles') or react.get('input') or ''
+        fields = react.get('fields') or []
+        vector = react.get('vector')
+        if hasattr(vector, 'tolist'):
+            try:
+                vector = vector.tolist()
+            except Exception:
+                vector = list(vector)
+        if not isinstance(vector, list):
+            try:
+                vector = list(vector or [])
+            except Exception:
+                vector = []
+        field_map: Dict[str, Any] = {}
+        for name, value in zip(fields, vector):
+            if isinstance(name, str):
+                field_map[name] = value
+
+        amine_present = react.get('masks', {}).get('amine') if isinstance(react.get('masks'), dict) else None
+        aryl_present = react.get('masks', {}).get('aryl_halide') if isinstance(react.get('masks'), dict) else None
+
+        row: List[Any] = [
+            idx,
+            smi,
+            ', '.join(idx_roles.get(idx, [])) or '',
+        ]
+
+        for key in feature_keys:
+            if key == 'amine.present' and amine_present is not None:
+                row.append(amine_present)
+                continue
+            if key == 'aryl_halide.present' and aryl_present is not None:
+                row.append(aryl_present)
+                continue
+            row.append(field_map.get(key))
+
+        rows.append(row)
+
+    if not rows:
+        rows.append([None] + [''] * (len(_STARTING_TABLE_HEADERS) - 1))
+
+    return rows
 
 
 CONDITION_RULE_FAMILY_SET = set(CONDITION_RULE_FAMILIES)
@@ -821,12 +929,14 @@ def ui_recommend_structured(
     detection_md = _format_detection_details(data.get("detection"))
     starting_payload = data.get("starting_materials")
     starting_md = _format_starting_materials_summary(starting_payload)
+    starting_table = _starting_materials_table(starting_payload)
     return (
         data,
         rows,
         human or "n/a",
         detection_md,
         starting_md,
+        starting_table,
         starting_payload or {},
     )
 
@@ -836,6 +946,8 @@ def ui_condition_rule_recommend(
     features_json: str,
     job_ctx_json: str,
     top_n: int,
+    *_,
+    rule_features_override: Optional[str] = None,
 ) -> Tuple[Dict[str, Any], List[List[Any]], str]:
     fam = (family or "").strip()
     header = [
@@ -853,7 +965,8 @@ def ui_condition_rule_recommend(
     if not fam:
         return {"error": "Select a reaction family."}, [header], "- No family selected -"
 
-    features = _safe_json_loads(features_json)
+    features_payload = rule_features_override if rule_features_override is not None else features_json
+    features = _safe_json_loads(features_payload)
     if not isinstance(features, dict) or not features:
         return {
             "error": "Features payload must be a non-empty JSON object.",
@@ -1418,81 +1531,164 @@ def build_demo() -> gr.Blocks:
                     else:
                         gr.Markdown("⚠️ Condition Rule Library not available; install `condition-rule-library` data bundle.")
 
-        with gr.Tab("Single Molecule (basic)"):
-            smi_in = gr.Textbox(label="SMILES", value="Clc1ccccc1")
+        with gr.Tab("Featurize"):
+            gr.Markdown(
+                """
+                ### Role-aware single input featurization
+                Provide a molecule SMILES, a reaction SMILES (we'll featurize the reactants), or a dot/newline-separated list of starting materials.
+                """
+            )
+            smi_in = gr.Textbox(label="SMILES or Reaction SMILES", value="Clc1ccccc1", lines=3)
             roles_in = gr.CheckboxGroup(
                 choices=["amine", "alcohol", "aryl_halide"],
-                label="Roles (optional; leave empty for globals-only)",
+                label="Roles (optional; applied to each reactant)",
                 value=[],
             )
             show_full = gr.Checkbox(value=False, label="Show full fields list (unchecked shows preview)")
             with gr.Row():
-                smi_btn = gr.Button("Featurize molecule", variant="primary")
+                smi_btn = gr.Button("Featurize", variant="primary")
                 dl_btn = gr.DownloadButton(label="Download CSV")
-            smi_out = gr.JSON(label="Result (vector length, masks, fields)")
+            smi_out = gr.JSON(label="Result (vector lengths, masks, fields)")
             rdkit_status = gr.Markdown(label="Status")
             csv_code = gr.Code(label="CSV preview")
 
-            def _ui_single_molecule(smi: str, roles: list[str], show_full_fields: bool):
+            def _rdkit_status_message() -> str:
+                if not rdkit_available():
+                    return (
+                        "⚠️ RDKit isn't available or is disabled. Descriptor blocks default to zeros. "
+                        "Set `CHEMTOOLS_DISABLE_RDKIT=0` (or unset it) and install RDKit to enable numeric features."
+                    )
+                return "✅ RDKit detected; numeric descriptors enabled."
+
+            def _format_feature_result(raw: Dict[str, Any] | None, show_full_fields: bool) -> Dict[str, Any]:
+                if not isinstance(raw, dict):
+                    return {"error": "Featurizer returned an unexpected payload."}
+                result = dict(raw)
+                vec = result.get("vector")
+                if isinstance(vec, list):
+                    vec_list = vec
+                elif hasattr(vec, "tolist"):
+                    try:
+                        vec_list = list(vec.tolist())  # type: ignore[arg-type]
+                    except Exception:
+                        vec_list = list(vec) if isinstance(vec, (tuple, list)) else ([] if vec is None else [vec])
+                else:
+                    vec_list = list(vec) if isinstance(vec, (tuple, list)) else ([] if vec is None else [vec])
+                result["vector"] = vec_list
+                result["length"] = len(vec_list)
+                fields = result.get("fields")
+                if isinstance(fields, list):
+                    field_list = list(fields)
+                elif isinstance(fields, tuple):
+                    field_list = list(fields)
+                else:
+                    field_list = []
+                if not show_full_fields:
+                    result["fields_preview"] = field_list[:12]
+                    result.pop("fields", None)
+                else:
+                    result["fields"] = field_list
+                return result
+
+            def _extract_reactants(text: str, treat_collection: bool) -> List[str]:
+                if treat_collection:
+                    return _split_reactant_block(text)
+                head = text.split(">", 1)[0]
+                return _split_reactant_block(head)
+
+            def _ui_featurize(input_text: str, roles: List[str], show_full_fields: bool):
                 if role_feat_mol is None:
                     return {"error": "role-aware featurizer unavailable"}, ""
-                roles = roles or []
-                out = role_feat_mol(smi or "", roles=roles)
-                vec = out.get("vector")
-                try:
-                    out["vector"] = vec.tolist()  # type: ignore
-                except Exception:
-                    pass
-                out["length"] = len(out.get("vector") or [])
-                # fields handling
-                flds = out.get("fields") or []
-                if not show_full_fields:
-                    out["fields_preview"] = flds[:12]
-                    try:
-                        del out["fields"]
-                    except Exception:
-                        pass
-                # RDKit status hint
-                status_msg = ""
-                if not rdkit_available():
-                    status_msg = (
-                        "?? RDKit is not available or disabled. Global descriptors, role-specific details, "
-                        "and fingerprints default to 0. Set `CHEMTOOLS_DISABLE_RDKIT=0` (or unset it) and install RDKit "
-                        "to enable numeric features."
-                    )
-                else:
-                    status_msg = "RDKit detected ?"
-                return out, status_msg
+                cleaned = (input_text or "").strip()
+                if not cleaned:
+                    return {"error": "Provide a SMILES string or reaction SMILES."}, ""
+                resolved_roles: Optional[List[str]] = roles or None
+                is_reaction = ">" in cleaned
+                treat_collection = not is_reaction and len(_split_reactant_block(cleaned)) > 1
 
-            def _to_csv(smi: str, roles: list[str]):
+                try:
+                    if is_reaction or treat_collection:
+                        reactants = _extract_reactants(cleaned, treat_collection)
+                        if not reactants:
+                            return {"error": "No reactant SMILES detected in the input."}, ""
+                        payloads: List[Dict[str, Any]] = []
+                        for idx, smi in enumerate(reactants):
+                            raw = role_feat_mol(smi, roles=resolved_roles)
+                            formatted = _format_feature_result(raw, show_full_fields)
+                            formatted["smiles"] = smi
+                            formatted["reactant_index"] = idx
+                            payloads.append(formatted)
+                        output: Dict[str, Any] = {
+                            "input": cleaned,
+                            "input_type": "reaction" if is_reaction else "collection",
+                            "reactant_count": len(payloads),
+                            "reactants": payloads,
+                        }
+                        if is_reaction and role_feat_rxn and resolved_roles is None:
+                            try:
+                                raw_rxn = role_feat_rxn(cleaned)
+                                if isinstance(raw_rxn, dict):
+                                    output["raw_reaction_payload"] = raw_rxn
+                            except Exception:
+                                pass
+                    else:
+                        raw = role_feat_mol(cleaned, roles=resolved_roles)
+                        formatted = _format_feature_result(raw, show_full_fields)
+                        formatted["smiles"] = cleaned
+                        output = {
+                            "input": cleaned,
+                            "input_type": "molecule",
+                            **formatted,
+                        }
+                except Exception as exc:
+                    return {"error": str(exc)}, ""
+
+                return output, _rdkit_status_message()
+
+            def _to_csv(input_text: str, roles: List[str]):
                 if role_feat_mol is None:
                     return b"error,role-aware featurizer unavailable\n"
-                roles = roles or []
-                out = role_feat_mol(smi or "", roles=roles)
-                vec = out.get("vector")
-                try:
-                    vec_list = vec.tolist()  # type: ignore
-                except Exception:
-                    vec_list = list(vec or [])  # type: ignore
-                fields = out.get("fields") or []
-                # Build CSV: field,value
-                lines = ["field,value"]
-                n = min(len(fields), len(vec_list))
-                for i in range(n):
-                    name = str(fields[i]).replace('"', '""')
-                    val = vec_list[i]
-                    lines.append(f'"{name}",{val}')
+                cleaned = (input_text or "").strip()
+                if not cleaned:
+                    return b"error,Provide a SMILES string first\n"
+                resolved_roles: Optional[List[str]] = roles or None
+                is_reaction = ">" in cleaned
+                treat_collection = not is_reaction and len(_split_reactant_block(cleaned)) > 1
+                reactants = _extract_reactants(cleaned, treat_collection) if (is_reaction or treat_collection) else [cleaned]
+                if not reactants:
+                    return b"error,No reactants detected\n"
+                lines = ["target,smiles,field,value"]
+                for idx, smi in enumerate(reactants):
+                    target = f"reactant_{idx + 1}" if (is_reaction or treat_collection) else "input"
+                    try:
+                        raw = role_feat_mol(smi, roles=resolved_roles)
+                    except Exception as exc:
+                        err = f"error,failed to featurize {smi},{exc}\n"
+                        return err.encode("utf-8")
+                    vec = raw.get("vector")
+                    try:
+                        vec_list = vec.tolist()  # type: ignore[attr-defined]
+                    except Exception:
+                        vec_list = list(vec or [])  # type: ignore[arg-type]
+                    fields = raw.get("fields") or []
+                    n = min(len(fields), len(vec_list))
+                    escaped_smi = smi.replace('"', '""')
+                    for i in range(n):
+                        name = str(fields[i]).replace('"', '""')
+                        val = json.dumps(vec_list[i])
+                        lines.append(f'"{target}","{escaped_smi}","{name}",{val}')
                 csv_text = "\n".join(lines) + "\n"
                 return csv_text.encode("utf-8")
 
-            smi_btn.click(_ui_single_molecule, inputs=[smi_in, roles_in, show_full], outputs=[smi_out, rdkit_status])
-            # Update CSV preview and download
-            def _update_csv_preview(smi: str, roles: list[str]) -> str:
-                data = _to_csv(smi, roles)
+            smi_btn.click(_ui_featurize, inputs=[smi_in, roles_in, show_full], outputs=[smi_out, rdkit_status])
+
+            def _update_csv_preview(input_text: str, roles: List[str]) -> str:
+                data = _to_csv(input_text, roles)
                 try:
                     return data.decode("utf-8") if isinstance(data, (bytes, bytearray)) else str(data)
                 except Exception:
                     return str(data)
+
             smi_btn.click(_update_csv_preview, inputs=[smi_in, roles_in], outputs=[csv_code])
             dl_btn.click(_to_csv, inputs=[smi_in, roles_in], outputs=[dl_btn])
 
@@ -1592,6 +1788,19 @@ def build_demo() -> gr.Blocks:
 
             rec_type_summary = gr.Markdown(default_summary or "- No reaction type selected -", label="Reaction family mapping")
 
+            with gr.Row():
+                rec_detect = gr.Markdown(label="Detection Details")
+                rec_starting_md = gr.Markdown(label="Starting materials summary")
+
+            with gr.Accordion("Starting materials featurization", open=False):
+                rec_starting_table = gr.Dataframe(
+                    label="Reactant feature highlights",
+                    headers=_STARTING_TABLE_HEADERS,
+                    interactive=False,
+                )
+                rec_starting_json = gr.JSON(label="Raw payload")
+            rec_rule_features_json = gr.Textbox(visible=False)
+
             rule_family_component = None
             rule_features_component = None
             rule_job_component = None
@@ -1613,14 +1822,10 @@ def build_demo() -> gr.Blocks:
                     rec_out = gr.JSON(label="Structured Recommendations")
                     rec_tbl = gr.Dataframe(headers=["rank", "core", "base", "solvent", "confidence", "support"], label="Recommendation Summary", interactive=False)
                     rec_human = gr.Textbox(label="Top recommended (core/base/solvent)", interactive=False)
-                    with gr.Row():
-                        rec_detect = gr.Markdown(label="Detection Details")
-                        rec_starting_md = gr.Markdown(label="Starting materials summary")
-                    rec_starting_json = gr.JSON(label="Starting materials featurization")
-                    rec_btn.click(
+                    rec_click = rec_btn.click(
                         ui_recommend_structured,
                         inputs=[rec_in, rec_type, rec_k, rec_limit, rec_cat, rec_use_rxi, rec_relax, rec_constraints],
-                        outputs=[rec_out, rec_tbl, rec_human, rec_detect, rec_starting_md, rec_starting_json],
+                        outputs=[rec_out, rec_tbl, rec_human, rec_detect, rec_starting_md, rec_starting_table, rec_starting_json],
                     )
 
                 with gr.Tab("Rule-based (CRL)"):
@@ -1657,11 +1862,27 @@ def build_demo() -> gr.Blocks:
                         rule_md = gr.Markdown(label="Details")
                         rule_btn.click(
                             ui_condition_rule_recommend,
-                            inputs=[rule_family_component, rule_features_component, rule_job_component, rule_topn],
+                            inputs=[rule_family_component, rule_features_component, rule_job_component, rule_topn, rec_rule_features_json],
                             outputs=[rule_json, rule_table, rule_md],
                         )
                     else:
                         gr.Markdown("⚠️ Rule-based condition library not available in this build.")
+
+            def _auto_rule_payload(structured: Dict[str, Any]) -> Tuple[Any, Any, Any]:
+                if not isinstance(structured, dict):
+                    return gr.update(), gr.update(), gr.update()
+                features_obj = structured.get("rule_features")
+                if not isinstance(features_obj, dict) or not features_obj:
+                    return gr.update(), gr.update(), gr.update()
+                try:
+                    features_text = json.dumps(features_obj, indent=2, sort_keys=True)
+                except Exception:
+                    features_text = json.dumps(features_obj, indent=2)
+                family_val = str(features_obj.get("family") or structured.get("family") or "").strip()
+                family_update = gr.update(value=family_val) if family_val else gr.update()
+                features_update = gr.update(value=features_text)
+                json_update = gr.update(value=structured)
+                return family_update, features_update, json_update
 
             if CONDITION_RULE_FAMILIES and rule_family_component and rule_features_component and rule_job_component:
                 rec_type.change(
@@ -1669,6 +1890,12 @@ def build_demo() -> gr.Blocks:
                     inputs=[rec_type],
                     outputs=[rec_type_summary, rule_family_component, rule_features_component, rule_job_component],
                 )
+                if rec_click is not None:
+                    rec_click.then(
+                        _auto_rule_payload,
+                        inputs=[rec_out],
+                        outputs=[rule_family_component, rule_features_component, rec_rule_features_json],
+                    )
             else:
                 def _meta_summary_only(selection: str) -> str:
                     summary, _, _, _ = ui_recommend_reaction_type_meta(selection)
