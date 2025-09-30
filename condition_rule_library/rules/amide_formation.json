@@ -1,400 +1,886 @@
 {
-  "reaction": "Amide Bond Formation",
-  "version": "2.0",
+  "reaction": "Amide bond formation (carboxylic acid + amine)",
+  "version": "2025-09-30-full",
   "schema_version": "1.1",
-  "last_updated": "2025-09-25T00:00:00Z",
   "defaults": {
+    "concentration_M": 0.2,
+    "temperature_C": 25,
+    "time_h": 16,
+    "stoichiometry": {
+      "acid_eq": 1.0,
+      "amine_eq": 1.1,
+      "coupling_reagent_eq": 1.2,
+      "additive_eq": 1.2,
+      "base_eq": 2.0
+    },
+    "solvent_priority": [
+      "DMF",
+      "MeCN",
+      "DCM",
+      "THF",
+      "EtOAc",
+      "2-MeTHF"
+    ],
+    "base_priority": [
+      "DIPEA",
+      "NMM",
+      "iPr2NEt",
+      "pyridine"
+    ],
+    "agitation": {
+      "rpm_min": 500,
+      "note": "Ensure homogeneity; add DMF/NMP co-solvent if solids persist."
+    },
     "notes": [
-      "Refer to catalyst-specific playbooks for detailed stoichiometry.",
-      "Water management and partner selection drive success across these regimes."
+      "Prefer Oxyma/ethyl cyano(hydroxyimino)acetate or related additives over HOBt/HOAt for safety; avoid drying HOBt/HOAt.",
+      "For scale-up, T3P (50% in EtOAc or MeCN) and EDC/Oxyma simplify workup compared to uronium/phosphonium salts.",
+      "Control temperature for alpha-chiral acids to limit racemization; pre-cool and add amine last.",
+      "Pre-activation (e.g., CDI or as acyl fluoride/chloride) can rescue sluggish anilines but may reduce chemoselectivity.",
+      "Exclude water for acid chloride or CDI routes; for EDC-type reagents, moderate moisture tolerance but slower rates."
     ]
   },
   "playbooks": [
     {
-      "id": "AM-BORON-B-C6F5-3",
-      "name": "B(C6F5)3 dehydrative coupling",
-      "status": "candidate",
-      "category": "Direct Dehydrative Amidation – Boron Catalysis",
+      "id": "AMIDE-EDC-OXYMA-GENERAL",
+      "name": "EDC·HCl + Oxyma (general, balanced)",
+      "status": "recommended",
       "when": {
-        "reaction_family": "amide_formation",
-        "category": "direct_dehydrative_boron_catalysis",
-        "substrate_class": "Aliphatic/aromatic carboxylic acids with primary/secondary amines"
+        "acid": {
+          "class": "aliphatic or benzoic acid"
+        },
+        "amine": {
+          "class": "primary or secondary, not highly hindered"
+        },
+        "constraints": {
+          "avoid_explosive_additives": true
+        }
       },
       "recipe": {
-        "precatalyst": "B(C6F5)3",
-        "catalyst_loading_mol%": 1.0,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.2 eq",
-        "partners": [
-          "amine partners (1.1–1.5 eq)",
-          "molecular sieves or azeotrope for H2O removal"
+        "reagent": "EDC·HCl",
+        "additive": [
+          "Oxyma"
         ],
-        "base": null,
-        "additives": "3Å MS 200 wt% (optional)",
-        "solvent": "toluene or CPME (Dean–Stark)",
-        "temperature_C": 110,
-        "time_h": "6-16"
-      },
-      "notes": [
-        "Maintain efficient water removal (molecular sieves or Dean–Stark).",
-        "Avoid strong bases that poison Lewis acidic borane."
-      ],
-      "scope_limitations": [
-        "Strongly basic amines and coordinating substrates can bind borane; higher loading or additives may be required."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: Aryl boranes (e.g., B(C6F5)3) act as Lewis acid catalysts to enable direct dehydrative amidation when water is continuously removed.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\gavit-et-al-2025-aryl-borane-as-a-catalyst-for-dehydrative-amide-synthesis_扫描版.pdf",
-          "line": 1
-        },
-        {
-          "quote": "Paraphrase; OCR pending: Borate catalysis can be applied to substrates bearing coordinating heteroatoms by tuning conditions and maintaining effective water removal.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Borate-catalysed direct amidation reactions of coordinating substratesj_扫描版.pdf",
-          "line": 1
-        }
-      ]
-    },
-    {
-      "id": "AM-BORON-TRIS-3-5-CF3",
-      "name": "Electron-poor aryl borane at mild temperature",
-      "status": "candidate",
-      "category": "Direct Dehydrative Amidation – Boron Catalysis",
-      "when": {
-        "reaction_family": "amide_formation",
-        "category": "direct_dehydrative_boron_catalysis",
-        "substrate_class": "Aliphatic/aromatic carboxylic acids with primary/secondary amines"
-      },
-      "recipe": {
-        "precatalyst": "tris(3,5-bis(trifluoromethyl)phenyl)borane",
-        "catalyst_loading_mol%": 2.0,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.3 eq",
-        "partners": [
-          "amine partners (1.1–1.5 eq)",
-          "molecular sieves or azeotrope for H2O removal"
+        "base": [
+          "DIPEA",
+          "NMM"
         ],
-        "base": null,
-        "additives": "MS or azeotrope",
-        "solvent": "toluene",
-        "temperature_C": 60,
-        "time_h": "8-24"
-      },
-      "notes": [
-        "Maintain efficient water removal (molecular sieves or Dean–Stark).",
-        "Avoid strong bases that poison Lewis acidic borane."
-      ],
-      "scope_limitations": [
-        "Strongly basic amines and coordinating substrates can bind borane; higher loading or additives may be required."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: Aryl borane catalysts enable dehydrative amide formation across diverse functional groups when water is efficiently removed.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Organoboron catalysis for direct amidepeptide bond formation_扫描版.pdf",
-          "line": 1
-        }
-      ]
-    },
-    {
-      "id": "AM-BORATE-COORDINATING",
-      "name": "Borate catalysis for coordinating substrates",
-      "status": "candidate",
-      "category": "Direct Dehydrative Amidation – Boron Catalysis",
-      "when": {
-        "reaction_family": "amide_formation",
-        "category": "direct_dehydrative_boron_catalysis",
-        "substrate_class": "Acids/amines bearing Lewis-basic sites (e.g., pyridyl, amino alcohols)"
-      },
-      "recipe": {
-        "precatalyst": "aryl borane/borate catalyst",
-        "catalyst_loading_mol%": 5.0,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.1 eq",
-        "partners": [
-          "amine partners (slow addition)",
-          "buffered removal of water"
+        "solvent": [
+          "DMF",
+          "MeCN",
+          "DCM"
         ],
-        "base": null,
-        "additives": "pyridine (cat.) or steric modulators",
-        "solvent": "toluene or chlorobenzene",
-        "temperature_C": 110,
-        "time_h": "12-24"
-      },
-      "notes": [
-        "Use slow amine addition and modest Lewis bases to moderate tight binding to the catalyst; maintain water removal."
-      ],
-      "scope_limitations": [
-        "Polyfunctional substrates may sequester catalyst; expect higher loadings and longer times."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: Coordinating substrates (e.g., pyridyl acids) require tailored borate catalysis to mitigate catalyst binding and preserve activity.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Borate-catalysed direct amidation reactions of coordinating substratesj_扫描版.pdf",
-          "line": 1
-        },
-        {
-          "quote": "Paraphrase; OCR pending: Aryl borane catalysts enable dehydrative amide formation across diverse functional groups when water is efficiently removed.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Organoboron catalysis for direct amidepeptide bond formation_扫描版.pdf",
-          "line": 1
-        }
-      ]
-    },
-    {
-      "id": "AM-SILANOL-TRIARYL",
-      "name": "Triarylsilanol direct amidation",
-      "status": "candidate",
-      "category": "Direct Amidation – Triarylsilanol Catalysts",
-      "when": {
-        "reaction_family": "amide_formation",
-        "category": "triarylsilanol_catalysis",
-        "substrate_class": "Broad scope acids with primary/secondary amines"
-      },
-      "recipe": {
-        "precatalyst": "triarylsilanol (e.g., triphenylsilanol)",
-        "catalyst_loading_mol%": 5.0,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.2 eq",
-        "partners": [
-          "amine partners (1.2 eq)",
-          "Dean–Stark or molecular sieves"
+        "temperature_C": [
+          0,
+          25
         ],
-        "base": null,
-        "additives": "3Å MS or azeotropic removal",
-        "solvent": "toluene or CPME",
-        "temperature_C": 110,
-        "time_h": "8-20"
-      },
-      "notes": [
-        "Employ azeotropic water removal; catalyst loadings of 2–10 mol% are typical depending on sterics."
-      ],
-      "scope_limitations": [
-        "Poorly nucleophilic amides (e.g., anilides) may require higher temperature or prolonged times."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: Triarylsilanols (Ar3SiOH) can catalyse the direct amidation of carboxylic acids with amines under azeotropic water removal.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\braddock-et-al-2023-on-the-use-of-triarylsilanols-as-catalysts-for-direct-amidation-of-carboxylic-acids_扫描版.pdf",
-          "line": 1
-        },
-        {
-          "quote": "Paraphrase; OCR pending: Representative protocols employ 2–10 mol% catalyst, toluene or CPME, and Dean–Stark or sieves to remove water.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\braddock-et-al-2023-on-the-use-of-triarylsilanols-as-catalysts-for-direct-amidation-of-carboxylic-acids_扫描版.pdf",
-          "line": 1
-        }
-      ]
-    },
-    {
-      "id": "AM-BIOCAT-ABS",
-      "name": "Amide bond synthetase cascade",
-      "status": "candidate",
-      "category": "Biocatalytic Amide Bond Formation",
-      "when": {
-        "reaction_family": "amide_formation",
-        "category": "biocatalytic_amidation",
-        "substrate_class": "Carboxylic acids with primary amines in water"
-      },
-      "recipe": {
-        "precatalyst": "enzyme (e.g., ABS/NRPS fragments)",
-        "catalyst_loading_mol%": null,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.5 eq",
-        "partners": [
-          "amine (1.5 eq)",
-          "ATP-regeneration (when required)"
+        "time_h": [
+          2,
+          18
         ],
-        "base": "buffer pH 7.5-9.0",
-        "additives": "Mg2+, ATP (or recycle system)",
-        "solvent": "H2O or H2O/MeCN",
-        "temperature_C": 30,
-        "time_h": "4-24"
-      },
-      "notes": [
-        "Maintain suitable pH and cofactors. Enzyme stability benefits from co-solvents at low percentage for hydrophobic substrates."
-      ],
-      "scope_limitations": [
-        "Enzyme specificity; scale-up may require immobilization and continuous removal of water/ammonia."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: Enzyme-based strategies (e.g., amide bond synthetases, acyltransferases) enable amide formation in aqueous media under mild conditions.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Biocatalytic amide bond formation_扫描版.pdf",
-          "line": 1
+        "stoichiometry": {
+          "EDC_eq": 1.2,
+          "Oxyma_eq": 1.2,
+          "amine_eq": 1.1,
+          "base_eq": 2.0
         },
-        {
-          "quote": "Paraphrase; OCR pending: Process adaptations include cofactor recycling, immobilization, and co-solvents to handle hydrophobic substrates.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Adv Synth Catal - 2023 - Acosta‐Guzmán - Contemporary Approaches for Amide Bond Formation_扫描版.pdf",
-          "line": 1
-        }
-      ]
+        "workup": [
+          "Dilute with DCM or EtOAc.",
+          "Wash with saturated NaHCO3 and brine.",
+          "Acidic wash (0.5 M HCl) removes EDU/urea residues if needed."
+        ]
+      }
     },
     {
-      "id": "AM-EDCI-OXYMA",
-      "name": "EDCI + Oxyma peptide coupling",
-      "status": "candidate",
-      "category": "Reagent-Based Couplings",
+      "id": "AMIDE-COMU-OXYMA-GREEN",
+      "name": "COMU (Oxyma-based uronium) – efficient, safer-than-HOBt",
+      "status": "recommended",
       "when": {
-        "reaction_family": "amide_formation",
-        "category": "reagent_based_coupling",
-        "substrate_class": "Carboxylic acids and amines including peptide fragments"
-      },
-      "recipe": {
-        "precatalyst": "EDCI·HCl",
-        "catalyst_loading_mol%": null,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.2 eq",
-        "base": "DIPEA 2.0 eq",
-        "additives": "Oxyma 1.1 eq (safer than HOBt)",
-        "solvent": "2-MeTHF or EtOAc/DMF",
-        "temperature_C": 25,
-        "time_h": "1-6"
-      },
-      "notes": [
-        "Use Oxyma as safer additive vs HOBt; prefer 2-MeTHF/EtOAc over DMF/NMP when possible."
-      ],
-      "scope_limitations": [
-        "Epimerization risk at alpha-stereocenters; maintain low temperature and short activation times."
-      ],
-      "evidence": [
-        {
-          "quote": "Modern guidance favours safer additives and greener solvents for peptide couplings (summary).",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Amide bond formation beyond the myth of coupling reagents_扫描版.pdf",
-          "line": 1
-        },
-        {
-          "quote": "Contemporary reviews outline process-friendly couplings minimizing hazardous reagents (summary).",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Adv Synth Catal - 2023 - Acosta‐Guzmán - Contemporary Approaches for Amide Bond Formation_扫描版.pdf",
-          "line": 1
+        "goal": "high_yield",
+        "constraints": {
+          "avoid_benzotriazoles": true
         }
-      ]
-    },
-    {
-      "id": "AM-CDI-DMAP",
-      "name": "CDI activation with catalytic DMAP",
-      "status": "candidate",
-      "category": "Reagent-Based Couplings",
-      "when": {
-        "reaction_family": "amide_formation",
-        "category": "reagent_based_coupling",
-        "substrate_class": "Acids prone to racemization; hindered amines"
       },
       "recipe": {
-        "precatalyst": "carbonyldiimidazole (CDI)",
-        "catalyst_loading_mol%": null,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.2 eq",
-        "base": "DIPEA 1.0 eq (optional)",
-        "additives": "DMAP 0.1 eq",
-        "solvent": "THF or 2-MeTHF",
-        "temperature_C": 25,
-        "time_h": "2-10"
-      },
-      "notes": [
-        "Pre-form acyl imidazole then add amine to limit racemization; remove imidazole salts during work-up."
-      ],
-      "scope_limitations": [
-        "Sensitive to moisture; CDI can over-activate acids bearing sensitive groups."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: CDI activation with catalytic DMAP can limit epimerization by preforming acyl imidazoles before amine addition.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Rethinking amide bond synthesis_扫描版.pdf",
-          "line": 1
-        },
-        {
-          "quote": "Paraphrase; OCR pending: Choice of solvent and temperature are critical to suppress racemization and side reactions in reagent-based couplings.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Amide bond formation beyond the myth of coupling reagents_扫描版.pdf",
-          "line": 1
-        }
-      ]
-    },
-    {
-      "id": "AM-PROCESS-MICELLAR",
-      "name": "Micellar or aqueous amidation",
-      "status": "candidate",
-      "category": "Process-Friendly and Green Approaches",
-      "when": {
-        "reaction_family": "amide_formation",
-        "category": "process_and_sustainability",
-        "substrate_class": "Benign media for amidations at scale"
-      },
-      "recipe": {
-        "precatalyst": "surfactant or enzyme catalyst",
-        "catalyst_loading_mol%": null,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.2 eq",
-        "partners": [
-          "amine partners"
+        "reagent": "COMU",
+        "additive": [
+          "Oxyma (built-in)"
         ],
-        "base": "carbonate or buffer",
-        "additives": "designer surfactants (e.g., TPGS-type)",
-        "solvent": "H2O or H2O/EtOH",
-        "temperature_C": 30,
-        "time_h": "6-24"
-      },
-      "notes": [
-        "Use phase-transfer or enzymes to enable coupling in water; simplifies work-up and reduces VOCs."
-      ],
-      "scope_limitations": [
-        "Hydrophobic substrates may require co-solvent or surfactant optimization."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: Micellar and aqueous media reduce VOC usage while enabling amidation, often aided by surfactants or enzymes.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Adv Synth Catal - 2023 - Acosta‐Guzmán - Contemporary Approaches for Amide Bond Formation_扫描版.pdf",
-          "line": 1
+        "base": [
+          "DIPEA",
+          "NMM"
+        ],
+        "solvent": [
+          "DMF",
+          "MeCN",
+          "2-MeTHF"
+        ],
+        "temperature_C": [
+          0,
+          40
+        ],
+        "time_h": [
+          1,
+          18
+        ],
+        "stoichiometry": {
+          "COMU_eq": 1.1,
+          "amine_eq": 1.2,
+          "base_eq": 2.0
         },
+        "notes": [
+          "Lower tendency for racemization vs some uronium reagents.",
+          "Often faster than EDC; good with hindered acids."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-HATU-HINDERED",
+      "name": "HATU for hindered substrates or anilines",
+      "status": "recommended",
+      "when": {
+        "acid": {
+          "class": "hindered or electron-poor"
+        },
+        "amine": {
+          "class": "hindered or aniline"
+        },
+        "constraints": {
+          "minimize_racemization": true
+        }
+      },
+      "recipe": {
+        "reagent": "HATU",
+        "additive": [
+          "Oxyma (optional)"
+        ],
+        "base": [
+          "DIPEA",
+          "NMM"
+        ],
+        "solvent": [
+          "DMF",
+          "NMP",
+          "DCM"
+        ],
+        "temperature_C": [
+          0,
+          40
+        ],
+        "time_h": [
+          1,
+          18
+        ],
+        "stoichiometry": {
+          "HATU_eq": 1.1,
+          "amine_eq": 1.2,
+          "base_eq": 3.0
+        },
+        "notes": [
+          "Charge acid, reagent, base, then add amine slowly at 0–10 °C for alpha-chiral acids.",
+          "Keep dry to prevent hydrolysis of activated esters."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-T3P-SCALE",
+      "name": "T3P (50% in EtOAc/MeCN) – scalable, easy workup",
+      "status": "recommended",
+      "when": {
+        "goal": "scale_up or operational_simplicity",
+        "functional_groups": {
+          "base_sensitive": false
+        }
+      },
+      "recipe": {
+        "reagent": "T3P (50% in EtOAc or MeCN)",
+        "base": [
+          "DIPEA",
+          "pyridine"
+        ],
+        "solvent": [
+          "EtOAc",
+          "MeCN",
+          "2-MeTHF"
+        ],
+        "temperature_C": [
+          0,
+          80
+        ],
+        "time_h": [
+          1,
+          16
+        ],
+        "stoichiometry": {
+          "T3P_eq": 1.5,
+          "amine_eq": 1.2,
+          "base_eq": 2.0
+        },
+        "workup": [
+          "Quench into saturated NaHCO3.",
+          "Phosphoric by-products partition to water; minimal solids handling."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-DIC-OXYMA-SOLUBLE",
+      "name": "DIC + Oxyma (soluble carbodiimide)",
+      "status": "recommended",
+      "when": {
+        "need": "homogeneous_mixture",
+        "avoid": "insoluble_urea"
+      },
+      "recipe": {
+        "reagent": "DIC",
+        "additive": [
+          "Oxyma"
+        ],
+        "base": [
+          "DIPEA"
+        ],
+        "solvent": [
+          "DCM",
+          "DMF",
+          "THF"
+        ],
+        "temperature_C": [
+          0,
+          25
+        ],
+        "time_h": [
+          2,
+          18
+        ],
+        "stoichiometry": {
+          "DIC_eq": 1.2,
+          "Oxyma_eq": 1.2,
+          "amine_eq": 1.2,
+          "base_eq": 2.0
+        },
+        "notes": [
+          "Avoids DCU precipitation seen with DCC; still subject to O→N acylurea without additive."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-CDI-IMIDAZOLIDE",
+      "name": "CDI pre-activation to acyl imidazole",
+      "status": "candidate",
+      "when": {
+        "acid": {
+          "class": "aliphatic or benzoic acid"
+        },
+        "functional_groups": {
+          "alcohols_free": false
+        },
+        "constraints": {
+          "avoid_uronium": true
+        }
+      },
+      "recipe": {
+        "reagent": "CDI",
+        "base": [
+          null
+        ],
+        "solvent": [
+          "THF",
+          "MeCN",
+          "DMF"
+        ],
+        "temperature_C": [
+          0,
+          25
+        ],
+        "time_h": [
+          0.5,
+          2.0
+        ],
+        "stoichiometry": {
+          "CDI_eq": 1.2,
+          "amine_eq": 1.5
+        },
+        "procedure": [
+          "Premix acid with CDI (0–25 °C) until CO2 stops (acyl imidazole).",
+          "Add amine; heat to 40–60 °C if needed for anilines."
+        ],
+        "notes": [
+          "Avoid free alcohols/phenols (O-acylation).",
+          "No external base required; imidazole generated in situ."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-ACID-CHLORIDE",
+      "name": "Acid chloride (oxalyl chloride + DMF cat.), then amine",
+      "status": "fallback",
+      "when": {
+        "amine": {
+          "class": "poorly_nucleophilic (e.g., anilines, sulfonamides)"
+        },
+        "constraints": {
+          "water_sensitive_ok": true
+        }
+      },
+      "recipe": {
+        "activator": "oxalyl chloride (cat. DMF) or thionyl chloride",
+        "base": [
+          "DIPEA",
+          "pyridine"
+        ],
+        "solvent": [
+          "DCM",
+          "THF"
+        ],
+        "temperature_C": [
+          -20,
+          25
+        ],
+        "time_h": [
+          0.5,
+          4.0
+        ],
+        "stoichiometry": {
+          "oxalyl_chloride_eq": 1.2,
+          "DMF_cat_mol%": 5,
+          "amine_eq": 1.5,
+          "base_eq": 3.0
+        },
+        "procedure": [
+          "Generate acid chloride at 0–25 °C (use gas trap).",
+          "Remove volatiles; add amine/base at −20 to 0 °C; warm to rt."
+        ],
+        "notes": [
+          "CO, CO2, HCl evolve; ventilate.",
+          "Potential over-acylation with diamines; control addition."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-MIXED-ANHYDRIDE-IBCF",
+      "name": "Mixed anhydride (iBuOCOCl) then amine",
+      "status": "candidate",
+      "when": {
+        "constraints": {
+          "minimize_racemization": true
+        },
+        "acid": {
+          "class": "alpha-chiral"
+        }
+      },
+      "recipe": {
+        "activator": "isobutyl chloroformate",
+        "base": [
+          "NMM"
+        ],
+        "solvent": [
+          "THF"
+        ],
+        "temperature_C": [
+          -20,
+          0
+        ],
+        "time_h": [
+          0.5,
+          4.0
+        ],
+        "stoichiometry": {
+          "IBCF_eq": 1.1,
+          "NMM_eq": 2.0,
+          "amine_eq": 1.2
+        },
+        "notes": [
+          "Cold mixed anhydride formation lowers epimerization.",
+          "NMM·HCl partitions to water; easy workup."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-ACYL-FLUORIDE-TFFH",
+      "name": "Acyl fluoride route (TFFH/BTFFH), then amine",
+      "status": "recommended",
+      "when": {
+        "functional_groups": {
+          "alcohols_free": true
+        },
+        "goal": "chemoselective_amidation"
+      },
+      "recipe": {
+        "reagent": "TFFH or BTFFH",
+        "base": [
+          "DIPEA",
+          "pyridine"
+        ],
+        "solvent": [
+          "DCM",
+          "MeCN"
+        ],
+        "temperature_C": [
+          0,
+          25
+        ],
+        "time_h": [
+          0.5,
+          4.0
+        ],
+        "stoichiometry": {
+          "fluoroformamidinium_eq": 1.2,
+          "amine_eq": 1.3,
+          "base_eq": 2.0
+        },
+        "procedure": [
+          "Form acyl fluoride at 0–25 °C; confirm by IR (~1810–1840 cm⁻¹).",
+          "Add amine at 0–10 °C; allow to warm to rt."
+        ],
+        "notes": [
+          "High chemoselectivity in presence of alcohols/phenols.",
+          "Often reduced racemization relative to acid chloride."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-PEPTIDE-COUPLING",
+      "name": "Peptide segment coupling (dipeptide to tetrapeptide)",
+      "status": "recommended",
+      "when": {
+        "substrate": {
+          "class": "amino_acid or peptide"
+        },
+        "goal": "peptide_coupling"
+      },
+      "recipe": {
+        "reagent": [
+          "HATU",
+          "COMU",
+          "T3P"
+        ],
+        "additive": [
+          "Oxyma (≥1.2 eq)"
+        ],
+        "base": [
+          "DIPEA",
+          "NMM"
+        ],
+        "solvent": [
+          "DMF",
+          "NMP"
+        ],
+        "temperature_C": [
+          0,
+          25
+        ],
+        "time_h": [
+          1,
+          24
+        ],
+        "stoichiometry": {
+          "reagent_eq": 1.2,
+          "Oxyma_eq": 1.2,
+          "base_eq": 2.0,
+          "amine_eq": 1.2
+        },
+        "notes": [
+          "For Cys/Ser/Thr side chains, protect to avoid O-acylation.",
+          "Monitor for epimerization; use sub-ambient temperatures for α-chiral acids."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-LACTAMIZATION-INTRA",
+      "name": "Intramolecular lactamization (5–8 membered)",
+      "status": "recommended",
+      "when": {
+        "substrate": {
+          "class": "ω-amino acid or tethered amino acid–acid"
+        },
+        "goal": "cyclization"
+      },
+      "recipe": {
+        "route": [
+          "T3P",
+          "CDI"
+        ],
+        "T3P": {
+          "equivalents": 1.5,
+          "base": "DIPEA 2.0 eq",
+          "solvent": [
+            "EtOAc",
+            "MeCN",
+            "2-MeTHF"
+          ],
+          "temperature_C": [
+            0,
+            60
+          ],
+          "time_h": [
+            2,
+            16
+          ]
+        },
+        "CDI": {
+          "equivalents": 1.3,
+          "solvent": [
+            "THF",
+            "MeCN"
+          ],
+          "preactivation_temp_C": [
+            0,
+            25
+          ],
+          "cyclization_temp_C": [
+            25,
+            60
+          ]
+        }
+      },
+      "guards": [
         {
-          "quote": "Paraphrase; OCR pending: Process case studies show improved work-up and waste profiles compared to traditional organic solvents.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Amide bond formation beyond the myth of coupling reagents_扫描版.pdf",
-          "line": 1
+          "if": {
+            "acid": {
+              "class": "alpha-chiral"
+            }
+          },
+          "action": "monitor_chiral_HPLC_every_h",
+          "params": {
+            "interval_h": 2
+          }
         }
       ]
     },
     {
-      "id": "AM-PROCESS-FLOW",
-      "name": "Flow amidation platform",
-      "status": "candidate",
-      "category": "Process-Friendly and Green Approaches",
+      "id": "AMIDE-ALPHA-CHIRAL-ANILINE-LR",
+      "name": "α-Chiral acid + aniline (low racemization)",
+      "status": "recommended",
       "when": {
-        "reaction_family": "amide_formation",
-        "category": "process_and_sustainability",
-        "substrate_class": "Continuous coupling platforms"
+        "acid": {
+          "class": "alpha-chiral"
+        },
+        "amine": {
+          "class": "aniline"
+        }
       },
       "recipe": {
-        "precatalyst": "solid acid/base or homogeneous catalyst",
-        "catalyst_loading_mol%": null,
-        "ligand": null,
-        "boron_partner": "acid 1.0 eq; amine 1.2 eq",
-        "partners": [
-          "amine partners"
+        "paths": [
+          "Path A: EDC·HCl (1.2 eq) + Oxyma (1.2 eq) in MeCN/DMF at 0–5 °C; add aniline slowly; hold ≤2 h then warm to 20–25 °C.",
+          "Path B: Mixed anhydride via iBuOCOCl (1.1 eq) + NMM (2.0 eq) in THF at −20–0 °C; add aniline (1.3 eq) at −10–0 °C.",
+          "Path C: Acyl fluoride (TFFH) at 0–5 °C; then aniline + DIPEA (2 eq)."
         ],
-        "base": "varies",
-        "additives": "in-line water removal",
-        "solvent": "toluene, MeCN, or EtOAc",
-        "temperature_C": 50,
-        "time_h": "residence 0.1-1.0"
-      },
-      "notes": [
-        "Residence time and in-line dehydration govern conversions; enables safe scale-up and heat management."
-      ],
-      "scope_limitations": [
-        "Precipitation and salt formation can clog systems; solubility engineering required."
-      ],
-      "evidence": [
-        {
-          "quote": "Paraphrase; OCR pending: Flow setups with in-line dehydration provide short residence times and controllable heat/water management for amide formation.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Rethinking amide bond synthesis_扫描版.pdf",
-          "line": 1
+        "solvent": [
+          "MeCN",
+          "DMF",
+          "THF"
+        ],
+        "temperature_C": [
+          -20,
+          25
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-HINDEREDxHINDERED",
+      "name": "Bulky acid + bulky secondary amine",
+      "status": "recommended",
+      "when": {
+        "acid": {
+          "sterics": "hindered"
         },
-        {
-          "quote": "Paraphrase; OCR pending: Continuous processes mitigate hazards of coupling reagents and streamline downstream processing.",
-          "source_file": "c:\\Users\\DHU\\Desktop\\酰胺缩合\\Adv Synth Catal - 2023 - Acosta‐Guzmán - Contemporary Approaches for Amide Bond Formation_扫描版.pdf",
-          "line": 1
+        "amine": {
+          "class": "secondary",
+          "sterics": "hindered"
         }
-      ]
+      },
+      "recipe": {
+        "reagent": "HATU (1.2 eq) or PyBOP (1.2 eq)",
+        "additive": "Oxyma 1.2 eq (optional)",
+        "base": "DIPEA 3.0 eq or NMM 4.0 eq",
+        "solvent": [
+          "DMF",
+          "NMP",
+          "DCM/DMF (1:1)"
+        ],
+        "temperature_C": [
+          0,
+          40
+        ],
+        "time_h": [
+          2,
+          18
+        ],
+        "charge_order": "acid + reagent + base → amine (slow) at 0–10 °C",
+        "repairs": [
+          "Switch to T3P (1.8 eq) + pyridine (3 eq) in MeCN at 40–60 °C.",
+          "Pre-activate with CDI; add catalytic DMAP (5–10 mol%) if still low."
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-ALCOHOL-PRESENT-CHEMOSELECTIVE",
+      "name": "Chemoselective amidation with free alcohol/phenol present",
+      "status": "recommended",
+      "when": {
+        "functional_groups": {
+          "alcohols_free": true
+        }
+      },
+      "recipe": {
+        "strategy": [
+          "Prefer acyl fluoride formation (TFFH/BTFFH) then amine addition (DIPEA 2 eq) at 0–25 °C.",
+          "Avoid CDI (O-acylation risk). Use EDC/Oxyma only if alcohol protected or sluggish."
+        ],
+        "solvent": [
+          "DCM",
+          "MeCN"
+        ],
+        "temperature_C": [
+          0,
+          25
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-ACID-CHLORIDE-HARD-ANILINE",
+      "name": "Acid chloride route for very poor nucleophiles",
+      "status": "fallback",
+      "when": {
+        "amine": {
+          "class": "very_poor_nucleophile (e.g., 4-nitroaniline, sulfonamide)"
+        },
+        "constraints": {
+          "water_sensitive_ok": true
+        }
+      },
+      "recipe": {
+        "activator": [
+          "oxalyl chloride (cat. DMF)",
+          "thionyl chloride"
+        ],
+        "solvent": [
+          "DCM",
+          "THF"
+        ],
+        "base": [
+          "DIPEA",
+          "pyridine"
+        ],
+        "catalyst": [
+          "DMAP 5–10 mol% (optional)"
+        ],
+        "temperature_C": [
+          -20,
+          25
+        ],
+        "procedure": [
+          "Generate acid chloride with gas scrubbing; remove volatiles.",
+          "Add amine + base (and DMAP) at −20–0 °C; warm to rt."
+        ]
+      }
     }
   ],
-  "guards": [],
-  "priors": [],
-  "repairs": []
+  "guards": [
+    {
+      "id": "AMIDE-GUARD-EXPLOSIVE-ADDITIVES",
+      "if": {
+        "additive in": [
+          "HOBt",
+          "HOAt"
+        ]
+      },
+      "action": "warn_or_substitute",
+      "rationale": "Dry HOBt/HOAt can be explosive; prefer Oxyma/ethyl cyanohydroxyiminoacetate."
+    },
+    {
+      "id": "AMIDE-GUARD-RACEMIZATION",
+      "if": {
+        "acid": {
+          "class": "alpha-chiral"
+        }
+      },
+      "action": "enforce",
+      "params": {
+        "max_temperature_C": 25,
+        "max_time_h": 6,
+        "prefer_playbooks": [
+          "AMIDE-EDC-OXYMA-GENERAL",
+          "AMIDE-MIXED-ANHYDRIDE-IBCF",
+          "AMIDE-ACYL-FLUORIDE-TFFH",
+          "AMIDE-T3P-SCALE"
+        ]
+      },
+      "rationale": "Minimize oxazolone/ketene formation and base-promoted epimerization."
+    },
+    {
+      "id": "AMIDE-GUARD-DCU-CLOG",
+      "if": {
+        "reagent": "DCC"
+      },
+      "action": "warn",
+      "rationale": "Insoluble DCU may clog equipment/filtration; consider DIC (soluble) or EDC/T3P."
+    },
+    {
+      "id": "AMIDE-GUARD-ACID-CHLORIDE-HAZARD",
+      "if": {
+        "activator": "oxalyl chloride"
+      },
+      "action": "warn",
+      "rationale": "Toxic, corrosive gases (CO, CO2, HCl) released; ensure scrubbing and venting."
+    },
+    {
+      "id": "AMIDE-GUARD-ALCOHOL-PRESENT",
+      "if": {
+        "functional_groups": {
+          "alcohols_free": true
+        },
+        "route": "CDI"
+      },
+      "action": "avoid_or_penalize",
+      "rationale": "CDI acyl imidazoles may O-acylate unprotected alcohols/phenols."
+    },
+    {
+      "id": "AMIDE-GUARD-UREA-REARRANGEMENT",
+      "if": {
+        "reagent in": [
+          "DCC",
+          "DIC"
+        ],
+        "no_additive": true
+      },
+      "action": "warn_or_substitute",
+      "rationale": "O-acylurea → N-acylurea rearrangement gives dead-end byproducts; add Oxyma or switch reagent."
+    },
+    {
+      "id": "AMIDE-GUARD-DIAMINE-OVERACYLATION",
+      "if": {
+        "amine": {
+          "class": "diamine"
+        }
+      },
+      "action": "enforce",
+      "params": {
+        "slow_addition": true,
+        "use_excess_base": false,
+        "protect_if_needed": true
+      },
+      "rationale": "Minimize bis-acylation; consider temporary protection or slow/low-temperature addition."
+    }
+  ],
+  "priors": [
+    {
+      "feature": "amine_class=aniline",
+      "effect": "boost",
+      "targets": [
+        "AMIDE-HATU-HINDERED",
+        "AMIDE-ACID-CHLORIDE",
+        "AMIDE-ACYL-FLUORIDE-TFFH"
+      ],
+      "comment": "Less nucleophilic amines benefit from stronger activation or acyl fluorides."
+    },
+    {
+      "feature": "hindered_substrates=true",
+      "effect": "boost",
+      "targets": [
+        "AMIDE-HATU-HINDERED",
+        "AMIDE-T3P-SCALE",
+        "AMIDE-HINDEREDxHINDERED"
+      ],
+      "comment": "Bulky acids/amines often need uronium/phosphonic activation."
+    },
+    {
+      "feature": "scale>=50 g",
+      "effect": "boost",
+      "targets": [
+        "AMIDE-T3P-SCALE",
+        "AMIDE-EDC-OXYMA-GENERAL"
+      ],
+      "comment": "Operational simplicity and benign by-products favored on scale."
+    },
+    {
+      "feature": "acid_class=alpha-chiral",
+      "effect": "penalize",
+      "targets": [
+        "AMIDE-ACID-CHLORIDE",
+        "AMIDE-HATU-HINDERED"
+      ],
+      "comment": "Higher racemization risk; default to cold EDC/Oxyma, acyl fluoride, or mixed anhydride."
+    },
+    {
+      "feature": "need_low_halogenated_solvents=true",
+      "effect": "boost",
+      "targets": [
+        "AMIDE-T3P-SCALE",
+        "AMIDE-EDC-OXYMA-GENERAL",
+        "AMIDE-COMU-OXYMA-GREEN"
+      ],
+      "comment": "EtOAc/MeCN/2-MeTHF alternatives available."
+    },
+    {
+      "feature": "alcohol_present=true",
+      "effect": "boost",
+      "targets": [
+        "AMIDE-ACYL-FLUORIDE-TFFH",
+        "AMIDE-ALCOHOL-PRESENT-CHEMOSELECTIVE"
+      ],
+      "comment": "Chemoselectivity improved with acyl fluorides."
+    }
+  ],
+  "repairs": [
+    {
+      "id": "AMIDE-REPAIR-LOW-CONVERSION",
+      "if": {
+        "outcome": "low_conversion"
+      },
+      "then": {
+        "action": "sequential_retry",
+        "steps": [
+          "raise_temp_by: 10",
+          "increase_equivalents: amine +0.3, reagent +0.2",
+          "switch_solvent: DMF↔MeCN↔DCM",
+          "switch_reagent: EDC/Oxyma → HATU → T3P",
+          "preactivate: CDI or acid chloride or acyl fluoride",
+          "add_catalyst: DMAP (5–10 mol%) for anhydrides/acyl chlorides"
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-REPAIR-RACEMIZATION",
+      "if": {
+        "outcome": "low_ee or dr_erosion"
+      },
+      "then": {
+        "action": "process_change",
+        "steps": [
+          "lower_temperature_to: 0–5 °C",
+          "shorten_time_to_h: ≤2",
+          "switch_route: mixed anhydride (IBCF/NMM, −20 to 0 °C) or acyl fluoride (TFFH)",
+          "replace_base: DIPEA → NMM/pyridine",
+          "use_additive: Oxyma (≥1.2 eq)"
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-REPAIR-INSOLUBLE-SOLIDS",
+      "if": {
+        "outcome": "heterogeneous_mixture or filtration_clogging"
+      },
+      "then": {
+        "action": "operational_change",
+        "steps": [
+          "switch_reagent: DCC → DIC/EDC/T3P",
+          "add_cosolvent: DMF or NMP (10–30%)",
+          "heat_to: 40–60 °C (if substrates stable)"
+        ]
+      }
+    },
+    {
+      "id": "AMIDE-REPAIR-UREA-CONTAMINATION",
+      "if": {
+        "outcome": "high_EDU_or_DCU_residuals"
+      },
+      "then": {
+        "action": "workup_change",
+        "steps": [
+          "acid_wash: 0.5 M HCl (removes EDU/urea)",
+          "silica_plug_or_carbon_treatment: if colored byproducts persist",
+          "solvent_swap: DCM↔EtOAc before washes"
+        ]
+      }
+    }
+  ]
 }

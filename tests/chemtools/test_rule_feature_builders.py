@@ -36,6 +36,21 @@ def test_amide_rule_feature_builder_enriches_payload() -> None:
     assert "carboxylic acid" in payload["substrate_class"].lower()
     assert payload.get("category")
     assert payload.get("water_management")
+    acid_meta = payload.get("acid") or {}
+    amine_meta = payload.get("amine") or {}
+    assert acid_meta.get("class") == payload.get("acid_class")
+    assert "aliphatic or benzoic acid" in (acid_meta.get("classes") or [])
+    assert amine_meta.get("class") == payload.get("amine_class")
+    assert amine_meta.get("diamine") is False
+    constraints = payload.get("constraints") or {}
+    assert constraints.get("avoid_explosive_additives") is True
+    assert constraints.get("avoid_benzotriazoles") is True
+    assert "minimize_racemization" not in constraints
+    functional_groups = payload.get("functional_groups") or {}
+    assert functional_groups.get("alcohols_free") is False
+    assert functional_groups.get("base_sensitive") is False
+    assert payload.get("hindered_substrates") is False
+    assert payload.get("alcohol_present") is False
     assignments = payload.get("role_assignments") or {}
     assert assignments.get("electrophile", {}).get("smiles") == acid
     assert assignments.get("nucleophile", {}).get("smiles") == amine

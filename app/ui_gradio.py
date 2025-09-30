@@ -121,17 +121,51 @@ _RULE_SAMPLE_FEATURES: Dict[str, Dict[str, Any]] = {
     },
     "Amide_Formation": {
         "reaction_family": "amide_formation",
-        "category": "direct_dehydrative_boron_catalysis",
-        "substrate_class": "Aliphatic/aromatic carboxylic acids with primary/secondary amines",
+        "category": "chemoselective_amidation",
+        "substrate_class": "α-Chiral carboxylic acids with primary anilines",
+        "acid_class": "alpha-chiral",
+        "amine_class": "aniline",
         "electrophile": {
             "class": "carboxylic acid",
-            "state": "liquid",
+            "description": "alpha-chiral carboxylic acids",
+            "state": "solid",
         },
         "nucleophile": {
-            "class": "primary amine",
+            "class": "primary aniline",
+            "basicity": "aromatic_primary",
         },
-        "solvent": "toluene",
-        "water_management": "Dean-Stark",
+        "acid": {
+            "class": "alpha-chiral",
+            "sterics": "moderate",
+            "alpha_chiral": True,
+            "classes": [
+                "alpha-chiral",
+                "hindered or electron-poor",
+                "benzoic acid",
+                "aliphatic or benzoic acid",
+            ],
+        },
+        "amine": {
+            "class": "aniline",
+            "sterics": "moderate",
+            "basicity": "aromatic_primary",
+            "classes": ["aniline", "hindered or aniline"],
+            "diamine": False,
+        },
+        "solvent": "MeCN",
+        "water_management": "Anhydrous conditions",
+        "functional_groups": {
+            "alcohols_free": True,
+            "base_sensitive": True,
+        },
+        "constraints": {
+            "avoid_explosive_additives": True,
+            "avoid_benzotriazoles": True,
+            "minimize_racemization": True,
+        },
+        "hindered_substrates": False,
+        "alcohol_present": True,
+        "goal": "chemoselective_amidation",
     },
     "Suzuki_Coupling": {
         "reaction_family": "suzuki_coupling",
@@ -437,6 +471,34 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
             lines.append(f"- Rule category: {rule_feats.get('category')}")
         if rule_feats.get('substrate_class'):
             lines.append(f"- Substrate class: {rule_feats.get('substrate_class')}")
+        acid_ctx = rule_feats.get('acid') if isinstance(rule_feats.get('acid'), dict) else {}
+        amine_ctx = rule_feats.get('amine') if isinstance(rule_feats.get('amine'), dict) else {}
+        acid_label = rule_feats.get('acid_class') or acid_ctx.get('class')
+        if acid_label:
+            lines.append(f"- Acid class: {acid_label}")
+        if acid_ctx:
+            if acid_ctx.get('sterics'):
+                lines.append(f"  • acid sterics: {acid_ctx.get('sterics')}")
+            if acid_ctx.get('alpha_chiral') is not None:
+                lines.append(f"  • alpha chiral: {acid_ctx.get('alpha_chiral')}")
+            if acid_ctx.get('alpha_branching'):
+                lines.append(f"  • alpha branching: {acid_ctx.get('alpha_branching')}")
+            classes = acid_ctx.get('classes')
+            if isinstance(classes, list) and classes:
+                lines.append(f"  • acid classes: {', '.join(str(c) for c in classes)}")
+        amine_label = rule_feats.get('amine_class') or amine_ctx.get('class')
+        if amine_label:
+            lines.append(f"- Amine class: {amine_label}")
+        if amine_ctx:
+            if amine_ctx.get('sterics'):
+                lines.append(f"  • amine sterics: {amine_ctx.get('sterics')}")
+            if amine_ctx.get('basicity'):
+                lines.append(f"  • amine basicity note: {amine_ctx.get('basicity')}")
+            if amine_ctx.get('diamine') is not None:
+                lines.append(f"  • diamine: {amine_ctx.get('diamine')}")
+            classes = amine_ctx.get('classes')
+            if isinstance(classes, list) and classes:
+                lines.append(f"  • amine classes: {', '.join(str(c) for c in classes)}")
         lines.append(f"- Electrophile class: {elec.get('class') or 'unknown'}")
         if elec.get('description'):
             lines.append(f"  • detail: {elec.get('description')}")
@@ -461,6 +523,22 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
             lines.append(f"- nucleophile basicity: {rule_feats.get('n_basicity')}")
         if rule_feats.get('water_management'):
             lines.append(f"- Water management: {rule_feats.get('water_management')}")
+        constraints = rule_feats.get('constraints') if isinstance(rule_feats.get('constraints'), dict) else {}
+        if constraints:
+            lines.append("- Constraints:")
+            for key, value in constraints.items():
+                lines.append(f"  • {key.replace('_', ' ')}: {value}")
+        func_groups = rule_feats.get('functional_groups') if isinstance(rule_feats.get('functional_groups'), dict) else {}
+        if func_groups:
+            lines.append("- Functional groups:")
+            for key, value in func_groups.items():
+                lines.append(f"  • {key.replace('_', ' ')}: {value}")
+        if rule_feats.get('hindered_substrates') is not None:
+            lines.append(f"- Hindered substrates: {rule_feats.get('hindered_substrates')}")
+        if rule_feats.get('goal'):
+            lines.append(f"- Goal hint: {rule_feats.get('goal')}")
+        if rule_feats.get('alcohol_present') is not None:
+            lines.append(f"- Free alcohol present: {rule_feats.get('alcohol_present')}")
     else:
         lines.append('- Rule-based substrate features missing from response.')
 

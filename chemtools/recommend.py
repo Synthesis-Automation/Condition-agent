@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Any, List, Tuple, Optional, Callable
+from typing import Dict, Any, List, Tuple, Optional, Callable, Set
 from dataclasses import dataclass
 from collections import Counter
 
@@ -284,6 +284,8 @@ def _analyze_carboxylic_acid(smiles: Optional[str]) -> Dict[str, Any]:
         "description": "carboxylic acids",
         "amino_acid_like": False,
         "present": False,
+        "alpha_chiral": False,
+        "sterics": "unknown",
     }
     if not smiles:
         return info
@@ -302,6 +304,7 @@ def _analyze_carboxylic_acid(smiles: Optional[str]) -> Dict[str, Any]:
                 acid_smarts = Chem.MolFromSmarts("C(=O)[O;H1,-1]")
                 matches = mol.GetSubstructMatches(acid_smarts)
                 info["present"] = info["present"] or bool(matches)
+                Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
                 for match in matches:
                     carbon_idx = match[0]
                     carbon_atom = mol.GetAtomWithIdx(carbon_idx)
@@ -322,6 +325,10 @@ def _analyze_carboxylic_acid(smiles: Optional[str]) -> Dict[str, Any]:
                             info["alpha_branching"] = "secondary"
                         else:
                             info["alpha_branching"] = "primary"
+                    for nbr in neighbors:
+                        if nbr.GetAtomicNum() == 6 and (nbr.HasProp("_CIPCode") or nbr.HasProp("_ChiralityPossible")):
+                            info["alpha_chiral"] = True
+                            break
                 carbon_count = sum(1 for atom in mol.GetAtoms() if atom.GetAtomicNum() == 6)
                 info["carbon_count"] = carbon_count
                 if carbon_count <= 8:
@@ -357,6 +364,8 @@ def _analyze_carboxylic_acid(smiles: Optional[str]) -> Dict[str, Any]:
                 elif info["carbon_count"] >= 12:
                     info["state"] = "solid"
         info["amino_acid_like"] = info["amino_acid_like"] or ("n" in s_lower and "c(=o)o" in s_lower)
+        if "@" in smiles:
+            info["alpha_chiral"] = True
     if info["heteroaromatic"]:
         info["description"] = "heteroaromatic carboxylic acids"
     elif info["aromatic"]:
@@ -365,6 +374,15 @@ def _analyze_carboxylic_acid(smiles: Optional[str]) -> Dict[str, Any]:
         info["description"] = "aliphatic carboxylic acids"
     else:
         info["description"] = "carboxylic acids"
+    branching = info.get("alpha_branching", "unknown")
+    if branching == "branched":
+        info["sterics"] = "hindered" if not info.get("aromatic") else "moderate"
+    elif branching == "secondary":
+        info["sterics"] = "moderate"
+    elif branching == "primary":
+        info["sterics"] = "low"
+    else:
+        info.setdefault("sterics", "unknown")
     return info
 
 
@@ -378,6 +396,7 @@ def _analyze_amine(smiles: Optional[str], features: Dict[str, Any]) -> Dict[str,
         "smiles": smiles or "",
         "aromatic": False,
         "heteroaromatic": False,
+        "diamine": False,
     }
     if not smiles:
         return info
@@ -398,13 +417,157 @@ def _analyze_amine(smiles: Optional[str], features: Dict[str, Any]) -> Dict[str,
                     atom.GetIsAromatic() and atom.GetAtomicNum() not in {6, 1}
                     for atom in mol.GetAtoms()
                 )
+                try:
+                    amine_pattern = Chem.MolFromSmarts("[NX3;H2,H1,H0+;!$([NX3](=O))]")
+                    matches = mol.GetSubstructMatches(amine_pattern)
+                    amine_indices: Set[int] = set()
+                    for match in matches:
+                        amine_indices.add(match[0])
+                    info["diamine"] = len(amine_indices) >= 2
+                except Exception:
+                    pass
     if not used_rdkit:
         s_lower = smiles.lower()
         if "c" in s_lower and "n" in s_lower:
             info["aromatic"] = True
         if info["aromatic"]:
             info["heteroaromatic"] = info["heteroaromatic"] or any(tok in s_lower for tok in ("n", "o", "s", "p"))
+        info["diamine"] = info["diamine"] or (s_lower.count("n") >= 2)
     return info
+
+
+def _has_free_alcohol(smiles: Optional[str]) -> bool:
+    if not smiles:
+        return False
+    if rdkit_available():
+        try:
+            from rdkit import Chem  # type: ignore
+        except Exception:
+            Chem = None  # type: ignore
+        if Chem is not None:
+            mol = parse_smiles(smiles)
+            if mol is not None:
+                try:
+                    alcohol = Chem.MolFromSmarts("[OX2H]")
+                    carboxy_acid = Chem.MolFromSmarts("C(=O)[OX2H]")
+                    acid_matches = {match[2] for match in mol.GetSubstructMatches(carboxy_acid)} if carboxy_acid else set()
+                    for match in mol.GetSubstructMatches(alcohol):
+                        oxygen_idx = match[0]
+                        if oxygen_idx in acid_matches:
+                            continue
+                        atom = mol.GetAtomWithIdx(oxygen_idx)
+                        is_carboxylic = False
+                        for nbr in atom.GetNeighbors():
+                            bond = mol.GetBondBetweenAtoms(oxygen_idx, nbr.GetIdx())
+                            if nbr.GetAtomicNum() == 6 and bond is not None:
+                                for b in nbr.GetBonds():
+                                    if b.GetOtherAtom(nbr).GetIdx() == oxygen_idx:
+                                        continue
+                                    if b.GetBondTypeAsDouble() == 2.0 and b.GetOtherAtom(nbr).GetAtomicNum() == 8:
+                                        is_carboxylic = True
+                                        break
+                                if is_carboxylic:
+                                    break
+                        if is_carboxylic:
+                            continue
+                        return True
+                except Exception:
+                    pass
+    s_lower = smiles.lower()
+    if "oh" in s_lower or "[oh]" in s_lower:
+        if "c(=o)o" in s_lower:
+            return "oo" in s_lower or s_lower.count("oh") > 1
+        return True
+    return False
+
+
+def _acid_classification(acid_info: Dict[str, Any]) -> Dict[str, Any]:
+    classes: List[str] = []
+    primary = "carboxylic acid"
+    sterics = acid_info.get("sterics") or "unknown"
+    if acid_info.get("alpha_chiral"):
+        classes.append("alpha-chiral")
+        primary = "alpha-chiral"
+    if acid_info.get("sterics") == "hindered" or acid_info.get("heteroaromatic"):
+        classes.append("hindered or electron-poor")
+        if primary == "carboxylic acid":
+            primary = "hindered or electron-poor"
+    if acid_info.get("aromatic"):
+        classes.append("benzoic acid")
+    if acid_info.get("aliphatic"):
+        classes.append("aliphatic")
+    if primary == "carboxylic acid":
+        primary = "aliphatic or benzoic acid"
+    if "aliphatic" in classes or "benzoic acid" in classes:
+        classes.append("aliphatic or benzoic acid")
+    classes = list(dict.fromkeys(classes))
+    return {
+        "class": primary,
+        "classes": classes,
+        "sterics": sterics,
+        "alpha_branching": acid_info.get("alpha_branching"),
+        "alpha_chiral": acid_info.get("alpha_chiral"),
+        "state": acid_info.get("state"),
+        "carbon_count": acid_info.get("carbon_count"),
+        "description": acid_info.get("description"),
+        "aromatic": acid_info.get("aromatic"),
+        "heteroaromatic": acid_info.get("heteroaromatic"),
+        "aliphatic": acid_info.get("aliphatic"),
+        "amino_acid_like": acid_info.get("amino_acid_like"),
+        "smiles": acid_info.get("smiles"),
+    }
+
+
+def _amine_classification(amine_info: Dict[str, Any], features: Dict[str, Any]) -> Dict[str, Any]:
+    nuc_class = str(features.get("nuc_class") or "").lower()
+    steric = str(features.get("steric_alpha") or "").lower()
+    basicity = str(features.get("n_basicity") or "").lower()
+    diaromatic = bool(amine_info.get("heteroaromatic"))
+
+    primary = "primary or secondary, not highly hindered"
+    if steric in {"high", "very_high"}:
+        primary = "hindered or aniline"
+    if nuc_class == "aniline":
+        if basicity == "deactivated":
+            primary = "very_poor_nucleophile (e.g., 4-nitroaniline, sulfonamide)"
+        elif primary != "hindered or aniline":
+            primary = "aniline"
+    elif basicity == "deactivated":
+        primary = "poorly_nucleophilic (e.g., anilines, sulfonamides)"
+    elif nuc_class == "amine_secondary":
+        primary = "secondary"
+
+    if steric in {"med", "medium"} and primary == "primary or secondary, not highly hindered":
+        primary = "primary or secondary, not highly hindered"
+
+    sterics_map = {
+        "high": "hindered",
+        "very_high": "hindered",
+        "med": "moderate",
+        "medium": "moderate",
+        "secondary": "moderate",
+        "low": "low",
+    }
+    sterics_tag = sterics_map.get(steric, "unknown")
+    classes = [primary]
+    if nuc_class == "aniline" and primary != "aniline":
+        classes.append("aniline")
+    if sterics_tag == "hindered" and primary != "hindered or aniline":
+        classes.append("hindered or aniline")
+    if amine_info.get("diamine"):
+        classes.append("diamine")
+
+    return {
+        "class": primary,
+        "classes": list(dict.fromkeys(classes)),
+        "basicity": basicity or amine_info.get("basicity"),
+        "sterics": sterics_tag,
+        "nuc_class": nuc_class,
+        "smiles": amine_info.get("smiles"),
+        "aromatic": amine_info.get("aromatic"),
+        "heteroaromatic": diaromatic,
+        "diamine": amine_info.get("diamine"),
+    }
 
 
 def _amide_substrate_class(acid_info: Dict[str, Any], amine_info: Dict[str, Any]) -> str:
@@ -498,6 +661,36 @@ def _amide_rule_feature_builder(ctx: _RuleFeatureContext) -> Dict[str, Any]:
     water_plan = _water_management_for_category(category)
     if water_plan:
         base["water_management"] = water_plan
+    acid_ctx = _acid_classification(acid_info)
+    amine_ctx = _amine_classification(amine_info, ctx.features)
+    base["acid"] = acid_ctx
+    base["amine"] = amine_ctx
+    base["acid_class"] = acid_ctx.get("class")
+    base["amine_class"] = amine_ctx.get("class")
+    hindered = (acid_ctx.get("sterics") == "hindered") or (amine_ctx.get("sterics") == "hindered")
+    base["hindered_substrates"] = bool(hindered)
+    functional_groups = {
+        "alcohols_free": _has_free_alcohol(acid_ctx.get("smiles")) or _has_free_alcohol(amine_ctx.get("smiles")),
+        "base_sensitive": bool(acid_ctx.get("alpha_chiral") or amine_ctx.get("basicity") == "deactivated"),
+    }
+    base["functional_groups"] = {k: v for k, v in functional_groups.items() if v is not None}
+    base["alcohol_present"] = bool(base["functional_groups"].get("alcohols_free"))
+    if acid_ctx.get("amino_acid_like"):
+        base.setdefault("substrate", {})
+        if isinstance(base["substrate"], dict):
+            base["substrate"].setdefault("class", "amino_acid or peptide")
+        base.setdefault("goal", "peptide_coupling")
+    elif base["functional_groups"].get("alcohols_free"):
+        base.setdefault("goal", "chemoselective_amidation")
+    constraints = {
+        "avoid_explosive_additives": True,
+        "avoid_benzotriazoles": True,
+    }
+    if acid_ctx.get("alpha_chiral"):
+        constraints["minimize_racemization"] = True
+    if amine_ctx.get("classes") and "diamine" in amine_ctx.get("classes", []):
+        constraints.setdefault("protect_if_needed", True)
+    base["constraints"] = constraints
     role_summary = dict(base.get("role_assignments") or {})
     if elec_entry:
         record = dict(role_summary.get("electrophile") or {})
