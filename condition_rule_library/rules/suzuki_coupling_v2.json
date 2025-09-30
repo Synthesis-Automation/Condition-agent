@@ -1,0 +1,243 @@
+{
+  "reaction": "Suzuki–Miyaura Cross-Coupling",
+  "version": "3.0",
+  "schema_version": "2.0-rule-first",
+  "last_updated": "2025-09-30",
+  "policy": {
+    "units": "mg/mmol/mL",
+    "order_of_addition": true,
+    "default_stoichiometry": {"electrophile_eq": 1.0, "boron_eq": 1.3, "base_eq": 2.0},
+    "dosing_order": [
+      "solvent_primary",
+      "solvent_water",
+      "base",
+      "boron_partner",
+      "electrophile",
+      "catalyst",
+      "ligand",
+      "additives"
+    ]
+  },
+  "fact_defs": [
+    {"name": "halide", "type": "enum", "options": ["Ar-I", "Ar-Br", "Ar-Cl", "Ar-OTf", "vinyl-I/Br", "vinyl-Cl"], "ask": "Select halide class"},
+    {"name": "boron_form", "type": "enum", "options": ["acid", "Bpin", "MIDA", "BF3K", "triisopropylboronate", "dan"], "ask": "Select boron reagent form"},
+    {"name": "sterics_E", "type": "enum", "options": ["ortho_free", "single_ortho", "double_ortho"], "ask": "Electrophile ortho crowding"},
+    {"name": "electronics_E", "type": "enum", "options": ["EDG", "neutral", "EWG"], "ask": "Electrophile ring electronics"},
+    {"name": "heteroaryl_flag", "type": "enum", "options": ["none", "2-pyridyl", "3-pyridyl", "thiophene", "furan", "other"], "ask": "Heteroaryl involvement (if any)"},
+    {"name": "vinyl_flag", "type": "bool", "ask": "Is the electrophile vinyl/alkenyl?"},
+    {"name": "alkyl_sp3_flag", "type": "enum", "options": ["none", "benzylic", "allylic", "primary_iodide", "secondary_chiral"], "ask": "Alkyl (sp3) coupling class if applicable"},
+    {"name": "water_policy", "type": "enum", "options": ["strict_dry", "tolerant", "prefer_5_15"], "ask": "Water policy / tolerance"},
+    {"name": "metals_allowed", "type": "enum", "options": ["Pd_only", "Pd_or_Ni", "Ni_only"], "ask": "Allowed catalytic metals"},
+    {"name": "scale_mmol", "type": "number", "ask": "Target scale (mmol) for dosing"},
+    {"name": "constraints", "type": "object", "schema": {
+      "banned_solvents": {"type": "array", "items": {"type": "string"}},
+      "max_pd_molpct": {"type": "number"},
+      "atmosphere": {"type": "string", "enum": ["N2", "Ar", "air_only"]}
+    }, "ask": "Operational constraints (banned solvents, max Pd, atmosphere)"}
+  ],
+  "core_token_format": "{metal}|{pd_source}|{ligand}|{base}|{solvent_primary}+H2O{water_volpct}",
+  "tail_token_format": "T{temp_C}C_{pd_molpct}Pd_{ligand_molpct}L_{base_eq}Base_{conc_M}M_{time_h}h",
+
+  "rules": [
+    {
+      "rule_id": "SUZ-ARBR-ACID/NP-LOWSTERIC-SPHOS",
+      "priority": 80,
+      "if": {
+        "family": "Suzuki",
+        "halide": ["Ar-Br", "Ar-I"],
+        "boron_form": ["acid", "Bpin"],
+        "sterics_E": ["ortho_free", "single_ortho"],
+        "heteroaryl_flag": ["none"],
+        "vinyl_flag": [false],
+        "metals_allowed": ["Pd_only", "Pd_or_Ni"]
+      },
+      "required_facts": ["halide", "boron_form", "sterics_E", "electronics_E", "water_policy", "metals_allowed", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Pd", "pd_source": "Pd(OAc)2", "ligand": "SPhos", "base": "K3PO4", "solvent_system": {"primary": "2-MeTHF", "water_volpct": 10}},
+        "tails": [
+          {"temp_C": 80, "pd_molpct": 0.8, "ligand_molpct": 1.6, "base_eq": 2.5, "conc_M": 0.20, "time_h": 6, "degassing": "N2_sparge_5min"}
+        ],
+        "defaults": {"boron_eq": 1.3}
+      },
+      "fallback_core": {"pd_source": "(XPhos)Pd-G3", "ligand": "XPhos", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 10}},
+      "contraindications": [
+        "constraints.banned_solvents contains 2-MeTHF",
+        "constraints.max_pd_molpct < 0.8"
+      ],
+      "on_contraindication": [
+        {"if": "constraints.banned_solvents contains 2-MeTHF", "action": "switch_core", "to": {"pd_source": "Pd(OAc)2", "ligand": "SPhos", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 10}}},
+        {"if": "constraints.max_pd_molpct < 0.8", "action": "raise_temp_within_window", "by_C": 5}
+      ],
+      "explain": "EDG/low-steric Ar–Br/I: SPhos accelerates OA/RE; phosphate + 5–15% H2O activates boronate while limiting protodeboronation."
+    },
+
+    {
+      "rule_id": "SUZ-ARBR-ORTHO-XPHOS",
+      "priority": 85,
+      "if": {
+        "family": "Suzuki",
+        "halide": ["Ar-Br"],
+        "sterics_E": ["double_ortho"],
+        "heteroaryl_flag": ["none"],
+        "metals_allowed": ["Pd_only", "Pd_or_Ni"]
+      },
+      "required_facts": ["halide", "sterics_E", "boron_form", "water_policy", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Pd", "pd_source": "Pd2(dba)3", "ligand": "XPhos", "base": "K2CO3", "solvent_system": {"primary": "toluene", "water_volpct": 20}},
+        "tails": [
+          {"temp_C": 80, "pd_molpct": 1.5, "ligand_molpct": 3.0, "base_eq": 2.5, "conc_M": 0.20, "time_h": 8, "degassing": "N2_sparge_5min"}
+        ],
+        "defaults": {"boron_eq": 1.3, "boron_form_pref": "Bpin"}
+      },
+      "fallback_core": {"pd_source": "Pd2(dba)3", "ligand": "tBuBrettPhos", "base": "K3PO4", "solvent_system": {"primary": "toluene", "water_volpct": 10}},
+      "contraindications": ["constraints.banned_solvents contains toluene"],
+      "on_contraindication": [
+        {"if": "constraints.banned_solvents contains toluene", "action": "switch_core", "to": {"pd_source": "Pd2(dba)3", "ligand": "XPhos", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 10}}}
+      ],
+      "explain": "Severe ortho crowding benefits from bulky, donating biaryl P ligands; modest water aids phosphate activation."
+    },
+
+    {
+      "rule_id": "SUZ-ARCL-EPOOR-XPHOS",
+      "priority": 90,
+      "if": {"family": "Suzuki", "halide": ["Ar-Cl"], "electronics_E": ["EWG"], "metals_allowed": ["Pd_only", "Pd_or_Ni"]},
+      "required_facts": ["halide", "electronics_E", "boron_form", "water_policy", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Pd", "pd_source": "Pd2(dba)3", "ligand": "XPhos", "base": "Cs2CO3", "solvent_system": {"primary": "toluene", "water_volpct": 10}},
+        "tails": [
+          {"temp_C": 100, "pd_molpct": 2.0, "ligand_molpct": 4.0, "base_eq": 2.5, "conc_M": 0.15, "time_h": 12, "degassing": "N2_sparge_10min"}
+        ],
+        "defaults": {"boron_eq": 1.5, "boron_form_pref": "Bpin"}
+      },
+      "fallback_core": {"pd_source": "(XPhos)Pd-G3", "ligand": "XPhos", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 5}},
+      "contraindications": ["constraints.max_pd_molpct < 2.0"],
+      "on_contraindication": [
+        {"if": "constraints.max_pd_molpct < 2.0", "action": "lower_loading_raise_temp_within_window", "pd_molpct": 1.0, "delta_C": 5}
+      ],
+      "explain": "Unactivated/π-poor Ar–Cl requires strong-donor bulky ligands; Cs2CO3 and small water fractions speed boronate activation."
+    },
+
+    {
+      "rule_id": "SUZ-TRIFLATE-DPPF-DRY",
+      "priority": 70,
+      "if": {"family": "Suzuki", "halide": ["Ar-OTf"], "water_policy": ["strict_dry"]},
+      "required_facts": ["halide", "boron_form", "water_policy", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Pd", "pd_source": "PdCl2(dppf)", "ligand": "dppf", "base": "K3PO4", "solvent_system": {"primary": "THF", "water_volpct": 0}},
+        "tails": [
+          {"temp_C": 80, "pd_molpct": 2.0, "ligand_molpct": 0.0, "base_eq": 2.0, "conc_M": 0.20, "time_h": 6, "degassing": "N2_fpt_1cycle"}
+        ],
+        "defaults": {"boron_eq": 1.2, "boron_form_pref": "acid"}
+      },
+      "fallback_core": {"pd_source": "Pd(dppf)Cl2", "ligand": "dppf", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 0}},
+      "explain": "Activated triflates perform best under anhydrous conditions with dppf and powdered phosphate."
+    },
+
+    {
+      "rule_id": "SUZ-HET-2PYRIDYL-XPHOS-MIDA",
+      "priority": 95,
+      "if": {"family": "Suzuki", "heteroaryl_flag": ["2-pyridyl"], "boron_form": ["MIDA", "BF3K"], "metals_allowed": ["Pd_only", "Pd_or_Ni"]},
+      "required_facts": ["heteroaryl_flag", "boron_form", "water_policy", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Pd", "pd_source": "(XPhos)Pd-precatalyst", "ligand": "XPhos", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 6}},
+        "tails": [
+          {"temp_C": 60, "pd_molpct": 2.0, "ligand_molpct": 0.0, "base_eq": 2.0, "conc_M": 0.15, "time_h": 12, "degassing": "N2_sparge_5min", "additives": "Cu(OAc)2 1.0 eq; diethanolamine 1.5 eq"}
+        ],
+        "defaults": {"boron_eq": 1.3}
+      },
+      "fallback_core": {"pd_source": "Pd(OAc)2", "ligand": "XPhos", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 4}},
+      "explain": "Slow-release 2-pyridyl boron sources with fast-activation XPhos precatalysts reduce protodeboronation."
+    },
+
+    {
+      "rule_id": "SUZ-VINYL-DPPF-RT",
+      "priority": 75,
+      "if": {"family": "Suzuki", "vinyl_flag": [true], "halide": ["vinyl-I/Br"]},
+      "required_facts": ["vinyl_flag", "halide", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Pd", "pd_source": "PdCl2(dppf)", "ligand": "dppf", "base": "NaOAc", "solvent_system": {"primary": "MeOH", "water_volpct": 0}},
+        "tails": [
+          {"temp_C": 25, "pd_molpct": 2.0, "ligand_molpct": 0.0, "base_eq": 2.0, "conc_M": 0.15, "time_h": 8, "degassing": "N2_sparge_2min"}
+        ],
+        "defaults": {"boron_eq": 1.2}
+      },
+      "explain": "Room-temperature acetate conditions suppress cis/trans isomerization of vinyl substrates."
+    },
+
+    {
+      "rule_id": "SUZ-ALKYL-BENZYLIC-PH3-BIPHASIC",
+      "priority": 60,
+      "if": {"family": "Suzuki", "alkyl_sp3_flag": ["benzylic", "allylic"]},
+      "required_facts": ["alkyl_sp3_flag", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Pd", "pd_source": "Pd(PPh3)4", "ligand": "PPh3(intrinsic)", "base": "NaOH(aq)", "solvent_system": {"primary": "benzene", "water_volpct": 50}},
+        "tails": [
+          {"temp_C": 80, "pd_molpct": 3.0, "ligand_molpct": 0.0, "base_eq": 2.0, "conc_M": 0.10, "time_h": 6, "degassing": "N2", "notes": "biphasic"}
+        ],
+        "defaults": {"boron_eq": 1.2, "boron_form_pref": "9-BBN-derived"}
+      },
+      "fallback_core": {"pd_source": "Pd(PPh3)4", "ligand": "PPh3(intrinsic)", "base": "K3PO4", "solvent_system": {"primary": "dioxane", "water_volpct": 10}},
+      "contraindications": ["constraints.banned_solvents contains benzene"],
+      "on_contraindication": [
+        {"if": "constraints.banned_solvents contains benzene", "action": "switch_core", "to": {"pd_source": "Pd(PPh3)4", "ligand": "PPh3(intrinsic)", "base": "NaOH(aq)", "solvent_system": {"primary": "toluene", "water_volpct": 40}}}
+      ],
+      "explain": "Benzylic/allylic couplings benefit from PPh3-bound Pd and biphasic basic media."
+    },
+
+    {
+      "rule_id": "SUZ-PROCESS-NI-MICELLAR",
+      "priority": 40,
+      "if": {"family": "Suzuki", "metals_allowed": ["Pd_or_Ni", "Ni_only"]},
+      "required_facts": ["metals_allowed", "scale_mmol", "constraints"],
+      "recommend": {
+        "core": {"metal": "Ni", "pd_source": "Ni nanoparticles", "ligand": null, "base": "K3PO4", "solvent_system": {"primary": "H2O", "water_volpct": 100}},
+        "tails": [
+          {"temp_C": 45, "pd_molpct": 1.0, "ligand_molpct": 0.0, "base_eq": 2.0, "conc_M": 0.10, "time_h": 6, "additives": "TPGS-750-M 2 wt%"}
+        ],
+        "defaults": {"boron_eq": 1.2, "boron_form_pref": "acid"}
+      },
+      "explain": "Micellar Ni protocol for aqueous, greener processing when Pd is disallowed or minimized."
+    }
+  ],
+
+  "guards": [
+    {"id": "G1-solvent-ban", "if": "constraints.banned_solvents contains recommend.core.solvent_system.primary", "action": "use_fallback_or_switch_primary"},
+    {"id": "G2-metal-policy", "if": "recommend.core.metal notin metals_allowed", "action": "skip_rule"},
+    {"id": "G3-max-pd", "if": "any(tail.pd_molpct > constraints.max_pd_molpct)", "action": "lower_loading_raise_temp_within_window"}
+  ],
+
+  "priors": [
+    {"feature": "boron_form=acid", "effect": "penalize", "comment": "Free acids can protodeboronate—prefer Bpin/MIDA if available or reduce H2O and temperature."},
+    {"feature": "sterics_E=double_ortho", "effect": "favor_rules", "rules": ["SUZ-ARBR-ORTHO-XPHOS"]}
+  ],
+
+  "repairs": [
+    {"issue": "protodeboronation", "actions": [
+      {"action": "decrease", "field": "tails[*].temp_C", "by_C": 10},
+      {"action": "decrease", "field": "recommend.core.solvent_system.water_volpct", "by_pct": 5, "floor": 0},
+      {"action": "swap", "field": "boron_form", "to": "Bpin"}
+    ]},
+    {"issue": "homocoupling", "actions": [
+      {"action": "decrease", "field": "tails[*].pd_molpct", "to": 0.5},
+      {"action": "swap", "field": "recommend.core.pd_source", "to": "Pd(OAc)2"},
+      {"action": "enforce", "field": "degassing", "value": "N2_fpt_2cycles"}
+    ]}
+  ],
+
+  "taxonomy_hooks": {
+    "ligand_synonyms": {
+      "SPhos": ["SPhos", "2-Dicyclohexylphosphino-2',6'-dimethoxybiphenyl"],
+      "XPhos": ["XPhos", "2-Dicyclohexylphosphino-2',4',6'-triisopropylbiphenyl"],
+      "tBuBrettPhos": ["tBuBrettPhos", "2-(Di-tert-butylphosphino)biphenyl ligand variant"],
+      "dppf": ["dppf", "1,1'-Bis(diphenylphosphino)ferrocene"],
+      "PPh3": ["PPh3", "triphenylphosphine"]
+    },
+    "base_families": {
+      "phosphates": ["K3PO4", "Na3PO4"],
+      "carbonates": ["K2CO3", "Cs2CO3", "Na2CO3"],
+      "alkoxides": ["KOtBu", "NaOtBu", "LiOtBu"],
+      "acetates": ["NaOAc", "KOAc"]
+    },
+    "solvent_aliases": {"2-MeTHF": ["2-MeTHF", "2-methyltetrahydrofuran"], "dioxane": ["1,4-dioxane"], "MeOH": ["methanol"]}
+  }
+}
