@@ -206,6 +206,21 @@ CSS = """
     color:#fff !important;
     fill:#fff !important;
 }
+.gradio-container button:not([role='tab']){
+    background-color:#2563eb !important;
+    border-color:#1d4ed8 !important;
+    color:#fff !important;
+    box-shadow:0 1px 2px rgba(15, 23, 42, 0.2);
+    transition:background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.gradio-container button:not([role='tab']):hover{
+    background-color:#1d4ed8 !important;
+    box-shadow:0 2px 6px rgba(15, 23, 42, 0.25);
+}
+.gradio-container button:not([role='tab']):focus-visible{
+    outline:2px solid #1e3a8a !important;
+    outline-offset:2px;
+}
 """
 
 CONDITION_SET_SCHEMA_PATH = Path(ROOT) / "condition_mcp" / "resources" / "schemas" / "condition_set.json"
@@ -531,6 +546,33 @@ def _starting_materials_table(starting: Dict[str, Any] | None) -> List[List[Any]
         rows.append([None] + [''] * (len(_STARTING_TABLE_HEADERS) - 1))
 
     return rows
+
+
+def _rule_feature_component_updates(features_obj: Dict[str, Any] | None, fallback_family: str | None = None) -> Tuple[Any, Any, Any]:
+    if not isinstance(features_obj, dict) or not features_obj:
+        return gr.update(), gr.update(), gr.update()
+    try:
+        features_pretty = json.dumps(features_obj, indent=2, sort_keys=True)
+    except Exception:
+        features_pretty = json.dumps(features_obj, indent=2)
+    try:
+        features_compact = json.dumps(features_obj, sort_keys=True)
+    except Exception:
+        features_compact = json.dumps(features_obj)
+    family_val = str(features_obj.get("family") or fallback_family or "").strip()
+    family_update = gr.update(value=family_val) if family_val else gr.update()
+    return family_update, gr.update(value=features_pretty), gr.update(value=features_compact)
+
+
+def _rule_payload_from_starting(starting: Dict[str, Any] | None) -> Tuple[Any, Any, Any]:
+    if not isinstance(starting, dict):
+        return gr.update(), gr.update(), gr.update()
+    features_obj = starting.get("rule_features")
+    fallback_family = None
+    if isinstance(features_obj, dict):
+        if isinstance(features_obj.get("family"), str):
+            fallback_family = features_obj.get("family")
+    return _rule_feature_component_updates(features_obj, fallback_family)
 
 
 CONDITION_RULE_FAMILY_SET = set(CONDITION_RULE_FAMILIES)
@@ -941,6 +983,110 @@ def ui_recommend_structured(
     )
 
 
+def ui_featurize_reactants_only(
+    reaction: str,
+    reaction_type: Optional[str] = None,
+    use_rxn_insight: bool = True,
+    relax_json: str = "",
+) -> Tuple[str, str, List[List[Any]], Dict[str, Any]]:
+    reaction_text = (reaction or "").strip()
+    if not reaction_text:
+        placeholder = _starting_materials_table(None)
+        return (
+            "- Provide a reaction SMILES first.",
+            "- Starting-material featurization unavailable.",
+            placeholder,
+            {},
+        )
+
+    fam_override = reaction_type
+    if isinstance(fam_override, str):
+        fam_override = RECOMMEND_FAMILY_VALUE_MAP.get(fam_override, fam_override)
+        if isinstance(fam_override, str) and not fam_override.strip():
+            fam_override = None
+    relax = _safe_json_loads(relax_json)
+    if not isinstance(relax, dict):
+        relax = {}
+    if "use_rxn_insight" in relax:
+        use_rxi = bool(relax.get("use_rxn_insight"))
+    else:
+        use_rxi = bool(use_rxn_insight)
+
+    try:
+        norm = recommend.normalize_reaction(reaction_text)
+    except Exception as exc:
+        placeholder = _starting_materials_table(None)
+        message = f"- Normalization failed: {exc}"
+        return (message, "- Starting-material featurization unavailable.", placeholder, {"error": str(exc)})
+
+    reactants = [
+        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
+        for r in (norm.get("reactants") or [])
+    ]
+
+    fam_override_clean = (fam_override.strip() if isinstance(fam_override, str) else None)
+    rxn_smiles_norm = norm.get("normalized") or reaction_text
+    rxn_auto: Dict[str, Any] | None = None
+    if use_rxi and getattr(recommend, "_HAS_RXN_INSIGHT", False):
+        try:
+            rxn_auto = recommend._rxn_detect(rxn_smiles_norm)  # type: ignore[attr-defined]
+        except Exception:
+            rxn_auto = None
+    auto_family = None
+    if rxn_auto and rxn_auto.get("success") and rxn_auto.get("mapped_family"):
+        auto_family = str(rxn_auto.get("mapped_family") or "Unknown")
+
+    rule_info = recommend.detect_family(reactants)
+    rule_family = rule_info.get("family") if isinstance(rule_info, dict) else None
+
+    if fam_override_clean:
+        fam = fam_override_clean or auto_family or rule_family or "Unknown"
+    else:
+        fam = auto_family or rule_family or "Unknown"
+
+    detection = {
+        "reaction_type": fam,
+        "source": "user_supplied" if fam_override_clean else "auto",
+        "provided_reaction_type": fam_override_clean,
+        "auto": None,
+        "rule_based": {
+            "reaction_type": rule_family,
+            "raw": rule_info,
+        },
+    }
+    if rxn_auto is not None:
+        detection["auto"] = {
+            "rxn_insight_available": bool(rxn_auto.get("available")),
+            "status": "success" if rxn_auto.get("success") else "fallback",
+            "rxn_insight_name": rxn_auto.get("rxn_name"),
+            "rxn_insight_class": rxn_auto.get("rxn_class"),
+            "rxn_insight_confidence": rxn_auto.get("confidence"),
+            "reaction_type": rxn_auto.get("mapped_family"),
+        }
+
+    try:
+        pick = getattr(recommend, "_pick_electrophile_nucleophile", None)
+        if callable(pick):
+            elec, nuc = pick(reactants)
+        else:
+            elec = reactants[0] if reactants else ""
+            nuc = reactants[1] if len(reactants) > 1 else ""
+        features = recommend.feat_molecular.featurize(elec, nuc)
+        role_pack = recommend._role_featurization_for_reactants(fam, reactants)
+        rule_features = recommend._compose_rule_features(fam, features, role_pack)
+        starting_payload = {
+            "role_featurization": role_pack,
+            "rule_features": rule_features,
+        }
+        starting_table = _starting_materials_table(starting_payload)
+        starting_md = _format_starting_materials_summary(starting_payload)
+    except Exception as exc:
+        starting_payload = {"error": str(exc)}
+        starting_table = _starting_materials_table(None)
+        starting_md = f"- Reactant featurization failed: {exc}"
+
+    detection_md = _format_detection_details(detection)
+    return detection_md, starting_md, starting_table, starting_payload
 def ui_condition_rule_recommend(
     family: str,
     features_json: str,
@@ -965,7 +1111,7 @@ def ui_condition_rule_recommend(
     if not fam:
         return {"error": "Select a reaction family."}, [header], "- No family selected -"
 
-    features_payload = rule_features_override if rule_features_override is not None else features_json
+    features_payload = rule_features_override if rule_features_override else features_json
     features = _safe_json_loads(features_payload)
     if not isinstance(features, dict) or not features:
         return {
@@ -1792,6 +1938,9 @@ def build_demo() -> gr.Blocks:
                 rec_detect = gr.Markdown(label="Detection Details")
                 rec_starting_md = gr.Markdown(label="Starting materials summary")
 
+            with gr.Row():
+                feat_btn = gr.Button("Featurize Reactants", variant="secondary")
+
             with gr.Accordion("Starting materials featurization", open=False):
                 rec_starting_table = gr.Dataframe(
                     label="Reactant feature highlights",
@@ -1804,6 +1953,7 @@ def build_demo() -> gr.Blocks:
             rule_family_component = None
             rule_features_component = None
             rule_job_component = None
+            feat_click = None
 
             with gr.Tabs():
                 with gr.Tab("Structured (ML)"):
@@ -1826,6 +1976,11 @@ def build_demo() -> gr.Blocks:
                         ui_recommend_structured,
                         inputs=[rec_in, rec_type, rec_k, rec_limit, rec_cat, rec_use_rxi, rec_relax, rec_constraints],
                         outputs=[rec_out, rec_tbl, rec_human, rec_detect, rec_starting_md, rec_starting_table, rec_starting_json],
+                    )
+                    feat_click = feat_btn.click(
+                        ui_featurize_reactants_only,
+                        inputs=[rec_in, rec_type, rec_use_rxi, rec_relax],
+                        outputs=[rec_detect, rec_starting_md, rec_starting_table, rec_starting_json],
                     )
 
                 with gr.Tab("Rule-based (CRL)"):
@@ -1872,17 +2027,8 @@ def build_demo() -> gr.Blocks:
                 if not isinstance(structured, dict):
                     return gr.update(), gr.update(), gr.update()
                 features_obj = structured.get("rule_features")
-                if not isinstance(features_obj, dict) or not features_obj:
-                    return gr.update(), gr.update(), gr.update()
-                try:
-                    features_text = json.dumps(features_obj, indent=2, sort_keys=True)
-                except Exception:
-                    features_text = json.dumps(features_obj, indent=2)
-                family_val = str(features_obj.get("family") or structured.get("family") or "").strip()
-                family_update = gr.update(value=family_val) if family_val else gr.update()
-                features_update = gr.update(value=features_text)
-                json_update = gr.update(value=structured)
-                return family_update, features_update, json_update
+                fallback_family = structured.get("family") if isinstance(structured.get("family"), str) else None
+                return _rule_feature_component_updates(features_obj, fallback_family)
 
             if CONDITION_RULE_FAMILIES and rule_family_component and rule_features_component and rule_job_component:
                 rec_type.change(
@@ -1894,6 +2040,12 @@ def build_demo() -> gr.Blocks:
                     rec_click.then(
                         _auto_rule_payload,
                         inputs=[rec_out],
+                        outputs=[rule_family_component, rule_features_component, rec_rule_features_json],
+                    )
+                if feat_click is not None:
+                    feat_click.then(
+                        _rule_payload_from_starting,
+                        inputs=[rec_starting_json],
                         outputs=[rule_family_component, rule_features_component, rec_rule_features_json],
                     )
             else:
