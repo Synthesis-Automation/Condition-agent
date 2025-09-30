@@ -14,6 +14,22 @@ except Exception:
 from .featurizers import molecular as feat_molecular
 from . import precedent, constraints, explain
 
+
+_FAMILY_ALIASES: Dict[str, str] = {
+    "Suzuki_CC": "Suzuki_Coupling",
+    "Suzuki_Coupling": "Suzuki_Coupling",
+    "Suzuki": "Suzuki_Coupling",
+    "Ullmann C?N": "Ullmann_CN",
+    "Buchwald C?N": "Buchwald_CN",
+}
+
+
+def _canonical_family(family: str | None) -> str:
+    if not family:
+        return "Unknown"
+    fam = str(family).strip()
+    return _FAMILY_ALIASES.get(fam, fam)
+
 try:  # Optional role-aware featurization
     from chem_feats import featurize_mol as _role_featurize_mol  # type: ignore
     _HAS_ROLE_FEATS = True
@@ -35,12 +51,20 @@ _FAMILY_ROLE_EXPECTATIONS: Dict[str, List[Dict[str, Any]]] = {
         {"label": "electrophile", "role": "aryl_halide", "required": True},
         {"label": "nucleophile", "role": "alcohol", "required": True},
     ],
+    "Suzuki_Coupling": [
+        {"label": "electrophile", "role": "aryl_halide", "required": True},
+        {"label": "boron_partner", "role": None, "required": True},
+    ],
+    "Amide_Formation": [
+        {"label": "electrophile", "role": None, "required": True},
+        {"label": "nucleophile", "role": "amine", "required": True},
+    ],
 }
 
 
 def _expected_roles_for_family(family: str | None) -> List[Dict[str, Any]]:
-    fam = (family or "").strip()
-    if not fam:
+    fam = _canonical_family(family)
+    if fam == "Unknown":
         return []
     return list(_FAMILY_ROLE_EXPECTATIONS.get(fam, []))
 
@@ -51,6 +75,8 @@ def _role_featurization_for_reactants(
 ) -> Dict[str, Any] | None:
     if not _HAS_ROLE_FEATS or _role_featurize_mol is None:
         return None
+
+    family = _canonical_family(family)
 
     entries: List[Dict[str, Any]] = []
     for smi in reactants:
