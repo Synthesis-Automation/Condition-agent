@@ -6,8 +6,8 @@ import pytest
 
 pytest.importorskip("rdkit")
 
-from chem_feats import featurize_mol, featurize_reaction
-from chem_feats.registry import REGISTRY
+from chemtools.features.role import featurize_mol, featurize_reaction
+from chemtools.features.role.registry import REGISTRY
 
 
 def _expected_vector_length(roles: List[str]) -> int:

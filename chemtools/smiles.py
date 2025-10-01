@@ -1,4 +1,5 @@
 from typing import Dict, Any, List
+import re
 from .util.rdkit_helpers import (
     canonical_smiles,
     parse_smiles,
@@ -12,6 +13,18 @@ def _split_fragments_text(s: str) -> List[str]:
     if not s:
         return []
     return [p for p in s.split('.') if p]
+
+def _neutralize_carboxylates(smiles: str) -> str:
+    patterns = [
+        (r"C\(=O\)\[O-\]", "C(=O)O"),
+        (r"\[O-\]C\(=O\)", "OC(=O)"),
+        (r"O=C\(\[O-\]\)", "O=C(O)"),
+    ]
+    for pattern, repl in patterns:
+        smiles = re.sub(pattern, repl, smiles)
+    return smiles
+
+
 
 def normalize(smi: str) -> Dict[str, Any]:
     s = (smi or '').strip()
@@ -61,6 +74,8 @@ def normalize(smi: str) -> Dict[str, Any]:
 
     # Canonical normalized SMILES
     smiles_norm = mol_to_canonical_smiles(mol_std) if mol_std is not None else canonical_smiles(largest_smiles) or largest_smiles
+    if smiles_norm:
+        smiles_norm = _neutralize_carboxylates(smiles_norm)
 
     return {
         "input": s,

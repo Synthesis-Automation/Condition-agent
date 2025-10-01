@@ -5,7 +5,7 @@ import pathlib
 
 import pytest
 
-from condition_mcp.tools import detect_family, featurize_substrates, normalize_reaction
+from chemtools.integrations.mcp.tools import detect_family, featurize_substrates, normalize_reaction
 
 
 @pytest.fixture(scope="module")
@@ -45,7 +45,8 @@ def test_featurize_substrates_produces_descriptors(sample_reactants: list[str]):
 
 
 def test_condition_set_schema_is_well_formed():
-    schema_path = pathlib.Path(__file__).parents[2] / "condition_mcp" / "resources" / "schemas" / "condition_set.json"
+    repo_root = pathlib.Path(__file__).resolve().parents[3]
+    schema_path = repo_root / "chemtools" / "integrations" / "mcp" / "resources" / "schemas" / "condition_set.json"
     data = json.loads(schema_path.read_text(encoding="utf-8"))
 
     assert data["title"] == "ConditionSet"

@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, List
 
 import pytest
 
-from clients.mcp_rules_client import McpRulesClient
+from chemtools.integrations.mcp.client import McpRulesClient
 
 
 class FakeStdout:
@@ -67,7 +67,7 @@ def patched_popen(monkeypatch: pytest.MonkeyPatch) -> None:
     def fake_popen(*_args: Any, **_kwargs: Any) -> FakeProcess:
         return FakeProcess(responses)
 
-    monkeypatch.setattr("clients.mcp_rules_client.subprocess.Popen", fake_popen)
+    monkeypatch.setattr("chemtools.integrations.mcp.client.subprocess.Popen", fake_popen)
 
 
 def test_client_formats_requests(monkeypatch: pytest.MonkeyPatch, patched_popen: None) -> None:
@@ -83,7 +83,7 @@ def test_client_detects_dead_process(monkeypatch: pytest.MonkeyPatch) -> None:
             super().__init__(responses=[])
             self._alive = False
 
-    monkeypatch.setattr("clients.mcp_rules_client.subprocess.Popen", lambda *args, **kwargs: DeadProcess())
+    monkeypatch.setattr("chemtools.integrations.mcp.client.subprocess.Popen", lambda *args, **kwargs: DeadProcess())
     client = McpRulesClient("python fake_server.py", "dummy.json", startup_timeout_s=0.05)
     with pytest.raises(TimeoutError):
         client.start()

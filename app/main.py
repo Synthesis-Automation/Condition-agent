@@ -20,8 +20,11 @@ try:
 except Exception:
     _HAS_RXN_INSIGHT = False
 try:
-    from chem_feats import featurize_mol as role_featurize_mol, featurize_reaction as role_featurize_reaction  # type: ignore
-    from chem_feats.registry import REGISTRY as ROLE_REGISTRY  # type: ignore
+    from chemtools.features.role import (
+        featurize_mol as role_featurize_mol,
+        featurize_reaction as role_featurize_reaction,
+    )  # type: ignore
+    from chemtools.features.role.registry import REGISTRY as ROLE_REGISTRY  # type: ignore
     _HAS_ROLE_FEATS = True
 except Exception:
     _HAS_ROLE_FEATS = False
@@ -132,7 +135,7 @@ def api_featurize_role_molecule(req: RoleAwareMolRequest):
     out = role_featurize_mol(req.smiles, roles=req.roles or None)
     vec = out.get("vector")
     try:
-        out["vector"] = vec.tolist()  # type: ignore
+        out["vector"] = vec.tolist(    )  # type: ignore
     except Exception:
         pass
     return out
@@ -147,7 +150,7 @@ def api_featurize_role_reaction(req: RoleAwareReactionRequest):
         for item in out.get("reactants") or []:  # type: ignore[union-attr]
             vec = item.get("vector")
             try:
-                item["vector"] = vec.tolist()  # type: ignore
+                item["vector"] = vec.tolist(    )  # type: ignore
             except Exception:
                 pass
     except Exception:
@@ -210,7 +213,7 @@ def api_featurize_molecule(req: RoleAwareMolRequest):
     out = role_featurize_mol(req.smiles, roles=roles)
     vec = out.get("vector")
     try:
-        out["vector"] = vec.tolist()  # type: ignore
+        out["vector"] = vec.tolist(    )  # type: ignore
     except Exception:
         pass
     return out
@@ -309,8 +312,8 @@ def api_condition_core_validate(req: ConditionCoreValidateRequest):
 @app.get("/metrics")
 def metrics():
     if _PROM:
-        data = generate_latest()  # type: ignore
-        return Response(content=data, media_type=CONTENT_TYPE_LATEST)  # type: ignore
+        data = generate_latest(    )  # type: ignore
+        return Response(content=data, media_type=CONTENT_TYPE_LATEST    )  # type: ignore
     # Fallback minimal metrics when prometheus_client is unavailable
     return {
         "ok": True,
@@ -323,7 +326,7 @@ async def warm_startup_caches() -> None:
     # Preload registry and dataset-derived aliases to reduce first-request latency
     try:
         from chemtools import registry as _reg
-        _reg._load_registry()  # type: ignore[attr-defined]
+        _reg._load_registry(    )  # type: ignore[attr-defined]
     except Exception:
         pass
     try:

@@ -6,9 +6,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_RULES_PATH = ROOT / "data" / "rules" / "buchwald_cn.json"
-DEFAULT_SERVER_BIN = f"{os.sys.executable} {ROOT / 'mcp_rules_server' / 'server.py'}"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_RULES_PATH = REPO_ROOT / "data" / "rules" / "buchwald_cn.json"
+DEFAULT_SERVER_BIN = f"{os.sys.executable} \"{REPO_ROOT / 'chemtools' / 'integrations' / 'mcp' / 'server' / 'server.py'}\""
 
 
 @dataclass

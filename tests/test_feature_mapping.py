@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from condition_agent.features.mapping import build_features, map_electrophile, map_nucleophile
+from chemtools.agent.features.mapping import build_features, map_electrophile, map_nucleophile
 
 
 def test_map_electrophile_detects_aryl_chloride() -> None:

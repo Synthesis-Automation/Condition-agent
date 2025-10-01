@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Gradio UI to interactively test chemtools functions.
 
@@ -24,8 +24,8 @@ if ROOT not in sys.path:
 
 import gradio as gr
 
-from condition_mcp import DEFAULT_SCHEMA_VERSION
-from condition_mcp.tools import (
+from chemtools.integrations.mcp import DEFAULT_SCHEMA_VERSION
+from chemtools.integrations.mcp.tools import (
     detect_family as mcp_detect_family,
     featurize_substrates as mcp_featurize_substrates,
     normalize_reaction as mcp_normalize_reaction,
@@ -59,16 +59,16 @@ RECOMMEND_REACTION_TYPE_CONFIGS: List[Dict[str, str]] = [
         "dataset_label": "Suzuki_CC",
     },
     {
-        "label": "Ullmann C–N",
-        "structured_family": "Ullmann C?N",
+        "label": "Ullmann C鈥揘",
+        "structured_family": "Ullmann C-N",
         "rule_family": "Ullmann_CN",
-        "dataset_label": "Ullmann C?N",
+        "dataset_label": "Ullmann C-N",
     },
     {
-        "label": "Buchwald C–N",
-        "structured_family": "Buchwald C?N",
+        "label": "Buchwald C鈥揘",
+        "structured_family": "Buchwald C-N",
         "rule_family": "Buchwald_CN",
-        "dataset_label": "Buchwald C?N",
+        "dataset_label": "Buchwald C-N",
     },
     {
         "label": "Amide Coupling",
@@ -122,7 +122,7 @@ _RULE_SAMPLE_FEATURES: Dict[str, Dict[str, Any]] = {
     "Amide_Formation": {
         "reaction_family": "amide_formation",
         "category": "chemoselective_amidation",
-        "substrate_class": "α-Chiral carboxylic acids with primary anilines",
+        "substrate_class": "伪-Chiral carboxylic acids with primary anilines",
         "acid_class": "alpha-chiral",
         "amine_class": "aniline",
         "electrophile": {
@@ -257,7 +257,7 @@ CSS = """
 }
 """
 
-CONDITION_SET_SCHEMA_PATH = Path(ROOT) / "condition_mcp" / "resources" / "schemas" / "condition_set.json"
+CONDITION_SET_SCHEMA_PATH = Path(ROOT) / "chemtools" / "integrations" / "mcp" / "resources" / "schemas" / "condition_set.json"
 
 # Enable RDKit by default unless explicitly disabled by the environment
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
@@ -271,7 +271,7 @@ from chemtools.util.rdkit_helpers import rdkit_available
 _CRL_DEFAULT: Dict[str, Any] | None = None
 
 try:
-    from condition_rule_library import api as crl_api
+    from chemtools.rules import api as crl_api
 except Exception:  # pragma: no cover - optional dependency guard
     crl_api = None  # type: ignore
 else:
@@ -311,12 +311,12 @@ if os.environ.get("CHEMTOOLS_RDKIT_QUIET", "1").strip().lower() not in {"0", "fa
         pass
 # Optional role-aware featurizers
 try:
-    from chem_feats import featurize_mol as role_feat_mol  # type: ignore
+    from chemtools.features.role import featurize_mol as role_feat_mol  # type: ignore
 except Exception:
     role_feat_mol = None  # type: ignore
 
 try:
-    from chem_feats import featurize_reaction as role_feat_rxn  # type: ignore
+    from chemtools.features.role import featurize_reaction as role_feat_rxn  # type: ignore
 except Exception:
     role_feat_rxn = None  # type: ignore
 
@@ -516,43 +516,43 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
             lines.append(f"- Acid class: {acid_label}")
         if acid_ctx:
             if acid_ctx.get('sterics'):
-                lines.append(f"  • acid sterics: {acid_ctx.get('sterics')}")
+                lines.append(f"  - acid sterics: {acid_ctx.get('sterics')}")
             if acid_ctx.get('alpha_chiral') is not None:
-                lines.append(f"  • alpha chiral: {acid_ctx.get('alpha_chiral')}")
+                lines.append(f"  - alpha chiral: {acid_ctx.get('alpha_chiral')}")
             if acid_ctx.get('alpha_branching'):
-                lines.append(f"  • alpha branching: {acid_ctx.get('alpha_branching')}")
+                lines.append(f"  - alpha branching: {acid_ctx.get('alpha_branching')}")
             classes = acid_ctx.get('classes')
             if isinstance(classes, list) and classes:
-                lines.append(f"  • acid classes: {', '.join(str(c) for c in classes)}")
+                lines.append(f"  - acid classes: {', '.join(str(c) for c in classes)}")
         amine_label = rule_feats.get('amine_class') or amine_ctx.get('class')
         if amine_label:
             lines.append(f"- Amine class: {amine_label}")
         if amine_ctx:
             if amine_ctx.get('sterics'):
-                lines.append(f"  • amine sterics: {amine_ctx.get('sterics')}")
+                lines.append(f"  - amine sterics: {amine_ctx.get('sterics')}")
             if amine_ctx.get('basicity'):
-                lines.append(f"  • amine basicity note: {amine_ctx.get('basicity')}")
+                lines.append(f"  - amine basicity note: {amine_ctx.get('basicity')}")
             if amine_ctx.get('diamine') is not None:
-                lines.append(f"  • diamine: {amine_ctx.get('diamine')}")
+                lines.append(f"  - diamine: {amine_ctx.get('diamine')}")
             classes = amine_ctx.get('classes')
             if isinstance(classes, list) and classes:
-                lines.append(f"  • amine classes: {', '.join(str(c) for c in classes)}")
+                lines.append(f"  - amine classes: {', '.join(str(c) for c in classes)}")
         lines.append(f"- Electrophile class: {elec.get('class') or 'unknown'}")
         if elec.get('description'):
-            lines.append(f"  • detail: {elec.get('description')}")
+            lines.append(f"  - detail: {elec.get('description')}")
         if elec.get('alpha_branching'):
-            lines.append(f"  • alpha branching: {elec.get('alpha_branching')}")
+            lines.append(f"  - alpha branching: {elec.get('alpha_branching')}")
         if elec.get('state'):
-            lines.append(f"  • state: {elec.get('state')}")
+            lines.append(f"  - state: {elec.get('state')}")
         if elec.get('smiles'):
-            lines.append(f"  • electrophile smiles: {elec.get('smiles')}")
+            lines.append(f"  - electrophile smiles: {elec.get('smiles')}")
         lines.append(f"- Nucleophile class: {nuc.get('class') or 'unknown'}")
         if nuc.get('basicity'):
-            lines.append(f"  • basicity: {nuc.get('basicity')}")
+            lines.append(f"  - basicity: {nuc.get('basicity')}")
         if nuc.get('steric_alpha'):
-            lines.append(f"  • steric alpha: {nuc.get('steric_alpha')}")
+            lines.append(f"  - steric alpha: {nuc.get('steric_alpha')}")
         if nuc.get('smiles'):
-            lines.append(f"  • nucleophile smiles: {nuc.get('smiles')}")
+            lines.append(f"  - nucleophile smiles: {nuc.get('smiles')}")
         if rule_feats.get('ortho_count') is not None:
             lines.append(f"- ortho substitution: {rule_feats.get('ortho_count')}")
         if rule_feats.get('para_EWG') is not None:
@@ -565,12 +565,12 @@ def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
         if constraints:
             lines.append("- Constraints:")
             for key, value in constraints.items():
-                lines.append(f"  • {key.replace('_', ' ')}: {value}")
+                lines.append(f"  - {key.replace('_', ' ')}: {value}")
         func_groups = rule_feats.get('functional_groups') if isinstance(rule_feats.get('functional_groups'), dict) else {}
         if func_groups:
             lines.append("- Functional groups:")
             for key, value in func_groups.items():
-                lines.append(f"  • {key.replace('_', ' ')}: {value}")
+                lines.append(f"  - {key.replace('_', ' ')}: {value}")
         if rule_feats.get('hindered_substrates') is not None:
             lines.append(f"- Hindered substrates: {rule_feats.get('hindered_substrates')}")
         if rule_feats.get('goal'):
@@ -742,7 +742,7 @@ def ui_recommend_reaction_type_meta(label: str) -> Tuple[str, str, str, str]:
         summary_lines.append("- **Rule family**: none (rule recommender disabled)")
 
     if structured_family and rule_family:
-        summary_lines.append(f"- Mapping: `{structured_family}` ↔ `{rule_family}`")
+        summary_lines.append(f"- Mapping: `{structured_family}` 鈫?`{rule_family}`")
 
     features_text, job_ctx_text = "{}", "{}"
     if rule_family:
@@ -1283,7 +1283,7 @@ def ui_condition_rule_recommend(
         return {
             "error": str(exc),
             "family": fam,
-        }, [header], f"⚠️ {exc}"
+        }, [header], f"鈿狅笍 {exc}"
 
     result_payload: Dict[str, Any] = {
         "family": fam,
@@ -1329,7 +1329,7 @@ def ui_condition_rule_recommend(
             rec.get("playbook_id", ""),
             rec.get("name", ""),
             rec.get("score", ""),
-            "✅" if rec.get("ok", True) else "⚠️",
+            "OK" if rec.get("ok", True) else "WARN",
             lig,
             pd_src,
             base,
@@ -1340,7 +1340,7 @@ def ui_condition_rule_recommend(
         breakdown = rec.get("score_breakdown") or {}
         guard_msgs = rec.get("guard_messages") or []
         md_lines.append(
-            f"**{rec.get('playbook_id', rec.get('name', 'Playbook'))}** — score {rec.get('score', '?')} (guards {breakdown.get('guard_adjust', 0)}, priors {breakdown.get('prior', 0)})"
+            f"**{rec.get('playbook_id', rec.get('name', 'Playbook'))}** - score {rec.get('score', '?')} (guards {breakdown.get('guard_adjust', 0)}, priors {breakdown.get('prior', 0)})"
         )
         if guard_msgs:
             for gm in guard_msgs:
@@ -1826,7 +1826,7 @@ def build_demo() -> gr.Blocks:
                         mcp_rule_btn.click(ui_mcp_rule_resource, inputs=[mcp_rule_family], outputs=[mcp_rule_json])
                         mcp_rule_family.change(ui_mcp_rule_resource, inputs=[mcp_rule_family], outputs=[mcp_rule_json])
                     else:
-                        gr.Markdown("⚠️ Condition Rule Library not available; install `condition-rule-library` data bundle.")
+                        gr.Markdown("鈿狅笍 Condition Rule Library not available; install `condition-rule-library` data bundle.")
 
         with gr.Tab("Featurize"):
             gr.Markdown(
@@ -1852,10 +1852,10 @@ def build_demo() -> gr.Blocks:
             def _rdkit_status_message() -> str:
                 if not rdkit_available():
                     return (
-                        "⚠️ RDKit isn't available or is disabled. Descriptor blocks default to zeros. "
+                        "鈿狅笍 RDKit isn't available or is disabled. Descriptor blocks default to zeros. "
                         "Set `CHEMTOOLS_DISABLE_RDKIT=0` (or unset it) and install RDKit to enable numeric features."
                     )
-                return "✅ RDKit detected; numeric descriptors enabled."
+                return "鉁?RDKit detected; numeric descriptors enabled."
 
             def _format_feature_result(raw: Dict[str, Any] | None, show_full_fields: bool) -> Dict[str, Any]:
                 if not isinstance(raw, dict):
@@ -2172,7 +2172,7 @@ def build_demo() -> gr.Blocks:
                             outputs=[rule_json, rule_table, rule_md],
                         )
                     else:
-                        gr.Markdown("⚠️ Rule-based condition library not available in this build.")
+                        gr.Markdown("鈿狅笍 Rule-based condition library not available in this build.")
 
             def _auto_rule_payload(structured: Dict[str, Any]) -> Tuple[Any, Any, Any]:
                 if not isinstance(structured, dict):

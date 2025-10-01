@@ -8,7 +8,7 @@ stdin/stdout, keeping deployments hermetic and testable.
 ## Running Locally
 
 ```bash
-python mcp_rules_server/server.py --rules data/rules/buchwald_cn.json
+python chemtools/integrations/mcp/server/server.py --rules data/rules/buchwald_cn.json
 ```
 
 Once started, the server accepts newline-delimited JSON-RPC requests. Supported

@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from clients.mcp_rules_client import McpRulesClient
+from chemtools.integrations.mcp.client import McpRulesClient
 
-ROOT = Path(__file__).resolve().parents[1]
-SERVER = [str(sys.executable), str(ROOT / 'mcp_rules_server' / 'server.py')]
-RULES_SRC = ROOT / "data" / "rules" / "buchwald_cn.json"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SERVER = [str(sys.executable), str(REPO_ROOT / 'chemtools' / 'integrations' / 'mcp' / 'server' / 'server.py')]
+RULES_SRC = REPO_ROOT / "data" / "rules" / "buchwald_cn.json"
 
 
 @pytest.fixture()

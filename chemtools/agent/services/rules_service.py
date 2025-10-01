@@ -4,9 +4,9 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Iterable, Optional
 
-from clients.mcp_rules_client import McpRulesClient, McpRulesClientError
-from condition_agent.config import RulesConfig
-from condition_agent.features.mapping import build_features
+from chemtools.integrations.mcp.client import McpRulesClient, McpRulesClientError
+from chemtools.agent.config import RulesConfig
+from chemtools.agent.features.mapping import build_features
 
 LOGGER = logging.getLogger(__name__)
 

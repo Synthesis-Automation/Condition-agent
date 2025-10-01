@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from condition_rule_library import api as crl_api
+from chemtools.rules import api as crl_api
 
 
 @lru_cache(maxsize=1)

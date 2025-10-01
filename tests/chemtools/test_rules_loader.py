@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from condition_rule_library import api
+from chemtools.rules import api
 
 
 def test_load_crl_resolves_buchwald_reference() -> None:
@@ -26,7 +26,7 @@ def test_load_crl_includes_amide_formation() -> None:
     assert playbooks, "Expected amide formation playbooks"
 
     ids = {pb.get("id") for pb in playbooks}
-    assert "AM-EDCI-OXYMA" in ids
+    assert "AMIDE-EDC-OXYMA-GENERAL" in ids
     assert "AM-BORON-B-C6F5-3" in ids
 
 

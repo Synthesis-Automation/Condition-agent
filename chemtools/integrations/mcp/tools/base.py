@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, List
 
 from pydantic import BaseModel, Field, ValidationError
 
-from condition_mcp import DEFAULT_SCHEMA_VERSION
+from chemtools.integrations.mcp import DEFAULT_SCHEMA_VERSION
 
 
 class ToolError(ValueError):

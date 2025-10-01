@@ -34,7 +34,7 @@ def _canonical_family(family: str | None) -> str:
     return _FAMILY_ALIASES.get(fam, fam)
 
 try:  # Optional role-aware featurization
-    from chem_feats import featurize_mol as _role_featurize_mol  # type: ignore
+    from chemtools.features.role import featurize_mol as _role_featurize_mol  # type: ignore
     _HAS_ROLE_FEATS = True
 except Exception:  # pragma: no cover - optional dependency may be absent
     _role_featurize_mol = None  # type: ignore

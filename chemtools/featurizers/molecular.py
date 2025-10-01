@@ -5,7 +5,7 @@ Implements a stable entry point `featurize(electrophile, nucleophile)`
 without emitting deprecation warnings (unlike the legacy `ullmann`
 module). Internally reuses the cached core implementation from
 `chemtools.featurizers.ullmann` and conditionally attaches role-aware
-vectors when the optional `chem_feats` package is available.
+vectors when the optional `chemtools.features.role` package is available.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import os
 from .ullmann import _featurize_cached as _u_cached  # core implementation
 
 try:  # Optional role-aware vectors
-    from chem_feats import featurize_mol as _role_feat  # type: ignore
+    from chemtools.features.role import featurize_mol as _role_feat  # type: ignore
     _HAS_ROLE_FEATS = True
 except Exception:  # pragma: no cover
     _role_feat = None  # type: ignore

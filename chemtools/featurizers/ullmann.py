@@ -7,7 +7,7 @@ from ..util.rdkit_helpers import rdkit_available, parse_smiles
 
 # Optional role-aware featurization (graceful fallback if package missing)
 try:
-    from chem_feats import featurize_mol as _role_feat
+    from chemtools.features.role import featurize_mol as _role_feat
     _HAS_ROLE_FEATS = True
 except Exception:
     _HAS_ROLE_FEATS = False

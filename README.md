@@ -32,6 +32,68 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
   ```
   Or with Makefile shortcuts: `make install`, `make run`, `make test`.
 
+## Repository Layout
+
+`data/` and `data-processor/` hold raw and processed datasets for demos and ETL pipelines; they remain unchanged and are omitted from the listing below so the focus stays on the runtime code.
+
+```text
+.
+├─ app/
+│  ├─ main.py                 # FastAPI service wiring and HTTP endpoints
+│  └─ ui_gradio.py            # Gradio UI surface for interactive testing
+├─ chemtools/
+│  ├─ agent/
+│  │  ├─ config.py            # Environment-driven config for MCP rule orchestration
+│  │  ├─ features/mapping.py  # Translates reactant context into rule features
+│  │  └─ services/rules_service.py  # Thin wrapper around the MCP rules client
+│  ├─ cli/registry.py         # CLI entry point for compound registry lookups
+│  ├─ features/
+│  │  └─ role/                # Role-aware descriptors, SMARTS, and fingerprint builders
+│  ├─ featurizers/
+│  │  ├─ molecular.py         # Primary molecular featurizer API
+│  │  └─ ullmann.py           # Backwards-compatible Ullmann-specific featurizer
+│  ├─ integrations/
+│  │  ├─ molpipeline.py       # Optional MolPipeline feature hooks
+│  │  └─ mcp/
+│  │     ├─ client.py         # Subprocess JSON-RPC client for rule suggestions
+│  │     ├─ server/server.py  # Vendored MCP rules JSON-RPC server
+│  │     └─ tools/            # Schema-stamped wrappers exposed as MCP tools
+│  ├─ rules/
+│  │  ├─ api.py               # Load, guard, and score rule playbooks
+│  │  └─ rules/*.json         # Condition rule library families
+│  ├─ util/                   # Shared helpers (RDKit guards, IO utilities)
+│  ├─ condition_core.py       # Condition-core parsing and normalization
+│  ├─ condition_rules.py      # High-level rule-based recommendation helpers
+│  ├─ constraints.py          # Post-processing filters for recommendations
+│  ├─ contracts.py            # Pydantic request/response contracts
+│  ├─ explain.py              # Human-readable justification builders
+│  ├─ precedent.py            # Precedent retrieval, KNN, and DRFP blending
+│  ├─ properties.py           # Name/CAS/token property lookup
+│  ├─ reaction_similarity.py  # DRFP/Tanimoto similarity utilities
+│  ├─ reaction_type_detector.py  # Reaction family inference via optional RXN Insight
+│  ├─ recommend.py            # Condition recommendation orchestrator
+│  ├─ registry.py             # Compound registry accessors
+│  ├─ router.py               # Reaction family heuristics
+│  └─ smiles.py               # SMILES normalization and reaction parsing
+├─ docs/
+│  └─ rules_mcp.md            # MCP integration notes and runbooks
+├─ scripts/                   # Developer CLIs for conditioning tests, DRFP caches, etc.
+├─ tests/
+│  ├─ chemtools/              # Package-focused unit and integration suites
+│  └─ test_*                  # API, precedent, router, and property tests
+├─ artifacts/                 # Optional precomputed DRFP fingerprint archives
+├─ AGENTS.md                  # Agent integration design notes
+├─ Makefile                   # Convenience targets (install/run/test)
+├─ pyproject.toml             # Project metadata and entry points
+└─ README.md                  # This guide
+```
+
+Supporting data directories:
+
+- `data/`: Sample registries, taxonomy JSONL, and rule family snapshots consumed by the API.
+- `data-processor/`: ETL utilities for building/updating those datasets (kept unchanged in this reorg).
+
+
 ## How to Test
 
 ### 1) Unit tests (fast, deterministic)
