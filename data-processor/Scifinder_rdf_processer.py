@@ -468,6 +468,12 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     solv_list = self._safe_json_list(row.get("Solvent", "[]"))
 
                     disp_core = self._compute_condition_core(row)
+                    full_system_list = self._safe_json_list(row.get("FullCatalyticSystem", "[]"))
+                    if not full_system_list:
+                        core_pairs = self._safe_json_list(row.get("CatalystCoreDetail", "[]"))
+                        lig_list = self._safe_json_list(row.get("Ligand", "[]"))
+                        full_system_list = (core_pairs or []) + (lig_list or [])
+                    catalytic_system = self._join_names(full_system_list)
 
                     T = row.get("Temperature_C", "")
                     t = row.get("Time_h", "")
@@ -498,6 +504,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         f.write(f"- Type: {rtype}\n")
                     if disp_core:
                         f.write(f"- Condition Core: {disp_core}\n")
+                    if catalytic_system:
+                        f.write(f"- Catalytic System: {catalytic_system}\n")
                     if y != "":
                         f.write(f"- Yield %: {y}\n")
                     if T != "":
