@@ -7,11 +7,14 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
 - Create a virtualenv and install deps:
 
   - macOS/Linux:
+
     ```bash
     python3 -m venv .venv && source .venv/bin/activate
     pip install -r requirements.txt
     ```
+
   - Windows (PowerShell):
+
     ```powershell
     python -m venv .venv
     .\.venv\Scripts\Activate.ps1
@@ -26,10 +29,12 @@ Deterministic chemistry tools (FastAPI + RDKit-friendly) to support condition re
   ```
 
 - Run tests:
+
   ```bash
   pip install -r requirements-dev.txt
   pytest -q
   ```
+
   Or with Makefile shortcuts: `make install`, `make run`, `make test`.
 
 ## Repository Layout
@@ -93,7 +98,6 @@ Supporting data directories:
 - `data/`: Sample registries, taxonomy JSONL, and rule family snapshots consumed by the API.
 - `data-processor/`: ETL utilities for building/updating those datasets (kept unchanged in this reorg).
 
-
 ## How to Test
 
 ### 1) Unit tests (fast, deterministic)
@@ -104,7 +108,7 @@ Supporting data directories:
 ### 2) Exercise the API via Swagger
 
 - Start: `uvicorn app.main:app --reload --port 8000`
-- Open: http://127.0.0.1:8000/docs
+- Open: <http://127.0.0.1:8000/docs>
 - Try endpoints:
   - POST `/api/v1/smiles/normalize` with `{ "smiles": "c1ccccc1O" }`
   - POST `/api/v1/router/detect-family` with `{ "reactants": ["Clc1ccccc1","Nc1ccccc1"] }`
@@ -119,7 +123,7 @@ Supporting data directories:
 ### 4) Gradio UI (no-code testing)
 
 - Launch: `python app/ui_gradio.py`
-- Open: http://127.0.0.1:7860
+- Open: <http://127.0.0.1:7860>
 - Tabs included:
   - SMILES Normalize: normalize a single SMILES.
   - Detect Family: infer reaction family from reactants (dot or newline separated).
@@ -144,7 +148,6 @@ pip install drfp==0.4.0 numpy
 - API callers can pass a `molpipeline` block inside the `/api/v1/precedent/knn` relax payload (roles, aggregation strategy, query role overrides) to get the same feature vectors programmatically.
 - The CLI helper `scripts/precedent_from_rxn.py` mirrors the UI via `--molpipeline`, `--molpipeline-config`, and `--molpipeline-query`, echoing availability, applied config, and vector lengths in the output.
 - All entry points rely on `chemtools.integrations.molpipeline.environment_snapshot()` so they degrade gracefully and can report version info when the extra stack is present.
-
 
 Gradio Core Search quick demo
 
@@ -234,25 +237,31 @@ Internal project scaffold. Add a LICENSE if distributing.
 
 - Molecule (aryl halide):
   - Request:
+
     ```bash
     curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/role-aware/molecule \
       -H "Content-Type: application/json" \
       -d '{"smiles":"Clc1ccccc1","roles":["aryl_halide"]}' | jq '{fields: .fields[0:8], vector: .vector[0:8], masks: .masks}'
     ```
+
   - Output (sample):
     `{"fields":["global.MW","global.logP",...], "vector":[112.56,2.93,...], "masks":{"aryl_halide":1,"amine":0,"alcohol":0}}`
 - Reaction (default roles for all reactants):
   - Request:
+
     ```bash
     curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/role-aware/reaction \
       -H "Content-Type: application/json" \
       -d '{"reaction":"Brc1ccccc1.Nc1ccccc1>>"}' | jq '.reactants[0] | {smiles, len: (.vector|length), masks}'
     ```
+
 - Field list for specific roles:
   - Request:
+
     ```bash
     curl -s "http://127.0.0.1:8000/api/v1/featurize/role-aware/fields?roles=amine,aryl_halide" | jq '.counts, (.fields[0:10])'
     ```
+
   - Use this to align downstream models to a stable field order.
 
 ## Performance & Tuning
@@ -321,12 +330,15 @@ Performance notes
 Examples
 
 - Globals-only curl:
+
   ```bash
   curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/molecule \
     -H "Content-Type: application/json" \
     -d '{"smiles":"Clc1ccccc1"}' | jq '{len: (.vector|length), fields: .fields[0:8], masks: .masks}'
   ```
+
 - Amine-only curl:
+
   ```bash
   curl -s -X POST http://127.0.0.1:8000/api/v1/featurize/molecule \
     -H "Content-Type: application/json" \
