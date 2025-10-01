@@ -365,10 +365,82 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                 out.append(nm)
         return ", ".join(out)
 
-    def _compute_condition_core(self, row: Dict[str, Any]) -> str:
+    _METAL_KEYWORDS: Dict[str, str] = {
+        "nickel": "Ni",
+        "palladium": "Pd",
+        "platinum": "Pt",
+        "copper": "Cu",
+        "ruthenium": "Ru",
+        "rhodium": "Rh",
+        "iridium": "Ir",
+        "cobalt": "Co",
+        "iron": "Fe",
+        "manganese": "Mn",
+        "chromium": "Cr",
+        "molybdenum": "Mo",
+        "tantalum": "Ta",
+        "niobium": "Nb",
+        "vanadium": "V",
+        "zinc": "Zn",
+        "silver": "Ag",
+        "gold": "Au",
+        "tin": "Sn",
+        "antimony": "Sb",
+        "bismuth": "Bi",
+        "osmium": "Os",
+        "rhenium": "Re"
+    }
+
+    def _extract_names(self, items: Optional[List[Any]] | None) -> List[str]:
+        out: List[str] = []
+        if not items:
+            return out
+        for element in items:
+            if isinstance(element, dict):
+                name = (element.get("name") or element.get("abbr") or element.get("token") or "").strip()
+            else:
+                text_val = str(element)
+                if "|" in text_val:
+                    name = text_val.split("|", 1)[0].strip()
+                else:
+                    name = text_val.strip()
+            if name:
+                out.append(name)
+        return out
+
+    def _infer_metal_from_names(self, *item_lists: Optional[List[Any]]) -> str:
+        names: List[str] = []
+        for items in item_lists:
+            names.extend(self._extract_names(items))
+        for name in names:
+            lower_name = name.lower()
+            for keyword, symbol in self._METAL_KEYWORDS.items():
+                if keyword in lower_name:
+                    return symbol
+        return ""
+
+    def _collect_full_catalytic_system(self, row: Dict[str, Any]) -> List[Any]:
+        full_system = self._safe_json_list(row.get("FullCatalyticSystem", "[]"))
+        if full_system:
+            return list(full_system)
+        core_pairs = self._safe_json_list(row.get("CatalystCoreDetail", "[]"))
+        lig_list = self._safe_json_list(row.get("Ligand", "[]"))
+        combined: List[Any] = []
+        if core_pairs:
+            combined.extend(core_pairs)
+        if lig_list:
+            combined.extend(lig_list)
+        return combined
+
+    def _compute_condition_core(
+        self, row: Dict[str, Any], full_system_list: Optional[List[Any]] | None = None
+    ) -> str:
         core_gen = self._safe_json_list(row.get("CatalystCoreGeneric", "[]"))
         core_pairs = self._safe_json_list(row.get("CatalystCoreDetail", "[]"))
         lig_list = self._safe_json_list(row.get("Ligand", "[]"))
+
+        if full_system_list is None:
+            full_system_list = self._safe_json_list(row.get("FullCatalyticSystem", "[]"))
 
         metal = ""
         if self.taxonomy:
@@ -376,13 +448,20 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
         if not metal:
             metal = (core_gen[0] if core_gen else "").strip()
 
+        alt_metal = self._infer_metal_from_names(core_pairs, full_system_list, lig_list)
+        if alt_metal and (not metal or alt_metal.lower() != metal.lower()):
+            metal = alt_metal
+
         lig_tok = ""
         if lig_list:
             first = lig_list[0]
             cas = ""
             nm = ""
-            if "|" in first:
+            if isinstance(first, str) and "|" in first:
                 nm, cas = (first.split("|", 1) + [""])[:2]
+            elif isinstance(first, dict):
+                nm = first.get("name") or first.get("abbr") or first.get("token") or ""
+                cas = first.get("cas") or ""
             else:
                 nm = first
             if self.taxonomy:
@@ -467,13 +546,10 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
                     solv_list = self._safe_json_list(row.get("Solvent", "[]"))
 
-                    disp_core = self._compute_condition_core(row)
-                    full_system_list = self._safe_json_list(row.get("FullCatalyticSystem", "[]"))
-                    if not full_system_list:
-                        core_pairs = self._safe_json_list(row.get("CatalystCoreDetail", "[]"))
-                        lig_list = self._safe_json_list(row.get("Ligand", "[]"))
-                        full_system_list = (core_pairs or []) + (lig_list or [])
+                    full_system_list = self._collect_full_catalytic_system(row)
                     catalytic_system = self._join_names(full_system_list)
+
+                    disp_core = self._compute_condition_core(row, full_system_list)
 
                     T = row.get("Temperature_C", "")
                     t = row.get("Time_h", "")
@@ -527,7 +603,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
         for row in rows:
             rid = row.get("ReactionID", "")
             rtype = row.get("ReactionType", "")
-            condition_core = self._compute_condition_core(row)
+            full_system_list = self._collect_full_catalytic_system(row)
+            condition_core = self._compute_condition_core(row, full_system_list)
 
             reag_list = self._safe_json_list(row.get("Reagent", "[]"))
             role_list = self._safe_json_list(row.get("ReagentRole", "[]"))

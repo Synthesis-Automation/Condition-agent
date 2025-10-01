@@ -5,55 +5,60 @@ Total reactions: 1131
 ## Reaction 31-031-CAS-10178990
 
 - Type: Amination-Ni
-- Condition Core: Oxidant: DDQ
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 57
 - Temperature (C): 25.0
 - Time (h): 32.167
-- Reagents: 280-57-9 (280-57-9) [UNK], DDQ (2,3-dichloro-5,6-dicyano-1,4-benzoquinone) (84-58-2) [OXIDANT]
+- Reagents: Dabco (280-57-9) [BASE], DDQ (2,3-dichloro-5,6-dicyano-1,4-benzoquinone) (84-58-2) [OXIDANT]
 - Solvents: tert-Butyl methyl ether (1634-04-4), Dichloromethane (75-09-2)
 - SMILES: COC(=O)CC1CNc2ccccc21.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>COC(=O)Cc1cn([C@]2(CCN=[N+]=[N-])C(=O)Nc3ccccc32)c2ccccc12
 
 ## Reaction 31-031-CAS-10502554
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 82
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Clc1ccc2c(c1)CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3cc(Cl)ccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-10789921
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 85
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Brc1ccc2c(c1)NCC2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3ccc(Br)cc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-12607453
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 71
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Brc1ccc2c(c1)CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3cc(Br)ccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-12917197
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 87
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: c1ccc2c(c1)CCN2.COc1ccc2c(c1)C(Br)(CCN=[N+]=[N-])C(=O)N2>>COc1ccc2c(c1)[C@](CCN=[N+]=[N-])(N1CCc3ccccc31)C(=O)N2
 
@@ -61,6 +66,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: K3PO4
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 13.0
@@ -71,55 +77,60 @@ Total reactions: 1131
 ## Reaction 31-031-CAS-14769241
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Fc1ccc2c(c1)NCC2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3ccc(F)cc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-15046542
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 72
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: c1ccc2c(c1)CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccc(Cl)cc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3ccccc32)C(=O)Nc2ccc(Cl)cc21
 
 ## Reaction 31-031-CAS-15375022
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 87
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: c1ccc2c(c1)CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3ccccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-1661856
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 82
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: c1ccc2c(c1)CCN2.COC(=O)CC1(Br)C(=O)Nc2ccccc21>>COC(=O)C[C@@]1(N2CCc3ccccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-1986649
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 76
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Clc1cccc2c1CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3c(Cl)cccc32)C(=O)Nc2ccccc21
 
@@ -127,6 +138,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 244261-66-3, dtbbpy
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 48.0
@@ -137,6 +149,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 244261-66-3, dtbbpy
 - Yield %: 52
 - Temperature (C): 60.0
 - Time (h): 48.0
@@ -147,6 +160,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 244261-66-3, dtbbpy
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 48.0
@@ -157,6 +171,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 244261-66-3, dtbbpy
 - Yield %: 72
 - Temperature (C): 60.0
 - Time (h): 48.0
@@ -166,44 +181,48 @@ Total reactions: 1131
 ## Reaction 31-031-CAS-3776198
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 61
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: c1ccc2c(c1)CCN2.O=C1c2ccccc2C(=O)N1CCC1(Br)C(=O)Nc2ccccc21>>O=C1c2ccccc2C(=O)N1CC[C@@]1(N2CCc3ccccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-4066353
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Cc1ccc2c(c1)CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>Cc1ccc2c(c1)CCN2[C@]1(CCN=[N+]=[N-])C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-5908301
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 87
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: c1ccc2c(c1)CCN2.COC(=O)CCC1(Br)C(=O)Nc2ccccc21>>COC(=O)CC[C@@]1(N2CCc3ccccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-6249846
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 75
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: COc1ccc2c(c1)CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>COc1ccc2c(c1)CCN2[C@]1(CCN=[N+]=[N-])C(=O)Nc2ccccc21
 
@@ -211,6 +230,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: K3PO4
+- Catalytic System: 373-02-4, 174500-20-0
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 5.0
@@ -221,33 +241,36 @@ Total reactions: 1131
 ## Reaction 31-031-CAS-8047956
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 81
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: c1ccc2c(c1)CCCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCCc3ccccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-8372955
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 79
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Fc1ccc2c(c1)CCN2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3cc(F)ccc32)C(=O)Nc2ccccc21
 
 ## Reaction 31-031-CAS-8650461
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Base: Dabco
+- Catalytic System: 373-02-4, 229184-98-9
 - Yield %: 88
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
+- Reagents: Dabco (280-57-9) [BASE], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
 - SMILES: Clc1ccc2c(c1)NCC2.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>[N-]=[N+]=NCC[C@@]1(N2CCc3ccc(Cl)cc32)C(=O)Nc2ccccc21
 
@@ -255,6 +278,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Copper(I) iodide, 542-92-7, dtbbpy
 - Yield %: 72
 - Time (h): 8.0
 - Solvents: Toluene (108-88-3)
@@ -264,6 +288,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Copper(I) iodide, 542-92-7, dtbbpy
 - Yield %: 68
 - Time (h): 11.0
 - Solvents: Toluene (108-88-3)
@@ -273,6 +298,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Copper(I) iodide, 542-92-7, dtbbpy
 - Yield %: 70
 - Time (h): 8.0
 - Solvents: Toluene (108-88-3)
@@ -281,6 +307,8 @@ Total reactions: 1131
 ## Reaction 31-032-CAS-3050295
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 58
 - Temperature (C): 25.0
 - Time (h): 5.0
@@ -292,10 +320,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, dtbbpy
 - Yield %: 56
 - Temperature (C): 120.0
 - Time (h): 10.0
-- Reagents: 429-42-5 (429-42-5) [UNK], 1184-88-9 (1184-88-9) [UNK]
+- Reagents: Tetrabutylammonium Tetrafluoroborate (429-42-5) [LIG], 1184-88-9 (1184-88-9) [UNK]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.O=C(Nc1cccc2cccnc12)c1ccc(F)cc1>>O=C(Nc1cccc2cccnc12)c1ccc(F)cc1N1CCOCC1
 
@@ -303,6 +332,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 76
 - Temperature (C): 110.0
 - Time (h): 21.0
@@ -314,6 +344,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 6.0
@@ -325,6 +356,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1660-93-1, dtbbpy
 - Yield %: 71
 - Temperature (C): 110.0
 - Time (h): 12.0
@@ -335,6 +367,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1660-93-1, dtbbpy
 - Yield %: 85
 - Temperature (C): 110.0
 - Time (h): 12.0
@@ -344,20 +377,24 @@ Total reactions: 1131
 ## Reaction 31-146-CAS-18229413
 
 - Type: Amination-Ni
+- Condition Core: Base: 1,1,3,3-Tetramethylguanidine
+- Catalytic System: 373-02-4, 4589-12-2
 - Yield %: 80
 - Temperature (C): 60.0
 - Time (h): 24.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Toluene (108-88-3)
 - SMILES: c1ccc(N2CCNCC2)cc1.OB(O)c1ccc(F)cc1>>Fc1ccc(N2CCN(c3ccccc3)CC2)cc1
 
 ## Reaction 31-146-CAS-18231354
 
 - Type: Amination-Ni
+- Condition Core: Base: 1,1,3,3-Tetramethylguanidine
+- Catalytic System: 373-02-4, 4589-12-2
 - Yield %: 78
 - Temperature (C): 60.0
 - Time (h): 24.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Toluene (108-88-3)
 - SMILES: c1ccc(N2CCNCC2)cc1.OB(O)c1cccc(Cl)c1>>Clc1cccc(N2CCN(c3ccccc3)CC2)c1
 
@@ -365,17 +402,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 79
 - Temperature (C): 25.0
 - Time (h): 78.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCCC2)cc1
 
 ## Reaction 31-172-CAS-10002197
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 60.0
 - Time (h): 2.0
@@ -386,7 +425,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-10167500
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.5
@@ -397,7 +437,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-10262810
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 81
 - Temperature (C): 60.0
 - Time (h): 1.5
@@ -408,7 +449,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-10749652
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 1.417
@@ -419,7 +461,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-10806249
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 0.75
@@ -431,6 +474,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 62
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -441,7 +485,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-10920659
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.833
@@ -452,7 +497,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-11033591
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -463,7 +509,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-11097128
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 0.5
@@ -475,6 +522,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 58
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -485,7 +533,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-11146111
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 84
 - Temperature (C): 60.0
 - Time (h): 1.333
@@ -497,6 +546,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 80
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -507,7 +557,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-11448269
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 0.833
@@ -518,7 +569,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-11806881
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 93
 - Temperature (C): 60.0
 - Time (h): 0.383
@@ -529,7 +581,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-12073378
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 60.0
 - Time (h): 1.25
@@ -540,7 +593,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-12584901
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 92
 - Temperature (C): 60.0
 - Time (h): 0.583
@@ -551,7 +605,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-12894236
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 84
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -562,7 +617,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-13154339
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 82
 - Temperature (C): 60.0
 - Time (h): 1.25
@@ -573,7 +629,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-13546403
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.283
@@ -584,7 +641,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-13551859
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 92
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -595,7 +653,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-13666841
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 84
 - Temperature (C): 60.0
 - Time (h): 1.833
@@ -606,7 +665,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-13762846
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -617,7 +677,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-14099748
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 93
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -628,7 +689,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-14153409
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 2.167
@@ -639,7 +701,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-14205396
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 1.5
@@ -650,7 +713,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-14366282
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -661,7 +725,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-14470347
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.667
@@ -672,7 +737,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-15189083
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -683,7 +749,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-15362453
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 0.75
@@ -695,10 +762,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1072067-44-7, dtbbpy
 - Yield %: 73
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: N#Cc1ccc(Br)cc1.FC(F)(F)Oc1ccc(C2CCNCC2)cc1>>N#Cc1ccc(N2CCC(c3ccc(OC(F)(F)F)cc3)CC2)cc1
 
@@ -706,10 +774,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 96
 - Temperature (C): -78.0
 - Time (h): 4.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -717,10 +786,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 76
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.CC(C)(C)OC(=O)N1CCNCC1>>CC(C)(C)OC(=O)N1CCN(c2ccc(C(F)(F)F)cc2)CC1
 
@@ -728,6 +798,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 70
 - Temperature (C): 25.0
 - Time (h): 48.0
@@ -739,10 +810,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 89
 - Temperature (C): 55.0
 - Time (h): 8.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.c1ccc2c(c1)CCN2>>FC(F)(F)c1ccc(N2CCc3ccccc32)cc1
 
@@ -750,10 +822,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 73
 - Temperature (C): 55.0
 - Time (h): 42.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.CCCCCNC>>CCCCCN(C)c1ccc(C(F)(F)F)cc1
 
@@ -761,10 +834,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 60
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.CC1CCCN1>>CC1CCCN1c1ccc(C(F)(F)F)cc1
 
@@ -772,10 +846,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 91
 - Temperature (C): -78.0
 - Time (h): 8.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -783,10 +858,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 60
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CCOC(=O)c1ncn2c1CN(C)C(=O)c1cc(Br)ccc1-2>>CCOC(=O)c1ncn2c1CN(C)C(=O)c1cc(N3CCCCC3)ccc1-2
 
@@ -794,10 +870,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 59
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3cccc(Br)c3C2)CN1C(=O)OCc1ccccc1>>COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3cccc(N4CCCCC4)c3C2)CN1C(=O)OCc1ccccc1
 
@@ -805,10 +882,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 89
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.O=C1O[C@@H](Cn2ccnn2)CN1c1ccc(I)c(F)c1>>O=C1O[C@@H](Cn2ccnn2)CN1c1ccc(N2CCCCC2)c(F)c1
 
@@ -816,17 +894,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 73
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CCCc1nc2ccc(I)cc2c(=O)n1Cc1ccc(-c2ccccc2S(=O)(=O)NC(C)(C)C)cc1>>CCCc1nc2ccc(N3CCCCC3)cc2c(=O)n1Cc1ccc(-c2ccccc2S(=O)(=O)NC(C)(C)C)cc1
 
 ## Reaction 31-172-CAS-1635611
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 2.0
@@ -838,6 +918,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 92
 - Temperature (C): 100.0
 - Time (h): 21.0
@@ -849,6 +930,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 88
 - Temperature (C): 100.0
 - Time (h): 21.0
@@ -860,6 +942,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 85
 - Temperature (C): 110.0
 - Time (h): 21.0
@@ -871,6 +954,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 82
 - Temperature (C): 100.0
 - Time (h): 21.0
@@ -882,6 +966,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 80
 - Temperature (C): 100.0
 - Time (h): 21.0
@@ -893,6 +978,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 21.0
@@ -904,6 +990,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 80
 - Temperature (C): 100.0
 - Time (h): 21.0
@@ -915,6 +1002,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2001039-58-1, dtbbpy
 - Yield %: 84
 - Temperature (C): 100.0
 - Time (h): 21.0
@@ -925,7 +1013,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-1663157
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 94
 - Temperature (C): 60.0
 - Time (h): 0.333
@@ -937,10 +1026,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 70236-68-9, dtbbpy
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 16.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Cyclopentyl methyl ether (5614-37-9)
 - SMILES: Clc1cccc2ccccc12.c1ccc2[nH]ccc2c1>>c1ccc2c(-n3ccc4ccccc43)cccc2c1
 
@@ -948,6 +1038,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 258278-25-0, dtbbpy
 - Yield %: 51
 - Temperature (C): 80.0
 - Time (h): 4.0
@@ -959,6 +1050,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 80
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -970,6 +1062,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 74
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -981,6 +1074,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 84
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -992,6 +1086,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 74
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1003,6 +1098,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 52
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1014,6 +1110,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 50
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1025,6 +1122,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 83
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1036,6 +1134,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 80
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1047,6 +1146,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 70
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1058,6 +1158,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 90
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1069,6 +1170,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 95
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1080,6 +1182,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 81
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1091,6 +1194,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 65
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1102,6 +1206,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 86
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1113,6 +1218,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 82
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1124,6 +1230,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 92
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1135,6 +1242,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 80
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1146,6 +1254,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 83
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1157,6 +1266,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 81
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1168,6 +1278,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 94
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1179,6 +1290,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 84
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1190,6 +1302,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 88
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1201,6 +1314,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 83
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1212,6 +1326,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 93
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1223,6 +1338,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 75
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1234,6 +1350,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 78
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1245,6 +1362,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 58
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1256,6 +1374,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 66
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1267,6 +1386,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 52
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1278,6 +1398,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 65
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1289,6 +1410,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 73
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1300,6 +1422,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 52
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1311,6 +1434,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 68
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1322,6 +1446,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 67
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1333,6 +1458,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 56
 - Temperature (C): 150.0
 - Time (h): 24.083
@@ -1344,10 +1470,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 96
 - Temperature (C): 100.0
 - Time (h): 13.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: C1COCCN1.Fc1ccc(Oc2ccccn2)cc1>>Fc1ccc(N2CCOCC2)cc1
 
@@ -1355,10 +1482,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 52
 - Temperature (C): 100.0
 - Time (h): 13.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: C1COCCN1.Fc1ccccc1Oc1ccccn1>>Fc1ccccc1N1CCOCC1
 
@@ -1366,17 +1494,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 205237-35-0, dtbbpy
 - Yield %: 95
 - Temperature (C): 28.0
 - Time (h): 0.167
-- Reagents: 280-57-9 (280-57-9) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
+- Reagents: Dabco (280-57-9) [BASE], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-172-CAS-1768305
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 86
 - Temperature (C): 60.0
 - Time (h): 1.5
@@ -1388,6 +1518,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Potassium tert-butoxide, IPrCl
 - Yield %: 5
 - Temperature (C): 100.0
 - Time (h): 49.5
@@ -1399,6 +1530,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Potassium tert-butoxide, IPrCl
 - Yield %: 11
 - Temperature (C): 100.0
 - Time (h): 49.5
@@ -1410,6 +1542,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 3.0
@@ -1421,6 +1554,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 55
 - Temperature (C): 25.0
 - Time (h): 8.0
@@ -1432,6 +1566,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 87
 - Temperature (C): 25.0
 - Time (h): 3.0
@@ -1443,6 +1578,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1454,6 +1590,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 79
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1465,6 +1602,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 72
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1476,6 +1614,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 65
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1487,6 +1626,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1498,6 +1638,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 80
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1509,6 +1650,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 76
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1520,6 +1662,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 53
 - Temperature (C): 25.0
 - Time (h): 3.0
@@ -1531,6 +1674,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 68
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1542,6 +1686,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 69
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1553,6 +1698,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 62
 - Temperature (C): 25.0
 - Time (h): 5.0
@@ -1564,6 +1710,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 3.0
@@ -1575,6 +1722,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 67
 - Temperature (C): 25.0
 - Time (h): 4.5
@@ -1586,17 +1734,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 63
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: CNS(=O)(=O)c1ccc(C)cc1.CC(C)(C)c1ccc(Br)cc1>>Cc1ccc(S(=O)(=O)N(C)c2ccc(C(C)(C)C)cc2)cc1
 
 ## Reaction 31-172-CAS-18793731
 
 - Type: Amination-Ni
-- Condition Core: Reductant: H2
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 18.0
@@ -1607,7 +1757,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-188402
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 86
 - Temperature (C): 60.0
 - Time (h): 0.667
@@ -1619,10 +1770,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1934269-97-2, dtbbpy
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -1630,9 +1782,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1934269-97-2, dtbbpy
 - Yield %: 83
 - Temperature (C): 25.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -1640,10 +1793,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1934269-97-2, dtbbpy
 - Yield %: 96
 - Temperature (C): 60.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: COc1ccc(Br)cc1.C1CCNC1>>COc1ccc(N2CCCC2)cc1
 
@@ -1651,10 +1805,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1934269-97-2, dtbbpy
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1ccc2ccccc2c1>>c1ccc2cc(N3CCCC3)ccc2c1
 
@@ -1662,10 +1817,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1934269-97-2, dtbbpy
 - Yield %: 68
 - Temperature (C): 60.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1ccccn1.C1CCNC1>>c1ccc(N2CCCC2)nc1
 
@@ -1673,6 +1829,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), DPPF
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 16.0
@@ -1684,6 +1841,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), DPPF
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 16.0
@@ -1695,6 +1853,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), DPPF
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 16.0
@@ -1706,6 +1865,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2225857-66-7, dtbbpy
 - Yield %: 90
 - Temperature (C): 110.0
 - Time (h): 17.0
@@ -1717,6 +1877,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), DPPF
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 16.0
@@ -1728,6 +1889,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 81
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1739,6 +1901,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 67
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1750,6 +1913,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 70
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1761,6 +1925,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 51
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1772,6 +1937,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 62
 - Temperature (C): 170.0
 - Time (h): 24.0
@@ -1783,6 +1949,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 56
 - Temperature (C): 170.0
 - Time (h): 24.0
@@ -1794,6 +1961,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 50
 - Temperature (C): 170.0
 - Time (h): 24.0
@@ -1805,6 +1973,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 68
 - Temperature (C): 170.0
 - Time (h): 24.0
@@ -1816,6 +1985,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 75
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1827,6 +1997,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 71
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1838,6 +2009,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 63
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1849,6 +2021,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 70
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1860,6 +2033,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 54
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1871,6 +2045,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 61
 - Temperature (C): 130.0
 - Time (h): 24.0
@@ -1882,9 +2057,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 92
 - Time (h): 3.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1cc(Br)cc(C(F)(F)F)c1.OCC1CCCNC1>>OCC1CCCN(c2cc(C(F)(F)F)cc(C(F)(F)F)c2)C1
 
@@ -1892,16 +2068,18 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 92
 - Time (h): 3.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Cl.OC1CNC1.FC(F)(F)c1ccc(Br)cn1>>OC1CN(c2ccc(C(F)(F)F)nc2)C1
 
 ## Reaction 31-172-CAS-19837394
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 62
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -1913,6 +2091,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 66
 - Temperature (C): 25.0
 - Time (h): 7.0
@@ -1924,6 +2103,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -1934,6 +2114,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 98
 - Temperature (C): 25.0
 - Time (h): 48.0
@@ -1944,6 +2125,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 80
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -1954,6 +2136,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 62
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -1964,6 +2147,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 98
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -1974,6 +2158,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 96
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -1984,6 +2169,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 97
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -1994,6 +2180,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -2004,6 +2191,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 93
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -2014,6 +2202,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1306-23-6, dtbbpy
 - Yield %: 87
 - Temperature (C): 55.0
 - Time (h): 24.0
@@ -2024,7 +2213,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-2017907
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.583
@@ -2036,10 +2226,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 81
 - Temperature (C): 25.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCOCC2)cc1
 
@@ -2047,10 +2238,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: CC(=O)c1ccc(Br)cc1.C1COCCN1>>CC(=O)c1ccc(N2CCOCC2)cc1
 
@@ -2058,10 +2250,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 51
 - Temperature (C): 25.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.O=Cc1ccc(Br)cc1>>O=Cc1ccc(N2CCOCC2)cc1
 
@@ -2069,10 +2262,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 89
 - Temperature (C): 25.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCOCC2)cc1
 
@@ -2080,10 +2274,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 84
 - Temperature (C): 25.0
 - Time (h): 21.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -2091,10 +2286,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 89
 - Temperature (C): 25.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccccc1Br>>N#Cc1ccccc1N1CCCC1
 
@@ -2102,10 +2298,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 81
 - Temperature (C): 25.0
 - Time (h): 78.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCCCC2)cc1
 
@@ -2113,10 +2310,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 91
 - Temperature (C): 25.0
 - Time (h): 19.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
@@ -2124,10 +2322,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 92
 - Temperature (C): 25.0
 - Time (h): 23.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCCC2)cc1
 
@@ -2135,10 +2334,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -2146,10 +2346,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2380324-83-2, dtbbpy
 - Yield %: 63
 - Temperature (C): 80.0
 - Time (h): 16.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Toluene (108-88-3)
 - SMILES: c1ccc2[nH]ccc2c1.N#Cc1ccc(Cl)cc1>>N#Cc1ccc(-n2ccc3ccccc32)cc1
 
@@ -2157,17 +2358,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2379878-02-9, 2380324-31-0, dtbbpy
 - Yield %: 79
 - Temperature (C): 80.0
 - Time (h): 16.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Cyclopentyl methyl ether (5614-37-9)
 - SMILES: C1COCCN1.N#Cc1ccc(Cl)cc1>>N#Cc1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-172-CAS-2151755
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 60.0
 - Time (h): 0.583
@@ -2179,9 +2382,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 97
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -2189,9 +2393,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 87
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.COC(=O)c1ccc(Br)cc1>>COC(=O)c1ccc(N2CCCC2)cc1
 
@@ -2199,9 +2404,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 90
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Brc1ccccc1.C1CCNC1>>c1ccc(N2CCCC2)cc1
 
@@ -2209,9 +2415,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 80
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: COc1ccc(Br)cc1.C1CCNC1>>COc1ccc(N2CCCC2)cc1
 
@@ -2219,9 +2426,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 75
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Cc1ccccc1Br.C1CCNC1>>Cc1ccccc1N1CCCC1
 
@@ -2229,9 +2437,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 94
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Clc1cccc(Br)c1.C1CCNC1>>Clc1cccc(N2CCCC2)c1
 
@@ -2239,9 +2448,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 82
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Brc1ccccn1.C1CCNC1>>c1ccc(N2CCCC2)nc1
 
@@ -2249,9 +2459,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 98
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Brc1cncnc1>>c1ncc(N2CCCC2)cn1
 
@@ -2259,9 +2470,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 82
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Brc1cnn(Cc2ccccc2)c1>>c1ccc(Cn2cc(N3CCCC3)cn2)cc1
 
@@ -2269,9 +2481,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 83
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Brc1cccc2ncccc12>>c1cc(N2CCCC2)c2cccnc2c1
 
@@ -2279,9 +2492,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 67
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Cn1ccc2cc(Br)ccc21>>Cn1ccc2cc(N3CCCC3)ccc21
 
@@ -2289,9 +2503,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 84
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Cn1ncc2ccc(Br)cc21>>Cn1ncc2ccc(N3CCCC3)cc21
 
@@ -2299,9 +2514,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 71
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1cccnc1>>c1cncc(N2CCCC2)c1
 
@@ -2309,9 +2525,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 93
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Cl)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
@@ -2319,9 +2536,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 63
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: FC(F)(F)c1ccc(Cl)cc1.C1COCCN1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -2329,9 +2547,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 94
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -2339,9 +2558,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Yield %: 92
 - Temperature (C): 80.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Brc1cncnc1>>c1ncc(N2CCCC2)cn1
 
@@ -2349,10 +2569,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 93
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCCC2)cc1
 
@@ -2360,10 +2581,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 81
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -2371,10 +2593,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.OC1CCNCC1>>OC1CCN(c2ccc(C(F)(F)F)cc2)CC1
 
@@ -2382,10 +2605,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 68
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -2393,10 +2617,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 80
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.c1ccc2c(c1)CCN2>>FC(F)(F)c1ccc(N2CCc3ccccc32)cc1
 
@@ -2404,10 +2629,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 63
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.CCCNC>>CCCN(C)c1ccc(C(F)(F)F)cc1
 
@@ -2415,10 +2641,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: CC(=O)c1ccc(Br)cc1.C1CCNCC1>>CC(=O)c1ccc(N2CCCCC2)cc1
 
@@ -2426,10 +2653,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCCCC2)cc1
 
@@ -2437,10 +2665,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 58
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Clc1ccc(Br)cc1.C1CCNCC1>>Clc1ccc(N2CCCCC2)cc1
 
@@ -2448,10 +2677,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 53
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Cc1ccc(Br)cc1.C1CCNCC1>>Cc1ccc(N2CCCCC2)cc1
 
@@ -2459,10 +2689,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 84
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.NC(=O)c1ccc(Br)cc1>>NC(=O)c1ccc(N2CCCCC2)cc1
 
@@ -2470,10 +2701,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 81
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.CNC(=O)c1ccc(Br)cc1>>CNC(=O)c1ccc(N2CCCCC2)cc1
 
@@ -2481,10 +2713,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 51
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.COC(=O)c1ccc(Br)cc1>>COC(=O)c1ccc(N2CCCCC2)cc1
 
@@ -2492,10 +2725,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 94
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCCC2)cc1
 
@@ -2503,10 +2737,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 78
 - Temperature (C): 25.0
 - Time (h): 18.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.FC(F)(F)Oc1cccc(Br)c1>>FC(F)(F)Oc1cccc(N2CCCCC2)c1
 
@@ -2514,10 +2749,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 154769-61-6, dtbbpy
 - Yield %: 98
 - Temperature (C): 25.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -2525,10 +2761,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 154769-61-6, dtbbpy
 - Yield %: 96
 - Temperature (C): 25.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -2536,10 +2773,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 154769-61-6, dtbbpy
 - Yield %: 98
 - Temperature (C): 55.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.Brc1cncnc1>>c1ncc(N2CCOCC2)cn1
 
@@ -2547,10 +2785,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 154769-61-6, dtbbpy
 - Yield %: 72
 - Temperature (C): 55.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.Brc1cccnc1>>c1cncc(N2CCOCC2)c1
 
@@ -2558,17 +2797,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 154769-61-6, dtbbpy
 - Yield %: 90
 - Temperature (C): 55.0
 - Time (h): 20.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.OC1CCNCC1>>OC1CCN(c2ccc(C(F)(F)F)cc2)CC1
 
 ## Reaction 31-172-CAS-2250244
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 1.167
@@ -2579,660 +2820,720 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-22606458
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 99
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-172-CAS-22606459
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC(=O)c1ccc(Br)cc1.C1CCNC1>>CC(=O)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-172-CAS-22606460
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
 ## Reaction 31-172-CAS-22606461
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 71
 - Temperature (C): 60.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-172-CAS-22606462
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 87
 - Temperature (C): 60.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.O=[N+]([O-])c1ccc(Br)cc1>>O=[N+]([O-])c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-172-CAS-22606463
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 96
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.COC(=O)c1ccc(Br)cc1>>COC(=O)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-172-CAS-22606464
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 90
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.N#Cc1ccccc1Br>>N#Cc1ccccc1N1CCCC1
 
 ## Reaction 31-172-CAS-22606465
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 73
 - Temperature (C): 60.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1ccc2ccccc2n1>>c1ccc2nc(N3CCCC3)ccc2c1
 
 ## Reaction 31-172-CAS-22606466
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 61
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1cccc2ncccc12>>c1cc(N2CCCC2)c2cccnc2c1
 
 ## Reaction 31-172-CAS-22606467
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 84
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1ccc2cccnc2c1>>c1cnc2cc(N3CCCC3)ccc2c1
 
 ## Reaction 31-172-CAS-22606468
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1nccc2ccccc12>>c1ccc2c(N3CCCC3)nccc2c1
 
 ## Reaction 31-172-CAS-22606469
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 88
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1cccc2ccncc12>>c1cc(N2CCCC2)c2cnccc2c1
 
 ## Reaction 31-172-CAS-22606470
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 99
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1cnc2ccccc2n1>>c1ccc2nc(N3CCCC3)cnc2c1
 
 ## Reaction 31-172-CAS-22606471
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Brc1ccc2nccnc2c1>>c1cnc2cc(N3CCCC3)ccc2n1
 
 ## Reaction 31-172-CAS-22606472
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1ncc2ccccc2n1>>c1ccc2nc(N3CCCC3)ncc2c1
 
 ## Reaction 31-172-CAS-22606473
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.COc1cc2ncnc(Cl)c2cc1OC>>COc1cc2ncnc(N3CCCC3)c2cc1OC
 
 ## Reaction 31-172-CAS-22606474
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Brc1cccc2ncncc12>>c1cc(N2CCCC2)c2cncnc2c1
 
 ## Reaction 31-172-CAS-22606475
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.COc1cc(Br)ccn1>>COc1cc(N2CCCC2)ccn1
 
 ## Reaction 31-172-CAS-22606476
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 64
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.COC(=O)c1ccnc(Br)c1>>COC(=O)c1ccnc(N2CCCC2)c1
 
 ## Reaction 31-172-CAS-22606477
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 74
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.N#Cc1cccnc1Br>>N#Cc1cccnc1N1CCCC1
 
 ## Reaction 31-172-CAS-22606478
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 65
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.FC(F)(F)c1cccnc1Br>>FC(F)(F)c1cccnc1N1CCCC1
 
 ## Reaction 31-172-CAS-22606479
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 77
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1cnccn1>>c1cnc(N2CCCC2)cn1
 
 ## Reaction 31-172-CAS-22606480
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 80
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1ncccn1>>c1cnc(N2CCCC2)nc1
 
 ## Reaction 31-172-CAS-22606481
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1cnc(Cl)nc1>>Clc1cnc(N2CCCC2)nc1
 
 ## Reaction 31-172-CAS-22606482
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 79
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Fc1cnc(Cl)nc1>>Fc1cnc(N2CCCC2)nc1
 
 ## Reaction 31-172-CAS-22606483
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccnc(Cl)n1>>FC(F)(F)c1ccnc(N2CCCC2)n1
 
 ## Reaction 31-172-CAS-22606484
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 81
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.CSc1ccnc(Cl)n1>>CSc1ccnc(N2CCCC2)n1
 
 ## Reaction 31-172-CAS-22606485
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 95
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1nc2ccccc2o1>>c1ccc2oc(N3CCCC3)nc2c1
 
 ## Reaction 31-172-CAS-22606486
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 97
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Clc1nc2ccccc2s1>>c1ccc2sc(N3CCCC3)nc2c1
 
 ## Reaction 31-172-CAS-22606487
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 59
 - Temperature (C): 60.0
 - Time (h): 2.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNC1.Brc1nccs1>>c1csc(N2CCCC2)n1
 
 ## Reaction 31-172-CAS-22606488
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 91
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CNC1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCC2)cc1
 
 ## Reaction 31-172-CAS-22606489
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 91
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC1CCCN1.CS(=O)(=O)c1ccc(Br)cc1>>CC1CCCN1c1ccc(S(C)(=O)=O)cc1
 
 ## Reaction 31-172-CAS-22606490
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.C1CCC2CNCC2C1>>CS(=O)(=O)c1ccc(N2CC3CCCCC3C2)cc1
 
 ## Reaction 31-172-CAS-22606491
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 87
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.CC1(C)C2CNCC21>>CC1(C)C2CN(c3ccc(S(C)(=O)=O)cc3)CC21
 
 ## Reaction 31-172-CAS-22606492
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.CC(C)(C)OC(=O)N1CC2CNCC2C1>>CC(C)(C)OC(=O)N1CC2CN(c3ccc(S(C)(=O)=O)cc3)CC2C1
 
 ## Reaction 31-172-CAS-22606493
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 91
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCCCC2)cc1
 
 ## Reaction 31-172-CAS-22606494
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 96
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC1CCNCC1.CS(=O)(=O)c1ccc(Br)cc1>>CC1CCN(c2ccc(S(C)(=O)=O)cc2)CC1
 
 ## Reaction 31-172-CAS-22606495
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: c1ccc(C2CCNCC2)cc1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCC(c3ccccc3)CC2)cc1
 
 ## Reaction 31-172-CAS-22606496
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 95
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: c1ccc2c(c1)CCNC2.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCc3ccccc3C2)cc1
 
 ## Reaction 31-172-CAS-22606497
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 91
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.N#CC1CCNCC1>>CS(=O)(=O)c1ccc(N2CCC(C#N)CC2)cc1
 
 ## Reaction 31-172-CAS-22606498
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 76
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: COC(=O)C1CCNCC1.CS(=O)(=O)c1ccc(Br)cc1>>COC(=O)C1CCN(c2ccc(S(C)(=O)=O)cc2)CC1
 
 ## Reaction 31-172-CAS-22606499
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.C1CC(N2CCOCC2)CCN1>>CS(=O)(=O)c1ccc(N2CCC(N3CCOCC3)CC2)cc1
 
 ## Reaction 31-172-CAS-22606500
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 76
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.OC1CCNCC1>>CS(=O)(=O)c1ccc(N2CCC(O)CC2)cc1
 
 ## Reaction 31-172-CAS-22606501
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 90
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.COC1CCNCC1>>COC1CCN(c2ccc(S(C)(=O)=O)cc2)CC1
 
 ## Reaction 31-172-CAS-22606502
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Manganese powder, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 63
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CC2(CCN1)OCCO2.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCC3(CC2)OCCO3)cc1
 
 ## Reaction 31-172-CAS-22606503
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.FC1(F)CCNCC1>>CS(=O)(=O)c1ccc(N2CCC(F)(F)CC2)cc1
 
 ## Reaction 31-172-CAS-22606504
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Manganese powder, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 52
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CNCCN1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCNCC2)cc1
 
 ## Reaction 31-172-CAS-22606505
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 71
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC1CNCCN1.CS(=O)(=O)c1ccc(Br)cc1>>CC1CN(c2ccc(S(C)(=O)=O)cc2)CCN1
 
 ## Reaction 31-172-CAS-22606506
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 88
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CN1CCNCC1.CS(=O)(=O)c1ccc(Br)cc1>>CN1CCN(c2ccc(S(C)(=O)=O)cc2)CC1
 
 ## Reaction 31-172-CAS-22606507
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Manganese powder, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 70
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.CN1CCNCC1=O>>CN1CCN(c2ccc(S(C)(=O)=O)cc2)CC1=O
 
 ## Reaction 31-172-CAS-22606508
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Manganese powder, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 85
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.COCCN1CCNCC1>>COCCN1CCN(c2ccc(S(C)(=O)=O)cc2)CC1
 
 ## Reaction 31-172-CAS-22606509
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.C=CCN1CCNCC1>>C=CCN1CCN(c2ccc(S(C)(=O)=O)cc2)CC1
 
 ## Reaction 31-172-CAS-22606510
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.c1ccc(N2CCNCC2)nc1>>CS(=O)(=O)c1ccc(N2CCN(c3ccccn3)CC2)cc1
 
 ## Reaction 31-172-CAS-22606511
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Manganese powder, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.CC(C)(C)OC(=O)N1CCNCC1>>CC(C)(C)OC(=O)N1CCN(c2ccc(S(C)(=O)=O)cc2)CC1
 
 ## Reaction 31-172-CAS-22606512
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Manganese powder, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1COCCN1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-172-CAS-22606513
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 67
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCCNCC1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCCCCC2)cc1
 
 ## Reaction 31-172-CAS-22606514
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 73
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CNCc1ccccc1.CS(=O)(=O)c1ccc(Br)cc1>>CN(Cc1ccccc1)c1ccc(S(C)(=O)=O)cc1
 
 ## Reaction 31-172-CAS-22606515
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 84
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CNCCc1ccccc1.CS(=O)(=O)c1ccc(Br)cc1>>CN(CCc1ccccc1)c1ccc(S(C)(=O)=O)cc1
 
 ## Reaction 31-172-CAS-22606516
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 66
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CNCC(OC)OC.CS(=O)(=O)c1ccc(Br)cc1>>COC(CN(C)c1ccc(S(C)(=O)=O)cc1)OC
 
 ## Reaction 31-172-CAS-22606517
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 74
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CS(=O)(=O)c1ccc(Br)cc1.CNCCOC>>COCCN(C)c1ccc(S(C)(=O)=O)cc1
 
@@ -3240,9 +3541,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 2489240-33-5, dtbbpy
 - Yield %: 52
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CCOC(=O)c1ncn2c1CN(C)C(=O)c1cc(Br)ccc1-2>>CCOC(=O)c1ncn2c1CN(C)C(=O)c1cc(N3CCCCC3)ccc1-2
 
@@ -3250,9 +3552,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 2489240-33-5, dtbbpy
 - Yield %: 55
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3c(F)ccc(Br)c3C2)CN1C(=O)OC(C)(C)C>>COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3c(F)ccc(N4CCCCC4)c3C2)CN1C(=O)OC(C)(C)C
 
@@ -3260,9 +3563,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 53
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3cccc(Br)c3C2)CN1C(=O)OCc1ccccc1>>COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3cccc(N4CCCCC4)c3C2)CN1C(=O)OCc1ccccc1
 
@@ -3270,6 +3574,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 82
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3281,6 +3586,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 71
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3292,6 +3598,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 60
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3303,6 +3610,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 52
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3314,6 +3622,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 61
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3325,6 +3634,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 53
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3336,6 +3646,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 61
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3347,6 +3658,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 72
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3358,6 +3670,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 60
 - Temperature (C): 80.0
 - Time (h): 28.0
@@ -3369,6 +3682,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 8
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3380,6 +3694,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 62
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3391,6 +3706,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 72
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3402,6 +3718,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 81
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3413,6 +3730,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 62
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3424,6 +3742,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 90
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3435,6 +3754,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 81
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3446,6 +3766,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 74
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3457,6 +3778,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 55
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3468,6 +3790,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 76
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3479,6 +3802,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 69
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3490,6 +3814,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 82
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3501,6 +3826,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 55
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3512,6 +3838,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 66
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3523,6 +3850,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 72
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3534,6 +3862,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 52
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3545,6 +3874,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 68
 - Temperature (C): 80.0
 - Time (h): 25.0
@@ -3556,6 +3886,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 97
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -3567,6 +3898,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 53
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3578,6 +3910,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 75
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3589,6 +3922,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 62
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3600,6 +3934,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 86
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3611,6 +3946,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 85
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3622,6 +3958,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 52
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3633,6 +3970,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 51
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3644,6 +3982,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, Dabco, dtbbpy
 - Yield %: 81
 - Temperature (C): 55.0
 - Time (h): 16.0
@@ -3654,7 +3993,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-2349331
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 1.5
@@ -3666,10 +4006,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 2173009-61-3, dtbbpy
 - Yield %: 100
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CCn1c(=O)c2c(nc(N[C@@H]3CCC[C@H]3O)n2Cc2ccc(OC)c(Br)c2)n(CCO)c1=O>>CCn1c(=O)c2c(nc(N[C@@H]3CCC[C@H]3O)n2Cc2ccc(OC)c(N3CCCCC3)c2)n(CCO)c1=O
 
@@ -3677,10 +4018,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 632-69-9, dtbbpy
 - Yield %: 81
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3cccc(Br)c3C2)CN1C(=O)OCc1ccccc1>>COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3cccc(N4CCCCC4)c3C2)CN1C(=O)OCc1ccccc1
 
@@ -3688,10 +4030,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, fac‑Tris(2‑phenylpyridinato)iridium(III), dtbbpy
 - Yield %: 100
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CCOC(=O)c1ncn2c1CN(C)C(=O)c1cc(Br)ccc1-2>>CCOC(=O)c1ncn2c1CN(C)C(=O)c1cc(N3CCCCC3)ccc1-2
 
@@ -3699,10 +4042,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, fac‑Tris(2‑phenylpyridinato)iridium(III), dtbbpy
 - Yield %: 55
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3c(F)ccc(Br)c3C2)CN1C(=O)OC(C)(C)C>>COC(=O)[C@@H]1C[C@@H](OC(=O)N2Cc3c(F)ccc(N4CCCCC4)c3C2)CN1C(=O)OC(C)(C)C
 
@@ -3710,10 +4054,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 2173009-59-9, dtbbpy
 - Yield %: 85
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CN1C(=O)C[C@@](C)(c2cc(Br)cs2)N=C1NC(=O)OC(C)(C)C>>CN1C(=O)C[C@@](C)(c2cc(N3CCCCC3)cs2)N=C1NC(=O)OC(C)(C)C
 
@@ -3721,10 +4066,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 2173009-61-3, dtbbpy
 - Yield %: 100
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.O=C1O[C@@H](Cn2ccnn2)CN1c1ccc(I)c(F)c1>>O=C1O[C@@H](Cn2ccnn2)CN1c1ccc(N2CCCCC2)c(F)c1
 
@@ -3732,10 +4078,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 2173009-61-3, dtbbpy
 - Yield %: 100
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CCCc1nc2ccc(I)cc2c(=O)n1Cc1ccc(-c2ccccc2S(=O)(=O)NC(C)(C)C)cc1>>CCCc1nc2ccc(N3CCCCC3)cc2c(=O)n1Cc1ccc(-c2ccccc2S(=O)(=O)NC(C)(C)C)cc1
 
@@ -3743,10 +4090,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, fac‑Tris(2‑phenylpyridinato)iridium(III), dtbbpy
 - Yield %: 89
 - Temperature (C): 55.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK], Acetic acid (64-19-7) [SOLVENT]
+- Reagents: Dabco (280-57-9) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C1CCNCC1.CCOC(=O)N1CCC(=C2c3ccc(Cl)cc3CCc3cc(Br)cnc32)CC1>>CCOC(=O)N1CCC(=C2c3ccc(Cl)cc3CCc3cc(N4CCCCC4)cnc32)CC1
 
@@ -3754,10 +4102,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 63
 - Temperature (C): 80.0
 - Time (h): 14.1
-- Reagents: Zinc dust (7440-66-6) [REDUCTANT], Lithium chloride (7447-41-8) [ADDITIVE], Zinc chloride (7646-85-7) [ADDITIVE], 1907-33-1 (1907-33-1) [UNK]
+- Reagents: Zinc dust (7440-66-6) [REDUCTANT], Lithium chloride (7447-41-8) [ADDITIVE], Zinc chloride (7646-85-7) [ADDITIVE], 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Fc1ccccc1Cl.COc1ccc(NC(=O)c2ccccc2F)cc1>>COc1ccc(-n2c(=O)c3ccccc3c3ccccc32)cc1
 
@@ -3765,10 +4114,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 57
 - Temperature (C): 100.0
 - Time (h): 14.1
-- Reagents: Zinc dust (7440-66-6) [REDUCTANT], Lithium chloride (7447-41-8) [ADDITIVE], Zinc chloride (7646-85-7) [ADDITIVE], 1907-33-1 (1907-33-1) [UNK]
+- Reagents: Zinc dust (7440-66-6) [REDUCTANT], Lithium chloride (7447-41-8) [ADDITIVE], Zinc chloride (7646-85-7) [ADDITIVE], 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Fc1ccc(Cl)c(F)c1.COc1ccc(NC(=O)c2ccccc2F)cc1>>COc1ccc(-n2c(=O)c3ccccc3c3ccc(F)cc32)cc1
 
@@ -3776,10 +4126,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 70
 - Temperature (C): 100.0
 - Time (h): 14.1
-- Reagents: Zinc dust (7440-66-6) [REDUCTANT], Lithium chloride (7447-41-8) [ADDITIVE], Zinc chloride (7646-85-7) [ADDITIVE], 1907-33-1 (1907-33-1) [UNK]
+- Reagents: Zinc dust (7440-66-6) [REDUCTANT], Lithium chloride (7447-41-8) [ADDITIVE], Zinc chloride (7646-85-7) [ADDITIVE], 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: COc1ccc(Cl)c(F)c1.COc1ccc(NC(=O)c2ccccc2F)cc1>>COc1ccc(-n2c(=O)c3ccccc3c3ccc(OC)cc32)cc1
 
@@ -3787,10 +4138,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 58
 - Temperature (C): 25.0
 - Time (h): 16.0
-- Reagents: Cesium carbonate (534-17-8) [BASE], Tetrabutylammonium bromide (1643-19-2) [ADDITIVE], 29166-72-1 (29166-72-1) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Tetrabutylammonium bromide (1643-19-2) [ADDITIVE], 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: COc1ccc(Br)cc1.CNS(=O)(=O)c1ccc(C)cc1>>COc1ccc(N(C)S(=O)(=O)c2ccc(C)cc2)cc1
 
@@ -3798,10 +4150,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 78
 - Temperature (C): 50.0
 - Time (h): 6.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Brc1cccnc1.FC1(F)CNC1>>FC1(F)CN(c2cccnc2)C1
 
@@ -3809,17 +4162,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 65
 - Temperature (C): 50.0
 - Time (h): 6.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Brc1cccnc1.CC(C)(C)OC(=O)N1CC2(CCNC2)C1>>CC(C)(C)OC(=O)N1CC2(CCN(c3cccnc3)C2)C1
 
 ## Reaction 31-172-CAS-2511775
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -3830,7 +4185,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-2574534
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 92
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -3841,7 +4197,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-3004647
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 0.917
@@ -3852,7 +4209,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-3240112
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 0.667
@@ -3863,7 +4221,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-3615880
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.667
@@ -3874,7 +4233,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-3675183
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.583
@@ -3885,7 +4245,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-3771720
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 0.917
@@ -3896,7 +4257,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-3876993
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 1.25
@@ -3907,7 +4269,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4097754
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.75
@@ -3918,7 +4281,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4153780
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 1.333
@@ -3929,7 +4293,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4188159
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 0.833
@@ -3941,6 +4306,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 24388-23-6, 258278-25-0, dtbbpy
 - Yield %: 74
 - Temperature (C): 80.0
 - Time (h): 18.017
@@ -3951,7 +4317,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4352121
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 0.5
@@ -3962,7 +4329,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4411847
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.333
@@ -3973,7 +4341,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4430373
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -3985,6 +4354,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 88
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -3995,7 +4365,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4753079
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -4006,7 +4377,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4856885
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 1.667
@@ -4017,7 +4389,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-4953599
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -4028,7 +4401,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-5089620
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 94
 - Temperature (C): 60.0
 - Time (h): 0.333
@@ -4039,7 +4413,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-5282840
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.75
@@ -4050,7 +4425,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-5798339
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 94
 - Temperature (C): 60.0
 - Time (h): 0.25
@@ -4061,7 +4437,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-5892524
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 60.0
 - Time (h): 1.5
@@ -4072,7 +4449,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-5899798
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 94
 - Temperature (C): 60.0
 - Time (h): 0.333
@@ -4084,6 +4462,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 94
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -4095,6 +4474,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 100
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -4105,7 +4485,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-6278605
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 1.833
@@ -4116,7 +4497,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-6280917
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.667
@@ -4127,7 +4509,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-6490323
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 1.083
@@ -4138,7 +4521,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-6670438
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 92
 - Temperature (C): 60.0
 - Time (h): 0.833
@@ -4149,7 +4533,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-6685961
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 0.75
@@ -4161,6 +4546,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 72
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -4171,7 +4557,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-7080080
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 0.667
@@ -4182,7 +4569,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-7168083
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -4194,6 +4582,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 68
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -4204,7 +4593,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-7878349
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 1.25
@@ -4215,7 +4605,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-7984912
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 0.833
@@ -4226,7 +4617,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8030525
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -4237,7 +4629,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8188857
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -4248,7 +4641,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8212056
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 92
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -4259,7 +4653,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8314225
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.75
@@ -4270,7 +4665,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8636791
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 86
 - Temperature (C): 60.0
 - Time (h): 1.0
@@ -4281,7 +4677,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8678467
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 0.417
@@ -4293,6 +4690,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 74
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -4303,7 +4701,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8694268
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 0.667
@@ -4314,7 +4713,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8747264
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 93
 - Temperature (C): 60.0
 - Time (h): 0.583
@@ -4326,6 +4726,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 258278-25-0, dtbbpy
 - Yield %: 89
 - Temperature (C): 80.0
 - Time (h): 5.0
@@ -4336,7 +4737,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8954640
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 60.0
 - Time (h): 0.583
@@ -4347,7 +4749,8 @@ Total reactions: 1131
 ## Reaction 31-172-CAS-8971226
 
 - Type: Amination-Ni
-- Condition Core: Base: KOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.583
@@ -4359,6 +4762,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 24388-23-6, 258278-25-0, dtbbpy
 - Yield %: 86
 - Temperature (C): 80.0
 - Time (h): 18.017
@@ -4369,7 +4773,8 @@ Total reactions: 1131
 ## Reaction 31-239-CAS-19832633
 
 - Type: Amination-Ni
-- Condition Core: Base: Na2CO3
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 71
 - Temperature (C): 140.0
 - Time (h): 12.0
@@ -4380,7 +4785,8 @@ Total reactions: 1131
 ## Reaction 31-239-CAS-19832634
 
 - Type: Amination-Ni
-- Condition Core: Base: Na2CO3
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 51
 - Temperature (C): 140.0
 - Time (h): 12.0
@@ -4391,7 +4797,8 @@ Total reactions: 1131
 ## Reaction 31-239-CAS-19832635
 
 - Type: Amination-Ni
-- Condition Core: Base: Na2CO3
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 85
 - Temperature (C): 140.0
 - Time (h): 12.0
@@ -4402,7 +4809,8 @@ Total reactions: 1131
 ## Reaction 31-239-CAS-19832640
 
 - Type: Amination-Ni
-- Condition Core: Base: Na2CO3
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 58
 - Temperature (C): 140.0
 - Time (h): 12.0
@@ -4413,7 +4821,8 @@ Total reactions: 1131
 ## Reaction 31-239-CAS-19832641
 
 - Type: Amination-Ni
-- Condition Core: Base: Na2CO3
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 60
 - Temperature (C): 140.0
 - Time (h): 12.0
@@ -4424,7 +4833,8 @@ Total reactions: 1131
 ## Reaction 31-239-CAS-19832643
 
 - Type: Amination-Ni
-- Condition Core: Base: Na2CO3
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 72
 - Temperature (C): 140.0
 - Time (h): 12.0
@@ -4436,10 +4846,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 63
 - Temperature (C): 120.0
 - Time (h): 12.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 99-87-6 (99-87-6)
 - SMILES: Fc1ccc(/C=C/Br)cc1.Cc1cccc(Nc2ncccn2)c1>>Cc1cccc(N(/C=C/c2ccc(F)cc2)c2ncccn2)c1
 
@@ -4447,10 +4858,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 65
 - Temperature (C): 120.0
 - Time (h): 12.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 99-87-6 (99-87-6)
 - SMILES: Clc1ccc(/C=C/Br)cc1.Cc1cccc(Nc2ncccn2)c1>>Cc1cccc(N(/C=C/c2ccc(Cl)cc2)c2ncccn2)c1
 
@@ -4458,10 +4870,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 73
 - Temperature (C): 120.0
 - Time (h): 12.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 99-87-6 (99-87-6)
 - SMILES: Clc1cccc(/C=C/Br)c1.Cc1cccc(Nc2ncccn2)c1>>Cc1cccc(N(/C=C/c2cccc(Cl)c2)c2ncccn2)c1
 
@@ -4469,10 +4882,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 60
 - Temperature (C): 120.0
 - Time (h): 12.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 99-87-6 (99-87-6)
 - SMILES: Cc1cccc(Nc2ncccn2)c1.Fc1ccc(/C=C/Br)cc1Br>>Cc1cccc(N(/C=C/c2ccc(F)c(Br)c2)c2ncccn2)c1
 
@@ -4480,17 +4894,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 75
 - Temperature (C): 100.0
 - Time (h): 24.0
-- Reagents: 75-50-3 (75-50-3) [UNK]
+- Reagents: Trimethylamine (75-50-3) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: N#CO.[Na].ClC(=NNc1ccccc1)c1ccccc1Cl>>O=c1[nH]c(-c2ccccc2Cl)nn1-c1ccccc1
 
 ## Reaction 31-298-CAS-19837366
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 90
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4501,7 +4917,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837367
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 85
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4512,7 +4929,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837368
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 74
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4523,7 +4941,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837369
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 87
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4534,7 +4953,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837370
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 86
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4545,7 +4965,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837371
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 97
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4556,7 +4977,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837372
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 71
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4567,7 +4989,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837373
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 80
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4578,7 +5001,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837374
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 65
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4589,7 +5013,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837375
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 75
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4600,7 +5025,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837376
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 86
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4611,7 +5037,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837377
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 78
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4622,7 +5049,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837378
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 73
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4633,7 +5061,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837380
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 51
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4644,7 +5073,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837381
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 96
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4655,7 +5085,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837382
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 75
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4666,7 +5097,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837384
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 73
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4677,7 +5109,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837385
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 50
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4688,7 +5121,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837386
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 60
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4699,7 +5133,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837387
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 84
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4710,7 +5145,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837388
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 69
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4721,7 +5157,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837389
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 77
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4732,7 +5169,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837390
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 92
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4743,7 +5181,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837391
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 89
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4754,7 +5193,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837392
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 67
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4765,7 +5205,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837393
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 79
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4776,7 +5217,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837395
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 84
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4787,7 +5229,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837397
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 82
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4798,7 +5241,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837398
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 89
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4809,7 +5253,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837399
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 95
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4820,7 +5265,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837400
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 71
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4831,7 +5277,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837407
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 63
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4842,7 +5289,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19837408
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 88
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4853,7 +5301,8 @@ Total reactions: 1131
 ## Reaction 31-298-CAS-19843113
 
 - Type: Amination-Ni
-- Condition Core: Reductant: Zn
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 90
 - Temperature (C): 140.0
 - Time (h): 24.0
@@ -4865,6 +5314,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Copper(I) iodide, 534-22-5, dtbbpy
 - Yield %: 74
 - Temperature (C): 110.0
 - Time (h): 5.0
@@ -4874,6 +5324,8 @@ Total reactions: 1131
 ## Reaction 31-309-CAS-23762457
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, 7429-90-5, XPhos
 - Yield %: 97
 - Temperature (C): 25.0
 - Time (h): 0.1
@@ -4883,6 +5335,8 @@ Total reactions: 1131
 ## Reaction 31-309-CAS-23762462
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, 7429-90-5, XPhos
 - Yield %: 92
 - Temperature (C): 25.0
 - Time (h): 0.1
@@ -4892,6 +5346,8 @@ Total reactions: 1131
 ## Reaction 31-309-CAS-23763254
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, 7429-90-5, XPhos
 - Yield %: 97
 - Temperature (C): 25.0
 - Time (h): 0.1
@@ -4901,7 +5357,8 @@ Total reactions: 1131
 ## Reaction 31-313-CAS-18621869
 
 - Type: Amination-Ni
-- Condition Core: Acid: HCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 98
 - Temperature (C): 80.0
 - Time (h): 4.0
@@ -4912,6 +5369,8 @@ Total reactions: 1131
 ## Reaction 31-333-CAS-21579007
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 506-93-4, 5089-70-3, XPhos
 - Yield %: 86
 - Temperature (C): 60.0
 - Time (h): 0.533
@@ -4921,6 +5380,8 @@ Total reactions: 1131
 ## Reaction 31-333-CAS-21579008
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 506-93-4, 5089-70-3, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.533
@@ -4930,6 +5391,8 @@ Total reactions: 1131
 ## Reaction 31-333-CAS-21579009
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 506-93-4, 5089-70-3, XPhos
 - Yield %: 96
 - Temperature (C): 60.0
 - Time (h): 0.45
@@ -4939,6 +5402,8 @@ Total reactions: 1131
 ## Reaction 31-333-CAS-21579010
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 506-93-4, 5089-70-3, XPhos
 - Yield %: 90
 - Temperature (C): 60.0
 - Time (h): 0.617
@@ -4948,6 +5413,8 @@ Total reactions: 1131
 ## Reaction 31-333-CAS-21579011
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 506-93-4, 5089-70-3, XPhos
 - Yield %: 96
 - Temperature (C): 60.0
 - Time (h): 0.617
@@ -4958,6 +5425,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 72
 - Temperature (C): 25.0
 - Time (h): 3.0
@@ -4968,6 +5436,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 56
 - Temperature (C): 25.0
 - Time (h): 3.0
@@ -4978,6 +5447,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 65
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -4989,6 +5459,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 258278-28-3, dtbbpy
 - Yield %: 55
 - Temperature (C): 60.0
 - Time (h): 12.0
@@ -5000,6 +5471,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Copper(I) iodide, 534-22-5, dtbbpy
 - Yield %: 78
 - Temperature (C): 110.0
 - Time (h): 4.5
@@ -5010,6 +5482,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Copper(I) iodide, 534-22-5, dtbbpy
 - Yield %: 77
 - Temperature (C): 110.0
 - Time (h): 5.0
@@ -5020,6 +5493,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Copper(I) iodide, 534-22-5, dtbbpy
 - Yield %: 75
 - Temperature (C): 110.0
 - Time (h): 5.0
@@ -5030,6 +5504,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 1902911-41-4, dtbbpy
 - Yield %: 84
 - Temperature (C): 100.0
 - Time (h): 18.0
@@ -5041,6 +5516,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 1902911-41-4, dtbbpy
 - Yield %: 94
 - Temperature (C): 100.0
 - Time (h): 18.0
@@ -5052,6 +5528,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 1902911-41-4, dtbbpy
 - Yield %: 66
 - Temperature (C): 100.0
 - Time (h): 21.0
@@ -5063,6 +5540,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 1902911-41-4, dtbbpy
 - Yield %: 87
 - Temperature (C): 100.0
 - Time (h): 18.0
@@ -5074,10 +5552,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2700228-06-2, dtbbpy
 - Yield %: 50
 - Temperature (C): 25.0
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -5085,10 +5564,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2700228-05-1, dtbbpy
 - Yield %: 84
 - Temperature (C): 25.0
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
@@ -5096,10 +5576,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2700228-05-1, dtbbpy
 - Yield %: 71
 - Temperature (C): 25.0
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.COC(=O)c1ccc(Br)cc1>>COC(=O)c1ccc(N2CCCC2)cc1
 
@@ -5107,10 +5588,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2700228-05-1, dtbbpy
 - Yield %: 81
 - Temperature (C): 25.0
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1cccnc1>>c1cncc(N2CCCC2)c1
 
@@ -5118,10 +5600,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2700228-05-1, dtbbpy
 - Yield %: 98
 - Temperature (C): 25.0
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -5129,10 +5612,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 191-28-6, dtbbpy
 - Yield %: 87
 - Temperature (C): 25.0
 - Time (h): 15.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -5140,10 +5624,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 191-28-6, dtbbpy
 - Yield %: 79
 - Temperature (C): 25.0
 - Time (h): 15.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -5151,10 +5636,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 191-28-6, dtbbpy
 - Yield %: 79
 - Temperature (C): 25.0
 - Time (h): 15.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: CNCc1ccccc1.FC(F)(F)c1ccc(Br)cc1>>CN(Cc1ccccc1)c1ccc(C(F)(F)F)cc1
 
@@ -5162,10 +5648,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 191-28-6, dtbbpy
 - Yield %: 69
 - Temperature (C): 25.0
 - Time (h): 64.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1ccccn1.C1CCNC1>>c1ccc(N2CCCC2)nc1
 
@@ -5173,10 +5660,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 191-28-6, dtbbpy
 - Yield %: 77
 - Temperature (C): 25.0
 - Time (h): 15.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
@@ -5184,16 +5672,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 74811-65-7, dtbbpy
 - Yield %: 94
 - Temperature (C): 25.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.COC(=O)c1ccc(Br)cc1>>COC(=O)c1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-614-CAS-24964283
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 97
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5205,16 +5696,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 17
 - Temperature (C): 140.0
 - Time (h): 2.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: C(#Cc1ccccc1)c1ccccc1.O=C(Nc1cccc2cccnc12)c1ccccc1F>>O=c1c2ccccc2c(-c2ccccc2)c(-c2ccccc2)n1-c1cccc2cccnc12.O=C(Nc1cccc2cccnc12)c1cccc2c(-c3ccccc3)c(-c3ccccc3)c(-c3ccccc3)c(-c3ccccc3)c12
 
 ## Reaction 31-614-CAS-25045512
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 97
 - Temperature (C): 29.0
 - Time (h): 0.1
@@ -5224,6 +5718,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-25169223
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 90
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5234,7 +5730,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-25253910
 
 - Type: Amination-Ni
-- Condition Core: Base: n-BuLi
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 89
 - Temperature (C): 40.0
 - Time (h): 24.5
@@ -5245,6 +5742,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-25260929
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 95
 - Temperature (C): 29.0
 - Time (h): 0.167
@@ -5254,7 +5753,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-25496606
 
 - Type: Amination-Ni
-- Condition Core: Cu
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Copper(I) thiophene-2-carboxylate
 - Yield %: 87
 - Temperature (C): 120.0
 - Time (h): 12.0
@@ -5266,6 +5766,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 99
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5277,6 +5778,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 90
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -5287,6 +5789,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-25740099
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 97
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5298,17 +5802,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 88
 - Temperature (C): 140.0
 - Time (h): 4.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: FC(F)(F)c1ccc(C#Cc2ccc(C(F)(F)F)cc2)cc1.O=C(Nc1cccc2cccnc12)c1ccccc1F>>O=c1c2ccccc2c(-c2ccc(C(F)(F)F)cc2)c(-c2ccc(C(F)(F)F)cc2)n1-c1cccc2cccnc12
 
 ## Reaction 31-614-CAS-25817525
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 86
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5320,6 +5826,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: PPh3
+- Catalytic System: 373-02-4, Triphenylphosphine
 - Yield %: 72
 - Temperature (C): 120.0
 - Time (h): 24.0
@@ -5330,7 +5837,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-25947410
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 78
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5341,7 +5849,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26088366
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 74
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5353,6 +5862,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 75
 - Temperature (C): 120.0
 - Time (h): 3.0
@@ -5363,6 +5873,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26185233
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 92
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5373,7 +5885,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26198624
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 79
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5384,7 +5897,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26255926
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 88
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5396,6 +5910,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 70
 - Temperature (C): 80.0
 - Time (h): 24.0
@@ -5406,6 +5921,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26440236
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 82
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5417,6 +5934,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 93
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5427,6 +5945,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26665732
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 98
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5437,6 +5957,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26749989
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 86
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5448,6 +5970,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 94
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5458,6 +5981,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-26910459
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 97
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5469,6 +5994,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: Na2CO3
+- Catalytic System: 373-02-4
 - Yield %: 68
 - Temperature (C): 170.0
 - Time (h): 24.0
@@ -5479,6 +6005,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-27051316
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 91
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5490,6 +6018,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 82
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5500,6 +6029,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-27143432
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 94
 - Temperature (C): 29.0
 - Time (h): 0.133
@@ -5510,6 +6041,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5520,6 +6052,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-27417736
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 88
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5531,6 +6065,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 76
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5541,6 +6076,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-27522089
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 91
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5551,6 +6088,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-27578708
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 64
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5562,10 +6101,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 81
 - Temperature (C): 100.0
 - Time (h): 24.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Fc1ccc(C#Cc2ccc(F)cc2)cc1.O=C(Nc1ccccc1)c1ccccc1Oc1ccccc1>>O=c1c2ccccc2c(-c2ccc(F)cc2)c(-c2ccc(F)cc2)n1-c1ccccc1
 
@@ -5573,10 +6113,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 17
 - Temperature (C): 140.0
 - Time (h): 2.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: C(#Cc1ccccc1)c1ccccc1.O=C(Nc1cccc2cccnc12)c1ccccc1F>>O=c1c2ccccc2c(-c2ccccc2)c(-c2ccccc2)n1-c1cccc2cccnc12.O=C(Nc1cccc2cccnc12)c1cccc2c(-c3ccccc3)c(-c3ccccc3)c(-c3ccccc3)c(-c3ccccc3)c12
 
@@ -5584,10 +6125,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 93
 - Temperature (C): 100.0
 - Time (h): 24.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C(#Cc1ccccc1)c1ccccc1.O=C(Nc1ccccc1)c1cc(F)ccc1Oc1ccccc1>>O=c1c2cc(F)ccc2c(-c2ccccc2)c(-c2ccccc2)n1-c1ccccc1
 
@@ -5595,6 +6137,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 92
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5605,6 +6148,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-27983218
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 94
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5616,6 +6161,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 81
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5626,6 +6172,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-28086336
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 92
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5637,6 +6185,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 92
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5647,6 +6196,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-28389779
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 95
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5657,6 +6208,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-28481599
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 99
 - Temperature (C): 29.0
 - Time (h): 0.133
@@ -5666,6 +6219,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-28492803
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 90
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5676,6 +6231,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-28632839
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 94
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5686,7 +6243,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-28717185
 
 - Type: Amination-Ni
-- Condition Core: Cu
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Copper(I) thiophene-2-carboxylate
 - Yield %: 80
 - Temperature (C): 120.0
 - Time (h): 12.0
@@ -5698,6 +6256,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 94
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5709,6 +6268,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Additive: PivOH
+- Catalytic System: 373-02-4, 12354-84-6, 26042-64-8
 - Yield %: 65
 - Temperature (C): 80.0
 - Time (h): 12.0
@@ -5720,6 +6280,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 89
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5730,6 +6291,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-28982861
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 96
 - Temperature (C): 29.0
 - Time (h): 0.083
@@ -5739,6 +6302,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-29012372
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 98
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5750,6 +6315,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 91
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5761,6 +6327,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5772,6 +6339,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: PPh3
+- Catalytic System: 373-02-4, Triphenylphosphine
 - Yield %: 65
 - Temperature (C): 120.0
 - Time (h): 24.0
@@ -5783,6 +6351,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 99
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -5794,6 +6363,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 99
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5805,6 +6375,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/IPrCl
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), IPrCl
 - Yield %: 82
 - Temperature (C): 25.0
 - Time (h): 6.0
@@ -5815,6 +6386,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-29377951
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 90
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5825,7 +6398,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-29391450
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 75
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5837,6 +6411,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 78
 - Temperature (C): 100.0
 - Time (h): 3.0
@@ -5847,7 +6422,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-29460345
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 70
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5859,6 +6435,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 74
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5869,7 +6446,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-29530870
 
 - Type: Amination-Ni
-- Condition Core: Cu
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Copper(I) thiophene-2-carboxylate
 - Yield %: 85
 - Temperature (C): 120.0
 - Time (h): 12.0
@@ -5881,16 +6459,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 14
 - Temperature (C): 80.0
 - Time (h): 3.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: C(#Cc1ccccc1)c1ccccc1.O=C(Nc1ccccc1)c1c(F)cccc1Oc1ccccc1>>O=c1c2c(F)cccc2c(-c2ccccc2)c(-c2ccccc2)n1-c1ccccc1.O=c1c2c(Oc3ccccc3)cccc2c(-c2ccccc2)c(-c2ccccc2)n1-c1ccccc1
 
 ## Reaction 31-614-CAS-29869421
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 96
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5902,6 +6483,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 94
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5913,6 +6495,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 94
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5923,7 +6506,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-30184726
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 83
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5934,6 +6518,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-30228344
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 93
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5945,6 +6531,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 66
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -5955,7 +6542,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-30382411
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5966,18 +6554,20 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-30430251
 
 - Type: Amination-Ni
-- Condition Core: dtbbpy
+- Condition Core: Pd/dtbbpy
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel, Zinc dust, 2256751-76-3, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 99
 - Temperature (C): 80.0
 - Time (h): 8.0
-- Reagents: 29166-72-1 (29166-72-1) [UNK]
+- Reagents: 2-tert-Butyl-1,1,3,3-tetramethylguanidine (29166-72-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: OCCOCCN1CCNCC1.ClC1=Nc2ccccc2Sc2ccccc21>>OCCOCCN1CCN(C2=Nc3ccccc3Sc3ccccc32)CC1
 
 ## Reaction 31-614-CAS-30485484
 
 - Type: Amination-Ni
-- Condition Core: Base: K3PO4
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 86
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -5989,6 +6579,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 94
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -6000,6 +6591,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 88
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -6011,6 +6603,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 77
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -6022,6 +6615,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 97
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6032,6 +6626,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-30772714
 
 - Type: Amination-Ni
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 75
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -6043,6 +6639,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 93
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -6053,6 +6650,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31025002
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 98
 - Temperature (C): 29.0
 - Time (h): 0.133
@@ -6063,10 +6662,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 88
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
@@ -6074,10 +6674,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: CC(=O)c1ccc(Br)cc1.C1CCNC1>>CC(=O)c1ccc(N2CCCC2)cc1
 
@@ -6085,10 +6686,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 75
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1cccc2ncccc12>>c1cc(N2CCCC2)c2cccnc2c1
 
@@ -6096,10 +6698,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 98
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -6107,10 +6710,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1cc(Br)cc(C(F)(F)F)c1>>FC(F)(F)c1cc(N2CCCC2)cc(C(F)(F)F)c1
 
@@ -6118,10 +6722,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 92
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -6129,10 +6734,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 54
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.Clc1ccc2c(c1)CCc1cccnc1C2=C1CCNCC1>>FC(F)(F)c1ccc(N2CCC(=C3c4ccc(Cl)cc4CCc4cccnc43)CC2)cc1
 
@@ -6140,10 +6746,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCCC2)cc1
 
@@ -6151,10 +6758,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 87
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2c(c1)CCNC2.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCc3ccccc3C2)cc1
 
@@ -6162,10 +6770,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 75
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Fc1c(F)c(F)c(Br)c(F)c1F>>Fc1c(F)c(F)c(N2CCCC2)c(F)c1F
 
@@ -6173,16 +6782,18 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate, dtbbpy
 - Temperature (C): 25.0
 - Time (h): 0.917
-- Reagents: 280-57-9 (280-57-9) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Dabco (280-57-9) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), Ethyl acetate (141-78-6)
 - SMILES: CN1CCNCC1.CC(C)(C)OC(=O)c1ccc(Br)cc1F>>CC(C)(C)OC(=O)c1ccccc1F.CN1CCN(c2ccc(C(=O)OC(C)(C)C)c(F)c2)CC1.Cl
 
 ## Reaction 31-614-CAS-31529597
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 78
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6193,7 +6804,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31529603
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 81
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6204,7 +6816,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31529604
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 75
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6215,7 +6828,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31529605
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 61
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6226,7 +6840,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31529633
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 70
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6237,7 +6852,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31529636
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 52
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6248,7 +6864,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31529648
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 60
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6259,7 +6876,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-31529649
 
 - Type: Amination-Ni
-- Condition Core: Additive: ZnCl2
+- Condition Core: Pd
+- Catalytic System: Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel
 - Yield %: 66
 - Temperature (C): 100.0
 - Time (h): 24.0
@@ -6271,6 +6889,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 96
 - Temperature (C): 25.0
 - Time (h): 48.0
@@ -6282,10 +6901,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 92
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.FC(F)(F)c1cc(Br)cc(C(F)(F)F)c1>>FC(F)(F)c1cc(N2CCCC2)cc(C(F)(F)F)c1
 
@@ -6293,10 +6913,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 94
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: FC(F)(F)c1ccc(Cl)cc1.C1COCCN1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -6304,6 +6925,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 91
 - Temperature (C): 25.0
 - Time (h): 48.0
@@ -6315,10 +6937,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 63
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: FC(F)(F)c1ccc(Cl)cc1.c1ccc2c(c1)CCN2>>FC(F)(F)c1ccc(N2CCc3ccccc32)cc1
 
@@ -6326,10 +6949,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: FC(F)(F)c1ccc(Cl)cc1.C1CCNCC1>>FC(F)(F)c1ccc(N2CCCCC2)cc1
 
@@ -6337,10 +6961,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 62
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.N#Cc1ccccc1Br>>N#Cc1ccccc1N1CCCC1
 
@@ -6348,10 +6973,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: FC(F)(F)c1ccc(Cl)cc1.CC(C)(C)OC(=O)N1CCNCC1>>CC(C)(C)OC(=O)N1CCN(c2ccc(C(F)(F)F)cc2)CC1
 
@@ -6359,10 +6985,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 89
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
@@ -6370,10 +6997,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: CC(=O)c1ccc(Br)cc1.C1CCNC1>>CC(=O)c1ccc(N2CCCC2)cc1
 
@@ -6381,10 +7009,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.Brc1cccnc1>>c1cncc(N2CCCC2)c1
 
@@ -6392,10 +7021,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 93
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.Ic1ccccc1>>c1ccc(N2CCCC2)cc1
 
@@ -6403,10 +7033,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 87
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.Brc1cncnc1>>c1ncc(N2CCCC2)cn1
 
@@ -6414,10 +7045,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 63
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.COc1cc(Br)cc(OC)c1>>COc1cc(OC)cc(N2CCCC2)c1
 
@@ -6425,10 +7057,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 82
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.Brc1ccc2c(c1)OCO2>>c1cc2c(cc1N1CCCC1)OCO2
 
@@ -6436,10 +7069,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 71
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: Cc1ccc(Br)cc1.C1CCNC1>>Cc1ccc(N2CCCC2)cc1
 
@@ -6447,10 +7081,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 91
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.CS(=O)(=O)c1ccc(Br)cc1>>CS(=O)(=O)c1ccc(N2CCCC2)cc1
 
@@ -6458,10 +7093,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: Clc1ccc2c(Cl)ccnc2c1.CC(C)(C)OC(=O)N1CCNCC1>>CC(C)(C)OC(=O)N1CCN(c2ccnc3cc(Cl)ccc23)CC1
 
@@ -6469,10 +7105,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 76
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.Brc1ccc2c(c1)Cc1ccccc1-2>>c1ccc2c(c1)Cc1cc(N3CCCC3)ccc1-2
 
@@ -6480,10 +7117,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: C1CCNC1.Brc1csc2ccccc12>>c1ccc2c(N3CCCC3)csc2c1
 
@@ -6491,10 +7129,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2763483-69-6, dtbbpy
 - Yield %: 91
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: 121-69-7 (121-69-7)
 - SMILES: CC(=O)c1ccc(Cl)cc1.C1CCNC1>>CC(=O)c1ccc(N2CCCC2)cc1
 
@@ -6502,6 +7141,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4-(Dimethylamino)pyridine, dtbbpy
 - Yield %: 50
 - Temperature (C): 60.0
 - Time (h): 16.0
@@ -6512,6 +7152,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/bpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2,2'-Bipyridine
 - Yield %: 13
 - Temperature (C): 130.0
 - Time (h): 22.0
@@ -6523,10 +7164,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 70
 - Temperature (C): 50.0
 - Time (h): 24.5
-- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], 7647-14-5 (7647-14-5) [UNK]
+- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], Sodium Chloride (7647-14-5) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: C1CCNC1.COC(=O)c1ccc(I)cc1>>COC(=O)c1ccc(N2CCCC2)cc1
 
@@ -6534,10 +7176,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 53
 - Temperature (C): 50.0
 - Time (h): 24.5
-- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], 7647-14-5 (7647-14-5) [UNK]
+- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], Sodium Chloride (7647-14-5) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1NC(=O)c2ccccc21.COC(=O)c1ccc(I)cc1>>COC(=O)c1ccc(N2C(=O)c3ccccc3C2=O)cc1
 
@@ -6545,10 +7188,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 50.0
 - Time (h): 24.5
-- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], 7647-14-5 (7647-14-5) [UNK]
+- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], Sodium Chloride (7647-14-5) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1NCCO1.COC(=O)c1ccc(I)cc1>>COC(=O)c1ccc(N2CCOC2=O)cc1
 
@@ -6556,10 +7200,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 70
 - Temperature (C): 50.0
 - Time (h): 24.5
-- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], 7647-14-5 (7647-14-5) [UNK]
+- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], Sodium Chloride (7647-14-5) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: FC(F)(F)c1ccc(I)cc1.O=C1NC2C=CC1C2>>O=C1C2C=CC(C2)N1c1ccc(C(F)(F)F)cc1
 
@@ -6567,10 +7212,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 52
 - Temperature (C): 50.0
 - Time (h): 48.5
-- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], 7647-14-5 (7647-14-5) [UNK]
+- Reagents: 1,8-Diazabicyclo[5.4.0]undec-7-ene (6674-22-2) [BASE], Sodium Chloride (7647-14-5) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: COC(=O)c1ccc(I)cc1.Cc1ccc(=O)[nH]c1>>COC(=O)c1ccc(-n2cc(C)ccc2=O)cc1
 
@@ -6578,6 +7224,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 52
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6589,6 +7236,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 60
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6600,6 +7248,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 88
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6611,6 +7260,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6622,6 +7272,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6633,6 +7284,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6644,6 +7296,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 88
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6655,6 +7308,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 80
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6666,6 +7320,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1092775-62-6, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 52
 - Temperature (C): 25.0
 - Time (h): 24.833
@@ -6676,147 +7331,168 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-33082843
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 79
 - Temperature (C): 55.0
 - Time (h): 20.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-33082844
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 99
 - Temperature (C): 55.0
 - Time (h): 14.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(I)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-33082845
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 99
 - Temperature (C): 55.0
 - Time (h): 14.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-33082846
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 75
 - Temperature (C): 55.0
 - Time (h): 26.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Cl)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-33082847
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 97
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-33082848
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 67
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1ccc(Br)cc1.C1CCNC1>>Brc1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-33082852
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 82
 - Temperature (C): 55.0
 - Time (h): 22.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccccc1Br>>N#Cc1ccccc1N1CCCC1
 
 ## Reaction 31-614-CAS-33082855
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 92
 - Temperature (C): 55.0
 - Time (h): 18.0
-- Reagents: 100-76-5 (100-76-5) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: Quinuclidine (100-76-5) [BASE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-614-CAS-33082857
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 69
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 100-76-5 (100-76-5) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: Quinuclidine (100-76-5) [BASE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCCC2)cc1
 
 ## Reaction 31-614-CAS-33082858
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 76
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 100-76-5 (100-76-5) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: Quinuclidine (100-76-5) [BASE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1ccc(Br)cc1.C1COCCN1>>Brc1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-614-CAS-33082859
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 75
 - Temperature (C): 70.0
 - Time (h): 24.0
-- Reagents: 100-76-5 (100-76-5) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: Quinuclidine (100-76-5) [BASE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1ccc(Br)cc1.CC(=O)N1CCNCC1>>CC(=O)N1CCN(c2ccc(Br)cc2)CC1
 
 ## Reaction 31-614-CAS-33082860
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 50
 - Temperature (C): 55.0
 - Time (h): 72.0
-- Reagents: 100-76-5 (100-76-5) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: Quinuclidine (100-76-5) [BASE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.CC1(C)OB(c2cccc(Br)c2)OC1(C)C>>CC1(C)OB(c2cccc(N3CCCC3)c2)OC1(C)C
 
 ## Reaction 31-614-CAS-33082862
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 63
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 100-76-5 (100-76-5) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: Quinuclidine (100-76-5) [BASE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1cncnc1>>c1ncc(N2CCCC2)cn1
 
 ## Reaction 31-614-CAS-33082863
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 64
 - Temperature (C): 55.0
 - Time (h): 26.0
-- Reagents: 100-76-5 (100-76-5) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: Quinuclidine (100-76-5) [BASE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1cccnc1>>c1cncc(N2CCCC2)c1
 
@@ -6824,6 +7500,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 91
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6835,6 +7512,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 90
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6846,6 +7524,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 83
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6857,6 +7536,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 81
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6868,6 +7548,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 90
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6879,6 +7560,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 68
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6890,6 +7572,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 88
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6901,6 +7584,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 74
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6912,6 +7596,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 89
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6923,6 +7608,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 84
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6934,6 +7620,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 84
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6945,6 +7632,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 84
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6956,6 +7644,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 67
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6967,6 +7656,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 84
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6978,6 +7668,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 73
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -6989,6 +7680,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7000,6 +7692,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 90
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7011,6 +7704,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 73
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7022,6 +7716,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 70
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7033,6 +7728,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7044,6 +7740,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 81
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7055,6 +7752,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 76
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7066,6 +7764,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7077,6 +7776,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 84
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7088,6 +7788,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 73
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7099,6 +7800,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7110,6 +7812,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 83
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7121,6 +7824,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 83
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7132,6 +7836,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 85
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7143,6 +7848,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 80
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7154,6 +7860,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 64
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7165,6 +7872,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 66
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7176,6 +7884,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 84
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7187,6 +7896,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 77
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7198,6 +7908,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 91
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7209,6 +7920,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 80
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7220,6 +7932,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 88
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7231,6 +7944,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7242,6 +7956,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 93
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7253,6 +7968,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 81
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7264,6 +7980,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 63
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7275,6 +7992,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7286,6 +8004,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 85
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7297,6 +8016,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 88
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7308,6 +8028,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 74
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7319,6 +8040,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 81
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7330,6 +8052,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 91
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7341,6 +8064,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 85
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7352,6 +8076,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 76
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7363,6 +8088,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 85
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7374,6 +8100,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 80
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7385,6 +8112,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 94
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7396,6 +8124,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 59
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7407,6 +8136,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 76
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7418,6 +8148,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 89
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7429,6 +8160,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 85
 - Temperature (C): 85.0
 - Time (h): 27.0
@@ -7440,6 +8172,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 72
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7451,6 +8184,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 57
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7462,6 +8196,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 87
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7473,6 +8208,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7484,6 +8220,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Base: DBU
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 80
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -7495,6 +8232,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Additive: PivOH
+- Catalytic System: 373-02-4
 - Yield %: 59
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -7506,6 +8244,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Additive: PivOH
+- Catalytic System: 373-02-4
 - Yield %: 60
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -7517,6 +8256,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Additive: PivOH
+- Catalytic System: 373-02-4
 - Yield %: 56
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -7528,6 +8268,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Additive: PivOH
+- Catalytic System: 373-02-4
 - Yield %: 66
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -7539,6 +8280,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Additive: PivOH
+- Catalytic System: 373-02-4
 - Yield %: 61
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -7550,6 +8292,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Additive: PivOH
+- Catalytic System: 373-02-4
 - Yield %: 50
 - Temperature (C): 110.0
 - Time (h): 24.0
@@ -7561,6 +8304,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, DPPF
 - Yield %: 79
 - Temperature (C): 110.0
 - Time (h): 27.5
@@ -7572,6 +8316,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, DPPF
 - Yield %: 86
 - Temperature (C): 110.0
 - Time (h): 27.5
@@ -7583,6 +8328,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, DPPF
 - Yield %: 91
 - Temperature (C): 110.0
 - Time (h): 27.5
@@ -7594,6 +8340,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, DPPF
 - Yield %: 86
 - Temperature (C): 110.0
 - Time (h): 27.5
@@ -7605,6 +8352,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, DPPF
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 27.5
@@ -7616,6 +8364,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, DPPF
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 27.5
@@ -7627,6 +8376,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, DPPF
 - Yield %: 20
 - Temperature (C): 130.0
 - Time (h): 31.5
@@ -7638,6 +8388,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, 15418-29-8, DPPF
 - Yield %: 62
 - Temperature (C): 110.0
 - Time (h): 43.5
@@ -7649,6 +8400,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, 15418-29-8, DPPF
 - Yield %: 59
 - Temperature (C): 110.0
 - Time (h): 43.5
@@ -7660,6 +8412,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, 15418-29-8, DPPF
 - Yield %: 62
 - Temperature (C): 110.0
 - Time (h): 43.5
@@ -7671,6 +8424,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, 15418-29-8, DPPF
 - Yield %: 56
 - Temperature (C): 110.0
 - Time (h): 43.5
@@ -7682,6 +8436,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2661321-37-3, 2764968-01-4, 15418-29-8, DPPF
 - Yield %: 73
 - Temperature (C): 110.0
 - Time (h): 43.5
@@ -7693,6 +8448,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), dtbbpy
 - Yield %: 71
 - Temperature (C): 150.0
 - Time (h): 1.0
@@ -7704,6 +8460,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 527-17-3, dtbbpy
 - Yield %: 90
 - Temperature (C): 150.0
 - Time (h): 1.0
@@ -7714,7 +8471,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328652
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7725,7 +8483,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328653
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7736,7 +8495,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328654
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 86
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7747,7 +8507,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328655
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7758,7 +8519,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328656
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7769,7 +8531,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328657
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 85
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7780,7 +8543,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328658
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 82
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7791,7 +8555,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328659
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7802,7 +8567,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328660
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 84
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7813,7 +8579,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328661
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 81
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7824,7 +8591,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328662
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 87
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7835,7 +8603,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328663
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 79
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7846,7 +8615,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328664
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 81
 - Temperature (C): 90.0
 - Time (h): 14.0
@@ -7857,7 +8627,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328665
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7868,7 +8639,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328670
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 91
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7879,7 +8651,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328671
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 74
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7890,7 +8663,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328672
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 75
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7901,7 +8675,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328673
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 79
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7912,7 +8687,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328677
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 57
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7923,7 +8699,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328680
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 61
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7934,7 +8711,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328682
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 67
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7945,7 +8723,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328684
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 63
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7956,7 +8735,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328693
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 60
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7967,7 +8747,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328697
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 83
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7978,7 +8759,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34328698
 
 - Type: Amination-Ni
-- Condition Core: Base: DMAP
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 77
 - Temperature (C): 90.0
 - Time (h): 11.0
@@ -7990,6 +8772,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 63
 - Temperature (C): 30.0
 - Time (h): 24.0
@@ -8001,6 +8784,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Temperature (C): 30.0
 - Time (h): 24.0
 - Reagents: Potassium carbonate (584-08-7) [BASE]
@@ -8011,6 +8795,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 72
 - Temperature (C): 30.0
 - Time (h): 24.0
@@ -8021,7 +8806,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408118
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 91
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8031,7 +8817,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408119
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 80
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8041,7 +8828,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408120
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 69
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8051,7 +8839,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408121
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 78
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8061,7 +8850,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408122
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 78
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8071,7 +8861,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408123
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 89
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8081,7 +8872,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408124
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 83
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8091,7 +8883,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408125
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 88
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8101,7 +8894,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408126
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 71
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8111,7 +8905,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408128
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 85
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8121,7 +8916,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408129
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 78
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8131,7 +8927,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408131
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 87
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8141,7 +8938,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408132
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 88
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8151,7 +8949,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408133
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 87
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8161,7 +8960,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408134
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 84
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8171,7 +8971,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408135
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 89
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8181,7 +8982,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408136
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 87
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8191,7 +8993,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408138
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 85
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8201,7 +9004,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408139
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 84
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8211,7 +9015,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408141
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 74
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8221,7 +9026,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408143
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 80
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8231,7 +9037,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408146
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 82
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8241,7 +9048,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408147
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 85
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8251,7 +9059,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408154
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 75
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8261,7 +9070,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408159
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 73
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8271,7 +9081,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408160
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 82
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8281,7 +9092,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408171
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 12
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8291,7 +9103,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408180
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 70
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8301,7 +9114,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408182
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 11
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8311,7 +9125,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408183
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 70
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8321,7 +9136,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408184
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 48
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8331,7 +9147,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408185
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 51
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8341,7 +9158,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408186
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 49
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8351,7 +9169,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34408188
 
 - Type: Amination-Ni
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
+- Catalytic System: Copper(I) iodide, Nickel(II) chloride (anhydrous), N,N′-dimethylethylenediamine
 - Yield %: 87
 - Temperature (C): 100.0
 - Time (h): 2.0
@@ -8361,220 +9180,264 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-34550700
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.C1CNC1>>FC(F)(F)c1ccc(N2CCC2)cc1
 
 ## Reaction 31-614-CAS-34550704
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-614-CAS-34550707
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.c1ccc2c(c1)CCN2>>FC(F)(F)c1ccc(N2CCc3ccccc32)cc1
 
 ## Reaction 31-614-CAS-34550708
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 85
 - Temperature (C): 25.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: FC(F)(F)c1ccc(Br)cc1.CCCCCNC>>CCCCCN(C)c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-614-CAS-34550714
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 96
 - Temperature (C): 25.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-34550722
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 90
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)Oc1ccc(Br)cc1>>FC(F)(F)Oc1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-34550723
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 97
 - Temperature (C): 25.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1cc(Br)cc(C(F)(F)F)c1>>FC(F)(F)c1cc(N2CCCC2)cc(C(F)(F)F)c1
 
 ## Reaction 31-614-CAS-34550724
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 93
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Fc1ccc(Br)cc1>>Fc1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-34550725
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 80
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1ccccc1.C1CCNC1>>c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-34550726
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 85
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Cc1ccccc1Br.C1CCNC1>>Cc1ccccc1N1CCCC1
 
 ## Reaction 31-614-CAS-34550727
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 88
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Clc1cccc(Br)c1.C1CCNC1>>Clc1cccc(N2CCCC2)c1
 
 ## Reaction 31-614-CAS-34550728
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 93
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccccc1Br>>N#Cc1ccccc1N1CCCC1
 
 ## Reaction 31-614-CAS-34550729
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 90
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1cccc(Br)c1>>N#Cc1cccc(N2CCCC2)c1
 
 ## Reaction 31-614-CAS-34550730
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 86
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: O=C(c1ccccc1)c1ccc(Br)cc1.C1CCNC1>>O=C(c1ccccc1)c1cccc(N2CCCC2)c1
 
 ## Reaction 31-614-CAS-34550731
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 73
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Nc1ccccc1Br>>Nc1ccccc1N1CCCC1
 
 ## Reaction 31-614-CAS-34550732
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 82
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.COc1cc(Br)cc(OC)c1>>COc1cc(OC)cc(N2CCCC2)c1
 
 ## Reaction 31-614-CAS-34550733
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 94
 - Temperature (C): 55.0
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(N2CCCC2)cc1
 
 ## Reaction 31-614-CAS-34550734
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 92
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1cccnc1>>c1cncc(N2CCCC2)c1
 
 ## Reaction 31-614-CAS-34550735
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 93
 - Temperature (C): 55.0
 - Time (h): 36.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.COC(=O)c1cccc(Br)c1>>COC(=O)c1cccc(N2CCCC2)c1
 
 ## Reaction 31-614-CAS-34550736
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 71
 - Temperature (C): 55.0
 - Time (h): 51.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.NC(=O)c1ccc(Br)cc1>>NC(=O)c1cccc(N2CCCC2)c1
 
 ## Reaction 31-614-CAS-34550737
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 82
 - Temperature (C): 55.0
 - Time (h): 24.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.CC1(C)OB(c2ccc(Br)cc2)OC1(C)C>>CC1(C)OB(c2ccc(N3CCCC3)cc2)OC1(C)C
 
 ## Reaction 31-614-CAS-34550738
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 2259313-99-8, XPhos
 - Yield %: 89
 - Temperature (C): 55.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1cncnc1>>c1ncc(N2CCCC2)cn1
 
@@ -8582,6 +9445,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 95
 - Temperature (C): 30.0
 - Time (h): 36.083
@@ -8593,6 +9457,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 99
 - Temperature (C): 30.0
 - Time (h): 36.083
@@ -8604,6 +9469,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 87
 - Temperature (C): 30.0
 - Time (h): 36.083
@@ -8615,6 +9481,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 84
 - Temperature (C): 30.0
 - Time (h): 36.083
@@ -8626,6 +9493,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 62
 - Temperature (C): 30.0
 - Time (h): 18.083
@@ -8637,6 +9505,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 99
 - Temperature (C): 30.0
 - Time (h): 18.083
@@ -8648,6 +9517,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 74
 - Temperature (C): 30.0
 - Time (h): 36.083
@@ -8659,6 +9529,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 88
 - Temperature (C): 30.0
 - Time (h): 18.083
@@ -8670,6 +9541,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 95
 - Temperature (C): 30.0
 - Time (h): 36.083
@@ -8681,6 +9553,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/CyclohexylJohnPhos
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), Cyclohexyl JohnPhos
 - Yield %: 68
 - Temperature (C): 60.0
 - Time (h): 18.0
@@ -8692,9 +9565,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/bpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 1639932-26-5, 2,2'-Bipyridine
 - Yield %: 97
 - Time (h): 5.0
-- Reagents: 100-76-5 (100-76-5) [UNK]
+- Reagents: Quinuclidine (100-76-5) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(N2CCCC2)cc1
 
@@ -8702,6 +9576,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 85
 - Temperature (C): 25.0
 - Time (h): 36.167
@@ -8713,6 +9588,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 72
 - Temperature (C): 25.0
 - Time (h): 36.167
@@ -8724,6 +9600,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2900355-72-6, dtbbpy
 - Temperature (C): 100.0
 - Reagents: Sodium tert-butoxide (865-48-5) [BASE]
 - Solvents: Toluene (108-88-3)
@@ -8733,6 +9610,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2900355-80-6, dtbbpy
 - Temperature (C): 100.0
 - Reagents: Sodium tert-butoxide (865-48-5) [BASE]
 - Solvents: Toluene (108-88-3)
@@ -8742,6 +9620,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2900355-76-0, dtbbpy
 - Temperature (C): 100.0
 - Reagents: Sodium tert-butoxide (865-48-5) [BASE]
 - Solvents: Toluene (108-88-3)
@@ -8751,6 +9630,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 95
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8761,6 +9641,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 94
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8771,6 +9652,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 93
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8781,6 +9663,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 89
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8791,6 +9674,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 88
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8801,6 +9685,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 71
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8811,6 +9696,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 76
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8821,6 +9707,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 84
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8831,6 +9718,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 84
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8841,6 +9729,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 79
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8851,6 +9740,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 75
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8861,6 +9751,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 69
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8871,6 +9762,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8881,6 +9773,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8891,6 +9784,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 543-90-8, dtbbpy
 - Yield %: 78
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -8900,6 +9794,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091247
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 50
 - Temperature (C): 130.0
 - Time (h): 15.0
@@ -8910,6 +9805,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091254
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 54
 - Temperature (C): 130.0
 - Time (h): 15.0
@@ -8920,6 +9816,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091256
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 66
 - Temperature (C): 130.0
 - Time (h): 15.0
@@ -8930,6 +9827,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091257
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 62
 - Temperature (C): 130.0
 - Time (h): 15.0
@@ -8940,6 +9838,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091264
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 57
 - Temperature (C): 130.0
 - Time (h): 15.0
@@ -8950,6 +9849,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091266
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 52
 - Temperature (C): 130.0
 - Time (h): 18.0
@@ -8960,6 +9860,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091273
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 56
 - Temperature (C): 130.0
 - Time (h): 15.0
@@ -8970,6 +9871,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36091274
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 2071-20-7
 - Yield %: 50
 - Temperature (C): 130.0
 - Time (h): 15.0
@@ -8981,16 +9883,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), DPPF
 - Yield %: 78
 - Temperature (C): 100.0
 - Time (h): 18.0
-- Reagents: 1907-33-1 (1907-33-1) [UNK]
+- Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Cyclopentyl methyl ether (5614-37-9)
 - SMILES: C1COCCN1.Clc1ccc2ncccc2c1>>c1cnc2ccc(N3CCOCC3)cc2c1
 
 ## Reaction 31-614-CAS-36488745
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 84
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9000,6 +9905,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488756
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 54
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9009,6 +9916,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488757
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 86
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9018,6 +9927,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488758
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 76
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9027,6 +9938,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488759
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 93
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9036,6 +9949,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488760
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 85
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9045,6 +9960,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488763
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 71
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9054,6 +9971,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488764
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 51
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9063,6 +9982,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488765
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 75
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9072,6 +9993,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488766
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 85
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9081,7 +10004,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488767
 
 - Type: Amination-Ni
-- Condition Core: Additive: LiCl
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 56
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9092,6 +10016,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488768
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 51
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9101,6 +10027,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488770
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 93
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9110,6 +10038,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488773
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 87
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9119,6 +10049,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488774
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 76
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9128,6 +10060,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488775
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 81
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9137,6 +10071,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488778
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 92
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9146,6 +10082,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488780
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 67
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9155,6 +10093,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488784
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 93
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9164,6 +10104,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488787
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 87
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9173,6 +10115,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36488789
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, XPhos
 - Yield %: 64
 - Temperature (C): 40.0
 - Time (h): 12.0
@@ -9183,6 +10127,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 76
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9194,6 +10139,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9205,6 +10151,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9216,6 +10163,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9227,6 +10175,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9238,6 +10187,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 27.0
@@ -9249,6 +10199,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 77
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9260,6 +10211,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 83
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9271,6 +10223,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9281,6 +10234,7 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-36529231
 
 - Type: Amination-Ni
+- Catalytic System: 373-02-4, 1134-35-6
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9291,6 +10245,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 85
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9302,6 +10257,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 61
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9313,6 +10269,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9324,6 +10281,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 75
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9335,6 +10293,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9346,6 +10305,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9357,6 +10317,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9368,6 +10329,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 79
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9379,6 +10341,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9390,6 +10353,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 61
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9401,6 +10365,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 68
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9412,6 +10377,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 68
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9423,6 +10389,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 80
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9434,6 +10401,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 65
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9445,6 +10413,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 83
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9456,6 +10425,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 75
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9467,6 +10437,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 71
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9478,6 +10449,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 73
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9489,6 +10461,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 79
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9500,6 +10473,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 72
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9511,6 +10485,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 68
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9522,6 +10497,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 72
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9533,6 +10509,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 58
 - Temperature (C): 85.0
 - Time (h): 36.0
@@ -9544,6 +10521,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9555,6 +10533,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 86
 - Temperature (C): 85.0
 - Time (h): 36.0
@@ -9566,6 +10545,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9577,6 +10557,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 61
 - Temperature (C): 85.0
 - Time (h): 36.0
@@ -9588,6 +10569,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 93
 - Temperature (C): 85.0
 - Time (h): 24.0
@@ -9599,6 +10581,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 98
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9610,6 +10593,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 77
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9621,6 +10605,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 86
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9632,6 +10617,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 96
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9643,6 +10629,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 94
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9654,6 +10641,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 88
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9665,6 +10653,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 94
 - Temperature (C): 50.0
 - Time (h): 31.333
@@ -9676,6 +10665,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 99
 - Temperature (C): 50.0
 - Time (h): 31.333
@@ -9687,6 +10677,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 55
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9698,6 +10689,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 81
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9709,6 +10701,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 64
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9720,6 +10713,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 90
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9731,6 +10725,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 94
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9742,6 +10737,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 64
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9753,6 +10749,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 84
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9764,6 +10761,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 75
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9775,6 +10773,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 81
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9786,6 +10785,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 75
 - Temperature (C): 80.0
 - Time (h): 34.333
@@ -9797,6 +10797,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 88
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9808,6 +10809,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 80
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9819,6 +10821,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 87
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9830,6 +10833,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 90
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9841,6 +10845,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 58
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9852,6 +10857,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 80
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9863,6 +10869,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 62
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9874,6 +10881,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 78
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9885,6 +10893,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 66
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9896,6 +10905,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 78
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9907,6 +10917,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 67
 - Temperature (C): 30.0
 - Time (h): 31.333
@@ -9918,6 +10929,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 72
 - Temperature (C): 30.0
 - Time (h): 27.333
@@ -9929,6 +10941,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2088024-91-1, dtbbpy
 - Yield %: 77
 - Temperature (C): 80.0
 - Time (h): 31.333
@@ -9940,10 +10953,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 85
 - Temperature (C): 25.0
 - Time (h): 12.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCCC2)cc1
 
@@ -9951,10 +10965,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 93
 - Temperature (C): 60.0
 - Time (h): 45.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CNCCN1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCNCC2)cc1
 
@@ -9962,10 +10977,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 12.5
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: OC1CCNCC1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCC(O)CC2)cc1
 
@@ -9973,10 +10989,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 89
 - Temperature (C): 25.0
 - Time (h): 13.5
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: N#CC1CCNCC1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCC(C#N)CC2)cc1
 
@@ -9984,10 +11001,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 13.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: CCOC(=O)c1ccc(Br)cc1.NC(=O)C1CCNCC1>>CCOC(=O)c1ccc(N2CCC(C(N)=O)CC2)cc1
 
@@ -9995,10 +11013,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 70
 - Temperature (C): 25.0
 - Time (h): 15.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNCC1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCCCC2)cc1
 
@@ -10006,10 +11025,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 91
 - Temperature (C): 25.0
 - Time (h): 11.5
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCOCC2)cc1
 
@@ -10017,10 +11037,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: CNCc1ccccc1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N(C)Cc2ccccc2)cc1
 
@@ -10028,10 +11049,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 76
 - Temperature (C): 25.0
 - Time (h): 12.5
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2c(c1)CCNC2.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCc3ccccc3C2)cc1
 
@@ -10039,10 +11061,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 95
 - Temperature (C): 60.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc(-c2cc[nH]n2)cc1.Brc1cncnc1>>c1ccc(-c2ccn(-c3cncnc3)n2)cc1
 
@@ -10050,10 +11073,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 77
 - Temperature (C): 80.0
 - Time (h): 35.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: c1c[nH]cn1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(-n2ccnc2)cc1
 
@@ -10061,10 +11085,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 61
 - Temperature (C): 60.0
 - Time (h): 55.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2[nH]ncc2c1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(-n2ncc3ccccc32)cc1
 
@@ -10072,10 +11097,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 73
 - Temperature (C): 60.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1cccnc1.c1ccc(-c2cc[nH]n2)cc1>>c1ccc(-c2ccn(-c3cccnc3)n2)cc1
 
@@ -10083,10 +11109,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 94
 - Temperature (C): 60.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc(-c2cc[nH]n2)cc1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(-n2ccc(-c3ccccc3)n2)cc1
 
@@ -10094,10 +11121,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 77
 - Temperature (C): 60.0
 - Time (h): 28.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1c[nH]cn1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(-n2ccnc2)cc1
 
@@ -10105,10 +11133,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 37.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: O=C1CCCN1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCCC2=O)cc1
 
@@ -10116,10 +11145,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 33.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: O=C1NCCO1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCOC2=O)cc1
 
@@ -10127,10 +11157,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 94
 - Temperature (C): 25.0
 - Time (h): 33.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: O=C1CCN1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCC2=O)cc1
 
@@ -10138,10 +11169,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 54
 - Temperature (C): 60.0
 - Time (h): 39.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: O=C1CCCN1.Brc1cccnc1>>O=C1CCCN1c1cccnc1
 
@@ -10149,10 +11181,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 73
 - Temperature (C): 25.0
 - Time (h): 12.5
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2c(c1)[nH]c1ccccc12.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(-n2c3ccccc3c3ccccc32)cc1
 
@@ -10160,10 +11193,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 51
 - Temperature (C): 60.0
 - Time (h): 49.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: O=C1CCCN1.Brc1cncnc1>>O=C1CCCN1c1cncnc1
 
@@ -10171,10 +11205,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 84
 - Temperature (C): 60.0
 - Time (h): 49.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2[nH]cnc2c1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(-n2cnc3ccccc32)cc1
 
@@ -10182,10 +11217,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 57
 - Temperature (C): 25.0
 - Time (h): 53.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: O=C1CCCCN1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCCCC2=O)cc1
 
@@ -10193,10 +11229,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 62
 - Temperature (C): 80.0
 - Time (h): 33.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: c1ccc2[nH]ccc2c1.Brc1cccnc1>>c1cncc(-n2ccc3ccccc32)c1
 
@@ -10204,10 +11241,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 70
 - Temperature (C): 25.0
 - Time (h): 33.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: O=C1COCCN1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(N2CCOCC2=O)cc1
 
@@ -10215,10 +11253,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 85
 - Temperature (C): 25.0
 - Time (h): 33.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: c1ccc2[nH]ccc2c1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(-n2ccc3ccccc32)cc1
 
@@ -10226,10 +11265,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 63
 - Temperature (C): 80.0
 - Time (h): 34.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: c1ccc2[nH]ccc2c1.Brc1cncnc1>>c1ccc2c(c1)ccn2-c1cncnc1
 
@@ -10237,10 +11277,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 85
 - Temperature (C): 60.0
 - Time (h): 33.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: c1ccc2[nH]cnc2c1.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(-n2cnc3ccccc32)cc1
 
@@ -10248,10 +11289,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 69
 - Temperature (C): 60.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: COC(=O)[C@H](Cc1cnc[nH]1)NC(=O)OC(C)(C)C.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc(-n2cnc(C[C@H](NC(=O)OC(C)(C)C)C(=O)OC)c2)cc1
 
@@ -10259,10 +11301,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 54
 - Temperature (C): 80.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK], 102-82-9 (102-82-9) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE], Tributylamine (102-82-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2[nH]cnc2c1.CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Cl)cc2)cc1>>CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(-n3cnc4ccccc43)cc2)cc1
 
@@ -10270,10 +11313,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 33.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2c(c1)[nH]c1ccccc12.Cc1ccc(-c2ncc(Cl)cc2-c2ccc(S(C)(=O)=O)cc2)cn1>>Cc1ccc(-c2ncc(-n3c4ccccc4c4ccccc43)cc2-c2ccc(S(C)(=O)=O)cc2)cn1
 
@@ -10281,10 +11325,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 72
 - Temperature (C): 80.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK], 102-82-9 (102-82-9) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE], Tributylamine (102-82-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1ccc2[nH]cnc2c1.COC(=O)C(C)(C)Oc1ccc(CCNC(=O)c2ccc(Cl)cc2)cc1>>COC(=O)C(C)(C)Oc1ccc(CCNC(=O)c2ccc(-n3cnc4ccccc43)cc2)cc1
 
@@ -10292,10 +11337,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 79
 - Temperature (C): 60.0
 - Time (h): 45.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: C1CNCCN1.FC(F)(F)c1cccc(Br)c1>>FC(F)(F)c1cccc(N2CCNCC2)c1
 
@@ -10303,10 +11349,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 95
 - Temperature (C): 60.0
 - Time (h): 21.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Clc1ccc2c(Cl)ccnc2c1.C1CNCCN1>>Clc1ccc2c(N3CCNCC3)ccnc2c1
 
@@ -10314,10 +11361,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 72
 - Temperature (C): 25.0
 - Time (h): 14.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Brc1ccc(Br)cc1.OC1CCNCC1>>OC1CCN(c2ccc(Br)cc2)CC1
 
@@ -10325,10 +11373,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 83
 - Temperature (C): 60.0
 - Time (h): 30.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: c1cn[nH]c1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(-n2cccn2)cc1
 
@@ -10336,10 +11385,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 72
 - Temperature (C): 60.0
 - Time (h): 45.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: O=C1CCCN1.Clc1ccc(Br)cn1>>O=C1CCCN1c1ccc(Cl)nc1
 
@@ -10347,10 +11397,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 61
 - Temperature (C): 80.0
 - Time (h): 49.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: O=C1NCc2ccccc21.CCC(C(=O)OC)c1ccc(Br)cc1>>CCC(C(=O)OC)c1ccc(N2Cc3ccccc3C2=O)cc1
 
@@ -10358,10 +11409,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 54
 - Temperature (C): 25.0
 - Time (h): 73.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: Acetonitrile (75-05-8)
 - SMILES: Brc1ccc(Br)cc1.O=C1COCCN1>>O=C1COCCN1c1ccc(Br)cc1
 
@@ -10369,10 +11421,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 54
 - Temperature (C): 60.0
 - Time (h): 26.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Cc1cnc[nH]1.Cc1ccc(C(=O)Nc2cc(Br)cc(C(F)(F)F)c2)cc1Br>>Cc1cn(-c2cc(NC(=O)c3ccc(C)c(Br)c3)cc(C(F)(F)F)c2)cn1
 
@@ -10380,6 +11433,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Bis(1,5-cyclooctadiene)nickel(0), 2962934-03-6, dtbbpy
 - Yield %: 78
 - Temperature (C): 40.0
 - Time (h): 15.0
@@ -10391,10 +11445,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 61228-18-0, dtbbpy
 - Yield %: 99
 - Temperature (C): 50.0
 - Time (h): 24.083
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N-Methyl-2-pyrrolidone (872-50-4)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -10402,10 +11457,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 61228-18-0, dtbbpy
 - Yield %: 60
 - Temperature (C): 50.0
 - Time (h): 24.083
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N-Methyl-2-pyrrolidone (872-50-4)
 - SMILES: C1COCCN1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
 
@@ -10413,10 +11469,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2950191-68-9, dtbbpy
 - Yield %: 70
 - Temperature (C): 50.0
 - Time (h): 16.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.COC(=O)c1cc(Br)cc2ccccc12>>COC(=O)c1cc(N2CCCC2)cc2ccccc12
 
@@ -10424,6 +11481,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 61
 - Temperature (C): 25.0
 - Time (h): 25.0
@@ -10434,6 +11492,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 52
 - Temperature (C): 60.0
 - Time (h): 14.0
@@ -10444,6 +11503,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 56
 - Temperature (C): 25.0
 - Time (h): 17.0
@@ -10454,6 +11514,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 64
 - Temperature (C): 25.0
 - Time (h): 17.5
@@ -10464,6 +11525,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 76
 - Temperature (C): 25.0
 - Time (h): 11.5
@@ -10474,6 +11536,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 59
 - Temperature (C): 25.0
 - Time (h): 14.0
@@ -10484,6 +11547,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 65
 - Temperature (C): 60.0
 - Time (h): 11.0
@@ -10494,6 +11558,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 53
 - Temperature (C): 60.0
 - Time (h): 13.0
@@ -10504,6 +11569,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 60
 - Temperature (C): 25.0
 - Time (h): 14.0
@@ -10514,6 +11580,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 70
 - Temperature (C): 25.0
 - Time (h): 12.5
@@ -10524,10 +11591,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 50
 - Temperature (C): 60.0
 - Time (h): 14.5
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.Brc1cncc(Br)c1.CCOC(=O)CCS>>CCOC(=O)CCSc1cncc(N2CCCC2)c1
 
@@ -10535,10 +11603,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 56
 - Temperature (C): 60.0
 - Time (h): 15.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1COCCN1.Brc1cncc(Br)c1.Sc1ccccc1>>c1ccc(Sc2cncc(N3CCOCC3)c2)cc1
 
@@ -10546,17 +11615,19 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 79
 - Temperature (C): 25.0
 - Time (h): 13.5
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: CCOC(=O)CCS.Brc1cnc(Br)nc1.C1CCNC1>>CCOC(=O)CCSc1ncc(N2CCCC2)cn1
 
 ## Reaction 31-614-CAS-38203483
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 75
 - Temperature (C): 120.0
 - Time (h): 9.5
@@ -10566,7 +11637,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203486
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 69
 - Temperature (C): 120.0
 - Time (h): 9.5
@@ -10576,7 +11648,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203487
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 77
 - Temperature (C): 120.0
 - Time (h): 8.0
@@ -10586,7 +11659,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203488
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 76
 - Temperature (C): 120.0
 - Time (h): 8.5
@@ -10596,7 +11670,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203489
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 73
 - Temperature (C): 120.0
 - Time (h): 9.0
@@ -10606,7 +11681,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203491
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 73
 - Temperature (C): 120.0
 - Time (h): 9.5
@@ -10616,7 +11692,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203492
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 80
 - Temperature (C): 120.0
 - Time (h): 8.5
@@ -10626,7 +11703,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203496
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 75
 - Temperature (C): 120.0
 - Time (h): 9.0
@@ -10636,7 +11714,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-38203498
 
 - Type: Amination-Ni
-- Condition Core: Base: NaOtBu
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 1317-61-9, 1671-88-1, 7440-50-8, 7631-86-9, XPhos
 - Yield %: 67
 - Temperature (C): 120.0
 - Time (h): 10.0
@@ -10647,6 +11726,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, dtbbpy
 - Yield %: 68
 - Temperature (C): 55.0
 - Time (h): 5.0
@@ -10657,6 +11737,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/bpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 2,2'-Bipyridine
 - Yield %: 99
 - Reagents: Lithium bromide (7550-35-8) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -10666,6 +11747,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, 1416881-52-1, dtbbpy
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 36.5
@@ -10676,6 +11758,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: DPPF
+- Catalytic System: 373-02-4, DPPF
 - Yield %: 70
 - Temperature (C): 110.0
 - Time (h): 24.083
@@ -10687,6 +11770,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: DPPF
+- Catalytic System: 373-02-4, DPPF
 - Yield %: 52
 - Temperature (C): 110.0
 - Time (h): 24.083
@@ -10698,6 +11782,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: DPPF
+- Catalytic System: 373-02-4, DPPF
 - Yield %: 61
 - Temperature (C): 110.0
 - Time (h): 24.083
@@ -10709,6 +11794,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: DPPF
+- Catalytic System: 373-02-4, DPPF
 - Yield %: 54
 - Temperature (C): 110.0
 - Time (h): 24.083
@@ -10720,6 +11806,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: DPPF
+- Catalytic System: 373-02-4, DPPF
 - Yield %: 66
 - Temperature (C): 110.0
 - Time (h): 24.083
@@ -10731,6 +11818,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, DPPF
 - Yield %: 82
 - Temperature (C): 110.0
 - Time (h): 24.5
@@ -10742,6 +11830,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, DPPF
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 24.5
@@ -10753,6 +11842,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, DPPF
 - Yield %: 73
 - Temperature (C): 110.0
 - Time (h): 24.5
@@ -10764,6 +11854,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/DPPF
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, DPPF
 - Yield %: 72
 - Temperature (C): 110.0
 - Time (h): 24.5
@@ -10774,6 +11865,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310238
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 85
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10783,6 +11876,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310240
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 12.0
@@ -10792,6 +11887,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310241
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 90
 - Temperature (C): 25.0
 - Time (h): 12.0
@@ -10801,6 +11898,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310242
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 93
 - Temperature (C): 25.0
 - Time (h): 12.0
@@ -10810,6 +11909,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310243
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 88
 - Temperature (C): 25.0
 - Time (h): 12.0
@@ -10819,6 +11920,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310246
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 91
 - Temperature (C): 25.0
 - Time (h): 12.0
@@ -10828,6 +11931,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310254
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 78
 - Temperature (C): 25.0
 - Time (h): 8.0
@@ -10837,6 +11942,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310256
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 82
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10846,6 +11953,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310257
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 88
 - Temperature (C): 25.0
 - Time (h): 36.0
@@ -10855,6 +11964,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310258
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 92
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10864,6 +11975,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310259
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 86
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10873,6 +11986,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310261
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 52
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10882,6 +11997,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310263
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10891,6 +12008,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310264
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 91
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10900,6 +12019,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310267
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 76
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10909,6 +12030,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-40310286
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel, 154769-61-6, XPhos
 - Yield %: 4
 - Temperature (C): 25.0
 - Time (h): 12.0
@@ -10919,6 +12042,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), 154769-61-6, dtbbpy
 - Yield %: 22
 - Temperature (C): 25.0
 - Time (h): 12.0
@@ -10929,6 +12053,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 64
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10939,6 +12064,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 63
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10949,6 +12075,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 83
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10959,6 +12086,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 70
 - Temperature (C): 25.0
 - Time (h): 24.0
@@ -10969,10 +12097,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride (anhydrous), dtbbpy
 - Yield %: 51
 - Temperature (C): 25.0
 - Time (h): 48.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: Cl.Fc1ccc([C@@H]2CCNC[C@H]2COc2ccc3c(c2)OCO3)cc1.O.CC(COC1=CC=C(OC2=CC=C([S+]3C4=CC=CC=C4SC4=CC=CC=C43)C=C2)C=C1)OC1=CC=CC=N1.[F-][B+3]([F-])([F-])[F-]>>CC(COc1ccc(Oc2ccc(N3CC[C@@H](c4ccc(F)cc4)[C@H](COc4ccc5c(c4)OCO5)C3)cc2)cc1)Oc1ccccn1
 
@@ -10980,9 +12109,10 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 143334-20-7, dtbbpy
 - Yield %: 84
 - Temperature (C): 25.0
-- Reagents: 280-57-9 (280-57-9) [UNK]
+- Reagents: Dabco (280-57-9) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5)
 - SMILES: C1CCNC1.FC(F)(F)c1ccc(Br)cc1>>FC(F)(F)c1ccc(N2CCCC2)cc1
 
@@ -10990,6 +12120,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 86
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -10999,6 +12130,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 79
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11008,6 +12140,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 97
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11017,6 +12150,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 77
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11026,6 +12160,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 92
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11035,6 +12170,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 72
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11044,6 +12180,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 90
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11053,6 +12190,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 86
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11062,6 +12200,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 54
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11071,6 +12210,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 62
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11080,6 +12220,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 88
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11089,6 +12230,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 50
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11098,6 +12240,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 78
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11107,6 +12250,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 57
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11116,6 +12260,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 69
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11125,6 +12270,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 75
 - Time (h): 4.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11134,6 +12280,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 52
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11143,6 +12290,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 74
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11152,6 +12300,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 70
 - Time (h): 4.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11161,6 +12310,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 60
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11170,6 +12320,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 65
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11179,6 +12330,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 57
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11188,6 +12340,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 51
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11197,6 +12350,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 84
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11206,6 +12360,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 79
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11215,6 +12370,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 94
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11224,6 +12380,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 73
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11233,6 +12390,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 61
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11242,6 +12400,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 76
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11251,6 +12410,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 84
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11260,6 +12420,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 58
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11269,6 +12430,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 55
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11278,6 +12440,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 70
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11287,6 +12450,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 66
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11296,6 +12460,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Zinc dust, dtbbpy
 - Yield %: 63
 - Time (h): 1.5
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -11305,6 +12470,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: batho-phen
+- Catalytic System: 373-02-4, Bathophenanthroline
 - Yield %: 95
 - Temperature (C): 30.0
 - Time (h): 48.0
@@ -11316,6 +12482,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 1134-35-6, dtbbpy
 - Yield %: 71
 - Temperature (C): 85.0
 - Time (h): 36.0
@@ -11327,6 +12494,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 78
 - Temperature (C): 50.0
 - Time (h): 12.0
@@ -11338,6 +12506,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 73
 - Temperature (C): 50.0
 - Time (h): 12.0
@@ -11349,6 +12518,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 64
 - Temperature (C): 50.0
 - Time (h): 24.0
@@ -11360,6 +12530,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 52
 - Temperature (C): 50.0
 - Time (h): 24.0
@@ -11371,6 +12542,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 66
 - Temperature (C): 50.0
 - Time (h): 36.0
@@ -11382,6 +12554,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 71
 - Temperature (C): 50.0
 - Time (h): 18.0
@@ -11393,6 +12566,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 63
 - Temperature (C): 50.0
 - Time (h): 12.0
@@ -11404,6 +12578,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 61
 - Temperature (C): 50.0
 - Time (h): 15.0
@@ -11415,6 +12590,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 67
 - Temperature (C): 50.0
 - Time (h): 18.0
@@ -11426,6 +12602,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 68
 - Temperature (C): 50.0
 - Time (h): 12.0
@@ -11437,6 +12614,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 62
 - Temperature (C): 50.0
 - Time (h): 24.0
@@ -11448,6 +12626,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 69
 - Temperature (C): 50.0
 - Time (h): 16.0
@@ -11459,6 +12638,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 68
 - Temperature (C): 50.0
 - Time (h): 18.0
@@ -11470,6 +12650,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 71
 - Temperature (C): 50.0
 - Time (h): 12.0
@@ -11481,6 +12662,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 76
 - Temperature (C): 50.0
 - Time (h): 16.0
@@ -11492,6 +12674,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 68
 - Temperature (C): 50.0
 - Time (h): 24.0
@@ -11503,6 +12686,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate, 123-75-1, dtbbpy
 - Yield %: 67
 - Temperature (C): 50.0
 - Time (h): 12.0
@@ -11513,6 +12697,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630313
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 86
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11522,6 +12708,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630314
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11531,6 +12719,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630316
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 92
 - Temperature (C): 75.0
 - Time (h): 0.75
@@ -11540,6 +12730,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630319
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11549,6 +12741,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630320
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 89
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11558,6 +12752,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630321
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 88
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11567,6 +12763,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630322
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 75
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11576,6 +12774,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630323
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 78
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11585,6 +12785,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630324
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 78
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11594,6 +12796,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630326
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 92
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11603,6 +12807,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630327
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 86
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11612,6 +12818,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630328
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 78
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11621,6 +12829,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630333
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 90
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11630,6 +12840,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630334
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 86
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11639,6 +12851,8 @@ Total reactions: 1131
 ## Reaction 31-614-CAS-41630337
 
 - Type: Amination-Ni
+- Condition Core: Pd/XPhos
+- Catalytic System: Nickel ferrite, XPhos
 - Yield %: 82
 - Temperature (C): 75.0
 - Time (h): 1.0
@@ -11649,6 +12863,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 52
 - Temperature (C): 40.0
 - Time (h): 48.0
@@ -11660,6 +12875,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 51
 - Temperature (C): 40.0
 - Time (h): 48.0
@@ -11671,6 +12887,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 60
 - Temperature (C): 40.0
 - Time (h): 72.0
@@ -11682,6 +12899,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 95
 - Temperature (C): 40.0
 - Time (h): 9.0
@@ -11693,6 +12911,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 56
 - Temperature (C): 40.0
 - Time (h): 2.0
@@ -11704,6 +12923,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 84
 - Temperature (C): 40.0
 - Time (h): 4.0
@@ -11715,6 +12935,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 59
 - Temperature (C): 40.0
 - Time (h): 6.0
@@ -11726,6 +12947,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 56
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11737,6 +12959,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 40.0
 - Time (h): 3.0
@@ -11748,6 +12971,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 77
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11759,6 +12983,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 71
 - Temperature (C): 40.0
 - Time (h): 18.0
@@ -11770,10 +12995,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 91
 - Temperature (C): 40.0
 - Time (h): 4.0
-- Reagents: 298-14-6 (298-14-6) [UNK]
+- Reagents: Potassium Bicarbonate (298-14-6) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: COC(=O)c1ccc(Br)cc1.CC(C)(C)OC(=O)NCCc1c[nH]c2ccccc12>>COC(=O)c1ccc(-n2cc(CCNC(=O)OC(C)(C)C)c3ccccc32)cc1
 
@@ -11781,6 +13007,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 71
 - Temperature (C): 40.0
 - Time (h): 48.0
@@ -11792,6 +13019,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 90
 - Temperature (C): 40.0
 - Time (h): 48.0
@@ -11803,6 +13031,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 71
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11814,6 +13043,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 79
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11825,6 +13055,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11836,6 +13067,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 52
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11847,6 +13079,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11858,6 +13091,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 83
 - Temperature (C): 40.0
 - Time (h): 2.0
@@ -11869,6 +13103,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 89
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11880,6 +13115,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 78
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11891,6 +13127,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 77
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11902,6 +13139,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 53
 - Temperature (C): 40.0
 - Time (h): 48.0
@@ -11913,6 +13151,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 71
 - Temperature (C): 40.0
 - Time (h): 48.0
@@ -11924,6 +13163,7 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) chloride dimethoxyethane complex, 676525-77-2, 4,4'-di-tert-Butyl-2,2'-bipyridine
 - Yield %: 82
 - Temperature (C): 40.0
 - Time (h): 24.0
@@ -11935,10 +13175,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 87
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: COc1ccc(NC(C)=O)cc1.FC(F)(F)c1ccc(I)cc1>>COc1ccc(N(C(C)=O)c2ccc(C(F)(F)F)cc2)cc1
 
@@ -11946,10 +13187,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 62
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CCOc1ccc(NC(C)=O)cc1.FC(F)(F)c1ccc(I)cc1>>CCOc1ccc(N(C(C)=O)c2ccc(C(F)(F)F)cc2)cc1
 
@@ -11957,10 +13199,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 60
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: FC(F)(F)c1ccc(I)cc1.COc1ccc(OC)c(NC(C)=O)c1>>COc1ccc(OC)c(N(C(C)=O)c2ccc(C(F)(F)F)cc2)c1
 
@@ -11968,10 +13211,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 65
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC(=O)Nc1ccccc1C.FC(F)(F)c1ccc(I)cc1>>CC(=O)N(c1ccc(C(F)(F)F)cc1)c1ccccc1C
 
@@ -11979,10 +13223,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 57
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: FC(F)(F)c1ccc(I)cc1.O=CNc1cccc2ccccc12>>O=CN(c1ccc(C(F)(F)F)cc1)c1cccc2ccccc12
 
@@ -11990,10 +13235,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 56
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: O=C1Cc2ccccc2N1.FC(F)(F)c1ccc(I)cc1>>O=C1Cc2ccccc2N1c1ccc(C(F)(F)F)cc1
 
@@ -12001,10 +13247,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 72
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: O=C1NC(=O)c2ccccc21.FC(F)(F)c1ccc(I)cc1>>O=C1c2ccccc2C(=O)N1c1ccc(C(F)(F)F)cc1
 
@@ -12012,10 +13259,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 61
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: COc1ccc(NC(C)=O)cc1.O=Cc1ccc(I)cc1>>COc1ccc(N(C(C)=O)c2ccc(C=O)cc2)cc1
 
@@ -12023,10 +13271,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 79
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: COc1ccc(NC(C)=O)cc1.N#Cc1ccc(Br)cc1>>COc1ccc(N(C(C)=O)c2ccc(C#N)cc2)cc1
 
@@ -12034,10 +13283,11 @@ Total reactions: 1131
 
 - Type: Amination-Ni
 - Condition Core: Ni/dtbbpy
+- Catalytic System: Nickel(II) bromide dimethoxyethane complex, Tetrabutylammonium chloride, 17217-57-1, 1416881-52-1, dtbbpy
 - Yield %: 57
 - Temperature (C): 40.0
 - Time (h): 57.0
-- Reagents: 80-70-6 (80-70-6) [UNK]
+- Reagents: 1,1,3,3-Tetramethylguanidine (80-70-6) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: COc1ccc(NC(C)=O)cc1.N#Cc1ccc(I)cc1>>COc1ccc(N(C(C)=O)c2ccc(C#N)cc2)cc1
 
