@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict, Any, List, Tuple, Optional, Callable, Set
 from dataclasses import dataclass
 from collections import Counter
+import re
 
 from .smiles import normalize_reaction
 from .router import detect_family
@@ -612,6 +613,19 @@ def _water_management_for_category(category: str) -> Optional[str]:
     return mapping.get(category)
 
 
+def _looks_like_aromatic_aniline(smiles: str | None) -> bool:
+    if not smiles:
+        return False
+    t = smiles.lower()
+    if "n" not in t:
+        return False
+    ring_markers = ("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8")
+    if any(marker in t for marker in ring_markers):
+        return True
+    # Also allow simple phenyl tokens like "c(" following an N attachment
+    return bool(re.search(r"n[^;]*c", t))
+
+
 def _default_rule_feature_builder(ctx: _RuleFeatureContext) -> Dict[str, Any]:
     features = ctx.features or {}
     lg = features.get("LG")
@@ -641,8 +655,51 @@ def _default_rule_feature_builder(ctx: _RuleFeatureContext) -> Dict[str, Any]:
     }
     entries = _role_reactant_entries(ctx.role_pack, ctx.reactants)
     role_summary = _build_role_summary(ctx.role_pack, entries)
+    elec_idx, elec_entry = _resolve_role_entry(ctx, "electrophile", fallback_idx=0)
+    nuc_idx, nuc_entry = _resolve_role_entry(ctx, "nucleophile", fallback_idx=1)
+
+    if not role_summary:
+        summary: Dict[str, Any] = {}
+        if elec_entry:
+            summary["electrophile"] = {
+                "role": "electrophile",
+                "smiles": elec_entry.get("smiles") or elec_entry.get("input"),
+                "matched_via_mask": False,
+                "index": elec_idx,
+            }
+        if nuc_entry:
+            summary["nucleophile"] = {
+                "role": "nucleophile",
+                "smiles": nuc_entry.get("smiles") or nuc_entry.get("input"),
+                "matched_via_mask": False,
+                "index": nuc_idx,
+            }
+        if summary:
+            role_summary = summary
+
+    nuc_smiles = (nuc_entry or {}).get("smiles") or (nuc_entry or {}).get("input") or ""
+    current_nuc_class = (rule_feats.get("nuc_class") or "").lower()
+    if _looks_like_aromatic_aniline(nuc_smiles) and current_nuc_class in {"", "amine", "amine_primary"}:
+        rule_feats["nuc_class"] = "aniline"
+        rule_feats["nucleophile"]["class"] = _nucleophile_class_text("aniline")
+        if rule_feats.get("n_basicity") in {None, "aliphatic_primary", "unknown"}:
+            rule_feats["n_basicity"] = "aromatic_primary"
+        if rule_feats["nucleophile"].get("basicity") in {None, "aliphatic_primary", "unknown"}:
+            rule_feats["nucleophile"]["basicity"] = "aromatic_primary"
+
     if role_summary:
         rule_feats["role_assignments"] = role_summary
+
+    if ctx.family == "Ullmann_CN":
+        lg_norm = (rule_feats.get("LG") or "").upper()
+        elec_section = rule_feats.get("electrophile") if isinstance(rule_feats.get("electrophile"), dict) else {}
+        if lg_norm in {"BR", "I"}:
+            elec_section["class"] = "aryl bromide or iodide"
+        elif lg_norm == "CL":
+            elec_section["class"] = "aryl chloride"
+        if elec_section:
+            rule_feats["electrophile"] = elec_section
+
     return rule_feats
 
 

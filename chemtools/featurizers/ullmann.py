@@ -146,6 +146,10 @@ def _nuc_class_text(s: str) -> str:
         return "indole"
     if re.search(r"c[^)]*n", t):
         return "aniline"
+    # Fallback aromatic detection when RDKit is unavailable: detect common ring
+    # patterns like ``c1ccccc1`` combined with an amine token.
+    if "n" in t and any(marker in t for marker in ("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8")):
+        return "aniline"
     if "n(" in t:
         return "amine_secondary"
     if "n" in t:
