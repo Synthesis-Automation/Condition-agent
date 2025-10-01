@@ -2185,7 +2185,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 86
-- Reagents: Tripotassium phosphate (7778-53-2) [BASE], 10294-33-4 (10294-33-4) [UNK], p-Toluenesulfonic acid (104-15-4) [ACID], 516-12-1 (516-12-1) [UNK], 7772-98-7 (7772-98-7) [UNK]
+- Reagents: Tripotassium phosphate (7778-53-2) [BASE], 10294-33-4 (10294-33-4) [UNK], p-Toluenesulfonic acid (104-15-4) [ACID], N-Iodosuccinimide (516-12-1) [BASE], 7772-98-7 (7772-98-7) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Dichloromethane (75-09-2)
 - SMILES: CB(O)O.COc1ccc(Br)c2c1C13c4c(OC)ccc(Br)c4CC1CCCC3C2>>Cc1cc(I)c(O)c2c1CC1CCCC3Cc4c(C)cc(I)c(O)c4C213
 
@@ -2419,7 +2419,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 82
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Clc1ccc(I)cc1>>O=C(c1ccccc1)c1ccc(Cl)cc1
 
@@ -2428,7 +2428,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 94
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Fc1ccc(I)cc1>>O=C(c1ccccc1)c1ccc(F)cc1
 
@@ -2437,7 +2437,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 90
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cc1ccc(I)cc1>>Cc1ccc(C(=O)c2ccccc2)cc1
 
@@ -2446,7 +2446,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 90
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cc1ccccc1I>>Cc1ccccc1C(=O)c1ccccc1
 
@@ -2455,7 +2455,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 84
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.COc1ccc(I)cc1>>COc1ccc(C(=O)c2ccccc2)cc1
 
@@ -2464,7 +2464,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 83
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.Cc1ccc(I)cc1.OB(O)c1ccc(F)cc1>>Cc1ccc(C(=O)c2ccc(F)cc2)cc1
 
@@ -2473,7 +2473,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 80
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.Cc1cccc(I)c1.OB(O)c1ccc2ccccc2c1>>Cc1cccc(C(=O)c2ccc3ccccc3c2)c1
 
@@ -2482,7 +2482,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 75
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.COc1ccccc1I>>COc1ccccc1C(=O)c1ccccc1
 
@@ -2491,7 +2491,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 80
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.O=[N+]([O-])c1ccc(I)cc1.OB(O)c1ccc(Cl)cc1>>O=C(c1ccc(Cl)cc1)c1ccc([N+](=O)[O-])cc1
 
@@ -2500,7 +2500,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 82
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.Cc1ccc(I)cc1.OB(O)c1ccc(Cl)cc1>>Cc1ccc(C(=O)c2ccc(Cl)cc2)cc1
 
@@ -2509,7 +2509,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 70
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.COc1ccc(I)cc1.Cc1ccccc1B(O)O>>COc1ccc(C(=O)c2ccccc2C)cc1
 
@@ -2518,7 +2518,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 72
-- Reagents: Potassium acetate (127-08-2) [BASE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Potassium acetate (127-08-2) [BASE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.Clc1ccc(I)cc1.OB(O)c1cccc2c1oc1ccccc12>>O=C(c1ccc(Cl)cc1)c1cccc2c1oc1ccccc12
 
@@ -2527,7 +2527,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 94
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Ic1ccccc1>>O=C(c1ccccc1)c1ccccc1
 
@@ -2536,7 +2536,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 91
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.Cc1ccc(I)cc1.OCc1ccc(B(O)O)cc1>>Cc1ccc(C(=O)c2ccc(CO)cc2)cc1
 
@@ -2545,7 +2545,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 82
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.Ic1cccc2ccccc12.OB(O)c1ccccc1>>O=C(c1ccccc1)c1cccc2ccccc12
 
@@ -2554,7 +2554,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 87
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cc1cc(C)cc(I)c1>>Cc1cc(C)cc(C(=O)c2ccccc2)c1
 
@@ -2563,7 +2563,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 85
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.Clc1ccc(I)cc1.Cc1cccc(B(O)O)c1>>Cc1cccc(C(=O)c2ccc(Cl)cc2)c1
 
@@ -2572,7 +2572,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 77
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.FC(F)(F)c1ccc(I)cc1>>O=C(c1ccccc1)c1ccc(C(F)(F)F)cc1
 
@@ -2581,7 +2581,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 87
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.O=[N+]([O-])c1ccc(I)cc1>>O=C(c1ccccc1)c1ccc([N+](=O)[O-])cc1
 
@@ -2590,7 +2590,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Fe
 - Yield %: 85
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: OB(O)c1ccccc1.COc1ccc(I)cc1.Cl[13CH](Cl)Cl>>COc1ccc([13C](=O)c2ccccc2)cc1
 
@@ -2806,7 +2806,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 86
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.FC(F)(F)c1ccc(I)cc1>>O=C(c1ccccc1)c1ccc(C(F)(F)F)cc1
 
@@ -2815,7 +2815,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 85
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.O=[N+]([O-])c1ccc(I)cc1>>O=C(c1ccccc1)c1ccc([N+](=O)[O-])cc1
 
@@ -2824,7 +2824,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 88
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Clc1ccc(I)cc1>>O=C(c1ccccc1)c1ccc(Cl)cc1
 
@@ -2833,7 +2833,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 93
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Fc1ccc(I)cc1>>O=C(c1ccccc1)c1ccc(F)cc1
 
@@ -2842,7 +2842,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 92
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Fc1cccc(I)c1>>O=C(c1ccccc1)c1cccc(F)c1
 
@@ -2851,7 +2851,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 90
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Clc1ccc(I)cc1Cl>>O=C(c1ccccc1)c1ccc(Cl)c(Cl)c1
 
@@ -2860,7 +2860,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 93
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Fc1ccc(I)c(Cl)c1>>O=C(c1ccccc1)c1ccc(F)cc1Cl
 
@@ -2869,7 +2869,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 91
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Ic1ccccc1>>O=C(c1ccccc1)c1ccccc1
 
@@ -2878,7 +2878,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 72
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.CC(C)(C)c1ccc(I)cc1>>CC(C)(C)c1ccc(C(=O)c2ccccc2)cc1
 
@@ -2887,7 +2887,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 87
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cc1cccc(I)c1>>Cc1cccc(C(=O)c2ccccc2)c1
 
@@ -2896,7 +2896,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 75
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.COc1cc(I)cc(OC)c1OC>>COc1cc(C(=O)c2ccccc2)cc(OC)c1OC
 
@@ -2905,7 +2905,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 94
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cc1cc(C)c(I)c(C)c1>>Cc1cc(C)c(C(=O)c2ccccc2)c(C)c1
 
@@ -2914,7 +2914,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 82
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.CC(C)c1ccccc1I>>CC(C)c1ccccc1C(=O)c1ccccc1
 
@@ -2923,7 +2923,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 81
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.COc1ccccc1I>>COc1ccccc1C(=O)c1ccccc1
 
@@ -2932,7 +2932,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 81
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cc1noc(C)c1I>>Cc1noc(C)c1C(=O)c1ccccc1
 
@@ -2941,7 +2941,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 80
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Ic1cccc2ccccc12.OB(O)c1ccccc1>>O=C(c1ccccc1)c1cccc2ccccc12
 
@@ -2950,7 +2950,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 85
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Poly(ethylene glycol) 400 (25322-68-3)
 - SMILES: ClC(Cl)Cl.FC(F)(F)c1ccc(I)cc1.OB(O)c1ccc2c(c1)CCO2>>O=C(c1ccc(C(F)(F)F)cc1)c1ccc2c(c1)CCO2
 
@@ -2959,7 +2959,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 84
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Clc1ccc(I)cc1.OB(O)c1ccc(F)c(Cl)c1>>O=C(c1ccc(Cl)cc1)c1ccc(F)c(Cl)c1
 
@@ -2968,7 +2968,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 73
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Clc1ccc(I)cc1.CC(C)c1cccc(B(O)O)c1>>CC(C)c1cccc(C(=O)c2ccc(Cl)cc2)c1
 
@@ -2977,7 +2977,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 70
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Cc1ccc(I)cc1.C=Cc1ccc(B(O)O)cc1>>C=Cc1ccc(C(=O)c2ccc(C)cc2)cc1
 
@@ -2986,7 +2986,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 81
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.FC(F)(F)c1ccc(I)cc1.OB(O)c1ccc(F)cc1>>O=C(c1ccc(F)cc1)c1ccc(C(F)(F)F)cc1
 
@@ -2995,7 +2995,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 83
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Cc1ccc(I)cc1.OCc1ccc(B(O)O)cc1>>Cc1ccc(C(=O)c2ccc(CO)cc2)cc1
 
@@ -3004,7 +3004,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 90
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Cc1cccc(I)c1.OB(O)c1ccc(OC(F)(F)F)cc1>>Cc1cccc(C(=O)c2ccc(OC(F)(F)F)cc2)c1
 
@@ -3013,7 +3013,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 75
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Cc1cccc(I)c1.Cc1ccccc1B(O)O>>Cc1cccc(C(=O)c2ccccc2C)c1
 
@@ -3022,7 +3022,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 77
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Cc1cccc(I)c1.OB(O)c1ccccc1F>>Cc1cccc(C(=O)c2ccccc2F)c1
 
@@ -3031,7 +3031,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 76
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.COc1ccccc1I.OB(O)c1cccc2ccccc12>>COc1ccccc1C(=O)c1cccc2ccccc12
 
@@ -3085,7 +3085,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 70
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.COc1ccccc1I.COc1cc(OC)cc(B(O)O)c1>>COc1cc(OC)cc(C(=O)c2ccccc2OC)c1
 
@@ -3094,7 +3094,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: Na2CO3
 - Yield %: 87
-- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [UNK]
+- Reagents: Pivalic acid (75-98-9) [ADDITIVE], Sodium carbonate (497-19-8) [BASE], Sodium iodide (7681-82-5) [ADDITIVE], 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Ethylene glycol (107-21-1)
 - SMILES: ClC(Cl)Cl.Cc1cc(C)c(I)c(C)c1.OB(O)c1cc(Cl)cc(Cl)c1>>Cc1cc(C)c(C(=O)c2cc(Cl)cc(Cl)c2)c(C)c1
 
@@ -3443,7 +3443,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 87
-- Reagents: Sodium carbonate (497-19-8) [BASE], Acetic acid (64-19-7) [SOLVENT], 516-12-1 (516-12-1) [UNK]
+- Reagents: Sodium carbonate (497-19-8) [BASE], Acetic acid (64-19-7) [SOLVENT], N-Iodosuccinimide (516-12-1) [BASE]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5), Chloroform (67-66-3)
 - SMILES: OB(O)c1cccs1.O=C1c2ccc(I)cc2CN1CCCO>>O=C1c2ccc(-c3ccc(I)s3)cc2CN1CCCO
 
@@ -3470,7 +3470,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 80
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], Water (7732-18-5) [SOLVENT], 128-08-5 (128-08-5) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], Water (7732-18-5) [SOLVENT], 128-08-5 (128-08-5) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Dichloromethane (75-09-2), Carbon tetrachloride (56-23-5), N,N-Dimethylformamide (68-12-2)
 - SMILES: Cc1ccc(Br)cc1.COc1cc2ccccc2cc1B(O)O.BrCc1ccccc1>>Cc1ccc(-c2cc3ccccc3c(Br)c2OCc2ccccc2)cc1
 
@@ -3479,7 +3479,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], Water (7732-18-5) [SOLVENT], 128-08-5 (128-08-5) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], Water (7732-18-5) [SOLVENT], 128-08-5 (128-08-5) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Dichloromethane (75-09-2), Carbon tetrachloride (56-23-5), N,N-Dimethylformamide (68-12-2)
 - SMILES: CCc1ccc(Br)cc1.COc1cc2ccccc2cc1B(O)O.BrCc1ccccc1>>CCc1ccc(-c2cc3ccccc3c(Br)c2OCc2ccccc2)cc1
 
@@ -3488,7 +3488,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], Water (7732-18-5) [SOLVENT], 128-08-5 (128-08-5) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], Water (7732-18-5) [SOLVENT], 128-08-5 (128-08-5) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Dichloromethane (75-09-2), Carbon tetrachloride (56-23-5), N,N-Dimethylformamide (68-12-2)
 - SMILES: Fc1ccc(Br)cc1.COc1cc2ccccc2cc1B(O)O.BrCc1ccccc1>>Fc1ccc(-c2cc3ccccc3c(Br)c2OCc2ccccc2)cc1
 
@@ -4699,7 +4699,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 83
-- Reagents: 35103-79-8 (35103-79-8) [UNK]
+- Reagents: Cesium hydroxide (35103-79-8) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Clc1ncccc1C1=NCCO1>>c1ccc(-c2ccc(C3=NCCO3)cn2)cc1
 
@@ -8688,7 +8688,7 @@ Total reactions: 50215
 ## Reaction 31-142-CAS-22164289
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
@@ -10545,7 +10545,7 @@ Total reactions: 50215
 ## Reaction 31-172-CAS-17180541
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 88
 - Reagents: 110-70-3 (110-70-3) [UNK], Potassium carbonate (584-08-7) [BASE], Sodium hydroxide (1310-73-2) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: 1,4-Dioxane (123-91-1), Toluene (108-88-3), Acetonitrile (75-05-8), Water (7732-18-5), Methanol (67-56-1)
@@ -10554,7 +10554,7 @@ Total reactions: 50215
 ## Reaction 31-172-CAS-17180542
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 100
 - Reagents: 110-70-3 (110-70-3) [UNK], Potassium carbonate (584-08-7) [BASE], Sodium hydroxide (1310-73-2) [BASE], Acetic acid (64-19-7) [SOLVENT]
 - Solvents: 1,4-Dioxane (123-91-1), Toluene (108-88-3), Acetonitrile (75-05-8), Water (7732-18-5), Methanol (67-56-1)
@@ -11098,7 +11098,7 @@ Total reactions: 50215
 ## Reaction 31-172-CAS-21761375
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 6
 - Reagents: N,N-Diisopropylethylamine (7087-68-5) [BASE], Potassium carbonate (584-08-7) [BASE], Oxygen (g) (7782-44-7) [OXIDANT], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 2-Propanol (67-63-0), N,N-Dimethylacetamide (127-19-5), Water (7732-18-5), Tetrahydrofuran (109-99-9)
@@ -11584,7 +11584,7 @@ Total reactions: 50215
 ## Reaction 31-176-CAS-17764963
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 7
 - Reagents: 12125-02-9 (12125-02-9) [UNK], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5), 1,4-Dioxane (123-91-1)
@@ -11701,7 +11701,7 @@ Total reactions: 50215
 ## Reaction 31-177-CAS-10095372
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 83
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: Cc1cc2ccccc2nc1Cl.CC12C[O-][B+3]([C-]3=CC=CC=N3)([O-]C1)[O-]C2.CCCC[N+](CCCC)(CCCC)CCCC>>Cc1cc2ccccc2nc1-c1ccccn1
@@ -11783,7 +11783,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 60
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1.Brc1cncc(N2CCCC2)c1>>CC(C)(C)OC(=O)N1CCCCC1c1cncc(N2CCCC2)c1
 
@@ -12196,7 +12196,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 72
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: Brc1nccc2ccccc12.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>CC(C)(C)OC(=O)N1CCCCC1c1nccc2ccccc12
 
@@ -12284,7 +12284,7 @@ Total reactions: 50215
 ## Reaction 31-177-CAS-11937154
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 85
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: COc1cccc(Cl)n1.CC12C[O-][B+3]([C-]3=CC=CC=N3)([O-]C1)[O-]C2.CCCC[N+](CCCC)(CCCC)CCCC>>COc1cccc(-c2ccccn2)n1
@@ -12436,7 +12436,7 @@ Total reactions: 50215
 ## Reaction 31-177-CAS-12247573
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 81
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: Cc1nc2cc(Cl)ccc2o1.CC12C[O-][B+3]([C-]3=CC=CC=N3)([O-]C1)[O-]C2.CCCC[N+](CCCC)(CCCC)CCCC>>Cc1nc2cc(-c3ccccn3)ccc2o1
@@ -12617,7 +12617,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 76
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: Cc1cnc(Br)cn1.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>Cc1cnc(C2CCCCN2C(=O)OC(C)(C)C)cn1
 
@@ -12752,7 +12752,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 66
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: Cn1ccc2cc(Br)cnc21.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>Cn1ccc2cc(C3CCCCN3C(=O)OC(C)(C)C)cnc21
 
@@ -12885,7 +12885,7 @@ Total reactions: 50215
 ## Reaction 31-177-CAS-14067218
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 92
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: O=[N+]([O-])c1ccc(Cl)nc1.CC12C[O-][B+3]([C-]3=CC=CC=N3)([O-]C1)[O-]C2.[Li+]>>O=[N+]([O-])c1ccc(-c2ccccn2)nc1
@@ -12904,7 +12904,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 60
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: Brc1ccnnc1.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>CC(C)(C)OC(=O)N1CCCCC1c1ccnnc1
 
@@ -13021,7 +13021,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 56
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1.FC(F)(F)c1cc(Br)ccn1>>CC(C)(C)OC(=O)N1CCCCC1c1ccnc(C(F)(F)F)c1
 
@@ -13183,7 +13183,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 84
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: FC(F)(F)c1ccc(Br)nc1.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>CC(C)(C)OC(=O)N1CCCCC1c1ccc(C(F)(F)F)cn1
 
@@ -15314,7 +15314,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Ic1ccccc1.C=C(C[Si](C)(C)c1ccccc1)B1OC(C)(C)C(C)(C)O1>>C=C(C[Si](C)(C)c1ccccc1)c1ccccc1
 
@@ -16841,7 +16841,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 77
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
 - SMILES: Cc1ccc(I)cc1.CCCC1=C(B2Oc3ccccc3O2)CCO1>>CCCC1=C(c2ccc(C)cc2)CCO1
 
@@ -17630,7 +17630,7 @@ Total reactions: 50215
 ## Reaction 31-177-CAS-19684976
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Reagents: Sodium carbonate (497-19-8) [BASE], Sodium hydrogen carbonate (144-55-8) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Diethyl ether (60-29-7), Water (7732-18-5)
@@ -18602,7 +18602,7 @@ Total reactions: 50215
 ## Reaction 31-177-CAS-20603442
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -22080,7 +22080,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 95
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Toluene (108-88-3)
 - SMILES: Brc1cccnc1.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>CC(C)(C)OC(=O)N1CCCC=C1c1cccnc1
 
@@ -22214,7 +22214,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: Brc1ccc2ccccc2n1.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>CC(C)(C)OC(=O)N1CCCCC1c1ccc2ccccc2n1
 
@@ -22358,7 +22358,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 77
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: Brc1cccnc1.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>CC(C)(C)OC(=O)N1CCCCC1c1cccnc1
 
@@ -23246,7 +23246,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 77
-- Reagents: Cesium carbonate (534-17-8) [BASE], 557-34-6 (557-34-6) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Zinc Acetate (557-34-6) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: CC(C)(C)c1cc(-c2c3[n]4->[Zn+2]56<-[n]7c(c(B8OC(C)(C)C(C)(C)O8)c8ccc2[n-]->58)C=Cc7c(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)c2ccc(c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c4C=C3)[n-]->62)cc(C(C)(C)C)c1.CC(C)(C)c1cc(Cn2c3cc(Br)c4cccc5c6cccc7c(Br)cc2c(c76)c3c45)cc(C(C)(C)C)c1>>CC(C)(C)c1cc(Cn2c3cc(-c4c5[n]6->[Zn+2]78<-[n]9c(c(-c%10cc(C(C)(C)C)cc(C(C)(C)C)c%10)c%10ccc(c(-c%11cc(C(C)(C)C)cc(C(C)(C)C)c%11)c6C=C5)[n-]->7%10)C=Cc9c(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)c5ccc4[n-]->85)c4cccc5c6cccc7c(-c8c9[n]%10->[Zn+2]%11%12<-[n]%13c(c(-c%14cc(C(C)(C)C)cc(C(C)(C)C)c%14)c%14ccc(c(-c%15cc(C(C)(C)C)cc(C(C)(C)C)c%15)c%10C=C9)[n-]->%11%14)C=Cc%13c(-c9cc(C(C)(C)C)cc(C(C)(C)C)c9)c9ccc8[n-]->%129)cc2c(c76)c3c45)cc(C(C)(C)C)c1
 
@@ -23291,7 +23291,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 70
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 631-61-8 (631-61-8) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 631-61-8 (631-61-8) [UNK]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: COc1ccc(Br)nc1.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>COc1ccc(C2CCCCN2C(=O)OC(C)(C)C)nc1
 
@@ -23622,7 +23622,7 @@ Total reactions: 50215
 ## Reaction 31-177-CAS-9814123
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 99
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: Clc1ccccn1.CC12C[O-][B+3]([C-]3=CC=CC=N3)([O-]C1)[O-]C2.CCCC[N+](CCCC)(CCCC)CCCC>>c1ccc(-c2ccccn2)nc1
@@ -23650,7 +23650,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 68
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Hydrogen (g) (1333-74-0) [REDUCTANT]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Hydrogen (g) (1333-74-0) [REDUCTANT]
 - Solvents: Toluene (108-88-3), Ethanol (64-17-5)
 - SMILES: Fc1cccnc1Br.CC(C)(C)OC(=O)N1CCCC=C1B1OC(C)(C)C(C)(C)O1>>CC(C)(C)OC(=O)N1CCCCC1c1ncccc1F
 
@@ -24061,7 +24061,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 96
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.CC(C)(C)OC(=O)n1cccc1B(O)O>>CC(C)(C)OC(=O)n1cccc1-c1cccnc1
 
@@ -24131,7 +24131,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1cc2ccccc2o1>>c1csc(-c2cc3ccccc3o2)c1
 
@@ -24689,7 +24689,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 71
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2cc3[nH]c2c(-c2ccc(-c4ccccc4)cc2)c2nc(c(-c4ccc(-c5ccccc5)cc4)c4ccc([nH]4)c(-c4ccc(-c5ccccc5)cc4)c4nc(c3-c3ccc(-c5ccccc5)cc3)C=C4)C=C2)OC1(C)C.Brc1cc2[nH]c1c(-c1ccc(-c3ccccc3)cc1)c1nc(c(-c3ccc(-c4ccccc4)cc3)c3ccc([nH]3)c(-c3ccc(-c4ccccc4)cc3)c3nc(c2-c2ccc(-c4ccccc4)cc2)C=C3)C=C1>>C1=Cc2nc1c(-c1ccc(-c3ccccc3)cc1)c1ccc([nH]1)c(-c1ccc(-c3ccccc3)cc1)c1nc(c(-c3ccc(-c4ccccc4)cc3)c3[nH]c(cc3-c3cc4[nH]c3c(-c3ccc(-c5ccccc5)cc3)c3nc(c(-c5ccc(-c6ccccc6)cc5)c5ccc([nH]5)c(-c5ccc(-c6ccccc6)cc5)c5nc(c4-c4ccc(-c6ccccc6)cc4)C=C5)C=C3)c2-c2ccc(-c3ccccc3)cc2)C=C1
 
@@ -25760,7 +25760,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 93
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.CC(C)(C)OC(=O)n1cccc1B(O)O>>CC(C)(C)OC(=O)n1cccc1-c1cccs1
 
@@ -25860,7 +25860,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 99
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Fc1ccc(Br)cc1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc(F)cc2)cc1
 
@@ -26010,7 +26010,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 85
-- Reagents: 516-12-1 (516-12-1) [UNK], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: N-Iodosuccinimide (516-12-1) [BASE], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: Acetone (67-64-1), Water (7732-18-5), 1,2-Dimethoxyethane (110-71-4)
 - SMILES: CCOC(=O)c1cc2cc(C)c(F)cc2[nH]1.COc1ncccc1B(O)O>>CCOC(=O)c1[nH]c2cc(F)c(C)cc2c1-c1cccnc1OC
 
@@ -26215,7 +26215,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-1051071
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 82
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -27096,7 +27096,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 99
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.CC(=O)c1ccc(B(O)O)s1>>CC(=O)c1ccc(-c2cccs2)s1
 
@@ -27391,7 +27391,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccsc1>>c1cncc(-c2ccsc2)c1
 
@@ -28011,7 +28011,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Cc1c(C)c2c(C)c(C)c1COc1ccccc1-c1c3nc(c(Br)c4ccc([nH]4)c(c4nc(cc5ccc1[nH]5)C=C4)-c1ccccc1OC2)C=C3.CC(C)(C)c1ccc(-c2c3nc(c(-c4ccc(C(C)(C)C)cc4)c4cc(B5OC(C)(C)C(C)(C)O5)c([nH]4)c(-c4ccc(C(C)(C)C)cc4)c4nc(c(-c5ccc(C(C)(C)C)cc5)c5ccc2[nH]5)C=C4)C=C3)cc1>>Cc1c(C)c2c(C)c(C)c1COc1ccccc1-c1c3nc(c(-c4cc5[nH]c4c(-c4ccc(C(C)(C)C)cc4)c4nc(c(-c6ccc(C(C)(C)C)cc6)c6ccc([nH]6)c(-c6ccc(C(C)(C)C)cc6)c6nc(c5-c5ccc(C(C)(C)C)cc5)C=C6)C=C4)c4ccc([nH]4)c(c4nc(cc5ccc1[nH]5)C=C4)-c1ccccc1OC2)C=C3
 
@@ -28675,7 +28675,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 94
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.O=Cc1ccc(B(O)O)o1>>O=Cc1ccc(-c2cccnc2)o1
 
@@ -30121,7 +30121,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 95
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.COc1ccc(B(O)O)cn1>>COc1ccc(-c2cccnc2)cn1
 
@@ -35797,7 +35797,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Brc1cncc(Br)c1.CC(C)(C)c1cc(B(O)O)cc(C(C)(C)C)c1>>CC(C)(C)c1cc(-c2cncc(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)c2)cc(C(C)(C)C)c1
 
@@ -36175,7 +36175,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 97
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.CC(C)(C)OC(=O)n1c(B(O)O)cc2ccccc21>>CC(C)(C)OC(=O)n1c(-c2cccs2)cc2ccccc21
 
@@ -36320,7 +36320,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 99
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Fc1ccc(Br)cc1.OB(O)c1ccc(Oc2ccccc2)cc1>>Fc1ccc(-c2ccc(Oc3ccccc3)cc2)cc1
 
@@ -37754,7 +37754,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1ccsc1>>c1csc(-c2ccsc2)c1
 
@@ -38033,7 +38033,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 96
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1cc2ccccc2s1>>c1cncc(-c2cc3ccccc3s2)c1
 
@@ -38114,7 +38114,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 99
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Fc1ccc(Br)cc1.OB(O)c1ccc2c(c1)OCO2>>Fc1ccc(-c2ccc3c(c2)OCO3)cc1
 
@@ -38276,7 +38276,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 85
-- Reagents: 516-12-1 (516-12-1) [UNK], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: N-Iodosuccinimide (516-12-1) [BASE], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: Acetone (67-64-1), Water (7732-18-5), 1,2-Dimethoxyethane (110-71-4)
 - SMILES: CCOC(=O)c1cc2cc(CC)c(F)cc2[nH]1.COc1ncccc1B(O)O>>CCOC(=O)c1[nH]c2cc(F)c(CC)cc2c1-c1cccnc1OC
 
@@ -38717,7 +38717,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 72
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: CC1(C)c2ccccc2-c2ccc(B(O)O)cc21.CCCCCCCCC(CCCCCC)COC(=O)/C(C#N)=c1\s/c(=c2/s/c(=C(/C#N)C(=O)OCC(CCCCCC)CCCCCCCC)c3cc(Cl)sc23)c2sc(Cl)cc12>>CCCCCCCCC(CCCCCC)COC(=O)/C(C#N)=c1\s/c(=c2/s/c(=C(/C#N)C(=O)OCC(CCCCCC)CCCCCCCC)c3cc(-c4ccc5c(c4)C(C)(C)c4ccccc4-5)sc23)c2sc(-c3ccc4c(c3)C(C)(C)c3ccccc3-4)cc12
 
@@ -39328,7 +39328,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccoc1>>c1cncc(-c2ccoc2)c1
 
@@ -39669,7 +39669,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12.COc1c(C(C)(C)C)ccc2ccc(Br)nc12>>COc1c(-c2ccc3ccc(C(C)(C)C)c(OC)c3n2)cc2ccccc2c1-c1c(OC)c(-c2ccc3ccc(C(C)(C)C)c(OC)c3n2)cc2ccccc12
 
@@ -40155,7 +40155,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 72
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Oc1ccc2ccc(Br)cc2c1>>Oc1ccc2ccc(-c3ccccc3)cc2c1
 
@@ -41085,7 +41085,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 96
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.COc1ncccc1B(O)O>>COc1ncccc1-c1cccnc1
 
@@ -41730,7 +41730,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5), Dichloromethane (75-09-2), Pyridine (110-86-1)
 - SMILES: COc1c(I)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12.Cc1c(C)c(C)c(B(O)O)c(C)c1C>>Cc1c(C)c(C)c(-c2cc3ccccc3c3c2OP(=O)(O)Oc2c(-c4c(C)c(C)c(C)c(C)c4C)cc4ccccc4c2-3)c(C)c1C
 
@@ -41944,7 +41944,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5), Dichloromethane (75-09-2), Pyridine (110-86-1)
 - SMILES: COc1c(I)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12.Cc1cc(C(C)(C)C)cc(C)c1B(O)O>>Cc1cc(C(C)(C)C)cc(C)c1-c1cc2ccccc2c2c1OP(=O)(O)Oc1c(-c3c(C)cc(C(C)(C)C)cc3C)cc3ccccc3c1-2
 
@@ -43672,7 +43672,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 59
-- Reagents: Cesium carbonate (534-17-8) [BASE], 557-34-6 (557-34-6) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Zinc Acetate (557-34-6) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Methanol (67-56-1)
 - SMILES: CCCCC(CC)Cn1c2cc(B3OC(C)(C)C(C)(C)O3)c3cccc4c5cccc6c(-c7ccc(C(C)(C)C)cc7)cc1c(c65)c2c34.CC(C)CCCC(C)Cc1c2nc(c(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)c3ccc([nH]3)c(CC(C)CCCC(C)C)c3nc(c(Br)c4ccc1[nH]4)C=C3)C=C2>>CCCCC(CC)Cn1c2cc(-c3ccc(C(C)(C)C)cc3)c3cccc4c5cccc6c(-c7c8[n]9->[Zn+2]%10%11<-[n]%12c(c(CC(C)CCCC(C)C)c%13ccc7[n-]->%10%13)C=Cc%12c(-c7cc(C(C)(C)C)cc(C(C)(C)C)c7)c7ccc(c(CC(C)CCCC(C)C)c9C=C8)[n-]->%117)cc1c(c65)c2c34
 
@@ -47396,7 +47396,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 86
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: O=[N+]([O-])c1cccc(B(O)O)c1.Brc1cccc(N2CCCC2)n1>>O=[N+]([O-])c1cccc(-c2cccc(N3CCCC3)n2)c1
 
@@ -47636,7 +47636,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 62
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccc(N)nc2)OC1(C)C.Cc1nc(NC(=O)OC(C)(C)C)sc1Br>>Cc1nc(NC(=O)OC(C)(C)C)sc1-c1ccc(N)nc1
 
@@ -47718,7 +47718,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/MePhos
 - Yield %: 99
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1CCC=C1I.COc1cc(C)cc(B(O)O)c1C>>COc1cc(C)cc(C2=CCCC2=O)c1C
 
@@ -48382,7 +48382,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1cc2ccccc2s1>>c1csc(-c2cc3ccccc3s2)c1
 
@@ -48671,7 +48671,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 95
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1csc2ccccc12>>c1cncc(-c2csc3ccccc23)c1
 
@@ -50057,7 +50057,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1cc2ccccc2o1>>c1cncc(-c2cc3ccccc3o2)c1
 
@@ -50264,7 +50264,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 97
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1csc2ccccc12>>c1csc(-c2csc3ccccc23)c1
 
@@ -50327,7 +50327,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccncc1>>c1cncc(-c2ccncc2)c1
 
@@ -51522,7 +51522,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-15553080
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 93
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -51774,7 +51774,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-15574120
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 77
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -53688,8 +53688,9 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-15713213
 
 - Type: Suzuki
+- Condition Core: Base: Cesiumhydroxide
 - Yield %: 75
-- Reagents: 35103-79-8 (35103-79-8) [UNK]
+- Reagents: Cesium hydroxide (35103-79-8) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Cc1cccc(C)c1B(O)O.Clc1cc(C2=NCCO2)ccn1>>Cc1cccc(C)c1-c1cc(C2=NCCO2)ccn1
 
@@ -61770,7 +61771,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 86
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Trifluoroacetic acid (76-05-1) [SOLVENT]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Trifluoroacetic acid (76-05-1) [SOLVENT]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Dichloromethane (75-09-2)
 - SMILES: OB(O)c1cc(-c2ccccc2)cc(-c2ccccc2)c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(C=O)cc2ccccc12>>O=Cc1cc2ccccc2c(-c2c(O)c(-c3cc(-c4ccccc4)cc(-c4ccccc4)c3)cc3ccccc23)c1O
 
@@ -64499,7 +64500,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Base: n-BuLi
 - Yield %: 70
-- Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], 516-12-1 (516-12-1) [UNK], 7772-98-7 (7772-98-7) [UNK]
+- Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], N-Iodosuccinimide (516-12-1) [BASE], 7772-98-7 (7772-98-7) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Methanol (67-56-1), Water (7732-18-5)
 - SMILES: CN(C)c1cccc(Br)c1.CC(C)[C@@H]1CC[C@@H](C)C[C@H]1B1OC(C)(C)C(C)(C)O1>>CC(C)[C@@H]1CC[C@@H](C)C[C@H]1c1cccc(N(C)C)c1
 
@@ -65199,7 +65200,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/RuPhos
 - Yield %: 81
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccccc1.CC[Si](CC)(CC)C(CCB1OC(C)(C)C(C)(C)O1)N(Cc1ccccc1)Cc1ccccc1>>CC[Si](CC)(CC)C(CCc1ccccc1)N(Cc1ccccc1)Cc1ccccc1
 
@@ -65539,7 +65540,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 77
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.Cc1nc2c(I)cccc2n1-c1cccc(Br)c1>>COc1ccc(-c2cccc3c2nc(C)n3-c2cccc(Br)c2)cc1
 
@@ -65557,7 +65558,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 83
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccc(F)cc1.Cc1nc2c(I)cccc2n1-c1cccc(Br)c1>>Cc1nc2c(-c3ccc(F)cc3)cccc2n1-c1cccc(Br)c1
 
@@ -65566,7 +65567,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 89
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.Cc1nc2c(-c3ccc(F)cc3)cccc2n1-c1cccc(Br)c1>>COc1ccc(-c2cccc(-n3c(C)nc4c(-c5ccc(F)cc5)cccc43)c2)cc1
 
@@ -66043,7 +66044,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PCy3
 - Yield %: 86
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cc(C)c(-c2cc(Br)cc(-c3c(C)cc(C)cc3C)c2N)c(C)c1.Cc1cc(C)c(-c2cc(B3OC(C)(C)C(C)(C)O3)cc(-c3c(C)cc(C)cc3C)c2N)c(C)c1>>Cc1cc(C)c(-c2cc(-c3cc(-c4c(C)cc(C)cc4C)c(N)c(-c4c(C)cc(C)cc4C)c3)cc(-c3c(C)cc(C)cc3C)c2N)c(C)c1
 
@@ -67031,7 +67032,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-16402681
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 91
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -70111,7 +70112,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: Copper(II) acetate (142-71-2) [OXIDANT], 546-89-4 (546-89-4) [UNK]
+- Reagents: Copper(II) acetate (142-71-2) [OXIDANT], Lithium acetate (546-89-4) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
 - SMILES: C=CS(=O)(=O)F.O=[N+]([O-])c1ccc(B(O)O)cc1.CN>>CN1C(c2ccc([N+](=O)[O-])cc2)CS1(=O)=O
 
@@ -73266,7 +73267,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-16737715
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 71
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2), 1,4-Dioxane (123-91-1)
@@ -73275,7 +73276,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-16737717
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 73
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2), 1,4-Dioxane (123-91-1)
@@ -73284,7 +73285,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-16737718
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2), 1,4-Dioxane (123-91-1)
@@ -73293,7 +73294,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-16737722
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -73302,7 +73303,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-16737726
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -73311,7 +73312,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-16737729
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 84
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -79407,7 +79408,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 71
-- Reagents: Triphenylphosphine (603-35-0) [LIG], 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Triphenylphosphine (603-35-0) [LIG], Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Nc1ccccc1Br.COCOc1ccc(C(F)(F)F)cc1B1OC(C)(C)C(C)(C)O1>>COCOc1ccc(C(F)(F)F)cc1-c1ccccc1N
 
@@ -79478,7 +79479,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Brc1ccc2c(ccc3c2nc2n3CCC2)c1>>c1ccc(-c2ccc3c(ccc4c3nc3n4CCC3)c2)cc1
 
@@ -80997,7 +80998,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125046
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 88
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81006,7 +81007,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125047
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81015,7 +81016,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125049
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 83
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81024,7 +81025,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125050
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 83
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81033,7 +81034,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125052
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 77
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81042,7 +81043,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125053
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 82
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81051,7 +81052,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125054
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 86
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81060,7 +81061,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125057
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81069,7 +81070,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125058
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 86
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81078,7 +81079,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125059
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81087,7 +81088,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125060
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 71
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81096,7 +81097,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125063
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 71
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81105,7 +81106,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125064
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81114,7 +81115,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125065
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 85
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81123,7 +81124,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125066
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 87
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81132,7 +81133,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125067
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 90
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81141,7 +81142,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125068
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 84
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81150,7 +81151,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125069
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 91
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81159,7 +81160,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125070
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81168,7 +81169,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125071
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81177,7 +81178,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125072
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 97
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81186,7 +81187,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125073
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 73
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81195,7 +81196,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125074
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 84
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81204,7 +81205,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125075
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 91
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -81213,7 +81214,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17125076
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 85
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 2-Propanol (67-63-0)
@@ -84446,7 +84447,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuXPhos
 - Yield %: 56
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: CCCCc1cc(Br)sc1-c1sc(Br)cc1CCCC.O=Cc1ccc(B(O)O)s1>>CCCCc1cc(-c2ccc(C=O)s2)sc1-c1sc(-c2ccc(C=O)s2)cc1CCCC
 
@@ -84455,7 +84456,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: CCCCc1cc(Br)sc1-c1ccc(-c2sc(C=O)cc2CCCC)s1.O=Cc1ccc(B(O)O)s1>>CCCCc1cc(C=O)sc1-c1ccc(-c2sc(-c3ccc(C=O)s3)cc2CCCC)s1
 
@@ -84464,7 +84465,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 82
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Cc1cc(Br)sc1-c1ccc(-c2sc(C=O)cc2C)s1.O=Cc1ccc(B(O)O)s1>>Cc1cc(C=O)sc1-c1ccc(-c2sc(-c3ccc(C=O)s3)cc2C)s1
 
@@ -85147,7 +85148,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/RuPhos
 - Yield %: 70
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: CC(C)C(=O)c1sccc1Br.C=C(c1ccccc1B(O)O)c1c(OCOC)ccc2ccccc12>>C=C(c1ccccc1-c1ccsc1C(=O)C(C)C)c1c(OCOC)ccc2ccccc12
 
@@ -86026,7 +86027,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339817
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 92
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86035,7 +86036,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339818
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 77
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86044,7 +86045,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339824
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86053,7 +86054,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339825
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 73
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86062,7 +86063,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339826
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 88
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86071,7 +86072,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339836
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86080,7 +86081,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339838
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 83
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86089,7 +86090,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339840
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86098,7 +86099,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339842
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 78
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86107,7 +86108,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339844
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86116,7 +86117,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339846
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 86
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -86125,7 +86126,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-17339848
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -92152,7 +92153,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 83
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 9037-24-5 (9037-24-5) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 9037-24-5 (9037-24-5) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Methanol (67-56-1), Tetrahydrofuran (109-99-9)
 - SMILES: OB(O)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.COCOc1ccc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>Oc1ccc2ccccc2c1-c1c(O)c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc12
 
@@ -99820,7 +99821,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 89
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.O=S12=Nc3ccc(Br)cc3C1CCC2>>O=S12=Nc3ccc(-c4ccccc4)cc3C1CCC2
 
@@ -100045,7 +100046,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 98
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: c1ccc2cc(B3OB(c4ccc5ccccc5c4)OB(c4ccc5ccccc5c4)O3)ccc2c1.COc1c(Br)cc(C)c(C)c1-c1c(C)c(C)cc(Br)c1OC>>COc1c(-c2ccc3ccccc3c2)cc(C)c(C)c1-c1c(C)c(C)cc(-c2ccc3ccccc3c2)c1OC
 
@@ -100666,7 +100667,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/Tri-tert-butylphosphinetetrafluoroborate
 - Yield %: 50
-- Reagents: 35103-79-8 (35103-79-8) [UNK], Sodium hydroxide (1310-73-2) [BASE]
+- Reagents: Cesium hydroxide (35103-79-8) [BASE], Sodium hydroxide (1310-73-2) [BASE]
 - Solvents: tert-Butanol (75-65-0), Water (7732-18-5)
 - SMILES: Brc1cccs1.c1cncc(B2OB(c3cccnc3)OB(c3cccnc3)O2)c1>>c1cncc(-c2cccs2)c1
 
@@ -102178,7 +102179,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1cc2ccccc2c2ccccc12.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2cc3ccccc3c3ccccc23)cc2ccccc2c1-c1c(OC)c(-c2cc3ccccc3c3ccccc23)cc2ccccc12
 
@@ -102187,7 +102188,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1cc(-c2ccccc2)cc(-c2ccccc2)c1.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2cc(-c3ccccc3)cc(-c3ccccc3)c2)cc2ccccc2c1-c1c(OC)c(-c2cc(-c3ccccc3)cc(-c3ccccc3)c2)cc2ccccc12
 
@@ -102196,7 +102197,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC(C)c1cc(C(C)C)c(Br)c(C(C)C)c1.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2c(C(C)C)cc(C(C)C)cc2C(C)C)cc2ccccc2c1-c1c(OC)c(-c2c(C(C)C)cc(C(C)C)cc2C(C)C)cc2ccccc12
 
@@ -102205,7 +102206,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12.Brc1c(C2CCCC2)cc(C2CCCC2)cc1C1CCCC1>>COc1c(-c2c(C3CCCC3)cc(C3CCCC3)cc2C2CCCC2)cc2ccccc2c1-c1c(OC)c(-c2c(C3CCCC3)cc(C3CCCC3)cc2C2CCCC2)cc2ccccc12
 
@@ -102214,7 +102215,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccc(-c2ccccc2)cc1.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2ccc(-c3ccccc3)cc2)cc2ccccc2c1-c1c(OC)c(-c2ccc(-c3ccccc3)cc2)cc2ccccc12
 
@@ -102223,7 +102224,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccccc1.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2ccccc2)cc2ccccc2c1-c1c(OC)c(-c2ccccc2)cc2ccccc12
 
@@ -102232,7 +102233,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1ccc(Br)cc1.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2ccc(C)cc2)cc2ccccc2c1-c1c(OC)c(-c2ccc(C)cc2)cc2ccccc12
 
@@ -108011,7 +108012,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/Tri-tert-butylphosphinetetrafluoroborate
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cc(B2Nc3cccc4cccc(c34)N2)cc(C)c1B1OC(C)(C)C(C)(C)O1.COCOc1c(Br)cc(Cc2c(C)cc(C)cc2C)cc1Br>>COCOc1c(-c2c(C)cc(B3Nc4cccc5cccc(c45)N3)cc2C)cc(Cc2c(C)cc(C)cc2C)cc1-c1c(C)cc(B2Nc3cccc4cccc(c34)N2)cc1C
 
@@ -108038,7 +108039,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 88
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Cc1c(I)c(C)c(I)c(C)c1I.COCOc1ccc(C)cc1B(O)O>>COCOc1ccc(C)cc1-c1c(C)c(-c2cc(C)ccc2OCOC)c(C)c(-c2cc(C)ccc2OCOC)c1C
 
@@ -111005,7 +111006,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dichloroethane (107-06-2), 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Nc1ccccc1/C=C/C(=O)c1ccc(Br)cc1.OB(O)c1ccccc1>>c1ccc(-c2ccc(-c3ccc4ccccc4n3)cc2)cc1
 
@@ -111014,7 +111015,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 73
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dichloroethane (107-06-2), 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Nc1ccccc1/C=C/C(=O)c1ccc(Br)cc1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc(-c3ccc4ccccc4n3)cc2)cc1
 
@@ -112005,7 +112006,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 88
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.C=Cc1ccc(Br)cc1>>C=Cc1ccc(-c2ccccc2)cc1
 
@@ -112743,7 +112744,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 79
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Cc1noc(C)c1B(O)O.CCCCC1Oc2cc(Br)ccc2NC1=O>>CCCCC1Oc2cc(-c3c(C)noc3C)ccc2NC1=O
 
@@ -113292,7 +113293,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 88
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cccc(C)c1B(O)O.CSc1cc(Br)ccc1I>>CSc1cc(Br)ccc1-c1c(C)cccc1C
 
@@ -113664,7 +113665,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-18895932
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 91
 - Reagents: 108-18-9 (108-18-9) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -114523,7 +114524,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 55
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: OB(O)c1cncnc1.Clc1sccc1-c1cccnc1>>c1cncc(-c2ccsc2-c2cncnc2)c1
 
@@ -115105,7 +115106,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 1
-- Reagents: Triphenylphosphine (603-35-0) [LIG], 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Triphenylphosphine (603-35-0) [LIG], Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Cc1sc(-c2ccccc2)cc1B1OC(C)(C)C(C)(C)O1.O=Cc1sc2ccccc2c1-c1sc2ccccc2c1Br>>Cc1sc(-c2ccccc2)cc1-c1c(-c2c(C=O)sc3ccccc23)sc2ccccc12
 
@@ -122312,7 +122313,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 93
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.O=S1(c2ccc(Br)cc2)=NCCC1>>O=S1(c2ccc(-c3ccccc3)cc2)=NCCC1
 
@@ -124232,7 +124233,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295168
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 89
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124241,7 +124242,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295170
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 59
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124250,7 +124251,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295172
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124259,7 +124260,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295186
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 52
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124268,7 +124269,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295188
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 84
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124277,7 +124278,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295192
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 83
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124286,7 +124287,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295195
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 52
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124295,7 +124296,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295197
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 50
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124304,7 +124305,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295199
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 55
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -124313,7 +124314,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19295205
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 50
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: Ethanol (64-17-5), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
@@ -125521,7 +125522,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 88
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1cccnc1>>c1cncc(-c2cccnc2)c1
 
@@ -126949,7 +126950,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 70
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: COc1cccc2ccc(Br)nc12.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2ccc3cccc(OC)c3n2)cc2ccccc2c1-c1c(OC)c(-c2ccc3cccc(OC)c3n2)cc2ccccc12
 
@@ -131135,7 +131136,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 83
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 9037-24-5 (9037-24-5) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 9037-24-5 (9037-24-5) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Methanol (67-56-1), Tetrahydrofuran (109-99-9)
 - SMILES: OB(O)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>Oc1c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc2c1-c1c(O)c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc12
 
@@ -133070,7 +133071,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), N,N-Dimethylacetamide (127-19-5)
 - SMILES: Cc1c(I)c(C)c(I)c(C)c1I.CC1(C)OB(c2cc(-c3ccncc3)cc(-c3ccncc3)c2)OC1(C)C>>Cc1c(-c2cc(-c3ccncc3)cc(-c3ccncc3)c2)c(C)c(-c2cc(-c3ccncc3)cc(-c3ccncc3)c2)c(C)c1-c1cc(-c2ccncc2)cc(-c2ccncc2)c1
 
@@ -133753,7 +133754,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 80
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Ethanol (64-17-5), Water (7732-18-5)
 - SMILES: Nc1ccccc1B(O)O.OC[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->71)[cH]->8[c-]->92I>>Nc1ccccc1-[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->71)[cH]->8[c-]->92CO
 
@@ -133762,7 +133763,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 77
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Ethanol (64-17-5), Water (7732-18-5)
 - SMILES: OC[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->71)[cH]->8[c-]->92I.Cc1ccc(B(O)O)c(N)c1>>Cc1ccc(-[c]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->82)[cH]->9[c-]->%103CO)c(N)c1
 
@@ -134696,7 +134697,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19684971
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: 1,2-Dichloroethane (107-06-2)
@@ -135273,7 +135274,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 73
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cccc(I)c1.COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12>>COc1c(-c2cccc(C)c2)cc2ccccc2c1-c1c(OC)c(-c2cccc(C)c2)cc2ccccc12
 
@@ -135298,7 +135299,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19721296
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 82
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: 2-Propanol (67-63-0)
@@ -135307,7 +135308,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19721298
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: 2-Propanol (67-63-0)
@@ -135316,7 +135317,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19721300
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: 2-Propanol (67-63-0)
@@ -135325,7 +135326,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19721301
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 85
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: 2-Propanol (67-63-0)
@@ -135334,7 +135335,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-19721304
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5)
@@ -135444,7 +135445,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 62
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: O=c1nc(N2CCOCC2)[nH]c2c(Br)cccc12.Cc1ccc2[nH]cc(B(O)O)c2c1>>Cc1ccc2[nH]cc(-c3cccc4c(=O)nc(N5CCOCC5)[nH]c34)c2c1
 
@@ -136929,7 +136930,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.O=C(c1ccccc1)c1c(Br)cn(Cc2ccccc2)c1F>>COc1ccc(-c2cn(Cc3ccccc3)c(F)c2C(=O)c2ccccc2)cc1
 
@@ -136938,7 +136939,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 77
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
 - SMILES: OB(O)c1cccnc1.O=C(c1ccccc1)c1c(Br)cn(Cc2ccccc2)c1F>>O=C(c1ccccc1)c1c(-c2cccnc2)cn(Cc2ccccc2)c1F
 
@@ -136947,7 +136948,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 73
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Fc1cn(Cc2ccccc2)cc1Br>>Fc1cn(Cc2ccccc2)cc1-c1ccccc1
 
@@ -140327,7 +140328,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 73
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Brc1cncc(Br)c1.Cc1cc(C)c(B(O)O)c(C)c1>>Cc1cc(C)c(-c2cncc(-c3c(C)cc(C)cc3C)c2)c(C)c1
 
@@ -140543,7 +140544,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc2ccccc2c2ccccc12.COCOc1c(I)ccc2c1-c1c(ccc(I)c1OCOC)CCCC2>>COCOc1c(-c2cc3ccccc3c3ccccc23)ccc2c1-c1c(ccc(-c3cc4ccccc4c4ccccc34)c1OCOC)CCCC2
 
@@ -140552,7 +140553,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 87
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc2ccccc2c2ccccc12.COCOc1c(I)ccc2c1-c1c(ccc(I)c1OCOC)CCCCC2>>COCOc1c(-c2cc3ccccc3c3ccccc23)ccc2c1-c1c(ccc(-c3cc4ccccc4c4ccccc34)c1OCOC)CCCCC2
 
@@ -140561,7 +140562,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 80
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc2ccccc2c2ccccc12.COCOc1c(I)ccc2c1-c1c(ccc(I)c1OCOC)CCCCCC2>>COCOc1c(-c2cc3ccccc3c3ccccc23)ccc2c1-c1c(ccc(-c3cc4ccccc4c4ccccc34)c1OCOC)CCCCCC2
 
@@ -142963,7 +142964,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/RuPhos
 - Yield %: 87
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccccc1.CN(CCCB1OC(C)(C)C(C)(C)O1)c1ccccc1>>CN(CCCc1ccccc1)c1ccccc1
 
@@ -143260,7 +143261,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 77
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5), Dichloromethane (75-09-2), Pyridine (110-86-1)
 - SMILES: OB(O)c1c2ccccc2cc2ccccc12.COc1c(I)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12>>O=P1(O)Oc2c(-c3c4ccccc4cc4ccccc34)cc3ccccc3c2-c2c(c(-c3c4ccccc4cc4ccccc34)cc3ccccc23)O1
 
@@ -144878,7 +144879,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 90
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Clc1ccc2ccc3ccc(Cl)nc3c2n1>>c1ccc(-c2ccc3ccc4ccc(-c5ccccc5)nc4c3n2)cc1
 
@@ -144887,7 +144888,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 90
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Clc1ccc2ccc3ccc(Cl)nc3c2n1.CC(C)(C)c1cc(B(O)O)cc(C(C)(C)C)c1>>CC(C)(C)c1cc(-c2ccc3ccc4ccc(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)nc4c3n2)cc(C(C)(C)C)c1
 
@@ -144896,7 +144897,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 91
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Cc1cc(C)c(B(O)O)c(C)c1.Clc1ccc2ccc3ccc(Cl)nc3c2n1>>Cc1cc(C)c(-c2ccc3ccc4ccc(-c5c(C)cc(C)cc5C)nc4c3n2)c(C)c1
 
@@ -144905,7 +144906,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 95
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Clc1ccc2ccc3ccc(Cl)nc3c2n1.CCc1cc(CC)c(B(O)O)c(CC)c1>>CCc1cc(CC)c(-c2ccc3ccc4ccc(-c5c(CC)cc(CC)cc5CC)nc4c3n2)c(CC)c1
 
@@ -144914,7 +144915,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 93
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Clc1ccc2ccc3ccc(Cl)nc3c2n1.CC(C)c1cc(C(C)C)c(B(O)O)c(C(C)C)c1>>CC(C)c1cc(C(C)C)c(-c2ccc3ccc4ccc(-c5c(C(C)C)cc(C(C)C)cc5C(C)C)nc4c3n2)c(C(C)C)c1
 
@@ -147593,7 +147594,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 81
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
 - SMILES: N#Cc1ccc(B(O)O)cc1.O=C(c1ccccc1)c1c(Br)cn(Cc2ccccc2)c1F>>N#Cc1ccc(-c2cn(Cc3ccccc3)c(F)c2C(=O)c2ccccc2)cc1
 
@@ -150673,184 +150674,207 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-20410833
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 91
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2ccccc2)O1
 
 ## Reaction 31-179-CAS-20410834
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 81
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Cc1cccc(B(O)O)c1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>Cc1cccc([C@@H]2C=C[C@H]3OC(C)(C)O[C@H]32)c1
 
 ## Reaction 31-179-CAS-20410835
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 84
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Cc1ccc(B(O)O)cc1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>Cc1ccc([C@@H]2C=C[C@H]3OC(C)(C)O[C@H]32)cc1
 
 ## Reaction 31-179-CAS-20410836
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 72
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1F.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2ccccc2F)O1
 
 ## Reaction 31-179-CAS-20410837
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 77
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccc(F)cc1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2ccc(F)cc2)O1
 
 ## Reaction 31-179-CAS-20410838
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 86
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1cccc(Br)c1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2cccc(Br)c2)O1
 
 ## Reaction 31-179-CAS-20410839
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 83
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccc(Cl)cc1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2ccc(Cl)cc2)O1
 
 ## Reaction 31-179-CAS-20410841
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 73
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>COc1ccc([C@@H]2C=C[C@H]3OC(C)(C)O[C@H]32)cc1
 
 ## Reaction 31-179-CAS-20410842
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 85
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: COc1cccc(B(O)O)c1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>COc1cccc([C@@H]2C=C[C@H]3OC(C)(C)O[C@H]32)c1
 
 ## Reaction 31-179-CAS-20410847
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 83
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccc2ccccc2c1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2ccc3ccccc3c2)O1
 
 ## Reaction 31-179-CAS-20410848
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 75
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1cccc2c1oc1ccccc12.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2cccc3c2oc2ccccc23)O1
 
 ## Reaction 31-179-CAS-20410849
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 50
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccc(Cl)nc1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2ccc(Cl)nc2)O1
 
 ## Reaction 31-179-CAS-20410850
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 72
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccsc1.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>CC1(C)O[C@@H]2[C@@H](C=C[C@H]2c2ccsc2)O1
 
 ## Reaction 31-179-CAS-20410852
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 82
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Cn1ncc2ccc(B(O)O)cc21.CC1(C)O[C@H]2[C@H](Cl)C=C[C@H]2O1>>Cn1ncc2ccc([C@@H]3CC[C@H]4OC(C)(C)O[C@H]43)cc21
 
 ## Reaction 31-179-CAS-20410853
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 72
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Cl[C@@H]1C=C[C@H]2[C@H]3CC[C@H](C3)[C@H]21>>C1=C[C@@H](c2ccccc2)[C@@H]2[C@@H]3CC[C@@H](C3)[C@H]12
 
 ## Reaction 31-179-CAS-20410858
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 85
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.O=S1(=O)N(Cc2ccccc2)[C@H]2[C@H](Cl)C=C[C@H]2N1Cc1ccccc1>>O=S1(=O)N(Cc2ccccc2)[C@@H]2[C@@H](C=C[C@H]2c2ccccc2)N1Cc1ccccc1
 
 ## Reaction 31-179-CAS-20410859
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 84
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: COc1cccc(B(O)O)c1.O=S1(=O)N(Cc2ccccc2)[C@H]2[C@H](Cl)C=C[C@H]2N1Cc1ccccc1>>COc1cccc([C@@H]2C=C[C@@H]3[C@H]2N(Cc2ccccc2)S(=O)(=O)N3Cc2ccccc2)c1
 
 ## Reaction 31-179-CAS-20410861
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Cn1ccc2cc(B(O)O)ccc21.O=S1(=O)N(Cc2ccccc2)[C@H]2[C@H](Cl)C=C[C@H]2N1Cc1ccccc1>>Cn1ccc2cc([C@@H]3C=C[C@@H]4[C@H]3N(Cc3ccccc3)S(=O)(=O)N4Cc3ccccc3)ccc21
 
 ## Reaction 31-179-CAS-20410862
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 91
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.CC(C)(C)OC(=O)N1C[C@H]2[C@H](Cl)C=C[C@H]2C1>>CC(C)(C)OC(=O)N1C[C@@H]2[C@@H](C=C[C@H]2c2ccccc2)C1
 
 ## Reaction 31-179-CAS-20410863
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 75
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: N#Cc1ccc(B(O)O)cc1.CC(C)(C)OC(=O)N1C[C@H]2[C@H](Cl)C=C[C@H]2C1>>CC(C)(C)OC(=O)N1C[C@@H]2[C@@H](C=C[C@H]2c2ccc(C#N)cc2)C1
 
 ## Reaction 31-179-CAS-20410864
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 74
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccc2c(c1)OCO2.CC(C)(C)OC(=O)N1C[C@H]2[C@H](Cl)C=C[C@H]2C1>>CC(C)(C)OC(=O)N1C[C@@H]2[C@@H](C=C[C@H]2c2ccc3c(c2)OCO3)C1
 
 ## Reaction 31-179-CAS-20410865
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 94
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1cccc(Cl)c1.CC(C)(C)OC(=O)N1C[C@H]2[C@H](Cl)C=C[C@H]2C1>>CC(C)(C)OC(=O)N1C[C@@H]2[C@@H](C=C[C@H]2c2cccc(Cl)c2)C1
 
 ## Reaction 31-179-CAS-20410866
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 64
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Cn1ccc2cc(B(O)O)ccc21.CC(C)(C)OC(=O)N1C[C@H]2[C@H](Cl)C=C[C@H]2C1>>Cn1ccc2cc([C@@H]3C=C[C@H]4CN(C(=O)OC(C)(C)C)C[C@H]43)ccc21
 
@@ -153496,7 +153520,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 92
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1ccccc1.CN(C)c1ccc(B(O)O)cc1>>CN(C)c1ccc(-c2ccccc2)cc1
 
@@ -153505,7 +153529,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 93
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1ccc2ccccc2c1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc3ccccc3c2)cc1
 
@@ -153514,7 +153538,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 99
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1ccc(-c2ccccc2)cc1.CN(C)c1ccc(B(O)O)cc1>>CN(C)c1ccc(-c2ccc(-c3ccccc3)cc2)cc1
 
@@ -153523,7 +153547,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 95
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: CC(=O)c1ccc(Br)cc1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc(C(C)=O)cc2)cc1
 
@@ -153532,7 +153556,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 70
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.Brc1ccc(N2CCCCC2)cc1>>COc1ccc(-c2ccc(N3CCCCC3)cc2)cc1
 
@@ -153541,7 +153565,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 96
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1ccc2sccc2c1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc3sccc3c2)cc1
 
@@ -153550,7 +153574,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 84
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.Brc1ccc(C#Cc2ccccc2)cc1>>COc1ccc(-c2ccc(C#Cc3ccccc3)cc2)cc1
 
@@ -153559,7 +153583,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 94
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1c2ccccc2cc2ccccc12.COc1ccc(B(O)O)cc1>>COc1ccc(-c2c3ccccc3cc3ccccc23)cc1
 
@@ -153568,7 +153592,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 80
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.CC1(C)c2ccccc2-c2ccc(Br)cc21>>COc1ccc(-c2ccc3c(c2)C(C)(C)c2ccccc2-3)cc1
 
@@ -153577,7 +153601,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 78
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: COc1ccc(B(O)O)cc1.Brc1ccc2c3ccccc3c3ccccc3c2c1>>COc1ccc(-c2ccc3c4ccccc4c4ccccc4c3c2)cc1
 
@@ -153586,7 +153610,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 89
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1ccc2ccc3cccc4ccc1c2c34.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc3ccc4cccc5ccc2c3c45)cc1
 
@@ -153595,7 +153619,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 73
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1ccc2ccc3cccc4ccc1c2c34.CN(C)c1ccc(B(O)O)cc1>>CN(C)c1ccc(-c2ccc3ccc4cccc5ccc2c3c45)cc1
 
@@ -153604,7 +153628,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 91
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: N#Cc1ccccc1Cl.Cc1ccc(B(O)O)cc1>>Cc1ccc(-c2ccccc2C#N)cc1
 
@@ -153613,7 +153637,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 78
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: CC(=O)c1ccc(Cl)cc1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc(C(C)=O)cc2)cc1
 
@@ -153622,7 +153646,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 95
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: O=C(c1ccccc1)c1ccc(Cl)cc1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc(C(=O)c3ccccc3)cc2)cc1
 
@@ -153631,7 +153655,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 88
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Ic1ccc(-c2ccccc2)cc1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc(-c3ccccc3)cc2)cc1
 
@@ -153640,7 +153664,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 99
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: OB(O)c1cccc(C(F)(F)F)c1>>FC(F)(F)c1cccc(-c2ccc(-c3ccccc3)cc2)c1
 
@@ -153649,7 +153673,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 99
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Brc1c2ccccc2c(Br)c2ccccc12.COc1ccc(B(O)O)cc1>>COc1ccc(-c2c3ccccc3c(-c3ccc(OC)cc3)c3ccccc23)cc1
 
@@ -153658,7 +153682,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 92
-- Reagents: 111-78-4 (111-78-4) [UNK], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: Water (7732-18-5)
 - SMILES: Clc1c2ccccc2c(Cl)c2ccccc12.COc1ccc(B(O)O)cc1>>COc1ccc(-c2c3ccccc3c(-c3ccc(OC)cc3)c3ccccc23)cc1
 
@@ -154279,7 +154303,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: COc1c(B(O)O)cc2ccccc2c1-c1c(OC)c(B(O)O)cc2ccccc12.COc1c(C(C)(C)C)ccc2ccc(Br)nc12>>COc1c(-c2ccc3ccc(C(C)(C)C)c(OC)c3n2)cc2ccccc2c1-c1c(OC)c(-c2ccc3ccc(C(C)(C)C)c(OC)c3n2)cc2ccccc12
 
@@ -157997,7 +158021,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-20632198
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Solvents: Acetonitrile (75-05-8), Dichloromethane (75-09-2), Water (7732-18-5)
 - SMILES: OB(O)c1ccncc1.Brc1ccc(-n2c3ccccc3c3ccccc32)cc1>>c1ccc2c(c1)c1ccccc1n2-c1ccc(-c2ccncc2)cc1
@@ -158005,7 +158029,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-20632199
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Solvents: Acetonitrile (75-05-8), Dichloromethane (75-09-2), Water (7732-18-5)
 - SMILES: OB(O)c1cccnc1.Brc1ccc(-n2c3ccccc3c3ccccc32)cc1>>c1cncc(-c2ccc(-n3c4ccccc4c4ccccc43)cc2)c1
@@ -159190,7 +159214,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 89
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: CC(=O)c1ccccc1Br.C=C(c1ccccc1B(O)O)c1c(OC)ccc2ccccc12>>C=C(c1ccccc1-c1ccccc1C(C)=O)c1c(OC)ccc2ccccc12
 
@@ -161852,7 +161876,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 84
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID], Sodium carbonate (497-19-8) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID], Sodium carbonate (497-19-8) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5), 1,4-Dioxane (123-91-1)
 - SMILES: Cc1cccc(C)c1B(O)O.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>Cc1cccc(C)c1-c1cc2ccccc2c(-c2c(O)c(-c3c(C)cccc3C)cc3ccccc23)c1O
 
@@ -162113,7 +162137,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 73
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Ic1ccccc1.OB(O)c1ccc2ccccc2c1-c1c(B(O)O)ccc2ccccc12>>OB(O)c1ccc2ccccc2c1-c1c(-c2ccccc2)ccc2ccccc12
 
@@ -163032,7 +163056,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 81
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Oc1ccc2ccc(Br)cc2c1.Cc1cc(C)cc(B(O)O)c1>>Cc1cc(C)cc(-c2ccc3ccc(O)cc3c2)c1
 
@@ -167000,7 +167024,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21135572
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 82
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 680-31-9 (680-31-9), Water (7732-18-5)
@@ -167009,7 +167033,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21135923
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 680-31-9 (680-31-9), Water (7732-18-5)
@@ -167018,7 +167042,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21136501
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 680-31-9 (680-31-9), Water (7732-18-5)
@@ -167117,7 +167141,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21154061
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 95
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: Ic1nccc2ccccc12.CCC[CH2-][B+3]1([CH2-]CCC)[CH-]2CCC[CH-]1CCC2.[Li+]>>CCCCc1nccc2ccccc12
@@ -167215,7 +167239,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21172862
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 71
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 680-31-9 (680-31-9), Water (7732-18-5)
@@ -167224,7 +167248,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21173057
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 89
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 680-31-9 (680-31-9), Water (7732-18-5)
@@ -167233,7 +167257,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21173710
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 73
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 680-31-9 (680-31-9), Water (7732-18-5)
@@ -167395,7 +167419,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21201121
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 97
 - Reagents: 81095-46-7 (81095-46-7) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -171604,7 +171628,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.CC(C)c1cc(I)cc(C(C)C)c1Br>>CC(C)c1cc(-c2ccccc2)cc(C(C)C)c1Br
 
@@ -174888,7 +174912,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21849157
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 67-71-0 (67-71-0)
@@ -174897,7 +174921,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21849161
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 77
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 67-71-0 (67-71-0)
@@ -174906,7 +174930,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21849162
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 67-71-0 (67-71-0)
@@ -174915,7 +174939,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21849163
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 67-71-0 (67-71-0)
@@ -174924,7 +174948,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21849167
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 67-71-0 (67-71-0)
@@ -174933,7 +174957,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21849168
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: 67-71-0 (67-71-0)
@@ -174942,7 +174966,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-21849614
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Solvents: Triethylamine (121-44-8)
 - SMILES: COc1ccc(B(O)O)cc1.FS(F)(F)(F)(F)c1ccc(C#Cc2cc(S(F)(F)(F)(F)F)cc3c(I)c(-c4ccc(S(F)(F)(F)(F)F)cc4)c4cccn4c23)cc1>>COc1ccc(-c2c(-c3ccc(S(F)(F)(F)(F)F)cc3)c3cccn3c3c(C#Cc4ccc(S(F)(F)(F)(F)F)cc4)cc(S(F)(F)(F)(F)F)cc23)cc1
@@ -176242,7 +176266,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: Ethanol (64-17-5), Water (7732-18-5)
 - SMILES: COc1ccc(Br)cc1.OB(O)c1cccc2ccccc12>>COc1ccc(-c2cccc3ccccc23)cc1
 
@@ -176980,7 +177004,7 @@ Total reactions: 50215
 - Condition Core: Pd/tBuXPhos
 - Yield %: 70
 - Reagents: Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
-- Solvents: 111-78-4 (111-78-4)
+- Solvents: 1,5-Cyclooctadiene (111-78-4)
 - SMILES: OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1
 
 ## Reaction 31-179-CAS-21961330
@@ -176989,7 +177013,7 @@ Total reactions: 50215
 - Condition Core: Pd/tBuXPhos
 - Yield %: 8
 - Reagents: Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
-- Solvents: 111-78-4 (111-78-4)
+- Solvents: 1,5-Cyclooctadiene (111-78-4)
 - SMILES: Brc1ccccc1Br.CN(C)c1ccc(B(O)O)cc1>>CN(C)c1ccc(-c2ccccc2-c2ccc(N(C)C)cc2)cc1.CN(C)c1ccc(-c2ccccc2Br)cc1
 
 ## Reaction 31-179-CAS-21961332
@@ -176998,7 +177022,7 @@ Total reactions: 50215
 - Condition Core: Pd/tBuXPhos
 - Yield %: 82
 - Reagents: Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
-- Solvents: 111-78-4 (111-78-4)
+- Solvents: 1,5-Cyclooctadiene (111-78-4)
 - SMILES: Brc1ccccc1Br.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccccc2Br)cc1.COc1ccc(-c2ccccc2-c2ccc(OC)cc2)cc1
 
 ## Reaction 31-179-CAS-21961333
@@ -177007,7 +177031,7 @@ Total reactions: 50215
 - Condition Core: Pd/tBuXPhos
 - Yield %: 72
 - Reagents: Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
-- Solvents: 111-78-4 (111-78-4)
+- Solvents: 1,5-Cyclooctadiene (111-78-4)
 - SMILES: COc1ccc(B(O)O)cc1.Fc1cc(Br)c(Br)cc1F>>COc1ccc(-c2cc(F)c(F)cc2Br)cc1.COc1ccc(-c2cc(F)c(F)cc2-c2ccc(OC)cc2)cc1
 
 ## Reaction 31-179-CAS-21961334
@@ -177016,7 +177040,7 @@ Total reactions: 50215
 - Condition Core: Pd/tBuXPhos
 - Yield %: 70
 - Reagents: Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
-- Solvents: 111-78-4 (111-78-4)
+- Solvents: 1,5-Cyclooctadiene (111-78-4)
 - SMILES: Brc1ccccc1Br.OB(O)c1ccc2ccccc2c1>>Brc1ccccc1-c1ccc2ccccc2c1.c1ccc(-c2ccc3ccccc3c2)c(-c2ccc3ccccc3c2)c1
 
 ## Reaction 31-179-CAS-21961335
@@ -177025,7 +177049,7 @@ Total reactions: 50215
 - Condition Core: Pd/tBuXPhos
 - Yield %: 71
 - Reagents: Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
-- Solvents: 111-78-4 (111-78-4)
+- Solvents: 1,5-Cyclooctadiene (111-78-4)
 - SMILES: Brc1ccccc1Br.COc1ccc2cc(B(O)O)ccc2c1>>COc1ccc2cc(-c3ccccc3Br)ccc2c1.COc1ccc2cc(-c3ccccc3-c3ccc4cc(OC)ccc4c3)ccc2c1
 
 ## Reaction 31-179-CAS-21962437
@@ -178183,7 +178207,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 97
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.CC(C)(C)OC(=O)n1c(B(O)O)cc2ccccc21>>CC(C)(C)OC(=O)n1c(-c2cccnc2)cc2ccccc21
 
@@ -179710,7 +179734,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 96
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.O=C(c1ccccc1)c1c(Br)cn(Cc2ccccc2)c1F>>O=C(c1ccccc1)c1c(-c2ccccc2)cn(Cc2ccccc2)c1F
 
@@ -180474,7 +180498,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 3
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccc(OCc3ccccc3)cc2)OC1(C)C.CCOC(=O)c1c(Br)c(Br)cn1COCC[Si](C)(C)C>>CCOC(=O)c1c(-c2ccc(OCc3ccccc3)cc2)c(Br)cn1COCC[Si](C)(C)C.CCOC(=O)c1c(-c2ccc(OCc3ccccc3)cc2)c(-c2ccc(OCc3ccccc3)cc2)cn1COCC[Si](C)(C)C
 
@@ -180483,7 +180507,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccc(OCc3ccccc3)cc2)OC1(C)C.CCOC(=O)c1c(Br)c(Br)cn1COCC[Si](C)(C)C>>CCOC(=O)c1c(-c2ccc(OCc3ccccc3)cc2)c(-c2ccc(OCc3ccccc3)cc2)cn1COCC[Si](C)(C)C
 
@@ -180492,7 +180516,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 72
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccc(OCc3ccccc3)c(OCc3ccccc3)c2)OC1(C)C.CCOC(=O)c1c(-c2ccc(OC)c(OCc3ccccc3)c2)c(Br)cn1COCC[Si](C)(C)C>>CCOC(=O)c1c(-c2ccc(OC)c(OCc3ccccc3)c2)c(-c2ccc(OCc3ccccc3)c(OCc3ccccc3)c2)cn1COCC[Si](C)(C)C
 
@@ -185801,7 +185825,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(C=O)cc2ccccc12>>COCOc1c(C=O)cc2ccccc2c1-c1c(OCOC)c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc12
 
@@ -188257,7 +188281,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 89
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Tetrahydrofuran (109-99-9)
 - SMILES: Brc1cccc(-c2ccccc2)c1.COCOc1c(B2OC(C)(C)C(C)(C)O2)cc2ccccc2c1-c1c(OCOC)c(B2OC(C)(C)C(C)(C)O2)cc2ccccc12>>Oc1c(-c2cccc(-c3ccccc3)c2)cc2ccccc2c1-c1c(O)c(-c2cccc(-c3ccccc3)c2)cc2ccccc12
 
@@ -189345,7 +189369,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 89
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cc(C)c(B(O)O)c(C)c1.Brc1ccnc(-c2cc(Br)ccn2)c1>>Cc1cc(C)c(-c2ccnc(-c3cc(-c4c(C)cc(C)cc4C)ccn3)c2)c(C)c1
 
@@ -190540,7 +190564,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 98
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: COc1ccc2cc(Br)ccc2c1.CC(C)(C)c1cc(B(O)O)cc(C(C)(C)C)c1>>COc1ccc2cc(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)ccc2c1
 
@@ -195819,7 +195843,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 82
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Cc1c(Br)ccc(N)c1-c1c(N)ccc(Br)c1C>>Cc1c(-c2ccccc2)ccc(N)c1-c1c(N)ccc(-c2ccccc2)c1C
 
@@ -196338,7 +196362,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23015357
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196347,7 +196371,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23015381
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196365,7 +196389,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23015722
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196391,7 +196415,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23016444
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196417,7 +196441,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23017120
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196426,7 +196450,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23017230
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196444,7 +196468,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23017300
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196461,7 +196485,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23017749
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196521,7 +196545,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23018248
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196530,7 +196554,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23018391
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Dichloromethane (75-09-2), Water (7732-18-5)
@@ -196827,7 +196851,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 79
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cc(C)c(B(O)O)c(C)c1.Brc1ccc(Br)c(I)c1>>Cc1cc(C)c(-c2cc(Br)ccc2Br)c(C)c1
 
@@ -196926,7 +196950,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 76
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC(C)c1cc(C(C)C)c(B(O)O)c(C(C)C)c1.Nc1ccc2cc(Br)ccc2c1-c1c(N)ccc2cc(Br)ccc12>>CC(C)c1cc(C(C)C)c(-c2ccc3c(-c4c(N)ccc5cc(-c6c(C(C)C)cc(C(C)C)cc6C(C)C)ccc45)c(N)ccc3c2)c(C(C)C)c1
 
@@ -199360,7 +199384,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23205016
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 6
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Potassium carbonate (584-08-7) [BASE], 108-18-9 (108-18-9) [UNK]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5), Methanol (67-56-1), Tetrahydrofuran (109-99-9)
@@ -201484,7 +201508,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.C[C@@]12C=C(c3ccc(Br)cc3)C[C@]1(C)C(c1ccccc1)=C(c1ccccc1)O2>>C[C@@]12C=C(c3ccc(-c4ccccc4)cc3)C[C@]1(C)C(c1ccccc1)=C(c1ccccc1)O2
 
@@ -201502,7 +201526,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 88
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>COCOc1c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc2c1-c1c(OCOC)c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc12
 
@@ -204378,7 +204402,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 6
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Ic1ccccc1-c1ccccc1I.CCCCCCC(CB1OC(C)(C)C(C)(C)O1)B1OC(C)(C)C(C)(C)O1>>CCCCCCC1Cc2ccccc2-c2ccccc21
 
@@ -204387,7 +204411,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 70
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Clc1ccccc1-c1ccccc1Br.CC1(C)OB(CC(CCc2ccccc2)B2OC(C)(C)C(C)(C)O2)OC1(C)C>>c1ccc(CCC2Cc3ccccc3-c3ccccc32)cc1
 
@@ -204405,7 +204429,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: CCCCCCC(CB1OC(C)(C)C(C)(C)O1)B1OC(C)(C)C(C)(C)O1.FC(F)(F)c1ccc(Br)c(-c2ccccc2Cl)c1>>CCCCCCC1Cc2ccc(C(F)(F)F)cc2-c2ccccc21
 
@@ -204414,7 +204438,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: CCCCCCC(CB1OC(C)(C)C(C)(C)O1)B1OC(C)(C)C(C)(C)O1.Cc1ccc(Br)c(-c2ccccc2Cl)c1>>CCCCCCC1Cc2ccc(C)cc2-c2ccccc21
 
@@ -204423,7 +204447,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 81
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: CCCCCCC(Cc1ccccc1-c1ccccc1Cl)B1OC(C)(C)C(C)(C)O1>>CCCCCCC1Cc2ccccc2-c2ccccc21
 
@@ -207662,7 +207686,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 7722-84-1 (7722-84-1) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 7722-84-1 (7722-84-1) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccc2ccc(Br)cc2c1.Cc1cc(C)c(-c2ccc3cccc(B(OC(C)C)OC(C)C)c3c2Cl)c(C)c1>>Cc1cc(C)c(-c2ccc3cccc(-c4ccc5ccc(-c6cccc7ccc(-c8c(C)cc(C)cc8C)c(Cl)c67)cc5c4)c3c2Cl)c(C)c1
 
@@ -207707,7 +207731,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 82
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 7722-84-1 (7722-84-1) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 7722-84-1 (7722-84-1) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1cccc(Br)c1.Cc1cc(C)c(-c2ccc3cccc(B(OC(C)C)OC(C)C)c3c2Cl)c(C)c1>>Cc1cc(C)c(-c2ccc3cccc(-c4cccc(-c5cccc6ccc(-c7c(C)cc(C)cc7C)c(Cl)c56)c4)c3c2Cl)c(C)c1
 
@@ -207815,7 +207839,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 7722-84-1 (7722-84-1) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 7722-84-1 (7722-84-1) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccc(Br)cc1.Cc1cc(C)c(-c2ccc3cccc(B(OC(C)C)OC(C)C)c3c2Cl)c(C)c1>>Cc1cc(C)c(-c2ccc3cccc(-c4ccc(-c5cccc6ccc(-c7c(C)cc(C)cc7C)c(Cl)c56)cc4)c3c2Cl)c(C)c1
 
@@ -207860,7 +207884,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 88
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 7722-84-1 (7722-84-1) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 7722-84-1 (7722-84-1) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccc2cc(Br)ccc2c1.Cc1cc(C)c(-c2ccc3cccc(B(OC(C)C)OC(C)C)c3c2Cl)c(C)c1>>Cc1cc(C)c(-c2ccc3cccc(-c4ccc5cc(-c6cccc7ccc(-c8c(C)cc(C)cc8C)c(Cl)c67)ccc5c4)c3c2Cl)c(C)c1
 
@@ -209296,7 +209320,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23722129
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC(Br)c1ccccc1.OB(O)c1cccnc1>>CC(c1ccccc1)c1cccnc1
@@ -209313,7 +209337,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23722399
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 90
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC(Br)c1ccccc1.CC(=O)c1ccc(B(O)O)cc1>>CC(=O)c1ccc(C(C)c2ccccc2)cc1
@@ -209402,7 +209426,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23723856
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC(Br)c1ccccc1.OB(O)c1ccsc1>>CC(c1ccccc1)c1ccsc1
@@ -209419,7 +209443,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23724973
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 75
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CCCC(Br)c1ccccc1.CC(=O)c1ccc(B(O)O)cc1>>CCCC(c1ccccc1)c1ccc(C(C)=O)cc1
@@ -209489,7 +209513,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23727418
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 96
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Cc1ccc(C(C)Br)cc1.CC(=O)c1ccc(B(O)O)cc1>>CC(=O)c1ccc(C(C)c2ccc(C)cc2)cc1
@@ -209569,7 +209593,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23729304
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: CC(Br)c1ccc(Br)cc1.CC(=O)c1ccc(B(O)O)cc1>>CC(=O)c1ccc(C(C)c2ccc(Br)cc2)cc1
@@ -209622,7 +209646,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-23730301
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 85
 - Solvents: Dimethyl sulfoxide (67-68-5)
 - SMILES: Cc1cccc(C(C)Br)c1.CC(=O)c1ccc(B(O)O)cc1>>CC(=O)c1ccc(C(C)c2cccc(C)c2)cc1
@@ -210763,7 +210787,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cccc(C(F)(F)F)c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>COCOc1c(-c2cccc(C(F)(F)F)c2)cc2ccccc2c1-c1c(OCOC)c(-c2cccc(C(F)(F)F)c2)cc2ccccc12
 
@@ -210853,7 +210877,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 97
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>COCOc1c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc2c1-c1c(OCOC)c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc12
 
@@ -210970,7 +210994,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CN(C)S(=O)(=O)c1cccc(B2OC(C)(C)C(C)(C)O2)c1.COCOc1c(Br)cc2cc(C(C)(C)C)ccc2c1-c1c(OCOC)c(Br)cc2cc(C(C)(C)C)ccc12>>COCOc1c(-c2cccc(S(=O)(=O)N(C)C)c2)cc2cc(C(C)(C)C)ccc2c1-c1c(OCOC)c(-c2cccc(S(=O)(=O)N(C)C)c2)cc2cc(C(C)(C)C)ccc12
 
@@ -211203,7 +211227,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1c2ccccc2cc2ccccc12.CCOCOc1c(I)cc2ccccc2c1-c1c(OCOCC)c(I)cc2ccccc12>>Oc1c(-c2c3ccccc3cc3ccccc23)cc2ccccc2c1-c1c(O)c(-c2c3ccccc3cc3ccccc23)cc2ccccc12
 
@@ -212785,7 +212809,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/SPhos
 - Yield %: 15
-- Reagents: Butylated hydroxytoluene (128-37-0) [ADDITIVE], 17194-00-2 (17194-00-2) [UNK], Water (7732-18-5) [SOLVENT]
+- Reagents: Butylated hydroxytoluene (128-37-0) [ADDITIVE], Barium hydroxide (17194-00-2) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2)
 - SMILES: COc1ccc(B2OC(C)(C)C(C)(C)O2)c2cc(C)cc(OC)c12.COc1cc(C[C@H](C)N(Cc2ccccc2)C(C)=O)c(I)c(OC)c1>>COc1cc(CC(C)N(Cc2ccccc2)C(C)=O)c(-c2ccc(OC)c3c(OC)cc(C)cc23)c(OC)c1.COc1cc(CC(C)N(Cc2ccccc2)C(C)=O)c(-c2ccc(OC)c3c(OC)cc(C)cc23)c(OC)c1
 
@@ -217716,7 +217740,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-2810066
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: 1,4-Dioxane (123-91-1)
@@ -219471,7 +219495,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-3170566
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 95
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -220106,7 +220130,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-3295622
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 51
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE], Lithium Hydroxide (1310-65-2) [BASE], N,N-Diisopropylethylamine (7087-68-5) [BASE], 132705-51-2 (132705-51-2) [UNK]
 - Solvents: Toluene (108-88-3), Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2)
@@ -222667,7 +222691,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 83
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: O=[N+]([O-])c1ccc(Br)cc1.CC(C)c1cc(C(C)C)c(B(O)O)c(C(C)C)c1>>CC(C)c1cc(C(C)C)c(-c2ccc([N+](=O)[O-])cc2)c(C(C)C)c1
 
@@ -223457,7 +223481,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1ccco1>>c1coc(-c2cccs2)c1
 
@@ -223475,7 +223499,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 85
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1cccnc1>>c1cncc(-c2cccs2)c1
 
@@ -225531,7 +225555,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccc2[nH]ccc2c1>>c1cncc(-c2ccc3[nH]ccc3c2)c1
 
@@ -226848,7 +226872,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-4617603
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 88
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: 1,4-Dioxane (123-91-1)
@@ -227633,7 +227657,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Oc1ccc2cc(Br)ccc2c1>>Oc1ccc2cc(-c3ccccc3)ccc2c1
 
@@ -227912,7 +227936,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 84
-- Reagents: Cesium carbonate (534-17-8) [BASE], 557-34-6 (557-34-6) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Zinc Acetate (557-34-6) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Methanol (67-56-1)
 - SMILES: OB(O)c1ccccc1.CCCCCCCCOc1ccc(N(c2ccc(OCCCCCCCC)cc2)c2ccc(-c3c4nc(cc5ccc([nH]5)c(-c5ccc(C(=O)OC)cc5)c5nc(c(Br)c6ccc3[nH]6)C=C5)C=C4)cc2)cc1>>CCCCCCCCOc1ccc(N(c2ccc(OCCCCCCCC)cc2)c2ccc(-c3c4[n]5->[Zn+2]67<-[n]8c(c(-c9ccc(C(=O)OC)cc9)c9ccc(cc5C=C4)[n-]->69)C=Cc8c(-c4ccccc4)c4ccc3[n-]->74)cc2)cc1
 
@@ -228358,7 +228382,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-4912846
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 90
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: 1,4-Dioxane (123-91-1)
@@ -228628,7 +228652,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-4973815
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Dichloromethane (75-09-2)
@@ -233064,7 +233088,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 94
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.O=Cc1ccc(B(O)O)o1>>O=Cc1ccc(-c2cccs2)o1
 
@@ -233389,7 +233413,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 85
-- Reagents: 516-12-1 (516-12-1) [UNK], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: N-Iodosuccinimide (516-12-1) [BASE], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: Acetone (67-64-1), Water (7732-18-5), 1,2-Dimethoxyethane (110-71-4)
 - SMILES: CCOC(=O)c1cc2c(cc(F)c3ccoc32)[nH]1.COc1ncccc1B(O)O>>CCOC(=O)c1[nH]c2cc(F)c3ccoc3c2c1-c1cccnc1OC
 
@@ -234575,7 +234599,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 94
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.COc1ccc(B(O)O)cn1>>COc1ccc(-c2cccs2)cn1
 
@@ -235882,7 +235906,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 99
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1ccc2[nH]ccc2c1>>c1csc(-c2ccc3[nH]ccc3c2)c1
 
@@ -236150,7 +236174,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1cccs1>>c1cncc(-c2cccs2)c1
 
@@ -236292,7 +236316,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-6497874
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4)
@@ -236904,7 +236928,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=[N+]([O-])c1ccccc1B(O)O.CC[C@@]1(CCCN=[N+]=[N-])CCC=C(I)C1=O>>CC[C@@]1(CCCN=[N+]=[N-])CCC=C(c2ccccc2[N+](=O)[O-])C1=O
 
@@ -238971,7 +238995,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 94
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1c2ccccc2cc2ccccc12.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>COCOc1c(-c2c3ccccc3cc3ccccc23)cc2ccccc2c1-c1c(OCOC)c(-c2c3ccccc3cc3ccccc23)cc2ccccc12
 
@@ -238980,7 +239004,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=[N+]([O-])c1ccccc1B(O)O.CCC1(CCCN=[N+]=[N-])CCC=C(I)C1=O>>CCC1(CCCN=[N+]=[N-])CCC=C(c2ccccc2[N+](=O)[O-])C1=O
 
@@ -239453,7 +239477,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-7102508
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Dichloromethane (75-09-2)
@@ -242755,7 +242779,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 85
-- Reagents: 516-12-1 (516-12-1) [UNK], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: N-Iodosuccinimide (516-12-1) [BASE], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: Acetone (67-64-1), Water (7732-18-5), 1,2-Dimethoxyethane (110-71-4)
 - SMILES: CCOC(=O)c1cc2cc(C(F)(F)F)c(F)cc2[nH]1.COc1ncccc1B(O)O>>CCOC(=O)c1[nH]c2cc(F)c(C(F)(F)F)cc2c1-c1cccnc1OC
 
@@ -242827,7 +242851,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 90
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5), Dichloromethane (75-09-2), Pyridine (110-86-1)
 - SMILES: OB(O)c1ccccc1.COc1c(I)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12>>O=P1(O)Oc2c(-c3ccccc3)cc3ccccc3c2-c2c(c(-c3ccccc3)cc3ccccc23)O1
 
@@ -243817,7 +243841,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 93
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1ccoc1>>c1csc(-c2ccoc2)c1
 
@@ -244365,7 +244389,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/PPh3
 - Yield %: 80
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Fc1ccc(Br)cc1>>Fc1ccc(-c2ccccc2)cc1
 
@@ -244437,7 +244461,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 65
-- Reagents: Copper(I) iodide (7681-65-4) [CAT], 10377-51-2 (10377-51-2) [UNK], 7631-90-5 (7631-90-5) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: Copper(I) iodide (7681-65-4) [CAT], Lithium iodide (10377-51-2) [ADDITIVE], 7631-90-5 (7631-90-5) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5), Water (7732-18-5), 1,2-Dimethoxyethane (110-71-4)
 - SMILES: CCCCCCn1c2cc(Br)ccc2c2ccc(-c3cccs3)cc21.CC1(C)OB(c2ccc(Br)s2)OC1(C)C>>CCCCCCn1c2cc(-c3cccs3)ccc2c2ccc(-c3ccc(Br)s3)cc21
 
@@ -245345,7 +245369,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.COc1ncccc1B(O)O>>COc1ncccc1-c1cccs1
 
@@ -246295,7 +246319,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 76
-- Reagents: Cesium carbonate (534-17-8) [BASE], 557-34-6 (557-34-6) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Zinc Acetate (557-34-6) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Toluene (108-88-3), Methanol (67-56-1)
 - SMILES: OB(O)c1ccccc1.CCCCCCCCOc1ccc(N(c2ccc(OCCCCCCCC)cc2)c2ccc(-c3c4nc(c(Br)c5ccc([nH]5)c(-c5ccc(C(=O)OC)cc5)c5nc(c(Br)c6ccc3[nH]6)C=C5)C=C4)cc2)cc1>>CCCCCCCCOc1ccc(N(c2ccc(OCCCCCCCC)cc2)c2ccc(-c3c4[n]5->[Zn+2]67<-[n]8c(c(-c9ccccc9)c9ccc3[n-]->69)C=Cc8c(-c3ccc(C(=O)OC)cc3)c3ccc(c(-c6ccccc6)c5C=C4)[n-]->73)cc2)cc1
 
@@ -246691,7 +246715,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccs1.OB(O)c1cccs1>>c1csc(-c2cccs2)c1
 
@@ -246951,7 +246975,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 95
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.CC(=O)c1ccc(B(O)O)s1>>CC(=O)c1ccc(-c2cccnc2)s1
 
@@ -248377,7 +248401,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 93
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccco1>>c1cncc(-c2ccco2)c1
 
@@ -250377,7 +250401,7 @@ Total reactions: 50215
 ## Reaction 31-179-CAS-9243757
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Dichloromethane (75-09-2)
@@ -250863,7 +250887,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 85
-- Reagents: 516-12-1 (516-12-1) [UNK], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
+- Reagents: N-Iodosuccinimide (516-12-1) [BASE], 7772-98-7 (7772-98-7) [UNK], Potassium carbonate (584-08-7) [BASE]
 - Solvents: Acetone (67-64-1), 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: CCOC(=O)c1cc2cc(Cl)ccc2[nH]1.COc1ncccc1B(O)O>>CCOC(=O)c1[nH]c2ccc(Cl)cc2c1-c1cccnc1OC
 
@@ -253705,7 +253729,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/SPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3)
 - SMILES: Cc1c[n+]([O-])cc(C)c1Br.COc1ccc(B(O)O)c(C)c1>>COc1ccc(-c2c(C)c[n+]([O-])cc2C)c(C)c1
 
@@ -253732,7 +253756,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 22
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: CC(C)(C)c1ccc(-c2c3nc(c(-c4ccc(C(C)(C)C)cc4)c4cc(B5OC(C)(C)C(C)(C)O5)c([nH]4)c(-c4ccc(C(C)(C)C)cc4)c4nc(c(-c5ccc(C(C)(C)C)cc5)c5ccc2[nH]5)C=C4)C=C3)cc1.Cc1cc2c(C)cc1COc1ccccc1-c1c3[n]4->[Zn+2]56<-[n]7c(c(Br)c8ccc1[n-]->58)C=Cc7c(c1ccc(c(Br)c4C=C3)[n-]->61)-c1ccccc1OC2>>Cc1cc2c(C)cc1COc1ccccc1-c1c3[n]4->[Zn+2]56<-[n]7c(cc8ccc1[n-]->58)C=Cc7c(c1ccc(c(-c5cc7[nH]c5c(-c5ccc(C(C)(C)C)cc5)c5nc(c(-c8ccc(C(C)(C)C)cc8)c8ccc([nH]8)c(-c8ccc(C(C)(C)C)cc8)c8nc(c7-c7ccc(C(C)(C)C)cc7)C=C8)C=C5)c4C=C3)[n-]->61)-c1ccccc1OC2.Cc1cc2c(C)cc1COc1ccccc1-c1c3[n]4->[Zn+2]56<-[n]7c(c(c8ccc(c(-c9cc%10[nH]c9c(-c9ccc(C(C)(C)C)cc9)c9nc(c(-c%11ccc(C(C)(C)C)cc%11)c%11ccc([nH]%11)c(-c%11ccc(C(C)(C)C)cc%11)c%11nc(c%10-c%10ccc(C(C)(C)C)cc%10)C=C%11)C=C9)c4C=C3)[n-]->58)-c3ccccc3OC2)C=Cc7c(-c2cc3[nH]c2c(-c2ccc(C(C)(C)C)cc2)c2nc(c(-c4ccc(C(C)(C)C)cc4)c4ccc([nH]4)c(-c4ccc(C(C)(C)C)cc4)c4nc(c3-c3ccc(C(C)(C)C)cc3)C=C4)C=C2)c2ccc1[n-]->62
 
@@ -254236,7 +254260,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 81
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 10294-33-4 (10294-33-4) [UNK], 12125-02-9 (12125-02-9) [UNK], 10025-87-3 (10025-87-3) [UNK], Water (7732-18-5) [SOLVENT], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5), Dichloromethane (75-09-2), Pyridine (110-86-1)
 - SMILES: Cc1cc(C)c(B(O)O)c(C)c1.COc1c(I)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12>>Cc1cc(C)c(-c2cc3ccccc3c3c2OP(=O)(O)Oc2c(-c4c(C)cc(C)cc4C)cc4ccccc4c2-3)c(C)c1
 
@@ -262619,7 +262643,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 73
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccc(OCc3ccccc3)c(OCc3ccccc3)c2)OC1(C)C.CCOC(=O)c1c(-c2ccc(OC)c(OCc3ccccc3)c2)c(Br)cn1COCC[Si](C)(C)C>>CCOC(=O)c1c(-c2ccc(OC)c(OCc3ccccc3)c2)c(-c2ccc(OCc3ccccc3)c(OCc3ccccc3)c2)cn1COCC[Si](C)(C)C
 
@@ -262925,7 +262949,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 81
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1CCC=C1I.COc1ccc(Cl)c(B(O)O)c1>>COc1ccc(Cl)c(C2=CCCC2=O)c1
 
@@ -262934,7 +262958,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 94
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccc(Cl)cc1.O=C1CCC=C1I>>O=C1CCC=C1c1ccc(Cl)cc1
 
@@ -262943,7 +262967,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 87
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1CCC=C1I.OB(O)c1cccc2c1sc1ccccc12>>O=C1CCC=C1c1cccc2c1sc1ccccc12
 
@@ -262952,7 +262976,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 92
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: COc1ccccc1B(O)O.O=C1CCC=C1I>>COc1ccccc1C1=CCCC1=O
 
@@ -262961,7 +262985,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Cc1ccccc1B(O)O.O=C1CCC=C1I>>Cc1ccccc1C1=CCCC1=O
 
@@ -262979,7 +263003,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1CCC=C1I.COc1cccc(B(O)O)c1OC>>COc1cccc(C2=CCCC2=O)c1OC
 
@@ -262988,7 +263012,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 83
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1Cl.O=C1CCC=C1I>>O=C1CCC=C1c1ccccc1Cl
 
@@ -262997,7 +263021,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 82
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1CCC=C1I.OB(O)c1cccc2c1oc1ccccc12>>O=C1CCC=C1c1cccc2c1oc1ccccc12
 
@@ -263006,7 +263030,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 72
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1CCC=C1I.COc1ccc(OC)c(B(O)O)c1>>COc1ccc(OC)c(C2=CCCC2=O)c1
 
@@ -263015,7 +263039,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/tBuMePhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: O=C1CCC=C1I.COc1cc(C)cc(B(O)O)c1OC>>COc1cc(C)cc(C2=CCCC2=O)c1OC
 
@@ -263285,7 +263309,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 81
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>COCOc1c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc2c1-c1c(OCOC)c(-c2cc(C(F)(F)F)cc(C(F)(F)F)c2)cc2ccccc12
 
@@ -263429,7 +263453,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 97
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: OB(O)c1ccccc1.O=[N+]([O-])c1ccc(CF)cc1>>O=[N+]([O-])c1ccc(Cc2ccccc2)cc1
 
@@ -263438,7 +263462,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 96
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: O=[N+]([O-])c1ccc(CF)cc1.Cc1cccc(B(O)O)c1>>Cc1cccc(Cc2ccc([N+](=O)[O-])cc2)c1
 
@@ -263447,7 +263471,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 86
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: OB(O)c1ccc(F)cc1.N#Cc1ccc(CF)cc1>>N#Cc1ccc(Cc2ccc(F)cc2)cc1
 
@@ -263456,7 +263480,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 92
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: O=[N+]([O-])c1ccc(CF)cc1.OB(O)c1ccc(-c2ccccc2)cc1>>O=[N+]([O-])c1ccc(Cc2ccc(-c3ccccc3)cc2)cc1
 
@@ -263465,7 +263489,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 87
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: O=[N+]([O-])c1ccc(B(O)O)cc1.FCc1cccc2ccccc12>>O=[N+]([O-])c1ccc(Cc2cccc3ccccc23)cc1
 
@@ -263474,7 +263498,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 96
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: N#Cc1ccc(CF)cc1.Cc1csc(B(O)O)c1>>Cc1csc(Cc2ccc(C#N)cc2)c1
 
@@ -263483,7 +263507,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 89
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: FCc1cccc2ccccc12.CCOC(=O)c1cc(B(O)O)cc([N+](=O)[O-])c1>>CCOC(=O)c1cc(Cc2cccc3ccccc23)cc([N+](=O)[O-])c1
 
@@ -263492,7 +263516,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 97
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: O=[N+]([O-])c1ccc(CF)cc1.OB(O)c1ccc(F)cc1>>O=[N+]([O-])c1ccc(Cc2ccc(F)cc2)cc1
 
@@ -263501,7 +263525,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 89
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: OB(O)c1ccccc1.CN(C)c1cccc(CF)c1>>CN(C)c1cccc(Cc2ccccc2)c1
 
@@ -263510,7 +263534,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 91
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: N#CCF.CCOC(=O)c1cc(B(O)O)cc([N+](=O)[O-])c1>>CCOC(=O)c1cc(CC#N)cc([N+](=O)[O-])c1
 
@@ -263528,7 +263552,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Ni/dtbbpy
 - Yield %: 71
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: FC1CCCCC1.COC(=O)c1ccc(B(O)O)cc1>>COC(=O)c1ccc(C2CCCCC2)cc1
 
@@ -263546,7 +263570,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 83
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: N#CCF.OB(O)c1ccccn1>>N#CCc1ccccn1
 
@@ -263573,7 +263597,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 74
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: OB(O)c1ccccc1.CCCCCCCCF>>CCCCCCCCc1ccccc1
 
@@ -263582,7 +263606,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/P(o-tol)3
 - Yield %: 72
-- Reagents: Cesium carbonate (534-17-8) [BASE], 10377-51-2 (10377-51-2) [UNK]
+- Reagents: Cesium carbonate (534-17-8) [BASE], Lithium iodide (10377-51-2) [ADDITIVE]
 - Solvents: Toluene (108-88-3)
 - SMILES: CCCCCCCCF.COC(=O)c1ccc(B(O)O)cc1>>CCCCCCCCc1ccc(C(=O)OC)cc1
 
@@ -263598,7 +263622,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-24622889
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 88
 - Temperature (C): 110.0
 - Time (h): 32.0
@@ -263638,7 +263662,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-24622894
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Temperature (C): 110.0
 - Time (h): 32.0
@@ -263667,7 +263691,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-24622902
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Temperature (C): 110.0
 - Time (h): 32.0
@@ -263678,7 +263702,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-24622905
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 88
 - Temperature (C): 110.0
 - Time (h): 32.0
@@ -263725,7 +263749,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-24622914
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 78
 - Temperature (C): 110.0
 - Time (h): 32.0
@@ -263736,7 +263760,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-24622918
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Temperature (C): 120.0
 - Time (h): 32.0
@@ -264172,7 +264196,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: SPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Ic1ccc(OCCOCc2ccccc2)cc1.CC(C)c1cc(B2OC(C)(C)C(C)(C)O2)cc(C(C)C)c1-c1cc(-c2cc(B3Nc4cccc5cccc(c45)N3)cc(-c3cc(-c4c(C(C)C)cc(B5OC(C)(C)C(C)(C)O5)cc4C(C)C)cc(-c4c(C(C)C)cc(B5OC(C)(C)C(C)(C)O5)cc4C(C)C)c3)c2)cc(-c2c(C(C)C)cc(B3OC(C)(C)C(C)(C)O3)cc2C(C)C)c1>>CC(C)c1cc(-c2ccc(OCCOCc3ccccc3)cc2)cc(C(C)C)c1-c1cc(-c2cc(B3Nc4cccc5cccc(c45)N3)cc(-c3cc(-c4c(C(C)C)cc(-c5ccc(OCCOCc6ccccc6)cc5)cc4C(C)C)cc(-c4c(C(C)C)cc(-c5ccc(OCCOCc6ccccc6)cc5)cc4C(C)C)c3)c2)cc(-c2c(C(C)C)cc(-c3ccc(OCCOCc4ccccc4)cc3)cc2C(C)C)c1
 
@@ -264190,7 +264214,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: XPhos
 - Yield %: 91
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: CC(C)(C)c1cc(I)cc(C(C)(C)C)c1.CC(C)c1cc(B2OC(C)(C)C(C)(C)O2)cc(C(C)C)c1-c1cc(-c2cc(B3Nc4cccc5cccc(c45)N3)cc(-c3cc(-c4c(C(C)C)cc(B5OC(C)(C)C(C)(C)O5)cc4C(C)C)cc(-c4c(C(C)C)cc(B5OC(C)(C)C(C)(C)O5)cc4C(C)C)c3)c2)cc(-c2c(C(C)C)cc(B3OC(C)(C)C(C)(C)O3)cc2C(C)C)c1>>CC(C)c1cc(-c2cc(C(C)(C)C)cc(C(C)(C)C)c2)cc(C(C)C)c1-c1cc(-c2cc(B3Nc4cccc5cccc(c45)N3)cc(-c3cc(-c4c(C(C)C)cc(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)cc4C(C)C)cc(-c4c(C(C)C)cc(-c5cc(C(C)(C)C)cc(C(C)(C)C)c5)cc4C(C)C)c3)c2)cc(-c2c(C(C)C)cc(-c3cc(C(C)(C)C)cc(C(C)(C)C)c3)cc2C(C)C)c1
 
@@ -264199,7 +264223,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: APhos
 - Yield %: 95
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Sodium Chloride (7647-14-5) [ADDITIVE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Sodium Chloride (7647-14-5) [ADDITIVE]
 - Solvents: Toluene (108-88-3), Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: CC(C)c1cccc(C(C)C)c1-c1cc(-c2cc(B3OC(C)(C)C(C)(C)O3)cc(-c3cc(-c4c(C(C)C)cccc4C(C)C)cc(-c4c(C(C)C)cccc4C(C)C)c3)c2)cc(-c2c(C(C)C)cccc2C(C)C)c1.C[Si](C)(C)CCOC(=O)c1c(Br)cccc1Br>>CC(C)c1cccc(C(C)C)c1-c1cc(-c2cc(-c3cc(-c4c(C(C)C)cccc4C(C)C)cc(-c4c(C(C)C)cccc4C(C)C)c3)cc(-c3cccc(-c4cc(-c5cc(-c6c(C(C)C)cccc6C(C)C)cc(-c6c(C(C)C)cccc6C(C)C)c5)cc(-c5cc(-c6c(C(C)C)cccc6C(C)C)cc(-c6c(C(C)C)cccc6C(C)C)c5)c4)c3C(=O)OCC[Si](C)(C)C)c2)cc(-c2c(C(C)C)cccc2C(C)C)c1
 
@@ -266311,7 +266335,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 74
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
 - SMILES: Cc1ccc(I)cc1.COc1ccc(S/C(=C/B2OC(C)(C)C(C)(C)O2)CCCCl)cc1>>COc1ccc(S/C(=C/c2ccc(C)cc2)CCCCl)cc1
 
@@ -266320,7 +266344,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
 - SMILES: Cc1ccc(I)cc1.Cc1ccc(S/C=C(\CCCl)B2OC(C)(C)C(C)(C)O2)cc1>>C=C/C(=C\Sc1ccc(C)cc1)c1ccc(C)cc1
 
@@ -269940,7 +269964,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: Tetrabutylammonium fluoride (anhydrous) (429-41-4) [ADDITIVE], 7647-15-6 (7647-15-6) [UNK]
+- Reagents: Tetrabutylammonium fluoride (anhydrous) (429-41-4) [ADDITIVE], Sodium Bromide (7647-15-6) [ADDITIVE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccc(-c3ccc(B4OC(C)(C)C(C)(C)O4)s3)s2)OC1(C)C.C[N+](C)(CCCCCCN1C(=O)c2cc(Br)c3c4c(cc(Br)c(c24)C1=O)C(=O)N(CCCCCC[N+](C)(C)CCCS(=O)(=O)[O-])C3=O)CCCS(=O)(=O)[O-]>>*c1ccc(-c2ccc(-c3cc4c5c(c(*)cc6c5c3C(=O)N(CCCCCC[N+](C)(C)CCCS(=O)(=O)[O-])C6=O)C(=O)N(CCCCCC[N+](C)(C)CCCS(=O)(=O)[O-])C4=O)s2)s1
 
@@ -276308,7 +276332,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 87
-- Reagents: Tetrabutylammonium fluoride (anhydrous) (429-41-4) [ADDITIVE], 7647-15-6 (7647-15-6) [UNK]
+- Reagents: Tetrabutylammonium fluoride (anhydrous) (429-41-4) [ADDITIVE], Sodium Bromide (7647-15-6) [ADDITIVE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccc(-c3ccc(-c4ccc(B5OC(C)(C)C(C)(C)O5)s4)c4nsnc34)s2)OC1(C)C.C[N+](C)(CCCCCCN1C(=O)C2=C(Br)N(CCCCCC[N+](C)(C)CCCS(=O)(=O)[O-])C(=O)C2=C1Br)CCCS(=O)(=O)[O-]>>*c1ccc(C2=C3C(=O)N(CCCCCC[N+](C)(C)CCCS(=O)(=O)[O-])C(c4ccc(-c5ccc(*)c6nsnc56)s4)=C3C(=O)N2CCCCCC[N+](C)(C)CCCS(=O)(=O)[O-])s1
 
@@ -277791,6 +277815,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059323
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 60
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277799,6 +277824,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059325
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 56
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277807,6 +277833,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059326
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 70
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277815,6 +277842,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059328
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 68
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277823,6 +277851,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059329
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 75
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277831,6 +277860,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059330
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 50
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277839,6 +277869,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059333
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 56
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277847,6 +277878,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059334
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 68
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277855,6 +277887,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059335
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 50
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277863,6 +277896,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059336
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 66
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -277871,6 +277905,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31059338
 
 - Type: Suzuki
+- Condition Core: 2,2,6,6-Tetramethyl-3,5-heptanedione
 - Yield %: 68
 - Reagents: Triethylamine (121-44-8) [SOLVENT], 18057-16-4 (18057-16-4) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
@@ -278778,7 +278813,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 88
-- Reagents: 111-78-4 (111-78-4) [UNK], Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
 - SMILES: O=C(c1ccccc1)c1ccc(Cl)cc1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2ccc(C(=O)c3ccccc3)cc2)cc1
 
 ## Reaction 31-614-CAS-31115970
@@ -278786,7 +278821,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/DavePhos
 - Yield %: 75
-- Reagents: 111-78-4 (111-78-4) [UNK], Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
+- Reagents: 1,5-Cyclooctadiene (111-78-4) [ADDITIVE], Water (7732-18-5) [SOLVENT], Cesium fluoride (13400-13-0) [ADDITIVE]
 - SMILES: COc1cccc(C(=O)c2cccc(Cl)c2)c1.COc1ccc(B(O)O)cc1C>>COc1cccc(C(=O)c2cccc(-c3ccc(OC)c(C)c3)c2)c1
 
 ## Reaction 31-614-CAS-31117782
@@ -280340,7 +280375,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 88
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2NS(=O)(=O)c2ccc([N+](=O)[O-])cc2)OC1(C)C.CC(C)(C)OC(=O)[C@H]1CC(I)=CN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)[C@H]1CC(c2ccccc2NS(=O)(=O)c2ccc([N+](=O)[O-])cc2)=CN1C(=O)OC(C)(C)C
 
@@ -280349,7 +280384,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 90
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC(=O)Nc1ccccc1B1OC(C)(C)C(C)(C)O1.CC(C)(C)OC(=O)[C@H]1CC(I)=CN1C(=O)OC(C)(C)C>>CC(=O)Nc1ccccc1C1=CN(C(=O)OC(C)(C)C)[C@@H](C(=O)OC(C)(C)C)C1
 
@@ -280358,7 +280393,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2NCc2ccccc2)OC1(C)C.CC(C)(C)OC(=O)[C@H]1CC(I)=CN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)[C@H]1CC(c2ccccc2NCc2ccccc2)=CN1C(=O)OC(C)(C)C
 
@@ -280367,7 +280402,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 80
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2N)OC1(C)C.CC(C)(C)OC(=O)[C@H]1CC(I)=CN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)[C@H]1CC(c2ccccc2N)=CN1C(=O)OC(C)(C)C
 
@@ -280376,7 +280411,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2N)OC1(C)C.CC(C)(C)OC(=O)[C@H]1CC(I)=CN1C(=O)OCc1ccccc1>>CC(C)(C)OC(=O)[C@H]1CC(c2ccccc2N)=CN1C(=O)OCc1ccccc1
 
@@ -280394,7 +280429,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2N)OC1(C)C.CC(C)(C)OC(=O)[C@H]1CC(I)=CN1S(=O)(=O)c1ccccc1>>CC(C)(C)OC(=O)[C@H]1CC(c2ccccc2N)=CN1S(=O)(=O)c1ccccc1
 
@@ -280412,7 +280447,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2N)OC1(C)C.CC(C)(C)OC(=O)[C@@H]1CC(I)=CN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)[C@@H]1CC(c2ccccc2N)=CN1C(=O)OC(C)(C)C
 
@@ -280862,7 +280897,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31303218
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 74
 - Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Dichloromethane (75-09-2), Toluene (108-88-3)
@@ -280871,7 +280906,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31303224
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 71
 - Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Dichloromethane (75-09-2), Toluene (108-88-3)
@@ -280880,7 +280915,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31303265
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 73
 - Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Dichloromethane (75-09-2), Toluene (108-88-3)
@@ -280889,7 +280924,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31303272
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 64
 - Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Dichloromethane (75-09-2), Toluene (108-88-3)
@@ -280898,7 +280933,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31303274
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 67
 - Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Dichloromethane (75-09-2), Toluene (108-88-3)
@@ -280907,7 +280942,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-31303275
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 66
 - Reagents: n-Butyllithium (in hexanes) (109-72-8) [BASE], Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), n-Hexane (110-54-3), Dichloromethane (75-09-2), Toluene (108-88-3)
@@ -294772,7 +294807,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-32110235
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 89
 - Reagents: Sodium carbonate (497-19-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -298416,7 +298451,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 83
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2N)OC1(C)C.Cc1ccc(S(=O)(=O)N2C=C(I)CC2)cc1>>Cc1ccc(S(=O)(=O)N2C=C(c3ccccc3N)CC2)cc1
 
@@ -298425,7 +298460,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 94
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccc(C(F)(F)F)cc2N)OC1(C)C.Cc1ccc(S(=O)(=O)N2C=C(I)CC2)cc1>>Cc1ccc(S(=O)(=O)N2C=C(c3ccc(C(F)(F)F)cc3N)CC2)cc1
 
@@ -298434,7 +298469,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 98
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2N)OC1(C)C.Cc1ccc(S(=O)(=O)N2C=C(I)CCCC2)cc1>>Cc1ccc(S(=O)(=O)N2C=C(c3ccccc3N)CCCC2)cc1
 
@@ -298443,7 +298478,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 70
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: COc1ccc(B2OC(C)(C)C(C)(C)O2)c(N)c1.Cc1ccc(S(=O)(=O)N2C=C(I)CC2)cc1>>COc1ccc(C2=CN(S(=O)(=O)c3ccc(C)cc3)CC2)c(N)c1
 
@@ -298452,7 +298487,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CyclohexylJohnPhos
 - Yield %: 79
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CC1(C)OB(c2ccccc2N)OC1(C)C.Cc1ccc(S(=O)(=O)N2C=C(I)CCC2)cc1>>Cc1ccc(S(=O)(=O)N2C=C(c3ccccc3N)CCC2)cc1
 
@@ -299907,7 +299942,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-32826607
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 93
 - Reagents: Cesium fluoride (13400-13-0) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -300724,7 +300759,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214332
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 70
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300733,7 +300768,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214334
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 78
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300742,7 +300777,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214336
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 77
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300751,7 +300786,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214339
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 76
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300760,7 +300795,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214342
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 74
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300769,7 +300804,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214343
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 73
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300778,7 +300813,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214346
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 72
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300787,7 +300822,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214347
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 76
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300796,7 +300831,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214350
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 75
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300805,7 +300840,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214351
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 70
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -300814,7 +300849,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33214356
 
 - Type: Suzuki
-- Condition Core: Pd
+- Condition Core: Pd/L-Proline
 - Yield %: 72
 - Reagents: Potassium carbonate (584-08-7) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: Ethanol (64-17-5), N,N-Dimethylformamide (68-12-2)
@@ -306544,8 +306579,9 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-33822721
 
 - Type: Suzuki
+- Condition Core: Base: Potassiumhydride
 - Yield %: 88
-- Reagents: 7693-26-7 (7693-26-7) [UNK]
+- Reagents: Potassium hydride (7693-26-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Brc1ccccc1.CC1(C)OB(C[C@H](CCc2ccccc2)B2OC(C)(C)C(C)(C)O2)OC1(C)C>>CC1(C)OB([C@@H](CCc2ccccc2)Cc2ccccc2)OC1(C)C
 
@@ -311454,7 +311490,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 80
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Toluene (108-88-3), Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Clc1ccc2ccccc2n1.OB(O)c1ccccn1>>c1cncc(-c2ccc3ccccc3n2)c1
 
@@ -311631,7 +311667,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-34334820
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -311640,7 +311676,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-34334853
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 92
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -312307,7 +312343,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 95
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5), Methanol (67-56-1), Dichloromethane (75-09-2)
 - SMILES: Brc1cccc(-c2ccccc2)c1.COCOc1c(B2OC(C)(C)C(C)(C)O2)cc2ccccc2c1-c1c(OCOC)c(B2OC(C)(C)C(C)(C)O2)cc2ccccc12>>Oc1c(-c2cccc(-c3ccccc3)c2)cc2ccccc2c1-c1c(O)c(-c2cccc(-c3ccccc3)c2)cc2ccccc12
 
@@ -314458,7 +314494,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: RuPhos
 - Yield %: 100
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5), Water (7732-18-5)
 - SMILES: Brc1ccccc1.CC(B1OC(C)(C)C(C)(C)O1)C(O)C1CCCCC1>>C/C=C/C1CCCCC1.CC(c1ccccc1)C(O)C1CCCCC1
 
@@ -314467,7 +314503,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: RuPhos
 - Yield %: 73
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 124-43-6 (124-43-6) [UNK], Potassium Bicarbonate (298-14-6) [BASE], 7789-23-3 (7789-23-3) [UNK], 7772-98-7 (7772-98-7) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 124-43-6 (124-43-6) [UNK], Potassium Bicarbonate (298-14-6) [BASE], 7789-23-3 (7789-23-3) [UNK], 7772-98-7 (7772-98-7) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Water (7732-18-5), Methanol (67-56-1), Tetrahydrofuran (109-99-9)
 - SMILES: Brc1ccccc1.COc1cccc(OC)c1O[Si](C)(C)C(CCc1ccccc1)C(C)B1OC(C)(C)C(C)(C)O1>>CC(c1ccccc1)C(O)CCc1ccccc1
 
@@ -314476,7 +314512,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: RuPhos
 - Yield %: 71
-- Reagents: 21351-79-1 (21351-79-1) [UNK], 124-43-6 (124-43-6) [UNK], Potassium Bicarbonate (298-14-6) [BASE], 7789-23-3 (7789-23-3) [UNK], 7772-98-7 (7772-98-7) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], 124-43-6 (124-43-6) [UNK], Potassium Bicarbonate (298-14-6) [BASE], 7789-23-3 (7789-23-3) [UNK], 7772-98-7 (7772-98-7) [UNK]
 - Solvents: Dimethyl sulfoxide (67-68-5), Water (7732-18-5), Methanol (67-56-1), Tetrahydrofuran (109-99-9)
 - SMILES: Brc1ccccc1.COc1cccc(OC)c1O[Si](C)(C)[C@@H](CCc1ccccc1)[C@H](C)B1OC(C)(C)C(C)(C)O1>>C[C@H](c1ccccc1)[C@@H](O)CCc1ccccc1
 
@@ -314800,7 +314836,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 59
-- Reagents: Sodium carbonate (497-19-8) [BASE], Acetic acid (64-19-7) [SOLVENT], 516-12-1 (516-12-1) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Sodium carbonate (497-19-8) [BASE], Acetic acid (64-19-7) [SOLVENT], N-Iodosuccinimide (516-12-1) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5), Acetonitrile (75-05-8)
 - SMILES: Cn1nccc1B1OC(C)(C)C(C)(C)O1.N#Cc1c(I)sc2ccncc12>>Cn1ncc(I)c1-c1sc2ccncc2c1C#N
 
@@ -317171,7 +317207,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cc(C(C)(C)C)cc(C)c1B(O)O.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(C=O)cc2ccccc12>>COCOc1c(C=O)cc2ccccc2c1-c1c(OCOC)c(-c2c(C)cc(C(C)(C)C)cc2C)cc2ccccc12
 
@@ -317180,7 +317216,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1cc(C(C)(C)C)cc(C)c1B(O)O.COCOc1c(C=O)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12>>COCOc1c(C=O)cc2ccccc2c1-c1c(OC)c(-c2c(C)cc(C(C)(C)C)cc2C)cc2ccccc12
 
@@ -318458,7 +318494,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 72
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Brc1cc2cccnc2c2ncccc12.CC1(C)OB(c2ccc3c4cccc5cccc(c6cccc2c63)c54)OC1(C)C>>c1cnc2c(c1)cc(-c1ccc3c4cccc5cccc(c6cccc1c63)c54)c1cccnc12
 
@@ -319232,7 +319268,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 77
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Sodium hydroxide (1310-73-2) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Sodium hydroxide (1310-73-2) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccco1>>c1cncc(-c2ccco2)c1
 
@@ -319241,7 +319277,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Sodium hydroxide (1310-73-2) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Sodium hydroxide (1310-73-2) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccc2ccccc2c1>>c1cncc(-c2ccc3ccccc3c2)c1
 
@@ -319250,7 +319286,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 98
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Sodium hydroxide (1310-73-2) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Sodium hydroxide (1310-73-2) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.OB(O)c1ccc(F)cc1>>Fc1ccc(-c2cccnc2)cc1
 
@@ -319259,7 +319295,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Sodium hydroxide (1310-73-2) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Sodium hydroxide (1310-73-2) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: Clc1cccnc1.COc1cccc(B(O)O)c1>>COc1cccc(-c2cccnc2)c1
 
@@ -319268,7 +319304,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 87
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Sodium hydroxide (1310-73-2) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Sodium hydroxide (1310-73-2) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Cc1cnccc1Br>>Cc1cnccc1-c1ccccc1
 
@@ -323311,7 +323347,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35120985
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 83
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323320,7 +323356,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35120988
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323329,7 +323365,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35120990
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 82
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323338,7 +323374,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35120992
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323347,7 +323383,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121000
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323356,7 +323392,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121004
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 92
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323365,7 +323401,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121009
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323374,7 +323410,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121013
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323401,7 +323437,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121017
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323419,7 +323455,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121025
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 85
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323428,7 +323464,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121027
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 84
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323437,7 +323473,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121030
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323446,7 +323482,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121032
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
@@ -323455,7 +323491,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121033
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 76
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323464,7 +323500,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121035
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 89
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323473,7 +323509,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121039
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 80
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323482,7 +323518,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121042
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 72
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323491,7 +323527,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121045
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 61
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323500,7 +323536,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121050
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 71
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323509,7 +323545,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121053
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 69
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -323518,7 +323554,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35121054
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 79
 - Reagents: 2-Propanol, 2-methyl-, lithium salt (1:1) (1907-33-1) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), 1,4-Dioxane (123-91-1), Water (7732-18-5)
@@ -325554,7 +325590,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 96
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cccc2ccccc12.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>COCOc1c(-c2cccc3ccccc23)cc2ccccc2c1-c1c(OCOC)c(-c2cccc3ccccc23)cc2ccccc12
 
@@ -326319,7 +326355,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 87
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccccc2)OC1(C)C.CN(C)S(=O)(=O)n1c(C(C)(C)O)cc(Br)c1-c1ccc(F)cc1>>CN(C)S(=O)(=O)n1c(C(C)(C)O)cc(-c2ccccc2)c1-c1ccc(F)cc1
 
@@ -329521,7 +329557,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-35440472
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 84
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Potassium carbonate (584-08-7) [BASE]
 - Solvents: Water (7732-18-5)
@@ -330664,7 +330700,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Sodium hydrogen carbonate (144-55-8) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Sodium hydrogen carbonate (144-55-8) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccccc2C2OCCO2)OC1(C)C.Brc1ccccc1CCCN(Cc1ccccc1)Cc1ccccc1>>c1ccc(CN(CCCc2ccccc2-c2ccccc2C2OCCO2)Cc2ccccc2)cc1
 
@@ -330673,7 +330709,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Sodium hydrogen carbonate (144-55-8) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Sodium hydrogen carbonate (144-55-8) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: CC1(C)OB(c2ccccc2C2OCCO2)OC1(C)C.Cc1ccc(CCCN(Cc2ccccc2)Cc2ccccc2)c(Br)c1>>Cc1ccc(CCCN(Cc2ccccc2)Cc2ccccc2)c(-c2ccccc2C2OCCO2)c1
 
@@ -330682,7 +330718,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Sodium hydrogen carbonate (144-55-8) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Sodium hydrogen carbonate (144-55-8) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Brc1ccccc1CCCN(Cc1ccccc1)Cc1ccccc1.Cc1ccc(C2OCCO2)c(B2OC(C)(C)C(C)(C)O2)c1>>Cc1ccc(C2OCCO2)c(-c2ccccc2CCCN(Cc2ccccc2)Cc2ccccc2)c1
 
@@ -332598,7 +332634,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 84
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC(C)(C)c1ccc(B(O)O)cc1.COCOc1c(-c2cccc(Br)c2)cc2ccccc2c1-c1c(OCOC)c(-c2cccc(Br)c2)cc2ccccc12>>CC(C)(C)c1ccc(-c2cccc(-c3cc4ccccc4c(-c4c(O)c(-c5cccc(-c6ccc(C(C)(C)C)cc6)c5)cc5ccccc45)c3O)c2)cc1
 
@@ -347040,7 +347076,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-36836113
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 87
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: tert-Butyl methyl ether (1634-04-4)
@@ -356809,7 +356845,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CPhos
 - Yield %: 76
-- Reagents: 594-19-4 (594-19-4) [UNK], 557-34-6 (557-34-6) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: 594-19-4 (594-19-4) [UNK], Zinc Acetate (557-34-6) [ADDITIVE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Toluene (108-88-3)
 - SMILES: C[C@H](CCCO[Si](C)(C)C(C)(C)C)B1OC(C)(C)C(C)(C)O1.Brc1ccc2sccc2c1>>C[C@H](CCCO[Si](C)(C)C(C)(C)C)c1ccc2sccc2c1
 
@@ -356818,7 +356854,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CPhos
 - Yield %: 76
-- Reagents: 594-19-4 (594-19-4) [UNK], 557-34-6 (557-34-6) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: 594-19-4 (594-19-4) [UNK], Zinc Acetate (557-34-6) [ADDITIVE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Toluene (108-88-3)
 - SMILES: C[C@H](CCc1ccccc1)B1OC(C)(C)C(C)(C)O1.COC(=O)c1ccc(Br)cc1>>COC(=O)c1ccc([C@H](C)CCc2ccccc2)cc1
 
@@ -356827,7 +356863,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CPhos
 - Yield %: 75
-- Reagents: 594-19-4 (594-19-4) [UNK], 557-34-6 (557-34-6) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: 594-19-4 (594-19-4) [UNK], Zinc Acetate (557-34-6) [ADDITIVE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Toluene (108-88-3)
 - SMILES: C[C@H](CCCO[Si](C)(C)C(C)(C)C)B1OC(C)(C)C(C)(C)O1.COc1ccc(Br)cc1>>COc1ccc([C@H](C)CCCO[Si](C)(C)C(C)(C)C)cc1
 
@@ -356836,7 +356872,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/CPhos
 - Yield %: 79
-- Reagents: 594-19-4 (594-19-4) [UNK], 557-34-6 (557-34-6) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: 594-19-4 (594-19-4) [UNK], Zinc Acetate (557-34-6) [ADDITIVE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Toluene (108-88-3)
 - SMILES: CC1(C)OB(C2Cc3ccccc3C2)OC1(C)C.Clc1ncccn1>>c1cnc(C2Cc3ccccc3C2)nc1
 
@@ -361990,7 +362026,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 71
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID], Sodium hydrogen carbonate (144-55-8) [BASE]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID], Sodium hydrogen carbonate (144-55-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC(C)(C)c1ccc(B(O)O)cc1.CCOCOc1c(I)cc2cc([Si](C(C)C)(C(C)C)C(C)C)ccc2c1-c1c(OCOCC)c(I)cc2cc([Si](C(C)C)(C(C)C)C(C)C)ccc12>>CC(C)[Si](c1ccc2c(-c3c(O)c(-c4ccc(C(C)(C)C)cc4)cc4cc([Si](C(C)C)(C(C)C)C(C)C)ccc34)c(O)c(-c3ccc(C(C)(C)C)cc3)cc2c1)(C(C)C)C(C)C
 
@@ -363748,315 +363784,315 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-38072307
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 87
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.COc1ccc(B(O)O)cc1.Ic1cncc2ccccc12>>COc1ccc(C(=O)c2cncc3ccccc23)cc1
 
 ## Reaction 31-614-CAS-38072309
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 79
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.N#Cc1ccc(B(O)O)cc1>>N#Cc1ccc(C(=O)c2cncc3ccccc23)cc1
 
 ## Reaction 31-614-CAS-38072310
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.OB(O)c1ccc(C(F)(F)F)cc1>>O=C(c1ccc(C(F)(F)F)cc1)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072311
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 82
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccc(Oc2ccccc2)cc1.Ic1cncc2ccccc12>>O=C(c1ccc(Oc2ccccc2)cc1)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072312
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 5
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Ic1cncc2ccccc12>>c1ccc(-c2cncc3ccccc23)cc1.O=C(c1ccccc1)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072313
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 80
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.OB(O)c1cccc(Cl)c1>>O=C(c1cccc(Cl)c1)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072314
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 83
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Cc1cccc(B(O)O)c1.Ic1cncc2ccccc12>>Cc1cccc(C(=O)c2cncc3ccccc23)c1
 
 ## Reaction 31-614-CAS-38072315
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 77
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.COc1ccc(B(O)O)cc1OC>>COc1ccc(C(=O)c2cncc3ccccc23)cc1OC
 
 ## Reaction 31-614-CAS-38072316
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 70
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.COc1cc(B(O)O)cc(OC)c1OC>>COc1cc(C(=O)c2cncc3ccccc23)cc(OC)c1OC
 
 ## Reaction 31-614-CAS-38072317
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Cc1ccccc1B(O)O.Ic1cncc2ccccc12>>Cc1ccccc1C(=O)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072319
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 76
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.COc1ccc(B(O)O)cc1F.COc1cc2c(I)cnc(N3CCOCC3)c2cc1OC>>COc1ccc(C(=O)c2cnc(N3CCOCC3)c3cc(OC)c(OC)cc23)cc1F
 
 ## Reaction 31-614-CAS-38072320
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 79
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1cccc2ccccc12.Ic1cncc2ccccc12>>O=C(c1cccc2ccccc12)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072321
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 73
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.OB(O)c1cc(Cl)cc(Cl)c1>>O=C(c1cc(Cl)cc(Cl)c1)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072322
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 75
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.COc1ccc(B(O)O)cc1F>>COc1ccc(C(=O)c2cncc3ccccc23)cc1F
 
 ## Reaction 31-614-CAS-38072323
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 76
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.O=[N+]([O-])c1cccc(B(O)O)c1.Ic1cncc2ccccc12>>O=C(c1cccc([N+](=O)[O-])c1)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072324
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 83
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cn1cc(I)c2ccccc2c1=O>>Cn1cc(C(=O)c2ccccc2)c2ccccc2c1=O
 
 ## Reaction 31-614-CAS-38072326
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 80
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Cc1cccc(B(O)O)c1.Cn1cc(I)c2ccccc2c1=O>>Cc1cccc(C(=O)c2cn(C)c(=O)c3ccccc23)c1
 
 ## Reaction 31-614-CAS-38072327
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 83
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Ic1cccnc1>>O=C(c1ccccc1)c1cccnc1
 
 ## Reaction 31-614-CAS-38072328
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 83
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Cc1ccc(B(O)O)cc1.Ic1cnc2ccccc2c1>>Cc1ccc(C(=O)c2cnc3ccccc3c2)cc1
 
 ## Reaction 31-614-CAS-38072331
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 76
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cccnc1.OB(O)c1ccccc1Br>>O=C(c1cccnc1)c1ccccc1Br
 
 ## Reaction 31-614-CAS-38072332
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 81
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cccnc1.COc1cccc(B(O)O)c1>>COc1cccc(C(=O)c2cccnc2)c1
 
 ## Reaction 31-614-CAS-38072333
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.COc1cccc(B(O)O)c1.Ic1cnc2ccccc2c1>>COc1cccc(C(=O)c2cnc3ccccc3c2)c1
 
 ## Reaction 31-614-CAS-38072334
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 72
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cncc2ccccc12.OB(O)c1ccc2c(c1)OCO2>>O=C(c1ccc2c(c1)OCO2)c1cncc2ccccc12
 
 ## Reaction 31-614-CAS-38072335
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 77
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cn1cc(I)c2cc3c(cc2c1=O)OCO3>>Cn1cc(C(=O)c2ccccc2)c2cc3c(cc2c1=O)OCO3
 
 ## Reaction 31-614-CAS-38072336
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 81
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Ic1cnc2ccccc2c1>>O=C(c1ccccc1)c1cnc2ccccc2c1
 
 ## Reaction 31-614-CAS-38072337
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 71
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cn1nc(I)c2ccccc21>>Cn1nc(C(=O)c2ccccc2)c2ccccc21
 
 ## Reaction 31-614-CAS-38072338
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 77
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cccnc1.OB(O)c1ccc(F)cc1>>O=C(c1ccc(F)cc1)c1cccnc1
 
 ## Reaction 31-614-CAS-38072339
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 72
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cnc2ccccc2c1.OB(O)c1ccccc1Br>>O=C(c1cnc2ccccc2c1)c1ccccc1Br
 
 ## Reaction 31-614-CAS-38072340
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 82
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Cc1cccc(B(O)O)c1.Cn1cc(I)cn1>>Cc1cccc(C(=O)c2cnn(C)c2)c1
 
 ## Reaction 31-614-CAS-38072341
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 73
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1ccccc1.Cn1nc(I)c2cccnc21>>Cn1nc(C(=O)c2ccccc2)c2cccnc21
 
 ## Reaction 31-614-CAS-38072343
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 79
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Cc1ccc(B(O)O)cc1.Cn1cc(I)c2cccnc21>>Cc1ccc(C(=O)c2cn(C)c3ncccc23)cc1
 
 ## Reaction 31-614-CAS-38072344
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 81
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.N#Cc1ccc(I)cc1.OB(O)c1ccc(Oc2ccccc2)cc1>>N#Cc1ccc(C(=O)c2ccc(Oc3ccccc3)cc2)cc1
 
 ## Reaction 31-614-CAS-38072345
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 79
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.Ic1cccnc1.OB(O)c1ccc(Cl)cc1>>O=C(c1ccc(Cl)cc1)c1cccnc1
 
 ## Reaction 31-614-CAS-38072352
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.OB(O)c1cccc2ccccc12.COc1cc(I)cc(OC)c1OC>>COc1cc(C(=O)c2cccc3ccccc23)cc(OC)c1OC
 
 ## Reaction 31-614-CAS-38072353
 
 - Type: Suzuki
-- Condition Core: Base: Cs2CO3
+- Condition Core: Base: 21351-79-1
 - Yield %: 75
-- Reagents: 21351-79-1 (21351-79-1) [UNK], Cesium carbonate (534-17-8) [BASE]
+- Reagents: 21351-79-1 (21351-79-1) [BASE], Cesium carbonate (534-17-8) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: ClC(Cl)Cl.COC(=O)c1ccc(C)c(I)c1.OB(O)c1ccc2c(c1)OCO2>>COC(=O)c1ccc(C)c(C(=O)c2ccc3c(c2)OCO3)c1
 
@@ -364874,7 +364910,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 86
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccc2ccccc2c1.COCOc1c(-c2cccc(Br)c2)cc2ccccc2c1-c1c(OCOC)c(-c2cccc(Br)c2)cc2ccccc12>>Oc1c(-c2cccc(-c3ccc4ccccc4c3)c2)cc2ccccc2c1-c1c(O)c(-c2cccc(-c3ccc4ccccc4c3)c2)cc2ccccc12
 
@@ -364883,7 +364919,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 86
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cc2ccccc2c2ccccc12.COCOc1c(-c2cccc(Br)c2)cc2ccccc2c1-c1c(OCOC)c(-c2cccc(Br)c2)cc2ccccc12>>Oc1c(-c2cccc(-c3cc4ccccc4c4ccccc34)c2)cc2ccccc2c1-c1c(O)c(-c2cccc(-c3cc4ccccc4c4ccccc34)c2)cc2ccccc12
 
@@ -371081,7 +371117,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-38651388
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 73
 - Reagents: Potassium iodide (7681-11-0) [ADDITIVE], Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Tetrahydrofuran (109-99-9)
@@ -381259,7 +381295,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-39322711
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 85
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -385089,7 +385125,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 85
-- Reagents: 17194-00-2 (17194-00-2) [UNK], Hydrochloric acid (7647-01-0) [ACID]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], Hydrochloric acid (7647-01-0) [ACID]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Brc1ccc(-c2ccc3ccccc3n2)cc1>>c1ccc(-c2ccc(-c3ccc4ccccc4n3)cc2)cc1
 
@@ -388007,7 +388043,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 99
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: CC(C)(C)c1ccc(B(O)O)cc1.COc1c(I)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12>>COc1c(-c2ccc(C(C)(C)C)cc2)cc2ccccc2c1-c1c(OC)c(-c2ccc(C(C)(C)C)cc2)cc2ccccc12
 
@@ -388016,7 +388052,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 99
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1cccc2ccccc12.COc1c(I)cc2ccccc2c1-c1c(OC)c(I)cc2ccccc12>>COc1c(-c2cccc3ccccc23)cc2ccccc2c1-c1c(OC)c(-c2cccc3ccccc23)cc2ccccc12
 
@@ -388259,7 +388295,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/RuPhos
 - Yield %: 75
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccccc1.CC[Si](CC)(CC)CCB1OC(C)(C)C(C)(C)O1>>CC[Si](CC)(CC)CCc1ccccc1
 
@@ -388268,7 +388304,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/RuPhos
 - Yield %: 70
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccccc1.CC1(C)OB(CC[Si](C)(c2ccccc2)c2ccccc2)OC1(C)C>>C[Si](CCc1ccccc1)(c1ccccc1)c1ccccc1
 
@@ -389915,7 +389951,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Clc1cc(I)cc(Cl)n1.CC(C)c1cccc(C(C)C)c1B(O)O>>CC(C)c1cccc(C(C)C)c1-c1cc(Cl)nc(Cl)c1
 
@@ -389924,7 +389960,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 92
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Clc1cc(Cl)cc(I)c1.CC(C)c1cccc(C(C)C)c1B(O)O>>CC(C)c1cccc(C(C)C)c1-c1cc(Cl)cc(Cl)c1
 
@@ -389942,7 +389978,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 75
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Clc1cc(Cl)cc(I)c1.CC(C)c1cc(C(C)C)c(B(O)O)c(C(C)C)c1>>CC(C)c1cc(C(C)C)c(-c2cc(Cl)cc(Cl)c2)c(C(C)C)c1
 
@@ -391567,7 +391603,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 99
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Cc1cc(C(C)(C)C)cc(C)c1B(O)O.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2cc(OC)ccc12>>COCOc1c(-c2c(C)cc(C(C)(C)C)cc2C)cc2ccccc2c1-c1c(OCOC)c(-c2c(C)cc(C(C)(C)C)cc2C)cc2cc(OC)ccc12
 
@@ -391576,7 +391612,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 92
-- Reagents: 17194-00-2 (17194-00-2) [UNK], 12125-02-9 (12125-02-9) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE], 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 1,2-Dimethoxyethane (110-71-4), Water (7732-18-5)
 - SMILES: Cc1cc(-c2ccccc2)cc(C)c1B(O)O.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2cc(OC)ccc12>>COCOc1c(-c2c(C)cc(-c3ccccc3)cc2C)cc2ccccc2c1-c1c(OCOC)c(-c2c(C)cc(-c3ccccc3)cc2C)cc2cc(OC)ccc12
 
@@ -392078,16 +392114,18 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40034668
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 79
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5), Water (7732-18-5)
 - SMILES: CC(C)Cc1ccc(B(O)O)cc1.NC(=O)CCCc1cc2cc(Br)ccc2c(=O)[nH]1>>CC(C)Cc1ccc(-c2ccc3c(=O)[nH]c(CCCC(N)=O)cc3c2)cc1
 
 ## Reaction 31-614-CAS-40034672
 
 - Type: Suzuki
+- Condition Core: Base: 21351-79-1
 - Yield %: 76
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: N,N-Dimethylacetamide (127-19-5), Water (7732-18-5)
 - SMILES: CC(C)Cc1ccc(B(O)O)cc1.NC(=O)c1ccc(-c2cc3cc(Br)ccc3c(=O)[nH]2)cc1>>CC(C)Cc1ccc(-c2ccc3c(=O)[nH]c(-c4ccc(C(N)=O)cc4)cc3c2)cc1
 
@@ -392213,7 +392251,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Cc1ccc(B(O)O)cc1.Cc1ccc(S(=O)(=O)Nc2ccc(O)c(-c3c(O)ccc4ccc(Br)cc34)c2)cc1>>Cc1ccc(-c2ccc3ccc(O)c(-c4cc(NS(=O)(=O)c5ccc(C)cc5)ccc4O)c3c2)cc1
 
@@ -392222,7 +392260,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 83
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.Cc1ccc(S(=O)(=O)Nc2ccc(O)c(-c3c(O)ccc4ccc(Br)cc34)c2)cc1>>Cc1ccc(S(=O)(=O)Nc2ccc(O)c(-c3c(O)ccc4ccc(-c5ccccc5)cc34)c2)cc1
 
@@ -394208,7 +394246,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133401
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 82
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394217,7 +394255,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133402
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 85
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394226,7 +394264,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133403
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 80
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394235,7 +394273,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133404
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 82
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394244,7 +394282,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133405
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 85
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394253,7 +394291,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133406
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 83
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394262,7 +394300,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133407
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 80
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394271,7 +394309,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133409
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 82
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394280,7 +394318,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133412
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 85
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394289,7 +394327,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133413
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 85
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -394298,7 +394336,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-40133414
 
 - Type: Suzuki
-- Condition Core: Pd/XPhos
+- Condition Core: Pd/L-Proline
 - Yield %: 80
 - Reagents: Triethylamine (121-44-8) [SOLVENT]
 - Solvents: Methanol (67-56-1)
@@ -413971,16 +414009,18 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-41372901
 
 - Type: Suzuki
+- Condition Core: Base: Bariumhydroxide
 - Yield %: 90
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: Brc1cccc(-c2cccc(Br)n2)n1.CCCCCc1c(CCCCC)c2c(-c3ccc(OC)cc3)c3ccc(B4OB(c5ccc6c(-c7ccc(OC)cc7)c7c(CCCCC)c(CCCCC)c8cc9ccccc9nc8n7c6c5)OB(c5ccc6c(-c7ccc(OC)cc7)c7c(CCCCC)c(CCCCC)c8cc9ccccc9nc8n7c6c5)O4)cc3n2c2nc3ccccc3cc12>>CCCCCc1c(CCCCC)c2c(-c3ccc(OC)cc3)c3ccc(-c4cccc(-c5cccc(-c6ccc7c(-c8ccc(OC)cc8)c8c(CCCCC)c(CCCCC)c9cc%10ccccc%10nc9n8c7c6)n5)n4)cc3n2c2nc3ccccc3cc12
 
 ## Reaction 31-614-CAS-41372903
 
 - Type: Suzuki
+- Condition Core: Base: Bariumhydroxide
 - Yield %: 66
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CCCCCc1c(CCCCC)c2c(-c3ccc(OC)cc3)c3ccc(B4OB(c5ccc6c(-c7ccc(OC)cc7)c7c(CCCCC)c(CCCCC)c8cc9ccccc9nc8n7c6c5)OB(c5ccc6c(-c7ccc(OC)cc7)c7c(CCCCC)c(CCCCC)c8cc9ccccc9nc8n7c6c5)O4)cc3n2c2nc3ccccc3cc12.CCCCCCCCOc1cc(Br)nc(-c2cc(OCCCCCCCC)cc(Br)n2)c1>>CCCCCCCCOc1cc(-c2ccc3c(-c4ccc(OC)cc4)c4c(CCCCC)c(CCCCC)c5cc6ccccc6nc5n4c3c2)nc(-c2cc(OCCCCCCCC)cc(-c3ccc4c(-c5ccc(OC)cc5)c5c(CCCCC)c(CCCCC)c6cc7ccccc7nc6n5c4c3)n2)c1
 
@@ -413996,8 +414036,9 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-41372907
 
 - Type: Suzuki
+- Condition Core: Base: Bariumhydroxide
 - Yield %: 93
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
 - SMILES: CCCCCCCCOc1cc(Br)nc(-c2cc(OCCCCCCCC)cc(Br)n2)c1.CCCCCc1c(CCCCC)c2c(-c3ccc(C)cc3)c3ccc(B4OC(C)(C)C(C)(C)O4)cc3n2c2nc3ccccc3cc12>>CCCCCCCCOc1cc(-c2ccc3c(-c4ccc(C)cc4)c4c(CCCCC)c(CCCCC)c5cc6ccccc6nc5n4c3c2)nc(-c2cc(OCCCCCCCC)cc(-c3ccc4c(-c5ccc(C)cc5)c5c(CCCCC)c(CCCCC)c6cc7ccccc7nc6n5c4c3)n2)c1
 
@@ -422082,7 +422123,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 91
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: OB(O)c1ccc2ccccc2c1.COCOc1c(I)cc2ccccc2c1-c1c(OCOC)c(I)cc2ccccc12>>COCOc1c(-c2ccc3ccccc3c2)cc2ccccc2c1-c1c(OCOC)c(-c2ccc3ccccc3c2)cc2ccccc12
 
@@ -425859,7 +425900,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 95
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9), Water (7732-18-5)
 - SMILES: Brc1cncc(Br)c1.Cc1cc(C)c(B(O)O)c(C)c1>>Cc1cc(C)c(-c2cncc(-c3c(C)cc(C)cc3C)c2)c(C)c1
 
@@ -427730,18 +427771,18 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42667843
 
 - Type: Suzuki
-- Condition Core: Additive: LiCl
+- Condition Core: Additive: ZincAcetate
 - Yield %: 83
-- Reagents: 594-19-4 (594-19-4) [UNK], 557-34-6 (557-34-6) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: 594-19-4 (594-19-4) [UNK], Zinc Acetate (557-34-6) [ADDITIVE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Toluene (108-88-3)
 - SMILES: CN(C[C@@H]1C[C@@H](c2ccccc2)[C@@H]1B1OC(C)(C)C(C)(C)O1)C(=O)OC(C)(C)C.COc1ccc(Br)cc1>>COc1ccc([C@@H]2[C@H](CN(C)C(=O)OC(C)(C)C)C[C@H]2c2ccccc2)cc1
 
 ## Reaction 31-614-CAS-42667855
 
 - Type: Suzuki
-- Condition Core: Additive: LiCl
+- Condition Core: Additive: ZincAcetate
 - Yield %: 70
-- Reagents: 594-19-4 (594-19-4) [UNK], 557-34-6 (557-34-6) [UNK], Lithium chloride (7447-41-8) [ADDITIVE]
+- Reagents: 594-19-4 (594-19-4) [UNK], Zinc Acetate (557-34-6) [ADDITIVE], Lithium chloride (7447-41-8) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9), Toluene (108-88-3)
 - SMILES: CN(C[C@@H]1C[C@@H](c2ccccc2)[C@@H]1B1OC(C)(C)C(C)(C)O1)C(=O)OC(C)(C)C.CCOC(=O)c1ccc(Br)cc1>>CCOC(=O)c1ccc([C@@H]2[C@H](CN(C)C(=O)OC(C)(C)C)C[C@H]2c2ccccc2)cc1
 
@@ -428284,7 +428325,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42789424
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 85
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -428293,7 +428334,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42789426
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 83
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -428302,7 +428343,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42789427
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 88
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -428311,7 +428352,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42789428
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 91
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -428320,7 +428361,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42789430
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 89
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -428329,7 +428370,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42789431
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 94
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -428338,7 +428379,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-42789432
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 86
 - Reagents: Triethylamine (121-44-8) [SOLVENT], Sodium carbonate (497-19-8) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Ethanol (64-17-5), Toluene (108-88-3), Water (7732-18-5)
@@ -431291,7 +431332,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1), Water (7732-18-5)
 - SMILES: Brc1ccc(I)cc1.Cc1cc(C)c(B(O)O)c(C)c1>>Cc1cc(C)c(-c2ccc(Br)cc2)c(C)c1
 
@@ -439515,7 +439556,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-44307130
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -439524,7 +439565,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-44307131
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 59
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -439533,7 +439574,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-44307132
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 70
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -439542,7 +439583,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-44307143
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 56
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -439551,7 +439592,7 @@ Total reactions: 50215
 ## Reaction 31-614-CAS-44307150
 
 - Type: Suzuki
-- Condition Core: Cu/N,N′-dimethylethylenediamine
+- Condition Core: Cu/N,N-Dimethylethylenediamine
 - Yield %: 61
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -448329,7 +448370,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 78
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.FC(F)(F)c1ccnc(Cl)c1>>FC(F)(F)c1ccnc(-c2ccccc2)c1
 
@@ -448338,7 +448379,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd/XPhos
 - Yield %: 74
-- Reagents: 21351-79-1 (21351-79-1) [UNK]
+- Reagents: 21351-79-1 (21351-79-1) [BASE]
 - Solvents: 1-Butanol (71-36-3), Water (7732-18-5)
 - SMILES: OB(O)c1ccccc1.COc1ccnc(Cl)c1>>COc1ccnc(-c2ccccc2)c1
 
@@ -449027,7 +449068,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 92
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Cc1cc(C)c(B(O)O)c(C)c1.Brc1cccc(-c2cccc(Br)n2)n1>>Cc1cc(C)c(-c2cccc(-c3cccc(-c4c(C)cc(C)cc4C)n3)n2)c(C)c1
 
@@ -449996,7 +450037,7 @@ Total reactions: 50215
 - Type: Suzuki
 - Condition Core: Pd
 - Yield %: 97
-- Reagents: 17194-00-2 (17194-00-2) [UNK]
+- Reagents: Barium hydroxide (17194-00-2) [BASE]
 - Solvents: Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Brc1cccc(-c2cccc(Br)n2)n1.CC(C)(C)c1cc(B(O)O)cc(C(C)(C)C)c1>>CC(C)(C)c1cc(-c2cccc(-c3cccc(-c4cc(C(C)(C)C)cc(C(C)(C)C)c4)n3)n2)cc(C(C)(C)C)c1
 
