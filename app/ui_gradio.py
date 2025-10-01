@@ -438,6 +438,44 @@ def _format_detection_details(det: Dict[str, Any] | None) -> str:
     return '\n'.join(f'- {line}' for line in lines)
 
 
+def _component_label(value: Any) -> str:
+    """Return a human-friendly label for summary components.
+
+    Handles dictionaries, primitive types, and nested lists so we do not crash
+    when backend payloads change shape (e.g., string sentinel values).
+    """
+    if isinstance(value, dict):
+        for key in ("name", "label", "abbreviation", "token", "uid", "cas", "core", "value"):
+            val = value.get(key)
+            if isinstance(val, str) and val.strip():
+                return val.strip()
+        # If dict only contains a single primitive value, surface it.
+        if len(value) == 1:
+            only_val = next(iter(value.values()))
+            if isinstance(only_val, str):
+                return only_val
+    if isinstance(value, (list, tuple)):
+        labels = [_component_label(item) for item in value]
+        return ", ".join(label for label in labels if label)
+    if value is None:
+        return ""
+    try:
+        text = str(value)
+    except Exception:
+        return ""
+    return text.strip()
+
+
+def _support_count(value: Any) -> Any:
+    if isinstance(value, dict):
+        count = value.get("count")
+        if isinstance(count, (int, float, str)):
+            return count
+    if isinstance(value, (int, float, str)):
+        return value
+    return ""
+
+
 def _format_starting_materials_summary(starting: Dict[str, Any] | None) -> str:
     if not isinstance(starting, dict):
         return '- Starting-material featurization unavailable.'
@@ -1046,28 +1084,35 @@ def ui_recommend_structured(
     recs = data.get("recommendations") or []
     rows: List[List[Any]] = []
     human_parts: List[str] = []
-    for rec in recs:
-        summary = rec.get("summary") or {}
-        base = summary.get("base") or {}
-        solvent = summary.get("solvent") or {}
-        support = summary.get("support") or {}
+    for idx, rec in enumerate(recs, start=1):
+        summary = rec.get("summary") if isinstance(rec.get("summary"), dict) else {}
+        core_label = _component_label(summary.get("core") if isinstance(summary, dict) else rec.get("core"))
+        base_label = _component_label(summary.get("base"))
+        solvent_label = _component_label(summary.get("solvent"))
+        support_val = _support_count(summary.get("support")) if isinstance(summary, dict) else ""
+        confidence = summary.get("confidence") if isinstance(summary, dict) else None
+        rank_val = rec.get("rank") or (summary.get("rank") if isinstance(summary, dict) else None) or idx
+
         rows.append([
-            rec.get("rank"),
-            summary.get("core"),
-            base.get("name") or base.get("cas"),
-            solvent.get("name") or solvent.get("cas"),
-            summary.get("confidence"),
-            support.get("count"),
+            rank_val,
+            core_label,
+            base_label,
+            solvent_label,
+            confidence,
+            support_val,
         ])
-        label_parts = [
-            str(summary.get("core") or ""),
-            str(base.get("name") or base.get("cas") or ""),
-            str(solvent.get("name") or solvent.get("cas") or ""),
-        ]
+
+        label_parts = [core_label, base_label, solvent_label]
         label = "/".join(part for part in label_parts if part)
         if label:
             human_parts.append(label)
-    human = "; ".join(human_parts) if human_parts else ""
+
+    if human_parts:
+        human = "; ".join(human_parts)
+    elif recs:
+        human = ""
+    else:
+        human = "No recommendations found"
     detection_md = _format_detection_details(data.get("detection"))
     starting_payload = data.get("starting_materials")
     starting_md = _format_starting_materials_summary(starting_payload)
@@ -1075,7 +1120,7 @@ def ui_recommend_structured(
     return (
         data,
         rows,
-        human or "n/a",
+        human,
         detection_md,
         starting_md,
         starting_table,
