@@ -37,6 +37,11 @@ try:  # pragma: no cover - import tested in runtime
 except Exception:  # pragma: no cover
     Chem = None  # type: ignore
 
+try:
+    from chemtools import registry as chemtools_registry
+except Exception:
+    chemtools_registry = None
+
 
 # ------------------------------ Schema helpers ------------------------------
 
@@ -794,21 +799,30 @@ def infer_reaction_type(core_generic_tokens: List[str]) -> str:
     return 'Other'
 
 def load_cas_maps(paths: List[str]) -> Dict[str, Dict[str, str]]:
-    """Load one or more JSONL mapping files into a dict: CAS -> {Name, GenericCore, Role, CategoryHint, Token}.
-    Only supports JSONL format. Missing fields are blank. CAS keys are normalized as plain strings.
+    """Load CAS metadata from JSONL files and/or chemtools taxonomy.
+
+    Returns a mapping: CAS -> {Name, GenericCore, Role, CategoryHint, Token}.
+    JSONL inputs remain supported for custom overrides; missing data fall back to the
+    in-repo taxonomy consumed by ``chemtools.registry``.
     """
+
     mapping: Dict[str, Dict[str, str]] = {}
-    
-    for p in paths:
-        if not p or not os.path.exists(p):
+
+    effective_paths: List[str] = [p for p in paths or [] if p]
+    if not effective_paths:
+        env_path = os.environ.get('CHEMTOOLS_REGISTRY_PATH', '').strip()
+        if env_path:
+            effective_paths.append(env_path)
+
+    for p in effective_paths:
+        if not os.path.exists(p):
             continue
-        
+
         if not p.endswith('.jsonl'):
             print(f"Warning: Skipping non-JSONL file {p}. Only JSONL format is supported.")
             continue
-        
+
         try:
-            # Load JSONL format
             with open(p, 'r', encoding='utf-8', errors='ignore') as f:
                 for line in f:
                     line = line.strip()
@@ -816,25 +830,50 @@ def load_cas_maps(paths: List[str]) -> Dict[str, Dict[str, str]]:
                         continue
                     try:
                         entry_data = json.loads(line)
-                        cas = (entry_data.get('cas') or '').strip()
-                        if not cas:
-                            continue
-                        
-                        entry = mapping.setdefault(cas, {})
-                        # Map JSONL fields to expected format
-                        entry['Name'] = (entry_data.get('name') or '').strip()
-                        entry['GenericCore'] = (entry_data.get('generic_core') or '').strip()
-                        # Accept both 'role' (lowercase, new JSONL) and 'Role' keys if present
-                        entry['Role'] = (entry_data.get('role') or entry_data.get('Role') or '').strip()
-                        entry['CategoryHint'] = (entry_data.get('category_hint') or '').strip()
-                        entry['Token'] = (entry_data.get('token') or '').strip()
-                        
                     except json.JSONDecodeError:
                         continue
-        except Exception:
-            # ignore file-specific issues
-            pass
-    
+                    cas = (entry_data.get('cas') or '').strip()
+                    if not cas:
+                        continue
+
+                    entry = mapping.setdefault(cas, {})
+                    entry['Name'] = (entry_data.get('name') or '').strip()
+                    entry['GenericCore'] = (entry_data.get('generic_core') or '').strip()
+                    entry['Role'] = (entry_data.get('role') or entry_data.get('Role') or '').strip()
+                    entry['CategoryHint'] = (entry_data.get('category_hint') or '').strip()
+                    entry['Token'] = (entry_data.get('token') or '').strip()
+        except Exception as exc:
+            print(f"Warning: Failed to load CAS map from {p}: {exc}")
+
+    if chemtools_registry is not None:
+        try:
+            idx = chemtools_registry._load_registry()  # type: ignore[attr-defined]
+            for uid, rec in idx.by_uid.items():
+                cas = (rec.get('cas') or uid or '').strip()
+                if not cas:
+                    continue
+                entry = mapping.setdefault(cas, {})
+                entry.setdefault('Name', (rec.get('name') or '').strip())
+                entry.setdefault('GenericCore', (rec.get('generic_core') or '').strip())
+                entry.setdefault('CategoryHint', (rec.get('compound_type') or '').strip())
+                role = (rec.get('role') or '').strip()
+                if role and not entry.get('Role'):
+                    entry['Role'] = role
+                token = (rec.get('token') or '').strip()
+                if token and not entry.get('Token'):
+                    entry['Token'] = token
+        except Exception as exc:
+            print(f"Warning: Could not load chemtools taxonomy registry ({exc})")
+
+    for cas, entry in mapping.items():
+        if not entry.get('Token'):
+            entry['Token'] = entry.get('Name') or cas
+        entry['Name'] = entry.get('Name', '').strip()
+        entry['GenericCore'] = entry.get('GenericCore', '').strip()
+        entry['Role'] = entry.get('Role', '').strip()
+        entry['CategoryHint'] = entry.get('CategoryHint', '').strip()
+        entry['Token'] = entry.get('Token', '').strip()
+
     return mapping
 
 
@@ -1730,17 +1769,12 @@ def main():
     if not args.no_auto_cas_maps:
         # Use only the unified registry if available, otherwise fall back to individual files
         here = os.path.dirname(os.path.abspath(__file__))
-        merged_path = os.path.join(here, 'cas_registry_merged.jsonl')
-        if os.path.exists(merged_path):
-            cas_map_paths.append(merged_path)
-        else:
-            # Fallback to individual JSONL files if merged doesn't exist
-            maybe = [
-                os.path.join(here, 'cas_dictionary.jsonl'),
-                os.path.join(here, 'comprehensive_cas_registry.jsonl'),
-            ]
-            cas_map_paths.extend([p for p in maybe if os.path.exists(p)])
-    cas_map = load_cas_maps(cas_map_paths) if cas_map_paths else {}
+        maybe = [
+            os.path.join(here, 'cas_dictionary.jsonl'),
+            os.path.join(here, 'comprehensive_cas_registry.jsonl'),
+        ]
+        cas_map_paths.extend([p for p in maybe if os.path.exists(p)])
+    cas_map = load_cas_maps(cas_map_paths)
 
     rows = assemble_rows(txt_map, rdf_map, cas_map)
     write_csv(rows, args.out)

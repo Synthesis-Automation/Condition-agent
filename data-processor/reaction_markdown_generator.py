@@ -70,6 +70,11 @@ except ImportError:
     REQUESTS_AVAILABLE = False
     print("Warning: 'requests' not available. Online CAS validation will be disabled.")
 
+try:
+    from chemtools import registry as chemtools_registry
+except Exception:
+    chemtools_registry = None
+
 
 class CASRegistry:
     """Enhanced CAS number registry with validation and lookup capabilities."""
@@ -77,6 +82,8 @@ class CASRegistry:
     def __init__(self):
         self.cas_cache = {}
         self.registry_data = {}  # Will store the full registry from JSONL
+        self.alias_index: Dict[str, str] = {}
+        self.registry_source: Optional[str] = None
         self.manual_corrections = {
             # Known corrections from your example
             "6737-42-4": "1,3-Bis(diphenylphosphino)propane",
@@ -139,38 +146,142 @@ class CASRegistry:
             "75-09-2": "solvent",
         }
         
-        # Load registry data from the updated JSONL file
+        # Load registry data from chemtools taxonomy or configured JSONL sources
         self.load_registry_data()
-    
+
+    @staticmethod
+    def _normalize_alias(value: Optional[str]) -> str:
+        if not value:
+            return ""
+        text = str(value).lower().strip()
+        if not text:
+            return ""
+        text = (
+            text.replace("’", "'")
+                .replace("‘", "'")
+                .replace("“", '"')
+                .replace("”", '"')
+        )
+        text = text.replace("'", "").replace('"', "")
+        text = text.replace('-', ' ')
+        import re
+        text = re.sub(r"[\[\]\(\),]", " ", text)
+        text = re.sub(r"\s+", " ", text)
+        return text
+
+    def _register_aliases(self, cas: str, *aliases: Optional[str]) -> None:
+        for alias in aliases:
+            norm = self._normalize_alias(alias)
+            if norm and norm not in self.alias_index:
+                self.alias_index[norm] = cas
+
+    def _ingest_entry(self, cas: str, entry: Dict[str, Any], aliases: Optional[List[str]] = None) -> None:
+        cas_key = cas.strip()
+        if not cas_key:
+            return
+        # Ensure we keep the richest entry when duplicates appear
+        existing = self.registry_data.get(cas_key, {})
+        merged = {**existing, **entry}
+        self.registry_data[cas_key] = merged
+        alias_list = (aliases or []) + [cas_key, entry.get('name'), entry.get('abbreviation'), entry.get('token'), entry.get('generic_core')]
+        self._register_aliases(cas_key, *alias_list)
+
+    def _load_jsonl(self, path: str) -> int:
+        count = 0
+        try:
+            with open(path, 'r', encoding='utf-8') as fh:
+                for raw in fh:
+                    line = raw.strip()
+                    if not line:
+                        continue
+                    try:
+                        data = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    cas = (data.get('cas') or '').strip()
+                    if not cas:
+                        continue
+                    entry = {
+                        'name': (data.get('name') or '').strip(),
+                        'abbreviation': (data.get('abbreviation') or '').strip(),
+                        'token': (data.get('token') or '').strip(),
+                        'generic_core': (data.get('generic_core') or '').strip(),
+                        'compound_type': (data.get('compound_type') or data.get('category_hint') or '').strip(),
+                        'role': (data.get('role') or data.get('Role') or '').strip(),
+                    }
+                    aliases: List[str] = []
+                    for key in ('aliases', 'synonyms'):
+                        vals = data.get(key)
+                        if isinstance(vals, list):
+                            aliases.extend(str(v) for v in vals if v)
+                    self._ingest_entry(cas, entry, aliases)
+                    count += 1
+        except FileNotFoundError:
+            return 0
+        except Exception as exc:
+            print(f"[WARNING] Could not load registry JSONL at {path}: {exc}")
+        return count
+
     def load_registry_data(self):
-        """Load the updated CAS registry data from the JSONL file."""
-        registry_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cas_registry_merged.jsonl')
-        
-        if os.path.exists(registry_path):
+        """Load CAS registry data from chemtools taxonomy or configured registry path."""
+        self.registry_data.clear()
+        self.alias_index.clear()
+        self.registry_source = None
+
+        loaded = 0
+
+        if chemtools_registry is not None:
             try:
-                with open(registry_path, 'r', encoding='utf-8') as f:
-                    for line in f:
-                        line = line.strip()
-                        if not line:
-                            continue
-                        
-                        try:
-                            entry = json.loads(line)
-                            cas = entry.get('cas')
-                            if cas:
-                                self.registry_data[cas] = entry
-                        except json.JSONDecodeError:
-                            continue
-                            
-                print(f"[INFO] Loaded {len(self.registry_data)} entries from CAS registry")
-            except Exception as e:
-                print(f"[WARNING] Could not load CAS registry: {e}")
-        else:
-            print(f"[WARNING] CAS registry not found at {registry_path}")
+                idx = chemtools_registry._load_registry()  # type: ignore[attr-defined]
+                for uid, rec in idx.by_uid.items():
+                    cas = (rec.get('cas') or uid or '').strip()
+                    if not cas:
+                        continue
+                    entry = {
+                        'name': (rec.get('name') or '').strip(),
+                        'abbreviation': (rec.get('abbreviation') or '').strip(),
+                        'token': (rec.get('token') or '').strip(),
+                        'generic_core': (rec.get('generic_core') or '').strip(),
+                        'compound_type': (rec.get('compound_type') or '').strip(),
+                        'role': (rec.get('role') or '').strip(),
+                    }
+                    aliases = idx.uid_to_aliases.get(uid, []) if hasattr(idx, 'uid_to_aliases') else []
+                    self._ingest_entry(cas, entry, aliases)
+                    loaded += 1
+                if loaded:
+                    self.registry_source = 'chemtools.taxonomy'
+                    return
+            except Exception as exc:
+                print(f"[WARNING] Could not load registry from chemtools taxonomy: {exc}")
+
+        env_path = os.environ.get('CHEMTOOLS_REGISTRY_PATH', '').strip()
+        if env_path:
+            loaded = self._load_jsonl(env_path)
+            if loaded:
+                self.registry_source = env_path
+                return
+
+        self.registry_source = 'manual'
+        if not self.registry_data:
+            print("[INFO] No external CAS registry source configured; defaulting to manual corrections.")
     
     def get_registry_entry(self, cas: str) -> Optional[Dict[str, Any]]:
         """Get the full registry entry for a CAS number."""
-        return self.registry_data.get(cas)
+        if not cas:
+            return None
+        entry = self.registry_data.get(cas)
+        if entry:
+            return entry
+        resolved = self.resolve_alias(cas)
+        if resolved:
+            return self.registry_data.get(resolved)
+        return None
+
+    def resolve_alias(self, text: Optional[str]) -> Optional[str]:
+        norm = self._normalize_alias(text)
+        if not norm:
+            return None
+        return self.alias_index.get(norm)
     
     def get_compound_abbreviation(self, cas: str) -> Optional[str]:
         """Get the abbreviation for a compound from the registry."""
@@ -356,8 +467,14 @@ class ReactionMarkdownGenerator:
             return ""
         import re
         s2 = s.lower().strip()
-        # Replace unicode primes and quotes with nothing
-        s2 = s2.replace("鈥?, "").replace("鈥?, "").replace("'", "")
+        # Replace unicode primes and quotes with simple ASCII quotes
+        s2 = (
+            s2.replace("’", "'")
+               .replace("‘", "'")
+               .replace("“", '"')
+               .replace("”", '"')
+        )
+        s2 = s2.replace("'", "").replace('"', "")
         # Remove brackets and commas
         s2 = re.sub(r"[\[\]\(\),]", " ", s2)
         # Collapse hyphens to spaces
@@ -542,6 +659,9 @@ class ReactionMarkdownGenerator:
         """Resolve a plain compound name to a CAS using registry and aliases."""
         if not name:
             return None
+        alias = self.cas_registry.resolve_alias(name)
+        if alias:
+            return alias
         n = self._norm(name)
         # Direct name match from registry
         cas = self.name_to_cas.get(n)
@@ -565,7 +685,7 @@ class ReactionMarkdownGenerator:
         - De-duplicate by CAS; if no CAS, de-duplicate by normalized name.
         """
         if not compound_list:
-            return f"**{title}:** None\n"
+            return f"**{title}:** None\n\n"
 
         seen_cas: set[str] = set()
         seen_names: set[str] = set()
@@ -672,7 +792,7 @@ class ReactionMarkdownGenerator:
                     continue
 
         if not lines:
-            return f"**{title}:** None\n"
+            return f"**{title}:** None\n\n"
         result = f"**{title}:**\n" + "\n".join(lines) + "\n\n"
         return result
     
@@ -805,39 +925,45 @@ class ReactionMarkdownGenerator:
     
     def format_reference(self, row: Dict[str, Any]) -> str:
         """Format reference information for markdown output."""
-        reference = row.get('Reference', '').strip()
+        reference = (row.get('Reference') or '').strip()
         if not reference:
             return ""
-        
-        # Parse reference format: title | authors | citation | doi
-        parts = [part.strip() for part in reference.split('|')]
-        
-        result = "**Reference:**\n"
-        
-        if len(parts) >= 1 and parts[0]:
-            # Title (first part)
-            result += f"  - **Title:** {parts[0]}\n"
-        
-        if len(parts) >= 2 and parts[1]:
-            # Authors (second part)
-            result += f"  - **Authors:** {parts[1]}\n"
-        
-        if len(parts) >= 3 and parts[2]:
-            # Citation (third part)
-            result += f"  - **Citation:** {parts[2]}\n"
-        
-        if len(parts) >= 4 and parts[3]:
-            # DOI (fourth part)
-            doi = parts[3].strip()
-            if doi:
-                # Format DOI as a clickable link
-                result += f"  - **DOI:** [https://doi.org/{doi}](https://doi.org/{doi})\n"
-        
-        # If only one part or doesn't follow expected format, show as-is
-        if len(parts) == 1 or not any(parts[1:]):
-            result = f"**Reference:** {reference}\n"
-        
-        return result + "\n"
+
+        # Break into structured parts (title | authors | citation | doi)
+        parts = [part.strip() for part in reference.split('|') if part.strip()]
+
+        citation_part = ''
+        if len(parts) >= 3:
+            citation_part = parts[2]
+        elif parts:
+            citation_part = parts[-1]
+
+        simple_reference = citation_part or reference
+
+        if citation_part:
+            import re
+
+            match = re.match(r"(?P<journal>.+?)\s*\((?P<year>\d{4})\)\s*,?\s*(?P<rest>.*)", citation_part)
+            if match:
+                journal = match.group('journal').strip()
+                year = match.group('year').strip()
+                rest = match.group('rest').strip()
+
+                pages = ''
+                if rest:
+                    page_candidates = [segment.strip() for segment in rest.split(',') if segment.strip()]
+                    if page_candidates:
+                        pages = page_candidates[-1]
+
+                pieces = [journal]
+                if year:
+                    pieces.append(year)
+                if pages:
+                    pieces.append(pages)
+
+                simple_reference = ', '.join(pieces)
+
+        return f"**Reference:** {simple_reference}\n\n"
     
     def clean_original_line(self, line: str) -> str:
         """Clean up SciFinder formatting artifacts from original text lines."""
@@ -917,8 +1043,10 @@ class ReactionMarkdownGenerator:
             solvents = []
         
         # Format catalytic system with validation
-        if full_catalytic:
-            markdown += self.format_compound_list(full_catalytic, "Full Catalytic System", allow_name_only=True)
+        # Always include a Full Catalytic System section; if explicit entries are missing,
+        # fall back to catalyst core and ligand components so the reader still sees the key species.
+        full_catalytic_display = full_catalytic if full_catalytic else (catalyst_core or []) + (ligands or [])
+        markdown += self.format_compound_list(full_catalytic_display, "Full Catalytic System", allow_name_only=True)
 
         # Compute and render ConditionCore (replaces "Catalyst Core")
         cc_label = self._compute_condition_core_label(
