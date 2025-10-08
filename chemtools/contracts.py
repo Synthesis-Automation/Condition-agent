@@ -33,6 +33,14 @@ class RecommendConditionsRequest(BaseModel):
     relax: Optional[Dict[str, Any]] = None
     constraints: Optional[Dict[str, Any]] = None
 
+class FusionRecommendRequest(BaseModel):
+    """Request for multi-source evidence fusion recommendation system."""
+    reaction: str
+    k: int = 50
+    max_variants: int = 5
+    relax: Optional[Dict[str, Any]] = None
+    constraints: Optional[Dict[str, Any]] = None
+
 class PlateDesignRequest(BaseModel):
     reaction: str
     plate_size: int = 24
