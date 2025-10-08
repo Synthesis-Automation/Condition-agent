@@ -1,0 +1,80 @@
+{
+  "id": "string",                      // prefer InChIKey; else stable slug/UUID
+  "name": "string",
+  "abbreviation": ["string"],
+  "aliases": ["string"],
+  "cas": "string|null",
+  "inchi_key": "string|null",
+  "smiles": "string|null",
+
+  "roles": {
+    "ligand": {
+      "families": ["biaryl_phosphine","nhc","n_heterocycle"],
+      "donors": ["P","N","S","O","C"],
+      "denticity": 1
+    },
+    "base": {
+      "families": ["carbonate_inorganic","alkoxide","organic_amine_secondary"],
+      "basicity": "weak|moderate|strong|superbase",
+      "nucleophilicity": "low|medium|high",
+      "sterics": "unhindered|hindered|bulky"
+    },
+    "acid": {
+      "families": ["sulfonic","carboxylic_aromatic","mineral"],
+      "acidity": "very_weak|weak|medium|strong|very_strong"
+    },
+    "oxidant": {
+      "families": ["peroxide","hypervalent_iodine","mode_set","mode_oat","mode_hat"],
+      "strength_band": "low|medium|high|very_high"
+    },
+    "reductant": {
+      "families": ["silane","borohydride","hantzsch_ester","mode_hydride","mode_set","mode_pcet","mode_hat"],
+      "strength_band": "low|medium|high|very_high"
+    },
+    "solvent": {
+      "families": ["aprotic_aromatic_lowpolarity","protic_alcohol_medium","polar_aprotic_strongly_coordinating"],
+      "proticity": "aprotic|protic|acidic|basic",
+      "polarity": "very_low|low|medium|high|very_high",
+      "coordination": "non|weak|moderate|strong"
+    },
+    "additive": {
+      "families": ["phase_transfer","halide_source","wca","water_scavenger","crown_ether","radical_suppressor"]
+    },
+
+    "metal_precursor": {               // salt/zero-valent source; typically needs extra ligand
+      "families": ["pd_ii_salt","pd0_source_dba","ni0_source_cod","cu_i_halide"],
+      "metal": "Pd|Ni|Cu|Co|Fe|Ru|Rh|Ir|Au|Ag|Pt|…",
+      "oxidation_states": [0,1,2,3,4]
+    },
+
+    "preformed_metal_catalyst": {      // pre-ligated; often used as-is
+      "families": ["pd_phosphine","ni_bipyridine","ir_photoredox_ppy3","pd_nhc"],
+      "metal": "Pd|Ni|Cu|Co|Fe|Ru|Rh|Ir|Au|Ag|Pt|Zn",
+      "oxidation_states": [0,1,2,3,4],
+      "ligand_type": "phosphine|NHC|bipyridine|phenanthroline|pincer|carboxylate|other"
+    },
+
+    "organo_catalyst": {
+      "families": ["cinchona","imidazolidinone","thiourea","phosphoric_acid","phase_transfer","nhc_organocatalyst","other"],
+      "activation_mode": "enamine|iminium|brønsted_acid|hydrogen_bonding|radical|other",
+      "chirality": "achiral|racemic|single_enantiomer"
+    },
+
+    "enzyme": {
+      "families": ["oxidoreductase","transferase","hydrolase","lyase","isomerase","ligase","polymerase","other"],
+      "source": "isolated|whole_cell|engineered|other",
+      "cofactor_requirement": "none|metal|organic|multiple"
+    },
+
+    "condensation_agent": {
+      "families": ["carbodiimide","uronium","phosphonium","imidazolium","sulfonyl_chloride","other"],
+      "strength_band": "low|medium|high"
+    },
+
+    "other_reagent": {
+      "families": ["misc_general","proprietary_mix","support_material"]
+    }
+  },
+
+  "embedding_text": "string|null"      // OPTIONAL (ideally auto-generated)
+}

@@ -1,0 +1,336 @@
+"""
+ChemTools Basic Tools Demo
+============================
+Demonstrates core SMILES, router, and featurization tools.
+
+Quick Start:
+    python tests/demo_basic_tools.py
+    # OR from tests directory:
+    cd tests && python demo_basic_tools.py
+
+Features Demonstrated:
+    1. SMILES normalization (canonicalization)
+    2. Reaction family detection (with and without catalysts)
+    3. Molecular featurization (leaving groups, nucleophiles)
+    4. Property lookup
+    5. DRFP similarity calculations
+"""
+
+import sys
+from pathlib import Path
+
+# Add parent directory to path for chemtools import
+parent_dir = Path(__file__).parent.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
+
+from chemtools.smiles import normalize, normalize_reaction
+from chemtools.router import detect_family, detect_family_from_reaction
+from chemtools.featurizers.molecular import featurize
+from chemtools.reaction_similarity import drfp_tanimoto, drfp_available
+from chemtools.reagent_lookup import find_reagent
+
+
+def test_1_smiles_normalization():
+    """Demonstrate SMILES canonicalization."""
+    print("\n" + "="*70)
+    print("  1. SMILES Normalization")
+    print("="*70)
+    
+    # Simple molecule
+    result = normalize('c1ccccc1O')
+    print(f"✅ normalize('c1ccccc1O')")
+    print(f"   → {result}")
+    
+    # Reaction normalization
+    rxn = 'Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1'
+    result = normalize_reaction(rxn)
+    print(f"\n✅ normalize_reaction('{rxn}')")
+    print(f"   → Normalized: {result.get('normalized', 'N/A')}")
+    print(f"   → Reactants: {len(result.get('reactants', []))}")
+    print(f"   → Products: {len(result.get('products', []))}")
+    
+    # Complex reaction with agents
+    rxn_with_agents = 'Brc1ccccc1.Nc1ccccc1>Pd(PPh3)4.K2CO3>c1ccccc1Nc1ccccc1'
+    result = normalize_reaction(rxn_with_agents)
+    print(f"\n✅ normalize_reaction (with agents)")
+    print(f"   → Input: {rxn_with_agents}")
+    print(f"   → Normalized: {result.get('normalized', 'N/A')}")
+    print(f"   → Agents: {len(result.get('agents', []))}")
+
+
+def test_2_family_detection():
+    """Demonstrate reaction family detection."""
+    print("\n" + "="*70)
+    print("  2. Reaction Family Detection")
+    print("="*70)
+    
+    # Method 1: From reactant list (rule-based only)
+    print("Method 1: detect_family(reactants) - Rule-based")
+    print("-" * 70)
+    reactants = ['Brc1ccccc1', 'Nc1ccccc1']
+    result = detect_family(reactants)
+    print(f"✅ detect_family({reactants})")
+    print(f"   → Family: {result.get('family', 'N/A')}")
+    print(f"   → Confidence: {result.get('confidence', 0):.2f}")
+    
+    # Method 2: From reaction SMILES (detects catalysts!)
+    print("\nMethod 2: detect_family_from_reaction() - With catalyst detection")
+    print("-" * 70)
+    rxn = 'Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1'
+    result = detect_family_from_reaction(rxn)
+    print(f"✅ detect_family_from_reaction('{rxn}')")
+    print(f"   → Family: {result.get('family', 'N/A')}")
+    print(f"   → Confidence: {result.get('confidence', 0):.2f}")
+    print(f"   💡 Also detects catalysts (Pd/Cu) from agents")
+    
+    # Example with Pd catalyst (should detect Buchwald)
+    rxn_pd = 'Brc1ccccc1.Nc1ccccc1>Pd(PPh3)4>c1ccccc1Nc1ccccc1'
+    result = detect_family_from_reaction(rxn_pd)
+    print(f"\n✅ With Pd catalyst:")
+    print(f"   → Input: {rxn_pd}")
+    print(f"   → Family: {result.get('family', 'N/A')}")
+    print(f"   → Confidence: {result.get('confidence', 0):.2f}")
+    print(f"   💡 Pd catalyst → Buchwald_CN (higher confidence)")
+    
+    # Example with Cu catalyst (should detect Ullmann)
+    rxn_cu = 'Brc1ccccc1.Nc1ccccc1>CuI>c1ccccc1Nc1ccccc1'
+    result = detect_family_from_reaction(rxn_cu)
+    print(f"\n✅ With Cu catalyst:")
+    print(f"   → Input: {rxn_cu}")
+    print(f"   → Family: {result.get('family', 'N/A')}")
+    print(f"   → Confidence: {result.get('confidence', 0):.2f}")
+    print(f"   💡 Cu catalyst → Ullmann_CN")
+    
+    # Suzuki reaction
+    print("\n✅ Suzuki coupling:")
+    suzuki = 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1'
+    result = detect_family_from_reaction(suzuki)
+    print(f"   → Input: {suzuki}")
+    print(f"   → Family: {result.get('family', 'N/A')}")
+    print(f"   → Confidence: {result.get('confidence', 0):.2f}")
+
+
+def test_3_molecular_featurization():
+    """Demonstrate molecular featurization."""
+    print("\n" + "="*70)
+    print("  3. Molecular Featurization")
+    print("="*70)
+    
+    # C-N coupling example
+    lg_smiles = 'Brc1ccccc1'
+    nuc_smiles = 'Nc1ccccc1'
+    result = featurize(lg_smiles, nuc_smiles)
+    print(f"✅ featurize('{lg_smiles}', '{nuc_smiles}')")
+    print(f"   → LG: {result.get('LG', 'N/A')}")
+    print(f"   → Electrophile class: {result.get('elec_class', 'N/A')}")
+    print(f"   → Nucleophile class: {result.get('nuc_class', 'N/A')}")
+    print(f"   → Bin: {result.get('bin', 'N/A')}")
+    
+    # Different leaving group
+    lg_smiles = 'Clc1ccccc1'
+    result = featurize(lg_smiles, nuc_smiles)
+    print(f"\n✅ featurize('{lg_smiles}', '{nuc_smiles}')")
+    print(f"   → LG: {result.get('LG', 'N/A')}")
+    print(f"   → Electrophile class: {result.get('elec_class', 'N/A')}")
+    print(f"   → Nucleophile class: {result.get('nuc_class', 'N/A')}")
+    print(f"   → Bin: {result.get('bin', 'N/A')}")
+    
+    # Secondary amine
+    nuc_smiles = 'CNc1ccccc1'
+    result = featurize(lg_smiles, nuc_smiles)
+    print(f"\n✅ featurize('{lg_smiles}', '{nuc_smiles}')")
+    print(f"   → LG: {result.get('LG', 'N/A')}")
+    print(f"   → Electrophile class: {result.get('elec_class', 'N/A')}")
+    print(f"   → Nucleophile class: {result.get('nuc_class', 'N/A')}")
+    print(f"   → Basicity: {result.get('n_basicity', 'N/A')}")
+    print(f"   → Steric (α): {result.get('steric_alpha', 'N/A')}")
+    print(f"   → Bin: {result.get('bin', 'N/A')}")
+
+
+def test_4_property_lookup():
+    """Demonstrate property lookup."""
+    print("\n" + "="*70)
+    print("  4. Property Lookup (Full Reagent Database)")
+    print("="*70)
+    print("  📚 Using find_reagent() - Full database (5000+ compounds)")
+    print("  " + "-"*66)
+    
+    # Try DMF in the solvent database
+    result = find_reagent('DMF', 'solvent')
+    if result:
+        print(f"  ✅ find_reagent('DMF', 'solvent')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+        print(f"     → SMILES: {result.get('smiles', 'N/A')}")
+        props = result.get('properties', {})
+        if props:
+            bp = props.get('boiling_point')
+            if bp:
+                print(f"     → Boiling point: {bp}°C")
+    
+    # Try K3PO4 in base database
+    result = find_reagent('K3PO4', 'base')
+    if result:
+        print(f"\n  ✅ find_reagent('K3PO4', 'base')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+        pka = result.get('pka')
+        if pka:
+            print(f"     → pKa: {pka}")
+    
+    # Try a ligand
+    result = find_reagent('BINAP', 'ligand')
+    if result:
+        print(f"\n  ✅ find_reagent('BINAP', 'ligand')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+        abbr = result.get('abbreviation', [])
+        if abbr:
+            print(f"     → Abbreviations: {', '.join(abbr)}")
+    
+    # Try a base
+    result = find_reagent('Cesium carbonate', 'base')
+    if result:
+        print(f"\n  ✅ find_reagent('Cesium carbonate', 'base')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+    
+    # Try a metal precursor
+    result = find_reagent('Pd(OAc)2', 'metal_precursor')
+    if result:
+        print(f"\n  ✅ find_reagent('Pd(OAc)2', 'metal_precursor')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+    
+    print(f"\n  💡 Available databases: ligand, base, solvent, metal_precursor, additive")
+
+
+def test_5_drfp_similarity():
+    """Demonstrate DRFP similarity calculations."""
+    print("\n" + "="*70)
+    print("  5. DRFP Similarity")
+    print("="*70)
+    
+    if not drfp_available():
+        print("⚠️  DRFP not installed")
+        print("   Install: pip install drfp")
+        return
+    
+    # Compare similar reactions
+    rxn1 = 'Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1'
+    rxn2 = 'Clc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1'
+    
+    try:
+        similarity = drfp_tanimoto(rxn1, rxn2)
+        print(f"✅ drfp_tanimoto(rxn1, rxn2)")
+        print(f"   → Rxn1: {rxn1}")
+        print(f"   → Rxn2: {rxn2}")
+        print(f"   → Similarity: {similarity:.3f}")
+        print(f"   💡 High similarity (only LG differs: Br vs Cl)")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+    
+    # Compare different reactions
+    rxn3 = 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1'  # Suzuki
+    
+    try:
+        similarity = drfp_tanimoto(rxn1, rxn3)
+        print(f"\n✅ drfp_tanimoto(rxn1, rxn3)")
+        print(f"   → Rxn1: {rxn1} (C-N)")
+        print(f"   → Rxn3: {rxn3} (Suzuki)")
+        print(f"   → Similarity: {similarity:.3f}")
+        print(f"   💡 Lower similarity (different reaction types)")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+
+
+def show_import_patterns():
+    """Display import patterns."""
+    print("\n" + "="*70)
+    print("  Import Patterns")
+    print("="*70)
+    print("""
+✅ SMILES Operations:
+   from chemtools.smiles import normalize, normalize_reaction
+
+✅ Family Detection:
+   from chemtools.router import detect_family
+   from chemtools.router import detect_family_from_reaction  # ⭐ Accepts reaction SMILES
+
+✅ Featurization:
+   from chemtools.featurizers.molecular import featurize
+
+✅ Reagent Database:
+   from chemtools.reagent_lookup import find_reagent  # Full database (5000+)
+   # Databases: ligand, base, solvent, metal_precursor, additive
+
+✅ DRFP Similarity (optional):
+   from chemtools.reaction_similarity import drfp_tanimoto
+""")
+
+
+def show_tips():
+    """Display usage tips."""
+    print("\n" + "="*70)
+    print("  Tips & Best Practices")
+    print("="*70)
+    print("""
+🎯 Family Detection:
+   - Use detect_family_from_reaction() for better accuracy
+   - It detects catalysts (Pd/Cu) from agents
+   - Pd catalyst → Buchwald_CN, Cu catalyst → Ullmann_CN
+   - Optional ML via use_rxn_insight=True
+
+⚡ Performance:
+   - SMILES normalization is fast (~1ms per reaction)
+   - Featurization is deterministic and cached
+   - DRFP calculations are slower (~10-50ms)
+
+📚 Next Steps:
+   - See demo_recommendations.py for condition recommendations
+   - See CHEMTOOLS_QUICKSTART.md for detailed guide
+   - See CHEMTOOLS_CLASS_GUIDE.md for advanced usage
+""")
+
+
+def main():
+    """Run all basic tool demonstrations."""
+    import sys
+    import io
+    # Fix Windows console encoding for emoji
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    
+    print("="*70)
+    print("  ChemTools Basic Tools Demo")
+    print("  October 2025 - Core Utilities")
+    print("="*70)
+    
+    tests = [
+        test_1_smiles_normalization,
+        test_2_family_detection,
+        test_3_molecular_featurization,
+        test_4_property_lookup,
+        test_5_drfp_similarity,
+    ]
+    
+    for test in tests:
+        try:
+            test()
+        except Exception as e:
+            print(f"\n❌ Error in {test.__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    show_import_patterns()
+    show_tips()
+    
+    print("\n" + "="*70)
+    print("  ✅ Basic Tools Demo Complete!")
+    print("="*70)
+    print("\n📖 Next: python tests/demo_recommendations.py")
+    print("🎨 Or try: python app/ui_gradio.py\n")
+
+
+if __name__ == "__main__":
+    main()

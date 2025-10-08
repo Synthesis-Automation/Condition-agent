@@ -1,0 +1,70 @@
+[
+  {
+    "id": "cas-109-63-7",
+    "name": "Boron trifluoride etherate",
+    "abbreviation": [
+      "BF3.Et2O"
+    ],
+    "aliases": [
+      "Borontrifluorideetherate",
+      "Boron trifluoride ethyl ether",
+      "ethoxyethane;trifluoroborane",
+      "BF3.Et2O",
+      "Boron trifluoride-diethyl etherate",
+      "ethoxyethane; trifluoroborane",
+      "boron trifluoride diethyl ether",
+      "boron trifluoride-diethyl ether",
+      "BF3 ethyl ether",
+      "BF3 ether",
+      "trifluoroborane ether",
+      "borontrifluride etherate",
+      "boron trifluorideetherate",
+      "borontriflouride etherate"
+    ],
+    "cas": "109-63-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "acid": {
+        "families": [
+          "boron_lewis_acids"
+        ]
+      }
+    },
+    "embedding_text": "type: ACID | family: Boron Lewis acids (boron_lewis_acids) | name: Boron trifluoride etherate | abbr: Boron trifluoride etherate | CAS: 109-63-7 | synonyms: Boron trifluoride etherate; 109-63-7; Borontrifluorideetherate; Boron trifluoride ethyl ether; ethoxyethane;trifluoroborane; BF3.Et2O; Boron trifluoride-diethyl etherate; ethoxyethane; trifluoroborane; boron trifluoride diethyl ether; boron trifluoride-diethyl ether; BF3 ethyl ether; BF3 ether; trifluoroborane ether; borontrifluride etherate; boron trifluorideetherate; borontriflouride etherate | family_notes: Lewis acids often metal halides; handled by name + metal."
+  },
+  {
+    "id": "cas-7647-01-0",
+    "name": "Hydrochloric Acid",
+    "abbreviation": [
+      "HCl"
+    ],
+    "aliases": [
+      "hydrogen chloride",
+      "Muriatic acid",
+      "chlorane",
+      "Chlorohydric acid",
+      "Acide chlorhydrique",
+      "Anhydrous hydrochloric acid",
+      "Chlorwasserstoff",
+      "Muriaticum acidum",
+      "Chloorwaterstof",
+      "Chlorowodor",
+      "Hydrogen chloride (HCl)",
+      "Acido cloridrico",
+      "Aqueous hydrogen chloride",
+      "chlorure d'hydrogene"
+    ],
+    "cas": "7647-01-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "acid": {
+        "families": [
+          "mineral_acids"
+        ]
+      }
+    },
+    "embedding_text": "type: ACID | family: Mineral acids (H2SO4/HCl/H3PO4) (mineral_acids) | name: Hydrochloric Acid | abbr: Hydrochloric Acid | CAS: 7647-01-0 | synonyms: Hydrochloric Acid; hydrogen chloride; 7647-01-0; Muriatic acid; chlorane; Chlorohydric acid; Acide chlorhydrique; Anhydrous hydrochloric acid; Chlorwasserstoff; Muriaticum acidum; Chloorwaterstof; Chlorowodor; Hydrogen chloride (HCl); Acido cloridrico; Aqueous hydrogen chloride; chlorure d'hydrogene | family_notes: HX, H2SO4, H3PO4; rely on name and formula."
+  }
+]

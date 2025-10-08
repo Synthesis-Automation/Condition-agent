@@ -1,0 +1,26 @@
+[
+  {
+    "id": "cas-9001-22-3",
+    "name": "Alcohol dehydrogenase",
+    "abbreviation": [
+      "ADH"
+    ],
+    "aliases": [
+      "Alcohol dehydrogenase",
+      "ADH"
+    ],
+    "cas": "9001-22-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "enzyme": {
+        "families": [
+          "oxidoreductase_general"
+        ],
+        "source": "isolated",
+        "cofactor_requirement": "organic"
+      }
+    },
+    "embedding_text": "type=enzyme | name=Alcohol dehydrogenase | family=oxidoreductase_general | source=isolated | cofactor=organic"
+  }
+]

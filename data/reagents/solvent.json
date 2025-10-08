@@ -1,0 +1,1660 @@
+[
+  {
+    "id": "cas-95-50-1",
+    "name": "1,2-Dichlorobenzene",
+    "abbreviation": [
+      "o-DCB"
+    ],
+    "aliases": [
+      "o-Dichlorobenzene",
+      "12Dichlorobenzene"
+    ],
+    "cas": "95-50-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "halogenated_aromatics"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Chlorinated aromatics (halogenated_aromatics) | name: 1,2-Dichlorobenzene | abbr: o-DCB | CAS: 95-50-1 | proticity: aprotic | polarity: low–medium | coordination: weakly coordinating | use_cases: High-temp couplings | best_for: Thermal stability; Solubilizing aromatics | avoid_when: EHS policies on chlorinated aromatics | ehs: halogenated | synonyms: 12Dichlorobenzene; o-DCB; o-Dichlorobenzene"
+  },
+  {
+    "id": "cas-107-06-2",
+    "name": "1,2-Dichloroethane",
+    "abbreviation": [
+      "DCE"
+    ],
+    "aliases": [
+      "Ethylene dichloride",
+      "12Dichloroethane"
+    ],
+    "cas": "107-06-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "halogenated_aliphatics"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Chlorinated aliphatics (halogenated_aliphatics) | name: 1,2-Dichloroethane | abbr: DCE | CAS: 107-06-2 | proticity: aprotic | polarity: low–medium | coordination: weakly coordinating | use_cases: Extractions; Some substitutions/couplings | best_for: Phase behavior needs; Moderate polarity without strong coordination | avoid_when: Environmental/health restrictions | ehs: halogenated, environmental_concern | synonyms: 12Dichloroethane; DCE; Ethylene dichloride"
+  },
+  {
+    "id": "cas-110-71-4",
+    "name": "1,2-Dimethoxyethane",
+    "abbreviation": [
+      "DME"
+    ],
+    "aliases": [
+      "Glyme",
+      "12Dimethoxyethane"
+    ],
+    "cas": "110-71-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_cyclic_glymes"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Cyclic/oligoether ethers (ethers_cyclic_glymes) | name: 1,2-Dimethoxyethane | abbr: DME | CAS: 110-71-4 | proticity: aprotic | polarity: low–medium | coordination: moderately coordinating | use_cases: Organometallics; Strong-base chemistry | best_for: Higher bp alternatives (MeTHF, CPME); Better green profile vs THF | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former, green_alt_available | synonyms: 12Dimethoxyethane; DME; Glyme"
+  },
+  {
+    "id": "cas-123-91-1",
+    "name": "1,4-Dioxane",
+    "abbreviation": [],
+    "aliases": [
+      "Dioxane",
+      "p-Dioxane",
+      "Diethylene ether",
+      "1,4-Diethylene dioxide",
+      "Dioxan",
+      "1,4-Dioxacyclohexane",
+      "Tetrahydro-p-dioxin",
+      "Di(ethylene oxide)",
+      "Dioxanne",
+      "Tetrahydro-1,4-dioxin",
+      "Dioxane-1,4",
+      "1,4-Dioxan",
+      "Diethylene dioxide",
+      "Glycol ethylene ether"
+    ],
+    "cas": "123-91-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "glycol_ethers_polyols"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | name: 1,4-Dioxane | abbr: 1,4-Dioxane | CAS: 123-91-1 | synonyms: 1,4-Dioxane; Dioxane; 123-91-1; p-Dioxane; Diethylene ether; 1,4-Diethylene dioxide; Dioxan; 1,4-Dioxacyclohexane; Tetrahydro-p-dioxin; Di(ethylene oxide); Dioxanne; Tetrahydro-1,4-dioxin; Dioxane-1,4; 1,4-Dioxan; Diethylene dioxide; Glycol ethylene ether"
+  },
+  {
+    "id": "cas-71-36-3",
+    "name": "1-Butanol",
+    "abbreviation": [
+      "n-BuOH"
+    ],
+    "aliases": [
+      "1Butanol"
+    ],
+    "cas": "71-36-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_primary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (primary) (alcohols_primary) | name: 1-Butanol | abbr: n-BuOH | CAS: 71-36-3 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: Solvolysis; Hydrogenations; Quenches | best_for: Green options (EtOH) | avoid_when: Water-intolerant reagents | synonyms: 1Butanol; n-BuOH"
+  },
+  {
+    "id": "cas-71-23-8",
+    "name": "1-Propanol",
+    "abbreviation": [
+      "n-PrOH"
+    ],
+    "aliases": [
+      "Propyl alcohol",
+      "1Propanol"
+    ],
+    "cas": "71-23-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_primary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (primary) (alcohols_primary) | name: 1-Propanol | abbr: n-PrOH | CAS: 71-23-8 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: Solvolysis; Hydrogenations; Quenches | best_for: Green options (EtOH) | avoid_when: Water-intolerant reagents | synonyms: 1Propanol; Propyl alcohol; n-PrOH"
+  },
+  {
+    "id": "cas-75-89-8",
+    "name": "2,2,2-Trifluoroethanol",
+    "abbreviation": [
+      "TFE"
+    ],
+    "aliases": [
+      "222Trifluoroethanol"
+    ],
+    "cas": "75-89-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "fluorinated_alcohols"
+        ],
+        "proticity": "acidic",
+        "polarity": "high",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Fluorinated alcohols (fluorinated_alcohols) | name: 2,2,2-Trifluoroethanol | abbr: TFE | CAS: 75-89-8 | proticity: protic (strong) | polarity: high | coordination: weakly coordinating | use_cases: Difficult couplings; H-bond catalysis | best_for: Strong HBD and acidity | avoid_when: Corrosion concerns, cost | ehs: corrosive | synonyms: 222Trifluoroethanol; TFE"
+  },
+  {
+    "id": "cas-78-92-2",
+    "name": "2-Butanol",
+    "abbreviation": [
+      "s-BuOH"
+    ],
+    "aliases": [
+      "sec-Butanol",
+      "2Butanol"
+    ],
+    "cas": "78-92-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_secondary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (secondary) (alcohols_secondary) | name: 2-Butanol | abbr: s-BuOH | CAS: 78-92-2 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: Hydrogenations/reductions; Cleaning | best_for: Low toxicity vs MeOH | avoid_when: Water-intolerant reagents | synonyms: 2Butanol; s-BuOH; sec-Butanol"
+  },
+  {
+    "id": "cas-110-80-5",
+    "name": "2-Ethoxyethanol",
+    "abbreviation": [
+      "Ethyl cellosolve"
+    ],
+    "aliases": [
+      "EE",
+      "2-EE",
+      "Ethoxyethanol",
+      "Glycol monoethyl ether",
+      "2Ethoxyethanol"
+    ],
+    "cas": "110-80-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "glycol_ethers_polyols"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: 2-Ethoxyethanol | abbr: Ethyl cellosolve | CAS: 110-80-5 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: 2-EE; 2Ethoxyethanol; EE; Ethoxyethanol; Ethyl cellosolve; Glycol monoethyl ether"
+  },
+  {
+    "id": "cas-109-86-4",
+    "name": "2-Methoxyethanol",
+    "abbreviation": [
+      "Methyl cellosolve"
+    ],
+    "aliases": [
+      "ME",
+      "2-ME",
+      "Methoxyethanol",
+      "2Methoxyethanol"
+    ],
+    "cas": "109-86-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "glycol_ethers_polyols"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: 2-Methoxyethanol | abbr: Methyl cellosolve | CAS: 109-86-4 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: 2-ME; 2Methoxyethanol; ME; Methoxyethanol; Methyl cellosolve"
+  },
+  {
+    "id": "cas-75-85-4",
+    "name": "2-Methyl-2-butanol",
+    "abbreviation": [
+      "t-AmylOH"
+    ],
+    "aliases": [
+      "tert-Amyl alcohol",
+      "TAA",
+      "t-AmOH",
+      "2Methyl2butanol"
+    ],
+    "cas": "75-85-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_tertiary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (tertiary) (alcohols_tertiary) | name: 2-Methyl-2-butanol | abbr: t-AmylOH | CAS: 75-85-4 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: High-temp protic medium; Modulate solvation | best_for: Low acidity protic environments | avoid_when: Strong hydrogen-bonding needed | synonyms: 2Methyl2butanol; TAA; t-AmOH; t-AmylOH; tert-Amyl alcohol"
+  },
+  {
+    "id": "cas-96-47-9",
+    "name": "2-Methyltetrahydrofuran",
+    "abbreviation": [
+      "MeTHF"
+    ],
+    "aliases": [
+      "2-MTHF",
+      "2Methyltetrahydrofuran"
+    ],
+    "cas": "96-47-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_cyclic_glymes"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Cyclic/oligoether ethers (ethers_cyclic_glymes) | name: 2-Methyltetrahydrofuran | abbr: MeTHF | CAS: 96-47-9 | proticity: aprotic | polarity: low–medium | coordination: moderately coordinating | use_cases: Organometallics; Strong-base chemistry | best_for: Higher bp alternatives (MeTHF, CPME); Better green profile vs THF | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former, green_alt_available | synonyms: 2-MTHF; 2Methyltetrahydrofuran; MeTHF"
+  },
+  {
+    "id": "cas-67-63-0",
+    "name": "2-Propanol",
+    "abbreviation": [
+      "i-PrOH"
+    ],
+    "aliases": [
+      "Isopropanol",
+      "IPA",
+      "2Propanol"
+    ],
+    "cas": "67-63-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_secondary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (secondary) (alcohols_secondary) | name: 2-Propanol | abbr: i-PrOH | CAS: 67-63-0 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: Hydrogenations/reductions; Cleaning | best_for: Low toxicity vs MeOH | avoid_when: Water-intolerant reagents | synonyms: 2Propanol; IPA; Isopropanol; i-PrOH"
+  },
+  {
+    "id": "cas-64-19-7",
+    "name": "Acetic acid",
+    "abbreviation": [
+      "AcOH"
+    ],
+    "aliases": [
+      "Aceticacid"
+    ],
+    "cas": "64-19-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "carboxylic_acids"
+        ],
+        "proticity": "acidic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Carboxylic acids (carboxylic_acids) | name: Acetic acid | abbr: AcOH | CAS: 64-19-7 | proticity: protic (acidic) | polarity: medium | coordination: weakly coordinating | use_cases: Acidic media; Acylation | best_for: Buffering acidic conditions | avoid_when: Base-sensitive operations | ehs: corrosive | synonyms: AcOH; Aceticacid"
+  },
+  {
+    "id": "cas-108-24-7",
+    "name": "Acetic anhydride",
+    "abbreviation": [
+      "Ac2O"
+    ],
+    "aliases": [
+      "Aceticanhydride"
+    ],
+    "cas": "108-24-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "esters_anhydrides"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Esters & anhydrides (esters_anhydrides) | name: Acetic anhydride | abbr: Ac2O | CAS: 108-24-7 | proticity: aprotic | polarity: low–medium | coordination: weak–moderate | use_cases: General medium; Workup-friendly systems | best_for: EtOAc as green solvent | avoid_when: Anhydrides reactive with nucleophiles | ehs: green_preferred | synonyms: Ac2O; Aceticanhydride"
+  },
+  {
+    "id": "cas-67-64-1",
+    "name": "Acetone",
+    "abbreviation": [
+      "Me2CO"
+    ],
+    "aliases": [
+      "Propan-2-one",
+      "Dimethyl ketone"
+    ],
+    "cas": "67-64-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ketones"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Ketones (ketones) | name: Acetone | abbr: Me2CO | CAS: 67-64-1 | proticity: aprotic | polarity: medium | coordination: moderately coordinating | use_cases: General purpose reactions; Condensations | best_for: Polar aprotic medium with moderate coordination | avoid_when: Very base-sensitive substrates (enolization) | synonyms: Acetone; Dimethyl ketone; Me2CO; Propan-2-one"
+  },
+  {
+    "id": "cas-75-05-8",
+    "name": "Acetonitrile",
+    "abbreviation": [
+      "MeCN"
+    ],
+    "aliases": [
+      "ACN"
+    ],
+    "cas": "75-05-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "nitriles"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Nitriles (nitriles) | name: Acetonitrile | abbr: MeCN | CAS: 75-05-8 | proticity: aprotic | polarity: medium–high | coordination: moderately coordinating | use_cases: Cross-couplings; Electrochemistry | best_for: High dielectric, moderate coordination | avoid_when: Nitrile-sensitive transformations | synonyms: ACN; Acetonitrile; MeCN"
+  },
+  {
+    "id": "cas-71-43-2",
+    "name": "Benzene",
+    "abbreviation": [
+      "PhH"
+    ],
+    "aliases": [
+      "Benzol"
+    ],
+    "cas": "71-43-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: Benzene | abbr: PhH | CAS: 71-43-2 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: Benzene; Benzol; PhH"
+  },
+  {
+    "id": "cas-1076-43-3",
+    "name": "Benzene-d6",
+    "abbreviation": [
+      "C6D6"
+    ],
+    "aliases": [
+      "Deuterated benzene",
+      "Benzened6"
+    ],
+    "cas": "1076-43-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "deuterated"
+        ]
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Deuterated solvents (NMR) (deuterated) | name: Benzene-d6 | abbr: C6D6 | CAS: 1076-43-3 | proticity: varies | polarity: varies | coordination: varies | use_cases: NMR spectroscopy | best_for: Analytical use | avoid_when: Production reactions | synonyms: Benzened6; C6D6; Deuterated benzene"
+  },
+  {
+    "id": "cas-56-23-5",
+    "name": "Carbon tetrachloride",
+    "abbreviation": [
+      "CCl4"
+    ],
+    "aliases": [
+      "Tetrachloromethane",
+      "Carbontetrachloride"
+    ],
+    "cas": "56-23-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "halogenated_aliphatics"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Chlorinated aliphatics (halogenated_aliphatics) | name: Carbon tetrachloride | abbr: CCl4 | CAS: 56-23-5 | proticity: aprotic | polarity: low–medium | coordination: weakly coordinating | use_cases: Extractions; Some substitutions/couplings | best_for: Phase behavior needs; Moderate polarity without strong coordination | avoid_when: Environmental/health restrictions | ehs: halogenated, environmental_concern | synonyms: CCl4; Carbontetrachloride; Tetrachloromethane"
+  },
+  {
+    "id": "cas-108-90-7",
+    "name": "Chlorobenzene",
+    "abbreviation": [
+      "PhCl"
+    ],
+    "aliases": [],
+    "cas": "108-90-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "halogenated_aromatics"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Chlorinated aromatics (halogenated_aromatics) | name: Chlorobenzene | abbr: PhCl | CAS: 108-90-7 | proticity: aprotic | polarity: low–medium | coordination: weakly coordinating | use_cases: High-temp couplings | best_for: Thermal stability; Solubilizing aromatics | avoid_when: EHS policies on chlorinated aromatics | ehs: halogenated | synonyms: Chlorobenzene; PhCl"
+  },
+  {
+    "id": "cas-67-66-3",
+    "name": "Chloroform",
+    "abbreviation": [
+      "CHCl3"
+    ],
+    "aliases": [
+      "Trichloromethane"
+    ],
+    "cas": "67-66-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "halogenated_aliphatics"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Chlorinated aliphatics (halogenated_aliphatics) | name: Chloroform | abbr: CHCl3 | CAS: 67-66-3 | proticity: aprotic | polarity: low–medium | coordination: weakly coordinating | use_cases: Extractions; Some substitutions/couplings | best_for: Phase behavior needs; Moderate polarity without strong coordination | avoid_when: Environmental/health restrictions | ehs: halogenated, environmental_concern | synonyms: CHCl3; Chloroform; Trichloromethane"
+  },
+  {
+    "id": "cas-110-82-7",
+    "name": "Cyclohexane",
+    "abbreviation": [
+      "CyH"
+    ],
+    "aliases": [],
+    "cas": "110-82-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_cycloaliphatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "very_low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Cycloaliphatic hydrocarbons (hydrocarbons_cycloaliphatic) | name: Cyclohexane | abbr: CyH | CAS: 110-82-7 | proticity: aprotic | polarity: very low | coordination: non-coordinating | use_cases: Hydrogenations; Nonpolar media | best_for: Higher bp vs n-hexane | avoid_when: Need donor solvent | synonyms: CyH; Cyclohexane"
+  },
+  {
+    "id": "cas-108-94-1",
+    "name": "Cyclohexanone",
+    "abbreviation": [
+      "CyOne"
+    ],
+    "aliases": [],
+    "cas": "108-94-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ketones"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Ketones (ketones) | name: Cyclohexanone | abbr: CyOne | CAS: 108-94-1 | proticity: aprotic | polarity: medium | coordination: moderately coordinating | use_cases: General purpose reactions; Condensations | best_for: Polar aprotic medium with moderate coordination | avoid_when: Very base-sensitive substrates (enolization) | synonyms: CyOne; Cyclohexanone"
+  },
+  {
+    "id": "cas-5614-37-9",
+    "name": "Cyclopentyl methyl ether",
+    "abbreviation": [
+      "CPME"
+    ],
+    "aliases": [
+      "Cyclopentylmethylether"
+    ],
+    "cas": "5614-37-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_cyclic_glymes"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Cyclic/oligoether ethers (ethers_cyclic_glymes) | name: Cyclopentyl methyl ether | abbr: CPME | CAS: 5614-37-9 | proticity: aprotic | polarity: low–medium | coordination: moderately coordinating | use_cases: Organometallics; Strong-base chemistry | best_for: Higher bp alternatives (MeTHF, CPME); Better green profile vs THF | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former, green_alt_available | synonyms: CPME; Cyclopentylmethylether"
+  },
+  {
+    "id": "cas-142-96-1",
+    "name": "Dibutyl ether",
+    "abbreviation": [
+      "DBE"
+    ],
+    "aliases": [
+      "Di-n-butyl ether",
+      "Dibutylether"
+    ],
+    "cas": "142-96-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_acyclic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Acyclic ethers (ethers_acyclic) | name: Dibutyl ether | abbr: DBE | CAS: 142-96-1 | proticity: aprotic | polarity: low | coordination: moderately coordinating | use_cases: Grignard; Reductions; Extractions | best_for: Moderate donor strength; Low bp operations | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former | synonyms: DBE; Di-n-butyl ether; Dibutylether"
+  },
+  {
+    "id": "cas-75-09-2",
+    "name": "Dichloromethane",
+    "abbreviation": [
+      "DCM"
+    ],
+    "aliases": [
+      "Methylene chloride",
+      "CH2Cl2"
+    ],
+    "cas": "75-09-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "halogenated_aliphatics"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Chlorinated aliphatics (halogenated_aliphatics) | name: Dichloromethane | abbr: DCM | CAS: 75-09-2 | proticity: aprotic | polarity: low–medium | coordination: weakly coordinating | use_cases: Extractions; Some substitutions/couplings | best_for: Phase behavior needs; Moderate polarity without strong coordination | avoid_when: Environmental/health restrictions | ehs: halogenated, environmental_concern | synonyms: CH2Cl2; DCM; Dichloromethane; Methylene chloride"
+  },
+  {
+    "id": "cas-60-29-7",
+    "name": "Diethyl ether",
+    "abbreviation": [
+      "Et2O"
+    ],
+    "aliases": [
+      "Ether",
+      "Ethyl ether",
+      "DEE",
+      "Diethylether"
+    ],
+    "cas": "60-29-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_acyclic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Acyclic ethers (ethers_acyclic) | name: Diethyl ether | abbr: Et2O | CAS: 60-29-7 | proticity: aprotic | polarity: low | coordination: moderately coordinating | use_cases: Grignard; Reductions; Extractions | best_for: Moderate donor strength; Low bp operations | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former | synonyms: DEE; Diethylether; Et2O; Ether; Ethyl ether"
+  },
+  {
+    "id": "cas-111-46-6",
+    "name": "Diethylene glycol",
+    "abbreviation": [
+      "DEG"
+    ],
+    "aliases": [
+      "Diethyleneglycol"
+    ],
+    "cas": "111-46-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "glycol_ethers_polyols"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: Diethylene glycol | abbr: DEG | CAS: 111-46-6 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: DEG; Diethyleneglycol"
+  },
+  {
+    "id": "cas-108-20-3",
+    "name": "Diisopropyl ether",
+    "abbreviation": [
+      "DIPE"
+    ],
+    "aliases": [
+      "Diisopropylether"
+    ],
+    "cas": "108-20-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_acyclic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Acyclic ethers (ethers_acyclic) | name: Diisopropyl ether | abbr: DIPE | CAS: 108-20-3 | proticity: aprotic | polarity: low | coordination: moderately coordinating | use_cases: Grignard; Reductions; Extractions | best_for: Moderate donor strength; Low bp operations | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former | synonyms: DIPE; Diisopropylether"
+  },
+  {
+    "id": "cas-67-68-5",
+    "name": "Dimethyl sulfoxide",
+    "abbreviation": [
+      "DMSO"
+    ],
+    "aliases": [
+      "Dimethylsulfoxide"
+    ],
+    "cas": "67-68-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "sulfoxides_dipolar_aprotic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "very_high",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Sulfoxides (dipolar aprotic) (sulfoxides_dipolar_aprotic) | name: Dimethyl sulfoxide | abbr: DMSO | CAS: 67-68-5 | proticity: aprotic | polarity: very high | coordination: strongly coordinating | use_cases: Polar reactions; High-temperature polar media | best_for: Very high donor strength; Water miscibility | avoid_when: Over-stabilization of anions | synonyms: DMSO; Dimethylsulfoxide"
+  },
+  {
+    "id": "cas-64-17-5",
+    "name": "Ethanol",
+    "abbreviation": [
+      "EtOH"
+    ],
+    "aliases": [],
+    "cas": "64-17-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_primary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (primary) (alcohols_primary) | name: Ethanol | abbr: EtOH | CAS: 64-17-5 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: Solvolysis; Hydrogenations; Quenches | best_for: Green options (EtOH) | avoid_when: Water-intolerant reagents | synonyms: EtOH; Ethanol"
+  },
+  {
+    "id": "cas-141-78-6",
+    "name": "Ethyl acetate",
+    "abbreviation": [
+      "EtOAc"
+    ],
+    "aliases": [
+      "Ethylacetate"
+    ],
+    "cas": "141-78-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "esters_anhydrides"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Esters & anhydrides (esters_anhydrides) | name: Ethyl acetate | abbr: EtOAc | CAS: 141-78-6 | proticity: aprotic | polarity: low–medium | coordination: weak–moderate | use_cases: General medium; Workup-friendly systems | best_for: EtOAc as green solvent | avoid_when: Anhydrides reactive with nucleophiles | ehs: green_preferred | synonyms: EtOAc; Ethylacetate"
+  },
+  {
+    "id": "cas-107-21-1",
+    "name": "Ethylene glycol",
+    "abbreviation": [
+      "EG"
+    ],
+    "aliases": [
+      "Ethyleneglycol"
+    ],
+    "cas": "107-21-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "glycol_ethers_polyols"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: Ethylene glycol | abbr: EG | CAS: 107-21-1 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: EG; Ethyleneglycol"
+  },
+  {
+    "id": "cas-920-66-1",
+    "name": "Hexafluoroisopropanol",
+    "abbreviation": [
+      "HFIP"
+    ],
+    "aliases": [
+      "1,1,1,3,3,3-Hexafluoro-2-propanol"
+    ],
+    "cas": "920-66-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "fluorinated_alcohols"
+        ],
+        "proticity": "acidic",
+        "polarity": "high",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Fluorinated alcohols (fluorinated_alcohols) | name: Hexafluoroisopropanol | abbr: HFIP | CAS: 920-66-1 | proticity: protic (strong) | polarity: high | coordination: weakly coordinating | use_cases: Difficult couplings; H-bond catalysis | best_for: Strong HBD and acidity | avoid_when: Corrosion concerns, cost | ehs: corrosive | synonyms: 1,1,1,3,3,3-Hexafluoro-2-propanol; HFIP; Hexafluoroisopropanol"
+  },
+  {
+    "id": "cas-78-83-1",
+    "name": "Isobutanol",
+    "abbreviation": [
+      "i-BuOH"
+    ],
+    "aliases": [
+      "2-Methyl-1-propanol"
+    ],
+    "cas": "78-83-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_primary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (primary) (alcohols_primary) | name: Isobutanol | abbr: i-BuOH | CAS: 78-83-1 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: Solvolysis; Hydrogenations; Quenches | best_for: Green options (EtOH) | avoid_when: Water-intolerant reagents | synonyms: 2-Methyl-1-propanol; Isobutanol; i-BuOH"
+  },
+  {
+    "id": "cas-108-21-4",
+    "name": "Isopropyl acetate",
+    "abbreviation": [
+      "iPrOAc"
+    ],
+    "aliases": [
+      "Isopropylacetate"
+    ],
+    "cas": "108-21-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "esters_anhydrides"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Esters & anhydrides (esters_anhydrides) | name: Isopropyl acetate | abbr: iPrOAc | CAS: 108-21-4 | proticity: aprotic | polarity: low–medium | coordination: weak–moderate | use_cases: General medium; Workup-friendly systems | best_for: EtOAc as green solvent | avoid_when: Anhydrides reactive with nucleophiles | ehs: green_preferred | synonyms: Isopropylacetate; iPrOAc"
+  },
+  {
+    "id": "cas-108-38-3",
+    "name": "m-Xylene",
+    "abbreviation": [
+      "m-Xyl"
+    ],
+    "aliases": [
+      "mXylene"
+    ],
+    "cas": "108-38-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: m-Xylene | abbr: m-Xyl | CAS: 108-38-3 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: m-Xyl; mXylene"
+  },
+  {
+    "id": "cas-108-67-8",
+    "name": "Mesitylene",
+    "abbreviation": [
+      "Mes"
+    ],
+    "aliases": [
+      "1,3,5-Trimethylbenzene"
+    ],
+    "cas": "108-67-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: Mesitylene | abbr: Mes | CAS: 108-67-8 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: 1,3,5-Trimethylbenzene; Mes; Mesitylene"
+  },
+  {
+    "id": "cas-67-56-1",
+    "name": "Methanol",
+    "abbreviation": [
+      "MeOH"
+    ],
+    "aliases": [],
+    "cas": "67-56-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_primary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (primary) (alcohols_primary) | name: Methanol | abbr: MeOH | CAS: 67-56-1 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: Solvolysis; Hydrogenations; Quenches | best_for: Green options (EtOH) | avoid_when: Water-intolerant reagents | synonyms: MeOH; Methanol"
+  },
+  {
+    "id": "cas-78-93-3",
+    "name": "Methyl ethyl ketone",
+    "abbreviation": [
+      "MEK"
+    ],
+    "aliases": [
+      "2-Butanone",
+      "Methylethylketone"
+    ],
+    "cas": "78-93-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ketones"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Ketones (ketones) | name: Methyl ethyl ketone | abbr: MEK | CAS: 78-93-3 | proticity: aprotic | polarity: medium | coordination: moderately coordinating | use_cases: General purpose reactions; Condensations | best_for: Polar aprotic medium with moderate coordination | avoid_when: Very base-sensitive substrates (enolization) | synonyms: 2-Butanone; MEK; Methylethylketone"
+  },
+  {
+    "id": "cas-108-10-1",
+    "name": "Methyl isobutyl ketone",
+    "abbreviation": [
+      "MIBK"
+    ],
+    "aliases": [
+      "4-Methyl-2-pentanone",
+      "Methylisobutylketone"
+    ],
+    "cas": "108-10-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ketones"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Ketones (ketones) | name: Methyl isobutyl ketone | abbr: MIBK | CAS: 108-10-1 | proticity: aprotic | polarity: medium | coordination: moderately coordinating | use_cases: General purpose reactions; Condensations | best_for: Polar aprotic medium with moderate coordination | avoid_when: Very base-sensitive substrates (enolization) | synonyms: 4-Methyl-2-pentanone; MIBK; Methylisobutylketone"
+  },
+  {
+    "id": "cas-127-19-5",
+    "name": "N,N-Dimethylacetamide",
+    "abbreviation": [
+      "DMAc"
+    ],
+    "aliases": [
+      "DMAC",
+      "NNDimethylacetamide"
+    ],
+    "cas": "127-19-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "amides_dipolar_aprotic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Amides (dipolar aprotic) (amides_dipolar_aprotic) | name: N,N-Dimethylacetamide | abbr: DMAc | CAS: 127-19-5 | proticity: aprotic | polarity: high | coordination: strongly coordinating | use_cases: Polar reactions; Cross-couplings | best_for: High donicity and bp | avoid_when: DMF/DMAc/NMP regulatory constraints | ehs: reproductive_toxicity_concern | synonyms: DMAC; DMAc; NNDimethylacetamide"
+  },
+  {
+    "id": "cas-68-12-2",
+    "name": "N,N-Dimethylformamide",
+    "abbreviation": [
+      "DMF"
+    ],
+    "aliases": [
+      "NNDimethylformamide"
+    ],
+    "cas": "68-12-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "amides_dipolar_aprotic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Amides (dipolar aprotic) (amides_dipolar_aprotic) | name: N,N-Dimethylformamide | abbr: DMF | CAS: 68-12-2 | proticity: aprotic | polarity: high | coordination: strongly coordinating | use_cases: Polar reactions; Cross-couplings | best_for: High donicity and bp | avoid_when: DMF/DMAc/NMP regulatory constraints | ehs: reproductive_toxicity_concern | synonyms: DMF; NNDimethylformamide"
+  },
+  {
+    "id": "cas-123-86-4",
+    "name": "n-Butyl acetate",
+    "abbreviation": [
+      "BuOAc"
+    ],
+    "aliases": [
+      "Butyl acetate",
+      "nButylacetate"
+    ],
+    "cas": "123-86-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "esters_anhydrides"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Esters & anhydrides (esters_anhydrides) | name: n-Butyl acetate | abbr: BuOAc | CAS: 123-86-4 | proticity: aprotic | polarity: low–medium | coordination: weak–moderate | use_cases: General medium; Workup-friendly systems | best_for: EtOAc as green solvent | avoid_when: Anhydrides reactive with nucleophiles | ehs: green_preferred | synonyms: BuOAc; Butyl acetate; nButylacetate"
+  },
+  {
+    "id": "cas-142-82-5",
+    "name": "n-Heptane",
+    "abbreviation": [
+      "Hept"
+    ],
+    "aliases": [
+      "Heptane",
+      "nHeptane"
+    ],
+    "cas": "142-82-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aliphatic_linear"
+        ],
+        "proticity": "aprotic",
+        "polarity": "very_low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aliphatic hydrocarbons (n-alkanes) (hydrocarbons_aliphatic_linear) | name: n-Heptane | abbr: Hept | CAS: 142-82-5 | proticity: aprotic | polarity: very low | coordination: non-coordinating | use_cases: Extractions; Nonpolar reactions | best_for: Green alternative to hexane (heptane) | avoid_when: Need polar/coordinating solvent | ehs: preferred_over_hexane | synonyms: Hept; Heptane; nHeptane"
+  },
+  {
+    "id": "cas-110-54-3",
+    "name": "n-Hexane",
+    "abbreviation": [
+      "Hex"
+    ],
+    "aliases": [
+      "Hexane",
+      "nHexane"
+    ],
+    "cas": "110-54-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aliphatic_linear"
+        ],
+        "proticity": "aprotic",
+        "polarity": "very_low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aliphatic hydrocarbons (n-alkanes) (hydrocarbons_aliphatic_linear) | name: n-Hexane | abbr: Hex | CAS: 110-54-3 | proticity: aprotic | polarity: very low | coordination: non-coordinating | use_cases: Extractions; Nonpolar reactions | best_for: Green alternative to hexane (heptane) | avoid_when: Need polar/coordinating solvent | ehs: preferred_over_hexane | synonyms: Hex; Hexane; nHexane"
+  },
+  {
+    "id": "cas-872-50-4",
+    "name": "N-Methyl-2-pyrrolidone",
+    "abbreviation": [
+      "NMP"
+    ],
+    "aliases": [
+      "NMethyl2pyrrolidone"
+    ],
+    "cas": "872-50-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "amides_dipolar_aprotic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Amides (dipolar aprotic) (amides_dipolar_aprotic) | name: N-Methyl-2-pyrrolidone | abbr: NMP | CAS: 872-50-4 | proticity: aprotic | polarity: high | coordination: strongly coordinating | use_cases: Polar reactions; Cross-couplings | best_for: High donicity and bp | avoid_when: DMF/DMAc/NMP regulatory constraints | ehs: reproductive_toxicity_concern | synonyms: NMP; NMethyl2pyrrolidone"
+  },
+  {
+    "id": "cas-109-66-0",
+    "name": "n-Pentane",
+    "abbreviation": [
+      "Pent"
+    ],
+    "aliases": [
+      "Pentane",
+      "nPentane"
+    ],
+    "cas": "109-66-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aliphatic_linear"
+        ],
+        "proticity": "aprotic",
+        "polarity": "very_low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aliphatic hydrocarbons (n-alkanes) (hydrocarbons_aliphatic_linear) | name: n-Pentane | abbr: Pent | CAS: 109-66-0 | proticity: aprotic | polarity: very low | coordination: non-coordinating | use_cases: Extractions; Nonpolar reactions | best_for: Green alternative to hexane (heptane) | avoid_when: Need polar/coordinating solvent | ehs: preferred_over_hexane | synonyms: Pent; Pentane; nPentane"
+  },
+  {
+    "id": "cas-98-95-3",
+    "name": "Nitrobenzene",
+    "abbreviation": [
+      "PhNO2"
+    ],
+    "aliases": [],
+    "cas": "98-95-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "nitro_solvents"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Nitro solvents (nitro_solvents) | name: Nitrobenzene | abbr: PhNO2 | CAS: 98-95-3 | proticity: aprotic | polarity: medium–high | coordination: weakly coordinating | use_cases: Polar substitutions; Nitration media (specialty) | best_for: High polarity without strong coordination | avoid_when: Energetic hazard constraints | ehs: energetic_hazard | synonyms: Nitrobenzene; PhNO2"
+  },
+  {
+    "id": "cas-75-52-5",
+    "name": "Nitromethane",
+    "abbreviation": [
+      "MeNO2"
+    ],
+    "aliases": [],
+    "cas": "75-52-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "nitro_solvents"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Nitro solvents (nitro_solvents) | name: Nitromethane | abbr: MeNO2 | CAS: 75-52-5 | proticity: aprotic | polarity: medium–high | coordination: weakly coordinating | use_cases: Polar substitutions; Nitration media (specialty) | best_for: High polarity without strong coordination | avoid_when: Energetic hazard constraints | ehs: energetic_hazard | synonyms: MeNO2; Nitromethane"
+  },
+  {
+    "id": "cas-95-47-6",
+    "name": "o-Xylene",
+    "abbreviation": [
+      "o-Xyl"
+    ],
+    "aliases": [
+      "oXylene"
+    ],
+    "cas": "95-47-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: o-Xylene | abbr: o-Xyl | CAS: 95-47-6 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: o-Xyl; oXylene"
+  },
+  {
+    "id": "cas-106-42-3",
+    "name": "p-Xylene",
+    "abbreviation": [
+      "p-Xyl"
+    ],
+    "aliases": [
+      "pXylene"
+    ],
+    "cas": "106-42-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: p-Xylene | abbr: p-Xyl | CAS: 106-42-3 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: p-Xyl; pXylene"
+  },
+  {
+    "id": "cas-25322-68-3",
+    "name": "Poly(ethylene glycol) 400",
+    "abbreviation": [
+      "PEG-400"
+    ],
+    "aliases": [
+      "PEG400",
+      "Polyethylene glycol (PEG-400)",
+      "Polyethyleneglycol400"
+    ],
+    "cas": "25322-68-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "glycol_ethers_polyols"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "strong"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Glycol ethers & polyols (glycol_ethers_polyols) | name: Poly(ethylene glycol) 400 | abbr: PEG-400 | CAS: 25322-68-3 | proticity: aprotic | polarity: medium | coordination: strongly coordinating | use_cases: Solubilization of polar substrates; High-bp media | best_for: Strong HBA, high bp | avoid_when: Toxicity concerns (some members) | ehs: toxicity_concern | synonyms: PEG-400; PEG400; Polyethylene glycol (PEG-400); Polyethyleneglycol400"
+  },
+  {
+    "id": "cas-79-09-4",
+    "name": "Propionic acid",
+    "abbreviation": [
+      "PrCO2H"
+    ],
+    "aliases": [
+      "Propanoic acid",
+      "Propionicacid"
+    ],
+    "cas": "79-09-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "carboxylic_acids"
+        ],
+        "proticity": "acidic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Carboxylic acids (carboxylic_acids) | name: Propionic acid | abbr: PrCO2H | CAS: 79-09-4 | proticity: protic (acidic) | polarity: medium | coordination: weakly coordinating | use_cases: Acidic media; Acylation | best_for: Buffering acidic conditions | avoid_when: Base-sensitive operations | ehs: corrosive | synonyms: PrCO2H; Propanoic acid; Propionicacid"
+  },
+  {
+    "id": "cas-110-86-1",
+    "name": "Pyridine",
+    "abbreviation": [
+      "Py"
+    ],
+    "aliases": [],
+    "cas": "110-86-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "amines_tertiary"
+        ],
+        "proticity": "basic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Amines (tertiary) (amines_tertiary) | name: Pyridine | abbr: Py | CAS: 110-86-1 | proticity: aprotic (basic) | polarity: medium | coordination: moderately coordinating | use_cases: Base/solvent dual role; Acylation scavenger media | best_for: Catalysis where base is solvent | avoid_when: Metal-catalysis sensitive to amine coordination | ehs: odor_strong | synonyms: Py; Pyridine"
+  },
+  {
+    "id": "cas-126-33-0",
+    "name": "Sulfolane",
+    "abbreviation": [
+      "Sulfolane"
+    ],
+    "aliases": [
+      "Tetramethylene sulfone",
+      "Tetrahydrothiophene 1,1-dioxide",
+      "Sulfolan",
+      "Thiophene, tetrahydro-, 1,1-dioxide",
+      "1,1-Dioxothiolan",
+      "Sulpholane",
+      "thiolane 1,1-dioxide",
+      "Sulfalone",
+      "Sulphoxaline",
+      "Dioxothiolan",
+      "Thiophan sulfone",
+      "Bondelane A",
+      "Bondolane A",
+      "Thiophane dioxide"
+    ],
+    "cas": "126-33-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "Sulfolane"
+        ],
+        "proticity": "aprotic",
+        "polarity_band": "high",
+        "polarity": "high",
+        "coordination": "high"
+      }
+    },
+    "embedding_text": " Tetramethylene sulfone; Tetrahydrothiophene 1,1-dioxide; Sulfolan; Thiophene, tetrahydro-, 1,1-dioxide; 1,1-Dioxothiolan; Sulpholane; thiolane 1,1-dioxide; Sulfalone; Sulphoxaline; Dioxothiolan; Thiophan sulfone; Bondelane A; Bondolane A; Thiophane dioxide"
+  },
+  {
+    "id": "cas-75-65-0",
+    "name": "tert-Butanol",
+    "abbreviation": [
+      "t-BuOH"
+    ],
+    "aliases": [
+      "TBA",
+      "tertButanol"
+    ],
+    "cas": "75-65-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_tertiary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Alcohols (tertiary) (alcohols_tertiary) | name: tert-Butanol | abbr: t-BuOH | CAS: 75-65-0 | proticity: protic | polarity: medium | coordination: weakly coordinating | use_cases: High-temp protic medium; Modulate solvation | best_for: Low acidity protic environments | avoid_when: Strong hydrogen-bonding needed | synonyms: TBA; t-BuOH; tertButanol"
+  },
+  {
+    "id": "cas-1634-04-4",
+    "name": "tert-Butyl methyl ether",
+    "abbreviation": [
+      "MTBE"
+    ],
+    "aliases": [
+      "TBME",
+      "t-BuOMe",
+      "tertButylmethylether"
+    ],
+    "cas": "1634-04-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_acyclic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Acyclic ethers (ethers_acyclic) | name: tert-Butyl methyl ether | abbr: MTBE | CAS: 1634-04-4 | proticity: aprotic | polarity: low | coordination: moderately coordinating | use_cases: Grignard; Reductions; Extractions | best_for: Moderate donor strength; Low bp operations | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former | synonyms: MTBE; TBME; t-BuOMe; tertButylmethylether"
+  },
+  {
+    "id": "cas-127-18-4",
+    "name": "Tetrachloroethylene",
+    "abbreviation": [
+      "PCE"
+    ],
+    "aliases": [
+      "Perchloroethylene"
+    ],
+    "cas": "127-18-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "halogenated_aliphatics"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Chlorinated aliphatics (halogenated_aliphatics) | name: Tetrachloroethylene | abbr: PCE | CAS: 127-18-4 | proticity: aprotic | polarity: low–medium | coordination: weakly coordinating | use_cases: Extractions; Some substitutions/couplings | best_for: Phase behavior needs; Moderate polarity without strong coordination | avoid_when: Environmental/health restrictions | ehs: halogenated, environmental_concern | synonyms: PCE; Perchloroethylene; Tetrachloroethylene"
+  },
+  {
+    "id": "cas-109-99-9",
+    "name": "Tetrahydrofuran",
+    "abbreviation": [
+      "THF"
+    ],
+    "aliases": [
+      "Oxolane"
+    ],
+    "cas": "109-99-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_cyclic_glymes"
+        ],
+        "proticity": "aprotic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Cyclic/oligoether ethers (ethers_cyclic_glymes) | name: Tetrahydrofuran | abbr: THF | CAS: 109-99-9 | proticity: aprotic | polarity: low–medium | coordination: moderately coordinating | use_cases: Organometallics; Strong-base chemistry | best_for: Higher bp alternatives (MeTHF, CPME); Better green profile vs THF | avoid_when: Peroxide risk unmanaged | ehs: peroxide_former, green_alt_available | synonyms: Oxolane; THF; Tetrahydrofuran"
+  },
+  {
+    "id": "cas-108-88-3",
+    "name": "Toluene",
+    "abbreviation": [
+      "PhMe"
+    ],
+    "aliases": [
+      "Methylbenzene",
+      "Toluol"
+    ],
+    "cas": "108-88-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: Toluene | abbr: PhMe | CAS: 108-88-3 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: Methylbenzene; PhMe; Toluene; Toluol"
+  },
+  {
+    "id": "cas-121-44-8",
+    "name": "Triethylamine",
+    "abbreviation": [
+      "Et3N"
+    ],
+    "aliases": [
+      "TEA"
+    ],
+    "cas": "121-44-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "amines_tertiary"
+        ],
+        "proticity": "basic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Amines (tertiary) (amines_tertiary) | name: Triethylamine | abbr: Et3N | CAS: 121-44-8 | proticity: aprotic (basic) | polarity: medium | coordination: moderately coordinating | use_cases: Base/solvent dual role; Acylation scavenger media | best_for: Catalysis where base is solvent | avoid_when: Metal-catalysis sensitive to amine coordination | ehs: odor_strong | synonyms: Et3N; TEA; Triethylamine"
+  },
+  {
+    "id": "cas-76-05-1",
+    "name": "Trifluoroacetic acid",
+    "abbreviation": [
+      "TFA"
+    ],
+    "aliases": [
+      "Trifluoroaceticacid"
+    ],
+    "cas": "76-05-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "carboxylic_acids"
+        ],
+        "proticity": "acidic",
+        "polarity": "medium",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Carboxylic acids (carboxylic_acids) | name: Trifluoroacetic acid | abbr: TFA | CAS: 76-05-1 | proticity: protic (acidic) | polarity: medium | coordination: weakly coordinating | use_cases: Acidic media; Acylation | best_for: Buffering acidic conditions | avoid_when: Base-sensitive operations | ehs: corrosive | synonyms: TFA; Trifluoroaceticacid"
+  },
+  {
+    "id": "cas-98-08-8",
+    "name": "Trifluoromethylbenzene",
+    "abbreviation": [
+      "PhCF3"
+    ],
+    "aliases": [
+      "(Trifluoromethyl)benzene",
+      "α,α,α-Trifluorotoluene"
+    ],
+    "cas": "98-08-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: Trifluoromethylbenzene | abbr: PhCF3 | CAS: 98-08-8 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: (Trifluoromethyl)benzene; PhCF3; Trifluoromethylbenzene; α,α,α-Trifluorotoluene"
+  },
+  {
+    "id": "cas-7732-18-5",
+    "name": "Water",
+    "abbreviation": [
+      "H2O"
+    ],
+    "aliases": [
+      "Aqua",
+      "Water (purified)"
+    ],
+    "cas": "7732-18-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "water"
+        ],
+        "proticity": "protic",
+        "polarity": "very_high",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Water (water) | name: Water | abbr: H2O | CAS: 7732-18-5 | proticity: protic | polarity: very high | coordination: weakly coordinating | use_cases: Biocatalysis; Micellar catalysis; Green processes | best_for: Green medium; Phase separation strategies | avoid_when: Water-intolerant reagents | ehs: green | synonyms: Aqua; H2O; Water; Water (purified)"
+  },
+  {
+    "id": "cas-1330-20-7",
+    "name": "Xylenes (mixed isomers)",
+    "abbreviation": [
+      "Xylenes"
+    ],
+    "aliases": [
+      "Dimethylbenzenes",
+      "Xylene",
+      "Xylenesmixedisomers"
+    ],
+    "cas": "1330-20-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "solvent": {
+        "families": [
+          "hydrocarbons_aromatic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "non"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: Xylenes (mixed isomers) | abbr: Xylenes | CAS: 1330-20-7 | proticity: aprotic | polarity: low | coordination: non-coordinating | use_cases: Nonpolar media; High-temp reactions (xylene/mesitylene) | best_for: Poorly polar substrates; Pd-catalyzed couplings at high T | avoid_when: Benzene toxicity constraints | ehs: carcinogen_benzene | synonyms: Dimethylbenzenes; Xylene; Xylenes; Xylenesmixedisomers"
+  }
+]

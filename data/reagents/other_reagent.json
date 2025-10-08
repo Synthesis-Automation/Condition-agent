@@ -1,0 +1,81 @@
+[
+  {
+    "id": "cas-616-47-7",
+    "name": "1-Methylimidazole",
+    "abbreviation": [
+      "1-Methylimidazole"
+    ],
+    "aliases": [
+      "1-Methyl-1H-imidazole",
+      "N-Methylimidazole",
+      "1H-Imidazole, 1-methyl-",
+      "IMIDAZOLE, 1-METHYL-",
+      "1-methyl-1H-imidazol-3-ium",
+      "N-methylimidazol",
+      "1-methylimidazol"
+    ],
+    "cas": "616-47-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ]
+      }
+    },
+    "embedding_text": "type: OTHER_REAGENT | family: Generic or uncategorized reagents that do not warrant a dedicated role (misc_general) | name: 1-Methylimidazole | abbr: 1-Methylimidazole | CAS: 616-47-7 | synonyms: 1-Methylimidazole; 616-47-7; 1-Methyl-1H-imidazole; N-Methylimidazole; 1H-Imidazole, 1-methyl-; IMIDAZOLE, 1-METHYL-; DTXSID6052291; CHEBI:113454; P4617QS63Y; NSC-88064; 1-methyl-1H-imidazol-3-ium; DTXCID6030863; RefChem:76394; 210-484-7; N-methylimidazol; 1-methylimidazol | family_notes: Use sparingly when a reagent cannot be mapped to a more specific role."
+  },
+  {
+    "id": "cas-1344-95-2",
+    "name": "Diatomaceous earth",
+    "abbreviation": [
+      "Celite"
+    ],
+    "aliases": [
+      "Celite",
+      "Filter aid",
+      "Diatomaceous earth"
+    ],
+    "cas": "1344-95-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ]
+      }
+    },
+    "embedding_text": "type=other_reagent | name=Diatomaceous earth | family=misc_general"
+  },
+  {
+    "id": "cas-4271-96-9",
+    "name": "Pyrimidine, 1,4,5,6-tetrahydro-1,2-dimethyl-",
+    "abbreviation": [
+      "Pyrimidine, 1,4,5,6-tetrahydro-1,2-dimethyl-"
+    ],
+    "aliases": [
+      "1,2-Dimethyl-1,4,5,6-tetrahydropyrimidine",
+      "1,4,5,6-Tetrahydro-1,2-dimethylpyrimidine",
+      "2,3-Dimethyltetrahydropyrimidine",
+      "2,3-dimethyl-3,4,5,6-tetrahydropyrimidine",
+      "Pyrimidine, 3,4,5,6-tetrahydro-2,3-dimethyl-",
+      "PYRANTEL EMBONATE IMPURITY D [EP IMPURITY]",
+      "MORANTEL HYDROGEN TARTRATE IMPURITY C [EP IMPURITY]",
+      "PYRANTEL EMBONATE IMPURITY D (EP IMPURITY)",
+      "MORANTEL HYDROGEN TARTRATE IMPURITY C (EP IMPURITY)"
+    ],
+    "cas": "4271-96-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ]
+      }
+    },
+    "embedding_text": "type: OTHER_REAGENT | family: Generic or uncategorized reagents that do not warrant a dedicated role (misc_general) | name: Pyrimidine, 1,4,5,6-tetrahydro-1,2-dimethyl- | abbr: F4M3LG4PSU; Pyrimidine, 1,4,5,6-tetrahydro-1,2-dimethyl- | CAS: 4271-96-9 | synonyms: Pyrimidine, 1,4,5,6-tetrahydro-1,2-dimethyl-; 1,2-Dimethyl-1,4,5,6-tetrahydropyrimidine; 1,4,5,6-Tetrahydro-1,2-dimethylpyrimidine; 2,3-Dimethyltetrahydropyrimidine; F4M3LG4PSU; EINECS 224-262-2; 2,3-dimethyl-3,4,5,6-tetrahydropyrimidine; DTXSID3063382; EC 224-262-2; Pyrimidine, 3,4,5,6-tetrahydro-2,3-dimethyl-; PYRANTEL EMBONATE IMPURITY D [EP IMPURITY]; MORANTEL HYDROGEN TARTRATE IMPURITY C [EP IMPURITY]; PYRANTEL EMBONATE IMPURITY D (EP IMPURITY); MORANTEL HYDROGEN TARTRATE IMPURITY C (EP IMPURITY); RefChem:177756; DTXCID3040140 | family_notes: Use sparingly when a reagent cannot be mapped to a more specific role."
+  }
+]

@@ -1,0 +1,318 @@
+{
+  "meta": {
+    "status": "success",
+    "model": "drfp_similarity",
+    "version": "2.0"
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+    "family": "C_N_Coupling_Cu"
+  },
+  "detection": {
+    "family": "C_N_Coupling_Cu",
+    "confidence": 0.95
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "reaction": {
+        "smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+      },
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": "Copper(I) iodide",
+          "abbreviation": "CuI",
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "[Unknown ligand] CAS 2809369-03-5",
+          "abbreviation": null,
+          "cas": "2809369-03-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Tripotassium phosphate",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Sulfolane",
+          "abbreviation": "Sulfolane",
+          "cas": "126-33-0",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 1,
+        "core": "Cu",
+        "base": {
+          "name": "Tripotassium phosphate",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Sulfolane",
+          "abbreviation": "Sulfolane",
+          "cas": "126-33-0",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.95,
+        "support": {
+          "count": 9,
+          "fraction_core": 0.9,
+          "reference_population": 10
+        },
+        "precedents": [
+          {
+            "reaction_id": "31-614-CAS-33566703",
+            "reference": "Oxalamide/Amide Ligands: Enhanced and Copper-Catalyzed C-N Cross-Coupling for Triarylamine Synthesis | Li, Sasa; Huang, Xia; Gao, Yunlong; Jin, Jian | Organic Letters (2022), 24(31), 5817-5824",
+            "yield_pct": null,
+            "core": "Cu"
+          },
+          {
+            "reaction_id": "31-614-CAS-33566706",
+            "reference": "Oxalamide/Amide Ligands: Enhanced and Copper-Catalyzed C-N Cross-Coupling for Triarylamine Synthesis | Li, Sasa; Huang, Xia; Gao, Yunlong; Jin, Jian | Organic Letters (2022), 24(31), 5817-5824",
+            "yield_pct": null,
+            "core": "Cu"
+          },
+          {
+            "reaction_id": "31-614-CAS-33566700",
+            "reference": "Oxalamide/Amide Ligands: Enhanced and Copper-Catalyzed C-N Cross-Coupling for Triarylamine Synthesis | Li, Sasa; Huang, Xia; Gao, Yunlong; Jin, Jian | Organic Letters (2022), 24(31), 5817-5824",
+            "yield_pct": null,
+            "core": "Cu"
+          }
+        ]
+      },
+      "combo": {
+        "base_uid": "7778-53-2",
+        "solvent_uid": "126-33-0"
+      }
+    },
+    {
+      "rank": 2,
+      "reaction": {
+        "smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+      },
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": "Copper(I) iodide",
+          "abbreviation": "CuI",
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "[Unknown ligand] CAS 2809369-03-5",
+          "abbreviation": null,
+          "cas": "2809369-03-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "[Unknown solvent] CAS 45656-71-1",
+          "abbreviation": null,
+          "cas": "45656-71-1",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 2,
+        "core": "Cu",
+        "base": {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "[Unknown solvent] CAS 45656-71-1",
+          "abbreviation": null,
+          "cas": "45656-71-1",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.95,
+        "support": {
+          "count": 1,
+          "fraction_core": 0.1,
+          "reference_population": 10
+        },
+        "precedents": [
+          {
+            "reaction_id": "31-614-CAS-31764849",
+            "reference": "High-Contrast Polymorphic Luminogen Formed through Effect of Tiny Differences in Intermolecular Interactions on the Intramolecular Charge Transfer Process | Wang, Kang; Xie, Yujun; Liu, Ming; Tao, Wei; Zhang, Hao; Huang, Meidong; You, Jinmao; Liu, Ying; Li, Yunliang; Li, Zhen; Dong, Yong Qiang | Advanced Optical Materials (2020), 8(16), 2000436",
+            "yield_pct": null,
+            "core": "Cu"
+          }
+        ]
+      },
+      "combo": {
+        "base_uid": "584-08-7",
+        "solvent_uid": "45656-71-1"
+      }
+    },
+    {
+      "rank": 3,
+      "reaction": {
+        "smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+      },
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": "Copper(I) iodide",
+          "abbreviation": "CuI",
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "[Unknown ligand] CAS 2809369-03-5",
+          "abbreviation": null,
+          "cas": "2809369-03-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Sulfolane",
+          "abbreviation": "Sulfolane",
+          "cas": "126-33-0",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 3,
+        "core": "Cu",
+        "base": {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Sulfolane",
+          "abbreviation": "Sulfolane",
+          "cas": "126-33-0",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.95,
+        "support": {
+          "count": 0,
+          "fraction_core": 0.0,
+          "reference_population": 10
+        },
+        "precedents": []
+      },
+      "combo": {
+        "base_uid": "584-08-7",
+        "solvent_uid": "126-33-0"
+      }
+    }
+  ],
+  "precedent_summary": {
+    "total_precedents": 10,
+    "chosen_core": "Cu",
+    "core_support": 10
+  }
+}
