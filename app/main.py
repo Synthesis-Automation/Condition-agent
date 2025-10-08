@@ -6,7 +6,8 @@ from chemtools.contracts import (
     NormalizeRequest, DetectFamilyRequest, FeaturizeUllmannRequest,
     ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
     ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest,
-    RecommendFromReactionRequest, RecommendConditionsRequest, PlateDesignRequest,
+    RecommendFromReactionRequest, RecommendConditionsRequest, FusionRecommendRequest,
+    PlateDesignRequest,
     CoreSearchRequest,
     RoleAwareMolRequest, RoleAwareReactionRequest,
     DetectTypeRequest,
@@ -20,7 +21,7 @@ from chemtools import chem
 
 # Deprecated: Keep old module imports for gradual migration
 # TODO: Remove these imports once all code uses chem.*
-from chemtools import smiles, router, featurizers, condition_core, properties, precedent, constraints, explain, recommend
+from chemtools import smiles, router, featurizers, condition_core, precedent, constraints, explain, recommend
 try:
     from chemtools.reaction_type_detector import detect_reaction_type as rxn_detect_type, is_available as rxn_insight_available  # type: ignore
     _HAS_RXN_INSIGHT = True
@@ -278,8 +279,10 @@ def api_featurize_molecule(req: RoleAwareMolRequest):
 @app.post("/api/v1/condition-core/parse")
 def api_condition_core(req: ConditionCoreParseRequest): return condition_core.parse_core(req.reagents, req.text or "")
 
-@app.post("/api/v1/properties/lookup")
-def api_properties(req: PropertiesLookupRequest): return chem.properties.lookup(req.query)
+# NOTE: Properties lookup endpoint removed - properties module deprecated
+# Reagent lookup is now available via chem.reagents.lookup() if needed
+# @app.post("/api/v1/properties/lookup")
+# def api_properties(req: PropertiesLookupRequest): return chem.properties.lookup(req.query)
 
 @app.get("/api/v1/cores")
 def api_core_list(family: str | None = None, limit: int = 200, counts: bool = True):
@@ -478,7 +481,38 @@ def api_recommend_conditions(req: RecommendConditionsRequest):
 
 @app.post("/api/v1/recommend")
 def api_recommend(req: RecommendFromReactionRequest):
-    return chem.recommend.recommend_from_reaction(req.reaction, k=req.k, relax=req.relax or {}, constraint_rules=req.constraints or {})
+    return recommend.recommend_from_reaction(req.reaction, k=req.k, relax=req.relax or {}, constraint_rules=req.constraints or {})
+
+
+@app.post("/api/v1/recommend/fusion")
+def api_recommend_fusion(req: FusionRecommendRequest):
+    """
+    Fusion recommendation endpoint - combines multiple evidence sources with adaptive weighting.
+    
+    Returns recommendations with fusion_meta containing:
+    - adaptive_weights: Learned weights (α, β, γ, δ) for each evidence source
+    - evidence_summary: Quality metrics for precedent data
+    - reasoning: Explanations for weight choices
+    """
+    result = recommend.recommend_from_reaction(
+        reaction=req.reaction,
+        k=req.k,
+        use_fusion=True,
+        max_variants=req.max_variants,
+        relax=req.relax or {},
+        constraint_rules=req.constraints or {}
+    )
+    
+    # Validate fusion metadata is present
+    if 'fusion_meta' not in result:
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Fusion mode enabled but no fusion_meta returned for reaction: {req.reaction[:50]}...")
+        result['fusion_meta'] = {
+            'error': 'Fusion metadata not available',
+            'note': 'Check if fusion is properly configured in recommend module'
+        }
+    
+    return result
 
 
 @app.post("/api/v1/design_plate")
