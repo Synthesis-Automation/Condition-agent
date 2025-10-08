@@ -206,6 +206,9 @@ for cond in plate['conditions'][:3]:
 # Fusion API tests
 python test_fusion_api_simple.py
 
+# Suzuki reaction comparison (Rule-based vs ML vs Fusion)
+python test_suzuki_recommendations.py
+
 # All integration tests
 pytest tests/ -v
 

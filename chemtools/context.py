@@ -274,7 +274,12 @@ class RecommendNamespace:
         """
         from . import recommend as _recommend
         return _recommend.recommend_conditions_structured(
-            reaction, reaction_type, k, limit, relax or {}, constraints or {}
+            reaction=reaction,
+            reaction_type=reaction_type,
+            k=k,
+            limit=limit,
+            relax=relax or {},
+            constraints=constraints or {}
         )
     
     def from_reaction(self, reaction: str, k: int = 5, relax: Optional[Dict] = None,
