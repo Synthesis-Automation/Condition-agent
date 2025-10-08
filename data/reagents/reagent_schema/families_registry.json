@@ -1,0 +1,3379 @@
+{
+  "version": "0.1",
+  "updated": "2025-10-03T04:39:26Z",
+  "schema": {
+    "role": "string",
+    "family": "string",
+    "definition": "string",
+    "include_smarts": [
+      "smarts..."
+    ],
+    "exclude_smarts": [
+      "smarts..."
+    ],
+    "required_props": {
+      "key": "value"
+    },
+    "precedence": "int (0-100)",
+    "keywords": [
+      "tokens"
+    ],
+    "examples_pos": [
+      "CAS..."
+    ],
+    "examples_neg": [
+      "CAS..."
+    ],
+    "notes": "string"
+  },
+  "entries": [
+    {
+      "role": "base",
+      "family": "inorg_carbonates_bicarbonate",
+      "definition": "Inorganic carbonates & bicarbonate",
+      "include_smarts": [
+        "[CX3](=O)([OX2-])[OX2-]",
+        "[CX3](=O)(O)[OX1-]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {
+        "has_metal_cation": true
+      },
+      "precedence": 80,
+      "keywords": [
+        "bicarbonate",
+        "carbonates",
+        "inorganic"
+      ],
+      "examples_pos": [
+        "584-08-7",
+        "534-17-8",
+        "497-19-8",
+        "144-55-8"
+      ],
+      "examples_neg": [],
+      "notes": "Inorganic carbonate/bicarbonate salts."
+    },
+    {
+      "role": "base",
+      "family": "inorg_carboxylates",
+      "definition": "Inorganic carboxylates (acetates, etc.)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acetates",
+        "carboxylates",
+        "inorganic"
+      ],
+      "examples_pos": [
+        "546-89-4",
+        "127-08-2",
+        "127-09-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "inorg_phosphates",
+      "definition": "Inorganic phosphates",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "inorganic",
+        "phosphates"
+      ],
+      "examples_pos": [
+        "7778-53-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "hydroxides",
+      "definition": "Hydroxides (alkali)",
+      "include_smarts": [
+        "[OX1-]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {
+        "has_metal_cation": true
+      },
+      "precedence": 85,
+      "keywords": [
+        "alkali",
+        "hydroxides"
+      ],
+      "examples_pos": [
+        "17194-00-2",
+        "1310-66-3",
+        "1310-65-2",
+        "7558-80-7",
+        "1310-58-3",
+        "1310-73-2",
+        "75-50-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "hydrides",
+      "definition": "Hydrides (alkali)",
+      "include_smarts": [
+        "[H-]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {
+        "has_metal_cation": true
+      },
+      "precedence": 80,
+      "keywords": [
+        "alkali",
+        "hydrides"
+      ],
+      "examples_pos": [
+        "7646-69-7"
+      ],
+      "examples_neg": [],
+      "notes": "Metal hydrides as bases."
+    },
+    {
+      "role": "base",
+      "family": "alkoxides_primary",
+      "definition": "Alkoxides (primary)",
+      "include_smarts": [
+        "[O-][C]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {
+        "has_metal_cation": true
+      },
+      "precedence": 75,
+      "keywords": [
+        "alkoxides",
+        "primary"
+      ],
+      "examples_pos": [
+        "124-41-4"
+      ],
+      "examples_neg": [],
+      "notes": "Alkali/alkaline-earth alkoxides."
+    },
+    {
+      "role": "base",
+      "family": "alkoxides_hindered",
+      "definition": "Alkoxides (tertiary, hindered)",
+      "include_smarts": [
+        "[O-][C]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {
+        "has_metal_cation": true
+      },
+      "precedence": 75,
+      "keywords": [
+        "alkoxides",
+        "hindered",
+        "tertiary"
+      ],
+      "examples_pos": [
+        "865-47-4",
+        "865-48-5"
+      ],
+      "examples_neg": [],
+      "notes": "Alkali/alkaline-earth alkoxides."
+    },
+    {
+      "role": "base",
+      "family": "metal_amides_silylamides",
+      "definition": "Metal amides / silylamides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "amides",
+        "metal",
+        "silylamides"
+      ],
+      "examples_pos": [
+        "4039-32-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "organolithiums",
+      "definition": "Organolithiums",
+      "include_smarts": [
+        "[Li]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "organolithiums"
+      ],
+      "examples_pos": [
+        "109-72-8"
+      ],
+      "examples_neg": [],
+      "notes": "Organolithium reagents."
+    },
+    {
+      "role": "base",
+      "family": "tertiary_amines_aliphatic",
+      "definition": "Tertiary amines (aliphatic)",
+      "include_smarts": [
+        "N(C)(C)C"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 60,
+      "keywords": [
+        "aliphatic",
+        "amines",
+        "tertiary"
+      ],
+      "examples_pos": [
+        "80-70-6",
+        "1907-33-1",
+        "29166-72-1",
+        "471-34-1",
+        "15519-28-5",
+        "35103-79-8",
+        "280-57-9",
+        "7087-68-5",
+        "516-12-1",
+        "298-14-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "aromatic_tertiary_amines",
+      "definition": "Aromatic tertiary amines (pyridines/lutidines)",
+      "include_smarts": [
+        "n1cccc(N)"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 60,
+      "keywords": [
+        "amines",
+        "aromatic",
+        "lutidines",
+        "pyridines",
+        "tertiary"
+      ],
+      "examples_pos": [
+        "110-86-1",
+        "108-48-5",
+        "109-02-4"
+      ],
+      "examples_neg": [],
+      "notes": "Heuristic DMAP-like is unreliable; treat as keyword-assisted."
+    },
+    {
+      "role": "base",
+      "family": "secondary_amines_cyclic",
+      "definition": "Secondary amines (cyclic)",
+      "include_smarts": [
+        "N(C)C"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 60,
+      "keywords": [
+        "amines",
+        "cyclic",
+        "secondary"
+      ],
+      "examples_pos": [
+        "110-89-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "amidine_guanidine_bases",
+      "definition": "Bicyclic amidines/guanidines",
+      "include_smarts": [
+        "N=C(N)N"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 70,
+      "keywords": [
+        "amidines",
+        "bicyclic",
+        "guanidines"
+      ],
+      "examples_pos": [
+        "6674-22-2",
+        "3001-72-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "nucleophilic_catalyst_bases",
+      "definition": "Nucleophilic catalyst-bases (DMAP, etc.)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "bases",
+        "catalyst",
+        "dmap",
+        "etc",
+        "nucleophilic"
+      ],
+      "examples_pos": [
+        "1122-58-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "base",
+      "family": "ammonia_aqueous",
+      "definition": "Ammonia / ammonium hydroxide (aq)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ammonia",
+        "ammonium",
+        "aq",
+        "hydroxide"
+      ],
+      "examples_pos": [
+        "1336-21-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "carbodiimides",
+      "definition": "Carbodiimides (→ O‑acylurea / active ester with additive)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "active",
+        "acylurea",
+        "additive",
+        "carbodiimides",
+        "ester",
+        "o",
+        "with"
+      ],
+      "examples_pos": [
+        "538-75-0",
+        "693-13-0",
+        "25952-53-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "aminium_uronium_guanidinium",
+      "definition": "Aminium/uronium/guanidinium (Bt/At/Oxyma-based)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "aminium",
+        "at",
+        "based",
+        "bt",
+        "guanidinium",
+        "oxyma",
+        "uronium"
+      ],
+      "examples_pos": [
+        "148893-10-1",
+        "94790-37-1",
+        "125700-67-6",
+        "330795-65-4",
+        "1075198-30-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "phosphonium_bt_at",
+      "definition": "Phosphonium (Bt/At variants)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "at",
+        "bt",
+        "phosphonium",
+        "variants"
+      ],
+      "examples_pos": [
+        "128625-52-5",
+        "128251-48-7",
+        "56602-33-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "triazine_non_halide",
+      "definition": "Triazine-based (do not generate acid halides)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acid",
+        "based",
+        "do",
+        "generate",
+        "halides",
+        "not",
+        "triazine"
+      ],
+      "examples_pos": [
+        "126851-73-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "imidazolide_formers",
+      "definition": "Imidazolide-forming reagents",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "forming",
+        "imidazolide",
+        "reagents"
+      ],
+      "examples_pos": [
+        "530-62-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "organophosphorus_anhydrides",
+      "definition": "Organophosphorus anhydrides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "anhydrides",
+        "organophosphorus"
+      ],
+      "examples_pos": [
+        "68957-94-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "organophosphorus_chlorides_azides",
+      "definition": "Organophosphorus chlorides/azides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "azides",
+        "chlorides",
+        "organophosphorus"
+      ],
+      "examples_pos": [
+        "1499-21-4",
+        "26386-88-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "acyl_halide_fluoride_generators",
+      "definition": "Acyl halide/fluoride generators (halo‑uronium/imidazolium)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acyl",
+        "fluoride",
+        "generators",
+        "halide",
+        "halo",
+        "imidazolium",
+        "uronium"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "mixed_anhydrides_chloroformates",
+      "definition": "Mixed anhydrides / chloroformates",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "anhydrides",
+        "chloroformates",
+        "mixed"
+      ],
+      "examples_pos": [
+        "543-27-1",
+        "2837-76-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "activated_esters_isolable",
+      "definition": "Activated esters (isolable)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "activated",
+        "esters",
+        "isolable"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "condensation_agent",
+      "family": "specialty_low_racemization",
+      "definition": "Specialty: carbonic anhydride route",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "anhydride",
+        "carbonic",
+        "route",
+        "specialty"
+      ],
+      "examples_pos": [
+        "4584-49-0",
+        "18747-60-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "hydrocarbons_aromatic",
+      "definition": "Aromatic hydrocarbons",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "aprotic",
+        "polarity_band": "low"
+      },
+      "precedence": 70,
+      "keywords": [
+        "aromatic",
+        "hydrocarbons"
+      ],
+      "examples_pos": [
+        "71-43-2",
+        "108-88-3",
+        "1330-20-7",
+        "108-38-3",
+        "95-47-6",
+        "106-42-3",
+        "108-67-8",
+        "98-08-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "hydrocarbons_aliphatic_linear",
+      "definition": "Aliphatic hydrocarbons (n-alkanes)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "aprotic",
+        "polarity_band": "very_low"
+      },
+      "precedence": 65,
+      "keywords": [
+        "aliphatic",
+        "alkanes",
+        "hydrocarbons",
+        "n"
+      ],
+      "examples_pos": [
+        "109-66-0",
+        "110-54-3",
+        "142-82-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "hydrocarbons_cycloaliphatic",
+      "definition": "Cycloaliphatic hydrocarbons",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "cycloaliphatic",
+        "hydrocarbons"
+      ],
+      "examples_pos": [
+        "110-82-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "halogenated_aliphatics",
+      "definition": "Chlorinated aliphatics",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "aliphatics",
+        "chlorinated"
+      ],
+      "examples_pos": [
+        "75-09-2",
+        "67-66-3",
+        "56-23-5",
+        "107-06-2",
+        "127-18-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "halogenated_aromatics",
+      "definition": "Chlorinated aromatics",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "aromatics",
+        "chlorinated"
+      ],
+      "examples_pos": [
+        "108-90-7",
+        "95-50-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "nitro_solvents",
+      "definition": "Nitro solvents",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "nitro",
+        "solvents"
+      ],
+      "examples_pos": [
+        "75-52-5",
+        "98-95-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "ethers_acyclic",
+      "definition": "Acyclic ethers",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acyclic",
+        "ethers"
+      ],
+      "examples_pos": [
+        "60-29-7",
+        "108-20-3",
+        "142-96-1",
+        "1634-04-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "ethers_cyclic_glymes",
+      "definition": "Cyclic/oligoether ethers",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "aprotic",
+        "coordination": "strong"
+      },
+      "precedence": 75,
+      "keywords": [
+        "cyclic",
+        "ethers",
+        "oligoether"
+      ],
+      "examples_pos": [
+        "110-71-4",
+        "109-99-9",
+        "96-47-9",
+        "5614-37-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "glycol_ethers_polyols",
+      "definition": "Glycol ethers & polyols",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ethers",
+        "glycol",
+        "polyols"
+      ],
+      "examples_pos": [
+        "123-91-1",
+        "110-80-5",
+        "109-86-4",
+        "111-46-6",
+        "107-21-1",
+        "25322-68-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "esters_anhydrides",
+      "definition": "Esters & anhydrides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "anhydrides",
+        "esters"
+      ],
+      "examples_pos": [
+        "141-78-6",
+        "108-21-4",
+        "123-86-4",
+        "108-24-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "ketones",
+      "definition": "Ketones",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ketones"
+      ],
+      "examples_pos": [
+        "67-64-1",
+        "78-93-3",
+        "108-10-1",
+        "108-94-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "nitriles",
+      "definition": "Nitriles",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "nitriles"
+      ],
+      "examples_pos": [
+        "75-05-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "amides_dipolar_aprotic",
+      "definition": "Amides (dipolar aprotic)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "aprotic",
+        "polarity_band": "high"
+      },
+      "precedence": 75,
+      "keywords": [
+        "amides",
+        "aprotic",
+        "dipolar"
+      ],
+      "examples_pos": [
+        "68-12-2",
+        "127-19-5",
+        "872-50-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "sulfoxides_dipolar_aprotic",
+      "definition": "Sulfoxides (dipolar aprotic)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "aprotic",
+        "polarity_band": "high"
+      },
+      "precedence": 75,
+      "keywords": [
+        "aprotic",
+        "dipolar",
+        "sulfoxides"
+      ],
+      "examples_pos": [
+        "67-68-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "alcohols_primary",
+      "definition": "Alcohols (primary)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "protic"
+      },
+      "precedence": 70,
+      "keywords": [
+        "alcohols",
+        "primary"
+      ],
+      "examples_pos": [
+        "67-56-1",
+        "64-17-5",
+        "71-23-8",
+        "71-36-3",
+        "78-83-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "alcohols_secondary",
+      "definition": "Alcohols (secondary)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "protic"
+      },
+      "precedence": 70,
+      "keywords": [
+        "alcohols",
+        "secondary"
+      ],
+      "examples_pos": [
+        "67-63-0",
+        "78-92-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "alcohols_tertiary",
+      "definition": "Alcohols (tertiary)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "protic"
+      },
+      "precedence": 70,
+      "keywords": [
+        "alcohols",
+        "tertiary"
+      ],
+      "examples_pos": [
+        "75-65-0",
+        "75-85-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "fluorinated_alcohols",
+      "definition": "Fluorinated alcohols",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {
+        "proticity": "aprotic"
+      },
+      "precedence": 60,
+      "keywords": [
+        "alcohols",
+        "fluorinated"
+      ],
+      "examples_pos": [
+        "75-89-8",
+        "920-66-1"
+      ],
+      "examples_neg": [],
+      "notes": "Perfluoro solvents; inert, low coordination."
+    },
+    {
+      "role": "solvent",
+      "family": "carboxylic_acids",
+      "definition": "Carboxylic acids",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acids",
+        "carboxylic"
+      ],
+      "examples_pos": [
+        "64-19-7",
+        "79-09-4",
+        "76-05-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "amines_tertiary",
+      "definition": "Amines (tertiary)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "amines",
+        "tertiary"
+      ],
+      "examples_pos": [
+        "110-86-1",
+        "121-44-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "water",
+      "definition": "Water",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "water"
+      ],
+      "examples_pos": [
+        "7732-18-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "solvent",
+      "family": "deuterated",
+      "definition": "Deuterated solvents (NMR)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "deuterated",
+        "nmr",
+        "solvents"
+      ],
+      "examples_pos": [
+        "1076-43-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "dialkylbiaryl_phosphines",
+      "definition": "Dialkylbiaryl phosphines (biaryl monophosphines)",
+      "include_smarts": [
+        "P(c1cccc(c1)*)*"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "biaryl",
+        "dialkylbiaryl",
+        "monophosphines",
+        "phosphines"
+      ],
+      "examples_pos": [
+        "657408-07-6",
+        "564483-18-7",
+        "787618-22-8",
+        "1070663-78-3",
+        "564483-19-8",
+        "145052-34-0",
+        "213697-53-1",
+        "251320-86-2",
+        "384347-21-1",
+        "200001-74-9"
+      ],
+      "examples_neg": [],
+      "notes": "Biaryl phosphines (Buchwald-type)."
+    },
+    {
+      "role": "ligand",
+      "family": "trialkyl_triaryl_phosphines",
+      "definition": "Trialkyl/Triaryl phosphines (monodentate)",
+      "include_smarts": [
+        "P(c1ccccc1)(c1ccccc1)c1ccccc1"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 70,
+      "keywords": [
+        "monodentate",
+        "phosphines",
+        "trialkyl",
+        "triaryl"
+      ],
+      "examples_pos": [
+        "2836-03-5",
+        "12678-01-2",
+        "1118-71-4",
+        "76189-55-4",
+        "742103-27-1",
+        "672-66-2",
+        "147-85-3",
+        "1486-28-8",
+        "108-00-9",
+        "1118-68-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "bidentate_diphosphines",
+      "definition": "Diphosphines (bidentate P^P)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "bidentate",
+        "diphosphines",
+        "p"
+      ],
+      "examples_pos": [
+        "2250-01-3",
+        "99646-27-4",
+        "117016-01-8",
+        "58467-99-1",
+        "52364-71-3",
+        "145854-69-9",
+        "196868-63-0",
+        "243984-11-4",
+        "150992-96-0",
+        "156707-92-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "phosphites",
+      "definition": "Phosphites (P(OR)3)",
+      "include_smarts": [
+        "P(=O)(OC)OC"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 70,
+      "keywords": [
+        "or",
+        "p",
+        "phosphites"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "phosphoramidites",
+      "definition": "Phosphoramidites (P(OR)(NR2)R')",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "nr",
+        "or",
+        "p",
+        "phosphoramidites",
+        "r"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "nhc_imidazolylidenes",
+      "definition": "N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "carbenes",
+        "heterocyclic",
+        "imidazolinylidenes",
+        "imidazolylidenes",
+        "n",
+        "nhc"
+      ],
+      "examples_pos": [
+        "246047-72-3",
+        "141556-45-8",
+        "343970-73-8",
+        "141556-44-7",
+        "250285-32-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "caac_carbenes",
+      "definition": "CAAC/BICAAC carbenes",
+      "include_smarts": [
+        "[C-](:C)[N+]",
+        "Imidazolylidene"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "bicaac",
+        "caac",
+        "carbenes"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": "NHCs; SMARTS placeholder."
+    },
+    {
+      "role": "ligand",
+      "family": "bipyridines",
+      "definition": "2,2'-Bipyridines (bpy family)",
+      "include_smarts": [
+        "n1cccc2ccccn12"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "bipyridines",
+        "bpy",
+        "family"
+      ],
+      "examples_pos": [
+        "366-18-7",
+        "72914-19-3",
+        "1762-34-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "phenanthrolines",
+      "definition": "1,10-Phenanthrolines",
+      "include_smarts": [
+        "n1cccc2ccc3ccccn3c2c1"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "phenanthrolines"
+      ],
+      "examples_pos": [
+        "66-71-7",
+        "484-11-7",
+        "1662-01-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "terpyridines",
+      "definition": "2,2':6',2''-Terpyridines (terpy)",
+      "include_smarts": [
+        "n1ccccncccn1"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "terpy",
+        "terpyridines"
+      ],
+      "examples_pos": [
+        "115091-29-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "bisoxazolines_BOX",
+      "definition": "Bis(oxazoline) ligands (BOX)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "bis",
+        "box",
+        "ligands",
+        "oxazoline"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "phox_pn",
+      "definition": "PHOX ligands (phosphino-oxazoline, P^N)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ligands",
+        "n",
+        "oxazoline",
+        "p",
+        "phosphino",
+        "phox"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "phosphine_pyridine_PN",
+      "definition": "Phosphine–pyridine (P,N) hemilabile ligands",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "hemilabile",
+        "ligands",
+        "n",
+        "p",
+        "phosphine",
+        "pyridine"
+      ],
+      "examples_pos": [
+        "37943-90-1",
+        "932710-63-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "pincers_PNP_PCP_PNN_CNN",
+      "definition": "Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 90,
+      "keywords": [
+        "cnn",
+        "etc",
+        "ligands",
+        "ncn",
+        "pcp",
+        "pincer",
+        "pnn",
+        "pnp"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": "Pattern varies; rely on keywords + metal-bound context."
+    },
+    {
+      "role": "ligand",
+      "family": "salen_salophen",
+      "definition": "Salen/Salophen (N2O2 chelates)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "chelates",
+        "n",
+        "o",
+        "salen",
+        "salophen"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "diamines",
+      "definition": "Diamines (aliphatic/cycloaliphatic N,N)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "aliphatic",
+        "cycloaliphatic",
+        "diamines",
+        "n"
+      ],
+      "examples_pos": [
+        "694-83-7",
+        "21436-03-3",
+        "1121-22-8",
+        "110-18-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "ligandless",
+      "definition": "Ligandless",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ligandless"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "catacxium_monophosphines",
+      "definition": "cataCXium® monodentate phosphines",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "catacxium",
+        "monodentate",
+        "phosphines"
+      ],
+      "examples_pos": [
+        "321921-71-5",
+        "714951-87-8",
+        "672937-61-0",
+        "740815-37-6",
+        "672937-60-9",
+        "1053658-91-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "dalphos_PN",
+      "definition": "DalPhos P,N chelates",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "chelates",
+        "dalphos",
+        "n",
+        "p"
+      ],
+      "examples_pos": [
+        "1219080-77-9",
+        "1237588-12-3",
+        "1237588-13-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "water_soluble_phosphines",
+      "definition": "Water-soluble phosphines",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "phosphines",
+        "soluble",
+        "water"
+      ],
+      "examples_pos": [
+        "53597-69-6",
+        "151888-20-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "tridentate_triphos",
+      "definition": "Tridentate phosphines (Triphos family)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "family",
+        "phosphines",
+        "tridentate",
+        "triphos"
+      ],
+      "examples_pos": [
+        "22031-12-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "triazine_pnn_phosphines",
+      "definition": "Triazine P,N,N ligands (BippyPhos family)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "bippyphos",
+        "family",
+        "ligands",
+        "n",
+        "p",
+        "triazine"
+      ],
+      "examples_pos": [
+        "894086-00-1",
+        "64741-28-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "secondary_phosphines",
+      "definition": "Secondary phosphines (R2PH)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ph",
+        "phosphines",
+        "r",
+        "secondary"
+      ],
+      "examples_pos": [
+        "829-84-5",
+        "829-85-6",
+        "819-19-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "bis_imino_pyridines_PDI",
+      "definition": "Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "bip",
+        "bis",
+        "imino",
+        "n",
+        "pdi",
+        "pyridines",
+        "tridentate"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "beta_diketiminates_NacNac",
+      "definition": "β-Diketiminates (nacnac/BDI; anionic N,N)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "anionic",
+        "bdi",
+        "diketiminates",
+        "n",
+        "nacnac"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "pyridine_oxazolines_PyOx",
+      "definition": "Pyridine-oxazolines (PyOx; N,N bidentate)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "bidentate",
+        "n",
+        "oxazolines",
+        "pyox",
+        "pyridine"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "tris_2pyridylmethyl_amine_TPMA",
+      "definition": "Tris(2-pyridylmethyl)amine (TPMA; N4 tripodal)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "amine",
+        "n",
+        "pyridylmethyl",
+        "tpma",
+        "tripodal",
+        "tris"
+      ],
+      "examples_pos": [
+        "16858-01-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "ligand",
+      "family": "quinolinol_NO_chelates",
+      "definition": "8-Quinolinol (oxine) N,O chelates",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "chelates",
+        "n",
+        "o",
+        "oxine",
+        "quinolinol"
+      ],
+      "examples_pos": [
+        "148-24-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "reductant",
+      "family": "metal_powders",
+      "definition": "Metal Powders (Zn, Mn, Fe)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 60,
+      "keywords": [
+        "fe",
+        "metal",
+        "mn",
+        "powders",
+        "zn"
+      ],
+      "examples_pos": [
+        "7440-66-6",
+        "7439-96-5"
+      ],
+      "examples_neg": [],
+      "notes": "Elemental metals; rely on name + element."
+    },
+    {
+      "role": "reductant",
+      "family": "hydrosilanes",
+      "definition": "Hydrosilanes",
+      "include_smarts": [
+        "[SiH]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "hydrosilanes"
+      ],
+      "examples_pos": [
+        "63148-57-2",
+        "3277-26-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "reductant",
+      "family": "complex_hydrides",
+      "definition": "Complex Hydrides (Borohydrides/Al hydrides)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "al",
+        "borohydrides",
+        "complex",
+        "hydrides"
+      ],
+      "examples_pos": [
+        "16940-66-2",
+        "16853-85-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "reductant",
+      "family": "organic_reductants",
+      "definition": "Organic Reductants (Hantzsch ester, TDAE, ascorbate)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ascorbate",
+        "ester",
+        "hantzsch",
+        "organic",
+        "reductants",
+        "tdae"
+      ],
+      "examples_pos": [
+        "13063-86-4",
+        "1149-23-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "reductant",
+      "family": "hydrogen_gas",
+      "definition": "Hydrogen Gas",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 60,
+      "keywords": [
+        "gas",
+        "hydrogen"
+      ],
+      "examples_pos": [
+        "1333-74-0"
+      ],
+      "examples_neg": [],
+      "notes": "H2 gas."
+    },
+    {
+      "role": "additive",
+      "family": "quaternary_ammonium_ptc",
+      "definition": "Quaternary ammonium phase-transfer catalysts (PTC)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ammonium",
+        "catalysts",
+        "phase",
+        "ptc",
+        "quaternary",
+        "transfer"
+      ],
+      "examples_pos": [
+        "111-78-4",
+        "10377-51-2",
+        "7647-15-6",
+        "7647-14-5",
+        "1643-19-2",
+        "1112-67-0",
+        "311-89-7",
+        "557-34-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "amide_coupling_additives",
+      "definition": "Amide coupling additives (benzotriazole / Oxyma)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "additives",
+        "amide",
+        "benzotriazole",
+        "coupling",
+        "oxyma"
+      ],
+      "examples_pos": [
+        "2592-95-2",
+        "39968-33-7",
+        "3849-21-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "crown_ethers",
+      "definition": "Crown ethers (K+/Na+/Li+ complexants)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "complexants",
+        "crown",
+        "ethers",
+        "k",
+        "li",
+        "na"
+      ],
+      "examples_pos": [
+        "17455-13-9",
+        "33100-27-5",
+        "287-15-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "iodide_promoters",
+      "definition": "Iodide promoters (Finkelstein/oxidative addition accelerants)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "accelerants",
+        "addition",
+        "finkelstein",
+        "iodide",
+        "oxidative",
+        "promoters"
+      ],
+      "examples_pos": [
+        "7681-82-5",
+        "7681-11-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "fluoride_sources_activators",
+      "definition": "Fluoride sources / silyl activators",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "activators",
+        "fluoride",
+        "silyl",
+        "sources"
+      ],
+      "examples_pos": [
+        "429-41-4",
+        "13400-13-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "silver_salts_halide_scavengers",
+      "definition": "Silver salts (halide scavengers / promoter salts)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "halide",
+        "promoter",
+        "salts",
+        "scavengers",
+        "silver"
+      ],
+      "examples_pos": [
+        "534-16-7",
+        "20667-12-3",
+        "7775-27-1",
+        "17026-41-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "carboxylate_promoters_ch_activation",
+      "definition": "Carboxylic acid promoters for C–H activation",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acid",
+        "activation",
+        "c",
+        "carboxylic",
+        "for",
+        "h",
+        "promoters"
+      ],
+      "examples_pos": [
+        "75-98-9",
+        "576-26-1",
+        "3111-27-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "molecular_sieves",
+      "definition": "Molecular sieves (water scavengers)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "molecular",
+        "scavengers",
+        "sieves",
+        "water"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "lithium_halide_accelerants",
+      "definition": "Lithium/alkaline halide accelerants",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "accelerants",
+        "alkaline",
+        "halide",
+        "lithium"
+      ],
+      "examples_pos": [
+        "7447-41-8",
+        "7550-35-8",
+        "7786-30-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "lewis_acid_promoters",
+      "definition": "Mild Lewis-acid promoters",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acid",
+        "lewis",
+        "mild",
+        "promoters"
+      ],
+      "examples_pos": [
+        "7646-85-7",
+        "7791-03-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "additive",
+      "family": "radical_suppressors",
+      "definition": "Radical suppressors / scavengers",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "radical",
+        "scavengers",
+        "suppressors"
+      ],
+      "examples_pos": [
+        "2564-83-2",
+        "128-37-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "oxidant",
+      "family": "o2_gas",
+      "definition": "Molecular Oxygen",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 60,
+      "keywords": [
+        "molecular",
+        "oxygen"
+      ],
+      "examples_pos": [
+        "7782-44-7"
+      ],
+      "examples_neg": [],
+      "notes": "Gaseous oxygen; handled by name."
+    },
+    {
+      "role": "oxidant",
+      "family": "hypervalent_iodine",
+      "definition": "Hypervalent Iodine Reagents",
+      "include_smarts": [
+        "I(=O)(=O)"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "hypervalent",
+        "iodine",
+        "reagents"
+      ],
+      "examples_pos": [
+        "65212-12-2",
+        "3240-34-4",
+        "87413-09-0",
+        "140681-55-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "oxidant",
+      "family": "peroxides_hydroperoxides",
+      "definition": "Peroxides and Hydroperoxides",
+      "include_smarts": [
+        "[OX2][OX2]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "and",
+        "hydroperoxides",
+        "peroxide",
+        "peroxides"
+      ],
+      "examples_pos": [
+        "75-91-2",
+        "7722-84-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "oxidant",
+      "family": "persulfates",
+      "definition": "Persulfate Oxidants",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "oxidants",
+        "persulfate"
+      ],
+      "examples_pos": [
+        "7727-21-1",
+        "7727-54-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "oxidant",
+      "family": "metal_salt_reoxidants",
+      "definition": "Metal-Salt Reoxidants (Cu/Ag)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "ag",
+        "cu",
+        "metal",
+        "reoxidants",
+        "salt"
+      ],
+      "examples_pos": [
+        "142-71-2",
+        "534-16-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "oxidant",
+      "family": "oxone",
+      "definition": "Oxone® (potassium peroxymonosulfate triple salt)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "oxone",
+        "peroxymonosulfate",
+        "potassium",
+        "salt",
+        "triple"
+      ],
+      "examples_pos": [
+        "37222-66-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "oxidant",
+      "family": "nitroxyl_radical_catalysts",
+      "definition": "Nitroxyl Radical Oxidation Systems (TEMPO family)",
+      "include_smarts": [
+        "N(=O)O•"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 70,
+      "keywords": [
+        "family",
+        "nitroxyl",
+        "oxidation",
+        "radical",
+        "systems",
+        "tempo"
+      ],
+      "examples_pos": [
+        "2564-83-2"
+      ],
+      "examples_neg": [],
+      "notes": "Radical 'NO' motif; pattern simplified."
+    },
+    {
+      "role": "oxidant",
+      "family": "quinone_oxidants",
+      "definition": "Quinone Oxidants",
+      "include_smarts": [
+        "O=C1C=CC(=O)C=CC1"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 75,
+      "keywords": [
+        "oxidants",
+        "quinone"
+      ],
+      "examples_pos": [
+        "84-58-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "oxidant",
+      "family": "mno2",
+      "definition": "Manganese Dioxide",
+      "include_smarts": [
+        "[Mn+4]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "dioxide",
+        "manganese"
+      ],
+      "examples_pos": [
+        "1313-13-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "pd_zero_sources",
+      "definition": "Pd(0) Sources (dba complexes, Pd(PPh3)4) (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Pd]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "complexes",
+        "dba",
+        "pd",
+        "pph",
+        "sources"
+      ],
+      "examples_pos": [
+        "51364-51-3",
+        "52522-40-4",
+        "32005-36-0",
+        "14221-01-3"
+      ],
+      "examples_neg": [],
+      "notes": "Pd(0) sources; dba etc."
+    },
+    {
+      "role": "metal_precursor",
+      "family": "pd_ii_salts",
+      "definition": "Pd(II) Salts and Simple Complexes (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Pd]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "and",
+        "complexes",
+        "ii",
+        "pd",
+        "salts",
+        "simple"
+      ],
+      "examples_pos": [
+        "53199-31-8",
+        "14592-56-4",
+        "7440-02-0",
+        "12168-54-6",
+        "7440-05-3",
+        "3375-31-3",
+        "14024-61-4",
+        "13444-94-5",
+        "7647-10-1",
+        "42196-31-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "pd_phosphine_complexes",
+      "definition": "Pd(II) Phosphine/Chelated Complexes (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "chelated",
+        "complexes",
+        "ii",
+        "pd",
+        "phosphine"
+      ],
+      "examples_pos": [
+        "95408-45-0",
+        "72287-26-4",
+        "29934-17-6",
+        "13965-03-2",
+        "40691-33-6",
+        "15629-92-2",
+        "95464-05-4",
+        "172418-32-5",
+        "887919-35-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "pd_g3_precatalysts",
+      "definition": "Buchwald G3 Precatalysts (BiarylP–Pd) (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "biarylp",
+        "buchwald",
+        "g",
+        "pd",
+        "precatalysts"
+      ],
+      "examples_pos": [
+        "1445085-55-1",
+        "1447963-75-8",
+        "1445085-77-7",
+        "1470372-59-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "pd_peppsi_nhc",
+      "definition": "PEPPSI™ Pd–NHC Precatalysts (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "nhc",
+        "pd",
+        "peppsi",
+        "precatalysts"
+      ],
+      "examples_pos": [
+        "905459-27-0",
+        "927706-57-8",
+        "1158652-41-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "ni_zero_sources",
+      "definition": "Ni(0) Sources (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "ni",
+        "sources"
+      ],
+      "examples_pos": [
+        "1295-35-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "ni_ii_halides",
+      "definition": "Ni(II) Halides (Anhydrous) (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Ni]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "anhydrous",
+        "halides",
+        "ii",
+        "ni"
+      ],
+      "examples_pos": [
+        "7718-54-9",
+        "13462-88-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "ni_ii_glyme",
+      "definition": "Ni(II) Glyme Adducts (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Ni]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "adducts",
+        "glyme",
+        "ii",
+        "ni"
+      ],
+      "examples_pos": [
+        "29046-78-4",
+        "28923-39-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "ni_ii_carboxylates",
+      "definition": "Ni(II) Carboxylates and β-Diketonates (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Ni]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "and",
+        "carboxylates",
+        "diketonates",
+        "ii",
+        "ni"
+      ],
+      "examples_pos": [
+        "3264-82-2",
+        "6018-89-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "cu_i_halides",
+      "definition": "Cu(I) Halides and Adducts (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Cu]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "adducts",
+        "and",
+        "cu",
+        "halides",
+        "i"
+      ],
+      "examples_pos": [
+        "7681-65-4",
+        "7787-70-4",
+        "54678-23-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "cu_i_carboxylates",
+      "definition": "Cu(I) Carboxylates (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Cu]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "carboxylates",
+        "cu",
+        "i"
+      ],
+      "examples_pos": [
+        "68986-76-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "cu_ii_salts",
+      "definition": "Cu(II) Salts (assigned as metal_precursor)",
+      "include_smarts": [
+        "[Cu]"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "cu",
+        "ii",
+        "salts"
+      ],
+      "examples_pos": [
+        "142-71-2",
+        "6046-93-1",
+        "34946-82-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "co_ii_halides",
+      "definition": "Co(II) Halides (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "co",
+        "halides",
+        "ii"
+      ],
+      "examples_pos": [
+        "7646-79-9",
+        "7789-43-7"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "co_beta_diketonates",
+      "definition": "Co Acetylacetonates (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "acetylacetonates",
+        "co"
+      ],
+      "examples_pos": [
+        "14024-48-7",
+        "21679-46-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "ru_metathesis_grubbs",
+      "definition": "Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "carbene",
+        "catalysts",
+        "grubbs",
+        "hoveyda",
+        "metathesis",
+        "ruthenium"
+      ],
+      "examples_pos": [
+        "172222-30-9",
+        "246047-72-3",
+        "301224-40-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "ru_arene_dimer",
+      "definition": "[(p‑cymene)RuCl2]2 and RuCl3 Sources (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "and",
+        "cymene",
+        "p",
+        "rucl",
+        "sources"
+      ],
+      "examples_pos": [
+        "52462-29-0",
+        "14898-67-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "rh_hydrogenation_precursors",
+      "definition": "Rhodium(I) Precursors for Hydrogenation (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "for",
+        "hydrogenation",
+        "i",
+        "precursors",
+        "rhodium"
+      ],
+      "examples_pos": [
+        "14694-95-2",
+        "12092-47-6",
+        "35138-22-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "rh_carbonyl_precursors",
+      "definition": "Rhodium Carbonyl Chloride Dimers (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "carbonyl",
+        "chloride",
+        "dimers",
+        "rhodium"
+      ],
+      "examples_pos": [
+        "14523-22-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "ir_cod_dimers",
+      "definition": "[Ir(cod)Cl]2 and Related Dimers (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "and",
+        "cl",
+        "cod",
+        "dimers",
+        "ir",
+        "related"
+      ],
+      "examples_pos": [
+        "12112-67-3",
+        "12148-71-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "ir_photoredox",
+      "definition": "Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "and",
+        "ar",
+        "catalysts",
+        "dfppy",
+        "dtbbpy",
+        "iridium",
+        "photoredox",
+        "ppy",
+        "salts"
+      ],
+      "examples_pos": [
+        "94928-86-6",
+        "870987-63-6"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "fe_carbonyls",
+      "definition": "Iron Carbonyls (Fe(0) Sources) (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "carbonyls",
+        "fe",
+        "iron",
+        "sources"
+      ],
+      "examples_pos": [
+        "13463-40-6",
+        "15321-51-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "fe_halides",
+      "definition": "Iron Halides (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "halides",
+        "iron"
+      ],
+      "examples_pos": [
+        "7705-08-0",
+        "7758-94-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "metal_precursor",
+      "family": "fe_acac",
+      "definition": "Iron Acetylacetonates (assigned as metal_precursor)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "acetylacetonates",
+        "iron"
+      ],
+      "examples_pos": [
+        "14024-18-1",
+        "14024-17-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "rh_hydroformylation_toolkit",
+      "definition": "Rh Hydroformylation Toolkits (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "hydroformylation",
+        "rh",
+        "toolkits"
+      ],
+      "examples_pos": [
+        "17185-29-4",
+        "14874-82-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "ru_hydrosilylation_pincers",
+      "definition": "Ru Pincer Hydrosilylation Precatalysts (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "hydrosilylation",
+        "pincer",
+        "precatalysts",
+        "ru"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "ru_polypyridyl_photoredox",
+      "definition": "Ruthenium Polypyridyl Photocatalysts (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "photocatalysts",
+        "polypyridyl",
+        "ruthenium"
+      ],
+      "examples_pos": [
+        "60804-74-2",
+        "50525-27-4"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "ir_ch_borylation_toolkit",
+      "definition": "Ir C–H Borylation Toolkits (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "borylation",
+        "c",
+        "h",
+        "ir",
+        "toolkits"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "preformed_metal_catalyst",
+      "family": "rh_hydrosilylation_toolkit",
+      "definition": "Rh Hydrosilylation Toolkits (assigned as preformed_metal_catalyst)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "hydrosilylation",
+        "rh",
+        "toolkits"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "mineral_acids",
+      "definition": "Mineral acids (H2SO4/HCl/H3PO4)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 85,
+      "keywords": [
+        "acids",
+        "h",
+        "hcl",
+        "mineral",
+        "po",
+        "so"
+      ],
+      "examples_pos": [
+        "7647-01-0",
+        "7664-38-2",
+        "590-29-4",
+        "7664-93-9"
+      ],
+      "examples_neg": [],
+      "notes": "HX, H2SO4, H3PO4; rely on name and formula."
+    },
+    {
+      "role": "acid",
+      "family": "sulfonic_acids",
+      "definition": "Aryl/alkyl sulfonic acids (p‑TsOH/MsOH)",
+      "include_smarts": [
+        "S(=O)(=O)O"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 80,
+      "keywords": [
+        "acids",
+        "alkyl",
+        "aryl",
+        "msoh",
+        "p",
+        "sulfonic",
+        "tsoh"
+      ],
+      "examples_pos": [
+        "75-75-2",
+        "104-15-4",
+        "6192-52-5"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "superacids",
+      "definition": "Superacids (non‑nucleophilic acids)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acids",
+        "non",
+        "nucleophilic",
+        "superacids"
+      ],
+      "examples_pos": [
+        "1493-13-6",
+        "7789-21-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "halogenated_carboxylic_acids",
+      "definition": "Halogenated carboxylic acids (TFA/TCA)",
+      "include_smarts": [
+        "C(=O)O"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 70,
+      "keywords": [
+        "acids",
+        "carboxylic",
+        "halogenated",
+        "tca",
+        "tfa"
+      ],
+      "examples_pos": [
+        "76-05-1",
+        "76-03-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "simple_carboxylic_acids",
+      "definition": "Simple carboxylic acids (AcOH/PivOH/Benzoic acid)",
+      "include_smarts": [
+        "C(=O)O"
+      ],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 70,
+      "keywords": [
+        "acid",
+        "acids",
+        "acoh",
+        "benzoic",
+        "carboxylic",
+        "pivoh",
+        "simple"
+      ],
+      "examples_pos": [
+        "64-19-7",
+        "75-98-9"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "solid_acid_resins",
+      "definition": "Solid acid resins and perfluorinated polymers",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acid",
+        "and",
+        "perfluorinated",
+        "polymers",
+        "resins",
+        "solid"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "pyridinium_acids",
+      "definition": "Pyridinium salts (e.g., PPTS)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "e",
+        "g",
+        "ppts",
+        "pyridinium",
+        "salts"
+      ],
+      "examples_pos": [
+        "24057-28-1"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "boron_lewis_acids",
+      "definition": "Boron Lewis acids",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 75,
+      "keywords": [
+        "acids",
+        "boron",
+        "lewis"
+      ],
+      "examples_pos": [
+        "109-63-7",
+        "1109-15-5"
+      ],
+      "examples_neg": [],
+      "notes": "Lewis acids often metal halides; handled by name + metal."
+    },
+    {
+      "role": "acid",
+      "family": "aluminum_halides",
+      "definition": "Aluminum halides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "aluminum",
+        "halides"
+      ],
+      "examples_pos": [
+        "12138-52-0",
+        "7727-15-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "titanium_halides",
+      "definition": "Titanium halides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "halides",
+        "titanium"
+      ],
+      "examples_pos": [
+        "7550-45-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "tin_halides",
+      "definition": "Tin halides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "halides",
+        "tin"
+      ],
+      "examples_pos": [
+        "7646-78-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "zinc_iron_halides",
+      "definition": "Zinc/iron halides",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "halides",
+        "iron",
+        "zinc"
+      ],
+      "examples_pos": [
+        "7646-85-7",
+        "7705-08-0"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "rare_earth_triflates",
+      "definition": "Rare‑earth/metal triflates (Sc(OTf)3, Yb(OTf)3, Zn(OTf)2, Cu(OTf)2)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "cu",
+        "earth",
+        "metal",
+        "otf",
+        "rare",
+        "sc",
+        "triflates",
+        "yb",
+        "zn"
+      ],
+      "examples_pos": [
+        "42164-05-2",
+        "52093-26-6",
+        "54010-75-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "silyl_triflates",
+      "definition": "Silyl triflates (TMSOTf/TBSOTf/TIPSOTf)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "silyl",
+        "tbsotf",
+        "tipsotf",
+        "tmsotf",
+        "triflates"
+      ],
+      "examples_pos": [
+        "27607-77-8",
+        "25561-30-2"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "perfluorosulfonimide_acids",
+      "definition": "Perfluorosulfonimide acids (e.g., HNTf2)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acids",
+        "e",
+        "g",
+        "hntf",
+        "perfluorosulfonimide"
+      ],
+      "examples_pos": [
+        "82113-65-3"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "magic_acid_systems",
+      "definition": "Magic-acid systems (HSO3F/SbF5 mixtures)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acid",
+        "f",
+        "hso",
+        "magic",
+        "mixtures",
+        "sbf",
+        "systems"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "hydrogen_halide_donors",
+      "definition": "Hydrogen halide donors (HCl/dioxane, HBr/AcOH)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acoh",
+        "dioxane",
+        "donors",
+        "halide",
+        "hbr",
+        "hcl",
+        "hydrogen"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "polyphosphoric_acids",
+      "definition": "Polyphosphoric/Eaton’s reagents",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "eaton",
+        "polyphosphoric",
+        "reagents",
+        "s"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "fluorinated_alcohol_media",
+      "definition": "Fluorinated alcohol media (HFIP/TFE)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "alcohol",
+        "fluorinated",
+        "hfip",
+        "media",
+        "tfe"
+      ],
+      "examples_pos": [
+        "920-66-1",
+        "75-89-8"
+      ],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "acid",
+      "family": "acidic_clays_zeolites",
+      "definition": "Acidic clays and zeolites (K‑10, H‑Beta, H‑ZSM‑5)",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 50,
+      "keywords": [
+        "acidic",
+        "and",
+        "beta",
+        "clays",
+        "h",
+        "k",
+        "zeolites",
+        "zsm"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": ""
+    },
+    {
+      "role": "other_reagent",
+      "family": "misc_general",
+      "definition": "Generic or uncategorized reagents that do not warrant a dedicated role",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 10,
+      "keywords": [
+        "misc",
+        "other",
+        "general",
+        "uncategorized"
+      ],
+      "examples_pos": [],
+      "examples_neg": [],
+      "notes": "Use sparingly when a reagent cannot be mapped to a more specific role."
+    },
+    {
+      "role": "organo_catalyst",
+      "family": "cinchona_alkaloids",
+      "definition": "Cinchona-derived bifunctional organocatalysts (e.g., quinine, cupreine).",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 70,
+      "keywords": [
+        "cinchona",
+        "quinine",
+        "organocatalyst",
+        "bifunctional"
+      ],
+      "examples_pos": [
+        "90-63-1",
+        "130-95-0"
+      ],
+      "examples_neg": [],
+      "notes": "Typically provide enantioselective enamine/ion-pair activation."
+    },
+    {
+      "role": "organo_catalyst",
+      "family": "phosphoric_acid_brønsted",
+      "definition": "Chiral phosphoric acid Brønsted organocatalysts (BINOL-derived).",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 60,
+      "keywords": [
+        "phosphoric",
+        "binol",
+        "organocatalyst",
+        "brønsted"
+      ],
+      "examples_pos": [
+        "67800-95-5"
+      ],
+      "examples_neg": [],
+      "notes": "Commonly used for hydrogen-bonding and ion-pair activation."
+    },
+    {
+      "role": "enzyme",
+      "family": "oxidoreductase_general",
+      "definition": "Oxidoreductase enzymes supplied as isolated proteins or whole-cell preparations.",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 40,
+      "keywords": [
+        "enzyme",
+        "oxidoreductase",
+        "biocatalyst"
+      ],
+      "examples_pos": [
+        "9001-22-3"
+      ],
+      "examples_neg": [],
+      "notes": "Representative class for alcohol dehydrogenases and related systems."
+    },
+    {
+      "role": "organo_catalyst",
+      "family": "photocatalysts_organic",
+      "definition": "Organic photoredox organocatalysts (e.g., carbazole/phenylacridinium scaffolds such as 4CzIPN).",
+      "include_smarts": [],
+      "exclude_smarts": [],
+      "required_props": {},
+      "precedence": 55,
+      "keywords": [
+        "photocatalyst",
+        "photoredox",
+        "4CzIPN",
+        "carbazole",
+        "acridinium"
+      ],
+      "examples_pos": [
+        "1443432-52-5"
+      ],
+      "examples_neg": [],
+      "notes": "Captures strongly oxidizing organic photoredox catalysts."
+    }
+  ]
+}

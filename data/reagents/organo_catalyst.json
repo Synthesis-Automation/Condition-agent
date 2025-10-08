@@ -1,0 +1,57 @@
+[
+  {
+    "id": "cas-1416881-52-1",
+    "name": "4CzIPN",
+    "abbreviation": [
+      "4CzIPN"
+    ],
+    "aliases": [
+      "2,4,5,6-Tetra(9H-carbazol-9-yl)isophthalonitrile",
+      "1,3-Benzenedicarbonitrile, 2,4,5,6-tetra-9H-carbazol-9-yl-",
+      "1,2,3,5-Tetrakis(carbazol-9-yl)-4,6-dicyanobenzene",
+      "2,4,5,6-Tetra(9H-carbazol-9-yl)-1,3-Dicyanobenzene",
+      "2,4,5,6-tetra(carbazol-9-yl)benzene-1,3-dicarbonitrile",
+      "2,4,5,6-tetrakis(carbazol-9-yl)-1,3-dicyanobenzene",
+      "tetrakis(9H-carbazol-9-yl)benzene-1,3-dicarbonitrile",
+      "tetrakis(carbazol-9-yl)benzene-1,3-dicarbonitrile",
+      "2,4,5,6-Tetra(9-carbazolyl)isophthalonitrile",
+      "2,4,5,6-Tetra-9H-carbazol-9-yl-1,3-benzenedicarbonitrile; 1,2,3,5-Tetrakis(carbazol-9-yl)-4,6-dicyanobenzene; 2,4,5,6-Tetra(9H-carbazol-9-yl)isophthalonitrile"
+    ],
+    "cas": "1416881-52-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "organo_catalyst": {
+        "families": [
+          "photocatalysts_organic"
+        ],
+        "activation_mode": null,
+        "chirality": null
+      }
+    },
+    "embedding_text": "type: ORGANO_CATALYST | family: Organic photoredox organocatalysts (e.g., carbazole/phenylacridinium scaffolds such as 4CzIPN). (photocatalysts_organic) | name: 4CzIPN | abbr: C56H32N6; 4CzIPN | CAS: 1416881-52-1 | synonyms: 4CzIPN; 1416881-52-1; RefChem:527125; 863-265-9; 2,4,5,6-Tetra(9H-carbazol-9-yl)isophthalonitrile; 1,3-Benzenedicarbonitrile, 2,4,5,6-tetra-9H-carbazol-9-yl-; MFCD27939633; 1,2,3,5-Tetrakis(carbazol-9-yl)-4,6-dicyanobenzene; 2,4,5,6-Tetra(9H-carbazol-9-yl)-1,3-Dicyanobenzene; 2,4,5,6-tetra(carbazol-9-yl)benzene-1,3-dicarbonitrile; C56H32N6; 2,4,5,6-tetrakis(carbazol-9-yl)-1,3-dicyanobenzene; tetrakis(9H-carbazol-9-yl)benzene-1,3-dicarbonitrile; tetrakis(carbazol-9-yl)benzene-1,3-dicarbonitrile; 2,4,5,6-Tetra(9-carbazolyl)isophthalonitrile; 2,4,5,6-Tetra-9H-carbazol-9-yl-1,3-benzenedicarbonitrile; 1,2,3,5-Tetrakis(carbazol-9-yl)-4,6-dicyanobenzene; 2,4,5,6-Tetra(9H-carbazol-9-yl)isophthalonitrile | family_notes: Captures strongly oxidizing organic photoredox catalysts."
+  },
+  {
+    "id": "cas-90-63-1",
+    "name": "Cinchonidine",
+    "abbreviation": [
+      "Cinchonidine"
+    ],
+    "aliases": [
+      "Cinchonidine"
+    ],
+    "cas": "90-63-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "enamine",
+        "chirality": "single_enantiomer"
+      }
+    },
+    "embedding_text": "type=organo_catalyst | name=Cinchonidine | family=cinchona_alkaloids | activation=enamine | chirality=single_enantiomer"
+  }
+]

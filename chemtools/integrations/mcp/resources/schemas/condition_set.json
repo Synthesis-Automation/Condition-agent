@@ -1,0 +1,293 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://synthesis-automation.github.io/condition-mcp/schema/condition_set.json",
+  "title": "ConditionSet",
+  "description": "Structured representation of a recommended reaction condition set.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "core",
+    "components"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Semantic version of the payload schema (e.g. 0.1.0)."
+    },
+    "core": {
+      "type": "object",
+      "description": "Descriptor for the catalytic core (metal/ligand pair).",
+      "required": [
+        "identifier"
+      ],
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Token describing the core (e.g. Pd/XPhos)."
+        },
+        "metal": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Metal symbol when known."
+        },
+        "ligand": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical ligand label when known."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional core-level properties (ratios, precatalyst flags, etc.).",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "components": {
+      "type": "array",
+      "description": "List of individual reagents that make up the condition set.",
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "identifier"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "Functional role (e.g. base, solvent, ligand, additive)."
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Primary identifier (CAS, UID, or internal token)."
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Preferred human-readable name."
+          },
+          "cas": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "CAS number when available."
+          },
+          "loading": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Loading or equivalents for this component."
+          },
+          "loading_unit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Unit for the loading/equivalents entry."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional component metadata (e.g. supplier, purity).",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "conditions": {
+      "type": "object",
+      "description": "Operational conditions associated with the recommendation.",
+      "properties": {
+        "temperature_c": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Nominal reaction temperature in °C."
+        },
+        "time_h": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Nominal reaction time in hours."
+        },
+        "pressure_atm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Nominal pressure in atmospheres."
+        },
+        "atmosphere": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reaction atmosphere (e.g. N2, Ar)."
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Free-form text with additional context."
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Quantitative scores describing the recommendation quality.",
+      "properties": {
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Model confidence value in the range [0, 1]."
+        },
+        "support": {
+          "type": "object",
+          "description": "Counts summarising precedent support.",
+          "properties": {
+            "count": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "fraction_core": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "reference_population": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Constraint handling metadata for the recommendation.",
+      "properties": {
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "rule_id",
+              "message"
+            ],
+            "properties": {
+              "rule_id": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "severity": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "rationale": {
+      "type": "object",
+      "description": "Narrative explanation of the recommendation.",
+      "properties": {
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uri"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Echo of the structured inputs used to produce the recommendation.",
+      "properties": {
+        "reaction_smiles": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reactants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "family": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "descriptors_hash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Stable hash of the descriptor payload." 
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,895 @@
+[
+  {
+    "id": "cas-1092775-62-6",
+    "name": "(2,2-Bipyridine)bis[3,5-difluoro-2-[5-trifluoromethyl-2-pyridinyl-kN)phenyl-kC]iridium(III) hexafluorophosphate",
+    "abbreviation": [
+      "[Ir{dFCF3ppy}2(bpy)]PF6"
+    ],
+    "aliases": [
+      "[IR{DFCF3PPY2(BPY)]PF6",
+      "2-(2,4-difluorobenzene-6-id-1-yl)-5-(trifluoromethyl)pyridine;iridium(3+);2-pyridin-2-ylpyridine;hexafluorophosphate",
+      "(2,2'-Bipyridine)bis[3,5-difluoro-2-[5-(trifluoromethyl)-2-pyridinyl-fEN][phenyl-fEC]iridium(III) Hexafluorophosphate",
+      "2,2'-bipyridine; bis({3,5-difluoro-2-[5-(trifluoromethyl)pyridin-2-yl]phenyl})iridiumylium; hexafluoro-lambda5-phosphanuide"
+    ],
+    "cas": "1092775-62-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ir_photoredox"
+        ],
+        "metal": null,
+        "oxidation_states": null,
+        "ligand_type": null
+      }
+    },
+    "embedding_text": "type: PREFORMED_METAL_CATALYST | family: Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (assigned as preformed_metal_catalyst) (ir_photoredox) | name: (2,2-Bipyridine)bis[3,5-difluoro-2-[5-trifluoromethyl-2-pyridinyl-kN)phenyl-kC]iridium(III) hexafluorophosphate | abbr: (2,2-Bipyridine)bis[3,5-difluoro-2-[5-trifluoromethyl-2-pyridinyl-kN)phenyl-kC]iridium(III) hexafluorophosphate | CAS: 1092775-62-6 | synonyms: (2,2-Bipyridine)bis[3,5-difluoro-2-[5-trifluoromethyl-2-pyridinyl-kN)phenyl-kC]iridium(III) hexafluorophosphate; [IR{DFCF3PPY2(BPY)]PF6; 1092775-61-5; 2-(2,4-difluorobenzene-6-id-1-yl)-5-(trifluoromethyl)pyridine;iridium(3+);2-pyridin-2-ylpyridine;hexafluorophosphate; SCHEMBL25432718; B6161; D80357; EN300-6745579; (2,2'-Bipyridine)bis[3,5-difluoro-2-[5-(trifluoromethyl)-2-pyridinyl-fEN][phenyl-fEC]iridium(III) Hexafluorophosphate; 2,2'-bipyridine; bis({3,5-difluoro-2-[5-(trifluoromethyl)pyridin-2-yl]phenyl})iridiumylium; hexafluoro-lambda5-phosphanuide"
+  },
+  {
+    "id": "cas-1470372-59-8",
+    "name": "(BrettPhos)Pd(allyl)Cl – G3",
+    "abbreviation": [
+      "BrettPhos-Pd-G3"
+    ],
+    "aliases": [],
+    "cas": "1470372-59-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_biaryl_phosphine_precatalyst"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(BrettPhos)Pd(allyl)Cl – G3 | abbr=BrettPhos-Pd-G3 | family=Buchwald G3 Precatalysts (BiarylP–Pd) (pd_g3_precatalysts → pd_biaryl_phosphine_precatalyst) | metal=Pd | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=1470372-59-8"
+  },
+  {
+    "id": "cas-1158652-41-5",
+    "name": "(IPent)Pd(allyl)Cl·pyridine (PEPPSI-IPent)",
+    "abbreviation": [
+      "Pd-PEPPSI-IPent"
+    ],
+    "aliases": [
+      "PEPPSI-IPent",
+      "Pd-PEPPSI™-IPent"
+    ],
+    "cas": "1158652-41-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_nhc"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "NHC"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(IPent)Pd(allyl)Cl·pyridine (PEPPSI-IPent) | abbr=Pd-PEPPSI-IPent | family=PEPPSI™ Pd–NHC Precatalysts (pd_peppsi_nhc → pd_nhc) | metal=Pd | ox=2 | ligand_type=NHC | additional_ligand=not_needed | cas=1158652-41-5"
+  },
+  {
+    "id": "cas-905459-27-0",
+    "name": "(IPr)Pd(allyl)Cl·pyridine (PEPPSI-IPr)",
+    "abbreviation": [
+      "Pd-PEPPSI-IPr"
+    ],
+    "aliases": [
+      "PEPPSI-IPr",
+      "Pd-PEPPSI™-IPr"
+    ],
+    "cas": "905459-27-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_nhc"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "NHC"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(IPr)Pd(allyl)Cl·pyridine (PEPPSI-IPr) | abbr=Pd-PEPPSI-IPr | family=PEPPSI™ Pd–NHC Precatalysts (pd_peppsi_nhc → pd_nhc) | metal=Pd | ox=2 | ligand_type=NHC | additional_ligand=not_needed | cas=905459-27-0"
+  },
+  {
+    "id": "jackiephos-pd-allyl-cl-g3",
+    "name": "(JackiePhos)Pd(allyl)Cl – G3",
+    "abbreviation": [
+      "JackiePhos-Pd-G3"
+    ],
+    "aliases": [],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_biaryl_phosphine_precatalyst"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(JackiePhos)Pd(allyl)Cl – G3 | abbr=JackiePhos-Pd-G3 | family=Buchwald G3 Precatalysts (BiarylP–Pd) (pd_g3_precatalysts → pd_biaryl_phosphine_precatalyst) | metal=Pd | ox=2 | ligand_type=other | additional_ligand=not_needed | cas="
+  },
+  {
+    "id": "cas-1445085-77-7",
+    "name": "(RuPhos)Pd(allyl)Cl – G3",
+    "abbreviation": [
+      "RuPhos-Pd-G3"
+    ],
+    "aliases": [],
+    "cas": "1445085-77-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_biaryl_phosphine_precatalyst"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(RuPhos)Pd(allyl)Cl – G3 | abbr=RuPhos-Pd-G3 | family=Buchwald G3 Precatalysts (BiarylP–Pd) (pd_g3_precatalysts → pd_biaryl_phosphine_precatalyst) | metal=Pd | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=1445085-77-7"
+  },
+  {
+    "id": "cas-927706-57-8",
+    "name": "(SIPr)Pd(allyl)Cl·pyridine (PEPPSI-SIPr)",
+    "abbreviation": [
+      "Pd-PEPPSI-SIPr"
+    ],
+    "aliases": [
+      "PEPPSI-SIPr",
+      "Pd-PEPPSI™-SIPr"
+    ],
+    "cas": "927706-57-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_nhc"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "NHC"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(SIPr)Pd(allyl)Cl·pyridine (PEPPSI-SIPr) | abbr=Pd-PEPPSI-SIPr | family=PEPPSI™ Pd–NHC Precatalysts (pd_peppsi_nhc → pd_nhc) | metal=Pd | ox=2 | ligand_type=NHC | additional_ligand=not_needed | cas=927706-57-8"
+  },
+  {
+    "id": "cas-1447963-75-8",
+    "name": "(tBuXPhos)Pd(allyl)Cl – G3",
+    "abbreviation": [
+      "tBuXPhos-Pd-G3"
+    ],
+    "aliases": [],
+    "cas": "1447963-75-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_biaryl_phosphine_precatalyst"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(tBuXPhos)Pd(allyl)Cl – G3 | abbr=tBuXPhos-Pd-G3 | family=Buchwald G3 Precatalysts (BiarylP–Pd) (pd_g3_precatalysts → pd_biaryl_phosphine_precatalyst) | metal=Pd | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=1447963-75-8"
+  },
+  {
+    "id": "cas-1445085-55-1",
+    "name": "(XPhos)Pd(allyl)Cl – G3",
+    "abbreviation": [
+      "XPhos-Pd-G3"
+    ],
+    "aliases": [],
+    "cas": "1445085-55-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_biaryl_phosphine_precatalyst"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=(XPhos)Pd(allyl)Cl – G3 | abbr=XPhos-Pd-G3 | family=Buchwald G3 Precatalysts (BiarylP–Pd) (pd_g3_precatalysts → pd_biaryl_phosphine_precatalyst) | metal=Pd | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=1445085-55-1"
+  },
+  {
+    "id": "ir-cod-cl-2-dtbbpy-hbpin-b2pin2",
+    "name": "[Ir(cod)Cl]2 + dtbbpy + HBpin/B2pin2",
+    "abbreviation": [
+      "Ir‑borylation (chloride)"
+    ],
+    "aliases": [
+      "[Ir(cod)Cl]2/dtbbpy/HBpin"
+    ],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ir-ch-borylation-toolkit"
+        ],
+        "metal": "Ir",
+        "oxidation_states": [
+          1
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=[Ir(cod)Cl]2 + dtbbpy + HBpin/B2pin2 | abbr=Ir‑borylation (chloride) | family=Ir C–H Borylation Toolkits (ir_ch_borylation_toolkit → ir-ch-borylation-toolkit) | metal=Ir | ox=1 | ligand_type=bipyridine | additional_ligand=not_needed | cas="
+  },
+  {
+    "id": "ir-ome-cod-2-dtbbpy-b2pin2-standard",
+    "name": "[Ir(OMe)(cod)]2 + dtbbpy + B2pin2 (standard)",
+    "abbreviation": [
+      "Ir‑borylation (std)"
+    ],
+    "aliases": [
+      "[Ir(OMe)(cod)]2/dtbbpy/B2pin2"
+    ],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ir-ch-borylation-toolkit"
+        ],
+        "metal": "Ir",
+        "oxidation_states": [
+          1
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=[Ir(OMe)(cod)]2 + dtbbpy + B2pin2 (standard) | abbr=Ir‑borylation (std) | family=Ir C–H Borylation Toolkits (ir_ch_borylation_toolkit → ir-ch-borylation-toolkit) | metal=Ir | ox=1 | ligand_type=bipyridine | additional_ligand=not_needed | cas="
+  },
+  {
+    "id": "rhcl-cod-2-pligand-e-g-binap-josiphos-hydrosilane",
+    "name": "[RhCl(cod)]2 + P‑ligand (e.g., BINAP/Josiphos) + hydrosilane",
+    "abbreviation": [
+      "Rh‑hydrosilylation (cod)"
+    ],
+    "aliases": [
+      "[RhCl(cod)]2 + ligand + silane"
+    ],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "rh-hydrosilylation-toolkit"
+        ],
+        "metal": "Rh",
+        "oxidation_states": [
+          1
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=[RhCl(cod)]2 + P‑ligand (e.g., BINAP/Josiphos) + hydrosilane | abbr=Rh‑hydrosilylation (cod) | family=Rh Hydrosilylation Toolkits (rh_hydrosilylation_toolkit → rh-hydrosilylation-toolkit) | metal=Rh | ox=1 | ligand_type=other | additional_ligand=not_needed | cas="
+  },
+  {
+    "id": "cas-95408-45-0",
+    "name": "Bis(di-tert-butylphosphino)ferrocene palladium(II) dichloride",
+    "abbreviation": [
+      "Pd(dtbpf)Cl2"
+    ],
+    "aliases": [],
+    "cas": "95408-45-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Bis(di-tert-butylphosphino)ferrocene palladium(II) dichloride | abbr=Pd(dtbpf)Cl2 | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=95408-45-0"
+  },
+  {
+    "id": "cas-72287-26-4",
+    "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+    "abbreviation": [
+      "Pd(dppf)Cl2"
+    ],
+    "aliases": [
+      "palladium(II) dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II)"
+    ],
+    "cas": "72287-26-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Bis(diphenylphosphino)ferrocene palladium(II) dichloride | abbr=Pd(dppf)Cl2 | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=72287-26-4"
+  },
+  {
+    "id": "cas-29934-17-6",
+    "name": "Bis(tricyclohexylphosphine)palladium(II) dichloride",
+    "abbreviation": [
+      "Pd(PCy3)2Cl2"
+    ],
+    "aliases": [],
+    "cas": "29934-17-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Bis(tricyclohexylphosphine)palladium(II) dichloride | abbr=Pd(PCy3)2Cl2 | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=29934-17-6"
+  },
+  {
+    "id": "cas-13965-03-2",
+    "name": "Bis(triphenylphosphine)palladium(II) dichloride",
+    "abbreviation": [
+      "Pd(PPh3)2Cl2"
+    ],
+    "aliases": [
+      "bis(triphenylphosphine)palladium(II) dichloride"
+    ],
+    "cas": "13965-03-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Bis(triphenylphosphine)palladium(II) dichloride | abbr=Pd(PPh3)2Cl2 | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=13965-03-2"
+  },
+  {
+    "id": "cas-870987-63-6",
+    "name": "Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate",
+    "abbreviation": [
+      "Ir[dF(CF3)ppy]2(dtbbpy)PF6"
+    ],
+    "aliases": [
+      "Ir(dF(CF3)ppy)2(dtbbpy)PF6"
+    ],
+    "cas": "870987-63-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ir_photoredox_ppy3"
+        ],
+        "metal": "Ir",
+        "oxidation_states": [
+          3
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Bis[2‑(2,4‑difluorophenyl)-5‑trifluoromethylpyridinato‑C2,N] (4,4′‑di‑tert‑butyl‑2,2′‑bipyridine)iridium(III) hexafluorophosphate | abbr=Ir[dF(CF3)ppy]2(dtbbpy)PF6 | family=Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (ir_photoredox → ir_photoredox_ppy3) | metal=Ir | ox=3 | ligand_type=bipyridine | additional_ligand=not_needed | cas=870987-63-6"
+  },
+  {
+    "id": "cas-40691-33-6",
+    "name": "Bis[tri(o-tolyl)phosphine]palladium(II) dichloride",
+    "abbreviation": [
+      "Pd[P(o-tol)3]2Cl2"
+    ],
+    "aliases": [
+      "bis[tri(o-tolyl)phosphine]palladium(II) dichloride"
+    ],
+    "cas": "40691-33-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Bis[tri(o-tolyl)phosphine]palladium(II) dichloride | abbr=Pd[P(o-tol)3]2Cl2 | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=40691-33-6"
+  },
+  {
+    "id": "cas-14694-95-2",
+    "name": "Chlorotris(triphenylphosphine)rhodium(I)",
+    "abbreviation": [
+      "Wilkinson’s catalyst"
+    ],
+    "aliases": [
+      "RhCl(PPh3)3"
+    ],
+    "cas": "14694-95-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "rh_hydrogenation"
+        ],
+        "metal": "Rh",
+        "oxidation_states": [
+          1
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Chlorotris(triphenylphosphine)rhodium(I) | abbr=Wilkinson’s catalyst | family=Rhodium(I) Precursors for Hydrogenation (rh_hydrogenation_precursors → rh_hydrogenation) | metal=Rh | ox=1 | ligand_type=phosphine | additional_ligand=not_needed | cas=14694-95-2"
+  },
+  {
+    "id": "cas-14874-82-9",
+    "name": "Dicarbonyl(acetylacetonato)rhodium(I)",
+    "abbreviation": [
+      "Rh(acac)(CO)2"
+    ],
+    "aliases": [
+      "Rh(O2C5H7)(CO)2"
+    ],
+    "cas": "14874-82-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "rh-hydroformylation-toolkit"
+        ],
+        "metal": "Rh",
+        "oxidation_states": [
+          1
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Dicarbonyl(acetylacetonato)rhodium(I) | abbr=Rh(acac)(CO)2 | family=Rh Hydroformylation Toolkits (rh_hydroformylation_toolkit → rh-hydroformylation-toolkit) | metal=Rh | ox=1 | ligand_type=other | additional_ligand=not_needed | cas=14874-82-9"
+  },
+  {
+    "id": "cas-15629-92-2",
+    "name": "Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel",
+    "abbreviation": [
+      "Ni(dppp)Cl2"
+    ],
+    "aliases": [
+      "[1,3-Bis(diphenylphosphino)propane]nickel(II) chloride",
+      "1,3-Bis(diphenylphosphino)propane nickel(II) chloride",
+      "Ni(dppp)Cl2",
+      "[1,3-Bis(diphenylphosphino)propane]dichloronickel(II)",
+      "1,3-Bis(diphenylphosphino)propane nickel (II) chloride",
+      "(1,3-dppp)NiCl2",
+      "1,3-Bis(diphenylphosphino)propane nickel(II)chloride",
+      "dichloronickel;3-diphenylphosphanylpropyl(diphenyl)phosphane",
+      "C27H26Cl2NiP2",
+      "[3-(DIPHENYLPHOSPHANYL)PROPYL]DIPHENYLPHOSPHANE; NICKEL CHLORIDE",
+      "(1,3-Bis(diphenylphosphino)propane)dichloronickel; 1,3-Bis(diphenylphosphino)nickel Dichloride; Dichloro[1,3-bis(diphenylphosphino)propane]nickel; Nickel 1,3-Bis(diphenylphosphino)propane Dichloride; (1,3-dppp)NiCl2;"
+    ],
+    "cas": "15629-92-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "Ni-phosphine"
+        ],
+        "metal": "Ni",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel | abbr=Dichloro(1,1'-(1,3-propanediyl)bis(1,1-diphenylphosphine-kappaP))nickel | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=15629-92-2"
+  },
+  {
+    "id": "cas-95464-05-4",
+    "name": "Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct",
+    "abbreviation": [],
+    "aliases": [
+      "RefChem:586665",
+      "95464-05-4",
+      "SCHEMBL15414563",
+      "STR09178",
+      "[1,1'-Bis(diphenylphosphino)ferrocene]palladium(II) chloride dichloromethane complex",
+      "palladium(2+) ion bis[3-(diphenylphosphanyl)cyclopenta-2,4-dien-1-yl]iron dichloromethane dichloride"
+    ],
+    "cas": "95464-05-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct | abbr=Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=95464-05-4"
+  },
+  {
+    "id": "cas-94928-86-6",
+    "name": "fac‑Tris(2‑phenylpyridinato)iridium(III)",
+    "abbreviation": [
+      "Ir(ppy)3"
+    ],
+    "aliases": [
+      "Tris(2‑phenylpyridine)iridium(III)"
+    ],
+    "cas": "94928-86-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ir_photoredox_ppy3"
+        ],
+        "metal": "Ir",
+        "oxidation_states": [
+          3
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=fac‑Tris(2‑phenylpyridinato)iridium(III) | abbr=Ir(ppy)3 | family=Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (ir_photoredox → ir_photoredox_ppy3) | metal=Ir | ox=3 | ligand_type=bipyridine | additional_ligand=not_needed | cas=94928-86-6"
+  },
+  {
+    "id": "cas-172222-30-9",
+    "name": "Grubbs catalyst, 1st generation",
+    "abbreviation": [
+      "Grubbs-I"
+    ],
+    "aliases": [
+      "(PCy3)2Cl2Ru=CHPh",
+      "M102"
+    ],
+    "cas": "172222-30-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ru_metathesis"
+        ],
+        "metal": "Ru",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Grubbs catalyst, 1st generation | abbr=Grubbs-I | family=Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (ru_metathesis_grubbs → ru_metathesis) | metal=Ru | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=172222-30-9"
+  },
+  {
+    "id": "cas-246047-72-3",
+    "name": "Grubbs catalyst, 2nd generation",
+    "abbreviation": [
+      "Grubbs-II"
+    ],
+    "aliases": [
+      "H2IMes Grubbs II",
+      "M204"
+    ],
+    "cas": "246047-72-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ru_metathesis"
+        ],
+        "metal": "Ru",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Grubbs catalyst, 2nd generation | abbr=Grubbs-II | family=Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (ru_metathesis_grubbs → ru_metathesis) | metal=Ru | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=246047-72-3"
+  },
+  {
+    "id": "cas-172418-32-5",
+    "name": "Herrmann’s palladacycle (cataCXium® C)",
+    "abbreviation": [
+      "Herrmann’s Catalyst"
+    ],
+    "aliases": [
+      "cataCXium C",
+      "Herrmann’s palladacycle"
+    ],
+    "cas": "172418-32-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Herrmann’s palladacycle (cataCXium® C) | abbr=Herrmann’s Catalyst | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=172418-32-5"
+  },
+  {
+    "id": "highvalent-rupcp-pincer-hydrosilylation-catalyst-representative",
+    "name": "High‑valent Ru–PCP pincer hydrosilylation catalyst (representative)",
+    "abbreviation": [
+      "Ru(PCP)‑hydrosilylation"
+    ],
+    "aliases": [
+      "Ru–PCP hydrosilylation precatalyst"
+    ],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ru-hydrosilylation-pincers"
+        ],
+        "metal": "Ru",
+        "oxidation_states": [
+          2,
+          4
+        ],
+        "ligand_type": "pincer"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=High‑valent Ru–PCP pincer hydrosilylation catalyst (representative) | abbr=Ru(PCP)‑hydrosilylation | family=Ru Pincer Hydrosilylation Precatalysts (ru_hydrosilylation_pincers → ru-hydrosilylation-pincers) | metal=Ru | ox=2,4 | ligand_type=pincer | additional_ligand=not_needed | cas="
+  },
+  {
+    "id": "cas-301224-40-8",
+    "name": "Hoveyda–Grubbs catalyst, 2nd generation",
+    "abbreviation": [
+      "HG-II"
+    ],
+    "aliases": [
+      "Hoveyda–Grubbs II",
+      "M72"
+    ],
+    "cas": "301224-40-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ru_metathesis"
+        ],
+        "metal": "Ru",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "other"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Hoveyda–Grubbs catalyst, 2nd generation | abbr=HG-II | family=Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (ru_metathesis_grubbs → ru_metathesis) | metal=Ru | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=301224-40-8"
+  },
+  {
+    "id": "cas-17185-29-4",
+    "name": "Hydridocarbonyltris(triphenylphosphine)rhodium(I)",
+    "abbreviation": [
+      "HRh(CO)(PPh3)3"
+    ],
+    "aliases": [
+      "RhH(CO)(PPh3)3",
+      "Wilkinson-type hydroformylation hydride"
+    ],
+    "cas": "17185-29-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "rh-hydroformylation-toolkit"
+        ],
+        "metal": "Rh",
+        "oxidation_states": [
+          1
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Hydridocarbonyltris(triphenylphosphine)rhodium(I) | abbr=HRh(CO)(PPh3)3 | family=Rh Hydroformylation Toolkits (rh_hydroformylation_toolkit → rh-hydroformylation-toolkit) | metal=Rh | ox=1 | ligand_type=phosphine | additional_ligand=not_needed | cas=17185-29-4"
+  },
+  {
+    "id": "cas-887919-35-9",
+    "name": "Palladium(II) dichloride complex of Amphos",
+    "abbreviation": [
+      "Pd(amphos)Cl2"
+    ],
+    "aliases": [],
+    "cas": "887919-35-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Palladium(II) dichloride complex of Amphos | abbr=Pd(amphos)Cl2 | family=Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes → pd_phosphine) | metal=Pd | ox=2 | ligand_type=phosphine | additional_ligand=not_needed | cas=887919-35-9"
+  },
+  {
+    "id": "rhcl-pph3-3-hydrosilane",
+    "name": "RhCl(PPh3)3 + hydrosilane",
+    "abbreviation": [
+      "Rh‑hydrosilylation (Wilkinson)"
+    ],
+    "aliases": [
+      "Wilkinson’s catalyst hydrosilylation"
+    ],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "rh-hydrosilylation-toolkit"
+        ],
+        "metal": "Rh",
+        "oxidation_states": [
+          1
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=RhCl(PPh3)3 + hydrosilane | abbr=Rh‑hydrosilylation (Wilkinson) | family=Rh Hydrosilylation Toolkits (rh_hydrosilylation_toolkit → rh-hydrosilylation-toolkit) | metal=Rh | ox=1 | ligand_type=phosphine | additional_ligand=not_needed | cas="
+  },
+  {
+    "id": "cas-14221-01-3",
+    "name": "Tetrakis(triphenylphosphine)palladium(0)",
+    "abbreviation": [
+      "Pd(PPh3)4"
+    ],
+    "aliases": [
+      "tetrakis(triphenylphosphine)palladium(0)",
+      "Pd(PPh3)4, tetrakis"
+    ],
+    "cas": "14221-01-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd0_source_phosphine"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          0
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Tetrakis(triphenylphosphine)palladium(0) | abbr=Pd(PPh3)4 | family=Pd(0) Sources (dba complexes, Pd(PPh3)4) (pd_zero_sources → pd0_source_phosphine) | metal=Pd | ox=0 | ligand_type=phosphine | additional_ligand=not_needed | cas=14221-01-3"
+  },
+  {
+    "id": "cas-50525-27-4",
+    "name": "Tris(2,2′‑bipyridine)ruthenium(II) chloride hexahydrate",
+    "abbreviation": [
+      "Ru(bpy)3Cl2·6H2O"
+    ],
+    "aliases": [
+      "[Ru(bpy)3]Cl2·6H2O"
+    ],
+    "cas": "50525-27-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ru-polypyridyl-photoredox"
+        ],
+        "metal": "Ru",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Tris(2,2′‑bipyridine)ruthenium(II) chloride hexahydrate | abbr=Ru(bpy)3Cl2·6H2O | family=Ruthenium Polypyridyl Photocatalysts (ru_polypyridyl_photoredox → ru-polypyridyl-photoredox) | metal=Ru | ox=2 | ligand_type=bipyridine | additional_ligand=not_needed | cas=50525-27-4"
+  },
+  {
+    "id": "cas-60804-74-2",
+    "name": "Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate",
+    "abbreviation": [
+      "Ru(bpy)3(PF6)2"
+    ],
+    "aliases": [
+      "[Ru(bpy)3](PF6)2",
+      "Ru(bpy)3^2+ (PF6 salt)"
+    ],
+    "cas": "60804-74-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ru-polypyridyl-photoredox"
+        ],
+        "metal": "Ru",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type=preformed_metal_catalyst | name=Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate | abbr=Ru(bpy)3(PF6)2 | family=Ruthenium Polypyridyl Photocatalysts (ru_polypyridyl_photoredox → ru-polypyridyl-photoredox) | metal=Ru | ox=2 | ligand_type=bipyridine | additional_ligand=not_needed | cas=60804-74-2"
+  }
+]

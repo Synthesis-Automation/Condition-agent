@@ -1,0 +1,890 @@
+[
+  {
+    "id": "cas-111-78-4",
+    "name": "1,5-Cyclooctadiene",
+    "abbreviation": [],
+    "aliases": [
+      "Cycloocta-1,5-diene",
+      "cis-1,5-cyclooctadiene",
+      "1,5-COD",
+      "1,5-cyclooctadiene, (1Z,5Z)-",
+      "1E1VVD385Z",
+      "(1Z,5Z)-cycloocta-1,5-diene",
+      "cis,cis-1,5-Cyclooctadiene"
+    ],
+    "cas": "111-78-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | functional_roles: phase_transfer | effect_bands: phase_transfer_power: high; water_scavenging_power: low; halide_promotion_power: medium; halide_scavenging_power: very low; lewis_acidity_band: very low; hygroscopicity_band: medium | moisture: low | solvent_classes: hydrocarbons_aromatic; hydrocarbons_aliphatic_linear; ethers_cyclic_glymes | use_cases: Biphasic substitutions; Alkylations under heterogeneous conditions; Anion shuttling in polar/aprotic media | best_for: Poorly soluble inorganic salts; Biphasic systems | avoid_when: Halide-sensitive catalysts (Cl−/Br− binding) | ehs: aquatic_toxicity, hygroscopic | name: 1,5-Cyclooctadiene | abbr: 1,5-Cyclooctadiene | CAS: 111-78-4 | synonyms: 1,5-Cyclooctadiene; Cycloocta-1,5-diene; 111-78-4; cis-1,5-cyclooctadiene; 1,5-COD; 1,5-cyclooctadiene, (1Z,5Z)-; 1E1VVD385Z; NSC-60155; DTXSID0026888; RefChem:417159; DTXCID20809673; 203-907-1; (1Z,5Z)-cycloocta-1,5-diene; 1552-12-1; cis,cis-1,5-Cyclooctadiene; MFCD00001752"
+  },
+  {
+    "id": "cas-3111-27-3",
+    "name": "1-Adamantane carboxylic acid",
+    "abbreviation": [
+      "1-AdCO2H"
+    ],
+    "aliases": [
+      "1AdCO2H",
+      "Adamantanecarboxylicacid"
+    ],
+    "cas": "3111-27-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "carboxylate_promoters_ch_activation"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Carboxylate promoters for C–H activation (carboxylate_promoters_ch_activation) | roles: carboxylate_promoter | name: 1-Adamantane carboxylic acid | abbr: 1-AdCO2H | CAS: 3111-27-3"
+  },
+  {
+    "id": "cas-39968-33-7",
+    "name": "1-Hydroxy-7-azabenzotriazole",
+    "abbreviation": [
+      "HOAt"
+    ],
+    "aliases": [
+      "1H-1,2,3-Triazolo[4,5-b]pyridin-1-ol"
+    ],
+    "cas": "39968-33-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "amide_coupling_additives"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Amide coupling additives (amide_coupling_additives) | roles: coupling_additive | name: 1-Hydroxy-7-azabenzotriazole | abbr: HOAt | CAS: 39968-33-7 | mode: HOAt additive accelerates peptide couplings and lowers racemization | solvents: DMF; NMP | cautions: energetic_benzotriazole | use_cases: Challenging amide couplings"
+  },
+  {
+    "id": "cas-2592-95-2",
+    "name": "1-Hydroxybenzotriazole",
+    "abbreviation": [
+      "HOBt"
+    ],
+    "aliases": [
+      "1H-Benzotriazole, 1-hydroxy-",
+      "1-benzotriazoleol"
+    ],
+    "cas": "2592-95-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "amide_coupling_additives"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Amide coupling additives (amide_coupling_additives) | roles: coupling_additive | name: 1-Hydroxybenzotriazole | abbr: HOBt | CAS: 2592-95-2 | mode: OBt active ester co-additive with carbodiimides; suppresses racemization | solvents: DMF; DCM; NMP | cautions: impact_sensitive (anhydrous) | use_cases: Carbodiimide couplings; Peptide activation"
+  },
+  {
+    "id": "cas-287-15-8",
+    "name": "12-Crown-4",
+    "abbreviation": [
+      "12C4"
+    ],
+    "aliases": [
+      "12Crown4"
+    ],
+    "cas": "287-15-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "crown_ethers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Crown ethers (crown_ethers) | roles: phase_transfer, ion_pair_disruption | name: 12-Crown-4 | abbr: 12C4 | CAS: 287-15-8 | PT power: medium | use_cases: Solubilize Li+ salts"
+  },
+  {
+    "id": "cas-33100-27-5",
+    "name": "15-Crown-5",
+    "abbreviation": [
+      "15C5"
+    ],
+    "aliases": [
+      "15Crown5"
+    ],
+    "cas": "33100-27-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "crown_ethers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Crown ethers (crown_ethers) | roles: phase_transfer, ion_pair_disruption | name: 15-Crown-5 | abbr: 15C5 | CAS: 33100-27-5 | PT power: high | use_cases: Solubilize Na+ salts; Promote substitutions and eliminations"
+  },
+  {
+    "id": "cas-17455-13-9",
+    "name": "18-Crown-6",
+    "abbreviation": [
+      "18C6"
+    ],
+    "aliases": [
+      "18Crown6"
+    ],
+    "cas": "17455-13-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "crown_ethers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Crown ethers (crown_ethers) | roles: phase_transfer, ion_pair_disruption | name: 18-Crown-6 | abbr: 18C6 | CAS: 17455-13-9 | PT power: very high | use_cases: Solubilize K+ salts; Promote SNAr & E2 with K2CO3/KF"
+  },
+  {
+    "id": "cas-576-26-1",
+    "name": "2,4,6-Trimethylbenzoic acid",
+    "abbreviation": [
+      "MesCO2H"
+    ],
+    "aliases": [
+      "Mesitylenecarboxylicacid"
+    ],
+    "cas": "576-26-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "carboxylate_promoters_ch_activation"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Carboxylate promoters for C–H activation (carboxylate_promoters_ch_activation) | roles: carboxylate_promoter | name: 2,4,6-Trimethylbenzoic acid | abbr: MesCO2H | CAS: 576-26-1"
+  },
+  {
+    "id": "3-a-molecular-sieves",
+    "name": "3 Å molecular sieves",
+    "abbreviation": [
+      "MS 3Å"
+    ],
+    "aliases": [
+      "Molecularsieves3A",
+      "MS3A"
+    ],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "molecular_sieves"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Molecular sieves (molecular_sieves) | roles: water_scavenger | name: 3 Å molecular sieves | abbr: MS 3Å | water scavenging: very high | use_cases: Remove water; Drive equilibria (acetalization, coupling)"
+  },
+  {
+    "id": "4-a-molecular-sieves",
+    "name": "4 Å molecular sieves",
+    "abbreviation": [
+      "MS 4Å"
+    ],
+    "aliases": [
+      "Molecularsieves4A",
+      "MS4A"
+    ],
+    "cas": null,
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "molecular_sieves"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Molecular sieves (molecular_sieves) | roles: water_scavenger | name: 4 Å molecular sieves | abbr: MS 4Å | water scavenging: very high"
+  },
+  {
+    "id": "cas-1066-33-7",
+    "name": "Ammonium Bicarbonate",
+    "abbreviation": [
+      "Al(HCO3)3"
+    ],
+    "aliases": [
+      "Ammonium hydrogencarbonate",
+      "Ammonium hydrogen carbonate",
+      "Monoammonium carbonate",
+      "Carbonic acid, monoammonium salt",
+      "Acid ammonium carbonate",
+      "Ammonium acid carbonate",
+      "Ammonium hydrogencarbonat",
+      "Ammonium bicarbonate (1:1)",
+      "Carbonic acid, ammonium salt (1:1)"
+    ],
+    "cas": "1066-33-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "Al salt"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | name: Ammonium Bicarbonate | abbr: Ammonium Bicarbonate | CAS: 1066-33-7 | synonyms: Ammonium Bicarbonate; 1066-33-7; Ammonium hydrogencarbonate; Ammonium hydrogen carbonate; Monoammonium carbonate; Carbonic acid, monoammonium salt; Acid ammonium carbonate; Ammonium acid carbonate; Ammonium hydrogencarbonat; Ammonium bicarbonate (1:1); Carbonic acid, ammonium salt (1:1); 45JP4345C9; DTXSID5035618; RefChem:5547; DTXCID3015618; 213-911-5"
+  },
+  {
+    "id": "cas-12125-02-9",
+    "name": "Ammonium Chloride",
+    "abbreviation": [
+      "NH4Cl"
+    ],
+    "aliases": [
+      "Ammonium muriate",
+      "Darammon",
+      "Ammoniumchlorid",
+      "Amchlor",
+      "Ammoneric",
+      "Chlorammonic",
+      "Salammonite",
+      "Ammonium chloride ((NH4)Cl)",
+      "Sal ammonia",
+      "Ammon Chlor",
+      "Ammonii Chloridum",
+      "Ammonium Chloratum",
+      "Cloruro de Amonio",
+      "Muriate of Ammonia"
+    ],
+    "cas": "12125-02-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | name: Ammonium Chloride | abbr: Ammonium Chloride | CAS: 12125-02-9 | synonyms: Ammonium Chloride; 12125-02-9; Ammonium muriate; Darammon; Ammoniumchlorid; Amchlor; Ammoneric; Chlorammonic; Salammonite; Ammonium chloride ((NH4)Cl); Sal ammonia; Ammon Chlor; Ammonii Chloridum; Ammonium Chloratum; Cloruro de Amonio; Muriate of Ammonia"
+  },
+  {
+    "id": "cas-128-37-0",
+    "name": "Butylated hydroxytoluene",
+    "abbreviation": [
+      "BHT"
+    ],
+    "aliases": [
+      "2,6-di-tert-butyl-4-methylphenol"
+    ],
+    "cas": "128-37-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "radical_suppressors"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Radical suppressors (radical_suppressors) | roles: radical_suppressor | name: Butylated hydroxytoluene | abbr: BHT | CAS: 128-37-0"
+  },
+  {
+    "id": "cas-13400-13-0",
+    "name": "Cesium fluoride",
+    "abbreviation": [
+      "CsF"
+    ],
+    "aliases": [
+      "Cesiumfluoride"
+    ],
+    "cas": "13400-13-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "fluoride_sources_activators"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Fluoride sources / silyl activators (fluoride_sources_activators) | roles: fluoride_source | name: Cesium fluoride | abbr: CsF | CAS: 13400-13-0 | use_cases: Desilylation; Promote Hiyama/allylsilane reactions"
+  },
+  {
+    "id": "cas-7550-35-8",
+    "name": "Lithium bromide",
+    "abbreviation": [
+      "LiBr"
+    ],
+    "aliases": [
+      "Lithiumbromide"
+    ],
+    "cas": "7550-35-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "lithium_halide_accelerants"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Lithium/alkaline halide accelerants (lithium_halide_accelerants) | roles: halide_promoter | name: Lithium bromide | abbr: LiBr | CAS: 7550-35-8"
+  },
+  {
+    "id": "cas-7447-41-8",
+    "name": "Lithium chloride",
+    "abbreviation": [
+      "LiCl"
+    ],
+    "aliases": [
+      "Lithiumchloride"
+    ],
+    "cas": "7447-41-8",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "lithium_halide_accelerants"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Lithium/alkaline halide accelerants (lithium_halide_accelerants) | roles: halide_promoter | name: Lithium chloride | abbr: LiCl | CAS: 7447-41-8 | use_cases: Accelerate transmetalation (Negishi/Kumada); Stabilize organometallics"
+  },
+  {
+    "id": "cas-10377-51-2",
+    "name": "Lithium iodide",
+    "abbreviation": [],
+    "aliases": [
+      "Lithium iodide (LiI)",
+      "Lithium monoiodide",
+      "S6K2XET783",
+      "LITHIUM IODIDE [MI]",
+      "Lithium iodide, anhydrous",
+      "lithiumiodide",
+      "lithium;iodide"
+    ],
+    "cas": "10377-51-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | functional_roles: phase_transfer | effect_bands: phase_transfer_power: high; water_scavenging_power: low; halide_promotion_power: medium; halide_scavenging_power: very low; lewis_acidity_band: very low; hygroscopicity_band: medium | moisture: low | solvent_classes: hydrocarbons_aromatic; hydrocarbons_aliphatic_linear; ethers_cyclic_glymes | use_cases: Biphasic substitutions; Alkylations under heterogeneous conditions; Anion shuttling in polar/aprotic media | best_for: Poorly soluble inorganic salts; Biphasic systems | avoid_when: Halide-sensitive catalysts (Cl−/Br− binding) | ehs: aquatic_toxicity, hygroscopic | name: Lithium iodide | abbr: Lithium iodide | CAS: 10377-51-2 | synonyms: Lithium iodide; Lithium iodide (LiI); Lithium monoiodide; UNII-S6K2XET783; S6K2XET783; EINECS 233-822-5; LITHIUM IODIDE [MI]; DTXSID30908580; RefChem:153730; DTXCID301337657; 233-822-5; 10377-51-2; Lithium iodide, anhydrous; lithiumiodide; lithium;iodide; MFCD00011092"
+  },
+  {
+    "id": "cas-7791-03-9",
+    "name": "Lithium perchlorate",
+    "abbreviation": [
+      "LiClO4"
+    ],
+    "aliases": [
+      "Lithiumperchlorate"
+    ],
+    "cas": "7791-03-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "lewis_acid_promoters"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Mild Lewis-acid promoters (lewis_acid_promoters) | roles: lewis_acid_promoter | name: Lithium perchlorate | abbr: LiClO4 | CAS: 7791-03-9 | use_cases: Accelerate Diels–Alder and SN1/ionization by ion pairing"
+  },
+  {
+    "id": "cas-7786-30-3",
+    "name": "Magnesium chloride",
+    "abbreviation": [
+      "MgCl2"
+    ],
+    "aliases": [
+      "Magnesiumchloride"
+    ],
+    "cas": "7786-30-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "lithium_halide_accelerants"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Lithium/alkaline halide accelerants (lithium_halide_accelerants) | roles: halide_promoter | name: Magnesium chloride | abbr: MgCl2 | CAS: 7786-30-3"
+  },
+  {
+    "id": "cas-3849-21-6",
+    "name": "Oxyma Pure",
+    "abbreviation": [
+      "Oxyma"
+    ],
+    "aliases": [
+      "Ethyl cyano(hydroxyimino)acetate"
+    ],
+    "cas": "3849-21-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "amide_coupling_additives"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Amide coupling additives (amide_coupling_additives) | roles: coupling_additive | name: Oxyma Pure | abbr: Oxyma | CAS: 3849-21-6 | mode: Oxyma additive forms safer active esters versus OBt/HOAt | solvents: DMF; MeCN | cautions: avoid strong base excess | use_cases: Bt-free peptide couplings"
+  },
+  {
+    "id": "cas-75-98-9",
+    "name": "Pivalic acid",
+    "abbreviation": [
+      "PivOH"
+    ],
+    "aliases": [
+      "Pivalicacid",
+      "tBuCO2H"
+    ],
+    "cas": "75-98-9",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "carboxylate_promoters_ch_activation"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Carboxylate promoters for C–H activation (carboxylate_promoters_ch_activation) | roles: carboxylate_promoter | name: Pivalic acid | abbr: PivOH | CAS: 75-98-9 | use_cases: Pd-catalyzed C–H activation; Proton shuttle"
+  },
+  {
+    "id": "cas-7681-11-0",
+    "name": "Potassium iodide",
+    "abbreviation": [
+      "KI"
+    ],
+    "aliases": [
+      "Potassiumiodide"
+    ],
+    "cas": "7681-11-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "iodide_promoters"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Iodide promoters (iodide_promoters) | roles: halide_promoter | name: Potassium iodide | abbr: KI | CAS: 7681-11-0 | halide promotion: very high | use_cases: Halide exchange; Pd/Ni-catalyzed couplings"
+  },
+  {
+    "id": "cas-534-16-7",
+    "name": "Silver carbonate",
+    "abbreviation": [
+      "Ag2CO3"
+    ],
+    "aliases": [
+      "Silvercarbonate"
+    ],
+    "cas": "534-16-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "silver_salts_halide_scavengers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger | name: Silver carbonate | abbr: Ag2CO3 | CAS: 534-16-7 | halide scavenging: very high | use_cases: Halide abstraction; Promote C–H activation"
+  },
+  {
+    "id": "cas-17026-41-2",
+    "name": "Silver hexafluoroantimonate",
+    "abbreviation": [
+      "AgSbF6"
+    ],
+    "aliases": [
+      "Silverhexafluoroantimonate"
+    ],
+    "cas": "17026-41-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "silver_salts_halide_scavengers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger, weakly_coordinating_anion | name: Silver hexafluoroantimonate | abbr: AgSbF6 | CAS: 17026-41-2 | halide scavenging: very high"
+  },
+  {
+    "id": "cas-20667-12-3",
+    "name": "Silver oxide",
+    "abbreviation": [
+      "Ag2O"
+    ],
+    "aliases": [
+      "Silveroxide"
+    ],
+    "cas": "20667-12-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "silver_salts_halide_scavengers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger | name: Silver oxide | abbr: Ag2O | CAS: 20667-12-3 | halide scavenging: very high"
+  },
+  {
+    "id": "cas-10294-26-5",
+    "name": "Silver sulfate",
+    "abbreviation": [
+      "Silver sulfate"
+    ],
+    "aliases": [
+      "Sulphuric acid, silver salt",
+      "Disilver sulfate",
+      "Disilver monosulfate",
+      "Disilver(1+) sulfate",
+      "Silver sulfate (Ag2SO4)",
+      "Silver sulphate",
+      "Sulfuric acid, silver(1+) salt (1:2)",
+      "DISILVER SULPHATE",
+      "Sulfuric acid silver salt (1:2)"
+    ],
+    "cas": "10294-26-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "silver_salts_halide_scavengers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Silver salts (halide scavengers / promoter salts) (silver_salts_halide_scavengers) | name: Silver sulfate | abbr: 8QG6HV4ZPO; Silver sulfate | CAS: 10294-26-5 | synonyms: Silver sulfate; 10294-26-5; Sulphuric acid, silver salt; Disilver sulfate; Disilver monosulfate; Disilver(1+) sulfate; Silver sulfate (Ag2SO4); 19287-89-9; Silver sulphate; UNII-8QG6HV4ZPO; 8QG6HV4ZPO; Sulfuric acid, silver(1+) salt (1:2); DISILVER SULPHATE; Sulfuric acid silver salt (1:2); EINECS 233-653-7; EINECS 242-941-1"
+  },
+  {
+    "id": "cas-7775-27-1",
+    "name": "Silver tetrafluoroborate",
+    "abbreviation": [
+      "AgBF4"
+    ],
+    "aliases": [],
+    "cas": "7775-27-1",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "silver_salts_halide_scavengers"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Silver salts (silver_salts_halide_scavengers) | roles: halide_scavenger, weakly_coordinating_anion | name: Silver tetrafluoroborate | abbr: AgBF4 | CAS: 7775-27-1 | halide scavenging: very high"
+  },
+  {
+    "id": "cas-7647-15-6",
+    "name": "Sodium Bromide",
+    "abbreviation": [],
+    "aliases": [
+      "Sedoneural",
+      "Bromide salt of sodium",
+      "Bromnatrium",
+      "Sodium bromide (NaBr)",
+      "Trisodium tribromide",
+      "NaBr",
+      "Natrum bromatum",
+      "bromosodium"
+    ],
+    "cas": "7647-15-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | functional_roles: phase_transfer | effect_bands: phase_transfer_power: high; water_scavenging_power: low; halide_promotion_power: medium; halide_scavenging_power: very low; lewis_acidity_band: very low; hygroscopicity_band: medium | moisture: low | solvent_classes: hydrocarbons_aromatic; hydrocarbons_aliphatic_linear; ethers_cyclic_glymes | use_cases: Biphasic substitutions; Alkylations under heterogeneous conditions; Anion shuttling in polar/aprotic media | best_for: Poorly soluble inorganic salts; Biphasic systems | avoid_when: Halide-sensitive catalysts (Cl−/Br− binding) | ehs: aquatic_toxicity, hygroscopic | name: Sodium Bromide | abbr: Sodium Bromide | CAS: 7647-15-6 | synonyms: Sodium Bromide; 7647-15-6; Sedoneural; Bromide salt of sodium; Bromnatrium; Sodium bromide (NaBr); Trisodium tribromide; NaBr; Natrum bromatum; Caswell No. 750A; DTXSID3034903; LC1V549NOM; NSC-77384; CHEBI:63004; DTXCID1014903; bromosodium"
+  },
+  {
+    "id": "cas-7647-14-5",
+    "name": "Sodium Chloride",
+    "abbreviation": [],
+    "aliases": [
+      "Table salt",
+      "Common salt",
+      "Dendritis",
+      "Purex",
+      "Sodium chloric",
+      "Iodized salt",
+      "Top flake",
+      "NaCl",
+      "Sodium chloride (NaCl)",
+      "Flexivial",
+      "Gingivyl",
+      "Hyposaline",
+      "Sodium monochloride",
+      "Slow Sodium"
+    ],
+    "cas": "7647-14-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | functional_roles: phase_transfer | effect_bands: phase_transfer_power: high; water_scavenging_power: low; halide_promotion_power: medium; halide_scavenging_power: very low; lewis_acidity_band: very low; hygroscopicity_band: medium | moisture: low | solvent_classes: hydrocarbons_aromatic; hydrocarbons_aliphatic_linear; ethers_cyclic_glymes | use_cases: Biphasic substitutions; Alkylations under heterogeneous conditions; Anion shuttling in polar/aprotic media | best_for: Poorly soluble inorganic salts; Biphasic systems | avoid_when: Halide-sensitive catalysts (Cl−/Br− binding) | ehs: aquatic_toxicity, hygroscopic | name: Sodium Chloride | abbr: Sodium Chloride | CAS: 7647-14-5 | synonyms: Sodium Chloride; 7647-14-5; Table salt; Common salt; Dendritis; Purex; Sodium chloric; Iodized salt; Top flake; NaCl; Sodium chloride (NaCl); Flexivial; Gingivyl; Hyposaline; Sodium monochloride; Slow Sodium"
+  },
+  {
+    "id": "cas-7681-82-5",
+    "name": "Sodium iodide",
+    "abbreviation": [
+      "NaI"
+    ],
+    "aliases": [
+      "Sodiumiodide"
+    ],
+    "cas": "7681-82-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "iodide_promoters"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Iodide promoters (iodide_promoters) | roles: halide_promoter | name: Sodium iodide | abbr: NaI | CAS: 7681-82-5 | halide promotion: very high | use_cases: Finkelstein reaction; Facilitate oxidative addition for aryl chlorides/bromides"
+  },
+  {
+    "id": "cas-2564-83-2",
+    "name": "TEMPO",
+    "abbreviation": [],
+    "aliases": [
+      "2,2,6,6-Tetramethylpiperidin-1-yl oxyl"
+    ],
+    "cas": "2564-83-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "radical_suppressors"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Radical suppressors (radical_suppressors) | roles: radical_suppressor | name: TEMPO | abbr: TEMPO | CAS: 2564-83-2 | use_cases: Probe radical pathways; Inhibit radical chains"
+  },
+  {
+    "id": "cas-1643-19-2",
+    "name": "Tetrabutylammonium bromide",
+    "abbreviation": [
+      "TBAB"
+    ],
+    "aliases": [
+      "Tetrabutylammoniumbromide"
+    ],
+    "cas": "1643-19-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium bromide | abbr: TBAB | CAS: 1643-19-2 | PT power: high | halide promotion: medium | hygroscopicity: medium | use_cases: Biphasic alkylations; Nucleophilic substitutions; Anion shuttling"
+  },
+  {
+    "id": "cas-1112-67-0",
+    "name": "Tetrabutylammonium chloride",
+    "abbreviation": [
+      "TBACl"
+    ],
+    "aliases": [
+      "Tetrabutylammoniumchloride"
+    ],
+    "cas": "1112-67-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium chloride | abbr: TBACl | CAS: 1112-67-0 | PT power: high | halide promotion: low | hygroscopicity: medium | use_cases: Phase-transfer catalysis; Ion pairing"
+  },
+  {
+    "id": "cas-29536-33-2",
+    "name": "Tetrabutylammonium dibutyl phosphate",
+    "abbreviation": [
+      "Tetrabutylammonium dibutyl phosphate"
+    ],
+    "aliases": [
+      "tetrabutylammonium dibutylphosphate",
+      "dibutyl phosphate;tetrabutylazanium",
+      "dibutyl phosphate;tetrabutylammonium"
+    ],
+    "cas": "29536-33-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | name: Tetrabutylammonium dibutyl phosphate | abbr: Tetrabutylammonium dibutyl phosphate | CAS: 29536-33-2 | synonyms: Tetrabutylammonium dibutyl phosphate; 29536-33-2; SCHEMBL6382222; tetrabutylammonium dibutylphosphate; dibutyl phosphate;tetrabutylazanium; dibutyl phosphate;tetrabutylammonium; G67457; F556775"
+  },
+  {
+    "id": "cas-429-41-4",
+    "name": "Tetrabutylammonium fluoride (anhydrous)",
+    "abbreviation": [
+      "TBAF"
+    ],
+    "aliases": [
+      "Tetrabutylammoniumfluoride"
+    ],
+    "cas": "429-41-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "fluoride_sources_activators"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Fluoride sources / silyl activators (fluoride_sources_activators) | roles: fluoride_source | name: Tetrabutylammonium fluoride | abbr: TBAF | CAS: 429-41-4 | hygroscopicity: very high | use_cases: Desilylation; Activate silyl nucleophiles"
+  },
+  {
+    "id": "cas-311-89-7",
+    "name": "Tetrabutylammonium iodide",
+    "abbreviation": [
+      "TBAI"
+    ],
+    "aliases": [
+      "Tetrabutylammoniumiodide"
+    ],
+    "cas": "311-89-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium PTC (quaternary_ammonium_ptc) | roles: phase_transfer | name: Tetrabutylammonium iodide | abbr: TBAI | CAS: 311-89-7 | PT power: high | halide promotion: high | hygroscopicity: medium | use_cases: Finkelstein-type halide exchange; Pd/Ni couplings (iodide promoter)"
+  },
+  {
+    "id": "cas-311-28-4",
+    "name": "Tetrabutylammonium Iodide",
+    "abbreviation": [
+      "TBAI"
+    ],
+    "aliases": [
+      "1-Butanaminium, N,N,N-tributyl-, iodide (1:1)",
+      "1-Butanaminium, N,N,N-tributyl-, iodide",
+      "Tetra-n-butylammonium iodide",
+      "Tetrabutyl ammonium iodide",
+      "tetrabutylammoniumiodide",
+      "tetrabutylazanium iodide",
+      "tetrabutyl-ammonium iodide"
+    ],
+    "cas": "311-28-4",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | name: Tetrabutylammonium Iodide | abbr: 6M53DT4JNG; TBAI; Tetrabutylammonium Iodide | CAS: 311-28-4 | synonyms: Tetrabutylammonium Iodide; 311-28-4; 1-Butanaminium, N,N,N-tributyl-, iodide (1:1); 1-Butanaminium, N,N,N-tributyl-, iodide; NSC-10414; 6M53DT4JNG; DTXSID30878092; RefChem:896768; DTXCID701016152; 206-220-5; Tetra-n-butylammonium iodide; TBAI; Tetrabutyl ammonium iodide; tetrabutylammoniumiodide; tetrabutylazanium iodide; tetrabutyl-ammonium iodide"
+  },
+  {
+    "id": "cas-557-34-6",
+    "name": "Zinc Acetate",
+    "abbreviation": [],
+    "aliases": [
+      "Zinc diacetate",
+      "Zinc(II) acetate",
+      "Dicarbomethoxyzinc",
+      "Acetic acid, zinc(II) salt",
+      "Acetic acid, zinc salt",
+      "Zinc acetate anhydrous",
+      "Siltex CL 4",
+      "Anhydrous Zinc Acetate",
+      "H2ZEY72PME",
+      "AI3-04465"
+    ],
+    "cas": "557-34-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | functional_roles: phase_transfer | effect_bands: phase_transfer_power: high; water_scavenging_power: low; halide_promotion_power: medium; halide_scavenging_power: very low; lewis_acidity_band: very low; hygroscopicity_band: medium | moisture: low | solvent_classes: hydrocarbons_aromatic; hydrocarbons_aliphatic_linear; ethers_cyclic_glymes | use_cases: Biphasic substitutions; Alkylations under heterogeneous conditions; Anion shuttling in polar/aprotic media | best_for: Poorly soluble inorganic salts; Biphasic systems | avoid_when: Halide-sensitive catalysts (Cl−/Br− binding) | ehs: aquatic_toxicity, hygroscopic | name: Zinc Acetate | abbr: Zinc Acetate | CAS: 557-34-6 | synonyms: Zinc Acetate; 557-34-6; Zinc diacetate; Zinc(II) acetate; Dicarbomethoxyzinc; Acetic acid, zinc(II) salt; Acetic acid, zinc salt; Zinc acetate anhydrous; Siltex CL 4; Anhydrous Zinc Acetate; H2ZEY72PME; DTXSID8038770; CHEBI:62984; AI3-04465; NSC-75801; DTXCID6018770"
+  },
+  {
+    "id": "cas-7646-85-7",
+    "name": "Zinc chloride",
+    "abbreviation": [
+      "ZnCl2"
+    ],
+    "aliases": [
+      "Zincchloride"
+    ],
+    "cas": "7646-85-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "additive": {
+        "families": [
+          "lewis_acid_promoters"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: Mild Lewis-acid promoters (lewis_acid_promoters) | roles: lewis_acid_promoter | name: Zinc chloride | abbr: ZnCl2 | CAS: 7646-85-7 | use_cases: Activate electrophiles; Promote acylations and substitutions"
+  }
+]

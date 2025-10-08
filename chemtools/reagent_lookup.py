@@ -1,0 +1,335 @@
+"""
+Reagent database lookup utilities.
+
+Provides functions to enrich condition recommendations with detailed reagent information
+from the JSON databases in data/reagents/.
+"""
+
+import json
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+from functools import lru_cache
+
+
+# Cache loaded reagent databases
+_REAGENT_CACHE: Dict[str, List[Dict[str, Any]]] = {}
+
+
+def get_data_dir() -> Path:
+    """Get the data directory path."""
+    module_dir = Path(__file__).parent.parent
+    return module_dir / "data"
+
+
+@lru_cache(maxsize=32)
+def load_reagent_database(reagent_type: str) -> List[Dict[str, Any]]:
+    """
+    Load a reagent database JSON file.
+    
+    Args:
+        reagent_type: Type of reagent (e.g., 'ligand', 'base', 'solvent', 'metal_precursor')
+        
+    Returns:
+        List of reagent dictionaries
+    """
+    if reagent_type in _REAGENT_CACHE:
+        return _REAGENT_CACHE[reagent_type]
+    
+    reagent_file = get_data_dir() / "reagents" / f"{reagent_type}.json"
+    
+    if not reagent_file.exists():
+        return []
+    
+    try:
+        with open(reagent_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            _REAGENT_CACHE[reagent_type] = data
+            return data
+    except Exception as e:
+        print(f"Warning: Failed to load {reagent_file}: {e}")
+        return []
+
+
+def normalize_name(name: str) -> str:
+    """Normalize a reagent name for matching."""
+    if not name:
+        return ""
+    # Lowercase, remove extra whitespace, remove common parentheticals
+    normalized = name.lower().strip()
+    normalized = ' '.join(normalized.split())  # Collapse whitespace
+    # Remove common formatting differences
+    normalized = normalized.replace(',', '').replace('-', '').replace('_', '')
+    return normalized
+
+
+def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
+    """
+    Find a reagent by name in the specified database.
+    
+    Args:
+        name: Reagent name to search for
+        reagent_type: Type of reagent database to search
+        
+    Returns:
+        Reagent dictionary if found, None otherwise
+    """
+    if not name:
+        return None
+    
+    db = load_reagent_database(reagent_type)
+    if not db:
+        return None
+    
+    # Normalize search name
+    search_name = normalize_name(name)
+    
+    # Try exact match first
+    for reagent in db:
+        if normalize_name(reagent.get('name', '')) == search_name:
+            return reagent
+        
+        # Check abbreviations
+        for abbr in reagent.get('abbreviation', []):
+            if normalize_name(abbr) == search_name:
+                return reagent
+        
+        # Check aliases
+        for alias in reagent.get('aliases', []):
+            if normalize_name(alias) == search_name:
+                return reagent
+        
+        # Check CAS number
+        if reagent.get('cas') and normalize_name(reagent.get('cas', '')) == search_name:
+            return reagent
+    
+    # Try partial match
+    for reagent in db:
+        reagent_name = normalize_name(reagent.get('name', ''))
+        if search_name in reagent_name or reagent_name in search_name:
+            return reagent
+    
+    return None
+
+
+def enrich_reagent_info(name: str, reagent_type: str) -> Dict[str, Any]:
+    """
+    Enrich a reagent name with detailed information from database.
+    
+    Args:
+        name: Reagent name
+        reagent_type: Type of reagent (ligand, base, solvent, etc.)
+        
+    Returns:
+        Dictionary with reagent details
+    """
+    # Default response
+    result = {
+        "name": name,
+        "type": reagent_type,
+        "cas": None,
+        "abbreviation": None,
+        "smiles": None,
+        "inchi_key": None,
+        "found": False,
+    }
+    
+    reagent = find_reagent(name, reagent_type)
+    
+    if reagent:
+        result.update({
+            "name": reagent.get('name', name),
+            "cas": reagent.get('cas'),
+            "abbreviation": reagent.get('abbreviation', [None])[0] if reagent.get('abbreviation') else None,
+            "smiles": reagent.get('smiles'),
+            "inchi_key": reagent.get('inchi_key'),
+            "aliases": reagent.get('aliases', []),
+            "roles": reagent.get('roles', {}),
+            "found": True,
+        })
+    
+    return result
+
+
+def enrich_conditions(conditions: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Enrich condition recommendations with detailed reagent information.
+    
+    Args:
+        conditions: Conditions dictionary from recommendation engine
+        
+    Returns:
+        Enriched conditions with reagent details
+    """
+    enriched = dict(conditions)
+    
+    # Map condition keys to reagent types
+    reagent_type_map = {
+        'catalyst': 'metal_precursor',
+        'pd_source': 'metal_precursor',
+        'cu_source': 'metal_precursor',
+        'ni_source': 'metal_precursor',
+        'metal_source': 'metal_precursor',
+        'ligand': 'ligand',
+        'ligands': 'ligand',
+        'base': 'base',
+        'solvent': 'solvent',
+        'solvents': 'solvent',
+        'oxidant': 'oxidant',
+        'reductant': 'reductant',
+        'additive': 'additive',
+        'acid': 'acid',
+    }
+    
+    # Enrich each condition category
+    for key, value in conditions.items():
+        reagent_type = reagent_type_map.get(key.lower())
+        
+        if not reagent_type:
+            continue
+        
+        # Handle list of options
+        if isinstance(value, list):
+            enriched_list = []
+            for item in value:
+                if isinstance(item, str):
+                    enriched_list.append(enrich_reagent_info(item, reagent_type))
+                else:
+                    enriched_list.append(item)
+            enriched[f"{key}_details"] = enriched_list
+        
+        # Handle single string value
+        elif isinstance(value, str):
+            enriched[f"{key}_details"] = enrich_reagent_info(value, reagent_type)
+        
+        # Handle dict with name key
+        elif isinstance(value, dict) and 'name' in value:
+            enriched[f"{key}_details"] = enrich_reagent_info(value['name'], reagent_type)
+    
+    return enriched
+
+
+def format_reagent_for_display(reagent_info: Dict[str, Any], compact: bool = False) -> str:
+    """
+    Format reagent information for display.
+    
+    Args:
+        reagent_info: Enriched reagent dictionary
+        compact: If True, return compact single-line format
+        
+    Returns:
+        Formatted string
+    """
+    if not reagent_info.get('found'):
+        return reagent_info.get('name', 'Unknown')
+    
+    parts = [reagent_info['name']]
+    
+    if reagent_info.get('abbreviation'):
+        parts.append(f"({reagent_info['abbreviation']})")
+    
+    if reagent_info.get('cas'):
+        parts.append(f"[CAS: {reagent_info['cas']}]")
+    
+    if compact:
+        return ' '.join(parts)
+    
+    # Full format with additional details
+    lines = [' '.join(parts)]
+    
+    if reagent_info.get('smiles'):
+        lines.append(f"  SMILES: {reagent_info['smiles']}")
+    
+    if reagent_info.get('aliases') and len(reagent_info['aliases']) > 0:
+        lines.append(f"  Also known as: {', '.join(reagent_info['aliases'][:3])}")
+    
+    return '\n'.join(lines)
+
+
+def get_all_reagent_types() -> List[str]:
+    """Get list of all available reagent database types."""
+    reagent_dir = get_data_dir() / "reagents"
+    if not reagent_dir.exists():
+        return []
+    
+    types = []
+    for file in reagent_dir.glob("*.json"):
+        if file.stem not in ['not_determined_reagents']:
+            types.append(file.stem)
+    
+    return sorted(types)
+
+
+def get_all_reagents_by_type(reagent_type: str) -> List[Dict[str, Any]]:
+    """
+    Get all reagents of a specific type.
+    
+    Args:
+        reagent_type: Type of reagent (e.g., 'ligand', 'base', 'solvent', 'metal_precursor', 'additive')
+        
+    Returns:
+        List of all reagent dictionaries in that database
+        
+    Example:
+        >>> solvents = get_all_reagents_by_type('solvent')
+        >>> print(f"Found {len(solvents)} solvents")
+        >>> for s in solvents[:5]:
+        ...     print(f"  - {s.get('name')} (CAS: {s.get('cas')})")
+    """
+    return load_reagent_database(reagent_type)
+
+
+def count_reagents_by_type(reagent_type: str) -> int:
+    """
+    Count reagents in a specific database.
+    
+    Args:
+        reagent_type: Type of reagent database
+        
+    Returns:
+        Number of reagents in that database
+    """
+    db = load_reagent_database(reagent_type)
+    return len(db)
+
+
+# Preload common databases on module import (optional)
+def preload_common_databases():
+    """Preload commonly used reagent databases for faster lookup."""
+    common_types = ['ligand', 'base', 'solvent', 'metal_precursor']
+    for reagent_type in common_types:
+        try:
+            load_reagent_database(reagent_type)
+        except Exception:
+            pass
+
+
+if __name__ == "__main__":
+    # Test the module
+    print("Testing reagent lookup...")
+    
+    # Test ligand lookup
+    print("\n1. Looking up 'PPh3':")
+    info = enrich_reagent_info("PPh3", "ligand")
+    print(format_reagent_for_display(info))
+    
+    # Test base lookup
+    print("\n2. Looking up 'K2CO3':")
+    info = enrich_reagent_info("K2CO3", "base")
+    print(format_reagent_for_display(info))
+    
+    # Test metal precursor
+    print("\n3. Looking up 'Pd(PPh3)4':")
+    info = enrich_reagent_info("Pd(PPh3)4", "metal_precursor")
+    print(format_reagent_for_display(info))
+    
+    # Test condition enrichment
+    print("\n4. Enriching full conditions:")
+    test_conditions = {
+        "catalyst": "Pd(PPh3)4",
+        "ligands": ["PPh3", "XPhos"],
+        "base": "K2CO3",
+        "solvent": ["DMF", "Toluene"]
+    }
+    enriched = enrich_conditions(test_conditions)
+    print(json.dumps(enriched, indent=2, default=str))
