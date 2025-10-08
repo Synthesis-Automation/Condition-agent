@@ -41,7 +41,7 @@ import logging, time
 # SCDB integration is now part of ChemTools v2.0 via chem.rules.*
 # Keeping backward compatibility for error handling
 try:
-    from chemtools.scdb_matcher.loader import SchemeConditionDBError
+    from chemtools.rule_scdb_matcher.loader import SchemeConditionDBError
     _HAS_SCDB = True
 except Exception:
     _HAS_SCDB = False
@@ -85,6 +85,7 @@ async def logging_timing_middleware(request: Request, call_next):
     start = time.perf_counter()
     path = request.url.path
     method = request.method
+    status = None
     try:
         response: Response = await call_next(request)
         status = response.status_code
@@ -92,8 +93,9 @@ async def logging_timing_middleware(request: Request, call_next):
     finally:
         dur = time.perf_counter() - start
         # Log without body to avoid PII
-        logger.info("%s %s -> %s in %.3f s", method, path, status, dur)
-        if REQUEST_COUNT is not None:
+        status_str = str(status) if status is not None else "ERROR"
+        logger.info("%s %s -> %s in %.3f s", method, path, status_str, dur)
+        if REQUEST_COUNT is not None and status is not None:
             REQUEST_COUNT.labels(method=method, path=path, status=str(status)).inc()
         if REQUEST_LATENCY is not None:
             REQUEST_LATENCY.labels(method=method, path=path).observe(dur)
@@ -403,7 +405,7 @@ def api_recommend_conditions(req: RecommendConditionsRequest):
     start_time = time.time()
     
     # Get raw ML recommendations
-    raw_data = chem.recommend.recommend_conditions_structured(
+    raw_data = chem.recommend.conditions(
         reaction=req.reaction,
         reaction_type=req.reaction_type,
         k=req.k,
@@ -426,14 +428,14 @@ def api_recommend_conditions(req: RecommendConditionsRequest):
         
         # Build reagents list
         reagents = []
-        for chem in chemicals:
+        for chemical in chemicals:
             reagents.append({
-                "id": chem.get("uid", chem.get("cas")),
-                "role": chem.get("role", "reagent"),
-                "name": chem.get("name"),
+                "id": chemical.get("uid", chemical.get("cas")),
+                "role": chemical.get("role", "reagent"),
+                "name": chemical.get("name"),
                 "abbreviation": None,
-                "cas": chem.get("cas"),
-                "smiles": chem.get("smiles"),
+                "cas": chemical.get("cas"),
+                "smiles": chemical.get("smiles"),
                 "equivalents": None,  # Not in summary
             })
         
