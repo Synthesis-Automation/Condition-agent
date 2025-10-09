@@ -272,22 +272,123 @@ def _starting_material_entries(reaction_smiles: str) -> List[Dict[str, Any]]:
     return entries
 
 
-def _normalize_rule_string_value(value: str, role: str) -> Dict[str, Any]:
-    """Convert string-based rule entries into structured chemical dictionaries."""
-    cleaned = re.sub(r"\s*\(.*?\)\s*$", "", value or "").strip()
-    chemical: Dict[str, Any] = {
-        "name": cleaned or value or None,
-        "role": role,
-        "notes": value,
-    }
+def _parse_amount_to_equivalents(amount: str, role: str) -> Optional[float]:
+    """Parse amount string to equivalents.
     
-    eq_match = re.search(r"([+-]?\d+(?:\.\d+)?)\s*eq", value or "", re.IGNORECASE)
+    Handles formats like:
+    - "200%" or "200–250%" -> 2.0 or 2.0 (midpoint 2.25)
+    - "0.5–1.5%" -> 0.005 or 0.005 (midpoint 0.01)
+    - "2.0 eq" -> 2.0
+    - "10–20%" for ligands -> 0.1 or 0.1 (midpoint 0.15)
+    
+    Args:
+        amount: Amount string from rule file
+        role: Reagent role (metal_source, ligand, base, solvent, etc.)
+    
+    Returns:
+        Equivalents as float, or None if cannot parse
+    """
+    if not amount or not isinstance(amount, str):
+        return None
+    
+    amount = amount.strip()
+    
+    # Check for explicit "eq" notation
+    eq_match = re.search(r'([\d.]+)\s*eq', amount, re.IGNORECASE)
     if eq_match:
         try:
-            chemical["equivalents"] = float(eq_match.group(1))
+            return float(eq_match.group(1))
         except ValueError:
-            pass
+            return None
     
+    # Check for percentage notation
+    # Match patterns like "200%", "0.5–1.5%", "10-20%"
+    pct_match = re.search(r'([\d.]+)(?:\s*[–\-]\s*([\d.]+))?\s*%', amount)
+    if pct_match:
+        try:
+            low = float(pct_match.group(1))
+            high = float(pct_match.group(2)) if pct_match.group(2) else low
+            
+            # For catalysts/ligands, % usually means mol%
+            # For bases, % usually means % equivalents (e.g., 200% = 2.0 eq)
+            if role in ['metal_precursor', 'metal_source', 'catalyst', 'ligand']:
+                # Convert mol% to equivalents (e.g., 1.5% = 0.015 eq)
+                midpoint = (low + high) / 2.0
+                return midpoint / 100.0
+            else:
+                # For bases and other reagents, % is equivalents (e.g., 200% = 2.0 eq)
+                midpoint = (low + high) / 2.0
+                return midpoint / 100.0
+        except (ValueError, TypeError):
+            return None
+    
+    # Check for "M" notation (molarity - not equivalents)
+    if 'M' in amount or 'm' in amount.lower():
+        return None
+    
+    return None
+
+
+def _normalize_rule_string_value(value: str, role: str, amount: Optional[str] = None) -> Dict[str, Any]:
+    """Convert string-based rule entries into structured chemical dictionaries with database enrichment.
+    
+    Args:
+        value: Reagent name/description from rule file
+        role: Chemical role (metal_precursor, ligand, base, etc.)
+        amount: Optional amount string to parse for equivalents
+    """
+    # Remove parenthetical notes to get clean name for lookup
+    cleaned = re.sub(r"\s*\(.*?\)\s*$", "", value or "").strip()
+    
+    # Map output roles to database reagent types
+    role_to_type_map = {
+        "metal_precursor": "metal_precursor",
+        "catalyst": "metal_precursor",
+        "ligand": "ligand",
+        "base": "base",
+        "solvent": "solvent",
+        "additive": "additive",
+        "oxidant": "oxidant",
+        "reductant": "reductant",
+        "acid": "acid",
+    }
+    
+    reagent_type = role_to_type_map.get(role, role)
+    
+    # Try to enrich with database information
+    enriched_info = reagent_lookup.enrich_reagent_info(cleaned, reagent_type)
+    
+    # Build chemical entry
+    chemical: Dict[str, Any] = {
+        "name": enriched_info.get("name") if enriched_info.get("found") else cleaned or value or None,
+        "role": role,
+        "notes": value,
+        "abbreviation": enriched_info.get("abbreviation") if enriched_info.get("found") else None,
+        "cas": enriched_info.get("cas") if enriched_info.get("found") else None,
+        "smiles": enriched_info.get("smiles") if enriched_info.get("found") else None,
+    }
+    
+    # Parse equivalents from amount parameter (new standardized format)
+    equivalents = None
+    if amount:
+        equivalents = _parse_amount_to_equivalents(amount, role)
+    
+    # Fallback: extract equivalents from the value string itself (legacy format)
+    if equivalents is None:
+        eq_match = re.search(r"([+-]?\d+(?:\.\d+)?)\s*eq", value or "", re.IGNORECASE)
+        if eq_match:
+            try:
+                equivalents = float(eq_match.group(1))
+            except ValueError:
+                pass
+    
+    # Set equivalents if found
+    if equivalents is not None:
+        chemical["equivalents"] = equivalents
+    else:
+        chemical["equivalents"] = None
+    
+    # Extract mol% from the original value string for additional info
     mol_match = re.search(r"([+-]?\d+(?:\.\d+)?)\s*mol%?", value or "", re.IGNORECASE)
     if mol_match:
         try:
@@ -356,7 +457,7 @@ def _convert_rule_match_to_recommendations(
                         output_role = role_mapping.get(role, role)
                         
                         if name:
-                            chemicals.append(_normalize_rule_string_value(str(name), output_role))
+                            chemicals.append(_normalize_rule_string_value(str(name), output_role, amount=amount))
                             reagents_added = True
         
         # Fallback to legacy format if reagents not found in new format

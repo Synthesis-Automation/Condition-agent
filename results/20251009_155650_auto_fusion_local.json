@@ -1,14 +1,14 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T05:45:11.705084Z",
+    "generated_at": "2025-10-09T07:57:06.417249Z",
     "model": "Fusion-hybrid",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 10594.56
+    "processing_time_ms": 10855.73
   },
   "input": {
-    "reaction_smiles": "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1",
+    "reaction_smiles": "Clc1ccc(C#N)cc1.c1coc(B(O)O)c1>>N#Cc1ccc(-c2ccoc2)cc1",
     "family": "Suzuki"
   },
   "detection": {
@@ -23,7 +23,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "Brc1ccccc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -31,7 +31,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -94,10 +94,10 @@
           "role": "solvent"
         },
         "confidence": "LOW",
-        "fusion_score": 0.3549251737603798,
+        "fusion_score": 0.35492771471087736,
         "component_scores": {
           "precedent": 0.0,
-          "analytics": 0.7007497020397241,
+          "analytics": 0.7007547187881424,
           "rules": 0.0,
           "ml": 0.5
         },
@@ -114,7 +114,7 @@
         }
       },
       "reaction": {
-        "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+        "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
       },
       "extras": {
         "combo": {
@@ -129,7 +129,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "Brc1ccccc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -137,7 +137,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -200,10 +200,10 @@
           "role": "solvent"
         },
         "confidence": "LOW",
-        "fusion_score": 0.3309973324473922,
+        "fusion_score": 0.33099920394291055,
         "component_scores": {
           "precedent": 0.0,
-          "analytics": 0.6535075538063897,
+          "analytics": 0.6535112488103618,
           "rules": 0.0,
           "ml": 0.5
         },
@@ -220,7 +220,7 @@
         }
       },
       "reaction": {
-        "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+        "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
       },
       "extras": {
         "combo": {
@@ -235,7 +235,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "Brc1ccccc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -243,7 +243,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -306,10 +306,10 @@
           "role": "solvent"
         },
         "confidence": "LOW",
-        "fusion_score": 0.32929124994115755,
+        "fusion_score": 0.32929311595000144,
         "component_scores": {
           "precedent": 0.0,
-          "analytics": 0.6501391344992085,
+          "analytics": 0.6501428186705156,
           "rules": 0.0,
           "ml": 0.5
         },
@@ -326,7 +326,7 @@
         }
       },
       "reaction": {
-        "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+        "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
       },
       "extras": {
         "combo": {
@@ -341,7 +341,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "Brc1ccccc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -349,7 +349,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -412,10 +412,10 @@
           "role": "solvent"
         },
         "confidence": "LOW",
-        "fusion_score": 0.3286228039350374,
+        "fusion_score": 0.3286246104780117,
         "component_scores": {
           "precedent": 0.0,
-          "analytics": 0.6488193821281507,
+          "analytics": 0.6488229488924846,
           "rules": 0.0,
           "ml": 0.5
         },
@@ -432,7 +432,7 @@
         }
       },
       "reaction": {
-        "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+        "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
       },
       "extras": {
         "combo": {
@@ -447,7 +447,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "Brc1ccccc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -455,7 +455,7 @@
         {
           "name": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null,
           "role": "starting_material",
           "abbreviation": null
@@ -469,17 +469,17 @@
           "role": "catalyst"
         },
         {
-          "name": "Potassium carbonate",
-          "abbreviation": "K2CO3",
-          "cas": "584-08-7",
+          "name": "Sodium carbonate",
+          "abbreviation": "Na2CO3",
+          "cas": "497-19-8",
           "smiles": null,
           "equivalents": null,
           "role": "base"
         },
         {
-          "name": "Ethanol",
-          "abbreviation": "EtOH",
-          "cas": "64-17-5",
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
           "smiles": null,
           "equivalents": null,
           "role": "solvent"
@@ -487,41 +487,41 @@
       ],
       "conditions": {
         "temperature": {
-          "value": 80.0,
+          "value": 100.0,
           "unit": "°C",
-          "text": "80 °C"
+          "text": "100 °C"
         },
         "time": {
           "value": 12.0,
           "unit": "h",
-          "text": "12 h"
+          "text": "12.0 h"
         },
         "atmosphere": null
       },
       "summary": {
         "rank": 5,
-        "core": "Pd",
+        "core": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
         "base": {
-          "name": "Potassium carbonate",
-          "abbreviation": "K2CO3",
-          "cas": "584-08-7",
+          "name": "Sodium carbonate",
+          "abbreviation": "Na2CO3",
+          "cas": "497-19-8",
           "smiles": null,
           "equivalents": null,
           "role": "base"
         },
         "solvent": {
-          "name": "Ethanol",
-          "abbreviation": "EtOH",
-          "cas": "64-17-5",
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
           "smiles": null,
           "equivalents": null,
           "role": "solvent"
         },
         "confidence": "LOW",
-        "fusion_score": 0.3194805194805195,
+        "fusion_score": 0.3053646051820346,
         "component_scores": {
-          "precedent": 0.6,
-          "analytics": 0.2,
+          "precedent": 0.0,
+          "analytics": 0.602899348692735,
           "rules": 0.0,
           "ml": 0.5
         },
@@ -532,18 +532,18 @@
           "δ": 0.0
         },
         "support": {
-          "count": 6,
+          "count": 0,
           "fraction_core": 0.0,
           "reference_population": 10
         }
       },
       "reaction": {
-        "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+        "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
       },
       "extras": {
         "combo": {
-          "base_uid": "584-08-7",
-          "solvent_uid": "64-17-5"
+          "base_uid": "Sodium carbonate",
+          "solvent_uid": "Water"
         }
       }
     }
@@ -558,18 +558,18 @@
       },
       "reasoning": [
         "Low similarity (0.50) → precedents less relevant",
-        "Large dataset (n=50,215) → trust analytics",
+        "Large dataset (n=50,214) → trust analytics",
         "No strong rule match → low rule weight",
         "No ML model available → δ=0"
       ],
       "evidence_summary": {
         "precedents": 10,
-        "diversity": 0.5555555555555556,
-        "dataset_size": 50215
+        "diversity": 0.6714975845410629,
+        "dataset_size": 50214
       }
     },
     "raw_response": {
-      "input": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+      "input": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1",
       "family": "Suzuki",
       "features": {},
       "bin": null,
@@ -580,7 +580,7 @@
         "T_C": 100.0,
         "time_h": 12.0,
         "confidence": "LOW",
-        "fusion_score": 0.3549251737603798,
+        "fusion_score": 0.35492771471087736,
         "fusion_method": "multi_source_evidence"
       },
       "alternatives": {
@@ -591,7 +591,7 @@
           ],
           [
             "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
-            1
+            2
           ],
           [
             "Bis(triphenylphosphine)palladium(II) dichloride",
@@ -605,79 +605,26 @@
           ],
           [
             "Sodium carbonate",
-            1
-          ],
-          [
-            "584-08-7",
-            1
+            2
           ]
         ],
         "solvents": [
           [
             "Water",
-            4
-          ],
-          [
-            "64-17-5",
-            1
+            5
           ]
         ]
       },
       "precedent_pack": {
         "precedents": [
           {
-            "reaction_id": "31-179-CAS-11004025",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Oxidant: O2",
-            "yield": 100.0,
-            "core": "Oxidant: O2",
-            "base_uid": null,
-            "solvent_uid": "7732-18-5",
-            "reagents": [
-              {
-                "name": "108-18-9",
-                "cas": "108-18-9",
-                "role": "UNK"
-              },
-              {
-                "name": "Oxygen (g)",
-                "cas": "7782-44-7",
-                "role": "OXIDANT"
-              }
-            ],
-            "solvents": [
-              {
-                "name": "Water",
-                "cas": "7732-18-5"
-              }
-            ],
-            "reference": "Palladium-heterogenized porous polyimide materials as effective and recyclable catalysts for reactions in water | Rangel Rangel, E.; Maya, E. M.; Sanchez, F.; de la Campa, J. G.; Iglesias, M. | Green Chemistry (2015), 17(1), 466-473",
-            "conditions": {
-              "temperature_c": null,
-              "time_h": null,
-              "yield_pct": 100.0
-            },
-            "catalyst": {},
-            "full_system": null,
-            "catalytic_system": [
-              {
-                "name": "1631992-73-8",
-                "cas": "1631992-73-8"
-              }
-            ],
-            "T_C": null,
-            "time_h": null
-          },
-          {
-            "reaction_id": "31-179-CAS-12636513",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Pd",
-            "yield": 100.0,
-            "core": "Pd",
+            "reaction_id": "31-614-CAS-32738995",
+            "reaction_smiles": "CC(=O)c1ccc(Cl)cc1.OB(O)c1ccco1>>CC(=O)c1ccc(-c2ccco2)cc1",
+            "reactants_smiles": "CC(=O)c1ccc(Cl)cc1.OB(O)c1ccco1",
+            "products_smiles": "CC(=O)c1ccc(-c2ccco2)cc1",
+            "condition_core": "Base: K2CO3",
+            "yield": 96.0,
+            "core": "Base: K2CO3",
             "base_uid": "584-08-7",
             "solvent_uid": "64-17-5",
             "reagents": [
@@ -691,41 +638,33 @@
               {
                 "name": "Ethanol",
                 "cas": "64-17-5"
-              },
-              {
-                "name": "Water",
-                "cas": "7732-18-5"
               }
             ],
-            "reference": "Modular Approach to Heterogenous Catalysis. Manipulation of Cross-Coupling Catalyst Activity | Stibingerova, Iva; Voltrova, Svatava; Kocova, Sarka; Lindale, Matthew; Srogl, Jiri | Organic Letters (2016), 18(2), 312-315",
+            "reference": "An air-stable, well-defined palladium-BIAN-NHC chloro dimer: a fast-activating, highly efficient catalyst for cross-coupling | Zhang, Jin; Li, Tao; Li, Xue; Zhang, Gaopeng; Fang, Shuai; Yan, Wenxuan; Li, Xiangyang; Yang, Xiufang; Ma, Yangmin; Szostak, Michal | Chemical Communications (Cambridge, United Kingdom) (2022), 58(53), 7404-7407",
             "conditions": {
               "temperature_c": null,
               "time_h": null,
-              "yield_pct": 100.0
+              "yield_pct": 96.0
             },
             "catalyst": {},
             "full_system": null,
             "catalytic_system": [
               {
-                "name": "Palladium",
-                "cas": "7440-05-3"
-              },
-              {
-                "name": "168908-22-3",
-                "cas": "168908-22-3"
+                "name": "1477501-20-4",
+                "cas": "1477501-20-4"
               }
             ],
             "T_C": null,
             "time_h": null
           },
           {
-            "reaction_id": "31-179-CAS-16598019",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Pd/diphenylphosphino",
-            "yield": 100.0,
-            "core": "Pd/diphenylphosphino",
+            "reaction_id": "31-614-CAS-40128447",
+            "reaction_smiles": "Fc1ccc(Cl)cc1.OB(O)c1ccco1>>Fc1ccc(-c2ccco2)cc1",
+            "reactants_smiles": "Fc1ccc(Cl)cc1.OB(O)c1ccco1",
+            "products_smiles": "Fc1ccc(-c2ccco2)cc1",
+            "condition_core": "Base: K3PO4",
+            "yield": 98.0,
+            "core": "Base: K3PO4",
             "base_uid": "7778-53-2",
             "solvent_uid": "109-99-9",
             "reagents": [
@@ -745,43 +684,48 @@
                 "cas": "7732-18-5"
               }
             ],
-            "reference": "Chemoselective Suzuki-Miyaura Cross-Coupling via Kinetic Transmetallation | Fyfe, James W. B.; Fazakerley, Neal J.; Watson, Allan J. B. | Angewandte Chemie, International Edition (2017), 56(5), 1249-1253",
+            "reference": "Comparison of Monophosphine and Bisphosphine Precatalysts for Ni-Catalyzed Suzuki-Miyaura Cross-Coupling: Understanding the Role of the Ligation State in Catalysis | Borowski, Julia E.; Newman-Stonebraker, Samuel H.; Doyle, Abigail G. | ACS Catalysis (2023), 13(12), 7966-7977",
             "conditions": {
               "temperature_c": null,
               "time_h": null,
-              "yield_pct": 100.0
+              "yield_pct": 98.0
             },
             "catalyst": {},
             "full_system": null,
             "catalytic_system": [
               {
-                "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
-                "cas": "72287-26-4"
+                "name": "3036755-16-2",
+                "cas": "3036755-16-2"
               }
             ],
             "T_C": null,
             "time_h": null
           },
           {
-            "reaction_id": "31-179-CAS-18611388",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Pd",
-            "yield": 100.0,
-            "core": "Pd",
-            "base_uid": "144-55-8",
+            "reaction_id": "31-614-CAS-36331611",
+            "reaction_smiles": "CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Cl)cc2)cc1.OB(O)c1ccoc1>>CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(-c3ccoc3)cc2)cc1",
+            "reactants_smiles": "CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Cl)cc2)cc1.OB(O)c1ccoc1",
+            "products_smiles": "CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(-c3ccoc3)cc2)cc1",
+            "condition_core": "Base: Cs2CO3",
+            "yield": 99.0,
+            "core": "Base: Cs2CO3",
+            "base_uid": "534-17-8",
             "solvent_uid": "64-17-5",
             "reagents": [
               {
-                "name": "2194545-09-8",
-                "cas": "2194545-09-8",
+                "name": "Cesium carbonate",
+                "cas": "534-17-8",
+                "role": "BASE"
+              },
+              {
+                "name": "7631-86-9",
+                "cas": "7631-86-9",
                 "role": "UNK"
               },
               {
-                "name": "Sodium hydrogen carbonate",
-                "cas": "144-55-8",
-                "role": "BASE"
+                "name": "40105-52-0",
+                "cas": "40105-52-0",
+                "role": "UNK"
               }
             ],
             "solvents": [
@@ -790,155 +734,68 @@
                 "cas": "64-17-5"
               },
               {
+                "name": "Tetrahydrofuran",
+                "cas": "109-99-9"
+              },
+              {
                 "name": "Water",
                 "cas": "7732-18-5"
               }
             ],
-            "reference": "Supramolecular Nanotubules as a Catalytic Regulator for Palladium Cations: Applications in Selective Catalysis | Wu, Shanshan; Li, Yongguang; Xie, Siying; Ma, Cong; Lim, Joonwon; Zhao, Jiong; Kim, Dae Seok; Yang, Minyong; Yoon, Doong Ki; Lee, Myongsoo; Kim, Sang Ouk; Huang, Zhegang | Angewandte Chemie, International Edition (2017), 56(38), 11511-11514",
+            "reference": "Automated, Capsule-Based Suzuki-Miyaura Cross Couplings | Coin, Guillaume; Jiang, Tuo; Bordi, Samuele; Nichols, Paula L.; Bode, Jeffrey W.; Wanner, Benedikt M. | Organic Letters (2024), 26(14), 2708-2712",
             "conditions": {
               "temperature_c": null,
               "time_h": null,
-              "yield_pct": 100.0
+              "yield_pct": 99.0
             },
             "catalyst": {},
             "full_system": null,
             "catalytic_system": [
               {
-                "name": "Palladium(II) chloride",
-                "cas": "7647-10-1"
+                "name": "7631-86-9",
+                "cas": "7631-86-9"
+              },
+              {
+                "name": "2568189-42-2",
+                "cas": "2568189-42-2"
               }
             ],
             "T_C": null,
             "time_h": null
           },
           {
-            "reaction_id": "31-179-CAS-20088501",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "reaction_id": "31-179-CAS-21932632",
+            "reaction_smiles": "CC(=O)c1ccc(Cl)cc1.OB(O)c1ccoc1>>CC(=O)c1ccc(-c2ccoc2)cc1",
+            "reactants_smiles": "CC(=O)c1ccc(Cl)cc1.OB(O)c1ccoc1",
+            "products_smiles": "CC(=O)c1ccc(-c2ccoc2)cc1",
             "condition_core": "Pd",
-            "yield": 100.0,
+            "yield": 98.0,
             "core": "Pd",
-            "base_uid": "584-08-7",
-            "solvent_uid": "64-17-5",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "123-91-1",
             "reagents": [
               {
-                "name": "Potassium carbonate",
-                "cas": "584-08-7",
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
                 "role": "BASE"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5",
+                "role": "SOLVENT"
               }
             ],
             "solvents": [
               {
-                "name": "Ethanol",
-                "cas": "64-17-5"
-              },
-              {
-                "name": "Water",
-                "cas": "7732-18-5"
+                "name": "1,4-Dioxane",
+                "cas": "123-91-1"
               }
             ],
-            "reference": "Electron- and Hydride-Reservoir Organometallics as Precursors of Catalytically Efficient Transition Metal Nanoparticles in Water | Fu, Fangyu; Wang, Qi; Ciganda, Roberto; Martinez-Villacorta, Angel M.; Escobar, Ane; Moya, Sergio; Fouquet, Eric; Ruiz, Jaime; Astruc, Didier | Chemistry - A European Journal (2018), 24(25), 6645-6653",
+            "reference": "A Highly Efficient Monophosphine Ligand for Parts per Million Levels Pd-Catalyzed Suzuki-Miyaura Coupling of (Hetero)Aryl Chlorides | Choy, Pui Ying; Yuen, On Ying; Leung, Man Pan; Chow, Wing Kin; Kwong, Fuk Yee | European Journal of Organic Chemistry (2020), 2020(19), 2846-2853",
             "conditions": {
               "temperature_c": null,
               "time_h": null,
-              "yield_pct": 100.0
-            },
-            "catalyst": {},
-            "full_system": null,
-            "catalytic_system": [
-              {
-                "name": "Palladium",
-                "cas": "7440-05-3"
-              }
-            ],
-            "T_C": null,
-            "time_h": null
-          },
-          {
-            "reaction_id": "31-179-CAS-2366474",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Pd",
-            "yield": 100.0,
-            "core": "Pd",
-            "base_uid": "584-08-7",
-            "solvent_uid": "64-17-5",
-            "reagents": [
-              {
-                "name": "Potassium carbonate",
-                "cas": "584-08-7",
-                "role": "BASE"
-              }
-            ],
-            "solvents": [
-              {
-                "name": "Ethanol",
-                "cas": "64-17-5"
-              },
-              {
-                "name": "Water",
-                "cas": "7732-18-5"
-              }
-            ],
-            "reference": "Single Crystal to Single Crystal (SC-to-SC) Transformation from a Nonporous to Porous Metal-Organic Framework and Its Application Potential in Gas Adsorption and Suzuki Coupling Reaction through Postmodification | Sen, Rupam; Saha, Debraj; Koner, Subratanath; Brandao, Paula; Lin, Zhi | Chemistry - A European Journal (2015), 21(15), 5962-5971",
-            "conditions": {
-              "temperature_c": null,
-              "time_h": null,
-              "yield_pct": 100.0
-            },
-            "catalyst": {},
-            "full_system": null,
-            "catalytic_system": [
-              {
-                "name": "Palladium",
-                "cas": "7440-05-3"
-              },
-              {
-                "name": "1121-60-4",
-                "cas": "1121-60-4"
-              },
-              {
-                "name": "1688706-66-2",
-                "cas": "1688706-66-2"
-              }
-            ],
-            "T_C": null,
-            "time_h": null
-          },
-          {
-            "reaction_id": "31-179-CAS-648707",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Pd",
-            "yield": 100.0,
-            "core": "Pd",
-            "base_uid": "584-08-7",
-            "solvent_uid": "64-17-5",
-            "reagents": [
-              {
-                "name": "Potassium carbonate",
-                "cas": "584-08-7",
-                "role": "BASE"
-              }
-            ],
-            "solvents": [
-              {
-                "name": "Ethanol",
-                "cas": "64-17-5"
-              },
-              {
-                "name": "Water",
-                "cas": "7732-18-5"
-              }
-            ],
-            "reference": "Development of Unimolecular Tetrakis(piperidin-4-ol) as a Ligand for Suzuki-Miyaura Cross-Coupling Reactions: Synthesis of Incrustoporin and Preclamol | Nallasivam, Jothi L.; Fernandes, Rodney A. | European Journal of Organic Chemistry (2015), 2015(16), 3558-3567",
-            "conditions": {
-              "temperature_c": null,
-              "time_h": null,
-              "yield_pct": 100.0
+              "yield_pct": 98.0
             },
             "catalyst": {},
             "full_system": null,
@@ -948,23 +805,23 @@
                 "cas": "3375-31-3"
               },
               {
-                "name": "1771693-10-7",
-                "cas": "1771693-10-7"
+                "name": "2169319-40-6",
+                "cas": "2169319-40-6"
               }
             ],
             "T_C": null,
             "time_h": null
           },
           {
-            "reaction_id": "31-179-CAS-19760961",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "reaction_id": "31-614-CAS-32738996",
+            "reaction_smiles": "CC(=O)c1ccc(Cl)cc1.OB(O)c1ccoc1>>CC(=O)c1ccc(-c2ccoc2)cc1",
+            "reactants_smiles": "CC(=O)c1ccc(Cl)cc1.OB(O)c1ccoc1",
+            "products_smiles": "CC(=O)c1ccc(-c2ccoc2)cc1",
             "condition_core": "Base: K2CO3",
-            "yield": 99.0,
+            "yield": 95.0,
             "core": "Base: K2CO3",
             "base_uid": "584-08-7",
-            "solvent_uid": "67-56-1",
+            "solvent_uid": "64-17-5",
             "reagents": [
               {
                 "name": "Potassium carbonate",
@@ -974,55 +831,144 @@
             ],
             "solvents": [
               {
-                "name": "Methanol",
-                "cas": "67-56-1"
-              },
-              {
-                "name": "N,N-Dimethylformamide",
-                "cas": "68-12-2"
+                "name": "Ethanol",
+                "cas": "64-17-5"
               }
             ],
-            "reference": "Discovery of Polyoxo-Noble-Metalate-Based Metal-Organic Frameworks | Bhattacharya, Saurav; Ayass, Wassim W.; Taffa, Dereje H.; Schneemann, Andreas; Semrau, A. Lisa; Wannapaiboon, Suttipong; Altmann, Philipp J.; Poethig, Alexander; Nisar, Talha; Balster, Torsten; Burtch, Nicholas C.; Wagner, Veit; Fischer, Roland A.; Wark, Michael; Kortz, Ulrich | Journal of the American Chemical Society (2019), 141(8), 3385-3389",
+            "reference": "An air-stable, well-defined palladium-BIAN-NHC chloro dimer: a fast-activating, highly efficient catalyst for cross-coupling | Zhang, Jin; Li, Tao; Li, Xue; Zhang, Gaopeng; Fang, Shuai; Yan, Wenxuan; Li, Xiangyang; Yang, Xiufang; Ma, Yangmin; Szostak, Michal | Chemical Communications (Cambridge, United Kingdom) (2022), 58(53), 7404-7407",
             "conditions": {
               "temperature_c": null,
               "time_h": null,
-              "yield_pct": 99.0
+              "yield_pct": 95.0
             },
             "catalyst": {},
             "full_system": null,
             "catalytic_system": [
               {
-                "name": "2274743-64-3",
-                "cas": "2274743-64-3"
+                "name": "1477501-20-4",
+                "cas": "1477501-20-4"
               }
             ],
             "T_C": null,
             "time_h": null
           },
           {
-            "reaction_id": "31-179-CAS-20509059",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Pd",
-            "yield": 99.0,
-            "core": "Pd",
-            "base_uid": "584-08-7",
-            "solvent_uid": "7732-18-5",
+            "reaction_id": "31-179-CAS-20309829",
+            "reaction_smiles": "OB(O)c1ccoc1.C=CCC1(c2ccc(Cl)cc2)c2ccccc2C(=O)N1C>>C=CCC1(c2ccc(-c3ccoc3)cc2)c2ccccc2C(=O)N1C",
+            "reactants_smiles": "OB(O)c1ccoc1.C=CCC1(c2ccc(Cl)cc2)c2ccccc2C(=O)N1C",
+            "products_smiles": "C=CCC1(c2ccc(-c3ccoc3)cc2)c2ccccc2C(=O)N1C",
+            "condition_core": "Base: K3PO4",
+            "yield": 87.0,
+            "core": "Base: K3PO4",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "123-91-1",
             "reagents": [
               {
-                "name": "Potassium carbonate",
-                "cas": "584-08-7",
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
                 "role": "BASE"
               }
             ],
             "solvents": [
+              {
+                "name": "1,4-Dioxane",
+                "cas": "123-91-1"
+              }
+            ],
+            "reference": "Functionalisation of isoindolinones via a calcium catalysed Hosomi-Sakurai allylation | Basson, Ashley J.; McLaughlin, Mark G. | Chemical Communications (Cambridge, United Kingdom) (2019), 55(57), 8317-8320",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 87.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "1445085-82-4",
+                "cas": "1445085-82-4"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-15584521",
+            "reaction_smiles": "O=C(CCCN1CCC(O)(c2ccc(Cl)cc2)CC1)c1ccc(F)cc1.OB(O)c1ccoc1>>O=C(CCCN1CCC(O)(c2ccc(-c3ccoc3)cc2)CC1)c1ccc(F)cc1",
+            "reactants_smiles": "O=C(CCCN1CCC(O)(c2ccc(Cl)cc2)CC1)c1ccc(F)cc1.OB(O)c1ccoc1",
+            "products_smiles": "O=C(CCCN1CCC(O)(c2ccc(-c3ccoc3)cc2)CC1)c1ccc(F)cc1",
+            "condition_core": "Base: K3PO4",
+            "yield": 80.0,
+            "core": "Base: K3PO4",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "109-99-9",
+            "reagents": [
+              {
+                "name": "621-23-8",
+                "cas": "621-23-8",
+                "role": "UNK"
+              },
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Tetrahydrofuran",
+                "cas": "109-99-9"
+              }
+            ],
+            "reference": "Tri(1-adamantyl)phosphine: Expanding the Boundary of Electron-Releasing Character Available to Organophosphorus Compounds | Chen, Liye; Ren, Peng; Carrow, Brad P. | Journal of the American Chemical Society (2016), 138(20), 6392-6395",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 80.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "897665-73-5",
+                "cas": "897665-73-5"
+              },
+              {
+                "name": "1204312-47-9",
+                "cas": "1204312-47-9"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-436871",
+            "reaction_smiles": "OB(O)c1ccco1.CC(=O)N1c2ccccc2CCc2ccc(Cl)cc21>>CC(=O)N1c2ccccc2CCc2ccc(-c3ccco3)cc21",
+            "reactants_smiles": "OB(O)c1ccco1.CC(=O)N1c2ccccc2CCc2ccc(Cl)cc21",
+            "products_smiles": "CC(=O)N1c2ccccc2CCc2ccc(-c3ccco3)cc21",
+            "condition_core": "Base: K3PO4",
+            "yield": 99.0,
+            "core": "Base: K3PO4",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "109-99-9",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Tetrahydrofuran",
+                "cas": "109-99-9"
+              },
               {
                 "name": "Water",
                 "cas": "7732-18-5"
               }
             ],
-            "reference": "An N-heterocyclic carbene-functionalised covalent organic framework with atomically dispersed palladium for coupling reactions under mild conditions | Yang, Junjuan; Wu, Yuanyuan; Wu, Xiaowei; Liu, Wenjing; Wang, Yaofang; Wang, Junwen | Green Chemistry (2019), 21(19), 5267-5273",
+            "reference": "A New Palladium Precatalyst Allows for the Fast Suzuki-Miyaura Coupling Reactions of Unstable Polyfluorophenyl and 2-Heteroaryl Boronic Acids | Kinzel, Tom; Zhang, Yong; Buchwald, Stephen L. | Journal of the American Chemical Society (2010), 132(40), 14073-14075",
             "conditions": {
               "temperature_c": null,
               "time_h": null,
@@ -1032,41 +978,86 @@
             "full_system": null,
             "catalytic_system": [
               {
-                "name": "Palladium",
-                "cas": "7440-05-3"
-              },
-              {
-                "name": "2375720-23-1",
-                "cas": "2375720-23-1"
+                "name": "936951-70-1",
+                "cas": "936951-70-1"
               }
             ],
             "T_C": null,
             "time_h": null
           },
           {
-            "reaction_id": "31-179-CAS-20952869",
-            "reaction_smiles": "OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1",
-            "reactants_smiles": "OB(O)c1ccccc1.Brc1ccccc1",
-            "products_smiles": "c1ccc(-c2ccccc2)cc1",
-            "condition_core": "Base: K2CO3",
-            "yield": 99.0,
-            "core": "Base: K2CO3",
-            "base_uid": "584-08-7",
-            "solvent_uid": "67-56-1",
+            "reaction_id": "31-179-CAS-9031327",
+            "reaction_smiles": "OB(O)c1ccoc1.CC(C)(C)OC(=O)N(Cc1ccccc1)C(=O)c1ccc(Cl)cc1>>CC(C)(C)OC(=O)N(Cc1ccccc1)C(=O)c1ccc(-c2ccoc2)cc1",
+            "reactants_smiles": "OB(O)c1ccoc1.CC(C)(C)OC(=O)N(Cc1ccccc1)C(=O)c1ccc(Cl)cc1",
+            "products_smiles": "CC(C)(C)OC(=O)N(Cc1ccccc1)C(=O)c1ccc(-c2ccoc2)cc1",
+            "condition_core": "Pd/SPhos",
+            "yield": 71.0,
+            "core": "Pd/SPhos",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
             "reagents": [
               {
-                "name": "Potassium carbonate",
-                "cas": "584-08-7",
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
                 "role": "BASE"
               }
             ],
             "solvents": [
               {
-                "name": "Methanol",
-                "cas": "67-56-1"
+                "name": "Toluene",
+                "cas": "108-88-3"
               }
             ],
-            "reference": "A palladium-carbon-connected organometallic framework and its catalytic application | Dong, Ying; Jv, Jing-Jing; Wu, Xiao-Wei; Kan, Jing-Lan; Lin, Ting; Dong, Yu-Bin | Chemical Communications (Cambridge, United Kingdom) (2019), 55(96), 14414-14417",
+            "reference": "Nickel-catalysed Suzuki-Miyaura coupling of amides | Weires, Nicholas A.; Baker, Emma L.; Garg, Neil K. | Nature Chemistry (2016), 8(1), 75-79",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 71.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "SPhos",
+                "cas": "657408-07-6"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-36762612",
+            "reaction_smiles": "Clc1ccc(-c2ccccc2)cc1.OB(O)c1ccoc1>>c1ccc(-c2ccc(-c3ccoc3)cc2)cc1",
+            "reactants_smiles": "Clc1ccc(-c2ccccc2)cc1.OB(O)c1ccoc1",
+            "products_smiles": "c1ccc(-c2ccc(-c3ccoc3)cc2)cc1",
+            "condition_core": "Pd/RuPhos",
+            "yield": 99.0,
+            "core": "Pd/RuPhos",
+            "base_uid": "584-08-7",
+            "solvent_uid": "123-91-1",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5",
+                "role": "SOLVENT"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "1,4-Dioxane",
+                "cas": "123-91-1"
+              }
+            ],
+            "reference": "Large acceleration of solvent-free Suzuki-Miyaura cross-coupling reactions at room temperature by the addition of small amounts of dioxane and water | Tanemura, Kiyoshi | Tetrahedron (2023), 140133470",
             "conditions": {
               "temperature_c": null,
               "time_h": null,
@@ -1076,8 +1067,12 @@
             "full_system": null,
             "catalytic_system": [
               {
-                "name": "2380311-59-9",
-                "cas": "2380311-59-9"
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "RuPhos",
+                "cas": "787618-22-8"
               }
             ],
             "T_C": null,
@@ -1097,11 +1092,11 @@
           0.5,
           0.5
         ],
-        "diversity_score": 0.5555555555555556,
+        "diversity_score": 0.6714975845410629,
         "avg_similarity": 0.5,
         "method": "fusion"
       },
-      "reasons": "Low similarity (0.50) → precedents less relevant\nLarge dataset (n=50,215) → trust analytics\nNo strong rule match → low rule weight\nNo ML model available → δ=0",
+      "reasons": "Low similarity (0.50) → precedents less relevant\nLarge dataset (n=50,214) → trust analytics\nNo strong rule match → low rule weight\nNo ML model available → δ=0",
       "formatted": {
         "meta": {
           "status": "success",
@@ -1116,7 +1111,7 @@
           }
         },
         "input": {
-          "reaction_smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+          "reaction_smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1",
           "family": "Suzuki"
         },
         "detection": {
@@ -1127,20 +1122,20 @@
           {
             "rank": 1,
             "reaction": {
-              "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+              "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
             },
             "chemicals": [
               {
                 "name": null,
                 "cas": null,
-                "smiles": "Brc1ccccc1",
+                "smiles": "N#Cc1ccc(Cl)cc1",
                 "equivalents": null,
                 "role": "starting_material"
               },
               {
                 "name": null,
                 "cas": null,
-                "smiles": "OB(O)c1ccccc1",
+                "smiles": "OB(O)c1ccco1",
                 "equivalents": null,
                 "role": "starting_material"
               },
@@ -1194,10 +1189,10 @@
                 "role": "solvent"
               },
               "confidence": "LOW",
-              "fusion_score": 0.3549251737603798,
+              "fusion_score": 0.35492771471087736,
               "component_scores": {
                 "precedent": 0.0,
-                "analytics": 0.7007497020397241,
+                "analytics": 0.7007547187881424,
                 "rules": 0.0,
                 "ml": 0.5
               },
@@ -1221,20 +1216,20 @@
           {
             "rank": 2,
             "reaction": {
-              "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+              "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
             },
             "chemicals": [
               {
                 "name": null,
                 "cas": null,
-                "smiles": "Brc1ccccc1",
+                "smiles": "N#Cc1ccc(Cl)cc1",
                 "equivalents": null,
                 "role": "starting_material"
               },
               {
                 "name": null,
                 "cas": null,
-                "smiles": "OB(O)c1ccccc1",
+                "smiles": "OB(O)c1ccco1",
                 "equivalents": null,
                 "role": "starting_material"
               },
@@ -1288,10 +1283,10 @@
                 "role": "solvent"
               },
               "confidence": "LOW",
-              "fusion_score": 0.3309973324473922,
+              "fusion_score": 0.33099920394291055,
               "component_scores": {
                 "precedent": 0.0,
-                "analytics": 0.6535075538063897,
+                "analytics": 0.6535112488103618,
                 "rules": 0.0,
                 "ml": 0.5
               },
@@ -1315,20 +1310,20 @@
           {
             "rank": 3,
             "reaction": {
-              "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+              "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
             },
             "chemicals": [
               {
                 "name": null,
                 "cas": null,
-                "smiles": "Brc1ccccc1",
+                "smiles": "N#Cc1ccc(Cl)cc1",
                 "equivalents": null,
                 "role": "starting_material"
               },
               {
                 "name": null,
                 "cas": null,
-                "smiles": "OB(O)c1ccccc1",
+                "smiles": "OB(O)c1ccco1",
                 "equivalents": null,
                 "role": "starting_material"
               },
@@ -1382,10 +1377,10 @@
                 "role": "solvent"
               },
               "confidence": "LOW",
-              "fusion_score": 0.32929124994115755,
+              "fusion_score": 0.32929311595000144,
               "component_scores": {
                 "precedent": 0.0,
-                "analytics": 0.6501391344992085,
+                "analytics": 0.6501428186705156,
                 "rules": 0.0,
                 "ml": 0.5
               },
@@ -1409,20 +1404,20 @@
           {
             "rank": 4,
             "reaction": {
-              "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+              "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
             },
             "chemicals": [
               {
                 "name": null,
                 "cas": null,
-                "smiles": "Brc1ccccc1",
+                "smiles": "N#Cc1ccc(Cl)cc1",
                 "equivalents": null,
                 "role": "starting_material"
               },
               {
                 "name": null,
                 "cas": null,
-                "smiles": "OB(O)c1ccccc1",
+                "smiles": "OB(O)c1ccco1",
                 "equivalents": null,
                 "role": "starting_material"
               },
@@ -1476,10 +1471,10 @@
                 "role": "solvent"
               },
               "confidence": "LOW",
-              "fusion_score": 0.3286228039350374,
+              "fusion_score": 0.3286246104780117,
               "component_scores": {
                 "precedent": 0.0,
-                "analytics": 0.6488193821281507,
+                "analytics": 0.6488229488924846,
                 "rules": 0.0,
                 "ml": 0.5
               },
@@ -1503,20 +1498,20 @@
           {
             "rank": 5,
             "reaction": {
-              "smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+              "smiles": "N#Cc1ccc(Cl)cc1.OB(O)c1ccco1>>N#Cc1ccc(-c2ccoc2)cc1"
             },
             "chemicals": [
               {
                 "name": null,
                 "cas": null,
-                "smiles": "Brc1ccccc1",
+                "smiles": "N#Cc1ccc(Cl)cc1",
                 "equivalents": null,
                 "role": "starting_material"
               },
               {
                 "name": null,
                 "cas": null,
-                "smiles": "OB(O)c1ccccc1",
+                "smiles": "OB(O)c1ccco1",
                 "equivalents": null,
                 "role": "starting_material"
               },
@@ -1529,51 +1524,51 @@
                 "role": "catalyst"
               },
               {
-                "name": "Potassium carbonate",
-                "abbreviation": "K2CO3",
-                "cas": "584-08-7",
+                "name": "Sodium carbonate",
+                "abbreviation": "Na2CO3",
+                "cas": "497-19-8",
                 "smiles": null,
                 "equivalents": null,
                 "role": "base"
               },
               {
-                "name": "Ethanol",
-                "abbreviation": "EtOH",
-                "cas": "64-17-5",
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
                 "smiles": null,
                 "equivalents": null,
                 "role": "solvent"
               }
             ],
             "conditions": {
-              "temperature": "80 °C",
-              "time": "12 h",
+              "temperature": "100 °C",
+              "time": "12.0 h",
               "atmosphere": null
             },
             "summary": {
               "rank": 5,
-              "core": "Pd",
+              "core": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
               "base": {
-                "name": "Potassium carbonate",
-                "abbreviation": "K2CO3",
-                "cas": "584-08-7",
+                "name": "Sodium carbonate",
+                "abbreviation": "Na2CO3",
+                "cas": "497-19-8",
                 "smiles": null,
                 "equivalents": null,
                 "role": "base"
               },
               "solvent": {
-                "name": "Ethanol",
-                "abbreviation": "EtOH",
-                "cas": "64-17-5",
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
                 "smiles": null,
                 "equivalents": null,
                 "role": "solvent"
               },
               "confidence": "LOW",
-              "fusion_score": 0.3194805194805195,
+              "fusion_score": 0.3053646051820346,
               "component_scores": {
-                "precedent": 0.6,
-                "analytics": 0.2,
+                "precedent": 0.0,
+                "analytics": 0.602899348692735,
                 "rules": 0.0,
                 "ml": 0.5
               },
@@ -1584,14 +1579,14 @@
                 "δ": 0.0
               },
               "support": {
-                "count": 6,
+                "count": 0,
                 "fraction_core": 0.0,
                 "reference_population": 10
               }
             },
             "combo": {
-              "base_uid": "584-08-7",
-              "solvent_uid": "64-17-5"
+              "base_uid": "Sodium carbonate",
+              "solvent_uid": "Water"
             }
           }
         ],
@@ -1615,14 +1610,14 @@
         },
         "reasoning": [
           "Low similarity (0.50) → precedents less relevant",
-          "Large dataset (n=50,215) → trust analytics",
+          "Large dataset (n=50,214) → trust analytics",
           "No strong rule match → low rule weight",
           "No ML model available → δ=0"
         ],
         "evidence_summary": {
           "precedents": 10,
-          "diversity": 0.5555555555555556,
-          "dataset_size": 50215
+          "diversity": 0.6714975845410629,
+          "dataset_size": 50214
         }
       },
       "constraint_filters": {}

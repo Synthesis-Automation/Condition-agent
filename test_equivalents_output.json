@@ -1,14 +1,13 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T07:34:14.370483Z",
-    "model": "Rule-based-Suzuki_db.json",
+    "generated_at": "2025-10-09T08:18:24.000331Z",
+    "model": "Rule-based",
     "model_version": "1.0.0",
     "status": "success",
-    "version": "2.0",
-    "processing_time_ms": 3.92
+    "version": "2.0"
   },
   "input": {
-    "reaction_smiles": "Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1",
+    "reaction_smiles": "c1ccc(B(O)O)cc1.Brc1ccc(C(F)(F)F)cc1>>c1ccc(-c2ccc(C(F)(F)F)cc2)cc1",
     "family": "Suzuki_Miyaura"
   },
   "detection": {
@@ -22,7 +21,7 @@
       "rank": 1,
       "chemicals": [
         {
-          "smiles": "Ic1ccncc1",
+          "smiles": "c1ccc(B(O)O)cc1",
           "role": "electrophile",
           "name": null,
           "abbreviation": null,
@@ -30,7 +29,7 @@
           "equivalents": null
         },
         {
-          "smiles": "c1ccc(B(O)O)cc1",
+          "smiles": "Brc1ccc(C(F)(F)F)cc1",
           "role": "nucleophile",
           "name": null,
           "abbreviation": null,
@@ -38,31 +37,31 @@
           "equivalents": null
         },
         {
-          "name": "Pd2(dba)3",
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
           "role": "metal_precursor",
           "notes": "Pd2(dba)3",
-          "abbreviation": null,
-          "cas": null,
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
           "smiles": null,
-          "equivalents": null
+          "equivalents": 0.01
         },
         {
           "name": "SPhos",
           "role": "ligand",
           "notes": "SPhos",
-          "abbreviation": null,
-          "cas": null,
+          "abbreviation": "SPhos",
+          "cas": "657408-07-6",
           "smiles": null,
-          "equivalents": null
+          "equivalents": 0.02
         },
         {
-          "name": "K2CO3",
+          "name": "Potassium carbonate",
           "role": "base",
           "notes": "K2CO3",
-          "abbreviation": null,
-          "cas": null,
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
           "smiles": null,
-          "equivalents": null
+          "equivalents": 2.0
         },
         {
           "name": "THF/H2O",
@@ -113,12 +112,12 @@
       "trace": {
         "normalization": {
           "reactant_smiles": [
-            "Ic1ccncc1",
-            "c1ccc(B(O)O)cc1"
+            "c1ccc(B(O)O)cc1",
+            "Brc1ccc(C(F)(F)F)cc1"
           ],
           "kept_reactants": [
-            "Ic1ccncc1",
-            "c1ccc(B(O)O)cc1"
+            "c1ccc(B(O)O)cc1",
+            "Brc1ccc(C(F)(F)F)cc1"
           ],
           "dropped_reactants": [],
           "smarts_bag": [
@@ -127,7 +126,7 @@
           "anchor_hits": [
             {
               "anchor": "[c]-[Cl,Br,I]",
-              "reactant_index": 0,
+              "reactant_index": 1,
               "atom_indices": [
                 1,
                 0
@@ -154,9 +153,9 @@
             "matches": [
               {
                 "smarts": "[c:1]-[I,Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Ic1ccncc1",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "Brc1ccc(C(F)(F)F)cc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -165,8 +164,8 @@
               },
               {
                 "smarts": "[B:3](-[O])(-[O])-[c:4]",
-                "masked_index": 1,
-                "reactant_index": 1,
+                "masked_index": 0,
+                "reactant_index": 0,
                 "reactant_smiles": "c1ccc(B(O)O)cc1",
                 "match_count": 1,
                 "atom_indices": [
@@ -197,9 +196,10 @@
             "priority": 60,
             "specificity": 6,
             "matches": [],
-            "missing": [],
-            "matched": false,
-            "filtered": true
+            "missing": [
+              "[c:1]-[Cl:2]"
+            ],
+            "matched": false
           },
           {
             "id": "SCDB-SUZ-ARCL-ERich-L95",
@@ -258,9 +258,21 @@
             "type": "scheme",
             "priority": 66,
             "specificity": 10,
-            "matches": [],
+            "matches": [
+              {
+                "smarts": "[c:1]-[Br:2]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "Brc1ccc(C(F)(F)F)cc1",
+                "match_count": 1,
+                "atom_indices": [
+                  1,
+                  0
+                ]
+              }
+            ],
             "missing": [
-              "[c:1]-[Br:2]"
+              "[B:3](-[O])(-[O])-[c:4]1[o,s][c][c][c]1"
             ],
             "matched": false
           },
@@ -272,9 +284,9 @@
             "matches": [
               {
                 "smarts": "[c:1]-[I,Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Ic1ccncc1",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "Brc1ccc(C(F)(F)F)cc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -292,9 +304,21 @@
             "type": "scheme",
             "priority": 48,
             "specificity": 8,
-            "matches": [],
+            "matches": [
+              {
+                "smarts": "[c:1]-[Br:2]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "Brc1ccc(C(F)(F)F)cc1",
+                "match_count": 1,
+                "atom_indices": [
+                  1,
+                  0
+                ]
+              }
+            ],
             "missing": [
-              "[c:1]-[Br:2]"
+              "[B:3](-[O])(-[O])-[c:4]([!H])([!H])"
             ],
             "matched": false
           },
@@ -354,9 +378,21 @@
             "type": "scheme",
             "priority": 64,
             "specificity": 11,
-            "matches": [],
+            "matches": [
+              {
+                "smarts": "[c:1]-[Br:2]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "Brc1ccc(C(F)(F)F)cc1",
+                "match_count": 1,
+                "atom_indices": [
+                  1,
+                  0
+                ]
+              }
+            ],
             "missing": [
-              "[c:1]-[Br:2]"
+              "[B:3](-[O])(-[O])-[c:4]1[n][c,n][c,n][c,n][c,n]1"
             ],
             "matched": false
           },
@@ -421,12 +457,12 @@
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "0.5–1.5%"
+          "amount": "0.5\u20131.5%"
         },
         {
           "name": "SPhos",
           "role": "ligand",
-          "amount": "1.0–3.0%"
+          "amount": "1.0\u20133.0%"
         },
         {
           "name": "K2CO3",

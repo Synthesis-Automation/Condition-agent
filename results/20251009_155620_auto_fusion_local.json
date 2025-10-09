@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "generated_at": "2025-10-09T07:56:21.190348Z",
+    "model": "Fusion-hybrid",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 384.98
+  },
+  "input": {
+    "reaction_smiles": "https://www.orgsyn.org/demo.aspx?prep=v102p0367",
+    "family": "Unknown"
+  },
+  "detection": {
+    "family": "Unknown",
+    "detected_reaction_type": "Unknown",
+    "method": "fusion",
+    "confidence": 0.0
+  },
+  "recommended_conditions": [],
+  "extras": {
+    "fusion_meta": {
+      "adaptive_weights": {
+        "α": 0.2706502636203867,
+        "β": 0.5536028119507909,
+        "γ": 0.17574692442882253,
+        "δ": 0.0
+      },
+      "reasoning": [
+        "Few precedents (n=0) → rely more on analytics",
+        "High diversity (1.00) → precedents representative",
+        "Low similarity (0.00) → precedents less relevant",
+        "Small dataset (n=0) → analytics less reliable",
+        "No strong rule match → low rule weight",
+        "No ML model available → δ=0"
+      ],
+      "evidence_summary": {
+        "precedents": 0,
+        "diversity": 1.0,
+        "dataset_size": 0
+      }
+    },
+    "raw_response": {
+      "input": "https://www.orgsyn.org/demo.aspx?prep=v102p0367>>",
+      "family": "Unknown",
+      "features": {},
+      "bin": null,
+      "recommendation": {
+        "core": null,
+        "base_uid": null,
+        "solvent_uid": null,
+        "T_C": null,
+        "time_h": null,
+        "confidence": 0.0,
+        "fusion_score": 0.0,
+        "fusion_method": "multi_source_evidence"
+      },
+      "alternatives": {
+        "cores": [],
+        "bases": [],
+        "solvents": []
+      },
+      "precedent_pack": {
+        "precedents": [],
+        "support": 0,
+        "similarities": [],
+        "diversity_score": 1.0,
+        "avg_similarity": 0.0,
+        "method": "fusion"
+      },
+      "reasons": "Few precedents (n=0) → rely more on analytics\nHigh diversity (1.00) → precedents representative\nLow similarity (0.00) → precedents less relevant\nSmall dataset (n=0) → analytics less reliable\nNo strong rule match → low rule weight\nNo ML model available → δ=0",
+      "formatted": {
+        "meta": {
+          "status": "success",
+          "model": "fusion",
+          "version": "2.0",
+          "method": "multi_source_evidence_fusion",
+          "adaptive_weights": {
+            "α": 0.2706502636203867,
+            "β": 0.5536028119507909,
+            "γ": 0.17574692442882253,
+            "δ": 0.0
+          }
+        },
+        "input": {
+          "reaction_smiles": "https://www.orgsyn.org/demo.aspx?prep=v102p0367>>",
+          "family": "Unknown"
+        },
+        "detection": {
+          "family": "Unknown",
+          "confidence": 0.0
+        },
+        "recommended_conditions": [],
+        "precedent_summary": {
+          "total_precedents": 0,
+          "chosen_core": null,
+          "core_support": 0
+        }
+      },
+      "detection": {
+        "auto_family": null,
+        "rule_family": "Unknown",
+        "source": "auto"
+      },
+      "fusion_meta": {
+        "adaptive_weights": {
+          "α": 0.2706502636203867,
+          "β": 0.5536028119507909,
+          "γ": 0.17574692442882253,
+          "δ": 0.0
+        },
+        "reasoning": [
+          "Few precedents (n=0) → rely more on analytics",
+          "High diversity (1.00) → precedents representative",
+          "Low similarity (0.00) → precedents less relevant",
+          "Small dataset (n=0) → analytics less reliable",
+          "No strong rule match → low rule weight",
+          "No ML model available → δ=0"
+        ],
+        "evidence_summary": {
+          "precedents": 0,
+          "diversity": 1.0,
+          "dataset_size": 0
+        }
+      },
+      "constraint_filters": {}
+    }
+  }
+}
