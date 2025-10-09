@@ -14,53 +14,6 @@
         "dppf_option",
         "alkoxide_or_carbonate"
       ],
-      "conditions": {
-        "ni_source": [
-          "Ni(cod)2",
-          "NiCl2(dme)"
-        ],
-        "ligands": [
-          "1,10-phenanthroline",
-          "dtbbpy",
-          "dppf"
-        ],
-        "base": [
-          "NaOtBu",
-          "K3PO4",
-          "K2CO3"
-        ],
-        "solvent": [
-          "2-MeTHF",
-          "toluene",
-          "dioxane"
-        ],
-        "temperature_C": [
-          80,
-          110
-        ],
-        "time_h": [
-          6,
-          16
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            2.0,
-            10.0
-          ],
-          "ligand_mol%": [
-            3.0,
-            20.0
-          ],
-          "base_eq": [
-            1.8,
-            2.5
-          ]
-        },
-        "concentration_M": [
-          0.1,
-          0.3
-        ]
-      },
       "env": {
         "anchors": {
           "lg_bearing_c_mapno": 1,
@@ -86,7 +39,39 @@
       "notes": [
         "Thermal Ni conditions for ArCl → anilines; dtbbpy/phen or dppf commonly used with alkoxide or carbonate bases.",
         "2-MeTHF is a robust, greener medium for these couplings."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "Ni(cod)2",
+          "role": "metal_source",
+          "amount": "2–10%"
+        },
+        {
+          "name": "1,10-phenanthroline",
+          "role": "ligand",
+          "amount": "3–20%"
+        },
+        {
+          "name": "NaOtBu",
+          "role": "base",
+          "amount": "180–250%"
+        },
+        {
+          "name": "2-MeTHF",
+          "role": "solvent",
+          "amount": "0.1–0.3M"
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          80.0,
+          110.0
+        ],
+        "time_h": [
+          6.0,
+          16.0
+        ]
+      }
     },
     {
       "id": "SCDB-NI-ARBRI-ANILINE-thermal",
@@ -100,48 +85,6 @@
         "thermal",
         "bipyridine_or_phen"
       ],
-      "conditions": {
-        "ni_source": [
-          "Ni(cod)2",
-          "NiBr2(dme)"
-        ],
-        "ligands": [
-          "dtbbpy",
-          "1,10-phenanthroline"
-        ],
-        "base": [
-          "K3PO4",
-          "K2CO3",
-          "NaOtBu"
-        ],
-        "solvent": [
-          "toluene",
-          "dioxane",
-          "DMA"
-        ],
-        "temperature_C": [
-          70,
-          100
-        ],
-        "time_h": [
-          4,
-          12
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            1.0,
-            6.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            12.0
-          ],
-          "base_eq": [
-            1.8,
-            2.3
-          ]
-        }
-      },
       "env": {
         "anchors": {
           "lg_bearing_c_mapno": 1,
@@ -167,7 +110,39 @@
       },
       "notes": [
         "Less forcing than ArCl; dtbbpy/phen give reliable performance."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "Ni(cod)2",
+          "role": "metal_source",
+          "amount": "1–6%"
+        },
+        {
+          "name": "dtbbpy",
+          "role": "ligand",
+          "amount": "2–12%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "180–230%"
+        },
+        {
+          "name": "toluene",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          70.0,
+          100.0
+        ],
+        "time_h": [
+          4.0,
+          12.0
+        ]
+      }
     },
     {
       "id": "SCDB-NI-OSULFAMATE-ANILINE-NHC",
@@ -182,45 +157,6 @@
         "alkoxide_base",
         "toluene"
       ],
-      "conditions": {
-        "ni_source": [
-          "Ni(cod)2"
-        ],
-        "ligands": [
-          "SIPr·HCl (with base preactivation)",
-          "IPr·HCl"
-        ],
-        "base": [
-          "NaOtBu",
-          "KOtBu"
-        ],
-        "solvent": [
-          "toluene",
-          "dioxane"
-        ],
-        "temperature_C": [
-          80,
-          110
-        ],
-        "time_h": [
-          6,
-          18
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            2.0,
-            10.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            15.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
-      },
       "env": {
         "features_from_smiles": {
           "electrophile.is_sulfamate_or_carbamate": "true if Ar-OSO2NR2 or Ar-OC(=O)NR2 detected",
@@ -240,7 +176,39 @@
       },
       "notes": [
         "NHC–Ni excels for O-activated electrophiles; strong alkoxide base required."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "Ni(cod)2",
+          "role": "metal_source",
+          "amount": "2–10%"
+        },
+        {
+          "name": "SIPr·HCl",
+          "role": "ligand",
+          "amount": "2–15%"
+        },
+        {
+          "name": "NaOtBu",
+          "role": "base",
+          "amount": "200–250%"
+        },
+        {
+          "name": "toluene",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          80.0,
+          110.0
+        ],
+        "time_h": [
+          6.0,
+          18.0
+        ]
+      }
     },
     {
       "id": "SCDB-NI-ARCL-ALIPHATIC-SEC",
@@ -255,47 +223,6 @@
         "bipyridine_or_phen",
         "carbonate_base"
       ],
-      "conditions": {
-        "ni_source": [
-          "Ni(cod)2",
-          "NiCl2(dme)"
-        ],
-        "ligands": [
-          "dtbbpy",
-          "1,10-phenanthroline"
-        ],
-        "base": [
-          "K3PO4",
-          "K2CO3"
-        ],
-        "solvent": [
-          "2-MeTHF",
-          "dioxane",
-          "toluene"
-        ],
-        "temperature_C": [
-          80,
-          105
-        ],
-        "time_h": [
-          8,
-          16
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            3.0,
-            8.0
-          ],
-          "ligand_mol%": [
-            6.0,
-            16.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
-      },
       "env": {
         "features_from_smiles": {
           "electrophile.lg_class": "Cl",
@@ -312,7 +239,39 @@
       },
       "notes": [
         "Keep temp ≤105 °C to limit β-H pathways; inorganic carbonate/phosphate bases preferred."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "Ni(cod)2",
+          "role": "metal_source",
+          "amount": "3–8%"
+        },
+        {
+          "name": "dtbbpy",
+          "role": "ligand",
+          "amount": "6–16%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "200–250%"
+        },
+        {
+          "name": "2-MeTHF",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          80.0,
+          105.0
+        ],
+        "time_h": [
+          8.0,
+          16.0
+        ]
+      }
     },
     {
       "id": "SCDB-NI-AIRSTABLE-PRECAT-ANILINE",
@@ -326,49 +285,6 @@
         "carbonate_or_alkoxide",
         "dioxane_or_toluene"
       ],
-      "conditions": {
-        "ni_source": [
-          "(PAd-DalPhos)Ni(allyl)Cl (or related)",
-          "L2Ni(aryl)X / LNi(aryl)X (air-stable)"
-        ],
-        "ligands": [
-          "PAd-DalPhos",
-          "dppf",
-          "XantPhos"
-        ],
-        "base": [
-          "K3PO4",
-          "NaOtBu",
-          "Cs2CO3"
-        ],
-        "solvent": [
-          "1,4-dioxane",
-          "toluene",
-          "2-MeTHF"
-        ],
-        "temperature_C": [
-          80,
-          100
-        ],
-        "time_h": [
-          6,
-          14
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            1.0,
-            3.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            6.0
-          ],
-          "base_eq": [
-            1.8,
-            2.5
-          ]
-        }
-      },
       "env": {
         "features_from_smiles": {
           "electrophile.lg_class": "Cl/Br/I/OTf",
@@ -387,7 +303,39 @@
       },
       "notes": [
         "Use air-stable precatalysts to simplify handling and broaden compatibility; strong performance on diverse electrophiles including ArCl and sulfonates."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "(PAd-DalPhos)Ni(allyl)Cl (or related)",
+          "role": "metal_source",
+          "amount": "1–3%"
+        },
+        {
+          "name": "PAd-DalPhos",
+          "role": "ligand",
+          "amount": "2–6%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "180–250%"
+        },
+        {
+          "name": "1,4-dioxane",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          80.0,
+          100.0
+        ],
+        "time_h": [
+          6.0,
+          14.0
+        ]
+      }
     },
     {
       "id": "SCDB-NI-OTf-OSulfonate-DBU",
@@ -400,49 +348,6 @@
         "DBU_or_carbonate",
         "dppf_or_XantPhos"
       ],
-      "conditions": {
-        "ni_source": [
-          "air-stable LNi(aryl)X",
-          "Ni(cod)2 + ligand"
-        ],
-        "ligands": [
-          "dppf",
-          "XantPhos",
-          "PAd-DalPhos"
-        ],
-        "base": [
-          "DBU",
-          "K2CO3",
-          "K3PO4"
-        ],
-        "solvent": [
-          "DMF",
-          "toluene",
-          "dioxane"
-        ],
-        "temperature_C": [
-          80,
-          105
-        ],
-        "time_h": [
-          8,
-          16
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            1.0,
-            3.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            6.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
-      },
       "env": {
         "features_from_smiles": {
           "electrophile.lg_class": "OTf/OMs/OFs",
@@ -468,7 +373,39 @@
       },
       "notes": [
         "DBU can enable homogeneous conditions; XantPhos/dppf platforms are reliable for sulfonates."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "air-stable LNi(aryl)X",
+          "role": "metal_source",
+          "amount": "1–3%"
+        },
+        {
+          "name": "dppf",
+          "role": "ligand",
+          "amount": "2–6%"
+        },
+        {
+          "name": "DBU",
+          "role": "base",
+          "amount": "200–250%"
+        },
+        {
+          "name": "DMF",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          80.0,
+          105.0
+        ],
+        "time_h": [
+          8.0,
+          16.0
+        ]
+      }
     },
     {
       "id": "SCDB-NI-OPIV-ANILINE",
@@ -482,44 +419,6 @@
         "NHC_or_bisphosphine",
         "alkoxide"
       ],
-      "conditions": {
-        "ni_source": [
-          "Ni(cod)2"
-        ],
-        "ligands": [
-          "SIPr·HCl/IPr·HCl",
-          "dppf"
-        ],
-        "base": [
-          "NaOtBu",
-          "KOtBu"
-        ],
-        "solvent": [
-          "toluene"
-        ],
-        "temperature_C": [
-          90,
-          110
-        ],
-        "time_h": [
-          8,
-          18
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            3.0,
-            10.0
-          ],
-          "ligand_mol%": [
-            6.0,
-            20.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
-      },
       "env": {
         "features_from_smiles": {
           "electrophile.is_pivalate_or_carbamate": true,
@@ -536,9 +435,40 @@
       },
       "notes": [
         "Representative of Ni activation of aryl carboxylates; strong alkoxide base is typical."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "Ni(cod)2",
+          "role": "metal_source",
+          "amount": "3–10%"
+        },
+        {
+          "name": "SIPr·HCl/IPr·HCl",
+          "role": "ligand",
+          "amount": "6–20%"
+        },
+        {
+          "name": "NaOtBu",
+          "role": "base",
+          "amount": "200–250%"
+        },
+        {
+          "name": "toluene",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          90.0,
+          110.0
+        ],
+        "time_h": [
+          8.0,
+          18.0
+        ]
+      }
     },
-
     {
       "id": "SCDB-NI-PRX-ARX-ANILINE",
       "reaction_type": "Nickel_CN",
@@ -555,51 +485,6 @@
         "blue_LED",
         "rt_to_40C"
       ],
-      "conditions": {
-        "ni_source": [
-          "NiBr2·glyme",
-          "NiCl2·dme"
-        ],
-        "ligands": [
-          "dtbbpy"
-        ],
-        "base": [
-          "DBU",
-          "K2CO3",
-          "K3PO4"
-        ],
-        "solvent": [
-          "DMA",
-          "MeCN"
-        ],
-        "additives": [
-          "[Ir(ppy)2(dtbbpy)]PF6 0.5–1.5 mol%",
-          "or 4CzIPN 1–2 mol% (organic PC)",
-          "blue LED irradiation"
-        ],
-        "temperature_C": [
-          20,
-          40
-        ],
-        "time_h": [
-          8,
-          18
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            1.0,
-            5.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            10.0
-          ],
-          "base_eq": [
-            1.5,
-            2.5
-          ]
-        }
-      },
       "env": {
         "features_from_smiles": {
           "electrophile.lg_class": "Cl/Br/I",
@@ -619,7 +504,54 @@
       },
       "notes": [
         "Mild room-temperature platform; dtbbpy/Ni with Ir or organic PCs; DBU frequently used."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "NiBr2·glyme",
+          "role": "metal_source",
+          "amount": "1–5%"
+        },
+        {
+          "name": "dtbbpy",
+          "role": "ligand",
+          "amount": "2–10%"
+        },
+        {
+          "name": "DBU",
+          "role": "base",
+          "amount": "150–250%"
+        },
+        {
+          "name": "[Ir(ppy)2(dtbbpy)]PF6 0.5–1.5 mol%",
+          "role": "additive",
+          "amount": ""
+        },
+        {
+          "name": "4CzIPN 1–2 mol% (organic PC)",
+          "role": "additive",
+          "amount": ""
+        },
+        {
+          "name": "blue LED irradiation",
+          "role": "additive",
+          "amount": ""
+        },
+        {
+          "name": "DMA",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          20.0,
+          40.0
+        ],
+        "time_h": [
+          8.0,
+          18.0
+        ]
+      }
     },
     {
       "id": "SCDB-NI-ELEC-ARX-ANILINE",
@@ -635,49 +567,6 @@
         "DMA_or_MeCN",
         "rt"
       ],
-      "conditions": {
-        "ni_source": [
-          "NiBr2·glyme"
-        ],
-        "ligands": [
-          "dtbbpy"
-        ],
-        "base": [
-          "DBU",
-          "Et3N"
-        ],
-        "solvent": [
-          "DMA",
-          "MeCN"
-        ],
-        "additives": [
-          "graphite or carbon felt electrodes",
-          "undivided cell",
-          "constant current (typ. 2–10 mA)"
-        ],
-        "temperature_C": [
-          20,
-          30
-        ],
-        "time_h": [
-          6,
-          14
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            2.0,
-            5.0
-          ],
-          "ligand_mol%": [
-            4.0,
-            10.0
-          ],
-          "base_eq": [
-            2.0,
-            3.0
-          ]
-        }
-      },
       "env": {
         "features_from_smiles": {
           "electrophile.lg_class": "Cl/Br/I",
@@ -697,9 +586,55 @@
       },
       "notes": [
         "Room-temperature alternative to photoredox; uses electricity to drive Ni redox cycling."
-      ]
+      ],
+      "reagents": [
+        {
+          "name": "NiBr2·glyme",
+          "role": "metal_source",
+          "amount": "2–5%"
+        },
+        {
+          "name": "dtbbpy",
+          "role": "ligand",
+          "amount": "4–10%"
+        },
+        {
+          "name": "DBU",
+          "role": "base",
+          "amount": "200–300%"
+        },
+        {
+          "name": "graphite or carbon felt electrodes",
+          "role": "additive",
+          "amount": ""
+        },
+        {
+          "name": "undivided cell",
+          "role": "additive",
+          "amount": ""
+        },
+        {
+          "name": "constant current (typ. 2–10 mA)",
+          "role": "additive",
+          "amount": ""
+        },
+        {
+          "name": "DMA",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {
+        "temperature_C": [
+          20.0,
+          30.0
+        ],
+        "time_h": [
+          6.0,
+          14.0
+        ]
+      }
     },
-
     {
       "id": "M-NI-ARCL-ANILINE",
       "type": "scheme",
@@ -709,47 +644,39 @@
         "[NH2]-[c]"
       ],
       "priority": 60,
+      "updated_at": "2025-10-06T03:40:00Z",
+      "reagents": [
+        {
+          "name": "Ni(cod)2",
+          "role": "metal_source",
+          "amount": "3–6%"
+        },
+        {
+          "name": "dtbbpy",
+          "role": "ligand",
+          "amount": "6–12%"
+        },
+        {
+          "name": "NaOtBu",
+          "role": "base",
+          "amount": "200–220%"
+        },
+        {
+          "name": "2-MeTHF",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
       "conditions": {
-        "ni_source": [
-          "Ni(cod)2",
-          "NiCl2(dme)"
-        ],
-        "ligands": [
-          "dtbbpy",
-          "1,10-phenanthroline"
-        ],
-        "base": [
-          "NaOtBu",
-          "K3PO4"
-        ],
-        "solvent": [
-          "2-MeTHF",
-          "toluene"
-        ],
         "temperature_C": [
-          90,
-          105
+          90.0,
+          105.0
         ],
         "time_h": [
-          8,
-          14
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            3.0,
-            6.0
-          ],
-          "ligand_mol%": [
-            6.0,
-            12.0
-          ],
-          "base_eq": [
-            2.0,
-            2.2
-          ]
-        }
-      },
-      "updated_at": "2025-10-06T03:40:00Z"
+          8.0,
+          14.0
+        ]
+      }
     },
     {
       "id": "M-NI-OTf-DBU",
@@ -760,46 +687,39 @@
         "[N;H1,H2]"
       ],
       "priority": 58,
+      "updated_at": "2025-10-06T03:40:00Z",
+      "reagents": [
+        {
+          "name": "air-stable LNi(aryl)X",
+          "role": "metal_source",
+          "amount": "1–3%"
+        },
+        {
+          "name": "XantPhos",
+          "role": "ligand",
+          "amount": "2–6%"
+        },
+        {
+          "name": "DBU",
+          "role": "base",
+          "amount": "200–230%"
+        },
+        {
+          "name": "DMF",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
       "conditions": {
-        "ni_source": [
-          "air-stable LNi(aryl)X"
-        ],
-        "ligands": [
-          "XantPhos",
-          "dppf"
-        ],
-        "base": [
-          "DBU",
-          "K2CO3"
-        ],
-        "solvent": [
-          "DMF",
-          "toluene"
-        ],
         "temperature_C": [
-          85,
-          105
+          85.0,
+          105.0
         ],
         "time_h": [
-          8,
-          16
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            1.0,
-            3.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            6.0
-          ],
-          "base_eq": [
-            2.0,
-            2.3
-          ]
-        }
-      },
-      "updated_at": "2025-10-06T03:40:00Z"
+          8.0,
+          16.0
+        ]
+      }
     },
     {
       "id": "M-NI-PRX-ARBR-RT",
@@ -810,46 +730,40 @@
         "[N;H1,H2]"
       ],
       "priority": 62,
+      "updated_at": "2025-10-06T03:40:00Z",
+      "reagents": [
+        {
+          "name": "NiBr2·glyme",
+          "role": "metal_source",
+          "amount": "2–4%"
+        },
+        {
+          "name": "dtbbpy",
+          "role": "ligand",
+          "amount": "4–8%"
+        },
+        {
+          "name": "DBU",
+          "role": "base",
+          "amount": "200–220%"
+        },
+        {
+          "name": "DMA",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
       "conditions": {
-        "ni_source": [
-          "NiBr2·glyme"
-        ],
-        "ligands": [
-          "dtbbpy"
-        ],
-        "base": [
-          "DBU"
-        ],
-        "solvent": [
-          "DMA",
-          "MeCN"
-        ],
         "temperature_C": [
-          20,
-          30
+          20.0,
+          30.0
         ],
         "time_h": [
-          10,
-          16
-        ],
-        "loadings": {
-          "Ni_mol%": [
-            2.0,
-            4.0
-          ],
-          "ligand_mol%": [
-            4.0,
-            8.0
-          ],
-          "base_eq": [
-            2.0,
-            2.2
-          ]
-        }
-      },
-      "updated_at": "2025-10-06T03:40:00Z"
+          10.0,
+          16.0
+        ]
+      }
     },
-
     {
       "id": "SCDB-NI-DEFAULT",
       "reaction_type": "Nickel_CN",
@@ -861,18 +775,37 @@
       ],
       "default_condition": {
         "rationale": "Generalist Ni fallback from literature themes; robust across common partners.",
-        "condition_core": "Ni/dtbbpy + carbonate in 2-MeTHF",
-        "ni_source": "NiCl2(dme)",
-        "ligand": "dtbbpy",
-        "base": "K3PO4",
-        "solvent": "2-MeTHF",
-        "temperature_C": 95,
-        "time_h": 12,
-        "concentration_M": 0.2,
-        "loadings": {
-          "Ni_mol%": 4.0,
-          "ligand_mol%": 8.0,
-          "base_eq": 2.0
+        "reagents": [
+          {
+            "name": "NiCl2(dme)",
+            "role": "metal_source",
+            "amount": "4%"
+          },
+          {
+            "name": "dtbbpy",
+            "role": "ligand",
+            "amount": "8%"
+          },
+          {
+            "name": "K3PO4",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "2-MeTHF",
+            "role": "solvent",
+            "amount": "0.2M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            95.0,
+            95.0
+          ],
+          "time_h": [
+            12.0,
+            12.0
+          ]
         }
       },
       "notes": [
@@ -897,18 +830,37 @@
       },
       "default_condition": {
         "rationale": "ArCl usually needs hotter thermal Ni or air-stable precatalyst.",
-        "condition_core": "Ni/dtbbpy + NaOtBu",
-        "ni_source": "Ni(cod)2",
-        "ligand": "dtbbpy",
-        "base": "NaOtBu",
-        "solvent": "2-MeTHF",
-        "temperature_C": 100,
-        "time_h": 14,
-        "concentration_M": 0.15,
-        "loadings": {
-          "Ni_mol%": 5.0,
-          "ligand_mol%": 10.0,
-          "base_eq": 2.0
+        "reagents": [
+          {
+            "name": "Ni(cod)2",
+            "role": "metal_source",
+            "amount": "5%"
+          },
+          {
+            "name": "dtbbpy",
+            "role": "ligand",
+            "amount": "10%"
+          },
+          {
+            "name": "NaOtBu",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "2-MeTHF",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            100.0,
+            100.0
+          ],
+          "time_h": [
+            14.0,
+            14.0
+          ]
         }
       },
       "notes": [
@@ -933,18 +885,37 @@
       },
       "default_condition": {
         "rationale": "Ni handles aryl sulfonates well under dppf/XantPhos with DBU or carbonate.",
-        "condition_core": "air-stable LNi(aryl)X / dppf + DBU",
-        "ni_source": "LNi(aryl)X (air-stable)",
-        "ligand": "dppf",
-        "base": "DBU",
-        "solvent": "DMF",
-        "temperature_C": 95,
-        "time_h": 12,
-        "concentration_M": 0.2,
-        "loadings": {
-          "Ni_mol%": 2.0,
-          "ligand_mol%": 4.0,
-          "base_eq": 2.0
+        "reagents": [
+          {
+            "name": "LNi(aryl)X (air-stable)",
+            "role": "metal_source",
+            "amount": "2%"
+          },
+          {
+            "name": "dppf",
+            "role": "ligand",
+            "amount": "4%"
+          },
+          {
+            "name": "DBU",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "DMF",
+            "role": "solvent",
+            "amount": "0.2M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            95.0,
+            95.0
+          ],
+          "time_h": [
+            12.0,
+            12.0
+          ]
         }
       },
       "notes": [
@@ -966,23 +937,38 @@
       ],
       "default_condition": {
         "rationale": "Mild room-temp platform for diverse aryl halides and amines.",
-        "condition_core": "NiBr2·glyme/dtbbpy + Ir PC + DBU, blue LEDs",
-        "ni_source": "NiBr2·glyme",
-        "ligand": "dtbbpy",
-        "base": "DBU",
-        "solvent": "DMA",
-        "temperature_C": 25,
-        "time_h": 12,
-        "concentration_M": 0.1,
-        "loadings": {
-          "Ni_mol%": 2.0,
-          "ligand_mol%": 4.0,
-          "base_eq": 2.0
-        },
-        "additives": [
-          "[Ir(ppy)2(dtbbpy)]PF6 (1 mol%)",
-          "blue LED irradiation"
-        ]
+        "reagents": [
+          {
+            "name": "NiBr2·glyme",
+            "role": "metal_source",
+            "amount": "2%"
+          },
+          {
+            "name": "dtbbpy",
+            "role": "ligand",
+            "amount": "4%"
+          },
+          {
+            "name": "DBU",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "DMA",
+            "role": "solvent",
+            "amount": "0.1M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            25.0,
+            25.0
+          ],
+          "time_h": [
+            12.0,
+            12.0
+          ]
+        }
       },
       "notes": [
         "Organic photocatalyst 4CzIPN is an effective alternative."

@@ -302,7 +302,11 @@ def _convert_rule_match_to_recommendations(
     reaction_smiles: str,
     match_result: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
-    """Convert SCDB match results into standardized recommendation entries."""
+    """Convert SCDB match results into standardized recommendation entries.
+    
+    Supports both new standardized format (with 'reagents' array) and legacy format
+    (with direct keys like 'pd_source', 'ligand', 'base', 'solvent').
+    """
     conditions = match_result.get("conditions")
     if isinstance(conditions, dict):
         condition_entries = [conditions]
@@ -314,27 +318,65 @@ def _convert_rule_match_to_recommendations(
     if not condition_entries:
         return []
     
+    # Check if entry contains reagents data (new format is at match_result level via raw entry)
+    entry_raw = match_result.get("trace", {}).get("selected", {})
+    
     starting_materials = _starting_material_entries(reaction_smiles)
     recommendations: List[Dict[str, Any]] = []
     
     for idx, cond in enumerate(condition_entries, start=1):
         chemicals: List[Dict[str, Any]] = copy.deepcopy(starting_materials)
         
-        def add_entry(value: Any, role: str) -> None:
-            if not value:
-                return
-            if isinstance(value, dict):
-                chemicals.append(_normalize_chemical_entry(value, role))
-            else:
-                chemicals.append(_normalize_rule_string_value(str(value), role))
+        # Role mapping for new standardized format
+        role_mapping = {
+            "metal_source": "metal_precursor",
+            "metal_precursor": "metal_precursor",
+            "catalyst": "metal_precursor",
+            "ligand": "ligand",
+            "base": "base",
+            "solvent": "solvent",
+            "additive": "additive",
+            "partner": "partner",
+            "boron_partner": "partner",
+        }
         
-        add_entry(cond.get("pd_source") or cond.get("catalyst"), "metal_precursor")
-        add_entry(cond.get("ligand"), "ligand")
-        add_entry(cond.get("base"), "base")
-        add_entry(cond.get("solvent"), "solvent")
-        add_entry(cond.get("additive"), "additive")
-        add_entry(cond.get("boron_partner"), "partner")
-        add_entry(cond.get("condition_core"), "condition_core")
+        # Try new format first: check for reagents in the entry's raw data
+        reagents_added = False
+        if "reagents" in match_result:
+            # Reagents at match result level (passed through from entry)
+            reagents = match_result.get("reagents", [])
+            if isinstance(reagents, list):
+                for reagent in reagents:
+                    if isinstance(reagent, dict):
+                        name = reagent.get("name")
+                        role = reagent.get("role", "reagent")
+                        amount = reagent.get("amount")
+                        
+                        # Map role to output role
+                        output_role = role_mapping.get(role, role)
+                        
+                        if name:
+                            chemicals.append(_normalize_rule_string_value(str(name), output_role))
+                            reagents_added = True
+        
+        # Fallback to legacy format if reagents not found in new format
+        if not reagents_added:
+            def add_entry(value: Any, role: str) -> None:
+                if not value:
+                    return
+                if isinstance(value, dict):
+                    chemicals.append(_normalize_chemical_entry(value, role))
+                else:
+                    chemicals.append(_normalize_rule_string_value(str(value), role))
+            
+            # Legacy format extraction
+            add_entry(cond.get("pd_source") or cond.get("catalyst") or cond.get("metal_source"), "metal_precursor")
+            add_entry(cond.get("ligand"), "ligand")
+            add_entry(cond.get("base"), "base")
+            add_entry(cond.get("solvent"), "solvent")
+            add_entry(cond.get("additive"), "additive")
+            add_entry(cond.get("boron_partner") or cond.get("partner"), "partner")
+            add_entry(cond.get("condition_core"), "condition_core")
         
         recommendation = {
             "rank": idx,

@@ -615,6 +615,9 @@ def _match_scheme(db: SchemeConditionDB, rxn_smiles: str) -> MatchResult:
         },
     )
 
+    # Extract reagents from the selected entry's raw data (new standardized format)
+    reagents = selected_entry.raw.get("reagents") if hasattr(selected_entry, 'raw') else None
+
     return MatchResult(
         reaction_type=db.reaction_type,
         match_type=match_type,
@@ -623,6 +626,7 @@ def _match_scheme(db: SchemeConditionDB, rxn_smiles: str) -> MatchResult:
         priority=selected_entry.priority,
         conditions=conditions,
         trace=trace,
+        reagents=reagents,  # Pass reagents to MatchResult
     )
 
 

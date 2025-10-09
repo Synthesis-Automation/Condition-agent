@@ -137,11 +137,12 @@ class MatchResult:
     priority: int
     conditions: Mapping[str, Any]
     trace: Dict[str, Any]
+    reagents: Any = None  # New field for standardized reagents array
 
     def to_json_dict(self) -> Dict[str, Any]:
         """Return a JSON-serialisable dictionary."""
 
-        return {
+        result = {
             "reaction_type": self.reaction_type,
             "match_type": self.match_type,
             "entry_id": self.entry_id,
@@ -150,6 +151,12 @@ class MatchResult:
             "conditions": self._to_plain(self.conditions),
             "trace": self.trace,
         }
+        
+        # Include reagents if present (new standardized format)
+        if self.reagents is not None:
+            result["reagents"] = self.reagents
+        
+        return result
 
     @staticmethod
     def _to_plain(value: Mapping[str, Any]) -> Dict[str, Any]:
