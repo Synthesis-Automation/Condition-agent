@@ -1,14 +1,14 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T12:53:56.343512Z",
+    "generated_at": "2025-10-09T14:24:00.098199Z",
     "model": "Rule-based-Suzuki_db.json",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 4.04
+    "processing_time_ms": 15.09
   },
   "input": {
-    "reaction_smiles": "Brc1ccccc1.c1ncc(B(O)O)cn1>>c1ccc(-c2cnccn2)cc1",
+    "reaction_smiles": "C/C=C/Br.C=CB(O)O>>C/C=C/C=C",
     "family": "Suzuki_Miyaura"
   },
   "detection": {
@@ -22,7 +22,7 @@
       "rank": 1,
       "chemicals": [
         {
-          "smiles": "Brc1ccccc1",
+          "smiles": "C/C=C/Br",
           "role": "electrophile",
           "name": null,
           "abbreviation": null,
@@ -30,7 +30,7 @@
           "equivalents": null
         },
         {
-          "smiles": "c1ncc(B(O)O)cn1",
+          "smiles": "C=CB(O)O",
           "role": "nucleophile",
           "name": null,
           "abbreviation": null,
@@ -38,22 +38,13 @@
           "equivalents": null
         },
         {
-          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "name": "Pd(PPh3)4",
           "role": "metal_precursor",
-          "notes": "Pd2(dba)3",
-          "abbreviation": "Pd2(dba)3",
-          "cas": "51364-51-3",
+          "notes": "Pd(PPh3)4",
+          "abbreviation": null,
+          "cas": null,
           "smiles": null,
-          "equivalents": 0.015
-        },
-        {
-          "name": "SPhos",
-          "role": "ligand",
-          "notes": "SPhos",
-          "abbreviation": "SPhos",
-          "cas": "657408-07-6",
-          "smiles": null,
-          "equivalents": 0.03
+          "equivalents": 0.025
         },
         {
           "name": "Potassium carbonate",
@@ -67,7 +58,7 @@
         {
           "name": "THF/H2O",
           "role": "solvent",
-          "notes": "THF/H2O (4:1)",
+          "notes": "THF/H2O (9:1)",
           "abbreviation": null,
           "cas": null,
           "smiles": null,
@@ -76,20 +67,20 @@
       ],
       "conditions": {
         "temperature": [
-          45.0,
-          60.0
+          20.0,
+          30.0
         ],
         "time": [
-          6.0,
-          10.0
+          4.0,
+          8.0
         ],
         "atmosphere": null
       },
       "source": {
         "match_type": "scheme",
-        "entry_id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
-        "entry_name": "Aryl iodides/bromides + aryl boron (SPhos set)",
-        "priority": 46
+        "entry_id": "M-SUZ-VINYL-RT",
+        "entry_name": "Vinyl halide + vinyl boron (scheme-based, RT)",
+        "priority": 75
       }
     }
   ],
@@ -97,43 +88,32 @@
     "match": {
       "reaction_type": "Suzuki_Miyaura",
       "match_type": "scheme",
-      "entry_id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
-      "entry_name": "Aryl iodides/bromides + aryl boron (SPhos set)",
-      "priority": 46,
+      "entry_id": "M-SUZ-VINYL-RT",
+      "entry_name": "Vinyl halide + vinyl boron (scheme-based, RT)",
+      "priority": 75,
       "conditions": {
         "temperature_C": [
-          45.0,
-          60.0
+          20.0,
+          30.0
         ],
         "time_h": [
-          6.0,
-          10.0
+          4.0,
+          8.0
         ]
       },
       "trace": {
         "normalization": {
           "reactant_smiles": [
-            "Brc1ccccc1",
-            "c1ncc(B(O)O)cn1"
+            "C/C=C/Br",
+            "C=CB(O)O"
           ],
           "kept_reactants": [
-            "Brc1ccccc1",
-            "c1ncc(B(O)O)cn1"
+            "C/C=C/Br",
+            "C=CB(O)O"
           ],
           "dropped_reactants": [],
-          "smarts_bag": [
-            "[c]-[Cl,Br,I]"
-          ],
-          "anchor_hits": [
-            {
-              "anchor": "[c]-[Cl,Br,I]",
-              "reactant_index": 0,
-              "atom_indices": [
-                1,
-                0
-              ]
-            }
-          ]
+          "smarts_bag": [],
+          "anchor_hits": []
         },
         "evaluations": [
           {
@@ -151,34 +131,11 @@
             "type": "scheme",
             "priority": 46,
             "specificity": 6,
-            "matches": [
-              {
-                "smarts": "[c:1]-[I,Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccccc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              },
-              {
-                "smarts": "[B:3](-[O])(-[O])-[c:4]",
-                "masked_index": 1,
-                "reactant_index": 1,
-                "reactant_smiles": "c1ncc(B(O)O)cn1",
-                "match_count": 1,
-                "atom_indices": [
-                  4,
-                  5,
-                  6,
-                  3
-                ]
-              }
+            "matches": [],
+            "missing": [
+              "[c:1]-[I,Br:2]"
             ],
-            "missing": [],
-            "matched": true
+            "matched": false
           },
           {
             "id": "SCDB-SUZ-ARBR-ORTHO-XPhos",
@@ -236,11 +193,36 @@
             "type": "scheme",
             "priority": 72,
             "specificity": 8,
-            "matches": [],
-            "missing": [
-              "[C:1]=[C:2]-[Br:3]"
+            "matches": [
+              {
+                "smarts": "[C:1]=[C:2]-[Br:3]",
+                "masked_index": 0,
+                "reactant_index": 0,
+                "reactant_smiles": "C/C=C/Br",
+                "match_count": 1,
+                "atom_indices": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "smarts": "[B:4](-[O])(-[O])-[C:5]=[C:6]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "C=CB(O)O",
+                "match_count": 1,
+                "atom_indices": [
+                  2,
+                  3,
+                  4,
+                  1,
+                  0
+                ]
+              }
             ],
-            "matched": false
+            "missing": [],
+            "matched": true
           },
           {
             "id": "SCDB-SUZ-ALKYL-PRIMARYI-9BBN",
@@ -258,21 +240,9 @@
             "type": "scheme",
             "priority": 66,
             "specificity": 10,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccccc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]1[o,s][c][c][c]1"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -281,21 +251,9 @@
             "type": "scheme",
             "priority": 52,
             "specificity": 4,
-            "matches": [
-              {
-                "smarts": "[c:1]-[I,Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccccc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "B-B"
+              "[c:1]-[I,Br:2]"
             ],
             "matched": false
           },
@@ -304,21 +262,9 @@
             "type": "scheme",
             "priority": 48,
             "specificity": 8,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccccc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]([!H])([!H])"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -358,10 +304,36 @@
             "type": "scheme",
             "priority": 75,
             "specificity": 8,
-            "matches": [],
+            "matches": [
+              {
+                "smarts": "[C:1]=[C:2]-[I,Br:3]",
+                "masked_index": 0,
+                "reactant_index": 0,
+                "reactant_smiles": "C/C=C/Br",
+                "match_count": 1,
+                "atom_indices": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "smarts": "[B:4](-[O])(-[O])-[C:5]=[C:6]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "C=CB(O)O",
+                "match_count": 1,
+                "atom_indices": [
+                  2,
+                  3,
+                  4,
+                  1,
+                  0
+                ]
+              }
+            ],
             "missing": [],
-            "matched": false,
-            "filtered": true
+            "matched": true
           },
           {
             "id": "M-SUZ-BF3K-GENERAL",
@@ -378,21 +350,9 @@
             "type": "scheme",
             "priority": 64,
             "specificity": 11,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccccc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]1[n][c,n][c,n][c,n][c,n]1"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -442,27 +402,21 @@
             "specificity": 0,
             "matches": [],
             "missing": [],
-            "matched": false,
-            "filtered": true
+            "matched": true
           }
         ],
         "selected": {
-          "id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+          "id": "M-SUZ-VINYL-RT",
           "type": "scheme",
-          "priority": 46,
-          "specificity": 6
+          "priority": 75,
+          "specificity": 8
         }
       },
       "reagents": [
         {
-          "name": "Pd2(dba)3",
+          "name": "Pd(PPh3)4",
           "role": "metal_source",
-          "amount": "1.5%"
-        },
-        {
-          "name": "SPhos",
-          "role": "ligand",
-          "amount": "3.0%"
+          "amount": "2–3%"
         },
         {
           "name": "K2CO3",
@@ -470,7 +424,7 @@
           "amount": "200%"
         },
         {
-          "name": "THF/H2O (4:1)",
+          "name": "THF/H2O (9:1)",
           "role": "solvent",
           "amount": ""
         }

@@ -1,11 +1,11 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T14:03:57.538168Z",
+    "generated_at": "2025-10-09T14:21:41.571539Z",
     "model": "Rule-based-Suzuki_db.json",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 4.16
+    "processing_time_ms": 4.63
   },
   "input": {
     "reaction_smiles": "C/C=C/Br.C=CB(O)O>>C/C=C/C=C",

@@ -1,11 +1,11 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T14:04:02.490588Z",
+    "generated_at": "2025-10-09T14:24:05.110084Z",
     "model": "ML-precedent-knn",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 4951.21
+    "processing_time_ms": 5010.45
   },
   "input": {
     "reaction_smiles": "C/C=C/Br.C=CB(O)O>>C/C=C/C=C",
@@ -42,11 +42,11 @@
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
+          "id": "95464-05-4",
           "role": "metal_precursor",
-          "name": "Palladium",
+          "name": "Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct",
           "abbreviation": null,
-          "cas": "7440-05-3",
+          "cas": "95464-05-4",
           "smiles": null,
           "equivalents": null
         },
@@ -99,11 +99,11 @@
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
+          "id": "95464-05-4",
           "role": "metal_precursor",
-          "name": "Palladium",
+          "name": "Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct",
           "abbreviation": null,
-          "cas": "7440-05-3",
+          "cas": "95464-05-4",
           "smiles": null,
           "equivalents": null
         },
@@ -156,11 +156,11 @@
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
+          "id": "95464-05-4",
           "role": "metal_precursor",
-          "name": "Palladium",
+          "name": "Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct",
           "abbreviation": null,
-          "cas": "7440-05-3",
+          "cas": "95464-05-4",
           "smiles": null,
           "equivalents": null
         },
@@ -213,11 +213,11 @@
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
+          "id": "95464-05-4",
           "role": "metal_precursor",
-          "name": "Palladium",
+          "name": "Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct",
           "abbreviation": null,
-          "cas": "7440-05-3",
+          "cas": "95464-05-4",
           "smiles": null,
           "equivalents": null
         },
@@ -270,11 +270,11 @@
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
+          "id": "95464-05-4",
           "role": "metal_precursor",
-          "name": "Palladium",
+          "name": "Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct",
           "abbreviation": null,
-          "cas": "7440-05-3",
+          "cas": "95464-05-4",
           "smiles": null,
           "equivalents": null
         },
