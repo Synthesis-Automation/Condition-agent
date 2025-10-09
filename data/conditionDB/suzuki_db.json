@@ -14,51 +14,13 @@
         "dioxane_H2O"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(PPh3)4",
-          "PdCl2(PPh3)2"
-        ],
-        "ligands": [
-          "PPh3 (intrinsic when Pd(PPh3)4)",
-          "PPh3"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.2–1.3 eq",
-          "aryl-Bpin 1.2–1.3 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq",
-          "Na2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "1,4-dioxane/H2O (4:1)",
-          "DME/H2O (4:1)"
-        ],
         "temperature_C": [
-          50,
-          70
+          50.0,
+          70.0
         ],
         "time_h": [
-          4,
-          12
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            0.5,
-            1.5
-          ],
-          "ligand_mol%": [
-            0.0,
-            3.0
-          ],
-          "base_eq": [
-            1.8,
-            2.5
-          ]
-        },
-        "concentration_M": [
-          0.1,
-          0.3
+          4.0,
+          12.0
         ]
       },
       "env": {
@@ -93,7 +55,24 @@
         "Classic benchmark for ArI/ArBr; water co-solvent helps boronate activation.",
         "Favor mono-ligated Pd(0) under carbonate bases for fast transmetallation."
       ],
-      "priority": 45
+      "priority": 45,
+      "reagents": [
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_source",
+          "amount": "0.5–1.5%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "1,4-dioxane/H2O (4:1)",
+          "role": "solvent",
+          "amount": "0.1–0.3M"
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
@@ -110,44 +89,14 @@
         "THF_H2O"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd2(dba)3"
-        ],
-        "ligands": [
-          "SPhos"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.3 eq",
-          "aryl-Bpin 1.2 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "THF/H2O (4:1)"
-        ],
         "temperature_C": [
-          45,
-          60
+          45.0,
+          60.0
         ],
         "time_h": [
-          6,
-          10
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            0.5,
-            1.5
-          ],
-          "ligand_mol%": [
-            1.0,
-            3.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          6.0,
+          10.0
+        ]
       },
       "env": {
         "anchors": {
@@ -172,7 +121,29 @@
       "notes": [
         "Electron-rich monophosphines help with fast OA and transmetallation at lower T."
       ],
-      "priority": 46
+      "priority": 46,
+      "reagents": [
+        {
+          "name": "Pd2(dba)3",
+          "role": "metal_source",
+          "amount": "0.5–1.5%"
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "amount": "1.0–3.0%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF/H2O (4:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-ARBR-ORTHO-XPhos",
@@ -188,46 +159,14 @@
         "toluene_H2O"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd2(dba)3"
-        ],
-        "ligands": [
-          "XPhos",
-          "Ligand 95 (dialkylbiaryl phosphine)"
-        ],
-        "boron_partner": [
-          "aryl-Bpin 1.3 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq",
-          "K3PO4 2.0 eq"
-        ],
-        "solvent": [
-          "toluene/H2O (3:1)",
-          "dioxane/H2O (4:1)"
-        ],
         "temperature_C": [
-          75,
-          90
+          75.0,
+          90.0
         ],
         "time_h": [
-          6,
-          12
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            1.0,
-            2.5
-          ],
-          "ligand_mol%": [
-            2.0,
-            5.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          6.0,
+          12.0
+        ]
       },
       "env": {
         "anchors": {
@@ -247,7 +186,29 @@
       "notes": [
         "Bulky biaryl phosphines enforce mono-ligation and a pocket that accommodates ortho groups."
       ],
-      "priority": 50
+      "priority": 50,
+      "reagents": [
+        {
+          "name": "Pd2(dba)3",
+          "role": "metal_source",
+          "amount": "1–2.5%"
+        },
+        {
+          "name": "XPhos",
+          "role": "ligand",
+          "amount": "1.0–3.0%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "toluene/H2O (3:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-ARCL-EPoor-XPhos",
@@ -263,46 +224,14 @@
         "toluene_H2O"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd2(dba)3",
-          "XPhos Pd G3 precatalyst"
-        ],
-        "ligands": [
-          "XPhos"
-        ],
-        "boron_partner": [
-          "aryl-Bpin 1.3–1.5 eq",
-          "aryl-B(OH)2 1.3 eq"
-        ],
-        "base": [
-          "Cs2CO3 2.0–2.5 eq"
-        ],
-        "solvent": [
-          "toluene/H2O (5:1)",
-          "dioxane/H2O (4:1)"
-        ],
         "temperature_C": [
-          90,
-          105
+          90.0,
+          105.0
         ],
         "time_h": [
-          8,
-          12
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            1.5,
-            3.0
-          ],
-          "ligand_mol%": [
-            3.0,
-            6.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          8.0,
+          12.0
+        ]
       },
       "env": {
         "anchors": {
@@ -326,7 +255,29 @@
       "notes": [
         "Use strong, bulky monophosphines to accelerate OA into C–Cl; robust with aqueous carbonate/phosphate."
       ],
-      "priority": 60
+      "priority": 60,
+      "reagents": [
+        {
+          "name": "Pd2(dba)3",
+          "role": "metal_source",
+          "amount": "1.5–3%"
+        },
+        {
+          "name": "XPhos",
+          "role": "ligand",
+          "amount": "1.0–3.0%"
+        },
+        {
+          "name": "Cs2CO3",
+          "role": "base",
+          "amount": "200–250%"
+        },
+        {
+          "name": "toluene/H2O (5:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-ARCL-ERich-L95",
@@ -342,45 +293,14 @@
         "toluene_H2O"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd2(dba)3"
-        ],
-        "ligands": [
-          "Ligand 95",
-          "XPhos"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.3 eq",
-          "aryl-Bpin 1.3 eq"
-        ],
-        "base": [
-          "K3PO4 2.0 eq"
-        ],
-        "solvent": [
-          "toluene/H2O (3:1)"
-        ],
         "temperature_C": [
-          80,
-          95
+          80.0,
+          95.0
         ],
         "time_h": [
-          6,
-          10
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            1.0,
-            2.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            4.0
-          ],
-          "base_eq": [
-            2.0,
-            2.2
-          ]
-        }
+          6.0,
+          10.0
+        ]
       },
       "env": {
         "anchors": {
@@ -403,7 +323,24 @@
       "notes": [
         "Dialkylbiaryl phosphines designed for stubborn C–Cl; K3PO4 often optimal with minimal hydrolysis."
       ],
-      "priority": 58
+      "priority": 58,
+      "reagents": [
+        {
+          "name": "Pd2(dba)3",
+          "role": "metal_source",
+          "amount": "1–2%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "toluene/H2O (3:1)",
+          "role": "solvent",
+          "amount": "0.2M"
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-OTf-DPPF",
@@ -419,45 +356,14 @@
         "THF"
       ],
       "conditions": {
-        "pd_source": [
-          "PdCl2(dppf)"
-        ],
-        "ligands": [
-          "dppf"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.2 eq",
-          "alkenyl-Bpin 1.2 eq"
-        ],
-        "base": [
-          "K3PO4 2.0 eq"
-        ],
-        "solvent": [
-          "dioxane",
-          "THF"
-        ],
         "temperature_C": [
-          60,
-          85
+          60.0,
+          85.0
         ],
         "time_h": [
-          4,
-          8
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            1.0,
-            2.5
-          ],
-          "ligand_mol%": [
-            1.0,
-            2.5
-          ],
-          "base_eq": [
-            2.0,
-            2.2
-          ]
-        }
+          4.0,
+          8.0
+        ]
       },
       "env": {
         "anchors": {
@@ -477,7 +383,24 @@
       "notes": [
         "Exclude excess water unless using slow-release boron; powdered K3PO4 in aprotic solvent is reliable."
       ],
-      "priority": 70
+      "priority": 70,
+      "reagents": [
+        {
+          "name": "PdCl2(dppf)",
+          "role": "metal_source",
+          "amount": "1–2.5%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "dioxane",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-HET-2PYRIDYL-SLOWRELEASE",
@@ -493,50 +416,14 @@
         "dioxane_H2O_low"
       ],
       "conditions": {
-        "pd_source": [
-          "XPhos Pd G3 precatalyst",
-          "Pd2(dba)3"
-        ],
-        "ligands": [
-          "XPhos"
-        ],
-        "boron_partner": [
-          "2-pyridyl MIDA 1.3 eq",
-          "2-pyridyl BF3K 1.3 eq"
-        ],
-        "base": [
-          "K3PO4 2.0 eq"
-        ],
-        "additives": [
-          "Cu(OAc)2 1.0 eq (optional)",
-          "diethanolamine 1.5 eq (optional)"
-        ],
-        "solvent": [
-          "dioxane/H2O (15:1)",
-          "toluene/H2O (10:1)"
-        ],
         "temperature_C": [
-          50,
-          65
+          50.0,
+          65.0
         ],
         "time_h": [
-          10,
-          14
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            1.5,
-            3.0
-          ],
-          "ligand_mol%": [
-            1.5,
-            3.0
-          ],
-          "base_eq": [
-            2.0,
-            2.2
-          ]
-        }
+          10.0,
+          14.0
+        ]
       },
       "env": {
         "anchors": {
@@ -559,7 +446,34 @@
       "notes": [
         "Slow release limits free boronic acid to suppress protodeboronation; keep water minimal and add base gradually."
       ],
-      "priority": 68
+      "priority": 68,
+      "reagents": [
+        {
+          "name": "XPhos Pd G3 precatalyst",
+          "role": "metal_source",
+          "amount": "1.5–3%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "Cu(OAc)2",
+          "role": "additive",
+          "amount": "100%"
+        },
+        {
+          "name": "diethanolamine",
+          "role": "additive",
+          "amount": "150%"
+        },
+        {
+          "name": "dioxane/H2O (15:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-VINYL-DPPF-RT",
@@ -575,44 +489,14 @@
         "rt"
       ],
       "conditions": {
-        "pd_source": [
-          "PdCl2(dppf)"
-        ],
-        "ligands": [
-          "dppf"
-        ],
-        "boron_partner": [
-          "alkenyl boron 1.2 eq",
-          "alkenyl boronic acid 1.2 eq"
-        ],
-        "base": [
-          "NaOAc 2.0 eq"
-        ],
-        "solvent": [
-          "MeOH"
-        ],
         "temperature_C": [
-          20,
-          25
+          20.0,
+          25.0
         ],
         "time_h": [
-          6,
-          10
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            1.0,
-            2.0
-          ],
-          "ligand_mol%": [
-            1.0,
-            2.0
-          ],
-          "base_eq": [
-            2.0,
-            2.0
-          ]
-        }
+          6.0,
+          10.0
+        ]
       },
       "env": {
         "anchors": {
@@ -630,7 +514,24 @@
       "notes": [
         "Acetate base at rt suppresses E/Z isomerization during coupling."
       ],
-      "priority": 72
+      "priority": 72,
+      "reagents": [
+        {
+          "name": "PdCl2(dppf)",
+          "role": "metal_source",
+          "amount": "1–2%"
+        },
+        {
+          "name": "NaOAc",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "MeOH",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-ALKYL-PRIMARYI-9BBN",
@@ -646,43 +547,14 @@
         "dioxane"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(PPh3)4"
-        ],
-        "ligands": [
-          "PPh3 (intrinsic)"
-        ],
-        "boron_partner": [
-          "9-alkyl-9-BBN 1.2 eq"
-        ],
-        "base": [
-          "K3PO4 3.0 eq"
-        ],
-        "solvent": [
-          "dioxane"
-        ],
         "temperature_C": [
-          55,
-          65
+          55.0,
+          65.0
         ],
         "time_h": [
-          18,
-          26
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            2.0,
-            4.0
-          ],
-          "ligand_mol%": [
-            2.0,
-            4.0
-          ],
-          "base_eq": [
-            3.0,
-            3.0
-          ]
-        }
+          18.0,
+          26.0
+        ]
       },
       "env": {
         "anchors": {
@@ -700,7 +572,24 @@
       "notes": [
         "Triphenylphosphine systems minimize β-H elimination; moderate temperature and excess phosphate recommended."
       ],
-      "priority": 62
+      "priority": 62,
+      "reagents": [
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_source",
+          "amount": "2–4%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "300%"
+        },
+        {
+          "name": "dioxane",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-HET-THIOPHENE-FURAN-TRIBORONATE",
@@ -715,44 +604,14 @@
         "THF_H2O_low"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(PPh3)4"
-        ],
-        "ligands": [
-          "PPh3 (intrinsic)"
-        ],
-        "boron_partner": [
-          "lithium triisopropylboronate 1.3 eq",
-          "cyclic triol boronate 1.3 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "THF/H2O (4:1)"
-        ],
         "temperature_C": [
-          45,
-          55
+          45.0,
+          55.0
         ],
         "time_h": [
-          6,
-          10
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            0.8,
-            1.5
-          ],
-          "ligand_mol%": [
-            0.8,
-            1.5
-          ],
-          "base_eq": [
-            2.0,
-            2.0
-          ]
-        }
+          6.0,
+          10.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -768,7 +627,24 @@
       "notes": [
         "These stabilized boronates resist protodeboronation; keep water modest to aid activation without rapid hydrolysis."
       ],
-      "priority": 66
+      "priority": 66,
+      "reagents": [
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_source",
+          "amount": "0.8–1.5%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF/H2O (4:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-MIYAURA-BORYLATION",
@@ -783,43 +659,14 @@
         "dioxane"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(PPh3)4"
-        ],
-        "ligands": [
-          "PPh3 (intrinsic)"
-        ],
-        "boron_partner": [
-          "B2pin2 1.05–1.2 eq"
-        ],
-        "base": [
-          "KOAc 2.0 eq"
-        ],
-        "solvent": [
-          "dioxane"
-        ],
         "temperature_C": [
-          55,
-          70
+          55.0,
+          70.0
         ],
         "time_h": [
-          6,
-          10
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            0.5,
-            1.5
-          ],
-          "ligand_mol%": [
-            0.5,
-            1.5
-          ],
-          "base_eq": [
-            2.0,
-            2.0
-          ]
-        }
+          6.0,
+          10.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -840,7 +687,24 @@
       "notes": [
         "Convenient one-step access to aryl-Bpin for downstream Suzuki couplings."
       ],
-      "priority": 52
+      "priority": 52,
+      "reagents": [
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_source",
+          "amount": "0.5–1.5%"
+        },
+        {
+          "name": "KOAc",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "dioxane",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-BULKY-NUC-XPHOS",
@@ -855,43 +719,14 @@
         "K3PO4"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd2(dba)3"
-        ],
-        "ligands": [
-          "XPhos"
-        ],
-        "boron_partner": [
-          "2,6-disubstituted aryl-B(OH)2 1.3 eq"
-        ],
-        "base": [
-          "K3PO4 2.5 eq"
-        ],
-        "solvent": [
-          "toluene"
-        ],
         "temperature_C": [
-          80,
-          90
+          80.0,
+          90.0
         ],
         "time_h": [
-          12,
-          18
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            2.0,
-            3.0
-          ],
-          "ligand_mol%": [
-            4.0,
-            6.0
-          ],
-          "base_eq": [
-            2.5,
-            3.0
-          ]
-        }
+          12.0,
+          18.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -907,7 +742,29 @@
       "notes": [
         "Bulky XPhos ligand handles sterically hindered aryl boron coupling partners."
       ],
-      "priority": 48
+      "priority": 48,
+      "reagents": [
+        {
+          "name": "Pd2(dba)3",
+          "role": "metal_source",
+          "amount": "2–3%"
+        },
+        {
+          "name": "XPhos",
+          "role": "ligand",
+          "amount": "1.0–3.0%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "250%"
+        },
+        {
+          "name": "toluene",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-2HETARYL-SPHOS",
@@ -922,43 +779,14 @@
         "K2CO3"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(OAc)2"
-        ],
-        "ligands": [
-          "SPhos"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.3 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "THF/H2O (9:1)"
-        ],
         "temperature_C": [
-          50,
-          65
+          50.0,
+          65.0
         ],
         "time_h": [
-          8,
-          14
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            3.0,
-            5.0
-          ],
-          "ligand_mol%": [
-            6.0,
-            10.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          8.0,
+          14.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -966,7 +794,11 @@
           "electrophile.ring_hetero_count": "≥1"
         },
         "feature_requirements": {
-          "electrophile.ring_hetero_count": [1, 2, 3]
+          "electrophile.ring_hetero_count": [
+            1,
+            2,
+            3
+          ]
         }
       },
       "evidence": {
@@ -976,7 +808,29 @@
       "notes": [
         "2-Heteroaryl positions prone to reduced reactivity; SPhos helps."
       ],
-      "priority": 65
+      "priority": 65,
+      "reagents": [
+        {
+          "name": "Pd(OAc)2",
+          "role": "metal_source",
+          "amount": "3–5%"
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "amount": "1.0–3.0%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF/H2O (9:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-ARI-META-TBUXPHOS",
@@ -991,43 +845,14 @@
         "K3PO4"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(OAc)2"
-        ],
-        "ligands": [
-          "tBuXPhos"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.3 eq"
-        ],
-        "base": [
-          "K3PO4 2.5 eq"
-        ],
-        "solvent": [
-          "THF"
-        ],
         "temperature_C": [
-          70,
-          80
+          70.0,
+          80.0
         ],
         "time_h": [
-          10,
-          16
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            2.0,
-            4.0
-          ],
-          "ligand_mol%": [
-            4.0,
-            8.0
-          ],
-          "base_eq": [
-            2.5,
-            3.0
-          ]
-        }
+          10.0,
+          16.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -1043,7 +868,29 @@
       "notes": [
         "Bulky tBuXPhos for meta-substitution patterns."
       ],
-      "priority": 55
+      "priority": 55,
+      "reagents": [
+        {
+          "name": "Pd(OAc)2",
+          "role": "metal_source",
+          "amount": "2–4%"
+        },
+        {
+          "name": "tBuXPhos",
+          "role": "ligand",
+          "amount": "1.0–3.0%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "250%"
+        },
+        {
+          "name": "THF",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "M-SUZ-OTf-DPPF",
@@ -1058,43 +905,14 @@
         "K2CO3"
       ],
       "conditions": {
-        "pd_source": [
-          "PdCl2(dppf)"
-        ],
-        "ligands": [
-          "dppf"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.3 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "THF"
-        ],
         "temperature_C": [
-          60,
-          70
+          60.0,
+          70.0
         ],
         "time_h": [
-          8,
-          12
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            3.0,
-            5.0
-          ],
-          "ligand_mol%": [
-            0.0,
-            0.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          8.0,
+          12.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -1113,7 +931,24 @@
       "notes": [
         "Scheme-based match for OTf with dppf."
       ],
-      "priority": 80
+      "priority": 80,
+      "reagents": [
+        {
+          "name": "PdCl2(dppf)",
+          "role": "metal_source",
+          "amount": "3–5%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "M-SUZ-VINYL-RT",
@@ -1128,43 +963,14 @@
         "RT"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(PPh3)4"
-        ],
-        "ligands": [
-          "PPh3 (intrinsic)"
-        ],
-        "boron_partner": [
-          "vinyl-B(OH)2 1.2 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "THF/H2O (9:1)"
-        ],
         "temperature_C": [
-          20,
-          30
+          20.0,
+          30.0
         ],
         "time_h": [
-          4,
-          8
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            2.0,
-            3.0
-          ],
-          "ligand_mol%": [
-            0.0,
-            0.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          4.0,
+          8.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -1187,7 +993,24 @@
       "notes": [
         "Vinyl-vinyl coupling at room temperature."
       ],
-      "priority": 75
+      "priority": 75,
+      "reagents": [
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_source",
+          "amount": "2–3%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF/H2O (9:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "M-SUZ-BF3K-GENERAL",
@@ -1202,43 +1025,14 @@
         "SPhos"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(OAc)2"
-        ],
-        "ligands": [
-          "SPhos"
-        ],
-        "boron_partner": [
-          "aryl-BF3K 1.2 eq"
-        ],
-        "base": [
-          "Cs2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "THF/H2O (9:1)"
-        ],
         "temperature_C": [
-          50,
-          65
+          50.0,
+          65.0
         ],
         "time_h": [
-          8,
-          12
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            3.0,
-            5.0
-          ],
-          "ligand_mol%": [
-            6.0,
-            10.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          8.0,
+          12.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -1262,7 +1056,29 @@
       "notes": [
         "BF3K partners are moisture-stable alternatives to boronic acids."
       ],
-      "priority": 65
+      "priority": 65,
+      "reagents": [
+        {
+          "name": "Pd(OAc)2",
+          "role": "metal_source",
+          "amount": "3–5%"
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "amount": "1.0–3.0%"
+        },
+        {
+          "name": "Cs2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF/H2O (9:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-HET-AZINE-BORON",
@@ -1276,43 +1092,14 @@
         "K2CO3"
       ],
       "conditions": {
-        "pd_source": [
-          "Pd(PPh3)4"
-        ],
-        "ligands": [
-          "PPh3 (intrinsic)"
-        ],
-        "boron_partner": [
-          "azine-B(OH)2 1.3 eq"
-        ],
-        "base": [
-          "K2CO3 2.5 eq"
-        ],
-        "solvent": [
-          "dioxane/H2O (4:1)"
-        ],
         "temperature_C": [
-          70,
-          85
+          70.0,
+          85.0
         ],
         "time_h": [
-          10,
-          16
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            3.0,
-            5.0
-          ],
-          "ligand_mol%": [
-            0.0,
-            0.0
-          ],
-          "base_eq": [
-            2.5,
-            3.0
-          ]
-        }
+          10.0,
+          16.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -1328,7 +1115,24 @@
       "notes": [
         "Azine boron partners (pyridine, pyrimidine) require careful conditions."
       ],
-      "priority": 64
+      "priority": 64,
+      "reagents": [
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_source",
+          "amount": "3–5%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "250%"
+        },
+        {
+          "name": "dioxane/H2O (4:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-DEFAULT-OTf",
@@ -1344,43 +1148,14 @@
         "K2CO3"
       ],
       "conditions": {
-        "pd_source": [
-          "PdCl2(dppf)"
-        ],
-        "ligands": [
-          "dppf"
-        ],
-        "boron_partner": [
-          "aryl-B(OH)2 1.3 eq"
-        ],
-        "base": [
-          "K2CO3 2.0 eq"
-        ],
-        "solvent": [
-          "THF"
-        ],
         "temperature_C": [
-          60,
-          70
+          60.0,
+          70.0
         ],
         "time_h": [
-          8,
-          12
-        ],
-        "loadings": {
-          "Pd_mol%": [
-            3.0,
-            5.0
-          ],
-          "ligand_mol%": [
-            0.0,
-            0.0
-          ],
-          "base_eq": [
-            2.0,
-            2.5
-          ]
-        }
+          8.0,
+          12.0
+        ]
       },
       "env": {
         "features_from_smiles": {
@@ -1399,7 +1174,24 @@
       "notes": [
         "Default for OTf electrophiles."
       ],
-      "priority": 0
+      "priority": 0,
+      "reagents": [
+        {
+          "name": "PdCl2(dppf)",
+          "role": "metal_source",
+          "amount": "3–5%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
     },
     {
       "id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
@@ -1440,7 +1232,20 @@
       "evidence": {
         "provenance": "playbook_carryover",
         "last_updated": "2025-10-04T22:10:00Z"
-      }
+      },
+      "reagents": [
+        {
+          "name": "",
+          "role": "metal_source",
+          "amount": ""
+        },
+        {
+          "name": "",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {}
     },
     {
       "id": "SCDB-SUZ-DEFAULT-ArCl",
@@ -1477,7 +1282,20 @@
       "evidence": {
         "provenance": "playbook_carryover+expert_default",
         "last_updated": "2025-10-04T22:10:00Z"
-      }
+      },
+      "reagents": [
+        {
+          "name": "",
+          "role": "metal_source",
+          "amount": ""
+        },
+        {
+          "name": "",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {}
     },
     {
       "id": "SCDB-SUZ-DEFAULT-2HET_prone",
@@ -1514,7 +1332,20 @@
       "evidence": {
         "provenance": "playbook_carryover+expert_default",
         "last_updated": "2025-10-04T22:10:00Z"
-      }
+      },
+      "reagents": [
+        {
+          "name": "",
+          "role": "metal_source",
+          "amount": ""
+        },
+        {
+          "name": "",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {}
     },
     {
       "id": "SCDB-SUZ-DEFAULT-vinyl",
@@ -1551,7 +1382,20 @@
       "evidence": {
         "provenance": "playbook_carryover",
         "last_updated": "2025-10-04T22:10:00Z"
-      }
+      },
+      "reagents": [
+        {
+          "name": "",
+          "role": "metal_source",
+          "amount": ""
+        },
+        {
+          "name": "",
+          "role": "solvent",
+          "amount": ""
+        }
+      ],
+      "conditions": {}
     }
   ],
   "reaction_type": "Suzuki_Miyaura",

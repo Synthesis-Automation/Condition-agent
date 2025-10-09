@@ -7,40 +7,130 @@
     "n_records": 41427,
     "dataset_summary": {
       "top_coupling_reagents": [
-        ["EDC·HCl", 11296],
-        ["HATU", 9078],
-        ["HBTU", 2339],
-        ["DCC", 1355],
-        ["TBTU", 1172],
-        ["PyBOP", 1161],
-        ["CDI", 879],
-        ["DIC", 772],
-        ["T3P (50% in EtOAc)", 625],
-        ["iBuOCOCl (IBCF)", 574]
+        [
+          "EDC·HCl",
+          11296
+        ],
+        [
+          "HATU",
+          9078
+        ],
+        [
+          "HBTU",
+          2339
+        ],
+        [
+          "DCC",
+          1355
+        ],
+        [
+          "TBTU",
+          1172
+        ],
+        [
+          "PyBOP",
+          1161
+        ],
+        [
+          "CDI",
+          879
+        ],
+        [
+          "DIC",
+          772
+        ],
+        [
+          "T3P (50% in EtOAc)",
+          625
+        ],
+        [
+          "iBuOCOCl (IBCF)",
+          574
+        ]
       ],
       "top_bases": [
-        ["DIPEA", 16108],
-        ["Et3N", 9330],
-        ["NMM", 2019],
-        ["NaHCO3", 1524],
-        ["pyridine", 965],
-        ["DMAP (base/catalyst)", 941],
-        ["piperidine", 863],
-        ["K2CO3", 622],
-        ["NaOH", 539],
-        ["Na2CO3", 472]
+        [
+          "DIPEA",
+          16108
+        ],
+        [
+          "Et3N",
+          9330
+        ],
+        [
+          "NMM",
+          2019
+        ],
+        [
+          "NaHCO3",
+          1524
+        ],
+        [
+          "pyridine",
+          965
+        ],
+        [
+          "DMAP (base/catalyst)",
+          941
+        ],
+        [
+          "piperidine",
+          863
+        ],
+        [
+          "K2CO3",
+          622
+        ],
+        [
+          "NaOH",
+          539
+        ],
+        [
+          "Na2CO3",
+          472
+        ]
       ],
       "top_solvents": [
-        ["DCM", 18176],
-        ["DMF", 16305],
-        ["H2O (biphasic / aqueous)", 7285],
-        ["THF", 4403],
-        ["MeCN", 2105],
-        ["MeOH", 1970],
-        ["EtOAc", 1265],
-        ["toluene", 1140],
-        ["1,4-dioxane", 670],
-        ["CHCl3", 594]
+        [
+          "DCM",
+          18176
+        ],
+        [
+          "DMF",
+          16305
+        ],
+        [
+          "H2O (biphasic / aqueous)",
+          7285
+        ],
+        [
+          "THF",
+          4403
+        ],
+        [
+          "MeCN",
+          2105
+        ],
+        [
+          "MeOH",
+          1970
+        ],
+        [
+          "EtOAc",
+          1265
+        ],
+        [
+          "toluene",
+          1140
+        ],
+        [
+          "1,4-dioxane",
+          670
+        ],
+        [
+          "CHCl3",
+          594
+        ]
       ],
       "notes": [
         "Legacy benzotriazole systems (HOBt/HOAt/HBTU/HATU) are overrepresented in literature vs. modern safer Oxyma/COMU/T3P or acyl-fluoride routes."
@@ -52,15 +142,30 @@
     "temperature_C": 25,
     "time_h": 16,
     "stoichiometry_eq": {
-      "acid": 1.00,
-      "amine": 1.10,
-      "activator_or_reagent": 1.20,
-      "additive": 1.20,
+      "acid": 1.0,
+      "amine": 1.1,
+      "activator_or_reagent": 1.2,
+      "additive": 1.2,
       "base": 2.0
     },
-    "solvent_priority": ["MeCN", "DMF", "DCM", "EtOAc", "2-MeTHF", "THF"],
-    "base_priority": ["DIPEA", "NMM", "Et3N", "pyridine"],
-    "agitation": {"rpm_min": 500, "note": "Add 5–20% DMF/NMP co-solvent if solids persist."},
+    "solvent_priority": [
+      "MeCN",
+      "DMF",
+      "DCM",
+      "EtOAc",
+      "2-MeTHF",
+      "THF"
+    ],
+    "base_priority": [
+      "DIPEA",
+      "NMM",
+      "Et3N",
+      "pyridine"
+    ],
+    "agitation": {
+      "rpm_min": 500,
+      "note": "Add 5–20% DMF/NMP co-solvent if solids persist."
+    },
     "general_notes": [
       "Prefer Oxyma/COMU or T3P for safety/operability; de-emphasize dry HOBt/HOAt systems.",
       "For α-chiral acids, work cold and shorten activation lifetime; add amine last.",
@@ -70,16 +175,38 @@
   },
   "feature_schema": {
     "acid": {
-      "class": ["aliphatic", "benzoic", "heteroaromatic", "alpha-chiral", "electron-poor", "hindered"],
+      "class": [
+        "aliphatic",
+        "benzoic",
+        "heteroaromatic",
+        "alpha-chiral",
+        "electron-poor",
+        "hindered"
+      ],
       "pKa_range": "optional",
       "has_beta_heteroatom": "optional",
       "is_alpha_amino_acid": "boolean",
       "internal_amine_free": "boolean"
     },
     "amine": {
-      "class": ["primary_aliphatic", "secondary_aliphatic", "aniline", "sulfonamide", "hydroxylamine", "diamine"],
-      "sterics": ["unhindered", "moderate", "hindered"],
-      "nucleophilicity": ["good", "moderate", "poor"],
+      "class": [
+        "primary_aliphatic",
+        "secondary_aliphatic",
+        "aniline",
+        "sulfonamide",
+        "hydroxylamine",
+        "diamine"
+      ],
+      "sterics": [
+        "unhindered",
+        "moderate",
+        "hindered"
+      ],
+      "nucleophilicity": [
+        "good",
+        "moderate",
+        "poor"
+      ],
       "is_benzylic": "boolean"
     },
     "functional_groups": {
@@ -97,55 +224,192 @@
     {
       "id": "AM-EDC-OXYMA-GENERAL",
       "if": {
-        "acid.class in": ["aliphatic", "benzoic", "heteroaromatic"],
-        "amine.class in": ["primary_aliphatic", "secondary_aliphatic", "aniline"],
+        "acid.class in": [
+          "aliphatic",
+          "benzoic",
+          "heteroaromatic"
+        ],
+        "amine.class in": [
+          "primary_aliphatic",
+          "secondary_aliphatic",
+          "aniline"
+        ],
         "functional_groups.alcohols_free": false
       },
       "then": {
-        "condition_core": {"reagent": "EDC·HCl", "additive": "Oxyma", "base": "DIPEA", "solvent": ["MeCN", "DMF", "DCM"]},
-        "window": {"temperature_C": [0, 25], "time_h": [2, 18]},
-        "equivalents": {"EDC·HCl": 1.2, "Oxyma": 1.2, "amine": 1.1, "base": 2.0},
+        "condition_core": {
+          "reagent": "EDC·HCl",
+          "additive": "Oxyma",
+          "base": "DIPEA",
+          "solvent": [
+            "MeCN",
+            "DMF",
+            "DCM"
+          ]
+        },
         "charge_order": "acid + Oxyma → EDC → base → slow add amine (0–5 °C for α-chiral)",
         "why": "Balanced general method with low urea waste and manageable racemization risk.",
-        "rank_hint": 0.95
+        "rank_hint": 0.95,
+        "reagents": [
+          {
+            "name": "EDC·HCl",
+            "role": "additive",
+            "amount": "120%"
+          },
+          {
+            "name": "Oxyma",
+            "role": "additive",
+            "amount": "120%"
+          },
+          {
+            "name": "DIPEA",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "MeCN",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            0.0,
+            25.0
+          ],
+          "time_h": [
+            2.0,
+            18.0
+          ]
+        }
       }
     },
     {
       "id": "AM-COMU-OXYMA-FAST",
       "if": {
-        "amine.nucleophilicity in": ["moderate", "poor"],
-        "acid.class not in": ["alpha-chiral"]
+        "amine.nucleophilicity in": [
+          "moderate",
+          "poor"
+        ],
+        "acid.class not in": [
+          "alpha-chiral"
+        ]
       },
       "then": {
-        "condition_core": {"reagent": "COMU", "base": "DIPEA", "solvent": ["DMF", "MeCN", "2-MeTHF"]},
-        "window": {"temperature_C": [0, 40], "time_h": [1, 12]},
-        "equivalents": {"COMU": 1.1, "amine": 1.2, "base": 2.0},
+        "condition_core": {
+          "reagent": "COMU",
+          "base": "DIPEA",
+          "solvent": [
+            "DMF",
+            "MeCN",
+            "2-MeTHF"
+          ]
+        },
         "charge_order": "acid → COMU → base → slow amine addition (0–10 °C for sensitive substrates)",
-        "notes": ["Often lower racemization vs some uronium reagents; fast for hindered acids/anilines."],
-        "rank_hint": 0.88
+        "notes": [
+          "Often lower racemization vs some uronium reagents; fast for hindered acids/anilines."
+        ],
+        "rank_hint": 0.88,
+        "reagents": [
+          {
+            "name": "COMU",
+            "role": "additive",
+            "amount": "110%"
+          },
+          {
+            "name": "DIPEA",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "DMF",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            0.0,
+            40.0
+          ],
+          "time_h": [
+            1.0,
+            12.0
+          ]
+        }
       }
     },
     {
       "id": "AM-HATU-HINDERED",
       "if": {
-        "acid.class in": ["hindered", "electron-poor"],
-        "amine.class in": ["secondary_aliphatic", "aniline"],
-        "amine.sterics in": ["moderate", "hindered"]
+        "acid.class in": [
+          "hindered",
+          "electron-poor"
+        ],
+        "amine.class in": [
+          "secondary_aliphatic",
+          "aniline"
+        ],
+        "amine.sterics in": [
+          "moderate",
+          "hindered"
+        ]
       },
       "then": {
-        "condition_core": {"reagent": "HATU", "base": ["DIPEA", "NMM"], "solvent": ["DMF", "NMP", "DCM/DMF 1:1"]},
-        "window": {"temperature_C": [0, 40], "time_h": [1, 18]},
-        "equivalents": {"HATU": 1.1, "amine": 1.2, "base": 3.0},
+        "condition_core": {
+          "reagent": "HATU",
+          "base": [
+            "DIPEA",
+            "NMM"
+          ],
+          "solvent": [
+            "DMF",
+            "NMP",
+            "DCM/DMF 1:1"
+          ]
+        },
         "charge_order": "acid + HATU + base (0–10 °C) → slow amine addition",
         "rank_hint": 0.84,
-        "safety_penalty_if": ["need_green", "alpha-chiral"]
+        "safety_penalty_if": [
+          "need_green",
+          "alpha-chiral"
+        ],
+        "reagents": [
+          {
+            "name": "HATU",
+            "role": "additive",
+            "amount": "110%"
+          },
+          {
+            "name": "DIPEA",
+            "role": "base",
+            "amount": "300%"
+          },
+          {
+            "name": "DMF",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            0.0,
+            40.0
+          ],
+          "time_h": [
+            1.0,
+            18.0
+          ]
+        }
       }
     },
     {
       "id": "AM-HINDERED-PRIMARY-COMU_T3P",
       "if": {
         "acid.class": "hindered",
-        "acid.class not in": ["alpha-chiral"],
+        "acid.class not in": [
+          "alpha-chiral"
+        ],
         "amine.class": "primary_aliphatic",
         "amine.nucleophilicity": "good"
       },
@@ -153,22 +417,87 @@
         "paths": [
           {
             "core": "COMU + DIPEA",
-            "solvent": ["DMF", "MeCN"],
-            "window": {"temperature_C": [25, 60], "time_h": [1, 8]},
-            "equivalents": {"COMU": 1.2, "amine": 1.2, "base": 2.0},
+            "solvent": [
+              "DMF",
+              "MeCN"
+            ],
             "charge_order": "acid → COMU → base → amine (controlled add)",
-            "rank_hint": 0.87
+            "rank_hint": 0.87,
+            "reagents": [
+              {
+                "name": "COMU",
+                "role": "additive",
+                "amount": "120%"
+              },
+              {
+                "name": "DIPEA",
+                "role": "base",
+                "amount": "200%"
+              },
+              {
+                "name": "DMF",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {
+              "temperature_C": [
+                25.0,
+                60.0
+              ],
+              "time_h": [
+                1.0,
+                8.0
+              ]
+            }
           },
           {
             "core": "T3P (50% in EtOAc or MeCN) + DIPEA",
-            "solvent": ["EtOAc", "MeCN", "2-MeTHF"],
-            "window": {"temperature_C": [25, 80], "time_h": [1, 10]},
-            "equivalents": {"T3P": 1.5, "amine": 1.2, "base": 2.0},
+            "solvent": [
+              "EtOAc",
+              "MeCN",
+              "2-MeTHF"
+            ],
             "charge_order": "acid → T3P → base → amine (controlled add)",
-            "rank_hint": 0.85
+            "rank_hint": 0.85,
+            "reagents": [
+              {
+                "name": "T3P",
+                "role": "additive",
+                "amount": "150%"
+              },
+              {
+                "name": "DIPEA",
+                "role": "base",
+                "amount": "200%"
+              },
+              {
+                "name": "EtOAc",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {
+              "temperature_C": [
+                25.0,
+                80.0
+              ],
+              "time_h": [
+                1.0,
+                10.0
+              ]
+            }
           }
         ],
-        "why": "Hindered aliphatic acids often need stronger activation even with good primary amines; COMU/T3P are robust and scale-friendly."
+        "why": "Hindered aliphatic acids often need stronger activation even with good primary amines; COMU/T3P are robust and scale-friendly.",
+        "reagents": [
+          {
+            "name": "",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {}
       }
     },
     {
@@ -178,11 +507,49 @@
         "process.need_green": true
       },
       "then": {
-        "condition_core": {"reagent": "T3P (50% in EtOAc or MeCN)", "base": ["DIPEA", "pyridine"], "solvent": ["EtOAc", "MeCN", "2-MeTHF"]},
-        "window": {"temperature_C": [0, 80], "time_h": [1, 16]},
-        "equivalents": {"T3P": 1.5, "amine": 1.2, "base": 2.0},
-        "workup": ["Quench into sat. NaHCO3; phosphorus byproducts partition to water."],
-        "rank_hint": 0.90
+        "condition_core": {
+          "reagent": "T3P (50% in EtOAc or MeCN)",
+          "base": [
+            "DIPEA",
+            "pyridine"
+          ],
+          "solvent": [
+            "EtOAc",
+            "MeCN",
+            "2-MeTHF"
+          ]
+        },
+        "workup": [
+          "Quench into sat. NaHCO3; phosphorus byproducts partition to water."
+        ],
+        "rank_hint": 0.9,
+        "reagents": [
+          {
+            "name": "T3P (50% in EtOAc or MeCN)",
+            "role": "additive",
+            "amount": ""
+          },
+          {
+            "name": "DIPEA",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "EtOAc",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            0.0,
+            80.0
+          ],
+          "time_h": [
+            1.0,
+            16.0
+          ]
+        }
       }
     },
     {
@@ -192,11 +559,52 @@
         "functional_groups.alcohols_free": true
       },
       "then": {
-        "condition_core": {"reagent": "DIC", "additive": "Oxyma", "base": "DIPEA", "solvent": ["DCM", "DMF", "THF"]},
-        "window": {"temperature_C": [0, 25], "time_h": [2, 18]},
-        "equivalents": {"DIC": 1.2, "Oxyma": 1.2, "amine": 1.2, "base": 2.0},
-        "notes": ["Avoid O→N acylurea by ensuring additive present."],
-        "rank_hint": 0.78
+        "condition_core": {
+          "reagent": "DIC",
+          "additive": "Oxyma",
+          "base": "DIPEA",
+          "solvent": [
+            "DCM",
+            "DMF",
+            "THF"
+          ]
+        },
+        "notes": [
+          "Avoid O→N acylurea by ensuring additive present."
+        ],
+        "rank_hint": 0.78,
+        "reagents": [
+          {
+            "name": "DIC",
+            "role": "additive",
+            "amount": "120%"
+          },
+          {
+            "name": "Oxyma",
+            "role": "additive",
+            "amount": "120%"
+          },
+          {
+            "name": "DIPEA",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "DCM",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            0.0,
+            25.0
+          ],
+          "time_h": [
+            2.0,
+            18.0
+          ]
+        }
       }
     },
     {
@@ -206,12 +614,44 @@
         "process.need_green": true
       },
       "then": {
-        "condition_core": {"reagent": "CDI (preactivation)", "solvent": ["THF", "MeCN", "DMF"]},
-        "window": {"temperature_C": [0, 25], "time_h": [0.5, 2.0]},
-        "equivalents": {"CDI": 1.2, "amine": 1.5},
-        "procedure": ["Premix acid+CDI until CO2 ceases → add amine; heat 40–60 °C if aniline."],
-        "rank_hint": 0.70,
-        "chemoselectivity_penalty_if": ["alcohols_free", "phenols_free"]
+        "condition_core": {
+          "reagent": "CDI (preactivation)",
+          "solvent": [
+            "THF",
+            "MeCN",
+            "DMF"
+          ]
+        },
+        "procedure": [
+          "Premix acid+CDI until CO2 ceases → add amine; heat 40–60 °C if aniline."
+        ],
+        "rank_hint": 0.7,
+        "chemoselectivity_penalty_if": [
+          "alcohols_free",
+          "phenols_free"
+        ],
+        "reagents": [
+          {
+            "name": "CDI (preactivation)",
+            "role": "additive",
+            "amount": ""
+          },
+          {
+            "name": "THF",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            0.0,
+            25.0
+          ],
+          "time_h": [
+            0.5,
+            2.0
+          ]
+        }
       }
     },
     {
@@ -221,11 +661,51 @@
         "functional_groups.alcohols_free": true
       },
       "then": {
-        "condition_core": {"activator": ["oxalyl chloride (cat. DMF)", "SOCl2"], "base": ["DIPEA", "pyridine"], "solvent": ["DCM", "THF"]},
-        "window": {"temperature_C": [-20, 25], "time_h": [0.5, 4.0]},
-        "equivalents": {"activator": 1.2, "DMF_cat_mol%": 5, "amine": 1.5, "base": 3.0},
-        "rank_hint": 0.60,
-        "notes": ["Use gas scrubbing; potential over-acylation with diamines—consider protection."]
+        "condition_core": {
+          "activator": [
+            "oxalyl chloride (cat. DMF)",
+            "SOCl2"
+          ],
+          "base": [
+            "DIPEA",
+            "pyridine"
+          ],
+          "solvent": [
+            "DCM",
+            "THF"
+          ]
+        },
+        "rank_hint": 0.6,
+        "notes": [
+          "Use gas scrubbing; potential over-acylation with diamines—consider protection."
+        ],
+        "reagents": [
+          {
+            "name": "oxalyl chloride (cat. DMF)",
+            "role": "additive",
+            "amount": "120%"
+          },
+          {
+            "name": "DIPEA",
+            "role": "base",
+            "amount": "300%"
+          },
+          {
+            "name": "DCM",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            -20.0,
+            25.0
+          ],
+          "time_h": [
+            0.5,
+            4.0
+          ]
+        }
       }
     },
     {
@@ -234,11 +714,40 @@
         "acid.class": "alpha-chiral"
       },
       "then": {
-        "condition_core": {"activator": "isobutyl chloroformate (IBCF)", "base": "NMM", "solvent": "THF"},
-        "window": {"temperature_C": [-20, 0], "time_h": [0.5, 4.0]},
-        "equivalents": {"IBCF": 1.1, "NMM": 2.0, "amine": 1.2},
-        "rank_hint": 0.80,
-        "why": "Low racemization when formed cold; rapid amine capture."
+        "condition_core": {
+          "activator": "isobutyl chloroformate (IBCF)",
+          "base": "NMM",
+          "solvent": "THF"
+        },
+        "rank_hint": 0.8,
+        "why": "Low racemization when formed cold; rapid amine capture.",
+        "reagents": [
+          {
+            "name": "isobutyl chloroformate (IBCF)",
+            "role": "additive",
+            "amount": ""
+          },
+          {
+            "name": "NMM",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            -20.0,
+            0.0
+          ],
+          "time_h": [
+            0.5,
+            4.0
+          ]
+        }
       }
     },
     {
@@ -247,12 +756,52 @@
         "functional_groups.alcohols_free": true
       },
       "then": {
-        "condition_core": {"reagent": ["TFFH", "BTFFH"], "base": ["DIPEA", "pyridine"], "solvent": ["DCM", "MeCN"]},
-        "window": {"temperature_C": [0, 25], "time_h": [0.5, 4.0]},
-        "equivalents": {"fluoroformamidinium": 1.2, "amine": 1.3, "base": 2.0},
-        "procedure": ["Form acyl fluoride (IR 1810–1840 cm−1) at 0–25 °C → add amine at 0–10 °C."],
+        "condition_core": {
+          "reagent": [
+            "TFFH",
+            "BTFFH"
+          ],
+          "base": [
+            "DIPEA",
+            "pyridine"
+          ],
+          "solvent": [
+            "DCM",
+            "MeCN"
+          ]
+        },
+        "procedure": [
+          "Form acyl fluoride (IR 1810–1840 cm−1) at 0–25 °C → add amine at 0–10 °C."
+        ],
         "rank_hint": 0.92,
-        "why": "High chemoselectivity and often reduced racemization versus acid chlorides."
+        "why": "High chemoselectivity and often reduced racemization versus acid chlorides.",
+        "reagents": [
+          {
+            "name": "TFFH",
+            "role": "additive",
+            "amount": "120%"
+          },
+          {
+            "name": "DIPEA",
+            "role": "base",
+            "amount": "200%"
+          },
+          {
+            "name": "DCM",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            0.0,
+            25.0
+          ],
+          "time_h": [
+            0.5,
+            4.0
+          ]
+        }
       }
     },
     {
@@ -261,11 +810,44 @@
         "process.water_tolerance_needed": true
       },
       "then": {
-        "condition_core": {"reagent": "DMTMM·Cl", "base": "Et3N (optional)", "solvent": ["water", "MeCN/H2O", "EtOH/H2O"]},
-        "window": {"temperature_C": [20, 40], "time_h": [1, 16]},
-        "equivalents": {"DMTMM": 1.2, "amine": 1.2},
+        "condition_core": {
+          "reagent": "DMTMM·Cl",
+          "base": "Et3N (optional)",
+          "solvent": [
+            "water",
+            "MeCN/H2O",
+            "EtOH/H2O"
+          ]
+        },
         "rank_hint": 0.82,
-        "why": "Water-tolerant amidation; avoids NHS and pH swings for many biopolymer conjugations."
+        "why": "Water-tolerant amidation; avoids NHS and pH swings for many biopolymer conjugations.",
+        "reagents": [
+          {
+            "name": "DMTMM·Cl",
+            "role": "additive",
+            "amount": ""
+          },
+          {
+            "name": "Et3N (optional)",
+            "role": "base",
+            "amount": ""
+          },
+          {
+            "name": "water",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {
+          "temperature_C": [
+            20.0,
+            40.0
+          ],
+          "time_h": [
+            1.0,
+            16.0
+          ]
+        }
       }
     },
     {
@@ -278,24 +860,123 @@
         "paths": [
           {
             "core": "COMU + DIPEA",
-            "solvent": ["DMF", "MeCN"],
-            "window": {"temperature_C": [0, 25], "time_h": [0.5, 6]},
-            "rank_hint": 0.88
+            "solvent": [
+              "DMF",
+              "MeCN"
+            ],
+            "rank_hint": 0.88,
+            "reagents": [
+              {
+                "name": "COMU",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "DIPEA",
+                "role": "base",
+                "amount": ""
+              },
+              {
+                "name": "DMF",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {
+              "temperature_C": [
+                0.0,
+                25.0
+              ],
+              "time_h": [
+                0.5,
+                6.0
+              ]
+            }
           },
           {
             "core": "TFFH/BTFFH + DIPEA",
-            "solvent": ["DCM", "MeCN"],
-            "window": {"temperature_C": [0, 25], "time_h": [0.5, 4]},
-            "rank_hint": 0.90
+            "solvent": [
+              "DCM",
+              "MeCN"
+            ],
+            "rank_hint": 0.9,
+            "reagents": [
+              {
+                "name": "TFFH",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "BTFFH",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "DIPEA",
+                "role": "base",
+                "amount": ""
+              },
+              {
+                "name": "DCM",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {
+              "temperature_C": [
+                0.0,
+                25.0
+              ],
+              "time_h": [
+                0.5,
+                4.0
+              ]
+            }
           },
           {
             "core": "IBCF + NMM (mixed anhydride; -20–0 °C) → amine",
-            "solvent": ["THF"],
-            "window": {"temperature_C": [-20, 0], "time_h": [0.5, 4]},
-            "rank_hint": 0.85
+            "solvent": [
+              "THF"
+            ],
+            "rank_hint": 0.85,
+            "reagents": [
+              {
+                "name": "IBCF",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "NMM→ amine",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "THF",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {
+              "temperature_C": [
+                -20.0,
+                0.0
+              ],
+              "time_h": [
+                0.5,
+                4.0
+              ]
+            }
           }
         ],
-        "guard_preference": "prefer acyl-fluoride/mixed-anhydride cold to minimize epimerization"
+        "guard_preference": "prefer acyl-fluoride/mixed-anhydride cold to minimize epimerization",
+        "reagents": [
+          {
+            "name": "",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {}
       }
     },
     {
@@ -308,84 +989,274 @@
         "paths": [
           {
             "core": "DMTMM·Cl (pH 7–8, aqueous/MeCN-H2O)",
-            "equivalents": {"DMTMM": 1.2, "amine": 1.2},
-            "window": {"temperature_C": [20, 30], "time_h": [1, 6]},
-            "rank_hint": 0.83
+            "rank_hint": 0.83,
+            "reagents": [
+              {
+                "name": "DMTMM·Cl",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {
+              "temperature_C": [
+                20.0,
+                30.0
+              ],
+              "time_h": [
+                1.0,
+                6.0
+              ]
+            }
           },
           {
             "core": "EDC·HCl + Oxyma (buffered, 0–10 °C)",
-            "equivalents": {"EDC·HCl": 1.2, "Oxyma": 1.2},
-            "window": {"temperature_C": [0, 10], "time_h": [1, 6]},
-            "rank_hint": 0.80
+            "rank_hint": 0.8,
+            "reagents": [
+              {
+                "name": "EDC·HCl",
+                "role": "additive",
+                "amount": "120%"
+              },
+              {
+                "name": "Oxyma",
+                "role": "additive",
+                "amount": "120%"
+              },
+              {
+                "name": "",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {
+              "temperature_C": [
+                0.0,
+                10.0
+              ],
+              "time_h": [
+                1.0,
+                6.0
+              ]
+            }
           }
         ],
-        "notes": ["Consider N-protection (Boc/Fmoc) if selectivity is poor; monitor for dimerization."]
+        "notes": [
+          "Consider N-protection (Boc/Fmoc) if selectivity is poor; monitor for dimerization."
+        ],
+        "reagents": [
+          {
+            "name": "",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {}
       }
     },
     {
       "id": "AM-PEPTIDE-SEGMENT",
       "if": {
         "acid.class": "alpha-chiral",
-        "amine.class in": ["primary_aliphatic", "secondary_aliphatic", "aniline"]
+        "amine.class in": [
+          "primary_aliphatic",
+          "secondary_aliphatic",
+          "aniline"
+        ]
       },
       "then": {
         "paths": [
-          {"core": "HATU + Oxyma + DIPEA in DMF/NMP (0–25 °C)", "rank_hint": 0.80},
-          {"core": "COMU + DIPEA in DMF/MeCN (0–25 °C)", "rank_hint": 0.85},
-          {"core": "T3P + DIPEA in EtOAc/MeCN (0–25 °C)", "rank_hint": 0.83}
+          {
+            "core": "HATU + Oxyma + DIPEA in DMF/NMP (0–25 °C)",
+            "rank_hint": 0.8,
+            "reagents": [
+              {
+                "name": "HATU",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "Oxyma",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "DIPEA in DMF",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "NMP",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {}
+          },
+          {
+            "core": "COMU + DIPEA in DMF/MeCN (0–25 °C)",
+            "rank_hint": 0.85,
+            "reagents": [
+              {
+                "name": "COMU",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "DIPEA in DMF",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "MeCN",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {}
+          },
+          {
+            "core": "T3P + DIPEA in EtOAc/MeCN (0–25 °C)",
+            "rank_hint": 0.83,
+            "reagents": [
+              {
+                "name": "T3P",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "DIPEA in EtOAc",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "MeCN",
+                "role": "additive",
+                "amount": ""
+              },
+              {
+                "name": "",
+                "role": "solvent",
+                "amount": "0.15M"
+              }
+            ],
+            "conditions": {}
+          }
         ],
-        "guard_preference": "favor cold/short activation to limit epimerization"
+        "guard_preference": "favor cold/short activation to limit epimerization",
+        "reagents": [
+          {
+            "name": "",
+            "role": "solvent",
+            "amount": "0.15M"
+          }
+        ],
+        "conditions": {}
       }
     }
   ],
   "guardrails": [
     {
       "id": "GD-EXPLOSIVE-BENZOTRIAZOLES",
-      "if": {"additive_or_reagent in": ["HOBt", "HOAt", "HBTU", "HATU", "TBTU"]},
+      "if": {
+        "additive_or_reagent in": [
+          "HOBt",
+          "HOAt",
+          "HBTU",
+          "HATU",
+          "TBTU"
+        ]
+      },
       "action": "warn_or_substitute",
       "message": "Dry benzotriazole systems can be impact/thermal sensitive; prefer Oxyma/COMU or T3P when feasible.",
       "severity": "high"
     },
     {
       "id": "GD-ACID-CHLORIDE-GAS",
-      "if": {"activator in": ["oxalyl chloride", "SOCl2"]},
+      "if": {
+        "activator in": [
+          "oxalyl chloride",
+          "SOCl2"
+        ]
+      },
       "action": "warn",
       "message": "CO/CO2/HCl evolved—use traps and ventilation; consider acyl fluorides for cleaner profiles.",
       "severity": "medium"
     },
     {
       "id": "GD-CDI-ALCOHOLS",
-      "if": {"route": "CDI", "functional_groups.alcohols_free": true},
+      "if": {
+        "route": "CDI",
+        "functional_groups.alcohols_free": true
+      },
       "action": "penalize",
       "message": "CDI acyl imidazoles can O-acylate free alcohols/phenols—use acyl fluoride or EDC/Oxyma instead.",
       "severity": "medium"
     },
     {
       "id": "GD-DCC-NO-ADDITIVE",
-      "if": {"reagent": "DCC", "no_additive": true},
+      "if": {
+        "reagent": "DCC",
+        "no_additive": true
+      },
       "action": "warn_or_substitute",
       "message": "O→N acylurea rearrangement without Oxyma/HOBt-type additive.",
       "severity": "medium"
     },
     {
       "id": "GD-DIAMINE-OVERACYLATION",
-      "if": {"amine.class": "diamine"},
+      "if": {
+        "amine.class": "diamine"
+      },
       "action": "enforce_params",
-      "params": {"slow_addition": true, "temp_max_C": 0, "use_excess_base": false},
+      "params": {
+        "slow_addition": true,
+        "temp_max_C": 0,
+        "use_excess_base": false
+      },
       "message": "Minimize bis-acylation; consider temporary mono-protection."
     },
     {
       "id": "GD-ALPHA-AA-PROTECTION-CHECK",
-      "if": {"acid.is_alpha_amino_acid": true},
+      "if": {
+        "acid.is_alpha_amino_acid": true
+      },
       "action": "enforce_params",
-      "params": {"cap_temperature_C": 25, "cap_time_h": 6, "require_feature": ["acid.internal_amine_free"]},
+      "params": {
+        "cap_temperature_C": 25,
+        "cap_time_h": 6,
+        "require_feature": [
+          "acid.internal_amine_free"
+        ]
+      },
       "message": "For α-amino acids, declare whether the α-NH2 is protected. Favor cold/short activation; consider acyl-fluoride/mixed-anhydride."
     },
     {
       "id": "GD-ALPHA-CHIRAL-EE",
-      "if": {"acid.class": "alpha-chiral"},
+      "if": {
+        "acid.class": "alpha-chiral"
+      },
       "action": "route_preference",
-      "prefer": ["AM-ACYL-FLUORIDE-TFFH_BTFFH", "AM-MIXED-ANHYDRIDE-IBCF", "AM-EDC-OXYMA-GENERAL", "AM-T3P-SCALE-EASYWORKUP"],
+      "prefer": [
+        "AM-ACYL-FLUORIDE-TFFH_BTFFH",
+        "AM-MIXED-ANHYDRIDE-IBCF",
+        "AM-EDC-OXYMA-GENERAL",
+        "AM-T3P-SCALE-EASYWORKUP"
+      ],
       "cap_temperature_C": 25,
       "cap_time_h": 6,
       "message": "Limit activation lifetime; sample chiral HPLC periodically."
@@ -394,35 +1265,59 @@
   "priors": [
     {
       "feature": "amine.class=aniline",
-      "boost": ["AM-ACYL-FLUORIDE-TFFH_BTFFH", "AM-HATU-HINDERED", "AM-EDC-OXYMA-GENERAL"],
+      "boost": [
+        "AM-ACYL-FLUORIDE-TFFH_BTFFH",
+        "AM-HATU-HINDERED",
+        "AM-EDC-OXYMA-GENERAL"
+      ],
       "comment": "Poorer nucleophiles benefit from stronger activation or acyl fluorides."
     },
     {
       "feature": "acid.class=hindered OR electron-poor",
-      "boost": ["AM-HATU-HINDERED", "AM-T3P-SCALE-EASYWORKUP", "AM-DIC-OXYMA-HOMOGENEOUS"]
+      "boost": [
+        "AM-HATU-HINDERED",
+        "AM-T3P-SCALE-EASYWORKUP",
+        "AM-DIC-OXYMA-HOMOGENEOUS"
+      ]
     },
     {
       "feature": "process.scale_g>=50",
-      "boost": ["AM-T3P-SCALE-EASYWORKUP", "AM-EDC-OXYMA-GENERAL"]
+      "boost": [
+        "AM-T3P-SCALE-EASYWORKUP",
+        "AM-EDC-OXYMA-GENERAL"
+      ]
     },
     {
       "feature": "functional_groups.alcohols_free=true",
-      "boost": ["AM-ACYL-FLUORIDE-TFFH_BTFFH"],
-      "penalize": ["AM-CDI-IMIDAZOLIDE"]
+      "boost": [
+        "AM-ACYL-FLUORIDE-TFFH_BTFFH"
+      ],
+      "penalize": [
+        "AM-CDI-IMIDAZOLIDE"
+      ]
     },
     {
       "feature": "process.need_green=true",
-      "boost": ["AM-T3P-SCALE-EASYWORKUP", "AM-EDC-OXYMA-GENERAL", "AM-DMTMM-AQUEOUS"]
+      "boost": [
+        "AM-T3P-SCALE-EASYWORKUP",
+        "AM-EDC-OXYMA-GENERAL",
+        "AM-DMTMM-AQUEOUS"
+      ]
     },
     {
       "feature": "amine.is_benzylic=true AND acid.class=hindered",
-      "boost": ["AM-HINDERED-PRIMARY-COMU_T3P", "AM-ACYL-FLUORIDE-TFFH_BTFFH"]
+      "boost": [
+        "AM-HINDERED-PRIMARY-COMU_T3P",
+        "AM-ACYL-FLUORIDE-TFFH_BTFFH"
+      ]
     }
   ],
   "repairs": [
     {
       "id": "RP-LOW-CONVERSION",
-      "if": {"outcome": "low_conversion"},
+      "if": {
+        "outcome": "low_conversion"
+      },
       "then": {
         "sequence": [
           "raise_temperature:+10 °C (if stable)",
@@ -436,7 +1331,12 @@
     },
     {
       "id": "RP-RACEMIZATION",
-      "if": {"outcome in": ["low_ee", "dr_erosion"]},
+      "if": {
+        "outcome in": [
+          "low_ee",
+          "dr_erosion"
+        ]
+      },
       "then": {
         "sequence": [
           "lower_temperature_to: 0–5 °C",
@@ -449,7 +1349,12 @@
     },
     {
       "id": "RP-INSOLUBLE/CLUMP",
-      "if": {"outcome in": ["heterogeneous_mixture", "filtration_clogging"]},
+      "if": {
+        "outcome in": [
+          "heterogeneous_mixture",
+          "filtration_clogging"
+        ]
+      },
       "then": {
         "sequence": [
           "switch_reagent: DCC → DIC/EDC/T3P",
@@ -460,7 +1365,9 @@
     },
     {
       "id": "RP-UREA-RESIDUES",
-      "if": {"outcome": "urea/EDU carryover"},
+      "if": {
+        "outcome": "urea/EDU carryover"
+      },
       "then": {
         "sequence": [
           "acidic_wash: 0.5 M HCl",
