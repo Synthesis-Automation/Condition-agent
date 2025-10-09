@@ -395,9 +395,6 @@ def _build_standard_output(
         "recommended_conditions": normalized_recommendations,
     }
     
-    # Backwards compatibility: keep previous key name.
-    output["recommendations"] = normalized_recommendations
-    
     if extras:
         output["extras"] = extras
     
