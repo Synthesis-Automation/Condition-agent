@@ -4,6 +4,52 @@ Complete guide to starting, testing, and using all ChemTools API endpoints.
 
 ---
 
+## ✨ What's New (2024)
+
+### Specific Catalyst Preservation
+
+Recommendations now show **exact catalyst complexes** instead of generic metals:
+
+**Before:**
+```text
+Catalyst: Palladium
+CAS: N/A
+```
+
+**After:**
+```text
+Catalyst: Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct
+CAS: 95464-05-4
+```
+
+This improvement ensures you get the **specific catalyst complex** used in the top precedent, not just the metal core.
+
+### New Reranking Strategies
+
+Control how recommendations are ranked:
+
+- `rerank_strategy='none'` - Pure similarity-based (fastest)
+- `rerank_strategy='rule'` - Apply reaction-specific rules (⭐ recommended)
+- `rerank_strategy='analytics'` - Use dataset analytics (for novel reactions)
+
+### Unknown Reagent Filtering
+
+Filter out recommendations with unidentified components:
+
+```python
+# Only get recommendations with known reagents
+response = requests.post(
+    'http://localhost:8000/api/v1/recommend',
+    json={
+        'reaction': 'CCBr.CCCO>>CCOCC',
+        'k': 50,
+        'filter_unknown_reagents': True  # No "[Unknown ...]" in results
+    }
+)
+```
+
+---
+
 ## 📚 Available Documentation
 
 | Document | Purpose | Best For |
@@ -73,9 +119,14 @@ Results: 2/2 tests passed
 
 **Scenario:** You have a reaction and want condition recommendations.
 
-**Endpoint:** `POST /api/v1/recommend`
+**Endpoint:** `POST /api/v1/recommend` ⭐ **Primary Endpoint**
 
-**Code:**
+**✨ New Features (2024):**
+- **Specific Catalyst Preservation**: Shows exact catalyst complexes (e.g., "Pd(dppf)Cl2·DCM") instead of generic metals
+- **Reranking Strategies**: Apply rule-based or analytics-based reranking (`rerank_strategy`)
+- **Unknown Reagent Filtering**: Filter out recommendations with unidentified reagents (`filter_unknown_reagents`)
+
+**Basic Example:**
 ```python
 import requests
 
@@ -97,9 +148,87 @@ print(f"Use {top['summary']['core']} + {top['summary']['base']} in {top['summary
 Use Cu + Tripotassium phosphate in Sulfolane
 ```
 
+**Advanced Example with New Parameters:**
+```python
+import requests
+
+# Suzuki coupling with reranking and specific catalysts
+response = requests.post(
+    'http://localhost:8000/api/v1/recommend',
+    json={
+        'reaction': 'c1ccccc1Br.c1ccccc1B(O)O>>c1ccccc1c1ccccc1',  # Suzuki
+        'reaction_family': 'suzuki',
+        'k': 100,
+        'rerank_strategy': 'rule',  # Options: 'none', 'rule', 'analytics'
+        'filter_unknown_reagents': True  # Only known reagents
+    }
+)
+
+result = response.json()
+top = result['formatted']['recommended_conditions'][0]
+
+# Now shows specific catalysts instead of generic "Palladium":
+print(f"Catalyst: {top['catalyst']['name']}")
+# "Dichloro(1,1'-bis(diphenylphosphino)ferrocene)palladium(II) dichloromethane adduct"
+
+print(f"CAS: {top['catalyst'].get('cas', 'N/A')}")  # CAS 95464-05-4
+print(f"Similarity: {top['similarity']:.3f}")
+```
+
+**Reranking Strategy Guide:**
+
+| Strategy | When to Use | Effect |
+|----------|-------------|--------|
+| `'none'` | Fast lookups, well-known reactions | Pure DRFP similarity ranking |
+| `'rule'` | Standard reactions (Suzuki, Buchwald, etc.) | Rerank using reaction-specific rules ⭐ **Recommended** |
+| `'analytics'` | Novel/complex reactions | Rerank using dataset analytics |
+
+**Filter Unknown Reagents:**
+```python
+# Only get recommendations with fully identified reagents
+response = requests.post(
+    'http://localhost:8000/api/v1/recommend',
+    json={
+        'reaction': 'CCBr.CCCO>>CCOCC',
+        'k': 50,
+        'filter_unknown_reagents': True
+    }
+)
+
+# All recommendations will have known catalysts, bases, ligands
+for cond in response.json()['formatted']['recommended_conditions']:
+    assert '[Unknown' not in str(cond.get('catalyst', {}))
+```
+
 ---
 
-### Use Case 2: Get Fusion Recommendations (NEW)
+### Use Case 2: Get Fusion Recommendations (DEPRECATED ⚠️)
+
+> **⚠️ DEPRECATED:** Use `/api/v1/recommend` with `rerank_strategy='analytics'` instead.
+>
+> The fusion endpoint is deprecated in favor of the unified `/api/v1/recommend` endpoint with reranking strategies.
+
+**Migration Guide:**
+
+```python
+# OLD (deprecated)
+response = requests.post(
+    'http://localhost:8000/api/v1/recommend/fusion',
+    json={'reaction': 'Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1', 'k': 50}
+)
+
+# NEW (recommended)
+response = requests.post(
+    'http://localhost:8000/api/v1/recommend',
+    json={
+        'reaction': 'Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1',
+        'k': 50,
+        'rerank_strategy': 'analytics'  # Use analytics-based reranking
+    }
+)
+```
+
+**Legacy Example (for reference only):**
 
 **Scenario:** You want smarter recommendations with adaptive weighting.
 
@@ -132,7 +261,7 @@ for reason in meta['reasoning']:
 ```
 
 **Output:**
-```
+```text
 Adaptive Weights:
   Precedent: 32.9%
   Analytics: 50.3%
@@ -262,11 +391,22 @@ print(f"Has fusion_meta: {'fusion_meta' in r2.json()}")
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/api/v1/recommend` | POST | Get condition recommendations (baseline) |
-| `/api/v1/recommend/fusion` | POST | Get fusion recommendations (adaptive) ⭐ NEW |
+| `/api/v1/recommend` | POST | Get condition recommendations ⭐ **Primary** (supports reranking, filtering) |
+| `/api/v1/recommend/fusion` | POST | Get fusion recommendations ⚠️ **DEPRECATED** (use `/recommend` with `rerank_strategy='analytics'`) |
 | `/api/v1/router/detect-family` | POST | Detect reaction family |
 | `/api/v1/design_plate` | POST | Design HTS plate |
 | `/health` | GET | Check server health |
+
+**New Parameters for `/api/v1/recommend`:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `reaction` | string | *required* | SMILES reaction string |
+| `reaction_family` | string | `null` | Reaction family (e.g., "suzuki", "buchwald") |
+| `k` | integer | `50` | Number of precedents to retrieve |
+| `rerank_strategy` | string | `'rule'` | Reranking method: `'none'`, `'rule'`, `'analytics'` |
+| `filter_unknown_reagents` | boolean | `false` | Filter out recommendations with unknown reagents |
+| `max_variants` | integer | `5` | Maximum condition variants to return |
 
 ### Mid-Level Endpoints
 

@@ -1,0 +1,434 @@
+{
+  "meta": {
+    "generated_at": "2025-10-09T14:31:09.082233Z",
+    "model": "Rule-based-Suzuki_db.json",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 3.52
+  },
+  "input": {
+    "reaction_smiles": "C/C=C/Br.C=CB(O)O>>C/C=C/C=C",
+    "family": "Suzuki_Miyaura"
+  },
+  "detection": {
+    "family": "Suzuki_Miyaura",
+    "detected_reaction_type": "Suzuki_Miyaura",
+    "method": "pattern-match",
+    "confidence": 1.0
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "smiles": "C/C=C/Br",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "C=CB(O)O",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_precursor",
+          "notes": "Pd(PPh3)4",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": 0.025
+        },
+        {
+          "name": "Potassium carbonate",
+          "role": "base",
+          "notes": "K2CO3",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "THF/H2O",
+          "role": "solvent",
+          "notes": "THF/H2O (9:1)",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          20.0,
+          30.0
+        ],
+        "time": [
+          4.0,
+          8.0
+        ],
+        "atmosphere": null
+      },
+      "source": {
+        "match_type": "scheme",
+        "entry_id": "M-SUZ-VINYL-RT",
+        "entry_name": "Vinyl halide + vinyl boron (scheme-based, RT)",
+        "priority": 75
+      }
+    }
+  ],
+  "extras": {
+    "match": {
+      "reaction_type": "Suzuki_Miyaura",
+      "match_type": "scheme",
+      "entry_id": "M-SUZ-VINYL-RT",
+      "entry_name": "Vinyl halide + vinyl boron (scheme-based, RT)",
+      "priority": 75,
+      "conditions": {
+        "temperature_C": [
+          20.0,
+          30.0
+        ],
+        "time_h": [
+          4.0,
+          8.0
+        ]
+      },
+      "trace": {
+        "normalization": {
+          "reactant_smiles": [
+            "C/C=C/Br",
+            "C=CB(O)O"
+          ],
+          "kept_reactants": [
+            "C/C=C/Br",
+            "C=CB(O)O"
+          ],
+          "dropped_reactants": [],
+          "smarts_bag": [],
+          "anchor_hits": []
+        },
+        "evaluations": [
+          {
+            "id": "SCDB-SUZ-ARBRI-GENERAL-PPh3",
+            "type": "scheme",
+            "priority": 45,
+            "specificity": 6,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+            "type": "scheme",
+            "priority": 46,
+            "specificity": 6,
+            "matches": [],
+            "missing": [
+              "[c:1]-[I,Br:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "SCDB-SUZ-ARBR-ORTHO-XPhos",
+            "type": "scheme",
+            "priority": 50,
+            "specificity": 12,
+            "matches": [],
+            "missing": [
+              "[c:1]1[c]([C,N,O,S,F,Cl])[c,cH][c,cH][c,cH][c,cH]1-[Br:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "SCDB-SUZ-ARCL-EPoor-XPhos",
+            "type": "scheme",
+            "priority": 60,
+            "specificity": 6,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-ARCL-ERich-L95",
+            "type": "scheme",
+            "priority": 58,
+            "specificity": 6,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-OTf-DPPF",
+            "type": "scheme",
+            "priority": 70,
+            "specificity": 13,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-HET-2PYRIDYL-SLOWRELEASE",
+            "type": "scheme",
+            "priority": 68,
+            "specificity": 11,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-VINYL-DPPF-RT",
+            "type": "scheme",
+            "priority": 72,
+            "specificity": 8,
+            "matches": [
+              {
+                "smarts": "[C:1]=[C:2]-[Br:3]",
+                "masked_index": 0,
+                "reactant_index": 0,
+                "reactant_smiles": "C/C=C/Br",
+                "match_count": 1,
+                "atom_indices": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "smarts": "[B:4](-[O])(-[O])-[C:5]=[C:6]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "C=CB(O)O",
+                "match_count": 1,
+                "atom_indices": [
+                  2,
+                  3,
+                  4,
+                  1,
+                  0
+                ]
+              }
+            ],
+            "missing": [],
+            "matched": true
+          },
+          {
+            "id": "SCDB-SUZ-ALKYL-PRIMARYI-9BBN",
+            "type": "scheme",
+            "priority": 62,
+            "specificity": 3,
+            "matches": [],
+            "missing": [
+              "[C;X4;H2:1]-[I:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "SCDB-SUZ-HET-THIOPHENE-FURAN-TRIBORONATE",
+            "type": "scheme",
+            "priority": 66,
+            "specificity": 10,
+            "matches": [],
+            "missing": [
+              "[c:1]-[Br:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "SCDB-SUZ-MIYAURA-BORYLATION",
+            "type": "scheme",
+            "priority": 52,
+            "specificity": 4,
+            "matches": [],
+            "missing": [
+              "[c:1]-[I,Br:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "SCDB-SUZ-BULKY-NUC-XPHOS",
+            "type": "scheme",
+            "priority": 48,
+            "specificity": 8,
+            "matches": [],
+            "missing": [
+              "[c:1]-[Br:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "SCDB-SUZ-2HETARYL-SPHOS",
+            "type": "scheme",
+            "priority": 65,
+            "specificity": 6,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-ARI-META-TBUXPHOS",
+            "type": "scheme",
+            "priority": 55,
+            "specificity": 13,
+            "matches": [],
+            "missing": [
+              "[c:1]1[c]([#6,#7,#8,#16])[c][c]([#6,#7,#8,#16])[c][c]1-[I:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "M-SUZ-OTf-DPPF",
+            "type": "scheme",
+            "priority": 80,
+            "specificity": 13,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "M-SUZ-VINYL-RT",
+            "type": "scheme",
+            "priority": 75,
+            "specificity": 8,
+            "matches": [
+              {
+                "smarts": "[C:1]=[C:2]-[I,Br:3]",
+                "masked_index": 0,
+                "reactant_index": 0,
+                "reactant_smiles": "C/C=C/Br",
+                "match_count": 1,
+                "atom_indices": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "smarts": "[B:4](-[O])(-[O])-[C:5]=[C:6]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "C=CB(O)O",
+                "match_count": 1,
+                "atom_indices": [
+                  2,
+                  3,
+                  4,
+                  1,
+                  0
+                ]
+              }
+            ],
+            "missing": [],
+            "matched": true
+          },
+          {
+            "id": "M-SUZ-BF3K-GENERAL",
+            "type": "scheme",
+            "priority": 65,
+            "specificity": 6,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-HET-AZINE-BORON",
+            "type": "scheme",
+            "priority": 64,
+            "specificity": 11,
+            "matches": [],
+            "missing": [
+              "[c:1]-[Br:2]"
+            ],
+            "matched": false
+          },
+          {
+            "id": "SCDB-SUZ-DEFAULT-OTf",
+            "type": "default_condition",
+            "priority": 0,
+            "specificity": 13,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
+            "type": "default_condition",
+            "priority": 0,
+            "specificity": 0,
+            "matches": [],
+            "missing": [],
+            "matched": true
+          },
+          {
+            "id": "SCDB-SUZ-DEFAULT-ArCl",
+            "type": "default_condition",
+            "priority": 0,
+            "specificity": 0,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-DEFAULT-2HET_prone",
+            "type": "default_condition",
+            "priority": 0,
+            "specificity": 0,
+            "matches": [],
+            "missing": [],
+            "matched": false,
+            "filtered": true
+          },
+          {
+            "id": "SCDB-SUZ-DEFAULT-vinyl",
+            "type": "default_condition",
+            "priority": 0,
+            "specificity": 0,
+            "matches": [],
+            "missing": [],
+            "matched": true
+          }
+        ],
+        "selected": {
+          "id": "M-SUZ-VINYL-RT",
+          "type": "scheme",
+          "priority": 75,
+          "specificity": 8
+        }
+      },
+      "reagents": [
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_source",
+          "amount": "2–3%"
+        },
+        {
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "THF/H2O (9:1)",
+          "role": "solvent",
+          "amount": ""
+        }
+      ]
+    }
+  }
+}
