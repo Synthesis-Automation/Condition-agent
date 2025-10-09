@@ -1,0 +1,806 @@
+{
+  "meta": {
+    "generated_at": "2025-10-09T12:09:53.397096Z",
+    "model": "ML-precedent-knn",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 604.25
+  },
+  "input": {
+    "reaction_smiles": "Brc1cnccn1.Nc1ccccc1>>c1ccccc1Nc1cnccn1",
+    "family": "C_N_Coupling_Cu",
+    "requested_reaction_type": "C_N_Coupling_Cu",
+    "requested_family": "C_N_Coupling_Cu"
+  },
+  "detection": {
+    "family": "C_N_Coupling_Cu",
+    "detected_reaction_type": "C_N_Coupling_Cu",
+    "method": "rxn-insight-ml",
+    "confidence": 0.475
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cnccn1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "66-71-7",
+          "role": "ligand",
+          "name": "1,10-Phenanthroline",
+          "abbreviation": null,
+          "cas": "66-71-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "1310-58-3",
+          "role": "base",
+          "name": "Potassium hydroxide",
+          "abbreviation": null,
+          "cas": "1310-58-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "110-71-4",
+          "role": "solvent",
+          "name": "1,2-Dimethoxyethane",
+          "abbreviation": null,
+          "cas": "110-71-4",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 2
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cnccn1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "66-71-7",
+          "role": "ligand",
+          "name": "1,10-Phenanthroline",
+          "abbreviation": null,
+          "cas": "66-71-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "534-17-8",
+          "role": "base",
+          "name": "Cesium carbonate",
+          "abbreviation": null,
+          "cas": "534-17-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "68-12-2",
+          "role": "solvent",
+          "name": "N,N-Dimethylformamide",
+          "abbreviation": null,
+          "cas": "68-12-2",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 2
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cnccn1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "66-71-7",
+          "role": "ligand",
+          "name": "1,10-Phenanthroline",
+          "abbreviation": null,
+          "cas": "66-71-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "7087-68-5",
+          "role": "base",
+          "name": "N,N-Diisopropylethylamine",
+          "abbreviation": null,
+          "cas": "7087-68-5",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "75-05-8",
+          "role": "solvent",
+          "name": "Acetonitrile",
+          "abbreviation": null,
+          "cas": "75-05-8",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 1
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cnccn1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "66-71-7",
+          "role": "ligand",
+          "name": "1,10-Phenanthroline",
+          "abbreviation": null,
+          "cas": "66-71-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "67-68-5",
+          "role": "solvent",
+          "name": "Dimethyl sulfoxide",
+          "abbreviation": null,
+          "cas": "67-68-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 3
+    },
+    {
+      "rank": 5,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cnccn1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "66-71-7",
+          "role": "ligand",
+          "name": "1,10-Phenanthroline",
+          "abbreviation": null,
+          "cas": "66-71-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "7778-53-2",
+          "role": "base",
+          "name": "Tripotassium phosphate",
+          "abbreviation": null,
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "123-91-1",
+          "role": "solvent",
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 1
+    }
+  ],
+  "precedents_used": {
+    "total_count": 10,
+    "top_precedents": [
+      {
+        "rank": 1,
+        "reaction_id": "31-172-CAS-21552230",
+        "reaction_smiles": "c1ccc2c(c1)[nH]c1ccccc12.Brc1ccc(I)cc1>>Brc1ccc(-n2c3ccccc3c3ccccc32)cc1",
+        "core": "Cu/phen",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1,10-Phenanthroline",
+            "cas": "66-71-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium hydroxide",
+            "cas": "1310-58-3",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,2-Dimethoxyethane",
+            "cas": "110-71-4"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Scope, Kinetics, and Mechanism of \"On Water\" Cu Catalysis in the C-N Cross-Coupling Reactions of Indole Derivatives | Malavade, Vrunda; Patil, Manish; Patil, M. | European Journal of Organic Chemistry (2020), 2020(5), 561-569"
+      },
+      {
+        "rank": 2,
+        "reaction_id": "31-172-CAS-21552231",
+        "reaction_smiles": "c1ccc2c(c1)[nH]c1ccccc12.Clc1ccc(I)cc1>>Clc1ccc(-n2c3ccccc3c3ccccc32)cc1",
+        "core": "Cu/phen",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1,10-Phenanthroline",
+            "cas": "66-71-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium hydroxide",
+            "cas": "1310-58-3",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,2-Dimethoxyethane",
+            "cas": "110-71-4"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Scope, Kinetics, and Mechanism of \"On Water\" Cu Catalysis in the C-N Cross-Coupling Reactions of Indole Derivatives | Malavade, Vrunda; Patil, Manish; Patil, M. | European Journal of Organic Chemistry (2020), 2020(5), 561-569"
+      },
+      {
+        "rank": 3,
+        "reaction_id": "31-172-CAS-23114586",
+        "reaction_smiles": "c1ccc2[nH]cnc2c1.COc1ccc(I)cc1>>COc1ccc(-n2cnc3ccccc32)cc1",
+        "core": "Cu/Oxine",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "8-Hydroxyquinoline",
+            "cas": "148-24-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Dimethyl sulfoxide",
+            "cas": "67-68-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Bis-NHC-Ag/Pd(OAc)2 catalytic system catalyzed transfer hydrogenation reaction | Chen, Hui-Ju; Chiu, Chien-Cheng; Wang, Tsui; Lee, Dong-Sheng; Lu, Ta-Jung | Catalysts (2021), 11(1), 8"
+      },
+      {
+        "rank": 4,
+        "reaction_id": "31-172-CAS-23707394",
+        "reaction_smiles": "COc1ccc(I)cc1.CC(C)(C)OC(=O)NNC(=O)OC(C)(C)C>>COc1ccc(N(NC(=O)OC(C)(C)C)C(=O)OC(C)(C)C)cc1",
+        "core": "Cu/phen",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1,10-Phenanthroline",
+            "cas": "66-71-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Cesium carbonate",
+            "cas": "534-17-8",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "N,N-Dimethylformamide",
+            "cas": "68-12-2"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "A Modular Approach to Arylazo-1,2,3-triazole Photoswitches | Tuck, Jeremy R.; Tombari, Robert J.; Yardeny, Noah; Olson, David E. | Organic Letters (2021), 23(11), 4305-4310"
+      },
+      {
+        "rank": 5,
+        "reaction_id": "31-614-CAS-24253047",
+        "reaction_smiles": "Fc1cc[c]([Bi]([c]2ccc(F)cc2)[c]2ccc(F)cc2)cc1.COC(=O)[C@H](Cc1cnc[nH]1)NC(=O)OC(C)(C)C>>COC(=O)[C@H](Cc1cn(-c2ccc(F)cc2)cn1)NC(=O)OC(C)(C)C",
+        "core": "Cu/phen",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(II) acetate",
+            "cas": "142-71-2",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1,10-Phenanthroline",
+            "cas": "66-71-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "N,N-Diisopropylethylamine",
+            "cas": "7087-68-5",
+            "role": "base"
+          },
+          {
+            "name": "Oxygen (g)",
+            "cas": "7782-44-7",
+            "role": "oxidant"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Acetonitrile",
+            "cas": "75-05-8"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Copper-promoted N-arylation of the imidazole side chain of protected histidine by using triarylbismuth reagents | Chan, Hwai-Chien; Bueno, Bianca; Le Roch, Adrien; Gagnon, Alexandre | Chemistry - A European Journal (2021), 27(53), 13330-13336"
+      },
+      {
+        "rank": 6,
+        "reaction_id": "31-614-CAS-35965263",
+        "reaction_smiles": "Ic1ccccc1.CC(C)(C)OC(=O)NNC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N(c1ccccc1)N(C(=O)OC(C)(C)C)c1ccccc1",
+        "core": "Cu/phen",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1,10-Phenanthroline",
+            "cas": "66-71-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Cesium carbonate",
+            "cas": "534-17-8",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "N,N-Dimethylformamide",
+            "cas": "68-12-2"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Facile One-Step Oxidation of N-Boc-Protected Diarylhydrazines to Diaryldiazenes with (Diacetoxyiodo)benzene under Mild Conditions | Orvos, Jakub; Pancik, Filip; Fischer, Robert | European Journal of Organic Chemistry (2023), 26(14), e202300049"
+      },
+      {
+        "rank": 7,
+        "reaction_id": "31-614-CAS-37788481",
+        "reaction_smiles": "Cc1c[nH]c2ccccc12.Cc1ccc(I)c(N)c1>>Cc1ccc(-n2cc(C)c3ccccc32)c(N)c1",
+        "core": "Cu/N,N'-Dimethylethylenediamine",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "N,N'-Dimethylethylenediamine",
+            "cas": "110-70-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Tripotassium phosphate",
+            "cas": "7778-53-2",
+            "role": "base"
+          },
+          {
+            "name": "Ammonium Chloride",
+            "cas": "12125-02-9",
+            "role": "additive"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,4-Dioxane",
+            "cas": "123-91-1"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "All-round catalytic and atroposelective strategy via dynamic kinetic resolution for N-/2-/3-arylindoles | Kim, Ahreum; Lee, Chanhee; Song, Jayoung; Lee, Sang Kook; Kwon, Yongseok | Nature Communications (2023), 14(1), 5502"
+      },
+      {
+        "rank": 8,
+        "reaction_id": "31-614-CAS-42064359",
+        "reaction_smiles": "Brc1ccc2c(c1)[nH]c1ccccc12.Ic1ccccn1>>Brc1ccc2c3ccccc3n(-c3ccccn3)c2c1",
+        "core": "Cu/TMEDA",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper oxide (Cu2O)",
+            "cas": "1317-39-1",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "TMEDA",
+            "cas": "110-18-9",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Tripotassium phosphate",
+            "cas": "7778-53-2",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,2-Dichlorobenzene",
+            "cas": "95-50-1"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Importance of the curvature in electronic, structural and charge transport properties: oligomers of N-pyridine carbazole | Brouillac, Clement; Serez, Ari; McIntosh, Nemo; Rault-Berthelot, Joelle; Jeannin, Olivier; Heinrich, Benoit; Quinton, Cassandre; De Sagazan, Olivier; Jacques, Emmanuel; Cornil, Jerome; Poriel, Cyril | Journal of Materials Chemistry C: Materials for Optical and Electronic Devices (2024), 12(32), 12598-12607"
+      },
+      {
+        "rank": 9,
+        "reaction_id": "31-172-CAS-23188649",
+        "reaction_smiles": "Nc1ccccc1I.N#Cc1ccc(NNC(=O)c2ccc(C#N)cc2)cc1>>N#Cc1ccc(C(=O)NN(c2ccc(C#N)cc2)c2ccccc2N)cc1",
+        "core": "Cu",
+        "yield": 98.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Dimethyl sulfoxide",
+            "cas": "67-68-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 98.0
+        },
+        "reference": "Electronic effects in profluorescent benzotriazinyl radicals: a combined experimental and theoretical study | Exner, Jessica; Maisuls, Ivan; Massolle, Anja; Klabunde, Sina; Hansen, Michael R.; Strassert, Cristian A.; Neugebauer, Johannes; Eckert, Hellmut; Studer, Armido | Physical Chemistry Chemical Physics (2021), 23(4), 2999-3007"
+      },
+      {
+        "rank": 10,
+        "reaction_id": "31-172-CAS-23189655",
+        "reaction_smiles": "Nc1ccccc1I.COc1ccc(C(=O)NNc2ccc(C#N)cc2)cc1>>COc1ccc(C(=O)NN(c2ccc(C#N)cc2)c2ccccc2N)cc1",
+        "core": "Cu",
+        "yield": 98.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Dimethyl sulfoxide",
+            "cas": "67-68-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 98.0
+        },
+        "reference": "Electronic effects in profluorescent benzotriazinyl radicals: a combined experimental and theoretical study | Exner, Jessica; Maisuls, Ivan; Massolle, Anja; Klabunde, Sina; Hansen, Michael R.; Strassert, Cristian A.; Neugebauer, Johannes; Eckert, Hellmut; Studer, Armido | Physical Chemistry Chemical Physics (2021), 23(4), 2999-3007"
+      }
+    ],
+    "core_matched_precedents": {
+      "core": "Cu/phen",
+      "count": 5,
+      "examples": [
+        {
+          "rank": 1,
+          "reaction_id": "31-172-CAS-21552230",
+          "core": "Cu/phen",
+          "base": "1310-58-3",
+          "solvent": "110-71-4",
+          "yield": 99.0
+        },
+        {
+          "rank": 2,
+          "reaction_id": "31-172-CAS-21552231",
+          "core": "Cu/phen",
+          "base": "1310-58-3",
+          "solvent": "110-71-4",
+          "yield": 99.0
+        },
+        {
+          "rank": 3,
+          "reaction_id": "31-172-CAS-23707394",
+          "core": "Cu/phen",
+          "base": "534-17-8",
+          "solvent": "68-12-2",
+          "yield": 99.0
+        },
+        {
+          "rank": 4,
+          "reaction_id": "31-614-CAS-24253047",
+          "core": "Cu/phen",
+          "base": "7087-68-5",
+          "solvent": "75-05-8",
+          "yield": 99.0
+        },
+        {
+          "rank": 5,
+          "reaction_id": "31-614-CAS-35965263",
+          "core": "Cu/phen",
+          "base": "534-17-8",
+          "solvent": "68-12-2",
+          "yield": 99.0
+        }
+      ]
+    },
+    "statistics": {
+      "average_yield": 98.8,
+      "yield_range": [
+        98.0,
+        99.0
+      ],
+      "temperature_range": null,
+      "time_range": null
+    }
+  }
+}

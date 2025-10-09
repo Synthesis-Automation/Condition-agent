@@ -135,12 +135,29 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
         family: Reaction family name (e.g., "C_N_Coupling_Pd")
         features: Query feature dict (bin, LG, nuc_class, etc.)
         k: Number of precedents to return (default: 50)
-        relax: Optional relaxation/configuration dict
+        relax: Optional relaxation/configuration dict with options:
+            - filter_by_reagent_database (bool): Only return precedents where all 
+              reagents are found in the reagent database (default: True)
+            - use_drfp (bool): Use DRFP-based similarity (default: False)
+            - selective_loading (bool): Load only requested family (default: True)
+            - debug_timing (bool): Log timing information (default: False)
         
     Returns:
         Dict with keys: prototype_id, support, precedents, (optional) error
+        
+    Example:
+        >>> # Get precedents with database filtering (default)
+        >>> pack = knn("C_N_Coupling_Pd", features={}, k=25)
+        >>> 
+        >>> # Disable database filtering to get all precedents
+        >>> pack = knn("C_N_Coupling_Pd", features={}, k=25, 
+        ...            relax={"filter_by_reagent_database": False})
     """
     relax_dict = dict(relax or {})
+    
+    # Set default: enable reagent database filtering
+    relax_dict.setdefault("filter_by_reagent_database", True)
+    
     molpipeline_cfg = relax_dict.pop('molpipeline', None)
     out = _knn_cached(family, _as_kv(features or {}), int(k), _as_kv(relax_dict))
     pack = {**out}
@@ -358,6 +375,58 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
             "T_C": r.get("T_C"),
             "time_h": r.get("time_h"),
         })
+    
+    # Optional filtering: only keep precedents where all reagents are in database
+    filter_by_database = relax.get("filter_by_reagent_database", True)  # Default: True
+    if filter_by_database:
+        try:
+            from ..reagent_lookup import filter_precedents_by_database_availability
+            
+            # Get full precedent data for filtering (top contains all needed fields)
+            precedents_for_filter = [r for r in top]
+            filtered = filter_precedents_by_database_availability(
+                precedents_for_filter,
+                require_all_in_database=True
+            )
+            
+            # Rebuild precedents list from filtered results
+            precedents = []
+            for r in filtered[:10]:  # Still limit to top 10
+                rsmi = r.get("reaction_smiles") or ""
+                reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
+                precedents.append({
+                    "reaction_id": r.get("reaction_id"),
+                    "reaction_smiles": rsmi,
+                    "reactants_smiles": reactants_smi,
+                    "products_smiles": products_smi,
+                    "condition_core": r.get("condition_core"),
+                    "yield": r.get("yield_value"),
+                    "core": r.get("condition_core"),
+                    "base_uid": r.get("base_uid"),
+                    "solvent_uid": r.get("solvent_uid"),
+                    "reagents": r.get("reagents"),
+                    "solvents": r.get("solvents"),
+                    "reference": r.get("reference"),
+                    "conditions": r.get("conditions"),
+                    "catalyst": r.get("catalyst"),
+                    "full_system": r.get("full_system"),
+                    "catalytic_system": r.get("catalytic_system"),
+                    "T_C": r.get("T_C"),
+                    "time_h": r.get("time_h"),
+                })
+            
+            # Update support to reflect filtered count
+            support = len(filtered)
+            
+            # Log filtering results if debugging
+            if relax.get("debug_timing", False):
+                original_count = len(top)
+                filtered_count = len(filtered)
+                logger.info(f"   Reagent database filtering: {original_count} → {filtered_count} precedents")
+        except ImportError:
+            # If reagent_lookup module not available, skip filtering
+            pass
+    
     timing['result_prep'] = time.time() - t_start_prep
     
     # ⏱️ TOTAL TIME
