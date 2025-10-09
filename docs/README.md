@@ -67,7 +67,7 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 
 ## Repository Layout
 
-```
+```text
 .
 |-- app/                     # FastAPI application wiring
 |   |-- main.py              # REST endpoints and request orchestration

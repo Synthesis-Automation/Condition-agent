@@ -433,8 +433,8 @@
           "K3PO4 2.0 eq"
         ],
         "solvent": [
-          "THF",
-          "dioxane"
+          "dioxane",
+          "THF"
         ],
         "temperature_C": [
           60,

@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "status": "success",
+    "model": "",
+    "version": "2.0"
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+    "family": "C_N_Coupling_Cu"
+  },
+  "detection": {
+    "family": "C_N_Coupling_Cu",
+    "confidence": 0.95
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material"
+        },
+        {
+          "name": "Copper(I) iodide",
+          "abbreviation": "CuI",
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "[Unknown ligand] CAS 2809369-03-5",
+          "abbreviation": null,
+          "cas": "2809369-03-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Tripotassium phosphate",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Sulfolane",
+          "abbreviation": "Sulfolane",
+          "cas": "126-33-0",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      }
+    }
+  ]
+}
