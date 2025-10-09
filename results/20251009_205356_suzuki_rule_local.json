@@ -1,14 +1,14 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T12:01:56.409389Z",
+    "generated_at": "2025-10-09T12:53:56.343512Z",
     "model": "Rule-based-Suzuki_db.json",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 4.7
+    "processing_time_ms": 4.04
   },
   "input": {
-    "reaction_smiles": "Brc1cnccn1.Nc1ccccc1>>c1ccccc1Nc1cnccn1",
+    "reaction_smiles": "Brc1ccccc1.c1ncc(B(O)O)cn1>>c1ccc(-c2cnccn2)cc1",
     "family": "Suzuki_Miyaura"
   },
   "detection": {
@@ -22,7 +22,7 @@
       "rank": 1,
       "chemicals": [
         {
-          "smiles": "Brc1cnccn1",
+          "smiles": "Brc1ccccc1",
           "role": "electrophile",
           "name": null,
           "abbreviation": null,
@@ -30,7 +30,7 @@
           "equivalents": null
         },
         {
-          "smiles": "Nc1ccccc1",
+          "smiles": "c1ncc(B(O)O)cn1",
           "role": "nucleophile",
           "name": null,
           "abbreviation": null,
@@ -38,13 +38,22 @@
           "equivalents": null
         },
         {
-          "name": "Pd(PPh3)4",
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
           "role": "metal_precursor",
-          "notes": "Pd(PPh3)4",
-          "abbreviation": null,
-          "cas": null,
+          "notes": "Pd2(dba)3",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
           "smiles": null,
-          "equivalents": 0.05
+          "equivalents": 0.015
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "notes": "SPhos",
+          "abbreviation": "SPhos",
+          "cas": "657408-07-6",
+          "smiles": null,
+          "equivalents": 0.03
         },
         {
           "name": "Potassium carbonate",
@@ -56,88 +65,63 @@
           "equivalents": 2.0
         },
         {
-          "name": "1,4-Dioxane",
+          "name": "THF/H2O",
           "role": "solvent",
-          "notes": "1,4-dioxane/H2O (4:1)",
+          "notes": "THF/H2O (4:1)",
           "abbreviation": null,
-          "cas": "123-91-1",
+          "cas": null,
           "smiles": null,
           "equivalents": null
         }
       ],
       "conditions": {
-        "temperature": {
-          "value": 60,
-          "unit": "C"
-        },
-        "time": {
-          "value": 8,
-          "unit": "h"
-        },
-        "atmosphere": null,
-        "extras": {
-          "extras": {
-            "rationale": "Robust benchmark set for most ArI/ArBr pairings.",
-            "condition_core": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-            "pd_source": "Pd(PPh3)4",
-            "ligand": "PPh3 (intrinsic)",
-            "boron_partner": "aryl-B(OH)2 or aryl-Bpin (1.2–1.3 eq)",
-            "base": "K2CO3 (2.0 eq)",
-            "solvent": "1,4-dioxane/H2O (4:1)",
-            "concentration_M": 0.2,
-            "loadings": {
-              "Pd_mol%": 1.0,
-              "ligand_mol%": 1.0,
-              "base_eq": 2.0
-            }
-          }
-        }
+        "temperature": [
+          45.0,
+          60.0
+        ],
+        "time": [
+          6.0,
+          10.0
+        ],
+        "atmosphere": null
       },
       "source": {
-        "match_type": "default",
-        "entry_id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
-        "entry_name": null,
-        "priority": 0
+        "match_type": "scheme",
+        "entry_id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+        "entry_name": "Aryl iodides/bromides + aryl boron (SPhos set)",
+        "priority": 46
       }
     }
   ],
   "extras": {
     "match": {
       "reaction_type": "Suzuki_Miyaura",
-      "match_type": "default",
-      "entry_id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
-      "entry_name": null,
-      "priority": 0,
+      "match_type": "scheme",
+      "entry_id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+      "entry_name": "Aryl iodides/bromides + aryl boron (SPhos set)",
+      "priority": 46,
       "conditions": {
-        "rationale": "Robust benchmark set for most ArI/ArBr pairings.",
-        "condition_core": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-        "pd_source": "Pd(PPh3)4",
-        "ligand": "PPh3 (intrinsic)",
-        "boron_partner": "aryl-B(OH)2 or aryl-Bpin (1.2–1.3 eq)",
-        "base": "K2CO3 (2.0 eq)",
-        "solvent": "1,4-dioxane/H2O (4:1)",
-        "temperature_C": 60,
-        "time_h": 8,
-        "concentration_M": 0.2,
-        "loadings": {
-          "Pd_mol%": 1.0,
-          "ligand_mol%": 1.0,
-          "base_eq": 2.0
-        }
+        "temperature_C": [
+          45.0,
+          60.0
+        ],
+        "time_h": [
+          6.0,
+          10.0
+        ]
       },
       "trace": {
         "normalization": {
           "reactant_smiles": [
-            "Brc1cnccn1",
-            "Nc1ccccc1"
+            "Brc1ccccc1",
+            "c1ncc(B(O)O)cn1"
           ],
           "kept_reactants": [
-            "Brc1cnccn1",
-            "Nc1ccccc1"
+            "Brc1ccccc1",
+            "c1ncc(B(O)O)cn1"
           ],
           "dropped_reactants": [],
           "smarts_bag": [
-            "[NH2]-[c]",
             "[c]-[Cl,Br,I]"
           ],
           "anchor_hits": [
@@ -147,14 +131,6 @@
               "atom_indices": [
                 1,
                 0
-              ]
-            },
-            {
-              "anchor": "[NH2]-[c]",
-              "reactant_index": 1,
-              "atom_indices": [
-                0,
-                1
               ]
             }
           ]
@@ -180,18 +156,29 @@
                 "smarts": "[c:1]-[I,Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1cnccn1",
+                "reactant_smiles": "Brc1ccccc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
                   0
                 ]
+              },
+              {
+                "smarts": "[B:3](-[O])(-[O])-[c:4]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "c1ncc(B(O)O)cn1",
+                "match_count": 1,
+                "atom_indices": [
+                  4,
+                  5,
+                  6,
+                  3
+                ]
               }
             ],
-            "missing": [
-              "[B:3](-[O])(-[O])-[c:4]"
-            ],
-            "matched": false
+            "missing": [],
+            "matched": true
           },
           {
             "id": "SCDB-SUZ-ARBR-ORTHO-XPhos",
@@ -276,7 +263,7 @@
                 "smarts": "[c:1]-[Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1cnccn1",
+                "reactant_smiles": "Brc1ccccc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -299,7 +286,7 @@
                 "smarts": "[c:1]-[I,Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1cnccn1",
+                "reactant_smiles": "Brc1ccccc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -322,7 +309,7 @@
                 "smarts": "[c:1]-[Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1cnccn1",
+                "reactant_smiles": "Brc1ccccc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -396,7 +383,7 @@
                 "smarts": "[c:1]-[Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1cnccn1",
+                "reactant_smiles": "Brc1ccccc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -460,17 +447,22 @@
           }
         ],
         "selected": {
-          "id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
-          "type": "default",
-          "priority": 0,
-          "specificity": 0
+          "id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+          "type": "scheme",
+          "priority": 46,
+          "specificity": 6
         }
       },
       "reagents": [
         {
-          "name": "Pd(PPh3)4",
+          "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "5%"
+          "amount": "1.5%"
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "amount": "3.0%"
         },
         {
           "name": "K2CO3",
@@ -478,9 +470,9 @@
           "amount": "200%"
         },
         {
-          "name": "1,4-dioxane/H2O (4:1)",
+          "name": "THF/H2O (4:1)",
           "role": "solvent",
-          "amount": "0.2M"
+          "amount": ""
         }
       ]
     }
