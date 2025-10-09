@@ -257,7 +257,10 @@ class RecommendNamespace:
     
     def conditions(self, reaction: str, reaction_type: Optional[str] = None,
                    k: int = 5, limit: int = 10, relax: Optional[Dict] = None,
-                   constraints: Optional[Dict] = None, **kwargs) -> Dict[str, Any]:
+                   constraints: Optional[Dict] = None, 
+                   rerank_strategy: str = 'rule',
+                   filter_unknown_reagents: bool = False,
+                   **kwargs) -> Dict[str, Any]:
         """Get ML-based condition recommendations.
         
         Args:
@@ -267,6 +270,8 @@ class RecommendNamespace:
             limit: Maximum recommendations to return
             relax: Relaxation rules
             constraints: Constraint rules
+            rerank_strategy: 'rule', 'analytics', or 'none' (default: 'rule')
+            filter_unknown_reagents: Filter precedents with unknown reagents (default: False)
             **kwargs: Additional parameters
             
         Returns:
@@ -279,7 +284,9 @@ class RecommendNamespace:
             k=k,
             limit=limit,
             relax=relax or {},
-            constraints=constraints or {}
+            constraints=constraints or {},
+            rerank_strategy=rerank_strategy,
+            filter_unknown_reagents=filter_unknown_reagents,
         )
     
     def from_reaction(self, reaction: str, k: int = 5, relax: Optional[Dict] = None,

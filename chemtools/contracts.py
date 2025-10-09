@@ -36,7 +36,12 @@ class RecommendConditionsRequest(BaseModel):
     constraints: Optional[Dict[str, Any]] = None
 
 class FusionRecommendRequest(BaseModel):
-    """Request for multi-source evidence fusion recommendation system."""
+    """
+    DEPRECATED: Fusion recommendation system has been removed.
+    
+    Use RecommendFromReactionRequest with rerank_strategy='rule' instead.
+    This class is kept for backward compatibility only.
+    """
     reaction: str
     k: int = 50
     max_variants: int = 5
