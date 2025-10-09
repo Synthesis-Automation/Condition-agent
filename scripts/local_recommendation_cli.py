@@ -215,6 +215,8 @@ def local_ml_recommendation(
     reaction_type: Optional[str],
     k_value: int,
     limit: int,
+    rerank_strategy: str = 'rule',
+    filter_unknown_reagents: bool = False,
 ) -> Dict[str, Any]:
     """Replicate the /api/v1/recommend/conditions endpoint locally."""
     start_time = time.perf_counter()
@@ -226,6 +228,8 @@ def local_ml_recommendation(
             limit=limit,
             relax={},
             constraints={},
+            rerank_strategy=rerank_strategy,
+            filter_unknown_reagents=filter_unknown_reagents,
         )
     except Exception as exc:
         return {"error": f"Local ML recommendation failed: {exc}"}
@@ -242,13 +246,28 @@ def local_fusion_recommendation(
     k_value: int,
     max_variants: int,
 ) -> Dict[str, Any]:
-    """Replicate the /api/v1/recommend/fusion endpoint locally."""
+    """
+    DEPRECATED: Fusion recommendation has been replaced.
+    
+    This function now redirects to the standard recommendation with rule-based reranking.
+    Use local_ml_recommendation() with rerank_strategy='rule' instead.
+    """
+    import warnings
+    warnings.warn(
+        "Fusion recommendation is deprecated. Use local_ml_recommendation() "
+        "with rerank_strategy='rule' instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
     start_time = time.perf_counter()
     try:
+        # Redirect to standard recommendation with rule reranking
         result = recommend.recommend_from_reaction(
             reaction=reaction,
             k=k_value,
-            use_fusion=True,
+            rerank_strategy='rule',  # Use rule reranking instead of fusion
+            filter_unknown_reagents=False,
             max_variants=max_variants,
             relax={},
             constraint_rules={},
@@ -258,11 +277,11 @@ def local_fusion_recommendation(
 
     processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
-    if "fusion_meta" not in result:
-        result["fusion_meta"] = {
-            "error": "Fusion metadata not available",
-            "note": "Check recommend.recommend_from_reaction fusion configuration",
-        }
+    # Add deprecation notice
+    result['_deprecated'] = {
+        'message': 'Fusion is deprecated. Use rerank_strategy="rule" instead.',
+        'migration': 'Use --rerank rule instead of --strategy fusion'
+    }
 
     return output_formatter.format_fusion_output(
         reaction_smiles=reaction,
@@ -342,7 +361,22 @@ Examples:
         type=str,
         default="all",
         choices=["all", "rule", "ml", "fusion"],
-        help="Which recommendation strategy to run (default: all)"
+        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated."
+    )
+    
+    parser.add_argument(
+        "--rerank",
+        type=str,
+        default="rule",
+        choices=["none", "rule", "analytics"],
+        help="Reranking strategy for ML recommendations: 'none' (similarity only), "
+             "'rule' (boost by rule match), 'analytics' (boost by popularity). Default: rule"
+    )
+    
+    parser.add_argument(
+        "--filter-unknown",
+        action="store_true",
+        help="Filter out precedents with unknown base/solvent reagents (not in database)"
     )
     
     parser.add_argument(
@@ -414,7 +448,14 @@ Examples:
         rule_file = save_to_dir(rule_result, f"{timestamp}_{label}_rule_local.json")
     
     if run_ml:
-        ml_result = local_ml_recommendation(reaction, reaction_type, k_value, limit_value)
+        ml_result = local_ml_recommendation(
+            reaction, 
+            reaction_type, 
+            k_value, 
+            limit_value,
+            rerank_strategy=args.rerank,
+            filter_unknown_reagents=args.filter_unknown
+        )
         ml_file = save_to_dir(ml_result, f"{timestamp}_{label}_ml_local.json")
     
     if run_fusion:

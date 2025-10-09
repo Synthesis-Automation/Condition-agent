@@ -355,6 +355,8 @@ def recommend_conditions_structured(
     limit: int = 5,
     relax: Optional[Dict[str, Any]] = None,
     constraints: Optional[Dict[str, Any]] = None,
+    rerank_strategy: str = 'rule',
+    filter_unknown_reagents: bool = False,
 ) -> Dict[str, Any]:
     """
     Recommend conditions with structured output format for API/UI consumers.
@@ -369,6 +371,8 @@ def recommend_conditions_structured(
         limit: Maximum number of recommendations to return (default: 5)
         relax: Relaxation parameters for precedent search
         constraints: Constraint rules (inventory, blacklist, etc.)
+        rerank_strategy: 'rule', 'analytics', or 'none' (default: 'rule')
+        filter_unknown_reagents: Filter precedents with unknown reagents (default: False)
     
     Returns:
         Dict with keys:
@@ -395,6 +399,8 @@ def recommend_conditions_structured(
         constraint_rules=constraints or {},
         family_override=reaction_type,
         max_variants=limit,
+        rerank_strategy=rerank_strategy,
+        filter_unknown_reagents=filter_unknown_reagents,
     )
     
     # Calculate processing time
@@ -1091,11 +1097,41 @@ def _build_formatted_output(
     
     # Catalyst system from precedents
     def _cat_items() -> List[Dict[str, Any]]:
+        """
+        Extract catalyst system from precedents.
+        
+        Strategy: Use the catalytic_system from the top-ranked precedent overall,
+        preferring specific catalyst complexes over generic metals. This preserves
+        actionable catalyst information (e.g., "Pd(dppf)Cl2" instead of generic "Pd").
+        
+        Falls back to group-specific precedents if top precedent has no catalytic_system.
+        """
         items: List[Dict[str, Any]] = []
-        src = next(
-            (p for p in group if p.get("catalytic_system") or p.get("full_system") or p.get("catalyst")),
-            None
-        )
+        
+        # Strategy: Try top-ranked precedent first (best similarity match)
+        # This often has the most specific catalyst information
+        src = None
+        
+        # 1. Try top-ranked precedent overall (highest similarity)
+        if precs:
+            top_prec = precs[0]
+            if top_prec.get("catalytic_system") or top_prec.get("full_system") or top_prec.get("catalyst"):
+                src = top_prec
+        
+        # 2. Fall back to first precedent in chosen core group
+        if not src and group:
+            src = next(
+                (p for p in group if p.get("catalytic_system") or p.get("full_system") or p.get("catalyst")),
+                None
+            )
+        
+        # 3. Fall back to any precedent with catalytic_system
+        if not src and precs:
+            src = next(
+                (p for p in precs if p.get("catalytic_system") or p.get("full_system") or p.get("catalyst")),
+                None
+            )
+        
         fs = None
         if src:
             fs = src.get("catalytic_system")
@@ -1109,7 +1145,7 @@ def _build_formatted_output(
         
         def role_for(name: str) -> str:
             n = (name or "").lower()
-            if any(tok in n for tok in ["pd", "palladium", "cu", "copper", "ni", "nickel"]):
+            if any(tok in n for tok in ["pd", "palladium", "cu", "copper", "ni", "nickel", "ir", "iridium", "ru", "ruthenium"]):
                 return "metal_precursor"
             return "ligand"
         
@@ -1118,17 +1154,30 @@ def _build_formatted_output(
             cs = (it or {}).get("cas")
             detected_role = role_for(str(nm or ""))
             
-            # Use _chemical_payload to get enriched info from database
+            # Try database lookup for additional info (SMILES, etc.)
+            enriched = None
             if cs:
-                # Look up by CAS number
                 enriched = _chemical_payload(cs, detected_role)
-                if enriched:
-                    items.append(enriched)
             elif nm:
-                # Look up by name
                 enriched = _chemical_payload(nm, detected_role)
-                if enriched:
-                    items.append(enriched)
+            
+            if enriched:
+                # If lookup marked as "unknown", override with precedent's original name
+                if enriched.get("unknown") or "[Unknown" in str(enriched.get("name", "")):
+                    if nm:
+                        # Use the specific catalyst name from the precedent
+                        enriched["name"] = nm
+                        enriched.pop("unknown", None)  # Remove unknown flag
+                items.append(enriched)
+            elif nm or cs:
+                # No database match - use original information from precedent
+                items.append({
+                    "name": nm or f"CAS {cs}",
+                    "cas": cs,
+                    "smiles": None,
+                    "equivalents": None,
+                    "role": detected_role,
+                })
             else:
                 # No identifier - add placeholder
                 items.append({
@@ -1141,6 +1190,15 @@ def _build_formatted_output(
         return items
     
     cat_items = _cat_items()
+    
+    # Fallback: If no catalytic_system found but we have a chosen_core,
+    # add a generic metal entry to ensure recommendations include at least the core metal
+    if not cat_items and chosen_core:
+        # Try to create a generic metal entry from the core string
+        # e.g., "Pd" -> lookup "Pd" or "Palladium"
+        core_payload = _chemical_payload(chosen_core, "metal_precursor")
+        if core_payload:
+            cat_items.append(core_payload)
     
     # Condition text
     cond_text = {
