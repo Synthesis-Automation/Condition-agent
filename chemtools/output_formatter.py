@@ -6,7 +6,9 @@ Provides comprehensive structured output following the improved format specifica
 
 from __future__ import annotations
 
+import copy
 import datetime
+import re
 from typing import Any, Dict, List, Optional, Tuple
 from . import reagent_lookup
 
@@ -16,13 +18,16 @@ def format_meta(
     status: str = "success",
     processing_time_ms: Optional[float] = None,
     request_id: Optional[str] = None,
+    schema_version: str = "2.0",
+    model_version: str = "1.0.0",
 ) -> Dict[str, Any]:
     """Format metadata section."""
     meta = {
         "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
         "model": model_type,
-        "model_version": "1.0.0",
+        "model_version": model_version,
         "status": status,
+        "version": schema_version,
     }
     
     if request_id:
@@ -37,14 +42,22 @@ def format_meta(
 def format_input(
     reaction_smiles: str,
     requested_reaction_type: Optional[str] = None,
+    detected_family: Optional[str] = None,
     constraints: Optional[Dict[str, Any]] = None,
     options: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Format input section."""
-    input_data = {
+    input_data: Dict[str, Any] = {
         "reaction_smiles": reaction_smiles,
-        "requested_reaction_type": requested_reaction_type,
     }
+    
+    if detected_family:
+        input_data["family"] = detected_family
+    
+    if requested_reaction_type:
+        input_data["requested_reaction_type"] = requested_reaction_type
+        # Provide an alias aligned with schema naming conventions.
+        input_data["requested_family"] = requested_reaction_type
     
     if constraints:
         input_data["constraints"] = constraints
@@ -57,21 +70,490 @@ def format_input(
 
 def format_detection(
     detected_type: str,
-    confidence: float,
+    confidence: Optional[float],
     method: str = "auto",
     alternatives: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Format detection section."""
     detection = {
+        "family": detected_type,
         "detected_reaction_type": detected_type,
-        "confidence": round(confidence, 4),
         "method": method,
     }
+    
+    if confidence is not None:
+        detection["confidence"] = round(float(confidence), 4)
     
     if alternatives:
         detection["alternative_types"] = alternatives
     
+    # Remove keys with None values to keep payload concise.
+    detection = {key: value for key, value in detection.items() if value is not None}
+    
     return detection
+
+
+_REQUIRED_CHEM_FIELDS: Tuple[str, ...] = (
+    "name",
+    "abbreviation",
+    "cas",
+    "smiles",
+    "equivalents",
+    "role",
+)
+
+
+def _normalize_chemical_entry(entry: Dict[str, Any], role_hint: Optional[str] = None) -> Dict[str, Any]:
+    """Ensure chemical entries provide the required schema keys."""
+    data: Dict[str, Any] = copy.deepcopy(entry or {})
+    
+    if role_hint and not data.get("role"):
+        data["role"] = role_hint
+    
+    for key in _REQUIRED_CHEM_FIELDS:
+        data.setdefault(key, None)
+    
+    return data
+
+
+def _normalize_condition_value(value: Any, default_unit: Optional[str] = None) -> Any:
+    """Normalize temperature/time values to a consistent structure."""
+    if value is None:
+        return None
+    
+    if isinstance(value, dict):
+        normalized = copy.deepcopy(value)
+        if "value" not in normalized:
+            if "amount" in normalized:
+                normalized["value"] = normalized.pop("amount")
+            elif "quantity" in normalized:
+                normalized["value"] = normalized.pop("quantity")
+        if default_unit and "unit" not in normalized and "units" not in normalized:
+            normalized.setdefault("unit", default_unit)
+        return normalized
+    
+    if isinstance(value, (int, float)):
+        result: Dict[str, Any] = {"value": value}
+        if default_unit:
+            result["unit"] = default_unit
+        return result
+    
+    if isinstance(value, str):
+        match = re.match(r"\s*([+-]?\d+(?:\.\d+)?)", value)
+        if match:
+            numeric = float(match.group(1))
+            remainder = value[match.end():].strip()
+            result = {"value": numeric}
+            unit = remainder or default_unit
+            if unit:
+                result["unit"] = unit
+            result["text"] = value
+            return result
+        return value
+    
+    return value
+
+
+def _normalize_conditions_block(conditions: Any) -> Dict[str, Any]:
+    """Normalize conditions dictionaries into the standard schema."""
+    if not isinstance(conditions, dict):
+        return {
+            "temperature": None,
+            "time": None,
+            "atmosphere": None,
+            "note": conditions,
+        }
+    
+    normalized: Dict[str, Any] = {}
+    
+    # Temperature
+    temp_value = (
+        conditions.get("temperature")
+        or conditions.get("temperature_C")
+        or conditions.get("temp_C")
+        or conditions.get("temp")
+    )
+    normalized["temperature"] = _normalize_condition_value(temp_value, "C")
+    
+    # Time
+    time_value = (
+        conditions.get("time")
+        or conditions.get("time_h")
+        or conditions.get("time_hr")
+        or conditions.get("time_hours")
+    )
+    normalized["time"] = _normalize_condition_value(time_value, "h")
+    
+    # Atmosphere
+    normalized["atmosphere"] = conditions.get("atmosphere") or conditions.get("environment")
+    
+    # Preserve any additional condition metadata
+    extras = {
+        key: copy.deepcopy(value)
+        for key, value in conditions.items()
+        if key not in {"temperature", "temperature_C", "temp_C", "temp", "time", "time_h", "time_hr", "time_hours", "atmosphere", "environment"}
+    }
+    if extras:
+        normalized["extras"] = extras
+    
+    for key in ("temperature", "time", "atmosphere"):
+        normalized.setdefault(key, None)
+    
+    return normalized
+
+
+def _normalize_recommendation_entry(rec: Dict[str, Any], position: int) -> Dict[str, Any]:
+    """Normalize a single recommendation entry to the standard schema."""
+    source = rec or {}
+    normalized: Dict[str, Any] = {}
+    
+    normalized["rank"] = source.get("rank") or position
+    
+    chemicals_source = source.get("chemicals")
+    if not isinstance(chemicals_source, list) or not chemicals_source:
+        chemicals_source = source.get("reagents") or []
+    
+    normalized_chemicals: List[Dict[str, Any]] = []
+    for chem in chemicals_source:
+        if isinstance(chem, dict):
+            normalized_chemicals.append(_normalize_chemical_entry(chem))
+        else:
+            normalized_chemicals.append(_normalize_chemical_entry({"name": str(chem)}, None))
+    normalized["chemicals"] = normalized_chemicals
+    
+    normalized["conditions"] = _normalize_conditions_block(source.get("conditions", {}))
+    
+    for key in ("confidence", "precedent_count", "summary", "component_scores", "reasons", "source", "reaction"):
+        if key in source:
+            normalized[key] = copy.deepcopy(source[key])
+    
+    extras_keys = set(source.keys()) - {
+        "rank",
+        "chemicals",
+        "reagents",
+        "conditions",
+        "confidence",
+        "precedent_count",
+        "summary",
+        "component_scores",
+        "reasons",
+        "source",
+        "reaction",
+    }
+    if extras_keys:
+        normalized["extras"] = {key: copy.deepcopy(source[key]) for key in extras_keys}
+    
+    return normalized
+
+
+def _normalize_recommendations(recommendations_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Normalize a list of recommendation entries."""
+    if not recommendations_data:
+        return []
+    return [
+        _normalize_recommendation_entry(rec, position=index)
+        for index, rec in enumerate(recommendations_data, start=1)
+    ]
+
+
+def _starting_material_entries(reaction_smiles: str) -> List[Dict[str, Any]]:
+    """Build chemical entries for starting materials based on reaction SMILES."""
+    if ">>" not in reaction_smiles:
+        return []
+    
+    reactants = [frag for frag in reaction_smiles.split(">>", 1)[0].split(".") if frag]
+    roles = ["electrophile", "nucleophile"]
+    
+    entries = []
+    for idx, smiles in enumerate(reactants):
+        role = roles[idx] if idx < len(roles) else "starting_material"
+        entries.append(_normalize_chemical_entry({"smiles": smiles, "role": role}, role))
+    
+    return entries
+
+
+def _normalize_rule_string_value(value: str, role: str) -> Dict[str, Any]:
+    """Convert string-based rule entries into structured chemical dictionaries."""
+    cleaned = re.sub(r"\s*\(.*?\)\s*$", "", value or "").strip()
+    chemical: Dict[str, Any] = {
+        "name": cleaned or value or None,
+        "role": role,
+        "notes": value,
+    }
+    
+    eq_match = re.search(r"([+-]?\d+(?:\.\d+)?)\s*eq", value or "", re.IGNORECASE)
+    if eq_match:
+        try:
+            chemical["equivalents"] = float(eq_match.group(1))
+        except ValueError:
+            pass
+    
+    mol_match = re.search(r"([+-]?\d+(?:\.\d+)?)\s*mol%?", value or "", re.IGNORECASE)
+    if mol_match:
+        try:
+            chemical.setdefault("extras", {})["mol_percent"] = float(mol_match.group(1))
+        except ValueError:
+            pass
+    
+    return _normalize_chemical_entry(chemical, role)
+
+
+def _convert_rule_match_to_recommendations(
+    reaction_smiles: str,
+    match_result: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    """Convert SCDB match results into standardized recommendation entries."""
+    conditions = match_result.get("conditions")
+    if isinstance(conditions, dict):
+        condition_entries = [conditions]
+    elif isinstance(conditions, list):
+        condition_entries = [cond for cond in conditions if isinstance(cond, dict)]
+    else:
+        condition_entries = []
+    
+    if not condition_entries:
+        return []
+    
+    starting_materials = _starting_material_entries(reaction_smiles)
+    recommendations: List[Dict[str, Any]] = []
+    
+    for idx, cond in enumerate(condition_entries, start=1):
+        chemicals: List[Dict[str, Any]] = copy.deepcopy(starting_materials)
+        
+        def add_entry(value: Any, role: str) -> None:
+            if not value:
+                return
+            if isinstance(value, dict):
+                chemicals.append(_normalize_chemical_entry(value, role))
+            else:
+                chemicals.append(_normalize_rule_string_value(str(value), role))
+        
+        add_entry(cond.get("pd_source") or cond.get("catalyst"), "metal_precursor")
+        add_entry(cond.get("ligand"), "ligand")
+        add_entry(cond.get("base"), "base")
+        add_entry(cond.get("solvent"), "solvent")
+        add_entry(cond.get("additive"), "additive")
+        add_entry(cond.get("boron_partner"), "partner")
+        add_entry(cond.get("condition_core"), "condition_core")
+        
+        recommendation = {
+            "rank": idx,
+            "chemicals": chemicals,
+            "conditions": _normalize_conditions_block(cond),
+        }
+        
+        loadings = cond.get("loadings")
+        if isinstance(loadings, dict) and loadings:
+            recommendation.setdefault("conditions", {}).setdefault("extras", {})["loadings"] = loadings
+        
+        source_meta = {
+            "match_type": match_result.get("match_type"),
+            "entry_id": match_result.get("entry_id"),
+            "entry_name": match_result.get("entry_name"),
+            "priority": match_result.get("priority"),
+        }
+        if any(value is not None for value in source_meta.values()):
+            recommendation["source"] = source_meta
+        
+        recommendations.append(recommendation)
+    
+    return recommendations
+
+
+def _build_standard_output(
+    *,
+    model_type: str,
+    reaction_smiles: str,
+    requested_type: Optional[str],
+    detected_type: Optional[str],
+    detection_confidence: Optional[float],
+    detection_method: str,
+    recommendations_data: List[Dict[str, Any]],
+    processing_time_ms: Optional[float] = None,
+    status: str = "success",
+    extras: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Construct the canonical output structure shared across recommendation modes."""
+    normalized_recommendations = _normalize_recommendations(recommendations_data)
+    
+    output: Dict[str, Any] = {
+        "meta": format_meta(
+            model_type=model_type,
+            status=status,
+            processing_time_ms=processing_time_ms,
+        ),
+        "input": format_input(
+            reaction_smiles=reaction_smiles,
+            requested_reaction_type=requested_type,
+            detected_family=detected_type,
+        ),
+        "detection": format_detection(
+            detected_type=detected_type or (requested_type or "unknown"),
+            confidence=detection_confidence,
+            method=detection_method,
+        ),
+        "recommended_conditions": normalized_recommendations,
+    }
+    
+    # Backwards compatibility: keep previous key name.
+    output["recommendations"] = normalized_recommendations
+    
+    if extras:
+        output["extras"] = extras
+    
+    return output
+
+
+def ensure_standard_output(
+    response: Dict[str, Any],
+    *,
+    default_model: str,
+    fallback_reaction_smiles: Optional[str] = None,
+    fallback_requested_type: Optional[str] = None,
+    extras: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Ensure an arbitrary response conforms to the canonical schema.
+    
+    If the response already satisfies the schema, it is returned unchanged.
+    Otherwise we attempt to coerce it into the new structure.
+    """
+    required_keys = {"meta", "input", "detection", "recommended_conditions"}
+    if isinstance(response, dict) and required_keys.issubset(response.keys()):
+        return response
+    
+    response = response or {}
+    input_section = response.get("input", {}) if isinstance(response, dict) else {}
+    detection_section = response.get("detection", {}) if isinstance(response, dict) else {}
+    
+    reaction_smiles = input_section.get("reaction_smiles") or fallback_reaction_smiles or ""
+    requested_type = (
+        input_section.get("requested_family")
+        or input_section.get("requested_reaction_type")
+        or fallback_requested_type
+    )
+    detected_type = (
+        detection_section.get("family")
+        or detection_section.get("detected_reaction_type")
+        or requested_type
+    )
+    detection_confidence = detection_section.get("confidence")
+    detection_method = detection_section.get("method", "auto")
+    processing_time_ms = (
+        response.get("meta", {}).get("processing_time_ms")
+        if isinstance(response.get("meta"), dict)
+        else None
+    )
+    
+    recomms = []
+    if isinstance(response, dict):
+        if isinstance(response.get("recommended_conditions"), list):
+            recomms = response["recommended_conditions"]
+        elif isinstance(response.get("recommendations"), list):
+            recomms = response["recommendations"]
+    
+    combined_extras: Dict[str, Any] = {}
+    if isinstance(response.get("extras"), dict):
+        combined_extras.update(response["extras"])
+    if extras:
+        combined_extras.update(extras)
+    combined_extras.setdefault("raw_response", copy.deepcopy(response))
+    
+    return _build_standard_output(
+        model_type=default_model,
+        reaction_smiles=reaction_smiles,
+        requested_type=requested_type,
+        detected_type=detected_type,
+        detection_confidence=detection_confidence,
+        detection_method=detection_method,
+        recommendations_data=recomms,
+        processing_time_ms=processing_time_ms,
+        extras=combined_extras,
+    )
+
+
+def format_rule_match_result(
+    reaction_smiles: str,
+    match_result: Dict[str, Any],
+    requested_type: Optional[str] = None,
+    database_name: Optional[str] = None,
+    processing_time_ms: Optional[float] = None,
+) -> Dict[str, Any]:
+    """Format raw SCDB match results into the canonical output schema."""
+    recommendations_data = _convert_rule_match_to_recommendations(reaction_smiles, match_result)
+    detected_type = (
+        match_result.get("reaction_type")
+        or match_result.get("family")
+        or requested_type
+    )
+    if not detected_type and database_name:
+        detected_type = database_name
+    extras = {
+        "match": match_result,
+    }
+    model_label = f"Rule-based-{database_name}" if database_name else "Rule-based"
+    return _build_standard_output(
+        model_type=model_label,
+        reaction_smiles=reaction_smiles,
+        requested_type=requested_type,
+        detected_type=detected_type,
+        detection_confidence=1.0 if recommendations_data else None,
+        detection_method="pattern-match",
+        recommendations_data=recommendations_data,
+        processing_time_ms=processing_time_ms,
+        extras=extras,
+    )
+
+
+def format_fusion_output(
+    reaction_smiles: str,
+    requested_type: Optional[str],
+    fusion_result: Dict[str, Any],
+    processing_time_ms: Optional[float] = None,
+) -> Dict[str, Any]:
+    """Format fusion recommendation results into the canonical schema."""
+    formatted_section = dict(fusion_result.get("formatted") or {})
+    detection_section = dict(formatted_section.get("detection") or fusion_result.get("detection") or {})
+    detected_type = (
+        detection_section.get("family")
+        or detection_section.get("detected_reaction_type")
+        or requested_type
+    )
+    confidence = detection_section.get("confidence")
+    if not isinstance(confidence, (int, float)):
+        confidence = None
+    method = detection_section.get("method", "fusion")
+    
+    recommendations_data = (
+        formatted_section.get("recommended_conditions")
+        or fusion_result.get("recommended_conditions")
+        or []
+    )
+    
+    extras = {
+        "fusion_meta": fusion_result.get("fusion_meta"),
+        "raw_response": fusion_result,
+    }
+    
+    meta_section = fusion_result.get("meta")
+    meta_processing = None
+    if isinstance(meta_section, dict):
+        meta_processing = meta_section.get("processing_time_ms")
+    if processing_time_ms is None:
+        processing_time_ms = meta_processing
+    
+    return _build_standard_output(
+        model_type="Fusion-hybrid",
+        reaction_smiles=reaction_smiles,
+        requested_type=requested_type,
+        detected_type=detected_type,
+        detection_confidence=confidence,
+        detection_method=method,
+        recommendations_data=recommendations_data,
+        processing_time_ms=processing_time_ms,
+        extras={key: value for key, value in extras.items() if value is not None},
+    )
+
 
 
 def enrich_reagent(
@@ -312,36 +794,23 @@ def format_ml_output(
     Returns:
         Complete formatted output dictionary
     """
-    output = {
-        "meta": format_meta(
-            model_type="ML-precedent-knn",
-            status="success",
-            processing_time_ms=processing_time_ms,
-        ),
-        "input": format_input(
-            reaction_smiles=reaction_smiles,
-            requested_reaction_type=requested_type,
-        ),
-        "detection": format_detection(
-            detected_type=detected_type,
-            confidence=detection_confidence,
-            method="rxn-insight-ml",
-        ),
-        "recommendations": [],
-    }
-    
-    # Format each recommendation
-    for i, rec_data in enumerate(recommendations_data[:3], 1):  # Limit to 3
-        output["recommendations"].append(rec_data)
-    
-    return output
+    return _build_standard_output(
+        model_type="ML-precedent-knn",
+        reaction_smiles=reaction_smiles,
+        requested_type=requested_type,
+        detected_type=detected_type,
+        detection_confidence=detection_confidence,
+        detection_method="rxn-insight-ml",
+        recommendations_data=recommendations_data,
+        processing_time_ms=processing_time_ms,
+    )
 
 
 def format_rule_output(
     reaction_smiles: str,
     requested_type: Optional[str],
-    detected_type: str,
-    recommendations_data: List[Dict[str, Any]],
+    detected_type: Optional[str],
+    recommendations_data: Any,
     database_name: str,
     processing_time_ms: Optional[float] = None,
 ) -> Dict[str, Any]:
@@ -359,29 +828,25 @@ def format_rule_output(
     Returns:
         Complete formatted output dictionary
     """
-    output = {
-        "meta": format_meta(
-            model_type=f"Rule-based-{database_name}",
-            status="success",
-            processing_time_ms=processing_time_ms,
-        ),
-        "input": format_input(
+    if isinstance(recommendations_data, dict):
+        return format_rule_match_result(
             reaction_smiles=reaction_smiles,
-            requested_reaction_type=requested_type,
-        ),
-        "detection": format_detection(
-            detected_type=detected_type,
-            confidence=1.0,  # Rule-based is deterministic
-            method="pattern-match",
-        ),
-        "recommendations": [],
-    }
+            match_result=recommendations_data,
+            requested_type=requested_type,
+            database_name=database_name,
+            processing_time_ms=processing_time_ms,
+        )
     
-    # Format each recommendation
-    for i, rec_data in enumerate(recommendations_data[:3], 1):  # Limit to 3
-        output["recommendations"].append(rec_data)
-    
-    return output
+    return _build_standard_output(
+        model_type=f"Rule-based-{database_name}",
+        reaction_smiles=reaction_smiles,
+        requested_type=requested_type,
+        detected_type=detected_type or requested_type,
+        detection_confidence=1.0 if recommendations_data else None,
+        detection_method="pattern-match",
+        recommendations_data=recommendations_data,
+        processing_time_ms=processing_time_ms,
+    )
 
 
 def parse_condition_string(condition_str: str) -> Tuple[str, Optional[float]]:

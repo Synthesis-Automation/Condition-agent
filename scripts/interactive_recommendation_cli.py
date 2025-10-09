@@ -2,9 +2,10 @@
 Interactive Recommendation Tester
 =================================
 
-This script prompts for a reaction SMILES and optional metadata, exercises
-three recommendation modes (rule-based, ML, fusion), saves their JSON
-responses, and prints a compact summary to the console.
+This script prompts for a reaction SMILES and lets you choose a reaction
+family (or auto-detect). It exercises three recommendation modes
+(rule-based, ML, fusion), saves their JSON responses, and prints a compact
+summary to the console.
 
 Usage:
     python scripts/interactive_recommendation_cli.py
@@ -21,9 +22,10 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import requests
+
 
 
 if sys.platform == "win32":
@@ -35,20 +37,53 @@ if sys.platform == "win32":
 DEFAULT_BASE_URL = "http://localhost:8000"
 DEFAULT_SCDB_PATH = "data/conditionDB/Suzuki_db.json"
 OUTPUT_DIR = Path("results")
+K_DEFAULT = 50
+LIMIT_DEFAULT = 5
+FUSION_VARIANTS_DEFAULT = 5
+
+# Canonical reaction families supported by the backend.
+REACTION_TYPE_CHOICES: Tuple[Tuple[str, Optional[str]], ...] = (
+    ("Auto-detect (server decides)", None),
+    ("Suzuki Coupling", "Suzuki"),
+    ("Ullmann C–N (Cu)", "C_N_Coupling_Cu"),
+    ("Buchwald C–N (Pd)", "C_N_Coupling_Pd"),
+    ("C–N Coupling (Ni)", "C_N_Coupling_Ni"),
+    ("Amide Formation", "Amide_formation"),
+)
 
 
-def prompt(text: str, default: Optional[str] = None, required: bool = False) -> str:
-    """Prompt the user for input, enforcing required fields and defaults."""
+def slugify_label(text: str) -> str:
+    """Create a filesystem-friendly slug from the given text."""
+    slug = "".join(ch.lower() if ch.isalnum() else "_" for ch in text)
+    slug = slug.strip("_")
+    return slug or "reaction"
+
+
+def prompt_smiles() -> str:
+    """Request a reaction SMILES string from the user."""
     while True:
-        suffix = f" [{default}]" if default else ""
-        value = input(f"{text}{suffix}: ").strip()
+        value = input("Enter reaction SMILES: ").strip()
         if value:
             return value
-        if default is not None:
-            return default
-        if not required:
-            return ""
-        print("Input required. Please try again.")
+        print("Reaction SMILES is required. Please try again.")
+
+
+def choose_reaction_type() -> Tuple[str, Optional[str]]:
+    """Allow the user to choose a reaction family from predefined options."""
+    print("\nReaction Type Options:")
+    for idx, (label, _) in enumerate(REACTION_TYPE_CHOICES, start=1):
+        default_marker = " (default)" if idx == 1 else ""
+        print(f"  {idx}) {label}{default_marker}")
+    
+    while True:
+        choice = input("Select reaction type [1]: ").strip()
+        if not choice:
+            return REACTION_TYPE_CHOICES[0]
+        if choice.isdigit():
+            idx = int(choice)
+            if 1 <= idx <= len(REACTION_TYPE_CHOICES):
+                return REACTION_TYPE_CHOICES[idx - 1]
+        print(f"Please enter a number between 1 and {len(REACTION_TYPE_CHOICES)}.")
 
 
 def ensure_output_dir() -> None:
@@ -75,6 +110,30 @@ def format_float(value: Any, precision: int = 3, fallback: str = "N/A") -> str:
         return f"{float(value):.{precision}f}"
     except (TypeError, ValueError):
         return fallback
+
+
+def format_condition_value(value: Any) -> Optional[str]:
+    """Render condition values (temperature/time) into human-readable strings."""
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        val = value.get("value")
+        unit = value.get("unit")
+        text = value.get("text")
+        if val is not None:
+            if unit:
+                return f"{val} {unit}"
+            return str(val)
+        if text:
+            return str(text)
+        # Fall back to JSON-style representation for complex payloads.
+        try:
+            return json.dumps(value)
+        except TypeError:
+            return str(value)
+    if isinstance(value, (int, float)):
+        return str(value)
+    return str(value)
 
 
 def call_rule_based(
@@ -188,54 +247,108 @@ def save_json(data: Dict[str, Any], filename: str) -> Path:
 
 def summarize_rule(data: Dict[str, Any]) -> None:
     """Print a short summary of the rule-based output."""
+    if not isinstance(data, dict):
+        print(f"Rule-based: unexpected response type ({type(data).__name__})")
+        return
     if "error" in data:
         print(f"Rule-based: {data['error']}")
         return
-
-    match_type = data.get("match_type") or "Unknown"
-    entry = data.get("entry_name") or data.get("entry_id") or "N/A"
+    
+    detection = data.get("detection", {})
+    family = (
+        detection.get("family")
+        or detection.get("detected_reaction_type")
+        or "Unknown"
+    )
+    print(f"Rule-based family: {family}")
+    
+    extras = data.get("extras", {})
+    match_info: Dict[str, Any] = {}
+    if isinstance(extras, dict):
+        match_info = extras.get("match") or {}
+    match_type = match_info.get("match_type") or "Unknown"
     print(f"Rule-based match type: {match_type}")
-    print(f"Rule-based entry: {entry}")
-
-    conditions = data.get("conditions")
-    if isinstance(conditions, list) and conditions:
-        first = conditions[0]
-    else:
-        first = conditions if isinstance(conditions, dict) else None
-
-    if isinstance(first, dict):
-        core = first.get("core") or first.get("catalyst")
-        base = first.get("base")
-        solvent = first.get("solvent")
-        if core:
-            print(f"  Core: {core}")
-        if base:
-            print(f"  Base: {base}")
-        if solvent:
-            print(f"  Solvent: {solvent}")
+    
+    entry = match_info.get("entry_name") or match_info.get("entry_id")
+    if entry:
+        print(f"Rule entry: {entry}")
+    
+    recommendations = data.get("recommended_conditions") or []
+    if not recommendations:
+        print("  No rule-based recommendations returned.")
+        return
+    
+    top = recommendations[0]
+    chemicals = top.get("chemicals", [])
+    
+    def find_role(role: str) -> Optional[str]:
+        for chem in chemicals:
+            chem_role = str(chem.get("role", "")).lower()
+            if chem_role == role.lower():
+                return chem.get("name") or chem.get("smiles")
+        return None
+    
+    catalyst = find_role("metal_precursor") or find_role("catalyst")
+    ligand = find_role("ligand")
+    base = find_role("base")
+    solvent = find_role("solvent")
+    
+    if catalyst:
+        print(f"  Catalyst: {catalyst}")
+    if ligand:
+        print(f"  Ligand: {ligand}")
+    if base:
+        print(f"  Base: {base}")
+    if solvent:
+        print(f"  Solvent: {solvent}")
+    
+    conditions = top.get("conditions", {})
+    temp_text = format_condition_value(conditions.get("temperature"))
+    time_text = format_condition_value(conditions.get("time"))
+    if temp_text:
+        print(f"  Temperature: {temp_text}")
+    if time_text:
+        print(f"  Time: {time_text}")
 
 
 def summarize_ml(data: Dict[str, Any]) -> None:
     """Print a short summary of the ML recommendation output."""
+    if not isinstance(data, dict):
+        print(f"ML recommendation: unexpected response type ({type(data).__name__})")
+        return
     if "error" in data:
         print(f"ML recommendation: {data['error']}")
         return
 
     detection = data.get("detection", {})
-    detected_type = detection.get("type", "Unknown")
-    confidence = detection.get("confidence", 0.0)
-    print(f"ML detected type: {detected_type} (confidence {confidence:.0%})")
+    detected_type = (
+        detection.get("family")
+        or detection.get("detected_reaction_type")
+        or detection.get("type")
+        or "Unknown"
+    )
+    confidence = detection.get("confidence")
+    confidence_text = "N/A"
+    if isinstance(confidence, (int, float)):
+        confidence_text = f"{format_float(confidence * 100, precision=0)}%"
+    print(f"ML detected family: {detected_type} (confidence {confidence_text})")
 
-    recommendations = data.get("recommendations", []) or data.get("formatted", {}).get("recommended_conditions", [])
+    recommendations = data.get("recommended_conditions") or data.get("recommendations") or []
     if not recommendations:
         print("  No ML recommendations returned.")
         return
 
     top = recommendations[0]
-    reagents = top.get("reagents", [])
-    catalyst = next((r.get("name") for r in reagents if r.get("role", "").lower() == "catalyst"), None)
-    base = next((r.get("name") for r in reagents if r.get("role", "").lower() == "base"), None)
-    solvent = next((r.get("name") for r in reagents if r.get("role", "").lower() == "solvent"), None)
+    chemicals = top.get("chemicals", []) or top.get("reagents", [])
+    def find_role(role: str) -> Optional[str]:
+        for chem in chemicals:
+            if str(chem.get("role", "")).lower() == role.lower():
+                return chem.get("name") or chem.get("smiles")
+        return None
+
+    catalyst = find_role("catalyst") or find_role("metal_precursor")
+    base = find_role("base")
+    solvent = find_role("solvent")
     confidence_score = top.get("confidence")
     support = top.get("precedent_count")
 
@@ -247,31 +360,35 @@ def summarize_ml(data: Dict[str, Any]) -> None:
     if solvent:
         print(f"  Solvent: {solvent}")
     if confidence_score is not None:
-        print(f"  Confidence: {confidence_score:.0%}")
+        print(f"  Confidence: {format_float(float(confidence_score) * 100, precision=0)}%")
     if support is not None:
         print(f"  Support: {support} precedents")
 
     conditions = top.get("conditions", {})
-    if isinstance(conditions, dict):
-        if "temperature" in conditions:
-            temp_val = conditions["temperature"]
-            if isinstance(temp_val, dict):
-                temp_val = temp_val.get("value")
-            print(f"  Temperature: {temp_val} C")
-        if "time" in conditions:
-            time_val = conditions["time"]
-            if isinstance(time_val, dict):
-                time_val = time_val.get("value")
-            print(f"  Time: {time_val} hours")
+    temp_text = format_condition_value(conditions.get("temperature"))
+    time_text = format_condition_value(conditions.get("time"))
+    if temp_text:
+        print(f"  Temperature: {temp_text}")
+    if time_text:
+        print(f"  Time: {time_text}")
 
 
 def summarize_fusion(data: Dict[str, Any]) -> None:
     """Print a short summary of the fusion recommendation output."""
+    if not isinstance(data, dict):
+        print(f"Fusion recommendation: unexpected response type ({type(data).__name__})")
+        return
     if "error" in data:
         print(f"Fusion recommendation: {data['error']}")
         return
 
-    fusion_meta = data.get("fusion_meta", {})
+    extras = data.get("extras", {})
+    fusion_meta = {}
+    if isinstance(extras, dict):
+        fusion_meta = extras.get("fusion_meta") or {}
+    if not fusion_meta and isinstance(data.get("fusion_meta"), dict):
+        fusion_meta = data["fusion_meta"]
+
     if fusion_meta and "error" not in fusion_meta:
         weights = fusion_meta.get("adaptive_weights", {})
         if weights:
@@ -288,8 +405,7 @@ def summarize_fusion(data: Dict[str, Any]) -> None:
     elif fusion_meta.get("error"):
         print(f"Fusion metadata error: {fusion_meta['error']}")
 
-    formatted = data.get("formatted", {})
-    recommendations = formatted.get("recommended_conditions") or data.get("recommended_conditions") or []
+    recommendations = data.get("recommended_conditions") or data.get("recommendations") or []
     if not recommendations:
         print("  No fusion recommendations returned.")
         return
@@ -315,46 +431,31 @@ def summarize_fusion(data: Dict[str, Any]) -> None:
         print(f"  Confidence: {confidence}")
 
 
-def parse_int(value: str, default: int) -> int:
-    """Convert input to int, falling back to default if conversion fails."""
-    try:
-        return int(value)
-    except ValueError:
-        print(f"Invalid integer '{value}'. Using default {default}.")
-        return default
-
-
 def main() -> None:
     print("Interactive Recommendation Test")
     print("--------------------------------")
 
-    base_url = prompt("Base URL", default=DEFAULT_BASE_URL, required=True)
+    base_url = DEFAULT_BASE_URL
+    print(f"Base URL: {base_url}")
     if not health_check(base_url):
         print("Aborting due to failed health check.")
         return
 
-    reaction = prompt("Enter reaction SMILES", required=True)
-    description = prompt("Optional description")
-    reaction_type = prompt("Optional reaction type (leave blank for auto-detect)")
+    reaction = prompt_smiles()
+    selected_label, reaction_type = choose_reaction_type()
+    print(f"Selected reaction type: {selected_label}")
 
-    k_input = prompt("Number of nearest precedents (k)", default="50")
-    limit_input = prompt("Number of recommendations to return", default="5")
-    fusion_variants_input = prompt("Max fusion variants", default="5")
+    k_value = K_DEFAULT
+    limit_value = LIMIT_DEFAULT
+    fusion_variants = FUSION_VARIANTS_DEFAULT
 
-    k_value = parse_int(k_input, 50)
-    limit_value = parse_int(limit_input, 5)
-    fusion_variants = parse_int(fusion_variants_input, 5)
-
-    db_path_input = prompt(
-        "SCDB path for rule-based lookup (blank to skip)",
-        default=DEFAULT_SCDB_PATH if Path(DEFAULT_SCDB_PATH).exists() else "",
-    )
-    db_path = db_path_input if db_path_input else None
-    if db_path and not Path(db_path).exists():
-        print(f"Warning: SCDB file '{db_path}' not found. Rule-based test may fail.")
+    db_path = DEFAULT_SCDB_PATH if Path(DEFAULT_SCDB_PATH).exists() else None
+    if db_path is None:
+        print("Warning: Default SCDB database not found; rule-based test will use server defaults.")
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    label = description.replace(" ", "_") if description else "reaction"
+    type_label = reaction_type or "auto"
+    label = slugify_label(type_label)
 
     print("\nRunning tests...\n")
 
