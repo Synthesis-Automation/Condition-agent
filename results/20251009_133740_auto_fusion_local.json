@@ -1,0 +1,1655 @@
+{
+  "meta": {
+    "generated_at": "2025-10-09T05:37:56.238202Z",
+    "model": "Fusion-hybrid",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 11100.61
+  },
+  "input": {
+    "reaction_smiles": "Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1",
+    "family": "Suzuki"
+  },
+  "detection": {
+    "family": "Suzuki",
+    "detected_reaction_type": "Suzuki",
+    "method": "fusion"
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Ic1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium",
+          "abbreviation": "Palladium",
+          "cas": "7440-05-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "catalyst"
+        },
+        {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": {
+          "value": 100.0,
+          "unit": "°C",
+          "text": "100 °C"
+        },
+        "time": {
+          "value": 12.0,
+          "unit": "h",
+          "text": "12.0 h"
+        },
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 1,
+        "core": "Tetrakis(triphenylphosphine)palladium(0)",
+        "base": {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": "LOW",
+        "fusion_score": 0.3549251737603798,
+        "component_scores": {
+          "precedent": 0.0,
+          "analytics": 0.7007497020397241,
+          "rules": 0.0,
+          "ml": 0.5
+        },
+        "adaptive_weights": {
+          "α": 0.3636363636363636,
+          "β": 0.5064935064935066,
+          "γ": 0.12987012987012989,
+          "δ": 0.0
+        },
+        "support": {
+          "count": 0,
+          "fraction_core": 0.0,
+          "reference_population": 10
+        }
+      },
+      "reaction": {
+        "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "Potassium carbonate",
+          "solvent_uid": "Water"
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Ic1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium",
+          "abbreviation": "Palladium",
+          "cas": "7440-05-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "catalyst"
+        },
+        {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Ethanol",
+          "abbreviation": "EtOH",
+          "cas": "64-17-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": {
+          "value": 80.0,
+          "unit": "°C",
+          "text": "80 °C"
+        },
+        "time": {
+          "value": 12.0,
+          "unit": "h",
+          "text": "12 h"
+        },
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 2,
+        "core": "Pd",
+        "base": {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Ethanol",
+          "abbreviation": "EtOH",
+          "cas": "64-17-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": "LOW",
+        "fusion_score": 0.33160173160173156,
+        "component_scores": {
+          "precedent": 0.6333333333333333,
+          "analytics": 0.2,
+          "rules": 0.0,
+          "ml": 0.5
+        },
+        "adaptive_weights": {
+          "α": 0.3636363636363636,
+          "β": 0.5064935064935066,
+          "γ": 0.12987012987012989,
+          "δ": 0.0
+        },
+        "support": {
+          "count": 6,
+          "fraction_core": 0.0,
+          "reference_population": 10
+        }
+      },
+      "reaction": {
+        "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "584-08-7",
+          "solvent_uid": "64-17-5"
+        }
+      }
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Ic1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium",
+          "abbreviation": "Palladium",
+          "cas": "7440-05-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "catalyst"
+        },
+        {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": {
+          "value": 100.0,
+          "unit": "°C",
+          "text": "100 °C"
+        },
+        "time": {
+          "value": 12.0,
+          "unit": "h",
+          "text": "12.0 h"
+        },
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 3,
+        "core": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+        "base": {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": "LOW",
+        "fusion_score": 0.3309973324473922,
+        "component_scores": {
+          "precedent": 0.0,
+          "analytics": 0.6535075538063897,
+          "rules": 0.0,
+          "ml": 0.5
+        },
+        "adaptive_weights": {
+          "α": 0.3636363636363636,
+          "β": 0.5064935064935066,
+          "γ": 0.12987012987012989,
+          "δ": 0.0
+        },
+        "support": {
+          "count": 0,
+          "fraction_core": 0.0,
+          "reference_population": 10
+        }
+      },
+      "reaction": {
+        "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "Potassium carbonate",
+          "solvent_uid": "Water"
+        }
+      }
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Ic1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium",
+          "abbreviation": "Palladium",
+          "cas": "7440-05-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "catalyst"
+        },
+        {
+          "name": "Sodium carbonate",
+          "abbreviation": "Na2CO3",
+          "cas": "497-19-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": {
+          "value": 100.0,
+          "unit": "°C",
+          "text": "100 °C"
+        },
+        "time": {
+          "value": 12.0,
+          "unit": "h",
+          "text": "12.0 h"
+        },
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 4,
+        "core": "Tetrakis(triphenylphosphine)palladium(0)",
+        "base": {
+          "name": "Sodium carbonate",
+          "abbreviation": "Na2CO3",
+          "cas": "497-19-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": "LOW",
+        "fusion_score": 0.32929124994115755,
+        "component_scores": {
+          "precedent": 0.0,
+          "analytics": 0.6501391344992085,
+          "rules": 0.0,
+          "ml": 0.5
+        },
+        "adaptive_weights": {
+          "α": 0.3636363636363636,
+          "β": 0.5064935064935066,
+          "γ": 0.12987012987012989,
+          "δ": 0.0
+        },
+        "support": {
+          "count": 0,
+          "fraction_core": 0.0,
+          "reference_population": 10
+        }
+      },
+      "reaction": {
+        "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "Sodium carbonate",
+          "solvent_uid": "Water"
+        }
+      }
+    },
+    {
+      "rank": 5,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Ic1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium",
+          "abbreviation": "Palladium",
+          "cas": "7440-05-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "catalyst"
+        },
+        {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": {
+          "value": 100.0,
+          "unit": "°C",
+          "text": "100 °C"
+        },
+        "time": {
+          "value": 12.0,
+          "unit": "h",
+          "text": "12.0 h"
+        },
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 5,
+        "core": "Bis(triphenylphosphine)palladium(II) dichloride",
+        "base": {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": "LOW",
+        "fusion_score": 0.3286228039350374,
+        "component_scores": {
+          "precedent": 0.0,
+          "analytics": 0.6488193821281507,
+          "rules": 0.0,
+          "ml": 0.5
+        },
+        "adaptive_weights": {
+          "α": 0.3636363636363636,
+          "β": 0.5064935064935066,
+          "γ": 0.12987012987012989,
+          "δ": 0.0
+        },
+        "support": {
+          "count": 0,
+          "fraction_core": 0.0,
+          "reference_population": 10
+        }
+      },
+      "reaction": {
+        "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "Potassium carbonate",
+          "solvent_uid": "Water"
+        }
+      }
+    }
+  ],
+  "extras": {
+    "fusion_meta": {
+      "adaptive_weights": {
+        "α": 0.3636363636363636,
+        "β": 0.5064935064935066,
+        "γ": 0.12987012987012989,
+        "δ": 0.0
+      },
+      "reasoning": [
+        "Low similarity (0.50) → precedents less relevant",
+        "Large dataset (n=50,215) → trust analytics",
+        "No strong rule match → low rule weight",
+        "No ML model available → δ=0"
+      ],
+      "evidence_summary": {
+        "precedents": 10,
+        "diversity": 0.5410628019323672,
+        "dataset_size": 50215
+      }
+    },
+    "raw_response": {
+      "input": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1",
+      "family": "Suzuki",
+      "features": {},
+      "bin": null,
+      "recommendation": {
+        "core": "Tetrakis(triphenylphosphine)palladium(0)",
+        "base_uid": "Potassium carbonate",
+        "solvent_uid": "Water",
+        "T_C": 100.0,
+        "time_h": 12.0,
+        "confidence": "LOW",
+        "fusion_score": 0.3549251737603798,
+        "fusion_method": "multi_source_evidence"
+      },
+      "alternatives": {
+        "cores": [
+          [
+            "Tetrakis(triphenylphosphine)palladium(0)",
+            2
+          ],
+          [
+            "Pd",
+            1
+          ],
+          [
+            "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+            1
+          ]
+        ],
+        "bases": [
+          [
+            "Potassium carbonate",
+            3
+          ],
+          [
+            "584-08-7",
+            1
+          ],
+          [
+            "Sodium carbonate",
+            1
+          ]
+        ],
+        "solvents": [
+          [
+            "Water",
+            4
+          ],
+          [
+            "64-17-5",
+            1
+          ]
+        ]
+      },
+      "precedent_pack": {
+        "precedents": [
+          {
+            "reaction_id": "31-614-CAS-41314159",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccncc1>>c1ccc(-c2ccncc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccncc1",
+            "products_smiles": "c1ccc(-c2ccncc2)cc1",
+            "condition_core": "Pd",
+            "yield": 88.0,
+            "core": "Pd",
+            "base_uid": "584-08-7",
+            "solvent_uid": "64-17-5",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Ethanol",
+                "cas": "64-17-5"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Fabrication of a Highly Efficient and Reusable Pd/Al2O3/Al Monolithic Catalyst for the Suzuki-Miyaura Reaction | Pan, Shiguang; Hu, Beibei; Liu, Dan; Kuvarega, Alex T.; Mamba, Bhekie B.; Gui, Jianzhou | European Journal of Organic Chemistry (2024), 27(33), e202400518",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 88.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium",
+                "cas": "7440-05-3"
+              },
+              {
+                "name": "1344-28-1",
+                "cas": "1344-28-1"
+              },
+              {
+                "name": "7429-90-5",
+                "cas": "7429-90-5"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-22968052",
+            "reaction_smiles": "Ic1ccncc1.CSc1ccc(B(O)O)cc1>>CSc1ccc(-c2ccncc2)cc1",
+            "reactants_smiles": "Ic1ccncc1.CSc1ccc(B(O)O)cc1",
+            "products_smiles": "CSc1ccc(-c2ccncc2)cc1",
+            "condition_core": "Pd/triphenylphosphine",
+            "yield": 80.0,
+            "core": "Pd/triphenylphosphine",
+            "base_uid": "1310-58-3",
+            "solvent_uid": "68-12-2",
+            "reagents": [
+              {
+                "name": "Potassium hydroxide",
+                "cas": "1310-58-3",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "N,N-Dimethylformamide",
+                "cas": "68-12-2"
+              },
+              {
+                "name": "1,2-Dimethoxyethane",
+                "cas": "110-71-4"
+              }
+            ],
+            "reference": "Hydroxylamine-Derived Reagent as a Dual Oxidant and Amino Group Donor for the Iron-Catalyzed Preparation of Unprotected Sulfinamides from Thiols | Chatterjee, Sayanti; Makai, Szabolcs; Morandi, Bill | Angewandte Chemie, International Edition (2021), 60(2), 758-765",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 80.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Tetrakis(triphenylphosphine)palladium(0)",
+                "cas": "14221-01-3"
+              },
+              {
+                "name": "Tetrabutylammonium bromide",
+                "cas": "1643-19-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-41433730",
+            "reaction_smiles": "Ic1ccncc1.CSc1ccc(B(O)O)cc1>>CSc1ccc(-c2ccncc2)cc1",
+            "reactants_smiles": "Ic1ccncc1.CSc1ccc(B(O)O)cc1",
+            "products_smiles": "CSc1ccc(-c2ccncc2)cc1",
+            "condition_core": "Pd/triphenylphosphine",
+            "yield": 80.0,
+            "core": "Pd/triphenylphosphine",
+            "base_uid": "584-08-7",
+            "solvent_uid": "123-91-1",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5",
+                "role": "SOLVENT"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "1,4-Dioxane",
+                "cas": "123-91-1"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Massive acceleration of SN2 reaction using the oriented external electric field | Tang, Chun; Su, Meiling; Lu, Taige; Zheng, Jueting; Wang, Juejun; Zhou, Yu; Zou, Yu-Ling; Liu, Wenqing; Huang, Ruiyun; Xu, Wei; Chen, Lijue; Zhang, Yanxi; Bai, Jie; Yang, Yang; Shi, Jia; Liu, Junyang; Hong, Wenjing | Chemical Science (2024), 15(33), 13486-13494",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 80.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Tetrakis(triphenylphosphine)palladium(0)",
+                "cas": "14221-01-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-10931534",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccccc1",
+            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "condition_core": "Pd",
+            "yield": 100.0,
+            "core": "Pd",
+            "base_uid": "584-08-7",
+            "solvent_uid": "64-17-5",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Ethanol",
+                "cas": "64-17-5"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Modular Approach to Heterogenous Catalysis. Manipulation of Cross-Coupling Catalyst Activity | Stibingerova, Iva; Voltrova, Svatava; Kocova, Sarka; Lindale, Matthew; Srogl, Jiri | Organic Letters (2016), 18(2), 312-315",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 100.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium",
+                "cas": "7440-05-3"
+              },
+              {
+                "name": "168908-22-3",
+                "cas": "168908-22-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-18611389",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccccc1",
+            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "condition_core": "Pd",
+            "yield": 100.0,
+            "core": "Pd",
+            "base_uid": "144-55-8",
+            "solvent_uid": "64-17-5",
+            "reagents": [
+              {
+                "name": "2194545-09-8",
+                "cas": "2194545-09-8",
+                "role": "UNK"
+              },
+              {
+                "name": "Sodium hydrogen carbonate",
+                "cas": "144-55-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Ethanol",
+                "cas": "64-17-5"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Supramolecular Nanotubules as a Catalytic Regulator for Palladium Cations: Applications in Selective Catalysis | Wu, Shanshan; Li, Yongguang; Xie, Siying; Ma, Cong; Lim, Joonwon; Zhao, Jiong; Kim, Dae Seok; Yang, Minyong; Yoon, Doong Ki; Lee, Myongsoo; Kim, Sang Ouk; Huang, Zhegang | Angewandte Chemie, International Edition (2017), 56(38), 11511-11514",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 100.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) chloride",
+                "cas": "7647-10-1"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-190947",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccccc1",
+            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "condition_core": "Pd",
+            "yield": 100.0,
+            "core": "Pd",
+            "base_uid": "584-08-7",
+            "solvent_uid": "64-17-5",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Ethanol",
+                "cas": "64-17-5"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Single Crystal to Single Crystal (SC-to-SC) Transformation from a Nonporous to Porous Metal-Organic Framework and Its Application Potential in Gas Adsorption and Suzuki Coupling Reaction through Postmodification | Sen, Rupam; Saha, Debraj; Koner, Subratanath; Brandao, Paula; Lin, Zhi | Chemistry - A European Journal (2015), 21(15), 5962-5971",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 100.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium",
+                "cas": "7440-05-3"
+              },
+              {
+                "name": "1121-60-4",
+                "cas": "1121-60-4"
+              },
+              {
+                "name": "1688706-66-2",
+                "cas": "1688706-66-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-22386446",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccccc1",
+            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "condition_core": "Pd",
+            "yield": 100.0,
+            "core": "Pd",
+            "base_uid": "584-08-7",
+            "solvent_uid": "64-17-5",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Ethanol",
+                "cas": "64-17-5"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Nanocatalosomes as plasmonic bilayer shells with interlayer catalytic nanospaces solar-light-induced reactions | Kumar, Amit; Kumari, Nitee; Dubbu, Sateesh; Kumar, Sumit; Kwon, Taewan; Koo, Jung Hun; Lim, Jongwon; Kim, Inki; Cho, Yoon-Kyoung; Rho, Junsuk; Lee, In Su | Angewandte Chemie, International Edition (2020), 59(24), 9460-9469",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 100.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium",
+                "cas": "7440-05-3"
+              },
+              {
+                "name": "7440-57-5",
+                "cas": "7440-57-5"
+              },
+              {
+                "name": "7631-86-9",
+                "cas": "7631-86-9"
+              },
+              {
+                "name": "20074-52-6",
+                "cas": "20074-52-6"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-34701447",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccccc1",
+            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "condition_core": "Pd",
+            "yield": 100.0,
+            "core": "Pd",
+            "base_uid": "584-08-7",
+            "solvent_uid": "64-17-5",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Ethanol",
+                "cas": "64-17-5"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Building bio-Profiles for common catalytic reactions | Egorova, Ksenia S.; Galushko, Alexey S.; Dzhemileva, Lilya U.; D'yakonov, Vladimir A.; Ananikov, Valentine P. | Green Chemistry (2021), 23(17), 6373-6391",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 100.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-16356802",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccccc1",
+            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "condition_core": "Base: K2CO3",
+            "yield": 99.0,
+            "core": "Base: K2CO3",
+            "base_uid": "584-08-7",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              }
+            ],
+            "reference": "Impact of Linker Engineering on the Catalytic Activity of Metal-Organic Frameworks Containing Pd(II)-Bipyridine Complexes | Li, Xinle; Van Zeeland, Ryan; Maligal-Ganesh, Raghu V.; Pei, Yuchen; Power, Gregory; Stanley, Levi; Huang, Wenyu | ACS Catalysis (2016), 6(9), 6324-6328",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 99.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "79104-99-7",
+                "cas": "79104-99-7"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-17211205",
+            "reaction_smiles": "OB(O)c1ccccc1.Ic1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            "reactants_smiles": "OB(O)c1ccccc1.Ic1ccccc1",
+            "products_smiles": "c1ccc(-c2ccccc2)cc1",
+            "condition_core": "Base: K3PO4",
+            "yield": 99.0,
+            "core": "Base: K3PO4",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "110-71-4",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "1,2-Dimethoxyethane",
+                "cas": "110-71-4"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Ligand-free Suzuki-Miyaura coupling using ruthenium(0) nanoparticles and a continuously irradiating microwave system | Akiyama, Toshiki; Taniguchi, Takahisa; Saito, Nozomi; Doi, Ryohei; Honma, Tetsuo; Tamenori, Yusuke; Ohki, Yuuta; Takahashi, Naoyuki; Fujioka, Hiromichi; Sato, Yoshihiro; Arisawa, Mitsuhiro | Green Chemistry (2017), 19(14), 3357-3369",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 99.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "7440-18-8",
+                "cas": "7440-18-8"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          }
+        ],
+        "support": 10,
+        "similarities": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "diversity_score": 0.5410628019323672,
+        "avg_similarity": 0.5,
+        "method": "fusion"
+      },
+      "reasons": "Low similarity (0.50) → precedents less relevant\nLarge dataset (n=50,215) → trust analytics\nNo strong rule match → low rule weight\nNo ML model available → δ=0",
+      "formatted": {
+        "meta": {
+          "status": "success",
+          "model": "fusion",
+          "version": "2.0",
+          "method": "multi_source_evidence_fusion",
+          "adaptive_weights": {
+            "α": 0.3636363636363636,
+            "β": 0.5064935064935066,
+            "γ": 0.12987012987012989,
+            "δ": 0.0
+          }
+        },
+        "input": {
+          "reaction_smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1",
+          "family": "Suzuki"
+        },
+        "detection": {
+          "family": "Suzuki",
+          "confidence": "LOW"
+        },
+        "recommended_conditions": [
+          {
+            "rank": 1,
+            "reaction": {
+              "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Ic1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "OB(O)c1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium",
+                "abbreviation": "Palladium",
+                "cas": "7440-05-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "catalyst"
+              },
+              {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": "100 °C",
+              "time": "12.0 h",
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 1,
+              "core": "Tetrakis(triphenylphosphine)palladium(0)",
+              "base": {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": "LOW",
+              "fusion_score": 0.3549251737603798,
+              "component_scores": {
+                "precedent": 0.0,
+                "analytics": 0.7007497020397241,
+                "rules": 0.0,
+                "ml": 0.5
+              },
+              "adaptive_weights": {
+                "α": 0.3636363636363636,
+                "β": 0.5064935064935066,
+                "γ": 0.12987012987012989,
+                "δ": 0.0
+              },
+              "support": {
+                "count": 0,
+                "fraction_core": 0.0,
+                "reference_population": 10
+              }
+            },
+            "combo": {
+              "base_uid": "Potassium carbonate",
+              "solvent_uid": "Water"
+            }
+          },
+          {
+            "rank": 2,
+            "reaction": {
+              "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Ic1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "OB(O)c1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium",
+                "abbreviation": "Palladium",
+                "cas": "7440-05-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "catalyst"
+              },
+              {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Ethanol",
+                "abbreviation": "EtOH",
+                "cas": "64-17-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": "80 °C",
+              "time": "12 h",
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 2,
+              "core": "Pd",
+              "base": {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Ethanol",
+                "abbreviation": "EtOH",
+                "cas": "64-17-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": "LOW",
+              "fusion_score": 0.33160173160173156,
+              "component_scores": {
+                "precedent": 0.6333333333333333,
+                "analytics": 0.2,
+                "rules": 0.0,
+                "ml": 0.5
+              },
+              "adaptive_weights": {
+                "α": 0.3636363636363636,
+                "β": 0.5064935064935066,
+                "γ": 0.12987012987012989,
+                "δ": 0.0
+              },
+              "support": {
+                "count": 6,
+                "fraction_core": 0.0,
+                "reference_population": 10
+              }
+            },
+            "combo": {
+              "base_uid": "584-08-7",
+              "solvent_uid": "64-17-5"
+            }
+          },
+          {
+            "rank": 3,
+            "reaction": {
+              "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Ic1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "OB(O)c1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium",
+                "abbreviation": "Palladium",
+                "cas": "7440-05-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "catalyst"
+              },
+              {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": "100 °C",
+              "time": "12.0 h",
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 3,
+              "core": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+              "base": {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": "LOW",
+              "fusion_score": 0.3309973324473922,
+              "component_scores": {
+                "precedent": 0.0,
+                "analytics": 0.6535075538063897,
+                "rules": 0.0,
+                "ml": 0.5
+              },
+              "adaptive_weights": {
+                "α": 0.3636363636363636,
+                "β": 0.5064935064935066,
+                "γ": 0.12987012987012989,
+                "δ": 0.0
+              },
+              "support": {
+                "count": 0,
+                "fraction_core": 0.0,
+                "reference_population": 10
+              }
+            },
+            "combo": {
+              "base_uid": "Potassium carbonate",
+              "solvent_uid": "Water"
+            }
+          },
+          {
+            "rank": 4,
+            "reaction": {
+              "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Ic1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "OB(O)c1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium",
+                "abbreviation": "Palladium",
+                "cas": "7440-05-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "catalyst"
+              },
+              {
+                "name": "Sodium carbonate",
+                "abbreviation": "Na2CO3",
+                "cas": "497-19-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": "100 °C",
+              "time": "12.0 h",
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 4,
+              "core": "Tetrakis(triphenylphosphine)palladium(0)",
+              "base": {
+                "name": "Sodium carbonate",
+                "abbreviation": "Na2CO3",
+                "cas": "497-19-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": "LOW",
+              "fusion_score": 0.32929124994115755,
+              "component_scores": {
+                "precedent": 0.0,
+                "analytics": 0.6501391344992085,
+                "rules": 0.0,
+                "ml": 0.5
+              },
+              "adaptive_weights": {
+                "α": 0.3636363636363636,
+                "β": 0.5064935064935066,
+                "γ": 0.12987012987012989,
+                "δ": 0.0
+              },
+              "support": {
+                "count": 0,
+                "fraction_core": 0.0,
+                "reference_population": 10
+              }
+            },
+            "combo": {
+              "base_uid": "Sodium carbonate",
+              "solvent_uid": "Water"
+            }
+          },
+          {
+            "rank": 5,
+            "reaction": {
+              "smiles": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Ic1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "OB(O)c1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium",
+                "abbreviation": "Palladium",
+                "cas": "7440-05-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "catalyst"
+              },
+              {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": "100 °C",
+              "time": "12.0 h",
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 5,
+              "core": "Bis(triphenylphosphine)palladium(II) dichloride",
+              "base": {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": "LOW",
+              "fusion_score": 0.3286228039350374,
+              "component_scores": {
+                "precedent": 0.0,
+                "analytics": 0.6488193821281507,
+                "rules": 0.0,
+                "ml": 0.5
+              },
+              "adaptive_weights": {
+                "α": 0.3636363636363636,
+                "β": 0.5064935064935066,
+                "γ": 0.12987012987012989,
+                "δ": 0.0
+              },
+              "support": {
+                "count": 0,
+                "fraction_core": 0.0,
+                "reference_population": 10
+              }
+            },
+            "combo": {
+              "base_uid": "Potassium carbonate",
+              "solvent_uid": "Water"
+            }
+          }
+        ],
+        "precedent_summary": {
+          "total_precedents": 10,
+          "chosen_core": "Tetrakis(triphenylphosphine)palladium(0)",
+          "core_support": 0
+        }
+      },
+      "detection": {
+        "auto_family": "Suzuki_CC",
+        "rule_family": "Suzuki_CC",
+        "source": "auto"
+      },
+      "fusion_meta": {
+        "adaptive_weights": {
+          "α": 0.3636363636363636,
+          "β": 0.5064935064935066,
+          "γ": 0.12987012987012989,
+          "δ": 0.0
+        },
+        "reasoning": [
+          "Low similarity (0.50) → precedents less relevant",
+          "Large dataset (n=50,215) → trust analytics",
+          "No strong rule match → low rule weight",
+          "No ML model available → δ=0"
+        ],
+        "evidence_summary": {
+          "precedents": 10,
+          "diversity": 0.5410628019323672,
+          "dataset_size": 50215
+        }
+      },
+      "constraint_filters": {}
+    }
+  }
+}

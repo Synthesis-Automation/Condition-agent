@@ -1,14 +1,14 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T04:24:00.678845Z",
+    "generated_at": "2025-10-09T05:37:40.372670Z",
     "model": "Rule-based-Suzuki_db.json",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 18.69
+    "processing_time_ms": 11.68
   },
   "input": {
-    "reaction_smiles": "Brc1ccc(OC)cc1.[K+].[B-](F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1",
+    "reaction_smiles": "Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1",
     "family": "Suzuki_Miyaura"
   },
   "detection": {
@@ -22,7 +22,7 @@
       "rank": 1,
       "chemicals": [
         {
-          "smiles": "Brc1ccc(OC)cc1",
+          "smiles": "Ic1ccncc1",
           "role": "electrophile",
           "name": null,
           "abbreviation": null,
@@ -30,7 +30,7 @@
           "equivalents": null
         },
         {
-          "smiles": "[K+]",
+          "smiles": "c1ccc(B(O)O)cc1",
           "role": "nucleophile",
           "name": null,
           "abbreviation": null,
@@ -38,261 +38,153 @@
           "equivalents": null
         },
         {
-          "smiles": "[B-](F)(F)c2ccccc2",
-          "role": "starting_material",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "equivalents": null
-        },
-        {
-          "name": "Pd(PPh3)4",
+          "name": "['Pd2(dba)3']",
           "role": "metal_precursor",
-          "notes": "Pd(PPh3)4",
+          "notes": "['Pd2(dba)3']",
           "abbreviation": null,
           "cas": null,
           "smiles": null,
           "equivalents": null
         },
         {
-          "name": "PPh3",
-          "role": "ligand",
-          "notes": "PPh3 (intrinsic)",
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "name": "K2CO3",
+          "name": "['K2CO3 2.0 eq']",
           "role": "base",
-          "notes": "K2CO3 (2.0 eq)",
+          "notes": "['K2CO3 2.0 eq']",
           "equivalents": 2.0,
           "abbreviation": null,
           "cas": null,
           "smiles": null
         },
         {
-          "name": "1,4-dioxane/H2O",
+          "name": "['THF/H2O (4:1)']",
           "role": "solvent",
-          "notes": "1,4-dioxane/H2O (4:1)",
+          "notes": "['THF/H2O (4:1)']",
           "abbreviation": null,
           "cas": null,
           "smiles": null,
           "equivalents": null
         },
         {
-          "name": "aryl-B",
+          "name": "['aryl-B(OH)2 1.3 eq', 'aryl-Bpin 1.2 eq']",
           "role": "partner",
-          "notes": "aryl-B(OH)2 or aryl-Bpin (1.2–1.3 eq)",
+          "notes": "['aryl-B(OH)2 1.3 eq', 'aryl-Bpin 1.2 eq']",
           "equivalents": 1.3,
           "abbreviation": null,
           "cas": null,
           "smiles": null
-        },
-        {
-          "name": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-          "role": "condition_core",
-          "notes": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null,
-          "equivalents": null
         }
       ],
       "conditions": {
-        "temperature": {
-          "value": 60,
-          "unit": "C"
-        },
-        "time": {
-          "value": 8,
-          "unit": "h"
-        },
+        "temperature": [
+          45,
+          60
+        ],
+        "time": [
+          6,
+          10
+        ],
         "atmosphere": null,
         "extras": {
           "extras": {
-            "rationale": "Robust benchmark set for most ArI/ArBr pairings.",
-            "condition_core": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-            "pd_source": "Pd(PPh3)4",
-            "ligand": "PPh3 (intrinsic)",
-            "boron_partner": "aryl-B(OH)2 or aryl-Bpin (1.2–1.3 eq)",
-            "base": "K2CO3 (2.0 eq)",
-            "solvent": "1,4-dioxane/H2O (4:1)",
-            "concentration_M": 0.2,
+            "pd_source": [
+              "Pd2(dba)3"
+            ],
+            "ligands": [
+              "SPhos"
+            ],
+            "boron_partner": [
+              "aryl-B(OH)2 1.3 eq",
+              "aryl-Bpin 1.2 eq"
+            ],
+            "base": [
+              "K2CO3 2.0 eq"
+            ],
+            "solvent": [
+              "THF/H2O (4:1)"
+            ],
             "loadings": {
-              "Pd_mol%": 1.0,
-              "ligand_mol%": 1.0,
-              "base_eq": 2.0
+              "Pd_mol%": [
+                0.5,
+                1.5
+              ],
+              "ligand_mol%": [
+                1.0,
+                3.0
+              ],
+              "base_eq": [
+                2.0,
+                2.5
+              ]
             }
           }
         }
       },
       "source": {
-        "match_type": "default",
-        "entry_id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
-        "entry_name": null,
-        "priority": 0
-      }
-    }
-  ],
-  "recommendations": [
-    {
-      "rank": 1,
-      "chemicals": [
-        {
-          "smiles": "Brc1ccc(OC)cc1",
-          "role": "electrophile",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "equivalents": null
-        },
-        {
-          "smiles": "[K+]",
-          "role": "nucleophile",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "equivalents": null
-        },
-        {
-          "smiles": "[B-](F)(F)c2ccccc2",
-          "role": "starting_material",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "equivalents": null
-        },
-        {
-          "name": "Pd(PPh3)4",
-          "role": "metal_precursor",
-          "notes": "Pd(PPh3)4",
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "name": "PPh3",
-          "role": "ligand",
-          "notes": "PPh3 (intrinsic)",
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "name": "K2CO3",
-          "role": "base",
-          "notes": "K2CO3 (2.0 eq)",
-          "equivalents": 2.0,
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null
-        },
-        {
-          "name": "1,4-dioxane/H2O",
-          "role": "solvent",
-          "notes": "1,4-dioxane/H2O (4:1)",
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "name": "aryl-B",
-          "role": "partner",
-          "notes": "aryl-B(OH)2 or aryl-Bpin (1.2–1.3 eq)",
-          "equivalents": 1.3,
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null
-        },
-        {
-          "name": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-          "role": "condition_core",
-          "notes": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-          "abbreviation": null,
-          "cas": null,
-          "smiles": null,
-          "equivalents": null
-        }
-      ],
-      "conditions": {
-        "temperature": {
-          "value": 60,
-          "unit": "C"
-        },
-        "time": {
-          "value": 8,
-          "unit": "h"
-        },
-        "atmosphere": null,
-        "extras": {
-          "extras": {
-            "rationale": "Robust benchmark set for most ArI/ArBr pairings.",
-            "condition_core": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-            "pd_source": "Pd(PPh3)4",
-            "ligand": "PPh3 (intrinsic)",
-            "boron_partner": "aryl-B(OH)2 or aryl-Bpin (1.2–1.3 eq)",
-            "base": "K2CO3 (2.0 eq)",
-            "solvent": "1,4-dioxane/H2O (4:1)",
-            "concentration_M": 0.2,
-            "loadings": {
-              "Pd_mol%": 1.0,
-              "ligand_mol%": 1.0,
-              "base_eq": 2.0
-            }
-          }
-        }
-      },
-      "source": {
-        "match_type": "default",
-        "entry_id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
-        "entry_name": null,
-        "priority": 0
+        "match_type": "scheme",
+        "entry_id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+        "entry_name": "Aryl iodides/bromides + aryl boron (SPhos set)",
+        "priority": 46
       }
     }
   ],
   "extras": {
     "match": {
       "reaction_type": "Suzuki_Miyaura",
-      "match_type": "default",
-      "entry_id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
-      "entry_name": null,
-      "priority": 0,
+      "match_type": "scheme",
+      "entry_id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+      "entry_name": "Aryl iodides/bromides + aryl boron (SPhos set)",
+      "priority": 46,
       "conditions": {
-        "rationale": "Robust benchmark set for most ArI/ArBr pairings.",
-        "condition_core": "Pd(PPh3)4 / carbonate / dioxane–H2O",
-        "pd_source": "Pd(PPh3)4",
-        "ligand": "PPh3 (intrinsic)",
-        "boron_partner": "aryl-B(OH)2 or aryl-Bpin (1.2–1.3 eq)",
-        "base": "K2CO3 (2.0 eq)",
-        "solvent": "1,4-dioxane/H2O (4:1)",
-        "temperature_C": 60,
-        "time_h": 8,
-        "concentration_M": 0.2,
+        "pd_source": [
+          "Pd2(dba)3"
+        ],
+        "ligands": [
+          "SPhos"
+        ],
+        "boron_partner": [
+          "aryl-B(OH)2 1.3 eq",
+          "aryl-Bpin 1.2 eq"
+        ],
+        "base": [
+          "K2CO3 2.0 eq"
+        ],
+        "solvent": [
+          "THF/H2O (4:1)"
+        ],
+        "temperature_C": [
+          45,
+          60
+        ],
+        "time_h": [
+          6,
+          10
+        ],
         "loadings": {
-          "Pd_mol%": 1.0,
-          "ligand_mol%": 1.0,
-          "base_eq": 2.0
+          "Pd_mol%": [
+            0.5,
+            1.5
+          ],
+          "ligand_mol%": [
+            1.0,
+            3.0
+          ],
+          "base_eq": [
+            2.0,
+            2.5
+          ]
         }
       },
       "trace": {
         "normalization": {
           "reactant_smiles": [
-            "Brc1ccc(OC)cc1",
-            "[K+]",
-            "[B-](F)(F)c2ccccc2"
+            "Ic1ccncc1",
+            "c1ccc(B(O)O)cc1"
           ],
           "kept_reactants": [
-            "Brc1ccc(OC)cc1",
-            "[B-](F)(F)c2ccccc2"
+            "Ic1ccncc1",
+            "c1ccc(B(O)O)cc1"
           ],
-          "dropped_reactants": [
-            "[K+]"
-          ],
+          "dropped_reactants": [],
           "smarts_bag": [
             "[c]-[Cl,Br,I]"
           ],
@@ -328,18 +220,29 @@
                 "smarts": "[c:1]-[I,Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1ccc(OC)cc1",
+                "reactant_smiles": "Ic1ccncc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
                   0
                 ]
+              },
+              {
+                "smarts": "[B:3](-[O])(-[O])-[c:4]",
+                "masked_index": 1,
+                "reactant_index": 1,
+                "reactant_smiles": "c1ccc(B(O)O)cc1",
+                "match_count": 1,
+                "atom_indices": [
+                  4,
+                  5,
+                  6,
+                  3
+                ]
               }
             ],
-            "missing": [
-              "[B:3](-[O])(-[O])-[c:4]"
-            ],
-            "matched": false
+            "missing": [],
+            "matched": true
           },
           {
             "id": "SCDB-SUZ-ARBR-ORTHO-XPhos",
@@ -419,21 +322,9 @@
             "type": "scheme",
             "priority": 66,
             "specificity": 10,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccc(OC)cc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]1[o,s][c][c][c]1"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -447,7 +338,7 @@
                 "smarts": "[c:1]-[I,Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1ccc(OC)cc1",
+                "reactant_smiles": "Ic1ccncc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -465,21 +356,9 @@
             "type": "scheme",
             "priority": 48,
             "specificity": 8,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccc(OC)cc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]([!H])([!H])"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -539,21 +418,9 @@
             "type": "scheme",
             "priority": 64,
             "specificity": 11,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1ccc(OC)cc1",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]1[n][c,n][c,n][c,n][c,n]1"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -608,10 +475,10 @@
           }
         ],
         "selected": {
-          "id": "SCDB-SUZ-DEFAULT-ArI_ArBr",
-          "type": "default",
-          "priority": 0,
-          "specificity": 0
+          "id": "SCDB-SUZ-ARBRI-GENERAL-SPhos",
+          "type": "scheme",
+          "priority": 46,
+          "specificity": 6
         }
       }
     }
