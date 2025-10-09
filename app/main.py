@@ -497,6 +497,8 @@ def api_recommend(req: RecommendFromReactionRequest):
         k=req.k,
         relax=req.relax or {},
         constraint_rules=req.constraints or {},
+        rerank_strategy=req.rerank_strategy,
+        filter_unknown_reagents=req.filter_unknown_reagents,
     )
     processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
     
@@ -518,32 +520,55 @@ def api_recommend(req: RecommendFromReactionRequest):
 @app.post("/api/v1/recommend/fusion")
 def api_recommend_fusion(req: FusionRecommendRequest):
     """
-    Fusion recommendation endpoint - combines multiple evidence sources with adaptive weighting.
+    DEPRECATED: Fusion recommendation endpoint has been removed.
     
-    Returns recommendations with fusion_meta containing:
-    - adaptive_weights: Learned weights (α, β, γ, δ) for each evidence source
-    - evidence_summary: Quality metrics for precedent data
-    - reasoning: Explanations for weight choices
+    The complex multi-source fusion logic has been replaced with simpler,
+    more maintainable precedent-centric ranking with optional reranking.
+    
+    This endpoint now redirects to the standard recommendation endpoint
+    with rule-based reranking enabled (equivalent quality).
+    
+    Please migrate to:
+    - POST /api/v1/recommend with rerank_strategy='rule' (default)
+    
+    Reranking strategies:
+    - 'rule': Boost precedents matching chemical rules
+    - 'analytics': Boost precedents using popular reagents
+    - 'none': Use DRFP similarity only
     """
+    import warnings
+    warnings.warn(
+        "The /api/v1/recommend/fusion endpoint is deprecated. "
+        "Use /api/v1/recommend with rerank_strategy parameter instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
     start_time = time.perf_counter()
+    
+    # Redirect to standard recommendation with rule-based reranking
     result = recommend.recommend_from_reaction(
         reaction=req.reaction,
         k=req.k,
-        use_fusion=True,
+        rerank_strategy='rule',  # Use rule reranking instead of fusion
+        filter_unknown_reagents=False,
         max_variants=req.max_variants,
         relax=req.relax or {},
         constraint_rules=req.constraints or {}
     )
     processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
     
-    # Validate fusion metadata is present
-    if 'fusion_meta' not in result:
-        logger = logging.getLogger(__name__)
-        logger.warning(f"Fusion mode enabled but no fusion_meta returned for reaction: {req.reaction[:50]}...")
-        result['fusion_meta'] = {
-            'error': 'Fusion metadata not available',
-            'note': 'Check if fusion is properly configured in recommend module'
+    # Add deprecation notice to response
+    result['_deprecated'] = {
+        'message': 'This endpoint is deprecated. Use /api/v1/recommend instead.',
+        'migration': {
+            'new_endpoint': '/api/v1/recommend',
+            'parameters': {
+                'rerank_strategy': 'rule',  # Equivalent to fusion quality
+                'filter_unknown_reagents': False
+            }
         }
+    }
     
     return output_formatter.format_fusion_output(
         reaction_smiles=req.reaction,
