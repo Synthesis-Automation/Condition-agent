@@ -126,12 +126,12 @@
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "0.5–1.5%"
+          "amount": "1.5%"
         },
         {
           "name": "SPhos",
           "role": "ligand",
-          "amount": "1.0–3.0%"
+          "amount": "3.0%"
         },
         {
           "name": "K2CO3",
@@ -191,12 +191,12 @@
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "1–2.5%"
+          "amount": "2%"
         },
         {
           "name": "XPhos",
           "role": "ligand",
-          "amount": "1.0–3.0%"
+          "amount": "3.0%"
         },
         {
           "name": "K2CO3",
@@ -260,12 +260,12 @@
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "1.5–3%"
+          "amount": "1.5%"
         },
         {
           "name": "XPhos",
           "role": "ligand",
-          "amount": "1.0–3.0%"
+          "amount": "3.0%"
         },
         {
           "name": "Cs2CO3",
@@ -328,7 +328,12 @@
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "1–2%"
+          "amount": "2%"
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "amount": "4%"
         },
         {
           "name": "K3PO4",
@@ -451,22 +456,12 @@
         {
           "name": "XPhos Pd G3 precatalyst",
           "role": "metal_source",
-          "amount": "1.5–3%"
+          "amount": "3%"
         },
         {
           "name": "K3PO4",
           "role": "base",
           "amount": "200%"
-        },
-        {
-          "name": "Cu(OAc)2",
-          "role": "additive",
-          "amount": "100%"
-        },
-        {
-          "name": "diethanolamine",
-          "role": "additive",
-          "amount": "150%"
         },
         {
           "name": "dioxane/H2O (15:1)",
@@ -692,8 +687,9 @@
         {
           "name": "Pd(PPh3)4",
           "role": "metal_source",
-          "amount": "0.5–1.5%"
+          "amount": "5%"
         },
+
         {
           "name": "KOAc",
           "role": "base",
@@ -1001,6 +997,11 @@
           "amount": "2–3%"
         },
         {
+          "name": "Pd(PPh3)4",
+          "role": "ligand",
+          "amount": ""
+        },
+        {
           "name": "K2CO3",
           "role": "base",
           "amount": "200%"
@@ -1123,6 +1124,11 @@
           "amount": "3–5%"
         },
         {
+          "name": "Pd(PPh3)4",
+          "role": "ligand",
+          "amount": ""
+        },
+        {
           "name": "K2CO3",
           "role": "base",
           "amount": "250%"
@@ -1235,14 +1241,19 @@
       },
       "reagents": [
         {
-          "name": "",
+          "name": "Pd(PPh3)4",
           "role": "metal_source",
-          "amount": ""
+          "amount": "5%"
         },
         {
-          "name": "",
+          "name": "K2CO3",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "1,4-dioxane/H2O (4:1)",
           "role": "solvent",
-          "amount": ""
+          "amount": "0.2M"
         }
       ],
       "conditions": {}
@@ -1285,14 +1296,24 @@
       },
       "reagents": [
         {
-          "name": "",
+          "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": ""
+          "amount": "5%"
         },
         {
-          "name": "",
+          "name": "XPhos",
+          "role": "ligand",
+          "amount": "4%"
+        },
+        {
+          "name": "Cs2CO3",
+          "role": "base",
+          "amount": "250%"
+        },
+        {
+          "name": "toluene/H2O (5:1)",
           "role": "solvent",
-          "amount": ""
+          "amount": "0.5M"
         }
       ],
       "conditions": {}
@@ -1335,12 +1356,22 @@
       },
       "reagents": [
         {
-          "name": "",
+          "name": "XPhos Pd G3 precatalyst",
           "role": "metal_source",
-          "amount": ""
+          "amount": "2%"
         },
         {
-          "name": "",
+          "name": "XPhos",
+          "role": "ligand",
+          "amount": "2%"
+        },
+        {
+          "name": "K3PO4",
+          "role": "base",
+          "amount": "200%"
+        },        
+        {
+          "name": "dioxane/H2O (15:1)",
           "role": "solvent",
           "amount": ""
         }
@@ -1385,12 +1416,17 @@
       },
       "reagents": [
         {
-          "name": "",
+          "name": "PdCl2(dppf)",
           "role": "metal_source",
-          "amount": ""
+          "amount": "2%"
         },
         {
-          "name": "",
+          "name": "NaOAc",
+          "role": "base",
+          "amount": "200%"
+        },
+        {
+          "name": "MeOH",
           "role": "solvent",
           "amount": ""
         }

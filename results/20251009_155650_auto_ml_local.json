@@ -1,23 +1,21 @@
 {
   "meta": {
-    "generated_at": "2025-10-09T07:34:19.195323Z",
+    "generated_at": "2025-10-09T07:56:55.561021Z",
     "model": "ML-precedent-knn",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 4824.6
+    "processing_time_ms": 4584.72
   },
   "input": {
-    "reaction_smiles": "Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1",
-    "family": "Suzuki",
-    "requested_reaction_type": "Suzuki",
-    "requested_family": "Suzuki"
+    "reaction_smiles": "Clc1ccc(C#N)cc1.c1coc(B(O)O)c1>>N#Cc1ccc(-c2ccoc2)cc1",
+    "family": "Suzuki"
   },
   "detection": {
     "family": "Suzuki",
     "detected_reaction_type": "Suzuki",
     "method": "rxn-insight-ml",
-    "confidence": 0.57
+    "confidence": 0.38
   },
   "recommended_conditions": [
     {
@@ -29,7 +27,7 @@
           "name": null,
           "abbreviation": null,
           "cas": null,
-          "smiles": "Ic1ccncc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null
         },
         {
@@ -38,51 +36,33 @@
           "name": null,
           "abbreviation": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
-          "role": "metal_precursor",
-          "name": "Palladium",
-          "abbreviation": null,
-          "cas": "7440-05-3",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "1344-28-1",
+          "id": "3036755-16-2",
           "role": "ligand",
-          "name": "[Unknown ligand] CAS 1344-28-1",
+          "name": "[Unknown ligand] CAS 3036755-16-2",
           "abbreviation": null,
-          "cas": "1344-28-1",
+          "cas": "3036755-16-2",
           "smiles": null,
           "equivalents": null
         },
         {
-          "id": "7429-90-5",
-          "role": "ligand",
-          "name": "[Unknown ligand] CAS 7429-90-5",
-          "abbreviation": null,
-          "cas": "7429-90-5",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "584-08-7",
+          "id": "7778-53-2",
           "role": "base",
-          "name": "Potassium carbonate",
+          "name": "Tripotassium phosphate",
           "abbreviation": null,
-          "cas": "584-08-7",
+          "cas": "7778-53-2",
           "smiles": null,
           "equivalents": null
         },
         {
-          "id": "64-17-5",
+          "id": "109-99-9",
           "role": "solvent",
-          "name": "Ethanol",
+          "name": "Tetrahydrofuran",
           "abbreviation": null,
-          "cas": "64-17-5",
+          "cas": "109-99-9",
           "smiles": null,
           "equivalents": null
         }
@@ -92,8 +72,8 @@
         "time": null,
         "atmosphere": null
       },
-      "confidence": 0.005699999999999999,
-      "precedent_count": 5
+      "confidence": 0.0038,
+      "precedent_count": 3
     },
     {
       "rank": 2,
@@ -104,7 +84,7 @@
           "name": null,
           "abbreviation": null,
           "cas": null,
-          "smiles": "Ic1ccncc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null
         },
         {
@@ -113,192 +93,24 @@
           "name": null,
           "abbreviation": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
-          "role": "metal_precursor",
-          "name": "Palladium",
-          "abbreviation": null,
-          "cas": "7440-05-3",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "1344-28-1",
+          "id": "3036755-16-2",
           "role": "ligand",
-          "name": "[Unknown ligand] CAS 1344-28-1",
+          "name": "[Unknown ligand] CAS 3036755-16-2",
           "abbreviation": null,
-          "cas": "1344-28-1",
+          "cas": "3036755-16-2",
           "smiles": null,
           "equivalents": null
         },
         {
-          "id": "7429-90-5",
-          "role": "ligand",
-          "name": "[Unknown ligand] CAS 7429-90-5",
-          "abbreviation": null,
-          "cas": "7429-90-5",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "144-55-8",
+          "id": "7778-53-2",
           "role": "base",
-          "name": "Sodium hydrogen carbonate",
+          "name": "Tripotassium phosphate",
           "abbreviation": null,
-          "cas": "144-55-8",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "64-17-5",
-          "role": "solvent",
-          "name": "Ethanol",
-          "abbreviation": null,
-          "cas": "64-17-5",
-          "smiles": null,
-          "equivalents": null
-        }
-      ],
-      "conditions": {
-        "temperature": null,
-        "time": null,
-        "atmosphere": null
-      },
-      "confidence": 0.005699999999999999,
-      "precedent_count": 1
-    },
-    {
-      "rank": 3,
-      "chemicals": [
-        {
-          "id": null,
-          "role": "starting_material",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "smiles": "Ic1ccncc1",
-          "equivalents": null
-        },
-        {
-          "id": null,
-          "role": "starting_material",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "smiles": "OB(O)c1ccccc1",
-          "equivalents": null
-        },
-        {
-          "id": "7440-05-3",
-          "role": "metal_precursor",
-          "name": "Palladium",
-          "abbreviation": null,
-          "cas": "7440-05-3",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "1344-28-1",
-          "role": "ligand",
-          "name": "[Unknown ligand] CAS 1344-28-1",
-          "abbreviation": null,
-          "cas": "1344-28-1",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "7429-90-5",
-          "role": "ligand",
-          "name": "[Unknown ligand] CAS 7429-90-5",
-          "abbreviation": null,
-          "cas": "7429-90-5",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "1310-58-3",
-          "role": "base",
-          "name": "Potassium hydroxide",
-          "abbreviation": null,
-          "cas": "1310-58-3",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "68-12-2",
-          "role": "solvent",
-          "name": "N,N-Dimethylformamide",
-          "abbreviation": null,
-          "cas": "68-12-2",
-          "smiles": null,
-          "equivalents": null
-        }
-      ],
-      "conditions": {
-        "temperature": null,
-        "time": null,
-        "atmosphere": null
-      },
-      "confidence": 0.005699999999999999,
-      "precedent_count": 1
-    },
-    {
-      "rank": 4,
-      "chemicals": [
-        {
-          "id": null,
-          "role": "starting_material",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "smiles": "Ic1ccncc1",
-          "equivalents": null
-        },
-        {
-          "id": null,
-          "role": "starting_material",
-          "name": null,
-          "abbreviation": null,
-          "cas": null,
-          "smiles": "OB(O)c1ccccc1",
-          "equivalents": null
-        },
-        {
-          "id": "7440-05-3",
-          "role": "metal_precursor",
-          "name": "Palladium",
-          "abbreviation": null,
-          "cas": "7440-05-3",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "1344-28-1",
-          "role": "ligand",
-          "name": "[Unknown ligand] CAS 1344-28-1",
-          "abbreviation": null,
-          "cas": "1344-28-1",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "7429-90-5",
-          "role": "ligand",
-          "name": "[Unknown ligand] CAS 7429-90-5",
-          "abbreviation": null,
-          "cas": "7429-90-5",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "584-08-7",
-          "role": "base",
-          "name": "Potassium carbonate",
-          "abbreviation": null,
-          "cas": "584-08-7",
+          "cas": "7778-53-2",
           "smiles": null,
           "equivalents": null
         },
@@ -317,7 +129,121 @@
         "time": null,
         "atmosphere": null
       },
-      "confidence": 0.005699999999999999,
+      "confidence": 0.0038,
+      "precedent_count": 1
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "N#Cc1ccc(Cl)cc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccco1",
+          "equivalents": null
+        },
+        {
+          "id": "3036755-16-2",
+          "role": "ligand",
+          "name": "[Unknown ligand] CAS 3036755-16-2",
+          "abbreviation": null,
+          "cas": "3036755-16-2",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "64-17-5",
+          "role": "solvent",
+          "name": "Ethanol",
+          "abbreviation": null,
+          "cas": "64-17-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0038,
+      "precedent_count": 2
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "N#Cc1ccc(Cl)cc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccco1",
+          "equivalents": null
+        },
+        {
+          "id": "3036755-16-2",
+          "role": "ligand",
+          "name": "[Unknown ligand] CAS 3036755-16-2",
+          "abbreviation": null,
+          "cas": "3036755-16-2",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "534-17-8",
+          "role": "base",
+          "name": "Cesium carbonate",
+          "abbreviation": null,
+          "cas": "534-17-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "64-17-5",
+          "role": "solvent",
+          "name": "Ethanol",
+          "abbreviation": null,
+          "cas": "64-17-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0038,
       "precedent_count": 1
     },
     {
@@ -329,7 +255,7 @@
           "name": null,
           "abbreviation": null,
           "cas": null,
-          "smiles": "Ic1ccncc1",
+          "smiles": "N#Cc1ccc(Cl)cc1",
           "equivalents": null
         },
         {
@@ -338,42 +264,24 @@
           "name": null,
           "abbreviation": null,
           "cas": null,
-          "smiles": "OB(O)c1ccccc1",
+          "smiles": "OB(O)c1ccco1",
           "equivalents": null
         },
         {
-          "id": "7440-05-3",
-          "role": "metal_precursor",
-          "name": "Palladium",
-          "abbreviation": null,
-          "cas": "7440-05-3",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "1344-28-1",
+          "id": "3036755-16-2",
           "role": "ligand",
-          "name": "[Unknown ligand] CAS 1344-28-1",
+          "name": "[Unknown ligand] CAS 3036755-16-2",
           "abbreviation": null,
-          "cas": "1344-28-1",
+          "cas": "3036755-16-2",
           "smiles": null,
           "equivalents": null
         },
         {
-          "id": "7429-90-5",
-          "role": "ligand",
-          "name": "[Unknown ligand] CAS 7429-90-5",
-          "abbreviation": null,
-          "cas": "7429-90-5",
-          "smiles": null,
-          "equivalents": null
-        },
-        {
-          "id": "584-08-7",
+          "id": "7778-53-2",
           "role": "base",
-          "name": "Potassium carbonate",
+          "name": "Tripotassium phosphate",
           "abbreviation": null,
-          "cas": "584-08-7",
+          "cas": "7778-53-2",
           "smiles": null,
           "equivalents": null
         },
@@ -392,7 +300,7 @@
         "time": null,
         "atmosphere": null
       },
-      "confidence": 0.005699999999999999,
+      "confidence": 0.0038,
       "precedent_count": 1
     }
   ]
