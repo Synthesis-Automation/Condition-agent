@@ -18,6 +18,7 @@ Requirements:
 
 from __future__ import annotations
 
+import argparse
 import io
 import os
 import sys
@@ -193,7 +194,7 @@ def _format_conditions_output(
             }
         )
 
-    return output_formatter.format_ml_output(
+    formatted_output = output_formatter.format_ml_output(
         reaction_smiles=reaction,
         requested_type=reaction_type,
         detected_type=detected_type,
@@ -201,6 +202,12 @@ def _format_conditions_output(
         recommendations_data=recommendations_data,
         processing_time_ms=elapsed_ms,
     )
+    
+    # Preserve precedents_used section from raw_data if available
+    if "precedents_used" in raw_data:
+        formatted_output["precedents_used"] = raw_data["precedents_used"]
+    
+    return formatted_output
 
 
 def local_ml_recommendation(
@@ -266,16 +273,108 @@ def local_fusion_recommendation(
 
 
 def main() -> None:
+    """Main entry point with optional command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Local Recommendation Tester - Test ChemTools recommendation pipelines",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Interactive mode (prompts for input):
+  python scripts/local_recommendation_cli.py
+  
+  # Provide reaction and type via command line:
+  python scripts/local_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1" --family Buchwald_CN
+  
+  # Auto-detect reaction type:
+  python scripts/local_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+  
+  # Specify output directory:
+  python scripts/local_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1" --save-dir my_results
+        """
+    )
+    
+    parser.add_argument(
+        "--rxn", "--reaction",
+        type=str,
+        default=None,
+        help="Reaction SMILES (reactants>>products). If not provided, will prompt interactively."
+    )
+    
+    parser.add_argument(
+        "--family", "--type",
+        type=str,
+        default=None,
+        choices=[None, "Suzuki", "Suzuki_CC", "C_N_Coupling_Cu", "Ullmann_CN", 
+                 "C_N_Coupling_Pd", "Buchwald_CN", "C_N_Coupling_Ni", "Amide_formation"],
+        help="Reaction family/type. If not provided, will prompt interactively or auto-detect."
+    )
+    
+    parser.add_argument(
+        "--k",
+        type=int,
+        default=K_DEFAULT,
+        help=f"Number of precedents to retrieve for ML (default: {K_DEFAULT})"
+    )
+    
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=LIMIT_DEFAULT,
+        help=f"Number of ML recommendations to return (default: {LIMIT_DEFAULT})"
+    )
+    
+    parser.add_argument(
+        "--fusion-variants",
+        type=int,
+        default=FUSION_VARIANTS_DEFAULT,
+        help=f"Number of fusion recommendation variants (default: {FUSION_VARIANTS_DEFAULT})"
+    )
+    
+    parser.add_argument(
+        "--save-dir",
+        type=str,
+        default="results",
+        help="Directory to save output JSON files (default: results)"
+    )
+    
+    parser.add_argument(
+        "--strategy",
+        type=str,
+        default="all",
+        choices=["all", "rule", "ml", "fusion"],
+        help="Which recommendation strategy to run (default: all)"
+    )
+    
+    parser.add_argument(
+        "--pretty",
+        action="store_true",
+        help="Pretty-print JSON output files"
+    )
+    
+    args = parser.parse_args()
+    
     print("Local Recommendation Test")
     print("-------------------------")
+    
+    # Get reaction SMILES - from args or prompt
+    if args.rxn:
+        reaction = args.rxn.strip()
+        print(f"Reaction SMILES: {reaction}")
+    else:
+        reaction = prompt_smiles()
+    
+    # Get reaction type - from args or prompt
+    if args.family:
+        reaction_type = args.family
+        selected_label = args.family
+        print(f"Reaction type: {selected_label}")
+    else:
+        selected_label, reaction_type = choose_reaction_type()
+        print(f"Selected reaction type: {selected_label}")
 
-    reaction = prompt_smiles()
-    selected_label, reaction_type = choose_reaction_type()
-    print(f"Selected reaction type: {selected_label}")
-
-    k_value = K_DEFAULT
-    limit_value = LIMIT_DEFAULT
-    fusion_variants = FUSION_VARIANTS_DEFAULT
+    k_value = args.k
+    limit_value = args.limit
+    fusion_variants = args.fusion_variants
 
     db_path = DEFAULT_SCDB_PATH if Path(DEFAULT_SCDB_PATH).exists() else None
     if db_path:
@@ -289,25 +388,60 @@ def main() -> None:
 
     print("\nRunning local pipelines...\n")
 
-    rule_result = local_rule_based_match(reaction, db_path)
-    ml_result = local_ml_recommendation(reaction, reaction_type, k_value, limit_value)
-    fusion_result = local_fusion_recommendation(reaction, k_value, fusion_variants)
+    # Update output directory from args
+    output_dir = Path(args.save_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create a custom save function with the specified directory
+    def save_to_dir(data: Dict[str, Any], filename: str) -> Path:
+        """Save JSON data to the specified output directory."""
+        output_path = output_dir / filename
+        import json
+        output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        return output_path
 
-    rule_file = save_json(rule_result, f"{timestamp}_{label}_rule_local.json")
-    ml_file = save_json(ml_result, f"{timestamp}_{label}_ml_local.json")
-    fusion_file = save_json(fusion_result, f"{timestamp}_{label}_fusion_local.json")
+    # Run selected strategies
+    run_rule = args.strategy in ["all", "rule"]
+    run_ml = args.strategy in ["all", "ml"]
+    run_fusion = args.strategy in ["all", "fusion"]
+    
+    rule_result = None
+    ml_result = None
+    fusion_result = None
+    
+    if run_rule:
+        rule_result = local_rule_based_match(reaction, db_path)
+        rule_file = save_to_dir(rule_result, f"{timestamp}_{label}_rule_local.json")
+    
+    if run_ml:
+        ml_result = local_ml_recommendation(reaction, reaction_type, k_value, limit_value)
+        ml_file = save_to_dir(ml_result, f"{timestamp}_{label}_ml_local.json")
+    
+    if run_fusion:
+        fusion_result = local_fusion_recommendation(reaction, k_value, fusion_variants)
+        fusion_file = save_to_dir(fusion_result, f"{timestamp}_{label}_fusion_local.json")
 
     print("Summary\n-------")
-    summarize_rule(rule_result)
-    print()
-    summarize_ml(ml_result)
-    print()
-    summarize_fusion(fusion_result)
+    
+    if rule_result:
+        summarize_rule(rule_result)
+        print()
+    
+    if ml_result:
+        summarize_ml(ml_result)
+        print()
+    
+    if fusion_result:
+        summarize_fusion(fusion_result)
 
     print("\nSaved outputs:")
-    print(f"  Rule JSON:   {rule_file}")
-    print(f"  ML JSON:     {ml_file}")
-    print(f"  Fusion JSON: {fusion_file}")
+    if run_rule:
+        print(f"  Rule JSON:   {rule_file}")
+    if run_ml:
+        print(f"  ML JSON:     {ml_file}")
+    if run_fusion:
+        print(f"  Fusion JSON: {fusion_file}")
+    
     print("\nDone.")
 
 

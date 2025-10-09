@@ -293,6 +293,139 @@ def count_reagents_by_type(reagent_type: str) -> int:
     return len(db)
 
 
+def is_reagent_in_database(name: str, reagent_type: str) -> bool:
+    """
+    Check if a reagent exists in the specified database.
+    
+    Args:
+        name: Reagent name to check
+        reagent_type: Type of reagent database to search
+        
+    Returns:
+        True if reagent is found, False otherwise
+    """
+    if not name:
+        return False
+    
+    reagent = find_reagent(name, reagent_type)
+    return reagent is not None
+
+
+def check_precedent_reagents_in_database(precedent: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Check if all reagents in a precedent can be found in the reagent database.
+    
+    Args:
+        precedent: Precedent dictionary with catalytic_system, reagents, and solvents
+        
+    Returns:
+        Dict with:
+            - all_found (bool): True if all reagents are in database
+            - missing (List[Dict]): List of missing reagents with name and type
+            - found_count (int): Number of reagents found
+            - total_count (int): Total number of reagents
+    """
+    missing = []
+    found_count = 0
+    total_count = 0
+    
+    # Check catalytic system (metal precursors and ligands)
+    for cat in precedent.get("catalytic_system", []):
+        name = cat.get("name")
+        if not name:
+            continue
+            
+        total_count += 1
+        
+        # Try metal_precursor first, then ligand
+        found = (is_reagent_in_database(name, "metal_precursor") or 
+                is_reagent_in_database(name, "ligand"))
+        
+        if found:
+            found_count += 1
+        else:
+            missing.append({"name": name, "type": "catalyst/ligand"})
+    
+    # Check reagents (bases, additives, etc.)
+    for reagent in precedent.get("reagents", []):
+        name = reagent.get("name")
+        role = reagent.get("role", "").upper()
+        if not name:
+            continue
+            
+        total_count += 1
+        
+        # Map role to database type
+        role_to_type = {
+            "BASE": "base",
+            "ADDITIVE": "additive",
+            "ACID": "acid",
+            "OXIDANT": "oxidant",
+            "REDUCTANT": "reductant",
+        }
+        
+        reagent_type = role_to_type.get(role, "additive")
+        found = is_reagent_in_database(name, reagent_type)
+        
+        if found:
+            found_count += 1
+        else:
+            missing.append({"name": name, "type": reagent_type})
+    
+    # Check solvents
+    for solvent in precedent.get("solvents", []):
+        name = solvent.get("name")
+        if not name:
+            continue
+            
+        total_count += 1
+        found = is_reagent_in_database(name, "solvent")
+        
+        if found:
+            found_count += 1
+        else:
+            missing.append({"name": name, "type": "solvent"})
+    
+    return {
+        "all_found": len(missing) == 0 and total_count > 0,
+        "missing": missing,
+        "found_count": found_count,
+        "total_count": total_count,
+    }
+
+
+def filter_precedents_by_database_availability(
+    precedents: List[Dict[str, Any]],
+    require_all_in_database: bool = True
+) -> List[Dict[str, Any]]:
+    """
+    Filter precedents to only include those where reagents are in the database.
+    
+    Args:
+        precedents: List of precedent dictionaries
+        require_all_in_database: If True, require ALL reagents to be in database.
+                                If False, keep precedents with at least some reagents found.
+        
+    Returns:
+        Filtered list of precedents
+    """
+    filtered = []
+    
+    for prec in precedents:
+        check_result = check_precedent_reagents_in_database(prec)
+        
+        if require_all_in_database:
+            # Only keep if all reagents found
+            if check_result["all_found"]:
+                filtered.append(prec)
+        else:
+            # Keep if at least some reagents found
+            if check_result["found_count"] > 0:
+                filtered.append(prec)
+    
+    return filtered
+
+
 # Preload common databases on module import (optional)
 def preload_common_databases():
     """Preload commonly used reagent databases for faster lookup."""

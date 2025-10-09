@@ -289,12 +289,125 @@ def collect_evidence(
             'yield_stats': {}
         }
     
-    # 3. Rule-Based Matching (placeholder for now)
-    evidence['rules'] = {
-        'matched_schemes': [],
-        'confidence': 0.0,
-        'recommended': None
-    }
+    # 3. Rule-Based Matching
+    try:
+        # Map family names to database files
+        family_to_db = {
+            # C-N couplings
+            'Ullmann_CN': 'C_N_Coupling_Cu_db.json',
+            'Buchwald_CN': 'C_N_Coupling_Pd_db.json',
+            'C_N_Coupling_Pd': 'C_N_Coupling_Pd_db.json',
+            'C_N_Coupling_Cu': 'C_N_Coupling_Cu_db.json',
+            'C_N_Coupling_Ni': 'C_N_Coupling_Ni_db.json',
+            # Suzuki
+            'Suzuki': 'suzuki_db.json',
+            'Suzuki_CC': 'suzuki_db.json',
+            'Suzuki_Miyaura': 'suzuki_db.json',
+            # Amide formation
+            'Amide_Formation': 'amide_formation_db.json',
+            'Amide_Coupling': 'amide_formation_db.json',
+        }
+        
+        # Get database file for this family
+        db_file = family_to_db.get(family)
+        
+        if db_file:
+            try:
+                # Load the rule database
+                rule_db = chem.rules.load_database(db_file, cache=True)
+                
+                # Match the reaction against the database
+                match_result = chem.rules.match(rule_db, reaction_smiles)
+                
+                # Convert match result to recommendation format
+                if match_result and match_result.conditions:
+                    # Extract the matched conditions (dict-like object)
+                    conditions = dict(match_result.conditions)
+                    reagents = match_result.reagents if match_result.reagents else []
+                    
+                    # Build chemicals list from reagents
+                    chemicals = []
+                    if reagents:
+                        for reagent in reagents:
+                            chemicals.append({
+                                'name': reagent.get('name'),
+                                'cas': reagent.get('cas') if 'cas' in reagent else None,
+                                'role': reagent.get('role', 'reagent'),
+                                'smiles': reagent.get('smiles') if 'smiles' in reagent else None,
+                                'equivalents': reagent.get('equivalents') if 'equivalents' in reagent else None
+                            })
+                    
+                    # Build conditions dict
+                    rule_conditions = {}
+                    if 'temperature_C' in conditions:
+                        rule_conditions['temperature'] = {
+                            'value': conditions['temperature_C'],
+                            'unit': '°C'
+                        }
+                    if 'time_h' in conditions:
+                        rule_conditions['time'] = {
+                            'value': conditions['time_h'],
+                            'unit': 'hours'
+                        }
+                    if 'concentration_M' in conditions:
+                        rule_conditions['concentration'] = {
+                            'value': conditions['concentration_M'],
+                            'unit': 'M'
+                        }
+                    
+                    # Extract core from conditions
+                    core = (conditions.get('condition_core') or 
+                           conditions.get('pd_source') or 
+                           conditions.get('cu_source') or 
+                           conditions.get('ni_source'))
+                    
+                    rule_recommendations = [{
+                        'rank': 1,
+                        'chemicals': chemicals,
+                        'conditions': rule_conditions,
+                        'core': core,
+                        'confidence': 0.95  # High confidence for rule-based match
+                    }]
+                    
+                    evidence['rules'] = {
+                        'matched_schemes': [match_result.entry_id],
+                        'confidence': 0.95,
+                        'recommended': conditions,
+                        'recommendations': rule_recommendations
+                    }
+                else:
+                    # No match found
+                    evidence['rules'] = {
+                        'matched_schemes': [],
+                        'confidence': 0.0,
+                        'recommended': None,
+                        'recommendations': []
+                    }
+            except Exception as e:
+                warnings.warn(f"Rule database matching failed for {family}: {e}")
+                evidence['rules'] = {
+                    'matched_schemes': [],
+                    'confidence': 0.0,
+                    'recommended': None,
+                    'recommendations': []
+                }
+        else:
+            # No rule database available for this family
+            warnings.warn(f"No rule database found for family: {family}")
+            evidence['rules'] = {
+                'matched_schemes': [],
+                'confidence': 0.0,
+                'recommended': None,
+                'recommendations': []
+            }
+    except Exception as e:
+        warnings.warn(f"Rule-based matching failed: {e}")
+        evidence['rules'] = {
+            'matched_schemes': [],
+            'confidence': 0.0,
+            'recommended': None,
+            'recommendations': []
+        }
     
     # 4. ML Model Info
     evidence['ml'] = {
@@ -675,15 +788,220 @@ def score_candidate(
     )
 
 
+def _convert_candidates_to_recommendations(
+    scored_candidates: List[ScoredCandidate],
+    reaction_smiles: str
+) -> List[Dict[str, Any]]:
+    """
+    Convert ScoredCandidate objects to recommendation dictionaries.
+    
+    Args:
+        scored_candidates: List of ScoredCandidate objects
+        reaction_smiles: Reaction SMILES
+    
+    Returns:
+        List of recommendation dictionaries
+    """
+    from chemtools import reagent_lookup
+    
+    recommendations = []
+    
+    for rank, sc in enumerate(scored_candidates, start=1):
+        cand = sc.candidate
+        
+        # Build chemicals list
+        chemicals = []
+        
+        # Add starting materials (placeholder)
+        parts = reaction_smiles.split('>>')
+        if len(parts) >= 2:
+            reactants = parts[0].split('.')
+            for r_smiles in reactants[:2]:
+                chemicals.append({
+                    'smiles': r_smiles.strip(),
+                    'role': 'starting_material',
+                    'name': None,
+                    'cas': None,
+                    'equivalents': None
+                })
+        
+        # Add catalyst/ligand from core
+        if cand.core and '/' in cand.core:
+            parts = cand.core.split('/')
+            metal_name = parts[0].strip()
+            ligand_name = parts[1].strip() if len(parts) > 1 else None
+            
+            # Try to find metal in database
+            metal_info = reagent_lookup.lookup_by_name(metal_name, 'metal')
+            if metal_info:
+                chemicals.append({
+                    'name': metal_info.get('name'),
+                    'cas': metal_info.get('cas'),
+                    'role': 'metal_precursor',
+                    'smiles': None,
+                    'equivalents': None
+                })
+            
+            # Try to find ligand
+            if ligand_name:
+                ligand_info = reagent_lookup.lookup_by_name(ligand_name, 'ligand')
+                if ligand_info:
+                    chemicals.append({
+                        'name': ligand_info.get('name'),
+                        'cas': ligand_info.get('cas'),
+                        'role': 'ligand',
+                        'smiles': None,
+                        'equivalents': None
+                    })
+        
+        # Add base
+        if cand.base:
+            base_info = reagent_lookup.find_reagent(cand.base, 'base')
+            if base_info:
+                chemicals.append({
+                    'name': base_info.get('name'),
+                    'cas': base_info.get('cas'),
+                    'role': 'base',
+                    'smiles': None,
+                    'equivalents': None
+                })
+        
+        # Add solvent
+        if cand.solvent:
+            solv_info = reagent_lookup.find_reagent(cand.solvent, 'solvent')
+            if solv_info:
+                chemicals.append({
+                    'name': solv_info.get('name'),
+                    'cas': solv_info.get('cas'),
+                    'role': 'solvent',
+                    'smiles': None,
+                    'equivalents': None
+                })
+        
+        # Build conditions
+        conditions = {}
+        if cand.T_C is not None:
+            conditions['temperature'] = {
+                'value': cand.T_C,
+                'unit': '°C'
+            }
+        if cand.time_h is not None:
+            conditions['time'] = {
+                'value': cand.time_h,
+                'unit': 'hours'
+            }
+        
+        # Build summary
+        summary = {
+            'rank': rank,
+            'core': cand.core,
+            'base': next((c for c in chemicals if c['role'] == 'base'), {}),
+            'solvent': next((c for c in chemicals if c['role'] == 'solvent'), {}),
+            'confidence': sc.total_score,
+            'support': {
+                'count': sc.supporting_precedents,
+                'fraction_core': 0.0,
+                'reference_population': 0
+            }
+        }
+        
+        recommendations.append({
+            'rank': rank,
+            'original_rank': rank,
+            'reaction': {'smiles': reaction_smiles},
+            'chemicals': chemicals,
+            'conditions': conditions,
+            'summary': summary
+        })
+    
+    return recommendations
+
+
+def _convert_recommendations_to_candidates(
+    recommendations: List[Dict[str, Any]]
+) -> List[ScoredCandidate]:
+    """
+    Convert recommendation dictionaries back to ScoredCandidate objects.
+    
+    Args:
+        recommendations: List of recommendation dictionaries
+    
+    Returns:
+        List of ScoredCandidate objects
+    """
+    candidates = []
+    
+    for rec in recommendations:
+        summary = rec.get('summary', {})
+        conditions = rec.get('conditions', {})
+        
+        # Extract components
+        core = summary.get('core', 'Unknown')
+        
+        base_info = summary.get('base', {})
+        base = base_info.get('cas') or base_info.get('name') or 'Unknown'
+        
+        solvent_info = summary.get('solvent', {})
+        solvent = solvent_info.get('cas') or solvent_info.get('name') or 'Unknown'
+        
+        temp = None
+        if conditions.get('temperature'):
+            temp = conditions['temperature'].get('value')
+        
+        time = None
+        if conditions.get('time'):
+            time = conditions['time'].get('value')
+        
+        # Create Candidate
+        candidate = Candidate(
+            core=core,
+            base=base,
+            solvent=solvent,
+            T_C=temp or 100.0,
+            time_h=time or 12.0,
+            source='reranked'
+        )
+        
+        # Create ScoredCandidate
+        alignment_meta = rec.get('alignment_meta', {})
+        total_score = alignment_meta.get('combined_score', summary.get('confidence', 0.5))
+        
+        component_scores = {}
+        if 'rule_alignment' in alignment_meta:
+            component_scores = alignment_meta['rule_alignment'].get('component_scores', {})
+        
+        reasoning = []
+        if 'rule_alignment' in alignment_meta:
+            reasoning = alignment_meta['rule_alignment'].get('reasoning', [])
+        
+        scored = ScoredCandidate(
+            candidate=candidate,
+            total_score=total_score,
+            component_scores=component_scores,
+            weights={},
+            confidence='HIGH' if total_score > 0.7 else ('MEDIUM' if total_score > 0.5 else 'LOW'),
+            reasoning=reasoning
+        )
+        
+        candidates.append(scored)
+    
+    return candidates
+
+
 def recommend_with_fusion(
     reaction_smiles: str,
     family: str,
     k: int = 50,
     top_n: int = 5,
-    relax: Optional[Dict] = None
+    relax: Optional[Dict] = None,
+    use_rule_alignment: bool = True,
+    alignment_weights: Optional[Dict[str, float]] = None
 ) -> Dict[str, Any]:
     """
     Main recommendation function with multi-source evidence fusion.
+    
+    Enhanced with rule-alignment scoring that reranks ML recommendations
+    based on their similarity to rule-based results.
     
     Args:
         reaction_smiles: Reaction SMILES string
@@ -691,6 +1009,8 @@ def recommend_with_fusion(
         k: Number of precedents to retrieve
         top_n: Number of top recommendations to return
         relax: Relaxation parameters
+        use_rule_alignment: Whether to rerank by rule-alignment (default: True)
+        alignment_weights: Custom weights for alignment scoring
     
     Returns:
         Recommendations with scores, evidence, and explanations
@@ -738,9 +1058,59 @@ def recommend_with_fusion(
         scored_cand = score_candidate(candidate, evidence, weights, reaction_smiles)
         scored.append(scored_cand)
     
-    # Step 5: Rank and return top-N
+    # Step 5: Initial ranking by fusion scores
     ranked = sorted(scored, key=lambda x: x.total_score, reverse=True)
     
+    # Step 6: NEW - Rerank by rule-alignment if enabled and rule data available
+    if use_rule_alignment and evidence.get('rules', {}).get('recommendations'):
+        try:
+            from .rule_alignment import rerank_ml_by_rule_alignment
+            
+            # Convert scored candidates to recommendation format for alignment
+            ml_recommendations = _convert_candidates_to_recommendations(
+                ranked[:top_n * 2],  # Process more candidates for better reranking
+                reaction_smiles
+            )
+            
+            # Get rule recommendations
+            rule_recommendations = evidence['rules']['recommendations']
+            
+            # Rerank by rule alignment
+            reranked_ml = rerank_ml_by_rule_alignment(
+                ml_recommendations,
+                rule_recommendations,
+                weights=alignment_weights,
+                ml_weight=0.6,
+                alignment_weight=0.4
+            )
+            
+            # Convert back to ScoredCandidate format
+            final_ranked = _convert_recommendations_to_candidates(reranked_ml[:top_n])
+            
+            return {
+                'recommended_conditions': final_ranked,
+                'evidence': evidence,
+                'evidence_summary': {
+                    'precedents': f"{evidence['precedents']['coverage']} found, "
+                                 f"diversity={evidence['precedents']['diversity_score']:.2f}, "
+                                 f"avg_similarity={evidence['precedents']['avg_similarity']:.2f}",
+                    'analytics': f"Dataset: {evidence['analytics']['dataset_size']:,} reactions",
+                    'rules': f"{len(rule_recommendations)} rule matches found",
+                    'ml': 'Available' if evidence['ml']['model_available'] else 'Not available',
+                    'reranking': 'Rule-alignment scoring applied'
+                },
+                'adaptive_weights': weight_info,
+                'reasoning': weight_info.get('reasoning', []) + [
+                    f"Reranked using rule-alignment scoring ({len(rule_recommendations)} rule entries)"
+                ],
+                'method': 'multi_source_fusion_with_rule_alignment'
+            }
+        except ImportError:
+            warnings.warn("Rule-alignment module not available. Using standard fusion.")
+        except Exception as e:
+            warnings.warn(f"Rule-alignment reranking failed: {e}. Using standard fusion.")
+    
+    # Fallback: standard fusion without rule alignment
     return {
         'recommended_conditions': ranked[:top_n],
         'evidence': evidence,  # Raw evidence for conversion/analysis
