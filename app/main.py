@@ -17,7 +17,7 @@ from chemtools.contracts import (
 os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 
 # ChemTools v2.0 - Unified API
-from chemtools import chem
+from chemtools import chem, output_formatter
 
 # Deprecated: Keep old module imports for gradual migration
 # TODO: Remove these imports once all code uses chem.*
@@ -118,6 +118,7 @@ def api_scdb_match(req: SchemeMatchRequest):
     if not db_path:
         raise HTTPException(status_code=400, detail="No database path configured for matching")
     
+    start_time = time.perf_counter()
     try:
         # Use ChemTools v2.0 chem.rules.* API
         db = chem.rules.load_database(db_path, cache=True)
@@ -133,7 +134,17 @@ def api_scdb_match(req: SchemeMatchRequest):
     payload = result.to_json_dict()
     if not req.include_trace:
         payload.pop("trace", None)
-    return payload
+    
+    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
+    database_label = Path(db_path).name if db_path else "SchemeConditionDB"
+    
+    return output_formatter.format_rule_match_result(
+        reaction_smiles=reaction,
+        match_result=payload,
+        requested_type=None,
+        database_name=database_label,
+        processing_time_ms=processing_time_ms,
+    )
 
 @app.post("/api/v1/smiles/normalize")
 def api_smiles_normalize(req: NormalizeRequest): return chem.smiles.normalize(req.smiles)
@@ -399,10 +410,7 @@ def api_recommend_conditions(req: RecommendConditionsRequest):
     Returns clean, compact output matching the ui_simple.py format.
     This is robot-friendly and excludes large feature vectors.
     """
-    import time
-    from chemtools import output_formatter
-    
-    start_time = time.time()
+    start_time = time.perf_counter()
     
     # Get raw ML recommendations
     raw_data = chem.recommend.conditions(
@@ -465,7 +473,7 @@ def api_recommend_conditions(req: RecommendConditionsRequest):
         recommendations_data.append(formatted_rec)
     
     # Build compact output using UI formatter
-    processing_time_ms = (time.time() - start_time) * 1000
+    processing_time_ms = (time.perf_counter() - start_time) * 1000
     
     output = output_formatter.format_ml_output(
         reaction_smiles=req.reaction,
@@ -483,7 +491,28 @@ def api_recommend_conditions(req: RecommendConditionsRequest):
 
 @app.post("/api/v1/recommend")
 def api_recommend(req: RecommendFromReactionRequest):
-    return recommend.recommend_from_reaction(req.reaction, k=req.k, relax=req.relax or {}, constraint_rules=req.constraints or {})
+    start_time = time.perf_counter()
+    raw_result = recommend.recommend_from_reaction(
+        req.reaction,
+        k=req.k,
+        relax=req.relax or {},
+        constraint_rules=req.constraints or {},
+    )
+    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
+    
+    formatted_source = raw_result.get("formatted") or raw_result
+    
+    standard = output_formatter.ensure_standard_output(
+        formatted_source,
+        default_model="ML-precedent-knn",
+        fallback_reaction_smiles=req.reaction,
+        extras={"raw_recommendation": raw_result},
+    )
+    
+    standard_meta = standard.setdefault("meta", {})
+    standard_meta["processing_time_ms"] = processing_time_ms
+    
+    return standard
 
 
 @app.post("/api/v1/recommend/fusion")
@@ -496,6 +525,7 @@ def api_recommend_fusion(req: FusionRecommendRequest):
     - evidence_summary: Quality metrics for precedent data
     - reasoning: Explanations for weight choices
     """
+    start_time = time.perf_counter()
     result = recommend.recommend_from_reaction(
         reaction=req.reaction,
         k=req.k,
@@ -504,6 +534,7 @@ def api_recommend_fusion(req: FusionRecommendRequest):
         relax=req.relax or {},
         constraint_rules=req.constraints or {}
     )
+    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
     
     # Validate fusion metadata is present
     if 'fusion_meta' not in result:
@@ -514,7 +545,12 @@ def api_recommend_fusion(req: FusionRecommendRequest):
             'note': 'Check if fusion is properly configured in recommend module'
         }
     
-    return result
+    return output_formatter.format_fusion_output(
+        reaction_smiles=req.reaction,
+        requested_type=None,
+        fusion_result=result,
+        processing_time_ms=processing_time_ms,
+    )
 
 
 @app.post("/api/v1/design_plate")
