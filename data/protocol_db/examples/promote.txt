@@ -1,0 +1,13 @@
+please convert this webpage to the standard json file (using a meaningful name, e.g. family name), using the predefined roles, make sure all starting material and reagents is extracted: 
+if there are several steps, only do the extraction for first step
+https://www.orgsyn.org/demo.aspx?prep=v91p0072
+
+please convert this webpage to the standard json file (using a meaningful name, e.g. family name), using the predefined roles, make sure all starting material and reagents is extracted: 
+please do the extraction for second step (amination)
+https://www.orgsyn.org/demo.aspx?prep=v92p0195
+
+
+please convert this webpage to the standard json file (using a meaningful name, e.g. family name), using the predefined roles, make sure all starting material and reagents is extracted: 
+please do the extraction for third step (suzuki)
+https://www.orgsyn.org/demo.aspx?prep=v92p0195
+
