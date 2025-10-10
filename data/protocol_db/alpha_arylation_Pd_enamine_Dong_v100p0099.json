@@ -1,0 +1,178 @@
+{
+  "source": {
+    "title": "α-Arylation of Cyclopentanones by Palladium/Enamine Cooperative Catalysis",
+    "journal": "Organic Syntheses",
+    "volume": 100,
+    "pages": "99-112",
+    "year": 2023,
+    "doi": "10.15227/orgsyn.100.0099",
+    "url": "https://www.orgsyn.org/demo.aspx?prep=v100p0099"
+  },
+  "reaction": {
+    "reaction_smiles": "O=C1CCCC1.Brc1ccc(C(=O)C)cc1>>O=C(C1CCCC1)c1ccc(C(=O)C)cc1",
+    "family": "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)",
+    "notes": "Step A only (first step): α-arylation of cyclopentanone with p-bromoacetophenone under Pd/enamine cooperative catalysis in 1,4-dioxane.",
+    "tags": "palladium; enamine; α-arylation; ketone; cyclopentanone; pressure vessel; dioxane; argon"
+  },
+  "reaction_setup": [
+    {
+      "chemicals": [
+        {
+          "name": "Cyclopentanone",
+          "abbreviation": null,
+          "cas": "120-92-3",
+          "smiles": "O=C1CCCC1",
+          "amount": {
+            "weight_g": 1.68,
+            "mmol": 20.0,
+            "volume_ml": null,
+            "equivalents": 1.0
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "4'-Bromoacetophenone",
+          "abbreviation": null,
+          "cas": "99-90-1",
+          "smiles": "CC(=O)c1ccc(Br)cc1",
+          "amount": {
+            "weight_g": 5.18,
+            "mmol": 26.0,
+            "volume_ml": null,
+            "equivalents": 1.3
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Palladium(II) acetate",
+          "abbreviation": "Pd(OAc)2",
+          "cas": "3375-31-3",
+          "smiles": null,
+          "amount": {
+            "weight_g": 0.045,
+            "mmol": 0.2,
+            "volume_ml": null,
+            "equivalents": 0.01
+          },
+          "role": "metal_precursor"
+        },
+        {
+          "name": "Tri(o-tolyl)phosphine",
+          "abbreviation": "P(o-tol)3",
+          "cas": "6163-58-2",
+          "smiles": "CC1=CC=CC=C1P(C2=CC=CC=C2C)C3=CC=CC=C3C",
+          "amount": {
+            "weight_g": 0.122,
+            "mmol": 0.4,
+            "volume_ml": null,
+            "equivalents": 0.02
+          },
+          "role": "ligand"
+        },
+        {
+          "name": "Sodium acetate (anhydrous)",
+          "abbreviation": "NaOAc",
+          "cas": "127-09-3",
+          "smiles": "CC(=O)[O-].[Na+]",
+          "amount": {
+            "weight_g": 1.64,
+            "mmol": 20.0,
+            "volume_ml": null,
+            "equivalents": 1.0
+          },
+          "role": "base"
+        },
+        {
+          "name": "Pyrrolidine",
+          "abbreviation": null,
+          "cas": "123-75-1",
+          "smiles": "C1CCNC1",
+          "amount": {
+            "weight_g": null,
+            "mmol": 6.0,
+            "volume_ml": 0.5,
+            "equivalents": 0.3
+          },
+          "role": "co_catalyst"
+        },
+        {
+          "name": "1,1,3,3-Tetramethylbutylamine (tert-octylamine)",
+          "abbreviation": null,
+          "cas": "107-45-9",
+          "smiles": "CC(C)(C)CC(C)(C)N",
+          "amount": {
+            "weight_g": null,
+            "mmol": 6.0,
+            "volume_ml": 0.96,
+            "equivalents": 0.3
+          },
+          "role": "co_catalyst"
+        },
+        {
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": "O1CCOCC1",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 100.0,
+            "equivalents": null
+          },
+          "role": "solvent"
+        }
+      ],
+      "conditions": [
+        {
+          "temperature_C": 25,
+          "time_h": 0.008,
+          "atmosphere": "Ar blow 7000 mL/min for 30 s"
+        },
+        {
+          "temperature_C": 25,
+          "time_h": 0.333,
+          "atmosphere": "Ar bubble 260 mL/min for 20 min"
+        },
+        {
+          "temperature_C": 130,
+          "time_h": 24.0,
+          "atmosphere": "Ar; sealed heavy-walled pressure vessel; oil bath"
+        }
+      ]
+    }
+  ],
+  "workup_and_purification": [
+    {
+      "quench": [],
+      "workup": [
+        {
+          "step": "Pad filtration",
+          "details": "Filter through short pad of silica gel (ID 10 cm; silica height 1 cm); elute with ethyl acetate (3 × 50 mL) into 1 L flask."
+        },
+        {
+          "step": "Concentration",
+          "details": "Rotary evaporation under reduced pressure (20 mmHg, 37 °C) affords crude dark red oil."
+        },
+        {
+          "step": "Column load",
+          "details": "Dissolve crude in dichloromethane and load onto silica gel column (see purification)."
+        }
+      ],
+      "purification": [
+        {
+          "method": "Flash column chromatography",
+          "stationary_phase": "Silica gel (125 g; 5 cm diameter; sea sand 1 cm top/bottom)",
+          "eluent": "Hexane/ethyl acetate gradient: 10:1 (1 L) → 8:1 (1 L) → 4:1 (3.25 L)",
+          "fractions": "Collect 250 mL fractions; combine 12–16 for product"
+        }
+      ],
+      "notes": [
+        "Blast shield placed in front of the closed vessel.",
+        "Color change: yellow → red (15 min) → dark brown (24 h).",
+        "TLC monitoring: hexane/ethyl acetate 2:1 (v/v), product Rf ≈ 0.29.",
+        "Isolated yield reported: 2.73 g (13.4 mmol, 67%)."
+      ]
+    }
+  ],
+  "original_procedure": "A 325 mL heavy-walled pressure vessel is charged with cyclopentanone, 4'-bromoacetophenone, palladium(II) acetate, tri(o‑tolyl)phosphine, sodium acetate, pyrrolidine, tert‑octylamine, and 1,4‑dioxane. [truncated due to copyright; see source URL]"
+}

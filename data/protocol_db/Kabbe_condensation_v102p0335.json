@@ -1,0 +1,133 @@
+{
+  "source": {
+    "title": "Synthesis of 6-Methoxy-2-methyl-2-(4-methylpent-3-en-1-yl)chroman-4-one via Kabbe Condensation",
+    "journal": "Organic Syntheses",
+    "volume": 102,
+    "pages": "335-349",
+    "year": 2025,
+    "doi": "10.15227/orgsyn.102.0335",
+    "url": "https://www.orgsyn.org/demo.aspx?prep=v102p0335"
+  },
+  "reaction": {
+    "reaction_smiles": "COC1=CC=C(O)C(=C1)C(=O)C.CC(=O)CC=C(C)C>>O=C1Oc2cc(OC)ccc2C(C)(CCC=C(C)C)C1",
+    "family": "Kabbe_Condensation",
+    "notes": "Under N2; pyrrolidine (1.50 equiv) + butyric acid (0.50 equiv) in DMSO (total ~24.1 mL), rt (21–22 °C), 18 h; aqueous workup and silica gel column (hexanes/EtOAc 19:1); 75% isolated yield (>98% qNMR).",
+    "tags": "Kabbe_Condensation"
+
+  },
+  "reaction_setup": [
+    {
+      "chemicals": [
+        {
+          "name": "2′-Hydroxy-5′-methoxyacetophenone",
+          "abbreviation": null,
+          "cas": "705-15-7",
+          "smiles": "COC1=CC=C(O)C(=C1)C(C)=O",
+          "amount": {
+            "weight_g": 2.0,
+            "mmol": 12.0,
+            "volume_ml": null,
+            "equivalents": 1.0
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "6-Methyl-5-hepten-2-one",
+          "abbreviation": null,
+          "cas": "110-93-0",
+          "smiles": "CC(=O)CC=C(C)C",
+          "amount": {
+            "weight_g": null,
+            "mmol": 13.2,
+            "volume_ml": 1.96,
+            "equivalents": 1.1
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Pyrrolidine (freshly distilled)",
+          "abbreviation": null,
+          "cas": "123-75-1",
+          "smiles": "C1CCNC1",
+          "amount": {
+            "weight_g": null,
+            "mmol": 18.1,
+            "volume_ml": 1.48,
+            "equivalents": 1.5
+          },
+          "role": "base"
+        },
+        {
+          "name": "Butyric acid",
+          "abbreviation": null,
+          "cas": "107-92-6",
+          "smiles": "CCCC(=O)O",
+          "amount": {
+            "weight_g": null,
+            "mmol": 6.02,
+            "volume_ml": 0.55,
+            "equivalents": 0.5
+          },
+          "role": "acid"
+        },
+        {
+          "name": "Dimethyl sulfoxide (anhydrous)",
+          "abbreviation": "DMSO",
+          "cas": "67-68-5",
+          "smiles": "CS(=O)C",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 24.1,
+            "equivalents": null
+          },
+          "role": "solvent"
+        }
+      ],
+      "conditions": [
+        {
+          "temperature_C": 21.5,
+          "time_h": 18,
+          "atmosphere": "N2"
+        }
+      ]
+    }
+  ],
+  "workup_and_purification": [
+    {
+      "quench": [],
+      "workup": [
+        {
+          "step": "Dilution & extraction",
+          "details": "Transfer to 2 L separatory funnel; add deionized water (1200 mL) and ethyl acetate (600 mL); separate; extract aqueous with EtOAc (2 × 300 mL)."
+        },
+        {
+          "step": "Wash",
+          "details": "Wash combined organics with brine (600 mL)."
+        },
+        {
+          "step": "Drying",
+          "details": "Add MgSO4 (5 g); let stand 5 min; gravity filter (Qualitative P5, medium porosity)."
+        },
+        {
+          "step": "Concentration",
+          "details": "Concentrate by rotary evaporation (40 °C, 200 mbar) then high vacuum (0.1 mbar) to give crude oil."
+        }
+      ],
+      "purification": [
+        {
+          "method": "Flash column chromatography",
+          "stationary_phase": "Silica gel column (50 mm diameter × ~20 cm), topped with 1 in. sand",
+          "eluent": "Hexanes/EtOAc 19:1 (5% EtOAc in hexanes), 1500–2000 mL",
+          "fractions": "Collect 20 mL fractions; product elutes in fractions 40–65; concentrate to give product; further dry at 0.1 mm Hg ≥2 h."
+        }
+      ],
+      "notes": [
+        "Apparatus flame-dried and maintained under nitrogen throughout reaction setup and run.",
+        "Pronounced color changes upon addition of reagents (pale yellow → orange → red/orange); reaction monitored by TLC.",
+        "Product obtained as transparent yellow oil; 75% yield; >98% purity by qNMR."
+      ]
+    }
+  ],
+  "original_procedure": "2-Methyl-2-(4-methylpent-3-en-1-yl)chroman-4-one (3). The apparatus is flame-dried under vacuum and maintained under an atmosphere of nitrogen during the course of the reaction. A 100-mL, 14/20 single-necked, round-bottom flask equipped with a 2-cm Teflon-coated, magnetic egg-shaped stir bar, and a rubber septum with a pressure-equalizing nitrogen needle inlet is charged with freshly distilled pyrrolidine (1.48 mL, 18.1 mmol, 1.50 equiv) and anhydrous DMSO (19.3 mL).\nThen, butyric acid (0.55 mL, 6.02 mmol, 0.50 equiv) is added via syringe to the solution over thirty seconds. A white gas forms in the headspace of the flask while the butyric acid is added. Once added, the acid/base mixture is stirred for 10 min. Then, 6-methyl-5-hepten-2-one (1) (1.96 mL, 13.2 mmol, 1.10 equiv) is added to the mixture via syringe over thirty seconds and the mixture is stirred for 15 min. As the solution stirs, the color changes from colorless to pale yellow.\n2′-Hydroxy-5′-methoxyacetophenone (2) (2.00 g, 12.0 mmol, 1.00 equiv) is added in one portion as a solution in DMSO (3.8 mL), then the scintillation vial containing the acetophenone is rinsed with DMSO (1 mL) and the solution is also added to the reaction flask. Upon addition of the acetophenone to the reaction, an immediate color change is observed from pale yellow, to orange, to red/orange. The resulting mixture is stirred for 18 h at ambient temperature and monitored by TLC.\nThe reaction mixture is then transferred to a 2-L separatory funnel and is diluted with deionized water (1200 mL, 100 mL/mmol) and ethyl acetate (600 mL, 50 mL/mmol). The organic layer is separated, and the aqueous layer is extracted with ethyl acetate (2 × 300 mL). The organic layers are combined and washed with brine (600 mL, 50 mL/mmol). The combined organic layer is then dried via addition of 5 g of MgSO4 which is allowed to sit for 5 min. Following this, the organic layer is gravity-filtered and concentrated at 40 °C by rotary evaporation (200 mbar) and then at 0.1 mbar to provide the product as a crude residue.\nA column (50 mm diameter) is slurry packed to a height of 8 in. of silica gel using hexanes and topped with 1 in. of sand, and the product is charged onto the column. Fraction collection (20 mL fractions) is begun, and the column is eluted with 1500–2000 mL of 5% ethyl acetate-hexanes (19:1 hexanes:ethyl acetate). The desired product elutes between fractions 40–65, which are concentrated by rotary evaporation (40 °C, 150 mm Hg). Following rotary evaporation, the organic residue is further dried under high vacuum (0.1 mm Hg) for at least 2 h to yield pure 2-methyl-2-(4-methylpent-3-en-1-yl)chroman-4-one (3) (2.46 g, 75% yield, >98 % purity by quantitative NMR) as a transparent yellow oil.\n"
+}

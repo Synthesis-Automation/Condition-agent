@@ -1,0 +1,120 @@
+{
+  "source": {
+    "title": "Visible-Light-Promoted C–S Cross-Coupling Reaction for Synthesis of Aromatic Thioethers",
+    "journal": "Organic Syntheses",
+    "volume": 100,
+    "pages": "234-247",
+    "year": 2023,
+    "doi": "10.15227/orgsyn.100.0234",
+    "url": "https://www.orgsyn.org/demo.aspx?prep=v100p0234",
+    "authors": [
+      "Yingjun Lan",
+      "Junhua Xu",
+      "Chern-Hooi Lim",
+      "Garret M. Miyake",
+      "Bin Liu"
+    ]
+  },
+  "reaction": {
+    "reaction_smiles": "Brc1ccc(C(=O)C)cc1.Clc1ccccc1S>>CC(=O)c1ccc(S-c2ccccc2Cl)cc1",
+    "family": "VisibleLight_C–S_Coupling_ArylBr+ArSH",
+    "notes": "Step A only: coupling of 4'-bromoacetophenone with 2-chlorobenzenethiol under blue light (456 nm) in DMSO with Cs2CO3 base; N2 atmosphere; 23 °C; 5 h.",
+    "tags": "visible light; C–S coupling; aryl bromide; aryl thiol; cesium carbonate; DMSO; nitrogen; Kessil PR160; 456 nm"
+  },
+  "reaction_setup": [
+    {
+      "chemicals": [
+        {
+          "name": "4'-Bromoacetophenone",
+          "abbreviation": null,
+          "cas": "99-90-1",
+          "smiles": "CC(=O)c1ccc(Br)cc1",
+          "amount": {
+            "weight_g": 3.98,
+            "mmol": 20.0,
+            "volume_ml": null,
+            "equivalents": 1.0
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "2-Chlorobenzenethiol",
+          "abbreviation": null,
+          "cas": "6320-03-2",
+          "smiles": "Clc1ccccc1S",
+          "amount": {
+            "weight_g": 4.34,
+            "mmol": 30.0,
+            "volume_ml": null,
+            "equivalents": 1.5
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Cesium carbonate",
+          "abbreviation": "Cs2CO3",
+          "cas": "534-17-8",
+          "smiles": "[Cs+].[Cs+].[O-]C(=O)[O-]",
+          "amount": {
+            "weight_g": 9.77,
+            "mmol": 30.0,
+            "volume_ml": null,
+            "equivalents": 1.5
+          },
+          "role": "base"
+        },
+        {
+          "name": "Dimethyl sulfoxide",
+          "abbreviation": "DMSO",
+          "cas": "67-68-5",
+          "smiles": "CS(=O)C",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 50.0,
+            "equivalents": null
+          },
+          "role": "solvent"
+        }
+      ],
+      "conditions": [
+        {
+          "temperature_C": 23,
+          "time_h": 0.05,
+          "atmosphere": "Evacuate/backfill with N2 (×3)"
+        },
+        {
+          "temperature_C": 23,
+          "time_h": 5.0,
+          "atmosphere": "N2; irradiate 456 nm, Kessil PR160 (40–50 W), 5 cm; stir 800 rpm"
+        }
+      ]
+    }
+  ],
+  "workup_and_purification": [
+    {
+      "quench": [
+        "Open to air; transfer to separatory funnel; rinse vessel with water (10 mL) and EtOAc (10 mL)."
+      ],
+      "workup": [
+        "Add water (50 mL). Extract with ethyl acetate (3 × 75 mL).",
+        "Wash combined organics with brine (20 mL).",
+        "Dry over anhydrous MgSO4 (7 g, 10 min). Filter and concentrate (30 °C, 225→60 mmHg).",
+        "Dissolve crude in dichloromethane (3 mL) and load onto silica column."
+      ],
+      "purification": [
+        {
+          "method": "Flash column chromatography",
+          "stationary_phase": "Silica gel (90 g), 5 cm × 20 cm; cotton plug protection",
+          "eluent": "Petroleum ether/ethyl acetate 5:1 (1.5 L total)",
+          "fractions": "10 mL per fraction; collect product-rich fractions (per TLC); combine and concentrate"
+        }
+      ],
+      "notes": [
+        "Lamp: Kessil PR160, 456 nm, distance 5 cm; fan used to maintain 23 °C; stirring 800 rpm.",
+        "Isolated: 4.34 g (83%) of 1-(4-((2-chlorophenyl)thio)phenyl)ethan-1-one, white solid; purity 98% by qNMR."
+      ]
+    }
+  ],
+  "original_procedure": "In a 100 mL glass reaction tube, add 4'-bromoacetophenone, cesium carbonate, and 2-chlorobenzenethiol. Evacuate and backfill with nitrogen three times. Add dry DMSO (50 mL) to give a yellow suspension. Seal and irradiate at 456 nm with a Kessil PR160 lamp (5 cm, fan-cooled) at 23 °C with stirring (800 rpm) for 5 h. Proceed to aqueous workup and silica gel chromatography as described on the source page. [Paraphrased summary of Step A; see source URL for full text.]"
+}

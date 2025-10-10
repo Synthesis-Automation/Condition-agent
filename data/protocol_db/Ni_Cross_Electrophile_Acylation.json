@@ -1,0 +1,167 @@
+{
+  "source": {
+    "title": "Nickel-Catalyzed Synthesis of Ketones from Alkyl Halides and Acid Chlorides: Preparation of Ethyl 4\u2011Oxododecanoate",
+    "journal": "Organic Syntheses",
+    "volume": 93,
+    "pages": "50-62",
+    "year": 2016,
+    "doi": "10.15227/orgsyn.093.0050",
+    "url": "https://www.orgsyn.org/demo.aspx?prep=v93p0050"
+  },
+  "reaction": {
+    "reaction_smiles": "CCCCCCCCI.CCOC(=O)CC(=O)Cl>>CCOC(=O)CC(=O)CCCCCCCC",
+    "family": "Ni_Cross_Electrophile_Acylation",
+    "notes": "NiCl2(dme)/dtbbpy with Mn powder in DMAc under N2 couples 1\u2011iodooctane and ethyl succinyl chloride to give ethyl 4\u2011oxododecanoate; 0\u20132 \u00b0C then rt.",
+    "tags": "nickel; cross-electrophile; acylation; dtbbpy; Mn; DMAc; alkyl iodide; acid chloride; OrgSyn v93p0050"
+  },
+  "reaction_setup": [
+    {
+      "chemicals": [
+        {
+          "name": "Nickel(II) chloride dimethoxyethane complex",
+          "abbreviation": "NiCl2(dme)",
+          "cas": "29046-78-4",
+          "smiles": null,
+          "amount": {
+            "weight_g": 1.11,
+            "mmol": 4.9,
+            "volume_ml": null,
+            "equivalents": 0.05
+          },
+          "role": "metal_precursor"
+        },
+        {
+          "name": "4,4'-Di-tert-butyl-2,2'-bipyridine",
+          "abbreviation": "dtbbpy",
+          "cas": "72914-19-3",
+          "smiles": null,
+          "amount": {
+            "weight_g": 1.48,
+            "mmol": 5.39,
+            "volume_ml": null,
+            "equivalents": 0.055
+          },
+          "role": "ligand"
+        },
+        {
+          "name": "Manganese powder",
+          "abbreviation": null,
+          "cas": "7439-96-5",
+          "smiles": "[Mn]",
+          "amount": {
+            "weight_g": 16.68,
+            "mmol": 303.6,
+            "volume_ml": null,
+            "equivalents": 3.1
+          },
+          "role": "reductant"
+        },
+        {
+          "name": "N,N-Dimethylacetamide (anhydrous)",
+          "abbreviation": "DMAc",
+          "cas": "127-19-5",
+          "smiles": "CC(=O)N(C)C",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 200.0,
+            "equivalents": null
+          },
+          "role": "solvent"
+        },
+        {
+          "name": "1-Iodooctane",
+          "abbreviation": null,
+          "cas": "629-27-6",
+          "smiles": "CCCCCCCCI",
+          "amount": {
+            "weight_g": 24.0,
+            "mmol": 98.0,
+            "volume_ml": null,
+            "equivalents": 1.0
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Ethyl succinyl chloride",
+          "abbreviation": null,
+          "cas": "14794-31-1",
+          "smiles": "CCOC(=O)CC(=O)Cl",
+          "amount": {
+            "weight_g": 25.45,
+            "mmol": 146.9,
+            "volume_ml": null,
+            "equivalents": 1.5
+          },
+          "role": "starting_material"
+        }
+      ],
+      "conditions": [
+        {
+          "temperature_C": 23.0,
+          "time_h": 1.0,
+          "atmosphere": "N2 (stir pre-catalyst slurry)"
+        },
+        {
+          "temperature_C": 1.0,
+          "time_h": 0.5,
+          "atmosphere": "N2 (cool before additions)"
+        },
+        {
+          "temperature_C": 1.0,
+          "time_h": 14.0,
+          "atmosphere": "N2 (after additions)"
+        },
+        {
+          "temperature_C": 23.0,
+          "time_h": 4.5,
+          "atmosphere": "N2 (warm to rt and stir 3\u20136 h)"
+        }
+      ]
+    }
+  ],
+  "workup_and_purification": [
+    {
+      "quench": [],
+      "workup": [
+        {
+          "step": "Dilution",
+          "details": "Dilute with 1:1 hexanes/MTBE (200 mL) to precipitate solids."
+        },
+        {
+          "step": "Filtration",
+          "details": "Filter through Celite bed; rinse black solids with deionized water; combine aqueous with organics."
+        },
+        {
+          "step": "Liquid\u2013liquid extraction",
+          "details": "Extract aqueous layer with 1:1 hexanes/MTBE (200 mL); wash combined organics with water (200 mL) then brine (250 mL)."
+        },
+        {
+          "step": "Drying",
+          "details": "Dry over anhydrous MgSO4 (20 g), 15\u201320 min; filter."
+        },
+        {
+          "step": "Concentration",
+          "details": "Remove solvents on rotary evaporator (30 \u00b0C, 25\u201330 mmHg)."
+        },
+        {
+          "step": "Forerun removal",
+          "details": "Distill small forerun (~3 mL) at 150 \u00b0C, 5\u20136 mmHg; cool before releasing vacuum."
+        }
+      ],
+      "purification": [
+        {
+          "method": "Flash column chromatography",
+          "stationary_phase": "Silica gel (~50 g), column ID 50 mm",
+          "eluent": "10% MTBE in hexanes (500 mL)",
+          "fractions": "All eluted solution collected"
+        }
+      ],
+      "notes": [
+        "Product: ethyl 4\u2011oxododecanoate obtained as pale yellow oil, 19.90 g (84%).",
+        "Alternative purification by high-vacuum distillation described in Notes; checkers obtained similar yield."
+      ]
+    }
+  ],
+  "original_procedure": ""
+}
