@@ -3,6 +3,8 @@ if there are several steps, only do the extraction for first step
 https://www.orgsyn.org/demo.aspx?prep=v80p0085
 
 
+please convert the following paragraph to the structured json output (using a meaningful name). after finishing, 1) check if all reagents are extracted
+2) check the validity of reaction smile
 
 
 
