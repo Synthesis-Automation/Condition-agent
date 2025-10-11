@@ -2,7 +2,26 @@
 
 ## 🚀 Quick Start
 
-### Single Query Mode
+### Windows Users - Easy Launch Scripts
+
+**Option 1: Batch Script (Recommended)**
+```cmd
+test_protocol.bat
+```
+
+**Option 2: PowerShell Script**
+```powershell
+.\test_protocol.ps1
+```
+
+**Option 3: With Arguments**
+```cmd
+test_protocol.bat "BrC1CCCCC1.c1ccccc1B(O)O>>c1ccccc1C1CCCCC1" -k 3
+```
+
+### Linux/macOS or Direct Python
+
+**Single Query Mode**
 
 Search for a specific reaction:
 
@@ -10,12 +29,23 @@ Search for a specific reaction:
 python test_protocol_cli.py "BrC1CCCCC1.c1ccc(Cl)cc1B(O)O>>Clc1ccc(C2CCCCC2)cc1"
 ```
 
-### Interactive Mode
+**Interactive Mode**
 
 Run without arguments for interactive mode:
 
 ```bash
 python test_protocol_cli.py
+```
+
+**Note for non-Windows:** If you get `ModuleNotFoundError`, set PYTHONPATH:
+```bash
+# Linux/macOS
+export PYTHONPATH=$(pwd)
+python tests/test_protocol_cli.py
+
+# Windows PowerShell (if not using the .ps1 script)
+$env:PYTHONPATH="$(Get-Location)"
+python tests\test_protocol_cli.py
 ```
 
 Then enter reactions one at a time:

@@ -1,0 +1,157 @@
+{
+  "source": {
+    "title": "RING-CLOSING METATHESIS SYNTHESIS OF N-Boc-3-PYRROLINE",
+    "journal": "Organic Syntheses",
+    "volume": 80,
+    "pages": "85",
+    "year": 2003,
+    "doi": "10.15227/orgsyn.080.0085",
+    "url": "https://www.orgsyn.org/demo.aspx?prep=v80p0085"
+  },
+  "reaction": {
+    "reaction_smiles": "CC(C)(C)OC(=O)N(CC=C)CC=C>>CC(C)(C)OC(=O)N1CCC=C1",
+    "family": "Olefin_Metathesis_RCM",
+    "notes": "Reaction SMILES are approximate; used to reflect diallylamine→3-pyrroline RCM transformation.",
+    "tags": "RCM; Grubbs-1; ruthenium carbene; DCM; nitrogen; reflux"
+  },
+  "reaction_setup": [
+    {
+      "chemicals": [
+        {
+          "name": "Bis(tricyclohexylphosphine)benzylidene ruthenium dichloride (Grubbs 1st generation)",
+          "abbreviation": "Grubbs I",
+          "cas": "172222-30-9",
+          "smiles": null,
+          "amount": {
+            "weight_g": 0.732,
+            "mmol": 0.89,
+            "volume_ml": null,
+            "equivalents": 0.005
+          },
+          "role": "preformed_catalyst"
+        },
+        {
+          "name": "Dichloromethane",
+          "abbreviation": "DCM",
+          "cas": "75-09-2",
+          "smiles": "ClCCl",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 445,
+            "equivalents": null
+          },
+          "role": "solvent"
+        },
+        {
+          "name": "N-Boc-diallylamine",
+          "abbreviation": null,
+          "cas": "151259-38-0",
+          "smiles": "CC(C)(C)OC(=O)N(CC=C)CC=C",
+          "amount": {
+            "weight_g": null,
+            "mmol": 178,
+            "volume_ml": 38.3,
+            "equivalents": 1.0
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Tris(hydroxymethyl)phosphine (aqueous methanolic solution, prepared per Note 5)",
+          "abbreviation": "THP",
+          "cas": "2767-80-8",
+          "smiles": "C(O)P(CO)CO",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 108,
+            "equivalents": null
+          },
+          "role": "additive"
+        },
+        {
+          "name": "Triethylamine",
+          "abbreviation": "TEA",
+          "cas": "121-44-8",
+          "smiles": "CCN(CC)CC",
+          "amount": {
+            "weight_g": null,
+            "mmol": 1.78,
+            "volume_ml": 0.247,
+            "equivalents": 0.01
+          },
+          "role": "base"
+        },
+        {
+          "name": "Methanol (rinse for transfer of THP solution)",
+          "abbreviation": null,
+          "cas": "67-56-1",
+          "smiles": "CO",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 5.0,
+            "equivalents": null
+          },
+          "role": "solvent"
+        }
+      ],
+      "conditions": [
+        {
+          "temperature_C": 25,
+          "time_h": 0.25,
+          "atmosphere": "N2"
+        },
+        {
+          "temperature_C": 40,
+          "time_h": 2.5,
+          "atmosphere": "N2"
+        },
+        {
+          "temperature_C": 25,
+          "time_h": 16,
+          "atmosphere": "N2"
+        }
+      ]
+    }
+  ],
+  "workup_and_purification": [
+    {
+      "quench": [
+        {
+          "reagent": "Deionized water",
+          "details": "Add 400 mL water to reaction mixture; stir vigorously 30 min, then separate layers."
+        }
+      ],
+      "workup": [
+        {
+          "step": "Aqueous wash",
+          "details": "Wash organic phase with 350 mL deionized water, then with 200 mL of 50% v/v water/saturated brine."
+        },
+        {
+          "step": "Drying",
+          "details": "Dry organic layer over anhydrous MgSO4 (~10 g); filter through sintered glass."
+        },
+        {
+          "step": "Concentration",
+          "details": "Remove solvent by rotary evaporation (water aspirator), bath ~40 °C."
+        }
+      ],
+      "purification": [
+        {
+          "method": "Kugelrohr distillation (reduced pressure)",
+          "stationary_phase": "None",
+          "eluent": "None",
+          "fractions": "Distill product; see apparatus/temp/pressure details in Notes 10–11; combine cuts to afford N-Boc-3-pyrroline."
+        }
+      ],
+      "notes": [
+        "Color changes from burgundy to dark brown on substrate addition; vigorous ethylene evolution observed.",
+        "Reaction heated to DCM reflux; DCM bp ≈40 °C.",
+        "After THP addition, mixture stirred overnight under N2; pale yellow solution forms.",
+        "Reported combined yield 90–94% (27.2–28.3 g) after distillation."
+      ]
+    }
+  ],
+  "original_procedure": "An oven-dried, 3-L, three-necked, round-bottomed flask equipped with an overhead mechanical stirrer, rubber septum with nitrogen inlet, and condenser with a bubbler-sealed outlet, is charged with 732 mg (0.89 mmol, 0.5 mol%) of bis(tricyclohexylphosphine)benzylidine ruthenium dichloride and 445 mL of dry dichloromethane. The mixture is stirred under a nitrogen atmosphere to give a burgundy-colored solution. N-Boc-diallylamine (38.3 mL, 178 mmol) is transferred to the flask by syringe. After addition of the N-Boc-diallylamine, ethylene gas is evolved vigorously and the color of the solution changes from burgundy to dark brown. The solution is heated to reflux with stirring for 2.5 hr, then cooled to room temperature. An aqueous methanolic solution of tris(hydroxymethyl)phosphine is prepared (Note 5). This solution is transferred to the flask containing the N-Boc-3-pyrroline, using 5 mL of methanol as a rinse. Triethylamine (0.247 mL, 1.78 mmol) is added to the mixture, which is vigorously stirred at room temperature overnight under a nitrogen atmosphere. Deionized water (400 mL) is added to the flask and the mixture is stirred vigorously for 30 min. The dichloromethane phase is separated and washed with 350 mL of deionized water and with 200 mL of 50% v/v water/saturated brine. The dichloromethane phase is dried with 10 g of MgSO4, then filtered. The filtrate is concentrated under reduced pressure by rotary evaporation (bath ca. 40 °C). The crude product is divided and each portion is separately distilled in a Kugelrohr apparatus to give a combined 90–94% yield of N-Boc-3-pyrroline."
+}
