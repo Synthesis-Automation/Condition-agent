@@ -14,8 +14,18 @@ Usage:
 """
 
 import sys
+import os
 import argparse
 from typing import Optional
+
+# Fix Windows console encoding for emojis
+if sys.platform == 'win32':
+    # Set UTF-8 encoding for stdout/stderr
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    # Also set environment variable
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 from chemtools.protocol import ProtocolRecommender
 
