@@ -289,3 +289,92 @@ def summarize_fusion(data: Dict[str, Any]) -> None:
         print(f"  Solvent: {solvent}")
     if confidence is not None:
         print(f"  Confidence: {confidence}")
+
+
+def summarize_protocol(data: Dict[str, Any]) -> None:
+    """Print a short summary of the protocol recommendation output."""
+    if not isinstance(data, dict):
+        print(f"Protocol recommendation: unexpected response type ({type(data).__name__})")
+        return
+    
+    if "error" in data:
+        print(f"Protocol recommendation: {data['error']}")
+        return
+    
+    # Check standard format
+    meta = data.get("meta", {})
+    detection = data.get("detection", {})
+    recommendations = data.get("recommended_conditions", [])
+    extras = data.get("extras", {})
+    
+    # Print model info
+    model = meta.get("model", "Unknown")
+    status = meta.get("status", "unknown")
+    processing_time = meta.get("processing_time_ms")
+    
+    print(f"Protocol recommendation ({model}):")
+    print(f"  Status: {status}")
+    if processing_time is not None:
+        print(f"  Processing time: {processing_time:.1f} ms")
+    
+    # Print detection info
+    detected_family = detection.get("family")
+    confidence = detection.get("confidence")
+    if detected_family:
+        print(f"  Detected family: {detected_family}")
+    if confidence is not None:
+        print(f"  Detection confidence: {confidence:.3f}")
+    
+    # Print search stats
+    num_candidates = extras.get("num_candidates")
+    num_matches = extras.get("num_matches")
+    if num_candidates is not None:
+        print(f"  Searched: {num_candidates} protocols")
+    if num_matches is not None:
+        print(f"  Found: {num_matches} matches")
+    
+    # Print recommendations
+    if not recommendations:
+        print("  No protocol recommendations returned.")
+        return
+    
+    print(f"\n  Top {len(recommendations)} protocol(s):")
+    for rec in recommendations[:3]:  # Show top 3
+        rank = rec.get("rank", "?")
+        similarity = rec.get("similarity", 0.0)
+        protocol = rec.get("protocol", {})
+        
+        title = protocol.get("title", "Untitled")
+        journal = protocol.get("journal", "")
+        year = protocol.get("year", "")
+        doi = protocol.get("doi", "")
+        
+        print(f"\n  {rank}. {title}")
+        print(f"     Similarity: {similarity:.3f}")
+        if journal:
+            print(f"     Source: {journal}", end="")
+            if year:
+                print(f" ({year})", end="")
+            print()
+        if doi:
+            print(f"     DOI: {doi}")
+        
+        # Show extracted conditions if available
+        conditions = rec.get("conditions")
+        if conditions:
+            parts = []
+            if conditions.get("catalyst"):
+                parts.append(f"Catalyst: {conditions['catalyst']}")
+            if conditions.get("ligand"):
+                parts.append(f"Ligand: {conditions['ligand']}")
+            if conditions.get("base"):
+                parts.append(f"Base: {conditions['base']}")
+            if conditions.get("solvent"):
+                parts.append(f"Solvent: {conditions['solvent']}")
+            if conditions.get("temperature_C") is not None:
+                parts.append(f"Temp: {conditions['temperature_C']}°C")
+            if conditions.get("time_h") is not None:
+                parts.append(f"Time: {conditions['time_h']}h")
+            
+            if parts:
+                print(f"     Conditions: {', '.join(parts)}")

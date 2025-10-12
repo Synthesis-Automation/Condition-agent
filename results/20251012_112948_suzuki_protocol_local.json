@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "generated_at": "2025-10-12T03:29:52.877218Z",
+    "model": "Protocol-DRFP",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 9.97
+  },
+  "input": {
+    "reaction_smiles": "BrC1CCCCC1.c1ccc(Cl)cc1B(O)O>>Clc1ccc(C2CCCCC2)cc1",
+    "options": {
+      "k": 2
+    }
+  },
+  "detection": {
+    "family": "Suzuki_Cu_alkyl_halide+aryl_boron",
+    "detected_reaction_type": "Suzuki_Cu_alkyl_halide+aryl_boron",
+    "method": "protocol-similarity",
+    "confidence": 0.8018
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "confidence": 0.8018,
+      "protocol": {
+        "filename": "Suzuki_Cu_C(sp3)-C(sp2).json",
+        "title": "Copper-Catalyzed Suzuki-Miyaura Coupling of Unactivated Alkyl Halides with Arylborons",
+        "journal": "Organic Syntheses",
+        "year": 2025,
+        "doi": "10.15227/orgsyn.102.0086",
+        "url": "https://www.orgsyn.org/demo.aspx?prep=v102p0086",
+        "reaction_smiles": "BrC1CCCCC1.c1ccc(Cl)cc1B(OC(C)(C)C)OC(C)(C)C>>Clc1ccc(C2CCCCC2)cc1",
+        "reaction_family": "Suzuki_Cu_alkyl_halide+aryl_boron",
+        "tags": [
+          "Suzuki, Cu, alkyl_halide, Coupling"
+        ],
+        "notes": "CuBr·SMe2 (5 mol%), bathophenanthroline (7.5 mol%), NaOtBu (1.5 equiv), toluene (20 mL), 80 °C, 24 h, air; combined 73% yield (65% + 8% from second collection)."
+      },
+      "similarity": 0.8018,
+      "source": "protocol_database",
+      "conditions": {
+        "catalyst": "CuBr·SMe2",
+        "ligand": "Bathophenanthroline",
+        "base": "NaOtBu",
+        "solvent": "toluene",
+        "additives": [],
+        "temperature_C": 80,
+        "time_h": 24,
+        "atmosphere": "air"
+      }
+    },
+    {
+      "rank": 2,
+      "confidence": 0.2928,
+      "protocol": {
+        "filename": "Wong_v92p0195_StepC_Suzuki.json",
+        "title": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
+        "journal": "Organic Syntheses",
+        "year": 2015,
+        "doi": "10.15227/orgsyn.092.0195",
+        "url": "https://www.orgsyn.org/demo.aspx?prep=v92p0195",
+        "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
+        "reaction_family": "Suzuki_Miyaura_Cross_Coupling",
+        "tags": [
+          "Suzuki",
+          "aryl mesylate",
+          "phenylboronic acid",
+          "Pd(OAc)2",
+          "CM-phos",
+          "K3PO4",
+          "tert-butanol",
+          "OrgSyn v92p0195 Step C"
+        ],
+        "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 °C, 24 h."
+      },
+      "similarity": 0.2928,
+      "source": "protocol_database",
+      "conditions": {
+        "catalyst": "Pd(OAc)2",
+        "ligand": "CM-phos",
+        "base": "K3PO4",
+        "solvent": "tBuOH",
+        "additives": [],
+        "temperature_C": 120.0,
+        "time_h": 24.0,
+        "atmosphere": "N2; oil bath; sealed Schlenk flask"
+      }
+    }
+  ],
+  "extras": {
+    "num_candidates": 16,
+    "num_total_protocols": 16,
+    "num_matches": 2
+  }
+}

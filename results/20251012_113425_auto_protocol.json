@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "generated_at": "2025-10-12T03:34:25.273806Z",
+    "model": "Protocol-DRFP",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 177.62
+  },
+  "input": {
+    "reaction_smiles": "CCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCB1OC(C)(C)C(C)(C)O1",
+    "options": {
+      "k": 1,
+      "tags": [
+        "borylation"
+      ]
+    }
+  },
+  "detection": {
+    "family": "Alkyl_Iodide_Borylation",
+    "detected_reaction_type": "Alkyl_Iodide_Borylation",
+    "method": "protocol-similarity",
+    "confidence": 0.8714
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "confidence": 0.8714,
+      "protocol": {
+        "filename": "Alkyl_Iodide_Borylation.json",
+        "title": "Synthesis of Alkylboronic Esters from Alkyl Iodides",
+        "journal": "Organic Syntheses",
+        "year": 2022,
+        "doi": "10.15227/orgsyn.099.0015",
+        "url": "https://www.orgsyn.org/demo.aspx?prep=v99p0015",
+        "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
+        "reaction_family": "Alkyl_Iodide_Borylation",
+        "tags": [
+          "borylation",
+          "alkyl iodide",
+          "B2pin2",
+          "LiOtBu",
+          "MeOH",
+          "OrgSyn v99p0015"
+        ],
+        "notes": "General LiOtBu/MeOH borylation of primary alkyl iodide with B2pin2 to give R–B(pin)."
+      },
+      "similarity": 0.8714,
+      "source": "protocol_database",
+      "conditions": {
+        "catalyst": null,
+        "ligand": null,
+        "base": "t-BuOLi",
+        "solvent": "MeOH",
+        "additives": [
+          "H2O"
+        ],
+        "temperature_C": 50.0,
+        "time_h": 56.0,
+        "atmosphere": "N2 (vacuum/refill cycles, reflux condenser)"
+      }
+    }
+  ],
+  "extras": {
+    "num_candidates": 1,
+    "num_total_protocols": 16,
+    "num_matches": 1
+  }
+}

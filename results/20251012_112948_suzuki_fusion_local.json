@@ -1,0 +1,216 @@
+{
+  "meta": {
+    "generated_at": "2025-10-12T03:29:52.860263Z",
+    "model": "Fusion-hybrid",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 96.88
+  },
+  "input": {
+    "reaction_smiles": "BrC1CCCCC1.c1ccc(Cl)cc1B(O)O>>Clc1ccc(C2CCCCC2)cc1",
+    "family": "Suzuki"
+  },
+  "detection": {
+    "family": "Suzuki",
+    "detected_reaction_type": "Suzuki",
+    "method": "fusion",
+    "confidence": 0.3
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "BrC1CCCCC1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "OB(O)c1cccc(Cl)c1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 1,
+        "core": null,
+        "base": null,
+        "solvent": null,
+        "confidence": 0.3,
+        "support": {
+          "count": 0,
+          "fraction_core": 0.0,
+          "reference_population": 0
+        },
+        "precedents": []
+      },
+      "reaction": {
+        "smiles": "BrC1CCCCC1.OB(O)c1cccc(Cl)c1>>Clc1ccc(C2CCCCC2)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "",
+          "solvent_uid": ""
+        }
+      }
+    }
+  ],
+  "extras": {
+    "raw_response": {
+      "input": "BrC1CCCCC1.OB(O)c1cccc(Cl)c1>>Clc1ccc(C2CCCCC2)cc1",
+      "family": "Suzuki",
+      "features": {},
+      "bin": "proto_Suzuki_25023",
+      "recommendation": {
+        "core": null,
+        "base_uid": null,
+        "solvent_uid": null,
+        "T_C": null,
+        "time_h": null,
+        "confidence": 0.3
+      },
+      "alternatives": {
+        "cores": [],
+        "bases": [],
+        "solvents": []
+      },
+      "precedent_pack": {
+        "prototype_id": "proto_Suzuki_25023",
+        "support": 0,
+        "precedents": [],
+        "timing": {
+          "load_data": 1.4008891582489014,
+          "build_candidates": 0.04685258865356445,
+          "drfp_query_encode": 0.011142253875732422,
+          "scoring": 2.8527402877807617,
+          "result_prep": 0.0030984878540039062,
+          "total": 4.314722776412964
+        },
+        "drfp_load_strategy": {
+          "binary": 50214,
+          "jsonl": 0,
+          "computed": 0
+        }
+      },
+      "reasons": {
+        "reasons": [
+          "Substrate bin: LG:?|NUC:?.",
+          "Support: 0 precedent(s)."
+        ],
+        "precedents": []
+      },
+      "formatted": {
+        "meta": {
+          "status": "success",
+          "model": "drfp_similarity",
+          "version": "2.0"
+        },
+        "input": {
+          "reaction_smiles": "BrC1CCCCC1.OB(O)c1cccc(Cl)c1>>Clc1ccc(C2CCCCC2)cc1",
+          "family": "Suzuki"
+        },
+        "detection": {
+          "family": "Suzuki",
+          "confidence": 0.3
+        },
+        "recommended_conditions": [
+          {
+            "rank": 1,
+            "reaction": {
+              "smiles": "BrC1CCCCC1.OB(O)c1cccc(Cl)c1>>Clc1ccc(C2CCCCC2)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "BrC1CCCCC1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "OB(O)c1cccc(Cl)c1",
+                "equivalents": null,
+                "role": "starting_material"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 1,
+              "core": null,
+              "base": null,
+              "solvent": null,
+              "confidence": 0.3,
+              "support": {
+                "count": 0,
+                "fraction_core": 0.0,
+                "reference_population": 0
+              },
+              "precedents": []
+            },
+            "combo": {
+              "base_uid": "",
+              "solvent_uid": ""
+            }
+          }
+        ],
+        "precedent_summary": {
+          "total_precedents": 0,
+          "chosen_core": null,
+          "core_support": 0
+        },
+        "precedents_used": {
+          "total_count": 0,
+          "top_precedents": [],
+          "core_matched_precedents": {
+            "core": null,
+            "count": 0,
+            "examples": []
+          },
+          "statistics": {
+            "average_yield": null,
+            "yield_range": null,
+            "temperature_range": null,
+            "time_range": null
+          }
+        }
+      },
+      "detection": {
+        "auto_family": "Suzuki_CC",
+        "rule_family": "Suzuki_CC",
+        "source": "auto"
+      },
+      "constraint_filters": {
+        "base": {
+          "allowed": [],
+          "blocked": []
+        },
+        "solvent": {
+          "allowed": [],
+          "blocked": []
+        }
+      },
+      "_deprecated": {
+        "message": "Fusion is deprecated. Use rerank_strategy=\"rule\" instead.",
+        "migration": "Use --rerank rule instead of --strategy fusion"
+      }
+    }
+  }
+}

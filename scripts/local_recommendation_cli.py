@@ -5,8 +5,8 @@ Local Recommendation Tester
 This script mirrors `interactive_recommendation_cli.py` but calls the
 ChemTools APIs directly rather than going through the FastAPI server.
 It prompts for a reaction SMILES and reaction family, runs rule-based,
-ML, and fusion recommendation pipelines, saves their JSON results, and
-prints a compact summary to the console.
+ML, fusion, and protocol recommendation pipelines, saves their JSON results,
+and prints a compact summary to the console.
 
 Usage:
     python scripts/local_recommendation_cli.py
@@ -14,6 +14,7 @@ Usage:
 Requirements:
     - ChemTools library dependencies installed (same as the FastAPI app)
     - Optional SCDB JSON database for rule-based matching
+    - Protocol index built (python -m chemtools.protocol.cli build)
 """
 
 from __future__ import annotations
@@ -35,6 +36,13 @@ if str(ROOT) not in sys.path:
 from chemtools import chem, output_formatter, recommend
 
 try:
+    from chemtools.protocol import ProtocolRecommender
+    HAS_PROTOCOL = True
+except ImportError:
+    HAS_PROTOCOL = False
+    ProtocolRecommender = None
+
+try:
     from chemtools.rule_scdb_matcher.loader import SchemeConditionDBError
 except Exception:  # pragma: no cover - fallback path
     class SchemeConditionDBError(RuntimeError):
@@ -54,6 +62,7 @@ try:
         summarize_fusion,
         summarize_ml,
         summarize_rule,
+        summarize_protocol,
     )
 except ModuleNotFoundError:
     sys.path.append(str(HERE))
@@ -69,6 +78,7 @@ except ModuleNotFoundError:
         summarize_fusion,
         summarize_ml,
         summarize_rule,
+        summarize_protocol,
     )
 
 
@@ -291,6 +301,70 @@ def local_fusion_recommendation(
     )
 
 
+def local_protocol_recommendation(
+    reaction: str,
+    k_value: int,
+    tags: Optional[List[str]] = None,
+    reaction_family: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Run protocol-based recommendation locally.
+    
+    Uses DRFP similarity to find matching experimental protocols.
+    Returns standard JSON format (same as ML/Rule modes).
+    
+    Args:
+        reaction: Reaction SMILES
+        k_value: Number of recommendations to return
+        tags: Optional list of tags to filter by
+        reaction_family: Optional reaction family to filter by
+    
+    Returns:
+        Standard format result with meta, input, detection, recommended_conditions
+    """
+    if not HAS_PROTOCOL:
+        return {
+            "error": "Protocol recommendation not available. Install with: pip install drfp",
+            "meta": {
+                "model": "Protocol-DRFP",
+                "status": "error"
+            }
+        }
+    
+    try:
+        # Initialize recommender (loads index)
+        recommender = ProtocolRecommender()
+        
+        # Get recommendations with details (includes extracted conditions)
+        result = recommender.recommend_with_details(
+            reaction_smiles=reaction,
+            k=k_value,
+            reaction_family=reaction_family,
+            tags=tags,
+            use_standard_format=True  # Ensure standard format
+        )
+        
+        return result
+        
+    except FileNotFoundError as exc:
+        return {
+            "error": f"Protocol index not found. Run: python -m chemtools.protocol.cli build",
+            "details": str(exc),
+            "meta": {
+                "model": "Protocol-DRFP",
+                "status": "error"
+            }
+        }
+    except Exception as exc:
+        return {
+            "error": f"Protocol recommendation failed: {exc}",
+            "meta": {
+                "model": "Protocol-DRFP",
+                "status": "error"
+            }
+        }
+
+
 def main() -> None:
     """Main entry point with optional command-line arguments."""
     parser = argparse.ArgumentParser(
@@ -360,8 +434,8 @@ Examples:
         "--strategy",
         type=str,
         default="all",
-        choices=["all", "rule", "ml", "fusion"],
-        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated."
+        choices=["all", "rule", "ml", "fusion", "protocol"],
+        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated, use --rerank rule instead."
     )
     
     parser.add_argument(
@@ -377,6 +451,13 @@ Examples:
         "--filter-unknown",
         action="store_true",
         help="Filter out precedents with unknown base/solvent reagents (not in database)"
+    )
+    
+    parser.add_argument(
+        "--protocol-tags",
+        type=str,
+        default=None,
+        help="Comma-separated tags to filter protocols (e.g., 'suzuki,palladium')"
     )
     
     parser.add_argument(
@@ -438,10 +519,12 @@ Examples:
     run_rule = args.strategy in ["all", "rule"]
     run_ml = args.strategy in ["all", "ml"]
     run_fusion = args.strategy in ["all", "fusion"]
+    run_protocol = args.strategy in ["all", "protocol"]
     
     rule_result = None
     ml_result = None
     fusion_result = None
+    protocol_result = None
     
     if run_rule:
         rule_result = local_rule_based_match(reaction, db_path)
@@ -461,6 +544,22 @@ Examples:
     if run_fusion:
         fusion_result = local_fusion_recommendation(reaction, k_value, fusion_variants)
         fusion_file = save_to_dir(fusion_result, f"{timestamp}_{label}_fusion_local.json")
+    
+    if run_protocol:
+        # Parse protocol tags if provided
+        protocol_tags = None
+        if args.protocol_tags:
+            protocol_tags = [tag.strip() for tag in args.protocol_tags.split(',')]
+        
+        # Protocol recommendation doesn't strictly need reaction_family
+        # Only pass it if it might help with filtering
+        protocol_result = local_protocol_recommendation(
+            reaction=reaction,
+            k_value=k_value,
+            tags=protocol_tags,
+            reaction_family=None  # Let protocol module auto-detect from similarity
+        )
+        protocol_file = save_to_dir(protocol_result, f"{timestamp}_{label}_protocol_local.json")
 
     print("Summary\n-------")
     
@@ -474,14 +573,20 @@ Examples:
     
     if fusion_result:
         summarize_fusion(fusion_result)
+        print()
+    
+    if protocol_result:
+        summarize_protocol(protocol_result)
 
     print("\nSaved outputs:")
     if run_rule:
-        print(f"  Rule JSON:   {rule_file}")
+        print(f"  Rule JSON:     {rule_file}")
     if run_ml:
-        print(f"  ML JSON:     {ml_file}")
+        print(f"  ML JSON:       {ml_file}")
     if run_fusion:
-        print(f"  Fusion JSON: {fusion_file}")
+        print(f"  Fusion JSON:   {fusion_file}")
+    if run_protocol:
+        print(f"  Protocol JSON: {protocol_file}")
     
     print("\nDone.")
 

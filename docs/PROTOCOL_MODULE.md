@@ -114,10 +114,17 @@ results = recommender.recommend(
     k=5
 )
 
-# Print matches
-for match in results['matches']:
-    print(f"{match['similarity']:.3f}: {match['source_title']}")
-    print(f"  DOI: {match['source_doi']}")
+# Standard JSON format with meta, input, detection, recommended_conditions
+print(f"Model: {results['meta']['model']}")
+print(f"Detected family: {results['detection']['family']}")
+print(f"Confidence: {results['detection']['confidence']:.3f}")
+
+# Print recommendations
+for rec in results['recommended_conditions']:
+    protocol = rec['protocol']
+    print(f"Rank {rec['rank']}: {protocol['title']}")
+    print(f"  Similarity: {rec['similarity']:.3f}")
+    print(f"  DOI: {protocol['doi']}")
 ```
 
 **With filtering:**
@@ -145,9 +152,11 @@ results = recommender.recommend_with_details(
     k=3
 )
 
-for match in results['matches']:
-    cond = match['conditions']
-    print(f"Catalyst: {cond['catalyst']}")
+for rec in results['recommended_conditions']:
+    protocol = rec['protocol']
+    cond = rec.get('conditions', {})
+    print(f"Rank {rec['rank']}: {protocol['title']}")
+    print(f"  Catalyst: {cond.get('catalyst')}")
     print(f"Solvent: {cond['solvent']}")
     print(f"Temperature: {cond['temperature_C']} °C")
 ```
