@@ -31,6 +31,30 @@ def _format_debug_log(entries: Iterable[str]) -> str:
     return json.dumps(items, ensure_ascii=False)
 
 
+def _strip_markdown_fences(content: str) -> str:
+    """
+    Remove markdown code fences from LLM response.
+    
+    Some LLM providers (especially DeepSeek) wrap JSON in ```json ... ``` fences.
+    This function extracts the content between fences.
+    """
+    content = content.strip()
+    
+    # Check for markdown code fence with language specifier
+    if content.startswith("```json") or content.startswith("```JSON"):
+        # Remove opening fence
+        content = content[7:].lstrip()
+    elif content.startswith("```"):
+        # Remove opening fence without language
+        content = content[3:].lstrip()
+    
+    # Remove closing fence
+    if content.endswith("```"):
+        content = content[:-3].rstrip()
+    
+    return content.strip()
+
+
 @dataclass
 class LLMReviewOptions:
     """Runtime configuration for the LLM-backed registry review."""
@@ -128,8 +152,10 @@ def review_taxonomy_proposal(
     parse_error: Optional[str] = None
 
     if raw_content:
+        # Strip markdown code fences that some LLMs add
+        cleaned_content = _strip_markdown_fences(raw_content)
         try:
-            parsed = json.loads(raw_content)
+            parsed = json.loads(cleaned_content)
         except json.JSONDecodeError as exc:
             parse_error = f"{exc.__class__.__name__}: {exc}"
 
@@ -164,6 +190,7 @@ def review_taxonomy_proposal(
             "suggested_synonyms": [
                 str(value) for value in parsed.get("suggested_synonyms", []) or []
             ],
+            "field_suggestions": parsed.get("field_suggestions", {}),
         }
 
     return result
