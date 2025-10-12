@@ -638,3 +638,169 @@ IMPORTANT:
 """,
     entry_json="{}",
 )
+
+
+MULTI_SOURCE_SYNTHESIS = PromptTemplate(
+    template="""You are an expert synthetic chemist analyzing multiple recommendation sources for reaction conditions.
+
+## Reaction
+
+{reaction_smiles}
+
+## ML-based Recommendations (DRFP Similarity with Precedent Database)
+
+Top 3 conditions from structural similarity search:
+{ml_conditions}
+
+## Rule-based Recommendations (SCDB Pattern Matching)
+
+Conditions from curated reaction database:
+{rule_conditions}
+
+## Protocol-based Recommendations (Literature Procedures)
+
+Conditions from published protocols:
+{protocol_conditions}
+
+## User Constraints
+
+{constraints}
+
+## Your Task
+
+Analyze all three sources and synthesize a final recommendation:
+
+1. **Identify consensus**: Where do sources agree? This indicates high confidence.
+2. **Explain discrepancies**: Why do sources disagree? Which is more appropriate for THIS substrate?
+3. **Assess confidence**: High (all agree), Medium (2/3 agree), Low (all differ)
+4. **Consider constraints**: User requirements like scale, cost, air sensitivity
+5. **Provide ONE best recommendation** with clear rationale citing specific sources
+6. **Suggest 1-2 backup conditions** for if the main recommendation fails
+
+## Response Format
+
+Respond with ONLY valid JSON (no markdown fences):
+{{
+  "consensus_analysis": {{
+    "catalyst": {{
+      "agreement": "high|medium|low",
+      "consensus_value": "Pd(PPh3)4 or null if no consensus",
+      "notes": "Why sources agree/disagree"
+    }},
+    "solvent": {{"agreement": "...", "consensus_value": "...", "notes": "..."}},
+    "temperature": {{"agreement": "...", "consensus_value": "...", "notes": "..."}},
+    "base": {{"agreement": "...", "consensus_value": "...", "notes": "..."}}
+  }},
+  "confidence_level": "high|medium|low",
+  "confidence_reasoning": "Why this confidence level based on source agreement",
+  "recommended_condition": {{
+    "catalyst": "Best catalyst choice",
+    "ligand": "Ligand if applicable",
+    "solvent": "Best solvent",
+    "temperature": "Best temperature",
+    "base": "Best base",
+    "additive": "Any additives needed",
+    "rationale": "2-3 sentence explanation citing which sources support this and why it's best given the substrate and constraints"
+  }},
+  "backup_conditions": [
+    {{
+      "catalyst": "...",
+      "solvent": "...",
+      "temperature": "...",
+      "base": "...",
+      "when_to_use": "Specific scenario where this is better than main recommendation"
+    }}
+  ],
+  "warnings": [
+    "Any red flags, functional group incompatibilities, or practical concerns"
+  ],
+  "source_comparison": {{
+    "ml_contribution": "What valuable insight did ML precedents provide?",
+    "rule_contribution": "What did rule-based database add?",
+    "protocol_contribution": "What did literature protocols add?"
+  }}
+}}
+
+CRITICAL:
+- Cite specific sources when explaining choices (e.g., "ML precedents show..." or "SCDB rule indicates...")
+- If all sources disagree, confidence should be LOW and warnings should mention high uncertainty
+- Consider functional groups in the substrate when choosing between conflicting recommendations
+- User constraints MUST be respected in final recommendation
+""",
+    reaction_smiles="",
+    ml_conditions="No ML recommendations available",
+    rule_conditions="No rule-based recommendations available",
+    protocol_conditions="No protocol recommendations available",
+    constraints="None specified",
+)
+
+MULTI_SOURCE_SYNTHESIS_V2 = PromptTemplate(
+    template="""Expert chemist: Synthesize recommendations for this reaction.
+
+## REACTION: {reaction_smiles}
+
+## SOURCES
+ML (DRFP): {ml_conditions}
+Rule (SCDB): {rule_conditions}
+Protocol (Lit): {protocol_conditions}
+
+## CONSTRAINTS: {constraints}
+
+## TASK
+Analyze sources → Synthesize ONE best recommendation with backups.
+
+**Confidence Thresholds:**
+- HIGH: All 3 sources agree on catalyst+solvent AND ML similarity >0.80
+- MEDIUM: 2/3 sources agree OR ML similarity 0.65-0.80
+- LOW: Sources disagree OR ML similarity <0.65
+
+**Chemistry Guidelines:**
+- Electron-poor aryl → electron-rich ligand (dppf, XPhos, SPhos)
+- Heteroaryl halides → chelating ligands (watch Pd coordination)
+- Nitro groups → avoid H2 (reduction risk); monitor proto-debromination
+- Sterically hindered → bidentate/bulky ligands (dppf, SPhos)
+- Aryl chlorides → strong base + high temp OR bulky ligand
+
+**Decision Tree for Backups:**
+- Backup 1: If main <30% conv after 6h (different ligand/solvent)
+- Backup 2: If Backup 1 <20% after 12h (different catalyst family)
+
+## OUTPUT (JSON only, no markdown)
+{{
+  "consensus_analysis": {{
+    "catalyst": {{"agreement": "high|medium|low", "consensus_value": "...", "notes": "..."}},
+    "solvent": {{"agreement": "...", "consensus_value": "...", "notes": "..."}},
+    "temperature": {{"agreement": "...", "consensus_value": "...", "notes": "..."}},
+    "base": {{"agreement": "...", "consensus_value": "...", "notes": "..."}}
+  }},
+  "confidence_level": "high|medium|low",
+  "confidence_reasoning": "Source agreement + ML similarity assessment",
+  "recommended_condition": {{
+    "catalyst": "...",
+    "ligand": "...",
+    "solvent": "...",
+    "temperature": "...",
+    "base": "...",
+    "additive": "...",
+    "rationale": "Cite sources + substrate chemistry + constraints"
+  }},
+  "backup_conditions": [
+    {{"catalyst": "...", "solvent": "...", "temperature": "...", "base": "...", 
+      "when_to_use": "<30% conv: try this ligand/solvent"}}
+  ],
+  "warnings": ["Functional group risks", "Practical concerns"],
+  "source_comparison": {{
+    "ml_contribution": "...",
+    "rule_contribution": "...",
+    "protocol_contribution": "..."
+  }}
+}}
+
+RULES: Respect constraints. Cite sources. Use chemistry guidelines for substrate-specific warnings.
+""",
+    reaction_smiles="",
+    ml_conditions="No ML recommendations available",
+    rule_conditions="No rule-based recommendations available",
+    protocol_conditions="No protocol recommendations available",
+    constraints="None specified",
+)
