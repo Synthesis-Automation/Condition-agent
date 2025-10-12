@@ -32,6 +32,9 @@ from PyQt6.QtWidgets import (
 MODULE_DIR = Path(__file__).resolve().parent
 if str(MODULE_DIR) not in sys.path:
     sys.path.insert(0, str(MODULE_DIR))
+ROOT_DIR = MODULE_DIR.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from reagent_taxonomy_generator import (  # type: ignore
     DEFAULT_RESOLVER_TIMEOUT,
@@ -43,6 +46,74 @@ from reagent_taxonomy_generator import (  # type: ignore
 
 
 DEFAULT_REGISTRY_DIR = (MODULE_DIR.parent / "data" / "reagents").resolve()
+
+DEFAULT_LLM_MODELS: Dict[str, List[str]] = {
+    "aliyun": [
+        "deepseek-r1-distill-qwen-7b",
+        "deepseek-v3.2-exp",
+        "deepseek-v3.1",
+        "deepseek-r1",
+        "deepseek-r1-0528",
+        "deepseek-v3",
+        "deepseek-r1-distill-qwen-1.5b",
+        "deepseek-r1-distill-qwen-14b",
+        "deepseek-r1-distill-qwen-32b",
+        "deepseek-r1-distill-llama-8b",
+        "deepseek-r1-distill-llama-70b",
+    ],
+    "openai": [
+        "gpt-5",
+        "gpt-5-pro",
+        "gpt-5-mini",
+        "gpt-5-nano",
+        "gpt-5-codex",
+        "o3",
+        "o3-pro",
+        "o3-mini",
+        "o4-mini",
+        "o3-deep-research",
+        "o4-mini-deep-research",
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4.1-mini",
+        "gpt-4.1-nano",
+    ],
+}
+
+DEFAULT_LLM_RECOMMENDED: Dict[str, Dict[str, str]] = {
+    "aliyun": {
+        "reasoning": "deepseek-r1",
+        "fast": "deepseek-r1-distill-qwen-7b",
+        "balanced": "deepseek-v3",
+        "experimental": "deepseek-v3.2-exp",
+    },
+    "openai": {
+        "reasoning": "o3-mini",
+        "fast": "gpt-4o-mini",
+        "balanced": "gpt-4o",
+        "advanced": "gpt-5-mini",
+    },
+}
+
+LLM_SUPPORT_ERROR: Optional[str] = None
+
+try:
+    from llmtools.clients import AVAILABLE_MODELS as LLM_AVAILABLE_MODELS
+    from llmtools.clients import RECOMMENDED_MODELS as LLM_RECOMMENDED_MODELS
+except Exception as exc:  # pragma: no cover - safeguard for missing optional deps
+    LLM_AVAILABLE_MODELS = DEFAULT_LLM_MODELS
+    LLM_RECOMMENDED_MODELS = DEFAULT_LLM_RECOMMENDED
+    LLM_SUPPORT_ERROR = f"{exc.__class__.__name__}: {exc}"
+
+try:
+    from llmtools.reagent_review import LLMReviewOptions, review_taxonomy_proposal
+    LLM_SUPPORT_AVAILABLE = True
+except Exception as exc:  # pragma: no cover - optional dependency
+    LLMReviewOptions = None  # type: ignore[assignment]
+    review_taxonomy_proposal = None  # type: ignore[assignment]
+    LLM_SUPPORT_AVAILABLE = False
+    if not LLM_SUPPORT_ERROR:
+        LLM_SUPPORT_ERROR = f"{exc.__class__.__name__}: {exc}"
 
 ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
     "ligand": {
@@ -488,6 +559,7 @@ def generate_taxonomy_entry(
     resolver_timeout: float = DEFAULT_RESOLVER_TIMEOUT,
     name_override: Optional[str] = None,
     smiles_override: Optional[str] = None,
+    llm_options: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Execute the registry workflow and return a JSON-friendly result."""
     if not cas:
@@ -564,12 +636,15 @@ def generate_taxonomy_entry(
         return result
 
     other_entries = store.cas_index.get(normalized_cas, [])
+    existing_other_roles: List[str] = []
     for other_role, _entry in other_entries:
         if other_role != role:
-            debug_log.append(
-                f"CAS already exists under role '{other_role}'; continuing to add entry for '{role}'."
-            )
-            break
+            existing_other_roles.append(str(other_role))
+    if existing_other_roles:
+        roles_str = ", ".join(sorted(existing_other_roles))
+        debug_log.append(
+            f"CAS already exists under roles [{roles_str}]; continuing to add entry for '{role}'."
+        )
 
     auto_resolve_source = resolved_identity.get("source") if resolved_identity else None
     resolved_smiles = resolved_identity.get("smiles") if resolved_identity else None
@@ -578,7 +653,7 @@ def generate_taxonomy_entry(
     if resolved_identity:
         inchi_key = resolved_identity.get("inchi_key") or resolved_identity.get("inchikey")
 
-    abbreviations = infer_abbreviations(name, synonyms)
+    abbreviations = list(infer_abbreviations(name, synonyms))
     aliases = build_aliases(name, normalized_cas, abbreviations, synonyms)
 
     role_payload = store.build_role_payload(role, family_id)
@@ -614,6 +689,137 @@ def generate_taxonomy_entry(
         result["family_tokens"] = family_reason
     if debug_log:
         result["debug_log"] = debug_log
+
+    if llm_options:
+        if not LLM_SUPPORT_AVAILABLE or not LLMReviewOptions or not review_taxonomy_proposal:
+            result["llm_review"] = {
+                "enabled": True,
+                "status": "error",
+                "error": "LLM support is not available in this environment.",
+            }
+        else:
+            # Filter unexpected keys to avoid dataclass errors.
+            supported_keys = {"enabled", "provider", "model", "temperature", "max_tokens", "timeout"}
+            filtered_opts = {k: v for k, v in llm_options.items() if k in supported_keys}
+            options_obj = LLMReviewOptions(**filtered_opts)
+            if options_obj.enabled:
+                llm_context = {
+                    "cas": normalized_cas,
+                    "name": name,
+                    "role": role,
+                    "family_id": family_id,
+                    "synonyms": list(synonyms),
+                    "abbreviations": abbreviations,
+                    "family_entry": family_entry,
+                    "family_reason": family_reason or [],
+                    "used_default_family": used_default,
+                    "debug_log": debug_log,
+                    "resolved_identity": resolved_identity or {},
+                    "existing_other_roles": existing_other_roles,
+                    "registry_file": str(store.file_for_role(role)),
+                    "entry_preview": entry,
+                }
+                llm_review = review_taxonomy_proposal(llm_context, options_obj)
+                result["llm_review"] = llm_review
+                analysis = llm_review.get("analysis") if isinstance(llm_review, dict) else None
+                if isinstance(analysis, dict):
+                    adjustment_errors: List[str] = []
+                    changes_summary: Dict[str, Any] = {}
+
+                    proposed_role = analysis.get("proposed_role")
+                    proposed_family = analysis.get("proposed_family")
+                    suggested_synonyms = [
+                        str(value).strip()
+                        for value in analysis.get("suggested_synonyms", []) or []
+                        if str(value).strip()
+                    ]
+
+                    combined_synonyms = dedupe_synonyms([*synonyms, *suggested_synonyms])
+                    synonyms_added = [syn for syn in combined_synonyms if syn not in synonyms]
+
+                    target_role = role
+                    target_family = family_id
+
+                    candidate_role = str(proposed_role).strip() if proposed_role else ""
+                    candidate_family = str(proposed_family).strip() if proposed_family else ""
+
+                    if candidate_role and candidate_role != role:
+                        if candidate_role in ROLE_CONFIG:
+                            # Use suggested family if provided; otherwise keep current until validated.
+                            family_candidate_for_role = candidate_family or target_family
+                            if family_candidate_for_role and store.family_entry(candidate_role, family_candidate_for_role):
+                                target_role = candidate_role
+                                target_family = family_candidate_for_role
+                                changes_summary["role"] = {"from": role, "to": target_role}
+                                if target_family != family_id:
+                                    changes_summary["family"] = {"from": family_id, "to": target_family}
+                            else:
+                                adjustment_errors.append(
+                                    f"Suggested role '{candidate_role}' missing valid family '{family_candidate_for_role or 'unspecified'}'."
+                                )
+                        else:
+                            adjustment_errors.append(f"Suggested role '{candidate_role}' is not recognized.")
+
+                    if candidate_family and target_role == role and candidate_family != family_id:
+                        if store.family_entry(target_role, candidate_family):
+                            target_family = candidate_family
+                            changes_summary["family"] = {"from": family_id, "to": target_family}
+                        else:
+                            adjustment_errors.append(
+                                f"Suggested family '{candidate_family}' not found for role '{target_role}'."
+                            )
+
+                    should_apply = (
+                        target_role != role
+                        or target_family != family_id
+                        or bool(synonyms_added)
+                    )
+
+                    if should_apply:
+                        if target_role == role and target_family == family_id:
+                            target_family_entry = family_entry
+                        else:
+                            target_family_entry = store.family_entry(target_role, target_family)
+                        if not target_family_entry:
+                            adjustment_errors.append(
+                                f"Family '{target_family}' for role '{target_role}' missing; cannot build adjusted entry."
+                            )
+                        else:
+                            updated_abbreviations = list(infer_abbreviations(name, combined_synonyms))
+                            updated_aliases = build_aliases(
+                                name,
+                                normalized_cas,
+                                updated_abbreviations,
+                                combined_synonyms,
+                            )
+                            adjusted_role_payload = store.build_role_payload(target_role, target_family)
+                            adjusted_entry = build_registry_entry(
+                                entry_id=entry_id,
+                                name=name,
+                                abbreviations=updated_abbreviations,
+                                aliases=updated_aliases,
+                                cas=normalized_cas,
+                                smiles=smiles,
+                                inchi_key=inchi_key,
+                                role=target_role,
+                                role_payload=adjusted_role_payload,
+                                family_entry=target_family_entry,
+                                synonyms=combined_synonyms,
+                            )
+                            result["llm_adjusted_entry"] = adjusted_entry
+                            if target_role != role:
+                                changes_summary.setdefault("role", {"from": role, "to": target_role})
+                            if target_family != family_id:
+                                changes_summary.setdefault("family", {"from": family_id, "to": target_family})
+                            if synonyms_added:
+                                changes_summary["synonyms_added"] = synonyms_added
+                            if changes_summary:
+                                result["llm_applied_changes"] = changes_summary
+
+                    if adjustment_errors:
+                        result["llm_adjustment_errors"] = adjustment_errors
+            else:
+                result["llm_review"] = {"enabled": False, "status": "disabled"}
 
     if dry_run:
         result["status"] = "dry_run"
@@ -697,6 +903,30 @@ class RegistryGeneratorWindow(QMainWindow):
             self.role_combo.setCurrentIndex(default_index)
         form_layout.addRow("Reagent role", self.role_combo)
 
+        self._llm_support_available = LLM_SUPPORT_AVAILABLE and bool(LLM_AVAILABLE_MODELS)
+        llm_widget = QWidget()
+        llm_layout = QHBoxLayout(llm_widget)
+        llm_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.llm_mode_combo = QComboBox()
+        self.llm_mode_combo.addItem("No LLM", userData=False)
+        self.llm_mode_combo.addItem("Use LLM", userData=True)
+        self.llm_mode_combo.currentIndexChanged.connect(self.on_llm_mode_changed)
+        llm_layout.addWidget(self.llm_mode_combo)
+
+        self.llm_provider_combo = QComboBox()
+        self.llm_provider_combo.currentIndexChanged.connect(self.on_llm_provider_changed)
+        llm_layout.addWidget(self.llm_provider_combo)
+
+        self.llm_model_combo = QComboBox()
+        llm_layout.addWidget(self.llm_model_combo)
+
+        llm_layout.addStretch()
+        form_layout.addRow("LLM assistance", llm_widget)
+
+        self._populate_llm_provider_options()
+        self.on_llm_mode_changed()
+
         path_layout = QHBoxLayout()
         self.registry_path_input = QLineEdit(str(DEFAULT_REGISTRY_DIR))
         browse_button = QPushButton("Browse")
@@ -736,6 +966,113 @@ class RegistryGeneratorWindow(QMainWindow):
 
         self.resize(820, 600)
 
+    def _populate_llm_provider_options(self) -> None:
+        """Populate provider and model combos based on available catalog."""
+        self.llm_provider_combo.clear()
+        self.llm_model_combo.clear()
+
+        if not self._llm_support_available:
+            self.llm_provider_combo.addItem("LLM unavailable", userData=None)
+            self.llm_provider_combo.setEnabled(False)
+            self.llm_model_combo.addItem("LLM unavailable", userData=None)
+            self.llm_model_combo.setEnabled(False)
+            return
+
+        providers = sorted(LLM_AVAILABLE_MODELS.keys())
+        if not providers:
+            self.llm_provider_combo.addItem("No providers found", userData=None)
+            self.llm_provider_combo.setEnabled(False)
+            self.llm_model_combo.addItem("No models", userData=None)
+            self.llm_model_combo.setEnabled(False)
+            return
+
+        for provider in providers:
+            label = provider.replace("_", " ").title()
+            self.llm_provider_combo.addItem(label, userData=provider)
+
+        self.llm_provider_combo.setEnabled(True)
+        self.llm_provider_combo.setCurrentIndex(0)
+        self._populate_llm_model_options(self.llm_provider_combo.currentData())
+
+    def _populate_llm_model_options(self, provider: Optional[str]) -> None:
+        """Populate model combo for selected provider."""
+        self.llm_model_combo.clear()
+
+        if not provider:
+            self.llm_model_combo.addItem("Select provider", userData=None)
+            self.llm_model_combo.setEnabled(False)
+            return
+
+        models = LLM_AVAILABLE_MODELS.get(provider, [])
+        if not models:
+            self.llm_model_combo.addItem("No models", userData=None)
+            self.llm_model_combo.setEnabled(False)
+            return
+
+        recommended = self._recommended_model_for_provider(provider)
+        recommended_index = 0
+        for idx, model in enumerate(models):
+            display = model
+            if recommended and model == recommended:
+                display = f"{model} (recommended)"
+                recommended_index = idx
+            self.llm_model_combo.addItem(display, userData=model)
+
+        self.llm_model_combo.setEnabled(True)
+        self.llm_model_combo.setCurrentIndex(recommended_index)
+
+    def _recommended_model_for_provider(self, provider: str) -> Optional[str]:
+        """Return preferred model for provider using catalog heuristics."""
+        preferences = LLM_RECOMMENDED_MODELS.get(provider, {})
+        for key in ("balanced", "fast", "reasoning", "advanced"):
+            candidate = preferences.get(key)
+            if candidate:
+                return candidate
+        models = LLM_AVAILABLE_MODELS.get(provider, [])
+        return models[0] if models else None
+
+    def on_llm_mode_changed(self, index: int = -1) -> None:  # noqa: ARG002 - index unused
+        """Toggle provider/model controls based on LLM mode selection."""
+        # When the widget itself is disabled (e.g. worker running), skip updates.
+        if not self.llm_mode_combo.isEnabled():
+            return
+
+        enabled = bool(self.llm_mode_combo.currentData())
+
+        if enabled and not self._llm_support_available:
+            QMessageBox.information(
+                self,
+                "LLM support unavailable",
+                "LLM integration is not available in this environment.\n"
+                "Install optional dependencies and configure API keys to enable it."
+                f"\n\nDetected issue: {LLM_SUPPORT_ERROR or 'Unknown'}",
+            )
+            self.llm_mode_combo.blockSignals(True)
+            self.llm_mode_combo.setCurrentIndex(0)
+            self.llm_mode_combo.blockSignals(False)
+            enabled = False
+
+        provider_has_options = self.llm_provider_combo.count() > 0 and self.llm_provider_combo.itemData(0) is not None
+        provider_ready = enabled and provider_has_options and self._llm_support_available
+        self.llm_provider_combo.setEnabled(provider_ready)
+        if provider_ready:
+            self._populate_llm_model_options(self.llm_provider_combo.currentData())
+        else:
+            self.llm_provider_combo.setEnabled(False)
+
+        model_has_options = self.llm_model_combo.count() > 0 and self.llm_model_combo.itemData(0) is not None
+        model_ready = enabled and model_has_options and self._llm_support_available
+        self.llm_model_combo.setEnabled(model_ready)
+
+    def on_llm_provider_changed(self, index: int = -1) -> None:  # noqa: ARG002 - index unused
+        """Refresh model options when the provider selection changes."""
+        if not self._llm_support_available:
+            return
+        if not self.llm_provider_combo.isEnabled():
+            return
+        provider = self.llm_provider_combo.currentData()
+        self._populate_llm_model_options(provider)
+
     def on_browse_registry_dir(self) -> None:
         """Let the user choose a registry directory."""
         directory = QFileDialog.getExistingDirectory(self, "Select registry directory", str(DEFAULT_REGISTRY_DIR))
@@ -762,6 +1099,21 @@ class RegistryGeneratorWindow(QMainWindow):
         registry_dir = Path(registry_dir_text).expanduser()
         allow_default = self.allow_default_checkbox.isChecked()
         name_override = self.name_input.text().strip() or None
+        llm_options: Optional[Dict[str, Any]] = None
+        if bool(self.llm_mode_combo.currentData()):
+            provider = self.llm_provider_combo.currentData()
+            model = self.llm_model_combo.currentData()
+            if not provider or not model:
+                self.show_error("Select an LLM provider and model before generating.")
+                return
+            llm_options = {
+                "enabled": True,
+                "provider": provider,
+                "model": model,
+                "temperature": 0.0,
+                "max_tokens": 800,
+                "timeout": 60,
+            }
 
         self.status_label.setText("Running registry generation...")
         self.output_view.clear()
@@ -778,6 +1130,8 @@ class RegistryGeneratorWindow(QMainWindow):
             "resolver_timeout": DEFAULT_RESOLVER_TIMEOUT,
             "name_override": name_override,
         }
+        if llm_options:
+            params["llm_options"] = llm_options
         worker = GenerationWorker(params)
         worker.signals.finished.connect(self.on_generation_success)
         worker.signals.error.connect(self.on_generation_failure)
@@ -789,13 +1143,34 @@ class RegistryGeneratorWindow(QMainWindow):
         self._last_result = result
         self.status_label.setText(f"Status: {result.get('status', 'ok')}")
         entry_preview = result.get('entry_preview')
-        if isinstance(entry_preview, dict):
-            display_payload = entry_preview
+        llm_review = result.get('llm_review')
+        llm_adjusted_entry = result.get('llm_adjusted_entry')
+        display_payload: Dict[str, Any] = {}
+        if isinstance(llm_review, dict) and isinstance(llm_adjusted_entry, dict):
+            if isinstance(entry_preview, dict):
+                display_payload["entry_original"] = entry_preview
+            display_payload["entry_revised"] = llm_adjusted_entry
+            display_payload["llm_review"] = llm_review
+            if result.get("llm_applied_changes"):
+                display_payload["llm_applied_changes"] = result["llm_applied_changes"]
+            if result.get("llm_adjustment_errors"):
+                display_payload["llm_adjustment_errors"] = result["llm_adjustment_errors"]
         else:
-            display_payload = {k: v for k, v in result.items() if k not in {'dry_run', 'registry_file'}}
+            if isinstance(entry_preview, dict):
+                display_payload["entry"] = entry_preview
+            elif isinstance(llm_adjusted_entry, dict):
+                display_payload["entry"] = llm_adjusted_entry
+            else:
+                exclude_keys = {'dry_run', 'registry_file'}
+                display_payload = {k: v for k, v in result.items() if k not in exclude_keys}
+            if llm_review:
+                display_payload["llm_review"] = llm_review
         self.output_view.setPlainText(json.dumps(display_payload, indent=2, ensure_ascii=False))
         self.set_inputs_enabled(True)
-        self.save_button.setEnabled(bool(entry_preview))
+        has_entry = any(
+            key in display_payload for key in ("entry_revised", "entry", "entry_original")
+        )
+        self.save_button.setEnabled(has_entry)
         self._current_worker = None
 
     def on_save_clicked(self) -> None:
@@ -805,12 +1180,16 @@ class RegistryGeneratorWindow(QMainWindow):
             self.show_error("Generate an entry before saving.")
             return
         try:
-            entry_preview = json.loads(payload_text)
+            payload = json.loads(payload_text)
         except json.JSONDecodeError as exc:
             self.show_error(f"Output is not valid JSON: {exc}")
             return
-        if not isinstance(entry_preview, dict):
-            self.show_error("Edited output must be a JSON object representing the registry entry.")
+        entry_to_save = self._extract_entry_from_payload(payload)
+        if not entry_to_save:
+            self.show_error(
+                "Output must contain a registry entry. Provide a JSON object with fields like 'cas', 'name', "
+                "and 'roles', or include it under 'entry_revised', 'llm_adjusted_entry', 'entry', or 'entry_preview'."
+            )
             return
         registry_dir_text = self.registry_path_input.text().strip()
         if not registry_dir_text:
@@ -822,21 +1201,30 @@ class RegistryGeneratorWindow(QMainWindow):
         except Exception as exc:
             self.show_error(str(exc))
             return
-        result_context = self._last_result or {}
-        role = result_context.get('role')
-        if not role:
-            self.show_error("Role missing from result; cannot determine destination file.")
+        roles_payload = entry_to_save.get("roles")
+        if not isinstance(roles_payload, dict) or not roles_payload:
+            self.show_error("Entry must include a 'roles' mapping to determine destination file.")
             return
+        role_for_save = next(iter(roles_payload.keys()))
+        role_details = roles_payload.get(role_for_save) or {}
+        families = role_details.get("families")
+        family_for_save: Optional[str] = families[0] if isinstance(families, list) and families else None
+        result_context = self._last_result or {}
         try:
-            store.add_entry(role, entry_preview)
-            path = store.save_role(role)
+            store.add_entry(role_for_save, entry_to_save)
+            path = store.save_role(role_for_save)
         except Exception as exc:
             self.show_error(str(exc))
             return
         result_context['status'] = 'written'
         result_context['written_to'] = str(path)
-        result_context['entry_preview'] = entry_preview
-        self.output_view.setPlainText(json.dumps(entry_preview, indent=2, ensure_ascii=False))
+        result_context['entry_preview'] = entry_to_save
+        result_context['role'] = role_for_save
+        if family_for_save:
+            result_context['family_id'] = family_for_save
+        if isinstance(result_context.get("llm_adjusted_entry"), dict):
+            result_context['llm_adjusted_entry'] = entry_to_save
+        self.output_view.setPlainText(json.dumps(entry_to_save, indent=2, ensure_ascii=False))
         self.status_label.setText("Status: written")
         self.save_button.setEnabled(False)
         self._last_result = result_context
@@ -862,6 +1250,9 @@ class RegistryGeneratorWindow(QMainWindow):
             self.cas_input,
             self.name_input,
             self.role_combo,
+            self.llm_mode_combo,
+            self.llm_provider_combo,
+            self.llm_model_combo,
             self.registry_path_input,
             self.allow_default_checkbox,
             self.generate_button,
@@ -869,6 +1260,37 @@ class RegistryGeneratorWindow(QMainWindow):
             self.clear_button,
         ):
             widget.setEnabled(enabled)
+        if enabled:
+            self.on_llm_mode_changed()
+
+    @staticmethod
+    def _is_registry_entry(candidate: Any) -> bool:
+        """Return True if candidate looks like a registry entry payload."""
+        return (
+            isinstance(candidate, dict)
+            and "cas" in candidate
+            and "name" in candidate
+            and isinstance(candidate.get("roles"), dict)
+            and candidate.get("roles")
+        )
+
+    def _extract_entry_from_payload(self, payload: Any) -> Optional[Dict[str, Any]]:
+        """Extract the first plausible registry entry from a payload structure."""
+        if self._is_registry_entry(payload):
+            return payload
+        if isinstance(payload, dict):
+            for key in (
+                "entry_revised",
+                "llm_adjusted_entry",
+                "candidate_entry",
+                "entry",
+                "entry_original",
+                "entry_preview",
+            ):
+                value = payload.get(key)
+                if self._is_registry_entry(value):
+                    return value
+        return None
 
     def show_error(self, message: str) -> None:
         """Show a modal error dialog."""
