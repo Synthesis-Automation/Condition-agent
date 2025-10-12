@@ -138,80 +138,136 @@ def classify_role(
 
 
 def _format_families_description(families: List[Dict[str, Any]]) -> str:
-    """Format family list for LLM prompt."""
+    """Format family list for LLM prompt with rich metadata from families_registry.json."""
     lines = []
     for fam in families:
         fam_id = fam.get("family", "")
         definition = fam.get("definition", "")
         keywords = fam.get("keywords", [])
-        kw_str = f" (keywords: {', '.join(keywords[:5])})" if keywords else ""
-        lines.append(f"- **{fam_id}**: {definition}{kw_str}")
-    return "\n".join(lines) if lines else "No families available"
-
-
-def _format_fields_schema(role: str, field_names: List[str], registry_dir: Path) -> str:
-    """Format field schema with allowed values."""
-    # This would ideally pull from actual schema, but for now we'll use hardcoded
+        examples_pos = fam.get("examples_pos", [])
+        notes = fam.get("notes", "")
+        
+        # Build rich description
+        desc_parts = [f"- **{fam_id}**: {definition}"]
+        
+        # Add keywords if available
+        if keywords:
+            kw_str = ", ".join(keywords[:8])  # Increased from 5 to 8
+            desc_parts.append(f"\n  Keywords: {kw_str}")
+        
+        # Add example CAS numbers if available
+        if examples_pos:
+            ex_str = ", ".join(examples_pos[:3])
+            desc_parts.append(f"\n  Example CAS: {ex_str}")
+        
+        # Add notes if helpful
+        if notes and len(notes) < 100:
+            desc_parts.append(f"\n  Note: {notes}")
+        
+        lines.append("".join(desc_parts))
     
-    field_schemas = {
+    return "\n\n".join(lines) if lines else "No families available"
+
+
+def _load_schema_for_role(role: str, registry_dir: Path) -> Dict[str, Any]:
+    """Load the reagent schema and extract field definitions for a specific role."""
+    schema_path = registry_dir / "reagent_schema" / "reagent_schema.json"
+    
+    # Default schema fallback
+    default_schemas = {
         "base": {
             "basicity": ["weak", "moderate", "strong", "superbase"],
             "nucleophilicity": ["weak", "moderate", "strong"],
-            "sterics": ["unhindered", "moderate", "hindered"],
+            "sterics": ["unhindered", "moderate", "hindered"]
         },
         "metal_precursor": {
-            "metal": "Element symbol (e.g., Pd, Ni, Cu, Fe, Ru, Ir, Rh, Pt, Au, Ag)",
-            "oxidation_states": "List of integers (e.g., [0], [2], [0, 2])",
+            "metal": "Element symbol (Pd, Ni, Cu, Co, Fe, Ru, Rh, Ir, Au, Ag, Pt, Zn, etc.)",
+            "oxidation_states": "List of integers [0], [1], [2], [0,2], etc."
         },
         "preformed_metal_catalyst": {
-            "metal": "Element symbol (e.g., Pd, Ni, Cu)",
+            "metal": "Element symbol (Pd, Ni, Cu, Co, Fe, Ru, Rh, Ir, Au, Ag, Pt, Zn)",
             "oxidation_states": "List of integers",
-            "ligand_type": "Optional string describing ligand coordination",
+            "ligand_type": ["phosphine", "NHC", "bipyridine", "phenanthroline", "pincer", "carboxylate", "other"]
         },
         "solvent": {
-            "proticity": ["aprotic", "protic"],
-            "polarity": ["polar", "nonpolar", "intermediate"],
-            "coordination": ["coordinating", "weakly_coordinating", "non_coordinating"],
+            "proticity": ["aprotic", "protic", "acidic", "basic"],
+            "polarity": ["very_low", "low", "medium", "high", "very_high"],
+            "coordination": ["non", "weak", "moderate", "strong"]
         },
         "ligand": {
-            "donors": "List of donor atoms (e.g., ['P'], ['N', 'N'], ['P', 'P'])",
-            "denticity": "Integer (1, 2, 3, 4, etc.)",
+            "donors": "List of donor atoms: ['P'], ['N','N'], ['P','P'], ['N','P'], etc.",
+            "denticity": "Integer (1=monodentate, 2=bidentate, 3=tridentate, etc.)"
         },
         "oxidant": {
-            "strength_band": ["weak", "moderate", "strong"],
+            "strength_band": ["weak", "moderate", "strong", "very_strong"]
         },
         "reductant": {
-            "strength_band": ["weak", "moderate", "strong"],
+            "strength_band": ["weak", "moderate", "strong", "very_strong"]
         },
         "condensation_agent": {
-            "strength_band": ["weak", "moderate", "strong"],
+            "strength_band": ["weak", "moderate", "strong"]
         },
         "acid": {
-            "acidity": ["weak", "moderate", "strong", "superacid"],
+            "acidity": ["very_weak", "weak", "medium", "strong", "very_strong"]
         },
         "organo_catalyst": {
-            "activation_mode": "String (e.g., 'lewis_base', 'phase_transfer', 'hydrogen_bonding')",
-            "chirality": ["achiral", "chiral"],
+            "activation_mode": ["enamine", "iminium", "brønsted_acid", "hydrogen_bonding", "radical", "other"],
+            "chirality": ["achiral", "racemic", "single_enantiomer"]
         },
         "enzyme": {
-            "source": "String (e.g., 'bacterial', 'fungal', 'mammalian', 'plant')",
-            "cofactor_requirement": "String or null",
+            "source": ["isolated", "whole_cell", "engineered", "other"],
+            "cofactor_requirement": ["none", "metal", "organic", "multiple"]
         },
+        "additive": {},  # No required fields beyond families
+        "other_reagent": {}  # No required fields beyond families
     }
     
-    schema = field_schemas.get(role, {})
+    # Try to load actual schema
+    if schema_path.exists():
+        try:
+            import re
+            schema_text = schema_path.read_text(encoding="utf-8")
+            # Remove comments (JSON doesn't support comments natively)
+            schema_text = re.sub(r'//.*', '', schema_text)
+            schema_data = json.loads(schema_text)
+            
+            if "roles" in schema_data and role in schema_data["roles"]:
+                role_schema = schema_data["roles"][role]
+                # Extract field definitions (skip 'families' which is always present)
+                fields = {k: v for k, v in role_schema.items() if k != "families"}
+                return fields if fields else default_schemas.get(role, {})
+        except Exception:
+            pass  # Fall back to defaults
+    
+    return default_schemas.get(role, {})
+
+
+def _format_fields_schema(role: str, registry_dir: Path) -> str:
+    """Format field schema with allowed values from actual reagent schema."""
+    schema = _load_schema_for_role(role, registry_dir)
+    
     if not schema:
-        return "No required fields"
+        return "No required fields beyond families"
     
     lines = []
     for field_name, allowed_values in schema.items():
         if isinstance(allowed_values, list):
+            # Enumerated values
             values_str = " | ".join(f'"{v}"' for v in allowed_values)
             lines.append(f'- **{field_name}**: {values_str}')
+        elif isinstance(allowed_values, str):
+            # Description or free-form field
+            if "|" in allowed_values:
+                # Pipe-separated options in string format
+                lines.append(f'- **{field_name}**: {allowed_values}')
+            else:
+                # Free-form description
+                lines.append(f'- **{field_name}**: {allowed_values}')
         else:
-            lines.append(f'- **{field_name}**: {allowed_values}')
+            # Unknown format
+            lines.append(f'- **{field_name}**: {str(allowed_values)}')
     
-    return "\n".join(lines)
+    return "\n".join(lines) if lines else "No required fields beyond families"
 
 
 def _get_example_entries(role: str, family: Optional[str], registry_dir: Path, limit: int = 2) -> str:
@@ -311,23 +367,8 @@ def assign_fields(
     # Format prompt components
     families_desc = _format_families_description(role_families)
     
-    # Get expected fields for this role (from ROLE_PAYLOAD_FIELDS)
-    # Hardcoded for now, ideally would import from reagent_taxonomy_qt.py
-    field_names_map = {
-        "base": ["basicity", "nucleophilicity", "sterics"],
-        "metal_precursor": ["metal", "oxidation_states"],
-        "preformed_metal_catalyst": ["metal", "oxidation_states", "ligand_type"],
-        "solvent": ["proticity", "polarity", "coordination"],
-        "ligand": ["donors", "denticity"],
-        "oxidant": ["strength_band"],
-        "reductant": ["strength_band"],
-        "condensation_agent": ["strength_band"],
-        "acid": ["acidity"],
-        "organo_catalyst": ["activation_mode", "chirality"],
-        "enzyme": ["source", "cofactor_requirement"],
-    }
-    field_names = field_names_map.get(role, [])
-    fields_schema = _format_fields_schema(role, field_names, registry_dir)
+    # Get field schema from actual reagent_schema.json
+    fields_schema = _format_fields_schema(role, registry_dir)
     
     examples = _get_example_entries(role, None, registry_dir, limit=2)
     

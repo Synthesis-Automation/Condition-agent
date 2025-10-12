@@ -16,8 +16,8 @@
     "base": {
       "families": ["carbonate_inorganic","alkoxide","organic_amine_secondary"],
       "basicity": "weak|moderate|strong|superbase",
-      "nucleophilicity": "low|medium|high",
-      "sterics": "unhindered|hindered|bulky"
+      "nucleophilicity": "weak|moderate|strong",
+      "sterics": "unhindered|moderate|hindered"
     },
     "acid": {
       "families": ["sulfonic","carboxylic_aromatic","mineral"],
@@ -25,11 +25,11 @@
     },
     "oxidant": {
       "families": ["peroxide","hypervalent_iodine","mode_set","mode_oat","mode_hat"],
-      "strength_band": "low|medium|high|very_high"
+      "strength_band": "weak|moderate|strong|very_strong"
     },
     "reductant": {
       "families": ["silane","borohydride","hantzsch_ester","mode_hydride","mode_set","mode_pcet","mode_hat"],
-      "strength_band": "low|medium|high|very_high"
+      "strength_band": "weak|moderate|strong|very_strong"
     },
     "solvent": {
       "families": ["aprotic_aromatic_lowpolarity","protic_alcohol_medium","polar_aprotic_strongly_coordinating"],
@@ -68,7 +68,7 @@
 
     "condensation_agent": {
       "families": ["carbodiimide","uronium","phosphonium","imidazolium","sulfonyl_chloride","other"],
-      "strength_band": "low|medium|high"
+      "strength_band": "weak|moderate|strong"
     },
 
     "other_reagent": {
