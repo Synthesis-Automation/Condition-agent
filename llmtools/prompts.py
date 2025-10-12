@@ -206,6 +206,74 @@ Provide final recommendation with justification.
 
 
 # =============================================================================
+# REAGENT REGISTRY REVIEW
+# =============================================================================
+
+REAGENT_REGISTRY_REVIEW = PromptTemplate(
+    template="""You are an expert chemical data curator helping vet entries for a reagent taxonomy database.
+
+Review the proposed registry entry and respond in JSON only. Do not include any additional commentary.
+
+## Reagent Identity
+- Name: {name}
+- CAS: {cas}
+- Synonyms: {synonyms}
+- Abbreviations: {abbreviations}
+
+## Deterministic Resolution
+- Resolver source: {resolver_source}
+- Resolver name: {resolver_name}
+- Resolver SMILES: {resolver_smiles}
+- Token hits for family: {family_tokens}
+- Default family used: {used_default_family}
+- Debug notes: {debug_log}
+
+## Proposed Assignment
+- Role: {role}
+- Family ID: {family_id}
+- Family definition: {family_definition}
+- Family notes: {family_notes}
+- Family keywords: {family_keywords}
+- Family examples: {family_examples}
+
+## Existing Conflicts
+- Already in registry (same role): {existing_same_role}
+- Already in registry (other roles): {existing_other_roles}
+
+Respond with strict JSON using this schema:
+{{
+  "status": "confirm" | "needs_review" | "reject",
+  "proposed_role": "string",
+  "proposed_family": "string",
+  "confidence": 0-1 float,
+  "justification": "short explanation",
+  "alerts": ["list of warnings or required actions"],
+  "suggested_synonyms": ["list of additional synonyms (if any)"]
+}}
+
+If you are uncertain or data is inconsistent, set status to "needs_review" and include alerts explaining why.
+If the deterministic assignment appears wrong, set status to "reject" and provide the corrected role/family you recommend.
+""",
+    synonyms="None provided",
+    abbreviations="[]",
+    resolver_source="Unknown",
+    resolver_name="Unknown",
+    resolver_smiles="Unknown",
+    family_tokens="[]",
+    used_default_family=False,
+    debug_log="[]",
+    role="Unknown",
+    family_id="Unknown",
+    family_definition="Definition not available",
+    family_notes="Notes not available",
+    family_keywords="[]",
+    family_examples="[]",
+    existing_same_role="None",
+    existing_other_roles="None",
+)
+
+
+# =============================================================================
 # SAFETY ASSESSMENT
 # =============================================================================
 
@@ -361,6 +429,7 @@ def get_template(name: str) -> PromptTemplate:
         "mechanism": MECHANISM_EXPLANATION,
         "literature": LITERATURE_SEARCH,
         "reagent_selection": REAGENT_SELECTION,
+        "reagent_registry_review": REAGENT_REGISTRY_REVIEW,
         "safety": SAFETY_ASSESSMENT,
         "troubleshooting": TROUBLESHOOTING,
         "spectroscopy": SPECTROSCOPY_INTERPRETATION,

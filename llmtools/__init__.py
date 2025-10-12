@@ -38,10 +38,18 @@ __version__ = "0.1.0"
 
 from llmtools.clients import LLMClient, build_client
 from llmtools.agents import ChemistryAgent
+from llmtools.reagent_review import (
+    LLMReviewOptions,
+    build_review_prompt,
+    review_taxonomy_proposal,
+)
 
 __all__ = [
     "LLMClient",
     "build_client",
     "ChemistryAgent",
+    "LLMReviewOptions",
+    "build_review_prompt",
+    "review_taxonomy_proposal",
     "__version__",
 ]
