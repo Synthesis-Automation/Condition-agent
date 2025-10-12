@@ -1,0 +1,723 @@
+{
+  "meta": {
+    "generated_at": "2025-10-12T15:55:15.935139Z",
+    "model": "ML-precedent-knn",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 1374.81
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1",
+    "family": "C_N_Coupling_Cu",
+    "requested_reaction_type": "C_N_Coupling_Cu",
+    "requested_family": "C_N_Coupling_Cu"
+  },
+  "detection": {
+    "family": "C_N_Coupling_Cu",
+    "detected_reaction_type": "C_N_Coupling_Cu",
+    "method": "rxn-insight-ml",
+    "confidence": 0.76
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "NCc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "2897656-97-0",
+          "role": "ligand",
+          "name": "2897656-97-0",
+          "abbreviation": null,
+          "cas": "2897656-97-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "124-41-4",
+          "role": "base",
+          "name": "Sodium methoxide",
+          "abbreviation": null,
+          "cas": "124-41-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "67-68-5",
+          "role": "solvent",
+          "name": "Dimethyl sulfoxide",
+          "abbreviation": null,
+          "cas": "67-68-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 1
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "NCc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "2897656-97-0",
+          "role": "ligand",
+          "name": "2897656-97-0",
+          "abbreviation": null,
+          "cas": "2897656-97-0",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 4
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "NCc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "2897656-97-0",
+          "role": "ligand",
+          "name": "2897656-97-0",
+          "abbreviation": null,
+          "cas": "2897656-97-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "68-12-2",
+          "role": "solvent",
+          "name": "N,N-Dimethylformamide",
+          "abbreviation": null,
+          "cas": "68-12-2",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 1
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "NCc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "2897656-97-0",
+          "role": "ligand",
+          "name": "2897656-97-0",
+          "abbreviation": null,
+          "cas": "2897656-97-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "1310-73-2",
+          "role": "base",
+          "name": "Sodium hydroxide",
+          "abbreviation": null,
+          "cas": "1310-73-2",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "64-17-5",
+          "role": "solvent",
+          "name": "Ethanol",
+          "abbreviation": null,
+          "cas": "64-17-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 1
+    },
+    {
+      "rank": 5,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "NCc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "2897656-97-0",
+          "role": "ligand",
+          "name": "2897656-97-0",
+          "abbreviation": null,
+          "cas": "2897656-97-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "534-17-8",
+          "role": "base",
+          "name": "Cesium carbonate",
+          "abbreviation": null,
+          "cas": "534-17-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "75-05-8",
+          "role": "solvent",
+          "name": "Acetonitrile",
+          "abbreviation": null,
+          "cas": "75-05-8",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 1
+    }
+  ],
+  "precedents_used": {
+    "total_count": 10,
+    "top_precedents": [
+      {
+        "rank": 1,
+        "reaction_id": "31-614-CAS-39895243",
+        "reaction_smiles": "Brc1ccccc1.C1COCCN1>>c1ccc(N2CCOCC2)cc1",
+        "core": "Cu",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "2897656-97-0",
+            "cas": "2897656-97-0",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Sodium methoxide",
+            "cas": "124-41-4",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Dimethyl sulfoxide",
+            "cas": "67-68-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Room-Temperature Cu-Catalyzed Amination of Aryl Bromides Enabled by DFT-Guided Ligand Design | Kim, Seoung-Tae; Strauss, Michael J.; Cabre, Albert; Buchwald, Stephen L. | Journal of the American Chemical Society (2023), 145(12), 6966-6975"
+      },
+      {
+        "rank": 2,
+        "reaction_id": "31-614-CAS-24285552",
+        "reaction_smiles": "Brc1ccccc1.C1COCCN1>>c1ccc(N2CCOCC2)cc1",
+        "core": "Pd",
+        "yield": 98.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "7440-50-8",
+            "cas": "7440-50-8",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium tert-butoxide",
+            "cas": "865-47-4",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "p-Xylene",
+            "cas": "106-42-3"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 98.0
+        },
+        "reference": "Product selective reaction controlled by the combination of palladium nanoparticles, continuous microwave irradiation and a co-existing solid; ligand-free Buchwald-Hartwig amination vs. aryne amination | Yamada, Makito; Ohta, Ryousuke; Harada, Kazuo; Takehara, Tsunayoshi; Haneoka, Hitoshi; Murakami, Yosuke; Suzuki, Takeyuki; Ohki, Yuuta; Takahashi, Naoyuki; Akiyama, Toshiki; Sirimangkalakitti, Natchanun; Sako, Makoto; Murai, Kenichi; Arai, Masayoshi; Arisawa, Mitsuhiro | Green Chemistry (2021), 23(20), 8131-8137"
+      },
+      {
+        "rank": 3,
+        "reaction_id": "31-614-CAS-41175790",
+        "reaction_smiles": "Brc1ccccc1.C1CCCNCC1>>c1ccc(N2CCCCCC2)cc1",
+        "core": "Cu/L-Proline",
+        "yield": 77.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "L-Proline",
+            "cas": "147-85-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Dimethyl sulfoxide",
+            "cas": "67-68-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 77.0
+        },
+        "reference": "α-Amino bicycloalkylation through organophotoredox catalysis | Nugent, Jeremy; Lopez-Frances, Adrian; Sterling, Alistair J.; Tay, Min Yi; Frank, Nils; Mousseau, James J.; Duarte, Fernanda; Anderson, Edward A. | Chemical Science (2024), 15(28), 10918-10925"
+      },
+      {
+        "rank": 4,
+        "reaction_id": "31-614-CAS-42120041",
+        "reaction_smiles": "Brc1ccccc1.Cc1ccc(C)c2c1CNCCC2C(=O)O>>Cc1ccc(C)c2c1CN(c1ccccc1)CCC2C(=O)O",
+        "core": "Cu",
+        "yield": 80.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Pyridine",
+            "cas": "110-86-1",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "N,N-Dimethylformamide",
+            "cas": "68-12-2"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 80.0
+        },
+        "reference": "Friedel-Crafts Chemistry. Part 63. Syntheses of some condensed N-heterocyclic systems via combined Darzens and Friedel-Crafts approaches | Abd El-Aal, Hassan A. K.; Khalaf, Ali A. | ARKIVOC (Gainesville, FL, United States) (2024), (8), 202412254"
+      },
+      {
+        "rank": 5,
+        "reaction_id": "31-614-CAS-34896350",
+        "reaction_smiles": "Brc1ccccc1.C1CCNC1>>c1ccc(N2CCCC2)cc1",
+        "core": "Cu",
+        "yield": 58.0,
+        "catalysts": [
+          {
+            "name": "Copper(II) acetate",
+            "cas": "142-71-2",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "2869174-88-7",
+            "cas": "2869174-88-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 58.0
+        },
+        "reference": "Functionalized imidazolium salt: an efficient catalyst for Buchwald-Hartwig type C-N cross-coupling of (hetero)aryl chlorides/bromides with amines under solvent-, inert gas-, and base-free ambience | Gautam, Deepak; Gahlaut, Puneet Singh; Yadav, Kapil; Jana, Barun | New Journal of Chemistry (2022), 46(47), 22841-22848"
+      },
+      {
+        "rank": 6,
+        "reaction_id": "31-614-CAS-34896368",
+        "reaction_smiles": "Brc1ccccc1.C1COCCN1>>c1ccc(N2CCOCC2)cc1",
+        "core": "Cu",
+        "yield": 56.0,
+        "catalysts": [
+          {
+            "name": "Copper(II) acetate",
+            "cas": "142-71-2",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "2869174-88-7",
+            "cas": "2869174-88-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 56.0
+        },
+        "reference": "Functionalized imidazolium salt: an efficient catalyst for Buchwald-Hartwig type C-N cross-coupling of (hetero)aryl chlorides/bromides with amines under solvent-, inert gas-, and base-free ambience | Gautam, Deepak; Gahlaut, Puneet Singh; Yadav, Kapil; Jana, Barun | New Journal of Chemistry (2022), 46(47), 22841-22848"
+      },
+      {
+        "rank": 7,
+        "reaction_id": "31-614-CAS-34896359",
+        "reaction_smiles": "Brc1ccccc1.C1CCNCC1>>c1ccc(N2CCCCC2)cc1",
+        "core": "Cu",
+        "yield": 55.0,
+        "catalysts": [
+          {
+            "name": "Copper(II) acetate",
+            "cas": "142-71-2",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "2869174-88-7",
+            "cas": "2869174-88-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 55.0
+        },
+        "reference": "Functionalized imidazolium salt: an efficient catalyst for Buchwald-Hartwig type C-N cross-coupling of (hetero)aryl chlorides/bromides with amines under solvent-, inert gas-, and base-free ambience | Gautam, Deepak; Gahlaut, Puneet Singh; Yadav, Kapil; Jana, Barun | New Journal of Chemistry (2022), 46(47), 22841-22848"
+      },
+      {
+        "rank": 8,
+        "reaction_id": "31-614-CAS-32327425",
+        "reaction_smiles": "S=C1NCCS1.Brc1ccccc1>>S=C1SCCN1c1ccccc1",
+        "core": "Cu",
+        "yield": 67.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Sodium hydroxide",
+            "cas": "1310-73-2",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 67.0
+        },
+        "reference": "Synthesis and biological evaluation of thiazolidine-2-thione derivatives as novel xanthine oxidase inhibitors | Wang, Mu-Xuan; Qin, Hong-Wei; Liu, Chao; Lv, Shen-Ming; Chen, Jia-Shu; Wang, Chun-Gu; Chen, Ying-Ying; Wang, Jia-Wei; Sun, Jin-Yue; Liao, Zhi-Xin | PLoS One (2022), 17(5), e0268531"
+      },
+      {
+        "rank": 9,
+        "reaction_id": "31-614-CAS-34896365",
+        "reaction_smiles": "NCCc1ccccc1.Brc1ccccc1.C1CCNC1>>c1ccc(CCNc2ccccc2)cc1.c1ccc(N2CCCC2)cc1",
+        "core": "Cu",
+        "yield": 50.0,
+        "catalysts": [
+          {
+            "name": "Copper(II) acetate",
+            "cas": "142-71-2",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "2869174-88-7",
+            "cas": "2869174-88-7",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 50.0
+        },
+        "reference": "Functionalized imidazolium salt: an efficient catalyst for Buchwald-Hartwig type C-N cross-coupling of (hetero)aryl chlorides/bromides with amines under solvent-, inert gas-, and base-free ambience | Gautam, Deepak; Gahlaut, Puneet Singh; Yadav, Kapil; Jana, Barun | New Journal of Chemistry (2022), 46(47), 22841-22848"
+      },
+      {
+        "rank": 10,
+        "reaction_id": "31-614-CAS-34342111",
+        "reaction_smiles": "Cc1ccc(Br)cc1.C1CNCCN1>>Cc1ccc(N2CCNCC2)cc1",
+        "core": "Cu",
+        "yield": 82.0,
+        "catalysts": [
+          {
+            "name": "Copper oxide (Cu2O)",
+            "cas": "1317-39-1",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "85721-33-1",
+            "cas": "85721-33-1",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Cesium carbonate",
+            "cas": "534-17-8",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Acetonitrile",
+            "cas": "75-05-8"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 82.0
+        },
+        "reference": "A recyclable ciprofloxacin polymer ligand for copper-catalyzed coupling of (hetero)aryl halide aminations | Song, Dake; Qin, Yi; Liu, Ying; Wang, Jifan; Yang, Haijie; Zheng, Zhonghui; Xu, Feng; Bao, Xuefei; Chen, Guoliang | New Journal of Chemistry (2022), 46(40), 19100-19103"
+      }
+    ],
+    "core_matched_precedents": {
+      "core": "Cu",
+      "count": 8,
+      "examples": [
+        {
+          "rank": 1,
+          "reaction_id": "31-614-CAS-39895243",
+          "core": "Cu",
+          "base": "124-41-4",
+          "solvent": "67-68-5",
+          "yield": 99.0
+        },
+        {
+          "rank": 2,
+          "reaction_id": "31-614-CAS-42120041",
+          "core": "Cu",
+          "base": "584-08-7",
+          "solvent": "68-12-2",
+          "yield": 80.0
+        },
+        {
+          "rank": 3,
+          "reaction_id": "31-614-CAS-34896350",
+          "core": "Cu",
+          "base": null,
+          "solvent": null,
+          "yield": 58.0
+        },
+        {
+          "rank": 4,
+          "reaction_id": "31-614-CAS-34896368",
+          "core": "Cu",
+          "base": null,
+          "solvent": null,
+          "yield": 56.0
+        },
+        {
+          "rank": 5,
+          "reaction_id": "31-614-CAS-34896359",
+          "core": "Cu",
+          "base": null,
+          "solvent": null,
+          "yield": 55.0
+        }
+      ]
+    },
+    "statistics": {
+      "average_yield": 72.2,
+      "yield_range": [
+        50.0,
+        99.0
+      ],
+      "temperature_range": null,
+      "time_range": null
+    }
+  }
+}
