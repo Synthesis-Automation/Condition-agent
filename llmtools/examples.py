@@ -208,10 +208,10 @@ def main():
         example_1_basic_client()
         
         # Uncomment to run more examples (costs tokens!)
-        # example_2_condition_recommendation()
-        # example_3_mechanism_explanation()
-        # example_4_troubleshooting()
-        # example_5_protocol_generation()
+        example_2_condition_recommendation()
+        example_3_mechanism_explanation()
+        example_4_troubleshooting()
+        example_5_protocol_generation()
         
         print("\n" + "="*70)
         print("Examples completed!")
