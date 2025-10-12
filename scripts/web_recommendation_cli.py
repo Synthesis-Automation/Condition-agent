@@ -3,16 +3,17 @@ Interactive Recommendation Tester
 =================================
 
 This script prompts for a reaction SMILES and lets you choose a reaction
-family (or auto-detect). It exercises three recommendation modes
-(rule-based, ML, fusion), saves their JSON responses, and prints a compact
-summary to the console.
+family (or auto-detect). It exercises four recommendation modes
+(rule-based, ML, fusion, protocol), saves their JSON responses, and prints
+a compact summary to the console.
 
 Usage:
-    python scripts/interactive_recommendation_cli.py
+    python scripts/web_recommendation_cli.py
 
 Requirements:
     - FastAPI server running (default: http://localhost:8000)
     - requests package installed
+    - Protocol index built (python -m chemtools.protocol.cli build)
 """
 
 from __future__ import annotations
@@ -43,6 +44,7 @@ try:
         summarize_fusion,
         summarize_ml,
         summarize_rule,
+        summarize_protocol,
     )
 except ModuleNotFoundError:
     sys.path.append(str(HERE))
@@ -58,6 +60,7 @@ except ModuleNotFoundError:
         summarize_fusion,
         summarize_ml,
         summarize_rule,
+        summarize_protocol,
     )
 
 
@@ -201,6 +204,66 @@ def call_fusion_recommendation(
         }
 
 
+def call_protocol_recommendation(
+    base_url: str,
+    reaction: str,
+    k: int,
+    tags: Optional[list] = None,
+) -> Dict[str, Any]:
+    """
+    Execute the protocol recommendation endpoint.
+    
+    Calls the local protocol module directly since there's no API endpoint yet.
+    Returns standard JSON format matching other recommendation modes.
+    """
+    # Import here to avoid dependency if not using protocol mode
+    try:
+        import sys
+        from pathlib import Path
+        ROOT = Path(__file__).resolve().parent.parent
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        
+        from chemtools.protocol import ProtocolRecommender
+        
+        try:
+            # Use local protocol recommendation
+            recommender = ProtocolRecommender()
+            result = recommender.recommend_with_details(
+                reaction_smiles=reaction,
+                k=k,
+                tags=tags,
+                reaction_family=None,  # Auto-detect from similarity
+                use_standard_format=True
+            )
+            return result
+        except FileNotFoundError as exc:
+            return {
+                "error": f"Protocol index not found. Run: python -m chemtools.protocol.cli build",
+                "details": str(exc),
+                "meta": {
+                    "model": "Protocol-DRFP",
+                    "status": "error"
+                }
+            }
+        except Exception as exc:
+            return {
+                "error": f"Protocol recommendation failed: {exc}",
+                "meta": {
+                    "model": "Protocol-DRFP",
+                    "status": "error"
+                }
+            }
+    except ImportError:
+        return {
+            "error": "Protocol recommendation not available. Install with: pip install drfp",
+            "meta": {
+                "model": "Protocol-DRFP",
+                "status": "error"
+            }
+        }
+
+
 def main() -> None:
     """Main entry point with optional command-line arguments."""
     import argparse
@@ -279,8 +342,8 @@ Examples:
         "--strategy",
         type=str,
         default="all",
-        choices=["all", "rule", "ml", "fusion"],
-        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated."
+        choices=["all", "rule", "ml", "fusion", "protocol"],
+        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated, use --rerank rule instead."
     )
     
     parser.add_argument(
@@ -298,6 +361,13 @@ Examples:
         help="Filter out precedents with unknown base/solvent reagents (not in database)"
     )
     
+    parser.add_argument(
+        "--protocol-tags",
+        type=str,
+        default=None,
+        help="Comma-separated tags to filter protocols (e.g., 'suzuki,palladium')"
+    )
+    
     args = parser.parse_args()
     
     print("Interactive Recommendation Test")
@@ -305,9 +375,14 @@ Examples:
 
     base_url = args.url
     print(f"Base URL: {base_url}")
-    if not health_check(base_url):
-        print("Aborting due to failed health check.")
-        return
+    
+    # Skip health check if only running protocol (it uses local module)
+    if args.strategy != "protocol":
+        if not health_check(base_url):
+            print("Aborting due to failed health check.")
+            return
+    else:
+        print("Protocol mode: using local module (no server required)")
 
     # Get reaction SMILES - from args or prompt
     if args.rxn:
@@ -355,10 +430,12 @@ Examples:
     run_rule = args.strategy in ["all", "rule"]
     run_ml = args.strategy in ["all", "ml"]
     run_fusion = args.strategy in ["all", "fusion"]
+    run_protocol = args.strategy in ["all", "protocol"]
     
     rule_result = None
     ml_result = None
     fusion_result = None
+    protocol_result = None
     
     if run_rule:
         rule_result = call_rule_based(base_url, reaction, db_path)
@@ -379,6 +456,20 @@ Examples:
     if run_fusion:
         fusion_result = call_fusion_recommendation(base_url, reaction, k_value, fusion_variants)
         fusion_file = save_to_dir(fusion_result, f"{timestamp}_{label}_fusion.json")
+    
+    if run_protocol:
+        # Parse protocol tags if provided
+        protocol_tags = None
+        if args.protocol_tags:
+            protocol_tags = [tag.strip() for tag in args.protocol_tags.split(',')]
+        
+        protocol_result = call_protocol_recommendation(
+            base_url=base_url,
+            reaction=reaction,
+            k=k_value,
+            tags=protocol_tags
+        )
+        protocol_file = save_to_dir(protocol_result, f"{timestamp}_{label}_protocol.json")
 
     print("Summary\n-------")
     
@@ -392,14 +483,20 @@ Examples:
     
     if fusion_result:
         summarize_fusion(fusion_result)
+        print()
+    
+    if protocol_result:
+        summarize_protocol(protocol_result)
 
     print("\nSaved outputs:")
     if run_rule:
-        print(f"  Rule JSON:   {rule_file}")
+        print(f"  Rule JSON:     {rule_file}")
     if run_ml:
-        print(f"  ML JSON:     {ml_file}")
+        print(f"  ML JSON:       {ml_file}")
     if run_fusion:
-        print(f"  Fusion JSON: {fusion_file}")
+        print(f"  Fusion JSON:   {fusion_file}")
+    if run_protocol:
+        print(f"  Protocol JSON: {protocol_file}")
     
     print("\nDone.")
 

@@ -7,7 +7,7 @@ Similar to the ML-based recommendation system but for experimental protocols.
 This module:
 1. Loads the protocol index (with DRFP fingerprints)
 2. Computes DRFP similarity between query reaction and all protocols
-3. Returns top-k most similar protocols
+3. Returns top-k most similar protocols in standard JSON format
 4. Optionally filters by reaction family and tags
 
 Usage:
@@ -20,16 +20,24 @@ Usage:
         k=5
     )
     
-    for match in results['matches']:
-        print(f"{match['similarity']:.3f}: {match['source_title']}")
+    # Standard output format with meta, input, detection, recommended_conditions
+    for rec in results['recommended_conditions']:
+        print(f"Rank {rec['rank']}: {rec['protocol']['title']}")
 """
 
 import logging
+import time
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import json
 
 from .indexer import ProtocolIndexer, ProtocolRecord
+
+try:
+    from ..output_formatter import format_meta, format_input, format_detection
+    HAS_OUTPUT_FORMATTER = True
+except ImportError:
+    HAS_OUTPUT_FORMATTER = False
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +88,8 @@ class ProtocolRecommender:
         k: int = 5,
         reaction_family: Optional[str] = None,
         tags: Optional[List[str]] = None,
-        min_similarity: float = 0.0
+        min_similarity: float = 0.0,
+        use_standard_format: bool = True
     ) -> Dict[str, Any]:
         """
         Find top-k most similar protocols for a reaction
@@ -91,41 +100,94 @@ class ProtocolRecommender:
             reaction_family: Optional family filter (e.g., 'Suzuki')
             tags: Optional tag filter (match ANY tag)
             min_similarity: Minimum similarity threshold (0.0-1.0)
+            use_standard_format: Return standard JSON format (default: True)
         
         Returns:
-            Dictionary with:
+            Dictionary with standard format:
+                - meta: Model metadata and timing
+                - input: Query information
+                - detection: Reaction type detection
+                - recommended_conditions: List of protocol recommendations
+                
+            Or legacy format if use_standard_format=False:
                 - matches: List of protocol matches with similarity scores
                 - query: Query information
                 - metadata: Search metadata
         """
+        start_time = time.time()
+        
         # Compute DRFP for query reaction
         try:
             query_drfp = self._compute_drfp(reaction_smiles)
         except Exception as e:
             logger.error(f"Failed to compute DRFP for query: {e}")
-            return {
-                'matches': [],
-                'query': {'reaction_smiles': reaction_smiles},
-                'metadata': {'error': str(e)}
-            }
+            
+            if use_standard_format and HAS_OUTPUT_FORMATTER:
+                return {
+                    'meta': format_meta(
+                        model_type='Protocol-DRFP',
+                        status='error',
+                        processing_time_ms=(time.time() - start_time) * 1000
+                    ),
+                    'input': format_input(reaction_smiles=reaction_smiles),
+                    'detection': format_detection(
+                        detected_type='unknown',
+                        confidence=None,
+                        method='protocol-similarity'
+                    ),
+                    'recommended_conditions': [],
+                    'extras': {'error': str(e)}
+                }
+            else:
+                return {
+                    'matches': [],
+                    'query': {'reaction_smiles': reaction_smiles},
+                    'metadata': {'error': str(e)}
+                }
         
         # Get candidate protocols (filter by family/tags if specified)
         candidates = self._get_candidates(reaction_family, tags)
         
         if not candidates:
-            return {
-                'matches': [],
-                'query': {
-                    'reaction_smiles': reaction_smiles,
-                    'family': reaction_family,
-                    'tags': tags
-                },
-                'metadata': {
-                    'num_candidates': 0,
-                    'num_total_protocols': len(self.indexer.records),
-                    'message': 'No candidates found matching filters'
+            processing_time_ms = (time.time() - start_time) * 1000
+            
+            if use_standard_format and HAS_OUTPUT_FORMATTER:
+                return {
+                    'meta': format_meta(
+                        model_type='Protocol-DRFP',
+                        status='success',
+                        processing_time_ms=processing_time_ms
+                    ),
+                    'input': format_input(
+                        reaction_smiles=reaction_smiles,
+                        requested_reaction_type=reaction_family
+                    ),
+                    'detection': format_detection(
+                        detected_type=reaction_family or 'unknown',
+                        confidence=0.0,
+                        method='protocol-similarity'
+                    ),
+                    'recommended_conditions': [],
+                    'extras': {
+                        'num_candidates': 0,
+                        'num_total_protocols': len(self.indexer.records),
+                        'message': 'No candidates found matching filters'
+                    }
                 }
-            }
+            else:
+                return {
+                    'matches': [],
+                    'query': {
+                        'reaction_smiles': reaction_smiles,
+                        'family': reaction_family,
+                        'tags': tags
+                    },
+                    'metadata': {
+                        'num_candidates': 0,
+                        'num_total_protocols': len(self.indexer.records),
+                        'message': 'No candidates found matching filters'
+                    }
+                }
         
         # Compute similarities
         similarities = []
@@ -151,6 +213,109 @@ class ProtocolRecommender:
         # Take top-k
         top_matches = similarities[:k]
         
+        processing_time_ms = (time.time() - start_time) * 1000
+        
+        # Return standard format or legacy format
+        if use_standard_format and HAS_OUTPUT_FORMATTER:
+            return self._format_standard_output(
+                reaction_smiles=reaction_smiles,
+                reaction_family=reaction_family,
+                tags=tags,
+                top_matches=top_matches,
+                num_candidates=len(candidates),
+                processing_time_ms=processing_time_ms
+            )
+        else:
+            return self._format_legacy_output(
+                reaction_smiles=reaction_smiles,
+                reaction_family=reaction_family,
+                tags=tags,
+                top_matches=top_matches,
+                num_candidates=len(candidates)
+            )
+    
+    def _format_standard_output(
+        self,
+        reaction_smiles: str,
+        reaction_family: Optional[str],
+        tags: Optional[List[str]],
+        top_matches: List[Dict[str, Any]],
+        num_candidates: int,
+        processing_time_ms: float
+    ) -> Dict[str, Any]:
+        """Format output in standard JSON format"""
+        # Build recommended_conditions array
+        recommended_conditions = []
+        
+        for rank, item in enumerate(top_matches, start=1):
+            record = item['record']
+            similarity = item['similarity']
+            
+            # Build protocol entry in standard format
+            protocol_rec = {
+                'rank': rank,
+                'confidence': round(similarity, 4),
+                'protocol': {
+                    'filename': record.filename,
+                    'title': record.source_title,
+                    'journal': record.source_journal,
+                    'year': record.source_year,
+                    'doi': record.source_doi,
+                    'url': record.source_url,
+                    'reaction_smiles': record.reaction_smiles,
+                    'reaction_family': record.reaction_family,
+                    'tags': record.tags,
+                    'notes': record.notes
+                },
+                'similarity': round(similarity, 4),
+                'source': 'protocol_database'
+            }
+            
+            recommended_conditions.append(protocol_rec)
+        
+        # Determine detected type from top match or use requested family
+        detected_type = reaction_family or 'unknown'
+        detection_confidence = None
+        
+        if top_matches:
+            # Use top match's family as detected type
+            detected_type = top_matches[0]['record'].reaction_family or detected_type
+            detection_confidence = top_matches[0]['similarity']
+        
+        return {
+            'meta': format_meta(
+                model_type='Protocol-DRFP',
+                status='success',
+                processing_time_ms=processing_time_ms,
+                model_version='1.0.0'
+            ),
+            'input': format_input(
+                reaction_smiles=reaction_smiles,
+                requested_reaction_type=reaction_family,
+                options={'k': len(top_matches), 'tags': tags} if tags else {'k': len(top_matches)}
+            ),
+            'detection': format_detection(
+                detected_type=detected_type,
+                confidence=detection_confidence,
+                method='protocol-similarity'
+            ),
+            'recommended_conditions': recommended_conditions,
+            'extras': {
+                'num_candidates': num_candidates,
+                'num_total_protocols': len(self.indexer.records),
+                'num_matches': len(top_matches)
+            }
+        }
+    
+    def _format_legacy_output(
+        self,
+        reaction_smiles: str,
+        reaction_family: Optional[str],
+        tags: Optional[List[str]],
+        top_matches: List[Dict[str, Any]],
+        num_candidates: int
+    ) -> Dict[str, Any]:
+        """Format output in legacy format (for backward compatibility)"""
         # Format results
         matches = []
         for item in top_matches:
@@ -178,10 +343,9 @@ class ProtocolRecommender:
                 'tags': tags
             },
             'metadata': {
-                'num_candidates': len(candidates),
-                'num_matches': len(similarities),
-                'num_total_protocols': len(self.indexer.records),
-                'min_similarity': min_similarity
+                'num_candidates': num_candidates,
+                'num_matches': len(top_matches),
+                'num_total_protocols': len(self.indexer.records)
             }
         }
     
@@ -357,6 +521,7 @@ class ProtocolRecommender:
         self,
         reaction_smiles: str,
         k: int = 5,
+        use_standard_format: bool = True,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -365,18 +530,37 @@ class ProtocolRecommender:
         Args:
             reaction_smiles: Query reaction SMILES
             k: Number of recommendations
+            use_standard_format: Return standard JSON format (default: True)
             **kwargs: Additional arguments for recommend()
         
         Returns:
-            Same as recommend() but with 'conditions' added to each match
+            Same as recommend() but with condition details added to each recommendation
+            
+            In standard format: 'conditions' added to each entry in 'recommended_conditions'
+            In legacy format: 'conditions' added to each entry in 'matches'
         """
-        results = self.recommend(reaction_smiles, k=k, **kwargs)
+        # Make sure use_standard_format is passed through
+        results = self.recommend(
+            reaction_smiles,
+            k=k,
+            use_standard_format=use_standard_format,
+            **kwargs
+        )
         
-        # Add detailed conditions to each match
-        for match in results['matches']:
-            protocol = self.get_protocol_details(match['filename'])
-            if protocol:
-                match['conditions'] = self.extract_conditions(protocol)
+        # Add detailed conditions to each match/recommendation
+        if use_standard_format and 'recommended_conditions' in results:
+            # Standard format
+            for rec in results['recommended_conditions']:
+                protocol_filename = rec['protocol']['filename']
+                protocol = self.get_protocol_details(protocol_filename)
+                if protocol:
+                    rec['conditions'] = self.extract_conditions(protocol)
+        elif 'matches' in results:
+            # Legacy format
+            for match in results['matches']:
+                protocol = self.get_protocol_details(match['filename'])
+                if protocol:
+                    match['conditions'] = self.extract_conditions(protocol)
         
         return results
 

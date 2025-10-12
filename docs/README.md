@@ -8,8 +8,9 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 - Rule-based family detection and router (`chemtools.router`) that drives the downstream recommendation flow.
 - Precedent search (`chemtools.precedent`) powered by DRFP similarity, Laplace-smoothed voting, and constraint filters (`chemtools.constraints`).
 - Deterministic condition recommendation core (`chemtools.recommend.core`) with optional ML re-ranking (`chemtools.ml`), fusion weighting, and plate design helpers.
+- **Protocol recommendation (`chemtools.protocol`)** powered by DRFP similarity search over experimental protocols with automatic condition extraction and standard JSON output.
 - Explanation packs (`chemtools.explain`) that summarize precedents, alternatives, and rule hits for API and UI consumption.
-- CLI utilities in `chemtools.rule_scdb_matcher.cli` for querying the Scheme Condition DB (SCDB).
+- CLI utilities in `chemtools.rule_scdb_matcher.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
 
 ## Quickstart
 
@@ -78,19 +79,38 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |   |-- constraints.py       # Constraint rule definitions
 |   |-- context.py           # Shared runtime configuration helpers
 |   |-- explain.py           # Explanation and rationale builders
+|   |-- output_formatter.py  # Standard JSON output formatting for all recommendation modes
 |   |-- features/            # Role-aware feature engineering
 |   |-- featurizers/         # Molecule and reaction featurizers (incl. Ullmann)
 |   |-- ml/                  # Optional ML models (DRFP predictor, fusion)
 |   |-- precedent/           # Precedent search, similarity, and loaders
+|   |-- protocol/            # Protocol recommendation (DRFP-based protocol search)
+|   |   |-- indexer.py       # Protocol indexing with DRFP fingerprints
+|   |   |-- recommend.py     # DRFP similarity-based protocol recommendation
+|   |   `-- cli.py           # CLI for protocol index management
 |   |-- recommend/           # Modular recommendation engine and plate design
 |   |-- rule_scdb_matcher/   # Scheme Condition DB tooling
 |   |-- router.py            # Reaction family detection and dispatch
 |   `-- smiles.py            # Reaction SMILES utilities
 |-- data/                    # Sample datasets (JSONL) used in demos/tests
+|   |-- protocol_db/         # Experimental protocol JSON files (Structured_Output_schema.json format)
+|   |   `-- .protocol_index.json  # Protocol index with precomputed DRFP fingerprints
+|   |-- registry_sample.jsonl     # Reagent registry snippets for CLI demo mode
+|   `-- reactions_sample.jsonl    # Compact reaction precedent data set for smoke testing
 |-- data-processor/          # QT utilities for reagent taxonomy demos
 |-- docs/                    # Project documentation (this README lives here)
+|   |-- API_DOCUMENTATION.md      # Endpoint details and example payloads
+|   |-- PROTOCOL_MODULE.md        # Protocol module technical documentation
+|   |-- PROTOCOL_OUTPUT_FORMAT.md # Protocol standard JSON output specification
+|   |-- PROTOCOL_QUICKSTART.md    # Protocol module 2-minute quick start
+|   |-- PROTOCOL_CLI_GUIDE.md     # Interactive CLI user guide
+|   `-- PROTOCOL_README.md        # Protocol module overview
 |-- scripts/                 # Developer helpers and DRFP precompute scripts
 |-- tests/                   # Pytest suite covering API and core modules
+|   |-- test_protocol_recommendation.py  # Protocol module tests
+|   `-- test_protocol_cli.py             # Interactive protocol CLI tester
+|-- run_protocol_cli.ps1     # PowerShell launcher for protocol CLI (Windows)
+|-- run_protocol_cli.bat     # Batch launcher for protocol CLI (Windows)
 `-- Makefile                 # Task shortcuts (install, run, test, registry, drfp-index)
 ```
 
@@ -114,9 +134,11 @@ See `docs/API_DOCUMENTATION.md` for detailed request examples and troubleshootin
 ## CLI and Scripts
 
 - `python -m chemtools.rule_scdb_matcher.cli`: search the Scheme Condition DB, supports CSV/JSONL output and demo mode.
+- `python -m chemtools.protocol.cli`: manage protocol index (build, stats, list-families, show-family, show-tag).
 - `make registry`: convenience wrapper for the CLI with flags such as `Q`, `FILE`, `JSONL`, `PRETTY`, and `DEMO`.
 - `scripts/precompute_drfp.py`: build DRFP NPZ bundles (`make drfp-index`, `make drfp-index-4096`) to warm caches at API startup.
 - `scripts/ui_gradio.py`: launch the browser UI for manual testing of the recommendation workflow.
+- `test_protocol_cli.py`: interactive CLI for testing protocol recommendations with reaction SMILES input.
 
 ## Data and Sample Assets
 
@@ -124,6 +146,8 @@ The project ships with small JSONL samples in `data/` to keep demos deterministi
 
 - `registry_sample.jsonl`: reagent registry snippets for CLI demo mode.
 - `reactions_sample.jsonl`: compact reaction precedent data set for smoke testing.
+- `protocol_db/*.json`: experimental protocol files following the Structured_Output_schema.json format (16 protocols currently indexed).
+- `protocol_db/.protocol_index.json`: precomputed protocol index with DRFP fingerprints for fast similarity search.
 
 Larger proprietary datasets should not be committed. Configure their paths via environment variables or local overrides.
 
@@ -142,11 +166,116 @@ ChemTools can run without RDKit for quick demos. Key environment variables:
 - `CHEMTOOLS_ATTACH_ROLE_AWARE=1` to include role-aware vectors during dataset loading.
 - `CHEMTOOLS_DRFPPATH=artifacts/drfp_index.npz` to preload a DRFP cache generated by `make drfp-index`.
 
+## Protocol Recommendation Module
+
+ChemTools now includes a **protocol recommendation system** that finds the most relevant experimental protocol for a given reaction using DRFP similarity search.
+
+### Key Features
+
+- **DRFP-based similarity**: Uses molecular fingerprints to match query reactions to experimental protocols
+- **Standard JSON output**: Returns the same format as ML-based and Rule-based recommendations (`meta`, `input`, `detection`, `recommended_conditions`)
+- **Fast indexing**: Precomputes DRFP fingerprints for instant search (~100ms per query)
+- **Flexible filtering**: Filter protocols by reaction family and tags
+- **Condition extraction**: Automatically extracts catalyst, ligand, base, solvent, temperature, time, and atmosphere
+- **CLI tools**: Command-line interface for index management and interactive testing
+
+### Quick Start
+
+```bash
+# Build the protocol index (one-time setup)
+python -m chemtools.protocol.cli build
+
+# View index statistics
+python -m chemtools.protocol.cli stats
+
+# Test interactively (Windows)
+.\run_protocol_cli.ps1
+
+# Or use Python directly
+python test_protocol_cli.py
+```
+
+### Python API
+
+```python
+from chemtools.protocol import ProtocolRecommender
+
+# Initialize (loads index)
+recommender = ProtocolRecommender()
+
+# Get top-3 similar protocols (standard JSON format)
+results = recommender.recommend(
+    reaction_smiles='CCBr.c1ccccc1B(O)O>>CCc1ccccc1',
+    k=3
+)
+
+# Access results using standard format
+print(f"Model: {results['meta']['model']}")  # "Protocol-DRFP"
+print(f"Detected family: {results['detection']['family']}")
+print(f"Confidence: {results['detection']['confidence']:.3f}")
+
+for rec in results['recommended_conditions']:
+    protocol = rec['protocol']
+    print(f"Rank {rec['rank']}: {protocol['title']}")
+    print(f"  Similarity: {rec['similarity']:.3f}")
+    print(f"  DOI: {protocol['doi']}")
+```
+
+### Output Format
+
+The protocol module returns **standard JSON format** compatible with ML-based and Rule-based recommendations:
+
+```json
+{
+  "meta": {
+    "model": "Protocol-DRFP",
+    "status": "success",
+    "processing_time_ms": 1702.6
+  },
+  "input": {
+    "reaction_smiles": "...",
+    "options": {"k": 3}
+  },
+  "detection": {
+    "family": "Suzuki_Cu_alkyl_halide+aryl_boron",
+    "confidence": 0.8018,
+    "method": "protocol-similarity"
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "confidence": 0.8018,
+      "protocol": {
+        "filename": "Suzuki_Cu_C(sp3)-C(sp2).json",
+        "title": "Copper-Catalyzed Suzuki-Miyaura Coupling...",
+        "doi": "10.15227/orgsyn.102.0086",
+        ...
+      },
+      "similarity": 0.8018,
+      "source": "protocol_database"
+    }
+  ],
+  "extras": {
+    "num_candidates": 16,
+    "num_total_protocols": 16
+  }
+}
+```
+
+### Documentation
+
+See `docs/PROTOCOL_MODULE.md` for complete documentation, or `docs/PROTOCOL_QUICKSTART.md` for a quick introduction.
+
 ## Additional References
 
 - `docs/API_DOCUMENTATION.md`: endpoint details and example payloads.
 - `docs/QUICKSTART_API_TEST.md`: step-by-step instructions for exercising the API.
 - `docs/TEST_SUZUKI_API_README.md` and related guides: focused testing playbooks for the Suzuki workflow.
+- `docs/PROTOCOL_MODULE.md`: complete technical documentation for the protocol recommendation module.
+- `docs/PROTOCOL_OUTPUT_FORMAT.md`: detailed specification of the standard JSON output format used by protocol recommendations.
+- `docs/PROTOCOL_QUICKSTART.md`: 2-minute quick start guide for the protocol module.
+- `docs/PROTOCOL_CLI_GUIDE.md`: user guide for the interactive protocol CLI tester.
 - `chemtools/contracts.py`: authoritative source for all request and response schemas.
+- `chemtools/output_formatter.py`: standard JSON output formatting utilities shared across ML, Rule, and Protocol recommendation modes.
 
 For questions or missing docs, open an issue with reproduction steps and the endpoint/module involved.
