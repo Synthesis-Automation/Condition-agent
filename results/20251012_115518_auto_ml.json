@@ -1,0 +1,298 @@
+{
+  "meta": {
+    "generated_at": "2025-10-12T03:55:22.674808Z",
+    "model": "ML-precedent-knn",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 110.58
+  },
+  "input": {
+    "reaction_smiles": "Brc1cccc2nsnc12.c1ccc(B(O)O)cc1>>c1ccc(-c2cccc3nsnc23)cc1",
+    "family": "Unknown"
+  },
+  "detection": {
+    "family": "Unknown",
+    "detected_reaction_type": "Unknown",
+    "method": "rxn-insight-ml",
+    "confidence": 0.0
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cccc2nsnc12",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "905459-27-0",
+          "role": "metal_precursor",
+          "name": "(IPr)Pd(allyl)Cl·pyridine (PEPPSI-IPr)",
+          "abbreviation": null,
+          "cas": "905459-27-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "109-99-9",
+          "role": "solvent",
+          "name": "Tetrahydrofuran",
+          "abbreviation": null,
+          "cas": "109-99-9",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 2
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cccc2nsnc12",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "905459-27-0",
+          "role": "metal_precursor",
+          "name": "(IPr)Pd(allyl)Cl·pyridine (PEPPSI-IPr)",
+          "abbreviation": null,
+          "cas": "905459-27-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "108-88-3",
+          "role": "solvent",
+          "name": "Toluene",
+          "abbreviation": null,
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 2
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cccc2nsnc12",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "905459-27-0",
+          "role": "metal_precursor",
+          "name": "(IPr)Pd(allyl)Cl·pyridine (PEPPSI-IPr)",
+          "abbreviation": null,
+          "cas": "905459-27-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "64-17-5",
+          "role": "solvent",
+          "name": "Ethanol",
+          "abbreviation": null,
+          "cas": "64-17-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 1
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cccc2nsnc12",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "905459-27-0",
+          "role": "metal_precursor",
+          "name": "(IPr)Pd(allyl)Cl·pyridine (PEPPSI-IPr)",
+          "abbreviation": null,
+          "cas": "905459-27-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "534-17-8",
+          "role": "base",
+          "name": "Cesium carbonate",
+          "abbreviation": null,
+          "cas": "534-17-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "68-12-2",
+          "role": "solvent",
+          "name": "N,N-Dimethylformamide",
+          "abbreviation": null,
+          "cas": "68-12-2",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 1
+    },
+    {
+      "rank": 5,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1cccc2nsnc12",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "905459-27-0",
+          "role": "metal_precursor",
+          "name": "(IPr)Pd(allyl)Cl·pyridine (PEPPSI-IPr)",
+          "abbreviation": null,
+          "cas": "905459-27-0",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "123-91-1",
+          "role": "solvent",
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 1
+    }
+  ]
+}
