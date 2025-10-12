@@ -1,0 +1,345 @@
+{
+  "meta": {
+    "generated_at": "2025-10-12T15:55:56.765434Z",
+    "model": "LLM-synthesis",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 39880.65
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1",
+    "family": "Unknown"
+  },
+  "detection": {
+    "family": "Unknown",
+    "detected_reaction_type": "Unknown",
+    "method": "llm-multi-source",
+    "confidence": 0.5
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "smiles": "Brc1ccccc1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "NCc1ccccc1",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_precursor",
+          "notes": "Pd(PPh3)4",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "N/A",
+          "role": "ligand",
+          "notes": "N/A (pre-ligated catalyst)",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Potassium carbonate",
+          "role": "base",
+          "notes": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "1,4-Dioxane",
+          "role": "solvent",
+          "notes": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          60.0,
+          60.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.5,
+      "summary": {
+        "rationale": "Selected Rule-based Pd-catalyzed system as it provides complete reaction parameters. The reaction is a Buchwald-Hartwig amination between bromobenzene and aniline derivative. Pd(PPh3)4 is well-established for C-N coupling of aryl bromides with amines. Potassium carbonate is a mild base suitable for this transformation. 60°C is appropriate for aryl bromides.",
+        "warnings": [
+          "Monitor for proto-debromination side reaction",
+          "Ensure anhydrous conditions for Pd catalysis",
+          "Aniline derivative may require protection if sensitive to base",
+          "Copper systems may require higher temperatures for good conversion"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "smiles": "Brc1ccccc1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "NCc1ccccc1",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Copper(I) iodide",
+          "role": "metal_precursor",
+          "notes": "CuI",
+          "abbreviation": "CuI",
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "2897656-97-0",
+          "role": "ligand",
+          "notes": "2897656-97-0",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Sodium methoxide",
+          "role": "base",
+          "notes": "Sodium methoxide",
+          "abbreviation": "NaOMe",
+          "cas": "124-41-4",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "Dimethyl sulfoxide",
+          "role": "solvent",
+          "notes": "DMSO",
+          "abbreviation": "DMSO",
+          "cas": "67-68-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          80.0,
+          80.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.4,
+      "summary": {
+        "rationale": "<30% conv: try copper-catalyzed system from ML with elevated temperature",
+        "warnings": [
+          "Monitor for proto-debromination side reaction",
+          "Ensure anhydrous conditions for Pd catalysis",
+          "Aniline derivative may require protection if sensitive to base",
+          "Copper systems may require higher temperatures for good conversion"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "smiles": "Brc1ccccc1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "NCc1ccccc1",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "role": "metal_precursor",
+          "notes": "Pd2(dba)3",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "XPhos",
+          "role": "ligand",
+          "notes": "XPhos",
+          "abbreviation": "XPhos",
+          "cas": "564483-18-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Potassium tert-butoxide",
+          "role": "base",
+          "notes": "Potassium tert-butoxide",
+          "abbreviation": "KOtBu",
+          "cas": "865-47-4",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "Toluene",
+          "role": "solvent",
+          "notes": "Toluene",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          100.0,
+          100.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.3,
+      "summary": {
+        "rationale": "<20% after 12h: switch to more active Pd/XPhos system for challenging couplings",
+        "warnings": [
+          "Monitor for proto-debromination side reaction",
+          "Ensure anhydrous conditions for Pd catalysis",
+          "Aniline derivative may require protection if sensitive to base",
+          "Copper systems may require higher temperatures for good conversion"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    }
+  ],
+  "extras": {
+    "llm_synthesis": {
+      "consensus_analysis": {
+        "catalyst": {
+          "agreement": "low",
+          "consensus_value": "No consensus",
+          "notes": "ML suggests CuI, Rule suggests Pd(PPh3)4, Protocol provides no catalyst info"
+        },
+        "solvent": {
+          "agreement": "low",
+          "consensus_value": "No consensus",
+          "notes": "ML suggests DMSO/DMF, Rule suggests 1,4-Dioxane, Protocol provides no solvent info"
+        },
+        "temperature": {
+          "agreement": "low",
+          "consensus_value": "60°C",
+          "notes": "Only Rule source provides temperature (60°C), ML and Protocol have no temperature data"
+        },
+        "base": {
+          "agreement": "low",
+          "consensus_value": "Potassium carbonate",
+          "notes": "ML suggests NaOMe/K2CO3, Rule suggests K2CO3, Protocol provides no base info"
+        }
+      },
+      "confidence_level": "low",
+      "confidence_reasoning": "Sources show complete disagreement on catalyst system (Cu vs Pd) and solvents. ML confidence scores are very low (0.01). Protocol data is incomplete. No clear consensus across sources.",
+      "recommended_condition": {
+        "catalyst": "Pd(PPh3)4",
+        "ligand": "N/A (pre-ligated catalyst)",
+        "solvent": "1,4-Dioxane",
+        "temperature": "60°C",
+        "base": "Potassium carbonate",
+        "additive": "None",
+        "rationale": "Selected Rule-based Pd-catalyzed system as it provides complete reaction parameters. The reaction is a Buchwald-Hartwig amination between bromobenzene and aniline derivative. Pd(PPh3)4 is well-established for C-N coupling of aryl bromides with amines. Potassium carbonate is a mild base suitable for this transformation. 60°C is appropriate for aryl bromides."
+      },
+      "backup_conditions": [
+        {
+          "catalyst": "CuI",
+          "ligand": "2897656-97-0",
+          "solvent": "DMSO",
+          "temperature": "80°C",
+          "base": "Sodium methoxide",
+          "when_to_use": "<30% conv: try copper-catalyzed system from ML with elevated temperature"
+        },
+        {
+          "catalyst": "Pd2(dba)3",
+          "ligand": "XPhos",
+          "solvent": "Toluene",
+          "temperature": "100°C",
+          "base": "Potassium tert-butoxide",
+          "when_to_use": "<20% after 12h: switch to more active Pd/XPhos system for challenging couplings"
+        }
+      ],
+      "warnings": [
+        "Monitor for proto-debromination side reaction",
+        "Ensure anhydrous conditions for Pd catalysis",
+        "Aniline derivative may require protection if sensitive to base",
+        "Copper systems may require higher temperatures for good conversion"
+      ],
+      "source_comparison": {
+        "ml_contribution": "Suggests copper catalysis but with very low confidence (0.01), incomplete parameters",
+        "rule_contribution": "Provides complete Pd-based system from established database, most reliable source",
+        "protocol_contribution": "No useful information provided (all N/A values)"
+      }
+    },
+    "sources_used": {
+      "ml_precedents": 3,
+      "rule_matches": 1,
+      "protocol_procedures": 3
+    },
+    "llm_metadata": {
+      "model": "deepseek-v3.2-exp",
+      "tokens": 1623,
+      "latency_ms": 39880.31000003684,
+      "processing_time_ms": 39880.65020006616
+    }
+  }
+}
