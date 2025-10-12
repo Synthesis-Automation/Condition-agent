@@ -1,0 +1,682 @@
+{
+  "meta": {
+    "generated_at": "2025-10-12T15:00:05.388195Z",
+    "model": "ML-precedent-knn",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 5769.23
+  },
+  "input": {
+    "reaction_smiles": "Ic1ccc(C(=O)OC)cc1.c1c[nH]c(B(O)O)c1>>COC(=O)c1ccc(-c2cc[nH]c2)cc1",
+    "family": "Suzuki"
+  },
+  "detection": {
+    "family": "Suzuki",
+    "detected_reaction_type": "Suzuki",
+    "method": "rxn-insight-ml",
+    "confidence": 0.665
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "COC(=O)c1ccc(I)cc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccc[nH]1",
+          "equivalents": null
+        },
+        {
+          "id": "2380311-59-9",
+          "role": "ligand",
+          "name": "2380311-59-9",
+          "abbreviation": null,
+          "cas": "2380311-59-9",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "64-17-5",
+          "role": "solvent",
+          "name": "Ethanol",
+          "abbreviation": null,
+          "cas": "64-17-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 5
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "COC(=O)c1ccc(I)cc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccc[nH]1",
+          "equivalents": null
+        },
+        {
+          "id": "2380311-59-9",
+          "role": "ligand",
+          "name": "2380311-59-9",
+          "abbreviation": null,
+          "cas": "2380311-59-9",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "7732-18-5",
+          "role": "solvent",
+          "name": "Water",
+          "abbreviation": null,
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 2
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "COC(=O)c1ccc(I)cc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccc[nH]1",
+          "equivalents": null
+        },
+        {
+          "id": "2380311-59-9",
+          "role": "ligand",
+          "name": "2380311-59-9",
+          "abbreviation": null,
+          "cas": "2380311-59-9",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "67-56-1",
+          "role": "solvent",
+          "name": "Methanol",
+          "abbreviation": null,
+          "cas": "67-56-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 1
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "COC(=O)c1ccc(I)cc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccc[nH]1",
+          "equivalents": null
+        },
+        {
+          "id": "2380311-59-9",
+          "role": "ligand",
+          "name": "2380311-59-9",
+          "abbreviation": null,
+          "cas": "2380311-59-9",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "108-88-3",
+          "role": "solvent",
+          "name": "Toluene",
+          "abbreviation": null,
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0066500000000000005,
+      "precedent_count": 1
+    }
+  ],
+  "precedents_used": {
+    "total_count": 10,
+    "top_precedents": [
+      {
+        "rank": 1,
+        "reaction_id": "31-179-CAS-20952885",
+        "reaction_smiles": "OB(O)c1ccccc1.COC(=O)c1ccc(I)cc1>>COC(=O)c1ccc(-c2ccccc2)cc1",
+        "core": "Base: K2CO3",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "2380311-59-9",
+            "cas": "2380311-59-9",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Methanol",
+            "cas": "67-56-1"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "A palladium-carbon-connected organometallic framework and its catalytic application | Dong, Ying; Jv, Jing-Jing; Wu, Xiao-Wei; Kan, Jing-Lan; Lin, Ting; Dong, Yu-Bin | Chemical Communications (Cambridge, United Kingdom) (2019), 55(96), 14414-14417"
+      },
+      {
+        "rank": 2,
+        "reaction_id": "31-179-CAS-23126362",
+        "reaction_smiles": "OB(O)c1ccccc1.COC(=O)c1ccc(I)cc1>>COC(=O)c1ccc(-c2ccccc2)cc1",
+        "core": "Pd",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Palladium Supported on Silk Fibroin for Suzuki-Miyaura Cross-Coupling Reactions | Rizzo, Giorgio; Albano, Gianluigi; Lo Presti, Marco; Milella, Antonella; Omenetto, Fiorenzo G.; Farinola, Gianluca M. | European Journal of Organic Chemistry (2020), 2020(45), 6992-6996"
+      },
+      {
+        "rank": 3,
+        "reaction_id": "31-179-CAS-23132375",
+        "reaction_smiles": "OB(O)c1ccccc1.O=C(O)c1ccc(I)cc1>>O=C(O)c1ccc(-c2ccccc2)cc1",
+        "core": "Pd",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Palladium Supported on Silk Fibroin for Suzuki-Miyaura Cross-Coupling Reactions | Rizzo, Giorgio; Albano, Gianluigi; Lo Presti, Marco; Milella, Antonella; Omenetto, Fiorenzo G.; Farinola, Gianluca M. | European Journal of Organic Chemistry (2020), 2020(45), 6992-6996"
+      },
+      {
+        "rank": 4,
+        "reaction_id": "31-614-CAS-34199019",
+        "reaction_smiles": "OB(O)c1ccccc1.CCOC(=O)c1ccc(I)cc1>>CCOC(=O)c1ccc(-c2ccccc2)cc1",
+        "core": "Pd",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1801427-52-0",
+            "cas": "1801427-52-0",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Palladium Nanoparticles Supported on Ce-MOF-801 as Highly Efficient and Stable Heterogeneous Catalysts for Suzuki-Miyaura Coupling Reactions | Lin, Wenting; Song, Yaping; Wang, Li; Li, Nan; Fu, Yanghe; Chen, De-Li; Zhu, Weidong; Zhang, Fumin | Catalysis Letters (2023), 153(8), 2368-2377"
+      },
+      {
+        "rank": 5,
+        "reaction_id": "31-614-CAS-35039247",
+        "reaction_smiles": "OB(O)c1ccccc1.COC(=O)c1ccc(I)cc1>>COC(=O)c1ccc(-c2ccccc2)cc1",
+        "core": "Ni",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Nickel",
+            "cas": "7440-02-0",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "7440-50-8",
+            "cas": "7440-50-8",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "7440-57-5",
+            "cas": "7440-57-5",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "From Inert to Catalytically Active Milling Media: Galvanostatic Coating for Direct Mechanocatalysis | Wohlgemuth, Maximilian; Mayer, Maike; Rappen, Marisol; Schmidt, Fabian; Saure, Roman; Gratz, Sven; Borchardt, Lars | Angewandte Chemie, International Edition (2022), 61(47), e202212694"
+      },
+      {
+        "rank": 6,
+        "reaction_id": "31-614-CAS-38070478",
+        "reaction_smiles": "OB(O)c1ccccc1.COC(=O)c1ccc(I)cc1>>COC(=O)c1ccc(-c2ccccc2)cc1",
+        "core": "Pd",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "Milling Medium-Free Suzuki Coupling by Direct Mechanocatalysis: From Mixer Mills to Resonant Acoustic Mixers** | Wohlgemuth, Maximilian; Schmidt, Sarah; Mayer, Maike; Pickhardt, Wilm; Graetz, Sven; Borchardt, Lars | Chemistry - A European Journal (2023), 29(65), e202301714"
+      },
+      {
+        "rank": 7,
+        "reaction_id": "31-179-CAS-12557431",
+        "reaction_smiles": "CCOC(=O)c1ccc(I)cc1.O=Cc1ccc(B(O)O)cc1>>CCOC(=O)c1ccc(-c2ccc(C=O)cc2)cc1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 94.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Toluene",
+            "cas": "108-88-3"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 94.0
+        },
+        "reference": "Newheterometallic zirconium metalloporphyrin frameworks and their heteroatom-activated high-surface-area carbon derivatives | Lin, Qipu; Bu, Xianhui; Kong, Aiguo; Mao, Chengyu; Zhao, Xiang; Bu, Fei; Feng, Pingyun | Journal of the American Chemical Society (2015), 137(6), 2235-2238"
+      },
+      {
+        "rank": 8,
+        "reaction_id": "31-614-CAS-35657534",
+        "reaction_smiles": "OB(O)c1ccccc1.O=C(O)c1ccc(I)cc1>>O=C(O)c1ccc(-c2ccccc2)cc1",
+        "core": "Pd",
+        "yield": 95.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1260119-00-3",
+            "cas": "1260119-00-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 95.0
+        },
+        "reference": "Stabilization of Palladium-Nanoparticle-Decorated Postsynthesis-Modified Zr-UiO-66 MOF as a Reusable Heterogeneous Catalyst in C-C Coupling Reaction | Mohammadi, Leila; Hosseinifard, Mojtaba; Vaezi, Mohammad Reza | ACS Omega (2023), 8(9), 8505-8518"
+      },
+      {
+        "rank": 9,
+        "reaction_id": "31-614-CAS-36318018",
+        "reaction_smiles": "OB(O)c1ccccc1.O=C(O)c1ccc(I)cc1>>O=C(O)c1ccc(-c2ccccc2)cc1",
+        "core": "Pd",
+        "yield": 95.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "1260119-00-3",
+            "cas": "1260119-00-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 95.0
+        },
+        "reference": "Palladium Nanoparticle-Decorated Porous Metal-Organic-Framework (Zr)@Guanidine: Novel Efficient Catalyst in Cross-Coupling (Suzuki, Heck, and Sonogashira) Reactions and Carbonylative Sonogashira under Mild Conditions | Mohammadi, Leila; Vaezi, Mohammad Reza | ACS Omega (2023), 8(18), 16395-16410"
+      },
+      {
+        "rank": 10,
+        "reaction_id": "31-614-CAS-37017799",
+        "reaction_smiles": "OB(O)c1ccccc1.O=C(O)c1ccc(I)cc1>>O=C(O)c1ccc(-c2ccccc2)cc1",
+        "core": "Pd",
+        "yield": 95.0,
+        "catalysts": [
+          {
+            "name": "Palladium",
+            "cas": "7440-05-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 95.0
+        },
+        "reference": "Stabilization of Pd NPs over the surface of β-cyclodextrin incorporated UiO-66-NH2 for the C-C coupling reaction | Mohammadi, Leila; Taghavi, Reza; Hosseinifard, Mojtaba; Vaezi, Mohammad Reza; Rostamnia, Sadegh | RSC Advances (2023), 13(25), 17143-17154"
+      }
+    ],
+    "core_matched_precedents": {
+      "core": "Pd",
+      "count": 7,
+      "examples": [
+        {
+          "rank": 1,
+          "reaction_id": "31-179-CAS-23126362",
+          "core": "Pd",
+          "base": "584-08-7",
+          "solvent": "64-17-5",
+          "yield": 99.0
+        },
+        {
+          "rank": 2,
+          "reaction_id": "31-179-CAS-23132375",
+          "core": "Pd",
+          "base": "584-08-7",
+          "solvent": "64-17-5",
+          "yield": 99.0
+        },
+        {
+          "rank": 3,
+          "reaction_id": "31-614-CAS-34199019",
+          "core": "Pd",
+          "base": "584-08-7",
+          "solvent": "64-17-5",
+          "yield": 99.0
+        },
+        {
+          "rank": 4,
+          "reaction_id": "31-614-CAS-38070478",
+          "core": "Pd",
+          "base": "584-08-7",
+          "solvent": "64-17-5",
+          "yield": 99.0
+        },
+        {
+          "rank": 5,
+          "reaction_id": "31-614-CAS-35657534",
+          "core": "Pd",
+          "base": "584-08-7",
+          "solvent": "7732-18-5",
+          "yield": 95.0
+        }
+      ]
+    },
+    "statistics": {
+      "average_yield": 97.3,
+      "yield_range": [
+        94.0,
+        99.0
+      ],
+      "temperature_range": null,
+      "time_range": null
+    }
+  }
+}

@@ -39,6 +39,10 @@ def _format_conditions_for_llm(conditions: List[Dict[str, Any]], source_name: st
     """
     Format conditions list into readable text for LLM prompt.
     
+    Handles multiple condition formats:
+    - ML/Protocol format: flat keys (catalyst, ligand, solvent, etc.)
+    - Rule-based format: chemicals array with roles + nested conditions
+    
     Args:
         conditions: List of condition dicts
         source_name: Name of the source (for context)
@@ -51,12 +55,42 @@ def _format_conditions_for_llm(conditions: List[Dict[str, Any]], source_name: st
     
     lines = []
     for i, cond in enumerate(conditions, 1):
-        # Extract key fields
-        catalyst = cond.get('catalyst', 'N/A')
-        ligand = cond.get('ligand', cond.get('Ligand', 'N/A'))
-        solvent = cond.get('solvent', cond.get('Solvent', 'N/A'))
-        temp = cond.get('temperature', cond.get('Temperature', 'N/A'))
-        base = cond.get('base', cond.get('Base', 'N/A'))
+        # Check if this is rule-based format (has 'chemicals' array)
+        if 'chemicals' in cond:
+            # Rule-based format: extract from chemicals array
+            catalyst = 'N/A'
+            ligand = 'N/A'
+            solvent = 'N/A'
+            base = 'N/A'
+            
+            for chem in cond.get('chemicals', []):
+                role = chem.get('role', '').lower()
+                name = chem.get('name') or chem.get('abbreviation', 'N/A')
+                
+                if role in ['metal_precursor', 'catalyst', 'metal_source']:
+                    catalyst = name
+                elif role == 'ligand':
+                    ligand = name
+                elif role == 'solvent':
+                    solvent = name
+                elif role == 'base':
+                    base = name
+            
+            # Extract temperature from nested conditions
+            nested_cond = cond.get('conditions', {})
+            temp = nested_cond.get('temperature', 'N/A')
+            if isinstance(temp, list) and len(temp) == 2:
+                temp = f"{temp[0]}-{temp[1]}°C"
+            elif isinstance(temp, (int, float)):
+                temp = f"{temp}°C"
+            
+        else:
+            # Flat format: direct key access
+            catalyst = cond.get('catalyst', 'N/A')
+            ligand = cond.get('ligand', cond.get('Ligand', 'N/A'))
+            solvent = cond.get('solvent', cond.get('Solvent', 'N/A'))
+            temp = cond.get('temperature', cond.get('Temperature', 'N/A'))
+            base = cond.get('base', cond.get('Base', 'N/A'))
         
         # Get confidence/similarity if available
         confidence = cond.get('confidence', cond.get('similarity', None))
@@ -220,6 +254,235 @@ def synthesize_recommendations_llm(
             "latency_ms": response.latency_ms
         }
     }
+
+
+def convert_llm_synthesis_to_standard_format(
+    reaction_smiles: str,
+    synthesis_result: Dict[str, Any],
+    requested_type: Optional[str] = None,
+    processing_time_ms: Optional[float] = None,
+) -> Dict[str, Any]:
+    """
+    Convert LLM synthesis result to standard output format for robotic execution.
+    
+    Transforms the analysis-focused LLM output into the same structure as
+    ML/Rule/Protocol outputs, making it compatible with robotic systems.
+    
+    Args:
+        reaction_smiles: Reaction SMILES string
+        synthesis_result: Result from synthesize_recommendations_llm()
+        requested_type: User-requested reaction type
+        processing_time_ms: Total processing time
+        
+    Returns:
+        Standard format output with meta, input, detection, recommended_conditions
+        
+    Example output structure:
+        {
+            "meta": {"model": "LLM-synthesis", ...},
+            "input": {"reaction_smiles": "...", ...},
+            "detection": {"family": "Suzuki_Miyaura", ...},
+            "recommended_conditions": [
+                {
+                    "rank": 1,
+                    "chemicals": [...],
+                    "conditions": {...},
+                    "confidence": 0.95,
+                    "reasoning": {...}
+                }
+            ]
+        }
+    """
+    from chemtools.output_formatter import (
+        format_meta,
+        format_input,
+        format_detection,
+        _normalize_chemical_entry,
+        _normalize_conditions_block,
+        _starting_material_entries,
+    )
+    
+    if synthesis_result.get("status") != "success":
+        # Return error format
+        return {
+            "meta": format_meta(
+                model_type="LLM-synthesis",
+                status="error",
+                processing_time_ms=processing_time_ms,
+            ),
+            "input": format_input(reaction_smiles=reaction_smiles),
+            "error": synthesis_result.get("error", "Unknown error"),
+        }
+    
+    synthesis = synthesis_result.get("synthesis", {})
+    llm_metadata = synthesis_result.get("llm_metadata", {})
+    sources_used = synthesis_result.get("sources_used", {})
+    
+    # Detect reaction type from synthesis or fallback
+    detected_type = requested_type or "Unknown"
+    
+    # Extract confidence level
+    confidence_level = synthesis.get("confidence_level", "medium")
+    confidence_map = {"high": 0.95, "medium": 0.75, "low": 0.50}
+    confidence_score = confidence_map.get(confidence_level, 0.75)
+    
+    # Build recommended conditions list (primary + backups)
+    recommendations = []
+    
+    # Primary recommendation
+    recommended_condition = synthesis.get("recommended_condition", {})
+    if recommended_condition:
+        primary_rec = _build_recommendation_from_llm(
+            rank=1,
+            condition_dict=recommended_condition,
+            reaction_smiles=reaction_smiles,
+            confidence=confidence_score,
+            reasoning=synthesis.get("confidence_reasoning"),
+            warnings=synthesis.get("warnings", []),
+        )
+        recommendations.append(primary_rec)
+    
+    # Backup conditions
+    backup_conditions = synthesis.get("backup_conditions", [])
+    for i, backup in enumerate(backup_conditions[:2], start=2):  # Max 2 backups
+        backup_rec = _build_recommendation_from_llm(
+            rank=i,
+            condition_dict=backup,
+            reaction_smiles=reaction_smiles,
+            confidence=confidence_score - (i-1) * 0.1,
+            reasoning=backup.get("when_to_use"),
+            warnings=synthesis.get("warnings", []),
+        )
+        recommendations.append(backup_rec)
+    
+    # Build standard output
+    output = {
+        "meta": format_meta(
+            model_type="LLM-synthesis",
+            status="success",
+            processing_time_ms=processing_time_ms or llm_metadata.get("processing_time_ms"),
+            model_version="1.0.0",
+        ),
+        "input": format_input(
+            reaction_smiles=reaction_smiles,
+            requested_reaction_type=requested_type,
+            detected_family=detected_type,
+        ),
+        "detection": format_detection(
+            detected_type=detected_type,
+            confidence=confidence_score,
+            method="llm-multi-source",
+        ),
+        "recommended_conditions": recommendations,
+        "extras": {
+            "llm_synthesis": synthesis,
+            "sources_used": sources_used,
+            "llm_metadata": llm_metadata,
+        }
+    }
+    
+    return output
+
+
+def _build_recommendation_from_llm(
+    rank: int,
+    condition_dict: Dict[str, Any],
+    reaction_smiles: str,
+    confidence: float,
+    reasoning: Optional[str] = None,
+    warnings: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """
+    Build a single recommendation entry from LLM condition dictionary.
+    
+    Args:
+        rank: Recommendation rank (1, 2, 3, ...)
+        condition_dict: LLM recommended condition dict
+        reaction_smiles: Reaction SMILES
+        confidence: Confidence score
+        reasoning: Reasoning text
+        warnings: List of warnings
+        
+    Returns:
+        Standard recommendation dictionary
+    """
+    from chemtools.output_formatter import (
+        _normalize_chemical_entry,
+        _starting_material_entries,
+        _normalize_rule_string_value,
+    )
+    
+    # Start with reactants
+    chemicals = _starting_material_entries(reaction_smiles)
+    
+    # Extract catalyst system from LLM output
+    catalyst_name = condition_dict.get("catalyst")
+    ligand_name = condition_dict.get("ligand")
+    solvent_name = condition_dict.get("solvent")
+    base_name = condition_dict.get("base")
+    additive_name = condition_dict.get("additive")
+    temperature = condition_dict.get("temperature")
+    
+    # Add chemicals with enrichment
+    if catalyst_name and catalyst_name not in ["None", "N/A", None]:
+        chemicals.append(_normalize_rule_string_value(catalyst_name, "metal_precursor"))
+    
+    if ligand_name and ligand_name not in ["None", "N/A", None, "None (pre-formed catalyst)", "pre-complexed"]:
+        chemicals.append(_normalize_rule_string_value(ligand_name, "ligand"))
+    
+    if base_name and base_name not in ["None", "N/A", None]:
+        chemicals.append(_normalize_rule_string_value(base_name, "base", amount="200%"))
+    
+    if solvent_name and solvent_name not in ["None", "N/A", None]:
+        chemicals.append(_normalize_rule_string_value(solvent_name, "solvent"))
+    
+    if additive_name and additive_name not in ["None", "N/A", None]:
+        chemicals.append(_normalize_rule_string_value(additive_name, "additive"))
+    
+    # Parse temperature
+    temp_value = None
+    temp_range = None
+    if temperature:
+        # Handle formats like "80°C", "80-90°C", "80-100 °C"
+        import re
+        temp_match = re.search(r'(\d+)(?:\s*-\s*(\d+))?\s*°?C?', str(temperature))
+        if temp_match:
+            temp_low = float(temp_match.group(1))
+            temp_high = float(temp_match.group(2)) if temp_match.group(2) else temp_low
+            temp_value = (temp_low + temp_high) / 2
+            temp_range = [temp_low, temp_high]
+    
+    # Build conditions block
+    conditions = {}
+    if temp_value:
+        conditions["temperature"] = temp_range if temp_range else temp_value
+    
+    # Default time for synthesis
+    conditions["time"] = [6.0, 24.0]  # Typical reaction time range
+    conditions["atmosphere"] = None  # Will be inferred from chemistry
+    
+    # Build recommendation
+    recommendation = {
+        "rank": rank,
+        "chemicals": chemicals,
+        "conditions": conditions,
+        "confidence": round(confidence, 4),
+    }
+    
+    # Add reasoning section for robotic logs
+    if reasoning or warnings:
+        recommendation["summary"] = {
+            "rationale": condition_dict.get("rationale") or reasoning or "",
+            "warnings": warnings or [],
+        }
+    
+    # Add source info
+    recommendation["source"] = {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "high" if confidence > 0.85 else "medium" if confidence > 0.65 else "low",
+    }
+    
+    return recommendation
 
 
 def explain_conditions_llm(
