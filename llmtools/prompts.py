@@ -240,6 +240,13 @@ Review the proposed registry entry and respond in JSON only. Do not include any 
 - Already in registry (same role): {existing_same_role}
 - Already in registry (other roles): {existing_other_roles}
 
+## Task
+Evaluate the proposed assignment carefully. Pay special attention to:
+1. **Role accuracy**: If current role is "other_reagent", STRONGLY recommend a more specific role if applicable
+2. **Family precision**: Suggest the most specific family that matches the reagent's chemistry
+3. **Field reliability**: Identify critical missing fields (e.g., metal, oxidation_states, basicity, etc.)
+4. **Synonym completeness**: Add any well-known synonyms or trade names
+
 Respond with strict JSON using this schema:
 {{
   "status": "confirm" | "needs_review" | "reject",
@@ -248,11 +255,16 @@ Respond with strict JSON using this schema:
   "confidence": 0-1 float,
   "justification": "short explanation",
   "alerts": ["list of warnings or required actions"],
-  "suggested_synonyms": ["list of additional synonyms (if any)"]
+  "suggested_synonyms": ["list of additional synonyms (if any)"],
+  "field_suggestions": {{
+    "field_name": "suggested_value",
+    "field_name2": "suggested_value2"
+  }}
 }}
 
 If you are uncertain or data is inconsistent, set status to "needs_review" and include alerts explaining why.
 If the deterministic assignment appears wrong, set status to "reject" and provide the corrected role/family you recommend.
+If current role is "other_reagent", ALWAYS propose a more specific role unless truly uncertain.
 """,
     synonyms="None provided",
     abbreviations="[]",
@@ -434,6 +446,9 @@ def get_template(name: str) -> PromptTemplate:
         "troubleshooting": TROUBLESHOOTING,
         "spectroscopy": SPECTROSCOPY_INTERPRETATION,
         "protocol": PROTOCOL_GENERATION,
+        "reagent_role_classification": REAGENT_ROLE_CLASSIFICATION,
+        "reagent_field_assignment": REAGENT_FIELD_ASSIGNMENT,
+        "reagent_entry_verification": REAGENT_ENTRY_VERIFICATION,
     }
     
     key = name.lower().replace(" ", "_").replace("-", "_")
@@ -461,4 +476,165 @@ def list_templates() -> Dict[str, str]:
         "troubleshooting": "Debug problematic reactions",
         "spectroscopy": "Interpret spectroscopic data",
         "protocol": "Generate experimental protocols",
+        "reagent_role_classification": "Classify reagent role from chemistry",
+        "reagent_field_assignment": "Assign family and fields for reagent role",
+        "reagent_entry_verification": "Verify reagent entry for errors",
     }
+
+
+# =============================================================================
+# REAGENT TAXONOMY CLASSIFICATION (New LLM Workflow)
+# =============================================================================
+
+REAGENT_ROLE_CLASSIFICATION = PromptTemplate(
+    template="""You are an expert chemical reagent classifier. Classify this reagent into the correct role category.
+
+## Reagent Information
+- Name: {name}
+- CAS: {cas}
+- SMILES: {smiles}
+- Molecular Formula: {molecular_formula}
+- Synonyms: {synonyms}
+
+## Available Roles
+
+**ligand**: Phosphines, NHCs, diimines, bidentate/multidentate donor ligands for metal coordination
+**metal_precursor**: Metal salts or simple complexes that generate catalytically active species (Pd, Ni, Cu, Fe, etc.)
+**preformed_metal_catalyst**: Precatalysts supplied with ligands, ready to use (e.g., Pd(PPh3)4)
+**base**: Brønsted or Lewis bases - amides, alkoxides, carbonates, phosphazenes, superbases
+**acid**: Mineral acids, sulfonic acids, Lewis acids used as activators or promoters
+**condensation_agent**: Carbodiimides, uronium salts, phosphonium activators for amide/ester formation
+**oxidant**: Terminal oxidants and co-oxidants (peroxides, hypervalent iodine, Oxone, O2)
+**reductant**: Hydrides, silanes, metal powders, organic electron donors
+**additive**: Phase-transfer catalysts, halide scavengers, fluoride sources, reaction modulators
+**solvent**: Reaction media categorized by polarity, coordination ability, proticity
+**organo_catalyst**: Small-molecule organocatalysts (cinchona, phosphoric acids, NHCs, thioureas)
+**enzyme**: Biocatalysts (isolated enzymes or whole-cell systems)
+**other_reagent**: Generic reagents that don't fit above categories (use as LAST RESORT)
+
+## Task
+
+Analyze the chemical structure and properties to determine the most appropriate role.
+
+Respond with ONLY valid JSON (no markdown, no explanation):
+{{
+  "role": "base",
+  "confidence": 0.95,
+  "reasoning": "Tertiary aliphatic amine with strong Brønsted basicity"
+}}
+
+IMPORTANT:
+- Choose the MOST SPECIFIC role that fits
+- Use "other_reagent" ONLY if truly uncertain
+- Confidence should be 0.0-1.0
+- Reasoning should be chemistry-focused (1-2 sentences)
+""",
+    name="Unknown",
+    cas="Unknown",
+    smiles="Unknown",
+    molecular_formula="Unknown",
+    synonyms="None",
+)
+
+
+REAGENT_FIELD_ASSIGNMENT = PromptTemplate(
+    template="""You are an expert chemical database curator. Assign this reagent to the correct family and populate all required fields.
+
+## Reagent Information
+- Name: {name}
+- CAS: {cas}
+- SMILES: {smiles}
+- Molecular Formula: {molecular_formula}
+- Role: {role}
+
+## Available Families for Role '{role}'
+
+{families_description}
+
+## Required Fields for Role '{role}'
+
+{fields_schema}
+
+## Examples from Database
+
+{examples}
+
+## Task
+
+1. Select the most specific family that matches this reagent's chemistry
+2. Assign values to ALL required fields based on chemical properties
+3. Suggest abbreviations and additional synonyms if commonly known
+
+Respond with ONLY valid JSON (no markdown, no explanation):
+{{
+  "family": "family_id",
+  "fields": {{
+    "field1": "value1",
+    "field2": "value2"
+  }},
+  "abbreviations": ["ABBR1", "ABBR2"],
+  "additional_synonyms": ["synonym1"],
+  "confidence": 0.92,
+  "reasoning": "Brief chemistry-based justification"
+}}
+
+IMPORTANT:
+- All field values must match allowed options in schema
+- Include ALL required fields (no null/missing values)
+- Abbreviations should be well-known (not made up)
+- Confidence should reflect certainty of classification
+""",
+    name="Unknown",
+    cas="Unknown",
+    smiles="Unknown",
+    molecular_formula="Unknown",
+    role="Unknown",
+    families_description="No families available",
+    fields_schema="No fields required",
+    examples="No examples available",
+)
+
+
+REAGENT_ENTRY_VERIFICATION = PromptTemplate(
+    template="""You are a quality control reviewer for a chemical reagent database. Check this proposed entry for errors and inconsistencies.
+
+## Proposed Entry
+
+{entry_json}
+
+## Verification Checklist
+
+1. **Chemical accuracy**: Does SMILES match the described role and properties?
+2. **Field consistency**: Are field values logically consistent? (e.g., "superbase" + "weak nucleophilicity" is suspicious)
+3. **Oxidation states**: For metals, are oxidation states chemically reasonable?
+4. **Missing information**: Are there obvious gaps in critical fields?
+5. **Obvious mistakes**: Wrong metal element, impossible coordination, etc.
+
+## Task
+
+Review the entry and identify any errors or warnings.
+
+Respond with ONLY valid JSON (no markdown, no explanation):
+{{
+  "approved": true,
+  "issues": [
+    {{
+      "severity": "error",
+      "field": "oxidation_states",
+      "message": "Pd cannot have oxidation state +5"
+    }}
+  ],
+  "suggestions": [
+    "Consider adding pKa value to notes",
+    "Verify SMILES stereochemistry"
+  ]
+}}
+
+IMPORTANT:
+- Set approved=false if ANY "error" severity issues exist
+- Use "warning" severity for minor issues that don't prevent saving
+- Keep messages concise and actionable
+- Focus on chemistry correctness, not formatting
+""",
+    entry_json="{}",
+)

@@ -84,7 +84,7 @@ DEFAULT_LLM_RECOMMENDED: Dict[str, Dict[str, str]] = {
     "aliyun": {
         "reasoning": "deepseek-r1",
         "fast": "deepseek-r1-distill-qwen-7b",
-        "balanced": "deepseek-v3",
+        "balanced": "deepseek-v3.2-exp",
         "experimental": "deepseek-v3.2-exp",
     },
     "openai": {
@@ -107,10 +107,17 @@ except Exception as exc:  # pragma: no cover - safeguard for missing optional de
 
 try:
     from llmtools.reagent_review import LLMReviewOptions, review_taxonomy_proposal
+    from llmtools.reagent_classifier import classify_role, assign_fields, verify_entry, VALID_ROLES
+    from llmtools.clients import LLMClient
     LLM_SUPPORT_AVAILABLE = True
 except Exception as exc:  # pragma: no cover - optional dependency
     LLMReviewOptions = None  # type: ignore[assignment]
     review_taxonomy_proposal = None  # type: ignore[assignment]
+    classify_role = None  # type: ignore[assignment]
+    assign_fields = None  # type: ignore[assignment]
+    verify_entry = None  # type: ignore[assignment]
+    VALID_ROLES = None  # type: ignore[assignment]
+    LLMClient = None  # type: ignore[assignment]
     LLM_SUPPORT_AVAILABLE = False
     if not LLM_SUPPORT_ERROR:
         LLM_SUPPORT_ERROR = f"{exc.__class__.__name__}: {exc}"
@@ -548,6 +555,210 @@ class RegistryGenerationError(RuntimeError):
     """Raised when registry generation fails for the requested input."""
 
 
+def generate_taxonomy_entry_llm(
+    *,
+    cas: str,
+    registry_dir: Path,
+    llm_client: Any,  # LLMClient from llmtools.clients
+    name_override: Optional[str] = None,
+    smiles_override: Optional[str] = None,
+    resolver_timeout: float = DEFAULT_RESOLVER_TIMEOUT,
+) -> Dict[str, Any]:
+    """
+    Pure LLM workflow for reagent taxonomy generation.
+    
+    Workflow:
+    1. Resolve chemical identity from CAS (PubChem API)
+    2. LLM classifies reagent role
+    3. LLM assigns family and role-specific fields
+    4. LLM verifies entry for errors
+    
+    Args:
+        cas: CAS registry number
+        registry_dir: Path to reagent registry
+        llm_client: Configured LLM client (from llmtools.clients)
+        name_override: Optional name override
+        smiles_override: Optional SMILES override
+        resolver_timeout: Timeout for CAS resolution
+        
+    Returns:
+        {
+            "status": "ready_to_save" | "needs_review" | "error",
+            "workflow": {
+                "step1_identity": {...},
+                "step2_role": {...},
+                "step3_fields": {...},
+                "step4_verification": {...}
+            },
+            "entry": {/* final entry to save */},
+            "error": "..." (if status=error)
+        }
+    """
+    if not LLM_SUPPORT_AVAILABLE:
+        return {
+            "status": "error",
+            "error": f"LLM support not available: {LLM_SUPPORT_ERROR}",
+        }
+    
+    if not cas:
+        return {"status": "error", "error": "CAS number is required."}
+    
+    normalized_cas = normalize_cas(cas)
+    
+    if not registry_dir.exists():
+        return {"status": "error", "error": f"Registry directory '{registry_dir}' does not exist."}
+    
+    workflow = {}
+    
+    # Step 1: Resolve identity
+    try:
+        resolved_identity = resolve_identity_from_cas(normalized_cas, timeout=resolver_timeout)
+        if not resolved_identity:
+            return {
+                "status": "error",
+                "error": f"Failed to resolve CAS {normalized_cas}. No data from PubChem.",
+            }
+        
+        # Apply overrides
+        if name_override:
+            resolved_identity["name"] = name_override
+        if smiles_override:
+            resolved_identity["smiles"] = smiles_override
+        
+        workflow["step1_identity"] = {
+            "status": "success",
+            "identity": resolved_identity,
+        }
+        
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"Step 1 (Identity Resolution) failed: {exc}",
+        }
+    
+    # Step 2: Classify role
+    try:
+        role_result = classify_role(resolved_identity, llm_client)
+        workflow["step2_role"] = role_result
+        
+        if role_result.get("status") != "success":
+            return {
+                "status": "error",
+                "error": f"Step 2 (Role Classification) failed: {role_result.get('error')}",
+                "workflow": workflow,
+            }
+        
+        role = role_result["role"]
+        
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"Step 2 (Role Classification) failed: {exc}",
+            "workflow": workflow,
+        }
+    
+    # Step 3: Assign fields
+    try:
+        fields_result = assign_fields(
+            identity=resolved_identity,
+            role=role,
+            registry_dir=registry_dir,
+            llm_client=llm_client,
+        )
+        workflow["step3_fields"] = fields_result
+        
+        if fields_result.get("status") != "success":
+            return {
+                "status": "error",
+                "error": f"Step 3 (Field Assignment) failed: {fields_result.get('error')}",
+                "workflow": workflow,
+            }
+        
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"Step 3 (Field Assignment) failed: {exc}",
+            "workflow": workflow,
+        }
+    
+    # Build entry
+    try:
+        # Combine identity with role-specific fields
+        entry = {
+            "name": resolved_identity.get("name"),
+            "cas": normalized_cas,
+            "molecular_formula": resolved_identity.get("molecular_formula"),
+            "smiles": resolved_identity.get("smiles"),
+            "roles": {
+                role: {
+                    "families": [fields_result["family"]],
+                    **fields_result["fields"],
+                }
+            },
+        }
+        
+        # Add abbreviations and synonyms
+        abbreviations = fields_result.get("abbreviations", [])
+        existing_synonyms = resolved_identity.get("synonyms", [])
+        additional_synonyms = fields_result.get("additional_synonyms", [])
+        all_synonyms = dedupe_synonyms(existing_synonyms + additional_synonyms)
+        
+        if abbreviations:
+            entry["abbreviations"] = abbreviations
+        if all_synonyms:
+            entry["synonyms"] = all_synonyms
+        
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"Failed to build entry: {exc}",
+            "workflow": workflow,
+        }
+    
+    # Step 4: Verify entry
+    try:
+        verification_result = verify_entry(entry, llm_client)
+        workflow["step4_verification"] = verification_result
+        
+        if verification_result.get("status") != "success":
+            return {
+                "status": "error",
+                "error": f"Step 4 (Verification) failed: {verification_result.get('error')}",
+                "workflow": workflow,
+                "entry": entry,
+            }
+        
+        # Check if entry is approved
+        approved = verification_result.get("approved", False)
+        issues = verification_result.get("issues", [])
+        
+        # Count error-level issues
+        errors = [iss for iss in issues if iss.get("severity") == "error"]
+        
+        if not approved or errors:
+            return {
+                "status": "needs_review",
+                "workflow": workflow,
+                "entry": entry,
+                "message": f"Entry has {len(errors)} error(s) and {len(issues) - len(errors)} warning(s). Please review before saving.",
+            }
+        
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"Step 4 (Verification) failed: {exc}",
+            "workflow": workflow,
+            "entry": entry,
+        }
+    
+    # Success!
+    return {
+        "status": "ready_to_save",
+        "workflow": workflow,
+        "entry": entry,
+        "message": "Entry successfully generated and verified by LLM. Ready to save!",
+    }
+
 
 def generate_taxonomy_entry(
     *,
@@ -743,6 +954,19 @@ def generate_taxonomy_entry(
                     candidate_role = str(proposed_role).strip() if proposed_role else ""
                     candidate_family = str(proposed_family).strip() if proposed_family else ""
 
+                    # ENHANCEMENT 1: Auto-upgrade "other_reagent" when LLM suggests better role
+                    if role == "other_reagent" and candidate_role and candidate_role != role:
+                        debug_log.append(
+                            f"LLM auto-upgrade: 'other_reagent' → '{candidate_role}' "
+                            f"(confidence: {analysis.get('confidence', 'N/A')})"
+                        )
+                        result["llm_auto_upgrade"] = {
+                            "from": "other_reagent",
+                            "to": candidate_role,
+                            "reason": analysis.get("justification", "LLM recommendation"),
+                            "confidence": analysis.get("confidence"),
+                        }
+
                     if candidate_role and candidate_role != role:
                         if candidate_role in ROLE_CONFIG:
                             # Use suggested family if provided; otherwise keep current until validated.
@@ -775,6 +999,12 @@ def generate_taxonomy_entry(
                         or bool(synonyms_added)
                     )
 
+                    # ENHANCEMENT 2: Apply LLM field suggestions
+                    field_suggestions = analysis.get("field_suggestions") or {}
+                    if isinstance(field_suggestions, dict) and field_suggestions:
+                        changes_summary["field_suggestions_applied"] = field_suggestions
+                        should_apply = True
+
                     if should_apply:
                         if target_role == role and target_family == family_id:
                             target_family_entry = family_entry
@@ -793,6 +1023,16 @@ def generate_taxonomy_entry(
                                 combined_synonyms,
                             )
                             adjusted_role_payload = store.build_role_payload(target_role, target_family)
+                            
+                            # ENHANCEMENT 2: Merge LLM field suggestions into role payload
+                            if isinstance(field_suggestions, dict):
+                                for field_name, field_value in field_suggestions.items():
+                                    if field_name and field_value is not None:
+                                        adjusted_role_payload[field_name] = field_value
+                                        debug_log.append(
+                                            f"LLM field suggestion: {field_name} = {field_value}"
+                                        )
+                            
                             adjusted_entry = build_registry_entry(
                                 entry_id=entry_id,
                                 name=name,
@@ -851,7 +1091,31 @@ class GenerationWorker(QRunnable):
 
     def run(self) -> None:  # pragma: no cover - UI worker thread
         try:
-            result = generate_taxonomy_entry(**self.params)
+            workflow_mode = self.params.pop("workflow_mode", "legacy")
+            
+            if workflow_mode == "llm_workflow":
+                # Pure LLM workflow
+                cas = self.params["cas"]
+                registry_dir = self.params["registry_dir"]
+                name_override = self.params.get("name_override")
+                provider = self.params["provider"]
+                model = self.params["model"]
+                
+                # Create LLM client
+                from llmtools.clients import LLMClient
+                llm_client = LLMClient(provider=provider, model=model)
+                
+                result = generate_taxonomy_entry_llm(
+                    cas=cas,
+                    registry_dir=registry_dir,
+                    llm_client=llm_client,
+                    name_override=name_override,
+                    dry_run=True  # Always dry-run in UI
+                )
+            else:
+                # Legacy workflow
+                result = generate_taxonomy_entry(**self.params)
+                
         except Exception as exc:  # noqa: BLE001 - we want to surface all failures
             self.signals.error.emit(str(exc))
         else:
@@ -885,6 +1149,15 @@ class RegistryGeneratorWindow(QMainWindow):
 
         self.role_combo = QComboBox()
         self.role_combo.addItem("Select role", userData=None)
+        
+        # Add "Auto-detect (LLM)" option if LLM is available
+        if self._llm_support_available:
+            self.role_combo.addItem("🤖 Auto-detect (LLM)", userData="__auto_detect__")
+            self.role_combo.setItemData(
+                1, 
+                "Use LLM to automatically detect the reagent role", 
+                Qt.ItemDataRole.ToolTipRole
+            )
 
         role_keys = sorted(
             ROLE_CONFIG.keys(),
@@ -904,6 +1177,21 @@ class RegistryGeneratorWindow(QMainWindow):
         form_layout.addRow("Reagent role", self.role_combo)
 
         self._llm_support_available = LLM_SUPPORT_AVAILABLE and bool(LLM_AVAILABLE_MODELS)
+        
+        # Workflow mode selection
+        workflow_widget = QWidget()
+        workflow_layout = QHBoxLayout(workflow_widget)
+        workflow_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.workflow_mode_combo = QComboBox()
+        self.workflow_mode_combo.addItem("Deterministic + LLM Review", userData="legacy")
+        self.workflow_mode_combo.addItem("🚀 Pure LLM Workflow (Recommended)", userData="llm_workflow")
+        self.workflow_mode_combo.setCurrentIndex(1)  # Default to pure LLM
+        self.workflow_mode_combo.currentIndexChanged.connect(self.on_workflow_mode_changed)
+        workflow_layout.addWidget(self.workflow_mode_combo)
+        workflow_layout.addStretch()
+        form_layout.addRow("Workflow mode", workflow_widget)
+        
         llm_widget = QWidget()
         llm_layout = QHBoxLayout(llm_widget)
         llm_layout.setContentsMargins(0, 0, 0, 0)
@@ -925,7 +1213,7 @@ class RegistryGeneratorWindow(QMainWindow):
         form_layout.addRow("LLM assistance", llm_widget)
 
         self._populate_llm_provider_options()
-        self.on_llm_mode_changed()
+        self.on_workflow_mode_changed()  # Initialize workflow mode (will call on_llm_mode_changed)
 
         path_layout = QHBoxLayout()
         self.registry_path_input = QLineEdit(str(DEFAULT_REGISTRY_DIR))
@@ -1031,6 +1319,34 @@ class RegistryGeneratorWindow(QMainWindow):
         models = LLM_AVAILABLE_MODELS.get(provider, [])
         return models[0] if models else None
 
+    def on_workflow_mode_changed(self, index: int = -1) -> None:  # noqa: ARG002
+        """Handle workflow mode changes."""
+        workflow_mode = self.workflow_mode_combo.currentData()
+        
+        # Pure LLM workflow requires LLM to be enabled
+        if workflow_mode == "llm_workflow":
+            # Auto-enable LLM and show provider/model options
+            self.llm_mode_combo.blockSignals(True)
+            self.llm_mode_combo.setCurrentIndex(1)  # "Use LLM"
+            self.llm_mode_combo.blockSignals(False)
+            self.llm_mode_combo.setEnabled(False)  # Can't disable LLM in pure mode
+            self.on_llm_mode_changed()
+            
+            # Show role auto-detect option
+            auto_detect_idx = self.role_combo.findData("__auto_detect__")
+            if auto_detect_idx != -1:
+                self.role_combo.setCurrentIndex(auto_detect_idx)
+            
+        else:  # legacy mode
+            # Re-enable LLM toggle
+            self.llm_mode_combo.setEnabled(True)
+            
+            # Set role back to other_reagent if it was auto-detect
+            if self.role_combo.currentData() == "__auto_detect__":
+                default_index = self.role_combo.findData("other_reagent")
+                if default_index != -1:
+                    self.role_combo.setCurrentIndex(default_index)
+
     def on_llm_mode_changed(self, index: int = -1) -> None:  # noqa: ARG002 - index unused
         """Toggle provider/model controls based on LLM mode selection."""
         # When the widget itself is disabled (e.g. worker running), skip updates.
@@ -1086,10 +1402,20 @@ class RegistryGeneratorWindow(QMainWindow):
             self.show_error("CAS number is required.")
             return
 
+        workflow_mode = self.workflow_mode_combo.currentData()
         role = self.role_combo.currentData()
-        if not role:
-            self.show_error("Select a reagent role before generating.")
-            return
+        
+        # For pure LLM workflow, role can be auto-detect
+        if workflow_mode == "llm_workflow":
+            if not role or role == "__auto_detect__":
+                # Auto-detect is allowed in pure LLM mode
+                pass
+            # Role is optional in pure LLM mode
+        else:
+            # Legacy mode requires explicit role
+            if not role or role == "__auto_detect__":
+                self.show_error("Select a reagent role before generating (auto-detect only available in Pure LLM mode).")
+                return
 
         registry_dir_text = self.registry_path_input.text().strip()
         if not registry_dir_text:
@@ -1097,41 +1423,70 @@ class RegistryGeneratorWindow(QMainWindow):
             return
 
         registry_dir = Path(registry_dir_text).expanduser()
-        allow_default = self.allow_default_checkbox.isChecked()
         name_override = self.name_input.text().strip() or None
-        llm_options: Optional[Dict[str, Any]] = None
-        if bool(self.llm_mode_combo.currentData()):
-            provider = self.llm_provider_combo.currentData()
-            model = self.llm_model_combo.currentData()
+        
+        # Get LLM settings
+        provider = self.llm_provider_combo.currentData()
+        model = self.llm_model_combo.currentData()
+        
+        if workflow_mode == "llm_workflow":
+            # Pure LLM workflow - validate LLM is configured
             if not provider or not model:
-                self.show_error("Select an LLM provider and model before generating.")
+                self.show_error("Pure LLM workflow requires an LLM provider and model.")
                 return
-            llm_options = {
-                "enabled": True,
+            
+            self.status_label.setText("Running Pure LLM workflow...")
+            self.output_view.clear()
+            self.save_button.setEnabled(False)
+            self._last_result = None
+            self.set_inputs_enabled(False)
+            
+            params = {
+                "workflow_mode": "llm_workflow",
+                "cas": cas,
+                "registry_dir": registry_dir,
+                "name_override": name_override,
                 "provider": provider,
                 "model": model,
-                "temperature": 0.0,
-                "max_tokens": 800,
-                "timeout": 60,
             }
+            
+        else:
+            # Legacy workflow
+            allow_default = self.allow_default_checkbox.isChecked()
+            llm_options: Optional[Dict[str, Any]] = None
+            
+            if bool(self.llm_mode_combo.currentData()):
+                if not provider or not model:
+                    self.show_error("Select an LLM provider and model before generating.")
+                    return
+                llm_options = {
+                    "enabled": True,
+                    "provider": provider,
+                    "model": model,
+                    "temperature": 0.0,
+                    "max_tokens": 800,
+                    "timeout": 60,
+                }
 
-        self.status_label.setText("Running registry generation...")
-        self.output_view.clear()
-        self.save_button.setEnabled(False)
-        self._last_result = None
-        self.set_inputs_enabled(False)
+            self.status_label.setText("Running registry generation...")
+            self.output_view.clear()
+            self.save_button.setEnabled(False)
+            self._last_result = None
+            self.set_inputs_enabled(False)
 
-        params = {
-            "cas": cas,
-            "role": role,
-            "registry_dir": registry_dir,
-            "allow_default_family": allow_default,
-            "dry_run": True,
-            "resolver_timeout": DEFAULT_RESOLVER_TIMEOUT,
-            "name_override": name_override,
-        }
-        if llm_options:
-            params["llm_options"] = llm_options
+            params = {
+                "workflow_mode": "legacy",
+                "cas": cas,
+                "role": role,
+                "registry_dir": registry_dir,
+                "allow_default_family": allow_default,
+                "dry_run": True,
+                "resolver_timeout": DEFAULT_RESOLVER_TIMEOUT,
+                "name_override": name_override,
+            }
+            if llm_options:
+                params["llm_options"] = llm_options
+        
         worker = GenerationWorker(params)
         worker.signals.finished.connect(self.on_generation_success)
         worker.signals.error.connect(self.on_generation_failure)
@@ -1141,36 +1496,105 @@ class RegistryGeneratorWindow(QMainWindow):
     def on_generation_success(self, result: Dict[str, Any]) -> None:
         """Handle successful completion of the registry worker."""
         self._last_result = result
-        self.status_label.setText(f"Status: {result.get('status', 'ok')}")
-        entry_preview = result.get('entry_preview')
-        llm_review = result.get('llm_review')
-        llm_adjusted_entry = result.get('llm_adjusted_entry')
-        display_payload: Dict[str, Any] = {}
-        if isinstance(llm_review, dict) and isinstance(llm_adjusted_entry, dict):
-            if isinstance(entry_preview, dict):
-                display_payload["entry_original"] = entry_preview
-            display_payload["entry_revised"] = llm_adjusted_entry
-            display_payload["llm_review"] = llm_review
-            if result.get("llm_applied_changes"):
-                display_payload["llm_applied_changes"] = result["llm_applied_changes"]
-            if result.get("llm_adjustment_errors"):
-                display_payload["llm_adjustment_errors"] = result["llm_adjustment_errors"]
+        
+        # Detect workflow mode from result structure
+        is_pure_llm = "workflow" in result and "status" in result and "entry" in result
+        
+        if is_pure_llm:
+            # Pure LLM workflow output
+            status = result.get("status", "unknown")
+            workflow_steps = result.get("workflow", {})
+            entry = result.get("entry", {})
+            
+            self.status_label.setText(f"Pure LLM Status: {status}")
+            
+            # Build clean display with workflow progress
+            display_payload: Dict[str, Any] = {
+                "workflow_mode": "Pure LLM",
+                "status": status,
+                "workflow_steps": {},
+                "entry": entry
+            }
+            
+            # Show workflow progress with checkmarks
+            for step_name, step_data in workflow_steps.items():
+                if isinstance(step_data, dict):
+                    step_status = step_data.get("status", "unknown")
+                    display_payload["workflow_steps"][step_name] = {
+                        "status": f"✓ {step_status}" if step_status == "success" else f"✗ {step_status}",
+                        "details": {k: v for k, v in step_data.items() if k != "status"}
+                    }
+            
+            self.output_view.setPlainText(json.dumps(display_payload, indent=2, ensure_ascii=False))
+            self.set_inputs_enabled(True)
+            
+            # Enable save only if ready
+            self.save_button.setEnabled(status == "ready_to_save")
+            
         else:
-            if isinstance(entry_preview, dict):
-                display_payload["entry"] = entry_preview
-            elif isinstance(llm_adjusted_entry, dict):
-                display_payload["entry"] = llm_adjusted_entry
+            # Legacy workflow output
+            self.status_label.setText(f"Status: {result.get('status', 'ok')}")
+            entry_preview = result.get('entry_preview')
+            llm_review = result.get('llm_review')
+            llm_adjusted_entry = result.get('llm_adjusted_entry')
+            llm_auto_upgrade = result.get('llm_auto_upgrade')
+            
+            display_payload: Dict[str, Any] = {}
+            
+            # ENHANCEMENT 3: Enhanced output format for review
+            if isinstance(llm_review, dict) and isinstance(llm_adjusted_entry, dict):
+                # Show comprehensive LLM review output
+                display_payload["review_summary"] = {
+                    "original_role": result.get("role"),
+                    "original_family": result.get("family_id"),
+                    "llm_status": llm_review.get("analysis", {}).get("status") if isinstance(llm_review.get("analysis"), dict) else "unknown",
+                    "confidence": llm_review.get("analysis", {}).get("confidence") if isinstance(llm_review.get("analysis"), dict) else None,
+                    "justification": llm_review.get("analysis", {}).get("justification") if isinstance(llm_review.get("analysis"), dict) else None,
+                }
+                
+                if llm_auto_upgrade:
+                    display_payload["review_summary"]["auto_upgrade"] = llm_auto_upgrade
+                
+                if isinstance(entry_preview, dict):
+                    display_payload["entry_original"] = entry_preview
+                
+                display_payload["entry_revised"] = llm_adjusted_entry
+                display_payload["llm_review_details"] = {
+                    "model": llm_review.get("model"),
+                    "provider": llm_review.get("provider"),
+                    "tokens_used": llm_review.get("total_tokens"),
+                    "latency_ms": llm_review.get("latency_ms"),
+                }
+                
+                if isinstance(llm_review.get("analysis"), dict):
+                    alerts = llm_review["analysis"].get("alerts", [])
+                    if alerts:
+                        display_payload["llm_alerts"] = alerts
+                
+                if result.get("llm_applied_changes"):
+                    display_payload["changes_applied"] = result["llm_applied_changes"]
+                
+                if result.get("llm_adjustment_errors"):
+                    display_payload["adjustment_errors"] = result["llm_adjustment_errors"]
             else:
-                exclude_keys = {'dry_run', 'registry_file'}
-                display_payload = {k: v for k, v in result.items() if k not in exclude_keys}
-            if llm_review:
-                display_payload["llm_review"] = llm_review
-        self.output_view.setPlainText(json.dumps(display_payload, indent=2, ensure_ascii=False))
-        self.set_inputs_enabled(True)
-        has_entry = any(
-            key in display_payload for key in ("entry_revised", "entry", "entry_original")
-        )
-        self.save_button.setEnabled(has_entry)
+                # No LLM or simple output
+                if isinstance(entry_preview, dict):
+                    display_payload["entry"] = entry_preview
+                elif isinstance(llm_adjusted_entry, dict):
+                    display_payload["entry"] = llm_adjusted_entry
+                else:
+                    exclude_keys = {'dry_run', 'registry_file'}
+                    display_payload = {k: v for k, v in result.items() if k not in exclude_keys}
+                if llm_review:
+                    display_payload["llm_review"] = llm_review
+            
+            self.output_view.setPlainText(json.dumps(display_payload, indent=2, ensure_ascii=False))
+            self.set_inputs_enabled(True)
+            has_entry = any(
+                key in display_payload for key in ("entry_revised", "entry", "entry_original")
+            )
+            self.save_button.setEnabled(has_entry)
+        
         self._current_worker = None
 
     def on_save_clicked(self) -> None:
