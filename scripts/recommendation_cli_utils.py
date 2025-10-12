@@ -378,3 +378,107 @@ def summarize_protocol(data: Dict[str, Any]) -> None:
             
             if parts:
                 print(f"     Conditions: {', '.join(parts)}")
+
+
+def summarize_llm_synthesis(data: Dict[str, Any]) -> None:
+    """Print a short summary of the LLM multi-source synthesis output."""
+    if not isinstance(data, dict):
+        print(f"LLM synthesis: unexpected response type ({type(data).__name__})")
+        return
+    
+    if "error" in data:
+        print(f"LLM synthesis: {data['error']}")
+        return
+    
+    status = data.get("status", "unknown")
+    synthesis = data.get("synthesis", {})
+    sources_used = data.get("sources_used", {})
+    llm_metadata = data.get("llm_metadata", {})
+    
+    # Print header
+    model = llm_metadata.get("model", "Unknown LLM")
+    print(f"LLM Multi-Source Synthesis ({model}):")
+    print(f"  Status: {status}")
+    
+    # Print processing time and cost
+    latency_ms = llm_metadata.get("latency_ms")
+    tokens = llm_metadata.get("tokens")
+    processing_time_ms = llm_metadata.get("processing_time_ms")
+    
+    if processing_time_ms is not None:
+        print(f"  Total processing time: {processing_time_ms:.1f} ms")
+    if latency_ms is not None:
+        print(f"  LLM latency: {latency_ms/1000:.1f}s")
+    if tokens is not None:
+        print(f"  Tokens used: {tokens}")
+    
+    # Print sources used
+    if sources_used:
+        ml_count = sources_used.get("ml_precedents", 0)
+        rule_count = sources_used.get("rule_matches", 0)
+        protocol_count = sources_used.get("protocol_procedures", 0)
+        print(f"  Sources: ML={ml_count}, Rule={rule_count}, Protocol={protocol_count}")
+    
+    if not synthesis:
+        print("  No synthesis data returned.")
+        return
+    
+    # Print confidence
+    confidence = synthesis.get("confidence_level", "unknown")
+    confidence_reasoning = synthesis.get("confidence_reasoning", "")
+    print(f"\n  Confidence: {confidence.upper()}")
+    if confidence_reasoning:
+        # Truncate if too long
+        reasoning = confidence_reasoning if len(confidence_reasoning) < 120 else confidence_reasoning[:117] + "..."
+        print(f"  Reasoning: {reasoning}")
+    
+    # Print recommended condition
+    recommended = synthesis.get("recommended_condition", {})
+    if recommended:
+        print(f"\n  RECOMMENDED CONDITIONS:")
+        if recommended.get("catalyst"):
+            print(f"    Catalyst: {recommended['catalyst']}")
+        if recommended.get("ligand"):
+            print(f"    Ligand: {recommended['ligand']}")
+        if recommended.get("solvent"):
+            print(f"    Solvent: {recommended['solvent']}")
+        if recommended.get("temperature"):
+            print(f"    Temperature: {recommended['temperature']}")
+        if recommended.get("base"):
+            print(f"    Base: {recommended['base']}")
+        if recommended.get("additive") and recommended['additive'] not in [None, "None", "N/A"]:
+            print(f"    Additive: {recommended['additive']}")
+        
+        rationale = recommended.get("rationale", "")
+        if rationale:
+            # Truncate if too long
+            rat_text = rationale if len(rationale) < 150 else rationale[:147] + "..."
+            print(f"    Rationale: {rat_text}")
+    
+    # Print backup conditions
+    backups = synthesis.get("backup_conditions", [])
+    if backups:
+        print(f"\n  BACKUP CONDITIONS ({len(backups)}):")
+        for i, backup in enumerate(backups[:2], 1):  # Show top 2 backups
+            catalyst = backup.get("catalyst", "?")
+            when = backup.get("when_to_use", "")
+            print(f"    {i}. {catalyst}")
+            if when:
+                when_text = when if len(when) < 100 else when[:97] + "..."
+                print(f"       When: {when_text}")
+    
+    # Print warnings
+    warnings = synthesis.get("warnings", [])
+    if warnings:
+        print(f"\n  WARNINGS ({len(warnings)}):")
+        for warning in warnings[:3]:  # Show top 3 warnings
+            warn_text = warning if len(warning) < 100 else warning[:97] + "..."
+            print(f"    • {warn_text}")
+    
+    # Print consensus analysis (brief)
+    consensus = synthesis.get("consensus_analysis", {})
+    if consensus:
+        catalyst_agreement = consensus.get("catalyst", {}).get("agreement", "unknown")
+        solvent_agreement = consensus.get("solvent", {}).get("agreement", "unknown")
+        print(f"\n  Consensus: Catalyst={catalyst_agreement}, Solvent={solvent_agreement}")
+

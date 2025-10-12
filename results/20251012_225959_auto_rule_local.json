@@ -1,14 +1,14 @@
 {
   "meta": {
-    "generated_at": "2025-10-12T03:20:15.052875Z",
+    "generated_at": "2025-10-12T14:59:59.617180Z",
     "model": "Rule-based-Suzuki_db.json",
     "model_version": "1.0.0",
     "status": "success",
     "version": "2.0",
-    "processing_time_ms": 8.11
+    "processing_time_ms": 13.05
   },
   "input": {
-    "reaction_smiles": "Brc1cccc2nsnc12.c1ccc(B(O)O)cc1>>c1ccc(-c2cccc3nsnc23)cc1",
+    "reaction_smiles": "Ic1ccc(C(=O)OC)cc1.c1c[nH]c(B(O)O)c1>>COC(=O)c1ccc(-c2cc[nH]c2)cc1",
     "family": "Suzuki_Miyaura"
   },
   "detection": {
@@ -22,7 +22,7 @@
       "rank": 1,
       "chemicals": [
         {
-          "smiles": "Brc1cccc2nsnc12",
+          "smiles": "Ic1ccc(C(=O)OC)cc1",
           "role": "electrophile",
           "name": null,
           "abbreviation": null,
@@ -30,7 +30,7 @@
           "equivalents": null
         },
         {
-          "smiles": "c1ccc(B(O)O)cc1",
+          "smiles": "c1c[nH]c(B(O)O)c1",
           "role": "nucleophile",
           "name": null,
           "abbreviation": null,
@@ -113,12 +113,12 @@
       "trace": {
         "normalization": {
           "reactant_smiles": [
-            "Brc1cccc2nsnc12",
-            "c1ccc(B(O)O)cc1"
+            "Ic1ccc(C(=O)OC)cc1",
+            "c1c[nH]c(B(O)O)c1"
           ],
           "kept_reactants": [
-            "Brc1cccc2nsnc12",
-            "c1ccc(B(O)O)cc1"
+            "Ic1ccc(C(=O)OC)cc1",
+            "c1c[nH]c(B(O)O)c1"
           ],
           "dropped_reactants": [],
           "smarts_bag": [
@@ -156,7 +156,7 @@
                 "smarts": "[c:1]-[I,Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1cccc2nsnc12",
+                "reactant_smiles": "Ic1ccc(C(=O)OC)cc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -167,7 +167,7 @@
                 "smarts": "[B:3](-[O])(-[O])-[c:4]",
                 "masked_index": 1,
                 "reactant_index": 1,
-                "reactant_smiles": "c1ccc(B(O)O)cc1",
+                "reactant_smiles": "c1c[nH]c(B(O)O)c1",
                 "match_count": 1,
                 "atom_indices": [
                   4,
@@ -197,9 +197,10 @@
             "priority": 60,
             "specificity": 6,
             "matches": [],
-            "missing": [],
-            "matched": false,
-            "filtered": true
+            "missing": [
+              "[c:1]-[Cl:2]"
+            ],
+            "matched": false
           },
           {
             "id": "SCDB-SUZ-ARCL-ERich-L95",
@@ -258,21 +259,9 @@
             "type": "scheme",
             "priority": 66,
             "specificity": 10,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1cccc2nsnc12",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]1[o,s][c][c][c]1"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -286,7 +275,7 @@
                 "smarts": "[c:1]-[I,Br:2]",
                 "masked_index": 0,
                 "reactant_index": 0,
-                "reactant_smiles": "Brc1cccc2nsnc12",
+                "reactant_smiles": "Ic1ccc(C(=O)OC)cc1",
                 "match_count": 1,
                 "atom_indices": [
                   1,
@@ -304,21 +293,9 @@
             "type": "scheme",
             "priority": 48,
             "specificity": 8,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1cccc2nsnc12",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]([!H])([!H])"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },
@@ -378,21 +355,9 @@
             "type": "scheme",
             "priority": 64,
             "specificity": 11,
-            "matches": [
-              {
-                "smarts": "[c:1]-[Br:2]",
-                "masked_index": 0,
-                "reactant_index": 0,
-                "reactant_smiles": "Brc1cccc2nsnc12",
-                "match_count": 1,
-                "atom_indices": [
-                  1,
-                  0
-                ]
-              }
-            ],
+            "matches": [],
             "missing": [
-              "[B:3](-[O])(-[O])-[c:4]1[n][c,n][c,n][c,n][c,n]1"
+              "[c:1]-[Br:2]"
             ],
             "matched": false
           },

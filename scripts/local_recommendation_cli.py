@@ -26,7 +26,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -41,6 +41,19 @@ try:
 except ImportError:
     HAS_PROTOCOL = False
     ProtocolRecommender = None
+
+try:
+    from llmtools.clients import LLMClient
+    from llmtools.recommendation_llm import (
+        synthesize_recommendations_llm,
+        convert_llm_synthesis_to_standard_format,
+    )
+    HAS_LLM = True
+except ImportError:
+    HAS_LLM = False
+    LLMClient = None
+    synthesize_recommendations_llm = None
+    convert_llm_synthesis_to_standard_format = None
 
 try:
     from chemtools.rule_scdb_matcher.loader import SchemeConditionDBError
@@ -63,6 +76,7 @@ try:
         summarize_ml,
         summarize_rule,
         summarize_protocol,
+        summarize_llm_synthesis,
     )
 except ModuleNotFoundError:
     sys.path.append(str(HERE))
@@ -79,6 +93,7 @@ except ModuleNotFoundError:
         summarize_ml,
         summarize_rule,
         summarize_protocol,
+        summarize_llm_synthesis,
     )
 
 
@@ -365,6 +380,94 @@ def local_protocol_recommendation(
         }
 
 
+def local_llm_synthesis(
+    reaction: str,
+    ml_result: Optional[Dict[str, Any]] = None,
+    rule_result: Optional[Dict[str, Any]] = None,
+    protocol_result: Optional[Dict[str, Any]] = None,
+    constraints: Optional[Dict[str, Any]] = None,
+    llm_provider: str = "aliyun",
+    llm_model: str = "deepseek-v3.2-exp",
+    prompt_version: str = "v2",
+    requested_type: Optional[str] = None,
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """
+    Run LLM-enhanced multi-source synthesis locally.
+    
+    Combines ML, Rule, and Protocol recommendations using LLM intelligence
+    to provide chemistry-aware synthesis with explanations, warnings, and backups.
+    
+    Args:
+        reaction: Reaction SMILES
+        ml_result: ML recommendation result (from local_ml_recommendation)
+        rule_result: Rule-based result (from local_rule_based_match)
+        protocol_result: Protocol result (from local_protocol_recommendation)
+        constraints: Optional user constraints (scale, cost, air_sensitivity, etc.)
+        llm_provider: LLM provider ("aliyun" or "openai")
+        llm_model: LLM model name (default: "deepseek-v3.2-exp")
+        prompt_version: Prompt version ("v1" or "v2", default "v2" for optimized)
+        requested_type: Requested reaction type for standard format output
+    
+    Returns:
+        Tuple of (analysis_result, standard_format_result):
+            - analysis_result: LLM synthesis analysis (original format)
+            - standard_format_result: Standard format for robotic execution
+    """
+    error_result = {
+        "error": "LLM synthesis not available. Install with: pip install dashscope openai",
+        "meta": {
+            "model": "LLM-Synthesis",
+            "status": "error"
+        }
+    }
+    
+    if not HAS_LLM:
+        return error_result, error_result
+    
+    try:
+        # Initialize LLM client
+        llm_client = LLMClient(provider=llm_provider, model=llm_model)
+        
+        # Run synthesis
+        start_time = time.perf_counter()
+        analysis_result = synthesize_recommendations_llm(
+            reaction_smiles=reaction,
+            ml_results=ml_result,
+            rule_results=rule_result,
+            protocol_results=protocol_result,
+            constraints=constraints,
+            llm_client=llm_client,
+            prompt_version=prompt_version,
+        )
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+        
+        # Add processing time
+        if analysis_result.get('status') == 'success':
+            if 'llm_metadata' not in analysis_result:
+                analysis_result['llm_metadata'] = {}
+            analysis_result['llm_metadata']['processing_time_ms'] = elapsed_ms
+        
+        # Convert to standard format for robotic execution
+        standard_result = convert_llm_synthesis_to_standard_format(
+            reaction_smiles=reaction,
+            synthesis_result=analysis_result,
+            requested_type=requested_type,
+            processing_time_ms=elapsed_ms,
+        )
+        
+        return analysis_result, standard_result
+        
+    except Exception as exc:
+        error_result = {
+            "error": f"LLM synthesis failed: {exc}",
+            "meta": {
+                "model": f"LLM-Synthesis-{llm_model}",
+                "status": "error"
+            }
+        }
+        return error_result, error_result
+
+
 def main() -> None:
     """Main entry point with optional command-line arguments."""
     parser = argparse.ArgumentParser(
@@ -434,8 +537,10 @@ Examples:
         "--strategy",
         type=str,
         default="all",
-        choices=["all", "rule", "ml", "fusion", "protocol"],
-        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated, use --rerank rule instead."
+        choices=["all", "rule", "ml", "fusion", "protocol", "llm"],
+        help="Which recommendation strategy to run (default: all). "
+             "Use 'llm' for multi-source LLM synthesis. "
+             "NOTE: 'fusion' is deprecated, use --rerank rule instead."
     )
     
     parser.add_argument(
@@ -458,6 +563,37 @@ Examples:
         type=str,
         default=None,
         help="Comma-separated tags to filter protocols (e.g., 'suzuki,palladium')"
+    )
+    
+    # LLM synthesis options
+    parser.add_argument(
+        "--llm-provider",
+        type=str,
+        default="aliyun",
+        choices=["aliyun", "openai"],
+        help="LLM provider for multi-source synthesis (default: aliyun)"
+    )
+    
+    parser.add_argument(
+        "--llm-model",
+        type=str,
+        default="deepseek-v3.2-exp",
+        help="LLM model for synthesis (default: deepseek-v3.2-exp)"
+    )
+    
+    parser.add_argument(
+        "--llm-prompt-version",
+        type=str,
+        default="v2",
+        choices=["v1", "v2"],
+        help="LLM prompt version: v1 (original) or v2 (optimized, 30%% faster). Default: v2"
+    )
+    
+    parser.add_argument(
+        "--constraints",
+        type=str,
+        default=None,
+        help="User constraints as JSON string (e.g., '{\"scale\": \"multigram\", \"cost\": \"low\"}')"
     )
     
     parser.add_argument(
@@ -516,15 +652,17 @@ Examples:
         return output_path
 
     # Run selected strategies
-    run_rule = args.strategy in ["all", "rule"]
-    run_ml = args.strategy in ["all", "ml"]
+    run_rule = args.strategy in ["all", "rule", "llm"]
+    run_ml = args.strategy in ["all", "ml", "llm"]
     run_fusion = args.strategy in ["all", "fusion"]
-    run_protocol = args.strategy in ["all", "protocol"]
+    run_protocol = args.strategy in ["all", "protocol", "llm"]
+    run_llm = args.strategy in ["all", "llm"]
     
     rule_result = None
     ml_result = None
     fusion_result = None
     protocol_result = None
+    llm_result = None
     
     if run_rule:
         rule_result = local_rule_based_match(reaction, db_path)
@@ -560,6 +698,40 @@ Examples:
             reaction_family=None  # Let protocol module auto-detect from similarity
         )
         protocol_file = save_to_dir(protocol_result, f"{timestamp}_{label}_protocol_local.json")
+    
+    # Initialize LLM result variables
+    llm_analysis_result = None
+    llm_standard_result = None
+    llm_analysis_file = None
+    llm_standard_file = None
+    
+    if run_llm:
+        # Parse constraints if provided
+        constraints = None
+        if args.constraints:
+            import json
+            try:
+                constraints = json.loads(args.constraints)
+            except json.JSONDecodeError as e:
+                print(f"Warning: Failed to parse constraints JSON: {e}")
+                constraints = None
+        
+        # Run LLM synthesis - returns both analysis and standard format
+        llm_analysis_result, llm_standard_result = local_llm_synthesis(
+            reaction=reaction,
+            ml_result=ml_result,
+            rule_result=rule_result,
+            protocol_result=protocol_result,
+            constraints=constraints,
+            llm_provider=args.llm_provider,
+            llm_model=args.llm_model,
+            prompt_version=args.llm_prompt_version,
+            requested_type=args.family,
+        )
+        
+        # Save both formats
+        llm_analysis_file = save_to_dir(llm_analysis_result, f"{timestamp}_{label}_llm_analysis.json")
+        llm_standard_file = save_to_dir(llm_standard_result, f"{timestamp}_{label}_llm_local.json")
 
     print("Summary\n-------")
     
@@ -577,16 +749,23 @@ Examples:
     
     if protocol_result:
         summarize_protocol(protocol_result)
+        print()
+    
+    if llm_analysis_result:
+        summarize_llm_synthesis(llm_analysis_result)
 
     print("\nSaved outputs:")
     if run_rule:
-        print(f"  Rule JSON:     {rule_file}")
+        print(f"  Rule JSON:            {rule_file}")
     if run_ml:
-        print(f"  ML JSON:       {ml_file}")
+        print(f"  ML JSON:              {ml_file}")
     if run_fusion:
-        print(f"  Fusion JSON:   {fusion_file}")
+        print(f"  Fusion JSON:          {fusion_file}")
     if run_protocol:
-        print(f"  Protocol JSON: {protocol_file}")
+        print(f"  Protocol JSON:        {protocol_file}")
+    if run_llm:
+        print(f"  LLM Analysis JSON:    {llm_analysis_file}")
+        print(f"  LLM Standard JSON:    {llm_standard_file}  (for robotic execution)")
     
     print("\nDone.")
 
