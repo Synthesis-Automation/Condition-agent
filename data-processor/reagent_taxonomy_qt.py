@@ -1109,8 +1109,7 @@ class GenerationWorker(QRunnable):
                     cas=cas,
                     registry_dir=registry_dir,
                     llm_client=llm_client,
-                    name_override=name_override,
-                    dry_run=True  # Always dry-run in UI
+                    name_override=name_override
                 )
             else:
                 # Legacy workflow
@@ -1131,6 +1130,7 @@ class RegistryGeneratorWindow(QMainWindow):
         self.thread_pool = QThreadPool.globalInstance()
         self._current_worker: Optional[GenerationWorker] = None
         self._last_result: Optional[Dict[str, Any]] = None
+        self._llm_support_available = LLM_SUPPORT_AVAILABLE and bool(LLM_AVAILABLE_MODELS)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -1175,8 +1175,6 @@ class RegistryGeneratorWindow(QMainWindow):
         if default_index != -1:
             self.role_combo.setCurrentIndex(default_index)
         form_layout.addRow("Reagent role", self.role_combo)
-
-        self._llm_support_available = LLM_SUPPORT_AVAILABLE and bool(LLM_AVAILABLE_MODELS)
         
         # Workflow mode selection
         workflow_widget = QWidget()
