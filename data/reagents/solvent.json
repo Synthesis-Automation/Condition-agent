@@ -480,7 +480,8 @@
           "deuterated"
         ],
         "coordination": null,
-        "proticity": null
+        "proticity": null,
+        "polarity": null
       }
     },
     "embedding_text": "type: SOLVENT | family: Deuterated solvents (NMR) (deuterated) | name: Benzene-d6 | abbr: C6D6 | CAS: 1076-43-3 | proticity:  | polarity:  | coordination:  | synonyms: Deuterated benzene; Benzened6"

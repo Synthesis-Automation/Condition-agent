@@ -454,6 +454,7 @@
       "2-(Dicyclohexylphosphino)-N,N-dimethyl-[1,1'-biphenyl]-2-amine"
     ],
     "cas": "213697-53-1",
+    "smiles": null,
     "inchi_key": "ZEMZPXWZVTUONV-UHFFFAOYSA-N",
     "roles": {
       "ligand": {

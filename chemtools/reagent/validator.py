@@ -465,6 +465,100 @@ def print_validation_summary(results: Dict[str, Any], verbose: bool = False) -> 
     print(f"\n{'='*70}\n")
 
 
+def print_critical_errors_summary(results: Dict[str, Any]) -> None:
+    """
+    Print a focused summary of critical errors only (not warnings).
+    Shows compound names by re-reading the files.
+    
+    Args:
+        results: Results from validate_database()
+    """
+    if "error" in results:
+        return
+    
+    # Collect all critical errors with file info
+    critical_errors = []
+    
+    for role, role_result in results["by_role"].items():
+        if "error" in role_result or not role_result.get("entry_issues"):
+            continue
+        
+        file_path = Path(role_result["file"])
+        
+        # Load entries to get names
+        entries = []
+        if file_path.exists():
+            try:
+                content = file_path.read_text(encoding="utf-8")
+                entries = json.loads(content)
+            except:
+                pass
+        
+        for entry_key, issues in role_result["entry_issues"].items():
+            for issue in issues:
+                if issue["severity"] == "error":
+                    # Extract index from "index_16"
+                    idx = int(entry_key.split("_")[1]) if "_" in entry_key else -1
+                    
+                    # Get compound name
+                    compound_name = "Unknown"
+                    compound_id = "Unknown"
+                    if 0 <= idx < len(entries):
+                        entry = entries[idx]
+                        compound_name = entry.get("name", "Unknown")
+                        compound_id = entry.get("id", "Unknown")
+                        # Try to get abbreviation if name is too long
+                        abbr = entry.get("abbreviation", [])
+                        if abbr and isinstance(abbr, list) and len(abbr) > 0:
+                            if len(compound_name) > 40:
+                                compound_name = f"{abbr[0]} ({compound_name[:37]}...)"
+                            else:
+                                compound_name = f"{abbr[0]} ({compound_name})"
+                    
+                    critical_errors.append({
+                        "role": role.upper(),
+                        "entry_key": entry_key,
+                        "field": issue["field"],
+                        "message": issue["message"],
+                        "compound_name": compound_name,
+                        "compound_id": compound_id,
+                    })
+    
+    if not critical_errors:
+        print(f"\n{'='*70}")
+        print("✅ NO CRITICAL ERRORS - All entries are valid!")
+        print(f"{'='*70}\n")
+        return
+    
+    print(f"\n{'='*70}")
+    print(f"🔴 CRITICAL ERRORS SUMMARY ({len(critical_errors)} errors)")
+    print(f"{'='*70}")
+    print("\nThe following compounds have CRITICAL errors that must be fixed:\n")
+    
+    # Group by role
+    errors_by_role = {}
+    for error in critical_errors:
+        role = error["role"]
+        if role not in errors_by_role:
+            errors_by_role[role] = []
+        errors_by_role[role].append(error)
+    
+    for role, errors in errors_by_role.items():
+        print(f"\n📌 {role} ({len(errors)} error{'s' if len(errors) > 1 else ''}):")
+        for i, error in enumerate(errors, 1):
+            print(f"   {i}. {error['compound_name']}")
+            print(f"      ID: {error['compound_id']}")
+            print(f"      ❌ {error['field']}: {error['message']}")
+            if i < len(errors):
+                print()
+    
+    print(f"\n{'='*70}")
+    print("💡 For detailed information, run with --verbose flag:")
+    print(f"   python scripts/validate_reagent_db.py --verbose")
+    print(f"\n📄 See REAGENT_ERRORS_REPORT.md for fix instructions")
+    print(f"{'='*70}\n")
+
+
 # CLI interface
 if __name__ == "__main__":
     import sys
