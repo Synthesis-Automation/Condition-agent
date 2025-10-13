@@ -61,6 +61,7 @@ from .validator import (
     validate_role_file,
     validate_database,
     print_validation_summary,
+    print_critical_errors_summary,
 )
 
 # Analytics functions
@@ -107,6 +108,7 @@ __all__ = [
     "validate_role_file",
     "validate_database",
     "print_validation_summary",
+    "print_critical_errors_summary",
     # Analytics
     "get_database_statistics",
     "get_family_statistics",

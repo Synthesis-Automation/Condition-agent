@@ -28,7 +28,8 @@
       "acid": {
         "families": [
           "boron_lewis_acids"
-        ]
+        ],
+        "acidity": "strong"
       }
     },
     "embedding_text": "type: ACID | family: Boron Lewis acids (boron_lewis_acids) | name: Boron trifluoride etherate | abbr: BF3.Et2O | CAS: 109-63-7 | synonyms: Borontrifluorideetherate; Boron trifluoride ethyl ether; ethoxyethane;trifluoroborane; BF3.Et2O; Boron trifluoride-diethyl etherate; ethoxyethane; trifluoroborane; boron trifluoride diethyl ether; boron trifluoride-diethyl ether; BF3 ethyl ether; BF3 ether; trifluoroborane ether; borontrifluride etherate | family_notes: Lewis acids often boron/metal halides; handle with care (moisture sensitive)."
@@ -62,7 +63,8 @@
       "acid": {
         "families": [
           "mineral_acids"
-        ]
+        ],
+        "acidity": "strong"
       }
     },
     "embedding_text": "type: ACID | family: Mineral acids (H2SO4/HCl/H3PO4) (mineral_acids) | name: Hydrochloric Acid | abbr: HCl | CAS: 7647-01-0 | synonyms: hydrogen chloride; Muriatic acid; chlorane; Chlorohydric acid; Acide chlorhydrique; Anhydrous hydrochloric acid; Chlorwasserstoff; Muriaticum acidum; Chloorwaterstof; Chlorowodor; Hydrogen chloride (HCl); Acido cloridrico | family_notes: HX/H2SO4/H3PO4 aqueous/non-aqueous use; corrosive."

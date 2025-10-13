@@ -19,6 +19,7 @@ from chemtools.reagent import (
     validate_database,
     validate_entry,
     print_validation_summary,
+    print_critical_errors_summary,
 )
 
 # Default to data/reagents in project root
@@ -68,6 +69,10 @@ def main():
     
     # Print results
     print_validation_summary(results, verbose=args.verbose)
+    
+    # Print critical errors summary (always show, even without --verbose)
+    if not args.verbose:
+        print_critical_errors_summary(results)
     
     # Return exit code
     if results.get("error") or results.get("invalid_entries", 0) > 0:
