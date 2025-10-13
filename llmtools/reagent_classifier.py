@@ -171,7 +171,15 @@ def _format_families_description(families: List[Dict[str, Any]]) -> str:
 
 def _load_schema_for_role(role: str, registry_dir: Path) -> Dict[str, Any]:
     """Load the reagent schema and extract field definitions for a specific role."""
+    # Try registry_dir first
     schema_path = registry_dir / "reagent_schema" / "reagent_schema.json"
+    
+    if not schema_path.exists():
+        # Fallback to chemtools package location
+        import chemtools.reagent
+        package_path = Path(chemtools.reagent.__file__).parent / "reagent_schema" / "reagent_schema.json"
+        if package_path.exists():
+            schema_path = package_path
     
     # Default schema fallback
     default_schemas = {
@@ -340,13 +348,20 @@ def assign_fields(
             "error": "..." (if status=error)
         }
     """
-    # Load families for this role
+    # Load families for this role - try registry_dir first, then chemtools package
     families_path = registry_dir / "reagent_schema" / "families_registry.json"
+    
     if not families_path.exists():
-        return {
-            "status": "error",
-            "error": f"Families registry not found: {families_path}",
-        }
+        # Fallback to chemtools package location
+        import chemtools.reagent
+        package_path = Path(chemtools.reagent.__file__).parent / "reagent_schema" / "families_registry.json"
+        if package_path.exists():
+            families_path = package_path
+        else:
+            return {
+                "status": "error",
+                "error": f"Families registry not found in {registry_dir / 'reagent_schema'} or {package_path}",
+            }
     
     try:
         families_data = json.loads(families_path.read_text(encoding="utf-8"))

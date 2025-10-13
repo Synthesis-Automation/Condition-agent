@@ -1,38 +1,5 @@
 [
   {
-    "entry_preview": {
-      "id": "cas-1660153-91-2",
-      "name": "(t-Bu)PhCPhos",
-      "abbreviation": [
-        "(t-Bu)PhCPhos"
-      ],
-      "aliases": [
-        "2-(t-Butylphenylphosphino)-2',6'-dimethylamino-1,1'-biphenyl",
-        "2-(t-Butylphenylphosphino)-26-dimethylamino-11-biphenyl",
-        "2'-(tert-Butyl(phenyl)phosphino)-N2,N2,N6,N6-tetramethyl-[1,1'-biphenyl]-2,6-diamine",
-        "2-[2-[tert-butyl(phenyl)phosphanyl]phenyl]-1-N,1-N,3-N,3-N-tetramethylbenzene-1,3-diamine",
-        "(t-Bu)PhCPhos, 95%",
-        "2'-[TERT-BUTYL(PHENYL)PHOSPHANYL]-N2,N2,N6,N6-TETRAMETHYL-[1,1'-BIPHENYL]-2,6-DIAMINE"
-      ],
-      "cas": "1660153-91-2",
-      "inchi_key": null,
-      "smiles": null,
-      "roles": {
-        "ligand": {
-          "families": [
-            "phox_pn"
-          ],
-          "donors": [
-            "P",
-            "N"
-          ],
-          "denticity": 2
-        }
-      },
-      "embedding_text": "type: LIGAND | family: PHOX ligands (phosphino-oxazoline, P^N) (phox_pn) | donor atoms: P, N | denticity: 2 | name: (t-Bu)PhCPhos | abbr: (t-Bu)PhCPhos | CAS: 1660153-91-2 | synonyms: (t-Bu)PhCPhos; 1660153-91-2; RefChem:408449; 110-484-6; MFCD29905429; 2-(t-Butylphenylphosphino)-2',6'-dimethylamino-1,1'-biphenyl; 2-(t-Butylphenylphosphino)-26-dimethylamino-11-biphenyl; 2'-(tert-Butyl(phenyl)phosphino)-N2,N2,N6,N6-tetramethyl-[1,1'-biphenyl]-2,6-diamine; 2-[2-[tert-butyl(phenyl)phosphanyl]phenyl]-1-N,1-N,3-N,3-N-tetramethylbenzene-1,3-diamine; (t-Bu)PhCPhos, 95%; SCHEMBL23166139; SCHEMBL29778093; 2'-[TERT-BUTYL(PHENYL)PHOSPHANYL]-N2,N2,N6,N6-TETRAMETHYL-[1,1'-BIPHENYL]-2,6-DIAMINE; SY073458; E84908; EN300-21685596"
-    }
-  },
-  {
     "id": "1_10_phenanthroline__66-71-7",
     "name": "1,10-Phenanthroline",
     "abbreviation": [
@@ -460,6 +427,44 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_PDI | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: DIPP-PDI | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
+  },
+  {
+    "id": "ZEMZPXWZVTUONV-UHFFFAOYSA-N",
+    "name": "2-(Dicyclohexylphosphino)-2'-(dimethylamino)biphenyl",
+    "abbreviation": [
+      "DavePhos"
+    ],
+    "aliases": [
+      "2'-(dicyclohexylphosphino)-N,N-dimethyl[1,1'-biphenyl]-2-amine",
+      "2'-(Dicyclohexylphosphino)-N,N-dimethyl(1,1'-biphenyl)-2-amine",
+      "RefChem:460558",
+      "606-749-5",
+      "2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)biphenyl",
+      "2'-(DICYCLOHEXYLPHOSPHINO)-N,N-DIMETHYL-[1,1'-BIPHENYL]-2-AMINE",
+      "MFCD02183572",
+      "2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethylaniline",
+      "2-dicyclohexylphosphino-2'-(dimethylamino)biphenyl",
+      "2'-(dicyclohexylphosphanyl)-N,N-dimethyl-[1,1'-biphenyl]-2-amine",
+      "2'-(dicyclohexylphosphino)-n,n-dimethylbiphenyl-2-amine",
+      "2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethyl-aniline",
+      "2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)-biphenyl",
+      "2-(Dicyclohexylphosphino)-N,N-dimethyl-[1,1'-biphenyl]-2-amine"
+    ],
+    "cas": "213697-53-1",
+    "inchi_key": "ZEMZPXWZVTUONV-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "phox_pn"
+        ],
+        "donors": [
+          "P",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: phox_pn (phox_pn) | denticity: 2 | name: 2-(Dicyclohexylphosphino)-2'-(dimethylamino)biphenyl | abbr: DavePhos | CAS: 213697-53-1 | synonyms: 2-(Dicyclohexylphosphino)-2'-(dimethylamino)biphenyl; 2'-(dicyclohexylphosphino)-N,N-dimethyl[1,1'-biphenyl]-2-amine; 2'-(Dicyclohexylphosphino)-N,N-dimethyl(1,1'-biphenyl)-2-amine; RefChem:460558; 606-749-5; 213697-53-1; 2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)biphenyl; DavePhos; 2'-(DICYCLOHEXYLPHOSPHINO)-N,N-DIMETHYL-[1,1'-BIPHENYL]-2-AMINE; MFCD02183572; 2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethylaniline; 2-dicyclohexylphosphino-2'-(dimethylamino)biphenyl; 2'-(dicyclohexylphosphanyl)-N,N-dimethyl-[1,1'-biphenyl]-2-amine; 2'-(dicyclohexylphosphino)-n,n-dimethylbiphenyl-2-amine; 2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethyl-aniline; 2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)-biphenyl; 2-(Dicyclohexylphosphino)-N,N-dimethyl-[1,1'-biphenyl]-2-amine"
   },
   {
     "id": "2_diphenylphosphino_pyridine__8543461d",

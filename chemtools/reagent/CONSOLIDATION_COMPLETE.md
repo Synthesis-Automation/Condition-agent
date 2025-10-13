@@ -18,6 +18,7 @@ The reagent management system has been consolidated into `chemtools/reagent/`. A
 ### Files Updated ✅
 
 **chemtools/ (7 files):**
+
 - ✅ `chemtools/output_formatter.py` - Updated imports
 - ✅ `chemtools/ml/simple_precedent_ranker.py` - Updated imports
 - ✅ `chemtools/precedent/search.py` - Updated imports
@@ -28,6 +29,7 @@ The reagent management system has been consolidated into `chemtools/reagent/`. A
 - ✅ `chemtools/explain.py` - Updated imports
 
 **tests/ (3 files):**
+
 - ✅ `tests/test_step5_rule_based.py` - Updated imports
 - ✅ `tests/test_step4_plate_design.py` - Updated imports
 - ✅ `tests/test_basic_tools.py` - Updated imports
@@ -37,6 +39,7 @@ The reagent management system has been consolidated into `chemtools/reagent/`. A
 ### Import Changes
 
 **Before:**
+
 ```python
 from chemtools import reagent_lookup
 from chemtools.reagent_lookup import find_reagent
@@ -45,6 +48,7 @@ result = reagent_lookup.enrich_reagent_info("Pd(PPh3)4", "metal_precursor")
 ```
 
 **After:**
+
 ```python
 from chemtools import reagent
 from chemtools.reagent import find_reagent
@@ -70,6 +74,7 @@ chemtools/reagent/
 ## Usage Examples
 
 ### Runtime Lookup (Most Common)
+
 ```python
 from chemtools.reagent import find_reagent, enrich_reagent_info
 
@@ -81,6 +86,7 @@ details = enrich_reagent_info("PPh3", "ligand")
 ```
 
 ### Taxonomy Management
+
 ```python
 from chemtools.reagent import TaxonomyStore, RoleHeuristics, normalize_cas
 
@@ -96,6 +102,7 @@ cas = normalize_cas("14221-01-3")  # Returns "14221-01-3"
 ```
 
 ### CLI Tool
+
 ```bash
 # List all families (requires taxonomy files)
 python -m chemtools.reagent.taxonomy_cli --list-families
@@ -115,6 +122,7 @@ python -m chemtools.reagent.taxonomy_cli --cas "14221-01-3"
 ## Testing Results ✅
 
 ### Import Tests
+
 ```
 ✅ All imports successful!
    - find_reagent: find_reagent
@@ -125,6 +133,7 @@ python -m chemtools.reagent.taxonomy_cli --cas "14221-01-3"
 ```
 
 ### Integration Tests
+
 ```
 ✅ context module imports successfully
 ✅ output_formatter module imports successfully
@@ -134,21 +143,27 @@ python -m chemtools.reagent.taxonomy_cli --cas "14221-01-3"
 ## Next Steps (Optional)
 
 ### Cleanup Old Files
+
 The old `chemtools/reagent_lookup.py` can now be safely deleted:
+
 ```bash
 # Optional: Remove old file
 rm chemtools/reagent_lookup.py
 ```
 
 ### Create Taxonomy Files
+
 If you want to use the taxonomy management features, you'll need to create the taxonomy directory structure:
+
 ```bash
 mkdir -p data/compound_taxonomy
 # Then populate with taxonomy JSON files
 ```
 
 ### Update data-processor Scripts
+
 Scripts in `data-processor/` that use `reagent_taxonomy_generator.py` can now use:
+
 ```python
 # Instead of sys.path hacking
 from chemtools.reagent import (
@@ -171,11 +186,13 @@ from chemtools.reagent import (
 ## Files Status
 
 ### Active Files (Use These!)
+
 - ✅ `chemtools/reagent/` - New consolidated package
 - ✅ All updated chemtools/ modules
 - ✅ All updated test files
 
 ### Deprecated Files (Can Be Removed)
+
 - ⚠️ `chemtools/reagent_lookup.py` - Replaced by `chemtools/reagent/lookup.py`
 - ⚠️ `data-processor/reagent_taxonomy_generator.py` - Functionality now in `chemtools/reagent/`
 - ⚠️ `data-processor/Reagent_taxonomy_qt.py` - Can be ported to `chemtools/reagent/taxonomy_ui.py`
