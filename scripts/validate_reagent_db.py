@@ -5,20 +5,24 @@ Usage:
     python scripts/validate_reagent_db.py
     python scripts/validate_reagent_db.py --verbose
     python scripts/validate_reagent_db.py --role ligand
+    python scripts/validate_reagent_db.py --registry-dir path/to/reagents
 """
 
 import sys
 from pathlib import Path
 
 # Add parent to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 from chemtools.reagent import (
     validate_database,
     validate_entry,
     print_validation_summary,
-    DEFAULT_REGISTRY_DIR,
 )
+
+# Default to data/reagents in project root
+DEFAULT_REGISTRY_PATH = project_root / "data" / "reagents"
 
 
 def main():
@@ -27,8 +31,8 @@ def main():
     parser = argparse.ArgumentParser(description="Validate reagent database")
     parser.add_argument(
         "--registry-dir",
-        default=DEFAULT_REGISTRY_DIR,
-        help="Path to reagent registry directory",
+        default=str(DEFAULT_REGISTRY_PATH),
+        help=f"Path to reagent registry directory (default: {DEFAULT_REGISTRY_PATH})",
     )
     parser.add_argument(
         "--role",

@@ -24,7 +24,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: yellow; air_stable: False; moisture_sensitive: True | member_embedding: type: CATALYST | family: Ni(0) Sources (ni_zero_sources) | metal: Ni | ox_states: 0 | class: Ni(0) source | name: Bis(1,5-cyclooctadiene)nickel(0) | abbr: Ni(cod)2 | CAS: 1295-35-8 | use_cases: Kumada; Negishi; Suzuki | best_for:  | avoid_when: | member_additional_ligand: usage: required; typical: ['dtbbpy', 'bpy', 'phen', 'terpy', 'IMes/SIPr', 'dppp']; notes: | family_label: Ni(0) Sources | family_precursor_class: Ni(0) source | family_use_cases: Cross-couplings (Kumada, Negishi, Suzuki), reductive couplings | family_preferred_rxns: Kumada, Negishi, Reductive couplings | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Highly air/moisture sensitive; handle strictly under inert atmosphere. | family_additional_ligand: usage: required; typical: ['bpy/dtbbpy', 'phen/neo', 'terpy', 'phosphines', 'NHC (SIPr/IMes)']; notes: Ni(cod)2 usually requires an added ligand and sometimes an activator/reductant. | family_recommended_pairs: {'for_reactions': ['Reductive cross‑electrophile coupling'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy', 'bpy']}, 'co_reagents': {'reductant': ['Zn', 'Mn'], 'base': ['TBAB (phase)']}, 'solvents': ['DMA', 'DMF', 'THF'], 'temp_C': [25, 80], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–12', 'ratio_L_to_M': 1.2}, 'notes': 'dtbbpy standard for aryl–alkyl couplings; halide salts beneficial.'}, {'for_reactions': ['Kumada/Negishi'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppp', 'dppb']}, 'co_reagents': {'base': []}, 'solvents': ['THF', 'Et2O'], 'temp_C': [0, 25], 'loadings': {'catalyst_mol%': '2–5', 'ligand_mol%': '2–6'}, 'notes': 'Classical Ni cross‑coupling manifolds.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Ni(0) Sources (ni_zero_sources) | metal: Ni | ox_states: 0 | name: Bis(1,5-cyclooctadiene)nickel(0) | abbr: Ni(cod)2 | CAS: 1295-35-8"
   },
   {
     "id": "R_cde4fd64a1ef5f3b",
@@ -49,7 +49,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True | member_embedding: type: CATALYST | family: Rhodium(I) Precursors for Hydrogenation (rh_hydrogenation_precursors) | metal: Rh | ox_states: 1 | class: Rh(I) complexes | name: Bis(1,5‑cyclooctadiene)rhodium(I) tetrafluoroborate | abbr: [Rh(cod)2]BF4 | CAS: 35138-22-8 | use_cases: Catalyst precursor, Cationic Rh(I) generation | preferred: Catalyst precursor, Cationic Rh(I) generation | member_additional_ligand: usage: required; typical: ['Phosphines (BINAP/DPPB)', 'NHC (IPr/SIPr)']; notes: | family_label: Rhodium(I) Precursors for Hydrogenation | family_precursor_class: Rh(I) complexes | family_use_cases: Homogeneous hydrogenation, Asymmetric hydrogenation (with chiral ligands), Hydroboration | family_best_for: Alkene/alkyne hydrogenation, Alkene hydrosilylation with P-based ligands | family_avoid_when: Strongly coordinating substrates without excess ligand, Water/air exposure during setup | family_preferred_rxns: Alkene/alkyne hydrogenation, Asymmetric hydrogenation with BINAP/DIPAMP | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Many are air‑stable but undergo hydrolysis/ligand loss when wet. | family_additional_ligand: usage: optional; typical: ['BINAP', 'DIPAMP', 'Josiphos', 'PPh3 (supplement)']; notes: Wilkinson’s often used alone; [RhCl(cod)]2 typically needs a P‑ligand. | family_recommended_pairs: {'for_reactions': ['Asymmetric hydrogenation'], 'with_ligand': {'family_id': 'bisphosphines', 'examples': ['BINAP', 'DIPAMP', 'DuPhos']}, 'co_reagents': {'base': []}, 'solvents': ['EtOH', 'MeOH', 'toluene'], 'temp_C': [20, 50], 'loadings': {'catalyst_mol%': '0.1–1', 'ligand_mol%': '0.12–1.2'}, 'notes': 'H2 pressure 1–10 bar typical; optimize by ligand bite angle/electronics.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Rhodium(I) Precursors for Hydrogenation (rh_hydrogenation_precursors) | metal: Rh | ox_states: 1 | name: Bis(1,5‑cyclooctadiene)rhodium(I) tetrafluoroborate | abbr: [Rh(cod)2]BF4 | CAS: 35138-22-8"
   },
   {
     "id": "R_4ea39624c9f2e7b4",
@@ -70,12 +70,11 @@
         ],
         "metal": "Fe",
         "oxidation_states": [
-          2,
-          3
+          2
         ]
       }
     },
-    "embedding_text": "properties: air_stable: False | member_embedding: type: CATALYST | family: Iron Acetylacetonates (fe_acac) | metal: Fe | ox_states: 2 | class: β‑diketonates | name: Bis(acetylacetonato)iron(II) | abbr: Fe(acac)2 | CAS: 14024-17-0 | use_cases: Catalysis precursor | preferred: Catalysis precursor | family_label: Iron Acetylacetonates | family_precursor_class: β‑diketonates | family_use_cases: Radical cross-couplings (with silanes), Oxidations, Polymerizations | family_preferred_rxns: Cross‑electrophile couplings (emerging), Oxidations | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Fe(acac)3 is air‑stable; Fe(acac)2 may oxidize on storage."
+    "embedding_text": "member_embedding: type: CATALYST | family: Iron Acetylacetonates (fe_acac) | metal: Fe | ox_states: 2 | name: Bis(acetylacetonato)iron(II) | abbr: Fe(acac)2 | CAS: 14024-17-0"
   },
   {
     "id": "R_18610828d0aa2974",
@@ -101,7 +100,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: black; moisture_sensitive: True | member_embedding: type: CATALYST | family: Pd(0) Sources (dba complexes, Pd(PPh3)4) (pd_zero_sources) | metal: Pd | ox_states: 0 | class: Pd(0) source | name: Bis(dibenzylideneacetone)palladium(0) | abbr: Pd(dba)2 | CAS: 32005-36-0 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | member_additional_ligand: usage: required; typical: ['Biaryl monophosphines', 'dppf', 'P(tBu)3', 'NHC (IPr/SIPr)']; notes: | family_label: Pd(0) Sources (dba complexes, Pd(PPh3)4) | family_precursor_class: Pd(0) source | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_best_for: Rapid in situ catalysis; low induction period | family_preferred_rxns: Buchwald–Hartwig, Suzuki | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Typically air/moisture sensitive; store under inert gas. | family_additional_ligand: usage: optional; typical: ['XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'PPh3', 'dppf', 'NHC (IPr/SIPr)']; notes: Pd(PPh3)4 often used alone; dba sources typically require an added ligand. | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (C–N/C–O)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos']}, 'co_reagents': {'base': ['K3PO4', 'NaOtBu', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane', 'tAmylOH'], 'temp_C': [80, 110], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–4', 'ratio_L_to_M': 1.2}, 'notes': 'Bulky biaryl monophosphines excel for aryl chlorides and hindered amines/phenols.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf', 'dppe']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water', 'toluene'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '0.5–1', 'ligand_mol%': '1–2', 'ratio_L_to_M': 1.1}, 'notes': 'dppf robust for boronic acids/esters; water cosolvent helpful.'}, {'for_reactions': ['Challenging couplings / strong σ-donation needed'], 'with_ligand': {'family_id': 'nhc_imidazolylidenes', 'examples': ['IPr', 'SIPr', 'IMes']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [80, 110], 'loadings': {'catalyst_mol%': '0.5–1.5', 'ligand_mol%': '1–3', 'ratio_L_to_M': 1.1}, 'notes': 'NHCs promote difficult C(sp2/sp3) couplings; often require activators.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(0) Sources (pd_zero_sources) | metal: Pd | ox_states: 0 | name: Bis(dibenzylideneacetone)palladium(0) | abbr: Pd(dba)2 | CAS: 32005-36-0"
   },
   {
     "id": "cas-543-90-8",
@@ -131,7 +130,7 @@
         ]
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (assigned as metal_precursor) (pd_ii_salts) | metal: Pd | oxidation states: 2 | name: Cadmium acetate | abbr: 95KC50Z1L0; Cadmium acetate | CAS: 543-90-8 | synonyms: Cadmium acetate; 543-90-8; Cadmium diacetate; Cadmium(II) acetate; Acetic acid, cadmium salt; Cadmium ethanoate; Bis(acetoxy)cadmium; CI 77185; AI3-01414; 95KC50Z1L0; C.I. 77185; DTXSID1020225; NSC-75795; (acetyloxy)cadmio acetate; RefChem:122562; DTXCID10225"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Cd | ox_states: 2 | name: Cadmium acetate | abbr: Cadmium acetate | CAS: 543-90-8"
   },
   {
     "id": "R_54014aad482950e1",
@@ -156,7 +155,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: False | member_embedding: type: CATALYST | family: [Ir(cod)Cl]2 and Related Dimers (ir_cod_dimers) | metal: Ir | ox_states: 1 | class: Ir(I) dimer | name: Chloro(1,5‑cyclooctadiene)iridium(I) dimer | abbr: [Ir(cod)Cl]2 | CAS: 12112-67-3 | use_cases: C–H borylation, Hydrogenation | preferred: C–H borylation, Hydrogenation | family_label: [Ir(cod)Cl]2 and Related Dimers | family_precursor_class: Ir(I) dimer | family_use_cases: C–H borylation (with bipy), Hydrogenation (with phosphines/NHCs), Allylic substitution | family_best_for: Undirected C(sp2)–H borylation of arenes/heteroarenes with dtbbpy + B2pin2, Late‑stage diversification; tolerant to halides/esters/ethers | family_avoid_when: Strongly coordinating substrates without masking (amines, pyridines), Aqueous or strongly acidic media; light‑sensitive stock | family_preferred_rxns: C–H borylation of arenes/heteroarenes | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Air/moisture sensitive; store under inert gas at low temperature. | family_additional_ligand: usage: required; typical: ['dtbbpy', 'bpy', 'phosphines/NHC (other reactions)']; notes: For C–H borylation, dtbbpy is commonly used with [Ir(OMe)(cod)]2 or [Ir(cod)Cl]2. | family_recommended_pairs: {'for_reactions': ['C–H borylation (arene)'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'base': []}, 'solvents': ['THF', 'cyclohexane', 'octane'], 'temp_C': [70, 90], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–4', 'ratio_L_to_M': 1.1}, 'notes': 'Combine with B2pin2 or HBpin; choose solvent per substrate solubility.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: [Ir(cod)Cl]2 and Related Dimers (ir_cod_dimers) | metal: Ir | ox_states: 1 | name: Chloro(1,5‑cyclooctadiene)iridium(I) dimer | abbr: [Ir(cod)Cl]2 | CAS: 12112-67-3"
   },
   {
     "id": "R_940ac570f145dd93",
@@ -181,7 +180,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True | member_embedding: type: CATALYST | family: Rhodium(I) Precursors for Hydrogenation (rh_hydrogenation_precursors) | metal: Rh | ox_states: 1 | class: Rh(I) complexes | name: Chloro(1,5‑cyclooctadiene)rhodium(I) dimer | abbr: [RhCl(cod)]2 | CAS: 12092-47-6 | use_cases: Hydrogenation, Asymmetric hydrogenation | preferred: Hydrogenation, Asymmetric hydrogenation | member_additional_ligand: usage: required; typical: ['BINAP', 'DPPB', 'Xantphos', 'Monophosphines']; notes: | family_label: Rhodium(I) Precursors for Hydrogenation | family_precursor_class: Rh(I) complexes | family_use_cases: Homogeneous hydrogenation, Asymmetric hydrogenation (with chiral ligands), Hydroboration | family_best_for: Alkene/alkyne hydrogenation, Alkene hydrosilylation with P-based ligands | family_avoid_when: Strongly coordinating substrates without excess ligand, Water/air exposure during setup | family_preferred_rxns: Alkene/alkyne hydrogenation, Asymmetric hydrogenation with BINAP/DIPAMP | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Many are air‑stable but undergo hydrolysis/ligand loss when wet. | family_additional_ligand: usage: optional; typical: ['BINAP', 'DIPAMP', 'Josiphos', 'PPh3 (supplement)']; notes: Wilkinson’s often used alone; [RhCl(cod)]2 typically needs a P‑ligand. | family_recommended_pairs: {'for_reactions': ['Asymmetric hydrogenation'], 'with_ligand': {'family_id': 'bisphosphines', 'examples': ['BINAP', 'DIPAMP', 'DuPhos']}, 'co_reagents': {'base': []}, 'solvents': ['EtOH', 'MeOH', 'toluene'], 'temp_C': [20, 50], 'loadings': {'catalyst_mol%': '0.1–1', 'ligand_mol%': '0.12–1.2'}, 'notes': 'H2 pressure 1–10 bar typical; optimize by ligand bite angle/electronics.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Rhodium(I) Precursors for Hydrogenation (rh_hydrogenation_precursors) | metal: Rh | ox_states: 1 | name: Chloro(1,5‑cyclooctadiene)rhodium(I) dimer | abbr: [RhCl(cod)]2 | CAS: 12092-47-6"
   },
   {
     "id": "R_e401d4b80a2a2030",
@@ -206,7 +205,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: False | member_embedding: type: CATALYST | family: Rhodium Carbonyl Chloride Dimers (rh_carbonyl_precursors) | metal: Rh | ox_states: 1 | class: Rh(I) carbonyl dimer | name: Chlorodicarbonylrhodium(I) dimer | abbr: [Rh(CO)2Cl]2 | CAS: 14523-22-9 | use_cases: Hydroformylation | preferred: Hydroformylation | family_label: Rhodium Carbonyl Chloride Dimers | family_precursor_class: Rh(I) carbonyl dimer | family_use_cases: Hydroformylation (with phosphines), Carbonylations | family_preferred_rxns: Hydroformylation of alkenes | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Sensitive; handle under inert gas. | family_additional_ligand: usage: required; typical: ['PPh3', 'Bite‑angle phosphines (e.g., Xantphos)']; notes: Hydroformylation requires phosphines under syngas."
+    "embedding_text": "member_embedding: type: CATALYST | family: Rhodium Carbonyl Chloride Dimers (rh_carbonyl_precursors) | metal: Rh | ox_states: 1 | name: Chlorodicarbonylrhodium(I) dimer | abbr: [Rh(CO)2Cl]2 | CAS: 14523-22-9"
   },
   {
     "id": "R_9024465e00800689",
@@ -233,7 +232,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Co Acetylacetonates (co_beta_diketonates) | metal: Co | ox_states: 2 | class: β-diketonates | name: Cobalt(II) acetylacetonate | abbr: Co(acac)2 | CAS: 14024-48-7 | use_cases: Catalysis precursor | best_for:  | avoid_when: | family_label: Co Acetylacetonates | family_precursor_class: β-diketonates | family_use_cases: Homogeneous catalysis; precursors reduced in situ | family_preferred_rxns: Hydrogenations (after activation), Cross-electrophile couplings (reduced) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable solids; stock under dry conditions. | family_additional_ligand: usage: required; typical: ['bpy', 'phen', 'terpy', 'phosphines', 'NHC']; notes: Reduced in situ; ligand recommended."
+    "embedding_text": "member_embedding: type: CATALYST | family: Co Acetylacetonates (co_beta_diketonates) | metal: Co | ox_states: 2, 3 | name: Cobalt(II) acetylacetonate | abbr: Co(acac)2 | CAS: 14024-48-7"
   },
   {
     "id": "R_b6608fc67c3d7db7",
@@ -259,7 +258,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Co(II) Halides (co_ii_halides) | metal: Co | ox_states: 2 | class: Co(II) salt | name: Cobalt(II) bromide | abbr: CoBr2 | CAS: 7789-43-7 | use_cases: Catalysis precursor | best_for:  | avoid_when: | family_label: Co(II) Halides | family_precursor_class: Co(II) salt | family_use_cases: Hydrogenations (Co-catalyzed), cross-electrophile couplings (after reduction) | family_preferred_rxns: Hydrogenations (after activation), Cross-electrophile couplings (reduced) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable solids; stock under dry conditions. | family_additional_ligand: usage: required; typical: ['bpy', 'phen', 'terpy', 'salen‑type']; notes: Typically needs ligand and reductant/activator."
+    "embedding_text": "member_embedding: type: CATALYST | family: Co(II) Halides (co_ii_halides) | metal: Co | ox_states: 2 | name: Cobalt(II) bromide | abbr: CoBr2 | CAS: 7789-43-7"
   },
   {
     "id": "R_19228d4ce575f585",
@@ -285,7 +284,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Co(II) Halides (co_ii_halides) | metal: Co | ox_states: 2 | class: Co(II) salt | name: Cobalt(II) chloride | abbr: CoCl2 | CAS: 7646-79-9 | use_cases: Catalysis precursor | best_for:  | avoid_when: | family_label: Co(II) Halides | family_precursor_class: Co(II) salt | family_use_cases: Hydrogenations (Co-catalyzed), cross-electrophile couplings (after reduction) | family_preferred_rxns: Hydrogenations (after activation), Cross-electrophile couplings (reduced) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable solids; stock under dry conditions. | family_additional_ligand: usage: required; typical: ['bpy', 'phen', 'terpy', 'salen‑type']; notes: Typically needs ligand and reductant/activator."
+    "embedding_text": "member_embedding: type: CATALYST | family: Co(II) Halides (co_ii_halides) | metal: Co | ox_states: 2 | name: Cobalt(II) chloride | abbr: CoCl2 | CAS: 7646-79-9"
   },
   {
     "id": "cas-1317-39-1",
@@ -320,7 +319,7 @@
         ]
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (assigned as metal_precursor) (pd_ii_salts) | metal: Cu | oxidation states: 2 | name: Copper oxide (Cu2O) | abbr: Copper oxide (Cu2O) | CAS: 1317-39-1 | synonyms: Copper oxide (Cu2O); (cupriooxy)copper; RefChem:1082154; 1317-39-1; Brown copper oxide; Caocobre; Caswell No. 266; CI 77402; Copox; copper (I) oxide; Copper hemioxide; Copper Nordox; Copper oxide, red; Copper protoxide; Copper Sandoz; Copper sardez"
+    "embedding_text": "member_embedding: type: CATALYST | family: Copper Salts (copper salt) | metal: Cu | ox_states: 1 | name: Copper oxide (Cu2O) | abbr: Cu2O | CAS: 1317-39-1"
   },
   {
     "id": "R_d8cb119bbf8e4b10",
@@ -346,7 +345,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Cu(I) Halides and Adducts (cu_i_halides) | metal: Cu | ox_states: 1 | class: Cu(I) salt | name: Copper(I) bromide | abbr: CuBr | CAS: 7787-70-4 | use_cases: Ullmann; Misc. catalysis | best_for:  | avoid_when: | family_label: Cu(I) Halides and Adducts | family_precursor_class: Cu(I) salt | family_use_cases: Sonogashira (co-catalyst), Ullmann-type couplings, Click chemistry (CuAAC) | family_preferred_rxns: Sonogashira (co‑cat.), Ullmann couplings, CuAAC | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Usually bench-stable; Cu(I) salts may slowly oxidize. | family_additional_ligand: usage: optional; typical: ['Diamines', 'Amino acids (e.g., L‑proline)', 'NHCs', 'Phosphines']; notes: Ligandless feasible (e.g., Sonogashira co‑cat.), but many Ullmann variants benefit from ligands. | family_recommended_pairs: {'for_reactions': ['Ullmann C–N/C–O'], 'with_ligand': {'family_id': 'diamines', 'examples': ['N,N′-dimethylethylenediamine', '1,10-phenanthroline']}, 'co_reagents': {'base': ['K2CO3', 'Cs2CO3']}, 'solvents': ['DMSO', 'DMF', 'toluene'], 'temp_C': [80, 130], 'loadings': {'catalyst_mol%': '5–20', 'ligand_mol%': '10–40'}, 'notes': 'Diamines or amino acid ligands enhance activity and scope.'}, {'for_reactions': ['CuAAC'], 'with_ligand': {'examples': []}, 'co_reagents': {'base': ['NEt3 (optional)']}, 'solvents': ['H2O/tBuOH', 'DMSO', 'DMF'], 'temp_C': [20, 40], 'loadings': {'catalyst_mol%': '0.1–5', 'ligand_mol%': '0'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Cu(I) Halides and Adducts (cu_i_halides) | metal: Cu | ox_states: 1 | name: Copper(I) bromide | abbr: CuBr | CAS: 7787-70-4"
   },
   {
     "id": "R_697a4b828a4a4b37",
@@ -373,7 +372,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Cu(I) Halides and Adducts (cu_i_halides) | metal: Cu | ox_states: 1 | class: Cu(I) salt | name: Copper(I) bromide–dimethyl sulfide complex | abbr: CuBr·SMe2 | CAS: 54678-23-8 | use_cases: Gligorich–Barton-type, cuprate generation; Ullmann | best_for:  | avoid_when: | family_label: Cu(I) Halides and Adducts | family_precursor_class: Cu(I) salt | family_use_cases: Sonogashira (co-catalyst), Ullmann-type couplings, Click chemistry (CuAAC) | family_preferred_rxns: Sonogashira (co‑cat.), Ullmann couplings, CuAAC | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Usually bench-stable; Cu(I) salts may slowly oxidize. | family_additional_ligand: usage: optional; typical: ['Diamines', 'Amino acids (e.g., L‑proline)', 'NHCs', 'Phosphines']; notes: Ligandless feasible (e.g., Sonogashira co‑cat.), but many Ullmann variants benefit from ligands. | family_recommended_pairs: {'for_reactions': ['Ullmann C–N/C–O'], 'with_ligand': {'family_id': 'diamines', 'examples': ['N,N′-dimethylethylenediamine', '1,10-phenanthroline']}, 'co_reagents': {'base': ['K2CO3', 'Cs2CO3']}, 'solvents': ['DMSO', 'DMF', 'toluene'], 'temp_C': [80, 130], 'loadings': {'catalyst_mol%': '5–20', 'ligand_mol%': '10–40'}, 'notes': 'Diamines or amino acid ligands enhance activity and scope.'}, {'for_reactions': ['CuAAC'], 'with_ligand': {'examples': []}, 'co_reagents': {'base': ['NEt3 (optional)']}, 'solvents': ['H2O/tBuOH', 'DMSO', 'DMF'], 'temp_C': [20, 40], 'loadings': {'catalyst_mol%': '0.1–5', 'ligand_mol%': '0'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Cu(I) Halides and Adducts (cu_i_halides) | metal: Cu | ox_states: 1 | name: Copper(I) bromide–dimethyl sulfide complex | abbr: CuBr·SMe2 | CAS: 54678-23-8"
   },
   {
     "id": "R_f9b98b8964858415",
@@ -399,7 +398,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Cu(I) Halides and Adducts (cu_i_halides) | metal: Cu | ox_states: 1 | class: Cu(I) salt | name: Copper(I) iodide | abbr: CuI | CAS: 7681-65-4 | use_cases: Sonogashira; CuAAC; Ullmann | best_for:  | avoid_when: | family_label: Cu(I) Halides and Adducts | family_precursor_class: Cu(I) salt | family_use_cases: Sonogashira (co-catalyst), Ullmann-type couplings, Click chemistry (CuAAC) | family_preferred_rxns: Sonogashira (co‑cat.), Ullmann couplings, CuAAC | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Usually bench-stable; Cu(I) salts may slowly oxidize. | family_additional_ligand: usage: optional; typical: ['Diamines', 'Amino acids (e.g., L‑proline)', 'NHCs', 'Phosphines']; notes: Ligandless feasible (e.g., Sonogashira co‑cat.), but many Ullmann variants benefit from ligands. | family_recommended_pairs: {'for_reactions': ['Ullmann C–N/C–O'], 'with_ligand': {'family_id': 'diamines', 'examples': ['N,N′-dimethylethylenediamine', '1,10-phenanthroline']}, 'co_reagents': {'base': ['K2CO3', 'Cs2CO3']}, 'solvents': ['DMSO', 'DMF', 'toluene'], 'temp_C': [80, 130], 'loadings': {'catalyst_mol%': '5–20', 'ligand_mol%': '10–40'}, 'notes': 'Diamines or amino acid ligands enhance activity and scope.'}, {'for_reactions': ['CuAAC'], 'with_ligand': {'examples': []}, 'co_reagents': {'base': ['NEt3 (optional)']}, 'solvents': ['H2O/tBuOH', 'DMSO', 'DMF'], 'temp_C': [20, 40], 'loadings': {'catalyst_mol%': '0.1–5', 'ligand_mol%': '0'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Cu(I) Halides and Adducts (cu_i_halides) | metal: Cu | ox_states: 1 | name: Copper(I) iodide | abbr: CuI | CAS: 7681-65-4"
   },
   {
     "id": "R_cefa99d745108361",
@@ -425,7 +424,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Cu(II) Salts (cu_ii_salts) | metal: Cu | ox_states: 2 | class: Cu(II) salt / Lewis acid | name: Copper(II) acetate | abbr: Cu(OAc)2 | CAS: 142-71-2 | use_cases: Oxidative couplings; General copper catalysis | best_for:  | avoid_when: | family_label: Cu(II) Salts | family_precursor_class: Cu(II) salt / Lewis acid | family_use_cases: Lewis acid catalysis, Oxidative couplings, As oxidant or co-catalyst | family_preferred_rxns: Lewis acid catalysis, Oxidative couplings | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Bench-stable salts; handle dry for reproducibility. | family_additional_ligand: usage: optional; typical: []; notes: Often used as Lewis acids/oxidants without dedicated ligand."
+    "embedding_text": "member_embedding: type: CATALYST | family: Cu(II) Salts (cu_ii_salts) | metal: Cu | ox_states: 2 | name: Copper(II) acetate | abbr: Cu(OAc)2 | CAS: 142-71-2"
   },
   {
     "id": "R_5e1c2365fc44e7cd",
@@ -451,7 +450,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Cu(II) Salts (cu_ii_salts) | metal: Cu | ox_states: 2 | class: Cu(II) salt / Lewis acid | name: Copper(II) acetate monohydrate | abbr: Cu(OAc)2·H2O | CAS: 6046-93-1 | use_cases: Oxidative couplings | best_for:  | avoid_when: | family_label: Cu(II) Salts | family_precursor_class: Cu(II) salt / Lewis acid | family_use_cases: Lewis acid catalysis, Oxidative couplings, As oxidant or co-catalyst | family_preferred_rxns: Lewis acid catalysis, Oxidative couplings | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Bench-stable salts; handle dry for reproducibility. | family_additional_ligand: usage: optional; typical: []; notes: Often used as Lewis acids/oxidants without dedicated ligand."
+    "embedding_text": "member_embedding: type: CATALYST | family: Cu(II) Salts (cu_ii_salts) | metal: Cu | ox_states: 2 | name: Copper(II) acetate monohydrate | abbr: Cu(OAc)2·H2O | CAS: 6046-93-1"
   },
   {
     "id": "R_c427849c3ec6a6c8",
@@ -477,7 +476,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Cu(II) Salts (cu_ii_salts) | metal: Cu | ox_states: 2 | class: Cu(II) salt / Lewis acid | name: Copper(II) trifluoromethanesulfonate | abbr: Cu(OTf)2 | CAS: 34946-82-2 | use_cases: Lewis acid catalysis; Diels–Alder; Cyclopropanations | best_for:  | avoid_when: | family_label: Cu(II) Salts | family_precursor_class: Cu(II) salt / Lewis acid | family_use_cases: Lewis acid catalysis, Oxidative couplings, As oxidant or co-catalyst | family_preferred_rxns: Lewis acid catalysis, Oxidative couplings | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Bench-stable salts; handle dry for reproducibility. | family_additional_ligand: usage: optional; typical: []; notes: Often used as Lewis acids/oxidants without dedicated ligand."
+    "embedding_text": "member_embedding: type: CATALYST | family: Cu(II) Salts (cu_ii_salts) | metal: Cu | ox_states: 2 | name: Copper(II) trifluoromethanesulfonate | abbr: Cu(OTf)2 | CAS: 34946-82-2"
   },
   {
     "id": "R_7ed661c19375a24e",
@@ -503,7 +502,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True | member_embedding: type: CATALYST | family: Rh Hydroformylation Toolkits (rh_hydroformylation_toolkit) | metal: Rh | ox_states: 1 | class: Rh(I) carbonyl | name: Dicarbonyl(acetylacetonato)rhodium(I) | abbr: Rh(acac)(CO)2 | CAS: 14874-82-9 | use_cases: Hydroformylation | family_label: Rh Hydroformylation Toolkits | family_precursor_class: Rh(I) carbonyl / cationic precatalysts | family_use_cases: Hydroformylation (oxo) of alkenes | family_best_for: Mild hydroformylation at low pressure with phosphine tuning | family_avoid_when: Sulfur/basic poisons; highly deactivated alkenes without strong ligands | family_preferred_rxns: Terminal-alkene hydroformylation to linear/branched aldehydes | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Operate under syngas; phosphines required for selectivity and stability. | family_additional_ligand: usage: not_needed; typical: []; notes: Toolkit includes recommended P‑ligands/hydride precursor."
+    "embedding_text": "member_embedding: type: CATALYST | family: Rh Hydroformylation Toolkits (rh_hydroformylation_toolkit) | metal: Rh | ox_states: 1 | name: Dicarbonyl(acetylacetonato)rhodium(I) | abbr: Rh(acac)(CO)2 | CAS: 14874-82-9"
   },
   {
     "id": "R_d15dd2333a043e21",
@@ -524,12 +523,11 @@
         ],
         "metal": "Ru",
         "oxidation_states": [
-          2,
-          3
+          2
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True | member_embedding: type: CATALYST | family: [(p‑cymene)RuCl2]2 and RuCl3 Sources (ru_arene_dimer) | metal: Ru | ox_states: 2,3 | class: Ru(II) arene dimer / Ru(III) salt | name: Dichloro(p‑cymene)ruthenium(II) dimer | abbr: [(p‑cymene)RuCl2]2 | CAS: 52462-29-0 | use_cases: Transfer hydrogenation, C–H activation | preferred: Transfer hydrogenation, C–H activation | family_label: [(p‑cymene)RuCl2]2 and RuCl3 Sources | family_precursor_class: Ru(II) arene dimer / Ru(III) salt | family_use_cases: Transfer hydrogenation, C–H activation, Redox catalysis | family_preferred_rxns: Borrowing‑hydrogen amination, Directed C–H functionalization | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Arene dimer usually bench‑stable; RuCl3·xH2O hygroscopic. | family_additional_ligand: usage: required; typical: ['Diamines (e.g., TsDPEN)', 'Carboxylates', 'Phosphines/NHC (context‑dependent)']; notes: [(p‑cymene)RuCl2]2 generally combined with chelating ligands for transfer hydrogenation/C–H activation. | family_recommended_pairs: {'for_reactions': ['Transfer hydrogenation (ketones/imines)'], 'with_ligand': {'family_id': 'diamines', 'examples': ['TsDPEN', 'Tsdpen']}, 'co_reagents': {'base': ['KOH', 'KOtBu (cat.)']}, 'solvents': ['iPrOH'], 'temp_C': [40, 80], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '0.6–2.4'}, 'notes': 'iPrOH serves as H‑donor; base activates the donor/acceptor pair.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: [(p‑cymene)RuCl2]2 and RuCl3 Sources (ru_arene_dimer) | metal: Ru | ox_states: 2 | name: Dichloro(p‑cymene)ruthenium(II) dimer | abbr: [(p‑cymene)RuCl2]2 | CAS: 52462-29-0"
   },
   {
     "id": "R_6c7a9a3d4abfcc4b",
@@ -555,7 +553,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: dark orange; air_stable: True | member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Dichloro-bis(acetonitrile)palladium(II) | abbr: Pd(MeCN)2Cl2 | CAS: 14592-56-4 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Dichloro-bis(acetonitrile)palladium(II) | abbr: Pd(MeCN)2Cl2 | CAS: 14592-56-4"
   },
   {
     "id": "R_441df0d3052d0b83",
@@ -580,7 +578,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: False | member_embedding: type: CATALYST | family: Iron Carbonyls (Fe(0) Sources) (fe_carbonyls) | metal: Fe | ox_states: 0 | class: Fe carbonyl | name: Diiron nonacarbonyl | abbr: Fe2(CO)9 | CAS: 15321-51-4 | use_cases: Pauson–Khand, Carbonylation | preferred: Pauson–Khand, Carbonylation | family_label: Iron Carbonyls (Fe(0) Sources) | family_precursor_class: Fe carbonyl | family_use_cases: Pauson–Khand reactions, Carbonylations, Radical chemistry | family_preferred_rxns: Pauson–Khand cyclizations | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Toxic, volatile (Fe(CO)5); strict ventilation and inert handling required."
+    "embedding_text": "member_embedding: type: CATALYST | family: Iron Carbonyls (Fe(0) Sources) (fe_carbonyls) | metal: Fe | ox_states: 0 | name: Diiron nonacarbonyl | abbr: Fe2(CO)9 | CAS: 15321-51-4"
   },
   {
     "id": "R_9c9e05a03c817dfd",
@@ -605,7 +603,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True | member_embedding: type: CATALYST | family: Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (ru_metathesis_grubbs) | metal: Ru | ox_states: 2 | class: Ru–carbene precatalyst | name: Grubbs catalyst, 1st generation | abbr: Grubbs-I | CAS: 172222-30-9 | use_cases: RCM, ROMP | preferred: RCM | family_label: Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) | family_precursor_class: Ru–carbene olefin metathesis precatalyst | family_use_cases: RCM, CM (cross‑metathesis), ROMP, ENE‑yne metathesis | family_preferred_rxns: RCM of tetrasubstituted alkenes, Late‑stage olefin edits | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Often tolerates air/moisture; store cold/dry for longevity. | family_additional_ligand: usage: not_needed; typical: []; notes: Grubbs/Hoveyda metathesis catalysts are pre‑ligated single‑component systems."
+    "embedding_text": "member_embedding: type: CATALYST | family: Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (ru_metathesis_grubbs) | metal: Ru | ox_states: 2 | name: Grubbs catalyst, 1st generation | abbr: Grubbs-I | CAS: 172222-30-9"
   },
   {
     "id": "R_c6ceed46092cef8d",
@@ -630,7 +628,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: False | member_embedding: type: CATALYST | family: Iron Carbonyls (Fe(0) Sources) (fe_carbonyls) | metal: Fe | ox_states: 0 | class: Fe carbonyl | name: Iron pentacarbonyl | abbr: Fe(CO)5 | CAS: 13463-40-6 | use_cases: Pauson–Khand, Carbonylation | preferred: Pauson–Khand, Carbonylation | family_label: Iron Carbonyls (Fe(0) Sources) | family_precursor_class: Fe carbonyl | family_use_cases: Pauson–Khand reactions, Carbonylations, Radical chemistry | family_preferred_rxns: Pauson–Khand cyclizations | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Toxic, volatile (Fe(CO)5); strict ventilation and inert handling required."
+    "embedding_text": "member_embedding: type: CATALYST | family: Iron Carbonyls (Fe(0) Sources) (fe_carbonyls) | metal: Fe | ox_states: 0 | name: Iron pentacarbonyl | abbr: Fe(CO)5 | CAS: 13463-40-6"
   },
   {
     "id": "R_e5cf7c1c68b4554a",
@@ -656,7 +654,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: False | member_embedding: type: CATALYST | family: Iron Halides (fe_halides) | metal: Fe | ox_states: 2,3 | class: Fe(II/III) salts | name: Iron(II) chloride | abbr: FeCl2 | CAS: 7758-94-3 | use_cases: Cross-coupling precatalyst (reduced) | preferred: Cross-coupling precatalyst (reduced) | family_label: Iron Halides | family_precursor_class: Fe(II/III) salts | family_use_cases: Lewis acid catalysis, Cross-couplings (iron‑catalyzed), Oxidations | family_preferred_rxns: Lewis acid activations, C–H functionalizations (radical) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: FeCl3 anhydrous is hygroscopic; FeCl2 oxidizes to FeCl3 in air."
+    "embedding_text": "member_embedding: type: CATALYST | family: Iron Halides (fe_halides) | metal: Fe | ox_states: 2, 3 | name: Iron(II) chloride | abbr: FeCl2 | CAS: 7758-94-3"
   },
   {
     "id": "R_0dd072e7dccb143d",
@@ -682,7 +680,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True; moisture_sensitive: True | member_embedding: type: CATALYST | family: Iron Halides (fe_halides) | metal: Fe | ox_states: 2,3 | class: Fe(II/III) salts | name: Iron(III) chloride | abbr: FeCl3 | CAS: 7705-08-0 | use_cases: Lewis acid, Oxidations | preferred: Lewis acid, Oxidations | family_label: Iron Halides | family_precursor_class: Fe(II/III) salts | family_use_cases: Lewis acid catalysis, Cross-couplings (iron‑catalyzed), Oxidations | family_preferred_rxns: Lewis acid activations, C–H functionalizations (radical) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: FeCl3 anhydrous is hygroscopic; FeCl2 oxidizes to FeCl3 in air."
+    "embedding_text": "member_embedding: type: CATALYST | family: Iron Halides (fe_halides) | metal: Fe | ox_states: 2, 3 | name: Iron(III) chloride | abbr: FeCl3 | CAS: 7705-08-0"
   },
   {
     "id": "R_76a48e46e22ea6e8",
@@ -708,7 +706,7 @@
         ]
       }
     },
-    "embedding_text": "properties: air_stable: False | member_embedding: type: CATALYST | family: [Ir(cod)Cl]2 and Related Dimers (ir_cod_dimers) | metal: Ir | ox_states: 1 | class: Ir(I) dimer | name: Methoxy(1,5‑cyclooctadiene)iridium(I) dimer | abbr: [Ir(OMe)(cod)]2 | CAS: 12150-46-8 | use_cases: C–H borylation | preferred: C–H borylation | family_label: [Ir(cod)Cl]2 and Related Dimers | family_precursor_class: Ir(I) dimer | family_use_cases: C–H borylation (with bipy), Hydrogenation (with phosphines/NHCs), Allylic substitution | family_best_for: Undirected C(sp2)–H borylation of arenes/heteroarenes with dtbbpy + B2pin2, Late‑stage diversification; tolerant to halides/esters/ethers | family_avoid_when: Strongly coordinating substrates without masking (amines, pyridines), Aqueous or strongly acidic media; light‑sensitive stock | family_preferred_rxns: C–H borylation of arenes/heteroarenes | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Air/moisture sensitive; store under inert gas at low temperature. | family_additional_ligand: usage: required; typical: ['dtbbpy', 'bpy', 'phosphines/NHC (other reactions)']; notes: For C–H borylation, dtbbpy is commonly used with [Ir(OMe)(cod)]2 or [Ir(cod)Cl]2. | family_recommended_pairs: {'for_reactions': ['C–H borylation (arene)'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'base': []}, 'solvents': ['THF', 'cyclohexane', 'octane'], 'temp_C': [70, 90], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–4', 'ratio_L_to_M': 1.1}, 'notes': 'Combine with B2pin2 or HBpin; choose solvent per substrate solubility.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: [Ir(cod)Cl]2 and Related Dimers (ir_cod_dimers) | metal: Ir | ox_states: 1 | name: Methoxy(1,5‑cyclooctadiene)iridium(I) dimer | abbr: [Ir(OMe)(cod)]2 | CAS: 12148-71-9"
   },
   {
     "id": "R_ad7fd9b71c3bb690",
@@ -735,11 +733,11 @@
         ],
         "metal": "Ni",
         "oxidation_states": [
-          2
+          0
         ]
       }
     },
-    "embedding_text": "member_embedding: type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | oxidation_states: 2 | class: Pd(II) salt | preferred_reactions: Suzuki; Heck | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | handling: notes: Air-stable solids; some are hygroscopic. | additional_ligand: usage: required; typical: PPh3, dppf, XPhos, tBuXPhos, RuPhos, BrettPhos, NHC (IMes/IPr/SIPr); notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}; {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'} | ehs: none | name: Nickel | abbr: Nickel | CAS: 7440-02-0 | synonyms: Nickel; 7440-02-0; Raney nickel; Fibrex; Metallic nickel; Nickel particles; Fibrex P; Niccolum metallicum; Nickel 200; Nickel 201; Nickel 205; Nickel 207; Nickel 270; Alcan 756; NI; NI 0901-S (harshaw) | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Nickel Metal (Ni metal) | metal: Ni | ox_states: 0 | name: Nickel | abbr: Nickel | CAS: 7440-02-0"
   },
   {
     "id": "cas-373-02-4",
@@ -771,7 +769,7 @@
         ]
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (assigned as metal_precursor) (pd_ii_salts) | metal: Pd | oxidation states: 2 | name: Nickel Acetate | abbr: 99QP4ELX96; Nickel Acetate | CAS: 373-02-4 | synonyms: Nickel Acetate; Nickelous acetate; Nickel(II) acetate; 373-02-4; Nickel diacetate; Nickel (II) acetate; Nickel di(acetate); Nickel(2+) acetate; Nickel(II) acetate (1:2); 99QP4ELX96; AI3-26110; Acetic acid, nickel(2+) salt (2:1); DTXSID7020926; NSC-112210; NSC112210; RefChem:165654"
+    "embedding_text": "member_embedding: type: CATALYST | family: Nickel(II) Salts (Ni salt) | metal: Ni | ox_states: 2 | name: Nickel Acetate | abbr: NiOAc2 | CAS: 373-02-4"
   },
   {
     "id": "R_c80231e28b30c0cd",
@@ -791,15 +789,15 @@
     "roles": {
       "metal_precursor": {
         "families": [
-          "pd_ii_salts"
+          "ni_zero_sources"
         ],
-        "metal": "Pd",
+        "metal": "Ni",
         "oxidation_states": [
-          2
+          0
         ]
       }
     },
-    "embedding_text": "member_embedding: type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | oxidation_states: 2 | class: Pd(II) salt | preferred_reactions: Suzuki; Heck | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | handling: notes: Air-stable solids; some are hygroscopic. | additional_ligand: usage: required; typical: PPh3, dppf, XPhos, tBuXPhos, RuPhos, BrettPhos, NHC (IMes/IPr/SIPr); notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}; {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'} | ehs: none | name: Nickel ferrite | abbr: Nickel ferrite | CAS: 12168-54-6 | synonyms: Nickel ferrite; RefChem:853874; 12168-54-6; CHEBI:133333; NiFe2O4; iron-nickel oxide; Iron nickel oxide, tech.; AKOS015903818; FI170856; SY109303; Iron nickel oxide, nanopowder, <50 nm particle size (APS), >=98% trace metals basis | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Ni(0) Sources (ni_zero_sources) | metal: Ni | ox_states: 0 | name: Nickel ferrite | abbr: Nickel ferrite | CAS: 12168-54-6"
   },
   {
     "id": "R_c3bea975264e29e8",
@@ -825,7 +823,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Ni(II) Carboxylates and β-Diketonates (ni_ii_carboxylates) | metal: Ni | ox_states: 2 | class: Ni(II) salt | name: Nickel(II) acetate tetrahydrate | abbr: Ni(OAc)2·4H2O | CAS: 6018-89-9 | use_cases: Cross-couplings (reduced in situ) | best_for:  | avoid_when: | family_label: Ni(II) Carboxylates and β-Diketonates | family_precursor_class: Ni(II) salt | family_use_cases: Cross-couplings after reduction; Alkene functionalizations | family_preferred_rxns: Kumada, Negishi, Suzuki (after in situ reduction) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable salts/adducts; sensitive to wet solvents during setup. | family_additional_ligand: usage: required; typical: ['bpy/dtbbpy', 'phen', 'phosphines', 'NHC']; notes: Often reduced in situ; ligand required. | family_recommended_pairs: {'for_reactions': ['Reductive cross‑electrophile coupling'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'reductant': ['Zn', 'Mn'], 'base': ['NaI (additive)']}, 'solvents': ['DMA', 'DMF', 'DMSO'], 'temp_C': [25, 80], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–12'}, 'notes': 'Ligand + reductant required to access Ni(I/0).'}, {'for_reactions': ['Amination (Ni)'], 'with_ligand': {'family_id': 'pyridine_oxazolines_PyOx', 'examples': ['tBu-PyOx', 'iPr-PyOx']}, 'co_reagents': {'base': ['K3PO4', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–15'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: ni_ii_carboxylates (ni_ii_carboxylates) | metal: Ni | ox_states: 2 | name: Nickel(II) acetate tetrahydrate | abbr: Ni(OAc)2·4H2O | CAS: 6018-89-9"
   },
   {
     "id": "R_18cf3a7ee011953c",
@@ -851,7 +849,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Ni(II) Carboxylates and β-Diketonates (ni_ii_carboxylates) | metal: Ni | ox_states: 2 | class: Ni(II) salt | name: Nickel(II) acetylacetonate | abbr: Ni(acac)2 | CAS: 3264-82-2 | use_cases: Cross-couplings (reduced in situ) | best_for:  | avoid_when: | family_label: Ni(II) Carboxylates and β-Diketonates | family_precursor_class: Ni(II) salt | family_use_cases: Cross-couplings after reduction; Alkene functionalizations | family_preferred_rxns: Kumada, Negishi, Suzuki (after in situ reduction) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable salts/adducts; sensitive to wet solvents during setup. | family_additional_ligand: usage: required; typical: ['bpy/dtbbpy', 'phen', 'phosphines', 'NHC']; notes: Often reduced in situ; ligand required. | family_recommended_pairs: {'for_reactions': ['Reductive cross‑electrophile coupling'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'reductant': ['Zn', 'Mn'], 'base': ['NaI (additive)']}, 'solvents': ['DMA', 'DMF', 'DMSO'], 'temp_C': [25, 80], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–12'}, 'notes': 'Ligand + reductant required to access Ni(I/0).'}, {'for_reactions': ['Amination (Ni)'], 'with_ligand': {'family_id': 'pyridine_oxazolines_PyOx', 'examples': ['tBu-PyOx', 'iPr-PyOx']}, 'co_reagents': {'base': ['K3PO4', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–15'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: ni_ii_carboxylates (ni_ii_carboxylates) | metal: Ni | ox_states: 2 | name: Nickel(II) acetylacetonate | abbr: Ni(acac)2 | CAS: 3264-82-2"
   },
   {
     "id": "R_81f3453c6fdf4dad",
@@ -877,7 +875,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Ni(II) Halides (ni_ii_halides) | metal: Ni | ox_states: 2 | class: Ni(II) salt | name: Nickel(II) bromide | abbr: NiBr2 | CAS: 13462-88-9 | use_cases: Kumada; Negishi; Suzuki | best_for:  | avoid_when: | family_label: Ni(II) Halides | family_precursor_class: Ni(II) salt | family_use_cases: Cross-couplings via in situ reduction (Kumada, Negishi, Suzuki) | family_preferred_rxns: Kumada, Negishi, Suzuki (after in situ reduction) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable salts/adducts; sensitive to wet solvents during setup. | family_additional_ligand: usage: required; typical: ['bpy/dtbbpy', 'phen', 'PyBox/PyOx', 'NHC', 'phosphines']; notes: Ligand and reductant typically required to access active Ni(0/I). | family_recommended_pairs: {'for_reactions': ['Reductive cross‑electrophile coupling'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'reductant': ['Zn', 'Mn'], 'base': ['NaI (additive)']}, 'solvents': ['DMA', 'DMF', 'DMSO'], 'temp_C': [25, 80], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–12'}, 'notes': 'Ligand + reductant required to access Ni(I/0).'}, {'for_reactions': ['Amination (Ni)'], 'with_ligand': {'family_id': 'pyridine_oxazolines_PyOx', 'examples': ['tBu-PyOx', 'iPr-PyOx']}, 'co_reagents': {'base': ['K3PO4', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–15'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: ni_ii_halides (ni_ii_halides) | metal: Ni | ox_states: 2 | name: Nickel(II) bromide | abbr: NiBr2 | CAS: 13462-88-9"
   },
   {
     "id": "R_71ed830a0995b358",
@@ -904,7 +902,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Ni(II) Glyme Adducts (ni_ii_glyme) | metal: Ni | ox_states: 2 | class: Ni(II) complex (glyme-adduct) | name: Nickel(II) bromide dimethoxyethane complex | abbr: NiBr2(dme) | CAS: 28923-39-9 | use_cases: Negishi; Suzuki | best_for:  | avoid_when: | family_label: Ni(II) Glyme Adducts | family_precursor_class: Ni(II) complex (glyme-adduct) | family_use_cases: Air-handled Ni(II) sources for cross-couplings (reduced in situ) | family_best_for: Improved solubility and handling vs anhydrous halides | family_preferred_rxns: Kumada, Negishi, Suzuki (after in situ reduction) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable salts/adducts; sensitive to wet solvents during setup. | family_additional_ligand: usage: required; typical: ['bpy/dtbbpy', 'phen', 'terpy', 'phosphines', 'NHC']; notes: Glyme adduct improves solubility; still needs ligand and reductant. | family_recommended_pairs: {'for_reactions': ['Reductive cross‑electrophile coupling'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'reductant': ['Zn', 'Mn'], 'base': ['NaI (additive)']}, 'solvents': ['DMA', 'DMF', 'DMSO'], 'temp_C': [25, 80], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–12'}, 'notes': 'Ligand + reductant required to access Ni(I/0).'}, {'for_reactions': ['Amination (Ni)'], 'with_ligand': {'family_id': 'pyridine_oxazolines_PyOx', 'examples': ['tBu-PyOx', 'iPr-PyOx']}, 'co_reagents': {'base': ['K3PO4', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–15'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: ni_ii_glyme (ni_ii_glyme) | metal: Ni | ox_states: 2 | name: Nickel(II) bromide dimethoxyethane complex | abbr: NiBr2(dme) | CAS: 28923-39-9"
   },
   {
     "id": "R_60f60d11e7a8abd1",
@@ -930,7 +928,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Ni(II) Halides (ni_ii_halides) | metal: Ni | ox_states: 2 | class: Ni(II) salt | name: Nickel(II) chloride | abbr: NiCl2 | CAS: 7718-54-9 | use_cases: Kumada; Negishi; Suzuki | best_for:  | avoid_when: | family_label: Ni(II) Halides | family_precursor_class: Ni(II) salt | family_use_cases: Cross-couplings via in situ reduction (Kumada, Negishi, Suzuki) | family_preferred_rxns: Kumada, Negishi, Suzuki (after in situ reduction) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable salts/adducts; sensitive to wet solvents during setup. | family_additional_ligand: usage: required; typical: ['bpy/dtbbpy', 'phen', 'PyBox/PyOx', 'NHC', 'phosphines']; notes: Ligand and reductant typically required to access active Ni(0/I). | family_recommended_pairs: {'for_reactions': ['Reductive cross‑electrophile coupling'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'reductant': ['Zn', 'Mn'], 'base': ['NaI (additive)']}, 'solvents': ['DMA', 'DMF', 'DMSO'], 'temp_C': [25, 80], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–12'}, 'notes': 'Ligand + reductant required to access Ni(I/0).'}, {'for_reactions': ['Amination (Ni)'], 'with_ligand': {'family_id': 'pyridine_oxazolines_PyOx', 'examples': ['tBu-PyOx', 'iPr-PyOx']}, 'co_reagents': {'base': ['K3PO4', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–15'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: ni_ii_halides (ni_ii_halides) | metal: Ni | ox_states: 2 | name: Nickel(II) chloride | abbr: NiCl2 | CAS: 7718-54-9"
   },
   {
     "id": "R_be7dd5e77f326397",
@@ -957,7 +955,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Ni(II) Glyme Adducts (ni_ii_glyme) | metal: Ni | ox_states: 2 | class: Ni(II) complex (glyme-adduct) | name: Nickel(II) chloride dimethoxyethane complex | abbr: NiCl2(dme) | CAS: 29046-78-4 | use_cases: Negishi; Suzuki | best_for:  | avoid_when: | family_label: Ni(II) Glyme Adducts | family_precursor_class: Ni(II) complex (glyme-adduct) | family_use_cases: Air-handled Ni(II) sources for cross-couplings (reduced in situ) | family_best_for: Improved solubility and handling vs anhydrous halides | family_preferred_rxns: Kumada, Negishi, Suzuki (after in situ reduction) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable salts/adducts; sensitive to wet solvents during setup. | family_additional_ligand: usage: required; typical: ['bpy/dtbbpy', 'phen', 'terpy', 'phosphines', 'NHC']; notes: Glyme adduct improves solubility; still needs ligand and reductant. | family_recommended_pairs: {'for_reactions': ['Reductive cross‑electrophile coupling'], 'with_ligand': {'family_id': 'bipyridines', 'examples': ['dtbbpy']}, 'co_reagents': {'reductant': ['Zn', 'Mn'], 'base': ['NaI (additive)']}, 'solvents': ['DMA', 'DMF', 'DMSO'], 'temp_C': [25, 80], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–12'}, 'notes': 'Ligand + reductant required to access Ni(I/0).'}, {'for_reactions': ['Amination (Ni)'], 'with_ligand': {'family_id': 'pyridine_oxazolines_PyOx', 'examples': ['tBu-PyOx', 'iPr-PyOx']}, 'co_reagents': {'base': ['K3PO4', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '5–10', 'ligand_mol%': '6–15'}}"
+    "embedding_text": "member_embedding: type: CATALYST | family: ni_ii_glyme (ni_ii_glyme) | metal: Ni | ox_states: 2 | name: Nickel(II) chloride dimethoxyethane complex | abbr: NiCl2(dme) | CAS: 29046-78-4"
   },
   {
     "id": "R_c6b5dbc5e3264042",
@@ -989,7 +987,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | oxidation_states: 2 | class: Pd(II) salt | preferred_reactions: Suzuki; Heck | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | handling: notes: Air-stable solids; some are hygroscopic. | additional_ligand: usage: required; typical: PPh3, dppf, XPhos, tBuXPhos, RuPhos, BrettPhos, NHC (IMes/IPr/SIPr); notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}; {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'} | ehs: none | name: Palladium | abbr: Palladium | CAS: 7440-05-3 | synonyms: Palladium; 7440-05-3; paladio; Palladium element; PD; Palladex 600; Palladium, elemental; 5TWQ1V240M; DTXSID4064680; CHEBI:33363; PALLADIUM METALLICUM; RefChem:6098; DTXCID2047644; 231-115-6; Palladium on carbon; Palladium Black | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium | abbr: Palladium | CAS: 7440-05-3"
   },
   {
     "id": "R_59e962adc31d4a68",
@@ -1015,7 +1013,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: orange-brown; air_stable: True | member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) acetate | abbr: Pd(OAc)2 | CAS: 3375-31-3 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium(II) acetate | abbr: Pd(OAc)2 | CAS: 3375-31-3"
   },
   {
     "id": "R_af8ecf2bab8a67b8",
@@ -1041,7 +1039,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: yellow; air_stable: True | member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) acetylacetonate | abbr: Pd(acac)2 | CAS: 14024-61-4 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium(II) acetylacetonate | abbr: Pd(acac)2 | CAS: 14024-61-4"
   },
   {
     "id": "R_5a439bb0b57e3b62",
@@ -1067,7 +1065,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: dark brown; air_stable: True | member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) bromide | abbr: PdBr2 | CAS: 13444-94-5 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium(II) bromide | abbr: PdBr2 | CAS: 13444-94-5"
   },
   {
     "id": "R_4de0a3c7d8b9b956",
@@ -1093,7 +1091,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: red-brown; air_stable: True | member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) chloride | abbr: PdCl2 | CAS: 7647-10-1 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium(II) chloride | abbr: PdCl2 | CAS: 7647-10-1"
   },
   {
     "id": "R_029c37667792268f",
@@ -1118,7 +1116,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: yellow; air_stable: True | member_embedding: type: CATALYST | family: Pd(II) Phosphine/Chelated Complexes (pd_phosphine_complexes) | metal: Pd | ox_states: 2 | class: preformed Pd–ligand complex | name: Palladium(II) dichloride complex of Amphos | abbr: Pd(amphos)Cl2 | CAS: 887919-35-9 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Phosphine/Chelated Complexes | family_precursor_class: preformed Pd–ligand complex | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Buchwald–Hartwig | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Many are bench-stable but hydrolyze in wet solvents. | family_additional_ligand: usage: not_needed; typical: []; notes: Pre‑formed phosphine complexes typically used without additional ligand. | family_recommended_pairs: {'for_reactions': ['Suzuki', 'Buchwald–Hartwig'], 'with_ligand': {'examples': []}, 'co_reagents': {'base': ['K3PO4', 'NaOtBu']}, 'solvents': ['toluene', 'dioxane', 'THF'], 'temp_C': [70, 110], 'loadings': {'catalyst_mol%': '1–2', 'ligand_mol%': '0'}, 'notes': 'Pre‑ligated; typically no additional ligand.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: pd_phosphine_complexes (pd_phosphine_complexes) | metal: Pd | ox_states: 2 | name: Palladium(II) dichloride complex of Amphos | abbr: Pd(amphos)Cl2 | CAS: 887919-35-9"
   },
   {
     "id": "R_d087d7b958c23a39",
@@ -1144,7 +1142,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: brown; air_stable: True | member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Palladium(II) trifluoroacetate | abbr: Pd(TFA)2 | CAS: 42196-31-6 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium(II) trifluoroacetate | abbr: Pd(TFA)2 | CAS: 42196-31-6"
   },
   {
     "id": "R_618091a9a31f926c",
@@ -1182,7 +1180,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: METAL_PRECURSOR | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | oxidation_states: 2 | class: Pd(II) salt | preferred_reactions: Suzuki; Heck | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | handling: notes: Air-stable solids; some are hygroscopic. | additional_ligand: usage: required; typical: PPh3, dppf, XPhos, tBuXPhos, RuPhos, BrettPhos, NHC (IMes/IPr/SIPr); notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}; {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'} | ehs: none | name: Palladium, di-mu-chlorobis(eta3-2-propenyl)di- | abbr: Palladium, di-mu-chlorobis(eta3-2-propenyl)di- | CAS: 12012-95-2 | synonyms: Palladium, di-mu-chlorobis(eta3-2-propenyl)di-; RefChem:858349; Palladium, di-.mu.-chlorobis(.eta.3-2-propenyl)di-; Palladium, di-mu-chlorobis(eta3-2-propenyl)di-(9CI); Allyl palladium (II) chloride dimer; 12012-95-2; Allylpalladium chloride dimer; Allylpalladium(II) chloride dimer; allylpalladium(II) chloride; Bis(allyl)dichlorodipalladium; Palladium allyl chloride dimer; Diallydichlorodipalladium; pi-Allyl palladium chloride; Diallyldipalladium dichloride; Bis(chloro-pi-allylpalladium); Bis((pi-allyl)chloropalladium) | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium, di-mu-chlorobis(eta3-2-propenyl)di- | abbr: Palladium, di-mu-chlorobis(eta3-2-propenyl)di- | CAS: 12012-95-2"
   },
   {
     "id": "R_e86dfaa7c2101e03",
@@ -1203,12 +1201,11 @@
         ],
         "metal": "Ru",
         "oxidation_states": [
-          2,
-          3
+          2
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True; moisture_sensitive: True | member_embedding: type: CATALYST | family: [(p‑cymene)RuCl2]2 and RuCl3 Sources (ru_arene_dimer) | metal: Ru | ox_states: 2,3 | class: Ru(II) arene dimer / Ru(III) salt | name: Ruthenium(III) chloride hydrate | abbr: RuCl3·xH2O | CAS: 14898-67-0 | use_cases: Transfer hydrogenation, C–H activation, Oxidations | preferred: Transfer hydrogenation, C–H activation, Oxidations | family_label: [(p‑cymene)RuCl2]2 and RuCl3 Sources | family_precursor_class: Ru(II) arene dimer / Ru(III) salt | family_use_cases: Transfer hydrogenation, C–H activation, Redox catalysis | family_preferred_rxns: Borrowing‑hydrogen amination, Directed C–H functionalization | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Arene dimer usually bench‑stable; RuCl3·xH2O hygroscopic. | family_additional_ligand: usage: required; typical: ['Diamines (e.g., TsDPEN)', 'Carboxylates', 'Phosphines/NHC (context‑dependent)']; notes: [(p‑cymene)RuCl2]2 generally combined with chelating ligands for transfer hydrogenation/C–H activation. | family_recommended_pairs: {'for_reactions': ['Transfer hydrogenation (ketones/imines)'], 'with_ligand': {'family_id': 'diamines', 'examples': ['TsDPEN', 'Tsdpen']}, 'co_reagents': {'base': ['KOH', 'KOtBu (cat.)']}, 'solvents': ['iPrOH'], 'temp_C': [40, 80], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '0.6–2.4'}, 'notes': 'iPrOH serves as H‑donor; base activates the donor/acceptor pair.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: [(p‑cymene)RuCl2]2 and RuCl3 Sources (ru_arene_dimer) | metal: Ru | ox_states: 2 | name: Ruthenium(III) chloride hydrate | abbr: RuCl3·xH2O | CAS: 14898-67-0"
   },
   {
     "id": "R_9855acabfee2ac17",
@@ -1234,7 +1231,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: dark yellow; moisture_sensitive: True | member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | class: Pd(II) salt | name: Tetrakis(acetonitrile)palladium(II) bis(tetrafluoroborate) | abbr: Pd(MeCN)4(BF4)2 | CAS: 21797-13-7 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | family_label: Pd(II) Salts and Simple Complexes | family_precursor_class: Pd(II) salt | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_preferred_rxns: Suzuki, Heck | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Air-stable solids; some are hygroscopic. | family_additional_ligand: usage: required; typical: ['PPh3', 'dppf', 'XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'NHC (IMes/IPr/SIPr)']; notes: Pd(II) salts typically combined with ligand and base; often reduced in situ to Pd(0). | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (aryl chloride)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [90, 120], 'loadings': {'catalyst_mol%': '1–3', 'ligand_mol%': '2–6', 'ratio_L_to_M': 1.5}, 'notes': 'Often reduced in situ to Pd(0); bulky ligands accelerate oxidative addition to Ar–Cl.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water'], 'temp_C': [70, 100], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–3'}, 'notes': 'dppf commonly paired with Pd(OAc)2 or PdCl2.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Tetrakis(acetonitrile)palladium(II) bis(tetrafluoroborate) | abbr: Pd(MeCN)4(BF4)2 | CAS: 21797-13-7"
   },
   {
     "id": "R_743b225d0bdb2ded",
@@ -1261,7 +1258,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Co Acetylacetonates (co_beta_diketonates) | metal: Co | ox_states: 3 | class: β-diketonates | name: Tris(acetylacetonato)cobalt(III) | abbr: Co(acac)3 | CAS: 21679-46-9 | use_cases: Catalysis precursor (reduced in situ) | best_for:  | avoid_when: | family_label: Co Acetylacetonates | family_precursor_class: β-diketonates | family_use_cases: Homogeneous catalysis; precursors reduced in situ | family_preferred_rxns: Hydrogenations (after activation), Cross-electrophile couplings (reduced) | family_handling: air_sensitive: False; moisture_sensitive: True; notes: Generally air-stable solids; stock under dry conditions. | family_additional_ligand: usage: required; typical: ['bpy', 'phen', 'terpy', 'phosphines', 'NHC']; notes: Reduced in situ; ligand recommended."
+    "embedding_text": "member_embedding: type: CATALYST | family: Co Acetylacetonates (co_beta_diketonates) | metal: Co | ox_states: 2, 3 | name: Tris(acetylacetonato)cobalt(III) | abbr: Co(acac)3 | CAS: 21679-46-9"
   },
   {
     "id": "R_86168e28ed7c7f82",
@@ -1282,12 +1279,11 @@
         ],
         "metal": "Fe",
         "oxidation_states": [
-          2,
-          3
+          2
         ]
       }
     },
-    "embedding_text": "properties: air_stable: True | member_embedding: type: CATALYST | family: Iron Acetylacetonates (fe_acac) | metal: Fe | ox_states: 3 | class: β‑diketonates | name: Tris(acetylacetonato)iron(III) | abbr: Fe(acac)3 | CAS: 14024-18-1 | use_cases: Oxidations, Catalysis precursor | preferred: Oxidations, Catalysis precursor | family_label: Iron Acetylacetonates | family_precursor_class: β‑diketonates | family_use_cases: Radical cross-couplings (with silanes), Oxidations, Polymerizations | family_preferred_rxns: Cross‑electrophile couplings (emerging), Oxidations | family_handling: air_sensitive: False; moisture_sensitive: False; notes: Fe(acac)3 is air‑stable; Fe(acac)2 may oxidize on storage."
+    "embedding_text": "member_embedding: type: CATALYST | family: Iron Acetylacetonates (fe_acac) | metal: Fe | ox_states: 2 | name: Tris(acetylacetonato)iron(III) | abbr: Fe(acac)3 | CAS: 14024-18-1"
   },
   {
     "id": "R_39c9045c5311f3e6",
@@ -1313,7 +1309,7 @@
         ]
       }
     },
-    "embedding_text": "properties: color: dark purple to black | member_embedding: type: CATALYST | family: Pd(0) Sources (dba complexes, Pd(PPh3)4) (pd_zero_sources) | metal: Pd | ox_states: 0 | class: Pd(0) source | name: Tris(dibenzylideneacetone)dipalladium(0) | abbr: Pd2(dba)3 | CAS: 51364-51-3 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | member_additional_ligand: usage: required; typical: ['XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'P(tBu)3', 'dppf', 'IPr/SIPr']; notes: Ligand required to generate active Pd(0)Ln. | family_label: Pd(0) Sources (dba complexes, Pd(PPh3)4) | family_precursor_class: Pd(0) source | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_best_for: Rapid in situ catalysis; low induction period | family_preferred_rxns: Buchwald–Hartwig, Suzuki | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Typically air/moisture sensitive; store under inert gas. | family_additional_ligand: usage: optional; typical: ['XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'PPh3', 'dppf', 'NHC (IPr/SIPr)']; notes: Pd(PPh3)4 often used alone; dba sources typically require an added ligand. | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (C–N/C–O)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos']}, 'co_reagents': {'base': ['K3PO4', 'NaOtBu', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane', 'tAmylOH'], 'temp_C': [80, 110], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–4', 'ratio_L_to_M': 1.2}, 'notes': 'Bulky biaryl monophosphines excel for aryl chlorides and hindered amines/phenols.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf', 'dppe']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water', 'toluene'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '0.5–1', 'ligand_mol%': '1–2', 'ratio_L_to_M': 1.1}, 'notes': 'dppf robust for boronic acids/esters; water cosolvent helpful.'}, {'for_reactions': ['Challenging couplings / strong σ-donation needed'], 'with_ligand': {'family_id': 'nhc_imidazolylidenes', 'examples': ['IPr', 'SIPr', 'IMes']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [80, 110], 'loadings': {'catalyst_mol%': '0.5–1.5', 'ligand_mol%': '1–3', 'ratio_L_to_M': 1.1}, 'notes': 'NHCs promote difficult C(sp2/sp3) couplings; often require activators.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(0) Sources (pd_zero_sources) | metal: Pd | ox_states: 0 | name: Tris(dibenzylideneacetone)dipalladium(0) | abbr: Pd2(dba)3 | CAS: 51364-51-3"
   },
   {
     "id": "R_56afc7e59540f051",
@@ -1339,6 +1335,6 @@
         ]
       }
     },
-    "embedding_text": "properties: color: purple | member_embedding: type: CATALYST | family: Pd(0) Sources (dba complexes, Pd(PPh3)4) (pd_zero_sources) | metal: Pd | ox_states: 0 | class: Pd(0) source | name: Tris(dibenzylideneacetone)dipalladium(0)–chloroform adduct | abbr: Pd2(dba)3·CHCl3 | CAS: 52522-40-4 | use_cases: Suzuki; Buchwald–Hartwig; Heck; Negishi; Sonogashira; Stille | best_for:  | avoid_when: | member_additional_ligand: usage: required; typical: ['Biaryl monophosphines', 'dppf', 'NHC (IPr/SIPr)']; notes: | family_label: Pd(0) Sources (dba complexes, Pd(PPh3)4) | family_precursor_class: Pd(0) source | family_use_cases: Suzuki, Buchwald–Hartwig, Heck, Negishi, Sonogashira, Stille | family_best_for: Rapid in situ catalysis; low induction period | family_preferred_rxns: Buchwald–Hartwig, Suzuki | family_handling: air_sensitive: True; moisture_sensitive: True; notes: Typically air/moisture sensitive; store under inert gas. | family_additional_ligand: usage: optional; typical: ['XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos', 'PPh3', 'dppf', 'NHC (IPr/SIPr)']; notes: Pd(PPh3)4 often used alone; dba sources typically require an added ligand. | family_recommended_pairs: {'for_reactions': ['Buchwald–Hartwig (C–N/C–O)'], 'with_ligand': {'family_id': 'dialkylbiaryl_phosphines', 'examples': ['XPhos', 'tBuXPhos', 'RuPhos', 'BrettPhos']}, 'co_reagents': {'base': ['K3PO4', 'NaOtBu', 'Cs2CO3']}, 'solvents': ['toluene', 'dioxane', 'tAmylOH'], 'temp_C': [80, 110], 'loadings': {'catalyst_mol%': '0.5–2', 'ligand_mol%': '1–4', 'ratio_L_to_M': 1.2}, 'notes': 'Bulky biaryl monophosphines excel for aryl chlorides and hindered amines/phenols.'}, {'for_reactions': ['Suzuki–Miyaura'], 'with_ligand': {'family_id': 'diphosphines', 'examples': ['dppf', 'dppe']}, 'co_reagents': {'base': ['K3PO4', 'K2CO3', 'Na2CO3']}, 'solvents': ['dioxane/water', 'THF/water', 'toluene'], 'temp_C': [60, 100], 'loadings': {'catalyst_mol%': '0.5–1', 'ligand_mol%': '1–2', 'ratio_L_to_M': 1.1}, 'notes': 'dppf robust for boronic acids/esters; water cosolvent helpful.'}, {'for_reactions': ['Challenging couplings / strong σ-donation needed'], 'with_ligand': {'family_id': 'nhc_imidazolylidenes', 'examples': ['IPr', 'SIPr', 'IMes']}, 'co_reagents': {'base': ['NaOtBu', 'K3PO4']}, 'solvents': ['toluene', 'dioxane'], 'temp_C': [80, 110], 'loadings': {'catalyst_mol%': '0.5–1.5', 'ligand_mol%': '1–3', 'ratio_L_to_M': 1.1}, 'notes': 'NHCs promote difficult C(sp2/sp3) couplings; often require activators.'}"
+    "embedding_text": "member_embedding: type: CATALYST | family: Pd(0) Sources (pd_zero_sources) | metal: Pd | ox_states: 0 | name: Tris(dibenzylideneacetone)dipalladium(0)–chloroform adduct | abbr: Pd2(dba)3·CHCl3 | CAS: 52522-40-4"
   }
 ]
