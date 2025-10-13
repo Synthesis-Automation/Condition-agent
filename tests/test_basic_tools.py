@@ -28,7 +28,7 @@ from chemtools.smiles import normalize, normalize_reaction
 from chemtools.router import detect_family, detect_family_from_reaction
 from chemtools.featurizers.molecular import featurize
 from chemtools.reaction_similarity import drfp_tanimoto, drfp_available
-from chemtools.reagent_lookup import find_reagent
+from chemtools.reagent import find_reagent
 
 
 def test_1_smiles_normalization():
@@ -262,7 +262,7 @@ def show_import_patterns():
    from chemtools.featurizers.molecular import featurize
 
 ✅ Reagent Database:
-   from chemtools.reagent_lookup import find_reagent  # Full database (5000+)
+   from chemtools.reagent import find_reagent  # Full database (5000+)
    # Databases: ligand, base, solvent, metal_precursor, additive
 
 ✅ DRFP Similarity (optional):

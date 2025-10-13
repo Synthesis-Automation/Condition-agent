@@ -22,22 +22,24 @@ from pathlib import Path
 # Add paths for imports
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT_DIR = SCRIPT_DIR.parent
+APP_DIR = ROOT_DIR / "app"
 
 # Add root to path for llmtools
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-# Add data-processor to path for reagent_taxonomy_qt
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
+# Add app directory to path for reagent_taxonomy_ui
+if str(APP_DIR) not in sys.path:
+    sys.path.insert(0, str(APP_DIR))
 
 try:
     from llmtools.clients import LLMClient
-    from reagent_taxonomy_qt import generate_taxonomy_entry_llm
+    from reagent_taxonomy_ui import generate_taxonomy_entry_llm
 except ImportError as exc:
     print(f"❌ Import failed: {exc}")
     print(f"\nPaths checked:")
     print(f"  ROOT_DIR: {ROOT_DIR}")
+    print(f"  APP_DIR: {APP_DIR}")
     print(f"  SCRIPT_DIR: {SCRIPT_DIR}")
     print(f"\nsys.path:")
     for p in sys.path[:5]:

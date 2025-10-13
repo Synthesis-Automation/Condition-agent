@@ -28,9 +28,9 @@ except Exception as e:
     print(f"   ❌ Failed: {e}")
     sys.exit(1)
 
-print("\n3. Importing reagent_taxonomy_generator...")
+print("\n3. Importing chemtools.reagent...")
 try:
-    from reagent_taxonomy_generator import normalize_cas, resolve_identity_from_cas
+    from chemtools.reagent import normalize_cas, resolve_identity_from_cas
     print("   ✓ Success")
 except Exception as e:
     print(f"   ❌ Failed: {e}")

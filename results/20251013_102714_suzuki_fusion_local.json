@@ -1,0 +1,2044 @@
+{
+  "meta": {
+    "generated_at": "2025-10-13T02:27:19.383175Z",
+    "model": "Fusion-hybrid",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 90.28
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccc(OC)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1",
+    "family": "Suzuki"
+  },
+  "detection": {
+    "family": "Suzuki",
+    "detected_reaction_type": "Suzuki",
+    "method": "fusion",
+    "confidence": 0.475
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "COc1ccc(Br)cc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "C#CB(O)O",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium(II) acetate",
+          "abbreviation": "Pd(OAc)2",
+          "cas": "3375-31-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "Tricyclohexylphosphine",
+          "abbreviation": "PCy3",
+          "cas": "2622-14-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Tripotassium phosphate",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Toluene",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 1,
+        "core": "Pd/PCy3",
+        "base": {
+          "name": "Tripotassium phosphate",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Toluene",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 3,
+          "fraction_core": 0.6,
+          "reference_population": 5
+        },
+        "precedents": [
+          {
+            "reaction_id": "31-614-CAS-34686952",
+            "reference": "Substrate-controlled C-H or C-C alkynylation of cyclopropanes: generation of aryl radical cations by direct light activation of hypervalent iodine reagents | Nguyen, Tin V. T.; Wodrich, Matthew D.; Waser, Jerome | Chemical Science (2022), 13(43), 12831-12839",
+            "yield_pct": null,
+            "core": "Pd/PCy3"
+          },
+          {
+            "reaction_id": "31-179-CAS-21463386",
+            "reference": "Silylium-Ion-Promoted Ring-Opening Hydrosilylation and Disilylation of Unactivated Cyclopropanes | Roy, Avijit; Bonetti, Vittorio; Wang, Guoqiang; Wu, Qian; Klare, Hendrik F. T.; Oestreich, Martin | Organic Letters (2020), 22(3), 1213-1216",
+            "yield_pct": null,
+            "core": "Pd/PCy3"
+          },
+          {
+            "reaction_id": "31-179-CAS-15711179",
+            "reference": "Metal Nanoparticles Catalyzed Selective Carbon-Carbon Bond Activation in the Liquid Phase | Ye, Rong; Yuan, Bing; Zhao, Jie; Ralston, Walter T.; Wu, Chung-Yeh; Unel Barin, Ebru; Toste, F. Dean; Somorjai, Gabor A. | Journal of the American Chemical Society (2016), 138(27), 8533-8537",
+            "yield_pct": null,
+            "core": "Pd/PCy3"
+          }
+        ]
+      },
+      "reaction": {
+        "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "7778-53-2",
+          "solvent_uid": "108-88-3"
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "COc1ccc(Br)cc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "C#CB(O)O",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium(II) acetate",
+          "abbreviation": "Pd(OAc)2",
+          "cas": "3375-31-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "Tricyclohexylphosphine",
+          "abbreviation": "PCy3",
+          "cas": "2622-14-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Cesium carbonate",
+          "abbreviation": "Cs2CO3",
+          "cas": "534-17-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Toluene",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 2,
+        "core": "Pd/PCy3",
+        "base": {
+          "name": "Cesium carbonate",
+          "abbreviation": "Cs2CO3",
+          "cas": "534-17-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Toluene",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 2,
+          "fraction_core": 0.4,
+          "reference_population": 5
+        },
+        "precedents": [
+          {
+            "reaction_id": "31-179-CAS-20236453",
+            "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580",
+            "yield_pct": null,
+            "core": "Pd/PCy3"
+          },
+          {
+            "reaction_id": "31-179-CAS-20236466",
+            "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580",
+            "yield_pct": null,
+            "core": "Pd/PCy3"
+          }
+        ]
+      },
+      "reaction": {
+        "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "534-17-8",
+          "solvent_uid": "108-88-3"
+        }
+      }
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "COc1ccc(Br)cc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "C#CB(O)O",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium(II) acetate",
+          "abbreviation": "Pd(OAc)2",
+          "cas": "3375-31-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "Tricyclohexylphosphine",
+          "abbreviation": "PCy3",
+          "cas": "2622-14-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Triethylamine",
+          "abbreviation": "Et3N",
+          "cas": "121-44-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 3,
+        "core": "Pd/PCy3",
+        "base": {
+          "name": "Triethylamine",
+          "abbreviation": "Et3N",
+          "cas": "121-44-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Water",
+          "abbreviation": "H2O",
+          "cas": "7732-18-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 1,
+          "fraction_core": 0.2,
+          "reference_population": 5
+        },
+        "precedents": []
+      },
+      "reaction": {
+        "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "121-44-8",
+          "solvent_uid": "7732-18-5"
+        }
+      }
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "COc1ccc(Br)cc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "C#CB(O)O",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Palladium(II) acetate",
+          "abbreviation": "Pd(OAc)2",
+          "cas": "3375-31-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "Tricyclohexylphosphine",
+          "abbreviation": "PCy3",
+          "cas": "2622-14-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Sodium carbonate",
+          "abbreviation": "Na2CO3",
+          "cas": "497-19-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 4,
+        "core": "Pd/PCy3",
+        "base": {
+          "name": "Sodium carbonate",
+          "abbreviation": "Na2CO3",
+          "cas": "497-19-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 1,
+          "fraction_core": 0.2,
+          "reference_population": 5
+        },
+        "precedents": []
+      },
+      "reaction": {
+        "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "497-19-8",
+          "solvent_uid": "123-91-1"
+        }
+      }
+    }
+  ],
+  "extras": {
+    "raw_response": {
+      "input": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1",
+      "family": "Suzuki",
+      "features": {},
+      "bin": "proto_Suzuki_14757",
+      "recommendation": {
+        "core": "Pd/PCy3",
+        "base_uid": "7778-53-2",
+        "solvent_uid": "108-88-3",
+        "T_C": null,
+        "time_h": null,
+        "confidence": 0.475
+      },
+      "alternatives": {
+        "cores": [
+          [
+            "Pd/PCy3",
+            5
+          ],
+          [
+            "Pd",
+            2
+          ],
+          [
+            "Pd/cataCXiumA",
+            1
+          ]
+        ],
+        "bases": [
+          [
+            "7778-53-2",
+            3
+          ],
+          [
+            "534-17-8",
+            2
+          ]
+        ],
+        "solvents": [
+          [
+            "108-88-3",
+            5
+          ]
+        ]
+      },
+      "precedent_pack": {
+        "prototype_id": "proto_Suzuki_14757",
+        "support": 33,
+        "precedents": [
+          {
+            "reaction_id": "31-179-CAS-20236453",
+            "reaction_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1>>COc1ccc(C2CC2)cc1",
+            "reactants_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1",
+            "products_smiles": "COc1ccc(C2CC2)cc1",
+            "condition_core": "Pd/PCy3",
+            "yield": 80.0,
+            "core": "Pd/PCy3",
+            "base_uid": "534-17-8",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Cesium carbonate",
+                "cas": "534-17-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 80.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "cas": "2622-14-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-42252838",
+            "reaction_smiles": "CB(O)O.CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Br)cc2)cc1>>Cc1ccc(C(=O)c2ccc(OC(C)(C)C(=O)OC(C)C)cc2)cc1",
+            "reactants_smiles": "CB(O)O.CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Br)cc2)cc1",
+            "products_smiles": "Cc1ccc(C(=O)c2ccc(OC(C)(C)C(=O)OC(C)C)cc2)cc1",
+            "condition_core": "Pd",
+            "yield": 99.0,
+            "core": "Pd",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Pd-Catalyzed C(sp2)-C(sp3) Suzuki Coupling and Synthesis of Lumacaftor Using Designed Monophosphine Ligands | Zhang, Xiangdong; Jia, Fushun; Guo, Xu; Liu, Guodu | Organic Letters (2024), 26(49), 10419-10423",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 99.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "3032599-60-0",
+                "cas": "3032599-60-0"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-34686952",
+            "reaction_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1>>COc1ccc(C2CC2)cc1",
+            "reactants_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1",
+            "products_smiles": "COc1ccc(C2CC2)cc1",
+            "condition_core": "Pd/PCy3",
+            "yield": 78.0,
+            "core": "Pd/PCy3",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Substrate-controlled C-H or C-C alkynylation of cyclopropanes: generation of aryl radical cations by direct light activation of hypervalent iodine reagents | Nguyen, Tin V. T.; Wodrich, Matthew D.; Waser, Jerome | Chemical Science (2022), 13(43), 12831-12839",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 78.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "cas": "2622-14-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-18102658",
+            "reaction_smiles": "COc1ccc(Br)cc1.CCCCB(CCCC)CCCC>>CCCCc1ccc(OC)cc1",
+            "reactants_smiles": "COc1ccc(Br)cc1.CCCCB(CCCC)CCCC",
+            "products_smiles": "CCCCc1ccc(OC)cc1",
+            "condition_core": "Pd/cataCXiumA",
+            "yield": 94.0,
+            "core": "Pd/cataCXiumA",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Tetrahydrofuran",
+                "cas": "109-99-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "A Concise and Atom-Economical Suzuki-Miyaura Coupling Reaction Using Unactivated Trialkyl- and Triarylboranes with Aryl Halides | Li, Hongmei; Zhong, Yong-Li; Chen, Cheng-yi; Ferraro, Ashley E.; Wang, Dengjin | Organic Letters (2015), 17(14), 3616-3619",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 94.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "cataCXium A",
+                "cas": "321921-71-5"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-39154061",
+            "reaction_smiles": "COc1ccc(Br)cc1.OB(O)CCc1ccccc1>>COc1ccc(CCc2ccccc2)cc1",
+            "reactants_smiles": "COc1ccc(Br)cc1.OB(O)CCc1ccccc1",
+            "products_smiles": "COc1ccc(CCc2ccccc2)cc1",
+            "condition_core": "Pd/di-tert-butylphosphino",
+            "yield": 78.0,
+            "core": "Pd/di-tert-butylphosphino",
+            "base_uid": "121-44-8",
+            "solvent_uid": "7732-18-5",
+            "reagents": [
+              {
+                "name": "Triethylamine",
+                "cas": "121-44-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Saponin: a green and efficient natural surfactant for Suzuki-Miyaura cross-couplings of heteroaryl substrates in aqueous media at ambient conditions | Vinayagam, Vinothkumar; Sadhukhan, Subir Kumar; Kasu, Sreenivasa Reddy; Maroju, Ravi Kumar; Kumar, Tanguturi Venkatanarayana Hajay; Karre, Satish Kumar; Baledi, Dhurwasulu | Green Chemistry (2024), 26(3), 1393-1398",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 78.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(di-tert-butylphosphino)ferrocene palladium(II) dichloride",
+                "cas": "95408-45-0"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-17783546",
+            "reaction_smiles": "COc1ccc(Br)cc1.OB(O)/C(F)=C/c1ccc2ccccc2c1>>COc1ccc(/C(F)=C/c2ccc3ccccc3c2)cc1",
+            "reactants_smiles": "COc1ccc(Br)cc1.OB(O)/C(F)=C/c1ccc2ccccc2c1",
+            "products_smiles": "COc1ccc(/C(F)=C/c2ccc3ccccc3c2)cc1",
+            "condition_core": "Pd",
+            "yield": 99.0,
+            "core": "Pd",
+            "base_uid": "497-19-8",
+            "solvent_uid": "123-91-1",
+            "reagents": [
+              {
+                "name": "Sodium carbonate",
+                "cas": "497-19-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "1,4-Dioxane",
+                "cas": "123-91-1"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Copper-Catalyzed Regioselective Monodefluoroborylation of Polyfluoroalkenes en Route to Diverse Fluoroalkenes | Sakaguchi, Hironobu; Uetake, Yuta; Ohashi, Masato; Niwa, Takashi; Ogoshi, Sensuke; Hosoya, Takamitsu | Journal of the American Chemical Society (2017), 139(36), 12855-12862",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 99.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) dichloride complex of Amphos",
+                "cas": "887919-35-9"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-21463386",
+            "reaction_smiles": "Brc1ccc(Br)cc1.OB(O)C1CC1>>c1cc(C2CC2)ccc1C1CC1",
+            "reactants_smiles": "Brc1ccc(Br)cc1.OB(O)C1CC1",
+            "products_smiles": "c1cc(C2CC2)ccc1C1CC1",
+            "condition_core": "Pd/PCy3",
+            "yield": 95.0,
+            "core": "Pd/PCy3",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Silylium-Ion-Promoted Ring-Opening Hydrosilylation and Disilylation of Unactivated Cyclopropanes | Roy, Avijit; Bonetti, Vittorio; Wang, Guoqiang; Wu, Qian; Klare, Hendrik F. T.; Oestreich, Martin | Organic Letters (2020), 22(3), 1213-1216",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 95.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "cas": "2622-14-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-22332257",
+            "reaction_smiles": "OB(O)C1CC1.CC(C)(C)OC(=O)C[C@@H](CC1CCCC1)C(=O)N1CC2(CC2)C[C@H]1c1nc(-c2ccc(Br)cc2)no1>>CC(C)(C)OC(=O)C[C@@H](CC1CCCC1)C(=O)N1CC2(CC2)C[C@H]1c1nc(-c2ccc(C3CC3)cc2)no1",
+            "reactants_smiles": "OB(O)C1CC1.CC(C)(C)OC(=O)C[C@@H](CC1CCCC1)C(=O)N1CC2(CC2)C[C@H]1c1nc(-c2ccc(Br)cc2)no1",
+            "products_smiles": "CC(C)(C)OC(=O)C[C@@H](CC1CCCC1)C(=O)N1CC2(CC2)C[C@H]1c1nc(-c2ccc(C3CC3)cc2)no1",
+            "condition_core": "Pd/Tri-tert-butylphosphinetetrafluoroborate",
+            "yield": 96.0,
+            "core": "Pd/Tri-tert-butylphosphinetetrafluoroborate",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Synthesis and anticancer activity of novel Actinonin derivatives as HsPDF inhibitors | Hu, Liu; Cai, Xing; Dong, Suzhen; Zhen, Yongjia; Hu, Jidi; Wang, Shenjun; Jiang, Jingwen; Huang, Jiawu; Han, Yuqiao; Qian, Yu; Yuan, Yanqiu; Hu, Wenhao | Journal of Medicinal Chemistry (2020), 63(13), 6959-6978",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 96.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tri-tert-butylphosphine tetrafluoroborate",
+                "cas": "131274-22-1"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-15711179",
+            "reaction_smiles": "O=[N+]([O-])c1ccc(Br)cc1.OB(O)C1CC1>>O=[N+]([O-])c1ccc(C2CC2)cc1",
+            "reactants_smiles": "O=[N+]([O-])c1ccc(Br)cc1.OB(O)C1CC1",
+            "products_smiles": "O=[N+]([O-])c1ccc(C2CC2)cc1",
+            "condition_core": "Pd/PCy3",
+            "yield": 94.0,
+            "core": "Pd/PCy3",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Metal Nanoparticles Catalyzed Selective Carbon-Carbon Bond Activation in the Liquid Phase | Ye, Rong; Yuan, Bing; Zhao, Jie; Ralston, Walter T.; Wu, Chung-Yeh; Unel Barin, Ebru; Toste, F. Dean; Somorjai, Gabor A. | Journal of the American Chemical Society (2016), 138(27), 8533-8537",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 94.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "cas": "2622-14-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-179-CAS-20236466",
+            "reaction_smiles": "Brc1ccc(-c2ccccc2)cc1.OB(O)C1CC1>>c1ccc(-c2ccc(C3CC3)cc2)cc1",
+            "reactants_smiles": "Brc1ccc(-c2ccccc2)cc1.OB(O)C1CC1",
+            "products_smiles": "c1ccc(-c2ccc(C3CC3)cc2)cc1",
+            "condition_core": "Pd/PCy3",
+            "yield": 94.0,
+            "core": "Pd/PCy3",
+            "base_uid": "534-17-8",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Cesium carbonate",
+                "cas": "534-17-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 94.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "cas": "2622-14-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          }
+        ],
+        "timing": {
+          "load_data": 1.6519405841827393,
+          "build_candidates": 0.04094862937927246,
+          "drfp_query_encode": 0.010812997817993164,
+          "scoring": 2.5945165157318115,
+          "result_prep": 0.04814743995666504,
+          "total": 4.3463661670684814
+        },
+        "drfp_load_strategy": {
+          "binary": 50214,
+          "jsonl": 0,
+          "computed": 0
+        },
+        "similarities": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "reasons": {
+        "reasons": [
+          "Substrate bin: LG:?|NUC:?.",
+          "Core(s): Pd/PCy3 (5), Palladium (2).",
+          "Common base(s): Tripotassium phosphate (6), Cesium carbonate (2).",
+          "Common solvent(s): Toluene (8), Water (1).",
+          "Support: 33 precedent(s)."
+        ],
+        "precedents": [
+          {
+            "reaction_id": "31-179-CAS-20236453",
+            "reaction_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1>>COc1ccc(C2CC2)cc1",
+            "reactants_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1",
+            "products_smiles": "COc1ccc(C2CC2)cc1",
+            "condition_core": "Pd/PCy3",
+            "yield": 80.0,
+            "core": "Pd/PCy3",
+            "base_uid": "534-17-8",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Cesium carbonate",
+                "cas": "534-17-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 80.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "cas": "2622-14-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-42252838",
+            "reaction_smiles": "CB(O)O.CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Br)cc2)cc1>>Cc1ccc(C(=O)c2ccc(OC(C)(C)C(=O)OC(C)C)cc2)cc1",
+            "reactants_smiles": "CB(O)O.CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Br)cc2)cc1",
+            "products_smiles": "Cc1ccc(C(=O)c2ccc(OC(C)(C)C(=O)OC(C)C)cc2)cc1",
+            "condition_core": "Pd",
+            "yield": 99.0,
+            "core": "Pd",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Pd-Catalyzed C(sp2)-C(sp3) Suzuki Coupling and Synthesis of Lumacaftor Using Designed Monophosphine Ligands | Zhang, Xiangdong; Jia, Fushun; Guo, Xu; Liu, Guodu | Organic Letters (2024), 26(49), 10419-10423",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 99.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "3032599-60-0",
+                "cas": "3032599-60-0"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-34686952",
+            "reaction_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1>>COc1ccc(C2CC2)cc1",
+            "reactants_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1",
+            "products_smiles": "COc1ccc(C2CC2)cc1",
+            "condition_core": "Pd/PCy3",
+            "yield": 78.0,
+            "core": "Pd/PCy3",
+            "base_uid": "7778-53-2",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Tripotassium phosphate",
+                "cas": "7778-53-2",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Substrate-controlled C-H or C-C alkynylation of cyclopropanes: generation of aryl radical cations by direct light activation of hypervalent iodine reagents | Nguyen, Tin V. T.; Wodrich, Matthew D.; Waser, Jerome | Chemical Science (2022), 13(43), 12831-12839",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 78.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "cas": "2622-14-2"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          }
+        ]
+      },
+      "formatted": {
+        "meta": {
+          "status": "success",
+          "model": "drfp_similarity",
+          "version": "2.0"
+        },
+        "input": {
+          "reaction_smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1",
+          "family": "Suzuki"
+        },
+        "detection": {
+          "family": "Suzuki",
+          "confidence": 0.475
+        },
+        "recommended_conditions": [
+          {
+            "rank": 1,
+            "reaction": {
+              "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "COc1ccc(Br)cc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "C#CB(O)O",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium(II) acetate",
+                "abbreviation": "Pd(OAc)2",
+                "cas": "3375-31-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "abbreviation": "PCy3",
+                "cas": "2622-14-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "Tripotassium phosphate",
+                "abbreviation": "K3PO4",
+                "cas": "7778-53-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Toluene",
+                "abbreviation": "PhMe",
+                "cas": "108-88-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 1,
+              "core": "Pd/PCy3",
+              "base": {
+                "name": "Tripotassium phosphate",
+                "abbreviation": "K3PO4",
+                "cas": "7778-53-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Toluene",
+                "abbreviation": "PhMe",
+                "cas": "108-88-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 3,
+                "fraction_core": 0.6,
+                "reference_population": 5
+              },
+              "precedents": [
+                {
+                  "reaction_id": "31-614-CAS-34686952",
+                  "reference": "Substrate-controlled C-H or C-C alkynylation of cyclopropanes: generation of aryl radical cations by direct light activation of hypervalent iodine reagents | Nguyen, Tin V. T.; Wodrich, Matthew D.; Waser, Jerome | Chemical Science (2022), 13(43), 12831-12839",
+                  "yield_pct": null,
+                  "core": "Pd/PCy3"
+                },
+                {
+                  "reaction_id": "31-179-CAS-21463386",
+                  "reference": "Silylium-Ion-Promoted Ring-Opening Hydrosilylation and Disilylation of Unactivated Cyclopropanes | Roy, Avijit; Bonetti, Vittorio; Wang, Guoqiang; Wu, Qian; Klare, Hendrik F. T.; Oestreich, Martin | Organic Letters (2020), 22(3), 1213-1216",
+                  "yield_pct": null,
+                  "core": "Pd/PCy3"
+                },
+                {
+                  "reaction_id": "31-179-CAS-15711179",
+                  "reference": "Metal Nanoparticles Catalyzed Selective Carbon-Carbon Bond Activation in the Liquid Phase | Ye, Rong; Yuan, Bing; Zhao, Jie; Ralston, Walter T.; Wu, Chung-Yeh; Unel Barin, Ebru; Toste, F. Dean; Somorjai, Gabor A. | Journal of the American Chemical Society (2016), 138(27), 8533-8537",
+                  "yield_pct": null,
+                  "core": "Pd/PCy3"
+                }
+              ]
+            },
+            "combo": {
+              "base_uid": "7778-53-2",
+              "solvent_uid": "108-88-3"
+            }
+          },
+          {
+            "rank": 2,
+            "reaction": {
+              "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "COc1ccc(Br)cc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "C#CB(O)O",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium(II) acetate",
+                "abbreviation": "Pd(OAc)2",
+                "cas": "3375-31-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "abbreviation": "PCy3",
+                "cas": "2622-14-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "Cesium carbonate",
+                "abbreviation": "Cs2CO3",
+                "cas": "534-17-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Toluene",
+                "abbreviation": "PhMe",
+                "cas": "108-88-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 2,
+              "core": "Pd/PCy3",
+              "base": {
+                "name": "Cesium carbonate",
+                "abbreviation": "Cs2CO3",
+                "cas": "534-17-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Toluene",
+                "abbreviation": "PhMe",
+                "cas": "108-88-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 2,
+                "fraction_core": 0.4,
+                "reference_population": 5
+              },
+              "precedents": [
+                {
+                  "reaction_id": "31-179-CAS-20236453",
+                  "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580",
+                  "yield_pct": null,
+                  "core": "Pd/PCy3"
+                },
+                {
+                  "reaction_id": "31-179-CAS-20236466",
+                  "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580",
+                  "yield_pct": null,
+                  "core": "Pd/PCy3"
+                }
+              ]
+            },
+            "combo": {
+              "base_uid": "534-17-8",
+              "solvent_uid": "108-88-3"
+            }
+          },
+          {
+            "rank": 3,
+            "reaction": {
+              "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "COc1ccc(Br)cc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "C#CB(O)O",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium(II) acetate",
+                "abbreviation": "Pd(OAc)2",
+                "cas": "3375-31-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "abbreviation": "PCy3",
+                "cas": "2622-14-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "Triethylamine",
+                "abbreviation": "Et3N",
+                "cas": "121-44-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 3,
+              "core": "Pd/PCy3",
+              "base": {
+                "name": "Triethylamine",
+                "abbreviation": "Et3N",
+                "cas": "121-44-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Water",
+                "abbreviation": "H2O",
+                "cas": "7732-18-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 1,
+                "fraction_core": 0.2,
+                "reference_population": 5
+              },
+              "precedents": []
+            },
+            "combo": {
+              "base_uid": "121-44-8",
+              "solvent_uid": "7732-18-5"
+            }
+          },
+          {
+            "rank": 4,
+            "reaction": {
+              "smiles": "COc1ccc(Br)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "COc1ccc(Br)cc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "C#CB(O)O",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Palladium(II) acetate",
+                "abbreviation": "Pd(OAc)2",
+                "cas": "3375-31-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "Tricyclohexylphosphine",
+                "abbreviation": "PCy3",
+                "cas": "2622-14-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "Sodium carbonate",
+                "abbreviation": "Na2CO3",
+                "cas": "497-19-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "1,4-Dioxane",
+                "abbreviation": null,
+                "cas": "123-91-1",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 4,
+              "core": "Pd/PCy3",
+              "base": {
+                "name": "Sodium carbonate",
+                "abbreviation": "Na2CO3",
+                "cas": "497-19-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "1,4-Dioxane",
+                "abbreviation": null,
+                "cas": "123-91-1",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 1,
+                "fraction_core": 0.2,
+                "reference_population": 5
+              },
+              "precedents": []
+            },
+            "combo": {
+              "base_uid": "497-19-8",
+              "solvent_uid": "123-91-1"
+            }
+          }
+        ],
+        "precedent_summary": {
+          "total_precedents": 10,
+          "chosen_core": "Pd/PCy3",
+          "core_support": 5
+        },
+        "precedents_used": {
+          "total_count": 10,
+          "top_precedents": [
+            {
+              "rank": 1,
+              "reaction_id": "31-179-CAS-20236453",
+              "reaction_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1>>COc1ccc(C2CC2)cc1",
+              "core": "Pd/PCy3",
+              "yield": 80.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "Tricyclohexylphosphine",
+                  "cas": "2622-14-2",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Cesium carbonate",
+                  "cas": "534-17-8",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 80.0
+              },
+              "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580"
+            },
+            {
+              "rank": 2,
+              "reaction_id": "31-614-CAS-42252838",
+              "reaction_smiles": "CB(O)O.CC(C)OC(=O)C(C)(C)Oc1ccc(C(=O)c2ccc(Br)cc2)cc1>>Cc1ccc(C(=O)c2ccc(OC(C)(C)C(=O)OC(C)C)cc2)cc1",
+              "core": "Pd",
+              "yield": 99.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "3032599-60-0",
+                  "cas": "3032599-60-0",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Tripotassium phosphate",
+                  "cas": "7778-53-2",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 99.0
+              },
+              "reference": "Pd-Catalyzed C(sp2)-C(sp3) Suzuki Coupling and Synthesis of Lumacaftor Using Designed Monophosphine Ligands | Zhang, Xiangdong; Jia, Fushun; Guo, Xu; Liu, Guodu | Organic Letters (2024), 26(49), 10419-10423"
+            },
+            {
+              "rank": 3,
+              "reaction_id": "31-614-CAS-34686952",
+              "reaction_smiles": "COc1ccc(Br)cc1.OB(O)C1CC1>>COc1ccc(C2CC2)cc1",
+              "core": "Pd/PCy3",
+              "yield": 78.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "Tricyclohexylphosphine",
+                  "cas": "2622-14-2",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Tripotassium phosphate",
+                  "cas": "7778-53-2",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 78.0
+              },
+              "reference": "Substrate-controlled C-H or C-C alkynylation of cyclopropanes: generation of aryl radical cations by direct light activation of hypervalent iodine reagents | Nguyen, Tin V. T.; Wodrich, Matthew D.; Waser, Jerome | Chemical Science (2022), 13(43), 12831-12839"
+            },
+            {
+              "rank": 4,
+              "reaction_id": "31-179-CAS-18102658",
+              "reaction_smiles": "COc1ccc(Br)cc1.CCCCB(CCCC)CCCC>>CCCCc1ccc(OC)cc1",
+              "core": "Pd/cataCXiumA",
+              "yield": 94.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "cataCXium A",
+                  "cas": "321921-71-5",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Tripotassium phosphate",
+                  "cas": "7778-53-2",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Tetrahydrofuran",
+                  "cas": "109-99-9"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 94.0
+              },
+              "reference": "A Concise and Atom-Economical Suzuki-Miyaura Coupling Reaction Using Unactivated Trialkyl- and Triarylboranes with Aryl Halides | Li, Hongmei; Zhong, Yong-Li; Chen, Cheng-yi; Ferraro, Ashley E.; Wang, Dengjin | Organic Letters (2015), 17(14), 3616-3619"
+            },
+            {
+              "rank": 5,
+              "reaction_id": "31-614-CAS-39154061",
+              "reaction_smiles": "COc1ccc(Br)cc1.OB(O)CCc1ccccc1>>COc1ccc(CCc2ccccc2)cc1",
+              "core": "Pd/di-tert-butylphosphino",
+              "yield": 78.0,
+              "catalysts": [
+                {
+                  "name": "Bis(di-tert-butylphosphino)ferrocene palladium(II) dichloride",
+                  "cas": "95408-45-0",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Triethylamine",
+                  "cas": "121-44-8",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 78.0
+              },
+              "reference": "Saponin: a green and efficient natural surfactant for Suzuki-Miyaura cross-couplings of heteroaryl substrates in aqueous media at ambient conditions | Vinayagam, Vinothkumar; Sadhukhan, Subir Kumar; Kasu, Sreenivasa Reddy; Maroju, Ravi Kumar; Kumar, Tanguturi Venkatanarayana Hajay; Karre, Satish Kumar; Baledi, Dhurwasulu | Green Chemistry (2024), 26(3), 1393-1398"
+            },
+            {
+              "rank": 6,
+              "reaction_id": "31-179-CAS-17783546",
+              "reaction_smiles": "COc1ccc(Br)cc1.OB(O)/C(F)=C/c1ccc2ccccc2c1>>COc1ccc(/C(F)=C/c2ccc3ccccc3c2)cc1",
+              "core": "Pd",
+              "yield": 99.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) dichloride complex of Amphos",
+                  "cas": "887919-35-9",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Sodium carbonate",
+                  "cas": "497-19-8",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "1,4-Dioxane",
+                  "cas": "123-91-1"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 99.0
+              },
+              "reference": "Copper-Catalyzed Regioselective Monodefluoroborylation of Polyfluoroalkenes en Route to Diverse Fluoroalkenes | Sakaguchi, Hironobu; Uetake, Yuta; Ohashi, Masato; Niwa, Takashi; Ogoshi, Sensuke; Hosoya, Takamitsu | Journal of the American Chemical Society (2017), 139(36), 12855-12862"
+            },
+            {
+              "rank": 7,
+              "reaction_id": "31-179-CAS-21463386",
+              "reaction_smiles": "Brc1ccc(Br)cc1.OB(O)C1CC1>>c1cc(C2CC2)ccc1C1CC1",
+              "core": "Pd/PCy3",
+              "yield": 95.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "Tricyclohexylphosphine",
+                  "cas": "2622-14-2",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Tripotassium phosphate",
+                  "cas": "7778-53-2",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 95.0
+              },
+              "reference": "Silylium-Ion-Promoted Ring-Opening Hydrosilylation and Disilylation of Unactivated Cyclopropanes | Roy, Avijit; Bonetti, Vittorio; Wang, Guoqiang; Wu, Qian; Klare, Hendrik F. T.; Oestreich, Martin | Organic Letters (2020), 22(3), 1213-1216"
+            },
+            {
+              "rank": 8,
+              "reaction_id": "31-179-CAS-22332257",
+              "reaction_smiles": "OB(O)C1CC1.CC(C)(C)OC(=O)C[C@@H](CC1CCCC1)C(=O)N1CC2(CC2)C[C@H]1c1nc(-c2ccc(Br)cc2)no1>>CC(C)(C)OC(=O)C[C@@H](CC1CCCC1)C(=O)N1CC2(CC2)C[C@H]1c1nc(-c2ccc(C3CC3)cc2)no1",
+              "core": "Pd/Tri-tert-butylphosphinetetrafluoroborate",
+              "yield": 96.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "Tri-tert-butylphosphine tetrafluoroborate",
+                  "cas": "131274-22-1",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Tripotassium phosphate",
+                  "cas": "7778-53-2",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 96.0
+              },
+              "reference": "Synthesis and anticancer activity of novel Actinonin derivatives as HsPDF inhibitors | Hu, Liu; Cai, Xing; Dong, Suzhen; Zhen, Yongjia; Hu, Jidi; Wang, Shenjun; Jiang, Jingwen; Huang, Jiawu; Han, Yuqiao; Qian, Yu; Yuan, Yanqiu; Hu, Wenhao | Journal of Medicinal Chemistry (2020), 63(13), 6959-6978"
+            },
+            {
+              "rank": 9,
+              "reaction_id": "31-179-CAS-15711179",
+              "reaction_smiles": "O=[N+]([O-])c1ccc(Br)cc1.OB(O)C1CC1>>O=[N+]([O-])c1ccc(C2CC2)cc1",
+              "core": "Pd/PCy3",
+              "yield": 94.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "Tricyclohexylphosphine",
+                  "cas": "2622-14-2",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Tripotassium phosphate",
+                  "cas": "7778-53-2",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 94.0
+              },
+              "reference": "Metal Nanoparticles Catalyzed Selective Carbon-Carbon Bond Activation in the Liquid Phase | Ye, Rong; Yuan, Bing; Zhao, Jie; Ralston, Walter T.; Wu, Chung-Yeh; Unel Barin, Ebru; Toste, F. Dean; Somorjai, Gabor A. | Journal of the American Chemical Society (2016), 138(27), 8533-8537"
+            },
+            {
+              "rank": 10,
+              "reaction_id": "31-179-CAS-20236466",
+              "reaction_smiles": "Brc1ccc(-c2ccccc2)cc1.OB(O)C1CC1>>c1ccc(-c2ccc(C3CC3)cc2)cc1",
+              "core": "Pd/PCy3",
+              "yield": 94.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "Tricyclohexylphosphine",
+                  "cas": "2622-14-2",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Cesium carbonate",
+                  "cas": "534-17-8",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 94.0
+              },
+              "reference": "Visible-Light-Mediated Synthesis of β-Chloro Ketones from Aryl Cyclopropanes | Petzold, Daniel; Singh, Pardeep; Almqvist, Fredrik; Koenig, Burkhard | Angewandte Chemie, International Edition (2019), 58(25), 8577-8580"
+            }
+          ],
+          "core_matched_precedents": {
+            "core": "Pd/PCy3",
+            "count": 5,
+            "examples": [
+              {
+                "rank": 1,
+                "reaction_id": "31-179-CAS-20236453",
+                "core": "Pd/PCy3",
+                "base": "534-17-8",
+                "solvent": "108-88-3",
+                "yield": 80.0
+              },
+              {
+                "rank": 2,
+                "reaction_id": "31-614-CAS-34686952",
+                "core": "Pd/PCy3",
+                "base": "7778-53-2",
+                "solvent": "108-88-3",
+                "yield": 78.0
+              },
+              {
+                "rank": 3,
+                "reaction_id": "31-179-CAS-21463386",
+                "core": "Pd/PCy3",
+                "base": "7778-53-2",
+                "solvent": "108-88-3",
+                "yield": 95.0
+              },
+              {
+                "rank": 4,
+                "reaction_id": "31-179-CAS-15711179",
+                "core": "Pd/PCy3",
+                "base": "7778-53-2",
+                "solvent": "108-88-3",
+                "yield": 94.0
+              },
+              {
+                "rank": 5,
+                "reaction_id": "31-179-CAS-20236466",
+                "core": "Pd/PCy3",
+                "base": "534-17-8",
+                "solvent": "108-88-3",
+                "yield": 94.0
+              }
+            ]
+          },
+          "statistics": {
+            "average_yield": 90.7,
+            "yield_range": [
+              78.0,
+              99.0
+            ],
+            "temperature_range": null,
+            "time_range": null
+          }
+        }
+      },
+      "detection": {
+        "auto_family": "Suzuki_CC",
+        "rule_family": "Sonogashira_CC",
+        "source": "auto"
+      },
+      "constraint_filters": {
+        "base": {
+          "allowed": [
+            "7778-53-2",
+            "534-17-8"
+          ],
+          "blocked": []
+        },
+        "solvent": {
+          "allowed": [
+            "108-88-3"
+          ],
+          "blocked": []
+        }
+      },
+      "_deprecated": {
+        "message": "Fusion is deprecated. Use rerank_strategy=\"rule\" instead.",
+        "migration": "Use --rerank rule instead of --strategy fusion"
+      }
+    }
+  }
+}

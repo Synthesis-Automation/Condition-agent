@@ -340,7 +340,7 @@ class ReagentNamespace:
         Returns:
             Reagent dictionary if found, None otherwise
         """
-        from . import reagent_lookup as _reagent
+        from . import reagent as _reagent
         return _reagent.find_reagent(name, reagent_type)
     
     @staticmethod
@@ -354,7 +354,7 @@ class ReagentNamespace:
         Returns:
             Dictionary with enriched reagent details
         """
-        from . import reagent_lookup as _reagent
+        from . import reagent as _reagent
         return _reagent.enrich_reagent_info(name, reagent_type)
     
     @staticmethod
@@ -367,7 +367,7 @@ class ReagentNamespace:
         Returns:
             Enriched conditions with detailed reagent information
         """
-        from . import reagent_lookup as _reagent
+        from . import reagent as _reagent
         return _reagent.enrich_conditions(conditions)
     
     @staticmethod
@@ -377,7 +377,7 @@ class ReagentNamespace:
         Returns:
             List of reagent type names
         """
-        from . import reagent_lookup as _reagent
+        from . import reagent as _reagent
         return _reagent.get_all_reagent_types()
 
 
@@ -1023,7 +1023,7 @@ class ChemTools:
                 return self._reagent_dbs[reagent_type]
             
             # Load through reagent_lookup module
-            from . import reagent_lookup as _reagent_lookup
+            from . import reagent as _reagent_lookup
             db = _reagent_lookup.load_reagent_database(reagent_type)
             
             # Cache the database

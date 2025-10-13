@@ -52,8 +52,8 @@ try:
         'Any': object,
     }
     
-    # Import dependencies that the function needs
-    from reagent_taxonomy_generator import normalize_cas, resolve_identity_from_cas, dedupe_synonyms
+    # Import dependencies from the new chemtools.reagent package
+    from chemtools.reagent import normalize_cas, resolve_identity_from_cas, dedupe_synonyms
     exec_globals['normalize_cas'] = normalize_cas
     exec_globals['resolve_identity_from_cas'] = resolve_identity_from_cas
     exec_globals['dedupe_synonyms'] = dedupe_synonyms
@@ -61,8 +61,8 @@ try:
     exec_globals['assign_fields'] = assign_fields
     exec_globals['verify_entry'] = verify_entry
     
-    # Load the function from file
-    qt_file = SCRIPT_DIR / "reagent_taxonomy_qt.py"
+    # Load the function from file (moved to app/)
+    qt_file = SCRIPT_DIR.parent / "app" / "reagent_taxonomy_ui.py"
     with open(qt_file, 'r', encoding='utf-8') as f:
         code = f.read()
     

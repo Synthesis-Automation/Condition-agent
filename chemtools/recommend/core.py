@@ -155,7 +155,7 @@ def recommend_from_reaction(
     # 5) Optional filtering: Remove precedents with unknown reagents
     if filter_unknown_reagents and precs:
         try:
-            from .. import reagent_lookup
+            from .. import reagent
             
             filtered_precs = []
             removed_count = 0
@@ -172,13 +172,13 @@ def recommend_from_reaction(
                 
                 # Check base (if present)
                 if base_uid:
-                    result = reagent_lookup.enrich_reagent_info(str(base_uid), 'base')
+                    result = reagent.enrich_reagent_info(str(base_uid), 'base')
                     if not result.get('found', False):
                         all_known = False
                 
                 # Check solvent (if present)
                 if all_known and solvent_uid:
-                    result = reagent_lookup.enrich_reagent_info(str(solvent_uid), 'solvent')
+                    result = reagent.enrich_reagent_info(str(solvent_uid), 'solvent')
                     if not result.get('found', False):
                         all_known = False
                 
@@ -675,7 +675,7 @@ def _build_formatted_output_from_fusion(
     def _lookup(uid: str, role: str) -> Dict[str, Any]:
         """Look up reagent information by CAS number or name."""
         try:
-            from .. import reagent_lookup
+            from .. import reagent
             
             role_to_type = {
                 "base": "base",
@@ -686,7 +686,7 @@ def _build_formatted_output_from_fusion(
             }
             reagent_type = role_to_type.get(role, role)
             
-            res = reagent_lookup.enrich_reagent_info(uid, reagent_type)
+            res = reagent.enrich_reagent_info(uid, reagent_type)
             if res and res.get("found"):
                 return {
                     "name": res.get("name"),
@@ -1017,7 +1017,7 @@ def _build_formatted_output(
     def _lookup(uid: str, role: str) -> Dict[str, Any]:
         """Look up reagent information by CAS number or name."""
         try:
-            from .. import reagent_lookup
+            from .. import reagent
             
             # Map role to reagent type for lookup
             role_to_type = {
@@ -1030,7 +1030,7 @@ def _build_formatted_output(
             reagent_type = role_to_type.get(role, role)
             
             # Try to enrich the reagent info
-            res = reagent_lookup.enrich_reagent_info(uid, reagent_type)
+            res = reagent.enrich_reagent_info(uid, reagent_type)
             if res and res.get("found"):
                 return {
                     "name": res.get("name"),

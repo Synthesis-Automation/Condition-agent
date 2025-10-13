@@ -10,7 +10,7 @@ import copy
 import datetime
 import re
 from typing import Any, Dict, List, Optional, Tuple
-from . import reagent_lookup
+from . import reagent
 
 
 def format_meta(
@@ -356,7 +356,7 @@ def _normalize_rule_string_value(value: str, role: str, amount: Optional[str] = 
     reagent_type = role_to_type_map.get(role, role)
     
     # Try to enrich with database information
-    enriched_info = reagent_lookup.enrich_reagent_info(cleaned, reagent_type)
+    enriched_info = reagent.enrich_reagent_info(cleaned, reagent_type)
     
     # Build chemical entry
     chemical: Dict[str, Any] = {
@@ -737,7 +737,7 @@ def enrich_reagent(
         })
     else:
         # Look up in database
-        db_info = reagent_lookup.enrich_reagent_info(name, reagent_type)
+        db_info = reagent.enrich_reagent_info(name, reagent_type)
         
         if db_info.get("found"):
             enriched.update({

@@ -33,13 +33,14 @@ from pathlib import Path
 # Add paths
 sys.path.insert(0, r'{root_dir}')
 sys.path.insert(0, r'{data_processor_dir}')
+sys.path.insert(0, r'{app_dir}')
 
 # Import dependencies
 from llmtools.clients import LLMClient
 from llmtools.reagent_classifier import classify_role, assign_fields, verify_entry
-from reagent_taxonomy_generator import normalize_cas, resolve_identity_from_cas, dedupe_synonyms
+from chemtools.reagent import normalize_cas, resolve_identity_from_cas, dedupe_synonyms
 
-# Import from reagent_taxonomy_qt
+# Import from reagent_taxonomy_ui (now in app/)
 exec(open(r'{qt_file}', encoding='utf-8').read())
 
 # Setup
@@ -63,8 +64,9 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 # Get paths
 script_dir = Path(__file__).resolve().parent
 root_dir = script_dir.parent
+app_dir = root_dir / "app"
 registry_dir = root_dir / "data" / "reagents"
-qt_file = script_dir / "reagent_taxonomy_qt.py"
+qt_file = app_dir / "reagent_taxonomy_ui.py"
 
 # Determine provider
 if has_aliyun:

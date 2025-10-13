@@ -380,7 +380,7 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
     filter_by_database = relax.get("filter_by_reagent_database", True)  # Default: True
     if filter_by_database:
         try:
-            from ..reagent_lookup import filter_precedents_by_database_availability
+            from ..reagent import filter_precedents_by_database_availability
             
             # Get full precedent data for filtering (top contains all needed fields)
             precedents_for_filter = [r for r in top]

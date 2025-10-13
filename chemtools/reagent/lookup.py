@@ -18,7 +18,7 @@ _REAGENT_CACHE: Dict[str, List[Dict[str, Any]]] = {}
 
 def get_data_dir() -> Path:
     """Get the data directory path."""
-    module_dir = Path(__file__).parent.parent
+    module_dir = Path(__file__).parent.parent.parent
     return module_dir / "data"
 
 
