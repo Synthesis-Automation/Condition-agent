@@ -40,7 +40,7 @@ def _normalize_id(x: str) -> str:
 def _lookup(uid_or_token: str) -> Dict[str, Any]:
     """Lookup reagent by UID or token, returning a unified record."""
     try:
-        from .reagent_lookup import find_reagent
+        from .reagent import find_reagent
         
         # Try to find in different reagent databases
         for reagent_type in ['base', 'solvent', 'ligand', 'metal_precursor', 'additive']:

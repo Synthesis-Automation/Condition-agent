@@ -30,22 +30,23 @@ from PyQt6.QtWidgets import (
 )
 
 MODULE_DIR = Path(__file__).resolve().parent
-if str(MODULE_DIR) not in sys.path:
-    sys.path.insert(0, str(MODULE_DIR))
 ROOT_DIR = MODULE_DIR.parent
+
+# Add root directory to path so chemtools can be imported
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from reagent_taxonomy_generator import (  # type: ignore
-    DEFAULT_RESOLVER_TIMEOUT,
+# Import from the new unified chemtools.reagent package
+from chemtools.reagent import (
     dedupe_synonyms,
     normalize_cas,
     resolve_identity_from_cas,
     tokenize_all,
 )
 
+DEFAULT_RESOLVER_TIMEOUT = 6.0  # Default timeout for identity resolution
 
-DEFAULT_REGISTRY_DIR = (MODULE_DIR.parent / "data" / "reagents").resolve()
+DEFAULT_REGISTRY_DIR = (ROOT_DIR / "data" / "reagents").resolve()
 
 DEFAULT_LLM_MODELS: Dict[str, List[str]] = {
     "aliyun": [

@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from chemtools.router import detect_family, detect_family_from_reaction
 from chemtools.recommend.core import recommend_from_reaction
-from chemtools import reagent_lookup
+from chemtools import reagent
 
 
 def lookup_name(cas: str, role: str) -> str:
@@ -30,7 +30,7 @@ def lookup_name(cas: str, role: str) -> str:
     if not cas or cas == 'N/A':
         return 'N/A'
     
-    info = reagent_lookup.enrich_reagent_info(cas, role)
+    info = reagent.enrich_reagent_info(cas, role)
     if info and info.get('name'):
         name = info['name']
         if name == cas or name.startswith('[Unknown'):

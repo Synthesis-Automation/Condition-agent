@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # Direct imports to avoid ML library loading overhead
 from chemtools.recommend.core import recommend_from_reaction
 from chemtools.recommend.plate_design import design_plate_from_reaction
-from chemtools import reagent_lookup
+from chemtools import reagent
 
 # Test reaction (same as previous tests)
 TEST_REACTION = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -32,7 +32,7 @@ def lookup_name(cas: str, role: str) -> str:
     if not cas or cas == 'N/A':
         return 'N/A'
     
-    info = reagent_lookup.enrich_reagent_info(cas, role)
+    info = reagent.enrich_reagent_info(cas, role)
     if info and info.get('name'):
         # Check if the name is just the CAS number (not found in database)
         name = info['name']

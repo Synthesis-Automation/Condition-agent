@@ -19,7 +19,7 @@ print("=" * 70)
 # Imports
 from llmtools.clients import LLMClient
 from llmtools.reagent_classifier import classify_role, assign_fields, verify_entry
-from reagent_taxonomy_generator import normalize_cas, resolve_identity_from_cas, dedupe_synonyms
+from chemtools.reagent import normalize_cas, resolve_identity_from_cas, dedupe_synonyms
 
 # Initialize
 client = LLMClient(provider="aliyun", model="deepseek-v3.2-exp")

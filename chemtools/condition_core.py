@@ -9,7 +9,7 @@ except Exception:  # pragma: no cover
     Reagent = Any  # type: ignore
 
 # Use reagent_lookup instead of old registry system
-from . import reagent_lookup
+from . import reagent
 
 
 def _lookup_reagent(name: str, uid: str, reagent_type: str = "metal_precursor") -> Optional[Dict]:
@@ -17,7 +17,7 @@ def _lookup_reagent(name: str, uid: str, reagent_type: str = "metal_precursor") 
     query = uid if uid else name
     if not query:
         return None
-    result = reagent_lookup.find_reagent(query, reagent_type)
+    result = reagent.find_reagent(query, reagent_type)
     return result
 
 

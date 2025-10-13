@@ -309,7 +309,7 @@ def recommend_simple(
     # Step 2: Filter unknown reagents (optional)
     if filter_unknown_reagents and precs:
         try:
-            from chemtools import reagent_lookup
+            from chemtools import reagent
             
             filtered_precs = []
             filtered_sims = []
@@ -327,13 +327,13 @@ def recommend_simple(
                 
                 # Check base (if present)
                 if base_uid:
-                    result = reagent_lookup.enrich_reagent_info(str(base_uid), 'base')
+                    result = reagent.enrich_reagent_info(str(base_uid), 'base')
                     if not result.get('found', False):
                         all_known = False
                 
                 # Check solvent (if present)
                 if all_known and solvent_uid:
-                    result = reagent_lookup.enrich_reagent_info(str(solvent_uid), 'solvent')
+                    result = reagent.enrich_reagent_info(str(solvent_uid), 'solvent')
                     if not result.get('found', False):
                         all_known = False
                 

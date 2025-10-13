@@ -35,7 +35,7 @@ def _name_from_uid(uid: str) -> str:
     if not uid:
         return ""
     try:
-        from .reagent_lookup import find_reagent
+        from .reagent import find_reagent
         
         # Try to find in different reagent databases
         for reagent_type in ['base', 'solvent', 'ligand', 'metal_precursor', 'additive']:
