@@ -31,7 +31,7 @@
         ]
       }
     },
-    "embedding_text": "type: ACID | family: Boron Lewis acids (boron_lewis_acids) | name: Boron trifluoride etherate | abbr: Boron trifluoride etherate | CAS: 109-63-7 | synonyms: Boron trifluoride etherate; 109-63-7; Borontrifluorideetherate; Boron trifluoride ethyl ether; ethoxyethane;trifluoroborane; BF3.Et2O; Boron trifluoride-diethyl etherate; ethoxyethane; trifluoroborane; boron trifluoride diethyl ether; boron trifluoride-diethyl ether; BF3 ethyl ether; BF3 ether; trifluoroborane ether; borontrifluride etherate; boron trifluorideetherate; borontriflouride etherate | family_notes: Lewis acids often metal halides; handled by name + metal."
+    "embedding_text": "type: ACID | family: Boron Lewis acids (boron_lewis_acids) | name: Boron trifluoride etherate | abbr: BF3.Et2O | CAS: 109-63-7 | synonyms: Borontrifluorideetherate; Boron trifluoride ethyl ether; ethoxyethane;trifluoroborane; BF3.Et2O; Boron trifluoride-diethyl etherate; ethoxyethane; trifluoroborane; boron trifluoride diethyl ether; boron trifluoride-diethyl ether; BF3 ethyl ether; BF3 ether; trifluoroborane ether; borontrifluride etherate | family_notes: Lewis acids often boron/metal halides; handle with care (moisture sensitive)."
   },
   {
     "id": "cas-7647-01-0",
@@ -65,6 +65,6 @@
         ]
       }
     },
-    "embedding_text": "type: ACID | family: Mineral acids (H2SO4/HCl/H3PO4) (mineral_acids) | name: Hydrochloric Acid | abbr: Hydrochloric Acid | CAS: 7647-01-0 | synonyms: Hydrochloric Acid; hydrogen chloride; 7647-01-0; Muriatic acid; chlorane; Chlorohydric acid; Acide chlorhydrique; Anhydrous hydrochloric acid; Chlorwasserstoff; Muriaticum acidum; Chloorwaterstof; Chlorowodor; Hydrogen chloride (HCl); Acido cloridrico; Aqueous hydrogen chloride; chlorure d'hydrogene | family_notes: HX, H2SO4, H3PO4; rely on name and formula."
+    "embedding_text": "type: ACID | family: Mineral acids (H2SO4/HCl/H3PO4) (mineral_acids) | name: Hydrochloric Acid | abbr: HCl | CAS: 7647-01-0 | synonyms: hydrogen chloride; Muriatic acid; chlorane; Chlorohydric acid; Acide chlorhydrique; Anhydrous hydrochloric acid; Chlorwasserstoff; Muriaticum acidum; Chloorwaterstof; Chlorowodor; Hydrogen chloride (HCl); Acido cloridrico | family_notes: HX/H2SO4/H3PO4 aqueous/non-aqueous use; corrosive."
   }
 ]

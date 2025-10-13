@@ -344,7 +344,7 @@ def get_common_reagents(family: str, role: Optional[str] = None, top_n: int = 10
     
     Args:
         family: Reaction family name
-        role: Optional role filter (e.g., 'BASE', 'ACID', 'OXIDANT', 'COUPLING_REAGENT')
+        role: Optional role filter (e.g., 'BASE', 'ACID', 'OXIDANT', 'CONDENSATION_AGENT')
         top_n: Number of top reagents to return
         min_yield: Optional minimum yield filter (0-100)
         

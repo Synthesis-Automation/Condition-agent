@@ -49,12 +49,13 @@
           "diamines"
         ],
         "donors": [
-          "P"
+          "N",
+          "N"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: 1,2-Benzenediamine, N1,N1-dimethyl- | CAS: 2836-03-5 | aliases: 2-Amino-N,N-dimethylaniline, 1,2-Benzenediamine, N,N-dimethyl-, o-(Dimethylamino)aniline, N,N-Dimethyl-o-phenylenediamine, 2-Dimethylaminoaniline, N,N-Dimethyl-1,2-benzenediamine | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: 1,2-Benzenediamine, N1,N1-dimethyl- | CAS: 2836-03-5 | aliases: 2-Amino-N,N-dimethylaniline, 1,2-Benzenediamine, N,N-dimethyl-, o-(Dimethylamino)aniline, N,N-Dimethyl-o-phenylenediamine, 2-Dimethylaminoaniline, N,N-Dimethyl-1,2-benzenediamine, o-Phenylenediamine, N,N-dimethyl-, N1,N1-dimethyl-1,2-benzenediamine, N1,N1-Dimethylbenzene-1,2-diamine | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "1_2_diaminocyclohexane__694-83-7",
@@ -86,7 +87,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: 1,2-Diaminocyclohexane | CAS: 694-83-7 | aliases: 1,2-Cyclohexanediamine, cyclohexane-1,2-diamine, Cyclohex-1,2-ylenediamine, DACH, 1,2-DACH, (rel)-Oxaliplatin | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: 1,2-Diaminocyclohexane | CAS: 694-83-7 | aliases: 1,2-Cyclohexanediamine, cyclohexane-1,2-diamine, Cyclohex-1,2-ylenediamine, DACH, 1,2-DACH, (rel)-Oxaliplatin, 1,2-Cylohexanediamine | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "1_2_diaminocyclohexane__21436-03-3",
@@ -121,7 +122,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: 1,2-Diaminocyclohexane, (+)- | CAS: 21436-03-3 | aliases: (1S,2S)-(+)-1,2-Diaminocyclohexane, (1S,2S)-Cyclohexane-1,2-diamine, trans-(+)-1,2-diaminocyclohexane, (1S,2S)-1,2-CYCLOHEXANEDIAMINE, (1S)trans1,2Cyclohexanediamine, (1S)trans1,2Diaminocyclohexane | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: 1,2-Diaminocyclohexane, (+)- | CAS: 21436-03-3 | aliases: (1S,2S)-(+)-1,2-Diaminocyclohexane, (1S,2S)-Cyclohexane-1,2-diamine, trans-(+)-1,2-diaminocyclohexane, (1S,2S)-1,2-CYCLOHEXANEDIAMINE, (1S)trans1,2Cyclohexanediamine, (1S)trans1,2Diaminocyclohexane, (1S,2S)-(+)-1,2-Cyclohexanediamine, (+/-)-trans-1,2-Diaminocyclohexane, (1s,2s)-1,2-diaminocyclohexane, 1,2-CYCLOHEXANEDIAMINE, (1S,2S)- | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "1_2_diaminocyclohexane_trans__1121-22-8",
@@ -155,7 +156,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: 1,2-Diaminocyclohexane, trans- | CAS: 1121-22-8 | aliases: (1R,2R)-(-)-1,2-Diaminocyclohexane, trans-1,2-Diaminocyclohexane, 1,2-Cyclohexanediamine, (1R,2R)-rel-, (-)-trans-1,2-Diaminocyclohexane, TRANS-N,N'-1,2-CYCLOHEXANEDIAMINE, 1,2-DIAMINOCYCLOHEXANE, TRANS-(-)- | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: 1,2-Diaminocyclohexane, trans- | CAS: 1121-22-8 | aliases: (1R,2R)-(-)-1,2-Diaminocyclohexane, trans-1,2-Diaminocyclohexane, 1,2-Cyclohexanediamine, (1R,2R)-rel-, (-)-trans-1,2-Diaminocyclohexane, TRANS-N,N'-1,2-CYCLOHEXANEDIAMINE, 1,2-DIAMINOCYCLOHEXANE, TRANS-(-)-, trans1,2Cyclohexanediamine, 1,2Cyclohexanediamine, (1R,2R)rel, (1R,2R)-cyclohexane-1,2-diamine | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "1_3_5_triaza_7_phosphaadamantane__53597-69-6",
@@ -201,7 +202,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) | family_id: nhc_imidazolylidenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: IAd | family_def: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)"
+    "embedding_text": "role: ligand | family_label: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) | family_id: nhc_imidazolylidenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: IAd | CAS: null | family_def: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)"
   },
   {
     "id": "1_3_di_tert_butylimidazol_2_ylidene__607d63ed",
@@ -224,7 +225,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) | family_id: nhc_imidazolylidenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: ItBu | family_def: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)"
+    "embedding_text": "role: ligand | family_label: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) | family_id: nhc_imidazolylidenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: ItBu | CAS: null | family_def: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)"
   },
   {
     "id": "1_3_dicyclohexylimidazol_2_ylidene__f4d336a6",
@@ -247,7 +248,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) | family_id: nhc_imidazolylidenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: ICy | family_def: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)"
+    "embedding_text": "role: ligand | family_label: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes) | family_id: nhc_imidazolylidenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: ICy | CAS: null | family_def: N-Heterocyclic carbenes (NHC: imidazolylidenes/imidazolinylidenes)"
   },
   {
     "id": "1_7_phenanthroline__12678-01-2",
@@ -266,15 +267,16 @@
     "roles": {
       "ligand": {
         "families": [
-          "trialkyl_triaryl_phosphines"
+          "phenanthrolines"
         ],
         "donors": [
-          "P"
+          "N",
+          "N"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: 1,7-Phenanthroline | CAS: 12678-01-2 | aliases: pyridino[2,3-f]quinoline, Phenanthrolines, m-Phenanthrolin | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: 1,10-Phenanthrolines | family_id: phenanthrolines | normalized_family: phenanthroline | donors: N,N | denticity: 2 | abbr: 1,7-Phenanthroline | CAS: 12678-01-2 | aliases: pyridino[2,3-f]quinoline, Phenanthrolines, m-Phenanthrolin | family_def: 1,10-Phenanthrolines"
   },
   {
     "id": "2_2_bipyridine__366-18-7",
@@ -320,10 +322,10 @@
           "N",
           "N"
         ],
-        "denticity": 2
+        "denticity": 3
       }
     },
-    "embedding_text": "role: ligand | family_label: 2,2':6',2''-Terpyridines (terpy) | family_id: terpyridines | normalized_family: ligand_misc | donors: N,N,N | denticity: 2 | abbr: terpy | family_def: 2,2':6',2''-Terpyridines (terpy)"
+    "embedding_text": "role: ligand | family_label: 2,2':6',2''-Terpyridines (terpy) | family_id: terpyridines | normalized_family: terpyridine | donors: N,N,N | denticity: 3 | abbr: terpy | CAS: null | family_def: 2,2':6',2''-Terpyridines (terpy)"
   },
   {
     "id": "2_2_6_6_tetramethyl_3_5_heptanedione__1118-71-4",
@@ -348,12 +350,13 @@
           "diones"
         ],
         "donors": [
+          "O",
           "O"
         ],
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: 2,2,6,6-Tetramethyl-3,5-heptanedione | CAS: 1118-71-4 | aliases: Dipivaloylmethane, 3,5-Heptanedione, 2,2,6,6-tetramethyl-, 2,2,6,6,-tetramethyl-3,5-heptanedione, 2,2,6,6-Tetramethylheptane-3,5-dione, 2,2,6,6-tetramethyl-heptane-3,5-dione, 2,2,6,6-Tetramethyl-3,5-heptanedione (Dipivaloylmethane) | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: β-Diketonates (acac/dpm family) | family_id: diones | normalized_family: diketonate | donors: O,O | denticity: 2 | abbr: 2,2,6,6-Tetramethyl-3,5-heptanedione | CAS: 1118-71-4 | aliases: Dipivaloylmethane, 3,5-Heptanedione, 2,2,6,6-tetramethyl-, 2,2,6,6,-tetramethyl-3,5-heptanedione, 2,2,6,6-Tetramethylheptane-3,5-dione, 2,2,6,6-tetramethyl-heptane-3,5-dione, 2,2,6,6-Tetramethyl-3,5-heptanedione (Dipivaloylmethane) | family_def: β-Diketonates (acac/dpm family)"
   },
   {
     "id": "2_4_6_trimethoxy_2_dicyclohexylphosphino_biphenyl__1000171-05-0",
@@ -401,7 +404,7 @@
         "denticity": 3
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_PDI | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: PDI | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
+    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_PDI | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: PDI | CAS: null | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
   },
   {
     "id": "2_6_bis_2_6_diisopropylphenyl_imino_pyridine__b867b4c4",
@@ -426,7 +429,7 @@
         "denticity": 3
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_PDI | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: DIPP-PDI | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
+    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_PDI | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: DIPP-PDI | CAS: null | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
   },
   {
     "id": "ZEMZPXWZVTUONV-UHFFFAOYSA-N",
@@ -455,16 +458,15 @@
     "roles": {
       "ligand": {
         "families": [
-          "phox_pn"
+          "dialkylbiaryl_phosphines"
         ],
         "donors": [
-          "P",
-          "N"
+          "P"
         ],
-        "denticity": 2
+        "denticity": 1
       }
     },
-    "embedding_text": "type: LIGAND | family: phox_pn (phox_pn) | denticity: 2 | name: 2-(Dicyclohexylphosphino)-2'-(dimethylamino)biphenyl | abbr: DavePhos | CAS: 213697-53-1 | synonyms: 2-(Dicyclohexylphosphino)-2'-(dimethylamino)biphenyl; 2'-(dicyclohexylphosphino)-N,N-dimethyl[1,1'-biphenyl]-2-amine; 2'-(Dicyclohexylphosphino)-N,N-dimethyl(1,1'-biphenyl)-2-amine; RefChem:460558; 606-749-5; 213697-53-1; 2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)biphenyl; DavePhos; 2'-(DICYCLOHEXYLPHOSPHINO)-N,N-DIMETHYL-[1,1'-BIPHENYL]-2-AMINE; MFCD02183572; 2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethylaniline; 2-dicyclohexylphosphino-2'-(dimethylamino)biphenyl; 2'-(dicyclohexylphosphanyl)-N,N-dimethyl-[1,1'-biphenyl]-2-amine; 2'-(dicyclohexylphosphino)-n,n-dimethylbiphenyl-2-amine; 2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethyl-aniline; 2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)-biphenyl; 2-(Dicyclohexylphosphino)-N,N-dimethyl-[1,1'-biphenyl]-2-amine"
+    "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: DavePhos | CAS: 213697-53-1 | aliases: 2'-(dicyclohexylphosphino)-N,N-dimethyl[1,1'-biphenyl]-2-amine, 2'-(Dicyclohexylphosphino)-N,N-dimethyl(1,1'-biphenyl)-2-amine, RefChem:460558, 606-749-5, 2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)biphenyl, 2'-(DICYCLOHEXYLPHOSPHINO)-N,N-DIMETHYL-[1,1'-BIPHENYL]-2-AMINE, MFCD02183572, 2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethylaniline, 2-dicyclohexylphosphino-2'-(dimethylamino)biphenyl, 2'-(dicyclohexylphosphanyl)-N,N-dimethyl-[1,1'-biphenyl]-2-amine, 2'-(dicyclohexylphosphino)-n,n-dimethylbiphenyl-2-amine, 2-(2-dicyclohexylphosphanylphenyl)-N,N-dimethyl-aniline, 2-Dicyclohexylphosphino-2'-(N,N-dimethylamino)-biphenyl, 2-(Dicyclohexylphosphino)-N,N-dimethyl-[1,1'-biphenyl]-2-amine | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
   },
   {
     "id": "2_diphenylphosphino_pyridine__8543461d",
@@ -487,10 +489,10 @@
           "P",
           "N"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 1 | abbr: PPh2Py | aliases: 2Diphenylphosphinopyridine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
+    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: null | aliases: 2Diphenylphosphinopyridine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
     "id": "4_4_4_tri_tert_butyl_2_2_6_2_terpyridine__115091-29-7",
@@ -512,10 +514,10 @@
           "N",
           "N"
         ],
-        "denticity": 2
+        "denticity": 3
       }
     },
-    "embedding_text": "role: ligand | family_label: 2,2':6',2''-Terpyridines (terpy) | family_id: terpyridines | normalized_family: ligand_misc | donors: N,N,N | denticity: 2 | abbr: tBu3-terpy | CAS: 115091-29-7 | family_def: 2,2':6',2''-Terpyridines (terpy)"
+    "embedding_text": "role: ligand | family_label: 2,2':6',2''-Terpyridines (terpy) | family_id: terpyridines | normalized_family: terpyridine | donors: N,N,N | denticity: 3 | abbr: tBu3-terpy | CAS: 115091-29-7 | family_def: 2,2':6',2''-Terpyridines (terpy)"
   },
   {
     "id": "4_4_di_tert_butyl_2_2_bipyridine__72914-19-3",
@@ -571,7 +573,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND | family: Phosphine–pyridine (P,N) hemilabile ligands (phosphine_pyridine_PN) | donor atoms: P, N | denticity: 1 | name: 4,4'-Dimethyl-2,2'-bipyridine | abbr: H79UAE6A72; 4,4'-Dimethyl-2,2'-bipyridine | CAS: 1134-35-6 | synonyms: 4,4'-Dimethyl-2,2'-bipyridine; 1134-35-6; 2,2'-Bi-4-picoline; 2,2'-BIPYRIDINE, 4,4'-DIMETHYL-; NSC-3261; H79UAE6A72; DTXSID3061552; RefChem:96269; DTXCID1033325; 214-483-2; 4,4'-Dimethyl-2,2'-bipyridyl; 4,4'-Dimethyl-2,2'-dipyridyl; 4-methyl-2-(4-methylpyridin-2-yl)pyridine; MFCD00006441; 2,2'-Bi(gamma-picoline); 2,2'-Bipyridyl, 4,4'-dimethyl-"
+    "embedding_text": "role: ligand | family_label: 2,2'-Bipyridines (bpy family) | family_id: bipyridines | normalized_family: bipyridine | donors: N,N | denticity: 2 | abbr: 4,4'-Dimethyl-2,2'-bipyridine | CAS: 1134-35-6 | aliases: 2,2'-Bi-4-picoline, 2,2'-BIPYRIDINE, 4,4'-DIMETHYL-, 4,4'-Dimethyl-2,2'-bipyridyl, 4,4'-Dimethyl-2,2'-dipyridyl, 4-methyl-2-(4-methylpyridin-2-yl)pyridine, 2,2'-Bi(gamma-picoline), 2,2'-Bipyridyl, 4,4'-dimethyl- | family_def: 2,2'-Bipyridines (bpy family)"
   },
   {
     "id": "5_5_dimethyl_2_2_bipyridine__1762-34-1",
@@ -619,7 +621,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: 2,2'-Bipyridines (bpy family) | family_id: bipyridines | normalized_family: bipyridine | donors: N,N | denticity: 2 | abbr: dmbpy | family_def: 2,2'-Bipyridines (bpy family)"
+    "embedding_text": "role: ligand | family_label: 2,2'-Bipyridines (bpy family) | family_id: bipyridines | normalized_family: bipyridine | donors: N,N | denticity: 2 | abbr: dmbpy | CAS: null | family_def: 2,2'-Bipyridines (bpy family)"
   },
   {
     "id": "6_dppon__64741-28-2",
@@ -762,10 +764,10 @@
           "P",
           "N"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 1 | abbr: APhos | CAS: 932710-63-9 | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
+    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: APhos | CAS: 932710-63-9 | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
     "id": "bathophenanthroline__1662-01-7",
@@ -814,7 +816,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: CAAC/BICAAC carbenes | family_id: caac_carbenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: BICAAC | aliases: BICAACgeneric | family_def: CAAC/BICAAC carbenes"
+    "embedding_text": "role: ligand | family_label: CAAC/BICAAC carbenes | family_id: caac_carbenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: BICAAC | CAS: null | aliases: BICAACgeneric | family_def: CAAC/BICAAC carbenes"
   },
   {
     "id": "binap__2250-01-3",
@@ -862,15 +864,16 @@
     "roles": {
       "ligand": {
         "families": [
-          "trialkyl_triaryl_phosphines"
+          "bidentate_diphosphines"
         ],
         "donors": [
+          "P",
           "P"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: Binap, (A+-)- | CAS: 76189-55-4 | aliases: 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, rac-BINAP, RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine), Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-, (R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: Binap, (A+-)- | CAS: 76189-55-4 | aliases: 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, rac-BINAP, RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine), Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-, (R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl, BINAP, (S)-BINAP | family_def: Diphosphines (bidentate P^P)"
   },
   {
     "id": "binol_derived_phosphoramidite__9246cdb8",
@@ -895,7 +898,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphoramidites (P(OR)(NR2)R') | family_id: phosphoramidites | normalized_family: phosphoramidite | donors: P | denticity: 1 | abbr: BINOL-Phosamidite | aliases: BINOLderivedphosphoramidite | family_def: Phosphoramidites (P(OR)(NR2)R')"
+    "embedding_text": "role: ligand | family_label: Phosphoramidites (P(OR)(NR2)R') | family_id: phosphoramidites | normalized_family: phosphoramidite | donors: P | denticity: 1 | abbr: BINOL-Phosamidite | CAS: null | aliases: BINOLderivedphosphoramidite | family_def: Phosphoramidites (P(OR)(NR2)R')"
   },
   {
     "id": "biphep__58467-99-1",
@@ -976,7 +979,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor atoms: N, N | denticity: 2 | name: Bis(diphenylphosphino)methane | abbr: I5O2HZR38V; Bis(diphenylphosphino)methane | CAS: 2071-20-7 | synonyms: Bis(diphenylphosphino)methane; 2071-20-7; Methylenebis(diphenylphosphine); diphenylphosphanylmethyl(diphenyl)phosphane; 1,1-bis(diphenylphosphino)methane; Methylenebis[diphenylphosphine]; I5O2HZR38V; NSC-147767; DTXSID10174766; RefChem:409708; DTXCID4097257; 218-194-2; dppm; Phosphine, methylenebis[diphenyl-; Tetraphenylmethylenediphosphine; MFCD00003537"
+    "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: DPPM | CAS: 2071-20-7 | aliases: Methylenebis(diphenylphosphine), diphenylphosphanylmethyl(diphenyl)phosphane, 1,1-bis(diphenylphosphino)methane, Methylenebis[diphenylphosphine], dppm, Phosphine, methylenebis[diphenyl-, Tetraphenylmethylenediphosphine | family_def: Diphosphines (bidentate P^P)"
   },
   {
     "id": "bis_p_sulfonatophenyl_phenylphosphine_dipotassium_dihydrate__151888-20-9",
@@ -993,15 +996,16 @@
     "roles": {
       "ligand": {
         "families": [
-          "water_soluble_phosphines"
+          "bidentate_diphosphines"
         ],
         "donors": [
+          "P",
           "P"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Water-soluble phosphines | family_id: water_soluble_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: BSPP | CAS: 151888-20-9 | aliases: Bispsulfonatophenylphenylphosphinedipotassiumdihydrate | family_def: Water-soluble phosphines"
+    "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: BSPP | CAS: 151888-20-9 | aliases: Bispsulfonatophenylphenylphosphinedipotassiumdihydrate | family_def: Diphosphines (bidentate P^P)"
   },
   {
     "id": "brettphos__1070663-78-3",
@@ -1075,7 +1079,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: CAAC/BICAAC carbenes | family_id: caac_carbenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: CAAC | aliases: CAACgeneric | family_def: CAAC/BICAAC carbenes"
+    "embedding_text": "role: ligand | family_label: CAAC/BICAAC carbenes | family_id: caac_carbenes | normalized_family: nhc | donors: C(carbene) | denticity: 1 | abbr: CAAC | CAS: null | aliases: CAACgeneric | family_def: CAAC/BICAAC carbenes"
   },
   {
     "id": "catacxium_a__321921-71-5",
@@ -1392,15 +1396,16 @@
     "roles": {
       "ligand": {
         "families": [
-          "trialkyl_triaryl_phosphines"
+          "bidentate_diphosphines"
         ],
         "donors": [
+          "P",
           "P"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane | CAS: 742103-27-1 | aliases: cBRIDP, cBRIDP(regR), di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphine, Phosphine,bis(1,1-dimethylethyl)(1-methyl-2,2-diphenylcyclopropyl)-, ditert-butyl-(1-methyl-2,2-diphenylcyclopropyl)phosphane, Di-tert-butyl(2,2-diphenyl-1-methyl-1-cyclopropyl)phosphine | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane | CAS: 742103-27-1 | aliases: cBRIDP, cBRIDP(regR), di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphine, Phosphine,bis(1,1-dimethylethyl)(1-methyl-2,2-diphenylcyclopropyl)-, ditert-butyl-(1-methyl-2,2-diphenylcyclopropyl)phosphane, Di-tert-butyl(2,2-diphenyl-1-methyl-1-cyclopropyl)phosphine | family_def: Diphosphines (bidentate P^P)"
   },
   {
     "id": "di_tert_butylphosphine__819-19-2",
@@ -1425,7 +1430,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Secondary phosphines (R2PH) | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HP(t-Bu)2 | CAS: 819-19-2 | aliases: Ditertbutylphosphine | family_def: Secondary phosphines (R2PH)"
+    "embedding_text": "role: ligand | family_label: secondary_phosphines | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HP(t-Bu)2 | CAS: 819-19-2 | aliases: Ditertbutylphosphine | family_def: secondary_phosphines"
   },
   {
     "id": "dicyclohexylphosphine__829-84-5",
@@ -1448,7 +1453,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Secondary phosphines (R2PH) | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HPCy2 | CAS: 829-84-5 | family_def: Secondary phosphines (R2PH)"
+    "embedding_text": "role: ligand | family_label: secondary_phosphines | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HPCy2 | CAS: 829-84-5 | family_def: secondary_phosphines"
   },
   {
     "id": "difluorphos__156707-92-7",
@@ -1518,10 +1523,10 @@
           "P",
           "N"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 1 | abbr: PPh2Py | CAS: 37943-90-1 | aliases: Diphenyl2pyridylphosphine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
+    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: 37943-90-1 | aliases: Diphenyl2pyridylphosphine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
     "id": "diphenylphosphine__829-85-6",
@@ -1544,7 +1549,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Secondary phosphines (R2PH) | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HPPh2 | CAS: 829-85-6 | family_def: Secondary phosphines (R2PH)"
+    "embedding_text": "role: ligand | family_label: secondary_phosphines | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HPPh2 | CAS: 829-85-6 | family_def: secondary_phosphines"
   },
   {
     "id": "dm_segphos__196868-63-0",
@@ -1594,7 +1599,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: DMEDA | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: DMEDA | CAS: null | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "dpephos__166330-10-5",
@@ -1790,7 +1795,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: β-Diketiminates (nacnac/BDI; anionic N,N) | family_id: beta_diketiminates_NacNac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: Dipp-NacNac | family_def: β-Diketiminates (nacnac/BDI; anionic N,N)"
+    "embedding_text": "role: ligand | family_label: beta_diketiminates_NacNac | family_id: beta_diketiminates_NacNac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: Dipp-NacNac | CAS: null | family_def: beta_diketiminates_NacNac"
   },
   {
     "id": "imes__141556-45-8",
@@ -1862,7 +1867,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(oxazoline) ligands (BOX) | family_id: bisoxazolines_BOX | normalized_family: oxazoline | donors: N,N | denticity: 2 | abbr: iPr-BOX | aliases: iPrBOX | family_def: Bis(oxazoline) ligands (BOX)"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-BOX | CAS: null | aliases: iPrBOX | family_def: bisoxazolines_BOX"
   },
   {
     "id": "ipr_phox__2319163b",
@@ -1886,7 +1891,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: PHOX ligands (phosphino-oxazoline, P^N) | family_id: phox_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: iPrPHOX | family_def: PHOX ligands (phosphino-oxazoline, P^N)"
+    "embedding_text": "role: ligand | family_label: phox_pn | family_id: phox_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: iPrPHOX | CAS: null | family_def: phox_pn"
   },
   {
     "id": "ipr_substituted_pyox__c86da0aa",
@@ -1912,7 +1917,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Pyridine-oxazolines (PyOx; N,N bidentate) | family_id: pyridine_oxazolines_PyOx | normalized_family: oxazoline | donors: N,N | denticity: 2 | abbr: iPr-PyOx | aliases: iPrsubstitutedPyOx | family_def: Pyridine-oxazolines (PyOx; N,N bidentate)"
+    "embedding_text": "role: ligand | family_label: pyridine_oxazolines_PyOx | family_id: pyridine_oxazolines_PyOx | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-PyOx | CAS: null | aliases: iPrsubstitutedPyOx | family_def: pyridine_oxazolines_PyOx"
   },
   {
     "id": "iprcl__250285-32-6",
@@ -1983,10 +1988,10 @@
           "O",
           "O"
         ],
-        "denticity": 2
+        "denticity": 4
       }
     },
-    "embedding_text": "role: ligand | family_label: Salen/Salophen (N2O2 chelates) | family_id: salen_salophen | normalized_family: phenanthroline | donors: N,N,O,O | denticity: 2 | abbr: salen* | aliases: Jacobsenssalen | family_def: Salen/Salophen (N2O2 chelates)"
+    "embedding_text": "role: ligand | family_label: salen_salophen | family_id: salen_salophen | normalized_family: ligand_misc | donors: N,N,O,O | denticity: 4 | abbr: salen* | CAS: null | aliases: Jacobsenssalen | family_def: salen_salophen"
   },
   {
     "id": "johnphos__145052-34-0",
@@ -2047,7 +2052,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: L-Proline | CAS: 147-85-3 | aliases: proline, L-(-)-Proline, (2S)-pyrrolidine-2-carboxylic acid, (S)-Pyrrolidine-2-carboxylic acid, 2-pyrrolidinecarboxylic acid, (-)-Proline | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: L-Proline | CAS: 147-85-3 | aliases: proline, L-(-)-Proline, (2S)-pyrrolidine-2-carboxylic acid, (S)-Pyrrolidine-2-carboxylic acid, 2-pyrrolidinecarboxylic acid, (-)-Proline, (-)-(S)-Proline, prolina, Prolinum, (S)-2-Pyrrolidinecarboxylic acid, (-)-2-Pyrrolidinecarboxylic acid, (S)-Proline, L-Prolin, L-alpha-Pyrrolidinecarboxylic acid | family_def: Trialkyl/Triaryl phosphines (monodentate)"
   },
   {
     "id": "me_dalphos__1219080-77-9",
@@ -2064,16 +2069,15 @@
     "roles": {
       "ligand": {
         "families": [
-          "dalphos_PN"
+          "dialkylbiaryl_phosphines"
         ],
         "donors": [
-          "P",
-          "N"
+          "P"
         ],
-        "denticity": 2
+        "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: DalPhos P,N chelates | family_id: dalphos_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: Me-DalPhos | CAS: 1219080-77-9 | aliases: MeDalPhos | family_def: DalPhos P,N chelates"
+    "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: Me-DalPhos | CAS: 1219080-77-9 | aliases: MeDalPhos | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
   },
   {
     "id": "me3_ome_tbuxphos__dc517a33",
@@ -2098,7 +2102,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: Me3(OMe)tBuXPhos | aliases: Me3OMetBuXPhos | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
+    "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: Me3(OMe)tBuXPhos | CAS: null | aliases: Me3OMetBuXPhos | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
   },
   {
     "id": "me4tbuxphos__857356-94-6",
@@ -2215,10 +2219,10 @@
         "donors": [
           "varies"
         ],
-        "denticity": 3
+        "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.) | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: pincer | donors: varies | denticity: 3 | abbr: PNP-iPr | aliases: MilsteinPNPiPr | family_def: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.)"
+    "embedding_text": "role: ligand | family_label: pincers_PNP_PCP_PNN_CNN | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: PNP-iPr | CAS: null | aliases: MilsteinPNPiPr | family_def: pincers_PNP_PCP_PNN_CNN"
   },
   {
     "id": "mor_dalphos__1237588-12-3",
@@ -2235,16 +2239,15 @@
     "roles": {
       "ligand": {
         "families": [
-          "dalphos_PN"
+          "dialkylbiaryl_phosphines"
         ],
         "donors": [
-          "P",
-          "N"
+          "P"
         ],
-        "denticity": 2
+        "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: DalPhos P,N chelates | family_id: dalphos_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: Mor-DalPhos | CAS: 1237588-12-3 | aliases: MorDalPhos | family_def: DalPhos P,N chelates"
+    "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: Mor-DalPhos | CAS: 1237588-12-3 | aliases: MorDalPhos | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
   },
   {
     "id": "mordalphos__1447952-32-2",
@@ -2301,7 +2304,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor atoms: N, N | denticity: 2 | name: N,N'-Dimethylethylenediamine | abbr: JBC5EX42TL; N,N'-Dimethylethylenediamine | CAS: 110-70-3 | synonyms: N,N'-Dimethylethylenediamine; 110-70-3; N,N'-dimethylethane-1,2-diamine; Dimethylethylenediamine; N,N'-Dimethyldiaminoethane; ETHYLENEDIAMINE, N,N'-DIMETHYL-; JBC5EX42TL; DTXSID4058730; RefChem:588553; DTXCID2032423; 203-793-3; N1,N2-Dimethylethane-1,2-diamine; N,N'-Dimethyl-1,2-ethanediamine; 1,2-Bis(methylamino)ethane; N,N'-Dimethylethanediamine; 1,2-Ethanediamine, N,N'-dimethyl-"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: N,N'-Dimethylethylenediamine | CAS: 110-70-3 | aliases: N,N'-dimethylethane-1,2-diamine, Dimethylethylenediamine, N,N'-Dimethyldiaminoethane, ETHYLENEDIAMINE, N,N'-DIMETHYL-, N1,N2-Dimethylethane-1,2-diamine, N,N'-Dimethyl-1,2-ethanediamine, 1,2-Bis(methylamino)ethane, N,N'-Dimethylethanediamine, 1,2-Ethanediamine, N,N'-dimethyl- | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "n_n_dimethylethylenediamine__108-00-9",
@@ -2326,15 +2329,16 @@
     "roles": {
       "ligand": {
         "families": [
-          "trialkyl_triaryl_phosphines"
+          "diamines"
         ],
         "donors": [
-          "P"
+          "N",
+          "N"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: N,N-Dimethylethylenediamine | CAS: 108-00-9 | aliases: (2-Aminoethyl)Dimethylamine, 1,2-Ethanediamine, N,N-dimethyl-, Unsym-dimethylethylenediamine, 1,2-Ethanediamine, N1,N1-dimethyl-, 1-Amino-2-dimethylaminoethane, DILRJUIACXKSQE-UHFFFAOYSA-N | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: N,N-Dimethylethylenediamine | CAS: 108-00-9 | aliases: (2-Aminoethyl)Dimethylamine, 1,2-Ethanediamine, N,N-dimethyl-, Unsym-dimethylethylenediamine, 1,2-Ethanediamine, N1,N1-dimethyl-, 1-Amino-2-dimethylaminoethane, DILRJUIACXKSQE-UHFFFAOYSA-N, 2-Dimethylaminoethylamine, 2-(Dimethylamino)ethylamine, N,N-Dimethylethanediamine | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "n_n_dimethylglycine__1118-68-9",
@@ -2366,7 +2370,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: N,N-Dimethylglycine | CAS: 1118-68-9 | aliases: dimethylglycine, 2-(dimethylamino)acetic acid, (Dimethylamino)acetic acid, glycine, N,N-dimethyl-, N-Methylsarcosine, N,N-Dimethylaminoacetic acid | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: N,N-Dimethylglycine | CAS: 1118-68-9 | aliases: dimethylglycine, 2-(dimethylamino)acetic acid, (Dimethylamino)acetic acid, glycine, N,N-dimethyl-, N-Methylsarcosine, N,N-Dimethylaminoacetic acid, 2-(dimethylazaniumyl)acetate, N,N-Dimethyl Glycine | family_def: Trialkyl/Triaryl phosphines (monodentate)"
   },
   {
     "id": "ncn_pincer__2c08e833",
@@ -2388,10 +2392,10 @@
         "donors": [
           "varies"
         ],
-        "denticity": 3
+        "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.) | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: pincer | donors: varies | denticity: 3 | abbr: NCN | aliases: NCNpincer | family_def: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.)"
+    "embedding_text": "role: ligand | family_label: pincers_PNP_PCP_PNN_CNN | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: NCN | CAS: null | aliases: NCNpincer | family_def: pincers_PNP_PCP_PNN_CNN"
   },
   {
     "id": "neocuproine_2_9_dimethyl_1_10_phenanthroline__484-11-7",
@@ -2437,10 +2441,10 @@
         "donors": [
           "varies"
         ],
-        "denticity": 3
+        "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.) | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: pincer | donors: varies | denticity: 3 | abbr: PCP-tBu | aliases: PCPtBuBuchwaldtypepincer | family_def: Pincer ligands (PNP/PCP/PNN/CNN/NCN etc.)"
+    "embedding_text": "role: ligand | family_label: pincers_PNP_PCP_PNN_CNN | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: PCP-tBu | CAS: null | aliases: PCPtBuBuchwaldtypepincer | family_def: pincers_PNP_PCP_PNN_CNN"
   },
   {
     "id": "ph_xphos__1185098-04-7",
@@ -2514,7 +2518,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(oxazoline) ligands (BOX) | family_id: bisoxazolines_BOX | normalized_family: oxazoline | donors: N,N | denticity: 2 | abbr: PyBOX | aliases: PyBOXpyridinebisoxazoline | family_def: Bis(oxazoline) ligands (BOX)"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: PyBOX | CAS: null | aliases: PyBOXpyridinebisoxazoline | family_def: bisoxazolines_BOX"
   },
   {
     "id": "pyridine_bis_oxazoline_ipr_substituted__c91418f0",
@@ -2540,7 +2544,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(oxazoline) ligands (BOX) | family_id: bisoxazolines_BOX | normalized_family: oxazoline | donors: N,N | denticity: 2 | abbr: iPr-PyBOX | aliases: PyridinebisoxazolineiPrsubstituted | family_def: Bis(oxazoline) ligands (BOX)"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-PyBOX | CAS: null | aliases: PyridinebisoxazolineiPrsubstituted | family_def: bisoxazolines_BOX"
   },
   {
     "id": "pyridine_bis_oxazoline_tbu_substituted__7b428bbb",
@@ -2566,7 +2570,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(oxazoline) ligands (BOX) | family_id: bisoxazolines_BOX | normalized_family: oxazoline | donors: N,N | denticity: 2 | abbr: tBu-PyBOX | aliases: PyridinebisoxazolinetBusubstituted | family_def: Bis(oxazoline) ligands (BOX)"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-PyBOX | CAS: null | aliases: PyridinebisoxazolinetBusubstituted | family_def: bisoxazolines_BOX"
   },
   {
     "id": "qphos__384347-21-1",
@@ -2611,7 +2615,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "BINAP"
+          "bidentate_diphosphines"
         ],
         "donors": [
           "P",
@@ -2620,7 +2624,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor atoms: N, N | denticity: 2 | name: Binap, (A+-)- | abbr: BINAP; (S)-BINAP; Binap, (A+-)- | CAS: 98327-87-8 | synonyms: Binap, (A+-)-; 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL; rac-BINAP; RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL; (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine); 970O8508MB; DTXSID40913327; Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-; RefChem:1079872; DTXCID701020048; 98327-87-8; 76189-55-4; 76189-56-5; (R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl; BINAP; (S)-BINAP"
+    "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: rac-BINAP | CAS: 98327-87-8 | aliases: 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, rac-BINAP, RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine), Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-, (R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl | family_def: Diphosphines (bidentate P^P)"
   },
   {
     "id": "rockphos__1262046-34-3",
@@ -2688,7 +2692,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "diphosphine"
+          "bidentate_diphosphines"
         ],
         "donors": [
           "P",
@@ -2697,7 +2701,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND  denticity: 2 | name: Binap, (A+-)- | abbr: BINAP; (S)-BINAP; Binap, (A+-)- | CAS: 76189-56-5 | synonyms: Binap, (A+-)-; 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL; rac-BINAP; RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL; (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine); 970O8508MB; DTXSID40913327; Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-; RefChem:1079872; DTXCID701020048; 98327-87-8; 76189-55-4; 76189-56-5; (R)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl; BINAP; (S)-BINAP"
+    "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: S-BINAP | CAS: 76189-56-5 | aliases: 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, S-BINAP, RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine), Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-, (S)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl | family_def: Diphosphines (bidentate P^P)"
   },
   {
     "id": "salophen__c6a875d6",
@@ -2720,10 +2724,10 @@
           "O",
           "O"
         ],
-        "denticity": 2
+        "denticity": 4
       }
     },
-    "embedding_text": "role: ligand | family_label: Salen/Salophen (N2O2 chelates) | family_id: salen_salophen | normalized_family: phenanthroline | donors: N,N,O,O | denticity: 2 | abbr: salophen | family_def: Salen/Salophen (N2O2 chelates)"
+    "embedding_text": "role: ligand | family_label: salen_salophen | family_id: salen_salophen | normalized_family: ligand_misc | donors: N,N,O,O | denticity: 4 | abbr: salophen | CAS: null | family_def: salen_salophen"
   },
   {
     "id": "segphos__145854-69-9",
@@ -2865,7 +2869,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: 8-Quinolinol (oxine) N,O chelates | family_id: quinolinol_NO_chelates | normalized_family: ligand_misc | donors: N,O | denticity: 2 | abbr: SO3-Oxine | aliases: Sulfonated8hydroxyquinolinegeneric | family_def: 8-Quinolinol (oxine) N,O chelates"
+    "embedding_text": "role: ligand | family_label: 8-Quinolinol (oxine) N,O chelates | family_id: quinolinol_NO_chelates | normalized_family: ligand_misc | donors: N,O | denticity: 2 | abbr: SO3-Oxine | CAS: null | aliases: Sulfonated8hydroxyquinolinegeneric | family_def: 8-Quinolinol (oxine) N,O chelates"
   },
   {
     "id": "synphos__205319-91-7",
@@ -2914,7 +2918,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphoramidites (P(OR)(NR2)R') | family_id: phosphoramidites | normalized_family: phosphoramidite | donors: P | denticity: 1 | abbr: TADDOL-Phosamidite | aliases: TADDOLderivedphosphoramidite | family_def: Phosphoramidites (P(OR)(NR2)R')"
+    "embedding_text": "role: ligand | family_label: Phosphoramidites (P(OR)(NR2)R') | family_id: phosphoramidites | normalized_family: phosphoramidite | donors: P | denticity: 1 | abbr: TADDOL-Phosamidite | CAS: null | aliases: TADDOLderivedphosphoramidite | family_def: Phosphoramidites (P(OR)(NR2)R')"
   },
   {
     "id": "tbu_box__533ea394",
@@ -2940,7 +2944,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(oxazoline) ligands (BOX) | family_id: bisoxazolines_BOX | normalized_family: oxazoline | donors: N,N | denticity: 2 | abbr: tBu-BOX | aliases: tBuBOX | family_def: Bis(oxazoline) ligands (BOX)"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-BOX | CAS: null | aliases: tBuBOX | family_def: bisoxazolines_BOX"
   },
   {
     "id": "tbu_phox__98334760",
@@ -2964,7 +2968,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: PHOX ligands (phosphino-oxazoline, P^N) | family_id: phox_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: tBuPHOX | family_def: PHOX ligands (phosphino-oxazoline, P^N)"
+    "embedding_text": "role: ligand | family_label: phox_pn | family_id: phox_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: tBuPHOX | CAS: null | family_def: phox_pn"
   },
   {
     "id": "tbu_substituted_pyox__bd918479",
@@ -2990,7 +2994,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Pyridine-oxazolines (PyOx; N,N bidentate) | family_id: pyridine_oxazolines_PyOx | normalized_family: oxazoline | donors: N,N | denticity: 2 | abbr: tBu-PyOx | aliases: tBusubstitutedPyOx | family_def: Pyridine-oxazolines (PyOx; N,N bidentate)"
+    "embedding_text": "role: ligand | family_label: pyridine_oxazolines_PyOx | family_id: pyridine_oxazolines_PyOx | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-PyOx | CAS: null | aliases: tBusubstitutedPyOx | family_def: pyridine_oxazolines_PyOx"
   },
   {
     "id": "tbubrettphos__1160861-53-9",
@@ -3115,7 +3119,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: Tetrabutylammonium Tetrafluoroborate | CAS: 429-42-5 | aliases: 1-Butanaminium, N,N,N-tributyl-, tetrafluoroborate(1-), NBu4 BF4, tetra-n-Butylammonium tetrafluoroborate, Tetrabutylammonium fluoroborate, tetrabutylammoniumtetrafluoroborate, tetrabutylazanium;tetrafluoroborate | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: Tetrabutylammonium Tetrafluoroborate | CAS: 429-42-5 | aliases: 1-Butanaminium, N,N,N-tributyl-, tetrafluoroborate(1-), NBu4 BF4, tetra-n-Butylammonium tetrafluoroborate, Tetrabutylammonium fluoroborate, tetrabutylammoniumtetrafluoroborate, tetrabutylazanium;tetrafluoroborate, Tetrabutylammonium fluoborate, tetrabutyl-ammonium tetrafluoroborate, tetrabutylazanium; tetrafluoroboranuide | family_def: Trialkyl/Triaryl phosphines (monodentate)"
   },
   {
     "id": "tmeda__110-18-9",
@@ -3189,7 +3193,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: DACH | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
+    "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: DACH | CAS: null | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
   },
   {
     "id": "tri_n_butylphosphine__998-40-3",
@@ -3273,7 +3277,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: Tri-tert-butylphosphine tetrafluoroborate | CAS: 131274-22-1 | aliases: Tri-tert-butylphosphonium tetrafluoroborate, tritert-butylphosphanium;tetrafluoroborate, Phosphine, tris(1,1-dimethylethyl)-, tetrafluoroborate(1-) (1:1), TRI-T-BUTYLPHOSPHONIUM TETRAFLUOROBORATE, [(t-Bu)3PH]BF4, tetrafluoroboranuide; tri-tert-butylphosphanium | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+    "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: Tri-tert-butylphosphine tetrafluoroborate | CAS: 131274-22-1 | aliases: Tri-tert-butylphosphonium tetrafluoroborate, tritert-butylphosphanium;tetrafluoroborate, Phosphine, tris(1,1-dimethylethyl)-, tetrafluoroborate(1-) (1:1), TRI-T-BUTYLPHOSPHONIUM TETRAFLUOROBORATE, [(t-Bu)3PH]BF4, tetrafluoroboranuide; tri-tert-butylphosphanium, Tri-tert-butylphosphoniumTetrafluoroborate, TRIS(TERT-BUTYL)PHOSPHONIUM TETRAFLUOROBORATE, Tri-tert-butylphosphine Tetrafluoroborate; Tris(tert-butyl)phosphine Tetrafluoroborate; Tris(tert-butyl)phosphonium Tetrafluoroborate;, tri-t-butylphosphoniumtetrafluoroborate | family_def: Trialkyl/Triaryl phosphines (monodentate)"
   },
   {
     "id": "tricyclohexylphosphine__2622-14-2",
@@ -3369,7 +3373,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphites (P(OR)3) | family_id: phosphites | normalized_family: phosphite | donors: P | denticity: 1 | abbr: P(OiPr)3 | aliases: Triisopropylphosphite | family_def: Phosphites (P(OR)3)"
+    "embedding_text": "role: ligand | family_label: phosphites | family_id: phosphites | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: P(OiPr)3 | CAS: null | aliases: Triisopropylphosphite | family_def: phosphites"
   },
   {
     "id": "triisopropylphosphine__6476-36-4",
@@ -3417,7 +3421,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphites (P(OR)3) | family_id: phosphites | normalized_family: phosphite | donors: P | denticity: 1 | abbr: P(OMe)3 | aliases: Trimethylphosphite | family_def: Phosphites (P(OR)3)"
+    "embedding_text": "role: ligand | family_label: phosphites | family_id: phosphites | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: P(OMe)3 | CAS: null | aliases: Trimethylphosphite | family_def: phosphites"
   },
   {
     "id": "trimethylphosphine__594-09-2",
@@ -3465,7 +3469,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphites (P(OR)3) | family_id: phosphites | normalized_family: phosphite | donors: P | denticity: 1 | abbr: P(OPh)3 | aliases: Triphenylphosphite | family_def: Phosphites (P(OR)3)"
+    "embedding_text": "role: ligand | family_label: phosphites | family_id: phosphites | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: P(OPh)3 | CAS: null | aliases: Triphenylphosphite | family_def: phosphites"
   },
   {
     "id": "triphenylphosphine__603-35-0",
@@ -3513,7 +3517,7 @@
         "denticity": 3
       }
     },
-    "embedding_text": "role: ligand | family_label: Tridentate phosphines (Triphos family) | family_id: tridentate_triphos | normalized_family: ligand_misc | donors: P,P,P | denticity: 3 | abbr: Triphos | CAS: 22031-12-5 | family_def: Tridentate phosphines (Triphos family)"
+    "embedding_text": "role: ligand | family_label: tridentate_triphos | family_id: tridentate_triphos | normalized_family: ligand_misc | donors: P,P,P | denticity: 3 | abbr: Triphos | CAS: 22031-12-5 | family_def: tridentate_triphos"
   },
   {
     "id": "tris_2_furyl_phosphine__5518-52-5",
@@ -3563,10 +3567,10 @@
           "N",
           "N"
         ],
-        "denticity": 3
+        "denticity": 4
       }
     },
-    "embedding_text": "role: ligand | family_label: Tris(2-pyridylmethyl)amine (TPMA; N4 tripodal) | family_id: tris_2pyridylmethyl_amine_TPMA | normalized_family: ligand_misc | donors: N,N,N,N | denticity: 3 | abbr: TPMA | CAS: 16858-01-8 | aliases: Tris2pyridylmethylamine | family_def: Tris(2-pyridylmethyl)amine (TPMA; N4 tripodal)"
+    "embedding_text": "role: ligand | family_label: tris_2pyridylmethyl_amine_TPMA | family_id: tris_2pyridylmethyl_amine_TPMA | normalized_family: ligand_misc | donors: N,N,N,N | denticity: 4 | abbr: TPMA | CAS: 16858-01-8 | aliases: Tris2pyridylmethylamine | family_def: tris_2pyridylmethyl_amine_TPMA"
   },
   {
     "id": "tris_mesityl_phosphine__23897-15-6",
@@ -3840,15 +3844,16 @@
     "roles": {
       "ligand": {
         "families": [
-          "water soluble phosphine"
+          "bidentate_diphosphines"
         ],
         "donors": [
-          "N"
+          "P",
+          "P"
         ],
-        "denticity": 1
+        "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND | family: Bis(oxazoline) ligands (BOX) (bisoxazolines_BOX) | donor atoms: N, N | denticity: 2 | name: Trisodium 3,3',3''-phosphinetriyltris(benzene-1-sulphonate) | abbr: TPPTS; WUE9W42Q27; Trisodium 3,3',3''-phosphinetriyltris(benzene-1-sulphonate) | CAS: 63995-70-0 | synonyms: Trisodium 3,3',3''-phosphinetriyltris(benzene-1-sulphonate); EINECS 264-596-6; Benzenesulfonic acid, 3,3',3''-phosphinidynetris-, sodium salt (1:3); RefChem:900480; 264-596-6; 63995-70-0; Sodium 3,3',3''-phosphinetriyltribenzenesulfonate; Triphenylphosphine-3,3',3''-trisulfonic acid trisodium salt; TPPTS; Tris(3-sulfophenyl)phosphine trisodium salt; MFCD00145472; C18H12Na3O9PS3; WUE9W42Q27; trisodium;3-bis(3-sulfonatophenyl)phosphanylbenzenesulfonate; tris-(3-Sulfornatophenyl)-phosphine 4-hydrate sodium salt; Tris(3-sulfophenyl)phosphine Trisodium (~85%)"
+    "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: TPPTS | CAS: 63995-70-0 | aliases: Benzenesulfonic acid, 3,3',3''-phosphinidynetris-, sodium salt (1:3), Sodium 3,3',3''-phosphinetriyltribenzenesulfonate, Triphenylphosphine-3,3',3''-trisulfonic acid trisodium salt, Tris(3-sulfophenyl)phosphine trisodium salt, C18H12Na3O9PS3, trisodium;3-bis(3-sulfonatophenyl)phosphanylbenzenesulfonate, tris-(3-Sulfornatophenyl)-phosphine 4-hydrate sodium salt, Tris(3-sulfophenyl)phosphine Trisodium (~85%) | family_def: Diphosphines (bidentate P^P)"
   },
   {
     "id": "trixiephos__255836-67-0",
@@ -3944,6 +3949,6 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: β-Diketiminates (nacnac/BDI; anionic N,N) | family_id: beta_diketiminates_NacNac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: NacNac | aliases: Diketiminategeneric | family_def: β-Diketiminates (nacnac/BDI; anionic N,N)"
+    "embedding_text": "role: ligand | family_label: beta_diketiminates_NacNac | family_id: beta_diketiminates_NacNac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: NacNac | CAS: null | aliases: Diketiminategeneric | family_def: beta_diketiminates_NacNac"
   }
 ]

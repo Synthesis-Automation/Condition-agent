@@ -72,7 +72,7 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
         r"support",
         r"carrier",
     ],
-    "coupling_reagent": [
+    "condensation_agent": [
         r"coupling",
         r"carbodiimide",
         r"uronium",
@@ -132,9 +132,9 @@ MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
     r"\bpeppsi\b": ("metal_precursor", "pd_peppsi_nhc"),
     r"\bgrubbs\b": ("metal_precursor", "ru_metathesis_grubbs"),
     r"\bdppf\b": ("ligand", "bidentate_diphosphines"),
-    r"\bbtffh\b": ("coupling_reagent", "acyl_halide_fluoride_generators"),
-    r"\bt3p\b": ("coupling_reagent", "organophosphorus_anhydrides"),
-    r"\bcdi\b": ("coupling_reagent", "imidazolide_formers"),
+    r"\bbtffh\b": ("condensation_agent", "acyl_halide_fluoride_generators"),
+    r"\bt3p\b": ("condensation_agent", "organophosphorus_anhydrides"),
+    r"\bcdi\b": ("condensation_agent", "imidazolide_formers"),
     r"\bdbu\b": ("base", "amidine_guanidine_bases"),
     r"\bdbn\b": ("base", "amidine_guanidine_bases"),
     r"\b(?:potassium|sodium|cesium|caesium|lithium|rubidium|ammonium)\s+acetate\b": ("base", "inorg_carboxylates"),
@@ -202,7 +202,7 @@ EMBEDDING_FIELD_MAP: Dict[str, Sequence[Tuple[str, str]]] = {
         ("avoid_when", "avoid_when"),
         ("ehs_green", "ehs"),
     ),
-    "coupling_reagent": (
+    "condensation_agent": (
         ("activation_mode", "activation"),
         ("leaving_group", "leaving_group"),
         ("typical_bases", "bases"),

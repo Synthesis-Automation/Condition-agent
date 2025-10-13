@@ -39,7 +39,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Phosphonium (Bt/At variants) | family_id: phosphonium_bt_at | activation: OBt/HOAt active‑ester transfer from phosphonium salts | LG: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | strength: high | abbr: BOP | CAS: 56602-33-6 | aliases: BOPlegacy | family_def: Phosphonium (Bt/At variants)"
+    "embedding_text": "role: condensation_agent | family_label: Phosphonium (Bt/At variants) | family_id: phosphonium_bt_at | activation: OBt/HOAt active-ester transfer from phosphonium salts | LG: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | strength: high | abbr: BOP | CAS: 56602-33-6 | aliases: BOPlegacy | family_def: Phosphonium (Bt/At variants)"
   },
   {
     "id": "btffh__e55c2dca",
@@ -59,7 +59,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Acyl halide/fluoride generators (halo‑uronium/imidazolium) | family_id: acyl_halide_fluoride_generators | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | LG: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | strength: high | abbr: BTFFH | family_def: Acyl halide/fluoride generators (halo‑uronium/imidazolium)"
+    "embedding_text": "role: condensation_agent | family_label: Acyl halide/fluoride generators (halo-uronium/imidazolium) | family_id: acyl_halide_fluoride_generators | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | LG: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | strength: high | abbr: BTFFH | CAS:  | family_def: Acyl halide/fluoride generators (halo-uronium/imidazolium)"
   },
   {
     "id": "cdmt_triazine_additive_activator__126851-73-0",
@@ -82,7 +82,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Triazine-based (do not generate acid halides) | family_id: triazine_non_halide | activation: Triazinylammonium salts (e.g., DMTMM) form reactive carboxonium in situ | LG: triazinyloxy (leaving group on activated carboxyl) | bases: None, DIPEA (optional) | solvents: Water, MeOH, MeCN | strength: high | abbr: CDMT | CAS: 126851-73-0 | aliases: CDMTtriazineadditiveactivator, DMTMM reagents | family_def: Triazine-based (do not generate acid halides)"
+    "embedding_text": "role: condensation_agent | family_label: Triazine-based (do not generate acid halides) | family_id: triazine_non_halide | activation: Triazinylammonium salts (e.g., DMTMM) form reactive carboxonium in situ | LG: triazinyloxy (leaving group on activated carboxyl) | bases: None, DIPEA (optional) | solvents: Water, MeOH, MeCN | strength: high | abbr: CDMT | CAS: 126851-73-0 | aliases: CDMTtriazineadditiveactivator; DMTMM reagents | family_def: Triazine-based (do not generate acid halides)"
   },
   {
     "id": "comu_oxyma_based_uronium__1075198-30-9",
@@ -106,7 +106,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: COMU | CAS: 1075198-30-9 | aliases: COMUOxymabaseduronium, Uronium reagents, Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
+    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: COMU | CAS: 1075198-30-9 | aliases: COMUOxymabaseduronium; Uronium reagents; Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
   },
   {
     "id": "dicyclohexylcarbodiimide__538-75-0",
@@ -128,7 +128,7 @@
         "strength_band": "medium"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Carbodiimides (→ O‑acylurea / active ester with additive) | family_id: carbodiimides | activation: Carboxylate adds to carbodiimide to give O‑acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | LG: OBt/HOAt/Oxyma, O‑acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | strength: medium | abbr: DCC | CAS: 538-75-0 | aliases: Carbodiimide couplers | family_def: Carbodiimides (→ O‑acylurea / active ester with additive)"
+    "embedding_text": "role: condensation_agent | family_label: Carbodiimides (→ O-acylurea / active ester with additive) | family_id: carbodiimides | activation: Carboxylate adds to carbodiimide to give O-acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | LG: OBt/HOAt/Oxyma, O-acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | strength: medium | abbr: DCC | CAS: 538-75-0 | aliases: Carbodiimide couplers | family_def: Carbodiimides (→ O-acylurea / active ester with additive)"
   },
   {
     "id": "diisopropylcarbodiimide__693-13-0",
@@ -150,7 +150,7 @@
         "strength_band": "medium"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Carbodiimides (→ O‑acylurea / active ester with additive) | family_id: carbodiimides | activation: Carboxylate adds to carbodiimide to give O‑acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | LG: OBt/HOAt/Oxyma, O‑acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | strength: medium | abbr: DIC | CAS: 693-13-0 | aliases: Carbodiimide couplers | family_def: Carbodiimides (→ O‑acylurea / active ester with additive)"
+    "embedding_text": "role: condensation_agent | family_label: Carbodiimides (→ O-acylurea / active ester with additive) | family_id: carbodiimides | activation: Carboxylate adds to carbodiimide to give O-acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | LG: OBt/HOAt/Oxyma, O-acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | strength: medium | abbr: DIC | CAS: 693-13-0 | aliases: Carbodiimide couplers | family_def: Carbodiimides (→ O-acylurea / active ester with additive)"
   },
   {
     "id": "diphenylphosphoryl_azide__26386-88-9",
@@ -173,7 +173,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Organophosphorus chlorides/azides | family_id: organophosphorus_chlorides_azides | activation: Mixed anhydride or acyl azide pathways via phosphoryl reagents | LG: phosphoryloxy, azide | bases: Et3N, Pyridine, DIPEA | solvents: DCM, Toluene, DMF | strength: high | abbr: DPPA | CAS: 26386-88-9 | aliases: Diphenylphosphorylazide, Phosphoryl couplers | family_def: Organophosphorus chlorides/azides"
+    "embedding_text": "role: condensation_agent | family_label: Organophosphorus chlorides/azides | family_id: organophosphorus_chlorides_azides | activation: Mixed anhydride or acyl azide pathways via phosphoryl reagents | LG: phosphoryloxy, azide | bases: Et3N, Pyridine, DIPEA | solvents: DCM, Toluene, DMF | strength: high | abbr: DPPA | CAS: 26386-88-9 | aliases: Diphenylphosphorylazide; Phosphoryl couplers | family_def: Organophosphorus chlorides/azides"
   },
   {
     "id": "diphenylphosphoryl_chloride__1499-21-4",
@@ -196,7 +196,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Organophosphorus chlorides/azides | family_id: organophosphorus_chlorides_azides | activation: Mixed anhydride or acyl azide pathways via phosphoryl reagents | LG: phosphoryloxy, azide | bases: Et3N, Pyridine, DIPEA | solvents: DCM, Toluene, DMF | strength: high | abbr: DPP‑Cl | CAS: 1499-21-4 | aliases: Diphenylphosphorylchloride, Phosphoryl couplers | family_def: Organophosphorus chlorides/azides"
+    "embedding_text": "role: condensation_agent | family_label: Organophosphorus chlorides/azides | family_id: organophosphorus_chlorides_azides | activation: Mixed anhydride or acyl azide pathways via phosphoryl reagents | LG: phosphoryloxy, azide | bases: Et3N, Pyridine, DIPEA | solvents: DCM, Toluene, DMF | strength: high | abbr: DPP‑Cl | CAS: 1499-21-4 | aliases: Diphenylphosphorylchloride; Phosphoryl couplers | family_def: Organophosphorus chlorides/azides"
   },
   {
     "id": "dmtmm_cl__8a8c7fa1",
@@ -219,7 +219,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Triazine-based (do not generate acid halides) | family_id: triazine_non_halide | activation: Triazinylammonium salts (e.g., DMTMM) form reactive carboxonium in situ | LG: triazinyloxy (leaving group on activated carboxyl) | bases: None, DIPEA (optional) | solvents: Water, MeOH, MeCN | strength: high | abbr: DMTMM | aliases: DMTMMCl, DMTMM reagents | family_def: Triazine-based (do not generate acid halides)"
+    "embedding_text": "role: condensation_agent | family_label: Triazine-based (do not generate acid halides) | family_id: triazine_non_halide | activation: Triazinylammonium salts (e.g., DMTMM) form reactive carboxonium in situ | LG: triazinyloxy (leaving group on activated carboxyl) | bases: None, DIPEA (optional) | solvents: Water, MeOH, MeCN | strength: high | abbr: DMTMM | CAS:  | aliases: DMTMMCl; DMTMM reagents | family_def: Triazine-based (do not generate acid halides)"
   },
   {
     "id": "edc_hcl_1_ethyl_3_3_dimethylaminopropyl_carbodiimide_hydrochloride__25952-53-8",
@@ -241,7 +241,7 @@
         "strength_band": "medium"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Carbodiimides (→ O‑acylurea / active ester with additive) | family_id: carbodiimides | activation: Carboxylate adds to carbodiimide to give O‑acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | LG: OBt/HOAt/Oxyma, O‑acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | strength: medium | abbr: EDCI·HCl | CAS: 25952-53-8 | aliases: Carbodiimide couplers | family_def: Carbodiimides (→ O‑acylurea / active ester with additive)"
+    "embedding_text": "role: condensation_agent | family_label: Carbodiimides (→ O-acylurea / active ester with additive) | family_id: carbodiimides | activation: Carboxylate adds to carbodiimide to give O-acylurea; often intercepted by HOBt/HOAt/Oxyma to form active ester | LG: OBt/HOAt/Oxyma, O-acylurea | bases: None, DIPEA (optional) | solvents: DCM, DMF | strength: medium | abbr: EDCI·HCl | CAS: 25952-53-8 | aliases: Carbodiimide couplers | family_def: Carbodiimides (→ O-acylurea / active ester with additive)"
   },
   {
     "id": "eedq__4584-49-0",
@@ -263,7 +263,7 @@
         "strength_band": "low"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Specialty: carbonic anhydride route | family_id: specialty_low_racemization | activation: Slow formation/fast consumption of carbonic anhydride minimizes epimerization | LG: quinoline‑oxyl | bases: None | solvents: DCM, MeCN | strength: low | abbr: EEDQ | CAS: 4584-49-0 | aliases: Diethoxy/Isopropoxy dihydroquinolin-oxyl reagents | family_def: Specialty: carbonic anhydride route"
+    "embedding_text": "role: condensation_agent | family_label: Specialty: carbonic anhydride route | family_id: specialty_low_racemization | activation: Slow formation/fast consumption of carbonic anhydride minimizes epimerization | LG: quinoline-oxyl | bases: None | solvents: DCM, MeCN | strength: low | abbr: EEDQ | CAS: 4584-49-0 | aliases: Diethoxy/Isopropoxy dihydroquinolin-oxyl reagents | family_def: Specialty: carbonic anhydride route"
   },
   {
     "id": "hatu__148893-10-1",
@@ -286,7 +286,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: HATU | CAS: 148893-10-1 | aliases: Uronium reagents, Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
+    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: HATU | CAS: 148893-10-1 | aliases: Uronium reagents; Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
   },
   {
     "id": "hbtu__94790-37-1",
@@ -309,7 +309,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: HBTU | CAS: 94790-37-1 | aliases: Uronium reagents, Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
+    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: HBTU | CAS: 94790-37-1 | aliases: Uronium reagents; Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
   },
   {
     "id": "hctu__330795-65-4",
@@ -332,7 +332,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: HCTU | CAS: 330795-65-4 | aliases: Uronium reagents, Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
+    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: HCTU | CAS: 330795-65-4 | aliases: Uronium reagents; Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
   },
   {
     "id": "iidq__18747-60-1",
@@ -354,7 +354,7 @@
         "strength_band": "low"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Specialty: carbonic anhydride route | family_id: specialty_low_racemization | activation: Slow formation/fast consumption of carbonic anhydride minimizes epimerization | LG: quinoline‑oxyl | bases: None | solvents: DCM, MeCN | strength: low | abbr: IIDQ | CAS: 18747-60-1 | aliases: Diethoxy/Isopropoxy dihydroquinolin-oxyl reagents | family_def: Specialty: carbonic anhydride route"
+    "embedding_text": "role: condensation_agent | family_label: Specialty: carbonic anhydride route | family_id: specialty_low_racemization | activation: Slow formation/fast consumption of carbonic anhydride minimizes epimerization | LG: quinoline-oxyl | bases: None | solvents: DCM, MeCN | strength: low | abbr: IIDQ | CAS: 18747-60-1 | aliases: Diethoxy/Isopropoxy dihydroquinolin-oxyl reagents | family_def: Specialty: carbonic anhydride route"
   },
   {
     "id": "isobutyl_chloroformate__543-27-1",
@@ -398,7 +398,7 @@
         "strength_band": "medium"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Activated esters (isolable) | family_id: activated_esters_isolable | activation: Pre‑form activated ester (NHS, Pfp, OBt, etc.) then aminolyze | LG: NHS, Pfp, OBt/ODhbt | bases: Et3N, DMAP (cat.) | solvents: DCM, DMF | strength: medium | abbr: NHS esters | aliases: NHydroxysuccinimideesters | family_def: Activated esters (isolable)"
+    "embedding_text": "role: condensation_agent | family_label: Activated esters (isolable) | family_id: activated_esters_isolable | activation: Pre-form activated ester (NHS, Pfp, OBt, etc.) then aminolyze | LG: NHS, Pfp, OBt/ODhbt | bases: Et3N, DMAP (cat.) | solvents: DCM, DMF | strength: medium | abbr: NHS esters | CAS:  | aliases: NHydroxysuccinimideesters | family_def: Activated esters (isolable)"
   },
   {
     "id": "pentafluorophenyl_esters__6484f96b",
@@ -420,7 +420,7 @@
         "strength_band": "medium"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Activated esters (isolable) | family_id: activated_esters_isolable | activation: Pre‑form activated ester (NHS, Pfp, OBt, etc.) then aminolyze | LG: NHS, Pfp, OBt/ODhbt | bases: Et3N, DMAP (cat.) | solvents: DCM, DMF | strength: medium | abbr: Pfp esters | aliases: Pentafluorophenylesters | family_def: Activated esters (isolable)"
+    "embedding_text": "role: condensation_agent | family_label: Activated esters (isolable) | family_id: activated_esters_isolable | activation: Pre-form activated ester (NHS, Pfp, OBt, etc.) then aminolyze | LG: NHS, Pfp, OBt/ODhbt | bases: Et3N, DMAP (cat.) | solvents: DCM, DMF | strength: medium | abbr: Pfp esters | CAS:  | aliases: Pentafluorophenylesters | family_def: Activated esters (isolable)"
   },
   {
     "id": "pyaop__128251-48-7",
@@ -440,7 +440,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Phosphonium (Bt/At variants) | family_id: phosphonium_bt_at | activation: OBt/HOAt active‑ester transfer from phosphonium salts | LG: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | strength: high | abbr: PyAOP | CAS: 128251-48-7 | family_def: Phosphonium (Bt/At variants)"
+    "embedding_text": "role: condensation_agent | family_label: Phosphonium (Bt/At variants) | family_id: phosphonium_bt_at | activation: OBt/HOAt active-ester transfer from phosphonium salts | LG: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | strength: high | abbr: PyAOP | CAS: 128251-48-7 | family_def: Phosphonium (Bt/At variants)"
   },
   {
     "id": "pybop__128625-52-5",
@@ -460,7 +460,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Phosphonium (Bt/At variants) | family_id: phosphonium_bt_at | activation: OBt/HOAt active‑ester transfer from phosphonium salts | LG: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | strength: high | abbr: PyBOP | CAS: 128625-52-5 | family_def: Phosphonium (Bt/At variants)"
+    "embedding_text": "role: condensation_agent | family_label: Phosphonium (Bt/At variants) | family_id: phosphonium_bt_at | activation: OBt/HOAt active-ester transfer from phosphonium salts | LG: OBt, HOAt | bases: DIPEA, Et3N | solvents: DCM, DMF | strength: high | abbr: PyBOP | CAS: 128625-52-5 | family_def: Phosphonium (Bt/At variants)"
   },
   {
     "id": "sec_butyl_chloroformate__2837-76-5",
@@ -504,7 +504,7 @@
         "strength_band": "medium"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Organophosphorus anhydrides | family_id: organophosphorus_anhydrides | activation: Propylphosphonic anhydride (T3P) generates mixed anhydrides for acyl transfer | LG: propylphosphonate (leaving as acid) | bases: DIPEA, Et3N | solvents: EtOAc, 2‑MeTHF, DMF | strength: medium | abbr: T3P | CAS: 68957-94-8 | aliases: Propylphosphonic anhydride reagents | family_def: Organophosphorus anhydrides"
+    "embedding_text": "role: condensation_agent | family_label: Organophosphorus anhydrides | family_id: organophosphorus_anhydrides | activation: Propylphosphonic anhydride (T3P) generates mixed anhydrides for acyl transfer | LG: propylphosphonate (leaving as acid) | bases: DIPEA, Et3N | solvents: EtOAc, 2-MeTHF, DMF | strength: medium | abbr: T3P | CAS: 68957-94-8 | aliases: Propylphosphonic anhydride reagents | family_def: Organophosphorus anhydrides"
   },
   {
     "id": "tbtu__125700-67-6",
@@ -527,7 +527,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: TBTU | CAS: 125700-67-6 | aliases: Uronium reagents, Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
+    "embedding_text": "role: condensation_agent | family_label: Aminium/uronium/guanidinium (Bt/At/Oxyma-based) | family_id: aminium_uronium_guanidinium | activation: In situ formation of active ester (OBt/HOAt/Oxyma) via aminium/uronium transfer | LG: OBt, HOAt, Oxyma | bases: DIPEA, Et3N | solvents: DMF, MeCN | strength: high | abbr: TBTU | CAS: 125700-67-6 | aliases: Uronium reagents; Aminium reagents | family_def: Aminium/uronium/guanidinium (Bt/At/Oxyma-based)"
   },
   {
     "id": "tcfh_nmi__dd7114c3",
@@ -549,7 +549,7 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Acyl halide/fluoride generators (halo‑uronium/imidazolium) | family_id: acyl_halide_fluoride_generators | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | LG: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | strength: high | abbr: TCFH+NMI | aliases: TCFHNMI | family_def: Acyl halide/fluoride generators (halo‑uronium/imidazolium)"
+    "embedding_text": "role: condensation_agent | family_label: Acyl halide/fluoride generators (halo-uronium/imidazolium) | family_id: acyl_halide_fluoride_generators | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | LG: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | strength: high | abbr: TCFH+NMI | CAS:  | aliases: TCFHNMI | family_def: Acyl halide/fluoride generators (halo-uronium/imidazolium)"
   },
   {
     "id": "tffh__01c61d9c",
@@ -569,6 +569,6 @@
         "strength_band": "high"
       }
     },
-    "embedding_text": "role: condensation_agent | family_label: Acyl halide/fluoride generators (halo‑uronium/imidazolium) | family_id: acyl_halide_fluoride_generators | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | LG: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | strength: high | abbr: TFFH | family_def: Acyl halide/fluoride generators (halo‑uronium/imidazolium)"
+    "embedding_text": "role: condensation_agent | family_label: Acyl halide/fluoride generators (halo-uronium/imidazolium) | family_id: acyl_halide_fluoride_generators | activation: In situ acyl halide/fluoride or acyl imidazolium; then aminolysis | LG: F− (acyl fluoride), Cl− (acyl chloride), imidazole (acyl imidazolium) | bases: DIPEA, NMI, NMM | solvents: DCM, MeCN | strength: high | abbr: TFFH | CAS:  | family_def: Acyl halide/fluoride generators (halo-uronium/imidazolium)"
   }
 ]

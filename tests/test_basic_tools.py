@@ -206,10 +206,116 @@ def test_4_property_lookup():
     print(f"\n  💡 Available databases: ligand, base, solvent, metal_precursor, additive")
 
 
-def test_5_drfp_similarity():
+def test_5_database_analytics():
+    """Demonstrate database analytics."""
+    from chemtools.reagent import (
+        count_reagents_by_type,
+        get_all_reagent_types,
+        get_family_statistics,
+        find_reagents_by_family,
+    )
+    
+    print("\n" + "="*70)
+    print("  5. Database Analytics")
+    print("="*70)
+    
+    # Get all types and counts
+    types = get_all_reagent_types()
+    print(f"\n  ✅ Available reagent types ({len(types)}):")
+    
+    for reagent_type in types[:5]:  # Show first 5
+        count = count_reagents_by_type(reagent_type)
+        print(f"     → {reagent_type:20s}: {count:3d} reagents")
+    
+    if len(types) > 5:
+        print(f"     ... and {len(types) - 5} more types")
+    
+    # Ligand family statistics
+    print(f"\n  ✅ Ligand families:")
+    ligand_stats = get_family_statistics('ligand')
+    print(f"     → Total ligands: {ligand_stats['total_reagents']}")
+    print(f"     → Total families: {ligand_stats['total_families']}")
+    
+    # Show top 3 families
+    for family_data in ligand_stats['families'][:3]:
+        name = family_data['name']
+        count = family_data['count']
+        print(f"     → {name}: {count} ligands")
+    
+    # Find reagents in a family
+    print(f"\n  ✅ Finding phosphine ligands...")
+    phosphines = find_reagents_by_family('ligand', 'trialkyl_triaryl_phosphines')
+    print(f"     → Found {len(phosphines)} phosphine ligands")
+    
+    if phosphines:
+        ligand = phosphines[0]
+        print(f"     → Example: {ligand.get('name', 'N/A')}")
+    
+    print(f"\n  💡 See scripts/demo_reagent_analytics.py for more examples")
+
+
+def test_6_drfp_similarity():
+    """Demonstrate property lookup."""
+    print("\n" + "="*70)
+    print("  4. Property Lookup (Full Reagent Database)")
+    print("="*70)
+    print("  📚 Using find_reagent() - Full database (5000+ compounds)")
+    print("  " + "-"*66)
+    
+    # Try DMF in the solvent database
+    result = find_reagent('DMF', 'solvent')
+    if result:
+        print(f"  ✅ find_reagent('DMF', 'solvent')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+        print(f"     → SMILES: {result.get('smiles', 'N/A')}")
+        props = result.get('properties', {})
+        if props:
+            bp = props.get('boiling_point')
+            if bp:
+                print(f"     → Boiling point: {bp}°C")
+    
+    # Try K3PO4 in base database
+    result = find_reagent('K3PO4', 'base')
+    if result:
+        print(f"\n  ✅ find_reagent('K3PO4', 'base')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+        pka = result.get('pka')
+        if pka:
+            print(f"     → pKa: {pka}")
+    
+    # Try a ligand
+    result = find_reagent('BINAP', 'ligand')
+    if result:
+        print(f"\n  ✅ find_reagent('BINAP', 'ligand')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+        abbr = result.get('abbreviation', [])
+        if abbr:
+            print(f"     → Abbreviations: {', '.join(abbr)}")
+    
+    # Try a base
+    result = find_reagent('Cesium carbonate', 'base')
+    if result:
+        print(f"\n  ✅ find_reagent('Cesium carbonate', 'base')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+    
+    # Try a metal precursor
+    result = find_reagent('Pd(OAc)2', 'metal_precursor')
+    if result:
+        print(f"\n  ✅ find_reagent('Pd(OAc)2', 'metal_precursor')")
+        print(f"     → Name: {result.get('name', 'N/A')}")
+        print(f"     → CAS: {result.get('cas', 'N/A')}")
+    
+    print(f"\n  💡 Available databases: ligand, base, solvent, metal_precursor, additive")
+
+
+def test_6_drfp_similarity():
     """Demonstrate DRFP similarity calculations."""
     print("\n" + "="*70)
-    print("  5. DRFP Similarity")
+    print("  6. DRFP Similarity")
     print("="*70)
     
     if not drfp_available():
@@ -311,7 +417,8 @@ def main():
         test_2_family_detection,
         test_3_molecular_featurization,
         test_4_property_lookup,
-        test_5_drfp_similarity,
+        test_5_database_analytics,
+        test_6_drfp_similarity,
     ]
     
     for test in tests:

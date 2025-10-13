@@ -256,29 +256,29 @@ def test_7_common_reagents():
         print(f"      {i:>2}. {count:>5} reactions | {role:<18} | {yield_str:>6} | {name_display}")
     
     # Test 7b: Filtered by role
-    print_subheader(f"{family} - Top 10 COUPLING_REAGENT")
+    print_subheader(f"{family} - Top 10 CONDENSATION_AGENT")
     
     start = time.time()
-    coupling_reagents = chem.analytics.get_common_reagents(
-        family, role="COUPLING_REAGENT", top_n=10
+    condensation_agents = chem.analytics.get_common_reagents(
+        family, role="CONDENSATION_AGENT", top_n=10
     )
     elapsed = time.time() - start
     
     print(f"\n   ⏱️  Time: {elapsed:.4f} seconds")
-    print(f"   📊 Found {len(coupling_reagents)} coupling reagents:\n")
+    print(f"   📊 Found {len(condensation_agents)} condensation agents:\n")
     
-    for i, (name, role, count, avg_yield) in enumerate(coupling_reagents, 1):
+    for i, (name, role, count, avg_yield) in enumerate(condensation_agents, 1):
         yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
         name_display = name[:55] + "..." if len(name) > 55 else name
         print(f"      {i:>2}. {count:>5} reactions | {yield_str:>6} | {name_display}")
     
     # Validation
     assert isinstance(all_reagents, list), "Should return a list"
-    assert isinstance(coupling_reagents, list), "Should return a list"
+    assert isinstance(condensation_agents, list), "Should return a list"
     
     # Check that filtered results only have the requested role
-    for name, role, count, avg_yield in coupling_reagents:
-        assert role == "COUPLING_REAGENT", "Should only have COUPLING_REAGENT role"
+    for name, role, count, avg_yield in condensation_agents:
+        assert role == "CONDENSATION_AGENT", "Should only have CONDENSATION_AGENT role"
     
     print(f"\n   ✅ Test passed: Reagent ranking and filtering work correctly")
     return True

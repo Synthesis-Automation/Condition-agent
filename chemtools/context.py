@@ -739,7 +739,7 @@ class DatasetAnalyticsNamespace:
         
         Args:
             family: Reaction family name
-            role: Optional role filter (e.g., 'BASE', 'ACID', 'OXIDANT', 'COUPLING_REAGENT')
+            role: Optional role filter (e.g., 'BASE', 'ACID', 'OXIDANT', 'CONDENSATION_AGENT')
             top_n: Number of top reagents to return (default: 10)
             min_yield: Optional minimum yield filter (0-100)
             
