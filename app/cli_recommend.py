@@ -244,6 +244,106 @@ Return ONLY a valid JSON object (no markdown) matching the same schema as before
 
 
 # ============================================================================
+# Reaction Type Determination
+# ============================================================================
+
+def determine_final_reaction_type(reaction_smiles: str, initial_type: Optional[str], constraints: dict[str, Any]) -> dict[str, Any]:
+    """Determine final reaction type considering constraints, especially metal catalysts.
+    
+    This routes to the appropriate recommendation system:
+    - C_N_Coupling with Cu catalyst -> C_N_Coupling_Cu (Ullmann, rule-based)
+    - C_N_Coupling with Pd catalyst -> C_N_Coupling_Pd (Buchwald, ML-based)
+    - Other reactions -> Use detected or provided type
+    
+    Returns dict with: final_type, detection_info, routing
+    """
+    try:
+        from chemtools.router import detect_family_from_reaction
+        from chemtools.recommend.utils import canonical_family
+    except ImportError:
+        logger.warning("Could not import router - using initial type as-is")
+        return {
+            "final_type": initial_type or "Unknown",
+            "detection_info": {"source": "user_provided"},
+            "routing": "fallback"
+        }
+    
+    # Detect reaction family from SMILES
+    detection = detect_family_from_reaction(reaction_smiles, use_rxn_insight=True)
+    detected_family = detection.get("family", "Unknown")
+    confidence = detection.get("confidence", 0.0)
+    
+    # Check for metal catalyst preferences in constraints
+    metal_pref = constraints.get("metal_preference")
+    required_reagents = constraints.get("required_reagents", [])
+    
+    # Determine metal from constraints
+    detected_metal = None
+    if metal_pref and metal_pref != "any":
+        detected_metal = metal_pref
+    else:
+        # Check required_reagents for metal mentions
+        reagent_text = " ".join(str(r).lower() for r in required_reagents)
+        if "copper" in reagent_text or "cu" in reagent_text:
+            detected_metal = "Cu"
+        elif "palladium" in reagent_text or "pd" in reagent_text:
+            detected_metal = "Pd"
+        elif "nickel" in reagent_text or "ni" in reagent_text:
+            detected_metal = "Ni"
+    
+    # Start with detected or user-provided type
+    final_type = initial_type or detected_family
+    
+    # Apply metal-specific routing for C-N coupling reactions
+    is_cn_coupling = any([
+        "C_N" in str(final_type).upper(),
+        "CN" in str(final_type).upper().replace("_", ""),
+        detected_family in ["Ullmann_CN", "Buchwald_CN"],
+        "ullmann" in str(final_type).lower(),
+        "buchwald" in str(final_type).lower(),
+    ])
+    
+    routing = "auto-detected"
+    
+    if is_cn_coupling:
+        if detected_metal == "Cu":
+            final_type = "C_N_Coupling_Cu"
+            routing = "metal-specific: Ullmann (rule-based)"
+        elif detected_metal == "Pd":
+            final_type = "C_N_Coupling_Pd"
+            routing = "metal-specific: Buchwald (ML-based)"
+        elif detected_metal == "Ni":
+            final_type = "C_N_Coupling_Ni"
+            routing = "metal-specific: Nickel (ML-based)"
+        elif detected_family == "Ullmann_CN":
+            final_type = "C_N_Coupling_Cu"
+            routing = "detected: Ullmann (rule-based)"
+        elif detected_family == "Buchwald_CN":
+            final_type = "C_N_Coupling_Pd"
+            routing = "detected: Buchwald (ML-based)"
+        else:
+            # Generic C-N coupling without specific metal
+            final_type = detected_family or "C_N_Coupling"
+            routing = "generic C-N coupling"
+    
+    # Normalize to canonical family name
+    try:
+        final_type = canonical_family(final_type)
+    except Exception:
+        pass
+    
+    return {
+        "final_type": final_type,
+        "initial_type": initial_type,
+        "detected_family": detected_family,
+        "confidence": confidence,
+        "detected_metal": detected_metal,
+        "routing": routing,
+        "detection_info": detection,
+    }
+
+
+# ============================================================================
 # Data Models
 # ============================================================================
 
@@ -347,7 +447,7 @@ class NaturalLanguageParser:
         requirements: str,
     ) -> ParsedRequest:
         """Parse initial user input into structured format."""
-        logger.info("Parsing user input via LLM...")
+        logger.info(f"Parsing user input via LLM ({self.model})...")
         
         prompt = PARSE_USER_INPUT_PROMPT.format(
             reaction_smiles=reaction_smiles,
@@ -375,7 +475,8 @@ class NaturalLanguageParser:
             
             logger.info(f"Parse complete. Valid: {result.is_valid()}, "
                        f"Issues: {len(result.validation_issues)}, "
-                       f"Clarifications: {len(result.clarification_needed)}")
+                       f"Clarifications: {len(result.clarification_needed)}, "
+                       f"Detected type: {result.reaction_type or 'None'}")
             
             return result
             
@@ -574,15 +675,84 @@ class InteractiveCLI:
         
         return response if response else None
     
+    def display_reaction_type_determination(self, request: ParsedRequest) -> dict[str, Any]:
+        """Determine and display final reaction type before submission."""
+        print(f"\n{Colors.BOLD}{Colors.HEADER}🔬 REACTION TYPE DETERMINATION{Colors.ENDC}\n")
+        
+        # Determine final reaction type
+        determination = determine_final_reaction_type(
+            reaction_smiles=request.reaction_smiles,
+            initial_type=request.reaction_type,
+            constraints=request.constraints,
+        )
+        
+        final_type = determination.get("final_type")
+        detected_family = determination.get("detected_family")
+        confidence = determination.get("confidence", 0.0)
+        detected_metal = determination.get("detected_metal")
+        routing = determination.get("routing")
+        
+        # Display detection results
+        print(f"{Colors.CYAN}Initial/Provided Type:{Colors.ENDC} {request.reaction_type or 'None'}")
+        print(f"{Colors.CYAN}Detected Family:{Colors.ENDC} {detected_family} (confidence: {confidence:.2f})")
+        
+        if detected_metal:
+            print(f"{Colors.YELLOW}Detected Metal Catalyst:{Colors.ENDC} {detected_metal}")
+        
+        # Show final determination
+        print(f"\n{Colors.GREEN}{Colors.BOLD}✓ Final Reaction Type:{Colors.ENDC} {Colors.BOLD}{final_type}{Colors.ENDC}")
+        print(f"{Colors.CYAN}Routing:{Colors.ENDC} {routing}")
+        
+        # Determine recommendation system
+        is_rule_based = False
+        is_ml_based = False
+        
+        if "rule-based" in routing.lower() or "Cu" in str(final_type):
+            is_rule_based = True
+        elif "ML" in routing or "Pd" in str(final_type) or "Ni" in str(final_type):
+            is_ml_based = True
+        
+        # Show system being used
+        if is_rule_based:
+            print(f"{Colors.HEADER}🎯 Recommendation System:{Colors.ENDC} {Colors.BOLD}RULE-BASED{Colors.ENDC} (deterministic constraints)")
+        elif is_ml_based:
+            print(f"{Colors.HEADER}🎯 Recommendation System:{Colors.ENDC} {Colors.BOLD}MACHINE LEARNING{Colors.ENDC} (similarity-based)")
+        
+        # Explain routing logic for C-N coupling
+        if "C_N_Coupling" in str(final_type):
+            print(f"\n{Colors.YELLOW}ℹ️  C-N Coupling Routing:{Colors.ENDC}")
+            if "Cu" in final_type:
+                print(f"{Colors.YELLOW}   → Ullmann reaction (copper-catalyzed){Colors.ENDC}")
+                print(f"{Colors.YELLOW}   → Uses rule-based constraint matching{Colors.ENDC}")
+            elif "Pd" in final_type:
+                print(f"{Colors.YELLOW}   → Buchwald-Hartwig reaction (palladium-catalyzed){Colors.ENDC}")
+                print(f"{Colors.YELLOW}   → Uses ML-based similarity search{Colors.ENDC}")
+            elif "Ni" in final_type:
+                print(f"{Colors.YELLOW}   → Nickel-catalyzed C-N coupling{Colors.ENDC}")
+                print(f"{Colors.YELLOW}   → Uses ML-based similarity search{Colors.ENDC}")
+            else:
+                print(f"{Colors.YELLOW}   → Generic C-N coupling (auto-routing){Colors.ENDC}")
+        
+        return determination
+    
     def confirm_submission(self, request: ParsedRequest) -> bool:
         """Ask user to confirm submission."""
         self.print_separator()
         print(f"{Colors.GREEN}{Colors.BOLD}✅ Request is ready for submission!{Colors.ENDC}\n")
         
+        # Determine final reaction type
+        determination = self.display_reaction_type_determination(request)
+        
+        # Update request with final type
+        final_type = determination.get("final_type")
+        if final_type and final_type != "Unknown":
+            request.reaction_type = final_type
+        
         # Show summary
+        self.print_separator()
+        print(f"{Colors.BOLD}📋 SUBMISSION SUMMARY{Colors.ENDC}\n")
         print(f"{Colors.CYAN}Reaction:{Colors.ENDC} {request.reaction_smiles}")
-        if request.reaction_type:
-            print(f"{Colors.CYAN}Type:{Colors.ENDC} {request.reaction_type}")
+        print(f"{Colors.CYAN}Type:{Colors.ENDC} {request.reaction_type or 'auto-detect'}")
         
         # Count meaningful constraints
         constraint_count = sum(
