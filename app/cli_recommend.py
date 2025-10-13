@@ -15,6 +15,32 @@ from pathlib import Path
 from typing import Any, Optional
 from dataclasses import dataclass, field
 
+# ANSI color codes for terminal output
+class Colors:
+    """ANSI color codes for colored terminal output."""
+    HEADER = '\033[95m'      # Magenta
+    BLUE = '\033[94m'        # Blue
+    CYAN = '\033[96m'        # Cyan
+    GREEN = '\033[92m'       # Green
+    YELLOW = '\033[93m'      # Yellow
+    RED = '\033[91m'         # Red
+    ENDC = '\033[0m'         # Reset
+    BOLD = '\033[1m'         # Bold
+    UNDERLINE = '\033[4m'    # Underline
+    
+    @staticmethod
+    def disable():
+        """Disable colors (for non-terminal output)."""
+        Colors.HEADER = ''
+        Colors.BLUE = ''
+        Colors.CYAN = ''
+        Colors.GREEN = ''
+        Colors.YELLOW = ''
+        Colors.RED = ''
+        Colors.ENDC = ''
+        Colors.BOLD = ''
+        Colors.UNDERLINE = ''
+
 # Add project root to path for imports
 PROJECT_ROOT = Path(__file__).parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -430,57 +456,60 @@ class NaturalLanguageParser:
 class InteractiveCLI:
     """Interactive command-line interface for reaction recommendations."""
     
-    def __init__(self, parser: NaturalLanguageParser):
+    def __init__(self, parser: NaturalLanguageParser, test_mode: bool = False):
         self.parser = parser
         self.current_request: Optional[ParsedRequest] = None
+        self.test_mode = test_mode
     
     def print_header(self):
         """Print CLI header."""
-        print("\n" + "=" * 70)
-        print("  🧪 CHEMISTRY CONDITION RECOMMENDATION CLI")
-        print("  Powered by LLM-assisted natural language parsing")
-        print("=" * 70 + "\n")
+        print("\n" + f"{Colors.CYAN}{'=' * 70}{Colors.ENDC}")
+        print(f"{Colors.BOLD}{Colors.HEADER}  🧪 CHEMISTRY CONDITION RECOMMENDATION CLI{Colors.ENDC}")
+        print(f"{Colors.CYAN}  Powered by LLM-assisted natural language parsing{Colors.ENDC}")
+        if self.test_mode:
+            print(f"{Colors.YELLOW}  ⚠️  TEST MODE: Will stop before actual API submission{Colors.ENDC}")
+        print(f"{Colors.CYAN}{'=' * 70}{Colors.ENDC}\n")
     
     def print_separator(self):
         """Print section separator."""
-        print("\n" + "-" * 70 + "\n")
+        print("\n" + f"{Colors.BLUE}{'-' * 70}{Colors.ENDC}\n")
     
     def get_initial_input(self) -> tuple[str, str]:
         """Get initial reaction SMILES and requirements from user."""
-        print("Please provide your reaction details:\n")
+        print(f"{Colors.BOLD}Please provide your reaction details:{Colors.ENDC}\n")
         
-        print("Reaction SMILES (reactants>>products format):")
-        print("Example: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1")
-        reaction = input("> ").strip()
+        print(f"{Colors.CYAN}Reaction SMILES (reactants>>products format):{Colors.ENDC}")
+        print(f"{Colors.YELLOW}Example: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1{Colors.ENDC}")
+        reaction = input(f"{Colors.GREEN}> {Colors.ENDC}").strip()
         
         if not reaction:
-            print("❌ Error: Reaction SMILES cannot be empty.")
+            print(f"{Colors.RED}❌ Error: Reaction SMILES cannot be empty.{Colors.ENDC}")
             sys.exit(1)
         
-        print("\n📝 Describe your requirements in natural language (optional):")
-        print("Examples:")
-        print("  • no strong base, room temperature")
-        print("  • avoid expensive catalysts, prefer DMF solvent")
-        print("  • mild conditions, no air-sensitive reagents")
-        print("  • (press Enter to skip if no specific requirements)\n")
+        print(f"\n{Colors.CYAN}📝 Describe your requirements in natural language (optional):{Colors.ENDC}")
+        print(f"{Colors.YELLOW}Examples:{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • no strong base, room temperature{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • avoid expensive catalysts, prefer DMF solvent{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • mild conditions, no air-sensitive reagents{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • (press Enter to skip if no specific requirements){Colors.ENDC}\n")
         
-        requirements = input("> ").strip()
+        requirements = input(f"{Colors.GREEN}> {Colors.ENDC}").strip()
         
         return reaction, requirements
     
     def display_parsed_state(self, request: ParsedRequest):
         """Display current parsed state to user."""
         self.print_separator()
-        print("📋 PARSED REQUEST:\n")
+        print(f"{Colors.BOLD}{Colors.HEADER}📋 PARSED REQUEST:{Colors.ENDC}\n")
         
         # Reaction SMILES status
         if request.reaction_smiles_is_valid:
-            print(f"✅ Reaction: {request.reaction_smiles}")
+            print(f"{Colors.GREEN}✅ Reaction: {Colors.ENDC}{request.reaction_smiles}")
         else:
-            print(f"❌ Reaction: {request.reaction_smiles}")
+            print(f"{Colors.RED}❌ Reaction: {Colors.ENDC}{request.reaction_smiles}")
         
         if request.reaction_type:
-            print(f"   Type: {request.reaction_type}")
+            print(f"{Colors.CYAN}   Type: {request.reaction_type}{Colors.ENDC}")
         
         # Constraints (if any)
         if request.constraints:
@@ -490,32 +519,32 @@ class InteractiveCLI:
             )
             
             if has_constraints:
-                print("\n📌 Constraints:")
+                print(f"\n{Colors.CYAN}📌 Constraints:{Colors.ENDC}")
                 for key, value in request.constraints.items():
                     if value is None or value == {} or (isinstance(value, list) and len(value) == 0):
                         continue
                     
                     if isinstance(value, dict):
-                        print(f"  • {key}:")
+                        print(f"{Colors.YELLOW}  • {key}:{Colors.ENDC}")
                         for k, v in value.items():
                             if v is not None:
                                 print(f"      {k}: {v}")
                     elif isinstance(value, list):
-                        print(f"  • {key}: {', '.join(str(v) for v in value)}")
+                        print(f"{Colors.YELLOW}  • {key}:{Colors.ENDC} {', '.join(str(v) for v in value)}")
                     else:
-                        print(f"  • {key}: {value}")
+                        print(f"{Colors.YELLOW}  • {key}:{Colors.ENDC} {value}")
         
         if request.additional_notes:
-            print(f"\n💡 Notes: {request.additional_notes}")
+            print(f"\n{Colors.CYAN}💡 Notes:{Colors.ENDC} {request.additional_notes}")
         
         # Validation status
         if request.is_valid():
-            print("\n✅ Request is VALID and ready to submit!")
+            print(f"\n{Colors.GREEN}{Colors.BOLD}✅ Request is VALID and ready to submit!{Colors.ENDC}")
         else:
             if request.validation_issues:
-                print("\n⚠️  VALIDATION ISSUES:")
+                print(f"\n{Colors.RED}⚠️  VALIDATION ISSUES:{Colors.ENDC}")
                 for issue in request.validation_issues:
-                    print(f"  • {issue}")
+                    print(f"{Colors.RED}  • {issue}{Colors.ENDC}")
     
     def request_clarifications(self, request: ParsedRequest) -> Optional[str]:
         """Request clarifications or fixes from user."""
@@ -523,37 +552,37 @@ class InteractiveCLI:
         
         # Show validation issues first (blocking)
         if request.validation_issues:
-            print("❌ VALIDATION ISSUES (must fix):\n")
+            print(f"{Colors.RED}{Colors.BOLD}❌ VALIDATION ISSUES (must fix):{Colors.ENDC}\n")
             for i, issue in enumerate(request.validation_issues, 1):
-                print(f"{i}. {issue}")
+                print(f"{Colors.RED}{i}. {issue}{Colors.ENDC}")
             print()
         
         # Show optional clarifications
         if request.clarification_needed:
-            print("⚠️  CLARIFICATIONS NEEDED (optional):\n")
+            print(f"{Colors.YELLOW}{Colors.BOLD}⚠️  CLARIFICATIONS NEEDED (optional):{Colors.ENDC}\n")
             for i, clarification in enumerate(request.clarification_needed, 1):
-                print(f"{i}. {clarification}")
+                print(f"{Colors.YELLOW}{i}. {clarification}{Colors.ENDC}")
             print()
         
         # Prompt for response
         if request.validation_issues:
-            print("Please fix the validation issues above:")
+            print(f"{Colors.CYAN}Please fix the validation issues above:{Colors.ENDC}")
         elif request.clarification_needed:
-            print("Please provide clarifications (or press Enter to skip):")
+            print(f"{Colors.CYAN}Please provide clarifications (or press Enter to skip):{Colors.ENDC}")
         
-        response = input("> ").strip()
+        response = input(f"{Colors.GREEN}> {Colors.ENDC}").strip()
         
         return response if response else None
     
     def confirm_submission(self, request: ParsedRequest) -> bool:
         """Ask user to confirm submission."""
         self.print_separator()
-        print("✅ Request is ready for submission!\n")
+        print(f"{Colors.GREEN}{Colors.BOLD}✅ Request is ready for submission!{Colors.ENDC}\n")
         
         # Show summary
-        print(f"Reaction: {request.reaction_smiles}")
+        print(f"{Colors.CYAN}Reaction:{Colors.ENDC} {request.reaction_smiles}")
         if request.reaction_type:
-            print(f"Type: {request.reaction_type}")
+            print(f"{Colors.CYAN}Type:{Colors.ENDC} {request.reaction_type}")
         
         # Count meaningful constraints
         constraint_count = sum(
@@ -562,15 +591,24 @@ class InteractiveCLI:
         )
         
         if constraint_count > 0:
-            print(f"Constraints: {constraint_count} specified")
+            print(f"{Colors.CYAN}Constraints:{Colors.ENDC} {constraint_count} specified")
         else:
-            print("Constraints: None (will use default recommendations)")
+            print(f"{Colors.YELLOW}Constraints:{Colors.ENDC} None (will use default recommendations)")
         
-        print("\n🔍 API Request Preview:")
-        print(json.dumps(request.to_api_request(), indent=2))
+        print(f"\n{Colors.BOLD}🔍 API Request Preview:{Colors.ENDC}")
+        print(f"{Colors.YELLOW}{json.dumps(request.to_api_request(), indent=2)}{Colors.ENDC}")
         
-        print("\n" + "=" * 70)
-        confirm = input("Submit this request? (yes/no): ").strip().lower()
+        # TEST MODE: Stop here without submission
+        if self.test_mode:
+            print(f"\n{Colors.YELLOW}{'=' * 70}{Colors.ENDC}")
+            print(f"{Colors.YELLOW}{Colors.BOLD}⚠️  TEST MODE: Stopping before actual submission{Colors.ENDC}")
+            print(f"{Colors.GREEN}✅ Input process validation complete!{Colors.ENDC}")
+            print(f"{Colors.CYAN}📋 The request is valid and ready to be submitted in production mode.{Colors.ENDC}")
+            print(f"{Colors.YELLOW}{'=' * 70}{Colors.ENDC}")
+            return False
+        
+        print(f"\n{Colors.CYAN}{'=' * 70}{Colors.ENDC}")
+        confirm = input(f"{Colors.BOLD}Submit this request? (yes/no):{Colors.ENDC} ").strip().lower()
         return confirm in ["yes", "y"]
     
     def run(self):
@@ -581,14 +619,15 @@ class InteractiveCLI:
         reaction, requirements = self.get_initial_input()
         
         # Parse with LLM
-        print("\n🤖 Parsing input with LLM...")
+        print(f"\n{Colors.CYAN}🤖 Parsing input with LLM...{Colors.ENDC}")
         try:
             self.current_request = self.parser.parse_initial_input(
                 reaction_smiles=reaction,
                 requirements=requirements,
             )
+            print(f"{Colors.GREEN}✅ LLM parsing complete{Colors.ENDC}")
         except Exception as e:
-            print(f"\n❌ Error parsing input: {e}")
+            print(f"\n{Colors.RED}❌ Error parsing input: {e}{Colors.ENDC}")
             sys.exit(1)
         
         # Display initial parse
@@ -610,23 +649,24 @@ class InteractiveCLI:
                     break
                 else:
                     # Has blocking issues but user didn't provide fix
-                    print("\n⚠️  Cannot proceed without fixing validation issues.")
-                    print("Please provide the corrected information or type 'quit' to exit.")
+                    print(f"\n{Colors.YELLOW}⚠️  Cannot proceed without fixing validation issues.{Colors.ENDC}")
+                    print(f"{Colors.CYAN}Please provide the corrected information or type 'quit' to exit.{Colors.ENDC}")
                     continue
             
             if clarification.lower() in ['quit', 'exit', 'q']:
-                print("\n❌ Exiting...")
+                print(f"\n{Colors.RED}❌ Exiting...{Colors.ENDC}")
                 sys.exit(0)
             
             # Refine with LLM
-            print("\n🤖 Refining with your input...")
+            print(f"\n{Colors.CYAN}🤖 Refining with your input...{Colors.ENDC}")
             try:
                 self.current_request = self.parser.refine_with_clarification(
                     current_state=self.current_request,
                     user_response=clarification,
                 )
+                print(f"{Colors.GREEN}✅ Refinement complete{Colors.ENDC}")
             except Exception as e:
-                print(f"\n❌ Error refining request: {e}")
+                print(f"\n{Colors.RED}❌ Error refining request: {e}{Colors.ENDC}")
                 continue
             
             # Display updated state
@@ -634,23 +674,25 @@ class InteractiveCLI:
         
         # Check final state
         if not self.current_request.is_valid():
-            print("\n⚠️  Could not create a valid request after maximum iterations.")
-            print("Please check your input and try again.")
+            print(f"\n{Colors.YELLOW}⚠️  Could not create a valid request after maximum iterations.{Colors.ENDC}")
+            print(f"{Colors.CYAN}Please check your input and try again.{Colors.ENDC}")
             self.save_draft()
             sys.exit(1)
         
         # Final confirmation
         if self.confirm_submission(self.current_request):
-            self.submit_request()
+            if not self.test_mode:
+                self.submit_request()
         else:
-            print("\n❌ Submission cancelled.")
-            self.save_draft()
+            if not self.test_mode:
+                print(f"\n{Colors.RED}❌ Submission cancelled.{Colors.ENDC}")
+                self.save_draft()
     
     def submit_request(self):
         """Submit the request to the API."""
-        print("\n" + "=" * 70)
-        print("  📤 SUBMITTING REQUEST...")
-        print("=" * 70 + "\n")
+        print(f"\n{Colors.CYAN}{'=' * 70}{Colors.ENDC}")
+        print(f"{Colors.BOLD}{Colors.HEADER}  📤 SUBMITTING REQUEST...{Colors.ENDC}")
+        print(f"{Colors.CYAN}{'=' * 70}{Colors.ENDC}\n")
         
         api_request = self.current_request.to_api_request()
         
@@ -662,27 +704,27 @@ class InteractiveCLI:
             # Create request object
             req = RecommendConditionsRequest(**api_request)
             
-            print("⏳ Calling API endpoint: POST /api/v1/recommend/conditions\n")
+            print(f"{Colors.CYAN}⏳ Calling API endpoint: POST /api/v1/recommend/conditions{Colors.ENDC}\n")
             
             # Call the actual API
             result = api_recommend_conditions(req)
             
-            print("✅ REQUEST SUCCESSFUL!\n")
-            print("=" * 70)
-            print("RESULTS:")
-            print("=" * 70)
+            print(f"{Colors.GREEN}{Colors.BOLD}✅ REQUEST SUCCESSFUL!{Colors.ENDC}\n")
+            print(f"{Colors.CYAN}{'=' * 70}{Colors.ENDC}")
+            print(f"{Colors.BOLD}RESULTS:{Colors.ENDC}")
+            print(f"{Colors.CYAN}{'=' * 70}{Colors.ENDC}")
             print(json.dumps(result, indent=2, ensure_ascii=False))
-            print("\n✨ Recommendation complete!")
+            print(f"\n{Colors.GREEN}✨ Recommendation complete!{Colors.ENDC}")
             
         except ImportError:
-            print("⚠️  API not available in current context.")
-            print("Request payload that would be sent:")
-            print(json.dumps(api_request, indent=2))
-            print("\n💡 To actually call the API, run this from the main app context.")
+            print(f"{Colors.YELLOW}⚠️  API not available in current context.{Colors.ENDC}")
+            print(f"{Colors.CYAN}Request payload that would be sent:{Colors.ENDC}")
+            print(f"{Colors.YELLOW}{json.dumps(api_request, indent=2)}{Colors.ENDC}")
+            print(f"\n{Colors.CYAN}💡 To actually call the API, run this from the main app context.{Colors.ENDC}")
         except Exception as e:
-            print(f"❌ API call failed: {e}")
-            print("\nRequest payload:")
-            print(json.dumps(api_request, indent=2))
+            print(f"{Colors.RED}❌ API call failed: {e}{Colors.ENDC}")
+            print(f"\n{Colors.CYAN}Request payload:{Colors.ENDC}")
+            print(f"{Colors.YELLOW}{json.dumps(api_request, indent=2)}{Colors.ENDC}")
     
     def save_draft(self):
         """Save current state as draft."""
@@ -698,7 +740,7 @@ class InteractiveCLI:
                 "clarification_needed": self.current_request.clarification_needed,
             }, f, indent=2)
         
-        print(f"\n💾 Draft saved to: {draft_file}")
+        print(f"\n{Colors.CYAN}💾 Draft saved to: {Colors.ENDC}{draft_file}")
 
 
 # ============================================================================
@@ -717,11 +759,17 @@ Examples:
   # Use default settings (Aliyun/DeepSeek)
   python app/cli_recommend.py
   
+  # Test mode (stop before submission)
+  python app/cli_recommend.py --test
+  
   # Use OpenAI
   python app/cli_recommend.py --provider openai --model gpt-4o
   
   # Enable debug logging
   python app/cli_recommend.py --debug
+  
+  # Disable colors
+  python app/cli_recommend.py --no-color
         """
     )
     parser.add_argument(
@@ -740,6 +788,16 @@ Examples:
         help="API key (or set via environment variable)",
     )
     parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Test mode: stop before actual API submission",
+    )
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Disable colored output",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         help="Enable debug logging",
@@ -750,6 +808,10 @@ Examples:
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
     
+    # Disable colors if requested
+    if args.no_color:
+        Colors.disable()
+    
     # Initialize parser and CLI
     try:
         nl_parser = NaturalLanguageParser(
@@ -758,22 +820,22 @@ Examples:
             api_key=args.api_key,
         )
     except Exception as e:
-        print(f"❌ Failed to initialize LLM client: {e}")
-        print("\n💡 Make sure you have set your API key via environment variable:")
-        print("   export OPENAI_API_KEY=your_key  (for OpenAI)")
-        print("   export DASHSCOPE_API_KEY=your_key  (for Aliyun)")
+        print(f"{Colors.RED}❌ Failed to initialize LLM client: {e}{Colors.ENDC}")
+        print(f"\n{Colors.CYAN}💡 Make sure you have set your API key via environment variable:{Colors.ENDC}")
+        print(f"{Colors.YELLOW}   export OPENAI_API_KEY=your_key  (for OpenAI){Colors.ENDC}")
+        print(f"{Colors.YELLOW}   export DASHSCOPE_API_KEY=your_key  (for Aliyun){Colors.ENDC}")
         sys.exit(1)
     
-    cli = InteractiveCLI(parser=nl_parser)
+    cli = InteractiveCLI(parser=nl_parser, test_mode=args.test)
     
     try:
         cli.run()
     except KeyboardInterrupt:
-        print("\n\n⚠️  Interrupted by user. Exiting...")
+        print(f"\n\n{Colors.YELLOW}⚠️  Interrupted by user. Exiting...{Colors.ENDC}")
         sys.exit(0)
     except Exception as e:
         logger.exception("Unexpected error in CLI")
-        print(f"\n❌ Fatal error: {e}")
+        print(f"\n{Colors.RED}❌ Fatal error: {e}{Colors.ENDC}")
         sys.exit(1)
 
 
