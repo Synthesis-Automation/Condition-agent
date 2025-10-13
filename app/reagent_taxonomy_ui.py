@@ -292,9 +292,18 @@ class ReagentRegistryStore:
         self._load_registry()
 
     def _load_families(self) -> None:
+        # Try registry directory first
         schema_path = self.base_dir / "reagent_schema" / "families_registry.json"
+        
         if not schema_path.exists():
-            raise FileNotFoundError(f"Families registry not found: {schema_path}")
+            # Fallback to chemtools package location
+            import chemtools.reagent
+            package_path = Path(chemtools.reagent.__file__).parent / "reagent_schema" / "families_registry.json"
+            if package_path.exists():
+                schema_path = package_path
+            else:
+                raise FileNotFoundError(f"Families registry not found in {self.base_dir / 'reagent_schema'} or {package_path}")
+        
         data = json.loads(schema_path.read_text(encoding="utf-8"))
         for entry in data.get("entries", []):
             role = entry.get("role")
@@ -682,32 +691,66 @@ def generate_taxonomy_entry_llm(
             "workflow": workflow,
         }
     
-    # Build entry
+    # Build entry following the reagent schema
     try:
-        # Combine identity with role-specific fields
-        entry = {
-            "name": resolved_identity.get("name"),
-            "cas": normalized_cas,
-            "molecular_formula": resolved_identity.get("molecular_formula"),
-            "smiles": resolved_identity.get("smiles"),
-            "roles": {
-                role: {
-                    "families": [fields_result["family"]],
-                    **fields_result["fields"],
-                }
-            },
-        }
+        # Get family info from registry
+        from chemtools.reagent import build_entry, build_embedding_text
         
-        # Add abbreviations and synonyms
+        # Prepare abbreviations
         abbreviations = fields_result.get("abbreviations", [])
+        primary_abbr = abbreviations[0] if abbreviations else ""
+        
+        # Prepare synonyms
         existing_synonyms = resolved_identity.get("synonyms", [])
         additional_synonyms = fields_result.get("additional_synonyms", [])
         all_synonyms = dedupe_synonyms(existing_synonyms + additional_synonyms)
         
-        if abbreviations:
-            entry["abbreviations"] = abbreviations
-        if all_synonyms:
-            entry["synonyms"] = all_synonyms
+        # Filter aliases to exclude: primary name, CAS, and abbreviations
+        name_lower = resolved_identity.get("name", "").lower()
+        cas_values = {normalized_cas, normalized_cas.replace("-", "")} if normalized_cas else set()
+        abbr_lower = {abbr.lower() for abbr in abbreviations}
+        
+        aliases = [
+            syn for syn in all_synonyms
+            if syn.lower() != name_lower  # Not the primary name
+            and syn not in cas_values  # Not CAS number
+            and syn.lower() not in abbr_lower  # Not an abbreviation
+        ]
+        
+        # Create family dict for embedding text
+        family_dict = {
+            "family_id": fields_result["family"],
+            "label": fields_result["family"],
+            **fields_result.get("fields", {})
+        }
+        
+        # Build entry following reagent_schema.json structure
+        entry = {
+            "id": resolved_identity.get("inchi_key") or normalized_cas,  # prefer InChIKey; else CAS
+            "name": resolved_identity.get("name"),
+            "abbreviation": abbreviations if abbreviations else None,
+            "aliases": aliases,  # Use filtered aliases (no name, CAS, or abbreviations)
+            "cas": normalized_cas,
+            "inchi_key": resolved_identity.get("inchi_key"),
+            "smiles": resolved_identity.get("smiles"),
+            "roles": {
+                role: {
+                    "families": [fields_result["family"]],
+                    **fields_result.get("fields", {}),
+                }
+            },
+        }
+        
+        # Build embedding text following schema
+        embedding_entry = {
+            "name": entry["name"],
+            "abbr": primary_abbr,
+            "cas": normalized_cas,
+        }
+        entry["embedding_text"] = build_embedding_text(role, family_dict, embedding_entry, all_synonyms)
+        
+        # Remove None values to keep JSON clean
+        entry = {k: v for k, v in entry.items() if v is not None}
         
     except Exception as exc:
         return {
@@ -1502,33 +1545,43 @@ class RegistryGeneratorWindow(QMainWindow):
         if is_pure_llm:
             # Pure LLM workflow output
             status = result.get("status", "unknown")
-            workflow_steps = result.get("workflow", {})
             entry = result.get("entry", {})
+            message = result.get("message", "")
             
-            self.status_label.setText(f"Pure LLM Status: {status}")
+            # Update status label with helpful message
+            if status == "ready_to_save":
+                self.status_label.setText("✅ LLM Approved - Ready to Save")
+            elif status == "needs_review":
+                self.status_label.setText("⚠️ Needs Review - Check entry before saving")
+            else:
+                self.status_label.setText(f"Status: {status}")
             
-            # Build clean display with workflow progress
+            # Show ONLY the entry that will be saved (simplified for user review)
             display_payload: Dict[str, Any] = {
-                "workflow_mode": "Pure LLM",
                 "status": status,
-                "workflow_steps": {},
-                "entry": entry
             }
             
-            # Show workflow progress with checkmarks
-            for step_name, step_data in workflow_steps.items():
-                if isinstance(step_data, dict):
-                    step_status = step_data.get("status", "unknown")
-                    display_payload["workflow_steps"][step_name] = {
-                        "status": f"✓ {step_status}" if step_status == "success" else f"✗ {step_status}",
-                        "details": {k: v for k, v in step_data.items() if k != "status"}
-                    }
+            # Add message if present
+            if message:
+                display_payload["message"] = message
+            
+            # Show the entry - this is what will be saved
+            display_payload["entry"] = entry
+            
+            # Add verification warnings if present (from needs_review status)
+            workflow = result.get("workflow", {})
+            verification = workflow.get("step4_verification", {})
+            if isinstance(verification, dict):
+                issues = verification.get("issues", [])
+                if issues:
+                    # Show issues for user review
+                    display_payload["llm_verification_issues"] = issues
             
             self.output_view.setPlainText(json.dumps(display_payload, indent=2, ensure_ascii=False))
             self.set_inputs_enabled(True)
             
-            # Enable save only if ready
-            self.save_button.setEnabled(status == "ready_to_save")
+            # Enable save if ready or needs review (both have valid entries)
+            self.save_button.setEnabled(status in ("ready_to_save", "needs_review"))
             
         else:
             # Legacy workflow output

@@ -185,7 +185,7 @@ def _pubchem_cid_rn_map(session: Any, cids: Sequence[Any], timeout: float) -> Di
 def _resolve_via_pubchem(session: Any, cas: str, timeout: float) -> Optional[Dict[str, Any]]:
     """Resolve reagent identity from CAS using PubChem API."""
     base = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/xref/RN/{quote(cas)}"
-    props_url = base + "/property/Title,IUPACName,IsomericSMILES,CanonicalSMILES/JSON"
+    props_url = base + "/property/Title,IUPACName,IsomericSMILES,CanonicalSMILES,InChIKey/JSON"
     props = _http_get_json(session, props_url, timeout)
     entries = props.get("PropertyTable", {}).get("Properties", []) if props else []
     if not entries:
@@ -240,6 +240,7 @@ def _resolve_via_pubchem(session: Any, cas: str, timeout: float) -> Optional[Dic
             return None
 
     smiles = selected_record.get("IsomericSMILES") or selected_record.get("CanonicalSMILES")
+    inchi_key = selected_record.get("InChIKey")
     primary_name = selected_record.get("Title") or selected_record.get("IUPACName")
 
     raw: List[str] = []
@@ -255,7 +256,7 @@ def _resolve_via_pubchem(session: Any, cas: str, timeout: float) -> Optional[Dic
         deduped = deduped[:16]
 
     name = primary_name or deduped[0]
-    return {"name": name, "synonyms": deduped, "smiles": smiles}
+    return {"name": name, "synonyms": deduped, "smiles": smiles, "inchi_key": inchi_key}
 
 
 def _resolve_via_cactus(session: Any, cas: str, timeout: float) -> Optional[Dict[str, Any]]:

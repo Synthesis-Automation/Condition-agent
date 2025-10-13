@@ -42,6 +42,11 @@ app/
 
 ### Files Moved (1)
 7. ✅ `data-processor/Reagent_taxonomy_qt.py` → `app/reagent_taxonomy_ui.py` (1732 lines)
+   - Updated imports to use `chemtools.reagent`
+   - Added ROOT_DIR to sys.path for direct execution
+   - **Fixed**: LLM mode save button (now works for "needs_review" status)
+   - **Improved**: Simplified LLM output (shows only entry, not workflow details)
+   - Can now run: `python app/reagent_taxonomy_ui.py`
 
 ### Files Deleted (1)
 8. ✅ Removed `chemtools/reagent_lookup.py` (deprecated wrapper)

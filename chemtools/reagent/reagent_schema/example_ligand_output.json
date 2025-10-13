@@ -1,0 +1,19 @@
+[
+  {
+    "id": "1_10_phenanthroline__66-71-7",
+    "name": "1,10-Phenanthroline",
+    "abbreviation": ["phen"],
+    "aliases": [],
+    "cas": "66-71-7",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "ligand": {
+        "families": ["phenanthrolines"],
+        "donors": ["N", "N"],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "role: ligand | family_label: 1,10-Phenanthrolines | family_id: phenanthrolines | normalized_family: phenanthroline | donors: N,N | denticity: 2 | abbr: phen | CAS: 66-71-7 | family_def: 1,10-Phenanthrolines"
+  }
+]
