@@ -55,6 +55,25 @@ from .taxonomy_utils import (
     build_entry,
 )
 
+# Validation functions
+from .validator import (
+    validate_entry,
+    validate_role_file,
+    validate_database,
+    print_validation_summary,
+)
+
+# Analytics functions
+from .analytics import (
+    get_database_statistics,
+    get_family_statistics,
+    find_reagents_by_family,
+    get_missing_data_report,
+    print_database_summary,
+    print_role_summary,
+    print_missing_data_report,
+)
+
 __all__ = [
     # Runtime lookup
     "find_reagent",
@@ -83,4 +102,17 @@ __all__ = [
     "dedupe_synonyms",
     "tokenize_all",
     "build_entry",
+    # Validation
+    "validate_entry",
+    "validate_role_file",
+    "validate_database",
+    "print_validation_summary",
+    # Analytics
+    "get_database_statistics",
+    "get_family_statistics",
+    "find_reagents_by_family",
+    "get_missing_data_report",
+    "print_database_summary",
+    "print_role_summary",
+    "print_missing_data_report",
 ]
