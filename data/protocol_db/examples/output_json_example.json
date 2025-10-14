@@ -1,110 +1,132 @@
-{
-  "source": {
-    "title": "Copper-Catalyzed Suzuki-Miyaura Coupling of Unactivated Alkyl Halides with Arylborons",
-    "journal": "Organic Syntheses",
-    "volume": 102,
-    "pages": "86-99",
-    "year": 2025,
-    "doi": "10.15227/orgsyn.102.0086",
-    "url": "https://www.orgsyn.org/demo.aspx?prep=v102p0086"
-  },
-  "reaction": {
-    "reaction_smiles": "BrC1CCCCC1.B1(OC(C)(C)C(C)(C)O1)c2ccc(Cl)cc2>>Clc1ccc(C2CCCCC2)cc1",
-    "family": "Suzuki_Cu_C(sp3)-C(sp2)",
-    "notes": "other information for human readability"
-  },
-  "reaction_setup": [
-    {
-      "chemicals": [
-        {
-          "name": "4-Chlorophenylboronic acid pinacol ester",
-          "abbreviation": "4-Cl-Ph-B(pin)",
-          "cas": "195062-61-4",
-          "smiles": "B1(OC(C)(C)C(C)(C)O1)c2ccc(Cl)cc2",
-          "amount" : {"weight_g": 1.0, "mmol": 0.4, "volume_ml": null, "equivalents": 1.8},
-          "role": "starting_material"
-        },
-        {
-          "name": "Sodium tert-butoxide",
-          "abbreviation": "NaOtBu",
-          "cas": "865-48-5",
-          "smiles": "[Na+].[O-]C(C)(C)C",
-          "amount" : {"weight_g": 1.0, "mmol": 0.4, "volume_ml": null, "equivalents": 1.8},
-          "role": "base"
-        },
-        {
-          "name": "Copper(I) bromide–dimethyl sulfide complex",
-          "abbreviation": "CuBr·SMe2",
-          "cas": "54678-23-8",
-          "smiles": null,
-          "amount" : {"weight_g": 0.004, "mmol": 0.04, "volume_ml": null, "equivalents": 0.05},
-          "role": "metal_precursor"
-        },
-        {
-          "name": "Toluene",
-          "abbreviation": null,
-          "cas": "108-88-3",
-          "smiles": "Cc1ccccc1",
-          "amount" : {"weight_g": null, "mmol": null, "volume_ml": 4, "equivalents": null},
-          "role": "solvent"
-        }
-      ],
-      "conditions": [
-        {
-          "temperature_C": 80,
-          "time_h": 24,
-          "atmosphere": "N2"
-        },
-        {
-          "temperature_C": 25,
-          "time_h": 0.5,
-          "atmosphere": "air"
-        }
-      ]
-    }
-  ],
-  "workup_and_purification": [
-    {
-      "quench": [
-        {
-          "reagent": "Water",
-          "details": "Add water (50 mL) to reaction mixture; stir vigorously (caution: gas evolution) until solids dissolve."
-        }
-      ],
-      "workup": [
-        {
-          "step": "Pad filtration",
-          "details": "Filter through short pad of layered silica gel (2.0 cm) and diatomite (0.10 cm); ID 4.25 cm; elute with ethyl acetate (3×50 mL)."
-        },
-        {
-          "step": "Concentration",
-          "details": "Rotary evaporation at 16 mbar, 38 °C to give crude oil."
-        },
-        {
-          "step": "Dry loading",
-          "details": "Dissolve crude in dichloromethane (8.0 mL), add silica gel (7 g); remove solvent to give free‑flowing powder."
-        }
-      ],
-      "purification": [
-        {
-          "method": "Flash column chromatography",
-          "stationary_phase": "Silica gel (160 g; 6.0 cm × 20 cm)",
-          "eluent": "Petroleum ether",
-          "fractions": "Collect 15 mL fractions; combine 26–37 for major product"
-        },
-        {
-          "method": "Second column (impure cuts)",
-          "stationary_phase": "Silica gel (50 g; 3.0 cm × 25 cm)",
-          "eluent": "Petroleum ether",
-          "fractions": "Collect 15 mL fractions; combine 10–13"
-        }
-      ],
-      "notes": [
-        "No inert atmosphere required; reaction set up and run under air.",
-        "Reaction mixture appears black during heating.",
-        "Toluene dried overnight with MgSO4 (~2 g per 50 mL) and filtered."
-      ]
-    }
-  ],
-  "original_procedure": "4-Cl-Ph-B(pin) was added. Add water (50 mL) to reaction mixture; stir vigorously (caution: gas evolution) until solids dissolve. Filter through short pad of layered silica gel (2.0 cm) and diatomite (0.10 cm); ID 4.25 cm; elute with ethyl acetate (3×50 mL)."
-}
+[
+  {
+    "source": {
+      "title": "Copper-Catalyzed Suzuki-Miyaura Coupling of Unactivated Alkyl Halides with Arylborons",
+      "journal": "Organic Syntheses",
+      "volume": 102,
+      "pages": "86-99",
+      "year": 2025,
+      "doi": "10.15227/orgsyn.102.0086",
+      "url": "https://www.orgsyn.org/demo.aspx?prep=v102p0086"
+    },
+    "reaction": {
+      "reaction_smiles": "BrC1CCCCC1.B1(OC(C)(C)C(C)(C)O1)c2ccc(Cl)cc2>>Clc1ccc(C2CCCCC2)cc1",
+      "family": "Suzuki_Cu_C(sp3)-C(sp2)",
+      "notes": "other information for human readability"
+    },
+    "reaction_setup": [
+      {
+        "chemicals": [
+          {
+            "name": "4-Chlorophenylboronic acid pinacol ester",
+            "abbreviation": "4-Cl-Ph-B(pin)",
+            "cas": "195062-61-4",
+            "smiles": "B1(OC(C)(C)C(C)(C)O1)c2ccc(Cl)cc2",
+            "amount": {
+              "weight_g": 1.0,
+              "mmol": 0.4,
+              "volume_ml": null,
+              "equivalents": 1.8
+            },
+            "role": "starting_material"
+          },
+          {
+            "name": "Sodium tert-butoxide",
+            "abbreviation": "NaOtBu",
+            "cas": "865-48-5",
+            "smiles": "[Na+].[O-]C(C)(C)C",
+            "amount": {
+              "weight_g": 1.0,
+              "mmol": 0.4,
+              "volume_ml": null,
+              "equivalents": 1.8
+            },
+            "role": "base"
+          },
+          {
+            "name": "Copper(I) bromide–dimethyl sulfide complex",
+            "abbreviation": "CuBr·SMe2",
+            "cas": "54678-23-8",
+            "smiles": null,
+            "amount": {
+              "weight_g": 0.004,
+              "mmol": 0.04,
+              "volume_ml": null,
+              "equivalents": 0.05
+            },
+            "role": "metal_precursor"
+          },
+          {
+            "name": "Toluene",
+            "abbreviation": null,
+            "cas": "108-88-3",
+            "smiles": "Cc1ccccc1",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 4,
+              "equivalents": null
+            },
+            "role": "solvent"
+          }
+        ],
+        "conditions": [
+          {
+            "temperature_C": 80,
+            "time_h": 24,
+            "atmosphere": "N2"
+          },
+          {
+            "temperature_C": 25,
+            "time_h": 0.5,
+            "atmosphere": "air"
+          }
+        ]
+      }
+    ],
+    "workup_and_purification": [
+      {
+        "quench": [
+          {
+            "reagent": "Water",
+            "details": "Add water (50 mL) to reaction mixture; stir vigorously (caution: gas evolution) until solids dissolve."
+          }
+        ],
+        "workup": [
+          {
+            "step": "Pad filtration",
+            "details": "Filter through short pad of layered silica gel (2.0 cm) and diatomite (0.10 cm); ID 4.25 cm; elute with ethyl acetate (3×50 mL)."
+          },
+          {
+            "step": "Concentration",
+            "details": "Rotary evaporation at 16 mbar, 38 °C to give crude oil."
+          },
+          {
+            "step": "Dry loading",
+            "details": "Dissolve crude in dichloromethane (8.0 mL), add silica gel (7 g); remove solvent to give free‑flowing powder."
+          }
+        ],
+        "purification": [
+          {
+            "method": "Flash column chromatography",
+            "stationary_phase": "Silica gel (160 g; 6.0 cm × 20 cm)",
+            "eluent": "Petroleum ether",
+            "fractions": "Collect 15 mL fractions; combine 26–37 for major product"
+          },
+          {
+            "method": "Second column (impure cuts)",
+            "stationary_phase": "Silica gel (50 g; 3.0 cm × 25 cm)",
+            "eluent": "Petroleum ether",
+            "fractions": "Collect 15 mL fractions; combine 10–13"
+          }
+        ],
+        "notes": [
+          "No inert atmosphere required; reaction set up and run under air.",
+          "Reaction mixture appears black during heating.",
+          "Toluene dried overnight with MgSO4 (~2 g per 50 mL) and filtered."
+        ]
+      }
+    ],
+    "original_procedure": "4-Cl-Ph-B(pin) was added. Add water (50 mL) to reaction mixture; stir vigorously (caution: gas evolution) until solids dissolve. Filter through short pad of layered silica gel (2.0 cm) and diatomite (0.10 cm); ID 4.25 cm; elute with ethyl acetate (3×50 mL)."
+  }
+]
