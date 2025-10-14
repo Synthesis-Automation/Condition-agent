@@ -174,7 +174,7 @@
 
     "original_procedure": {
       "type": "string",
-      "description": "Verbatim text of the source procedure (may be empty)."
+      "description": "Verbatim text of the source procedure (try to make it complete)."
     }
   }
 }
