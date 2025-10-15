@@ -1,6 +1,6 @@
 # ChemTools Project (v2)
 
-ChemTools is a deterministic toolkit for reaction condition recommendation, centered on Ullmann C–N couplings with hooks for additional reaction families. The project ships as a FastAPI application (`app/main.py`) backed by reusable Python modules in `chemtools/`, command-line helpers, and a pytest suite.
+ChemTools is a deterministic toolkit for reaction condition recommendation, centered on C-N coupling reactions (Ullmann and Buchwald-Hartwig) with hooks for additional reaction families. The project ships as a FastAPI application (`app/main.py`) backed by reusable Python modules in `chemtools/`, command-line helpers, and a pytest suite.
 
 ## Feature Highlights
 
@@ -81,7 +81,7 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |   |-- explain.py           # Explanation and rationale builders
 |   |-- output_formatter.py  # Standard JSON output formatting for all recommendation modes
 |   |-- features/            # Role-aware feature engineering
-|   |-- featurizers/         # Molecule and reaction featurizers (incl. Ullmann)
+|   |-- featurizers/         # Molecule and reaction featurizers for C-N coupling
 |   |-- ml/                  # Optional ML models (DRFP predictor, fusion)
 |   |-- precedent/           # Precedent search, similarity, and loaders
 |   |-- protocol/            # Protocol recommendation (DRFP-based protocol search)
@@ -122,7 +122,7 @@ All request/response schemas live in `chemtools/contracts.py`. The FastAPI serve
 | --- | --- | --- |
 | Health | `GET /health` | Lightweight readiness probe. |
 | Reaction utilities | `POST /normalize`, `POST /detect_family`, `POST /detect_type` | Normalize SMILES strings and infer reaction families/types. |
-| Featurization | `POST /featurize/ullmann`, `POST /featurize/role-aware` | Deterministic role-aware feature generation with RDKit opt-in. |
+| Featurization | `POST /featurize/molecular`, `POST /featurize/role-aware` | Deterministic role-aware feature generation with RDKit opt-in. |
 | Precedents | `POST /precedent/knn`, `POST /precedent/filters`, `POST /precedent/explain` | DRFP-backed precedent lookup and explanation packs. |
 | Recommendation | `POST /api/v1/recommend`, `POST /api/v1/recommend/conditions`, `POST /api/v1/recommend/fusion` | Core recommendation, structured condition sets, and fusion-mode outputs. |
 | Plate design | `POST /api/v1/design_plate` | Builds plate-ready experiment grids from recommendation output. |

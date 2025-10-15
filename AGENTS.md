@@ -4,7 +4,7 @@
 
 - `app/main.py`: FastAPI app and route wiring (OpenAPI at `/docs`).
 - `chemtools/`: Core deterministic libraries (`smiles.py`, `router.py`, `properties.py`, `precedent.py`, `constraints.py`, `explain.py`).
-  - `condition_core.py` and `featurizers/ullmann.py` for Ullmann C–N.
+  - `condition_core.py` and `featurizers/molecular.py` for C-N coupling substrate features.
   - `protocol/`: Protocol-based recommendation using DRFP similarity.
   - `cli/registry.py`: CLI entrypoint (`chem-registry`).
 - `llmtools/`: LLM integration for advanced operations (`clients.py`, `agents.py`, `prompts.py`).

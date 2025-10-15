@@ -546,14 +546,14 @@ class FeaturizersNamespace:
     def __init__(self, context: 'ChemTools'):
         self._ctx = context
     
-    def ullmann(self, **kwargs) -> Any:
-        """Access Ullmann C-N coupling featurizer.
+    def molecular(self, **kwargs) -> Any:
+        """Access molecular featurizer for C-N coupling substrates.
         
         Returns:
-            Ullmann featurizer namespace
+            Molecular featurizer namespace
         """
         from . import featurizers as _featurizers
-        return _featurizers.ullmann
+        return _featurizers.molecular
 
 
 class FeaturesNamespace:
