@@ -17,7 +17,7 @@ https://www.orgsyn.org/demo.aspx?prep=v92p0195
 
 
 
-
+please analyze this md file (contain a number of synthesis procedures) please convert this md file to the standard json file (using a meaningful name), using attached json template and examples, make sure all starting material and reagents is extracted. 
 
 
 
