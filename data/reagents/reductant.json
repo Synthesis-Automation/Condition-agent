@@ -1,71 +1,5 @@
 [
   {
-    "id": "cas-16853-85-3",
-    "name": "Lithium aluminum hydride",
-    "abbreviation": [
-      "LiAlH4"
-    ],
-    "aliases": [
-      "LAH"
-    ],
-    "cas": "16853-85-3",
-    "inchi_key": null,
-    "smiles": null,
-    "roles": {
-      "reductant": {
-        "families": [
-          "complex_hydrides"
-        ],
-        "strength_band": "very_high"
-      }
-    },
-    "embedding_text": "type: REDUCTANT | family: Complex Hydrides (Borohydrides/Al hydrides) (complex_hydrides) | name: Lithium aluminum hydride | abbr: LiAlH4 | CAS: 16853-85-3 | use_cases: Strong reductions"
-  },
-  {
-    "id": "cas-16940-66-2",
-    "name": "Sodium borohydride",
-    "abbreviation": [
-      "NaBH4"
-    ],
-    "aliases": [
-      "sodium tetrahydroborate"
-    ],
-    "cas": "16940-66-2",
-    "inchi_key": null,
-    "smiles": null,
-    "roles": {
-      "reductant": {
-        "families": [
-          "complex_hydrides"
-        ],
-        "strength_band": "very_high"
-      }
-    },
-    "embedding_text": "type: REDUCTANT | family: Complex Hydrides (Borohydrides/Al hydrides) (complex_hydrides) | name: Sodium borohydride | abbr: NaBH4 | CAS: 16940-66-2 | use_cases: Carbonyl reduction"
-  },
-  {
-    "id": "cas-1333-74-0",
-    "name": "Hydrogen (g)",
-    "abbreviation": [
-      "H2"
-    ],
-    "aliases": [
-      "dihydrogen"
-    ],
-    "cas": "1333-74-0",
-    "inchi_key": null,
-    "smiles": null,
-    "roles": {
-      "reductant": {
-        "families": [
-          "hydrogen_gas"
-        ],
-        "strength_band": "high"
-      }
-    },
-    "embedding_text": "type: REDUCTANT | family: Hydrogen Gas (hydrogen_gas) | name: Hydrogen (g) | abbr: H2 | CAS: 1333-74-0 | use_cases: Hydrogenation"
-  },
-  {
     "id": "cas-3277-26-7",
     "name": "1,1,3,3-Tetramethyldisiloxane",
     "abbreviation": [
@@ -84,70 +18,6 @@
       }
     },
     "embedding_text": "type: REDUCTANT | family: Hydrosilanes (hydrosilanes) | name: 1,1,3,3-Tetramethyldisiloxane | abbr: TMDS | CAS: 3277-26-7 | use_cases: Hydrosilylation"
-  },
-  {
-    "id": "cas-63148-57-2",
-    "name": "Polymethylhydrosiloxane",
-    "abbreviation": [
-      "PMHS"
-    ],
-    "aliases": [],
-    "cas": "63148-57-2",
-    "inchi_key": null,
-    "smiles": null,
-    "roles": {
-      "reductant": {
-        "families": [
-          "hydrosilanes"
-        ],
-        "strength_band": "medium"
-      }
-    },
-    "embedding_text": "type: REDUCTANT | family: Hydrosilanes (hydrosilanes) | name: Polymethylhydrosiloxane | abbr: PMHS | CAS: 63148-57-2 | use_cases: Hydrosilylation"
-  },
-  {
-    "id": "cas-7439-96-5",
-    "name": "Manganese powder",
-    "abbreviation": [
-      "Mn"
-    ],
-    "aliases": [
-      "Mn powder"
-    ],
-    "cas": "7439-96-5",
-    "inchi_key": null,
-    "smiles": null,
-    "roles": {
-      "reductant": {
-        "families": [
-          "metal_powders"
-        ],
-        "strength_band": "high"
-      }
-    },
-    "embedding_text": "type: REDUCTANT | family: Metal Powders (Zn, Mn, Fe) (metal_powders) | name: Manganese powder | abbr: Mn | CAS: 7439-96-5 | use_cases: Cross-electrophile"
-  },
-  {
-    "id": "cas-7440-66-6",
-    "name": "Zinc dust",
-    "abbreviation": [
-      "Zn"
-    ],
-    "aliases": [
-      "Zn powder"
-    ],
-    "cas": "7440-66-6",
-    "inchi_key": null,
-    "smiles": null,
-    "roles": {
-      "reductant": {
-        "families": [
-          "metal_powders"
-        ],
-        "strength_band": "high"
-      }
-    },
-    "embedding_text": "type: REDUCTANT | family: Metal Powders (Zn, Mn, Fe) (metal_powders) | name: Zinc dust | abbr: Zn | CAS: 7440-66-6 | use_cases: Cross-electrophile"
   },
   {
     "id": "cas-13063-86-4",
@@ -200,5 +70,171 @@
       }
     },
     "embedding_text": "type: REDUCTANT | family: Organic Reductants (Hantzsch ester, TDAE, ascorbate) (organic_reductants) | class: organic electron/hydride donors | mechanism: SET; Hydride transfer | strength: 2 | use_cases: Photoredox reductive couplings; Organocatalytic reductions | best_for: Mild, functional-group-tolerant reductions | avoid_when: Air/O2 sensitive (TDAE) | ehs: none | name: Hantzsch ester | abbr: Hantzsch ester | CAS: 1149-23-1 | synonyms: Hantzsch ester; 1149-23-1; Diethyl 1,4-dihydro-2,6-dimethyl-3,5-pyridinedicarboxylate; Etidin; Diethone; Hantzsch's dihydropyridine; 3,5-Pyridinedicarboxylic acid, 1,4-dihydro-2,6-dimethyl-, diethyl ester; diludin; GWN6123BUG; 2,6-Dimethyl-3,5-diethoxycarbonyl-1,4-dihydropyridine; DTXSID80150895; 2,6-dimethyl-3,5-dicarbethoxy-1,4-dihydropyridine; ethidin; DM-DEOC-DHP; RefChem:139231; DTXCID4073386"
+  },
+  {
+    "id": "cas-1333-74-0",
+    "name": "Hydrogen (g)",
+    "abbreviation": [
+      "H2"
+    ],
+    "aliases": [
+      "dihydrogen"
+    ],
+    "cas": "1333-74-0",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "reductant": {
+        "families": [
+          "hydrogen_gas"
+        ],
+        "strength_band": "high"
+      }
+    },
+    "embedding_text": "type: REDUCTANT | family: Hydrogen Gas (hydrogen_gas) | name: Hydrogen (g) | abbr: H2 | CAS: 1333-74-0 | use_cases: Hydrogenation"
+  },
+  {
+    "id": "XEEYBQQBJWHFJM-UHFFFAOYSA-N",
+    "name": "Iron",
+    "abbreviation": [
+      "Fe"
+    ],
+    "aliases": [
+      "Iron, elemental",
+      "ferrous iron",
+      "Iron powder",
+      "Remko",
+      "Armco iron",
+      "Ferrovac E",
+      "Hoeganaes EH",
+      "3ZhP",
+      "Ancor B",
+      "Atomiron 5M",
+      "PZhO",
+      "Atomiron 44MR",
+      "hierro",
+      "Atomiron AFP 5",
+      "Ferrum",
+      "Elemental iron"
+    ],
+    "cas": "7439-89-6",
+    "inchi_key": "XEEYBQQBJWHFJM-UHFFFAOYSA-N",
+    "roles": {
+      "reductant": {
+        "families": [
+          "metal_powders"
+        ],
+        "strength_band": "moderate"
+      }
+    },
+    "embedding_text": "type: REDUCTANT | family: metal_powders (metal_powders) | name: Iron | abbr: Fe | CAS: 7439-89-6 | synonyms: Iron; 7439-89-6; Iron, elemental; ferrous iron; Iron powder; Remko; Armco iron; Ferrovac E; Hoeganaes EH; 3ZhP; Ancor B; Atomiron 5M; PZhO; Atomiron 44MR; hierro; Atomiron AFP 5; Ferrum; Elemental iron"
+  },
+  {
+    "id": "cas-16853-85-3",
+    "name": "Lithium aluminum hydride",
+    "abbreviation": [
+      "LiAlH4"
+    ],
+    "aliases": [
+      "LAH"
+    ],
+    "cas": "16853-85-3",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "reductant": {
+        "families": [
+          "complex_hydrides"
+        ],
+        "strength_band": "very_high"
+      }
+    },
+    "embedding_text": "type: REDUCTANT | family: Complex Hydrides (Borohydrides/Al hydrides) (complex_hydrides) | name: Lithium aluminum hydride | abbr: LiAlH4 | CAS: 16853-85-3 | use_cases: Strong reductions"
+  },
+  {
+    "id": "cas-7439-96-5",
+    "name": "Manganese powder",
+    "abbreviation": [
+      "Mn"
+    ],
+    "aliases": [
+      "Mn powder"
+    ],
+    "cas": "7439-96-5",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "reductant": {
+        "families": [
+          "metal_powders"
+        ],
+        "strength_band": "high"
+      }
+    },
+    "embedding_text": "type: REDUCTANT | family: Metal Powders (Zn, Mn, Fe) (metal_powders) | name: Manganese powder | abbr: Mn | CAS: 7439-96-5 | use_cases: Cross-electrophile"
+  },
+  {
+    "id": "cas-63148-57-2",
+    "name": "Polymethylhydrosiloxane",
+    "abbreviation": [
+      "PMHS"
+    ],
+    "aliases": [],
+    "cas": "63148-57-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "reductant": {
+        "families": [
+          "hydrosilanes"
+        ],
+        "strength_band": "medium"
+      }
+    },
+    "embedding_text": "type: REDUCTANT | family: Hydrosilanes (hydrosilanes) | name: Polymethylhydrosiloxane | abbr: PMHS | CAS: 63148-57-2 | use_cases: Hydrosilylation"
+  },
+  {
+    "id": "cas-16940-66-2",
+    "name": "Sodium borohydride",
+    "abbreviation": [
+      "NaBH4"
+    ],
+    "aliases": [
+      "sodium tetrahydroborate"
+    ],
+    "cas": "16940-66-2",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "reductant": {
+        "families": [
+          "complex_hydrides"
+        ],
+        "strength_band": "very_high"
+      }
+    },
+    "embedding_text": "type: REDUCTANT | family: Complex Hydrides (Borohydrides/Al hydrides) (complex_hydrides) | name: Sodium borohydride | abbr: NaBH4 | CAS: 16940-66-2 | use_cases: Carbonyl reduction"
+  },
+  {
+    "id": "cas-7440-66-6",
+    "name": "Zinc dust",
+    "abbreviation": [
+      "Zn"
+    ],
+    "aliases": [
+      "Zn powder"
+    ],
+    "cas": "7440-66-6",
+    "inchi_key": null,
+    "smiles": null,
+    "roles": {
+      "reductant": {
+        "families": [
+          "metal_powders"
+        ],
+        "strength_band": "high"
+      }
+    },
+    "embedding_text": "type: REDUCTANT | family: Metal Powders (Zn, Mn, Fe) (metal_powders) | name: Zinc dust | abbr: Zn | CAS: 7440-66-6 | use_cases: Cross-electrophile"
   }
 ]

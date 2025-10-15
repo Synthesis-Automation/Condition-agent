@@ -496,6 +496,45 @@
     "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: null | aliases: 2Diphenylphosphinopyridine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
+    "id": "NPAXPTHCUCUHPT-UHFFFAOYSA-N",
+    "name": "3,4,7,8-Tetramethyl-1,10-phenanthroline",
+    "abbreviation": [
+      "tmphen",
+      "TMPhen"
+    ],
+    "aliases": [
+      "1,10-Phenanthroline, 3,4,7,8-tetramethyl-",
+      "DTXSID2061856",
+      "TM-1,10-P",
+      "RefChem:90964",
+      "DTXCID4035330",
+      "216-762-4",
+      "MFCD00004974",
+      "3,4,7,8-Tetramethylphenanthroline",
+      "CHEMBL99384",
+      "3,4,7,8-Tetramethyl-[1,10]phenanthroline",
+      "3,4,7,8-Tetramethyl-1,10-diazaphenanthrene; 3,4,7,8-Tetramethyl-o-phenanthroline; 3,4,7,8-Tetramethylphenanthroline",
+      "3,4,7,8-tetramethylpyridino[3,2-h]quinoline",
+      "4-Amino-7-beta-D-ribofuranosyl-7H-pyrrolo[2,3-d]pyrimidine-5-carboxamide; 7-Deazaadenosine-7-carboxamide; NSC 65346;",
+      "EINECS 216-762-4"
+    ],
+    "cas": "1660-93-1",
+    "inchi_key": "NPAXPTHCUCUHPT-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "phenanthrolines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: phenanthrolines (phenanthrolines) | denticity: 2 | name: 3,4,7,8-Tetramethyl-1,10-phenanthroline | abbr: tmphen | CAS: 1660-93-1 | synonyms: 3,4,7,8-Tetramethyl-1,10-phenanthroline; 1660-93-1; 1,10-Phenanthroline, 3,4,7,8-tetramethyl-; DTXSID2061856; TM-1,10-P; RefChem:90964; DTXCID4035330; 216-762-4; MFCD00004974; 3,4,7,8-Tetramethylphenanthroline; CHEMBL99384; 3,4,7,8-Tetramethyl-[1,10]phenanthroline; 3,4,7,8-Tetramethyl-1,10-diazaphenanthrene; 3,4,7,8-Tetramethyl-o-phenanthroline; 3,4,7,8-Tetramethylphenanthroline; 3,4,7,8-tetramethylpyridino[3,2-h]quinoline; 4-Amino-7-beta-D-ribofuranosyl-7H-pyrrolo[2,3-d]pyrimidine-5-carboxamide; 7-Deazaadenosine-7-carboxamide; NSC 65346;; EINECS 216-762-4"
+  },
+  {
     "id": "4_4_4_tri_tert_butyl_2_2_6_2_terpyridine__115091-29-7",
     "name": "4,4',4''-Tri-tert-butyl-2,2':6',2''-terpyridine",
     "abbreviation": [

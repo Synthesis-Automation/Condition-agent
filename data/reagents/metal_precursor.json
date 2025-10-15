@@ -322,6 +322,43 @@
     "embedding_text": "member_embedding: type: CATALYST | family: Copper Salts (copper salt) | metal: Cu | ox_states: 1 | name: Copper oxide (Cu2O) | abbr: Cu2O | CAS: 1317-39-1"
   },
   {
+    "id": "ARUVKPQLZAKDPS-UHFFFAOYSA-L",
+    "name": "Copper Sulfate",
+    "abbreviation": [
+      "CuSO4"
+    ],
+    "aliases": [
+      "Copper(II) sulfate",
+      "CUPRIC SULFATE",
+      "Cupric sulfate anhydrous",
+      "Copper sulphate",
+      "Copper(2+) sulfate",
+      "Copper(ii) sulfate, anhydrous",
+      "Copper monosulfate",
+      "Trinagle",
+      "Delcup",
+      "Hylinec",
+      "Copper sulfate (1:1)",
+      "Cupric sulphate",
+      "Roman vitriol",
+      "Blue vitriol"
+    ],
+    "cas": "7758-98-7",
+    "inchi_key": "ARUVKPQLZAKDPS-UHFFFAOYSA-L",
+    "roles": {
+      "metal_precursor": {
+        "families": [
+          "cu_ii_salts"
+        ],
+        "metal": "Cu",
+        "oxidation_states": [
+          2
+        ]
+      }
+    },
+    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper Sulfate | abbr: CuSO4 | CAS: 7758-98-7 | synonyms: Copper Sulfate; 7758-98-7; Copper(II) sulfate; CUPRIC SULFATE; Cupric sulfate anhydrous; Copper sulphate; Copper(2+) sulfate; Copper(ii) sulfate, anhydrous; Copper monosulfate; Trinagle; Delcup; Hylinec; Copper sulfate (1:1); Cupric sulphate; Roman vitriol; CuSO4; Blue vitriol"
+  },
+  {
     "id": "R_d8cb119bbf8e4b10",
     "name": "Copper(I) bromide",
     "abbreviation": [
