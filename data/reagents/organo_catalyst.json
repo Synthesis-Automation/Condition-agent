@@ -1,5 +1,42 @@
 [
   {
+    "id": "LWPXTYZKAWSRIP-UHFFFAOYSA-M",
+    "name": "1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-1H-imidazol-3-ium chloride",
+    "abbreviation": [
+      "SIPr·HCl"
+    ],
+    "aliases": [
+      "RefChem:413930",
+      "627-991-8",
+      "1,3-Bis-(2,6-diisopropylphenyl)imidazolinium chloride",
+      "MFCD07369796",
+      "1,3-bis[2,6-di(propan-2-yl)phenyl]-4,5-dihydroimidazol-1-ium;chloride",
+      "C27H39ClN2",
+      "1,3-bis(2,6-diisopropylphenyl)-imidazolidinium-chloride",
+      "N,N'-(2,6-Diisopropylphenyl)dihydroimidazolium chloride",
+      "SIPr.HCl",
+      "SCHEMBL739370",
+      "1,3-bis(2,6-diisopropylphenyl)-4,5-dihydroimidazol-1-ium;chloride",
+      "1,3-bis[2,6-di(propan-2-yl)phenyl]-4,5-dihydroimidazol-1-ium chloride",
+      "AKOS016002955",
+      "CS-W011635",
+      "Saturated NHC precursor",
+      "1,3-Bis(2,6-diisopropylphenyl)imidazolinium chloride"
+    ],
+    "cas": "258278-25-0",
+    "inchi_key": "LWPXTYZKAWSRIP-UHFFFAOYSA-M",
+    "roles": {
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "hydrogen_bonding",
+        "chirality": "achiral"
+      }
+    },
+    "embedding_text": "type: ORGANO_CATALYST | family: cinchona_alkaloids (cinchona_alkaloids) | name: 1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-1H-imidazol-3-ium chloride | abbr: SIPr·HCl | CAS: 258278-25-0 | synonyms: 1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-1H-imidazol-3-ium chloride; RefChem:413930; 627-991-8; 258278-25-0; 1,3-Bis-(2,6-diisopropylphenyl)imidazolinium chloride; MFCD07369796; 1,3-bis[2,6-di(propan-2-yl)phenyl]-4,5-dihydroimidazol-1-ium;chloride; C27H39ClN2; 1,3-bis(2,6-diisopropylphenyl)-imidazolidinium-chloride; N,N'-(2,6-Diisopropylphenyl)dihydroimidazolium chloride; SIPr.HCl; SCHEMBL739370; 1,3-bis(2,6-diisopropylphenyl)-4,5-dihydroimidazol-1-ium;chloride; 1,3-bis[2,6-di(propan-2-yl)phenyl]-4,5-dihydroimidazol-1-ium chloride; AKOS016002955; CS-W011635; Saturated NHC precursor; 1,3-Bis(2,6-diisopropylphenyl)imidazolinium chloride"
+  },
+  {
     "id": "cas-1416881-52-1",
     "name": "4CzIPN",
     "abbreviation": [
