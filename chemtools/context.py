@@ -20,7 +20,8 @@ Architecture:
     │   ├── smiles - SMILES parsing and normalization
     │   ├── router - Reaction family detection
     │   ├── properties - Compound property lookup
-    │   └── constraints - Constraint validation
+    │   ├── constraints - Constraint validation
+    │   └── functional_groups - Functional group detection
     │
     ├── Data Operations (stateful, lazy-loaded through context)
     │   ├── precedent - Precedent reaction search
@@ -180,6 +181,129 @@ class ConstraintsNamespace:
         """
         from . import constraints as _constraints
         return _constraints.filter(candidates, constraints, **kwargs)
+
+
+class FunctionalGroupsNamespace:
+    """Functional group detection and analysis.
+    
+    Stateless operations for detecting functional groups in molecules.
+    Uses RDKit SMARTS matching when available, falls back to text patterns.
+    """
+    
+    @staticmethod
+    def detect(smiles: Optional[str]) -> Dict[str, bool]:
+        """Detect all functional groups in a molecule.
+        
+        Args:
+            smiles: SMILES string to analyze
+            
+        Returns:
+            Dict mapping functional group name to presence (True/False)
+            
+        Example:
+            >>> chem.functional_groups.detect("CC(=O)O")
+            {'carboxylic_acid': True, 'carbonyl': True, ...}
+        """
+        from .util import functional_groups as _fg
+        return _fg.detect_all(smiles)
+    
+    @staticmethod
+    def get_groups(smiles: Optional[str]) -> List[str]:
+        """Get list of functional groups present in a molecule.
+        
+        Args:
+            smiles: SMILES string to analyze
+            
+        Returns:
+            List of functional group names
+            
+        Example:
+            >>> chem.functional_groups.get_groups("c1ccc(Br)cc1N")
+            ['aniline', 'amine_primary', 'aryl_bromide', 'aromatic']
+        """
+        from .util import functional_groups as _fg
+        return _fg.get_functional_groups(smiles)
+    
+    @staticmethod
+    def has(smiles: Optional[str], group_name: str) -> bool:
+        """Check if molecule has a specific functional group.
+        
+        Args:
+            smiles: SMILES string to analyze
+            group_name: Name of functional group to check
+            
+        Returns:
+            True if functional group is present
+            
+        Example:
+            >>> chem.functional_groups.has("CC(=O)O", "carboxylic_acid")
+            True
+        """
+        from .util import functional_groups as _fg
+        return _fg.has_functional_group(smiles, group_name)
+    
+    @staticmethod
+    def count(smiles: Optional[str], group_name: str) -> int:
+        """Count occurrences of a specific functional group.
+        
+        Args:
+            smiles: SMILES string to analyze
+            group_name: Name of functional group to count
+            
+        Returns:
+            Number of times the functional group appears
+            
+        Example:
+            >>> chem.functional_groups.count("O=C(O)CC(=O)O", "carboxylic_acid")
+            2
+        """
+        from .util import functional_groups as _fg
+        return _fg.count_functional_groups(smiles, group_name)
+    
+    @staticmethod
+    def categorize(smiles: Optional[str]) -> Dict[str, List[str]]:
+        """Organize detected functional groups by chemical category.
+        
+        Args:
+            smiles: SMILES string to analyze
+            
+        Returns:
+            Dict mapping category to list of functional groups
+            
+        Example:
+            >>> chem.functional_groups.categorize("CC(=O)Oc1ccccc1")
+            {'oxygen': ['ester', 'carbonyl', 'phenol'], 'aromatic': [...]}
+        """
+        from .util import functional_groups as _fg
+        return _fg.get_group_categories(smiles)
+    
+    @staticmethod
+    def summarize(smiles: Optional[str]) -> str:
+        """Get human-readable summary of functional groups.
+        
+        Args:
+            smiles: SMILES string to analyze
+            
+        Returns:
+            Formatted string summary
+            
+        Example:
+            >>> print(chem.functional_groups.summarize("CC(=O)Oc1ccccc1"))
+            Oxygen: ester, carbonyl, phenol
+            Aromatic: aromatic, phenol
+        """
+        from .util import functional_groups as _fg
+        return _fg.summarize_functional_groups(smiles)
+    
+    @staticmethod
+    def list_available() -> List[str]:
+        """Get list of all detectable functional group names.
+        
+        Returns:
+            List of functional group names that can be detected
+        """
+        from .util import functional_groups as _fg
+        return sorted(_fg.FUNCTIONAL_GROUP_SMARTS.keys())
 
 
 # ============================================================================
@@ -889,6 +1013,7 @@ class ChemTools:
         self.router = RouterNamespace()
         self.properties = PropertiesNamespace()
         self.constraints = ConstraintsNamespace()
+        self.functional_groups = FunctionalGroupsNamespace()  # Functional group detection
         self.reagent = ReagentNamespace()  # Reagent database access
         self.rules = RuleNamespace()       # Rule-based scheme matching
         self.analytics = DatasetAnalyticsNamespace()  # Dataset analytics

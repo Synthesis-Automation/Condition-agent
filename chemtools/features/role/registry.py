@@ -41,7 +41,7 @@ REGISTRY = {
         {"name": "aryl_halide.heteroaryl", "type": "int", "default": 0},
         {"name": "aryl_halide.ring_aromatic_count", "type": "int", "default": 0},
         {"name": "aryl_halide.triflate_flag", "type": "int", "default": 0},
-    ],
+    ], 
     "fingerprints": {
         "amine": {"bits": 512, "radius": 2},
         "alcohol": {"bits": 512, "radius": 2},
