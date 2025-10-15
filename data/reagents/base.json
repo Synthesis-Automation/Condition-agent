@@ -1124,6 +1124,44 @@
     "embedding_text": "type: BASE | family: Tertiary amines (aliphatic/cyclic) (tertiary_amines_aliphatic) | name: Sodium trimethylsilanolate | abbr: Sodium trimethylsilanolate | CAS: 18027-10-6 | strength_band: moderate | nucleophilicity: medium | steric: hindered | synonyms: Trimethylsilanol sodium salt; Silanol, 1,1,1-trimethyl-, sodium salt (1:1); Silanol, trimethyl, sodium salt; Silanol, 1,1,1trimethyl, sodium salt (1:1); sodium;trimethyl(oxido)silane; C3H9NaOSi; Sodium trimethyl silanolate; Silanol, trimethyl-, sodium salt; Sodium trimethylsilanolate"
   },
   {
+    "id": "JRHPOFJADXHYBR-HTQZYQBOSA-N",
+    "name": "trans-N,N'-dimethyl-1,2-cyclohexanediamine",
+    "abbreviation": [
+      "TMCD",
+      "CyDMEN"
+    ],
+    "aliases": [
+      "RefChem:393209",
+      "68737-65-5",
+      "(1r,2r)-n,n'-dimethyl-1,2-cyclohexanediamine",
+      "(1r,2r)-n1,n2-dimethylcyclohexane-1,2-diamine",
+      "trans-N1,N2-Dimethylcyclohexane-1,2-diamine",
+      "(1R,2R)-(-)-N,N'-Dimethylcyclohexane-1,2-diamine",
+      "trans-(1R,2R)-N,N'-Bismethyl-1,2-cyclohexanediamine",
+      "trans-N,N'-Dimethylcyclohexane-1,2-diamine",
+      "MFCD00671527",
+      "(1R,2R)-1-N,2-N-dimethylcyclohexane-1,2-diamine",
+      "trans-1,2-Bis(methylamino)cyclohexane",
+      "trans-(1R,2R)-N,N'-Bismethyl-1,2-cyclohexane diamine",
+      "(1R,2R)-N,N'-dimethylcyclohexane-1,2-diamine",
+      "(R,R)-(-)-N,N'-Dimethyl-1,2-cyclohexanediamine",
+      "N,N'-dimethyl-1,2-cyclohexanediamine"
+    ],
+    "cas": "67579-81-1",
+    "inchi_key": "JRHPOFJADXHYBR-HTQZYQBOSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "diamine"
+        ],
+        "basicity": "moderate",
+        "nucleophilicity": "moderate",
+        "sterics": "moderate"
+      }
+    },
+    "embedding_text": "type: BASE | family: tertiary_amines_aliphatic (tertiary_amines_aliphatic) | name: trans-N,N'-dimethyl-1,2-cyclohexanediamine | abbr: TMCD | CAS: 67579-81-1 | synonyms: trans-N,N'-dimethyl-1,2-cyclohexanediamine; 67579-81-1; RefChem:393209; 68737-65-5; (1r,2r)-n,n'-dimethyl-1,2-cyclohexanediamine; (1r,2r)-n1,n2-dimethylcyclohexane-1,2-diamine; trans-N1,N2-Dimethylcyclohexane-1,2-diamine; (1R,2R)-(-)-N,N'-Dimethylcyclohexane-1,2-diamine; trans-(1R,2R)-N,N'-Bismethyl-1,2-cyclohexanediamine; trans-N,N'-Dimethylcyclohexane-1,2-diamine; MFCD00671527; (1R,2R)-1-N,2-N-dimethylcyclohexane-1,2-diamine; trans-1,2-Bis(methylamino)cyclohexane; trans-(1R,2R)-N,N'-Bismethyl-1,2-cyclohexane diamine; (1R,2R)-N,N'-dimethylcyclohexane-1,2-diamine; (R,R)-(-)-N,N'-Dimethyl-1,2-cyclohexanediamine; N,N'-dimethyl-1,2-cyclohexanediamine"
+  },
+  {
     "id": "102-82-9",
     "name": "Tributylamine",
     "abbreviation": [],

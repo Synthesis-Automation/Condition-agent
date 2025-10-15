@@ -256,6 +256,39 @@
     "embedding_text": "type=preformed_metal_catalyst | name=[Ir(cod)Cl]2 + dtbbpy + HBpin/B2pin2 | abbr=Ir‑borylation (chloride) | family=Ir C–H Borylation Toolkits (ir-ch-borylation-toolkit) | metal=Ir | ox=1 | ligand_type=bipyridine | additional_ligand=not_needed | cas="
   },
   {
+    "id": "ZCNUFCYLERNPGN-UHFFFAOYSA-N",
+    "name": "[Ir(dFCF3ppy)2-(5,5trade mark-dCF3bpy)]PF6",
+    "abbreviation": [
+      "Ir(dFCF3ppy)2(dCF3bpy)PF6"
+    ],
+    "aliases": [
+      "C34H18F16IrN4P",
+      "SCHEMBL29877053",
+      "STB77562",
+      "YDD37572",
+      "EN300-1693988",
+      "2-(2,4-difluorobenzene-6-id-1-yl)-5-(trifluoromethyl)pyridine;iridium(3+);2-(2-pyridyl)pyridine;hexafluorophosphate",
+      "iridium(3+) bis(3,5-difluoro-2-[5-(trifluoromethyl)pyridin-2-yl]benzen-1-ide) bipyridyl hexafluorophosphate",
+      "iridium(3+) ion 2-(pyridin-2-yl)pyridine bis(3,5-difluoro-2-[5-(trifluoromethyl)pyridin-2-yl]benzen-1-ide) hexafluoro-lambda5-phosphanuide",
+      "[Ir(dFCF3ppy)2(5,5'-dCF3bpy)]PF6"
+    ],
+    "cas": "1973375-72-2",
+    "inchi_key": "ZCNUFCYLERNPGN-UHFFFAOYSA-N",
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ir_photoredox"
+        ],
+        "metal": "Ir",
+        "oxidation_states": [
+          3
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type: PREFORMED_METAL_CATALYST | family: ir_photoredox (ir_photoredox) | name: [Ir(dFCF3ppy)2-(5,5trade mark-dCF3bpy)]PF6 | abbr: Ir(dFCF3ppy)2(dCF3bpy)PF6 | CAS: 1973375-72-2 | synonyms: [Ir(dFCF3ppy)2-(5,5trade mark-dCF3bpy)]PF6; C34H18F16IrN4P; SCHEMBL29877053; STB77562; YDD37572; EN300-1693988; 2-(2,4-difluorobenzene-6-id-1-yl)-5-(trifluoromethyl)pyridine;iridium(3+);2-(2-pyridyl)pyridine;hexafluorophosphate; iridium(3+) bis(3,5-difluoro-2-[5-(trifluoromethyl)pyridin-2-yl]benzen-1-ide) bipyridyl hexafluorophosphate; iridium(3+) ion 2-(pyridin-2-yl)pyridine bis(3,5-difluoro-2-[5-(trifluoromethyl)pyridin-2-yl]benzen-1-ide) hexafluoro-lambda5-phosphanuide; [Ir(dFCF3ppy)2(5,5'-dCF3bpy)]PF6"
+  },
+  {
     "id": "ir-ome-cod-2-dtbbpy-b2pin2-standard",
     "name": "[Ir(OMe)(cod)]2 + dtbbpy + B2pin2 (standard)",
     "abbreviation": [

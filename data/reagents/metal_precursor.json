@@ -453,6 +453,44 @@
     "embedding_text": "member_embedding: type: CATALYST | family: Cu(II) Salts (cu_ii_salts) | metal: Cu | ox_states: 2 | name: Copper(II) acetate monohydrate | abbr: Cu(OAc)2·H2O | CAS: 6046-93-1"
   },
   {
+    "id": "KMOVDRADWUSGIH-UHFFFAOYSA-N",
+    "name": "Copper(II) acetylacetonate",
+    "abbreviation": [
+      "Cu(acac)2"
+    ],
+    "aliases": [
+      "Copper bis(acetylacetone)",
+      "Copper bis(acetylacetonate)",
+      "69QQY9TJ8M",
+      "Copper bis(2,4-pentanedionate)",
+      "DTXSID50904281",
+      "Copper, bis(2,4-pentanedionato)-",
+      "Copper, bis(2,4-pentanedionato-kappaO,kappaO')-, (SP-4-1)-",
+      "Cu(II) acetyl acetonate",
+      "RefChem:579109",
+      "DTXCID001839161",
+      "acetyl acetonate, copper (+2) salt",
+      "236-477-9",
+      "Bis(acetylacetonato)copper",
+      "Bis(acetylacetone)copper",
+      "Bis(acetylacetonato)copper(II)"
+    ],
+    "cas": "13395-16-9",
+    "inchi_key": "KMOVDRADWUSGIH-UHFFFAOYSA-N",
+    "roles": {
+      "metal_precursor": {
+        "families": [
+          "cu_ii_salts"
+        ],
+        "metal": "Cu",
+        "oxidation_states": [
+          2
+        ]
+      }
+    },
+    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper(II) acetylacetonate | abbr: Cu(acac)2 | CAS: 13395-16-9 | synonyms: Copper(II) acetylacetonate; Copper bis(acetylacetone); Copper bis(acetylacetonate); 69QQY9TJ8M; Copper bis(2,4-pentanedionate); DTXSID50904281; Copper, bis(2,4-pentanedionato)-; Copper, bis(2,4-pentanedionato-kappaO,kappaO')-, (SP-4-1)-; Cu(II) acetyl acetonate; RefChem:579109; DTXCID001839161; acetyl acetonate, copper (+2) salt; 236-477-9; 13395-16-9; Bis(acetylacetonato)copper; Bis(acetylacetone)copper; Bis(acetylacetonato)copper(II)"
+  },
+  {
     "id": "R_c427849c3ec6a6c8",
     "name": "Copper(II) trifluoromethanesulfonate",
     "abbreviation": [
