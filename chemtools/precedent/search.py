@@ -1,3 +1,4 @@
+#utf-8
 """k-NN precedent search and core-based reaction lookup.
 
 Main search functionality for finding similar reactions based on molecular
@@ -132,7 +133,7 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
     Main public API for precedent search. Uses cached implementation for performance.
     
     Args:
-        family: Reaction family name (e.g., "C_N_Coupling_Pd")
+        family: Reaction family name (e.g., "C_N_Coupling", "Suzuki")
         features: Query feature dict (bin, LG, nuc_class, etc.)
         k: Number of precedents to return (default: 50)
         relax: Optional relaxation/configuration dict with options:
@@ -147,10 +148,10 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
         
     Example:
         >>> # Get precedents with database filtering (default)
-        >>> pack = knn("C_N_Coupling_Pd", features={}, k=25)
+        >>> pack = knn("C_N_Coupling", features={}, k=25)
         >>> 
         >>> # Disable database filtering to get all precedents
-        >>> pack = knn("C_N_Coupling_Pd", features={}, k=25, 
+        >>> pack = knn("C_N_Coupling", features={}, k=25, 
         ...            relax={"filter_by_reagent_database": False})
     """
     relax_dict = dict(relax or {})

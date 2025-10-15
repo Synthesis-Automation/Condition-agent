@@ -1,0 +1,2050 @@
+{
+  "meta": {
+    "generated_at": "2025-10-15T06:23:50.682700Z",
+    "model": "Fusion-hybrid",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 8.75
+  },
+  "input": {
+    "reaction_smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc",
+    "family": "C_N_Coupling"
+  },
+  "detection": {
+    "family": "C_N_Coupling",
+    "detected_reaction_type": "C_N_Coupling",
+    "method": "fusion",
+    "confidence": 0.475
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Clc1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "DPPF",
+          "abbreviation": "DPPF",
+          "cas": "12150-46-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+          "abbreviation": "DBU",
+          "cas": "6674-22-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "2-Methyltetrahydrofuran",
+          "abbreviation": "MeTHF",
+          "cas": "96-47-9",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 1,
+        "core": "Ni/dtbbpy",
+        "base": {
+          "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+          "abbreviation": "DBU",
+          "cas": "6674-22-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "2-Methyltetrahydrofuran",
+          "abbreviation": "MeTHF",
+          "cas": "96-47-9",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 5,
+          "fraction_core": 1.0,
+          "reference_population": 5
+        },
+        "precedents": [
+          {
+            "reaction_id": "31-614-CAS-35851599",
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "yield_pct": null,
+            "core": "Ni/dtbbpy"
+          },
+          {
+            "reaction_id": "31-614-CAS-35851611",
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "yield_pct": null,
+            "core": "Ni/dtbbpy"
+          },
+          {
+            "reaction_id": "31-614-CAS-35851610",
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "yield_pct": null,
+            "core": "Ni/dtbbpy"
+          }
+        ]
+      },
+      "reaction": {
+        "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "6674-22-2",
+          "solvent_uid": "96-47-9"
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Clc1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "DPPF",
+          "abbreviation": "DPPF",
+          "cas": "12150-46-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "tert-Butanol",
+          "abbreviation": "t-BuOH",
+          "cas": "75-65-0",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 2,
+        "core": "Ni/dtbbpy",
+        "base": {
+          "name": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "tert-Butanol",
+          "abbreviation": "t-BuOH",
+          "cas": "75-65-0",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 3,
+          "fraction_core": 0.6,
+          "reference_population": 5
+        },
+        "precedents": []
+      },
+      "reaction": {
+        "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "584-08-7",
+          "solvent_uid": "75-65-0"
+        }
+      }
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Clc1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "DPPF",
+          "abbreviation": "DPPF",
+          "cas": "12150-46-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Sodium tert-butoxide",
+          "abbreviation": "NaOtBu",
+          "cas": "865-48-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Toluene",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 3,
+        "core": "Ni/dtbbpy",
+        "base": {
+          "name": "Sodium tert-butoxide",
+          "abbreviation": "NaOtBu",
+          "cas": "865-48-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        "solvent": {
+          "name": "Toluene",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 1,
+          "fraction_core": 0.2,
+          "reference_population": 5
+        },
+        "precedents": []
+      },
+      "reaction": {
+        "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "865-48-5",
+          "solvent_uid": "108-88-3"
+        }
+      }
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Clc1ccncc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null,
+          "role": "starting_material",
+          "abbreviation": null
+        },
+        {
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_precursor"
+        },
+        {
+          "name": "DPPF",
+          "abbreviation": "DPPF",
+          "cas": "12150-46-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Acetonitrile",
+          "abbreviation": "MeCN",
+          "cas": "75-05-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "summary": {
+        "rank": 4,
+        "core": "Ni/dtbbpy",
+        "base": null,
+        "solvent": {
+          "name": "Acetonitrile",
+          "abbreviation": "MeCN",
+          "cas": "75-05-8",
+          "smiles": null,
+          "equivalents": null,
+          "role": "solvent"
+        },
+        "confidence": 0.475,
+        "support": {
+          "count": 1,
+          "fraction_core": 0.2,
+          "reference_population": 5
+        },
+        "precedents": []
+      },
+      "reaction": {
+        "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+      },
+      "extras": {
+        "combo": {
+          "base_uid": "",
+          "solvent_uid": "75-05-8"
+        }
+      }
+    }
+  ],
+  "extras": {
+    "raw_response": {
+      "input": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc",
+      "family": "C_N_Coupling",
+      "features": {},
+      "bin": "proto_C_N_Coupling_39007",
+      "recommendation": {
+        "core": "Ni/dtbbpy",
+        "base_uid": "6674-22-2",
+        "solvent_uid": "96-47-9",
+        "T_C": null,
+        "time_h": null,
+        "confidence": 0.475
+      },
+      "alternatives": {
+        "cores": [
+          [
+            "Ni/dtbbpy",
+            5
+          ],
+          [
+            "Pd/XPhos",
+            3
+          ],
+          [
+            "Pd/DPPF",
+            1
+          ]
+        ],
+        "bases": [
+          [
+            "6674-22-2",
+            5
+          ]
+        ],
+        "solvents": [
+          [
+            "96-47-9",
+            5
+          ]
+        ]
+      },
+      "precedent_pack": {
+        "prototype_id": "proto_C_N_Coupling_39007",
+        "support": 18,
+        "precedents": [
+          {
+            "reaction_id": "31-614-CAS-41961539",
+            "reaction_smiles": "Nc1ccccc1.CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(Br)C=C1>>CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(NC2=CC=CC=C2)C=C1",
+            "reactants_smiles": "Nc1ccccc1.CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(Br)C=C1",
+            "products_smiles": "CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(NC2=CC=CC=C2)C=C1",
+            "condition_core": "Pd/DPPF",
+            "yield": 74.0,
+            "core": "Pd/DPPF",
+            "base_uid": "865-48-5",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Sodium tert-butoxide",
+                "cas": "865-48-5",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              }
+            ],
+            "reference": "Rhodium(III)-Catalyzed B(4)-Azo Coupling of o-Carboranes with Aryl Diazonium Tetrafluoroborates | Lee, Kyungsup; Yoon, Sugyeong; Noh, Hee Chan; Kim, Dongwook; Lee, Phil Ho | Organic Letters (2024), 26(39), 8410-8415",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 74.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+                "cas": "51364-51-3"
+              },
+              {
+                "name": "DPPF",
+                "cas": "12150-46-8"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-35851599",
+            "reaction_smiles": "COc1ccc(N)cc1.N#Cc1ccc(Cl)cc1>>COc1ccc(Nc2ccc(C#N)cc2)cc1",
+            "reactants_smiles": "COc1ccc(N)cc1.N#Cc1ccc(Cl)cc1",
+            "products_smiles": "COc1ccc(Nc2ccc(C#N)cc2)cc1",
+            "condition_core": "Ni/dtbbpy",
+            "yield": 99.0,
+            "core": "Ni/dtbbpy",
+            "base_uid": "6674-22-2",
+            "solvent_uid": "96-47-9",
+            "reagents": [
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "cas": "6674-22-2",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium iodide",
+                "cas": "7681-82-5",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "cas": "96-47-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 99.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                "cas": "1295-35-8"
+              },
+              {
+                "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                "cas": "72914-19-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-35851611",
+            "reaction_smiles": "Nc1ccccc1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(Nc2ccccc2)cc1",
+            "reactants_smiles": "Nc1ccccc1.COC(=O)c1ccc(Cl)cc1",
+            "products_smiles": "COC(=O)c1ccc(Nc2ccccc2)cc1",
+            "condition_core": "Ni/dtbbpy",
+            "yield": 78.0,
+            "core": "Ni/dtbbpy",
+            "base_uid": "6674-22-2",
+            "solvent_uid": "96-47-9",
+            "reagents": [
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "cas": "6674-22-2",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium iodide",
+                "cas": "7681-82-5",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "cas": "96-47-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 78.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                "cas": "1295-35-8"
+              },
+              {
+                "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                "cas": "72914-19-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-35851610",
+            "reaction_smiles": "Cc1cccc(N)c1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(Nc2cccc(C)c2)cc1",
+            "reactants_smiles": "Cc1cccc(N)c1.COC(=O)c1ccc(Cl)cc1",
+            "products_smiles": "COC(=O)c1ccc(Nc2cccc(C)c2)cc1",
+            "condition_core": "Ni/dtbbpy",
+            "yield": 87.0,
+            "core": "Ni/dtbbpy",
+            "base_uid": "6674-22-2",
+            "solvent_uid": "96-47-9",
+            "reagents": [
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "cas": "6674-22-2",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium iodide",
+                "cas": "7681-82-5",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "cas": "96-47-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 87.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                "cas": "1295-35-8"
+              },
+              {
+                "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                "cas": "72914-19-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-46425621",
+            "reaction_smiles": "Nc1ccc([N+](=O)[O-])cc1.Clc1ccccc1>>O=[N+]([O-])c1ccc(Nc2ccccc2)cc1",
+            "reactants_smiles": "Nc1ccc([N+](=O)[O-])cc1.Clc1ccccc1",
+            "products_smiles": "O=[N+]([O-])c1ccc(Nc2ccccc2)cc1",
+            "condition_core": "Pd/XPhos",
+            "yield": 73.0,
+            "core": "Pd/XPhos",
+            "base_uid": "584-08-7",
+            "solvent_uid": "75-65-0",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium hydrogen carbonate",
+                "cas": "144-55-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "tert-Butanol",
+                "cas": "75-65-0"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Potent inhibitors of the human RNA ligase Rlig1 highlights its role in RNA integrity maintenance under oxidative cellular stress | Schlor, Lisa A.; Peussner, Maya; Mueller, Silke; Marx, Andreas | Chemical Science (2025), 16(7), 3313-3322",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 73.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "XPhos",
+                "cas": "564483-18-7"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-42014635",
+            "reaction_smiles": "O=Cc1c(Cl)c2ccccc2oc1=O.Nc1ccncc1.CCO[PH](=O)OCC>>CCOP(OCC)(=[O]->[Zn+2]([Cl-])([Cl-])[Cl-])C(O)C1=C([N+]2=CC=C(N)C=C2)C2=CC=CC=C2OC1=O",
+            "reactants_smiles": "O=Cc1c(Cl)c2ccccc2oc1=O.Nc1ccncc1.CCO[PH](=O)OCC>>CCOP(OCC)(=[O]->[Zn+2]([Cl-])([Cl-])[Cl-])C(O)C1=C([N+]2=CC=C(N)C=C2)C2=CC=CC=C2OC1=O",
+            "products_smiles": "",
+            "condition_core": "Additive: ZnCl2",
+            "yield": 100.0,
+            "core": "Additive: ZnCl2",
+            "base_uid": null,
+            "solvent_uid": "75-05-8",
+            "reagents": [
+              {
+                "name": "Zinc chloride",
+                "cas": "7646-85-7",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Acetonitrile",
+                "cas": "75-05-8"
+              }
+            ],
+            "reference": "Synthesis of 6H-Chromeno[4,3-b]quinolin-7-ylphosphonates through Three Component Phosphonylation of Coumarin Carbaldehyde and Their Antimicrobial and Photophysical Properties | Ghashghaee, Mojtaba; Kaboudin, Babak; Kazemi, Foad; Hassan, Maryam; Fukaya, Haruhiko; Yanai, Hikaru | Journal of Organic Chemistry (2024), 89(11), 7662-7670",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 100.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-35851597",
+            "reaction_smiles": "FC(F)(F)c1ccc(Cl)cc1.COc1ccc(N)cc1>>COc1ccc(Nc2ccc(C(F)(F)F)cc2)cc1",
+            "reactants_smiles": "FC(F)(F)c1ccc(Cl)cc1.COc1ccc(N)cc1",
+            "products_smiles": "COc1ccc(Nc2ccc(C(F)(F)F)cc2)cc1",
+            "condition_core": "Ni/dtbbpy",
+            "yield": 90.0,
+            "core": "Ni/dtbbpy",
+            "base_uid": "6674-22-2",
+            "solvent_uid": "96-47-9",
+            "reagents": [
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "cas": "6674-22-2",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium iodide",
+                "cas": "7681-82-5",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "cas": "96-47-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 90.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                "cas": "1295-35-8"
+              },
+              {
+                "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                "cas": "72914-19-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-35851600",
+            "reaction_smiles": "COc1ccc(N)cc1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(Nc2ccc(OC)cc2)cc1",
+            "reactants_smiles": "COc1ccc(N)cc1.COC(=O)c1ccc(Cl)cc1",
+            "products_smiles": "COC(=O)c1ccc(Nc2ccc(OC)cc2)cc1",
+            "condition_core": "Ni/dtbbpy",
+            "yield": 93.0,
+            "core": "Ni/dtbbpy",
+            "base_uid": "6674-22-2",
+            "solvent_uid": "96-47-9",
+            "reagents": [
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "cas": "6674-22-2",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium iodide",
+                "cas": "7681-82-5",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "cas": "96-47-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 93.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                "cas": "1295-35-8"
+              },
+              {
+                "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                "cas": "72914-19-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-46425600",
+            "reaction_smiles": "FC(F)(F)c1ccc(Cl)cc1.Nc1ccc([N+](=O)[O-])cc1>>O=[N+]([O-])c1ccc(Nc2ccc(C(F)(F)F)cc2)cc1",
+            "reactants_smiles": "FC(F)(F)c1ccc(Cl)cc1.Nc1ccc([N+](=O)[O-])cc1",
+            "products_smiles": "O=[N+]([O-])c1ccc(Nc2ccc(C(F)(F)F)cc2)cc1",
+            "condition_core": "Pd/XPhos",
+            "yield": 83.0,
+            "core": "Pd/XPhos",
+            "base_uid": "584-08-7",
+            "solvent_uid": "75-65-0",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium hydrogen carbonate",
+                "cas": "144-55-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "tert-Butanol",
+                "cas": "75-65-0"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Potent inhibitors of the human RNA ligase Rlig1 highlights its role in RNA integrity maintenance under oxidative cellular stress | Schlor, Lisa A.; Peussner, Maya; Mueller, Silke; Marx, Andreas | Chemical Science (2025), 16(7), 3313-3322",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 83.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "XPhos",
+                "cas": "564483-18-7"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-46425618",
+            "reaction_smiles": "Nc1ccc([N+](=O)[O-])cc1.Cc1ccc(Cl)cc1>>Cc1ccc(Nc2ccc([N+](=O)[O-])cc2)cc1",
+            "reactants_smiles": "Nc1ccc([N+](=O)[O-])cc1.Cc1ccc(Cl)cc1",
+            "products_smiles": "Cc1ccc(Nc2ccc([N+](=O)[O-])cc2)cc1",
+            "condition_core": "Pd/XPhos",
+            "yield": 82.0,
+            "core": "Pd/XPhos",
+            "base_uid": "584-08-7",
+            "solvent_uid": "75-65-0",
+            "reagents": [
+              {
+                "name": "Potassium carbonate",
+                "cas": "584-08-7",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium hydrogen carbonate",
+                "cas": "144-55-8",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "tert-Butanol",
+                "cas": "75-65-0"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Potent inhibitors of the human RNA ligase Rlig1 highlights its role in RNA integrity maintenance under oxidative cellular stress | Schlor, Lisa A.; Peussner, Maya; Mueller, Silke; Marx, Andreas | Chemical Science (2025), 16(7), 3313-3322",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 82.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Palladium(II) acetate",
+                "cas": "3375-31-3"
+              },
+              {
+                "name": "XPhos",
+                "cas": "564483-18-7"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          }
+        ],
+        "timing": {
+          "load_data": 0.4384176731109619,
+          "build_candidates": 0.012350082397460938,
+          "drfp_query_encode": 0.008388996124267578,
+          "scoring": 0.8255231380462646,
+          "result_prep": 0.04433250427246094,
+          "total": 1.329012393951416
+        },
+        "drfp_load_strategy": {
+          "binary": 15967,
+          "jsonl": 0,
+          "computed": 0
+        },
+        "similarities": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      "reasons": {
+        "reasons": [
+          "Substrate bin: LG:?|NUC:?.",
+          "Core(s): Ni/dtbbpy (5), XPhos (3).",
+          "Common base(s): 1,8-Diazabicyclo[5.4.0]undec-7-ene (5), Potassium carbonate (3).",
+          "Common solvent(s): 2-Methyltetrahydrofuran (5), tert-Butanol (3).",
+          "Support: 18 precedent(s)."
+        ],
+        "precedents": [
+          {
+            "reaction_id": "31-614-CAS-41961539",
+            "reaction_smiles": "Nc1ccccc1.CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(Br)C=C1>>CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(NC2=CC=CC=C2)C=C1",
+            "reactants_smiles": "Nc1ccccc1.CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(Br)C=C1",
+            "products_smiles": "CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(NC2=CC=CC=C2)C=C1",
+            "condition_core": "Pd/DPPF",
+            "yield": 74.0,
+            "core": "Pd/DPPF",
+            "base_uid": "865-48-5",
+            "solvent_uid": "108-88-3",
+            "reagents": [
+              {
+                "name": "Sodium tert-butoxide",
+                "cas": "865-48-5",
+                "role": "BASE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "Toluene",
+                "cas": "108-88-3"
+              }
+            ],
+            "reference": "Rhodium(III)-Catalyzed B(4)-Azo Coupling of o-Carboranes with Aryl Diazonium Tetrafluoroborates | Lee, Kyungsup; Yoon, Sugyeong; Noh, Hee Chan; Kim, Dongwook; Lee, Phil Ho | Organic Letters (2024), 26(39), 8410-8415",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 74.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+                "cas": "51364-51-3"
+              },
+              {
+                "name": "DPPF",
+                "cas": "12150-46-8"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-35851599",
+            "reaction_smiles": "COc1ccc(N)cc1.N#Cc1ccc(Cl)cc1>>COc1ccc(Nc2ccc(C#N)cc2)cc1",
+            "reactants_smiles": "COc1ccc(N)cc1.N#Cc1ccc(Cl)cc1",
+            "products_smiles": "COc1ccc(Nc2ccc(C#N)cc2)cc1",
+            "condition_core": "Ni/dtbbpy",
+            "yield": 99.0,
+            "core": "Ni/dtbbpy",
+            "base_uid": "6674-22-2",
+            "solvent_uid": "96-47-9",
+            "reagents": [
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "cas": "6674-22-2",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium iodide",
+                "cas": "7681-82-5",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "cas": "96-47-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 99.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                "cas": "1295-35-8"
+              },
+              {
+                "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                "cas": "72914-19-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          },
+          {
+            "reaction_id": "31-614-CAS-35851611",
+            "reaction_smiles": "Nc1ccccc1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(Nc2ccccc2)cc1",
+            "reactants_smiles": "Nc1ccccc1.COC(=O)c1ccc(Cl)cc1",
+            "products_smiles": "COC(=O)c1ccc(Nc2ccccc2)cc1",
+            "condition_core": "Ni/dtbbpy",
+            "yield": 78.0,
+            "core": "Ni/dtbbpy",
+            "base_uid": "6674-22-2",
+            "solvent_uid": "96-47-9",
+            "reagents": [
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "cas": "6674-22-2",
+                "role": "BASE"
+              },
+              {
+                "name": "Sodium iodide",
+                "cas": "7681-82-5",
+                "role": "ADDITIVE"
+              }
+            ],
+            "solvents": [
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "cas": "96-47-9"
+              },
+              {
+                "name": "Water",
+                "cas": "7732-18-5"
+              }
+            ],
+            "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+            "conditions": {
+              "temperature_c": null,
+              "time_h": null,
+              "yield_pct": 78.0
+            },
+            "catalyst": {},
+            "full_system": null,
+            "catalytic_system": [
+              {
+                "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                "cas": "1295-35-8"
+              },
+              {
+                "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                "cas": "72914-19-3"
+              }
+            ],
+            "T_C": null,
+            "time_h": null
+          }
+        ]
+      },
+      "formatted": {
+        "meta": {
+          "status": "success",
+          "model": "drfp_similarity",
+          "version": "2.0"
+        },
+        "input": {
+          "reaction_smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc",
+          "family": "C_N_Coupling"
+        },
+        "detection": {
+          "family": "C_N_Coupling",
+          "confidence": 0.475
+        },
+        "recommended_conditions": [
+          {
+            "rank": 1,
+            "reaction": {
+              "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Clc1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Nc1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+                "abbreviation": "Pd2(dba)3",
+                "cas": "51364-51-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "DPPF",
+                "abbreviation": "DPPF",
+                "cas": "12150-46-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "abbreviation": "DBU",
+                "cas": "6674-22-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "2-Methyltetrahydrofuran",
+                "abbreviation": "MeTHF",
+                "cas": "96-47-9",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 1,
+              "core": "Ni/dtbbpy",
+              "base": {
+                "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                "abbreviation": "DBU",
+                "cas": "6674-22-2",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "2-Methyltetrahydrofuran",
+                "abbreviation": "MeTHF",
+                "cas": "96-47-9",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 5,
+                "fraction_core": 1.0,
+                "reference_population": 5
+              },
+              "precedents": [
+                {
+                  "reaction_id": "31-614-CAS-35851599",
+                  "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+                  "yield_pct": null,
+                  "core": "Ni/dtbbpy"
+                },
+                {
+                  "reaction_id": "31-614-CAS-35851611",
+                  "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+                  "yield_pct": null,
+                  "core": "Ni/dtbbpy"
+                },
+                {
+                  "reaction_id": "31-614-CAS-35851610",
+                  "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367",
+                  "yield_pct": null,
+                  "core": "Ni/dtbbpy"
+                }
+              ]
+            },
+            "combo": {
+              "base_uid": "6674-22-2",
+              "solvent_uid": "96-47-9"
+            }
+          },
+          {
+            "rank": 2,
+            "reaction": {
+              "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Clc1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Nc1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+                "abbreviation": "Pd2(dba)3",
+                "cas": "51364-51-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "DPPF",
+                "abbreviation": "DPPF",
+                "cas": "12150-46-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "tert-Butanol",
+                "abbreviation": "t-BuOH",
+                "cas": "75-65-0",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 2,
+              "core": "Ni/dtbbpy",
+              "base": {
+                "name": "Potassium carbonate",
+                "abbreviation": "K2CO3",
+                "cas": "584-08-7",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "tert-Butanol",
+                "abbreviation": "t-BuOH",
+                "cas": "75-65-0",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 3,
+                "fraction_core": 0.6,
+                "reference_population": 5
+              },
+              "precedents": []
+            },
+            "combo": {
+              "base_uid": "584-08-7",
+              "solvent_uid": "75-65-0"
+            }
+          },
+          {
+            "rank": 3,
+            "reaction": {
+              "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Clc1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Nc1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+                "abbreviation": "Pd2(dba)3",
+                "cas": "51364-51-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "DPPF",
+                "abbreviation": "DPPF",
+                "cas": "12150-46-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "Sodium tert-butoxide",
+                "abbreviation": "NaOtBu",
+                "cas": "865-48-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              {
+                "name": "Toluene",
+                "abbreviation": "PhMe",
+                "cas": "108-88-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 3,
+              "core": "Ni/dtbbpy",
+              "base": {
+                "name": "Sodium tert-butoxide",
+                "abbreviation": "NaOtBu",
+                "cas": "865-48-5",
+                "smiles": null,
+                "equivalents": null,
+                "role": "base"
+              },
+              "solvent": {
+                "name": "Toluene",
+                "abbreviation": "PhMe",
+                "cas": "108-88-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 1,
+                "fraction_core": 0.2,
+                "reference_population": 5
+              },
+              "precedents": []
+            },
+            "combo": {
+              "base_uid": "865-48-5",
+              "solvent_uid": "108-88-3"
+            }
+          },
+          {
+            "rank": 4,
+            "reaction": {
+              "smiles": "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc"
+            },
+            "chemicals": [
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Clc1ccncc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": null,
+                "cas": null,
+                "smiles": "Nc1ccccc1",
+                "equivalents": null,
+                "role": "starting_material"
+              },
+              {
+                "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+                "abbreviation": "Pd2(dba)3",
+                "cas": "51364-51-3",
+                "smiles": null,
+                "equivalents": null,
+                "role": "metal_precursor"
+              },
+              {
+                "name": "DPPF",
+                "abbreviation": "DPPF",
+                "cas": "12150-46-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "ligand"
+              },
+              {
+                "name": "Acetonitrile",
+                "abbreviation": "MeCN",
+                "cas": "75-05-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              }
+            ],
+            "conditions": {
+              "temperature": null,
+              "time": null,
+              "atmosphere": null
+            },
+            "summary": {
+              "rank": 4,
+              "core": "Ni/dtbbpy",
+              "base": null,
+              "solvent": {
+                "name": "Acetonitrile",
+                "abbreviation": "MeCN",
+                "cas": "75-05-8",
+                "smiles": null,
+                "equivalents": null,
+                "role": "solvent"
+              },
+              "confidence": 0.475,
+              "support": {
+                "count": 1,
+                "fraction_core": 0.2,
+                "reference_population": 5
+              },
+              "precedents": []
+            },
+            "combo": {
+              "base_uid": "",
+              "solvent_uid": "75-05-8"
+            }
+          }
+        ],
+        "precedent_summary": {
+          "total_precedents": 10,
+          "chosen_core": "Ni/dtbbpy",
+          "core_support": 5
+        },
+        "precedents_used": {
+          "total_count": 10,
+          "top_precedents": [
+            {
+              "rank": 1,
+              "reaction_id": "31-614-CAS-41961539",
+              "reaction_smiles": "Nc1ccccc1.CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(Br)C=C1>>CC1234[BH]567[BH]89%10[BH]5%11%12[BH]85%13[BH]98%14[BH]%1061[BH]821[CH]326[BH]%115([BH]%12724)B%13%1416/N=N/C1=CC=C(NC2=CC=CC=C2)C=C1",
+              "core": "Pd/DPPF",
+              "yield": 74.0,
+              "catalysts": [
+                {
+                  "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+                  "cas": "51364-51-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "DPPF",
+                  "cas": "12150-46-8",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Sodium tert-butoxide",
+                  "cas": "865-48-5",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Toluene",
+                  "cas": "108-88-3"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 74.0
+              },
+              "reference": "Rhodium(III)-Catalyzed B(4)-Azo Coupling of o-Carboranes with Aryl Diazonium Tetrafluoroborates | Lee, Kyungsup; Yoon, Sugyeong; Noh, Hee Chan; Kim, Dongwook; Lee, Phil Ho | Organic Letters (2024), 26(39), 8410-8415"
+            },
+            {
+              "rank": 2,
+              "reaction_id": "31-614-CAS-35851599",
+              "reaction_smiles": "COc1ccc(N)cc1.N#Cc1ccc(Cl)cc1>>COc1ccc(Nc2ccc(C#N)cc2)cc1",
+              "core": "Ni/dtbbpy",
+              "yield": 99.0,
+              "catalysts": [
+                {
+                  "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                  "cas": "1295-35-8",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                  "cas": "72914-19-3",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                  "cas": "6674-22-2",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium iodide",
+                  "cas": "7681-82-5",
+                  "role": "additive"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "2-Methyltetrahydrofuran",
+                  "cas": "96-47-9"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 99.0
+              },
+              "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367"
+            },
+            {
+              "rank": 3,
+              "reaction_id": "31-614-CAS-35851611",
+              "reaction_smiles": "Nc1ccccc1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(Nc2ccccc2)cc1",
+              "core": "Ni/dtbbpy",
+              "yield": 78.0,
+              "catalysts": [
+                {
+                  "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                  "cas": "1295-35-8",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                  "cas": "72914-19-3",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                  "cas": "6674-22-2",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium iodide",
+                  "cas": "7681-82-5",
+                  "role": "additive"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "2-Methyltetrahydrofuran",
+                  "cas": "96-47-9"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 78.0
+              },
+              "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367"
+            },
+            {
+              "rank": 4,
+              "reaction_id": "31-614-CAS-35851610",
+              "reaction_smiles": "Cc1cccc(N)c1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(Nc2cccc(C)c2)cc1",
+              "core": "Ni/dtbbpy",
+              "yield": 87.0,
+              "catalysts": [
+                {
+                  "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                  "cas": "1295-35-8",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                  "cas": "72914-19-3",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                  "cas": "6674-22-2",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium iodide",
+                  "cas": "7681-82-5",
+                  "role": "additive"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "2-Methyltetrahydrofuran",
+                  "cas": "96-47-9"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 87.0
+              },
+              "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367"
+            },
+            {
+              "rank": 5,
+              "reaction_id": "31-614-CAS-46425621",
+              "reaction_smiles": "Nc1ccc([N+](=O)[O-])cc1.Clc1ccccc1>>O=[N+]([O-])c1ccc(Nc2ccccc2)cc1",
+              "core": "Pd/XPhos",
+              "yield": 73.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "XPhos",
+                  "cas": "564483-18-7",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Potassium carbonate",
+                  "cas": "584-08-7",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium hydrogen carbonate",
+                  "cas": "144-55-8",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "tert-Butanol",
+                  "cas": "75-65-0"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 73.0
+              },
+              "reference": "Potent inhibitors of the human RNA ligase Rlig1 highlights its role in RNA integrity maintenance under oxidative cellular stress | Schlor, Lisa A.; Peussner, Maya; Mueller, Silke; Marx, Andreas | Chemical Science (2025), 16(7), 3313-3322"
+            },
+            {
+              "rank": 6,
+              "reaction_id": "31-614-CAS-42014635",
+              "reaction_smiles": "O=Cc1c(Cl)c2ccccc2oc1=O.Nc1ccncc1.CCO[PH](=O)OCC>>CCOP(OCC)(=[O]->[Zn+2]([Cl-])([Cl-])[Cl-])C(O)C1=C([N+]2=CC=C(N)C=C2)C2=CC=CC=C2OC1=O",
+              "core": "Additive: ZnCl2",
+              "yield": 100.0,
+              "reagents": [
+                {
+                  "name": "Zinc chloride",
+                  "cas": "7646-85-7",
+                  "role": "additive"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "Acetonitrile",
+                  "cas": "75-05-8"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 100.0
+              },
+              "reference": "Synthesis of 6H-Chromeno[4,3-b]quinolin-7-ylphosphonates through Three Component Phosphonylation of Coumarin Carbaldehyde and Their Antimicrobial and Photophysical Properties | Ghashghaee, Mojtaba; Kaboudin, Babak; Kazemi, Foad; Hassan, Maryam; Fukaya, Haruhiko; Yanai, Hikaru | Journal of Organic Chemistry (2024), 89(11), 7662-7670"
+            },
+            {
+              "rank": 7,
+              "reaction_id": "31-614-CAS-35851597",
+              "reaction_smiles": "FC(F)(F)c1ccc(Cl)cc1.COc1ccc(N)cc1>>COc1ccc(Nc2ccc(C(F)(F)F)cc2)cc1",
+              "core": "Ni/dtbbpy",
+              "yield": 90.0,
+              "catalysts": [
+                {
+                  "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                  "cas": "1295-35-8",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                  "cas": "72914-19-3",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                  "cas": "6674-22-2",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium iodide",
+                  "cas": "7681-82-5",
+                  "role": "additive"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "2-Methyltetrahydrofuran",
+                  "cas": "96-47-9"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 90.0
+              },
+              "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367"
+            },
+            {
+              "rank": 8,
+              "reaction_id": "31-614-CAS-35851600",
+              "reaction_smiles": "COc1ccc(N)cc1.COC(=O)c1ccc(Cl)cc1>>COC(=O)c1ccc(Nc2ccc(OC)cc2)cc1",
+              "core": "Ni/dtbbpy",
+              "yield": 93.0,
+              "catalysts": [
+                {
+                  "name": "Bis(1,5-cyclooctadiene)nickel(0)",
+                  "cas": "1295-35-8",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "4,4'-di-tert-Butyl-2,2'-bipyridine",
+                  "cas": "72914-19-3",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "1,8-Diazabicyclo[5.4.0]undec-7-ene",
+                  "cas": "6674-22-2",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium iodide",
+                  "cas": "7681-82-5",
+                  "role": "additive"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "2-Methyltetrahydrofuran",
+                  "cas": "96-47-9"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 93.0
+              },
+              "reference": "Sodium-iodide-promoted nickel-catalyzed C-N cross-coupling of aryl chlorides and N-nucleophiles under visible-light irradiation | Feng, Yunhui; Luo, Hang; Yu, Fangnian; Liao, Qian; Lin, Luqing | Green Chemistry (2023), 25(6), 2361-2367"
+            },
+            {
+              "rank": 9,
+              "reaction_id": "31-614-CAS-46425600",
+              "reaction_smiles": "FC(F)(F)c1ccc(Cl)cc1.Nc1ccc([N+](=O)[O-])cc1>>O=[N+]([O-])c1ccc(Nc2ccc(C(F)(F)F)cc2)cc1",
+              "core": "Pd/XPhos",
+              "yield": 83.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "XPhos",
+                  "cas": "564483-18-7",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Potassium carbonate",
+                  "cas": "584-08-7",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium hydrogen carbonate",
+                  "cas": "144-55-8",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "tert-Butanol",
+                  "cas": "75-65-0"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 83.0
+              },
+              "reference": "Potent inhibitors of the human RNA ligase Rlig1 highlights its role in RNA integrity maintenance under oxidative cellular stress | Schlor, Lisa A.; Peussner, Maya; Mueller, Silke; Marx, Andreas | Chemical Science (2025), 16(7), 3313-3322"
+            },
+            {
+              "rank": 10,
+              "reaction_id": "31-614-CAS-46425618",
+              "reaction_smiles": "Nc1ccc([N+](=O)[O-])cc1.Cc1ccc(Cl)cc1>>Cc1ccc(Nc2ccc([N+](=O)[O-])cc2)cc1",
+              "core": "Pd/XPhos",
+              "yield": 82.0,
+              "catalysts": [
+                {
+                  "name": "Palladium(II) acetate",
+                  "cas": "3375-31-3",
+                  "role": "catalyst/ligand"
+                },
+                {
+                  "name": "XPhos",
+                  "cas": "564483-18-7",
+                  "role": "catalyst/ligand"
+                }
+              ],
+              "reagents": [
+                {
+                  "name": "Potassium carbonate",
+                  "cas": "584-08-7",
+                  "role": "base"
+                },
+                {
+                  "name": "Sodium hydrogen carbonate",
+                  "cas": "144-55-8",
+                  "role": "base"
+                }
+              ],
+              "solvents": [
+                {
+                  "name": "tert-Butanol",
+                  "cas": "75-65-0"
+                },
+                {
+                  "name": "Water",
+                  "cas": "7732-18-5"
+                }
+              ],
+              "conditions": {
+                "temperature_C": null,
+                "time_h": null,
+                "yield_pct": 82.0
+              },
+              "reference": "Potent inhibitors of the human RNA ligase Rlig1 highlights its role in RNA integrity maintenance under oxidative cellular stress | Schlor, Lisa A.; Peussner, Maya; Mueller, Silke; Marx, Andreas | Chemical Science (2025), 16(7), 3313-3322"
+            }
+          ],
+          "core_matched_precedents": {
+            "core": "Ni/dtbbpy",
+            "count": 5,
+            "examples": [
+              {
+                "rank": 1,
+                "reaction_id": "31-614-CAS-35851599",
+                "core": "Ni/dtbbpy",
+                "base": "6674-22-2",
+                "solvent": "96-47-9",
+                "yield": 99.0
+              },
+              {
+                "rank": 2,
+                "reaction_id": "31-614-CAS-35851611",
+                "core": "Ni/dtbbpy",
+                "base": "6674-22-2",
+                "solvent": "96-47-9",
+                "yield": 78.0
+              },
+              {
+                "rank": 3,
+                "reaction_id": "31-614-CAS-35851610",
+                "core": "Ni/dtbbpy",
+                "base": "6674-22-2",
+                "solvent": "96-47-9",
+                "yield": 87.0
+              },
+              {
+                "rank": 4,
+                "reaction_id": "31-614-CAS-35851597",
+                "core": "Ni/dtbbpy",
+                "base": "6674-22-2",
+                "solvent": "96-47-9",
+                "yield": 90.0
+              },
+              {
+                "rank": 5,
+                "reaction_id": "31-614-CAS-35851600",
+                "core": "Ni/dtbbpy",
+                "base": "6674-22-2",
+                "solvent": "96-47-9",
+                "yield": 93.0
+              }
+            ]
+          },
+          "statistics": {
+            "average_yield": 85.9,
+            "yield_range": [
+              73.0,
+              100.0
+            ],
+            "temperature_range": null,
+            "time_range": null
+          }
+        }
+      },
+      "detection": {
+        "auto_family": null,
+        "rule_family": "C_N_Coupling",
+        "source": "auto"
+      },
+      "constraint_filters": {
+        "base": {
+          "allowed": [
+            "6674-22-2"
+          ],
+          "blocked": []
+        },
+        "solvent": {
+          "allowed": [
+            "96-47-9"
+          ],
+          "blocked": []
+        }
+      },
+      "_deprecated": {
+        "message": "Fusion is deprecated. Use rerank_strategy=\"rule\" instead.",
+        "migration": "Use --rerank rule instead of --strategy fusion"
+      }
+    }
+  }
+}

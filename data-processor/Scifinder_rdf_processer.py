@@ -1,3 +1,4 @@
+#utf-8
 #!/usr/bin/env python3
 """
 Simple Qt6 GUI wrapper for processing RDF files only.
@@ -922,15 +923,29 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         
                         # Map common SciFinder reaction type names
                         scifinder_map = {
-                            # C-N Coupling variations
-                            "buchwald": "C_N_Coupling_Pd",
-                            "buchwald-hartwig": "C_N_Coupling_Pd",
-                            "buchwald c-n": "C_N_Coupling_Pd",
-                            "buchwald_cn": "C_N_Coupling_Pd",
-                            "ullmann": "C_N_Coupling_Cu",
-                            "ullmann c-n": "C_N_Coupling_Cu",
-                            "ullmann_cn": "C_N_Coupling_Cu",
-                            "goldberg": "C_N_Coupling_Cu",
+                            # C-N Coupling variations (unified dataset)
+                            "buchwald": "C_N_Coupling",
+                            "buchwald-hartwig": "C_N_Coupling",
+                            "buchwald c-n": "C_N_Coupling",
+                            "buchwald_cn": "C_N_Coupling",
+                            "ullmann": "C_N_Coupling",
+                            "ullmann c-n": "C_N_Coupling",
+                            "ullmann_cn": "C_N_Coupling",
+                            "goldberg": "C_N_Coupling",
+                            "c-n coupling": "C_N_Coupling",
+                            "c-n cross-coupling": "C_N_Coupling",
+                            # C-O Coupling variations
+                            "c-o coupling": "C_O_Coupling",
+                            "c-o cross-coupling": "C_O_Coupling",
+                            "ullmann c-o": "C_O_Coupling",
+                            "ullmann_co": "C_O_Coupling",
+                            "ullmann ether": "C_O_Coupling",
+                            # C-S Coupling variations
+                            "c-s coupling": "C_S_Coupling",
+                            "c-s cross-coupling": "C_S_Coupling",
+                            "ullmann c-s": "C_S_Coupling",
+                            "ullmann_cs": "C_S_Coupling",
+                            "ullmann thioether": "C_S_Coupling",
                             # Suzuki
                             "suzuki": "Suzuki_CC",
                             "suzuki-miyaura": "Suzuki_CC",
@@ -2367,7 +2382,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             
-            # Use parent_dir only (e.g., "Suzuki", "C_N_Coupling_Cu") as filename
+            # Use parent_dir only (e.g., "Suzuki", "C_N_Coupling", "C_O_Coupling") as filename
             final_name = _safe(parent_dir) or "dataset"
             output_jsonl = os.path.join(dataset_dir, final_name + ".jsonl")
             

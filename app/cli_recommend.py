@@ -74,7 +74,7 @@ RECOMMENDATION_REQUEST_SCHEMA = {
         },
         "reaction_type": {
             "type": ["string", "null"],
-            "description": "Detected or specified reaction type (e.g., Suzuki, Buchwald, Ullmann, C_N_Coupling)"
+            "description": "Detected or specified reaction type (e.g., Suzuki, C_N_Coupling, C_O_Coupling, C_S_Coupling)"
         },
         "constraints": {
             "type": "object",
@@ -248,11 +248,12 @@ Return ONLY a valid JSON object (no markdown) matching the same schema as before
 # ============================================================================
 
 def determine_final_reaction_type(reaction_smiles: str, initial_type: Optional[str], constraints: dict[str, Any]) -> dict[str, Any]:
-    """Determine final reaction type considering constraints, especially metal catalysts.
+    """Determine final reaction type considering constraints.
     
     This routes to the appropriate recommendation system:
-    - C_N_Coupling with Cu catalyst -> C_N_Coupling_Cu (Ullmann, rule-based)
-    - C_N_Coupling with Pd catalyst -> C_N_Coupling_Pd (Buchwald, ML-based)
+    - C_N_Coupling -> Unified dataset (metal preference via constraints)
+    - C_O_Coupling -> C-O coupling dataset
+    - C_S_Coupling -> C-S coupling dataset
     - Other reactions -> Use detected or provided type
     
     Returns dict with: final_type, detection_info, routing
@@ -273,58 +274,9 @@ def determine_final_reaction_type(reaction_smiles: str, initial_type: Optional[s
     detected_family = detection.get("family", "Unknown")
     confidence = detection.get("confidence", 0.0)
     
-    # Check for metal catalyst preferences in constraints
-    metal_pref = constraints.get("metal_preference")
-    required_reagents = constraints.get("required_reagents", [])
-    
-    # Determine metal from constraints
-    detected_metal = None
-    if metal_pref and metal_pref != "any":
-        detected_metal = metal_pref
-    else:
-        # Check required_reagents for metal mentions
-        reagent_text = " ".join(str(r).lower() for r in required_reagents)
-        if "copper" in reagent_text or "cu" in reagent_text:
-            detected_metal = "Cu"
-        elif "palladium" in reagent_text or "pd" in reagent_text:
-            detected_metal = "Pd"
-        elif "nickel" in reagent_text or "ni" in reagent_text:
-            detected_metal = "Ni"
-    
     # Start with detected or user-provided type
     final_type = initial_type or detected_family
-    
-    # Apply metal-specific routing for C-N coupling reactions
-    is_cn_coupling = any([
-        "C_N" in str(final_type).upper(),
-        "CN" in str(final_type).upper().replace("_", ""),
-        detected_family in ["Ullmann_CN", "Buchwald_CN"],
-        "ullmann" in str(final_type).lower(),
-        "buchwald" in str(final_type).lower(),
-    ])
-    
     routing = "auto-detected"
-    
-    if is_cn_coupling:
-        if detected_metal == "Cu":
-            final_type = "C_N_Coupling_Cu"
-            routing = "metal-specific: Ullmann (rule-based)"
-        elif detected_metal == "Pd":
-            final_type = "C_N_Coupling_Pd"
-            routing = "metal-specific: Buchwald (ML-based)"
-        elif detected_metal == "Ni":
-            final_type = "C_N_Coupling_Ni"
-            routing = "metal-specific: Nickel (ML-based)"
-        elif detected_family == "Ullmann_CN":
-            final_type = "C_N_Coupling_Cu"
-            routing = "detected: Ullmann (rule-based)"
-        elif detected_family == "Buchwald_CN":
-            final_type = "C_N_Coupling_Pd"
-            routing = "detected: Buchwald (ML-based)"
-        else:
-            # Generic C-N coupling without specific metal
-            final_type = detected_family or "C_N_Coupling"
-            routing = "generic C-N coupling"
     
     # Normalize to canonical family name
     try:
@@ -337,7 +289,6 @@ def determine_final_reaction_type(reaction_smiles: str, initial_type: Optional[s
         "initial_type": initial_type,
         "detected_family": detected_family,
         "confidence": confidence,
-        "detected_metal": detected_metal,
         "routing": routing,
         "detection_info": detection,
     }

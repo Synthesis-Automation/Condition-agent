@@ -6,10 +6,10 @@
   },
   "input": {
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
-    "family": "C_N_Coupling_Cu"
+    "family": "C_N_Coupling"
   },
   "detection": {
-    "family": "C_N_Coupling_Cu",
+    "family": "C_N_Coupling",
     "confidence": 0.95
   },
   "recommended_conditions": [

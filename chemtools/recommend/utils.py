@@ -17,14 +17,25 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "Suzuki_CC": "Suzuki",
     "Suzuki_Coupling": "Suzuki",
     "Suzuki": "Suzuki",
-    # C-N Coupling variants -> canonical dataset names
-    "Ullmann C?N": "C_N_Coupling_Cu",
-    "Ullmann_CN": "C_N_Coupling_Cu",
-    "Buchwald C?N": "C_N_Coupling_Pd",
-    "Buchwald_CN": "C_N_Coupling_Pd",
-    "C_N_Coupling_Cu_Ullmann": "C_N_Coupling_Cu",
-    "C_N_Coupling_Pd_Buchwald": "C_N_Coupling_Pd",
-    "C_N_Coupling_Ni": "C_N_Coupling_Ni",
+    # C-N Coupling variants -> unified canonical dataset name
+    "Ullmann C?N": "C_N_Coupling",
+    "Ullmann_CN": "C_N_Coupling",
+    "Buchwald C?N": "C_N_Coupling",
+    "Buchwald_CN": "C_N_Coupling",
+    "C_N_Coupling_Cu": "C_N_Coupling",  # Legacy copper-specific
+    "C_N_Coupling_Pd": "C_N_Coupling",  # Legacy palladium-specific
+    "C_N_Coupling_Ni": "C_N_Coupling",  # Legacy nickel-specific
+    "C_N_Coupling_Cu_Ullmann": "C_N_Coupling",
+    "C_N_Coupling_Pd_Buchwald": "C_N_Coupling",
+    "C_N_Coupling": "C_N_Coupling",
+    # C-O Coupling variants -> canonical dataset name
+    "C_O_Coupling": "C_O_Coupling",
+    "Ullmann_CO": "C_O_Coupling",
+    "Ullmann C?O": "C_O_Coupling",
+    # C-S Coupling variants -> canonical dataset name
+    "C_S_Coupling": "C_S_Coupling",
+    "Ullmann_CS": "C_S_Coupling",
+    "Ullmann C?S": "C_S_Coupling",
     # Amide variants -> canonical dataset name
     "Amide_Coupling": "Amide_formation",
     "Amide_formation": "Amide_formation",

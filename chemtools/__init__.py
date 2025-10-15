@@ -11,7 +11,7 @@ Primary Interface:
     result = chem.smiles.normalize("CCO")
     
     # Precedent search
-    precedents = chem.precedent.knn("C_N_Coupling_Pd", features={...}, k=5)
+    precedents = chem.precedent.knn("C_N_Coupling", features={...}, k=5)
     
     # ML recommendations
     recommendations = chem.recommend.conditions(reaction="...", k=5)
@@ -21,7 +21,7 @@ Custom Instances:
     
     # For API servers - preload everything
     api_chem = ChemTools(
-        datasets=["C_N_Coupling_Pd"],
+        datasets=["C_N_Coupling"],
         preload=True
     )
     
