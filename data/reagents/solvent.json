@@ -75,6 +75,35 @@
     "embedding_text": "type: SOLVENT | family: Cyclic/oligoether ethers (ethers_cyclic_glymes) | name: 1,2-Dimethoxyethane | abbr: DME | CAS: 110-71-4 | proticity: aprotic | polarity: medium | coordination: moderate | synonyms: Glyme; 12Dimethoxyethane"
   },
   {
+    "id": "CYSGHNMQYZDMIA-UHFFFAOYSA-N",
+    "name": "1,3-Dimethyl-2-imidazolidinone",
+    "abbreviation": [
+      "DMI"
+    ],
+    "aliases": [
+      "Dimethyl imidazolidinone",
+      "2-IMIDAZOLIDINONE, 1,3-DIMETHYL-",
+      "1,3-Dimethylimidazolidin-2-one",
+      "N,N'-Dimethylethyleneurea",
+      "1,3-Dimethylimidazolidone",
+      "DMEU",
+      "N,N'-Dimethylimidazolidinone"
+    ],
+    "cas": "80-73-9",
+    "inchi_key": "CYSGHNMQYZDMIA-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "amides_dipolar_aprotic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: amides_dipolar_aprotic (amides_dipolar_aprotic) | proticity: aprotic | name: 1,3-Dimethyl-2-imidazolidinone | abbr: DMI | CAS: 80-73-9 | synonyms: 1,3-Dimethyl-2-imidazolidinone; 80-73-9; Dimethyl imidazolidinone; Rhonite 1; 2-IMIDAZOLIDINONE, 1,3-DIMETHYL-; 5C1YQQ9M90; DTXSID1073153; NIKKOL DMI; RefChem:72710; DTXCID2048169; 201-304-8; 1,3-Dimethylimidazolidin-2-one; N,N'-Dimethylethyleneurea; 1,3-Dimethylimidazolidone; DMEU; N,N'-Dimethylimidazolidinone"
+  },
+  {
     "id": "cas-123-91-1",
     "name": "1,4-Dioxane",
     "abbreviation": [],
