@@ -159,7 +159,7 @@ Total reactions: 8117
 - Yield %: 73
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Oc1ccc(S)cc1.CC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=C5(OC6=CC=C(SC78=[CH]9[CH]%10=C%11(C)[CH]%12=[CH]7[Fe+2]%12%109%1187%13%14%15<-[CH-]8[CH]7=[CH]%13[CH]%14=[CH]8%15)C=C6)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Oc1ccc(S)cc1.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(OC1=CC=C(S[C]34->[Fe+2]5678%11%12%13%14(<-[CH]%15=[CH]->5[CH-]->6[CH]->7=[CH]->8%15)<-[CH](=[CH]->%113)[C]->%12(C)=[CH]->%13[CH]->%14=4)C=C1)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-013-CAS-13487361
 
@@ -234,7 +234,7 @@ Total reactions: 8117
 - Yield %: 80
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: Cc1ccc(S)cc1.ClC12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=CC=C(SC23=[CH]4[CH]5=[CH]6[CH]7=C2(SC2=CC=C(C)C=C2)[Fe+2]56473289%10<-[CH-]3[CH]2=[CH]8[CH]9=[CH]3%10)C=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Cc1ccc(S)cc1.Cl[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=[C]->51Cl)[CH]->6=2)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=CC=C(S[C]23->[Fe+2]456789%10%11(<-[CH](=[CH]->4[CH]->5=[C]->62SC2=CC=C(C)C=C2)[CH]->7=3)<-[CH]2=[CH]->8[CH-]->9[CH]->%10=[CH]->%112)C=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-026-CAS-10296404
 
@@ -243,7 +243,7 @@ Total reactions: 8117
 - Yield %: 85
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCCCS.CC12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=[CH]5[CH]6=C1(SCCCCCCSC17=[CH]8[CH]9=[CH]%10[CH]%11=C1(C)[Fe+2]%109%11871%12%13%14<-[CH-]7[CH]1=[CH]%12[CH]%13=[CH]7%14)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCCCS.C[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=[C]->51Cl)[CH]->6=2)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->7[cH]->8[c]->91SCCCCCCS[c]13->[Fe+2]456789%11%12(<-[cH]%13[cH]->4[cH]->5[cH-]->6[cH]->7%13)<-[cH]([cH]->8[cH]->91)[cH]->%11[c]->%123C)[cH]->%102
 
 ## Reaction 31-026-CAS-11100259
 
@@ -261,7 +261,7 @@ Total reactions: 8117
 - Yield %: 72
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCCCS.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(Cl)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=[CH]5C6(C)=C1(SCCCCCCSC17=C8(C)[CH]9=[CH]%10[CH]%11=C1(C)[Fe+2]%109%11871%12%13%14<-[CH-]7[CH]1=[CH]%12[CH]%13=[CH]7%14)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91Cl)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[cH]->8[c]->9(C)[c]->%102SCCCCCCS[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->7[c]->81C)[cH]->9[c]->%102C
 
 ## Reaction 31-026-CAS-13275976
 
@@ -270,7 +270,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.COC12=C3(F)C4(C)=[CH]5[CH]6=[CH]1[Cr]65423(C#O)(C#O)C#O>>COC12=C3(SCC4=CC=CC=C4)C4(C)=[CH]5[CH]6=[CH]1[Cr]65423(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C)[C]->6=2F>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C)[C]->6=2SCC1=CC=CC=C1
 
 ## Reaction 31-026-CAS-1361715
 
@@ -279,7 +279,7 @@ Total reactions: 8117
 - Yield %: 87
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9)
-- SMILES: Sc1ccccc1.ClC12=[CH]3[CH]4=C5(SCCCCSC67=[CH]8[CH]9=C%10(Cl)[CH]%11=[CH]6[Fe+2]%1198%1076%12%13%14<-[CH-]7[CH]6=[CH]%12[CH]%13=[CH]7%14)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29>>C1=CC=C(SC23=[CH]4[CH]5=C6(SCCCCSC78=[CH]9[CH]%10=C%11(SC%12=CC=CC=C%12)[CH]%12=[CH]7[Fe+2]%129%108%117%13%14%15<-[CH-]8[CH]7=[CH]%13[CH]%14=[CH]8%15)[CH]7=[CH]2[Fe+2]75463289%10<-[CH-]3[CH]2=[CH]8[CH]9=[CH]3%10)C=C1
+- SMILES: Sc1ccccc1.Cl[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]1[cH]->7[c]->8(SCCCCS[c]13->[Fe+2]45678%11%12%13(<-[cH]%14[cH]->4[cH]->5[cH-]->6[cH]->7%14)<-[cH]([cH]->81)[c]->%11(Cl)[cH]->%12[cH]->%133)[cH]->9[cH]->%102>>c1ccc(S[c]23->[Fe+2]456789%10%11(<-[cH]%12[cH]->4[cH]->5[cH-]->6[cH]->7%12)<-[cH]([cH]->82)[c]->9(SCCCCS[c]24->[Fe+2]56789%12%13%14(<-[cH]%15[cH]->5[cH]->6[cH-]->7[cH]->8%15)<-[cH]2[cH]->9[c]->%12(Sc2ccccc2)[cH]->%13[cH]->%144)[cH]->%10[cH]->%113)cc1
 
 ## Reaction 31-026-CAS-13684827
 
@@ -288,7 +288,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Sc1ccc(S)cc1.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(Cl)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=[CH]5C6(C)=C1(SC1=CC=C(SC78=C9(C)[CH]%10=[CH]%11[CH]%12=C7(C)[Fe+2]%11%10%12987%13%14%15<-[CH-]8[CH]7=[CH]%13[CH]%14=[CH]8%15)C=C1)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Sc1ccc(S)cc1.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91Cl)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91SC1=CC=C(S[C]34->[Fe+2]56789%11%12%13(<-[CH]%14=[CH]->5[CH-]->6[CH]->7=[CH]->8%14)<-[CH](=[CH]->9[C]->%11=3C)[CH]->%12=[C]->%134C)C=C1)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-026-CAS-14134497
 
@@ -297,7 +297,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Tetrabutylammonium fluoride (anhydrous) (429-41-4) [ADDITIVE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.[Na].COC12=[CH]3[CH]4=C5(C)C6(F)=C1([Si](C)(C)C)[Cr]43526(C#O)(C#O)C#O>>COC12=[CH]3[CH]4=C5(C)C6(SCC7=CC=CC=C7)=[CH]1[Cr]34256(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.[Na].CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[C]->3(C)[C]->4(F)=[C]->51[Si](C)(C)C)[CH]->6=2>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]=1[CH]->3=[C]->4(C)[C]->5(SCC1=CC=CC=C1)=[CH]->62
 
 ## Reaction 31-026-CAS-14719097
 
@@ -306,7 +306,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5), Tetrahydrofuran (109-99-9)
-- SMILES: Cc1ccccc1S.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(Cl)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=C(SC23=C4(C)[CH]5=[CH]6[CH]7=C2(C)[Fe+2]65743289%10<-[CH-]3[CH]2=[CH]8[CH]9=[CH]3%10)C=CC=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Cc1ccccc1S.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91Cl)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=C(S[C]23->[Fe+2]456789%10%11(<-[CH]%12=[CH]->4[CH-]->5[CH]->6=[CH]->7%12)<-[CH](=[CH]->8[C]->9=2C)[CH]->%10=[C]->%113C)C=CC=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-026-CAS-15406795
 
@@ -315,13 +315,13 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.COC12=[CH]3[CH]4=C5(C)C6(F)=C1([Si](C)(C)C)[Cr]43526(C#O)(C#O)C#O>>COC12=[CH]3[CH]4=C5(C)C6(SCC7=CC=CC=C7)=[CH]1[Cr]34256(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[C]->3(C)[C]->4(F)=[C]->51[Si](C)(C)C)[CH]->6=2>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]=1[CH]->3=[C]->4(C)[C]->5(SCC1=CC=CC=C1)=[CH]->62
 
 ## Reaction 31-026-CAS-1698171
 
 - Type: C_S_Coupling
 - Yield %: 79
-- SMILES: Sc1ccccc1.CCN(CC)C(=O)C12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]546321789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CCN(CC)C(=O)C12=[CH]3[CH]4=[CH]5[CH]6=C1(SC1=CC=CC=C1)[Fe+2]546321789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Sc1ccccc1.CCN(CC)C(=O)[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=1)[CH]->5=[C]->62Cl)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CCN(CC)C(=O)[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=1)[CH]->5=[C]->62SC1=CC=CC=C1)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-026-CAS-23302459
 
@@ -357,7 +357,7 @@ Total reactions: 8117
 - Yield %: 77
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Sc1ccccc1S.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(Cl)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=[CH]5C6(C)=C1(SC1=C(SC78=C9(C)[CH]%10=[CH]%11[CH]%12=C7(C)[Fe+2]%11%10%12987%13%14%15<-[CH-]8[CH]7=[CH]%13[CH]%14=[CH]8%15)C=CC=C1)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Sc1ccccc1S.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91Cl)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91SC1=C(S[C]34->[Fe+2]56789%11%12%13(<-[CH]%14=[CH]->5[CH-]->6[CH]->7=[CH]->8%14)<-[CH](=[CH]->9[C]->%11=3C)[CH]->%12=[C]->%134C)C=CC=C1)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-026-CAS-261233
 
@@ -366,7 +366,7 @@ Total reactions: 8117
 - Yield %: 90
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Sc1cccc(S)c1.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(Cl)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=[CH]5C6(C)=C1(SC1=CC=CC(SC78=C9(C)[CH]%10=[CH]%11[CH]%12=C7(C)[Fe+2]%11%10%12987%13%14%15<-[CH-]8[CH]7=[CH]%13[CH]%14=[CH]8%15)=C1)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Sc1cccc(S)c1.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91Cl)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91SC1=CC=CC(S[C]34->[Fe+2]56789%11%12%13(<-[CH]%14=[CH]->5[CH-]->6[CH]->7=[CH]->8%14)<-[CH](=[CH]->9[C]->%11=3C)[CH]->%12=[C]->%134C)=C1)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-026-CAS-2626947
 
@@ -375,7 +375,7 @@ Total reactions: 8117
 - Yield %: 90
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.COC12=C3(F)[CH]4=[CH]5[CH]6=[CH]1[Cr]56432(C#O)(C#O)C#O>>COC12=C3(SCC4=CC=CC=C4)[CH]4=[CH]5[CH]6=[CH]1[Cr]65423(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->3[C]->4=1F)[CH]->5=[CH]->62>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[CH]->5[C]->6=2SCC1=CC=CC=C1
 
 ## Reaction 31-026-CAS-3098274
 
@@ -384,7 +384,7 @@ Total reactions: 8117
 - Yield %: 84
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: Cc1ccc(S)cc1.ClC12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=CC=C(SC23=[CH]4[CH]5=[CH]6[CH]7=C2(Cl)[Fe+2]65743289%10<-[CH-]3[CH]2=[CH]8[CH]9=[CH]3%10)C=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Cc1ccc(S)cc1.Cl[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=[C]->51Cl)[CH]->6=2)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=CC=C(S[C]23->[Fe+2]456789%10%11(<-[CH](=[CH]->4[CH]->5=2)[CH]->6=[C]->73Cl)<-[CH]2=[CH]->8[CH-]->9[CH]->%10=[CH]->%112)C=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-026-CAS-4007540
 
@@ -401,7 +401,7 @@ Total reactions: 8117
 - Yield %: 83
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.COC12=[CH]3[CH]4=C5(F)[CH]6=[CH]1[Cr]64352(C#O)(C#O)C#O>>COC12=[CH]3[CH]4=C5(SCC6=CC=CC=C6)[CH]6=[CH]1[Cr]63425(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[C]->4(F)=[CH]->5[CH]->6=2>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]1=[CH]->3[C]->4(SCC1=CC=CC=C1)=[CH]->5[CH]->6=2
 
 ## Reaction 31-026-CAS-4899747
 
@@ -410,7 +410,7 @@ Total reactions: 8117
 - Yield %: 75
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCS.CC12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=[CH]5[CH]6=C1(SCCCCSC17=[CH]8[CH]9=[CH]%10[CH]%11=C1(C)[Fe+2]%109%11871%12%13%14<-[CH-]7[CH]1=[CH]%12[CH]%13=[CH]7%14)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCS.C[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=[C]->51Cl)[CH]->6=2)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->7[cH]->8[c]->91SCCCCS[c]13->[Fe+2]456789%11%12(<-[cH]%13[cH]->4[cH]->5[cH-]->6[cH]->7%13)<-[cH]([cH]->8[cH]->91)[cH]->%11[c]->%123C)[cH]->%102
 
 ## Reaction 31-026-CAS-6100064
 
@@ -428,7 +428,7 @@ Total reactions: 8117
 - Yield %: 77
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCS.CC12=[CH]3[CH]4=[CH]5C6(C)=C1(Cl)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=[CH]5C6(C)=C1(SCCSC17=C8(C)[CH]9=[CH]%10[CH]%11=C1(C)[Fe+2]%109%11871%12%13%14<-[CH-]7[CH]1=[CH]%12[CH]%13=[CH]7%14)[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(C)=[C]->91Cl)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[cH]->8[c]->9(C)[c]->%102SCCS[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->7[c]->81C)[cH]->9[c]->%102C
 
 ## Reaction 31-026-CAS-6864675
 
@@ -445,7 +445,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 90
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.[Na].COC12=C3(F)[CH]4=[CH]5[CH]6=[CH]1[Cr]56432(C#O)(C#O)C#O>>COC12=C3(SCC4=CC=CC=C4)[CH]4=[CH]5[CH]6=[CH]1[Cr]65423(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.[Na].CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->3[C]->4=1F)[CH]->5=[CH]->62>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[CH]->5[C]->6=2SCC1=CC=CC=C1
 
 ## Reaction 31-026-CAS-7767733
 
@@ -454,14 +454,14 @@ Total reactions: 8117
 - Yield %: 98
 - Reagents: Potassium carbonate (584-08-7) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9)
-- SMILES: Sc1ccccc1.O=S(=O)(CCCCS(=O)(=O)C12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29)C12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29>>O=S(=O)(CCCCS(=O)(=O)C12=[CH]3[CH]4=C5(SC6=CC=CC=C6)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29)C12=[CH]3[CH]4=C5(SC6=CC=CC=C6)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: Sc1ccccc1.O=S(=O)(CCCCS(=O)(=O)[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[c]->8(Cl)[cH]->9[cH]->%102)[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[c]->8(Cl)[cH]->9[cH]->%102>>O=S(=O)(CCCCS(=O)(=O)[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[c]->8(Sc1ccccc1)[cH]->9[cH]->%102)[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[c]->8(Sc1ccccc1)[cH]->9[cH]->%102
 
 ## Reaction 31-026-CAS-794417
 
 - Type: C_S_Coupling
 - Yield %: 83
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.[Na].COC12=[CH]3[CH]4=C5(F)[CH]6=[CH]1[Cr]64352(C#O)(C#O)C#O>>COC12=[CH]3[CH]4=C5(SCC6=CC=CC=C6)[CH]6=[CH]1[Cr]63425(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.[Na].CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[C]->4(F)=[CH]->5[CH]->6=2>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]1=[CH]->3[C]->4(SCC1=CC=CC=C1)=[CH]->5[CH]->6=2
 
 ## Reaction 31-026-CAS-8284494
 
@@ -478,7 +478,7 @@ Total reactions: 8117
 - Yield %: 77
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: Sc1c(Cl)cccc1Cl.CC1=CC=CC(C)=C1OC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=CC=CC(C)=C1OC12=[CH]3[CH]4=C5(SC6=C(Cl)C=CC=C6Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Sc1c(Cl)cccc1Cl.CC1=CC=CC(C)=C1O[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->71)[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC1=CC=CC(C)=C1O[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(SC1=C(Cl)C=CC=C1Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-031-CAS-14068113
 
@@ -504,7 +504,7 @@ Total reactions: 8117
 - Condition Core: Base: KOtBu
 - Yield %: 88
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE], Triethylamine (121-44-8) [BASE], 124-63-0 (124-63-0) [UNK]
-- Solvents: 80-73-9 (80-73-9), Dichloromethane (75-09-2)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Dichloromethane (75-09-2)
 - SMILES: CCCCS.OCc1c(Br)c(CO)c(Br)c(CO)c1Br>>CCCCSc1c(CCl)c(SCCCC)c(CCl)c(SCCCC)c1CCl
 
 ## Reaction 31-048-CAS-3811340
@@ -513,7 +513,7 @@ Total reactions: 8117
 - Condition Core: Base: KOtBu
 - Yield %: 87
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE], Triethylamine (121-44-8) [BASE], 124-63-0 (124-63-0) [UNK]
-- Solvents: 80-73-9 (80-73-9), Dichloromethane (75-09-2)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Dichloromethane (75-09-2)
 - SMILES: CCCCCS.OCc1c(Br)c(CO)c(Br)c(CO)c1Br>>CCCCCSc1c(CCl)c(SCCCCC)c(CCl)c(SCCCCC)c1CCl
 
 ## Reaction 31-048-CAS-5953576
@@ -522,7 +522,7 @@ Total reactions: 8117
 - Condition Core: Base: KOtBu
 - Yield %: 91
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE], Triethylamine (121-44-8) [BASE], 124-63-0 (124-63-0) [UNK]
-- Solvents: 80-73-9 (80-73-9), Dichloromethane (75-09-2)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Dichloromethane (75-09-2)
 - SMILES: CCCCCCS.OCc1c(Br)c(CO)c(Br)c(CO)c1Br>>CCCCCCSc1c(CCl)c(SCCCCCC)c(CCl)c(SCCCCCC)c1CCl
 
 ## Reaction 31-049-CAS-12824203
@@ -600,7 +600,7 @@ Total reactions: 8117
 - Yield %: 7
 - Reagents: Trifluoroacetic acid (76-05-1) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Water (7732-18-5)
-- SMILES: CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CS)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C.COC1=C2C(=C(OC)C=C1)P(C(C)(C)C)(C(C)(C)C)[Pd+2]1([I-])(<-[C-]3=CC=C(I)C=C3)C3(C(C)C)=CC(C(C)C)=CC(C(C)C)=C231.[11CH]#N>>CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CSc1ccc([11C]#N)cc1)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C
+- SMILES: CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CS)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C.COc1ccc(OC)c2[P](C(C)(C)C)(C(C)(C)C)[Pd+2]3([I-])(<-[c-]4ccc(I)cc4)<-[c]4(C(C)C)cc(C(C)C)cc(C(C)C)[c]->34-c12.[11CH]#N>>CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CSc1ccc([11C]#N)cc1)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C
 
 ## Reaction 31-073-CAS-17333959
 
@@ -608,7 +608,7 @@ Total reactions: 8117
 - Yield %: 3
 - Reagents: Trifluoroacetic acid (76-05-1) [SOLVENT]
 - Solvents: Dimethyl sulfoxide (67-68-5), Water (7732-18-5)
-- SMILES: CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CS)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C.CC(C)OC1=C23C4=CC=CC=C4P(C4CCCCC4)(C4CCCCC4)[Pd+2]2([I-])(<-[C-]2=CC=C(I)C=C2)C3(OC(C)C)=CC=C1.[11CH]#N>>CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CSc1ccc([11C]#N)cc1)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C
+- SMILES: CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CS)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C.CC(C)Oc1ccc[c]2(OC(C)C)->[Pd+2]3([I-])(<-[c-]4ccc(I)cc4)<-[c]12-c1ccccc1[P]3(C1CCCCC1)C1CCCCC1.[11CH]#N>>CC(=O)N[C@@H](Cc1ccccc1)C(=O)N[C@@H](CC(C)C)C(=O)NCC(=O)N[C@@H](CCCCN)C(=O)NCC(=O)N[C@H](C(=O)NCC(=O)N[C@@H](CSc1ccc([11C]#N)cc1)C(=O)N[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)C(C)C
 
 ## Reaction 31-076-CAS-21552301
 
@@ -1924,7 +1924,7 @@ Total reactions: 8117
 - Yield %: 88
 - Reagents: Sodium tert-butoxide (865-48-5) [BASE]
 - Solvents: Toluene (108-88-3)
-- SMILES: Cc1ccc(Br)cc1.[H-][Rh+3]12([Cl-])<-[C-]3=C(C=CC=C3OP1(C(C)C)C(C)C)OP2(C(C)C)C(C)C.CCCCCS>>CCCCC[S-]->[Rh+3]12(<-[c-]3ccc(C)cc3)<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C.CCCCC[S](c1ccc(C)cc1)[Rh+]12<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C
+- SMILES: Cc1ccc(Br)cc1.[H-][Rh+3]12([Cl-])<-[C-]3=C(C=CC=C3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C.CCCCCS>>CCCCC[S-]->[Rh+3]12(<-[c-]3ccc(C)cc3)<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C.CCCCC[S](c1ccc(C)cc1)[Rh+]12<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C
 
 ## Reaction 31-152-CAS-9564151
 
@@ -1933,7 +1933,7 @@ Total reactions: 8117
 - Yield %: 5
 - Reagents: Sodium tert-butoxide (865-48-5) [BASE]
 - Solvents: Toluene (108-88-3)
-- SMILES: Cc1ccc(Br)cc1.[H-][Rh+3]12([Cl-])<-[C-]3=C(C=CC=C3OP1(C(C)C)C(C)C)OP2(C(C)C)C(C)C.CCCCCS>>CCCCC[S-]->[Rh+3]12(<-[c-]3ccc(C)cc3)<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C.CCCCC[S](c1ccc(C)cc1)[Rh+]12<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C
+- SMILES: Cc1ccc(Br)cc1.[H-][Rh+3]12([Cl-])<-[C-]3=C(C=CC=C3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C.CCCCCS>>CCCCC[S-]->[Rh+3]12(<-[c-]3ccc(C)cc3)<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C.CCCCC[S](c1ccc(C)cc1)[Rh+]12<-[c-]3c(cccc3O[P]1(C(C)C)C(C)C)O[P]2(C(C)C)C(C)C
 
 ## Reaction 31-170-CAS-11786549
 
@@ -3044,7 +3044,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 78
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: FC(F)(F)S.[Cu].O=Cc1ccc(I)cc1>>O=Cc1ccc(SC(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-10361063
@@ -3929,7 +3929,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 86
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: O=[N+]([O-])c1ccc(I)cc1.FC(F)(F)S.[Cu]>>O=[N+]([O-])c1ccc(SC(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-10692777
@@ -4408,7 +4408,7 @@ Total reactions: 8117
 - Yield %: 74
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCS.ClC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>ClC12=[CH]3[CH]4=C5(SCCCCSC67=[CH]8[CH]9=C%10(Cl)[CH]%11=[CH]6[Fe+2]%1198%1076%12%13%14<-[CH-]7[CH]6=[CH]%12[CH]%13=[CH]7%14)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCS.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>Cl[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]1[cH]->7[c]->8(SCCCCS[c]13->[Fe+2]45678%11%12%13(<-[cH]%14[cH]->4[cH]->5[cH-]->6[cH]->7%14)<-[cH]([cH]->81)[c]->%11(Cl)[cH]->%12[cH]->%133)[cH]->9[cH]->%102
 
 ## Reaction 31-171-CAS-1089840
 
@@ -5127,7 +5127,7 @@ Total reactions: 8117
 - Yield %: 93
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
-- SMILES: CC(C)(C)OC(=O)NCCS.Fc1c(F)c(F)c(-c2c3n4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>CC(C)(C)OC(=O)NCCSc1c(F)c(F)c(-c2c3ccc([nH]3)c(-c3c(F)c(F)c(F)c(F)c3F)c3nc(c(-c4c(F)c(F)c(F)c(F)c4F)c4ccc([nH]4)c4ccc2[nH]4)C=C3)c(F)c1F
+- SMILES: CC(C)(C)OC(=O)NCCS.Fc1c(F)c(F)c(-c2c3[n]4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>CC(C)(C)OC(=O)NCCSc1c(F)c(F)c(-c2c3ccc([nH]3)c(-c3c(F)c(F)c(F)c(F)c3F)c3nc(c(-c4c(F)c(F)c(F)c(F)c4F)c4ccc([nH]4)c4ccc2[nH]4)C=C3)c(F)c1F
 
 ## Reaction 31-171-CAS-11141663
 
@@ -5655,7 +5655,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 78
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: FC(F)(F)S.[Cu].Ic1ccc(N2CCOCC2)cc1>>FC(F)(F)Sc1ccc(N2CCOCC2)cc1
 
 ## Reaction 31-171-CAS-11336182
@@ -6259,7 +6259,7 @@ Total reactions: 8117
 - Yield %: 80
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCS.CC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3C4(SCCSC56=[CH]7[CH]8=[CH]9C%10(C)=[CH]5[Fe+2]897%1065%11%12%13<-[CH-]6[CH]5=[CH]%11[CH]%12=[CH]6%13)=[CH]5[CH]6=[CH]1[Fe+2]635241789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[cH]->8[c]->9(SCCS[c]13->[Fe+2]456789%11%12(<-[cH]%13[cH]->4[cH]->5[cH-]->6[cH]->7%13)<-[cH]([cH]->8[c]->9(C)[cH]->%111)[cH]->%123)[cH]->%102
 
 ## Reaction 31-171-CAS-11604804
 
@@ -7685,7 +7685,7 @@ Total reactions: 8117
 - Yield %: 86
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
-- SMILES: O=C(O)CS.Fc1c(F)c(F)c(-c2c3n4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>O=C(O)CSc1c(F)c(F)c(-c2c3nc(c(-c4c(F)c(F)c(SCC(=O)O)c(F)c4F)c4ccc([nH]4)c4ccc([nH]4)c(-c4c(F)c(F)c(SCC(=O)O)c(F)c4F)c4ccc2[nH]4)C=C3)c(F)c1F
+- SMILES: O=C(O)CS.Fc1c(F)c(F)c(-c2c3[n]4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>O=C(O)CSc1c(F)c(F)c(-c2c3nc(c(-c4c(F)c(F)c(SCC(=O)O)c(F)c4F)c4ccc([nH]4)c4ccc([nH]4)c(-c4c(F)c(F)c(SCC(=O)O)c(F)c4F)c4ccc2[nH]4)C=C3)c(F)c1F
 
 ## Reaction 31-171-CAS-12115195
 
@@ -8202,7 +8202,7 @@ Total reactions: 8117
 - Condition Core: Base: Cs2CO3
 - Yield %: 97
 - Reagents: Cesium carbonate (534-17-8) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Clc1c(Cl)c(Cl)c(Cl)c(Cl)c1Cl.Sc1ccc(-c2cc(-c3ccccn3)nc(-c3ccccn3)c2)cc1>>c1ccc(-c2cc(-c3ccc(Sc4c(Sc5ccc(-c6cc(-c7ccccn7)nc(-c7ccccn7)c6)cc5)c(Sc5ccc(-c6cc(-c7ccccn7)nc(-c7ccccn7)c6)cc5)c(Sc5ccc(-c6cc(-c7ccccn7)nc(-c7ccccn7)c6)cc5)c(Sc5ccc(-c6cc(-c7ccccn7)nc(-c7ccccn7)c6)cc5)c4Sc4ccc(-c5cc(-c6ccccn6)nc(-c6ccccn6)c5)cc4)cc3)cc(-c3ccccn3)n2)nc1
 
 ## Reaction 31-171-CAS-12282729
@@ -8768,7 +8768,7 @@ Total reactions: 8117
 - Yield %: 99
 - Reagents: Triethylamine (121-44-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: COCCOCCS.O=C1OC2=N3->[Ga+2]45([Cl-])<-N6=C(C=CC6=C(C6=C(F)C(F)=C(F)C(F)=C6F)C6=CC=C(C(C7=C(F)C(F)=C(F)C(F)=C7F)=C13)[N-]->46)C(C1=C(F)C(F)=C(F)C(F)=C1F)=C1C=CC(=C2C2=C(F)C(F)=C(F)C(F)=C2F)[N-]->51>>COCCOCCSC1=C(F)C(F)=C(C2=C3C=CC4=N3->[Ga+2]35([Cl-])<-N6=C(OC(=O)C6=C(C6=C(F)C(F)=C(SCCOCCOC)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(SCCOCCOC)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(SCCOCCOC)C(F)=C3F)[N-]->52)C(F)=C1F
+- SMILES: COCCOCCS.O=C1OC2=[N]3->[Ga+2]45([Cl-])<-[N]6=C(C=CC6=C(C6=C(F)C(F)=C(F)C(F)=C6F)C6=CC=C(C(C7=C(F)C(F)=C(F)C(F)=C7F)=C13)[N-]->46)C(C1=C(F)C(F)=C(F)C(F)=C1F)=C1C=CC(=C2C2=C(F)C(F)=C(F)C(F)=C2F)[N-]->51>>COCCOCCSC1=C(F)C(F)=C(C2=C3C=CC4=[N]3->[Ga+2]35([Cl-])<-[N]6=C(OC(=O)C6=C(C6=C(F)C(F)=C(SCCOCCOC)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(SCCOCCOC)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(SCCOCCOC)C(F)=C3F)[N-]->52)C(F)=C1F
 
 ## Reaction 31-171-CAS-12485465
 
@@ -10081,7 +10081,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 96
 - Solvents: Acetonitrile (75-05-8)
-- SMILES: Sc1ccccc1.[K].CC12=C3(C)[C-]4(C)->[Ru+2]1356789%10([CH]1=C5(Cl)[CH]6=C7(Cl)[CH]8=C19Cl)C2(C)=C4%10C.O=S(=O)([O-])C(F)(F)F>>CC12=C3(C)[C-]4(C)->[Ru+2]1356789%10([CH]1=C5(SC3=CC=CC=C3)[CH]6=C7(SC3=CC=CC=C3)[CH]8=C19SC1=CC=CC=C1)C2(C)=C4%10C.O=S(=O)([O-])C(F)(F)F
+- SMILES: Sc1ccccc1.[K].C[c]12->[Ru+2]3456789%10(<-[cH]%11[c]->3(Cl)[cH]->4[c]->5(Cl)[cH]->6[c]->7%11Cl)<-[c]1(C)[c]->8(C)[c-]->9(C)[c]->%102C.O=S(=O)([O-])C(F)(F)F>>C[c]12->[Ru+2]3456789%10(<-[cH]%11[c]->3(Sc3ccccc3)[cH]->4[c]->5(Sc3ccccc3)[cH]->6[c]->7%11Sc3ccccc3)<-[c]1(C)[c]->8(C)[c-]->9(C)[c]->%102C.O=S(=O)([O-])C(F)(F)F
 
 ## Reaction 31-171-CAS-12948132
 
@@ -10323,7 +10323,7 @@ Total reactions: 8117
 - Yield %: 87
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCS.ClC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>ClC12=[CH]3[CH]4=C5(SCCSC67=[CH]8[CH]9=C%10(Cl)[CH]%11=[CH]6[Fe+2]%1198%1076%12%13%14<-[CH-]7[CH]6=[CH]%12[CH]%13=[CH]7%14)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCS.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>Cl[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]1[cH]->7[c]->8(SCCS[c]13->[Fe+2]45678%11%12%13(<-[cH]%14[cH]->4[cH]->5[cH-]->6[cH]->7%14)<-[cH]([cH]->81)[c]->%11(Cl)[cH]->%12[cH]->%133)[cH]->9[cH]->%102
 
 ## Reaction 31-171-CAS-13031864
 
@@ -10610,7 +10610,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 85
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Fc1ccc(I)cc1.FC(F)(F)S.[Cu]>>Fc1ccc(SC(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-13149987
@@ -11111,7 +11111,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 95
-- Reagents: 80-73-9 (80-73-9) [UNK]
+- Reagents: 1,3-Dimethyl-2-imidazolidinone (80-73-9) [SOLVENT]
 - SMILES: Fc1ccc(Br)cc1F.CS.[Na]>>CSc1ccc(Br)cc1SC
 
 ## Reaction 31-171-CAS-13356114
@@ -11948,7 +11948,7 @@ Total reactions: 8117
 - Yield %: 89
 - Reagents: Potassium carbonate (584-08-7) [BASE], Hydrochloric Acid (7647-01-0) [ACID], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
-- SMILES: OCCS.ClC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>OCCSC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: OCCS.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>OCCS[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->71)[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-171-CAS-13689443
 
@@ -14949,7 +14949,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 78
 - Reagents: 7440-23-5 (7440-23-5) [UNK]
-- Solvents: Ethanol (64-17-5), 80-73-9 (80-73-9)
+- Solvents: Ethanol (64-17-5), 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Sc1ccccc1Cl.Brc1ccc2c(Br)c3cc(Br)ccc3c(Br)c2c1>>Clc1ccccc1Sc1ccc2c(Sc3ccccc3Cl)c3cc(Sc4ccccc4Cl)ccc3c(Sc3ccccc3Cl)c2c1
 
 ## Reaction 31-171-CAS-14709024
@@ -15346,7 +15346,7 @@ Total reactions: 8117
 - Yield %: 90
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4)
-- SMILES: CCCCCCCCCCCCS.IC1=CC=C(C23CC4(C5=CC=C(I)C=C5)CC(C5=CC=C(I)C=C5)(C2)CC(C2=CC=C(C#C[C-]56->[Fe+2]789%10%11%12%13(<-[CH-]%14[CH]7=[CH]8[CH]9=[CH]%14%10)[CH](=[CH]5%11)[CH]%12=[CH]6%13)C=C2)(C3)C4)C=C1>>CCCCCCCCCCCCSC1=CC=C(C23CC4(C5=CC=C(C#C[C-]67->[Fe+2]89%10%11%12%13%14(<-[CH-]%15[CH]8=[CH]9[CH]%10=[CH]%15%11)[CH](=[CH]6%12)[CH]%13=[CH]7%14)C=C5)CC(C5=CC=C(SCCCCCCCCCCCC)C=C5)(C2)CC(C2=CC=C(SCCCCCCCCCCCC)C=C2)(C4)C3)C=C1
+- SMILES: CCCCCCCCCCCCS.Ic1ccc(C23CC4(c5ccc(I)cc5)CC(c5ccc(I)cc5)(C2)CC(c2ccc(C#C[c-]56->[Fe+2]789%10%11%12%13(<-[cH]%14[cH]->7[cH]->8[cH-]->9[cH]->%10%14)<-[cH]([cH]->%11[cH]->%125)[cH]->%136)cc2)(C3)C4)cc1>>CCCCCCCCCCCCSc1ccc(C23CC4(c5ccc(C#C[c-]67->[Fe+2]89%10%11%12%13%14(<-[cH]%15[cH]->8[cH]->9[cH-]->%10[cH]->%11%15)<-[cH]([cH]->%12[cH]->%136)[cH]->%147)cc5)CC(c5ccc(SCCCCCCCCCCCC)cc5)(C2)CC(c2ccc(SCCCCCCCCCCCC)cc2)(C4)C3)cc1
 
 ## Reaction 31-171-CAS-1483420
 
@@ -15557,7 +15557,7 @@ Total reactions: 8117
 - Yield %: 90
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
 - Solvents: 1,2-Dimethoxyethane (110-71-4)
-- SMILES: CCCCCCCCS.IC1=CC=C(C23CC4(C5=CC=C(I)C=C5)CC(C5=CC=C(I)C=C5)(C2)CC(C2=CC=C(C#C[C-]56->[Fe+2]789%10%11%12%13(<-[CH-]%14[CH]7=[CH]8[CH]9=[CH]%14%10)[CH](=[CH]5%11)[CH]%12=[CH]6%13)C=C2)(C3)C4)C=C1>>CCCCCCCCSC1=CC=C(C23CC4(C5=CC=C(C#C[C-]67->[Fe+2]89%10%11%12%13%14(<-[CH-]%15[CH]8=[CH]9[CH]%10=[CH]%15%11)[CH](=[CH]6%12)[CH]%13=[CH]7%14)C=C5)CC(C5=CC=C(SCCCCCCCC)C=C5)(C2)CC(C2=CC=C(SCCCCCCCC)C=C2)(C4)C3)C=C1
+- SMILES: CCCCCCCCS.Ic1ccc(C23CC4(c5ccc(I)cc5)CC(c5ccc(I)cc5)(C2)CC(c2ccc(C#C[c-]56->[Fe+2]789%10%11%12%13(<-[cH]%14[cH]->7[cH]->8[cH-]->9[cH]->%10%14)<-[cH]([cH]->%11[cH]->%125)[cH]->%136)cc2)(C3)C4)cc1>>CCCCCCCCSc1ccc(C23CC4(c5ccc(C#C[c-]67->[Fe+2]89%10%11%12%13%14(<-[cH]%15[cH]->8[cH]->9[cH-]->%10[cH]->%11%15)<-[cH]([cH]->%12[cH]->%136)[cH]->%147)cc5)CC(c5ccc(SCCCCCCCC)cc5)(C2)CC(c2ccc(SCCCCCCCC)cc2)(C4)C3)cc1
 
 ## Reaction 31-171-CAS-14914295
 
@@ -15674,7 +15674,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 83
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: N#Cc1ccc(I)cc1.FC(F)(F)S.[Cu]>>N#Cc1ccc(SC(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-14950253
@@ -16133,7 +16133,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCS.ClC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>ClC12=[CH]3C4(SCCCCSC56=[CH]7[CH]8=[CH]9C%10(Cl)=[CH]5[Fe+2]897%1065%11%12%13<-[CH-]6[CH]5=[CH]%11[CH]%12=[CH]6%13)=[CH]5[CH]6=[CH]1[Fe+2]635241789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCS.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>Cl[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[cH]->8[c]->9(SCCCCS[c]13->[Fe+2]456789%11%12(<-[cH]%13[cH]->4[cH]->5[cH-]->6[cH]->7%13)<-[cH]([cH]->8[c]->9(Cl)[cH]->%111)[cH]->%123)[cH]->%102
 
 ## Reaction 31-171-CAS-1516736
 
@@ -20016,7 +20016,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 88
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Clc1c(Cl)c(Cl)c(Cl)c(Cl)c1Cl.COc1ccc(S)cc1>>COc1ccc(Sc2c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c2Sc2ccc(OC)cc2)cc1
 
 ## Reaction 31-171-CAS-16859656
@@ -20197,7 +20197,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 84
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Clc1c(Cl)c(Cl)c(Cl)c(Cl)c1Cl.CC(C)(C)Oc1ccc(S)cc1>>CC(C)(C)Oc1ccc(Sc2c(Sc3ccc(OC(C)(C)C)cc3)c(Sc3ccc(OC(C)(C)C)cc3)c(Sc3ccc(OC(C)(C)C)cc3)c(Sc3ccc(OC(C)(C)C)cc3)c2Sc2ccc(OC(C)(C)C)cc2)cc1
 
 ## Reaction 31-171-CAS-16896593
@@ -20206,7 +20206,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 75
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Clc1c(Cl)c(Cl)c(Cl)c(Cl)c1Cl.CC(C)(C)Oc1ccc(Sc2ccc(Sc3ccc(S)cc3)cc2)cc1>>CC(C)(C)Oc1ccc(Sc2ccc(Sc3ccc(Sc4c(Sc5ccc(Sc6ccc(Sc7ccc(OC(C)(C)C)cc7)cc6)cc5)c(Sc5ccc(Sc6ccc(Sc7ccc(OC(C)(C)C)cc7)cc6)cc5)c(Sc5ccc(Sc6ccc(Sc7ccc(OC(C)(C)C)cc7)cc6)cc5)c(Sc5ccc(Sc6ccc(Sc7ccc(OC(C)(C)C)cc7)cc6)cc5)c4Sc4ccc(Sc5ccc(Sc6ccc(OC(C)(C)C)cc6)cc5)cc4)cc3)cc2)cc1
 
 ## Reaction 31-171-CAS-16896594
@@ -20215,7 +20215,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 74
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Clc1c(Cl)c(Cl)c(Cl)c(Cl)c1Cl.CC(C)(C)Oc1ccc(Sc2ccc(S)cc2)cc1>>CC(C)(C)Oc1ccc(Sc2ccc(Sc3c(Sc4ccc(Sc5ccc(OC(C)(C)C)cc5)cc4)c(Sc4ccc(Sc5ccc(OC(C)(C)C)cc5)cc4)c(Sc4ccc(Sc5ccc(OC(C)(C)C)cc5)cc4)c(Sc4ccc(Sc5ccc(OC(C)(C)C)cc5)cc4)c3Sc3ccc(Sc4ccc(OC(C)(C)C)cc4)cc3)cc2)cc1
 
 ## Reaction 31-171-CAS-16902318
@@ -21652,7 +21652,7 @@ Total reactions: 8117
 - Yield %: 80
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCCCS.CC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=C5(SCCCCCCSC67=[CH]8[CH]9=C%10(C)[CH]%11=[CH]6[Fe+2]%1198%1076%12%13%14<-[CH-]7[CH]6=[CH]%12[CH]%13=[CH]7%14)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]1[cH]->7[c]->8(SCCCCCCS[c]13->[Fe+2]45678%11%12%13(<-[cH]%14[cH]->4[cH]->5[cH-]->6[cH]->7%14)<-[cH]([cH]->81)[c]->%11(C)[cH]->%12[cH]->%133)[cH]->9[cH]->%102
 
 ## Reaction 31-171-CAS-17730531
 
@@ -23627,7 +23627,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 88
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: FC(F)(F)S.[Cu].CCOC(=O)c1ccc(I)cc1>>CCOC(=O)c1ccc(SC(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-18329226
@@ -23792,7 +23792,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 75
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Cc1ccc(S)cc1.Clc1c(Cl)c2c(Cl)c(Cl)c3c(Cl)c(Cl)c4c(Cl)c(Cl)c5c(Cl)c(Cl)c1c1c2c3c4c51>>Cc1ccc(Sc2c(Sc3ccc(C)cc3)c3c(Sc4ccc(C)cc4)c(Sc4ccc(C)cc4)c4c(Sc5ccc(C)cc5)c(Sc5ccc(C)cc5)c5c(Sc6ccc(C)cc6)c(Sc6ccc(C)cc6)c6c(Sc7ccc(C)cc7)c(Sc7ccc(C)cc7)c2c2c3c4c5c62)cc1
 
 ## Reaction 31-171-CAS-18426905
@@ -24898,7 +24898,7 @@ Total reactions: 8117
 - Condition Core: Acid: HCl
 - Yield %: 70
 - Reagents: Hydrochloric Acid (7647-01-0) [ACID]
-- Solvents: 80-73-9 (80-73-9), Water (7732-18-5)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Water (7732-18-5)
 - SMILES: CS.[Na].COC(=O)c1c(Br)c(Br)c(C(=O)OC)c(Br)c1Br>>CSc1c(SC)c(C(=O)O)c(SC)c(SC)c1C(=O)O
 
 ## Reaction 31-171-CAS-18964567
@@ -24984,7 +24984,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 77
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Sc1ccccc1.Brc1c(Br)c2ccc3c(Br)c(Br)c4ccc5ccc1c1c5c4c3c21>>c1ccc(Sc2c(Sc3ccccc3)c3ccc4c(Sc5ccccc5)c(Sc5ccccc5)c5ccc6ccc2c2c6c5c4c32)cc1
 
 ## Reaction 31-171-CAS-18995867
@@ -24993,7 +24993,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 89
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Sc1ccccc1.Clc1c(Cl)c2c(Cl)c(Cl)c3c(Cl)c(Cl)c4c(Cl)c(Cl)c5c(Cl)c(Cl)c1c1c2c3c4c51>>c1ccc(Sc2c(Sc3ccccc3)c3c(Sc4ccccc4)c(Sc4ccccc4)c4c(Sc5ccccc5)c(Sc5ccccc5)c5c(Sc6ccccc6)c(Sc6ccccc6)c6c(Sc7ccccc7)c(Sc7ccccc7)c2c2c3c4c5c62)cc1
 
 ## Reaction 31-171-CAS-18995868
@@ -25002,7 +25002,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 84
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: SC1CCCCC1.Clc1c(Cl)c2c(Cl)c(Cl)c3c(Cl)c(Cl)c4c(Cl)c(Cl)c5c(Cl)c(Cl)c1c1c2c3c4c51>>C1CCC(Sc2c(SC3CCCCC3)c3c(SC4CCCCC4)c(SC4CCCCC4)c4c(SC5CCCCC5)c(SC5CCCCC5)c5c(SC6CCCCC6)c(SC6CCCCC6)c6c(SC7CCCCC7)c(SC7CCCCC7)c2c2c3c4c5c62)CC1
 
 ## Reaction 31-171-CAS-19002416
@@ -25765,7 +25765,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 90
-- Reagents: 80-73-9 (80-73-9) [UNK]
+- Reagents: 1,3-Dimethyl-2-imidazolidinone (80-73-9) [SOLVENT]
 - SMILES: CS.[Na].COC(=O)c1c(F)cc(-c2cc(F)c(C(=O)OC)c(F)c2)cc1F>>COC(=O)c1c(SC)cc(-c2cc(SC)c(C(=O)OC)c(SC)c2)cc1SC
 
 ## Reaction 31-171-CAS-19209110
@@ -26187,7 +26187,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 72
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Sc1ccccc1.[Na].CCc1c(Br)c(CC)c(Br)c(CC)c1Br>>CCc1c(Sc2ccccc2)c(CC)c(Sc2ccccc2)c(CC)c1Sc1ccccc1
 
 ## Reaction 31-171-CAS-19373974
@@ -26432,7 +26432,7 @@ Total reactions: 8117
 - Yield %: 76
 - Reagents: Triethylamine (121-44-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: O=C(O)CS.CC1(C)c2ccc3C(=C4C=CC=N4->[Pd+2]4(<-N5=CC=CC5=C(c5c(F)c(F)c(F)c(F)c5F)c5ccc1[n-]->45)<-[n-]32)c1c(F)c(F)c(F)c(F)c1F>>CC1(C)c2ccc3C(=C4C=CC=N4->[Pd+2]4(<-N5=CC=CC5=C(c5c(F)c(F)c(SCC(=O)[O-])c(F)c5F)c5ccc1[n-]->45)<-[n-]32)c1c(F)c(F)c(F)c(F)c1F.[H+]
+- SMILES: O=C(O)CS.CC1(C)c2ccc3C(=C4C=CC=[N]4->[Pd+2]4(<-[N]5=CC=CC5=C(c5c(F)c(F)c(F)c(F)c5F)c5ccc1[n-]->45)<-[n-]32)c1c(F)c(F)c(F)c(F)c1F>>CC1(C)c2ccc3C(=C4C=CC=[N]4->[Pd+2]4(<-[N]5=CC=CC5=C(c5c(F)c(F)c(SCC(=O)[O-])c(F)c5F)c5ccc1[n-]->45)<-[n-]32)c1c(F)c(F)c(F)c(F)c1F.[H+]
 
 ## Reaction 31-171-CAS-19429627
 
@@ -26831,7 +26831,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 88
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@H]1O.[Na].Fc1c(F)c(F)c(C2=C3C=CC=N3->[Ga+3]34(<-N5=CC=CC5=C(c5c(F)c(F)c(F)c(F)c5F)c5ccc[n-]->35)(<-N3=CC=CC3=C(c3c(F)c(F)c(F)c(F)c3F)c3ccc[n-]->43)<-[n-]3cccc32)c(F)c1F>>OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=N4->[Ga+3]45(<-N6=CC=CC6=C(c6c(F)c(F)c(S[C@@H]7O[C@H](CO)[C@H](O)[C@H](O)[C@H]7O)c(F)c6F)c6ccc[n-]->46)(<-N4=CC=CC4=C(c4c(F)c(F)c(S[C@@H]6O[C@H](CO)[C@H](O)[C@H](O)[C@H]6O)c(F)c4F)c4ccc[n-]->54)<-[n-]4cccc43)c(F)c2F)[C@H](O)[C@@H](O)[C@H]1O
+- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@H]1O.[Na].Fc1c(F)c(F)c(C2=C3C=CC=[N]3->[Ga+3]34(<-[N]5=CC=CC5=C(c5c(F)c(F)c(F)c(F)c5F)c5ccc[n-]->35)(<-[N]3=CC=CC3=C(c3c(F)c(F)c(F)c(F)c3F)c3ccc[n-]->43)<-[n-]3cccc32)c(F)c1F>>OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=[N]4->[Ga+3]45(<-[N]6=CC=CC6=C(c6c(F)c(F)c(S[C@@H]7O[C@H](CO)[C@H](O)[C@H](O)[C@H]7O)c(F)c6F)c6ccc[n-]->46)(<-[N]4=CC=CC4=C(c4c(F)c(F)c(S[C@@H]6O[C@H](CO)[C@H](O)[C@H](O)[C@H]6O)c(F)c4F)c4ccc[n-]->54)<-[n-]4cccc43)c(F)c2F)[C@H](O)[C@@H](O)[C@H]1O
 
 ## Reaction 31-171-CAS-19635428
 
@@ -27038,7 +27038,7 @@ Total reactions: 8117
 - Yield %: 96
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
-- SMILES: O=[N+]([O-])c1ccc(F)c(Br)c1.S[C-]12->[Fe+2]3456789(<-[C-]%10(S)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>O=[N+]([O-])C1=CC(Br)=C(S[C-]23->[Fe+2]456789%10(<-[C-]%11(SC%12=C(Br)C=C([N+](=O)[O-])C=C%12)[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1
+- SMILES: O=[N+]([O-])c1ccc(F)c(Br)c1.S[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(S)[cH]->91>>O=[N+]([O-])c1ccc(S[c-]23->[Fe+2]456789%10(<-[cH]([cH]->4[cH]->52)[cH]->63)<-[cH]2[cH]->7[cH]->8[c-]->9(Sc3ccc([N+](=O)[O-])cc3Br)[cH]->%102)c(Br)c1
 
 ## Reaction 31-171-CAS-19672728
 
@@ -28284,7 +28284,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 70
 - Reagents: 141-52-6 (141-52-6) [UNK]
-- Solvents: Ethanol (64-17-5), 80-73-9 (80-73-9)
+- Solvents: Ethanol (64-17-5), 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Cc1ccc(S)cc1.Brc1c(Br)c2ccc3c(Br)c(Br)c4ccc5ccc1c1c5c4c3c21>>Cc1ccc(Sc2c(Sc3ccc(C)cc3)c3ccc4c(Sc5ccc(C)cc5)c(Sc5ccc(C)cc5)c5ccc6ccc2c2c6c5c4c32)cc1
 
 ## Reaction 31-171-CAS-20131486
@@ -28961,7 +28961,7 @@ Total reactions: 8117
 - Condition Core: Acid: HCl
 - Yield %: 99
 - Reagents: Cesium carbonate (534-17-8) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
-- Solvents: 80-73-9 (80-73-9), Water (7732-18-5)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Water (7732-18-5)
 - SMILES: Fc1c(F)c(F)c(F)c(F)c1F.CC(C)OC(=O)c1cccc(S)c1>>CC(C)OC(=O)c1cccc(Sc2c(Sc3cccc(C(=O)OC(C)C)c3)c(Sc3cccc(C(=O)OC(C)C)c3)c(Sc3cccc(C(=O)OC(C)C)c3)c(Sc3cccc(C(=O)OC(C)C)c3)c2Sc2cccc(C(=O)OC(C)C)c2)c1
 
 ## Reaction 31-171-CAS-20415055
@@ -28970,7 +28970,7 @@ Total reactions: 8117
 - Condition Core: Acid: HCl
 - Yield %: 96
 - Reagents: Potassium carbonate (584-08-7) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
-- Solvents: 80-73-9 (80-73-9), Water (7732-18-5)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Water (7732-18-5)
 - SMILES: Fc1c(F)c(F)c(F)c(F)c1F.CC(C)OC(=O)c1ccc(S)cc1>>CC(C)OC(=O)c1ccc(Sc2c(Sc3ccc(C(=O)OC(C)C)cc3)c(Sc3ccc(C(=O)OC(C)C)cc3)c(Sc3ccc(C(=O)OC(C)C)cc3)c(Sc3ccc(C(=O)OC(C)C)cc3)c2Sc2ccc(C(=O)OC(C)C)cc2)cc1
 
 ## Reaction 31-171-CAS-20440344
@@ -31239,7 +31239,7 @@ Total reactions: 8117
 - Condition Core: Base: K2CO3
 - Yield %: 90
 - Reagents: Potassium carbonate (584-08-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Cc1ccc(S)cc1.O=Cc1c(F)c(F)c(F)c(F)c1F>>Cc1ccc(Sc2c(C=O)c(Sc3ccc(C)cc3)c(Sc3ccc(C)cc3)c(Sc3ccc(C)cc3)c2Sc2ccc(C)cc2)cc1
 
 ## Reaction 31-171-CAS-21629638
@@ -31463,7 +31463,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 86
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Fc1cc(F)cc(F)c1.CS.[Na]>>CSc1cc(SC)cc(SC)c1
 
 ## Reaction 31-171-CAS-21742757
@@ -34015,7 +34015,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 85
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Fc1ccc(Br)cc1.CS.[Na]>>CSc1ccc(Br)cc1
 
 ## Reaction 31-171-CAS-23019158
@@ -35053,7 +35053,7 @@ Total reactions: 8117
 - Yield %: 98
 - Reagents: Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@@H]1O.[Na].Fc1c(F)c(F)c(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)c(F)c1F>>OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=N4->[Ir+3]45(<-[c-]6ccccc6-c6ccccn->46)(<-[c-]4ccccc4-c4ccccn->54)<-[n-]4cccc43)c(F)c2F)[C@H](O)[C@@H](O)[C@@H]1O
+- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@@H]1O.[Na].Fc1c(F)c(F)c(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)c(F)c1F>>OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=[N]4->[Ir+3]45(<-[c-]6ccccc6-c6cccc[n]->46)(<-[c-]4ccccc4-c4cccc[n]->54)<-[n-]4cccc43)c(F)c2F)[C@H](O)[C@@H](O)[C@@H]1O
 
 ## Reaction 31-171-CAS-23584155
 
@@ -35061,7 +35061,7 @@ Total reactions: 8117
 - Yield %: 92
 - Reagents: Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@H]1O.[Na].O=[N+]([O-])c1cc(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)ccc1F>>O=[N+]([O-])c1cc(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)ccc1S[C@@H]1O[C@H](CO)[C@H](O)[C@H](O)[C@H]1O
+- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@H]1O.[Na].O=[N+]([O-])c1cc(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)ccc1F>>O=[N+]([O-])c1cc(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)ccc1S[C@@H]1O[C@H](CO)[C@H](O)[C@H](O)[C@H]1O
 
 ## Reaction 31-171-CAS-23584333
 
@@ -35099,7 +35099,7 @@ Total reactions: 8117
 - Yield %: 92
 - Reagents: Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@H]1O.[Na].Fc1c(F)c(F)c(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)c(F)c1F>>OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=N4->[Ir+3]45(<-[c-]6ccccc6-c6ccccn->46)(<-[c-]4ccccc4-c4ccccn->54)<-[n-]4cccc43)c(F)c2F)[C@H](O)[C@@H](O)[C@H]1O
+- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@H]1O.[Na].Fc1c(F)c(F)c(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)c(F)c1F>>OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=[N]4->[Ir+3]45(<-[c-]6ccccc6-c6cccc[n]->46)(<-[c-]4ccccc4-c4cccc[n]->54)<-[n-]4cccc43)c(F)c2F)[C@H](O)[C@@H](O)[C@H]1O
 
 ## Reaction 31-171-CAS-23586790
 
@@ -35166,7 +35166,7 @@ Total reactions: 8117
 - Yield %: 90
 - Reagents: Water (7732-18-5) [SOLVENT]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@@H]1O.[Na].O=[N+]([O-])c1cc(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)ccc1F>>O=[N+]([O-])c1cc(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)ccc1S[C@@H]1O[C@H](CO)[C@@H](O)[C@H](O)[C@H]1O
+- SMILES: OC[C@H]1O[C@@H](S)[C@H](O)[C@@H](O)[C@@H]1O.[Na].O=[N+]([O-])c1cc(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)ccc1F>>O=[N+]([O-])c1cc(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)ccc1S[C@@H]1O[C@H](CO)[C@@H](O)[C@H](O)[C@H]1O
 
 ## Reaction 31-171-CAS-23588854
 
@@ -35190,7 +35190,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 91
 - Solvents: 1,2-Dichloroethane (107-06-2)
-- SMILES: CS.[Na].FC1=C(F)C(F)=C(C2=C3C=CC4=N3->[Fe+4]35(=[C-2]6C7CC8CC(C7)CC6C8)<-N6=C(C=CC6=C(C6=C(F)C(F)=C(F)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(F)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(F)C(F)=C3F)[N-]->52)C(F)=C1F>>CSC1=C(F)C(F)=C(C2=C3C=CC4=N3->[Fe+4]35(=[C-2]6C7CC8CC(C7)CC6C8)<-N6=C(C=CC6=C(C6=C(F)C(F)=C(SC)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(SC)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(SC)C(F)=C3F)[N-]->52)C(F)=C1F
+- SMILES: CS.[Na].FC1=C(F)C(F)=C(C2=C3C=CC4=[N]3->[Fe+4]35(=[C-2]6C7CC8CC(C7)CC6C8)<-[N]6=C(C=CC6=C(C6=C(F)C(F)=C(F)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(F)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(F)C(F)=C3F)[N-]->52)C(F)=C1F>>CSC1=C(F)C(F)=C(C2=C3C=CC4=[N]3->[Fe+4]35(=[C-2]6C7CC8CC(C7)CC6C8)<-[N]6=C(C=CC6=C(C6=C(F)C(F)=C(SC)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(SC)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(SC)C(F)=C3F)[N-]->52)C(F)=C1F
 
 ## Reaction 31-171-CAS-23595037
 
@@ -37044,7 +37044,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 95
 - Solvents: Benzene (71-43-2)
-- SMILES: Cc1ccccc1S.Fc1ccc(I)cc1.CC(C)(C)P1(C(C)(C)C)C=C2C=CC3=C4C(=CC=C3)F[Pd+2]1(<-[C-]1=CC=C(F)C=C1)<-[N-]24>>Cc1ccccc1Sc1ccc(F)cc1.CC(C)(C)[P]1(Cc2ccc3cccc(F)c3n2->[Pd+2]1([I-])<-[c-]1ccc(F)cc1)C(C)(C)C
+- SMILES: Cc1ccccc1S.Fc1ccc(I)cc1.CC(C)(C)[P]1(C(C)(C)C)C=C2C=CC3=C4C(=CC=C3)[F][Pd+2]1(<-[C-]1=CC=C(F)C=C1)<-[N-]24>>Cc1ccccc1Sc1ccc(F)cc1.CC(C)(C)[P]1(Cc2ccc3cccc(F)c3[n]2->[Pd+2]1([I-])<-[c-]1ccc(F)cc1)C(C)(C)C
 
 ## Reaction 31-171-CAS-2633661
 
@@ -37452,7 +37452,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 74
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: O=Cc1ccc(F)cc1.CC(C)(C)S.[Na]>>CC(C)(C)Sc1ccc(C=O)cc1
 
 ## Reaction 31-171-CAS-2747971
@@ -38152,7 +38152,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 73
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Fc1c(F)c(F)c(F)c(F)c1F.Sc1ccccc1.[Na]>>Fc1c(Sc2ccccc2)c(Sc2ccccc2)c(F)c(Sc2ccccc2)c1Sc1ccccc1
 
 ## Reaction 31-171-CAS-2990295
@@ -39235,7 +39235,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 75
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: O=Cc1c(F)c(F)c(F)c(F)c1F.Sc1ccccc1.[Na]>>O=Cc1c(Sc2ccccc2)c(Sc2ccccc2)c(Sc2ccccc2)c(Sc2ccccc2)c1Sc1ccccc1
 
 ## Reaction 31-171-CAS-3406001
@@ -39555,7 +39555,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 87
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: Tetrahydrofuran (109-99-9), 80-73-9 (80-73-9), Water (7732-18-5)
+- Solvents: Tetrahydrofuran (109-99-9), 1,3-Dimethyl-2-imidazolidinone (80-73-9), Water (7732-18-5)
 - SMILES: CC(C)(C)c1ccc(S)cc1.O=Cc1c(F)c(F)c(F)c(C=O)c1F>>CC(C)(C)c1ccc(Sc2c(C=O)c(Sc3ccc(C(C)(C)C)cc3)c(Sc3ccc(C(C)(C)C)cc3)c(Sc3ccc(C(C)(C)C)cc3)c2C=O)cc1
 
 ## Reaction 31-171-CAS-3508019
@@ -39735,7 +39735,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCCCS.CC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3C4(SCCCCCCSC56=[CH]7[CH]8=[CH]9C%10(C)=[CH]5[Fe+2]897%1065%11%12%13<-[CH-]6[CH]5=[CH]%11[CH]%12=[CH]6%13)=[CH]5[CH]6=[CH]1[Fe+2]635241789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[cH]->8[c]->9(SCCCCCCS[c]13->[Fe+2]456789%11%12(<-[cH]%13[cH]->4[cH]->5[cH-]->6[cH]->7%13)<-[cH]([cH]->8[c]->9(C)[cH]->%111)[cH]->%123)[cH]->%102
 
 ## Reaction 31-171-CAS-3558681
 
@@ -39975,7 +39975,7 @@ Total reactions: 8117
 - Yield %: 91
 - Time (h): 0.167
 - Solvents: Methanol (67-56-1)
-- SMILES: CO.CS.[Na].O#C[Re+]1234(<-N#[O+])(<-[CH-]5[CH]1=[CH]2[CH]3=[CH]54)P(C1=C(F)C(F)=C(F)C(F)=C1F)(C1=C(F)C(F)=C(F)C(F)=C1F)C1=C(F)C(F)=C(F)C(F)=C1F.[F-][B+3]([F-])([F-])[F-]>>CO[C-](=O)->[Re+]1234(<-N#[O+])(<-[CH-]5[CH]1=[CH]2[CH]3=[CH]54)P(C1=C(F)C(F)=C(SC)C(F)=C1F)(C1=C(F)C(F)=C(SC)C(F)=C1F)C1=C(F)C(F)=C(SC)C(F)=C1F
+- SMILES: CO.CS.[Na].O#[C][Re+]1234(<-[N]#[O+])(<-[CH]5=[CH]->1[CH-]->2[CH]->3=[CH]->45)[P](C1=C(F)C(F)=C(F)C(F)=C1F)(C1=C(F)C(F)=C(F)C(F)=C1F)C1=C(F)C(F)=C(F)C(F)=C1F.[F-][B+3]([F-])([F-])[F-]>>CO[C-](=O)->[Re+]1234(<-[N]#[O+])(<-[cH]5[cH]->1[cH]->2[cH-]->3[cH]->45)[P](c1c(F)c(F)c(SC)c(F)c1F)(c1c(F)c(F)c(SC)c(F)c1F)c1c(F)c(F)c(SC)c(F)c1F
 
 ## Reaction 31-171-CAS-367587
 
@@ -40135,7 +40135,7 @@ Total reactions: 8117
 - Condition Core: Base: KOtBu
 - Yield %: 97
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: CCCS.OCc1c(Br)c(CO)c(Br)c(CO)c1Br>>CCCSc1c(CO)c(SCCC)c(CO)c(SCCC)c1CO
 
 ## Reaction 31-171-CAS-3755862
@@ -40805,7 +40805,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 83
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Clc1ccc(I)cc1.FC(F)(F)S.[Cu]>>FC(F)(F)Sc1ccc(Cl)cc1
 
 ## Reaction 31-171-CAS-4016313
@@ -40854,7 +40854,7 @@ Total reactions: 8117
 - Yield %: 81
 - Reagents: Potassium tert-butoxide (865-47-4) [BASE], 151-50-8 (151-50-8) [UNK]
 - Solvents: Toluene (108-88-3), Acetonitrile (75-05-8), Dichloromethane (75-09-2), Water (7732-18-5)
-- SMILES: [I-][Cu+]1<-n2c3ccc4ccc5ccc(n->1c5c42)-c1ccc(cc1)OCCCCCCOc1cccc(c1)OCCCCCCOc1ccc-3cc1.Ic1ccc(OCCCCCCC(c2ccc(-c3ccccc3)cc2)(c2ccc(-c3ccccc3)cc2)c2ccc(-c3ccccc3)cc2)cc1.SCCCCCCC(c1ccc(-c2ccccc2)cc1)(c1ccc(-c2ccccc2)cc1)c1ccc(-c2ccccc2)cc1>>c1ccc(-c2ccc(C(CCCCCCOc3ccc(SCCCCCCC(c4ccc(-c5ccccc5)cc4)(c4ccc(-c5ccccc5)cc4)c4ccc(-c5ccccc5)cc4)cc3)(c3ccc(-c4ccccc4)cc3)c3ccc(-c4ccccc4)cc3)cc2)cc1.c1cc2cc(c1)OCCCCCCOc1ccc(cc1)-c1ccc3ccc4ccc(nc4c3n1)-c1ccc(cc1)OCCCCCCO2.c1ccc(-c2ccc(C(CCCCCCOc3ccc(SCCCCCCC(c4ccc(-c5ccccc5)cc4)(c4ccc(-c5ccccc5)cc4)c4ccc(-c5ccccc5)cc4)cc3)(c3ccc(-c4ccccc4)cc3)c3ccc(-c4ccccc4)cc3)cc2)cc1
+- SMILES: [I-][Cu+]1<-[n]2c3ccc4ccc5ccc([n]->1c5c42)-c1ccc(cc1)OCCCCCCOc1cccc(c1)OCCCCCCOc1ccc-3cc1.Ic1ccc(OCCCCCCC(c2ccc(-c3ccccc3)cc2)(c2ccc(-c3ccccc3)cc2)c2ccc(-c3ccccc3)cc2)cc1.SCCCCCCC(c1ccc(-c2ccccc2)cc1)(c1ccc(-c2ccccc2)cc1)c1ccc(-c2ccccc2)cc1>>c1ccc(-c2ccc(C(CCCCCCOc3ccc(SCCCCCCC(c4ccc(-c5ccccc5)cc4)(c4ccc(-c5ccccc5)cc4)c4ccc(-c5ccccc5)cc4)cc3)(c3ccc(-c4ccccc4)cc3)c3ccc(-c4ccccc4)cc3)cc2)cc1.c1cc2cc(c1)OCCCCCCOc1ccc(cc1)-c1ccc3ccc4ccc(nc4c3n1)-c1ccc(cc1)OCCCCCCO2.c1ccc(-c2ccc(C(CCCCCCOc3ccc(SCCCCCCC(c4ccc(-c5ccccc5)cc4)(c4ccc(-c5ccccc5)cc4)c4ccc(-c5ccccc5)cc4)cc3)(c3ccc(-c4ccccc4)cc3)c3ccc(-c4ccccc4)cc3)cc2)cc1
 
 ## Reaction 31-171-CAS-403396
 
@@ -41930,7 +41930,7 @@ Total reactions: 8117
 - Condition Core: Base: Cs2CO3
 - Yield %: 70
 - Reagents: Cesium carbonate (534-17-8) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: CCCCCCCCS.N#Cc1cc(I)c(I)cc1C#N>>CCCCCCCCSc1cc(C#N)c(C#N)cc1I
 
 ## Reaction 31-171-CAS-4477134
@@ -42193,7 +42193,7 @@ Total reactions: 8117
 - Yield %: 71
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Sc1cccc(S)c1.CC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=C5(SC6=CC=CC(SC78=[CH]9[CH]%10=C%11(C)[CH]%12=[CH]7[Fe+2]%12%109%1187%13%14%15<-[CH-]8[CH]7=[CH]%13[CH]%14=[CH]8%15)=C6)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Sc1cccc(S)c1.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(SC1=CC=CC(S[C]34->[Fe+2]5678%11%12%13%14(<-[CH]%15=[CH]->5[CH-]->6[CH]->7=[CH]->8%15)<-[CH](=[CH]->%113)[C]->%12(C)=[CH]->%13[CH]->%14=4)=C1)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-171-CAS-4559654
 
@@ -42251,7 +42251,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 78
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: CC(C)(C)S.[Na].Cc1cccc(Cl)c1Cl>>Cc1cccc(SC(C)(C)C)c1SC(C)(C)C
 
 ## Reaction 31-171-CAS-456970
@@ -42633,7 +42633,7 @@ Total reactions: 8117
 - Yield %: 72
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.CC12=C3(F)[CH]4=[CH]5[CH]6=[CH]1[Cr]65423(C#O)(C#O)C#O>>CC12=C3(SCC4=CC=CC=C4)[CH]4=[CH]5[CH]6=[CH]1[Cr]65423(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.C[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[CH]->5[C]->6=2F>>C[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[CH]->5[C]->6=2SCC1=CC=CC=C1
 
 ## Reaction 31-171-CAS-4689272
 
@@ -44546,7 +44546,7 @@ Total reactions: 8117
 - Yield %: 90
 - Reagents: Potassium carbonate (584-08-7) [BASE], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Acetonitrile (75-05-8)
-- SMILES: CCCCS.Ic1ccc(I)cc1.O#C[Cr](C#O)(C#O)(C#O)(C#O)C#O>>CCCCSC(=O)c1ccc(SCCCC)cc1
+- SMILES: CCCCS.Ic1ccc(I)cc1.O#[C][Cr]([C]#O)([C]#O)([C]#O)([C]#O)[C]#O>>CCCCSC(=O)c1ccc(SCCCC)cc1
 
 ## Reaction 31-171-CAS-5396522
 
@@ -45470,7 +45470,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 89
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Cc1ccc(I)cc1.FC(F)(F)S.[Cu]>>Cc1ccc(SC(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-5670243
@@ -46373,7 +46373,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCCCS.CC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3C4(SCCCCCCSC56=[CH]7[CH]8=[CH]9C%10(C)=[CH]5[Fe+2]897%1065%11%12%13<-[CH-]6[CH]5=[CH]%11[CH]%12=[CH]6%13)=[CH]5[CH]6=[CH]1[Fe+2]635241789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[cH]->8[c]->9(SCCCCCCS[c]13->[Fe+2]456789%11%12(<-[cH]%13[cH]->4[cH]->5[cH-]->6[cH]->7%13)<-[cH]([cH]->8[c]->9(C)[cH]->%111)[cH]->%123)[cH]->%102
 
 ## Reaction 31-171-CAS-6038443
 
@@ -46736,7 +46736,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 80
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: FC(F)(F)c1ccc(I)cc1.FC(F)(F)S.[Cu]>>FC(F)(F)Sc1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-6151351
@@ -46900,7 +46900,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 71
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Fc1cc(F)cc(F)c1.Cc1ccc(S)cc1.[Na]>>Cc1ccc(Sc2cc(Sc3ccc(C)cc3)cc(Sc3ccc(C)cc3)c2)cc1
 
 ## Reaction 31-171-CAS-6239456
@@ -47908,7 +47908,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 80
 - Solvents: Benzene (71-43-2)
-- SMILES: Cc1ccc(S)cc1.Fc1ccc(I)cc1.CC[S]1c2cccc3c2[N-]2->[Pd+2]1(<-[c-]1ccc(F)cc1)[P](C(C)(C)C)(C(C)(C)C)C=C2C=C3>>Cc1ccc(Sc2ccc(F)cc2)cc1.CC[S]1c2cccc3ccc4n(->[Pd+2]1(<-[c-]1ccc(F)cc1)[P](C(C)(C)C)(C(C)(C)C)C4)c23.[I-]
+- SMILES: Cc1ccc(S)cc1.Fc1ccc(I)cc1.CC[S]1c2cccc3c2[N-]2->[Pd+2]1(<-[c-]1ccc(F)cc1)[P](C(C)(C)C)(C(C)(C)C)C=C2C=C3>>Cc1ccc(Sc2ccc(F)cc2)cc1.CC[S]1c2cccc3ccc4[n](->[Pd+2]1(<-[c-]1ccc(F)cc1)[P](C(C)(C)C)(C(C)(C)C)C4)c23.[I-]
 
 ## Reaction 31-171-CAS-6648923
 
@@ -47954,7 +47954,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 99
 - Reagents: 74-88-4 (74-88-4) [UNK]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Sc1ccccc1.[Na].O=Cc1cc(F)c(F)c(F)c1>>O=Cc1cc(Sc2ccccc2)c(Sc2ccccc2)c(Sc2ccccc2)c1
 
 ## Reaction 31-171-CAS-6660964
@@ -48025,7 +48025,7 @@ Total reactions: 8117
 - Yield %: 76
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: Sc1ccccc1S.CC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=C5(SC6=C(SC78=[CH]9[CH]%10=C%11(C)[CH]%12=[CH]7[Fe+2]%12%109%1187%13%14%15<-[CH-]8[CH]7=[CH]%13[CH]%14=[CH]8%15)C=CC=C6)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: Sc1ccccc1S.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(SC1=C(S[C]34->[Fe+2]5678%11%12%13%14(<-[CH]%15=[CH]->5[CH-]->6[CH]->7=[CH]->8%15)<-[CH](=[CH]->%113)[C]->%12(C)=[CH]->%13[CH]->%14=4)C=CC=C1)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-171-CAS-6691150
 
@@ -48207,7 +48207,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 89
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Cc1ccccc1I.FC(F)(F)S.[Cu]>>Cc1ccccc1SC(F)(F)F
 
 ## Reaction 31-171-CAS-6753727
@@ -48550,7 +48550,7 @@ Total reactions: 8117
 - Condition Core: Acid: HCl
 - Yield %: 80
 - Reagents: Hydrochloric Acid (7647-01-0) [ACID]
-- Solvents: 80-73-9 (80-73-9), Water (7732-18-5)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Water (7732-18-5)
 - SMILES: CS.[Na].COC(=O)c1ccc(-c2cc(F)c(-c3ccc(C(=O)OC)cc3)cc2F)cc1>>CSc1cc(-c2ccc(C(=O)O)cc2)c(SC)cc1-c1ccc(C(=O)O)cc1
 
 ## Reaction 31-171-CAS-6880330
@@ -48580,7 +48580,7 @@ Total reactions: 8117
 - Yield %: 79
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.COC12=[CH]3[CH]4=C5(F)C6([Si](C)(C)C)=[CH]1[Cr]34256(C#O)(C#O)C#O>>COC12=[CH]3[CH]4=C5(SCC6=CC=CC=C6)[CH]6=[CH]1[Cr]63425(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]=1[CH]->3=[C]->4(F)[C]->5([Si](C)(C)C)=[CH]->62>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]1=[CH]->3[C]->4(SCC1=CC=CC=C1)=[CH]->5[CH]->6=2
 
 ## Reaction 31-171-CAS-6891250
 
@@ -49337,7 +49337,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 95
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9), Toluene (108-88-3), Water (7732-18-5)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9), Toluene (108-88-3), Water (7732-18-5)
 - SMILES: Fc1c(F)c(F)c(F)c(F)c1F.COc1ccc(S)cc1>>COc1ccc(Sc2c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c2Sc2ccc(OC)cc2)cc1
 
 ## Reaction 31-171-CAS-7105477
@@ -49555,7 +49555,7 @@ Total reactions: 8117
 - Yield %: 83
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
-- SMILES: N[C@@H](CS)C(=O)O.Fc1c(F)c(F)c(-c2c3n4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>N[C@@H](CSc1c(F)c(F)c(-c2c3nc(c(-c4c(F)c(F)c(SC[C@H](N)C(=O)O)c(F)c4F)c4ccc([nH]4)c4ccc([nH]4)c(-c4c(F)c(F)c(SC[C@H](N)C(=O)O)c(F)c4F)c4ccc2[nH]4)C=C3)c(F)c1F)C(=O)O
+- SMILES: N[C@@H](CS)C(=O)O.Fc1c(F)c(F)c(-c2c3[n]4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>N[C@@H](CSc1c(F)c(F)c(-c2c3nc(c(-c4c(F)c(F)c(SC[C@H](N)C(=O)O)c(F)c4F)c4ccc([nH]4)c4ccc([nH]4)c(-c4c(F)c(F)c(SC[C@H](N)C(=O)O)c(F)c4F)c4ccc2[nH]4)C=C3)c(F)c1F)C(=O)O
 
 ## Reaction 31-171-CAS-7202668
 
@@ -52114,7 +52114,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 72
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Sc1ccccc1.[Na].CC(=O)OCc1c(Br)c(COC(C)=O)c(Br)c(COC(C)=O)c1Br>>CC(=O)OCc1c(Sc2ccccc2)c(COC(C)=O)c(Sc2ccccc2)c(COC(C)=O)c1Sc1ccccc1
 
 ## Reaction 31-171-CAS-8067409
@@ -52422,7 +52422,7 @@ Total reactions: 8117
 - Yield %: 93
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCCCS.CC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3C4(SCCCCSC56=[CH]7[CH]8=[CH]9C%10(C)=[CH]5[Fe+2]897%1065%11%12%13<-[CH-]6[CH]5=[CH]%11[CH]%12=[CH]6%13)=[CH]5[CH]6=[CH]1[Fe+2]635241789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]([cH]->71)[cH]->8[c]->9(SCCCCS[c]13->[Fe+2]456789%11%12(<-[cH]%13[cH]->4[cH]->5[cH-]->6[cH]->7%13)<-[cH]([cH]->8[c]->9(C)[cH]->%111)[cH]->%123)[cH]->%102
 
 ## Reaction 31-171-CAS-8173854
 
@@ -53407,7 +53407,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 77
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 108-86-1 (108-86-1) [UNK]
-- Solvents: Diethyl ether (60-29-7), 80-73-9 (80-73-9)
+- Solvents: Diethyl ether (60-29-7), 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Sc1ccccc1.Brc1cc2c3cc(Br)c(Br)cc3c3cc(Br)c(Br)cc3c2cc1Br>>c1ccc(Sc2cc3c4cc(Sc5ccccc5)c(Sc5ccccc5)cc4c4cc(Sc5ccccc5)c(Sc5ccccc5)cc4c3cc2Sc2ccccc2)cc1
 
 ## Reaction 31-171-CAS-853584
@@ -53499,7 +53499,7 @@ Total reactions: 8117
 - Yield %: 88
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
-- SMILES: O=C(O)CCS.Fc1c(F)c(F)c(-c2c3n4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>O=C(O)CCSc1c(F)c(F)c(-c2c3nc(c(-c4c(F)c(F)c(SCCC(=O)O)c(F)c4F)c4ccc([nH]4)c4ccc([nH]4)c(-c4c(F)c(F)c(SCCC(=O)O)c(F)c4F)c4ccc2[nH]4)C=C3)c(F)c1F
+- SMILES: O=C(O)CCS.Fc1c(F)c(F)c(-c2c3[n]4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>O=C(O)CCSc1c(F)c(F)c(-c2c3nc(c(-c4c(F)c(F)c(SCCC(=O)O)c(F)c4F)c4ccc([nH]4)c4ccc([nH]4)c(-c4c(F)c(F)c(SCCC(=O)O)c(F)c4F)c4ccc2[nH]4)C=C3)c(F)c1F
 
 ## Reaction 31-171-CAS-8573319
 
@@ -53603,7 +53603,7 @@ Total reactions: 8117
 - Yield %: 99
 - Reagents: Triethylamine (121-44-8) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: COCCOCCS.O=C1Oc2c(-c3c(F)c(F)c(F)c(F)c3F)c3ccc4c(-c5c(F)c(F)c(F)c(F)c5F)c5n6->[Pt+2]7(<-n2c1c(-c1c(F)c(F)c(F)c(F)c1F)c1ccc(c(-c2c(F)c(F)c(F)c(F)c2F)c6C=C5)[n-]->71)<-[n-]43>>COCCOCCSc1c(F)c(F)c(-c2c3n4->[Pt+2]56<-n7c(c(-c8c(F)c(F)c(SCCOCCOC)c(F)c8F)c8ccc2[n-]->58)OC(=O)c7c(-c2c(F)c(F)c(SCCOCCOC)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(SCCOCCOC)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F
+- SMILES: COCCOCCS.O=C1Oc2c(-c3c(F)c(F)c(F)c(F)c3F)c3ccc4c(-c5c(F)c(F)c(F)c(F)c5F)c5[n]6->[Pt+2]7(<-[n]2c1c(-c1c(F)c(F)c(F)c(F)c1F)c1ccc(c(-c2c(F)c(F)c(F)c(F)c2F)c6C=C5)[n-]->71)<-[n-]43>>COCCOCCSc1c(F)c(F)c(-c2c3[n]4->[Pt+2]56<-[n]7c(c(-c8c(F)c(F)c(SCCOCCOC)c(F)c8F)c8ccc2[n-]->58)OC(=O)c7c(-c2c(F)c(F)c(SCCOCCOC)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(SCCOCCOC)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F
 
 ## Reaction 31-171-CAS-8609550
 
@@ -53997,7 +53997,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 100
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: CS.[Na].Fc1cc(Br)cc(F)c1F>>CSc1cc(Br)cc(SC)c1SC
 
 ## Reaction 31-171-CAS-8794374
@@ -54822,7 +54822,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 70
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Brc1cc(Br)c2ccc3c(Br)cc(Br)c4ccc1c2c43.Cc1ccc(Sc2cc(S)cc(Sc3ccc(C)cc3)c2)cc1>>Cc1ccc(Sc2cc(Sc3ccc(C)cc3)cc(Sc3cc(Sc4cc(Sc5ccc(C)cc5)cc(Sc5ccc(C)cc5)c4)c4ccc5c(Sc6cc(Sc7ccc(C)cc7)cc(Sc7ccc(C)cc7)c6)cc(Sc6cc(Sc7ccc(C)cc7)cc(Sc7ccc(C)cc7)c6)c6ccc3c4c65)c2)cc1
 
 ## Reaction 31-171-CAS-9112018
@@ -54848,7 +54848,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 92
 - Solvents: Benzene (71-43-2)
-- SMILES: Cc1cccc(C)c1S.Fc1ccc(I)cc1.CC(C)(C)P1(C(C)(C)C)C=C2C=CC3=C4C(=CC=C3)F[Pd+2]1(<-[C-]1=CC=C(F)C=C1)<-[N-]24>>Cc1cccc(C)c1Sc1ccc(F)cc1.CC(C)(C)[P]1(Cc2ccc3cccc(F)c3n2->[Pd+2]1([I-])<-[c-]1ccc(F)cc1)C(C)(C)C
+- SMILES: Cc1cccc(C)c1S.Fc1ccc(I)cc1.CC(C)(C)[P]1(C(C)(C)C)C=C2C=CC3=C4C(=CC=C3)[F][Pd+2]1(<-[C-]1=CC=C(F)C=C1)<-[N-]24>>Cc1cccc(C)c1Sc1ccc(F)cc1.CC(C)(C)[P]1(Cc2ccc3cccc(F)c3[n]2->[Pd+2]1([I-])<-[c-]1ccc(F)cc1)C(C)(C)C
 
 ## Reaction 31-171-CAS-9114160
 
@@ -55583,7 +55583,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 90
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Cc1ccc(S)cc1.Brc1cc(Br)c2ccc3c(Br)cc(Br)c4ccc1c2c43>>Cc1ccc(Sc2cc(Sc3ccc(C)cc3)c3ccc4c(Sc5ccc(C)cc5)cc(Sc5ccc(C)cc5)c5ccc2c3c54)cc1
 
 ## Reaction 31-171-CAS-9348200
@@ -55762,7 +55762,7 @@ Total reactions: 8117
 - Yield %: 75
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
-- SMILES: CC(=O)OC[C@H]1O[C@@H](S)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O.Fc1c(F)c(F)c(-c2c3n4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>CC(=O)OC[C@H]1O[C@@H](Sc2c(F)c(F)c(-c3c4nc(c(-c5c(F)c(F)c(S[C@@H]6O[C@H](COC(C)=O)[C@@H](OC(C)=O)[C@H](OC(C)=O)[C@H]6OC(C)=O)c(F)c5F)c5ccc([nH]5)c5ccc([nH]5)c(-c5c(F)c(F)c(S[C@@H]6O[C@H](COC(C)=O)[C@@H](OC(C)=O)[C@H](OC(C)=O)[C@H]6OC(C)=O)c(F)c5F)c5ccc3[nH]5)C=C4)c(F)c2F)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O
+- SMILES: CC(=O)OC[C@H]1O[C@@H](S)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O.Fc1c(F)c(F)c(-c2c3[n]4->[Bi+3]56<-[n-]7c2ccc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c7ccc(c(-c8c(F)c(F)c(F)c(F)c8F)c4C=C3)[n-]->57)[n-]->62)c(F)c1F>>CC(=O)OC[C@H]1O[C@@H](Sc2c(F)c(F)c(-c3c4nc(c(-c5c(F)c(F)c(S[C@@H]6O[C@H](COC(C)=O)[C@@H](OC(C)=O)[C@H](OC(C)=O)[C@H]6OC(C)=O)c(F)c5F)c5ccc([nH]5)c5ccc([nH]5)c(-c5c(F)c(F)c(S[C@@H]6O[C@H](COC(C)=O)[C@@H](OC(C)=O)[C@H](OC(C)=O)[C@H]6OC(C)=O)c(F)c5F)c5ccc3[nH]5)C=C4)c(F)c2F)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O
 
 ## Reaction 31-171-CAS-9386761
 
@@ -56068,7 +56068,7 @@ Total reactions: 8117
 - Yield %: 79
 - Reagents: Potassium carbonate (584-08-7) [BASE], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Tetrahydrofuran (109-99-9), Water (7732-18-5)
-- SMILES: SCCS.CC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>CC12=[CH]3[CH]4=C5(SCCSC67=[CH]8[CH]9=C%10(C)[CH]%11=[CH]6[Fe+2]%1198%1076%12%13%14<-[CH-]7[CH]6=[CH]%12[CH]%13=[CH]7%14)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29
+- SMILES: SCCS.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C[c]12->[Fe+2]3456789%10(<-[cH]%11[cH]->3[cH]->4[cH-]->5[cH]->6%11)<-[cH]1[cH]->7[c]->8(SCCS[c]13->[Fe+2]45678%11%12%13(<-[cH]%14[cH]->4[cH]->5[cH-]->6[cH]->7%14)<-[cH]([cH]->81)[c]->%11(C)[cH]->%12[cH]->%133)[cH]->9[cH]->%102
 
 ## Reaction 31-171-CAS-9486750
 
@@ -56195,7 +56195,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 85
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: COc1ccc(I)cc1.FC(F)(F)S.[Cu]>>COc1ccc(SC(F)(F)F)cc1
 
 ## Reaction 31-171-CAS-9549135
@@ -58588,7 +58588,7 @@ Total reactions: 8117
 - Yield %: 92
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.ClC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2ccc(Sc3cccc(OC)c3)cc2)CC1
+- SMILES: C1CNCCN1.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2ccc(Sc3cccc(OC)c3)cc2)CC1
 
 ## Reaction 31-365-CAS-10529482
 
@@ -58597,7 +58597,7 @@ Total reactions: 8117
 - Yield %: 77
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.ClC12=[CH]3[CH]4=C5(Cl)[CH]6=[CH]1[Fe+2]634251789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC12CC3CC(CC(C3)C1)C2.COC(=O)Cl>>COC(=O)N1CCN(c2ccc(SC34CC5CC(CC(C5)C3)C4)cc2)CC1
+- SMILES: C1CNCCN1.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH]1=[CH]->7[C]->8(Cl)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC12CC3CC(CC(C3)C1)C2.COC(=O)Cl>>COC(=O)N1CCN(c2ccc(SC34CC5CC(CC(C5)C3)C4)cc2)CC1
 
 ## Reaction 31-365-CAS-1341000
 
@@ -58606,7 +58606,7 @@ Total reactions: 8117
 - Yield %: 93
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.CC12=C3(Cl)[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]546321789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(Sc3cccc(OC)c3)c2C)CC1
+- SMILES: C1CNCCN1.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8=1Cl)[CH]->9=[C]->%102Cl.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(Sc3cccc(OC)c3)c2C)CC1
 
 ## Reaction 31-365-CAS-15010142
 
@@ -58615,7 +58615,7 @@ Total reactions: 8117
 - Yield %: 74
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCNC1.ClC12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCCN(c2ccccc2Sc2cccc(OC)c2)CC1
+- SMILES: C1CNCCNC1.Cl[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=[C]->51Cl)[CH]->6=2)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCCN(c2ccccc2Sc2cccc(OC)c2)CC1
 
 ## Reaction 31-365-CAS-4051709
 
@@ -58624,7 +58624,7 @@ Total reactions: 8117
 - Yield %: 98
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.ClC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(Sc3cccc(OC)c3)c2)CC1
+- SMILES: C1CNCCN1.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(Sc3cccc(OC)c3)c2)CC1
 
 ## Reaction 31-365-CAS-4131726
 
@@ -58633,7 +58633,7 @@ Total reactions: 8117
 - Yield %: 86
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.ClC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC12CC3CC(CC(C3)C1)C2.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(SC34CC5CC(CC(C5)C3)C4)c2)CC1
+- SMILES: C1CNCCN1.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC12CC3CC(CC(C3)C1)C2.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(SC34CC5CC(CC(C5)C3)C4)c2)CC1
 
 ## Reaction 31-365-CAS-4462338
 
@@ -58642,7 +58642,7 @@ Total reactions: 8117
 - Yield %: 86
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.ClC12=[CH]3[CH]4=[CH]5C6(Cl)=[CH]1[Fe+2]453261789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC1CCCCC1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(SC3CCCCC3)c2)CC1
+- SMILES: C1CNCCN1.Cl[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8(Cl)=[CH]->91)[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC1CCCCC1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(SC3CCCCC3)c2)CC1
 
 ## Reaction 31-365-CAS-5934864
 
@@ -58651,7 +58651,7 @@ Total reactions: 8117
 - Yield %: 97
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.ClC12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2ccccc2Sc2cccc(OC)c2)CC1
+- SMILES: C1CNCCN1.Cl[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=[C]->51Cl)[CH]->6=2)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-].COc1cccc(S)c1.COC(=O)Cl>>COC(=O)N1CCN(c2ccccc2Sc2cccc(OC)c2)CC1
 
 ## Reaction 31-365-CAS-6880081
 
@@ -58660,7 +58660,7 @@ Total reactions: 8117
 - Yield %: 76
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.CC12=C3(Cl)[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]546321789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC1CCCCC1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(SC3CCCCC3)c2C)CC1
+- SMILES: C1CNCCN1.C[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->7[C]->8=1Cl)[CH]->9=[C]->%102Cl.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC1CCCCC1.COC(=O)Cl>>COC(=O)N1CCN(c2cccc(SC3CCCCC3)c2C)CC1
 
 ## Reaction 31-365-CAS-9330704
 
@@ -58669,7 +58669,7 @@ Total reactions: 8117
 - Yield %: 77
 - Reagents: Potassium carbonate (584-08-7) [BASE], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE], 1,10-Phenanthroline (66-71-7) [LIGAND], Acetonitrile (75-05-8) [SOLVENT], Hydrochloric Acid (7647-01-0) [ACID], Water (7732-18-5) [SOLVENT]
 - Solvents: Tetrahydrofuran (109-99-9), N,N-Dimethylformamide (68-12-2), 1,2-Dichloroethane (107-06-2)
-- SMILES: C1CNCCN1.ClC12=[CH]3[CH]4=[CH]5[CH]6=C1(Cl)[Fe+2]453621789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC1CCCCC1.COC(=O)Cl>>COC(=O)N1CCN(c2ccccc2SC2CCCCC2)CC1
+- SMILES: C1CNCCN1.Cl[C]12->[Fe+2]3456789%10(<-[CH](=[CH]->3[CH]->4=[C]->51Cl)[CH]->6=2)<-[CH]1=[CH]->7[CH-]->8[CH]->9=[CH]->%101.[F-][P+5]([F-])([F-])([F-])([F-])[F-].SC1CCCCC1.COC(=O)Cl>>COC(=O)N1CCN(c2ccccc2SC2CCCCC2)CC1
 
 ## Reaction 31-373-CAS-5765780
 
@@ -58705,7 +58705,7 @@ Total reactions: 8117
 - Yield %: 87
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: CCS.COC1=CC=C(C23=[CH]4[CH]5=[CH]6C7(C)=C2(F)[Cr]56437(C#O)(C#O)C#O)C=C1>>CCSc1c(C)cccc1-c1ccc(OC)cc1
+- SMILES: CCS.COC1=CC=C([C]23->[Cr]4567([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->4[C]->5(C)=[C]->62F)[CH]->7=3)C=C1>>CCSc1c(C)cccc1-c1ccc(OC)cc1
 
 ## Reaction 31-530-CAS-2075199
 
@@ -58730,7 +58730,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 100
 - Solvents: Ethanol (64-17-5)
-- SMILES: [Cl-][Ru+2]123456([Cl-][Ru+2]789%10%11([Cl-])([Cl-]1)[CH]1=[CH]7[CH]8=[CH]9[CH]%10=[CH]1%11)[CH]1=[CH]2[CH]3=[CH]4[CH]5=[CH]16.Sc1ccc(Br)cc1>>BrC1=CC=C([S-]2->[Ru+2]345678([S-](C9=CC=C(Br)C=C9)->[Ru+2]29%10%11%12%13(<-[S-]3C2=CC=C(Br)C=C2)[CH]2=[CH]9[CH]%10=[CH]%11[CH]%12=[CH]2%13)[CH]2=[CH]4[CH]5=[CH]6[CH]7=[CH]28)C=C1.[Cl-]
+- SMILES: [Cl-][Ru+2]123456(<-[CH]7=[CH]->1[CH]->2=[CH]->3[CH]->4=[CH]->57)[Cl-][Ru+2]12345([Cl-])(<-[CH]7=[CH]->1[CH]->2=[CH]->3[CH]->4=[CH]->57)[Cl-]6.Sc1ccc(Br)cc1>>Brc1ccc([S-]2->[Ru+2]345678(<-[cH]9[cH]->3[cH]->4[cH]->5[cH]->6[cH]->79)[S-](c3ccc(Br)cc3)->[Ru+2]234567(<-[cH]2[cH]->3[cH]->4[cH]->5[cH]->6[cH]->72)<-[S-]8c2ccc(Br)cc2)cc1.[Cl-]
 
 ## Reaction 31-562-CAS-12477533
 
@@ -58739,7 +58739,7 @@ Total reactions: 8117
 - Yield %: 70
 - Reagents: 7758-89-6 (7758-89-6) [UNK], Ammonium hydroxide (aqueous ammonia) (1336-21-6) [BASE]
 - Solvents: Acetonitrile (75-05-8), Water (7732-18-5)
-- SMILES: COc1c(C)cnc(Cn2ccc(-c3ccccc3SC)n2)c1C.Fc1c(F)c(F)c(S)c(F)c1F>>COc1c(C)cn2->[Cu+](<-n3c(-c4ccccc4SC)ccn3Cc2c1C)[S-]1(c2c(F)c(F)c(F)c(F)c2F)[Cu+]2<-[S-]([Cu+][S-](c3c(F)c(F)c(F)c(F)c3F)->[Cu+]<-1[S-](c1c(F)c(F)c(F)c(F)c1F)->[Cu+](<-[S-](c1c(F)c(F)c(F)c(F)c1F)[Cu+]13<-n4cc(C)c(OC)c(C)c4Cn4ccc(-c5ccccc5[S]1C)n->34)[S-]->2c1c(F)c(F)c(F)c(F)c1F)c1c(F)c(F)c(F)c(F)c1F
+- SMILES: COc1c(C)cnc(Cn2ccc(-c3ccccc3SC)n2)c1C.Fc1c(F)c(F)c(S)c(F)c1F>>COc1c(C)c[n]2->[Cu+](<-[n]3c(-c4ccccc4SC)ccn3Cc2c1C)[S-]1(c2c(F)c(F)c(F)c(F)c2F)[Cu+]2<-[S-]([Cu+][S-](c3c(F)c(F)c(F)c(F)c3F)->[Cu+]<-1[S-](c1c(F)c(F)c(F)c(F)c1F)->[Cu+](<-[S-](c1c(F)c(F)c(F)c(F)c1F)[Cu+]13<-[n]4cc(C)c(OC)c(C)c4Cn4ccc(-c5ccccc5[S]1C)[n]->34)[S-]->2c1c(F)c(F)c(F)c(F)c1F)c1c(F)c(F)c(F)c(F)c1F
 
 ## Reaction 31-614-CAS-23916864
 
@@ -59393,7 +59393,7 @@ Total reactions: 8117
 - Yield %: 80
 - Reagents: Potassium carbonate (584-08-7) [BASE], Hydrochloric Acid (7647-01-0) [ACID], 16941-11-0 (16941-11-0) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2), Water (7732-18-5)
-- SMILES: O=C(CCS)OCC(COC(=O)CCS)(COC(=O)CCS)COC(=O)CCS.O=C([O-])C1=CC=C(OC23=[CH]4[CH]5=C6(Cl)[CH]7=[CH]2[Fe+2]75463289%10<-[CH-]3[CH]2=[CH]8[CH]9=[CH]3%10)C=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-].[H+]>>O=C(CCSC12=[CH]3[CH]4=C5(OC6=CC=C(C(=O)[O-])C=C6)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29)OCC(COC(=O)CCSC12=[CH]3[CH]4=C5(OC6=CC=C(C(=O)[O-])C=C6)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29)(COC(=O)CCSC12=[CH]3[CH]4=C5(OC6=CC=C(C(=O)[O-])C=C6)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29)COC(=O)CCSC12=[CH]3[CH]4=C5(OC6=CC=C(C(=O)[O-])C=C6)[CH]6=[CH]1[Fe+2]643521789<-[CH-]2[CH]1=[CH]7[CH]8=[CH]29.[F-][P+5]([F-])([F-])([F-])([F-])[F-].[H+]
+- SMILES: O=C(CCS)OCC(COC(=O)CCS)(COC(=O)CCS)COC(=O)CCS.O=C([O-])C1=CC=C(O[C]23->[Fe+2]456789%10%11(<-[CH]%12=[CH]->4[CH-]->5[CH]->6=[CH]->7%12)<-[CH](=[CH]->82)[C]->9(Cl)=[CH]->%10[CH]->%11=3)C=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-].[H+]>>O=C(CCS[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->71)[C]->8(OC1=CC=C(C(=O)[O-])C=C1)=[CH]->9[CH]->%10=2)OCC(COC(=O)CCS[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->71)[C]->8(OC1=CC=C(C(=O)[O-])C=C1)=[CH]->9[CH]->%10=2)(COC(=O)CCS[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->71)[C]->8(OC1=CC=C(C(=O)[O-])C=C1)=[CH]->9[CH]->%10=2)COC(=O)CCS[C]12->[Fe+2]3456789%10(<-[CH]%11=[CH]->3[CH-]->4[CH]->5=[CH]->6%11)<-[CH](=[CH]->71)[C]->8(OC1=CC=C(C(=O)[O-])C=C1)=[CH]->9[CH]->%10=2.[F-][P+5]([F-])([F-])([F-])([F-])[F-].[H+]
 
 ## Reaction 31-614-CAS-24279109
 
@@ -60680,7 +60680,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 77
 - Reagents: 7440-23-5 (7440-23-5) [UNK]
-- Solvents: Ethanol (64-17-5), 80-73-9 (80-73-9)
+- Solvents: Ethanol (64-17-5), 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: CCCCCCCCCCCCS.Clc1c(Cl)c2c(Cl)c(Cl)c3c(Cl)c(Cl)c4c(Cl)c(Cl)c5c(Cl)c(Cl)c1c1c2c3c4c51>>CCCCCCCCCCCCSc1c(SCCCCCCCCCCCC)c2c(SCCCCCCCCCCCC)c(SCCCCCCCCCCCC)c3c(SCCCCCCCCCCCC)c(SCCCCCCCCCCCC)c4c(SCCCCCCCCCCCC)c(SCCCCCCCCCCCC)c5c(SCCCCCCCCCCCC)c(SCCCCCCCCCCCC)c1c1c2c3c4c51
 
 ## Reaction 31-614-CAS-26736480
@@ -60709,7 +60709,7 @@ Total reactions: 8117
 - Yield %: 83
 - Reagents: N,N-Diisopropylethylamine (7087-68-5) [BASE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: FC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)CCS.FC1=C(F)C(F)=C(C2=C3C=CC4=N3->[Fe+3]35([Cl-])<-N6=C(C=CC6=C(C6=C(F)C(F)=C(F)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(F)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(F)C(F)=C3F)[N-]->52)C(F)=C1F>>FC1=C(F)C(C2=C3C=CC4=N3->[Fe+3]35([Cl-])<-N6=C(C=CC6=C(C6=C(F)C(F)=C(SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)C(F)=C3F)[N-]->52)=C(F)C(F)=C1SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F
+- SMILES: FC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)CCS.FC1=C(F)C(F)=C(C2=C3C=CC4=[N]3->[Fe+3]35([Cl-])<-[N]6=C(C=CC6=C(C6=C(F)C(F)=C(F)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(F)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(F)C(F)=C3F)[N-]->52)C(F)=C1F>>FC1=C(F)C(C2=C3C=CC4=[N]3->[Fe+3]35([Cl-])<-[N]6=C(C=CC6=C(C6=C(F)C(F)=C(SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)C(F)=C6F)C6=CC=C2[N-]->36)C(C2=C(F)C(F)=C(SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)C(F)=C2F)=C2C=CC(=C4C3=C(F)C(F)=C(SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)C(F)=C3F)[N-]->52)=C(F)C(F)=C1SCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F
 
 ## Reaction 31-614-CAS-27006521
 
@@ -60726,7 +60726,7 @@ Total reactions: 8117
 - Condition Core: Base: Cs2CO3
 - Yield %: 76
 - Reagents: Cesium carbonate (534-17-8) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Brc1cc(Br)c2ccc3c(Br)cc(Br)c4ccc1c2c43.Sc1ccc(-c2cc(-c3ccccn3)nc(-c3ccccn3)c2)cc1>>c1ccc(-c2cc(-c3ccc(Sc4cc(Sc5ccc(-c6cc(-c7ccccn7)nc(-c7ccccn7)c6)cc5)c5ccc6c(Sc7ccc(-c8cc(-c9ccccn9)nc(-c9ccccn9)c8)cc7)cc(Sc7ccc(-c8cc(-c9ccccn9)nc(-c9ccccn9)c8)cc7)c7ccc4c5c76)cc3)cc(-c3ccccn3)n2)nc1
 
 ## Reaction 31-614-CAS-27046105
@@ -60924,7 +60924,7 @@ Total reactions: 8117
 - Yield %: 7
 - Reagents: Triethylamine (121-44-8) [BASE]
 - Solvents: Acetonitrile (75-05-8)
-- SMILES: CC1=CC=N2->[Ir+3]34(<-[C-]5=CC(CO)=CC=C5C5=CC=CC=N->35)(<-[C-]3=CC(CO)=CC=C3C3=CC=CC=N->43)<-N3=CC=C(COC(=O)NCCSC4=C(F)C(F)=C(C5=C(F)C(F)=C(F)C(F)=C5F)C(F)=C4F)C=C3C2=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-].NCC(=O)N[C@@H](CS)C(=O)N1CCC[C@H]1C(=O)NCC(=O)O.O=C(O)C(F)(F)F>>CC1=CC=N2->[Ir+3]34(<-[C-]5=CC(CO)=CC=C5C5=CC=C6C=CC=CC6=N->35)(<-[C-]3=CC(CO)=CC=C3C3=CC=C5C=CC=CC5=N->43)<-N3=CC=C(COC(=O)NCCSC4=C(F)C(F)=C(C5=C(F)C(F)=C(SSC[C@H](NC(=O)CN)C(=O)N6CCC[C@H]6C(=O)NCC(=O)O)C(F)=C5F)C(F)=C4F)C=C3C2=C1.O=C(O)C(F)(F)F.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: CC1=CC=[N]2->[Ir+3]34(<-[C-]5=CC(CO)=CC=C5C5=CC=CC=[N]->35)(<-[C-]3=CC(CO)=CC=C3C3=CC=CC=[N]->43)<-[N]3=CC=C(COC(=O)NCCSC4=C(F)C(F)=C(C5=C(F)C(F)=C(F)C(F)=C5F)C(F)=C4F)C=C3C2=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-].NCC(=O)N[C@@H](CS)C(=O)N1CCC[C@H]1C(=O)NCC(=O)O.O=C(O)C(F)(F)F>>CC1=CC=[N]2->[Ir+3]34(<-[C-]5=CC(CO)=CC=C5C5=CC=C6C=CC=CC6=[N]->35)(<-[C-]3=CC(CO)=CC=C3C3=CC=C5C=CC=CC5=[N]->43)<-[N]3=CC=C(COC(=O)NCCSC4=C(F)C(F)=C(C5=C(F)C(F)=C(SSC[C@H](NC(=O)CN)C(=O)N6CCC[C@H]6C(=O)NCC(=O)O)C(F)=C5F)C(F)=C4F)C=C3C2=C1.O=C(O)C(F)(F)F.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-614-CAS-28570808
 
@@ -60933,7 +60933,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - Solvents: Tetrahydrofuran (109-99-9)
-- SMILES: SCc1ccccc1.COC12=[CH]3[CH]4=C5(F)[CH]6=[CH]1[Cr]64352(C#O)(C#O)C#O>>COC12=[CH]3C4(C)=C5(SCC6=CC=CC=C6)[CH]6=[CH]1[Cr]63245(C#O)(C#O)C#O
+- SMILES: SCc1ccccc1.CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[C]->4(F)=[CH]->5[CH]->6=2>>CO[C]12->[Cr]3456([C]#O)([C]#O)([C]#O)<-[CH]1=[CH]->3[C]->4(SCC1=CC=CC=C1)=[C]->5(C)[CH]->6=2
 
 ## Reaction 31-614-CAS-28785872
 
@@ -61160,14 +61160,14 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 89
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: Sc1ccncc1.Fc1c(F)c(F)c2c(c1F)-c1nc3c4c(F)c(F)c(F)c(F)c4c4nc5n6->[Zn+2]7(<-n1c-2nc1c2c(F)c(F)c(F)c(F)c2c(nc6-c2c(F)c(F)c(F)c(F)c2-5)[n-]->71)<-[n-]34>>Fc1c(Sc2ccncc2)c(Sc2ccncc2)c(F)c2c1-c1nc3c4c(F)c(Sc5ccncc5)c(Sc5ccncc5)c(F)c4c4nc5n6->[Zn+2]7(<-n1c-2nc1c2c(F)c(Sc8ccncc8)c(Sc8ccncc8)c(F)c2c(nc6-c2c(F)c(Sc6ccncc6)c(Sc6ccncc6)c(F)c2-5)[n-]->71)<-[n-]34
+- SMILES: Sc1ccncc1.Fc1c(F)c(F)c2c(c1F)-c1nc3c4c(F)c(F)c(F)c(F)c4c4nc5[n]6->[Zn+2]7(<-[n]1c-2nc1c2c(F)c(F)c(F)c(F)c2c(nc6-c2c(F)c(F)c(F)c(F)c2-5)[n-]->71)<-[n-]34>>Fc1c(Sc2ccncc2)c(Sc2ccncc2)c(F)c2c1-c1nc3c4c(F)c(Sc5ccncc5)c(Sc5ccncc5)c(F)c4c4nc5[n]6->[Zn+2]7(<-[n]1c-2nc1c2c(F)c(Sc8ccncc8)c(Sc8ccncc8)c(F)c2c(nc6-c2c(F)c(Sc6ccncc6)c(Sc6ccncc6)c(F)c2-5)[n-]->71)<-[n-]34
 
 ## Reaction 31-614-CAS-30419235
 
 - Type: C_S_Coupling
 - Condition Core: Base: NaH
 - Yield %: 87
-- Reagents: 80-73-9 (80-73-9) [UNK], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
+- Reagents: 1,3-Dimethyl-2-imidazolidinone (80-73-9) [SOLVENT], Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
 - SMILES: Brc1cc2c3cc(Br)c(Br)cc3c3cc(Br)c(Br)cc3c2cc1Br.COc1ccc(S)cc1>>COc1ccc(Sc2cc3c4cc(Sc5ccc(OC)cc5)c(Sc5ccc(OC)cc5)cc4c4cc(Sc5ccc(OC)cc5)c(Sc5ccc(OC)cc5)cc4c3cc2Sc2ccc(OC)cc2)cc1
 
 ## Reaction 31-614-CAS-30573377
@@ -63579,7 +63579,7 @@ Total reactions: 8117
 - Yield %: 83
 - Reagents: 109-89-7 (109-89-7) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: CC(=O)OC[C@H]1O[C@@H](S)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O.Fc1c(F)c(F)c(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)c(F)c1F>>CC(=O)OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=N4->[Ir+3]45(<-[c-]6ccccc6-c6ccccn->46)(<-[c-]4ccccc4-c4ccccn->54)<-[n-]4cccc43)c(F)c2F)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O
+- SMILES: CC(=O)OC[C@H]1O[C@@H](S)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O.Fc1c(F)c(F)c(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)c(F)c1F>>CC(=O)OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=[N]4->[Ir+3]45(<-[c-]6ccccc6-c6cccc[n]->46)(<-[c-]4ccccc4-c4cccc[n]->54)<-[n-]4cccc43)c(F)c2F)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@@H]1OC(C)=O
 
 ## Reaction 31-614-CAS-31983799
 
@@ -63587,7 +63587,7 @@ Total reactions: 8117
 - Yield %: 78
 - Reagents: 109-89-7 (109-89-7) [UNK]
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: CC(=O)OC[C@H]1O[C@@H](S)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@H]1OC(C)=O.Fc1c(F)c(F)c(C2=C3C=CC=N3->[Ir+3]34(<-[c-]5ccccc5-c5ccccn->35)(<-[c-]3ccccc3-c3ccccn->43)<-[n-]3cccc32)c(F)c1F>>CC(=O)OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=N4->[Ir+3]45(<-[c-]6ccccc6-c6ccccn->46)(<-[c-]4ccccc4-c4ccccn->54)<-[n-]4cccc43)c(F)c2F)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@H]1OC(C)=O
+- SMILES: CC(=O)OC[C@H]1O[C@@H](S)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@H]1OC(C)=O.Fc1c(F)c(F)c(C2=C3C=CC=[N]3->[Ir+3]34(<-[c-]5ccccc5-c5cccc[n]->35)(<-[c-]3ccccc3-c3cccc[n]->43)<-[n-]3cccc32)c(F)c1F>>CC(=O)OC[C@H]1O[C@@H](Sc2c(F)c(F)c(C3=C4C=CC=[N]4->[Ir+3]45(<-[c-]6ccccc6-c6cccc[n]->46)(<-[c-]4ccccc4-c4cccc[n]->54)<-[n-]4cccc43)c(F)c2F)[C@H](OC(C)=O)[C@@H](OC(C)=O)[C@H]1OC(C)=O
 
 ## Reaction 31-614-CAS-32020563
 
@@ -65918,7 +65918,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 87
 - Solvents: Methanol (67-56-1), N,N-Dimethylformamide (68-12-2)
-- SMILES: O=C(O)CS.CCCC[N+](CCCC)(CCCC)CCCC.[OH-].Fc1c(F)c(F)c(-c2c3n4->[Zn+2]56<-n7c(c(-c8c(F)c(F)c(F)c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F>>CCCC[N+](CCCC)(CCCC)CCCC.O=C([O-])CSc1c(F)c(F)c(-c2c3n4->[Zn+2]56<-n7c(c(-c8c(F)c(F)c(SCC(=O)[O-])c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(SCC(=O)[O-])c(F)c2F)c2ccc(c(-c5c(F)c(F)c(SCC(=O)[O-])c(F)c5F)c4C=C3)[n-]->62)c(F)c1F
+- SMILES: O=C(O)CS.CCCC[N+](CCCC)(CCCC)CCCC.[OH-].Fc1c(F)c(F)c(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8c(F)c(F)c(F)c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F>>CCCC[N+](CCCC)(CCCC)CCCC.O=C([O-])CSc1c(F)c(F)c(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8c(F)c(F)c(SCC(=O)[O-])c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(SCC(=O)[O-])c(F)c2F)c2ccc(c(-c5c(F)c(F)c(SCC(=O)[O-])c(F)c5F)c4C=C3)[n-]->62)c(F)c1F
 
 ## Reaction 31-614-CAS-35298888
 
@@ -66346,7 +66346,7 @@ Total reactions: 8117
 - Type: C_S_Coupling
 - Yield %: 87
 - Solvents: N,N-Dimethylformamide (68-12-2)
-- SMILES: O=C(O)CS.CCCC[N+](CCCC)(CCCC)CCCC.[OH-].Fc1c(F)c(F)c(-c2c3n4->[Zn+2]56<-n7c(c(-c8c(F)c(F)c(F)c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F>>CCCC[N+](CCCC)(CCCC)CCCC.O=C([O-])CSc1c(F)c(F)c(-c2c3n4->[Zn+2]56<-n7c(c(-c8c(F)c(F)c(SCC(=O)[O-])c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(SCC(=O)[O-])c(F)c2F)c2ccc(c(-c5c(F)c(F)c(SCC(=O)[O-])c(F)c5F)c4C=C3)[n-]->62)c(F)c1F
+- SMILES: O=C(O)CS.CCCC[N+](CCCC)(CCCC)CCCC.[OH-].Fc1c(F)c(F)c(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8c(F)c(F)c(F)c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(F)c(F)c2F)c2ccc(c(-c5c(F)c(F)c(F)c(F)c5F)c4C=C3)[n-]->62)c(F)c1F>>CCCC[N+](CCCC)(CCCC)CCCC.O=C([O-])CSc1c(F)c(F)c(-c2c3[n]4->[Zn+2]56<-[n]7c(c(-c8c(F)c(F)c(SCC(=O)[O-])c(F)c8F)c8ccc2[n-]->58)C=Cc7c(-c2c(F)c(F)c(SCC(=O)[O-])c(F)c2F)c2ccc(c(-c5c(F)c(F)c(SCC(=O)[O-])c(F)c5F)c4C=C3)[n-]->62)c(F)c1F
 
 ## Reaction 31-614-CAS-35924563
 
@@ -70716,7 +70716,7 @@ Total reactions: 8117
 - Condition Core: Base: NaH
 - Yield %: 88
 - Reagents: Sodium hydride (60% dispersion in mineral oil) (7646-69-7) [BASE]
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Clc1c(Cl)c(Cl)c(Cl)c(Cl)c1Cl.COc1ccc(S)cc1>>COc1ccc(Sc2c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c(Sc3ccc(OC)cc3)c2Sc2ccc(OC)cc2)cc1
 
 ## Reaction 31-614-CAS-39570108
@@ -73129,7 +73129,7 @@ Total reactions: 8117
 
 - Type: C_S_Coupling
 - Yield %: 74
-- Solvents: 80-73-9 (80-73-9)
+- Solvents: 1,3-Dimethyl-2-imidazolidinone (80-73-9)
 - SMILES: Brc1ccc(-c2ccc(Br)cc2)cc1.CCCCCCCCCCCCS.[Na]>>CCCCCCCCCCCCSC1=CCC(c2ccc(SCCCCCCCCCCCC)cc2)C=C1
 
 ## Reaction 31-614-CAS-42895630
