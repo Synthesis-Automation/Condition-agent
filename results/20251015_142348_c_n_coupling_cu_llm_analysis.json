@@ -1,0 +1,78 @@
+{
+  "status": "success",
+  "synthesis": {
+    "consensus_analysis": {
+      "catalyst": {
+        "agreement": "medium",
+        "consensus_value": "Tris(dibenzylideneacetone)dipalladium(0)",
+        "notes": "ML sources (3/3) and Rule source agree on Pd2(dba)3 catalyst family"
+      },
+      "solvent": {
+        "agreement": "low",
+        "consensus_value": "Toluene",
+        "notes": "ML source #3 and Rule source both suggest toluene, but ML sources #1-2 suggest different solvents (2-MeTHF, t-BuOH)"
+      },
+      "temperature": {
+        "agreement": "low",
+        "consensus_value": "100°C",
+        "notes": "Only Rule source specifies temperature (100°C), ML sources provide no temperature data"
+      },
+      "base": {
+        "agreement": "low",
+        "consensus_value": "No consensus",
+        "notes": "ML sources suggest DBU, K2CO3, or NaOt-Bu; Rule source suggests Cs2CO3"
+      }
+    },
+    "confidence_level": "medium",
+    "confidence_reasoning": "Medium confidence due to catalyst consensus across sources but disagreement on solvent/base. ML confidence scores are 0.00 (low similarity), but substrate chemistry supports the recommended approach.",
+    "recommended_condition": {
+      "catalyst": "Tris(dibenzylideneacetone)dipalladium(0) (2-5 mol%)",
+      "ligand": "XPhos (4-10 mol%)",
+      "solvent": "Toluene",
+      "temperature": "100°C",
+      "base": "Cesium carbonate (2.0 equiv)",
+      "additive": "None",
+      "rationale": "Rule source provides specific conditions for this C-N coupling. XPhos is optimal for electron-poor heteroaryl chlorides (2-chloropyridine) coupling with anilines. High temperature (100°C) facilitates oxidative addition with aryl chloride. Cs2CO3 provides good solubility and moderate basicity."
+    },
+    "backup_conditions": [
+      {
+        "catalyst": "Tris(dibenzylideneacetone)dipalladium(0) (2-5 mol%)",
+        "ligand": "DPPF (4-10 mol%)",
+        "solvent": "2-Methyltetrahydrofuran",
+        "temperature": "80-90°C",
+        "base": "Sodium tert-butoxide (1.5 equiv)",
+        "when_to_use": "<30% conv after 6h: try DPPF ligand in 2-MeTHF with stronger base"
+      },
+      {
+        "catalyst": "Pd(OAc)2 (5 mol%)",
+        "ligand": "XPhos (10 mol%)",
+        "solvent": "t-Butanol",
+        "temperature": "90°C",
+        "base": "Potassium carbonate (2.0 equiv)",
+        "when_to_use": "If Backup 1 <20% after 12h: switch catalyst family to Pd(OAc)2/XPhos"
+      }
+    ],
+    "warnings": [
+      "2-Chloropyridine is electron-poor - XPhos/DPPF are appropriate electron-rich ligands",
+      "Aryl chloride requires strong base/high temp for oxidative addition - monitor for decomposition",
+      "No nitro groups present - no reduction risk concerns",
+      "Heteroaryl chloride benefits from chelating/bulky ligands for stability"
+    ],
+    "source_comparison": {
+      "ml_contribution": "Provided multiple Pd2(dba)3/DPPF combinations but with low confidence scores",
+      "rule_contribution": "Provided specific XPhos/toluene/100°C/Cs2CO3 conditions optimized for this reaction type",
+      "protocol_contribution": "Minimal contribution - all protocols had incomplete data and low confidence"
+    }
+  },
+  "sources_used": {
+    "ml_precedents": 3,
+    "rule_matches": 1,
+    "protocol_procedures": 3
+  },
+  "llm_metadata": {
+    "model": "deepseek-v3.2-exp",
+    "tokens": 1827,
+    "latency_ms": 58903.865700005554,
+    "processing_time_ms": 58904.1181000066
+  }
+}

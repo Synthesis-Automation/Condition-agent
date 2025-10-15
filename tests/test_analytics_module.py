@@ -57,7 +57,7 @@ def test_2_dataset_statistics():
     """Test 2: Get comprehensive dataset statistics."""
     print_header("Test 2: Dataset Statistics")
     
-    families_to_test = ["Suzuki", "C_N_Coupling_Pd", "Amide_formation"]
+    families_to_test = ["Suzuki", "C_N_Coupling", "Amide_formation"]
     
     for family in families_to_test:
         print_subheader(f"{family} Dataset")
@@ -112,7 +112,7 @@ def test_3_common_catalysts():
     """Test 3: Get common catalysts with yield data."""
     print_header("Test 3: Common Catalysts (Frequency Ranking)")
     
-    family = "C_N_Coupling_Pd"
+    family = "C_N_Coupling"
     top_n = 10
     
     print_subheader(f"{family} - Top {top_n} Catalysts")
@@ -152,7 +152,7 @@ def test_4_common_ligands():
     """Test 4: Get common ligands with yield data."""
     print_header("Test 4: Common Ligands (Frequency Ranking)")
     
-    family = "C_N_Coupling_Pd"
+    family = "C_N_Coupling"
     top_n = 10
     
     print_subheader(f"{family} - Top {top_n} Ligands")
@@ -288,7 +288,7 @@ def test_8_catalytic_systems():
     """Test 8: Get common catalytic systems (catalyst + ligand combinations)."""
     print_header("Test 8: Common Catalytic Systems & Generation Analysis")
     
-    family = "C_N_Coupling_Pd"
+    family = "C_N_Coupling"
     top_n = 15
     
     print_subheader(f"{family} - Top {top_n} Catalytic Systems")
@@ -459,7 +459,7 @@ def test_10_condition_cores():
     """Test 10: Get common condition core combinations."""
     print_header("Test 10: Common Condition Cores")
     
-    family = "C_N_Coupling_Pd"
+    family = "C_N_Coupling"
     top_n = 10
     
     print_subheader(f"{family} - Top {top_n} Condition Cores")
@@ -487,7 +487,7 @@ def test_11_plate_recommendations():
     """Test 11: Generate HTE plate recommendations."""
     print_header("Test 11: Plate Design Recommendations")
     
-    family = "C_N_Coupling_Pd"
+    family = "C_N_Coupling"
     
     # Test different optimization strategies
     strategies = [

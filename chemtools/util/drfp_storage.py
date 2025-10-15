@@ -13,10 +13,10 @@ Storage Benefits:
 
 Usage:
     # Save fingerprints to binary file
-    save_drfp_index(fingerprints, reaction_ids, "data/C_N_Coupling_Cu_drfp.npz")
+    save_drfp_index(fingerprints, reaction_ids, "data/C_N_Coupling_drfp.npz")
     
     # Load fingerprints by reaction_id
-    loader = DRFPLoader("data/C_N_Coupling_Cu_drfp.npz")
+    loader = DRFPLoader("data/C_N_Coupling_drfp.npz")
     fp = loader.get_fingerprint("31-172-CAS-23306204")
 """
 
@@ -211,8 +211,8 @@ def extract_drfp_from_jsonl(
         Dictionary mapping reaction_id -> fingerprint array
     
     Example:
-        >>> fps = extract_drfp_from_jsonl("data/C_N_Coupling_Cu.jsonl", 
-        ...                                "data/C_N_Coupling_Cu_drfp.npz")
+        >>> fps = extract_drfp_from_jsonl("data/C_N_Coupling.jsonl", 
+        ...                                "data/C_N_Coupling_drfp.npz")
     """
     import json
     
@@ -270,10 +270,10 @@ def get_drfp_path_for_family(family: str, data_dir: str = "data/reaction_dataset
     Get the standard DRFP NPZ path for a reaction family.
     
     Args:
-        family: Reaction family name (e.g., "C_N_Coupling_Cu")
+        family: Reaction family name (e.g., "C_N_Coupling", "C_O_Coupling", "C_S_Coupling")
         data_dir: Directory containing reaction datasets
     
     Returns:
-        Path to DRFP NPZ file (e.g., "data/reaction_dataset/C_N_Coupling_Cu_drfp.npz")
+        Path to DRFP NPZ file (e.g., "data/reaction_dataset/C_N_Coupling_drfp.npz")
     """
     return os.path.join(data_dir, f"{family}_drfp.npz")

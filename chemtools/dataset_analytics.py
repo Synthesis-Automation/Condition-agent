@@ -33,7 +33,7 @@ def _load_dataset(family: str) -> List[Dict[str, Any]]:
     """Load a reaction dataset JSONL file.
     
     Args:
-        family: Reaction family name (e.g., "Suzuki", "C_N_Coupling_Pd")
+        family: Reaction family name (e.g., "Suzuki", "C_N_Coupling")
         
     Returns:
         List of reaction dictionaries

@@ -27,8 +27,10 @@ def _compile_smarts():
         "acid": Chem.MolFromSmarts("C(=O)[OH]"),
         # N-nucleophile (amine/anilines, simple)
         "nucleophile_n": Chem.MolFromSmarts("[NX3;H1,H2]"),
-        # Phenoxide/alcohol O-H (for etherification heuristic if needed)
-        "nucleophile_o": Chem.MolFromSmarts("[OX2H]")
+        # Phenoxide/alcohol O-H (for C-O coupling)
+        "nucleophile_o": Chem.MolFromSmarts("[OX2H]"),
+        # Thiol S-H (for C-S coupling)
+        "nucleophile_s": Chem.MolFromSmarts("[SX2H]")
     }
     return smarts
 
@@ -99,13 +101,18 @@ def _detect_agent_metals(agents: List[Dict[str, Any]]) -> Set[str]:
 
 
 def _apply_catalyst_override(family: str, metals: Set[str], *, is_cn_coupling: bool) -> str:
+    """
+    Apply catalyst-based family override for C-N coupling reactions.
+    
+    Note: With unified C_N_Coupling dataset, this function is deprecated but kept
+    for backward compatibility. Metal preference should now be handled via constraints.
+    """
     if not metals or not is_cn_coupling:
         return family
-    # Prioritise Pd systems (Buchwald-Hartwig) over Cu-based Ullmann pathways.
-    if "Pd" in metals:
-        return "Buchwald_CN"
-    if family in {"Unknown", "Ullmann_CN", None} and "Cu" in metals:
-        return "Ullmann_CN"
+    # All C-N coupling variants now map to unified C_N_Coupling
+    # Metal preference is handled by the recommendation engine via constraints
+    if family in {"Unknown", "C_N_Coupling", "Ullmann_CN", "Buchwald_CN", None}:
+        return "C_N_Coupling"
     return family
 
 
@@ -122,6 +129,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
         "boron": has("b(") or has("b[") or has("b(o)o") or has("ob(o)"),
         "nucleophile_n": has("n") or has("nh"),
         "nucleophile_o": has("o") or has("oh"),
+        "nucleophile_s": has("s") or has("sh"),
         "terminal_alkyne": has("c#c") or has("c#cc"),
         "acid": has("c(=o)oh") or has("c(=o)o") or has("oc(=o)"),
     }
@@ -152,6 +160,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
             "boron": any_match("boron"),
             "nucleophile_n": any_match("nucleophile_n"),
             "nucleophile_o": any_match("nucleophile_o"),
+            "nucleophile_s": any_match("nucleophile_s"),
             "terminal_alkyne": any_match("terminal_alkyne"),
             "acid": any_match("acid"),
         }
@@ -168,17 +177,30 @@ def detect_family(reactants: List[str]) -> Dict[str, Any]:
 
     # Determine family based on prioritized deterministic rules
     is_aryl_or_vinyl_electrophile = h.get("aryl_halide") or h.get("vinyl_halide") or h.get("triflate")
+    
+    # C-N Coupling (unified - metal preference handled via constraints)
     if is_aryl_or_vinyl_electrophile and h.get("nucleophile_n"):
-        fam, conf = "Ullmann_CN", 0.9 if h.get("aryl_halide") else 0.8
+        fam, conf = "C_N_Coupling", 0.9 if h.get("aryl_halide") else 0.8
+    
+    # C-O Coupling (Ullmann-type etherification)
+    if is_aryl_or_vinyl_electrophile and h.get("nucleophile_o"):
+        fam, conf = "C_O_Coupling", 0.85 if h.get("aryl_halide") else 0.75
+    
+    # C-S Coupling (Ullmann-type thioetherification)
+    if is_aryl_or_vinyl_electrophile and h.get("nucleophile_s"):
+        fam, conf = "C_S_Coupling", 0.85 if h.get("aryl_halide") else 0.75
+    
+    # C-C Suzuki Coupling (higher priority than C-O/C-S)
     if h.get("aryl_halide") and h.get("boron"):
         fam, conf = "Suzuki_CC", max(conf, 0.9)
+    
+    # C-C Sonogashira Coupling
     if is_aryl_or_vinyl_electrophile and h.get("terminal_alkyne"):
         fam, conf = "Sonogashira_CC", max(conf, 0.85)
+    
+    # Amide formation
     if h.get("acid") and h.get("nucleophile_n"):
         fam, conf = "Amide_Coupling", max(conf, 0.8)
-    # Optional: etherification (Ullmann O) – not primary target but can hint
-    if is_aryl_or_vinyl_electrophile and h.get("nucleophile_o") and fam == "Unknown":
-        fam, conf = "Ullmann_O", 0.75
 
     return {"family": fam, "confidence": float(conf), "hits": h}
 
@@ -214,13 +236,11 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
 
     has_cn_signature = bool(
         (hits.get("nucleophile_n") and (hits.get("aryl_halide") or hits.get("vinyl_halide") or hits.get("triflate")))
-        or fam_rule in {"Ullmann_CN", "Buchwald_CN"}
+        or fam_rule in {"C_N_Coupling", "Ullmann_CN", "Buchwald_CN"}
     )
     fam_rule = _apply_catalyst_override(fam_rule, agent_metals, is_cn_coupling=has_cn_signature)
-    if fam_rule == "Buchwald_CN":
+    if fam_rule == "C_N_Coupling":
         conf_rule = max(conf_rule, 0.9 if hits.get("aryl_halide") else 0.85)
-    elif fam_rule == "Ullmann_CN" and "Cu" in agent_metals:
-        conf_rule = max(conf_rule, 0.85)
 
     auto: Optional[Dict[str, Any]] = None
     fam_rxn: Optional[str] = None
@@ -245,13 +265,26 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
                     conf_rxn = None
 
     if fam_rxn:
-        fam_rxn = _apply_catalyst_override(fam_rxn, agent_metals, is_cn_coupling=has_cn_signature or fam_rxn in {"Ullmann_CN", "Buchwald_CN"})
-        if fam_rxn == "Buchwald_CN" and (conf_rxn or 0) < 0.85:
+        fam_rxn = _apply_catalyst_override(fam_rxn, agent_metals, is_cn_coupling=has_cn_signature or fam_rxn in {"C_N_Coupling", "Ullmann_CN", "Buchwald_CN"})
+        if fam_rxn == "C_N_Coupling" and (conf_rxn or 0) < 0.85:
             conf_rxn = 0.85
 
-    # Choose final family preferring rxn-insight mapping when present
-    fam_final = fam_rxn or fam_rule
-    conf_final = conf_rxn if (conf_rxn is not None) else conf_rule
+    # Choose final family with intelligent preference logic
+    # Prefer rule-based detection for C-O and C-S coupling (more specific)
+    # Prefer rxn_insight for other reactions when available and has confidence
+    if fam_rule in {"C_O_Coupling", "C_S_Coupling"} and conf_rule >= 0.75:
+        # Rule-based C-O/C-S detection is reliable, use it
+        fam_final = fam_rule
+        conf_final = conf_rule
+    elif fam_rxn and conf_rxn is not None:
+        # RXN insight has a result with confidence
+        fam_final = fam_rxn
+        conf_final = conf_rxn
+    else:
+        # Fall back to rule-based
+        fam_final = fam_rule
+        conf_final = conf_rule
+    
     agreement = (fam_rxn is not None) and (str(fam_rxn) == str(fam_rule))
 
     out: Dict[str, Any] = {
