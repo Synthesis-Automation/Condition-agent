@@ -839,6 +839,34 @@
     "embedding_text": "type: ADDITIVE | family: Quaternary ammonium phase-transfer catalysts (PTC) (quaternary_ammonium_ptc) | name: Tetrabutylammonium Iodide | abbr: 6M53DT4JNG; TBAI; Tetrabutylammonium Iodide | CAS: 311-28-4 | synonyms: Tetrabutylammonium Iodide; 311-28-4; 1-Butanaminium, N,N,N-tributyl-, iodide (1:1); 1-Butanaminium, N,N,N-tributyl-, iodide; NSC-10414; 6M53DT4JNG; DTXSID30878092; RefChem:896768; DTXCID701016152; 206-220-5; Tetra-n-butylammonium iodide; TBAI; Tetrabutyl ammonium iodide; tetrabutylammoniumiodide; tetrabutylazanium iodide; tetrabutyl-ammonium iodide"
   },
   {
+    "id": "DPKBAXPHAYBPRL-UHFFFAOYSA-M",
+    "name": "Tetrabutylammonium Iodide",
+    "abbreviation": [
+      "TBAI",
+      "Bu₄NI"
+    ],
+    "aliases": [
+      "1-Butanaminium, N,N,N-tributyl-, iodide (1:1)",
+      "1-Butanaminium, N,N,N-tributyl-, iodide",
+      "Tetra-n-butylammonium iodide",
+      "Tetrabutyl ammonium iodide",
+      "tetrabutylammoniumiodide",
+      "tetrabutylazanium iodide",
+      "tetrabutyl-ammonium iodide",
+      "N,N,N-Tributyl-1-butanaminium iodide"
+    ],
+    "cas": "311-28-4",
+    "inchi_key": "DPKBAXPHAYBPRL-UHFFFAOYSA-M",
+    "roles": {
+      "additive": {
+        "families": [
+          "quaternary_ammonium_ptc"
+        ]
+      }
+    },
+    "embedding_text": "type: ADDITIVE | family: quaternary_ammonium_ptc (quaternary_ammonium_ptc) | name: Tetrabutylammonium Iodide | abbr: TBAI | CAS: 311-28-4 | synonyms: Tetrabutylammonium Iodide; 311-28-4; 1-Butanaminium, N,N,N-tributyl-, iodide (1:1); 1-Butanaminium, N,N,N-tributyl-, iodide; NSC-10414; 6M53DT4JNG; DTXSID30878092; RefChem:896768; DTXCID701016152; 206-220-5; Tetra-n-butylammonium iodide; TBAI; Tetrabutyl ammonium iodide; tetrabutylammoniumiodide; tetrabutylazanium iodide; tetrabutyl-ammonium iodide; N,N,N-Tributyl-1-butanaminium iodide"
+  },
+  {
     "id": "cas-557-34-6",
     "name": "Zinc Acetate",
     "abbreviation": [],
