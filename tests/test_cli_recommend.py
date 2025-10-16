@@ -28,7 +28,7 @@ import builtins
 builtins.input = mock_input
 
 # Now run the CLI
-from app.cli_recommend import main
+from app.cli_AI_recommend import main
 
 if __name__ == "__main__":
     try:

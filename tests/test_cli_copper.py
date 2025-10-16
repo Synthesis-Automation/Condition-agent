@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.cli_recommend import InteractiveCLI
+from app.cli_AI_recommend import InteractiveCLI
 
 
 def test_copper_catalyst_parsing():
@@ -43,7 +43,7 @@ def test_copper_catalyst_parsing():
         requirements = "use copper catalyst"
         
         # Simulate what the LLM would parse
-        from app.cli_recommend import ParsedRequest
+        from app.cli_AI_recommend import ParsedRequest
         result = ParsedRequest(
             reaction_smiles=reaction,
             reaction_smiles_is_valid=True,
@@ -90,7 +90,7 @@ def test_copper_catalyst_parsing():
 
 def test_api_request_conversion():
     """Test that ParsedRequest.to_api_request() correctly handles metal_preference."""
-    from app.cli_recommend import ParsedRequest
+    from app.cli_AI_recommend import ParsedRequest
     
     # Test case 1: Only metal_preference
     request1 = ParsedRequest(
