@@ -55,10 +55,17 @@ def _row_catalyst_class(row: Dict[str, Any]) -> str:
     """Heuristically classify a precedent row into a catalyst class.
 
     Returns one of metal symbols (e.g., 'Pd', 'Ni', ...), 'enzyme', 'organo_catalyst', or 'other'.
+    
+    Note: Bases and acids (e.g., "Base: K2CO3", "Acid: HCl") are classified as 'other'
+    because they are stoichiometric reagents, not catalysts.
     """
     # 1) Use condition_core like 'Pd/XPhos'
     core = (row.get("condition_core") or "").strip()
     if core:
+        # Check if it's a base/acid reagent (not a true catalyst)
+        if core.startswith("Base:") or core.startswith("Acid:"):
+            return "other"  # Bases/acids are reagents, not catalysts
+        
         head = core.split("/", 1)[0].strip()
         sym = _normalize_symbol(head)
         if sym:
@@ -90,9 +97,14 @@ def _row_catalyst_class(row: Dict[str, Any]) -> str:
         if any(k in nm for k in _ENZYME_KEYWORDS):
             return "enzyme"
     
-    # 4) If no metal detected, assume organocatalyst when there is any catalyst/ligand info
-    if core or (isinstance(fs, list) and fs):
-        return "organo_catalyst"
+    # 4) If no metal detected, check for true organocatalysts
+    # True organocatalysts: proline, DMAP, DBU, thioureas, squaramides, etc.
+    # But NOT simple bases/acids which are used stoichiometrically
+    if core and not core.startswith("Base:") and not core.startswith("Acid:"):
+        # Only classify as organo_catalyst if it's not a common base/acid
+        if (isinstance(fs, list) and fs):
+            return "organo_catalyst"
+    
     return "other"
 
 

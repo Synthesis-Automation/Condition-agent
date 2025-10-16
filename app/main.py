@@ -132,6 +132,39 @@ def api_scdb_match(req: SchemeMatchRequest):
         raise HTTPException(status_code=500, detail="Internal error while performing SchemeConditionDB match") from exc
     
     payload = result.to_json_dict()
+    
+    # Apply catalyst class filtering if provided via relax parameter
+    catalyst_filter = None
+    if req.relax and isinstance(req.relax, dict):
+        catalyst_filter = req.relax.get("catalyst_class")
+    
+    if catalyst_filter and payload.get("recommended_conditions"):
+        # Filter conditions by catalyst class
+        filtered_conditions = []
+        for cond in payload["recommended_conditions"]:
+            # Extract catalyst class from condition (look in core or full_system)
+            condition_core = cond.get("core", "")
+            # Simple matching: check if catalyst filter (e.g., "Cu") appears in core
+            catalyst_match = False
+            if isinstance(condition_core, str):
+                # Normalize for comparison
+                core_lower = condition_core.lower()
+                filter_lower = str(catalyst_filter).lower()
+                # Match if filter appears in core (e.g., "Cu" in "Cu/L1")
+                if filter_lower in core_lower or filter_lower in core_lower.split("/")[0]:
+                    catalyst_match = True
+            
+            if catalyst_match:
+                filtered_conditions.append(cond)
+        
+        # Update payload with filtered conditions
+        payload["recommended_conditions"] = filtered_conditions
+        payload["_catalyst_filtered"] = {
+            "requested": catalyst_filter,
+            "original_count": len(payload.get("recommended_conditions", [])),
+            "filtered_count": len(filtered_conditions)
+        }
+    
     if not req.include_trace:
         payload.pop("trace", None)
     

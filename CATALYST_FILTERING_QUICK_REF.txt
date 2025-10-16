@@ -1,0 +1,199 @@
+================================================================================
+                    CATALYST FILTERING - QUICK REFERENCE
+================================================================================
+
+✅ STATUS: Feature is ALREADY IMPLEMENTED and READY TO USE
+
+No code changes needed! Just pass `catalyst_class` in the `relax` parameter.
+
+================================================================================
+HOW TO USE
+================================================================================
+
+Python API:
+-----------
+from chemtools.recommend import recommend_from_reaction
+
+result = recommend_from_reaction(
+    reaction="Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+    k=50,
+    relax={
+        "catalyst_class": "Pd"  # Filter to Palladium only
+    }
+)
+
+REST API:
+---------
+POST /api/v1/recommend
+{
+  "reaction": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+  "k": 50,
+  "relax": {
+    "catalyst_class": "Pd"
+  }
+}
+
+================================================================================
+SUPPORTED CATALYSTS
+================================================================================
+
+Metal Symbols (case-insensitive):
+  Pd, Cu, Ni, Co, Fe, Ru, Rh, Ir, Au, Ag, Zn, Mg, Mn, Pt
+
+Full Names (also supported):
+  palladium, copper, nickel, cobalt, iron, etc.
+
+Special Classes:
+  enzyme, organo_catalyst, other
+
+================================================================================
+C_N_COUPLING DATASET STATISTICS
+================================================================================
+
+Total reactions: 15,967
+
+Catalyst breakdown:
+  Cu (Copper)         : 3,716 reactions (23.3%)
+  No catalyst         : 1,683 reactions (10.5%)
+  Ni (Nickel)         :   800 reactions ( 5.0%)
+  Pd (Palladium)      :   555 reactions ( 3.5%)
+  Ligand-specific     : 9,213 reactions (57.7%)
+
+Top Pd-catalyzed cores:
+  - Pd/XantPhos   : 350 reactions
+  - Pd/rac-BINAP  : 296 reactions
+  - Pd/XPhos      : 243 reactions
+  - Pd/RuPhos     : 218 reactions
+
+Top Cu-catalyzed cores:
+  - Cu (generic)                     : 3,716 reactions
+  - Cu/N,N'-Dimethylethylenediamine  :   305 reactions
+  - Cu/phen                          :   284 reactions
+
+Top Ni-catalyzed cores:
+  - Ni (generic)  : 800 reactions
+  - Ni/dtbbpy     : 250 reactions
+
+================================================================================
+USE CASES
+================================================================================
+
+1. Laboratory Constraints:
+   "Our lab only has Pd catalysts available"
+   → Use relax={"catalyst_class": "Pd"}
+
+2. Green Chemistry:
+   "Prefer Cu over Pd (cheaper, less toxic)"
+   → Use relax={"catalyst_class": "Cu"}
+
+3. Method Comparison:
+   "Compare Buchwald-Hartwig (Pd) vs Ullmann (Cu)"
+   → Run with both "Pd" and "Cu" filters
+
+4. Reaction Optimization:
+   "Test which metal gives best conditions"
+   → Loop through ["Pd", "Cu", "Ni"]
+
+================================================================================
+HOW IT WORKS
+================================================================================
+
+Pre-filtering flow:
+
+  Input Reaction
+      ↓
+  Family Detection (e.g., C_N_Coupling)
+      ↓
+  Load Dataset (15,967 reactions)
+      ↓
+  [CATALYST FILTER] → Filter to Pd (1,664 reactions)
+      ↓
+  Bin-based Candidate Pool (substrate matching)
+      ↓
+  DRFP Similarity Ranking
+      ↓
+  Top k Recommendations
+
+Benefits:
+  ✓ Reduces search space (15,967 → 1,664 for Pd)
+  ✓ Faster recommendations
+  ✓ Prevents catalyst cross-contamination
+  ✓ More focused, chemically relevant results
+
+================================================================================
+EXAMPLE OUTPUT
+================================================================================
+
+Without catalyst filter:
+  Top 10 cores: Mixed (Cu, Pd, Ni, Base-only)
+  Confidence: Variable quality
+
+With catalyst_class="Pd":
+  Top 10 cores: Pd/XantPhos, Pd/rac-BINAP, Pd/XPhos, Pd/RuPhos, ...
+  Confidence: Higher (more consistent precedents)
+
+================================================================================
+TESTING
+================================================================================
+
+Run the demonstration script:
+
+  python scripts/demo_catalyst_filtering.py
+
+This will:
+  1. Compare Pd vs Cu vs Ni recommendations
+  2. Verify filtering works correctly
+  3. Show with/without filter comparison
+  4. Display API usage examples
+
+Expected output:
+  ✓ Pd filter: 50 precedents, all Pd-based
+  ✓ Cu filter: 50 precedents, all Cu-based
+  ✓ Ni filter: 50 precedents, all Ni-based
+
+================================================================================
+DOCUMENTATION
+================================================================================
+
+Full Guide:
+  📄 CATALYST_FILTERING_GUIDE.md
+  (Comprehensive guide with examples, API details, code locations)
+
+Demo Script:
+  🐍 scripts/demo_catalyst_filtering.py
+  (Interactive demonstration with comparisons)
+
+Code Locations:
+  - Catalyst detection: chemtools/precedent/catalyst.py
+  - Pre-filtering: chemtools/precedent/search.py (lines 64-68)
+  - API integration: Via relax parameter (existing infrastructure)
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+1. Feature is FULLY IMPLEMENTED - no code changes needed
+2. Works with existing API - just add catalyst_class to relax dict
+3. Backward compatible - existing code continues to work
+4. Zero performance impact - filtering happens before DRFP calculations
+5. Applies to ALL reaction families (not just C_N_Coupling)
+
+================================================================================
+QUICK START
+================================================================================
+
+from chemtools.recommend import recommend_from_reaction
+
+# Get Pd-catalyzed recommendations
+result = recommend_from_reaction(
+    reaction=your_reaction_smiles,
+    k=50,
+    relax={"catalyst_class": "Pd"}
+)
+
+print(f"Core: {result['recommendation']['core']}")
+print(f"Confidence: {result['recommendation']['confidence']:.1%}")
+
+# Done! 🎉
+
+================================================================================

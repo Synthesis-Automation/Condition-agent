@@ -5,7 +5,7 @@ Local Recommendation Tester
 This script mirrors `interactive_recommendation_cli.py` but calls the
 ChemTools APIs directly rather than going through the FastAPI server.
 It prompts for a reaction SMILES and reaction family, runs rule-based,
-ML, fusion, and protocol recommendation pipelines, saves their JSON results,
+ML, and protocol recommendation pipelines, saves their JSON results,
 and prints a compact summary to the console.
 
 Usage:
@@ -15,6 +15,10 @@ Requirements:
     - ChemTools library dependencies installed (same as the FastAPI app)
     - Optional SCDB JSON database for rule-based matching
     - Protocol index built (python -m chemtools.protocol.cli build)
+    
+Note:
+    - Fusion method has been deprecated and removed
+    - Use ML recommendation with --rerank rule for similar functionality
 """
 
 from __future__ import annotations
@@ -65,14 +69,13 @@ except Exception:  # pragma: no cover - fallback path
 try:
     from scripts.recommendation_cli_utils import (
         DEFAULT_SCDB_PATH,
-        FUSION_VARIANTS_DEFAULT,
         K_DEFAULT,
         LIMIT_DEFAULT,
         choose_reaction_type,
+        choose_catalyst,
         prompt_smiles,
         save_json,
         slugify_label,
-        summarize_fusion,
         summarize_ml,
         summarize_rule,
         summarize_protocol,
@@ -82,14 +85,13 @@ except ModuleNotFoundError:
     sys.path.append(str(HERE))
     from recommendation_cli_utils import (
         DEFAULT_SCDB_PATH,
-        FUSION_VARIANTS_DEFAULT,
         K_DEFAULT,
         LIMIT_DEFAULT,
         choose_reaction_type,
+        choose_catalyst,
         prompt_smiles,
         save_json,
         slugify_label,
-        summarize_fusion,
         summarize_ml,
         summarize_rule,
         summarize_protocol,
@@ -120,8 +122,31 @@ def _resolve_rule_db(candidate: Optional[str]) -> Optional[str]:
     return None
 
 
-def local_rule_based_match(reaction: str, db_path: Optional[str]) -> Dict[str, Any]:
-    """Replicate the /match endpoint using in-process ChemTools calls."""
+def local_rule_based_match(reaction: str, db_path: Optional[str], reaction_type: Optional[str] = None) -> Dict[str, Any]:
+    """Replicate the /match endpoint using in-process ChemTools calls.
+    
+    Args:
+        reaction: Reaction SMILES string
+        db_path: Explicit database path (overrides auto-selection)
+        reaction_type: Detected or user-specified reaction type for DB selection
+    """
+    # Auto-detect reaction type if not provided (fallback - should be done earlier in main)
+    if db_path is None and not reaction_type:
+        from chemtools.router import detect_family_from_reaction
+        detection = detect_family_from_reaction(reaction, use_rxn_insight=False)
+        reaction_type = detection.get("family")
+        # Note: Auto-detection is now done earlier in main() so catalyst prompt can work
+    
+    # Auto-select database based on reaction type if not explicitly provided
+    if db_path is None and reaction_type:
+        db_map = {
+            "Suzuki": "data/conditionDB/Suzuki_db.json",
+            "Suzuki_CC": "data/conditionDB/Suzuki_db.json",
+            "C_N_Coupling": "data/conditionDB/C_N_Coupling_Cu_db.json",  # Use Cu as default for now
+            "Amide_formation": "data/conditionDB/amide_formation_db.json",
+        }
+        db_path = db_map.get(reaction_type)  # Let _resolve_rule_db handle existence check
+    
     target_db = _resolve_rule_db(db_path) or _ENV_SCDB_DEFAULT
     start_time = time.perf_counter()
 
@@ -134,7 +159,7 @@ def local_rule_based_match(reaction: str, db_path: Optional[str]) -> Dict[str, A
         return output_formatter.format_rule_match_result(
             reaction_smiles=reaction,
             match_result=payload,
-            requested_type=None,
+            requested_type=reaction_type,
             database_name=database_label,
             processing_time_ms=processing_time_ms,
         )
@@ -242,16 +267,33 @@ def local_ml_recommendation(
     limit: int,
     rerank_strategy: str = 'rule',
     filter_unknown_reagents: bool = False,
+    catalyst_preference: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Replicate the /api/v1/recommend/conditions endpoint locally."""
+    """Replicate the /api/v1/recommend/conditions endpoint locally.
+    
+    Args:
+        reaction: Reaction SMILES string
+        reaction_type: Reaction family/type
+        k_value: Number of precedents to retrieve
+        limit: Number of recommendations to return
+        rerank_strategy: Reranking strategy ('rule', 'analytics', or 'none')
+        filter_unknown_reagents: Whether to filter out unknown reagents
+        catalyst_preference: Preferred catalyst class (e.g., 'Pd', 'Cu', 'Ni')
+    """
     start_time = time.perf_counter()
+    
+    # Build relax constraints for catalyst filtering
+    relax = {}
+    if catalyst_preference:
+        relax["catalyst_class"] = catalyst_preference
+    
     try:
         raw_data = chem.recommend.conditions(
             reaction=reaction,
             reaction_type=reaction_type,
             k=k_value,
             limit=limit,
-            relax={},
+            relax=relax,
             constraints={},
             rerank_strategy=rerank_strategy,
             filter_unknown_reagents=filter_unknown_reagents,
@@ -264,56 +306,6 @@ def local_ml_recommendation(
         return _format_conditions_output(raw_data, reaction, reaction_type, limit, elapsed_ms)
     except Exception as exc:  # pragma: no cover - formatting failure
         return {"error": f"Failed to format ML recommendation: {exc}"}
-
-
-def local_fusion_recommendation(
-    reaction: str,
-    k_value: int,
-    max_variants: int,
-) -> Dict[str, Any]:
-    """
-    DEPRECATED: Fusion recommendation has been replaced.
-    
-    This function now redirects to the standard recommendation with rule-based reranking.
-    Use local_ml_recommendation() with rerank_strategy='rule' instead.
-    """
-    import warnings
-    warnings.warn(
-        "Fusion recommendation is deprecated. Use local_ml_recommendation() "
-        "with rerank_strategy='rule' instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
-    
-    start_time = time.perf_counter()
-    try:
-        # Redirect to standard recommendation with rule reranking
-        result = recommend.recommend_from_reaction(
-            reaction=reaction,
-            k=k_value,
-            rerank_strategy='rule',  # Use rule reranking instead of fusion
-            filter_unknown_reagents=False,
-            max_variants=max_variants,
-            relax={},
-            constraint_rules={},
-        )
-    except Exception as exc:
-        return {"error": f"Local fusion recommendation failed: {exc}"}
-
-    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
-
-    # Add deprecation notice
-    result['_deprecated'] = {
-        'message': 'Fusion is deprecated. Use rerank_strategy="rule" instead.',
-        'migration': 'Use --rerank rule instead of --strategy fusion'
-    }
-
-    return output_formatter.format_fusion_output(
-        reaction_smiles=reaction,
-        requested_type=None,
-        fusion_result=result,
-        processing_time_ms=processing_time_ms,
-    )
 
 
 def local_protocol_recommendation(
@@ -390,6 +382,7 @@ def local_llm_synthesis(
     llm_model: str = "deepseek-v3.2-exp",
     prompt_version: str = "v2",
     requested_type: Optional[str] = None,
+    timeout: int = 180,  # Increased from default 60s
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Run LLM-enhanced multi-source synthesis locally.
@@ -407,6 +400,7 @@ def local_llm_synthesis(
         llm_model: LLM model name (default: "deepseek-v3.2-exp")
         prompt_version: Prompt version ("v1" or "v2", default "v2" for optimized)
         requested_type: Requested reaction type for standard format output
+        timeout: LLM request timeout in seconds (default: 180)
     
     Returns:
         Tuple of (analysis_result, standard_format_result):
@@ -425,8 +419,13 @@ def local_llm_synthesis(
         return error_result, error_result
     
     try:
-        # Initialize LLM client
-        llm_client = LLMClient(provider=llm_provider, model=llm_model)
+        # Initialize LLM client with increased timeout for synthesis
+        llm_client = LLMClient(
+            provider=llm_provider, 
+            model=llm_model,
+            timeout=timeout,  # Use configurable timeout (default 180s)
+            max_tokens=4000,  # Increase token limit for synthesis
+        )
         
         # Run synthesis
         start_time = time.perf_counter()
@@ -500,9 +499,17 @@ Examples:
         "--family", "--type",
         type=str,
         default=None,
-        choices=[None, "Suzuki", "Suzuki_CC", "C_N_Coupling_Cu", "Ullmann_CN", 
-                 "C_N_Coupling_Pd", "Buchwald_CN", "C_N_Coupling_Ni", "Amide_formation"],
+        choices=[None, "Suzuki", "Suzuki_CC", "C_N_Coupling", "Amide_formation"],
         help="Reaction family/type. If not provided, will prompt interactively or auto-detect."
+    )
+    
+    parser.add_argument(
+        "--catalyst",
+        type=str,
+        default=None,
+        choices=[None, "Pd", "Cu", "Ni", "other"],
+        help="Catalyst preference for C-N coupling (Pd, Cu, Ni, other=non-catalyzed). "
+             "If not provided, will prompt interactively. Uses relax parameter for filtering."
     )
     
     parser.add_argument(
@@ -520,13 +527,6 @@ Examples:
     )
     
     parser.add_argument(
-        "--fusion-variants",
-        type=int,
-        default=FUSION_VARIANTS_DEFAULT,
-        help=f"Number of fusion recommendation variants (default: {FUSION_VARIANTS_DEFAULT})"
-    )
-    
-    parser.add_argument(
         "--save-dir",
         type=str,
         default="results",
@@ -537,10 +537,10 @@ Examples:
         "--strategy",
         type=str,
         default="all",
-        choices=["all", "rule", "ml", "fusion", "protocol", "llm"],
+        choices=["all", "rule", "ml", "protocol", "llm"],
         help="Which recommendation strategy to run (default: all). "
              "Use 'llm' for multi-source LLM synthesis. "
-             "NOTE: 'fusion' is deprecated, use --rerank rule instead."
+             "Note: Fusion has been removed - use --rerank rule for similar functionality."
     )
     
     parser.add_argument(
@@ -590,6 +590,13 @@ Examples:
     )
     
     parser.add_argument(
+        "--llm-timeout",
+        type=int,
+        default=180,
+        help="LLM request timeout in seconds (default: 180). Increase if experiencing timeouts."
+    )
+    
+    parser.add_argument(
         "--constraints",
         type=str,
         default=None,
@@ -622,10 +629,31 @@ Examples:
     else:
         selected_label, reaction_type = choose_reaction_type()
         print(f"Selected reaction type: {selected_label}")
+    
+    # If auto-detect was selected, detect the reaction type now
+    detected_type = None
+    if reaction_type is None:
+        from chemtools.router import detect_family_from_reaction
+        detection = detect_family_from_reaction(reaction, use_rxn_insight=False)
+        detected_type = detection.get("family")
+        confidence = detection.get("confidence", 0)
+        print(f"Auto-detected: {detected_type} (confidence: {confidence:.2f})")
+        reaction_type = detected_type
+    
+    # ALWAYS prompt for catalyst preference (mandatory selection)
+    # Only skip if already provided via --catalyst argument
+    if not args.catalyst:
+        catalyst_label, catalyst_preference = choose_catalyst()
+        if catalyst_preference:
+            print(f"Catalyst preference: {catalyst_label}")
+        else:
+            print("Catalyst preference: Any or none (no filtering)")
+    else:
+        catalyst_preference = args.catalyst
+        print(f"Catalyst preference: {catalyst_preference}")
 
     k_value = args.k
     limit_value = args.limit
-    fusion_variants = args.fusion_variants
 
     db_path = DEFAULT_SCDB_PATH if Path(DEFAULT_SCDB_PATH).exists() else None
     if db_path:
@@ -654,18 +682,16 @@ Examples:
     # Run selected strategies
     run_rule = args.strategy in ["all", "rule", "llm"]
     run_ml = args.strategy in ["all", "ml", "llm"]
-    run_fusion = args.strategy in ["all", "fusion"]
     run_protocol = args.strategy in ["all", "protocol", "llm"]
     run_llm = args.strategy in ["all", "llm"]
     
     rule_result = None
     ml_result = None
-    fusion_result = None
     protocol_result = None
     llm_result = None
     
     if run_rule:
-        rule_result = local_rule_based_match(reaction, db_path)
+        rule_result = local_rule_based_match(reaction, db_path, reaction_type)
         rule_file = save_to_dir(rule_result, f"{timestamp}_{label}_rule_local.json")
     
     if run_ml:
@@ -675,13 +701,10 @@ Examples:
             k_value, 
             limit_value,
             rerank_strategy=args.rerank,
-            filter_unknown_reagents=args.filter_unknown
+            filter_unknown_reagents=args.filter_unknown,
+            catalyst_preference=catalyst_preference
         )
         ml_file = save_to_dir(ml_result, f"{timestamp}_{label}_ml_local.json")
-    
-    if run_fusion:
-        fusion_result = local_fusion_recommendation(reaction, k_value, fusion_variants)
-        fusion_file = save_to_dir(fusion_result, f"{timestamp}_{label}_fusion_local.json")
     
     if run_protocol:
         # Parse protocol tags if provided
@@ -727,6 +750,7 @@ Examples:
             llm_model=args.llm_model,
             prompt_version=args.llm_prompt_version,
             requested_type=args.family,
+            timeout=args.llm_timeout,  # Pass timeout from CLI args
         )
         
         # Save both formats
@@ -743,10 +767,6 @@ Examples:
         summarize_ml(ml_result)
         print()
     
-    if fusion_result:
-        summarize_fusion(fusion_result)
-        print()
-    
     if protocol_result:
         summarize_protocol(protocol_result)
         print()
@@ -759,8 +779,6 @@ Examples:
         print(f"  Rule JSON:            {rule_file}")
     if run_ml:
         print(f"  ML JSON:              {ml_file}")
-    if run_fusion:
-        print(f"  Fusion JSON:          {fusion_file}")
     if run_protocol:
         print(f"  Protocol JSON:        {protocol_file}")
     if run_llm:
