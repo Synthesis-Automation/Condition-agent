@@ -18,13 +18,21 @@ LIMIT_DEFAULT = 5
 FUSION_VARIANTS_DEFAULT = 5
 
 # Canonical reaction families supported by the backends.
+# Note: C-N coupling is now unified - metal preference is handled via constraints
 REACTION_TYPE_CHOICES: Tuple[Tuple[str, Optional[str]], ...] = (
     ("Auto-detect (server decides)", None),
     ("Suzuki Coupling", "Suzuki"),
-    ("Ullmann C–N (Cu)", "C_N_Coupling_Cu"),
-    ("Buchwald C–N (Pd)", "C_N_Coupling_Pd"),
-    ("C–N Coupling (Ni)", "C_N_Coupling_Ni"),
+    ("C–N Coupling (unified)", "C_N_Coupling"),
     ("Amide Formation", "Amide_formation"),
+)
+
+# Catalyst options for C-N coupling reactions
+CATALYST_CHOICES: Tuple[Tuple[str, Optional[str]], ...] = (
+    ("Catalyst - optional; any or none", None),
+    ("Palladium (Pd)", "Pd"),
+    ("Copper (Cu)", "Cu"),
+    ("Nickel (Ni)", "Ni"),
+    ("No catalyst (non-catalyzed)", "other"),
 )
 
 
@@ -60,6 +68,24 @@ def choose_reaction_type() -> Tuple[str, Optional[str]]:
             if 1 <= idx <= len(REACTION_TYPE_CHOICES):
                 return REACTION_TYPE_CHOICES[idx - 1]
         print(f"Please enter a number between 1 and {len(REACTION_TYPE_CHOICES)}.")
+
+
+def choose_catalyst() -> Tuple[str, Optional[str]]:
+    """Allow the user to choose a preferred catalyst for C-N coupling."""
+    print("\nCatalyst Preference:")
+    for idx, (label, _) in enumerate(CATALYST_CHOICES, start=1):
+        default_marker = " (default)" if idx == 1 else ""
+        print(f"  {idx}) {label}{default_marker}")
+
+    while True:
+        choice = input("Select catalyst preference [1]: ").strip()
+        if not choice:
+            return CATALYST_CHOICES[0]
+        if choice.isdigit():
+            idx = int(choice)
+            if 1 <= idx <= len(CATALYST_CHOICES):
+                return CATALYST_CHOICES[idx - 1]
+        print(f"Please enter a number between 1 and {len(CATALYST_CHOICES)}.")
 
 
 def ensure_output_dir() -> None:

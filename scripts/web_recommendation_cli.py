@@ -34,33 +34,33 @@ if str(ROOT) not in sys.path:
 try:
     from scripts.recommendation_cli_utils import (
         DEFAULT_SCDB_PATH,
-        FUSION_VARIANTS_DEFAULT,
         K_DEFAULT,
         LIMIT_DEFAULT,
         choose_reaction_type,
+        choose_catalyst,
         prompt_smiles,
         save_json,
         slugify_label,
-        summarize_fusion,
         summarize_ml,
         summarize_rule,
         summarize_protocol,
+        summarize_llm_synthesis,
     )
 except ModuleNotFoundError:
     sys.path.append(str(HERE))
     from recommendation_cli_utils import (
         DEFAULT_SCDB_PATH,
-        FUSION_VARIANTS_DEFAULT,
         K_DEFAULT,
         LIMIT_DEFAULT,
         choose_reaction_type,
+        choose_catalyst,
         prompt_smiles,
         save_json,
         slugify_label,
-        summarize_fusion,
         summarize_ml,
         summarize_rule,
         summarize_protocol,
+        summarize_llm_synthesis,
     )
 
 
@@ -90,6 +90,7 @@ def call_rule_based(
     base_url: str,
     reaction: str,
     db_path: Optional[str],
+    catalyst_preference: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Execute the rule-based /match endpoint."""
     payload: Dict[str, Any] = {
@@ -98,6 +99,10 @@ def call_rule_based(
     }
     if db_path:
         payload["db"] = db_path
+    
+    # Add catalyst preference via relax parameter
+    if catalyst_preference:
+        payload["relax"] = {"catalyst_class": catalyst_preference}
 
     try:
         response = requests.post(f"{base_url}/match", json=payload, timeout=20)
@@ -123,6 +128,7 @@ def call_ml_recommendation(
     limit: int,
     rerank_strategy: str = 'rule',
     filter_unknown_reagents: bool = False,
+    catalyst_preference: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Execute the ML recommendation endpoint."""
     payload: Dict[str, Any] = {
@@ -135,6 +141,10 @@ def call_ml_recommendation(
         "rerank_strategy": rerank_strategy,
         "filter_unknown_reagents": filter_unknown_reagents,
     }
+    
+    # Add catalyst preference via relax parameter
+    if catalyst_preference:
+        payload["relax"]["catalyst_class"] = catalyst_preference
 
     try:
         response = requests.post(
@@ -156,50 +166,36 @@ def call_ml_recommendation(
         }
 
 
-def call_fusion_recommendation(
+def call_llm_synthesis(
     base_url: str,
     reaction: str,
-    k: int,
-    max_variants: int,
+    family: Optional[str] = None,
+    catalyst_preference: Optional[str] = None,
+    timeout: int = 180,
 ) -> Dict[str, Any]:
-    """
-    Execute the fusion recommendation endpoint.
-    
-    NOTE: The /api/v1/recommend/fusion endpoint is DEPRECATED.
-    Use /api/v1/recommend/conditions with rerank_strategy='rule' instead.
-    """
-    import warnings
-    warnings.warn(
-        "Fusion endpoint is deprecated. Use call_ml_recommendation() "
-        "with rerank_strategy='rule' instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
-    
+    """Execute the LLM synthesis recommendation endpoint."""
     payload: Dict[str, Any] = {
         "reaction": reaction,
-        "k": k,
-        "max_variants": max_variants,
-        "relax": {},
-        "constraints": {},
+        "family": family,
+        "catalyst_preference": catalyst_preference,
     }
 
     try:
         response = requests.post(
-            f"{base_url}/api/v1/recommend/fusion",
+            f"{base_url}/api/v1/recommend/llm_synthesis",
             json=payload,
-            timeout=30,
+            timeout=timeout,
         )
         response.raise_for_status()
         return response.json()
     except requests.RequestException as exc:
         return {
-            "error": f"Fusion recommendation failed: {exc}",
+            "error": f"LLM synthesis failed: {exc}",
             "payload": payload,
         }
     except ValueError:
         return {
-            "error": "Fusion recommendation response was not valid JSON.",
+            "error": "LLM synthesis response was not valid JSON.",
             "payload": payload,
         }
 
@@ -276,11 +272,14 @@ Examples:
   # Interactive mode (prompts for input):
   python scripts/web_recommendation_cli.py
   
-  # Provide reaction and type via command line:
-  python scripts/web_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1" --family Buchwald_CN
+  # Provide reaction, auto-detect type, specify catalyst:
+  python scripts/web_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1" --catalyst Cu
   
-  # Auto-detect reaction type:
-  python scripts/web_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+  # Specify reaction type and catalyst:
+  python scripts/web_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1" --family C_N_Coupling --catalyst Cu
+  
+  # Run only LLM synthesis with longer timeout:
+  python scripts/web_recommendation_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1" --strategy llm_synthesis --llm-timeout 300
   
   # Custom server URL:
   python scripts/web_recommendation_cli.py --url http://myserver:8080
@@ -305,8 +304,7 @@ Examples:
         "--family", "--type",
         type=str,
         default=None,
-        choices=[None, "Suzuki", "Suzuki_CC", "C_N_Coupling_Cu", "Ullmann_CN", 
-                 "C_N_Coupling_Pd", "Buchwald_CN", "C_N_Coupling_Ni", "Amide_formation"],
+        choices=[None, "Suzuki", "C_N_Coupling", "Amide_formation"],
         help="Reaction family/type. If not provided, will prompt interactively or auto-detect."
     )
     
@@ -325,10 +323,17 @@ Examples:
     )
     
     parser.add_argument(
-        "--fusion-variants",
+        "--catalyst",
+        type=str,
+        choices=["None", "Pd", "Cu", "Ni", "other"],
+        help="Catalyst preference: None, Pd, Cu, Ni, or other"
+    )
+    
+    parser.add_argument(
+        "--llm-timeout",
         type=int,
-        default=FUSION_VARIANTS_DEFAULT,
-        help=f"Number of fusion recommendation variants (default: {FUSION_VARIANTS_DEFAULT})"
+        default=180,
+        help="Timeout in seconds for LLM API calls (default: 180)"
     )
     
     parser.add_argument(
@@ -342,8 +347,8 @@ Examples:
         "--strategy",
         type=str,
         default="all",
-        choices=["all", "rule", "ml", "fusion", "protocol"],
-        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated, use --rerank rule instead."
+        choices=["all", "rule", "ml", "protocol", "llm_synthesis"],
+        help="Which recommendation strategy to run (default: all). NOTE: 'fusion' is deprecated."
     )
     
     parser.add_argument(
@@ -399,10 +404,31 @@ Examples:
     else:
         selected_label, reaction_type = choose_reaction_type()
         print(f"Selected reaction type: {selected_label}")
+    
+    # Auto-detect reaction type if user selected "Auto-detect"
+    if reaction_type is None:
+        print("\nAuto-detecting reaction type...")
+        from chemtools.router import detect_family_from_reaction
+        family, confidence, hits = detect_family_from_reaction(reaction)
+        if family:
+            reaction_type = family
+            print(f"✓ Detected: {family} (confidence: {confidence:.2f})")
+        else:
+            print("⚠ Could not auto-detect reaction type")
+            reaction_type = None
+    
+    # Get catalyst preference - from args or prompt (MANDATORY)
+    if args.catalyst:
+        catalyst_label = args.catalyst
+        catalyst_value = args.catalyst if args.catalyst != "None" else None
+        print(f"Catalyst: {catalyst_label}")
+    else:
+        catalyst_label, catalyst_value = choose_catalyst()
+        print(f"Selected catalyst: {catalyst_label}")
 
     k_value = args.k
     limit_value = args.limit
-    fusion_variants = args.fusion_variants
+    llm_timeout = args.llm_timeout
 
     db_path = DEFAULT_SCDB_PATH if Path(DEFAULT_SCDB_PATH).exists() else None
     if db_path is None:
@@ -429,16 +455,21 @@ Examples:
     # Run selected strategies
     run_rule = args.strategy in ["all", "rule"]
     run_ml = args.strategy in ["all", "ml"]
-    run_fusion = args.strategy in ["all", "fusion"]
     run_protocol = args.strategy in ["all", "protocol"]
+    run_llm = args.strategy in ["all", "llm_synthesis"]
     
     rule_result = None
     ml_result = None
-    fusion_result = None
     protocol_result = None
+    llm_result = None
     
     if run_rule:
-        rule_result = call_rule_based(base_url, reaction, db_path)
+        rule_result = call_rule_based(
+            base_url, 
+            reaction, 
+            db_path,
+            catalyst_preference=catalyst_value
+        )
         rule_file = save_to_dir(rule_result, f"{timestamp}_{label}_rule.json")
     
     if run_ml:
@@ -449,13 +480,10 @@ Examples:
             k_value, 
             limit_value,
             rerank_strategy=args.rerank,
-            filter_unknown_reagents=args.filter_unknown
+            filter_unknown_reagents=args.filter_unknown,
+            catalyst_preference=catalyst_value
         )
         ml_file = save_to_dir(ml_result, f"{timestamp}_{label}_ml.json")
-    
-    if run_fusion:
-        fusion_result = call_fusion_recommendation(base_url, reaction, k_value, fusion_variants)
-        fusion_file = save_to_dir(fusion_result, f"{timestamp}_{label}_fusion.json")
     
     if run_protocol:
         # Parse protocol tags if provided
@@ -470,6 +498,16 @@ Examples:
             tags=protocol_tags
         )
         protocol_file = save_to_dir(protocol_result, f"{timestamp}_{label}_protocol.json")
+    
+    if run_llm:
+        llm_result = call_llm_synthesis(
+            base_url=base_url,
+            reaction=reaction,
+            family=reaction_type,
+            catalyst_preference=catalyst_value,
+            timeout=llm_timeout
+        )
+        llm_file = save_to_dir(llm_result, f"{timestamp}_{label}_llm.json")
 
     print("Summary\n-------")
     
@@ -481,22 +519,22 @@ Examples:
         summarize_ml(ml_result)
         print()
     
-    if fusion_result:
-        summarize_fusion(fusion_result)
-        print()
-    
     if protocol_result:
         summarize_protocol(protocol_result)
+        print()
+    
+    if llm_result:
+        summarize_llm_synthesis(llm_result)
 
     print("\nSaved outputs:")
     if run_rule:
         print(f"  Rule JSON:     {rule_file}")
     if run_ml:
         print(f"  ML JSON:       {ml_file}")
-    if run_fusion:
-        print(f"  Fusion JSON:   {fusion_file}")
     if run_protocol:
         print(f"  Protocol JSON: {protocol_file}")
+    if run_llm:
+        print(f"  LLM JSON:      {llm_file}")
     
     print("\nDone.")
 

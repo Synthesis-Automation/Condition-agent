@@ -74,6 +74,7 @@ class SchemeMatchRequest(BaseModel):
     reaction: str
     db: Optional[str] = None
     include_trace: bool = True
+    relax: Optional[Dict[str, Any]] = None  # For catalyst_class filtering
 
 
 # Core search (by condition core, e.g., 'Pd/XPhos')
