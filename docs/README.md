@@ -6,10 +6,12 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 
 - Reaction parsing and normalization via `chemtools.smiles` with typed request/response contracts defined in `chemtools/contracts.py`.
 - Rule-based family detection and router (`chemtools.router`) that drives the downstream recommendation flow.
+- **Functional group detection (`chemtools.util.functional_groups`)** with 80+ detectable groups using SMARTS patterns (RDKit) or text-based fallbacks, accessible via unified Context API (`chem.functional_groups.*`).
 - Precedent search (`chemtools.precedent`) powered by DRFP similarity, Laplace-smoothed voting, and constraint filters (`chemtools.constraints`).
 - Deterministic condition recommendation core (`chemtools.recommend.core`) with optional ML re-ranking (`chemtools.ml`), fusion weighting, and plate design helpers.
 - **Protocol recommendation (`chemtools.protocol`)** powered by DRFP similarity search over experimental protocols with automatic condition extraction and standard JSON output.
 - Explanation packs (`chemtools.explain`) that summarize precedents, alternatives, and rule hits for API and UI consumption.
+- **LLM integration (`llmtools`)** with multi-provider support (OpenAI, Aliyun/DeepSeek) for chemistry-specific agents and natural language processing.
 - CLI utilities in `chemtools.rule_scdb_matcher.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
 
 ## Quickstart
@@ -77,11 +79,12 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |   |-- contracts.py         # Typed request/response dataclasses
 |   |-- condition_core.py    # Legacy core selection logic (compat shim)
 |   |-- constraints.py       # Constraint rule definitions
-|   |-- context.py           # Shared runtime configuration helpers
+|   |-- context.py           # Unified ChemTools API (chem.* namespace)
 |   |-- explain.py           # Explanation and rationale builders
 |   |-- output_formatter.py  # Standard JSON output formatting for all recommendation modes
 |   |-- features/            # Role-aware feature engineering
 |   |-- featurizers/         # Molecule and reaction featurizers for C-N coupling
+|   |   `-- molecular.py     # C-N coupling substrate featurization (Ullmann, Buchwald, etc.)
 |   |-- ml/                  # Optional ML models (DRFP predictor, fusion)
 |   |-- precedent/           # Precedent search, similarity, and loaders
 |   |-- protocol/            # Protocol recommendation (DRFP-based protocol search)
@@ -91,24 +94,38 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |   |-- recommend/           # Modular recommendation engine and plate design
 |   |-- rule_scdb_matcher/   # Scheme Condition DB tooling
 |   |-- router.py            # Reaction family detection and dispatch
-|   `-- smiles.py            # Reaction SMILES utilities
+|   |-- smiles.py            # Reaction SMILES utilities
+|   `-- util/                # Shared utilities
+|       |-- functional_groups.py  # Comprehensive functional group detection (80+ groups)
+|       |-- rdkit_helpers.py      # RDKit integration with graceful fallbacks
+|       `-- drfp_storage.py       # DRFP fingerprint caching
 |-- data/                    # Sample datasets (JSONL) used in demos/tests
 |   |-- protocol_db/         # Experimental protocol JSON files (Structured_Output_schema.json format)
 |   |   `-- .protocol_index.json  # Protocol index with precomputed DRFP fingerprints
 |   |-- registry_sample.jsonl     # Reagent registry snippets for CLI demo mode
 |   `-- reactions_sample.jsonl    # Compact reaction precedent data set for smoke testing
 |-- data-processor/          # QT utilities for reagent taxonomy demos
+|   `-- requirements.txt     # Data processor specific dependencies
 |-- docs/                    # Project documentation (this README lives here)
 |   |-- API_DOCUMENTATION.md      # Endpoint details and example payloads
 |   |-- PROTOCOL_MODULE.md        # Protocol module technical documentation
 |   |-- PROTOCOL_OUTPUT_FORMAT.md # Protocol standard JSON output specification
 |   |-- PROTOCOL_QUICKSTART.md    # Protocol module 2-minute quick start
 |   |-- PROTOCOL_CLI_GUIDE.md     # Interactive CLI user guide
-|   `-- PROTOCOL_README.md        # Protocol module overview
+|   |-- PROTOCOL_README.md        # Protocol module overview
+|   `-- requirements.txt          # Documentation build dependencies
+|-- llmtools/                # LLM integration for advanced operations
+|   |-- clients.py           # Multi-provider LLM client (OpenAI, Aliyun/DeepSeek)
+|   |-- agents.py            # Chemistry-specific LLM agents
+|   `-- prompts.py           # Prompt templates for chemistry tasks
 |-- scripts/                 # Developer helpers and DRFP precompute scripts
 |-- tests/                   # Pytest suite covering API and core modules
 |   |-- test_protocol_recommendation.py  # Protocol module tests
 |   `-- test_protocol_cli.py             # Interactive protocol CLI tester
+|-- requirements.txt         # Main production dependencies
+|-- requirements-dev.txt     # Development and testing tools (NEW)
+|-- FUNCTIONAL_GROUPS_GUIDE.md   # Functional groups detection user guide (NEW)
+|-- REQUIREMENTS_GUIDE.md    # Installation and dependency guide (NEW)
 |-- run_protocol_cli.ps1     # PowerShell launcher for protocol CLI (Windows)
 |-- run_protocol_cli.bat     # Batch launcher for protocol CLI (Windows)
 `-- Makefile                 # Task shortcuts (install, run, test, registry, drfp-index)
@@ -123,6 +140,7 @@ All request/response schemas live in `chemtools/contracts.py`. The FastAPI serve
 | Health | `GET /health` | Lightweight readiness probe. |
 | Reaction utilities | `POST /normalize`, `POST /detect_family`, `POST /detect_type` | Normalize SMILES strings and infer reaction families/types. |
 | Featurization | `POST /featurize/molecular`, `POST /featurize/role-aware` | Deterministic role-aware feature generation with RDKit opt-in. |
+| Functional groups | Via Context API: `chem.functional_groups.*` | Detect 80+ functional groups in molecules (SMARTS or text patterns). |
 | Precedents | `POST /precedent/knn`, `POST /precedent/filters`, `POST /precedent/explain` | DRFP-backed precedent lookup and explanation packs. |
 | Recommendation | `POST /api/v1/recommend`, `POST /api/v1/recommend/conditions`, `POST /api/v1/recommend/fusion` | Core recommendation, structured condition sets, and fusion-mode outputs. |
 | Plate design | `POST /api/v1/design_plate` | Builds plate-ready experiment grids from recommendation output. |
@@ -275,6 +293,8 @@ See `docs/PROTOCOL_MODULE.md` for complete documentation, or `docs/PROTOCOL_QUIC
 - `docs/PROTOCOL_OUTPUT_FORMAT.md`: detailed specification of the standard JSON output format used by protocol recommendations.
 - `docs/PROTOCOL_QUICKSTART.md`: 2-minute quick start guide for the protocol module.
 - `docs/PROTOCOL_CLI_GUIDE.md`: user guide for the interactive protocol CLI tester.
+- `FUNCTIONAL_GROUPS_GUIDE.md`: comprehensive guide for functional group detection API (80+ groups).
+- `REQUIREMENTS_GUIDE.md`: installation guide and dependency troubleshooting.
 - `chemtools/contracts.py`: authoritative source for all request and response schemas.
 - `chemtools/output_formatter.py`: standard JSON output formatting utilities shared across ML, Rule, and Protocol recommendation modes.
 
