@@ -1,0 +1,68 @@
+# ============================================================================
+# Condition-Agent Requirements
+# ============================================================================
+# Python >= 3.10 required
+#
+# Install: pip install -r requirements.txt
+# For development: pip install -r requirements.txt -r requirements-dev.txt
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# Core Web Framework & API
+# ----------------------------------------------------------------------------
+fastapi==0.111.0                # Modern async web framework for API
+uvicorn[standard]==0.30.1       # ASGI server with WebSocket support
+pydantic==2.7.4                 # Data validation and settings management
+
+# ----------------------------------------------------------------------------
+# HTTP & Networking
+# ----------------------------------------------------------------------------
+requests>=2.31.0                # HTTP client for external APIs
+
+# ----------------------------------------------------------------------------
+# Data Science & Machine Learning
+# ----------------------------------------------------------------------------
+numpy==1.26.4                   # Numerical computing
+pandas==2.2.2                   # Data manipulation and analysis
+scikit-learn==1.4.2             # Machine learning algorithms
+
+# ----------------------------------------------------------------------------
+# Chemistry & Molecular Processing
+# ----------------------------------------------------------------------------
+rdkit-pypi                      # Cheminformatics toolkit (SMARTS, fingerprints, etc.)
+                                # Optional but highly recommended for full functionality
+                                # Set CHEMTOOLS_DISABLE_RDKIT=1 to run without RDKit
+
+# ----------------------------------------------------------------------------
+# Web UI (Optional)
+# ----------------------------------------------------------------------------
+gradio==4.44.0                  # Interactive web UI for demos
+                                # Only needed if running app/ui_gradio.py or app/ui_simple.py
+
+# ----------------------------------------------------------------------------
+# LLM Integration (Optional)
+# ----------------------------------------------------------------------------
+openai>=1.0.0                   # OpenAI API client (also supports Aliyun/DeepSeek)
+                                # Only needed if using llmtools package
+                                # Set OPENAI_API_KEY or DASHSCOPE_API_KEY environment variable
+
+# ============================================================================
+# Notes
+# ============================================================================
+# 
+# RDKit Installation:
+# - If rdkit-pypi fails, try: conda install -c conda-forge rdkit
+# - Or disable RDKit: export CHEMTOOLS_DISABLE_RDKIT=1
+# 
+# LLM Configuration:
+# - OpenAI: export OPENAI_API_KEY=sk-...
+# - Aliyun/DeepSeek: export DASHSCOPE_API_KEY=...
+# 
+# Development Tools:
+# - See requirements-dev.txt for pytest, black, mypy, etc.
+# 
+# Functional Groups Detection:
+# - Works with or without RDKit (has text-based fallbacks)
+# - RDKit provides 80+ groups via SMARTS patterns
+# - Text mode provides ~30 groups via simple pattern matching
+# ============================================================================
