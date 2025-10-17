@@ -29,7 +29,7 @@ scikit-learn==1.4.2             # Machine learning algorithms
 # ----------------------------------------------------------------------------
 # Chemistry & Molecular Processing
 # ----------------------------------------------------------------------------
-rdkit-pypi                      # Cheminformatics toolkit (SMARTS, fingerprints, etc.)
+rdkit                      # Cheminformatics toolkit (SMARTS, fingerprints, etc.)
                                 # Optional but highly recommended for full functionality
                                 # Set CHEMTOOLS_DISABLE_RDKIT=1 to run without RDKit
 
@@ -46,6 +46,8 @@ openai>=1.0.0                   # OpenAI API client (also supports Aliyun/DeepSe
                                 # Only needed if using llmtools package
                                 # Set OPENAI_API_KEY or DASHSCOPE_API_KEY environment variable
 
+
+rxn-insight
 # ============================================================================
 # Notes
 # ============================================================================
