@@ -1,6 +1,6 @@
 {
   "source": {
-    "title": "Palladium-catalyzed Buchwald\u2013Hartwig Amination and Suzuki\u2013Miyaura Cross-coupling Reaction of Aryl Mesylates",
+    "title": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
     "journal": "Organic Syntheses",
     "volume": 92,
     "pages": "195-212",
@@ -10,9 +10,74 @@
   },
   "reaction": {
     "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
-    "family": "Suzuki_Miyaura_Cross_Coupling",
-    "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 \u00b0C, 24 h.",
-    "tags": "Suzuki; aryl mesylate; phenylboronic acid; Pd(OAc)2; CM-phos; K3PO4; tert-butanol; OrgSyn v92p0195 Step C"
+    "family": "Suzuki_Miyaura_Cross_Coupling_OMs",
+    "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 °C, 24 h.",
+    "tags": "Suzuki; aryl mesylate; phenylboronic acid; Pd(OAc)2; CM-phos; K3PO4; tert-butanol; OrgSyn v92p0195 Step C",
+    "scope": {
+      "requires_any": [
+        {
+          "pattern": "[a]-OS(=O)(=O)C",
+          "min_count": 1,
+          "label": "at_least_one_aryl_mesylate"
+        },
+        {
+          "pattern": "[#6]-[B](O[H])(O[H])",
+          "min_count": 1,
+          "label": "at_least_one_boronic_acid_partner"
+        }
+      ],
+      "forbid": [
+        {
+          "pattern": "[CX4;H2,H3]-OS(=O)(=O)C",
+          "label": "no_alkyl_mesylate"
+        },
+        {
+          "pattern": "[a]-[Cl,Br,I]",
+          "label": "no_aryl_halide"
+        },
+        {
+          "pattern": "[a]-OS(=O)(=O)C(F)(F)F",
+          "label": "no_aryl_triflate"
+        },
+        {
+          "pattern": "[a]-OS(=O)(=O)[c]",
+          "label": "no_other_aryl_sulfonate_such_as_tosylate"
+        },
+        {
+          "pattern": "[a]-O-C(=O)[C,c]",
+          "label": "no_aryl_carboxylate_leaving_group"
+        },
+        {
+          "pattern": "[#6]-[B](O[H0])(O)",
+          "label": "no_boronate_or_alkoxide_oxygen_present_1"
+        },
+        {
+          "pattern": "[#6]-[B](O)(O[H0])",
+          "label": "no_boronate_or_alkoxide_oxygen_present_2"
+        },
+        {
+          "pattern": "[#6]-[B](O[H0])(O[H0])",
+          "label": "no_boronate_ester_di_alkoxy"
+        },
+        {
+          "pattern": "[#6]-[B]([O-])(O)",
+          "label": "no_boronate_anion_1"
+        },
+        {
+          "pattern": "[#6]-[B](O)([O-])",
+          "label": "no_boronate_anion_2"
+        },
+        {
+          "pattern": "[#6]-[B]([O-])([O-])",
+          "label": "no_boronate_di_anion"
+        },
+        {
+          "pattern": "[#6]-[B](O-C)(O-C)",
+          "label": "no_generic_boronate_ester"
+        }
+      ],
+      "notes": "Boron partner must be boronic acids only (B(OH)2). Esters/alkoxides/MIDA/pinacol boronates are forbidden. Match is role-agnostic over all inputs."
+    }
   },
   "reaction_setup": [
     {
@@ -151,8 +216,8 @@
       "quench": [],
       "workup": [
         {
-          "step": "Liquid\u2013liquid extraction",
-          "details": "Transfer to separatory funnel; rinse flask with diethyl ether (2 \u00d7 50 mL), brine (2 \u00d7 50 mL), water (50 mL), and ether (50 mL); separate layers; extract aqueous with ether (2 \u00d7 50 mL)."
+          "step": "Liquid–liquid extraction",
+          "details": "Transfer to separatory funnel; rinse flask with diethyl ether (2 × 50 mL), brine (2 × 50 mL), water (50 mL), and ether (50 mL); separate layers; extract aqueous with ether (2 × 50 mL)."
         },
         {
           "step": "Drying",
@@ -160,19 +225,19 @@
         },
         {
           "step": "Concentration",
-          "details": "Concentrate under reduced pressure (40 \u00b0C, 15 mmHg) to give brown oil."
+          "details": "Concentrate under reduced pressure (40 °C, 15 mmHg) to give brown oil."
         }
       ],
       "purification": [
         {
           "method": "Flash column chromatography",
-          "stationary_phase": "Silica gel (100 g; column 4.5 cm \u00d7 12 cm)",
+          "stationary_phase": "Silica gel (100 g; column 4.5 cm × 12 cm)",
           "eluent": "Hexane (start with 75 mL; continue with hexane until product elutes)",
           "fractions": "Collect 100-mL fractions; combine product-containing fractions"
         }
       ],
       "notes": [
-        "Product: 4-(tert-Butyl)-1,1'-biphenyl obtained as white solid, 2.20\u20132.90 g (60\u201379%)."
+        "Product: 4-(tert-Butyl)-1,1'-biphenyl obtained as white solid, 2.20–2.90 g (60–79%)."
       ]
     }
   ],

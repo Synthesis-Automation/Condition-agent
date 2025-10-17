@@ -12,7 +12,52 @@
     "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
     "family": "Alkyl_Iodide_Borylation",
     "notes": "General LiOtBu/MeOH borylation of primary alkyl iodide with B2pin2 to give R\u2013B(pin).",
-    "tags": "borylation; alkyl iodide; B2pin2; LiOtBu; MeOH; OrgSyn v99p0015"
+    "tags": "borylation; alkyl iodide; B2pin2; LiOtBu; MeOH; OrgSyn v99p0015",
+    "scope": {
+      "requires_any": [
+        {
+          "pattern": "[CX4;H2,H3]-I",
+          "min_count": 1,
+          "label": "at_least_one_primary_alkyl_iodide"
+        },
+        {
+          "pattern": "[B;H0;X3](-O)(-O)",
+          "min_count": 1,
+          "label": "at_least_one_boron_ester_or_diboron"
+        }
+      ],
+      "forbid": [
+        {
+          "pattern": "[a]-I",
+          "label": "no_aryl_iodide"
+        },
+        {
+          "pattern": "[a]-[CH2]-I",
+          "label": "no_benzylic_iodide"
+        },
+        {
+          "pattern": "C=C-[CH2]-I",
+          "label": "no_allylic_iodide"
+        },
+        {
+          "pattern": "[CH]-I",
+          "label": "no_secondary_iodide"
+        },
+        {
+          "pattern": "[C;H0]-I",
+          "label": "no_tertiary_iodide"
+        },
+        {
+          "pattern": "[B](O[H])O[H]",
+          "label": "no_boronic_acid"
+        },
+        {
+          "pattern": "[B](O[H])O",
+          "label": "no_mixed_oh_or_boronic_acid_variant"
+        }
+      ],
+      "notes": "Match the union of all input molecules; do not rely on reagent roles. requires_any enforces presence (>= min_count) of each pattern somewhere; forbid enforces absence everywhere."
+    }
   },
   "reaction_setup": [
     {
@@ -136,5 +181,5 @@
       ]
     }
   ],
-  "original_procedure": ""
+  "original_procedure": "Filter reaction mixture via B\u00fcchner funnel; wash filter cake with n-hexane (20 mL)."
 }

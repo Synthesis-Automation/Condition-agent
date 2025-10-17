@@ -9,7 +9,7 @@
     "url": "https://orgsyn.org/demo.aspx?prep=v97p0314"
   },
   "reaction": {
-    "reaction_smiles": "C1=CC2=C(NN=C2C=C1)I>>C1=CC=C2C(=C1)C(=NN2)C#N",
+    "reaction_smiles": "C1=CC2=C(NN=C2C=C1)I>>C1=CC=C2C(=C1)C(=NN2)C#N ",
     "family": "Aryl_Iodide_Cyanation",
     "notes": "Pd\u2013Xantphos-catalyzed cyanation of 3-iodo-1H-indazole using K4[Fe(CN)6]\u00b73H2O in DMAc/H2O under argon to give 1H-indazole-3-carbonitrile.",
     "tags": "cyanation; aryl iodide; palladium; Xantphos; ferrocyanide; DMAc; OrgSyn v97p0314"
