@@ -1,7 +1,9 @@
 # API Testing Quick Reference - PowerShell
 
 ## Prerequisites
+
 Start the FastAPI server in a separate terminal:
+
 ```powershell
 python -m uvicorn app.main:app --reload --port 8000
 ```
@@ -9,16 +11,19 @@ python -m uvicorn app.main:app --reload --port 8000
 ## Test Commands (Copy & Paste)
 
 ### 1. Health Check
+
 ```powershell
 Invoke-WebRequest -Uri "http://localhost:8000/health" | Select-Object StatusCode, Content
 ```
 
 ### 2. Rule-Based Recommendation (/match)
+
 **Correct field name: `reaction` (not `reaction_smiles`)**
 
 **⚠️ Important: You must specify the `db` path to an existing database file.**
 
 #### Basic Usage (No Catalyst Filter)
+
 ```powershell
 $body = @{
     reaction = "BrC1CCCCC1.c1ccc(Cl)cc1B(O)O>>Clc1ccc(C2CCCCC2)cc1"
@@ -31,6 +36,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/match" -Method POST `
 ```
 
 #### With Catalyst Filter (NEW!)
+
 Filter recommendations by catalyst type (Pd, Cu, Ni, etc.):
 
 ```powershell
@@ -63,6 +69,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/match" -Method POST `
 ```
 
 **Available databases:**
+
 - `data/conditionDB/suzuki_db.json` - Suzuki coupling
 - `data/conditionDB/C_N_Coupling_Pd_db.json` - C-N coupling (Pd)
 - `data/conditionDB/C_N_Coupling_Ni_db.json` - C-N coupling (Ni)  
@@ -70,6 +77,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/match" -Method POST `
 - `data/conditionDB/amide_formation_db.json` - Amide formation
 
 **Parameters:**
+
 - `reaction`: Reaction SMILES (required)
 - `db`: Database file path (default: "cn_coupling_pd_db.json" - may not exist)
 - `include_trace`: Include matching trace (default: true)
@@ -77,6 +85,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/match" -Method POST `
   - `catalyst_class`: Filter by catalyst type ("Pd", "Cu", "Ni", "Ru", "Co", etc.)
 
 **Supported Catalyst Values:**
+
 - `"Pd"` - Palladium catalysts
 - `"Cu"` - Copper catalysts
 - `"Ni"` - Nickel catalysts
@@ -90,6 +99,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/match" -Method POST `
 The ML-based recommendation endpoint uses machine learning to find similar precedent reactions and recommend conditions based on structural similarity (DRFP fingerprints).
 
 #### Basic Usage (No Catalyst Filter)
+
 ```powershell
 $body = @{
     reaction = "BrC1CCCCC1.c1ccc(Cl)cc1B(O)O>>Clc1ccc(C2CCCCC2)cc1"
@@ -103,6 +113,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Expected Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -171,6 +182,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Response Field Descriptions:**
+
 - `status`: "success" or "error"
 - `reaction_smiles`: The input reaction (normalized)
 - `recommendations`: Array of recommended conditions (sorted by rank)
@@ -193,6 +205,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
   - `processing_time_ms`: Time taken to generate recommendations
 
 #### With Catalyst Filter (NEW!)
+
 Filter recommendations by catalyst type (Pd, Cu, Ni, etc.):
 
 ```powershell
@@ -212,6 +225,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Expected Response with Catalyst Filter:**
+
 ```json
 {
   "status": "success",
@@ -283,6 +297,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Note:** With catalyst filtering:
+
 - Only catalysts matching the specified type are returned
 - `meta.catalyst_filter` shows the active filter
 - Precedent count may be lower due to filtering
@@ -305,6 +320,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Expected Response with Cu Filter:**
+
 ```json
 {
   "status": "success",
@@ -376,12 +392,14 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Comparing Pd vs Cu Results:**
+
 - **Pd**: Higher confidence (0.92), shorter time (16h), moderate temp (100°C), ligand: XPhos
 - **Cu**: Lower confidence (0.88), longer time (24h), lower temp (90°C), ligand: L-Proline
 - **Pd**: Typically more selective, faster reactions
 - **Cu**: More economical, different selectivity profile
 
 #### With Multiple Filters
+
 ```powershell
 # Combine catalyst filter with reranking strategy
 $body = @{
@@ -401,6 +419,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Parameters:**
+
 - `reaction`: Reaction SMILES (required)
 - `reaction_type`: Reaction family (optional, auto-detects if omitted)
 - `k`: Number of precedents to retrieve (default: 50)
@@ -414,6 +433,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 - `filter_unknown_reagents`: Exclude precedents with unknown reagents (default: false)
 
 **Supported Reaction Types:**
+
 - `"Suzuki"` - Suzuki-Miyaura coupling
 - `"C_N_Coupling"` - C-N coupling (auto-selects Pd/Cu/Ni database)
 - `"Amide_formation"` - Amide formation
@@ -422,6 +442,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 #### Error Responses and Edge Cases
 
 **Error: Invalid Reaction SMILES**
+
 ```json
 {
   "status": "error",
@@ -437,6 +458,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Error: No Precedents Found**
+
 ```json
 {
   "status": "success",
@@ -456,6 +478,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Warning: Low Confidence Detection**
+
 ```json
 {
   "status": "success",
@@ -475,6 +498,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 **Success: Empty Results with Catalyst Filter**
+
 ```json
 {
   "status": "success",
@@ -495,6 +519,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 ### 4. Fusion Recommendation (/api/v1/recommend/fusion) - Deprecated
+
 ```powershell
 $body = @{
     reaction = "BrC1CCCCC1.c1ccc(Cl)cc1B(O)O>>Clc1ccc(C2CCCCC2)cc1"
@@ -519,6 +544,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/reaction/detect-type" -Meth
 ```
 
 **Response shows:**
+
 - `selected_family`: The detected reaction type
 - `rxn_insight`: Results from ML-based detection (if available)
 - `router_fallback`: Results from rule-based detection
@@ -527,6 +553,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/reaction/detect-type" -Meth
 ### 6. Auto-Detection with Recommendations
 
 #### ML Recommendations with Auto-Detection
+
 Omit `reaction_type` to let the API auto-detect:
 
 ```powershell
@@ -543,6 +570,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 ```
 
 #### Auto-Detection + Catalyst Filter
+
 Combine auto-detection with catalyst preference:
 
 ```powershell
@@ -570,6 +598,7 @@ $result | ConvertTo-Json -Depth 10
 ```
 
 #### Test Different Reaction Types with Auto-Detection
+
 ```powershell
 # Test 1: C-N Coupling (should detect automatically)
 Write-Host "`n=== Testing C-N Coupling Auto-Detection ===" -ForegroundColor Cyan
@@ -609,6 +638,7 @@ Write-Host "Detected as: $($amide_result.meta.reaction_type)" -ForegroundColor G
 ```
 
 ### 7. Protocol Recommendation (No API endpoint - uses CLI)
+
 **Protocol doesn't have an API endpoint yet. Use the CLI tool:**
 
 ```powershell
@@ -632,6 +662,7 @@ python scripts/web_recommendation_cli.py `
 ## Catalyst Filtering Examples
 
 ### Example 1: Compare Different Catalysts for C-N Coupling
+
 ```powershell
 # Test with Palladium
 $bodyPd = @{
@@ -680,6 +711,7 @@ $resultNi | ConvertTo-Json -Depth 10
 ```
 
 ### Example 2: Rule-Based with Catalyst Filter
+
 ```powershell
 # Get Cu-specific rule-based recommendations
 $body = @{
@@ -699,6 +731,7 @@ $result | ConvertTo-Json -Depth 10
 ```
 
 ### Example 3: Auto-Detection + Catalyst Filter
+
 ```powershell
 # Let the API auto-detect reaction type, but specify catalyst preference
 $body = @{
@@ -721,6 +754,7 @@ $result | ConvertTo-Json -Depth 10
 ## Common Mistakes
 
 ### ❌ Wrong Field Names
+
 ```powershell
 # WRONG for /match endpoint
 $body = @{
@@ -738,6 +772,7 @@ $body = @{
 ```
 
 ### ❌ Forgetting -Depth for Nested Objects
+
 ```powershell
 # WRONG - catalyst_class won't be included
 $body = @{
@@ -753,6 +788,7 @@ $body = @{
 ```
 
 ### ❌ Using Wrong Database with Catalyst Filter
+
 ```powershell
 # WRONG - Asking for Cu catalysts from Pd database
 $body = @{
@@ -772,6 +808,7 @@ $body = @{
 ## Quick Reference Card
 
 ### Auto-Detection Usage
+
 ```powershell
 # Option 1: Omit reaction_type completely
 $body = @{
@@ -800,6 +837,7 @@ $body = @{
 ```
 
 ### Catalyst Filter Syntax
+
 ```powershell
 # Add this to any request that supports filtering:
 relax = @{
@@ -808,6 +846,7 @@ relax = @{
 ```
 
 ### Common Catalyst Values
+
 | Value | Description | Example Reactions |
 |-------|-------------|-------------------|
 | `"Pd"` | Palladium | Suzuki, Buchwald-Hartwig |
@@ -817,6 +856,7 @@ relax = @{
 | `"Co"` | Cobalt | C-H activation |
 
 ### Reaction Type Values
+
 | Value | Description | Databases |
 |-------|-------------|-----------|
 | `"Suzuki"` | Suzuki-Miyaura C-C coupling | `suzuki_db.json` |
@@ -825,6 +865,7 @@ relax = @{
 | `null` / omitted | **Auto-detect** | - |
 
 ### Auto-Detection Behavior
+
 | Scenario | Detection Method | Notes |
 |----------|------------------|-------|
 | `reaction_type` omitted | ML-based (rxn-insight) → Rule-based fallback | Recommended approach |
@@ -833,12 +874,14 @@ relax = @{
 | Auto-detect + catalyst filter | Detects type, filters by catalyst | Best for exploration |
 
 **Detection Priority:**
+
 1. User-specified `reaction_type` (if provided)
 2. ML-based detection via `rxn-insight` (if available)
 3. Rule-based detection via `chemtools.router`
 4. Fallback to "Unknown"
 
 ### Rerank Strategies
+
 | Value | Description | Best For |
 |-------|-------------|----------|
 | `"rule"` | Boost by chemical rule matching | Default - balanced quality |
