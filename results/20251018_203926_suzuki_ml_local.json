@@ -1,0 +1,650 @@
+{
+  "meta": {
+    "generated_at": "2025-10-18T12:39:28.539061Z",
+    "model": "ML-precedent-knn",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 2474.16
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1",
+    "family": "Suzuki",
+    "requested_reaction_type": "Suzuki",
+    "requested_family": "Suzuki"
+  },
+  "detection": {
+    "family": "Suzuki",
+    "detected_reaction_type": "Suzuki",
+    "method": "rxn-insight-ml",
+    "confidence": 0.475
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "72287-26-4",
+          "role": "metal_precursor",
+          "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+          "abbreviation": null,
+          "cas": "72287-26-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "107-06-2",
+          "role": "solvent",
+          "name": "1,2-Dichloroethane",
+          "abbreviation": null,
+          "cas": "107-06-2",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 1
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "72287-26-4",
+          "role": "metal_precursor",
+          "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+          "abbreviation": null,
+          "cas": "72287-26-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "109-99-9",
+          "role": "solvent",
+          "name": "Tetrahydrofuran",
+          "abbreviation": null,
+          "cas": "109-99-9",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 1
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "72287-26-4",
+          "role": "metal_precursor",
+          "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+          "abbreviation": null,
+          "cas": "72287-26-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "497-19-8",
+          "role": "base",
+          "name": "Sodium carbonate",
+          "abbreviation": null,
+          "cas": "497-19-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "123-91-1",
+          "role": "solvent",
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 1
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "72287-26-4",
+          "role": "metal_precursor",
+          "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+          "abbreviation": null,
+          "cas": "72287-26-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "75-05-8",
+          "role": "solvent",
+          "name": "Acetonitrile",
+          "abbreviation": null,
+          "cas": "75-05-8",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 2
+    },
+    {
+      "rank": 5,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": "7681-65-4",
+          "role": "metal_precursor",
+          "name": "Copper(I) iodide",
+          "abbreviation": null,
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "72287-26-4",
+          "role": "metal_precursor",
+          "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+          "abbreviation": null,
+          "cas": "72287-26-4",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "121-44-8",
+          "role": "base",
+          "name": "Triethylamine",
+          "abbreviation": null,
+          "cas": "121-44-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "67-68-5",
+          "role": "solvent",
+          "name": "Dimethyl sulfoxide",
+          "abbreviation": null,
+          "cas": "67-68-5",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.00475,
+      "precedent_count": 1
+    }
+  ],
+  "precedents_used": {
+    "total_count": 6,
+    "top_precedents": [
+      {
+        "rank": 1,
+        "reaction_id": "31-179-CAS-20632198",
+        "reaction_smiles": "OB(O)c1ccncc1.Brc1ccc(-n2c3ccccc3c3ccccc32)cc1>>c1ccc2c(c1)c1ccccc1n2-c1ccc(-c2ccncc2)cc1",
+        "core": "Cu/diphenylphosphino",
+        "yield": 75.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+            "cas": "72287-26-4",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Acetonitrile",
+            "cas": "75-05-8"
+          },
+          {
+            "name": "Dichloromethane",
+            "cas": "75-09-2"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 75.0
+        },
+        "reference": "Cation-π interactions secure aggregation induced emission of planar organic luminophores | Leduskrasts, Kaspars; Kinens, Artis; Suna, Edgars | Chemical Communications (Cambridge, United Kingdom) (2019), 55(84), 12663-12666"
+      },
+      {
+        "rank": 2,
+        "reaction_id": "31-179-CAS-20632199",
+        "reaction_smiles": "OB(O)c1cccnc1.Brc1ccc(-n2c3ccccc3c3ccccc32)cc1>>c1cncc(-c2ccc(-n3c4ccccc4c4ccccc43)cc2)c1",
+        "core": "Cu/diphenylphosphino",
+        "yield": 72.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Bis(diphenylphosphino)ferrocene palladium(II) dichloride",
+            "cas": "72287-26-4",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Acetonitrile",
+            "cas": "75-05-8"
+          },
+          {
+            "name": "Dichloromethane",
+            "cas": "75-09-2"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 72.0
+        },
+        "reference": "Cation-π interactions secure aggregation induced emission of planar organic luminophores | Leduskrasts, Kaspars; Kinens, Artis; Suna, Edgars | Chemical Communications (Cambridge, United Kingdom) (2019), 55(84), 12663-12666"
+      },
+      {
+        "rank": 3,
+        "reaction_id": "31-179-CAS-19684971",
+        "reaction_smiles": "OB(O)c1ccccc1.O=c1occ(Br)cc1Br>>O=c1occ(Br)cc1-c1ccccc1",
+        "core": "Cu/triphenylphosphine",
+        "yield": 70.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,2-Dichloroethane",
+            "cas": "107-06-2"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 70.0
+        },
+        "reference": "A Short Synthesis of Delavatine A Unveils New Insights into Site-Selective Cross-Coupling of 3,5-Dibromo-2-pyrone | Palani, Vignesh; Hugelshofer, Cedric L.; Kevlishvili, Ilia; Liu, Peng; Sarpong, Richmond | Journal of the American Chemical Society (2019), 141(6), 2652-2660"
+      },
+      {
+        "rank": 4,
+        "reaction_id": "31-614-CAS-35204867",
+        "reaction_smiles": "C#Cc1ccccc1.Brc1ccccc1I.N#Cc1cccc(B(O)O)c1>>N#Cc1cccc(-c2ccccc2C#Cc2ccccc2)c1",
+        "core": "Cu/PCy3",
+        "yield": 71.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Bis(triphenylphosphine)palladium(II) dichloride",
+            "cas": "13965-03-2",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Palladium(II) acetate",
+            "cas": "3375-31-3",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Tricyclohexylphosphine",
+            "cas": "2622-14-2",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Triethylamine",
+            "cas": "121-44-8",
+            "role": "base"
+          },
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Dimethyl sulfoxide",
+            "cas": "67-68-5"
+          },
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          },
+          {
+            "name": "Toluene",
+            "cas": "108-88-3"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 71.0
+        },
+        "reference": "Iron-Catalyzed Synthesis of 13-Aryl-13H-indeno[1,2-l]phenanthrene via Double Annulations of 2-Alkynyl Biaryls | Chanda, Rupsa; Ghosh, Tubai; Jana, Umasish | Journal of Organic Chemistry (2023), 88(1), 658-664"
+      },
+      {
+        "rank": 5,
+        "reaction_id": "31-179-CAS-16402681",
+        "reaction_smiles": "OB(O)c1ccc(N(c2ccccc2)c2ccccc2)cc1.Brc1ccc(C#Cc2ccccc2)cn1>>C(#Cc1ccc(-c2ccc(N(c3ccccc3)c3ccccc3)cc2)nc1)c1ccccc1",
+        "core": "Cu/triphenylphosphine",
+        "yield": 91.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Tetrahydrofuran",
+            "cas": "109-99-9"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 91.0
+        },
+        "reference": "A Convenient Approach to Synthesize o-Carborane-Functionalized Phosphorescent Iridium(III) Complexes for Endocellular Hypoxia Imaging | Li, Xiang; Tong, Xiao; Yan, Hong; Lu, Changsheng; Zhao, Qiang; Huang, Wei | Chemistry - A European Journal (2016), 22(48), 17282-17290"
+      },
+      {
+        "rank": 6,
+        "reaction_id": "31-614-CAS-32110235",
+        "reaction_smiles": "COc1ccc(OC)c(B(O)O)c1.COc1c(OC)c2ccc(Br)cc2c2cc(Br)ccc12>>COc1ccc(OC)c(-c2ccc3c(OC)c(OC)c4ccc(-c5cc(OC)ccc5OC)cc4c3c2)c1",
+        "core": "Cu/triphenylphosphine",
+        "yield": 89.0,
+        "catalysts": [
+          {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Sodium carbonate",
+            "cas": "497-19-8",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,4-Dioxane",
+            "cas": "123-91-1"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 89.0
+        },
+        "reference": "Phenanthrene[2]arene: synthesis and application as nonporous adaptive crystals in the separation of benzene from cyclohexane | Zeng, Fei; Cheng, Lu; Zhang, Wei-Jun; Tang, Lin-Li; Wang, Xiao-Feng | Organic Chemistry Frontiers (2022), 9(12), 3307-3311"
+      }
+    ],
+    "core_matched_precedents": {
+      "core": "Cu/triphenylphosphine",
+      "count": 3,
+      "examples": [
+        {
+          "rank": 1,
+          "reaction_id": "31-179-CAS-19684971",
+          "core": "Cu/triphenylphosphine",
+          "base": "584-08-7",
+          "solvent": "107-06-2",
+          "yield": 70.0
+        },
+        {
+          "rank": 2,
+          "reaction_id": "31-179-CAS-16402681",
+          "core": "Cu/triphenylphosphine",
+          "base": "584-08-7",
+          "solvent": "109-99-9",
+          "yield": 91.0
+        },
+        {
+          "rank": 3,
+          "reaction_id": "31-614-CAS-32110235",
+          "core": "Cu/triphenylphosphine",
+          "base": "497-19-8",
+          "solvent": "123-91-1",
+          "yield": 89.0
+        }
+      ]
+    },
+    "statistics": {
+      "average_yield": 78.0,
+      "yield_range": [
+        70.0,
+        91.0
+      ],
+      "temperature_range": null,
+      "time_range": null
+    }
+  }
+}
