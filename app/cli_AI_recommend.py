@@ -155,43 +155,70 @@ PARSE_USER_INPUT_PROMPT = PromptTemplate(
     name="parse_user_input",
     template="""You are a chemistry lab assistant helping users specify reaction conditions.
 
-Convert the user's natural language input into a structured JSON format for a recommendation system.
+The user has provided input that may contain:
+1. A reaction SMILES string (in reactants>>products format)
+2. Natural language requirements/constraints
+3. Or both mixed together
 
 USER INPUT:
-Reaction SMILES: {reaction_smiles}
-Requirements: {requirements}
+{user_input}
 
 INSTRUCTIONS:
-1. **VALIDATE REACTION SMILES**: Check if it follows reactants>>products format. Set "reaction_smiles_is_valid" to true/false.
-   - Valid examples: "Br.c1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1", "CCBr.O=C(O)C>>CCC(=O)O"
-   - Invalid examples: "invalid", "C=C", "broken>>", ">>product"
-   - Must have ">>" separator and non-empty reactants
-   
-2. **EXTRACT CONSTRAINTS** (all optional):
-   - Temperature: Extract numeric ranges (e.g., "no high temperature" → max: 80, "room temperature" → max: 30)
-   - Base strength: Map to weak/moderate/strong (e.g., "no strong base" → "moderate", "mild base" → "weak")
-   - Solvent: Map to polar_aprotic/polar_protic/nonpolar/aqueous
-   - **Required reagents**: Extract when user says "use X", "prefer X", "with X" (e.g., "use copper catalyst" → ["copper"])
-   - **Metal preference**: Extract metal symbol when user specifies catalyst metal (e.g., "copper catalyst" → "Cu", "palladium" → "Pd")
-   - Excluded reagents: Extract specific chemical names when user says "avoid", "no", "exclude"
-   - Air sensitivity: true if mentions "inert atmosphere", "glovebox", false if "air stable"
-   - Cost: Map from "cheap"/"expensive" to low/medium/high
 
-3. **VALIDATION**: Report issues in "validation_issues" array:
-   - If reaction SMILES is invalid or missing: "Invalid reaction SMILES format"
-   - Any other critical issues that would prevent API call
+**STEP 1: EXTRACT REACTION SMILES**
+- Look for a SMILES string with ">>" separator (e.g., "Br.c1ccccc1>>c1ccc(...)cc1")
+- The SMILES may appear anywhere in the input (beginning, middle, or end)
+- The SMILES may be surrounded by text like "I want to run", "using", "with", etc.
+- Extract the complete SMILES string (everything from first reactant to last product)
+- If multiple ">>" patterns exist, take the most complete one
+- Set "reaction_smiles_is_valid" to true only if:
+  * Has ">>" separator
+  * Has non-empty reactants (left side of >>)
+  * Appears to be valid SMILES format
 
-4. **CLARIFICATIONS**: List ambiguous requirements in "clarification_needed" (only for constraints):
-   - Vague temperature terms without clear ranges
-   - Ambiguous reagent exclusions
-   - Contradictory requirements
-   - Note: DO NOT ask for clarification if user provided no requirements - this is acceptable!
+**STEP 2: EXTRACT REQUIREMENTS FROM SURROUNDING TEXT**
+- All text that is NOT part of the SMILES string may contain requirements
+- Extract constraints from this text (all optional):
+  * Temperature: "no high temperature" → max: 80, "room temperature" → max: 30, "RT" → max: 25
+  * Base strength: "no strong base" → "moderate", "mild base" → "weak", "strong base ok" → "strong"
+  * **Required reagents**: "use X", "with X", "prefer X", "need X" → add to required_reagents array
+  * **Metal preference**: "copper catalyst" → "Cu", "palladium" → "Pd", "nickel" → "Ni", "use Cu" → "Cu"
+  * Excluded reagents: "no X", "avoid X", "exclude X", "without X" → add to exclude_reagents array
+  * Solvent: "DMF", "DMSO" → "polar_aprotic"; "methanol", "water" → "polar_protic"; "toluene" → "nonpolar"
+  * Air sensitivity: "inert atmosphere", "glovebox", "Schlenk" → true; "air stable", "bench" → false
+  * Cost: "cheap", "inexpensive" → "low"; "expensive ok" → "high"; "moderate cost" → "medium"
+
+**STEP 3: VALIDATION**
+- Report in "validation_issues" array:
+  * "Invalid reaction SMILES format" - if SMILES missing or invalid
+  * Any other blocking issues
+- If no SMILES found: add "No reaction SMILES found in input"
+- If SMILES invalid format: add "Invalid reaction SMILES format"
+
+**STEP 4: CLARIFICATIONS** (only for ambiguous constraints)
+- List truly ambiguous requirements in "clarification_needed"
+- Do NOT ask for clarification if user provided no requirements - this is fine!
+- Only ask about genuinely unclear constraints
+
+**EXAMPLES:**
+
+Input: "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1 use copper catalyst"
+→ reaction_smiles: "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
+→ constraints: {{"required_reagents": ["copper catalyst"], "metal_preference": "Cu"}}
+
+Input: "I want to run Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1 with no strong base and room temperature"
+→ reaction_smiles: "Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+→ constraints: {{"base_strength": "moderate", "temperature": {{"max": 30}}}}
+
+Input: "use palladium for CCBr.c1ccccc1>>CCc1ccccc1 avoid expensive reagents"
+→ reaction_smiles: "CCBr.c1ccccc1>>CCc1ccccc1"
+→ constraints: {{"metal_preference": "Pd", "required_reagents": ["palladium"], "cost_level": "low"}}
 
 IMPORTANT:
+- Intelligently separate SMILES from requirements text
 - Only the reaction SMILES must be valid - all constraints are optional
-- If user says "no requirements" or gives empty string, that's perfectly fine - just validate SMILES
-- Empty constraints object is acceptable
-- Be permissive with constraints - use null for unclear optional values
+- Empty constraints object is perfectly acceptable
+- Be permissive - use null for unclear optional values
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object (no markdown, no explanation) matching this schema:
@@ -394,15 +421,13 @@ class NaturalLanguageParser:
     
     def parse_initial_input(
         self,
-        reaction_smiles: str,
-        requirements: str,
+        user_input: str,
     ) -> ParsedRequest:
-        """Parse initial user input into structured format."""
+        """Parse initial user input (mixed SMILES and requirements) into structured format."""
         logger.info(f"Parsing user input via LLM ({self.model})...")
         
         prompt = PARSE_USER_INPUT_PROMPT.format(
-            reaction_smiles=reaction_smiles,
-            requirements=requirements or "no specific requirements",
+            user_input=user_input,
             schema=self.schema_str,
         )
         
@@ -436,14 +461,14 @@ class NaturalLanguageParser:
             logger.debug(f"LLM response: {content}")
             # Return a fallback with error
             return ParsedRequest(
-                reaction_smiles=reaction_smiles,
+                reaction_smiles="",
                 reaction_smiles_is_valid=False,
                 validation_issues=[f"LLM parsing error: {str(e)}"]
             )
         except Exception as e:
             logger.error(f"Error during LLM parsing: {e}")
             return ParsedRequest(
-                reaction_smiles=reaction_smiles,
+                reaction_smiles="",
                 reaction_smiles_is_valid=False,
                 validation_issues=[f"Error: {str(e)}"]
             )
@@ -526,28 +551,31 @@ class InteractiveCLI:
         """Print section separator."""
         print("\n" + f"{Colors.BLUE}{'-' * 70}{Colors.ENDC}\n")
     
-    def get_initial_input(self) -> tuple[str, str]:
-        """Get initial reaction SMILES and requirements from user."""
-        print(f"{Colors.BOLD}Please provide your reaction details:{Colors.ENDC}\n")
+    def get_initial_input(self) -> str:
+        """Get combined reaction SMILES and requirements from user in one input."""
+        print(f"{Colors.BOLD}Please provide your reaction:{Colors.ENDC}\n")
         
-        print(f"{Colors.CYAN}Reaction SMILES (reactants>>products format):{Colors.ENDC}")
-        print(f"{Colors.YELLOW}Example: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1{Colors.ENDC}")
-        reaction = input(f"{Colors.GREEN}> {Colors.ENDC}").strip()
+        print(f"{Colors.CYAN}Enter reaction SMILES with optional requirements (all in one line):{Colors.ENDC}\n")
         
-        if not reaction:
-            print(f"{Colors.RED}❌ Error: Reaction SMILES cannot be empty.{Colors.ENDC}")
+        print(f"{Colors.YELLOW}Format options:{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • Just SMILES: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • SMILES + requirements: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1 use copper catalyst{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • Requirements + SMILES: I want to run Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1 with no strong base{Colors.ENDC}")
+        print(f"{Colors.YELLOW}  • Mixed: use palladium for CCBr.c1ccccc1>>CCc1ccccc1 at room temperature{Colors.ENDC}\n")
+        
+        print(f"{Colors.GREEN}Examples of requirements:{Colors.ENDC}")
+        print(f"{Colors.GREEN}  • use copper catalyst{Colors.ENDC}")
+        print(f"{Colors.GREEN}  • no strong base, room temperature{Colors.ENDC}")
+        print(f"{Colors.GREEN}  • avoid expensive catalysts, prefer DMF{Colors.ENDC}")
+        print(f"{Colors.GREEN}  • with palladium, mild conditions{Colors.ENDC}\n")
+        
+        user_input = input(f"{Colors.BOLD}{Colors.CYAN}> {Colors.ENDC}").strip()
+        
+        if not user_input:
+            print(f"{Colors.RED}❌ Error: Input cannot be empty.{Colors.ENDC}")
             sys.exit(1)
         
-        print(f"\n{Colors.CYAN}📝 Describe your requirements in natural language (optional):{Colors.ENDC}")
-        print(f"{Colors.YELLOW}Examples:{Colors.ENDC}")
-        print(f"{Colors.YELLOW}  • no strong base, room temperature{Colors.ENDC}")
-        print(f"{Colors.YELLOW}  • avoid expensive catalysts, prefer DMF solvent{Colors.ENDC}")
-        print(f"{Colors.YELLOW}  • mild conditions, no air-sensitive reagents{Colors.ENDC}")
-        print(f"{Colors.YELLOW}  • (press Enter to skip if no specific requirements){Colors.ENDC}\n")
-        
-        requirements = input(f"{Colors.GREEN}> {Colors.ENDC}").strip()
-        
-        return reaction, requirements
+        return user_input
     
     def display_parsed_state(self, request: ParsedRequest):
         """Display current parsed state to user."""
@@ -736,16 +764,13 @@ class InteractiveCLI:
         """Run the interactive CLI loop."""
         self.print_header()
         
-        # Get initial input
-        reaction, requirements = self.get_initial_input()
+        # Get initial input (combined SMILES + requirements)
+        user_input = self.get_initial_input()
         
         # Parse with LLM
         print(f"\n{Colors.CYAN}🤖 Parsing input with LLM...{Colors.ENDC}")
         try:
-            self.current_request = self.parser.parse_initial_input(
-                reaction_smiles=reaction,
-                requirements=requirements,
-            )
+            self.current_request = self.parser.parse_initial_input(user_input)
             print(f"{Colors.GREEN}✅ LLM parsing complete{Colors.ENDC}")
         except Exception as e:
             print(f"\n{Colors.RED}❌ Error parsing input: {e}{Colors.ENDC}")
