@@ -7,28 +7,28 @@
 ```
 ┌─────────────────────────────────────────────┐
 │ User Input:                                 │
-│ - CAS: 121-44-8                            │
+│ - CAS: 121-44-8                             │
 │ - Role: other_reagent                       │
-│ - LLM: Disabled                            │
+│ - LLM: Disabled                             │
 └─────────────────────────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────────┐
 │ Deterministic Processing                    │
-│ - Resolve identity (name, synonyms)        │
+│ - Resolve identity (name, synonyms)         │
 │ - Match family tokens                       │
-│ - Use default family if no match           │
+│ - Use default family if no match            │
 └─────────────────────────────────────────────┘
                     ↓
 ┌─────────────────────────────────────────────┐
 │ Output:                                     │
 │ {                                           │
-│   "name": "Triethylamine",                 │
-│   "cas": "121-44-8",                       │
-│   "role": "other_reagent",                 │
-│   "family_id": "misc_general",             │
-│   "roles": {                               │
-│     "other_reagent": {                     │
-│       "families": ["misc_general"]         │
+│   "name": "Triethylamine",                  │
+│   "cas": "121-44-8",                        │
+│   "role": "other_reagent",                  │
+│   "family_id": "misc_general",              │
+│   "roles": {                                │
+│     "other_reagent": {                      │
+│       "families": ["misc_general"]          │
 │     }                                       │
 │   }                                         │
 │ }                                           │
