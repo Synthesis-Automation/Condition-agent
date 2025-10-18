@@ -1,0 +1,332 @@
+{
+  "meta": {
+    "generated_at": "2025-10-18T12:40:23.780070Z",
+    "model": "LLM-synthesis",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 54340.52
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1",
+    "family": "Unknown"
+  },
+  "detection": {
+    "family": "Unknown",
+    "detected_reaction_type": "Unknown",
+    "method": "llm-multi-source",
+    "confidence": 0.5
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "smiles": "Brc1ccccc1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "c1ccc(B(O)O)cc1",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Pd(dppf)Cl2",
+          "role": "metal_precursor",
+          "notes": "Pd(dppf)Cl2",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "N/A",
+          "role": "ligand",
+          "notes": "N/A (pre-formed complex)",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Potassium carbonate",
+          "role": "base",
+          "notes": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "THF/H2O",
+          "role": "solvent",
+          "notes": "THF/H2O (4:1)",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          60.0,
+          60.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.5,
+      "summary": {
+        "rationale": "Combining ML catalyst preference (Pd(dppf)Cl2) with Rule solvent system (THF/H2O) and temperature guidance. This Suzuki-Miyaura coupling between bromobenzene and phenylboronic acid benefits from aqueous conditions for base solubility. dppf ligand provides good activity for simple aryl-aryl couplings.",
+        "warnings": [
+          "Standard Suzuki-Miyaura conditions - no special functional group risks identified",
+          "Ensure proper degassing to prevent catalyst oxidation",
+          "Monitor for homocoupling byproducts if boronic acid is unstable"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "smiles": "Brc1ccccc1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "c1ccc(B(O)O)cc1",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "role": "metal_precursor",
+          "notes": "Pd2(dba)3",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "notes": "SPhos",
+          "abbreviation": "SPhos",
+          "cas": "657408-07-6",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Potassium carbonate",
+          "role": "base",
+          "notes": "Potassium carbonate",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "Toluene",
+          "role": "solvent",
+          "notes": "Toluene/H2O (4:1)",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          80.0,
+          80.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.4,
+      "summary": {
+        "rationale": "<30% conv: try this more active catalyst/ligand system",
+        "warnings": [
+          "Standard Suzuki-Miyaura conditions - no special functional group risks identified",
+          "Ensure proper degassing to prevent catalyst oxidation",
+          "Monitor for homocoupling byproducts if boronic acid is unstable"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "smiles": "Brc1ccccc1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "c1ccc(B(O)O)cc1",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_precursor",
+          "notes": "Pd(PPh3)4",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Tripotassium phosphate",
+          "role": "base",
+          "notes": "Potassium phosphate",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "1,4-Dioxane",
+          "role": "solvent",
+          "notes": "1,4-Dioxane/H2O (4:1)",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          90.0,
+          90.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.3,
+      "summary": {
+        "rationale": "<20% after 12h: try different catalyst family with stronger base",
+        "warnings": [
+          "Standard Suzuki-Miyaura conditions - no special functional group risks identified",
+          "Ensure proper degassing to prevent catalyst oxidation",
+          "Monitor for homocoupling byproducts if boronic acid is unstable"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    }
+  ],
+  "extras": {
+    "llm_synthesis": {
+      "consensus_analysis": {
+        "catalyst": {
+          "agreement": "low",
+          "consensus_value": "Pd-based catalyst (Pd(dppf)Cl2 or Pd2(dba)3/SPhos)",
+          "notes": "ML suggests Pd(dppf)Cl2, Rule suggests Pd2(dba)3/SPhos. No agreement between sources."
+        },
+        "solvent": {
+          "agreement": "low",
+          "consensus_value": "THF or 1,2-Dichloroethane or 1,4-Dioxane",
+          "notes": "ML suggests various organic solvents, Rule suggests THF/H2O mixture. No clear consensus."
+        },
+        "temperature": {
+          "agreement": "low",
+          "consensus_value": "45-60°C or ambient",
+          "notes": "Only Rule source provides temperature range (45-60°C), ML sources lack temperature data"
+        },
+        "base": {
+          "agreement": "medium",
+          "consensus_value": "Potassium carbonate",
+          "notes": "2/3 ML sources and Rule source agree on K2CO3, one ML source suggests Na2CO3"
+        }
+      },
+      "confidence_level": "low",
+      "confidence_reasoning": "Sources disagree on catalyst system and solvent. ML confidence scores are 0.00, indicating low similarity. Protocol sources provide no useful information. Only base shows partial agreement.",
+      "recommended_condition": {
+        "catalyst": "Pd(dppf)Cl2",
+        "ligand": "N/A (pre-formed complex)",
+        "solvent": "THF/H2O (4:1)",
+        "temperature": "60°C",
+        "base": "Potassium carbonate",
+        "additive": "None",
+        "rationale": "Combining ML catalyst preference (Pd(dppf)Cl2) with Rule solvent system (THF/H2O) and temperature guidance. This Suzuki-Miyaura coupling between bromobenzene and phenylboronic acid benefits from aqueous conditions for base solubility. dppf ligand provides good activity for simple aryl-aryl couplings."
+      },
+      "backup_conditions": [
+        {
+          "catalyst": "Pd2(dba)3",
+          "ligand": "SPhos",
+          "solvent": "Toluene/H2O (4:1)",
+          "temperature": "80°C",
+          "base": "Potassium carbonate",
+          "when_to_use": "<30% conv: try this more active catalyst/ligand system"
+        },
+        {
+          "catalyst": "Pd(PPh3)4",
+          "ligand": "N/A",
+          "solvent": "1,4-Dioxane/H2O (4:1)",
+          "temperature": "90°C",
+          "base": "Potassium phosphate",
+          "when_to_use": "<20% after 12h: try different catalyst family with stronger base"
+        }
+      ],
+      "warnings": [
+        "Standard Suzuki-Miyaura conditions - no special functional group risks identified",
+        "Ensure proper degassing to prevent catalyst oxidation",
+        "Monitor for homocoupling byproducts if boronic acid is unstable"
+      ],
+      "source_comparison": {
+        "ml_contribution": "Provided Pd(dppf)Cl2 catalyst suggestion but with zero confidence scores",
+        "rule_contribution": "Provided solvent system (THF/H2O) and temperature guidance (45-60°C)",
+        "protocol_contribution": "No useful information provided (all fields N/A)"
+      }
+    },
+    "sources_used": {
+      "ml_precedents": 3,
+      "rule_matches": 1,
+      "protocol_procedures": 3
+    },
+    "llm_metadata": {
+      "model": "deepseek-v3.2-exp",
+      "tokens": 1750,
+      "latency_ms": 54340.26830000221,
+      "processing_time_ms": 54340.52260000317
+    }
+  }
+}

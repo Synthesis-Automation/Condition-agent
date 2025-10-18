@@ -753,6 +753,44 @@ $result | ConvertTo-Json -Depth 10
 
 ## Common Mistakes
 
+### ❌ Wrong Field for Catalyst Filtering
+
+**CRITICAL: Use `relax.catalyst_class`, NOT `constraints.metal_preference`**
+
+```powershell
+# ❌ WRONG - Using constraints (will be IGNORED!)
+$body = @{
+    reaction = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
+    reaction_type = "Suzuki"
+    k = 10
+    limit = 5
+    constraints = @{
+        metal_preference = "Cu"  # ❌ WRONG FIELD - DOES NOT WORK!
+    }
+    relax = @{}
+} | ConvertTo-Json -Depth 5
+```
+
+```powershell
+# ✅ CORRECT - Using relax.catalyst_class
+$body = @{
+    reaction = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
+    reaction_type = "Suzuki"
+    k = 10
+    limit = 5
+    relax = @{
+        catalyst_class = "Cu"  # ✅ CORRECT - THIS WORKS!
+    }
+    constraints = @{}
+} | ConvertTo-Json -Depth 5
+```
+
+**Why this matters:**
+
+- `relax` parameters control the **precedent search** (filtering BEFORE recommendation)
+- `constraints` parameters filter the **final recommendations** (filtering AFTER recommendation)
+- Catalyst filtering MUST happen during search, so use `relax.catalyst_class`
+
 ### ❌ Wrong Field Names
 
 ```powershell
