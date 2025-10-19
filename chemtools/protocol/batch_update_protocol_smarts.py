@@ -863,13 +863,14 @@ class ProtocolSmartsUpdater:
         result = build_smarts_with_guards(smiles)
         return result
     
-    def build_product_pattern(self, smiles: str, product_info, reactant_info_list) -> str:
+    def build_product_pattern(self, smiles: str, product_info, reactant_info_list, reactant_smiles_list=None) -> str:
         """Build product pattern focusing on newly formed bonds.
         
         Args:
             smiles: Product SMILES
             product_info: SubstrateInfo for product
             reactant_info_list: List of SubstrateInfo for reactants
+            reactant_smiles_list: List of reactant SMILES (optional, for better detection)
             
         Returns:
             SMARTS pattern string for product

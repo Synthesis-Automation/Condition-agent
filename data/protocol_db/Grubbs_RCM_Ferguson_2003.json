@@ -14,7 +14,7 @@
     "notes": "Reaction SMILES are approximate; used to reflect diallylamine→3-pyrroline RCM transformation.",
     "tags": "RCM; Grubbs-1; ruthenium carbene; DCM; nitrogen; reflux",
     "reaction_smarts_applicability": {
-      "core": "[NX3;H0]-[CX3](=O)>>[NX3;H0]-[CX3](=O)",
+      "core": "[NX3;H0]-[CX3](=O)",
       "guards_forbid": [
         "[NX3;H2;!$(NC=O)]  # Exclude non-amide primary amines",
         "[NX3;H1;!$(NC=O)]  # Exclude non-amide secondary amines"

@@ -15,8 +15,9 @@
     "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 °C, 24 h.",
     "tags": "Suzuki; aryl mesylate; phenylboronic acid; Pd(OAc)2; CM-phos; K3PO4; tert-butanol; OrgSyn v92p0195 Step C",
     "reaction_smarts_applicability": {
-      "core": "c-[OX2]-[SX4](=O)(=O)-[CH3].[B]>>a",
-      "guards_forbid": ["[CX4]-[OX2]-[SX4](=O)(=O)  # Exclude alkyl sulfonates"]
+      "core": "CS(=O)(=O)O[c]1cc[c]([C](C)(C)C)cc1.[B]>>c-c",
+      "guards_forbid": [],
+      "method": "fallback"
     },
     "mapping_confidence": 0.4393101061358973,
     "mapping_tool": "RXNMapper-0.4.2"
