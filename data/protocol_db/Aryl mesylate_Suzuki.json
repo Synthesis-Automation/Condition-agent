@@ -77,6 +77,10 @@
         }
       ],
       "notes": "Boron partner must be boronic acids only (B(OH)2). Esters/alkoxides/MIDA/pinacol boronates are forbidden. Match is role-agnostic over all inputs."
+    },
+    "reaction_smarts_applicability": {
+      "core": "a>>a",
+      "guards_forbid": []
     }
   },
   "reaction_setup": [

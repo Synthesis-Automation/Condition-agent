@@ -11,8 +11,14 @@
   "reaction": {
     "reaction_smiles": "C1=CC2=C(NN=C2C=C1)I>>C1=CC=C2C(=C1)C(=NN2)C#N ",
     "family": "Aryl_Iodide_Cyanation",
-    "notes": "Pd\u2013Xantphos-catalyzed cyanation of 3-iodo-1H-indazole using K4[Fe(CN)6]\u00b73H2O in DMAc/H2O under argon to give 1H-indazole-3-carbonitrile.",
-    "tags": "cyanation; aryl iodide; palladium; Xantphos; ferrocyanide; DMAc; OrgSyn v97p0314"
+    "notes": "Pd–Xantphos-catalyzed cyanation of 3-iodo-1H-indazole using K4[Fe(CN)6]·3H2O in DMAc/H2O under argon to give 1H-indazole-3-carbonitrile.",
+    "tags": "cyanation; aryl iodide; palladium; Xantphos; ferrocyanide; DMAc; OrgSyn v97p0314",
+    "reaction_smarts_applicability": {
+      "core": "[a]-[I]>>a",
+      "guards_forbid": [
+        "[CX4]-[I]  # Exclude aliphatic halides"
+      ]
+    }
   },
   "reaction_setup": [
     {
@@ -45,7 +51,7 @@
         },
         {
           "name": "Potassium ferrocyanide trihydrate",
-          "abbreviation": "K4[Fe(CN)6]\u00b73H2O",
+          "abbreviation": "K4[Fe(CN)6]·3H2O",
           "cas": "14459-95-1",
           "smiles": null,
           "amount": {
@@ -121,7 +127,7 @@
       "workup": [
         {
           "step": "Phase split and extraction",
-          "details": "Add water (60 mL) then 2-MeTHF (140 mL); transfer to separatory funnel; separate aqueous layer; back-extract with 2\u2011MeTHF (1 \u00d7 140 mL, then 5 \u00d7 100 mL)."
+          "details": "Add water (60 mL) then 2-MeTHF (140 mL); transfer to separatory funnel; separate aqueous layer; back-extract with 2‑MeTHF (1 × 140 mL, then 5 × 100 mL)."
         },
         {
           "step": "Wash",
@@ -129,11 +135,11 @@
         },
         {
           "step": "Concentration",
-          "details": "Concentrate under reduced pressure (39 \u00b0C, 780\u201360 mmHg, 25 min) to give a DMAc solution; further concentrate to ~40 mL (39 \u00b0C, 780\u201314 mmHg, 30 min)."
+          "details": "Concentrate under reduced pressure (39 °C, 780–60 mmHg, 25 min) to give a DMAc solution; further concentrate to ~40 mL (39 °C, 780–14 mmHg, 30 min)."
         },
         {
           "step": "Crystallization",
-          "details": "Add water (100 mL) over 4 min; stir at 25 \u00b0C for 2 h; filter on Kiriyama funnel; wash cake with water (60 mL); dry under vacuum (28 \u00b0C, 0.8 mmHg, 17 h)."
+          "details": "Add water (100 mL) over 4 min; stir at 25 °C for 2 h; filter on Kiriyama funnel; wash cake with water (60 mL); dry under vacuum (28 °C, 0.8 mmHg, 17 h)."
         }
       ],
       "purification": [

@@ -12,7 +12,11 @@
     "reaction_smiles": "O=C1CCCC1.Brc1ccc(C(=O)C)cc1>>O=C(C1CCCC1)c1ccc(C(=O)C)cc1",
     "family": "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)",
     "notes": "Step A only (first step): α-arylation of cyclopentanone with p-bromoacetophenone under Pd/enamine cooperative catalysis in 1,4-dioxane.",
-    "tags": "palladium; enamine; α-arylation; ketone; cyclopentanone; pressure vessel; dioxane; argon"
+    "tags": "palladium; enamine; α-arylation; ketone; cyclopentanone; pressure vessel; dioxane; argon",
+    "reaction_smarts_applicability": {
+      "core": "[C]-[CX3](=O)-[C]>>[C]-[CX3](=O)-[C]",
+      "guards_forbid": []
+    }
   },
   "reaction_setup": [
     {

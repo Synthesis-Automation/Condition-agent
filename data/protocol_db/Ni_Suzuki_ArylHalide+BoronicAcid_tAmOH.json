@@ -16,7 +16,13 @@
     "reaction_smiles": "Brc1cncnc1.OB(O)c1ccoc1>>C1(C2=COC=C2)=CN=CN=C1",
     "family": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",
     "notes": "Coupling of heterocyclic substrates with aryl boronic acids, NiCl2(PCy3)2-catalyzed Suzuki–Miyaura coupling of 5-bromopyrimidine with 3-furanylboronic acid in tert-amyl alcohol under nitrogen.",
-    "tags": "nickel; Suzuki–Miyaura; t-amyl alcohol; K3PO4; low-loading (0.5 mol %)"
+    "tags": "nickel; Suzuki–Miyaura; t-amyl alcohol; K3PO4; low-loading (0.5 mol %)",
+    "reaction_smarts_applicability": {
+      "core": "[a]-[Br]>>a",
+      "guards_forbid": [
+        "[CX4]-[Br]  # Exclude aliphatic halides"
+      ]
+    }
   },
   "reaction_setup": [
     {
