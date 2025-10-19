@@ -14,9 +14,13 @@
     "notes": "Step A only: (Z)-1-iodooct-1-ene + acetone cyanohydrin → (Z)-non-2-enenitrile using CuI/1,10-phenanthroline in DMF with tri-n-butylamine under Ar.",
     "tags": "Cyanation, Cu, Copper, Alkenyl_Iodide, coupling",
     "reaction_smarts_applicability": {
-      "core": "[#6]>>[#6]",
-      "guards_forbid": []
-    }
+      "core": "[NX3].[CX4]-[I]>>CCCCCCC=C[C]#[N]",
+      "guards_forbid": [],
+      "method": "fallback"
+    },
+    "reaction_smiles_mapped": "CC(C)(O)[C:9]#[N:10].I[CH:8]=[CH:7][CH2:6][CH2:5][CH2:4][CH2:3][CH2:2][CH3:1]>>[CH3:1][CH2:2][CH2:3][CH2:4][CH2:5][CH2:6][CH:7]=[CH:8][C:9]#[N:10]",
+    "mapping_confidence": 0.7779285913868582,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

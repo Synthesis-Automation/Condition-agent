@@ -13,9 +13,13 @@
     "family": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride",
     "notes": "NiCl2(dme) (15 mol%), K3PO4 (3.0 equiv), triethoxysilane (1.1 equiv) in DMF (37.5 mL), 21–22 °C, N2, 24 h; quenched with sat. NaHCO3 then extracted; purified by flash chromatography; 62% yield (two runs).",
     "reaction_smarts_applicability": {
-      "core": "[CX3](=O)-[OX2]-[C]>>[CX3](=O)-[OX2]-[C]",
-      "guards_forbid": []
-    }
+      "core": "C[C](=[O])[O][c]1cc[c](C=C)cc1.c-[F]>>c-c",
+      "guards_forbid": [],
+      "method": "fallback"
+    },
+    "reaction_smiles_mapped": "[CH3:1][C:2](=[O:3])[O:4][c:5]1[cH:6][cH:7][c:8]([CH:9]=[CH2:10])[cH:19][cH:20]1.F[C:11](=[O:12])[c:13]1[cH:14][cH:15][cH:16][cH:17][cH:18]1>>[CH3:1][C:2](=[O:3])[O:4][c:5]1[cH:6][cH:7][c:8]([CH:9]([CH3:10])[C:11](=[O:12])[c:13]2[cH:14][cH:15][cH:16][cH:17][cH:18]2)[cH:19][cH:20]1",
+    "mapping_confidence": 0.8400844056218324,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

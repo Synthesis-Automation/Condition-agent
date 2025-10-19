@@ -10,78 +10,16 @@
   },
   "reaction": {
     "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
+    "reaction_smiles_mapped": "CS(=O)(=O)O[c:8]1[cH:7][cH:6][c:5]([C:2]([CH3:1])([CH3:3])[CH3:4])[cH:16][cH:15]1.OB(O)[c:9]1[cH:10][cH:11][cH:12][cH:13][cH:14]1>>[CH3:1][C:2]([CH3:3])([CH3:4])[c:5]1[cH:6][cH:7][c:8](-[c:9]2[cH:10][cH:11][cH:12][cH:13][cH:14]2)[cH:15][cH:16]1",
     "family": "Suzuki_Miyaura_Cross_Coupling_OMs",
     "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 °C, 24 h.",
     "tags": "Suzuki; aryl mesylate; phenylboronic acid; Pd(OAc)2; CM-phos; K3PO4; tert-butanol; OrgSyn v92p0195 Step C",
-    "scope": {
-      "requires_any": [
-        {
-          "pattern": "[a]-OS(=O)(=O)C",
-          "min_count": 1,
-          "label": "at_least_one_aryl_mesylate"
-        },
-        {
-          "pattern": "[#6]-[B](O[H])(O[H])",
-          "min_count": 1,
-          "label": "at_least_one_boronic_acid_partner"
-        }
-      ],
-      "forbid": [
-        {
-          "pattern": "[CX4;H2,H3]-OS(=O)(=O)C",
-          "label": "no_alkyl_mesylate"
-        },
-        {
-          "pattern": "[a]-[Cl,Br,I]",
-          "label": "no_aryl_halide"
-        },
-        {
-          "pattern": "[a]-OS(=O)(=O)C(F)(F)F",
-          "label": "no_aryl_triflate"
-        },
-        {
-          "pattern": "[a]-OS(=O)(=O)[c]",
-          "label": "no_other_aryl_sulfonate_such_as_tosylate"
-        },
-        {
-          "pattern": "[a]-O-C(=O)[C,c]",
-          "label": "no_aryl_carboxylate_leaving_group"
-        },
-        {
-          "pattern": "[#6]-[B](O[H0])(O)",
-          "label": "no_boronate_or_alkoxide_oxygen_present_1"
-        },
-        {
-          "pattern": "[#6]-[B](O)(O[H0])",
-          "label": "no_boronate_or_alkoxide_oxygen_present_2"
-        },
-        {
-          "pattern": "[#6]-[B](O[H0])(O[H0])",
-          "label": "no_boronate_ester_di_alkoxy"
-        },
-        {
-          "pattern": "[#6]-[B]([O-])(O)",
-          "label": "no_boronate_anion_1"
-        },
-        {
-          "pattern": "[#6]-[B](O)([O-])",
-          "label": "no_boronate_anion_2"
-        },
-        {
-          "pattern": "[#6]-[B]([O-])([O-])",
-          "label": "no_boronate_di_anion"
-        },
-        {
-          "pattern": "[#6]-[B](O-C)(O-C)",
-          "label": "no_generic_boronate_ester"
-        }
-      ],
-      "notes": "Boron partner must be boronic acids only (B(OH)2). Esters/alkoxides/MIDA/pinacol boronates are forbidden. Match is role-agnostic over all inputs."
-    },
     "reaction_smarts_applicability": {
-      "core": "a>>a",
-      "guards_forbid": []
-    }
+      "core": "c-[OX2]-[SX4](=O)(=O)-[CH3].[B]>>a",
+      "guards_forbid": ["[CX4]-[OX2]-[SX4](=O)(=O)  # Exclude alkyl sulfonates"]
+    },
+    "mapping_confidence": 0.4393101061358973,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {
