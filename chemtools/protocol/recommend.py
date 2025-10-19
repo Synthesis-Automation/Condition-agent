@@ -9,6 +9,7 @@ This module:
 2. Computes DRFP similarity between query reaction and all protocols
 3. Returns top-k most similar protocols in standard JSON format
 4. Optionally filters by reaction family and tags
+5. Supports SMARTS-based pre-filtering for structural matching
 
 Usage:
     from chemtools.protocol.recommend import ProtocolRecommender
@@ -17,7 +18,8 @@ Usage:
     
     results = recommender.recommend(
         reaction_smiles='CCBr.c1ccccc1B(O)O>>CCc1ccccc1',
-        k=5
+        k=5,
+        use_smarts_filter=True  # Enable SMARTS-based filtering
     )
     
     # Standard output format with meta, input, detection, recommended_conditions
@@ -40,6 +42,92 @@ except ImportError:
     HAS_OUTPUT_FORMATTER = False
 
 logger = logging.getLogger(__name__)
+
+
+def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> bool:
+    """
+    Check if a reaction SMILES matches any of the provided SMARTS patterns.
+    
+    Uses RDKit's reaction SMARTS matching when available. Falls back to returning
+    True if RDKit is not available (permissive fallback).
+    
+    Args:
+        reaction_smiles: Input reaction SMILES string (e.g., "CCBr.c1ccccc1B(O)O>>CCc1ccccc1")
+        smarts_patterns: List of reaction SMARTS patterns to match against
+    
+    Returns:
+        True if the reaction matches any pattern, False otherwise
+    """
+    if not smarts_patterns:
+        # No patterns specified, always match
+        return True
+    
+    if not reaction_smiles or '>>' not in reaction_smiles:
+        # Invalid reaction SMILES
+        return False
+    
+    try:
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+        
+        # Parse the input reaction
+        try:
+            rxn_mol = AllChem.ReactionFromSmarts(reaction_smiles, useSmiles=True)
+            if rxn_mol is None:
+                logger.debug(f"Could not parse reaction SMILES: {reaction_smiles}")
+                return True  # Permissive fallback
+        except Exception as e:
+            logger.debug(f"Error parsing reaction SMILES: {e}")
+            return True  # Permissive fallback
+        
+        # Try to match against each SMARTS pattern
+        for pattern in smarts_patterns:
+            if not pattern or '>>' not in pattern:
+                continue
+            
+            try:
+                # Parse the SMARTS pattern as a reaction
+                pattern_rxn = AllChem.ReactionFromSmarts(pattern)
+                if pattern_rxn is None:
+                    logger.debug(f"Could not parse reaction SMARTS: {pattern}")
+                    continue
+                
+                # Check if the input reaction matches the pattern
+                # We need to check if the pattern is a substructure of the reaction
+                # This is done by comparing reactants and products separately
+                
+                # Get reactants and products from both
+                rxn_reactants = rxn_mol.GetReactants()
+                rxn_products = rxn_mol.GetProducts()
+                pattern_reactants = pattern_rxn.GetReactants()
+                pattern_products = pattern_rxn.GetProducts()
+                
+                # Check if all pattern reactants match some rxn reactants
+                reactants_match = all(
+                    any(rxn_r.HasSubstructMatch(pat_r) for rxn_r in rxn_reactants)
+                    for pat_r in pattern_reactants
+                )
+                
+                # Check if all pattern products match some rxn products
+                products_match = all(
+                    any(rxn_p.HasSubstructMatch(pat_p) for rxn_p in rxn_products)
+                    for pat_p in pattern_products
+                )
+                
+                if reactants_match and products_match:
+                    logger.debug(f"Reaction matched SMARTS pattern: {pattern}")
+                    return True
+                    
+            except Exception as e:
+                logger.debug(f"Error matching SMARTS pattern {pattern}: {e}")
+                continue
+        
+        # No patterns matched
+        return False
+        
+    except ImportError:
+        logger.debug("RDKit not available for SMARTS matching, using permissive fallback")
+        return True  # Permissive fallback when RDKit is not available
 
 
 class ProtocolRecommender:
@@ -89,7 +177,8 @@ class ProtocolRecommender:
         reaction_family: Optional[str] = None,
         tags: Optional[List[str]] = None,
         min_similarity: float = 0.0,
-        use_standard_format: bool = True
+        use_standard_format: bool = True,
+        use_smarts_filter: bool = True
     ) -> Dict[str, Any]:
         """
         Find top-k most similar protocols for a reaction
@@ -101,6 +190,7 @@ class ProtocolRecommender:
             tags: Optional tag filter (match ANY tag)
             min_similarity: Minimum similarity threshold (0.0-1.0)
             use_standard_format: Return standard JSON format (default: True)
+            use_smarts_filter: Use reaction SMARTS for structural pre-filtering (default: True)
         
         Returns:
             Dictionary with standard format:
@@ -147,6 +237,16 @@ class ProtocolRecommender:
         
         # Get candidate protocols (filter by family/tags if specified)
         candidates = self._get_candidates(reaction_family, tags)
+        
+        # Apply SMARTS-based filtering if requested
+        num_before_smarts = len(candidates)
+        if use_smarts_filter:
+            candidates = self._filter_by_smarts(reaction_smiles, candidates)
+            num_after_smarts = len(candidates)
+            if num_after_smarts < num_before_smarts:
+                logger.debug(
+                    f"SMARTS filtering reduced candidates from {num_before_smarts} to {num_after_smarts}"
+                )
         
         if not candidates:
             processing_time_ms = (time.time() - start_time) * 1000
@@ -251,11 +351,29 @@ class ProtocolRecommender:
             record = item['record']
             similarity = item['similarity']
             
+            # Load full protocol to get chemicals list
+            protocol_data = self.get_protocol_details(record.filename)
+            chemicals_list = []
+            conditions_data = {}
+            
+            if protocol_data:
+                # Extract chemicals from reaction_setup
+                reaction_setup = protocol_data.get('reaction_setup', [])
+                if reaction_setup and len(reaction_setup) > 0:
+                    chemicals_list = reaction_setup[0].get('chemicals', [])
+                
+                # Extract conditions using existing method
+                conditions_data = self.extract_conditions(protocol_data)
+            
             # Build protocol entry in standard format
             protocol_rec = {
                 'rank': rank,
                 'confidence': round(similarity, 4),
-                'protocol': {
+                'chemicals': chemicals_list,  # Now includes full chemicals list
+                'conditions': conditions_data,
+                'source': 'protocol_database',
+                'similarity': round(similarity, 4),
+                'protocol_metadata': {  # Metadata moved to nested object
                     'filename': record.filename,
                     'title': record.source_title,
                     'journal': record.source_journal,
@@ -263,12 +381,11 @@ class ProtocolRecommender:
                     'doi': record.source_doi,
                     'url': record.source_url,
                     'reaction_smiles': record.reaction_smiles,
+                    'reaction_smarts': record.reaction_smarts,
                     'reaction_family': record.reaction_family,
                     'tags': record.tags,
                     'notes': record.notes
-                },
-                'similarity': round(similarity, 4),
-                'source': 'protocol_database'
+                }
             }
             
             recommended_conditions.append(protocol_rec)
@@ -303,7 +420,8 @@ class ProtocolRecommender:
             'extras': {
                 'num_candidates': num_candidates,
                 'num_total_protocols': len(self.indexer.records),
-                'num_matches': len(top_matches)
+                'num_matches': len(top_matches),
+                'smarts_filtering_enabled': True
             }
         }
     
@@ -324,6 +442,7 @@ class ProtocolRecommender:
                 'filename': record.filename,
                 'similarity': item['similarity'],
                 'reaction_smiles': record.reaction_smiles,
+                'reaction_smarts': record.reaction_smarts,
                 'reaction_family': record.reaction_family,
                 'tags': record.tags,
                 'notes': record.notes,
@@ -374,6 +493,35 @@ class ProtocolRecommender:
             ]
         
         return candidates
+    
+    def _filter_by_smarts(
+        self,
+        reaction_smiles: str,
+        candidates: List[ProtocolRecord]
+    ) -> List[ProtocolRecord]:
+        """
+        Filter candidates by matching reaction SMARTS patterns
+        
+        Args:
+            reaction_smiles: Query reaction SMILES
+            candidates: List of protocol records to filter
+        
+        Returns:
+            Filtered list of protocols that match the reaction structure
+        """
+        filtered = []
+        
+        for record in candidates:
+            # If protocol has no SMARTS patterns, include it (permissive)
+            if not record.reaction_smarts:
+                filtered.append(record)
+                continue
+            
+            # Check if the reaction matches any of the protocol's SMARTS patterns
+            if match_reaction_smarts(reaction_smiles, record.reaction_smarts):
+                filtered.append(record)
+        
+        return filtered
     
     def _compute_drfp(self, reaction_smiles: str) -> List[float]:
         """
@@ -522,47 +670,34 @@ class ProtocolRecommender:
         reaction_smiles: str,
         k: int = 5,
         use_standard_format: bool = True,
+        use_smarts_filter: bool = True,
         **kwargs
     ) -> Dict[str, Any]:
         """
         Recommend protocols and include extracted condition details
         
+        NOTE: When use_standard_format=True (default), chemicals and conditions
+        are already included in the output, so this method is equivalent to recommend().
+        This method is maintained for backward compatibility.
+        
         Args:
             reaction_smiles: Query reaction SMILES
             k: Number of recommendations
             use_standard_format: Return standard JSON format (default: True)
+            use_smarts_filter: Use reaction SMARTS for structural pre-filtering (default: True)
             **kwargs: Additional arguments for recommend()
         
         Returns:
-            Same as recommend() but with condition details added to each recommendation
-            
-            In standard format: 'conditions' added to each entry in 'recommended_conditions'
-            In legacy format: 'conditions' added to each entry in 'matches'
+            Same as recommend() - with chemicals and conditions already included
         """
-        # Make sure use_standard_format is passed through
-        results = self.recommend(
+        # In standard format mode, details are already included
+        return self.recommend(
             reaction_smiles,
             k=k,
             use_standard_format=use_standard_format,
+            use_smarts_filter=use_smarts_filter,
             **kwargs
         )
-        
-        # Add detailed conditions to each match/recommendation
-        if use_standard_format and 'recommended_conditions' in results:
-            # Standard format
-            for rec in results['recommended_conditions']:
-                protocol_filename = rec['protocol']['filename']
-                protocol = self.get_protocol_details(protocol_filename)
-                if protocol:
-                    rec['conditions'] = self.extract_conditions(protocol)
-        elif 'matches' in results:
-            # Legacy format
-            for match in results['matches']:
-                protocol = self.get_protocol_details(match['filename'])
-                if protocol:
-                    match['conditions'] = self.extract_conditions(protocol)
-        
-        return results
 
 
 def recommend_protocol(
@@ -570,7 +705,8 @@ def recommend_protocol(
     k: int = 5,
     reaction_family: Optional[str] = None,
     tags: Optional[List[str]] = None,
-    index_path: Optional[Path] = None
+    index_path: Optional[Path] = None,
+    use_smarts_filter: bool = True
 ) -> Dict[str, Any]:
     """
     Standalone function to recommend protocols
@@ -581,6 +717,7 @@ def recommend_protocol(
         reaction_family: Optional family filter
         tags: Optional tag filter
         index_path: Optional index file path
+        use_smarts_filter: Use reaction SMARTS for structural pre-filtering (default: True)
     
     Returns:
         Recommendation results dictionary
@@ -591,7 +728,8 @@ def recommend_protocol(
         results = recommend_protocol(
             'CCBr.c1ccccc1B(O)O>>CCc1ccccc1',
             k=3,
-            tags=['Suzuki']
+            tags=['Suzuki'],
+            use_smarts_filter=True
         )
         
         for match in results['matches']:
@@ -602,5 +740,6 @@ def recommend_protocol(
         reaction_smiles=reaction_smiles,
         k=k,
         reaction_family=reaction_family,
-        tags=tags
+        tags=tags,
+        use_smarts_filter=use_smarts_filter
     )

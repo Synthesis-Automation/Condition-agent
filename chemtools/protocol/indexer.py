@@ -50,6 +50,7 @@ class ProtocolRecord:
     reaction_smiles: str
     reaction_family: str
     tags: List[str] = field(default_factory=list)
+    reaction_smarts: List[str] = field(default_factory=list)  # SMARTS patterns for matching
     notes: str = ""
     
     # Source info
@@ -250,6 +251,13 @@ class ProtocolIndexer:
         reaction_family = reaction.get('family', '')
         notes = reaction.get('notes', '')
         
+        # Extract reaction SMARTS patterns
+        reaction_smarts_raw = reaction.get('reaction_SMARTS', [])
+        if isinstance(reaction_smarts_raw, list):
+            reaction_smarts = [str(s).strip() for s in reaction_smarts_raw if s]
+        else:
+            reaction_smarts = []
+        
         # Extract tags
         tags_raw = reaction.get('tags', '')
         if isinstance(tags_raw, str):
@@ -279,6 +287,7 @@ class ProtocolIndexer:
             filepath=str(json_path.relative_to(self.protocol_dir.parent)),
             file_hash=file_hash,
             reaction_smiles=reaction_smiles,
+            reaction_smarts=reaction_smarts,
             reaction_family=reaction_family,
             tags=tags,
             notes=notes,

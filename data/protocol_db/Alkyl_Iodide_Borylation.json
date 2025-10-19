@@ -10,7 +10,7 @@
   },
   "reaction": {
     "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
-    "reaction_core_smiles": ["IC([H])[H].CC(C)(C(C)(O1)C)OB1BB2OC(C)(C(C)(O2)C)C>>CB3OC(C)(C(C)(O3)C)C"],
+    "reaction_SMARTS": ["I[CH2].CC1(C(OB(BB2OC(C(O2)(C)C)(C)C)O1)(C)C)C>>[CH2]B3OC(C(O3)(C)C)(C)C"],
     "compatible_functional_groups": ["ketone", "aromatic"],
     "incompatible_functional_groups": ["enamine", "alcohol", "carboxylic acid"],
     "family": "Alkyl_Iodide_Borylation",

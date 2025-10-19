@@ -1,5 +1,9 @@
 """
-Protocol Database Matcher
+Protocol Database Matcher (Legacy)
+
+DEPRECATED: This module is maintained for backward compatibility only.
+New code should use chemtools.protocol.recommend.ProtocolRecommender instead,
+which provides better SMARTS-based filtering and DRFP similarity search.
 
 This module provides functionality to match user-supplied reactions to standard
 procedure protocols stored in the protocol_db directory.
@@ -31,7 +35,7 @@ import json
 import os
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from datetime import datetime
 import logging
 
@@ -55,6 +59,7 @@ class ProtocolMetadata:
     source_doi: str
     
     # Computed fields
+    reaction_smarts: List[str] = field(default_factory=list)  # SMARTS patterns for matching
     canonical_reaction: str = ""
     drfp_fingerprint: Optional[Any] = None
     
@@ -77,6 +82,7 @@ class ProtocolMatch:
     notes: str
     source_title: str
     source_doi: str
+    reaction_smarts: List[str] = field(default_factory=list)  # SMARTS patterns for matching
     
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -292,6 +298,13 @@ class ProtocolMatcher:
         else:
             tags = []
         
+        # Extract reaction SMARTS patterns
+        reaction_smarts_raw = reaction.get('reaction_SMARTS', [])
+        if isinstance(reaction_smarts_raw, list):
+            reaction_smarts = [str(s).strip() for s in reaction_smarts_raw if s]
+        else:
+            reaction_smarts = []
+        
         # Normalize reaction SMILES
         reaction_smiles = reaction.get('reaction_smiles', '')
         canonical_rxn = ''
@@ -305,6 +318,7 @@ class ProtocolMatcher:
         metadata = ProtocolMetadata(
             filename=json_path.name,
             reaction_smiles=reaction_smiles,
+            reaction_smarts=reaction_smarts,
             reaction_family=reaction.get('family', ''),
             tags=tags,
             notes=reaction.get('notes', ''),
@@ -416,6 +430,7 @@ class ProtocolMatcher:
                         filename=protocol.filename,
                         similarity=similarity,
                         reaction_smiles=protocol.reaction_smiles,
+                        reaction_smarts=protocol.reaction_smarts,
                         reaction_family=protocol.reaction_family,
                         tags=protocol.tags,
                         notes=protocol.notes,

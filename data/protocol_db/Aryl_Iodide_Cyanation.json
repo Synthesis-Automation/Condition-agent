@@ -9,18 +9,13 @@
     "url": "https://orgsyn.org/demo.aspx?prep=v97p0314"
   },
   "reaction": {
-    "reaction_smiles": "C1=CC2=C(NN=C2C=C1)I>>C1=CC=C2C(=C1)C(=NN2)C#N ",
+    "reaction_smiles": "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43",
+    "reaction_SMARTS": ["IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43"],
+    "compatible_functional_groups": ["aromatic"],
+    "incompatible_functional_groups": ["carboxylic acid"],
     "family": "Aryl_Iodide_Cyanation",
     "notes": "Pd–Xantphos-catalyzed cyanation of 3-iodo-1H-indazole using K4[Fe(CN)6]·3H2O in DMAc/H2O under argon to give 1H-indazole-3-carbonitrile.",
-    "tags": "cyanation; aryl iodide; palladium; Xantphos; ferrocyanide; DMAc; OrgSyn v97p0314",
-    "reaction_smarts_applicability": {
-      "core": "c-[I]>>c-C#C",
-      "guards_forbid": [],
-      "method": "fallback"
-    },
-    "reaction_smiles_mapped": "I[c:2]1[nH:1][n:4][c:6]2[cH:7][cH:8][cH:3][cH:10][c:11]12>>[N:1]#[C:2][c:3]1[n:4][nH:5][c:6]2[cH:7][cH:8][cH:9][cH:10][c:11]12",
-    "mapping_confidence": 0.9765143535282383,
-    "mapping_tool": "RXNMapper-0.4.2"
+    "tags": "cyanation; aryl iodide; palladium; Xantphos; ferrocyanide; DMAc; OrgSyn v97p0314"
   },
   "reaction_setup": [
     {
