@@ -21,11 +21,13 @@
     "notes": "Step A only: coupling of 4'-bromoacetophenone with 2-chlorobenzenethiol under blue light (456 nm) in DMSO with Cs2CO3 base; N2 atmosphere; 23 °C; 5 h.",
     "tags": "visible light; C–S coupling; aryl bromide; aryl thiol; cesium carbonate; DMSO; nitrogen; Kessil PR160; 456 nm",
     "reaction_smarts_applicability": {
-      "core": "[C]-[CX3](=O)-[C]>>[C]-[CX3](=O)-[C]",
-      "guards_forbid": [
-        "[CX4]-[Cl]  # Exclude aliphatic halides"
-      ]
-    }
+      "core": "c-[Br].c-[Cl]>>c-c",
+      "guards_forbid": [],
+      "method": "fallback"
+    },
+    "reaction_smiles_mapped": "Br[c:7]1[cH:6][cH:5][c:4]([C:2]([CH3:1])=[O:3])[cH:17][cH:16]1.[SH:8][c:9]1[cH:10][cH:11][cH:12][cH:13][c:14]1[Cl:15]>>[CH3:1][C:2](=[O:3])[c:4]1[cH:5][cH:6][c:7]([S:8][c:9]2[cH:10][cH:11][cH:12][cH:13][c:14]2[Cl:15])[cH:16][cH:17]1",
+    "mapping_confidence": 0.9810162184414115,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

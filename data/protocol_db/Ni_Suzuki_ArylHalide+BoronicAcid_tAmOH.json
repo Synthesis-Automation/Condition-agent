@@ -18,11 +18,13 @@
     "notes": "Coupling of heterocyclic substrates with aryl boronic acids, NiCl2(PCy3)2-catalyzed Suzuki–Miyaura coupling of 5-bromopyrimidine with 3-furanylboronic acid in tert-amyl alcohol under nitrogen.",
     "tags": "nickel; Suzuki–Miyaura; t-amyl alcohol; K3PO4; low-loading (0.5 mol %)",
     "reaction_smarts_applicability": {
-      "core": "[a]-[Br]>>a",
-      "guards_forbid": [
-        "[CX4]-[Br]  # Exclude aliphatic halides"
-      ]
-    }
+      "core": "c-[Br].[B]>>c-c",
+      "guards_forbid": [],
+      "method": "fallback"
+    },
+    "reaction_smiles_mapped": "Br[c:4]1[cH:3][n:2][cH:1][n:11][cH:10]1.OB(O)[c:5]1[cH:6][cH:7][o:8][cH:9]1>>[cH:1]1[n:2][cH:3][c:4](-[c:5]2[cH:6][cH:7][o:8][cH:9]2)[cH:10][n:11]1",
+    "mapping_confidence": 0.7441908275674918,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

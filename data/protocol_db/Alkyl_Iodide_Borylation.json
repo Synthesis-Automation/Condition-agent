@@ -14,14 +14,17 @@
     "notes": "General LiOtBu/MeOH borylation of primary alkyl iodide with B2pin2 to give R–B(pin).",
     "tags": "borylation; alkyl iodide; B2pin2; LiOtBu; MeOH; OrgSyn v99p0015",
     "reaction_smarts_applicability": {
-      "core": "[CX4;H2,H3]-[I]>>[B]1OC(C)(C)C(C)(C)O1",
+      "core": "[CX4;H2,H3]-[I].[B]1OC(C)(C)C(C)(C)O1>>c-C",
       "guards_forbid": [
         "[CX4;H1]-[I]  # Exclude secondary",
         "[CX4;H0]-[I]  # Exclude tertiary",
         "[CH2;$([CH2][c])]-[I]  # Exclude benzylic",
         "[CH2;$([CH2]C=C)]-[I]  # Exclude allylic"
       ]
-    }
+    },
+    "reaction_smiles_mapped": "CC1(C)OB(B[B:9]2[O:10][C:11]([CH3:12])([CH3:13])[C:14]([CH3:15])([CH3:16])[O:17]2)OC1(C)C.I[CH2:8][CH2:7][CH2:6][CH2:5][CH2:4][CH2:3][CH2:2][CH3:1]>>[CH3:1][CH2:2][CH2:3][CH2:4][CH2:5][CH2:6][CH2:7][CH2:8][B:9]1[O:10][C:11]([CH3:12])([CH3:13])[C:14]([CH3:15])([CH3:16])[O:17]1",
+    "mapping_confidence": 0.16139555413755033,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

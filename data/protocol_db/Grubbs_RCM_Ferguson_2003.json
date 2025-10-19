@@ -19,7 +19,10 @@
         "[NX3;H2;!$(NC=O)]  # Exclude non-amide primary amines",
         "[NX3;H1;!$(NC=O)]  # Exclude non-amide secondary amines"
       ]
-    }
+    },
+    "reaction_smiles_mapped": "C=[CH:10][CH2:9][N:8]([C:6]([O:5][C:2]([CH3:1])([CH3:3])[CH3:4])=[O:7])[CH2:12][CH:11]=C>>[CH3:1][C:2]([CH3:3])([CH3:4])[O:5][C:6](=[O:7])[N:8]1[CH:9]=[CH:10][CH2:11][CH2:12]1",
+    "mapping_confidence": 0.22015981507427065,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

@@ -14,12 +14,13 @@
     "notes": "CuBr·SMe2 (5 mol%), bathophenanthroline (7.5 mol%), NaOtBu (1.5 equiv), toluene (20 mL), 80 °C, 24 h, air; combined 73% yield (65% + 8% from second collection).",
     "tags": "Suzuki, Cu, alkyl_halide, Coupling",
     "reaction_smarts_applicability": {
-      "core": "[CX4;H1]-[Br]>>c-[Cl]",
-      "guards_forbid": [
-        "[CX4;H2,H3]-[Br]  # Exclude primary",
-        "[CX4;H0]-[Br]  # Exclude tertiary"
-      ]
-    }
+      "core": "[CX4]-[Br].c-[Cl]>>c-c",
+      "guards_forbid": [],
+      "method": "fallback"
+    },
+    "reaction_smiles_mapped": "Br[CH:6]1[CH2:7][CH2:8][CH2:9][CH2:10][CH2:11]1.CC1(C)OB([c:5]2[cH:4][cH:3][c:2]([Cl:1])[cH:13][cH:12]2)OC1(C)C>>[Cl:1][c:2]1[cH:3][cH:4][c:5]([CH:6]2[CH2:7][CH2:8][CH2:9][CH2:10][CH2:11]2)[cH:12][cH:13]1",
+    "mapping_confidence": 0.8474732173718237,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

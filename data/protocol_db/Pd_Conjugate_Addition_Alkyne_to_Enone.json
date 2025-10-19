@@ -19,9 +19,12 @@
     "notes": "First step only: Pd(OAc)2/PMe3-catalyzed 1,4-addition of phenylacetylene to ethyl vinyl ketone in water; staged alkyne addition; 60 °C for 48 h.",
     "tags": "palladium; conjugate addition; alkyne; enone; water; PMe3; biphasic; vigorous stirring",
     "reaction_smarts_applicability": {
-      "core": "a>>[C]-[CX3](=O)-[C]",
+      "core": "C#C.[C]-[CX3](=O)-[C]>>[C]-[CX3](=O)-[C]",
       "guards_forbid": []
-    }
+    },
+    "reaction_smiles_mapped": "[CH:6]#[C:7][c:8]1[cH:9][cH:10][cH:11][cH:12][cH:13]1.C[CH2:1][C:2](=[O:3])[CH:4]=[CH2:5]>>[CH3:1][C:2](=[O:3])[CH2:4][CH2:5][C:6]#[C:7][c:8]1[cH:9][cH:10][cH:11][cH:12][cH:13]1",
+    "mapping_confidence": 0.6491752334378249,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {

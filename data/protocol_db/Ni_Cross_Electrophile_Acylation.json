@@ -14,14 +14,13 @@
     "notes": "NiCl2(dme)/dtbbpy with Mn powder in DMAc under N2 couples 1‑iodooctane and ethyl succinyl chloride to give ethyl 4‑oxododecanoate; 0–2 °C then rt.",
     "tags": "nickel; cross-electrophile; acylation; dtbbpy; Mn; DMAc; alkyl iodide; acid chloride; OrgSyn v93p0050",
     "reaction_smarts_applicability": {
-      "core": "[CX4;H2,H3]-[I]>>[CX3](=O)-[OX2]-[C]",
-      "guards_forbid": [
-        "[CX4;H1]-[I]  # Exclude secondary",
-        "[CX4;H0]-[I]  # Exclude tertiary",
-        "[CH2;$([CH2][c])]-[I]  # Exclude benzylic",
-        "[CH2;$([CH2]C=C)]-[I]  # Exclude allylic"
-      ]
-    }
+      "core": "[CX4]-[I].[CX4]-[Cl]>>CCCCCCCC[C](=[O])C[C](=[O])[O]CC",
+      "guards_forbid": [],
+      "method": "fallback"
+    },
+    "reaction_smiles_mapped": "I[CH2:8][CH2:7][CH2:6][CH2:5][CH2:4][CH2:3][CH2:2][CH3:1].Cl[C:9](=[O:10])[CH2:11][C:12](=[O:13])[O:14][CH2:15][CH3:16]>>[CH3:1][CH2:2][CH2:3][CH2:4][CH2:5][CH2:6][CH2:7][CH2:8][C:9](=[O:10])[CH2:11][C:12](=[O:13])[O:14][CH2:15][CH3:16]",
+    "mapping_confidence": 0.8614441756765695,
+    "mapping_tool": "RXNMapper-0.4.2"
   },
   "reaction_setup": [
     {
