@@ -13,18 +13,20 @@ The codebase demonstrates good architectural foundations with the ChemTools v2.0
 **Overall Grade: B-**
 
 ### Strengths
+
 ✅ Clear module organization with ChemTools v2.0 unified API  
 ✅ Good separation of concerns (chemtools = deterministic, llmtools = LLM)  
 ✅ Type hints usage across modules  
 ✅ Comprehensive testing structure  
-✅ Well-documented public APIs  
+✅ Well-documented public APIs
 
 ### Major Issues
+
 ❌ **Large monolithic files** (1,300+ lines) reducing maintainability  
 ❌ **Deprecated code not removed** causing confusion  
 ❌ **Inconsistent error handling** patterns  
 ❌ **Complex UI files mixing concerns** (1,600-2,400 lines)  
-❌ **Mixed abstraction levels** in API endpoints  
+❌ **Mixed abstraction levels** in API endpoints
 
 ---
 
@@ -32,19 +34,20 @@ The codebase demonstrates good architectural foundations with the ChemTools v2.0
 
 ### Critical Issues (>1000 lines)
 
-| File | Lines | Issue | Priority |
-|------|-------|-------|----------|
-| `output_formatter.py` | 1,398 | Multiple formatting concerns mixed | HIGH |
-| `recommend/core.py` | 1,302 | Complex recommendation logic | HIGH |
-| `context.py` | 1,249 | ChemTools master class too large | MEDIUM |
-| `ui_gradio.py` | 2,439 | Massive UI file mixing concerns | HIGH |
-| `ui_simple.py` | 1,988 | Another large UI file | HIGH |
-| `reagent_taxonomy_ui.py` | 1,786 | PyQt6 UI mixing business logic | HIGH |
-| `dataset_analytics.py` | 700 | Analytics and stats mixed | MEDIUM |
+| File                     | Lines | Issue                              | Priority |
+| ------------------------ | ----- | ---------------------------------- | -------- |
+| `output_formatter.py`    | 1,398 | Multiple formatting concerns mixed | HIGH     |
+| `recommend/core.py`      | 1,302 | Complex recommendation logic       | HIGH     |
+| `context.py`             | 1,249 | ChemTools master class too large   | MEDIUM   |
+| `ui_gradio.py`           | 2,439 | Massive UI file mixing concerns    | HIGH     |
+| `ui_simple.py`           | 1,988 | Another large UI file              | HIGH     |
+| `reagent_taxonomy_ui.py` | 1,786 | PyQt6 UI mixing business logic     | HIGH     |
+| `dataset_analytics.py`   | 700   | Analytics and stats mixed          | MEDIUM   |
 
 ### Recommendations
 
 #### 1.1 Split `output_formatter.py` (1,398 lines)
+
 ```
 chemtools/formatters/
   ├── __init__.py
@@ -56,11 +59,13 @@ chemtools/formatters/
 ```
 
 **Benefits:**
+
 - Each formatter has single responsibility
 - Easier testing and maintenance
 - Better code reusability
 
 #### 1.2 Split `recommend/core.py` (1,302 lines)
+
 ```
 chemtools/recommend/
   ├── __init__.py
@@ -73,11 +78,13 @@ chemtools/recommend/
 ```
 
 **Benefits:**
+
 - Clear separation of recommendation stages
 - Testable components
 - Easier to add new reranking strategies
 
 #### 1.3 Refactor UI Files
+
 ```
 app/ui/
   ├── __init__.py
@@ -98,6 +105,7 @@ app/ui/
 ```
 
 **Benefits:**
+
 - UI components reusable
 - Business logic separated from presentation
 - Easier to test handlers independently
@@ -109,13 +117,16 @@ app/ui/
 ### Issues Found
 
 #### 2.1 Deprecated Imports Not Removed
+
 **File:** `app/main.py:23`
+
 ```python
 # TODO: Remove these imports once all code uses chem.*
 from chemtools import smiles, router, featurizers, condition_core, precedent, constraints, explain, recommend
 ```
 
 **Impact:**
+
 - Confusing for new developers
 - Maintenance burden
 - Import namespace pollution
@@ -123,30 +134,37 @@ from chemtools import smiles, router, featurizers, condition_core, precedent, co
 **Action:** Create migration plan and remove deprecated imports
 
 #### 2.2 Deprecated Fusion Endpoint
+
 **File:** `app/main.py:560-580`
+
 ```python
 @app.post("/api/v1/recommend/fusion")
 def api_recommend_fusion(req: FusionRecommendRequest):
     """DEPRECATED: Fusion recommendation endpoint has been removed."""
 ```
 
-**Action:** 
+**Action:**
+
 - Remove deprecated endpoint in next major version
 - Add clear migration guide
 - Return 410 Gone status instead of redirecting
 
 #### 2.3 Incomplete TODOs
+
 **File:** `chemtools/output_formatter.py:756`
+
 ```python
 # TODO: Calculate from SMILES or look up
 ```
 
 **File:** `llmtools/agents.py:388`
+
 ```python
 # TODO: Implement iterative optimization loop
 ```
 
 **Action:**
+
 - Complete or remove TODOs
 - Add GitHub issues for incomplete features
 - Document why postponed if not implementing
@@ -191,7 +209,7 @@ class RuleMatchingService:
     def match_reaction(self, reaction: str, db_path: str) -> MatchResult:
         """High-level matching logic"""
         pass
-    
+
     def filter_by_catalyst(self, conditions: List, catalyst_class: str) -> List:
         """Catalyst filtering logic"""
         pass
@@ -201,10 +219,10 @@ class RuleMatchingService:
 def api_scdb_match(req: SchemeMatchRequest):
     service = RuleMatchingService()
     result = service.match_reaction(req.reaction, req.db or _SCDB_DEFAULT_DB)
-    
+
     if req.relax and req.relax.get("catalyst_class"):
         result = service.filter_by_catalyst(result, req.relax["catalyst_class"])
-    
+
     return output_formatter.format_rule_match_result(result)
 ```
 
@@ -298,6 +316,7 @@ with database_context(db_path) as db:
 ### 4.1 Repeated Validation Logic
 
 **Found in multiple files:**
+
 - `app/main.py`: Input validation
 - `chemtools/contracts.py`: Pydantic models
 - `app/ui_*.py`: Form validation
@@ -325,6 +344,7 @@ def api_recommend(req: RecommendRequest):
 ### 4.2 Repeated Formatting Logic
 
 **Found in:**
+
 - `chemtools/output_formatter.py`: Multiple similar formatters
 - `app/ui_*.py`: UI-specific formatting
 - `llmtools/prompts.py`: LLM prompt formatting
@@ -337,7 +357,7 @@ class BaseFormatter(ABC):
     @abstractmethod
     def format(self, data: Dict) -> Dict:
         pass
-    
+
     def add_metadata(self, output: Dict, **kwargs) -> Dict:
         """Common metadata addition"""
         output.setdefault("meta", {})
@@ -379,7 +399,7 @@ class LLMConfig:
     temperature: float = 0.7
     max_tokens: int = 2000
     timeout: int = 60
-    
+
     @classmethod
     def from_env(cls, prefix: str = "LLM_") -> "LLMConfig":
         """Load from environment variables"""
@@ -389,7 +409,7 @@ class LLMConfig:
             temperature=float(os.getenv(f"{prefix}TEMPERATURE", "0.7")),
             ...
         )
-    
+
     @classmethod
     def for_chemistry(cls) -> "LLMConfig":
         """Recommended config for chemistry tasks"""
@@ -493,27 +513,27 @@ def test_drfp_search_performance(benchmark):
 
 **Recommendation:** Add OpenAPI-compliant docstrings
 
-```python
+````python
 @app.post("/api/v1/recommend/conditions", response_model=RecommendationResponse)
 async def api_recommend_conditions(req: RecommendConditionsRequest):
     """
     Get ML-based condition recommendations for a reaction.
-    
+
     This endpoint uses DRFP similarity search to find similar precedent reactions
     and recommends conditions based on their conditions. Supports automatic
     reaction type detection and constraint filtering.
-    
+
     Args:
         req: Recommendation request with reaction SMILES and parameters
-        
+
     Returns:
         Structured recommendation output with top-k conditions
-        
+
     Raises:
         HTTPException(400): Invalid reaction SMILES
         HTTPException(404): No precedents found
         HTTPException(500): Internal processing error
-        
+
     Example:
         ```python
         response = requests.post("/api/v1/recommend/conditions", json={
@@ -524,7 +544,7 @@ async def api_recommend_conditions(req: RecommendConditionsRequest):
         ```
     """
     ...
-```
+````
 
 ### 7.2 Architecture Documentation Needed
 
@@ -547,16 +567,19 @@ docs/architecture/
 ### High Priority (Do First)
 
 1. **Split large files** (output_formatter.py, recommend/core.py, UI files)
+
    - Impact: High
    - Effort: Medium
    - Timeline: 1-2 weeks
 
 2. **Remove deprecated code** (main.py imports, fusion endpoint)
+
    - Impact: Medium
    - Effort: Low
    - Timeline: 2-3 days
 
 3. **Standardize error handling** (create exceptions.py, add handlers)
+
    - Impact: High
    - Effort: Medium
    - Timeline: 1 week
@@ -569,11 +592,13 @@ docs/architecture/
 ### Medium Priority (Do Next)
 
 5. **Centralize validation** (consolidate validation logic)
+
    - Impact: Medium
    - Effort: Medium
    - Timeline: 1 week
 
 6. **Improve LLM configuration** (config.py, template management)
+
    - Impact: Medium
    - Effort: Low
    - Timeline: 3-5 days
@@ -586,11 +611,13 @@ docs/architecture/
 ### Low Priority (Nice to Have)
 
 8. **Add performance tests** (benchmark suite)
+
    - Impact: Low
    - Effort: Medium
    - Timeline: 1 week
 
 9. **Improve documentation** (API docs, architecture docs)
+
    - Impact: Low
    - Effort: High
    - Timeline: 2-3 weeks
@@ -606,14 +633,14 @@ docs/architecture/
 
 ### Current State
 
-| Metric | Value | Target | Status |
-|--------|-------|--------|--------|
-| Average file size | 442 lines | < 300 lines | ⚠️ WARN |
-| Files > 1000 lines | 7 files | 0 files | ❌ FAIL |
-| TODOs/FIXMEs | 15+ | < 5 | ⚠️ WARN |
-| Test coverage | Unknown | > 80% | ❓ CHECK |
-| Circular imports | 0 | 0 | ✅ PASS |
-| Type hints coverage | ~70% | > 90% | ⚠️ WARN |
+| Metric              | Value     | Target      | Status   |
+| ------------------- | --------- | ----------- | -------- |
+| Average file size   | 442 lines | < 300 lines | ⚠️ WARN  |
+| Files > 1000 lines  | 7 files   | 0 files     | ❌ FAIL  |
+| TODOs/FIXMEs        | 15+       | < 5         | ⚠️ WARN  |
+| Test coverage       | Unknown   | > 80%       | ❓ CHECK |
+| Circular imports    | 0         | 0           | ✅ PASS  |
+| Type hints coverage | ~70%      | > 90%       | ⚠️ WARN  |
 
 ### Improvement Targets (3 months)
 
@@ -628,16 +655,19 @@ docs/architecture/
 ## 10. Refactoring Roadmap
 
 ### Phase 1: Foundation (Month 1)
+
 - Week 1-2: Split large files, remove deprecated code
 - Week 3: Standardize error handling
 - Week 4: Add integration tests
 
 ### Phase 2: Architecture (Month 2)
+
 - Week 1-2: Extract service layer from endpoints
 - Week 3: Centralize validation and configuration
 - Week 4: Improve LLM tools structure
 
 ### Phase 3: Polish (Month 3)
+
 - Week 1-2: Add documentation
 - Week 3: Performance optimization and benchmarks
 - Week 4: Final cleanup and review
