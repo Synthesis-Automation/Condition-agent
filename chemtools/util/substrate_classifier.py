@@ -385,54 +385,23 @@ class SubstrateClassifier:
         """
         # Priority classification order
         
-        # 1. Halides (most common in cross-coupling)
-        if any(fg_dict.get(f"alkyl_{x}") for x in ['iodide', 'bromide', 'chloride', 'fluoride']):
-            info.substrate_family = 'halide'
-            info.substrate_class = self._classify_halide(info, fg_dict)
+        # Special case: empty or None
+        if not info.smiles:
+            info.substrate_family = 'unknown'
+            info.substrate_class = 'unknown'
+            return
         
-        elif any(fg_dict.get(f"aryl_{x}") for x in ['iodide', 'bromide', 'chloride', 'fluoride']):
-            info.substrate_family = 'halide'
-            info.substrate_class = self._classify_aryl_halide(info, fg_dict)
-        
-        # 2. Amines
-        elif fg_dict.get('aniline'):
-            info.substrate_family = 'amine'
-            info.substrate_class = 'aniline'
-        
-        elif any(fg_dict.get(f) for f in ['amine_primary', 'amine_secondary', 'amine_tertiary']):
-            info.substrate_family = 'amine'
-            if fg_dict.get('amine_primary'):
-                info.substrate_class = 'primary_amine'
-            elif fg_dict.get('amine_secondary'):
-                info.substrate_class = 'secondary_amine'
+        # 1. Boron compounds (check early, before alcohols confuse B(O)O)
+        if 'B(' in info.smiles or 'B1' in info.smiles:
+            info.substrate_family = 'boron'
+            if 'B(O)O' in info.smiles or 'B(OH)' in info.smiles:
+                info.substrate_class = 'boronic_acid'
+            elif 'B1OC(C)(C)C(C)(C)O1' in info.smiles or 'Bpin' in info.smiles.lower():
+                info.substrate_class = 'boronic_ester_pinacol'
             else:
-                info.substrate_class = 'tertiary_amine'
+                info.substrate_class = 'boron_compound'
         
-        # 3. Amides (separate from amines!)
-        elif fg_dict.get('amide'):
-            info.substrate_family = 'amide'
-            if fg_dict.get('amide_primary'):
-                info.substrate_class = 'primary_amide'
-            elif fg_dict.get('amide_secondary'):
-                info.substrate_class = 'secondary_amide'
-            else:
-                info.substrate_class = 'tertiary_amide'
-        
-        # 4. Alcohols and phenols
-        elif fg_dict.get('phenol'):
-            info.substrate_family = 'alcohol'
-            info.substrate_class = 'phenol'
-        
-        elif fg_dict.get('alcohol'):
-            info.substrate_family = 'alcohol'
-            if info.special_positions.benzylic:
-                info.substrate_class = 'benzylic_alcohol'
-            elif info.special_positions.allylic:
-                info.substrate_class = 'allylic_alcohol'
-            else:
-                info.substrate_class = 'aliphatic_alcohol'
-        
-        # 5. Carbonyls
+        # 2. Carbonyls (check before alcohols, as carboxylic acid has O)
         elif fg_dict.get('carboxylic_acid'):
             info.substrate_family = 'carbonyl'
             info.substrate_class = 'carboxylic_acid'
@@ -449,15 +418,52 @@ class SubstrateClassifier:
             info.substrate_family = 'carbonyl'
             info.substrate_class = 'ketone'
         
-        # 6. Boron compounds
-        elif 'B(' in info.smiles or 'B1' in info.smiles:
-            info.substrate_family = 'boron'
-            if 'B(O)O' in info.smiles or 'B(OH)' in info.smiles:
-                info.substrate_class = 'boronic_acid'
-            elif 'B1OC(C)(C)C(C)(C)O1' in info.smiles or 'Bpin' in info.smiles.lower():
-                info.substrate_class = 'boronic_ester_pinacol'
+        # 3. Halides (most common in cross-coupling)
+        elif any(fg_dict.get(f"alkyl_{x}") for x in ['iodide', 'bromide', 'chloride', 'fluoride']):
+            info.substrate_family = 'halide'
+            info.substrate_class = self._classify_halide(info, fg_dict)
+        
+        elif any(fg_dict.get(f"aryl_{x}") for x in ['iodide', 'bromide', 'chloride', 'fluoride']):
+            info.substrate_family = 'halide'
+            info.substrate_class = self._classify_aryl_halide(info, fg_dict)
+        
+        # 4. Amides (check before amines!)
+        elif fg_dict.get('amide'):
+            info.substrate_family = 'amide'
+            if fg_dict.get('amide_primary'):
+                info.substrate_class = 'primary_amide'
+            elif fg_dict.get('amide_secondary'):
+                info.substrate_class = 'secondary_amide'
             else:
-                info.substrate_class = 'boron_compound'
+                info.substrate_class = 'tertiary_amide'
+        
+        # 5. Amines
+        elif fg_dict.get('aniline'):
+            info.substrate_family = 'amine'
+            info.substrate_class = 'aniline'
+        
+        elif any(fg_dict.get(f) for f in ['amine_primary', 'amine_secondary', 'amine_tertiary']):
+            info.substrate_family = 'amine'
+            if fg_dict.get('amine_primary'):
+                info.substrate_class = 'primary_amine'
+            elif fg_dict.get('amine_secondary'):
+                info.substrate_class = 'secondary_amine'
+            else:
+                info.substrate_class = 'tertiary_amine'
+        
+        # 6. Alcohols and phenols
+        elif fg_dict.get('phenol'):
+            info.substrate_family = 'alcohol'
+            info.substrate_class = 'phenol'
+        
+        elif fg_dict.get('alcohol'):
+            info.substrate_family = 'alcohol'
+            if info.special_positions.benzylic:
+                info.substrate_class = 'benzylic_alcohol'
+            elif info.special_positions.allylic:
+                info.substrate_class = 'allylic_alcohol'
+            else:
+                info.substrate_class = 'aliphatic_alcohol'
         
         # 7. Other heteroatoms
         elif fg_dict.get('thiol'):
