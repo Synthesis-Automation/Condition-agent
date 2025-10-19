@@ -9,18 +9,13 @@
     "url": "https://www.orgsyn.org/demo.aspx?prep=v100p0099"
   },
   "reaction": {
-    "reaction_smiles": "O=C1CCCC1.Brc1ccc(C(=O)C)cc1>>O=C(C1CCCC1)c1ccc(C(=O)C)cc1",
+    "reaction_smiles": "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
+    "reaction_core_smiles": ["O=C1CCCC1.Brc2ccccc2>>O=C(CCC3)C3c4ccccc4"],
+    "compatible_functional_groups": ["ketone", "aromatic", "enamine", "alcohol", "carboxylic acid"],
+    "incompatible_functional_groups": ["amine"],
     "family": "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)",
     "notes": "Step A only (first step): α-arylation of cyclopentanone with p-bromoacetophenone under Pd/enamine cooperative catalysis in 1,4-dioxane.",
-    "tags": "palladium; enamine; α-arylation; ketone; cyclopentanone; pressure vessel; dioxane; argon",
-    "reaction_smarts_applicability": {
-      "core": "c-[Br].[C]1(=[O])CCCC1>>c-c",
-      "guards_forbid": [],
-      "method": "fallback"
-    },
-    "reaction_smiles_mapped": "Br[c:7]1[cH:6][cH:5][c:4]([C:2]([CH3:1])=[O:3])[cH:16][cH:15]1.[C:8]1(=[O:9])[CH2:10][CH2:13][CH2:12][CH2:11]1>>[CH3:1][C:2](=[O:3])[c:4]1[cH:5][cH:6][c:7]([C:8](=[O:9])[CH:10]2[CH2:11][CH2:12][CH2:13][CH2:14]2)[cH:15][cH:16]1",
-    "mapping_confidence": 0.9408326769391616,
-    "mapping_tool": "RXNMapper-0.4.2"
+    "tags": "palladium; enamine; α-arylation; ketone; cyclopentanone; pressure vessel; dioxane; argon"
   },
   "reaction_setup": [
     {
