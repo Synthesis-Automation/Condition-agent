@@ -287,6 +287,51 @@
     "embedding_text": "member_embedding: type: CATALYST | family: Co(II) Halides (co_ii_halides) | metal: Co | ox_states: 2 | name: Cobalt(II) chloride | abbr: CoCl2 | CAS: 7646-79-9"
   },
   {
+    "id": "RYGMFSIKBFXOCR-UHFFFAOYSA-N",
+    "name": "Copper",
+    "abbreviation": [
+      "Cu(0)",
+      "Cu"
+    ],
+    "aliases": [
+      "Copper powder",
+      "cuprum",
+      "Bronze powder",
+      "Copper bronze",
+      "Copper, elemental",
+      "Arwood copper",
+      "Copper-airborne",
+      "Copper-milled",
+      "Kafar copper",
+      "Paragard T 380a",
+      "Raney copper",
+      "Gold bronze",
+      "Copper metal",
+      "Elemental copper"
+    ],
+    "cas": "7440-50-8",
+    "inchi_key": "RYGMFSIKBFXOCR-UHFFFAOYSA-N",
+    "roles": {
+      "metal_precursor": {
+        "families": [
+          "pure metal"
+        ],
+        "metal": "Cu",
+        "oxidation_states": [
+          0
+        ]
+      },
+      "reductant": {
+        "families": [
+          "metal_powders"
+        ],
+        "strength_band": "moderate",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper | abbr: Cu(0) | CAS: 7440-50-8 | synonyms: Copper; 7440-50-8; Copper powder; cuprum; Bronze powder; Copper bronze; Copper, elemental; Tatum-T; cuivre; Arwood copper; Copper-airborne; Copper-milled; Kafar copper; Paragard T 380a; Raney copper; Gold bronze; Copper metal; Elemental copper"
+  },
+  {
     "id": "cas-1317-39-1",
     "name": "Copper oxide (Cu2O)",
     "abbreviation": [

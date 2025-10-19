@@ -572,6 +572,7 @@ def generate_taxonomy_entry_llm(
     llm_client: Any,  # LLMClient from llmtools.clients
     name_override: Optional[str] = None,
     smiles_override: Optional[str] = None,
+    role_override: Optional[str] = None,
     resolver_timeout: float = DEFAULT_RESOLVER_TIMEOUT,
 ) -> Dict[str, Any]:
     """
@@ -579,7 +580,7 @@ def generate_taxonomy_entry_llm(
     
     Workflow:
     1. Resolve chemical identity from CAS (PubChem API)
-    2. LLM classifies reagent role
+    2. LLM classifies reagent role (or use role_override)
     3. LLM assigns family and role-specific fields
     4. LLM verifies entry for errors
     
@@ -588,6 +589,7 @@ def generate_taxonomy_entry_llm(
         registry_dir: Path to reagent registry
         llm_client: Configured LLM client (from llmtools.clients)
         name_override: Optional name override
+        role_override: Optional role override (skips LLM classification)
         smiles_override: Optional SMILES override
         resolver_timeout: Timeout for CAS resolution
         
@@ -646,19 +648,56 @@ def generate_taxonomy_entry_llm(
             "error": f"Step 1 (Identity Resolution) failed: {exc}",
         }
     
-    # Step 2: Classify role
+    # Step 2: Classify role (or use override)
     try:
-        role_result = classify_role(resolved_identity, llm_client)
-        workflow["step2_role"] = role_result
+        llm_suggested_role = None
         
-        if role_result.get("status") != "success":
-            return {
-                "status": "error",
-                "error": f"Step 2 (Role Classification) failed: {role_result.get('error')}",
-                "workflow": workflow,
-            }
-        
-        role = role_result["role"]
+        if role_override:
+            # Use the role provided by the user as primary
+            role = role_override
+            
+            # Also get LLM suggestion for comparison/reference
+            try:
+                llm_result = classify_role(resolved_identity, llm_client)
+                if llm_result.get("status") == "success":
+                    llm_suggested_role = llm_result.get("role")
+                    workflow["step2_role"] = {
+                        "status": "success",
+                        "role": role,
+                        "source": "user_override",
+                        "llm_suggestion": llm_suggested_role,
+                        "llm_confidence": llm_result.get("confidence"),
+                        "llm_reasoning": llm_result.get("reasoning"),
+                    }
+                else:
+                    # LLM suggestion failed, but that's OK since user provided role
+                    workflow["step2_role"] = {
+                        "status": "success",
+                        "role": role,
+                        "source": "user_override",
+                        "llm_suggestion_error": llm_result.get("error"),
+                    }
+            except Exception as llm_exc:
+                # LLM suggestion failed, but that's OK since user provided role
+                workflow["step2_role"] = {
+                    "status": "success",
+                    "role": role,
+                    "source": "user_override",
+                    "llm_suggestion_error": str(llm_exc),
+                }
+        else:
+            # LLM classifies the role
+            role_result = classify_role(resolved_identity, llm_client)
+            workflow["step2_role"] = role_result
+            
+            if role_result.get("status") != "success":
+                return {
+                    "status": "error",
+                    "error": f"Step 2 (Role Classification) failed: {role_result.get('error')}",
+                    "workflow": workflow,
+                }
+            
+            role = role_result["role"]
         
     except Exception as exc:
         return {
@@ -740,6 +779,29 @@ def generate_taxonomy_entry_llm(
                 }
             },
         }
+        
+        # If user overrode the role and LLM suggested something different, add it as secondary role
+        if llm_suggested_role and llm_suggested_role != role:
+            try:
+                # Get fields for the LLM-suggested role
+                llm_fields_result = assign_fields(
+                    identity=resolved_identity,
+                    role=llm_suggested_role,
+                    registry_dir=registry_dir,
+                    llm_client=llm_client,
+                )
+                
+                if llm_fields_result.get("status") == "success":
+                    # Add LLM-suggested role as secondary
+                    entry["roles"][llm_suggested_role] = {
+                        "families": [llm_fields_result["family"]],
+                        **llm_fields_result.get("fields", {}),
+                        "_note": "LLM-suggested alternative role",
+                    }
+            except Exception:
+                # If getting fields for suggested role fails, that's OK
+                # Just use the user's role only
+                pass
         
         # Build embedding text following schema
         embedding_entry = {
@@ -1142,6 +1204,7 @@ class GenerationWorker(QRunnable):
                 cas = self.params["cas"]
                 registry_dir = self.params["registry_dir"]
                 name_override = self.params.get("name_override")
+                role_override = self.params.get("role_override")
                 provider = self.params["provider"]
                 model = self.params["model"]
                 
@@ -1153,7 +1216,8 @@ class GenerationWorker(QRunnable):
                     cas=cas,
                     registry_dir=registry_dir,
                     llm_client=llm_client,
-                    name_override=name_override
+                    name_override=name_override,
+                    role_override=role_override,
                 )
             else:
                 # Legacy workflow
@@ -1483,11 +1547,15 @@ class RegistryGeneratorWindow(QMainWindow):
             self._last_result = None
             self.set_inputs_enabled(False)
             
+            # Pass role if user selected one (skip if auto-detect)
+            role_to_pass = role if role and role != "__auto_detect__" else None
+            
             params = {
                 "workflow_mode": "llm_workflow",
                 "cas": cas,
                 "registry_dir": registry_dir,
                 "name_override": name_override,
+                "role_override": role_to_pass,
                 "provider": provider,
                 "model": model,
             }

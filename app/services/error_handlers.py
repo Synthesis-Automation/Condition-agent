@@ -6,7 +6,7 @@ ensuring that errors are returned in a standard format with appropriate
 HTTP status codes.
 
 Usage in main.py:
-    from app.error_handlers import register_error_handlers
+    from app.services.error_handlers import register_error_handlers
     
     app = FastAPI(...)
     register_error_handlers(app)
