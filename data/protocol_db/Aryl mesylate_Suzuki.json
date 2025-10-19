@@ -10,17 +10,18 @@
   },
   "reaction": {
     "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
-    "reaction_smiles_mapped": "CS(=O)(=O)O[c:8]1[cH:7][cH:6][c:5]([C:2]([CH3:1])([CH3:3])[CH3:4])[cH:16][cH:15]1.OB(O)[c:9]1[cH:10][cH:11][cH:12][cH:13][cH:14]1>>[CH3:1][C:2]([CH3:3])([CH3:4])[c:5]1[cH:6][cH:7][c:8](-[c:9]2[cH:10][cH:11][cH:12][cH:13][cH:14]2)[cH:15][cH:16]1",
+    "reaction_SMARTS": [
+      "O=S(OC)([a])=O.OB(O)[a]>>[a][a]"
+    ],
+    "compatible_functional_groups": [
+      "aromatic"
+    ],
+    "incompatible_functional_groups": [
+      "carboxylic acid"
+    ],
     "family": "Suzuki_Miyaura_Cross_Coupling_OMs",
     "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 °C, 24 h.",
-    "tags": "Suzuki; aryl mesylate; phenylboronic acid; Pd(OAc)2; CM-phos; K3PO4; tert-butanol; OrgSyn v92p0195 Step C",
-    "reaction_smarts_applicability": {
-      "core": "CS(=O)(=O)O[c]1cc[c]([C](C)(C)C)cc1.[B]>>c-c",
-      "guards_forbid": [],
-      "method": "fallback"
-    },
-    "mapping_confidence": 0.4393101061358973,
-    "mapping_tool": "RXNMapper-0.4.2"
+    "tags": "Suzuki; aryl mesylate; phenylboronic acid; Pd(OAc)2; CM-phos; K3PO4; tert-butanol; OrgSyn v92p0195 Step C"
   },
   "reaction_setup": [
     {
