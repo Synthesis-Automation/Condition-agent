@@ -65,7 +65,7 @@ def _dataset_family_map(raw: str) -> str:
     if tl in {"c_n_coupling_ni"}:
         return "C_N_Coupling_Ni"
     
-    # Legacy naming (deprecated but supported for backward compatibility)
+    # Legacy naming (supported for backward compatibility)
     if tl in {"ullman", "ullmann", "ullman-c-n", "ullmann-c-n", "ullmann c-n", "ullmann_cn"}:
         return "C_N_Coupling_Cu"
     if tl in {"buchwald", "buchwald-c-n", "buchwald c-n", "buchwald_cn"}:

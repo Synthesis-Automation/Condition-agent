@@ -4,9 +4,9 @@ from functools import lru_cache
 from pathlib import Path
 from chemtools.contracts import (
     NormalizeRequest, DetectFamilyRequest, FeaturizeUllmannRequest,
-    ConditionCoreParseRequest, PropertiesLookupRequest, PrecedentKNNRequest,
+    ConditionCoreParseRequest, PrecedentKNNRequest,
     ConstraintsFilterRequest, ExplainPrecedentsRequest, ConditionCoreValidateRequest,
-    RecommendFromReactionRequest, RecommendConditionsRequest, FusionRecommendRequest,
+    RecommendFromReactionRequest, RecommendConditionsRequest,
     PlateDesignRequest,
     CoreSearchRequest,
     RoleAwareMolRequest, RoleAwareReactionRequest,
@@ -19,9 +19,18 @@ os.environ.setdefault("CHEMTOOLS_DISABLE_RDKIT", "0")
 # ChemTools v2.0 - Unified API
 from chemtools import chem, output_formatter
 
-# Deprecated: Keep old module imports for gradual migration
-# TODO: Remove these imports once all code uses chem.*
-from chemtools import smiles, router, featurizers, condition_core, precedent, constraints, explain, recommend
+# Import specific modules that don't have chem.* equivalents yet
+from chemtools import featurizers, condition_core
+
+# Import service layer
+from app.services import (
+    matching_service,
+    featurization_service,
+    recommendation_service,
+    rule_matching_service,
+    precedent_service,
+)
+
 try:
     from chemtools.reaction_type_detector import detect_reaction_type as rxn_detect_type, is_available as rxn_insight_available  # type: ignore
     _HAS_RXN_INSIGHT = True
@@ -38,16 +47,21 @@ except Exception:
     _HAS_ROLE_FEATS = False
 import logging, time
 
+# Import error handlers
+from app.error_handlers import register_error_handlers
+from chemtools.exceptions import (
+    ValidationError,
+    DatabaseNotFoundError,
+    ProcessingError,
+    SchemeConditionDBError,
+)
+
 # SCDB integration is now part of ChemTools v2.0 via chem.rules.*
-# Keeping backward compatibility for error handling
 try:
-    from chemtools.rule_scdb_matcher.loader import SchemeConditionDBError
+    from chemtools.rule_scdb_matcher import loader as scdb_loader
     _HAS_SCDB = True
 except Exception:
     _HAS_SCDB = False
-    
-    class SchemeConditionDBError(RuntimeError):
-        pass
 
 
 _SCDB_DEFAULT_DB = (
@@ -79,6 +93,9 @@ logger = logging.getLogger("chemtools.api")
 
 app = FastAPI(title="Chemistry Tools API", version="0.1.2")
 
+# Register error handlers for consistent error responses
+register_error_handlers(app)
+
 
 @app.middleware("http")
 async def logging_timing_middleware(request: Request, call_next):
@@ -107,159 +124,32 @@ def health(): return {"ok": True}
 @app.post("/match")
 def api_scdb_match(req: SchemeMatchRequest):
     """Match reaction to rule-based scheme database using ChemTools v2.0."""
-    if not _HAS_SCDB:
-        raise HTTPException(status_code=503, detail="SchemeConditionDB matcher unavailable")
-    
-    reaction = (req.reaction or "").strip()
-    if not reaction:
-        raise HTTPException(status_code=400, detail="Reaction must be a non-empty string")
-    
-    db_path = (req.db or _SCDB_DEFAULT_DB).strip()
-    if not db_path:
-        raise HTTPException(status_code=400, detail="No database path configured for matching")
-    
-    start_time = time.perf_counter()
-    try:
-        # Use ChemTools v2.0 chem.rules.* API
-        db = chem.rules.load_database(db_path, cache=True)
-        result = chem.rules.match(db, reaction)
-    except FileNotFoundError as exc:
-        raise HTTPException(status_code=404, detail=f"Database file not found: {db_path}") from exc
-    except SchemeConditionDBError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception as exc:
-        logger.exception("Unexpected error while matching SchemeConditionDB")
-        raise HTTPException(status_code=500, detail="Internal error while performing SchemeConditionDB match") from exc
-    
-    payload = result.to_json_dict()
-    
-    # Apply catalyst class filtering if provided via relax parameter
-    catalyst_filter = None
-    if req.relax and isinstance(req.relax, dict):
-        catalyst_filter = req.relax.get("catalyst_class")
-    
-    if catalyst_filter and payload.get("recommended_conditions"):
-        # Filter conditions by catalyst class
-        filtered_conditions = []
-        for cond in payload["recommended_conditions"]:
-            # Extract catalyst class from condition (look in core or full_system)
-            condition_core = cond.get("core", "")
-            # Simple matching: check if catalyst filter (e.g., "Cu") appears in core
-            catalyst_match = False
-            if isinstance(condition_core, str):
-                # Normalize for comparison
-                core_lower = condition_core.lower()
-                filter_lower = str(catalyst_filter).lower()
-                # Match if filter appears in core (e.g., "Cu" in "Cu/L1")
-                if filter_lower in core_lower or filter_lower in core_lower.split("/")[0]:
-                    catalyst_match = True
-            
-            if catalyst_match:
-                filtered_conditions.append(cond)
-        
-        # Update payload with filtered conditions
-        payload["recommended_conditions"] = filtered_conditions
-        payload["_catalyst_filtered"] = {
-            "requested": catalyst_filter,
-            "original_count": len(payload.get("recommended_conditions", [])),
-            "filtered_count": len(filtered_conditions)
-        }
-    
-    if not req.include_trace:
-        payload.pop("trace", None)
-    
-    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
-    database_label = Path(db_path).name if db_path else "SchemeConditionDB"
-    
-    return output_formatter.format_rule_match_result(
-        reaction_smiles=reaction,
-        match_result=payload,
-        requested_type=None,
-        database_name=database_label,
-        processing_time_ms=processing_time_ms,
-    )
+    return rule_matching_service.match_reaction(req)
 
 @app.post("/api/v1/smiles/normalize")
-def api_smiles_normalize(req: NormalizeRequest): return chem.smiles.normalize(req.smiles)
+def api_smiles_normalize(req: NormalizeRequest): 
+    return matching_service.normalize_smiles(req)
 
 @app.post("/api/v1/router/detect-family")
-def api_router_detect(req: DetectFamilyRequest): return router.detect_family(req.reactants)  # Note: router.detect_family expects list, not reaction string
+def api_router_detect(req: DetectFamilyRequest): 
+    return matching_service.detect_family(req)
 
 @app.post("/api/v1/reaction/detect-type")
 def api_detect_type(req: DetectTypeRequest):
-    """Detect reaction type using rxn-insight when available, with router fallback.
-
-    Returns a combined payload including rxn-insight results, router fallback, and the selected family.
-    """
-    rxn = req.reaction
-    norm = chem.smiles.normalize_reaction(rxn)
-    reactants = [
-        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
-        for r in (norm.get("reactants") or [])
-    ]
-    fallback = router.detect_family(reactants)  # Using list of reactants as expected
-    auto = None
-    if _HAS_RXN_INSIGHT:
-        try:
-            auto = rxn_detect_type(norm.get("normalized") or rxn)
-        except Exception:
-            auto = None
-    selected = None
-    if isinstance(auto, dict) and (auto.get("mapped_family") or auto.get("success")):
-        selected = auto.get("mapped_family") or fallback.get("family")
-    else:
-        selected = fallback.get("family")
-    return {
-        "input": {"reaction_smiles": norm.get("normalized") or rxn},
-        "rxn_insight_available": bool(_HAS_RXN_INSIGHT),
-        "rxn_insight": auto,
-        "router_fallback": fallback,
-        "selected_family": selected,
-    }
-
-@app.post("/api/v1/featurize/ullmann")
-def api_featurize_ullmann(req: FeaturizeUllmannRequest, response: Response):
-    # Backwards-compatible alias; prefer /api/v1/featurize/molecular
-    logger.warning("DEPRECATED endpoint /api/v1/featurize/ullmann; use /api/v1/featurize/molecular")
-    try:
-        response.headers["X-Deprecated"] = "true"
-        response.headers["Link"] = "</api/v1/featurize/molecular>; rel=\"successor-version\""
-    except Exception:
-        pass
-    return featurizers.molecular.featurize(req.electrophile, req.nucleophile)
+    """Detect reaction type using rxn-insight when available, with router fallback."""
+    return matching_service.detect_reaction_type(req)
 
 @app.post("/api/v1/featurize/molecular")
 def api_featurize_molecular(req: FeaturizeUllmannRequest):
-    return featurizers.molecular.featurize(req.electrophile, req.nucleophile)
+    return featurization_service.featurize_molecular(req)
 
 @app.post("/api/v1/featurize/role-aware/molecule")
 def api_featurize_role_molecule(req: RoleAwareMolRequest):
-    if not _HAS_ROLE_FEATS:
-        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
-    out = role_featurize_mol(req.smiles, roles=req.roles or None)
-    vec = out.get("vector")
-    try:
-        out["vector"] = vec.tolist(    )  # type: ignore
-    except Exception:
-        pass
-    return out
+    return featurization_service.featurize_role_aware_molecule(req)
 
 @app.post("/api/v1/featurize/role-aware/reaction")
 def api_featurize_role_reaction(req: RoleAwareReactionRequest):
-    if not _HAS_ROLE_FEATS:
-        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
-    out = role_featurize_reaction(req.reaction)
-    # Ensure vectors are JSON-serializable lists
-    try:
-        for item in out.get("reactants") or []:  # type: ignore[union-attr]
-            vec = item.get("vector")
-            try:
-                item["vector"] = vec.tolist(    )  # type: ignore
-            except Exception:
-                pass
-    except Exception:
-        pass
-    return out
+    return featurization_service.featurize_role_aware_reaction(req)
 
 
 @app.get("/api/v1/featurize/role-aware/fields")
@@ -268,40 +158,7 @@ def api_role_aware_fields(roles: str | None = None):
 
     Query param `roles` can be a comma-separated list; defaults to amine,alcohol,aryl_halide.
     """
-    if not _HAS_ROLE_FEATS:
-        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
-    # Parse and normalize roles
-    default_roles = ["amine", "alcohol", "aryl_halide"]
-    if roles is None or not str(roles).strip():
-        use_roles = default_roles
-    else:
-        use_roles = [r.strip() for r in str(roles).split(",") if r.strip()]
-        # Keep only known roles, preserve order
-        known = {"amine", "alcohol", "aryl_halide"}
-        use_roles = [r for r in use_roles if r in known]
-        if not use_roles:
-            use_roles = default_roles
-
-    # Assemble fields: global -> role fields (in order) -> fingerprints per role
-    fields: list[str] = []
-    fields.extend([f.get("name", "") for f in ROLE_REGISTRY.get("global", [])])
-    for r in use_roles:
-        fields.extend([f.get("name", "") for f in ROLE_REGISTRY.get(r, [])])
-    for r in use_roles:
-        bits = int(ROLE_REGISTRY.get("fingerprints", {}).get(r, {}).get("bits", 512))
-        fields.extend([f"fp.{r}.{i}" for i in range(bits)])
-
-    counts = {
-        "global": len(ROLE_REGISTRY.get("global", [])),
-        "by_role": {r: len(ROLE_REGISTRY.get(r, [])) for r in use_roles},
-        "fingerprints": {r: int(ROLE_REGISTRY.get("fingerprints", {}).get(r, {}).get("bits", 512)) for r in use_roles},
-    }
-    return {
-        "roles": use_roles,
-        "fields": fields,
-        "counts": {**counts, "total": len(fields)},
-        "registry": ROLE_REGISTRY,
-    }
+    return featurization_service.get_role_aware_fields(roles)
 
 
 @app.post("/api/v1/featurize/molecule")
@@ -311,100 +168,34 @@ def api_featurize_molecule(req: RoleAwareMolRequest):
     If roles is omitted/null, returns global/basic features only (roles=[]).
     Pass roles=[...] to include role-specific blocks.
     """
-    if not _HAS_ROLE_FEATS:
-        raise HTTPException(status_code=503, detail="role-aware featurization unavailable")
-    roles = req.roles if req.roles is not None else []  # default to globals-only
-    out = role_featurize_mol(req.smiles, roles=roles)
-    vec = out.get("vector")
-    try:
-        out["vector"] = vec.tolist(    )  # type: ignore
-    except Exception:
-        pass
-    return out
+    # Use featurization service with default roles=[] for backwards compatibility
+    req.roles = req.roles if req.roles is not None else []
+    return featurization_service.featurize_role_aware_molecule(req)
 
 @app.post("/api/v1/condition-core/parse")
-def api_condition_core(req: ConditionCoreParseRequest): return condition_core.parse_core(req.reagents, req.text or "")
+def api_condition_core(req: ConditionCoreParseRequest): 
+    return precedent_service.parse_condition_core(req)
 
-# NOTE: Properties lookup endpoint removed - properties module deprecated
-# Reagent lookup is now available via chem.reagents.lookup() if needed
-# @app.post("/api/v1/properties/lookup")
-# def api_properties(req: PropertiesLookupRequest): return chem.properties.lookup(req.query)
-
-@app.get("/api/v1/cores")
+@app.get("/api/v1/precedent/cores")
 def api_core_list(family: str | None = None, limit: int = 200, counts: bool = True):
-    data = chem.precedent.list_cores(family=family, top_n=int(limit or 200), include_counts=bool(counts))
-    return {"cores": data}
+    return precedent_service.list_cores(family, limit, counts)
 
 @app.post("/api/v1/precedent/knn")
-def api_precedent_knn(req: PrecedentKNNRequest): return chem.precedent.knn(req.family, req.features, req.k, req.relax or {})
+def api_precedent_knn(req: PrecedentKNNRequest): 
+    return precedent_service.knn_search(req)
 
 @app.post("/api/v1/constraints/filter")
-def api_constraints_filter(req: ConstraintsFilterRequest): return chem.constraints.filter(req.candidates, req.rules or {})
+def api_constraints_filter(req: ConstraintsFilterRequest): 
+    return precedent_service.filter_constraints(req)
 
 @app.post("/api/v1/explain/precedents")
-def api_explain_precedents(req: ExplainPrecedentsRequest): return chem.explain.for_pack(req.pack, req.features)
+def api_explain_precedents(req: ExplainPrecedentsRequest): 
+    return precedent_service.explain_precedents(req)
 
 
 @app.post("/api/v1/condition-core/validate-dataset")
 def api_condition_core_validate(req: ConditionCoreValidateRequest):
-    import json, os
-    path = req.path
-    limit = int(req.limit or 0)
-    if not os.path.exists(path):
-        raise HTTPException(status_code=400, detail=f"Dataset not found: {path}")
-
-    total = 0
-    ok = 0
-    mismatches = []
-
-    def _norm_core(s: str) -> str:
-        s = (s or "").strip()
-        return s[:-5] if s.endswith("/none") else s
-
-    def _metal_part(s: str) -> str:
-        s = (s or "").strip()
-        return s.split("/", 1)[0] if s else ""
-
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rec = json.loads(line)
-            except Exception:
-                continue
-            cat = rec.get("catalyst") or {}
-            reagents = []
-            for item in (cat.get("full_system") or cat.get("core") or []):
-                reagents.append({"name": item.get("name"), "uid": item.get("cas"), "role": "CATALYST"})
-            for item in (rec.get("reagents") or []):
-                reagents.append({"name": item.get("name"), "uid": item.get("cas"), "role": item.get("role") or "ADDITIVE"})
-            for item in (rec.get("solvents") or []):
-                reagents.append({"name": item.get("name"), "uid": item.get("cas"), "role": "SOLVENT"})
-
-            out = condition_core.parse(reagents, "")
-            truth = (rec.get("condition_core") or "").strip()
-            pred = (out.get("core") or "").strip()
-
-            t = _norm_core(truth)
-            p = _norm_core(pred)
-            ok_flag = (t == p) or (req.metal_only_ok and _metal_part(t) and _metal_part(t) == _metal_part(p))
-
-            total += 1
-            if ok_flag:
-                ok += 1
-            elif len(mismatches) < int(req.show_mismatches or 0):
-                mismatches.append({
-                    "reaction_id": rec.get("reaction_id"),
-                    "truth": truth,
-                    "pred": pred,
-                })
-            if limit and total >= limit:
-                break
-
-    acc = (ok / total) * 100.0 if total else 0.0
-    return {"records": total, "matches": ok, "accuracy": round(acc, 2), "mismatches": mismatches}
+    return precedent_service.validate_dataset(req)
 
 
 @app.get("/metrics")
@@ -443,200 +234,19 @@ def api_recommend_conditions(req: RecommendConditionsRequest):
     Returns clean, compact output matching the ui_simple.py format.
     This is robot-friendly and excludes large feature vectors.
     """
-    start_time = time.perf_counter()
-    
-    # Get raw ML recommendations
-    raw_data = chem.recommend.conditions(
-        reaction=req.reaction,
-        reaction_type=req.reaction_type,
-        k=req.k,
-        limit=req.limit,
-        relax=req.relax or {},
-        constraints=req.constraints or {},
-    )
-    
-    # Extract detection info
-    detection = raw_data.get("detection", {})
-    detected_type = detection.get("reaction_type", "Unknown")
-    confidence = detection.get("auto", {}).get("confidence", 0.0) if detection.get("source") == "auto" else 1.0
-    
-    # Format recommendations using the UI formatter
-    recommendations_data = []
-    for rec in raw_data.get("recommendations", [])[:req.limit]:
-        summary = rec.get("summary", {})
-        chemicals = rec.get("chemicals", [])
-        conditions_info = rec.get("conditions", {})
-        
-        # Build reagents list
-        reagents = []
-        for chemical in chemicals:
-            reagents.append({
-                "id": chemical.get("uid", chemical.get("cas")),
-                "role": chemical.get("role", "reagent"),
-                "name": chemical.get("name"),
-                "abbreviation": None,
-                "cas": chemical.get("cas"),
-                "smiles": chemical.get("smiles"),
-                "equivalents": None,  # Not in summary
-            })
-        
-        # Format conditions
-        conditions = {}
-        if conditions_info.get("temperature"):
-            conditions["temperature"] = {
-                "value": conditions_info["temperature"],
-                "unit": "°C"
-            }
-        if conditions_info.get("time"):
-            conditions["time"] = {
-                "value": conditions_info["time"],
-                "unit": "hours"
-            }
-        if conditions_info.get("atmosphere"):
-            conditions["atmosphere"] = conditions_info["atmosphere"]
-        
-        formatted_rec = {
-            "rank": rec.get("rank", len(recommendations_data) + 1),
-            "confidence": summary.get("confidence", 0.0) / 100.0 if summary.get("confidence") else 0.0,  # Convert % to decimal
-            "reagents": reagents,
-            "conditions": conditions,
-            "precedent_count": summary.get("support", {}).get("count") if isinstance(summary.get("support"), dict) else summary.get("support", 0),
-        }
-        
-        recommendations_data.append(formatted_rec)
-    
-    # Build compact output using UI formatter
-    processing_time_ms = (time.perf_counter() - start_time) * 1000
-    
-    output = output_formatter.format_ml_output(
-        reaction_smiles=req.reaction,
-        requested_type=req.reaction_type,
-        detected_type=detected_type,
-        detection_confidence=confidence,
-        recommendations_data=recommendations_data,
-        processing_time_ms=processing_time_ms,
-    )
-    
-    return output
-
-
+    return recommendation_service.recommend_conditions(req)
 
 
 @app.post("/api/v1/recommend")
 def api_recommend(req: RecommendFromReactionRequest):
-    start_time = time.perf_counter()
-    raw_result = recommend.recommend_from_reaction(
-        req.reaction,
-        k=req.k,
-        relax=req.relax or {},
-        constraint_rules=req.constraints or {},
-        rerank_strategy=req.rerank_strategy,
-        filter_unknown_reagents=req.filter_unknown_reagents,
-    )
-    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
-    
-    formatted_source = raw_result.get("formatted") or raw_result
-    
-    standard = output_formatter.ensure_standard_output(
-        formatted_source,
-        default_model="ML-precedent-knn",
-        fallback_reaction_smiles=req.reaction,
-        extras={"raw_recommendation": raw_result},
-    )
-    
-    standard_meta = standard.setdefault("meta", {})
-    standard_meta["processing_time_ms"] = processing_time_ms
-    
-    return standard
-
-
-@app.post("/api/v1/recommend/fusion")
-def api_recommend_fusion(req: FusionRecommendRequest):
-    """
-    DEPRECATED: Fusion recommendation endpoint has been removed.
-    
-    The complex multi-source fusion logic has been replaced with simpler,
-    more maintainable precedent-centric ranking with optional reranking.
-    
-    This endpoint now redirects to the standard recommendation endpoint
-    with rule-based reranking enabled (equivalent quality).
-    
-    Please migrate to:
-    - POST /api/v1/recommend with rerank_strategy='rule' (default)
-    
-    Reranking strategies:
-    - 'rule': Boost precedents matching chemical rules
-    - 'analytics': Boost precedents using popular reagents
-    - 'none': Use DRFP similarity only
-    """
-    import warnings
-    warnings.warn(
-        "The /api/v1/recommend/fusion endpoint is deprecated. "
-        "Use /api/v1/recommend with rerank_strategy parameter instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
-    
-    start_time = time.perf_counter()
-    
-    # Redirect to standard recommendation with rule-based reranking
-    result = recommend.recommend_from_reaction(
-        reaction=req.reaction,
-        k=req.k,
-        rerank_strategy='rule',  # Use rule reranking instead of fusion
-        filter_unknown_reagents=False,
-        max_variants=req.max_variants,
-        relax=req.relax or {},
-        constraint_rules=req.constraints or {}
-    )
-    processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
-    
-    # Add deprecation notice to response
-    result['_deprecated'] = {
-        'message': 'This endpoint is deprecated. Use /api/v1/recommend instead.',
-        'migration': {
-            'new_endpoint': '/api/v1/recommend',
-            'parameters': {
-                'rerank_strategy': 'rule',  # Equivalent to fusion quality
-                'filter_unknown_reagents': False
-            }
-        }
-    }
-    
-    return output_formatter.format_fusion_output(
-        reaction_smiles=req.reaction,
-        requested_type=None,
-        fusion_result=result,
-        processing_time_ms=processing_time_ms,
-    )
+    return recommendation_service.recommend_from_reaction(req)
 
 
 @app.post("/api/v1/design_plate")
 def api_design_plate(req: PlateDesignRequest):
-    return chem.recommend.design_plate_from_reaction(req.reaction, plate_size=req.plate_size, relax=req.relax or {}, constraint_rules=req.constraints or {})
-    # Optionally preload DRFP fingerprints from NPZ bundle if provided via env
-    try:
-        import os
-        from chemtools.reaction_similarity import load_precomputed_npz  # type: ignore
-        path = os.environ.get("CHEMTOOLS_DRFPPATH", "").strip()
-        if path and os.path.exists(path):
-            res = load_precomputed_npz(path)
-            # Silent on failure to avoid impacting startup
-            _ = res
-    except Exception:
-        pass
+    return recommendation_service.design_plate(req)
 
 
 @app.post("/api/v1/core/search")
 def api_core_search(req: CoreSearchRequest):
-    rows = precedent.find_reactions_by_core(
-        req.core,
-        family=req.family,
-        fuzzy=bool(req.fuzzy),
-        limit=int(req.limit or 50),
-    )
-    return {
-        "query": {"core": req.core, "family": req.family, "fuzzy": bool(req.fuzzy), "limit": int(req.limit or 50)},
-        "count": len(rows),
-        "results": rows,
-    }
+    return precedent_service.search_by_core(req)
