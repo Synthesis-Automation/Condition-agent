@@ -19,7 +19,7 @@
     "notes": "Step A only: acetylation of 6-bromobenzothiophene with acetyltrimethylsilane using Pd(PPh3)4 and CsF in 1,2-dichloroethane at 75 °C for 24 h under inert atmosphere.",
     "tags": "palladium; aryl bromide; acetylation; silyl enol; cesium fluoride; 1,2-dichloroethane; argon",
     "reaction_smarts_applicability": {
-      "core": "a.[#6]>>a",
+      "core": "a.[#6]",
       "guards_forbid": []
     }
   },
