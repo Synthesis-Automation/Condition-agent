@@ -1,29 +1,28 @@
 """
-Enhanced output formatter for reaction condition recommendations.
+chemtools.formatters - Output formatting for chemistry recommendations.
 
-This module maintains backwards compatibility by re-exporting all formatting
-functions from the chemtools.formatters package.
+This package provides modular formatting functions for structuring
+recommendation outputs in standardized JSON formats.
 
-REFACTORED: The original 1,398-line monolithic file has been split into
-logical modules in chemtools/formatters/:
-    - base.py: Core formatting (metadata, input, detection)
-    - normalization.py: Normalization helpers for chemicals and conditions
-    - rule_output.py: Rule-based output formatting (SCDB)
-    - ml_output.py: ML output formatting and standard builders
-    - utils.py: Reagent enrichment and condition formatting utilities
-
-For new code, prefer importing directly from chemtools.formatters submodules.
-This file provides a compatibility layer for existing code.
+Modules:
+    base: Core formatting for metadata, input, and detection sections
+    normalization: Normalization helpers for chemicals, conditions, recommendations
+    rule_output: Rule-based output formatting (SCDB)
+    ml_output: ML output formatting and standard builders
+    utils: Utility functions for reagent enrichment and condition formatting
 """
 
-# Re-export all public functions from formatters package
-from chemtools.formatters import (
-    # Base formatting (metadata, input, detection)
+# Re-export all public functions for backwards compatibility
+
+# From base.py
+from chemtools.formatters.base import (
     format_meta,
     format_input,
     format_detection,
-    
-    # Normalization helpers
+)
+
+# From normalization.py
+from chemtools.formatters.normalization import (
     normalize_chemical_entry,
     normalize_condition_value,
     normalize_conditions_block,
@@ -31,20 +30,26 @@ from chemtools.formatters import (
     normalize_recommendations,
     parse_amount_to_equivalents,
     normalize_rule_string_value,
-    
-    # Rule-based output formatting
+)
+
+# From rule_output.py
+from chemtools.formatters.rule_output import (
     starting_material_entries,
     convert_rule_match_to_recommendations,
-    
-    # ML output and standard builders
+)
+
+# From ml_output.py
+from chemtools.formatters.ml_output import (
     build_standard_output,
     ensure_standard_output,
     format_ml_output,
     format_rule_output,
     format_fusion_output,
     format_rule_match_result,
-    
-    # Utility functions
+)
+
+# From utils.py
+from chemtools.formatters.utils import (
     enrich_reagent,
     format_conditions,
     format_recommendation,

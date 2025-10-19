@@ -104,8 +104,8 @@ def _apply_catalyst_override(family: str, metals: Set[str], *, is_cn_coupling: b
     """
     Apply catalyst-based family override for C-N coupling reactions.
     
-    Note: With unified C_N_Coupling dataset, this function is deprecated but kept
-    for backward compatibility. Metal preference should now be handled via constraints.
+    All C-N coupling variants now map to unified C_N_Coupling.
+    Metal preference is handled by the recommendation engine via constraints.
     """
     if not metals or not is_cn_coupling:
         return family

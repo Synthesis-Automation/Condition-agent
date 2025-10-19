@@ -13,7 +13,6 @@ class Reagent(BaseModel):
 class ConditionCoreParseRequest(BaseModel):
     reagents: List[Reagent]; text: Optional[str] = None
 
-class PropertiesLookupRequest(BaseModel): query: str
 class PrecedentKNNRequest(BaseModel):
     family: str; features: Dict[str, Any]; k: int = 50; relax: Optional[Dict[str, Any]] = None
 class ConstraintsFilterRequest(BaseModel):
@@ -32,19 +31,6 @@ class RecommendConditionsRequest(BaseModel):
     reaction_type: Optional[str] = None
     k: int = 50
     limit: int = 5
-    relax: Optional[Dict[str, Any]] = None
-    constraints: Optional[Dict[str, Any]] = None
-
-class FusionRecommendRequest(BaseModel):
-    """
-    DEPRECATED: Fusion recommendation system has been removed.
-    
-    Use RecommendFromReactionRequest with rerank_strategy='rule' instead.
-    This class is kept for backward compatibility only.
-    """
-    reaction: str
-    k: int = 50
-    max_variants: int = 5
     relax: Optional[Dict[str, Any]] = None
     constraints: Optional[Dict[str, Any]] = None
 
