@@ -12,8 +12,14 @@
     "reaction_smiles": "BrC1CCCCC1.Clc2ccc(B(OC3(C)C)OC3(C)C)cc2>>Clc4ccc(C5CCCCC5)cc4",
     "family": "Suzuki_Cu_alkyl_halide+aryl_boron",
     "notes": "CuBr·SMe2 (5 mol%), bathophenanthroline (7.5 mol%), NaOtBu (1.5 equiv), toluene (20 mL), 80 °C, 24 h, air; combined 73% yield (65% + 8% from second collection).",
-    "tags": "Suzuki, Cu, alkyl_halide, Coupling"
-
+    "tags": "Suzuki, Cu, alkyl_halide, Coupling",
+    "reaction_smarts_applicability": {
+      "core": "[CX4;H1]-[Br]>>c-[Cl]",
+      "guards_forbid": [
+        "[CX4;H2,H3]-[Br]  # Exclude primary",
+        "[CX4;H0]-[Br]  # Exclude tertiary"
+      ]
+    }
   },
   "reaction_setup": [
     {

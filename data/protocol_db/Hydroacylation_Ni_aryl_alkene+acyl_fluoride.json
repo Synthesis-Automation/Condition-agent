@@ -11,7 +11,11 @@
   "reaction": {
     "reaction_smiles": "CC(=O)Oc1ccc(C=C)cc1.O=C(F)c2ccccc2>>CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1",
     "family": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride",
-    "notes": "NiCl2(dme) (15 mol%), K3PO4 (3.0 equiv), triethoxysilane (1.1 equiv) in DMF (37.5 mL), 21–22 °C, N2, 24 h; quenched with sat. NaHCO3 then extracted; purified by flash chromatography; 62% yield (two runs)."
+    "notes": "NiCl2(dme) (15 mol%), K3PO4 (3.0 equiv), triethoxysilane (1.1 equiv) in DMF (37.5 mL), 21–22 °C, N2, 24 h; quenched with sat. NaHCO3 then extracted; purified by flash chromatography; 62% yield (two runs).",
+    "reaction_smarts_applicability": {
+      "core": "[CX3](=O)-[OX2]-[C]>>[CX3](=O)-[OX2]-[C]",
+      "guards_forbid": []
+    }
   },
   "reaction_setup": [
     {
@@ -21,7 +25,12 @@
           "abbreviation": null,
           "cas": "2623-07-8",
           "smiles": "CC(=O)Oc1ccc(C=C)cc1",
-          "amount": { "weight_g": null, "mmol": 15.0, "volume_ml": 2.3, "equivalents": 1.0 },
+          "amount": {
+            "weight_g": null,
+            "mmol": 15.0,
+            "volume_ml": 2.3,
+            "equivalents": 1.0
+          },
           "role": "starting_material"
         },
         {
@@ -29,7 +38,12 @@
           "abbreviation": null,
           "cas": "455-61-0",
           "smiles": "O=C(F)c1ccccc1",
-          "amount": { "weight_g": null, "mmol": 22.5, "volume_ml": 2.4, "equivalents": 1.5 },
+          "amount": {
+            "weight_g": null,
+            "mmol": 22.5,
+            "volume_ml": 2.4,
+            "equivalents": 1.5
+          },
           "role": "electrophile"
         },
         {
@@ -37,7 +51,12 @@
           "abbreviation": "NiCl2(dme)",
           "cas": null,
           "smiles": null,
-          "amount": { "weight_g": 0.494, "mmol": 2.25, "volume_ml": null, "equivalents": 0.15 },
+          "amount": {
+            "weight_g": 0.494,
+            "mmol": 2.25,
+            "volume_ml": null,
+            "equivalents": 0.15
+          },
           "role": "metal_precursor"
         },
         {
@@ -45,7 +64,12 @@
           "abbreviation": "K3PO4",
           "cas": "7778-53-2",
           "smiles": null,
-          "amount": { "weight_g": 9.55, "mmol": 45.0, "volume_ml": null, "equivalents": 3.0 },
+          "amount": {
+            "weight_g": 9.55,
+            "mmol": 45.0,
+            "volume_ml": null,
+            "equivalents": 3.0
+          },
           "role": "base"
         },
         {
@@ -53,7 +77,12 @@
           "abbreviation": "HSi(OEt)3",
           "cas": "998-30-1",
           "smiles": null,
-          "amount": { "weight_g": null, "mmol": 16.5, "volume_ml": 3.0, "equivalents": 1.1 },
+          "amount": {
+            "weight_g": null,
+            "mmol": 16.5,
+            "volume_ml": 3.0,
+            "equivalents": 1.1
+          },
           "role": "reductant"
         },
         {
@@ -61,7 +90,12 @@
           "abbreviation": "DMF",
           "cas": "68-12-2",
           "smiles": "CN(C=O)C",
-          "amount": { "weight_g": null, "mmol": null, "volume_ml": 37.5, "equivalents": null },
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 37.5,
+            "equivalents": null
+          },
           "role": "solvent"
         }
       ],

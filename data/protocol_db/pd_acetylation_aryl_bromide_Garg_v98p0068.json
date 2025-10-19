@@ -17,7 +17,11 @@
     "reaction_smiles": "Brc1cc2sc(cc2)cc1.CC(=O)[Si](C)(C)C>>CC(=O)c1ccc2sc(cc2)cc1",
     "family": "Pd_Acetylation_ArylBr_SilylEnol",
     "notes": "Step A only: acetylation of 6-bromobenzothiophene with acetyltrimethylsilane using Pd(PPh3)4 and CsF in 1,2-dichloroethane at 75 °C for 24 h under inert atmosphere.",
-    "tags": "palladium; aryl bromide; acetylation; silyl enol; cesium fluoride; 1,2-dichloroethane; argon"
+    "tags": "palladium; aryl bromide; acetylation; silyl enol; cesium fluoride; 1,2-dichloroethane; argon",
+    "reaction_smarts_applicability": {
+      "core": "a>>a",
+      "guards_forbid": []
+    }
   },
   "reaction_setup": [
     {

@@ -12,8 +12,13 @@
     "reaction_smiles": "NC(=O)c1ccccc1I.C#CCCCC>>NC(=O)c1ccccc1C#CCCCC",
     "family": "Sonogashira_Coupling",
     "notes": "Pd(OAc)₂ (1 mol%), CuI (1 mol%), PPh₃ (2 mol%) in DMF (40 mL) and Et₃N (120 mL); 1‑hexyne (1.3 equiv); 60 °C oil bath under N₂, 16 h; aqueous workup and silica gel chromatography; 90% yield (checkers: 91%).",
-    "tags": "Sonogashira, Pd, Coupling"
-
+    "tags": "Sonogashira, Pd, Coupling",
+    "reaction_smarts_applicability": {
+      "core": "c-[I]>>[NX3;H2]-[CX3](=O)",
+      "guards_forbid": [
+        "[CX4]-[I]  # Exclude aliphatic halides"
+      ]
+    }
   },
   "reaction_setup": [
     {

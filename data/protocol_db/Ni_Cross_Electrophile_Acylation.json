@@ -1,6 +1,6 @@
 {
   "source": {
-    "title": "Nickel-Catalyzed Synthesis of Ketones from Alkyl Halides and Acid Chlorides: Preparation of Ethyl 4\u2011Oxododecanoate",
+    "title": "Nickel-Catalyzed Synthesis of Ketones from Alkyl Halides and Acid Chlorides: Preparation of Ethyl 4‑Oxododecanoate",
     "journal": "Organic Syntheses",
     "volume": 93,
     "pages": "50-62",
@@ -11,8 +11,17 @@
   "reaction": {
     "reaction_smiles": "CCCCCCCCI.CCOC(=O)CC(=O)Cl>>CCOC(=O)CC(=O)CCCCCCCC",
     "family": "Ni_Cross_Electrophile_Acylation",
-    "notes": "NiCl2(dme)/dtbbpy with Mn powder in DMAc under N2 couples 1\u2011iodooctane and ethyl succinyl chloride to give ethyl 4\u2011oxododecanoate; 0\u20132 \u00b0C then rt.",
-    "tags": "nickel; cross-electrophile; acylation; dtbbpy; Mn; DMAc; alkyl iodide; acid chloride; OrgSyn v93p0050"
+    "notes": "NiCl2(dme)/dtbbpy with Mn powder in DMAc under N2 couples 1‑iodooctane and ethyl succinyl chloride to give ethyl 4‑oxododecanoate; 0–2 °C then rt.",
+    "tags": "nickel; cross-electrophile; acylation; dtbbpy; Mn; DMAc; alkyl iodide; acid chloride; OrgSyn v93p0050",
+    "reaction_smarts_applicability": {
+      "core": "[CX4;H2,H3]-[I]>>[CX3](=O)-[OX2]-[C]",
+      "guards_forbid": [
+        "[CX4;H1]-[I]  # Exclude secondary",
+        "[CX4;H0]-[I]  # Exclude tertiary",
+        "[CH2;$([CH2][c])]-[I]  # Exclude benzylic",
+        "[CH2;$([CH2]C=C)]-[I]  # Exclude allylic"
+      ]
+    }
   },
   "reaction_setup": [
     {
@@ -115,7 +124,7 @@
         {
           "temperature_C": 23.0,
           "time_h": 4.5,
-          "atmosphere": "N2 (warm to rt and stir 3\u20136 h)"
+          "atmosphere": "N2 (warm to rt and stir 3–6 h)"
         }
       ]
     }
@@ -133,20 +142,20 @@
           "details": "Filter through Celite bed; rinse black solids with deionized water; combine aqueous with organics."
         },
         {
-          "step": "Liquid\u2013liquid extraction",
+          "step": "Liquid–liquid extraction",
           "details": "Extract aqueous layer with 1:1 hexanes/MTBE (200 mL); wash combined organics with water (200 mL) then brine (250 mL)."
         },
         {
           "step": "Drying",
-          "details": "Dry over anhydrous MgSO4 (20 g), 15\u201320 min; filter."
+          "details": "Dry over anhydrous MgSO4 (20 g), 15–20 min; filter."
         },
         {
           "step": "Concentration",
-          "details": "Remove solvents on rotary evaporator (30 \u00b0C, 25\u201330 mmHg)."
+          "details": "Remove solvents on rotary evaporator (30 °C, 25–30 mmHg)."
         },
         {
           "step": "Forerun removal",
-          "details": "Distill small forerun (~3 mL) at 150 \u00b0C, 5\u20136 mmHg; cool before releasing vacuum."
+          "details": "Distill small forerun (~3 mL) at 150 °C, 5–6 mmHg; cool before releasing vacuum."
         }
       ],
       "purification": [
@@ -158,7 +167,7 @@
         }
       ],
       "notes": [
-        "Product: ethyl 4\u2011oxododecanoate obtained as pale yellow oil, 19.90 g (84%).",
+        "Product: ethyl 4‑oxododecanoate obtained as pale yellow oil, 19.90 g (84%).",
         "Alternative purification by high-vacuum distillation described in Notes; checkers obtained similar yield."
       ]
     }

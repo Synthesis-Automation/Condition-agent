@@ -12,8 +12,11 @@
     "reaction_smiles": "COC1=CC=C(O)C(=C1)C(=O)C.CC(=O)CC=C(C)C>>O=C1Oc2cc(OC)ccc2C(C)(CCC=C(C)C)C1",
     "family": "Kabbe_Condensation",
     "notes": "Under N2; pyrrolidine (1.50 equiv) + butyric acid (0.50 equiv) in DMSO (total ~24.1 mL), rt (21–22 °C), 18 h; aqueous workup and silica gel column (hexanes/EtOAc 19:1); 75% isolated yield (>98% qNMR).",
-    "tags": "Kabbe_Condensation"
-
+    "tags": "Kabbe_Condensation",
+    "reaction_smarts_applicability": {
+      "core": "[C]-[CX3](=O)-[C]>>[CX3](=O)-[OX2]-[C]",
+      "guards_forbid": []
+    }
   },
   "reaction_setup": [
     {
