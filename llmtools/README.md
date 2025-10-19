@@ -120,6 +120,7 @@ print(client.get_usage_summary())
 ### Prompt Templates (`prompts.py`)
 
 Available templates:
+
 - `condition_recommendation` - Recommend reaction conditions
 - `retrosynthesis` - Plan synthetic routes
 - `mechanism` - Explain reaction mechanisms
@@ -148,6 +149,7 @@ prompt = template(
 ### Chemistry Agents (`agents.py`)
 
 **ChemistryAgent** - General-purpose assistant:
+
 ```python
 agent = ChemistryAgent(client)
 
@@ -171,18 +173,21 @@ agent.assess_safety(reaction, reagents="...", solvents="...")
 ```
 
 **ConditionOptimizer** - Iterative optimization (TODO):
+
 ```python
 optimizer = ConditionOptimizer(client)
 result = optimizer.optimize(reaction, reaction_type, constraints={...})
 ```
 
 **RetrosynthesisPlanner** - Route planning:
+
 ```python
 planner = RetrosynthesisPlanner(client)
 route = planner.plan_route(target_smiles, max_steps=5)
 ```
 
 **ReactionAnalyzer** - Comprehensive analysis:
+
 ```python
 analyzer = ReactionAnalyzer(client)
 analysis = analyzer.analyze(
@@ -197,6 +202,7 @@ analysis = analyzer.analyze(
 ## Supported LLM Providers
 
 ### OpenAI
+
 ```bash
 export OPENAI_API_KEY="sk-..."
 export OPENAI_BASE_URL="https://api.openai.com/v1"  # optional
@@ -205,6 +211,7 @@ export OPENAI_BASE_URL="https://api.openai.com/v1"  # optional
 Models: `gpt-4o`, `gpt-4o-mini`, `gpt-5-mini`, `o3-mini`, etc.
 
 ### Aliyun (DeepSeek)
+
 ```bash
 export ALIYUN_API_KEY="sk-..."
 export ALIYUN_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"  # optional
@@ -301,6 +308,7 @@ print(result["protocol"])
 ## Roadmap
 
 ### Implemented ✅
+
 - [x] Multi-provider LLM client
 - [x] Chemistry prompt templates
 - [x] Basic chemistry agent
@@ -308,6 +316,7 @@ print(result["protocol"])
 - [x] Usage tracking
 
 ### In Progress 🚧
+
 - [ ] Structured output parsing
 - [ ] Multi-step reasoning chains
 - [ ] Response caching
@@ -315,6 +324,7 @@ print(result["protocol"])
 - [ ] Batch processing
 
 ### Planned 📋
+
 - [ ] Fine-tuned chemistry models
 - [ ] RAG (retrieval-augmented generation) for literature
 - [ ] Automated experiment design
@@ -334,20 +344,24 @@ python tests/test_llm.py aliyun --model deepseek-r1 "Explain Suzuki coupling"
 ## Best Practices
 
 1. **Choose the right model**:
+
    - Reasoning tasks: `o3-mini`, `deepseek-r1`
    - Fast responses: `gpt-4o-mini`, `deepseek-r1-distill-qwen-7b`
    - Balanced: `gpt-4o`, `deepseek-v3`
 
 2. **Use appropriate temperature**:
+
    - Factual tasks (protocols, safety): `0.0-0.3`
    - Creative tasks (retrosynthesis): `0.7-1.0`
    - Balanced (troubleshooting): `0.5-0.7`
 
 3. **Leverage chemtools precedents**:
+
    - Always use `use_chemtools=True` when available
    - Precedents ground LLM recommendations in real data
 
 4. **Monitor usage**:
+
    ```python
    print(agent.get_usage_summary())
    ```
