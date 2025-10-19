@@ -1,9 +1,0 @@
-{
-  "core": "c-[Br]>>c-[NX3;H2;!$(NC=O)]",
-  "guards_forbid": [
-    "[CX4]-[Br]  # Exclude aliphatic halides",
-    "[CX4]-[NX3;H2;!$(NC=O)]  # Exclude aliphatic primary amines",
-    "[CX4]-[NX3;H1;!$(NC=O)]  # Exclude aliphatic secondary amines"
-  ],
-  "notes": "Auto-generated pattern - please review and refine"
-}
