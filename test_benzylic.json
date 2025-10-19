@@ -1,0 +1,7 @@
+{
+  "core": "[CH2;$([CH2][c])]-[Cl]>>[NX3;H1;!$(NC=O)]",
+  "guards_forbid": [
+    "c-[NX3;H2]  # Exclude aniline"
+  ],
+  "notes": "Auto-generated pattern - please review and refine"
+}

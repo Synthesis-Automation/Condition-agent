@@ -20,13 +20,25 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 
+# Add parent directory to path if running as script (not as module)
+if __name__ == "__main__" and __package__ is None:
+    _script_dir = Path(__file__).resolve().parent
+    _project_root = _script_dir.parent.parent
+    if str(_project_root) not in sys.path:
+        sys.path.insert(0, str(_project_root))
+
 try:
-    from rdkit import Chem
-    from rdkit.Chem import AllChem, Draw
-    from rdkit.Chem.Draw import rdMolDraw2D
+    from rdkit import Chem  # type: ignore[import-not-found]
+    from rdkit.Chem import AllChem, Draw  # type: ignore[import-not-found]
+    from rdkit.Chem.Draw import rdMolDraw2D  # type: ignore[import-not-found]
     RDKIT_AVAILABLE = True
 except ImportError:
     RDKIT_AVAILABLE = False
+    Chem = None  # type: ignore[assignment]
+
+# Import our reusable chemistry utilities
+from chemtools.util.substrate_classifier import SubstrateClassifier, classify_substrate
+from chemtools.util.smarts_builders import SmartsBuilder, build_smarts_with_guards
 
 
 # ============================================================================
@@ -152,84 +164,38 @@ class SmartsGenerator:
         
         return f"{reactant_smarts}>>{product_smarts}"
     
-    def _mol_to_generic_smarts(self, mol: 'Chem.Mol', add_mapping: bool = False) -> str:
-        """Convert molecule to generic SMARTS pattern focusing on functional groups.
+    def _mol_to_generic_smarts(self, mol: Any, add_mapping: bool = False) -> str:  # mol is Chem.Mol when rdkit available
+        """Convert molecule to chemistry-aware SMARTS pattern.
         
-        This creates a generic SMARTS pattern that focuses on key functional groups
-        rather than the entire molecule structure. This makes patterns more general.
+        Uses SubstrateClassifier and SmartsBuilder for context-aware pattern generation.
+        This creates patterns that reflect actual chemical context (primary vs secondary,
+        aryl vs alkyl, aniline vs aliphatic amine, etc.).
         
-        Users should refine this to add:
+        Users should refine the generated pattern to add:
         - Atom mapping (:1, :2, etc.)
-        - Specific atom properties (H2, H3, X4, etc.)
-        - Negation patterns (!$(...))
+        - Additional constraints if needed
+        
+        Returns:
+            Chemistry-aware SMARTS pattern
         """
-        # Identify key functional groups and heteroatoms
-        key_atoms = set()
+        # Convert RDKit mol to SMILES
+        smiles = Chem.MolToSmiles(mol)
         
-        for atom in mol.GetAtoms():
-            symbol = atom.GetSymbol()
-            # Include all non-carbon atoms (halogens, heteroatoms, etc.)
-            if symbol != 'C':
-                key_atoms.add(atom.GetIdx())
-                # Include carbons directly bonded to heteroatoms
-                for neighbor in atom.GetNeighbors():
-                    if neighbor.GetSymbol() == 'C':
-                        key_atoms.add(neighbor.GetIdx())
-        
-        # If we found heteroatoms, create a minimal pattern around them
-        if key_atoms:
-            # Find the smallest fragment containing key atoms
-            # For simple cases like R-I, we want [C]-[I] not [C][C][C][C][C][C][C][C][I]
-            
-            # Strategy: Include only heteroatoms and their immediate C neighbors
-            minimal_atoms = set()
-            for idx in key_atoms:
-                atom = mol.GetAtomWithIdx(idx)
-                minimal_atoms.add(idx)
-                
-                # For carbon neighbors of heteroatoms, just represent as generic [C]
-                # Don't expand further into the carbon chain
-            
-            # Build a simple pattern
-            # For alkyl halides: [C]-[X] where X is the halogen
-            # For alkyl-B: [C]-[B]
-            
-            heteroatoms = [mol.GetAtomWithIdx(i) for i in key_atoms if mol.GetAtomWithIdx(i).GetSymbol() != 'C']
-            if heteroatoms:
-                # Get the first heteroatom (leaving group or reaction center)
-                hetero = heteroatoms[0]
-                hetero_symbol = hetero.GetSymbol()
-                
-                # Find carbon neighbors
-                carbon_neighbors = [n for n in hetero.GetNeighbors() if n.GetSymbol() == 'C']
-                
-                if carbon_neighbors:
-                    c = carbon_neighbors[0]
-                    # Determine carbon type by hydrogen count
-                    h_count = c.GetTotalNumHs()
-                    
-                    if h_count >= 2:
-                        # Primary carbon
-                        if hetero_symbol in ['I', 'Br', 'Cl', 'F']:
-                            return f"[C;H2,H3]-[{hetero_symbol}]"
-                        else:
-                            return f"[C;H2,H3]-[{hetero_symbol}]"
-                    elif h_count == 1:
-                        # Secondary carbon
-                        return f"[C;H1]-[{hetero_symbol}]"
-                    else:
-                        # Tertiary or quaternary
-                        return f"[C;H0]-[{hetero_symbol}]"
-                else:
-                    # Heteroatom not bonded to carbon (unusual)
-                    return f"[{hetero_symbol}]"
-        
-        # Fallback: use full SMARTS (shouldn't reach here often)
-        smarts = Chem.MolToSmarts(mol)
-        return smarts
+        # Use SmartsBuilder for chemistry-aware pattern generation
+        builder = SmartsBuilder()
+        try:
+            smarts = builder.build_from_smiles(smiles)
+            return smarts
+        except Exception as e:
+            # Fallback: use full SMARTS if builder fails
+            print(f"  ⚠ Warning: SmartsBuilder failed ({e}), using fallback")
+            return Chem.MolToSmarts(mol)
     
     def suggest_guard_patterns(self, verbose: bool = False) -> List[str]:
-        """Suggest guard patterns based on reaction analysis.
+        """Suggest context-aware guard patterns based on substrate classification.
+        
+        Uses SubstrateClassifier and SmartsBuilder to generate chemistry-aware
+        exclusion patterns based on the actual substrate type detected.
         
         Returns:
             List of SMARTS patterns that should be forbidden
@@ -237,38 +203,29 @@ class SmartsGenerator:
         if not RDKIT_AVAILABLE:
             return []
         
-        suggestions = []
+        all_guards = []
         
-        # Analyze reactants for common exclusions
-        reactant_mols = [Chem.MolFromSmiles(smi.strip()) for smi in self.reactants_smiles.split('.') if smi.strip()]
+        # Analyze each reactant
+        reactant_smiles_list = [smi.strip() for smi in self.reactants_smiles.split('.') if smi.strip()]
         
-        for mol in reactant_mols:
-            if mol is None:
-                continue
-            
-            # Check for aromatic systems
-            if mol.GetAromaticAtoms():
+        for smiles in reactant_smiles_list:
+            try:
+                # Use build_smarts_with_guards for context-aware guard generation
+                result = build_smarts_with_guards(smiles)
+                
+                if result.get('guards_forbid'):
+                    all_guards.extend(result['guards_forbid'])
+                    
+                    if verbose:
+                        print(f"  ℹ Substrate detected as: {result['substrate_class']} ({result['substrate_family']})")
+                        print(f"    Generated {len(result['guards_forbid'])} guard patterns")
+                        
+            except Exception as e:
                 if verbose:
-                    print("  ℹ Consider excluding aromatic leaving groups if only aliphatic reactions work")
-            
-            # Check for specific atom types
-            atoms = [atom.GetSymbol() for atom in mol.GetAtoms()]
-            if 'I' in atoms:
-                suggestions.append("[C;H0]-I  # Exclude tertiary iodides if only primary/secondary work")
-                suggestions.append("[CH]-I  # Exclude secondary iodides if only primary work")
-                suggestions.append("[C;H2]-[c,$(C=C)]-I  # Exclude benzylic/allylic iodides (aromatic or double bond adjacent)")
-                suggestions.append("[CH2;$([CH2][c])]-I  # Exclude benzylic iodides if not compatible")
-                suggestions.append("[CH2;$([CH2]C=C)]-I  # Exclude allylic iodides if not compatible")
-            elif 'Br' in atoms:
-                suggestions.append("[C;H0]-Br  # Exclude tertiary bromides")
-                suggestions.append("[CH]-Br  # Exclude secondary bromides")
-                suggestions.append("[CH2;$([CH2][c])]-Br  # Exclude benzylic bromides")
-            elif 'Cl' in atoms:
-                suggestions.append("[C;H0]-Cl  # Exclude tertiary chlorides")
-                suggestions.append("[CH]-Cl  # Exclude secondary chlorides")
-                suggestions.append("[CH2;$([CH2][c])]-Cl  # Exclude benzylic chlorides")
+                    print(f"  ⚠ Warning: Could not analyze {smiles}: {e}")
+                continue
         
-        return suggestions
+        return all_guards
     
     def generate_interactive(self) -> ReactionSmartsApplicability:
         """Interactive mode to build SMARTS pattern with user guidance."""
@@ -760,10 +717,32 @@ def run_single_reaction(reaction_smiles: str, output_file: Optional[Path] = None
     try:
         generator = SmartsGenerator(reaction_smiles)
         
-        print(f"\n🧪 Analyzing reaction: {reaction_smiles}\n")
+        print(f"\n🧪 Analyzing reaction: {reaction_smiles}")
+        
+        # Show substrate classification for each reactant
+        print("\n📊 Substrate Analysis:")
+        print("-" * 70)
+        reactant_smiles_list = [smi.strip() for smi in generator.reactants_smiles.split('.') if smi.strip()]
+        
+        for i, smiles in enumerate(reactant_smiles_list, 1):
+            try:
+                info = classify_substrate(smiles)
+                print(f"  Reactant {i}: {smiles}")
+                print(f"    └─ Class:  {info.substrate_class}")
+                print(f"    └─ Family: {info.substrate_family}")
+                if info.special_positions.benzylic:
+                    print(f"    └─ Special: Benzylic position(s) detected")
+                if info.special_positions.allylic:
+                    print(f"    └─ Special: Allylic position(s) detected")
+                if info.special_positions.propargylic:
+                    print(f"    └─ Special: Propargylic position(s) detected")
+            except Exception as e:
+                print(f"  Reactant {i}: {smiles} (classification failed: {e})")
+        
+        print()
         
         core = generator.generate_core_smarts()
-        guards = generator.suggest_guard_patterns(verbose=True)
+        guards = generator.suggest_guard_patterns(verbose=False)
         
         result = ReactionSmartsApplicability(
             core=core,
