@@ -32,7 +32,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 try:
-    from scripts.recommendation_cli_utils import (
+    from recommendation_cli_utils import (
         DEFAULT_SCDB_PATH,
         K_DEFAULT,
         LIMIT_DEFAULT,
