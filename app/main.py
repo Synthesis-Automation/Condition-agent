@@ -48,7 +48,7 @@ except Exception:
 import logging, time
 
 # Import error handlers
-from app.error_handlers import register_error_handlers
+from app.services.error_handlers import register_error_handlers
 from chemtools.exceptions import (
     ValidationError,
     DatabaseNotFoundError,
