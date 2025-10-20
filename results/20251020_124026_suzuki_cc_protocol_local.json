@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "generated_at": "2025-10-20T04:40:32.070473Z",
+    "model": "Protocol-DRFP",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 12.41
+  },
+  "input": {
+    "reaction_smiles": "Brc1cncnc1.OB(c2cocc2)O>>C3(C4=COC=C4)=CN=CN=C3"
+  },
+  "detection": {
+    "family": "unknown",
+    "detected_reaction_type": "unknown",
+    "method": "protocol-similarity",
+    "confidence": 0.0
+  },
+  "recommended_conditions": [],
+  "extras": {
+    "num_candidates": 0,
+    "num_total_protocols": 13,
+    "message": "No candidates found matching filters"
+  }
+}

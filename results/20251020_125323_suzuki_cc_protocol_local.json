@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "generated_at": "2025-10-20T04:53:28.790003Z",
+    "model": "Protocol-DRFP",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 9.3
+  },
+  "input": {
+    "reaction_smiles": "BrC1=CC=CC=C1.OB(O)c2ccoc2>>C3(C4=COC=C4)=CC=CC=C3",
+    "options": {
+      "k": 1
+    }
+  },
+  "detection": {
+    "family": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",
+    "detected_reaction_type": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",
+    "method": "protocol-similarity",
+    "confidence": 0.7073
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "confidence": 0.7073,
+      "chemicals": [
+        {
+          "name": "Potassium phosphate tribasic (anhydrous)",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": "O=P([O-])([O-])[O-].[K+].[K+].[K+]",
+          "amount": {
+            "weight_g": 60.0,
+            "mmol": 283.0,
+            "volume_ml": null,
+            "equivalents": 4.5
+          },
+          "role": "base"
+        },
+        {
+          "name": "5-Bromopyrimidine",
+          "abbreviation": null,
+          "cas": "4595-59-9",
+          "smiles": "Brc1cncnc1",
+          "amount": {
+            "weight_g": 10.0,
+            "mmol": 63.0,
+            "volume_ml": null,
+            "equivalents": 1.0
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "3-Furanylboronic acid",
+          "abbreviation": null,
+          "cas": "55552-70-0",
+          "smiles": "OB(O)c1ccoc1",
+          "amount": {
+            "weight_g": 17.6,
+            "mmol": 158.0,
+            "volume_ml": null,
+            "equivalents": 2.5
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Bis(tricyclohexylphosphine)nickel(II) chloride",
+          "abbreviation": "NiCl2(PCy3)2",
+          "cas": "19999-87-2",
+          "smiles": null,
+          "amount": {
+            "weight_g": 0.22,
+            "mmol": 0.315,
+            "volume_ml": null,
+            "equivalents": 0.005
+          },
+          "role": "preformed_catalyst"
+        },
+        {
+          "name": "tert-Amyl alcohol (2-methyl-2-butanol)",
+          "abbreviation": "t-AmOH",
+          "cas": "75-85-4",
+          "smiles": "CCC(C)(C)O",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 210.0,
+            "equivalents": null
+          },
+          "role": "solvent"
+        }
+      ],
+      "conditions": {
+        "catalyst": "NiCl2(PCy3)2",
+        "ligand": null,
+        "base": "K3PO4",
+        "solvent": "t-AmOH",
+        "additives": [],
+        "temperature_C": 120,
+        "time_h": 1.0,
+        "atmosphere": "N2; oil bath; reflux condenser"
+      },
+      "source": "protocol_database",
+      "similarity": 0.7073,
+      "protocol_metadata": {
+        "filename": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json",
+        "title": "Nickel-Catalyzed Suzuki-Miyaura Coupling in t-Amyl Alcohol for the Preparation of 5-(Furan-3-yl)pyrimidine",
+        "journal": "Organic Syntheses",
+        "year": 2016,
+        "doi": "10.15227/orgsyn.093.0306",
+        "url": "https://www.orgsyn.org/demo.aspx?prep=v93p0306",
+        "reaction_smiles": "Brc1cncnc1.OB(O)c1ccoc1>>C1(C2=COC=C2)=CN=CN=C1",
+        "reaction_smarts": [
+          "[Cl,Br,I][c,C,n,o,s].OB([c,C,n,o,s])O>>[c,C,n,o,s][c,C,n,o,s]"
+        ],
+        "reaction_family": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",
+        "tags": [
+          "nickel",
+          "Suzuki–Miyaura",
+          "t-amyl alcohol",
+          "K3PO4",
+          "low-loading (0.5 mol %)"
+        ],
+        "notes": "Coupling of heterocyclic substrates with aryl boronic acids, NiCl2(PCy3)2-catalyzed Suzuki–Miyaura coupling of 5-bromopyrimidine with 3-furanylboronic acid in tert-amyl alcohol under nitrogen."
+      }
+    }
+  ],
+  "extras": {
+    "num_candidates": 1,
+    "num_total_protocols": 14,
+    "num_matches": 1,
+    "smarts_filtering_enabled": true
+  }
+}

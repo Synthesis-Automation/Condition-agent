@@ -17,11 +17,11 @@
   },
   "reaction": {
     "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.CNc2ccccc2>>CC(C)(C)c1ccc(N(C)c2ccccc2)cc1",
-
-    "reaction_SMARTS": ["[a]OS(=O)(C)=O.[N;H1,H2]>>[N;H1,H2][a]"],
+    "reaction_SMARTS": [
+      "[c,C,n,o,s]OS(=O)(=O)C.[NH]>>[NH][c,C,n,o,s]"
+    ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
-
     "family": "Pd_Buchwald_Arylsulfonate_Amination_CMPhos",
     "notes": "Second step (amination) only: Pd(OAc)2/CM-Phos-catalyzed Buchwald–Hartwig amination of 4-(tert-butyl)phenyl mesylate with N-methylaniline in tert-butanol at 120 °C for 24 h under N2. Catalyst pre-activation in DCM/Et3N, then solvent removal prior to coupling.",
     "tags": "palladium; CM-Phos; aryl mesylate; Buchwald–Hartwig amination; tert-butanol; K2CO3; phenylboronic acid additive"

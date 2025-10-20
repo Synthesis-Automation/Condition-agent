@@ -10,10 +10,11 @@
   },
   "reaction": {
     "reaction_smiles": "OCc1ccccc1.O=Cc1ccc(O)cc1>>O=Cc1ccc(OCc2ccccc2)cc1",
-    "reaction_SMARTS": ["O[CH2,CH3,CH].[a]O>>[a]O[CH2,CH3,CH]"],
+    "reaction_SMARTS": [
+      "OC.[c,C,n,o,s]O>>[c,C,n,o,s]OC"
+    ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
-    
     "family": "Mitsunobu_etherification",
     "notes": "DIAD/PPh3 in dry THF at 0 °C under N2; DIAD added dropwise over 5 min; stirred 1 h until TLC shows full conversion. DIAD added dropwise over 5 min at 0 °C under N2 (separate addition step encoded).",
     "tags": "Mitsunobu; etherification; phenol; DIAD; PPh3; THF"

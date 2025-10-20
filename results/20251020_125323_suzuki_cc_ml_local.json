@@ -1,0 +1,753 @@
+{
+  "meta": {
+    "generated_at": "2025-10-20T04:53:28.766083Z",
+    "model": "ML-precedent-knn",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 4913.99
+  },
+  "input": {
+    "reaction_smiles": "BrC1=CC=CC=C1.OB(O)c2ccoc2>>C3(C4=COC=C4)=CC=CC=C3",
+    "family": "Suzuki",
+    "requested_reaction_type": "Suzuki_CC",
+    "requested_family": "Suzuki_CC"
+  },
+  "detection": {
+    "family": "Suzuki",
+    "detected_reaction_type": "Suzuki",
+    "method": "rxn-insight-ml",
+    "confidence": 0.76
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccoc1",
+          "equivalents": null
+        },
+        {
+          "id": "14221-01-3",
+          "role": "metal_precursor",
+          "name": "Tetrakis(triphenylphosphine)palladium(0)",
+          "abbreviation": null,
+          "cas": "14221-01-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "123-91-1",
+          "role": "solvent",
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 2
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccoc1",
+          "equivalents": null
+        },
+        {
+          "id": "14221-01-3",
+          "role": "metal_precursor",
+          "name": "Tetrakis(triphenylphosphine)palladium(0)",
+          "abbreviation": null,
+          "cas": "14221-01-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "68-12-2",
+          "role": "solvent",
+          "name": "N,N-Dimethylformamide",
+          "abbreviation": null,
+          "cas": "68-12-2",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 2
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccoc1",
+          "equivalents": null
+        },
+        {
+          "id": "14221-01-3",
+          "role": "metal_precursor",
+          "name": "Tetrakis(triphenylphosphine)palladium(0)",
+          "abbreviation": null,
+          "cas": "14221-01-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "497-19-8",
+          "role": "base",
+          "name": "Sodium carbonate",
+          "abbreviation": null,
+          "cas": "497-19-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "67-56-1",
+          "role": "solvent",
+          "name": "Methanol",
+          "abbreviation": null,
+          "cas": "67-56-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 2
+    },
+    {
+      "rank": 4,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccoc1",
+          "equivalents": null
+        },
+        {
+          "id": "14221-01-3",
+          "role": "metal_precursor",
+          "name": "Tetrakis(triphenylphosphine)palladium(0)",
+          "abbreviation": null,
+          "cas": "14221-01-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "584-08-7",
+          "role": "base",
+          "name": "Potassium carbonate",
+          "abbreviation": null,
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "109-99-9",
+          "role": "solvent",
+          "name": "Tetrahydrofuran",
+          "abbreviation": null,
+          "cas": "109-99-9",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 1
+    },
+    {
+      "rank": 5,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "OB(O)c1ccoc1",
+          "equivalents": null
+        },
+        {
+          "id": "14221-01-3",
+          "role": "metal_precursor",
+          "name": "Tetrakis(triphenylphosphine)palladium(0)",
+          "abbreviation": null,
+          "cas": "14221-01-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "497-19-8",
+          "role": "base",
+          "name": "Sodium carbonate",
+          "abbreviation": null,
+          "cas": "497-19-8",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "id": "123-91-1",
+          "role": "solvent",
+          "name": "1,4-Dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.0076,
+      "precedent_count": 1
+    }
+  ],
+  "precedents_used": {
+    "total_count": 10,
+    "top_precedents": [
+      {
+        "rank": 1,
+        "reaction_id": "31-179-CAS-15929631",
+        "reaction_smiles": "O=Cc1ccc(Br)cc1.OB(O)c1ccoc1>>O=Cc1ccc(-c2ccoc2)cc1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 99.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "N,N-Dimethylformamide",
+            "cas": "68-12-2"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 99.0
+        },
+        "reference": "VP1 crystal structure-guided exploration and optimization of 4,5-dimethoxybenzene-based inhibitors of rhinovirus 14 infection | Da Costa, Laurene; Roche, Manon; Scheers, Els; Coluccia, Antonio; Neyts, Johan; Terme, Thierry; Leyssen, Pieter; Silvestri, Romano; Vanelle, Patrice | European Journal of Medicinal Chemistry (2016), 115453-462"
+      },
+      {
+        "rank": 2,
+        "reaction_id": "31-179-CAS-17135993",
+        "reaction_smiles": "OB(O)c1ccoc1.Brc1ccc(Cn2cnnn2)cc1>>c1cc(-c2ccc(Cn3cnnn3)cc2)co1",
+        "core": "Pd",
+        "yield": 89.0,
+        "catalysts": [
+          {
+            "name": "Palladium(II) chloride",
+            "cas": "7647-10-1",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Triethylamine",
+            "cas": "121-44-8",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Ethanol",
+            "cas": "64-17-5"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 89.0
+        },
+        "reference": "Aryl and Heteroaryl N1-Tetrazoles through Ligand-Free Suzuki-Reaction under Aerobic, Aqueous Conditions | Seifried, Marco; Knoll, Christian; Giester, Gerald; Welch, Jan M.; Mueller, Danny; Weinberger, Peter | European Journal of Organic Chemistry (2017), 2017(17), 2416-2424"
+      },
+      {
+        "rank": 3,
+        "reaction_id": "31-614-CAS-40903380",
+        "reaction_smiles": "C=CCCc1ccc(Br)cc1.OB(O)c1ccoc1>>C=CCCc1ccc(-c2ccoc2)cc1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 86.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Sodium carbonate",
+            "cas": "497-19-8",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Methanol",
+            "cas": "67-56-1"
+          },
+          {
+            "name": "Toluene",
+            "cas": "108-88-3"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 86.0
+        },
+        "reference": "Catalytic Regio- and Enantioselective Remote Hydrocarboxylation of Unactivated Alkenes with CO2 | Zhou, Li; Li, Liping; Zhang, Sudong; Kuang, Xiao-kang; Zhou, You-Yun; Tang, Yong | Journal of the American Chemical Society (2024), 146(28), 18823-18830"
+      },
+      {
+        "rank": 4,
+        "reaction_id": "31-614-CAS-41686135",
+        "reaction_smiles": "OB(O)c1ccoc1.Brc1ccc(/N=N/N2CCCC2)cc1>>c1cc(-c2ccc(/N=N/N3CCCC3)cc2)co1",
+        "core": "Pd/PPh3",
+        "yield": 84.0,
+        "catalysts": [
+          {
+            "name": "Bis(tricyclohexylphosphine)palladium(II) dichloride",
+            "cas": "29934-17-6",
+            "role": "catalyst/ligand"
+          },
+          {
+            "name": "Triphenylphosphine",
+            "cas": "603-35-0",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,4-Dioxane",
+            "cas": "123-91-1"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 84.0
+        },
+        "reference": "Palladium-Catalyzed Suzuki-Miyaura Reactions with Triazenyl-Tethered Aryl Bromides: Exploiting the Orthogonal Coupling Sites under Different Conditions | Li, Yang; Peng, Zhiyong; Liu, Daming; Pan, Mengni; Shen, Yue; You, Hui; Zhao, Mengmeng; Li, Wanfang | Journal of Organic Chemistry (2024), 89(18), 13296-13307"
+      },
+      {
+        "rank": 5,
+        "reaction_id": "31-614-CAS-33466492",
+        "reaction_smiles": "OB(O)c1ccoc1.CC(C)(C)OC(=O)C(C)(C)Oc1cccc(N2CCCC(C(=O)N(Cc3ccc(Br)cc3)C3CC3)C2)c1>>CC(C)(C)OC(=O)C(C)(C)Oc1cccc(N2CCCC(C(=O)N(Cc3ccc(-c4ccoc4)cc3)C3CC3)C2)c1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 87.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,4-Dioxane",
+            "cas": "123-91-1"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 87.0
+        },
+        "reference": "Discovery of 2-(3-(3-Carbamoylpiperidin-1-yl)phenoxy)acetic Acid Derivatives as Novel Small-Molecule Inhibitors of the β-Catenin/B-Cell Lymphoma 9 Protein-Protein Interaction | Wang, Zhen; Zhang, Min; Luo, Wen; Zhang, Yongqiang; Ji, Haitao | Journal of Medicinal Chemistry (2021), 64(9), 5886-5904"
+      },
+      {
+        "rank": 6,
+        "reaction_id": "31-179-CAS-20960470",
+        "reaction_smiles": "O=C(c1ccccc1)c1ccc(Br)cc1.OB(O)c1ccoc1>>O=C(c1ccccc1)c1ccc(-c2ccoc2)cc1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 86.0,
+        "catalysts": [
+          {
+            "name": "Bis(triphenylphosphine)palladium(II) dichloride",
+            "cas": "13965-03-2",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Tetrahydrofuran",
+            "cas": "109-99-9"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 86.0
+        },
+        "reference": "Palladium-catalyzed Suzuki-Miyaura coupling of thioureas or thioamides | Mai, Shaoyu; Li, Wendong; Li, Xue; Zhao, Yingwei; Song, Qiuling | Nature Communications (2019), 10(1), 5709pp."
+      },
+      {
+        "rank": 7,
+        "reaction_id": "31-179-CAS-16293807",
+        "reaction_smiles": "OB(O)c1ccoc1.F[C@@H]1CCO[C@H](/C=C/c2ccc(Br)cc2)C1>>F[C@@H]1CCO[C@H](/C=C/c2ccc(-c3ccoc3)cc2)C1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 83.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Sodium carbonate",
+            "cas": "497-19-8",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "Methanol",
+            "cas": "67-56-1"
+          },
+          {
+            "name": "Toluene",
+            "cas": "108-88-3"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 83.0
+        },
+        "reference": "Nickel-Catalyzed Cross-Electrophile Coupling of Alkyl Fluorides: Stereospecific Synthesis of Vinylcyclopropanes | Erickson, Lucas W.; Lucas, Erika L.; Tollefson, Emily J.; Jarvo, Elizabeth R. | Journal of the American Chemical Society (2016), 138(42), 14006-14011"
+      },
+      {
+        "rank": 8,
+        "reaction_id": "31-179-CAS-20076901",
+        "reaction_smiles": "OB(O)c1ccoc1.CN(CCCC#N)c1cccc(Br)c1>>CN(CCCC#N)c1cccc(-c2ccoc2)c1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 93.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "N,N-Dimethylformamide",
+            "cas": "68-12-2"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 93.0
+        },
+        "reference": "Copper-catalyzed ring-opening C(sp3)-N coupling of cycloketone oxime esters: access to 1°, 2° and 3° alkyl amines | Tian, Li; Gao, Shuangqiu; Wang, Rui; Li, Yang; Tang, Chunlin; Shi, Lili; Fu, Junkai | Chemical Communications (Cambridge, United Kingdom) (2019), 55(37), 5347-5350"
+      },
+      {
+        "rank": 9,
+        "reaction_id": "31-614-CAS-39099817",
+        "reaction_smiles": "OB(O)c1ccoc1.Cc1c([N+](=O)[O-])c(=O)n(-c2ccc(Br)cc2)n1C>>Cc1c([N+](=O)[O-])c(=O)n(-c2ccc(-c3ccoc3)cc2)n1C",
+        "core": "Pd/triphenylphosphine",
+        "yield": 73.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Potassium carbonate",
+            "cas": "584-08-7",
+            "role": "base"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,4-Dioxane",
+            "cas": "123-91-1"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 73.0
+        },
+        "reference": "Discovery of GPX4 inhibitors through FP-based high-throughput screening | Cao, Yu; Wu, Bin; Xu, Ying; Wang, Mingchen; Wu, Xinyu; Liang, Xiaochen; Lin, Jin; Li, Zhihai; Lin, Hua; Luo, Cheng; Chen, Shijie | European Journal of Medicinal Chemistry (2024), 265116044"
+      },
+      {
+        "rank": 10,
+        "reaction_id": "31-614-CAS-34425978",
+        "reaction_smiles": "OB(O)c1ccoc1.Brc1ccc(-c2ncc(OCC3CCNCC3)nc2-c2ccc(Br)cc2)cc1>>Cl.c1cc(-c2ccc(-c3ncc(OCC4CCNCC4)nc3-c3ccc(-c4ccoc4)cc3)cc2)co1",
+        "core": "Pd/triphenylphosphine",
+        "yield": 79.0,
+        "catalysts": [
+          {
+            "name": "Tetrakis(triphenylphosphine)palladium(0)",
+            "cas": "14221-01-3",
+            "role": "catalyst/ligand"
+          }
+        ],
+        "reagents": [
+          {
+            "name": "Sodium carbonate",
+            "cas": "497-19-8",
+            "role": "base"
+          },
+          {
+            "name": "Hydrochloric Acid",
+            "cas": "7647-01-0",
+            "role": "acid"
+          }
+        ],
+        "solvents": [
+          {
+            "name": "1,4-Dioxane",
+            "cas": "123-91-1"
+          },
+          {
+            "name": "Water",
+            "cas": "7732-18-5"
+          },
+          {
+            "name": "Dichloromethane",
+            "cas": "75-09-2"
+          }
+        ],
+        "conditions": {
+          "temperature_C": null,
+          "time_h": null,
+          "yield_pct": 79.0
+        },
+        "reference": "Structure-activity relationship and antitumor activity of 1,4-pyrazine-containing inhibitors of histone acetyltransferases P300/CBP | Nie, Shenyou; Wu, Fangrui; Wu, Jingyu; Li, Xin; Zhou, Chao; Yao, Yuan; Song, Yongcheng | European Journal of Medicinal Chemistry (2022), 237114407"
+      }
+    ],
+    "core_matched_precedents": {
+      "core": "Pd/triphenylphosphine",
+      "count": 8,
+      "examples": [
+        {
+          "rank": 1,
+          "reaction_id": "31-179-CAS-15929631",
+          "core": "Pd/triphenylphosphine",
+          "base": "584-08-7",
+          "solvent": "68-12-2",
+          "yield": 99.0
+        },
+        {
+          "rank": 2,
+          "reaction_id": "31-614-CAS-40903380",
+          "core": "Pd/triphenylphosphine",
+          "base": "497-19-8",
+          "solvent": "67-56-1",
+          "yield": 86.0
+        },
+        {
+          "rank": 3,
+          "reaction_id": "31-614-CAS-33466492",
+          "core": "Pd/triphenylphosphine",
+          "base": "584-08-7",
+          "solvent": "123-91-1",
+          "yield": 87.0
+        },
+        {
+          "rank": 4,
+          "reaction_id": "31-179-CAS-20960470",
+          "core": "Pd/triphenylphosphine",
+          "base": "584-08-7",
+          "solvent": "109-99-9",
+          "yield": 86.0
+        },
+        {
+          "rank": 5,
+          "reaction_id": "31-179-CAS-16293807",
+          "core": "Pd/triphenylphosphine",
+          "base": "497-19-8",
+          "solvent": "67-56-1",
+          "yield": 83.0
+        }
+      ]
+    },
+    "statistics": {
+      "average_yield": 85.9,
+      "yield_range": [
+        73.0,
+        99.0
+      ],
+      "temperature_range": null,
+      "time_range": null
+    }
+  }
+}

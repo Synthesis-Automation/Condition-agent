@@ -11,11 +11,10 @@
   "reaction": {
     "reaction_smiles": "CCCCCCCCI.CCOC(=O)CC(=O)Cl>>CCOC(=O)CC(=O)CCCCCCCC",
     "reaction_SMARTS": [
-      "[C;!a;!H0]CI.[C;!a;!H0]C(Cl)=O>>[C;!a;!H0]C(C[C;!a;!H0])=O"
+      "CI.C(Cl)=O>>CC(C)=O"
     ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
-
     "family": "Ni_Cross_Electrophile_Acylation",
     "notes": "NiCl2(dme)/dtbbpy with Mn powder in DMAc under N2 couples 1‑iodooctane and ethyl succinyl chloride to give ethyl 4‑oxododecanoate; 0–2 °C then rt.",
     "tags": "nickel; cross-electrophile; acylation; dtbbpy; Mn; DMAc; alkyl iodide; acid chloride; OrgSyn v93p0050"

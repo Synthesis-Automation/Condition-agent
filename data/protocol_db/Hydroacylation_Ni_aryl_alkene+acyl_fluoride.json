@@ -10,10 +10,11 @@
   },
   "reaction": {
     "reaction_smiles": "CC(=O)Oc1ccc(C=C)cc1.O=C(F)c2ccccc2>>CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1",
-    "reaction_SMARTS": ["[a]/C([H])=C([H])/[H].O=C([a])F>>[a]C(C([a])=O)C"],
+    "reaction_SMARTS": [
+      "C=C.O=C(F)>>C(C)C(=O)"
+    ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
-    
     "family": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride",
     "notes": "NiCl2(dme) (15 mol%), K3PO4 (3.0 equiv), triethoxysilane (1.1 equiv) in DMF (37.5 mL), 21–22 °C, N2, 24 h; quenched with sat. NaHCO3 then extracted; purified by flash chromatography; 62% yield (two runs).",
     "reaction_smarts_applicability": {
