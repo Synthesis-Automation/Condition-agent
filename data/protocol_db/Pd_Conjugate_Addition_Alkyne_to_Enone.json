@@ -1,4 +1,4 @@
-{
+[{
   "source": {
     "title": "Palladium-catalyzed 1,4-Addition of Terminal Alkynes to Conjugated Enones",
     "journal": "Organic Syntheses",
@@ -174,3 +174,4 @@
   ],
   "original_procedure": "In a 100-mL three-necked flask under N2, Pd(OAc)2 and PMe3 (1.0 M in toluene) are stirred 10 min to give a brown solution. Add deionized water (50 mL), then phenylacetylene (0.6 equiv) and ethyl vinyl ketone (1.5 equiv). With vigorous stirring (~1400 rpm), add the remaining phenylacetylene (0.4 equiv) at 0.4 mL/min. Heat at 60 °C for 48 h, then extract with ether, wash with brine, dry (Na2SO4), concentrate, and purify by silica gel column; optional short-path distillation affords the product. [Paraphrased from the source page.]"
 }
+]

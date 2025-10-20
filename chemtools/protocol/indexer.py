@@ -206,24 +206,37 @@ class ProtocolIndexer:
                 filename = json_path.name
                 file_hash = self._compute_file_hash(json_path)
                 
-                # Check if file has changed
-                if filename in existing_records:
-                    existing_record = existing_records[filename]
-                    if existing_record.file_hash == file_hash and not force_rebuild:
-                        # File unchanged, reuse existing record
-                        self.records[filename] = existing_record
-                        skipped += 1
-                        continue
+                # Check if file has changed (check against any record from this file)
+                file_unchanged = False
+                if not force_rebuild:
+                    # Check if any existing record from this file exists
+                    for existing_key, existing_record in existing_records.items():
+                        # Match by filepath rather than filename
+                        if existing_record.filepath.endswith(filename):
+                            if existing_record.file_hash == file_hash:
+                                file_unchanged = True
+                                break
                 
-                # Process the file
-                record, drfp_fp = self._process_protocol_file(json_path, file_hash, compute_drfp)
-                self.records[filename] = record
-                processed += 1
+                if file_unchanged:
+                    # File unchanged, reuse all existing records from this file
+                    for existing_key, existing_record in existing_records.items():
+                        if existing_record.filepath.endswith(filename):
+                            self.records[existing_key] = existing_record
+                    skipped += 1
+                    continue
                 
-                # Collect DRFP fingerprint if computed
-                if drfp_fp is not None:
-                    drfp_fingerprints.append(drfp_fp)
-                    drfp_filenames.append(filename)
+                # Process the file (returns lists now)
+                records_list, drfp_fps_list = self._process_protocol_file(json_path, file_hash, compute_drfp)
+                
+                # Add all records from this file
+                for record, drfp_fp in zip(records_list, drfp_fps_list):
+                    self.records[record.filename] = record
+                    processed += 1
+                    
+                    # Collect DRFP fingerprint if computed
+                    if drfp_fp is not None:
+                        drfp_fingerprints.append(drfp_fp)
+                        drfp_filenames.append(record.filename)
                 
             except Exception as e:
                 logger.error(f"Error processing {json_path.name}: {e}")
@@ -292,9 +305,13 @@ class ProtocolIndexer:
         json_path: Path,
         file_hash: str,
         compute_drfp: bool
-    ) -> tuple[ProtocolRecord, Optional[Any]]:
+    ) -> tuple[List[ProtocolRecord], List[Optional[Any]]]:
         """
-        Process a single protocol file and create index record
+        Process a single protocol file and create index records
+        
+        Each JSON file can now contain either:
+        - A single protocol object (legacy format)
+        - An array of protocol objects (new format)
         
         Args:
             json_path: Path to protocol JSON file
@@ -302,14 +319,66 @@ class ProtocolIndexer:
             compute_drfp: Whether to compute DRFP fingerprint
         
         Returns:
-            Tuple of (ProtocolRecord, drfp_fingerprint)
+            Tuple of (List[ProtocolRecord], List[drfp_fingerprint])
             drfp_fingerprint is None if not computed or computation failed
         """
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
+        # Handle both array and single protocol formats
+        if isinstance(data, list):
+            protocols = data
+        else:
+            protocols = [data]
+        
+        records = []
+        drfp_fps = []
+        
+        for idx, protocol_data in enumerate(protocols):
+            # Generate unique filename for each protocol in array
+            if len(protocols) > 1:
+                # Multiple protocols: use index suffix
+                protocol_id = f"{json_path.stem}[{idx}]"
+            else:
+                # Single protocol: use original filename
+                protocol_id = json_path.stem
+            
+            record, drfp_fp = self._process_single_protocol(
+                protocol_data=protocol_data,
+                json_path=json_path,
+                protocol_id=protocol_id,
+                file_hash=file_hash,
+                compute_drfp=compute_drfp
+            )
+            records.append(record)
+            drfp_fps.append(drfp_fp)
+        
+        return records, drfp_fps
+    
+    def _process_single_protocol(
+        self,
+        protocol_data: Dict[str, Any],
+        json_path: Path,
+        protocol_id: str,
+        file_hash: str,
+        compute_drfp: bool
+    ) -> tuple[ProtocolRecord, Optional[Any]]:
+        """
+        Process a single protocol object and create index record
+        
+        Args:
+            protocol_data: Protocol JSON object
+            json_path: Path to source JSON file
+            protocol_id: Unique identifier for this protocol
+            file_hash: MD5 hash of the file
+            compute_drfp: Whether to compute DRFP fingerprint
+        
+        Returns:
+            Tuple of (ProtocolRecord, drfp_fingerprint)
+            drfp_fingerprint is None if not computed or computation failed
+        """
         # Extract reaction info
-        reaction = data.get('reaction', {})
+        reaction = protocol_data.get('reaction', {})
         reaction_smiles = reaction.get('reaction_smiles', '')
         reaction_family = reaction.get('family', '')
         notes = reaction.get('notes', '')
@@ -331,7 +400,7 @@ class ProtocolIndexer:
             tags = []
         
         # Extract source info
-        source = data.get('source', {})
+        source = protocol_data.get('source', {})
         
         # Parse reaction SMILES
         canonical_rxn, reactants, products = self._parse_reaction(reaction_smiles)
@@ -349,7 +418,7 @@ class ProtocolIndexer:
         
         # Create record (without embedding DRFP)
         record = ProtocolRecord(
-            filename=json_path.name,
+            filename=protocol_id,  # Use protocol_id instead of json_path.name
             filepath=str(json_path.relative_to(self.protocol_dir.parent)),
             file_hash=file_hash,
             reaction_smiles=reaction_smiles,

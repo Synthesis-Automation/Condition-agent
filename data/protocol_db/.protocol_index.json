@@ -1,18 +1,18 @@
 {
   "metadata": {
     "version": "1.0",
-    "created_at": "2025-10-20T08:28:43.385523",
-    "updated_at": "2025-10-20T08:28:43.385523",
-    "num_protocols": 16,
+    "created_at": "2025-10-20T12:32:07.058481",
+    "updated_at": "2025-10-20T12:32:07.058481",
+    "num_protocols": 20,
     "protocol_dir": "C:\\Git-softwares\\Condition-agent\\data\\protocol_db",
     "has_drfp": true,
     "drfp_storage": "npz"
   },
   "records": {
-    "Alkyl_Iodide_Borylation.json": {
-      "filename": "Alkyl_Iodide_Borylation.json",
+    "Alkyl_Iodide_Borylation": {
+      "filename": "Alkyl_Iodide_Borylation",
       "filepath": "protocol_db\\Alkyl_Iodide_Borylation.json",
-      "file_hash": "fa710ea355c50bca8a533cdae2e721bc",
+      "file_hash": "f18c86c5c56121991300e7a56d3fe10e",
       "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
       "reaction_family": "Alkyl_Iodide_Borylation",
       "tags": [
@@ -41,12 +41,12 @@
         "CCCCCCCCB1OC(C)(C)C(C)(C)O1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.240349"
+      "indexed_at": "2025-10-20T12:32:06.861325"
     },
-    "alpha_arylation_Pd_enamine_Dong_v100p0099.json": {
-      "filename": "alpha_arylation_Pd_enamine_Dong_v100p0099.json",
+    "alpha_arylation_Pd_enamine_Dong_v100p0099": {
+      "filename": "alpha_arylation_Pd_enamine_Dong_v100p0099",
       "filepath": "protocol_db\\alpha_arylation_Pd_enamine_Dong_v100p0099.json",
-      "file_hash": "4bd404fe9dd1db68f85cae73c9d016be",
+      "file_hash": "b659b00532b4c2bca483a1d514e15e8f",
       "reaction_smiles": "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
       "reaction_family": "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)",
       "tags": [
@@ -77,12 +77,12 @@
         "O=C(C)c3ccc(C4C(CCC4)=O)cc3"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.252327"
+      "indexed_at": "2025-10-20T12:32:06.871298"
     },
-    "Aryl mesylate_Suzuki.json": {
-      "filename": "Aryl mesylate_Suzuki.json",
+    "Aryl mesylate_Suzuki": {
+      "filename": "Aryl mesylate_Suzuki",
       "filepath": "protocol_db\\Aryl mesylate_Suzuki.json",
-      "file_hash": "1ab3099bacbb5dfd680c975508aa02f7",
+      "file_hash": "7bf60332324270e1374e7a57ca001a56",
       "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
       "reaction_family": "Suzuki_Miyaura_Cross_Coupling_OMs",
       "tags": [
@@ -113,12 +113,12 @@
         "CC(C)(C)c1ccc(-c2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.264189"
+      "indexed_at": "2025-10-20T12:32:06.883575"
     },
-    "Aryl_Iodide_Cyanation.json": {
-      "filename": "Aryl_Iodide_Cyanation.json",
+    "Aryl_Iodide_Cyanation": {
+      "filename": "Aryl_Iodide_Cyanation",
       "filepath": "protocol_db\\Aryl_Iodide_Cyanation.json",
-      "file_hash": "85457635c804a795e823ecbe4924a95c",
+      "file_hash": "a14d4adbcaf890a99e58b37c4ca3001d",
       "reaction_smiles": "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43",
       "reaction_family": "Aryl_Iodide_Cyanation",
       "tags": [
@@ -147,12 +147,12 @@
         "N#CC3=NNC4=CC=CC=C43"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.269034"
+      "indexed_at": "2025-10-20T12:32:06.891421"
     },
-    "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA.json": {
-      "filename": "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA.json",
+    "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA": {
+      "filename": "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA",
       "filepath": "protocol_db\\Evano_2016_Cu_cyanation_alkenyl_iodides_stepA.json",
-      "file_hash": "093d375aba19c352b556238a4b490623",
+      "file_hash": "17daa83334d7153af8ab3334384263ad",
       "reaction_smiles": "IC=CCCCCCC.CC(C)(O)C#N>>N#CC=CCCCCCC",
       "reaction_family": "Cyanation_Cu_Alkenyl_Iodide",
       "tags": [
@@ -176,12 +176,12 @@
         "N#CC=CCCCCCC"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.274223"
+      "indexed_at": "2025-10-20T12:32:06.898452"
     },
-    "Grubbs_RCM_Ferguson_2003.json": {
-      "filename": "Grubbs_RCM_Ferguson_2003.json",
+    "Grubbs_RCM_Ferguson_2003": {
+      "filename": "Grubbs_RCM_Ferguson_2003",
       "filepath": "protocol_db\\Grubbs_RCM_Ferguson_2003.json",
-      "file_hash": "61b7299804b50a52547581cdf540e9d0",
+      "file_hash": "af8b30a432509c96b005700affbfcd53",
       "reaction_smiles": "CC(C)(C)OC(=O)N(CC=C)CC=C>>CC(C)(C)OC(=O)N1CCC=C1",
       "reaction_family": "Olefin_Metathesis_RCM",
       "tags": [
@@ -209,12 +209,12 @@
         "CC(C)(C)OC(=O)N1CCC=C1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.285265"
+      "indexed_at": "2025-10-20T12:32:06.905257"
     },
-    "Hydroacylation_Ni_aryl_alkene+acyl_fluoride.json": {
-      "filename": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride.json",
+    "Hydroacylation_Ni_aryl_alkene+acyl_fluoride": {
+      "filename": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride",
       "filepath": "protocol_db\\Hydroacylation_Ni_aryl_alkene+acyl_fluoride.json",
-      "file_hash": "e60701736fef9c77061ac6770dc948d9",
+      "file_hash": "9cfc2d44f9db499687fbfa610c98a4a8",
       "reaction_smiles": "CC(=O)Oc1ccc(C=C)cc1.O=C(F)c2ccccc2>>CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1",
       "reaction_family": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride",
       "tags": [],
@@ -236,12 +236,12 @@
         "CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.296830"
+      "indexed_at": "2025-10-20T12:32:06.918079"
     },
-    "Ni_Cross_Electrophile_Acylation.json": {
-      "filename": "Ni_Cross_Electrophile_Acylation.json",
+    "Ni_Cross_Electrophile_Acylation": {
+      "filename": "Ni_Cross_Electrophile_Acylation",
       "filepath": "protocol_db\\Ni_Cross_Electrophile_Acylation.json",
-      "file_hash": "b8005dbe17698c41c03c20dba0c6298d",
+      "file_hash": "de6bf566659f4143d7ba08826c227d2a",
       "reaction_smiles": "CCCCCCCCI.CCOC(=O)CC(=O)Cl>>CCOC(=O)CC(=O)CCCCCCCC",
       "reaction_family": "Ni_Cross_Electrophile_Acylation",
       "tags": [
@@ -273,12 +273,12 @@
         "CCOC(=O)CC(=O)CCCCCCCC"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.302331"
+      "indexed_at": "2025-10-20T12:32:06.926828"
     },
-    "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json": {
-      "filename": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json",
+    "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH": {
+      "filename": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",
       "filepath": "protocol_db\\Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json",
-      "file_hash": "5205669c4e53ae4878a4f0a09d2d37cd",
+      "file_hash": "f603cdd31269d0e7f238f7d4ed5a21fc",
       "reaction_smiles": "Brc1cncnc1.OB(O)c1ccoc1>>C1(C2=COC=C2)=CN=CN=C1",
       "reaction_family": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",
       "tags": [
@@ -306,12 +306,12 @@
         "C1(C2=COC=C2)=CN=CN=C1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.315603"
+      "indexed_at": "2025-10-20T12:32:06.935353"
     },
-    "pd_acetylation_aryl_bromide_Garg_v98p0068.json": {
-      "filename": "pd_acetylation_aryl_bromide_Garg_v98p0068.json",
+    "pd_acetylation_aryl_bromide_Garg_v98p0068": {
+      "filename": "pd_acetylation_aryl_bromide_Garg_v98p0068",
       "filepath": "protocol_db\\pd_acetylation_aryl_bromide_Garg_v98p0068.json",
-      "file_hash": "80c913400aa857a2685d74a0a5f3f9b9",
+      "file_hash": "a089c962d8fd2218a9da997d58eb49fd",
       "reaction_smiles": "BrC1=CC=CC=C1.CC([Si](C)(C)C)=O>>CC(C2=CC=CC=C2)=O",
       "reaction_family": "Pd_Acetylation_ArylBr_SilylEnol",
       "tags": [
@@ -341,12 +341,12 @@
         "CC(C2=CC=CC=C2)=O"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.320787"
+      "indexed_at": "2025-10-20T12:32:06.942955"
     },
-    "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json": {
-      "filename": "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json",
+    "Pd_Buchwald_Arylsulfonate_Amination_CMPhos": {
+      "filename": "Pd_Buchwald_Arylsulfonate_Amination_CMPhos",
       "filepath": "protocol_db\\Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json",
-      "file_hash": "ee1090c6d52671ed3cf0b26733e45642",
+      "file_hash": "5cc8dc2478e1e369acfe563aa4fe58db",
       "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.CNc2ccccc2>>CC(C)(C)c1ccc(N(C)c2ccccc2)cc1",
       "reaction_family": "Pd_Buchwald_Arylsulfonate_Amination_CMPhos",
       "tags": [
@@ -376,12 +376,12 @@
         "CC(C)(C)c1ccc(N(C)c2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.334181"
+      "indexed_at": "2025-10-20T12:32:06.955144"
     },
-    "Pd_Conjugate_Addition_Alkyne_to_Enone.json": {
-      "filename": "Pd_Conjugate_Addition_Alkyne_to_Enone.json",
+    "Pd_Conjugate_Addition_Alkyne_to_Enone": {
+      "filename": "Pd_Conjugate_Addition_Alkyne_to_Enone",
       "filepath": "protocol_db\\Pd_Conjugate_Addition_Alkyne_to_Enone.json",
-      "file_hash": "a05a4af5e3ee132ee0edd7d451b0aab7",
+      "file_hash": "2134e9e45e6498b20b6f247efbf01765",
       "reaction_smiles": "C#Cc1ccccc1.CCC(=O)C=C>>CC(=O)CCC#CC1=CC=CC=C1",
       "reaction_family": "Pd_Conjugate_Addition_Alkyne_to_Enone",
       "tags": [
@@ -412,12 +412,12 @@
         "CC(=O)CCC#CC1=CC=CC=C1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.344315"
+      "indexed_at": "2025-10-20T12:32:06.963276"
     },
-    "Renaudet_Reymond_2004_Mitsunobu.json": {
-      "filename": "Renaudet_Reymond_2004_Mitsunobu.json",
+    "Renaudet_Reymond_2004_Mitsunobu": {
+      "filename": "Renaudet_Reymond_2004_Mitsunobu",
       "filepath": "protocol_db\\Renaudet_Reymond_2004_Mitsunobu.json",
-      "file_hash": "9b130551510410f6a45e882fd8b171bf",
+      "file_hash": "3e3628a56d8823e5f2f8b02b2227c374",
       "reaction_smiles": "OCc1ccccc1.O=Cc1ccc(O)cc1>>O=Cc1ccc(OCc2ccccc2)cc1",
       "reaction_family": "Mitsunobu_etherification",
       "tags": [
@@ -446,12 +446,12 @@
         "O=Cc1ccc(OCc2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.352350"
+      "indexed_at": "2025-10-20T12:32:06.973876"
     },
-    "Sonogashira-Coupling.json": {
-      "filename": "Sonogashira-Coupling.json",
+    "Sonogashira-Coupling": {
+      "filename": "Sonogashira-Coupling",
       "filepath": "protocol_db\\Sonogashira-Coupling.json",
-      "file_hash": "121e0002b52b373279aad9b809d34cea",
+      "file_hash": "96f2f27f49156be22b15fe9e053ebd88",
       "reaction_smiles": "NC(=O)c1ccccc1I.C#CCCCC>>NC(=O)c1ccccc1C#CCCCC",
       "reaction_family": "Sonogashira_Coupling",
       "tags": [
@@ -475,12 +475,12 @@
         "NC(=O)c1ccccc1C#CCCCC"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.364147"
+      "indexed_at": "2025-10-20T12:32:06.983243"
     },
-    "Suzuki_Cu_C(sp3)-C(sp2).json": {
-      "filename": "Suzuki_Cu_C(sp3)-C(sp2).json",
+    "Suzuki_Cu_C(sp3)-C(sp2)": {
+      "filename": "Suzuki_Cu_C(sp3)-C(sp2)",
       "filepath": "protocol_db\\Suzuki_Cu_C(sp3)-C(sp2).json",
-      "file_hash": "37a98dca001690a3fed6c021d8ee53a2",
+      "file_hash": "4c4a376582df4d6aac4eaa250a3ceb72",
       "reaction_smiles": "BrC1CCCCC1.Clc2ccc(B(OC3(C)C)OC3(C)C)cc2>>Clc4ccc(C5CCCCC5)cc4",
       "reaction_family": "Suzuki_Cu_alkyl_halide+aryl_boron",
       "tags": [
@@ -504,12 +504,155 @@
         "Clc4ccc(C5CCCCC5)cc4"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.376018"
+      "indexed_at": "2025-10-20T12:32:06.995123"
     },
-    "visible_light_CS_coupling_Miyake_v100p0234.json": {
-      "filename": "visible_light_CS_coupling_Miyake_v100p0234.json",
+    "Suzuki_protocols[0]": {
+      "filename": "Suzuki_protocols[0]",
+      "filepath": "protocol_db\\Suzuki_protocols.json",
+      "file_hash": "d9dd3bcd2b77ae63758c95db2b537185",
+      "reaction_smiles": "O=C(OC(C)(C)C)NC1=C(Br)C=CC=C1.CC2=C(B3OC(C)(C)C(C)(C)O3)C=CC=C2>>O=C(OC(C)(C)C)NC4=C(C5=C(C)C=CC=C5)C=CC=C4",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl bromide",
+        "aryl boronate",
+        "Pd(PPh3)4",
+        "K2CO3",
+        "dioxane",
+        "water",
+        "nitrogen"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s][#35,#53].[c,n,o,s]B(O[C])O[C]>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Aryl pinacol boronate as coupling partner.",
+      "source_title": "Suzuki coupling of aryl pinacol boronate with aryl bromide (Pd(PPh3)4/K2CO3 in dioxane/H2O)",
+      "source_journal": null,
+      "source_year": null,
+      "source_doi": null,
+      "source_url": null,
+      "canonical_reaction": "CC2=C(B3OC(C)(C)C(C)(C)O3)C=CC=C2.O=C(OC(C)(C)C)NC1=C(Br)C=CC=C1>>O=C(OC(C)(C)C)NC4=C(C5=C(C)C=CC=C5)C=CC=C4",
+      "reactants": [
+        "CC2=C(B3OC(C)(C)C(C)(C)O3)C=CC=C2",
+        "O=C(OC(C)(C)C)NC1=C(Br)C=CC=C1"
+      ],
+      "products": [
+        "O=C(OC(C)(C)C)NC4=C(C5=C(C)C=CC=C5)C=CC=C4"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2025-10-20T12:32:07.010056"
+    },
+    "Suzuki_protocols[1]": {
+      "filename": "Suzuki_protocols[1]",
+      "filepath": "protocol_db\\Suzuki_protocols.json",
+      "file_hash": "d9dd3bcd2b77ae63758c95db2b537185",
+      "reaction_smiles": "BrC1=CC=C(C=C1)C(OC)=O.FC2=CC=C(C=C2)B(O)O>>FC3=CC=C(C4=CC=C(C=C4)C(OC)=O)C=C3",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl bromide",
+        "4-fluorophenylboronic acid",
+        "Pd(dppf)Cl2·CH2Cl2",
+        "Na2CO3",
+        "toluene",
+        "reflux"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s][#35,#53].[c,n,o,s]B(O)O>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Pd(dppf)Cl2·CH2Cl2 pre-catalyst used; aqueous Na2CO3; toluene reflux.",
+      "source_title": "Suzuki coupling of methyl 4-bromobenzoate with 4-fluorophenylboronic acid (Pd(dppf)Cl2·CH2Cl2/Na2CO3 in toluene)",
+      "source_journal": null,
+      "source_year": 2002,
+      "source_doi": null,
+      "source_url": null,
+      "canonical_reaction": "BrC1=CC=C(C=C1)C(OC)=O.FC2=CC=C(C=C2)B(O)O>>FC3=CC=C(C4=CC=C(C=C4)C(OC)=O)C=C3",
+      "reactants": [
+        "BrC1=CC=C(C=C1)C(OC)=O",
+        "FC2=CC=C(C=C2)B(O)O"
+      ],
+      "products": [
+        "FC3=CC=C(C4=CC=C(C=C4)C(OC)=O)C=C3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2025-10-20T12:32:07.020806"
+    },
+    "Suzuki_protocols[2]": {
+      "filename": "Suzuki_protocols[2]",
+      "filepath": "protocol_db\\Suzuki_protocols.json",
+      "file_hash": "d9dd3bcd2b77ae63758c95db2b537185",
+      "reaction_smiles": "CCC1=CC(C(OC)=O)=C(OS(=O)(=O)C(F)(F)F)C=C1.FC2=CC=C(B(O)O)C=C2>>CCC3=CC=C(C4=CC=C(F)C=C4)C(C(OC)=O)=C3",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl triflate",
+        "4-fluorophenylboronic acid",
+        "Pd(PPh3)4",
+        "Na2CO3",
+        "toluene",
+        "ethanol",
+        "90C"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s]OS(=O)(C(F)(F)F)=O.[c,n,o,s]B(O)O>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Two-phase toluene/EtOH with aqueous Na2CO3; 90 °C for 12 h.",
+      "source_title": "Suzuki coupling of aryl triflate with 4-fluorophenylboronic acid (Pd(PPh3)4/Na2CO3 in toluene/EtOH)",
+      "source_journal": null,
+      "source_year": 2005,
+      "source_doi": null,
+      "source_url": null,
+      "canonical_reaction": "CCC1=CC(C(OC)=O)=C(OS(=O)(=O)C(F)(F)F)C=C1.FC2=CC=C(B(O)O)C=C2>>CCC3=CC=C(C4=CC=C(F)C=C4)C(C(OC)=O)=C3",
+      "reactants": [
+        "CCC1=CC(C(OC)=O)=C(OS(=O)(=O)C(F)(F)F)C=C1",
+        "FC2=CC=C(B(O)O)C=C2"
+      ],
+      "products": [
+        "CCC3=CC=C(C4=CC=C(F)C=C4)C(C(OC)=O)=C3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2025-10-20T12:32:07.034671"
+    },
+    "Suzuki_protocols[3]": {
+      "filename": "Suzuki_protocols[3]",
+      "filepath": "protocol_db\\Suzuki_protocols.json",
+      "file_hash": "d9dd3bcd2b77ae63758c95db2b537185",
+      "reaction_smiles": "O=C(OC)/C=C/C1=CC=CC(Cl)=C1.OB(O)C2=CC=CC=C2>>O=C(OC)/C=C/C3=CC=CC(C4=CC=CC=C4)=C3",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl chloride",
+        "phenylboronic acid",
+        "PdCl2(PCy3)2",
+        "CsF",
+        "NMP",
+        "100C",
+        "nitrogen"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s]Cl.[c,n,o,s]B(O)O>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Aryl chloride coupling with CsF in NMP at 100 °C.",
+      "source_title": "Suzuki coupling of aryl chloride (PdCl2(PCy3)2/CsF in NMP)",
+      "source_journal": "Tetrahedron Letters",
+      "source_year": 1997,
+      "source_doi": null,
+      "source_url": null,
+      "canonical_reaction": "O=C(OC)/C=C/C1=CC=CC(Cl)=C1.OB(O)C2=CC=CC=C2>>O=C(OC)/C=C/C3=CC=CC(C4=CC=CC=C4)=C3",
+      "reactants": [
+        "O=C(OC)/C=C/C1=CC=CC(Cl)=C1",
+        "OB(O)C2=CC=CC=C2"
+      ],
+      "products": [
+        "O=C(OC)/C=C/C3=CC=CC(C4=CC=CC=C4)=C3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2025-10-20T12:32:07.046035"
+    },
+    "visible_light_CS_coupling_Miyake_v100p0234": {
+      "filename": "visible_light_CS_coupling_Miyake_v100p0234",
       "filepath": "protocol_db\\visible_light_CS_coupling_Miyake_v100p0234.json",
-      "file_hash": "7cf5b1e5d75edeed9f237e8835c47834",
+      "file_hash": "a220f3cf5a1bdb48fcf28aaf1e0e3f55",
       "reaction_smiles": "Brc1ccc(C(=O)C)cc1.Clc1ccccc1S>>CC(=O)c1ccc(S-c2ccccc2Cl)cc1",
       "reaction_family": "VisibleLight_C–S_Coupling_ArylBr+ArSH",
       "tags": [
@@ -541,298 +684,363 @@
         "CC(=O)c1ccc(S-c2ccccc2Cl)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T08:28:43.385523"
+      "indexed_at": "2025-10-20T12:32:07.056445"
     }
   },
   "family_index": {
     "Alkyl_Iodide_Borylation": [
-      "Alkyl_Iodide_Borylation.json"
+      "Alkyl_Iodide_Borylation"
     ],
     "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099"
     ],
     "Suzuki_Miyaura_Cross_Coupling_OMs": [
-      "Aryl mesylate_Suzuki.json"
+      "Aryl mesylate_Suzuki"
     ],
     "Aryl_Iodide_Cyanation": [
-      "Aryl_Iodide_Cyanation.json"
+      "Aryl_Iodide_Cyanation"
     ],
     "Cyanation_Cu_Alkenyl_Iodide": [
-      "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA.json"
+      "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA"
     ],
     "Olefin_Metathesis_RCM": [
-      "Grubbs_RCM_Ferguson_2003.json"
+      "Grubbs_RCM_Ferguson_2003"
     ],
     "Hydroacylation_Ni_aryl_alkene+acyl_fluoride": [
-      "Hydroacylation_Ni_aryl_alkene+acyl_fluoride.json"
+      "Hydroacylation_Ni_aryl_alkene+acyl_fluoride"
     ],
     "Ni_Cross_Electrophile_Acylation": [
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH": [
-      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json"
+      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH"
     ],
     "Pd_Acetylation_ArylBr_SilylEnol": [
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json"
+      "pd_acetylation_aryl_bromide_Garg_v98p0068"
     ],
     "Pd_Buchwald_Arylsulfonate_Amination_CMPhos": [
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json"
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos"
     ],
     "Pd_Conjugate_Addition_Alkyne_to_Enone": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "Mitsunobu_etherification": [
-      "Renaudet_Reymond_2004_Mitsunobu.json"
+      "Renaudet_Reymond_2004_Mitsunobu"
     ],
     "Sonogashira_Coupling": [
-      "Sonogashira-Coupling.json"
+      "Sonogashira-Coupling"
     ],
     "Suzuki_Cu_alkyl_halide+aryl_boron": [
-      "Suzuki_Cu_C(sp3)-C(sp2).json"
+      "Suzuki_Cu_C(sp3)-C(sp2)"
+    ],
+    "Suzuki_Coupling": [
+      "Suzuki_protocols[0]",
+      "Suzuki_protocols[1]",
+      "Suzuki_protocols[2]",
+      "Suzuki_protocols[3]"
     ],
     "VisibleLight_C–S_Coupling_ArylBr+ArSH": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ]
   },
   "tag_index": {
     "borylation": [
-      "Alkyl_Iodide_Borylation.json"
+      "Alkyl_Iodide_Borylation"
     ],
     "alkyl iodide": [
-      "Alkyl_Iodide_Borylation.json",
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Alkyl_Iodide_Borylation",
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "b2pin2": [
-      "Alkyl_Iodide_Borylation.json"
+      "Alkyl_Iodide_Borylation"
     ],
     "liotbu": [
-      "Alkyl_Iodide_Borylation.json"
+      "Alkyl_Iodide_Borylation"
     ],
     "meoh": [
-      "Alkyl_Iodide_Borylation.json"
+      "Alkyl_Iodide_Borylation"
     ],
     "orgsyn v99p0015": [
-      "Alkyl_Iodide_Borylation.json"
+      "Alkyl_Iodide_Borylation"
     ],
     "palladium": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json",
-      "Aryl_Iodide_Cyanation.json",
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json",
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json",
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099",
+      "Aryl_Iodide_Cyanation",
+      "pd_acetylation_aryl_bromide_Garg_v98p0068",
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos",
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "enamine": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099"
     ],
     "α-arylation": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099"
     ],
     "ketone": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099"
     ],
     "cyclopentanone": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099"
     ],
     "pressure vessel": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099"
     ],
     "dioxane": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099",
+      "Suzuki_protocols[0]"
     ],
     "argon": [
-      "alpha_arylation_Pd_enamine_Dong_v100p0099.json",
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json"
+      "alpha_arylation_Pd_enamine_Dong_v100p0099",
+      "pd_acetylation_aryl_bromide_Garg_v98p0068"
     ],
     "suzuki": [
-      "Aryl mesylate_Suzuki.json"
+      "Aryl mesylate_Suzuki",
+      "Suzuki_protocols[0]",
+      "Suzuki_protocols[1]",
+      "Suzuki_protocols[2]",
+      "Suzuki_protocols[3]"
     ],
     "aryl mesylate": [
-      "Aryl mesylate_Suzuki.json",
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json"
+      "Aryl mesylate_Suzuki",
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos"
     ],
     "phenylboronic acid": [
-      "Aryl mesylate_Suzuki.json"
+      "Aryl mesylate_Suzuki",
+      "Suzuki_protocols[3]"
     ],
     "pd(oac)2": [
-      "Aryl mesylate_Suzuki.json"
+      "Aryl mesylate_Suzuki"
     ],
     "cm-phos": [
-      "Aryl mesylate_Suzuki.json",
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json"
+      "Aryl mesylate_Suzuki",
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos"
     ],
     "k3po4": [
-      "Aryl mesylate_Suzuki.json",
-      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json"
+      "Aryl mesylate_Suzuki",
+      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH"
     ],
     "tert-butanol": [
-      "Aryl mesylate_Suzuki.json",
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json"
+      "Aryl mesylate_Suzuki",
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos"
     ],
     "orgsyn v92p0195 step c": [
-      "Aryl mesylate_Suzuki.json"
+      "Aryl mesylate_Suzuki"
     ],
     "cyanation": [
-      "Aryl_Iodide_Cyanation.json"
+      "Aryl_Iodide_Cyanation"
     ],
     "aryl iodide": [
-      "Aryl_Iodide_Cyanation.json"
+      "Aryl_Iodide_Cyanation"
     ],
     "xantphos": [
-      "Aryl_Iodide_Cyanation.json"
+      "Aryl_Iodide_Cyanation"
     ],
     "ferrocyanide": [
-      "Aryl_Iodide_Cyanation.json"
+      "Aryl_Iodide_Cyanation"
     ],
     "dmac": [
-      "Aryl_Iodide_Cyanation.json",
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Aryl_Iodide_Cyanation",
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "orgsyn v97p0314": [
-      "Aryl_Iodide_Cyanation.json"
+      "Aryl_Iodide_Cyanation"
     ],
     "cyanation, cu, copper, alkenyl_iodide, coupling": [
-      "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA.json"
+      "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA"
     ],
     "rcm": [
-      "Grubbs_RCM_Ferguson_2003.json"
+      "Grubbs_RCM_Ferguson_2003"
     ],
     "grubbs-1": [
-      "Grubbs_RCM_Ferguson_2003.json"
+      "Grubbs_RCM_Ferguson_2003"
     ],
     "ruthenium carbene": [
-      "Grubbs_RCM_Ferguson_2003.json"
+      "Grubbs_RCM_Ferguson_2003"
     ],
     "dcm": [
-      "Grubbs_RCM_Ferguson_2003.json"
+      "Grubbs_RCM_Ferguson_2003"
     ],
     "nitrogen": [
-      "Grubbs_RCM_Ferguson_2003.json",
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "Grubbs_RCM_Ferguson_2003",
+      "Suzuki_protocols[0]",
+      "Suzuki_protocols[3]",
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "reflux": [
-      "Grubbs_RCM_Ferguson_2003.json"
+      "Grubbs_RCM_Ferguson_2003",
+      "Suzuki_protocols[1]"
     ],
     "nickel": [
-      "Ni_Cross_Electrophile_Acylation.json",
-      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json"
+      "Ni_Cross_Electrophile_Acylation",
+      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH"
     ],
     "cross-electrophile": [
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "acylation": [
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "dtbbpy": [
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "mn": [
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "acid chloride": [
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "orgsyn v93p0050": [
-      "Ni_Cross_Electrophile_Acylation.json"
+      "Ni_Cross_Electrophile_Acylation"
     ],
     "suzuki–miyaura": [
-      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json"
+      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH"
     ],
     "t-amyl alcohol": [
-      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json"
+      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH"
     ],
     "low-loading (0.5 mol %)": [
-      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json"
+      "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH"
     ],
     "aryl bromide": [
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json",
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "pd_acetylation_aryl_bromide_Garg_v98p0068",
+      "Suzuki_protocols[0]",
+      "Suzuki_protocols[1]",
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "acetylation": [
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json"
+      "pd_acetylation_aryl_bromide_Garg_v98p0068"
     ],
     "silyl enol": [
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json"
+      "pd_acetylation_aryl_bromide_Garg_v98p0068"
     ],
     "cesium fluoride": [
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json"
+      "pd_acetylation_aryl_bromide_Garg_v98p0068"
     ],
     "1,2-dichloroethane": [
-      "pd_acetylation_aryl_bromide_Garg_v98p0068.json"
+      "pd_acetylation_aryl_bromide_Garg_v98p0068"
     ],
     "buchwald–hartwig amination": [
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json"
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos"
     ],
     "k2co3": [
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json"
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos",
+      "Suzuki_protocols[0]"
     ],
     "phenylboronic acid additive": [
-      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json"
+      "Pd_Buchwald_Arylsulfonate_Amination_CMPhos"
     ],
     "conjugate addition": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "alkyne": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "enone": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "water": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone",
+      "Suzuki_protocols[0]"
     ],
     "pme3": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "biphasic": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "vigorous stirring": [
-      "Pd_Conjugate_Addition_Alkyne_to_Enone.json"
+      "Pd_Conjugate_Addition_Alkyne_to_Enone"
     ],
     "mitsunobu": [
-      "Renaudet_Reymond_2004_Mitsunobu.json"
+      "Renaudet_Reymond_2004_Mitsunobu"
     ],
     "etherification": [
-      "Renaudet_Reymond_2004_Mitsunobu.json"
+      "Renaudet_Reymond_2004_Mitsunobu"
     ],
     "phenol": [
-      "Renaudet_Reymond_2004_Mitsunobu.json"
+      "Renaudet_Reymond_2004_Mitsunobu"
     ],
     "diad": [
-      "Renaudet_Reymond_2004_Mitsunobu.json"
+      "Renaudet_Reymond_2004_Mitsunobu"
     ],
     "pph3": [
-      "Renaudet_Reymond_2004_Mitsunobu.json"
+      "Renaudet_Reymond_2004_Mitsunobu"
     ],
     "thf": [
-      "Renaudet_Reymond_2004_Mitsunobu.json"
+      "Renaudet_Reymond_2004_Mitsunobu"
     ],
     "sonogashira, pd, coupling": [
-      "Sonogashira-Coupling.json"
+      "Sonogashira-Coupling"
     ],
     "suzuki, cu, alkyl_halide, coupling": [
-      "Suzuki_Cu_C(sp3)-C(sp2).json"
+      "Suzuki_Cu_C(sp3)-C(sp2)"
+    ],
+    "aryl boronate": [
+      "Suzuki_protocols[0]"
+    ],
+    "pd(pph3)4": [
+      "Suzuki_protocols[0]",
+      "Suzuki_protocols[2]"
+    ],
+    "4-fluorophenylboronic acid": [
+      "Suzuki_protocols[1]",
+      "Suzuki_protocols[2]"
+    ],
+    "pd(dppf)cl2·ch2cl2": [
+      "Suzuki_protocols[1]"
+    ],
+    "na2co3": [
+      "Suzuki_protocols[1]",
+      "Suzuki_protocols[2]"
+    ],
+    "toluene": [
+      "Suzuki_protocols[1]",
+      "Suzuki_protocols[2]"
+    ],
+    "aryl triflate": [
+      "Suzuki_protocols[2]"
+    ],
+    "ethanol": [
+      "Suzuki_protocols[2]"
+    ],
+    "90c": [
+      "Suzuki_protocols[2]"
+    ],
+    "aryl chloride": [
+      "Suzuki_protocols[3]"
+    ],
+    "pdcl2(pcy3)2": [
+      "Suzuki_protocols[3]"
+    ],
+    "csf": [
+      "Suzuki_protocols[3]"
+    ],
+    "nmp": [
+      "Suzuki_protocols[3]"
+    ],
+    "100c": [
+      "Suzuki_protocols[3]"
     ],
     "visible light": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "c–s coupling": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "aryl thiol": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "cesium carbonate": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "dmso": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "kessil pr160": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ],
     "456 nm": [
-      "visible_light_CS_coupling_Miyake_v100p0234.json"
+      "visible_light_CS_coupling_Miyake_v100p0234"
     ]
   }
 }

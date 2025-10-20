@@ -1,4 +1,4 @@
-{
+[{
   "source": {
     "title": "N‑Carboxylated‑2‑substituted Indoles and 2,3‑Disubstituted‑2,3‑dihydro‑4‑quinolones from 2‑Alkynylbenzamides — Step A: 2‑(1‑Hexynyl)benzamide",
     "journal": "Organic Syntheses",
@@ -160,3 +160,4 @@
   ],
   "original_procedure": "Step A (paraphrased): In a 500‑mL flask, combine 2‑iodobenzamide (80 mmol), PPh3 (0.02 equiv), CuI (0.01 equiv), Pd(OAc)2 (0.01 equiv), DMF (40 mL), Et3N (120 mL), and 1‑hexyne (1.3 equiv). Purge with N2 and stir at 60 °C for 16 h. Dilute with EtOAc; wash with sat. NH4Cl and brine; dry (Na2SO4), filter, and concentrate. Purify by silica gel chromatography to give 2‑(1‑hexynyl)benzamide (≈90% yield)."
 }
+]

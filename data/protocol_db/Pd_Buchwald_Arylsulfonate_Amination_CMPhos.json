@@ -1,199 +1,199 @@
-{
-  "source": {
-    "title": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
-    "journal": "Organic Syntheses",
-    "volume": 92,
-    "pages": "195-212",
-    "year": 2015,
-    "doi": "10.15227/orgsyn.092.0195",
-    "url": "https://www.orgsyn.org/demo.aspx?prep=v92p0195",
-    "authors": [
-      "Shun Man Wong",
-      "Pui Ying Choy",
-      "On Ying Yuen",
-      "Chau Ming So",
-      "Fuk Yee Kwong"
-    ]
-  },
-  "reaction": {
-    "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.CNc2ccccc2>>CC(C)(C)c1ccc(N(C)c2ccccc2)cc1",
-    "reaction_SMARTS": [
-      "[c,n,o,s]OS(=O)(=O)C.N>>[c,n,o,s]N"
+[
+  {
+    "source": {
+      "title": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
+      "journal": "Organic Syntheses",
+      "volume": 92,
+      "pages": "195-212",
+      "year": 2015,
+      "doi": "10.15227/orgsyn.092.0195",
+      "url": "https://www.orgsyn.org/demo.aspx?prep=v92p0195",
+      "authors": [
+        "Shun Man Wong",
+        "Pui Ying Choy",
+        "On Ying Yuen",
+        "Chau Ming So",
+        "Fuk Yee Kwong"
+      ]
+    },
+    "reaction": {
+      "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.CNc2ccccc2>>CC(C)(C)c1ccc(N(C)c2ccccc2)cc1",
+      "reaction_SMARTS": ["[c,n,o,s]OS(=O)(=O)C.N>>[c,n,o,s]N"],
+      "compatible_functional_groups": [],
+      "incompatible_functional_groups": [],
+      "family": "Pd_Buchwald_Arylsulfonate_Amination_CMPhos",
+      "notes": "Second step (amination) only: Pd(OAc)2/CM-Phos-catalyzed Buchwald–Hartwig amination of 4-(tert-butyl)phenyl mesylate with N-methylaniline in tert-butanol at 120 °C for 24 h under N2. Catalyst pre-activation in DCM/Et3N, then solvent removal prior to coupling.",
+      "tags": "palladium; CM-Phos; aryl mesylate; Buchwald–Hartwig amination; tert-butanol; K2CO3; phenylboronic acid additive"
+    },
+    "reaction_setup": [
+      {
+        "chemicals": [
+          {
+            "name": "Palladium(II) acetate",
+            "abbreviation": "Pd(OAc)2",
+            "cas": "3375-31-3",
+            "smiles": "[Pd++].CC([O-])=O.CC([O-])=O",
+            "amount": {
+              "weight_g": 0.0393,
+              "mmol": 0.175,
+              "volume_ml": null,
+              "equivalents": 0.01
+            },
+            "role": "metal_precursor"
+          },
+          {
+            "name": "CM-Phos (2-[2-(dicyclohexylphosphino)phenyl]-1-methyl-1H-indole)",
+            "abbreviation": "CM-Phos",
+            "cas": "1067883-58-2",
+            "smiles": "Cn1c(cc2ccccc12)-c3ccccc3P(C4CCCCC4)C5CCCCC5",
+            "amount": {
+              "weight_g": 0.282,
+              "mmol": 0.7,
+              "volume_ml": null,
+              "equivalents": 0.04
+            },
+            "role": "ligand"
+          },
+          {
+            "name": "Dichloromethane",
+            "abbreviation": "DCM",
+            "cas": "75-09-2",
+            "smiles": "C(Cl)Cl",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 18.0,
+              "equivalents": null
+            },
+            "role": "solvent"
+          },
+          {
+            "name": "Triethylamine",
+            "abbreviation": "Et3N",
+            "cas": "121-44-8",
+            "smiles": "CCN(CC)CC",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 1.8,
+              "equivalents": null
+            },
+            "role": "base"
+          },
+          {
+            "name": "Potassium carbonate",
+            "abbreviation": "K2CO3",
+            "cas": "584-08-7",
+            "smiles": "[K+].[K+].[O-]C(=O)[O-]",
+            "amount": {
+              "weight_g": 6.05,
+              "mmol": 43.8,
+              "volume_ml": null,
+              "equivalents": 2.5
+            },
+            "role": "base"
+          },
+          {
+            "name": "Phenylboronic acid",
+            "abbreviation": null,
+            "cas": "98-80-6",
+            "smiles": "B(c1ccccc1)(O)O",
+            "amount": {
+              "weight_g": 0.0427,
+              "mmol": 0.35,
+              "volume_ml": null,
+              "equivalents": 0.02
+            },
+            "role": "additive"
+          },
+          {
+            "name": "4-(tert-Butyl)phenyl methanesulfonate",
+            "abbreviation": null,
+            "cas": "59970-38-6",
+            "smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1",
+            "amount": {
+              "weight_g": 3.99,
+              "mmol": 17.5,
+              "volume_ml": null,
+              "equivalents": 1.0
+            },
+            "role": "starting_material"
+          },
+          {
+            "name": "N-Methylaniline",
+            "abbreviation": null,
+            "cas": "100-61-8",
+            "smiles": "CNc1ccccc1",
+            "amount": {
+              "weight_g": null,
+              "mmol": 26.3,
+              "volume_ml": 2.85,
+              "equivalents": 1.5
+            },
+            "role": "starting_material"
+          },
+          {
+            "name": "tert-Butyl alcohol (2-methyl-2-propanol)",
+            "abbreviation": "t-BuOH",
+            "cas": "75-65-0",
+            "smiles": "CC(C)(C)O",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 70.0,
+              "equivalents": null
+            },
+            "role": "solvent"
+          }
+        ],
+        "conditions": [
+          {
+            "temperature_C": 50,
+            "time_h": 0.083,
+            "atmosphere": "N2; pre-activate Pd(OAc)2 with CM-Phos in DCM/Et3N; sealed Schlenk; oil bath"
+          },
+          {
+            "temperature_C": null,
+            "time_h": 1.0,
+            "atmosphere": "Vacuum 0.01 mmHg to remove volatiles"
+          },
+          {
+            "temperature_C": 23,
+            "time_h": 0.167,
+            "atmosphere": "N2; after charging K2CO3, phenylboronic acid, mesylate, N-methylaniline and t-BuOH; stir 10 min at rt"
+          },
+          {
+            "temperature_C": 120,
+            "time_h": 24.0,
+            "atmosphere": "N2; sealed Schlenk; oil bath"
+          }
+        ]
+      }
     ],
-    "compatible_functional_groups": [],
-    "incompatible_functional_groups": [],
-    "family": "Pd_Buchwald_Arylsulfonate_Amination_CMPhos",
-    "notes": "Second step (amination) only: Pd(OAc)2/CM-Phos-catalyzed Buchwald–Hartwig amination of 4-(tert-butyl)phenyl mesylate with N-methylaniline in tert-butanol at 120 °C for 24 h under N2. Catalyst pre-activation in DCM/Et3N, then solvent removal prior to coupling.",
-    "tags": "palladium; CM-Phos; aryl mesylate; Buchwald–Hartwig amination; tert-butanol; K2CO3; phenylboronic acid additive"
-  },
-  "reaction_setup": [
-    {
-      "chemicals": [
-        {
-          "name": "Palladium(II) acetate",
-          "abbreviation": "Pd(OAc)2",
-          "cas": "3375-31-3",
-          "smiles": "[Pd++].CC([O-])=O.CC([O-])=O",
-          "amount": {
-            "weight_g": 0.0393,
-            "mmol": 0.175,
-            "volume_ml": null,
-            "equivalents": 0.01
-          },
-          "role": "metal_precursor"
-        },
-        {
-          "name": "CM-Phos (2-[2-(dicyclohexylphosphino)phenyl]-1-methyl-1H-indole)",
-          "abbreviation": "CM-Phos",
-          "cas": "1067883-58-2",
-          "smiles": "Cn1c(cc2ccccc12)-c3ccccc3P(C4CCCCC4)C5CCCCC5",
-          "amount": {
-            "weight_g": 0.282,
-            "mmol": 0.7,
-            "volume_ml": null,
-            "equivalents": 0.04
-          },
-          "role": "ligand"
-        },
-        {
-          "name": "Dichloromethane",
-          "abbreviation": "DCM",
-          "cas": "75-09-2",
-          "smiles": "C(Cl)Cl",
-          "amount": {
-            "weight_g": null,
-            "mmol": null,
-            "volume_ml": 18.0,
-            "equivalents": null
-          },
-          "role": "solvent"
-        },
-        {
-          "name": "Triethylamine",
-          "abbreviation": "Et3N",
-          "cas": "121-44-8",
-          "smiles": "CCN(CC)CC",
-          "amount": {
-            "weight_g": null,
-            "mmol": null,
-            "volume_ml": 1.8,
-            "equivalents": null
-          },
-          "role": "base"
-        },
-        {
-          "name": "Potassium carbonate",
-          "abbreviation": "K2CO3",
-          "cas": "584-08-7",
-          "smiles": "[K+].[K+].[O-]C(=O)[O-]",
-          "amount": {
-            "weight_g": 6.05,
-            "mmol": 43.8,
-            "volume_ml": null,
-            "equivalents": 2.5
-          },
-          "role": "base"
-        },
-        {
-          "name": "Phenylboronic acid",
-          "abbreviation": null,
-          "cas": "98-80-6",
-          "smiles": "B(c1ccccc1)(O)O",
-          "amount": {
-            "weight_g": 0.0427,
-            "mmol": 0.35,
-            "volume_ml": null,
-            "equivalents": 0.02
-          },
-          "role": "additive"
-        },
-        {
-          "name": "4-(tert-Butyl)phenyl methanesulfonate",
-          "abbreviation": null,
-          "cas": "59970-38-6",
-          "smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1",
-          "amount": {
-            "weight_g": 3.99,
-            "mmol": 17.5,
-            "volume_ml": null,
-            "equivalents": 1.0
-          },
-          "role": "starting_material"
-        },
-        {
-          "name": "N-Methylaniline",
-          "abbreviation": null,
-          "cas": "100-61-8",
-          "smiles": "CNc1ccccc1",
-          "amount": {
-            "weight_g": null,
-            "mmol": 26.3,
-            "volume_ml": 2.85,
-            "equivalents": 1.5
-          },
-          "role": "starting_material"
-        },
-        {
-          "name": "tert-Butyl alcohol (2-methyl-2-propanol)",
-          "abbreviation": "t-BuOH",
-          "cas": "75-65-0",
-          "smiles": "CC(C)(C)O",
-          "amount": {
-            "weight_g": null,
-            "mmol": null,
-            "volume_ml": 70.0,
-            "equivalents": null
-          },
-          "role": "solvent"
-        }
-      ],
-      "conditions": [
-        {
-          "temperature_C": 50,
-          "time_h": 0.083,
-          "atmosphere": "N2; pre-activate Pd(OAc)2 with CM-Phos in DCM/Et3N; sealed Schlenk; oil bath"
-        },
-        {
-          "temperature_C": null,
-          "time_h": 1.0,
-          "atmosphere": "Vacuum 0.01 mmHg to remove volatiles"
-        },
-        {
-          "temperature_C": 23,
-          "time_h": 0.167,
-          "atmosphere": "N2; after charging K2CO3, phenylboronic acid, mesylate, N-methylaniline and t-BuOH; stir 10 min at rt"
-        },
-        {
-          "temperature_C": 120,
-          "time_h": 24.0,
-          "atmosphere": "N2; sealed Schlenk; oil bath"
-        }
-      ]
-    }
-  ],
-  "workup_and_purification": [
-    {
-      "quench": [
-        "Cool to room temperature; transfer to separatory funnel.",
-        "Rinse reaction flask with ether (2 × 50 mL), brine (2 × 50 mL), water (50 mL), and ether (50 mL); add all rinses to funnel."
-      ],
-      "workup": [
-        "Separate layers; extract aqueous with ether (2 × 50 mL).",
-        "Dry combined organics over Na2SO4 (5 g); filter; rinse Na2SO4 with ether (50 mL).",
-        "Concentrate on rotary evaporator (40 °C, 12 mmHg) to brown oil."
-      ],
-      "purification": [
-        {
-          "method": "Flash column chromatography",
-          "stationary_phase": "Silica gel (130 g; 4.5 cm ID × 16 cm packed height)",
-          "eluent": "Hexane (130 mL), then CH2Cl2/hexane (1:49) until product is eluted",
-          "fractions": "Collect 100 mL fractions; combine product fractions"
-        }
-      ],
-      "notes": [
-        "Product: 4-(tert-Butyl)-N-methyl-N-phenylaniline obtained as pale-yellow liquid, 3.60–3.85 g (86–92%)."
-      ]
-    }
-  ],
-  "original_procedure": "In a resealable Schlenk flask under N2, Pd(OAc)2 (1.0 mol%) and CM‑Phos (4.0 mol%) are combined with DCM (18 mL) and Et3N (1.8 mL). After 5 min in a 50 °C oil bath, volatiles are removed (0.01 mmHg, 1 h). K2CO3 (2.5 equiv), phenylboronic acid (0.2 equiv), 4-(tert‑butyl)phenyl mesylate (1.0 equiv), N‑methylaniline (≈1.5 equiv), and tert‑butyl alcohol (70 mL) are added under N2. Stir 10 min at rt, then heat at 120 °C for 24 h. Work up by dilution/extraction, dry (Na2SO4), concentrate, and purify by silica gel chromatography (hexane then CH2Cl2/hexane 1:49) to afford the tertiary aniline."
-}
+    "workup_and_purification": [
+      {
+        "quench": [
+          "Cool to room temperature; transfer to separatory funnel.",
+          "Rinse reaction flask with ether (2 × 50 mL), brine (2 × 50 mL), water (50 mL), and ether (50 mL); add all rinses to funnel."
+        ],
+        "workup": [
+          "Separate layers; extract aqueous with ether (2 × 50 mL).",
+          "Dry combined organics over Na2SO4 (5 g); filter; rinse Na2SO4 with ether (50 mL).",
+          "Concentrate on rotary evaporator (40 °C, 12 mmHg) to brown oil."
+        ],
+        "purification": [
+          {
+            "method": "Flash column chromatography",
+            "stationary_phase": "Silica gel (130 g; 4.5 cm ID × 16 cm packed height)",
+            "eluent": "Hexane (130 mL), then CH2Cl2/hexane (1:49) until product is eluted",
+            "fractions": "Collect 100 mL fractions; combine product fractions"
+          }
+        ],
+        "notes": [
+          "Product: 4-(tert-Butyl)-N-methyl-N-phenylaniline obtained as pale-yellow liquid, 3.60–3.85 g (86–92%)."
+        ]
+      }
+    ],
+    "original_procedure": "In a resealable Schlenk flask under N2, Pd(OAc)2 (1.0 mol%) and CM‑Phos (4.0 mol%) are combined with DCM (18 mL) and Et3N (1.8 mL). After 5 min in a 50 °C oil bath, volatiles are removed (0.01 mmHg, 1 h). K2CO3 (2.5 equiv), phenylboronic acid (0.2 equiv), 4-(tert‑butyl)phenyl mesylate (1.0 equiv), N‑methylaniline (≈1.5 equiv), and tert‑butyl alcohol (70 mL) are added under N2. Stir 10 min at rt, then heat at 120 °C for 24 h. Work up by dilution/extraction, dry (Na2SO4), concentrate, and purify by silica gel chromatography (hexane then CH2Cl2/hexane 1:49) to afford the tertiary aniline."
+  }
+]
