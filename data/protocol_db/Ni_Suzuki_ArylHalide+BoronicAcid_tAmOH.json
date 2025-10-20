@@ -14,7 +14,7 @@
   },
   "reaction": {
     "reaction_smiles": "Brc1cncnc1.OB(O)c1ccoc1>>C1(C2=COC=C2)=CN=CN=C1",
-    "reaction_SMARTS": ["[Cl,Br,I][c,n,o,s].OB([c,n,o,s])O>>[c,n,o,s][c,n,o,s]"],
+    "reaction_SMARTS": ["[Br][c,n].[c,o]B>>"],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
     "family": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",

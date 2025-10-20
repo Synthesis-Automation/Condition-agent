@@ -52,6 +52,7 @@ def print_recommendations(results: dict, pretty: bool = False):
     meta = results.get('meta', {})
     detection = results.get('detection', {})
     recommendations = results.get('recommended_conditions', [])
+    extras = results.get('extras', {})
     
     print("=" * 70)
     print("Protocol Recommendations")
@@ -63,6 +64,12 @@ def print_recommendations(results: dict, pretty: bool = False):
     print(f"Status: {meta.get('status', 'Unknown')}")
     print(f"Processing time: {meta.get('processing_time_ms', 0):.1f} ms")
     print()
+    
+    # SMARTS filter warning (if any)
+    if extras.get('smarts_filter_warning'):
+        print("⚠️  SMARTS FILTER WARNING:")
+        print(f"    {extras['smarts_filter_warning']}")
+        print()
     
     # Detection info
     print(f"Detected type: {detection.get('detected_type', 'Unknown')}")
@@ -79,6 +86,10 @@ def print_recommendations(results: dict, pretty: bool = False):
     # Recommendations
     if not recommendations:
         print("No matching protocols found.")
+        # Show additional info about filtering
+        if extras.get('num_before_smarts_filter'):
+            print(f"\nNote: {extras['num_before_smarts_filter']} protocol(s) were eliminated by SMARTS filtering.")
+            print("Try using --no-smarts-filter to see all protocols ranked by DRFP similarity.")
         return
     
     print(f"Found {len(recommendations)} matching protocol(s):")

@@ -221,3 +221,80 @@ if rxn_pattern:
 else:
     print("❌ Pattern failed to parse")
 ```
+
+## Important: Aromaticity Sanitization
+
+### ⚠️ Critical Discovery (Oct 2025)
+
+When extracting molecules from reactions using `AllChem.ReactionFromSmarts(smiles, useSmiles=True)`, the resulting molecules **do not have aromaticity perceived by default**. This causes aromatic SMARTS patterns (using `[c]`, `[n]`, `[o]`, `[s]`) to fail matching even when they should match.
+
+**Example of the Problem**:
+
+```python
+from rdkit import Chem
+from rdkit.Chem import AllChem
+
+# This works fine - standalone molecule
+mol = Chem.MolFromSmiles("BrC1=CC=CC=C1")
+pattern = Chem.MolFromSmarts("[Br][c]")
+print(mol.HasSubstructMatch(pattern))  # ✅ True
+
+# This fails - molecule from reaction
+rxn = AllChem.ReactionFromSmarts("BrC1=CC=CC=C1.CC([Si](C)(C)C)=O>>CC(C2=CC=CC=C2)=O", useSmiles=True)
+reactants = rxn.GetReactants()
+r0 = reactants[0]
+print(r0.HasSubstructMatch(pattern))  # ❌ False - aromaticity not perceived!
+
+# Fix: Sanitize the molecule first
+Chem.SanitizeMol(r0)
+print(r0.HasSubstructMatch(pattern))  # ✅ True - now works!
+```
+
+### Solution Implemented
+
+Both `validate_protocols.py` and `recommend.py` now automatically sanitize molecules extracted from reactions:
+
+```python
+# Get molecules from reaction
+rxn_reactants = rxn_mol.GetReactants()
+rxn_products = rxn_mol.GetProducts()
+
+# CRITICAL: Sanitize to ensure aromaticity perception
+for mol in rxn_reactants:
+    Chem.SanitizeMol(mol)
+for mol in rxn_products:
+    Chem.SanitizeMol(mol)
+
+# Now aromatic SMARTS patterns will work correctly
+```
+
+### When This Matters
+
+This is critical when your SMARTS patterns include:
+
+- Aromatic atoms: `[c]`, `[n]`, `[o]`, `[s]`
+- Aromatic bonds: `:` (e.g., `c:c`)
+- Ring aromaticity: `a` (aromatic atom)
+
+**Without sanitization**, patterns like:
+
+- `[Br][c]` (bromobenzene)
+- `[c]B` (aryl boronic acid)
+- `C#C[c]` (phenylacetylene)
+
+...will **fail to match** even valid aromatic structures.
+
+### Best Practice
+
+If you're writing custom code that uses `AllChem.ReactionFromSmarts()` with reaction SMILES:
+
+```python
+# Always sanitize molecules extracted from reactions
+rxn = AllChem.ReactionFromSmarts(reaction_smiles, useSmiles=True)
+for mol in rxn.GetReactants():
+    Chem.SanitizeMol(mol)
+for mol in rxn.GetProducts():
+    Chem.SanitizeMol(mol)
+```
+
+This ensures aromatic SMARTS patterns work as expected.

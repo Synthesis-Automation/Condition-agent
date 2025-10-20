@@ -11,7 +11,7 @@
   "reaction": {
     "reaction_smiles": "OCc1ccccc1.O=Cc1ccc(O)cc1>>O=Cc1ccc(OCc2ccccc2)cc1",
     "reaction_SMARTS": [
-      "OC.[c,C,n,o,s]O>>[c,C,n,o,s]OC"
+      "OC.[c,n,o,s]O>>[c,n,o,s]OC"
     ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],

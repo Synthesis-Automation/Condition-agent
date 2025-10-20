@@ -16,7 +16,7 @@
   "reaction": {
     "reaction_smiles": "BrC1=CC=CC=C1.CC([Si](C)(C)C)=O>>CC(C2=CC=CC=C2)=O",
     "reaction_SMARTS": [
-      "Br[c,C,n,o,s].CC([Si])=O>>CC([c,C,n,o,s])=O"
+      "[Br][c].CC([Si])=O>>CC([c])=O"
     ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],

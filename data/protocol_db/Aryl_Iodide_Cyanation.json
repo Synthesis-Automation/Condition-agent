@@ -10,7 +10,7 @@
   },
   "reaction": {
     "reaction_smiles": "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43",
-    "reaction_SMARTS": ["IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43"],
+    "reaction_SMARTS": ["I[c,n,o,s]>>N#C[c,n,o,s]"],
     "compatible_functional_groups": ["aromatic"],
     "incompatible_functional_groups": ["carboxylic acid"],
     "family": "Aryl_Iodide_Cyanation",
