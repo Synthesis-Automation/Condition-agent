@@ -277,3 +277,16 @@ def get_drfp_path_for_family(family: str, data_dir: str = "data/reaction_dataset
         Path to DRFP NPZ file (e.g., "data/reaction_dataset/C_N_Coupling_drfp.npz")
     """
     return os.path.join(data_dir, f"{family}_drfp.npz")
+
+
+def get_unified_drfp_path(data_dir: str = "data/reaction_dataset") -> str:
+    """
+    Get the path to unified cross-family DRFP NPZ file.
+    
+    Args:
+        data_dir: Directory containing reaction datasets
+    
+    Returns:
+        Path to unified DRFP NPZ file
+    """
+    return os.path.join(data_dir, "ALL_FAMILIES_drfp.npz")

@@ -384,18 +384,20 @@ class RecommendNamespace:
                    constraints: Optional[Dict] = None, 
                    rerank_strategy: str = 'rule',
                    filter_unknown_reagents: bool = False,
+                   search_all_families: bool = False,
                    **kwargs) -> Dict[str, Any]:
         """Get ML-based condition recommendations.
         
         Args:
             reaction: Reaction SMILES
-            reaction_type: Optional reaction type hint
+            reaction_type: Optional reaction type hint (ignored if search_all_families=True)
             k: Number of precedents for each recommendation
             limit: Maximum recommendations to return
             relax: Relaxation rules
             constraints: Constraint rules
             rerank_strategy: 'rule', 'analytics', or 'none' (default: 'rule')
             filter_unknown_reagents: Filter precedents with unknown reagents (default: False)
+            search_all_families: Search across all reaction datasets (default: False)
             **kwargs: Additional parameters
             
         Returns:
@@ -411,6 +413,7 @@ class RecommendNamespace:
             constraints=constraints or {},
             rerank_strategy=rerank_strategy,
             filter_unknown_reagents=filter_unknown_reagents,
+            search_all_families=search_all_families,
         )
     
     def from_reaction(self, reaction: str, k: int = 5, relax: Optional[Dict] = None,

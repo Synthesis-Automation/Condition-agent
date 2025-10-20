@@ -22,6 +22,7 @@ def recommend_conditions_structured(
     constraints: Optional[Dict[str, Any]] = None,
     rerank_strategy: str = 'rule',
     filter_unknown_reagents: bool = False,
+    search_all_families: bool = False,
     _recommend_fn=None,  # Injected to avoid circular imports
 ) -> Dict[str, Any]:
     """
@@ -32,13 +33,14 @@ def recommend_conditions_structured(
     
     Args:
         reaction: Reaction SMILES string
-        reaction_type: Optional reaction type override
+        reaction_type: Optional reaction type override (ignored if search_all_families=True)
         k: Number of precedents (default: 50 for better coverage)
         limit: Maximum number of recommendations to return (default: 5)
         relax: Relaxation parameters for precedent search
         constraints: Constraint rules (inventory, blacklist, etc.)
         rerank_strategy: 'rule', 'analytics', or 'none' (default: 'rule')
         filter_unknown_reagents: Filter precedents with unknown reagents (default: False)
+        search_all_families: Search across all reaction families (default: False)
     
     Returns:
         Dict with keys:
@@ -68,6 +70,7 @@ def recommend_conditions_structured(
         max_variants=limit,
         rerank_strategy=rerank_strategy,
         filter_unknown_reagents=filter_unknown_reagents,
+        search_all_families=search_all_families,
     )
     
     # Calculate processing time

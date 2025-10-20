@@ -28,11 +28,12 @@ except ImportError:
 
 # Import DRFP binary storage utilities
 try:
-    from ..util.drfp_storage import DRFPLoader, get_drfp_path_for_family
+    from ..util.drfp_storage import DRFPLoader, get_drfp_path_for_family, get_unified_drfp_path
     _drfp_storage_available = True
 except ImportError:
     DRFPLoader = None  # type: ignore
     get_drfp_path_for_family = None  # type: ignore
+    get_unified_drfp_path = None  # type: ignore
     _drfp_storage_available = False
 
 # Global cache for DRFP loaders (one per family)
@@ -47,7 +48,7 @@ def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str,
     
     Args:
         rows: All loaded precedent rows
-        family_txt: Canonical family name
+        family_txt: Canonical family name (or None/"All" for cross-family search)
         feat: Query feature dict
         k: Target number of results
         relax: Relaxation configuration dict
@@ -55,8 +56,11 @@ def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str,
     Returns:
         List of candidate precedent rows
     """
-    # Filter rows to family first
-    fam_rows = [r for r in rows if (r.get("rxn_type") or "") == family_txt]
+    # Filter rows to family first (or use all if family is None/"All")
+    if family_txt is None or family_txt.lower() in ["all", "none", ""]:
+        fam_rows = rows  # Use all reactions regardless of family
+    else:
+        fam_rows = [r for r in rows if (r.get("rxn_type") or "") == family_txt]
     
     # Optional catalyst class filter
     cat_filter = None
@@ -127,13 +131,14 @@ def _knn_cached(family: str, features_kv: Tuple[Tuple[str, Any], ...], k: int, r
     return _knn_impl(family, features, k, relax)
 
 
-def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
+def knn(family: str | None, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
     """Find k nearest neighbor precedents for a reaction.
     
     Main public API for precedent search. Uses cached implementation for performance.
     
     Args:
-        family: Reaction family name (e.g., "C_N_Coupling", "Suzuki")
+        family: Reaction family name (e.g., "C_N_Coupling", "Suzuki"), or None/"All" 
+                to search across all reaction families (cross-family search)
         features: Query feature dict (bin, LG, nuc_class, etc.)
         k: Number of precedents to return (default: 50)
         relax: Optional relaxation/configuration dict with options:
@@ -141,6 +146,7 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
               reagents are found in the reagent database (default: True)
             - use_drfp (bool): Use DRFP-based similarity (default: False)
             - selective_loading (bool): Load only requested family (default: True)
+              Note: Automatically set to False when family=None/"All"
             - debug_timing (bool): Log timing information (default: False)
         
     Returns:
@@ -149,6 +155,10 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
     Example:
         >>> # Get precedents with database filtering (default)
         >>> pack = knn("C_N_Coupling", features={}, k=25)
+        >>> 
+        >>> # Search across all reaction families (cross-family search)
+        >>> pack = knn(None, features={}, k=25, 
+        ...            relax={"use_drfp": True, "reaction_smiles": "..."})
         >>> 
         >>> # Disable database filtering to get all precedents
         >>> pack = knn("C_N_Coupling", features={}, k=25, 
@@ -159,27 +169,40 @@ def knn(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any
     # Set default: enable reagent database filtering
     relax_dict.setdefault("filter_by_reagent_database", True)
     
+    # For cross-family search, disable selective loading (must load all families)
+    if family is None or (isinstance(family, str) and family.lower() in ["all", "none", ""]):
+        relax_dict["selective_loading"] = False
+    
     molpipeline_cfg = relax_dict.pop('molpipeline', None)
-    out = _knn_cached(family, _as_kv(features or {}), int(k), _as_kv(relax_dict))
+    family_key = family if family is not None else "__ALL__"  # Use special key for caching
+    out = _knn_cached(family_key, _as_kv(features or {}), int(k), _as_kv(relax_dict))
     pack = {**out}
     if molpipeline_cfg:
         pack = _attach_molpipeline_features(pack, molpipeline_cfg)
     return pack
 
 
-def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
+def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:
     """
     Retrieve precedents by coarse-bin candidate selection followed by similarity ranking.
 
     Returns dict with keys: prototype_id, support, precedents[]. If no candidates, returns
     {prototype_id: str, support: 0, precedents: [], error: "NO_PRECEDENTS"}.
+    
+    Args:
+        family: Reaction family name, or None/"All"/"__ALL__" for cross-family search
     """
     # ⏱️ START TIMING
     t_start_total = time.time()
     timing = {}
     
     relax = relax or {}
-    family_txt = _family_text(family)
+    
+    # Handle cross-family search (family=None or special markers)
+    if family is None or family in ["__ALL__", "All", "all", "None", "none", ""]:
+        family_txt = None  # Signal for cross-family search
+    else:
+        family_txt = _family_text(family)
     
     # Selective loading: only load the requested family to improve performance
     # Check if selective loading is enabled (default: True for better performance)
@@ -187,11 +210,11 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
     
     # ⏱️ TIME: Data loading
     t_start_load = time.time()
-    if use_selective_loading:
+    if use_selective_loading and family_txt is not None:
         # Load only the requested family
         rows = _load_selective(families=[family_txt])
     else:
-        # Load all datasets (legacy behavior)
+        # Load all datasets (legacy behavior OR cross-family search)
         rows = _load()
     timing['load_data'] = time.time() - t_start_load
     
@@ -202,7 +225,8 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
     timing['build_candidates'] = time.time() - t_start_candidates
     
     if not cands:
-        proto = f"proto_{_proto_family_id(family_txt)}_none_0"
+        proto_family = _proto_family_id(family_txt) if family_txt else "all_families"
+        proto = f"proto_{proto_family}_none_0"
         return {"prototype_id": proto, "support": 0, "precedents": [], "error": "NO_PRECEDENTS"}
 
     # Score by similarity and yield-weighting
@@ -254,29 +278,58 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
             r_fp = None
             
             # STRATEGY 1: Try to load from binary NPZ file (fastest, most space-efficient)
-            if _drfp_storage_available and get_drfp_path_for_family is not None:
+            if _drfp_storage_available and DRFPLoader is not None:
                 reaction_id = r.get("reaction_id")
                 if reaction_id:
-                    # Get or create loader for this family
-                    if family_txt not in _DRFP_LOADER_CACHE:
-                        npz_path = get_drfp_path_for_family(family_txt)
-                        if os.path.exists(npz_path):
+                    # For cross-family search, use unified NPZ file
+                    if family_txt is None:
+                        # Use unified cross-family index
+                        if "__UNIFIED__" not in _DRFP_LOADER_CACHE and get_unified_drfp_path is not None:
+                            unified_path = get_unified_drfp_path()
+                            if os.path.exists(unified_path):
+                                try:
+                                    _DRFP_LOADER_CACHE["__UNIFIED__"] = DRFPLoader(unified_path)
+                                    if relax.get("debug_timing", False):
+                                        logger.info(f"   Loaded unified DRFP index: {unified_path}")
+                                except Exception as e:
+                                    _DRFP_LOADER_CACHE["__UNIFIED__"] = None
+                                    if relax.get("debug_timing", False):
+                                        logger.warning(f"   Failed to load unified DRFP index: {e}")
+                            else:
+                                _DRFP_LOADER_CACHE["__UNIFIED__"] = None
+                        
+                        # Load fingerprint from unified index
+                        loader = _DRFP_LOADER_CACHE.get("__UNIFIED__")
+                        if loader is not None:
                             try:
-                                _DRFP_LOADER_CACHE[family_txt] = DRFPLoader(npz_path)
+                                r_fp = loader.get_fingerprint(reaction_id)
+                                if r_fp is not None:
+                                    drfp_load_count['binary'] += 1
                             except Exception:
-                                _DRFP_LOADER_CACHE[family_txt] = None
-                        else:
-                            _DRFP_LOADER_CACHE[family_txt] = None
+                                pass
                     
-                    # Load fingerprint if loader available
-                    loader = _DRFP_LOADER_CACHE.get(family_txt)
-                    if loader is not None:
-                        try:
-                            r_fp = loader.get_fingerprint(reaction_id)
-                            if r_fp is not None:
-                                drfp_load_count['binary'] += 1
-                        except Exception:
-                            pass
+                    # For family-specific search, use family NPZ file
+                    elif get_drfp_path_for_family is not None:
+                        # Get or create loader for this family
+                        if family_txt not in _DRFP_LOADER_CACHE:
+                            npz_path = get_drfp_path_for_family(family_txt)
+                            if os.path.exists(npz_path):
+                                try:
+                                    _DRFP_LOADER_CACHE[family_txt] = DRFPLoader(npz_path)
+                                except Exception:
+                                    _DRFP_LOADER_CACHE[family_txt] = None
+                            else:
+                                _DRFP_LOADER_CACHE[family_txt] = None
+                        
+                        # Load fingerprint if loader available
+                        loader = _DRFP_LOADER_CACHE.get(family_txt)
+                        if loader is not None:
+                            try:
+                                r_fp = loader.get_fingerprint(reaction_id)
+                                if r_fp is not None:
+                                    drfp_load_count['binary'] += 1
+                            except Exception:
+                                pass
             
             # STRATEGY 2: Try to load precomputed DRFP from JSONL (legacy fallback)
             if r_fp is None:
@@ -336,7 +389,7 @@ def _knn_impl(family: str, features: Dict[str, Any], k: int = 50, relax: Dict[st
     support = len(scored)
 
     # Prototype id is a stable-ish hash of family+bin
-    family_norm = _proto_family_id(family_txt)
+    family_norm = _proto_family_id(family_txt) if family_txt else "all_families"
     bin_key = str(features.get("bin") or f"LG:{target_feat.get('LG','?')}|NUC:{target_feat.get('nuc_class','?')}")
     proto = f"proto_{family_norm}_{abs(hash(bin_key)) % 100000}"
 

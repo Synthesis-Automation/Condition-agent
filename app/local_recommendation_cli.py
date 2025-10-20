@@ -268,17 +268,19 @@ def local_ml_recommendation(
     rerank_strategy: str = 'rule',
     filter_unknown_reagents: bool = False,
     catalyst_preference: Optional[str] = None,
+    search_all_families: bool = False,
 ) -> Dict[str, Any]:
     """Replicate the /api/v1/recommend/conditions endpoint locally.
     
     Args:
         reaction: Reaction SMILES string
-        reaction_type: Reaction family/type
+        reaction_type: Reaction family/type (ignored if search_all_families=True)
         k_value: Number of precedents to retrieve
         limit: Number of recommendations to return
         rerank_strategy: Reranking strategy ('rule', 'analytics', or 'none')
         filter_unknown_reagents: Whether to filter out unknown reagents
         catalyst_preference: Preferred catalyst class (e.g., 'Pd', 'Cu', 'Ni')
+        search_all_families: If True, search across all reaction datasets (ignore reaction type)
     """
     start_time = time.perf_counter()
     
@@ -297,6 +299,7 @@ def local_ml_recommendation(
             constraints={},
             rerank_strategy=rerank_strategy,
             filter_unknown_reagents=filter_unknown_reagents,
+            search_all_families=search_all_families,
         )
     except Exception as exc:
         return {"error": f"Local ML recommendation failed: {exc}"}
@@ -559,6 +562,14 @@ Examples:
     )
     
     parser.add_argument(
+        "--search-all-families",
+        action="store_true",
+        help="Search across ALL reaction datasets (ignore reaction type). "
+             "Uses DRFP similarity to find similar reactions regardless of family. "
+             "Useful when reaction type is uncertain or for broad exploration."
+    )
+    
+    parser.add_argument(
         "--protocol-tags",
         type=str,
         default=None,
@@ -702,7 +713,8 @@ Examples:
             limit_value,
             rerank_strategy=args.rerank,
             filter_unknown_reagents=args.filter_unknown,
-            catalyst_preference=catalyst_preference
+            catalyst_preference=catalyst_preference,
+            search_all_families=args.search_all_families
         )
         ml_file = save_to_dir(ml_result, f"{timestamp}_{label}_ml_local.json")
     
