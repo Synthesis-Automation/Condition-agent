@@ -1,0 +1,175 @@
+{
+  "source": {
+    "title": "Palladium-catalyzed 1,4-Addition of Terminal Alkynes to Conjugated Enones",
+    "journal": "Organic Syntheses",
+    "volume": 91,
+    "pages": "72-82",
+    "year": 2014,
+    "doi": "10.15227/orgsyn.091.0072",
+    "url": "https://www.orgsyn.org/demo.aspx?prep=v91p0072",
+    "authors": [
+      "Feng Zhou",
+      "Liang Chen",
+      "Chao-Jun Li"
+    ]
+  },
+  "reaction": {
+    "reaction_smiles": "C#Cc1ccccc1.CCC(=O)C=C>>CC(=O)CCC#CC1=CC=CC=C1",
+    "reaction_SMARTS": ["[!#1]C#C[H] . [#6;!a][C](=O)[CH]=[CH2] >> [#6;!a][C](=O)[CH2][CH2]C#C[!#1]"],
+    "compatible_functional_groups": [],
+    "incompatible_functional_groups": [],
+    "family": "Pd_Conjugate_Addition_Alkyne_to_Enone",
+    "notes": "First step only: Pd(OAc)2/PMe3-catalyzed 1,4-addition of phenylacetylene to ethyl vinyl ketone in water; staged alkyne addition; 60 °C for 48 h.",
+    "tags": "palladium; conjugate addition; alkyne; enone; water; PMe3; biphasic; vigorous stirring"
+
+  },
+  "reaction_setup": [
+    {
+      "chemicals": [
+        {
+          "name": "Palladium(II) acetate",
+          "abbreviation": "Pd(OAc)2",
+          "cas": "3375-31-3",
+          "smiles": null,
+          "amount": {
+            "weight_g": 0.224,
+            "mmol": 1.0,
+            "volume_ml": null,
+            "equivalents": 0.02
+          },
+          "role": "metal_precursor"
+        },
+        {
+          "name": "Trimethylphosphine (1.0 M in toluene)",
+          "abbreviation": "PMe3",
+          "cas": "594-09-2",
+          "smiles": "P(C)(C)C",
+          "amount": {
+            "weight_g": null,
+            "mmol": 4.0,
+            "volume_ml": 4.0,
+            "equivalents": 0.08
+          },
+          "role": "ligand"
+        },
+        {
+          "name": "Water (deionized)",
+          "abbreviation": null,
+          "cas": "7732-18-5",
+          "smiles": "O",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 50.0,
+            "equivalents": null
+          },
+          "role": "solvent"
+        },
+        {
+          "name": "Toluene (from PMe3 solution)",
+          "abbreviation": null,
+          "cas": "108-88-3",
+          "smiles": "Cc1ccccc1",
+          "amount": {
+            "weight_g": null,
+            "mmol": null,
+            "volume_ml": 4.0,
+            "equivalents": null
+          },
+          "role": "solvent"
+        },
+        {
+          "name": "Phenylacetylene (initial portion)",
+          "abbreviation": null,
+          "cas": "536-74-3",
+          "smiles": "C#Cc1ccccc1",
+          "amount": {
+            "weight_g": 3.07,
+            "mmol": 30.0,
+            "volume_ml": null,
+            "equivalents": 0.6
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Ethyl vinyl ketone",
+          "abbreviation": "EVK",
+          "cas": "1629-58-9",
+          "smiles": "CCC(=O)C=C",
+          "amount": {
+            "weight_g": 6.31,
+            "mmol": 75.0,
+            "volume_ml": null,
+            "equivalents": 1.5
+          },
+          "role": "starting_material"
+        },
+        {
+          "name": "Phenylacetylene (second portion; added slowly)",
+          "abbreviation": null,
+          "cas": "536-74-3",
+          "smiles": "C#Cc1ccccc1",
+          "amount": {
+            "weight_g": 2.04,
+            "mmol": 20.0,
+            "volume_ml": null,
+            "equivalents": 0.4
+          },
+          "role": "starting_material"
+        }
+      ],
+      "conditions": [
+        {
+          "temperature_C": 23,
+          "time_h": 0.167,
+          "atmosphere": "N2; dissolve Pd(OAc)2 and PMe3 (homogeneous brown)"
+        },
+        {
+          "temperature_C": 23,
+          "time_h": 0.033,
+          "atmosphere": "Add DI water (biphasic); N2 no longer required"
+        },
+        {
+          "temperature_C": 23,
+          "time_h": 0.033,
+          "atmosphere": "Add phenylacetylene (0.6 equiv) then ethyl vinyl ketone (1.5 equiv); vigorous stirring ~1400 rpm"
+        },
+        {
+          "temperature_C": 23,
+          "time_h": 0.083,
+          "atmosphere": "Add remaining phenylacetylene (0.4 equiv) at 0.4 mL/min"
+        },
+        {
+          "temperature_C": 60,
+          "time_h": 48.0,
+          "atmosphere": "Heat in oil bath; vigorous stirring; darkening to dark brown"
+        }
+      ]
+    }
+  ],
+  "workup_and_purification": [
+    {
+      "quench": [],
+      "workup": [
+        "Cool to room temperature; transfer to separatory funnel.",
+        "Extract with diethyl ether (3 × 60 mL).",
+        "Wash combined organics with saturated brine (3 × 5 mL).",
+        "Dry over anhydrous Na2SO4 (25 g, 8 h).",
+        "Filter and concentrate at 200 mmHg then 10 mmHg at 25 °C."
+      ],
+      "purification": [
+        {
+          "method": "Flash column chromatography",
+          "stationary_phase": "Silica gel (3 cm × 30 cm; 40–63 μm)",
+          "eluent": "Hexanes/EtOAc: 50:1 to remove byproduct; then 15:1 to elute product (total ~500 mL)",
+          "fractions": "Analyze by TLC (10% EtOAc/hexanes); combine product fractions; optional vacuum distillation (120 °C/1 mmHg)"
+        }
+      ],
+      "notes": [
+        "Byproduct 1,4-diphenyl-1,3-butadiyne observed in early fractions (~4% yield).",
+        "Isolated product 7-phenyl-6-heptyn-3-one as brown liquid 6.85–6.94 g (75%); after distillation colorless liquid 6.20 g (66%)."
+      ]
+    }
+  ],
+  "original_procedure": "In a 100-mL three-necked flask under N2, Pd(OAc)2 and PMe3 (1.0 M in toluene) are stirred 10 min to give a brown solution. Add deionized water (50 mL), then phenylacetylene (0.6 equiv) and ethyl vinyl ketone (1.5 equiv). With vigorous stirring (~1400 rpm), add the remaining phenylacetylene (0.4 equiv) at 0.4 mL/min. Heat at 60 °C for 48 h, then extract with ether, wash with brine, dry (Na2SO4), concentrate, and purify by silica gel column; optional short-path distillation affords the product. [Paraphrased from the source page.]"
+}
