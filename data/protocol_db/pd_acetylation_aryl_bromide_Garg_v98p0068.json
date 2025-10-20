@@ -1,4 +1,4 @@
-{
+[{
   "source": {
     "title": "Palladium-Catalyzed Acetylation of Arylbromides",
     "journal": "Organic Syntheses",
@@ -132,3 +132,4 @@
   ],
   "original_procedure": "Flame-dry a 250 mL round-bottom flask, cool under inert gas, and charge with 6-bromobenzothiophene, CsF, and Pd(PPh3)4. Purge (~5 min), then add acetyltrimethylsilane followed by 1,2-dichloroethane. Fit a reflux condenser and heat at 75 °C with vigorous stirring under inert atmosphere for 24 h. Allow to cool, dilute with heptane, filter through a silica plug (EtOAc elution), concentrate, and purify by silica gel chromatography (heptane/EtOAc gradient) to obtain 6-acetylbenzothiophene (Step A, paraphrased; see source URL for full text)."
 }
+]

@@ -211,6 +211,8 @@ from rdkit.Chem import AllChem
 rxn_smiles = "CCBr.c1ccccc1B(O)O>>CCc1ccccc1"
 pattern = "[c,C,n,o,s]Br.OB(O)[c,C,n,o,s]>>[c,C,n,o,s][c,C,n,o,s]"
 
+[c,n,o,s] = aryl
+
 # Parse reaction
 rxn = AllChem.ReactionFromSmarts(rxn_smiles, useSmiles=True)
 rxn_pattern = AllChem.ReactionFromSmarts(pattern)

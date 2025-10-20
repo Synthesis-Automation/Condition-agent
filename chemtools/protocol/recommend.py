@@ -673,21 +673,61 @@ class ProtocolRecommender:
         """
         Load full protocol details from JSON file
         
+        Handles both formats:
+        - Legacy: filename is the actual JSON file (e.g., 'Suzuki_protocols.json')
+        - New: filename includes index (e.g., 'Suzuki_protocols[0]')
+        
         Args:
-            filename: Protocol filename (e.g., 'Suzuki_Cu_C(sp3)-C(sp2).json')
+            filename: Protocol filename or identifier (e.g., 'Suzuki_protocols.json' or 'Suzuki_protocols[0]')
         
         Returns:
             Full protocol dictionary or None if not found
         """
-        protocol_path = self.protocol_dir / filename
+        # Parse filename to extract actual file and index
+        if '[' in filename and ']' in filename:
+            # New format: filename[index]
+            base_name = filename.split('[')[0]
+            index_str = filename.split('[')[1].split(']')[0]
+            try:
+                protocol_index = int(index_str)
+            except ValueError:
+                logger.error(f"Invalid protocol index in filename: {filename}")
+                return None
+            actual_filename = f"{base_name}.json"
+        else:
+            # Legacy format: just the filename
+            if not filename.endswith('.json'):
+                actual_filename = f"{filename}.json"
+            else:
+                actual_filename = filename
+            protocol_index = None
+        
+        protocol_path = self.protocol_dir / actual_filename
         
         if not protocol_path.exists():
-            logger.error(f"Protocol file not found: {filename}")
+            logger.error(f"Protocol file not found: {actual_filename}")
             return None
         
         try:
             with open(protocol_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+            
+            # Handle both array and single protocol formats
+            if isinstance(data, list):
+                if protocol_index is not None:
+                    # Return specific protocol from array
+                    if 0 <= protocol_index < len(data):
+                        return data[protocol_index]
+                    else:
+                        logger.error(f"Protocol index {protocol_index} out of range for {actual_filename} (has {len(data)} protocols)")
+                        return None
+                else:
+                    # Return first protocol if no index specified
+                    return data[0] if data else None
+            else:
+                # Single protocol format (legacy)
+                return data
+                
         except Exception as e:
             logger.error(f"Error loading protocol {filename}: {e}")
             return None

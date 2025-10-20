@@ -1,152 +1,149 @@
-{
-  "source": {
-    "title": "Synthesis of Alkylboronic Esters from Alkyl Iodides",
-    "journal": "Organic Syntheses",
-    "volume": 99,
-    "pages": "15-28",
-    "year": 2022,
-    "doi": "10.15227/orgsyn.099.0015",
-    "url": "https://www.orgsyn.org/demo.aspx?prep=v99p0015"
-  },
-  "reaction": {
-    "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
-    "reaction_SMARTS": [
-      "IC.BB>>CB"
-    ],
-    "compatible_functional_groups": [
-      "ketone",
-      "aromatic"
-    ],
-    "incompatible_functional_groups": [
-      "enamine",
-      "alcohol",
-      "carboxylic acid"
-    ],
-    "family": "Alkyl_Iodide_Borylation",
-    "notes": "General LiOtBu/MeOH borylation of primary alkyl iodide with B2pin2 to give R–B(pin).",
-    "tags": "borylation; alkyl iodide; B2pin2; LiOtBu; MeOH; OrgSyn v99p0015"
-  },
-  "reaction_setup": [
-    {
-      "chemicals": [
-        {
-          "name": "1-Iodooctane",
-          "abbreviation": null,
-          "cas": "628-17-1",
-          "smiles": "CCCCCCCCI",
-          "amount": {
-            "weight_g": 50.0,
-            "mmol": 208.0,
-            "volume_ml": 37.8,
-            "equivalents": 1.0
-          },
-          "role": "starting_material"
-        },
-        {
-          "name": "Bis(pinacolato)diboron",
-          "abbreviation": "B2pin2",
-          "cas": "73183-34-3",
-          "smiles": "B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2",
-          "amount": {
-            "weight_g": 211.0,
-            "mmol": 833.0,
-            "volume_ml": null,
-            "equivalents": 4.0
-          },
-          "role": "nucleophile"
-        },
-        {
-          "name": "Lithium tert-butoxide",
-          "abbreviation": "t-BuOLi",
-          "cas": "1907-33-1",
-          "smiles": "[Li+].[O-]C(C)(C)C",
-          "amount": {
-            "weight_g": 33.3,
-            "mmol": 416.0,
-            "volume_ml": null,
-            "equivalents": 2.0
-          },
-          "role": "base"
-        },
-        {
-          "name": "Methanol",
-          "abbreviation": "MeOH",
-          "cas": "67-56-1",
-          "smiles": "CO",
-          "amount": {
-            "weight_g": null,
-            "mmol": null,
-            "volume_ml": 420.0,
-            "equivalents": null
-          },
-          "role": "solvent"
-        },
-        {
-          "name": "Water",
-          "abbreviation": "H2O",
-          "cas": "7732-18-5",
-          "smiles": "O",
-          "amount": {
-            "weight_g": null,
-            "mmol": null,
-            "volume_ml": 4.2,
-            "equivalents": null
-          },
-          "role": "additive"
-        }
+[
+  {
+    "source": {
+      "title": "Synthesis of Alkylboronic Esters from Alkyl Iodides",
+      "journal": "Organic Syntheses",
+      "volume": 99,
+      "pages": "15-28",
+      "year": 2022,
+      "doi": "10.15227/orgsyn.099.0015",
+      "url": "https://www.orgsyn.org/demo.aspx?prep=v99p0015"
+    },
+    "reaction": {
+      "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
+      "reaction_SMARTS": ["IC.BB>>CB"],
+      "compatible_functional_groups": ["ketone", "aromatic"],
+      "incompatible_functional_groups": [
+        "enamine",
+        "alcohol",
+        "carboxylic acid"
       ],
-      "conditions": [
-        {
-          "temperature_C": 25.0,
-          "time_h": 0.017,
-          "atmosphere": "air (pre-stir before base)"
-        },
-        {
-          "temperature_C": 50.0,
-          "time_h": 56.0,
-          "atmosphere": "N2 (vacuum/refill cycles, reflux condenser)"
-        }
-      ]
-    }
-  ],
-  "workup_and_purification": [
-    {
-      "quench": [],
-      "workup": [
-        {
-          "step": "Filtration",
-          "details": "Filter reaction mixture via Büchner funnel; wash filter cake with n-hexane (20 mL)."
-        },
-        {
-          "step": "Concentration",
-          "details": "Concentrate combined filtrate on rotary evaporator (35 °C, 40 mmHg)."
-        },
-        {
-          "step": "Solvent switch",
-          "details": "Add n-heptane (400 mL) to residue; stir at 26 °C for 10 min; filter."
-        },
-        {
-          "step": "Cold crystallization",
-          "details": "Cool filtrate to −50 °C in dry ice–ethanol bath, stir 10 min; filter."
-        },
-        {
-          "step": "Concentration",
-          "details": "Concentrate filtrate again on rotary evaporator (35 °C, 40 mmHg)."
-        }
-      ],
-      "purification": [
-        {
-          "method": "Flash column chromatography",
-          "stationary_phase": "Silica gel (750 g; column dia 10 cm)",
-          "eluent": "First petroleum ether (to remove SM), then petroleum ether:ethyl acetate (4:1) to elute product",
-          "fractions": "not reported"
-        }
-      ],
-      "notes": [
-        "White solid precipitates after 2–3 h; TLC monitoring used.",
-        "Product obtained as colorless oil in 70% isolated yield after chromatography (scale: 208 mmol)."
-      ]
-    }
-  ],
-  "original_procedure": "Filter reaction mixture via Büchner funnel; wash filter cake with n-hexane (20 mL)."
-}
+      "family": "Alkyl_Iodide_Borylation",
+      "notes": "General LiOtBu/MeOH borylation of primary alkyl iodide with B2pin2 to give R–B(pin).",
+      "tags": "borylation; alkyl iodide; B2pin2; LiOtBu; MeOH; OrgSyn v99p0015"
+    },
+    "reaction_setup": [
+      {
+        "chemicals": [
+          {
+            "name": "1-Iodooctane",
+            "abbreviation": null,
+            "cas": "628-17-1",
+            "smiles": "CCCCCCCCI",
+            "amount": {
+              "weight_g": 50.0,
+              "mmol": 208.0,
+              "volume_ml": 37.8,
+              "equivalents": 1.0
+            },
+            "role": "starting_material"
+          },
+          {
+            "name": "Bis(pinacolato)diboron",
+            "abbreviation": "B2pin2",
+            "cas": "73183-34-3",
+            "smiles": "B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2",
+            "amount": {
+              "weight_g": 211.0,
+              "mmol": 833.0,
+              "volume_ml": null,
+              "equivalents": 4.0
+            },
+            "role": "nucleophile"
+          },
+          {
+            "name": "Lithium tert-butoxide",
+            "abbreviation": "t-BuOLi",
+            "cas": "1907-33-1",
+            "smiles": "[Li+].[O-]C(C)(C)C",
+            "amount": {
+              "weight_g": 33.3,
+              "mmol": 416.0,
+              "volume_ml": null,
+              "equivalents": 2.0
+            },
+            "role": "base"
+          },
+          {
+            "name": "Methanol",
+            "abbreviation": "MeOH",
+            "cas": "67-56-1",
+            "smiles": "CO",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 420.0,
+              "equivalents": null
+            },
+            "role": "solvent"
+          },
+          {
+            "name": "Water",
+            "abbreviation": "H2O",
+            "cas": "7732-18-5",
+            "smiles": "O",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 4.2,
+              "equivalents": null
+            },
+            "role": "additive"
+          }
+        ],
+        "conditions": [
+          {
+            "temperature_C": 25.0,
+            "time_h": 0.017,
+            "atmosphere": "air (pre-stir before base)"
+          },
+          {
+            "temperature_C": 50.0,
+            "time_h": 56.0,
+            "atmosphere": "N2 (vacuum/refill cycles, reflux condenser)"
+          }
+        ]
+      }
+    ],
+    "workup_and_purification": [
+      {
+        "quench": [],
+        "workup": [
+          {
+            "step": "Filtration",
+            "details": "Filter reaction mixture via Büchner funnel; wash filter cake with n-hexane (20 mL)."
+          },
+          {
+            "step": "Concentration",
+            "details": "Concentrate combined filtrate on rotary evaporator (35 °C, 40 mmHg)."
+          },
+          {
+            "step": "Solvent switch",
+            "details": "Add n-heptane (400 mL) to residue; stir at 26 °C for 10 min; filter."
+          },
+          {
+            "step": "Cold crystallization",
+            "details": "Cool filtrate to −50 °C in dry ice–ethanol bath, stir 10 min; filter."
+          },
+          {
+            "step": "Concentration",
+            "details": "Concentrate filtrate again on rotary evaporator (35 °C, 40 mmHg)."
+          }
+        ],
+        "purification": [
+          {
+            "method": "Flash column chromatography",
+            "stationary_phase": "Silica gel (750 g; column dia 10 cm)",
+            "eluent": "First petroleum ether (to remove SM), then petroleum ether:ethyl acetate (4:1) to elute product",
+            "fractions": "not reported"
+          }
+        ],
+        "notes": [
+          "White solid precipitates after 2–3 h; TLC monitoring used.",
+          "Product obtained as colorless oil in 70% isolated yield after chromatography (scale: 208 mmol)."
+        ]
+      }
+    ],
+    "original_procedure": "Filter reaction mixture via Büchner funnel; wash filter cake with n-hexane (20 mL)."
+  }
+]

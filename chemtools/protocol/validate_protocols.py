@@ -70,11 +70,24 @@ def get_protocol_dir() -> Path:
     return protocol_dir
 
 
-def load_protocol(filepath: Path) -> Optional[Dict[str, Any]]:
-    """Load a protocol JSON file"""
+def load_protocol(filepath: Path) -> Optional[List[Dict[str, Any]]]:
+    """
+    Load a protocol JSON file
+    
+    Returns a list of protocol dictionaries to handle both:
+    - Legacy: Single protocol object -> wrapped in list
+    - New: Array of protocol objects -> returned as-is
+    """
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+        
+        # Handle both array and single protocol formats
+        if isinstance(data, list):
+            return data
+        else:
+            return [data]
+            
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in {filepath.name}: {e}")
         return None
@@ -179,57 +192,77 @@ def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> T
     return matched, errors
 
 
-def validate_protocol(filepath: Path) -> ValidationResult:
-    """Validate a single protocol file"""
-    result = ValidationResult(
-        filename=filepath.name,
-        valid=False
-    )
+def validate_protocol(filepath: Path) -> List[ValidationResult]:
+    """
+    Validate a single protocol file
     
-    # Load the protocol
-    protocol = load_protocol(filepath)
-    if protocol is None:
+    Returns a list of ValidationResults (one per protocol in the file)
+    """
+    # Load the protocol(s)
+    protocols = load_protocol(filepath)
+    if protocols is None:
+        result = ValidationResult(filename=filepath.name, valid=False)
         result.errors.append("Failed to load protocol JSON")
-        return result
+        return [result]
     
-    # Check structure
-    if 'reaction' not in protocol:
-        result.errors.append("Missing 'reaction' field")
-        return result
+    results = []
     
-    reaction = protocol['reaction']
+    # Validate each protocol in the file
+    for idx, protocol in enumerate(protocols):
+        # Generate protocol identifier
+        if len(protocols) > 1:
+            protocol_id = f"{filepath.name}[{idx}]"
+        else:
+            protocol_id = filepath.name
+        
+        result = ValidationResult(
+            filename=protocol_id,
+            valid=False
+        )
+        
+        # Check structure
+        if 'reaction' not in protocol:
+            result.errors.append("Missing 'reaction' field")
+            results.append(result)
+            continue
+        
+        reaction = protocol['reaction']
+        
+        # Extract reaction_smiles
+        reaction_smiles = reaction.get('reaction_smiles')
+        if not reaction_smiles:
+            result.errors.append("Missing 'reaction.reaction_smiles' field")
+            results.append(result)
+            continue
+        
+        result.reaction_smiles = reaction_smiles
+        
+        # Extract reaction_SMARTS
+        reaction_smarts = reaction.get('reaction_SMARTS', [])
+        if not isinstance(reaction_smarts, list):
+            result.warnings.append("'reaction.reaction_SMARTS' should be a list")
+            reaction_smarts = [reaction_smarts] if reaction_smarts else []
+        
+        result.reaction_smarts = reaction_smarts
+        
+        if not reaction_smarts:
+            result.warnings.append("No reaction_SMARTS patterns defined")
+            result.valid = True  # Not an error, just a warning
+            results.append(result)
+            continue
+        
+        # Validate SMARTS matching
+        matched, errors = match_reaction_smarts(reaction_smiles, reaction_smarts)
+        
+        if matched:
+            result.valid = True
+        else:
+            result.valid = False
+            result.errors.extend(errors)
+        
+        results.append(result)
     
-    # Extract reaction_smiles
-    reaction_smiles = reaction.get('reaction_smiles')
-    if not reaction_smiles:
-        result.errors.append("Missing 'reaction.reaction_smiles' field")
-        return result
-    
-    result.reaction_smiles = reaction_smiles
-    
-    # Extract reaction_SMARTS
-    reaction_smarts = reaction.get('reaction_SMARTS', [])
-    if not isinstance(reaction_smarts, list):
-        result.warnings.append("'reaction.reaction_SMARTS' should be a list")
-        reaction_smarts = [reaction_smarts] if reaction_smarts else []
-    
-    result.reaction_smarts = reaction_smarts
-    
-    if not reaction_smarts:
-        result.warnings.append("No reaction_SMARTS patterns defined")
-        result.valid = True  # Not an error, just a warning
-        return result
-    
-    # Validate SMARTS matching
-    matched, errors = match_reaction_smarts(reaction_smiles, reaction_smarts)
-    
-    if matched:
-        result.valid = True
-    else:
-        result.valid = False
-        result.errors.extend(errors)
-    
-    return result
+    return results
 
 
 def validate_all_protocols(
@@ -246,8 +279,8 @@ def validate_all_protocols(
             logger.error(f"File not found: {specific_file}")
             return []
         
-        result = validate_protocol(filepath)
-        results.append(result)
+        file_results = validate_protocol(filepath)
+        results.extend(file_results)
     else:
         # Validate all JSON files (exclude index and schema files)
         all_json_files = sorted(protocol_dir.glob("*.json"))
@@ -264,8 +297,8 @@ def validate_all_protocols(
         print()
         
         for filepath in json_files:
-            result = validate_protocol(filepath)
-            results.append(result)
+            file_results = validate_protocol(filepath)
+            results.extend(file_results)
     
     return results
 
