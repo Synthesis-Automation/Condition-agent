@@ -11,7 +11,7 @@
   "reaction": {
     "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
     "reaction_SMARTS": [
-      "[c,C,n,o,s]OS(=O)(=O)C.OB(O)[c,C,n,o,s]>>[c,C,n,o,s][c,C,n,o,s]"
+      "[c,n,o,s]OS(=O)(=O)C.OB(O)[c,n,o,s]>>[c,n,o,s][c,n,o,s]"
     ],
     "compatible_functional_groups": [
       "aromatic"

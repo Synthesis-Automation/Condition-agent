@@ -102,6 +102,16 @@ def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> b
                 pattern_reactants = pattern_rxn.GetReactants()
                 pattern_products = pattern_rxn.GetProducts()
                 
+                # Sanitize molecules to ensure proper aromaticity perception
+                try:
+                    for mol in rxn_reactants:
+                        Chem.SanitizeMol(mol)
+                    for mol in rxn_products:
+                        Chem.SanitizeMol(mol)
+                except Exception as e:
+                    logger.debug(f"Error sanitizing reaction molecules: {e}")
+                    continue
+                
                 # Check if all pattern reactants match some rxn reactants
                 reactants_match = all(
                     any(rxn_r.HasSubstructMatch(pat_r) for rxn_r in rxn_reactants)
@@ -356,6 +366,8 @@ class ProtocolRecommender:
                 tags=tags,
                 top_matches=top_matches,
                 num_candidates=len(candidates),
+                num_before_smarts=num_before_smarts,
+                smarts_filter_warning=smarts_filter_warning,
                 processing_time_ms=processing_time_ms
             )
         else:
@@ -364,7 +376,9 @@ class ProtocolRecommender:
                 reaction_family=reaction_family,
                 tags=tags,
                 top_matches=top_matches,
-                num_candidates=len(candidates)
+                num_candidates=len(candidates),
+                num_before_smarts=num_before_smarts,
+                smarts_filter_warning=smarts_filter_warning
             )
     
     def _format_standard_output(
@@ -374,6 +388,8 @@ class ProtocolRecommender:
         tags: Optional[List[str]],
         top_matches: List[Dict[str, Any]],
         num_candidates: int,
+        num_before_smarts: int,
+        smarts_filter_warning: Optional[str],
         processing_time_ms: float
     ) -> Dict[str, Any]:
         """Format output in standard JSON format"""
@@ -432,6 +448,19 @@ class ProtocolRecommender:
             detected_type = top_matches[0]['record'].reaction_family or detected_type
             detection_confidence = top_matches[0]['similarity']
         
+        extras = {
+            'num_candidates': num_candidates,
+            'num_total_protocols': len(self.indexer.records),
+            'num_matches': len(top_matches),
+            'smarts_filtering_enabled': True
+        }
+        
+        # Add SMARTS filter warning if applicable
+        if smarts_filter_warning:
+            extras['smarts_filter_warning'] = smarts_filter_warning
+            extras['num_before_smarts_filter'] = num_before_smarts
+            extras['num_after_smarts_filter'] = num_candidates
+        
         return {
             'meta': format_meta(
                 model_type='Protocol-DRFP',
@@ -450,12 +479,7 @@ class ProtocolRecommender:
                 method='protocol-similarity'
             ),
             'recommended_conditions': recommended_conditions,
-            'extras': {
-                'num_candidates': num_candidates,
-                'num_total_protocols': len(self.indexer.records),
-                'num_matches': len(top_matches),
-                'smarts_filtering_enabled': True
-            }
+            'extras': extras
         }
     
     def _format_legacy_output(
@@ -464,7 +488,9 @@ class ProtocolRecommender:
         reaction_family: Optional[str],
         tags: Optional[List[str]],
         top_matches: List[Dict[str, Any]],
-        num_candidates: int
+        num_candidates: int,
+        num_before_smarts: int,
+        smarts_filter_warning: Optional[str]
     ) -> Dict[str, Any]:
         """Format output in legacy format (for backward compatibility)"""
         # Format results
@@ -487,6 +513,18 @@ class ProtocolRecommender:
             }
             matches.append(match)
         
+        metadata = {
+            'num_candidates': num_candidates,
+            'num_matches': len(top_matches),
+            'num_total_protocols': len(self.indexer.records)
+        }
+        
+        # Add SMARTS filter warning if applicable
+        if smarts_filter_warning:
+            metadata['smarts_filter_warning'] = smarts_filter_warning
+            metadata['num_before_smarts_filter'] = num_before_smarts
+            metadata['num_after_smarts_filter'] = num_candidates
+        
         return {
             'matches': matches,
             'query': {
@@ -494,11 +532,7 @@ class ProtocolRecommender:
                 'family': reaction_family,
                 'tags': tags
             },
-            'metadata': {
-                'num_candidates': num_candidates,
-                'num_matches': len(top_matches),
-                'num_total_protocols': len(self.indexer.records)
-            }
+            'metadata': metadata
         }
     
     def _get_candidates(

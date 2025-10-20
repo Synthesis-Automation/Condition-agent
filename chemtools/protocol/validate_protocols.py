@@ -138,6 +138,16 @@ def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> T
             pattern_reactants = pattern_rxn.GetReactants()
             pattern_products = pattern_rxn.GetProducts()
             
+            # Sanitize molecules to ensure proper aromaticity perception
+            try:
+                for mol in rxn_reactants:
+                    Chem.SanitizeMol(mol)
+                for mol in rxn_products:
+                    Chem.SanitizeMol(mol)
+            except Exception as e:
+                pattern_errors.append(f"Error sanitizing reaction molecules: {e}")
+                continue
+            
             # Check if all pattern reactants match some rxn reactants
             reactants_match = all(
                 any(rxn_r.HasSubstructMatch(pat_r) for rxn_r in rxn_reactants)
@@ -239,11 +249,15 @@ def validate_all_protocols(
         result = validate_protocol(filepath)
         results.append(result)
     else:
-        # Validate all JSON files
-        json_files = sorted(protocol_dir.glob("*.json"))
+        # Validate all JSON files (exclude index and schema files)
+        all_json_files = sorted(protocol_dir.glob("*.json"))
+        json_files = [
+            f for f in all_json_files
+            if not f.name.startswith('.') and 'schema' not in f.name.lower()
+        ]
         
         if not json_files:
-            logger.warning(f"No JSON files found in {protocol_dir}")
+            logger.warning(f"No protocol JSON files found in {protocol_dir}")
             return []
         
         logger.info(f"Validating {len(json_files)} protocol files...")
