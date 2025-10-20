@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "generated_at": "2025-10-20T15:39:55.130425Z",
+    "model": "Protocol-DRFP",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 8.51
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+  },
+  "detection": {
+    "family": "unknown",
+    "detected_reaction_type": "unknown",
+    "method": "protocol-similarity",
+    "confidence": 0.0
+  },
+  "recommended_conditions": [],
+  "extras": {
+    "num_candidates": 0,
+    "num_total_protocols": 20,
+    "message": "No candidates found matching filters",
+    "smarts_filter_warning": "No protocols found matching the reaction SMARTS pattern. All 20 candidate(s) were filtered out. Try --no-smarts-filter to see protocols ranked by chemical similarity only."
+  }
+}

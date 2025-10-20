@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "generated_at": "2025-10-20T15:33:48.776590Z",
+    "model": "ML-precedent-knn",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 685.78
+  },
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+    "family": "C_N_Coupling",
+    "requested_reaction_type": "C_N_Coupling",
+    "requested_family": "C_N_Coupling"
+  },
+  "detection": {
+    "family": "C_N_Coupling",
+    "detected_reaction_type": "C_N_Coupling",
+    "method": "rxn-insight-ml",
+    "confidence": 0.3
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": null
+        },
+        {
+          "id": null,
+          "role": "starting_material",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": null,
+        "time": null,
+        "atmosphere": null
+      },
+      "confidence": 0.003,
+      "precedent_count": 0
+    }
+  ],
+  "precedents_used": {
+    "total_count": 0,
+    "top_precedents": [],
+    "core_matched_precedents": {
+      "core": null,
+      "count": 0,
+      "examples": []
+    },
+    "statistics": {
+      "average_yield": null,
+      "yield_range": null,
+      "temperature_range": null,
+      "time_range": null
+    }
+  }
+}
