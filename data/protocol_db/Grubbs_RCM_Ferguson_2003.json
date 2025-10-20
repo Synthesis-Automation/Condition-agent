@@ -10,13 +10,13 @@
   },
   "reaction": {
     "reaction_smiles": "CC(C)(C)OC(=O)N(CC=C)CC=C>>CC(C)(C)OC(=O)N1CCC=C1",
-    "reaction_SMARTS": ["[C:1]=[C:2]-[$([#6,#7,#8,#16;!a]):5]-[$([#6,#7,#8,#16;!a]):6]-[$([#6,#7,#8,#16;!a]):7]-[C:4]=[C:3]>>[C:1]=[C:3].[C:2]1-[$([#6,#7,#8,#16;!a]):5]-[$([#6,#7,#8,#16;!a]):6]-[$([#6,#7,#8,#16;!a]):7]-[C:4]=[C:2]1"],
+    "reaction_SMARTS": ["C=C.C=C>>C=C"],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
 
     "family": "Olefin_Metathesis_RCM",
     "notes": "Reaction SMILES are approximate; used to reflect diallylamine→3-pyrroline RCM transformation.",
-    "tags": "RCM; Grubbs-1; ruthenium carbene; DCM; nitrogen; reflux",
+    "tags": "RCM; Grubbs-1; ruthenium carbene; DCM; nitrogen; reflux"
   },
   "reaction_setup": [
     {

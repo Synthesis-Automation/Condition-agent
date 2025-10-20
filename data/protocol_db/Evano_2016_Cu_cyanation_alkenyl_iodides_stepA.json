@@ -16,7 +16,7 @@
     "incompatible_functional_groups": ["enamine", "alcohol", "carboxylic acid"],
     
     "notes": "Step A only: (Z)-1-iodooct-1-ene + acetone cyanohydrin → (Z)-non-2-enenitrile using CuI/1,10-phenanthroline in DMF with tri-n-butylamine under Ar.",
-    "tags": "Cyanation, Cu, Copper, Alkenyl_Iodide, coupling",
+    "tags": "Cyanation, Cu, Copper, Alkenyl_Iodide, coupling"
   },
   "reaction_setup": [
     {

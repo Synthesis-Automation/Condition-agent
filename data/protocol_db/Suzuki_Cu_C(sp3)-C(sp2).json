@@ -11,7 +11,7 @@
   "reaction": {
     "reaction_smiles": "BrC1CCCCC1.Clc2ccc(B(OC3(C)C)OC3(C)C)cc2>>Clc4ccc(C5CCCCC5)cc4",
     "reaction_SMARTS": [
-      "BrC.[c,C,n,o,s]B(Opin)>>[c,C,n,o,s]C"
+      "BrC.[c,C,n,o,s]B>>[c,C,n,o,s]C"
     ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],

@@ -18,7 +18,7 @@
   "reaction": {
     "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.CNc2ccccc2>>CC(C)(C)c1ccc(N(C)c2ccccc2)cc1",
     "reaction_SMARTS": [
-      "[c,C,n,o,s]OS(=O)(=O)C.[NH]>>[NH][c,C,n,o,s]"
+      "[c,C,n,o,s]OS(=O)(=O)C.N>>[c,C,n,o,s]N"
     ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
