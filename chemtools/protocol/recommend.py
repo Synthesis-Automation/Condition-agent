@@ -240,18 +240,48 @@ class ProtocolRecommender:
         
         # Apply SMARTS-based filtering if requested
         num_before_smarts = len(candidates)
+        smarts_filter_warning = None
+        
         if use_smarts_filter:
             candidates = self._filter_by_smarts(reaction_smiles, candidates)
             num_after_smarts = len(candidates)
+            
             if num_after_smarts < num_before_smarts:
-                logger.debug(
-                    f"SMARTS filtering reduced candidates from {num_before_smarts} to {num_after_smarts}"
+                removed = num_before_smarts - num_after_smarts
+                logger.warning(
+                    f"SMARTS filtering removed {removed} protocol(s): "
+                    f"{num_before_smarts} → {num_after_smarts} candidates"
+                )
+                smarts_filter_warning = (
+                    f"SMARTS filtering removed {removed} protocol(s) that did not match "
+                    f"the reaction structure. {num_after_smarts} of {num_before_smarts} protocols remain. "
+                    f"Use --no-smarts-filter to see all protocols ranked by similarity."
+                )
+            
+            if num_after_smarts == 0:
+                logger.warning(
+                    f"SMARTS filtering eliminated ALL {num_before_smarts} candidate protocol(s). "
+                    f"No protocols match the reaction structure pattern. "
+                    f"Consider using --no-smarts-filter for DRFP-only similarity matching."
+                )
+                smarts_filter_warning = (
+                    f"No protocols found matching the reaction SMARTS pattern. "
+                    f"All {num_before_smarts} candidate(s) were filtered out. "
+                    f"Try --no-smarts-filter to see protocols ranked by chemical similarity only."
                 )
         
         if not candidates:
             processing_time_ms = (time.time() - start_time) * 1000
             
             if use_standard_format and HAS_OUTPUT_FORMATTER:
+                extras = {
+                    'num_candidates': 0,
+                    'num_total_protocols': len(self.indexer.records),
+                    'message': 'No candidates found matching filters'
+                }
+                if smarts_filter_warning:
+                    extras['smarts_filter_warning'] = smarts_filter_warning
+                
                 return {
                     'meta': format_meta(
                         model_type='Protocol-DRFP',
@@ -268,13 +298,17 @@ class ProtocolRecommender:
                         method='protocol-similarity'
                     ),
                     'recommended_conditions': [],
-                    'extras': {
-                        'num_candidates': 0,
-                        'num_total_protocols': len(self.indexer.records),
-                        'message': 'No candidates found matching filters'
-                    }
+                    'extras': extras
                 }
             else:
+                metadata = {
+                    'num_candidates': 0,
+                    'num_total_protocols': len(self.indexer.records),
+                    'message': 'No candidates found matching filters'
+                }
+                if smarts_filter_warning:
+                    metadata['smarts_filter_warning'] = smarts_filter_warning
+                
                 return {
                     'matches': [],
                     'query': {
@@ -282,22 +316,21 @@ class ProtocolRecommender:
                         'family': reaction_family,
                         'tags': tags
                     },
-                    'metadata': {
-                        'num_candidates': 0,
-                        'num_total_protocols': len(self.indexer.records),
-                        'message': 'No candidates found matching filters'
-                    }
+                    'metadata': metadata
                 }
         
         # Compute similarities
         similarities = []
         for record in candidates:
-            if record.drfp_fingerprint is None:
+            # Get DRFP fingerprint from NPZ file (lazy loaded)
+            drfp_fp = self.indexer.get_drfp_fingerprint(record.filename)
+            
+            if drfp_fp is None:
                 logger.debug(f"Skipping {record.filename} (no DRFP)")
                 continue
             
             try:
-                similarity = self._cosine_similarity(query_drfp, record.drfp_fingerprint)
+                similarity = self._cosine_similarity(query_drfp, drfp_fp)
                 
                 if similarity >= min_similarity:
                     similarities.append({
