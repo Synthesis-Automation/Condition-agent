@@ -331,30 +331,49 @@ class ProtocolRecommender:
         
         # Compute similarities
         similarities = []
+        
+        # Debug: Check query_drfp type
+        logger.debug(f"Query DRFP type: {type(query_drfp)}, len: {len(query_drfp) if hasattr(query_drfp, '__len__') else 'N/A'}")
+        
         for record in candidates:
+            logger.debug(f"Processing candidate: {record.filename}")
+            
             # Get DRFP fingerprint from NPZ file (lazy loaded)
             drfp_fp = self.indexer.get_drfp_fingerprint(record.filename)
             
             if drfp_fp is None:
-                logger.debug(f"Skipping {record.filename} (no DRFP)")
+                logger.debug(f"  DRFP is None, skipping")
                 continue
+            
+            logger.debug(f"  Protocol DRFP type: {type(drfp_fp)}, shape: {drfp_fp.shape if hasattr(drfp_fp, 'shape') else 'N/A'}")
             
             try:
                 similarity = self._cosine_similarity(query_drfp, drfp_fp)
+                logger.debug(f"  Similarity: {similarity:.4f}, threshold: {min_similarity}")
                 
                 if similarity >= min_similarity:
+                    logger.debug(f"  ✓ Added to matches (similarity >= threshold)")
                     similarities.append({
                         'record': record,
                         'similarity': similarity
                     })
+                else:
+                    logger.debug(f"  ✗ Rejected (similarity < threshold)")
             except Exception as e:
-                logger.debug(f"Error computing similarity for {record.filename}: {e}")
+                logger.debug(f"  ERROR computing similarity: {e}")
+                import traceback
+                logger.debug(traceback.format_exc())
         
         # Sort by similarity (descending)
         similarities.sort(key=lambda x: x['similarity'], reverse=True)
         
         # Take top-k
         top_matches = similarities[:k]
+        
+        logger.debug(f"Total similarities: {len(similarities)}, top_matches: {len(top_matches)}")
+        if top_matches:
+            for i, match in enumerate(top_matches):
+                logger.debug(f"  Match {i+1}: {match['record'].filename}, similarity: {match['similarity']:.4f}")
         
         processing_time_ms = (time.time() - start_time) * 1000
         

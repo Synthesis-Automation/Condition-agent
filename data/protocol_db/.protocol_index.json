@@ -1,8 +1,8 @@
 {
   "metadata": {
     "version": "1.0",
-    "created_at": "2025-10-20T07:49:48.026690",
-    "updated_at": "2025-10-20T07:49:48.026690",
+    "created_at": "2025-10-20T08:28:43.385523",
+    "updated_at": "2025-10-20T08:28:43.385523",
     "num_protocols": 16,
     "protocol_dir": "C:\\Git-softwares\\Condition-agent\\data\\protocol_db",
     "has_drfp": true,
@@ -41,7 +41,7 @@
         "CCCCCCCCB1OC(C)(C)C(C)(C)O1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.876773"
+      "indexed_at": "2025-10-20T08:28:43.240349"
     },
     "alpha_arylation_Pd_enamine_Dong_v100p0099.json": {
       "filename": "alpha_arylation_Pd_enamine_Dong_v100p0099.json",
@@ -77,7 +77,7 @@
         "O=C(C)c3ccc(C4C(CCC4)=O)cc3"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.893321"
+      "indexed_at": "2025-10-20T08:28:43.252327"
     },
     "Aryl mesylate_Suzuki.json": {
       "filename": "Aryl mesylate_Suzuki.json",
@@ -113,12 +113,12 @@
         "CC(C)(C)c1ccc(-c2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.909964"
+      "indexed_at": "2025-10-20T08:28:43.264189"
     },
     "Aryl_Iodide_Cyanation.json": {
       "filename": "Aryl_Iodide_Cyanation.json",
       "filepath": "protocol_db\\Aryl_Iodide_Cyanation.json",
-      "file_hash": "5ae417059ee05b794f8e95a48577d225",
+      "file_hash": "85457635c804a795e823ecbe4924a95c",
       "reaction_smiles": "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43",
       "reaction_family": "Aryl_Iodide_Cyanation",
       "tags": [
@@ -131,7 +131,7 @@
         "OrgSyn v97p0314"
       ],
       "reaction_smarts": [
-        "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43"
+        "I[c,n,o,s]>>N#C[c,n,o,s]"
       ],
       "notes": "Pd–Xantphos-catalyzed cyanation of 3-iodo-1H-indazole using K4[Fe(CN)6]·3H2O in DMAc/H2O under argon to give 1H-indazole-3-carbonitrile.",
       "source_title": "Preparation of 1H-Indazole-3-carbonitrile",
@@ -147,7 +147,7 @@
         "N#CC3=NNC4=CC=CC=C43"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.920991"
+      "indexed_at": "2025-10-20T08:28:43.269034"
     },
     "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA.json": {
       "filename": "Evano_2016_Cu_cyanation_alkenyl_iodides_stepA.json",
@@ -176,7 +176,7 @@
         "N#CC=CCCCCCC"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.931554"
+      "indexed_at": "2025-10-20T08:28:43.274223"
     },
     "Grubbs_RCM_Ferguson_2003.json": {
       "filename": "Grubbs_RCM_Ferguson_2003.json",
@@ -209,7 +209,7 @@
         "CC(C)(C)OC(=O)N1CCC=C1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.938155"
+      "indexed_at": "2025-10-20T08:28:43.285265"
     },
     "Hydroacylation_Ni_aryl_alkene+acyl_fluoride.json": {
       "filename": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride.json",
@@ -236,7 +236,7 @@
         "CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.951405"
+      "indexed_at": "2025-10-20T08:28:43.296830"
     },
     "Ni_Cross_Electrophile_Acylation.json": {
       "filename": "Ni_Cross_Electrophile_Acylation.json",
@@ -273,7 +273,7 @@
         "CCOC(=O)CC(=O)CCCCCCCC"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.959980"
+      "indexed_at": "2025-10-20T08:28:43.302331"
     },
     "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json": {
       "filename": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.json",
@@ -306,7 +306,7 @@
         "C1(C2=COC=C2)=CN=CN=C1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.959980"
+      "indexed_at": "2025-10-20T08:28:43.315603"
     },
     "pd_acetylation_aryl_bromide_Garg_v98p0068.json": {
       "filename": "pd_acetylation_aryl_bromide_Garg_v98p0068.json",
@@ -341,7 +341,7 @@
         "CC(C2=CC=CC=C2)=O"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.976566"
+      "indexed_at": "2025-10-20T08:28:43.320787"
     },
     "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json": {
       "filename": "Pd_Buchwald_Arylsulfonate_Amination_CMPhos.json",
@@ -376,7 +376,7 @@
         "CC(C)(C)c1ccc(N(C)c2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.976566"
+      "indexed_at": "2025-10-20T08:28:43.334181"
     },
     "Pd_Conjugate_Addition_Alkyne_to_Enone.json": {
       "filename": "Pd_Conjugate_Addition_Alkyne_to_Enone.json",
@@ -412,7 +412,7 @@
         "CC(=O)CCC#CC1=CC=CC=C1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.993096"
+      "indexed_at": "2025-10-20T08:28:43.344315"
     },
     "Renaudet_Reymond_2004_Mitsunobu.json": {
       "filename": "Renaudet_Reymond_2004_Mitsunobu.json",
@@ -446,19 +446,19 @@
         "O=Cc1ccc(OCc2ccccc2)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:47.993096"
+      "indexed_at": "2025-10-20T08:28:43.352350"
     },
     "Sonogashira-Coupling.json": {
       "filename": "Sonogashira-Coupling.json",
       "filepath": "protocol_db\\Sonogashira-Coupling.json",
-      "file_hash": "83b235ab2e157ee12bfea5a28e1cbb71",
+      "file_hash": "121e0002b52b373279aad9b809d34cea",
       "reaction_smiles": "NC(=O)c1ccccc1I.C#CCCCC>>NC(=O)c1ccccc1C#CCCCC",
       "reaction_family": "Sonogashira_Coupling",
       "tags": [
         "Sonogashira, Pd, Coupling"
       ],
       "reaction_smarts": [
-        "[c,n,o,s]I.C#C>>[c,n,o,s]C#C"
+        "[c,n,o,s][Br,Cl,I].C#C>>[c,n,o,s]C#C"
       ],
       "notes": "Pd(OAc)₂ (1 mol%), CuI (1 mol%), PPh₃ (2 mol%) in DMF (40 mL) and Et₃N (120 mL); 1‑hexyne (1.3 equiv); 60 °C oil bath under N₂, 16 h; aqueous workup and silica gel chromatography; 90% yield (checkers: 91%).",
       "source_title": "N‑Carboxylated‑2‑substituted Indoles and 2,3‑Disubstituted‑2,3‑dihydro‑4‑quinolones from 2‑Alkynylbenzamides — Step A: 2‑(1‑Hexynyl)benzamide",
@@ -475,7 +475,7 @@
         "NC(=O)c1ccccc1C#CCCCC"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:48.009796"
+      "indexed_at": "2025-10-20T08:28:43.364147"
     },
     "Suzuki_Cu_C(sp3)-C(sp2).json": {
       "filename": "Suzuki_Cu_C(sp3)-C(sp2).json",
@@ -504,7 +504,7 @@
         "Clc4ccc(C5CCCCC5)cc4"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:48.026690"
+      "indexed_at": "2025-10-20T08:28:43.376018"
     },
     "visible_light_CS_coupling_Miyake_v100p0234.json": {
       "filename": "visible_light_CS_coupling_Miyake_v100p0234.json",
@@ -541,7 +541,7 @@
         "CC(=O)c1ccc(S-c2ccccc2Cl)cc1"
       ],
       "has_drfp": true,
-      "indexed_at": "2025-10-20T07:49:48.026690"
+      "indexed_at": "2025-10-20T08:28:43.385523"
     }
   },
   "family_index": {

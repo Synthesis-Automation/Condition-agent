@@ -11,7 +11,7 @@
   "reaction": {
     "reaction_smiles": "NC(=O)c1ccccc1I.C#CCCCC>>NC(=O)c1ccccc1C#CCCCC",
     "reaction_SMARTS": [
-      "[c,n,o,s]I.C#C>>[c,n,o,s]C#C"
+      "[c,n,o,s][Br,Cl,I].C#C>>[c,n,o,s]C#C"
     ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
