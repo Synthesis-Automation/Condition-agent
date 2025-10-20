@@ -11,7 +11,7 @@
   "reaction": {
     "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
     "reaction_SMARTS": [
-      "IC.B2pin2>>CB(Opin)"
+      "IC.BB>>CB"
     ],
     "compatible_functional_groups": [
       "ketone",
