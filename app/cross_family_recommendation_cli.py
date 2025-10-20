@@ -46,6 +46,69 @@ def extract_chemicals_by_roles(chemicals: list, roles: list) -> dict:
     return result
 
 
+def find_matching_precedents(rec: dict, all_precedents: list, max_count: int = 5) -> list:
+    """
+    Find matching precedents for a recommendation from the full precedents list.
+    
+    Args:
+        rec: Recommendation dict with 'summary' and 'combo'
+        all_precedents: List of all precedent dicts from result['precedents_used']['top_precedents']
+        max_count: Maximum number of precedents to return
+    
+    Returns:
+        List of matching precedent dicts
+    """
+    # First, check if summary already has precedents
+    summary = rec.get('summary', {})
+    if summary.get('precedents'):
+        return summary['precedents'][:max_count]
+    
+    # Try to match based on combo (base + solvent)
+    combo = rec.get('combo', {})
+    base_uid = combo.get('base_uid')
+    solvent_uid = combo.get('solvent_uid')
+    
+    if not base_uid and not solvent_uid:
+        return []
+    
+    # Find precedents that match the combo
+    matched = []
+    for prec in all_precedents:
+        # Check if base matches
+        base_match = False
+        if base_uid:
+            for reagent in prec.get('reagents', []):
+                if reagent.get('cas') == base_uid:
+                    base_match = True
+                    break
+        else:
+            base_match = True  # No base requirement
+        
+        # Check if solvent matches
+        solvent_match = False
+        if solvent_uid:
+            for solvent in prec.get('solvents', []):
+                if solvent.get('cas') == solvent_uid:
+                    solvent_match = True
+                    break
+        else:
+            solvent_match = True  # No solvent requirement
+        
+        if base_match and solvent_match:
+            # Convert to simplified format for display
+            matched.append({
+                'reaction_id': prec.get('reaction_id'),
+                'core': prec.get('core'),
+                'yield_pct': prec.get('yield'),
+                'reference': prec.get('reference', '')
+            })
+            
+            if len(matched) >= max_count:
+                break
+    
+    return matched
+
+
 def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int = 3):
     """Print recommendation results in a readable format."""
     print_separator()
@@ -83,6 +146,9 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
         return
     
     print(f"\nFound {len(recommendations)} recommendation(s):\n")
+    
+    # Get all precedents from result for matching
+    all_precedents = result.get('precedents_used', {}).get('top_precedents', [])
     
     for idx, rec in enumerate(recommendations, 1):
         print(f"{'─' * 80}")
@@ -153,11 +219,17 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 if count > 0:
                     print(f"  Precedent Support: {count} similar reaction(s)")
         
-        # Precedent information from summary
-        precedents = summary.get("precedents", [])
+        # Precedent information - use helper to find matching precedents
+        precedents = find_matching_precedents(rec, all_precedents, max_precedents)
         if precedents:
             num_to_show = min(len(precedents), max_precedents)
-            print(f"  Top Precedents ({num_to_show} of {len(precedents)}):")
+            support = summary.get('support', {})
+            total_support = support.get('count', 0)
+            # Use the actual support count if available, otherwise use precedent count
+            if total_support > 0:
+                print(f"  Top Precedents ({num_to_show} of {total_support}):")
+            else:
+                print(f"  Top Precedents ({num_to_show}):")
             for i, prec in enumerate(precedents[:max_precedents], 1):
                 reaction_id = prec.get("reaction_id", "N/A")
                 ref = prec.get("reference", "")
@@ -175,7 +247,7 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 if ref_title:
                     print(f"       Ref: {ref_title}...")
         else:
-            # If no precedents in summary, note it
+            # If no precedents found
             print(f"  Top Precedents: None available")
         
         print()
