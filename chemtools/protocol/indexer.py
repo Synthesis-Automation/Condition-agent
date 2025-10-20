@@ -7,20 +7,29 @@ The index includes reaction fingerprints for DRFP-based similarity search.
 This module focuses on:
 1. Scanning protocol_db directory
 2. Extracting metadata (reaction, family, tags, source)
-3. Computing DRFP fingerprints
+3. Computing DRFP fingerprints (stored separately in NPZ format)
 4. Building searchable index
 5. Incremental updates
+
+DRFP Storage Strategy:
+- DRFP fingerprints are stored in a separate .npz file (compressed binary)
+- This reduces index JSON size by ~90% (from 4096 floats per protocol)
+- Uses uint8 arrays (0-255) for space efficiency
+- Protocol index only stores metadata; fingerprints loaded on-demand
 
 Usage:
     from chemtools.protocol.indexer import ProtocolIndexer
     
-    # Build index
+    # Build index with DRFP fingerprints
     indexer = ProtocolIndexer()
-    indexer.build_index()
+    indexer.build_index(compute_drfp=True)
     indexer.save()
     
     # Load existing index
     indexer = ProtocolIndexer.load()
+    
+    # Get DRFP fingerprint for a protocol
+    fp = indexer.get_drfp_fingerprint("protocol_001.json")
 """
 
 import json
@@ -32,6 +41,15 @@ from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Try to import DRFP storage utilities
+try:
+    from ..util.drfp_storage import DRFPLoader, save_drfp_index
+    _DRFP_STORAGE_AVAILABLE = True
+except ImportError:
+    DRFPLoader = None  # type: ignore
+    save_drfp_index = None  # type: ignore
+    _DRFP_STORAGE_AVAILABLE = False
 
 
 @dataclass
@@ -65,14 +83,15 @@ class ProtocolRecord:
     reactants: List[str] = field(default_factory=list)
     products: List[str] = field(default_factory=list)
     
-    # DRFP fingerprint (stored as list for JSON serialization)
-    drfp_fingerprint: Optional[List[float]] = None
+    # DRFP fingerprint reference (NOT stored in JSON - use separate NPZ file)
+    # This flag indicates whether DRFP was computed for this protocol
+    has_drfp: bool = False
     
     # Metadata
     indexed_at: str = ""
     
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for JSON serialization"""
+        """Convert to dictionary for JSON serialization (excludes DRFP data)"""
         return asdict(self)
     
     @classmethod
@@ -88,15 +107,21 @@ class ProtocolIndexer:
     The indexer:
     - Scans protocol_db/*.json files
     - Extracts reaction info and metadata
-    - Computes DRFP fingerprints for similarity search
+    - Computes DRFP fingerprints for similarity search (stored in separate NPZ)
     - Builds lookup indexes (by family, tags)
     - Supports incremental updates (only reindex changed files)
+    
+    DRFP Storage:
+    - Fingerprints stored in separate .protocol_drfp.npz file (compressed binary)
+    - Reduces index size by ~90% compared to embedding in JSON
+    - Loaded on-demand via DRFPLoader for similarity searches
     """
     
     def __init__(
         self,
         protocol_dir: Optional[Path] = None,
-        index_path: Optional[Path] = None
+        index_path: Optional[Path] = None,
+        drfp_path: Optional[Path] = None
     ):
         """
         Initialize indexer
@@ -104,6 +129,7 @@ class ProtocolIndexer:
         Args:
             protocol_dir: Directory containing protocol JSON files
             index_path: Path to save index file
+            drfp_path: Path to save DRFP fingerprints NPZ file
         """
         # Set default paths
         if protocol_dir is None:
@@ -113,13 +139,20 @@ class ProtocolIndexer:
         if index_path is None:
             index_path = protocol_dir / '.protocol_index.json'
         
+        if drfp_path is None:
+            drfp_path = protocol_dir / '.protocol_drfp.npz'
+        
         self.protocol_dir = Path(protocol_dir)
         self.index_path = Path(index_path)
+        self.drfp_path = Path(drfp_path)
         
         # Index data structures
         self.records: Dict[str, ProtocolRecord] = {}  # filename -> record
         self.family_index: Dict[str, List[str]] = {}  # family -> [filenames]
         self.tag_index: Dict[str, List[str]] = {}  # tag -> [filenames]
+        
+        # DRFP loader (lazy-loaded)
+        self._drfp_loader: Optional[Any] = None
         
         # Index metadata
         self.metadata = {
@@ -128,7 +161,8 @@ class ProtocolIndexer:
             'updated_at': None,
             'num_protocols': 0,
             'protocol_dir': str(self.protocol_dir),
-            'has_drfp': False  # Whether DRFP fingerprints are computed
+            'has_drfp': False,  # Whether DRFP fingerprints are computed
+            'drfp_storage': 'npz'  # Storage format for DRFP fingerprints
         }
     
     def build_index(self, compute_drfp: bool = True, force_rebuild: bool = False):
@@ -158,10 +192,14 @@ class ProtocolIndexer:
         protocol_files = self._find_protocol_files()
         logger.info(f"Found {len(protocol_files)} protocol files")
         
-        # Process each file
+        # Process each file and collect DRFP data
         processed = 0
         skipped = 0
         errors = 0
+        
+        # For DRFP storage
+        drfp_fingerprints = []
+        drfp_filenames = []
         
         for json_path in protocol_files:
             try:
@@ -178,13 +216,37 @@ class ProtocolIndexer:
                         continue
                 
                 # Process the file
-                record = self._process_protocol_file(json_path, file_hash, compute_drfp)
+                record, drfp_fp = self._process_protocol_file(json_path, file_hash, compute_drfp)
                 self.records[filename] = record
                 processed += 1
+                
+                # Collect DRFP fingerprint if computed
+                if drfp_fp is not None:
+                    drfp_fingerprints.append(drfp_fp)
+                    drfp_filenames.append(filename)
                 
             except Exception as e:
                 logger.error(f"Error processing {json_path.name}: {e}")
                 errors += 1
+        
+        # Save DRFP fingerprints to separate NPZ file
+        if compute_drfp and drfp_fingerprints and _DRFP_STORAGE_AVAILABLE:
+            try:
+                logger.info(f"Saving {len(drfp_fingerprints)} DRFP fingerprints to {self.drfp_path}")
+                save_drfp_index(
+                    fingerprints=drfp_fingerprints,
+                    reaction_ids=drfp_filenames,
+                    output_path=str(self.drfp_path),
+                    n_bits=4096,
+                    radius=3
+                )
+                self.metadata['has_drfp'] = True
+            except Exception as e:
+                logger.error(f"Failed to save DRFP fingerprints: {e}")
+                self.metadata['has_drfp'] = False
+        elif compute_drfp and not _DRFP_STORAGE_AVAILABLE:
+            logger.warning("DRFP storage utilities not available. Fingerprints not saved.")
+            self.metadata['has_drfp'] = False
         
         # Build lookup indexes
         self._build_lookup_indexes()
@@ -194,13 +256,13 @@ class ProtocolIndexer:
             self.metadata['created_at'] = datetime.utcnow().isoformat()
         self.metadata['updated_at'] = datetime.utcnow().isoformat()
         self.metadata['num_protocols'] = len(self.records)
-        self.metadata['has_drfp'] = compute_drfp
         
         logger.info(f"Index build complete:")
         logger.info(f"  Processed: {processed}")
         logger.info(f"  Skipped (unchanged): {skipped}")
         logger.info(f"  Errors: {errors}")
         logger.info(f"  Total protocols: {len(self.records)}")
+        logger.info(f"  DRFP fingerprints: {len(drfp_fingerprints) if drfp_fingerprints else 0}")
     
     def _find_protocol_files(self) -> List[Path]:
         """Find all protocol JSON files (excluding examples and hidden files)"""
@@ -230,7 +292,7 @@ class ProtocolIndexer:
         json_path: Path,
         file_hash: str,
         compute_drfp: bool
-    ) -> ProtocolRecord:
+    ) -> tuple[ProtocolRecord, Optional[Any]]:
         """
         Process a single protocol file and create index record
         
@@ -240,7 +302,8 @@ class ProtocolIndexer:
             compute_drfp: Whether to compute DRFP fingerprint
         
         Returns:
-            ProtocolRecord with extracted metadata
+            Tuple of (ProtocolRecord, drfp_fingerprint)
+            drfp_fingerprint is None if not computed or computation failed
         """
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -275,13 +338,16 @@ class ProtocolIndexer:
         
         # Compute DRFP fingerprint if requested
         drfp_fp = None
+        has_drfp = False
         if compute_drfp and reaction_smiles:
             try:
                 drfp_fp = self._compute_drfp(reaction_smiles)
+                if drfp_fp is not None:
+                    has_drfp = True
             except Exception as e:
                 logger.debug(f"Could not compute DRFP for {json_path.name}: {e}")
         
-        # Create record
+        # Create record (without embedding DRFP)
         record = ProtocolRecord(
             filename=json_path.name,
             filepath=str(json_path.relative_to(self.protocol_dir.parent)),
@@ -299,11 +365,11 @@ class ProtocolIndexer:
             canonical_reaction=canonical_rxn,
             reactants=reactants,
             products=products,
-            drfp_fingerprint=drfp_fp,
+            has_drfp=has_drfp,
             indexed_at=datetime.utcnow().isoformat()
         )
         
-        return record
+        return record, drfp_fp
     
     def _parse_reaction(self, reaction_smiles: str) -> tuple[str, List[str], List[str]]:
         """
@@ -356,12 +422,12 @@ class ProtocolIndexer:
             logger.debug(f"Error parsing reaction: {e}")
             return reaction_smiles, [], []
     
-    def _compute_drfp(self, reaction_smiles: str) -> Optional[List[float]]:
+    def _compute_drfp(self, reaction_smiles: str) -> Optional[Any]:
         """
         Compute DRFP fingerprint for a reaction
         
         Returns:
-            List of float values (DRFP vector) or None if computation fails
+            NumPy array (uint8) or None if computation fails
         """
         try:
             from drfp import DrfpEncoder
@@ -371,16 +437,52 @@ class ProtocolIndexer:
             encoder = DrfpEncoder()
             fp = encoder.encode([reaction_smiles])[0]
             
-            # Convert to list for JSON serialization
+            # Convert to uint8 numpy array for efficient storage
             if isinstance(fp, np.ndarray):
-                return fp.tolist()
-            return list(fp)
+                return fp.astype('uint8')
+            return np.array(fp, dtype='uint8')
             
         except ImportError:
             logger.warning("DRFP package not available. Install with: pip install drfp")
             return None
         except Exception as e:
             logger.debug(f"DRFP computation failed: {e}")
+            return None
+    
+    def get_drfp_fingerprint(self, filename: str) -> Optional[Any]:
+        """
+        Get DRFP fingerprint for a protocol from the NPZ file
+        
+        Args:
+            filename: Protocol filename (e.g., 'Suzuki_Cu_C(sp3)-C(sp2).json')
+        
+        Returns:
+            NumPy array of DRFP fingerprint or None if not available
+        """
+        if not self.metadata.get('has_drfp', False):
+            return None
+        
+        if not _DRFP_STORAGE_AVAILABLE or DRFPLoader is None:
+            logger.warning("DRFP storage utilities not available")
+            return None
+        
+        # Lazy-load DRFP loader
+        if self._drfp_loader is None:
+            if not self.drfp_path.exists():
+                logger.warning(f"DRFP file not found: {self.drfp_path}")
+                return None
+            
+            try:
+                self._drfp_loader = DRFPLoader(str(self.drfp_path))
+            except Exception as e:
+                logger.error(f"Failed to load DRFP file: {e}")
+                return None
+        
+        # Get fingerprint for this protocol
+        try:
+            return self._drfp_loader.get_fingerprint(filename)
+        except Exception as e:
+            logger.debug(f"Could not get DRFP for {filename}: {e}")
             return None
     
     def _build_lookup_indexes(self):
@@ -464,8 +566,11 @@ class ProtocolIndexer:
         else:
             protocol_dir = index_path.parent
         
+        # Determine DRFP path
+        drfp_path = protocol_dir / '.protocol_drfp.npz'
+        
         # Create indexer instance
-        indexer = cls(protocol_dir=protocol_dir, index_path=index_path)
+        indexer = cls(protocol_dir=protocol_dir, index_path=index_path, drfp_path=drfp_path)
         
         # Load metadata
         indexer.metadata = index_data.get('metadata', {})
@@ -481,6 +586,8 @@ class ProtocolIndexer:
         
         logger.info(f"Loaded protocol index from {index_path}")
         logger.info(f"  {len(indexer.records)} protocols")
+        if indexer.metadata.get('has_drfp', False):
+            logger.info(f"  DRFP fingerprints available in {indexer.drfp_path}")
         
         return indexer
     
