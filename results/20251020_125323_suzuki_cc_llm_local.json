@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "generated_at": "2025-10-20T04:56:28.645014Z",
+    "model": "LLM-synthesis",
+    "model_version": "1.0.0",
+    "status": "success",
+    "version": "2.0",
+    "processing_time_ms": 179018.4
+  },
+  "input": {
+    "reaction_smiles": "BrC1=CC=CC=C1.OB(O)c2ccoc2>>C3(C4=COC=C4)=CC=CC=C3",
+    "family": "Unknown"
+  },
+  "detection": {
+    "family": "Unknown",
+    "detected_reaction_type": "Unknown",
+    "method": "llm-multi-source",
+    "confidence": 0.75
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "chemicals": [
+        {
+          "smiles": "BrC1=CC=CC=C1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "OB(O)c2ccoc2",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Tris(dibenzylideneacetone)dipalladium(0)",
+          "role": "metal_precursor",
+          "notes": "Pd2(dba)3",
+          "abbreviation": "Pd2(dba)3",
+          "cas": "51364-51-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "SPhos",
+          "role": "ligand",
+          "notes": "SPhos",
+          "abbreviation": "SPhos",
+          "cas": "657408-07-6",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Potassium carbonate",
+          "role": "base",
+          "notes": "K2CO3",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "THF/H2O",
+          "role": "solvent",
+          "notes": "THF/H2O (4:1)",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          60.0,
+          60.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.75,
+      "summary": {
+        "rationale": "Rule source provides specific guidance for Suzuki coupling with heteroaryl boronate (2-furylboronate). SPhos ligand recommended for electron-rich/heteroaryl systems. THF/H2O biphasic system facilitates base solubility while maintaining organoboron stability. Temperature from Rule source optimized for conversion.",
+        "warnings": [
+          "2-Furylboronate may be sensitive to protodeboronation - monitor reaction progress",
+          "Heteroaryl systems can coordinate Pd differently - SPhos/XPhos recommended",
+          "Aqueous base necessary but minimize water content with boronate ester",
+          "No nitro groups present so no reduction risk"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "medium"
+      }
+    },
+    {
+      "rank": 2,
+      "chemicals": [
+        {
+          "smiles": "BrC1=CC=CC=C1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "OB(O)c2ccoc2",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Pd(PPh3)4",
+          "role": "metal_precursor",
+          "notes": "Pd(PPh3)4",
+          "abbreviation": null,
+          "cas": null,
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Potassium carbonate",
+          "role": "base",
+          "notes": "K2CO3",
+          "abbreviation": "K2CO3",
+          "cas": "584-08-7",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "1,4-Dioxane",
+          "role": "solvent",
+          "notes": "1,4-dioxane",
+          "abbreviation": null,
+          "cas": "123-91-1",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          80.0,
+          80.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.65,
+      "summary": {
+        "rationale": "<30% conv after 6h: try traditional Pd(PPh3)4 in dioxane with higher temp",
+        "warnings": [
+          "2-Furylboronate may be sensitive to protodeboronation - monitor reaction progress",
+          "Heteroaryl systems can coordinate Pd differently - SPhos/XPhos recommended",
+          "Aqueous base necessary but minimize water content with boronate ester",
+          "No nitro groups present so no reduction risk"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    },
+    {
+      "rank": 3,
+      "chemicals": [
+        {
+          "smiles": "BrC1=CC=CC=C1",
+          "role": "electrophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "smiles": "OB(O)c2ccoc2",
+          "role": "nucleophile",
+          "name": null,
+          "abbreviation": null,
+          "cas": null,
+          "equivalents": null
+        },
+        {
+          "name": "Palladium(II) acetate",
+          "role": "metal_precursor",
+          "notes": "Pd(OAc)2",
+          "abbreviation": "Pd(OAc)2",
+          "cas": "3375-31-3",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "XPhos",
+          "role": "ligand",
+          "notes": "XPhos",
+          "abbreviation": "XPhos",
+          "cas": "564483-18-7",
+          "smiles": null,
+          "equivalents": null
+        },
+        {
+          "name": "Cesium carbonate",
+          "role": "base",
+          "notes": "Cs2CO3",
+          "abbreviation": "Cs2CO3",
+          "cas": "534-17-8",
+          "smiles": null,
+          "equivalents": 2.0
+        },
+        {
+          "name": "Toluene",
+          "role": "solvent",
+          "notes": "toluene/H2O",
+          "abbreviation": "PhMe",
+          "cas": "108-88-3",
+          "smiles": null,
+          "equivalents": null
+        }
+      ],
+      "conditions": {
+        "temperature": [
+          90.0,
+          90.0
+        ],
+        "time": [
+          6.0,
+          24.0
+        ],
+        "atmosphere": null
+      },
+      "confidence": 0.55,
+      "summary": {
+        "rationale": "<20% conv after 12h: switch to more active Pd/XPhos system with stronger base",
+        "warnings": [
+          "2-Furylboronate may be sensitive to protodeboronation - monitor reaction progress",
+          "Heteroaryl systems can coordinate Pd differently - SPhos/XPhos recommended",
+          "Aqueous base necessary but minimize water content with boronate ester",
+          "No nitro groups present so no reduction risk"
+        ]
+      },
+      "source": {
+        "method": "llm-multi-source-synthesis",
+        "confidence_level": "low"
+      }
+    }
+  ],
+  "extras": {
+    "llm_synthesis": {
+      "consensus_analysis": {
+        "catalyst": {
+          "agreement": "low",
+          "consensus_value": "Pd(PPh3)4",
+          "notes": "ML sources agree on Pd(PPh3)4, but Rule source prefers Pd2(dba)3/SPhos and Protocol has no catalyst"
+        },
+        "solvent": {
+          "agreement": "low",
+          "consensus_value": "No consensus",
+          "notes": "ML: dioxane/DMF/MeOH (disagree), Rule: THF/H2O, Protocol: tert-amyl alcohol"
+        },
+        "temperature": {
+          "agreement": "low",
+          "consensus_value": "45-60°C",
+          "notes": "Only Rule source specifies temperature (45-60°C), others unspecified"
+        },
+        "base": {
+          "agreement": "medium",
+          "consensus_value": "Potassium carbonate",
+          "notes": "2/3 ML sources + Rule source use K2CO3, Protocol uses K3PO4"
+        }
+      },
+      "confidence_level": "medium",
+      "confidence_reasoning": "Medium confidence due to base agreement across sources but significant divergence in catalyst/solvent recommendations. ML similarity scores are very low (0.01), but Rule source provides substrate-specific guidance.",
+      "recommended_condition": {
+        "catalyst": "Pd2(dba)3",
+        "ligand": "SPhos",
+        "solvent": "THF/H2O (4:1)",
+        "temperature": "60°C",
+        "base": "K2CO3",
+        "additive": "None",
+        "rationale": "Rule source provides specific guidance for Suzuki coupling with heteroaryl boronate (2-furylboronate). SPhos ligand recommended for electron-rich/heteroaryl systems. THF/H2O biphasic system facilitates base solubility while maintaining organoboron stability. Temperature from Rule source optimized for conversion."
+      },
+      "backup_conditions": [
+        {
+          "catalyst": "Pd(PPh3)4",
+          "ligand": "None",
+          "solvent": "1,4-dioxane",
+          "temperature": "80°C",
+          "base": "K2CO3",
+          "when_to_use": "<30% conv after 6h: try traditional Pd(PPh3)4 in dioxane with higher temp"
+        },
+        {
+          "catalyst": "Pd(OAc)2",
+          "ligand": "XPhos",
+          "solvent": "toluene/H2O",
+          "temperature": "90°C",
+          "base": "Cs2CO3",
+          "when_to_use": "<20% conv after 12h: switch to more active Pd/XPhos system with stronger base"
+        }
+      ],
+      "warnings": [
+        "2-Furylboronate may be sensitive to protodeboronation - monitor reaction progress",
+        "Heteroaryl systems can coordinate Pd differently - SPhos/XPhos recommended",
+        "Aqueous base necessary but minimize water content with boronate ester",
+        "No nitro groups present so no reduction risk"
+      ],
+      "source_comparison": {
+        "ml_contribution": "Provided multiple Pd(PPh3)4 conditions but with low confidence scores",
+        "rule_contribution": "Key guidance for heteroaryl boronate system with Pd2(dba)3/SPhos",
+        "protocol_contribution": "Alternative solvent (tert-amyl alcohol) and base (K3PO4) options"
+      }
+    },
+    "sources_used": {
+      "ml_precedents": 3,
+      "rule_matches": 1,
+      "protocol_procedures": 1
+    },
+    "llm_metadata": {
+      "model": "deepseek-v3.2-exp",
+      "tokens": 1641,
+      "latency_ms": 179018.15449999413,
+      "processing_time_ms": 179018.40119998087
+    }
+  }
+}

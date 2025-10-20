@@ -297,9 +297,9 @@ def convert_llm_synthesis_to_standard_format(
         format_meta,
         format_input,
         format_detection,
-        _normalize_chemical_entry,
-        _normalize_conditions_block,
-        _starting_material_entries,
+        normalize_chemical_entry,
+        normalize_conditions_block,
+        starting_material_entries,
     )
     
     if synthesis_result.get("status") != "success":
@@ -407,13 +407,13 @@ def _build_recommendation_from_llm(
         Standard recommendation dictionary
     """
     from chemtools.output_formatter import (
-        _normalize_chemical_entry,
-        _starting_material_entries,
-        _normalize_rule_string_value,
+        normalize_chemical_entry,
+        starting_material_entries,
+        normalize_rule_string_value,
     )
     
     # Start with reactants
-    chemicals = _starting_material_entries(reaction_smiles)
+    chemicals = starting_material_entries(reaction_smiles)
     
     # Extract catalyst system from LLM output
     catalyst_name = condition_dict.get("catalyst")
@@ -425,19 +425,19 @@ def _build_recommendation_from_llm(
     
     # Add chemicals with enrichment
     if catalyst_name and catalyst_name not in ["None", "N/A", None]:
-        chemicals.append(_normalize_rule_string_value(catalyst_name, "metal_precursor"))
+        chemicals.append(normalize_rule_string_value(catalyst_name, "metal_precursor"))
     
     if ligand_name and ligand_name not in ["None", "N/A", None, "None (pre-formed catalyst)", "pre-complexed"]:
-        chemicals.append(_normalize_rule_string_value(ligand_name, "ligand"))
+        chemicals.append(normalize_rule_string_value(ligand_name, "ligand"))
     
     if base_name and base_name not in ["None", "N/A", None]:
-        chemicals.append(_normalize_rule_string_value(base_name, "base", amount="200%"))
+        chemicals.append(normalize_rule_string_value(base_name, "base", amount="200%"))
     
     if solvent_name and solvent_name not in ["None", "N/A", None]:
-        chemicals.append(_normalize_rule_string_value(solvent_name, "solvent"))
+        chemicals.append(normalize_rule_string_value(solvent_name, "solvent"))
     
     if additive_name and additive_name not in ["None", "N/A", None]:
-        chemicals.append(_normalize_rule_string_value(additive_name, "additive"))
+        chemicals.append(normalize_rule_string_value(additive_name, "additive"))
     
     # Parse temperature
     temp_value = None

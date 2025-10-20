@@ -15,13 +15,14 @@
   },
   "reaction": {
     "reaction_smiles": "C#Cc1ccccc1.CCC(=O)C=C>>CC(=O)CCC#CC1=CC=CC=C1",
-    "reaction_SMARTS": ["[!#1]C#C[H] . [#6;!a][C](=O)[CH]=[CH2] >> [#6;!a][C](=O)[CH2][CH2]C#C[!#1]"],
+    "reaction_SMARTS": [
+      "C#C.C(=O)C=C>>C(=O)CCC#C"
+    ],
     "compatible_functional_groups": [],
     "incompatible_functional_groups": [],
     "family": "Pd_Conjugate_Addition_Alkyne_to_Enone",
     "notes": "First step only: Pd(OAc)2/PMe3-catalyzed 1,4-addition of phenylacetylene to ethyl vinyl ketone in water; staged alkyne addition; 60 °C for 48 h.",
     "tags": "palladium; conjugate addition; alkyne; enone; water; PMe3; biphasic; vigorous stirring"
-
   },
   "reaction_setup": [
     {

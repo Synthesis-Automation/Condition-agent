@@ -10,7 +10,7 @@
   },
   "reaction": {
     "reaction_smiles": "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
-    "reaction_SMARTS": ["O=C1CCCC1.Br[a]>>[a]C2C(CCC2)=O"],
+    "reaction_SMARTS": ["O=C1CCCC1.Br[c,C,n,o,s]>>[c,C,n,o,s]C2C(CCC2)=O"],
     "compatible_functional_groups": ["ketone", "aromatic", "enamine", "alcohol", "carboxylic acid"],
     "incompatible_functional_groups": ["amine"],
     "family": "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)",
