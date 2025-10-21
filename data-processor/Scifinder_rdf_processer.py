@@ -1181,13 +1181,14 @@ class RDFWorker(QtCore.QObject):
                 pass
 
     def _find_rdf_files(self) -> List[str]:
-        """Find all RDF files in the specified folder"""
+        """Find all RDF files in the specified folder and its subfolders (recursive)"""
         rdf_files = []
         try:
-            for file in os.listdir(self.folder_path):
-                if file.lower().endswith('.rdf'):
-                    full_path = os.path.join(self.folder_path, file)
-                    if os.path.isfile(full_path):
+            # Walk through all subdirectories
+            for root, dirs, files in os.walk(self.folder_path):
+                for file in files:
+                    if file.lower().endswith('.rdf'):
+                        full_path = os.path.join(root, file)
                         rdf_files.append(full_path)
         except Exception as e:
             raise RuntimeError(f"Error scanning folder: {e}")
@@ -2227,7 +2228,10 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         folder_box = QtWidgets.QHBoxLayout()
         folder_box.addWidget(self.folder_edit)
         folder_box.addWidget(self.btn_folder)
+        folder_hint = QtWidgets.QLabel("(includes all subfolders)")
+        folder_hint.setStyleSheet("font-style: italic; color: #666; font-size: 9px;")
         form.addRow("RDF Folder:", folder_box)
+        form.addRow("", folder_hint)
         
         # Output file selection
         output_box = QtWidgets.QHBoxLayout()
@@ -2237,14 +2241,14 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         
         # Add note about file locations
         note_label = QtWidgets.QLabel(
-            "Note: JSONL → data/reaction_dataset/ (for chemtools)\n"
-            "      Markdown → data-processor/original_dataset/ (for records)"
+            "Note: All RDF files in folder and subfolders will be combined\n"
+            "      JSONL → data/reaction_dataset/{category}.jsonl\n"
+            "      Markdown → selected folder/{category}.md"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
         form.addRow("", note_label)
         
         form.addRow("Save unknowns:", self.unknowns_checkbox)
-        form.addRow("", note_label)
         
         layout.addLayout(form)
         
@@ -2303,7 +2307,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             self.output_md_edit.setText(path)
 
     def _update_file_list(self):
-        """Update the list of RDF files found in the selected folder"""
+        """Update the list of RDF files found in the selected folder and subfolders"""
         folder_path = self.folder_edit.text().strip()
         self.file_list.clear()
         self.rdf_files = []
@@ -2314,21 +2318,23 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             return
         
         try:
-            # Find RDF files
-            for file in os.listdir(folder_path):
-                if file.lower().endswith('.rdf'):
-                    full_path = os.path.join(folder_path, file)
-                    if os.path.isfile(full_path):
+            # Find RDF files recursively in all subfolders
+            for root, dirs, files in os.walk(folder_path):
+                for file in files:
+                    if file.lower().endswith('.rdf'):
+                        full_path = os.path.join(root, file)
                         self.rdf_files.append(full_path)
-                        self.file_list.addItem(file)
+                        # Display relative path from selected folder for better clarity
+                        rel_path = os.path.relpath(full_path, folder_path)
+                        self.file_list.addItem(rel_path)
             
             # Update UI
             count = len(self.rdf_files)
             if count == 0:
-                self.file_count_label.setText("No RDF files found in this folder")
+                self.file_count_label.setText("No RDF files found in this folder or subfolders")
                 self.btn_run.setEnabled(False)
             else:
-                self.file_count_label.setText(f"Found {count} RDF file{'s' if count != 1 else ''}")
+                self.file_count_label.setText(f"Found {count} RDF file{'s' if count != 1 else ''} (including subfolders)")
                 self.btn_run.setEnabled(True)
                 
         except Exception as e:
@@ -2364,38 +2370,40 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         self.log_msg("Starting RDF processing...")
         
         # Calculate output paths
-        # Name JSONL using upper folder names, e.g., Buchwald/2021-2025 -> Buchwald2021-2025.jsonl
+        # Name JSONL using folder hierarchy, e.g., C_N_Coupling/2020-2022 -> C_N_Coupling.jsonl
         try:
             folder_path = self.folder_edit.text().strip()
             norm_folder = os.path.normpath(folder_path)
-            parent_dir = os.path.basename(os.path.dirname(norm_folder)) or ""
-            current_dir = os.path.basename(norm_folder) or ""
             import re as _re
             def _safe(s: str) -> str:
                 s = _re.sub(r"\s+", "", s or "")  # remove spaces
                 s = _re.sub(r"[^A-Za-z0-9_-]+", "", s)  # keep only safe chars
                 return s
-            base_name_no_ext = (_safe(parent_dir) + _safe(current_dir)) or "dataset"
+            
+            # Determine the main category folder name
+            # If the selected folder is under original_dataset/, use that as category
+            folder_parts = norm_folder.split(os.sep)
+            category_name = os.path.basename(norm_folder)
+            
+            # Check if this is a category folder (like C_N_Coupling, Suzuki, etc.)
+            # by looking for "original_dataset" in path and taking the next folder
+            if "original_dataset" in folder_parts:
+                idx = folder_parts.index("original_dataset")
+                if idx + 1 < len(folder_parts):
+                    category_name = folder_parts[idx + 1]
             
             # JSONL: Save directly to data/reaction_dataset/ for chemtools consumption
+            # Use category name (all subfolders are automatically included)
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             
-            # Use parent_dir only (e.g., "Suzuki", "C_N_Coupling", "C_O_Coupling") as filename
-            final_name = _safe(parent_dir) or "dataset"
+            final_name = _safe(category_name) or "dataset"
+            # Use simple category name for compatibility with chemtools
             output_jsonl = os.path.join(dataset_dir, final_name + ".jsonl")
             
-            # Markdown: Save to data-processor/original_dataset/{parent_dir}/{current_dir}/
-            # This preserves the folder structure for record-keeping
-            original_dataset_dir = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "original_dataset",
-                _safe(parent_dir) or "dataset",
-                _safe(current_dir) or ""
-            )
-            os.makedirs(original_dataset_dir, exist_ok=True)
-            output_md = os.path.join(original_dataset_dir, final_name + ".md")
+            # Markdown: Save to the selected folder (preserves subfolder structure)
+            output_md = os.path.join(norm_folder, final_name + ".md")
             
             try:
                 # Reflect the computed Markdown path back into the UI
