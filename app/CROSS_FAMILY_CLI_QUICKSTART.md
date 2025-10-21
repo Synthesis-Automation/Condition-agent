@@ -39,7 +39,7 @@ python app/cross_family_recommendation_cli.py --help
 
 ```bash
 # 1. Build unified DRFP index (optional but recommended)
-python scripts/build_unified_drfp_index.py
+python scripts/build_unified_drfp_index.py --force
 
 # 2. Run recommendations
 python app/cross_family_recommendation_cli.py "reaction>>product"
