@@ -367,6 +367,39 @@
     "embedding_text": "member_embedding: type: CATALYST | family: Copper Salts (copper salt) | metal: Cu | ox_states: 1 | name: Copper oxide (Cu2O) | abbr: Cu2O | CAS: 1317-39-1"
   },
   {
+    "id": "KKCXRELNMOYFLS-UHFFFAOYSA-N",
+    "name": "Copper oxide (CuO)",
+    "abbreviation": [
+      "CuO"
+    ],
+    "aliases": [
+      "Copper(II) oxide",
+      "Cupric oxide",
+      "Copper monoxide"
+    ],
+    "cas": "1317-38-0",
+    "inchi_key": "KKCXRELNMOYFLS-UHFFFAOYSA-N",
+    "roles": {
+      "metal_precursor": {
+        "families": [
+          "cu_ii_salts"
+        ],
+        "metal": "Cu",
+        "oxidation_states": [
+          2
+        ]
+      },
+      "oxidant": {
+        "families": [
+          "metal_salt_reoxidants"
+        ],
+        "strength_band": "moderate",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper oxide (CuO) | abbr: CuO | CAS: 1317-38-0 | synonyms: Copper oxide (CuO); Cuprum oxydatum nigrum; DTXSID5034488; CHEBI:75955; V1XJQ704R4; NSC-83537; Copper Oxide 0.4; RefChem:54904; Cuprite 3 Special Order; DTXCID101333885; 215-269-1; 1317-38-0; Banacobru ol; Black copper oxide; Boliden Salt K-33; Boliden-CCA Wood Preservative; Copper(II) oxide; Cupric oxide; Copper monoxide"
+  },
+  {
     "id": "ARUVKPQLZAKDPS-UHFFFAOYSA-L",
     "name": "Copper Sulfate",
     "abbreviation": [
