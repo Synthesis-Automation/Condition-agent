@@ -926,5 +926,43 @@
       }
     },
     "embedding_text": "type=preformed_metal_catalyst | name=Tris(2,2′‑bipyridine)ruthenium(II) hexafluorophosphate | abbr=Ru(bpy)3(PF6)2 | family=Ruthenium Polypyridyl Photocatalysts (ru-polypyridyl-photoredox) | metal=Ru | ox=2 | ligand_type=bipyridine | additional_ligand=not_needed | cas=60804-74-2"
+  },
+  {
+    "id": "SJFYGUKHUNLZTK-UHFFFAOYSA-L",
+    "name": "Tris[2,2'-bipyridine]ruthenium dichloride",
+    "abbreviation": [
+      "Ru(bpy)₃Cl₂",
+      "Ru-bipy"
+    ],
+    "aliases": [
+      "Tris(2,2'-bipyridine)ruthenium dichloride",
+      "ALF8B3WYC2",
+      "EINECS 238-266-7",
+      "NSC 71326",
+      "Ruthenium tris(2,2'-bipyridine)-, dichloride",
+      "Ruthenium(2+), tris(2,2'-bipyridine)-, dichloride",
+      "Tris(2,2'-bipyridine)ruthenium(II) dichloride",
+      "Ruthenium(2+), tris(2,2'-bipyridine-kappaN1,kappaN1')-, dichloride, (OC-6-11)-",
+      "Ruthenium(2+), tris(2,2'-bipyridine-N,N')-, dichloride, (OC-6-11)-",
+      "tris(2,2'-bipyridine-kappa(2)N(1),N(1'))ruthenium(II) dichloride",
+      "RefChem:192063",
+      "Ruthenium tris(2,2'bipyridine), dichloride",
+      "Tris(2,2'-bipyridyl)ruthenium(II) chloride"
+    ],
+    "cas": "14323-06-9",
+    "inchi_key": "SJFYGUKHUNLZTK-UHFFFAOYSA-L",
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "ru_polypyridyl_photoredox"
+        ],
+        "metal": "Ru",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "bipyridine"
+      }
+    },
+    "embedding_text": "type: PREFORMED_METAL_CATALYST | family: ru_polypyridyl_photoredox (ru_polypyridyl_photoredox) | name: Tris[2,2'-bipyridine]ruthenium dichloride | abbr: Ru(bpy)₃Cl₂ | CAS: 14323-06-9 | synonyms: Tris[2,2'-bipyridine]ruthenium dichloride; Tris(2,2'-bipyridine)ruthenium dichloride; 14323-06-9; ALF8B3WYC2; EINECS 238-266-7; NSC 71326; Ruthenium tris(2,2'-bipyridine)-, dichloride; NSC-71326; Ruthenium(2+), tris(2,2'-bipyridine)-, dichloride; Tris(2,2'-bipyridine)ruthenium(II) dichloride; Ruthenium(2+), tris(2,2'-bipyridine-kappaN1,kappaN1')-, dichloride, (OC-6-11)-; Ruthenium(2+), tris(2,2'-bipyridine-N,N')-, dichloride, (OC-6-11)-; CHEBI:52358; tris(2,2'-bipyridine-kappa(2)N(1),N(1'))ruthenium(II) dichloride; RefChem:192063; Ruthenium tris(2,2'bipyridine), dichloride; Tris(2,2'-bipyridyl)ruthenium(II) chloride"
   }
 ]

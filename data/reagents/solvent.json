@@ -516,6 +516,46 @@
     "embedding_text": "type: SOLVENT | family: Deuterated solvents (NMR) (deuterated) | name: Benzene-d6 | abbr: C6D6 | CAS: 1076-43-3 | proticity:  | polarity:  | coordination:  | synonyms: Deuterated benzene; Benzened6"
   },
   {
+    "id": "JFDZBHWFFUWGJE-UHFFFAOYSA-N",
+    "name": "Benzonitrile",
+    "abbreviation": [
+      "PhCN",
+      "BN"
+    ],
+    "aliases": [
+      "Phenyl cyanide",
+      "Cyanobenzene",
+      "Benzenenitrile",
+      "Benzoic acid nitrile",
+      "Benzene, cyano-",
+      "Benzenecarbonitrile",
+      "Phenylcyanide",
+      "Fenylkyanid",
+      "9V9APP5H5S",
+      "C6H5-CN",
+      "Benzene carbonitrile"
+    ],
+    "cas": "100-47-0",
+    "inchi_key": "JFDZBHWFFUWGJE-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "nitriles"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "moderate"
+      },
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: nitriles (nitriles) | proticity: aprotic | name: Benzonitrile | abbr: PhCN | CAS: 100-47-0 | synonyms: Benzonitrile; 100-47-0; Phenyl cyanide; Cyanobenzene; Benzenenitrile; Benzoic acid nitrile; Benzene, cyano-; Benzenecarbonitrile; Phenylcyanide; Fenylkyanid; 9V9APP5H5S; C6H5-CN; DTXSID7021491; CHEBI:27991; NSC-8039; DTXCID001491; Benzene carbonitrile"
+  },
+  {
     "id": "cas-56-23-5",
     "name": "Carbon tetrachloride",
     "abbreviation": [
