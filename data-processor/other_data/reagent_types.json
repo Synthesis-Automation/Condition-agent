@@ -1,0 +1,412 @@
+{
+  "ArX*": {
+    "members": [
+      {
+        "id": "ArBr",
+        "name": "aryl bromide"
+      },
+      {
+        "id": "ArCl",
+        "name": "aryl chloride"
+      },
+      {
+        "id": "ArI",
+        "name": "aryl iodide"
+      },
+      {
+        "id": "ArF",
+        "name": "aryl fluoride"
+      },
+      {
+        "id": "ArOSO2R",
+        "name": "aryl sulfonate"
+      },
+      {
+        "id": "ArOMs",
+        "name": "aryl mesylate"
+      },
+      {
+        "id": "ArOTf",
+        "name": "aryl triflate"
+      },
+      {
+        "id": "ArOTs",
+        "name": "aryl tosylate"
+      }
+    ],
+    "group": "Electrophiles",
+    "description": "Aryl halides and aryl sulfonates (pseudohalides)."
+  },
+  "VinylX*": {
+    "members": [
+      {
+        "id": "alkene-Br",
+        "name": "vinyl bromide"
+      },
+      {
+        "id": "alkene-I",
+        "name": "vinyl iodide"
+      },
+      {
+        "id": "alkene-Cl",
+        "name": "vinyl chloride"
+      },
+      {
+        "id": "VinylOTf",
+        "name": "vinyl triflate"
+      }
+    ],
+    "group": "Electrophiles",
+    "description": "Vinyl halides and vinyl triflates."
+  },
+  "Alkyl-X": {
+    "members": [
+      {
+        "id": "Alkyl-Br",
+        "name": "alkyl bromide"
+      },
+      {
+        "id": "Alkyl-Cl",
+        "name": "alkyl chloride"
+      },
+      {
+        "id": "Alkyl-I",
+        "name": "alkyl iodide"
+      },
+      {
+        "id": "Alkyl-OSO2R",
+        "name": "alkyl sulfonate"
+      }
+    ],
+    "group": "Electrophiles",
+    "description": "Alkyl halides and alkyl sulfonates."
+  },
+  "RSO2Cl": {
+    "members": [
+      {
+        "id": "RSO2Cl",
+        "name": "sulfonyl chloride"
+      },
+      {
+        "id": "MsCl",
+        "name": "methanesulfonyl chloride"
+      }
+    ],
+    "group": "Electrophiles",
+    "description": "Sulfonyl chlorides (acylating/electrophilic sulfur)."
+  },
+  "Acyl-source-electrophile": {
+    "members": [
+      {
+        "id": "RCOCl",
+        "name": "acyl chloride"
+      },
+      {
+        "id": "PivCl",
+        "name": "pivaloyl chloride"
+      },
+      {
+        "id": "Anhydride",
+        "name": "carboxylic anhydride"
+      }
+    ],
+    "group": "Electrophiles",
+    "description": "Activated acyl electrophiles for amide/ester formation."
+  },
+  "ArB*": {
+    "members": [
+      {
+        "id": "ArB(OH)2",
+        "name": "aryl boronic acid"
+      },
+      {
+        "id": "ArB(OR)2",
+        "name": "aryl boronate ester"
+      },
+      {
+        "id": "ArBF3K",
+        "name": "aryl trifluoroborate"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Aryl boron reagents (boronic acids/esters/trifluoroborates)."
+  },
+  "RB*": {
+    "members": [
+      {
+        "id": "Alkyl-B(OH)2",
+        "name": "alkyl boronic acid"
+      },
+      {
+        "id": "Alkyl-B(OR)2",
+        "name": "alkyl boronate ester"
+      },
+      {
+        "id": "Alkyl-BF3K",
+        "name": "alkyl trifluoroborate"
+      },
+      {
+        "id": "alkeneB(OR)2",
+        "name": "alkenyl boronate ester"
+      },
+      {
+        "id": "alkeneB(OH)2",
+        "name": "alkenyl boronic acid"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Alkyl or alkenyl boron reagents (boronic acids/esters/trifluoroborates)."
+  },
+  "Organometallic": {
+    "members": [
+      {
+        "id": "Alkyl-M",
+        "name": "alkyl organometallic (Grignard, organozinc, etc.)"
+      },
+      {
+        "id": "Ar-M",
+        "name": "aryl organometallic (Grignard, organozinc, etc.)"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Organometallic reagents (Grignard, organozinc, organolithium, etc.)."
+  },
+  "Aliphatic-amine": {
+    "members": [
+      {
+        "id": "RNH2",
+        "name": "primary aliphatic amine"
+      },
+      {
+        "id": "RNH2-a-branch",
+        "name": "primary aliphatic amine (α-branched)"
+      },
+      {
+        "id": "R2NH",
+        "name": "secondary aliphatic amine"
+      },
+      {
+        "id": "R2NH-a-branch",
+        "name": "secondary aliphatic amine (α-branched)"
+      },
+      {
+        "id": "R3N",
+        "name": "tertiary aliphatic amine"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Aliphatic primary/secondary/tertiary amines (including α-branched variants)."
+  },
+  "Aniline-type": {
+    "members": [
+      {
+        "id": "ArNH2",
+        "name": "aniline (primary)"
+      },
+      {
+        "id": "ArNHR",
+        "name": "N-alkyl aniline (secondary)"
+      },
+      {
+        "id": "Ar2NH",
+        "name": "diarylamine (secondary)"
+      },
+      {
+        "id": "arom-NH",
+        "name": "aromatic NH (heteroaromatic)"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Aniline-class amines and heteroaromatic NH nucleophiles."
+  },
+  "ROH": {
+    "members": [
+      {
+        "id": "ROH-primary",
+        "name": "primary aliphatic alcohol"
+      },
+      {
+        "id": "ROH-secondary",
+        "name": "secondary aliphatic alcohol"
+      },
+      {
+        "id": "ROH-tertiary",
+        "name": "tertiary aliphatic alcohol"
+      },
+      {
+        "id": "ROH-a-branch",
+        "name": "aliphatic alcohol (α-branched)"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Aliphatic alcohols (primary, secondary, tertiary, and α-branched)."
+  },
+  "ArOH": {
+    "members": [
+      {
+        "id": "ArOH",
+        "name": "phenol"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Phenols and naphthols."
+  },
+  "RSH": {
+    "members": [
+      {
+        "id": "RSH",
+        "name": "thiol"
+      },
+      {
+        "id": "ArSH",
+        "name": "thiophenol"
+      }
+    ],
+    "group": "Nucleophiles",
+    "description": "Thiols (aliphatic and aromatic)."
+  },
+  "Alkyl-C-H": {
+    "members": [
+      {
+        "id": "Alkyl-H",
+        "name": "aliphatic C–H donor"
+      },
+      {
+        "id": "Alkyl-H-acidic",
+        "name": "acidic aliphatic C–H donor (α to EWG)"
+      }
+    ],
+    "group": "C–H Donors / π-Systems",
+    "description": "Aliphatic C–H donors; acidic/activated variants for C–H activation."
+  },
+  "ArH": {
+    "members": [
+      {
+        "id": "Ar-H",
+        "name": "aryl C–H donor"
+      },
+      {
+        "id": "Hetero-ArH",
+        "name": "heteroaryl C–H donor"
+      }
+    ],
+    "group": "C–H Donors / π-Systems",
+    "description": "Aryl and heteroaryl C–H donors for direct arylation."
+  },
+  "Amide-type": {
+    "members": [
+      {
+        "id": "RCONH2",
+        "name": "primary amide"
+      },
+      {
+        "id": "RCONHR",
+        "name": "secondary amide"
+      },
+      {
+        "id": "Lactam",
+        "name": "lactam"
+      },
+      {
+        "id": "Carbamate",
+        "name": "carbamate (ROC(O)NR2)"
+      },
+      {
+        "id": "Sulfonyl-amide",
+        "name": "sulfonyl amide (RSO2NR2)"
+      },
+      {
+        "id": "Urea",
+        "name": "urea"
+      }
+    ],
+    "group": "Neutral / Directing",
+    "description": "Neutral amide-like groups (amides, ureas, lactams, carbamates, sulfonamides)."
+  },
+  "Acyl-source": {
+    "members": [
+      {
+        "id": "RCO2H",
+        "name": "carboxylic acid"
+      },
+      {
+        "id": "RCO2M",
+        "name": "carboxylate salt"
+      },
+      {
+        "id": "RCO2OR",
+        "name": "carboxylic acid ester"
+      }
+    ],
+    "group": "Neutral / Directing",
+    "description": "Carboxylic acids, salts, and esters as acyl sources or directing groups."
+  },
+  "Alkene": {
+    "members": [
+      {
+        "id": "alkene",
+        "name": "alkene (C=C)"
+      },
+      {
+        "id": "R-alkene",
+        "name": "alkyl-substituted alkene"
+      },
+      {
+        "id": "Ar-alkene",
+        "name": "aryl-substituted alkene (styrene-type)"
+      },
+      {
+        "id": "enol-ether",
+        "name": "enol ether"
+      }
+    ],
+    "group": "Neutral / Directing",
+    "description": "Alkenes and enol ethers for addition, metathesis, or Heck reactions."
+  },
+  "Alkyne": {
+    "members": [
+      {
+        "id": "alkyne",
+        "name": "alkyne (C≡C)"
+      },
+      {
+        "id": "R-alkyne",
+        "name": "alkyl-substituted alkyne"
+      },
+      {
+        "id": "Ar-alkyne",
+        "name": "aryl-substituted alkyne"
+      }
+    ],
+    "group": "Neutral / Directing",
+    "description": "Alkynes for Sonogashira, cycloaddition, or hydrogenation."
+  },
+  "Aldehyde": {
+    "members": [
+      {
+        "id": "RCHO",
+        "name": "aliphatic aldehyde"
+      },
+      {
+        "id": "ArCHO",
+        "name": "aromatic aldehyde"
+      }
+    ],
+    "group": "Neutral / Directing",
+    "description": "Aldehydes as electrophiles or directing groups."
+  },
+  "Ketone": {
+    "members": [
+      {
+        "id": "RCOR",
+        "name": "aliphatic ketone"
+      },
+      {
+        "id": "ArCOR",
+        "name": "aromatic ketone"
+      }
+    ],
+    "group": "Neutral / Directing",
+    "description": "Ketones as electrophiles or directing groups."
+  }
+}
