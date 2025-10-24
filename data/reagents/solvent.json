@@ -163,6 +163,43 @@
     "embedding_text": "type: SOLVENT | family: Alcohols (primary) (alcohols_primary) | name: 1-Butanol | abbr: n-BuOH | CAS: 71-36-3 | proticity: protic | polarity: medium | coordination: weak | synonyms: 1Butanol"
   },
   {
+    "id": "KBPLFHHGFOOTCA-UHFFFAOYSA-N",
+    "name": "1-Octanol",
+    "abbreviation": [
+      "C8OH",
+      "n-Octanol"
+    ],
+    "aliases": [
+      "Octan-1-ol",
+      "Octyl alcohol",
+      "caprylic alcohol",
+      "n-Octyl alcohol",
+      "Heptyl carbinol",
+      "1-Hydroxyoctane",
+      "Primary octyl alcohol",
+      "Alcohol C-8",
+      "n-Octan-1-ol",
+      "Octilin",
+      "Alfol 8",
+      "Sipol L8",
+      "Lorol 20",
+      "Capryl alcohol"
+    ],
+    "cas": "111-87-5",
+    "inchi_key": "KBPLFHHGFOOTCA-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "alcohols_primary"
+        ],
+        "proticity": "protic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: alcohols_primary (alcohols_primary) | proticity: protic | name: 1-Octanol | abbr: C8OH | CAS: 111-87-5 | synonyms: 1-Octanol; Octan-1-ol; 111-87-5; N-octanol; Octyl alcohol; caprylic alcohol; n-Octyl alcohol; Heptyl carbinol; 1-Hydroxyoctane; Primary octyl alcohol; Alcohol C-8; n-Octan-1-ol; Octilin; Alfol 8; Sipol L8; Lorol 20; Capryl alcohol"
+  },
+  {
     "id": "cas-71-23-8",
     "name": "1-Propanol",
     "abbreviation": [
@@ -465,6 +502,42 @@
       }
     },
     "embedding_text": "type: SOLVENT | family: Nitriles (nitriles) | name: Acetonitrile | abbr: MeCN | CAS: 75-05-8 | proticity: aprotic | polarity: high | coordination: moderate | synonyms: ACN"
+  },
+  {
+    "id": "RDOXTESZEPMUJZ-UHFFFAOYSA-N",
+    "name": "anisole",
+    "abbreviation": [
+      "PhOMe"
+    ],
+    "aliases": [
+      "Methoxybenzene",
+      "Benzene, methoxy-",
+      "Methyl phenyl ether",
+      "Anisol",
+      "Phenyl methyl ether",
+      "Phenoxymethane",
+      "Anizol",
+      "Phenol methyl ether",
+      "Ether, methyl phenyl",
+      "Benzene, methoxy",
+      "FEMA No. 2097",
+      "B3W693GAZH",
+      "CHEBI:16579",
+      "NSC-7920"
+    ],
+    "cas": "100-66-3",
+    "inchi_key": "RDOXTESZEPMUJZ-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_acyclic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: ethers_acyclic (ethers_acyclic) | proticity: aprotic | name: anisole | abbr: PhOMe | CAS: 100-66-3 | synonyms: Anisole; Methoxybenzene; 100-66-3; Benzene, methoxy-; Methyl phenyl ether; Anisol; Phenyl methyl ether; Phenoxymethane; Anizol; Phenol methyl ether; Ether, methyl phenyl; Benzene, methoxy; FEMA No. 2097; B3W693GAZH; CHEBI:16579; NSC-7920"
   },
   {
     "id": "cas-71-43-2",
@@ -1323,6 +1396,51 @@
     "embedding_text": "type: SOLVENT | family: Nitro solvents (nitro_solvents) | name: Nitromethane | abbr: MeNO2 | CAS: 75-52-5 | proticity: aprotic | polarity: high | coordination: weak"
   },
   {
+    "id": "VVKVBQDZJLGAFG-UHFFFAOYSA-N",
+    "name": "NMI",
+    "abbreviation": [
+      "NMI"
+    ],
+    "aliases": [
+      "3-(1-methyl-1H-indol-3-yl)propanoic acid",
+      "RefChem:489519",
+      "877-955-2",
+      "3-(1-Methyl-1H-indol-3-yl)-propionic acid",
+      "3-(1-methylindol-3-yl)propanoic acid",
+      "MFCD01548325",
+      "1H-Indole-3-propanoic acid, 1-methyl-",
+      "NSC401600",
+      "SCHEMBL1326755",
+      "1-Methylindole-3-propionic acid",
+      "DTXSID80322590",
+      "VVKVBQDZJLGAFG-UHFFFAOYSA-N",
+      "HMS1695B16",
+      "ALBB-028602",
+      "STL472215",
+      "1-Methylimidazole",
+      "1-Methyl-1H-imidazole"
+    ],
+    "cas": "7479-20-1",
+    "inchi_key": "VVKVBQDZJLGAFG-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "amides_dipolar_aprotic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "moderate"
+      },
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: amides_dipolar_aprotic (amides_dipolar_aprotic) | proticity: aprotic | name: NMI | abbr: NMI | CAS: 7479-20-1 | synonyms: 3-(1-methyl-1H-indol-3-yl)propanoic acid; RefChem:489519; 877-955-2; 7479-20-1; 3-(1-Methyl-1H-indol-3-yl)-propionic acid; 3-(1-methylindol-3-yl)propanoic acid; MFCD01548325; 1H-Indole-3-propanoic acid, 1-methyl-; NSC401600; SCHEMBL1326755; 1-Methylindole-3-propionic acid; DTXSID80322590; VVKVBQDZJLGAFG-UHFFFAOYSA-N; HMS1695B16; ALBB-028602; STL472215; 1-Methylimidazole; 1-Methyl-1H-imidazole"
+  },
+  {
     "id": "cas-95-47-6",
     "name": "o-Xylene",
     "abbreviation": [
@@ -1347,6 +1465,50 @@
     "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: o-Xylene | abbr: o-Xyl | CAS: 95-47-6 | proticity: aprotic | polarity: low | coordination: non | synonyms: oXylene"
   },
   {
+    "id": "WWZKQHOCKIZLMA-UHFFFAOYSA-N",
+    "name": "Octanoic acid",
+    "abbreviation": [
+      "C8:0",
+      "FA 8:0"
+    ],
+    "aliases": [
+      "caprylic acid",
+      "n-octanoic acid",
+      "Octylic acid",
+      "n-caprylic acid",
+      "octoic acid",
+      "n-octylic acid",
+      "n-Octoic acid",
+      "1-heptanecarboxylic acid",
+      "Enantic acid",
+      "Octic acid",
+      "C-8 acid",
+      "Caprylsaeure",
+      "Acido octanoico",
+      "Acide octanoique"
+    ],
+    "cas": "124-07-2",
+    "inchi_key": "WWZKQHOCKIZLMA-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "carboxylic_acids"
+        ],
+        "proticity": "acidic",
+        "polarity": "medium",
+        "coordination": "moderate"
+      },
+      "acid": {
+        "families": [
+          "simple_carboxylic_acids"
+        ],
+        "acidity": "weak",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: carboxylic_acids (carboxylic_acids) | proticity: acidic | name: Octanoic acid | abbr: C8:0 | CAS: 124-07-2 | synonyms: Octanoic Acid; caprylic acid; 124-07-2; n-octanoic acid; Octylic acid; n-caprylic acid; octoic acid; n-octylic acid; n-Octoic acid; 1-heptanecarboxylic acid; Enantic acid; Octic acid; C-8 acid; Caprylsaeure; Acido octanoico; Acide octanoique"
+  },
+  {
     "id": "cas-106-42-3",
     "name": "p-Xylene",
     "abbreviation": [
@@ -1369,6 +1531,44 @@
       }
     },
     "embedding_text": "type: SOLVENT | family: Aromatic hydrocarbons (hydrocarbons_aromatic) | name: p-Xylene | abbr: p-Xyl | CAS: 106-42-3 | proticity: aprotic | polarity: low | coordination: non | synonyms: pXylene"
+  },
+  {
+    "id": "USIUVYZYUHIAEV-UHFFFAOYSA-N",
+    "name": "Ph2O",
+    "abbreviation": [
+      "DPE",
+      "DPO"
+    ],
+    "aliases": [
+      "Diphenyl Ether",
+      "Diphenyl oxide",
+      "Phenoxybenzene",
+      "Phenyl ether",
+      "Benzene, 1,1'-oxybis-",
+      "Phenyl oxide",
+      "Diphenylether",
+      "Oxybisbenzene",
+      "Biphenyl oxide",
+      "Oxydiphenyl",
+      "Geranium crystals",
+      "Chemcryl JK-EB",
+      "Benzene, phenoxy-",
+      "1,1'-Oxybis(benzene)",
+      "1,1'-Oxybisbenzene"
+    ],
+    "cas": "101-84-8",
+    "inchi_key": "USIUVYZYUHIAEV-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "ethers_acyclic"
+        ],
+        "proticity": "aprotic",
+        "polarity": "low",
+        "coordination": "weak"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: ethers_acyclic (ethers_acyclic) | proticity: aprotic | name: Ph2O | abbr: DPE | CAS: 101-84-8 | synonyms: Diphenyl Ether; Diphenyl oxide; 101-84-8; Phenoxybenzene; Phenyl ether; Benzene, 1,1'-oxybis-; Phenyl oxide; Diphenylether; Oxybisbenzene; Biphenyl oxide; Oxydiphenyl; Geranium crystals; Chemcryl JK-EB; Benzene, phenoxy-; 1,1'-Oxybis(benzene); 1,1'-Oxybisbenzene"
   },
   {
     "id": "cas-25322-68-3",
@@ -1420,6 +1620,79 @@
       }
     },
     "embedding_text": "type: SOLVENT | family: Carboxylic acids (carboxylic_acids) | name: Propionic acid | abbr: PrCO2H | CAS: 79-09-4 | proticity: acidic | polarity: medium | coordination: weak | synonyms: Propanoic acid; Propionicacid"
+  },
+  {
+    "id": "FVSKHRXBFJPNKK-UHFFFAOYSA-N",
+    "name": "Propionitrile",
+    "abbreviation": [
+      "C2H5CN",
+      "EtCN"
+    ],
+    "aliases": [
+      "Propanenitrile",
+      "Ethyl cyanide",
+      "Propiononitrile",
+      "Cyanoethane",
+      "Propylnitrile",
+      "Propionic nitrile",
+      "Ether cyanatus",
+      "Hydrocyanic ether",
+      "Propannitril",
+      "Ethylkyanid",
+      "RCRA waste number P101",
+      "n-Propanenitrile",
+      "E16N05FX3S",
+      "DTXSID1021879"
+    ],
+    "cas": "107-12-0",
+    "inchi_key": "FVSKHRXBFJPNKK-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "nitriles"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: nitriles (nitriles) | proticity: aprotic | name: Propionitrile | abbr: C2H5CN | CAS: 107-12-0 | synonyms: Propionitrile; Propanenitrile; 107-12-0; Ethyl cyanide; Propiononitrile; Cyanoethane; Propylnitrile; Propionic nitrile; Ether cyanatus; Hydrocyanic ether; Propannitril; Ethylkyanid; RCRA waste number P101; n-Propanenitrile; E16N05FX3S; DTXSID1021879"
+  },
+  {
+    "id": "RUOJZAUFBMNUDX-UHFFFAOYSA-N",
+    "name": "propylene carbonate",
+    "abbreviation": [
+      "PC"
+    ],
+    "aliases": [
+      "4-Methyl-1,3-dioxolan-2-one",
+      "1,2-Propylene carbonate",
+      "1,2-Propanediol cyclic carbonate",
+      "Texacar PC",
+      "1,3-Dioxolan-2-one, 4-methyl-",
+      "Arconate 5000",
+      "Cyclic propylene carbonate",
+      "1,2-Propanediol carbonate",
+      "Dipropylene carbonate",
+      "1-Methylethylene carbonate",
+      "1,2-Propanediyl carbonate",
+      "Cyclic 1,2-propylene carbonate",
+      "Propylene glycol cyclic carbonate",
+      "Cyclic methylethylene carbonate"
+    ],
+    "cas": "108-32-7",
+    "inchi_key": "RUOJZAUFBMNUDX-UHFFFAOYSA-N",
+    "roles": {
+      "solvent": {
+        "families": [
+          "esters_anhydrides"
+        ],
+        "proticity": "aprotic",
+        "polarity": "high",
+        "coordination": "moderate"
+      }
+    },
+    "embedding_text": "type: SOLVENT | family: esters_anhydrides (esters_anhydrides) | proticity: aprotic | name: propylene carbonate | abbr: PC | CAS: 108-32-7 | synonyms: Propylene Carbonate; 108-32-7; 4-Methyl-1,3-dioxolan-2-one; 1,2-Propylene carbonate; 1,2-Propanediol cyclic carbonate; Texacar PC; 1,3-Dioxolan-2-one, 4-methyl-; Arconate 5000; Cyclic propylene carbonate; 1,2-Propanediol carbonate; Dipropylene carbonate; 1-Methylethylene carbonate; 1,2-Propanediyl carbonate; Cyclic 1,2-propylene carbonate; Propylene glycol cyclic carbonate; Cyclic methylethylene carbonate"
   },
   {
     "id": "cas-110-86-1",

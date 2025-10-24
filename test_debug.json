@@ -1,0 +1,23 @@
+{
+  "total_processed": 2,
+  "already_exists": 1,
+  "cas_not_found": 0,
+  "added_successfully": 1,
+  "failed": 0,
+  "skipped": 0,
+  "details": [
+    {
+      "name": "water",
+      "role": "additive",
+      "status": "already_exists",
+      "reason": "Found by name in registry"
+    },
+    {
+      "name": "Potassium 2-ethylhexanoate",
+      "role": "additive",
+      "cas": "3164-85-0",
+      "status": "would_add",
+      "method": "llm_workflow"
+    }
+  ]
+}
