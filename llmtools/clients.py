@@ -244,12 +244,26 @@ class LLMClient:
         """
         start_time = time.perf_counter()
         
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=temperature or self.temperature,
-            max_tokens=max_tokens or self.max_tokens,
+        # Prepare API parameters
+        api_params = {
+            "model": self.model,
+            "messages": messages,
+        }
+        
+        # GPT-5 and o-series models have different parameter requirements
+        is_gpt5_or_o_series = self.provider == "openai" and any(
+            self.model.startswith(prefix) for prefix in ["gpt-5", "o3", "o4"]
         )
+        
+        if is_gpt5_or_o_series:
+            # GPT-5 and o-series: use max_completion_tokens, skip temperature (only default=1 supported)
+            api_params["max_completion_tokens"] = max_tokens or self.max_tokens
+        else:
+            # Standard models: use max_tokens and temperature
+            api_params["max_tokens"] = max_tokens or self.max_tokens
+            api_params["temperature"] = temperature or self.temperature
+        
+        response = self.client.chat.completions.create(**api_params)
         
         latency_ms = (time.perf_counter() - start_time) * 1000
         

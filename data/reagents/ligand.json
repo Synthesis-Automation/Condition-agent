@@ -496,11 +496,80 @@
     "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: null | aliases: 2Diphenylphosphinopyridine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
+    "id": "AEVYOOWHCJTENF-UHFFFAOYSA-N",
+    "name": "2-diamine",
+    "abbreviation": [
+      "en"
+    ],
+    "aliases": [
+      "(2-Aminoethyl)[(2-nitrophenyl)methyl]amine",
+      "N'-[(2-nitrophenyl)methyl]ethane-1,2-diamine",
+      "SCHEMBL20024573",
+      "AKOS010110221",
+      "ethylenediamine",
+      "1,2-ethanediamine"
+    ],
+    "cas": "102494-87-1",
+    "inchi_key": "AEVYOOWHCJTENF-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "diamines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: 2-diamine | abbr: en | CAS: 102494-87-1 | synonyms: (2-Aminoethyl)[(2-nitrophenyl)methyl]amine; 102494-87-1; 2-diaMine; N'-[(2-nitrophenyl)methyl]ethane-1,2-diamine; SCHEMBL20024573; AKOS010110221; ethylenediamine; 1,2-ethanediamine"
+  },
+  {
     "id": "NPAXPTHCUCUHPT-UHFFFAOYSA-N",
     "name": "3,4,7,8-Tetramethyl-1,10-phenanthroline",
     "abbreviation": [
       "tmphen",
       "TMPhen"
+    ],
+    "aliases": [
+      "1,10-Phenanthroline, 3,4,7,8-tetramethyl-",
+      "DTXSID2061856",
+      "TM-1,10-P",
+      "RefChem:90964",
+      "DTXCID4035330",
+      "216-762-4",
+      "MFCD00004974",
+      "3,4,7,8-Tetramethylphenanthroline",
+      "CHEMBL99384",
+      "3,4,7,8-Tetramethyl-[1,10]phenanthroline",
+      "3,4,7,8-Tetramethyl-1,10-diazaphenanthrene; 3,4,7,8-Tetramethyl-o-phenanthroline; 3,4,7,8-Tetramethylphenanthroline",
+      "3,4,7,8-tetramethylpyridino[3,2-h]quinoline",
+      "4-Amino-7-beta-D-ribofuranosyl-7H-pyrrolo[2,3-d]pyrimidine-5-carboxamide; 7-Deazaadenosine-7-carboxamide; NSC 65346;",
+      "EINECS 216-762-4"
+    ],
+    "cas": "1660-93-1",
+    "inchi_key": "NPAXPTHCUCUHPT-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "phenanthrolines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: phenanthrolines (phenanthrolines) | denticity: 2 | name: 3,4,7,8-Tetramethyl-1,10-phenanthroline | abbr: tmphen | CAS: 1660-93-1 | synonyms: 3,4,7,8-Tetramethyl-1,10-phenanthroline; 1660-93-1; 1,10-Phenanthroline, 3,4,7,8-tetramethyl-; DTXSID2061856; TM-1,10-P; RefChem:90964; DTXCID4035330; 216-762-4; MFCD00004974; 3,4,7,8-Tetramethylphenanthroline; CHEMBL99384; 3,4,7,8-Tetramethyl-[1,10]phenanthroline; 3,4,7,8-Tetramethyl-1,10-diazaphenanthrene; 3,4,7,8-Tetramethyl-o-phenanthroline; 3,4,7,8-Tetramethylphenanthroline; 3,4,7,8-tetramethylpyridino[3,2-h]quinoline; 4-Amino-7-beta-D-ribofuranosyl-7H-pyrrolo[2,3-d]pyrimidine-5-carboxamide; 7-Deazaadenosine-7-carboxamide; NSC 65346;; EINECS 216-762-4"
+  },
+  {
+    "id": "NPAXPTHCUCUHPT-UHFFFAOYSA-N",
+    "name": "3,4,7,8-Tetramethyl-1,10-phenanthroline",
+    "abbreviation": [
+      "tmphen",
+      "Me4phen"
     ],
     "aliases": [
       "1,10-Phenanthroline, 3,4,7,8-tetramethyl-",
@@ -582,6 +651,45 @@
       }
     },
     "embedding_text": "role: ligand | family_label: 2,2'-Bipyridines (bpy family) | family_id: bipyridines | normalized_family: bipyridine | donors: N,N | denticity: 2 | abbr: dtbbpy | CAS: 72914-19-3 | family_def: 2,2'-Bipyridines (bpy family)"
+  },
+  {
+    "id": "LKZVYVQLBVTSLH-UHFFFAOYSA-N",
+    "name": "4,4'-di-tert-butyl-N-cyano-(2,2'-bipyridine)-6-carboximidamide",
+    "abbreviation": [
+      "dtbCbpy"
+    ],
+    "aliases": [
+      "4,4'-di-tert-butyl-N-cyano-[2,2'-bipyridine]-6-carboximidamide",
+      "RefChem:506594",
+      "989-117-4",
+      "4-tert-butyl-6-(4-tert-butylpyridin-2-yl)-N-cyanopyridine-2-carboximidamide",
+      "MFCD34622479",
+      "SCHEMBL31639101",
+      "BY-0207",
+      "SY361192",
+      "G61922",
+      "4,4''-Di-tert-butyl-N-cyano-[2,2''-bipyridine]-6-carboximidamide",
+      "4,4'-Di-tert-Butyl-N-cyano[2,2'-bipyridine]-6-carboximidamide",
+      "4,4-DI-TERT-BUTYL-N-CYANO-[2,2-BIPYRIDINE]-6-CARBOXIMIDAMIDE",
+      "4-tert-butyl-6-(4-tert-butyl-2-pyridyl)-N'-cyano-pyridine-2-carboxamidine",
+      "4-tert-butyl-6-(4-tert-butylpyridin-2-yl)-N'-cyanopyridine-2-carboximidamide",
+      "4,4'-di-tert-butyl-6-cyanoamidine-2,2'-bipyridine"
+    ],
+    "cas": "2755915-54-7",
+    "inchi_key": "LKZVYVQLBVTSLH-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "bipyridines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: bipyridines (bipyridines) | denticity: 2 | name: 4,4'-di-tert-butyl-N-cyano-(2,2'-bipyridine)-6-carboximidamide | abbr: dtbCbpy | CAS: 2755915-54-7 | synonyms: 4,4'-di-tert-butyl-N-cyano-(2,2'-bipyridine)-6-carboximidamide; 2755915-54-7; 4,4'-di-tert-butyl-N-cyano-[2,2'-bipyridine]-6-carboximidamide; RefChem:506594; 989-117-4; 4-tert-butyl-6-(4-tert-butylpyridin-2-yl)-N-cyanopyridine-2-carboximidamide; MFCD34622479; SCHEMBL31639101; BY-0207; SY361192; G61922; 4,4''-Di-tert-butyl-N-cyano-[2,2''-bipyridine]-6-carboximidamide; 4,4'-Di-tert-Butyl-N-cyano[2,2'-bipyridine]-6-carboximidamide; 4,4-DI-TERT-BUTYL-N-CYANO-[2,2-BIPYRIDINE]-6-CARBOXIMIDAMIDE; 4-tert-butyl-6-(4-tert-butyl-2-pyridyl)-N'-cyano-pyridine-2-carboxamidine; 4-tert-butyl-6-(4-tert-butylpyridin-2-yl)-N'-cyanopyridine-2-carboximidamide; 4,4'-di-tert-butyl-6-cyanoamidine-2,2'-bipyridine"
   },
   {
     "id": "cas-1134-35-6",
@@ -717,6 +825,54 @@
     "embedding_text": "role: ligand | family_label: 8-Quinolinol (oxine) N,O chelates | family_id: quinolinol_NO_chelates | normalized_family: ligand_misc | donors: N,O | denticity: 2 | abbr: Oxine | CAS: 148-24-3 | aliases: 8Hydroxyquinoline | family_def: 8-Quinolinol (oxine) N,O chelates"
   },
   {
+    "id": "FJKUOCCQEBLPNX-UHFFFAOYSA-N",
+    "name": "8-Quinolinol N-oxide",
+    "abbreviation": [
+      "8-HQNO",
+      "Oxine N-oxide"
+    ],
+    "aliases": [
+      "8-Hydroxyquinoline N-oxide",
+      "8-Hydroxyquinoline-N-oxide",
+      "8-Hydroxyquinoline 1-oxide",
+      "8-QUINOLINOL, N-OXIDE",
+      "NSC-21656",
+      "OXYQUINOLINE N-OXIDE",
+      "TMI4LD989P",
+      "DTXSID70150142",
+      "HYDROXYQUINOLINE 1-OXIDE, 8-",
+      "CCRIS 4451",
+      "EINECS 214-430-3",
+      "NSC 21656",
+      "UNII-TMI4LD989P",
+      "BRN 0128737",
+      "RefChem:107199"
+    ],
+    "cas": "1127-45-3",
+    "inchi_key": "FJKUOCCQEBLPNX-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "quinolinol_NO_chelates"
+        ],
+        "donors": [
+          "N",
+          "O"
+        ],
+        "denticity": 2
+      },
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "hydrogen_bonding",
+        "chirality": "achiral",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: quinolinol_NO_chelates (quinolinol_NO_chelates) | denticity: 2 | name: 8-Quinolinol N-oxide | abbr: 8-HQNO | CAS: 1127-45-3 | synonyms: 8-Hydroxyquinoline N-oxide; 1127-45-3; 8-Hydroxyquinoline-N-oxide; 8-Hydroxyquinoline 1-oxide; 8-QUINOLINOL, N-OXIDE; NSC-21656; OXYQUINOLINE N-OXIDE; TMI4LD989P; DTXSID70150142; HYDROXYQUINOLINE 1-OXIDE, 8-; CCRIS 4451; EINECS 214-430-3; NSC 21656; UNII-TMI4LD989P; BRN 0128737; RefChem:107199; Oxine N-oxide"
+  },
+  {
     "id": "adbrettphos__1160861-59-5",
     "name": "AdBrettPhos",
     "abbreviation": [
@@ -738,6 +894,43 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: AdBrettPhos | CAS: 1160861-59-5 | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
+  },
+  {
+    "id": "NMGHOZQCYNKWBG-UHFFFAOYSA-N",
+    "name": "AdBrettPhos",
+    "abbreviation": [
+      "AdBrettPhos"
+    ],
+    "aliases": [
+      "2-(Di-1-adaMantylphosphino)-3,6-diMethoxy-2',4',6'-tri-i-propyl-1,1'-biphenyl",
+      "MFCD23379935",
+      "bis(1-adamantyl)-[3,6-dimethoxy-2-[2,4,6-tri(propan-2-yl)phenyl]phenyl]phosphane",
+      "Phosphine, [3,6-dimethoxy-2',4',6'-tris(1-methylethyl)[1,1'-biphenyl]-2-yl]bis(tricyclo[3.3.1.13,7]dec-1-yl)-",
+      "Di(adamantan-1-yl)(2',4',6'-triisopropyl-3,6-dimethoxy-[1,1'-biphenyl]-2-yl)phosphine",
+      "2-(Di-1-adaMantylphosphino)-3,6-diMethoxy-2',4',6'-tri-i-propyl-1,1'-biphenyl, Min. 95% AdBrettPhos",
+      "AdBrettPhos, 95%",
+      "SCHEMBL18191395",
+      "C43H61O2P",
+      "SY070329",
+      "F10194",
+      "bis(1-adamantyl)-[3,6-dimethoxy-2-(2,4,6-triisopropylphenyl)phenyl]phosphane",
+      "Di(1-adamantyl)(2 inverted exclamation mark ,4 inverted exclamation mark ,6 inverted exclamation mark -triisopropyl-3,6-dimethoxy-2-biphenylyl)phosphine",
+      "2-Di-tert-butylphosphino-3,4,5,6-tetramethyl-2',4',6'-triisopropyl-1,1'-biphenyl"
+    ],
+    "cas": "1160861-59-5",
+    "inchi_key": "NMGHOZQCYNKWBG-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "dialkylbiaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: dialkylbiaryl_phosphines (dialkylbiaryl_phosphines) | denticity: 1 | name: AdBrettPhos | abbr: AdBrettPhos | CAS: 1160861-59-5 | synonyms: AdBrettPhos; 1160861-59-5; 2-(Di-1-adaMantylphosphino)-3,6-diMethoxy-2',4',6'-tri-i-propyl-1,1'-biphenyl; MFCD23379935; bis(1-adamantyl)-[3,6-dimethoxy-2-[2,4,6-tri(propan-2-yl)phenyl]phenyl]phosphane; Phosphine, [3,6-dimethoxy-2',4',6'-tris(1-methylethyl)[1,1'-biphenyl]-2-yl]bis(tricyclo[3.3.1.13,7]dec-1-yl)-; Di(adamantan-1-yl)(2',4',6'-triisopropyl-3,6-dimethoxy-[1,1'-biphenyl]-2-yl)phosphine; 2-(Di-1-adaMantylphosphino)-3,6-diMethoxy-2',4',6'-tri-i-propyl-1,1'-biphenyl, Min. 95% AdBrettPhos; AdBrettPhos, 95%; SCHEMBL18191395; C43H61O2P; SY070329; F10194; bis(1-adamantyl)-[3,6-dimethoxy-2-(2,4,6-triisopropylphenyl)phenyl]phosphane; Di(1-adamantyl)(2 inverted exclamation mark ,4 inverted exclamation mark ,6 inverted exclamation mark -triisopropyl-3,6-dimethoxy-2-biphenylyl)phosphine; 2-Di-tert-butylphosphino-3,4,5,6-tetramethyl-2',4',6'-triisopropyl-1,1'-biphenyl"
   },
   {
     "id": "alphos__1447953-76-7",
@@ -832,6 +1025,51 @@
       }
     },
     "embedding_text": "role: ligand | family_label: 1,10-Phenanthrolines | family_id: phenanthrolines | normalized_family: phenanthroline | donors: N,N | denticity: 2 | abbr: batho-phen | CAS: 1662-01-7 | family_def: 1,10-Phenanthrolines"
+  },
+  {
+    "id": "XRURWFXKCKASSN-UHFFFAOYSA-N",
+    "name": "BFMO",
+    "abbreviation": [
+      "BFMO"
+    ],
+    "aliases": [
+      "N,N'-Difurfuryloxamide",
+      "RefChem:821904",
+      "669-088-1",
+      "N1,N2-Bis(furan-2-ylmethyl)oxalamide",
+      "N,N'-bis(furan-2-ylmethyl)oxamide",
+      "MFCD00090454",
+      "STK051972",
+      "N,N'-bis(furan-2-ylmethyl)ethanediamide",
+      "N,N'-Bis(2-furylmethyl)oxamide",
+      "N1,N2-Bis(2-furylmethyl)oxalamide",
+      "NSC320224",
+      "Vortioxetine Impurity 74",
+      "orb1306038",
+      "SCHEMBL18415483"
+    ],
+    "cas": "69010-90-8",
+    "inchi_key": "XRURWFXKCKASSN-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "phosphoramidites"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      },
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "other",
+        "chirality": "single_enantiomer",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: phosphoramidites (phosphoramidites) | denticity: 1 | name: BFMO | abbr: BFMO | CAS: 69010-90-8 | synonyms: N,N'-Difurfuryloxamide; RefChem:821904; 669-088-1; 69010-90-8; N1,N2-Bis(furan-2-ylmethyl)oxalamide; N,N'-bis(furan-2-ylmethyl)oxamide; MFCD00090454; BFMO; STK051972; N,N'-bis(furan-2-ylmethyl)ethanediamide; N,N'-Bis(2-furylmethyl)oxamide; N1,N2-Bis(2-furylmethyl)oxalamide; NSC320224; Vortioxetine Impurity 74; orb1306038; SCHEMBL18415483"
   },
   {
     "id": "bicaac_generic__abeec18b",
@@ -1473,6 +1711,89 @@
     "embedding_text": "role: ligand | family_label: secondary_phosphines | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HP(t-Bu)2 | CAS: 819-19-2 | aliases: Ditertbutylphosphine | family_def: secondary_phosphines"
   },
   {
+    "id": "QNNRAWADYXIGHE-UHFFFAOYSA-L",
+    "name": "Dichlorobis((di-tert-butyl)phenylphosphine)palladium(II)",
+    "abbreviation": [
+      "P(tBu)2Ph",
+      "DTBPP"
+    ],
+    "aliases": [
+      "Dichlorobis[(di-tert-butyl)phenylphosphine]palladium(II)",
+      "RefChem:586736",
+      "681-978-1",
+      "dichlorobis(di-tert-butylphenylphosphine)palladium(ii)",
+      "Dichlorobis(di-tert-butylphenylphosphine) palladium(II)",
+      "ditert-butyl(phenyl)phosphane;dichloropalladium",
+      "MFCD09953450",
+      "Pd 122",
+      "Dichlorobis(di-t-butylphenylphosphino)palladium(II), 99%",
+      "SCHEMBL1304876",
+      "JBA40944",
+      "AKOS027251097",
+      "F10012",
+      "bis(di-t-butyl phenyl phosphine) palladium dichloride",
+      "Bis(di-tert-butylphenylphosphine)palladium dichloride",
+      "Palladium(II) dichlorobis(di-tert-butylphenylphosphine)"
+    ],
+    "cas": "34409-44-4",
+    "inchi_key": "QNNRAWADYXIGHE-UHFFFAOYSA-L",
+    "roles": {
+      "ligand": {
+        "families": [
+          "trialkyl_triaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      },
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_phosphine_complexes"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: trialkyl_triaryl_phosphines (trialkyl_triaryl_phosphines) | denticity: 1 | name: Dichlorobis((di-tert-butyl)phenylphosphine)palladium(II) | abbr: P(tBu)2Ph | CAS: 34409-44-4 | synonyms: Dichlorobis((di-tert-butyl)phenylphosphine)palladium(II); 34409-44-4; Dichlorobis[(di-tert-butyl)phenylphosphine]palladium(II); RefChem:586736; 681-978-1; dichlorobis(di-tert-butylphenylphosphine)palladium(ii); Dichlorobis(di-tert-butylphenylphosphine) palladium(II); ditert-butyl(phenyl)phosphane;dichloropalladium; MFCD09953450; Pd 122; Dichlorobis(di-t-butylphenylphosphino)palladium(II), 99%; SCHEMBL1304876; JBA40944; AKOS027251097; F10012; bis(di-t-butyl phenyl phosphine) palladium dichloride; Bis(di-tert-butylphenylphosphine)palladium dichloride; Palladium(II) dichlorobis(di-tert-butylphenylphosphine)"
+  },
+  {
+    "id": "IWYLGIFVMPKVOA-UHFFFAOYSA-N",
+    "name": "Dicyclohexyl(cyclopentyl)phosphane;iron",
+    "abbreviation": [
+      "PCypCy2"
+    ],
+    "aliases": [
+      "1,1/'-BIS(DICYCLOHEXYLPHOSPHINO)FERROCENE",
+      "1,1-Bis(Dicyclohexylphosphino)Ferrocene",
+      "1,1'-Bis(dicyclohexylphosphino",
+      "SCHEMBL29536420",
+      "SCHEMBL29812991",
+      "BCP05513",
+      "AKOS030228298",
+      "1,1 inverted exclamation mark -Bis(dicyclohexylphosphino)ferrocene",
+      "Dicyclohexyl(cyclopentyl)phosphine iron complex"
+    ],
+    "cas": "146960-90-9",
+    "inchi_key": "IWYLGIFVMPKVOA-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "trialkyl_triaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: trialkyl_triaryl_phosphines (trialkyl_triaryl_phosphines) | denticity: 1 | name: Dicyclohexyl(cyclopentyl)phosphane;iron | abbr: PCypCy2 | CAS: 146960-90-9 | synonyms: Dicyclohexyl(cyclopentyl)phosphane;iron; 1,1/'-BIS(DICYCLOHEXYLPHOSPHINO)FERROCENE; 1,1-Bis(Dicyclohexylphosphino)Ferrocene; 1,1'-Bis(dicyclohexylphosphino; SCHEMBL29536420; SCHEMBL29812991; BCP05513; AKOS030228298; 1,1 inverted exclamation mark -Bis(dicyclohexylphosphino)ferrocene; Dicyclohexyl(cyclopentyl)phosphine iron complex"
+  },
+  {
     "id": "dicyclohexylphosphine__829-84-5",
     "name": "Dicyclohexylphosphine",
     "abbreviation": [
@@ -1592,6 +1913,56 @@
     "embedding_text": "role: ligand | family_label: secondary_phosphines | family_id: secondary_phosphines | normalized_family: ligand_misc | donors: P | denticity: 1 | abbr: HPPh2 | CAS: 829-85-6 | family_def: secondary_phosphines"
   },
   {
+    "id": "ONIBWKKTOPOVIA-UHFFFAOYSA-N",
+    "name": "DL-Proline",
+    "abbreviation": [
+      "Pro",
+      "DL-Pro"
+    ],
+    "aliases": [
+      "proline dl-form",
+      "Proline, DL-",
+      "UNII-DCS9E77JPQ",
+      "DCS9E77JPQ",
+      "CCRIS 8602",
+      "EINECS 210-189-3",
+      "NSC 97923",
+      "NSC-97923",
+      "PROLINE DL-FORM [MI]",
+      "2-PYRROLIDINYLCARBOXYLIC ACID",
+      "(+-)-proline",
+      "RefChem:202730",
+      "210-189-3",
+      "pyrrolidine-2-carboxylic acid",
+      "(±)-Proline",
+      "rac-Proline",
+      "2-Pyrrolidinecarboxylic acid"
+    ],
+    "cas": "609-36-9",
+    "inchi_key": "ONIBWKKTOPOVIA-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "diamines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      },
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "enamine",
+        "chirality": "racemic",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: DL-Proline | abbr: Pro | CAS: 609-36-9 | synonyms: proline dl-form; 609-36-9; Proline, DL-; UNII-DCS9E77JPQ; DCS9E77JPQ; CCRIS 8602; EINECS 210-189-3; NSC 97923; NSC-97923; PROLINE DL-FORM [MI]; 2-PYRROLIDINYLCARBOXYLIC ACID; (+-)-proline; RefChem:202730; 210-189-3; DL-Proline; pyrrolidine-2-carboxylic acid; (±)-Proline; rac-Proline; 2-Pyrrolidinecarboxylic acid"
+  },
+  {
     "id": "dm_segphos__196868-63-0",
     "name": "DM-SEGPHOS",
     "abbreviation": [
@@ -1640,6 +2011,56 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Diamines (aliphatic/cycloaliphatic N,N) | family_id: diamines | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: DMEDA | CAS: null | family_def: Diamines (aliphatic/cycloaliphatic N,N)"
+  },
+  {
+    "id": "JFTAPSBIODPQJN-UHFFFAOYSA-N",
+    "name": "DMPAO",
+    "abbreviation": [
+      "DMPAO",
+      "P,N-DMPAO"
+    ],
+    "aliases": [
+      "2-(2,6-Dimethylphenylamino)-2-oxoacetic acid",
+      "RefChem:824202",
+      "[(2,6-dimethylphenyl)carbamoyl]formic acid",
+      "2,6-Dimethylanilino(oxo)acetic acid",
+      "N-(2,6-Dimethylphenyl)oxamic acid",
+      "2-(2,6-dimethylanilino)-2-oxoacetic acid",
+      "MFCD10018453",
+      "Acetic acid, 2-[(2,6-dimethylphenyl)amino]-2-oxo-",
+      "[(2,6-Dimethylphenyl)amino](oxo)acetic Acid",
+      "2-((2,6-Dimethylphenyl)amino)-2-oxoacetic acid",
+      "Oxanilic acid, 2',6'-dimethyl-",
+      "CVT-2537",
+      "J7KKT84Z1Z",
+      "RS-89289",
+      "Acetic acid, 2-((2,6-dimethylphenyl)amino)-2-oxo-",
+      "2-(Dimethylphosphino)pyridine N-oxide",
+      "2-(Dimethylphosphanyl)pyridine 1-oxide"
+    ],
+    "cas": "2903-48-2",
+    "inchi_key": "JFTAPSBIODPQJN-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "phosphine_pyridine_PN"
+        ],
+        "donors": [
+          "P",
+          "N"
+        ],
+        "denticity": 2
+      },
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "enamine",
+        "chirality": "single_enantiomer",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: phosphine_pyridine_PN (phosphine_pyridine_PN) | denticity: 2 | name: DMPAO | abbr: DMPAO | CAS: 2903-48-2 | synonyms: 2-(2,6-Dimethylphenylamino)-2-oxoacetic acid; RefChem:824202; 2903-48-2; [(2,6-dimethylphenyl)carbamoyl]formic acid; 2,6-Dimethylanilino(oxo)acetic acid; N-(2,6-Dimethylphenyl)oxamic acid; 2-(2,6-dimethylanilino)-2-oxoacetic acid; MFCD10018453; Acetic acid, 2-[(2,6-dimethylphenyl)amino]-2-oxo-; [(2,6-Dimethylphenyl)amino](oxo)acetic Acid; 2-((2,6-Dimethylphenyl)amino)-2-oxoacetic acid; Oxanilic acid, 2',6'-dimethyl-; CVT-2537; J7KKT84Z1Z; RS-89289; Acetic acid, 2-((2,6-dimethylphenyl)amino)-2-oxo-; 2-(Dimethylphosphino)pyridine N-oxide; 2-(Dimethylphosphanyl)pyridine 1-oxide"
   },
   {
     "id": "dpephos__166330-10-5",
@@ -1786,6 +2207,118 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: DTBM-SEGPHOS | CAS: 243984-11-4 | aliases: DTBMSEGPHOS | family_def: Diphosphines (bidentate P^P)"
+  },
+  {
+    "id": "WDUDHEOUGWAKFD-UHFFFAOYSA-N",
+    "name": "dtbpf",
+    "abbreviation": [
+      "dtbpf",
+      "DtbPF"
+    ],
+    "aliases": [
+      "1,1'-Bis(di-tert-butylphosphino)ferrocene",
+      "1,1'-bis[di-tert-butylphosphino)ferrocene",
+      "RefChem:409224",
+      "626-167-5",
+      "Ferrocene, 1,1'-bis[bis(1,1-dimethylethyl)phosphino]-",
+      "SCHEMBL29365262",
+      "SCHEMBL29414744",
+      "SCHEMBL29421568",
+      "WDUDHEOUGWAKFD-UHFFFAOYSA-N",
+      "1,1'-bis(di-tert-butylphoshino)ferrocene",
+      "1,1'-bis(di-tert-butylphosphino)-ferrocene",
+      "1,1'-bis(di-tert.-butylphosphino) ferrocene",
+      "F996235",
+      "Di-tert-butylphosphinoferrocene"
+    ],
+    "cas": "84680-95-5",
+    "inchi_key": "WDUDHEOUGWAKFD-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "bidentate_diphosphines"
+        ],
+        "donors": [
+          "P",
+          "P"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: bidentate_diphosphines (bidentate_diphosphines) | denticity: 2 | name: dtbpf | abbr: dtbpf | CAS: 84680-95-5 | synonyms: 1,1'-Bis(di-tert-butylphosphino)ferrocene; 84680-95-5; 1,1'-bis[di-tert-butylphosphino)ferrocene; RefChem:409224; 626-167-5; DTBPF; Ferrocene, 1,1'-bis[bis(1,1-dimethylethyl)phosphino]-; SCHEMBL29365262; SCHEMBL29414744; SCHEMBL29421568; WDUDHEOUGWAKFD-UHFFFAOYSA-N; 1,1'-bis(di-tert-butylphoshino)ferrocene; 1,1'-bis(di-tert-butylphosphino)-ferrocene; 1,1'-bis(di-tert.-butylphosphino) ferrocene; F996235; Di-tert-butylphosphinoferrocene"
+  },
+  {
+    "id": "FDAKNRLXSJBEFL-UHFFFAOYSA-N",
+    "name": "EPhos",
+    "abbreviation": [
+      "EPhos"
+    ],
+    "aliases": [
+      "Dicyclohexyl(3-isopropoxy-2',4',6'-triisopropyl-[1,1'-biphenyl]-2-yl)phosphine",
+      "MFCD31619192",
+      "Ephos, >=95%",
+      "C36H55OP",
+      "SCHEMBL25338156",
+      "Dicyclohexyl(3-isopropoxy-2',4',6'-triisopropyl-2-biphenylyl)phosphine",
+      "AT33857",
+      "dicyclohexyl-[2-propan-2-yloxy-6-[2,4,6-tri(propan-2-yl)phenyl]phenyl]phosphane",
+      "Phosphine, dicyclohexyl[3-(1-methylethoxy)-2',4',6'-tris(1-methylethyl)[1,1'-biphenyl]-2-yl]-",
+      "SY317704",
+      "CS-0203239",
+      "F635135",
+      "dicyclohexyl-[2-isopropoxy-6-(2,4,6-triisopropylphenyl)phenyl]phosphane",
+      "Dicyclohexyl(3-isopropoxy-2'',4'',6''-triisopropyl-[1,1''-biphenyl]-2-yl)phosphane",
+      "2-(Dicyclohexylphosphino)-2'-(N,N-dimethylamino)biphenyl"
+    ],
+    "cas": "2118959-55-8",
+    "inchi_key": "FDAKNRLXSJBEFL-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "dialkylbiaryl_phosphines"
+        ],
+        "donors": "P",
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: dialkylbiaryl_phosphines (dialkylbiaryl_phosphines) | denticity: 1 | name: EPhos | abbr: EPhos | CAS: 2118959-55-8 | synonyms: Ephos; 2118959-55-8; Dicyclohexyl(3-isopropoxy-2',4',6'-triisopropyl-[1,1'-biphenyl]-2-yl)phosphine; MFCD31619192; Ephos, >=95%; C36H55OP; SCHEMBL25338156; Dicyclohexyl(3-isopropoxy-2',4',6'-triisopropyl-2-biphenylyl)phosphine; AT33857; dicyclohexyl-[2-propan-2-yloxy-6-[2,4,6-tri(propan-2-yl)phenyl]phenyl]phosphane; Phosphine, dicyclohexyl[3-(1-methylethoxy)-2',4',6'-tris(1-methylethyl)[1,1'-biphenyl]-2-yl]-; SY317704; CS-0203239; F635135; dicyclohexyl-[2-isopropoxy-6-(2,4,6-triisopropylphenyl)phenyl]phosphane; Dicyclohexyl(3-isopropoxy-2'',4'',6''-triisopropyl-[1,1''-biphenyl]-2-yl)phosphane; 2-(Dicyclohexylphosphino)-2'-(N,N-dimethylamino)biphenyl"
+  },
+  {
+    "id": "JKLUIDIKASJZCK-UHFFFAOYSA-N",
+    "name": "GPhos",
+    "abbreviation": [
+      "GPhos"
+    ],
+    "aliases": [
+      "(3-(tert-Butoxy)-2',6'-diisopropyl-6-methoxy-[1,1'-biphenyl]-2-yl)dicyclohexylphosphane",
+      "MFCD32857529",
+      "(3-(Tert-butoxy)-2'',6''-diisopropyl-6-methoxy-[1,1''-biphenyl]-2-yl)dicyclohexylphosphane GPhos",
+      "SCHEMBL27152237",
+      "SCHEMBL30305204",
+      "AT33855",
+      "Phosphine, dicyclohexyl[3-(1,1-dimethylethoxy)-6-methoxy-2',6'-bis(1-methylethyl)[1,1'-biphenyl]-2-yl]-",
+      "SY318038",
+      "F867966",
+      "[6-tert-butoxy-2-(2,6-diisopropylphenyl)-3-methoxy-phenyl]-dicyclohexyl-phosphane",
+      "(3-(tert-Butoxy)-2',6'-diisopropyl-6-methoxy-[1,1'-biphenyl]-2-yl)dicyclohexylphosphane, 98%",
+      "[3-(tert-Butoxy)-2 inverted exclamation mark ,6 inverted exclamation mark -diisopropyl-6-methoxy-2-biphenylyl]dicyclohexylphosphine",
+      "dicyclohexyl-[2-[2,6-di(propan-2-yl)phenyl]-3-methoxy-6-[(2-methylpropan-2-yl)oxy]phenyl]phosphane",
+      "GPhos ligand"
+    ],
+    "cas": "2489243-29-8",
+    "inchi_key": "JKLUIDIKASJZCK-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "dialkylbiaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: dialkylbiaryl_phosphines (dialkylbiaryl_phosphines) | denticity: 1 | name: GPhos | abbr: GPhos | CAS: 2489243-29-8 | synonyms: (3-(tert-Butoxy)-2',6'-diisopropyl-6-methoxy-[1,1'-biphenyl]-2-yl)dicyclohexylphosphane; 2489243-29-8; MFCD32857529; (3-(Tert-butoxy)-2'',6''-diisopropyl-6-methoxy-[1,1''-biphenyl]-2-yl)dicyclohexylphosphane GPhos; GPHOS; SCHEMBL27152237; SCHEMBL30305204; AT33855; Phosphine, dicyclohexyl[3-(1,1-dimethylethoxy)-6-methoxy-2',6'-bis(1-methylethyl)[1,1'-biphenyl]-2-yl]-; SY318038; F867966; [6-tert-butoxy-2-(2,6-diisopropylphenyl)-3-methoxy-phenyl]-dicyclohexyl-phosphane; (3-(tert-Butoxy)-2',6'-diisopropyl-6-methoxy-[1,1'-biphenyl]-2-yl)dicyclohexylphosphane, 98%; [3-(tert-Butoxy)-2 inverted exclamation mark ,6 inverted exclamation mark -diisopropyl-6-methoxy-2-biphenylyl]dicyclohexylphosphine; dicyclohexyl-[2-[2,6-di(propan-2-yl)phenyl]-3-methoxy-6-[(2-methylpropan-2-yl)oxy]phenyl]phosphane; GPhos ligand"
   },
   {
     "id": "h8_binap__117016-01-8",
@@ -2168,6 +2701,44 @@
     "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: Me4tBuXPhos | CAS: 857356-94-6 | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
   },
   {
+    "id": "AVVSJWUWBATQBX-UHFFFAOYSA-N",
+    "name": "meCgPPh",
+    "abbreviation": [
+      "meCgPhos"
+    ],
+    "aliases": [
+      "1,3,5,7-Tetramethyl-6-phenyl-2,4,8-trioxa-6-phosphaadamantane",
+      "RefChem:412448",
+      "814-805-7",
+      "1,3,5,7-tetramethyl-2,4,8-trioxa-6-phenyl-6-phosphaadamantane",
+      "1,3,5,7-Tetramethyl-8-phenyl-2,4,6-trioxa-8-phosphatricyclo[3.3.1.13,7]decane",
+      "MFCD10567051",
+      "1,3,5,7-Tetramethyl-8-phenyl-2,4,6-trioxa-8-phosphaadamantane",
+      "SCHEMBL482912",
+      "DTXSID50699640",
+      "AKOS025295966",
+      "AS-71280",
+      "SY033850",
+      "DB-390236",
+      "CS-0086419",
+      "(2-methylcyclohexyl)diphenylphosphine"
+    ],
+    "cas": "97739-46-3",
+    "inchi_key": "AVVSJWUWBATQBX-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "dialkylbiaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: dialkylbiaryl_phosphines (dialkylbiaryl_phosphines) | denticity: 1 | name: meCgPPh | abbr: meCgPhos | CAS: 97739-46-3 | synonyms: 1,3,5,7-Tetramethyl-6-phenyl-2,4,8-trioxa-6-phosphaadamantane; RefChem:412448; 814-805-7; 97739-46-3; 1,3,5,7-tetramethyl-2,4,8-trioxa-6-phenyl-6-phosphaadamantane; 1,3,5,7-Tetramethyl-8-phenyl-2,4,6-trioxa-8-phosphatricyclo[3.3.1.13,7]decane; MFCD10567051; 1,3,5,7-Tetramethyl-8-phenyl-2,4,6-trioxa-8-phosphaadamantane; meCgPPh; SCHEMBL482912; DTXSID50699640; AKOS025295966; AS-71280; SY033850; DB-390236; CS-0086419; (2-methylcyclohexyl)diphenylphosphine"
+  },
+  {
     "id": "meo_biphep__52364-71-3",
     "name": "MeO-BIPHEP",
     "abbreviation": [
@@ -2313,6 +2884,182 @@
     "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: MorDalPhos | CAS: 1447952-32-2 | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
   },
   {
+    "id": "IJGRMHOSHXDMSA-UHFFFAOYSA-N",
+    "name": "N",
+    "abbreviation": [
+      "N/A"
+    ],
+    "aliases": [
+      "Nitrogen",
+      "Nitrogen gas",
+      "Molecular nitrogen",
+      "Dinitrogen",
+      "Nitrogen-14",
+      "MOL Nitrogen",
+      "Nitrogeno",
+      "Nitrogen (n2)",
+      "INS NO.941",
+      "DTXSID4036304",
+      "CHEBI:17997",
+      "INS-941",
+      "E-941",
+      "N762921K75",
+      "Diazyne",
+      "None",
+      "No ligand"
+    ],
+    "cas": "7727-37-9",
+    "inchi_key": "IJGRMHOSHXDMSA-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "ligandless"
+        ],
+        "donors": [],
+        "denticity": 0
+      },
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: ligandless (ligandless) | denticity: 0 | name: N | abbr: N/A | CAS: 7727-37-9 | synonyms: Nitrogen; Nitrogen gas; Molecular nitrogen; Dinitrogen; 7727-37-9; Nitrogen-14; MOL Nitrogen; Nitrogeno; Nitrogen (n2); INS NO.941; DTXSID4036304; CHEBI:17997; INS-941; E-941; N762921K75; Diazyne; None; No ligand"
+  },
+  {
+    "id": "NGVJMONAWAGMOA-UHFFFAOYSA-N",
+    "name": "N,N'-bis(2,4,6-trimethoxyphenyl)ethanediamide",
+    "aliases": [
+      "RefChem:821725",
+      "862-324-6",
+      "N,N'-Bis(2,4,6-trimethoxyphenyl)oxalamide",
+      "N1,N2-Bis(2,4,6-trimethoxyphenyl)ethanediamide",
+      "MFCD30491289",
+      "N,N'-bis(2,4,6-trimethoxyphenyl)oxamide",
+      "N1,N2-BIS(2,4,6-TRIMETHOXYPHENYL)OXALAMIDE",
+      "SCHEMBL18415560",
+      "AKOS037652138",
+      "AT10822",
+      "FB171929",
+      "SY078567",
+      "CS-0128765",
+      "EN300-22125240"
+    ],
+    "cas": "957476-07-2",
+    "inchi_key": "NGVJMONAWAGMOA-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "diamines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      },
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "hydrogen_bonding",
+        "chirality": "achiral",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: N,N'-bis(2,4,6-trimethoxyphenyl)ethanediamide | CAS: 957476-07-2 | synonyms: N,N'-bis(2,4,6-trimethoxyphenyl)ethanediamide; 957476-07-2; RefChem:821725; 862-324-6; N,N'-Bis(2,4,6-trimethoxyphenyl)oxalamide; N1,N2-Bis(2,4,6-trimethoxyphenyl)ethanediamide; MFCD30491289; N,N'-bis(2,4,6-trimethoxyphenyl)oxamide; N1,N2-BIS(2,4,6-TRIMETHOXYPHENYL)OXALAMIDE; SCHEMBL18415560; AKOS037652138; AT10822; FB171929; SY078567; CS-0128765; EN300-22125240"
+  },
+  {
+    "id": "VGDOSNKYJILNDC-UHFFFAOYSA-N",
+    "name": "N,N'-bis(4-hydroxy-2,6-dimethylphenyl)ethanediamide",
+    "aliases": [
+      "RefChem:821803",
+      "976-301-4",
+      "N1,N2-Bis(4-hydroxy-2,6-dimethylphenyl)oxalamide",
+      "Ethanediamide, N1,N2-bis(4-hydroxy-2,6-dimethylphenyl)-",
+      "MFCD32666963",
+      "N,N'-bis(4-hydroxy-2,6-dimethylphenyl)oxamide",
+      "C18H20N2O4",
+      "N1,N2-Bis(4-hydroxy-2,6-dimethylphenyl)ethanediamide",
+      "N,N'-bis(4-hydroxy-2,6-dimethyl-phenyl)oxamide",
+      "SCHEMBL18415453",
+      "JXC28895",
+      "AKOS037648811",
+      "BS-15698",
+      "SY277279",
+      "N,N'-bis(4-hydroxy-2,6-dimethylphenyl)oxalamide"
+    ],
+    "cas": "1809288-95-6",
+    "inchi_key": "VGDOSNKYJILNDC-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "salen_salophen"
+        ],
+        "donors": [
+          "N",
+          "O"
+        ],
+        "denticity": 2
+      },
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "hydrogen_bonding",
+        "chirality": "achiral",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: salen_salophen (salen_salophen) | denticity: 2 | name: N,N'-bis(4-hydroxy-2,6-dimethylphenyl)ethanediamide | CAS: 1809288-95-6 | synonyms: N,N'-bis(4-hydroxy-2,6-dimethylphenyl)ethanediamide; 1809288-95-6; RefChem:821803; 976-301-4; N1,N2-Bis(4-hydroxy-2,6-dimethylphenyl)oxalamide; Ethanediamide, N1,N2-bis(4-hydroxy-2,6-dimethylphenyl)-; MFCD32666963; N,N'-bis(4-hydroxy-2,6-dimethylphenyl)oxamide; C18H20N2O4; N1,N2-Bis(4-hydroxy-2,6-dimethylphenyl)ethanediamide; N,N'-bis(4-hydroxy-2,6-dimethyl-phenyl)oxamide; SCHEMBL18415453; JXC28895; AKOS037648811; BS-15698; SY277279; N,N'-bis(4-hydroxy-2,6-dimethylphenyl)oxalamide"
+  },
+  {
+    "id": "AOIKOYRULAZZLJ-UHFFFAOYSA-N",
+    "name": "N,N'-Dibenzyloxamide",
+    "abbreviation": [
+      "DBOA"
+    ],
+    "aliases": [
+      "RefChem:821886",
+      "636-853-6",
+      "N,N'-dibenzylethanediamide",
+      "N,N'-dibenzyl-oxalamide",
+      "N1,N2-Dibenzyloxalamide",
+      "MFCD00022012",
+      "NSC314",
+      "Ethanediamide, N,N'-bis(phenylmethyl)-",
+      "NCIOpen2_006531",
+      "SCHEMBL3056874",
+      "DTXSID80276988",
+      "NSC-314",
+      "N~1~,N~2~-dibenzylethanediamide",
+      "N,N'-bis(phenylmethyl)ethanediamide",
+      "Oxamide, N,N'-dibenzyl-"
+    ],
+    "cas": "3551-78-8",
+    "inchi_key": "AOIKOYRULAZZLJ-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "diamines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      },
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: N,N'-Dibenzyloxamide | abbr: DBOA | CAS: 3551-78-8 | synonyms: N,N'-Dibenzyloxamide; RefChem:821886; 636-853-6; N,N'-dibenzylethanediamide; 3551-78-8; N,N'-dibenzyl-oxalamide; N1,N2-Dibenzyloxalamide; MFCD00022012; NSC314; Ethanediamide, N,N'-bis(phenylmethyl)-; NCIOpen2_006531; SCHEMBL3056874; DTXSID80276988; NSC-314; N~1~,N~2~-dibenzylethanediamide; N,N'-bis(phenylmethyl)ethanediamide; Oxamide, N,N'-dibenzyl-"
+  },
+  {
     "id": "cas-110-70-3",
     "name": "N,N'-Dimethylethylenediamine",
     "abbreviation": [
@@ -2411,6 +3158,169 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: N,N-Dimethylglycine | CAS: 1118-68-9 | aliases: dimethylglycine, 2-(dimethylamino)acetic acid, (Dimethylamino)acetic acid, glycine, N,N-dimethyl-, N-Methylsarcosine, N,N-Dimethylaminoacetic acid, 2-(dimethylazaniumyl)acetate, N,N-Dimethyl Glycine | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+  },
+  {
+    "id": "FSYKKLYZXJSNPZ-UHFFFAOYSA-N",
+    "name": "N-Methylglycine",
+    "abbreviation": [
+      "Sarcosine"
+    ],
+    "aliases": [
+      "Sarcosinic acid",
+      "2-(methylamino)acetic acid",
+      "Methylglycine",
+      "Glycine, N-methyl-",
+      "Methylaminoacetic acid",
+      "N-Methylaminoacetic acid",
+      "Sarcosin",
+      "(Methylamino)acetic acid",
+      "(Methylamino)ethanoic acid",
+      "Acetic acid, (methylamino)-",
+      "(methylamino)acetate",
+      "CHEBI:15611",
+      "Methylaminoethanoic acid"
+    ],
+    "cas": "107-97-1",
+    "inchi_key": "FSYKKLYZXJSNPZ-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "diamines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      },
+      "organo_catalyst": {
+        "families": [
+          "cinchona_alkaloids"
+        ],
+        "activation_mode": "enamine",
+        "chirality": "achiral",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: N-Methylglycine | abbr: Sarcosine | CAS: 107-97-1 | synonyms: Sarcosine; 107-97-1; N-methylglycine; Sarcosinic acid; 2-(methylamino)acetic acid; Methylglycine; Glycine, N-methyl-; Methylaminoacetic acid; N-Methylaminoacetic acid; Sarcosin; (Methylamino)acetic acid; (Methylamino)ethanoic acid; Acetic acid, (methylamino)-; (methylamino)acetate; CHEBI:15611; Methylaminoethanoic acid"
+  },
+  {
+    "id": "HSWZLYXRAOXOLL-UHFFFAOYSA-N",
+    "name": "N-XantPhos",
+    "abbreviation": [
+      "XantPhos"
+    ],
+    "aliases": [
+      "4,6-Bis(diphenylphosphino)-10H-phenoxazine",
+      "RefChem:507908",
+      "812-116-6",
+      "4,6-Bis(diphenylphosphino)phenoxazine",
+      "NIXANTPHOS",
+      "10H-Phenoxazine, 4,6-bis(diphenylphosphino)-",
+      "MFCD03788937",
+      "(6-diphenylphosphanyl-10H-phenoxazin-4-yl)-diphenylphosphane",
+      "C36H27NOP2",
+      "4,6-bis(diphenylphosphanyl)-10H-phenoxazine",
+      "Bis(diphenylphosphino)phenoxazine",
+      "(6-diphenylphosphanyl-10H-phenoxazin-4-yl)-diphenyl-phosphane",
+      "NiXanthphos",
+      "N-XantPhos, 97%",
+      "4,5-Bis(diphenylphosphino)-9,9-dimethylxanthene",
+      "9,9-Dimethyl-4,5-bis(diphenylphosphino)xanthene"
+    ],
+    "cas": "261733-18-0",
+    "inchi_key": "HSWZLYXRAOXOLL-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "dialkylbiaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: dialkylbiaryl_phosphines (dialkylbiaryl_phosphines) | denticity: 1 | name: N-XantPhos | abbr: XantPhos | CAS: 261733-18-0 | synonyms: 4,6-Bis(diphenylphosphino)-10H-phenoxazine; RefChem:507908; 812-116-6; 261733-18-0; 4,6-Bis(diphenylphosphino)phenoxazine; N-XantPhos; NIXANTPHOS; 10H-Phenoxazine, 4,6-bis(diphenylphosphino)-; MFCD03788937; (6-diphenylphosphanyl-10H-phenoxazin-4-yl)-diphenylphosphane; C36H27NOP2; 4,6-bis(diphenylphosphanyl)-10H-phenoxazine; Bis(diphenylphosphino)phenoxazine; (6-diphenylphosphanyl-10H-phenoxazin-4-yl)-diphenyl-phosphane; NiXanthphos; N-XantPhos, 97%; 4,5-Bis(diphenylphosphino)-9,9-dimethylxanthene; 9,9-Dimethyl-4,5-bis(diphenylphosphino)xanthene"
+  },
+  {
+    "id": "UJFILYKONHUVCH-UHFFFAOYSA-N",
+    "name": "N1,N2-bis(1-naphthalenylmethyl)ethanediamide",
+    "aliases": [
+      "N1,N2-Bis(naphthalen-1-ylmethyl)oxalamide",
+      "MFCD32633515",
+      "SCHEMBL22323341",
+      "N,N'-bis(1-naphthylmethyl)oxamide",
+      "N1,N2-Bis(1-naphthylmethyl)oxalamide",
+      "N,N'-bis(naphthalen-1-ylmethyl)oxamide",
+      "BS-47862",
+      "SY360243",
+      "CS-0530588",
+      "F73383",
+      "F782520",
+      "N,N'-bis(1-naphthylmethyl)ethanediamide",
+      "N1,N2-di(1-naphthylmethyl)oxalamide"
+    ],
+    "cas": "2281918-10-1",
+    "inchi_key": "UJFILYKONHUVCH-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "diamines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: N1,N2-bis(1-naphthalenylmethyl)ethanediamide | CAS: 2281918-10-1 | synonyms: N1,N2-bis(1-naphthalenylmethyl)ethanediamide; 2281918-10-1; N1,N2-Bis(naphthalen-1-ylmethyl)oxalamide; MFCD32633515; SCHEMBL22323341; N,N'-bis(1-naphthylmethyl)oxamide; N1,N2-Bis(1-naphthylmethyl)oxalamide; N,N'-bis(naphthalen-1-ylmethyl)oxamide; BS-47862; SY360243; CS-0530588; F73383; F782520; N,N'-bis(1-naphthylmethyl)ethanediamide; N1,N2-di(1-naphthylmethyl)oxalamide"
+  },
+  {
+    "id": "IPZCJUOJSODZNK-UHFFFAOYSA-N",
+    "name": "N1,N2-Dimethylethanediamide",
+    "abbreviation": [
+      "DMEDA"
+    ],
+    "aliases": [
+      "N,N'-Dimethyloxamide",
+      "Ethanediamide, N,N'-dimethyl-",
+      "573D5I9HQV",
+      "NSC-80645",
+      "DTXSID80210468",
+      "RefChem:821921",
+      "DTXCID80132959",
+      "210-420-8",
+      "N,N'-dimethyloxalamide",
+      "N1,N2-dimethyloxalamide",
+      "N,N'-dimethylethanediamide",
+      "CH3NHCOCONHCH3",
+      "MFCD00025634",
+      "NN'-Dimethyloxamide",
+      "N,N'-Dimethylethylenediamine"
+    ],
+    "cas": "615-35-0",
+    "inchi_key": "IPZCJUOJSODZNK-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "diamines"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      },
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: N1,N2-Dimethylethanediamide | abbr: DMEDA | CAS: 615-35-0 | synonyms: N1,N2-Dimethylethanediamide; N,N'-Dimethyloxamide; 615-35-0; Ethanediamide, N,N'-dimethyl-; 573D5I9HQV; NSC-80645; DTXSID80210468; RefChem:821921; DTXCID80132959; 210-420-8; N,N'-dimethyloxalamide; N1,N2-dimethyloxalamide; N,N'-dimethylethanediamide; CH3NHCOCONHCH3; MFCD00025634; NN'-Dimethyloxamide; N,N'-Dimethylethylenediamine"
   },
   {
     "id": "ncn_pincer__2c08e833",
@@ -2533,6 +3443,45 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: PhDavePhos | CAS: 240417-00-9 | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
+  },
+  {
+    "id": "AWTLXLDETPWZRB-UHFFFAOYSA-N",
+    "name": "PMPBO",
+    "abbreviation": [
+      "PMPBO"
+    ],
+    "aliases": [
+      "N1-Benzyl-N2-(5-methyl-2-biphenylyl)oxalamide",
+      "MFCD30491291",
+      "N1-Benzyl-N2-(5-methyl-[1,1'-biphenyl]-2-yl)oxalamide",
+      "N-benzyl-N'-(4-methyl-2-phenylphenyl)oxamide",
+      "C22H20N2O2",
+      "N'-benzyl-N-{5-methyl-[1,1'-biphenyl]-2-yl}ethanediamide",
+      "SCHEMBL18415534",
+      "JBD33382",
+      "AC2505",
+      "AKOS037649630",
+      "CS-12807",
+      "SY225316",
+      "CS-0047356",
+      "N-benzyl-N'-(4-methyl-2-phenyl-phenyl)oxamide",
+      "Phosphino-oxazoline ligand PMPBO"
+    ],
+    "cas": "1909333-82-9",
+    "inchi_key": "AWTLXLDETPWZRB-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "phox_pn"
+        ],
+        "donors": [
+          "P",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: phox_pn (phox_pn) | denticity: 2 | name: PMPBO | abbr: PMPBO | CAS: 1909333-82-9 | synonyms: N1-Benzyl-N2-(5-methyl-2-biphenylyl)oxalamide; 1909333-82-9; MFCD30491291; N1-Benzyl-N2-(5-methyl-[1,1'-biphenyl]-2-yl)oxalamide; N-benzyl-N'-(4-methyl-2-phenylphenyl)oxamide; C22H20N2O2; PMPBO; N'-benzyl-N-{5-methyl-[1,1'-biphenyl]-2-yl}ethanediamide; SCHEMBL18415534; JBD33382; AC2505; AKOS037649630; CS-12807; SY225316; CS-0047356; N-benzyl-N'-(4-methyl-2-phenyl-phenyl)oxamide; Phosphino-oxazoline ligand PMPBO"
   },
   {
     "id": "pybox_pyridine_bis_oxazoline__2eada5d5",
@@ -2744,6 +3693,44 @@
     "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: S-BINAP | CAS: 76189-56-5 | aliases: 2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, S-BINAP, RAC-2,2'-BIS(DIPHENYLPHOSPHINO)-1,1'-BINAPHTHYL, (1,1'-Binaphthalene)-2,2'-diylbis(diphenylphosphine), Phosphine, 1,1'-(1,1'-binaphthalene)-2,2'-diylbis(1,1-diphenyl-, (S)-(+)-2,2'-Bis(diphenylphosphino)-1,1'-binaphthyl | family_def: Diphosphines (bidentate P^P)"
   },
   {
+    "id": "ORIHZIZPTZTNCU-VMPITWQZSA-N",
+    "name": "Salicylaldoxime",
+    "abbreviation": [
+      "SAO"
+    ],
+    "aliases": [
+      "2-Hydroxybenzaldehyde oxime",
+      "Saldox",
+      "o-Hydroxybenzaldoxime",
+      "2-Hydroxybenzaldoxime",
+      "Salicylaldehydoxime",
+      "o-Hydroxybenzaldehyde oxime",
+      "Benzaldehyde, 2-hydroxy-, oxime",
+      "(2-Hydroxyphenylmethylene)azanol",
+      "2-Formylphenol oxime",
+      "2QTV2A0T5Q",
+      "NSC-5057",
+      "RefChem:180918",
+      "202-353-8",
+      "21013-96-7"
+    ],
+    "cas": "94-67-7",
+    "inchi_key": "ORIHZIZPTZTNCU-VMPITWQZSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "quinolinol_NO_chelates"
+        ],
+        "donors": [
+          "N",
+          "O"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: quinolinol_NO_chelates (quinolinol_NO_chelates) | denticity: 2 | name: Salicylaldoxime | abbr: SAO | CAS: 94-67-7 | synonyms: Salicylaldoxime; 2-Hydroxybenzaldehyde oxime; 94-67-7; Saldox; o-Hydroxybenzaldoxime; 2-Hydroxybenzaldoxime; Salicylaldehydoxime; o-Hydroxybenzaldehyde oxime; Benzaldehyde, 2-hydroxy-, oxime; (2-Hydroxyphenylmethylene)azanol; 2-Formylphenol oxime; 2QTV2A0T5Q; NSC-5057; RefChem:180918; 202-353-8; 21013-96-7"
+  },
+  {
     "id": "salophen__c6a875d6",
     "name": "Salophen",
     "abbreviation": [
@@ -2934,6 +3921,46 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Diphosphines (bidentate P^P) | family_id: bidentate_diphosphines | normalized_family: diphosphine | donors: P,P | denticity: 2 | abbr: SynPhos | CAS: 205319-91-7 | family_def: Diphosphines (bidentate P^P)"
+  },
+  {
+    "id": "HTHOMNNVAUPLKK-UHFFFAOYSA-N",
+    "name": "t-Bu)PhCPhos",
+    "abbreviation": [
+      "t-BuPhCPhos"
+    ],
+    "aliases": [
+      "(t-Bu)PhCPhos",
+      "RefChem:408449",
+      "110-484-6",
+      "MFCD29905429",
+      "2-(t-Butylphenylphosphino)-2',6'-dimethylamino-1,1'-biphenyl",
+      "2-(t-Butylphenylphosphino)-26-dimethylamino-11-biphenyl",
+      "2'-(tert-Butyl(phenyl)phosphino)-N2,N2,N6,N6-tetramethyl-[1,1'-biphenyl]-2,6-diamine",
+      "2-[2-[tert-butyl(phenyl)phosphanyl]phenyl]-1-N,1-N,3-N,3-N-tetramethylbenzene-1,3-diamine",
+      "(t-Bu)PhCPhos, 95%",
+      "SCHEMBL23166139",
+      "SCHEMBL29778093",
+      "2'-[TERT-BUTYL(PHENYL)PHOSPHANYL]-N2,N2,N6,N6-TETRAMETHYL-[1,1'-BIPHENYL]-2,6-DIAMINE",
+      "SY073458",
+      "E84908",
+      "EN300-21685596",
+      "tert-ButylPhCPhos",
+      "2'-(Di-tert-butylphosphino)-N,N-dimethylbiphenyl-2-amine"
+    ],
+    "cas": "1660153-91-2",
+    "inchi_key": "HTHOMNNVAUPLKK-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "dialkylbiaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: dialkylbiaryl_phosphines (dialkylbiaryl_phosphines) | denticity: 1 | name: t-Bu)PhCPhos | abbr: t-BuPhCPhos | CAS: 1660153-91-2 | synonyms: (t-Bu)PhCPhos; 1660153-91-2; RefChem:408449; 110-484-6; MFCD29905429; 2-(t-Butylphenylphosphino)-2',6'-dimethylamino-1,1'-biphenyl; 2-(t-Butylphenylphosphino)-26-dimethylamino-11-biphenyl; 2'-(tert-Butyl(phenyl)phosphino)-N2,N2,N6,N6-tetramethyl-[1,1'-biphenyl]-2,6-diamine; 2-[2-[tert-butyl(phenyl)phosphanyl]phenyl]-1-N,1-N,3-N,3-N-tetramethylbenzene-1,3-diamine; (t-Bu)PhCPhos, 95%; SCHEMBL23166139; SCHEMBL29778093; 2'-[TERT-BUTYL(PHENYL)PHOSPHANYL]-N2,N2,N6,N6-TETRAMETHYL-[1,1'-BIPHENYL]-2,6-DIAMINE; SY073458; E84908; EN300-21685596; tert-ButylPhCPhos; 2'-(Di-tert-butylphosphino)-N,N-dimethylbiphenyl-2-amine"
   },
   {
     "id": "taddol_derived_phosphoramidite__ca07c850",
@@ -3389,6 +4416,54 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Trialkyl/Triaryl phosphines (monodentate) | family_id: trialkyl_triaryl_phosphines | normalized_family: monodentate_phosphine | donors: P | denticity: 1 | abbr: PEt3 | CAS: 554-70-1 | family_def: Trialkyl/Triaryl phosphines (monodentate)"
+  },
+  {
+    "id": "WFHPXSHLCFHEIA-UHFFFAOYSA-N",
+    "name": "triisobutylphosphatrane",
+    "abbreviation": [
+      "TIBP"
+    ],
+    "aliases": [
+      "2,8,9-Triisobutyl-2,5,8,9-tetraaza-1-phosphabicyclo(3.3.3)undecane",
+      "2,8,9-Triisobutyl-2,5,8,9-tetraaza-1-phosphabicyclo[3.3.3]undecane",
+      "Triisobutylazaphosphatrane",
+      "Triisobutylproazaphosphatrane",
+      "X79X7GNS8K",
+      "Triisobutyl-verkade's superbase [MI]",
+      "DTXSID90404376",
+      "2,8,9-Tris(2-methylpropyl)-2,5,8,9-tetraaza-1-phosphabicyclo[3.3.3]undecane",
+      "2,8,9-Tris(2-methylpropyl)-2,5,8,9-tetraaza-1-phosphabicyclo(3.3.3)undecane",
+      "2,5,8,9-Tetraaza-1-phosphabicyclo(3.3.3)undecane, 2,8,9-tris(2-methylpropyl)-",
+      "4,6,11-Tris(2-methylpropyl)-1,4,6,11-tetraza-5-phosphabicyclo(3.3.3)undecane",
+      "4,6,11-tris(2-methylpropyl)-1,4,6,11-tetraza-5-phosphabicyclo[3.3.3]undecane",
+      "RefChem:197476",
+      "DTXCID10355230",
+      "TRIISOBUTYL-VERKADE'S SUPERBASE",
+      "812-117-1"
+    ],
+    "cas": "331465-71-5",
+    "inchi_key": "WFHPXSHLCFHEIA-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "trialkyl_triaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      },
+      "base": {
+        "families": [
+          "amidine_guanidine_bases"
+        ],
+        "basicity": "strong",
+        "nucleophilicity": "moderate",
+        "sterics": "hindered",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: LIGAND | family: trialkyl_triaryl_phosphines (trialkyl_triaryl_phosphines) | denticity: 1 | name: triisobutylphosphatrane | abbr: TIBP | CAS: 331465-71-5 | synonyms: 2,8,9-Triisobutyl-2,5,8,9-tetraaza-1-phosphabicyclo(3.3.3)undecane; 2,8,9-Triisobutyl-2,5,8,9-tetraaza-1-phosphabicyclo[3.3.3]undecane; Triisobutylazaphosphatrane; Triisobutylproazaphosphatrane; X79X7GNS8K; Triisobutyl-verkade's superbase [MI]; DTXSID90404376; 2,8,9-Tris(2-methylpropyl)-2,5,8,9-tetraaza-1-phosphabicyclo[3.3.3]undecane; 2,8,9-Tris(2-methylpropyl)-2,5,8,9-tetraaza-1-phosphabicyclo(3.3.3)undecane; 2,5,8,9-Tetraaza-1-phosphabicyclo(3.3.3)undecane, 2,8,9-tris(2-methylpropyl)-; 4,6,11-Tris(2-methylpropyl)-1,4,6,11-tetraza-5-phosphabicyclo(3.3.3)undecane; 4,6,11-tris(2-methylpropyl)-1,4,6,11-tetraza-5-phosphabicyclo[3.3.3]undecane; RefChem:197476; DTXCID10355230; TRIISOBUTYL-VERKADE'S SUPERBASE; 812-117-1; triisobutylphosphatrane"
   },
   {
     "id": "triisopropyl_phosphite__71dd388d",
@@ -3917,6 +4992,44 @@
       }
     },
     "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: TrixiePhos | CAS: 255836-67-0 | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
+  },
+  {
+    "id": "LYVFKWGKMKCNPE-UHFFFAOYSA-N",
+    "name": "VPhos",
+    "abbreviation": [
+      "VPhos"
+    ],
+    "aliases": [
+      "[2',4'-Bis(1,1-dimethylethyl)-6'-methoxy[1,1'-biphenyl]-2-yl]dicyclohexylphosphine",
+      "MFCD30184625",
+      "dicyclohexyl-[2-(2,4-ditert-butyl-6-methoxyphenyl)phenyl]phosphane",
+      "Dicyclohexyl(2',4'-di-tert-butyl-6'-methoxy-[1,1'-biphenyl]-2-yl)phosphane",
+      "VPhos, 95%",
+      "C33H49OP",
+      "SCHEMBL23165885",
+      "SCHEMBL29778112",
+      "YYC24475",
+      "DICYCLOHEXYL({2',4'-DI-TERT-BUTYL-6'-METHOXY-[1,1'-BIPHENYL]-2-YL})PHOSPHANE",
+      "SY073795",
+      "CS-0035239",
+      "F17177",
+      "EN300-25371821",
+      "VPhos ligand"
+    ],
+    "cas": "1848244-75-6",
+    "inchi_key": "LYVFKWGKMKCNPE-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "dialkylbiaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: dialkylbiaryl_phosphines (dialkylbiaryl_phosphines) | denticity: 1 | name: VPhos | abbr: VPhos | CAS: 1848244-75-6 | synonyms: [2',4'-Bis(1,1-dimethylethyl)-6'-methoxy[1,1'-biphenyl]-2-yl]dicyclohexylphosphine; 1848244-75-6; Vphos; MFCD30184625; dicyclohexyl-[2-(2,4-ditert-butyl-6-methoxyphenyl)phenyl]phosphane; Dicyclohexyl(2',4'-di-tert-butyl-6'-methoxy-[1,1'-biphenyl]-2-yl)phosphane; VPhos, 95%; C33H49OP; SCHEMBL23165885; SCHEMBL29778112; YYC24475; DICYCLOHEXYL({2',4'-DI-TERT-BUTYL-6'-METHOXY-[1,1'-BIPHENYL]-2-YL})PHOSPHANE; SY073795; CS-0035239; F17177; EN300-25371821; VPhos ligand"
   },
   {
     "id": "xantphos__161265-03-8",

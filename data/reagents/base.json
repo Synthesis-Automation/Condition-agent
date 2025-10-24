@@ -245,6 +245,92 @@
     "embedding_text": "type: BASE | family: Tertiary amines (aliphatic/cyclic) (tertiary_amines_aliphatic) | name: 7-Methyl-1,5,7-triazabicyclo[4.4.0]dec-5-ene | abbr: MTBD | CAS: 84030-20-6 | strength_band: moderate | nucleophilicity: medium | steric: hindered | synonyms: 1,3,4,6,7,8-Hexahydro-1-methyl-2H-pyrimido[1,2-a]pyrimidine; 1,3,4,6,7,8-Hexahydro-1-methyl-2H-pyrimido(1,2-a)pyrimidine; 2H-Pyrimido[1,2-a]pyrimidine, 1,3,4,6,7,8-hexahydro-1-methyl-; 7-methyl-1,5,7-triazabicyclo(4.4.0)dec-5-ene; 2H-Pyrimido(1,2-a)pyrimidine, 1,3,4,6,7,8-hexahydro-1-methyl-; 1-Methyl-2,3,4,6,7,8-hexahydro-1H-pyrimido[1,2-a]pyrimidine; 1-methyl-2,3,4,6,7,8-hexahydropyrimido[1,2-a]pyrimidine"
   },
   {
+    "id": "NDVLTYZPCACLMA-UHFFFAOYSA-N",
+    "name": "Ag2O",
+    "abbreviation": [
+      "Silver oxide"
+    ],
+    "aliases": [
+      "Disilver oxide",
+      "RefChem:56012",
+      "disilver;oxygen(2-)",
+      "Silver oxide (Ag2O)",
+      "SILVER RUST",
+      "ARGENTUM OXYDATUM",
+      "SILVER OXIDE [MI]",
+      "SCHEMBL1753",
+      "SILVER OXIDE [WHO-DD]",
+      "ARGENTUM OXYDATUM [HPUS]",
+      "AKOS015901876",
+      "BP-30198",
+      "F044724",
+      "Q407815",
+      "Silver(I) oxide",
+      "Argentous oxide"
+    ],
+    "cas": "11113-88-5",
+    "inchi_key": "NDVLTYZPCACLMA-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "hydroxides"
+        ],
+        "basicity": "moderate",
+        "nucleophilicity": "weak",
+        "sterics": "unhindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: hydroxides (hydroxides) | name: Ag2O | abbr: Silver oxide | CAS: 11113-88-5 | synonyms: Disilver oxide; AG2O; RefChem:56012; disilver;oxygen(2-); Silver oxide (Ag2O); 11113-88-5; SILVER RUST; ARGENTUM OXYDATUM; SILVER OXIDE [MI]; SCHEMBL1753; SILVER OXIDE [WHO-DD]; ARGENTUM OXYDATUM [HPUS]; AKOS015901876; BP-30198; F044724; Q407815; Silver(I) oxide; Argentous oxide"
+  },
+  {
+    "id": "CQLFBEKRDQMJLZ-UHFFFAOYSA-M",
+    "name": "AgOAc",
+    "abbreviation": [
+      "AgOAc"
+    ],
+    "aliases": [
+      "Silver acetate",
+      "Silver(I) acetate",
+      "Silver(1+) acetate",
+      "Silver monoacetate",
+      "ACETIC ACID, SILVER(1+) SALT",
+      "19PPS85F9H",
+      "DTXSID8032041",
+      "argentio acetate",
+      "NSC-112212",
+      "RefChem:183021",
+      "DTXCID6012041",
+      "209-254-9",
+      "silver;acetate",
+      "Acetic acid, silver(1+) salt (1:1)",
+      "Silver acetate Ag(OAc)",
+      "Argentous acetate"
+    ],
+    "cas": "563-63-3",
+    "inchi_key": "CQLFBEKRDQMJLZ-UHFFFAOYSA-M",
+    "roles": {
+      "base": {
+        "families": [
+          "inorg_carboxylates"
+        ],
+        "basicity": "weak",
+        "nucleophilicity": "weak",
+        "sterics": "unhindered"
+      },
+      "metal_precursor": {
+        "families": [
+          "cu_ii_salts"
+        ],
+        "metal": "Ag",
+        "oxidation_states": [
+          2
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: BASE | family: inorg_carboxylates (inorg_carboxylates) | name: AgOAc | abbr: AgOAc | CAS: 563-63-3 | synonyms: Silver acetate; 563-63-3; Silver(I) acetate; Silver(1+) acetate; Silver monoacetate; ACETIC ACID, SILVER(1+) SALT; 19PPS85F9H; DTXSID8032041; argentio acetate; NSC-112212; RefChem:183021; DTXCID6012041; 209-254-9; silver;acetate; Acetic acid, silver(1+) salt (1:1); Silver acetate Ag(OAc); Argentous acetate"
+  },
+  {
     "id": "1336-21-6",
     "name": "Ammonium hydroxide (aqueous ammonia)",
     "abbreviation": [
@@ -338,6 +424,43 @@
       }
     },
     "embedding_text": "type: BASE | family: Inorganic carbonates & bicarbonates (inorg_carbonates_bicarbonate) | name: Calcium Carbonate | abbr: Calcium Carbonate | CAS: 471-34-1 | strength_band: moderate | nucleophilicity: low | steric: unhindered | synonyms: Aeromatt; Calcium carbonate (1:1); Carbonic acid calcium salt (1:1); Calofort U; Albaglos; Calcicoll; Calseeds; Caltrate; Calwhite; Chemcarb; Duramite; Hydrocarb"
+  },
+  {
+    "id": "ZOAIGCHJWKDIPJ-UHFFFAOYSA-M",
+    "name": "Cesium acetate",
+    "abbreviation": [
+      "CsOAc"
+    ],
+    "aliases": [
+      "CAESIUM ACETATE",
+      "Acetic acid, cesium salt (1:1)",
+      "M74D2UJ8C9",
+      "EINECS 222-248-0",
+      "DTXSID00883971",
+      "RefChem:124631",
+      "DTXCID501023446",
+      "222-248-0",
+      "cesiumacetate",
+      "Acetic acid, cesium salt",
+      "cesium;acetate",
+      "Ccesium acetate",
+      "Acetic Acid Cesium Salt",
+      "C2H3CsO2",
+      "Cesium ethanoate"
+    ],
+    "cas": "3396-11-0",
+    "inchi_key": "ZOAIGCHJWKDIPJ-UHFFFAOYSA-M",
+    "roles": {
+      "base": {
+        "families": [
+          "inorg_carboxylates"
+        ],
+        "basicity": "moderate",
+        "nucleophilicity": "weak",
+        "sterics": "unhindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: inorg_carboxylates (inorg_carboxylates) | name: Cesium acetate | abbr: CsOAc | CAS: 3396-11-0 | synonyms: Cesium acetate; CAESIUM ACETATE; Acetic acid, cesium salt (1:1); M74D2UJ8C9; EINECS 222-248-0; DTXSID00883971; RefChem:124631; DTXCID501023446; 222-248-0; 3396-11-0; cesiumacetate; Acetic acid, cesium salt; cesium;acetate; Ccesium acetate; Acetic Acid Cesium Salt; C2H3CsO2; Cesium ethanoate"
   },
   {
     "id": "15519-28-5",
@@ -448,6 +571,115 @@
       }
     },
     "embedding_text": "type: BASE | family: Tertiary amines (aliphatic/cyclic) (tertiary_amines_aliphatic) | name: Dabco | abbr: Dabco | CAS: 280-57-9 | strength_band: moderate | nucleophilicity: medium | steric: hindered | synonyms: 1,4-Diazabicyclo[2.2.2]octane; Triethylenediamine; 1,4-DIAZABICYCLO(2.2.2)OCTANE; 1,4-Ethylenepiperazine; Dabco crystal; TEDA; Dabco EG; N,N'-endo-Ethylenepiperazine; 1,4-Diazabicyclo-octane; Dabco"
+  },
+  {
+    "id": "ZPWVASYFFYYZEW-UHFFFAOYSA-L",
+    "name": "K2HPO4",
+    "abbreviation": [
+      "DKP"
+    ],
+    "aliases": [
+      "Potassium Phosphate, Dibasic",
+      "Dipotassium hydrogen phosphate",
+      "DIPOTASSIUM PHOSPHATE",
+      "Potassium phosphate dibasic",
+      "Dipotassium hydrogenphosphate",
+      "Dibasic potassium phosphate",
+      "Phosphoric acid, dipotassium salt",
+      "Potassium dibasic phosphate",
+      "Dipotassium monophosphate",
+      "Potassium monophosphate",
+      "Dipotassium orthophosphate",
+      "Dipotassium monohydrogen phosphate",
+      "Hydrogen dipotassium phosphate",
+      "Potassium phosphate (dibasic)",
+      "di-potassium hydrogen phosphate"
+    ],
+    "cas": "7758-11-4",
+    "inchi_key": "ZPWVASYFFYYZEW-UHFFFAOYSA-L",
+    "roles": {
+      "base": {
+        "families": [
+          "inorg_phosphates"
+        ],
+        "basicity": "weak",
+        "nucleophilicity": "weak",
+        "sterics": "unhindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: inorg_phosphates (inorg_phosphates) | name: K2HPO4 | abbr: DKP | CAS: 7758-11-4 | synonyms: Potassium Phosphate, Dibasic; 7758-11-4; Dipotassium hydrogen phosphate; DIPOTASSIUM PHOSPHATE; Potassium phosphate dibasic; Dipotassium hydrogenphosphate; Dibasic potassium phosphate; Phosphoric acid, dipotassium salt; Potassium dibasic phosphate; Dipotassium monophosphate; Potassium monophosphate; Dipotassium orthophosphate; Dipotassium monohydrogen phosphate; Hydrogen dipotassium phosphate; Potassium phosphate (dibasic); di-potassium hydrogen phosphate"
+  },
+  {
+    "id": "IUBQJLUDMLPAGT-UHFFFAOYSA-N",
+    "name": "KHMDS",
+    "abbreviation": [
+      "KHMDS"
+    ],
+    "aliases": [
+      "Potassium bis(trimethylsilyl)amide",
+      "Silanamine, 1,1,1-trimethyl-N-(trimethylsilyl)-, potassium salt (1:1)",
+      "DTXSID00390655",
+      "RefChem:867730",
+      "DTXCID50341516",
+      "424-100-2",
+      "609-880-6",
+      "Potassium Hexamethyldisilazide",
+      "Hexamethyldisilazane potassium salt",
+      "potassium;bis(trimethylsilyl)azanide",
+      "Potassium hexamethyldisilyl azide",
+      "MFCD00010330",
+      "potassium bis-trimethylsilylamide",
+      "Potassium Bis(trimethylsilyl)amide (95%)"
+    ],
+    "cas": "40949-94-8",
+    "inchi_key": "IUBQJLUDMLPAGT-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "metal_amides_silylamides"
+        ],
+        "basicity": "strong",
+        "nucleophilicity": "moderate",
+        "sterics": "hindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: metal_amides_silylamides (metal_amides_silylamides) | name: KHMDS | abbr: KHMDS | CAS: 40949-94-8 | synonyms: Potassium bis(trimethylsilyl)amide; Silanamine, 1,1,1-trimethyl-N-(trimethylsilyl)-, potassium salt (1:1); DTXSID00390655; RefChem:867730; DTXCID50341516; 424-100-2; 609-880-6; 40949-94-8; KHMDS; Potassium Hexamethyldisilazide; Hexamethyldisilazane potassium salt; potassium;bis(trimethylsilyl)azanide; Potassium hexamethyldisilyl azide; MFCD00010330; potassium bis-trimethylsilylamide; Potassium Bis(trimethylsilyl)amide (95%)"
+  },
+  {
+    "id": "XGZVUEUWXADBQD-UHFFFAOYSA-L",
+    "name": "Li2CO3",
+    "abbreviation": [
+      "Lithium carbonate"
+    ],
+    "aliases": [
+      "Dilithium carbonate",
+      "Lithobid",
+      "Lithane",
+      "Carbonic acid, dilithium salt",
+      "Eskalith",
+      "Lithotabs",
+      "Carbonic acid lithium salt",
+      "Camcolit",
+      "Liskonum",
+      "Lithizine",
+      "Limas",
+      "Eskalith CR",
+      "Neurolepsin",
+      "Priadel"
+    ],
+    "cas": "554-13-2",
+    "inchi_key": "XGZVUEUWXADBQD-UHFFFAOYSA-L",
+    "roles": {
+      "base": {
+        "families": [
+          "inorg_carbonates_bicarbonate"
+        ],
+        "basicity": "weak",
+        "nucleophilicity": "weak",
+        "sterics": "unhindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: inorg_carbonates_bicarbonate (inorg_carbonates_bicarbonate) | name: Li2CO3 | abbr: Lithium carbonate | CAS: 554-13-2 | synonyms: Lithium Carbonate; 554-13-2; Dilithium carbonate; Lithobid; Lithane; Carbonic acid, dilithium salt; Eskalith; Lithotabs; Carbonic acid lithium salt; Camcolit; Liskonum; Lithizine; Limas; Eskalith CR; Neurolepsin; Priadel"
   },
   {
     "id": "546-89-4",
@@ -614,6 +846,121 @@
     "embedding_text": "type: BASE | family: Organolithiums (organolithiums) | name: n-Butyllithium (in hexanes) | abbr: n-BuLi | CAS: 109-72-8 | strength_band: superbase | nucleophilicity: high | steric: variable | synonyms: n-Butyl lithium; n-BuLi; nButyllithiuminhexanes"
   },
   {
+    "id": "QGZKDVFQNNGYKY-UHFFFAOYSA-N",
+    "name": "NH3",
+    "abbreviation": [
+      "NH4OH"
+    ],
+    "aliases": [
+      "Ammonia",
+      "azane",
+      "Ammonia gas",
+      "Nitro-sil",
+      "Ammonia anhydrous",
+      "Ammonia, anhydrous",
+      "Anhydrous ammonia",
+      "Ammoniak",
+      "Liquid Ammonia",
+      "AM-Fol",
+      "ammoniac",
+      "Aqueous ammonia",
+      "Refrigerent R717",
+      "amoniaco",
+      "Ammoniaca",
+      "Ammonium hydroxide",
+      "Aqua ammonia"
+    ],
+    "cas": "7664-41-7",
+    "inchi_key": "QGZKDVFQNNGYKY-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "ammonia_aqueous"
+        ],
+        "basicity": "weak",
+        "nucleophilicity": "moderate",
+        "sterics": "unhindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: ammonia_aqueous (ammonia_aqueous) | name: NH3 | abbr: NH4OH | CAS: 7664-41-7 | synonyms: Ammonia; azane; 7664-41-7; Ammonia gas; Nitro-sil; Ammonia anhydrous; Ammonia, anhydrous; Anhydrous ammonia; Ammoniak; Liquid Ammonia; AM-Fol; ammoniac; Aqueous ammonia; Refrigerent R717; amoniaco; Ammoniaca; Ammonium hydroxide; Aqua ammonia"
+  },
+  {
+    "id": "VVKVBQDZJLGAFG-UHFFFAOYSA-N",
+    "name": "NMI",
+    "abbreviation": [
+      "NMI"
+    ],
+    "aliases": [
+      "3-(1-methyl-1H-indol-3-yl)propanoic acid",
+      "RefChem:489519",
+      "877-955-2",
+      "3-(1-Methyl-1H-indol-3-yl)-propionic acid",
+      "3-(1-methylindol-3-yl)propanoic acid",
+      "MFCD01548325",
+      "1H-Indole-3-propanoic acid, 1-methyl-",
+      "NSC401600",
+      "SCHEMBL1326755",
+      "1-Methylindole-3-propionic acid",
+      "DTXSID80322590",
+      "VVKVBQDZJLGAFG-UHFFFAOYSA-N",
+      "HMS1695B16",
+      "ALBB-028602",
+      "STL472215",
+      "1-Methylimidazole",
+      "N-Methylimidazole"
+    ],
+    "cas": "7479-20-1",
+    "inchi_key": "VVKVBQDZJLGAFG-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "nucleophilic_catalyst_bases"
+        ],
+        "basicity": "moderate",
+        "nucleophilicity": "strong",
+        "sterics": "unhindered"
+      },
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: BASE | family: nucleophilic_catalyst_bases (nucleophilic_catalyst_bases) | name: NMI | abbr: NMI | CAS: 7479-20-1 | synonyms: 3-(1-methyl-1H-indol-3-yl)propanoic acid; RefChem:489519; 877-955-2; 7479-20-1; 3-(1-Methyl-1H-indol-3-yl)-propionic acid; 3-(1-methylindol-3-yl)propanoic acid; MFCD01548325; 1H-Indole-3-propanoic acid, 1-methyl-; NSC401600; SCHEMBL1326755; 1-Methylindole-3-propionic acid; DTXSID80322590; VVKVBQDZJLGAFG-UHFFFAOYSA-N; HMS1695B16; ALBB-028602; STL472215; 1-Methylimidazole; N-Methylimidazole"
+  },
+  {
+    "id": "NHFRRDMZVIALKN-UHFFFAOYSA-N",
+    "name": "Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium salt",
+    "abbreviation": [
+      "BHT-Na",
+      "NaBHT"
+    ],
+    "aliases": [
+      "Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium salt (1:1)",
+      "C15H24NaO",
+      "SCHEMBL29484785",
+      "RAA65489",
+      "MFCD30474994",
+      "Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium",
+      "Butylated hydroxytoluene sodium salt",
+      "2,6-di-tert-butyl-4-methylphenol sodium salt"
+    ],
+    "cas": "16654-89-0",
+    "inchi_key": "NHFRRDMZVIALKN-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "alkoxides_hindered"
+        ],
+        "basicity": "moderate",
+        "nucleophilicity": "weak",
+        "sterics": "hindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: alkoxides_hindered (alkoxides_hindered) | name: Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium salt | abbr: BHT-Na | CAS: 16654-89-0 | synonyms: Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium salt; 16654-89-0; Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium salt (1:1); C15H24NaO; SCHEMBL29484785; RAA65489; MFCD30474994; Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium; Butylated hydroxytoluene sodium salt; 2,6-di-tert-butyl-4-methylphenol sodium salt"
+  },
+  {
     "id": "110-89-4",
     "name": "Piperidine",
     "abbreviation": [
@@ -637,6 +984,43 @@
       }
     },
     "embedding_text": "type: BASE | family: Secondary amines (cyclic) (secondary_amines_cyclic) | name: Piperidine | abbr: Pip | CAS: 110-89-4 | strength_band: strong | nucleophilicity: high | steric: unhindered | synonyms: Pip; Piperidine"
+  },
+  {
+    "id": "ZUFQCVZBBNZMKD-UHFFFAOYSA-M",
+    "name": "Potassium 2-ethylhexanoate",
+    "abbreviation": [
+      "KOEtHex"
+    ],
+    "aliases": [
+      "Hexanoic acid, 2-ethyl-, potassium salt",
+      "2-Ethylhexanoic acid, potassium salt",
+      "EINECS 221-625-7",
+      "UNII-P089X9A38X",
+      "DTXSID4027525",
+      "P089X9A38X",
+      "DTXCID307525",
+      "EC 221-625-7",
+      "RefChem:175365",
+      "2Ethylhexanoic acid, potassium salt",
+      "Hexanoic acid, 2ethyl, potassium salt",
+      "Potassium2ethylcaproate, 2Ethylcaproic acid, potassium salt",
+      "221-625-7",
+      "potassium;2-ethylhexanoate",
+      "Potassium octoate"
+    ],
+    "cas": "3164-85-0",
+    "inchi_key": "ZUFQCVZBBNZMKD-UHFFFAOYSA-M",
+    "roles": {
+      "base": {
+        "families": [
+          "inorg_carboxylates"
+        ],
+        "basicity": "weak",
+        "nucleophilicity": "weak",
+        "sterics": "unhindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: inorg_carboxylates (inorg_carboxylates) | name: Potassium 2-ethylhexanoate | abbr: KOEtHex | CAS: 3164-85-0 | synonyms: Potassium 2-ethylhexanoate; 3164-85-0; Hexanoic acid, 2-ethyl-, potassium salt; 2-Ethylhexanoic acid, potassium salt; EINECS 221-625-7; UNII-P089X9A38X; DTXSID4027525; P089X9A38X; DTXCID307525; EC 221-625-7; RefChem:175365; 2Ethylhexanoic acid, potassium salt; Hexanoic acid, 2ethyl, potassium salt; Potassium2ethylcaproate, 2Ethylcaproic acid, potassium salt; 221-625-7; potassium;2-ethylhexanoate; Potassium octoate"
   },
   {
     "id": "127-08-2",
@@ -915,6 +1299,43 @@
     "embedding_text": "type: BASE | family: Tertiary amines (aliphatic/cyclic) (tertiary_amines_aliphatic) | name: Quinuclidine | abbr: Quinuclidine | CAS: 100-76-5 | strength_band: moderate | nucleophilicity: medium | steric: hindered | synonyms: 1-Azabicyclo[2.2.2]octane; 1,4-Ethanopiperidine; 1,4-Ethylenepiperidine; Chinuclidin; 1-Azabicyclo(2.2.2)octane; 4-Azabicyclo[2.2.2]octane; QUINUCLIDINE [MI]; 4-Azabicyclo(2.2.2)octane; Quinuclidine"
   },
   {
+    "id": "CGRKYEALWSRNJS-UHFFFAOYSA-N",
+    "name": "Sodium 2-methylbutan-2-olate",
+    "abbreviation": [
+      "t-PentONa"
+    ],
+    "aliases": [
+      "2-Butanol, 2-methyl-, sodium salt",
+      "UNII-51Z39PY5Z8",
+      "51Z39PY5Z8",
+      "EINECS 238-639-4",
+      "DTXSID4044583",
+      "EC 238-639-4",
+      "RefChem:183624",
+      "DTXCID2024583",
+      "238-639-4",
+      "Sodium tert-pentoxide",
+      "sodium;2-methylbutan-2-olate",
+      "Sodium tert-Amylate",
+      "Sodium tert-amoxide",
+      "MFCD00064245",
+      "Sodium tert-amyloxide"
+    ],
+    "cas": "14593-46-5",
+    "inchi_key": "CGRKYEALWSRNJS-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "alkoxides_hindered"
+        ],
+        "basicity": "strong",
+        "nucleophilicity": "moderate",
+        "sterics": "hindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: alkoxides_hindered (alkoxides_hindered) | name: Sodium 2-methylbutan-2-olate | abbr: t-PentONa | CAS: 14593-46-5 | synonyms: Sodium 2-methylbutan-2-olate; 14593-46-5; 2-Butanol, 2-methyl-, sodium salt; UNII-51Z39PY5Z8; 51Z39PY5Z8; EINECS 238-639-4; DTXSID4044583; EC 238-639-4; RefChem:183624; DTXCID2024583; 238-639-4; Sodium tert-pentoxide; sodium;2-methylbutan-2-olate; Sodium tert-Amylate; Sodium tert-amoxide; MFCD00064245; Sodium tert-amyloxide"
+  },
+  {
     "id": "127-09-3",
     "name": "Sodium acetate",
     "abbreviation": [
@@ -1124,6 +1545,81 @@
     "embedding_text": "type: BASE | family: Tertiary amines (aliphatic/cyclic) (tertiary_amines_aliphatic) | name: Sodium trimethylsilanolate | abbr: Sodium trimethylsilanolate | CAS: 18027-10-6 | strength_band: moderate | nucleophilicity: medium | steric: hindered | synonyms: Trimethylsilanol sodium salt; Silanol, 1,1,1-trimethyl-, sodium salt (1:1); Silanol, trimethyl, sodium salt; Silanol, 1,1,1trimethyl, sodium salt (1:1); sodium;trimethyl(oxido)silane; C3H9NaOSi; Sodium trimethyl silanolate; Silanol, trimethyl-, sodium salt; Sodium trimethylsilanolate"
   },
   {
+    "id": "KWYHDKDOAIKMQN-UHFFFAOYSA-N",
+    "name": "TMEDA",
+    "abbreviation": [
+      "TMEDA",
+      "TMEN"
+    ],
+    "aliases": [
+      "N,N,N',N'-Tetramethylethylenediamine",
+      "Temed",
+      "Tetramethylethylenediamine",
+      "N,N,N',N'-tetramethylethane-1,2-diamine",
+      "1,2-Bis(dimethylamino)ethane",
+      "Tetramethyldiaminoethane",
+      "Tetrameen",
+      "Propamine D",
+      "1,2-Ethanediamine, N,N,N',N'-tetramethyl-",
+      "Tetramethyl ethylene diamine",
+      "N,N,N',N'-TETRAMETHYL-1,2-ETHANEDIAMINE",
+      "Ethylenediamine, N,N,N',N'-tetramethyl-",
+      "N,N,N',N'-Tetramethyl-1,2-diaminoethane",
+      "Dimethyl(2-(dimethylamino)ethyl)amine"
+    ],
+    "cas": "110-18-9",
+    "inchi_key": "KWYHDKDOAIKMQN-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "tertiary_amines_aliphatic"
+        ],
+        "basicity": "moderate",
+        "nucleophilicity": "moderate",
+        "sterics": "hindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: tertiary_amines_aliphatic (tertiary_amines_aliphatic) | name: TMEDA | abbr: TMEDA | CAS: 110-18-9 | synonyms: N,N,N',N'-Tetramethylethylenediamine; 110-18-9; Temed; TMEDA; Tetramethylethylenediamine; N,N,N',N'-tetramethylethane-1,2-diamine; 1,2-Bis(dimethylamino)ethane; Tetramethyldiaminoethane; Tetrameen; Propamine D; 1,2-Ethanediamine, N,N,N',N'-tetramethyl-; Tetramethyl ethylene diamine; N,N,N',N'-TETRAMETHYL-1,2-ETHANEDIAMINE; Ethylenediamine, N,N,N',N'-tetramethyl-; N,N,N',N'-Tetramethyl-1,2-diaminoethane; Dimethyl(2-(dimethylamino)ethyl)amine"
+  },
+  {
+    "id": "LBKJNHPKYFYCLL-UHFFFAOYSA-N",
+    "name": "TMSOK",
+    "abbreviation": [
+      "TMSOK"
+    ],
+    "aliases": [
+      "Potassium trimethylsilanolate",
+      "DTXSID9065106",
+      "Silanol, 1,1,1-trimethyl-, potassium salt (1:1)",
+      "RefChem:868178",
+      "DTXCID1032939",
+      "234-062-7",
+      "Trimethylsiloxypotassium",
+      "potassiumtrimethylsilanolate",
+      "Trimethylsilanol potassium salt",
+      "Silanol, trimethyl-, potassium salt",
+      "MFCD00013421",
+      "potassium;trimethyl(oxido)silane",
+      "s25261",
+      "Potassium trimethylsilanolate, 2M in THF (26-29wgt%)",
+      "potassium trimethyl silanolate",
+      "Potassium trimethylsiloxide"
+    ],
+    "cas": "10519-96-7",
+    "inchi_key": "LBKJNHPKYFYCLL-UHFFFAOYSA-N",
+    "roles": {
+      "base": {
+        "families": [
+          "alkoxides_primary"
+        ],
+        "basicity": "strong",
+        "nucleophilicity": "strong",
+        "sterics": "unhindered"
+      }
+    },
+    "embedding_text": "type: BASE | family: alkoxides_primary (alkoxides_primary) | name: TMSOK | abbr: TMSOK | CAS: 10519-96-7 | synonyms: Potassium trimethylsilanolate; 10519-96-7; DTXSID9065106; Silanol, 1,1,1-trimethyl-, potassium salt (1:1); RefChem:868178; DTXCID1032939; 234-062-7; Trimethylsiloxypotassium; potassiumtrimethylsilanolate; Trimethylsilanol potassium salt; Silanol, trimethyl-, potassium salt; MFCD00013421; potassium;trimethyl(oxido)silane; s25261; Potassium trimethylsilanolate, 2M in THF (26-29wgt%); potassium trimethyl silanolate; Potassium trimethylsiloxide"
+  },
+  {
     "id": "JRHPOFJADXHYBR-HTQZYQBOSA-N",
     "name": "trans-N,N'-dimethyl-1,2-cyclohexanediamine",
     "abbreviation": [
@@ -1272,5 +1768,52 @@
       }
     },
     "embedding_text": "type: BASE | family: inorg_phosphates (inorg_phosphates) | name: Tripotassium phosphate | abbr: K3PO4 | CAS: 7778-53-2 | strength_band: moderate | nucleophilicity: low | steric: hindered | synonyms: Potassium phosphate (tribasic); K3PO4; Tripotassiumphosphate"
+  },
+  {
+    "id": "DJWUNCQRNNEAKC-UHFFFAOYSA-L",
+    "name": "Zinc acetate",
+    "abbreviation": [
+      "Zn(OAc)₂"
+    ],
+    "aliases": [
+      "Zinc diacetate",
+      "Zinc(II) acetate",
+      "Dicarbomethoxyzinc",
+      "Acetic acid, zinc(II) salt",
+      "Acetic acid, zinc salt",
+      "Zinc acetate anhydrous",
+      "Siltex CL 4",
+      "Anhydrous Zinc Acetate",
+      "H2ZEY72PME",
+      "DTXSID8038770",
+      "CHEBI:62984",
+      "AI3-04465",
+      "NSC-75801",
+      "DTXCID6018770",
+      "Acetic acid zinc salt"
+    ],
+    "cas": "557-34-6",
+    "inchi_key": "DJWUNCQRNNEAKC-UHFFFAOYSA-L",
+    "roles": {
+      "base": {
+        "families": [
+          "inorg_carboxylates"
+        ],
+        "basicity": "weak",
+        "nucleophilicity": "weak",
+        "sterics": "unhindered"
+      },
+      "metal_precursor": {
+        "families": [
+          "cu_ii_salts"
+        ],
+        "metal": "Zn",
+        "oxidation_states": [
+          2
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: BASE | family: inorg_carboxylates (inorg_carboxylates) | name: Zinc acetate | abbr: Zn(OAc)₂ | CAS: 557-34-6 | synonyms: Zinc Acetate; 557-34-6; Zinc diacetate; Zinc(II) acetate; Dicarbomethoxyzinc; Acetic acid, zinc(II) salt; Acetic acid, zinc salt; Zinc acetate anhydrous; Siltex CL 4; Anhydrous Zinc Acetate; H2ZEY72PME; DTXSID8038770; CHEBI:62984; AI3-04465; NSC-75801; DTXCID6018770; Acetic acid zinc salt"
   }
 ]

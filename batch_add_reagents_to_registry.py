@@ -351,39 +351,69 @@ def batch_add_reagents(
                     resolver_timeout=6.0
                 )
                 
-                if result.get("status") == "ready_to_save":
+                result_status = result.get("status")
+                
+                if result_status == "ready_to_save" or result_status == "needs_review":
                     entry = result.get("entry")
                     if entry and not dry_run:
                         store.add_entry(role, entry)
                         store.save_role(role)
-                        print(f"  ✓ Added successfully (LLM workflow)")
+                        status_msg = "Added successfully (LLM workflow)"
+                        if result_status == "needs_review":
+                            status_msg += f" [with warnings: {result.get('message', '')}]"
+                        print(f"  ✓ {status_msg}")
                         results["added_successfully"] += 1
                         results["details"].append({
                             "name": name,
                             "role": role,
                             "cas": cas,
                             "status": "added",
-                            "method": "llm_workflow"
+                            "method": "llm_workflow",
+                            "warnings": result.get("message") if result_status == "needs_review" else None
                         })
                     elif dry_run:
-                        print(f"  ✓ Would add (dry run, LLM workflow)")
+                        status_msg = "Would add (dry run, LLM workflow)"
+                        if result_status == "needs_review":
+                            status_msg += f" [with warnings: {result.get('message', '')}]"
+                        print(f"  ✓ {status_msg}")
                         results["added_successfully"] += 1
                         results["details"].append({
                             "name": name,
                             "role": role,
                             "cas": cas,
                             "status": "would_add",
-                            "method": "llm_workflow"
+                            "method": "llm_workflow",
+                            "warnings": result.get("message") if result_status == "needs_review" else None
                         })
                 else:
-                    print(f"  ✗ LLM workflow failed: {result.get('error', 'Unknown error')}")
+                    # Get detailed error message
+                    result_status = result.get("status", "unknown")
+                    error_msg = result.get('error')
+                    
+                    if not error_msg:
+                        # No explicit error - show status and message
+                        message = result.get('message', '')
+                        error_msg = f"Status '{result_status}'"
+                        if message:
+                            error_msg += f": {message}"
+                        
+                        # Try to extract from workflow steps
+                        workflow = result.get('workflow', {})
+                        for step_name, step_data in workflow.items():
+                            if isinstance(step_data, dict) and step_data.get('status') != 'success':
+                                step_error = step_data.get('error', 'Failed without details')
+                                error_msg += f" | {step_name}: {step_error}"
+                    
+                    print(f"  ✗ LLM workflow failed: {error_msg}")
                     results["failed"] += 1
                     results["details"].append({
                         "name": name,
                         "role": role,
                         "cas": cas,
                         "status": "failed",
-                        "error": result.get("error")
+                        "error": error_msg,
+                        "llm_result_status": result_status,
+                        "llm_message": result.get("message")
                     })
             
             else:
