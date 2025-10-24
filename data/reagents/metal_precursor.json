@@ -332,6 +332,43 @@
     "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper | abbr: Cu(0) | CAS: 7440-50-8 | synonyms: Copper; 7440-50-8; Copper powder; cuprum; Bronze powder; Copper bronze; Copper, elemental; Tatum-T; cuivre; Arwood copper; Copper-airborne; Copper-milled; Kafar copper; Paragard T 380a; Raney copper; Gold bronze; Copper metal; Elemental copper"
   },
   {
+    "id": "QTMDXZNDVAMKGV-UHFFFAOYSA-L",
+    "name": "Copper bromide",
+    "abbreviation": [
+      "CuBr2"
+    ],
+    "aliases": [
+      "Copper(II) bromide",
+      "CUPRIC BROMIDE",
+      "Dibromocopper",
+      "1KC430K0ZN",
+      "DTXSID7064863",
+      "Cuprum Bromatum",
+      "RefChem:58532",
+      "DTXCID9048067",
+      "CUPRIC BROMIDE, ANHYDROUS",
+      "232-167-2",
+      "Copper (II) bromide",
+      "MFCD00010970",
+      "copper(II)bromide",
+      "Copper II bromide"
+    ],
+    "cas": "7789-45-9",
+    "inchi_key": "QTMDXZNDVAMKGV-UHFFFAOYSA-L",
+    "roles": {
+      "metal_precursor": {
+        "families": [
+          "cu_ii_salts"
+        ],
+        "metal": "Cu",
+        "oxidation_states": [
+          2
+        ]
+      }
+    },
+    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper bromide (CuBr2) | abbr: CuBr2 | CAS: 7789-45-9 | synonyms: Copper bromide (CuBr2); Copper(II) bromide; 7789-45-9; CUPRIC BROMIDE; Dibromocopper; 1KC430K0ZN; DTXSID7064863; Cuprum Bromatum; RefChem:58532; DTXCID9048067; CUPRIC BROMIDE, ANHYDROUS; 232-167-2; Copper (II) bromide; MFCD00010970; copper(II)bromide; Copper II bromide"
+  },
+  {
     "id": "cas-1317-39-1",
     "name": "Copper oxide (Cu2O)",
     "abbreviation": [
@@ -1334,6 +1371,47 @@
       }
     },
     "embedding_text": "member_embedding: type: CATALYST | family: Pd(II) Salts and Simple Complexes (pd_ii_salts) | metal: Pd | ox_states: 2 | name: Palladium, di-mu-chlorobis(eta3-2-propenyl)di- | abbr: Palladium, di-mu-chlorobis(eta3-2-propenyl)di- | CAS: 12012-95-2"
+  },
+  {
+    "id": "JKDXLSQCLASSTC-HRNDJLQDSA-N",
+    "name": "Pd(crotyl)Cl",
+    "abbreviation": [
+      "Pd-170"
+    ],
+    "aliases": [
+      "Chloro(crotyl)(2-dicyclohexylphosphino-2',4',6'-triisopropyl-1,1'-biphenyl) palladium(II)",
+      "C37H54ClPPd+2",
+      "SY362389",
+      "F552997",
+      "[(1,2,3-|C)-2-Buten-1-yl]chloro[dicyclohexyl(2',4',6'-trisisopropyl-2-biphenylyl)phosphine]palladium",
+      "[2-[(E)-but-2-enyl]-3-chloro-6-(2,4,6-triisopropylphenyl)phenyl]-dicyclohexyl-phosphane;palladium(2+)",
+      "[2-[(E)-but-2-enyl]-3-chloro-6-[2,4,6-tri(propan-2-yl)phenyl]phenyl]-dicyclohexylphosphane;palladium(2+)"
+    ],
+    "cas": "1798782-02-1",
+    "inchi_key": "JKDXLSQCLASSTC-HRNDJLQDSA-N",
+    "roles": {
+      "metal_precursor": {
+        "families": [
+          "pd_zero_sources"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          0
+        ]
+      },
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_g3_precatalysts"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine",
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: METAL_PRECURSOR | family: pd_zero_sources (pd_zero_sources) | metal: Pd | oxidation_states: 0 | name: Pd-170 | abbr: Pd-170 | CAS: 1798782-02-1 | synonyms: Pd-170; 1798782-02-1; RefChem:858792; 868-350-4; Chloro(crotyl)(2-dicyclohexylphosphino-2',4',6'-triisopropyl-1,1'-biphenyl) palladium(II); C37H54ClPPd+2; SY362389; F552997; [(1,2,3-|C)-2-Buten-1-yl]chloro[dicyclohexyl(2',4',6'-trisisopropyl-2-biphenylyl)phosphine]palladium; [2-[(E)-but-2-enyl]-3-chloro-6-(2,4,6-triisopropylphenyl)phenyl]-dicyclohexyl-phosphane;palladium(2+); [2-[(E)-but-2-enyl]-3-chloro-6-[2,4,6-tri(propan-2-yl)phenyl]phenyl]-dicyclohexylphosphane;palladium(2+)"
   },
   {
     "id": "R_e86dfaa7c2101e03",
