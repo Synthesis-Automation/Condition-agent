@@ -884,12 +884,6 @@
 - **Occurrences:** 44
 - **Used in reactions:** Alkylation, Buchwald-Hartwig, CN-Coupling
 
-### NaOH
-
-- **Role:** Base
-- **Occurrences:** 124
-- **Used in reactions:** Buchwald-Hartwig, CO-Coupling, Suzuki-Miyaura
-
 ### NaOMe
 
 - **Role:** Base
@@ -907,12 +901,6 @@
 - **Role:** Base
 - **Occurrences:** 104
 - **Used in reactions:** Buchwald-Hartwig, Condensation, SNAr
-
-### PPh3
-
-- **Role:** Base
-- **Occurrences:** 2
-- **Used in reactions:** Condensation
 
 ### Potassium 2-ethylhexanoate
 
@@ -976,13 +964,13 @@
 
 ### Zinc acetate
 
-- **Role:** Base
+- **Role:** ADDITIVE
 - **Occurrences:** 125
 - **Used in reactions:** Addition, Borylation, Miyaura, Buchwald-Hartwig, Condensation, Cyclization
 
 ### ZnCl2
 
-- **Role:** Base
+- **Role:** ADDITIVE
 - **Occurrences:** 5
 - **Used in reactions:** Condensation
 
@@ -1024,851 +1012,833 @@
 
 ---
 
-## Catalyst (141 reagents)
+## preformed_metal_catalyst (141 reagents)
 
 ### (4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 72
 - **Used in reactions:** CC-Coupling, Negishi, in-situ
 
 ### (CyMPhos)PdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 139
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling, Suzuki-Miyaura
 
 ### (DiMeIHept Cl) Pd(cinnamyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 954
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, CS-Coupling, Hydrolysis, Negishi, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### (NHP-DalPhos)NiCl(o-tol)
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 8
 - **Used in reactions:** Negishi, in-situ
 
 ### (R)-BINAP Pd(allyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 517
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Negishi, Suzuki-Miyaura
 
 ### (Ru(p-cymene)Cl2)2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 264
 - **Used in reactions:** CH-Activation
 
 ### 4-dtbbpy)NiCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 72
 - **Used in reactions:** CC-Coupling, Negishi, in-situ
 
 ### APhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 30
 - **Used in reactions:** Buchwald-Hartwig
 
 ### AdBrettPhosPd G6 Br
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 606
 - **Used in reactions:** Alkylation, Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyanation, Cyclization, Heck, Suzuki-Miyaura
 
 ### AlPhosPd G6 Br
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 778
 - **Used in reactions:** Alkylation, Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyanation, Cyclization
 
 ### AlphosPd)2cod
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 963
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyanation, Heck, Hydrolysis, Negishi, Negishi, in-situ, Sonogashira, Suzuki-Miyaura
 
 ### AmPhos Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1295
 - **Used in reactions:** Alkylation, Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, CS-Coupling, Dimerization, reductive, Hydrolysis, Negishi, Negishi, in-situ, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### AmPhos2PdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1235
 - **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, Heck, Negishi, Negishi, in-situ, Sonogashira, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### BippyPhos Pd(allyl)OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1087
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Heck, Hydrolysis, Negishi, Negishi, in-situ, Stannylation, Suzuki-Miyaura
 
 ### BrettPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 88
 - **Used in reactions:** Buchwald-Hartwig, CC-Coupling, Hydrolysis, Sonogashira, Suzuki-Miyaura
 
 ### BrettPhos Pd(crotyl)OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 796
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Hydrolysis, Negishi, Sonogashira, Suzuki-Miyaura
 
 ### CX31
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 40
 - **Used in reactions:** Buchwald-Hartwig, Negishi, Suzuki-Miyaura
 
 ### CataCXiumA Pd(allyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 825
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, Cyclization, Dimerization, reductive, Heck, Negishi, Negishi, in-situ, Sonogashira, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### Copper(I) thiophene-2-carboxylate
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 139
 - **Used in reactions:** CN-Coupling, Sonogashira
 
 ### Copper(II) acetate monohydrate
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 40
 - **Used in reactions:** CN-Coupling
 
 ### Copper(II)acetate
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 312
 - **Used in reactions:** CH-Activation, CN-Coupling, CO-Coupling
 
 ### Cu(MeCN)4BF4
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 946
 - **Used in reactions:** Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyclization, Hydrolysis, Negishi, in-situ, Sandmeyer, Sonogashira
 
 ### Cu(OTf)2
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 24
 - **Used in reactions:** Sandmeyer
 
 ### Cu2O
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 832
 - **Used in reactions:** Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyclization, Negishi, in-situ, Sandmeyer
 
 ### CuBr
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 92
 - **Used in reactions:** CN-Coupling, CO-Coupling
 
 ### CuBr2
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 28
 - **Used in reactions:** CO-Coupling
 
 ### CuF2
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 32
 - **Used in reactions:** Sandmeyer
 
-### CuI
-
-- **Role:** Catalyst
-- **Occurrences:** 3786
-- **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyanation, Cyclization, Hydrolysis, SNAr, Sonogashira, Suzuki-Miyaura, in situ
-
 ### CuO
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 191
 - **Used in reactions:** Buchwald-Hartwig, CN-Coupling, CO-Coupling
 
-### CuSO4 anhydrous
+### CuSO4
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 4
 - **Used in reactions:** CO-Coupling
 
 ### CyJohnPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 123
 - **Used in reactions:** Buchwald-Hartwig
 
 ### DPEPhos Pd(allyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 602
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Heck, Sonogashira, Suzuki-Miyaura
 
 ### DPEPhosPdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 93
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling, Negishi, Suzuki-Miyaura
 
 ### EPhosPd G6 Br
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 162
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Suzuki-Miyaura
 
 ### FPhos Pd G6 OTES
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 96
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CO-Coupling, Sonogashira
 
 ### GPhos Pd G6 Br
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 326
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyanation, Cyclization, Negishi, Suzuki-Miyaura
 
 ### GPhos Pd G6 TES
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 180
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CO-Coupling, Heck, Negishi, in-situ
 
 ### Glorius-NHC\*HClO4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 24
 - **Used in reactions:** Stetter
 
-### IPent Pd(tBuInd)Cl]
+### IPent Pd(tBuInd)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 234
 - **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Negishi, Sonogashira, Suzuki-Miyaura
 
 ### IPr Pd(tBuInd)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 86
 - **Used in reactions:** Buchwald-Hartwig, CO-Coupling, CS-Coupling, Cyclization, Suzuki-Miyaura
 
 ### Jackie CPhos Pd G4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 293
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, Cyanation, Negishi, Suzuki-Miyaura
 
 ### JackiePhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 292
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Hydrolysis, Negishi, Suzuki-Miyaura
 
 ### JosiphosSL-J009-1 Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1089
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, CS-Coupling, Cyanation, Cyclization, Heck, Hydrolysis, Negishi, Negishi, in-situ, Suzuki-Miyaura
 
 ### Me3(OMe)tBuXPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 355
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyclization, Heck, Hydrolysis, Negishi, SNAr, Suzuki-Miyaura, in situ
 
 ### Me4tBuXPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 278
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, Heck, Hydrolysis, Negishi
 
 ### MorDalPhos Pd G6 Br
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 196
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, Cyanation, Negishi, Suzuki-Miyaura
 
 ### MorDalphos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 711
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Heck, Hydrolysis, Negishi, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### N-XantPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 149
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, Heck, Hydrolysis, Suzuki-Miyaura
 
 ### Ni(COD)(DQ)
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 24
 - **Used in reactions:** Negishi, in-situ
 
 ### Ni(OAc)2
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 222
 - **Used in reactions:** CC-Coupling, Negishi, in-situ
 
 ### NiBr2
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 144
 - **Used in reactions:** CC-Coupling
 
 ### NiBr2-glyme
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 120
 - **Used in reactions:** CC-Coupling
 
 ### NiCl2-glyme
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 32
 - **Used in reactions:** Borylation, Miyaura, CC-Coupling
 
 ### NiI2
 
-- **Role:** Catalyst
+- **Role:** metal_precusor
 - **Occurrences:** 24
 - **Used in reactions:** Negishi, in-situ
 
 ### P(Cy)3 Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 372
 - **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, Dimerization, reductive, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### P(Cy3) Pd G2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 12
 - **Used in reactions:** Suzuki-Miyaura
 
 ### P(Cy3) Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 57
 - **Used in reactions:** Buchwald-Hartwig, Cyclization, Negishi, in-situ, Suzuki-Miyaura
 
 ### P(oTol)3 Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 114
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, Heck, Sonogashira, Suzuki-Miyaura
 
 ### P(tBu)(Cy)2)2PdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 199
 - **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, Negishi, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### P(tBu)2Ph)2PdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 158
 - **Used in reactions:** Borylation, Miyaura, CC-Coupling, Negishi, Negishi, in-situ, Suzuki-Miyaura
 
 ### P(tBu)3 Pd G2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 188
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling, Negishi, Suzuki-Miyaura, in situ
 
 ### P(tBu)3 Pd G6
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 212
 - **Used in reactions:** Alkylation, Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, Cyanation, Negishi, in-situ, Sonogashira, Suzuki-Miyaura
 
 ### P(tBu)3 Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1656
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CO-Coupling, CS-Coupling, Cyanation, Cyclization, Heck, Hydrolysis, Negishi, Negishi, in-situ, Reduction, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### PEPPSI SIPr
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 8
 - **Used in reactions:** Buchwald-Hartwig
 
 ### PEPPSI-IPENT
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 376
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Heck, Hydrolysis, Sonogashira, Suzuki-Miyaura
 
-### PPh3)2PdCl2
-
-- **Role:** Catalyst
-- **Occurrences:** 821
-- **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CS-Coupling, Cyclization, Negishi, Sonogashira, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
-
-### Pd(OAc)2
-
-- **Role:** Catalyst
-- **Occurrences:** 314
-- **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CH-Activation
-
 ### Pd(OTFA)2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 14
 - **Used in reactions:** CH-Activation, Cyclization
 
 ### Pd-PEPPSI-IHept Cl 3-chloropyridine
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 316
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CS-Coupling, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### Pd-PEPPSI-IPent Cl 3-chloropyridine
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 456
 - **Used in reactions:** Alkylation, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Cyclization, Negishi, Negishi, in-situ, Suzuki-Miyaura
 
 ### Pd-PEPPSI-IPent Cl o-picoline
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 709
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyanation, Cyclization, Heck, Hydrolysis, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### Pd/C
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 136
 - **Used in reactions:** Dimerization, reductive, Hydrodehalogenation
 
 ### Pd2dba3.CHCl3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 16
 - **Used in reactions:** Buchwald-Hartwig
 
 ### Ph3P AuCl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 40
 - **Used in reactions:** Cyclization
 
 ### Piperidinyl-amino-pincer PdCl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 85
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, Cyclization, Negishi, in-situ, Suzuki-Miyaura
 
 ### QPhos Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1304
 - **Used in reactions:** Alkylation, Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyanation, Heck, Hydrolysis, Negishi, Stannylation, Suzuki-Miyaura
 
 ### QPhosPd G6 Br
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 38
 - **Used in reactions:** Buchwald-Hartwig, CN-Coupling
 
 ### RockPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 376
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Cyclization, Hydrolysis, Negishi, Negishi, in-situ, Sonogashira, Suzuki-Miyaura
 
 ### RockPhos Pd G6 Br
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 128
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CO-Coupling
 
 ### Rovis-NHC\*HBF4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 24
 - **Used in reactions:** Stetter
 
 ### RuPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 8
 - **Used in reactions:** Buchwald-Hartwig
 
 ### RuPhos Pd G4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 100
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CC-Coupling, CN-Coupling, Hydrolysis
 
 ### RuPhos Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 773
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Negishi, Negishi, in-situ, Suzuki-Miyaura
 
 ### SPhos Pd G2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 40
 - **Used in reactions:** Buchwald-Hartwig
 
 ### SPhos Pd G4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 60
 - **Used in reactions:** Buchwald-Hartwig, Negishi, in-situ, Suzuki-Miyaura
 
 ### SPhos Pd(allyl)OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 160
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Negishi, Sonogashira, Suzuki-Miyaura
 
 ### SPhos Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1532
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Hydrolysis, Negishi, Negishi, in-situ, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### SPhos Pd(tBuInd)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 70
 - **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, Suzuki-Miyaura
 
 ### SPhos Pd-Fe nanoparticles
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 56
 - **Used in reactions:** Negishi, in-situ, Suzuki-Miyaura
 
 ### Strykers reagent
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 24
 - **Used in reactions:** Reduction
 
 ### TrixiePhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 243
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Negishi, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### VPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 32
 - **Used in reactions:** Negishi, in-situ
 
 ### VPhos Pd G4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 284
 - **Used in reactions:** Buchwald-Hartwig, CC-Coupling, CN-Coupling, Negishi, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### XPhos Pd G2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 728
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, Hydrolysis, Negishi, Negishi, in-situ, Sonogashira, Suzuki-Miyaura
 
 ### XPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1185
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyclization, Heck, Hydrolysis, Negishi, SNAr, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### XPhos Pd G4
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 242
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, Negishi, Negishi, in-situ, Suzuki-Miyaura
 
 ### XPhos Pd(crotyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1496
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Dimerization, reductive, Negishi, Negishi, in-situ, Sonogashira, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### XPhos Pd(tBuInd)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 64
 - **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CO-Coupling, Cyclization
 
 ### XantPhos Pd G2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 168
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling, Suzuki-Miyaura
 
 ### XantPhos Pd(allyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 2048
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, CS-Coupling, Cyanation, Cyclization, Heck, Hydrolysis, Negishi, Suzuki-Miyaura
 
 ### XantPhosPdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 864
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, Negishi, Sonogashira, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### [Ir(cod)Cl]2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 48
 - **Used in reactions:** Borylation, C-H
 
 ### [Ir(cod)OMe]2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 72
 - **Used in reactions:** Borylation, C-H
 
 ### [Pd(Cinnamyl)Cl]2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 21
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation
 
 ### [Pd(OTf)2(DPPP)]
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 14
 - **Used in reactions:** CH-Activation, Cyclization
 
 ### [Pd(allyl)(Ad-BippyPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 36
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CO-Coupling
 
 ### [Pd(allyl)(Ad-BrettPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 8
 - **Used in reactions:** Buchwald-Hartwig
 
 ### [Pd(allyl)(AlPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 42
 - **Used in reactions:** Buchwald-Hartwig
 
 ### [Pd(allyl)(CPhos-Hybrid)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 17
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig
 
 ### [Pd(allyl)(JohnPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 52
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, Sonogashira
 
 ### [Pd(allyl)(Me4-tBu-XPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 341
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Heck
 
 ### [Pd(allyl)(Ph-DavePhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 21
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation
 
 ### [Pd(allyl)(Ph-SPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 17
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation
 
 ### [Pd(allyl)(RockPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 177
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Heck, Hydrolysis
 
 ### [Pd(allyl)(XPhos)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 8
 - **Used in reactions:** Buchwald-Hartwig
 
 ### [Pd(allyl)(cataCXiumPCy)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 18
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation
 
 ### [Pd(allyl)(cataCXiumPOMeCy)]OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 17
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig
 
 ### bridged tBuPhosphinito PdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 93
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, Negishi, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### cBridP Pd(allyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 792
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, CS-Coupling, Hydrolysis, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### cPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 202
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, Negishi, Suzuki-Miyaura
 
 ### cataCXiumA Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 419
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Hydrolysis, Negishi, in-situ, SNAr, Sonogashira, Suzuki-Miyaura
 
 ### cataCXiumA Pd G6 Br)2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 192
 - **Used in reactions:** Alkylation, Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CS-Coupling, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### dcypfPdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 200
 - **Used in reactions:** Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Suzuki-Miyaura
 
 ### di-IodobisP(tBu)3 Pd2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 12
 - **Used in reactions:** Alkylation
 
 ### dppbPdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 46
 - **Used in reactions:** Borylation, Miyaura, CC-Coupling, CH-Activation, Suzuki-Miyaura
 
 ### dppdtbpf)PdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 229
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Heck, Suzuki-Miyaura
 
 ### dppf Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 600
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Cyanation, Cyclization, Negishi, Sonogashira, Suzuki-Miyaura
 
 ### dppfPdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1276
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Negishi, Negishi, in-situ, SNAr, Sonogashira, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### dpppPdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 270
 - **Used in reactions:** Borylation, Miyaura, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyanation, Cyclization, Heck, Suzuki-Miyaura
 
 ### dtbpfPdCl2
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 2190
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Dimerization, reductive, Heck, Hydrolysis, Negishi, Sonogashira, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### iPr AuCl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 8
 - **Used in reactions:** Cyclization
 
 ### meCgPPh Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1231
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CO-Coupling, Dimerization, reductive, Heck, Hydrolysis, Negishi, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### rac-Antphos Pd(allyl)Cl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 16
 - **Used in reactions:** Suzuki-Miyaura
 
 ### rac-BINAP Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 718
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Heck, Hydrolysis, Negishi, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### tBu)PhCPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 113
 - **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling
 
 ### tBuBrettPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 50
 - **Used in reactions:** Buchwald-Hartwig, CC-Coupling, Hydrolysis, Suzuki-Miyaura
 
 ### tBuBrettPhos Pd(allyl)OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 2413
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, CS-Coupling, Cyanation, Cyclization, Heck, Hydrolysis, Negishi, Sonogashira, Suzuki-Miyaura
 
 ### tBuXPhos Pd G3
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1169
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CN-Coupling, CO-Coupling, Cyclization, Heck, Hydrolysis, Negishi, SNAr, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### tBuXPhos Pd(allyl)OTf
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 1239
 - **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Cyclization, Heck, Hydrolysis, Negishi, Negishi, in-situ, Sonogashira, Suzuki-Miyaura
 
 ### thiazolium-NHC\*HCl
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 228
 - **Used in reactions:** Cyclization, Stetter
 
 ### triisobutylphosphatrane Pd G6
 
-- **Role:** Catalyst
+- **Role:** preformed_metal_catalyst
 - **Occurrences:** 508
 - **Used in reactions:** Arylation, acidic C-H, Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Hydrolysis, Negishi, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
@@ -2186,24 +2156,6 @@
 - **Occurrences:** 20
 - **Used in reactions:** Borylation, C-H, Buchwald-Hartwig, CN-Coupling
 
-### 3-Bis(2
-
-- **Role:** Ligand
-- **Occurrences:** 51
-- **Used in reactions:** Buchwald-Hartwig, CN-Coupling, CO-Coupling, Stetter
-
-### 4
-
-- **Role:** Ligand
-- **Occurrences:** 2372
-- **Used in reactions:** Arylation, acidic C-H, Borylation, C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, CS-Coupling, Cyclization, Heck, Hydrolysis, Negishi, Negishi, in-situ, Sonogashira, Stetter, Suzuki-Miyaura
-
-### 4-Dimethyl-2
-
-- **Role:** Ligand
-- **Occurrences:** 24
-- **Used in reactions:** Borylation, C-H, Buchwald-Hartwig, CN-Coupling
-
 ### 44′-Dimethoxy-22′-bipyridyl
 
 - **Role:** Ligand
@@ -2211,18 +2163,6 @@
 - **Used in reactions:** Buchwald-Hartwig, CS-Coupling, Negishi, in-situ
 
 ### 5-heptanedione
-
-- **Role:** Ligand
-- **Occurrences:** 36
-- **Used in reactions:** Buchwald-Hartwig, CN-Coupling, CO-Coupling
-
-### 6
-
-- **Role:** Ligand
-- **Occurrences:** 111
-- **Used in reactions:** Buchwald-Hartwig, CC-Coupling, CN-Coupling, CO-Coupling, Stetter
-
-### 6-Tetramethyl-3
 
 - **Role:** Ligand
 - **Occurrences:** 36
@@ -2768,42 +2708,6 @@
 - **Occurrences:** 316
 - **Used in reactions:** Buchwald-Hartwig, CC-Coupling, CN-Coupling, Negishi, Negishi, in-situ, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
-### Weix 2-pyridyl-N-cyanocarboxamidine
-
-- **Role:** Ligand
-- **Occurrences:** 24
-- **Used in reactions:** Negishi, in-situ
-
-### Weix 2-pyridylcarboxamidine
-
-- **Role:** Ligand
-- **Occurrences:** 8
-- **Used in reactions:** Negishi, in-situ
-
-### Weix 2-pyridyldicarboxamidine bis-HCl
-
-- **Role:** Ligand
-- **Occurrences:** 24
-- **Used in reactions:** CC-Coupling
-
-### XPhos
-
-- **Role:** Ligand
-- **Occurrences:** 5327
-- **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Cyclization, Dimerization, reductive, Heck, Hydrolysis, Negishi, Negishi, in-situ, SNAr, Sonogashira, Stannylation, Suzuki-Miyaura, Suzuki-Miyaura, in situ
-
-### XantPhos
-
-- **Role:** Ligand
-- **Occurrences:** 3229
-- **Used in reactions:** Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, CS-Coupling, Cyanation, Cyclization, Heck, Hydrolysis, Negishi, Sonogashira, Suzuki-Miyaura, Suzuki-Miyaura, in situ
-
-### Xantphos
-
-- **Role:** Ligand
-- **Occurrences:** 84
-- **Used in reactions:** Buchwald-Hartwig, CH-Activation, CN-Coupling, CO-Coupling
-
 ### bphen
 
 - **Role:** Ligand
@@ -2948,18 +2852,6 @@
 - **Occurrences:** 120
 - **Used in reactions:** CC-Coupling
 
-### trans-1
-
-- **Role:** Ligand
-- **Occurrences:** 168
-- **Used in reactions:** Buchwald-Hartwig, CN-Coupling, CO-Coupling, CS-Coupling
-
-### trans-Hyp
-
-- **Role:** Ligand
-- **Occurrences:** 226
-- **Used in reactions:** Buchwald-Hartwig, CN-Coupling, CO-Coupling
-
 ### trans-NN-Dimethylcyclohexane-12-diamine
 
 - **Role:** Ligand
@@ -2987,12 +2879,6 @@
 - **Role:** Solvent
 - **Occurrences:** 41
 - **Used in reactions:** Buchwald-Hartwig, Suzuki-Miyaura, Suzuki-Miyaura, in situ
-
-### AcOH
-
-- **Role:** Solvent
-- **Occurrences:** 227
-- **Used in reactions:** Arylation, acidic C-H, CH-Activation, Chlorination, Condensation, Cyclization, Deprotection, Glycosidation, Hydrodehalogenation, Oxidation
 
 ### AcOiBu
 
@@ -3377,12 +3263,6 @@
 - **Role:** Solvent
 - **Occurrences:** 36
 - **Used in reactions:** Condensation
-
-### water
-
-- **Role:** Solvent
-- **Occurrences:** 18343
-- **Used in reactions:** Alkylation, Amide coupling, Arylation, acidic C-H, Borylation, Miyaura, Buchwald-Hartwig, CC-Coupling, CH-Activation, CN-Coupling, CO-Coupling, Chlorination, Condensation, Cyclization, Deprotection, Dimerization, reductive, Heck, Hydration, Hydrolysis, Negishi, in-situ, Oxidation, SNAr, Suzuki-Miyaura, Suzuki-Miyaura, in situ
 
 ### xylenes
 
