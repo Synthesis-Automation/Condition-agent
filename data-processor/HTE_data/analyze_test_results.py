@@ -10,8 +10,11 @@ Issues identified:
 
 import json
 
+from chemtools.reagent import get_reactant_types_file
+
 # Load current patterns
-with open('data-processor/other_data/reactant_types.json', 'r', encoding='utf-8') as f:
+REACTANT_TYPES_PATH = get_reactant_types_file()
+with open(REACTANT_TYPES_PATH, 'r', encoding='utf-8') as f:
     reactant_types = json.load(f)
 
 # Fix heteroaryl halide patterns to be more general and prioritized

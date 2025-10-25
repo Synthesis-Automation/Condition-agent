@@ -1,15 +1,17 @@
-"""Validate and analyze reaction_types.json coverage."""
+"""Validate and analyze the canonical reaction type taxonomy coverage."""
 
-import json
-import pandas as pd
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
+
+import pandas as pd
+
+from chemtools.reagent import (
+    get_reaction_type_definitions,
+)
 
 def validate_reaction_types():
     # Load reaction types JSON
-    json_path = Path(__file__).parent / "reaction_types.json"
-    with open(json_path, 'r', encoding='utf-8') as f:
-        reaction_data = json.load(f)
+    reaction_data = get_reaction_type_definitions()
     
     # Load z-Score CSV
     csv_path = Path(__file__).parent / "z-Score Peaks with FG.csv"

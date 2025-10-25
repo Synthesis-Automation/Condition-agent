@@ -1,8 +1,7 @@
-import json
+from chemtools.reagent import get_reactant_type_definitions
 
 # Load the updated reactant_types.json
-with open('data-processor/other_data/reactant_types.json', 'r', encoding='utf-8') as f:
-    data = json.load(f)
+data = get_reactant_type_definitions()
 
 print(f'Total categories: {len(data)}')
 total_members = sum(len(v['members']) for v in data.values())

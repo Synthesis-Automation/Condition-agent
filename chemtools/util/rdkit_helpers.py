@@ -38,6 +38,16 @@ def parse_smiles(smiles: str):
     except Exception:
         return None
 
+def parse_smarts(smarts: str):
+    """Parse a SMARTS pattern into an RDKit molecule; returns None if unavailable."""
+    Chem, _ = _import_rdkit()
+    if Chem is None:
+        return None
+    try:
+        return Chem.MolFromSmarts(smarts)
+    except Exception:
+        return None
+
 def choose_largest_organic_fragment(mol):
     """Prefer the largest fragment containing carbon; fallback to largest by heavy atoms."""
     Chem, rdMolStandardize = _import_rdkit()

@@ -1,19 +1,16 @@
-"""Analyze reactants field in reaction_types.json against reactant_types.json."""
+"""Analyze reactants field definitions using the shared ChemTools taxonomy."""
 
-import json
-from pathlib import Path
 from collections import defaultdict
 
+from chemtools.reagent import (
+    get_reaction_type_definitions,
+    get_reactant_type_definitions,
+)
+
 def load_json_files():
-    """Load both JSON files."""
-    base_path = Path(__file__).parent
-    
-    with open(base_path / "reaction_types.json", 'r', encoding='utf-8') as f:
-        reaction_types = json.load(f)
-    
-    with open(base_path / "reactant_types.json", 'r', encoding='utf-8') as f:
-        reactant_types = json.load(f)
-    
+    """Load both JSON taxonomies from chemtools.reagent."""
+    reaction_types = get_reaction_type_definitions()
+    reactant_types = get_reactant_type_definitions()
     return reaction_types, reactant_types
 
 def extract_valid_reactant_ids(reactant_types):

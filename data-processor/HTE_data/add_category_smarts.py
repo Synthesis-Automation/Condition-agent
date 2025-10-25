@@ -8,6 +8,11 @@ This enables hierarchical matching:
 
 import json
 
+from chemtools.reagent import (
+    clear_reactant_type_cache,
+    get_reactant_types_file,
+)
+
 # Category-level SMARTS patterns (broader than member patterns)
 CATEGORY_SMARTS = {
     "ArX*": "c[Br,Cl,I,F,$([OX2][SX4](=O)(=O))]",  # Aryl + any halogen or sulfonate
@@ -73,7 +78,6 @@ def add_category_smarts(input_file, output_file):
 
 
 if __name__ == "__main__":
-    input_file = "reactant_types.json"
-    output_file = "reactant_types.json"
-    
-    add_category_smarts(input_file, output_file)
+    target_path = str(get_reactant_types_file())
+    add_category_smarts(target_path, target_path)
+    clear_reactant_type_cache()

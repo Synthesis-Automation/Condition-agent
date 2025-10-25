@@ -6,7 +6,7 @@ Successfully added category-level SMARTS patterns to all 28 reactant type catego
 ## Changes Made
 
 ### 1. Added Category-Level SMARTS Patterns
-- **File**: `data-processor/other_data/reactant_types.json`
+- **File**: `chemtools/reagent/data/reactant_types.json`
 - **Changes**: Added `"smarts"` field to all 28 top-level categories
 - **Examples**:
   ```json
