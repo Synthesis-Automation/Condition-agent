@@ -197,7 +197,16 @@ Example:
 
 ## Future Enhancements
 
-1. Add more specific reactant types as needed (e.g., "Heterocyclic-halide", "Enamine")
+1. ~~Add more specific reactant types as needed (e.g., "Heterocyclic-halide", "Enamine")~~ ✅ **COMPLETED** - See `REACTANT_TYPES_ENHANCEMENT.md`
+   - Added 7 new categories: Heterocyclic-halide, Enamine, Imines, Allylic-halide, Benzylic-halide, Azide, Nitrile
+   - Total categories: 21 → 28
+   - Total member types: 71 → 98
 2. Create reverse mapping (reactant type → compatible reactions)
-3. Add SMARTS patterns to reactant types for automatic detection
+3. ~~Add SMARTS patterns to reactant types for automatic detection~~ ✅ **COMPLETED** - See `SMARTS_AUTO_CLASSIFICATION.md`
+   - Added SMARTS patterns to all 98 member types
+   - Created `classify_reactant.py` for automatic classification
+   - Structure-based detection using RDKit
+   - Smart prioritization (specific > general functional groups)
+   - **Tested on 308 real reactants from sample_reactions.py: 93.5% accuracy** ✅
+   - See `SMARTS_TESTING_REPORT.md` for detailed test results
 4. Link to specific examples in sample_reactions.py
