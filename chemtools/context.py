@@ -547,7 +547,7 @@ class RuleNamespace:
             >>> db = chem.rules.load_database("data/rule_db/Suzuki_db.json")
             >>> db = chem.rules.load_database("/absolute/path/db.json")
         """
-        from .rule_scdb_matcher import load_db
+        from .rule import load_db
         from pathlib import Path
         
         # Normalize path
@@ -602,7 +602,7 @@ class RuleNamespace:
             >>> print(result.entry_name)
             >>> print(result.match_type)
         """
-        from .rule_scdb_matcher import match
+        from .rule import match
         return match(db, reaction, features=features)
     
     def list_databases(self) -> List[str]:

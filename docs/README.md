@@ -16,7 +16,7 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 - **Reagent taxonomy and analytics (`chemtools.reagent`)** for CAS normalization, taxonomy storage/validation, and CLI-driven curation of reagent roles.
 - **HTE simple recommender (`chemtools.recommend.hte_simple`)** providing deterministic condition suggestions from the standardized HTE z-score dataset shipped under `data/HTE_db`.
 - **HTE dataset tooling (`data-processor/HTE_data`)** to clean z-score exports, expand SMARTS coverage, benchmark the simple condition recommender, and ship scenario-focused pytest suites.
-- CLI utilities in `chemtools.rule_scdb_matcher.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
+- CLI utilities in `chemtools.rule.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
 
 ## Quickstart
 
@@ -52,8 +52,8 @@ Make targets wrap the common tasks: `make install`, `make run`, `make test`, `ma
 ### Run the CLI against the Scheme Condition DB
 
 ```bash
-python -m chemtools.rule_scdb_matcher.cli "Toluene"
-python -m chemtools.rule_scdb_matcher.cli --jsonl -f queries.txt
+python -m chemtools.rule.cli "Toluene"
+python -m chemtools.rule.cli --jsonl -f queries.txt
 ```
 
 Pass `--demo` to load sample data from `data/registry_sample.jsonl`.
@@ -100,7 +100,7 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |   |   `-- cli.py           # CLI for protocol index management
 |   |-- reagent/             # Reagent taxonomy store, analytics, and validation
 |   |-- recommend/           # Modular recommendation engine and plate design
-|   |-- rule_scdb_matcher/   # Scheme Condition DB tooling
+|   |-- rule/                # Scheme Condition DB tooling
 |   |-- schema/              # JSON schema and validation utilities
 |   |-- smiles.py            # Reaction SMILES utilities
 |   `-- util/                # Shared utilities (functional groups, RDKit fallbacks, DRFP caching)
@@ -157,7 +157,7 @@ See `docs/API_DOCUMENTATION.md` for detailed request examples and troubleshootin
 
 ## CLI and Scripts
 
-- `python -m chemtools.rule_scdb_matcher.cli`: search the Scheme Condition DB, supports CSV/JSONL output and demo mode.
+- `python -m chemtools.rule.cli`: search the Scheme Condition DB, supports CSV/JSONL output and demo mode.
 - `python -m chemtools.protocol.cli`: manage protocol index (build, stats, list-families, show-family, show-tag).
 - `python -m chemtools.protocol.smarts_generator_cli --reaction "CCCCI>>CCCB"`: generate reaction SMARTS applicability patterns (use `--batch` for files, `--check-rdkit` to verify RDKit availability).
 - `python scripts/local_recommendation_cli.py`: legacy-friendly wrapper for the interactive recommendation CLI (mirrors `app/local_recommendation_cli.py`).

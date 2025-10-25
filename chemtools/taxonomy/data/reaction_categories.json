@@ -1,0 +1,52 @@
+[
+  {
+    "description": null,
+    "id": "cross_coupling_reactions",
+    "name": "Cross-Coupling Reactions"
+  },
+  {
+    "description": null,
+    "id": "c_n_coupling_reactions",
+    "name": "C-N Coupling Reactions"
+  },
+  {
+    "description": null,
+    "id": "c_o_coupling_reactions",
+    "name": "C-O Coupling Reactions"
+  },
+  {
+    "description": null,
+    "id": "c_s_coupling_reactions",
+    "name": "C-S Coupling Reactions"
+  },
+  {
+    "description": null,
+    "id": "amide_and_carbonyl_chemistry",
+    "name": "Amide and Carbonyl Chemistry"
+  },
+  {
+    "description": null,
+    "id": "c_h_activation_and_functionalization",
+    "name": "C-H Activation and Functionalization"
+  },
+  {
+    "description": null,
+    "id": "functional_group_transformations",
+    "name": "Functional Group Transformations"
+  },
+  {
+    "description": null,
+    "id": "protection_and_deprotection",
+    "name": "Protection and Deprotection"
+  },
+  {
+    "description": null,
+    "id": "hydrolysis_and_water_chemistry",
+    "name": "Hydrolysis and Water Chemistry"
+  },
+  {
+    "description": null,
+    "id": "miscellaneous_reactions",
+    "name": "Miscellaneous Reactions"
+  }
+]

@@ -63,7 +63,7 @@ Implemented in `app/main.py`; each endpoint returns the same payloads as the Pyt
 
 ## CLI Entrypoints
 
-- `python -m chemtools.rule_scdb_matcher.cli` – Scheme Condition DB search (JSONL/CSV support).
+- `python -m chemtools.rule.cli` – Scheme Condition DB search (JSONL/CSV support).
 - `python -m chemtools.protocol.cli` – protocol index build/stats/show-family/show-tag.
 - `python -m chemtools.protocol.smarts_generator_cli --reaction ...` – generate SMARTS patterns (`--batch`, `--check-rdkit`).
 - `python -m chemtools.reagent.taxonomy_cli` – taxonomy maintenance.

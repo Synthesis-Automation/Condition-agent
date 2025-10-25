@@ -60,7 +60,7 @@ except ImportError:
     convert_llm_synthesis_to_standard_format = None
 
 try:
-    from chemtools.rule_scdb_matcher.loader import SchemeConditionDBError
+    from chemtools.rule.loader import SchemeConditionDBError
 except Exception:  # pragma: no cover - fallback path
     class SchemeConditionDBError(RuntimeError):
         """Fallback when SCDB loader is unavailable."""
