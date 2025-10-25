@@ -15,8 +15,7 @@
           "ArB*"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Pd(II)"
+          "Pd"
         ],
         "typical_conditions": "Base, ligand (phosphine), solvent"
       },
@@ -33,8 +32,7 @@
           "RB*"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Pd(II)"
+          "Pd"
         ],
         "typical_conditions": "Base, ligand, solvent"
       },
@@ -50,8 +48,8 @@
           "Organometallic"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Ni(0)"
+          "Pd",
+          "Ni"
         ],
         "typical_conditions": "Anhydrous, inert atmosphere"
       },
@@ -69,8 +67,8 @@
           "Organometallic"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Ni(0)"
+          "Pd",
+          "Ni"
         ],
         "typical_conditions": "Anhydrous, inert atmosphere"
       },
@@ -87,8 +85,7 @@
           "Alkene"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Pd(II)"
+          "Pd"
         ],
         "typical_conditions": "Base, ligand, high temperature"
       },
@@ -101,11 +98,11 @@
         "description": "Pd/Cu-catalyzed coupling of terminal alkynes with aryl/vinyl halides",
         "reactants": [
           "ArX*",
-          "Alkyne"
+          "terminal-alkyne"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "CuI"
+          "Pd",
+          "Cu"
         ],
         "typical_conditions": "Base, amine solvent or co-catalyst"
       },
@@ -122,8 +119,7 @@
           "Organometallic"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Pd(II)"
+          "Pd"
         ],
         "typical_conditions": "Ligand (phosphine), DMF or toluene, elevated temperature"
       },
@@ -139,8 +135,8 @@
           "Organometallic"
         ],
         "typical_catalysts": [
-          "Ni(0)",
-          "Pd(0)"
+          "Ni",
+          "Pd"
         ],
         "typical_conditions": "Anhydrous, inert atmosphere, THF or ether"
       },
@@ -158,7 +154,7 @@
           "Organometallic"
         ],
         "typical_catalysts": [
-          "Zinc metal"
+          "Zn"
         ],
         "typical_conditions": "THF or ether, mild heating"
       },
@@ -215,8 +211,7 @@
           "Aniline-type"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Pd(II)"
+          "Pd"
         ],
         "typical_conditions": "Base, bulky phosphine ligand, elevated temperature"
       },
@@ -275,8 +270,7 @@
           "Aniline-type"
         ],
         "typical_catalysts": [
-          "Cu(I)",
-          "Cu(II)"
+          "Cu"
         ],
         "typical_conditions": "Base, ligand, elevated temperature"
       },
@@ -295,7 +289,7 @@
           "Amide-type"
         ],
         "typical_catalysts": [
-          "Cu(OAc)2 or Cu(II)"
+          "Cu"
         ],
         "typical_conditions": "Oxidant (air or peroxide), base, room temperature"
       }
@@ -370,8 +364,7 @@
           "ArOH"
         ],
         "typical_catalysts": [
-          "Cu(I)",
-          "Cu(II)"
+          "Cu"
         ],
         "typical_conditions": "Base, ligand, elevated temperature"
       }
@@ -552,8 +545,7 @@
           "RB*"
         ],
         "typical_catalysts": [
-          "Pd(0)",
-          "Pd(II)"
+          "Pd"
         ],
         "typical_conditions": "Base, ligand"
       }
@@ -697,7 +689,7 @@
           "Aniline-type"
         ],
         "typical_catalysts": [
-          "Cu(I) salts"
+          "Cu salts"
         ],
         "typical_conditions": "Low temperature for diazotization, then warming"
       }
