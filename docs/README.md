@@ -21,7 +21,6 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 
 ### Environment setup
 
-
 ```bash
 # macOS / Linux
 python3 -m venv .venv
@@ -141,17 +140,17 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 
 All request/response schemas live in `chemtools/contracts.py`. The FastAPI server exposes the following groups of endpoints:
 
-| Category | Endpoints | Notes |
-| --- | --- | --- |
-| Health | `GET /health` | Lightweight readiness probe. |
-| Reaction utilities | `POST /normalize`, `POST /detect_family`, `POST /detect_type` | Normalize SMILES strings and infer reaction families/types. |
-| Featurization | `POST /featurize/molecular`, `POST /featurize/role-aware` | Deterministic role-aware feature generation with RDKit opt-in. |
-| Functional groups | Via Context API: `chem.functional_groups.*` | Detect 80+ functional groups in molecules (SMARTS or text patterns). |
-| Precedents | `POST /precedent/knn`, `POST /precedent/filters`, `POST /precedent/explain` | DRFP-backed precedent lookup and explanation packs. |
-| Recommendation | `POST /api/v1/recommend`, `POST /api/v1/recommend/conditions`, `POST /api/v1/recommend/fusion` | Core recommendation, structured condition sets, and fusion-mode outputs. |
-| Plate design | `POST /api/v1/design_plate` | Builds plate-ready experiment grids from recommendation output. |
-| Core search | `POST /api/v1/core/search` | Lookup precedents by catalyst core and family. |
-| Registry | `POST /match`, `POST /registry` | Scheme Condition DB matcher and reagent registry queries. |
+| Category           | Endpoints                                                                                      | Notes                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Health             | `GET /health`                                                                                  | Lightweight readiness probe.                                             |
+| Reaction utilities | `POST /normalize`, `POST /detect_family`, `POST /detect_type`                                  | Normalize SMILES strings and infer reaction families/types.              |
+| Featurization      | `POST /featurize/molecular`, `POST /featurize/role-aware`                                      | Deterministic role-aware feature generation with RDKit opt-in.           |
+| Functional groups  | Via Context API: `chem.functional_groups.*`                                                    | Detect 80+ functional groups in molecules (SMARTS or text patterns).     |
+| Precedents         | `POST /precedent/knn`, `POST /precedent/filters`, `POST /precedent/explain`                    | DRFP-backed precedent lookup and explanation packs.                      |
+| Recommendation     | `POST /api/v1/recommend`, `POST /api/v1/recommend/conditions`, `POST /api/v1/recommend/fusion` | Core recommendation, structured condition sets, and fusion-mode outputs. |
+| Plate design       | `POST /api/v1/design_plate`                                                                    | Builds plate-ready experiment grids from recommendation output.          |
+| Core search        | `POST /api/v1/core/search`                                                                     | Lookup precedents by catalyst core and family.                           |
+| Registry           | `POST /match`, `POST /registry`                                                                | Scheme Condition DB matcher and reagent registry queries.                |
 
 See `docs/API_DOCUMENTATION.md` for detailed request examples and troubleshooting guides.
 
