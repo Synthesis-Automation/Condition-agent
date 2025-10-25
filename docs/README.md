@@ -10,6 +10,7 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 - Precedent search (`chemtools.precedent`) powered by DRFP similarity, Laplace-smoothed voting, and constraint filters (`chemtools.constraints`).
 - Deterministic condition recommendation core (`chemtools.recommend.core`) with optional ML re-ranking (`chemtools.ml`), fusion weighting, and plate design helpers.
 - **Protocol recommendation (`chemtools.protocol`)** powered by DRFP similarity search over experimental protocols with automatic condition extraction and standard JSON output.
+- **Protocol SMARTS tooling (`chemtools.protocol.smarts_generator_cli`)** to derive reaction SMARTS applicability patterns, guards, and visualisations for protocol curation and testing.
 - Explanation packs (`chemtools.explain`) that summarize precedents, alternatives, and rule hits for API and UI consumption.
 - **LLM integration (`llmtools`)** with multi-provider support (OpenAI, Aliyun/DeepSeek) for chemistry-specific agents and natural language processing.
 - **Reagent taxonomy and analytics (`chemtools.reagent`)** for CAS normalization, taxonomy storage/validation, and CLI-driven curation of reagent roles.
@@ -158,6 +159,8 @@ See `docs/API_DOCUMENTATION.md` for detailed request examples and troubleshootin
 
 - `python -m chemtools.rule_scdb_matcher.cli`: search the Scheme Condition DB, supports CSV/JSONL output and demo mode.
 - `python -m chemtools.protocol.cli`: manage protocol index (build, stats, list-families, show-family, show-tag).
+- `python -m chemtools.protocol.smarts_generator_cli --reaction "CCCCI>>CCCB"`: generate reaction SMARTS applicability patterns (use `--batch` for files, `--check-rdkit` to verify RDKit availability).
+- `python scripts/local_recommendation_cli.py`: legacy-friendly wrapper for the interactive recommendation CLI (mirrors `app/local_recommendation_cli.py`).
 - `make registry`: convenience wrapper for the CLI with flags such as `Q`, `FILE`, `JSONL`, `PRETTY`, and `DEMO`.
 - `scripts/precompute_drfp.py`: build DRFP NPZ bundles (`make drfp-index`, `make drfp-index-4096`) to warm caches at API startup.
 - `scripts/ui_gradio.py`: launch the browser UI for manual testing of the recommendation workflow.

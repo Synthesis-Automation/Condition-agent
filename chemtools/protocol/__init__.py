@@ -37,10 +37,34 @@ from .recommend import (
     recommend_protocol,
 )
 
+from .smarts_generator_cli import (
+    SmartsGenerator,
+    ReactionSmartsApplicability,
+    visualize_smarts_pattern,
+    visualize_reaction_smarts,
+    visualize_pattern_with_examples,
+    main as smarts_generator_main,
+    RDKIT_AVAILABLE as PROTOCOL_SMARTS_RDKIT_AVAILABLE,
+)
+
+from .batch_update_protocol_smarts import (
+    ProtocolSmartsUpdater,
+    ProcessingResult,
+)
+
 __all__ = [
     'ProtocolIndexer',
     'ProtocolRecord',
     'build_index',
     'ProtocolRecommender',
     'recommend_protocol',
+    'SmartsGenerator',
+    'ReactionSmartsApplicability',
+    'visualize_smarts_pattern',
+    'visualize_reaction_smarts',
+    'visualize_pattern_with_examples',
+    'smarts_generator_main',
+    'PROTOCOL_SMARTS_RDKIT_AVAILABLE',
+    'ProtocolSmartsUpdater',
+    'ProcessingResult',
 ]
