@@ -117,7 +117,7 @@ class _TaxonomyIndex:
     def __init__(self, base_dir: str) -> None:
         raw_base = os.path.abspath(base_dir)
         if not os.path.isdir(raw_base) and os.path.basename(raw_base) == 'compound_taxonomy':
-            candidate = os.path.join(os.path.dirname(raw_base), 'reagents')
+            candidate = os.path.join(os.path.dirname(raw_base), 'reagent_db')
             if os.path.isdir(candidate):
                 raw_base = candidate
         if not os.path.isdir(raw_base):
@@ -1203,10 +1203,10 @@ class RDFWorker(QtCore.QObject):
         """Load the reagent registry and build a CAS/name map for roles and tokens."""
         # Default base dir relative to repo
         here = os.path.dirname(os.path.abspath(__file__))
-        tax_dir = os.path.join(os.path.dirname(here), 'data', 'reagents')
+        tax_dir = os.path.join(os.path.dirname(here), 'data', 'reagent_db')
         if not os.path.exists(tax_dir):
-            # fallback to local data/reagents relative to this file
-            tax_dir = os.path.join(here, 'data', 'reagents')
+            # fallback to local data/reagent_db relative to this file
+            tax_dir = os.path.join(here, 'data', 'reagent_db')
         try:
             idx = _TaxonomyIndex(tax_dir)
             return idx
@@ -1229,11 +1229,11 @@ class RDFWorker(QtCore.QObject):
             return self._undetermined_file_path_cache
         here = os.path.dirname(os.path.abspath(__file__))
         repo_root = os.path.dirname(here)
-        target_dir = os.path.join(repo_root, "data", "reagents")
+        target_dir = os.path.join(repo_root, "data", "reagent_db")
         target_path = os.path.join(target_dir, "not_determined_reagents.json")
         legacy_path = os.path.join(here, "not_determined_reagents.json")
         if not os.path.exists(target_path) and os.path.exists(legacy_path):
-            self._emit("Note: using legacy not_determined_reagents.json from data-processor directory; it will be rewritten to data/reagents on save.")
+            self._emit("Note: using legacy not_determined_reagents.json from data-processor directory; it will be rewritten to data/reagent_db on save.")
         self._undetermined_file_path_cache = target_path
         return target_path
 

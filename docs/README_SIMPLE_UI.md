@@ -121,7 +121,7 @@ Edit these constants in `ui_simple.py` to customize:
 ```python
 # Rule database paths
 RULE_DATABASES = {
-    "C-N Coupling (Cu)": "data/conditionDB/C_N_Coupling_Cu_db.json",
+    "C-N Coupling (Cu)": "data/rule_db/C_N_Coupling_Cu_db.json",
     # ... add more databases
 }
 
@@ -141,7 +141,7 @@ ML_FAMILY_MAP = {
 
 ### No Rule-Based Recommendations
 - Ensure `chemtools.scdb_matcher` is available (included in chemtools package)
-- Check that rule database file exists in `data/conditionDB/`
+- Check that rule database file exists in `data/rule_db/`
 - Verify reaction matches SMARTS patterns in database
 
 ### Auto-detect Not Working

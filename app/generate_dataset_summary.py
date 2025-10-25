@@ -177,9 +177,9 @@ def generate_summary():
     print("- *_drfp.npz files contain DRFP fingerprints for similarity search")
     print()
     print("Supporting databases:")
-    print("- data/conditionDB/ - Curated condition databases by reaction type")
+    print("- data/rule_db/ - Curated condition databases by reaction type")
     print("- data/protocol_db/ - Protocol-based recommendation database")
-    print("- data/reagents/ - Reagent taxonomy and classification")
+    print("- data/reagent_db/ - Reagent taxonomy and classification")
     print()
 
 

@@ -136,10 +136,10 @@ def local_rule_based_match(reaction: str, db_path: Optional[str], reaction_type:
     # Auto-select database based on reaction type if not explicitly provided
     if db_path is None and reaction_type:
         db_map = {
-            "Suzuki": "data/conditionDB/Suzuki_db.json",
-            "Suzuki_CC": "data/conditionDB/Suzuki_db.json",
-            "C_N_Coupling": "data/conditionDB/C_N_Coupling_Cu_db.json",  # Use Cu as default for now
-            "Amide_formation": "data/conditionDB/amide_formation_db.json",
+            "Suzuki": "data/rule_db/Suzuki_db.json",
+            "Suzuki_CC": "data/rule_db/Suzuki_db.json",
+            "C_N_Coupling": "data/rule_db/C_N_Coupling_Cu_db.json",  # Use Cu as default for now
+            "Amide_formation": "data/rule_db/amide_formation_db.json",
         }
         db_path = db_map.get(reaction_type)  # Let _resolve_rule_db handle existence check
     

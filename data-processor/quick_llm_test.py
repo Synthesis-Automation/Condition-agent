@@ -121,7 +121,7 @@ def test_field_assignment(llm_client: LLMClient, role_results):
     print("="*80)
     
     results = []
-    registry_dir = Path("../data/reagents")
+    registry_dir = Path("../data/reagent_db")
     
     for i, role_result in enumerate(role_results, 1):
         if "error" in role_result:

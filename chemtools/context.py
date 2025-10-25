@@ -453,7 +453,7 @@ class ReagentNamespace:
     """Reagent database lookup and enrichment.
     
     Stateless operations for finding and enriching reagent information
-    from the data/reagents/*.json databases.
+    from the data/reagent_db/*.json databases.
     """
     
     @staticmethod
@@ -535,7 +535,7 @@ class RuleNamespace:
         Args:
             path: Path to database JSON file. Can be:
                   - Absolute path: "/full/path/to/db.json"
-                  - Relative to data/conditionDB/: "C_N_Coupling_Pd_db.json"
+                  - Relative to data/rule_db/: "C_N_Coupling_Pd_db.json"
                   - Relative to CWD: "path/to/db.json"
             cache: Whether to cache the loaded database (default: True)
             
@@ -544,7 +544,7 @@ class RuleNamespace:
             
         Example:
             >>> db = chem.rules.load_database("C_N_Coupling_Pd_db.json")
-            >>> db = chem.rules.load_database("data/conditionDB/Suzuki_db.json")
+            >>> db = chem.rules.load_database("data/rule_db/Suzuki_db.json")
             >>> db = chem.rules.load_database("/absolute/path/db.json")
         """
         from .rule_scdb_matcher import load_db
@@ -553,8 +553,8 @@ class RuleNamespace:
         # Normalize path
         p = Path(path)
         if not p.is_absolute():
-            # Try relative to data/conditionDB/ first
-            candidate = Path("data/conditionDB") / path
+            # Try relative to data/rule_db/ first
+            candidate = Path("data/rule_db") / path
             if candidate.exists():
                 p = candidate.resolve()
             else:
@@ -606,7 +606,7 @@ class RuleNamespace:
         return match(db, reaction, features=features)
     
     def list_databases(self) -> List[str]:
-        """List available databases in data/conditionDB/.
+        """List available databases in data/rule_db/.
         
         Returns:
             List of database filenames
@@ -617,7 +617,7 @@ class RuleNamespace:
             ['Amide_formation_db.json', 'C_N_Coupling_Cu_db.json', ...]
         """
         from pathlib import Path
-        db_dir = Path("data/conditionDB")
+        db_dir = Path("data/rule_db")
         if db_dir.exists():
             return sorted([f.name for f in db_dir.glob("*.json")])
         return []

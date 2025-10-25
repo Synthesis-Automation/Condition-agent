@@ -114,7 +114,7 @@ def preload_datasets():
 # ============================================================================
 
 # Paths to rule databases (SchemeConditionDB)
-SCDB_DIR = Path(ROOT) / "data" / "conditionDB"
+SCDB_DIR = Path(ROOT) / "data" / "rule_db"
 RULE_DATABASES = {
     "C-N Coupling (Cu)": str(SCDB_DIR / "C_N_Coupling_Cu_db.json"),
     "C-N Coupling (Pd)": str(SCDB_DIR / "C_N_Coupling_Pd_db.json"),

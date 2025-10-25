@@ -30,7 +30,7 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
     Get comprehensive statistics about the reagent database.
     
     Args:
-        registry_dir: Path to reagent registry (default: data/reagents)
+        registry_dir: Path to reagent registry (default: data/reagent_db)
         
     Returns:
         Dictionary with statistics:

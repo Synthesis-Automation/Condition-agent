@@ -52,4 +52,4 @@ ROLE_PRIORITY: Dict[str, int] = {
 DEFAULT_TAXONOMY_DIR = "compound_taxonomy"
 
 # Registry directory path relative to data folder  
-DEFAULT_REGISTRY_DIR = "reagents"
+DEFAULT_REGISTRY_DIR = "reagent_db"

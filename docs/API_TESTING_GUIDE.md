@@ -27,7 +27,7 @@ Invoke-WebRequest -Uri "http://localhost:8000/health" | Select-Object StatusCode
 ```powershell
 $body = @{
     reaction = "BrC1CCCCC1.c1ccc(Cl)cc1B(O)O>>Clc1ccc(C2CCCCC2)cc1"
-    db = "data/conditionDB/suzuki_db.json"
+    db = "data/rule_db/suzuki_db.json"
     include_trace = $true
 } | ConvertTo-Json
 
@@ -43,7 +43,7 @@ Filter recommendations by catalyst type (Pd, Cu, Ni, etc.):
 # Filter for Copper catalysts only
 $body = @{
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
-    db = "data/conditionDB/C_N_Coupling_Cu_db.json"
+    db = "data/rule_db/C_N_Coupling_Cu_db.json"
     include_trace = $true
     relax = @{
         catalyst_class = "Cu"
@@ -58,7 +58,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/match" -Method POST `
 # Filter for Palladium catalysts only
 $body = @{
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
-    db = "data/conditionDB/C_N_Coupling_Pd_db.json"
+    db = "data/rule_db/C_N_Coupling_Pd_db.json"
     relax = @{
         catalyst_class = "Pd"
     }
@@ -70,11 +70,11 @@ Invoke-RestMethod -Uri "http://localhost:8000/match" -Method POST `
 
 **Available databases:**
 
-- `data/conditionDB/suzuki_db.json` - Suzuki coupling
-- `data/conditionDB/C_N_Coupling_Pd_db.json` - C-N coupling (Pd)
-- `data/conditionDB/C_N_Coupling_Ni_db.json` - C-N coupling (Ni)  
-- `data/conditionDB/C_N_Coupling_Cu_db.json` - C-N coupling (Cu)
-- `data/conditionDB/amide_formation_db.json` - Amide formation
+- `data/rule_db/suzuki_db.json` - Suzuki coupling
+- `data/rule_db/C_N_Coupling_Pd_db.json` - C-N coupling (Pd)
+- `data/rule_db/C_N_Coupling_Ni_db.json` - C-N coupling (Ni)  
+- `data/rule_db/C_N_Coupling_Cu_db.json` - C-N coupling (Cu)
+- `data/rule_db/amide_formation_db.json` - Amide formation
 
 **Parameters:**
 
@@ -653,10 +653,10 @@ python scripts/web_recommendation_cli.py `
 | Endpoint | Method | Key Fields | Catalyst Filter | Description |
 |----------|--------|------------|-----------------|-------------|
 | `/health` | GET | - | N/A | Health check |
-| `/match` | POST | `reaction`, `db` | ‚úÖ `relax.catalyst_class` | Rule-based (SCDB) |
-| `/api/v1/recommend/conditions` | POST | `reaction`, `reaction_type` | ‚úÖ `relax.catalyst_class` | ML-based (precedents) |
-| `/api/v1/recommend` | POST | `reaction` | ‚úÖ `relax.catalyst_class` | Full recommendation |
-| `/api/v1/recommend/fusion` | POST | `reaction` | ‚ùå Deprecated | Fusion (deprecated) |
+| `/match` | POST | `reaction`, `db` | ‚ú?`relax.catalyst_class` | Rule-based (SCDB) |
+| `/api/v1/recommend/conditions` | POST | `reaction`, `reaction_type` | ‚ú?`relax.catalyst_class` | ML-based (precedents) |
+| `/api/v1/recommend` | POST | `reaction` | ‚ú?`relax.catalyst_class` | Full recommendation |
+| `/api/v1/recommend/fusion` | POST | `reaction` | ‚ù?Deprecated | Fusion (deprecated) |
 | `/api/v1/reaction/detect-type` | POST | `reaction` | N/A | Type detection |
 
 ## Catalyst Filtering Examples
@@ -716,7 +716,7 @@ $resultNi | ConvertTo-Json -Depth 10
 # Get Cu-specific rule-based recommendations
 $body = @{
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
-    db = "data/conditionDB/C_N_Coupling_Cu_db.json"
+    db = "data/rule_db/C_N_Coupling_Cu_db.json"
     include_trace = $true
     relax = @{ catalyst_class = "Cu" }
 } | ConvertTo-Json -Depth 5
@@ -753,33 +753,33 @@ $result | ConvertTo-Json -Depth 10
 
 ## Common Mistakes
 
-### ‚ùå Wrong Field for Catalyst Filtering
+### ‚ù?Wrong Field for Catalyst Filtering
 
 **CRITICAL: Use `relax.catalyst_class`, NOT `constraints.metal_preference`**
 
 ```powershell
-# ‚ùå WRONG - Using constraints (will be IGNORED!)
+# ‚ù?WRONG - Using constraints (will be IGNORED!)
 $body = @{
     reaction = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     reaction_type = "Suzuki"
     k = 10
     limit = 5
     constraints = @{
-        metal_preference = "Cu"  # ‚ùå WRONG FIELD - DOES NOT WORK!
+        metal_preference = "Cu"  # ‚ù?WRONG FIELD - DOES NOT WORK!
     }
     relax = @{}
 } | ConvertTo-Json -Depth 5
 ```
 
 ```powershell
-# ‚úÖ CORRECT - Using relax.catalyst_class
+# ‚ú?CORRECT - Using relax.catalyst_class
 $body = @{
     reaction = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     reaction_type = "Suzuki"
     k = 10
     limit = 5
     relax = @{
-        catalyst_class = "Cu"  # ‚úÖ CORRECT - THIS WORKS!
+        catalyst_class = "Cu"  # ‚ú?CORRECT - THIS WORKS!
     }
     constraints = @{}
 } | ConvertTo-Json -Depth 5
@@ -791,7 +791,7 @@ $body = @{
 - `constraints` parameters filter the **final recommendations** (filtering AFTER recommendation)
 - Catalyst filtering MUST happen during search, so use `relax.catalyst_class`
 
-### ‚ùå Wrong Field Names
+### ‚ù?Wrong Field Names
 
 ```powershell
 # WRONG for /match endpoint
@@ -805,11 +805,11 @@ $body = @{
 # CORRECT for /match endpoint
 $body = @{
     reaction = "..."  # Correct!
-    db = "data/conditionDB/suzuki_db.json"
+    db = "data/rule_db/suzuki_db.json"
 } | ConvertTo-Json
 ```
 
-### ‚ùå Forgetting -Depth for Nested Objects
+### ‚ù?Forgetting -Depth for Nested Objects
 
 ```powershell
 # WRONG - catalyst_class won't be included
@@ -825,20 +825,20 @@ $body = @{
 } | ConvertTo-Json -Depth 5
 ```
 
-### ‚ùå Using Wrong Database with Catalyst Filter
+### ‚ù?Using Wrong Database with Catalyst Filter
 
 ```powershell
 # WRONG - Asking for Cu catalysts from Pd database
 $body = @{
     reaction = "..."
-    db = "data/conditionDB/C_N_Coupling_Pd_db.json"  # Pd database
+    db = "data/rule_db/C_N_Coupling_Pd_db.json"  # Pd database
     relax = @{ catalyst_class = "Cu" }  # Cu filter - mismatch!
 } | ConvertTo-Json -Depth 5
 
 # CORRECT - Match database to catalyst
 $body = @{
     reaction = "..."
-    db = "data/conditionDB/C_N_Coupling_Cu_db.json"  # Cu database
+    db = "data/rule_db/C_N_Coupling_Cu_db.json"  # Cu database
     relax = @{ catalyst_class = "Cu" }  # Cu filter - match!
 } | ConvertTo-Json -Depth 5
 ```
@@ -906,7 +906,7 @@ relax = @{
 
 | Scenario | Detection Method | Notes |
 |----------|------------------|-------|
-| `reaction_type` omitted | ML-based (rxn-insight) ‚Üí Rule-based fallback | Recommended approach |
+| `reaction_type` omitted | ML-based (rxn-insight) ‚Ü?Rule-based fallback | Recommended approach |
 | `reaction_type = null` | Same as omitted | Explicit auto-detect |
 | `reaction_type = "Suzuki"` | User-specified, no detection | Manual override |
 | Auto-detect + catalyst filter | Detects type, filters by catalyst | Best for exploration |

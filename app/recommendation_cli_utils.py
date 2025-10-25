@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 OUTPUT_DIR = Path("results")
-DEFAULT_SCDB_PATH = "data/conditionDB/Suzuki_db.json"
+DEFAULT_SCDB_PATH = "data/rule_db/Suzuki_db.json"
 K_DEFAULT = 50
 LIMIT_DEFAULT = 5
 FUSION_VARIANTS_DEFAULT = 5
@@ -499,7 +499,7 @@ def summarize_llm_synthesis(data: Dict[str, Any]) -> None:
         print(f"\n  WARNINGS ({len(warnings)}):")
         for warning in warnings[:3]:  # Show top 3 warnings
             warn_text = warning if len(warning) < 100 else warning[:97] + "..."
-            print(f"    â€¢ {warn_text}")
+            print(f"    â€?{warn_text}")
     
     # Print consensus analysis (brief)
     consensus = synthesis.get("consensus_analysis", {})
