@@ -17292,8 +17292,8 @@ Total reactions: 24571
 ## Reaction 31-172-CAS-22478330
 
 - Type: original_dataset
-- Condition Core: N,N'-Dimethylethylenediamine
-- Catalytic System: 7789-45-9, N,N'-Dimethylethylenediamine
+- Condition Core: Cu/N,N'-Dimethylethylenediamine
+- Catalytic System: Copper bromide, N,N'-Dimethylethylenediamine
 - Yield %: 54
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Toluene (108-88-3)
@@ -52530,8 +52530,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-23949575
 
 - Type: original_dataset
-- Condition Core: Additive: AgBF4
-- Catalytic System: Tetrabutylammonium bromide, 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide, Tetrabutylammonium bromide
 - Yield %: 92
 - Reagents: Silver tetrafluoroborate (7775-27-1) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -52540,8 +52540,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-23949581
 
 - Type: original_dataset
-- Condition Core: Additive: AgBF4
-- Catalytic System: Tetrabutylammonium bromide, 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide, Tetrabutylammonium bromide
 - Yield %: 93
 - Reagents: Silver tetrafluoroborate (7775-27-1) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -52550,8 +52550,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-23949587
 
 - Type: original_dataset
-- Condition Core: Additive: AgBF4
-- Catalytic System: Tetrabutylammonium bromide, 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide, Tetrabutylammonium bromide
 - Yield %: 93
 - Reagents: Silver tetrafluoroborate (7775-27-1) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -52560,8 +52560,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-23949592
 
 - Type: original_dataset
-- Condition Core: Additive: AgBF4
-- Catalytic System: Tetrabutylammonium bromide, 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide, Tetrabutylammonium bromide
 - Yield %: 88
 - Reagents: Silver tetrafluoroborate (7775-27-1) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -52570,8 +52570,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-23949598
 
 - Type: original_dataset
-- Condition Core: Additive: AgBF4
-- Catalytic System: Tetrabutylammonium bromide, 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide, Tetrabutylammonium bromide
 - Yield %: 92
 - Reagents: Silver tetrafluoroborate (7775-27-1) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -55356,7 +55356,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-24147428
 
 - Type: original_dataset
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 91
 - SMILES: NCCN.COc1ccc([N+](=O)[O-])c(F)c1>>COc1ccc([N+](=O)[O-])c(NCCN)c1
 
@@ -58252,7 +58253,7 @@ Total reactions: 24571
 
 - Type: original_dataset
 - Condition Core: Cu
-- Catalytic System: Copper(II) acetate, 7789-45-9
+- Catalytic System: Copper(II) acetate, Copper bromide
 - Yield %: 60
 - Reagents: Sodium carbonate (497-19-8) [BASE], TEMPO (2564-83-2) [ADDITIVE], Sodium Chloride (7647-14-5) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2), water (7732-18-5)
@@ -60218,8 +60219,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-24341626
 
 - Type: original_dataset
-- Condition Core: Pd/triphenylphosphine
-- Catalytic System: Bis(triphenylphosphine)palladium(II) dichloride, 7789-45-9, 283175-97-3
+- Condition Core: Cu/triphenylphosphine
+- Catalytic System: Copper bromide, Bis(triphenylphosphine)palladium(II) dichloride, 283175-97-3
 - Yield %: 89
 - Reagents: 16731-55-8 (16731-55-8) [UNK]
 - SMILES: CNC1CCCCC1.O=C(O)c1cc(F)cc(F)c1>>CN(C1CCCCC1)S(=O)(=O)c1cc(F)cc(F)c1
@@ -72245,8 +72246,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-31117440
 
 - Type: original_dataset
-- Condition Core: DPPB
-- Catalytic System: 7789-45-9, DPPB
+- Condition Core: Cu/DPPB
+- Catalytic System: Copper bromide, DPPB
 - Yield %: 53
 - Reagents: Potassium carbonate (584-08-7) [BASE], Tetrabutylammonium bromide (1643-19-2) [ADDITIVE], water (7732-18-5) [ADDITIVE]
 - Solvents: Acetonitrile (75-05-8), water (7732-18-5)
@@ -72255,8 +72256,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-31117450
 
 - Type: original_dataset
-- Condition Core: DPPB
-- Catalytic System: 7789-45-9, DPPB
+- Condition Core: Cu/DPPB
+- Catalytic System: Copper bromide, DPPB
 - Yield %: 61
 - Reagents: tert-Butanol (75-65-0) [SOLVENT], Potassium carbonate (584-08-7) [BASE], Tetrabutylammonium bromide (1643-19-2) [ADDITIVE]
 - Solvents: Acetonitrile (75-05-8), water (7732-18-5)
@@ -72265,8 +72266,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-31117453
 
 - Type: original_dataset
-- Condition Core: DPPB
-- Catalytic System: 7789-45-9, DPPB
+- Condition Core: Cu/DPPB
+- Catalytic System: Copper bromide, DPPB
 - Yield %: 74
 - Reagents: Potassium carbonate (584-08-7) [BASE], Tetrabutylammonium bromide (1643-19-2) [ADDITIVE], water (7732-18-5) [ADDITIVE]
 - Solvents: Acetonitrile (75-05-8), water (7732-18-5)
@@ -97961,8 +97962,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434017
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 83
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -97971,8 +97972,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434024
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 69
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -97981,8 +97982,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434029
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 71
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -97991,8 +97992,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434033
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 74
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -98001,8 +98002,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434035
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 78
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -98011,8 +98012,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434037
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 68
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -98021,8 +98022,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434045
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 82
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -98031,8 +98032,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434053
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 90
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -98041,8 +98042,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434054
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 75
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -98051,8 +98052,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-33434055
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 61
 - Reagents: 582-25-2 (582-25-2) [UNK], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Tetrahydrofuran (109-99-9)
@@ -110779,8 +110780,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-34566374
 
 - Type: original_dataset
-- Condition Core: Base: Cs2CO3
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 72
 - Reagents: Cesium carbonate (534-17-8) [BASE], water (7732-18-5) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -110789,8 +110790,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-34566380
 
 - Type: original_dataset
-- Condition Core: Base: Cs2CO3
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 90
 - Reagents: Cesium carbonate (534-17-8) [BASE], water (7732-18-5) [ADDITIVE]
 - Solvents: N,N-Dimethylformamide (68-12-2)
@@ -127198,8 +127199,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-35834394
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9, 183072-30-2
+- Condition Core: Cu
+- Catalytic System: Copper bromide, 183072-30-2
 - Yield %: 58
 - Reagents: 7722-76-1 (7722-76-1) [UNK], Oxygen (g) (7782-44-7) [OXIDANT], 10139-47-6 (10139-47-6) [UNK]
 - Solvents: Mesitylene (108-67-8)
@@ -127208,8 +127209,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-35834395
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9, 32959-62-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide, 32959-62-9
 - Yield %: 62
 - Reagents: 7722-76-1 (7722-76-1) [UNK], Oxygen (g) (7782-44-7) [OXIDANT], 10139-47-6 (10139-47-6) [UNK]
 - Solvents: Chlorobenzene (108-90-7)
@@ -127218,8 +127219,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-35834401
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9, 183072-30-2
+- Condition Core: Cu
+- Catalytic System: Copper bromide, 183072-30-2
 - Yield %: 56
 - Reagents: 7722-76-1 (7722-76-1) [UNK], Oxygen (g) (7782-44-7) [OXIDANT], 10139-47-6 (10139-47-6) [UNK]
 - Solvents: Mesitylene (108-67-8)
@@ -127228,8 +127229,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-35834403
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9, 183072-30-2
+- Condition Core: Cu
+- Catalytic System: Copper bromide, 183072-30-2
 - Yield %: 60
 - Reagents: 7722-76-1 (7722-76-1) [UNK], Oxygen (g) (7782-44-7) [OXIDANT], 10139-47-6 (10139-47-6) [UNK]
 - Solvents: Mesitylene (108-67-8)
@@ -131311,8 +131312,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411448
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 91
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131321,8 +131322,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411452
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 98
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131331,8 +131332,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411456
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 55
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131341,8 +131342,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411459
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 56
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131351,8 +131352,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411464
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 85
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131361,8 +131362,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411466
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 60
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131371,8 +131372,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411469
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 71
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131381,8 +131382,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411470
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 79
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131391,8 +131392,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411472
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 81
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131401,8 +131402,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411475
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 91
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131411,8 +131412,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411476
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 92
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131421,8 +131422,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411478
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 96
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131431,8 +131432,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411479
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 58
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131441,8 +131442,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36411487
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 80
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131579,8 +131580,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36420179
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 96
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131589,8 +131590,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36420181
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 95
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131599,8 +131600,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36420187
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 92
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131609,8 +131610,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36420190
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 95
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -131619,8 +131620,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-36420193
 
 - Type: original_dataset
-- Condition Core: Oxidant: O2
-- Catalytic System: 7789-45-9
+- Condition Core: Cu
+- Catalytic System: Copper bromide
 - Yield %: 94
 - Reagents: Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Toluene (108-88-3)
@@ -190200,7 +190201,7 @@ Total reactions: 24571
 
 - Type: original_dataset
 - Condition Core: Pd/XantPhos
-- Catalytic System: Palladium(II) acetate, 7789-45-9, Xantphos
+- Catalytic System: Palladium(II) acetate, Copper bromide, Xantphos
 - Yield %: 60
 - Reagents: Cesium carbonate (534-17-8) [BASE]
 - Solvents: Toluene (108-88-3)
@@ -213034,8 +213035,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-42946569
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
-- Catalytic System: 7789-45-9, 176763-62-5
+- Condition Core: Cu
+- Catalytic System: Copper bromide, 176763-62-5
 - Yield %: 53
 - Reagents: Triethylamine (121-44-8) [BASE], Oxygen (g) (7782-44-7) [OXIDANT]
 - Solvents: Acetonitrile (75-05-8), Toluene (108-88-3)
@@ -227259,8 +227260,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331785
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227269,8 +227270,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331786
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 77
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227279,8 +227280,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331787
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 86
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227289,8 +227290,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331788
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 78
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227299,8 +227300,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331789
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227309,8 +227310,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331791
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 70
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227319,8 +227320,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331792
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 87
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227329,8 +227330,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331794
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 91
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227339,8 +227340,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331796
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227349,8 +227350,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331797
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227359,8 +227360,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331798
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 73
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227369,8 +227370,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331799
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227379,8 +227380,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331802
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 76
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227389,8 +227390,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331803
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227399,8 +227400,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331804
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 78
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227409,8 +227410,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331808
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227419,8 +227420,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331809
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 79
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227429,8 +227430,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331810
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227439,8 +227440,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331811
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 81
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227449,8 +227450,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331812
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 73
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227459,8 +227460,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331813
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 85
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227469,8 +227470,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331815
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 77
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227479,8 +227480,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331816
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 75
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227489,8 +227490,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331818
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 79
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227499,8 +227500,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331819
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227509,8 +227510,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331820
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 73
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227519,8 +227520,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331823
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 96
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227529,8 +227530,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331827
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227539,8 +227540,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331829
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 90
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227549,8 +227550,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331830
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 70
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227559,8 +227560,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331831
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 74
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227569,8 +227570,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331832
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227579,8 +227580,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331834
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227589,8 +227590,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331839
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 80
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227599,8 +227600,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331844
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 93
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227609,8 +227610,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331846
 
 - Type: original_dataset
-- Condition Core: Cu
-- Catalytic System: Copper(I) bromide, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper(I) bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 3
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227619,8 +227620,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331847
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 79
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227629,8 +227630,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331849
 
 - Type: original_dataset
-- Condition Core: Cu
-- Catalytic System: Copper(I) bromide, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper(I) bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 6
 - Reagents: Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227639,8 +227640,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331852
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227649,8 +227650,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331854
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 73
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE], Hydrochloric Acid (7647-01-0) [ACID]
 - Solvents: Dimethyl sulfoxide (67-68-5), water (7732-18-5)
@@ -227659,8 +227660,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331862
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 87
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227669,8 +227670,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331868
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 84
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227679,8 +227680,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331869
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 100
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227689,8 +227690,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331873
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 81
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227699,8 +227700,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331874
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 83
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)
@@ -227709,8 +227710,8 @@ Total reactions: 24571
 ## Reaction 31-614-CAS-46331877
 
 - Type: original_dataset
-- Condition Core: Base: K3PO4
-- Catalytic System: 7789-45-9, 289708-48-1
+- Condition Core: Cu/N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
+- Catalytic System: Copper bromide, N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide
 - Yield %: 70
 - Reagents: 302-01-2 (302-01-2) [UNK], Tripotassium phosphate (7778-53-2) [BASE]
 - Solvents: Dimethyl sulfoxide (67-68-5)

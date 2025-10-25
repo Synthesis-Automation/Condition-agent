@@ -3278,6 +3278,32 @@
     "embedding_text": "type: LIGAND | family: diamines (diamines) | denticity: 2 | name: N1,N2-bis(1-naphthalenylmethyl)ethanediamide | CAS: 2281918-10-1 | synonyms: N1,N2-bis(1-naphthalenylmethyl)ethanediamide; 2281918-10-1; N1,N2-Bis(naphthalen-1-ylmethyl)oxalamide; MFCD32633515; SCHEMBL22323341; N,N'-bis(1-naphthylmethyl)oxamide; N1,N2-Bis(1-naphthylmethyl)oxalamide; N,N'-bis(naphthalen-1-ylmethyl)oxamide; BS-47862; SY360243; CS-0530588; F73383; F782520; N,N'-bis(1-naphthylmethyl)ethanediamide; N1,N2-di(1-naphthylmethyl)oxalamide"
   },
   {
+    "id": "ZKIZSQINSUMBTN-UHFFFAOYSA-N",
+    "name": "N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide",
+    "abbreviation": [],
+    "aliases": [
+      "N,N'-bis(2,5-dimethylpyrrol-1-yl)oxamide",
+      "N1,N2-Bis(2,5-dimethyl-1-pyrrolyl)oxalamide",
+      "N,N'-bis(2,5-dimethylpyrrol-1-yl)ethanediamide",
+      "N1,N2-Bis(2,5-dimethylpyrrol-1-yl)oxalamide"
+    ],
+    "cas": "289708-48-1",
+    "inchi_key": "ZKIZSQINSUMBTN-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "oxalamide"
+        ],
+        "donors": [
+          "N",
+          "N"
+        ],
+        "denticity": 2
+      }
+    },
+    "embedding_text": "type: LIGAND | family: bisoxazolines_BOX (bisoxazolines_BOX) | denticity: 2 | name: N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide | abbr: BOX | CAS: 289708-48-1 | synonyms: N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide; 289708-48-1; MFCD34182524; SCHEMBL4573808; AT25935; SY333648; N,N'-bis(2,5-dimethylpyrrol-1-yl)oxamide; B6291; N1,N2-Bis(2,5-dimethyl-1-pyrrolyl)oxalamide; N,N'-bis(2,5-dimethylpyrrol-1-yl)ethanediamide; N1,N2-Bis(2,5-dimethylpyrrol-1-yl)oxalamide"
+  },
+  {
     "id": "IPZCJUOJSODZNK-UHFFFAOYSA-N",
     "name": "N1,N2-Dimethylethanediamide",
     "abbreviation": [
