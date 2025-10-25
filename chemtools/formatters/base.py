@@ -121,6 +121,9 @@ def format_detection(
     
     if confidence is not None:
         detection["confidence"] = round(float(confidence), 4)
+
+    if family_label:
+        detection["family_label"] = family_label
     
     if alternatives:
         detection["alternative_types"] = alternatives
