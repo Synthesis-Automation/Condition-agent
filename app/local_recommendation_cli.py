@@ -138,8 +138,11 @@ def local_rule_based_match(reaction: str, db_path: Optional[str], reaction_type:
         db_map = {
             "Suzuki": "data/rule_db/Suzuki_db.json",
             "Suzuki_CC": "data/rule_db/Suzuki_db.json",
+            "suzuki_miyaura": "data/rule_db/Suzuki_db.json",
             "C_N_Coupling": "data/rule_db/C_N_Coupling_Cu_db.json",  # Use Cu as default for now
+            "cn_coupling": "data/rule_db/C_N_Coupling_Cu_db.json",
             "Amide_formation": "data/rule_db/amide_formation_db.json",
+            "amide_coupling": "data/rule_db/amide_formation_db.json",
         }
         db_path = db_map.get(reaction_type)  # Let _resolve_rule_db handle existence check
     
@@ -504,7 +507,7 @@ Examples:
         "--family", "--type",
         type=str,
         default=None,
-        choices=[None, "Suzuki", "Suzuki_CC", "C_N_Coupling", "Amide_formation"],
+        choices=[None, "suzuki_miyaura", "cn_coupling", "amide_coupling"],
         help="Reaction family/type. If not provided, will prompt interactively or auto-detect."
     )
     

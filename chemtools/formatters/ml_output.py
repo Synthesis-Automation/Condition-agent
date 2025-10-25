@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import copy
 from typing import Any, Dict, List, Optional
+from ..recommend.utils import friendly_family_label
 from .base import format_meta, format_input, format_detection
 from .normalization import normalize_recommendations
 
@@ -59,11 +60,13 @@ def build_standard_output(
             reaction_smiles=reaction_smiles,
             requested_reaction_type=requested_type,
             detected_family=detected_type,
+            detected_family_label=friendly_family_label(detected_type),
         ),
         "detection": format_detection(
-            detected_type=detected_type or (requested_type or "unknown"),
+            detected_type=detected_type or requested_type,
             confidence=detection_confidence,
             method=detection_method,
+            family_label=friendly_family_label(detected_type or requested_type),
         ),
         "recommended_conditions": normalized_recommendations,
     }

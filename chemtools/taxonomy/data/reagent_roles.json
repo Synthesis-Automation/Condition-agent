@@ -1,32 +1,32 @@
 [
   {
+    "name": "Acid",
     "default_family_id": "mineral_acids",
     "description": null,
     "id": "acid",
     "metadata": {
       "taxonomy_file": "taxonomy_acid.json"
     },
-    "name": "Acid",
     "priority": 3
   },
   {
+    "name": "Additive",
     "default_family_id": "quaternary_ammonium_ptc",
     "description": null,
     "id": "additive",
     "metadata": {
       "taxonomy_file": "taxonomy_additive.json"
     },
-    "name": "Additive",
     "priority": 7
   },
   {
+    "name": "Base",
     "default_family_id": "tertiary_amines_aliphatic",
     "description": null,
     "id": "base",
     "metadata": {
       "taxonomy_file": "taxonomy_base.json"
     },
-    "name": "Base",
     "priority": 2
   },
   {
@@ -40,31 +40,31 @@
     "priority": 4
   },
   {
+    "name": "Enzyme",
     "default_family_id": null,
     "description": null,
     "id": "enzyme",
     "metadata": {},
-    "name": "Enzyme",
     "priority": 100
   },
   {
+    "name": "Ligand",
     "default_family_id": "trialkyl_triaryl_phosphines",
     "description": null,
     "id": "ligand",
     "metadata": {
       "taxonomy_file": "taxonomy_ligand.json"
     },
-    "name": "Ligand",
     "priority": 0
   },
   {
+    "name": "Metal Precursor",
     "default_family_id": "pd_ii_salts",
     "description": null,
     "id": "metal_precursor",
     "metadata": {
       "taxonomy_file": "taxonomy_catalysts_precursor.json"
     },
-    "name": "Metal Precursor",
     "priority": 1
   },
   {
@@ -76,49 +76,49 @@
     "priority": 100
   },
   {
+    "name": "Other Reagent",
     "default_family_id": "misc_general",
     "description": null,
     "id": "other_reagent",
     "metadata": {},
-    "name": "Other Reagent",
     "priority": 9
   },
   {
+    "name": "Oxidant",
     "default_family_id": "o2_gas",
     "description": null,
     "id": "oxidant",
     "metadata": {
       "taxonomy_file": "taxonomy_oxidant.json"
     },
-    "name": "Oxidant",
     "priority": 5
   },
   {
+    "name": "Preformed Metal Catalyst",
     "default_family_id": null,
     "description": null,
     "id": "preformed_metal_catalyst",
     "metadata": {},
-    "name": "Preformed Metal Catalyst",
     "priority": 100
   },
   {
+    "name": "Reductant",
     "default_family_id": "metal_powders",
     "description": null,
     "id": "reductant",
     "metadata": {
       "taxonomy_file": "taxonomy_reductant.json"
     },
-    "name": "Reductant",
     "priority": 6
   },
   {
+    "name": "Solvent",
     "default_family_id": "hydrocarbons_aromatic",
     "description": null,
     "id": "solvent",
     "metadata": {
       "taxonomy_file": "taxonomy_solvent.json"
     },
-    "name": "Solvent",
     "priority": 8
   }
 ]

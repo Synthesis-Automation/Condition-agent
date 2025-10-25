@@ -439,40 +439,28 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
         try:
             result = detect_reaction_type(reaction_smiles)
             if result.get("success"):
-                mapped_family = result.get("mapped_family")  # e.g., "Buchwald_CN", "Ullmann_CN", "Suzuki_CC"
+                taxonomy_family = result.get("mapped_family")
                 rxn_class = result.get("rxn_class")  # e.g., "Heteroatom Alkylation and Arylation"
                 rxn_name = result.get("rxn_name")  # e.g., "Buchwald-Hartwig C-N coupling"
                 confidence = result.get("confidence", 0.8)
                 catalysts = result.get("catalysts", [])
-                
+
                 # Map to ML and rule database names
                 ml_family = None
                 rule_db_name = None
-                
-                # Handle C-N coupling variations based on catalyst
-                if mapped_family in ["Buchwald_CN", "C_N_Coupling_Pd"]:
-                    ml_family = "C_N_Coupling_Pd"
-                    rule_db_name = "C-N Coupling (Pd)"
-                    detected_family = "Buchwald_CN (Pd-catalyzed)"
-                elif mapped_family == "Ullmann_CN" or mapped_family == "C_N_Coupling_Cu":
-                    ml_family = "C_N_Coupling_Cu"
-                    rule_db_name = "C-N Coupling (Cu)"
-                    detected_family = "Ullmann_CN (Cu-catalyzed)"
-                elif mapped_family == "C_N_Coupling_Ni":
-                    ml_family = "C_N_Coupling_Ni"
-                    rule_db_name = "C-N Coupling (Ni)"
-                    detected_family = "C_N_Coupling_Ni"
-                elif mapped_family in ["Suzuki_CC", "Suzuki"]:
-                    ml_family = "Suzuki_CC"
-                    rule_db_name = "Suzuki Coupling"
-                    detected_family = "Suzuki_CC"
-                elif mapped_family == "Amide_Coupling":
-                    ml_family = "Amide_Coupling"
-                    rule_db_name = "Amide Formation"
-                    detected_family = "Amide_Coupling"
-                else:
-                    detected_family = mapped_family or "Unknown"
-                
+                detected_family = taxonomy_family or "Unknown"
+
+                family_display_map = {
+                    "buchwald_hartwig_c_n": ("C_N_Coupling_Pd", "C-N Coupling (Pd)", "Buchwald_CN (Pd-catalyzed)"),
+                    "ullmann_cn": ("C_N_Coupling_Cu", "C-N Coupling (Cu)", "Ullmann_CN (Cu-catalyzed)"),
+                    "cn_coupling": ("C_N_Coupling", "C-N Coupling (General)", "C_N_Coupling"),
+                    "suzuki_miyaura": ("Suzuki_CC", "Suzuki Coupling", "Suzuki_CC"),
+                    "amide_coupling": ("Amide_Coupling", "Amide Formation", "Amide_Coupling"),
+                }
+
+                entry = family_display_map.get(taxonomy_family)
+                if entry:
+                    ml_family, rule_db_name, detected_family = entry
                 # Build message
                 msg_parts = []
                 if rxn_class:
@@ -517,6 +505,11 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
             "Amide_Coupling": "Amide_Coupling",
             "Suzuki_CC": "Suzuki_CC",
             "Suzuki": "Suzuki_CC",
+            "cn_coupling": "C_N_Coupling",
+            "ullmann_cn": "C_N_Coupling_Cu",
+            "buchwald_hartwig_c_n": "C_N_Coupling_Pd",
+            "suzuki_miyaura": "Suzuki_CC",
+            "amide_coupling": "Amide_Coupling",
         }
         
         family_to_db = {
@@ -528,6 +521,11 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
             "Amide_Coupling": "Amide Formation",
             "Suzuki_CC": "Suzuki Coupling",
             "Suzuki": "Suzuki Coupling",
+            "cn_coupling": "C-N Coupling (General)",
+            "ullmann_cn": "C-N Coupling (Cu)",
+            "buchwald_hartwig_c_n": "C-N Coupling (Pd)",
+            "suzuki_miyaura": "Suzuki Coupling",
+            "amide_coupling": "Amide Formation",
         }
         
         ml_family = family_to_ml.get(detected_family)

@@ -11,7 +11,7 @@ from typing import Dict, Any, List, Optional
 from collections import Counter
 
 from ...smiles import normalize_reaction
-from ...router import detect_family
+from ...router import detect_family, resolve_reaction_family
 from ... import precedent, explain
 from ..utils import canonical_family, median, pick_with_constraints
 
@@ -94,6 +94,10 @@ def recommend_from_reaction(
     relax = dict(relax or {})
     max_variants = max(1, int(max_variants or 1))
     fam_override_clean = (family_override.strip() if family_override else None)
+    if fam_override_clean:
+        resolved_override = resolve_reaction_family(fam_override_clean)
+        if resolved_override:
+            fam_override_clean = resolved_override
 
     # 1) Normalize reaction SMILES
     norm = normalize_reaction(reaction)

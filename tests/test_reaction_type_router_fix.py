@@ -1,7 +1,7 @@
 """
 Test script to verify the reaction type router fix.
 
-Tests that C-N coupling reactions are correctly routed to C_N_Coupling_Cu_db.json
+Tests that C-N coupling reactions are correctly routed to cn_coupling_Cu_db.json
 instead of incorrectly using Suzuki_db.json.
 """
 
@@ -12,7 +12,16 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.local_recommendation_cli import local_rule_based_match
 from scripts.recommendation_cli_utils import REACTION_TYPE_CHOICES
+import pytest
 from chemtools.router import detect_family_from_reaction
+
+SCDB_DIR = Path("data/rule_db")
+
+def _ensure_rule_db(filenames):
+    missing = [SCDB_DIR / name for name in filenames if not (SCDB_DIR / name).exists()]
+    if missing:
+        pytest.skip(f"Rule DB not available: {missing}")
+
 
 
 def test_reaction_type_choices():
@@ -21,13 +30,13 @@ def test_reaction_type_choices():
     print("TEST 1: Reaction Type Choices")
     print("=" * 70)
     
-    # Should have unified C_N_Coupling, not separate Cu/Pd/Ni
+    # Should have unified cn_coupling, not separate Cu/Pd/Ni
     choices = [choice[1] for choice in REACTION_TYPE_CHOICES if choice[1]]
     
     print(f"Available choices: {choices}")
     
     # Check for unified option
-    assert "C_N_Coupling" in choices, "C_N_Coupling should be available"
+    assert "cn_coupling" in choices, "cn_coupling should be available"
     
     # Check deprecated options are removed
     deprecated = ["C_N_Coupling_Cu", "C_N_Coupling_Pd", "C_N_Coupling_Ni"]
@@ -56,7 +65,7 @@ def test_router_detection():
     print(f"Detected Family: {family}")
     print(f"Confidence: {confidence}")
     
-    assert family == "C_N_Coupling", f"Expected C_N_Coupling, got {family}"
+    assert family == "cn_coupling", f"Expected cn_coupling, got {family}"
     assert confidence >= 0.85, f"Expected confidence >= 0.85, got {confidence}"
     
     print("✅ PASSED: Router correctly detects C-N coupling")
@@ -70,8 +79,9 @@ def test_database_selection():
     print("=" * 70)
     
     rsmi = "Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1"
-    reaction_type = "C_N_Coupling"
+    reaction_type = "cn_coupling"
     
+    _ensure_rule_db(["C_N_Coupling_Cu_db.json"])
     result = local_rule_based_match(rsmi, None, reaction_type)
     
     # Check no errors
@@ -83,8 +93,8 @@ def test_database_selection():
     print(f"Reaction Type: {reaction_type}")
     print(f"Detected Family: {family}")
     
-    # The family might be Ullmann_CN or C_N_Coupling (both are valid for C-N coupling)
-    valid_families = ["C_N_Coupling", "Ullmann_CN", "Buchwald_CN"]
+    # The family might be ullmann_cn or cn_coupling (both are valid for C-N coupling)
+    valid_families = ["cn_coupling", "ullmann_cn", "buchwald_hartwig_c_n"]
     assert family in valid_families, f"Expected C-N coupling variant, got {family}"
     
     # Check recommendations exist
@@ -123,10 +133,11 @@ def test_suzuki_still_works():
     print(f"Auto-detected Family: {family_auto}")
     
     # Should detect as Suzuki
-    assert family_auto in ["Suzuki_CC", "Suzuki"], f"Expected Suzuki, got {family_auto}"
+    assert family_auto == "suzuki_miyaura", f"Expected Suzuki, got {family_auto}"
     
     # Test rule-based matching
-    result_rule = local_rule_based_match(rsmi, None, "Suzuki")
+    _ensure_rule_db(["Suzuki_db.json"])
+    result_rule = local_rule_based_match(rsmi, None, "suzuki_miyaura")
     
     assert "error" not in result_rule, f"Got error: {result_rule.get('error')}"
     
@@ -148,12 +159,14 @@ def test_comparison_before_after():
     suzuki_reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
     
     # Test C-N coupling
-    cn_result = local_rule_based_match(cn_reaction, None, "C_N_Coupling")
+    _ensure_rule_db(["C_N_Coupling_Cu_db.json"])
+    cn_result = local_rule_based_match(cn_reaction, None, "cn_coupling")
     cn_family = cn_result.get("detection", {}).get("family", "Unknown")
     cn_matches = len(cn_result.get("recommended_conditions", []))
     
     # Test Suzuki
-    suzuki_result = local_rule_based_match(suzuki_reaction, None, "Suzuki")
+    _ensure_rule_db(["Suzuki_db.json"])
+    suzuki_result = local_rule_based_match(suzuki_reaction, None, "suzuki_miyaura")
     suzuki_family = suzuki_result.get("detection", {}).get("family", "Unknown")
     suzuki_matches = len(suzuki_result.get("recommended_conditions", []))
     
@@ -168,7 +181,7 @@ def test_comparison_before_after():
     print(f"  Matches: {suzuki_matches}")
     
     # They should be different families
-    assert cn_family != suzuki_family or "C_N" in cn_family, \
+    assert cn_family != suzuki_family, \
         "C-N coupling should not be detected as Suzuki"
     
     print("\n✅ PASSED: Different reactions routed to different databases")
