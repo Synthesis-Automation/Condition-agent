@@ -42,6 +42,20 @@ try:
 except Exception:
     chemtools_registry = None
 
+# Import reactant classifier if available
+try:
+    import sys
+    import os
+    # Add data-processor/other_data to path for classify_reactant import
+    other_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other_data')
+    if other_data_path not in sys.path:
+        sys.path.insert(0, other_data_path)
+    from classify_reactant import classify_reactant, load_reactant_types
+    REACTANT_TYPES = load_reactant_types()
+except Exception:
+    classify_reactant = None
+    REACTANT_TYPES = None
+
 
 # ------------------------------ Schema helpers ------------------------------
 
@@ -133,6 +147,42 @@ def build_famsig(row: Dict[str, str]) -> str:
         "+".join(sorted(solv)),
     ])
     return _hash32_hex(key)
+
+
+def classify_reactants_from_smiles(smiles_string: str) -> Tuple[List[str], List[str]]:
+    """
+    Classify reactants from a SMILES string (dot-separated).
+    
+    Args:
+        smiles_string: Dot-separated SMILES of reactants (e.g., "c1ccccc1Br.CCN")
+        
+    Returns:
+        Tuple of (reactant_types, reactant_categories)
+        Each is a list matching the reactant order in SMILES
+    """
+    if not smiles_string or not classify_reactant or not REACTANT_TYPES:
+        return ([], [])
+    
+    reactant_smiles = smiles_string.split('.')
+    reactant_types = []
+    reactant_categories = []
+    
+    for smi in reactant_smiles:
+        smi = smi.strip()
+        if not smi:
+            reactant_types.append('')
+            reactant_categories.append('')
+            continue
+            
+        result = classify_reactant(smi, REACTANT_TYPES)
+        if result:
+            reactant_types.append(result.get('member_type', ''))
+            reactant_categories.append(result.get('category', ''))
+        else:
+            reactant_types.append('')
+            reactant_categories.append('')
+    
+    return (reactant_types, reactant_categories)
 
 
 # --------------------------- Parsing the TXT file ---------------------------
@@ -1509,6 +1559,10 @@ def assemble_rows(txt: Dict[str, Dict[str, Any]], rdf: Dict[str, Dict[str, Any]]
             if smi:
                 pro_smiles_list.append(smi)
 
+        # Classify reactant types from SMILES if available
+        reactant_smiles_str = '.'.join(rct_smiles_list) if rct_smiles_list else ''
+        reactant_types, reactant_categories = classify_reactants_from_smiles(reactant_smiles_str)
+
         # Compose compound lists as "name|cas" strings
         rgt_name_idx = _build_name_to_cas_index(r.get('rgt_cas', []), cas_map or {}) if cas_map is not None else {}
         sol_name_idx = _build_name_to_cas_index(r.get('sol_cas', []), cas_map or {}) if cas_map is not None else {}
@@ -1717,6 +1771,9 @@ def assemble_rows(txt: Dict[str, Dict[str, Any]], rdf: Dict[str, Dict[str, Any]]
             'RGTName': _json_list(rgt_names),
             'CATName': _json_list(cat_names),
             'SOLName': _json_list(sol_names),
+            # Reactant type classification (added for recommendation system)
+            'ReactantTypes': _json_list(reactant_types),
+            'ReactantCategories': _json_list(reactant_categories),
             # Original text preservation
             'original_text': t.get('original_text', []),
         }
@@ -1740,6 +1797,8 @@ def write_csv(rows: List[Dict[str, Any]], out_path: str) -> None:
         'CondKey', 'CondSig', 'FamSig', 'RawCAS', 'RawData',
         # enrichment columns (optional)
     'RCTName', 'PROName', 'RGTName', 'CATName', 'SOLName',
+        # reactant type classification (for recommendation system)
+        'ReactantTypes', 'ReactantCategories',
     ]
     with open(out_path, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=cols)

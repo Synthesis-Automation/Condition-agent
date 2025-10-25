@@ -1,0 +1,519 @@
+{
+  "C-C_bond_formation": {
+    "category": "Cross-Coupling Reactions",
+    "reactions": [
+      {
+        "id": "Suzuki-Miyaura",
+        "name": "Suzuki-Miyaura Coupling",
+        "aliases": ["Suzuki", "Suzuki coupling"],
+        "description": "Pd-catalyzed cross-coupling of aryl/vinyl halides with organoboron compounds",
+        "reactants": [["ArX*"], ["ArB*"]],
+        "typical_catalysts": ["Pd"],
+        "typical_conditions": "Base, ligand (phosphine), solvent"
+      },
+      {
+        "id": "Suzuki-Miyaura-in-situ",
+        "name": "Suzuki-Miyaura Coupling (in situ borylation)",
+        "aliases": ["Suzuki in situ", "Suzuki-Miyaura, in situ"],
+        "description": "Suzuki coupling with in situ generation of organoboron species",
+        "reactants": [["ArX*"], ["RB*"]],
+        "typical_catalysts": ["Pd"],
+        "typical_conditions": "Base, ligand, solvent"
+      },
+      {
+        "id": "Negishi",
+        "name": "Negishi Coupling",
+        "aliases": ["Negishi cross-coupling"],
+        "description": "Pd or Ni-catalyzed cross-coupling of organozinc reagents with organic halides",
+        "reactants": [["ArX*"], ["Organometallic"]],
+        "typical_catalysts": ["Pd", "Ni"],
+        "typical_conditions": "Anhydrous, inert atmosphere"
+      },
+      {
+        "id": "Negishi-in-situ",
+        "name": "Negishi Coupling (in situ)",
+        "aliases": ["Negishi in-situ", "Negishi, in-situ"],
+        "description": "Negishi coupling with in situ formation of organozinc reagent",
+        "reactants": [["ArX*"], ["Alkyl-X"], ["Organometallic"]],
+        "typical_catalysts": ["Pd", "Ni"],
+        "typical_conditions": "Anhydrous, inert atmosphere"
+      },
+      {
+        "id": "Heck",
+        "name": "Heck Reaction",
+        "aliases": ["Mizoroki-Heck", "Heck coupling"],
+        "description": "Pd-catalyzed coupling of aryl halides with alkenes",
+        "reactants": [["ArX*"], ["Alkene"]],
+        "typical_catalysts": ["Pd"],
+        "typical_conditions": "Base, ligand, high temperature"
+      },
+      {
+        "id": "Sonogashira",
+        "name": "Sonogashira Coupling",
+        "aliases": ["Sonogashira cross-coupling"],
+        "description": "Pd/Cu-catalyzed coupling of terminal alkynes with aryl/vinyl halides",
+        "reactants": [["ArX*"], ["terminal-alkyne"]],
+        "typical_catalysts": ["Pd", "Cu"],
+        "typical_conditions": "Base, amine solvent or co-catalyst"
+      },
+      {
+        "id": "Stille",
+        "name": "Stille Coupling",
+        "aliases": ["Stille cross-coupling", "Migita-Kosugi-Stille coupling"],
+        "description": "Pd-catalyzed coupling of organostannanes with aryl/vinyl halides",
+        "reactants": [["ArX*"], ["Organometallic"]],
+        "typical_catalysts": ["Pd"],
+        "typical_conditions": "Ligand (phosphine), DMF or toluene, elevated temperature"
+      },
+      {
+        "id": "Kumada",
+        "name": "Kumada Coupling",
+        "aliases": ["Kumada-Corriu coupling"],
+        "description": "Ni or Pd-catalyzed coupling of Grignard reagents with aryl/vinyl halides",
+        "reactants": [["ArX*"], ["Organometallic"]],
+        "typical_catalysts": ["Ni", "Pd"],
+        "typical_conditions": "Anhydrous, inert atmosphere, THF or ether"
+      },
+      {
+        "id": "Reformatsky",
+        "name": "Reformatsky Reaction",
+        "aliases": ["Reformatsky addition"],
+        "description": "Zn-mediated addition of α-halo esters to carbonyl compounds",
+        "reactants": [["Aldehyde", "Ketone"], ["Alkyl-X"], ["Organometallic"]],
+        "typical_catalysts": ["Zn"],
+        "typical_conditions": "THF or ether, mild heating"
+      },
+      {
+        "id": "Horner-Wadsworth-Emmons",
+        "name": "Horner-Wadsworth-Emmons Reaction",
+        "aliases": ["HWE", "Horner-Emmons olefination"],
+        "description": "Phosphonate-based olefination of aldehydes/ketones (Wittig variant)",
+        "reactants": [["Aldehyde", "Ketone"]],
+        "typical_catalysts": ["Base (NaH, t-BuOK)"],
+        "typical_conditions": "Strong base, generates E-olefin selectively"
+      },
+      {
+        "id": "CC-Coupling",
+        "name": "C-C Coupling (General)",
+        "aliases": ["Carbon-carbon coupling"],
+        "description": "General C-C bond formation not classified under specific named reactions",
+        "reactants": [["ArX*", "Alkyl-X"], ["Organometallic"]],
+        "typical_catalysts": ["Transition metals"],
+        "typical_conditions": "Varies"
+      }
+    ]
+  },
+  "C-N_bond_formation": {
+    "category": "C-N Coupling Reactions",
+    "reactions": [
+      {
+        "id": "Buchwald-Hartwig-C-N",
+        "name": "Buchwald-Hartwig C-N Amination",
+        "aliases": [
+          "Buchwald-Hartwig",
+          "BH coupling",
+          "Pd-catalyzed amination"
+        ],
+        "description": "Pd-catalyzed cross-coupling of amines with aryl halides",
+        "reactants": [["ArX*"], ["Aliphatic-amine", "Aniline-type"]],
+        "typical_catalysts": ["Pd"],
+        "typical_conditions": "Base, bulky phosphine ligand, elevated temperature"
+      },
+      {
+        "id": "CN-Coupling",
+        "name": "C-N Coupling (General)",
+        "aliases": ["Carbon-nitrogen coupling"],
+        "description": "General C-N bond formation reactions",
+        "reactants": [
+          ["ArX*", "Alkyl-X"],
+          ["Aliphatic-amine", "Aniline-type"]
+        ],
+        "typical_catalysts": ["Pd", "Cu", "Ni"],
+        "typical_conditions": "Base, ligand"
+      },
+      {
+        "id": "SNAr",
+        "name": "Nucleophilic Aromatic Substitution",
+        "aliases": ["SNAr", "Aromatic nucleophilic substitution"],
+        "description": "Direct nucleophilic substitution on electron-deficient aryl halides",
+        "reactants": [
+          ["ArX*"],
+          ["Aliphatic-amine", "Aniline-type", "ROH", "ArOH", "RSH"]
+        ],
+        "typical_catalysts": ["None (thermal) or metal catalyst"],
+        "typical_conditions": "Base, polar solvent, elevated temperature"
+      },
+      {
+        "id": "Ullmann-CN",
+        "name": "Ullmann C-N Coupling",
+        "aliases": ["Ullmann amination", "Cu-catalyzed amination"],
+        "description": "Cu-catalyzed coupling of amines with aryl halides",
+        "reactants": [["ArX*"], ["Aliphatic-amine", "Aniline-type"]],
+        "typical_catalysts": ["Cu"],
+        "typical_conditions": "Base, ligand, elevated temperature"
+      },
+      {
+        "id": "Chan-Lam",
+        "name": "Chan-Lam Coupling",
+        "aliases": ["Chan-Lam-Evans coupling", "Oxidative C-N coupling"],
+        "description": "Cu-catalyzed oxidative coupling of boronic acids with amines/amides",
+        "reactants": [
+          ["ArB*"],
+          ["Aliphatic-amine", "Aniline-type", "Amide-type"]
+        ],
+        "typical_catalysts": ["Cu"],
+        "typical_conditions": "Oxidant (air or peroxide), base, room temperature"
+      }
+    ]
+  },
+  "C-O_bond_formation": {
+    "category": "C-O Coupling Reactions",
+    "reactions": [
+      {
+        "id": "CO-Coupling",
+        "name": "C-O Coupling",
+        "aliases": ["Carbon-oxygen coupling", "Aryl ether formation"],
+        "description": "Formation of C-O bonds (aryl ethers, alkyl aryl ethers)",
+        "reactants": [["ArX*"], ["ROH", "ArOH"]],
+        "typical_catalysts": ["Cu", "Pd"],
+        "typical_conditions": "Base, ligand, polar solvent"
+      },
+      {
+        "id": "Mitsunobu",
+        "name": "Mitsunobu Reaction",
+        "aliases": ["Mitsunobu esterification"],
+        "description": "Dehydrative coupling of alcohols with nucleophiles (often with inversion)",
+        "reactants": ["ROH"],
+        "typical_catalysts": ["DEAD or DIAD", "PPh3"],
+        "typical_conditions": "Room temperature to mild heating"
+      },
+      {
+        "id": "Glycosidation",
+        "name": "Glycosidation",
+        "aliases": ["Glycosylation", "Glycoside formation"],
+        "description": "Formation of glycosidic bonds between carbohydrates and alcohols/amines",
+        "reactants": ["Aliphatic-amine"],
+        "typical_catalysts": ["Lewis acids", "promoters"],
+        "typical_conditions": "Anhydrous, low temperature"
+      },
+      {
+        "id": "Ullmann-Ether",
+        "name": "Ullmann Ether Synthesis",
+        "aliases": ["Ullmann C-O coupling", "Cu-catalyzed ether formation"],
+        "description": "Cu-catalyzed coupling of phenols/alcohols with aryl halides to form ethers",
+        "reactants": [["ArX*"], ["ROH", "ArOH"]],
+        "typical_catalysts": ["Cu"],
+        "typical_conditions": "Base, ligand, elevated temperature"
+      }
+    ]
+  },
+  "C-S_bond_formation": {
+    "category": "C-S Coupling Reactions",
+    "reactions": [
+      {
+        "id": "CS-Coupling",
+        "name": "C-S Coupling",
+        "aliases": ["Carbon-sulfur coupling", "Thioether formation"],
+        "description": "Formation of C-S bonds (aryl/alkyl thioethers)",
+        "reactants": [["ArX*"], ["RSH"]],
+        "typical_catalysts": ["Cu", "Pd"],
+        "typical_conditions": "Base, ligand"
+      }
+    ]
+  },
+  "Amide_carbonyl_chemistry": {
+    "category": "Amide and Carbonyl Chemistry",
+    "reactions": [
+      {
+        "id": "Amide-coupling",
+        "name": "Amide Coupling",
+        "aliases": ["Amide formation", "Peptide coupling"],
+        "description": "Formation of amide bonds from carboxylic acids/esters and amines",
+        "reactants": [["RCO2H or activated acyl"], ["Aliphatic-amine"]],
+        "typical_catalysts": ["Coupling reagents (EDC, DIC, HATU, T3P, etc.)"],
+        "typical_conditions": "Base (tertiary amine), room temperature"
+      },
+      {
+        "id": "Condensation",
+        "name": "Condensation Reaction",
+        "aliases": ["Aldol", "Claisen", "Knoevenagel"],
+        "description": "Formation of C-C or C-heteroatom bonds with loss of small molecule (H2O, ROH)",
+        "reactants": [
+          ["Aldehyde", "Ketone"],
+          ["Aliphatic-amine", "Aniline-type", "ROH", "ArOH", "RSH"]
+        ],
+        "typical_catalysts": ["Acid or base"],
+        "typical_conditions": "Varies (thermal, acidic, basic)"
+      },
+      {
+        "id": "Wittig",
+        "name": "Wittig Reaction",
+        "aliases": ["Wittig olefination"],
+        "description": "Formation of alkenes from aldehydes/ketones and phosphonium ylides",
+        "reactants": [["Aldehyde", "Ketone"]],
+        "typical_catalysts": ["None (stoichiometric PPh3)"],
+        "typical_conditions": "Base, room temperature to reflux"
+      },
+      {
+        "id": "Stetter",
+        "name": "Stetter Reaction",
+        "aliases": ["Stetter conjugate addition"],
+        "description": "NHC-catalyzed conjugate addition of aldehydes to Michael acceptors",
+        "reactants": [["Aldehyde"], ["Ketone"]],
+        "typical_catalysts": ["NHC (thiazolium or imidazolium salt)"],
+        "typical_conditions": "Base, mild temperature"
+      }
+    ]
+  },
+  "C-H_activation": {
+    "category": "C-H Activation and Functionalization",
+    "reactions": [
+      {
+        "id": "CH-Activation",
+        "name": "C-H Activation (General)",
+        "aliases": ["Direct C-H functionalization"],
+        "description": "Direct functionalization of C-H bonds without pre-functionalization",
+        "reactants": [
+          ["Alkyl-C-H", "ArH"],
+          ["ArX*", "Organometallic"]
+        ],
+        "typical_catalysts": ["Pd", "Ru", "Rh", "Ir"],
+        "typical_conditions": "Directing group, oxidant, elevated temperature"
+      },
+      {
+        "id": "Arylation-acidic-C-H",
+        "name": "Arylation of Acidic C-H",
+        "aliases": ["Direct arylation", "Arylation, acidic C-H"],
+        "description": "C-H arylation of substrates with acidic C-H bonds (heterocycles, ketones)",
+        "reactants": [["Alkyl-C-H"], ["ArX*"]],
+        "typical_catalysts": ["Pd", "Cu"],
+        "typical_conditions": "Base, ligand, elevated temperature"
+      },
+      {
+        "id": "Borylation-C-H",
+        "name": "C-H Borylation",
+        "aliases": ["Direct borylation", "Borylation, C-H"],
+        "description": "Direct borylation of C-H bonds",
+        "reactants": [["Alkyl-C-H", "ArH"], ["RB*"]],
+        "typical_catalysts": ["Ir", "Rh"],
+        "typical_conditions": "Ligand, elevated temperature"
+      },
+      {
+        "id": "Borylation-Miyaura",
+        "name": "Miyaura Borylation",
+        "aliases": [
+          "Miyaura borylation",
+          "Halide borylation",
+          "Borylation, Miyaura"
+        ],
+        "description": "Pd-catalyzed borylation of aryl halides",
+        "reactants": [["ArX*"], ["RB*"]],
+        "typical_catalysts": ["Pd"],
+        "typical_conditions": "Base, ligand"
+      }
+    ]
+  },
+  "Functional_group_transformations": {
+    "category": "Functional Group Transformations",
+    "reactions": [
+      {
+        "id": "Alkylation",
+        "name": "Alkylation",
+        "aliases": ["N-alkylation", "O-alkylation", "C-alkylation"],
+        "description": "Introduction of alkyl groups to N, O, C, or S nucleophiles",
+        "reactants": [
+          ["Aliphatic-amine", "Aniline-type", "ROH", "ArOH", "RSH"],
+          ["Alkyl-X"]
+        ],
+        "typical_catalysts": ["Base (often sufficient)"],
+        "typical_conditions": "Base, polar aprotic solvent"
+      },
+      {
+        "id": "Oxidation",
+        "name": "Oxidation",
+        "aliases": ["Oxidative transformation"],
+        "description": "Increase in oxidation state (alcohol to carbonyl, etc.)",
+        "reactants": [],
+        "typical_catalysts": ["Oxidants (MnO2, PCC, DMP, TEMPO, etc.)"],
+        "typical_conditions": "Varies by oxidant"
+      },
+      {
+        "id": "Reduction",
+        "name": "Reduction",
+        "aliases": ["Reductive transformation"],
+        "description": "Decrease in oxidation state (carbonyl to alcohol, nitro to amine, etc.)",
+        "reactants": [],
+        "typical_catalysts": ["Reductants (NaBH4, LiAlH4, H2/Pd, etc.)"],
+        "typical_conditions": "Varies by reductant"
+      },
+      {
+        "id": "Halogenation-Chlorination",
+        "name": "Chlorination",
+        "aliases": ["Chlorination"],
+        "description": "Introduction of chlorine atom",
+        "reactants": [],
+        "typical_catalysts": ["SOCl2, PCl5, NCS, etc."],
+        "typical_conditions": "Varies"
+      },
+      {
+        "id": "Fluorination-oxidative",
+        "name": "Oxidative Fluorination",
+        "aliases": ["Electrophilic fluorination", "Fluorination, oxidative"],
+        "description": "Introduction of fluorine via oxidative conditions",
+        "reactants": [],
+        "typical_catalysts": ["Oxidant or electrophilic F reagent"],
+        "typical_conditions": "Mild to moderate conditions"
+      },
+      {
+        "id": "Deoxyfluorination",
+        "name": "Deoxyfluorination",
+        "aliases": ["Alcohol to fluoride"],
+        "description": "Replacement of OH with F",
+        "reactants": ["ROH"],
+        "typical_catalysts": ["Fluorinating reagent"],
+        "typical_conditions": "Low to room temperature"
+      },
+      {
+        "id": "Cyanation",
+        "name": "Cyanation",
+        "aliases": ["Nitrile formation"],
+        "description": "Introduction of cyano group",
+        "reactants": ["ArX*"],
+        "typical_catalysts": ["Pd", "Cu", "or metal-free"],
+        "typical_conditions": "Base, ligand (for metal-catalyzed)"
+      },
+      {
+        "id": "Hydrodehalogenation",
+        "name": "Hydrodehalogenation",
+        "aliases": ["Dehalogenation"],
+        "description": "Replacement of halogen with hydrogen",
+        "reactants": ["Alkyl-X"],
+        "typical_catalysts": ["Pd/C", "Ni", "or radical initiators"],
+        "typical_conditions": "H2 atmosphere or hydrogen donor"
+      },
+      {
+        "id": "Sandmeyer",
+        "name": "Sandmeyer Reaction",
+        "aliases": ["Diazonium substitution"],
+        "description": "Conversion of anilines to aryl halides/nitriles via diazonium salts",
+        "reactants": ["Aniline-type"],
+        "typical_catalysts": ["Cu salts"],
+        "typical_conditions": "Low temperature for diazotization, then warming"
+      }
+    ]
+  },
+  "Protection_deprotection": {
+    "category": "Protection and Deprotection",
+    "reactions": [
+      {
+        "id": "Protection",
+        "name": "Protection",
+        "aliases": ["Protecting group installation"],
+        "description": "Installation of protecting groups (Boc, Cbz, TBS, etc.)",
+        "reactants": [],
+        "typical_catalysts": ["Base or acid"],
+        "typical_conditions": "Varies by protecting group"
+      },
+      {
+        "id": "Deprotection",
+        "name": "Deprotection",
+        "aliases": ["Protecting group removal"],
+        "description": "Removal of protecting groups",
+        "reactants": [],
+        "typical_catalysts": ["Acid, base, or specific reagent"],
+        "typical_conditions": "Varies by protecting group"
+      }
+    ]
+  },
+  "Hydrolysis_water_chemistry": {
+    "category": "Hydrolysis and Water Chemistry",
+    "reactions": [
+      {
+        "id": "Hydrolysis",
+        "name": "Hydrolysis",
+        "aliases": ["Ester hydrolysis", "Amide hydrolysis"],
+        "description": "Cleavage of bonds by water (esters, amides, nitriles, etc.)",
+        "reactants": [],
+        "typical_catalysts": ["Acid or base"],
+        "typical_conditions": "Aqueous medium, heat"
+      },
+      {
+        "id": "Dehydration",
+        "name": "Dehydration",
+        "aliases": ["Water elimination"],
+        "description": "Elimination of water to form double bonds or cyclize",
+        "reactants": ["ROH"],
+        "typical_catalysts": ["Acid, heat, or dehydrating agents"],
+        "typical_conditions": "Elevated temperature, acidic"
+      },
+      {
+        "id": "Hydration",
+        "name": "Hydration",
+        "aliases": ["Water addition"],
+        "description": "Addition of water across multiple bonds (alkenes, alkynes, nitriles)",
+        "reactants": [["Alkene", "Alkyne"]],
+        "typical_catalysts": ["Acid or metal catalyst"],
+        "typical_conditions": "Aqueous acidic or metal-catalyzed"
+      }
+    ]
+  },
+  "Miscellaneous_reactions": {
+    "category": "Miscellaneous Reactions",
+    "reactions": [
+      {
+        "id": "Cyclization",
+        "name": "Cyclization",
+        "aliases": ["Ring formation", "Intramolecular coupling"],
+        "description": "Formation of cyclic structures from linear precursors",
+        "reactants": [],
+        "typical_catalysts": [
+          "Varies (metal catalyst, acid, base, or thermal)"
+        ],
+        "typical_conditions": "Varies"
+      },
+      {
+        "id": "Addition",
+        "name": "Addition Reaction",
+        "aliases": ["Nucleophilic addition", "Electrophilic addition"],
+        "description": "Addition of reagents across multiple bonds",
+        "reactants": [
+          ["Alkene", "Alkyne"],
+          ["Aliphatic-amine", "ArX*", "Alkyl-X"]
+        ],
+        "typical_catalysts": ["Acid, base, or metal catalyst"],
+        "typical_conditions": "Varies"
+      },
+      {
+        "id": "Dimerization-reductive",
+        "name": "Reductive Dimerization",
+        "aliases": [
+          "Reductive coupling",
+          "Pinacol coupling",
+          "Dimerization, reductive"
+        ],
+        "description": "Coupling of two carbonyl compounds via reduction (pinacol formation)",
+        "reactants": [["Aldehyde", "Ketone"]],
+        "typical_catalysts": ["Low-valent metals (Mg, Zn, SmI2, etc.)"],
+        "typical_conditions": "Reducing conditions"
+      },
+      {
+        "id": "Salt-formation",
+        "name": "Salt Formation",
+        "aliases": ["Acid-base neutralization"],
+        "description": "Formation of salts from acids and bases",
+        "reactants": [],
+        "typical_catalysts": ["None"],
+        "typical_conditions": "Mixing in solution"
+      },
+      {
+        "id": "Activation",
+        "name": "Activation",
+        "aliases": ["Functional group activation"],
+        "description": "Conversion of functional groups to more reactive forms",
+        "reactants": [],
+        "typical_catalysts": ["Varies"],
+        "typical_conditions": "Varies"
+      }
+    ]
+  }
+}
