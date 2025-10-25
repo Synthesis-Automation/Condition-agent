@@ -33,7 +33,7 @@ python test_llm_workflow.py
 Test: Triethylamine (CAS 121-44-8)
 ============================================================
 ✓ Using DeepSeek V3 (Aliyun)
-✓ Registry directory: .../data/reagents
+✓ Registry directory: .../data/reagent_db
 
 ------------------------------------------------------------
 Running LLM workflow...
@@ -85,7 +85,7 @@ from reagent_taxonomy_qt import generate_taxonomy_entry_llm
 
 # Initialize LLM client
 client = LLMClient(provider="aliyun", model="deepseek-v3")
-registry_dir = Path("data/reagents")
+registry_dir = Path("data/reagent_db")
 
 # Generate entry
 result = generate_taxonomy_entry_llm(
@@ -178,7 +178,7 @@ python data-processor/test_llm_workflow.py
 ## ⚠️ Important Notes
 
 1. **API Keys Required**: Set `ALIYUN_API_KEY` or `OPENAI_API_KEY`
-2. **Registry Must Exist**: `data/reagents/` directory with schema
+2. **Registry Must Exist**: `data/reagent_db/` directory with schema
 3. **Old Workflow Unchanged**: `generate_taxonomy_entry()` still works
 4. **DeepSeek Compatible**: Handles markdown code fences automatically
 
@@ -193,7 +193,7 @@ pip install openai  # or your LLM provider SDK
 ```bash
 # Make sure you're in the right directory
 cd Condition-agent
-ls data/reagents  # Should exist
+ls data/reagent_db  # Should exist
 ```
 
 **"No data from PubChem"**:

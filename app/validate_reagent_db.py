@@ -5,7 +5,7 @@ Usage:
     python scripts/validate_reagent_db.py
     python scripts/validate_reagent_db.py --verbose
     python scripts/validate_reagent_db.py --role ligand
-    python scripts/validate_reagent_db.py --registry-dir path/to/reagents
+    python scripts/validate_reagent_db.py --registry-dir path/to/reagent_db
 """
 
 import sys
@@ -22,8 +22,8 @@ from chemtools.reagent import (
     print_critical_errors_summary,
 )
 
-# Default to data/reagents in project root
-DEFAULT_REGISTRY_PATH = project_root / "data" / "reagents"
+# Default to data/reagent_db in project root
+DEFAULT_REGISTRY_PATH = project_root / "data" / "reagent_db"
 
 
 def main():

@@ -258,7 +258,7 @@ Run this to verify schema consistency:
 from llmtools.reagent_classifier import _load_schema_for_role
 from pathlib import Path
 
-registry_dir = Path("../data/reagents")
+registry_dir = Path("../data/reagent_db")
 roles = ["base", "solvent", "ligand", "catalyst", "oxidant", "reductant"]
 
 for role in roles:
@@ -274,7 +274,7 @@ for role in roles:
 import json
 from pathlib import Path
 
-families_path = Path("../data/reagents/reagent_schema/families_registry.json")
+families_path = Path("../data/reagent_db/reagent_schema/families_registry.json")
 families_data = json.loads(families_path.read_text(encoding="utf-8"))
 
 # Count families per role
@@ -311,7 +311,7 @@ print("Families per role:", dict(role_counts))
 
 ### Modified Files
 
-1. **`data/reagents/reagent_schema/reagent_schema.json`**
+1. **`data/reagent_db/reagent_schema/reagent_schema.json`**
    - Fixed 5 field value inconsistencies
    - Standardized terminology (weak/moderate/strong)
 

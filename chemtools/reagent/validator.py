@@ -9,7 +9,7 @@ Usage:
     from chemtools.reagent import validate_database, validate_entry
     
     # Validate entire database
-    results = validate_database("data/reagents")
+    results = validate_database("data/reagent_db")
     print(f"Valid: {results['valid_count']}, Invalid: {results['invalid_count']}")
     
     # Validate single entry
@@ -566,8 +566,8 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python -m chemtools.reagent.validator <registry_dir> [--strict] [--verbose]")
         print("\nExample:")
-        print("  python -m chemtools.reagent.validator data/reagents")
-        print("  python -m chemtools.reagent.validator data/reagents --verbose")
+        print("  python -m chemtools.reagent.validator data/reagent_db")
+        print("  python -m chemtools.reagent.validator data/reagent_db --verbose")
         sys.exit(1)
     
     registry_dir = sys.argv[1]

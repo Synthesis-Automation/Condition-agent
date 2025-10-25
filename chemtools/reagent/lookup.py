@@ -2,7 +2,7 @@
 Reagent database lookup utilities.
 
 Provides functions to enrich condition recommendations with detailed reagent information
-from the JSON databases in data/reagents/.
+from the JSON databases in data/reagent_db/.
 """
 
 import json

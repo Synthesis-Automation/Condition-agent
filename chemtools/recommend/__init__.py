@@ -22,10 +22,13 @@ Example:
 """
 
 from .core import recommend_from_reaction, recommend_conditions_structured
+from .hte_simple import HTESimpleConditionRecommender, RecommendationOptions
 from .plate_design import design_plate_from_reaction
 
 __all__ = [
     "recommend_from_reaction",
     "recommend_conditions_structured",
+    "HTESimpleConditionRecommender",
+    "RecommendationOptions",
     "design_plate_from_reaction",
 ]

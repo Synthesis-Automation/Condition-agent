@@ -40,7 +40,7 @@
 
 ## Files Modified
 
-1. `data/reagents/reagent_schema/reagent_schema.json` - Fixed 5 field inconsistencies
+1. `data/reagent_db/reagent_schema/reagent_schema.json` - Fixed 5 field inconsistencies
 2. `llmtools/reagent_classifier.py` - Schema-driven loading, richer family descriptions
 
 ## Ready to Test

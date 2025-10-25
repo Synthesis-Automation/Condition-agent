@@ -27,14 +27,14 @@ class MatchResult:
 - **New format support**: Extracts reagents from `reagents` array
 - **Legacy format support**: Falls back to old keys (`pd_source`, `ligand`, `base`, `solvent`)
 - **Role mapping**: Maps standardized roles to output roles
-  - `metal_source` â†’ `metal_precursor`
-  - `ligand` â†’ `ligand`
-  - `base` â†’ `base`
-  - `solvent` â†’ `solvent`
-  - `additive` â†’ `additive`
-  - `boron_partner` â†’ `partner`
+  - `metal_source` â†?`metal_precursor`
+  - `ligand` â†?`ligand`
+  - `base` â†?`base`
+  - `solvent` â†?`solvent`
+  - `additive` â†?`additive`
+  - `boron_partner` â†?`partner`
 
-### 4. **Fixed Rule Database** (`data/conditionDB/Suzuki_db.json`)
+### 4. **Fixed Rule Database** (`data/rule_db/Suzuki_db.json`)
 - Added missing SPhos ligand to SCDB-SUZ-ARBRI-GENERAL-SPhos entry
 - Ensured all reagents mentioned in `token_signature` are in `reagents` array
 
@@ -64,12 +64,12 @@ class MatchResult:
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "0.5â€“1.5%"
+          "amount": "0.5â€?.5%"
         },
         {
           "name": "SPhos",
           "role": "ligand",
-          "amount": "1.0â€“3.0%"
+          "amount": "1.0â€?.0%"
         },
         {
           "name": "K2CO3",
@@ -164,11 +164,11 @@ The system maintains full backward compatibility:
 ## Testing
 
 ### Test Results
-âœ… Rule-based matching: Working with new format
-âœ… Reagent extraction: All reagents (metal, ligand, base, solvent) extracted correctly
-âœ… Output formatting: Proper role mapping and chemical structure
-âœ… Backward compatibility: Legacy format still supported
-âœ… CLI integration: Local recommendation CLI works end-to-end
+âœ?Rule-based matching: Working with new format
+âœ?Reagent extraction: All reagents (metal, ligand, base, solvent) extracted correctly
+âœ?Output formatting: Proper role mapping and chemical structure
+âœ?Backward compatibility: Legacy format still supported
+âœ?CLI integration: Local recommendation CLI works end-to-end
 
 ### Test Command
 ```powershell
@@ -204,7 +204,7 @@ Top match (rank 1):
 1. `chemtools/rule_scdb_matcher/types.py` - Added reagents field to MatchResult
 2. `chemtools/rule_scdb_matcher/matcher.py` - Extract and pass reagents
 3. `chemtools/output_formatter.py` - Support new and legacy formats
-4. `data/conditionDB/Suzuki_db.json` - Added missing SPhos ligand
+4. `data/rule_db/Suzuki_db.json` - Added missing SPhos ligand
 5. `scripts/fix_rule_reagents.py` - New utility script (created)
 6. `scripts/recommendation_cli_utils.py` - Already updated for single output key
 
