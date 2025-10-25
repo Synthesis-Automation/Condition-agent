@@ -17,7 +17,7 @@ from chemtools.contracts import SchemeMatchRequest
 from chemtools.exceptions import ValidationError, DatabaseNotFoundError, SchemeConditionDBError
 
 try:
-    from chemtools.rule_scdb_matcher import loader as scdb_loader
+    from chemtools.rule import loader as scdb_loader
     _HAS_SCDB = True
 except Exception:
     _HAS_SCDB = False

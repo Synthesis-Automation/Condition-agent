@@ -1,11 +1,11 @@
-# Rule-Based System Updates for Standardized Rule Format
+ï»¿# Rule-Based System Updates for Standardized Rule Format
 
 ## Overview
 Updated the rule-based recommendation system and output formatter to support the new standardized rule file format while maintaining backward compatibility with legacy formats.
 
 ## Changes Made
 
-### 1. **Updated MatchResult Type** (`chemtools/rule_scdb_matcher/types.py`)
+### 1. **Updated MatchResult Type** (`chemtools/rule/types.py`)
 - Added `reagents` field to `MatchResult` dataclass
 - Updated `to_json_dict()` to include reagents when present
 - Maintains backward compatibility - reagents field is optional
@@ -17,7 +17,7 @@ class MatchResult:
     reagents: Any = None  # New field for standardized reagents array
 ```
 
-### 2. **Updated Matcher** (`chemtools/rule_scdb_matcher/matcher.py`)
+### 2. **Updated Matcher** (`chemtools/rule/matcher.py`)
 - Modified `_match_scheme()` to extract reagents from entry's raw data
 - Passes reagents to MatchResult constructor
 - Reagents are extracted from `selected_entry.raw.get("reagents")`
@@ -27,12 +27,12 @@ class MatchResult:
 - **New format support**: Extracts reagents from `reagents` array
 - **Legacy format support**: Falls back to old keys (`pd_source`, `ligand`, `base`, `solvent`)
 - **Role mapping**: Maps standardized roles to output roles
-  - `metal_source` â†?`metal_precursor`
-  - `ligand` â†?`ligand`
-  - `base` â†?`base`
-  - `solvent` â†?`solvent`
-  - `additive` â†?`additive`
-  - `boron_partner` â†?`partner`
+  - `metal_source` éˆ«?`metal_precursor`
+  - `ligand` éˆ«?`ligand`
+  - `base` éˆ«?`base`
+  - `solvent` éˆ«?`solvent`
+  - `additive` éˆ«?`additive`
+  - `boron_partner` éˆ«?`partner`
 
 ### 4. **Fixed Rule Database** (`data/rule_db/Suzuki_db.json`)
 - Added missing SPhos ligand to SCDB-SUZ-ARBRI-GENERAL-SPhos entry
@@ -64,12 +64,12 @@ class MatchResult:
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "0.5â€?.5%"
+          "amount": "0.5éˆ¥?.5%"
         },
         {
           "name": "SPhos",
           "role": "ligand",
-          "amount": "1.0â€?.0%"
+          "amount": "1.0éˆ¥?.0%"
         },
         {
           "name": "K2CO3",
@@ -164,11 +164,11 @@ The system maintains full backward compatibility:
 ## Testing
 
 ### Test Results
-âœ?Rule-based matching: Working with new format
-âœ?Reagent extraction: All reagents (metal, ligand, base, solvent) extracted correctly
-âœ?Output formatting: Proper role mapping and chemical structure
-âœ?Backward compatibility: Legacy format still supported
-âœ?CLI integration: Local recommendation CLI works end-to-end
+é‰?Rule-based matching: Working with new format
+é‰?Reagent extraction: All reagents (metal, ligand, base, solvent) extracted correctly
+é‰?Output formatting: Proper role mapping and chemical structure
+é‰?Backward compatibility: Legacy format still supported
+é‰?CLI integration: Local recommendation CLI works end-to-end
 
 ### Test Command
 ```powershell
@@ -182,7 +182,7 @@ Top match (rank 1):
   Entry: Aryl iodides/bromides + aryl boron (SPhos set)
   Match type: scheme
   Catalyst: Pd2(dba)3
-  Temperature: [45.0, 60.0]Â°C
+  Temperature: [45.0, 60.0]æ³C
 ```
 
 ## Next Steps
@@ -201,8 +201,8 @@ Top match (rank 1):
 
 ## Files Modified
 
-1. `chemtools/rule_scdb_matcher/types.py` - Added reagents field to MatchResult
-2. `chemtools/rule_scdb_matcher/matcher.py` - Extract and pass reagents
+1. `chemtools/rule/types.py` - Added reagents field to MatchResult
+2. `chemtools/rule/matcher.py` - Extract and pass reagents
 3. `chemtools/output_formatter.py` - Support new and legacy formats
 4. `data/rule_db/Suzuki_db.json` - Added missing SPhos ligand
 5. `scripts/fix_rule_reagents.py` - New utility script (created)
@@ -211,3 +211,4 @@ Top match (rank 1):
 ## Summary
 
 The rule-based recommendation system has been successfully updated to support the new standardized rule file format with `reagents` arrays. All reagents (metal sources, ligands, bases, solvents) are now properly extracted and formatted in the output. The system maintains full backward compatibility with legacy formats, ensuring a smooth transition.
+

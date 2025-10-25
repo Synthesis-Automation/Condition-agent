@@ -26,7 +26,7 @@
 - Run tests: `make test` or `pytest -q`
 - Registry CLI:
   - Make: `make registry Q="Toluene" PRETTY=1`
-  - Module: `python -m chemtools.rule_scdb_matcher.cli --jsonl -f queries.txt`
+  - Module: `python -m chemtools.rule.cli --jsonl -f queries.txt`
 
 ## Coding Style & Naming Conventions
 

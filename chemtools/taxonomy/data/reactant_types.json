@@ -1,0 +1,1037 @@
+[
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aryl halides and aryl sulfonates (pseudohalides).",
+    "id": "arx",
+    "members": [
+      {
+        "aliases": [],
+        "id": "ArBr",
+        "metadata": {},
+        "name": "aryl bromide",
+        "smarts": "c[Br]"
+      },
+      {
+        "aliases": [],
+        "id": "ArCl",
+        "metadata": {},
+        "name": "aryl chloride",
+        "smarts": "c[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "ArI",
+        "metadata": {},
+        "name": "aryl iodide",
+        "smarts": "c[I]"
+      },
+      {
+        "aliases": [],
+        "id": "ArF",
+        "metadata": {},
+        "name": "aryl fluoride",
+        "smarts": "c[F]"
+      },
+      {
+        "aliases": [],
+        "id": "ArOSO2R",
+        "metadata": {},
+        "name": "aryl sulfonate",
+        "smarts": "c[OX2][SX4](=O)(=O)[#6]"
+      },
+      {
+        "aliases": [],
+        "id": "ArOMs",
+        "metadata": {},
+        "name": "aryl mesylate",
+        "smarts": "c[OX2][SX4](=O)(=O)[CH3]"
+      },
+      {
+        "aliases": [],
+        "id": "ArOTf",
+        "metadata": {},
+        "name": "aryl triflate",
+        "smarts": "c[OX2][SX4](=O)(=O)[CF3]"
+      },
+      {
+        "aliases": [],
+        "id": "ArOTs",
+        "metadata": {},
+        "name": "aryl tosylate",
+        "smarts": "c[OX2][SX4](=O)(=O)c1ccc([CH3])cc1"
+      }
+    ],
+    "metadata": {},
+    "name": "ArX*",
+    "smarts": "c[Br,Cl,I,F,$([OX2][SX4](=O)(=O))]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Heteroaryl halides (pyridines, pyrimidines, thiazoles, indoles, etc.) - often more challenging than simple ArX due to electronic effects and coordination.",
+    "id": "heterocyclic_halide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "HetArBr",
+        "metadata": {},
+        "name": "heteroaryl bromide",
+        "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Br]"
+      },
+      {
+        "aliases": [],
+        "id": "HetArCl",
+        "metadata": {},
+        "name": "heteroaryl chloride",
+        "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "HetArI",
+        "metadata": {},
+        "name": "heteroaryl iodide",
+        "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[I]"
+      },
+      {
+        "aliases": [],
+        "id": "HetArOTf",
+        "metadata": {},
+        "name": "heteroaryl triflate",
+        "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[OX2][SX4](=O)(=O)[CF3]"
+      },
+      {
+        "aliases": [],
+        "id": "PyridineBr",
+        "metadata": {},
+        "name": "pyridine bromide",
+        "smarts": "n1ccccc1[Br]"
+      },
+      {
+        "aliases": [],
+        "id": "PyrimidineCl",
+        "metadata": {},
+        "name": "pyrimidine chloride",
+        "smarts": "n1cnccn1[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "ThiazoleBr",
+        "metadata": {},
+        "name": "thiazole bromide",
+        "smarts": "s1ccnc1[Br]"
+      },
+      {
+        "aliases": [],
+        "id": "IndoleBr",
+        "metadata": {},
+        "name": "indole bromide",
+        "smarts": "c1ccc2[nH]ccc2c1[Br]"
+      }
+    ],
+    "metadata": {},
+    "name": "Heterocyclic-halide",
+    "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Br,Cl,I,F,$([OX2][SX4](=O)(=O))]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Vinyl halides and vinyl triflates.",
+    "id": "vinylx",
+    "members": [
+      {
+        "aliases": [],
+        "id": "alkene-Br",
+        "metadata": {},
+        "name": "vinyl bromide",
+        "smarts": "[CX3]=[CX3][Br]"
+      },
+      {
+        "aliases": [],
+        "id": "alkene-I",
+        "metadata": {},
+        "name": "vinyl iodide",
+        "smarts": "[CX3]=[CX3][I]"
+      },
+      {
+        "aliases": [],
+        "id": "alkene-Cl",
+        "metadata": {},
+        "name": "vinyl chloride",
+        "smarts": "[CX3]=[CX3][Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "VinylOTf",
+        "metadata": {},
+        "name": "vinyl triflate",
+        "smarts": "[CX3]=[CX3][OX2][SX4](=O)(=O)[CF3]"
+      }
+    ],
+    "metadata": {},
+    "name": "VinylX*",
+    "smarts": "[CX3]=[CX3][Br,Cl,I,F,$([OX2][SX4](=O)(=O))]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Alkyl halides and alkyl sulfonates.",
+    "id": "alkyl_x",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Alkyl-Br",
+        "metadata": {},
+        "name": "alkyl bromide",
+        "smarts": "[CX4][Br]"
+      },
+      {
+        "aliases": [],
+        "id": "Alkyl-Cl",
+        "metadata": {},
+        "name": "alkyl chloride",
+        "smarts": "[CX4][Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "Alkyl-I",
+        "metadata": {},
+        "name": "alkyl iodide",
+        "smarts": "[CX4][I]"
+      },
+      {
+        "aliases": [],
+        "id": "Alkyl-OSO2R",
+        "metadata": {},
+        "name": "alkyl sulfonate",
+        "smarts": "[CX4][OX2][SX4](=O)(=O)[#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Alkyl-X",
+    "smarts": "[CX4][Br,Cl,I,F,$([OX2][SX4](=O)(=O))]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Allylic halides and leaving groups - undergo SN2', allylic substitution, and cross-coupling with retention or inversion.",
+    "id": "allylic_halide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Allyl-Br",
+        "metadata": {},
+        "name": "allylic bromide",
+        "smarts": "[CX4;H1,H2,H3][CX3]=[CX3].[Br]"
+      },
+      {
+        "aliases": [],
+        "id": "Allyl-Cl",
+        "metadata": {},
+        "name": "allylic chloride",
+        "smarts": "[CX4;H1,H2,H3][CX3]=[CX3].[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "Allyl-I",
+        "metadata": {},
+        "name": "allylic iodide",
+        "smarts": "[CX4;H1,H2,H3][CX3]=[CX3].[I]"
+      },
+      {
+        "aliases": [],
+        "id": "Allyl-OAc",
+        "metadata": {},
+        "name": "allylic acetate",
+        "smarts": "[CX4;H1,H2,H3][CX3]=[CX3].[OX2][CX3](=O)[CH3]"
+      },
+      {
+        "aliases": [],
+        "id": "Allyl-OCO2R",
+        "metadata": {},
+        "name": "allylic carbonate",
+        "smarts": "[CX4;H1,H2,H3][CX3]=[CX3].[OX2][CX3](=O)[OX2][#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Allylic-halide",
+    "smarts": "[CX4][CX3]=[CX3]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Benzylic halides - more reactive than simple alkyl halides due to resonance stabilization of carbocation/radical intermediates.",
+    "id": "benzylic_halide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Bn-Br",
+        "metadata": {},
+        "name": "benzylic bromide",
+        "smarts": "[CX4;H1,H2,H3]c.[Br]"
+      },
+      {
+        "aliases": [],
+        "id": "Bn-Cl",
+        "metadata": {},
+        "name": "benzylic chloride",
+        "smarts": "[CX4;H1,H2,H3]c.[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "Bn-I",
+        "metadata": {},
+        "name": "benzylic iodide",
+        "smarts": "[CX4;H1,H2,H3]c.[I]"
+      }
+    ],
+    "metadata": {},
+    "name": "Benzylic-halide",
+    "smarts": "[CX4]c"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Sulfonyl chlorides (acylating/electrophilic sulfur).",
+    "id": "rso2cl",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RSO2Cl",
+        "metadata": {},
+        "name": "sulfonyl chloride",
+        "smarts": "[#6][SX4](=O)(=O)[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "MsCl",
+        "metadata": {},
+        "name": "methanesulfonyl chloride",
+        "smarts": "[CH3][SX4](=O)(=O)[Cl]"
+      }
+    ],
+    "metadata": {},
+    "name": "RSO2Cl",
+    "smarts": "[#6][SX4](=O)(=O)[Cl]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Activated acyl electrophiles for amide/ester formation.",
+    "id": "acyl_source_electrophile",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RCOCl",
+        "metadata": {},
+        "name": "acyl chloride",
+        "smarts": "[#6][CX3](=O)[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "PivCl",
+        "metadata": {},
+        "name": "pivaloyl chloride",
+        "smarts": "[CX4]([CH3])([CH3])([CH3])[CX3](=O)[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "Anhydride",
+        "metadata": {},
+        "name": "carboxylic anhydride",
+        "smarts": "[#6][CX3](=O)[OX2][CX3](=O)[#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Acyl-source-electrophile",
+    "smarts": "[#6][CX3](=O)[$([Cl]),$([OX2][CX3](=O))]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aryl boron reagents (boronic acids/esters/trifluoroborates).",
+    "id": "arb",
+    "members": [
+      {
+        "aliases": [],
+        "id": "ArB(OH)2",
+        "metadata": {},
+        "name": "aryl boronic acid",
+        "smarts": "c[B]([OH])[OH]"
+      },
+      {
+        "aliases": [],
+        "id": "ArB(OR)2",
+        "metadata": {},
+        "name": "aryl boronate ester",
+        "smarts": "c[B]([OX2][#6])[OX2][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "ArBF3K",
+        "metadata": {},
+        "name": "aryl trifluoroborate",
+        "smarts": "c[B-]([F])([F])[F]"
+      }
+    ],
+    "metadata": {},
+    "name": "ArB*",
+    "smarts": "c[B]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Alkyl or alkenyl boron reagents (boronic acids/esters/trifluoroborates).",
+    "id": "rb",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Alkyl-B(OH)2",
+        "metadata": {},
+        "name": "alkyl boronic acid",
+        "smarts": "[CX4][B]([OH])[OH]"
+      },
+      {
+        "aliases": [],
+        "id": "Alkyl-B(OR)2",
+        "metadata": {},
+        "name": "alkyl boronate ester",
+        "smarts": "[CX4][B]([OX2][#6])[OX2][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "Alkyl-BF3K",
+        "metadata": {},
+        "name": "alkyl trifluoroborate",
+        "smarts": "[CX4][B-]([F])([F])[F]"
+      },
+      {
+        "aliases": [],
+        "id": "alkeneB(OR)2",
+        "metadata": {},
+        "name": "alkenyl boronate ester",
+        "smarts": "[CX3]=[CX3][B]([OX2][#6])[OX2][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "alkeneB(OH)2",
+        "metadata": {},
+        "name": "alkenyl boronic acid",
+        "smarts": "[CX3]=[CX3][B]([OH])[OH]"
+      }
+    ],
+    "metadata": {},
+    "name": "RB*",
+    "smarts": "[CX4,CX3][B]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Organometallic reagents (Grignard, organozinc, organolithium, etc.).",
+    "id": "organometallic",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Alkyl-M",
+        "metadata": {},
+        "name": "alkyl organometallic (Grignard, organozinc, etc.)",
+        "smarts": "[CX4][Mg,Zn,Li]"
+      },
+      {
+        "aliases": [],
+        "id": "Ar-M",
+        "metadata": {},
+        "name": "aryl organometallic (Grignard, organozinc, etc.)",
+        "smarts": "c[Mg,Zn,Li]"
+      }
+    ],
+    "metadata": {},
+    "name": "Organometallic",
+    "smarts": "[#6][Mg,Zn,Li,Al,Cu]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aliphatic primary/secondary/tertiary amines (including α-branched variants).",
+    "id": "aliphatic_amine",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RNH2",
+        "metadata": {},
+        "name": "primary aliphatic amine",
+        "smarts": "[CX4][NX3;H2;!$(NC=O)]"
+      },
+      {
+        "aliases": [],
+        "id": "RNH2-a-branch",
+        "metadata": {},
+        "name": "primary aliphatic amine (α-branched)",
+        "smarts": "[CX4;H1]([#6])([#6])[NX3;H2;!$(NC=O)]"
+      },
+      {
+        "aliases": [],
+        "id": "R2NH",
+        "metadata": {},
+        "name": "secondary aliphatic amine",
+        "smarts": "[CX4][NX3;H1;!$(NC=O)][CX4]"
+      },
+      {
+        "aliases": [],
+        "id": "R2NH-a-branch",
+        "metadata": {},
+        "name": "secondary aliphatic amine (α-branched)",
+        "smarts": "[CX4;H1]([#6])([#6])[NX3;H1;!$(NC=O)]"
+      },
+      {
+        "aliases": [],
+        "id": "R3N",
+        "metadata": {},
+        "name": "tertiary aliphatic amine",
+        "smarts": "[NX3;H0;!$(NC=O);!$(N=*)]([CX4])([CX4])[CX4]"
+      }
+    ],
+    "metadata": {},
+    "name": "Aliphatic-amine",
+    "smarts": "[CX4][NX3;H1,H2;!$(NC=O)]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aniline-class amines and heteroaromatic NH nucleophiles.",
+    "id": "aniline_type",
+    "members": [
+      {
+        "aliases": [],
+        "id": "ArNH2",
+        "metadata": {},
+        "name": "aniline (primary)",
+        "smarts": "c[NX3;H2;!$(NC=O)]"
+      },
+      {
+        "aliases": [],
+        "id": "ArNHR",
+        "metadata": {},
+        "name": "N-alkyl aniline (secondary)",
+        "smarts": "c[NX3;H1;!$(NC=O)][CX4]"
+      },
+      {
+        "aliases": [],
+        "id": "Ar2NH",
+        "metadata": {},
+        "name": "diarylamine (secondary)",
+        "smarts": "c[NX3;H1;!$(NC=O)]c"
+      },
+      {
+        "aliases": [],
+        "id": "arom-NH",
+        "metadata": {},
+        "name": "aromatic NH (heteroaromatic)",
+        "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[NH2,NH1]"
+      }
+    ],
+    "metadata": {},
+    "name": "Aniline-type",
+    "smarts": "c[NX3;H1,H2;!$(NC=O)]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Enamines - versatile carbon nucleophiles formed from aldehydes/ketones and secondary amines; used in organocatalysis and C-C bond formation.",
+    "id": "enamine",
+    "members": [
+      {
+        "aliases": [],
+        "id": "enamine",
+        "metadata": {},
+        "name": "enamine (R2C=C-NR2)",
+        "smarts": "[NX3]([#6])[#6]=[CX3]"
+      },
+      {
+        "aliases": [],
+        "id": "morpholine-enamine",
+        "metadata": {},
+        "name": "morpholine-derived enamine",
+        "smarts": "O1CCN([#6]=[CX3])CC1"
+      },
+      {
+        "aliases": [],
+        "id": "pyrrolidine-enamine",
+        "metadata": {},
+        "name": "pyrrolidine-derived enamine",
+        "smarts": "C1CCN([#6]=[CX3])C1"
+      }
+    ],
+    "metadata": {},
+    "name": "Enamine",
+    "smarts": "[NX3][#6]=[CX3]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Imines and Schiff bases - electrophilic and nucleophilic depending on activation; common in reductive amination and cycloadditions.",
+    "id": "imines",
+    "members": [
+      {
+        "aliases": [],
+        "id": "imine",
+        "metadata": {},
+        "name": "imine (R2C=NR)",
+        "smarts": "[NX2]=[CX3]"
+      },
+      {
+        "aliases": [],
+        "id": "Ar-imine",
+        "metadata": {},
+        "name": "aromatic imine",
+        "smarts": "c[CX3]=[NX2]"
+      },
+      {
+        "aliases": [],
+        "id": "N-protected-imine",
+        "metadata": {},
+        "name": "N-protected imine (e.g., N-Ts, N-Boc)",
+        "smarts": "[NX2]([SX4](=O)(=O)[#6])=[CX3]"
+      }
+    ],
+    "metadata": {},
+    "name": "Imines",
+    "smarts": "[NX2]=[CX3]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aliphatic alcohols (primary, secondary, tertiary, and α-branched).",
+    "id": "roh",
+    "members": [
+      {
+        "aliases": [],
+        "id": "ROH-primary",
+        "metadata": {},
+        "name": "primary aliphatic alcohol",
+        "smarts": "[CX4;H2][OX2H]"
+      },
+      {
+        "aliases": [],
+        "id": "ROH-secondary",
+        "metadata": {},
+        "name": "secondary aliphatic alcohol",
+        "smarts": "[CX4;H1]([#6])[OX2H]"
+      },
+      {
+        "aliases": [],
+        "id": "ROH-tertiary",
+        "metadata": {},
+        "name": "tertiary aliphatic alcohol",
+        "smarts": "[CX4;H0]([#6])([#6])[OX2H]"
+      },
+      {
+        "aliases": [],
+        "id": "ROH-a-branch",
+        "metadata": {},
+        "name": "aliphatic alcohol (α-branched)",
+        "smarts": "[CX4;H1]([#6])([#6])[OX2H]"
+      }
+    ],
+    "metadata": {},
+    "name": "ROH",
+    "smarts": "[CX4][OX2H]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Phenols and naphthols.",
+    "id": "aroh",
+    "members": [
+      {
+        "aliases": [],
+        "id": "ArOH",
+        "metadata": {},
+        "name": "phenol",
+        "smarts": "c[OX2H]"
+      }
+    ],
+    "metadata": {},
+    "name": "ArOH",
+    "smarts": "c[OX2H]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Thiols (aliphatic and aromatic).",
+    "id": "rsh",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RSH",
+        "metadata": {},
+        "name": "thiol",
+        "smarts": "[#6][SX2H]"
+      },
+      {
+        "aliases": [],
+        "id": "ArSH",
+        "metadata": {},
+        "name": "thiophenol",
+        "smarts": "c[SX2H]"
+      }
+    ],
+    "metadata": {},
+    "name": "RSH",
+    "smarts": "[#6][SX2H]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aliphatic C–H donors; acidic/activated variants for C–H activation.",
+    "id": "alkyl_c_h",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Alkyl-H",
+        "metadata": {},
+        "name": "aliphatic C–H donor",
+        "smarts": "[CX4;H1,H2,H3]"
+      },
+      {
+        "aliases": [],
+        "id": "Alkyl-H-acidic",
+        "metadata": {},
+        "name": "acidic aliphatic C–H donor (α to EWG)",
+        "smarts": "[CX4;H1,H2,H3][CX3]=O"
+      }
+    ],
+    "metadata": {},
+    "name": "Alkyl-C-H",
+    "smarts": "[CX4;H1,H2,H3]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aryl and heteroaryl C–H donors for direct arylation.",
+    "id": "arh",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Ar-H",
+        "metadata": {},
+        "name": "aryl C–H donor",
+        "smarts": "c[H]"
+      },
+      {
+        "aliases": [],
+        "id": "Hetero-ArH",
+        "metadata": {},
+        "name": "heteroaryl C–H donor",
+        "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[H]"
+      }
+    ],
+    "metadata": {},
+    "name": "ArH",
+    "smarts": "[c,n,o,s]:[c,n,o,s]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Neutral amide-like groups (amides, ureas, lactams, carbamates, sulfonamides).",
+    "id": "amide_type",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RCONH2",
+        "metadata": {},
+        "name": "primary amide",
+        "smarts": "[#6][CX3](=O)[NX3;H2]"
+      },
+      {
+        "aliases": [],
+        "id": "RCONHR",
+        "metadata": {},
+        "name": "secondary amide",
+        "smarts": "[#6][CX3](=O)[NX3;H1][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "Lactam",
+        "metadata": {},
+        "name": "lactam",
+        "smarts": "[CX3r](=O)[NX3r]"
+      },
+      {
+        "aliases": [],
+        "id": "Carbamate",
+        "metadata": {},
+        "name": "carbamate (ROC(O)NR2)",
+        "smarts": "[OX2][CX3](=O)[NX3]"
+      },
+      {
+        "aliases": [],
+        "id": "Sulfonyl-amide",
+        "metadata": {},
+        "name": "sulfonyl amide (RSO2NR2)",
+        "smarts": "[SX4](=O)(=O)[NX3]"
+      },
+      {
+        "aliases": [],
+        "id": "Urea",
+        "metadata": {},
+        "name": "urea",
+        "smarts": "[NX3][CX3](=O)[NX3]"
+      }
+    ],
+    "metadata": {},
+    "name": "Amide-type",
+    "smarts": "[CX3,SX4](=O)[NX3]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Carboxylic acids, salts, and esters as acyl sources or directing groups.",
+    "id": "acyl_source",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RCO2H",
+        "metadata": {},
+        "name": "carboxylic acid",
+        "smarts": "[#6][CX3](=O)[OX2H]"
+      },
+      {
+        "aliases": [],
+        "id": "RCO2M",
+        "metadata": {},
+        "name": "carboxylate salt",
+        "smarts": "[#6][CX3](=O)[O-].[Na+,K+,Li+]"
+      },
+      {
+        "aliases": [],
+        "id": "RCO2OR",
+        "metadata": {},
+        "name": "carboxylic acid ester",
+        "smarts": "[#6][CX3](=O)[OX2][#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Acyl-source",
+    "smarts": "[#6][CX3](=O)[OX2,O-]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Alkenes and enol ethers for addition, metathesis, or Heck reactions.",
+    "id": "alkene",
+    "members": [
+      {
+        "aliases": [],
+        "id": "ethene",
+        "metadata": {},
+        "name": "ethene (H2C=CH2)",
+        "smarts": "[CX3;H2]=[CX3;H2]"
+      },
+      {
+        "aliases": [],
+        "id": "terminal-alkene",
+        "metadata": {},
+        "name": "terminal alkene (R-CH=CH2)",
+        "smarts": "[#6][CX3]=[CX3;H2]"
+      },
+      {
+        "aliases": [],
+        "id": "internal-alkene",
+        "metadata": {},
+        "name": "internal alkene (R-CH=CH-R)",
+        "smarts": "[#6][CX3;H1]=[CX3;H1][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "R-alkene",
+        "metadata": {},
+        "name": "alkyl-substituted alkene",
+        "smarts": "[CX4][CX3]=[CX3][CX4]"
+      },
+      {
+        "aliases": [],
+        "id": "Ar-alkene",
+        "metadata": {},
+        "name": "aryl-substituted alkene (styrene-type)",
+        "smarts": "c[CX3]=[CX3]"
+      },
+      {
+        "aliases": [],
+        "id": "enol-ether",
+        "metadata": {},
+        "name": "enol ether",
+        "smarts": "[OX2][#6]=[CX3]"
+      }
+    ],
+    "metadata": {},
+    "name": "Alkene",
+    "smarts": "[CX3]=[CX3]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Azides - versatile nucleophiles for click chemistry, reduction to amines, and cycloadditions.",
+    "id": "azide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "R-N3",
+        "metadata": {},
+        "name": "alkyl azide",
+        "smarts": "[CX4][NX2]=[NX2]=[NX1]"
+      },
+      {
+        "aliases": [],
+        "id": "Ar-N3",
+        "metadata": {},
+        "name": "aryl azide",
+        "smarts": "c[NX2]=[NX2]=[NX1]"
+      },
+      {
+        "aliases": [],
+        "id": "NaN3",
+        "metadata": {},
+        "name": "sodium azide",
+        "smarts": "[Na+].[N-]=[N+]=[N-]"
+      }
+    ],
+    "metadata": {},
+    "name": "Azide",
+    "smarts": "[#6][NX2]=[NX2]=[NX1]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Nitriles - directing groups for C-H activation and precursors to amides, amines, carboxylic acids.",
+    "id": "nitrile",
+    "members": [
+      {
+        "aliases": [],
+        "id": "R-CN",
+        "metadata": {},
+        "name": "alkyl nitrile",
+        "smarts": "[CX4][CX2]#[NX1]"
+      },
+      {
+        "aliases": [],
+        "id": "Ar-CN",
+        "metadata": {},
+        "name": "aryl nitrile",
+        "smarts": "c[CX2]#[NX1]"
+      }
+    ],
+    "metadata": {},
+    "name": "Nitrile",
+    "smarts": "[#6][CX2]#[NX1]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Alkynes for Sonogashira, cycloaddition, or hydrogenation.",
+    "id": "alkyne",
+    "members": [
+      {
+        "aliases": [],
+        "id": "acetylene",
+        "metadata": {},
+        "name": "acetylene (HC≡CH)",
+        "smarts": "[CX2;H1]#[CX2;H1]"
+      },
+      {
+        "aliases": [],
+        "id": "terminal-alkyne",
+        "metadata": {},
+        "name": "terminal alkyne (R-C≡CH)",
+        "smarts": "[#6][CX2]#[CX2;H1]"
+      },
+      {
+        "aliases": [],
+        "id": "internal-alkyne",
+        "metadata": {},
+        "name": "internal alkyne (R-C≡C-R)",
+        "smarts": "[#6][CX2;H0]#[CX2;H0][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "R-alkyne",
+        "metadata": {},
+        "name": "alkyl-substituted alkyne",
+        "smarts": "[CX4][CX2]#[CX2]"
+      },
+      {
+        "aliases": [],
+        "id": "Ar-alkyne",
+        "metadata": {},
+        "name": "aryl-substituted alkyne",
+        "smarts": "c[CX2]#[CX2]"
+      }
+    ],
+    "metadata": {},
+    "name": "Alkyne",
+    "smarts": "[CX2]#[CX2]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Aldehydes as electrophiles or directing groups.",
+    "id": "aldehyde",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RCHO",
+        "metadata": {},
+        "name": "aliphatic aldehyde",
+        "smarts": "[CX4][CX3H1](=O)"
+      },
+      {
+        "aliases": [],
+        "id": "ArCHO",
+        "metadata": {},
+        "name": "aromatic aldehyde",
+        "smarts": "c[CX3H1](=O)"
+      }
+    ],
+    "metadata": {},
+    "name": "Aldehyde",
+    "smarts": "[#6][CX3H1](=O)"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Ketones as electrophiles or directing groups.",
+    "id": "ketone",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RCOR",
+        "metadata": {},
+        "name": "aliphatic ketone",
+        "smarts": "[#6][CX3](=O)[#6]"
+      },
+      {
+        "aliases": [],
+        "id": "ArCOR",
+        "metadata": {},
+        "name": "aromatic ketone",
+        "smarts": "c[CX3](=O)[#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Ketone",
+    "smarts": "[#6][CX3](=O)[#6]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": null,
+    "id": "rco2h_or_activated_acyl",
+    "members": [],
+    "metadata": {
+      "generated_from_token": "RCO2H or activated acyl",
+      "source": "legacy/reaction_types.json:Amide-coupling"
+    },
+    "name": "RCO2H or activated acyl",
+    "smarts": null
+  }
+]

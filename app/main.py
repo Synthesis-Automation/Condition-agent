@@ -58,7 +58,7 @@ from chemtools.exceptions import (
 
 # SCDB integration is now part of ChemTools v2.0 via chem.rules.*
 try:
-    from chemtools.rule_scdb_matcher import loader as scdb_loader
+    from chemtools.rule import loader as scdb_loader
     _HAS_SCDB = True
 except Exception:
     _HAS_SCDB = False

@@ -1,0 +1,124 @@
+[
+  {
+    "default_family_id": "mineral_acids",
+    "description": null,
+    "id": "acid",
+    "metadata": {
+      "taxonomy_file": "taxonomy_acid.json"
+    },
+    "name": "Acid",
+    "priority": 3
+  },
+  {
+    "default_family_id": "quaternary_ammonium_ptc",
+    "description": null,
+    "id": "additive",
+    "metadata": {
+      "taxonomy_file": "taxonomy_additive.json"
+    },
+    "name": "Additive",
+    "priority": 7
+  },
+  {
+    "default_family_id": "tertiary_amines_aliphatic",
+    "description": null,
+    "id": "base",
+    "metadata": {
+      "taxonomy_file": "taxonomy_base.json"
+    },
+    "name": "Base",
+    "priority": 2
+  },
+  {
+    "default_family_id": "carbodiimides",
+    "description": null,
+    "id": "condensation_agent",
+    "metadata": {
+      "taxonomy_file": "taxonomy_condensation_agent.json"
+    },
+    "name": "Condensation Agent",
+    "priority": 4
+  },
+  {
+    "default_family_id": null,
+    "description": null,
+    "id": "enzyme",
+    "metadata": {},
+    "name": "Enzyme",
+    "priority": 100
+  },
+  {
+    "default_family_id": "trialkyl_triaryl_phosphines",
+    "description": null,
+    "id": "ligand",
+    "metadata": {
+      "taxonomy_file": "taxonomy_ligand.json"
+    },
+    "name": "Ligand",
+    "priority": 0
+  },
+  {
+    "default_family_id": "pd_ii_salts",
+    "description": null,
+    "id": "metal_precursor",
+    "metadata": {
+      "taxonomy_file": "taxonomy_catalysts_precursor.json"
+    },
+    "name": "Metal Precursor",
+    "priority": 1
+  },
+  {
+    "default_family_id": null,
+    "description": null,
+    "id": "organo_catalyst",
+    "metadata": {},
+    "name": "Organo Catalyst",
+    "priority": 100
+  },
+  {
+    "default_family_id": "misc_general",
+    "description": null,
+    "id": "other_reagent",
+    "metadata": {},
+    "name": "Other Reagent",
+    "priority": 9
+  },
+  {
+    "default_family_id": "o2_gas",
+    "description": null,
+    "id": "oxidant",
+    "metadata": {
+      "taxonomy_file": "taxonomy_oxidant.json"
+    },
+    "name": "Oxidant",
+    "priority": 5
+  },
+  {
+    "default_family_id": null,
+    "description": null,
+    "id": "preformed_metal_catalyst",
+    "metadata": {},
+    "name": "Preformed Metal Catalyst",
+    "priority": 100
+  },
+  {
+    "default_family_id": "metal_powders",
+    "description": null,
+    "id": "reductant",
+    "metadata": {
+      "taxonomy_file": "taxonomy_reductant.json"
+    },
+    "name": "Reductant",
+    "priority": 6
+  },
+  {
+    "default_family_id": "hydrocarbons_aromatic",
+    "description": null,
+    "id": "solvent",
+    "metadata": {
+      "taxonomy_file": "taxonomy_solvent.json"
+    },
+    "name": "Solvent",
+    "priority": 8
+  }
+]
