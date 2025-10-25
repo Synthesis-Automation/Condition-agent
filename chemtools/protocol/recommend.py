@@ -34,6 +34,7 @@ from typing import Dict, Any, List, Optional
 import json
 
 from .indexer import ProtocolIndexer, ProtocolRecord
+from ..recommend.utils import friendly_family_label
 
 try:
     from ..output_formatter import format_meta, format_input, format_detection
@@ -229,11 +230,16 @@ class ProtocolRecommender:
                         status='error',
                         processing_time_ms=(time.time() - start_time) * 1000
                     ),
-                    'input': format_input(reaction_smiles=reaction_smiles),
+                    'input': format_input(
+                        reaction_smiles=reaction_smiles,
+                        detected_family='unknown',
+                        detected_family_label=friendly_family_label('unknown'),
+                    ),
                     'detection': format_detection(
                         detected_type='unknown',
                         confidence=None,
-                        method='protocol-similarity'
+                        method='protocol-similarity',
+                        family_label=friendly_family_label('unknown'),
                     ),
                     'recommended_conditions': [],
                     'extras': {'error': str(e)}
@@ -282,6 +288,7 @@ class ProtocolRecommender:
         
         if not candidates:
             processing_time_ms = (time.time() - start_time) * 1000
+            detected_type = reaction_family or 'unknown'
             
             if use_standard_format and HAS_OUTPUT_FORMATTER:
                 extras = {
@@ -300,12 +307,15 @@ class ProtocolRecommender:
                     ),
                     'input': format_input(
                         reaction_smiles=reaction_smiles,
-                        requested_reaction_type=reaction_family
+                        requested_reaction_type=reaction_family,
+                        detected_family=detected_type,
+                        detected_family_label=friendly_family_label(detected_type),
                     ),
                     'detection': format_detection(
-                        detected_type=reaction_family or 'unknown',
+                        detected_type=detected_type,
                         confidence=0.0,
-                        method='protocol-similarity'
+                        method='protocol-similarity',
+                        family_label=friendly_family_label(detected_type),
                     ),
                     'recommended_conditions': [],
                     'extras': extras
@@ -490,12 +500,15 @@ class ProtocolRecommender:
             'input': format_input(
                 reaction_smiles=reaction_smiles,
                 requested_reaction_type=reaction_family,
+                detected_family=detected_type,
+                detected_family_label=friendly_family_label(detected_type),
                 options={'k': len(top_matches), 'tags': tags} if tags else {'k': len(top_matches)}
             ),
             'detection': format_detection(
                 detected_type=detected_type,
                 confidence=detection_confidence,
-                method='protocol-similarity'
+                method='protocol-similarity',
+                family_label=friendly_family_label(detected_type),
             ),
             'recommended_conditions': recommended_conditions,
             'extras': extras

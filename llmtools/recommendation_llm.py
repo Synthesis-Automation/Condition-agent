@@ -17,6 +17,7 @@ import json
 import re
 from llmtools.clients import LLMClient
 from llmtools.prompts import MULTI_SOURCE_SYNTHESIS
+from chemtools.recommend.utils import friendly_family_label
 
 
 def _strip_markdown_fences(text: str) -> str:
@@ -319,7 +320,7 @@ def convert_llm_synthesis_to_standard_format(
     sources_used = synthesis_result.get("sources_used", {})
     
     # Detect reaction type from synthesis or fallback
-    detected_type = requested_type or "Unknown"
+    detected_type = requested_type or "unknown"
     
     # Extract confidence level
     confidence_level = synthesis.get("confidence_level", "medium")
@@ -367,11 +368,13 @@ def convert_llm_synthesis_to_standard_format(
             reaction_smiles=reaction_smiles,
             requested_reaction_type=requested_type,
             detected_family=detected_type,
+            detected_family_label=friendly_family_label(detected_type),
         ),
         "detection": format_detection(
             detected_type=detected_type,
             confidence=confidence_score,
             method="llm-multi-source",
+            family_label=friendly_family_label(detected_type),
         ),
         "recommended_conditions": recommendations,
         "extras": {

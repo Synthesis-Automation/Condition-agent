@@ -58,7 +58,13 @@ def detect_family(req: DetectFamilyRequest) -> Dict[str, Any]:
     if not req.reactants:
         raise ValidationError("Reactants list cannot be empty")
     
-    return chem.router.detect_family(req.reactants)
+    result = chem.router.detect_family(req.reactants)
+    if isinstance(result, dict):
+        label = friendly_family_label(result.get("family"))
+        if label:
+            result = dict(result)
+            result["family_label"] = label
+    return result
 
 
 def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
@@ -101,6 +107,11 @@ def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
     
     # Router-based family detection (always available)
     fallback = chem.router.detect_family(reactants)
+    if isinstance(fallback, dict):
+        fallback_label = friendly_family_label(fallback.get("family"))
+        if fallback_label:
+            fallback = dict(fallback)
+            fallback["family_label"] = fallback_label
     
     # Try rxn-insight if available
     auto = None
@@ -119,6 +130,15 @@ def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
         selected = auto.get("mapped_family") or fallback_family
     else:
         selected = fallback_family
+
+    selected_label = friendly_family_label(selected)
+
+    if isinstance(auto, dict):
+        mapped_family = auto.get("mapped_family")
+        label = friendly_family_label(mapped_family)
+        if label:
+            auto = dict(auto)
+            auto["family_label"] = label
     
     return {
         "input": {"reaction_smiles": norm.get("normalized") or rxn},
@@ -126,6 +146,7 @@ def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
         "rxn_insight": auto,
         "router_fallback": fallback,
         "selected_family": selected,
+        "selected_family_label": selected_label,
     }
 
 

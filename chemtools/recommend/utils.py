@@ -6,9 +6,11 @@ Helper functions for family normalization, reactant analysis, and constraint han
 
 from __future__ import annotations
 
-from typing import Dict, Any, List, Tuple
+from functools import lru_cache
+from typing import Dict, Any, List, Tuple, Optional
 
 from .. import constraints
+from ..taxonomy import load_registry
 
 
 # Family name normalization
@@ -89,17 +91,65 @@ def canonical_family(family: str | None) -> str:
     return _FAMILY_ALIASES.get(fam, fam)
 
 
+@lru_cache(maxsize=1)
+def _cached_registry():
+    try:
+        return load_registry()
+    except Exception:
+        return None
+
+
+def _taxonomy_family_label(family: str) -> Optional[str]:
+    registry = _cached_registry()
+    if registry is None:
+        return None
+    record = registry.get_reaction_type(family)
+    if record is not None:
+        return record.name
+    alias = registry.resolve_alias(family)
+    if alias and alias.entity_type == "reaction_type":
+        target = registry.get_reaction_type(alias.entity_id)
+        if target is not None:
+            return target.name
+    return None
+
+
 def friendly_family_label(family: str | None) -> Optional[str]:
     """
     Return a human-friendly label for a canonical reaction family.
     """
     if not family:
         return None
-    label = _FAMILY_LABELS.get(family)
+    fam = str(family).strip()
+    if not fam:
+        return None
+
+    # Try taxonomy lookups (exact, alias, and simple variants)
+    label = _taxonomy_family_label(fam)
     if label:
         return label
-    # Fallback: replace underscores with spaces and title-case
-    return str(family).replace("_", " ").title()
+
+    variants = {
+        fam.lower(),
+        fam.replace("_", " "),
+        fam.replace("_", "-"),
+        fam.replace("-", " "),
+    }
+    for candidate in variants:
+        candidate = candidate.strip()
+        if not candidate:
+            continue
+        label = _taxonomy_family_label(candidate)
+        if label:
+            return label
+
+    canonical = canonical_family(fam)
+    label = _FAMILY_LABELS.get(canonical) or _FAMILY_LABELS.get(fam)
+    if label:
+        return label
+
+    # Fallback: prettify canonical ID.
+    return canonical.replace("_", " ").replace("-", " ").title()
 
 
 def pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
