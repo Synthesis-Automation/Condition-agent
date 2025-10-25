@@ -13,7 +13,7 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 - **Protocol SMARTS tooling (`chemtools.protocol.smarts_generator_cli`)** to derive reaction SMARTS applicability patterns, guards, and visualisations for protocol curation and testing.
 - Explanation packs (`chemtools.explain`) that summarize precedents, alternatives, and rule hits for API and UI consumption.
 - **LLM integration (`llmtools`)** with multi-provider support (OpenAI, Aliyun/DeepSeek) for chemistry-specific agents and natural language processing.
-- **Reagent taxonomy and analytics (`chemtools.reagent`)** for CAS normalization, taxonomy storage/validation, and CLI-driven curation of reagent roles.
+- **Unified taxonomy (`chemtools.taxonomy`)** providing centralized reaction, reactant, and reagent-role classifications with validation helpers, feeding router/recommendation modules; reagent enrichment utilities remain available under `chemtools.reagent`.
 - **HTE simple recommender (`chemtools.recommend.hte_simple`)** providing deterministic condition suggestions from the standardized HTE z-score dataset shipped under `data/HTE_db`.
 - **HTE dataset tooling (`data-processor/HTE_data`)** to clean z-score exports, expand SMARTS coverage, benchmark the simple condition recommender, and ship scenario-focused pytest suites.
 - CLI utilities in `chemtools.rule.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
@@ -98,7 +98,8 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |   |   |-- indexer.py       # Protocol indexing with DRFP fingerprints
 |   |   |-- recommend.py     # DRFP similarity-based protocol recommendation
 |   |   `-- cli.py           # CLI for protocol index management
-|   |-- reagent/             # Reagent taxonomy store, analytics, and validation
+|   |-- taxonomy/            # Unified reaction/reactant/reagent taxonomy registry + validators
+|   |-- reagent/             # Reagent enrichment utilities and analytics (legacy helpers)
 |   |-- recommend/           # Modular recommendation engine and plate design
 |   |-- rule/                # Scheme Condition DB tooling
 |   |-- schema/              # JSON schema and validation utilities
@@ -165,7 +166,8 @@ See `docs/API_DOCUMENTATION.md` for detailed request examples and troubleshootin
 - `scripts/precompute_drfp.py`: build DRFP NPZ bundles (`make drfp-index`, `make drfp-index-4096`) to warm caches at API startup.
 - `scripts/ui_gradio.py`: launch the browser UI for manual testing of the recommendation workflow.
 - `test_protocol_cli.py`: interactive CLI for testing protocol recommendations with reaction SMILES input.
-- `python -m chemtools.reagent.taxonomy_cli`: curate the reagent taxonomy store, validate CAS metadata, and inspect taxonomy analytics.
+- `python -m chemtools.taxonomy.validate`: load and validate the unified taxonomy bundle (supports `--root` overrides and cache resets).
+- `python -m chemtools.reagent.taxonomy_cli`: reagent enrichment helper built atop the unified taxonomy (CAS lookups, family inspection).
 - `python data-processor/process_reactions.py --rdf <file.rdf> --txt <file.txt> --out <output.csv>`: convert paired SciFinder exports into the canonical reaction CSV schema.
 - `python data-processor/HTE_data/test_recommender.py`: interactive harness around the simple condition recommender plus coverage tests (see `data-processor/HTE_data/HOW_TO_TEST.md`).
 - `python data-processor/HTE_data/quick_test.py`: smoke-test five representative reaction scenarios against the z-score dataset.
@@ -185,7 +187,7 @@ Larger proprietary datasets should not be committed. Configure their paths via e
 
 `data-processor/` houses the standalone ingestion and high-throughput experiment (HTE) analysis stack:
 
-- Combine SciFinder TXT/RDF exports with `data-processor/process_reactions.py` (see `data-processor/README.md`) to generate normalized reaction CSVs and feed the reagent taxonomy pipeline.
+- Combine SciFinder TXT/RDF exports with `data-processor/process_reactions.py` (see `data-processor/README.md`) to generate normalized reaction CSVs and feed the unified taxonomy pipeline.
 - The `data-processor/HTE_data/` workspace ships SMARTS-based reactant classification, reaction/role taxonomies, z-score cleaning, and a simple condition recommender with focused pytest coverage (`test_recommender.py`, `test_category_coverage.py`, `test_smarts_on_samples.py`, etc.).
 - Markdown reports such as `SMARTS_SUMMARY.md`, `CONDITION_RECOMMENDATION_PROPOSAL.md`, and `ZSCORE_STANDARDIZATION_SUMMARY.md` capture dataset decisions—update them alongside code changes.
 - Follow `data-processor/HTE_data/HOW_TO_TEST.md` for quick smoke tests, interactive benchmarking, and full regression runs against the z-score dataset.
