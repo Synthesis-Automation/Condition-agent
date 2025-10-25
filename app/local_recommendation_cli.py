@@ -99,10 +99,6 @@ except ModuleNotFoundError:
     )
 
 
-if sys.platform == "win32":
-    # Ensure UTF-8 output when running in Windows terminals.
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 
 _ENV_SCDB_DEFAULT = (
@@ -472,6 +468,12 @@ def local_llm_synthesis(
 
 def main() -> None:
     """Main entry point with optional command-line arguments."""
+    if sys.platform == "win32" and os.environ.get("CHEMTOOLS_DISABLE_UTF8_STDIO") != "1":
+        if hasattr(sys.stdout, "buffer"):
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+        if hasattr(sys.stderr, "buffer"):
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
+
     parser = argparse.ArgumentParser(
         description="Local Recommendation Tester - Test ChemTools recommendation pipelines",
         formatter_class=argparse.RawDescriptionHelpFormatter,
