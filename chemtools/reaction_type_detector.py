@@ -17,7 +17,7 @@ Returned dict (best-effort):
   "success": bool,               # Whether a classification was obtained
   "rxn_class": str | None,       # Broad class (e.g., "C-C Coupling")
   "rxn_name": str | None,        # Specific name (e.g., "Suzuki coupling with boronic acids")
-  "mapped_family": str | None,   # Mapped to chemtools family (e.g., "Suzuki_CC")
+  "mapped_family": str | None,   # Canonical taxonomy reaction type ID (e.g., "suzuki_miyaura")
   "confidence": float | None,    # If provided or inferred
     "raw": any,                    # Raw object from rxn_insight for debugging
     "catalysts": list[str]         # Metals inferred from agents (if any)
@@ -35,11 +35,29 @@ except Exception:
 try:
     # Use our own helpers to parse reactants and apply simple functional-group hits
     from .smiles import normalize_reaction as _norm_rxn  # type: ignore
-    from .router import _rule_hits as _hits, _detect_agent_metals as _agent_metals  # type: ignore
+    from .router import (  # type: ignore
+        _rule_hits as _hits,
+        _detect_agent_metals as _agent_metals,
+        resolve_reaction_family as _resolve_family,
+    )
 except Exception:
     _norm_rxn = None  # type: ignore
     _hits = None  # type: ignore
     _agent_metals = None  # type: ignore
+    def _resolve_family(value: Optional[str]):  # type: ignore
+        return value
+
+
+def _resolve_family_safe(label: Optional[str]) -> Optional[str]:
+    try:
+        resolved = _resolve_family(label)
+    except Exception:
+        resolved = None
+    if resolved:
+        return resolved
+    if label and label not in {"Unknown", "unknown"}:
+        return label
+    return None
 
 
 def is_available() -> bool:
@@ -142,6 +160,8 @@ def _map_to_family(rxn_class: Optional[str], rxn_name: Optional[str]) -> Optiona
     c = (rxn_class or "").lower()
     n = (rxn_name or "").lower()
 
+    alias: Optional[str] = None
+
     # C-N couplings (Buchwald–Hartwig, Ullmann–Goldberg, Chan–Lam etc.)
     if (
         "heteroatom alkylation" in c
@@ -149,20 +169,22 @@ def _map_to_family(rxn_class: Optional[str], rxn_name: Optional[str]) -> Optiona
         or ("n-arylation" in n)
         or ("buchwald" in n or "hartwig" in n or "ullmann" in n or "goldberg" in n or "chan-lam" in n)
     ):
-        return "Ullmann_CN"
+        alias = "Ullmann_CN"
 
     # Suzuki C–C coupling
-    if ("c-c coupling" in c and "suzuki" in n) or ("suzuki" in n):
-        return "Suzuki_CC"
+    elif ("c-c coupling" in c and "suzuki" in n) or ("suzuki" in n):
+        alias = "Suzuki_CC"
 
     # Other C–C couplings could be added here as families become supported
 
     # Amide formation (acylation)
-    if ("acylation" in c or "amide" in n) and (
+    elif ("acylation" in c or "amide" in n) and (
         "carboxylic acid" in n or "amine" in n or "amide" in n
     ):
-        return "Amide_Coupling"
+        alias = "Amide_Coupling"
 
+    if alias:
+        return _resolve_family_safe(alias)
     return None
 
 
@@ -176,7 +198,7 @@ def _refine_cn_family(
         return mapped, rxn_name
 
     cn_related = bool(
-        (mapped in {"Ullmann_CN", "Buchwald_CN"})
+        (mapped in {"cn_coupling", "ullmann_cn", "buchwald_hartwig_c_n"})
         or (rxn_class and "heteroatom" in rxn_class.lower())
         or (rxn_name and any(token in rxn_name.lower() for token in ("buchwald", "hartwig", "ullmann", "amination")))
     )
@@ -184,26 +206,33 @@ def _refine_cn_family(
         return mapped, rxn_name
 
     if "Pd" in catalysts:
-        mapped = "Buchwald_CN"
-        if not rxn_name or "buchwald" not in rxn_name.lower():
-            rxn_name = (rxn_name or "Buchwald-Hartwig C–N coupling")
-    elif "Cu" in catalysts and (mapped in {None, "Unknown", "Ullmann_CN"}):
-        mapped = "Ullmann_CN"
-        if not rxn_name or "ullmann" not in rxn_name.lower():
-            rxn_name = rxn_name or "Ullmann/Golberg C–N coupling"
+        override = _resolve_family_safe("Buchwald_CN")
+        if override:
+            mapped = override
+            if not rxn_name or "buchwald" not in rxn_name.lower():
+                rxn_name = rxn_name or "Buchwald-Hartwig C–N coupling"
+    elif "Cu" in catalysts and (mapped is None or mapped in {"Unknown", "cn_coupling"}):
+        override = _resolve_family_safe("Ullmann_CN")
+        if override:
+            mapped = override
+            if not rxn_name or "ullmann" not in rxn_name.lower():
+                rxn_name = rxn_name or "Ullmann/Golberg C–N coupling"
 
     return mapped, rxn_name
 
 
 def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
-    """Detect reaction type using rxn_insight, mapping to chemtools family.
-
-    Always returns a dict; falls back to {available: False, success: False}
-    when rxn_insight is not installed or classification fails.
-    """
-    avail = is_available()
-    if not avail:
-        return {"available": False, "success": False, "rxn_class": None, "rxn_name": None, "mapped_family": None, "confidence": None, "raw": None}
+    """Detect reaction type using rxn_insight, returning canonical taxonomy families."""
+    if not is_available():
+        return {
+            "available": False,
+            "success": False,
+            "rxn_class": None,
+            "rxn_name": None,
+            "mapped_family": None,
+            "confidence": None,
+            "raw": None,
+        }
 
     norm = _norm_rxn(reaction_smiles) if _norm_rxn else None
     catalysts: Set[str] = set()
@@ -215,57 +244,59 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
 
     raw = _call_insight(reaction_smiles)
     rxn_class, rxn_name, conf = _extract_fields(raw)
-    mapped = _map_to_family(rxn_class, rxn_name)
+    mapped_family = _map_to_family(rxn_class, rxn_name)
 
     # If no mapping yet, try ReactionClassifier + lightweight heuristics
-    if not mapped and _HAS_RC:
+    if not mapped_family and _HAS_RC:
         try:
             rc = ReactionClassifier(reaction_smiles)  # type: ignore[call-arg]
-            # Populate internal flags
             try:
                 rc.classify_reaction()
             except Exception:
                 pass
-            # Derive broad class
-            if getattr(rc, 'is_cc_coupling')() if hasattr(rc, 'is_cc_coupling') else False:  # type: ignore[misc]
-                rxn_class = rxn_class or 'C-C Coupling'
-                # Use boron presence to identify Suzuki when possible
+
+            if getattr(rc, "is_cc_coupling")() if hasattr(rc, "is_cc_coupling") else False:  # type: ignore[misc]
+                rxn_class = rxn_class or "C-C Coupling"
                 boron = False
                 try:
                     if norm is None and _norm_rxn:
                         norm = _norm_rxn(reaction_smiles)
                     if norm and _hits:
                         reactants = [
-                            (r.get('smiles_norm') or r.get('largest_smiles') or r.get('input') or '')
-                            for r in (norm.get('reactants') or [])
+                            (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
+                            for r in (norm.get("reactants") or [])
                         ]
                         reactants = [s for s in reactants if s]
-                        h = _hits(reactants)
-                        boron = bool(h.get('boron'))
+                        boron = bool(_hits(reactants).get("boron"))
                 except Exception:
                     boron = False
                 if boron:
-                    rxn_name = rxn_name or 'Suzuki coupling with boronic acids'
-                    mapped = mapped or 'Suzuki_CC'
-            elif getattr(rc, 'is_heteroatom_alkylation')() if hasattr(rc, 'is_heteroatom_alkylation') else False:  # type: ignore[misc]
-                rxn_class = rxn_class or 'Heteroatom Alkylation and Arylation'
-                mapped = mapped or 'Ullmann_CN'
-            elif getattr(rc, 'is_acylation')() if hasattr(rc, 'is_acylation') else False:  # type: ignore[misc]
-                rxn_class = rxn_class or 'Acylation'
-                mapped = mapped or 'Amide_Coupling'
+                    rxn_name = rxn_name or "Suzuki coupling with boronic acids"
+                    mapped_family = _resolve_family_safe("Suzuki_CC")
+            elif getattr(rc, "is_heteroatom_alkylation")() if hasattr(rc, "is_heteroatom_alkylation") else False:  # type: ignore[misc]
+                rxn_class = rxn_class or "Heteroatom Alkylation and Arylation"
+                mapped_family = mapped_family or _resolve_family_safe("Ullmann_CN")
+            elif getattr(rc, "is_acylation")() if hasattr(rc, "is_acylation") else False:  # type: ignore[misc]
+                rxn_class = rxn_class or "Acylation"
+                mapped_family = mapped_family or _resolve_family_safe("Amide_Coupling")
         except Exception:
             pass
 
     if catalysts:
-        mapped, rxn_name = _refine_cn_family(mapped, rxn_name, rxn_class, catalysts)
+        mapped_family, rxn_name = _refine_cn_family(
+            mapped_family,
+            rxn_name,
+            rxn_class,
+            catalysts,
+        )
 
-    success = bool(rxn_class or rxn_name or mapped)
+    success = bool(rxn_class or rxn_name or mapped_family)
     return {
         "available": True,
         "success": success,
         "rxn_class": rxn_class,
         "rxn_name": rxn_name,
-        "mapped_family": mapped,
+        "mapped_family": mapped_family,
         "confidence": conf,
         "raw": raw,
         "catalysts": sorted(catalysts) if catalysts else [],

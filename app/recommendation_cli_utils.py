@@ -21,9 +21,9 @@ FUSION_VARIANTS_DEFAULT = 5
 # Note: C-N coupling is now unified - metal preference is handled via constraints
 REACTION_TYPE_CHOICES: Tuple[Tuple[str, Optional[str]], ...] = (
     ("Auto-detect (server decides)", None),
-    ("Suzuki Coupling", "Suzuki"),
-    ("C–N Coupling (unified)", "C_N_Coupling"),
-    ("Amide Formation", "Amide_formation"),
+    ("Suzuki Coupling", "suzuki_miyaura"),
+    ("C–N Coupling (unified)", "cn_coupling"),
+    ("Amide Formation", "amide_coupling"),
 )
 
 # Catalyst options for C-N coupling reactions
@@ -499,7 +499,7 @@ def summarize_llm_synthesis(data: Dict[str, Any]) -> None:
         print(f"\n  WARNINGS ({len(warnings)}):")
         for warning in warnings[:3]:  # Show top 3 warnings
             warn_text = warning if len(warning) < 100 else warning[:97] + "..."
-            print(f"    �?{warn_text}")
+            print(f"    ?{warn_text}")
     
     # Print consensus analysis (brief)
     consensus = synthesis.get("consensus_analysis", {})

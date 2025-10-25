@@ -54,6 +54,7 @@ def format_input(
     reaction_smiles: str,
     requested_reaction_type: Optional[str] = None,
     detected_family: Optional[str] = None,
+    detected_family_label: Optional[str] = None,
     constraints: Optional[Dict[str, Any]] = None,
     options: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
@@ -76,6 +77,8 @@ def format_input(
     
     if detected_family:
         input_data["family"] = detected_family
+        if detected_family_label:
+            input_data["family_label"] = detected_family_label
     
     if requested_reaction_type:
         input_data["requested_reaction_type"] = requested_reaction_type
@@ -92,9 +95,10 @@ def format_input(
 
 
 def format_detection(
-    detected_type: str,
+    detected_type: Optional[str],
     confidence: Optional[float],
     method: str = "auto",
+    family_label: Optional[str] = None,
     alternatives: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """

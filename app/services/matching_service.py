@@ -9,6 +9,7 @@ This service handles:
 
 from typing import Dict, Any, List
 from chemtools import chem
+from chemtools.recommend.utils import friendly_family_label
 from chemtools.contracts import NormalizeRequest, DetectFamilyRequest, DetectTypeRequest
 from chemtools.exceptions import ValidationError
 
@@ -112,10 +113,12 @@ def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
     
     # Select best family
     selected = None
+    fallback_family = fallback.get("family")
+
     if isinstance(auto, dict) and (auto.get("mapped_family") or auto.get("success")):
-        selected = auto.get("mapped_family") or fallback.get("family")
+        selected = auto.get("mapped_family") or fallback_family
     else:
-        selected = fallback.get("family")
+        selected = fallback_family
     
     return {
         "input": {"reaction_smiles": norm.get("normalized") or rxn},

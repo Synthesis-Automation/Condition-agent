@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Dict, Any, List, Optional, Tuple
 from collections import Counter
 
+from ..utils import friendly_family_label
 from .precedent_builder import build_precedent_details
 
 
@@ -362,9 +363,11 @@ def build_formatted_output(
         "input": {
             "reaction_smiles": norm.get("normalized") or reaction,
             "family": fam,
+            "family_label": friendly_family_label(fam),
         },
         "detection": {
             "family": fam,
+            "family_label": friendly_family_label(fam),
             "confidence": round(float(conf), 3),
         },
         "recommended_conditions": variants,
@@ -375,3 +378,18 @@ def build_formatted_output(
         },
         "precedents_used": build_precedent_details(precs, chosen_core, group),
     }
+FAMILY_LABELS = {
+    "cn_coupling": "C–N Coupling",
+    "buchwald_hartwig_c_n": "Buchwald–Hartwig C–N Coupling",
+    "ullmann_cn": "Ullmann C–N Coupling",
+    "chan_lam_cn": "Chan–Lam Coupling",
+    "co_coupling": "C–O Coupling",
+    "ullmann_ether": "Ullmann Ether Synthesis",
+    "cs_coupling": "C–S Coupling",
+    "suzuki_miyaura": "Suzuki–Miyaura Coupling",
+    "negishi": "Negishi Coupling",
+    "sonogashira": "Sonogashira Coupling",
+    "stille": "Stille Coupling",
+    "heck": "Heck Reaction",
+    "amide_coupling": "Amide Formation",
+}

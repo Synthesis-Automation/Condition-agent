@@ -17,6 +17,10 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "Suzuki_CC": "Suzuki",
     "Suzuki_Coupling": "Suzuki",
     "Suzuki": "Suzuki",
+    "suzuki_miyaura": "Suzuki",
+    "negishi": "Negishi",
+    "stille": "Stille",
+    "heck": "Heck",
     # C-N Coupling variants -> unified canonical dataset name
     "Ullmann C?N": "C_N_Coupling",
     "Ullmann_CN": "C_N_Coupling",
@@ -28,17 +32,44 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "C_N_Coupling_Cu_Ullmann": "C_N_Coupling",
     "C_N_Coupling_Pd_Buchwald": "C_N_Coupling",
     "C_N_Coupling": "C_N_Coupling",
+    "cn_coupling": "C_N_Coupling",
+    "buchwald_hartwig_c_n": "C_N_Coupling",
+    "ullmann_cn": "C_N_Coupling",
+    "chan_lam_cn": "C_N_Coupling",
     # C-O Coupling variants -> canonical dataset name
     "C_O_Coupling": "C_O_Coupling",
     "Ullmann_CO": "C_O_Coupling",
     "Ullmann C?O": "C_O_Coupling",
+    "co_coupling": "C_O_Coupling",
+    "ullmann_ether": "C_O_Coupling",
     # C-S Coupling variants -> canonical dataset name
     "C_S_Coupling": "C_S_Coupling",
     "Ullmann_CS": "C_S_Coupling",
     "Ullmann C?S": "C_S_Coupling",
+    "cs_coupling": "C_S_Coupling",
+    # Sonogashira variants
+    "Sonogashira_CC": "Sonogashira_CC",
+    "sonogashira": "Sonogashira_CC",
     # Amide variants -> canonical dataset name
     "Amide_Coupling": "Amide_formation",
     "Amide_formation": "Amide_formation",
+    "amide_coupling": "Amide_formation",
+}
+
+_FAMILY_LABELS: Dict[str, str] = {
+    "cn_coupling": "C–N Coupling",
+    "buchwald_hartwig_c_n": "Buchwald–Hartwig C–N Coupling",
+    "ullmann_cn": "Ullmann C–N Coupling",
+    "chan_lam_cn": "Chan–Lam Coupling",
+    "co_coupling": "C–O Coupling",
+    "ullmann_ether": "Ullmann Ether Synthesis",
+    "cs_coupling": "C–S Coupling",
+    "suzuki_miyaura": "Suzuki–Miyaura Coupling",
+    "negishi": "Negishi Coupling",
+    "sonogashira": "Sonogashira Coupling",
+    "stille": "Stille Coupling",
+    "heck": "Heck Reaction",
+    "amide_coupling": "Amide Formation",
 }
 
 
@@ -56,6 +87,19 @@ def canonical_family(family: str | None) -> str:
         return "Unknown"
     fam = str(family).strip()
     return _FAMILY_ALIASES.get(fam, fam)
+
+
+def friendly_family_label(family: str | None) -> Optional[str]:
+    """
+    Return a human-friendly label for a canonical reaction family.
+    """
+    if not family:
+        return None
+    label = _FAMILY_LABELS.get(family)
+    if label:
+        return label
+    # Fallback: replace underscores with spaces and title-case
+    return str(family).replace("_", " ").title()
 
 
 def pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
