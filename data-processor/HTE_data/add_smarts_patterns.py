@@ -1,14 +1,20 @@
 """
 Add SMARTS patterns to reactant_types.json for automatic detection.
 
-This script reads the current reactant_types.json and adds SMARTS patterns
-to each member type for automatic substrate classification.
+This script reads the canonical ChemTools reactant_types.json and adds SMARTS
+patterns to each member type for automatic substrate classification.
 """
 
 import json
 
+from chemtools.reagent import (
+    clear_reactant_type_cache,
+    get_reactant_types_file,
+)
+
 # Load existing reactant types
-with open('data-processor/other_data/reactant_types.json', 'r', encoding='utf-8') as f:
+REACTANT_TYPES_PATH = get_reactant_types_file()
+with open(REACTANT_TYPES_PATH, 'r', encoding='utf-8') as f:
     reactant_types = json.load(f)
 
 # SMARTS patterns for each member type
@@ -182,7 +188,7 @@ for category, data in reactant_types.items():
             missing_patterns.append(f"{category}/{member_id}")
 
 # Save updated reactant_types.json
-with open('data-processor/other_data/reactant_types.json', 'w', encoding='utf-8') as f:
+with open(REACTANT_TYPES_PATH, 'w', encoding='utf-8') as f:
     json.dump(reactant_types, f, indent=2, ensure_ascii=False)
 
 print(f"✅ Updated {updated_count} members with SMARTS patterns")
@@ -196,4 +202,7 @@ if missing_patterns:
 else:
     print("\n✅ All members have SMARTS patterns!")
 
-print("\n📁 Updated: data-processor/other_data/reactant_types.json")
+print(f"\n📁 Updated: {REACTANT_TYPES_PATH}")
+
+# Ensure downstream imports pick up the changes
+clear_reactant_type_cache()

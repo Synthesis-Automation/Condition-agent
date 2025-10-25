@@ -12,11 +12,14 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 - **Protocol recommendation (`chemtools.protocol`)** powered by DRFP similarity search over experimental protocols with automatic condition extraction and standard JSON output.
 - Explanation packs (`chemtools.explain`) that summarize precedents, alternatives, and rule hits for API and UI consumption.
 - **LLM integration (`llmtools`)** with multi-provider support (OpenAI, Aliyun/DeepSeek) for chemistry-specific agents and natural language processing.
+- **Reagent taxonomy and analytics (`chemtools.reagent`)** for CAS normalization, taxonomy storage/validation, and CLI-driven curation of reagent roles.
+- **HTE dataset tooling (`data-processor/HTE_data`)** to clean z-score exports, expand SMARTS coverage, benchmark the simple condition recommender, and ship scenario-focused pytest suites.
 - CLI utilities in `chemtools.rule_scdb_matcher.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
 
 ## Quickstart
 
 ### Environment setup
+
 
 ```bash
 # macOS / Linux
@@ -75,53 +78,55 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |-- app/                     # FastAPI application wiring
 |   |-- main.py              # REST endpoints and request orchestration
 |   `-- ui_gradio.py         # Optional Gradio front-end
-|-- chemtools/               # Core deterministic libraries
+|-- chemtools/               # Core deterministic libraries and analytics
 |   |-- contracts.py         # Typed request/response dataclasses
+|   |-- context.py           # Unified ChemTools API (chem.* namespace)
 |   |-- condition_core.py    # Legacy core selection logic (compat shim)
 |   |-- constraints.py       # Constraint rule definitions
-|   |-- context.py           # Unified ChemTools API (chem.* namespace)
+|   |-- dataset_analytics.py # Dataset profiling helpers for precedents/HTE
 |   |-- explain.py           # Explanation and rationale builders
-|   |-- output_formatter.py  # Standard JSON output formatting for all recommendation modes
+|   |-- output_formatter.py  # Standard JSON output formatting shared across engines
+|   |-- formatters/          # Shared output formatters for rule/ML/protocol
 |   |-- features/            # Role-aware feature engineering
 |   |-- featurizers/         # Molecule and reaction featurizers for C-N coupling
 |   |   `-- molecular.py     # C-N coupling substrate featurization (Ullmann, Buchwald, etc.)
+|   |-- integrations/        # External connectors (MolPipeline, MCP envelopes)
 |   |-- ml/                  # Optional ML models (DRFP predictor, fusion)
 |   |-- precedent/           # Precedent search, similarity, and loaders
 |   |-- protocol/            # Protocol recommendation (DRFP-based protocol search)
 |   |   |-- indexer.py       # Protocol indexing with DRFP fingerprints
 |   |   |-- recommend.py     # DRFP similarity-based protocol recommendation
 |   |   `-- cli.py           # CLI for protocol index management
+|   |-- reagent/             # Reagent taxonomy store, analytics, and validation
 |   |-- recommend/           # Modular recommendation engine and plate design
 |   |-- rule_scdb_matcher/   # Scheme Condition DB tooling
-|   |-- router.py            # Reaction family detection and dispatch
+|   |-- schema/              # JSON schema and validation utilities
 |   |-- smiles.py            # Reaction SMILES utilities
-|   `-- util/                # Shared utilities
-|       |-- functional_groups.py  # Comprehensive functional group detection (80+ groups)
-|       |-- rdkit_helpers.py      # RDKit integration with graceful fallbacks
-|       `-- drfp_storage.py       # DRFP fingerprint caching
+|   `-- util/                # Shared utilities (functional groups, RDKit fallbacks, DRFP caching)
 |-- data/                    # Sample datasets (JSONL) used in demos/tests
 |   |-- protocol_db/         # Experimental protocol JSON files (Structured_Output_schema.json format)
 |   |   `-- .protocol_index.json  # Protocol index with precomputed DRFP fingerprints
 |   |-- registry_sample.jsonl     # Reagent registry snippets for CLI demo mode
 |   `-- reactions_sample.jsonl    # Compact reaction precedent data set for smoke testing
-|-- data-processor/          # QT utilities for reagent taxonomy demos
-|   `-- requirements.txt     # Data processor specific dependencies
-|-- docs/                    # Project documentation (this README lives here)
+|-- data-processor/          # Standalone ingestion + HTE analytics tooling
+|   |-- README.md            # SciFinder processor quick start
+|   |-- process_reactions.py # Merge SciFinder TXT/RDF exports into CSV
+|   `-- HTE_data/            # SMARTS classification, z-score cleanup, tests, docs
+|-- docs/                    # Project documentation (developer + protocol guides)
 |   |-- API_DOCUMENTATION.md      # Endpoint details and example payloads
 |   |-- PROTOCOL_MODULE.md        # Protocol module technical documentation
 |   |-- PROTOCOL_OUTPUT_FORMAT.md # Protocol standard JSON output specification
 |   |-- PROTOCOL_QUICKSTART.md    # Protocol module 2-minute quick start
 |   |-- PROTOCOL_CLI_GUIDE.md     # Interactive CLI user guide
-|   |-- PROTOCOL_README.md        # Protocol module overview
+|   |-- README.md                 # Project overview (this file)
 |   `-- requirements.txt          # Documentation build dependencies
 |-- llmtools/                # LLM integration for advanced operations
 |   |-- clients.py           # Multi-provider LLM client (OpenAI, Aliyun/DeepSeek)
 |   |-- agents.py            # Chemistry-specific LLM agents
 |   `-- prompts.py           # Prompt templates for chemistry tasks
+|-- results/                 # Generated analysis markdown/exports (checked-in samples)
 |-- scripts/                 # Developer helpers and DRFP precompute scripts
-|-- tests/                   # Pytest suite covering API and core modules
-|   |-- test_protocol_recommendation.py  # Protocol module tests
-|   `-- test_protocol_cli.py             # Interactive protocol CLI tester
+|-- tests/                   # Pytest suite covering API, precedents, and integrations
 |-- requirements.txt         # Main production dependencies
 |-- requirements-dev.txt     # Development and testing tools (NEW)
 |-- FUNCTIONAL_GROUPS_GUIDE.md   # Functional groups detection user guide (NEW)
@@ -157,6 +162,10 @@ See `docs/API_DOCUMENTATION.md` for detailed request examples and troubleshootin
 - `scripts/precompute_drfp.py`: build DRFP NPZ bundles (`make drfp-index`, `make drfp-index-4096`) to warm caches at API startup.
 - `scripts/ui_gradio.py`: launch the browser UI for manual testing of the recommendation workflow.
 - `test_protocol_cli.py`: interactive CLI for testing protocol recommendations with reaction SMILES input.
+- `python -m chemtools.reagent.taxonomy_cli`: curate the reagent taxonomy store, validate CAS metadata, and inspect taxonomy analytics.
+- `python data-processor/process_reactions.py --rdf <file.rdf> --txt <file.txt> --out <output.csv>`: convert paired SciFinder exports into the canonical reaction CSV schema.
+- `python data-processor/HTE_data/test_recommender.py`: interactive harness around the simple condition recommender plus coverage tests (see `data-processor/HTE_data/HOW_TO_TEST.md`).
+- `python data-processor/HTE_data/quick_test.py`: smoke-test five representative reaction scenarios against the z-score dataset.
 
 ## Data and Sample Assets
 
@@ -169,11 +178,21 @@ The project ships with small JSONL samples in `data/` to keep demos deterministi
 
 Larger proprietary datasets should not be committed. Configure their paths via environment variables or local overrides.
 
+## HTE Dataset Tooling
+
+`data-processor/` houses the standalone ingestion and high-throughput experiment (HTE) analysis stack:
+
+- Combine SciFinder TXT/RDF exports with `data-processor/process_reactions.py` (see `data-processor/README.md`) to generate normalized reaction CSVs and feed the reagent taxonomy pipeline.
+- The `data-processor/HTE_data/` workspace ships SMARTS-based reactant classification, reaction/role taxonomies, z-score cleaning, and a simple condition recommender with focused pytest coverage (`test_recommender.py`, `test_category_coverage.py`, `test_smarts_on_samples.py`, etc.).
+- Markdown reports such as `SMARTS_SUMMARY.md`, `CONDITION_RECOMMENDATION_PROPOSAL.md`, and `ZSCORE_STANDARDIZATION_SUMMARY.md` capture dataset decisions—update them alongside code changes.
+- Follow `data-processor/HTE_data/HOW_TO_TEST.md` for quick smoke tests, interactive benchmarking, and full regression runs against the z-score dataset.
+
 ## Testing and QA
 
 - Run `pytest -q` locally before submitting changes. The suite covers API contracts (`tests/test_*_api.py`) and domain logic (`tests/test_*.py`).
 - Add new tests near the affected modules and use fixtures defined in `tests/conftest.py`.
 - For API changes, regenerate or update examples in `docs/API_DOCUMENTATION.md` and the Suzuki/Fusion test guides under `docs/`.
+- When touching `data-processor/` workflows, follow `data-processor/HTE_data/HOW_TO_TEST.md` and execute the focused pytest modules (e.g., `pytest data-processor/HTE_data/test_recommender.py`) to keep recommender diagnostics green.
 
 ## Environment Toggles
 
@@ -293,6 +312,9 @@ See `docs/PROTOCOL_MODULE.md` for complete documentation, or `docs/PROTOCOL_QUIC
 - `docs/PROTOCOL_OUTPUT_FORMAT.md`: detailed specification of the standard JSON output format used by protocol recommendations.
 - `docs/PROTOCOL_QUICKSTART.md`: 2-minute quick start guide for the protocol module.
 - `docs/PROTOCOL_CLI_GUIDE.md`: user guide for the interactive protocol CLI tester.
+- `data-processor/README.md`: SciFinder TXT/RDF processing and registry enrichment workflow.
+- `data-processor/HTE_data/HOW_TO_TEST.md`: testing matrix for the simple condition recommender and SMARTS coverage.
+- `AGENTS.md`: overview of the chemistry-focused LLM agents and workflows.
 - `FUNCTIONAL_GROUPS_GUIDE.md`: comprehensive guide for functional group detection API (80+ groups).
 - `REQUIREMENTS_GUIDE.md`: installation guide and dependency troubleshooting.
 - `chemtools/contracts.py`: authoritative source for all request and response schemas.

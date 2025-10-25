@@ -75,6 +75,32 @@ from .analytics import (
     print_missing_data_report,
 )
 
+# Reactant/reaction type taxonomy utilities
+from .types import (
+    ReactantMatch,
+    get_reactant_type_definitions,
+    get_reactant_types_file,
+    clear_reactant_type_cache,
+    build_reactant_lookup,
+    normalize_reactant_identifier,
+    reactant_category_for,
+    classify_reactant_smiles,
+    classify_reactant_category,
+    classify_reactant_group,
+    classify_reactant_batch,
+    get_reactant_category_matches,
+    get_all_reactant_matches,
+    get_reaction_type_definitions,
+    get_reaction_types_file,
+    clear_reaction_type_cache,
+    list_reaction_type_ids,
+    build_reaction_lookup,
+    describe_reaction_type,
+    normalize_reaction_type,
+    iter_reactions_for_category,
+    required_reactant_categories,
+)
+
 __all__ = [
     # Runtime lookup
     "find_reagent",
@@ -117,4 +143,27 @@ __all__ = [
     "print_database_summary",
     "print_role_summary",
     "print_missing_data_report",
+    # Reactant/reaction taxonomy
+    "ReactantMatch",
+    "get_reactant_type_definitions",
+    "get_reactant_types_file",
+    "clear_reactant_type_cache",
+    "build_reactant_lookup",
+    "normalize_reactant_identifier",
+    "reactant_category_for",
+    "classify_reactant_smiles",
+    "classify_reactant_category",
+    "classify_reactant_group",
+    "classify_reactant_batch",
+    "get_reactant_category_matches",
+    "get_all_reactant_matches",
+    "get_reaction_type_definitions",
+    "get_reaction_types_file",
+    "clear_reaction_type_cache",
+    "list_reaction_type_ids",
+    "build_reaction_lookup",
+    "describe_reaction_type",
+    "normalize_reaction_type",
+    "iter_reactions_for_category",
+    "required_reactant_categories",
 ]

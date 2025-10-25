@@ -1,19 +1,20 @@
-"""Automatically fix reactants field in reaction_types.json to reference reactant_types.json properly."""
+"""Automatically fix reactants field in the reaction taxonomy to reference the canonical reactant types."""
 
 import json
-from pathlib import Path
 import re
+from pathlib import Path
+
+from chemtools.reagent import (
+    clear_reaction_type_cache,
+    get_reaction_type_definitions,
+    get_reaction_types_file,
+    get_reactant_type_definitions,
+)
 
 def load_json_files():
-    """Load both JSON files."""
-    base_path = Path(__file__).parent
-    
-    with open(base_path / "reaction_types.json", 'r', encoding='utf-8') as f:
-        reaction_types = json.load(f)
-    
-    with open(base_path / "reactant_types.json", 'r', encoding='utf-8') as f:
-        reactant_types = json.load(f)
-    
+    """Load both JSON taxonomies from chemtools.reagent."""
+    reaction_types = get_reaction_type_definitions()
+    reactant_types = get_reactant_type_definitions()
     return reaction_types, reactant_types
 
 def get_reactant_mapping():
@@ -182,7 +183,7 @@ def normalize_reactants(reaction_types, mapping):
 
 def save_reaction_types(reaction_types):
     """Save the updated reaction types JSON."""
-    output_path = Path(__file__).parent / "reaction_types_UPDATED.json"
+    output_path = get_reaction_types_file().with_name("reaction_types_UPDATED.json")
     
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(reaction_types, f, indent=2, ensure_ascii=False)
@@ -208,5 +209,8 @@ if __name__ == "__main__":
         print(f"  New: {change['new']}")
     
     output_path = save_reaction_types(reaction_types)
+    target_file = get_reaction_types_file()
     print(f"\n\nUpdated reaction_types saved to: {output_path}")
-    print("\nPlease review the changes, then rename to reaction_types.json if satisfied.")
+    print(f"Target canonical file: {target_file}")
+    print("Rename the updated file to reaction_types.json and replace the canonical file after review.")
+    clear_reaction_type_cache()
