@@ -1,9 +1,20 @@
-from typing import List, Dict, Any, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 import re
 
-from .taxonomy import load_registry
-from .taxonomy.registry import TaxonomyRegistry
+from .analysis.reactions import (
+    AMIDE_FAMILIES_CANONICAL,
+    BUCHWALD_SPECIFIC_CANONICAL,
+    CN_FAMILIES_CANONICAL,
+    CO_FAMILIES_CANONICAL,
+    CS_FAMILIES_CANONICAL,
+    SONOGASHIRA_FAMILIES_CANONICAL,
+    SUZUKI_FAMILIES_CANONICAL,
+    ULLMANN_SPECIFIC_CANONICAL,
+    apply_catalyst_override,
+    canonical_family_label,
+    resolve_reaction_family as _resolve_reaction_family,
+)
 from .util.rdkit_helpers import rdkit_available, parse_smiles
 from .smiles import normalize_reaction as _normalize_reaction
 
@@ -39,80 +50,10 @@ def _compile_smarts():
 
 _SMARTS = _compile_smarts()
 
-_TAXONOMY_CACHE: Optional[TaxonomyRegistry] = None
-_TAXONOMY_LOAD_FAILED = False
-
-_FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
-    "C_N_Coupling": "cn_coupling",
-    "Buchwald_CN": "buchwald_hartwig_c_n",
-    "Ullmann_CN": "ullmann_cn",
-    "Chan_Lam_CN": "chan_lam_cn",
-    "C_O_Coupling": "co_coupling",
-    "Ullmann_CO": "ullmann_ether",
-    "C_S_Coupling": "cs_coupling",
-    "Suzuki_CC": "suzuki_miyaura",
-    "Negishi": "negishi",
-    "Sonogashira_CC": "sonogashira",
-    "Stille": "stille",
-    "Heck": "heck",
-    "Amide_Coupling": "amide_coupling",
-}
-
-_CN_FAMILIES_CANONICAL = {"cn_coupling", "buchwald_hartwig_c_n", "ullmann_cn", "chan_lam_cn"}
-_CO_FAMILIES_CANONICAL = {"co_coupling", "ullmann_ether"}
-_CS_FAMILIES_CANONICAL = {"cs_coupling"}
-_AMIDE_FAMILIES_CANONICAL = {"amide_coupling"}
-_SONOGASHIRA_FAMILIES_CANONICAL = {"sonogashira"}
-_SUZUKI_FAMILIES_CANONICAL = {"suzuki_miyaura"}
-_ULLMANN_SPECIFIC_CANONICAL = {"ullmann_cn"}
-_BUCHWALD_SPECIFIC_CANONICAL = {"buchwald_hartwig_c_n"}
-
-
-def _get_taxonomy_registry() -> Optional[TaxonomyRegistry]:
-    global _TAXONOMY_CACHE, _TAXONOMY_LOAD_FAILED
-    if _TAXONOMY_CACHE is not None:
-        return _TAXONOMY_CACHE
-    if _TAXONOMY_LOAD_FAILED:
-        return None
-    try:
-        _TAXONOMY_CACHE = load_registry()
-        return _TAXONOMY_CACHE
-    except Exception:
-        _TAXONOMY_LOAD_FAILED = True
-        return None
-
-
-def _slugify_family(value: str) -> str:
-    return re.sub(r"[^0-9a-z]+", "_", value.lower()).strip("_")
-
-
-def _canonical_family_label(family: Optional[str]) -> Optional[str]:
-    if not family:
-        return None
-    family = family.strip()
-    if not family:
-        return None
-
-    registry = _get_taxonomy_registry()
-    if registry:
-        if family in registry.reaction_types:
-            return family
-        alias = registry.resolve_alias(family)
-        if alias and alias.entity_type == "reaction_type":
-            return alias.entity_id
-        alias = registry.resolve_alias(family.lower())
-        if alias and alias.entity_type == "reaction_type":
-            return alias.entity_id
-        slug = _slugify_family(family)
-        alias = registry.resolve_alias(slug)
-        if alias and alias.entity_type == "reaction_type":
-            return alias.entity_id
-    return _FAMILY_ALIAS_OVERRIDES.get(family)
-
 
 def resolve_reaction_family(family: Optional[str]) -> Optional[str]:
-    """Resolve arbitrary family label/alias to canonical taxonomy ID (or None)."""
-    return _canonical_family_label(family)
+    """Backwards-compatible wrapper around the analysis resolver."""
+    return _resolve_reaction_family(family)
 
 _METAL_ATOMIC_NUMBERS = {
     29: "Cu",
@@ -175,32 +116,6 @@ def _detect_agent_metals(agents: List[Dict[str, Any]]) -> Set[str]:
                     metals.add(label)
 
     return metals
-
-
-def _apply_catalyst_override(
-    family: str,
-    metals: Set[str],
-    *,
-    is_cn_coupling: bool,
-) -> str:
-    """
-    Apply catalyst-based family override for C-N coupling reactions using canonical IDs.
-    """
-    canonical = family
-
-    if not metals or not is_cn_coupling:
-        return canonical
-
-    if "Pd" in metals and canonical not in _BUCHWALD_SPECIFIC_CANONICAL:
-        override = _canonical_family_label("Buchwald_CN")
-        if override:
-            return override
-    if "Cu" in metals and canonical not in _ULLMANN_SPECIFIC_CANONICAL:
-        override = _canonical_family_label("Ullmann_CN")
-        if override:
-            return override
-
-    return canonical
 
 
 def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
@@ -329,10 +244,10 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
 
     has_cn_signature = bool(
         (hits.get("nucleophile_n") and (hits.get("aryl_halide") or hits.get("vinyl_halide") or hits.get("triflate")))
-        or fam_rule in _CN_FAMILIES_CANONICAL
+        or fam_rule in CN_FAMILIES_CANONICAL
     )
-    fam_rule = _apply_catalyst_override(fam_rule, agent_metals, is_cn_coupling=has_cn_signature)
-    if fam_rule in _CN_FAMILIES_CANONICAL:
+    fam_rule = apply_catalyst_override(fam_rule, agent_metals, is_cn_coupling=has_cn_signature)
+    if fam_rule in CN_FAMILIES_CANONICAL:
         conf_rule = max(conf_rule, 0.9 if hits.get("aryl_halide") else 0.85)
 
     auto: Optional[Dict[str, Any]] = None
@@ -358,21 +273,21 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
                     conf_rxn = None
 
     if fam_rxn:
-        fam_rxn_canonical = _canonical_family_label(fam_rxn)
+        fam_rxn_canonical = canonical_family_label(fam_rxn)
         if fam_rxn_canonical:
             fam_rxn = fam_rxn_canonical
-        fam_rxn = _apply_catalyst_override(
+        fam_rxn = apply_catalyst_override(
             fam_rxn,
             agent_metals,
-            is_cn_coupling=has_cn_signature or fam_rxn in _CN_FAMILIES_CANONICAL,
+            is_cn_coupling=has_cn_signature or fam_rxn in CN_FAMILIES_CANONICAL,
         )
-        if fam_rxn in _CN_FAMILIES_CANONICAL and (conf_rxn or 0) < 0.85:
+        if fam_rxn in CN_FAMILIES_CANONICAL and (conf_rxn or 0) < 0.85:
             conf_rxn = 0.85
 
     # Choose final family with intelligent preference logic
     # Prefer rule-based detection for C-O and C-S coupling (more specific)
     # Prefer rxn_insight for other reactions when available and has confidence
-    if (fam_rule in _CO_FAMILIES_CANONICAL or fam_rule in _CS_FAMILIES_CANONICAL) and conf_rule >= 0.75:
+    if (fam_rule in CO_FAMILIES_CANONICAL or fam_rule in CS_FAMILIES_CANONICAL) and conf_rule >= 0.75:
         # Rule-based C-O/C-S detection is reliable, use it
         fam_final = fam_rule
         conf_final = conf_rule

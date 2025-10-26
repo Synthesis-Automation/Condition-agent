@@ -35,6 +35,7 @@ from .taxonomy_store import (
     TaxonomyStore,
     RoleHeuristics,
     build_embedding_text,
+    load_families_registry_entries,
 )
 
 # Constants
@@ -117,6 +118,7 @@ __all__ = [
     "TaxonomyStore",
     "RoleHeuristics",
     "build_embedding_text",
+    "load_families_registry_entries",
     # Constants
     "ROLE_FILES",
     "DEFAULT_FAMILY_BY_ROLE",

@@ -9,17 +9,20 @@ Provides:
 
 from __future__ import annotations
 
+import copy
 import datetime as dt
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
-from .constants import (
-    DEFAULT_FAMILY_BY_ROLE,
-    ROLE_FILES,
-    ROLE_PRIORITY,
-)
+from chemtools.taxonomy import load_registry
+from chemtools.taxonomy.models import ReagentFamily, ReagentRole
+
+from .constants import DEFAULT_FAMILY_BY_ROLE, ROLE_FILES, ROLE_PRIORITY
+
+if TYPE_CHECKING:
+    from chemtools.taxonomy.registry import TaxonomyRegistry
 
 # Role keyword patterns for automatic role detection
 ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
@@ -126,6 +129,79 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
         r"\bo2\b",
     ],
 }
+
+
+def _safe_load_registry(candidates: Iterable[Optional[Path]]) -> Optional[TaxonomyRegistry]:
+    """Attempt to load the taxonomy registry from a list of candidate roots."""
+    for root in candidates:
+        if root is None:
+            try:
+                return load_registry()
+            except Exception:
+                continue
+        try:
+            return load_registry(root)
+        except Exception:
+            continue
+    return None
+
+
+def _family_entry_from_registry(role: ReagentRole, family: ReagentFamily) -> Dict[str, Any]:
+    """Convert a registry ReagentFamily into the legacy family schema dict."""
+    entry: Dict[str, Any] = {
+        "role": role.id,
+        "role_label": role.name,
+        "family": family.id,
+        "family_id": family.id,
+        "label": family.name or family.id,
+        "definition": family.description or "",
+        "include_smarts": list(family.include_smarts or []),
+        "exclude_smarts": list(family.exclude_smarts or []),
+        "required_props": dict(family.required_props or {}),
+        "precedence": family.precedence if family.precedence is not None else role.priority,
+        "keywords": list(family.keywords or []),
+        "examples_pos": list(family.examples_pos or []),
+        "examples_neg": list(family.examples_neg or []),
+        "notes": family.notes or "",
+        "metadata": copy.deepcopy(family.metadata or {}),
+    }
+
+    example_members = entry["metadata"].get("example_members")
+    if example_members is None:
+        example_members = [
+            {"cas": cas, "source": "taxonomy_examples"}
+            for cas in entry["examples_pos"]
+            if cas
+        ]
+    entry["example_members"] = copy.deepcopy(example_members)
+    return entry
+
+
+def load_families_registry_entries(root: Optional[Path] = None) -> List[Dict[str, Any]]:
+    """Return families registry entries derived from the unified taxonomy."""
+    registry = _safe_load_registry([root, None])
+    if registry is None:
+        raise FileNotFoundError("Unable to load taxonomy registry for reagent families.")
+
+    entries: List[Dict[str, Any]] = []
+    for family in registry.reagent_families.values():
+        role = registry.reagent_roles.get(family.role_id)
+        if role is None:
+            continue
+        entries.append(_family_entry_from_registry(role, family))
+
+    # Maintain deterministic ordering by role priority and family precedence.
+    def _sort_key(entry: Dict[str, Any]) -> Tuple[int, str]:
+        role_id = entry.get("role", "")
+        role_obj = registry.reagent_roles.get(role_id)
+        priority = role_obj.priority if role_obj else 100
+        precedence = entry.get("precedence")
+        if precedence is None:
+            precedence = 100
+        return (priority, precedence, entry.get("family", ""))
+
+    entries.sort(key=_sort_key)
+    return entries
 
 # Manual patterns for specific reagents (higher priority)
 MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
@@ -396,18 +472,16 @@ class RoleHeuristics:
 
 
 class TaxonomyStore:
-    """Manages reagent taxonomy data from JSON files."""
+    """Manages reagent taxonomy data sourced from the unified registry (with legacy fallback)."""
 
-    def __init__(self, base_dir: Path) -> None:
+    def __init__(self, base_dir: Optional[Path] = None) -> None:
         """
         Initialize taxonomy store.
-        
+
         Args:
-            base_dir: Path to taxonomy directory (e.g., data/compound_taxonomy)
+            base_dir: Optional path to legacy taxonomy directory (e.g., data/compound_taxonomy).
         """
-        self.base_dir = Path(base_dir)
-        if not self.base_dir.exists():
-            raise FileNotFoundError(f"Taxonomy directory {self.base_dir} does not exist")
+        self.base_dir = Path(base_dir) if base_dir is not None else None
         self.role_data: Dict[str, Dict[str, Any]] = {}
         self.family_lookup: Dict[str, Tuple[str, Dict[str, Any]]] = {}
         self.cas_index: Dict[str, Tuple[str, str, Dict[str, Any]]] = {}
@@ -416,11 +490,76 @@ class TaxonomyStore:
         self._load_all()
 
     def _load_all(self) -> None:
-        """Load all taxonomy files."""
+        """Load taxonomy data from the registry or legacy JSON files."""
+        self.role_data.clear()
+        self.family_lookup.clear()
+        self.cas_index.clear()
+        self.family_tokens.clear()
+        self.family_numeric_baseline.clear()
+
+        legacy_paths = []
+        if self.base_dir is not None:
+            legacy_paths = [self.base_dir / filename for filename in ROLE_FILES.values()]
+
+        if legacy_paths and any(path.exists() for path in legacy_paths):
+            self._load_from_legacy(legacy_paths)
+            return
+
+        registry = _safe_load_registry([self.base_dir, None])
+        if registry is None:
+            raise FileNotFoundError(
+                "Unable to load reagent taxonomy from registry or legacy JSON files."
+            )
+        self._load_from_registry(registry)
+
+    def _load_from_registry(self, registry: "TaxonomyRegistry") -> None:
+        """Populate store data from the unified taxonomy registry."""
+        for role_id, role in registry.reagent_roles.items():
+            families: List[Dict[str, Any]] = []
+            for family in registry.reagent_families.values():
+                if family.role_id != role_id:
+                    continue
+                entry = _family_entry_from_registry(role, family)
+                families.append(entry)
+                family_id = entry["family_id"]
+                self.family_lookup[family_id] = (role_id, entry)
+                tokens = self._collect_family_tokens(entry)
+                self.family_tokens[(role_id, family_id)] = tokens
+                baseline: Optional[Dict[str, Any]] = None
+                for member in entry.get("example_members", []):
+                    cas = member.get("cas")
+                    if cas:
+                        self.cas_index[str(cas)] = (role_id, family_id, member)
+                    numeric = member.get("numeric_features")
+                    if baseline is None and numeric:
+                        baseline = dict(numeric)
+                self.family_numeric_baseline[(role_id, family_id)] = dict(baseline) if baseline else None
+
+            # Preserve ordering by precedence within role
+            families.sort(key=lambda item: (item.get("precedence", 100), item.get("family_id", "")))
+            self.role_data[role_id] = {
+                "role": role_id,
+                "name": role.name,
+                "description": role.description,
+                "priority": role.priority,
+                "default_family_id": role.default_family_id,
+                "metadata": copy.deepcopy(role.metadata or {}),
+                "families": families,
+            }
+
+    def _load_from_legacy(self, legacy_paths: List[Path]) -> None:
+        """Fallback loader for legacy taxonomy JSON files."""
         for role, filename in ROLE_FILES.items():
-            path = self.base_dir / filename
-            if not path.exists():
-                raise FileNotFoundError(f"Expected taxonomy file {path} for role '{role}'")
+            path = None
+            if self.base_dir is not None:
+                candidate = self.base_dir / filename
+                if candidate.exists():
+                    path = candidate
+            if path is None:
+                raise FileNotFoundError(
+                    f"Expected taxonomy file '{filename}' for role '{role}' in legacy directory."
+                )
+
             data = json.loads(path.read_text(encoding="utf-8"))
             self.role_data[role] = data
             for family in data.get("families", []):
@@ -543,6 +682,8 @@ class TaxonomyStore:
 
     def file_for_role(self, role: str) -> Path:
         """Get file path for a role."""
+        if self.base_dir is None:
+            raise RuntimeError("Legacy taxonomy directory not configured for write access.")
         filename = ROLE_FILES.get(role)
         if not filename:
             raise KeyError(f"Unknown role '{role}'")
@@ -550,6 +691,8 @@ class TaxonomyStore:
 
     def save_role(self, role: str) -> Path:
         """Save role data to file."""
+        if self.base_dir is None:
+            raise RuntimeError("Cannot persist taxonomy data without a legacy directory.")
         if role not in self.role_data:
             raise KeyError(f"No data cached for role '{role}'")
         data = self.role_data[role]
