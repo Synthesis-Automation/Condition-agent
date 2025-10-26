@@ -1062,5 +1062,715 @@
     },
     "name": "RCO2H or activated acyl",
     "smarts": "[#6][CX3](=O)[OX2H,O-,Cl,$([OX2][CX3](=O))]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Esters for transesterification, aminolysis, or Claisen condensation.",
+    "id": "ester",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RCOOR",
+        "metadata": {},
+        "name": "aliphatic ester",
+        "smarts": "[#6;!c][CX3](=O)[OX2][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "ArCOOR",
+        "metadata": {},
+        "name": "aromatic ester",
+        "smarts": "c[CX3](=O)[OX2][#6]"
+      },
+      {
+        "aliases": [],
+        "id": "activated_ester",
+        "metadata": {},
+        "name": "activated ester",
+        "smarts": "[#6][CX3](=O)[OX2]c1ccc([N+](=O)[O-])cc1"
+      }
+    ],
+    "metadata": {},
+    "name": "Ester",
+    "smarts": "[#6][CX3](=O)[OX2][#6]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Metal hydride reducing agents for carbonyl and other functional group reductions.",
+    "id": "metal_hydride",
+    "members": [
+      {
+        "aliases": [],
+        "id": "NaBH4",
+        "metadata": {},
+        "name": "sodium borohydride",
+        "smarts": "[Na+].[BH4-]"
+      },
+      {
+        "aliases": [],
+        "id": "LiBH4",
+        "metadata": {},
+        "name": "lithium borohydride",
+        "smarts": "[Li+].[BH4-]"
+      },
+      {
+        "aliases": [],
+        "id": "LiAlH4",
+        "metadata": {},
+        "name": "lithium aluminum hydride",
+        "smarts": "[Li+].[AlH4-]"
+      },
+      {
+        "aliases": [],
+        "id": "NaBH(OAc)3",
+        "metadata": {},
+        "name": "sodium triacetoxyborohydride",
+        "smarts": "[Na+].[BH]"
+      },
+      {
+        "aliases": [],
+        "id": "DIBAL",
+        "metadata": {},
+        "name": "diisobutylaluminum hydride",
+        "smarts": "[Al]([H])"
+      }
+    ],
+    "metadata": {},
+    "name": "Metal Hydrides",
+    "smarts": "[BH4-,AlH4-,BH,AlH]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Grignard reagents for nucleophilic addition to carbonyls and C-C bond formation.",
+    "id": "grignard",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RMgBr",
+        "metadata": {},
+        "name": "alkyl/aryl magnesium bromide",
+        "smarts": "[#6][Mg][Br]"
+      },
+      {
+        "aliases": [],
+        "id": "RMgCl",
+        "metadata": {},
+        "name": "alkyl/aryl magnesium chloride",
+        "smarts": "[#6][Mg][Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "RMgI",
+        "metadata": {},
+        "name": "alkyl/aryl magnesium iodide",
+        "smarts": "[#6][Mg][I]"
+      }
+    ],
+    "metadata": {},
+    "name": "Grignard Reagents",
+    "smarts": "[#6][Mg][Br,Cl,I]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Organozinc reagents for Negishi coupling and nucleophilic additions.",
+    "id": "organozinc",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RZnBr",
+        "metadata": {},
+        "name": "organozinc bromide",
+        "smarts": "[#6][Zn][Br]"
+      },
+      {
+        "aliases": [],
+        "id": "RZnCl",
+        "metadata": {},
+        "name": "organozinc chloride",
+        "smarts": "[#6][Zn][Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "R2Zn",
+        "metadata": {},
+        "name": "dialkylzinc",
+        "smarts": "[#6][Zn][#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Organozinc Reagents",
+    "smarts": "[#6][Zn]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Organolithium reagents (strong nucleophiles and bases).",
+    "id": "organolithium",
+    "members": [
+      {
+        "aliases": [],
+        "id": "RLi",
+        "metadata": {},
+        "name": "alkyllithium",
+        "smarts": "[#6;!c][Li]"
+      },
+      {
+        "aliases": [],
+        "id": "ArLi",
+        "metadata": {},
+        "name": "aryllithium",
+        "smarts": "c[Li]"
+      },
+      {
+        "aliases": [],
+        "id": "nBuLi",
+        "metadata": {},
+        "name": "n-butyllithium",
+        "smarts": "[Li]CCCC"
+      },
+      {
+        "aliases": [],
+        "id": "tBuLi",
+        "metadata": {},
+        "name": "tert-butyllithium",
+        "smarts": "[Li]C(C)(C)C"
+      }
+    ],
+    "metadata": {},
+    "name": "Organolithium Reagents",
+    "smarts": "[#6][Li]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Hydrogen gas and hydrogen donors for catalytic hydrogenation and transfer hydrogenation.",
+    "id": "hydrogen_source",
+    "members": [
+      {
+        "aliases": [],
+        "id": "H2",
+        "metadata": {},
+        "name": "hydrogen gas",
+        "smarts": "[H][H]"
+      },
+      {
+        "aliases": [],
+        "id": "formic_acid",
+        "metadata": {},
+        "name": "formic acid (H-donor)",
+        "smarts": "[H]C(=O)[OH]"
+      },
+      {
+        "aliases": [],
+        "id": "isopropanol",
+        "metadata": {},
+        "name": "isopropanol (H-donor)",
+        "smarts": "CC(C)O"
+      }
+    ],
+    "metadata": {},
+    "name": "Hydrogen Sources",
+    "smarts": "[H][H]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Oxidizing reagents for alcohol oxidation, epoxidation, and other oxidative transformations.",
+    "id": "oxidant",
+    "members": [
+      {
+        "aliases": [],
+        "id": "mCPBA",
+        "metadata": {},
+        "name": "meta-chloroperoxybenzoic acid",
+        "smarts": "Clc1cccc(c1)C(=O)OO"
+      },
+      {
+        "aliases": [],
+        "id": "PCC",
+        "metadata": {},
+        "name": "pyridinium chlorochromate",
+        "smarts": "[Cr]"
+      },
+      {
+        "aliases": [],
+        "id": "DMP",
+        "metadata": {},
+        "name": "Dess-Martin periodinane",
+        "smarts": "c1ccc2c(c1)I(OC(=O)C)(OC(=O)C)OC2"
+      },
+      {
+        "aliases": [],
+        "id": "IBX",
+        "metadata": {},
+        "name": "2-iodoxybenzoic acid",
+        "smarts": "c1ccc2c(c1)I(=O)(=O)OC2(O)O"
+      },
+      {
+        "aliases": [],
+        "id": "TEMPO",
+        "metadata": {},
+        "name": "TEMPO radical",
+        "smarts": "CC1(C)CCCC(C)(C)N1[O]"
+      },
+      {
+        "aliases": [],
+        "id": "CrO3",
+        "metadata": {},
+        "name": "chromium trioxide",
+        "smarts": "[Cr]"
+      },
+      {
+        "aliases": [],
+        "id": "KMnO4",
+        "metadata": {},
+        "name": "potassium permanganate",
+        "smarts": "[K+].[Mn]"
+      },
+      {
+        "aliases": [],
+        "id": "DDQ",
+        "metadata": {},
+        "name": "DDQ",
+        "smarts": "ClC1=C(Cl)C(=O)C(C#N)=C(C#N)C1=O"
+      },
+      {
+        "aliases": [],
+        "id": "NaOCl",
+        "metadata": {},
+        "name": "sodium hypochlorite",
+        "smarts": "[Na+].[O-]Cl"
+      }
+    ],
+    "metadata": {},
+    "name": "Oxidants",
+    "smarts": "[O][O]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "1,3-conjugated dienes for Diels-Alder cycloaddition reactions.",
+    "id": "diene",
+    "members": [
+      {
+        "aliases": [],
+        "id": "conjugated-diene",
+        "metadata": {},
+        "name": "1,3-conjugated diene",
+        "smarts": "[#6]=[#6][#6]=[#6]"
+      },
+      {
+        "aliases": [],
+        "id": "cyclopentadiene",
+        "metadata": {},
+        "name": "cyclopentadiene",
+        "smarts": "C1=CC=CC1"
+      },
+      {
+        "aliases": [],
+        "id": "furan-diene",
+        "metadata": {},
+        "name": "furan (aromatic diene)",
+        "smarts": "o1cccc1"
+      },
+      {
+        "aliases": [],
+        "id": "anthracene",
+        "metadata": {},
+        "name": "anthracene (polycyclic diene)",
+        "smarts": "c1ccc2cc3ccccc3cc2c1"
+      }
+    ],
+    "metadata": {},
+    "name": "Dienes",
+    "smarts": "[#6]=[#6][#6]=[#6]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Dienophiles (alkenes/alkynes) for Diels-Alder reactions.",
+    "id": "dienophile",
+    "members": [
+      {
+        "aliases": [],
+        "id": "activated-dienophile",
+        "metadata": {},
+        "name": "α,β-unsaturated carbonyl",
+        "smarts": "[#6]=[#6][CX3]=O"
+      },
+      {
+        "aliases": [],
+        "id": "maleic-anhydride",
+        "metadata": {},
+        "name": "maleic anhydride",
+        "smarts": "O=C1OC(=O)C=C1"
+      },
+      {
+        "aliases": [],
+        "id": "simple-dienophile",
+        "metadata": {},
+        "name": "simple alkene",
+        "smarts": "[#6]=[#6]"
+      },
+      {
+        "aliases": [],
+        "id": "alkyne-dienophile",
+        "metadata": {},
+        "name": "alkyne dienophile",
+        "smarts": "[#6]#[#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Dienophiles",
+    "smarts": "[#6]=[#6]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Phosphorus ylides and phosphonates for Wittig and HWE olefination reactions.",
+    "id": "ylide_phosphonate",
+    "members": [
+      {
+        "aliases": [],
+        "id": "Wittig-ylide",
+        "metadata": {},
+        "name": "phosphonium ylide",
+        "smarts": "[P+]([#6])([#6])([#6])[C-]"
+      },
+      {
+        "aliases": [],
+        "id": "stabilized-ylide",
+        "metadata": {},
+        "name": "stabilized ylide",
+        "smarts": "[P+]([#6])([#6])([#6])[C-][CX3]=O"
+      },
+      {
+        "aliases": [],
+        "id": "HWE-phosphonate",
+        "metadata": {},
+        "name": "phosphonate ester",
+        "smarts": "[P](=O)([OX2][#6])[OX2][#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Ylides & Phosphonates",
+    "smarts": "[P]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Enolates and enol equivalents for nucleophilic addition reactions.",
+    "id": "enolate",
+    "members": [
+      {
+        "aliases": [],
+        "id": "enolate",
+        "metadata": {},
+        "name": "enolate ion",
+        "smarts": "[#6]=[#6][C-][OX1-]"
+      },
+      {
+        "aliases": [],
+        "id": "silyl_enol_ether",
+        "metadata": {},
+        "name": "silyl enol ether",
+        "smarts": "[#6]=[#6][OX2][Si]"
+      },
+      {
+        "aliases": [],
+        "id": "beta_dicarbonyl",
+        "metadata": {},
+        "name": "β-dicarbonyl compound",
+        "smarts": "[CX3](=O)[CX4][CX3](=O)"
+      }
+    ],
+    "metadata": {},
+    "name": "Enolates",
+    "smarts": "[#6]=[#6][C,O]"
+  },
+  {
+        "aliases": [],
+    "category": null,
+    "description": "Epoxides for ring-opening reactions.",
+    "id": "epoxide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "epoxide",
+        "metadata": {},
+        "name": "epoxide",
+        "smarts": "[#6]1[OX2][#6]1"
+      },
+      {
+        "aliases": [],
+        "id": "styrene_oxide",
+        "metadata": {},
+        "name": "styrene oxide",
+        "smarts": "c1ccccc1C1CO1"
+      }
+    ],
+    "metadata": {},
+    "name": "Epoxides",
+    "smarts": "[#6]1[OX2][#6]1"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Borane reagents for hydroboration reactions.",
+    "id": "borane",
+    "members": [
+      {
+        "aliases": [],
+        "id": "BH3",
+        "metadata": {},
+        "name": "borane",
+        "smarts": "[BH3]"
+      },
+      {
+        "aliases": [],
+        "id": "B2H6",
+        "metadata": {},
+        "name": "diborane",
+        "smarts": "[B]"
+      },
+      {
+        "aliases": [],
+        "id": "9-BBN",
+        "metadata": {},
+        "name": "9-borabicyclo[3.3.1]nonane",
+        "smarts": "B1CCCC2CCCCC12"
+      },
+      {
+        "aliases": [],
+        "id": "catecholborane",
+        "metadata": {},
+        "name": "catecholborane",
+        "smarts": "B1Oc2ccccc2O1"
+      },
+      {
+        "aliases": [],
+        "id": "pinacolborane",
+        "metadata": {},
+        "name": "pinacolborane",
+        "smarts": "[H]B1OC(C)(C)C(C)(C)O1"
+      }
+    ],
+    "metadata": {},
+    "name": "Borane Reagents",
+    "smarts": "[B]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Cyanide nucleophiles for nitrile formation via SN2.",
+    "id": "cyanide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "NaCN",
+        "metadata": {},
+        "name": "sodium cyanide",
+        "smarts": "[Na+].[C-]#N"
+      },
+      {
+        "aliases": [],
+        "id": "KCN",
+        "metadata": {},
+        "name": "potassium cyanide",
+        "smarts": "[K+].[C-]#N"
+      },
+      {
+        "aliases": [],
+        "id": "CN-",
+        "metadata": {},
+        "name": "cyanide anion",
+        "smarts": "[C-]#N"
+      }
+    ],
+    "metadata": {},
+    "name": "Cyanide Nucleophiles",
+    "smarts": "[C-]#N"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Azide nucleophiles for azide formation and click chemistry.",
+    "id": "azide_nucleophile",
+    "members": [
+      {
+        "aliases": [],
+        "id": "NaN3",
+        "metadata": {},
+        "name": "sodium azide",
+        "smarts": "[Na+].[N-]=[N+]=[N-]"
+      },
+      {
+        "aliases": [],
+        "id": "N3-",
+        "metadata": {},
+        "name": "azide anion",
+        "smarts": "[N-]=[N+]=[N-]"
+      }
+    ],
+    "metadata": {},
+    "name": "Azide Nucleophiles",
+    "smarts": "[N-]=[N+]=[N-]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Iodide for Finkelstein halide exchange.",
+    "id": "iodide_nucleophile",
+    "members": [
+      {
+        "aliases": [],
+        "id": "NaI",
+        "metadata": {},
+        "name": "sodium iodide",
+        "smarts": "[Na+].[I-]"
+      },
+      {
+        "aliases": [],
+        "id": "KI",
+        "metadata": {},
+        "name": "potassium iodide",
+        "smarts": "[K+].[I-]"
+      },
+      {
+        "aliases": [],
+        "id": "I-",
+        "metadata": {},
+        "name": "iodide anion",
+        "smarts": "[I-]"
+      }
+    ],
+    "metadata": {},
+    "name": "Iodide Nucleophiles",
+    "smarts": "[I-]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Hydroxide for SN2 alcohol formation and base-catalyzed reactions.",
+    "id": "hydroxide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "NaOH",
+        "metadata": {},
+        "name": "sodium hydroxide",
+        "smarts": "[Na+].[OH-]"
+      },
+      {
+        "aliases": [],
+        "id": "KOH",
+        "metadata": {},
+        "name": "potassium hydroxide",
+        "smarts": "[K+].[OH-]"
+      },
+      {
+        "aliases": [],
+        "id": "OH-",
+        "metadata": {},
+        "name": "hydroxide anion",
+        "smarts": "[OH-]"
+      }
+    ],
+    "metadata": {},
+    "name": "Hydroxide Nucleophiles",
+    "smarts": "[OH-]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Alkoxide nucleophiles for Williamson ether synthesis and other substitutions.",
+    "id": "alkoxide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "NaOMe",
+        "metadata": {},
+        "name": "sodium methoxide",
+        "smarts": "[Na+].[O-]C"
+      },
+      {
+        "aliases": [],
+        "id": "NaOEt",
+        "metadata": {},
+        "name": "sodium ethoxide",
+        "smarts": "[Na+].[O-]CC"
+      },
+      {
+        "aliases": [],
+        "id": "KOtBu",
+        "metadata": {},
+        "name": "potassium tert-butoxide",
+        "smarts": "[K+].[O-]C(C)(C)C"
+      },
+      {
+        "aliases": [],
+        "id": "RO-",
+        "metadata": {},
+        "name": "alkoxide anion",
+        "smarts": "[O-][#6]"
+      }
+    ],
+    "metadata": {},
+    "name": "Alkoxide Nucleophiles",
+    "smarts": "[O-][#6]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Hydrogen peroxide and peroxide reagents for oxidations.",
+    "id": "peroxide",
+    "members": [
+      {
+        "aliases": [],
+        "id": "H2O2",
+        "metadata": {},
+        "name": "hydrogen peroxide",
+        "smarts": "OO"
+      },
+      {
+        "aliases": [],
+        "id": "tBuOOH",
+        "metadata": {},
+        "name": "tert-butyl hydroperoxide",
+        "smarts": "CC(C)(C)OO"
+      }
+    ],
+    "metadata": {},
+    "name": "Peroxides",
+    "smarts": "[O][O]"
+  },
+  {
+    "aliases": [],
+    "category": null,
+    "description": "Carbanion nucleophiles including stabilized anions.",
+    "id": "carbanion",
+    "members": [
+      {
+        "aliases": [],
+        "id": "malonate",
+        "metadata": {},
+        "name": "malonate anion",
+        "smarts": "[C-](C(=O)[O-])C(=O)[O-]"
+      },
+      {
+        "aliases": [],
+        "id": "acetoacetate",
+        "metadata": {},
+        "name": "acetoacetate anion",
+        "smarts": "[C-](C(=O)C)C(=O)[O-]"
+      }
+    ],
+    "metadata": {},
+    "name": "Carbanion Nucleophiles",
+    "smarts": "[C-]"
   }
 ]

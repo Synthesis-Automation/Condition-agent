@@ -1614,5 +1614,911 @@
     "source_ids": [
       "Activation"
     ]
+  },
+  {
+    "aliases": [
+      "Diels-Alder",
+      "DA reaction"
+    ],
+    "category_id": "cycloaddition_reactions",
+    "description": "[4+2] cycloaddition of a conjugated diene with a dienophile to form a six-membered ring",
+    "id": "diels_alder",
+    "metadata": {
+      "typical_catalysts": [
+        "Lewis acids (optional)"
+      ],
+      "typical_conditions": "Thermal or catalyzed"
+    },
+    "name": "Diels-Alder Cycloaddition",
+    "reactants": [
+      {
+        "notes": "Conjugated diene",
+        "original_tokens": [
+          "diene"
+        ],
+        "reactant_type_id": "diene",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Dienophile (alkene or alkyne)",
+        "original_tokens": [
+          "dienophile"
+        ],
+        "reactant_type_id": "dienophile",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Diels-Alder"
+    ]
+  },
+  {
+    "aliases": [
+      "Catalytic hydrogenation",
+      "H2 reduction"
+    ],
+    "category_id": "reduction_reactions",
+    "description": "Catalytic addition of hydrogen to unsaturated bonds or reduction of functional groups",
+    "id": "hydrogenation",
+    "metadata": {
+      "typical_catalysts": [
+        "Pd/C",
+        "Pt",
+        "Rh",
+        "Raney Ni"
+      ],
+      "typical_conditions": "H2 gas, metal catalyst, pressure"
+    },
+    "name": "Hydrogenation",
+    "reactants": [
+      {
+        "notes": "Hydrogen source",
+        "original_tokens": [
+          "H2"
+        ],
+        "reactant_type_id": "hydrogen_source",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Hydrogenation"
+    ]
+  },
+  {
+    "aliases": [
+      "Carbonyl reduction",
+      "Ketone reduction",
+      "Aldehyde reduction"
+    ],
+    "category_id": "reduction_reactions",
+    "description": "Reduction of carbonyl compounds using metal hydrides",
+    "id": "carbonyl_reduction",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Metal hydride reagent (NaBH4, LiAlH4)"
+    },
+    "name": "Carbonyl Reduction",
+    "reactants": [
+      {
+        "notes": "Aldehyde or ketone",
+        "original_tokens": [
+          "RCHO",
+          "RCOR"
+        ],
+        "reactant_type_id": "aldehyde",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Metal hydride reducing agent",
+        "original_tokens": [
+          "NaBH4",
+          "LiAlH4"
+        ],
+        "reactant_type_id": "metal_hydride",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Carbonyl-reduction"
+    ]
+  },
+  {
+    "aliases": [
+      "Alcohol oxidation",
+      "Primary alcohol oxidation",
+      "Secondary alcohol oxidation"
+    ],
+    "category_id": "oxidation_reactions",
+    "description": "Oxidation of alcohols to aldehydes, ketones, or carboxylic acids",
+    "id": "alcohol_oxidation",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Oxidizing agent (PCC, DMP, Jones, Swern)"
+    },
+    "name": "Alcohol Oxidation",
+    "reactants": [
+      {
+        "notes": "Primary or secondary alcohol",
+        "original_tokens": [
+          "ROH"
+        ],
+        "reactant_type_id": "roh",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Oxidizing reagent",
+        "original_tokens": [
+          "oxidant"
+        ],
+        "reactant_type_id": "oxidant",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Alcohol-oxidation"
+    ]
+  },
+  {
+    "aliases": [
+      "Epoxidation",
+      "Alkene epoxidation"
+    ],
+    "category_id": "oxidation_reactions",
+    "description": "Formation of epoxides from alkenes using peroxy acids or other oxidants",
+    "id": "epoxidation",
+    "metadata": {
+      "typical_catalysts": [
+        "None (mCPBA)",
+        "Ti (Sharpless)",
+        "Mn (Jacobsen)"
+      ],
+      "typical_conditions": "Peroxy acid or oxidant"
+    },
+    "name": "Epoxidation",
+    "reactants": [
+      {
+        "notes": "Alkene",
+        "original_tokens": [
+          "alkene"
+        ],
+        "reactant_type_id": "alkene",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Oxidant (typically mCPBA)",
+        "original_tokens": [
+          "mCPBA",
+          "oxidant"
+        ],
+        "reactant_type_id": "oxidant",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Epoxidation"
+    ]
+  },
+  {
+    "aliases": [
+      "Baeyer-Villiger oxidation",
+      "BV oxidation"
+    ],
+    "category_id": "oxidation_reactions",
+    "description": "Oxidation of ketones to esters or lactones using peroxy acids",
+    "id": "baeyer_villiger",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Peroxy acid (mCPBA, peracetic acid)"
+    },
+    "name": "Baeyer-Villiger Oxidation",
+    "reactants": [
+      {
+        "notes": "Ketone substrate",
+        "original_tokens": [
+          "RCOR"
+        ],
+        "reactant_type_id": "ketone",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Peroxy acid oxidant",
+        "original_tokens": [
+          "mCPBA"
+        ],
+        "reactant_type_id": "oxidant",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Baeyer-Villiger"
+    ]
+  },
+  {
+    "aliases": [
+      "SN2",
+      "Nucleophilic substitution bimolecular"
+    ],
+    "category_id": "substitution_reactions",
+    "description": "Bimolecular nucleophilic substitution at saturated carbon",
+    "id": "sn2_substitution",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Polar aprotic solvent, good nucleophile"
+    },
+    "name": "SN2 Substitution",
+    "reactants": [
+      {
+        "notes": "Alkyl halide (primary or secondary)",
+        "original_tokens": [
+          "Alkyl-X"
+        ],
+        "reactant_type_id": "alkyl_x",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "SN2"
+    ]
+  },
+  {
+    "aliases": [
+      "E2 elimination",
+      "Beta elimination"
+    ],
+    "category_id": "elimination_reactions",
+    "description": "Bimolecular elimination to form alkenes",
+    "id": "e2_elimination",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Strong base"
+    },
+    "name": "E2 Elimination",
+    "reactants": [
+      {
+        "notes": "Alkyl halide",
+        "original_tokens": [
+          "Alkyl-X"
+        ],
+        "reactant_type_id": "alkyl_x",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "E2"
+    ]
+  },
+  {
+    "aliases": [
+      "Aldol",
+      "Aldol addition"
+    ],
+    "category_id": "carbonyl_reactions",
+    "description": "Addition of an enolate to a carbonyl compound",
+    "id": "aldol_condensation",
+    "metadata": {
+      "typical_catalysts": [
+        "Base or acid"
+      ],
+      "typical_conditions": "Base (NaOH, LDA) or acid catalyst"
+    },
+    "name": "Aldol Condensation",
+    "reactants": [
+      {
+        "notes": "Aldehyde or ketone (electrophile)",
+        "original_tokens": [
+          "RCHO",
+          "RCOR"
+        ],
+        "reactant_type_id": "aldehyde",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Enolate precursor or another carbonyl",
+        "original_tokens": [
+          "RCHO",
+          "RCOR",
+          "enolate"
+        ],
+        "reactant_type_id": "aldehyde",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Aldol"
+    ]
+  },
+  {
+    "aliases": [
+      "Reductive amination",
+      "Imine reduction"
+    ],
+    "category_id": "reduction_reactions",
+    "description": "Formation of amines from aldehydes/ketones and amines via imine intermediates",
+    "id": "reductive_amination",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Reducing agent (NaBH4, NaBH(OAc)3, H2/Pd)"
+    },
+    "name": "Reductive Amination",
+    "reactants": [
+      {
+        "notes": "Aldehyde or ketone",
+        "original_tokens": [
+          "RCHO",
+          "RCOR"
+        ],
+        "reactant_type_id": "aldehyde",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Amine",
+        "original_tokens": [
+          "RNH2",
+          "R2NH"
+        ],
+        "reactant_type_id": "aliphatic_amine",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Reducing agent",
+        "original_tokens": [
+          "NaBH4"
+        ],
+        "reactant_type_id": "metal_hydride",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Reductive-amination"
+    ]
+  },
+  {
+    "aliases": [
+      "RCM",
+      "Ring closing olefin metathesis"
+    ],
+    "category_id": "metathesis_reactions",
+    "description": "Intramolecular alkene metathesis to form cyclic compounds",
+    "id": "ring_closing_metathesis",
+    "metadata": {
+      "typical_catalysts": [
+        "Grubbs catalyst",
+        "Hoveyda-Grubbs"
+      ],
+      "typical_conditions": "Ru catalyst, inert atmosphere"
+    },
+    "name": "Ring-Closing Metathesis",
+    "reactants": [
+      {
+        "notes": "Diene substrate",
+        "original_tokens": [
+          "alkene"
+        ],
+        "reactant_type_id": "alkene",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "RCM"
+    ]
+  },
+  {
+    "aliases": [
+      "Cross metathesis",
+      "CM",
+      "Olefin cross metathesis"
+    ],
+    "category_id": "metathesis_reactions",
+    "description": "Intermolecular alkene metathesis between two different alkenes",
+    "id": "cross_metathesis",
+    "metadata": {
+      "typical_catalysts": [
+        "Grubbs catalyst",
+        "Hoveyda-Grubbs"
+      ],
+      "typical_conditions": "Ru catalyst, inert atmosphere"
+    },
+    "name": "Cross Metathesis",
+    "reactants": [
+      {
+        "notes": "First alkene",
+        "original_tokens": [
+          "alkene"
+        ],
+        "reactant_type_id": "alkene",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Second alkene",
+        "original_tokens": [
+          "alkene"
+        ],
+        "reactant_type_id": "alkene",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Cross-metathesis"
+    ]
+  },
+  {
+    "aliases": [
+      "Birch",
+      "Dissolving metal reduction"
+    ],
+    "category_id": "reduction_reactions",
+    "description": "Reduction of aromatic rings using alkali metals in liquid ammonia",
+    "id": "birch_reduction",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Na or Li in liquid NH3, alcohol"
+    },
+    "name": "Birch Reduction",
+    "reactants": [],
+    "required_roles": [],
+    "source_ids": [
+      "Birch"
+    ]
+  },
+  {
+    "aliases": [
+      "Pictet-Spengler cyclization",
+      "PS reaction"
+    ],
+    "category_id": "cyclization_reactions",
+    "description": "Acid-catalyzed cyclization of β-arylethylamines with carbonyl compounds to form tetrahydroisoquinolines or β-carbolines",
+    "id": "pictet_spengler",
+    "metadata": {
+      "typical_catalysts": [
+        "Acid"
+      ],
+      "typical_conditions": "Acidic conditions, heat"
+    },
+    "name": "Pictet-Spengler Reaction",
+    "reactants": [
+      {
+        "notes": "β-Arylethylamine or tryptamine",
+        "original_tokens": [
+          "RNH2"
+        ],
+        "reactant_type_id": "aliphatic_amine",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Aldehyde or ketone",
+        "original_tokens": [
+          "RCHO",
+          "RCOR"
+        ],
+        "reactant_type_id": "aldehyde",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Pictet-Spengler"
+    ]
+  },
+  {
+    "aliases": [
+      "C-H alkylation",
+      "Friedel-Crafts alkylation"
+    ],
+    "category_id": "ch_activation_reactions",
+    "description": "Alkylation of C-H bonds, often via Friedel-Crafts or metal-catalyzed pathways",
+    "id": "ch_alkylation",
+    "metadata": {
+      "typical_catalysts": [
+        "Lewis acid",
+        "Transition metal"
+      ],
+      "typical_conditions": "Catalyst, alkylating agent"
+    },
+    "name": "C-H Alkylation",
+    "reactants": [
+      {
+        "notes": "Aromatic or aliphatic C-H",
+        "original_tokens": [
+          "ArH",
+          "Alkyl-H"
+        ],
+        "reactant_type_id": "arh",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Alkylating agent",
+        "original_tokens": [
+          "Alkyl-X"
+        ],
+        "reactant_type_id": "alkyl_x",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "C-H-alkylation"
+    ]
+  },
+  {
+    "aliases": [
+      "Fischer esterification",
+      "Ester formation"
+    ],
+    "category_id": "carbonyl_reactions",
+    "description": "Formation of esters from carboxylic acids or acid chlorides with alcohols",
+    "id": "esterification",
+    "metadata": {
+      "typical_catalysts": [
+        "Acid (H2SO4, HCl)",
+        "DCC",
+        "EDC"
+      ],
+      "typical_conditions": "Acid catalyst or coupling reagent"
+    },
+    "name": "Esterification",
+    "reactants": [
+      {
+        "notes": "Carboxylic acid or acid chloride",
+        "original_tokens": [
+          "RCO2H",
+          "RCOCl"
+        ],
+        "reactant_type_id": "rco2h_or_activated_acyl",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Alcohol",
+        "original_tokens": [
+          "ROH"
+        ],
+        "reactant_type_id": "roh",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Esterification"
+    ]
+  },
+  {
+    "aliases": [
+      "Grignard carbonyl addition",
+      "Grignard ketone addition"
+    ],
+    "category_id": "carbonyl_reactions",
+    "description": "Nucleophilic addition of Grignard reagents to aldehydes, ketones, or esters",
+    "id": "grignard_addition",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Anhydrous, ether solvent, low temperature"
+    },
+    "name": "Grignard Addition",
+    "reactants": [
+      {
+        "notes": "Aldehyde, ketone, or ester",
+        "original_tokens": [
+          "RCHO",
+          "RCOR",
+          "RCOOR"
+        ],
+        "reactant_type_id": "aldehyde",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Grignard reagent",
+        "original_tokens": [
+          "RMgBr",
+          "RMgCl"
+        ],
+        "reactant_type_id": "grignard",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Grignard-addition"
+    ]
+  },
+  {
+    "aliases": [
+      "Hydroboration-oxidation",
+      "Anti-Markovnikov hydration"
+    ],
+    "category_id": "functional_group_transformations",
+    "description": "Two-step conversion of alkenes to alcohols via hydroboration followed by oxidative workup",
+    "id": "hydroboration",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "1) BH3, THF 2) H2O2, NaOH"
+    },
+    "name": "Hydroboration-Oxidation",
+    "reactants": [
+      {
+        "notes": "Alkene substrate",
+        "original_tokens": [
+          "alkene"
+        ],
+        "reactant_type_id": "alkene",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Borane reagent",
+        "original_tokens": [
+          "BH3",
+          "9-BBN"
+        ],
+        "reactant_type_id": "borane",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Hydroboration"
+    ]
+  },
+  {
+    "aliases": [
+      "Claisen",
+      "Ester condensation"
+    ],
+    "category_id": "carbonyl_reactions",
+    "description": "Base-catalyzed condensation of two esters or an ester with a ketone to form β-keto esters",
+    "id": "claisen_condensation",
+    "metadata": {
+      "typical_catalysts": [
+        "Strong base"
+      ],
+      "typical_conditions": "NaOEt, KOtBu, LDA"
+    },
+    "name": "Claisen Condensation",
+    "reactants": [
+      {
+        "notes": "Ester substrate",
+        "original_tokens": [
+          "RCOOR"
+        ],
+        "reactant_type_id": "ester",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Second ester or ketone",
+        "original_tokens": [
+          "RCOOR",
+          "RCOR"
+        ],
+        "reactant_type_id": "ester",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Claisen"
+    ]
+  },
+  {
+    "aliases": [
+      "Michael",
+      "Conjugate addition"
+    ],
+    "category_id": "carbonyl_reactions",
+    "description": "Nucleophilic addition to α,β-unsaturated carbonyl compounds (1,4-addition)",
+    "id": "michael_addition",
+    "metadata": {
+      "typical_catalysts": [
+        "Base or Lewis acid"
+      ],
+      "typical_conditions": "Nucleophile, base or catalyst"
+    },
+    "name": "Michael Addition",
+    "reactants": [
+      {
+        "notes": "α,β-unsaturated carbonyl (Michael acceptor)",
+        "original_tokens": [
+          "alkene"
+        ],
+        "reactant_type_id": "alkene",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Nucleophile (enolate, malonate, amine, etc.)",
+        "original_tokens": [
+          "enolate",
+          "malonate"
+        ],
+        "reactant_type_id": "enolate",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Michael"
+    ]
+  },
+  {
+    "aliases": [
+      "Organolithium addition",
+      "RLi addition"
+    ],
+    "category_id": "carbonyl_reactions",
+    "description": "Nucleophilic addition of organolithium reagents to carbonyl compounds",
+    "id": "organolithium_addition",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Anhydrous, low temperature, inert atmosphere"
+    },
+    "name": "Organolithium Addition",
+    "reactants": [
+      {
+        "notes": "Aldehyde, ketone, or ester",
+        "original_tokens": [
+          "RCHO",
+          "RCOR"
+        ],
+        "reactant_type_id": "aldehyde",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Organolithium reagent",
+        "original_tokens": [
+          "RLi",
+          "nBuLi"
+        ],
+        "reactant_type_id": "organolithium",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Organolithium-addition"
+    ]
+  },
+  {
+    "aliases": [
+      "Nitrile formation",
+      "Cyanation"
+    ],
+    "category_id": "substitution_reactions",
+    "description": "SN2 substitution with cyanide to form nitriles",
+    "id": "nitrile_formation",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "NaCN or KCN in polar aprotic solvent"
+    },
+    "name": "Nitrile Formation (SN2)",
+    "reactants": [
+      {
+        "notes": "Alkyl halide",
+        "original_tokens": [
+          "Alkyl-X"
+        ],
+        "reactant_type_id": "alkyl_x",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Cyanide nucleophile",
+        "original_tokens": [
+          "NaCN",
+          "KCN"
+        ],
+        "reactant_type_id": "cyanide",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Nitrile-formation"
+    ]
+  },
+  {
+    "aliases": [
+      "Finkelstein",
+      "Halide exchange"
+    ],
+    "category_id": "substitution_reactions",
+    "description": "SN2 halide exchange reaction, typically Cl/Br to I using NaI",
+    "id": "finkelstein",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "NaI in acetone"
+    },
+    "name": "Finkelstein Reaction",
+    "reactants": [
+      {
+        "notes": "Alkyl halide (Cl or Br)",
+        "original_tokens": [
+          "Alkyl-X"
+        ],
+        "reactant_type_id": "alkyl_x",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Iodide salt",
+        "original_tokens": [
+          "NaI",
+          "KI"
+        ],
+        "reactant_type_id": "iodide_nucleophile",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Finkelstein"
+    ]
+  },
+  {
+    "aliases": [
+      "Williamson ether",
+      "Williamson synthesis"
+    ],
+    "category_id": "substitution_reactions",
+    "description": "SN2 ether formation from alkoxide and alkyl halide",
+    "id": "williamson_ether",
+    "metadata": {
+      "typical_catalysts": [
+        "None"
+      ],
+      "typical_conditions": "Strong base (NaH), alkoxide nucleophile"
+    },
+    "name": "Williamson Ether Synthesis",
+    "reactants": [
+      {
+        "notes": "Alkyl halide",
+        "original_tokens": [
+          "Alkyl-X"
+        ],
+        "reactant_type_id": "alkyl_x",
+        "stoichiometry": null
+      },
+      {
+        "notes": "Alkoxide nucleophile",
+        "original_tokens": [
+          "NaOMe",
+          "RO-"
+        ],
+        "reactant_type_id": "alkoxide",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "Williamson"
+    ]
   }
 ]
