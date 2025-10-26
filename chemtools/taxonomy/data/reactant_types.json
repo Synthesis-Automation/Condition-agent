@@ -1024,14 +1024,43 @@
   {
     "aliases": [],
     "category": null,
-    "description": null,
+    "description": "Carboxylic acids and activated acyl electrophiles for amide coupling reactions.",
     "id": "rco2h_or_activated_acyl",
-    "members": [],
+    "members": [
+      {
+        "aliases": [],
+        "id": "RCO2H",
+        "metadata": {},
+        "name": "carboxylic acid",
+        "smarts": "[#6][CX3](=O)[OX2H]"
+      },
+      {
+        "aliases": [],
+        "id": "RCO2M",
+        "metadata": {},
+        "name": "carboxylate salt",
+        "smarts": "[#6][CX3](=O)[O-].[Na+,K+,Li+]"
+      },
+      {
+        "aliases": [],
+        "id": "RCOCl",
+        "metadata": {},
+        "name": "acyl chloride",
+        "smarts": "[#6][CX3](=O)[Cl]"
+      },
+      {
+        "aliases": [],
+        "id": "Anhydride",
+        "metadata": {},
+        "name": "carboxylic anhydride",
+        "smarts": "[#6][CX3](=O)[OX2][CX3](=O)[#6]"
+      }
+    ],
     "metadata": {
       "generated_from_token": "RCO2H or activated acyl",
       "source": "legacy/reaction_types.json:Amide-coupling"
     },
     "name": "RCO2H or activated acyl",
-    "smarts": null
+    "smarts": "[#6][CX3](=O)[OX2H,O-,Cl,$([OX2][CX3](=O))]"
   }
 ]
