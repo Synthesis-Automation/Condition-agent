@@ -109,6 +109,22 @@ def normalize(smi: str) -> Dict[str, Any]:
 def _split_reaction_smiles(rsmi: str) -> List[str]:
     # Reaction SMILES has 3 fields: reactants > agents > products
     # Some strings may use '>>' with empty agents.
+    # Non-standard format: reactants>>[reagent]>>products (convert to reactants.reagent>>products)
+    
+    # First, check for non-standard triple-part format: reactants>>[reagent]>>products
+    parts = rsmi.split(">>")
+    if len(parts) == 3:
+        # Non-standard format: reactants>>[reagent]>>products
+        # Convert to standard format: reactants.reagent>agents>products
+        reactants = parts[0]
+        reagent = parts[1]
+        products = parts[2]
+        # Combine reagent with reactants using dot notation
+        combined_reactants = f"{reactants}.{reagent}" if reagent else reactants
+        # Return as standard 3-part: [reactants.reagent, "", products]
+        return [combined_reactants, "", products]
+    
+    # Standard handling
     parts = rsmi.split(">")
     if len(parts) == 2 and ">>" in rsmi:
         # empty agents

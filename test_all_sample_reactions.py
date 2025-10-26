@@ -149,7 +149,21 @@ def main():
         if ">>" not in reaction_str:
             continue
         
-        smiles = reaction_str.split(">>")[0] + ">>" + reaction_str.split(">>")[1].split(" (")[0]
+        # Handle both standard (reactants>>products) and non-standard (reactants>>[reagent]>>products) formats
+        parts = reaction_str.split(">>")
+        if len(parts) == 2:
+            # Standard format: reactants>>products (description)
+            smiles = parts[0] + ">>" + parts[1].split(" (")[0]
+        elif len(parts) >= 3:
+            # Non-standard format: reactants>>[reagent]>>products (description)
+            # Convert to standard: reactants.reagent>>products
+            reactants = parts[0]
+            reagent = parts[1]
+            products = parts[2].split(" (")[0]
+            smiles = f"{reactants}.{reagent}>>{products}"
+        else:
+            continue
+        
         description = reaction_str.split("(")[-1].rstrip(")") if "(" in reaction_str else "No description"
         reaction_type = extract_reaction_type(reaction_str)
         

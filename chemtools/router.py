@@ -46,7 +46,7 @@ def _compile_smarts():
         "nucleophile_s": Chem.MolFromSmarts("[SX2H]"),
         
         # Phase 2 additions - carbonyl compounds
-        "carbonyl": Chem.MolFromSmarts("[CX3](=O)[C,H]"),  # Ketone or aldehyde
+        "carbonyl": Chem.MolFromSmarts("[CX3]=O"),  # Ketone, aldehyde, or ester carbonyl
         "aldehyde": Chem.MolFromSmarts("[CX3H](=O)"),  # Aldehyde specifically
         "ketone": Chem.MolFromSmarts("[CX3](=O)[C]"),  # Ketone specifically
         "ester": Chem.MolFromSmarts("[CX3](=O)[OX2][C,H]"),  # Ester
@@ -197,6 +197,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
                 except Exception:
                     continue
             return False
+        # RDKit SMARTS matching when available; OR with text_hits to be robust to parse failures
         rdkit_hits = {
             "aryl_halide": any_match("aryl_halide"),
             "vinyl_halide": any_match("vinyl_halide"),
@@ -207,6 +208,23 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
             "nucleophile_s": any_match("nucleophile_s"),
             "terminal_alkyne": any_match("terminal_alkyne"),
             "acid": any_match("acid"),
+            # Phase 2 additions
+            "carbonyl": any_match("carbonyl"),
+            "aldehyde": any_match("aldehyde"),
+            "ketone": any_match("ketone"),
+            "ester": any_match("ester"),
+            "alcohol": any_match("alcohol"),
+            "grignard": any_match("grignard"),
+            "organozinc": any_match("organozinc"),
+            "organolithium": any_match("organolithium"),
+            "cyanide": any_match("cyanide"),
+            "iodide": any_match("iodide"),
+            "alkoxide": any_match("alkoxide"),
+            "alkyl_halide": any_match("alkyl_halide"),
+            "alkene": any_match("alkene"),
+            "conjugated_diene": any_match("conjugated_diene"),
+            "alpha_beta_unsaturated": any_match("alpha_beta_unsaturated"),
+            "borane": any_match("borane"),
         }
         # Combine conservatively (logical OR)
         return {k: bool(rdkit_hits.get(k) or text_hits.get(k)) for k in text_hits.keys()}
@@ -306,15 +324,15 @@ def detect_family(reactants: List[str]) -> Dict[str, Any]:
     
     # Kumada Coupling (aryl halide + Grignard, no carbonyl already checked above)
     elif is_aryl_or_vinyl_electrophile and h.get("grignard"):
-        fam, conf = "kumada_coupling", 0.85
+        fam, conf = "kumada", 0.85
     
     # Negishi Coupling (aryl halide + organozinc, no carbonyl already checked above)
     elif is_aryl_or_vinyl_electrophile and h.get("organozinc"):
-        fam, conf = "negishi_coupling", 0.85
+        fam, conf = "negishi", 0.85
     
     # Heck Coupling (aryl halide + alkene, no boron)
     elif is_aryl_or_vinyl_electrophile and h.get("alkene") and not h.get("boron"):
-        fam, conf = "heck_coupling", 0.80
+        fam, conf = "heck", 0.80
     
     # PRIORITY 3: C-N/C-O/C-S Couplings (heteroatom couplings)
     # C-N Coupling (unified - metal preference handled via constraints)
