@@ -15,7 +15,7 @@ import datetime as dt
 import json
 import re
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
@@ -25,6 +25,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from chemtools.reagent import constants as reagent_constants  # type: ignore  # noqa: E402
+from chemtools.taxonomy import load_registry as load_unified_registry  # type: ignore  # noqa: E402
 from chemtools.taxonomy.registry import TaxonomyRegistry  # type: ignore  # noqa: E402
 
 LEGACY_REACTANT_TYPES = REPO_ROOT / "chemtools" / "reagent" / "data" / "reactant_types.json"
@@ -101,6 +102,38 @@ def add_alias(
         "entity_id": entity_id,
         "source": source,
         "notes": notes,
+    }
+
+
+def payloads_from_unified_registry(manifest: dict) -> Dict[str, object]:
+    registry = load_unified_registry()
+
+    reaction_categories = [asdict(cat) for cat in registry.reaction_categories.values()]
+    reaction_categories.sort(key=lambda item: item["id"])
+
+    reaction_types = [asdict(rt) for rt in registry.reaction_types.values()]
+    reaction_types.sort(key=lambda item: item["id"])
+
+    reactant_types = [asdict(rt) for rt in registry.reactant_types.values()]
+    reactant_types.sort(key=lambda item: item["id"])
+
+    reagent_roles = [asdict(role) for role in registry.reagent_roles.values()]
+    reagent_roles.sort(key=lambda item: (item.get("priority", 100), item["id"]))
+
+    reagent_families = [asdict(family) for family in registry.reagent_families.values()]
+    reagent_families.sort(key=lambda item: (item.get("role_id", ""), item["id"]))
+
+    aliases = [asdict(alias) for alias in registry.aliases.values()]
+    aliases.sort(key=lambda item: item["alias"].lower())
+
+    return {
+        "manifest.json": manifest,
+        "reaction_categories.json": reaction_categories,
+        "reaction_types.json": reaction_types,
+        "reactant_types.json": reactant_types,
+        "reagent_roles.json": reagent_roles,
+        "reagent_families.json": reagent_families,
+        "aliases.json": aliases,
     }
 
 
@@ -406,64 +439,89 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
     output_dir = args.output_dir or (REPO_ROOT / "chemtools" / "taxonomy" / "data")
 
-    alias_records: Dict[str, dict] = {}
-
-    # Reactant types
-    reactant_builder = ReactantTypeBuilder(aliases=alias_records)
-    legacy_reactants = read_json(LEGACY_REACTANT_TYPES)
-    if not isinstance(legacy_reactants, dict):
-        raise RuntimeError("Expected reactant_types.json to contain an object mapping IDs to definitions.")
-    reactant_builder.load_legacy(legacy_reactants)
-
-    # Reagent families (collect role usage)
-    reagent_families, role_to_families, roles_used = convert_reagent_families(LEGACY_REAGENT_FAMILIES, alias_records)
-
-    # Reagent roles (including roles referenced by families)
-    reagent_roles, role_alias_map = convert_reagent_roles(additional_roles=roles_used)
-    for alias, canonical_id in role_alias_map.items():
-        add_alias(
-            alias_records,
-            alias,
-            entity_type=ALIAS_ENTITY_REAGENT_ROLE,
-            entity_id=canonical_id,
-            source="legacy/reagent_roles",
-        )
-
-    for family in reagent_families:
-        role_alias = family["role_id"]
-        canonical = (
-            role_alias_map.get(role_alias)
-            or role_alias_map.get(role_alias.lower())
-            or role_alias_map.get(slugify(role_alias))
-        )
-        if canonical is None:
-            raise RuntimeError(f"Unable to resolve reagent role '{role_alias}' referenced by family '{family['id']}'")
-        family["role_id"] = canonical
-
-    # Reaction categories/types
-    legacy_reactions = read_json(LEGACY_REACTION_TYPES)
-    if not isinstance(legacy_reactions, dict):
-        raise RuntimeError("Expected reaction_types.json to contain category mapping.")
-    reaction_categories, reaction_types = convert_reactions(
-        legacy_reactions,
-        reactant_builder=reactant_builder,
-        alias_records=alias_records,
-    )
-
-    reactant_types, reactant_token_map = reactant_builder.build()
-
     manifest = build_manifest(args.schema_version, args.taxonomy_version)
 
-    payloads = {
-        "manifest.json": manifest,
-        "reaction_categories.json": reaction_categories,
-        "reaction_types.json": reaction_types,
-        "reactant_types.json": reactant_types,
-        "reagent_roles.json": reagent_roles,
-        "reagent_families.json": reagent_families,
-        "aliases.json": sorted(alias_records.values(), key=lambda item: item["alias"].lower()),
-    }
+    legacy_paths = [
+        LEGACY_REACTANT_TYPES,
+        LEGACY_REACTION_TYPES,
+        LEGACY_REAGENT_FAMILIES,
+    ]
+    missing_legacy_paths = [path for path in legacy_paths if not path.exists()]
 
+    if missing_legacy_paths:
+        payloads = payloads_from_unified_registry(manifest)
+    else:
+        alias_records: Dict[str, dict] = {}
+
+        # Reactant types
+        legacy_reactants = read_json(LEGACY_REACTANT_TYPES)
+        if not isinstance(legacy_reactants, dict):
+            raise RuntimeError("Expected reactant_types.json to contain an object mapping IDs to definitions.")
+        reactant_builder = ReactantTypeBuilder(aliases=alias_records)
+        reactant_builder.load_legacy(legacy_reactants)
+
+        # Reagent families (collect role usage)
+        reagent_families, role_to_families, roles_used = convert_reagent_families(LEGACY_REAGENT_FAMILIES, alias_records)
+
+        # Reagent roles (including roles referenced by families)
+        reagent_roles, role_alias_map = convert_reagent_roles(additional_roles=roles_used)
+        for alias, canonical_id in role_alias_map.items():
+            add_alias(
+                alias_records,
+                alias,
+                entity_type=ALIAS_ENTITY_REAGENT_ROLE,
+                entity_id=canonical_id,
+                source="legacy/reagent_roles",
+            )
+
+        for family in reagent_families:
+            role_alias = family["role_id"]
+            canonical = (
+                role_alias_map.get(role_alias)
+                or role_alias_map.get(role_alias.lower())
+                or role_alias_map.get(slugify(role_alias))
+            )
+            if canonical is None:
+                raise RuntimeError(f"Unable to resolve reagent role '{role_alias}' referenced by family '{family['id']}'")
+            family["role_id"] = canonical
+
+        # Reaction categories/types
+        legacy_reactions = read_json(LEGACY_REACTION_TYPES)
+        if not isinstance(legacy_reactions, dict):
+            raise RuntimeError("Expected reaction_types.json to contain category mapping.")
+        reaction_categories, reaction_types = convert_reactions(
+            legacy_reactions,
+            reactant_builder=reactant_builder,
+            alias_records=alias_records,
+        )
+
+        reactant_types, reactant_token_map = reactant_builder.build()
+
+        payloads = {
+            "manifest.json": manifest,
+            "reaction_categories.json": reaction_categories,
+            "reaction_types.json": reaction_types,
+            "reactant_types.json": reactant_types,
+            "reagent_roles.json": reagent_roles,
+            "reagent_families.json": reagent_families,
+            "aliases.json": sorted(alias_records.values(), key=lambda item: item["alias"].lower()),
+        }
+
+    if args.dry_run:
+        print("Dry-run conversion summary:")
+        for name, payload in payloads.items():
+            if isinstance(payload, list):
+                print(f"  - {name}: {len(payload)} entries")
+            elif isinstance(payload, dict):
+                print(f"  - {name}: keys={list(payload.keys())[:5]}{'...' if len(payload) > 5 else ''}")
+        return 0
+
+    for filename, payload in payloads.items():
+        write_json(output_dir / filename, payload)
+
+    # Validate by reloading
+    TaxonomyRegistry.from_path(output_dir)
+    return 0
     if args.dry_run:
         print("Dry-run conversion summary:")
         for name, payload in payloads.items():

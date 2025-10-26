@@ -837,7 +837,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    store = TaxonomyStore(Path(args.taxonomy_dir))
+    taxonomy_dir = Path(args.taxonomy_dir)
+    base_dir: Optional[Path] = taxonomy_dir if taxonomy_dir.exists() else None
+    store = TaxonomyStore(base_dir)
     heuristics = RoleHeuristics(store)
 
     if args.list_families:
@@ -847,6 +849,12 @@ def main() -> None:
                 label_str = f" - {label}" if label else ""
                 print(f"  {fid}{label_str}")
         return
+
+    if not args.dry_run and store.base_dir is None:
+        raise SystemExit(
+            "Cannot modify taxonomy because no legacy taxonomy directory is available. "
+            "Provide --taxonomy-dir pointing to a writable directory."
+        )
 
     if not args.cas:
         raise SystemExit("--cas is required unless --list-families is used.")

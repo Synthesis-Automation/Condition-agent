@@ -118,7 +118,11 @@ Examples:
 def main() -> None:
     """Main CLI entry point."""
     args = parse_args()
-    store = TaxonomyStore(Path(args.taxonomy_dir))
+    taxonomy_dir = Path(args.taxonomy_dir)
+    base_dir: Optional[Path] = taxonomy_dir if taxonomy_dir.exists() else None
+    if base_dir is None and args.verbose:
+        print(f"# Using unified taxonomy registry (legacy directory '{taxonomy_dir}' not found).")
+    store = TaxonomyStore(base_dir)
     heuristics = RoleHeuristics(store)
 
     # List families and exit
@@ -129,6 +133,12 @@ def main() -> None:
                 label_str = f" - {label}" if label else ""
                 print(f"  {fid}{label_str}")
         return
+
+    if not args.dry_run and store.base_dir is None:
+        raise SystemExit(
+            "Cannot modify taxonomy because no legacy taxonomy directory is available. "
+            "Provide --taxonomy-dir pointing to a writable directory."
+        )
 
     # Validate CAS is provided
     if not args.cas:

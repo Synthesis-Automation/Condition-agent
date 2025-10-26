@@ -14,7 +14,7 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 - **Protocol SMARTS tooling (`chemtools.protocol.smarts_generator_cli`)** to derive reaction SMARTS applicability patterns, guards, and visualisations for protocol curation and testing.
 - Explanation packs (`chemtools.explain`) that summarize precedents, alternatives, and rule hits for API and UI consumption.
 - **LLM integration (`llmtools`)** with multi-provider support (OpenAI, Aliyun/DeepSeek) for chemistry-specific agents and natural language processing.
-- **Unified taxonomy (`chemtools.taxonomy`)** providing centralized reaction, reactant, and reagent-role classifications with validation helpers, feeding router/recommendation modules; reagent enrichment utilities remain available under `chemtools.reagent`.
+- **Unified taxonomy (`chemtools.taxonomy`)** providing centralized reaction, reactant, and reagent-role classifications with validation helpers, feeding router/recommendation modules; reagent enrichment utilities now load from the same registry via `chemtools.reagent.taxonomy_store` and `load_families_registry_entries`.
 - **HTE simple recommender (`chemtools.recommend.hte_simple`)** providing deterministic condition suggestions from the standardized HTE z-score dataset shipped under `data/HTE_db`.
 - **HTE dataset tooling (`data-processor/HTE_data`)** to clean z-score exports, expand SMARTS coverage, benchmark the simple condition recommender, and ship scenario-focused pytest suites.
 - CLI utilities in `chemtools.rule.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
