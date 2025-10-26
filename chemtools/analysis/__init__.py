@@ -23,6 +23,8 @@ __all__ = [
     "classify_reactant_batch",
     "get_reactant_category_matches",
     "get_all_reactant_matches",
+    "normalize_reactant_identifier",
+    "normalize_reaction_type",
     "resolve_reaction_family",
     "canonical_family_label",
     "analyze_reaction",
@@ -38,6 +40,8 @@ classify_reactant_group = _reactants.classify_reactant_group
 classify_reactant_batch = _reactants.classify_reactant_batch
 get_reactant_category_matches = _reactants.get_reactant_category_matches
 get_all_reactant_matches = _reactants.get_all_reactant_matches
+normalize_reactant_identifier = _reactants.normalize_reactant_identifier
+normalize_reaction_type = _reactants.normalize_reaction_type
 resolve_reaction_family = _reactions.resolve_reaction_family
 canonical_family_label = _reactions.canonical_family_label
 
