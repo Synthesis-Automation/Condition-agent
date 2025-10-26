@@ -39,6 +39,7 @@ if str(ROOT_DIR) not in sys.path:
 # Import from the new unified chemtools.reagent package
 from chemtools.reagent import (
     dedupe_synonyms,
+    load_families_registry_entries,
     normalize_cas,
     resolve_identity_from_cas,
     tokenize_all,
@@ -292,20 +293,22 @@ class ReagentRegistryStore:
         self._load_registry()
 
     def _load_families(self) -> None:
-        # Try registry directory first
+        entries: List[Dict[str, Any]] = []
         schema_path = self.base_dir / "reagent_schema" / "families_registry.json"
-        
-        if not schema_path.exists():
-            # Fallback to chemtools package location
-            import chemtools.reagent
-            package_path = Path(chemtools.reagent.__file__).parent / "reagent_schema" / "families_registry.json"
-            if package_path.exists():
-                schema_path = package_path
-            else:
-                raise FileNotFoundError(f"Families registry not found in {self.base_dir / 'reagent_schema'} or {package_path}")
-        
-        data = json.loads(schema_path.read_text(encoding="utf-8"))
-        for entry in data.get("entries", []):
+
+        if schema_path.exists():
+            data = json.loads(schema_path.read_text(encoding="utf-8"))
+            entries = data.get("entries", [])
+        else:
+            try:
+                entries = load_families_registry_entries()
+            except FileNotFoundError as exc:
+                raise FileNotFoundError(
+                    f"Families registry not found in {self.base_dir / 'reagent_schema'} "
+                    f"and unable to load unified taxonomy: {exc}"
+                ) from exc
+
+        for entry in entries:
             role = entry.get("role")
             family = entry.get("family")
             if not role or not family:

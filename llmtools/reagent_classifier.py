@@ -28,6 +28,8 @@ from llmtools.prompts import (
 )
 from llmtools.reagent_review import _strip_markdown_fences
 
+from chemtools.reagent import load_families_registry_entries
+
 
 # Valid roles - must match ROLE_CONFIG in reagent_taxonomy_qt.py
 VALID_ROLES = {
@@ -348,30 +350,29 @@ def assign_fields(
             "error": "..." (if status=error)
         }
     """
-    # Load families for this role - try registry_dir first, then chemtools package
-    families_path = registry_dir / "reagent_schema" / "families_registry.json"
-    
-    if not families_path.exists():
-        # Fallback to chemtools package location
-        import chemtools.reagent
-        package_path = Path(chemtools.reagent.__file__).parent / "reagent_schema" / "families_registry.json"
-        if package_path.exists():
-            families_path = package_path
-        else:
+    # Load families for this role - prefer registry_dir override, fallback to unified taxonomy
+    families_entries: List[Dict[str, Any]] = []
+    schema_path = registry_dir / "reagent_schema" / "families_registry.json"
+
+    if schema_path.exists():
+        try:
+            families_data = json.loads(schema_path.read_text(encoding="utf-8"))
+            families_entries = families_data.get("entries", [])
+        except Exception as exc:
             return {
                 "status": "error",
-                "error": f"Families registry not found in {registry_dir / 'reagent_schema'} or {package_path}",
+                "error": f"Failed to load families registry: {exc}",
             }
-    
-    try:
-        families_data = json.loads(families_path.read_text(encoding="utf-8"))
-        all_families = families_data.get("entries", [])
-        role_families = [f for f in all_families if f.get("role") == role]
-    except Exception as exc:
-        return {
-            "status": "error",
-            "error": f"Failed to load families: {exc}",
-        }
+    else:
+        try:
+            families_entries = load_families_registry_entries()
+        except FileNotFoundError as exc:
+            return {
+                "status": "error",
+                "error": f"Families registry unavailable: {exc}",
+            }
+
+    role_families = [f for f in families_entries if f.get("role") == role]
     
     if not role_families:
         return {

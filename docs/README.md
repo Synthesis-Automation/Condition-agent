@@ -5,6 +5,7 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 ## Feature Highlights
 
 - Reaction parsing and normalization via `chemtools.smiles` with typed request/response contracts defined in `chemtools/contracts.py`.
+- Unified SMILES + taxonomy analysis helpers in `chemtools.analysis`, combining molecule normalization, reactant classification, and reaction-family metadata for routers, recommenders, and HTE pipelines.
 - Rule-based family detection and router (`chemtools.router`) that drives the downstream recommendation flow.
 - **Functional group detection (`chemtools.util.functional_groups`)** with 80+ detectable groups using SMARTS patterns (RDKit) or text-based fallbacks, accessible via unified Context API (`chem.functional_groups.*`).
 - Precedent search (`chemtools.precedent`) powered by DRFP similarity, Laplace-smoothed voting, and constraint filters (`chemtools.constraints`).
@@ -85,6 +86,11 @@ The tests rely on lightweight fixtures stored under `tests/` and do not require 
 |   |-- condition_core.py    # Legacy core selection logic (compat shim)
 |   |-- constraints.py       # Constraint rule definitions
 |   |-- dataset_analytics.py # Dataset profiling helpers for precedents/HTE
+|   |-- analysis/            # Unified SMILES/taxonomy analysis services
+|   |   |-- __init__.py      # analyze_reaction + convenience exports
+|   |   |-- smiles.py        # Normalization helpers (formerly chemtools.smiles)
+|   |   |-- reactants.py     # SMARTS classification + taxonomy lookups
+|   |   `-- reactions.py     # Reaction-family alias/catalyst utilities
 |   |-- explain.py           # Explanation and rationale builders
 |   |-- output_formatter.py  # Standard JSON output formatting shared across engines
 |   |-- formatters/          # Shared output formatters for rule/ML/protocol
