@@ -54,6 +54,7 @@ def _compile_smarts():
         # Phase 2 additions - nucleophiles and organometallics
         "alcohol": Chem.MolFromSmarts("[CX4][OX2H]"),  # Aliphatic alcohol
         "grignard": Chem.MolFromSmarts("[C,c][Mg][Br,Cl,I]"),  # Grignard reagent
+        "organozinc": Chem.MolFromSmarts("[C,c][Zn][Br,Cl,I]"),  # Organozinc (Negishi)
         "organolithium": Chem.MolFromSmarts("[C,c][Li]"),  # Organolithium
         "cyanide": Chem.MolFromSmarts("[C-]#N"),  # Cyanide anion
         "iodide": Chem.MolFromSmarts("[I-]"),  # Iodide anion
@@ -165,6 +166,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
         "ester": has("c(=o)o") and not has("c(=o)oh"),
         "alcohol": has("co") or has("oh"),
         "grignard": has("[mg]") or has("mgbr") or has("mgcl"),
+        "organozinc": has("[zn]") or has("znbr") or has("zncl") or has("rzn"),
         "organolithium": has("[li]") or has("li"),
         "cyanide": has("[c-]#n") or has("cn-") or has("nacn") or has("kcn"),
         "iodide": has("[i-]") or has("nai") or has("ki"),
@@ -212,128 +214,157 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
     return text_hits
 
 
-def _detect_reducing_agent(agents: List[Dict[str, Any]]) -> Optional[str]:
-    """Detect common reducing agents in reaction agents. Returns agent type or None."""
-    agent_text = " ".join([
-        str(a.get("smiles_norm") or a.get("largest_smiles") or a.get("input") or "")
-        for a in agents
-    ]).lower()
+def _detect_reducing_agent(reactants: List[str]) -> Optional[str]:
+    """Detect common reducing agents in reactants. Returns agent type or None."""
+    reactant_text = " ".join(reactants).lower()
     
-    if "h2" in agent_text or "[h][h]" in agent_text:
+    # Check for hydrogen gas (molecular hydrogen)
+    if "[h][h]" in reactant_text or "hh" in reactant_text:
         return "H2"
-    if "nabh4" in agent_text or "nabh(oac)3" in agent_text:
+    # Check for sodium borohydride
+    if "nabh4" in reactant_text or "nabh(oac)3" in reactant_text or "[bh4-]" in reactant_text:
         return "NaBH4"
-    if "lialh4" in agent_text:
+    # Check for lithium aluminum hydride
+    if "lialh4" in reactant_text or "[alh4-]" in reactant_text:
         return "LiAlH4"
-    if "bh3" in agent_text or "b2h6" in agent_text:
+    # Check for borane
+    if "bh3" in reactant_text or "b2h6" in reactant_text:
         return "BH3"
-    if "dibal" in agent_text:
+    # Check for DIBAL
+    if "dibal" in reactant_text or "diisobutyl" in reactant_text:
         return "DIBAL"
     return None
 
 
-def _detect_oxidizing_agent(agents: List[Dict[str, Any]]) -> Optional[str]:
-    """Detect common oxidizing agents in reaction agents. Returns agent type or None."""
-    agent_text = " ".join([
-        str(a.get("smiles_norm") or a.get("largest_smiles") or a.get("input") or "")
-        for a in agents
-    ]).lower()
+def _detect_oxidizing_agent(reactants: List[str]) -> Optional[str]:
+    """Detect common oxidizing agents in reactants. Returns agent type or None."""
+    reactant_text = " ".join(reactants).lower()
     
-    if "pcc" in agent_text or "pyridinium chlorochromate" in agent_text:
+    # Check for chromium-based oxidants
+    if "pcc" in reactant_text or "pyridinium" in reactant_text and "chrom" in reactant_text:
         return "PCC"
-    if "kmno4" in agent_text or "permanganate" in agent_text:
+    if "kmno4" in reactant_text or "permanganate" in reactant_text or "[mno4-]" in reactant_text:
         return "KMnO4"
-    if "cro3" in agent_text or "jones" in agent_text:
+    if "cro3" in reactant_text or "jones" in reactant_text:
         return "CrO3"
-    if "swern" in agent_text or "dmso" in agent_text and ("oxalyl" in agent_text or "(cocl)2" in agent_text):
+    # Check for Swern oxidation components
+    if "swern" in reactant_text or ("dmso" in reactant_text and ("oxalyl" in reactant_text or "cocl" in reactant_text)):
         return "Swern"
-    if "mno2" in agent_text:
+    # Check for manganese dioxide
+    if "mno2" in reactant_text:
         return "MnO2"
-    if "mcpba" in agent_text or "m-cpba" in agent_text:
+    # Check for mCPBA (meta-chloroperoxybenzoic acid)
+    if "mcpba" in reactant_text or "m-cpba" in reactant_text or "chloroperoxy" in reactant_text:
         return "mCPBA"
-    if "h2o2" in agent_text or "peroxide" in agent_text:
+    # Check for hydrogen peroxide
+    if "h2o2" in reactant_text or "ooh" in reactant_text:
         return "H2O2"
+    # Dess-Martin periodinane
+    if "dess" in reactant_text or "martin" in reactant_text:
+        return "Dess-Martin"
     return None
 
 
-def _detect_strong_base(agents: List[Dict[str, Any]]) -> bool:
+def _detect_strong_base(reactants: List[str]) -> bool:
     """Detect strong bases suitable for E2 elimination or deprotonation."""
-    agent_text = " ".join([
-        str(a.get("smiles_norm") or a.get("largest_smiles") or a.get("input") or "")
-        for a in agents
-    ]).lower()
+    reactant_text = " ".join(reactants).lower()
     
-    strong_bases = ["kot-bu", "koh", "naoh", "nah", "lda", "lhmds", "khmds", "dbu", "naome", "naoet"]
-    return any(base in agent_text for base in strong_bases)
+    strong_bases = ["kot-bu", "kotbu", "koh", "naoh", "nah", "lda", "lhmds", "khmds", "dbu", 
+                    "naome", "naoet", "[oh-]", "[o-]", "hydroxide", "alkoxide"]
+    return any(base in reactant_text for base in strong_bases)
 
 
 def detect_family(reactants: List[str]) -> Dict[str, Any]:
     h = _rule_hits(reactants)
     fam: Optional[str] = None
     conf = 0.3
+    
+    # Helper for checking reactant text
+    rs = " ".join(reactants).lower()
 
     # Determine family based on prioritized deterministic rules
     is_aryl_or_vinyl_electrophile = h.get("aryl_halide") or h.get("vinyl_halide") or h.get("triflate")
     
+    # PRIORITY 1: Grignard/organometallic addition to carbonyl (HIGHEST PRIORITY)
+    # This must come BEFORE any C-C coupling to prioritize carbonyl addition
+    if h.get("carbonyl") and (h.get("grignard") or h.get("organolithium") or h.get("organozinc")):
+        if h.get("grignard"):
+            fam, conf = "grignard_addition", 0.90
+        elif h.get("organozinc"):
+            fam, conf = "organozinc_addition", 0.90
+        else:
+            fam, conf = "organolithium_addition", 0.90
+    
+    # PRIORITY 2: C-C Couplings (if not carbonyl addition)
+    # C-C Suzuki Coupling (highest confidence C-C coupling)
+    elif h.get("aryl_halide") and h.get("boron"):
+        fam, conf = "suzuki_miyaura", 0.9
+    
+    # C-C Sonogashira Coupling
+    elif is_aryl_or_vinyl_electrophile and h.get("terminal_alkyne"):
+        fam, conf = "sonogashira", 0.85
+    
+    # Kumada Coupling (aryl halide + Grignard, no carbonyl already checked above)
+    elif is_aryl_or_vinyl_electrophile and h.get("grignard"):
+        fam, conf = "kumada_coupling", 0.85
+    
+    # Negishi Coupling (aryl halide + organozinc, no carbonyl already checked above)
+    elif is_aryl_or_vinyl_electrophile and h.get("organozinc"):
+        fam, conf = "negishi_coupling", 0.85
+    
+    # Heck Coupling (aryl halide + alkene, no boron)
+    elif is_aryl_or_vinyl_electrophile and h.get("alkene") and not h.get("boron"):
+        fam, conf = "heck_coupling", 0.80
+    
+    # PRIORITY 3: C-N/C-O/C-S Couplings (heteroatom couplings)
     # C-N Coupling (unified - metal preference handled via constraints)
-    if is_aryl_or_vinyl_electrophile and h.get("nucleophile_n"):
+    elif is_aryl_or_vinyl_electrophile and h.get("nucleophile_n"):
         fam, conf = "cn_coupling", 0.9 if h.get("aryl_halide") else 0.8
     
     # C-O Coupling (Ullmann-type etherification)
-    if is_aryl_or_vinyl_electrophile and h.get("nucleophile_o"):
+    elif is_aryl_or_vinyl_electrophile and h.get("nucleophile_o"):
         fam, conf = "co_coupling", 0.85 if h.get("aryl_halide") else 0.75
     
     # C-S Coupling (Ullmann-type thioetherification)
-    if is_aryl_or_vinyl_electrophile and h.get("nucleophile_s"):
+    elif is_aryl_or_vinyl_electrophile and h.get("nucleophile_s"):
         fam, conf = "cs_coupling", 0.85 if h.get("aryl_halide") else 0.75
     
-    # C-C Suzuki Coupling (higher priority than C-O/C-S)
-    if h.get("aryl_halide") and h.get("boron"):
-        fam, conf = "suzuki_miyaura", max(conf, 0.9)
+    # PRIORITY 4: Amide/Ester formation
+    # Amide formation (higher priority than esterification)
+    elif h.get("acid") and h.get("nucleophile_n"):
+        fam, conf = "amide_coupling", 0.8
     
-    # C-C Sonogashira Coupling
-    if is_aryl_or_vinyl_electrophile and h.get("terminal_alkyne"):
-        fam, conf = "sonogashira", max(conf, 0.85)
+    # Esterification (acid + alcohol, but not amide)
+    elif h.get("acid") and h.get("alcohol"):
+        fam, conf = "esterification", 0.85
     
-    # Amide formation
-    if h.get("acid") and h.get("nucleophile_n"):
-        fam, conf = "amide_coupling", max(conf, 0.8)
+    # PRIORITY 5: SN2 reactions and substitutions
+    # Hydroboration (alkene + borane)
+    elif h.get("alkene") and h.get("borane"):
+        fam, conf = "hydroboration", 0.85
     
-    # Phase 2 additions - Esterification
-    if h.get("acid") and h.get("alcohol") and not h.get("nucleophile_n"):
-        fam, conf = "esterification", max(conf, 0.85)
+    # SN2 with cyanide (highest priority SN2)
+    elif h.get("alkyl_halide") and h.get("cyanide"):
+        fam, conf = "nitrile_formation", 0.90
     
-    # Phase 2 additions - Grignard addition (carbonyl + Grignard)
-    if h.get("carbonyl") and (h.get("grignard") or h.get("organolithium")):
-        if h.get("grignard"):
-            fam, conf = "grignard_addition", max(conf, 0.90)
-        else:
-            fam, conf = "organolithium_addition", max(conf, 0.90)
+    # Finkelstein (halide exchange)
+    elif h.get("alkyl_halide") and h.get("iodide"):
+        fam, conf = "finkelstein", 0.85
     
-    # Phase 2 additions - Hydroboration (alkene + borane)
-    if h.get("alkene") and h.get("borane"):
-        fam, conf = "hydroboration", max(conf, 0.85)
+    # Williamson ether synthesis
+    elif h.get("alkyl_halide") and (h.get("alkoxide") or h.get("alcohol")):
+        fam, conf = "williamson_ether", 0.85
     
-    # Phase 2 additions - SN2 reactions
-    if h.get("alkyl_halide"):
-        if h.get("cyanide"):
-            fam, conf = "nitrile_formation", max(conf, 0.90)
-        elif h.get("iodide"):
-            fam, conf = "finkelstein", max(conf, 0.85)
-        elif h.get("alkoxide") or (h.get("alcohol") and not h.get("acid")):
-            fam, conf = "williamson_ether", max(conf, 0.85)
+    # PRIORITY 6: Condensation reactions (LOWER PRIORITY)
+    elif h.get("ester") and rs.count("c(=o)o") >= 2:  # Two esters (Claisen)
+        fam, conf = "claisen_condensation", 0.70
     
-    # Phase 2 additions - Condensation reactions
-    if h.get("carbonyl") and h.get("ester"):
-        # Both carbonyl and ester present - likely Claisen
-        fam, conf = "claisen_condensation", max(conf, 0.70)
-    elif h.get("alpha_beta_unsaturated") and h.get("carbonyl"):
-        # α,β-unsaturated carbonyl + nucleophilic carbonyl - likely Michael
-        fam, conf = "michael_addition", max(conf, 0.65)
+    elif h.get("alpha_beta_unsaturated"):  # α,β-unsaturated carbonyl - Michael
+        fam, conf = "michael_addition", 0.65
     
-    # Phase 2 additions - Cycloaddition
-    if h.get("conjugated_diene") and h.get("alkene"):
-        fam, conf = "diels_alder", max(conf, 0.85)
+    # PRIORITY 7: Cycloaddition
+    elif h.get("conjugated_diene") and h.get("alkene"):
+        fam, conf = "diels_alder", 0.85
 
     canonical_family = fam or "Unknown"
 
@@ -381,30 +412,36 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
     if fam_rule in CN_FAMILIES_CANONICAL:
         conf_rule = max(conf_rule, 0.9 if hits.get("aryl_halide") else 0.85)
     
-    # Phase 2 additions - Agent-based detection (hydrogenation, reduction, oxidation, elimination)
-    agents_list = norm.get("agents") or []
+    # Phase 2 additions - Reagent-based detection (hydrogenation, reduction, oxidation, elimination)
+    # Check reactants for common reagents (they appear in reactants, not separate agents)
+    # ONLY override if no family detected yet OR low confidence
     
     # Detect hydrogenation (H2 + alkene/alkyne/aryl/carbonyl)
-    reducing_agent = _detect_reducing_agent(agents_list)
+    reducing_agent = _detect_reducing_agent(reactants)
     if reducing_agent == "H2" and (hits.get("alkene") or hits.get("terminal_alkyne") or hits.get("carbonyl")):
-        fam_rule, conf_rule = "hydrogenation", max(conf_rule, 0.90)
+        if fam_rule == "Unknown" or conf_rule < 0.85:
+            fam_rule, conf_rule = "hydrogenation", 0.90
     
     # Detect carbonyl reduction (NaBH4/LiAlH4 + carbonyl)
     elif reducing_agent in ("NaBH4", "LiAlH4", "BH3", "DIBAL") and hits.get("carbonyl"):
-        fam_rule, conf_rule = "carbonyl_reduction", max(conf_rule, 0.88)
+        if fam_rule == "Unknown" or conf_rule < 0.85:
+            fam_rule, conf_rule = "carbonyl_reduction", 0.88
     
     # Detect alcohol oxidation (oxidant + alcohol)
-    oxidizing_agent = _detect_oxidizing_agent(agents_list)
-    if oxidizing_agent in ("PCC", "KMnO4", "CrO3", "Swern", "MnO2") and hits.get("alcohol"):
-        fam_rule, conf_rule = "alcohol_oxidation", max(conf_rule, 0.85)
+    oxidizing_agent = _detect_oxidizing_agent(reactants)
+    if oxidizing_agent in ("PCC", "KMnO4", "CrO3", "Swern", "MnO2", "Dess-Martin") and hits.get("alcohol"):
+        if fam_rule == "Unknown" or conf_rule < 0.80:
+            fam_rule, conf_rule = "alcohol_oxidation", 0.85
     
     # Detect epoxidation (mCPBA/H2O2 + alkene)
     elif oxidizing_agent in ("mCPBA", "H2O2") and hits.get("alkene"):
-        fam_rule, conf_rule = "epoxidation", max(conf_rule, 0.85)
+        if fam_rule == "Unknown" or conf_rule < 0.80:
+            fam_rule, conf_rule = "epoxidation", 0.85
     
     # Detect E2 elimination (strong base + alkyl halide)
-    if _detect_strong_base(agents_list) and hits.get("alkyl_halide") and not hits.get("cyanide"):
-        fam_rule, conf_rule = "e2_elimination", max(conf_rule, 0.80)
+    if _detect_strong_base(reactants) and hits.get("alkyl_halide") and not hits.get("cyanide"):
+        if fam_rule == "Unknown" or conf_rule < 0.75:
+            fam_rule, conf_rule = "e2_elimination", 0.80
 
     auto: Optional[Dict[str, Any]] = None
     fam_rxn: Optional[str] = None
