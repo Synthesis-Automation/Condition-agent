@@ -5,6 +5,7 @@
 **Hybrid approach: Rule-based (primary) + rxn_insight ML (optional fallback)**
 
 ### 1. Rule-Based Detection (`chemtools/router.py`)
+
 - **Location**: `detect_family()` function (lines 175-215)
 - **Method**: SMARTS pattern matching on reactants
 - **Coverage**: **Only 7 reaction patterns hardcoded**
@@ -17,12 +18,14 @@
   7. **Default: Unknown** for everything else
 
 ### 2. rxn_insight ML Detection (optional)
+
 - **Status**: ✓ Installed, available
 - **Accuracy on Phase 2 types**: ⚠️ **Poor** (see test results below)
 - **Method**: Trained ML classifier from rxn_insight library
 - **Used as**: Fallback/augmentation to rule-based
 
 ### 3. Taxonomy JSON Files (metadata only)
+
 - **Files**: `reactant_types.json` (49 types), `reaction_types.json` (72 types)
 - **Purpose**: Define reactant categories and reaction metadata
 - **Usage**: Classification of individual reactants, NOT reaction family detection
@@ -55,6 +58,7 @@
 **Approach**: Manually add SMARTS patterns and logic for each Phase 2 reaction type
 
 **Implementation Steps**:
+
 1. Add SMARTS patterns to `_compile_smarts()`:
    - Ketone/aldehyde: `[CX3](=O)[C,H]`
    - Ester: `[CX3](=O)[OX2][C,H]`
@@ -66,6 +70,7 @@
    - etc.
 
 2. Add detection logic to `detect_family()`:
+
    ```python
    # Esterification
    if h.get("acid") and h.get("alcohol"):
@@ -81,6 +86,7 @@
    ```
 
 **Pros**:
+
 - ✅ Deterministic, reproducible
 - ✅ Fast (no ML overhead)
 - ✅ No external dependencies
@@ -89,6 +95,7 @@
 - ✅ Aligns with existing codebase architecture
 
 **Cons**:
+
 - ⚠️ Manual work (2-4 hours for all Phase 2 types)
 - ⚠️ Requires chemistry knowledge for SMARTS
 - ⚠️ Each new type needs manual addition
@@ -102,6 +109,7 @@
 **Approach**: Rewrite `detect_family()` to iterate through `reaction_types.json`
 
 **Implementation Steps**:
+
 1. Load taxonomy JSON files at startup
 2. For each reaction type in JSON:
    - Check if all required reactant types are present
@@ -109,12 +117,14 @@
 3. Return best match based on confidence scoring
 
 **Pros**:
+
 - ✅ Systematic, scalable
 - ✅ Taxonomy-driven (add types via JSON, not code)
 - ✅ Easier to maintain long-term
 - ✅ Supports dynamic expansion
 
 **Cons**:
+
 - ❌ Major refactoring (200+ lines of new code)
 - ❌ Need to design matching algorithm
 - ❌ Performance overhead (JSON parsing, iteration)
@@ -131,15 +141,18 @@
 **Approach**: Use existing rxn_insight, add mapping rules for new types
 
 **Implementation Steps**:
+
 1. Add mapping rules in `reaction_type_detector.py` `_map_to_family()`
 2. Trust rxn_insight classifications
 3. Add manual overrides for edge cases
 
 **Pros**:
+
 - ✅ Minimal code changes
 - ✅ ML may generalize to unseen reactions
 
 **Cons**:
+
 - ❌ **Test results show poor accuracy** (0/9 correct)
 - ❌ External dependency (black box)
 - ❌ No control over ML model
@@ -153,7 +166,7 @@
 
 ## **Recommendation: Option A (Add Detection Rules to router.py)** ⭐⭐⭐⭐⭐
 
-### Why Option A is Best:
+### Why Option A is Best
 
 1. **Proven Architecture**: Current system already uses rule-based detection successfully for 7 reaction types
 2. **High Accuracy**: Deterministic rules can achieve >95% accuracy when properly designed
@@ -163,44 +176,49 @@
 6. **No Dependencies**: Works offline, no ML black boxes
 7. **Aligns with Codebase**: Minimal disruption to existing architecture
 
-### Implementation Plan (3-5 hours):
+### Implementation Plan (3-5 hours)
 
 **Phase 2A: Add SMARTS patterns** (1 hour)
+
 - Carbonyl, ester, Grignard, borane, cyanide, iodide, alkoxide, alkene
 
 **Phase 2B: Add detection logic** (2-3 hours)
+
 - Esterification, Grignard addition, hydroboration
 - Nitrile formation, Finkelstein, Williamson ether
 - Claisen condensation, Michael addition, organolithium addition
 
 **Phase 2C: Validation** (1 hour)
+
 - Re-run test suite
 - Measure UNKNOWN reduction (expect 107 → 40-60)
 
-### Expected Outcome:
+### Expected Outcome
+
 - Coverage improvement: **74.9% → 85-90%** (320 → ~360-380 classified)
 - UNKNOWN reduction: **107 → ~40-60** reactions
 
 ---
 
-## Why NOT Option B or C:
+## Why NOT Option B or C
 
 **Option B (JSON refactoring)**:
+
 - Too complex for current needs
 - Better suited for future v3.0 rewrite
 - Save for when you have >200 reaction types
 
 **Option C (rxn_insight)**:
+
 - Test results prove **0% accuracy** on Phase 2 types
 - Unreliable for production use
 - Keep as optional augmentation only
 
 ---
 
-## Next Steps (if approved):
+## Next Steps (if approved)
 
 1. Implement Option A detection rules in `router.py`
 2. Validate with test suite
 3. Document new patterns in code comments
 4. Generate final coverage report
-
