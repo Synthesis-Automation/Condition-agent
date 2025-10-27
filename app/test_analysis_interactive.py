@@ -7,7 +7,11 @@ Users can input reaction SMILES and optionally specify the reaction type.
 """
 
 import sys
+from pathlib import Path
 from typing import Optional
+
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from chemtools.analysis.reaction_context import (
     classify_reactants_with_context,
