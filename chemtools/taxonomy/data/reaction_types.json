@@ -510,19 +510,19 @@
   },
   {
     "aliases": [
-      "SNAr",
-      "Aromatic nucleophilic substitution"
+      "SNAr C-N",
+      "Aromatic nucleophilic substitution with amines"
     ],
     "category_id": "c_n_coupling_reactions",
-    "description": "Direct nucleophilic substitution on electron-deficient aryl halides",
-    "id": "snar",
+    "description": "Direct nucleophilic substitution on electron-deficient aryl halides with nitrogen nucleophiles",
+    "id": "snar_cn",
     "metadata": {
       "typical_catalysts": [
         "None (thermal) or metal catalyst"
       ],
       "typical_conditions": "Base, polar solvent, elevated temperature"
     },
-    "name": "Nucleophilic Aromatic Substitution",
+    "name": "Nucleophilic Aromatic Substitution (C-N)",
     "reactants": [
       {
         "notes": null,
@@ -536,10 +536,7 @@
         "notes": null,
         "original_tokens": [
           "Aliphatic-amine",
-          "Aniline-type",
-          "ROH",
-          "ArOH",
-          "RSH"
+          "Aniline-type"
         ],
         "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
@@ -547,7 +544,7 @@
     ],
     "required_roles": [],
     "source_ids": [
-      "SNAr"
+      "SNAr-CN"
     ]
   },
   {
@@ -771,6 +768,45 @@
   },
   {
     "aliases": [
+      "SNAr C-O",
+      "Aromatic nucleophilic substitution with alcohols"
+    ],
+    "category_id": "c_o_coupling_reactions",
+    "description": "Direct nucleophilic substitution on electron-deficient aryl halides with oxygen nucleophiles",
+    "id": "snar_co",
+    "metadata": {
+      "typical_catalysts": [
+        "None (thermal) or metal catalyst"
+      ],
+      "typical_conditions": "Base, polar solvent, elevated temperature"
+    },
+    "name": "Nucleophilic Aromatic Substitution (C-O)",
+    "reactants": [
+      {
+        "notes": null,
+        "original_tokens": [
+          "ArX*"
+        ],
+        "reactant_type_id": "ArX*",
+        "stoichiometry": null
+      },
+      {
+        "notes": null,
+        "original_tokens": [
+          "ROH",
+          "ArOH"
+        ],
+        "reactant_type_id": "ROH",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "SNAr-CO"
+    ]
+  },
+  {
+    "aliases": [
       "Carbon-sulfur coupling",
       "Thioether formation"
     ],
@@ -806,6 +842,44 @@
     "required_roles": [],
     "source_ids": [
       "CS-Coupling"
+    ]
+  },
+  {
+    "aliases": [
+      "SNAr C-S",
+      "Aromatic nucleophilic substitution with thiols"
+    ],
+    "category_id": "c_s_coupling_reactions",
+    "description": "Direct nucleophilic substitution on electron-deficient aryl halides with sulfur nucleophiles",
+    "id": "snar_cs",
+    "metadata": {
+      "typical_catalysts": [
+        "None (thermal) or metal catalyst"
+      ],
+      "typical_conditions": "Base, polar solvent, elevated temperature"
+    },
+    "name": "Nucleophilic Aromatic Substitution (C-S)",
+    "reactants": [
+      {
+        "notes": null,
+        "original_tokens": [
+          "ArX*"
+        ],
+        "reactant_type_id": "ArX*",
+        "stoichiometry": null
+      },
+      {
+        "notes": null,
+        "original_tokens": [
+          "RSH"
+        ],
+        "reactant_type_id": "RSH",
+        "stoichiometry": null
+      }
+    ],
+    "required_roles": [],
+    "source_ids": [
+      "SNAr-CS"
     ]
   },
   {

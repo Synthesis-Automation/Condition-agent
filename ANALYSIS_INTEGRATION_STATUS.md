@@ -7,6 +7,7 @@ The **new taxonomy/analysis module** has been successfully integrated into the r
 ## What's Working
 
 ### ✅ Detection in Cross-Family Mode
+
 ```bash
 $ python app/cross_family_recommendation_cli.py "Brc1ccccc1.Nc1ccccc1>>..."
 
@@ -15,15 +16,18 @@ Detected Family: C_N_Coupling (confidence: 0.30)
 ```
 
 ### ✅ Reactant Classification
-- **Reactant 1**: ArBr (aryl bromide) - electrophile  
+
+- **Reactant 1**: ArBr (aryl bromide) - electrophile
 - **Reactant 2**: ArNH2 (aniline) - nucleophile candidate
 
 ### ✅ Family Mapping
+
 - `ullmann_cn` (taxonomy ID) → `C_N_Coupling` (precedent database family)
 - `suzuki_miyaura` → `Suzuki`
 - `buchwald_hartwig_c_n` → `C_N_Coupling`
 
 ### ✅ Three-Tier Detection System
+
 1. **Priority 1**: Analysis module (SMARTS + Two-Pass Approach)
 2. **Priority 2**: rxn-insight ML model
 3. **Priority 3**: Rule-based detection
@@ -33,12 +37,14 @@ Detected Family: C_N_Coupling (confidence: 0.30)
 The precedent search is returning 0 results for some reactions. This is **NOT** an analysis module issue - it's a pre-existing DRFP/precedent search issue.
 
 **Evidence**:
+
 - Detection works: `family: C_N_Coupling` ✅
-- Data exists: `C_N_Coupling.jsonl` (38MB, thousands of reactions) ✅  
+- Data exists: `C_N_Coupling.jsonl` (38MB, thousands of reactions) ✅
 - DRFP index exists: `C_N_Coupling_drfp.npz` (1.8MB) ✅
 - But precedent search returns: `0 precedents` ❌
 
 **Possible causes**:
+
 1. SMILES format mismatch between query and database
 2. DRFP similarity threshold too strict
 3. DRFP fingerprint computation issue
@@ -67,7 +73,7 @@ assert rc['reaction_type'] == 'ullmann_cn'
 assert rc['confidence'] == 0.85
 assert rc['num_reactants'] == 2
 
-# ✅ Reactants correctly classified  
+# ✅ Reactants correctly classified
 reactants = rc['reactants']
 assert reactants[0]['member_type'] == 'ArBr'
 assert reactants[0]['role'] == 'electrophile'
@@ -77,11 +83,13 @@ assert reactants[1]['member_type'] == 'ArNH2'
 ## Files Modified
 
 1. **`chemtools/recommend/modules/recommender.py`**:
+
    - Added Three-Tier detection system
    - Preserved detection in cross-family mode
    - Added `detected_family` to results
 
 2. **`chemtools/recommend/modules/structured.py`**:
+
    - Preserved detection metadata from recommender
    - Added reactant classification to API output
    - Fixed metadata loss in structured wrapper

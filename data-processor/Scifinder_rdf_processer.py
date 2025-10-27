@@ -16,6 +16,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 from typing import List, Optional, Dict, Any, Set, Tuple
+from collections import defaultdict
 
 from PyQt6 import QtWidgets, QtCore
 QtBinding = 'PyQt6'
@@ -441,17 +442,79 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             return {"name": name.strip(), "cas": cas.strip()}
         return {"name": item.strip(), "cas": ""}
 
+    def _component_from_item(self, item: Any) -> Dict[str, Any]:
+        if isinstance(item, dict):
+            return {k: v for k, v in item.items()}
+        if isinstance(item, str):
+            return self._pair_to_obj(item)
+        return {"name": str(item).strip(), "cas": ""}
+
+    def _lookup_registry_record(self, name: str, cas: str) -> Tuple[Dict[str, Any], str]:
+        cas_key = (cas or "").strip()
+        record: Dict[str, Any] = {}
+        if cas_key:
+            record = self.cas_map.get(cas_key, {})
+        if (not record) and name:
+            taxonomy = getattr(self, "taxonomy", None)
+            if taxonomy:
+                norm_func = getattr(taxonomy, "_norm_name", None)
+                norm_name = norm_func(name) if callable(norm_func) else name.lower().strip()
+                alt_cas = taxonomy.name_to_cas.get(norm_name)
+                if alt_cas:
+                    maybe_record = self.cas_map.get(alt_cas, {})
+                    if maybe_record:
+                        record = maybe_record
+                        cas_key = alt_cas
+        return record or {}, cas_key
+
+    def _normalize_component(self, component: Dict[str, Any]) -> Dict[str, Any]:
+        base = {k: v for k, v in component.items() if v is not None}
+        name = (base.get("name") or "").strip()
+        cas = (base.get("cas") or "").strip()
+        record, resolved_cas = self._lookup_registry_record(name, cas)
+
+        abbreviation = (record.get("Abbreviation") or "").strip()
+        token = (record.get("Token") or "").strip()
+        registry_name = (record.get("Name") or "").strip()
+
+        display_name = (
+            abbreviation
+            or token
+            or name
+            or registry_name
+            or resolved_cas
+            or "?"
+        ).strip()
+        if not display_name:
+            display_name = "?"
+
+        normalized = dict(base)
+        if resolved_cas:
+            normalized["cas"] = resolved_cas
+
+        normalized["name"] = display_name
+
+        if abbreviation:
+            normalized["abbreviation"] = abbreviation
+        else:
+            normalized.pop("abbreviation", None)
+
+        original_candidate = name or registry_name
+        if original_candidate and original_candidate != display_name:
+            normalized["original_name"] = original_candidate
+        else:
+            normalized.pop("original_name", None)
+
+        return normalized
+
     def _join_names(self, arr):
         if not arr:
             return ""
         out = []
         for it in arr:
-            if isinstance(it, dict):
-                nm = (it.get("name") or "").strip()
-            elif isinstance(it, str):
-                nm = it.split("|", 1)[0].strip()
-            else:
-                nm = str(it)
+            component = self._component_from_item(it)
+            normalized = self._normalize_component(component)
+            nm = (normalized.get("name") or "").strip()
             if nm:
                 out.append(nm)
         return ", ".join(out)
@@ -788,7 +851,7 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
 
                     reag_out = []
                     for i, item in enumerate(reag_list):
-                        obj = self._pair_to_obj(item)
+                        obj = self._normalize_component(self._component_from_item(item))
                         role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
                         seg = obj.get("name") or obj.get("cas") or "?"
                         if obj.get("cas"):
@@ -797,7 +860,7 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
 
                     solv_out = []
                     for item in solv_list:
-                        obj = self._pair_to_obj(item)
+                        obj = self._normalize_component(self._component_from_item(item))
                         seg = obj.get("name") or obj.get("cas") or "?"
                         if obj.get("cas"):
                             seg += f" ({obj['cas']})"
@@ -849,9 +912,18 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             chemtools_available = False
             drfp_available = False
         
-        out_lines = []
+        out_lines: List[str] = []
         precompute_stats = {"success": 0, "failed": 0, "skipped": 0, "drfp_computed": 0}
         family_sources = {"scifinder": 0, "scifinder_partial": 0, "scifinder_unmapped": 0, "unknown": 0}
+        snar_map = {
+            "C_N_Coupling": "SNAr-CN",
+            "C_O_Coupling": "SNAr-CO",
+            "C_S_Coupling": "SNAr-CS",
+        }
+        snar_outputs: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        snar_counts: Dict[str, int] = defaultdict(int)
+        dropped_no_catalyst = 0
+        dataset_family = os.path.splitext(os.path.basename(output_path))[0] or source_folder
         
         # Collect DRFP fingerprints for binary storage
         drfp_fingerprints = []  # List of numpy arrays
@@ -864,19 +936,29 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             condition_core = self._compute_condition_core(row, full_system_list)
 
             # Process catalytic system (same format as reagents)
-            catalytic_system = [self._pair_to_obj(x) for x in full_system_list]
+            catalytic_system = [
+                self._normalize_component(self._component_from_item(x))
+                for x in full_system_list
+            ]
+            if dataset_family == "Suzuki" and not catalytic_system:
+                dropped_no_catalyst += 1
+                precompute_stats["skipped"] += 1
+                continue
 
             reag_list = self._safe_json_list(row.get("Reagent", "[]"))
             role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
             reagents = []
             for i, item in enumerate(reag_list):
-                obj = self._pair_to_obj(item)
+                obj = self._normalize_component(self._component_from_item(item))
                 role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
                 obj["role"] = role
                 reagents.append(obj)
 
             solv_list = self._safe_json_list(row.get("Solvent", "[]"))
-            solvents = [self._pair_to_obj(x) for x in solv_list]
+            solvents = [
+                self._normalize_component(self._component_from_item(x))
+                for x in solv_list
+            ]
 
             def _num(x):
                 try:
@@ -1027,12 +1109,6 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         # Store precomputed data (without DRFP - saved separately)
                         precomputed = {
                             "reaction_smiles": reaction_smiles,
-                            "normalized": normalized_rxn,
-                            "reactants_normalized": reactants_normalized,
-                            "detected_family": detected_family,
-                            "family_confidence": round(family_confidence, 3),
-                            "family_source": family_source,  # Track where family came from
-                            "scifinder_type": scifinder_type,  # Keep original SciFinder name
                             "features": features,
                         }
                         
@@ -1061,9 +1137,14 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             elif not chemtools_available:
                 precompute_stats["skipped"] += 1
 
+            target_dataset = dataset_family
+            if not catalytic_system and dataset_family in snar_map:
+                target_dataset = snar_map[dataset_family]
+                snar_counts[target_dataset] += 1
+
             analysis_record = {
                 "reaction_id": rid,
-                "reaction_type": rtype,
+                "reaction_type": target_dataset,
                 "condition_core": condition_core,
                 "catalytic_system": catalytic_system,
                 "reagents": reagents,
@@ -1077,12 +1158,60 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             if precomputed:
                 analysis_record["precomputed"] = precomputed
             
-            out_lines.append(_json.dumps(analysis_record, ensure_ascii=False))
+            if target_dataset == dataset_family:
+                out_lines.append(_json.dumps(analysis_record, ensure_ascii=False))
+            else:
+                snar_outputs[target_dataset].append(analysis_record)
 
         # Write output file
         try:
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
+            
+            # Persist routed SNAr reactions to dedicated datasets
+            if snar_outputs:
+                dataset_dir = os.path.dirname(output_path)
+                for snar_type, records in snar_outputs.items():
+                    if not records:
+                        continue
+                    snar_path = os.path.join(dataset_dir, f"{snar_type}.jsonl")
+                    existing_ids: Set[str] = set()
+                    if os.path.exists(snar_path):
+                        try:
+                            with open(snar_path, "r", encoding="utf-8") as existing_file:
+                                for line in existing_file:
+                                    line = line.strip()
+                                    if not line:
+                                        continue
+                                    try:
+                                        rid_val = _json.loads(line).get("reaction_id")
+                                    except Exception:
+                                        continue
+                                    if rid_val:
+                                        existing_ids.add(str(rid_val))
+                        except Exception:
+                            existing_ids = set()
+                    new_lines: List[str] = []
+                    for record in records:
+                        rid_val = str(record.get("reaction_id") or "")
+                        if rid_val and rid_val in existing_ids:
+                            continue
+                        if rid_val:
+                            existing_ids.add(rid_val)
+                        new_lines.append(_json.dumps(record, ensure_ascii=False))
+                    if not new_lines:
+                        continue
+                    mode = "a"
+                    need_newline = False
+                    if not os.path.exists(snar_path) or os.path.getsize(snar_path) == 0:
+                        mode = "w"
+                    else:
+                        need_newline = True
+                    with open(snar_path, mode, encoding="utf-8") as snar_file:
+                        if need_newline:
+                            snar_file.write("\n")
+                        snar_file.write("\n".join(new_lines))
+                    print(f"  Routed {len(new_lines)} reactions to {snar_type} dataset ({snar_path})")
             
             # Save DRFP fingerprints to binary NPZ file
             if drfp_fingerprints and drfp_reaction_ids:
@@ -1128,6 +1257,12 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                 print(f"  SciFinder partial match: {family_sources['scifinder_partial']} ({family_sources['scifinder_partial']/max(1,precompute_stats['success'])*100:.1f}%)")
                 print(f"  SciFinder unmapped:      {family_sources['scifinder_unmapped']} ({family_sources['scifinder_unmapped']/max(1,precompute_stats['success'])*100:.1f}%)")
                 print(f"  Unknown/Missing:         {family_sources['unknown']} ({family_sources['unknown']/max(1,precompute_stats['success'])*100:.1f}%)")
+                if dropped_no_catalyst:
+                    print(f"\nExcluded (no catalyst, Suzuki): {dropped_no_catalyst}")
+                if snar_counts:
+                    print("\nSNAr routing summary:")
+                    for snar_type, count in snar_counts.items():
+                        print(f"  {snar_type}: {count}")
                 print(f"{'='*60}")
                 print(f"✓ Dataset saved with precomputed normalization and features!")
                 print(f"✓ DRFP fingerprints saved to separate binary .npz file (saves ~90% space)")
