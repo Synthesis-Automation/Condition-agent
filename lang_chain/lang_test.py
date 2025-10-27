@@ -9,9 +9,6 @@ from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 # -------- API Configuration --------
@@ -23,7 +20,7 @@ def get_llm_client():
     """Get LLM client using configured provider and model."""
     # Determine provider from environment
     provider = os.getenv("LLM_PROVIDER", "openai")
-    model = os.getenv("LLM_MODEL", "gpt-4o-mini")
+    model = os.getenv("LLM_MODEL", "gpt-4o")
     
     if provider == "aliyun":
         api_key = os.getenv("ALIYUN_API_KEY")
