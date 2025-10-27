@@ -131,12 +131,25 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
     print(f"Strategy: {strategy.upper()}")
     print(f"Confidence: {confidence:.2f}")
     
-    # Detection information
+    # Detection information - show both detected family and analysis results
     if "detection" in result:
         detection = result["detection"]
-        detected_family = detection.get("family", "Unknown")
+        detected_family = detection.get("detected_family") or detection.get("family", "Unknown")
         detection_confidence = detection.get("confidence", 0.0)
+        analysis_used = detection.get("analysis_module_used", False)
+        
         print(f"Detected Family: {detected_family} (confidence: {detection_confidence:.2f})")
+        
+        # Show reactant classification if available
+        if analysis_used and detection.get("reactant_classification"):
+            rc = detection["reactant_classification"]
+            rxn_type = rc.get("reaction_type", "Unknown")
+            num_reactants = rc.get("num_reactants", 0)
+            print(f"  - Analysis Module: {rxn_type} ({num_reactants} reactants classified)")
+    elif "detected_family" in result:
+        # Fallback to top-level detected_family
+        detected_family = result.get("detected_family", "Unknown")
+        print(f"Detected Family: {detected_family}")
     
     # Recommendations
     recommendations = result.get("recommendations", [])

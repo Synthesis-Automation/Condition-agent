@@ -88,9 +88,21 @@ def recommend_conditions_structured(
         if isinstance(summary, dict):
             summary.setdefault("rank", idx)
     
-    # Build detection section with all fields
+    # Build detection section - start with result's detection metadata
+    result_detection = result.get("detection") or {}
     detection = dict(formatted.get("detection") or {})
-    detected_family = detection.get("family") or result.get("family") or "Unknown"
+    
+    # Preserve important fields from result.detection
+    for key in ["auto_family", "rule_family", "detected_family", "source", "search_mode", 
+                "analysis_module_used", "reactant_classification"]:
+        if key in result_detection:
+            detection[key] = result_detection[key]
+    
+    detected_family = (detection.get("detected_family") or 
+                      detection.get("family") or 
+                      result.get("detected_family") or
+                      result.get("family") or 
+                      "Unknown")
     detection_confidence = detection.get("confidence", 0.95)
     
     if reaction_type and not detection.get("source"):
@@ -100,6 +112,12 @@ def recommend_conditions_structured(
     detection["confidence"] = detection_confidence
     detection.setdefault("method", "drfp_precedent_search")
     detection.setdefault("provided_reaction_type", reaction_type)
+    
+    # Ensure analysis module info is preserved
+    if not detection.get("analysis_module_used") and result_detection.get("analysis_module_used"):
+        detection["analysis_module_used"] = True
+        if result_detection.get("reactant_classification"):
+            detection["reactant_classification"] = result_detection["reactant_classification"]
     
     # Build meta section with all fields
     meta = dict(formatted.get("meta") or {})

@@ -22,6 +22,13 @@ try:
 except Exception:
     _HAS_RXN_INSIGHT = False
 
+# New analysis module integration for improved reaction type detection and reactant classification
+try:
+    from ...analysis.reaction_context import classify_reactants_with_context
+    _HAS_ANALYSIS_MODULE = True
+except Exception:
+    _HAS_ANALYSIS_MODULE = False
+
 
 def recommend_from_reaction(
     reaction: str,
@@ -106,51 +113,79 @@ def recommend_from_reaction(
         for r in (norm.get("reactants") or [])
     ]
 
-    # 2) Detect reaction family (skip if search_all_families=True)
+    # 2) Detect reaction family
     rxn_smiles_norm = norm.get("normalized") or reaction
     
-    if search_all_families:
-        # Cross-family search: skip detection and use all families
-        fam = None  # Signal for cross-family search
-        auto_family = None
-        rule_family = None
-        rule_info = {}
-        detection_source = "cross_family_search"
-        rxn_auto = None
+    # Always try to detect the reaction type (even for cross-family search)
+    # Detection helps with filtering and metadata, even when searching all families
+    detection_source = "user_supplied" if fam_override_clean else "auto"
+    fam = fam_override_clean or "Unknown"
+    
+    # Priority 1: New analysis module (most comprehensive - includes reactant classification)
+    auto_family = None
+    analysis_result = None
+    use_analysis_module = relax.get("use_analysis_module", True)  # Enabled by default
+    
+    if use_analysis_module and _HAS_ANALYSIS_MODULE and not fam_override_clean:
+        try:
+            # Use Two-Pass Approach with auto-detection
+            analysis_result = classify_reactants_with_context(
+                reaction_smiles=rxn_smiles_norm,
+                reaction_type=None,  # Auto-detect
+                auto_detect=True
+            )
+            if analysis_result and analysis_result.reaction_type:
+                auto_family = analysis_result.reaction_type
+                # Don't store in relax (needs to be hashable for caching)
+                # Will be stored separately in the result
+        except Exception as e:
+            # Fallback to other methods if analysis module fails
+            import warnings
+            warnings.warn(
+                f"Analysis module failed: {e}. Falling back to rxn-insight/rule-based detection.",
+                UserWarning
+            )
+    
+    # Priority 2: rxn-insight ML-based detection (if analysis module didn't work)
+    use_rxn_insight = relax.get("use_rxn_insight")
+    if use_rxn_insight is None:
+        import os as _os
+        env_off = (_os.environ.get("CHEMTOOLS_DISABLE_RXN_INSIGHT", "").strip().lower() 
+                   in {"1", "true", "yes", "on"})
+        use_rxn_insight = not env_off
+    
+    rxn_auto = None
+    if not auto_family and bool(use_rxn_insight) and _HAS_RXN_INSIGHT:
+        try:
+            rxn_auto = _rxn_detect(rxn_smiles_norm)
+            if rxn_auto and rxn_auto.get("success") and rxn_auto.get("mapped_family"):
+                auto_family = str(rxn_auto.get("mapped_family") or "Unknown")
+        except Exception:
+            pass
+    
+    # Priority 3: Rule-based detection as final fallback
+    rule_info = detect_family(reactants)
+    rule_family = rule_info.get("family") or "Unknown"
+    
+    # Prioritize: user override > analysis module > ML detection > rule-based
+    if not fam_override_clean:
+        fam = auto_family or rule_family or "Unknown"
     else:
-        # Try rxn-insight ML-based detection first (if available), fallback to rule-based
-        detection_source = "user_supplied" if fam_override_clean else "auto"
-        fam = fam_override_clean or "Unknown"
-        
-        # Check if rxn-insight should be used
-        use_rxn_insight = relax.get("use_rxn_insight")
-        if use_rxn_insight is None:
-            import os as _os
-            env_off = (_os.environ.get("CHEMTOOLS_DISABLE_RXN_INSIGHT", "").strip().lower() 
-                       in {"1", "true", "yes", "on"})
-            use_rxn_insight = not env_off
-        
-        auto_family = None
-        rxn_auto = None
-        if bool(use_rxn_insight) and _HAS_RXN_INSIGHT:
-            try:
-                rxn_auto = _rxn_detect(rxn_smiles_norm)
-                if rxn_auto and rxn_auto.get("success") and rxn_auto.get("mapped_family"):
-                    auto_family = str(rxn_auto.get("mapped_family") or "Unknown")
-            except Exception:
-                pass
-        
-        # Rule-based detection as fallback
-        rule_info = detect_family(reactants)
-        rule_family = rule_info.get("family") or "Unknown"
-        
-        # Prioritize: user override > ML detection > rule-based
-        if not fam_override_clean:
-            fam = auto_family or rule_family or "Unknown"
-        else:
-            fam = fam_override_clean
-        
-        fam = canonical_family(fam)
+        fam = fam_override_clean
+    
+    # Normalize to canonical precedent database family name
+    # (e.g., ullmann_cn -> C_N_Coupling, suzuki_miyaura -> Suzuki)
+    canonical_fam = canonical_family(fam)
+    
+    # For cross-family search: detect but search all families
+    if search_all_families:
+        # Keep detection metadata but set fam to None for cross-family precedent search
+        detection_source = "cross_family_search"
+        detected_fam = canonical_fam  # Store the canonical family for metadata
+        fam = None  # Signal for cross-family search in precedent.knn()
+    else:
+        detected_fam = canonical_fam
+        fam = canonical_fam
     
     # 3) Features: Keep empty for DRFP-based search (default)
     # DRFP uses reaction_smiles directly, no need for complex substrate featurization
@@ -199,6 +234,7 @@ def recommend_from_reaction(
     
     relax.setdefault("precompute_drfp", False)  # Use binary NPZ files (faster)
     relax.setdefault("selective_loading", True)  # Load only needed family
+    relax.setdefault("filter_by_reagent_database", False)  # Disable DB filter (we filter later if needed)
     
     pack = precedent.knn(family=fam, features=features, k=int(k), relax=relax)
     
@@ -363,11 +399,22 @@ def recommend_from_reaction(
     }
     
     detection_meta = {
-        "auto_family": auto_family if not search_all_families else None,
-        "rule_family": rule_family if not search_all_families else None,
+        "auto_family": auto_family,
+        "rule_family": rule_family,
+        "detected_family": detected_fam,  # The actual detected family (before canonical mapping)
         "source": detection_source,
         "search_mode": "cross_family" if search_all_families else "family_specific",
+        "analysis_module_used": analysis_result is not None,
+        "reactant_classification": None,  # Will be populated if analysis module was used
     }
+    
+    # Add reactant classification info from analysis module
+    if analysis_result is not None:
+        try:
+            from ...analysis.reaction_context import get_reactant_summary
+            detection_meta["reactant_classification"] = get_reactant_summary(analysis_result)
+        except Exception:
+            pass  # Ignore serialization errors
     
     # 13) Build formatted output with variants (use injected function to avoid circular imports)
     if _build_formatted_output_fn is None:
@@ -395,7 +442,8 @@ def recommend_from_reaction(
     
     return {
         "input": rxn_smiles_norm,
-        "family": "All" if search_all_families else fam,  # Use "All" to indicate cross-family search
+        "family": "All" if search_all_families else fam,  # Use "All" for cross-family, canonical name for family-specific
+        "detected_family": detected_fam,  # The actual detected family (for display/metadata)
         "features": features,
         "bin": pack.get("prototype_id"),
         "recommendation": recommendation,

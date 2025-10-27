@@ -5,7 +5,7 @@ Simple demo of the analysis module showing multiple reaction types.
 Run this to see automated analysis without interactive prompts.
 """
 
-from test_analysis_interactive import run_analysis, print_header
+from app.test_analysis_interactive import run_analysis, print_header
 
 
 def simple_demo():
