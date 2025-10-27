@@ -36,7 +36,7 @@ def load_reagent_database(reagent_type: str) -> List[Dict[str, Any]]:
     if reagent_type in _REAGENT_CACHE:
         return _REAGENT_CACHE[reagent_type]
     
-    reagent_file = get_data_dir() / "reagents" / f"{reagent_type}.json"
+    reagent_file = get_data_dir() / "reagent_db" / f"{reagent_type}.json"
     
     if not reagent_file.exists():
         return []
@@ -248,7 +248,7 @@ def format_reagent_for_display(reagent_info: Dict[str, Any], compact: bool = Fal
 
 def get_all_reagent_types() -> List[str]:
     """Get list of all available reagent database types."""
-    reagent_dir = get_data_dir() / "reagents"
+    reagent_dir = get_data_dir() / "reagent_db"
     if not reagent_dir.exists():
         return []
     
