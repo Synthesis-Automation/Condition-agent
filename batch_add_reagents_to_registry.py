@@ -23,7 +23,7 @@ from chemtools.reagent import (
 )
 
 # Import from reagent_taxonomy_ui
-from app.reagent_taxonomy_ui import (
+from app.reagent_addition_ui import (
     ReagentRegistryStore,
     generate_taxonomy_entry_llm,
     ROLE_CONFIG,
@@ -461,7 +461,7 @@ def batch_add_reagents(
                 # Build embedding text
                 family_entry = store.family_entry(role, family_id)
                 if family_entry:
-                    from app.reagent_taxonomy_ui import build_embedding_text
+                    from app.reagent_addition_ui import build_embedding_text
                     entry["embedding_text"] = build_embedding_text(
                         role, family_entry, entry, synonyms
                     )
