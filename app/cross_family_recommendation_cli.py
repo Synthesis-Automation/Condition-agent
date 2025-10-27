@@ -33,6 +33,80 @@ def extract_chemical_by_role(chemicals: list, role: str) -> str:
     return "N/A"
 
 
+def parse_catalyst_from_precedents(precedents: list) -> str:
+    """
+    Extract catalyst information from precedent list.
+    
+    Looks at the first few precedents to find catalyst info from:
+    1. condition_core field if it contains catalyst info (e.g., "Pd/XPhos")
+    2. Parsed catalytic_system (metal + ligand) - but skip if just CAS numbers
+    """
+    catalyst_names = []
+    
+    for prec in precedents[:3]:  # Check first 3 precedents
+        # Try condition_core first - it often has good catalyst info
+        core = prec.get('core', '')
+        
+        # Skip if it's just a base/acid indicator
+        if core and not any(core.startswith(prefix) for prefix in ['Base:', 'Acid:', 'base:', 'acid:']):
+            # Check if it looks like a real catalyst (has "/" or chemical name, not just CAS)
+            if '/' in core or any(char.isalpha() for char in core):
+                # Looks like "Pd/XPhos" or a chemical name
+                if core not in catalyst_names:
+                    catalyst_names.append(core)
+        
+        # Also check catalysts array (structured)
+        catalysts = prec.get('catalysts', [])
+        for cat in catalysts:
+            name = cat.get('name') or cat.get('abbreviation')
+            # Skip if it's just a CAS number (all digits and hyphens)
+            if name and not all(c.isdigit() or c == '-' for c in name.replace('-', '')):
+                if name not in catalyst_names:
+                    catalyst_names.append(name)
+    
+    # Return the most common or first found
+    if catalyst_names:
+        return catalyst_names[0]  # Use first/most common
+    
+    return "N/A"
+
+
+def extract_base_from_precedents(precedents: list) -> str:
+    """Extract base information from precedent list."""
+    for prec in precedents[:3]:
+        # Try structured reagents array
+        reagents = prec.get('reagents', [])
+        for reagent in reagents:
+            if reagent.get('role', '').upper() in ['BASE', 'base']:
+                name = reagent.get('name') or reagent.get('abbreviation')
+                if name and not name.startswith('[Unknown'):
+                    return name
+        
+        # Fallback: check if condition_core starts with "Base:"
+        core = prec.get('core', '')
+        if core.startswith('Base:'):
+            return core.replace('Base:', '').strip()
+    
+    return "N/A"
+
+
+def extract_solvent_from_precedents(precedents: list) -> str:
+    """Extract solvent information from precedent list."""
+    for prec in precedents[:3]:
+        # Try structured solvents array
+        solvents = prec.get('solvents', [])
+        if solvents:
+            solvent_names = []
+            for solv in solvents:
+                name = solv.get('name') or solv.get('abbreviation')
+                if name and not name.startswith('[Unknown'):
+                    solvent_names.append(name)
+            if solvent_names:
+                return " + ".join(solvent_names)
+    
+    return "N/A"
+
+
 def extract_chemicals_by_roles(chemicals: list, roles: list) -> dict:
     """Extract multiple chemicals by roles from chemicals list."""
     result = {}
@@ -173,32 +247,62 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
         chemicals = rec.get("chemicals", [])
         conditions = rec.get("conditions", {})
         
-        # Catalyst (from summary.core or extract from chemicals)
-        catalyst = summary.get("core", "N/A")
-        if catalyst == "N/A":
-            metal = extract_chemical_by_role(chemicals, "metal_precursor")
-            ligand = extract_chemical_by_role(chemicals, "ligand")
-            if metal != "N/A" or ligand != "N/A":
-                parts = [p for p in [metal, ligand] if p != "N/A"]
-                catalyst = "/".join(parts)
-        print(f"  Catalyst: {catalyst}")
+        # Get FULL precedents for this recommendation (not just summary.precedents)
+        matched_precedents = find_matching_precedents(rec, all_precedents, max_count=10)
         
-        # Base
-        base = summary.get("base", {})
-        if isinstance(base, dict):
-            base_name = base.get("name") or base.get("abbreviation", "N/A")
-        else:
-            base_name = extract_chemical_by_role(chemicals, "base")
-        if base_name != "N/A":
+        # Catalyst - parse from precedents for more accurate info
+        catalyst = parse_catalyst_from_precedents(matched_precedents)
+        if catalyst == "N/A":
+            # Fallback to summary.core but parse it
+            core = summary.get("core", "N/A")
+            if core != "N/A" and not any(core.startswith(prefix) for prefix in ['Base:', 'Acid:', 'base:', 'acid:']):
+                catalyst = core
+            else:
+                # Last resort: extract from chemicals (but skip CAS-only entries)
+                metal = extract_chemical_by_role(chemicals, "metal_precursor")
+                ligand = extract_chemical_by_role(chemicals, "ligand")
+                # Check if these are just CAS numbers
+                if metal != "N/A" and all(c.isdigit() or c == '-' for c in metal.replace('-', '')):
+                    metal = "N/A"  # Skip CAS-only metal
+                if ligand != "N/A" and all(c.isdigit() or c == '-' for c in ligand.replace('-', '')):
+                    ligand = "N/A"  # Skip CAS-only ligand
+                if metal != "N/A" or ligand != "N/A":
+                    parts = [p for p in [metal, ligand] if p != "N/A"]
+                    catalyst = "/".join(parts)
+        
+        # Only print catalyst if we found a real one (not N/A and not just CAS)
+        if catalyst != "N/A":
+            print(f"  Catalyst: {catalyst}")
+        
+        # Base - parse from precedents
+        base_name = extract_base_from_precedents(matched_precedents)
+        if base_name == "N/A":
+            # Fallback to summary
+            base = summary.get("base", {})
+            if isinstance(base, dict):
+                base_name = base.get("name") or base.get("abbreviation", "N/A")
+                # Skip if it's an "Unknown" placeholder
+                if base_name.startswith("[Unknown"):
+                    base_name = extract_chemical_by_role(chemicals, "base")
+            else:
+                base_name = extract_chemical_by_role(chemicals, "base")
+        if base_name != "N/A" and not base_name.startswith("[Unknown"):
             print(f"  Base: {base_name}")
         
-        # Solvent
-        solvent = summary.get("solvent", {})
-        if isinstance(solvent, dict):
-            solvent_name = solvent.get("name") or solvent.get("abbreviation", "N/A")
-        else:
-            solvent_name = extract_chemical_by_role(chemicals, "solvent")
-        print(f"  Solvent: {solvent_name}")
+        # Solvent - parse from precedents
+        solvent_name = extract_solvent_from_precedents(matched_precedents)
+        if solvent_name == "N/A":
+            # Fallback to summary
+            solvent = summary.get("solvent", {})
+            if isinstance(solvent, dict):
+                solvent_name = solvent.get("name") or solvent.get("abbreviation", "N/A")
+                # Skip if it's an "Unknown" placeholder
+                if solvent_name.startswith("[Unknown"):
+                    solvent_name = extract_chemical_by_role(chemicals, "solvent")
+            else:
+                solvent_name = extract_chemical_by_role(chemicals, "solvent")
+        if solvent_name != "N/A" and not solvent_name.startswith("[Unknown"):
+            print(f"  Solvent: {solvent_name}")
         
         # Additional reagents
         other_reagents = extract_chemicals_by_roles(
