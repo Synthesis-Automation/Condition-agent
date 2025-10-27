@@ -105,16 +105,19 @@ AI-formatted Response
 ## Troubleshooting
 
 **Missing API key?**
+
 ```powershell
 $env:OPENAI_API_KEY = "sk-your-key-here"
 ```
 
 **Import errors?**
+
 ```powershell
 pip install langchain langchain-openai langgraph python-dotenv
 ```
 
 **Agent not working?**
+
 - Enable verbose mode: `ChemToolsAgent(verbose=True)`
 - Check API key is set
 - Ensure internet connection
