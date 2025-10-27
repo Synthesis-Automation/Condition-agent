@@ -4,7 +4,7 @@
       "Suzuki",
       "Suzuki coupling"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Pd-catalyzed cross-coupling of aryl/vinyl halides with organoboron compounds",
     "id": "suzuki_miyaura",
     "metadata": {
@@ -20,7 +20,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -28,7 +28,7 @@
         "original_tokens": [
           "ArB*"
         ],
-        "reactant_type_id": "arb",
+        "reactant_type_id": "ArB*",
         "stoichiometry": null
       }
     ],
@@ -42,7 +42,7 @@
       "Suzuki in situ",
       "Suzuki-Miyaura, in situ"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Suzuki coupling with in situ generation of organoboron species",
     "id": "suzuki_miyaura_in_situ",
     "metadata": {
@@ -58,7 +58,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -66,7 +66,7 @@
         "original_tokens": [
           "RB*"
         ],
-        "reactant_type_id": "rb",
+        "reactant_type_id": "RB*",
         "stoichiometry": null
       }
     ],
@@ -79,7 +79,7 @@
     "aliases": [
       "Negishi cross-coupling"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Pd or Ni-catalyzed cross-coupling of organozinc reagents with organic halides",
     "id": "negishi",
     "metadata": {
@@ -96,7 +96,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -104,7 +104,7 @@
         "original_tokens": [
           "Organometallic"
         ],
-        "reactant_type_id": "organometallic",
+        "reactant_type_id": "R-M",
         "stoichiometry": null
       }
     ],
@@ -118,7 +118,7 @@
       "Negishi in-situ",
       "Negishi, in-situ"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Negishi coupling with in situ formation of organozinc reagent",
     "id": "negishi_in_situ",
     "metadata": {
@@ -135,7 +135,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -143,7 +143,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       },
       {
@@ -151,7 +151,7 @@
         "original_tokens": [
           "Organometallic"
         ],
-        "reactant_type_id": "organometallic",
+        "reactant_type_id": "R-M",
         "stoichiometry": null
       }
     ],
@@ -165,7 +165,7 @@
       "Mizoroki-Heck",
       "Heck coupling"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Pd-catalyzed coupling of aryl halides with alkenes",
     "id": "heck",
     "metadata": {
@@ -181,7 +181,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -189,7 +189,7 @@
         "original_tokens": [
           "Alkene"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       }
     ],
@@ -202,7 +202,7 @@
     "aliases": [
       "Sonogashira cross-coupling"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Pd/Cu-catalyzed coupling of terminal alkynes with aryl/vinyl halides",
     "id": "sonogashira",
     "metadata": {
@@ -219,7 +219,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -227,7 +227,7 @@
         "original_tokens": [
           "terminal-alkyne"
         ],
-        "reactant_type_id": "alkyne",
+        "reactant_type_id": "Alkyne",
         "stoichiometry": null
       }
     ],
@@ -241,7 +241,7 @@
       "Stille cross-coupling",
       "Migita-Kosugi-Stille coupling"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Pd-catalyzed coupling of organostannanes with aryl/vinyl halides",
     "id": "stille",
     "metadata": {
@@ -257,7 +257,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -265,7 +265,7 @@
         "original_tokens": [
           "Organometallic"
         ],
-        "reactant_type_id": "organometallic",
+        "reactant_type_id": "R-M",
         "stoichiometry": null
       }
     ],
@@ -278,7 +278,7 @@
     "aliases": [
       "Kumada-Corriu coupling"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Ni or Pd-catalyzed coupling of Grignard reagents with aryl/vinyl halides",
     "id": "kumada",
     "metadata": {
@@ -295,7 +295,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -303,7 +303,7 @@
         "original_tokens": [
           "Organometallic"
         ],
-        "reactant_type_id": "organometallic",
+        "reactant_type_id": "R-M",
         "stoichiometry": null
       }
     ],
@@ -316,7 +316,7 @@
     "aliases": [
       "Reformatsky addition"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Zn-mediated addition of α-halo esters to carbonyl compounds",
     "id": "reformatsky",
     "metadata": {
@@ -333,7 +333,7 @@
           "Aldehyde",
           "Ketone"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -341,7 +341,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       },
       {
@@ -349,7 +349,7 @@
         "original_tokens": [
           "Organometallic"
         ],
-        "reactant_type_id": "organometallic",
+        "reactant_type_id": "R-M",
         "stoichiometry": null
       }
     ],
@@ -363,7 +363,7 @@
       "HWE",
       "Horner-Emmons olefination"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "Phosphonate-based olefination of aldehydes/ketones (Wittig variant)",
     "id": "horner_wadsworth_emmons",
     "metadata": {
@@ -380,7 +380,7 @@
           "Aldehyde",
           "Ketone"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       }
     ],
@@ -393,7 +393,7 @@
     "aliases": [
       "Carbon-carbon coupling"
     ],
-    "category_id": "cross_coupling_reactions",
+    "category_id": "c_c_coupling_reactions",
     "description": "General C-C bond formation not classified under specific named reactions",
     "id": "cc_coupling",
     "metadata": {
@@ -410,7 +410,7 @@
           "ArX*",
           "Alkyl-X"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -418,7 +418,7 @@
         "original_tokens": [
           "Organometallic"
         ],
-        "reactant_type_id": "organometallic",
+        "reactant_type_id": "R-M",
         "stoichiometry": null
       }
     ],
@@ -449,7 +449,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -458,7 +458,7 @@
           "Aliphatic-amine",
           "Aniline-type"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -490,7 +490,7 @@
           "ArX*",
           "Alkyl-X"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -499,7 +499,7 @@
           "Aliphatic-amine",
           "Aniline-type"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -529,7 +529,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -541,7 +541,7 @@
           "ArOH",
           "RSH"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -571,7 +571,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -580,7 +580,7 @@
           "Aliphatic-amine",
           "Aniline-type"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -610,7 +610,7 @@
         "original_tokens": [
           "ArB*"
         ],
-        "reactant_type_id": "arb",
+        "reactant_type_id": "ArB*",
         "stoichiometry": null
       },
       {
@@ -620,7 +620,7 @@
           "Aniline-type",
           "Amide-type"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -651,7 +651,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -660,7 +660,7 @@
           "ROH",
           "ArOH"
         ],
-        "reactant_type_id": "roh",
+        "reactant_type_id": "ROH",
         "stoichiometry": null
       }
     ],
@@ -690,7 +690,7 @@
         "original_tokens": [
           "ROH"
         ],
-        "reactant_type_id": "roh",
+        "reactant_type_id": "ROH",
         "stoichiometry": null
       }
     ],
@@ -721,7 +721,7 @@
         "original_tokens": [
           "Aliphatic-amine"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -751,7 +751,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -760,7 +760,7 @@
           "ROH",
           "ArOH"
         ],
-        "reactant_type_id": "roh",
+        "reactant_type_id": "ROH",
         "stoichiometry": null
       }
     ],
@@ -791,7 +791,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -799,7 +799,7 @@
         "original_tokens": [
           "RSH"
         ],
-        "reactant_type_id": "rsh",
+        "reactant_type_id": "RSH",
         "stoichiometry": null
       }
     ],
@@ -829,7 +829,7 @@
         "original_tokens": [
           "RCO2H or activated acyl"
         ],
-        "reactant_type_id": "rco2h_or_activated_acyl",
+        "reactant_type_id": "RCO2H-activated",
         "stoichiometry": null
       },
       {
@@ -837,7 +837,7 @@
         "original_tokens": [
           "Aliphatic-amine"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -869,7 +869,7 @@
           "Aldehyde",
           "Ketone"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -881,7 +881,7 @@
           "ArOH",
           "RSH"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -911,7 +911,7 @@
           "Aldehyde",
           "Ketone"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       }
     ],
@@ -940,7 +940,7 @@
         "original_tokens": [
           "Aldehyde"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -948,7 +948,7 @@
         "original_tokens": [
           "Ketone"
         ],
-        "reactant_type_id": "ketone",
+        "reactant_type_id": "Ketone",
         "stoichiometry": null
       }
     ],
@@ -981,7 +981,7 @@
           "Alkyl-C-H",
           "ArH"
         ],
-        "reactant_type_id": "alkyl_c_h",
+        "reactant_type_id": "Alkyl-C-H",
         "stoichiometry": null
       },
       {
@@ -990,7 +990,7 @@
           "ArX*",
           "Organometallic"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       }
     ],
@@ -1021,7 +1021,7 @@
         "original_tokens": [
           "Alkyl-C-H"
         ],
-        "reactant_type_id": "alkyl_c_h",
+        "reactant_type_id": "Alkyl-C-H",
         "stoichiometry": null
       },
       {
@@ -1029,7 +1029,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       }
     ],
@@ -1061,7 +1061,7 @@
           "Alkyl-C-H",
           "ArH"
         ],
-        "reactant_type_id": "alkyl_c_h",
+        "reactant_type_id": "Alkyl-C-H",
         "stoichiometry": null
       },
       {
@@ -1069,7 +1069,7 @@
         "original_tokens": [
           "RB*"
         ],
-        "reactant_type_id": "rb",
+        "reactant_type_id": "RB*",
         "stoichiometry": null
       }
     ],
@@ -1100,7 +1100,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       },
       {
@@ -1108,7 +1108,7 @@
         "original_tokens": [
           "RB*"
         ],
-        "reactant_type_id": "rb",
+        "reactant_type_id": "RB*",
         "stoichiometry": null
       }
     ],
@@ -1143,7 +1143,7 @@
           "ArOH",
           "RSH"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       },
       {
@@ -1151,7 +1151,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       }
     ],
@@ -1261,7 +1261,7 @@
         "original_tokens": [
           "ROH"
         ],
-        "reactant_type_id": "roh",
+        "reactant_type_id": "ROH",
         "stoichiometry": null
       }
     ],
@@ -1292,7 +1292,7 @@
         "original_tokens": [
           "ArX*"
         ],
-        "reactant_type_id": "arx",
+        "reactant_type_id": "ArX*",
         "stoichiometry": null
       }
     ],
@@ -1323,7 +1323,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       }
     ],
@@ -1352,7 +1352,7 @@
         "original_tokens": [
           "Aniline-type"
         ],
-        "reactant_type_id": "aniline_type",
+        "reactant_type_id": "ArNH2/Ar2NH",
         "stoichiometry": null
       }
     ],
@@ -1442,7 +1442,7 @@
         "original_tokens": [
           "ROH"
         ],
-        "reactant_type_id": "roh",
+        "reactant_type_id": "ROH",
         "stoichiometry": null
       }
     ],
@@ -1472,7 +1472,7 @@
           "Alkene",
           "Alkyne"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       }
     ],
@@ -1524,7 +1524,7 @@
           "Alkene",
           "Alkyne"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       },
       {
@@ -1534,7 +1534,7 @@
           "ArX*",
           "Alkyl-X"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       }
     ],
@@ -1566,7 +1566,7 @@
           "Aldehyde",
           "Ketone"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       }
     ],
@@ -1636,7 +1636,7 @@
         "original_tokens": [
           "diene"
         ],
-        "reactant_type_id": "diene",
+        "reactant_type_id": "Diene",
         "stoichiometry": null
       },
       {
@@ -1644,7 +1644,7 @@
         "original_tokens": [
           "dienophile"
         ],
-        "reactant_type_id": "dienophile",
+        "reactant_type_id": "Dienophile",
         "stoichiometry": null
       }
     ],
@@ -1677,7 +1677,7 @@
         "original_tokens": [
           "H2"
         ],
-        "reactant_type_id": "hydrogen_source",
+        "reactant_type_id": "H2",
         "stoichiometry": null
       }
     ],
@@ -1709,7 +1709,7 @@
           "RCHO",
           "RCOR"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -1718,7 +1718,7 @@
           "NaBH4",
           "LiAlH4"
         ],
-        "reactant_type_id": "metal_hydride",
+        "reactant_type_id": "Metal-H",
         "stoichiometry": null
       }
     ],
@@ -1749,7 +1749,7 @@
         "original_tokens": [
           "ROH"
         ],
-        "reactant_type_id": "roh",
+        "reactant_type_id": "ROH",
         "stoichiometry": null
       },
       {
@@ -1757,7 +1757,7 @@
         "original_tokens": [
           "oxidant"
         ],
-        "reactant_type_id": "oxidant",
+        "reactant_type_id": "Oxidant",
         "stoichiometry": null
       }
     ],
@@ -1789,7 +1789,7 @@
         "original_tokens": [
           "alkene"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       },
       {
@@ -1798,7 +1798,7 @@
           "mCPBA",
           "oxidant"
         ],
-        "reactant_type_id": "oxidant",
+        "reactant_type_id": "Oxidant",
         "stoichiometry": null
       }
     ],
@@ -1828,7 +1828,7 @@
         "original_tokens": [
           "RCOR"
         ],
-        "reactant_type_id": "ketone",
+        "reactant_type_id": "Ketone",
         "stoichiometry": null
       },
       {
@@ -1836,7 +1836,7 @@
         "original_tokens": [
           "mCPBA"
         ],
-        "reactant_type_id": "oxidant",
+        "reactant_type_id": "Oxidant",
         "stoichiometry": null
       }
     ],
@@ -1866,7 +1866,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       }
     ],
@@ -1896,7 +1896,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       }
     ],
@@ -1927,7 +1927,7 @@
           "RCHO",
           "RCOR"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -1937,7 +1937,7 @@
           "RCOR",
           "enolate"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       }
     ],
@@ -1968,7 +1968,7 @@
           "RCHO",
           "RCOR"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -1977,7 +1977,7 @@
           "RNH2",
           "R2NH"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       },
       {
@@ -1985,7 +1985,7 @@
         "original_tokens": [
           "NaBH4"
         ],
-        "reactant_type_id": "metal_hydride",
+        "reactant_type_id": "Metal-H",
         "stoichiometry": null
       }
     ],
@@ -2016,7 +2016,7 @@
         "original_tokens": [
           "alkene"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       }
     ],
@@ -2048,7 +2048,7 @@
         "original_tokens": [
           "alkene"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       },
       {
@@ -2056,7 +2056,7 @@
         "original_tokens": [
           "alkene"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       }
     ],
@@ -2107,7 +2107,7 @@
         "original_tokens": [
           "RNH2"
         ],
-        "reactant_type_id": "aliphatic_amine",
+        "reactant_type_id": "RNH2/R2NH",
         "stoichiometry": null
       },
       {
@@ -2116,7 +2116,7 @@
           "RCHO",
           "RCOR"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       }
     ],
@@ -2148,7 +2148,7 @@
           "ArH",
           "Alkyl-H"
         ],
-        "reactant_type_id": "arh",
+        "reactant_type_id": "ArH",
         "stoichiometry": null
       },
       {
@@ -2156,7 +2156,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       }
     ],
@@ -2189,7 +2189,7 @@
           "RCO2H",
           "RCOCl"
         ],
-        "reactant_type_id": "rco2h_or_activated_acyl",
+        "reactant_type_id": "RCO2H-activated",
         "stoichiometry": null
       },
       {
@@ -2197,7 +2197,7 @@
         "original_tokens": [
           "ROH"
         ],
-        "reactant_type_id": "roh",
+        "reactant_type_id": "ROH",
         "stoichiometry": null
       }
     ],
@@ -2229,7 +2229,7 @@
           "RCOR",
           "RCOOR"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -2238,7 +2238,7 @@
           "RMgBr",
           "RMgCl"
         ],
-        "reactant_type_id": "grignard",
+        "reactant_type_id": "RMgX",
         "stoichiometry": null
       }
     ],
@@ -2268,7 +2268,7 @@
         "original_tokens": [
           "alkene"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       },
       {
@@ -2277,7 +2277,7 @@
           "BH3",
           "9-BBN"
         ],
-        "reactant_type_id": "borane",
+        "reactant_type_id": "Borane",
         "stoichiometry": null
       }
     ],
@@ -2307,7 +2307,7 @@
         "original_tokens": [
           "RCOOR"
         ],
-        "reactant_type_id": "ester",
+        "reactant_type_id": "Ester",
         "stoichiometry": null
       },
       {
@@ -2316,7 +2316,7 @@
           "RCOOR",
           "RCOR"
         ],
-        "reactant_type_id": "ester",
+        "reactant_type_id": "Ester",
         "stoichiometry": null
       }
     ],
@@ -2346,7 +2346,7 @@
         "original_tokens": [
           "alkene"
         ],
-        "reactant_type_id": "alkene",
+        "reactant_type_id": "Alkene",
         "stoichiometry": null
       },
       {
@@ -2355,7 +2355,7 @@
           "enolate",
           "malonate"
         ],
-        "reactant_type_id": "enolate",
+        "reactant_type_id": "Enolate",
         "stoichiometry": null
       }
     ],
@@ -2386,7 +2386,7 @@
           "RCHO",
           "RCOR"
         ],
-        "reactant_type_id": "aldehyde",
+        "reactant_type_id": "Aldehyde",
         "stoichiometry": null
       },
       {
@@ -2395,7 +2395,7 @@
           "RLi",
           "nBuLi"
         ],
-        "reactant_type_id": "organolithium",
+        "reactant_type_id": "RLi",
         "stoichiometry": null
       }
     ],
@@ -2425,7 +2425,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       },
       {
@@ -2434,7 +2434,7 @@
           "NaCN",
           "KCN"
         ],
-        "reactant_type_id": "cyanide",
+        "reactant_type_id": "CN-",
         "stoichiometry": null
       }
     ],
@@ -2464,7 +2464,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       },
       {
@@ -2473,7 +2473,7 @@
           "NaI",
           "KI"
         ],
-        "reactant_type_id": "iodide_nucleophile",
+        "reactant_type_id": "I-",
         "stoichiometry": null
       }
     ],
@@ -2503,7 +2503,7 @@
         "original_tokens": [
           "Alkyl-X"
         ],
-        "reactant_type_id": "alkyl_x",
+        "reactant_type_id": "Alkyl-X",
         "stoichiometry": null
       },
       {
@@ -2512,7 +2512,7 @@
           "NaOMe",
           "RO-"
         ],
-        "reactant_type_id": "alkoxide",
+        "reactant_type_id": "RO-",
         "stoichiometry": null
       }
     ],

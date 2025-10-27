@@ -1,8 +1,13 @@
 [
   {
-    "description": null,
+    "description": "Carbon-carbon bond forming reactions including Suzuki, Negishi, Heck, Sonogashira, Stille, and Kumada couplings",
+    "id": "c_c_coupling_reactions",
+    "name": "C-C Coupling Reactions"
+  },
+  {
+    "description": "General cross-coupling reactions that don't fit into specific C-C, C-N, C-O, or C-S categories",
     "id": "cross_coupling_reactions",
-    "name": "Cross-Coupling Reactions"
+    "name": "Cross-Coupling Reactions (General)"
   },
   {
     "description": null,

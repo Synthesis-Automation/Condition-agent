@@ -9,13 +9,13 @@ print(f"Reactant types loaded: {len(list(registry.iter_reactant_types()))}")
 print(f"Reaction types loaded: {len(list(registry.iter_reaction_types()))}")
 
 # Test a few specific types
-arx = registry.get_reactant_type("arx")
-print(f"\nArX reactant type: {arx.name if arx else 'NOT FOUND'}")
+arx = registry.get_reactant_type("ArX*")
+print(f"\nArX* reactant type: {arx.name if arx else 'NOT FOUND'}")
 
-epoxide = registry.get_reactant_type("epoxide")
+epoxide = registry.get_reactant_type("Epoxide")
 print(f"Epoxide reactant type: {epoxide.name if epoxide else 'NOT FOUND'}")
 
-diene = registry.get_reactant_type("diene")
+diene = registry.get_reactant_type("Diene")
 print(f"Diene reactant type: {diene.name if diene else 'NOT FOUND'}")
 
 # Test reaction types
