@@ -626,7 +626,6 @@ BUCHWALD_HARTWIG_REACTIONS = [
     
     # Aryl iodides (most reactive)
     "Ic1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1 (B-H: PhI + aniline → diphenylamine, fast)",
-    "Ic1ccc(C)cc1.CN(C)C>>CN(C)c1ccc(C)cc1 (B-H: 4-iodotoluene + dimethylamine → fast)",
     "Ic1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1 (B-H: 4-iodopyridine + aniline → heteroaryl)",
     
     # ═══════ BENZYL AMINES ═══════
