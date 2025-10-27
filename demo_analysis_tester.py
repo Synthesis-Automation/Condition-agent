@@ -5,7 +5,7 @@ Demo script showing the analysis module interactive tester in action.
 This demonstrates the output without requiring interactive input.
 """
 
-from test_analysis_interactive import (
+from app.test_analysis_interactive import (
     run_analysis,
     show_examples,
     list_reaction_types,
