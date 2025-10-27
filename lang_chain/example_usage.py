@@ -47,8 +47,10 @@ def example_1_normalize_smiles():
     
     query = "Normalize this SMILES: c1ccccc1"
     print(f"\nQuery: {query}")
-    print("\nAgent Response:")
+    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
+    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
+    print("Agent Response:")
     print(response)
 
 
@@ -62,8 +64,10 @@ def example_2_detect_reaction():
     
     query = "What reaction family is this: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     print(f"\nQuery: {query}")
-    print("\nAgent Response:")
+    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
+    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
+    print("Agent Response:")
     print(response)
 
 
@@ -77,8 +81,10 @@ def example_3_recommend_conditions():
     
     query = "Recommend optimal conditions for this Buchwald coupling: Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
     print(f"\nQuery: {query}")
-    print("\nAgent Response:")
+    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
+    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
+    print("Agent Response:")
     print(response)
 
 
@@ -92,8 +98,10 @@ def example_4_reagent_lookup():
     
     query = "What is the CAS number and role of Cs2CO3?"
     print(f"\nQuery: {query}")
-    print("\nAgent Response:")
+    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
+    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
+    print("Agent Response:")
     print(response)
 
 
