@@ -37,7 +37,8 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "cn_coupling": "C_N_Coupling",
     "buchwald_hartwig_c_n": "C_N_Coupling",
     "ullmann_cn": "C_N_Coupling",
-    "chan_lam_cn": "C_N_Coupling",
+    "chan_lam": "C_N_Coupling",
+    "chan_lam_cn": "C_N_Coupling",  # Legacy alias
     # C-O Coupling variants -> canonical dataset name
     "C_O_Coupling": "C_O_Coupling",
     "Ullmann_CO": "C_O_Coupling",
@@ -62,7 +63,8 @@ _FAMILY_LABELS: Dict[str, str] = {
     "cn_coupling": "C–N Coupling",
     "buchwald_hartwig_c_n": "Buchwald–Hartwig C–N Coupling",
     "ullmann_cn": "Ullmann C–N Coupling",
-    "chan_lam_cn": "Chan–Lam Coupling",
+    "chan_lam": "Chan–Lam Coupling",
+    "chan_lam_cn": "Chan–Lam Coupling",  # Legacy alias
     "co_coupling": "C–O Coupling",
     "ullmann_ether": "Ullmann Ether Synthesis",
     "cs_coupling": "C–S Coupling",

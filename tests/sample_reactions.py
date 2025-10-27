@@ -217,14 +217,14 @@ SAMPLE_REACTIONS = [
     # ═══════════════════════════════════════════════════════════
     
     # Hydrogenation
-    "C=Cc1ccccc1>>[H][H]>>CCc1ccccc1 (Hydrogenation - Ethylbenzene)",
-    "c1ccc(C=O)cc1>>[H][H]>>c1ccc(CO)cc1 (Hydrogenation - Benzyl alcohol)",
-    "C#Cc1ccccc1>>[H][H]>>CCc1ccccc1 (Hydrogenation - Complete alkyne)",
-    "c1ccc([N+](=O)[O-])cc1>>[H][H]>>c1ccc(N)cc1 (Hydrogenation - Nitro to amine)",
-    "C=CC=C>>[H][H]>>CCCC (Hydrogenation - 1,3-butadiene)",
-    "c1ccc(C#N)cc1>>[H][H]>>c1ccc(CN)cc1 (Hydrogenation - Nitrile to benzylamine)",
-    "O=C1CCCCC1>>[H][H]>>OC1CCCCC1 (Hydrogenation - Cyclohexanone to cyclohexanol)",
-    "C1=CC=C(C=C1)C=CC(=O)O>>[H][H]>>c1ccc(CCC(=O)O)cc1 (Hydrogenation - Cinnamic acid)",
+    "C=Cc1ccccc1.[H][H]>>CCc1ccccc1 (Hydrogenation - Ethylbenzene)",
+    "c1ccc(C=O)cc1.[H][H]>>c1ccc(CO)cc1 (Hydrogenation - Benzyl alcohol)",
+    "C#Cc1ccccc1.[H][H]>>CCc1ccccc1 (Hydrogenation - Complete alkyne)",
+    "c1ccc([N+](=O)[O-])cc1.[H][H]>>c1ccc(N)cc1 (Hydrogenation - Nitro to amine)",
+    "C=CC=C.[H][H]>>CCCC (Hydrogenation - 1,3-butadiene)",
+    "c1ccc(C#N)cc1.[H][H]>>c1ccc(CN)cc1 (Hydrogenation - Nitrile to benzylamine)",
+    "O=C1CCCCC1.[H][H]>>OC1CCCCC1 (Hydrogenation - Cyclohexanone to cyclohexanol)",
+    "C1=CC=C(C=C1)C=CC(=O)O.[H][H]>>c1ccc(CCC(=O)O)cc1 (Hydrogenation - Cinnamic acid)",
     
     # Metal Hydride Reductions
     "c1ccc(C=O)cc1.[BH4-].[Na+]>>c1ccc(CO)cc1 (NaBH4 - Benzaldehyde reduction)",
@@ -483,7 +483,7 @@ SAMPLE_REACTIONS = [
     # Cbz Protection/Deprotection
     "c1ccc(N)cc1.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(Nc1ccccc1)OCc1ccccc1 (Cbz Protection - Aniline)",
     "NCC(=O)O.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(NCC(=O)O)OCc1ccccc1 (Cbz Protection - Glycine)",
-    "O=C(Nc1ccccc1)OCc1ccccc1>>[H][H].[Pd]>>c1ccc(N)cc1 (Cbz Deprotection - Hydrogenolysis)",
+    "O=C(Nc1ccccc1)OCc1ccccc1.[H][H].[Pd]>>c1ccc(N)cc1 (Cbz Deprotection - Hydrogenolysis)",
     
     # FMOC Protection/Deprotection
     "c1ccc(N)cc1.O=C1OC(=O)c2ccccc21>>O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21 (FMOC Protection)",
@@ -504,7 +504,7 @@ SAMPLE_REACTIONS = [
     
     # Benzyl Ether Protection/Deprotection
     "c1ccc(CO)cc1.BrCc1ccccc1>>c1ccc(COCc2ccccc2)cc1 (Bn Protection)",
-    "c1ccc(COCc2ccccc2)cc1>>[H][H].[Pd]>>c1ccc(CO)cc1 (Bn Deprotection - Hydrogenolysis)",
+    "c1ccc(COCc2ccccc2)cc1.[H][H].[Pd]>>c1ccc(CO)cc1 (Bn Deprotection - Hydrogenolysis)",
     
     # Trityl Protection/Deprotection
     "c1ccc(CO)cc1.ClC(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(COC(c2ccccc2)(c2ccccc2)c2ccccc2)cc1 (Trityl Protection)",

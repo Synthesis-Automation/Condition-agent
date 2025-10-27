@@ -14,18 +14,32 @@ from typing import Optional, Dict, Set
 from ._registry import get_registry
 
 FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
+    # C-N Coupling reactions
     "C_N_Coupling": "cn_coupling",
     "Buchwald_CN": "buchwald_hartwig_c_n",
+    "Buchwald-Hartwig": "buchwald_hartwig_c_n",
     "Ullmann_CN": "ullmann_cn",
-    "Chan_Lam_CN": "chan_lam_cn",
+    "Chan_Lam_CN": "chan_lam",
+    "chan_lam_cn": "chan_lam",  # Legacy alias
+    
+    # C-O Coupling reactions
     "C_O_Coupling": "co_coupling",
     "Ullmann_CO": "ullmann_ether",
+    
+    # C-S Coupling reactions
     "C_S_Coupling": "cs_coupling",
+    
+    # C-C Coupling reactions
     "Suzuki_CC": "suzuki_miyaura",
+    "Suzuki": "suzuki_miyaura",
+    "Suzuki-Miyaura": "suzuki_miyaura",
     "Negishi": "negishi",
     "Sonogashira_CC": "sonogashira",
+    "Sonogashira": "sonogashira",
     "Stille": "stille",
     "Heck": "heck",
+    
+    # Amide Coupling
     "Amide_Coupling": "amide_coupling",
 }
 
@@ -33,13 +47,16 @@ CN_FAMILIES_CANONICAL: Set[str] = {
     "cn_coupling",
     "buchwald_hartwig_c_n",
     "ullmann_cn",
-    "chan_lam_cn",
+    "chan_lam",
 }
 CO_FAMILIES_CANONICAL: Set[str] = {"co_coupling", "ullmann_ether"}
 CS_FAMILIES_CANONICAL: Set[str] = {"cs_coupling"}
 AMIDE_FAMILIES_CANONICAL: Set[str] = {"amide_coupling"}
 SONOGASHIRA_FAMILIES_CANONICAL: Set[str] = {"sonogashira"}
-SUZUKI_FAMILIES_CANONICAL: Set[str] = {"suzuki_miyaura"}
+SUZUKI_FAMILIES_CANONICAL: Set[str] = {"suzuki_miyaura", "suzuki_miyaura_in_situ"}
+NEGISHI_FAMILIES_CANONICAL: Set[str] = {"negishi", "negishi_in_situ"}
+STILLE_FAMILIES_CANONICAL: Set[str] = {"stille"}
+HECK_FAMILIES_CANONICAL: Set[str] = {"heck"}
 ULLMANN_SPECIFIC_CANONICAL: Set[str] = {"ullmann_cn"}
 BUCHWALD_SPECIFIC_CANONICAL: Set[str] = {"buchwald_hartwig_c_n"}
 
@@ -113,6 +130,9 @@ __all__ = [
     "AMIDE_FAMILIES_CANONICAL",
     "SONOGASHIRA_FAMILIES_CANONICAL",
     "SUZUKI_FAMILIES_CANONICAL",
+    "NEGISHI_FAMILIES_CANONICAL",
+    "STILLE_FAMILIES_CANONICAL",
+    "HECK_FAMILIES_CANONICAL",
     "ULLMANN_SPECIFIC_CANONICAL",
     "BUCHWALD_SPECIFIC_CANONICAL",
     "slugify_family",

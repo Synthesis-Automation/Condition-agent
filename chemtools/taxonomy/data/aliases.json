@@ -1,7 +1,7 @@
 [
   {
     "alias": "acetylene",
-    "entity_id": "alkyne",
+    "entity_id": "Alkyne",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -43,7 +43,7 @@
   },
   {
     "alias": "Acyl-source",
-    "entity_id": "acyl_source",
+    "entity_id": "RCO2H",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -113,7 +113,7 @@
   },
   {
     "alias": "Aldehyde",
-    "entity_id": "aldehyde",
+    "entity_id": "Aldehyde",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -127,7 +127,7 @@
   },
   {
     "alias": "Aliphatic-amine",
-    "entity_id": "aliphatic_amine",
+    "entity_id": "RNH2/R2NH",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -141,35 +141,35 @@
   },
   {
     "alias": "alkene-Br",
-    "entity_id": "vinylx",
+    "entity_id": "VinylX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "alkene-Cl",
-    "entity_id": "vinylx",
+    "entity_id": "VinylX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "alkene-I",
-    "entity_id": "vinylx",
+    "entity_id": "VinylX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "alkeneB(OH)2",
-    "entity_id": "rb",
+    "entity_id": "RB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "alkeneB(OR)2",
-    "entity_id": "rb",
+    "entity_id": "RB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -190,84 +190,84 @@
   },
   {
     "alias": "Alkyl-B(OH)2",
-    "entity_id": "rb",
+    "entity_id": "RB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-B(OR)2",
-    "entity_id": "rb",
+    "entity_id": "RB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-BF3K",
-    "entity_id": "rb",
+    "entity_id": "RB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-Br",
-    "entity_id": "alkyl_x",
+    "entity_id": "Alkyl-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-C-H",
-    "entity_id": "alkyl_c_h",
+    "entity_id": "Alkyl-C-H",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-Cl",
-    "entity_id": "alkyl_x",
+    "entity_id": "Alkyl-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-H",
-    "entity_id": "alkyl_c_h",
+    "entity_id": "Alkyl-C-H",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-H-acidic",
-    "entity_id": "alkyl_c_h",
+    "entity_id": "Alkyl-C-H",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-I",
-    "entity_id": "alkyl_x",
+    "entity_id": "Alkyl-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-M",
-    "entity_id": "organometallic",
+    "entity_id": "R-M",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-OSO2R",
-    "entity_id": "alkyl_x",
+    "entity_id": "Alkyl-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Alkyl-X",
-    "entity_id": "alkyl_x",
+    "entity_id": "Alkyl-X",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -281,7 +281,7 @@
   },
   {
     "alias": "Alkyne",
-    "entity_id": "alkyne",
+    "entity_id": "Alkyne",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -365,7 +365,7 @@
   },
   {
     "alias": "Amide-type",
-    "entity_id": "amide_type",
+    "entity_id": "Amide",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -421,7 +421,7 @@
   },
   {
     "alias": "Aniline-type",
-    "entity_id": "aniline_type",
+    "entity_id": "ArNH2/Ar2NH",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -435,21 +435,21 @@
   },
   {
     "alias": "Ar-alkyne",
-    "entity_id": "alkyne",
+    "entity_id": "Alkyne",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Ar-CN",
-    "entity_id": "nitrile",
+    "entity_id": "Nitrile",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Ar-H",
-    "entity_id": "arh",
+    "entity_id": "ArH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -463,126 +463,126 @@
   },
   {
     "alias": "Ar-M",
-    "entity_id": "organometallic",
+    "entity_id": "R-M",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Ar-N3",
-    "entity_id": "azide",
+    "entity_id": "Azide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Ar2NH",
-    "entity_id": "aniline_type",
+    "entity_id": "ArNH2/Ar2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArB(OH)2",
-    "entity_id": "arb",
+    "entity_id": "ArB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArB(OR)2",
-    "entity_id": "arb",
+    "entity_id": "ArB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArB*",
-    "entity_id": "arb",
+    "entity_id": "ArB*",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArBF3K",
-    "entity_id": "arb",
+    "entity_id": "ArB*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArBr",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArCHO",
-    "entity_id": "aldehyde",
+    "entity_id": "Aldehyde",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArCl",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArCOR",
-    "entity_id": "ketone",
+    "entity_id": "Ketone",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArF",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArH",
-    "entity_id": "arh",
+    "entity_id": "ArH",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArI",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArNH2",
-    "entity_id": "aniline_type",
+    "entity_id": "ArNH2/Ar2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArNHR",
-    "entity_id": "aniline_type",
+    "entity_id": "ArNH2/Ar2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArOH",
-    "entity_id": "aroh",
+    "entity_id": "ArOH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "arom-NH",
-    "entity_id": "aniline_type",
+    "entity_id": "ArNH2/Ar2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -603,42 +603,42 @@
   },
   {
     "alias": "ArOMs",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArOSO2R",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArOTf",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArOTs",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArSH",
-    "entity_id": "rsh",
+    "entity_id": "RSH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ArX*",
-    "entity_id": "arx",
+    "entity_id": "ArX*",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -673,7 +673,7 @@
   },
   {
     "alias": "Azide",
-    "entity_id": "azide",
+    "entity_id": "Azide",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -869,7 +869,7 @@
   },
   {
     "alias": "Carbamate",
-    "entity_id": "amide_type",
+    "entity_id": "Amide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -1219,7 +1219,7 @@
   },
   {
     "alias": "enamine",
-    "entity_id": "enamine",
+    "entity_id": "Enamine",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -1422,42 +1422,42 @@
   },
   {
     "alias": "HetArBr",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "HetArCl",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "HetArI",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "HetArOTf",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Hetero-ArH",
-    "entity_id": "arh",
+    "entity_id": "ArH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "Heterocyclic-halide",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -1597,7 +1597,7 @@
   },
   {
     "alias": "IndoleBr",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -1632,7 +1632,7 @@
   },
   {
     "alias": "internal-alkyne",
-    "entity_id": "alkyne",
+    "entity_id": "Alkyne",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -1674,7 +1674,7 @@
   },
   {
     "alias": "Ketone",
-    "entity_id": "ketone",
+    "entity_id": "Ketone",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -1716,7 +1716,7 @@
   },
   {
     "alias": "Lactam",
-    "entity_id": "amide_type",
+    "entity_id": "Amide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -1863,7 +1863,7 @@
   },
   {
     "alias": "morpholine-enamine",
-    "entity_id": "enamine",
+    "entity_id": "Enamine",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -1891,7 +1891,7 @@
   },
   {
     "alias": "NaN3",
-    "entity_id": "azide",
+    "entity_id": "Azide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -1982,7 +1982,7 @@
   },
   {
     "alias": "Nitrile",
-    "entity_id": "nitrile",
+    "entity_id": "Nitrile",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -2073,7 +2073,7 @@
   },
   {
     "alias": "Organometallic",
-    "entity_id": "organometallic",
+    "entity_id": "R-M",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
@@ -2254,8 +2254,8 @@
     "source": "legacy/families_registry.json"
   },
   {
-    "alias": "phosphoric_acid_brønsted",
-    "entity_id": "phosphoric_acid_brønsted",
+    "alias": "phosphoric_acid_br\u9176nsted",
+    "entity_id": "phosphoric_acid_br\u9176nsted",
     "entity_type": "reagent_family",
     "notes": null,
     "source": "legacy/families_registry.json"
@@ -2339,7 +2339,7 @@
   },
   {
     "alias": "PyridineBr",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2353,14 +2353,14 @@
   },
   {
     "alias": "PyrimidineCl",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "pyrrolidine-enamine",
-    "entity_id": "enamine",
+    "entity_id": "Enamine",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2395,42 +2395,42 @@
   },
   {
     "alias": "R-alkyne",
-    "entity_id": "alkyne",
+    "entity_id": "Alkyne",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "R-CN",
-    "entity_id": "nitrile",
+    "entity_id": "Nitrile",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "R-N3",
-    "entity_id": "azide",
+    "entity_id": "Azide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "R2NH",
-    "entity_id": "aliphatic_amine",
+    "entity_id": "RNH2/R2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "R2NH-a-branch",
-    "entity_id": "aliphatic_amine",
+    "entity_id": "RNH2/R2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "R3N",
-    "entity_id": "aliphatic_amine",
+    "entity_id": "RNH2/R2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2451,42 +2451,42 @@
   },
   {
     "alias": "RB*",
-    "entity_id": "rb",
+    "entity_id": "RB*",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RCHO",
-    "entity_id": "aldehyde",
+    "entity_id": "Aldehyde",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RCO2H",
-    "entity_id": "acyl_source",
+    "entity_id": "RCO2H",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RCO2H or activated acyl",
-    "entity_id": "rco2h_or_activated_acyl",
+    "entity_id": "RCO2H-activated",
     "entity_type": "reactant_type",
     "notes": "generated_from_token",
     "source": "legacy/reaction_types.json:Amide-coupling"
   },
   {
     "alias": "RCO2M",
-    "entity_id": "acyl_source",
+    "entity_id": "RCO2H",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RCO2OR",
-    "entity_id": "acyl_source",
+    "entity_id": "RCO2H",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2500,21 +2500,21 @@
   },
   {
     "alias": "RCONH2",
-    "entity_id": "amide_type",
+    "entity_id": "Amide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RCONHR",
-    "entity_id": "amide_type",
+    "entity_id": "Amide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RCOR",
-    "entity_id": "ketone",
+    "entity_id": "Ketone",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2612,56 +2612,56 @@
   },
   {
     "alias": "RNH2",
-    "entity_id": "aliphatic_amine",
+    "entity_id": "RNH2/R2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RNH2-a-branch",
-    "entity_id": "aliphatic_amine",
+    "entity_id": "RNH2/R2NH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ROH",
-    "entity_id": "roh",
+    "entity_id": "ROH",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ROH-a-branch",
-    "entity_id": "roh",
+    "entity_id": "ROH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ROH-primary",
-    "entity_id": "roh",
+    "entity_id": "ROH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ROH-secondary",
-    "entity_id": "roh",
+    "entity_id": "ROH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "ROH-tertiary",
-    "entity_id": "roh",
+    "entity_id": "ROH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "RSH",
-    "entity_id": "rsh",
+    "entity_id": "RSH",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2871,7 +2871,7 @@
   },
   {
     "alias": "Sulfonyl-amide",
-    "entity_id": "amide_type",
+    "entity_id": "Amide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2955,7 +2955,7 @@
   },
   {
     "alias": "terminal-alkyne",
-    "entity_id": "alkyne",
+    "entity_id": "Alkyne",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -2976,7 +2976,7 @@
   },
   {
     "alias": "ThiazoleBr",
-    "entity_id": "heterocyclic_halide",
+    "entity_id": "HetAr-X",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
@@ -3081,21 +3081,21 @@
   },
   {
     "alias": "Urea",
-    "entity_id": "amide_type",
+    "entity_id": "Amide",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "VinylOTf",
-    "entity_id": "vinylx",
+    "entity_id": "VinylX*",
     "entity_type": "reactant_type",
     "notes": "member_id",
     "source": "legacy/reactant_types.json"
   },
   {
     "alias": "VinylX*",
-    "entity_id": "vinylx",
+    "entity_id": "VinylX*",
     "entity_type": "reactant_type",
     "notes": null,
     "source": "legacy/reactant_types.json"
