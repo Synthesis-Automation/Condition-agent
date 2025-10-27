@@ -130,11 +130,12 @@ def find_matching_precedents(rec: dict, all_precedents: list, max_count: int = 5
         max_count: Maximum number of precedents to return
     
     Returns:
-        List of matching precedent dicts
+        List of matching precedent dicts with full details
     """
     # First, check if summary already has precedents
     summary = rec.get('summary', {})
     if summary.get('precedents'):
+        # Return with full details if available
         return summary['precedents'][:max_count]
     
     # Try to match based on combo (base + solvent)
@@ -169,13 +170,8 @@ def find_matching_precedents(rec: dict, all_precedents: list, max_count: int = 5
             solvent_match = True  # No solvent requirement
         
         if base_match and solvent_match:
-            # Convert to simplified format for display
-            matched.append({
-                'reaction_id': prec.get('reaction_id'),
-                'core': prec.get('core'),
-                'yield_pct': prec.get('yield'),
-                'reference': prec.get('reference', '')
-            })
+            # Return full precedent details for enhanced display
+            matched.append(prec)
             
             if len(matched) >= max_count:
                 break
@@ -350,19 +346,122 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
             for i, prec in enumerate(precedents[:max_precedents], 1):
                 reaction_id = prec.get("reaction_id", "N/A")
                 ref = prec.get("reference", "")
-                core = prec.get("core", "")
-                yield_pct = prec.get("yield_pct")
+                yield_pct = prec.get("yield") or prec.get("yield_pct")
+                
+                # Extract dataset name from reaction_id (e.g., "31-001-CAS-16722741" -> dataset "31")
+                dataset_name = "Unknown"
+                if reaction_id and "-" in str(reaction_id):
+                    parts = str(reaction_id).split("-")
+                    if parts:
+                        dataset_name = f"Dataset-{parts[0]}"
+                
+                # Get reaction SMILES
+                reaction_smiles = prec.get("reaction_smiles", "N/A")
+                if reaction_smiles == "N/A":
+                    # Try to construct from reactants and products
+                    smiles_data = prec.get("smiles", {})
+                    if isinstance(smiles_data, dict):
+                        reactants = smiles_data.get("reactants", "")
+                        products = smiles_data.get("products", "")
+                        if reactants and products:
+                            reaction_smiles = f"{reactants}>>{products}"
+                
+                # Get full catalytic system
+                catalytic_system = prec.get("catalytic_system", [])
+                catalyst_display = []
+                if catalytic_system:
+                    for cat in catalytic_system:
+                        if isinstance(cat, dict):
+                            cat_name = cat.get("name") or cat.get("abbreviation") or cat.get("cas", "")
+                        else:
+                            cat_name = str(cat)
+                        if cat_name and not cat_name.startswith("[Unknown"):
+                            catalyst_display.append(cat_name)
+                
+                # Fallback to condition_core if no catalytic_system
+                if not catalyst_display:
+                    core = prec.get("core", "") or prec.get("condition_core", "")
+                    if core and not any(core.startswith(prefix) for prefix in ['Base:', 'Acid:', 'base:', 'acid:']):
+                        catalyst_display.append(core)
+                
+                # Get full solvent info
+                solvents = prec.get("solvents", [])
+                solvent_display = []
+                if solvents:
+                    for solv in solvents:
+                        if isinstance(solv, dict):
+                            solv_name = solv.get("name") or solv.get("abbreviation", "")
+                        else:
+                            solv_name = str(solv)
+                        if solv_name and not solv_name.startswith("[Unknown"):
+                            solvent_display.append(solv_name)
+                
+                # Get reagents (base, additives, etc.)
+                reagents = prec.get("reagents", [])
+                base_display = []
+                additive_display = []
+                if reagents:
+                    for reagent in reagents:
+                        if isinstance(reagent, dict):
+                            reagent_name = reagent.get("name") or reagent.get("abbreviation", "")
+                            reagent_role = reagent.get("role", "").upper()
+                            if reagent_name and not reagent_name.startswith("[Unknown"):
+                                if reagent_role == "BASE":
+                                    base_display.append(reagent_name)
+                                elif reagent_role in ["ADDITIVE", "REAGENT", "ACTIVATING_AGENT"]:
+                                    additive_display.append(f"{reagent_name} ({reagent_role})")
+                
+                # Get temperature and time
+                conditions = prec.get("conditions", {})
+                temperature = conditions.get("temperature_c") if isinstance(conditions, dict) else None
+                time_h = conditions.get("time_h") if isinstance(conditions, dict) else None
                 
                 # Extract just the title from reference
-                ref_title = ref.split("|")[0].strip() if "|" in ref else ref[:80]
+                ref_title = ref.split("|")[0].strip() if "|" in ref else (ref[:80] if ref else "N/A")
                 
-                print(f"    {i}. {reaction_id}")
-                if core:
-                    print(f"       Catalyst: {core}")
+                # Print precedent details
+                print(f"    {i}. [{dataset_name}] {reaction_id}")
+                
+                # Show reaction SMILES
+                if reaction_smiles != "N/A":
+                    # Truncate if too long
+                    if len(reaction_smiles) > 100:
+                        reaction_smiles_display = reaction_smiles[:97] + "..."
+                    else:
+                        reaction_smiles_display = reaction_smiles
+                    print(f"       Reaction: {reaction_smiles_display}")
+                
+                # Show catalytic system
+                if catalyst_display:
+                    print(f"       Catalytic System: {', '.join(catalyst_display)}")
+                
+                # Show base
+                if base_display:
+                    print(f"       Base: {', '.join(base_display)}")
+                
+                # Show solvent
+                if solvent_display:
+                    print(f"       Solvent: {', '.join(solvent_display)}")
+                
+                # Show additives
+                if additive_display:
+                    print(f"       Additives: {', '.join(additive_display)}")
+                
+                # Show temperature
+                if temperature is not None:
+                    print(f"       Temperature: {temperature}°C")
+                
+                # Show time
+                if time_h is not None:
+                    print(f"       Time: {time_h}h")
+                
+                # Show yield
                 if yield_pct is not None:
                     print(f"       Yield: {yield_pct}%")
-                if ref_title:
-                    print(f"       Ref: {ref_title}...")
+                
+                # Show reference
+                if ref_title and ref_title != "N/A":
+                    print(f"       Reference: {ref_title}...")
         else:
             # If no precedents found
             print(f"  Top Precedents: None available")
