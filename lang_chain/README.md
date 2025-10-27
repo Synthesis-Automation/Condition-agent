@@ -87,6 +87,8 @@ python chemtools_cli.py --verbose
 ```
 You: Recommend conditions for Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
 
+⠋ Agent is thinking...  [animated spinner while processing]
+
 Agent: This is a Buchwald-Hartwig C-N coupling reaction. Based on precedent 
 analysis, I recommend:
 
@@ -192,7 +194,16 @@ result = custom_agent.invoke({
 })
 ```
 
-## 📚 Tool Reference
+## Key Features (Updated)
+
+- ✅ **No code changes** to existing chemtools
+- ✅ **ReAct agent** combines LLM reasoning with deterministic chemistry
+- ✅ **8 chemistry tools** wrapped and ready to use
+- ✅ **Conversational interface** with history
+- ✅ **Animated spinner** provides visual feedback during processing
+- ✅ **Multi-provider support** (OpenAI, Aliyun)
+- ✅ **Comprehensive docs** with examples
+- ✅ **Interactive CLI** for exploration
 
 ### normalize_smiles_tool
 ```python
@@ -304,6 +315,7 @@ Most tools accept standard parameters. Key ones:
 User Query
     ↓
 LangGraph ReAct Agent (reasoning + planning)
+    ↓  [Shows animated spinner while working]
     ↓
 LangChain Tool Wrappers (@tool decorators)
     ↓

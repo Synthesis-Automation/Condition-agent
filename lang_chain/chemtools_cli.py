@@ -29,6 +29,8 @@ import sys
 import os
 from pathlib import Path
 from typing import List
+import threading
+import time
 
 # Add parent directory to path for imports
 parent_dir = Path(__file__).parent.parent
@@ -55,6 +57,48 @@ class Colors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+
+# ============================================================================
+# Progress Spinner
+# ============================================================================
+
+class Spinner:
+    """Animated spinner to show agent is working."""
+    
+    def __init__(self, message="Processing"):
+        """Initialize spinner.
+        
+        Args:
+            message: Message to display while spinning
+        """
+        self.message = message
+        self.spinning = False
+        self.thread = None
+        self.spinner_chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+        self.current_idx = 0
+    
+    def _spin(self):
+        """Internal spinning loop."""
+        while self.spinning:
+            char = self.spinner_chars[self.current_idx]
+            print(f'\r{Colors.OKCYAN}{char} {self.message}...{Colors.ENDC}', end='', flush=True)
+            self.current_idx = (self.current_idx + 1) % len(self.spinner_chars)
+            time.sleep(0.1)
+    
+    def start(self):
+        """Start the spinner."""
+        self.spinning = True
+        self.thread = threading.Thread(target=self._spin, daemon=True)
+        self.thread.start()
+    
+    def stop(self):
+        """Stop the spinner and clear the line."""
+        self.spinning = False
+        if self.thread:
+            self.thread.join()
+        # Clear the spinner line
+        print('\r' + ' ' * (len(self.message) + 20), end='\r', flush=True)
 
 
 # ============================================================================
@@ -94,7 +138,7 @@ class ChemToolsCLI:
     def initialize_agent(self):
         """Initialize the agent (lazy loading)."""
         if self.agent is None:
-            print(f"{Colors.OKCYAN}Initializing ChemTools Agent...{Colors.ENDC}")
+            print(f"{Colors.OKCYAN}⚙️  Initializing ChemTools Agent...{Colors.ENDC}")
             try:
                 self.agent = ChemToolsAgent(verbose=self.verbose)
                 print(f"{Colors.OKGREEN}✓ Agent ready!{Colors.ENDC}\n")
@@ -229,15 +273,19 @@ class ChemToolsCLI:
                     continue
                 
                 # Process query with agent
-                print(f"\n{Colors.OKBLUE}{Colors.BOLD}Agent:{Colors.ENDC} ", end="", flush=True)
+                spinner = Spinner("Agent is thinking")
+                spinner.start()
                 
-                response, self.history = self.agent.chat(
-                    user_input,
-                    self.history,
-                    recursion_limit=15
-                )
+                try:
+                    response, self.history = self.agent.chat(
+                        user_input,
+                        self.history,
+                        recursion_limit=15
+                    )
+                finally:
+                    spinner.stop()
                 
-                print(response)
+                print(f"{Colors.OKBLUE}{Colors.BOLD}Agent:{Colors.ENDC} {response}")
                 print()
                 
             except KeyboardInterrupt:

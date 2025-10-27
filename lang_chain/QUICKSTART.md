@@ -68,6 +68,7 @@ python lang_chain/example_usage.py
 ✅ No code changes to existing chemtools  
 ✅ AI reasoning + deterministic chemistry  
 ✅ Conversational interface with history  
+✅ **Animated spinner** shows agent progress  
 ✅ 8 chemistry tools available  
 ✅ Supports OpenAI and Aliyun providers  
 
