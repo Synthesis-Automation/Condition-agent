@@ -5,6 +5,7 @@ This directory contains a **LangChain/LangGraph wrapper** for ChemTools, exposin
 ## 🎯 Overview
 
 The integration enables:
+
 - **LangChain Tools**: ChemTools functions wrapped as LangChain `@tool` decorators
 - **ReAct Agent**: LangGraph agent that reasons about chemistry problems and calls tools
 - **No Code Changes**: Pure wrapper - doesn't modify existing chemtools code
@@ -13,6 +14,7 @@ The integration enables:
 ## 📁 Structure
 
 ```
+
 lang_chain/
 ├── chemtools_wrapper.py   # LangChain tool wrappers for chemtools
 ├── chemtools_agent.py     # LangGraph ReAct agent
@@ -26,19 +28,23 @@ lang_chain/
 The wrapper exposes 8 core chemtools functions as LangChain tools:
 
 ### SMILES & Structure Tools
+
 1. **normalize_smiles_tool** - Canonicalize SMILES strings
 2. **normalize_reaction_tool** - Canonicalize reaction SMILES
 
 ### Analysis Tools
+
 3. **detect_reaction_family_tool** - Detect reaction type (Suzuki, Buchwald, etc.)
 4. **classify_reactant_tool** - Classify reactant types (aryl halide, amine, etc.)
 5. **get_functional_groups_tool** - Detect 80+ functional groups
 
 ### Recommendation Tools
+
 6. **recommend_conditions_tool** - ML-based condition recommendations
 7. **search_precedents_tool** - Find similar precedent reactions
 
 ### Database Tools
+
 8. **find_reagent_tool** - Look up reagent information (CAS, properties, roles)
 
 ## 🚀 Quick Start
@@ -84,6 +90,7 @@ python chemtools_cli.py --verbose
 ```
 
 **Example Session:**
+
 ```
 You: Recommend conditions for Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
 
@@ -112,6 +119,7 @@ Agent: Cesium carbonate (Cs2CO3) is an inorganic base with:
 #### 2. Python API
 
 **Basic Usage:**
+
 ```python
 from lang_chain.chemtools_agent import ChemToolsAgent
 
@@ -129,6 +137,7 @@ response, history = agent.chat("What role does it play?", history)
 ```
 
 **Quick One-Shot Query:**
+
 ```python
 from lang_chain.chemtools_agent import quick_query
 
@@ -137,6 +146,7 @@ print(result)
 ```
 
 **Custom Configuration:**
+
 ```python
 from lang_chain.chemtools_agent import ChemToolsAgent
 
@@ -206,12 +216,14 @@ result = custom_agent.invoke({
 - ✅ **Interactive CLI** for exploration
 
 ### normalize_smiles_tool
+
 ```python
 normalize_smiles_tool.invoke({"smiles": "c1ccccc1"})
 # Returns: "c1ccccc1"
 ```
 
 ### normalize_reaction_tool
+
 ```python
 normalize_reaction_tool.invoke({
     "reaction_smiles": "CCBr.CCO>>CCOCC"
@@ -220,6 +232,7 @@ normalize_reaction_tool.invoke({
 ```
 
 ### detect_reaction_family_tool
+
 ```python
 detect_reaction_family_tool.invoke({
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -228,12 +241,14 @@ detect_reaction_family_tool.invoke({
 ```
 
 ### classify_reactant_tool
+
 ```python
 classify_reactant_tool.invoke({"smiles": "Brc1ccccc1"})
 # Returns: {"category": "aryl_halide", ...}
 ```
 
 ### get_functional_groups_tool
+
 ```python
 get_functional_groups_tool.invoke({
     "smiles": "CCO",
@@ -243,6 +258,7 @@ get_functional_groups_tool.invoke({
 ```
 
 ### recommend_conditions_tool
+
 ```python
 recommend_conditions_tool.invoke({
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
@@ -254,6 +270,7 @@ recommend_conditions_tool.invoke({
 ```
 
 ### search_precedents_tool
+
 ```python
 search_precedents_tool.invoke({
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
@@ -264,6 +281,7 @@ search_precedents_tool.invoke({
 ```
 
 ### find_reagent_tool
+
 ```python
 find_reagent_tool.invoke({"query": "Cs2CO3"})
 # Returns: {"name": "Cesium carbonate", "cas": "534-17-8", ...}
@@ -299,11 +317,13 @@ ChemToolsAgent(
 Most tools accept standard parameters. Key ones:
 
 **recommend_conditions_tool:**
+
 - `k` (int): Number of precedents to retrieve (default: 25)
 - `max_variants` (int): Max condition variants (default: 3)
 - `rerank_strategy` (str): "rule", "analytics", or "none" (default: "rule")
 
 **search_precedents_tool:**
+
 - `k` (int): Number of precedents to find (default: 10)
 - `family` (str, optional): Filter by reaction family
 
@@ -413,6 +433,7 @@ When using the interactive CLI:
 ## 🔍 Example Use Cases
 
 ### 1. Reaction Condition Discovery
+
 ```
 You: I want to couple bromobenzene with aniline
 
@@ -420,6 +441,7 @@ Agent: [detects Buchwald coupling, recommends Pd/XPhos, Cs2CO3, dioxane, 100°C]
 ```
 
 ### 2. Reagent Information Lookup
+
 ```
 You: What is the CAS number for cesium carbonate?
 
@@ -427,6 +449,7 @@ Agent: [looks up Cs2CO3, returns CAS: 534-17-8, role: base, etc.]
 ```
 
 ### 3. Structure Analysis
+
 ```
 You: What functional groups are in c1ccc(O)cc1?
 
@@ -434,6 +457,7 @@ Agent: [normalizes SMILES, detects phenol, aromatic OH, etc.]
 ```
 
 ### 4. Precedent Search
+
 ```
 You: Find similar reactions to my Suzuki coupling
 
@@ -441,6 +465,7 @@ Agent: [searches precedents, returns top matches with conditions and yields]
 ```
 
 ### 5. Multi-Step Workflows
+
 ```
 You: Analyze this reaction and recommend conditions: Brc1ccccc1.c1cccnc1B(O)O>>...
 
@@ -475,23 +500,27 @@ ai_result = quick_query(
 ## 🐛 Troubleshooting
 
 ### "Missing API key" Error
+
 ```powershell
 # Set your API key
 $env:OPENAI_API_KEY = "sk-your-key-here"
 ```
 
 ### Import Errors
+
 ```powershell
 # Install missing packages
 pip install langchain langchain-openai langgraph python-dotenv
 ```
 
 ### Agent Not Calling Tools
+
 - Increase `recursion_limit` parameter
 - Check system prompt is not overridden
 - Enable `verbose=True` to see reasoning
 
 ### Tool Returns Error
+
 - Test the underlying chemtools function directly first
 - Check SMILES format is correct
 - Ensure required data files are present
@@ -513,6 +542,7 @@ To add new tools:
 5. Update this README
 
 Example:
+
 ```python
 @tool
 def my_new_tool(param: str) -> str:
@@ -547,6 +577,7 @@ Same as parent ChemTools project.
 ## 🎉 Summary
 
 You now have a powerful AI agent that can:
+
 - ✅ Call ChemTools functions intelligently
 - ✅ Reason about chemistry problems
 - ✅ Explain results in natural language
@@ -558,6 +589,7 @@ You now have a powerful AI agent that can:
 ---
 
 **Quick Start Reminder:**
+
 ```powershell
 # 1. Install dependencies
 pip install langchain langchain-openai langgraph python-dotenv
