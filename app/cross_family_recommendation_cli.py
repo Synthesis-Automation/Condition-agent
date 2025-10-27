@@ -348,12 +348,30 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 ref = prec.get("reference", "")
                 yield_pct = prec.get("yield") or prec.get("yield_pct")
                 
-                # Extract dataset name from reaction_id (e.g., "31-001-CAS-16722741" -> dataset "31")
-                dataset_name = "Unknown"
-                if reaction_id and "-" in str(reaction_id):
-                    parts = str(reaction_id).split("-")
-                    if parts:
-                        dataset_name = f"Dataset-{parts[0]}"
+                # Extract dataset name from rxn_type field (used internally by precedent loader)
+                # The reaction_id format is "31-XXX-CAS-YYYYYYY" where 31 is the SciFinder dataset ID
+                # But we want to show the actual reaction family/type from rxn_type field
+                dataset_name = prec.get("rxn_type") or prec.get("reaction_type", "Unknown")
+                if dataset_name != "Unknown":
+                    # Map canonical family names back to dataset filenames
+                    # The loader normalizes names like "C_N_Coupling" -> "C_N_Coupling_Pd" or "C_N_Coupling_Cu"
+                    # But the actual JSONL files use simpler names like "C_N_Coupling.jsonl"
+                    # So we need to reverse-map these
+                    family_to_file = {
+                        "C_N_Coupling_Pd": "C_N_Coupling",
+                        "C_N_Coupling_Cu": "C_N_Coupling",
+                        "C_N_Coupling_Ni": "C_N_Coupling",
+                        "Suzuki": "Suzuki",
+                        "Amide_formation": "Amide_formation",
+                        "C_O_Coupling": "C_O_Coupling",
+                        "C_S_Coupling": "C_S_Coupling",
+                        "SNAr-CN": "SNAr-CN",
+                        "SNAr-CO": "SNAr-CO",
+                        "SNAr-CS": "SNAr-CS",
+                    }
+                    # Use mapping if available, otherwise use the raw value
+                    file_base = family_to_file.get(dataset_name, dataset_name)
+                    dataset_name = f"{file_base}.jsonl"
                 
                 # Get reaction SMILES
                 reaction_smiles = prec.get("reaction_smiles", "N/A")
@@ -372,7 +390,15 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 if catalytic_system:
                     for cat in catalytic_system:
                         if isinstance(cat, dict):
-                            cat_name = cat.get("name") or cat.get("abbreviation") or cat.get("cas", "")
+                            # Try name, abbreviation, then CAS as fallback
+                            cat_name = cat.get("name") or cat.get("abbreviation")
+                            if not cat_name:
+                                # If no name/abbrev, show CAS with label
+                                cas_num = cat.get("cas", "")
+                                if cas_num and not cas_num.startswith("[Unknown"):
+                                    cat_name = f"CAS:{cas_num}"
+                                else:
+                                    cat_name = ""
                         else:
                             cat_name = str(cat)
                         if cat_name and not cat_name.startswith("[Unknown"):
@@ -390,7 +416,14 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 if solvents:
                     for solv in solvents:
                         if isinstance(solv, dict):
-                            solv_name = solv.get("name") or solv.get("abbreviation", "")
+                            solv_name = solv.get("name") or solv.get("abbreviation")
+                            if not solv_name:
+                                # If no name/abbrev, show CAS with label
+                                cas_num = solv.get("cas", "")
+                                if cas_num and not cas_num.startswith("[Unknown"):
+                                    solv_name = f"CAS:{cas_num}"
+                                else:
+                                    solv_name = ""
                         else:
                             solv_name = str(solv)
                         if solv_name and not solv_name.startswith("[Unknown"):
@@ -403,7 +436,14 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 if reagents:
                     for reagent in reagents:
                         if isinstance(reagent, dict):
-                            reagent_name = reagent.get("name") or reagent.get("abbreviation", "")
+                            reagent_name = reagent.get("name") or reagent.get("abbreviation")
+                            if not reagent_name:
+                                # If no name/abbrev, show CAS with label
+                                cas_num = reagent.get("cas", "")
+                                if cas_num and not cas_num.startswith("[Unknown"):
+                                    reagent_name = f"CAS:{cas_num}"
+                                else:
+                                    reagent_name = ""
                             reagent_role = reagent.get("role", "").upper()
                             if reagent_name and not reagent_name.startswith("[Unknown"):
                                 if reagent_role == "BASE":

@@ -419,6 +419,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             "core": r.get("condition_core"),
             "base_uid": r.get("base_uid"),
             "solvent_uid": r.get("solvent_uid"),
+            "rxn_type": r.get("rxn_type"),  # Include reaction family/type for dataset identification
             "reagents": r.get("reagents"),
             "solvents": r.get("solvents"),
             "reference": r.get("reference"),
@@ -458,6 +459,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                     "core": r.get("condition_core"),
                     "base_uid": r.get("base_uid"),
                     "solvent_uid": r.get("solvent_uid"),
+                    "rxn_type": r.get("rxn_type"),  # Include reaction family/type for dataset identification
                     "reagents": r.get("reagents"),
                     "solvents": r.get("solvents"),
                     "reference": r.get("reference"),

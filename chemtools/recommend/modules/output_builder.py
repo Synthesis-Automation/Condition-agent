@@ -296,6 +296,7 @@ def build_formatted_output(
                 "reference": p.get("reference"),
                 "yield_pct": p.get("yield_pct"),
                 "core": p.get("core"),
+                "rxn_type": p.get("rxn_type"),  # Include reaction family/type for dataset identification
             }
             for p in matched[:3]
             if p.get("reaction_id")
