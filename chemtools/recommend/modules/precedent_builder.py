@@ -35,6 +35,7 @@ def build_precedent_details(
             "reaction_smiles": p.get("reaction_smiles"),
             "core": p.get("core") or p.get("condition_core"),
             "yield": p.get("yield"),
+            "rxn_type": p.get("rxn_type"),  # Add reaction family/type for dataset identification
         }
         
         # Add detailed reagent information
