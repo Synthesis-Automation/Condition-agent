@@ -9,7 +9,8 @@ Successfully created a **comprehensive LangChain/LangGraph wrapper** for ChemToo
 ### Core Files
 
 1. **`chemtools_wrapper.py`** (450+ lines)
-   - 8 LangChain `@tool` decorators exposing chemtools functions
+   - 9 LangChain `@tool` decorators exposing chemtools functions
+   - Constraint-aware catalyst filtering with allow/exclude/prefer metal options
    - Proper error handling and JSON serialization
    - Fixed function signatures to match actual chemtools API
 
@@ -22,42 +23,47 @@ Successfully created a **comprehensive LangChain/LangGraph wrapper** for ChemToo
 3. **`chemtools_cli.py`** (280+ lines)
    - Interactive command-line interface
    - Colored output, help commands, examples
-   - History management and verbose mode
+   - History management, verbose mode, and constraint command shortcuts
+
+4. **`constraint_parser.py`**
+   - Deterministic parsing of catalyst/solvent preferences
+   - Shared across wrapper, agent, and CLI for consistent behavior
 
 ### Documentation
 
-4. **`README.md`** (650+ lines)
+5. **`README.md`** (650+ lines)
    - Complete API reference
    - Usage examples for all tools
    - Architecture diagrams
    - Troubleshooting guide
 
-5. **`QUICKSTART.md`**
+6. **`QUICKSTART.md`**
    - Fast-start guide with essentials
    - Copy-paste ready commands
 
-6. **`SUMMARY.md`** (this file)
+7. **`SUMMARY.md`** (this file)
    - Implementation overview
 
 ### Testing & Examples
 
-7. **`test_tools.py`**
-   - Direct tool tests (no API key needed)
-   - 8 test cases covering all tools
+8. **`test_tools.py`**
+    - Direct tool tests (no API key needed)
+    - 10 test cases covering core and constraint-aware tools
+    - Validates constraint parsing and catalyst filtering
    - ✅ All tests passing
 
-8. **`example_usage.py`**
+9. **`example_usage.py`**
    - 6 working examples
    - Conversational agent demo
    - Custom configuration examples
 
 ### Package Files
 
-9. **`__init__.py`**
+10. **`__init__.py`**
    - Clean package exports
    - Version tracking
 
-10. **`requirements.txt`**
+11. **`requirements.txt`**
     - LangChain dependencies
     - Isolated from main project
 
@@ -70,12 +76,14 @@ Successfully created a **comprehensive LangChain/LangGraph wrapper** for ChemToo
 5. ✅ **get_functional_groups_tool** - Detect functional groups
 6. ✅ **recommend_conditions_tool** - ML-based recommendations
 7. ✅ **search_precedents_tool** - Find similar reactions
-8. ✅ **find_reagent_tool** - Look up reagent info
+8. ✅ **list_supported_cores_tool** - Inspect catalyst cores in precedents
+9. ✅ **find_reagent_tool** - Look up reagent info
 
 ## 🎯 Key Features
 
 - ✅ **Zero modifications** to existing chemtools code
-- ✅ **8 chemistry tools** fully functional
+- ✅ **9 chemistry tools** fully functional
+- ✅ **Constraint-aware recommendations** with catalyst filtering and cross-family search
 - ✅ **ReAct agent** with reasoning capabilities
 - ✅ **Conversational UI** with history
 - ✅ **Multi-provider** (OpenAI, Aliyun)
@@ -104,16 +112,18 @@ python lang_chain/example_usage.py
 ## 📊 Test Results
 
 ```
-Test 1: Normalize SMILES              ✓ PASSED
-Test 2: Normalize Reaction             ✓ PASSED
-Test 3: Detect Reaction Family         ✓ PASSED
-Test 4: Classify Reactant              ✓ PASSED
-Test 5: Detect Functional Groups       ✓ PASSED
-Test 6: Find Reagent                   ✓ PASSED
-Test 7: Recommend Conditions           ✓ PASSED
-Test 8: Search Precedents              ✓ PASSED
+Test 1: Normalize SMILES              PASSED
+Test 2: Normalize Reaction             PASSED
+Test 3: Detect Reaction Family         PASSED
+Test 4: Classify Reactant              PASSED
+Test 5: Detect Functional Groups       PASSED
+Test 6: Find Reagent                   PASSED
+Test 7: Recommend Conditions           PASSED
+Test 8: Search Precedents              PASSED
+Test 9: Recommend With Constraints     PASSED
+Test 10: List Supported Cores          PASSED
 
-Test Results: 8 passed, 0 failed
+Test Results: 10 passed, 0 failed
 ```
 
 ## 🔧 Configuration

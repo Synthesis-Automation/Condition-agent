@@ -27,6 +27,7 @@ Commands:
 
 import sys
 import os
+import re
 from pathlib import Path
 from typing import List
 import threading
@@ -40,6 +41,12 @@ if str(parent_dir) not in sys.path:
 from langchain_core.messages import BaseMessage
 from lang_chain.chemtools_agent import ChemToolsAgent
 from lang_chain.chemtools_wrapper import get_tool_descriptions
+from lang_chain.constraint_parser import (
+    ConstraintSpec,
+    build_constraint_spec,
+    format_constraints_for_prompt,
+    merge_specs,
+)
 
 
 # ============================================================================
@@ -75,7 +82,7 @@ class Spinner:
         self.message = message
         self.spinning = False
         self.thread = None
-        self.spinner_chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+        self.spinner_chars = ['|', '/', '-', '\\']
         self.current_idx = 0
     
     def _spin(self):
@@ -111,6 +118,7 @@ EXAMPLE_QUERIES = [
     "Classify this reactant: Brc1ccccc1",
     "What reaction family is: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1",
     "Recommend conditions for: Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+    "Recommend Pd-free conditions for: Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
     "Search for precedents of Suzuki coupling",
     "What is the CAS number for Cs2CO3?",
     "Look up information about XPhos ligand",
@@ -134,16 +142,20 @@ class ChemToolsCLI:
         self.verbose = verbose
         self.history: List[BaseMessage] = []
         self.agent = None
+        self.constraint_spec = ConstraintSpec()
         
     def initialize_agent(self):
         """Initialize the agent (lazy loading)."""
         if self.agent is None:
-            print(f"{Colors.OKCYAN}⚙️  Initializing ChemTools Agent...{Colors.ENDC}")
+            print(f"{Colors.OKCYAN}Initializing ChemTools Agent...{Colors.ENDC}")
             try:
-                self.agent = ChemToolsAgent(verbose=self.verbose)
-                print(f"{Colors.OKGREEN}✓ Agent ready!{Colors.ENDC}\n")
+                self.agent = ChemToolsAgent(
+                    verbose=self.verbose,
+                    session_constraints=self.constraint_spec
+                )
+                print(f"{Colors.OKGREEN}Agent ready!{Colors.ENDC}\n")
             except Exception as e:
-                print(f"{Colors.FAIL}✗ Failed to initialize agent: {e}{Colors.ENDC}")
+                print(f"{Colors.FAIL}Failed to initialize agent: {e}{Colors.ENDC}")
                 print(f"\n{Colors.WARNING}Please ensure your API keys are configured:{Colors.ENDC}")
                 print("  - Set OPENAI_API_KEY or ALIYUN_API_KEY")
                 print("  - Optionally set LLM_PROVIDER (openai/aliyun) and LLM_MODEL")
@@ -162,6 +174,7 @@ class ChemToolsCLI:
         print("  tools          - List available tools")
         print("  clear/cls      - Clear conversation history")
         print("  verbose on/off - Toggle detailed output")
+        print("  constraints    - Manage catalyst/solvent constraints")
         print("  quit/exit/q    - Exit")
         print()
         print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
@@ -178,6 +191,11 @@ class ChemToolsCLI:
         print(f"\n{Colors.BOLD}{'=' * 70}{Colors.ENDC}")
         print(f"{Colors.WARNING}Tip:{Colors.ENDC} The agent uses multiple tools automatically.")
         print("You can ask follow-up questions - conversation history is maintained.")
+        print(f"\n{Colors.OKBLUE}Constraint commands:{Colors.ENDC}")
+        print("  constraints show          - Display active constraints")
+        print("  constraints set Pd-free   - Replace with new preferences")
+        print("  constraints allow Cu Ni   - Override allowed metals")
+        print("  constraints cross on      - Enable cross-family search")
         print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
     def print_tools(self):
@@ -194,6 +212,164 @@ class ChemToolsCLI:
         
         print(f"\n{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
+    def print_input_indicator(self):
+        """Show an indicator that user input is expected."""
+        print(f"{Colors.OKCYAN}[input]{Colors.ENDC} Your turn.")
+    
+    def print_constraints(self):
+        """Display the currently active constraint summary."""
+        summary = self.constraint_spec.formatted_summary()
+        prompt_hint = format_constraints_for_prompt(self.constraint_spec) or ""
+        print(f"\n{Colors.BOLD}{'=' * 70}{Colors.ENDC}")
+        print(f"{Colors.OKBLUE}{Colors.BOLD}Active Constraints:{Colors.ENDC}")
+        print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}")
+        print(f"{summary if summary != 'none' else 'None'}")
+        if self.constraint_spec.constraint_rules:
+            rules = ", ".join(sorted(self.constraint_spec.constraint_rules.keys()))
+            print(f"Rules enabled: {rules}")
+        if prompt_hint:
+            print(prompt_hint)
+        print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
+    
+    def sync_agent_constraints(self) -> None:
+        """Push the current constraint spec into the agent instance."""
+        if self.agent:
+            self.agent.session_constraints = self.constraint_spec
+    
+    @staticmethod
+    def _tokenize_metals(payload: str) -> List[str]:
+        return [
+            token for token in re.split(r"[\\s,]+", payload.strip())
+            if token
+        ]
+    
+    def handle_constraints_command(self, raw_input: str) -> None:
+        """Parse and execute constraint-prefixed commands."""
+        parts = raw_input.strip().split(maxsplit=2)
+        if len(parts) == 1:
+            self.print_constraints()
+            return
+        
+        action = parts[1].lower()
+        payload = parts[2] if len(parts) > 2 else ""
+        
+        truthy = {"on", "true", "yes", "1", "enable", "enabled", "all"}
+        falsy = {"off", "false", "no", "0", "disable", "disabled", "auto", "detect"}
+        
+        if action in {"show", "status"}:
+            self.print_constraints()
+            return
+        
+        if action in {"clear", "reset"}:
+            self.constraint_spec = ConstraintSpec()
+            self.sync_agent_constraints()
+            print(f"{Colors.OKGREEN}Constraints cleared.{Colors.ENDC}\n")
+            return
+        
+        if action == "set":
+            spec = build_constraint_spec(text=payload)
+            self.constraint_spec = spec
+            self.sync_agent_constraints()
+            self.print_constraints()
+            return
+        
+        if action == "add":
+            spec = build_constraint_spec(text=payload)
+            self.constraint_spec = merge_specs(self.constraint_spec, spec)
+            self.sync_agent_constraints()
+            self.print_constraints()
+            return
+        
+        if action in {"allow", "include"}:
+            metals = self._tokenize_metals(payload)
+            if not metals:
+                print(f"{Colors.WARNING}Provide one or more metal symbols to allow.{Colors.ENDC}\n")
+                return
+            spec = build_constraint_spec(allow_metals=metals)
+            self.constraint_spec.allow_metals = spec.allow_metals
+            self.constraint_spec.exclude_metals -= self.constraint_spec.allow_metals
+            self.sync_agent_constraints()
+            self.print_constraints()
+            return
+        
+        if action in {"exclude", "avoid"}:
+            metals = self._tokenize_metals(payload)
+            if not metals:
+                print(f"{Colors.WARNING}Provide one or more metal symbols to exclude.{Colors.ENDC}\n")
+                return
+            spec = build_constraint_spec(exclude_metals=metals)
+            self.constraint_spec.exclude_metals = spec.exclude_metals
+            self.constraint_spec.allow_metals -= self.constraint_spec.exclude_metals
+            self.sync_agent_constraints()
+            self.print_constraints()
+            return
+        
+        if action == "prefer":
+            metals = self._tokenize_metals(payload)
+            if not metals:
+                print(f"{Colors.WARNING}Provide one or more metal symbols to prefer.{Colors.ENDC}\n")
+                return
+            spec = build_constraint_spec(prefer_metals=metals)
+            self.constraint_spec.prefer_metals = spec.prefer_metals
+            self.sync_agent_constraints()
+            self.print_constraints()
+            return
+        
+        if action in {"cross", "crossfamily", "families"}:
+            state = payload.strip().lower()
+            if not state:
+                self.constraint_spec.search_all_families = not self.constraint_spec.search_all_families
+            elif state in truthy:
+                self.constraint_spec.search_all_families = True
+            elif state in falsy:
+                self.constraint_spec.search_all_families = False
+            else:
+                print(f"{Colors.WARNING}Specify 'on' or 'off' to control cross-family search.{Colors.ENDC}\n")
+                return
+            self.sync_agent_constraints()
+            self.print_constraints()
+            return
+        
+        if action in {"rule", "rules"}:
+            if not payload:
+                if self.constraint_spec.constraint_rules:
+                    rules = ", ".join(f"{k}=on" for k in sorted(self.constraint_spec.constraint_rules.keys()))
+                    print(f"{Colors.OKBLUE}Rules active: {rules}{Colors.ENDC}\n")
+                else:
+                    print(f"{Colors.OKBLUE}No optional rules active.{Colors.ENDC}\n")
+                return
+            parts_rule = payload.split(maxsplit=1)
+            alias = parts_rule[0].lower()
+            state = parts_rule[1].lower() if len(parts_rule) > 1 else ""
+            mapping = {
+                "no_chlorinated": "no_chlorinated",
+                "chlorinated": "no_chlorinated",
+                "aqueous": "aqueous_only",
+                "aqueous_only": "aqueous_only",
+                "no_hmpa": "no_HMPA",
+                "hmpa": "no_HMPA",
+            }
+            if alias not in mapping:
+                print(f"{Colors.WARNING}Unknown rule '{alias}'. Supported: no_chlorinated, aqueous, no_hmpa.{Colors.ENDC}\n")
+                return
+            rule_key = mapping[alias]
+            if not state or state in truthy:
+                self.constraint_spec.constraint_rules[rule_key] = True
+            elif state in falsy:
+                self.constraint_spec.constraint_rules.pop(rule_key, None)
+            else:
+                print(f"{Colors.WARNING}Specify 'on' or 'off' for rule state.{Colors.ENDC}\n")
+                return
+            self.sync_agent_constraints()
+            self.print_constraints()
+            return
+        
+        print(
+            f"{Colors.WARNING}Unrecognized constraints command. "
+            "Usage examples: 'constraints show', 'constraints set Pd-free', "
+            "'constraints allow Pd', 'constraints cross on'.{Colors.ENDC}\n"
+        )
+    
     def handle_command(self, user_input: str) -> bool:
         """
         Handle special commands.
@@ -205,10 +381,14 @@ class ChemToolsCLI:
             True if command was handled, False otherwise
         """
         cmd = user_input.lower().strip()
+
+        if cmd.startswith('constraint'):
+            self.handle_constraints_command(user_input)
+            return False
         
         # Exit commands
         if cmd in ['quit', 'exit', 'q']:
-            print(f"\n{Colors.OKGREEN}Goodbye! 👋{Colors.ENDC}\n")
+            print(f"\n{Colors.OKGREEN}Goodbye!{Colors.ENDC}\n")
             return True
         
         # Help
@@ -224,7 +404,7 @@ class ChemToolsCLI:
         # Clear history
         if cmd in ['clear', 'cls']:
             self.history = []
-            print(f"{Colors.OKGREEN}✓ Conversation history cleared.{Colors.ENDC}\n")
+            print(f"{Colors.OKGREEN}Conversation history cleared.{Colors.ENDC}\n")
             return False
         
         # Verbose toggle
@@ -235,12 +415,12 @@ class ChemToolsCLI:
                     self.verbose = True
                     if self.agent:
                         self.agent.verbose = True
-                    print(f"{Colors.OKGREEN}✓ Verbose mode enabled.{Colors.ENDC}\n")
+                    print(f"{Colors.OKGREEN}Verbose mode enabled.{Colors.ENDC}\n")
                 elif parts[1] == 'off':
                     self.verbose = False
                     if self.agent:
                         self.agent.verbose = False
-                    print(f"{Colors.OKGREEN}✓ Verbose mode disabled.{Colors.ENDC}\n")
+                    print(f"{Colors.OKGREEN}Verbose mode disabled.{Colors.ENDC}\n")
             else:
                 status = "ON" if self.verbose else "OFF"
                 print(f"{Colors.OKCYAN}Verbose mode is {status}{Colors.ENDC}\n")
@@ -256,6 +436,7 @@ class ChemToolsCLI:
         while True:
             try:
                 # Get user input
+                self.print_input_indicator()
                 user_input = input(f"{Colors.BOLD}You:{Colors.ENDC} ").strip()
                 
                 # Empty input
@@ -280,7 +461,8 @@ class ChemToolsCLI:
                     response, self.history = self.agent.chat(
                         user_input,
                         self.history,
-                        recursion_limit=15
+                        recursion_limit=15,
+                        constraints=self.constraint_spec
                     )
                 finally:
                     spinner.stop()
@@ -292,7 +474,7 @@ class ChemToolsCLI:
                 print(f"\n\n{Colors.WARNING}Interrupted. Type 'quit' to exit.{Colors.ENDC}\n")
                 continue
             except EOFError:
-                print(f"\n{Colors.OKGREEN}Goodbye! 👋{Colors.ENDC}\n")
+                print(f"\n{Colors.OKGREEN}Goodbye!{Colors.ENDC}\n")
                 break
             except Exception as e:
                 print(f"\n{Colors.FAIL}Error: {e}{Colors.ENDC}\n")

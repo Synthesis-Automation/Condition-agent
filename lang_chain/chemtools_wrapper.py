@@ -21,7 +21,7 @@ Usage:
     agent = create_react_agent(llm, CHEMTOOLS_TOOLS)
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Sequence, Tuple
 import json
 from langchain_core.tools import tool
 
@@ -32,6 +32,13 @@ from chemtools.recommend.modules import recommend_from_reaction
 from chemtools.precedent import knn as precedent_knn
 from chemtools.reagent import find_reagent, classify_reactant_smiles
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
+
+from .constraint_parser import (
+    ConstraintSpec,
+    build_constraint_spec,
+    filter_cores_by_constraints,
+    format_constraints_for_prompt,
+)
 
 
 # ============================================================================
@@ -182,7 +189,13 @@ def recommend_conditions_tool(
     reaction_smiles: str,
     k: int = 25,
     max_variants: int = 3,
-    rerank_strategy: str = "rule"
+    rerank_strategy: str = "rule",
+    constraint_text: Optional[str] = None,
+    allow_metals: Optional[List[str]] = None,
+    exclude_metals: Optional[List[str]] = None,
+    prefer_metals: Optional[List[str]] = None,
+    search_all_families: Optional[bool] = None,
+    constraint_rules: Optional[Dict[str, Any]] = None,
 ) -> str:
     """
     Recommend reaction conditions using ML-based DRFP similarity search.
@@ -215,23 +228,74 @@ def recommend_conditions_tool(
         }
     """
     try:
+        constraint_spec = build_constraint_spec(
+            text=constraint_text,
+            allow_metals=allow_metals,
+            exclude_metals=exclude_metals,
+            prefer_metals=prefer_metals,
+            search_all_families=search_all_families,
+            base_constraint_rules=constraint_rules,
+        )
+
         result = recommend_from_reaction(
             reaction=reaction_smiles,
             k=k,
             max_variants=max_variants,
-            rerank_strategy=rerank_strategy
+            rerank_strategy=rerank_strategy,
+            search_all_families=constraint_spec.search_all_families,
+            constraint_rules=constraint_spec.constraint_rules or None,
         )
-        # Simplify output for LLM consumption
-        simplified = {
-            "family": result.get("family", "Unknown"),
-            "recommendation": result.get("recommendation", {}),
-            "alternatives": result.get("alternatives", {}),
-            "reasons": result.get("reasons", [])[:5],  # Top 5 reasons
-            "precedent_count": len(result.get("precedent_pack", {}).get("precedents", []))
-        }
+
+        simplified = _simplify_recommendation(result)
+        simplified, notes = _apply_core_constraints(simplified, constraint_spec)
+        if notes:
+            simplified["constraint_notes"] = notes
+
+        prompt_hint = format_constraints_for_prompt(constraint_spec)
+        if prompt_hint:
+            simplified["constraint_summary"] = prompt_hint
+
         return json.dumps(simplified, indent=2)
     except Exception as e:
         return json.dumps({"error": str(e), "family": "Unknown"})
+
+
+@tool
+def list_supported_cores_tool(
+    reaction_smiles: str,
+    k: int = 25,
+    search_all_families: bool = False,
+) -> str:
+    """
+    List the catalyst cores observed in precedent reactions for the query.
+    
+    Useful when planning constraints (e.g., deciding whether Cu or Pd options
+    exist for a given substrate pairing).
+    """
+    try:
+        result = recommend_from_reaction(
+            reaction=reaction_smiles,
+            k=k,
+            max_variants=1,
+            search_all_families=search_all_families,
+        )
+
+        alternatives = result.get("alternatives", {}) or {}
+        core_counts: Sequence[Tuple[str, int]] = alternatives.get("cores", []) or []
+        cores = [
+            {"core": core, "support": support}
+            for core, support in core_counts
+        ]
+
+        return json.dumps({
+            "family": result.get("family"),
+            "detected_family": result.get("detected_family"),
+            "search_all_families": search_all_families,
+            "core_candidates": cores,
+            "precedent_count": len(result.get("precedent_pack", {}).get("precedents", [])),
+        }, indent=2)
+    except Exception as e:
+        return json.dumps({"error": str(e), "core_candidates": []})
 
 
 @tool
@@ -382,6 +446,7 @@ CHEMTOOLS_TOOLS = [
     
     # Database tools
     find_reagent_tool,
+    list_supported_cores_tool,
 ]
 
 
@@ -414,3 +479,95 @@ def print_tool_summary():
 if __name__ == "__main__":
     # Print tool summary when run directly
     print_tool_summary()
+
+
+# ============================================================================
+# Internal helpers (kept at end to avoid cluttering the main tool definitions)
+# ============================================================================
+
+def _simplify_recommendation(raw: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract the subset of recommendation fields most useful to the LLM."""
+    reasons_src = raw.get("reasons")
+    reasons_list: List[str] = []
+    if isinstance(reasons_src, dict):
+        reasons_list = [str(v) for v in reasons_src.values()]
+    elif isinstance(reasons_src, (list, tuple)):
+        reasons_list = [str(v) for v in reasons_src]
+    elif reasons_src:
+        reasons_list = [str(reasons_src)]
+
+    return {
+        "family": raw.get("family", "Unknown"),
+        "detected_family": raw.get("detected_family"),
+        "search_all_families": raw.get("search_all_families", False),
+        "recommendation": raw.get("recommendation", {}) or {},
+        "alternatives": raw.get("alternatives", {}) or {},
+        "reasons": reasons_list[:5],
+        "precedent_count": len(raw.get("precedent_pack", {}).get("precedents", [])),
+        "detection": raw.get("detection", {}),
+        "constraint_filters": raw.get("constraint_filters"),
+    }
+
+
+def _apply_core_constraints(
+    simplified: Dict[str, Any],
+    spec: ConstraintSpec,
+) -> Tuple[Dict[str, Any], Optional[str]]:
+    """
+    Apply catalyst-core constraints using the structured specification.
+    
+    Returns the updated simplified dict and a note describing any adjustments.
+    """
+    if not spec.allow_metals and not spec.exclude_metals and not spec.prefer_metals:
+        return simplified, None
+
+    recommendation = dict(simplified.get("recommendation") or {})
+    if not recommendation:
+        return simplified, None
+
+    base_core = recommendation.get("core")
+
+    alt_list = simplified.get("alternatives", {}) or {}
+    core_counts: Sequence[Tuple[str, int]] = alt_list.get("cores", []) or []
+    ordered_cores: List[str] = []
+
+    if base_core:
+        ordered_cores.append(base_core)
+    ordered_cores.extend(
+        core for core, _ in core_counts
+        if core and core not in ordered_cores
+    )
+
+    updated_order = filter_cores_by_constraints(
+        ordered_cores,
+        allow_metals=spec.allow_metals,
+        exclude_metals=spec.exclude_metals,
+        prefer_metals=spec.prefer_metals,
+    )
+
+    if not updated_order:
+        return simplified, None
+
+    new_core = updated_order[0]
+    note_bits: List[str] = []
+
+    if new_core != base_core:
+        recommendation["core"] = new_core
+        note_bits.append(f"core updated to {new_core}")
+
+    simplified["recommendation"] = recommendation
+    simplified["alternatives"] = dict(alt_list)
+    simplified["alternatives"]["cores"] = [
+        (core, next((count for c, count in core_counts if c == core), None))
+        for core in updated_order
+    ]
+
+    if spec.allow_metals:
+        note_bits.append(f"allowed metals: {', '.join(sorted(spec.allow_metals))}")
+    if spec.exclude_metals:
+        note_bits.append(f"excluded metals: {', '.join(sorted(spec.exclude_metals))}")
+    if spec.prefer_metals:
+        note_bits.append(f"preferred metals: {', '.join(sorted(spec.prefer_metals))}")
+
+    note = "; ".join(note_bits) if note_bits else None
+    return simplified, note

@@ -28,6 +28,12 @@ echo 'OPENAI_API_KEY=sk-your-key-here' > .env
 ```powershell
 python -m lang_chain.chemtools_cli
 ```
+Constraint-aware commands:
+- constraints show — display active catalyst/base filters
+- constraints set Pd-free — replace constraints using natural language
+- constraints allow Pd Ni — force allowed metals
+- constraints cross on — search across reaction families
+
 
 ### Option 2: Python API
 
@@ -53,13 +59,15 @@ python lang_chain/example_usage.py
 5. **get_functional_groups_tool** - Detect functional groups
 6. **recommend_conditions_tool** - Get ML recommendations
 7. **search_precedents_tool** - Find similar reactions
-8. **find_reagent_tool** - Look up reagent info
+8. **list_supported_cores_tool** - Inspect catalyst cores in precedents
+9. **find_reagent_tool** - Look up reagent info
 
 ## Example Queries
 
 - "Normalize c1ccccc1"
 - "What reaction is Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1?"
 - "Recommend conditions for Suzuki coupling"
+- "Give Pd-free conditions for Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
 - "What is the CAS for Cs2CO3?"
 - "What functional groups are in CCO?"
 

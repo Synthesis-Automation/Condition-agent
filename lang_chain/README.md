@@ -25,7 +25,7 @@ lang_chain/
 
 ## 🛠️ Available Tools
 
-The wrapper exposes 8 core chemtools functions as LangChain tools:
+The wrapper exposes 9 core ChemTools functions as LangChain tools:
 
 ### SMILES & Structure Tools
 
@@ -42,10 +42,11 @@ The wrapper exposes 8 core chemtools functions as LangChain tools:
 
 6. **recommend_conditions_tool** - ML-based condition recommendations
 7. **search_precedents_tool** - Find similar precedent reactions
+8. **list_supported_cores_tool** - Summarize catalyst cores found in similar precedents
 
 ### Database Tools
 
-8. **find_reagent_tool** - Look up reagent information (CAS, properties, roles)
+9. **find_reagent_tool** - Look up reagent information (CAS, properties, roles)
 
 ## 🚀 Quick Start
 
@@ -264,9 +265,27 @@ recommend_conditions_tool.invoke({
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
     "k": 25,
     "max_variants": 3,
-    "rerank_strategy": "rule"
+    "rerank_strategy": "rule",
+    "constraint_text": "Pd-free, prefer copper",
+    "allow_metals": ["Cu", "Ni"],
+    "constraint_rules": {"no_chlorinated": true}
 })
 # Returns: JSON with recommendations, alternatives, reasons
+Optional parameters:
+- `constraint_text`: Parse natural language requests such as 'Pd-free' or 'prefer copper'.
+- `allow_metals` / `exclude_metals` / `prefer_metals`: Structured overrides for catalyst cores.
+- `constraint_rules`: Forward deterministic solvent/base rules (e.g., `{"no_chlorinated": true}`).
+- `search_all_families`: Set to `true` to perform cross-family precedent search.
+```
+
+### list_supported_cores_tool
+
+```python
+list_supported_cores_tool.invoke({
+    "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+    "k": 25
+})
+# Returns: core vote counts to help plan catalyst constraints
 ```
 
 ### search_precedents_tool
