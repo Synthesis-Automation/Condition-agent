@@ -578,6 +578,7 @@ pip install langchain langchain-openai langgraph python-dotenv
 - **Recommendation**: Use agent for exploration, direct calls for production
 - **Caching**: Consecutive recommendation + core-list queries reuse cached DRFP results to trim duplicate compute
 - **Cache management**: In the CLI, run `cache show` to inspect entries or `cache clear` to flush them
+- **Benchmark (Buchwald example)**: Cold recommendation ≈1150 ms, cached follow-up ≈0.01 ms (>99% reduction)
 
 ## 🤝 Contributing
 
