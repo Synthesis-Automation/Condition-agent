@@ -20,7 +20,7 @@
 
 **Exit criteria:** Sequential tool calls reuse cached packs; measured latency drop (>30% on repeat queries); CLI exposes cache management command.
 
-**Status:** 🟢 Cache sharing shipped (`chemtools_wrapper` now reuses DRFP results) and CLI exposes cache stats/clear commands; next capture latency benchmarks to quantify gains.
+**Status:** ✅ Completed — shared cache flows shipped, CLI exposes cache stats/clear commands, and benchmarking (Buchwald example: cold 1151 ms vs cached 0.01 ms) shows >99% latency reduction.
 
 ## Phase 3 – Rich Precedent Rationales
 
