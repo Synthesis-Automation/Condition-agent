@@ -161,11 +161,13 @@ def add_reagent_entry(
     provided_syns = _coerce_synonyms(synonyms)
     abbr = (abbreviation or final_name).strip()
     combined_synonyms = dedupe_synonyms([final_name, abbr, *provided_syns, *resolved_synonyms])
-    token_set = tokenize_all(combined_synonyms)
+    token_list = tokenize_all(combined_synonyms)
+    token_set = {tok for tok in token_list if tok}
 
     role_reason: Optional[str] = None
     family_tokens: Optional[List[str]] = None
     default_rejection: Optional[str] = None
+    family_candidates: List[Dict[str, Any]] = []
     used_default = False
 
     if family_id:
@@ -205,7 +207,12 @@ def add_reagent_entry(
     if not family_id:
         default_family = heuristics.default_family_for_role(role) if allow_default_family else None
         if default_family:
-            if token_set and store.family_token_overlap(role, default_family, token_set):
+            use_default = False
+            if use_flat_registry:
+                use_default = True
+            elif token_set and store.family_token_overlap(role, default_family, token_set):
+                use_default = True
+            if use_default:
                 family_id = default_family
                 used_default = True
             else:
@@ -219,6 +226,10 @@ def add_reagent_entry(
             "Unable to determine family. Provide it explicitly or enable default fallback."
         )
 
+    if hasattr(store, 'suggest_families'):
+        suggestions = store.suggest_families(role, token_set, limit=5)
+        if suggestions:
+            family_candidates = suggestions
     if use_flat_registry:
         family_entry = store.family_entry(role, family_id)
         if not family_entry:
@@ -293,6 +304,8 @@ def add_reagent_entry(
     }
     if not use_flat_registry:
         result["taxonomy_file"] = result["registry_file"]
+    if family_candidates:
+        result["family_candidates"] = family_candidates
     if auto_resolve_source:
         result["auto_resolve_source"] = auto_resolve_source
     if resolved_smiles and not smiles:

@@ -443,7 +443,7 @@ def add_reagent_tool(
     abbreviation: Optional[str] = None,
     smiles: Optional[str] = None,
     taxonomy_dir: Optional[str] = None,
-    allow_default_family: bool = False,
+    allow_default_family: bool = True,
     dry_run: bool = False,
     auto_resolve: bool = True,
     resolver_timeout: float = REAGENT_RESOLVER_TIMEOUT,
