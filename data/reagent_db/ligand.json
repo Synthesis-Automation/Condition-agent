@@ -303,6 +303,35 @@
     "embedding_text": "role: ligand | family_label: 2,2'-Bipyridines (bpy family) | family_id: bipyridines | normalized_family: bipyridine | donors: N,N | denticity: 2 | abbr: bpy | CAS: 366-18-7 | family_def: 2,2'-Bipyridines (bpy family)"
   },
   {
+    "id": "ZQTILGDVDYWICD-UHFFFAOYSA-N",
+    "name": "2,2'-Bipyridine-6-carboxylic acid",
+    "abbreviation": [
+      "2,2'-Bipyridine-6-carboxylic acid"
+    ],
+    "aliases": [
+      "[2,2'-Bipyridine]-6-carboxylic acid",
+      "6-pyridin-2-ylpyridine-2-carboxylic Acid",
+      "6-(2-pyridyl)pyridine-2-carboxylic acid",
+      "2,2-bipyridine-6-carboxylic acid",
+      "[2,2'-Bipyridine]-6-carboxylic acid hydrochloride",
+      "bipyridine-6-carboxylic acid",
+      "[2,2'-Bipyridine]-6-carboxylicacid"
+    ],
+    "cas": "4392-87-4",
+    "inchi_key": "ZQTILGDVDYWICD-UHFFFAOYSA-N",
+    "smiles": null,
+    "roles": {
+      "ligand": {
+        "families": [
+          "bipyridine_ligands"
+        ],
+        "donors": null,
+        "denticity": null
+      }
+    },
+    "embedding_text": "type: LIGAND | family: Auto family for bipyridine ligands (bipyridine_ligands) | name: 2,2'-Bipyridine-6-carboxylic acid | abbr: 2,2'-Bipyridine-6-carboxylic acid | CAS: 4392-87-4 | synonyms: 2,2'-Bipyridine-6-carboxylic acid; 4392-87-4; [2,2'-Bipyridine]-6-carboxylic acid; 6-pyridin-2-ylpyridine-2-carboxylic Acid; MFCD11100046; 6-(2-pyridyl)pyridine-2-carboxylic acid; 2,2-bipyridine-6-carboxylic acid; [2,2'-Bipyridine]-6-carboxylic acid hydrochloride; bipyridine-6-carboxylic acid; SCHEMBL4811257; YSCH0067; DTXSID80452568; SBB052900; [2,2'-Bipyridine]-6-carboxylicacid; AKOS026675804; CS-W004555"
+  },
+  {
     "id": "2_2_6_2_terpyridine__fe5af27b",
     "name": "2,2':6',2''-Terpyridine",
     "abbreviation": [

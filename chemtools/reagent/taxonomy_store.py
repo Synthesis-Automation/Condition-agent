@@ -633,6 +633,33 @@ class TaxonomyStore:
                     result.append((rl, fid, label))
         return sorted(result, key=lambda item: (item[0], item[1]))
 
+    def suggest_families(self, role: str, tokens: Iterable[str], limit: int = 5) -> List[Dict[str, Any]]:
+        """Suggest families matching the provided token set."""
+        token_set = {tok for tok in tokens if tok}
+        suggestions: List[Tuple[int, str, List[str]]] = []
+        for (fam_role, fam_id), fam_tokens in self.family_tokens.items():
+            if fam_role != role:
+                continue
+            matches = sorted(token_set & fam_tokens)
+            if not matches:
+                continue
+            suggestions.append((len(matches), fam_id, matches))
+        suggestions.sort(key=lambda item: (item[0], item[1]), reverse=True)
+
+        results: List[Dict[str, Any]] = []
+        for score, fam_id, matches in suggestions[:limit]:
+            entry = self.family_lookup.get(fam_id)
+            label = ""
+            if entry:
+                label = entry[1].get("label") or entry[1].get("definition") or fam_id
+            results.append({
+                "family_id": fam_id,
+                "label": label,
+                "matches": matches,
+                "score": score,
+            })
+        return results
+
     def role_for_family(self, family_id: str) -> Optional[str]:
         """Get role for a family."""
         entry = self.family_lookup.get(family_id)

@@ -25,7 +25,7 @@ from .constants import DEFAULT_FAMILY_BY_ROLE
 ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
     "ligand": {
         "filename": "ligand.json",
-        "default_family": "trialkyl_triaryl_phosphines",
+        "default_family": "generic_ligands",
     },
     "metal_precursor": {
         "filename": "metal_precursor.json",
@@ -271,12 +271,51 @@ class RegistryStore:
     # ------------------------------------------------------------------ loading
     def _load_families(self) -> None:
         schema_path = self.base_dir / "reagent_schema" / "families_registry.json"
+        entries: List[Dict[str, Any]] = []
         if schema_path.exists():
             data = json.loads(schema_path.read_text(encoding="utf-8"))
-            entries: Iterable[Dict[str, Any]] = data.get("entries", [])
+            entries = list(data.get("entries", []))
         else:
-            entries = load_families_registry_entries()
+            try:
+                entries = list(load_families_registry_entries())
+            except FileNotFoundError:
+                entries = []
+        if not entries:
+            def add_entry(role: str, family: str, definition: str, keywords: Sequence[str]) -> None:
+                entries.append({
+                    "role": role,
+                    "family": family,
+                    "label": definition,
+                    "definition": definition,
+                    "notes": "",
+                    "keywords": list(keywords),
+                    "required_props": {},
+                    "examples_pos": [],
+                })
 
+            for role, cfg in ROLE_CONFIG.items():
+                default_family = cfg.get("default_family") or f"{role}_general"
+                add_entry(role, default_family, f"Auto-generated family for {role}", [])
+
+            # Additional common ligand scaffolds for better suggestions.
+            add_entry(
+                "ligand",
+                "trialkyl_triaryl_phosphines",
+                "Auto family for phosphine ligands",
+                ["phosphine", "phosphorus", "pr3", "ph3"],
+            )
+            add_entry(
+                "ligand",
+                "bipyridine_ligands",
+                "Auto family for bipyridine ligands",
+                ["bipyridine", "bipy", "bpy", "diimine"],
+            )
+            add_entry(
+                "ligand",
+                "phenanthroline_ligands",
+                "Auto family for phenanthroline ligands",
+                ["phenanthroline", "phen", "phenanthroline"],
+            )
         for entry in entries:
             role = entry.get("role")
             family = entry.get("family")
@@ -290,7 +329,6 @@ class RegistryStore:
             self.family_tokens[key] = {tok for tok in tokens if tok}
             examples = {str(cas) for cas in entry.get("examples_pos", []) if cas}
             self.family_examples[key] = examples
-
     def _load_registry(self) -> None:
         for role, cfg in ROLE_CONFIG.items():
             filename = cfg.get("filename")
@@ -434,6 +472,32 @@ class RegistryStore:
             _score, matches, fam_id = best
             return fam_id, matches
         return None
+
+    def suggest_families(self, role: str, tokens: Iterable[str], limit: int = 5) -> List[Dict[str, Any]]:
+        token_set = {tok for tok in tokens if tok}
+        suggestions: List[Tuple[int, str, List[str]]] = []
+        for (fam_role, fam_id), fam_tokens in self.family_tokens.items():
+            if fam_role != role:
+                continue
+            matches = sorted(token_set & fam_tokens)
+            if not matches:
+                continue
+            suggestions.append((len(matches), fam_id, matches))
+        suggestions.sort(key=lambda item: (item[0], item[1]), reverse=True)
+
+        results: List[Dict[str, Any]] = []
+        for score, fam_id, matches in suggestions[:limit]:
+            entry = self.family_lookup.get(fam_id)
+            label = ""
+            if entry:
+                label = entry[1].get("label") or entry[1].get("definition") or fam_id
+            results.append({
+                "family_id": fam_id,
+                "label": label,
+                "matches": matches,
+                "score": score,
+            })
+        return results
 
     def infer_role(self, name: str, synonyms: Sequence[str]) -> Optional[Tuple[str, str]]:
         texts = " ".join([name, *synonyms])
