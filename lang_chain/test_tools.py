@@ -32,6 +32,23 @@ from lang_chain.chemtools_wrapper import (
 )
 
 
+def _format_output(payload: object, limit: int = 400) -> str:
+    """Pretty-print helpers for consistent console output."""
+    try:
+        text = json.dumps(payload, indent=2, default=str)
+    except TypeError:
+        text = str(payload)
+    if len(text) > limit:
+        return text[:limit] + "..."
+    return text
+
+
+def _assert_success(result: dict, message: str) -> None:
+    """Validate standard tool success response."""
+    assert isinstance(result, dict), f"{message}: tool did not return a dict"
+    assert result.get("success"), f"{message}: {result}"
+
+
 def test_normalize_smiles():
     """Test SMILES normalization."""
     print("\n" + "="*70)
@@ -40,9 +57,9 @@ def test_normalize_smiles():
     
     result = normalize_smiles_tool.invoke({"smiles": "c1ccccc1"})
     print(f"Input: c1ccccc1")
-    print(f"Output: {result}")
-    # Result is JSON string, check it contains normalized SMILES
-    assert "smiles_norm" in result or "c1ccccc1" in result, "SMILES normalization failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "SMILES normalization failed")
+    assert result.get("smiles_norm") == "c1ccccc1", "Missing normalized SMILES"
     print("PASSED")
 
 
@@ -55,8 +72,9 @@ def test_normalize_reaction():
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
     result = normalize_reaction_tool.invoke({"reaction_smiles": reaction})
     print(f"Input: {reaction}")
-    print(f"Output: {result}")
-    assert len(result) > 0, "Reaction normalization failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Reaction normalization failed")
+    assert result.get("normalized"), "Normalized reaction missing"
     print("PASSED")
 
 
@@ -69,8 +87,9 @@ def test_detect_reaction_family():
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
     result = detect_reaction_family_tool.invoke({"reaction_smiles": reaction})
     print(f"Input: {reaction}")
-    print(f"Output: {result[:200]}...")  # First 200 chars
-    assert "family" in result.lower(), "Family detection failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Family detection failed")
+    assert result.get("family"), "Family label missing"
     print("PASSED")
 
 
@@ -82,9 +101,9 @@ def test_classify_reactant():
     
     result = classify_reactant_tool.invoke({"smiles": "Brc1ccccc1"})
     print(f"Input: Brc1ccccc1")
-    print(f"Output: {result[:200]}...")  # First 200 chars
-    # Just check it doesn't error - null is acceptable for some reactants
-    assert len(result) > 0, "Reactant classification failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Reactant classification failed")
+    assert "classification" in result or "classes" in result, "Classification metadata missing"
     print("PASSED")
 
 
@@ -96,8 +115,9 @@ def test_functional_groups():
     
     result = get_functional_groups_tool.invoke({"smiles": "CCO"})
     print(f"Input: CCO")
-    print(f"Output: {result[:200]}...")  # First 200 chars
-    assert "alcohol" in result.lower() or "error" in result.lower(), "Functional group detection failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Functional group detection failed")
+    assert "alcohol" in result, "Expected alcohol functional group metadata"
     print("PASSED")
 
 
@@ -109,8 +129,9 @@ def test_find_reagent():
     
     result = find_reagent_tool.invoke({"query": "Cs2CO3"})
     print(f"Input: Cs2CO3")
-    print(f"Output: {result[:200]}...")  # First 200 chars
-    assert "cas" in result.lower() or "error" in result.lower(), "Reagent lookup failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Reagent lookup failed")
+    assert result.get("cas"), "CAS metadata missing"
     print("PASSED")
 
 
@@ -127,8 +148,10 @@ def test_recommend_conditions():
         "max_variants": 2
     })
     print(f"Input: {reaction}")
-    print(f"Output: {result[:300]}...")  # First 300 chars
-    assert "family" in result.lower() or "error" in result.lower(), "Recommendation failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Recommendation failed")
+    assert "recommendation" in result, "Recommendation payload missing"
+    assert "cache_hit" in result and "timing_ms" in result
     print("PASSED")
 
 
@@ -144,8 +167,9 @@ def test_search_precedents():
         "k": 5
     })
     print(f"Input: {reaction}")
-    print(f"Output: {result[:300]}...")  # First 300 chars
-    assert "precedent" in result.lower() or "error" in result.lower(), "Precedent search failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Precedent search failed")
+    assert result.get("precedents"), "No precedents returned"
     print("PASSED")
 
 
@@ -156,16 +180,17 @@ def test_recommend_with_constraints():
     print("="*70)
     
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
-    raw = recommend_conditions_tool.invoke({
+    result = recommend_conditions_tool.invoke({
         "reaction_smiles": reaction,
         "constraint_text": "Pd-free, prefer copper",
         "allow_metals": ["Cu", "Ni"],
         "constraint_rules": {"no_chlorinated": True},
     })
-    data = json.loads(raw)
     print(f"Input: {reaction}")
-    print(f"Output: {json.dumps(data, indent=2)[:300]}...")
-    assert "constraint_summary" in data or "constraint_notes" in data, "Constraint metadata missing"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Constraint-aware recommendation failed")
+    assert "constraint_summary" in result or "constraint_notes" in result, "Constraint metadata missing"
+    assert "cache_hit" in result
     print("PASSED")
 
 
@@ -181,8 +206,10 @@ def test_list_supported_cores():
         "k": 5
     })
     print(f"Input: {reaction}")
-    print(f"Output: {result[:300]}...")
-    assert "core_candidates" in result.lower() or "error" in result.lower(), "Core listing failed"
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Core listing failed")
+    assert "core_candidates" in result, "Core candidates missing"
+    assert "cache_hit" in result and "timing_ms" in result
     print("PASSED")
 
 def test_add_reagent_tool_dry_run():
@@ -201,9 +228,11 @@ def test_add_reagent_tool_dry_run():
     }
     result = add_reagent_tool.invoke(payload)
     print(f"Payload: {payload}")
-    print(f"Output: {result[:300]}...")
-    data = json.loads(result)
-    assert "error" in data or data.get("status") in {"dry_run", "exists", "written"}
+    print(f"Output: {_format_output(result)}")
+    if result.get("success"):
+        assert result.get("status") in {"dry_run", "exists", "written", None}, "Unexpected reagent status"
+    else:
+        print("Warning: add_reagent_tool reported an error (acceptable in dry-run environments).")
     print("PASSED")
 
 

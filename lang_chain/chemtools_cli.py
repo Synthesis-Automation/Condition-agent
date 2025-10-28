@@ -40,7 +40,11 @@ if str(parent_dir) not in sys.path:
 
 from langchain_core.messages import BaseMessage
 from lang_chain.chemtools_agent import ChemToolsAgent
-from lang_chain.chemtools_wrapper import get_tool_descriptions
+from lang_chain.chemtools_wrapper import (
+    get_tool_descriptions,
+    clear_recommendation_cache,
+    recommendation_cache_stats,
+)
 from lang_chain.constraint_parser import (
     ConstraintSpec,
     build_constraint_spec,
@@ -175,6 +179,7 @@ class ChemToolsCLI:
         print("  clear/cls      - Clear conversation history")
         print("  verbose on/off - Toggle detailed output")
         print("  constraints    - Manage catalyst/solvent constraints")
+        print("  cache          - Show or clear recommendation cache")
         print("  quit/exit/q    - Exit")
         print()
         print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
@@ -196,6 +201,9 @@ class ChemToolsCLI:
         print("  constraints set Pd-free   - Replace with new preferences")
         print("  constraints allow Cu Ni   - Override allowed metals")
         print("  constraints cross on      - Enable cross-family search")
+        print(f"\n{Colors.OKBLUE}Cache commands:{Colors.ENDC}")
+        print("  cache show                - Display cached recommendation entries")
+        print("  cache clear               - Flush cached entries")
         print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
     def print_tools(self):
@@ -207,8 +215,21 @@ class ChemToolsCLI:
         tools = get_tool_descriptions()
         for i, tool in enumerate(tools, 1):
             print(f"{Colors.OKCYAN}{i}. {tool['name']}{Colors.ENDC}")
-            desc = tool['description'].split('\n')[0]  # First line only
-            print(f"   {desc[:100]}...")
+            desc_line = (tool["description"] or "").strip()
+            if desc_line:
+                first_line = desc_line.split("\n")[0]
+                print(f"   {first_line}")
+            parameters = tool.get("parameters") or []
+            if not parameters:
+                print("   Parameters: none")
+            else:
+                print("   Parameters:")
+                for param in parameters:
+                    requirement = "required" if param.get("required") else "optional"
+                    param_type = param.get("type") or "any"
+                    print(f"     - {param['name']} ({param_type}, {requirement})")
+                    if param.get("description"):
+                        print(f"       {param['description']}")
         
         print(f"\n{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
@@ -229,6 +250,28 @@ class ChemToolsCLI:
             print(f"Rules enabled: {rules}")
         if prompt_hint:
             print(prompt_hint)
+        print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
+
+    def print_cache_stats(self) -> None:
+        """Display recommendation cache statistics."""
+        stats = recommendation_cache_stats()
+        print(f"\n{Colors.BOLD}{'=' * 70}{Colors.ENDC}")
+        print(f"{Colors.OKBLUE}{Colors.BOLD}Recommendation Cache:{Colors.ENDC}")
+        print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}")
+        print(f"Entries: {stats['entries']}")
+        if stats["entries"]:
+            for idx, item in enumerate(stats["items"], 1):
+                print(f"\n[{idx}] Reaction key: {item['reaction']}")
+                print(f"     k={item['k']} max_variants={item['max_variants']}")
+                print(f"     search_all_families={item['search_all_families']}")
+                if item["allow_metals"]:
+                    print(f"     allow_metals={', '.join(item['allow_metals'])}")
+                if item["exclude_metals"]:
+                    print(f"     exclude_metals={', '.join(item['exclude_metals'])}")
+                if item["prefer_metals"]:
+                    print(f"     prefer_metals={', '.join(item['prefer_metals'])}")
+                if item["constraint_rules"]:
+                    print(f"     constraint_rules={dict(item['constraint_rules'])}")
         print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
     def sync_agent_constraints(self) -> None:
@@ -385,6 +428,10 @@ class ChemToolsCLI:
         if cmd.startswith('constraint'):
             self.handle_constraints_command(user_input)
             return False
+
+        if cmd.startswith('cache'):
+            self.handle_cache_command(user_input)
+            return False
         
         # Exit commands
         if cmd in ['quit', 'exit', 'q']:
@@ -427,6 +474,21 @@ class ChemToolsCLI:
             return False
         
         return False  # Not a command
+
+    def handle_cache_command(self, raw_input: str) -> None:
+        """Parse cache-related commands (show/clear)."""
+        parts = raw_input.strip().split()
+        if len(parts) == 1 or parts[1].lower() in {"show", "status"}:
+            self.print_cache_stats()
+            return
+        if parts[1].lower() == "clear":
+            clear_recommendation_cache()
+            print(f"{Colors.OKGREEN}Recommendation cache cleared.{Colors.ENDC}\n")
+            return
+        print(
+            f"{Colors.WARNING}Unrecognized cache command. "
+            "Usage: 'cache', 'cache show', or 'cache clear'.{Colors.ENDC}\n"
+        )
     
     def run(self):
         """Run the interactive CLI."""

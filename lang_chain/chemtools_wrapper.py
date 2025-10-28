@@ -23,6 +23,10 @@ Usage:
 
 from typing import Dict, Any, List, Optional, Sequence, Tuple
 import json
+import time
+from dataclasses import dataclass
+from collections import OrderedDict
+from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 
 # Import chemtools functions
@@ -49,42 +53,362 @@ from .constraint_parser import (
 
 
 # ============================================================================
+# Pydantic Schemas
+# ============================================================================
+
+
+class NormalizeSmilesInput(BaseModel):
+    """Schema for SMILES normalization."""
+
+    smiles: str = Field(..., description="SMILES string to normalize.")
+
+
+class NormalizeReactionInput(BaseModel):
+    """Schema for reaction SMILES normalization."""
+
+    reaction_smiles: str = Field(
+        ...,
+        description="Reaction SMILES in 'reactants>>products' or "
+        "'reactants>agents>products' format.",
+    )
+
+
+class DetectReactionFamilyInput(BaseModel):
+    """Schema for reaction family detection."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES to analyze.")
+
+
+class ClassifyReactantInput(BaseModel):
+    """Schema for reactant classification."""
+
+    smiles: str = Field(..., description="Reactant SMILES string.")
+
+
+class FunctionalGroupInput(BaseModel):
+    """Schema for functional group detection."""
+
+    smiles: str = Field(..., description="SMILES string to analyze for functional groups.")
+
+
+class RecommendConditionsInput(BaseModel):
+    """Schema for condition recommendation tool."""
+
+    reaction_smiles: str = Field(
+        ..., description="Reaction SMILES string (reactants>>products)."
+    )
+    k: int = Field(
+        25,
+        ge=1,
+        le=200,
+        description="Maximum precedents to retrieve for DRFP similarity search.",
+    )
+    max_variants: int = Field(
+        3,
+        ge=1,
+        le=10,
+        description="Maximum number of recommendation variants to generate.",
+    )
+    rerank_strategy: str = Field(
+        "rule",
+        description="Condition reranking strategy: 'rule', 'analytics', or 'none'.",
+    )
+    constraint_text: Optional[str] = Field(
+        None,
+        description="Natural language constraint hints (e.g., 'Pd-free, prefer Cu').",
+    )
+    allow_metals: Optional[List[str]] = Field(
+        None,
+        description="Whitelist of allowed catalyst metals (e.g., ['Cu', 'Ni']).",
+    )
+    exclude_metals: Optional[List[str]] = Field(
+        None,
+        description="Metals that must be excluded from recommendations.",
+    )
+    prefer_metals: Optional[List[str]] = Field(
+        None,
+        description="Metals to prioritize in the recommended catalyst cores.",
+    )
+    search_all_families: Optional[bool] = Field(
+        None,
+        description="Search for precedents across all reaction families.",
+    )
+    constraint_rules: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Structured constraint overrides (e.g., {'no_chlorinated': True}).",
+    )
+
+
+class ListSupportedCoresInput(BaseModel):
+    """Schema for listing supported catalyst cores."""
+
+    reaction_smiles: str = Field(
+        ..., description="Reaction SMILES string for precedent lookup."
+    )
+    k: int = Field(
+        25,
+        ge=1,
+        le=200,
+        description="Number of precedents to inspect for catalyst cores.",
+    )
+    search_all_families: bool = Field(
+        False,
+        description="Whether to search across all reaction families.",
+    )
+
+
+class SearchPrecedentsInput(BaseModel):
+    """Schema for precedent search."""
+
+    reaction_smiles: str = Field(
+        ..., description="Reaction SMILES string used to compute DRFP embeddings."
+    )
+    k: int = Field(
+        10,
+        ge=1,
+        le=200,
+        description="Number of most similar precedents to return.",
+    )
+    family: Optional[str] = Field(
+        None,
+        description="Optional reaction family override if auto-detection should be skipped.",
+    )
+
+
+class FindReagentInput(BaseModel):
+    """Schema for reagent lookup."""
+
+    query: str = Field(..., description="Reagent name, abbreviation, CAS, or UID.")
+    reagent_type: str = Field(
+        "base",
+        description="Preferred reagent collection to search (base, solvent, ligand, metal, additive).",
+    )
+
+
+class AddReagentInput(BaseModel):
+    """Schema for adding reagents to the taxonomy."""
+
+    cas: str = Field(..., description="CAS identifier for the reagent.")
+    name: Optional[str] = Field(
+        None, description="Preferred reagent name (resolved automatically if omitted)."
+    )
+    synonyms: Optional[Any] = Field(
+        None,
+        description="Additional synonyms (list/tuple/set or comma-delimited string).",
+    )
+    role: Optional[str] = Field(
+        None, description="Explicit reagent role override (e.g., base, ligand)."
+    )
+    family_id: Optional[str] = Field(
+        None, description="Explicit taxonomy family override if required."
+    )
+    abbreviation: Optional[str] = Field(
+        None, description="Abbreviation override (defaults to resolved name)."
+    )
+    smiles: Optional[str] = Field(
+        None, description="Optional SMILES annotation for the reagent."
+    )
+    taxonomy_dir: Optional[str] = Field(
+        None,
+        description="Optional override for writable taxonomy directory (falls back to defaults).",
+    )
+    allow_default_family: bool = Field(
+        True,
+        description="Allow fallback to default family if inference fails.",
+    )
+    dry_run: bool = Field(
+        False,
+        description="When true, validate the payload without writing to disk.",
+    )
+    auto_resolve: bool = Field(
+        True,
+        description="Resolve missing fields via CAS resolver when available.",
+    )
+    resolver_timeout: float = Field(
+        REAGENT_RESOLVER_TIMEOUT,
+        gt=0,
+        description="Timeout (seconds) for CAS resolution attempts.",
+    )
+
+
+# ============================================================================
+# Recommendation Cache Utilities
+# ============================================================================
+
+
+@dataclass
+class _RecommendationCacheEntry:
+    """Stored recommendation result with metadata about request breadth."""
+
+    k: int
+    max_variants: int
+    result: Dict[str, Any]
+
+
+class _RecommendationCache:
+    """Simple LRU cache for expensive recommend_from_reaction calls."""
+
+    def __init__(self, max_entries: int = 8):
+        self.max_entries = max_entries
+        self._store: "OrderedDict[Tuple[Any, ...], _RecommendationCacheEntry]" = OrderedDict()
+
+    def clear(self) -> None:
+        """Remove all cached entries."""
+        self._store.clear()
+
+    def __len__(self) -> int:
+        return len(self._store)
+
+    def _make_key(
+        self,
+        normalized_reaction: str,
+        rerank_strategy: str,
+        spec: ConstraintSpec,
+    ) -> Tuple[Any, ...]:
+        allow_metals = tuple(sorted(spec.allow_metals))
+        exclude_metals = tuple(sorted(spec.exclude_metals))
+        prefer_metals = tuple(sorted(spec.prefer_metals))
+        rules = spec.constraint_rules or {}
+        try:
+            rule_items = tuple(
+                sorted(
+                    (key, json.dumps(value, sort_keys=True, default=str))
+                    for key, value in rules.items()
+                )
+            )
+        except TypeError:
+            rule_items = tuple(sorted((key, str(value)) for key, value in rules.items()))
+        return (
+            normalized_reaction,
+            rerank_strategy.lower() if rerank_strategy else "",
+            spec.search_all_families,
+            allow_metals,
+            exclude_metals,
+            prefer_metals,
+            rule_items,
+        )
+
+    def get_or_compute(
+        self,
+        *,
+        reaction_smiles: str,
+        normalized_reaction: str,
+        k: int,
+        max_variants: int,
+        rerank_strategy: str,
+        constraint_spec: ConstraintSpec,
+    ) -> Tuple[Dict[str, Any], bool]:
+        """Return cached recommendation or compute and store a new entry."""
+        key = self._make_key(normalized_reaction, rerank_strategy, constraint_spec)
+        entry = self._store.get(key)
+        if entry and entry.k >= k and entry.max_variants >= max_variants:
+            self._store.move_to_end(key)
+            return entry.result, True
+
+        result = recommend_from_reaction(
+            reaction=reaction_smiles,
+            k=k,
+            max_variants=max_variants,
+            rerank_strategy=rerank_strategy,
+            search_all_families=constraint_spec.search_all_families,
+            constraint_rules=constraint_spec.constraint_rules or None,
+        )
+
+        self._store[key] = _RecommendationCacheEntry(
+            k=k,
+            max_variants=max_variants,
+            result=result,
+        )
+        if len(self._store) > self.max_entries:
+            self._store.popitem(last=False)
+        return result, False
+
+
+def _normalized_reaction_key(reaction_smiles: str) -> str:
+    """Return a deterministic key for reaction-based cache lookups."""
+    try:
+        normalized = normalize_reaction(reaction_smiles)
+        if isinstance(normalized, dict):
+            if normalized.get("normalized"):
+                return normalized["normalized"]
+            if normalized.get("input"):
+                return str(normalized["input"]).strip()
+        if isinstance(normalized, str):
+            return normalized.strip()
+    except Exception:
+        pass
+    return reaction_smiles.strip()
+
+
+_recommendation_cache = _RecommendationCache(max_entries=10)
+
+
+def clear_recommendation_cache() -> None:
+    """Expose cache clearing for CLI/tests."""
+    _recommendation_cache.clear()
+
+
+def recommendation_cache_stats() -> Dict[str, Any]:
+    """Return lightweight stats describing the recommendation cache."""
+    entries: List[Dict[str, Any]] = []
+    for key, entry in _recommendation_cache._store.items():
+        normalized_reaction = key[0]
+        if len(normalized_reaction) > 80:
+            normalized_reaction = normalized_reaction[:77] + "..."
+        entries.append({
+            "reaction": normalized_reaction,
+            "search_all_families": key[2],
+            "allow_metals": list(key[3]),
+            "exclude_metals": list(key[4]),
+            "prefer_metals": list(key[5]),
+            "constraint_rules": {k: v for k, v in key[6]},
+            "k": entry.k,
+            "max_variants": entry.max_variants,
+        })
+    return {"entries": len(entries), "items": entries}
+
+
+# ============================================================================
 # SMILES Normalization Tools
 # ============================================================================
 
-@tool
-def normalize_smiles_tool(smiles: str) -> str:
+@tool(args_schema=NormalizeSmilesInput)
+def normalize_smiles_tool(smiles: str) -> Dict[str, Any]:
     """
     Normalize (canonicalize) a SMILES string.
     
     This standardizes molecular representations for consistent comparisons.
-    Returns a dict with normalization details.
+    Returns a dictionary containing the canonical form, fragment breakdown,
+    and other normalization metadata.
     
     Args:
         smiles: SMILES string to normalize (e.g., "CCO", "c1ccccc1")
     
     Returns:
-        JSON string with normalized SMILES and metadata
+        Dict[str, Any]: Structured normalization payload with success flag.
     
     Example:
         Input: "c1ccccc1"
-        Output: {"smiles_norm": "c1ccccc1", ...}
+        Output: {"success": True, "smiles_norm": "c1ccccc1", ...}
     """
     try:
         result = normalize(smiles)
         if isinstance(result, dict):
-            # Return the normalized SMILES if it's a dict
-            return json.dumps(result, indent=2)
-        elif result:
-            return json.dumps({"smiles_norm": result}, indent=2)
-        else:
-            return json.dumps({"error": f"Invalid SMILES '{smiles}'"})
+            if result.get("error"):
+                return _error_response(
+                    str(result.get("error")),
+                    {"details": result, "smiles": smiles},
+                )
+            return _success_response(result)
+        if result:
+            return _success_response({"smiles_norm": result})
+        return _error_response(f"Invalid SMILES '{smiles}'", {"smiles": smiles})
     except Exception as e:
-        return json.dumps({"error": str(e)})
+        return _error_response(str(e), {"smiles": smiles})
 
 
-@tool
-def normalize_reaction_tool(reaction_smiles: str) -> str:
+@tool(args_schema=NormalizeReactionInput)
+def normalize_reaction_tool(reaction_smiles: str) -> Dict[str, Any]:
     """
     Normalize a reaction SMILES string.
     
@@ -95,7 +419,7 @@ def normalize_reaction_tool(reaction_smiles: str) -> str:
         reaction_smiles: Reaction SMILES (e.g., "CCBr.CCO>>CCOCC")
     
     Returns:
-        Canonicalized reaction SMILES string
+        Dict[str, Any]: Structured normalization payload with success flag.
     
     Example:
         Input: "c1ccccc1Br.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -103,17 +427,24 @@ def normalize_reaction_tool(reaction_smiles: str) -> str:
     """
     try:
         result = normalize_reaction(reaction_smiles)
-        return result if result else f"Error: Invalid reaction SMILES '{reaction_smiles}'"
+        if not result:
+            return _error_response(
+                f"Invalid reaction SMILES '{reaction_smiles}'",
+                {"reaction_smiles": reaction_smiles},
+            )
+        if isinstance(result, dict):
+            return _success_response(result)
+        return _success_response({"normalized": str(result)})
     except Exception as e:
-        return f"Error normalizing reaction: {str(e)}"
+        return _error_response(str(e), {"reaction_smiles": reaction_smiles})
 
 
 # ============================================================================
 # Reaction Analysis Tools
 # ============================================================================
 
-@tool
-def detect_reaction_family_tool(reaction_smiles: str) -> str:
+@tool(args_schema=DetectReactionFamilyInput)
+def detect_reaction_family_tool(reaction_smiles: str) -> Dict[str, Any]:
     """
     Detect the reaction family/type from a reaction SMILES.
     
@@ -124,7 +455,7 @@ def detect_reaction_family_tool(reaction_smiles: str) -> str:
         reaction_smiles: Reaction SMILES string
     
     Returns:
-        JSON string with detected family and metadata
+        Dict[str, Any]: Family detection metadata with success flag.
     
     Example:
         Input: "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
@@ -132,13 +463,19 @@ def detect_reaction_family_tool(reaction_smiles: str) -> str:
     """
     try:
         result = detect_family_from_reaction(reaction_smiles)
-        return json.dumps(result, indent=2)
+        payload = dict(result or {})
+        if not payload.get("family"):
+            return _error_response(
+                "Could not determine reaction family",
+                {"details": payload, "reaction_smiles": reaction_smiles},
+            )
+        return _success_response(payload)
     except Exception as e:
-        return json.dumps({"error": str(e), "family": "Unknown"})
+        return _error_response(str(e), {"family": "Unknown", "reaction_smiles": reaction_smiles})
 
 
-@tool
-def classify_reactant_tool(smiles: str) -> str:
+@tool(args_schema=ClassifyReactantInput)
+def classify_reactant_tool(smiles: str) -> Dict[str, Any]:
     """
     Classify a reactant molecule type.
     
@@ -149,7 +486,7 @@ def classify_reactant_tool(smiles: str) -> str:
         smiles: SMILES string of the reactant
     
     Returns:
-        JSON string with classification results
+        Dict[str, Any]: Classification payload with success flag.
     
     Example:
         Input: "Brc1ccccc1"
@@ -157,13 +494,15 @@ def classify_reactant_tool(smiles: str) -> str:
     """
     try:
         result = classify_reactant_smiles(smiles)
-        return json.dumps(result, indent=2, default=str)
+        if isinstance(result, dict):
+            return _success_response(result)
+        return _success_response({"classification": result})
     except Exception as e:
-        return json.dumps({"error": str(e), "category": "unknown"})
+        return _error_response(str(e), {"category": "unknown", "smiles": smiles})
 
 
-@tool
-def get_functional_groups_tool(smiles: str) -> str:
+@tool(args_schema=FunctionalGroupInput)
+def get_functional_groups_tool(smiles: str) -> Dict[str, Any]:
     """
     Detect functional groups in a molecule.
     
@@ -174,7 +513,7 @@ def get_functional_groups_tool(smiles: str) -> str:
         smiles: SMILES string to analyze
     
     Returns:
-        JSON string with detected functional groups
+        Dict[str, Any]: Functional group boolean map with success flag.
     
     Example:
         Input: "CCO"
@@ -182,16 +521,18 @@ def get_functional_groups_tool(smiles: str) -> str:
     """
     try:
         result = detect_functional_groups(smiles)
-        return json.dumps(result, indent=2)
+        if isinstance(result, dict):
+            return _success_response(result)
+        return _success_response({"functional_groups": result})
     except Exception as e:
-        return json.dumps({"error": str(e)})
+        return _error_response(str(e), {"smiles": smiles})
 
 
 # ============================================================================
 # Recommendation Tools
 # ============================================================================
 
-@tool
+@tool(args_schema=RecommendConditionsInput)
 def recommend_conditions_tool(
     reaction_smiles: str,
     k: int = 25,
@@ -203,7 +544,7 @@ def recommend_conditions_tool(
     prefer_metals: Optional[List[str]] = None,
     search_all_families: Optional[bool] = None,
     constraint_rules: Optional[Dict[str, Any]] = None,
-) -> str:
+) -> Dict[str, Any]:
     """
     Recommend reaction conditions using ML-based DRFP similarity search.
     
@@ -217,7 +558,7 @@ def recommend_conditions_tool(
         rerank_strategy: Ranking strategy - "rule", "analytics", or "none" (default: "rule")
     
     Returns:
-        JSON string with recommended conditions and alternatives
+        Dict[str, Any]: Recommendation payload with success flag.
     
     Example:
         Input: "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -244,14 +585,17 @@ def recommend_conditions_tool(
             base_constraint_rules=constraint_rules,
         )
 
-        result = recommend_from_reaction(
-            reaction=reaction_smiles,
+        normalized_key = _normalized_reaction_key(reaction_smiles)
+        start = time.perf_counter()
+        result, cache_hit = _recommendation_cache.get_or_compute(
+            reaction_smiles=reaction_smiles,
+            normalized_reaction=normalized_key,
             k=k,
             max_variants=max_variants,
             rerank_strategy=rerank_strategy,
-            search_all_families=constraint_spec.search_all_families,
-            constraint_rules=constraint_spec.constraint_rules or None,
+            constraint_spec=constraint_spec,
         )
+        duration_ms = (time.perf_counter() - start) * 1000
 
         simplified = _simplify_recommendation(result)
         simplified, notes = _apply_core_constraints(simplified, constraint_spec)
@@ -261,18 +605,20 @@ def recommend_conditions_tool(
         prompt_hint = format_constraints_for_prompt(constraint_spec)
         if prompt_hint:
             simplified["constraint_summary"] = prompt_hint
+        simplified["cache_hit"] = cache_hit
+        simplified["timing_ms"] = round(duration_ms, 2)
 
-        return json.dumps(simplified, indent=2)
+        return _success_response(simplified)
     except Exception as e:
-        return json.dumps({"error": str(e), "family": "Unknown"})
+        return _error_response(str(e), {"family": "Unknown"})
 
 
-@tool
+@tool(args_schema=ListSupportedCoresInput)
 def list_supported_cores_tool(
     reaction_smiles: str,
     k: int = 25,
     search_all_families: bool = False,
-) -> str:
+) -> Dict[str, Any]:
     """
     List the catalyst cores observed in precedent reactions for the query.
     
@@ -280,12 +626,20 @@ def list_supported_cores_tool(
     exist for a given substrate pairing).
     """
     try:
-        result = recommend_from_reaction(
-            reaction=reaction_smiles,
-            k=k,
-            max_variants=1,
+        constraint_spec = build_constraint_spec(
             search_all_families=search_all_families,
         )
+        normalized_key = _normalized_reaction_key(reaction_smiles)
+        start = time.perf_counter()
+        result, cache_hit = _recommendation_cache.get_or_compute(
+            reaction_smiles=reaction_smiles,
+            normalized_reaction=normalized_key,
+            k=k,
+            max_variants=1,
+            rerank_strategy="rule",
+            constraint_spec=constraint_spec,
+        )
+        duration_ms = (time.perf_counter() - start) * 1000
 
         alternatives = result.get("alternatives", {}) or {}
         core_counts: Sequence[Tuple[str, int]] = alternatives.get("cores", []) or []
@@ -294,23 +648,25 @@ def list_supported_cores_tool(
             for core, support in core_counts
         ]
 
-        return json.dumps({
+        return _success_response({
             "family": result.get("family"),
             "detected_family": result.get("detected_family"),
             "search_all_families": search_all_families,
             "core_candidates": cores,
             "precedent_count": len(result.get("precedent_pack", {}).get("precedents", [])),
-        }, indent=2)
+            "cache_hit": cache_hit,
+            "timing_ms": round(duration_ms, 2),
+        })
     except Exception as e:
-        return json.dumps({"error": str(e), "core_candidates": []})
+        return _error_response(str(e), {"core_candidates": []})
 
 
-@tool
+@tool(args_schema=SearchPrecedentsInput)
 def search_precedents_tool(
     reaction_smiles: str,
     k: int = 10,
     family: Optional[str] = None
-) -> str:
+) -> Dict[str, Any]:
     """
     Search for similar precedent reactions using DRFP fingerprints.
     
@@ -323,7 +679,7 @@ def search_precedents_tool(
         family: Optional reaction family filter (e.g., "Suzuki", "Buchwald_CN")
     
     Returns:
-        JSON string with similar precedent reactions
+        Dict[str, Any]: Similar precedent summary with success flag.
     
     Example:
         Input: "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -370,21 +726,21 @@ def search_precedents_tool(
                 "reaction": p.get("rxn_smiles", "")[:100]  # Truncate long SMILES
             })
         
-        return json.dumps({
+        return _success_response({
             "family": family,
             "precedent_count": len(simplified_precedents),
             "precedents": simplified_precedents
-        }, indent=2)
+        })
     except Exception as e:
-        return json.dumps({"error": str(e), "precedents": []})
+        return _error_response(str(e), {"precedents": []})
 
 
 # ============================================================================
 # Reagent Database Tools
 # ============================================================================
 
-@tool
-def find_reagent_tool(query: str, reagent_type: str = "base") -> str:
+@tool(args_schema=FindReagentInput)
+def find_reagent_tool(query: str, reagent_type: str = "base") -> Dict[str, Any]:
     """
     Look up reagent information from the reagent database.
     
@@ -398,7 +754,7 @@ def find_reagent_tool(query: str, reagent_type: str = "base") -> str:
                      Default: "base"
     
     Returns:
-        JSON string with reagent information
+        Dict[str, Any]: Reagent metadata with success flag.
     
     Example:
         Input: query="Cs2CO3", reagent_type="base"
@@ -426,14 +782,14 @@ def find_reagent_tool(query: str, reagent_type: str = "base") -> str:
                     "source": result.get("data_source", ""),
                     "reagent_type": r_type
                 }
-                return json.dumps(simplified, indent=2)
+                return _success_response(simplified)
         
-        return json.dumps({"error": f"Reagent not found: {query}"})
+        return _error_response(f"Reagent not found: {query}")
     except Exception as e:
-        return json.dumps({"error": str(e)})
+        return _error_response(str(e), {"query": query, "reagent_type": reagent_type})
 
 
-@tool
+@tool(args_schema=AddReagentInput)
 def add_reagent_tool(
     cas: str,
     name: Optional[str] = None,
@@ -447,7 +803,7 @@ def add_reagent_tool(
     dry_run: bool = False,
     auto_resolve: bool = True,
     resolver_timeout: float = REAGENT_RESOLVER_TIMEOUT,
-) -> str:
+) -> Dict[str, Any]:
     """
     Add a reagent entry to the taxonomy registry.
 
@@ -464,6 +820,9 @@ def add_reagent_tool(
         dry_run: When true, preview without saving.
         auto_resolve: Use CAS resolver to fill missing data.
         resolver_timeout: Resolver timeout in seconds.
+    
+    Returns:
+        Dict[str, Any]: Result payload including success flag and status metadata.
     """
     try:
         normalised_synonyms = _normalise_synonyms_field(synonyms)
@@ -484,11 +843,14 @@ def add_reagent_tool(
             auto_resolve=auto_resolve,
             resolver_timeout=resolver_timeout,
         )
-        return json.dumps(result, indent=2)
+        if isinstance(result, dict) and result.get("error"):
+            return _error_response(str(result["error"]), {"details": result})
+        payload = result if isinstance(result, dict) else {"result": result}
+        return _success_response(payload)
     except ReagentAdditionError as exc:
-        return json.dumps({"error": str(exc)})
+        return _error_response(str(exc))
     except Exception as exc:
-        return json.dumps({"error": str(exc)})
+        return _error_response(str(exc))
 
 
 # ============================================================================
@@ -520,13 +882,69 @@ CHEMTOOLS_TOOLS = [
 # Helper Functions
 # ============================================================================
 
-def get_tool_descriptions() -> List[Dict[str, str]]:
-    """Get descriptions of all available tools."""
-    descriptions = []
+def _success_response(data: Any) -> Dict[str, Any]:
+    """Return a standardized success payload merged with tool output."""
+    payload: Dict[str, Any] = {"success": True}
+    if isinstance(data, dict):
+        payload.update(data)
+    else:
+        payload["data"] = data
+    return payload
+
+
+def _error_response(message: str, extra: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Return a standardized error payload with optional contextual fields."""
+    payload: Dict[str, Any] = {"success": False, "error": message}
+    if extra:
+        if isinstance(extra, dict):
+            payload.update(extra)
+        else:
+            payload["details"] = extra
+    return payload
+
+
+def _schema_properties(tool_obj: Any) -> Dict[str, Any]:
+    """Return JSON-schema properties for a tool's input model."""
+    args_schema = getattr(tool_obj, "args_schema", None)
+    if not args_schema:
+        return {}
+    try:
+        return args_schema.model_json_schema().get("properties", {})
+    except AttributeError:
+        # Pydantic <2 compatibility
+        return args_schema.schema().get("properties", {})
+
+
+def _schema_required(tool_obj: Any) -> List[str]:
+    """Return required parameter names for a tool."""
+    args_schema = getattr(tool_obj, "args_schema", None)
+    if not args_schema:
+        return []
+    try:
+        return list(args_schema.model_json_schema().get("required", []))
+    except AttributeError:
+        return list(args_schema.schema().get("required", []))
+
+
+def get_tool_descriptions() -> List[Dict[str, Any]]:
+    """Get structured descriptions (name, docstring, parameters) for tools."""
+    descriptions: List[Dict[str, Any]] = []
     for tool_obj in CHEMTOOLS_TOOLS:
+        properties = _schema_properties(tool_obj)
+        required = set(_schema_required(tool_obj))
+        params: List[Dict[str, Any]] = []
+        for param_name, metadata in properties.items():
+            params.append({
+                "name": param_name,
+                "required": param_name in required,
+                "description": metadata.get("description", ""),
+                "type": metadata.get("type"),
+                "default": metadata.get("default", None),
+            })
         descriptions.append({
             "name": tool_obj.name,
             "description": tool_obj.description or "",
+            "parameters": params,
         })
     return descriptions
 
@@ -536,9 +954,22 @@ def print_tool_summary():
     print("=" * 70)
     print("ChemTools LangChain Tools")
     print("=" * 70)
-    for i, tool_obj in enumerate(CHEMTOOLS_TOOLS, 1):
-        print(f"\n{i}. {tool_obj.name}")
-        print(f"   {tool_obj.description.split('.')[0] if tool_obj.description else 'No description'}")
+    descriptions = get_tool_descriptions()
+    for i, entry in enumerate(descriptions, 1):
+        print(f"\n{i}. {entry['name']}")
+        desc_line = (entry["description"] or "").split("\n")[0].strip()
+        print(f"   {desc_line if desc_line else 'No description'}")
+        params = entry.get("parameters") or []
+        if not params:
+            print("   Parameters: none")
+        else:
+            print("   Parameters:")
+            for param in params:
+                requirement = "required" if param.get("required") else "optional"
+                param_type = param.get("type") or "any"
+                print(f"     - {param['name']} ({param_type}, {requirement})")
+                if param.get("description"):
+                    print(f"       {param['description']}")
     print("\n" + "=" * 70)
 
 
