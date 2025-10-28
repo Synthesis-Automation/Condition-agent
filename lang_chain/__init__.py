@@ -30,7 +30,13 @@ Available Tools:
 See README.md for complete documentation.
 """
 
-from .chemtools_wrapper import CHEMTOOLS_TOOLS, get_tool_descriptions, print_tool_summary
+from .chemtools_wrapper import (
+    CHEMTOOLS_TOOLS,
+    get_tool_descriptions,
+    print_tool_summary,
+    clear_recommendation_cache,
+    recommendation_cache_stats,
+)
 from .chemtools_agent import ChemToolsAgent, create_agent, quick_query
 
 __version__ = "1.0.0"
@@ -45,4 +51,6 @@ __all__ = [
     "CHEMTOOLS_TOOLS",
     "get_tool_descriptions",
     "print_tool_summary",
+    "clear_recommendation_cache",
+    "recommendation_cache_stats",
 ]

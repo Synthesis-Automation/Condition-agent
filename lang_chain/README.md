@@ -239,7 +239,7 @@ normalize_reaction_tool.invoke({
 detect_reaction_family_tool.invoke({
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
 })
-# Returns: JSON with family detection results
+# Returns: {"success": True, "family": "...", ...}
 ```
 
 ### classify_reactant_tool
@@ -253,10 +253,9 @@ classify_reactant_tool.invoke({"smiles": "Brc1ccccc1"})
 
 ```python
 get_functional_groups_tool.invoke({
-    "smiles": "CCO",
-    "method": "rdkit"  # or "text"
+    "smiles": "CCO"
 })
-# Returns: {"alcohol": true, "primary_alcohol": true, ...}
+# Returns: {"success": True, "alcohol": true, ...}
 ```
 
 ### recommend_conditions_tool
@@ -271,12 +270,16 @@ recommend_conditions_tool.invoke({
     "allow_metals": ["Cu", "Ni"],
     "constraint_rules": {"no_chlorinated": true}
 })
-# Returns: JSON with recommendations, alternatives, reasons
+# Returns: {"success": True, "recommendation": {...}, "alternatives": {...}, ...}
 Optional parameters:
 - `constraint_text`: Parse natural language requests such as 'Pd-free' or 'prefer copper'.
 - `allow_metals` / `exclude_metals` / `prefer_metals`: Structured overrides for catalyst cores.
 - `constraint_rules`: Forward deterministic solvent/base rules (e.g., `{"no_chlorinated": true}`).
 - `search_all_families`: Set to `true` to perform cross-family precedent search.
+
+Response metadata:
+- `cache_hit`: Indicates whether the recommendation came from the in-process cache.
+- `timing_ms`: Elapsed time for the tool call (includes cache lookup when relevant).
 ```
 
 ### list_supported_cores_tool
@@ -286,7 +289,11 @@ list_supported_cores_tool.invoke({
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
     "k": 25
 })
-# Returns: core vote counts to help plan catalyst constraints
+# Returns: {"success": True, "core_candidates": [...], ...}
+
+Response metadata:
+- `cache_hit`: True when the catalyst summary reused a cached recommendation pack.
+- `timing_ms`: Elapsed time for the underlying recommendation fetch.
 ```
 
 ### add_reagent_tool
@@ -299,7 +306,7 @@ add_reagent_tool.invoke({
     "allow_default_family": True,
     "dry_run": True
 })
-# Returns: preview payload for a new reagent entry (use dry_run=False to persist)
+# Returns: {"success": True, "status": "dry_run", ...} (use dry_run=False to persist)
 ```
 
 Key parameters:
@@ -316,7 +323,7 @@ search_precedents_tool.invoke({
     "k": 10,
     "family": "Buchwald_CN"  # optional
 })
-# Returns: JSON with similar precedent reactions
+# Returns: {"success": True, "precedents": [...], ...}
 ```
 
 ### find_reagent_tool
@@ -569,6 +576,8 @@ pip install langchain langchain-openai langgraph python-dotenv
 - **Direct chemtools call**: <100ms
 - **Agent with tools**: 2-10s (LLM reasoning overhead)
 - **Recommendation**: Use agent for exploration, direct calls for production
+- **Caching**: Consecutive recommendation + core-list queries reuse cached DRFP results to trim duplicate compute
+- **Cache management**: In the CLI, run `cache show` to inspect entries or `cache clear` to flush them
 
 ## 🤝 Contributing
 
@@ -583,8 +592,14 @@ To add new tools:
 Example:
 
 ```python
-@tool
-def my_new_tool(param: str) -> str:
+from pydantic import BaseModel, Field
+from langchain_core.tools import tool
+
+class MyToolInput(BaseModel):
+    param: str = Field(..., description="Description of parameter")
+
+@tool(args_schema=MyToolInput)
+def my_new_tool(param: str) -> dict:
     """
     Detailed description of what this tool does.
     
@@ -592,11 +607,11 @@ def my_new_tool(param: str) -> str:
         param: Description of parameter
     
     Returns:
-        Description of return value
+        Structured payload with success flag
     """
     from chemtools.my_module import my_function
     result = my_function(param)
-    return json.dumps(result)
+    return {"success": True, "result": result}
 
 # Add to CHEMTOOLS_TOOLS
 CHEMTOOLS_TOOLS.append(my_new_tool)
