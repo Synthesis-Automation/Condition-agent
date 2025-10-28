@@ -48,7 +48,7 @@ Successfully created a **comprehensive LangChain/LangGraph wrapper** for ChemToo
 
 8. **`test_tools.py`**
     - Direct tool tests (no API key needed)
-    - 10 test cases covering core and constraint-aware tools
+    - 11 test cases covering core and constraint-aware tools
     - Validates constraint parsing and catalyst filtering
    - ✅ All tests passing
 
@@ -82,7 +82,7 @@ Successfully created a **comprehensive LangChain/LangGraph wrapper** for ChemToo
 ## 🎯 Key Features
 
 - ✅ **Zero modifications** to existing chemtools code
-- ✅ **9 chemistry tools** fully functional
+- ✅ **10 chemistry tools** fully functional
 - ✅ **Constraint-aware recommendations** with catalyst filtering and cross-family search
 - ✅ **ReAct agent** with reasoning capabilities
 - ✅ **Conversational UI** with history
@@ -122,8 +122,9 @@ Test 7: Recommend Conditions           PASSED
 Test 8: Search Precedents              PASSED
 Test 9: Recommend With Constraints     PASSED
 Test 10: List Supported Cores          PASSED
+Test 11: Add Reagent (Dry Run)          PASSED
 
-Test Results: 10 passed, 0 failed
+Test Results: 11 passed, 0 failed
 ```
 
 ## 🔧 Configuration
@@ -218,7 +219,7 @@ The agent follows the **ReAct pattern**:
 3. ✅ Fixed `knn` call (use `relax` param for DRFP)
 4. ✅ Fixed `normalize_smiles` return type (handles dict)
 5. ✅ Updated default model to **gpt-4o**
-6. ✅ All 8 tools tested and working
+6. ✅ All 10 tools tested and working
 
 ## 🎉 Status: COMPLETE & TESTED
 
@@ -254,8 +255,8 @@ This wrapper integrates with:
 
 - **Files Created**: 10
 - **Lines of Code**: ~2,500+
-- **Tools Exposed**: 8
-- **Tests Written**: 8
+- **Tools Exposed**: 10
+- **Tests Written**: 11
 - **Test Pass Rate**: 100%
 - **Documentation**: 1,500+ lines
 

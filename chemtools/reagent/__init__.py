@@ -47,6 +47,8 @@ from .constants import (
     DEFAULT_REGISTRY_DIR,
 )
 
+from .registry_store import RegistryStore
+
 # Utility functions
 from .taxonomy_utils import (
     normalize_cas,
@@ -54,6 +56,12 @@ from .taxonomy_utils import (
     dedupe_synonyms,
     tokenize_all,
     build_entry,
+)
+
+from .registry_addition import (
+    add_reagent_entry,
+    list_available_families,
+    ReagentAdditionError,
 )
 
 # Validation functions
@@ -117,6 +125,7 @@ __all__ = [
     # Taxonomy management
     "TaxonomyStore",
     "RoleHeuristics",
+    "RegistryStore",
     "build_embedding_text",
     "load_families_registry_entries",
     # Constants
@@ -131,6 +140,9 @@ __all__ = [
     "dedupe_synonyms",
     "tokenize_all",
     "build_entry",
+    "add_reagent_entry",
+    "list_available_families",
+    "ReagentAdditionError",
     # Validation
     "validate_entry",
     "validate_role_file",

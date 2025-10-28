@@ -61,6 +61,7 @@ python lang_chain/example_usage.py
 7. **search_precedents_tool** - Find similar reactions
 8. **list_supported_cores_tool** - Inspect catalyst cores in precedents
 9. **find_reagent_tool** - Look up reagent info
+10. **add_reagent_tool** - Add or preview reagent entries
 
 ## Example Queries
 
@@ -68,6 +69,7 @@ python lang_chain/example_usage.py
 - "What reaction is Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1?"
 - "Recommend conditions for Suzuki coupling"
 - "Give Pd-free conditions for Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+- "Add cesium carbonate to the reagent database as a base"
 - "What is the CAS for Cs2CO3?"
 - "What functional groups are in CCO?"
 

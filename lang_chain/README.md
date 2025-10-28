@@ -25,7 +25,7 @@ lang_chain/
 
 ## 🛠️ Available Tools
 
-The wrapper exposes 9 core ChemTools functions as LangChain tools:
+The wrapper exposes 10 core ChemTools functions as LangChain tools:
 
 ### SMILES & Structure Tools
 
@@ -47,6 +47,7 @@ The wrapper exposes 9 core ChemTools functions as LangChain tools:
 ### Database Tools
 
 9. **find_reagent_tool** - Look up reagent information (CAS, properties, roles)
+10. **add_reagent_tool** - Add or dry-run reagent entries in the taxonomy registry
 
 ## 🚀 Quick Start
 
@@ -287,6 +288,25 @@ list_supported_cores_tool.invoke({
 })
 # Returns: core vote counts to help plan catalyst constraints
 ```
+
+### add_reagent_tool
+
+```python
+add_reagent_tool.invoke({
+    "cas": "50-00-0",
+    "name": "Formaldehyde",
+    "role": "other_reagent",
+    "allow_default_family": True,
+    "dry_run": True
+})
+# Returns: preview payload for a new reagent entry (use dry_run=False to persist)
+```
+
+Key parameters:
+- `allow_default_family`: Permit fallback when the heuristics cannot confidently assign a family.
+- `dry_run`: Preview the entry without writing to disk (recommended before persistence).
+- `taxonomy_dir`: Optional path to a writable taxonomy directory (defaults to project data).
+- `auto_resolve`: Use CAS lookup to fill missing fields when user input is incomplete.
 
 ### search_precedents_tool
 

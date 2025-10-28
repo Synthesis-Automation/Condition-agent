@@ -30,8 +30,15 @@ from chemtools.smiles import normalize, normalize_reaction
 from chemtools.router import detect_family_from_reaction
 from chemtools.recommend.modules import recommend_from_reaction
 from chemtools.precedent import knn as precedent_knn
-from chemtools.reagent import find_reagent, classify_reactant_smiles
+from chemtools.reagent import (
+    find_reagent,
+    classify_reactant_smiles,
+    add_reagent_entry,
+    ReagentAdditionError,
+)
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
+
+REAGENT_RESOLVER_TIMEOUT = 6.0
 
 from .constraint_parser import (
     ConstraintSpec,
@@ -426,6 +433,64 @@ def find_reagent_tool(query: str, reagent_type: str = "base") -> str:
         return json.dumps({"error": str(e)})
 
 
+@tool
+def add_reagent_tool(
+    cas: str,
+    name: Optional[str] = None,
+    synonyms: Optional[Any] = None,
+    role: Optional[str] = None,
+    family_id: Optional[str] = None,
+    abbreviation: Optional[str] = None,
+    smiles: Optional[str] = None,
+    taxonomy_dir: Optional[str] = None,
+    allow_default_family: bool = False,
+    dry_run: bool = False,
+    auto_resolve: bool = True,
+    resolver_timeout: float = REAGENT_RESOLVER_TIMEOUT,
+) -> str:
+    """
+    Add a reagent entry to the taxonomy registry.
+
+    Args:
+        cas: CAS identifier for the reagent.
+        name: Preferred reagent name (optional if resolver is enabled).
+        synonyms: Additional synonyms (list or comma-separated string).
+        role: Explicit role override.
+        family_id: Explicit family override.
+        abbreviation: Abbreviation override (defaults to name).
+        smiles: Optional SMILES annotation.
+        taxonomy_dir: Optional path to a writable taxonomy directory.
+        allow_default_family: Allow default family fallback when inference fails.
+        dry_run: When true, preview without saving.
+        auto_resolve: Use CAS resolver to fill missing data.
+        resolver_timeout: Resolver timeout in seconds.
+    """
+    try:
+        normalised_synonyms = _normalise_synonyms_field(synonyms)
+        taxonomy_path = taxonomy_dir.strip() if isinstance(taxonomy_dir, str) else taxonomy_dir
+        if isinstance(taxonomy_path, str) and not taxonomy_path:
+            taxonomy_path = None
+        result = add_reagent_entry(
+            cas=cas,
+            taxonomy_dir=taxonomy_path,
+            name=name,
+            synonyms=normalised_synonyms,
+            abbreviation=abbreviation,
+            role=role,
+            family_id=family_id,
+            smiles=smiles,
+            allow_default_family=allow_default_family,
+            dry_run=dry_run,
+            auto_resolve=auto_resolve,
+            resolver_timeout=resolver_timeout,
+        )
+        return json.dumps(result, indent=2)
+    except ReagentAdditionError as exc:
+        return json.dumps({"error": str(exc)})
+    except Exception as exc:
+        return json.dumps({"error": str(exc)})
+
+
 # ============================================================================
 # Tool Collection
 # ============================================================================
@@ -447,6 +512,7 @@ CHEMTOOLS_TOOLS = [
     # Database tools
     find_reagent_tool,
     list_supported_cores_tool,
+    add_reagent_tool,
 ]
 
 
@@ -484,6 +550,27 @@ if __name__ == "__main__":
 # ============================================================================
 # Internal helpers (kept at end to avoid cluttering the main tool definitions)
 # ============================================================================
+
+def _normalise_synonyms_field(value: Any) -> Optional[List[str]]:
+    """Normalize synonyms input from the tool into a list of strings."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        try:
+            parsed = json.loads(stripped)
+        except json.JSONDecodeError:
+            parsed = None
+        if isinstance(parsed, (list, tuple, set)):
+            return [str(item).strip() for item in parsed if str(item).strip()]
+        return [part.strip() for part in stripped.split(",") if part.strip()]
+    if isinstance(value, (list, tuple, set)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    coerced = str(value).strip()
+    return [coerced] if coerced else None
+
 
 def _simplify_recommendation(raw: Dict[str, Any]) -> Dict[str, Any]:
     """Extract the subset of recommendation fields most useful to the LLM."""

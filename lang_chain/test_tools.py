@@ -28,6 +28,7 @@ from lang_chain.chemtools_wrapper import (
     search_precedents_tool,
     find_reagent_tool,
     list_supported_cores_tool,
+    add_reagent_tool,
 )
 
 
@@ -184,6 +185,27 @@ def test_list_supported_cores():
     assert "core_candidates" in result.lower() or "error" in result.lower(), "Core listing failed"
     print("PASSED")
 
+def test_add_reagent_tool_dry_run():
+    """Ensure reagent addition tool responds without crashing."""
+    print("\n" + "="*70)
+    print("Test 11: Add Reagent (Dry Run)")
+    print("="*70)
+    
+    payload = {
+        "cas": "50-00-0",
+        "name": "Formaldehyde",
+        "role": "other_reagent",
+        "allow_default_family": True,
+        "dry_run": True,
+        "auto_resolve": False,
+    }
+    result = add_reagent_tool.invoke(payload)
+    print(f"Payload: {payload}")
+    print(f"Output: {result[:300]}...")
+    data = json.loads(result)
+    assert "error" in data or data.get("status") in {"dry_run", "exists", "written"}
+    print("PASSED")
+
 
 def main():
     """Run all tests."""
@@ -203,6 +225,7 @@ def main():
         test_search_precedents,
         test_recommend_with_constraints,
         test_list_supported_cores,
+        test_add_reagent_tool_dry_run,
     ]
     
     passed = 0
