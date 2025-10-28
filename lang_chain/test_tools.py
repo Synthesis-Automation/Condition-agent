@@ -9,6 +9,7 @@ Usage:
     python -m lang_chain.test_tools
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -26,6 +27,7 @@ from lang_chain.chemtools_wrapper import (
     recommend_conditions_tool,
     search_precedents_tool,
     find_reagent_tool,
+    list_supported_cores_tool,
 )
 
 
@@ -40,7 +42,7 @@ def test_normalize_smiles():
     print(f"Output: {result}")
     # Result is JSON string, check it contains normalized SMILES
     assert "smiles_norm" in result or "c1ccccc1" in result, "SMILES normalization failed"
-    print("✓ PASSED")
+    print("PASSED")
 
 
 def test_normalize_reaction():
@@ -54,7 +56,7 @@ def test_normalize_reaction():
     print(f"Input: {reaction}")
     print(f"Output: {result}")
     assert len(result) > 0, "Reaction normalization failed"
-    print("✓ PASSED")
+    print("PASSED")
 
 
 def test_detect_reaction_family():
@@ -68,7 +70,7 @@ def test_detect_reaction_family():
     print(f"Input: {reaction}")
     print(f"Output: {result[:200]}...")  # First 200 chars
     assert "family" in result.lower(), "Family detection failed"
-    print("✓ PASSED")
+    print("PASSED")
 
 
 def test_classify_reactant():
@@ -82,7 +84,7 @@ def test_classify_reactant():
     print(f"Output: {result[:200]}...")  # First 200 chars
     # Just check it doesn't error - null is acceptable for some reactants
     assert len(result) > 0, "Reactant classification failed"
-    print("✓ PASSED")
+    print("PASSED")
 
 
 def test_functional_groups():
@@ -95,7 +97,7 @@ def test_functional_groups():
     print(f"Input: CCO")
     print(f"Output: {result[:200]}...")  # First 200 chars
     assert "alcohol" in result.lower() or "error" in result.lower(), "Functional group detection failed"
-    print("✓ PASSED")
+    print("PASSED")
 
 
 def test_find_reagent():
@@ -108,7 +110,7 @@ def test_find_reagent():
     print(f"Input: Cs2CO3")
     print(f"Output: {result[:200]}...")  # First 200 chars
     assert "cas" in result.lower() or "error" in result.lower(), "Reagent lookup failed"
-    print("✓ PASSED")
+    print("PASSED")
 
 
 def test_recommend_conditions():
@@ -126,7 +128,7 @@ def test_recommend_conditions():
     print(f"Input: {reaction}")
     print(f"Output: {result[:300]}...")  # First 300 chars
     assert "family" in result.lower() or "error" in result.lower(), "Recommendation failed"
-    print("✓ PASSED")
+    print("PASSED")
 
 
 def test_search_precedents():
@@ -143,7 +145,44 @@ def test_search_precedents():
     print(f"Input: {reaction}")
     print(f"Output: {result[:300]}...")  # First 300 chars
     assert "precedent" in result.lower() or "error" in result.lower(), "Precedent search failed"
-    print("✓ PASSED")
+    print("PASSED")
+
+
+def test_recommend_with_constraints():
+    """Ensure constraint-aware parameters are accepted."""
+    print("\n" + "="*70)
+    print("Test 9: Recommend With Constraints")
+    print("="*70)
+    
+    reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+    raw = recommend_conditions_tool.invoke({
+        "reaction_smiles": reaction,
+        "constraint_text": "Pd-free, prefer copper",
+        "allow_metals": ["Cu", "Ni"],
+        "constraint_rules": {"no_chlorinated": True},
+    })
+    data = json.loads(raw)
+    print(f"Input: {reaction}")
+    print(f"Output: {json.dumps(data, indent=2)[:300]}...")
+    assert "constraint_summary" in data or "constraint_notes" in data, "Constraint metadata missing"
+    print("PASSED")
+
+
+def test_list_supported_cores():
+    """Test the core listing helper tool."""
+    print("\n" + "="*70)
+    print("Test 10: List Supported Cores")
+    print("="*70)
+    
+    reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+    result = list_supported_cores_tool.invoke({
+        "reaction_smiles": reaction,
+        "k": 5
+    })
+    print(f"Input: {reaction}")
+    print(f"Output: {result[:300]}...")
+    assert "core_candidates" in result.lower() or "error" in result.lower(), "Core listing failed"
+    print("PASSED")
 
 
 def main():
@@ -162,6 +201,8 @@ def main():
         test_find_reagent,
         test_recommend_conditions,
         test_search_precedents,
+        test_recommend_with_constraints,
+        test_list_supported_cores,
     ]
     
     passed = 0
@@ -172,7 +213,7 @@ def main():
             test()
             passed += 1
         except Exception as e:
-            print(f"✗ FAILED: {e}")
+            print(f"FAILED: {e}")
             failed += 1
             import traceback
             traceback.print_exc()
@@ -182,13 +223,13 @@ def main():
     print("="*70)
     
     if failed == 0:
-        print("\n✅ All tests passed! The wrapper is working correctly.")
+        print("\nAll tests passed! The wrapper is working correctly.")
         print("\nNext steps:")
         print("  1. Set API key: $env:OPENAI_API_KEY = 'sk-your-key-here'")
         print("  2. Run CLI: python -m lang_chain.chemtools_cli")
         print("  3. Or run examples: python lang_chain/example_usage.py")
     else:
-        print(f"\n❌ {failed} test(s) failed. Check the output above.")
+        print(f"\n {failed} test(s) failed. Check the output above.")
         sys.exit(1)
 
 

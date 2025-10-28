@@ -22,13 +22,19 @@ Usage:
 """
 
 import os
-from typing import List, Optional
+from typing import List, Optional, Union
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv
 
 from .chemtools_wrapper import CHEMTOOLS_TOOLS
+from .constraint_parser import (
+    ConstraintSpec,
+    build_constraint_spec,
+    format_constraints_for_prompt,
+    merge_specs,
+)
 
 
 # Load environment variables
@@ -113,6 +119,7 @@ You have access to the following tools:
 6. **recommend_conditions_tool**: Get ML-based condition recommendations
 7. **search_precedents_tool**: Find similar precedent reactions
 8. **find_reagent_tool**: Look up reagent information from database
+9. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
 
 **How to help users:**
 
@@ -120,8 +127,10 @@ For reaction condition recommendations:
 1. First normalize the reaction SMILES if needed
 2. Detect the reaction family to understand the reaction type
 3. Use recommend_conditions_tool to get comprehensive recommendations
-4. Optionally search for precedents to provide context
-5. Explain the recommendations in clear, practical terms
+4. Include catalyst and reagent constraints via the tool parameters when the user mentions preferences (use constraint_text / allow_metals / exclude_metals / prefer_metals / search_all_families).
+5. Call list_supported_cores_tool when you need to understand which catalyst cores exist before setting constraints.
+6. Optionally search for precedents to provide context
+7. Explain the recommendations in clear, practical terms
 
 For reagent questions:
 1. Use find_reagent_tool to look up properties and roles
@@ -173,7 +182,8 @@ class ChemToolsAgent:
         model: Optional[str] = None,
         temperature: float = 0,
         system_prompt: Optional[str] = None,
-        verbose: bool = False
+        verbose: bool = False,
+        session_constraints: Optional[Union[ConstraintSpec, dict, str]] = None,
     ):
         """
         Initialize ChemTools agent.
@@ -188,6 +198,7 @@ class ChemToolsAgent:
         self.llm = get_llm_client(provider, model, temperature)
         self.system_prompt = system_prompt or CHEMISTRY_SYSTEM_PROMPT
         self.verbose = verbose
+        self.session_constraints = self._coerce_constraints(session_constraints)
         
         # Create ReAct agent with tools
         self.agent = create_react_agent(
@@ -200,7 +211,8 @@ class ChemToolsAgent:
         self,
         query: str,
         history: Optional[List[BaseMessage]] = None,
-        recursion_limit: int = 15
+        recursion_limit: int = 15,
+        constraints: Optional[Union[ConstraintSpec, dict, str]] = None
     ) -> str:
         """
         Run the agent on a query.
@@ -209,6 +221,7 @@ class ChemToolsAgent:
             query: User question or task
             history: Conversation history (list of messages)
             recursion_limit: Maximum reasoning steps
+            constraints: Optional one-off constraint specification for this call
         
         Returns:
             Agent's response text
@@ -217,13 +230,21 @@ class ChemToolsAgent:
             >>> agent = ChemToolsAgent()
             >>> response = agent.run("What conditions for Suzuki coupling?")
         """
-        if history is None:
-            history = []
-        
         try:
+            messages = list(history or [])
+
+            # Merge session and call-specific constraints.
+            call_spec = self._coerce_constraints(constraints)
+            active_spec = merge_specs(self.session_constraints, call_spec)
+            constraint_prompt = format_constraints_for_prompt(active_spec)
+            if constraint_prompt:
+                messages.append(HumanMessage(content=constraint_prompt))
+
+            messages.append(HumanMessage(content=query))
+        
             # Invoke agent with query and history
             result = self.agent.invoke(
-                {"messages": history + [HumanMessage(content=query)]},
+                {"messages": messages},
                 config={"recursion_limit": recursion_limit}
             )
             
@@ -245,7 +266,8 @@ class ChemToolsAgent:
         self,
         query: str,
         history: List[BaseMessage],
-        recursion_limit: int = 15
+        recursion_limit: int = 15,
+        constraints: Optional[Union[ConstraintSpec, dict, str]] = None
     ) -> tuple[str, List[BaseMessage]]:
         """
         Chat with the agent and maintain conversation history.
@@ -254,6 +276,7 @@ class ChemToolsAgent:
             query: User question
             history: Current conversation history
             recursion_limit: Maximum reasoning steps
+            constraints: Optional one-off constraint specification for this turn
         
         Returns:
             Tuple of (response, updated_history)
@@ -264,7 +287,7 @@ class ChemToolsAgent:
             >>> response, history = agent.chat("Normalize c1ccccc1", history)
             >>> response, history = agent.chat("What functional groups?", history)
         """
-        response = self.run(query, history, recursion_limit)
+        response = self.run(query, history, recursion_limit, constraints=constraints)
         
         # Update history
         updated_history = history + [
@@ -274,6 +297,51 @@ class ChemToolsAgent:
         
         return response, updated_history
 
+    # ======================================================================
+    # Constraint helpers
+    # ======================================================================
+
+    def _coerce_constraints(
+        self,
+        value: Optional[Union[ConstraintSpec, dict, str]]
+    ) -> ConstraintSpec:
+        """Normalize value into a ConstraintSpec instance."""
+        if isinstance(value, ConstraintSpec):
+            return value
+        if isinstance(value, dict):
+            return build_constraint_spec(
+                text=value.get("constraint_text"),
+                allow_metals=value.get("allow_metals"),
+                exclude_metals=value.get("exclude_metals"),
+                prefer_metals=value.get("prefer_metals"),
+                search_all_families=value.get("search_all_families"),
+                base_constraint_rules=value.get("constraint_rules"),
+            )
+        if isinstance(value, str):
+            return build_constraint_spec(text=value)
+        return ConstraintSpec()
+
+    def update_session_constraints(self, **kwargs) -> ConstraintSpec:
+        """
+        Merge new parameters into the session-level constraint defaults.
+        
+        Returns the updated constraint specification.
+        """
+        spec = build_constraint_spec(
+            text=kwargs.get("constraint_text"),
+            allow_metals=kwargs.get("allow_metals"),
+            exclude_metals=kwargs.get("exclude_metals"),
+            prefer_metals=kwargs.get("prefer_metals"),
+            search_all_families=kwargs.get("search_all_families"),
+            base_constraint_rules=kwargs.get("constraint_rules"),
+        )
+        self.session_constraints = merge_specs(self.session_constraints, spec)
+        return self.session_constraints
+
+    def clear_session_constraints(self) -> None:
+        """Remove all stored session-level constraints."""
+        self.session_constraints = ConstraintSpec()
+
 
 # ============================================================================
 # Convenience Functions
@@ -282,6 +350,7 @@ class ChemToolsAgent:
 def create_agent(
     provider: Optional[str] = None,
     model: Optional[str] = None,
+    session_constraints: Optional[Union[ConstraintSpec, dict, str]] = None,
     **kwargs
 ) -> ChemToolsAgent:
     """
@@ -290,20 +359,31 @@ def create_agent(
     Args:
         provider: LLM provider ("openai" or "aliyun")
         model: Model name
+        session_constraints: Optional default constraints applied to each query
         **kwargs: Additional arguments for ChemToolsAgent
     
     Returns:
         Configured ChemToolsAgent instance
     """
-    return ChemToolsAgent(provider=provider, model=model, **kwargs)
+    return ChemToolsAgent(
+        provider=provider,
+        model=model,
+        session_constraints=session_constraints,
+        **kwargs
+    )
 
 
-def quick_query(query: str, **kwargs) -> str:
+def quick_query(
+    query: str,
+    constraints: Optional[Union[ConstraintSpec, dict, str]] = None,
+    **kwargs
+) -> str:
     """
     Quick one-shot query without maintaining state.
     
     Args:
         query: Question or task
+        constraints: Optional one-off constraint specification
         **kwargs: Arguments for ChemToolsAgent
     
     Returns:
@@ -314,7 +394,7 @@ def quick_query(query: str, **kwargs) -> str:
         >>> result = quick_query("Recommend conditions for Suzuki coupling")
     """
     agent = ChemToolsAgent(**kwargs)
-    return agent.run(query)
+    return agent.run(query, constraints=constraints)
 
 
 # ============================================================================
