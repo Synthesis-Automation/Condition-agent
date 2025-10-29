@@ -288,13 +288,14 @@ class _DetectionEngine:
                 "mapping_method": str      # How it was mapped
             }
         """
-        # Check if rxn-insight is available
-        try:
-            from .reaction_type_detector import (
-                _detect_reaction_type_impl as _rxn_detect,
-                is_available as _rxn_avail,
-            )
-        except ImportError:
+        # Call rxn-insight via internal ML helpers
+        from . import _ml_helpers
+        
+        ml_result = _ml_helpers.call_rxn_insight(
+            self.normalized.get("normalized") or self.reaction_smiles
+        )
+        
+        if not ml_result.get("available"):
             return {
                 "available": False,
                 "family": None,
@@ -303,35 +304,6 @@ class _DetectionEngine:
                 "confidence": None,
                 "raw": None,
                 "mapping_method": "not_available",
-            }
-        
-        if not _rxn_avail():
-            return {
-                "available": False,
-                "family": None,
-                "rxn_class": None,
-                "rxn_name": None,
-                "confidence": None,
-                "raw": None,
-                "mapping_method": "not_available",
-            }
-        
-        # Call rxn-insight
-        try:
-            ml_result = _rxn_detect(
-                self.normalized.get("normalized") or self.reaction_smiles
-            )
-        except Exception as e:
-            logger.warning(f"ML detection failed: {e}")
-            return {
-                "available": True,
-                "family": None,
-                "rxn_class": None,
-                "rxn_name": None,
-                "confidence": None,
-                "raw": None,
-                "error": str(e),
-                "mapping_method": "failed",
             }
         
         if not ml_result.get("success"):

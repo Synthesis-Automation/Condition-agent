@@ -128,8 +128,8 @@ def local_rule_based_match(reaction: str, db_path: Optional[str], reaction_type:
     """
     # Auto-detect reaction type if not provided (fallback - should be done earlier in main)
     if db_path is None and not reaction_type:
-        from chemtools.router import detect_family_from_reaction
-        detection = detect_family_from_reaction(reaction, use_rxn_insight=False)
+        from chemtools import detect_reaction
+        detection = detect_reaction(reaction, use_ml=False)
         reaction_type = detection.get("family")
         # Note: Auto-detection is now done earlier in main() so catalyst prompt can work
     
@@ -649,8 +649,8 @@ Examples:
     # If auto-detect was selected, detect the reaction type now
     detected_type = None
     if reaction_type is None:
-        from chemtools.router import detect_family_from_reaction
-        detection = detect_family_from_reaction(reaction, use_rxn_insight=False)
+        from chemtools import detect_reaction
+        detection = detect_reaction(reaction, use_ml=False)
         detected_type = detection.get("family")
         confidence = detection.get("confidence", 0)
         print(f"Auto-detected: {detected_type} (confidence: {confidence:.2f})")

@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
 
-from chemtools.router import detect_family as _detect_family
+from chemtools.detection import detect_reaction  # New unified API
 
 from .base import SchemaStamped, pick_first, validate_payload
 
@@ -39,7 +39,10 @@ def detect_family(data: Dict[str, Any]) -> Dict[str, Any]:
 
     payload = validate_payload(DetectFamilyInput, data)
     reactants = _normalise_reactants(payload.reactants)
-    result = _detect_family(reactants)
+    
+    # Convert reactants to pseudo-reaction for unified API
+    pseudo_reaction = ".".join(reactants) + ">>"
+    result = detect_reaction(pseudo_reaction, use_ml=False)
 
     family = pick_first([result.get("family"), "Unknown"]) or "Unknown"
     confidence_raw = result.get("confidence", 0.0)
@@ -47,11 +50,14 @@ def detect_family(data: Dict[str, Any]) -> Dict[str, Any]:
         confidence = float(confidence_raw)
     except Exception:  # pragma: no cover - defensive conversion
         confidence = 0.0
+    
+    # Extract hits from details
+    hits = result.get("details", {}).get("functional_groups", {})
 
     output = DetectFamilyOutput(
         family=family,
         confidence=confidence,
-        hits={str(k): bool(v) for k, v in (result.get("hits") or {}).items()},
+        hits={str(k): bool(v) for k, v in hits.items()},
         has_conflict=bool(result.get("status") == "conflict"),
     )
     return output.model_dump()

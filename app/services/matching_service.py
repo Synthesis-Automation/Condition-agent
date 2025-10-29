@@ -3,24 +3,16 @@ Matching Service - SMILES normalization and reaction family detection.
 
 This service handles:
 - SMILES normalization (canonicalization)
-- Reaction family detection using router
-- Reaction type detection using rxn-insight + router fallback
+- Reaction family detection using unified detection API
+- Reaction type detection using ML-enhanced detection
 """
 
 from typing import Dict, Any, List
 from chemtools import chem
+from chemtools import detect_reaction  # New unified API
 from chemtools.recommend.utils import friendly_family_label
 from chemtools.contracts import NormalizeRequest, DetectFamilyRequest, DetectTypeRequest
 from chemtools.exceptions import ValidationError
-
-try:
-    from chemtools.reaction_type_detector import (
-        detect_reaction_type as rxn_detect_type,
-        is_available as rxn_insight_available,
-    )
-    _HAS_RXN_INSIGHT = True
-except Exception:
-    _HAS_RXN_INSIGHT = False
 
 
 def normalize_smiles(req: NormalizeRequest) -> str:
@@ -46,11 +38,13 @@ def detect_family(req: DetectFamilyRequest) -> Dict[str, Any]:
     """
     Detect reaction family from reactants.
     
+    Uses the new unified detection API (chemtools.detect_reaction).
+    
     Args:
         req: DetectFamilyRequest with reactants list
         
     Returns:
-        Dictionary with family detection results
+        Dictionary with family detection results (old schema for compatibility)
         
     Raises:
         ValidationError: If reactants are invalid
@@ -58,24 +52,39 @@ def detect_family(req: DetectFamilyRequest) -> Dict[str, Any]:
     if not req.reactants:
         raise ValidationError("Reactants list cannot be empty")
     
-    result = chem.router.detect_family(req.reactants)
-    if isinstance(result, dict):
-        label = friendly_family_label(result.get("family"))
-        if label:
-            result = dict(result)
-            result["family_label"] = label
-    return result
+    # Convert reactants to pseudo-reaction for unified API
+    reaction = ".".join(req.reactants) + ">>"
+    
+    # Use new unified API with rule-based detection only
+    result = detect_reaction(reaction, use_ml=False)
+    
+    # Convert to old schema for backwards compatibility
+    family = result["family"]
+    confidence = result["confidence"]
+    hits = result["details"].get("functional_groups", {})
+    
+    response = {
+        "family": family,
+        "confidence": confidence,
+        "hits": hits
+    }
+    
+    # Add friendly label
+    label = friendly_family_label(family)
+    if label:
+        response["family_label"] = label
+    
+    return response
 
 
 def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
     """
-    Detect reaction type using rxn-insight when available, with router fallback.
+    Detect reaction type using unified detection API with ML enhancement.
     
-    This function:
-    1. Normalizes the reaction SMILES
-    2. Attempts rxn-insight detection (if available)
-    3. Falls back to router-based family detection
-    4. Returns combined results with selected family
+    This function uses the new detect_reaction() API which combines:
+    1. Rule-based detection (SMARTS patterns)
+    2. ML detection (rxn-insight if available)
+    3. Catalyst-aware refinements
     
     Args:
         req: DetectTypeRequest with reaction SMILES
@@ -83,10 +92,9 @@ def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
     Returns:
         Dictionary containing:
         - input: Normalized reaction SMILES
-        - rxn_insight_available: Whether rxn-insight is installed
-        - rxn_insight: rxn-insight detection results (or None)
-        - router_fallback: Router-based family detection
+        - detection: Full detection results from unified API
         - selected_family: Best family determination
+        - ml_available: Whether ML detection was used
         
     Raises:
         ValidationError: If reaction SMILES is invalid
@@ -98,58 +106,69 @@ def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
     
     # Normalize reaction SMILES
     norm = chem.smiles.normalize_reaction(rxn)
+    normalized_rxn = norm.get("normalized") or rxn
     
-    # Extract reactants for router fallback
-    reactants = [
-        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
-        for r in (norm.get("reactants") or [])
-    ]
+    # Use new unified detection API with ML enabled
+    detection_result = detect_reaction(normalized_rxn, use_ml=True)
     
-    # Router-based family detection (always available)
-    fallback = chem.router.detect_family(reactants)
-    if isinstance(fallback, dict):
-        fallback_label = friendly_family_label(fallback.get("family"))
-        if fallback_label:
-            fallback = dict(fallback)
-            fallback["family_label"] = fallback_label
+    # Extract key fields
+    family = detection_result["family"]
+    confidence = detection_result["confidence"]
+    method = detection_result["method"]
+    details = detection_result["details"]
     
-    # Try rxn-insight if available
-    auto = None
-    if _HAS_RXN_INSIGHT:
-        try:
-            auto = rxn_detect_type(norm.get("normalized") or rxn)
-        except Exception:
-            # Silently fall back to router if rxn-insight fails
-            auto = None
+    # Check if ML was actually used
+    ml_used = "ml" in method.lower() or details.get("ml_prediction") is not None
     
-    # Select best family
-    selected = None
-    fallback_family = fallback.get("family")
-
-    if isinstance(auto, dict) and (auto.get("mapped_family") or auto.get("success")):
-        selected = auto.get("mapped_family") or fallback_family
-    else:
-        selected = fallback_family
-
-    selected_label = friendly_family_label(selected)
-
-    if isinstance(auto, dict):
-        mapped_family = auto.get("mapped_family")
-        label = friendly_family_label(mapped_family)
-        if label:
-            auto = dict(auto)
-            auto["family_label"] = label
+    # Add friendly labels
+    family_label = friendly_family_label(family)
     
-    return {
-        "input": {"reaction_smiles": norm.get("normalized") or rxn},
-        "rxn_insight_available": bool(_HAS_RXN_INSIGHT),
-        "rxn_insight": auto,
-        "router_fallback": fallback,
-        "selected_family": selected,
-        "selected_family_label": selected_label,
+    # Build response with new and legacy fields
+    response = {
+        "input": {"reaction_smiles": normalized_rxn},
+        "detection": {
+            "family": family,
+            "confidence": confidence,
+            "method": method,
+            "family_label": family_label,
+        },
+        "selected_family": family,
+        "selected_family_label": family_label,
+        "ml_available": ml_used,
+        "details": details,  # Full details for debugging
     }
+    
+    # Add ML prediction details if available
+    if details.get("ml_prediction"):
+        ml_pred = details["ml_prediction"]
+        response["ml_prediction"] = {
+            "rxn_class": ml_pred.get("rxn_class"),
+            "rxn_name": ml_pred.get("rxn_name"),
+            "confidence": ml_pred.get("confidence"),
+            "available": ml_pred.get("available", True),
+        }
+    
+    # Add rule-based prediction for comparison
+    if details.get("rule_prediction"):
+        rule_pred = details["rule_prediction"]
+        response["rule_prediction"] = {
+            "family": rule_pred.get("family"),
+            "confidence": rule_pred.get("confidence"),
+        }
+    
+    return response
 
 
 def is_rxn_insight_available() -> bool:
-    """Check if rxn-insight is available for advanced reaction type detection."""
-    return _HAS_RXN_INSIGHT
+    """
+    Check if ML detection is available.
+    
+    Note: This is a legacy function. The new detect_reaction() API
+    automatically handles ML availability internally.
+    """
+    try:
+        from chemtools._ml_helpers import is_available
+        return is_available()
+    except ImportError:
+        return False
+

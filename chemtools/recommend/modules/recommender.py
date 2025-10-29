@@ -11,16 +11,13 @@ from typing import Dict, Any, List, Optional
 from collections import Counter
 
 from ...smiles import normalize_reaction
-from ...router import detect_family, resolve_reaction_family
+from ...detection import detect_reaction  # New unified API
+from ...router import resolve_reaction_family
 from ... import precedent, explain
 from ..utils import canonical_family, median, pick_with_constraints
 
-# Optional rxn-insight integration for ML-based family detection
-try:
-    from ...reaction_type_detector import _detect_reaction_type_impl as _rxn_detect
-    _HAS_RXN_INSIGHT = True
-except Exception:
-    _HAS_RXN_INSIGHT = False
+# No longer needed - use unified detect_reaction() API instead
+# Old rxn-insight integration removed
 
 # New analysis module integration for improved reaction type detection and reactant classification
 try:
@@ -154,20 +151,16 @@ def recommend_from_reaction(
                    in {"1", "true", "yes", "on"})
         use_rxn_insight = not env_off
     
-    rxn_auto = None
-    if not auto_family and bool(use_rxn_insight) and _HAS_RXN_INSIGHT:
-        try:
-            rxn_auto = _rxn_detect(rxn_smiles_norm)
-            if rxn_auto and rxn_auto.get("success") and rxn_auto.get("mapped_family"):
-                auto_family = str(rxn_auto.get("mapped_family") or "Unknown")
-        except Exception:
-            pass
+    # ML detection removed - use unified detect_reaction() API
+    # Old code using _rxn_detect has been removed
     
     # Priority 3: Rule-based detection as final fallback
-    rule_info = detect_family(reactants)
-    rule_family = rule_info.get("family") or "Unknown"
+    # Convert reactants to pseudo-reaction for unified API
+    pseudo_reaction = ".".join(reactants) + ">>"
+    detection_result = detect_reaction(pseudo_reaction, use_ml=False)
+    rule_family = detection_result.get("family") or "Unknown"
     
-    # Prioritize: user override > analysis module > ML detection > rule-based
+    # Prioritize: user override > analysis module > rule-based
     if not fam_override_clean:
         fam = auto_family or rule_family or "Unknown"
     else:

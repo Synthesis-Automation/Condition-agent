@@ -17,7 +17,7 @@ from chemtools.analysis.reaction_context import (
     classify_reactants_with_context,
     ReactionClassification,
 )
-from chemtools.router import detect_family_from_reaction
+from chemtools import detect_reaction
 from chemtools.analysis._registry import get_registry
 
 
@@ -243,7 +243,7 @@ def display_detection_only(smiles: str) -> None:
     print_section("Detecting Reaction Type...")
     
     try:
-        detection_result = detect_family_from_reaction(smiles)
+        detection_result = detect_reaction(smiles, use_ml=False)
         
         detected_family = detection_result.get('family', 'Unknown')
         confidence = detection_result.get('confidence', 0.0)
