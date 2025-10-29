@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional
 from .reactants import ReactantMatch, iter_reactant_matches
 from .smiles import normalize_reaction
 from ._registry import get_registry
-from ..router import detect_family_from_reaction
+from ..detection import detect_reaction  # New unified API
 
 
 @dataclass
@@ -159,13 +159,14 @@ def classify_reactants_with_context(
         detection_method = "user_provided"
         confidence = 1.0
     elif auto_detect:
-        # Auto-detect
-        detection_result = detect_family_from_reaction(reaction_smiles)
+        # Auto-detect using unified API
+        detection_result = detect_reaction(reaction_smiles, use_ml=True)
         reaction_type = detection_result.get("family", "Unknown")
         confidence = detection_result.get("confidence", 0.0)
         
         # Determine detection method
-        if detection_result.get("rxn") and detection_result["rxn"].get("success"):
+        method = detection_result.get("method", "rule")
+        if "ml" in method.lower():
             detection_method = "ml_detected"
         else:
             detection_method = "rule_based"

@@ -224,7 +224,7 @@ def test_ullmann_cn_coupling():
     
     # Import heavy modules only when test runs (not at module import time)
     from chemtools.recommend.core import recommend_from_reaction
-    from chemtools.reaction_type_detector import detect_reaction_type
+    from chemtools import detect_reaction
     
     # Test reaction
     smiles = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -245,8 +245,8 @@ def test_ullmann_cn_coupling():
     ml_time = (time.time() - start) * 1000
     
     # Get detection info
-    detection = detect_reaction_type(smiles)
-    detected_type = detection.get("type", "Unknown")
+    detection = detect_reaction(smiles, use_ml=True)
+    detected_type = detection.get("family", "Unknown")
     detection_conf = detection.get("confidence")
     
     # Handle None confidence
@@ -405,7 +405,7 @@ def test_suzuki_coupling():
     
     # Import heavy modules only when test runs
     from chemtools.recommend.core import recommend_from_reaction
-    from chemtools.reaction_type_detector import detect_reaction_type
+    from chemtools import detect_reaction
     
     smiles = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     
@@ -418,8 +418,8 @@ def test_suzuki_coupling():
     ml_raw = recommend_from_reaction(smiles, k=5)
     ml_time = (time.time() - start) * 1000
     
-    detection = detect_reaction_type(smiles)
-    detected_type = detection.get("type", "Unknown")
+    detection = detect_reaction(smiles, use_ml=True)
+    detected_type = detection.get("family", "Unknown")
     
     # Use the formatted output that's already in ml_raw
     if 'formatted' in ml_raw and 'recommended_conditions' in ml_raw['formatted']:
@@ -462,13 +462,13 @@ def test_field_consistency():
     
     # Import heavy modules only when test runs
     from chemtools.recommend.core import recommend_from_reaction
-    from chemtools.reaction_type_detector import detect_reaction_type
+    from chemtools import detect_reaction
     
     smiles = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
     
     # Generate outputs - use k=5 for faster testing
     ml_raw = recommend_from_reaction(smiles, k=5)
-    detection = detect_reaction_type(smiles)
+    detection = detect_reaction(smiles, use_ml=True)
     
     # Use the formatted output that's already in ml_raw
     if 'formatted' in ml_raw and 'recommended_conditions' in ml_raw['formatted']:

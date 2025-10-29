@@ -38,13 +38,15 @@ from chemtools import reagent_lookup  # Reagent database lookup
 from chemtools import output_formatter  # Enhanced output formatting
 from chemtools import precedent  # For dataset pre-loading
 
-# Optional: Reaction type detector (rxn-insight)
+# Optional: Reaction detection with ML (rxn-insight)
 try:
-    from chemtools.reaction_type_detector import detect_reaction_type, is_available as detector_available
+    from chemtools import detect_reaction
+    from chemtools._ml_helpers import is_available as detector_available
     DETECTOR_AVAILABLE = detector_available()
 except Exception:
-    detect_reaction_type = None
+    detect_reaction = None
     DETECTOR_AVAILABLE = False
+
 
 # Optional: SchemeConditionDB matcher
 try:
@@ -400,7 +402,8 @@ def format_rule_recommendations(result: Any, db_name: str) -> Tuple[str, List[Li
 def auto_detect_reaction_type(reaction_smiles: str) -> str:
     """Auto-detect reaction type from SMILES (for display only)."""
     try:
-        result = router.detect_family(reaction_smiles)
+        from chemtools import detect_reaction
+        result = detect_reaction(reaction_smiles, use_ml=False)
         family = result.get("family", "Unknown")
         confidence = result.get("confidence", 0.0)
         return f"**Auto-detected:** {family} (confidence: {confidence:.2%})"
@@ -434,21 +437,24 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
             "message": f"Using user-specified type: {requested_type}",
         }
     
-    # Try rxn-insight detector first (more accurate)
-    if DETECTOR_AVAILABLE and detect_reaction_type:
+    # Try ML-enhanced detection first (more accurate)
+    if DETECTOR_AVAILABLE and detect_reaction:
         try:
-            result = detect_reaction_type(reaction_smiles)
-            if result.get("success"):
-                taxonomy_family = result.get("mapped_family")
-                rxn_class = result.get("rxn_class")  # e.g., "Heteroatom Alkylation and Arylation"
-                rxn_name = result.get("rxn_name")  # e.g., "Buchwald-Hartwig C-N coupling"
+            result = detect_reaction(reaction_smiles, use_ml=True)
+            if result.get("family") and result.get("confidence", 0) > 0.5:
+                detected_family = result.get("family")
                 confidence = result.get("confidence", 0.8)
-                catalysts = result.get("catalysts", [])
+                method = result.get("method", "unknown")
+                details = result.get("details", {})
+                
+                ml_pred = details.get("ml_prediction", {})
+                rxn_class = ml_pred.get("rxn_class") if ml_pred else None
+                rxn_name = ml_pred.get("rxn_name") if ml_pred else None
+                catalysts = details.get("catalysts", [])
 
                 # Map to ML and rule database names
                 ml_family = None
                 rule_db_name = None
-                detected_family = taxonomy_family or "Unknown"
 
                 family_display_map = {
                     "buchwald_hartwig_c_n": ("C_N_Coupling_Pd", "C-N Coupling (Pd)", "Buchwald_CN (Pd-catalyzed)"),
@@ -458,9 +464,12 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
                     "amide_coupling": ("Amide_Coupling", "Amide Formation", "Amide_Coupling"),
                 }
 
-                entry = family_display_map.get(taxonomy_family)
+                entry = family_display_map.get(detected_family)
                 if entry:
-                    ml_family, rule_db_name, detected_family = entry
+                    ml_family, rule_db_name, display_name = entry
+                else:
+                    display_name = detected_family
+                    
                 # Build message
                 msg_parts = []
                 if rxn_class:
@@ -470,7 +479,7 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
                 if catalysts:
                     msg_parts.append(f"Catalysts: {', '.join(catalysts)}")
                 
-                message = f"**Auto-detected (rxn-insight):** {detected_family}\n"
+                message = f"**Auto-detected ({method}):** {display_name}\n"
                 if msg_parts:
                     message += "  " + " | ".join(msg_parts)
                 if confidence:
@@ -481,17 +490,18 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
                     "ml_family": ml_family,
                     "rule_db_name": rule_db_name,
                     "confidence": confidence or 0.8,
-                    "method": "rxn_insight",
+                    "method": method,
                     "success": True,
                     "message": message,
                     "raw_detection": result,
                 }
         except Exception as e:
-            print(f"⚠ rxn-insight detection failed: {e}")
+            print(f"⚠ ML detection failed: {e}")
     
-    # Fallback to router-based detection
+    # Fallback to rule-based detection only
     try:
-        result = router.detect_family(reaction_smiles)
+        from chemtools import detect_reaction
+        result = detect_reaction(reaction_smiles, use_ml=False)
         detected_family = result.get("family", "Unknown")
         confidence = result.get("confidence", 0.0)
         
@@ -1419,12 +1429,13 @@ def search_precedents(
         if not reactants:
             return "**Error:** No reactants found in reaction SMILES.", ""
         
-        # Detect family
+        # Detect family using unified API
         print(f"Detecting reaction family...")
         det_start = time.time()
-        fam_result = router.detect_family(reactants)
-        family = fam_result.get("family", "Unknown")
-        confidence = fam_result.get("confidence", 0.0)
+        from chemtools import detect_reaction
+        detection = detect_reaction(reaction_smiles.strip(), use_ml=False)
+        family = detection.get("family", "Unknown")
+        confidence = detection.get("confidence", 0.0)
         print(f"  Detection: {time.time() - det_start:.2f}s")
         print(f"  Family: {family} (confidence: {confidence:.2%})")
         

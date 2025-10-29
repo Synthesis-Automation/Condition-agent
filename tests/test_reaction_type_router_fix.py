@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.local_recommendation_cli import local_rule_based_match
 from scripts.recommendation_cli_utils import REACTION_TYPE_CHOICES
 import pytest
-from chemtools.router import detect_family_from_reaction
+from chemtools import detect_reaction
 
 SCDB_DIR = Path("data/rule_db")
 
@@ -56,7 +56,7 @@ def test_router_detection():
     # User's example: aryl bromide + benzylamine
     rsmi = "Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1"
     
-    result = detect_family_from_reaction(rsmi, use_rxn_insight=False)
+    result = detect_reaction(rsmi, use_ml=False)
     
     family = result.get("family")
     confidence = result.get("confidence")
@@ -126,7 +126,7 @@ def test_suzuki_still_works():
     # Suzuki reaction: aryl bromide + boronic acid
     rsmi = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
     
-    result_auto = detect_family_from_reaction(rsmi, use_rxn_insight=False)
+    result_auto = detect_reaction(rsmi, use_ml=False)
     family_auto = result_auto.get("family")
     
     print(f"Reaction: {rsmi}")

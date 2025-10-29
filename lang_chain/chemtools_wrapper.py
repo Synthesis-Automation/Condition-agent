@@ -35,7 +35,7 @@ from langchain_core.tools import tool
 
 # Import chemtools functions
 from chemtools.smiles import normalize, normalize_reaction
-from chemtools.router import detect_family_from_reaction
+from chemtools import detect_reaction
 from chemtools.recommend.modules import recommend_from_reaction
 from chemtools.precedent import knn as precedent_knn
 from chemtools.dataset_analytics import (
@@ -533,15 +533,19 @@ def detect_reaction_family_tool(reaction_smiles: str) -> Dict[str, Any]:
     
     Example:
         Input: "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
-        Output: {"family": "Suzuki", "confidence": "high"}
+        Output: {"family": "suzuki_miyaura", "confidence": 0.9}
     """
     try:
-        result = detect_family_from_reaction(reaction_smiles)
-        payload = dict(result or {})
+        result = detect_reaction(reaction_smiles, use_ml=False)
+        payload = {
+            "family": result.get("family"),
+            "confidence": result.get("confidence"),
+            "method": result.get("method"),
+        }
         if not payload.get("family"):
             return _error_response(
                 "Could not determine reaction family",
-                {"details": payload, "reaction_smiles": reaction_smiles},
+                {"details": result, "reaction_smiles": reaction_smiles},
             )
         return _success_response(payload)
     except Exception as e:
@@ -772,8 +776,8 @@ def search_precedents_tool(
     try:
         # Auto-detect family if not provided
         if family is None:
-            family_result = detect_family_from_reaction(reaction_smiles)
-            family = family_result.get("family", "Unknown")
+            detection = detect_reaction(reaction_smiles, use_ml=False)
+            family = detection.get("family", "Unknown")
         
         # Use relax parameter for DRFP-based search
         result = precedent_knn(

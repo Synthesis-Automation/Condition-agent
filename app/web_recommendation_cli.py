@@ -408,8 +408,10 @@ Examples:
     # Auto-detect reaction type if user selected "Auto-detect"
     if reaction_type is None:
         print("\nAuto-detecting reaction type...")
-        from chemtools.router import detect_family_from_reaction
-        family, confidence, hits = detect_family_from_reaction(reaction)
+        from chemtools import detect_reaction
+        detection = detect_reaction(reaction, use_ml=False)
+        family = detection.get("family")
+        confidence = detection.get("confidence", 0.0)
         if family:
             reaction_type = family
             print(f"✓ Detected: {family} (confidence: {confidence:.2f})")

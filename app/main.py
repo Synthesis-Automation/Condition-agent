@@ -31,11 +31,7 @@ from app.services import (
     precedent_service,
 )
 
-try:
-    from chemtools.reaction_type_detector import detect_reaction_type as rxn_detect_type, is_available as rxn_insight_available  # type: ignore
-    _HAS_RXN_INSIGHT = True
-except Exception:
-    _HAS_RXN_INSIGHT = False
+# Role-aware featurization (optional)
 try:
     from chemtools.features.role import (
         featurize_mol as role_featurize_mol,

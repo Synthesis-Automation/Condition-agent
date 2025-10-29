@@ -286,18 +286,18 @@ def determine_final_reaction_type(reaction_smiles: str, initial_type: Optional[s
     Returns dict with: final_type, detection_info, routing
     """
     try:
-        from chemtools.router import detect_family_from_reaction
+        from chemtools import detect_reaction
         from chemtools.recommend.utils import canonical_family
     except ImportError:
-        logger.warning("Could not import router - using initial type as-is")
+        logger.warning("Could not import detection API - using initial type as-is")
         return {
             "final_type": initial_type or "Unknown",
             "detection_info": {"source": "user_provided"},
             "routing": "fallback"
         }
     
-    # Detect reaction family from SMILES
-    detection = detect_family_from_reaction(reaction_smiles, use_rxn_insight=True)
+    # Detect reaction family from SMILES using unified API with ML
+    detection = detect_reaction(reaction_smiles, use_ml=True)
     detected_family = detection.get("family", "Unknown")
     confidence = detection.get("confidence", 0.0)
     

@@ -25,7 +25,7 @@ if str(parent_dir) not in sys.path:
     sys.path.insert(0, str(parent_dir))
 
 from chemtools.smiles import normalize, normalize_reaction
-from chemtools.router import detect_family, detect_family_from_reaction
+from chemtools import detect_reaction
 from chemtools.featurizers.molecular import featurize
 from chemtools.reaction_similarity import drfp_tanimoto, drfp_available
 from chemtools.reagent import find_reagent
@@ -66,49 +66,52 @@ def test_2_family_detection():
     print("="*70)
     
     # Method 1: From reactant list (rule-based only)
-    print("Method 1: detect_family(reactants) - Rule-based")
+    print("Method 1: detect_reaction(reactants) - Rule-based")
     print("-" * 70)
     reactants = ['Brc1ccccc1', 'Nc1ccccc1']
-    result = detect_family(reactants)
-    print(f"✅ detect_family({reactants})")
+    # Convert reactants to pseudo-reaction
+    pseudo_rxn = ".".join(reactants) + ">>"
+    result = detect_reaction(pseudo_rxn, use_ml=False)
+    print(f"✅ detect_reaction(\"{pseudo_rxn}\", use_ml=False)")
     print(f"   → Family: {result.get('family', 'N/A')}")
     print(f"   → Confidence: {result.get('confidence', 0):.2f}")
     
     # Method 2: From reaction SMILES (detects catalysts!)
-    print("\nMethod 2: detect_family_from_reaction() - With catalyst detection")
+    print("\nMethod 2: detect_reaction() - With catalyst detection")
     print("-" * 70)
     rxn = 'Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1'
-    result = detect_family_from_reaction(rxn)
-    print(f"✅ detect_family_from_reaction('{rxn}')")
+    result = detect_reaction(rxn, use_ml=False)
+    print(f"✅ detect_reaction('{rxn}', use_ml=False)")
     print(f"   → Family: {result.get('family', 'N/A')}")
     print(f"   → Confidence: {result.get('confidence', 0):.2f}")
-    print(f"   💡 Also detects catalysts (Pd/Cu) from agents")
+    print(f"   💡 Automatically detects catalysts (Pd/Cu) from agents")
     
     # Example with Pd catalyst (should detect Buchwald)
     rxn_pd = 'Brc1ccccc1.Nc1ccccc1>Pd(PPh3)4>c1ccccc1Nc1ccccc1'
-    result = detect_family_from_reaction(rxn_pd)
+    result = detect_reaction(rxn_pd, use_ml=False)
     print(f"\n✅ With Pd catalyst:")
     print(f"   → Input: {rxn_pd}")
     print(f"   → Family: {result.get('family', 'N/A')}")
     print(f"   → Confidence: {result.get('confidence', 0):.2f}")
-    print(f"   💡 Pd catalyst → Buchwald_CN (higher confidence)")
+    print(f"   💡 Pd catalyst → buchwald_hartwig_c_n (higher confidence)")
     
     # Example with Cu catalyst (should detect Ullmann)
     rxn_cu = 'Brc1ccccc1.Nc1ccccc1>CuI>c1ccccc1Nc1ccccc1'
-    result = detect_family_from_reaction(rxn_cu)
+    result = detect_reaction(rxn_cu, use_ml=False)
     print(f"\n✅ With Cu catalyst:")
     print(f"   → Input: {rxn_cu}")
     print(f"   → Family: {result.get('family', 'N/A')}")
     print(f"   → Confidence: {result.get('confidence', 0):.2f}")
-    print(f"   💡 Cu catalyst → Ullmann_CN")
+    print(f"   💡 Cu catalyst → ullmann_cn")
     
     # Suzuki reaction
     print("\n✅ Suzuki coupling:")
     suzuki = 'Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1'
-    result = detect_family_from_reaction(suzuki)
+    result = detect_reaction(suzuki, use_ml=False)
     print(f"   → Input: {suzuki}")
     print(f"   → Family: {result.get('family', 'N/A')}")
     print(f"   → Confidence: {result.get('confidence', 0):.2f}")
+
 
 
 def test_3_molecular_featurization():
@@ -361,8 +364,7 @@ def show_import_patterns():
    from chemtools.smiles import normalize, normalize_reaction
 
 ✅ Family Detection:
-   from chemtools.router import detect_family
-   from chemtools.router import detect_family_from_reaction  # ⭐ Accepts reaction SMILES
+   from chemtools import detect_reaction  # ⭐ Unified detection API
 
 ✅ Featurization:
    from chemtools.featurizers.molecular import featurize
@@ -383,8 +385,9 @@ def show_tips():
     print("="*70)
     print("""
 🎯 Family Detection:
-   - Use detect_family_from_reaction() for better accuracy
-   - It detects catalysts (Pd/Cu) from agents
+   - Use detect_reaction(rxn, use_ml=True) for ML-enhanced detection
+   - Use detect_reaction(rxn, use_ml=False) for rule-based only
+   - Automatically detects catalysts (Pd/Cu) from agents
    - Pd catalyst → Buchwald_CN, Cu catalyst → Ullmann_CN
    - Optional ML via use_rxn_insight=True
 
