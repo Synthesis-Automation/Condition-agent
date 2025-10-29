@@ -753,6 +753,35 @@
     "embedding_text": "role: ligand | family_label: 2,2'-Bipyridines (bpy family) | family_id: bipyridines | normalized_family: bipyridine | donors: N,N | denticity: 2 | abbr: 4,4'-Dimethyl-2,2'-bipyridine | CAS: 1134-35-6 | aliases: 2,2'-Bi-4-picoline, 2,2'-BIPYRIDINE, 4,4'-DIMETHYL-, 4,4'-Dimethyl-2,2'-bipyridyl, 4,4'-Dimethyl-2,2'-dipyridyl, 4-methyl-2-(4-methylpyridin-2-yl)pyridine, 2,2'-Bi(gamma-picoline), 2,2'-Bipyridyl, 4,4'-dimethyl- | family_def: 2,2'-Bipyridines (bpy family)"
   },
   {
+    "id": "JIVLDFFWTQYGSR-UHFFFAOYSA-N",
+    "name": "4,7-Dimethyl-1,10-phenanthroline",
+    "abbreviation": [
+      "4,7-Dimethyl-1,10-phenanthroline"
+    ],
+    "aliases": [
+      "1,10-Phenanthroline, 4,7-dimethyl-",
+      "4,7-Dimethyl-o-phenanthroline",
+      "4,7-DIMETHYL-[1,10]PHENANTHROLINE",
+      "UNII-P3YJ54Z8ZO",
+      "4,7-Dimethyl-(1,10)phenanthroline",
+      "4,7Dimethylophenanthroline",
+      "1,10Phenanthroline, 4,7dimethyl"
+    ],
+    "cas": "3248-05-3",
+    "inchi_key": "JIVLDFFWTQYGSR-UHFFFAOYSA-N",
+    "smiles": null,
+    "roles": {
+      "ligand": {
+        "families": [
+          "phenanthroline_ligands"
+        ],
+        "donors": null,
+        "denticity": null
+      }
+    },
+    "embedding_text": "type: LIGAND | family: Auto family for phenanthroline ligands (phenanthroline_ligands) | name: 4,7-Dimethyl-1,10-phenanthroline | abbr: 4,7-Dimethyl-1,10-phenanthroline | CAS: 3248-05-3 | synonyms: 4,7-Dimethyl-1,10-phenanthroline; 1,10-Phenanthroline, 4,7-dimethyl-; 4,7-Dimethyl-o-phenanthroline; 4,7-DIMETHYL-[1,10]PHENANTHROLINE; UNII-P3YJ54Z8ZO; 4,7-Dimethyl-(1,10)phenanthroline; 4,7Dimethylophenanthroline; 1,10Phenanthroline, 4,7dimethyl; 3248-05-3; NSC-4281; DTXSID9062932; NSC 4281; EINECS 221-827-5; RefChem:96735; DTXCID8038516; 221-827-5"
+  },
+  {
     "id": "5_5_dimethyl_2_2_bipyridine__1762-34-1",
     "name": "5,5'-Dimethyl-2,2'-bipyridine",
     "abbreviation": [
