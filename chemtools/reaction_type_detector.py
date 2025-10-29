@@ -221,7 +221,14 @@ def _refine_cn_family(
     return mapped, rxn_name
 
 
-def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
+def _detect_reaction_type_impl(reaction_smiles: str) -> Dict[str, Any]:
+    """
+    Internal implementation of ML-based reaction detection.
+    
+    This is the unwrapped version used internally to avoid deprecation warnings.
+    External code should use chemtools.detect_reaction() instead.
+    """
+    # Original implementation
     """Detect reaction type using rxn_insight, returning canonical taxonomy families."""
     if not is_available():
         return {
@@ -301,3 +308,46 @@ def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         "raw": raw,
         "catalysts": sorted(catalysts) if catalysts else [],
     }
+
+
+def detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
+    """
+    DEPRECATED: Use chemtools.detect_reaction() instead.
+    
+    This function will be removed in v2.0.
+    
+    Args:
+        reaction_smiles: Full reaction SMILES string
+        
+    Returns:
+        Dict with ML detection results (for backwards compatibility)
+    """
+    import warnings
+    warnings.warn(
+        "detect_reaction_type() is deprecated and will be removed in v2.0. "
+        "Use chemtools.detect_reaction() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    # Delegate to new unified API
+    try:
+        from .detection import detect_reaction
+        result = detect_reaction(reaction_smiles, use_ml=True)
+        
+        # Convert to old schema for backwards compatibility
+        ml_pred = result["details"].get("ml_prediction", {})
+        
+        return {
+            "available": ml_pred.get("family") is not None or is_available(),
+            "success": result["confidence"] > 0.5 and ml_pred.get("family") is not None,
+            "rxn_class": ml_pred.get("rxn_class"),
+            "rxn_name": ml_pred.get("rxn_name"),
+            "mapped_family": result["family"],
+            "confidence": result["confidence"],
+            "raw": ml_pred.get("raw"),
+            "catalysts": result["details"]["catalysts"],
+        }
+    except Exception:
+        # Fallback to original implementation if new API fails
+        return _detect_reaction_type_impl(reaction_smiles)

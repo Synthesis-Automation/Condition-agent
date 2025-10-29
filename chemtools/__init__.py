@@ -41,12 +41,14 @@ See CHEMTOOLS_QUICKSTART.md for more examples.
 """
 
 from .context import ChemTools, chem, ResourceConfig
+from .detection import detect_reaction
 
 # Primary exports - ChemTools is the recommended interface
 __all__ = [
     "chem",          # Global singleton instance (recommended)
     "ChemTools",     # Class for custom instances
     "ResourceConfig", # Configuration dataclass
+    "detect_reaction", # Unified reaction detection API (NEW)
 ]
 
 # Version info

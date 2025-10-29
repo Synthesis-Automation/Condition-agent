@@ -293,6 +293,42 @@ def _detect_strong_base(reactants: List[str]) -> bool:
 
 
 def detect_family(reactants: List[str]) -> Dict[str, Any]:
+    """
+    DEPRECATED: Use chemtools.detect_reaction() instead.
+    
+    This function will be removed in v2.0.
+    
+    Args:
+        reactants: List of reactant SMILES strings
+        
+    Returns:
+        Dict with family, confidence, and hits (for backwards compatibility)
+    """
+    import warnings
+    warnings.warn(
+        "detect_family() is deprecated and will be removed in v2.0. "
+        "Use chemtools.detect_reaction() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    # Delegate to new unified API
+    try:
+        from .detection import detect_reaction
+        # Convert reactants list to pseudo-reaction
+        reaction = ".".join(reactants) + ">>"
+        result = detect_reaction(reaction, use_ml=False)
+        # Convert to old schema for backwards compatibility
+        return {
+            "family": result["family"],
+            "confidence": result["confidence"],
+            "hits": result["details"]["functional_groups"]
+        }
+    except Exception:
+        # Fallback to original implementation if new API fails
+        pass
+    
+    # Original implementation (fallback)
     h = _rule_hits(reactants)
     fam: Optional[str] = None
     conf = 0.3
@@ -394,6 +430,80 @@ def detect_family(reactants: List[str]) -> Dict[str, Any]:
 
 
 def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool = True) -> Dict[str, Any]:
+    """
+    DEPRECATED: Use chemtools.detect_reaction() instead.
+    
+    This function will be removed in v2.0.
+    
+    Args:
+        reaction_smiles: Full reaction SMILES (reactants>>products)
+        use_rxn_insight: Use ML detection if available (deprecated parameter name)
+        
+    Returns:
+        Dict with family, confidence, hits, and optional auto field
+    """
+    import warnings
+    warnings.warn(
+        "detect_family_from_reaction() is deprecated and will be removed in v2.0. "
+        "Use chemtools.detect_reaction() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    # Delegate to new unified API
+    try:
+        from .detection import detect_reaction
+        result = detect_reaction(reaction_smiles, use_ml=use_rxn_insight)
+        
+        # Convert to old schema for backwards compatibility
+        out = {
+            "family": result["family"],
+            "confidence": result["confidence"],
+            "hits": result["details"]["functional_groups"],
+            "agreement": result.get("agreement"),
+            "status": result.get("status"),
+        }
+        
+        # Add old-style nested results
+        out["rule"] = {
+            "family": result["details"]["rule_prediction"]["family"],
+            "confidence": result["details"]["rule_prediction"]["confidence"],
+            "hits": result["details"]["functional_groups"],
+        }
+        
+        # Add ML prediction if available
+        if "ml_prediction" in result["details"]:
+            ml_pred = result["details"]["ml_prediction"]
+            out["auto"] = {
+                "available": True,
+                "success": ml_pred.get("family") is not None,
+                "rxn_class": ml_pred.get("rxn_class"),
+                "rxn_name": ml_pred.get("rxn_name"),
+                "mapped_family": ml_pred.get("family"),
+                "confidence": ml_pred.get("confidence"),
+            }
+            out["rxn"] = {
+                "family": ml_pred.get("family"),
+                "confidence": ml_pred.get("confidence"),
+                "available": True,
+                "success": ml_pred.get("family") is not None,
+                "rxn_class": ml_pred.get("rxn_class"),
+                "rxn_name": ml_pred.get("rxn_name"),
+            }
+        
+        # Add catalyst info if present
+        if result["details"].get("catalysts"):
+            out["catalysts"] = {
+                "metals": result["details"]["catalysts"],
+                "source": "agents",
+            }
+        
+        return out
+    except Exception:
+        # Fallback to original implementation if new API fails
+        pass
+    
+    # Original implementation (fallback)
     """Detect reaction family from a reaction SMILES string.
 
     - If ``use_rxn_insight`` and the optional rxn_insight integration is available,
@@ -466,7 +576,7 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
     conf_rxn: Optional[float] = None
     if use_rxn_insight:
         try:
-            from .reaction_type_detector import detect_reaction_type as _rxn_detect, is_available as _rxn_avail  # type: ignore
+            from .reaction_type_detector import _detect_reaction_type_impl as _rxn_detect, is_available as _rxn_avail  # type: ignore
         except Exception:
             _rxn_detect = None  # type: ignore
             _rxn_avail = lambda: False  # type: ignore
