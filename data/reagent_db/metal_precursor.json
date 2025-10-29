@@ -1439,6 +1439,39 @@
     "embedding_text": "member_embedding: type: CATALYST | family: [(p‑cymene)RuCl2]2 and RuCl3 Sources (ru_arene_dimer) | metal: Ru | ox_states: 2 | name: Ruthenium(III) chloride hydrate | abbr: RuCl3·xH2O | CAS: 14898-67-0"
   },
   {
+    "id": "GNQXUMGHBSAQBV-UHFFFAOYSA-N",
+    "name": "tetrakis(acetonitrile)copper(I) hexafluorophosphate",
+    "abbreviation": [
+      "tetrakis(acetonitrile)copper(I) hexafluorophosphate"
+    ],
+    "aliases": [
+      "Copper(1+), tetrakis(acetonitrile), (T4), hexafluorophosphate(1)",
+      "Tetrakis(acetonitrile)copper (I) hexafluorophosphate",
+      "Tetrakis(acetonitrile)copper hexafluorophosphate",
+      "Cu(MeCN)4PF6",
+      "[Cu(MeCN)4]PF6",
+      "C8H12CuF6N4P",
+      "Cuprous tetrakis(acetonitrile) hexafluorophosphate",
+      "Copper(I) tetrakis(acetonitrile) hexafluorophosphate",
+      "cuprous;acetonitrile;hexafluorophosphate"
+    ],
+    "cas": "64443-05-6",
+    "inchi_key": "GNQXUMGHBSAQBV-UHFFFAOYSA-N",
+    "smiles": null,
+    "roles": {
+      "metal_precursor": {
+        "families": [
+          "pd_ii_salts"
+        ],
+        "metal": "Cd",
+        "oxidation_states": [
+          2
+        ]
+      }
+    },
+    "embedding_text": "type: METAL_PRECURSOR | family: Auto-generated family for metal_precursor (pd_ii_salts) | metal: Cd | oxidation states: 2 | name: tetrakis(acetonitrile)copper(I) hexafluorophosphate | abbr: tetrakis(acetonitrile)copper(I) hexafluorophosphate | CAS: 64443-05-6 | synonyms: tetrakis(acetonitrile)copper(I) hexafluorophosphate; DTXSID70983013; RefChem:897252; DTXCID901410263; Copper(1+), tetrakis(acetonitrile), (T4), hexafluorophosphate(1); 64443-05-6; Tetrakis(acetonitrile)copper (I) hexafluorophosphate; MFCD00064810; Tetrakis(acetonitrile)copper hexafluorophosphate; Cu(MeCN)4PF6; [Cu(MeCN)4]PF6; C8H12CuF6N4P; Cuprous tetrakis(acetonitrile) hexafluorophosphate; Copper(I) tetrakis(acetonitrile) hexafluorophosphate; SCHEMBL22557409; cuprous;acetonitrile;hexafluorophosphate"
+  },
+  {
     "id": "R_9855acabfee2ac17",
     "name": "Tetrakis(acetonitrile)palladium(II) bis(tetrafluoroborate)",
     "abbreviation": [
