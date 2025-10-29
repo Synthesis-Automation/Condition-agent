@@ -11,6 +11,9 @@ Available Tools:
     - recommend_conditions_tool: Get ML-based condition recommendations
     - search_precedents_tool: Search for similar precedent reactions
     - find_reagent_tool: Look up reagent information from database
+    - reagent_database_analytics_tool: Summarize reagent registry statistics
+    - list_supported_cores_tool: Enumerate catalyst cores observed in precedents
+    - add_reagent_tool: Insert or preview reagent taxonomy entries
     - classify_reactant_tool: Classify reactant type (aryl halide, amine, etc.)
     - get_functional_groups_tool: Detect functional groups in a molecule
 
@@ -39,6 +42,11 @@ from chemtools.reagent import (
     classify_reactant_smiles,
     add_reagent_entry,
     ReagentAdditionError,
+)
+from chemtools.reagent.analytics import (
+    get_database_statistics,
+    get_family_statistics,
+    get_missing_data_report,
 )
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
 
@@ -172,6 +180,29 @@ class SearchPrecedentsInput(BaseModel):
     family: Optional[str] = Field(
         None,
         description="Optional reaction family override if auto-detection should be skipped.",
+    )
+
+
+class ReagentAnalyticsInput(BaseModel):
+    """Schema for requesting reagent database analytics."""
+
+    statistic: str = Field(
+        "summary",
+        description="Statistic to compute: 'summary', 'role_summary', or 'missing_data'.",
+    )
+    role: Optional[str] = Field(
+        None,
+        description="Reagent role identifier required when statistic is 'role_summary' (e.g., 'solvent').",
+    )
+    registry_dir: Optional[str] = Field(
+        None,
+        description="Optional override path for the reagent registry directory.",
+    )
+    top_families: int = Field(
+        20,
+        ge=1,
+        le=100,
+        description="Maximum number of top families to include for summary statistics.",
     )
 
 
@@ -739,6 +770,116 @@ def search_precedents_tool(
 # Reagent Database Tools
 # ============================================================================
 
+@tool(args_schema=ReagentAnalyticsInput)
+def reagent_database_analytics_tool(
+    statistic: str = "summary",
+    role: Optional[str] = None,
+    registry_dir: Optional[str] = None,
+    top_families: int = 20,
+) -> Dict[str, Any]:
+    """
+    Access aggregated analytics for the reagent database.
+
+    Args:
+        statistic: Metric to compute ('summary', 'role_summary', 'missing_data').
+        role: Reagent role used when requesting a role summary.
+        registry_dir: Optional override for the reagent registry directory.
+        top_families: Maximum number of families to include in ranked outputs.
+
+    Returns:
+        Dict[str, Any]: Analytics payload with a success flag and structured data.
+    """
+    try:
+        stat_key = (statistic or "summary").strip().lower()
+        registry_path = registry_dir.strip() if isinstance(registry_dir, str) else registry_dir
+        if isinstance(registry_path, str) and not registry_path:
+            registry_path = None
+
+        if stat_key in {"summary", "database_summary", "overview"}:
+            raw_stats = get_database_statistics(registry_path)
+
+            families_by_role = {
+                role_key: sorted(set(families))
+                for role_key, families in raw_stats.get("families_by_role", {}).items()
+            }
+
+            family_counts_raw = raw_stats.get("family_counts", {})
+            if hasattr(family_counts_raw, "most_common"):
+                family_counts_list = family_counts_raw.most_common(top_families)
+            elif isinstance(family_counts_raw, dict):
+                family_counts_list = list(family_counts_raw.items())[:top_families]
+            else:
+                family_counts_list = []
+            family_counts = {
+                str(name): int(count)
+                for name, count in family_counts_list
+            }
+
+            top_families_list = [
+                {"family": str(name), "count": int(count)}
+                for name, count in list(raw_stats.get("top_families", []))[:top_families]
+            ]
+
+            roles_per_reagent_entries = []
+            roles_per_reagent_raw = raw_stats.get("roles_per_reagent", {})
+            try:
+                iterator = roles_per_reagent_raw.items()
+            except AttributeError:
+                iterator = []
+            for num_roles, count in sorted(iterator, key=lambda item: item[0]):
+                roles_per_reagent_entries.append(
+                    {"roles": int(num_roles), "reagents": int(count)}
+                )
+
+            summary = {
+                "registry_dir": raw_stats.get("registry_dir"),
+                "total_reagents": raw_stats.get("total_reagents"),
+                "by_type": dict(raw_stats.get("by_type", {})),
+                "total_with_cas": raw_stats.get("total_with_cas"),
+                "total_with_inchikey": raw_stats.get("total_with_inchikey"),
+                "total_with_smiles": raw_stats.get("total_with_smiles"),
+                "total_with_abbreviations": raw_stats.get("total_with_abbreviations"),
+                "id_format_stats": dict(raw_stats.get("id_format_stats", {})),
+                "multi_role_reagents": raw_stats.get("multi_role_reagents"),
+                "families_by_role": families_by_role,
+                "family_counts": family_counts,
+                "top_families": top_families_list,
+                "roles_per_reagent_breakdown": roles_per_reagent_entries,
+            }
+
+            return _success_response(
+                {"statistic": "summary", "summary": summary}
+            )
+
+        if stat_key in {"role_summary", "role", "families"}:
+            if not role or not role.strip():
+                return _error_response("role is required when statistic='role_summary'")
+            role_key = role.strip()
+            role_stats = get_family_statistics(role_key, registry_path)
+            families = role_stats.get("families", [])
+            limited_families = families[:top_families] if top_families else families
+            payload = {
+                "role": role_stats.get("role", role_key),
+                "total_reagents": role_stats.get("total_reagents"),
+                "total_families": role_stats.get("total_families"),
+                "families": [
+                    {"name": str(entry.get("name", "")), "count": int(entry.get("count", 0))}
+                    for entry in limited_families
+                ],
+            }
+            return _success_response(
+                {"statistic": "role_summary", "summary": payload}
+            )
+
+        if stat_key in {"missing_data", "missing", "data_gaps"}:
+            report = get_missing_data_report(registry_path)
+            return _success_response({"statistic": "missing_data", "report": report})
+
+        return _error_response(f"Unsupported statistic '{statistic}'.")
+    except Exception as exc:
+        return _error_response(str(exc))
+
+
 @tool(args_schema=FindReagentInput)
 def find_reagent_tool(query: str, reagent_type: str = "base") -> Dict[str, Any]:
     """
@@ -873,6 +1014,7 @@ CHEMTOOLS_TOOLS = [
     
     # Database tools
     find_reagent_tool,
+    reagent_database_analytics_tool,
     list_supported_cores_tool,
     add_reagent_tool,
 ]
