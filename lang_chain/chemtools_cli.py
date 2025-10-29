@@ -499,12 +499,15 @@ class ChemToolsCLI:
             try:
                 # Get user input
                 self.print_input_indicator()
-                user_input = input(f"{Colors.BOLD}You:{Colors.ENDC} ").strip()
+                sys.stdout.write(f"{Colors.OKGREEN}{Colors.BOLD}You:{Colors.ENDC} {Colors.OKGREEN}")
+                sys.stdout.flush()
+                user_input = input().strip()
+                sys.stdout.write(f"{Colors.ENDC}")
+                sys.stdout.flush()
                 
                 # Empty input
                 if not user_input:
                     continue
-                
                 # Handle commands
                 should_exit = self.handle_command(user_input)
                 if should_exit:
