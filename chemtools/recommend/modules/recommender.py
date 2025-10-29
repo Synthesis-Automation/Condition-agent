@@ -17,7 +17,7 @@ from ..utils import canonical_family, median, pick_with_constraints
 
 # Optional rxn-insight integration for ML-based family detection
 try:
-    from ...reaction_type_detector import detect_reaction_type as _rxn_detect
+    from ...reaction_type_detector import _detect_reaction_type_impl as _rxn_detect
     _HAS_RXN_INSIGHT = True
 except Exception:
     _HAS_RXN_INSIGHT = False
