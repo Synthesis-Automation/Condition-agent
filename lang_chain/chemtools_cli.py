@@ -235,7 +235,8 @@ class ChemToolsCLI:
     
     def print_input_indicator(self):
         """Show an indicator that user input is expected."""
-        print(f"{Colors.OKCYAN}[input]{Colors.ENDC} Your turn.")
+        # Indicator intentionally left blank for cleaner prompt display.
+        return
     
     def print_constraints(self):
         """Display the currently active constraint summary."""

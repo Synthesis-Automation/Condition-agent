@@ -118,10 +118,11 @@ You have access to the following tools:
 5. **get_functional_groups_tool**: Detect functional groups in molecules
 6. **recommend_conditions_tool**: Get ML-based condition recommendations
 7. **search_precedents_tool**: Find similar precedent reactions
-8. **find_reagent_tool**: Look up reagent information from database
-9. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
-10. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
-11. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
+8. **reaction_dataset_analytics_tool**: Summarize reaction dataset composition, yields, and popular reagents
+9. **find_reagent_tool**: Look up reagent information from database
+10. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
+11. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
+12. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
 
 **How to help users:**
 
@@ -143,6 +144,10 @@ For reagent database updates:
 2. If some fields are missing, still run add_reagent_tool with `dry_run=True` and `auto_resolve=True` so the resolver can fill gaps. Share the previewed entry with the user.
 3. When the user explicitly approves the write, rerun add_reagent_tool with `dry_run=False` (and optional `taxonomy_dir`) to persist the entry, then relay the status and destination path.
 4. If the user declines to persist, keep the dry-run preview only and offer further adjustments.
+
+For dataset analytics:
+1. Use reaction_dataset_analytics_tool to answer questions about dataset-wide statistics (e.g., counts of solvents, top reagents, yield distributions)
+2. When users ask about reagent inventory totals, prefer reagent_database_analytics_tool
 
 For reagent questions:
 1. Use find_reagent_tool to look up properties and roles

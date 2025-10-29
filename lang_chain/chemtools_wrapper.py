@@ -10,6 +10,7 @@ Available Tools:
     - detect_reaction_family_tool: Detect reaction family/type
     - recommend_conditions_tool: Get ML-based condition recommendations
     - search_precedents_tool: Search for similar precedent reactions
+    - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
     - find_reagent_tool: Look up reagent information from database
     - reagent_database_analytics_tool: Summarize reagent registry statistics
     - list_supported_cores_tool: Enumerate catalyst cores observed in precedents
@@ -37,6 +38,16 @@ from chemtools.smiles import normalize, normalize_reaction
 from chemtools.router import detect_family_from_reaction
 from chemtools.recommend.modules import recommend_from_reaction
 from chemtools.precedent import knn as precedent_knn
+from chemtools.dataset_analytics import (
+    get_dataset_stats,
+    get_common_catalysts,
+    get_common_ligands,
+    get_common_bases,
+    get_common_solvents,
+    get_common_reagents,
+    get_condition_cores,
+    get_all_families,
+)
 from chemtools.reagent import (
     find_reagent,
     classify_reactant_smiles,
@@ -180,6 +191,38 @@ class SearchPrecedentsInput(BaseModel):
     family: Optional[str] = Field(
         None,
         description="Optional reaction family override if auto-detection should be skipped.",
+    )
+
+
+class ReactionAnalyticsInput(BaseModel):
+    """Schema for reaction dataset analytics access."""
+
+    statistic: str = Field(
+        "summary",
+        description=(
+            "Statistic to compute: 'summary', 'top_catalysts', 'top_ligands', "
+            "'top_bases', 'top_solvents', 'top_condition_cores', 'top_reagents', or 'families'."
+        ),
+    )
+    family: Optional[str] = Field(
+        None,
+        description="Reaction family identifier (e.g., 'Suzuki'). Required for most statistics.",
+    )
+    role: Optional[str] = Field(
+        None,
+        description="Reagent role for 'top_reagents' analytics (e.g., 'ligand', 'base').",
+    )
+    top_n: int = Field(
+        10,
+        ge=1,
+        le=100,
+        description="Maximum number of ranked entries to return for top-N statistics.",
+    )
+    min_yield: Optional[float] = Field(
+        None,
+        ge=0,
+        le=100,
+        description="Optional minimum yield threshold (%) when ranking reagents.",
     )
 
 
@@ -767,8 +810,134 @@ def search_precedents_tool(
 
 
 # ============================================================================
-# Reagent Database Tools
+# Reaction Dataset & Reagent Database Tools
 # ============================================================================
+
+@tool(args_schema=ReactionAnalyticsInput)
+def reaction_dataset_analytics_tool(
+    statistic: str = "summary",
+    family: Optional[str] = None,
+    role: Optional[str] = None,
+    top_n: int = 10,
+    min_yield: Optional[float] = None,
+) -> Dict[str, Any]:
+    """
+    Access analytics derived from reaction precedent datasets.
+
+    Args:
+        statistic: Metric to compute ('summary', 'top_catalysts', 'top_ligands', 'top_bases',
+                  'top_solvents', 'top_condition_cores', 'top_reagents', or 'families').
+        family: Reaction family identifier (required for most metrics).
+        role: Reagent role filter required when statistic='top_reagents'.
+        top_n: Maximum number of ranked entries to return.
+        min_yield: Optional yield threshold (%) when ranking reagents.
+
+    Returns:
+        Dict[str, Any]: Analytics payload with success flag.
+    """
+    try:
+        stat_key = (statistic or "summary").strip().lower()
+
+        def _format_ranked(items: Sequence[Tuple[str, int, Optional[float]]]) -> List[Dict[str, Any]]:
+            formatted: List[Dict[str, Any]] = []
+            for name, count, avg in items:
+                formatted.append(
+                    {
+                        "name": str(name),
+                        "count": int(count),
+                        "avg_yield": float(avg) if avg is not None else None,
+                    }
+                )
+            return formatted[:top_n]
+
+        if stat_key in {"families", "list_families", "available_families"}:
+            families = get_all_families()
+            return _success_response({"statistic": "families", "families": families})
+
+        if not family or not str(family).strip():
+            return _error_response("family is required for reaction dataset analytics")
+
+        family_key = str(family).strip()
+
+        if stat_key in {"summary", "dataset_summary", "overview"}:
+            stats = get_dataset_stats(family_key)
+            summary = {
+                "family": family_key,
+                "total_reactions": stats.get("total_reactions"),
+                "unique_condition_cores": stats.get("unique_condition_cores"),
+                "unique_solvents": stats.get("unique_solvents"),
+                "unique_bases": stats.get("unique_bases"),
+                "unique_catalysts": stats.get("unique_catalysts"),
+                "yield_stats": stats.get("yield_stats"),
+                "temperature_stats": stats.get("temperature_stats"),
+                "time_stats": stats.get("time_stats"),
+            }
+            return _success_response({"statistic": "summary", "summary": summary})
+
+        if stat_key in {"top_catalysts", "catalysts"}:
+            ranked = get_common_catalysts(family_key, top_n=top_n, min_yield=min_yield)
+            return _success_response(
+                {"statistic": "top_catalysts", "results": _format_ranked(ranked)}
+            )
+
+        if stat_key in {"top_ligands", "ligands"}:
+            ranked = get_common_ligands(family_key, top_n=top_n, min_yield=min_yield)
+            return _success_response(
+                {"statistic": "top_ligands", "results": _format_ranked(ranked)}
+            )
+
+        if stat_key in {"top_bases", "bases"}:
+            ranked = get_common_bases(family_key, top_n=top_n, min_yield=min_yield)
+            return _success_response({"statistic": "top_bases", "results": _format_ranked(ranked)})
+
+        if stat_key in {"top_solvents", "solvents"}:
+            ranked = get_common_solvents(family_key, top_n=top_n, min_yield=min_yield)
+            return _success_response(
+                {"statistic": "top_solvents", "results": _format_ranked(ranked)}
+            )
+
+        if stat_key in {"top_condition_cores", "condition_cores", "cores"}:
+            ranked = get_condition_cores(family_key, top_n=top_n, min_yield=min_yield)
+            results: List[Dict[str, Any]] = []
+            for core, count, avg in ranked[:top_n]:
+                results.append(
+                    {
+                        "core": str(core),
+                        "count": int(count),
+                        "avg_yield": float(avg) if avg is not None else None,
+                    }
+                )
+            return _success_response(
+                {"statistic": "top_condition_cores", "results": results}
+            )
+
+        if stat_key in {"top_reagents", "reagents"}:
+            if not role or not str(role).strip():
+                return _error_response("role is required when statistic='top_reagents'")
+            role_key = str(role).strip()
+            ranked = get_common_reagents(
+                family_key,
+                role_key,
+                top_n=top_n,
+                min_yield=min_yield,
+            )
+            results = [
+                {
+                    "role": role_key,
+                    "name": str(name),
+                    "count": int(count),
+                    "avg_yield": float(avg) if avg is not None else None,
+                }
+                for name, count, avg in ranked[:top_n]
+            ]
+            return _success_response(
+                {"statistic": "top_reagents", "role": role_key, "results": results}
+            )
+
+        return _error_response(f"Unsupported statistic '{statistic}'.")
+    except Exception as exc:
+        return _error_response(str(exc))
+
 
 @tool(args_schema=ReagentAnalyticsInput)
 def reagent_database_analytics_tool(
@@ -1013,6 +1182,7 @@ CHEMTOOLS_TOOLS = [
     search_precedents_tool,
     
     # Database tools
+    reaction_dataset_analytics_tool,
     find_reagent_tool,
     reagent_database_analytics_tool,
     list_supported_cores_tool,
