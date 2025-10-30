@@ -283,8 +283,13 @@ class ChemToolsCLI:
         time.sleep(0.5)
         prompt.stop()
         
-        # Now get input without animation interfering
+        # Now get input with cyan color for user text
+        sys.stdout.write(f"{Colors.OKCYAN}")
+        sys.stdout.flush()
         user_input = input()
+        sys.stdout.write(f"{Colors.ENDC}")
+        sys.stdout.flush()
+        
         return user_input.strip()
     
     def print_constraints(self):
