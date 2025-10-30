@@ -49,11 +49,28 @@ def _call_insight(reaction_smiles: str) -> Any:
             except Exception:
                 continue
 
-    # Try class-based API (e.g., rxn_insight.Reaction(...).analyze())
+    # Try class-based API with Reaction(...).get_class() and get_name()
     try:
         cls = getattr(rxn_insight, "Reaction", None)
         if cls is not None:
             obj = cls(reaction_smiles)  # type: ignore
+            
+            # Try get_class() and get_name() methods (current rxn-insight API)
+            if hasattr(obj, 'get_class') and hasattr(obj, 'get_name'):
+                try:
+                    rxn_class = obj.get_class()
+                    rxn_name = obj.get_name()
+                    # Return a dict-like structure
+                    return {
+                        'class': rxn_class,
+                        'name': rxn_name,
+                        'classification': rxn_class,
+                        'class_name': rxn_name
+                    }
+                except Exception:
+                    pass
+            
+            # Fallback: try other method names
             for m in ("analyze", "classify", "analyze_reaction"):
                 meth = getattr(obj, m, None)
                 if callable(meth):

@@ -138,35 +138,46 @@ def list_reaction_types() -> None:
     print()
 
 
-def get_reaction_type_choice() -> Optional[str]:
-    """Prompt user for reaction type selection."""
+def get_reaction_type_choice() -> tuple[Optional[str], bool]:
+    """
+    Prompt user for reaction type selection.
+    
+    Returns:
+        (reaction_type, use_ml) tuple
+        - reaction_type: Specified type or None for auto-detect
+        - use_ml: Whether to use ML-enhanced detection
+    """
     print("\nReaction Type Selection:")
-    print("  1. Auto-detect (recommended)")
-    print("  2. Specify reaction type manually")
-    print("  3. List all available reaction types")
+    print("  1. Auto-detect with ML (recommended)")
+    print("  2. Auto-detect (rule-based only)")
+    print("  3. Specify reaction type manually")
+    print("  4. List all available reaction types")
     print()
     
-    choice = input("Select option (1-3): ").strip()
+    choice = input("Select option (1-4): ").strip()
     
     if choice == '1' or not choice:
-        return None  # Auto-detect
+        return None, True  # Auto-detect with ML
     
     elif choice == '2':
-        reaction_type = input("Enter reaction type (e.g., suzuki_miyaura, buchwald_hartwig_c_n): ").strip()
-        if reaction_type:
-            return reaction_type
-        return None
+        return None, False  # Auto-detect rule-based only
     
     elif choice == '3':
+        reaction_type = input("Enter reaction type (e.g., suzuki_miyaura, buchwald_hartwig_c_n): ").strip()
+        if reaction_type:
+            return reaction_type, True
+        return None, True
+    
+    elif choice == '4':
         list_reaction_types()
         reaction_type = input("\nEnter reaction type from the list above: ").strip()
         if reaction_type:
-            return reaction_type
-        return None
+            return reaction_type, True
+        return None, True
     
     else:
-        print("⚠ Invalid choice, using auto-detect")
-        return None
+        print("⚠ Invalid choice, using auto-detect with ML")
+        return None, True
 
 
 def format_confidence(confidence: float) -> str:
@@ -237,37 +248,148 @@ def display_reaction_analysis(result: ReactionClassification, smiles: str) -> No
             print()
 
 
-def display_detection_only(smiles: str) -> None:
-    """Display only reaction type detection (no user-provided type)."""
+def display_detection_only(smiles: str, use_ml: bool = True) -> Optional[dict]:
+    """
+    Display reaction type detection with detailed breakdown.
+    
+    Args:
+        smiles: Reaction SMILES
+        use_ml: Whether to use ML-enhanced detection (default: True)
+    
+    Returns:
+        Detection result dict or None if error
+    """
     
     print_section("Detecting Reaction Type...")
     
     try:
-        detection_result = detect_reaction(smiles, use_ml=False)
+        # Run unified detection
+        detection_result = detect_reaction(smiles, use_ml=use_ml)
         
         detected_family = detection_result.get('family', 'Unknown')
         confidence = detection_result.get('confidence', 0.0)
+        method = detection_result.get('method', 'unknown')
+        details = detection_result.get('details', {})
         
+        # Main detection result
         print(f"Detected Family:  {detected_family}")
         print(f"Confidence:       {format_confidence(confidence)}")
+        print(f"Detection Method: {method}")
+        
+        # Show detection breakdown if available
+        if details:
+            print()
+            print("Detection Breakdown:")
+            print("-" * 40)
+            
+            # Rule-based prediction
+            rule_pred = details.get('rule_prediction', {})
+            if rule_pred:
+                print(f"  Rule-based:  {rule_pred.get('family', 'N/A')} "
+                      f"(conf: {rule_pred.get('confidence', 0):.2f})")
+            
+            # ML prediction (if ML was used)
+            ml_pred = details.get('ml_prediction', {})
+            if ml_pred and use_ml:
+                ml_family = ml_pred.get('family', 'N/A')
+                ml_conf = ml_pred.get('confidence')
+                ml_name = ml_pred.get('rxn_name', '')
+                ml_class = ml_pred.get('rxn_class', '')
+                
+                if ml_family and ml_family != 'N/A':
+                    conf_str = f"{ml_conf:.2f}" if isinstance(ml_conf, (int, float)) else "N/A"
+                    print(f"  ML-based:    {ml_family} (conf: {conf_str})")
+                    if ml_name:
+                        print(f"               ML name: \"{ml_name}\"")
+                    if ml_class:
+                        print(f"               ML class: \"{ml_class}\"")
+                else:
+                    print(f"  ML-based:    Not available or failed")
+            
+            # Functional groups detected
+            fg = details.get('functional_groups', {})
+            if fg:
+                detected_groups = [k for k, v in fg.items() if v]
+                if detected_groups:
+                    print()
+                    print(f"  Functional Groups Detected ({len(detected_groups)}):")
+                    for group in sorted(detected_groups)[:8]:  # Show first 8
+                        print(f"    • {group}")
+                    if len(detected_groups) > 8:
+                        print(f"    ... and {len(detected_groups) - 8} more")
+            
+            # Catalysts detected
+            catalysts = details.get('catalysts', [])
+            if catalysts:
+                print()
+                print(f"  Catalysts Detected: {', '.join(catalysts)}")
+        
+        # Agreement status
+        agreement = detection_result.get('agreement')
+        status = detection_result.get('status', '')
+        if agreement is not None and use_ml:
+            print()
+            if agreement:
+                print("  ✓ Rule-based and ML predictions agree")
+            else:
+                if status == 'conflict':
+                    print("  ⚠ Conflict: Rule-based and ML predictions differ")
+                    print("    Using ML prediction (higher confidence)")
+                elif status == 'rule_only':
+                    print("  ℹ ML detection not available - using rule-based only")
         
         if detected_family == 'Unknown':
             print()
             print("⚠ Could not detect reaction type")
-            print("  Consider specifying the reaction type manually")
+            print("  Suggestions:")
+            print("    • Check if reaction SMILES is valid")
+            print("    • Try specifying the reaction type manually")
+            print("    • Reaction may not be in supported families")
+        
+        return detection_result
         
     except Exception as e:
         print(f"❌ Error during detection: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
 
 
-def run_analysis(smiles: str, reaction_type: Optional[str] = None) -> None:
-    """Run the complete analysis workflow."""
+def run_analysis(smiles: str, reaction_type: Optional[str] = None, use_ml: bool = True) -> None:
+    """
+    Run the complete analysis workflow.
+    
+    Args:
+        smiles: Reaction SMILES
+        reaction_type: Optional user-specified reaction type
+        use_ml: Whether to use ML-enhanced detection (default: True)
+    """
     
     try:
-        # If no reaction type specified, show detection first
+        # If no reaction type specified, show detailed detection first
+        detection_result = None
         if not reaction_type:
-            display_detection_only(smiles)
+            detection_result = display_detection_only(smiles, use_ml=use_ml)
             print()
+            
+            # Offer to use detected type or specify manually
+            if detection_result and detection_result.get('family') != 'Unknown':
+                print("Options:")
+                print(f"  1. Use detected type: {detection_result['family']}")
+                print("  2. Specify different reaction type")
+                print("  3. Skip classification (detection only)")
+                print()
+                
+                opt = input("Select option (1-3, default=1): ").strip()
+                
+                if opt == '2':
+                    reaction_type = input("Enter reaction type: ").strip()
+                    if not reaction_type:
+                        print("⚠ No type entered, using detected type")
+                elif opt == '3':
+                    print("\n✓ Detection complete. Skipping classification.")
+                    return
+                # opt == '1' or default: use detected type (reaction_type remains None)
         
         # Run Two-Pass classification
         print_section("Running Two-Pass Classification...")
@@ -280,6 +402,24 @@ def run_analysis(smiles: str, reaction_type: Optional[str] = None) -> None:
         
         # Display results
         display_reaction_analysis(result, smiles)
+        
+        # Show additional insights
+        if detection_result and result.reactants:
+            print_section("Analysis Summary")
+            
+            total_reactants = len(result.reactants)
+            expected_reactants = sum(1 for r in result.reactants if r.is_expected)
+            
+            print(f"Reactants classified:     {total_reactants}")
+            print(f"Expected reactants:       {expected_reactants}")
+            print(f"Unexpected reactants:     {total_reactants - expected_reactants}")
+            print(f"Detection confidence:     {format_confidence(result.reaction_confidence)}")
+            print(f"Multi-functional groups:  {'Yes' if result.has_multi_functional else 'No'}")
+            
+            if result.reaction_confidence < 0.5:
+                print()
+                print("⚠ Low confidence detection - results may be unreliable")
+                print("  Consider verifying the reaction type manually")
         
     except Exception as e:
         print(f"\n❌ Error during analysis: {e}")
@@ -329,16 +469,31 @@ def main():
     
     print_header("REACTION ANALYSIS MODULE - INTERACTIVE TESTER", "=")
     
-    print("This tool tests:")
-    print("  1. Reaction type detection (auto or manual)")
+    print("This tool tests the unified detection system:")
+    print("  1. Reaction type detection (unified detect_reaction API)")
+    print("     • ML-enhanced detection (rxn-insight integration)")
+    print("     • Rule-based detection (SMARTS pattern matching)")
+    print("     • Catalyst-aware refinements (Pd/Cu/Ni detection)")
+    print()
     print("  2. Reactant classification using the Two-Pass Approach")
-    print("  3. Context-aware functional group analysis")
+    print("     • Context-aware functional group analysis")
+    print("     • Multi-functional group detection")
+    print("     • Role-based reactant categorization")
     print()
     print("Commands:")
     print("  - Type 'examples' to see example reactions")
     print("  - Type 'types' to list available reaction types")
     print("  - Type 'quit' or 'exit' to quit")
     print()
+    
+    # Check ML availability
+    try:
+        from chemtools._ml_helpers import is_available as ml_available
+        ml_status = "✓ Available" if ml_available() else "✗ Not installed"
+    except:
+        ml_status = "✗ Not available"
+    
+    print(f"ML Detection (rxn-insight): {ml_status}")
     
     # Check registry
     registry = get_registry()
@@ -371,10 +526,10 @@ def main():
             continue
         
         # Get reaction type preference
-        reaction_type = get_reaction_type_choice()
+        reaction_type, use_ml = get_reaction_type_choice()
         
         # Run analysis
-        run_analysis(smiles, reaction_type)
+        run_analysis(smiles, reaction_type, use_ml=use_ml)
         
         # Ask to continue
         print()
