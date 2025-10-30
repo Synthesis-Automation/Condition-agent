@@ -588,13 +588,6 @@
         "source": "legacy/reactant_types.json"
     },
     {
-        "alias": "Aromatic nucleophilic substitution",
-        "entity_id": "snar",
-        "entity_type": "reaction_type",
-        "notes": "legacy_alias",
-        "source": "legacy/reaction_types.json"
-    },
-    {
         "alias": "aromatic_tertiary_amines",
         "entity_id": "aromatic_tertiary_amines",
         "entity_type": "reagent_family",
@@ -2023,13 +2016,6 @@
         "source": "legacy/reaction_types.json"
     },
     {
-        "alias": "Nucleophilic Aromatic Substitution",
-        "entity_id": "snar",
-        "entity_type": "reaction_type",
-        "notes": "display_name",
-        "source": "legacy/reaction_types.json"
-    },
-    {
         "alias": "nucleophilic_catalyst_bases",
         "entity_id": "nucleophilic_catalyst_bases",
         "entity_type": "reagent_family",
@@ -2756,13 +2742,6 @@
         "entity_type": "reagent_family",
         "notes": null,
         "source": "legacy/families_registry.json"
-    },
-    {
-        "alias": "SNAr",
-        "entity_id": "snar",
-        "entity_type": "reaction_type",
-        "notes": "legacy_alias",
-        "source": "legacy/reaction_types.json"
     },
     {
         "alias": "solid_acid_resins",
