@@ -19,6 +19,11 @@ from chemtools.analysis.reaction_context import (
 )
 from chemtools import detect_reaction
 from chemtools.analysis._registry import get_registry
+from chemtools.analysis.reactants import (
+    classify_reactant_smiles,
+    required_reactant_categories,
+    iter_reactant_matches,
+)
 
 
 def print_header(text: str, char: str = "="):
@@ -109,7 +114,7 @@ def list_reaction_types() -> None:
         ],
         'Halogenation/Substitution': [
             'halogenation_chlorination', 'finkelstein', 'deoxyfluorination',
-            'sn2_substitution', 'snar', 'sandmeyer'
+            'sn2_substitution', 'snar_cn', 'snar_co', 'snar_cs', 'sandmeyer'
         ],
         'Addition': [
             'addition', 'michael_addition', 'diels_alder', 'hydroboration',
@@ -248,6 +253,79 @@ def display_reaction_analysis(result: ReactionClassification, smiles: str) -> No
             print()
 
 
+def _display_reactant_classification(family: str, details: dict) -> None:
+    """
+    Display reaction-specific reactant classification.
+    
+    Args:
+        family: Detected reaction family
+        details: Detection details containing reactants
+    """
+    if family == 'Unknown':
+        return
+    
+    # Map internal family names to taxonomy reaction IDs
+    reaction_id_map = {
+        'suzuki_miyaura': 'Suzuki-Miyaura',
+        'buchwald_hartwig_c_n': 'Buchwald-Hartwig-C-N',
+        'ullmann_cn': 'Ullmann-CN',
+        'ullmann_co': 'Ullmann-CO',
+        'sonogashira': 'Sonogashira',
+        'negishi': 'Negishi',
+        'heck': 'Heck',
+        'stille': 'Stille',
+        'cn_coupling': 'Buchwald-Hartwig-C-N',  # Generic C-N coupling
+        'co_coupling': 'Ullmann-CO',  # Generic C-O coupling
+        'aldol_condensation': 'Aldol',
+        'wittig': 'Wittig',
+        'grignard': 'Grignard',
+    }
+    
+    reaction_id = reaction_id_map.get(family)
+    if not reaction_id:
+        return
+    
+    # Get expected reactant types for this reaction
+    expected_types = required_reactant_categories(reaction_id)
+    if not expected_types:
+        return
+    
+    reactants = details.get('reactants', [])
+    if not reactants:
+        return
+    
+    print()
+    print(f"  Reactant Classification for {reaction_id}:")
+    print(f"  {'-' * 38}")
+    
+    # Show expected types
+    print(f"  Expected: {' + '.join(['/'.join(group) for group in expected_types])}")
+    print()
+    
+    # Classify each reactant
+    for i, reactant_smiles in enumerate(reactants, 1):
+        match = classify_reactant_smiles(reactant_smiles)
+        if match:
+            # Check if it matches expected types
+            is_expected = any(match.category in group for group in expected_types)
+            status = "✓" if is_expected else "⚠"
+            
+            print(f"  Reactant {i}: {reactant_smiles}")
+            print(f"    {status} Type: {match.category} ({match.member_type})")
+            print(f"      Name: {match.name}")
+            
+            # Show if it matches other categories too
+            all_matches = iter_reactant_matches(reactant_smiles)
+            if len(all_matches) > 1:
+                other_categories = [m.category for m in all_matches[1:4] if m.category != match.category]
+                if other_categories:
+                    print(f"      Also: {', '.join(other_categories)}")
+        else:
+            print(f"  Reactant {i}: {reactant_smiles}")
+            print(f"    ⚠ No classification match")
+        print()
+
+
 def display_detection_only(smiles: str, use_ml: bool = True) -> Optional[dict]:
     """
     Display reaction type detection with detailed breakdown.
@@ -323,6 +401,9 @@ def display_detection_only(smiles: str, use_ml: bool = True) -> Optional[dict]:
             if catalysts:
                 print()
                 print(f"  Catalysts Detected: {', '.join(catalysts)}")
+            
+            # Reaction-specific reactant analysis
+            _display_reactant_classification(detected_family, details)
         
         # Agreement status
         agreement = detection_result.get('agreement')
