@@ -113,6 +113,43 @@ class Spinner:
 
 
 # ============================================================================
+# Input Prompt Indicator
+# ============================================================================
+
+class InputPrompt:
+    """Visual indicator for user input with pulsing effect."""
+    
+    def __init__(self):
+        """Initialize input prompt indicator."""
+        self.pulsing = False
+        self.thread = None
+        self.prompt_chars = ['⚛', '⚛️', '⚛ ', '⚛  ']
+        self.current_idx = 0
+    
+    def _pulse(self):
+        """Internal pulsing loop."""
+        while self.pulsing:
+            char = self.prompt_chars[self.current_idx]
+            print(f'\r{Colors.OKGREEN}{Colors.BOLD}You {char}▸{Colors.ENDC} ', end='', flush=True)
+            self.current_idx = (self.current_idx + 1) % len(self.prompt_chars)
+            time.sleep(0.3)
+    
+    def start(self):
+        """Start the pulsing prompt."""
+        self.pulsing = True
+        self.thread = threading.Thread(target=self._pulse, daemon=True)
+        self.thread.start()
+    
+    def stop(self):
+        """Stop pulsing and show final prompt."""
+        self.pulsing = False
+        if self.thread:
+            self.thread.join()
+        # Show final static prompt
+        print(f'\r{Colors.OKGREEN}{Colors.BOLD}You ▸{Colors.ENDC} ', end='', flush=True)
+
+
+# ============================================================================
 # Example Queries
 # ============================================================================
 
@@ -233,10 +270,27 @@ class ChemToolsCLI:
         
         print(f"\n{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
-    def print_input_indicator(self):
-        """Show an indicator that user input is expected."""
-        # Indicator intentionally left blank for cleaner prompt display.
-        return
+    def get_user_input_with_indicator(self):
+        """Get user input with animated prompt indicator.
+        
+        Returns:
+            str: User input string
+        """
+        prompt = InputPrompt()
+        prompt.start()
+        
+        # Wait a moment for visual effect, then stop before input
+        time.sleep(0.5)
+        prompt.stop()
+        
+        # Now get input with cyan color for user text
+        sys.stdout.write(f"{Colors.OKCYAN}")
+        sys.stdout.flush()
+        user_input = input()
+        sys.stdout.write(f"{Colors.ENDC}")
+        sys.stdout.flush()
+        
+        return user_input.strip()
     
     def print_constraints(self):
         """Display the currently active constraint summary."""
@@ -498,13 +552,8 @@ class ChemToolsCLI:
         
         while True:
             try:
-                # Get user input
-                self.print_input_indicator()
-                sys.stdout.write(f"{Colors.OKGREEN}{Colors.BOLD}You:{Colors.ENDC} {Colors.OKGREEN}")
-                sys.stdout.flush()
-                user_input = input().strip()
-                sys.stdout.write(f"{Colors.ENDC}")
-                sys.stdout.flush()
+                # Get user input with animated indicator
+                user_input = self.get_user_input_with_indicator()
                 
                 # Empty input
                 if not user_input:
