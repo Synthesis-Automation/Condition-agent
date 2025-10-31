@@ -148,6 +148,10 @@ def _safe_load_registry(candidates: Iterable[Optional[Path]]) -> Optional[Taxono
 
 def _family_entry_from_registry(role: ReagentRole, family: ReagentFamily) -> Dict[str, Any]:
     """Convert a registry ReagentFamily into the legacy family schema dict."""
+    # Some older taxonomy payloads may not include a 'metadata' field on ReagentFamily.
+    # Use a safe fallback to an empty mapping to avoid attribute errors during conversion.
+    family_metadata: Dict[str, Any] = copy.deepcopy(getattr(family, "metadata", {}) or {})
+
     entry: Dict[str, Any] = {
         "role": role.id,
         "role_label": role.name,
@@ -163,7 +167,7 @@ def _family_entry_from_registry(role: ReagentRole, family: ReagentFamily) -> Dic
         "examples_pos": list(family.examples_pos or []),
         "examples_neg": list(family.examples_neg or []),
         "notes": family.notes or "",
-        "metadata": copy.deepcopy(family.metadata or {}),
+        "metadata": family_metadata,
     }
 
     example_members = entry["metadata"].get("example_members")

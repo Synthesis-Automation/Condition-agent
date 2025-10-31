@@ -230,6 +230,40 @@
     "embedding_text": "type=preformed_metal_catalyst | name=(XPhos)Pd(allyl)Cl – G3 | abbr=XPhos-Pd-G3 | family=Buchwald G3 Precatalysts (BiarylP–Pd) (pd_biaryl_phosphine_precatalyst) | metal=Pd | ox=2 | ligand_type=other | additional_ligand=not_needed | cas=1445085-55-1"
   },
   {
+    "id": "JIMOHYWEUIAPAA-UHFFFAOYSA-N",
+    "name": "[2'-(Amino-kappaN)[1,1'-biphenyl]-2-yl-kappaC][[5-(diphenylphosphino)-9,9-dimethyl-9H-xanthen-4-yl]diphenylphosphine-kappaP](methanesulfonato-kappaO)palladium",
+    "abbreviation": [
+      "Xantphos Pd G3"
+    ],
+    "aliases": [
+      "(2'-(Amino-kappaN)(1,1'-biphenyl)-2-yl-kappaC)((5-(diphenylphosphino)-9,9-dimethyl-9H-xanthen-4-yl)diphenylphosphine-kappaP)(methanesulfonato-kappaO)palladium",
+      "RefChem:394274",
+      "MFCD22572675",
+      "Methanesulfonato[4,5-Bis(diphenylphosphino)-9,9-dimethylxanthene](2'-amino-1,1'-biphenyl-2-yl)palladium(II)",
+      "[2'-(Amino-|EN)[1,1'-biphenyl]-2-yl-|EC][[5-(diphenylphosphino)-9,9-dimethyl-9H-xanthen-4-yl]diphenylphosphine-|EP](methanesulfonato-|EO)palladium",
+      "XantPhos Pd G3, 95%",
+      "SCHEMBL22290588",
+      "KS-00000SRJ",
+      "(5-diphenylphosphanyl-9,9-dimethylxanthen-4-yl)-diphenylphosphane;methanesulfonic acid;palladium;2-phenylanilineE",
+      "Buchwald Palladacycle G3 Precatalyst"
+    ],
+    "cas": "1445085-97-1",
+    "inchi_key": "JIMOHYWEUIAPAA-UHFFFAOYSA-N",
+    "roles": {
+      "preformed_metal_catalyst": {
+        "families": [
+          "pd_g3_precatalysts"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine"
+      }
+    },
+    "embedding_text": "type: PREFORMED_METAL_CATALYST | family: pd_g3_precatalysts (pd_g3_precatalysts) | name: [2'-(Amino-kappaN)[1,1'-biphenyl]-2-yl-kappaC][[5-(diphenylphosphino)-9,9-dimethyl-9H-xanthen-4-yl]diphenylphosphine-kappaP](methanesulfonato-kappaO)palladium | abbr: Buchwald G3 | CAS: 1445085-97-1 | synonyms: [2'-(Amino-kappaN)[1,1'-biphenyl]-2-yl-kappaC][[5-(diphenylphosphino)-9,9-dimethyl-9H-xanthen-4-yl]diphenylphosphine-kappaP](methanesulfonato-kappaO)palladium; (2'-(Amino-kappaN)(1,1'-biphenyl)-2-yl-kappaC)((5-(diphenylphosphino)-9,9-dimethyl-9H-xanthen-4-yl)diphenylphosphine-kappaP)(methanesulfonato-kappaO)palladium; RefChem:394274; MFCD22572675; Methanesulfonato[4,5-Bis(diphenylphosphino)-9,9-dimethylxanthene](2'-amino-1,1'-biphenyl-2-yl)palladium(II); [2'-(Amino-|EN)[1,1'-biphenyl]-2-yl-|EC][[5-(diphenylphosphino)-9,9-dimethyl-9H-xanthen-4-yl]diphenylphosphine-|EP](methanesulfonato-|EO)palladium; XantPhos Pd G3, 95%; SCHEMBL22290588; KS-00000SRJ; (5-diphenylphosphanyl-9,9-dimethylxanthen-4-yl)-diphenylphosphane;methanesulfonic acid;palladium;2-phenylanilineE; Buchwald Palladacycle G3 Precatalyst"
+  },
+  {
     "id": "ir-cod-cl-2-dtbbpy-hbpin-b2pin2",
     "name": "[Ir(cod)Cl]2 + dtbbpy + HBpin/B2pin2",
     "abbreviation": [

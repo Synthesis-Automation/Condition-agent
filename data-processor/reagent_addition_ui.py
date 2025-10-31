@@ -47,7 +47,9 @@ from chemtools.reagent import (
 
 DEFAULT_RESOLVER_TIMEOUT = 6.0  # Default timeout for identity resolution
 
-DEFAULT_REGISTRY_DIR = (ROOT_DIR / "data" / "reagents").resolve()
+# Default to the unified flattened registry directory used across the project
+# Aligns with chemtools.reagent defaults (data/reagent_db)
+DEFAULT_REGISTRY_DIR = (ROOT_DIR / "data" / "reagent_db").resolve()
 
 DEFAULT_LLM_MODELS: Dict[str, List[str]] = {
     "aliyun": [
