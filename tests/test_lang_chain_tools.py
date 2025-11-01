@@ -1,7 +1,7 @@
 """Regression tests for the LangChain ChemTools wrappers."""
 
-import lang_chain.chemtools_wrapper as wrapper
-from lang_chain.chemtools_wrapper import (
+import chem_assistant.chemtools_wrapper as wrapper
+from chem_assistant.chemtools_wrapper import (
     get_tool_descriptions,
     normalize_smiles_tool,
     normalize_reaction_tool,

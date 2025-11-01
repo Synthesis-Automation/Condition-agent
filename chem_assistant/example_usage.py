@@ -43,7 +43,7 @@ def example_1_normalize_smiles():
     print("Example 1: Normalize SMILES")
     print("="*70)
     
-    from lang_chain.chemtools_agent import quick_query
+    from chem_assistant.chemtools_agent import quick_query
     
     query = "Normalize this SMILES: c1ccccc1"
     print(f"\nQuery: {query}")
@@ -60,7 +60,7 @@ def example_2_detect_reaction():
     print("Example 2: Detect Reaction Family")
     print("="*70)
     
-    from lang_chain.chemtools_agent import quick_query
+    from chem_assistant.chemtools_agent import quick_query
     
     query = "What reaction family is this: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     print(f"\nQuery: {query}")
@@ -77,7 +77,7 @@ def example_3_recommend_conditions():
     print("Example 3: Recommend Conditions")
     print("="*70)
     
-    from lang_chain.chemtools_agent import quick_query
+    from chem_assistant.chemtools_agent import quick_query
     
     query = "Recommend optimal conditions for this Buchwald coupling: Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
     print(f"\nQuery: {query}")
@@ -94,7 +94,7 @@ def example_4_reagent_lookup():
     print("Example 4: Reagent Lookup")
     print("="*70)
     
-    from lang_chain.chemtools_agent import quick_query
+    from chem_assistant.chemtools_agent import quick_query
     
     query = "What is the CAS number and role of Cs2CO3?"
     print(f"\nQuery: {query}")
@@ -111,7 +111,7 @@ def example_5_conversational():
     print("Example 5: Conversational Agent")
     print("="*70)
     
-    from lang_chain.chemtools_agent import ChemToolsAgent
+    from chem_assistant.chemtools_agent import ChemToolsAgent
     
     agent = ChemToolsAgent()
     history = []
@@ -134,7 +134,7 @@ def example_6_custom_agent():
     print("Example 6: Custom Agent Configuration")
     print("="*70)
     
-    from lang_chain.chemtools_agent import ChemToolsAgent
+    from chem_assistant.chemtools_agent import ChemToolsAgent
     
     # Create agent with custom settings
     agent = ChemToolsAgent(

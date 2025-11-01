@@ -18,7 +18,7 @@ parent_dir = Path(__file__).parent.parent
 if str(parent_dir) not in sys.path:
     sys.path.insert(0, str(parent_dir))
 
-from lang_chain.chemtools_wrapper import (
+from chem_assistant.chemtools_wrapper import (
     normalize_smiles_tool,
     normalize_reaction_tool,
     detect_reaction_family_tool,

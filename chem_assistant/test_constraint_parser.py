@@ -5,7 +5,7 @@ These tests run without touching the LangChain runtime and validate that
 the deterministic parsing helpers behave as expected.
 """
 
-from lang_chain.constraint_parser import (
+from chem_assistant.constraint_parser import (
     build_constraint_spec,
     filter_cores_by_constraints,
 )
