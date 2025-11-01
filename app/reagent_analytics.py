@@ -176,7 +176,7 @@ def demonstrate_cas_search():
         ("Sodium tert-butoxide", "865-48-5", "base"),
         ("Toluene", "108-88-3", "solvent"),
         ("Tetrahydrofuran (THF)", "109-99-9", "solvent"),
-        ("Palladium(II) acetate", "3375-31-3", "metal_precursor"),
+        ("Palladium(II) acetate", "3375-31-3", "metal_catalyst"),
         ("XPhos", "564483-18-7", "ligand"),
         ("tBuXPhos", "564483-18-7", "ligand"),
         ("Potassium carbonate", "584-08-7", "base"),
@@ -239,8 +239,8 @@ def demonstrate_name_search():
         ("sodium tert-butoxide", "base"),
         ("THF", "solvent"),
         ("tetrahydrofuran", "solvent"),
-        ("Pd(OAc)2", "metal_precursor"),
-        ("palladium acetate", "metal_precursor"),
+        ("Pd(OAc)2", "metal_catalyst"),
+        ("palladium acetate", "metal_catalyst"),
         ("XPhos", "ligand"),
         ("2-dicyclohexylphosphino-2',4',6'-triisopropylbiphenyl", "ligand"),
         ("K2CO3", "base"),
@@ -289,7 +289,7 @@ def demonstrate_role_based_search():
     """Demonstrate role-based filtering with colored output."""
     print_section("ROLE-BASED FILTERING - DEMONSTRATIONS", Fore.MAGENTA + Style.BRIGHT)
     
-    roles_to_show = ["base", "solvent", "ligand", "metal_precursor", "additive"]
+    roles_to_show = ["base", "solvent", "ligand", "metal_catalyst", "additive"]
     
     for role in roles_to_show:
         print_subsection(f"All {Fore.MAGENTA + Style.BRIGHT}{role.upper()}s{Style.RESET_ALL} in Database", Fore.LIGHTMAGENTA_EX)

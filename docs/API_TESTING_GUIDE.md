@@ -20,7 +20,7 @@ Invoke-WebRequest -Uri "http://localhost:8000/health" | Select-Object StatusCode
 
 **Correct field name: `reaction` (not `reaction_smiles`)**
 
-**⚠️ Important: You must specify the `db` path to an existing database file.**
+**â ï¸ Important: You must specify the `db` path to an existing database file.**
 
 #### Basic Usage (No Catalyst Filter)
 
@@ -125,7 +125,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
       "reagents": [
         {
           "id": "7440-50-8",
-          "role": "metal_precursor",
+          "role": "metal_catalyst",
           "name": "Pd(PPh3)4",
           "abbreviation": null,
           "cas": "7440-50-8",
@@ -152,7 +152,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
       "conditions": {
         "temperature": {
           "value": 80,
-          "unit": "°C"
+          "unit": "Â°C"
         },
         "time": {
           "value": 12,
@@ -189,7 +189,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
   - `rank`: Position in recommendations (1 = best)
   - `confidence`: Confidence score (0.0-1.0)
   - `reagents`: List of chemicals needed
-    - `role`: "metal_precursor", "ligand", "base", "solvent", "starting_material"
+    - `role`: "metal_catalyst", "ligand", "base", "solvent", "starting_material"
     - `name`: Chemical name
     - `cas`: CAS registry number
     - `smiles`: Chemical structure
@@ -237,7 +237,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
       "reagents": [
         {
           "id": "14221-01-3",
-          "role": "metal_precursor",
+          "role": "metal_catalyst",
           "name": "Pd(OAc)2",
           "abbreviation": null,
           "cas": "14221-01-3",
@@ -273,7 +273,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
       "conditions": {
         "temperature": {
           "value": 100,
-          "unit": "°C"
+          "unit": "Â°C"
         },
         "time": {
           "value": 16,
@@ -332,7 +332,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
       "reagents": [
         {
           "id": "7758-89-6",
-          "role": "metal_precursor",
+          "role": "metal_catalyst",
           "name": "CuI",
           "abbreviation": null,
           "cas": "7758-89-6",
@@ -368,7 +368,7 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
       "conditions": {
         "temperature": {
           "value": 90,
-          "unit": "°C"
+          "unit": "Â°C"
         },
         "time": {
           "value": 24,
@@ -393,8 +393,8 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/recommend/conditions" -Meth
 
 **Comparing Pd vs Cu Results:**
 
-- **Pd**: Higher confidence (0.92), shorter time (16h), moderate temp (100°C), ligand: XPhos
-- **Cu**: Lower confidence (0.88), longer time (24h), lower temp (90°C), ligand: L-Proline
+- **Pd**: Higher confidence (0.92), shorter time (16h), moderate temp (100Â°C), ligand: XPhos
+- **Cu**: Lower confidence (0.88), longer time (24h), lower temp (90Â°C), ligand: L-Proline
 - **Pd**: Typically more selective, faster reactions
 - **Cu**: More economical, different selectivity profile
 
@@ -653,10 +653,10 @@ python scripts/web_recommendation_cli.py `
 | Endpoint | Method | Key Fields | Catalyst Filter | Description |
 |----------|--------|------------|-----------------|-------------|
 | `/health` | GET | - | N/A | Health check |
-| `/match` | POST | `reaction`, `db` | �?`relax.catalyst_class` | Rule-based (SCDB) |
-| `/api/v1/recommend/conditions` | POST | `reaction`, `reaction_type` | �?`relax.catalyst_class` | ML-based (precedents) |
-| `/api/v1/recommend` | POST | `reaction` | �?`relax.catalyst_class` | Full recommendation |
-| `/api/v1/recommend/fusion` | POST | `reaction` | �?Deprecated | Fusion (deprecated) |
+| `/match` | POST | `reaction`, `db` | â?`relax.catalyst_class` | Rule-based (SCDB) |
+| `/api/v1/recommend/conditions` | POST | `reaction`, `reaction_type` | â?`relax.catalyst_class` | ML-based (precedents) |
+| `/api/v1/recommend` | POST | `reaction` | â?`relax.catalyst_class` | Full recommendation |
+| `/api/v1/recommend/fusion` | POST | `reaction` | â?Deprecated | Fusion (deprecated) |
 | `/api/v1/reaction/detect-type` | POST | `reaction` | N/A | Type detection |
 
 ## Catalyst Filtering Examples
@@ -753,33 +753,33 @@ $result | ConvertTo-Json -Depth 10
 
 ## Common Mistakes
 
-### �?Wrong Field for Catalyst Filtering
+### â?Wrong Field for Catalyst Filtering
 
 **CRITICAL: Use `relax.catalyst_class`, NOT `constraints.metal_preference`**
 
 ```powershell
-# �?WRONG - Using constraints (will be IGNORED!)
+# â?WRONG - Using constraints (will be IGNORED!)
 $body = @{
     reaction = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     reaction_type = "Suzuki"
     k = 10
     limit = 5
     constraints = @{
-        metal_preference = "Cu"  # �?WRONG FIELD - DOES NOT WORK!
+        metal_preference = "Cu"  # â?WRONG FIELD - DOES NOT WORK!
     }
     relax = @{}
 } | ConvertTo-Json -Depth 5
 ```
 
 ```powershell
-# �?CORRECT - Using relax.catalyst_class
+# â?CORRECT - Using relax.catalyst_class
 $body = @{
     reaction = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     reaction_type = "Suzuki"
     k = 10
     limit = 5
     relax = @{
-        catalyst_class = "Cu"  # �?CORRECT - THIS WORKS!
+        catalyst_class = "Cu"  # â?CORRECT - THIS WORKS!
     }
     constraints = @{}
 } | ConvertTo-Json -Depth 5
@@ -791,7 +791,7 @@ $body = @{
 - `constraints` parameters filter the **final recommendations** (filtering AFTER recommendation)
 - Catalyst filtering MUST happen during search, so use `relax.catalyst_class`
 
-### �?Wrong Field Names
+### â?Wrong Field Names
 
 ```powershell
 # WRONG for /match endpoint
@@ -809,7 +809,7 @@ $body = @{
 } | ConvertTo-Json
 ```
 
-### �?Forgetting -Depth for Nested Objects
+### â?Forgetting -Depth for Nested Objects
 
 ```powershell
 # WRONG - catalyst_class won't be included
@@ -825,7 +825,7 @@ $body = @{
 } | ConvertTo-Json -Depth 5
 ```
 
-### �?Using Wrong Database with Catalyst Filter
+### â?Using Wrong Database with Catalyst Filter
 
 ```powershell
 # WRONG - Asking for Cu catalysts from Pd database
@@ -906,7 +906,7 @@ relax = @{
 
 | Scenario | Detection Method | Notes |
 |----------|------------------|-------|
-| `reaction_type` omitted | ML-based (rxn-insight) �?Rule-based fallback | Recommended approach |
+| `reaction_type` omitted | ML-based (rxn-insight) â?Rule-based fallback | Recommended approach |
 | `reaction_type = null` | Same as omitted | Explicit auto-detect |
 | `reaction_type = "Suzuki"` | User-specified, no detection | Manual override |
 | Auto-detect + catalyst filter | Detects type, filters by catalyst | Best for exploration |

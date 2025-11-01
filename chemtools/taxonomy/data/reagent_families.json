@@ -2296,7 +2296,7 @@
     "role_id": "oxidant"
   },
   {
-    "description": "Pd(0) Sources (dba complexes, Pd(PPh3)4) (assigned as metal_precursor)",
+    "description": "Pd(0) Sources (dba complexes, Pd(PPh3)4) (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "51364-51-3",
@@ -2316,14 +2316,14 @@
       "pph",
       "sources"
     ],
-    "name": "Pd(0) Sources (dba complexes, Pd(PPh3)4) (assigned as metal_precursor)",
+    "name": "Pd(0) Sources (dba complexes, Pd(PPh3)4) (assigned as metal_catalyst)",
     "notes": "Pd(0) sources; dba etc.",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Pd(II) Salts and Simple Complexes (assigned as metal_precursor)",
+    "description": "Pd(II) Salts and Simple Complexes (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "53199-31-8",
@@ -2350,14 +2350,14 @@
       "salts",
       "simple"
     ],
-    "name": "Pd(II) Salts and Simple Complexes (assigned as metal_precursor)",
+    "name": "Pd(II) Salts and Simple Complexes (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Pd(II) Phosphine/Chelated Complexes (assigned as preformed_metal_catalyst)",
+    "description": "Pd(II) Phosphine/Chelated Complexes (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "95408-45-0",
@@ -2380,14 +2380,14 @@
       "pd",
       "phosphine"
     ],
-    "name": "Pd(II) Phosphine/Chelated Complexes (assigned as preformed_metal_catalyst)",
+    "name": "Pd(II) Phosphine/Chelated Complexes (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Buchwald G3 Precatalysts (BiarylP–Pd) (assigned as preformed_metal_catalyst)",
+    "description": "Buchwald G3 Precatalysts (BiarylP–Pd) (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "1445085-55-1",
@@ -2405,14 +2405,14 @@
       "pd",
       "precatalysts"
     ],
-    "name": "Buchwald G3 Precatalysts (BiarylP–Pd) (assigned as preformed_metal_catalyst)",
+    "name": "Buchwald G3 Precatalysts (BiarylP–Pd) (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "PEPPSI™ Pd–NHC Precatalysts (assigned as preformed_metal_catalyst)",
+    "description": "PEPPSI™ Pd–NHC Precatalysts (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "905459-27-0",
@@ -2428,14 +2428,14 @@
       "peppsi",
       "precatalysts"
     ],
-    "name": "PEPPSI™ Pd–NHC Precatalysts (assigned as preformed_metal_catalyst)",
+    "name": "PEPPSI™ Pd–NHC Precatalysts (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ni(0) Sources (assigned as metal_precursor)",
+    "description": "Ni(0) Sources (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "1295-35-8"
@@ -2447,14 +2447,14 @@
       "ni",
       "sources"
     ],
-    "name": "Ni(0) Sources (assigned as metal_precursor)",
+    "name": "Ni(0) Sources (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ni(II) Halides (Anhydrous) (assigned as metal_precursor)",
+    "description": "Ni(II) Halides (Anhydrous) (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "7718-54-9",
@@ -2471,14 +2471,14 @@
       "ii",
       "ni"
     ],
-    "name": "Ni(II) Halides (Anhydrous) (assigned as metal_precursor)",
+    "name": "Ni(II) Halides (Anhydrous) (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ni(II) Glyme Adducts (assigned as metal_precursor)",
+    "description": "Ni(II) Glyme Adducts (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "29046-78-4",
@@ -2495,14 +2495,14 @@
       "ii",
       "ni"
     ],
-    "name": "Ni(II) Glyme Adducts (assigned as metal_precursor)",
+    "name": "Ni(II) Glyme Adducts (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ni(II) Carboxylates and β-Diketonates (assigned as metal_precursor)",
+    "description": "Ni(II) Carboxylates and β-Diketonates (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "3264-82-2",
@@ -2520,14 +2520,14 @@
       "ii",
       "ni"
     ],
-    "name": "Ni(II) Carboxylates and β-Diketonates (assigned as metal_precursor)",
+    "name": "Ni(II) Carboxylates and β-Diketonates (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Cu(I) Halides and Adducts (assigned as metal_precursor)",
+    "description": "Cu(I) Halides and Adducts (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "7681-65-4",
@@ -2546,14 +2546,14 @@
       "halides",
       "i"
     ],
-    "name": "Cu(I) Halides and Adducts (assigned as metal_precursor)",
+    "name": "Cu(I) Halides and Adducts (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Cu(I) Carboxylates (assigned as metal_precursor)",
+    "description": "Cu(I) Carboxylates (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "68986-76-5"
@@ -2568,14 +2568,14 @@
       "cu",
       "i"
     ],
-    "name": "Cu(I) Carboxylates (assigned as metal_precursor)",
+    "name": "Cu(I) Carboxylates (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Cu(II) Salts (assigned as metal_precursor)",
+    "description": "Cu(II) Salts (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "142-71-2",
@@ -2592,14 +2592,14 @@
       "ii",
       "salts"
     ],
-    "name": "Cu(II) Salts (assigned as metal_precursor)",
+    "name": "Cu(II) Salts (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Co(II) Halides (assigned as metal_precursor)",
+    "description": "Co(II) Halides (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "7646-79-9",
@@ -2613,14 +2613,14 @@
       "halides",
       "ii"
     ],
-    "name": "Co(II) Halides (assigned as metal_precursor)",
+    "name": "Co(II) Halides (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Co Acetylacetonates (assigned as metal_precursor)",
+    "description": "Co Acetylacetonates (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "14024-48-7",
@@ -2633,14 +2633,14 @@
       "acetylacetonates",
       "co"
     ],
-    "name": "Co Acetylacetonates (assigned as metal_precursor)",
+    "name": "Co Acetylacetonates (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (assigned as preformed_metal_catalyst)",
+    "description": "Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "172222-30-9",
@@ -2658,14 +2658,14 @@
       "metathesis",
       "ruthenium"
     ],
-    "name": "Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (assigned as preformed_metal_catalyst)",
+    "name": "Ruthenium Carbene Metathesis Catalysts (Grubbs/Hoveyda) (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "[(p‑cymene)RuCl2]2 and RuCl3 Sources (assigned as metal_precursor)",
+    "description": "[(p‑cymene)RuCl2]2 and RuCl3 Sources (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "52462-29-0",
@@ -2681,14 +2681,14 @@
       "rucl",
       "sources"
     ],
-    "name": "[(p‑cymene)RuCl2]2 and RuCl3 Sources (assigned as metal_precursor)",
+    "name": "[(p‑cymene)RuCl2]2 and RuCl3 Sources (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Rhodium(I) Precursors for Hydrogenation (assigned as preformed_metal_catalyst)",
+    "description": "Rhodium(I) Precursors for Hydrogenation (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "14694-95-2",
@@ -2705,14 +2705,14 @@
       "precursors",
       "rhodium"
     ],
-    "name": "Rhodium(I) Precursors for Hydrogenation (assigned as preformed_metal_catalyst)",
+    "name": "Rhodium(I) Precursors for Hydrogenation (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Rhodium Carbonyl Chloride Dimers (assigned as metal_precursor)",
+    "description": "Rhodium Carbonyl Chloride Dimers (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "14523-22-9"
@@ -2726,14 +2726,14 @@
       "dimers",
       "rhodium"
     ],
-    "name": "Rhodium Carbonyl Chloride Dimers (assigned as metal_precursor)",
+    "name": "Rhodium Carbonyl Chloride Dimers (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "[Ir(cod)Cl]2 and Related Dimers (assigned as metal_precursor)",
+    "description": "[Ir(cod)Cl]2 and Related Dimers (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "12112-67-3",
@@ -2750,14 +2750,14 @@
       "ir",
       "related"
     ],
-    "name": "[Ir(cod)Cl]2 and Related Dimers (assigned as metal_precursor)",
+    "name": "[Ir(cod)Cl]2 and Related Dimers (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (assigned as preformed_metal_catalyst)",
+    "description": "Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "94928-86-6",
@@ -2777,14 +2777,14 @@
       "ppy",
       "salts"
     ],
-    "name": "Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (assigned as preformed_metal_catalyst)",
+    "name": "Iridium Photoredox Catalysts (Ar2ppy)3 and dFppy/dtbbpy salts (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Iron Carbonyls (Fe(0) Sources) (assigned as metal_precursor)",
+    "description": "Iron Carbonyls (Fe(0) Sources) (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "13463-40-6",
@@ -2799,14 +2799,14 @@
       "iron",
       "sources"
     ],
-    "name": "Iron Carbonyls (Fe(0) Sources) (assigned as metal_precursor)",
+    "name": "Iron Carbonyls (Fe(0) Sources) (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Iron Halides (assigned as metal_precursor)",
+    "description": "Iron Halides (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "7705-08-0",
@@ -2819,14 +2819,14 @@
       "halides",
       "iron"
     ],
-    "name": "Iron Halides (assigned as metal_precursor)",
+    "name": "Iron Halides (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Iron Acetylacetonates (assigned as metal_precursor)",
+    "description": "Iron Acetylacetonates (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "14024-18-1",
@@ -2839,14 +2839,14 @@
       "acetylacetonates",
       "iron"
     ],
-    "name": "Iron Acetylacetonates (assigned as metal_precursor)",
+    "name": "Iron Acetylacetonates (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 80,
     "required_props": {},
-    "role_id": "metal_precursor"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Rh Hydroformylation Toolkits (assigned as preformed_metal_catalyst)",
+    "description": "Rh Hydroformylation Toolkits (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "17185-29-4",
@@ -2860,14 +2860,14 @@
       "rh",
       "toolkits"
     ],
-    "name": "Rh Hydroformylation Toolkits (assigned as preformed_metal_catalyst)",
+    "name": "Rh Hydroformylation Toolkits (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ru Pincer Hydrosilylation Precatalysts (assigned as preformed_metal_catalyst)",
+    "description": "Ru Pincer Hydrosilylation Precatalysts (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [],
     "exclude_smarts": [],
@@ -2879,14 +2879,14 @@
       "precatalysts",
       "ru"
     ],
-    "name": "Ru Pincer Hydrosilylation Precatalysts (assigned as preformed_metal_catalyst)",
+    "name": "Ru Pincer Hydrosilylation Precatalysts (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ruthenium Polypyridyl Photocatalysts (assigned as preformed_metal_catalyst)",
+    "description": "Ruthenium Polypyridyl Photocatalysts (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [
       "60804-74-2",
@@ -2900,14 +2900,14 @@
       "polypyridyl",
       "ruthenium"
     ],
-    "name": "Ruthenium Polypyridyl Photocatalysts (assigned as preformed_metal_catalyst)",
+    "name": "Ruthenium Polypyridyl Photocatalysts (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Ir C–H Borylation Toolkits (assigned as preformed_metal_catalyst)",
+    "description": "Ir C–H Borylation Toolkits (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [],
     "exclude_smarts": [],
@@ -2920,14 +2920,14 @@
       "ir",
       "toolkits"
     ],
-    "name": "Ir C–H Borylation Toolkits (assigned as preformed_metal_catalyst)",
+    "name": "Ir C–H Borylation Toolkits (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
-    "description": "Rh Hydrosilylation Toolkits (assigned as preformed_metal_catalyst)",
+    "description": "Rh Hydrosilylation Toolkits (assigned as metal_catalyst)",
     "examples_neg": [],
     "examples_pos": [],
     "exclude_smarts": [],
@@ -2938,11 +2938,11 @@
       "rh",
       "toolkits"
     ],
-    "name": "Rh Hydrosilylation Toolkits (assigned as preformed_metal_catalyst)",
+    "name": "Rh Hydrosilylation Toolkits (assigned as metal_catalyst)",
     "notes": "",
     "precedence": 85,
     "required_props": {},
-    "role_id": "preformed_metal_catalyst"
+    "role_id": "metal_catalyst"
   },
   {
     "description": "Mineral acids (H2SO4/HCl/H3PO4)",

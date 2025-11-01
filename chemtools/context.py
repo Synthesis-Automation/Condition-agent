@@ -462,7 +462,7 @@ class ReagentNamespace:
         
         Args:
             name: Reagent name, CAS number, or abbreviation
-            reagent_type: Database type ('ligand', 'base', 'solvent', 'metal_precursor', etc.)
+            reagent_type: Database type ('ligand', 'base', 'solvent', 'metal_catalyst', etc.)
             
         Returns:
             Reagent dictionary if found, None otherwise

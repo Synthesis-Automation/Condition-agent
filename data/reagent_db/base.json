@@ -317,7 +317,7 @@
         "nucleophilicity": "weak",
         "sterics": "unhindered"
       },
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -1803,7 +1803,7 @@
         "nucleophilicity": "weak",
         "sterics": "unhindered"
       },
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],

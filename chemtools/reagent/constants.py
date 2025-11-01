@@ -12,7 +12,7 @@ ROLE_FILES: Dict[str, str] = {
     "acid": "taxonomy_acid.json",
     "additive": "taxonomy_additive.json",
     "ligand": "taxonomy_ligand.json",
-    "metal_precursor": "taxonomy_catalysts_precursor.json",
+    "metal_catalyst": "taxonomy_catalysts_precursor.json",
     "base": "taxonomy_base.json",
     "condensation_agent": "taxonomy_condensation_agent.json",
     "oxidant": "taxonomy_oxidant.json",
@@ -25,7 +25,7 @@ DEFAULT_FAMILY_BY_ROLE: Dict[str, str] = {
     "acid": "mineral_acids",
     "additive": "quaternary_ammonium_ptc",
     "ligand": "trialkyl_triaryl_phosphines",
-    "metal_precursor": "pd_ii_salts",
+    "metal_catalyst": "pd_ii_salts",
     "base": "tertiary_amines_aliphatic",
     "condensation_agent": "carbodiimides",
     "oxidant": "o2_gas",
@@ -37,7 +37,7 @@ DEFAULT_FAMILY_BY_ROLE: Dict[str, str] = {
 # Priority order for role assignment (lower number = higher priority)
 ROLE_PRIORITY: Dict[str, int] = {
     "ligand": 0,
-    "metal_precursor": 1,
+    "metal_catalyst": 1,
     "base": 2,
     "acid": 3,
     "condensation_agent": 4,
@@ -53,3 +53,10 @@ DEFAULT_TAXONOMY_DIR = "compound_taxonomy"
 
 # Registry directory path relative to data folder  
 DEFAULT_REGISTRY_DIR = "reagent_db"
+
+# Legacy role aliases that should normalize to the canonical role keys
+ROLE_ALIASES: Dict[str, str] = {
+    "metal_precursor": "metal_catalyst",
+    "preformed_metal_catalyst": "metal_catalyst",
+}
+

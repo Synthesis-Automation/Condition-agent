@@ -120,7 +120,7 @@ def add_reagent_entry(
         name: Preferred reagent name. If omitted, an online resolver is used when permitted.
         synonyms: Optional list of synonyms/aliases.
         abbreviation: Explicit abbreviation override. Defaults to the reagent name.
-        role: Reagent role (ligand, base, metal_precursor, ...). When omitted, the role
+        role: Reagent role (ligand, base, metal_catalyst, ...). When omitted, the role
             heuristics attempt to infer it.
         family_id: Target family identifier. When omitted, heuristics attempt to infer it
             (optionally falling back to default families when ``allow_default_family`` is True).

@@ -170,7 +170,7 @@ def summarize_rule(data: Dict[str, Any]) -> None:
     
     # Show key reagents
     if chemicals:
-        catalyst = next((c for c in chemicals if c.get("role") in ["catalyst", "metal_precursor"]), None)
+        catalyst = next((c for c in chemicals if c.get("role") in ["catalyst", "metal_catalyst"]), None)
         if catalyst:
             cat_name = catalyst.get("name") or catalyst.get("abbreviation") or "Unknown"
             print(f"  Catalyst: {cat_name}")

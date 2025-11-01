@@ -45,6 +45,7 @@ from .constants import (
     ROLE_PRIORITY,
     DEFAULT_TAXONOMY_DIR,
     DEFAULT_REGISTRY_DIR,
+    ROLE_ALIASES,
 )
 
 from .registry_store import RegistryStore
@@ -134,6 +135,7 @@ __all__ = [
     "ROLE_PRIORITY",
     "DEFAULT_TAXONOMY_DIR",
     "DEFAULT_REGISTRY_DIR",
+    "ROLE_ALIASES",
     # Utilities
     "normalize_cas",
     "resolve_identity_from_cas",

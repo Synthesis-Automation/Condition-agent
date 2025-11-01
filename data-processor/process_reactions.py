@@ -361,10 +361,10 @@ def _classify_catalyst_or_ligand(name: str) -> Tuple[str, str]:
         "imes", "ipr", "simes", "nhc",
     ]
     ligand_like = any(k in n for k in ligand_keywords)
-    # Metal precursors (cores) include explicit metal salts/precursors
-    is_metal_precursor = bool(metal) or (any(k in n for k in ["oxide", "bromide", "iodide", "chloride", "acetate", "triflate", "acac", "sulfate"]) and ("copper" in n or "palladium" in n or "nickel" in n))
+    # Metal catalysts (cores) include explicit metal salts/precursors
+    is_metal_catalyst = bool(metal) or (any(k in n for k in ["oxide", "bromide", "iodide", "chloride", "acetate", "triflate", "acac", "sulfate"]) and ("copper" in n or "palladium" in n or "nickel" in n))
     # Heuristic: if it looks like those ligands, call it ligand; otherwise treat as core (covers organocatalysts like DMAP)
-    kind = "ligand" if (ligand_like and not is_metal_precursor) else "core"
+    kind = "ligand" if (ligand_like and not is_metal_catalyst) else "core"
     return kind, metal
 
 

@@ -69,8 +69,8 @@ def build_formatted_output(
                 "base": "base",
                 "solvent": "solvent",
                 "ligand": "ligand",
-                "metal_precursor": "metal_precursor",
-                "catalyst": "metal_precursor",
+                "metal_catalyst": "metal_catalyst",
+                "catalyst": "metal_catalyst",
             }
             reagent_type = role_to_type.get(role, role)
             
@@ -191,7 +191,7 @@ def build_formatted_output(
         def role_for(name: str) -> str:
             n = (name or "").lower()
             if any(tok in n for tok in ["pd", "palladium", "cu", "copper", "ni", "nickel", "ir", "iridium", "ru", "ruthenium"]):
-                return "metal_precursor"
+                return "metal_catalyst"
             return "ligand"
         
         for it in fs:
@@ -241,7 +241,7 @@ def build_formatted_output(
     if not cat_items and chosen_core:
         # Try to create a generic metal entry from the core string
         # e.g., "Pd" -> lookup "Pd" or "Palladium"
-        core_payload = _chemical_payload(chosen_core, "metal_precursor")
+        core_payload = _chemical_payload(chosen_core, "metal_catalyst")
         if core_payload:
             cat_items.append(core_payload)
     

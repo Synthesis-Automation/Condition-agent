@@ -84,7 +84,7 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
         r"\bbtffh\b",
         r"activated ester",
     ],
-    "metal_precursor": [
+    "metal_catalyst": [
         r"palladium",
         r"nickel",
         r"copper",
@@ -209,8 +209,8 @@ def load_families_registry_entries(root: Optional[Path] = None) -> List[Dict[str
 
 # Manual patterns for specific reagents (higher priority)
 MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
-    r"\bpeppsi\b": ("metal_precursor", "pd_peppsi_nhc"),
-    r"\bgrubbs\b": ("metal_precursor", "ru_metathesis_grubbs"),
+    r"\bpeppsi\b": ("metal_catalyst", "pd_peppsi_nhc"),
+    r"\bgrubbs\b": ("metal_catalyst", "ru_metathesis_grubbs"),
     r"\bdppf\b": ("ligand", "bidentate_diphosphines"),
     r"\bbtffh\b": ("condensation_agent", "acyl_halide_fluoride_generators"),
     r"\bt3p\b": ("condensation_agent", "organophosphorus_anhydrides"),
@@ -295,7 +295,7 @@ EMBEDDING_FIELD_MAP: Dict[str, Sequence[Tuple[str, str]]] = {
         ("avoid_when", "avoid_when"),
         ("ehs_green", "ehs"),
     ),
-    "metal_precursor": (
+    "metal_catalyst": (
         ("metal", "metal"),
         ("oxidation_states", "oxidation_states"),
         ("precursor_class", "class"),

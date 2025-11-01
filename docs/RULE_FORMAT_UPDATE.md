@@ -1,4 +1,4 @@
-﻿# Rule-Based System Updates for Standardized Rule Format
+ï»¿# Rule-Based System Updates for Standardized Rule Format
 
 ## Overview
 Updated the rule-based recommendation system and output formatter to support the new standardized rule file format while maintaining backward compatibility with legacy formats.
@@ -27,12 +27,12 @@ class MatchResult:
 - **New format support**: Extracts reagents from `reagents` array
 - **Legacy format support**: Falls back to old keys (`pd_source`, `ligand`, `base`, `solvent`)
 - **Role mapping**: Maps standardized roles to output roles
-  - `metal_source` 鈫?`metal_precursor`
-  - `ligand` 鈫?`ligand`
-  - `base` 鈫?`base`
-  - `solvent` 鈫?`solvent`
-  - `additive` 鈫?`additive`
-  - `boron_partner` 鈫?`partner`
+  - `metal_source` é«?`metal_catalyst`
+  - `ligand` é«?`ligand`
+  - `base` é«?`base`
+  - `solvent` é«?`solvent`
+  - `additive` é«?`additive`
+  - `boron_partner` é«?`partner`
 
 ### 4. **Fixed Rule Database** (`data/rule_db/Suzuki_db.json`)
 - Added missing SPhos ligand to SCDB-SUZ-ARBRI-GENERAL-SPhos entry
@@ -64,12 +64,12 @@ class MatchResult:
         {
           "name": "Pd2(dba)3",
           "role": "metal_source",
-          "amount": "0.5鈥?.5%"
+          "amount": "0.5é¥?.5%"
         },
         {
           "name": "SPhos",
           "role": "ligand",
-          "amount": "1.0鈥?.0%"
+          "amount": "1.0é¥?.0%"
         },
         {
           "name": "K2CO3",
@@ -119,7 +119,7 @@ class MatchResult:
         },
         {
           "name": "Pd2(dba)3",
-          "role": "metal_precursor",
+          "role": "metal_catalyst",
           ...
         },
         {
@@ -164,11 +164,11 @@ The system maintains full backward compatibility:
 ## Testing
 
 ### Test Results
-鉁?Rule-based matching: Working with new format
-鉁?Reagent extraction: All reagents (metal, ligand, base, solvent) extracted correctly
-鉁?Output formatting: Proper role mapping and chemical structure
-鉁?Backward compatibility: Legacy format still supported
-鉁?CLI integration: Local recommendation CLI works end-to-end
+é?Rule-based matching: Working with new format
+é?Reagent extraction: All reagents (metal, ligand, base, solvent) extracted correctly
+é?Output formatting: Proper role mapping and chemical structure
+é?Backward compatibility: Legacy format still supported
+é?CLI integration: Local recommendation CLI works end-to-end
 
 ### Test Command
 ```powershell
@@ -182,7 +182,7 @@ Top match (rank 1):
   Entry: Aryl iodides/bromides + aryl boron (SPhos set)
   Match type: scheme
   Catalyst: Pd2(dba)3
-  Temperature: [45.0, 60.0]掳C
+  Temperature: [45.0, 60.0]æ³C
 ```
 
 ## Next Steps

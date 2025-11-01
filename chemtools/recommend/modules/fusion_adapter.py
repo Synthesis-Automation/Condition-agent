@@ -228,8 +228,8 @@ def build_formatted_output_from_fusion(
                 "base": "base",
                 "solvent": "solvent",
                 "ligand": "ligand",
-                "metal_precursor": "metal_precursor",
-                "catalyst": "metal_precursor",
+                "metal_catalyst": "metal_catalyst",
+                "catalyst": "metal_catalyst",
             }
             reagent_type = role_to_type.get(role, role)
             

@@ -38,7 +38,7 @@ def _name_from_uid(uid: str) -> str:
         from .reagent import find_reagent
         
         # Try to find in different reagent databases
-        for reagent_type in ['base', 'solvent', 'ligand', 'metal_precursor', 'additive']:
+        for reagent_type in ['base', 'solvent', 'ligand', 'metal_catalyst', 'additive']:
             result = find_reagent(uid, reagent_type)
             if result:
                 # Return name or first abbreviation, or CAS

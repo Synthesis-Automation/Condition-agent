@@ -188,7 +188,7 @@ def format_ml_recommendations(data: Dict[str, Any]) -> Tuple[str, List[List[Any]
         
         # Extract catalytic system from chemicals array
         chemicals = rec.get("chemicals", [])
-        metal_precursors = [c for c in chemicals if c.get("role") == "metal_precursor"]
+        metal_catalysts = [c for c in chemicals if c.get("role") == "metal_catalyst"]
         ligands = [c for c in chemicals if c.get("role") == "ligand"]
         
         # Format core (remove /none suffix if present)
@@ -229,8 +229,8 @@ def format_ml_recommendations(data: Dict[str, Any]) -> Tuple[str, List[List[Any]
         
         # Format catalytic system components
         catalyst_parts = []
-        for metal in metal_precursors:
-            metal_str = fmt_component(metal, "metal_precursor")
+        for metal in metal_catalysts:
+            metal_str = fmt_component(metal, "metal_catalyst")
             if metal_str:
                 catalyst_parts.append(metal_str)
         for lig in ligands:
@@ -310,11 +310,11 @@ def format_rule_recommendations(result: Any, db_name: str) -> Tuple[str, List[Li
     
     # Map condition keys to reagent types for lookup
     reagent_type_map = {
-        'pd_source': 'metal_precursor',
-        'cu_source': 'metal_precursor',
-        'ni_source': 'metal_precursor',
-        'metal_source': 'metal_precursor',
-        'catalyst': 'metal_precursor',
+        'pd_source': 'metal_catalyst',
+        'cu_source': 'metal_catalyst',
+        'ni_source': 'metal_catalyst',
+        'metal_source': 'metal_catalyst',
+        'catalyst': 'metal_catalyst',
         'ligand': 'ligand',
         'ligands': 'ligand',
         'base': 'base',
@@ -1033,11 +1033,11 @@ def get_ml_recommendations(
                         }
                     })
             
-            # Add catalytic system components (metal_precursor, ligand) from chemicals array
+            # Add catalytic system components (metal_catalyst, ligand) from chemicals array
             catalyst_count = 0
             for chem in rec.get("chemicals", []):
                 role = chem.get("role")
-                if role in ["metal_precursor", "ligand"]:
+                if role in ["metal_catalyst", "ligand"]:
                     catalyst_count += 1
                     catalyst_name = chem.get("name") or chem.get("cas") or f"Catalyst_{catalyst_count}"
                     # Enrich catalyst using reagent lookup
@@ -1045,8 +1045,8 @@ def get_ml_recommendations(
                         name=catalyst_name,
                         reagent_type="catalyst",
                         role=role,  # Preserve the specific catalytic role
-                        equivalents=0.05 if role == "metal_precursor" else 0.1,
-                        equiv_range=(0.01, 0.1) if role == "metal_precursor" else (0.05, 0.15),
+                        equivalents=0.05 if role == "metal_catalyst" else 0.1,
+                        equiv_range=(0.01, 0.1) if role == "metal_catalyst" else (0.05, 0.15),
                         reagent_id=f"CAT{catalyst_count}"
                     )
                     # Override with original data if enrichment didn't find it

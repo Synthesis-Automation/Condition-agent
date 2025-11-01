@@ -1,4 +1,4 @@
-Taxonomy Centralization – Phases 0 & 1
+Taxonomy Centralization â Phases 0 & 1
 ======================================
 
 Overview
@@ -6,7 +6,7 @@ Overview
 - Objective: consolidate reaction, reactant, and reagent taxonomies into a single, canonical registry that downstream tools (router, recommenders, CLIs, data processors, LLM agents) can trust.
 - Scope: finish Phase 0 (recon) and Phase 1 (schema design) deliverables so implementation work can begin with clear requirements, ownership, and compatibility guarantees.
 
-Phase 0 – Current-State Recon
+Phase 0 â Current-State Recon
 -----------------------------
 
 ### Source Assets
@@ -14,12 +14,12 @@ Phase 0 – Current-State Recon
   - JSON keyed by reactant macro-types (`ArX*`, `RNH2`, `BoronicAcid`), each with members supplying `id`, `name`, `smarts`.
   - No explicit category hierarchy beyond implicit naming; contains aliases in free text but no canonical slug format.
 - `chemtools/reagent/data/reaction_types.json`
-  - Nested dict grouped by coarse category (`C-C_bond_formation`, `C-N_bond_formation`, …) with `reactions` list carrying fields (`id`, `name`, `aliases`, `description`, `reactants`, `typical_catalysts`, `typical_conditions`).
+  - Nested dict grouped by coarse category (`C-C_bond_formation`, `C-N_bond_formation`, â¦) with `reactions` list carrying fields (`id`, `name`, `aliases`, `description`, `reactants`, `typical_catalysts`, `typical_conditions`).
   - Reactant references are arrays of reactant tokens (e.g., `["ArX*"]`, `["ArNH2"]`); no enforcement that tokens exist in `reactant_types.json`.
 - `data/reagent_db/*.json`
   - Per-role registries (`ligand.json`, `base.json`, `solvent.json`, etc.) describing concrete reagents with `id`, `name`, `aliases`, identifiers, role metadata.
   - Roles are implicit in filenames; metadata keys vary per file (e.g., ligands carry families/denticity, bases carry sterics/basicity).
-- `chemtools/reagent/reagent_schema/families_registry.json` (legacy copy – unified registry now supplies this data)
+- `chemtools/reagent/reagent_schema/families_registry.json` (legacy copy â unified registry now supplies this data)
   - Master mapping of reagent families per role; used to validate `reagent_db`.
 - `chemtools/reagent/constants.py`
   - Hard-coded mapping between role names and taxonomy filenames (`taxonomy_ligand.json`, etc.) plus default family fallbacks and role priority order.
@@ -49,7 +49,7 @@ Phase 0 – Current-State Recon
 - Validation scripts are decentralized and cannot guarantee referential integrity (lack of shared registry, versioning, or schema enforcement).
 - Migration risk: external users and LLM prompts depend on legacy names; we need alias resolution and telemetry to avoid breaking CLI/API behavior.
 
-Phase 1 – Unified Schema Design
+Phase 1 â Unified Schema Design
 -------------------------------
 
 ### Canonical Entities
@@ -70,7 +70,7 @@ Phase 1 – Unified Schema Design
    - `smarts` patterns, `members` (optional list with `id`, `smarts`, `aliases`)
    - `category` (`aryl_halide`, `boron_partner`, etc.), optional `functional_group_tags`.
 4. **ReagentRole**
-   - `id` (`ligand`, `metal_precursor`, `base`, etc.)
+   - `id` (`ligand`, `metal_catalyst`, `base`, etc.)
    - `display_name`, `priority`, `default_family_id`
    - Relationship: ties to `ReagentFamily` definitions.
 5. **ReagentFamily**
@@ -150,4 +150,4 @@ Next Actions Snapshot
   - `chemtools/taxonomy/validate.py` provides a lightweight CLI for sanity checks.
   - `tests/test_taxonomy_registry.py` ensures both registry loading and the conversion dry-run stay green.
 
-With these Phase 0–1 outputs finalized, implementation (Phase 2 onward) can proceed with clear specifications and compatibility constraints.
+With these Phase 0â1 outputs finalized, implementation (Phase 2 onward) can proceed with clear specifications and compatibility constraints.
