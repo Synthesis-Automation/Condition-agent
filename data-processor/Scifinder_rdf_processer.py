@@ -1,4 +1,4 @@
-#utf-8
+﻿#utf-8
 #!/usr/bin/env python3
 """
 Simple Qt6 GUI wrapper for processing RDF files only.
@@ -17,6 +17,13 @@ import urllib.error
 import urllib.parse
 from typing import List, Optional, Dict, Any, Set, Tuple
 from collections import defaultdict
+from pathlib import Path
+
+# Add parent directory to path so we can import chemtools
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from PyQt6 import QtWidgets, QtCore
 QtBinding = 'PyQt6'

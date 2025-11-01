@@ -39,13 +39,13 @@ if str(parent_dir) not in sys.path:
     sys.path.insert(0, str(parent_dir))
 
 from langchain_core.messages import BaseMessage
-from lang_chain.chemtools_agent import ChemToolsAgent
-from lang_chain.chemtools_wrapper import (
+from chem_assistant.chemtools_agent import ChemToolsAgent
+from chem_assistant.chemtools_wrapper import (
     get_tool_descriptions,
     clear_recommendation_cache,
     recommendation_cache_stats,
 )
-from lang_chain.constraint_parser import (
+from chem_assistant.constraint_parser import (
     ConstraintSpec,
     build_constraint_spec,
     format_constraints_for_prompt,
