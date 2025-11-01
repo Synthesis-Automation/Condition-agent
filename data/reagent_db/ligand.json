@@ -3529,6 +3529,39 @@
     "embedding_text": "role: ligand | family_label: Dialkylbiaryl phosphines (biaryl monophosphines) | family_id: dialkylbiaryl_phosphines | normalized_family: biaryl_phosphine | donors: P | denticity: 1 | abbr: PhDavePhos | CAS: 240417-00-9 | family_def: Dialkylbiaryl phosphines (biaryl monophosphines)"
   },
   {
+    "id": "SIOXPEMLGUPBBT-UHFFFAOYSA-N",
+    "name": "Picolinic acid",
+    "abbreviation": [
+      "98-98-6",
+      "Picolinic acid"
+    ],
+    "aliases": [
+      "Pyridine-2-carboxylic acid",
+      "2-Pyridinecarboxylic acid",
+      "2-Carboxypyridine",
+      "o-Pyridinecarboxylic acid",
+      "Acide picolique",
+      "alpha-Pyridinecarboxylic acid",
+      "2-pyridine carboxylic acid",
+      "2-Picolinic acid"
+    ],
+    "cas": "98-98-6",
+    "inchi_key": "SIOXPEMLGUPBBT-UHFFFAOYSA-N",
+    "smiles": null,
+    "roles": {
+      "ligand": {
+        "families": [
+          "trialkyl_triaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1
+      }
+    },
+    "embedding_text": "type: LIGAND | family: Trialkyl/Triaryl phosphines (monodentate) (trialkyl_triaryl_phosphines) | donor atoms: P | denticity: 1 | name: Picolinic acid | abbr: 98-98-6; Picolinic acid | CAS: 98-98-6 | synonyms: Picolinic acid; 98-98-6; Pyridine-2-carboxylic acid; 2-Pyridinecarboxylic acid; 2-Carboxypyridine; o-Pyridinecarboxylic acid; Acide picolique; alpha-Pyridinecarboxylic acid; 2-pyridine carboxylic acid; QZV2W997JQ; DTXSID7031903; CHEBI:28747; DTXCID5011903; RefChem:863115; 202-719-7; 2-Picolinic acid"
+  },
+  {
     "id": "AWTLXLDETPWZRB-UHFFFAOYSA-N",
     "name": "PMPBO",
     "abbreviation": [

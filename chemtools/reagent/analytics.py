@@ -75,6 +75,11 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
     
     for reagent_type in types:
         db = load_reagent_database(reagent_type)
+        
+        # Skip if db is not a list (e.g., taxonomy files which are role definitions)
+        if not isinstance(db, list):
+            continue
+        
         count = len(db)
         stats["by_type"][reagent_type] = count
         stats["total_reagents"] += count
