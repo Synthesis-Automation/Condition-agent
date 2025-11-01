@@ -90,8 +90,8 @@ def generate_summary():
         print()
         
         # Top catalytic systems (complete catalyst + ligand combinations)
-        print("[TOP 10 CATALYTIC SYSTEMS]")
-        systems = get_common_catalytic_systems(family, top_n=10)
+        print("[TOP 20 CATALYTIC SYSTEMS]")
+        systems = get_common_catalytic_systems(family, top_n=20)
         if systems:
             for system, count, avg_yield in systems:
                 yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
@@ -101,8 +101,8 @@ def generate_summary():
         print()
         
         # Top catalysts
-        print("[TOP 10 CATALYSTS]")
-        catalysts = get_common_catalysts(family, top_n=10)
+        print("[TOP 20 CATALYSTS]")
+        catalysts = get_common_catalysts(family, top_n=20)
         if catalysts:
             for name, count, avg_yield in catalysts:
                 yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
@@ -112,8 +112,8 @@ def generate_summary():
         print()
         
         # Top ligands
-        print("[TOP 10 LIGANDS]")
-        ligands = get_common_ligands(family, top_n=10)
+        print("[TOP 20 LIGANDS]")
+        ligands = get_common_ligands(family, top_n=20)
         if ligands:
             for name, count, avg_yield in ligands:
                 yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
@@ -123,8 +123,8 @@ def generate_summary():
         print()
         
         # Top bases
-        print("[TOP 10 BASES]")
-        bases = get_common_bases(family, top_n=10)
+        print("[TOP 20 BASES]")
+        bases = get_common_bases(family, top_n=20)
         if bases:
             for name, count, avg_yield in bases:
                 yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
@@ -134,8 +134,8 @@ def generate_summary():
         print()
         
         # Top solvents
-        print("[TOP 10 SOLVENTS]")
-        solvents = get_common_solvents(family, top_n=10)
+        print("[TOP 20 SOLVENTS]")
+        solvents = get_common_solvents(family, top_n=20)
         if solvents:
             for name, count, avg_yield in solvents:
                 yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
@@ -146,8 +146,8 @@ def generate_summary():
         
         # Top condensation agents (for amide formation)
         if family == "Amide_formation":
-            print("[TOP 10 CONDENSATION AGENTS]")
-            condensation_agents = get_common_reagents(family, role='CONDENSATION_AGENT', top_n=10)
+            print("[TOP 20 CONDENSATION AGENTS]")
+            condensation_agents = get_common_reagents(family, role='CONDENSATION_AGENT', top_n=20)
             if condensation_agents:
                 for name, role, count, avg_yield in condensation_agents:
                     yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
@@ -157,8 +157,8 @@ def generate_summary():
             print()
         
         # Top condition cores
-        print("[TOP 10 CONDITION CORES]")
-        cores = get_condition_cores(family, top_n=10)
+        print("[TOP 20 CONDITION CORES]")
+        cores = get_condition_cores(family, top_n=20)
         if cores:
             for core, count, avg_yield in cores:
                 yield_str = f"{avg_yield:.1f}%" if avg_yield else "N/A"
