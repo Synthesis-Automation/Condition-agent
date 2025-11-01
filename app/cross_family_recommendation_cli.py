@@ -24,6 +24,169 @@ def print_separator(char="=", length=80):
     print(char * length)
 
 
+def run_recommendation(
+    reaction_smiles: str,
+    *,
+    k: int,
+    max_precedents: int,
+    use_drfp: bool,
+    debug: bool,
+) -> bool:
+    """Execute a single recommendation request."""
+    relax = {}
+    if not use_drfp:
+        relax["use_drfp"] = False
+
+    if debug:
+        print_separator("-")
+        print("Debug: Calling chem.recommend.conditions()")
+        print(f"  reaction: {reaction_smiles}")
+        print(f"  k: {k}")
+        print(f"  search_all_families: True")
+        print(f"  relax: {relax if relax else None}")
+        print_separator("-")
+
+    result = chem.recommend.conditions(
+        reaction=reaction_smiles,
+        k=k,
+        search_all_families=True,
+        relax=relax if relax else None,
+    )
+
+    if debug:
+        print(f"Debug: Result keys: {list(result.keys())}")
+        print_separator("-")
+
+    print_recommendation(result, reaction_smiles, max_precedents)
+    recommendations = result.get("recommendations", [])
+    return bool(recommendations)
+
+
+def interactive_session(
+    *,
+    k: int,
+    max_precedents: int,
+    use_drfp: bool,
+    debug: bool,
+) -> None:
+    """Interactive REPL for entering reactions and tweaking options."""
+    print_separator()
+    print("Cross-family Recommendation Interactive Mode")
+    print("Type a reaction SMILES (reactants>>product) to get recommendations.")
+    print("Commands:")
+    print("  /k <int>              -> set number of precedents to search (current: %d)" % k)
+    print(
+        "  /precedents <int>     -> set precedents to show per recommendation (current: %d)"
+        % max_precedents
+    )
+    print("  /drfp on|off          -> enable or disable DRFP similarity (currently: %s)" %
+          ("on" if use_drfp else "off"))
+    print("  /debug on|off         -> toggle debug logging (currently: %s)" %
+          ("on" if debug else "off"))
+    print("  /show                 -> display current settings")
+    print("  /help                 -> show this message again")
+    print("  /exit or /quit        -> leave interactive mode")
+    print_separator()
+
+    current_k = k
+    current_max_precedents = max_precedents
+    current_use_drfp = use_drfp
+    current_debug = debug
+
+    while True:
+        try:
+            raw = input("reaction> ").strip()
+        except KeyboardInterrupt:
+            print("\nExiting.")
+            break
+        except EOFError:
+            print("\n")
+            break
+
+        if not raw:
+            continue
+
+        lowered = raw.lower()
+        if lowered in {"/exit", "/quit"}:
+            break
+        if lowered == "/help":
+            print_separator()
+            print("Commands:")
+            print("  /k <int>")
+            print("  /precedents <int>")
+            print("  /drfp on|off")
+            print("  /debug on|off")
+            print("  /show")
+            print("  /help")
+            print("  /exit or /quit")
+            print_separator()
+            continue
+        if lowered == "/show":
+            print_separator("-")
+            print(f"k: {current_k}")
+            print(f"max_precedents: {current_max_precedents}")
+            print(f"use_drfp: {current_use_drfp}")
+            print(f"debug: {current_debug}")
+            print_separator("-")
+            continue
+        if lowered.startswith("/k "):
+            value = raw.split(maxsplit=1)[1]
+            if value.isdigit():
+                current_k = max(1, int(value))
+                print(f"Updated k to {current_k}")
+            else:
+                print("Invalid value for /k. Example: /k 50")
+            continue
+        if lowered.startswith("/precedents "):
+            value = raw.split(maxsplit=1)[1]
+            if value.isdigit():
+                current_max_precedents = max(1, int(value))
+                print(f"Updated max precedents to {current_max_precedents}")
+            else:
+                print("Invalid value for /precedents. Example: /precedents 3")
+            continue
+        if lowered.startswith("/drfp "):
+            value = raw.split(maxsplit=1)[1]
+            if value in {"on", "off"}:
+                current_use_drfp = value == "on"
+                print(f"DRFP similarity {'enabled' if current_use_drfp else 'disabled'}.")
+            else:
+                print("Invalid value for /drfp. Use /drfp on or /drfp off.")
+            continue
+        if lowered.startswith("/debug "):
+            value = raw.split(maxsplit=1)[1]
+            if value in {"on", "off"}:
+                current_debug = value == "on"
+                print(f"Debug logging {'enabled' if current_debug else 'disabled'}.")
+            else:
+                print("Invalid value for /debug. Use /debug on or /debug off.")
+            continue
+        if raw.startswith("/"):
+            print("Unknown command. Type /help for options.")
+            continue
+
+        if ">>" not in raw:
+            print("Invalid reaction format. Expected reactants>>product.")
+            continue
+
+        try:
+            success = run_recommendation(
+                raw,
+                k=current_k,
+                max_precedents=current_max_precedents,
+                use_drfp=current_use_drfp,
+                debug=current_debug,
+            )
+            if not success:
+                print("No recommendations returned.")
+        except Exception as exc:
+            print(f"Error: {exc}")
+            if current_debug:
+                import traceback
+
+                traceback.print_exc()
+        print_separator()
+
 def extract_chemical_by_role(chemicals: list, role: str) -> str:
     """Extract chemical by role from chemicals list."""
     for chem in chemicals:
@@ -118,6 +281,205 @@ def extract_chemicals_by_roles(chemicals: list, roles: list) -> dict:
                     result[role] = name
                 break
     return result
+
+
+ROLE_GROUPS = [
+    ("Catalyst(s)", {"metal_catalyst", "catalyst"}),
+    ("Ligand(s)", {"ligand"}),
+    ("Base(s)", {"base"}),
+    ("Acid(s)", {"acid"}),
+    ("Oxidant(s)", {"oxidant"}),
+    ("Reductant(s)", {"reductant"}),
+    ("Solvent(s)", {"solvent"}),
+    (
+        "Additive(s)",
+        {"additive", "activating_agent", "coupling_agent", "reagent", "buffer", "promoter"},
+    ),
+]
+
+
+DETAIL_LABELS = [
+    ("mol_percent", "mol%"),
+    ("mol%", "mol%"),
+    ("mol_percent_range", "mol% range"),
+    ("wt_percent", "wt%"),
+    ("weight_percent", "wt%"),
+    ("volume_percent", "vol%"),
+    ("v_v_percent", "vol%"),
+    ("mass_percent", "mass%"),
+]
+
+
+def _format_number(value):
+    """Format numeric values with sensible precision."""
+    try:
+        if isinstance(value, int):
+            return str(value)
+        if isinstance(value, float):
+            if value.is_integer():
+                return str(int(value))
+            return f"{value:.3g}"
+    except Exception:
+        pass
+    return str(value)
+
+
+def _format_loading(loading):
+    """Format catalyst loading dictionaries or values."""
+    if not loading:
+        return None
+    if isinstance(loading, dict):
+        range_val = loading.get("range")
+        if isinstance(range_val, (list, tuple)) and len(range_val) == 2:
+            low, high = range_val
+            text = f"{_format_number(low)}-{_format_number(high)}"
+        else:
+            value = loading.get("value")
+            if value is not None:
+                text = _format_number(value)
+            else:
+                text = None
+        unit = loading.get("unit") or loading.get("units")
+        if text and unit:
+            return f"{text} {unit}"
+        return text
+    if isinstance(loading, (int, float, str)):
+        return str(loading)
+    return None
+
+
+def _extract_detail_value(chemical, extras, key):
+    """Fetch detail value from chemical or extras block."""
+    if isinstance(chemical, dict) and key in chemical and chemical[key] is not None:
+        return chemical[key]
+    if extras and key in extras and extras[key] is not None:
+        return extras[key]
+    return None
+
+
+def _format_condition_value(value):
+    """Format condition dictionaries/numbers into readable strings."""
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        range_val = value.get("range")
+        if isinstance(range_val, (list, tuple)) and len(range_val) == 2:
+            low, high = range_val
+            text = f"{_format_number(low)}-{_format_number(high)}"
+        elif "value" in value:
+            text = _format_number(value["value"])
+        else:
+            text = value.get("text") or value.get("note") or None
+        unit = value.get("unit") or value.get("units")
+        if text and unit:
+            return f"{text} {unit}"
+        return text or unit
+    if isinstance(value, (int, float)):
+        return _format_number(value)
+    if isinstance(value, (list, tuple)):
+        return ", ".join(_format_number(v) for v in value)
+    if isinstance(value, str):
+        return value
+    return str(value)
+
+
+def build_full_condition_lines(chemicals, conditions) -> list:
+    """Build human-readable full condition lines for a recommendation."""
+    groups = {label: [] for label, _ in ROLE_GROUPS}
+    other_entries = []
+
+    if not isinstance(chemicals, list):
+        chemicals = []
+
+    for chemical in chemicals:
+        if not isinstance(chemical, dict):
+            continue
+        role = (chemical.get("role") or "").lower()
+        name = (
+            chemical.get("name")
+            or chemical.get("abbreviation")
+            or chemical.get("smiles")
+            or chemical.get("cas")
+        )
+        if not name or name.startswith("[Unknown"):
+            continue
+
+        details = []
+
+        equivalents = chemical.get("equivalents")
+        if equivalents not in (None, "", "N/A"):
+            details.append(f"{_format_number(equivalents)} eq")
+
+        loading_detail = _format_loading(chemical.get("loading"))
+        if loading_detail:
+            details.append(f"loading {loading_detail}")
+
+        extras = chemical.get("extras") or {}
+        for key, label in DETAIL_LABELS:
+            value = _extract_detail_value(chemical, extras, key)
+            if value is not None:
+                if isinstance(value, (list, tuple)) and len(value) == 2:
+                    formatted = f"{_format_number(value[0])}-{_format_number(value[1])}"
+                elif isinstance(value, (int, float)):
+                    formatted = _format_number(value)
+                else:
+                    formatted = str(value)
+                details.append(f"{formatted} {label}")
+
+        entry = name
+        if details:
+            entry += f" ({', '.join(details)})"
+
+        matched_group = False
+        for label, roles in ROLE_GROUPS:
+            if role in roles:
+                groups[label].append(entry)
+                matched_group = True
+                break
+        if not matched_group:
+            descriptor = role.replace("_", " ") if role else "reagent"
+            other_entries.append(f"{descriptor.title()}: {entry}")
+
+    lines = []
+    for label, _ in ROLE_GROUPS:
+        entries = groups[label]
+        if entries:
+            lines.append(f"{label}: " + "; ".join(entries))
+
+    if other_entries:
+        lines.append("Other reagents: " + "; ".join(other_entries))
+
+    condition_data = conditions if isinstance(conditions, dict) else {}
+    temp_text = _format_condition_value(
+        condition_data.get("temperature") or condition_data.get("temperature_c")
+    )
+    if temp_text:
+        lines.append(f"Temperature: {temp_text}")
+
+    time_text = _format_condition_value(
+        condition_data.get("time") or condition_data.get("time_h") or condition_data.get("time_hr")
+    )
+    if time_text:
+        lines.append(f"Time: {time_text}")
+
+    atmosphere = condition_data.get("atmosphere") or condition_data.get("environment")
+    if atmosphere:
+        lines.append(f"Atmosphere: {atmosphere}")
+
+    extras = condition_data.get("extras") if isinstance(condition_data.get("extras"), dict) else {}
+    for key, value in extras.items():
+        formatted = _format_condition_value(value)
+        label = key.replace("_", " ").title()
+        if formatted:
+            lines.append(f"{label}: {formatted}")
+        else:
+            lines.append(f"{label}: {value}")
+
+    note = condition_data.get("note")
+    if note:
+        lines.append(f"Note: {note}")
+
+    return lines
 
 
 def find_matching_precedents(rec: dict, all_precedents: list, max_count: int = 5) -> list:
@@ -241,7 +603,8 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
         # Extract from summary if available (preferred)
         summary = rec.get("summary", {})
         chemicals = rec.get("chemicals", [])
-        conditions = rec.get("conditions", {})
+        raw_conditions = rec.get("conditions") or {}
+        conditions = raw_conditions if isinstance(raw_conditions, dict) else {"note": raw_conditions}
         
         # Get FULL precedents for this recommendation (not just summary.precedents)
         matched_precedents = find_matching_precedents(rec, all_precedents, max_count=10)
@@ -311,14 +674,18 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 print(f"    - {role.replace('_', ' ').title()}: {name}")
         
         # Temperature
-        temp = conditions.get("temperature")
-        if temp:
-            print(f"  Temperature: {temp}")
-        
+        temp_text = _format_condition_value(
+            conditions.get("temperature") or conditions.get("temperature_c")
+        )
+        if temp_text:
+            print(f"  Temperature: {temp_text}")
+    
         # Time
-        time = conditions.get("time")
-        if time:
-            print(f"  Time: {time}")
+        time_text = _format_condition_value(
+            conditions.get("time") or conditions.get("time_h") or conditions.get("time_hr")
+        )
+        if time_text:
+            print(f"  Time: {time_text}")
         
         # Confidence/support from summary
         if summary:
@@ -331,6 +698,12 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 count = support.get("count", 0)
                 if count > 0:
                     print(f"  Precedent Support: {count} similar reaction(s)")
+
+        full_condition_lines = build_full_condition_lines(chemicals, conditions)
+        if full_condition_lines:
+            print("  Full Conditions:")
+            for line in full_condition_lines:
+                print(f"    - {line}")
         
         # Precedent information - use helper to find matching precedents
         precedents = find_matching_precedents(rec, all_precedents, max_precedents)
@@ -535,11 +908,7 @@ Examples:
         """
     )
     
-    parser.add_argument(
-        "reaction",
-        nargs="?",
-        help="Reaction SMILES (reactants>>product)"
-    )
+    parser.add_argument("reaction", nargs="?", help="Reaction SMILES (reactants>>product)")
     parser.add_argument(
         "--rxn",
         dest="reaction_flag",
@@ -570,62 +939,38 @@ Examples:
     
     args = parser.parse_args()
     
-    # Get reaction SMILES from either positional or flag argument
+    use_drfp = not args.no_drfp
     reaction_smiles = args.reaction or args.reaction_flag
-    
+
     if not reaction_smiles:
-        parser.print_help()
-        print("\nError: No reaction SMILES provided")
-        print("Use: python app/cross_family_recommendation_cli.py \"reaction>>product\"")
-        sys.exit(1)
-    
-    # Validate reaction SMILES format
+        interactive_session(
+            k=args.k,
+            max_precedents=args.max_precedents,
+            use_drfp=use_drfp,
+            debug=args.debug,
+        )
+        return
+
     if ">>" not in reaction_smiles:
-        print(f"Error: Invalid reaction SMILES format")
-        print(f"Expected format: reactants>>product")
+        print("Error: Invalid reaction SMILES format")
+        print("Expected format: reactants>>product")
         print(f"Got: {reaction_smiles}")
         sys.exit(1)
-    
+
     try:
-        # Build relax options
-        relax = {}
-        if args.no_drfp:
-            relax["use_drfp"] = False
-        
-        if args.debug:
-            print(f"Debug: Calling chem.recommend.conditions()")
-            print(f"  reaction: {reaction_smiles}")
-            print(f"  k: {args.k}")
-            print(f"  search_all_families: True")
-            print(f"  relax: {relax}")
-            print()
-        
-        # Get cross-family recommendation
-        result = chem.recommend.conditions(
-            reaction=reaction_smiles,
+        success = run_recommendation(
+            reaction_smiles,
             k=args.k,
-            search_all_families=True,
-            relax=relax if relax else None
+            max_precedents=args.max_precedents,
+            use_drfp=use_drfp,
+            debug=args.debug,
         )
-        
-        if args.debug:
-            print(f"Debug: Result keys: {list(result.keys())}")
-            print()
-        
-        # Print results
-        print_recommendation(result, reaction_smiles, args.max_precedents)
-        
-        # Exit with appropriate code
-        recommendations = result.get("recommendations", [])
-        if recommendations:
-            sys.exit(0)
-        else:
-            sys.exit(1)
-    
-    except Exception as e:
-        print(f"\nError: {str(e)}")
+        sys.exit(0 if success else 1)
+    except Exception as exc:
+        print(f"\nError: {exc}")
         if args.debug:
             import traceback
+
             print("\nDebug: Full traceback:")
             traceback.print_exc()
         sys.exit(1)

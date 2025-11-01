@@ -49,6 +49,7 @@ except Exception:
 # ---------------------------- Taxonomy integration ----------------------------
 
 import json as _json
+from chemtools.reagent.constants import ROLE_ALIASES
 
 PUBCHEM_PUG_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 PUBCHEM_VIEW_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound"
@@ -107,6 +108,11 @@ REGISTRY_CATEGORY_HINT: Dict[str, str] = {
 CATALYST_ROLES: Set[str] = {
     "metal_catalyst",
 }
+
+def canonical_role(role: str) -> str:
+    """Normalize role labels to canonical registry roles."""
+    key = (role or "").lower()
+    return ROLE_ALIASES.get(key, key)
 
 class _TaxonomyIndex:
     """Load the reagent registry and expose lookup utilities compatible with the
@@ -297,9 +303,9 @@ class _TaxonomyIndex:
                     if not role_key:
                         continue
                     role_payload = role_payload_raw if isinstance(role_payload_raw, dict) else {}
-                    role_lookup = role_key.lower()
-                    role_code = REGISTRY_ROLE_CODE_MAP.get(role_lookup, role_key.upper())
-                    category_hint = REGISTRY_CATEGORY_HINT.get(role_lookup, role_lookup)
+                    canonical = canonical_role(role_key)
+                    role_code = REGISTRY_ROLE_CODE_MAP.get(canonical, canonical.upper())
+                    category_hint = REGISTRY_CATEGORY_HINT.get(canonical, canonical)
                     families = role_payload.get("families") or []
                     family_id = families[0] if families else None
                     metal_val = role_payload.get("metal")
@@ -309,7 +315,7 @@ class _TaxonomyIndex:
                         metal = ""
                     else:
                         metal = str(metal_val).strip()
-                    generic_core = metal if role_lookup in CATALYST_ROLES else ""
+                    generic_core = metal if canonical in CATALYST_ROLES else ""
                     self._index_member(
                         cas=cas,
                         name=name,
@@ -581,17 +587,29 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
         if not token:
             return ""
         cleaned = str(token)
-        for src, dest in (("â€?, "-"), ("â€?, "-"), ("â€?, "-"), ("âˆ?, "-"), ("Â·", "")):
+        replacements = [
+            ("\u2013", "-"),  # en dash
+            ("\u2014", "-"),  # em dash
+            ("\u2212", "-"),  # minus sign
+            ("\u2215", "-"),  # division slash
+            ("\u00B7", ""),   # middle dot
+            ("\u00A0", " "),  # non-breaking space
+        ]
+        for src, dest in replacements:
             cleaned = cleaned.replace(src, dest)
         cleaned = cleaned.replace(" ", "")
-        return cleaned.strip('-')
+        return cleaned.strip("-")
 
     @classmethod
     def _cleanup_preformed_segment(cls, segment: str) -> str:
         if not segment:
             return ""
-        segment = segment.replace("â€?, "-").replace("â€?, "-").replace("â€?, "-")
-        segment = segment.replace("Â·", " ")
+        segment = (
+            segment.replace("\u2013", "-")
+            .replace("\u2014", "-")
+            .replace("\u2212", "-")
+        )
+        segment = segment.replace("\u00B7", " ")
         segment = segment.strip()
         for ch in "[]{}":
             segment = segment.replace(ch, " ")
@@ -620,12 +638,16 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
     def _parse_ligand_from_text(cls, text: str) -> str:
         if not text:
             return ""
-        normalized = text.replace("â€?, "-").replace("â€?, "-").replace("â€?, "-")
+        normalized = (
+            text.replace("\u2013", "-")
+            .replace("\u2014", "-")
+            .replace("\u2212", "-")
+        )
         for content in re.findall(r'\(([^()]+)\)', normalized):
             candidate = cls._cleanup_preformed_segment(content)
             if cls._is_ligand_candidate(candidate):
                 return candidate
-        plus_normalized = normalized.replace('Â·', '+').replace('/', '+')
+        plus_normalized = normalized.replace('\u00B7', '+').replace('\u00A0', '+').replace('/', '+')
         segments = [seg.strip() for seg in plus_normalized.split('+') if seg.strip()]
         if len(segments) > 1:
             for seg in segments[1:]:
@@ -1110,7 +1132,7 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         }
                         
                         # DO NOT add DRFP to JSONL - it will be saved to binary .npz file
-                        # This saves ~90% space (e.g., 670 MB â†?70 MB + 12 MB .npz)
+                        # This saves ~90% space (e.g., 670 MB ->70 MB + 12 MB .npz)
                         
                         # Collect DRFP for later binary storage
                         if drfp_fp is not None:
@@ -1232,10 +1254,10 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     )
                     
                     npz_size_mb = os.path.getsize(npz_path) / (1024 * 1024)
-                    print(f"\nâœ?Saved {len(drfp_reaction_ids)} DRFP fingerprints to {npz_path}")
+                    print(f"\n*Saved {len(drfp_reaction_ids)} DRFP fingerprints to {npz_path}")
                     print(f"  Binary file size: {npz_size_mb:.2f} MB ({npz_size_mb/len(drfp_reaction_ids)*1000:.1f} KB per reaction)")
                 except Exception as e:
-                    print(f"\nâš ï¸  Warning: Failed to save DRFP binary file: {e}")
+                    print(f"\nWARNING: Failed to save DRFP binary file: {e}")
             
             # Print preprocessing statistics
             if chemtools_available:
@@ -1261,11 +1283,11 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     for snar_type, count in snar_counts.items():
                         print(f"  {snar_type}: {count}")
                 print(f"{'='*60}")
-                print(f"âœ?Dataset saved with precomputed normalization and features!")
-                print(f"âœ?DRFP fingerprints saved to separate binary .npz file (saves ~90% space)")
-                print(f"âœ?Family names from SciFinder metadata (no SMARTS detection)")
-                print(f"âœ?Unmapped types can be added to scifinder_map for next import")
-                print(f"âœ?SMARTS detection will run on-demand for user queries only")
+                print(f"*Dataset saved with precomputed normalization and features!")
+                print(f"*DRFP fingerprints saved to separate binary .npz file (saves ~90% space)")
+                print(f"*Family names from SciFinder metadata (no SMARTS detection)")
+                print(f"*Unmapped types can be added to scifinder_map for next import")
+                print(f"*SMARTS detection will run on-demand for user queries only")
             
         except Exception as e:
             print(f"Error writing JSONL: {e}")
@@ -2286,11 +2308,13 @@ class RDFWorker(QtCore.QObject):
             
             if self.finished:
                 self.finished.emit(
-                    True, 
-                    f"Successfully processed {len(self.rdf_files)} RDF files with {len(rows)} reactions.\n\n"
-                    f"ðŸ“ Markdown (records): {self.output_md_path}\n"
-                    f"ðŸ“Š JSONL (chemtools): {self.output_jsonl_path}\n"
-                    f"ðŸ”¬ DRFP binary: {self.output_jsonl_path.rsplit('.', 1)[0] + '_drfp.npz'}"
+                    True,
+                    (
+                        f"Successfully processed {len(self.rdf_files)} RDF files with {len(rows)} reactions.\n\n"
+                        f"Markdown (records): {self.output_md_path}\n"
+                        f"JSONL (chemtools): {self.output_jsonl_path}\n"
+                        f"DRFP binary: {self.output_jsonl_path.rsplit('.', 1)[0] + '_drfp.npz'}"
+                    ),
                 )
                 
         except Exception as e:
@@ -2374,8 +2398,8 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         # Add note about file locations
         note_label = QtWidgets.QLabel(
             "Note: All RDF files in folder and subfolders will be combined\n"
-            "      JSONL â†?data/reaction_dataset/{category}.jsonl\n"
-            "      Markdown â†?selected folder/{category}.md"
+            "      JSONL ->data/reaction_dataset/{category}.jsonl\n"
+            "      Markdown ->selected folder/{category}.md"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
         form.addRow("", note_label)
@@ -2617,4 +2641,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
 

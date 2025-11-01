@@ -62,6 +62,10 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
         # Check all mapped atoms
         all_map_nums = set(reactant_map_to_atom.keys()) | set(product_map_to_atom.keys())
         
+        # Also track leaving groups and joining groups (unmapped atoms)
+        leaving_groups = []  # Bonds to unmapped atoms in reactants
+        joining_groups = []  # Bonds to unmapped atoms in products
+        
         for map_num in all_map_nums:
             if map_num not in reactant_map_to_atom:
                 # Atom only in product (formed)
@@ -74,13 +78,20 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
                 r_atom, r_mol = reactant_map_to_atom[map_num]
                 p_atom, p_mol = product_map_to_atom[map_num]
                 
-                # Get neighbors by map number
+                # Get neighbors by map number (mapped atoms only)
                 r_neighbors = set()
                 for bond in r_atom.GetBonds():
                     other = bond.GetOtherAtom(r_atom)
                     other_map = other.GetAtomMapNum()
                     if other_map > 0:
                         r_neighbors.add((other_map, bond.GetBondType()))
+                    else:
+                        # Unmapped neighbor = leaving group
+                        leaving_groups.append((
+                            map_num,
+                            other.GetSymbol(),
+                            str(bond.GetBondType())
+                        ))
                 
                 p_neighbors = set()
                 for bond in p_atom.GetBonds():
@@ -88,6 +99,13 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
                     other_map = other.GetAtomMapNum()
                     if other_map > 0:
                         p_neighbors.add((other_map, bond.GetBondType()))
+                    else:
+                        # Unmapped neighbor = joining group
+                        joining_groups.append((
+                            map_num,
+                            other.GetSymbol(),
+                            str(bond.GetBondType())
+                        ))
                 
                 # If neighbors changed, this atom is in reaction center
                 if r_neighbors != p_neighbors:
@@ -105,6 +123,18 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
                     for neighbor_map in p_neighbor_maps - r_neighbor_maps:
                         formed_bonds.append((map_num, neighbor_map))
         
+        # Add leaving/joining groups to broken/formed bonds
+        # Format: (mapped_atom, "X" where X is element symbol)
+        for leaving in leaving_groups:
+            map_num, element, bond_type = leaving
+            broken_bonds.append((map_num, f"{element} (leaving group)"))
+            changed_atoms.add(map_num)
+        
+        for joining in joining_groups:
+            map_num, element, bond_type = joining
+            formed_bonds.append((map_num, f"{element} (joining group)"))
+            changed_atoms.add(map_num)
+        
         spectator_atoms = all_map_nums - changed_atoms
         
         return {
@@ -112,6 +142,8 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
             'broken_bonds': broken_bonds,
             'formed_bonds': formed_bonds,
             'spectator_atoms': spectator_atoms,
+            'leaving_groups': leaving_groups,  # [(map_num, element, bond_type), ...]
+            'joining_groups': joining_groups,  # [(map_num, element, bond_type), ...]
             'success': True
         }
         
@@ -159,28 +191,53 @@ def generate_smarts_from_mapped_reaction(mapped_smiles: str) -> Dict[str, Any]:
 def compare_unmapped_reaction_to_find_changes(reaction_smiles: str) -> Dict[str, Any]:
     """Identify likely reaction center by comparing reactants to products.
     
-    This is a fallback when atom mapping is not available.
-    Uses Maximum Common Substructure (MCS) to identify unchanged parts.
+    This function now uses RXNMapper for automatic atom mapping if available.
+    Falls back to a helpful error message if RXNMapper is not installed.
     
     Args:
         reaction_smiles: Unmapped reaction SMILES
         
     Returns:
-        Dictionary with identified changes
+        Dictionary with identified changes (same format as identify_changed_atoms_from_mapped_smiles)
     """
     if not HAS_RDKIT:
-        return {'error': 'RDKit not available'}
+        return {'error': 'RDKit not available', 'success': False}
     
     try:
-        reactants_smiles, products_smiles = reaction_smiles.split('>>')
+        # Try to use RXNMapper for automatic atom mapping
+        try:
+            from .._atom_mapping import add_atom_mapping
+            
+            mapping_result = add_atom_mapping(reaction_smiles)
+            
+            if mapping_result['success']:
+                # Successfully mapped, now analyze
+                mapped_smiles = mapping_result['mapped_smiles']
+                analysis = identify_changed_atoms_from_mapped_smiles(mapped_smiles)
+                
+                # Add mapping metadata
+                if analysis.get('success'):
+                    analysis['auto_mapped'] = True
+                    analysis['mapping_confidence'] = mapping_result.get('confidence')
+                    analysis['original_smiles'] = reaction_smiles
+                    analysis['mapped_smiles'] = mapped_smiles
+                
+                return analysis
+            else:
+                # Mapping failed
+                return {
+                    'success': False,
+                    'message': f'Automatic atom mapping failed: {mapping_result.get("error")}',
+                    'recommendation': 'Install RXNMapper: pip install rxnmapper'
+                }
         
-        # This is complex and requires MCS algorithms
-        # For now, return a note that this needs atom mapping
-        return {
-            'success': False,
-            'message': 'Automatic reaction center detection without atom mapping is unreliable. Please provide atom-mapped SMILES.',
-            'recommendation': 'Add "reaction_smiles_mapped" field to protocol JSON'
-        }
+        except ImportError:
+            # RXNMapper module not available
+            return {
+                'success': False,
+                'message': 'Automatic reaction center detection without atom mapping requires RXNMapper.',
+                'recommendation': 'Install RXNMapper: pip install rxnmapper'
+            }
         
     except Exception as e:
         return {'error': str(e), 'success': False}
