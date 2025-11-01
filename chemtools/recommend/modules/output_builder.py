@@ -252,6 +252,22 @@ def build_formatted_output(
         "atmosphere": None,
     }
     
+    # Add cross-family metadata if available (from first precedent in group or all precs)
+    source_precs = group if group else precs
+    if source_precs:
+        first_prec = source_precs[0]
+        if first_prec.get("cross_family_metadata"):
+            cond_text["cross_family_metadata"] = first_prec.get("cross_family_metadata")
+        # Also add individual compatibility fields for easier access
+        if first_prec.get("mechanism_similarity") is not None:
+            cond_text["mechanism_similarity"] = first_prec.get("mechanism_similarity")
+        if first_prec.get("mechanism_status"):
+            cond_text["mechanism_status"] = first_prec.get("mechanism_status")
+        if first_prec.get("reaction_type_status"):
+            cond_text["reaction_type_status"] = first_prec.get("reaction_type_status")
+        if first_prec.get("rxn_type"):
+            cond_text["reaction_family"] = first_prec.get("rxn_type")
+    
     core_group_size = len(group) if group else 0
     combo_counts = Counter(
         (str(p.get("base_uid") or ""), str(p.get("solvent_uid") or ""))

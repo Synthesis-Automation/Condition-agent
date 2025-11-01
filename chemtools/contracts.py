@@ -25,6 +25,10 @@ class RecommendFromReactionRequest(BaseModel):
     constraints: Optional[Dict[str, Any]] = None
     rerank_strategy: str = 'rule'  # 'rule', 'analytics', or 'none'
     filter_unknown_reagents: bool = False
+    search_all_families: bool = False  # Enable cross-family search
+    reaction_type_threshold: float = 0.15  # Min representation for reaction type filtering (15%)
+    mechanism_similarity_threshold: float = 0.4  # Min mechanism similarity (40%)
+    mechanism_weight: float = 0.3  # Weight for mechanism-enhanced similarity (30%)
 
 class RecommendConditionsRequest(BaseModel):
     reaction: str

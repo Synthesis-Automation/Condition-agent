@@ -313,6 +313,102 @@ def recommend_from_reaction(
     elif search_all_families and rerank_strategy != 'none':
         rerank_reasons.append(f"Reranking skipped for cross-family search ('{rerank_strategy}' not applicable)")
     
+    # 6.5) Cross-family mechanism-aware marking and reranking
+    if search_all_families and precs and detected_fam:  # Use detected_fam instead of fam
+        try:
+            from ...precedent.mechanism_similarity import enhance_precedent_similarity, calculate_mechanism_similarity
+            
+            # Get configuration parameters
+            reaction_type_threshold = float(relax.get('reaction_type_threshold', 0.15))
+            mechanism_threshold = float(relax.get('mechanism_similarity_threshold', 0.4))
+            mechanism_weight = float(relax.get('mechanism_weight', 0.3))
+            
+            # Step 1: Mark reaction type compatibility (don't filter, just mark)
+            if reaction_type_threshold > 0:
+                from ...precedent.mechanism_similarity import get_representation_status
+                
+                type_counts = Counter([p.get('rxn_type', 'unknown') for p in precs])
+                total_precs = len(precs)
+                
+                marked_count = 0
+                for prec in precs:
+                    prec_type = prec.get('rxn_type', 'unknown')
+                    type_fraction = type_counts[prec_type] / total_precs if total_precs > 0 else 0
+                    
+                    # Mark all precedents with their reaction type compatibility
+                    prec['reaction_type_fraction'] = type_fraction
+                    prec['reaction_type_status'] = get_representation_status(type_fraction, reaction_type_threshold)
+                    
+                    if prec['reaction_type_status'] == 'underrepresented':
+                        marked_count += 1
+                
+                if marked_count > 0:
+                    rerank_reasons.append(f"Marked {marked_count} precedents as underrepresented reaction types (threshold: {reaction_type_threshold:.1%})")
+            
+            # Step 2: Calculate mechanism similarity and mark compatibility
+            from ...precedent.mechanism_similarity import get_compatibility_status
+            
+            mechanism_marked = 0
+            for prec in precs:
+                prec_family = prec.get('rxn_type', '')
+                mechanism_sim = calculate_mechanism_similarity(detected_fam, prec_family)  # Use detected_fam
+                prec['mechanism_similarity'] = mechanism_sim
+                prec['mechanism_status'] = get_compatibility_status(mechanism_sim)
+                
+                if prec['mechanism_status'] != 'compatible':
+                    mechanism_marked += 1
+            
+            if mechanism_marked > 0:
+                rerank_reasons.append(f"Marked {mechanism_marked} precedents with low/moderate mechanism compatibility")
+            
+            # Step 3: Enhance similarity scores with mechanism awareness and compatibility penalties
+            if mechanism_weight > 0 and precs:
+                for i, prec in enumerate(precs):
+                    base_sim = prec.get('drfp_similarity', prec.get('similarity', 0.5))
+                    
+                    # Apply mechanism enhancement
+                    enhanced_sim = enhance_precedent_similarity(
+                        prec, detected_fam, base_sim, mechanism_weight  # Use detected_fam
+                    )
+                    
+                    # Apply compatibility penalties for ranking
+                    final_sim = enhanced_sim
+                    
+                    # Penalty for underrepresented reaction types
+                    if prec.get('reaction_type_status') == 'underrepresented':
+                        final_sim *= 0.85  # 15% penalty
+                    
+                    # Penalty for incompatible mechanisms
+                    if prec.get('mechanism_status') == 'incompatible':
+                        final_sim *= 0.70  # 30% penalty
+                    elif prec.get('mechanism_status') == 'moderate':
+                        final_sim *= 0.90  # 10% penalty
+                    
+                    prec['similarity'] = final_sim
+                    prec['base_similarity'] = base_sim  # Keep original for reference
+                    prec['enhanced_similarity'] = enhanced_sim  # Keep enhanced for reference
+                    prec['mechanism_enhanced'] = True
+                
+                # Re-sort by final similarity (with penalties applied)
+                precs.sort(key=lambda p: p.get('similarity', 0), reverse=True)
+                rerank_reasons.append(f"Enhanced similarity with mechanism awareness and compatibility penalties (weight: {mechanism_weight:.1f})")
+            
+            # Step 4: Add cross-family metadata for transparency
+            for prec in precs:
+                prec['cross_family_metadata'] = {
+                    'detected_family': detected_fam,  # Use detected_fam
+                    'precedent_family': prec.get('rxn_type', 'unknown'),
+                    'mechanism_similarity': prec.get('mechanism_similarity', 0),
+                    'mechanism_status': prec.get('mechanism_status', 'unknown'),
+                    'reaction_type_status': prec.get('reaction_type_status', 'unknown'),
+                    'reaction_type_fraction': prec.get('reaction_type_fraction', 0)
+                }
+            
+        except Exception as e:
+            import warnings
+            warnings.warn(f"Cross-family mechanism marking failed: {e}. Using all precedents without marking.")
+            rerank_reasons.append(f"Mechanism marking error: {e} - using all precedents without marking")
+    
     # 7) Vote for catalytic core (Laplace smoothing for better confidence)
     core_counts = Counter([str(p.get("core") or "") for p in precs if p.get("core")])
     labels = list(core_counts.keys())

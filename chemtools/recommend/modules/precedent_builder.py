@@ -97,6 +97,18 @@ def build_precedent_details(
         if p.get("reference"):
             precedent_info["reference"] = p.get("reference")
         
+        # Add cross-family metadata if available (for cross-family recommendations)
+        if p.get("cross_family_metadata"):
+            precedent_info["cross_family_metadata"] = p.get("cross_family_metadata")
+        
+        # Also add mechanism compatibility fields if available
+        if p.get("mechanism_similarity") is not None:
+            precedent_info["mechanism_similarity"] = p.get("mechanism_similarity")
+        if p.get("mechanism_status"):
+            precedent_info["mechanism_status"] = p.get("mechanism_status")
+        if p.get("reaction_type_status"):
+            precedent_info["reaction_type_status"] = p.get("reaction_type_status")
+        
         top_precedents.append(precedent_info)
     
     # Get precedents matching the chosen core
