@@ -25,6 +25,7 @@ from chem_assistant.chemtools_wrapper import (
     classify_reactant_tool,
     get_functional_groups_tool,
     recommend_conditions_tool,
+    enhanced_cross_family_recommend_tool,
     search_precedents_tool,
     find_reagent_tool,
     list_supported_cores_tool,
@@ -155,10 +156,31 @@ def test_recommend_conditions():
     print("PASSED")
 
 
+def test_enhanced_cross_family():
+    """Test enhanced cross-family recommendation workflow."""
+    print("\n" + "="*70)
+    print("Test 8: Enhanced Cross-Family Recommendations")
+    print("="*70)
+    
+    reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+    result = enhanced_cross_family_recommend_tool.invoke({
+        "reaction_smiles": reaction,
+        "k": 10,
+    })
+    print(f"Input: {reaction}")
+    print(f"Output: {_format_output(result)}")
+    _assert_success(result, "Enhanced cross-family recommendation failed")
+    metrics = result.get("cross_family_metrics", {})
+    assert metrics, "Cross-family metrics missing"
+    assert result.get("insights"), "Insights should be returned for LLM guidance"
+    assert metrics.get("total_recommendations", 0) >= 1, "No cross-family precedents reported"
+    print("PASSED")
+
+
 def test_search_precedents():
     """Test precedent search."""
     print("\n" + "="*70)
-    print("Test 8: Search Precedents")
+    print("Test 9: Search Precedents")
     print("="*70)
     
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -176,7 +198,7 @@ def test_search_precedents():
 def test_recommend_with_constraints():
     """Ensure constraint-aware parameters are accepted."""
     print("\n" + "="*70)
-    print("Test 9: Recommend With Constraints")
+    print("Test 10: Recommend With Constraints")
     print("="*70)
     
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -197,7 +219,7 @@ def test_recommend_with_constraints():
 def test_list_supported_cores():
     """Test the core listing helper tool."""
     print("\n" + "="*70)
-    print("Test 10: List Supported Cores")
+    print("Test 11: List Supported Cores")
     print("="*70)
     
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
@@ -215,7 +237,7 @@ def test_list_supported_cores():
 def test_add_reagent_tool_dry_run():
     """Ensure reagent addition tool responds without crashing."""
     print("\n" + "="*70)
-    print("Test 11: Add Reagent (Dry Run)")
+    print("Test 12: Add Reagent (Dry Run)")
     print("="*70)
     
     payload = {
@@ -251,6 +273,7 @@ def main():
         test_functional_groups,
         test_find_reagent,
         test_recommend_conditions,
+        test_enhanced_cross_family,
         test_search_precedents,
         test_recommend_with_constraints,
         test_list_supported_cores,

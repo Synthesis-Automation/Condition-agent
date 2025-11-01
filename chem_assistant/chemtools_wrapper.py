@@ -9,6 +9,7 @@ Available Tools:
     - normalize_reaction_tool: Canonicalize reaction SMILES
     - detect_reaction_family_tool: Detect reaction family/type
     - recommend_conditions_tool: Get ML-based condition recommendations
+    - enhanced_cross_family_recommend_tool: Cross-family precedent search with mechanism filters
     - search_precedents_tool: Search for similar precedent reactions
     - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
     - find_reagent_tool: Look up reagent information from database
@@ -38,6 +39,7 @@ from langchain_core.tools import tool
 # Import chemtools functions
 from chemtools.smiles import normalize, normalize_reaction
 from chemtools import detect_reaction
+from chemtools.output_formatter import ensure_standard_output
 from chemtools.recommend.modules import recommend_from_reaction
 from chemtools.precedent import knn as precedent_knn
 from chemtools.dataset_analytics import (
@@ -196,6 +198,43 @@ class RecommendConditionsInput(BaseModel):
     constraint_rules: Optional[Dict[str, Any]] = Field(
         None,
         description="Structured constraint overrides (e.g., {'no_chlorinated': True}).",
+    )
+
+
+class EnhancedCrossFamilyInput(BaseModel):
+    """Schema for enhanced cross-family recommendation tool."""
+
+    reaction_smiles: str = Field(
+        ...,
+        description="Reaction SMILES string for cross-family comparison (reactants>>products).",
+    )
+    k: int = Field(
+        50,
+        ge=1,
+        le=250,
+        description="Number of cross-family precedents to retrieve.",
+    )
+    reaction_type_threshold: float = Field(
+        0.15,
+        ge=0.0,
+        le=1.0,
+        description="Minimum fraction of precedents a reaction type must represent.",
+    )
+    mechanism_similarity_threshold: float = Field(
+        0.4,
+        ge=0.0,
+        le=1.0,
+        description="Minimum allowed mechanism similarity for precedents.",
+    )
+    mechanism_weight: float = Field(
+        0.3,
+        ge=0.0,
+        le=1.0,
+        description="Weighting for mechanism similarity in cross-family scoring.",
+    )
+    filter_unknown_reagents: bool = Field(
+        True,
+        description="Exclude precedents missing base/solvent annotations.",
     )
 
 
@@ -802,6 +841,257 @@ def analyze_bond_changes_tool(reaction_smiles: str, use_hybrid: bool = True) -> 
 # Recommendation Tools
 # ============================================================================
 
+def _build_cross_family_relax_config(
+    reaction_type_threshold: float,
+    mechanism_similarity_threshold: float,
+    mechanism_weight: float,
+) -> Dict[str, float]:
+    """Compose the relax configuration for enhanced cross-family search."""
+    return {
+        "reaction_type_threshold": reaction_type_threshold,
+        "mechanism_similarity_threshold": mechanism_similarity_threshold,
+        "mechanism_weight": mechanism_weight,
+        "use_drfp": True,
+    }
+
+
+def _extract_cross_family_metrics(
+    recommended_conditions: Sequence[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """Summarize family diversity and mechanism compatibility across precedents."""
+    if not recommended_conditions:
+        return {}
+
+    family_counts: Dict[str, int] = {}
+    mechanism_scores: List[float] = []
+    compatibility_stats = {
+        "compatible": 0,
+        "moderate": 0,
+        "incompatible": 0,
+        "well_represented": 0,
+        "underrepresented": 0,
+    }
+
+    for rec in recommended_conditions:
+        cond_section = rec.get("conditions") if isinstance(rec, dict) else {}
+        if not isinstance(cond_section, dict):
+            cond_section = {}
+        cross_meta = cond_section.get("cross_family_metadata")
+        if not isinstance(cross_meta, dict):
+            cross_meta = {}
+
+        family = (
+            cond_section.get("reaction_family")
+            or cond_section.get("rxn_type")
+            or cross_meta.get("precedent_family")
+            or "Unknown"
+        )
+        family_counts[family] = family_counts.get(family, 0) + 1
+
+        mech_sim = cross_meta.get("mechanism_similarity")
+        if isinstance(mech_sim, (int, float)):
+            mechanism_scores.append(float(mech_sim))
+
+        mech_status = cross_meta.get("mechanism_status")
+        if mech_status in compatibility_stats:
+            compatibility_stats[mech_status] += 1
+
+        type_status = cross_meta.get("reaction_type_status")
+        if type_status in compatibility_stats:
+            compatibility_stats[type_status] += 1
+
+    total = len(recommended_conditions)
+    family_diversity = len(family_counts) / total if total else 0.0
+    metrics: Dict[str, Any] = {
+        "total_recommendations": total,
+        "family_diversity_score": round(family_diversity, 3),
+        "unique_families": len(family_counts),
+        "family_distribution": dict(sorted(family_counts.items(), key=lambda kv: kv[1], reverse=True)),
+        "compatibility_breakdown": {
+            "mechanism_compatibility": {
+                "compatible": compatibility_stats["compatible"],
+                "moderate": compatibility_stats["moderate"],
+                "incompatible": compatibility_stats["incompatible"],
+            },
+            "reaction_type_representation": {
+                "well_represented": compatibility_stats["well_represented"],
+                "underrepresented": compatibility_stats["underrepresented"],
+            },
+        },
+    }
+
+    if mechanism_scores:
+        metrics.update({
+            "avg_mechanism_similarity": round(sum(mechanism_scores) / len(mechanism_scores), 3),
+            "min_mechanism_similarity": round(min(mechanism_scores), 3),
+            "max_mechanism_similarity": round(max(mechanism_scores), 3),
+        })
+
+    return metrics
+
+
+def _format_chemical_label(entry: Any) -> Optional[str]:
+    """Return the most human-readable identifier for a chemical entry."""
+    if isinstance(entry, dict):
+        return (
+            entry.get("name")
+            or entry.get("abbreviation")
+            or entry.get("cas")
+            or entry.get("smiles")
+        )
+    if entry is None:
+        return None
+    return str(entry)
+
+
+def _format_condition_value(value: Any) -> Optional[str]:
+    """Normalize condition values (temperature/time) for summaries."""
+    if value is None:
+        return None
+    if isinstance(value, (list, tuple)):
+        compact = [str(v) for v in value if v is not None]
+        return "-".join(compact) if compact else None
+    return str(value)
+
+
+def _summarize_top_cross_family_condition(
+    recommended_conditions: Sequence[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """Capture key details from the lead cross-family recommendation."""
+    if not recommended_conditions:
+        return {}
+
+    first = recommended_conditions[0] or {}
+    summary = first.get("summary", {}) if isinstance(first, dict) else {}
+    conditions = first.get("conditions", {}) if isinstance(first, dict) else {}
+    if not isinstance(summary, dict):
+        summary = {}
+    if not isinstance(conditions, dict):
+        conditions = {}
+    cross_meta = conditions.get("cross_family_metadata")
+    if not isinstance(cross_meta, dict):
+        cross_meta = {}
+
+    support = summary.get("support")
+    support_count: Optional[int] = None
+    if isinstance(support, dict):
+        support_count = support.get("count") or support.get("reference_population")
+    elif isinstance(support, (int, float)):
+        support_count = int(support)
+    precedents = summary.get("precedents")
+    if support_count is None and isinstance(precedents, list):
+        support_count = len(precedents)
+
+    top_payload = {
+        "rank": summary.get("rank") or first.get("rank"),
+        "core": summary.get("core"),
+        "base": _format_chemical_label(summary.get("base")),
+        "ligand": _format_chemical_label(summary.get("ligand")),
+        "solvent": _format_chemical_label(summary.get("solvent")),
+        "temperature": _format_condition_value(conditions.get("temperature")),
+        "time": _format_condition_value(conditions.get("time")),
+        "confidence": summary.get("confidence"),
+        "supporting_precedents": support_count,
+        "reaction_family": conditions.get("reaction_family"),
+        "precedent_family": cross_meta.get("precedent_family") or cross_meta.get("detected_family"),
+        "mechanism_similarity": cross_meta.get("mechanism_similarity") or conditions.get("mechanism_similarity"),
+        "mechanism_status": cross_meta.get("mechanism_status") or conditions.get("mechanism_status"),
+        "reaction_type_status": cross_meta.get("reaction_type_status") or conditions.get("reaction_type_status"),
+    }
+
+    return {key: value for key, value in top_payload.items() if value is not None}
+
+
+def _generate_cross_family_insights(
+    recommended_conditions: Sequence[Dict[str, Any]],
+    metrics: Dict[str, Any],
+) -> List[str]:
+    """Produce concise insights for LLM consumption."""
+    if not recommended_conditions:
+        return ["No cross-family precedents met the specified thresholds."]
+
+    insights: List[str] = []
+    total = metrics.get("total_recommendations") or len(recommended_conditions)
+    family_distribution = metrics.get("family_distribution") or {}
+
+    if family_distribution:
+        sorted_families = list(family_distribution.items())
+        top_family, top_count = sorted_families[0]
+        insights.append(f"Top precedent family: {top_family} ({top_count}/{total}).")
+        if len(sorted_families) > 1:
+            others = ", ".join(
+                f"{fam} ({count})" for fam, count in sorted_families[1:3]
+            )
+            if others:
+                insights.append(f"Secondary families represented: {others}.")
+
+    mech_avg = metrics.get("avg_mechanism_similarity")
+    if mech_avg is not None:
+        mech_min = metrics.get("min_mechanism_similarity", mech_avg)
+        mech_max = metrics.get("max_mechanism_similarity", mech_avg)
+        insights.append(
+            f"Mechanism similarity averages {mech_avg:.2f} "
+            f"(range {mech_min:.2f}-{mech_max:.2f})."
+        )
+
+    compat = metrics.get("compatibility_breakdown", {})
+    mech_compat = compat.get("mechanism_compatibility", {}) if isinstance(compat, dict) else {}
+    if mech_compat:
+        incompatible = mech_compat.get("incompatible", 0)
+        moderate = mech_compat.get("moderate", 0)
+        if incompatible:
+            insights.append(f"{incompatible} precedent(s) flagged as mechanism incompatible were filtered out.")
+        if moderate:
+            insights.append(f"{moderate} precedent(s) show moderate mechanism similarity and may need scrutiny.")
+
+    repr_stats = compat.get("reaction_type_representation", {}) if isinstance(compat, dict) else {}
+    underrepresented = repr_stats.get("underrepresented", 0)
+    if underrepresented:
+        insights.append(
+            f"{underrepresented} reaction family/families are underrepresented and may require manual validation."
+        )
+
+    lead_summary = _summarize_top_cross_family_condition(recommended_conditions)
+    if lead_summary:
+        components: List[str] = []
+        core_val = lead_summary.get("core")
+        if core_val:
+            components.append(str(core_val))
+        core_text_lower = str(core_val).lower() if core_val else ""
+
+        base_val = lead_summary.get("base")
+        if base_val:
+            base_text = f"Base: {base_val}"
+            if "base" not in core_text_lower and not any(str(base_val) in comp for comp in components):
+                components.append(base_text)
+
+        ligand_val = lead_summary.get("ligand")
+        if ligand_val:
+            ligand_text = f"Ligand: {ligand_val}"
+            if not any(str(ligand_val) in comp for comp in components):
+                components.append(ligand_text)
+
+        solvent_val = lead_summary.get("solvent")
+        if solvent_val:
+            solvent_text = f"Solvent: {solvent_val}"
+            if not any(str(solvent_val) in comp for comp in components):
+                components.append(solvent_text)
+
+        if lead_summary.get("temperature"):
+            components.append(f"T: {lead_summary['temperature']}")
+        if lead_summary.get("time"):
+            components.append(f"t: {lead_summary['time']}")
+        if components:
+            insights.append("Lead cross-family condition -> " + "; ".join(components))
+
+        mech_sim = lead_summary.get("mechanism_similarity")
+        if isinstance(mech_sim, (int, float)):
+            status = lead_summary.get("mechanism_status", "unknown")
+            insights.append(f"Lead precedent mechanism similarity {float(mech_sim):.2f} ({status}).")
+
+    return insights
+
+
 @tool(args_schema=RecommendConditionsInput)
 def recommend_conditions_tool(
     reaction_smiles: str,
@@ -881,6 +1171,79 @@ def recommend_conditions_tool(
         return _success_response(simplified)
     except Exception as e:
         return _error_response(str(e), {"family": "Unknown"})
+
+
+@tool(args_schema=EnhancedCrossFamilyInput)
+def enhanced_cross_family_recommend_tool(
+    reaction_smiles: str,
+    k: int = 50,
+    reaction_type_threshold: float = 0.15,
+    mechanism_similarity_threshold: float = 0.4,
+    mechanism_weight: float = 0.3,
+    filter_unknown_reagents: bool = True,
+) -> Dict[str, Any]:
+    """
+    Run the enhanced cross-family recommendation workflow with mechanism-aware filtering.
+
+    Provides DRFP-backed precedent suggestions drawn from all families, while enforcing
+    reaction-type representation and mechanism-similarity thresholds. The output mirrors
+    the CLI but is tailored for LLM consumption (metrics + concise insights).
+    """
+    try:
+        relax_config = _build_cross_family_relax_config(
+            reaction_type_threshold=reaction_type_threshold,
+            mechanism_similarity_threshold=mechanism_similarity_threshold,
+            mechanism_weight=mechanism_weight,
+        )
+
+        raw_result = recommend_from_reaction(
+            reaction=reaction_smiles,
+            k=k,
+            relax=relax_config,
+            rerank_strategy="none",
+            filter_unknown_reagents=filter_unknown_reagents,
+            search_all_families=True,
+        )
+
+        formatted_source = raw_result.get("formatted")
+        if not isinstance(formatted_source, dict):
+            raise ValueError("Recommendation engine did not return formatted output.")
+
+        formatted = ensure_standard_output(
+            formatted_source,
+            default_model="Enhanced-Cross-Family-Search",
+            fallback_reaction_smiles=reaction_smiles,
+            extras={"raw_recommendation": raw_result},
+        )
+
+        recommended_conditions = formatted.get("recommended_conditions", [])
+        metrics = _extract_cross_family_metrics(recommended_conditions)
+        if metrics:
+            formatted.setdefault("meta", {})["cross_family_metrics"] = metrics
+
+        insights = _generate_cross_family_insights(recommended_conditions, metrics)
+        top_summary = _summarize_top_cross_family_condition(recommended_conditions)
+
+        payload = {
+            "input_reaction": reaction_smiles,
+            "parameters": {
+                "k": k,
+                "reaction_type_threshold": reaction_type_threshold,
+                "mechanism_similarity_threshold": mechanism_similarity_threshold,
+                "mechanism_weight": mechanism_weight,
+                "filter_unknown_reagents": filter_unknown_reagents,
+            },
+            "recommended_conditions": recommended_conditions,
+            "recommendations": recommended_conditions,
+            "top_recommendation": top_summary,
+            "cross_family_metrics": metrics,
+            "insights": insights,
+            "meta": formatted.get("meta", {}),
+            "formatted": formatted,
+        }
+        return _success_response(payload)
+    except Exception as exc:
+        return _error_response(str(exc), {"reaction_smiles": reaction_smiles})
 
 
 @tool(args_schema=ListSupportedCoresInput)
@@ -1377,6 +1740,7 @@ CHEMTOOLS_TOOLS = [
     
     # Recommendation tools
     recommend_conditions_tool,
+    enhanced_cross_family_recommend_tool,
     search_precedents_tool,
     
     # Database tools
