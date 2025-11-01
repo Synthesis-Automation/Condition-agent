@@ -4,6 +4,7 @@ pytest.importorskip("molpipeline")
 
 from chemtools.integrations import molpipeline as mp
 from chemtools.featurizers import molpipeline as mp_feats
+from chemtools.featurizers import molecular as mol_feat
 from chemtools.smiles import normalize
 
 
@@ -47,3 +48,34 @@ def test_physchem_features_subset():
     )
     assert descriptors.shape == (1, 2)
     assert descriptors.dtype == float
+
+
+def test_molecular_featurize_includes_molpipeline_vectors():
+    result = mol_feat.featurize(
+        "Brc1ccccc1",
+        "Nc1ccccc1",
+        include_molpipeline=True,
+    )
+    mp_payload = result.get("molpipeline")
+    assert isinstance(mp_payload, dict)
+    settings = mp_payload.get("settings")
+    assert isinstance(settings, dict)
+    bits = settings.get("morgan_bits")
+    assert isinstance(bits, int) and bits > 0
+    descriptors = settings.get("physchem_descriptors")
+    assert isinstance(descriptors, list) and len(descriptors) > 0
+
+    elec_vec = mp_payload.get("electrophile")
+    nuc_vec = mp_payload.get("nucleophile")
+    assert isinstance(elec_vec, dict)
+    assert isinstance(nuc_vec, dict)
+
+    for vec in (elec_vec, nuc_vec):
+        morgan = vec.get("morgan_fp")
+        physchem = vec.get("physchem")
+        assert isinstance(morgan, list)
+        assert len(morgan) == bits
+        assert all(isinstance(x, float) for x in morgan)
+        assert isinstance(physchem, list)
+        assert len(physchem) == len(descriptors)
+        assert all(isinstance(x, float) for x in physchem)

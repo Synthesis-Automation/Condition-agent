@@ -9,7 +9,7 @@ steric properties. Conditionally attaches role-aware vectors when available.
 
 from __future__ import annotations
 
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from functools import lru_cache
 import os
 import re
@@ -22,6 +22,103 @@ try:  # Optional role-aware vectors
 except Exception:  # pragma: no cover
     _role_feat = None  # type: ignore
     _HAS_ROLE_FEATS = False
+
+
+_MOLPIPELINE_SENTINEL = object()
+_MOLPIPELINE_HELPERS: Any = _MOLPIPELINE_SENTINEL  # type: ignore[misc]
+_DEFAULT_MOLPIPELINE_DESCRIPTOR_LIST = [
+    "HeavyAtomMolWt",
+    "TPSA",
+    "MolLogP",
+    "MolMR",
+    "NumHAcceptors",
+    "NumHDonors",
+]
+
+
+def _get_env_bool(name: str, default: bool = False) -> bool:
+    v = os.environ.get(name)
+    if v is None:
+        return default
+    return v.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_int(name: str, default: int) -> int:
+    try:
+        value = int(os.environ.get(name, str(default)))
+    except Exception:
+        return default
+    return value if value > 0 else default
+
+
+def _maybe_import_molpipeline():
+    global _MOLPIPELINE_HELPERS
+    if _MOLPIPELINE_HELPERS is None:
+        return None
+    if _MOLPIPELINE_HELPERS is _MOLPIPELINE_SENTINEL:
+        try:
+            from . import molpipeline as _mp_helpers  # type: ignore
+        except Exception:
+            _MOLPIPELINE_HELPERS = None
+            return None
+        _MOLPIPELINE_HELPERS = _mp_helpers
+    return _MOLPIPELINE_HELPERS
+
+
+def _to_float_list(arr: Any) -> Optional[List[float]]:
+    if arr is None:
+        return None
+    try:
+        import numpy as np
+
+        return np.asarray(arr, dtype=float).ravel().tolist()
+    except Exception:
+        try:
+            return [float(x) for x in arr]  # type: ignore[arg-type]
+        except Exception:
+            return None
+
+
+def _molpipeline_vectors(smiles: str) -> Optional[Dict[str, Any]]:
+    helpers = _maybe_import_molpipeline()
+    if helpers is None:
+        return None
+    settings = {
+        "morgan_bits": _env_int("CHEMTOOLS_MOLPIPE_MORGAN_BITS", 1024),
+        "morgan_radius": _env_int("CHEMTOOLS_MOLPIPE_MORGAN_RADIUS", 2),
+        "physchem_descriptors": _DEFAULT_MOLPIPELINE_DESCRIPTOR_LIST,
+    }
+    descriptor_env = os.environ.get("CHEMTOOLS_MOLPIPE_PHYS_DESC")
+    if descriptor_env:
+        parsed = [part.strip() for part in descriptor_env.split(",") if part.strip()]
+        if parsed:
+            settings["physchem_descriptors"] = parsed
+
+    try:
+        morgan = helpers.morgan_fingerprint(
+            smiles,
+            n_bits=settings["morgan_bits"],
+            radius=settings["morgan_radius"],
+            return_sparse=False,
+        )
+        morgan_list = _to_float_list(morgan)
+        physchem = helpers.physchem_features(
+            smiles,
+            descriptor_list=settings["physchem_descriptors"],
+        )
+        physchem_list = _to_float_list(physchem)
+    except Exception:
+        return None
+
+    result: Dict[str, Any] = {}
+    if morgan_list is not None:
+        result["morgan_fp"] = morgan_list
+    if physchem_list is not None:
+        result["physchem"] = physchem_list
+    if not result:
+        return None
+    result["_settings"] = settings
+    return result
 
 
 def _guess_lg_text(s: str) -> str:
@@ -276,7 +373,12 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     }
 
 
-def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
+def featurize(
+    electrophile: str,
+    nucleophile: str,
+    *,
+    include_molpipeline: Optional[bool] = None,
+) -> Dict[str, Any]:
     """Featurize electrophile/nucleophile pair for C-N coupling reactions.
     
     Extracts structural and chemical features including:
@@ -298,7 +400,7 @@ def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     """
     base = _featurize_cached(electrophile, nucleophile)
     out = dict(base)
-    
+
     # Attach role-aware only when explicitly enabled via env (default off for speed)
     attach_flag = (os.environ.get("CHEMTOOLS_ATTACH_ROLE_AWARE", "").strip().lower() in {"1", "true", "yes", "on"})
     if attach_flag and _HAS_ROLE_FEATS and _role_feat is not None:
@@ -311,6 +413,33 @@ def featurize(electrophile: str, nucleophile: str) -> Dict[str, Any]:
             }
         except Exception:
             pass
+
+    if include_molpipeline is None:
+        include_molpipeline = _get_env_bool("CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES", False)
+    if include_molpipeline:
+        molpipeline_data: Dict[str, Any] = {}
+        settings_snapshot: Optional[Dict[str, Any]] = None
+
+        elec_vec = _molpipeline_vectors(electrophile) if electrophile else None
+        if elec_vec is not None:
+            settings_snapshot = dict(elec_vec.pop("_settings", {}))
+            molpipeline_data["electrophile"] = elec_vec
+
+        nuc_vec = _molpipeline_vectors(nucleophile) if nucleophile else None
+        if nuc_vec is not None:
+            nuc_settings = dict(nuc_vec.pop("_settings", {}))
+            if settings_snapshot is None:
+                settings_snapshot = nuc_settings
+            else:
+                for key, value in nuc_settings.items():
+                    settings_snapshot.setdefault(key, value)
+            molpipeline_data["nucleophile"] = nuc_vec
+
+        if molpipeline_data:
+            if settings_snapshot is not None:
+                molpipeline_data["settings"] = settings_snapshot
+            out["molpipeline"] = molpipeline_data
+
     return out
 
 
