@@ -53,8 +53,10 @@ def morgan_fingerprint(
     if return_sparse:
         return matrix
     if hasattr(matrix, "toarray"):
-        return matrix.toarray()
-    return np.asarray(matrix, dtype=float)
+        dense = matrix.toarray()
+    else:
+        dense = matrix
+    return np.asarray(dense, dtype=float, copy=True)
 
 
 def physchem_features(
