@@ -1,5 +1,73 @@
 [
   {
+    "id": "HLXMDSGYOJBEBA-UHFFFAOYSA-M",
+    "name": "[2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane",
+    "abbreviation": [
+      "XPhos Pd G2"
+    ],
+    "aliases": [
+      "(2'-aminobiphenyl-2-yl)(chloro)[dicyclo hexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium",
+      "(2'-aminobiphenyl-2-yl)(chloro)[dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium",
+      "dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-amino biphenyl-2-yl)(chloro)palladium",
+      "dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-aminobiphenyl-2-yl)(chloro)palladium",
+      "Palladium phosphine complex"
+    ],
+    "cas": "1310584-14-5",
+    "inchi_key": "HLXMDSGYOJBEBA-UHFFFAOYSA-M",
+    "roles": {
+      "metal_catalyst": {
+        "families": [
+          "pd_phosphine_complexes"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine",
+        "form": "precatalyst_complex",
+        "activation": "optional",
+        "activation_mode": "other",
+        "counter_anion": null,
+        "support": null
+      }
+    },
+    "embedding_text": "type: METAL_CATALYST | family: pd_phosphine_complexes (pd_phosphine_complexes) | metal: Pd | oxidation_states: 2 | name: [2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane | abbr: Pd-phosphine | CAS: 1310584-14-5 | synonyms: [2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane; SCHEMBL15018638; TWXHYYDFYKNEIT-UHFFFAOYSA-M; AKOS040767809; F10290; (2'-aminobiphenyl-2-yl)(chloro)[dicyclo hexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium; (2'-aminobiphenyl-2-yl)(chloro)[dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium; dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-amino biphenyl-2-yl)(chloro)palladium; dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-aminobiphenyl-2-yl)(chloro)palladium; Palladium phosphine complex"
+  },
+  {
+    "id": "HLXMDSGYOJBEBA-UHFFFAOYSA-M",
+    "name": "[2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane",
+    "abbreviation": [
+      "XPhos Pd G2"
+    ],
+    "aliases": [
+      "(2'-aminobiphenyl-2-yl)(chloro)[dicyclo hexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium",
+      "(2'-aminobiphenyl-2-yl)(chloro)[dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium",
+      "dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-amino biphenyl-2-yl)(chloro)palladium",
+      "dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-aminobiphenyl-2-yl)(chloro)palladium",
+      "Palladium-Phosphine Complex"
+    ],
+    "cas": "1310584-14-5",
+    "inchi_key": "HLXMDSGYOJBEBA-UHFFFAOYSA-M",
+    "roles": {
+      "metal_catalyst": {
+        "families": [
+          "pd_phosphine_complexes"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          2
+        ],
+        "ligand_type": "phosphine",
+        "form": "precatalyst_complex",
+        "activation": "optional",
+        "activation_mode": "other",
+        "counter_anion": null,
+        "support": null
+      }
+    },
+    "embedding_text": "type: METAL_CATALYST | family: pd_phosphine_complexes (pd_phosphine_complexes) | metal: Pd | oxidation_states: 2 | name: [2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane | abbr: Pd-Phosphine | CAS: 1310584-14-5 | synonyms: [2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane; SCHEMBL15018638; TWXHYYDFYKNEIT-UHFFFAOYSA-M; AKOS040767809; F10290; (2'-aminobiphenyl-2-yl)(chloro)[dicyclo hexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium; (2'-aminobiphenyl-2-yl)(chloro)[dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphoranylidene]palladium; dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-amino biphenyl-2-yl)(chloro)palladium; dicyclohexyl(2',4',6'-triisopropylbiphenyl-2-yl)phosphine (2'-aminobiphenyl-2-yl)(chloro)palladium; Palladium-Phosphine Complex"
+  },
+  {
     "id": "R_0f3b54547fc37794",
     "name": "Bis(1,5-cyclooctadiene)nickel(0)",
     "abbreviation": [
@@ -101,6 +169,46 @@
       }
     },
     "embedding_text": "member_embedding: type: CATALYST | family: Pd(0) Sources (pd_zero_sources) | metal: Pd | ox_states: 0 | name: Bis(dibenzylideneacetone)palladium(0) | abbr: Pd(dba)2 | CAS: 32005-36-0"
+  },
+  {
+    "id": "MXQOYLRVSVOCQT-UHFFFAOYSA-N",
+    "name": "Bis(tri-tert-butylphosphine)palladium(0)",
+    "abbreviation": [
+      "Pd(P(t-Bu)3)2"
+    ],
+    "aliases": [
+      "BIS(TRI-TERT-BUTYLPHOSPHINE)PALLADIUM",
+      "palladium;tritert-butylphosphane",
+      "Bis(tri-t-butylphosphine)palladium(0)",
+      "MFCD03094580",
+      "bis(tri-tert-butylphosphane) palladium",
+      "Bis(tri-t-butylphosphine)palladium (0)",
+      "PD(T-BU3P)2",
+      "pd(p(tbu)3)2",
+      "BIS(TRI-T-BUTYLPHOSPHINE)PALLADIUM",
+      "C24H54P2Pd",
+      "Pd tri-tert-butylphosphine complex"
+    ],
+    "cas": "53199-31-8",
+    "inchi_key": "MXQOYLRVSVOCQT-UHFFFAOYSA-N",
+    "roles": {
+      "metal_catalyst": {
+        "families": [
+          "pd_zero_sources"
+        ],
+        "metal": "Pd",
+        "oxidation_states": [
+          0
+        ],
+        "ligand_type": "phosphine",
+        "form": "precatalyst_complex",
+        "activation": "none",
+        "activation_mode": "none",
+        "counter_anion": null,
+        "support": null
+      }
+    },
+    "embedding_text": "type: METAL_CATALYST | family: pd_zero_sources (pd_zero_sources) | metal: Pd | oxidation_states: 0 | name: Bis(tri-tert-butylphosphine)palladium(0) | abbr: Pd(P(t-Bu)3)2 | CAS: 53199-31-8 | synonyms: Bis(tri-tert-butylphosphine)palladium(0); 53199-31-8; DTXSID80370359; RefChem:329913; DTXCID10321394; 640-284-9; BIS(TRI-TERT-BUTYLPHOSPHINE)PALLADIUM; palladium;tritert-butylphosphane; Bis(tri-t-butylphosphine)palladium(0); MFCD03094580; bis(tri-tert-butylphosphane) palladium; Bis(tri-t-butylphosphine)palladium (0); PD(T-BU3P)2; pd(p(tbu)3)2; BIS(TRI-T-BUTYLPHOSPHINE)PALLADIUM; C24H54P2Pd; Pd tri-tert-butylphosphine complex"
   },
   {
     "id": "cas-543-90-8",
