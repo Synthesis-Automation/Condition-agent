@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, TYPE_CHECKING
 
 from chemtools import smiles as chem_smiles
@@ -16,11 +17,12 @@ try:  # Optional dependency: molpipeline and rdkit stack
     from molpipeline.any2mol import AutoToMol
     from molpipeline.mol2any import MolToMorganFP, MolToRDKitPhysChem
     from molpipeline.mol2mol import ElementFilter, SaltRemover
+    from molpipeline.abstract_pipeline_elements.core import InvalidInstance
 
     _MOLPIPELINE_IMPORT_ERROR: Optional[Exception] = None
 except Exception as exc:  # pragma: no cover - executed only when molpipeline missing
     MolPipeline = None  # type: ignore[assignment]
-    AutoToMol = MolToMorganFP = MolToRDKitPhysChem = ElementFilter = SaltRemover = None  # type: ignore[assignment]
+    AutoToMol = MolToMorganFP = MolToRDKitPhysChem = ElementFilter = SaltRemover = InvalidInstance = None  # type: ignore[assignment]
     _MOLPIPELINE_IMPORT_ERROR = exc
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -77,6 +79,51 @@ def environment_snapshot() -> MolPipelineEnvironment:
         shap_version=_version("shap"),
         import_error=None,
     )
+
+
+@lru_cache(maxsize=1)
+def _default_auto_to_mol() -> Optional[AutoToMol]:
+    if AutoToMol is None:
+        return None
+    try:
+        return AutoToMol()
+    except Exception:
+        return None
+
+
+def auto_to_mol(value: Any) -> Any:
+    """Convert arbitrary input into an RDKit molecule using MolPipeline.
+
+    Raises ValueError when the input cannot be converted and RuntimeError when
+    MolPipeline could not be loaded.
+    """
+
+    _require_molpipeline()
+    auto = _default_auto_to_mol()
+    if auto is None:
+        raise RuntimeError("MolPipeline AutoToMol is not available.")
+    result = auto.pretransform_single(value)
+    if InvalidInstance is not None and isinstance(result, InvalidInstance):
+        message = getattr(result, "message", "Unparseable molecule")
+        raise ValueError(f"Unable to convert input to molecule: {message}")
+    return result
+
+
+def try_auto_to_mol(value: Any) -> Any | None:
+    """Best-effort conversion to an RDKit molecule; returns None on failure."""
+
+    if not is_available():
+        return None
+    auto = _default_auto_to_mol()
+    if auto is None:
+        return None
+    try:
+        result = auto.pretransform_single(value)
+    except Exception:
+        return None
+    if InvalidInstance is not None and isinstance(result, InvalidInstance):
+        return None
+    return result
 
 
 def _require_molpipeline() -> None:
@@ -398,6 +445,8 @@ __all__ = [
     "MolPipelineEnvironment",
     "environment_snapshot",
     "is_available",
+    "auto_to_mol",
+    "try_auto_to_mol",
     "build_physchem_pipeline",
     "build_morgan_pipeline",
     "build_standardization_steps",

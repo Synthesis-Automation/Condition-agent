@@ -1,3 +1,3 @@
-from . import molecular
+from . import molecular, molpipeline
 
-__all__ = ["molecular"]
+__all__ = ["molecular", "molpipeline"]
