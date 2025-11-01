@@ -4,12 +4,12 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 
 ## Feature Highlights
 
-- Reaction parsing and normalization via `chemtools.smiles` with typed request/response contracts defined in `chemtools/contracts.py`.
+- Reaction parsing and normalization via `chemtools.smiles` with typed request/response contracts defined in `chemtools/contracts.py`. Optional MolPipeline integration seamlessly upgrades multi-format ingestion when the dependency is installed.
 - Unified SMILES + taxonomy analysis helpers in `chemtools.analysis`, combining molecule normalization, reactant classification, and reaction-family metadata for routers, recommenders, and HTE pipelines.
 - Rule-based family detection and router (`chemtools.router`) that drives the downstream recommendation flow.
 - **Functional group detection (`chemtools.util.functional_groups`)** with 80+ detectable groups using SMARTS patterns (RDKit) or text-based fallbacks, accessible via unified Context API (`chem.functional_groups.*`).
 - Precedent search (`chemtools.precedent`) powered by DRFP similarity, Laplace-smoothed voting, and constraint filters (`chemtools.constraints`).
-- Deterministic condition recommendation core (`chemtools.recommend.core`) with optional ML re-ranking (`chemtools.ml`), fusion weighting, and plate design helpers.
+- Deterministic condition recommendation core (`chemtools.recommend.core`) with optional ML re-ranking (`chemtools.ml`), fusion weighting, and plate design helpers. Per-reactant fingerprint/descriptor vectors can be appended via MolPipeline-backed featurization (`include_molpipeline=True`).
 - **Protocol recommendation (`chemtools.protocol`)** powered by DRFP similarity search over experimental protocols with automatic condition extraction and standard JSON output.
 - **Protocol SMARTS tooling (`chemtools.protocol.smarts_generator_cli`)** to derive reaction SMARTS applicability patterns, guards, and visualisations for protocol curation and testing.
 - Explanation packs (`chemtools.explain`) that summarize precedents, alternatives, and rule hits for API and UI consumption.
@@ -17,7 +17,7 @@ ChemTools is a deterministic toolkit for reaction condition recommendation, cent
 - **Unified taxonomy (`chemtools.taxonomy`)** providing centralized reaction, reactant, and reagent-role classifications with validation helpers, feeding router/recommendation modules; reagent enrichment utilities now load from the same registry via `chemtools.reagent.taxonomy_store` and `load_families_registry_entries`.
 - **HTE simple recommender (`chemtools.recommend.hte_simple`)** providing deterministic condition suggestions from the standardized HTE z-score dataset shipped under `data/HTE_db`.
 - **HTE dataset tooling (`data-processor/HTE_data`)** to clean z-score exports, expand SMARTS coverage, benchmark the simple condition recommender, and ship scenario-focused pytest suites.
-- CLI utilities in `chemtools.rule.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management.
+- CLI utilities in `chemtools.rule.cli` for querying the Scheme Condition DB (SCDB) and `chemtools.protocol.cli` for protocol index management. `scripts/showcase_molpipeline_features.py` provides a ready-made demo of the MolPipeline fingerprint payload.
 
 ## Quickstart
 
@@ -72,6 +72,20 @@ pytest -q
 ```
 
 The tests rely on lightweight fixtures stored under `tests/` and do not require RDKit unless explicitly enabled.
+
+### Optional MolPipeline features
+
+MolPipeline support is fully optional. Install the extra dependency to unlock the enhanced SMILES ingestion and numerical feature payloads:
+
+```bash
+pip install molpipeline
+```
+
+Once installed:
+
+- `chemtools.smiles.normalize` will automatically fall back to MolPipeline’s `AutoToMol` reader for InChI, binary, or SDF inputs before applying legacy heuristics.
+- `chemtools.featurizers.molecular.featurize(..., include_molpipeline=True)` appends Morgan fingerprints and RDKit phys-chem descriptors for electrophile/nucleophile pairs. Set `CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES=1` to enable this behaviour globally.
+- Run `python scripts/showcase_molpipeline_features.py` to inspect the combined categorical + fingerprint feature bundle for a given substrate pair.
 
 ## Repository Layout
 
