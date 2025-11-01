@@ -54,7 +54,6 @@ def test_molecular_featurize_includes_molpipeline_vectors():
     result = mol_feat.featurize(
         "Brc1ccccc1",
         "Nc1ccccc1",
-        include_molpipeline=True,
     )
     mp_payload = result.get("molpipeline")
     assert isinstance(mp_payload, dict)
@@ -73,9 +72,13 @@ def test_molecular_featurize_includes_molpipeline_vectors():
     for vec in (elec_vec, nuc_vec):
         morgan = vec.get("morgan_fp")
         physchem = vec.get("physchem")
+        physchem_map = vec.get("physchem_map")
         assert isinstance(morgan, list)
         assert len(morgan) == bits
         assert all(isinstance(x, float) for x in morgan)
         assert isinstance(physchem, list)
         assert len(physchem) == len(descriptors)
         assert all(isinstance(x, float) for x in physchem)
+        assert isinstance(physchem_map, dict)
+        assert set(physchem_map.keys()) == set(descriptors)
+        assert all(isinstance(val, float) for val in physchem_map.values())

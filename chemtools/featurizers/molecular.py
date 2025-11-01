@@ -114,7 +114,10 @@ def _molpipeline_vectors(smiles: str) -> Optional[Dict[str, Any]]:
     if morgan_list is not None:
         result["morgan_fp"] = morgan_list
     if physchem_list is not None:
+        descriptor_names = settings.get("physchem_descriptors", [])
         result["physchem"] = physchem_list
+        if descriptor_names and len(descriptor_names) == len(physchem_list):
+            result["physchem_map"] = dict(zip(descriptor_names, physchem_list))
     if not result:
         return None
     result["_settings"] = settings
@@ -415,7 +418,10 @@ def featurize(
             pass
 
     if include_molpipeline is None:
-        include_molpipeline = _get_env_bool("CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES", False)
+        include_molpipeline = _get_env_bool(
+            "CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES",
+            _maybe_import_molpipeline() is not None,
+        )
     if include_molpipeline:
         molpipeline_data: Dict[str, Any] = {}
         settings_snapshot: Optional[Dict[str, Any]] = None
