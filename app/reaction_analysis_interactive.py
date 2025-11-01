@@ -502,10 +502,216 @@ def run_analysis(smiles: str, reaction_type: Optional[str] = None, use_ml: bool 
                 print("⚠ Low confidence detection - results may be unreliable")
                 print("  Consider verifying the reaction type manually")
         
+        # NEW: Bond Analysis with RXNMapper
+        try_bond_analysis = input("\n🔬 Analyze bond breaking/formation? (y/n, default=n): ").strip().lower()
+        if try_bond_analysis in ['y', 'yes']:
+            display_bond_analysis(smiles)
+        
     except Exception as e:
         print(f"\n❌ Error during analysis: {e}")
         import traceback
         print("\nFull traceback:")
+        traceback.print_exc()
+
+
+def display_bond_analysis(smiles: str) -> None:
+    """
+    Display bond breaking and formation analysis using hybrid approach.
+    
+    Shows results from all three methods:
+    - Manual mapping (if available)
+    - RXNMapper (ML-based)
+    - MCS (graph-based)
+    
+    Args:
+        smiles: Reaction SMILES (mapped or unmapped)
+    """
+    from chemtools import rxnmapper_available, analyze_bond_changes_hybrid
+    
+    print_section("Bond Breaking/Formation Analysis (Hybrid)")
+    
+    # Check RXNMapper availability
+    if not rxnmapper_available():
+        print("⚠️  RXNMapper not available - will use MCS method only")
+        print("   For best results, install: pip install rxnmapper")
+        print()
+    
+    print("Analyzing bond changes with multiple methods...")
+    print()
+    
+    try:
+        # Use hybrid approach - tries manual, RXNMapper, and MCS
+        result = analyze_bond_changes_hybrid(
+            smiles,
+            use_rxnmapper=True,
+            use_mcs=True,
+            use_manual=True,
+            auto_map=True
+        )
+        
+        if not result['success']:
+            print(f"❌ All bond analysis methods failed: {result.get('error')}")
+            return
+        
+        # Show overall result
+        print("=" * 80)
+        print(f"✅ Analysis successful using: {result['method'].upper()}")
+        print(f"   Combined confidence: {result['combined_confidence']:.3f}")
+        print(f"   Validation: {result.get('validation', 'N/A')}")
+        print("=" * 80)
+        print()
+        
+        # Show agreement matrix
+        if result.get('agreement'):
+            print("Method Agreement:")
+            agreements = result['agreement']
+            for comparison, agreed in agreements.items():
+                if agreed is not None:
+                    status = "✅ Agree" if agreed else "⚠️  Disagree"
+                    methods = comparison.replace('_', ' ').title()
+                    print(f"  {status}: {methods}")
+            print()
+        
+        # Function to display method results
+        def display_method_result(method_name: str, method_result: dict, is_recommended: bool = False):
+            if not method_result or not method_result.get('success'):
+                return
+            
+            marker = "★" if is_recommended else " "
+            print(f"{marker} --- {method_name} {'(RECOMMENDED)' if is_recommended else ''} " + "-" * (60 - len(method_name)))
+            
+            # Confidence
+            conf = method_result.get('mapping_confidence') or method_result.get('confidence', 'N/A')
+            if isinstance(conf, float):
+                print(f"   Confidence: {conf:.3f}")
+            else:
+                print(f"   Confidence: {conf}")
+            
+            # Changed atoms (if available)
+            if 'changed_atoms' in method_result:
+                changed = sorted(method_result['changed_atoms'])
+                spectator = method_result.get('spectator_atoms', [])
+                print(f"   Changed atoms: {len(changed)}, Spectator: {len(spectator)}")
+            
+            # Broken bonds
+            broken = method_result.get('broken_bonds', [])
+            if broken:
+                print(f"   Bonds Broken ({len(broken)}):")
+                for bond in broken:
+                    if isinstance(bond, (list, tuple)) and len(bond) == 2:
+                        print(f"     ❌ {bond[0]} — {bond[1]}")
+                    else:
+                        print(f"     ❌ {bond}")
+            else:
+                # Check for estimated broken bonds (MCS)
+                if 'likely_broken_bonds' in method_result:
+                    count = method_result['likely_broken_bonds']
+                    print(f"   Bonds Broken: ~{count} (estimated)")
+                else:
+                    print(f"   Bonds Broken: None detected")
+            
+            # Formed bonds
+            formed = method_result.get('formed_bonds', [])
+            if formed:
+                # Remove duplicates (bond appears twice for bidirectional)
+                unique_formed = []
+                seen = set()
+                for bond in formed:
+                    if isinstance(bond, (list, tuple)) and len(bond) == 2:
+                        canonical = tuple(sorted(bond))
+                        if canonical not in seen:
+                            unique_formed.append(bond)
+                            seen.add(canonical)
+                
+                print(f"   Bonds Formed ({len(unique_formed)}):")
+                for bond in unique_formed:
+                    print(f"     ✅ {bond[0]} — {bond[1]}")
+            else:
+                # Check for estimated formed bonds (MCS)
+                if 'likely_formed_bonds' in method_result:
+                    count = method_result['likely_formed_bonds']
+                    print(f"   Bonds Formed: ~{count} (estimated)")
+                else:
+                    print(f"   Bonds Formed: None detected")
+            
+            # MCS-specific info
+            if 'mcs_size' in method_result:
+                print(f"   MCS size: {method_result['mcs_size']} atoms")
+                print(f"   Coverage: {method_result.get('mcs_coverage', 0):.1%}")
+                print(f"   Interpretation: {method_result.get('interpretation', 'N/A')}")
+                if method_result.get('warning'):
+                    print(f"   ⚠️  {method_result['warning']}")
+            
+            print()
+        
+        # Display all method results
+        print()
+        print("=" * 80)
+        print("DETAILED RESULTS FROM ALL METHODS")
+        print("=" * 80)
+        print()
+        
+        recommended = result.get('recommended_result')
+        
+        # Manual mapping (highest priority)
+        if result.get('manual_result'):
+            is_rec = (recommended == result['manual_result'])
+            display_method_result("Manual Mapping (Ground Truth)", result['manual_result'], is_rec)
+        
+        # RXNMapper
+        if result.get('rxnmapper_result'):
+            is_rec = (recommended == result['rxnmapper_result'])
+            display_method_result("RXNMapper (ML-based)", result['rxnmapper_result'], is_rec)
+        
+        # MCS
+        if result.get('mcs_result'):
+            is_rec = (recommended == result['mcs_result'])
+            display_method_result("MCS (Graph-based)", result['mcs_result'], is_rec)
+        
+        # Final interpretation
+        print("=" * 80)
+        print("INTERPRETATION")
+        print("=" * 80)
+        
+        if recommended:
+            broken = recommended.get('broken_bonds', [])
+            formed = recommended.get('formed_bonds', [])
+            
+            # Handle MCS estimates
+            if 'likely_broken_bonds' in recommended:
+                broken_count = recommended['likely_broken_bonds']
+                formed_count = recommended['likely_formed_bonds']
+            else:
+                broken_count = len(broken)
+                # Count unique formed bonds
+                unique_formed = set()
+                for bond in formed:
+                    if isinstance(bond, (list, tuple)) and len(bond) == 2:
+                        unique_formed.add(tuple(sorted(bond)))
+                formed_count = len(unique_formed)
+            
+            print(f"Based on {result['method']} analysis:")
+            if broken_count > 0 and formed_count > 0:
+                print(f"  • Substitution/coupling reaction")
+                print(f"  • {broken_count} bond(s) break, {formed_count} bond(s) form")
+            elif broken_count > formed_count:
+                print(f"  • Bond-breaking dominant (fragmentation/elimination)")
+            elif formed_count > broken_count:
+                print(f"  • Bond-forming dominant (addition/condensation)")
+            else:
+                print(f"  • Balanced bond changes or rearrangement")
+            
+            # Confidence warning
+            if result['combined_confidence'] < 0.5:
+                print()
+                print("  ⚠️  Low confidence - results may be uncertain")
+                print("     Consider providing manually atom-mapped SMILES for best results")
+            
+        print()
+            
+    except Exception as e:
+        print(f"❌ Error during bond analysis: {e}")
+        import traceback
         traceback.print_exc()
 
 
@@ -561,6 +767,11 @@ def main():
     print("     • Multi-functional group detection")
     print("     • Role-based reactant categorization")
     print()
+    print("  3. Bond breaking/formation analysis (NEW!)")
+    print("     • Automatic atom mapping with RXNMapper")
+    print("     • Identifies which bonds break and form")
+    print("     • Reaction center identification")
+    print()
     print("Commands:")
     print("  - Type 'examples' to see example reactions")
     print("  - Type 'types' to list available reaction types")
@@ -575,6 +786,15 @@ def main():
         ml_status = "✗ Not available"
     
     print(f"ML Detection (rxn-insight): {ml_status}")
+    
+    # Check RXNMapper availability
+    try:
+        from chemtools import rxnmapper_available
+        rxn_status = "✓ Available" if rxnmapper_available() else "✗ Not installed (pip install rxnmapper)"
+    except:
+        rxn_status = "✗ Not available"
+    
+    print(f"Bond Analysis (RXNMapper):  {rxn_status}")
     
     # Check registry
     registry = get_registry()

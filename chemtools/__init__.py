@@ -42,13 +42,32 @@ See CHEMTOOLS_QUICKSTART.md for more examples.
 
 from .context import ChemTools, chem, ResourceConfig
 from .detection import detect_reaction
+from ._atom_mapping import (
+    add_atom_mapping,
+    analyze_bond_changes,
+    analyze_with_mcs,
+    analyze_bond_changes_hybrid,
+    is_available as rxnmapper_available,
+)
+from .util.reaction_center_detector import (
+    identify_changed_atoms_from_mapped_smiles,
+    compare_unmapped_reaction_to_find_changes,
+)
 
 # Primary exports - ChemTools is the recommended interface
 __all__ = [
     "chem",          # Global singleton instance (recommended)
     "ChemTools",     # Class for custom instances
     "ResourceConfig", # Configuration dataclass
-    "detect_reaction", # Unified reaction detection API (NEW)
+    "detect_reaction", # Unified reaction detection API
+    # Atom mapping and bond analysis (NEW)
+    "add_atom_mapping",  # Add atom mapping to reaction SMILES
+    "analyze_bond_changes",  # High-level bond analysis (RXNMapper)
+    "analyze_with_mcs",  # MCS-based bond change estimation
+    "analyze_bond_changes_hybrid",  # Hybrid RXNMapper + MCS (recommended)
+    "identify_changed_atoms_from_mapped_smiles",  # Low-level bond analysis
+    "compare_unmapped_reaction_to_find_changes",  # Auto-map then analyze
+    "rxnmapper_available",  # Check if RXNMapper is installed
 ]
 
 # Version info

@@ -46,10 +46,15 @@ openai>=1.0.0                   # OpenAI API client (also supports Aliyun/DeepSe
                                 # Only needed if using llmtools package
                                 # Set OPENAI_API_KEY or DASHSCOPE_API_KEY environment variable
 
-
-rxn-insight
-lightgbm
-drfp
+# ----------------------------------------------------------------------------
+# ML Models for Chemistry (Optional)
+# ----------------------------------------------------------------------------
+rxn-insight                     # ML-based reaction type classification
+rxnmapper                       # Automatic atom mapping for reactions (NEW)
+                                # Enables bond breaking/formation analysis
+                                # Install: pip install rxnmapper
+lightgbm                        # LightGBM for ML models
+drfp                            # DRFP fingerprints for similarity search
 # ============================================================================
 # Notes
 # ============================================================================

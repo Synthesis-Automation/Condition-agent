@@ -99,7 +99,7 @@ DEFAULT_LLM_RECOMMENDED: Dict[str, Dict[str, str]] = {
     },
     "openai": {
         "reasoning": "o3-mini",
-        "fast": "gpt-4o-mini",
+        "fast": "gpt-4o",
         "balanced": "gpt-4o",
         "advanced": "gpt-5-mini",
     },
@@ -1387,7 +1387,11 @@ class RegistryGeneratorWindow(QMainWindow):
             self.llm_provider_combo.addItem(label, userData=provider)
 
         self.llm_provider_combo.setEnabled(True)
-        self.llm_provider_combo.setCurrentIndex(0)
+        
+        # Set default to openai provider
+        openai_index = next((i for i in range(self.llm_provider_combo.count()) 
+                            if self.llm_provider_combo.itemData(i) == "openai"), 0)
+        self.llm_provider_combo.setCurrentIndex(openai_index)
         self._populate_llm_model_options(self.llm_provider_combo.currentData())
 
     def _populate_llm_model_options(self, provider: Optional[str]) -> None:
