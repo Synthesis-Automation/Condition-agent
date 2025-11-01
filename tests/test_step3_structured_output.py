@@ -492,7 +492,7 @@ def test_3c_multiple_variants():
             elif 'chemicals' in rec:
                 # Alternative format: chemicals array
                 chemicals = rec['chemicals']
-                catalysts = [c for c in chemicals if c.get('role') in ['metal_precursor', 'ligand']]
+                catalysts = [c for c in chemicals if c.get('role') in ['metal_catalyst', 'ligand']]
                 bases = [c for c in chemicals if c.get('role') == 'base']
                 solvents = [c for c in chemicals if c.get('role') == 'solvent']
                 

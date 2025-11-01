@@ -1,4 +1,4 @@
-"""
+﻿"""
 Protocol Database Matcher (Legacy)
 
 DEPRECATED: This module is maintained for backward compatibility only.
@@ -38,6 +38,8 @@ from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass, asdict, field
 from datetime import datetime
 import logging
+
+from chemtools.reagent.constants import ROLE_ALIASES
 
 from ..smiles import normalize
 from ..reaction_similarity import compute_drfp_similarity
@@ -586,7 +588,8 @@ class ProtocolMatcher:
             abbrev = chem.get('abbreviation')
             display_name = abbrev if abbrev else name
             
-            if role in ('metal_precursor', 'preformed_catalyst', 'co_catalyst'):
+            normalized_role = ROLE_ALIASES.get(role, role)
+            if normalized_role in ('metal_catalyst', 'co_catalyst'):
                 if conditions['catalyst'] is None:
                     conditions['catalyst'] = display_name
                 else:
@@ -654,3 +657,5 @@ def build_protocol_index(
         auto_rebuild_index=True
     )
     return matcher.index
+
+

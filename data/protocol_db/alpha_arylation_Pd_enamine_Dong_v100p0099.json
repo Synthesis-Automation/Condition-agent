@@ -58,7 +58,7 @@
             "volume_ml": null,
             "equivalents": 0.01
           },
-          "role": "metal_precursor"
+          "role": "metal_catalyst"
         },
         {
           "name": "Tri(o-tolyl)phosphine",

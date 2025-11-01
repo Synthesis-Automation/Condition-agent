@@ -1,4 +1,4 @@
-"""
+﻿"""
 LLM-Based Reagent Classifier
 ============================
 
@@ -34,8 +34,7 @@ from chemtools.reagent import load_families_registry_entries
 # Valid roles - must match ROLE_CONFIG in reagent_taxonomy_qt.py
 VALID_ROLES = {
     "ligand",
-    "metal_precursor",
-    "preformed_metal_catalyst",
+    "metal_catalyst",
     "base",
     "acid",
     "condensation_agent",
@@ -194,12 +193,7 @@ def _load_schema_for_role(role: str, registry_dir: Path) -> Dict[str, Any]:
             "metal": "Element symbol (Pd, Ni, Cu, Co, Fe, Ru, Rh, Ir, Au, Ag, Pt, Zn, etc.)",
             "oxidation_states": "List of integers [0], [1], [2], [0,2], etc."
         },
-        "preformed_metal_catalyst": {
-            "metal": "Element symbol (Pd, Ni, Cu, Co, Fe, Ru, Rh, Ir, Au, Ag, Pt, Zn)",
-            "oxidation_states": "List of integers",
-            "ligand_type": ["phosphine", "NHC", "bipyridine", "phenanthroline", "pincer", "carboxylate", "other"]
-        },
-        "solvent": {
+        "metal_catalyst": {\n            "metal": "Element symbol (Pd, Ni, Cu, Co, Fe, Ru, Rh, Ir, Au, Ag, Pt, Zn)",\n            "oxidation_states": "List of integers",\n            "ligand_type": "Optional descriptor for pre-ligated complexes (phosphine, NHC, bipyridine, phenanthroline, pincer, carboxylate, other). Omit for simple salts."\n        },\n"solvent": {
             "proticity": ["aprotic", "protic", "acidic", "basic"],
             "polarity": ["very_low", "low", "medium", "high", "very_high"],
             "coordination": ["non", "weak", "moderate", "strong"]
@@ -221,7 +215,7 @@ def _load_schema_for_role(role: str, registry_dir: Path) -> Dict[str, Any]:
             "acidity": ["very_weak", "weak", "medium", "strong", "very_strong"]
         },
         "organo_catalyst": {
-            "activation_mode": ["enamine", "iminium", "brønsted_acid", "hydrogen_bonding", "radical", "other"],
+            "activation_mode": ["enamine", "iminium", "br酶nsted_acid", "hydrogen_bonding", "radical", "other"],
             "chirality": ["achiral", "racemic", "single_enantiomer"]
         },
         "enzyme": {
@@ -528,3 +522,5 @@ __all__ = [
     "verify_entry",
     "VALID_ROLES",
 ]
+
+

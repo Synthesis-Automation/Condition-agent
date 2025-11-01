@@ -266,7 +266,7 @@ def parse_amount_to_equivalents(amount: str, role: str) -> Optional[float]:
             
             # For catalysts/ligands, % usually means mol%
             # For bases, % usually means % equivalents (e.g., 200% = 2.0 eq)
-            if role in ['metal_precursor', 'metal_source', 'catalyst', 'ligand']:
+            if role in ['metal_catalyst', 'metal_source', 'catalyst', 'ligand']:
                 # Convert mol% to equivalents (e.g., 1.5% = 0.015 eq)
                 midpoint = (low + high) / 2.0
                 return midpoint / 100.0
@@ -290,7 +290,7 @@ def normalize_rule_string_value(value: str, role: str, amount: Optional[str] = N
     
     Args:
         value: Reagent name/description from rule file
-        role: Chemical role (metal_precursor, ligand, base, etc.)
+        role: Chemical role (metal_catalyst, ligand, base, etc.)
         amount: Optional amount string to parse for equivalents
         
     Returns:
@@ -301,8 +301,8 @@ def normalize_rule_string_value(value: str, role: str, amount: Optional[str] = N
     
     # Map output roles to database reagent types
     role_to_type_map = {
-        "metal_precursor": "metal_precursor",
-        "catalyst": "metal_precursor",
+        "metal_catalyst": "metal_catalyst",
+        "catalyst": "metal_catalyst",
         "ligand": "ligand",
         "base": "base",
         "solvent": "solvent",

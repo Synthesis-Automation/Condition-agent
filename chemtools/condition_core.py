@@ -12,7 +12,7 @@ except Exception:  # pragma: no cover
 from . import reagent
 
 
-def _lookup_reagent(name: str, uid: str, reagent_type: str = "metal_precursor") -> Optional[Dict]:
+def _lookup_reagent(name: str, uid: str, reagent_type: str = "metal_catalyst") -> Optional[Dict]:
     """Lookup reagent using reagent_lookup system."""
     query = uid if uid else name
     if not query:
@@ -156,8 +156,8 @@ def _get_attr(r: Any, key: str) -> str:
 
 
 def _pick_metal_symbol(name: str, uid: str) -> Optional[str]:
-    # Try reagent lookup for metal precursors
-    res = _lookup_reagent(name, uid, "metal_precursor")
+    # Try reagent lookup for metal catalysts
+    res = _lookup_reagent(name, uid, "metal_catalyst")
     # Check for generic_core field (if reagent database has it)
     if res and isinstance(res, dict):
         gen = res.get("generic_core")
@@ -237,7 +237,7 @@ def parse(reagents: List[Reagent], text: str | None = None) -> Dict[str, Any]:
                 metal = sym
                 metal_uid = uid
             # pre-catalyst detection via reagent database compound_type
-            res = _lookup_reagent(nm, uid, "metal_precursor")
+            res = _lookup_reagent(nm, uid, "metal_catalyst")
             ctype = None
             if isinstance(res, dict):
                 ctype = res.get("compound_type")

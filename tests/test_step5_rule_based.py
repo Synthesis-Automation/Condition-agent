@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Test Step 5: Rule-Based Reaction Family Detection
 
@@ -46,7 +46,7 @@ TEST_REACTIONS = {
         "expected_family": "C_N_Coupling_Cu",  # After mapping
         "expected_rule_family": "Ullmann_CN",
         "confidence_min": 0.85,
-        "description": "Aryl bromide + aniline �?Diphenylamine (Cu-catalyzed)"
+        "description": "Aryl bromide + aniline 芒聠?Diphenylamine (Cu-catalyzed)"
     },
     "Buchwald-Hartwig C-N (Pd)": {
         "smiles": "Brc1ccccc1.Nc1ccccc1>[Pd]>c1ccccc1Nc1ccccc1",
@@ -60,21 +60,21 @@ TEST_REACTIONS = {
         "expected_family": "Suzuki_Miyaura",
         "expected_rule_family": "Suzuki_CC",
         "confidence_min": 0.85,
-        "description": "Aryl bromide + boronic acid �?Biphenyl"
+        "description": "Aryl bromide + boronic acid 芒聠?Biphenyl"
     },
     "Sonogashira Coupling": {
         "smiles": "Brc1ccccc1.C#C>>C#Cc1ccccc1",
         "expected_family": "Sonogashira",
         "expected_rule_family": "Sonogashira_CC",
         "confidence_min": 0.80,
-        "description": "Aryl bromide + terminal alkyne �?Phenylacetylene"
+        "description": "Aryl bromide + terminal alkyne 芒聠?Phenylacetylene"
     },
     "Amide Coupling": {
         "smiles": "CC(=O)O.NCc1ccccc1>>CC(=O)NCc1ccccc1",
         "expected_family": "Amide_Formation",
         "expected_rule_family": "Amide_Coupling",
         "confidence_min": 0.75,
-        "description": "Acetic acid + benzylamine �?N-benzylacetamide"
+        "description": "Acetic acid + benzylamine 芒聠?N-benzylacetamide"
     },
 }
 
@@ -85,16 +85,16 @@ def test_5a_rule_based_detection():
     print("  Test Step 5: Rule-Based Reaction Family Detection")
     print("=" * 70)
     print()
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Test 5a: Rule-Based Family Detection")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     
     passed_tests = 0
     total_tests = len(TEST_REACTIONS)
     
     for rxn_name, rxn_data in TEST_REACTIONS.items():
-        print(f"   🧪 Testing: {rxn_name}")
+        print(f"   冒聼搂陋 Testing: {rxn_name}")
         print(f"      Description: {rxn_data['description']}")
         print(f"      SMILES: {rxn_data['smiles'][:60]}{'...' if len(rxn_data['smiles']) > 60 else ''}")
         
@@ -115,8 +115,8 @@ def test_5a_rule_based_detection():
             hits = result.get('hits', {})
             rule_info = result.get('rule', {})
             
-            print(f"      ⏱️  Detection time: {t_elapsed:.3f}s")
-            print(f"      📊 Results:")
+            print(f"      芒聫卤茂赂聫  Detection time: {t_elapsed:.3f}s")
+            print(f"      冒聼聯聤 Results:")
             print(f"         Family: {detected_family}")
             print(f"         Confidence: {confidence:.2f}")
             
@@ -138,10 +138,10 @@ def test_5a_rule_based_detection():
             confidence_ok = confidence >= min_confidence
             
             if family_match and confidence_ok:
-                print(f"      �?PASSED")
+                print(f"      芒聹?PASSED")
                 passed_tests += 1
             else:
-                print(f"      �?FAILED")
+                print(f"      芒聺?FAILED")
                 if not family_match:
                     print(f"         Expected family: {expected_rule}, got: {detected_family}")
                 if not confidence_ok:
@@ -150,21 +150,21 @@ def test_5a_rule_based_detection():
             print()
             
         except Exception as e:
-            print(f"      �?ERROR: {e}")
+            print(f"      芒聺?ERROR: {e}")
             import traceback
             traceback.print_exc()
             print()
     
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Summary")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     print(f"   Tests passed: {passed_tests}/{total_tests}")
     
     if passed_tests == total_tests:
-        print("   �?Test 5a PASSED")
+        print("   芒聹?Test 5a PASSED")
     else:
-        print(f"   ⚠️  Test 5a PARTIAL ({passed_tests}/{total_tests} passed)")
+        print(f"   芒職聽茂赂聫  Test 5a PARTIAL ({passed_tests}/{total_tests} passed)")
     
     print()
     return 0 if passed_tests == total_tests else 1
@@ -172,9 +172,9 @@ def test_5a_rule_based_detection():
 
 def test_5b_pattern_recognition():
     """Test 5b: SMARTS pattern recognition."""
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Test 5b: SMARTS Pattern Recognition")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     
     # Test specific patterns
@@ -214,10 +214,10 @@ def test_5b_pattern_recognition():
         expected = set(pattern_data['expected_hits'])
         not_expected = set(pattern_data['not_expected'])
         
-        print(f"   🔍 Testing pattern: {pattern_name}")
+        print(f"   冒聼聰聧 Testing pattern: {pattern_name}")
         print(f"      Reactants: {', '.join(reactants)}")
         
-        result = detect_reaction(".".join(reactants) + ">>"", use_ml=False)
+        result = detect_reaction(".".join(reactants) + ">>", use_ml=False)
         hits = result.get('hits', {})
         
         # Check expected hits
@@ -228,10 +228,10 @@ def test_5b_pattern_recognition():
         print(f"      Found: {', '.join(found_expected) if found_expected else 'none'}")
         
         if found_expected == expected and not found_unexpected:
-            print(f"      �?PASSED")
+            print(f"      芒聹?PASSED")
             passed += 1
         else:
-            print(f"      �?FAILED")
+            print(f"      芒聺?FAILED")
             if found_expected != expected:
                 missing = expected - found_expected
                 print(f"         Missing: {', '.join(missing)}")
@@ -240,16 +240,16 @@ def test_5b_pattern_recognition():
         
         print()
     
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Summary")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     print(f"   Pattern tests passed: {passed}/{total}")
     
     if passed == total:
-        print("   �?Test 5b PASSED")
+        print("   芒聹?Test 5b PASSED")
     else:
-        print(f"   ⚠️  Test 5b PARTIAL ({passed}/{total} passed)")
+        print(f"   芒職聽茂赂聫  Test 5b PARTIAL ({passed}/{total} passed)")
     
     print()
     return 0 if passed == total else 1
@@ -257,9 +257,9 @@ def test_5b_pattern_recognition():
 
 def test_5c_catalyst_override():
     """Test 5c: Catalyst detection and override logic."""
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Test 5c: Catalyst Detection & Override")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     
     # Test catalyst override for C-N coupling
@@ -269,21 +269,21 @@ def test_5c_catalyst_override():
             "smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
             "expected_family": "Ullmann_CN",
             "expected_catalyst": None,
-            "description": "No explicit catalyst �?defaults to Ullmann"
+            "description": "No explicit catalyst 芒聠?defaults to Ullmann"
         },
         {
             "name": "Cu-catalyzed C-N (explicit)",
             "smiles": "Brc1ccccc1.Nc1ccccc1>[Cu]>c1ccccc1Nc1ccccc1",
             "expected_family": "Ullmann_CN",
             "expected_catalyst": "Cu",
-            "description": "Explicit Cu catalyst �?Ullmann_CN"
+            "description": "Explicit Cu catalyst 芒聠?Ullmann_CN"
         },
         {
             "name": "Pd-catalyzed C-N (Buchwald-Hartwig)",
             "smiles": "Brc1ccccc1.Nc1ccccc1>[Pd]>c1ccccc1Nc1ccccc1",
             "expected_family": "Buchwald_CN",
             "expected_catalyst": "Pd",
-            "description": "Explicit Pd catalyst �?Buchwald_CN override"
+            "description": "Explicit Pd catalyst 芒聠?Buchwald_CN override"
         },
     ]
     
@@ -291,7 +291,7 @@ def test_5c_catalyst_override():
     total = len(test_cases)
     
     for test_case in test_cases:
-        print(f"   🧪 {test_case['name']}")
+        print(f"   冒聼搂陋 {test_case['name']}")
         print(f"      {test_case['description']}")
         
         result = detect_family_from_reaction(
@@ -328,10 +328,10 @@ def test_5c_catalyst_override():
             catalyst_found = True  # No catalyst expected
         
         if family_match and catalyst_found:
-            print(f"      �?PASSED")
+            print(f"      芒聹?PASSED")
             passed += 1
         else:
-            print(f"      �?FAILED")
+            print(f"      芒聺?FAILED")
             if not family_match:
                 print(f"         Expected: {test_case['expected_family']}, Got: {detected_family}")
             if test_case['expected_catalyst'] and not catalyst_found:
@@ -339,16 +339,16 @@ def test_5c_catalyst_override():
         
         print()
     
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Summary")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     print(f"   Catalyst tests passed: {passed}/{total}")
     
     if passed == total:
-        print("   �?Test 5c PASSED")
+        print("   芒聹?Test 5c PASSED")
     else:
-        print(f"   ⚠️  Test 5c PARTIAL ({passed}/{total} passed)")
+        print(f"   芒職聽茂赂聫  Test 5c PARTIAL ({passed}/{total} passed)")
     
     print()
     return 0 if passed == total else 1
@@ -356,9 +356,9 @@ def test_5c_catalyst_override():
 
 def test_5d_ml_vs_rule_comparison():
     """Test 5d: ML vs Rule-based detection comparison (if ML available)."""
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Test 5d: ML vs Rule-Based Comparison")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     
     # Check if ML detection is available
@@ -369,23 +369,23 @@ def test_5d_ml_vs_rule_comparison():
         ml_available = False
     
     if not ml_available:
-        print("   ⚠️  ML detection (rxn-insight) not available")
-        print("   ℹ️  Skipping ML comparison test")
-        print("   �?Test 5d SKIPPED (not a failure)")
+        print("   芒職聽茂赂聫  ML detection (rxn-insight) not available")
+        print("   芒聞鹿茂赂聫  Skipping ML comparison test")
+        print("   芒聹?Test 5d SKIPPED (not a failure)")
         print()
         return 0
     
-    print("   �?ML detection available, comparing with rule-based...")
+    print("   芒聹?ML detection available, comparing with rule-based...")
     print()
     
     # Test a few reactions with both methods
     test_rxn = "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
     
-    print(f"   🧪 Testing: {test_rxn}")
+    print(f"   冒聼搂陋 Testing: {test_rxn}")
     print()
     
     # Rule-based only
-    print("   📋 Rule-based detection:")
+    print("   冒聼聯聥 Rule-based detection:")
     t_start = time.time()
     result_rule = detect_reaction(test_rxn, use_ml=False)
     t_rule = time.time() - t_start
@@ -396,7 +396,7 @@ def test_5d_ml_vs_rule_comparison():
     print()
     
     # ML-based
-    print("   🤖 ML-based detection:")
+    print("   冒聼陇聳 ML-based detection:")
     t_start = time.time()
     result_ml = detect_reaction(test_rxn, use_ml=True)
     t_ml = time.time() - t_start
@@ -416,22 +416,22 @@ def test_5d_ml_vs_rule_comparison():
     agreement = result_rule.get('family') == result_ml.get('family')
     status = result_ml.get('status', 'unknown')
     
-    print("   📊 Comparison:")
-    print(f"      Agreement: {'�?Yes' if agreement else '⚠️  No'}")
+    print("   冒聼聯聤 Comparison:")
+    print(f"      Agreement: {'芒聹?Yes' if agreement else '芒職聽茂赂聫  No'}")
     print(f"      Status: {status}")
     print(f"      Speed ratio: {t_ml/t_rule:.1f}x (ML is {t_ml/t_rule:.1f}x slower)")
     print()
     
-    print("   �?Test 5d PASSED (informational)")
+    print("   芒聹?Test 5d PASSED (informational)")
     print()
     return 0
 
 
 def test_5e_detailed_conditions():
     """Test 5e: Get detailed reaction conditions with recommendations."""
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print("  Test 5e: Detailed Reaction Conditions")
-    print("──" * 35)
+    print("芒聰聙芒聰聙" * 35)
     print()
     
     # Test a few reactions and get full recommendations
@@ -447,12 +447,12 @@ def test_5e_detailed_conditions():
     ]
     
     for test_case in test_cases:
-        print(f"   🧪 {test_case['name']}")
+        print(f"   冒聼搂陋 {test_case['name']}")
         print(f"      SMILES: {test_case['smiles']}")
         print()
         
         # Step 1: Detect family
-        print("      📋 Family Detection:")
+        print("      冒聼聯聥 Family Detection:")
         detection = detect_reaction(test_case['smiles'], use_ml=False)
         family = detection.get('family', 'Unknown')
         confidence = detection.get('confidence', 0.0)
@@ -462,7 +462,7 @@ def test_5e_detailed_conditions():
         print()
         
         # Step 2: Get recommendations
-        print("      💡 Recommended Conditions:")
+        print("      冒聼聮隆 Recommended Conditions:")
         try:
             result = recommend_from_reaction(
                 reaction=test_case['smiles'],
@@ -482,8 +482,8 @@ def test_5e_detailed_conditions():
                     temp_time = cond.get('conditions', {})
                     
                     # Show catalyst system
-                    print("         🔬 Catalyst System:")
-                    catalyst_items = [c for c in chemicals if c.get('role') in ['metal_precursor', 'ligand']]
+                    print("         冒聼聰卢 Catalyst System:")
+                    catalyst_items = [c for c in chemicals if c.get('role') in ['metal_catalyst', 'ligand']]
                     if catalyst_items:
                         for item in catalyst_items:
                             role = item.get('role', 'unknown')
@@ -496,7 +496,7 @@ def test_5e_detailed_conditions():
                     
                     # Show base
                     print()
-                    print("         ⚗️  Base:")
+                    print("         芒職聴茂赂聫  Base:")
                     base_items = [c for c in chemicals if c.get('role') == 'base']
                     if base_items:
                         for item in base_items:
@@ -510,7 +510,7 @@ def test_5e_detailed_conditions():
                     
                     # Show solvent
                     print()
-                    print("         🧪 Solvent:")
+                    print("         冒聼搂陋 Solvent:")
                     solvent_items = [c for c in chemicals if c.get('role') == 'solvent']
                     if solvent_items:
                         for item in solvent_items:
@@ -524,7 +524,7 @@ def test_5e_detailed_conditions():
                     
                     # Show temperature and time
                     print()
-                    print("         🌡�? Reaction Conditions:")
+                    print("         冒聼聦隆茂赂? Reaction Conditions:")
                     temperature = temp_time.get('temperature', 'N/A')
                     time = temp_time.get('time', 'N/A')
                     
@@ -532,7 +532,7 @@ def test_5e_detailed_conditions():
                     if temperature == 'N/A' or temperature is None:
                         temp_c = combo.get('T_C', 'N/A')
                         if temp_c and temp_c != 'N/A':
-                            temperature = f"{temp_c}°C"
+                            temperature = f"{temp_c}脗掳C"
                     
                     if time == 'N/A' or time is None:
                         time_h = combo.get('time_h', 'N/A')
@@ -544,7 +544,7 @@ def test_5e_detailed_conditions():
                     
                     # Show precedent support
                     print()
-                    print("         📊 Precedent Support:")
+                    print("         冒聼聯聤 Precedent Support:")
                     if 'precedent_pack' in result:
                         pack = result['precedent_pack']
                         support = pack.get('support', 0)
@@ -558,18 +558,18 @@ def test_5e_detailed_conditions():
                             score = top.get('score', 0)
                             print(f"            Best match score: {score:.3f}")
                 else:
-                    print("         ⚠️  No recommendations available")
+                    print("         芒職聽茂赂聫  No recommendations available")
             else:
-                print("         ⚠️  No formatted output")
+                print("         芒職聽茂赂聫  No formatted output")
                 
         except Exception as e:
-            print(f"         �?Error: {e}")
+            print(f"         芒聺?Error: {e}")
         
         print()
-        print("      " + "─" * 60)
+        print("      " + "芒聰聙" * 60)
         print()
     
-    print("   �?Test 5e PASSED (informational)")
+    print("   芒聹?Test 5e PASSED (informational)")
     print()
     return 0
 
@@ -602,9 +602,9 @@ def main():
     total_failed = result_5a + result_5b + result_5c
     
     if total_failed == 0:
-        print("   🎉 All tests passed!")
+        print("   冒聼聨聣 All tests passed!")
     else:
-        print(f"   ⚠️  Some tests failed or partially passed")
+        print(f"   芒職聽茂赂聫  Some tests failed or partially passed")
     
     print()
     return total_failed
@@ -612,4 +612,5 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
+
 

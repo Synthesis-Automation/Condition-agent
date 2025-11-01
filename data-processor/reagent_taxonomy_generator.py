@@ -24,7 +24,7 @@ ROLE_FILES: Dict[str, str] = {
     "acid": "taxonomy_acid.json",
     "additive": "taxonomy_additive.json",
     "ligand": "taxonomy_ligand.json",
-    "metal_precursor": "taxonomy_catalysts_precursor.json",
+    "metal_catalyst": "taxonomy_catalysts_precursor.json",
     "base": "taxonomy_base.json",
     "coupling_reagent": "taxonomy_coupling_reagent.json",
     "oxidant": "taxonomy_oxidant.json",
@@ -36,7 +36,7 @@ DEFAULT_FAMILY_BY_ROLE: Dict[str, str] = {
     "acid": "mineral_acids",
     "additive": "quaternary_ammonium_ptc",
     "ligand": "trialkyl_triaryl_phosphines",
-    "metal_precursor": "pd_ii_salts",
+    "metal_catalyst": "pd_ii_salts",
     "base": "tertiary_amines_aliphatic",
     "coupling_reagent": "carbodiimides",
     "oxidant": "o2_gas",
@@ -47,7 +47,7 @@ DEFAULT_FAMILY_BY_ROLE: Dict[str, str] = {
 
 ROLE_PRIORITY: Dict[str, int] = {
     "ligand": 0,
-    "metal_precursor": 1,
+    "metal_catalyst": 1,
     "base": 2,
     "acid": 3,
     "coupling_reagent": 4,
@@ -117,7 +117,7 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
         r"\bbtffh\b",
         r"activated ester",
     ],
-    "metal_precursor": [
+    "metal_catalyst": [
         r"palladium",
         r"nickel",
         r"copper",
@@ -164,8 +164,8 @@ ROLE_KEYWORDS_RAW: Dict[str, Sequence[str]] = {
 }
 
 MANUAL_FAMILY_PATTERNS: Dict[str, Tuple[str, str]] = {
-    r"\bpeppsi\b": ("metal_precursor", "pd_peppsi_nhc"),
-    r"\bgrubbs\b": ("metal_precursor", "ru_metathesis_grubbs"),
+    r"\bpeppsi\b": ("metal_catalyst", "pd_peppsi_nhc"),
+    r"\bgrubbs\b": ("metal_catalyst", "ru_metathesis_grubbs"),
     r"\bdppf\b": ("ligand", "bidentate_diphosphines"),
     r"\bbtffh\b": ("coupling_reagent", "acyl_halide_fluoride_generators"),
     r"\bt3p\b": ("coupling_reagent", "organophosphorus_anhydrides"),
@@ -679,7 +679,7 @@ EMBEDDING_FIELD_MAP: Dict[str, Sequence[Tuple[str, str]]] = {
         ("avoid_when", "avoid_when"),
         ("ehs_green", "ehs"),
     ),
-    "metal_precursor": (
+    "metal_catalyst": (
         ("metal", "metal"),
         ("oxidation_states", "oxidation_states"),
         ("precursor_class", "class"),

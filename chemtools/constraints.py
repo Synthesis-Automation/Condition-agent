@@ -43,7 +43,7 @@ def _lookup(uid_or_token: str) -> Dict[str, Any]:
         from .reagent import find_reagent
         
         # Try to find in different reagent databases
-        for reagent_type in ['base', 'solvent', 'ligand', 'metal_precursor', 'additive']:
+        for reagent_type in ['base', 'solvent', 'ligand', 'metal_catalyst', 'additive']:
             result = find_reagent(uid_or_token, reagent_type)
             if result:
                 # Convert to legacy format for compatibility

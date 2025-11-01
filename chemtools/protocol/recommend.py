@@ -1,4 +1,4 @@
-"""
+﻿"""
 Protocol Recommendation System
 
 Uses DRFP similarity to find the most relevant protocol for a user's reaction.
@@ -266,7 +266,7 @@ class ProtocolRecommender:
                 removed = num_before_smarts - num_after_smarts
                 logger.warning(
                     f"SMARTS filtering removed {removed} protocol(s): "
-                    f"{num_before_smarts} → {num_after_smarts} candidates"
+                    f"{num_before_smarts} 鈫?{num_after_smarts} candidates"
                 )
                 smarts_filter_warning = (
                     f"SMARTS filtering removed {removed} protocol(s) that did not match "
@@ -362,13 +362,13 @@ class ProtocolRecommender:
                 logger.debug(f"  Similarity: {similarity:.4f}, threshold: {min_similarity}")
                 
                 if similarity >= min_similarity:
-                    logger.debug(f"  ✓ Added to matches (similarity >= threshold)")
+                    logger.debug(f"  鉁?Added to matches (similarity >= threshold)")
                     similarities.append({
                         'record': record,
                         'similarity': similarity
                     })
                 else:
-                    logger.debug(f"  ✗ Rejected (similarity < threshold)")
+                    logger.debug(f"  鉁?Rejected (similarity < threshold)")
             except Exception as e:
                 logger.debug(f"  ERROR computing similarity: {e}")
                 import traceback
@@ -779,7 +779,8 @@ class ProtocolRecommender:
             abbrev = chem.get('abbreviation')
             display_name = abbrev if abbrev else name
             
-            if role in ('metal_precursor', 'preformed_catalyst', 'co_catalyst'):
+            normalized_role = ROLE_ALIASES.get(role, role)
+            if normalized_role in ('metal_catalyst', 'co_catalyst'):
                 if conditions['catalyst'] is None:
                     conditions['catalyst'] = display_name
                 else:
@@ -882,3 +883,6 @@ def recommend_protocol(
         tags=tags,
         use_smarts_filter=use_smarts_filter
     )
+
+
+

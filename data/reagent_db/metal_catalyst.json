@@ -14,7 +14,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_zero_sources"
         ],
@@ -39,7 +39,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "rh_hydrogenation_precursors"
         ],
@@ -64,7 +64,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "fe_acac"
         ],
@@ -90,7 +90,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_zero_sources"
         ],
@@ -120,7 +120,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -145,7 +145,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ir_cod_dimers"
         ],
@@ -170,7 +170,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "rh_hydrogenation_precursors"
         ],
@@ -195,7 +195,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "rh_carbonyl_precursors"
         ],
@@ -221,7 +221,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "co_beta_diketonates"
         ],
@@ -248,7 +248,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "co_ii_halides"
         ],
@@ -274,7 +274,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "co_ii_halides"
         ],
@@ -312,7 +312,14 @@
     "cas": "7440-50-8",
     "inchi_key": "RYGMFSIKBFXOCR-UHFFFAOYSA-N",
     "roles": {
-      "metal_precursor": {
+      "reductant": {
+        "families": [
+          "metal_powders"
+        ],
+        "strength_band": "moderate",
+        "_note": "LLM-suggested alternative role"
+      },
+      "metal_catalyst": {
         "families": [
           "pure metal"
         ],
@@ -320,16 +327,9 @@
         "oxidation_states": [
           0
         ]
-      },
-      "reductant": {
-        "families": [
-          "metal_powders"
-        ],
-        "strength_band": "moderate",
-        "_note": "LLM-suggested alternative role"
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper | abbr: Cu(0) | CAS: 7440-50-8 | synonyms: Copper; 7440-50-8; Copper powder; cuprum; Bronze powder; Copper bronze; Copper, elemental; Tatum-T; cuivre; Arwood copper; Copper-airborne; Copper-milled; Kafar copper; Paragard T 380a; Raney copper; Gold bronze; Copper metal; Elemental copper"
+    "embedding_text": "type: METAL_CATALYST | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper | abbr: Cu(0) | CAS: 7440-50-8 | synonyms: Copper; 7440-50-8; Copper powder; cuprum; Bronze powder; Copper bronze; Copper, elemental; Tatum-T; cuivre; Arwood copper; Copper-airborne; Copper-milled; Kafar copper; Paragard T 380a; Raney copper; Gold bronze; Copper metal; Elemental copper"
   },
   {
     "id": "QTMDXZNDVAMKGV-UHFFFAOYSA-L",
@@ -356,7 +356,7 @@
     "cas": "7789-45-9",
     "inchi_key": "QTMDXZNDVAMKGV-UHFFFAOYSA-L",
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -366,7 +366,7 @@
         ]
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper bromide (CuBr2) | abbr: CuBr2 | CAS: 7789-45-9 | synonyms: Copper bromide (CuBr2); Copper(II) bromide; 7789-45-9; CUPRIC BROMIDE; Dibromocopper; 1KC430K0ZN; DTXSID7064863; Cuprum Bromatum; RefChem:58532; DTXCID9048067; CUPRIC BROMIDE, ANHYDROUS; 232-167-2; Copper (II) bromide; MFCD00010970; copper(II)bromide; Copper II bromide"
+    "embedding_text": "type: METAL_CATALYST | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper bromide (CuBr2) | abbr: CuBr2 | CAS: 7789-45-9 | synonyms: Copper bromide (CuBr2); Copper(II) bromide; 7789-45-9; CUPRIC BROMIDE; Dibromocopper; 1KC430K0ZN; DTXSID7064863; Cuprum Bromatum; RefChem:58532; DTXCID9048067; CUPRIC BROMIDE, ANHYDROUS; 232-167-2; Copper (II) bromide; MFCD00010970; copper(II)bromide; Copper II bromide"
   },
   {
     "id": "cas-1317-39-1",
@@ -391,7 +391,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "copper salt"
         ],
@@ -417,7 +417,14 @@
     "cas": "1317-38-0",
     "inchi_key": "KKCXRELNMOYFLS-UHFFFAOYSA-N",
     "roles": {
-      "metal_precursor": {
+      "oxidant": {
+        "families": [
+          "metal_salt_reoxidants"
+        ],
+        "strength_band": "moderate",
+        "_note": "LLM-suggested alternative role"
+      },
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -425,16 +432,9 @@
         "oxidation_states": [
           2
         ]
-      },
-      "oxidant": {
-        "families": [
-          "metal_salt_reoxidants"
-        ],
-        "strength_band": "moderate",
-        "_note": "LLM-suggested alternative role"
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper oxide (CuO) | abbr: CuO | CAS: 1317-38-0 | synonyms: Copper oxide (CuO); Cuprum oxydatum nigrum; DTXSID5034488; CHEBI:75955; V1XJQ704R4; NSC-83537; Copper Oxide 0.4; RefChem:54904; Cuprite 3 Special Order; DTXCID101333885; 215-269-1; 1317-38-0; Banacobru ol; Black copper oxide; Boliden Salt K-33; Boliden-CCA Wood Preservative; Copper(II) oxide; Cupric oxide; Copper monoxide"
+    "embedding_text": "type: METAL_CATALYST | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper oxide (CuO) | abbr: CuO | CAS: 1317-38-0 | synonyms: Copper oxide (CuO); Cuprum oxydatum nigrum; DTXSID5034488; CHEBI:75955; V1XJQ704R4; NSC-83537; Copper Oxide 0.4; RefChem:54904; Cuprite 3 Special Order; DTXCID101333885; 215-269-1; 1317-38-0; Banacobru ol; Black copper oxide; Boliden Salt K-33; Boliden-CCA Wood Preservative; Copper(II) oxide; Cupric oxide; Copper monoxide"
   },
   {
     "id": "ARUVKPQLZAKDPS-UHFFFAOYSA-L",
@@ -461,7 +461,7 @@
     "cas": "7758-98-7",
     "inchi_key": "ARUVKPQLZAKDPS-UHFFFAOYSA-L",
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -471,7 +471,7 @@
         ]
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper Sulfate | abbr: CuSO4 | CAS: 7758-98-7 | synonyms: Copper Sulfate; 7758-98-7; Copper(II) sulfate; CUPRIC SULFATE; Cupric sulfate anhydrous; Copper sulphate; Copper(2+) sulfate; Copper(ii) sulfate, anhydrous; Copper monosulfate; Trinagle; Delcup; Hylinec; Copper sulfate (1:1); Cupric sulphate; Roman vitriol; CuSO4; Blue vitriol"
+    "embedding_text": "type: METAL_CATALYST | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper Sulfate | abbr: CuSO4 | CAS: 7758-98-7 | synonyms: Copper Sulfate; 7758-98-7; Copper(II) sulfate; CUPRIC SULFATE; Cupric sulfate anhydrous; Copper sulphate; Copper(2+) sulfate; Copper(ii) sulfate, anhydrous; Copper monosulfate; Trinagle; Delcup; Hylinec; Copper sulfate (1:1); Cupric sulphate; Roman vitriol; CuSO4; Blue vitriol"
   },
   {
     "id": "R_d8cb119bbf8e4b10",
@@ -487,7 +487,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_i_halides"
         ],
@@ -514,7 +514,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_i_halides"
         ],
@@ -540,7 +540,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_i_halides"
         ],
@@ -566,7 +566,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -592,7 +592,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -630,7 +630,7 @@
     "cas": "13395-16-9",
     "inchi_key": "KMOVDRADWUSGIH-UHFFFAOYSA-N",
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -640,7 +640,7 @@
         ]
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper(II) acetylacetonate | abbr: Cu(acac)2 | CAS: 13395-16-9 | synonyms: Copper(II) acetylacetonate; Copper bis(acetylacetone); Copper bis(acetylacetonate); 69QQY9TJ8M; Copper bis(2,4-pentanedionate); DTXSID50904281; Copper, bis(2,4-pentanedionato)-; Copper, bis(2,4-pentanedionato-kappaO,kappaO')-, (SP-4-1)-; Cu(II) acetyl acetonate; RefChem:579109; DTXCID001839161; acetyl acetonate, copper (+2) salt; 236-477-9; 13395-16-9; Bis(acetylacetonato)copper; Bis(acetylacetone)copper; Bis(acetylacetonato)copper(II)"
+    "embedding_text": "type: METAL_CATALYST | family: cu_ii_salts (cu_ii_salts) | metal: Cu | oxidation_states: 2 | name: Copper(II) acetylacetonate | abbr: Cu(acac)2 | CAS: 13395-16-9 | synonyms: Copper(II) acetylacetonate; Copper bis(acetylacetone); Copper bis(acetylacetonate); 69QQY9TJ8M; Copper bis(2,4-pentanedionate); DTXSID50904281; Copper, bis(2,4-pentanedionato)-; Copper, bis(2,4-pentanedionato-kappaO,kappaO')-, (SP-4-1)-; Cu(II) acetyl acetonate; RefChem:579109; DTXCID001839161; acetyl acetonate, copper (+2) salt; 236-477-9; 13395-16-9; Bis(acetylacetonato)copper; Bis(acetylacetone)copper; Bis(acetylacetonato)copper(II)"
   },
   {
     "id": "R_c427849c3ec6a6c8",
@@ -656,7 +656,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "cu_ii_salts"
         ],
@@ -682,7 +682,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "rh_hydroformylation_toolkit"
         ],
@@ -707,7 +707,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ru_arene_dimer"
         ],
@@ -733,7 +733,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -758,7 +758,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "fe_carbonyls"
         ],
@@ -783,7 +783,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ru_metathesis_grubbs"
         ],
@@ -808,7 +808,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "fe_carbonyls"
         ],
@@ -833,7 +833,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "fe_halides"
         ],
@@ -859,7 +859,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "fe_halides"
         ],
@@ -886,7 +886,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ir_cod_dimers"
         ],
@@ -917,7 +917,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "Ni metal"
         ],
@@ -949,7 +949,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "Ni salt"
         ],
@@ -977,7 +977,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_zero_sources"
         ],
@@ -1003,7 +1003,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_ii_carboxylates"
         ],
@@ -1029,7 +1029,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_ii_carboxylates"
         ],
@@ -1055,7 +1055,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_ii_halides"
         ],
@@ -1082,7 +1082,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_ii_glyme"
         ],
@@ -1108,7 +1108,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_ii_halides"
         ],
@@ -1135,7 +1135,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ni_ii_glyme"
         ],
@@ -1167,7 +1167,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1193,7 +1193,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1219,7 +1219,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1245,7 +1245,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1271,7 +1271,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1296,7 +1296,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_phosphine_complexes"
         ],
@@ -1322,7 +1322,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1360,7 +1360,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1390,7 +1390,7 @@
     "cas": "1798782-02-1",
     "inchi_key": "JKDXLSQCLASSTC-HRNDJLQDSA-N",
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_zero_sources"
         ],
@@ -1398,20 +1398,9 @@
         "oxidation_states": [
           0
         ]
-      },
-      "preformed_metal_catalyst": {
-        "families": [
-          "pd_g3_precatalysts"
-        ],
-        "metal": "Pd",
-        "oxidation_states": [
-          2
-        ],
-        "ligand_type": "phosphine",
-        "_note": "LLM-suggested alternative role"
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: pd_zero_sources (pd_zero_sources) | metal: Pd | oxidation_states: 0 | name: Pd-170 | abbr: Pd-170 | CAS: 1798782-02-1 | synonyms: Pd-170; 1798782-02-1; RefChem:858792; 868-350-4; Chloro(crotyl)(2-dicyclohexylphosphino-2',4',6'-triisopropyl-1,1'-biphenyl) palladium(II); C37H54ClPPd+2; SY362389; F552997; [(1,2,3-|C)-2-Buten-1-yl]chloro[dicyclohexyl(2',4',6'-trisisopropyl-2-biphenylyl)phosphine]palladium; [2-[(E)-but-2-enyl]-3-chloro-6-(2,4,6-triisopropylphenyl)phenyl]-dicyclohexyl-phosphane;palladium(2+); [2-[(E)-but-2-enyl]-3-chloro-6-[2,4,6-tri(propan-2-yl)phenyl]phenyl]-dicyclohexylphosphane;palladium(2+)"
+    "embedding_text": "type: METAL_CATALYST | family: pd_zero_sources (pd_zero_sources) | metal: Pd | oxidation_states: 0 | name: Pd-170 | abbr: Pd-170 | CAS: 1798782-02-1 | synonyms: Pd-170; 1798782-02-1; RefChem:858792; 868-350-4; Chloro(crotyl)(2-dicyclohexylphosphino-2',4',6'-triisopropyl-1,1'-biphenyl) palladium(II); C37H54ClPPd+2; SY362389; F552997; [(1,2,3-|C)-2-Buten-1-yl]chloro[dicyclohexyl(2',4',6'-trisisopropyl-2-biphenylyl)phosphine]palladium; [2-[(E)-but-2-enyl]-3-chloro-6-(2,4,6-triisopropylphenyl)phenyl]-dicyclohexyl-phosphane;palladium(2+); [2-[(E)-but-2-enyl]-3-chloro-6-[2,4,6-tri(propan-2-yl)phenyl]phenyl]-dicyclohexylphosphane;palladium(2+)"
   },
   {
     "id": "R_e86dfaa7c2101e03",
@@ -1426,7 +1415,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "ru_arene_dimer"
         ],
@@ -1459,7 +1448,7 @@
     "inchi_key": "GNQXUMGHBSAQBV-UHFFFAOYSA-N",
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1469,7 +1458,7 @@
         ]
       }
     },
-    "embedding_text": "type: METAL_PRECURSOR | family: Auto-generated family for metal_precursor (pd_ii_salts) | metal: Cd | oxidation states: 2 | name: tetrakis(acetonitrile)copper(I) hexafluorophosphate | abbr: tetrakis(acetonitrile)copper(I) hexafluorophosphate | CAS: 64443-05-6 | synonyms: tetrakis(acetonitrile)copper(I) hexafluorophosphate; DTXSID70983013; RefChem:897252; DTXCID901410263; Copper(1+), tetrakis(acetonitrile), (T4), hexafluorophosphate(1); 64443-05-6; Tetrakis(acetonitrile)copper (I) hexafluorophosphate; MFCD00064810; Tetrakis(acetonitrile)copper hexafluorophosphate; Cu(MeCN)4PF6; [Cu(MeCN)4]PF6; C8H12CuF6N4P; Cuprous tetrakis(acetonitrile) hexafluorophosphate; Copper(I) tetrakis(acetonitrile) hexafluorophosphate; SCHEMBL22557409; cuprous;acetonitrile;hexafluorophosphate"
+    "embedding_text": "type: METAL_CATALYST | family: Auto-generated family for metal_catalyst (pd_ii_salts) | metal: Cd | oxidation states: 2 | name: tetrakis(acetonitrile)copper(I) hexafluorophosphate | abbr: tetrakis(acetonitrile)copper(I) hexafluorophosphate | CAS: 64443-05-6 | synonyms: tetrakis(acetonitrile)copper(I) hexafluorophosphate; DTXSID70983013; RefChem:897252; DTXCID901410263; Copper(1+), tetrakis(acetonitrile), (T4), hexafluorophosphate(1); 64443-05-6; Tetrakis(acetonitrile)copper (I) hexafluorophosphate; MFCD00064810; Tetrakis(acetonitrile)copper hexafluorophosphate; Cu(MeCN)4PF6; [Cu(MeCN)4]PF6; C8H12CuF6N4P; Cuprous tetrakis(acetonitrile) hexafluorophosphate; Copper(I) tetrakis(acetonitrile) hexafluorophosphate; SCHEMBL22557409; cuprous;acetonitrile;hexafluorophosphate"
   },
   {
     "id": "R_9855acabfee2ac17",
@@ -1485,7 +1474,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_ii_salts"
         ],
@@ -1511,7 +1500,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "co_beta_diketonates"
         ],
@@ -1537,7 +1526,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "fe_acac"
         ],
@@ -1563,7 +1552,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_zero_sources"
         ],
@@ -1589,7 +1578,7 @@
     "inchi_key": null,
     "smiles": null,
     "roles": {
-      "metal_precursor": {
+      "metal_catalyst": {
         "families": [
           "pd_zero_sources"
         ],

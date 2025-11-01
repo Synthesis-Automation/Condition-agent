@@ -19,7 +19,7 @@ rule_conditions = [
         "chemicals": [
             {
                 "name": "Tris(dibenzylideneacetone)dipalladium(0)",
-                "role": "metal_precursor",
+                "role": "metal_catalyst",
                 "abbreviation": "Pd2(dba)3",
                 "equivalents": 0.015
             },

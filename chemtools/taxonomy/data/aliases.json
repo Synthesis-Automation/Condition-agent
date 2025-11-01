@@ -1764,8 +1764,8 @@
         "source": "legacy/families_registry.json"
     },
     {
-        "alias": "metal_precursor",
-        "entity_id": "metal_precursor",
+        "alias": "metal_catalyst",
+        "entity_id": "metal_catalyst",
         "entity_type": "reagent_role",
         "notes": null,
         "source": "legacy/reagent_roles"
@@ -2275,8 +2275,8 @@
         "source": "legacy/reactant_types.json"
     },
     {
-        "alias": "preformed_metal_catalyst",
-        "entity_id": "preformed_metal_catalyst",
+        "alias": "metal_catalyst",
+        "entity_id": "metal_catalyst",
         "entity_type": "reagent_role",
         "notes": null,
         "source": "legacy/reagent_roles"
@@ -3122,3 +3122,4 @@
         "source": "legacy/families_registry.json"
     }
 ]
+

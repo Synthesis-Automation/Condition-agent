@@ -255,7 +255,7 @@ def print_recommendation(result: dict, reaction_smiles: str, max_precedents: int
                 catalyst = core
             else:
                 # Last resort: extract from chemicals (but skip CAS-only entries)
-                metal = extract_chemical_by_role(chemicals, "metal_precursor")
+                metal = extract_chemical_by_role(chemicals, "metal_catalyst")
                 ligand = extract_chemical_by_role(chemicals, "ligand")
                 # Check if these are just CAS numbers
                 if metal != "N/A" and all(c.isdigit() or c == '-' for c in metal.replace('-', '')):

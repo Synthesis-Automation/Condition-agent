@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 
 """PyQt6 UI for the reagent registry generator workflow."""
 
@@ -43,6 +43,7 @@ from chemtools.reagent import (
     normalize_cas,
     resolve_identity_from_cas,
     tokenize_all,
+    ROLE_ALIASES,
 )
 
 DEFAULT_RESOLVER_TIMEOUT = 6.0  # Default timeout for identity resolution
@@ -50,6 +51,11 @@ DEFAULT_RESOLVER_TIMEOUT = 6.0  # Default timeout for identity resolution
 # Default to the unified flattened registry directory used across the project
 # Aligns with chemtools.reagent defaults (data/reagent_db)
 DEFAULT_REGISTRY_DIR = (ROOT_DIR / "data" / "reagent_db").resolve()
+
+
+def canonical_role(role: str) -> str:
+    """Normalize legacy role labels to the canonical registry keys."""
+    return ROLE_ALIASES.get(role, role)
 
 DEFAULT_LLM_MODELS: Dict[str, List[str]] = {
     "aliyun": [
@@ -134,19 +140,12 @@ ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
         "priority": 0,
         "default_family": "trialkyl_triaryl_phosphines",
     },
-    "metal_precursor": {
-        "filename": "metal_precursor.json",
-        "label": "Metal precursor",
-        "hint": "Metal salts or complexes that generate the catalytically active species.",
+    "metal_catalyst": {
+        "filename": "metal_catalyst.json",
+        "label": "Metal catalyst",
+        "hint": "Metal salts or pre-ligated complexes that generate the active catalyst.",
         "priority": 1,
         "default_family": "pd_ii_salts",
-    },
-    "preformed_metal_catalyst": {
-        "filename": "preformed_metal_catalyst.json",
-        "label": "Preformed metal catalyst",
-        "hint": "Precatalysts supplied with ligands; typically used as-is.",
-        "priority": 2,
-        "default_family": "pd_phosphine_complexes",
     },
     "base": {
         "filename": "base.json",
@@ -222,8 +221,7 @@ ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
 
 ROLE_EMBED_FIELDS: Dict[str, Sequence[str]] = {
     "ligand": ("donors", "denticity"),
-    "metal_precursor": ("metal", "oxidation_states"),
-    "preformed_metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
+    "metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
     "base": ("basicity", "nucleophilicity", "sterics"),
     "acid": ("acidity",),
     "condensation_agent": ("strength_band",),
@@ -261,9 +259,8 @@ ROLE_PAYLOAD_FIELDS: Dict[str, Sequence[str]] = {
     "base": ("basicity", "nucleophilicity", "sterics"),
     "condensation_agent": ("strength_band",),
     "ligand": ("donors", "denticity"),
-    "metal_precursor": ("metal", "oxidation_states"),
     "oxidant": ("strength_band",),
-    "preformed_metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
+    "metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
     "reductant": ("strength_band",),
     "solvent": ("proticity", "polarity", "coordination"),
     "organo_catalyst": ("activation_mode", "chirality"),
@@ -1068,7 +1065,7 @@ def generate_taxonomy_entry(
                     # ENHANCEMENT 1: Auto-upgrade "other_reagent" when LLM suggests better role
                     if role == "other_reagent" and candidate_role and candidate_role != role:
                         debug_log.append(
-                            f"LLM auto-upgrade: 'other_reagent' → '{candidate_role}' "
+                            f"LLM auto-upgrade: 'other_reagent' 鈫?'{candidate_role}' "
                             f"(confidence: {analysis.get('confidence', 'N/A')})"
                         )
                         result["llm_auto_upgrade"] = {
@@ -1265,7 +1262,7 @@ class RegistryGeneratorWindow(QMainWindow):
         
         # Add "Auto-detect (LLM)" option if LLM is available
         if self._llm_support_available:
-            self.role_combo.addItem("🤖 Auto-detect (LLM)", userData="__auto_detect__")
+            self.role_combo.addItem("馃 Auto-detect (LLM)", userData="__auto_detect__")
             self.role_combo.setItemData(
                 1, 
                 "Use LLM to automatically detect the reagent role", 
@@ -1296,7 +1293,7 @@ class RegistryGeneratorWindow(QMainWindow):
         
         self.workflow_mode_combo = QComboBox()
         self.workflow_mode_combo.addItem("Deterministic + LLM Review", userData="legacy")
-        self.workflow_mode_combo.addItem("🚀 Pure LLM Workflow (Recommended)", userData="llm_workflow")
+        self.workflow_mode_combo.addItem("馃殌 Pure LLM Workflow (Recommended)", userData="llm_workflow")
         self.workflow_mode_combo.setCurrentIndex(1)  # Default to pure LLM
         self.workflow_mode_combo.currentIndexChanged.connect(self.on_workflow_mode_changed)
         workflow_layout.addWidget(self.workflow_mode_combo)
@@ -1623,9 +1620,9 @@ class RegistryGeneratorWindow(QMainWindow):
             
             # Update status label with helpful message
             if status == "ready_to_save":
-                self.status_label.setText("✅ LLM Approved - Ready to Save")
+                self.status_label.setText("鉁?LLM Approved - Ready to Save")
             elif status == "needs_review":
-                self.status_label.setText("⚠️ Needs Review - Check entry before saving")
+                self.status_label.setText("鈿狅笍 Needs Review - Check entry before saving")
             else:
                 self.status_label.setText(f"Status: {status}")
             
@@ -1754,7 +1751,7 @@ class RegistryGeneratorWindow(QMainWindow):
         if not isinstance(roles_payload, dict) or not roles_payload:
             self.show_error("Entry must include a 'roles' mapping to determine destination file.")
             return
-        role_for_save = next(iter(roles_payload.keys()))
+        role_for_save = canonical_role(next(iter(roles_payload.keys())))
         role_details = roles_payload.get(role_for_save) or {}
         families = role_details.get("families")
         family_for_save: Optional[str] = families[0] if isinstance(families, list) and families else None
@@ -1856,3 +1853,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

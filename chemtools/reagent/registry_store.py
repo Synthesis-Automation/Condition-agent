@@ -16,7 +16,14 @@ import re
 
 from .taxonomy_store import ROLE_KEYWORDS_RAW, load_families_registry_entries
 from .taxonomy_utils import tokenize_all
-from .constants import DEFAULT_FAMILY_BY_ROLE
+from .constants import DEFAULT_FAMILY_BY_ROLE, ROLE_ALIASES
+
+
+
+def _canonical_role(role: str) -> str:
+    """Normalize legacy role names to the canonical registry labels."""
+    return ROLE_ALIASES.get(role, role)
+
 
 # -----------------------------------------------------------------------------
 # Role configuration for flattened registry schema
@@ -27,13 +34,9 @@ ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
         "filename": "ligand.json",
         "default_family": "generic_ligands",
     },
-    "metal_precursor": {
-        "filename": "metal_precursor.json",
+    "metal_catalyst": {
+        "filename": "metal_catalyst.json",
         "default_family": "pd_ii_salts",
-    },
-    "preformed_metal_catalyst": {
-        "filename": "preformed_metal_catalyst.json",
-        "default_family": "pd_nhc_precatalysts",
     },
     "base": {
         "filename": "base.json",
@@ -74,9 +77,8 @@ ROLE_PAYLOAD_FIELDS: Dict[str, Sequence[str]] = {
     "base": ("basicity", "nucleophilicity", "sterics"),
     "condensation_agent": ("strength_band",),
     "ligand": ("donors", "denticity"),
-    "metal_precursor": ("metal", "oxidation_states"),
     "oxidant": ("strength_band",),
-    "preformed_metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
+    "metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
     "reductant": ("strength_band",),
     "acid": ("acidity",),
     "solvent": ("polarity_band", "proticity"),
@@ -102,8 +104,7 @@ ROLE_FIELD_LABELS: Dict[str, str] = {
 
 ROLE_EMBED_FIELDS: Dict[str, Sequence[str]] = {
     "ligand": ("donors", "denticity"),
-    "metal_precursor": ("metal", "oxidation_states"),
-    "preformed_metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
+    "metal_catalyst": ("metal", "oxidation_states", "ligand_type"),
     "base": ("basicity", "nucleophilicity", "sterics"),
     "acid": ("acidity",),
     "condensation_agent": ("strength_band",),
@@ -282,6 +283,7 @@ class RegistryStore:
                 entries = []
         if not entries:
             def add_entry(role: str, family: str, definition: str, keywords: Sequence[str]) -> None:
+                role = _canonical_role(role)
                 entries.append({
                     "role": role,
                     "family": family,
@@ -355,6 +357,7 @@ class RegistryStore:
                         self.family_numeric_baseline[(role, family)] = deepcopy(numeric)
 
     def build_role_payload(self, role: str, family_id: str) -> Dict[str, Any]:
+        role = _canonical_role(role)
         payload: Dict[str, Any] = {"families": [family_id]}
         family = self.family_entry(role, family_id)
         if family:
@@ -368,6 +371,7 @@ class RegistryStore:
         return payload
 
     def _default_role_fields(self, role: str, family_id: str) -> Dict[str, Any]:
+        role = _canonical_role(role)
         entries = self.role_entries.get(role, [])
         for entry in entries:
             role_payload = entry.get("roles", {}).get(role, {})
@@ -384,6 +388,7 @@ class RegistryStore:
 
     # ------------------------------------------------------------------ queries
     def file_for_role(self, role: str) -> Path:
+        role = _canonical_role(role)
         cfg = ROLE_CONFIG.get(role)
         if not cfg or not cfg.get("filename"):
             raise KeyError(f"Unknown or unsupported role '{role}'.")
@@ -394,21 +399,25 @@ class RegistryStore:
         return data[0] if data else None
 
     def family_data(self, role: str, family_id: str) -> Dict[str, Any]:
+        role = _canonical_role(role)
         data = self.family_lookup.get(family_id)
         if not data or data[0] != role:
             raise KeyError(f"Family '{family_id}' not found for role '{role}'.")
         return data[1]
 
     def numeric_baseline(self, role: str, family_id: str) -> Optional[Dict[str, Any]]:
+        role = _canonical_role(role)
         return self.family_numeric_baseline.get((role, family_id))
 
     def family_entry(self, role: str, family_id: str) -> Optional[Dict[str, Any]]:
+        role = _canonical_role(role)
         data = self.family_lookup.get(family_id)
         if not data or data[0] != role:
             return None
         return data[1]
 
     def default_family(self, role: str) -> Optional[str]:
+        role = _canonical_role(role)
         cfg = ROLE_CONFIG.get(role)
         return cfg.get("default_family") if cfg else DEFAULT_FAMILY_BY_ROLE.get(role)
 
@@ -425,6 +434,7 @@ class RegistryStore:
         return items
 
     def family_token_overlap(self, role: str, family_id: str, tokens: Iterable[str]) -> bool:
+        role = _canonical_role(role)
         familial = self.family_tokens.get((role, family_id), set())
         return bool(familial & set(tokens))
 
@@ -437,6 +447,7 @@ class RegistryStore:
 
     # ------------------------------------------------------------------ updates
     def add_entry(self, role: str, entry: Dict[str, Any]) -> None:
+        role = _canonical_role(role)
         entries = self.role_entries.setdefault(role, [])
         entries.append(entry)
         entries.sort(key=lambda item: (item.get("name") or "").lower())
@@ -450,6 +461,7 @@ class RegistryStore:
             self.family_tokens.setdefault((role, family), set()).update(tokens)
 
     def save_role(self, role: str) -> Path:
+        role = _canonical_role(role)
         path = self.file_for_role(role)
         path.parent.mkdir(parents=True, exist_ok=True)
         entries = self.role_entries.get(role, [])
@@ -458,6 +470,7 @@ class RegistryStore:
 
     # ------------------------------------------------------------------ heuristics
     def infer_family(self, role: str, tokens: Set[str]) -> Optional[Tuple[str, List[str]]]:
+        role = _canonical_role(role)
         best: Optional[Tuple[int, List[str], str]] = None
         for (fam_role, fam_id), fam_tokens in self.family_tokens.items():
             if fam_role != role:
@@ -474,6 +487,7 @@ class RegistryStore:
         return None
 
     def suggest_families(self, role: str, tokens: Iterable[str], limit: int = 5) -> List[Dict[str, Any]]:
+        role = _canonical_role(role)
         token_set = {tok for tok in tokens if tok}
         suggestions: List[Tuple[int, str, List[str]]] = []
         for (fam_role, fam_id), fam_tokens in self.family_tokens.items():
@@ -506,3 +520,7 @@ class RegistryStore:
                 if re.search(pattern, texts, flags=re.IGNORECASE):
                     return role, pattern
         return None
+
+
+
+

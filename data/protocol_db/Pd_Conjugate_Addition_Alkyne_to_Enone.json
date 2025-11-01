@@ -38,7 +38,7 @@
             "volume_ml": null,
             "equivalents": 0.02
           },
-          "role": "metal_precursor"
+          "role": "metal_catalyst"
         },
         {
           "name": "Trimethylphosphine (1.0 M in toluene)",

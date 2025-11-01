@@ -68,7 +68,7 @@ def _format_conditions_for_llm(conditions: List[Dict[str, Any]], source_name: st
                 role = chem.get('role', '').lower()
                 name = chem.get('name') or chem.get('abbreviation', 'N/A')
                 
-                if role in ['metal_precursor', 'catalyst', 'metal_source']:
+                if role in ['metal_catalyst', 'catalyst', 'metal_source']:
                     catalyst = name
                 elif role == 'ligand':
                     ligand = name
@@ -428,7 +428,7 @@ def _build_recommendation_from_llm(
     
     # Add chemicals with enrichment
     if catalyst_name and catalyst_name not in ["None", "N/A", None]:
-        chemicals.append(normalize_rule_string_value(catalyst_name, "metal_precursor"))
+        chemicals.append(normalize_rule_string_value(catalyst_name, "metal_catalyst"))
     
     if ligand_name and ligand_name not in ["None", "N/A", None, "None (pre-formed catalyst)", "pre-complexed"]:
         chemicals.append(normalize_rule_string_value(ligand_name, "ligand"))

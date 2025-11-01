@@ -28,7 +28,7 @@ def load_reagent_database(reagent_type: str) -> List[Dict[str, Any]]:
     Load a reagent database JSON file.
     
     Args:
-        reagent_type: Type of reagent (e.g., 'ligand', 'base', 'solvent', 'metal_precursor')
+        reagent_type: Type of reagent (e.g., 'ligand', 'base', 'solvent', 'metal_catalyst')
         
     Returns:
         List of reagent dictionaries
@@ -165,11 +165,11 @@ def enrich_conditions(conditions: Dict[str, Any]) -> Dict[str, Any]:
     
     # Map condition keys to reagent types
     reagent_type_map = {
-        'catalyst': 'metal_precursor',
-        'pd_source': 'metal_precursor',
-        'cu_source': 'metal_precursor',
-        'ni_source': 'metal_precursor',
-        'metal_source': 'metal_precursor',
+        'catalyst': 'metal_catalyst',
+        'pd_source': 'metal_catalyst',
+        'cu_source': 'metal_catalyst',
+        'ni_source': 'metal_catalyst',
+        'metal_source': 'metal_catalyst',
         'ligand': 'ligand',
         'ligands': 'ligand',
         'base': 'base',
@@ -265,7 +265,7 @@ def get_all_reagents_by_type(reagent_type: str) -> List[Dict[str, Any]]:
     Get all reagents of a specific type.
     
     Args:
-        reagent_type: Type of reagent (e.g., 'ligand', 'base', 'solvent', 'metal_precursor', 'additive')
+        reagent_type: Type of reagent (e.g., 'ligand', 'base', 'solvent', 'metal_catalyst', 'additive')
         
     Returns:
         List of all reagent dictionaries in that database
@@ -329,7 +329,7 @@ def check_precedent_reagents_in_database(precedent: Dict[str, Any]) -> Dict[str,
     found_count = 0
     total_count = 0
     
-    # Check catalytic system (metal precursors and ligands)
+    # Check catalytic system (metal catalysts and ligands)
     for cat in precedent.get("catalytic_system", []):
         name = cat.get("name")
         if not name:
@@ -337,8 +337,8 @@ def check_precedent_reagents_in_database(precedent: Dict[str, Any]) -> Dict[str,
             
         total_count += 1
         
-        # Try metal_precursor first, then ligand
-        found = (is_reagent_in_database(name, "metal_precursor") or 
+        # Try metal_catalyst first, then ligand
+        found = (is_reagent_in_database(name, "metal_catalyst") or 
                 is_reagent_in_database(name, "ligand"))
         
         if found:
@@ -429,7 +429,7 @@ def filter_precedents_by_database_availability(
 # Preload common databases on module import (optional)
 def preload_common_databases():
     """Preload commonly used reagent databases for faster lookup."""
-    common_types = ['ligand', 'base', 'solvent', 'metal_precursor']
+    common_types = ['ligand', 'base', 'solvent', 'metal_catalyst']
     for reagent_type in common_types:
         try:
             load_reagent_database(reagent_type)
@@ -451,9 +451,9 @@ if __name__ == "__main__":
     info = enrich_reagent_info("K2CO3", "base")
     print(format_reagent_for_display(info))
     
-    # Test metal precursor
+    # Test metal catalyst
     print("\n3. Looking up 'Pd(PPh3)4':")
-    info = enrich_reagent_info("Pd(PPh3)4", "metal_precursor")
+    info = enrich_reagent_info("Pd(PPh3)4", "metal_catalyst")
     print(format_reagent_for_display(info))
     
     # Test condition enrichment

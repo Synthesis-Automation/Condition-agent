@@ -46,7 +46,7 @@ Examples:
   
   # Specify role and family explicitly
   %(prog)s --cas "14221-01-3" --name "Pd(PPh3)4" \\
-           --role metal_precursor --family pd_0_complexes
+           --role metal_catalyst --family pd_0_complexes
   
   # List all available families
   %(prog)s --list-families

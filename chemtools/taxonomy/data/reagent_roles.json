@@ -58,10 +58,10 @@
     "priority": 0
   },
   {
-    "name": "Metal Precursor",
+    "name": "Metal Catalyst",
     "default_family_id": "pd_ii_salts",
-    "description": null,
-    "id": "metal_precursor",
+    "description": "Unified role covering precursor salts and pre-formed catalyst complexes.",
+    "id": "metal_catalyst",
     "metadata": {
       "taxonomy_file": "taxonomy_catalysts_precursor.json"
     },
@@ -92,14 +92,6 @@
       "taxonomy_file": "taxonomy_oxidant.json"
     },
     "priority": 5
-  },
-  {
-    "name": "Preformed Metal Catalyst",
-    "default_family_id": null,
-    "description": null,
-    "id": "preformed_metal_catalyst",
-    "metadata": {},
-    "priority": 100
   },
   {
     "name": "Reductant",

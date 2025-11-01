@@ -1805,7 +1805,7 @@
         ],
         "denticity": 1
       },
-      "preformed_metal_catalyst": {
+      "metal_catalyst": {
         "families": [
           "pd_phosphine_complexes"
         ],

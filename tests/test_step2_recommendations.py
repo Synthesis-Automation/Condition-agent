@@ -70,7 +70,7 @@ def test_condition_recommendations():
             print(f"       → Summary: {summary if summary else 'N/A'}")
             
             # Extract catalyst system
-            catalysts = [c for c in chemicals if c.get('role') in ['metal_precursor', 'ligand']]
+            catalysts = [c for c in chemicals if c.get('role') in ['metal_catalyst', 'ligand']]
             if catalysts:
                 cat_names = [c.get('name', 'Unknown') for c in catalysts]
                 print(f"       → Catalysts: {', '.join(cat_names)}")
@@ -146,7 +146,7 @@ def test_condition_recommendations():
             print(f"       → Summary: {summary if summary else 'N/A'}")
             
             # Extract Pd catalyst system
-            catalysts = [c for c in chemicals if c.get('role') in ['metal_precursor', 'ligand']]
+            catalysts = [c for c in chemicals if c.get('role') in ['metal_catalyst', 'ligand']]
             if catalysts:
                 cat_names = [c.get('name', 'Unknown') for c in catalysts]
                 print(f"       → Pd System: {', '.join(cat_names)}")
@@ -211,7 +211,7 @@ def test_condition_recommendations():
         print(f"       → Summary: {summary if summary else 'N/A'}")
         
         # Catalysts
-        catalysts = [c for c in chemicals if c.get('role') in ['metal_precursor', 'ligand']]
+        catalysts = [c for c in chemicals if c.get('role') in ['metal_catalyst', 'ligand']]
         if catalysts:
             cat_names = [c.get('name', 'Unknown') for c in catalysts]
             print(f"       → Catalysts: {', '.join(cat_names)}")

@@ -39,7 +39,7 @@
               "volume_ml": null,
               "equivalents": 0.01
             },
-            "role": "metal_precursor"
+            "role": "metal_catalyst"
           },
           {
             "name": "CM-Phos (2-[2-(dicyclohexylphosphino)phenyl]-1-methyl-1H-indole)",

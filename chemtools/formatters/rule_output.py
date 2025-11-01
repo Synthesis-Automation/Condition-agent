@@ -79,9 +79,9 @@ def convert_rule_match_to_recommendations(
         
         # Role mapping for new standardized format
         role_mapping = {
-            "metal_source": "metal_precursor",
-            "metal_precursor": "metal_precursor",
-            "catalyst": "metal_precursor",
+            "metal_source": "metal_catalyst",
+            "metal_catalyst": "metal_catalyst",
+            "catalyst": "metal_catalyst",
             "ligand": "ligand",
             "base": "base",
             "solvent": "solvent",
@@ -120,7 +120,7 @@ def convert_rule_match_to_recommendations(
                     chemicals.append(normalize_rule_string_value(str(value), role))
             
             # Legacy format extraction
-            add_entry(cond.get("pd_source") or cond.get("catalyst") or cond.get("metal_source"), "metal_precursor")
+            add_entry(cond.get("pd_source") or cond.get("catalyst") or cond.get("metal_source"), "metal_catalyst")
             add_entry(cond.get("ligand"), "ligand")
             add_entry(cond.get("base"), "base")
             add_entry(cond.get("solvent"), "solvent")

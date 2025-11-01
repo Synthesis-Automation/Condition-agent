@@ -1,4 +1,4 @@
-"""
+﻿"""
 Chemistry-Specific Prompt Templates
 ====================================
 
@@ -499,9 +499,8 @@ REAGENT_ROLE_CLASSIFICATION = PromptTemplate(
 ## Available Roles
 
 **ligand**: Phosphines, NHCs, diimines, bidentate/multidentate donor ligands for metal coordination
-**metal_precursor**: Metal salts or simple complexes that generate catalytically active species (Pd, Ni, Cu, Fe, etc.)
-**preformed_metal_catalyst**: Precatalysts supplied with ligands, ready to use (e.g., Pd(PPh3)4)
-**base**: Brønsted or Lewis bases - amides, alkoxides, carbonates, phosphazenes, superbases
+**metal_catalyst**: Metal salts or pre-ligated complexes that provide the catalytic metal source (e.g., Pd(OAc)2, Pd(PPh3)4)
+**base**: Br酶nsted or Lewis bases - amides, alkoxides, carbonates, phosphazenes, superbases
 **acid**: Mineral acids, sulfonic acids, Lewis acids used as activators or promoters
 **condensation_agent**: Carbodiimides, uronium salts, phosphonium activators for amide/ester formation
 **oxidant**: Terminal oxidants and co-oxidants (peroxides, hypervalent iodine, Oxone, O2)
@@ -520,7 +519,7 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 {{
   "role": "base",
   "confidence": 0.95,
-  "reasoning": "Tertiary aliphatic amine with strong Brønsted basicity"
+  "reasoning": "Tertiary aliphatic amine with strong Br酶nsted basicity"
 }}
 
 IMPORTANT:
@@ -747,7 +746,7 @@ Protocol (Lit): {protocol_conditions}
 ## CONSTRAINTS: {constraints}
 
 ## TASK
-Analyze sources → Synthesize ONE best recommendation with backups.
+Analyze sources 鈫?Synthesize ONE best recommendation with backups.
 
 **Confidence Thresholds:**
 - HIGH: All 3 sources agree on catalyst+solvent AND ML similarity >0.80
@@ -755,11 +754,11 @@ Analyze sources → Synthesize ONE best recommendation with backups.
 - LOW: Sources disagree OR ML similarity <0.65
 
 **Chemistry Guidelines:**
-- Electron-poor aryl → electron-rich ligand (dppf, XPhos, SPhos)
-- Heteroaryl halides → chelating ligands (watch Pd coordination)
-- Nitro groups → avoid H2 (reduction risk); monitor proto-debromination
-- Sterically hindered → bidentate/bulky ligands (dppf, SPhos)
-- Aryl chlorides → strong base + high temp OR bulky ligand
+- Electron-poor aryl 鈫?electron-rich ligand (dppf, XPhos, SPhos)
+- Heteroaryl halides 鈫?chelating ligands (watch Pd coordination)
+- Nitro groups 鈫?avoid H2 (reduction risk); monitor proto-debromination
+- Sterically hindered 鈫?bidentate/bulky ligands (dppf, SPhos)
+- Aryl chlorides 鈫?strong base + high temp OR bulky ligand
 
 **Decision Tree for Backups:**
 - Backup 1: If main <30% conv after 6h (different ligand/solvent)
@@ -804,3 +803,4 @@ RULES: Respect constraints. Cite sources. Use chemistry guidelines for substrate
     protocol_conditions="No protocol recommendations available",
     constraints="None specified",
 )
+

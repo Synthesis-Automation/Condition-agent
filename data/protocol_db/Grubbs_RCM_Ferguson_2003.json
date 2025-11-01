@@ -32,7 +32,7 @@
             "volume_ml": null,
             "equivalents": 0.005
           },
-          "role": "preformed_catalyst"
+          "role": "metal_catalyst"
         },
         {
           "name": "Dichloromethane",
