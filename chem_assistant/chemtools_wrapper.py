@@ -17,6 +17,7 @@ Available Tools:
     - add_reagent_tool: Insert or preview reagent taxonomy entries
     - classify_reactant_tool: Classify reactant type (aryl halide, amine, etc.)
     - get_functional_groups_tool: Detect functional groups in a molecule
+    - analyze_bond_changes_tool: Analyze bond breaking/formation in reactions (NEW)
 
 Usage:
     from lang_chain.chemtools_wrapper import CHEMTOOLS_TOOLS
@@ -60,6 +61,13 @@ from chemtools.reagent.analytics import (
     get_missing_data_report,
 )
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
+
+# Import bond analysis tools (NEW)
+from chemtools import (
+    analyze_bond_changes,
+    analyze_bond_changes_hybrid,
+    rxnmapper_available,
+)
 
 REAGENT_RESOLVER_TIMEOUT = 6.0
 
@@ -108,6 +116,20 @@ class FunctionalGroupInput(BaseModel):
     """Schema for functional group detection."""
 
     smiles: str = Field(..., description="SMILES string to analyze for functional groups.")
+
+
+class AnalyzeBondChangesInput(BaseModel):
+    """Schema for bond breaking/formation analysis."""
+    
+    reaction_smiles: str = Field(
+        ..., 
+        description="Reaction SMILES string (reactants>>products) for bond analysis."
+    )
+    use_hybrid: bool = Field(
+        True,
+        description="Use hybrid approach (Manual + RXNMapper + MCS) for best results. "
+                    "If False, uses RXNMapper only."
+    )
 
 
 class RecommendConditionsInput(BaseModel):
@@ -604,6 +626,116 @@ def get_functional_groups_tool(smiles: str) -> Dict[str, Any]:
         return _success_response({"functional_groups": result})
     except Exception as e:
         return _error_response(str(e), {"smiles": smiles})
+
+
+@tool(args_schema=AnalyzeBondChangesInput)
+def analyze_bond_changes_tool(reaction_smiles: str, use_hybrid: bool = True) -> Dict[str, Any]:
+    """
+    Analyze which bonds break and form in a chemical reaction.
+    
+    Uses a hybrid approach combining:
+    - Manual atom mapping (if present in SMILES) - ground truth
+    - RXNMapper (ML-based automatic atom mapping) - precise
+    - MCS (Maximum Common Substructure) - validation fallback
+    
+    Detects leaving groups (like Br, I) and joining groups accurately.
+    
+    Args:
+        reaction_smiles: Reaction SMILES (reactants>>products)
+        use_hybrid: Use hybrid multi-method approach (recommended)
+    
+    Returns:
+        Dict[str, Any]: Bond analysis with broken_bonds, formed_bonds, 
+                       leaving_groups, confidence, and agreement between methods.
+    
+    Example:
+        Input: "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
+        Output: {
+            "success": true,
+            "method": "hybrid",
+            "combined_confidence": 0.75,
+            "broken_bonds": [(5, "Br (leaving group)"), (4, "B (leaving group)")],
+            "formed_bonds": [(4, 5)],
+            "agreement": {"rxnmapper_vs_mcs": true},
+            "validation": "Both methods agree"
+        }
+    """
+    try:
+        # Check if RXNMapper is available
+        if not rxnmapper_available():
+            return _error_response(
+                "RXNMapper not available. Install with: pip install rxnmapper",
+                {"recommendation": "Install rxnmapper for accurate bond analysis"}
+            )
+        
+        # Use hybrid approach or single method
+        if use_hybrid:
+            result = analyze_bond_changes_hybrid(
+                reaction_smiles,
+                use_rxnmapper=True,
+                use_mcs=True,
+                use_manual=True,
+                auto_map=True
+            )
+        else:
+            result = analyze_bond_changes(reaction_smiles, auto_map=True)
+        
+        if result.get('success'):
+            # Format the result for better readability
+            formatted = {
+                'success': True,
+                'method': result.get('method', 'unknown'),
+                'combined_confidence': result.get('combined_confidence', result.get('mapping_confidence', 0.0)),
+            }
+            
+            # Add recommended result if hybrid
+            if use_hybrid and 'recommended_result' in result:
+                rec = result['recommended_result']
+                formatted['broken_bonds'] = rec.get('broken_bonds', [])
+                formatted['formed_bonds'] = rec.get('formed_bonds', [])
+                formatted['changed_atoms'] = list(rec.get('changed_atoms', []))
+                formatted['leaving_groups'] = rec.get('leaving_groups', [])
+                formatted['joining_groups'] = rec.get('joining_groups', [])
+                formatted['agreement'] = result.get('agreement', {})
+                formatted['validation'] = result.get('validation', 'N/A')
+                
+                # Add individual method results for transparency
+                if result.get('manual_result'):
+                    formatted['manual_detected'] = True
+                if result.get('rxnmapper_result'):
+                    formatted['rxnmapper_confidence'] = result['rxnmapper_result'].get('mapping_confidence')
+                if result.get('mcs_result'):
+                    formatted['mcs_coverage'] = result['mcs_result'].get('mcs_coverage')
+            else:
+                # Single method result
+                formatted['broken_bonds'] = result.get('broken_bonds', [])
+                formatted['formed_bonds'] = result.get('formed_bonds', [])
+                formatted['changed_atoms'] = list(result.get('changed_atoms', []))
+                formatted['leaving_groups'] = result.get('leaving_groups', [])
+                formatted['joining_groups'] = result.get('joining_groups', [])
+            
+            # Add interpretation
+            broken_count = len(formatted.get('broken_bonds', []))
+            formed_count = len(formatted.get('formed_bonds', []))
+            
+            if broken_count > 0 and formed_count > 0:
+                formatted['interpretation'] = f"Substitution/coupling: {broken_count} bond(s) break, {formed_count} bond(s) form"
+            elif broken_count > formed_count:
+                formatted['interpretation'] = "Bond-breaking dominant (fragmentation/elimination)"
+            elif formed_count > broken_count:
+                formatted['interpretation'] = "Bond-forming dominant (addition/condensation)"
+            else:
+                formatted['interpretation'] = "Balanced or rearrangement"
+            
+            return formatted
+        else:
+            return _error_response(
+                result.get('error', 'Bond analysis failed'),
+                {'reaction_smiles': reaction_smiles}
+            )
+            
+    except Exception as e:
+        return _error_response(str(e), {'reaction_smiles': reaction_smiles})
 
 
 # ============================================================================
@@ -1180,6 +1312,7 @@ CHEMTOOLS_TOOLS = [
     detect_reaction_family_tool,
     classify_reactant_tool,
     get_functional_groups_tool,
+    analyze_bond_changes_tool,  # NEW: Bond breaking/formation analysis
     
     # Recommendation tools
     recommend_conditions_tool,
