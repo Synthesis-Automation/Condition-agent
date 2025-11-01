@@ -17,6 +17,7 @@ Available Tools:
     - add_reagent_tool: Insert or preview reagent taxonomy entries
     - classify_reactant_tool: Classify reactant type (aryl halide, amine, etc.)
     - get_functional_groups_tool: Detect functional groups in a molecule
+    - molpipeline_featurize_tool: Generate molecular features with optional MolPipeline vectors
     - analyze_bond_changes_tool: Analyze bond breaking/formation in reactions (NEW)
 
 Usage:
@@ -61,6 +62,7 @@ from chemtools.reagent.analytics import (
     get_missing_data_report,
 )
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
+from chemtools.featurizers import molecular as molecular_featurizer
 
 # Import bond analysis tools (NEW)
 from chemtools import (
@@ -129,6 +131,23 @@ class AnalyzeBondChangesInput(BaseModel):
         True,
         description="Use hybrid approach (Manual + RXNMapper + MCS) for best results. "
                     "If False, uses RXNMapper only."
+    )
+
+
+class MolPipelineFeaturizeInput(BaseModel):
+    """Schema for MolPipeline-backed molecular featurization."""
+
+    electrophile: str = Field(
+        ...,
+        description="Electrophile SMILES (e.g., aryl halide or activated electrophile).",
+    )
+    nucleophile: str = Field(
+        ...,
+        description="Nucleophile SMILES (amine, alcohol, etc.).",
+    )
+    include_molpipeline: bool = Field(
+        True,
+        description="Include MolPipeline fingerprint/descriptor payload when available.",
     )
 
 
@@ -626,6 +645,47 @@ def get_functional_groups_tool(smiles: str) -> Dict[str, Any]:
         return _success_response({"functional_groups": result})
     except Exception as e:
         return _error_response(str(e), {"smiles": smiles})
+
+
+@tool(args_schema=MolPipelineFeaturizeInput)
+def molpipeline_featurize_tool(
+    electrophile: str,
+    nucleophile: str,
+    include_molpipeline: bool = True,
+) -> Dict[str, Any]:
+    """
+    Featurize an electrophile/nucleophile pair with optional MolPipeline vectors.
+
+    Returns the deterministic ChemTools substrate features (LG, bin, nucleophile class)
+    and, when available and requested, MolPipeline-backed Morgan fingerprints plus
+    RDKit phys-chem descriptors for each reactant. The MolPipeline payload exposes both
+    list and name-value map (`physchem_map`) so properties such as MolLogP or TPSA can
+    be accessed directly.
+
+    Args:
+        electrophile: Electrophile SMILES (aryl halide, activated electrophile, etc.)
+        nucleophile: Nucleophile SMILES (amine, alcohol, etc.)
+        include_molpipeline: Include MolPipeline fingerprint/descriptor payload.
+
+    Returns:
+        Dict[str, Any]: Feature dictionary wrapped in a success payload.
+    """
+    try:
+        features = molecular_featurizer.featurize(
+            electrophile,
+            nucleophile,
+            include_molpipeline=include_molpipeline,
+        )
+        return _success_response(features)
+    except Exception as e:
+        return _error_response(
+            str(e),
+            {
+                "electrophile": electrophile,
+                "nucleophile": nucleophile,
+                "include_molpipeline": include_molpipeline,
+            },
+        )
 
 
 @tool(args_schema=AnalyzeBondChangesInput)
@@ -1311,6 +1371,7 @@ CHEMTOOLS_TOOLS = [
     # Analysis tools
     detect_reaction_family_tool,
     classify_reactant_tool,
+    molpipeline_featurize_tool,
     get_functional_groups_tool,
     analyze_bond_changes_tool,  # NEW: Bond breaking/formation analysis
     
