@@ -145,14 +145,24 @@ def recommend_from_reaction(req: RecommendFromReactionRequest) -> Dict[str, Any]
     
     start_time = time.perf_counter()
     
+    # Prepare relax dict with cross-family parameters
+    relax_dict = req.relax or {}
+    if req.search_all_families:
+        relax_dict.update({
+            'reaction_type_threshold': req.reaction_type_threshold,
+            'mechanism_similarity_threshold': req.mechanism_similarity_threshold,
+            'mechanism_weight': req.mechanism_weight
+        })
+    
     # Get raw recommendations
     raw_result = chem.recommend.recommend_from_reaction(
         req.reaction,
         k=req.k,
-        relax=req.relax or {},
+        relax=relax_dict,
         constraint_rules=req.constraints or {},
         rerank_strategy=req.rerank_strategy,
         filter_unknown_reagents=req.filter_unknown_reagents,
+        search_all_families=req.search_all_families,
     )
     
     processing_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
