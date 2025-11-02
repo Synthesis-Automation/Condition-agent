@@ -1,5 +1,5 @@
 {
-  "version": "2025-11-02.v2.0",
+  "version": "2025-11-02.v2.2",
   "schema_notes": {
     "bool": "<motif>_present",
     "int": "<motif>_site_count",
@@ -160,6 +160,15 @@
       "why": "Total sp2 sulfonate (OTf/OTs/OMs) sites"
     },
     {
+      "token": "halogen_count",
+      "type": "int",
+      "scope": "global",
+      "detect": {
+        "smarts_count": "[F,Cl,Br,I]"
+      },
+      "why": "Total number of halogen atoms (F, Cl, Br, I)"
+    },
+    {
       "token": "aryl_halide_present",
       "type": "bool",
       "scope": "global",
@@ -296,6 +305,28 @@
         ]
       },
       "why": "Alkyl boron"
+    },
+    {
+      "token": "tert_butyl_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH0;X4](C)(C)C"
+        ]
+      },
+      "why": "tert-Butyl group (quaternary carbon with three methyl groups)"
+    },
+    {
+      "token": "isopropyl_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH;X4](C)C"
+        ]
+      },
+      "why": "Isopropyl group (branching pattern)"
     },
     {
       "token": "boron_bpin_present",
@@ -478,6 +509,50 @@
         ]
       },
       "why": "Anilines"
+    },
+    {
+      "token": "boc_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3][CX3](=[OX1])[OX2]C(C)(C)C"
+        ]
+      },
+      "why": "tert-Butoxycarbonyl (Boc) protecting group on nitrogen"
+    },
+    {
+      "token": "cbz_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3][CX3](=[OX1])[OX2]Cc1ccccc1"
+        ]
+      },
+      "why": "Benzyloxycarbonyl (Cbz/Z) protecting group on nitrogen"
+    },
+    {
+      "token": "fmoc_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3][CX3](=[OX1])OCC1c2ccccc2-c2ccccc12"
+        ]
+      },
+      "why": "Fluorenylmethoxycarbonyl (Fmoc) protecting group on nitrogen"
+    },
+    {
+      "token": "silyl_ether_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "O[Si]([#6])([#6])[#6]"
+        ]
+      },
+      "why": "Silyl ether protecting group on oxygen (TMS, TBS, TIPS, etc.)"
     },
     {
       "token": "phenol_present",
@@ -766,6 +841,120 @@
       "why": "Any heteroaryl ring"
     },
     {
+      "token": "strong_ewg_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c[NX3](=[OX1])=[OX1]",
+          "c[N+](=O)[O-]",
+          "c[CX2]#[NX1]",
+          "c[CX3](=[OX1])[F,Cl]",
+          "cS(=O)(=O)[#6]",
+          "c[CX3](=O)O"
+        ]
+      },
+      "why": "Strong electron-withdrawing group on aryl ring (nitro, nitrile, acyl halide, sulfonyl, carboxylic acid)"
+    },
+    {
+      "token": "strong_edg_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c[OX2H]",
+          "c[OX2][CH3]",
+          "c[NX3H2]",
+          "c[NX3H1]",
+          "c[NX3]([CH3])[CH3]"
+        ]
+      },
+      "why": "Strong electron-donating group on aryl ring (phenol, methoxy, aniline, N-substituted aniline, N,N-dimethylaniline)"
+    },
+    {
+      "token": "bidentate_chelator_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c1ccccc1-c1ccccn1",
+          "c1ccc(N)cc1N",
+          "[NX3][CX4][CX3](=O)[OX2,OX1-]",
+          "[#6]~[#7]~[#6]~[#7]",
+          "[#6]~[#8]~[#6]~[#8]",
+          "[#6]~[#7]~[#6]~[#8]"
+        ]
+      },
+      "why": "Potential bidentate ligand; can chelate metals (2-phenylpyridine, o-phenylenediamine, amino acid, diamine, diol, amino alcohol)"
+    },
+    {
+      "token": "phosphine_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[PX3]([#6])([#6])[#6]"
+        ]
+      },
+      "why": "Phosphine; common ligand, air-sensitive"
+    },
+    {
+      "token": "low_molecular_weight",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "molecular_weight < 200"
+      },
+      "why": "Low MW; volatile, potential loss during workup"
+    },
+    {
+      "token": "high_molecular_weight",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "molecular_weight > 500"
+      },
+      "why": "High MW; potential solubility issues"
+    },
+    {
+      "token": "fused_ring_system",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "has fused ring system"
+      },
+      "why": "Fused rings; increased rigidity, π-system extension (naphthalene, quinoline, etc.)"
+    },
+    {
+      "token": "spirocyclic_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CX4;R2]"
+        ]
+      },
+      "why": "Spirocyclic center; 3D character, increased complexity (carbon atom in 2 rings)"
+    },
+    {
+      "token": "chiral_center_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "has stereogenic center"
+      },
+      "why": "Chirality; potential racemization or stereoselective requirements"
+    },
+    {
+      "token": "chiral_center_count",
+      "type": "int",
+      "scope": "global",
+      "detect": {
+        "heuristic": "count stereogenic centers"
+      },
+      "why": "Number of chiral centers; diastereomer complexity"
+    },
+    {
       "token": "polarity_high",
       "type": "bool",
       "scope": "global",
@@ -819,6 +1008,15 @@
       "why": "Isomerization/elimination risk"
     },
     {
+      "token": "ortho_substitution_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "ortho-disubstituted benzene ring"
+      },
+      "why": "Steric hindrance from ortho substituents on aromatic rings"
+    },
+    {
       "token": "pyridine_poison_risk",
       "type": "bool",
       "scope": "global",
@@ -851,6 +1049,11 @@
       "token": "heteroaryl_halide_present",
       "derive": "(aryl_halide_present OR sp2_pseudohalide_present) AND heteroaryl_present",
       "why": "Heteroaryl C–LG (any halogen or sulfonate on heteroaryl)"
+    },
+    {
+      "token": "polyhalogenated",
+      "derive": "halogen_count >= 2",
+      "why": "Molecule contains 2 or more halogen atoms (useful for sequential coupling reactions)"
     },
     {
       "token": "ArCl_present",

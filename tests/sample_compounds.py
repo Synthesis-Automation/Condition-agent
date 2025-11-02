@@ -1088,6 +1088,311 @@ def get_compounds_by_reaction(reaction_type: str) -> List[Dict[str, Any]]:
     return [c for c in ARYL_HALIDES if reaction_type in c.get("reaction_types", [])]
 
 
+# ═══════════════════════════════════════════════════════════
+# PHASE 3/4 TEST COMPOUNDS - Advanced Features
+# ═══════════════════════════════════════════════════════════
+
+PHASE_3_4_COMPOUNDS = [
+    # Phase 3: Halogen counting & polyhalogenated
+    {
+        "smiles": "Brc1cc(Br)cc(Br)c1",
+        "name": "1,3,5-Tribromobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "polyhalogenated"],
+        "notes": "Polyhalogenated substrate; halogen_count=3"
+    },
+    {
+        "smiles": "Fc1c(F)c(F)c(Br)c(F)c1F",
+        "name": "Pentafluorobromobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "polyhalogenated", "strong_ewg_present"],
+        "notes": "Polyhalogenated with fluorine EWG; halogen_count=6"
+    },
+    {
+        "smiles": "Clc1ccc(Cl)nc1",
+        "name": "2,5-Dichloropyridine",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
+        "features": ["heteroaryl_halide_present", "sp2_chloride_present", "ArCl_present", "polyhalogenated", "pyridine_present"],
+        "notes": "Polyhalogenated heteroaryl; halogen_count=2"
+    },
+    {
+        "smiles": "Ic1c(Cl)cccc1Cl",
+        "name": "2,6-Dichloro-iodobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "sp2_chloride_present", "polyhalogenated", "ortho_substitution_present"],
+        "notes": "Mixed halides with ortho substitution; halogen_count=3"
+    },
+    
+    # Phase 3: Steric hindrance (tert-butyl, isopropyl, ortho)
+    {
+        "smiles": "Brc1ccccc1C(C)(C)C",
+        "name": "2-tert-Butylbromobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "tert_butyl_present", "ortho_substitution_present"],
+        "notes": "Sterically hindered ortho-tert-butyl"
+    },
+    {
+        "smiles": "Clc1cc(C(C)C)ccc1C(C)C",
+        "name": "3,5-Diisopropylchlorobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "isopropyl_present"],
+        "notes": "Multiple isopropyl substituents"
+    },
+    {
+        "smiles": "Ic1c(OC)cccc1OC",
+        "name": "2,6-Dimethoxyiodobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "ortho_substitution_present", "strong_edg_present"],
+        "notes": "Ortho-disubstituted with electron-donating groups"
+    },
+    {
+        "smiles": "Brc1c(C)c(C)c(C)c(C)c1C",
+        "name": "Pentamethylbromobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "ortho_substitution_present"],
+        "notes": "Extremely sterically hindered; all positions substituted"
+    },
+    
+    # Phase 3: Protecting groups (BOC, CBZ, FMOC, silyl ethers)
+    {
+        "smiles": "Ic1ccc(NC(=O)OC(C)(C)C)cc1",
+        "name": "4-Iodo-N-Boc-aniline",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "boc_present", "amide_present"],
+        "notes": "BOC-protected aniline"
+    },
+    {
+        "smiles": "Brc1ccc(NC(=O)OCc2ccccc2)cc1",
+        "name": "4-Bromo-N-Cbz-aniline",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "cbz_present", "amide_present"],
+        "notes": "CBZ-protected aniline"
+    },
+    {
+        "smiles": "Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1",
+        "name": "4-Chloro-N-Fmoc-aniline",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "fmoc_present", "amide_present", "fused_ring_system"],
+        "notes": "FMOC-protected aniline with fluorenyl group"
+    },
+    {
+        "smiles": "Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1",
+        "name": "4-Bromo-TBS-phenol",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "silyl_ether_present", "tert_butyl_present"],
+        "notes": "TBS-protected phenol"
+    },
+    {
+        "smiles": "Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1",
+        "name": "4-Iodo-TIPS-phenol",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "silyl_ether_present", "isopropyl_present"],
+        "notes": "TIPS-protected phenol"
+    },
+    
+    # Phase 4: Strong EWG/EDG
+    {
+        "smiles": "Brc1ccc([N+](=O)[O-])cc1",
+        "name": "4-Bromonitrobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "nitro_present", "strong_ewg_present"],
+        "notes": "Strong electron-withdrawing nitro group"
+    },
+    {
+        "smiles": "Clc1ccc(C#N)cc1",
+        "name": "4-Chlorobenzonitrile",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
+        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "nitrile_present", "strong_ewg_present"],
+        "notes": "Strong electron-withdrawing nitrile group"
+    },
+    {
+        "smiles": "Brc1ccc(N(C)C)cc1",
+        "name": "4-Bromo-N,N-dimethylaniline",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "tertiary_amine_present", "strong_edg_present"],
+        "notes": "Strong electron-donating dialkylamino group"
+    },
+    {
+        "smiles": "Ic1ccc(OC)cc1",
+        "name": "4-Iodoanisole",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "strong_edg_present"],
+        "notes": "Strong electron-donating methoxy group"
+    },
+    
+    # Phase 4: Chelating groups (bidentate, phosphine)
+    {
+        "smiles": "Brc1ccccc1P(c2ccccc2)c2ccccc2",
+        "name": "2-Bromophenyl diphenylphosphine",
+        "role": "bifunctional",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "phosphine_present", "ortho_substitution_present"],
+        "notes": "Ortho-phosphine for ligand synthesis; note: not itself a bidentate chelator"
+    },
+    {
+        "smiles": "NC(Cc1ccccc1)C(=O)O",
+        "name": "Phenylalanine",
+        "role": "nucleophile",
+        "reaction_types": ["Peptide coupling"],
+        "features": ["primary_amine_present", "carboxylic_acid_present", "bidentate_chelator_present", "chiral_center_present"],
+        "notes": "Amino acid with bidentate chelating ability; chiral_center_count=1"
+    },
+    {
+        "smiles": "c1ccc(P(c2ccccc2)c2ccccc2)cc1",
+        "name": "Triphenylphosphine",
+        "role": "ligand",
+        "reaction_types": ["Various cross-couplings"],
+        "features": ["phosphine_present"],
+        "notes": "Common phosphine ligand"
+    },
+    {
+        "smiles": "c1ccc2c(c1)c(P(C)C)ccc2P(C)C",
+        "name": "1,8-Bis(dimethylphosphino)naphthalene",
+        "role": "ligand",
+        "reaction_types": ["Various cross-couplings"],
+        "features": ["phosphine_present", "fused_ring_system"],
+        "notes": "Bidentate phosphine ligand (note: current SMARTS doesn't capture P-P bidentate pattern)"
+    },
+    
+    # Phase 4: Molecular weight categories
+    {
+        "smiles": "CC",
+        "name": "Ethane",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["low_molecular_weight"],
+        "notes": "MW=30; low molecular weight test"
+    },
+    {
+        "smiles": "c1ccc2cc3ccccc3cc2c1",
+        "name": "Anthracene",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["fused_ring_system"],
+        "notes": "MW=178; medium molecular weight; fused rings"
+    },
+    {
+        "smiles": "c1ccc2cc3ccc4ccc5ccc6ccc1c7c2c3c4c5c67",
+        "name": "Coronene",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["fused_ring_system"],
+        "notes": "MW=300; large polycyclic aromatic (note: not high_molecular_weight which requires MW>500)"
+    },
+    
+    # Phase 4: Ring complexity (fused, spirocyclic)
+    {
+        "smiles": "Brc1ccc2ccccc2c1",
+        "name": "2-Bromonaphthalene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "fused_ring_system"],
+        "notes": "Fused bicyclic aromatic system"
+    },
+    {
+        "smiles": "Clc1ccc2c3ccccc3ccc2c1",
+        "name": "9-Chloroanthracene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "fused_ring_system"],
+        "notes": "Tricyclic fused aromatic system"
+    },
+    {
+        "smiles": "C1CCC2(CC1)CCCC2",
+        "name": "Spiro[5.5]undecane",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["spirocyclic_present"],
+        "notes": "Spirocyclic aliphatic system"
+    },
+    {
+        "smiles": "Brc1ccc2c(c1)C1(CCCC1)CCCC2",
+        "name": "6-Bromo-spiro[chroman-2,1'-cyclohexane]",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "spirocyclic_present"],
+        "notes": "Spirocyclic with aryl bromide"
+    },
+    
+    # Phase 4: Chirality
+    {
+        "smiles": "C[C@H](N)C(=O)O",
+        "name": "(S)-Alanine",
+        "role": "nucleophile",
+        "reaction_types": ["Peptide coupling"],
+        "features": ["primary_amine_present", "carboxylic_acid_present", "chiral_center_present", "bidentate_chelator_present", "low_molecular_weight"],
+        "notes": "Chiral amino acid; chiral_center_count=1"
+    },
+    {
+        "smiles": "C[C@H](O)[C@H](C)O",
+        "name": "(2R,3R)-Butane-2,3-diol",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["alcohol_present", "chiral_center_present", "low_molecular_weight"],
+        "notes": "Two chiral centers; chiral_center_count=2"
+    },
+    {
+        "smiles": "C[C@H]1CC[C@@H](C)C[C@H]1C",
+        "name": "(1R,3R,5S)-1,3,5-Trimethylcyclohexane",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["chiral_center_present"],
+        "notes": "Three chiral centers; chiral_center_count=3"
+    },
+    {
+        "smiles": "Br[C@H](Cl)F",
+        "name": "(R)-Bromochlorofluoromethane",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["chiral_center_present", "polyhalogenated", "low_molecular_weight"],
+        "notes": "Chiral halomethane; chiral_center_count=1; halogen_count=3"
+    },
+    
+    # Additional Phase 3/4 compounds
+    {
+        "smiles": "Clc1cc(Cl)c(Br)c(Cl)c1",
+        "name": "2,4,5,6-Tetrachlorobromobenzene",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "sp2_chloride_present", "polyhalogenated", "ortho_substitution_present"],
+        "notes": "Highly polyhalogenated; halogen_count=5"
+    },
+    {
+        "smiles": "Brc1ccc(NC(=O)c2ccccc2)cc1",
+        "name": "4-Bromo-N-benzoylaniline",
+        "role": "electrophile",
+        "reaction_types": ["Suzuki-Miyaura"],
+        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "amide_present", "secondary_amide_present", "carbonyl_present"],
+        "notes": "Amide-protected aniline derivative"
+    },
+    {
+        "smiles": "C[C@@H]1CCC[C@@H](C)[C@@H]1C",
+        "name": "(1S,2R,5S)-1,2,5-Trimethylcyclohexane",
+        "role": "reference",
+        "reaction_types": [],
+        "features": ["chiral_center_present"],
+        "notes": "Multiple stereogenic centers; chiral_center_count=3"
+    },
+]
+
+
 # Convenience function to get compounds by feature
 def get_compounds_by_feature(feature: str) -> List[Dict[str, Any]]:
     """
@@ -1099,11 +1404,12 @@ def get_compounds_by_feature(feature: str) -> List[Dict[str, Any]]:
     Returns:
         List of compound dictionaries
     """
-    return [c for c in ARYL_HALIDES if feature in c.get("features", [])]
+    all_compounds = ARYL_HALIDES + PHASE_3_4_COMPOUNDS
+    return [c for c in all_compounds if feature in c.get("features", [])]
 
 
 # Export all compounds as flat list
-ALL_SAMPLE_COMPOUNDS = ARYL_HALIDES
+ALL_SAMPLE_COMPOUNDS = ARYL_HALIDES + PHASE_3_4_COMPOUNDS
 
 
 if __name__ == "__main__":

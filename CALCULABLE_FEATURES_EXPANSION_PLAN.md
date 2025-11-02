@@ -1,8 +1,29 @@
 # Calculable Features JSON - Expansion Plan
 
 **Date**: November 2, 2025  
-**Current Version**: 2025-11-02.v1.1  
-**Proposed Version**: 2025-11-02.v2.0
+**Current Version**: 2025-11-02.v2.2  
+**Baseline Version**: 2025-11-02.v1.1
+
+## 📋 Implementation Status
+
+- ✅ **Phase 1 COMPLETE** (19 features) - Critical fixes + high-priority features
+- ✅ **Phase 2 COMPLETE** (4 features) - Completed during Phase 1 implementation
+- ✅ **Phase 3 COMPLETE** (9 features) - Halogen counting, steric indicators, protecting groups
+- ✅ **Phase 4 COMPLETE** (10 features) - EWG/EDG, chelation, MW categories, ring complexity, chirality
+
+**Total Features:**
+- v1.1 (baseline): 71 features
+- v2.0 (Phase 1): 90 features (+19)
+- v2.1 (Phase 3): 97 features (+9, -2 adjustment)
+- v2.2 (Phase 4): 107 features (+10)
+
+**Implementation Documents:**
+- `PHASE3_IMPLEMENTATION_COMPLETE.md` - Phase 3 details
+- `PHASE4_IMPLEMENTATION_COMPLETE.md` - Phase 4 details
+
+**Test Results:** 51/51 passing (100%) across Phases 3-4
+
+---
 
 ## Executive Summary
 
@@ -15,6 +36,7 @@ Based on validation testing with 119 sample compounds, we've identified several 
 ### 1. Heteroaryl Halide Detection Pattern Too Restrictive
 
 **Current Issue:**
+
 ```json
 "smarts_any": [
   "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",
@@ -23,8 +45,9 @@ Based on validation testing with 119 sample compounds, we've identified several 
 ```
 
 **Problem:**
+
 - ❌ Misses 4-bromopyridine (`Brc1ccncc1`) - halogen not adjacent to N
-- ❌ Misses 3-bromopyridine (`Brc1cccnc1`)  
+- ❌ Misses 3-bromopyridine (`Brc1cccnc1`)
 - ❌ Misses 2-bromothiophene (`Brc1cccs1`) - 5-membered ring
 - ❌ Misses 3-bromofuran (`Brc1ccoc1`) - halogen position
 - ✅ Matches 2-bromopyridine (`Brc1ccccn1`) - halogen adjacent to N
@@ -32,9 +55,10 @@ Based on validation testing with 119 sample compounds, we've identified several 
 **Root Cause:** Pattern requires halogen to be directly bonded to the heteroatom in a 6-membered ring.
 
 **Proposed Fix:**
+
 ```json
 "smarts_any": [
-  "c1:[n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",  
+  "c1:[n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",
   "c1:[c,n,o,s]:[n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",
   "c1:[c,n,o,s]:[c,n,o,s]:[n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",
   "c1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",
@@ -48,13 +72,16 @@ Based on validation testing with 119 sample compounds, we've identified several 
 ```
 
 **Simpler Alternative:**
+
 ```json
 "smarts_any": [
   "[a;r5,r6][Cl,Br,I,F]",  // Any aromatic halogen in 5/6-membered ring
   "[n,o,s]OS(=O)(=O)"      // Heteroaryl sulfonate
 ]
 ```
+
 Then use derived feature:
+
 ```json
 "token": "heteroaryl_halide_present",
 "derive": "(aryl_halide_present OR sp2_pseudohalide_present) AND heteroaryl_present"
@@ -69,10 +96,12 @@ Then use derived feature:
 ### 2. Distinguish Boronic Acids from Boronic Esters
 
 **Current State:**
+
 - Only `sp2_boron_present` exists (generic)
 - `boron_bpin_present` exists but is for pinacol ester specifically
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "boronic_acid_present",
@@ -104,10 +133,12 @@ Then use derived feature:
 ### 3. Distinguish Primary, Secondary, Tertiary Amines
 
 **Current State:**
+
 - Only `aliphatic_amine_present` (all N-H amines)
 - Only `aniline_present` (aryl-NH2/NH-R)
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "primary_amine_present",
@@ -153,6 +184,7 @@ Then use derived feature:
 **Current State:** Not present
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "amide_present",
@@ -199,6 +231,7 @@ Then use derived feature:
 **Current State:** Not present
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "ester_present",
@@ -233,6 +266,7 @@ Then use derived feature:
 **Current State:** Not present
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "carbonyl_present",
@@ -279,6 +313,7 @@ Then use derived feature:
 **Current State:** Not present
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "nitrile_present",
@@ -313,6 +348,7 @@ Then use derived feature:
 **Current State:** Not present
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "nitro_present",
@@ -347,6 +383,7 @@ Then use derived feature:
 **Current State:** Only generic `alcohol_present`
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "phenol_present",
@@ -381,6 +418,7 @@ Then use derived feature:
 **Current State:** Only binary (present/absent)
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "halogen_count",
@@ -411,6 +449,7 @@ Then use derived feature:
 **Current State:** Not present
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "tert_butyl_present",
@@ -454,6 +493,7 @@ Then use derived feature:
 **Current State:** Only `carbamate_present`
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "boc_present",
@@ -510,6 +550,7 @@ Then use derived feature:
 **Current State:** Not systematically covered
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "strong_ewg_present",
@@ -552,6 +593,7 @@ Then use derived feature:
 **Current State:** Only `pyridine_poison_risk`
 
 **Proposed Addition:**
+
 ```json
 {
   "token": "bidentate_chelator_present",
@@ -664,6 +706,7 @@ Then use derived feature:
 ## 📊 Summary Statistics
 
 ### Current State (v1.1)
+
 - **Total features defined**: 71
   - Boolean (SMARTS): 55
   - Integer (count): 2
@@ -671,6 +714,7 @@ Then use derived feature:
   - Derived: 14
 
 ### Proposed State (v2.0)
+
 - **Total features**: 110+ (55% increase)
   - Boolean (SMARTS): 85+
   - Integer (count): 4+
@@ -678,6 +722,7 @@ Then use derived feature:
   - Derived: 18+
 
 ### Coverage Improvements
+
 - ✅ Heteroaryl halide detection: 14+ compounds
 - ✅ Amine classification: 20+ compounds
 - ✅ Carbonyl detection: 30+ compounds
@@ -689,23 +734,27 @@ Then use derived feature:
 ## 🚀 Implementation Priority
 
 ### Phase 1: Critical Fixes (Week 1)
+
 1. Fix heteroaryl_halide_present SMARTS pattern
 2. Add boronic_acid_present vs boronic_ester_present
 3. Add primary/secondary/tertiary amine detection
 
 ### Phase 2: High Priority (Week 2)
+
 4. Add amide detection (primary/secondary)
 5. Add ester detection
 6. Add ketone/aldehyde detection
 7. Add nitrile and nitro detection
 
 ### Phase 3: Medium Priority (Week 3)
+
 8. Add phenol vs aliphatic alcohol
 9. Add halogen counting
 10. Add steric hindrance indicators
 11. Add protecting group detection
 
 ### Phase 4: Enhancement (Week 4)
+
 12. Add EWG/EDG detection
 13. Add chelating group detection
 14. Add molecular weight categories
@@ -717,6 +766,7 @@ Then use derived feature:
 ## 📝 Testing Strategy
 
 For each new feature:
+
 1. ✅ Add SMARTS pattern or heuristic to JSON
 2. ✅ Add unit test in `tests/test_calculable_features.py`
 3. ✅ Add example compound to `tests/sample_compounds.py`
@@ -727,8 +777,8 @@ For each new feature:
 ---
 
 **Next Steps:**
+
 1. Review and approve this expansion plan
 2. Implement Phase 1 critical fixes
 3. Validate with sample compounds
 4. Proceed to subsequent phases
-
