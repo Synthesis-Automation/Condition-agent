@@ -18,6 +18,7 @@ Available Tools:
     - add_reagent_tool: Insert or preview reagent taxonomy entries
     - classify_reactant_tool: Classify reactant type (aryl halide, amine, etc.)
     - get_functional_groups_tool: Detect functional groups in a molecule
+    - calculable_features_tool: Evaluate curated calculable feature library for a molecule
     - molpipeline_featurize_tool: Generate molecular features with optional MolPipeline vectors
     - analyze_bond_changes_tool: Analyze bond breaking/formation in reactions (NEW)
 
@@ -787,6 +788,25 @@ def calculable_features_tool(
 
         present_tokens = calculable_features.get_present_features(smiles)
 
+        steric_tokens = {
+            "ortho_substitution_present": bool(all_features.get("ortho_substitution_present")),
+            "tert_butyl_present": bool(all_features.get("tert_butyl_present")),
+            "isopropyl_present": bool(all_features.get("isopropyl_present")),
+        }
+        # Lightweight textual fallback when RDKit unavailable
+        if not steric_tokens["isopropyl_present"] and "C(C)C" in smiles:
+            steric_tokens["isopropyl_present"] = True
+        if not steric_tokens["tert_butyl_present"] and "C(C)(C)C" in smiles:
+            steric_tokens["tert_butyl_present"] = True
+        steric_indicators = [
+            token for token, present in steric_tokens.items() if present
+        ]
+        steric_level = "low"
+        if steric_tokens["ortho_substitution_present"] or len(steric_indicators) >= 2:
+            steric_level = "high"
+        elif steric_indicators:
+            steric_level = "moderate"
+
         payload: Dict[str, Any] = {
             "features": filtered,
             "present_features": present_tokens,
@@ -795,6 +815,10 @@ def calculable_features_tool(
             payload["missing_tokens"] = missing
         if include_summary:
             payload["summary"] = calculable_features.feature_summary(smiles)
+        payload["steric_hindrance"] = {
+            "level": steric_level,
+            "indicators": steric_indicators,
+        }
         return _success_response(payload)
     except Exception as e:
         return _error_response(
