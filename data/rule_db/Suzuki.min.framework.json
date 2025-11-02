@@ -1,0 +1,169 @@
+{
+  "reaction_type": "Suzuki-Miyaura",
+  "version": "2025-11-02",
+  "evaluation": "Use this file ONLY if 'applies_if' tokens are present. Then try base_rules (top→down). If none match, use default_rule. After picking a rule, scan all modifiers and apply those that match (tokens OR plain-text heuristics).",
+  "applies_if": {
+    "all": [
+      "sp2_halide_present",
+      "sp2_boron_present"
+    ]
+  },
+  "default_rule": {
+    "id": "DEF_sp2_general",
+    "description": "General starter for sp2–sp2 Suzuki (avoid Pd(PPh3)4 as first choice).",
+    "features": {
+      "any": [
+        "aryl_halide",
+        "vinyl_halide"
+      ],
+      "all": [
+        "boron:sp2_partner"
+      ]
+    },
+    "conditions": {
+      "pd_source": "PdCl2(dtbpf)",
+      "ligand": "dtbpf or dppf",
+      "pd_loading_molpct": "1–2",
+      "base": "K3PO4 (aq, 3.25 M)",
+      "solvent": "dioxane/H2O ~4:1",
+      "temperature_C": "80–100",
+      "time_h": "1–12",
+      "atmosphere": "N2 or Ar"
+    }
+  },
+  "base_rules": [
+    {
+      "id": "BR_arCl_unhindered_or_EWG",
+      "description": "Aryl chloride that is unhindered OR has EWG near ipso.",
+      "features": {
+        "all": [
+          "aryl_chloride"
+        ],
+        "any": [
+          "unhindered",
+          "EWG_near_ipso"
+        ]
+      },
+      "conditions": {
+        "pd_source": "Pd(dba)2",
+        "ligand": "XPhos",
+        "base": "K3PO4 (aq)",
+        "solvent": "dioxane/H2O ~4:1",
+        "temperature_C": "100–120"
+      }
+    },
+    {
+      "id": "BR_hindered_or_heteroaryl",
+      "description": "Sterically hindered site OR heteroaryl present.",
+      "features": {
+        "any": [
+          "hindered",
+          "heteroaryl_present"
+        ]
+      },
+      "conditions": {
+        "pd_source": "Pd(dba)2",
+        "ligand": "SPhos",
+        "base": "K3PO4 (aq)",
+        "solvent": "THF/H2O ~4:1",
+        "temperature_C": "80–110"
+      }
+    },
+    {
+      "id": "BR_neop_boronate",
+      "description": "Neopentyl boronate partner.",
+      "features": {
+        "all": [
+          "boron:neop"
+        ]
+      },
+      "conditions": {
+        "base": "KOTMS",
+        "notes": "Neop–B partner; KOTMS often beneficial."
+      }
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "MOD_polarity_high",
+      "match": {
+        "any_tokens": [
+          "polarity:high"
+        ],
+        "when_text": "substrates overall more polar"
+      },
+      "suggest": "Set solvent to THF/H2O (3–5:1)."
+    },
+    {
+      "id": "MOD_polarity_low",
+      "match": {
+        "any_tokens": [
+          "polarity:low"
+        ],
+        "when_text": "substrates overall less polar"
+      },
+      "suggest": "Set solvent to toluene/H2O (3–6:1)."
+    },
+    {
+      "id": "MOD_hydrodehalogenation_TBAB",
+      "match": {
+        "any_tokens": [
+          "symptom:hydrodehalogenation"
+        ],
+        "when_text": "if hydrodehalogenation is observed"
+      },
+      "suggest": "Add TBAB 0.5–1.0 equiv."
+    },
+    {
+      "id": "MOD_boronate_dimer",
+      "match": {
+        "any_tokens": [
+          "symptom:boronate_dimer_high"
+        ],
+        "when_text": "boronate dimerization problem"
+      },
+      "suggest": "Tighten inert atmosphere and reduce Pd loading to 0.5–1.0 mol%."
+    },
+    {
+      "id": "MOD_base_sensitive",
+      "match": {
+        "any_tokens": [
+          "fg:base_sensitive"
+        ],
+        "when_text": "base-sensitive functional groups present"
+      },
+      "suggest": "Use K2CO3(aq) or lower vol% K3PO4(aq); reduce H2O (≤10%); cap T at ≤80 °C; consider neop-boronate + KOTMS."
+    },
+    {
+      "id": "MOD_ligand_mapping",
+      "match": {
+        "when_text": "ligand-specific base preference",
+        "any_tokens": [
+          "ligand:dtbpf_or_dppf",
+          "ligand:Amphos"
+        ]
+      },
+      "suggest": "If ligand is dtbpf/dppf → K3PO4(aq). If Amphos → K2CO3(aq)."
+    }
+  ],
+  "token_notes": {
+    "sp2_halide_present": "At least one sp2 carbon bears I/Br/Cl (aryl or vinyl).",
+    "sp2_boron_present": "Partner is an sp2 boron species (boronic acid/ester).",
+    "aryl_halide": "Aryl carbon–halogen bond present.",
+    "vinyl_halide": "Vinylic carbon–halogen bond present.",
+    "aryl_chloride": "Aryl carbon–chlorine bond present.",
+    "unhindered": "No significant ortho bulk near the coupling site.",
+    "hindered": "Significant ortho steric bulk (e.g., tert‑Bu or multiple branches).",
+    "EWG_near_ipso": "EWG within ~2 bonds of the coupling site.",
+    "heteroaryl_present": "At least one heteroatom-containing aromatic ring.",
+    "boron:sp2_partner": "Boron partner is aryl/vinyl.",
+    "boron:neop": "Neopentyl boronate ester detected.",
+    "polarity:high": "TPSA≥50 or HBA+HBD≥4 (coarse).",
+    "polarity:low": "TPSA≤20 and HBA+HBD≤2 (coarse).",
+    "fg:base_sensitive": "Motifs likely to degrade under aqueous base.",
+    "symptom:hydrodehalogenation": "Observed hydrodehalogenation side-reaction.",
+    "symptom:boronate_dimer_high": "Observed boronate dimerization issue.",
+    "ligand:dtbpf_or_dppf": "Ligand explicitly chosen as dtbpf or dppf.",
+    "ligand:Amphos": "Ligand explicitly chosen as Amphos."
+  }
+}

@@ -330,23 +330,22 @@ class TestDerivedFeatures:
         assert features["VinylBr_present"] is True
         assert features["VinylCl_present"] is False
         assert features["ArBr_present"] is False
-    
+
     def test_aryl_sulfonate_shortcuts(self):
         """Test ArOX sulfonate shortcuts."""
         # Aryl triflate
         features = calculable.detect_all_features("c1ccc(OS(=O)(=O)C(F)(F)F)cc1")
         assert features["ArOTf_present"] is True
         assert features["ArOTs_present"] is False
-        
+
         # Aryl tosylate
         features = calculable.detect_all_features("c1ccc(OS(=O)(=O)c2ccc(C)cc2)cc1")
         assert features["ArOTs_present"] is True
         assert features["ArOTf_present"] is False
 
-
 class TestUtilityFunctions:
     """Test utility and convenience functions."""
-    
+
     def test_detect_feature_single(self):
         """Test detecting a single feature."""
         result = calculable.detect_feature("c1ccc(Br)cc1", "sp2_bromide_present")
