@@ -34,11 +34,15 @@ def _run_match(args: argparse.Namespace) -> int:
         db = load_db(args.db)
         if isinstance(db, SchemeConditionDB):
             if args.rxn is None:
-                raise ValueError("--rxn is required when matching SchemeConditionDB payloads")
+                raise ValueError(
+                    "--rxn is required when matching SchemeConditionDB payloads"
+                )
             result = match(db, args.rxn)
         elif isinstance(db, SelectorRuleDB):
             if args.features is None:
-                raise ValueError("--features is required when matching selector rule payloads")
+                raise ValueError(
+                    "--features is required when matching selector rule payloads"
+                )
             features_path: Path = args.features
             if not features_path.exists():
                 raise ValueError(f"Features file not found: {features_path}")
@@ -72,17 +76,31 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="scdb", description="Rule database matcher")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    match_parser = subparsers.add_parser("match", help="Match reaction conditions for a rule database")
-    match_parser.add_argument("--db", required=True, type=Path, help="Path to a rule database JSON file")
-    match_parser.add_argument("--rxn", help="Reaction SMILES (required for scheme databases)")
+    match_parser = subparsers.add_parser(
+        "match", help="Match reaction conditions for a rule database"
+    )
+    match_parser.add_argument(
+        "--db", required=True, type=Path, help="Path to a rule database JSON file"
+    )
+    match_parser.add_argument(
+        "--rxn", help="Reaction SMILES (required for scheme databases)"
+    )
     match_parser.add_argument(
         "--features",
         type=Path,
         help="Path to JSON feature payload (required for selector databases)",
     )
-    match_parser.add_argument("--json", action="store_true", help="Emit JSON instead of text")
-    match_parser.add_argument("--no-trace", action="store_true", help="Exclude trace information from JSON output")
-    match_parser.add_argument("--indent", type=int, default=None, help="Indent level for JSON output")
+    match_parser.add_argument(
+        "--json", action="store_true", help="Emit JSON instead of text"
+    )
+    match_parser.add_argument(
+        "--no-trace",
+        action="store_true",
+        help="Exclude trace information from JSON output",
+    )
+    match_parser.add_argument(
+        "--indent", type=int, default=None, help="Indent level for JSON output"
+    )
     match_parser.set_defaults(func=_run_match)
 
     return parser
