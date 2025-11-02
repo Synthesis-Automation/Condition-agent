@@ -5,6 +5,7 @@ from chem_assistant.chemtools_wrapper import (
     get_tool_descriptions,
     normalize_smiles_tool,
     normalize_reaction_tool,
+    rule_based_conditions_tool,
 )
 
 
@@ -82,3 +83,32 @@ def test_recommendation_cache_reuse(monkeypatch):
     assert stats["entries"] == 1
     wrapper.clear_recommendation_cache()
     assert wrapper.recommendation_cache_stats()["entries"] == 0
+
+
+def test_rule_based_conditions_tool_autodetects_database():
+    """Rule engine tool should auto-select Buchwald CN database for CN couplings."""
+    wrapper._RULE_ENGINE_CACHE.clear()
+    payload = rule_based_conditions_tool.invoke(
+        {"reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"}
+    )
+    assert payload["success"], payload
+    assert payload.get("database_name") == "buchwald_cn"
+    assert payload.get("base_rule", {}).get("name"), "Expected base rule name in response"
+    detection = payload.get("family_detection") or {}
+    assert detection.get("family") in {"cn_coupling", "buchwald_cn"}
+    assert payload.get("summary", "").startswith("=")
+
+
+def test_rule_based_conditions_tool_handles_missing_database():
+    """Explicitly missing databases should surface structured error details."""
+    wrapper._RULE_ENGINE_CACHE.clear()
+    payload = rule_based_conditions_tool.invoke(
+        {
+            "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+            "database": "not_a_real_db",
+            "auto_detect": False,
+        }
+    )
+    assert not payload["success"]
+    assert "error" in payload
+    assert payload.get("attempted")

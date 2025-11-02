@@ -9,6 +9,7 @@ Available Tools:
     - normalize_reaction_tool: Canonicalize reaction SMILES
     - detect_reaction_family_tool: Detect reaction family/type
     - recommend_conditions_tool: Get ML-based condition recommendations
+    - rule_based_conditions_tool: Deterministic rule-engine condition guidance (NEW)
     - enhanced_cross_family_recommend_tool: Cross-family precedent search with mechanism filters
     - search_precedents_tool: Search for similar precedent reactions
     - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
@@ -29,11 +30,12 @@ Usage:
     agent = create_react_agent(llm, CHEMTOOLS_TOOLS)
 """
 
-from typing import Dict, Any, List, Optional, Sequence, Tuple
+from typing import Dict, Any, List, Optional, Sequence, Tuple, Union, Literal
 import json
 import time
 from dataclasses import dataclass
 from collections import OrderedDict
+from pathlib import Path
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 
@@ -68,6 +70,9 @@ from chemtools.util.functional_groups import detect_all as detect_functional_gro
 from chemtools.featurizers import molecular as molecular_featurizer
 from chemtools.featurizers import calculable as calculable_features
 
+# Rule-based recommendation engine
+from chemtools.rule import RuleEngine
+
 # Import bond analysis tools (NEW)
 from chemtools import (
     analyze_bond_changes,
@@ -83,6 +88,52 @@ from .constraint_parser import (
     filter_cores_by_constraints,
     format_constraints_for_prompt,
 )
+
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+_RULE_DB_SEARCH_PATHS: List[Path] = [
+    _REPO_ROOT / "data" / "rule_db",
+    _REPO_ROOT / "data",
+    _REPO_ROOT,
+    Path.cwd() / "data" / "rule_db",
+    Path.cwd() / "data",
+    Path.cwd(),
+]
+
+_FAMILY_TO_RULE_DB = {
+    "cn_coupling": "buchwald_cn",
+    "c_n_coupling": "buchwald_cn",
+    "buchwald_cn": "buchwald_cn",
+    "buchwald_hartwig": "buchwald_cn",
+    "buchwald_hartwig_cn": "buchwald_cn",
+    "buchwald_hartwig_c_n": "buchwald_cn",
+    "buchwald-hartwig": "buchwald_cn",
+    "suzuki": "suzuki",
+    "suzuki_coupling": "suzuki",
+    "suzuki_miyaura": "suzuki",
+    "suzuki-miyaura": "suzuki",
+}
+
+_RULE_ENGINE_CACHE: "OrderedDict[Path, RuleEngine]" = OrderedDict()
+_RULE_ENGINE_CACHE_SIZE = 4
+
+
+class RuleDatabaseResolutionError(FileNotFoundError):
+    """Raised when a rule database cannot be located from provided identifiers."""
+
+    def __init__(
+        self,
+        attempted: List[str],
+        reason: Optional[str] = None,
+        detection: Optional[Dict[str, Any]] = None,
+    ):
+        attempted_display = attempted or ["<none>"]
+        message = "Could not locate rule database for identifiers: " + ", ".join(attempted_display)
+        if reason:
+            message += f" ({reason})"
+        super().__init__(message)
+        self.attempted = attempted_display
+        self.reason = reason
+        self.detection = detection
 
 
 # ============================================================================
@@ -258,6 +309,43 @@ class EnhancedCrossFamilyInput(BaseModel):
     filter_unknown_reagents: bool = Field(
         True,
         description="Exclude precedents missing base/solvent annotations.",
+    )
+
+
+class RuleRecommendInput(BaseModel):
+    """Schema for deterministic rule-engine condition recommendation."""
+
+    reaction_smiles: str = Field(
+        ...,
+        description="Reaction SMILES string (reactants>>products).",
+    )
+    database: Optional[str] = Field(
+        None,
+        description="Rule database name or JSON path (e.g., 'buchwald_cn' or 'data/rule_db/buchwald_cn.json').",
+    )
+    family_hint: Optional[str] = Field(
+        None,
+        description="Optional reaction family hint to help map to a rule database (e.g., 'Buchwald_CN').",
+    )
+    symptoms: Optional[Union[str, List[str]]] = Field(
+        None,
+        description="Observed symptoms or failure modes (list or comma-separated string).",
+    )
+    combine_method: Literal["union", "all", "first", "separate"] = Field(
+        "union",
+        description="How to combine features from multiple reactants when matching rules.",
+    )
+    include_reasoning: bool = Field(
+        True,
+        description="Include matched features and modifier triggers in the output.",
+    )
+    auto_detect: bool = Field(
+        True,
+        description="Infer the rule database via reaction-family detection when database is omitted.",
+    )
+    include_summary: bool = Field(
+        True,
+        description="Include a formatted text summary of the recommendation.",
     )
 
 
@@ -543,6 +631,231 @@ def recommendation_cache_stats() -> Dict[str, Any]:
             "max_variants": entry.max_variants,
         })
     return {"entries": len(entries), "items": entries}
+
+
+# ============================================================================
+# Rule-Based Recommendation Helpers
+# ============================================================================
+
+def _normalize_family_label(value: Optional[str]) -> Optional[str]:
+    """Normalize family strings for lookup/mapping."""
+    if value is None:
+        return None
+    text = str(value).strip().lower()
+    if not text:
+        return None
+    if text.endswith(".json"):
+        text = text[:-5]
+    replacements = {
+        "-": "_",
+        " ": "_",
+        "\t": "_",
+        "/": "_",
+        "\\": "_",
+        ":": "_",
+        ";": "_",
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    while "__" in text:
+        text = text.replace("__", "_")
+    text = text.strip("_")
+    return text or None
+
+
+def _map_family_to_db_name(value: Optional[str]) -> Optional[str]:
+    """Map a reaction family label to the configured rule database name."""
+    normalized = _normalize_family_label(value)
+    if not normalized:
+        return None
+    return _FAMILY_TO_RULE_DB.get(normalized, normalized)
+
+
+def _looks_like_path_identifier(identifier: str) -> bool:
+    """Heuristically determine whether the identifier is a file path."""
+    identifier = identifier.strip()
+    if not identifier:
+        return False
+    return any(sep in identifier for sep in ("/", "\\")) or identifier.startswith(".")
+
+
+def _expand_with_extension(path: Path) -> List[Path]:
+    """Return candidate paths including optional .json extension."""
+    if path.suffix:
+        return [path]
+    return [path, path.with_suffix(".json")]
+
+
+def _generate_identifier_variants(identifier: Optional[str]) -> List[str]:
+    """Generate lookup variants for a database identifier."""
+    if not identifier:
+        return []
+    ident = str(identifier).strip()
+    if not ident or ident.lower() == "auto":
+        return []
+    variants: List[str] = []
+    is_path = _looks_like_path_identifier(ident)
+    if is_path:
+        variants.append(ident)
+        return variants
+    if ident.lower().endswith(".json"):
+        stem = Path(ident).stem
+        variants.extend([ident, stem])
+    else:
+        variants.append(ident)
+    normalized = _normalize_family_label(ident)
+    if normalized and normalized not in variants:
+        variants.append(normalized)
+    mapped = _map_family_to_db_name(ident)
+    if mapped and mapped not in variants:
+        variants.append(mapped)
+    if normalized:
+        dashed = normalized.replace("_", "-")
+        if dashed not in variants:
+            variants.append(dashed)
+    return variants
+
+
+def _resolve_candidate_to_path(candidate: str) -> Optional[Path]:
+    """Resolve a single candidate identifier to an existing JSON path."""
+    candidate = candidate.strip()
+    if not candidate:
+        return None
+    path_candidate = Path(candidate)
+    targets: List[Path] = []
+    if path_candidate.is_absolute() or _looks_like_path_identifier(candidate):
+        targets.extend(_expand_with_extension(path_candidate if path_candidate.is_absolute() else path_candidate))
+        if not path_candidate.is_absolute():
+            targets.extend(
+                _expand_with_extension(_REPO_ROOT / path_candidate)
+            )
+    else:
+        names = [candidate]
+        normalized = _normalize_family_label(candidate)
+        if normalized and normalized not in names:
+            names.append(normalized)
+        mapped = _map_family_to_db_name(candidate)
+        if mapped and mapped not in names:
+            names.append(mapped)
+        if candidate.lower().endswith(".json"):
+            stem = Path(candidate).stem
+            if stem and stem not in names:
+                names.append(stem)
+        for name in dict.fromkeys(names):
+            for base in _RULE_DB_SEARCH_PATHS:
+                targets.extend(_expand_with_extension(base / name))
+    dedup: List[Path] = []
+    seen: set[str] = set()
+    for target in targets:
+        key = str(target)
+        if key in seen:
+            continue
+        seen.add(key)
+        dedup.append(target)
+    for target in dedup:
+        try:
+            if target.exists():
+                return target.resolve()
+        except OSError:
+            continue
+    return None
+
+
+def _resolve_rule_database(*identifiers: Optional[str]) -> Tuple[Path, str, List[str]]:
+    """Resolve the rule database path from one or more identifiers."""
+    attempted: List[str] = []
+    for identifier in identifiers:
+        for variant in _generate_identifier_variants(identifier):
+            if not variant or variant in attempted:
+                continue
+            attempted.append(variant)
+            resolved = _resolve_candidate_to_path(variant)
+            if resolved:
+                return resolved, resolved.stem, attempted
+    raise RuleDatabaseResolutionError(attempted)
+
+
+def _select_rule_database(
+    reaction_smiles: str,
+    *,
+    database: Optional[str],
+    family_hint: Optional[str],
+    auto_detect: bool,
+) -> Tuple[Path, str, Optional[Dict[str, Any]], List[str]]:
+    """
+    Determine which rule database to use and return resolution metadata.
+    
+    Returns:
+        (database_path, database_name, detection_payload, attempted_identifiers)
+    """
+    identifiers: List[str] = []
+    attempted: List[str] = []
+    detection_payload: Optional[Dict[str, Any]] = None
+    database_clean = database.strip() if isinstance(database, str) else None
+
+    if database_clean and database_clean.lower() != "auto":
+        identifiers.append(database_clean)
+
+    if family_hint:
+        identifiers.append(str(family_hint))
+
+    detection_error: Optional[str] = None
+    if auto_detect:
+        try:
+            detection_payload = detect_reaction(reaction_smiles, use_ml=False)
+            detected_family = detection_payload.get("family")
+            if detected_family:
+                identifiers.append(str(detected_family))
+        except Exception as exc:
+            detection_payload = {"error": str(exc)}
+            detection_error = str(exc)
+
+    if not identifiers:
+        raise RuleDatabaseResolutionError(
+            [],
+            reason=detection_error or "no identifiers provided",
+            detection=detection_payload,
+        )
+
+    try:
+        db_path, db_name, attempted = _resolve_rule_database(*identifiers)
+        return db_path, db_name, detection_payload, attempted
+    except RuleDatabaseResolutionError as exc:
+        reason = detection_error or getattr(exc, "reason", None)
+        raise RuleDatabaseResolutionError(
+            exc.attempted,
+            reason=reason,
+            detection=detection_payload or getattr(exc, "detection", None),
+        ) from exc
+
+
+def _get_rule_engine(db_path: Path) -> RuleEngine:
+    """Return a cached RuleEngine instance for the given database path."""
+    resolved = db_path.resolve()
+    engine = _RULE_ENGINE_CACHE.get(resolved)
+    if engine is not None:
+        _RULE_ENGINE_CACHE.move_to_end(resolved)
+        return engine
+
+    engine = RuleEngine.from_file(resolved)
+    _RULE_ENGINE_CACHE[resolved] = engine
+    if len(_RULE_ENGINE_CACHE) > _RULE_ENGINE_CACHE_SIZE:
+        _RULE_ENGINE_CACHE.popitem(last=False)
+    return engine
+
+
+def _normalize_symptom_list(value: Optional[Union[str, List[str]]]) -> Optional[List[str]]:
+    """Coerce symptom inputs into a normalized list of strings."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        parts = [part.strip() for part in value.split(",") if part.strip()]
+        return parts or None
+    if isinstance(value, (list, tuple, set)):
+        cleaned = [str(item).strip() for item in value if str(item).strip()]
+        return cleaned or None
+    coerced = str(value).strip()
+    return [coerced] if coerced else None
 
 
 # ============================================================================
@@ -1277,6 +1590,109 @@ def recommend_conditions_tool(
         return _error_response(str(e), {"family": "Unknown"})
 
 
+@tool(args_schema=RuleRecommendInput)
+def rule_based_conditions_tool(
+    reaction_smiles: str,
+    database: Optional[str] = None,
+    family_hint: Optional[str] = None,
+    symptoms: Optional[Union[str, List[str]]] = None,
+    combine_method: Literal["union", "all", "first", "separate"] = "union",
+    include_reasoning: bool = True,
+    auto_detect: bool = True,
+    include_summary: bool = True,
+) -> Dict[str, Any]:
+    """
+    Recommend reaction conditions using the deterministic rule engine.
+    
+    Loads the upgraded rule-based database (e.g., Buchwald CN rules) and applies
+    feature-driven matching to produce condition guidance along with matched
+    rules and modifiers. The tool can automatically infer the appropriate
+    database by detecting the reaction family or accept an explicit path/name.
+    
+    Args:
+        reaction_smiles: Reaction SMILES string (reactants>>products)
+        database: Optional rule database name or JSON path
+        family_hint: Optional reaction-family hint to assist auto selection
+        symptoms: Observed symptoms/failure modes (list or comma-separated)
+        combine_method: How to merge features across reactants
+        include_reasoning: Include matched features/modifiers in result
+        auto_detect: Attempt automatic family detection when database omitted
+        include_summary: Include formatted text summary of recommendation
+    
+    Returns:
+        Dict[str, Any]: Rule-engine recommendation payload with success flag.
+    """
+    start = time.perf_counter()
+    detection_payload: Optional[Dict[str, Any]] = None
+    attempted: List[str] = []
+
+    try:
+        db_path, db_name, detection_payload, attempted = _select_rule_database(
+            reaction_smiles,
+            database=database,
+            family_hint=family_hint,
+            auto_detect=auto_detect,
+        )
+
+        engine = _get_rule_engine(db_path)
+        symptom_list = _normalize_symptom_list(symptoms)
+        recommendation = engine.recommend(
+            reaction_smiles,
+            symptoms=symptom_list or None,
+            combine_method=combine_method,
+            include_reasoning=include_reasoning,
+        )
+
+        payload = recommendation.to_dict()
+        payload["database_name"] = db_name
+        payload["database_path"] = str(db_path)
+        payload["combine_method"] = combine_method
+        payload["symptoms"] = symptom_list or []
+        payload["attempted_identifiers"] = attempted
+        payload["auto_detect"] = auto_detect
+        payload["include_reasoning"] = include_reasoning
+        if detection_payload is not None:
+            payload["family_detection"] = detection_payload
+
+        db_meta = getattr(getattr(engine, "database", None), "metadata", None)
+        if isinstance(db_meta, dict):
+            payload["database_metadata"] = {
+                key: db_meta.get(key)
+                for key in ("name", "reaction_type", "version", "description")
+                if db_meta.get(key) is not None
+            }
+
+        if include_summary:
+            payload["summary"] = recommendation.format_summary()
+
+        payload["timing_ms"] = round((time.perf_counter() - start) * 1000, 2)
+        return _success_response(payload)
+
+    except RuleDatabaseResolutionError as exc:
+        details: Dict[str, Any] = {
+            "attempted": getattr(exc, "attempted", []),
+            "database": database,
+            "family_hint": family_hint,
+            "auto_detect": auto_detect,
+        }
+        detection_info = getattr(exc, "detection", None)
+        if detection_info is not None:
+            details["family_detection"] = detection_info
+        if exc.reason:
+            details["reason"] = exc.reason
+        return _error_response(str(exc), details)
+    except Exception as exc:
+        details = {
+            "database": database,
+            "family_hint": family_hint,
+            "auto_detect": auto_detect,
+        }
+        if detection_payload is not None:
+            details["family_detection"] = detection_payload
+        details["attempted"] = attempted
+        return _error_response(str(exc), details)
+
+
 @tool(args_schema=EnhancedCrossFamilyInput)
 def enhanced_cross_family_recommend_tool(
     reaction_smiles: str,
@@ -1845,6 +2261,7 @@ CHEMTOOLS_TOOLS = [
     
     # Recommendation tools
     recommend_conditions_tool,
+    rule_based_conditions_tool,
     enhanced_cross_family_recommend_tool,
     search_precedents_tool,
     
