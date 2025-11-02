@@ -1,4 +1,5 @@
 {
+  "name": "Suzuki-Miyaura Coupling",
   "reaction_type": "Suzuki-Miyaura",
   "version": "2025-11-02",
   "evaluation": "Use this file ONLY if 'applies_if' tokens are present. Then try base_rules (top→down). If none match, use default_rule. After picking a rule, scan all modifiers and apply those that match (tokens OR plain-text heuristics).",
@@ -21,6 +22,7 @@
   },
   "base_rules": [
     {
+      "name": "Aryl Chloride (Unhindered/EWG)",
       "id": "BR_arCl_unhindered_or_EWG",
       "description": "Aryl chloride that is unhindered OR has EWG near ipso.",
       "reactant_features": {
@@ -35,6 +37,7 @@
       }
     },
     {
+      "name": "Hindered or Heteroaryl",
       "id": "BR_hindered_or_heteroaryl",
       "description": "Sterically hindered site OR heteroaryl present.",
       "reactant_features": {

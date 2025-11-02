@@ -14,8 +14,7 @@ from typing import Dict, List, Any, Optional
 class AppliedRule:
     """Represents a rule that was applied during recommendation."""
     
-    id: str
-    description: str
+    name: str
     conditions: Dict[str, Any]
     matched_features: List[str] = field(default_factory=list)
     confidence: float = 1.0
@@ -23,8 +22,7 @@ class AppliedRule:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
-            "id": self.id,
-            "description": self.description,
+            "name": self.name,
             "conditions": self.conditions,
             "matched_features": self.matched_features,
             "confidence": self.confidence,
@@ -35,19 +33,19 @@ class AppliedRule:
 class AppliedModifier:
     """Represents a modifier that was applied during recommendation."""
     
-    id: str
-    when: List[str]
-    suggest: str
+    suggestion: str
+    rationale: Optional[str] = None
     matched_conditions: List[str] = field(default_factory=list)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
-        return {
-            "id": self.id,
-            "when": self.when,
-            "suggest": self.suggest,
+        result = {
+            "suggestion": self.suggestion,
             "matched_conditions": self.matched_conditions,
         }
+        if self.rationale:
+            result["rationale"] = self.rationale
+        return result
 
 
 @dataclass
@@ -55,77 +53,64 @@ class ConditionRecommendation:
     """Complete recommendation output with base conditions and modifiers."""
     
     reaction_smiles: str
-    reaction_type: str
-    base_conditions: Dict[str, Any]
-    applied_rule: AppliedRule
-    applied_modifiers: List[AppliedModifier] = field(default_factory=list)
+    base_rule: AppliedRule
+    modifiers: List[AppliedModifier] = field(default_factory=list)
     detected_features: Dict[str, Any] = field(default_factory=dict)
-    warnings: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    applied_modifiers: List[AppliedModifier] = field(default_factory=list)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "reaction_smiles": self.reaction_smiles,
-            "reaction_type": self.reaction_type,
-            "base_conditions": self.base_conditions,
-            "applied_rule": self.applied_rule.to_dict(),
-            "applied_modifiers": [m.to_dict() for m in self.applied_modifiers],
+            "base_rule": self.base_rule.to_dict(),
+            "modifiers": [m.to_dict() for m in self.modifiers],
             "detected_features": self.detected_features,
-            "warnings": self.warnings,
-            "metadata": self.metadata,
         }
     
     def format_summary(self) -> str:
         """Format a human-readable summary."""
         lines = [
             f"{'='*70}",
-            f"REACTION CONDITIONS RECOMMENDATION",
+            f"CONDITION RECOMMENDATION",
             f"{'='*70}",
-            f"Reaction Type: {self.reaction_type}",
-            f"Reaction SMILES: {self.reaction_smiles}",
+            f"Reaction: {self.reaction_smiles}",
             f"",
-            f"Applied Rule: {self.applied_rule.id}",
-            f"Description: {self.applied_rule.description}",
+            f"Applied Rule: {self.base_rule.name}",
+            f"Confidence: {self.base_rule.confidence:.2f}",
             f"",
-            f"BASE CONDITIONS:",
+            f"RECOMMENDED CONDITIONS:",
             f"{'-'*70}",
         ]
         
-        for key, value in self.base_conditions.items():
+        for key, value in self.base_rule.conditions.items():
             lines.append(f"  {key:25s}: {value}")
         
-        if self.applied_modifiers:
+        if self.base_rule.matched_features:
+            lines.append(f"")
+            lines.append(f"Matched features: {', '.join(self.base_rule.matched_features)}")
+        
+        if self.modifiers:
             lines.append(f"")
             lines.append(f"MODIFIERS APPLIED:")
             lines.append(f"{'-'*70}")
-            for mod in self.applied_modifiers:
-                lines.append(f"  [{mod.id}]")
-                lines.append(f"  → {mod.suggest}")
+            for mod in self.modifiers:
+                lines.append(f"  • {mod.suggestion}")
+                if mod.rationale:
+                    lines.append(f"    Reason: {mod.rationale}")
+                if mod.matched_conditions:
+                    lines.append(f"    Triggers: {', '.join(mod.matched_conditions)}")
                 lines.append(f"")
         
-        if self.warnings:
-            lines.append(f"")
-            lines.append(f"WARNINGS:")
+        if self.detected_features:
+            lines.append(f"KEY FEATURES DETECTED:")
             lines.append(f"{'-'*70}")
-            for warning in self.warnings:
-                lines.append(f"  ⚠ {warning}")
-        
-        lines.append(f"")
-        lines.append(f"KEY FEATURES DETECTED:")
-        lines.append(f"{'-'*70}")
-        
-        # Show only True boolean features and non-zero integer features
-        relevant_features = {
-            k: v for k, v in self.detected_features.items()
-            if (isinstance(v, bool) and v) or (isinstance(v, int) and v > 0)
-        }
-        
-        for key, value in sorted(relevant_features.items()):
-            if isinstance(value, bool):
-                lines.append(f"  ✓ {key}")
-            else:
-                lines.append(f"  • {key} = {value}")
+            
+            # Show only True boolean features and non-zero values
+            for key, value in sorted(self.detected_features.items()):
+                if isinstance(value, bool) and value:
+                    lines.append(f"  ✓ {key}")
+                elif isinstance(value, int) and value > 0:
+                    lines.append(f"  • {key} = {value}")
         
         lines.append(f"{'='*70}")
         
@@ -136,11 +121,32 @@ class ConditionRecommendation:
 class RuleSpec:
     """Specification for a single rule in the database."""
     
-    id: str
-    description: str
+    name: str
+    conditions: Dict[str, Any]
     reactant_features: Optional[Dict[str, Any]] = None
-    conditions: Dict[str, Any] = field(default_factory=dict)
     priority: int = 0
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> RuleSpec:
+        """Create RuleSpec from dictionary."""
+        return cls(
+            name=data.get("name", "unnamed"),
+            conditions=data.get("conditions", {}),
+            reactant_features=data.get("reactant_features"),
+            priority=data.get("priority", 0)
+        )
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        result = {
+            "name": self.name,
+            "conditions": self.conditions,
+        }
+        if self.reactant_features:
+            result["reactant_features"] = self.reactant_features
+        if self.priority != 0:
+            result["priority"] = self.priority
+        return result
     
     def matches(self, features: Dict[str, Any]) -> tuple[bool, List[str]]:
         """
@@ -188,35 +194,54 @@ class RuleSpec:
 class ModifierSpec:
     """Specification for a modifier in the database."""
     
-    id: str
     when: List[str]
-    suggest: str
+    suggestion: str
+    rationale: Optional[str] = None
     priority: int = 0
     
-    def matches(self, features: Dict[str, Any], symptoms: List[str] = None) -> tuple[bool, List[str]]:
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> ModifierSpec:
+        """Create ModifierSpec from dictionary."""
+        return cls(
+            when=data.get("when", []),
+            suggestion=data.get("suggestion", data.get("suggest", "")),
+            rationale=data.get("rationale"),
+            priority=data.get("priority", 0)
+        )
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        result = {
+            "when": self.when,
+            "suggestion": self.suggestion,
+        }
+        if self.rationale:
+            result["rationale"] = self.rationale
+        if self.priority != 0:
+            result["priority"] = self.priority
+        return result
+    
+    def matches(self, features: Dict[str, Any], symptoms: List[str] = None) -> bool:
         """
         Check if this modifier should be applied.
         
         Args:
             features: Detected molecular features
-            symptoms: Optional list of observed symptoms (e.g., "hydrodehalogenation")
+            symptoms: Optional list of observed symptoms
         
         Returns:
-            (should_apply, matched_conditions)
+            True if any condition matches
         """
         symptoms = symptoms or []
-        matched = []
         
         for condition in self.when:
             # Check for symptom-based conditions
             if condition.startswith("symptom:"):
                 symptom_text = condition.replace("symptom:", "").strip()
                 if any(symptom_text.lower() in s.lower() for s in symptoms):
-                    matched.append(condition)
-                    continue
-            
+                    return True
             # Check for feature-based conditions
-            if features.get(condition, False):
-                matched.append(condition)
+            elif features.get(condition, False):
+                return True
         
-        return len(matched) > 0, matched
+        return False
