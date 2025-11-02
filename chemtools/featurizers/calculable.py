@@ -276,7 +276,9 @@ def _evaluate_derived_feature(derive_expr: str, base_features: Dict[str, Any]) -
     
     Supports:
         - AND operations: "feature1 AND feature2"
+        - OR operations: "feature1 OR feature2"
         - NOT operations: "NOT feature1"
+        - Parentheses: "(feature1 OR feature2) AND feature3"
         - Combinations: "feature1 AND NOT feature2"
     
     Args:
@@ -289,11 +291,42 @@ def _evaluate_derived_feature(derive_expr: str, base_features: Dict[str, Any]) -
     # Normalize expression
     expr = derive_expr.strip()
     
+    # Handle parentheses recursively
+    while '(' in expr:
+        # Find innermost parenthesized expression
+        start = expr.rfind('(')
+        end = expr.find(')', start)
+        if end == -1:
+            break
+        inner_expr = expr[start+1:end]
+        inner_result = _evaluate_derived_feature(inner_expr, base_features)
+        expr = expr[:start] + str(inner_result) + expr[end+1:]
+    
+    # Replace True/False strings with actual booleans
+    expr = expr.replace('True', 'true_token').replace('False', 'false_token')
+    
+    # Split on OR first (lower precedence)
+    if ' OR ' in expr:
+        or_parts = [part.strip() for part in expr.split(' OR ')]
+        result = False
+        for part in or_parts:
+            part_result = _evaluate_derived_feature(part, base_features)
+            result = result or part_result
+            if result:  # Short-circuit on true
+                return True
+        return result
+    
     # Split on AND
     and_parts = [part.strip() for part in expr.split(' AND ')]
     
     result = True
     for part in and_parts:
+        # Handle boolean tokens from parentheses
+        if part == 'true_token':
+            continue
+        if part == 'false_token':
+            return False
+            
         # Check for NOT
         if part.startswith('NOT '):
             feature_name = part[4:].strip()

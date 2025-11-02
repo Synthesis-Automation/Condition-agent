@@ -1,5 +1,5 @@
 {
-  "version": "2025-11-02.v1.1",
+  "version": "2025-11-02.v2.0",
   "schema_notes": {
     "bool": "<motif>_present",
     "int": "<motif>_site_count",
@@ -172,18 +172,6 @@
       "why": "Any aryl C–LG including aryl sulfonates"
     },
     {
-      "token": "heteroaryl_halide_present",
-      "type": "bool",
-      "scope": "global",
-      "detect": {
-        "smarts_any": [
-          "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",
-          "[n,o,s]OS(=O)(=O)"
-        ]
-      },
-      "why": "Heteroaryl C–LG"
-    },
-    {
       "token": "vinyl_halide_present",
       "type": "bool",
       "scope": "global",
@@ -354,6 +342,30 @@
       "why": "MIDA boronate"
     },
     {
+      "token": "boronic_acid_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[#6]B([OH])([OH])",
+          "[#6]B(O[H])(O[H])"
+        ]
+      },
+      "why": "Free boronic acid (not ester); hygroscopic, air-sensitive"
+    },
+    {
+      "token": "boronic_ester_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[#6]B1OC([C,c])([C,c])C([C,c])([C,c])O1",
+          "[#6]B(O[C,c])O[C,c]"
+        ]
+      },
+      "why": "Boronic ester; more stable than free acid"
+    },
+    {
       "token": "grignard_present",
       "type": "bool",
       "scope": "global",
@@ -422,6 +434,39 @@
       "why": "Aliphatic amines"
     },
     {
+      "token": "primary_amine_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3H2;!$([N][C,c]=O);!$([N]S(=O)(=O))]"
+        ]
+      },
+      "why": "Primary amine (NH2); not amide/sulfonamide; highest nucleophilicity"
+    },
+    {
+      "token": "secondary_amine_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3H1;!$([N][C,c]=O);!$([N]S(=O)(=O))]"
+        ]
+      },
+      "why": "Secondary amine (NHR); not amide/sulfonamide"
+    },
+    {
+      "token": "tertiary_amine_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3H0;!$([N][C,c]=O);!$([N]S(=O)(=O));!$(n)]"
+        ]
+      },
+      "why": "Tertiary amine (NR3); not amide/sulfonamide; potential base/ligand"
+    },
+    {
       "token": "aniline_present",
       "type": "bool",
       "scope": "global",
@@ -451,10 +496,22 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
+          "[OX2H][CX4]",
+          "c[OX2H]"
+        ]
+      },
+      "why": "Any alcohol (aliphatic or phenolic OH)"
+    },
+    {
+      "token": "aliphatic_alcohol_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
           "[OX2H][CX4]"
         ]
       },
-      "why": "Alcohols"
+      "why": "Aliphatic alcohol; less acidic than phenol"
     },
     {
       "token": "thiol_present",
@@ -490,6 +547,85 @@
       "why": "Acyl chlorides"
     },
     {
+      "token": "carbonyl_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[OX1]"
+        ]
+      },
+      "why": "Any carbonyl (ketone/aldehyde/ester/amide/acid)"
+    },
+    {
+      "token": "ketone_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[#6][CX3](=[OX1])[#6;!$(C=O)]"
+        ]
+      },
+      "why": "Ketone; potential condensation/reduction"
+    },
+    {
+      "token": "aldehyde_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CX3H1](=[OX1])[#6]",
+          "[CX3H1](=[OX1])[H]"
+        ]
+      },
+      "why": "Aldehyde; highly reactive, oxidation-prone"
+    },
+    {
+      "token": "ester_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[#6][CX3](=[OX1])[OX2][#6]"
+        ]
+      },
+      "why": "Ester group; potential saponification/transesterification"
+    },
+    {
+      "token": "amide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3][CX3](=[OX1])[#6]",
+          "[NX3][CX3](=[OX1])[H]"
+        ]
+      },
+      "why": "Amide group; resonance-stabilized, low nucleophilicity"
+    },
+    {
+      "token": "primary_amide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3H2][CX3](=[OX1])"
+        ]
+      },
+      "why": "Primary amide (CONH2); potential hydrogen bonding"
+    },
+    {
+      "token": "secondary_amide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3H1][CX3](=[OX1])"
+        ]
+      },
+      "why": "Secondary amide (CONHR); reduced nucleophilicity"
+    },
+    {
       "token": "anhydride_present",
       "type": "bool",
       "scope": "global",
@@ -510,6 +646,54 @@
         ]
       },
       "why": "Activated aryl esters (pNP esters)"
+    },
+    {
+      "token": "nitrile_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX1]#[CX2]"
+        ]
+      },
+      "why": "Nitrile group; potential metal coordination"
+    },
+    {
+      "token": "aryl_nitrile_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c[CX2]#[NX1]"
+        ]
+      },
+      "why": "Aryl nitrile; electron-withdrawing substituent"
+    },
+    {
+      "token": "nitro_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[N+](=O)[O-]",
+          "[NX3](=[OX1])=[OX1]",
+          "[$([N+](=O)[O-]),$([N](=O)=O)]"
+        ]
+      },
+      "why": "Nitro group; strong electron-withdrawing, potential reduction"
+    },
+    {
+      "token": "aryl_nitro_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c[N+](=O)[O-]",
+          "c[NX3](=[OX1])=[OX1]",
+          "c[$([N+](=O)[O-]),$([N](=O)=O)]"
+        ]
+      },
+      "why": "Aryl nitro; activates SNAr, can be reduced"
     },
     {
       "token": "activated_fluoro_ester_present",
@@ -662,6 +846,11 @@
       "token": "internal_alkyne_present",
       "derive": "alkyne_present AND NOT terminal_alkyne_present",
       "why": "Internal alkyne by exclusion"
+    },
+    {
+      "token": "heteroaryl_halide_present",
+      "derive": "(aryl_halide_present OR sp2_pseudohalide_present) AND heteroaryl_present",
+      "why": "Heteroaryl C–LG (any halogen or sulfonate on heteroaryl)"
     },
     {
       "token": "ArCl_present",
