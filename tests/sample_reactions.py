@@ -755,6 +755,53 @@ BUCHWALD_HARTWIG_REACTIONS = [
     "O=C(O)C(c1ccccc1)c1ccccc1.NCCCCCC>>O=C(NCCCCCC)C(c1ccccc1)c1ccccc1 (Amide: Diphenylacetic acid + hexylamine)",
     "CCCCCCC(=O)O.Nc1ccc2[nH]c3ccccc3c2c1>>CCCCCCC(=O)Nc1ccc2[nH]c3ccccc3c2c1 (Amide: Heptanoic acid + 2-aminocarbazole)",
     "O=C(O)c1ccc(Oc2ccccc2)cc1.NC1CC1C(F)(F)F>>O=C(NC1CC1C(F)(F)F)c1ccc(Oc2ccccc2)cc1 (Amide: 4-Phenoxybenzoic acid + 2-trifluoromethylcyclopropylamine)",
+    
+    # ═══════════════════════════════════════════════════════════
+    # PHASE 3/4 FEATURE TEST REACTIONS - Advanced Substrates
+    # ═══════════════════════════════════════════════════════════
+    
+    # Polyhalogenated substrates
+    "Brc1cc(Br)cc(Br)c1.OB(O)c1ccccc1>>Brc1cc(Br)cc(-c2ccccc2)c1 (Suzuki - 1,3,5-Tribromobenzene selective coupling)",
+    "Fc1c(F)c(F)c(Br)c(F)c1F.OB(O)c1ccccc1>>Fc1c(F)c(F)c(-c2ccccc2)c(F)c1F (Suzuki - Pentafluorobromobenzene)",
+    "Clc1ccc(Cl)nc1.OB(O)c1ccccc1>>Clc1ccc(-c2ccccc2)nc1 (Suzuki - 2,5-Dichloropyridine)",
+    "Brc1c(Cl)cccc1Cl.OB(O)c1ccccc1>>c1ccccc1-c1c(Cl)cccc1Cl (Suzuki - Mixed halide with ortho-chlorines)",
+    
+    # Sterically hindered substrates  
+    "Brc1ccccc1C(C)(C)C.OB(O)c1ccccc1>>CC(C)(C)c1ccccc1-c1ccccc1 (Suzuki - Ortho-tert-butyl sterics)",
+    "Clc1cc(C(C)C)ccc1C(C)C.OB(O)c1ccccc1>>CC(C)c1cccc(C(C)C)c1-c1ccccc1 (Suzuki - Diisopropyl sterics)",
+    "Brc1c(C)c(C)c(C)c(C)c1C.OB(O)c1ccccc1>>Cc1c(C)c(C)c(C)c(C)c1-c1ccccc1 (Suzuki - Pentamethyl extreme sterics)",
+    "Ic1c(OC)cccc1OC.OB(O)c1ccccc1>>COc1cccc(OC)c1-c1ccccc1 (Suzuki - Ortho-dimethoxy with EDG)",
+    
+    # Protected intermediates (BOC, CBZ, FMOC, silyl)
+    "Ic1ccc(NC(=O)OC(C)(C)C)cc1.OB(O)c1ccccc1>>CC(C)(C)OC(=O)Nc1ccc(-c2ccccc2)cc1 (Suzuki - BOC-protected aniline)",
+    "Brc1ccc(NC(=O)OCc2ccccc2)cc1.OB(O)c1ccccc1>>c1ccccc1COC(=O)Nc1ccc(-c2ccccc2)cc1 (Suzuki - CBZ-protected aniline)",
+    "Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1.OB(O)c1ccccc1>>c1ccccc1-c1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1 (Suzuki - FMOC-protected aniline)",
+    "Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1.OB(O)c1ccccc1>>CC(C)(C)[Si](C)(C)Oc1ccc(-c2ccccc2)cc1 (Suzuki - TBS-protected phenol)",
+    "Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1.OB(O)c1ccccc1>>CC(C)[Si](C(C)C)(C(C)C)Oc1ccc(-c2ccccc2)cc1 (Suzuki - TIPS-protected phenol)",
+    
+    # Strong EWG/EDG substrates
+    "Brc1ccc([N+](=O)[O-])cc1.OB(O)c1ccccc1>>[O-][N+](=O)c1ccc(-c2ccccc2)cc1 (Suzuki - p-Nitrobromobenzene strong EWG)",
+    "Clc1ccc(C#N)cc1.OB(O)c1ccccc1>>N#Cc1ccc(-c2ccccc2)cc1 (Suzuki - p-Chlorobenzonitrile strong EWG)",
+    "Brc1ccc(N(C)C)cc1.OB(O)c1ccccc1>>CN(C)c1ccc(-c2ccccc2)cc1 (Suzuki - p-Dimethylaminobromobenzene strong EDG)",
+    "Ic1ccc(OC)cc1.OB(O)c1ccccc1>>COc1ccc(-c2ccccc2)cc1 (Suzuki - p-Iodoanisole strong EDG)",
+    
+    # Chiral substrates
+    "NC(Cc1ccccc1)C(=O)O.Brc1ccccc1>>Brc1ccccc1.NC(Cc1ccccc1)C(=O)O (C-N - Phenylalanine amination, chiral)",
+    "C[C@H](N)C(=O)O.Brc1ccccc1>>Brc1ccccc1.C[C@H](N)C(=O)O (C-N - (S)-Alanine amination, chiral center)",
+    
+    # Fused ring systems
+    "Brc1ccc2ccccc2c1.OB(O)c1ccccc1>>c1ccccc1-c1ccc2ccccc2c1 (Suzuki - 2-Bromonaphthalene fused bicyclic)",
+    "Clc1ccc2c3ccccc3ccc2c1.OB(O)c1ccccc1>>c1ccccc1-c1ccc2c3ccccc3ccc2c1 (Suzuki - 9-Chloroanthracene fused tricyclic)",
+    
+    # Buchwald-Hartwig with Phase 3/4 features
+    "Brc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(Nc2ccccc2)cc1 (C-N - p-Nitrobromobenzene + aniline, strong EWG)",
+    "Ic1ccc(NC(=O)OC(C)(C)C)cc1.Nc1ccccc1>>CC(C)(C)OC(=O)Nc1ccc(Nc2ccccc2)cc1 (C-N - BOC-protected with amination)",
+    "Brc1c(OC)cccc1OC.Nc1ccccc1>>COc1cccc(OC)c1Nc1ccccc1 (C-N - Ortho-dimethoxy sterically hindered)",
+    "Brc1ccc2ccccc2c1.NCCC>>CCCNc1ccc2ccccc2c1 (C-N - 2-Bromonaphthalene fused ring + propylamine)",
+    
+    # Sonogashira with Phase 3/4 features
+    "Brc1cc(Br)cc(Br)c1.C#Cc1ccccc1>>Brc1cc(Br)cc(C#Cc2ccccc2)c1 (Sonogashira - Tribromobenzene polyhalogenated)",
+    "Ic1ccccc1C(C)(C)C.C#Cc1ccccc1>>CC(C)(C)c1ccccc1C#Cc1ccccc1 (Sonogashira - Ortho-tert-butyl sterics)",
 ]
 
 def get_sample_reactions():
@@ -969,6 +1016,56 @@ SUZUKI_DB_TEST_REACTIONS = {
         "expected_features": {"lg_class": "OTf"}
     }
 }
+
+
+# ═══════════════════════════════════════════════════════════
+# PHASE 3/4 FEATURE TEST REACTIONS
+# ═══════════════════════════════════════════════════════════
+
+PHASE_3_4_REACTIONS = [
+    # Polyhalogenated substrates
+    "Brc1cc(Br)cc(Br)c1.OB(O)c1ccccc1>>Brc1cc(Br)cc(-c2ccccc2)c1 (Suzuki - 1,3,5-Tribromobenzene selective coupling)",
+    "Fc1c(F)c(F)c(Br)c(F)c1F.OB(O)c1ccccc1>>Fc1c(F)c(F)c(-c2ccccc2)c(F)c1F (Suzuki - Pentafluorobromobenzene)",
+    "Clc1ccc(Cl)nc1.OB(O)c1ccccc1>>Clc1ccc(-c2ccccc2)nc1 (Suzuki - 2,5-Dichloropyridine)",
+    "Brc1c(Cl)cccc1Cl.OB(O)c1ccccc1>>c1ccccc1-c1c(Cl)cccc1Cl (Suzuki - Mixed halide with ortho-chlorines)",
+    
+    # Sterically hindered substrates
+    "Brc1ccccc1C(C)(C)C.OB(O)c1ccccc1>>CC(C)(C)c1ccccc1-c1ccccc1 (Suzuki - Ortho-tert-butyl sterics)",
+    "Clc1cc(C(C)C)ccc1C(C)C.OB(O)c1ccccc1>>CC(C)c1cccc(C(C)C)c1-c1ccccc1 (Suzuki - Diisopropyl sterics)",
+    "Brc1c(C)c(C)c(C)c(C)c1C.OB(O)c1ccccc1>>Cc1c(C)c(C)c(C)c(C)c1-c1ccccc1 (Suzuki - Pentamethyl extreme sterics)",
+    "Ic1c(OC)cccc1OC.OB(O)c1ccccc1>>COc1cccc(OC)c1-c1ccccc1 (Suzuki - Ortho-dimethoxy with EDG)",
+    
+    # Protected intermediates (BOC, CBZ, FMOC, silyl)
+    "Ic1ccc(NC(=O)OC(C)(C)C)cc1.OB(O)c1ccccc1>>CC(C)(C)OC(=O)Nc1ccc(-c2ccccc2)cc1 (Suzuki - BOC-protected aniline)",
+    "Brc1ccc(NC(=O)OCc2ccccc2)cc1.OB(O)c1ccccc1>>c1ccccc1COC(=O)Nc1ccc(-c2ccccc2)cc1 (Suzuki - CBZ-protected aniline)",
+    "Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1.OB(O)c1ccccc1>>c1ccccc1-c1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1 (Suzuki - FMOC-protected aniline)",
+    "Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1.OB(O)c1ccccc1>>CC(C)(C)[Si](C)(C)Oc1ccc(-c2ccccc2)cc1 (Suzuki - TBS-protected phenol)",
+    "Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1.OB(O)c1ccccc1>>CC(C)[Si](C(C)C)(C(C)C)Oc1ccc(-c2ccccc2)cc1 (Suzuki - TIPS-protected phenol)",
+    
+    # Strong EWG/EDG substrates
+    "Brc1ccc([N+](=O)[O-])cc1.OB(O)c1ccccc1>>[O-][N+](=O)c1ccc(-c2ccccc2)cc1 (Suzuki - p-Nitrobromobenzene strong EWG)",
+    "Clc1ccc(C#N)cc1.OB(O)c1ccccc1>>N#Cc1ccc(-c2ccccc2)cc1 (Suzuki - p-Chlorobenzonitrile strong EWG)",
+    "Brc1ccc(N(C)C)cc1.OB(O)c1ccccc1>>CN(C)c1ccc(-c2ccccc2)cc1 (Suzuki - p-Dimethylaminobromobenzene strong EDG)",
+    "Ic1ccc(OC)cc1.OB(O)c1ccccc1>>COc1ccc(-c2ccccc2)cc1 (Suzuki - p-Iodoanisole strong EDG)",
+    
+    # Chiral substrates
+    "NC(Cc1ccccc1)C(=O)O.Brc1ccccc1>>Brc1ccccc1.NC(Cc1ccccc1)C(=O)O (C-N - Phenylalanine amination, chiral)",
+    "C[C@H](N)C(=O)O.Brc1ccccc1>>Brc1ccccc1.C[C@H](N)C(=O)O (C-N - (S)-Alanine amination, chiral center)",
+    
+    # Fused ring systems
+    "Brc1ccc2ccccc2c1.OB(O)c1ccccc1>>c1ccccc1-c1ccc2ccccc2c1 (Suzuki - 2-Bromonaphthalene fused bicyclic)",
+    "Clc1ccc2c3ccccc3ccc2c1.OB(O)c1ccccc1>>c1ccccc1-c1ccc2c3ccccc3ccc2c1 (Suzuki - 9-Chloroanthracene fused tricyclic)",
+    
+    # Buchwald-Hartwig with Phase 3/4 features
+    "Brc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(Nc2ccccc2)cc1 (C-N - p-Nitrobromobenzene + aniline, strong EWG)",
+    "Ic1ccc(NC(=O)OC(C)(C)C)cc1.Nc1ccccc1>>CC(C)(C)OC(=O)Nc1ccc(Nc2ccccc2)cc1 (C-N - BOC-protected with amination)",
+    "Brc1c(OC)cccc1OC.Nc1ccccc1>>COc1cccc(OC)c1Nc1ccccc1 (C-N - Ortho-dimethoxy sterically hindered)",
+    "Brc1ccc2ccccc2c1.NCCC>>CCCNc1ccc2ccccc2c1 (C-N - 2-Bromonaphthalene fused ring + propylamine)",
+    
+    # Sonogashira with Phase 3/4 features
+    "Brc1cc(Br)cc(Br)c1.C#Cc1ccccc1>>Brc1cc(Br)cc(C#Cc2ccccc2)c1 (Sonogashira - Tribromobenzene polyhalogenated)",
+    "Ic1ccccc1C(C)(C)C.C#Cc1ccccc1>>CC(C)(C)c1ccccc1C#Cc1ccccc1 (Sonogashira - Ortho-tert-butyl sterics)",
+]
 
 
 def get_suzuki_db_tests():

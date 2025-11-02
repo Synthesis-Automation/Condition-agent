@@ -65,6 +65,7 @@ from chemtools.reagent.analytics import (
 )
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
 from chemtools.featurizers import molecular as molecular_featurizer
+from chemtools.featurizers import calculable as calculable_features
 
 # Import bond analysis tools (NEW)
 from chemtools import (
@@ -150,6 +151,27 @@ class MolPipelineFeaturizeInput(BaseModel):
     include_molpipeline: bool = Field(
         True,
         description="Include MolPipeline fingerprint/descriptor payload when available.",
+    )
+
+
+class CalculableFeaturesInput(BaseModel):
+    """Schema for calculable feature detection."""
+
+    smiles: str = Field(
+        ...,
+        description="SMILES string of the molecule to analyze.",
+    )
+    feature_tokens: Optional[List[str]] = Field(
+        None,
+        description="Optional list of feature tokens to extract. Defaults to all features.",
+    )
+    only_present: bool = Field(
+        False,
+        description="Return only features that evaluate to True or positive counts.",
+    )
+    include_summary: bool = Field(
+        False,
+        description="Include a human-readable summary of detected features.",
     )
 
 
@@ -723,6 +745,64 @@ def molpipeline_featurize_tool(
                 "electrophile": electrophile,
                 "nucleophile": nucleophile,
                 "include_molpipeline": include_molpipeline,
+            },
+        )
+
+
+@tool(args_schema=CalculableFeaturesInput)
+def calculable_features_tool(
+    smiles: str,
+    feature_tokens: Optional[List[str]] = None,
+    only_present: bool = False,
+    include_summary: bool = False,
+) -> Dict[str, Any]:
+    """
+    Detect calculable features for a molecule using the curated feature library.
+
+    Features cover SMARTS-derived motifs, integer counts, and heuristic properties
+    defined in ``chemtools/featurizers/calculable_features.json``. When ``feature_tokens``
+    is supplied the output is restricted to those tokens (missing entries are
+    reported separately). Setting ``only_present`` filters the result to features
+    that evaluate to ``True`` or positive integers.
+    """
+    try:
+        all_features = calculable_features.detect_all_features(smiles)
+        filtered = dict(all_features)
+        missing: List[str] = []
+        if feature_tokens:
+            filtered = {}
+            for token in feature_tokens:
+                if token in all_features:
+                    filtered[token] = all_features[token]
+                else:
+                    missing.append(token)
+
+        if only_present:
+            filtered = {
+                token: value
+                for token, value in filtered.items()
+                if (isinstance(value, bool) and value)
+                or (isinstance(value, int) and value > 0)
+            }
+
+        present_tokens = calculable_features.get_present_features(smiles)
+
+        payload: Dict[str, Any] = {
+            "features": filtered,
+            "present_features": present_tokens,
+        }
+        if missing:
+            payload["missing_tokens"] = missing
+        if include_summary:
+            payload["summary"] = calculable_features.feature_summary(smiles)
+        return _success_response(payload)
+    except Exception as e:
+        return _error_response(
+            str(e),
+            {
+                "smiles": smiles,
+                "feature_tokens": feature_tokens,
+                "only_present": only_present,
             },
         )
 
@@ -1736,6 +1816,7 @@ CHEMTOOLS_TOOLS = [
     classify_reactant_tool,
     molpipeline_featurize_tool,
     get_functional_groups_tool,
+    calculable_features_tool,
     analyze_bond_changes_tool,  # NEW: Bond breaking/formation analysis
     
     # Recommendation tools

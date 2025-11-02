@@ -224,6 +224,126 @@ def _detect_beta_hydride(mol) -> bool:
         return False
 
 
+def _detect_ortho_substitution(mol) -> bool:
+    """
+    Detect ortho-disubstituted benzene rings.
+    
+    This looks for benzene rings with two substituents in ortho (1,2) positions,
+    which can cause steric hindrance in reactions.
+    
+    Args:
+        mol: RDKit molecule object
+        
+    Returns:
+        True if ortho-disubstituted pattern is found
+    """
+    if mol is None or not rdkit_available():
+        return False
+    
+    try:
+        from rdkit import Chem
+        
+        # SMARTS for ortho-disubstituted benzene
+        # Pattern: Two adjacent aromatic carbons in a 6-membered aromatic ring,
+        # both with non-ring substituents
+        ortho_patterns = [
+            # Generic ortho-disubstituted pattern
+            "c1ccccc1(*)(*)",  # Two adjacent positions with substituents
+            # More specific: both positions have non-H substituents
+            "c1c([!H])c([!H])ccc1",
+        ]
+        
+        for smarts in ortho_patterns:
+            pattern = _compile_smarts(smarts)
+            if pattern and mol.HasSubstructMatch(pattern):
+                return True
+        
+        return False
+    except Exception:
+        return False
+
+
+def _detect_molecular_weight(mol) -> float:
+    """
+    Calculate molecular weight.
+    
+    Args:
+        mol: RDKit molecule object
+        
+    Returns:
+        Molecular weight in g/mol
+    """
+    if mol is None or not rdkit_available():
+        return 0.0
+    
+    try:
+        from rdkit.Chem import Descriptors
+        return Descriptors.MolWt(mol)
+    except Exception:
+        return 0.0
+
+
+def _detect_fused_ring_system(mol) -> bool:
+    """
+    Detect fused ring systems (e.g., naphthalene, quinoline).
+    
+    Args:
+        mol: RDKit molecule object
+        
+    Returns:
+        True if molecule has fused rings
+    """
+    if mol is None or not rdkit_available():
+        return False
+    
+    try:
+        from rdkit import Chem
+        
+        # Get ring info
+        ri = mol.GetRingInfo()
+        rings = ri.AtomRings()
+        
+        if len(rings) < 2:
+            return False
+        
+        # Check if any two rings share at least one edge (two atoms)
+        for i, ring1 in enumerate(rings):
+            for ring2 in rings[i+1:]:
+                shared_atoms = set(ring1) & set(ring2)
+                if len(shared_atoms) >= 2:
+                    return True
+        
+        return False
+    except Exception:
+        return False
+
+
+def _detect_chiral_centers(mol) -> tuple[bool, int]:
+    """
+    Detect chiral centers in molecule.
+    
+    Args:
+        mol: RDKit molecule object
+        
+    Returns:
+        Tuple of (has_chiral_center, chiral_center_count)
+    """
+    if mol is None or not rdkit_available():
+        return (False, 0)
+    
+    try:
+        from rdkit import Chem
+        from rdkit.Chem import FindMolChiralCenters
+        
+        # Find chiral centers
+        chiral_centers = FindMolChiralCenters(mol, includeUnassigned=True)
+        count = len(chiral_centers)
+        
+        return (count > 0, count)
+    except Exception:
+        return (False, 0)
+
+
 def _detect_heuristic_features(mol, heuristic_desc: str, token: str) -> Union[bool, int]:
     """
     Detect features that require heuristic/descriptor-based logic.
@@ -244,6 +364,31 @@ def _detect_heuristic_features(mol, heuristic_desc: str, token: str) -> Union[bo
     # β-hydride detection
     if token == 'beta_hydride_possible':
         return _detect_beta_hydride(mol)
+    
+    # Ortho-substitution detection
+    if token == 'ortho_substitution_present':
+        return _detect_ortho_substitution(mol)
+    
+    # Molecular weight features
+    if token in ('low_molecular_weight', 'high_molecular_weight'):
+        mw = _detect_molecular_weight(mol)
+        if token == 'low_molecular_weight':
+            return mw < 200
+        else:  # high_molecular_weight
+            return mw > 500
+    
+    # Fused ring system detection
+    if token == 'fused_ring_system':
+        return _detect_fused_ring_system(mol)
+    
+    # Chiral center detection
+    if token == 'chiral_center_present':
+        has_chiral, _ = _detect_chiral_centers(mol)
+        return has_chiral
+    
+    if token == 'chiral_center_count':
+        _, count = _detect_chiral_centers(mol)
+        return count
     
     # Count features with SMARTS patterns embedded in heuristic description
     if token == 'sp2_halide_site_count':
@@ -279,6 +424,7 @@ def _evaluate_derived_feature(derive_expr: str, base_features: Dict[str, Any]) -
         - OR operations: "feature1 OR feature2"
         - NOT operations: "NOT feature1"
         - Parentheses: "(feature1 OR feature2) AND feature3"
+        - Comparisons: "halogen_count >= 2", "ring_count > 0"
         - Combinations: "feature1 AND NOT feature2"
     
     Args:
@@ -288,8 +434,40 @@ def _evaluate_derived_feature(derive_expr: str, base_features: Dict[str, Any]) -
     Returns:
         Boolean result of the expression
     """
+    import re
+    
     # Normalize expression
     expr = derive_expr.strip()
+    
+    # Handle comparisons (>=, <=, >, <, ==, !=)
+    comparison_pattern = r'(\w+)\s*(>=|<=|>|<|==|!=)\s*(\d+)'
+    
+    def evaluate_comparison(match):
+        """Evaluate a comparison and return 'True' or 'False' string."""
+        feature = match.group(1)
+        operator = match.group(2)
+        value = int(match.group(3))
+        feature_value = base_features.get(feature, 0)
+        
+        if operator == '>=':
+            result = feature_value >= value
+        elif operator == '<=':
+            result = feature_value <= value
+        elif operator == '>':
+            result = feature_value > value
+        elif operator == '<':
+            result = feature_value < value
+        elif operator == '==':
+            result = feature_value == value
+        elif operator == '!=':
+            result = feature_value != value
+        else:
+            result = False
+        
+        return 'True' if result else 'False'
+    
+    # Replace all comparisons with True/False
+    expr = re.sub(comparison_pattern, evaluate_comparison, expr)
     
     # Handle parentheses recursively
     while '(' in expr:
@@ -342,6 +520,7 @@ def _evaluate_derived_feature(derive_expr: str, base_features: Dict[str, Any]) -
             return False
     
     return result
+
 
 
 # ============================================================================
@@ -416,6 +595,11 @@ def detect_all_features(smiles: str) -> Dict[str, Any]:
                 result[token] = _detect_smarts_feature(mol, smarts_list)
             elif ftype == "int":
                 result[token] = _count_substructure_matches(mol, smarts_list)
+        
+        # SMARTS count (always returns int)
+        elif "smarts_count" in detect:
+            smarts_pattern = detect["smarts_count"]
+            result[token] = _count_substructure_matches(mol, [smarts_pattern])
         
         # Heuristic-based detection
         elif "heuristic" in detect:
