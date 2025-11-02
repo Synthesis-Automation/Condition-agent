@@ -16,10 +16,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[cX3][Cl]",
-          "[C;X2]=[C;X2][Cl]"
-        ]
+        "smarts_any": ["[cX3][Cl]", "[C;X2]=[C;X2][Cl]"]
       },
       "why": "Aryl/vinyl chloride"
     },
@@ -28,10 +25,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[cX3][Br]",
-          "[C;X2]=[C;X2][Br]"
-        ]
+        "smarts_any": ["[cX3][Br]", "[C;X2]=[C;X2][Br]"]
       },
       "why": "Aryl/vinyl bromide"
     },
@@ -40,10 +34,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[cX3][I]",
-          "[C;X2]=[C;X2][I]"
-        ]
+        "smarts_any": ["[cX3][I]", "[C;X2]=[C;X2][I]"]
       },
       "why": "Aryl/vinyl iodide"
     },
@@ -52,10 +43,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[cX3]F",
-          "[C;X2]=[C;X2]F"
-        ]
+        "smarts_any": ["[cX3]F", "[C;X2]=[C;X2]F"]
       },
       "why": "Aryl/vinyl fluoride (SNAr scope)"
     },
@@ -64,10 +52,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "cOS(=O)(=O)C(F)(F)F",
-          "[C;X2]=[C;X2]OS(=O)(=O)C(F)(F)F"
-        ]
+        "smarts_any": ["cOS(=O)(=O)C(F)(F)F", "[C;X2]=[C;X2]OS(=O)(=O)C(F)(F)F"]
       },
       "why": "Aryl/vinyl triflate"
     },
@@ -88,10 +73,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "cOS(=O)(=O)C",
-          "[C;X2]=[C;X2]OS(=O)(=O)C"
-        ]
+        "smarts_any": ["cOS(=O)(=O)C", "[C;X2]=[C;X2]OS(=O)(=O)C"]
       },
       "why": "Aryl/vinyl mesylate (OMs)"
     },
@@ -113,9 +95,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH2,CH,CH3][Cl]"
-        ]
+        "smarts_any": ["[CH2,CH,CH3][Cl]"]
       },
       "why": "Alkyl chloride"
     },
@@ -124,9 +104,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH2,CH,CH3][Br]"
-        ]
+        "smarts_any": ["[CH2,CH,CH3][Br]"]
       },
       "why": "Alkyl bromide"
     },
@@ -135,9 +113,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH2,CH,CH3][I]"
-        ]
+        "smarts_any": ["[CH2,CH,CH3][I]"]
       },
       "why": "Alkyl iodide"
     },
@@ -173,10 +149,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[cX3][Cl,Br,I,F]",
-          "cOS(=O)(=O)"
-        ]
+        "smarts_any": ["[cX3][Cl,Br,I,F]", "cOS(=O)(=O)"]
       },
       "why": "Any aryl C–LG including aryl sulfonates"
     },
@@ -185,10 +158,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CX3]=[CX3][Cl,Br,I,F]",
-          "[CX3]=[CX3]OS(=O)(=O)"
-        ]
+        "smarts_any": ["[CX3]=[CX3][Cl,Br,I,F]", "[CX3]=[CX3]OS(=O)(=O)"]
       },
       "why": "Vinyl C–LG"
     },
@@ -197,9 +167,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[C]=[C]-[CH2][Cl,Br,I]"
-        ]
+        "smarts_any": ["[C]=[C]-[CH2][Cl,Br,I]"]
       },
       "why": "Allylic halides only"
     },
@@ -208,9 +176,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[C]=[C]-[CH2]-O-C(=O)C"
-        ]
+        "smarts_any": ["[C]=[C]-[CH2]-O-C(=O)C"]
       },
       "why": "Allylic acetates"
     },
@@ -219,9 +185,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[C]=[C]-[CH2]-O-C(=O)O"
-        ]
+        "smarts_any": ["[C]=[C]-[CH2]-O-C(=O)O"]
       },
       "why": "Allylic carbonates"
     },
@@ -230,9 +194,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH2]c[Cl,Br,I]"
-        ]
+        "smarts_any": ["[CH2]c[Cl,Br,I]"]
       },
       "why": "Benzylic halides"
     },
@@ -241,9 +203,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C=C"
-        ]
+        "smarts_any": ["C=C"]
       },
       "why": "General alkene handle"
     },
@@ -252,10 +212,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH2]=[C]",
-          "[C]=[CH2]"
-        ]
+        "smarts_any": ["[CH2]=[C]", "[C]=[CH2]"]
       },
       "why": "Terminal alkene"
     },
@@ -264,9 +221,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C#C"
-        ]
+        "smarts_any": ["C#C"]
       },
       "why": "General alkyne handle"
     },
@@ -275,10 +230,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH]#C",
-          "C#[CH]"
-        ]
+        "smarts_any": ["[CH]#C", "C#[CH]"]
       },
       "why": "Terminal alkyne"
     },
@@ -287,11 +239,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "c-[B]",
-          "C=C-[B]",
-          "[B-](F)(F)F"
-        ]
+        "smarts_any": ["c-[B]", "C=C-[B]", "[B-](F)(F)F"]
       },
       "why": "Aryl/vinyl boron"
     },
@@ -300,9 +248,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CX4]-[B]"
-        ]
+        "smarts_any": ["[CX4]-[B]"]
       },
       "why": "Alkyl boron"
     },
@@ -311,9 +257,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH0;X4](C)(C)C"
-        ]
+        "smarts_any": ["[CH0;X4](C)(C)C"]
       },
       "why": "tert-Butyl group (quaternary carbon with three methyl groups)"
     },
@@ -322,9 +266,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CH;X4](C)C"
-        ]
+        "smarts_any": ["[CH;X4](C)C"]
       },
       "why": "Isopropyl group (branching pattern)"
     },
@@ -333,9 +275,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "B(OC(C)(C)C)(OC(C)(C)C)"
-        ]
+        "smarts_any": ["B(OC(C)(C)C)(OC(C)(C)C)"]
       },
       "why": "BPin"
     },
@@ -344,9 +284,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "B(OCC(C)(C)O)"
-        ]
+        "smarts_any": ["B(OCC(C)(C)O)"]
       },
       "why": "Neop boronate"
     },
@@ -355,9 +293,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[B-](F)(F)F"
-        ]
+        "smarts_any": ["[B-](F)(F)F"]
       },
       "why": "BF3K salts"
     },
@@ -366,9 +302,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "B1OCC(=O)N(C)C(=O)O1"
-        ]
+        "smarts_any": ["B1OCC(=O)N(C)C(=O)O1"]
       },
       "why": "MIDA boronate"
     },
@@ -377,10 +311,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[#6]B([OH])([OH])",
-          "[#6]B(O[H])(O[H])"
-        ]
+        "smarts_any": ["[#6]B([OH])([OH])", "[#6]B(O[H])(O[H])"]
       },
       "why": "Free boronic acid (not ester); hygroscopic, air-sensitive"
     },
@@ -401,9 +332,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[Mg]"
-        ]
+        "smarts_any": ["[Mg]"]
       },
       "why": "Kumada"
     },
@@ -412,9 +341,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[Zn]"
-        ]
+        "smarts_any": ["[Zn]"]
       },
       "why": "Negishi"
     },
@@ -423,9 +350,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[Li]"
-        ]
+        "smarts_any": ["[Li]"]
       },
       "why": "Lithium reagents"
     },
@@ -434,9 +359,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[Sn]"
-        ]
+        "smarts_any": ["[Sn]"]
       },
       "why": "Stille"
     },
@@ -445,9 +368,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[Si]"
-        ]
+        "smarts_any": ["[Si]"]
       },
       "why": "Hiyama"
     },
@@ -469,9 +390,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3H2;!$([N][C,c]=O);!$([N]S(=O)(=O))]"
-        ]
+        "smarts_any": ["[NX3H2;!$([N][C,c]=O);!$([N]S(=O)(=O))]"]
       },
       "why": "Primary amine (NH2); not amide/sulfonamide; highest nucleophilicity"
     },
@@ -480,9 +399,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3H1;!$([N][C,c]=O);!$([N]S(=O)(=O))]"
-        ]
+        "smarts_any": ["[NX3H1;!$([N][C,c]=O);!$([N]S(=O)(=O))]"]
       },
       "why": "Secondary amine (NHR); not amide/sulfonamide"
     },
@@ -491,9 +408,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3H0;!$([N][C,c]=O);!$([N]S(=O)(=O));!$(n)]"
-        ]
+        "smarts_any": ["[NX3H0;!$([N][C,c]=O);!$([N]S(=O)(=O));!$(n)]"]
       },
       "why": "Tertiary amine (NR3); not amide/sulfonamide; potential base/ligand"
     },
@@ -502,11 +417,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "c[NH2]",
-          "c[NH][#6]",
-          "cN([#6])[#6]"
-        ]
+        "smarts_any": ["c[NH2]", "c[NH][#6]", "cN([#6])[#6]"]
       },
       "why": "Anilines"
     },
@@ -515,9 +426,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3][CX3](=[OX1])[OX2]C(C)(C)C"
-        ]
+        "smarts_any": ["[NX3][CX3](=[OX1])[OX2]C(C)(C)C"]
       },
       "why": "tert-Butoxycarbonyl (Boc) protecting group on nitrogen"
     },
@@ -526,9 +435,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3][CX3](=[OX1])[OX2]Cc1ccccc1"
-        ]
+        "smarts_any": ["[NX3][CX3](=[OX1])[OX2]Cc1ccccc1"]
       },
       "why": "Benzyloxycarbonyl (Cbz/Z) protecting group on nitrogen"
     },
@@ -537,9 +444,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3][CX3](=[OX1])OCC1c2ccccc2-c2ccccc12"
-        ]
+        "smarts_any": ["[NX3][CX3](=[OX1])OCC1c2ccccc2-c2ccccc12"]
       },
       "why": "Fluorenylmethoxycarbonyl (Fmoc) protecting group on nitrogen"
     },
@@ -548,9 +453,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "O[Si]([#6])([#6])[#6]"
-        ]
+        "smarts_any": ["O[Si]([#6])([#6])[#6]"]
       },
       "why": "Silyl ether protecting group on oxygen (TMS, TBS, TIPS, etc.)"
     },
@@ -559,9 +462,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "c[OX2H]"
-        ]
+        "smarts_any": ["c[OX2H]"]
       },
       "why": "Phenols"
     },
@@ -570,10 +471,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[OX2H][CX4]",
-          "c[OX2H]"
-        ]
+        "smarts_any": ["[OX2H][CX4]", "c[OX2H]"]
       },
       "why": "Any alcohol (aliphatic or phenolic OH)"
     },
@@ -582,9 +480,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[OX2H][CX4]"
-        ]
+        "smarts_any": ["[OX2H][CX4]"]
       },
       "why": "Aliphatic alcohol; less acidic than phenol"
     },
@@ -593,9 +489,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[SX2H]"
-        ]
+        "smarts_any": ["[SX2H]"]
       },
       "why": "Thiols"
     },
@@ -604,9 +498,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C(=O)O[H]"
-        ]
+        "smarts_any": ["C(=O)O[H]"]
       },
       "why": "Carboxylic acids"
     },
@@ -615,9 +507,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C(=O)Cl"
-        ]
+        "smarts_any": ["C(=O)Cl"]
       },
       "why": "Acyl chlorides"
     },
@@ -626,9 +516,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CX3]=[OX1]"
-        ]
+        "smarts_any": ["[CX3]=[OX1]"]
       },
       "why": "Any carbonyl (ketone/aldehyde/ester/amide/acid)"
     },
@@ -637,9 +525,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[#6][CX3](=[OX1])[#6;!$(C=O)]"
-        ]
+        "smarts_any": ["[#6][CX3](=[OX1])[#6;!$(C=O)]"]
       },
       "why": "Ketone; potential condensation/reduction"
     },
@@ -648,10 +534,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CX3H1](=[OX1])[#6]",
-          "[CX3H1](=[OX1])[H]"
-        ]
+        "smarts_any": ["[CX3H1](=[OX1])[#6]", "[CX3H1](=[OX1])[H]"]
       },
       "why": "Aldehyde; highly reactive, oxidation-prone"
     },
@@ -660,9 +543,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[#6][CX3](=[OX1])[OX2][#6]"
-        ]
+        "smarts_any": ["[#6][CX3](=[OX1])[OX2][#6]"]
       },
       "why": "Ester group; potential saponification/transesterification"
     },
@@ -671,10 +552,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3][CX3](=[OX1])[#6]",
-          "[NX3][CX3](=[OX1])[H]"
-        ]
+        "smarts_any": ["[NX3][CX3](=[OX1])[#6]", "[NX3][CX3](=[OX1])[H]"]
       },
       "why": "Amide group; resonance-stabilized, low nucleophilicity"
     },
@@ -683,9 +561,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3H2][CX3](=[OX1])"
-        ]
+        "smarts_any": ["[NX3H2][CX3](=[OX1])"]
       },
       "why": "Primary amide (CONH2); potential hydrogen bonding"
     },
@@ -694,9 +570,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX3H1][CX3](=[OX1])"
-        ]
+        "smarts_any": ["[NX3H1][CX3](=[OX1])"]
       },
       "why": "Secondary amide (CONHR); reduced nucleophilicity"
     },
@@ -705,9 +579,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C(=O)OC(=O)"
-        ]
+        "smarts_any": ["C(=O)OC(=O)"]
       },
       "why": "Anhydrides"
     },
@@ -716,9 +588,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C(=O)O[c]1ccc([N+](=O)[O-])cc1"
-        ]
+        "smarts_any": ["C(=O)O[c]1ccc([N+](=O)[O-])cc1"]
       },
       "why": "Activated aryl esters (pNP esters)"
     },
@@ -727,9 +597,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[NX1]#[CX2]"
-        ]
+        "smarts_any": ["[NX1]#[CX2]"]
       },
       "why": "Nitrile group; potential metal coordination"
     },
@@ -738,9 +606,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "c[CX2]#[NX1]"
-        ]
+        "smarts_any": ["c[CX2]#[NX1]"]
       },
       "why": "Aryl nitrile; electron-withdrawing substituent"
     },
@@ -775,9 +641,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C(=O)O[c]1c(F)c(F)c(F)c(F)c1F"
-        ]
+        "smarts_any": ["C(=O)O[c]1c(F)c(F)c(F)c(F)c1F"]
       },
       "why": "Pentafluorophenyl esters (PFP)"
     },
@@ -786,9 +650,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "n1ccccc1"
-        ]
+        "smarts_any": ["n1ccccc1"]
       },
       "why": "Azine, potential catalyst poison/ligand effect"
     },
@@ -797,9 +659,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "n1cnccn1"
-        ]
+        "smarts_any": ["n1cnccn1"]
       },
       "why": "Azine"
     },
@@ -808,11 +668,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "c1n[cH]n1",
-          "c1nc[oH]1",
-          "c1nc[sH]1"
-        ]
+        "smarts_any": ["c1n[cH]n1", "c1nc[oH]1", "c1nc[sH]1"]
       },
       "why": "Azoles (triazoles/imidazoles proxy)"
     },
@@ -821,9 +677,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "c1ccc2[nH]ccc2c1"
-        ]
+        "smarts_any": ["c1ccc2[nH]ccc2c1"]
       },
       "why": "Indole"
     },
@@ -832,11 +686,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "n",
-          "o",
-          "s"
-        ]
+        "smarts_any": ["n", "o", "s"]
       },
       "why": "Any heteroaryl ring"
     },
@@ -892,9 +742,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[PX3]([#6])([#6])[#6]"
-        ]
+        "smarts_any": ["[PX3]([#6])([#6])[#6]"]
       },
       "why": "Phosphine; common ligand, air-sensitive"
     },
@@ -930,9 +778,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[CX4;R2]"
-        ]
+        "smarts_any": ["[CX4;R2]"]
       },
       "why": "Spirocyclic center; 3D character, increased complexity (carbon atom in 2 rings)"
     },
@@ -977,11 +823,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "C(=O)Cl",
-          "S(=O)(=O)F",
-          "[Si]"
-        ]
+        "smarts_any": ["C(=O)Cl", "S(=O)(=O)F", "[Si]"]
       },
       "why": "Prefer milder base / lower H2O"
     },
@@ -990,11 +832,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "O[H]",
-          "S[H]",
-          "P(=O)(O)O"
-        ]
+        "smarts_any": ["O[H]", "S[H]", "P(=O)(O)O"]
       },
       "why": "Base consumption / salts"
     },
@@ -1021,9 +859,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "n1ccccc1"
-        ]
+        "smarts_any": ["n1ccccc1"]
       },
       "why": "Potential metal coordination/poisoning"
     },
@@ -1032,9 +868,7 @@
       "type": "bool",
       "scope": "global",
       "detect": {
-        "smarts_any": [
-          "[SX2H]"
-        ]
+        "smarts_any": ["[SX2H]"]
       },
       "why": "Strong metal-binding risk"
     }
@@ -1054,6 +888,11 @@
       "token": "polyhalogenated",
       "derive": "halogen_count >= 2",
       "why": "Molecule contains 2 or more halogen atoms (useful for sequential coupling reactions)"
+    },
+    {
+      "token": "sp2_halide_present",
+      "derive": "sp2_chloride_present OR sp2_bromide_present OR sp2_iodide_present OR sp2_fluoride_present",
+      "why": "Any sp2 halide (aryl or vinyl C-X where X = F, Cl, Br, I)"
     },
     {
       "token": "ArCl_present",
