@@ -1,0 +1,215 @@
+{
+  "name": "Ullmann C-N Coupling (Copper)",
+  "reaction_type": "Ullmann_C_N",
+  "version": "2025-11-02",
+  "evaluation": "Use this rule set when an Ullmann C-N coupling (copper-mediated arylation of amines) is applicable. Apply these rules only if an aryl (sp²) halide is present along with an N-H nucleophile (amine, amide, or N-heterocycle). Then select the matching base_rule for the nucleophile class (first matching rule). If none apply, use the default_rule. After choosing a base or default rule, check all modifiers and apply any that match observed conditions or substrate features. Copper-catalyzed amination of aryl halides has seen a renaissance and now rivals palladium (Buchwald-Hartwig) methods:contentReference[oaicite:0]{index=0}. This is enabled by simple ligands that allow catalytic Cu to form C-N bonds under milder conditions:contentReference[oaicite:1]{index=1}:contentReference[oaicite:2]{index=2}. Historically, Ullmann-Goldberg reactions required harsh conditions (strong base, >200 °C, stoichiometric Cu):contentReference[oaicite:3]{index=3}, but modern protocols with bidentate ligands (N,N- or N,O-donors) permit lower temperatures and catalytic Cu loading:contentReference[oaicite:4]{index=4}.",
+  "applies_if": {
+    "all": [
+      "sp2_halide_present",
+      {
+        "any": [
+          "amine_present",
+          "aniline_present",
+          "amide_present",
+          "indole_present",
+          "azole_present"
+        ]
+      }
+    ]
+  },
+  "default_rule": {
+    "id": "DEF_Cu_N_arylation_general",
+    "description": "General conditions for copper-catalyzed N-arylation of amines/amide: CuI (≈5-15 mol%) with a suitable ligand (e.g., diamine or 1,10-phenanthroline, ~10-20 mol%), base ~2 eq (K₃PO₄ or Cs₂CO₃), in a high-boiling polar solvent (DMSO, DMF, or toluene with polar co-solvent) at 100-120 °C for 12-24 h. Use aryl iodides or bromides (chlorides are usually unreactive). Inert atmosphere (N₂/Ar) is recommended. These conditions are a good starting point if specific guidance is not matched by other rules.",
+    "conditions": {
+      "cu_source": "CuI",
+      "ligand": "Phenanthroline or DMEDA",
+      "base": "K3PO4 or Cs2CO3 (~2 eq)",
+      "solvent": "DMSO or DMF (anhydrous)",
+      "temperature_C": "100-120",
+      "time_h": "12-24",
+      "atmosphere": "N2 or Ar"
+    }
+  },
+  "base_rules": [
+    {
+      "name": "Primary Aliphatic Amine (RNH2)",
+      "id": "BR_primary_alkyl_amine",
+      "description": "Unhindered aliphatic primary amines (RNH₂) couple efficiently under Ullmann conditions. A typical recipe uses CuI (~5-10 mol%) with a bidentate diamine ligand (e.g., N,N-dimethylethylenediamine, DMEDA, 10-20 mol%):contentReference[oaicite:5]{index=5}. A non-nucleophilic base such as K₃PO₄ or K₂CO₃ (≈2 equivalents) is used to deprotonate the amine and form the active Cu-amide complex. Run the reaction at elevated temperature (~110 °C) for about 12-24 h:contentReference[oaicite:6]{index=6}. Aryl iodides (or activated bromides) are preferred coupling partners; they afford good yields of mono-arylated amines under these conditions. Use ~1:1 stoichiometry of amine to aryl halide to favor mono-arylation (primary amines can undergo double arylation if excess aryl halide is present).",
+      "reactant_features": {
+        "and": [
+          "primary_amine_present",
+          {
+            "not": "aniline_present"
+          },
+          {
+            "not": "indole_present"
+          },
+          {
+            "not": "azole_present"
+          },
+          {
+            "not": "amide_present"
+          }
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5-10 mol%)",
+        "ligand": "DMEDA (10-20 mol%)",
+        "base": "K3PO4 or K2CO3 (~2 eq)",
+        "solvent": "Toluene or DMF",
+        "temperature_C": "100-120",
+        "time_h": "12-24",
+        "atmosphere": "N2 or Ar"
+      }
+    },
+    {
+      "name": "Secondary Aliphatic Amine (R2NH)",
+      "id": "BR_secondary_alkyl_amine",
+      "description": "Secondary aliphatic amines (R₁R₂NH) are also amenable to Cu-catalyzed N-arylation, forming tertiary amines. Conditions mirror those for primary amines: CuI (~5-10 mol%) with an N,N-diamine ligand (e.g., TMEDA or DMEDA) and ~2 eq of base (K₃PO₄, K₂CO₃, or Cs₂CO₃) at 100-120 °C. Sterically hindered secondary amines may require slightly stronger base (Cs₂CO₃) or longer reaction time to reach full conversion. Aryl iodides are recommended; less reactive aryl bromides can be used but might need higher temperature or extended time. For very hindered amines, using an excess of aryl halide (2-3 equiv) can improve yields:contentReference[oaicite:7]{index=7}. Once the N-H is consumed, no further arylation is possible, simplifying the product profile.",
+      "reactant_features": {
+        "and": [
+          "secondary_amine_present",
+          {
+            "not": "aniline_present"
+          },
+          {
+            "not": "indole_present"
+          },
+          {
+            "not": "azole_present"
+          },
+          {
+            "not": "amide_present"
+          }
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5-10 mol%)",
+        "ligand": "TMEDA or DMEDA (10-20 mol%)",
+        "base": "K3PO4 or Cs2CO3 (~2 eq)",
+        "solvent": "DMF or DMSO",
+        "temperature_C": "100-120",
+        "time_h": "12-24",
+        "atmosphere": "N2 or Ar"
+      }
+    },
+    {
+      "name": "Aromatic Amine (ArNH2 or ArNHR)",
+      "id": "BR_aromatic_amine",
+      "description": "Arylamines (anilines and N-alkyl anilines) require strong bases and appropriate ligands due to reduced nucleophilicity and coordination to Cu. Historically, the N-arylation of anilines (Goldberg reaction) needed stoichiometric Cu and very high temperatures:contentReference[oaicite:8]{index=8}. Modern protocols use CuI (5-10 mol%) with ligands like 1,10-phenanthroline or bidentate diamines, plus a base such as K₃PO₄ or Cs₂CO₃, to achieve coupling at 80-120 °C. Aryl iodides (or activated bromides) are generally required; aryl chlorides are typically unreactive in copper systems. Under these conditions, N-arylation of anilines can reach high yields (often 80-95% yield):contentReference[oaicite:9]{index=9} even with various substituents on the aryl halide (electron-donating or -withdrawing):contentReference[oaicite:10]{index=10}. Functional groups such as aldehydes, ketones, alcohols, and nitriles are tolerated on either coupling partner:contentReference[oaicite:11]{index=11}. To avoid over-arylation (formation of triarylamines), use ~1 equiv of aryl halide per NH and monitor the reaction.",
+      "reactant_features": {
+        "and": [
+          "aniline_present",
+          {
+            "not": "amide_present"
+          },
+          {
+            "not": "indole_present"
+          },
+          {
+            "not": "azole_present"
+          }
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5-10 mol%)",
+        "ligand": "1,10-Phenanthroline or DMEDA",
+        "base": "K3PO4 or Cs2CO3 (~2 eq)",
+        "solvent": "Xylene or DMSO",
+        "temperature_C": "100-120",
+        "time_h": "12-24",
+        "atmosphere": "N2 or Ar"
+      }
+    },
+    {
+      "name": "Heteroaryl N-H (Indole, Pyrrole, Imidazole, etc.)",
+      "id": "BR_heteroaryl_NH",
+      "description": "NH-containing heterocycles (five-membered, e.g., indoles, pyrroles, pyrazoles, imidazoles, triazoles) are relatively acidic and readily undergo N-arylation with Cu catalysts. Effective conditions use CuI (≈10 mol%) with a diamine ligand (10-20 mol%) and ~2 eq of base, typically K₃PO₄ or K₂CO₃:contentReference[oaicite:12]{index=12}. Heating at ~110 °C for ~16-24 h is sufficient to afford N-aryl heterocycles in good to excellent yields:contentReference[oaicite:13]{index=13}. Aryl iodides are ideal coupling partners; aryl bromides also work (often requiring the full 110 °C), whereas aryl chlorides are usually unsuitable. This protocol tolerates many functional groups on either the heterocycle or aryl halide:contentReference[oaicite:14]{index=14} (e.g., carbonyl, nitro, cyano, unprotected OH). Buchwald et al. demonstrated that with CuI/diamine at 110 °C, even hindered or functionalized heterocycles could be N-arylated in high yield:contentReference[oaicite:15]{index=15}. Ensure the base can deprotonate the heterocycle (most standard bases suffice given the acidity of N-H heterocycles).",
+      "reactant_features": {
+        "and": [
+          {
+            "any": [
+              "indole_present",
+              "azole_present"
+            ]
+          },
+          {
+            "not": "amide_present"
+          }
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5-15 mol%)",
+        "ligand": "Diamine (e.g., DMEDA, 10-20%)",
+        "base": "K3PO4 or K2CO3 (~2 eq)",
+        "solvent": "DMF or DMSO",
+        "temperature_C": "100-110",
+        "time_h": "16-24",
+        "atmosphere": "N2 or Ar"
+      }
+    },
+    {
+      "name": "Amide (R-CO-NH-R')",
+      "id": "BR_amide_NH",
+      "description": "Amides (particularly secondary amides R-CO-NH-R') are challenging substrates for Ullmann N-arylation (Goldberg coupling). Successful amidation typically requires an optimized ligand and strong base:contentReference[oaicite:16]{index=16}. Copper(I) iodide (5-10 mol%) with an N,O-bidentate ligand (e.g., an amino acid like L-proline or N,N-dimethylglycine) is often employed to activate the amide nucleophile:contentReference[oaicite:17]{index=17}. Use a strong, hindered base such as K₃PO₄ or Cs₂CO₃ (~2 eq) and heat to ~110 °C in a polar aprotic solvent (DMSO is preferred for higher yields):contentReference[oaicite:18]{index=18}. Aryl iodides are strongly recommended; aryl bromides or chlorides usually give poor conversion (e.g., PhBr gave ~11% vs PhI ~90% yield under the same conditions):contentReference[oaicite:19]{index=19}. With the proper conditions (CuI + amino acid ligand, K₃PO₄, 110 °C), N-arylation of amides can reach ~80-90% yield within hours:contentReference[oaicite:20]{index=20}:contentReference[oaicite:21]{index=21}, whereas without a ligand the reaction is inefficient. Primary amides (R-CONH₂) can also be N-arylated but may form mixtures of mono- and di-arylated products if excess aryl halide is present. If standard conditions fail, consider more forcing conditions or a Pd-catalyzed protocol for aryl amides.",
+      "reactant_features": {
+        "and": [
+          "amide_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5-10 mol%)",
+        "ligand": "L-Proline or amino acid (10-20%)",
+        "base": "K3PO4 or Cs2CO3 (~2 eq)",
+        "solvent": "DMSO (anhydrous)",
+        "temperature_C": "110-130",
+        "time_h": "5-24",
+        "atmosphere": "N2 or Ar"
+      }
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "MOD_low_solubility",
+      "when": [
+        "symptom:if reactants are poorly soluble"
+      ],
+      "suggest": "Increase solvent polarity or add a co-solvent to dissolve reactants (e.g., add DMSO/DMF if using toluene). Ensuring all reagents are in solution can significantly improve reaction rate."
+    },
+    {
+      "id": "MOD_low_conversion",
+      "when": [
+        "symptom:if low conversion is observed"
+      ],
+      "suggest": "Try increasing the reaction temperature or extending the reaction time. Also consider using a higher catalyst/ligand loading. If using an aryl bromide (or especially an aryl chloride), the coupling may be sluggish; using an aryl iodide or a more activating ligand could improve conversion. In stubborn cases, evaluate switching to a Pd-catalyzed amination for that substrate."
+    },
+    {
+      "id": "MOD_thiol_poisoning",
+      "when": [
+        "thiol_present"
+      ],
+      "suggest": "Free thiol groups will poison the Cu catalyst:contentReference[oaicite:22]{index=22}. If a thiol (-SH) is present, protect it or remove it before coupling. Even thioethers or other sulfur-containing groups can coordinate to Cu and inhibit the reaction; in such cases, you may need to increase ligand equivalents to compete or consider an alternative method."
+    },
+    {
+      "id": "MOD_pyridine_poisoning",
+      "when": [
+        "pyridine_present"
+      ],
+      "suggest": "Heteroaromatic nitrogens (e.g., pyridines, quinolines) in substrates can bind to Cu and deactivate the catalyst. If coupling a halogenated pyridine or if the nucleophile contains a pyridine ring, use higher ligand loading or a very strong chelating ligand to outcompete the substrate binding:contentReference[oaicite:23]{index=23}. Otherwise, a Pd-catalyzed amination might be more effective for such substrates."
+    },
+    {
+      "id": "MOD_multiple_N_or_coord",
+      "when": [
+        "symptom:if substrate has multiple N donors or coordinating sites"
+      ],
+      "suggest": "Molecules with multiple amine or heteroatom donors can chelate the copper and stall the desired reaction. Consider protecting additional amine groups or adding excess ligand to saturate the catalyst. For example, polyamines may need one NH protected to achieve a selective mono-arylation:contentReference[oaicite:24]{index=24}."
+    },
+    {
+      "id": "MOD_scale_up",
+      "when": [
+        "symptom:if scaling up reaction"
+      ],
+      "suggest": "On larger scale, maintain a moderate concentration (e.g., ~0.5 M) to ensure good mixing of any solids. If possible, use a higher-boiling, less toxic solvent (e.g., xylene instead of DMF) to facilitate easier solvent removal. After reaction, perform a hot filtration (through Celite) to remove copper and base precipitates, which simplifies product isolation."
+    }
+  ]
+}

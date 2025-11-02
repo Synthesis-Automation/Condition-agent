@@ -1,0 +1,6 @@
+Brc1ccccc1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1ccccc1
+Brc1ccc(C)cc1.c1cc[nH]c1>>Cc1ccc(n2cccc2)cc1
+Brc1ccccc1.c1c[nH]nc1>>c1ccccc1n1ccnc1
+Brc1ccccc1.NC(=O)C>>CC(=O)Nc1ccccc1
+Brc1ccc(OC)cc1.NC(=O)c1ccccc1>>COc1ccc(NC(=O)c2ccccc2)cc1
+Brc1ccccc1.C1CCNC1=O>>O=C1CCCN1c1ccccc1
