@@ -381,6 +381,7 @@ def featurize(
     nucleophile: str,
     *,
     include_molpipeline: Optional[bool] = None,
+    include_calculable: Optional[bool] = None,
 ) -> Dict[str, Any]:
     """Featurize electrophile/nucleophile pair for C-N coupling reactions.
     
@@ -393,16 +394,36 @@ def featurize(
     - Steric hindrance
     
     Optionally attaches role-aware feature vectors when CHEMTOOLS_ATTACH_ROLE_AWARE=1.
+    Optionally includes calculable features when CHEMTOOLS_INCLUDE_CALCULABLE_FEATURES=1.
     
     Args:
         electrophile: SMILES string of electrophile (aryl halide, triflate, etc.)
         nucleophile: SMILES string of nucleophile (amine, alcohol, etc.)
+        include_molpipeline: Include MolPipeline features (fingerprints, descriptors)
+        include_calculable: Include calculable features from calculable_features.json
         
     Returns:
         Dictionary with extracted features and optional role-aware vectors
     """
     base = _featurize_cached(electrophile, nucleophile)
     out = dict(base)
+
+    # Attach calculable features when explicitly enabled via env or parameter
+    if include_calculable is None:
+        include_calculable = _get_env_bool("CHEMTOOLS_INCLUDE_CALCULABLE_FEATURES", False)
+    
+    if include_calculable:
+        try:
+            from . import calculable
+            calculable_data = {}
+            if electrophile:
+                calculable_data["electrophile"] = calculable.detect_all_features(electrophile)
+            if nucleophile:
+                calculable_data["nucleophile"] = calculable.detect_all_features(nucleophile)
+            if calculable_data:
+                out["calculable"] = calculable_data
+        except Exception:
+            pass  # Graceful degradation if calculable module unavailable
 
     # Attach role-aware only when explicitly enabled via env (default off for speed)
     attach_flag = (os.environ.get("CHEMTOOLS_ATTACH_ROLE_AWARE", "").strip().lower() in {"1", "true", "yes", "on"})

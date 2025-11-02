@@ -1,5 +1,79 @@
 [
   {
+    "id": "IQTHEAQKKVAXGV-UHFFFAOYSA-N",
+    "name": "(4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine",
+    "abbreviation": [
+      "Amphos"
+    ],
+    "aliases": [
+      "DTXSID10471005",
+      "RefChem:402272",
+      "DTXCID90421821",
+      "802-197-6",
+      "4-(Di-tert-butylphosphino)-N,N-dimethylaniline",
+      "Amphos",
+      "Bis(di-tert-butyl)-4-dimethylaminophenylphosphine",
+      "4-(di-tert-butylphosphanyl)-N,N-dimethylaniline",
+      "MFCD09265102",
+      "A-taPhos",
+      "4-ditert-butylphosphanyl-N,N-dimethylaniline",
+      "C16H28NP",
+      "(4-Dimethylaminophenyl)di-tert-butylphosphine",
+      "4-ditert-butylphosphanyl-N,N-dimethyl-aniline"
+    ],
+    "cas": "932710-63-9",
+    "inchi_key": "IQTHEAQKKVAXGV-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "trialkyl_triaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1,
+        "steric_cone_angle": 170,
+        "electronic_tepp": -4.4
+      }
+    },
+    "embedding_text": "type: LIGAND | family: trialkyl_triaryl_phosphines (trialkyl_triaryl_phosphines) | denticity: 1 | name: (4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine | abbr: DMAP-t-BuPhos | CAS: 932710-63-9 | synonyms: (4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine; 932710-63-9; DTXSID10471005; RefChem:402272; DTXCID90421821; 802-197-6; 4-(Di-tert-butylphosphino)-N,N-dimethylaniline; Amphos; Bis(di-tert-butyl)-4-dimethylaminophenylphosphine; 4-(di-tert-butylphosphanyl)-N,N-dimethylaniline; MFCD09265102; A-taPhos; 4-ditert-butylphosphanyl-N,N-dimethylaniline; C16H28NP; (4-Dimethylaminophenyl)di-tert-butylphosphine; 4-ditert-butylphosphanyl-N,N-dimethyl-aniline"
+  },
+  {
+    "id": "IQTHEAQKKVAXGV-UHFFFAOYSA-N",
+    "name": "(4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine",
+    "abbreviation": [
+      "Amphos"
+    ],
+    "aliases": [
+      "4-(Di-tert-butylphosphino)-N,N-dimethylaniline",
+      "Amphos",
+      "Bis(di-tert-butyl)-4-dimethylaminophenylphosphine",
+      "4-(di-tert-butylphosphanyl)-N,N-dimethylaniline",
+      "A-taPhos",
+      "4-ditert-butylphosphanyl-N,N-dimethylaniline",
+      "C16H28NP",
+      "(4-Dimethylaminophenyl)di-tert-butylphosphine",
+      "4-ditert-butylphosphanyl-N,N-dimethyl-aniline",
+      "4-(N,N-Dimethylaminophenyl)di-tert-butylphosphine"
+    ],
+    "cas": "932710-63-9",
+    "inchi_key": "IQTHEAQKKVAXGV-UHFFFAOYSA-N",
+    "roles": {
+      "ligand": {
+        "families": [
+          "trialkyl_triaryl_phosphines"
+        ],
+        "donors": [
+          "P"
+        ],
+        "denticity": 1,
+        "steric_cone_angle": 170,
+        "electronic_tepp": -4.4
+      }
+    },
+    "embedding_text": "type: LIGAND | family: trialkyl_triaryl_phosphines (trialkyl_triaryl_phosphines) | denticity: 1 | name: (4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine | abbr: DABP | CAS: 932710-63-9 | synonyms: (4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine; 932710-63-9; DTXSID10471005; RefChem:402272; DTXCID90421821; 802-197-6; 4-(Di-tert-butylphosphino)-N,N-dimethylaniline; Amphos; Bis(di-tert-butyl)-4-dimethylaminophenylphosphine; 4-(di-tert-butylphosphanyl)-N,N-dimethylaniline; MFCD09265102; A-taPhos; 4-ditert-butylphosphanyl-N,N-dimethylaniline; C16H28NP; (4-Dimethylaminophenyl)di-tert-butylphosphine; 4-ditert-butylphosphanyl-N,N-dimethyl-aniline; 4-(N,N-Dimethylaminophenyl)di-tert-butylphosphine"
+  },
+  {
     "id": "1_10_phenanthroline__66-71-7",
     "name": "1,10-Phenanthroline",
     "abbreviation": [

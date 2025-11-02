@@ -1,0 +1,719 @@
+{
+  "version": "2025-11-02.v1.1",
+  "schema_notes": {
+    "bool": "<motif>_present",
+    "int": "<motif>_site_count",
+    "derived": "expressions over other tokens",
+    "scope": "global unless stated; site-level optional for future",
+    "rdkit_smart_tips": [
+      "Prefer permissive SMARTS first; tighten after audits.",
+      "Use separate tokens + logic for negatives (e.g., internal_alkyne = alkyne_present AND NOT terminal_alkyne_present)."
+    ]
+  },
+  "features": [
+    {
+      "token": "sp2_chloride_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[cX3][Cl]",
+          "[C;X2]=[C;X2][Cl]"
+        ]
+      },
+      "why": "Aryl/vinyl chloride"
+    },
+    {
+      "token": "sp2_bromide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[cX3][Br]",
+          "[C;X2]=[C;X2][Br]"
+        ]
+      },
+      "why": "Aryl/vinyl bromide"
+    },
+    {
+      "token": "sp2_iodide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[cX3][I]",
+          "[C;X2]=[C;X2][I]"
+        ]
+      },
+      "why": "Aryl/vinyl iodide"
+    },
+    {
+      "token": "sp2_fluoride_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[cX3]F",
+          "[C;X2]=[C;X2]F"
+        ]
+      },
+      "why": "Aryl/vinyl fluoride (SNAr scope)"
+    },
+    {
+      "token": "sp2_triflate_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "cOS(=O)(=O)C(F)(F)F",
+          "[C;X2]=[C;X2]OS(=O)(=O)C(F)(F)F"
+        ]
+      },
+      "why": "Aryl/vinyl triflate"
+    },
+    {
+      "token": "sp2_tosylate_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "cOS(=O)(=O)c1ccc(C)cc1",
+          "[C;X2]=[C;X2]OS(=O)(=O)c1ccc(C)cc1"
+        ]
+      },
+      "why": "Aryl/vinyl tosylate (OTs)"
+    },
+    {
+      "token": "sp2_mesylate_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "cOS(=O)(=O)C",
+          "[C;X2]=[C;X2]OS(=O)(=O)C"
+        ]
+      },
+      "why": "Aryl/vinyl mesylate (OMs)"
+    },
+    {
+      "token": "sp2_pseudohalide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "OS(=O)(=O)C(F)(F)F",
+          "OS(=O)(=O)c1ccc(C)cc1",
+          "OS(=O)(=O)C"
+        ]
+      },
+      "why": "Any sulfonate group attached to sp2 site"
+    },
+    {
+      "token": "sp3_chloride_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH2,CH,CH3][Cl]"
+        ]
+      },
+      "why": "Alkyl chloride"
+    },
+    {
+      "token": "sp3_bromide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH2,CH,CH3][Br]"
+        ]
+      },
+      "why": "Alkyl bromide"
+    },
+    {
+      "token": "sp3_iodide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH2,CH,CH3][I]"
+        ]
+      },
+      "why": "Alkyl iodide"
+    },
+    {
+      "token": "sp2_halide_site_count",
+      "type": "int",
+      "scope": "global",
+      "detect": {
+        "heuristic": "count [cX3]-[Cl,Br,I,F] plus [C;X2]=[C;X2]-[Cl,Br,I,F]"
+      },
+      "why": "Total sp2 C–Hal sites"
+    },
+    {
+      "token": "sp2_sulfonate_site_count",
+      "type": "int",
+      "scope": "global",
+      "detect": {
+        "heuristic": "count sp2-OS(=O)(=O)R sites"
+      },
+      "why": "Total sp2 sulfonate (OTf/OTs/OMs) sites"
+    },
+    {
+      "token": "aryl_halide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[cX3][Cl,Br,I,F]",
+          "cOS(=O)(=O)"
+        ]
+      },
+      "why": "Any aryl C–LG including aryl sulfonates"
+    },
+    {
+      "token": "heteroaryl_halide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[Cl,Br,I,F]",
+          "[n,o,s]OS(=O)(=O)"
+        ]
+      },
+      "why": "Heteroaryl C–LG"
+    },
+    {
+      "token": "vinyl_halide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[CX3][Cl,Br,I,F]",
+          "[CX3]=[CX3]OS(=O)(=O)"
+        ]
+      },
+      "why": "Vinyl C–LG"
+    },
+    {
+      "token": "allylic_halide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[C]=[C]-[CH2][Cl,Br,I]"
+        ]
+      },
+      "why": "Allylic halides only"
+    },
+    {
+      "token": "allylic_acetate_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[C]=[C]-[CH2]-O-C(=O)C"
+        ]
+      },
+      "why": "Allylic acetates"
+    },
+    {
+      "token": "allylic_carbonate_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[C]=[C]-[CH2]-O-C(=O)O"
+        ]
+      },
+      "why": "Allylic carbonates"
+    },
+    {
+      "token": "benzylic_halide_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH2]c[Cl,Br,I]"
+        ]
+      },
+      "why": "Benzylic halides"
+    },
+    {
+      "token": "alkene_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C=C"
+        ]
+      },
+      "why": "General alkene handle"
+    },
+    {
+      "token": "terminal_alkene_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH2]=[C]",
+          "[C]=[CH2]"
+        ]
+      },
+      "why": "Terminal alkene"
+    },
+    {
+      "token": "alkyne_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C#C"
+        ]
+      },
+      "why": "General alkyne handle"
+    },
+    {
+      "token": "terminal_alkyne_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CH]#C",
+          "C#[CH]"
+        ]
+      },
+      "why": "Terminal alkyne"
+    },
+    {
+      "token": "sp2_boron_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c-[B]",
+          "C=C-[B]",
+          "[B-](F)(F)F"
+        ]
+      },
+      "why": "Aryl/vinyl boron"
+    },
+    {
+      "token": "sp3_boron_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[CX4]-[B]"
+        ]
+      },
+      "why": "Alkyl boron"
+    },
+    {
+      "token": "boron_bpin_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "B(OC(C)(C)C)(OC(C)(C)C)"
+        ]
+      },
+      "why": "BPin"
+    },
+    {
+      "token": "boron_neop_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "B(OCC(C)(C)O)"
+        ]
+      },
+      "why": "Neop boronate"
+    },
+    {
+      "token": "boron_bf3k_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[B-](F)(F)F"
+        ]
+      },
+      "why": "BF3K salts"
+    },
+    {
+      "token": "boron_mida_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "B1OCC(=O)N(C)C(=O)O1"
+        ]
+      },
+      "why": "MIDA boronate"
+    },
+    {
+      "token": "grignard_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[Mg]"
+        ]
+      },
+      "why": "Kumada"
+    },
+    {
+      "token": "organozinc_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[Zn]"
+        ]
+      },
+      "why": "Negishi"
+    },
+    {
+      "token": "organolithium_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[Li]"
+        ]
+      },
+      "why": "Lithium reagents"
+    },
+    {
+      "token": "stannane_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[Sn]"
+        ]
+      },
+      "why": "Stille"
+    },
+    {
+      "token": "organosilane_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[Si]"
+        ]
+      },
+      "why": "Hiyama"
+    },
+    {
+      "token": "aliphatic_amine_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H2;!$(NC=O)]",
+          "[NX3;H1;!$(NC=O)]",
+          "[NX3;H0;!$(NC=O)]"
+        ]
+      },
+      "why": "Aliphatic amines"
+    },
+    {
+      "token": "aniline_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c[NH2]",
+          "c[NH][#6]",
+          "cN([#6])[#6]"
+        ]
+      },
+      "why": "Anilines"
+    },
+    {
+      "token": "phenol_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c[OX2H]"
+        ]
+      },
+      "why": "Phenols"
+    },
+    {
+      "token": "alcohol_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[OX2H][CX4]"
+        ]
+      },
+      "why": "Alcohols"
+    },
+    {
+      "token": "thiol_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[SX2H]"
+        ]
+      },
+      "why": "Thiols"
+    },
+    {
+      "token": "carboxylic_acid_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C(=O)O[H]"
+        ]
+      },
+      "why": "Carboxylic acids"
+    },
+    {
+      "token": "acyl_chloride_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C(=O)Cl"
+        ]
+      },
+      "why": "Acyl chlorides"
+    },
+    {
+      "token": "anhydride_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C(=O)OC(=O)"
+        ]
+      },
+      "why": "Anhydrides"
+    },
+    {
+      "token": "activated_aryl_ester_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C(=O)O[c]1ccc([N+](=O)[O-])cc1"
+        ]
+      },
+      "why": "Activated aryl esters (pNP esters)"
+    },
+    {
+      "token": "activated_fluoro_ester_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C(=O)O[c]1c(F)c(F)c(F)c(F)c1F"
+        ]
+      },
+      "why": "Pentafluorophenyl esters (PFP)"
+    },
+    {
+      "token": "pyridine_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "n1ccccc1"
+        ]
+      },
+      "why": "Azine, potential catalyst poison/ligand effect"
+    },
+    {
+      "token": "pyrimidine_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "n1cnccn1"
+        ]
+      },
+      "why": "Azine"
+    },
+    {
+      "token": "azole_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c1n[cH]n1",
+          "c1nc[oH]1",
+          "c1nc[sH]1"
+        ]
+      },
+      "why": "Azoles (triazoles/imidazoles proxy)"
+    },
+    {
+      "token": "indole_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "c1ccc2[nH]ccc2c1"
+        ]
+      },
+      "why": "Indole"
+    },
+    {
+      "token": "heteroaryl_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "n",
+          "o",
+          "s"
+        ]
+      },
+      "why": "Any heteroaryl ring"
+    },
+    {
+      "token": "polarity_high",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "TPSA≥50 or (HBA+HBD)≥4"
+      },
+      "why": "Solvent matching"
+    },
+    {
+      "token": "polarity_low",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "TPSA≤20 and (HBA+HBD)≤2"
+      },
+      "why": "Solvent matching"
+    },
+    {
+      "token": "base_sensitive",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "C(=O)Cl",
+          "S(=O)(=O)F",
+          "[Si]"
+        ]
+      },
+      "why": "Prefer milder base / lower H2O"
+    },
+    {
+      "token": "acidic_proton_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "O[H]",
+          "S[H]",
+          "P(=O)(O)O"
+        ]
+      },
+      "why": "Base consumption / salts"
+    },
+    {
+      "token": "beta_hydride_possible",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "exists sp3 C–LG with β-C bearing ≥1 H"
+      },
+      "why": "Isomerization/elimination risk"
+    },
+    {
+      "token": "pyridine_poison_risk",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "n1ccccc1"
+        ]
+      },
+      "why": "Potential metal coordination/poisoning"
+    },
+    {
+      "token": "thiol_poison_risk",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[SX2H]"
+        ]
+      },
+      "why": "Strong metal-binding risk"
+    }
+  ],
+  "derived_shortcuts": [
+    {
+      "token": "internal_alkyne_present",
+      "derive": "alkyne_present AND NOT terminal_alkyne_present",
+      "why": "Internal alkyne by exclusion"
+    },
+    {
+      "token": "ArCl_present",
+      "derive": "sp2_chloride_present AND aryl_halide_present"
+    },
+    {
+      "token": "ArBr_present",
+      "derive": "sp2_bromide_present AND aryl_halide_present"
+    },
+    {
+      "token": "ArI_present",
+      "derive": "sp2_iodide_present AND aryl_halide_present"
+    },
+    {
+      "token": "ArF_present",
+      "derive": "sp2_fluoride_present AND aryl_halide_present"
+    },
+    {
+      "token": "VinylCl_present",
+      "derive": "sp2_chloride_present AND vinyl_halide_present"
+    },
+    {
+      "token": "VinylBr_present",
+      "derive": "sp2_bromide_present AND vinyl_halide_present"
+    },
+    {
+      "token": "VinylI_present",
+      "derive": "sp2_iodide_present AND vinyl_halide_present"
+    },
+    {
+      "token": "ArOTf_present",
+      "derive": "sp2_triflate_present AND aryl_halide_present"
+    },
+    {
+      "token": "ArOTs_present",
+      "derive": "sp2_tosylate_present AND aryl_halide_present"
+    },
+    {
+      "token": "ArOMs_present",
+      "derive": "sp2_mesylate_present AND aryl_halide_present"
+    },
+    {
+      "token": "VinylOTf_present",
+      "derive": "sp2_triflate_present AND vinyl_halide_present"
+    },
+    {
+      "token": "VinylOTs_present",
+      "derive": "sp2_tosylate_present AND vinyl_halide_present"
+    },
+    {
+      "token": "VinylOMs_present",
+      "derive": "sp2_mesylate_present AND vinyl_halide_present"
+    }
+  ]
+}
