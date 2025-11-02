@@ -551,8 +551,8 @@ def build_registry_entry(
     entry: Dict[str, Any] = {
         "id": entry_id,
         "name": name,
-        "abbreviation": list(abbreviations),
-        "aliases": list(aliases),
+        "abbreviation": list(abbreviations) if abbreviations else [],
+        "aliases": list(aliases) if aliases else [],
         "cas": cas,
         "inchi_key": inchi_key,
         "smiles": smiles,
@@ -769,7 +769,7 @@ def generate_taxonomy_entry_llm(
         entry = {
             "id": resolved_identity.get("inchi_key") or normalized_cas,  # prefer InChIKey; else CAS
             "name": resolved_identity.get("name"),
-            "abbreviation": abbreviations if abbreviations else None,
+            "abbreviation": abbreviations if abbreviations else [],
             "aliases": aliases,  # Use filtered aliases (no name, CAS, or abbreviations)
             "cas": normalized_cas,
             "inchi_key": resolved_identity.get("inchi_key"),
@@ -813,8 +813,8 @@ def generate_taxonomy_entry_llm(
         }
         entry["embedding_text"] = build_embedding_text(role, family_dict, embedding_entry, all_synonyms)
         
-        # Remove None values to keep JSON clean
-        entry = {k: v for k, v in entry.items() if v is not None}
+        # Remove None values to keep JSON clean, but keep empty lists (required by schema)
+        entry = {k: v for k, v in entry.items() if v is not None or isinstance(v, list)}
         
     except Exception as exc:
         return {
