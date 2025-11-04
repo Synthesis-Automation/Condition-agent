@@ -858,7 +858,7 @@ ARYL_HALIDES = [
         "notes": "Alkyl Grignard"
     },
     {
-        "smiles": "[Zn]Clc1ccccc1",
+        "smiles": "Cl[Zn]c1ccccc1",
         "name": "Phenylzinc chloride",
         "role": "nucleophile",
         "reaction_types": ["Negishi"],
