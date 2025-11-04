@@ -850,7 +850,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     obj = item if isinstance(item, dict) else self._pair_to_obj(item)
                     token = _token_from_item(obj)
                     if token:
-                        return f"{label}: {token}"
+                        # For uncatalyzed reactions, return reagent name without the role type
+                        return token
 
             return ""
 
