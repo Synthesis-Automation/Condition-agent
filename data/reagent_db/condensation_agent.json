@@ -1020,5 +1020,50 @@
       }
     },
     "embedding_text": "type: CONDENSATION_AGENT | family: acyl_halide_fluoride_generators (acyl_halide_fluoride_generators) | name: Thionyl Chloride | abbr: SOCl2 | CAS: 7719-09-7 | synonyms: Thionyl Chloride; Thionyl dichloride; 7719-09-7; Sulfinyl chloride; Sulfurous dichloride; Sulfurous oxychloride; Sulfinyl dichloride; Sulfur oxychloride; Sulfur chloride oxide; Sulfur chloride oxide (Cl2SO); 4A8YJA13N4; DTXSID3064778; CHEBI:29290; RefChem:6303; DTXCID0047953; 231-748-8"
+  },
+  {
+    "id": "NWIUTZDMDHAVTP-UHFFFAOYSA-N",
+    "name": "Tris(2,2,2-trifluoroethyl) Borate",
+    "abbreviation": [
+      "B(OCH2CF3)3"
+    ],
+    "aliases": [
+      "63659-18-7",
+      "Betaxololum",
+      "SL 75212",
+      "O0ZR1R6RZ2",
+      "1-(4-(2-(Cyclopropylmethoxy)ethyl)phenoxy)-3-((1-methylethyl)amino)-2-propanol",
+      "CHEBI:3082",
+      "DTXSID2022674",
+      "ALO-140102 FREE BASE",
+      "2-Propanol, 1-(4-(2-(cyclopropylmethoxy)ethyl)phenoxy)-3-((1-methylethyl)amino)-",
+      "SL-7521210 FREE BASE",
+      "1-[4-[2-(cyclopropylmethoxy)ethyl]phenoxy]-3-(propan-2-ylamino)propan-2-ol",
+      "DTXCID102674",
+      "1-(isopropylamino)-3-[p-(cyclopropylmethoxyethyl)phenoxy]-2-propanol",
+      "1-{4-[2-(cyclopropylmethoxy)ethyl]phenoxy}-3-(propan-2-ylamino)propan-2-ol",
+      "betaxololo",
+      "Kerlone"
+    ],
+    "cas": "659-18-7",
+    "inchi_key": "NWIUTZDMDHAVTP-UHFFFAOYSA-N",
+    "roles": {
+      "condensation_agent": {
+        "families": [
+          "boron"
+        ],
+        "strength_band": "moderate",
+        "byproducts": "urea derivatives",
+        "racemization_risk": "medium",
+        "recommended_additives": "HOBt"
+      },
+      "other_reagent": {
+        "families": [
+          "misc_general"
+        ],
+        "_note": "LLM-suggested alternative role"
+      }
+    },
+    "embedding_text": "type: CONDENSATION_AGENT | family: aminium_uronium_guanidinium (aminium_uronium_guanidinium) | name: Betaxolol | abbr: Betaxolol | CAS: 659-18-7 | synonyms: Betaxolol; 63659-18-7; Betaxololum; SL 75212; O0ZR1R6RZ2; 1-(4-(2-(Cyclopropylmethoxy)ethyl)phenoxy)-3-((1-methylethyl)amino)-2-propanol; CHEBI:3082; DTXSID2022674; ALO-140102 FREE BASE; 2-Propanol, 1-(4-(2-(cyclopropylmethoxy)ethyl)phenoxy)-3-((1-methylethyl)amino)-; SL-7521210 FREE BASE; 1-[4-[2-(cyclopropylmethoxy)ethyl]phenoxy]-3-(propan-2-ylamino)propan-2-ol; DTXCID102674; 1-(isopropylamino)-3-[p-(cyclopropylmethoxyethyl)phenoxy]-2-propanol; 1-{4-[2-(cyclopropylmethoxy)ethyl]phenoxy}-3-(propan-2-ylamino)propan-2-ol; betaxololo; Kerlone"
   }
 ]
