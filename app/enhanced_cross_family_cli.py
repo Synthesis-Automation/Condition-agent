@@ -61,8 +61,8 @@ def enhanced_cross_family_recommend(
     
     try:
         # Get recommendations with cross-family search enabled
-        result = chem.recommend.recommend_from_reaction(
-            reaction_smiles,
+        result = chem.recommend.conditions(
+            reaction=reaction_smiles,
             k=k,
             search_all_families=True,
             relax=relax_config,

@@ -5,7 +5,7 @@ Total reactions: 1201
 ## Reaction 31-006-CAS-10532348
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 83
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: DCM (75-09-2), water (7732-18-5), THF (109-99-9), Et2O (60-29-7), MeOH (67-56-1)
@@ -14,8 +14,8 @@ Total reactions: 1201
 ## Reaction 31-013-CAS-779757
 
 - Type: original_dataset
-- Condition Core: Pd/triphenylphosphine
-- Catalytic System: Pd(PPh3)4
+- Condition Core: DIPEA/Py/NaOH/NH4Cl/Fe
+- Catalytic System: 14221-01-3
 - Reagents: 56553-60-7 (56553-60-7) [UNK], DIPEA (7087-68-5) [BASE], 694-53-1 (694-53-1) [UNK], PPh3 (603-35-0) [LIGAND], 870-50-8 (870-50-8) [UNK], Fe (7439-89-6) [REDUCTANT], NH4Cl (12125-02-9) [ADDITIVE], Py (110-86-1) [BASE], NaOH (1310-73-2) [BASE], 7664-38-2 (7664-38-2) [UNK]
 - Solvents: HOAc (64-19-7), EDC (107-06-2), DMF (68-12-2), DCM (75-09-2), THF (109-99-9), EtOH (64-17-5), water (7732-18-5), Py (110-86-1)
 - SMILES: Cc1c(N)cccc1[N+](=O)[O-].C=CCOc1cc(Oc2ccc(C=O)cc2)ccc1Br.Fc1ccc(CBr)c(F)c1.CCOC(=O)CO.CS(=O)(=O)Cl>>Cc1c(NS(C)(=O)=O)cccc1N(Cc1ccc(Oc2ccc(Br)c(OCC(=O)O)c2)cc1)Cc1ccc(F)cc1F
@@ -23,7 +23,7 @@ Total reactions: 1201
 ## Reaction 31-022-CAS-10430548
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/Lutidine/HOBt/EDCIHCl
 - Yield %: 88
 - Reagents: HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 13292-87-0 (13292-87-0) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE], Lutidine (108-48-5) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5), DCM (75-09-2)
@@ -32,7 +32,7 @@ Total reactions: 1201
 ## Reaction 31-022-CAS-5649968
 
 - Type: original_dataset
-- Condition Core: Base: PotassiumBicarbonate
+- Condition Core: PotassiumBicarbonate/Py
 - Yield %: 22
 - Reagents: 100-39-0 (100-39-0) [UNK], PotassiumBicarbonate (298-14-6) [BASE], 25895-60-7 (25895-60-7) [UNK], Py (110-86-1) [BASE]
 - Solvents: DMF (68-12-2), MeOH (67-56-1), DCM (75-09-2)
@@ -41,7 +41,7 @@ Total reactions: 1201
 ## Reaction 31-022-CAS-8301986
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/Lutidine/HOBt/EDCIHCl
 - Yield %: 84
 - Reagents: HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 13292-87-0 (13292-87-0) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE], Lutidine (108-48-5) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5), DCM (75-09-2)
@@ -50,7 +50,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-10915913
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 56
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -60,7 +60,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-11681675
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 49
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -69,7 +69,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-12002744
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 41
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -78,7 +78,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-12482858
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 80
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], Et3N (121-44-8) [BASE]
 - Solvents: DCM (75-09-2), MeOH (67-56-1), DMSO (67-68-5)
@@ -87,7 +87,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-1249219
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 59
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -96,7 +96,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-12662870
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 41
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -106,7 +106,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-12685517
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 8
 - Reagents: TMSCI (75-77-4) [ADDITIVE], 100-52-7 (100-52-7) [UNK], Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT], LiAlH4 (16853-85-3) [REDUCTANT], 540-69-2 (540-69-2) [UNK], 56553-60-7 (56553-60-7) [UNK]
@@ -116,7 +116,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-12988530
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 36
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -126,7 +126,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-13051696
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 70
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -136,7 +136,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-13810815
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 49
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -145,7 +145,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-14259235
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Yield %: 80
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
@@ -154,7 +154,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-14645855
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 45
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -163,7 +163,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-14841118
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 49
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -173,7 +173,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-15168270
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 90
 - Reagents: 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), THF (109-99-9), DCM (75-09-2), water (7732-18-5)
@@ -182,7 +182,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-15458166
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 53
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -192,7 +192,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-1746571
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 43
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -202,7 +202,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-2376217
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 8
 - Reagents: TMSCI (75-77-4) [ADDITIVE], 100-52-7 (100-52-7) [UNK], Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT], LiAlH4 (16853-85-3) [REDUCTANT], 540-69-2 (540-69-2) [UNK], 56553-60-7 (56553-60-7) [UNK]
@@ -212,7 +212,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-2545888
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 70
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -221,7 +221,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-2936331
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 19
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -230,7 +230,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-3140020
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 67
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -239,7 +239,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-3472914
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 77
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -248,7 +248,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-3915273
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 74
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -258,7 +258,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-4137872
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 67
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -268,7 +268,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-4522360
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 49
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -278,7 +278,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-4681459
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/K2CO3/NaBH4
 - Yield %: 78
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2)
@@ -287,7 +287,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-6132248
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaOH/LiAlH4
 - Yield %: 67
 - Reagents: Et3N (121-44-8) [BASE], LiAlH4 (16853-85-3) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -296,7 +296,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-6324431
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 67
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -306,7 +306,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-7135760
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 32
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -315,7 +315,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-733313
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 27
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -324,7 +324,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-7404820
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 32
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -333,7 +333,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-7456860
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 36
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -343,7 +343,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-7745485
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 34
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -352,7 +352,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-8072347
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 36
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -362,7 +362,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-920995
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3
 - Catalytic System: HOAc
 - Yield %: 86
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE]
@@ -372,7 +372,7 @@ Total reactions: 1201
 ## Reaction 31-031-CAS-9550947
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/K2CO3/TFA/NaBH4
 - Yield %: 51
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], K2CO3 (584-08-7) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: PhMe (108-88-3), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2), DCM (75-09-2)
@@ -381,16 +381,16 @@ Total reactions: 1201
 ## Reaction 31-032-CAS-10303499
 
 - Type: original_dataset
-- Condition Core: Base: NaH
+- Condition Core: NaH/HOAc/water/SOCl2
 - Yield %: 49
-- Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], 7719-09-7 (7719-09-7) [UNK], NaH (7646-69-7) [BASE]
+- Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], SOCl2 (7719-09-7) [COUPLING_REAGENT], NaH (7646-69-7) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), DMF (68-12-2)
 - SMILES: O=Cc1cc[nH]n1.C[C@H](CO)NCc1ccccc1>>C[C@@H]1Cn2nccc2CN1Cc1ccccc1
 
 ## Reaction 31-032-CAS-12332822
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: CO.O=C1CCOCC1.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>CN(C1CCOCC1)[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O.O=C(O)C(F)(F)F
@@ -398,7 +398,7 @@ Total reactions: 1201
 ## Reaction 31-032-CAS-7632778
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 26
 - Reagents: 7790-28-5 (7790-28-5) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: water (7732-18-5), MeCN (75-05-8)
@@ -407,7 +407,7 @@ Total reactions: 1201
 ## Reaction 31-049-CAS-2085069
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/NaOH/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], DIPEA (7087-68-5) [BASE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: CC(C)(C)[Si](C)(C)OCC=O.C[C@@H](NC(=O)[C@H]1CCCCN1)c1ccc(Nc2ncc3cc(-c4ccncc4)ccc3n2)cc1.Cl>>C[C@@H](NC(=O)[C@H]1CCCCN1CCO)c1ccc(Nc2ncc3cc(-c4ccncc4)ccc3n2)cc1
@@ -423,7 +423,7 @@ Total reactions: 1201
 ## Reaction 31-111-CAS-14980816
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 75
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -432,7 +432,7 @@ Total reactions: 1201
 ## Reaction 31-113-CAS-13626160
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 85
 - Reagents: 64-18-6 (64-18-6) [UNK]
@@ -442,7 +442,7 @@ Total reactions: 1201
 ## Reaction 31-113-CAS-9184746
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/NaOH/HOAc
 - Yield %: 38
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaOAc (127-09-3) [BASE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE], 17026-42-5 (17026-42-5) [UNK]
 - Solvents: DCM (75-09-2), water (7732-18-5), THF (109-99-9)
@@ -451,7 +451,7 @@ Total reactions: 1201
 ## Reaction 31-142-CAS-2114994
 
 - Type: original_dataset
-- Condition Core: Additive: MeOH
+- Condition Core: MeOH/NH4Cl
 - Yield %: 83
 - Reagents: 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE], 594-19-4 (594-19-4) [UNK], 5419-55-6 (5419-55-6) [UNK], NH4Cl (12125-02-9) [ADDITIVE]
 - Solvents: DCM (75-09-2), THF (109-99-9), water (7732-18-5)
@@ -460,8 +460,8 @@ Total reactions: 1201
 ## Reaction 31-170-CAS-592255
 
 - Type: original_dataset
-- Condition Core: Pd/triphenylphosphine
-- Catalytic System: Pd(PPh3)4
+- Condition Core: HCl/Et3N/DIPEA/K2CO3/NaOH/MsCl/NaBH4
+- Catalytic System: 14221-01-3
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], Et3N (121-44-8) [BASE], MsCl (124-63-0) [COUPLING_REAGENT], DIPEA (7087-68-5) [BASE], K2CO3 (584-08-7) [BASE], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: THF (109-99-9), MeOH (67-56-1), DCM (75-09-2), MeCN (75-05-8), NMP (872-50-4), EtOH (64-17-5), water (7732-18-5), Hex (110-54-3)
 - SMILES: CC(=O)Cl.N#Cc1cc[c]([Zn][Br])cc1F.Cc1cn([C@H]2CCCNC2)c(=O)[nH]c1=O.Oc1cccc(Cl)c1>>Cc1cn([C@H]2CCCN([C@H](C)c3ccc(C(=O)O)c(Oc4cccc(Cl)c4)c3)C2)c(=O)[nH]c1=O.Cc1cn([C@H]2CCCN([C@@H](C)c3ccc(C(=O)O)c(Oc4cccc(Cl)c4)c3)C2)c(=O)[nH]c1=O
@@ -479,7 +479,7 @@ Total reactions: 1201
 ## Reaction 31-172-CAS-3162592
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 49
 - Reagents: NaOH (1310-73-2) [BASE], H2 (1333-74-0) [REDUCTANT], HCl (7647-01-0) [ACID], Na2CO3 (497-19-8) [BASE]
@@ -499,7 +499,7 @@ Total reactions: 1201
 ## Reaction 31-172-CAS-3515988
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3
 - Catalytic System: HOAc
 - Yield %: 28
 - Reagents: K2CO3 (584-08-7) [BASE], 56553-60-7 (56553-60-7) [UNK]
@@ -518,7 +518,7 @@ Total reactions: 1201
 ## Reaction 31-172-CAS-3645178
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: Cc1ccccc1Br.COC(=O)C1CCNCC1.O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCNCC1>>Cc1ccccc1N1CCC(CN2CCC(N3C(=O)N(C4CCCCC4)C[C@H]3c3ccccc3)CC2)CC1
@@ -526,7 +526,7 @@ Total reactions: 1201
 ## Reaction 31-172-CAS-5277480
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 72
 - Reagents: NaOH (1310-73-2) [BASE], H2 (1333-74-0) [REDUCTANT], HCl (7647-01-0) [ACID], Na2CO3 (497-19-8) [BASE]
@@ -555,8 +555,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-10267078
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.C[C@@H]1COCCN1.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>CC(C)CNCc1ccc(-c2ccccc2S(=O)(=O)N2CCOC[C@H]2C)cc1
@@ -564,8 +564,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-12007208
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1ccncc1Br.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>CC(C)CNCc1ccc(-c2cnccc2S(=O)(=O)N2CCCC2)cc1
@@ -573,8 +573,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-12297374
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1ncccc1Br.O=Cc1ccc(B(O)O)cc1.C1CC2CNC(C1)C2>>O=S(=O)(c1ncccc1-c1ccc(CN2CC3CCCC2C3)cc1)N1CCCC1
@@ -582,8 +582,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-12656952
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.FC1(F)CCNC1.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>CC(C)CNCc1ccc(-c2ccccc2S(=O)(=O)N2CCC(F)(F)C2)cc1
@@ -591,8 +591,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-1401076
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.FC1(F)CCNC1.O=Cc1ccc(B(O)O)cc1.NC1CCOCC1>>O=S(=O)(c1ccccc1-c1ccc(CNC2CCOCC2)cc1)N1CCC(F)(F)C1
@@ -600,8 +600,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-14135956
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1ccncc1Br.O=Cc1ccc(B(O)O)cc1.CC(C)(C)CCN>>CC(C)(C)CCNCc1ccc(-c2cnccc2S(=O)(=O)N2CCCC2)cc1
@@ -609,8 +609,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-14424623
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1ncccc1Br.O=Cc1ccc(B(O)O)cc1.CC(C)(C)CCN>>CC(C)(C)CCNCc1ccc(-c2cccnc2S(=O)(=O)N2CCCC2)cc1
@@ -618,8 +618,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-14467518
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.COC[C@@H]1CCCN1.O=Cc1ccc(B(O)O)cc1.C1CC2CNC(C1)C2>>COC[C@@H]1CCCN1S(=O)(=O)c1ccccc1-c1ccc(CN2CC3CCCC2C3)cc1
@@ -627,8 +627,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-14747676
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.C[C@@H]1COCCN1.O=Cc1ccc(B(O)O)cc1F.CC(C)CN>>CC(C)CNCc1ccc(-c2ccccc2S(=O)(=O)N2CCOC[C@H]2C)cc1F
@@ -636,8 +636,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-2877850
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1ncccc1Br.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>CC(C)CNCc1ccc(-c2cccnc2S(=O)(=O)N2CCCC2)cc1
@@ -645,8 +645,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-3360239
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DME (110-71-4), water (7732-18-5), DCM (75-09-2)
 - SMILES: O=S(=O)(c1ccccc1Br)N1CCCC1.O=Cc1ccc(B(O)O)cn1.CC(C)CN>>CC(C)CNCc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cn1
@@ -654,8 +654,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-3495743
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DME (110-71-4), water (7732-18-5), DCM (75-09-2)
 - SMILES: O=S(=O)(c1ccccc1Br)N1CCCC1.O=Cc1ccc(B(O)O)nc1.CC(C)CN>>CC(C)CNCc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)nc1
@@ -663,8 +663,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-3545857
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.C[C@@H]1COCCN1.O=Cc1ccc(B(O)O)cc1.NC1CCOCC1>>C[C@@H]1COCCN1S(=O)(=O)c1ccccc1-c1ccc(CNC2CCOCC2)cc1
@@ -672,8 +672,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-4137104
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: CC(C)N.O=S(=O)(Cl)c1ccccc1Br.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>CC(C)CNCc1ccc(-c2ccccc2S(=O)(=O)NC(C)C)cc1
@@ -681,8 +681,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-5335870
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DME (110-71-4), water (7732-18-5), DCM (75-09-2)
 - SMILES: O=S(=O)(c1ccccc1Br)N1CCCC1.O=Cc1ccc(B(O)O)cn1.C1CC2CNC(C1)C2>>O=S(=O)(c1ccccc1-c1ccc(CN2CC3CCCC2C3)nc1)N1CCCC1
@@ -690,8 +690,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-5615865
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DME (110-71-4), water (7732-18-5), DCM (75-09-2)
 - SMILES: O=S(=O)(c1ccccc1Br)N1CCCC1.O=Cc1ccc(B(O)O)nc1.C1CC2CNC(C1)C2>>O=S(=O)(c1ccccc1-c1ccc(CN2CC3CCCC2C3)cn1)N1CCCC1
@@ -699,8 +699,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-746420
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1cnccc1Br.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>CC(C)CNCc1ccc(-c2ccncc2S(=O)(=O)N2CCCC2)cc1
@@ -708,8 +708,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-7754825
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1cccnc1Br.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>CC(C)CNCc1ccc(-c2ncccc2S(=O)(=O)N2CCCC2)cc1
@@ -717,8 +717,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-8083909
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.C[C@@H]1COCCN1.O=Cc1ccc(B(O)O)cc1.CN1CCNCC1>>C[C@@H]1COCCN1S(=O)(=O)c1ccccc1-c1ccc(CN2CCN(C)CC2)cc1
@@ -726,8 +726,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-8135052
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: O=S(=O)(Cl)c1ccccc1Br.COC[C@@H]1CCCN1.O=Cc1ccc(B(O)O)cc1.CC(C)CN>>COC[C@@H]1CCCN1S(=O)(=O)c1ccccc1-c1ccc(CNCC(C)C)cc1
@@ -735,8 +735,8 @@ Total reactions: 1201
 ## Reaction 31-179-CAS-9878820
 
 - Type: original_dataset
-- Condition Core: Pd/diphenylphosphino
-- Catalytic System: Pd(dppf)Cl2
+- Condition Core: Et3N/Na2CO3
+- Catalytic System: 72287-26-4
 - Reagents: Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), DME (110-71-4), water (7732-18-5)
 - SMILES: C1CCNC1.O=S(=O)(Cl)c1cccnc1Br.O=Cc1ccc(B(O)O)cc1.C1CC2CNC(C1)C2>>O=S(=O)(c1cccnc1-c1ccc(CN2CC3CCCC2C3)cc1)N1CCCC1
@@ -752,7 +752,7 @@ Total reactions: 1201
 ## Reaction 31-287-CAS-11966878
 
 - Type: original_dataset
-- Condition Core: Acid: p-TsOH
+- Condition Core: p-TsOH/CsF
 - Yield %: 51
 - Reagents: p-TsOH (104-15-4) [ACID], CsF (13400-13-0) [ADDITIVE]
 - Solvents: PhMe (108-88-3), DME (110-71-4)
@@ -775,7 +775,7 @@ Total reactions: 1201
 ## Reaction 31-309-CAS-6510442
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4
 - Yield %: 44
 - Reagents: 58-54-8 (58-54-8) [UNK], H2SO4 (7664-93-9) [ACID]
 - Solvents: PhMe (108-88-3), EtOH (64-17-5)
@@ -784,7 +784,7 @@ Total reactions: 1201
 ## Reaction 31-310-CAS-2641484
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/LiAlH4
 - Yield %: 55
 - Reagents: LiAlH4 (16853-85-3) [REDUCTANT], 7646-93-7 (7646-93-7) [UNK], NaOAc (127-09-3) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5), EtOH (64-17-5)
@@ -793,7 +793,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10001322
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 5
 - Reagents: Et3N (121-44-8) [BASE], 7550-45-0 (7550-45-0) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9)
@@ -810,7 +810,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10049296
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc(Cl)cc(Cl)c1O.Nc1ccc2c(=O)cc(-c3ccccc3)oc2c1.C=O>>O=c1cc(-c2ccccc2)oc2cc(N3COc4c(Cl)cc(Cl)cc4C3)ccc12
@@ -818,7 +818,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10052171
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAt
 - Reagents: 1892-57-5 (1892-57-5) [UNK], HOAt (39968-33-7) [ADDITIVE], 13283-31-3 (13283-31-3) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
 - SMILES: Nc1cccnc1.O=C(O)C1CCN(C(=O)OCc2ccccc2)CC1>>O=C(OCc1ccccc1)N1CCC(CNc2cccnc2)CC1
@@ -826,7 +826,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10068998
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)NCCC=O.CCC(N)c1nc2ccsc2c(=O)n1Cc1ccccn1>>CCC(NCCCNC(=O)OC(C)(C)C)c1nc2ccsc2c(=O)n1Cc1ccccn1
@@ -834,7 +834,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10078787
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 47
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -843,7 +843,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1009154
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA
 - Yield %: 62
 - Reagents: 79-37-8 (79-37-8) [UNK], DIPEA (7087-68-5) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DMSO (67-68-5), DCM (75-09-2)
@@ -860,7 +860,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10103697
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc
 - Yield %: 73
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -869,7 +869,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10106068
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], 109-89-7 (109-89-7) [UNK]
 - Solvents: EDC (107-06-2), DMF (68-12-2)
 - SMILES: COc1ccccc1Oc1cccc(C=O)c1.COC(=O)C1(NC(=O)OCC2c3ccccc3-c3ccccc32)CCNCC1.Cl>>COC(=O)C1(N)CCN(Cc2cccc(Oc3ccccc3OC)c2)CC1
@@ -877,7 +877,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10114649
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/NaOH/EDCIHCl/LiAlH4
 - Yield %: 40
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), THF (109-99-9), water (7732-18-5)
@@ -886,7 +886,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10131799
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc
 - Yield %: 13
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -895,7 +895,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10156750
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/TFA
 - Yield %: 77
 - Reagents: TFA (76-05-1) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), EtOAc (141-78-6), water (7732-18-5)
@@ -904,7 +904,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10165338
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: C1COCCN1.O=Cc1ccc(C#Cc2ccc(OC3CCCCO3)cc2)cc1>>C(#Cc1ccc(OC2CCCCO2)cc1)c1ccc(CN2CCOCC2)cc1
@@ -912,7 +912,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10169150
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, water
 - Yield %: 69
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -922,7 +922,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10191359
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
 - SMILES: COC(=O)C=O.Nc1ccc(I)cc1F>>COC(=O)CNc1ccc(I)cc1F
@@ -938,7 +938,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10208518
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC1(O)CCNCC1.O=Cc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1>>CC1(O)CCN(Cc2ccc(-c3ccccc3S(=O)(=O)N3CCCC3)cc2)CC1
@@ -946,7 +946,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10213252
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: O=C1CCS(=O)(=O)CC1.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>O=C(O)C(F)(F)F.O=C1C[C@@H](NC2CCS(=O)(=O)CC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -954,7 +954,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10231011
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 71
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -963,7 +963,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1023507
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Reagents: NaHCO3 (144-55-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
 - SMILES: CC(C)=O.COC(=O)[C@H]1CCCN1.Cl>>COC(=O)[C@H]1CCCN1C(C)C
@@ -971,7 +971,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10236582
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 67
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -980,7 +980,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10256522
 
 - Type: original_dataset
-- Condition Core: Base: Py
+- Condition Core: Py/HOAc
 - Yield %: 19
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], Py (110-86-1) [BASE]
 - Solvents: DCM (75-09-2)
@@ -989,7 +989,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10263676
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 66
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -999,7 +999,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10264645
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/TFA/HATU
 - Reagents: DIPEA (7087-68-5) [BASE], HATU (148893-10-1) [COUPLING_REAGENT], 25895-60-7 (25895-60-7) [UNK], TFA (76-05-1) [ADDITIVE]
 - Solvents: NMP (872-50-4), HOAc (64-19-7), DMAc (127-19-5), water (7732-18-5)
 - SMILES: CSCC[C@H](N)C(=O)O.O=Cc1ccc(C(=O)O)c(-c2ccccc2)c1.N[C@H](CO)CC1CCCCC1>>CSCC[C@H](NC(=O)c1ccc(CN[C@H](CO)CC2CCCCC2)cc1-c1ccccc1)C(=O)O
@@ -1023,7 +1023,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10334504
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 50
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -1032,7 +1032,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10380620
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc(Br)ccc1O.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>O=c1cc(-c2ccccc2)oc2ccc(N3COc4ccc(Br)cc4C3)cc12
@@ -1040,7 +1040,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10385150
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 75
 - Time (h): 4.0
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
@@ -1050,7 +1050,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10404987
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 86
 - Reagents: NaOH (1310-73-2) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -1059,7 +1059,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10417790
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1ccccc1C(F)(F)F.NCCc1cccs1>>FC(F)(F)c1ccccc1C1NCCc2sccc21
@@ -1083,7 +1083,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10459653
 
 - Type: original_dataset
-- Condition Core: Additive: MeOH
+- Condition Core: MeOH
 - Yield %: 62
 - Reagents: 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: THF (109-99-9)
@@ -1107,7 +1107,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1048069
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 72
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -1116,7 +1116,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10482547
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 86
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -1125,7 +1125,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10490187
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 95
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -1134,7 +1134,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10512164
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/water
 - Yield %: 53
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: DCM (75-09-2), Et2O (60-29-7), MeOH (67-56-1)
@@ -1143,7 +1143,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10524439
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/NaBH4
 - Yield %: 52
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], 7646-93-7 (7646-93-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -1160,7 +1160,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10541850
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 36
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -1170,7 +1170,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10544145
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Yield %: 79
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -1179,7 +1179,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10564453
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 30
 - Reagents: 7487-88-9 (7487-88-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -1188,7 +1188,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10591162
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 71
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -1215,7 +1215,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10668911
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 85
 - Reagents: 7487-88-9 (7487-88-9) [UNK], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -1224,7 +1224,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10701141
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1cccc(Cl)c1.NCCc1cccs1>>Clc1cccc(C2NCCc3sccc32)c1
@@ -1240,7 +1240,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10735377
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 43
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), Et2O (60-29-7), DCM (75-09-2), water (7732-18-5), EtOAc (141-78-6)
@@ -1249,7 +1249,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10738729
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: HOAc
 - Yield %: 40
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -1259,7 +1259,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10742118
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/H2
 - Catalytic System: 7440-06-4
 - Reagents: HCl (7647-01-0) [ACID], H2 (1333-74-0) [REDUCTANT]
 - Solvents: EtOH (64-17-5), PhMe (108-88-3), water (7732-18-5)
@@ -1268,7 +1268,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1077979
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Yield %: 83
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -1277,7 +1277,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10790737
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: CC(C)N.O=Cc1c[nH]c2ncccc12>>CC(C)NCc1c[nH]c2ncccc12
@@ -1293,7 +1293,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10797974
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -1302,7 +1302,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10807010
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 34
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -1319,7 +1319,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10817385
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 43
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -1328,7 +1328,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1082697
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O.NS(=O)(=O)N1CCC(=O)CC1>>NS(=O)(=O)N1CCC(N[C@@H]2CC(=O)N[C@@H](Cc3c[nH]c4ccccc34)C(=O)N[C@@H](Cc3ccccc3)C(=O)N[C@H](Cc3ccccc3)CNC2=O)CC1.O=C(O)C(F)(F)F
@@ -1336,7 +1336,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10837145
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 31
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -1345,7 +1345,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10860085
 
 - Type: original_dataset
-- Condition Core: Additive: NH4Cl
+- Condition Core: NH4Cl
 - Yield %: 95
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NH4Cl (12125-02-9) [ADDITIVE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -1354,7 +1354,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10861736
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/K2CO3
 - Yield %: 97
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], K2CO3 (584-08-7) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -1363,7 +1363,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10872118
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/HOAc
 - Yield %: 84
 - Reagents: HOAc (64-19-7) [ADDITIVE], Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -1372,7 +1372,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10880809
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/LiAlH4
 - Yield %: 85
 - Reagents: 95-14-7 (95-14-7) [UNK], LiAlH4 (16853-85-3) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), THF (109-99-9), water (7732-18-5)
@@ -1389,7 +1389,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10902787
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 89
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -1398,7 +1398,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10957893
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 83
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -1407,7 +1407,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10958859
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 22
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -1416,7 +1416,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-10997019
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 68
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -1433,7 +1433,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11012991
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Reagents: H2 (1333-74-0) [REDUCTANT], Lutidine (108-48-5) [BASE], TFA (76-05-1) [ADDITIVE], NaHCO3 (144-55-8) [BASE], 56553-60-7 (56553-60-7) [UNK], 304-59-6 (304-59-6) [UNK]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), DCM (75-09-2), water (7732-18-5), EDC (107-06-2)
@@ -1442,7 +1442,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11013899
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/H2
 - Catalytic System: 7440-06-4
 - Reagents: HCl (7647-01-0) [ACID], H2 (1333-74-0) [REDUCTANT]
 - Solvents: EtOH (64-17-5), PhMe (108-88-3), water (7732-18-5)
@@ -1451,7 +1451,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11034297
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOAc/Zn
 - Yield %: 85
 - Reagents: HOAc (64-19-7) [ADDITIVE], Zn (7440-66-6) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: water (7732-18-5)
@@ -1468,7 +1468,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11073604
 
 - Type: original_dataset
-- Condition Core: Additive: ZnCl2
+- Condition Core: ZnCl2
 - Yield %: 80
 - Reagents: ZnCl2 (7646-85-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -1477,7 +1477,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11077853
 
 - Type: original_dataset
-- Condition Core: Ru
+- Condition Core: Ru/p‑cymene
 - Catalytic System: [(p‑cymene)RuCl2]2, 850253-53-1
 - Yield %: 86
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -1487,7 +1487,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11090832
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 82
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: MeCN (75-05-8), THF (109-99-9), water (7732-18-5)
@@ -1496,7 +1496,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11118305
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 98
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), DCM (75-09-2)
@@ -1505,7 +1505,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11157323
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 31
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -1514,7 +1514,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11184672
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 63
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9), water (7732-18-5)
@@ -1523,7 +1523,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11185935
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA
 - Yield %: 69
 - Reagents: DIPEA (7087-68-5) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EtOAc (141-78-6), water (7732-18-5)
@@ -1532,7 +1532,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11189079
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 30
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -1550,7 +1550,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11221631
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/NH4Cl
 - Catalytic System: 53-59-8, 9028-53-9, 75718-21-7
 - Yield %: 94
 - Reagents: 50-99-7 (50-99-7) [UNK], NaOH (1310-73-2) [BASE], NH4Cl (12125-02-9) [ADDITIVE]
@@ -1576,7 +1576,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1124647
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 63
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -1594,7 +1594,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11267049
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 60
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -1610,7 +1610,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11285382
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 33
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeCN (75-05-8), THF (109-99-9), water (7732-18-5)
@@ -1619,7 +1619,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11301942
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 70
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DMF (68-12-2)
@@ -1651,7 +1651,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11342274
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/EDCIHCl
 - Reagents: DIPEA (7087-68-5) [BASE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT]
 - Solvents: DCM (75-09-2)
 - SMILES: CC(C)[C@H](NC(=O)OCc1ccccc1)C(=O)O.CNOC.Cl>>CON(C)C(O)[C@@H](NC(=O)OCc1ccccc1)C(C)C
@@ -1659,7 +1659,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11354448
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 93
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -1676,7 +1676,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11376475
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Yield %: 75
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: PhMe (108-88-3), EtOH (64-17-5), water (7732-18-5)
@@ -1685,7 +1685,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11403943
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 83
 - Reagents: 540-69-2 (540-69-2) [UNK], HCl (7647-01-0) [ACID]
@@ -1695,7 +1695,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11413337
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 40
 - Reagents: 7757-82-6 (7757-82-6) [UNK], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: HOAc (64-19-7), water (7732-18-5)
@@ -1704,7 +1704,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11426781
 
 - Type: original_dataset
-- Condition Core: Base: NaH
+- Condition Core: NaH/NaBH4
 - Yield %: 54
 - Reagents: NaH (7646-69-7) [BASE], EtOH (64-17-5) [SOLVENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DMF (68-12-2)
@@ -1713,7 +1713,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11461717
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
 - SMILES: O=Cc1ccc2c(n1)NC(=O)CS2.COc1ccc2nccc(C(O)C[C@@H]3CC[C@@H](N)CO3)c2n1>>COc1ccc2nccc(C(O)C[C@@H]3CC[C@@H](NCc4ccc5c(n4)NC(=O)CS5)CO3)c2n1
@@ -1721,7 +1721,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11517449
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 72
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -1730,7 +1730,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11540005
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/DIPEA/NaHCO3
 - Yield %: 98
 - Reagents: HCl (7647-01-0) [ACID], DIPEA (7087-68-5) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EtOH (64-17-5), THF (109-99-9), water (7732-18-5), DCM (75-09-2)
@@ -1739,7 +1739,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11548833
 
 - Type: original_dataset
-- Condition Core: Reductant: H2
+- Condition Core: H2
 - Catalytic System: 7440-06-4
 - Yield %: 87
 - Reagents: 546-68-9 (546-68-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -1749,7 +1749,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11549446
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 25
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -1758,7 +1758,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11552264
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 47
 - Reagents: 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -1767,7 +1767,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11576281
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/water
 - Yield %: 90
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: DCM (75-09-2)
@@ -1776,7 +1776,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11590548
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 66
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -1785,7 +1785,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11595490
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 88
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -1794,7 +1794,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1159918
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 53
 - Reagents: Et3N (121-44-8) [BASE], 14044-65-6 (14044-65-6) [UNK]
 - Solvents: DCM (75-09-2), THF (109-99-9)
@@ -1803,7 +1803,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11600278
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 84
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -1812,7 +1812,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11600843
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 13
 - Reagents: Py (110-86-1) [BASE], 2687-43-6 (2687-43-6) [UNK], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], Et3N (121-44-8) [BASE], Na2CO3 (497-19-8) [BASE], H2 (1333-74-0) [REDUCTANT]
@@ -1822,7 +1822,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11619457
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 54
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -1831,7 +1831,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11638181
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 56
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -1840,7 +1840,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11643231
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 93
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -1850,7 +1850,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11701677
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)N1CCNCC1.Cc1c(C=O)sc2c(N3CCOCC3)nc(Cl)nc12>>Cc1c(CN2CCN(C(=O)OC(C)(C)C)CC2)sc2c(N3CCOCC3)nc(Cl)nc12
@@ -1858,7 +1858,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11707930
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -1867,7 +1867,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11712096
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 49
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -1884,7 +1884,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11770389
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 29
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -1893,7 +1893,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11774463
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 69
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -1902,7 +1902,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11777095
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 81
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -1919,7 +1919,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11814402
 
 - Type: original_dataset
-- Condition Core: Additive: Zn
+- Condition Core: Zn
 - Yield %: 52
 - Reagents: 3087-36-3 (3087-36-3) [UNK], Zn (7440-66-6) [ADDITIVE]
 - Solvents: THF (109-99-9), HOAc (64-19-7)
@@ -1928,7 +1928,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11838792
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 28
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -1937,7 +1937,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11855899
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], 546-68-9 (546-68-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5)
 - SMILES: CN.Cl.CC(=O)Cc1ccncc1>>CNC(C)Cc1ccncc1
@@ -1953,7 +1953,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11877585
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 86
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -1970,7 +1970,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11914988
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 56
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -1979,7 +1979,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11916607
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 66
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2), EtOAc (141-78-6)
@@ -1988,7 +1988,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11926984
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3
 - Yield %: 15
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -1997,7 +1997,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1195596
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], 546-68-9 (546-68-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5)
 - SMILES: CC(=O)Cc1ccc(F)cc1.CN.Cl>>CNC(C)Cc1ccc(F)cc1
@@ -2005,15 +2005,15 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-11972580
 
 - Type: original_dataset
-- Condition Core: Base: NMM
-- Reagents: 7719-09-7 (7719-09-7) [UNK], 105-58-8 (105-58-8) [UNK], NMM (109-02-4) [BASE], HOBt (2592-95-2) [ADDITIVE]
+- Condition Core: NMM/HOBt/SOCl2
+- Reagents: SOCl2 (7719-09-7) [COUPLING_REAGENT], 105-58-8 (105-58-8) [UNK], NMM (109-02-4) [BASE], HOBt (2592-95-2) [ADDITIVE]
 - Solvents: DMF (68-12-2)
 - SMILES: O=C1c2ccc(Cl)c(Cl)c2CCc2cc(Br)cnc21.C1CNCCN1.O=C(O)Cc1cc[n+]([O-])cc1>>O=C(Cc1cc[n+]([O-])cc1)N1CCN([C@H]2c3ccc(Cl)c(Cl)c3CCc3cc(Br)cnc32)CC1
 
 ## Reaction 31-313-CAS-12002389
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 78
 - Reagents: 64-18-6 (64-18-6) [UNK], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: 64-18-6 (64-18-6), PhMe (108-88-3), water (7732-18-5), iPrOH (67-63-0)
@@ -2022,7 +2022,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12006732
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 97
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -2031,7 +2031,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12031891
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 61
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: THF (109-99-9), EtOAc (141-78-6), water (7732-18-5)
@@ -2048,7 +2048,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12087215
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 48
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -2058,7 +2058,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12088225
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Catalytic System: HOAc
 - Yield %: 98
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
@@ -2068,7 +2068,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-120914
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/TFA
 - Yield %: 86
 - Reagents: TFA (76-05-1) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOAc (141-78-6), water (7732-18-5)
@@ -2077,7 +2077,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12122035
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 93
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - SMILES: CCOC(=O)C1(S(=O)(=O)c2ccc(Sc3ccccc3)cc2)CCNCC1.O=C(O)C(F)(F)F.CCOC1(O[Si](C)(C)C)CC1>>CCOC(=O)C1(S(=O)(=O)c2ccc(Sc3ccccc3)cc2)CCN(C2CC2)CC1
@@ -2085,7 +2085,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12122630
 
 - Type: original_dataset
-- Condition Core: Additive: LiCl
+- Condition Core: LiCl/NaBH4
 - Yield %: 65
 - Reagents: LiCl (7447-41-8) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -2094,7 +2094,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12126003
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 90
 - Reagents: 64-18-6 (64-18-6) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: iPrOH (67-63-0), water (7732-18-5), iPrOAc (108-21-4)
@@ -2103,7 +2103,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12130578
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/Na2CO3/NaBH4
 - Yield %: 57
 - Reagents: Et3N (121-44-8) [BASE], 7550-45-0 (7550-45-0) [UNK], NaBH4 (16940-66-2) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
 - Solvents: DCM (75-09-2), THF (109-99-9), water (7732-18-5)
@@ -2112,7 +2112,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12152064
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: NC(=O)c1ccc(Oc2ccc(C=O)cc2)cc1.O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCNCC1>>NC(=O)c1ccc(Oc2ccc(CN3CCC(N4C(=O)N(C5CCCCC5)C[C@H]4c4ccccc4)CC3)cc2)cc1
@@ -2120,7 +2120,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12160262
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 97
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -2129,7 +2129,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12171677
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 70
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -2146,7 +2146,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12188259
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc([N+](=O)[O-])ccc1O.Nc1ccc2c(=O)cc(-c3ccccc3)oc2c1.C=O>>O=c1cc(-c2ccccc2)oc2cc(N3COc4ccc([N+](=O)[O-])cc4C3)ccc12
@@ -2154,7 +2154,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12198126
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)NCCC=O.CCC(N)c1nc2ccsc2c(=O)n1Cc1cccnc1>>CCC(NCCCNC(=O)OC(C)(C)C)c1nc2ccsc2c(=O)n1Cc1cccnc1
@@ -2162,7 +2162,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12233553
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 95
 - Reagents: 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: DMAc (127-19-5), water (7732-18-5), iPrOH (67-63-0), PhMe (108-88-3), Hept (142-82-5)
@@ -2171,7 +2171,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12236849
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/NaOH/EDCIHCl/LiAlH4
 - Yield %: 64
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), THF (109-99-9), water (7732-18-5)
@@ -2180,7 +2180,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12273474
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/K2CO3
 - Yield %: 57
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK], K2CO3 (584-08-7) [BASE]
 - Solvents: MeOH (67-56-1), THF (109-99-9), water (7732-18-5)
@@ -2189,7 +2189,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12287197
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 86
 - Reagents: 64-18-6 (64-18-6) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: water (7732-18-5)
@@ -2198,7 +2198,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12307296
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 85
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -2207,7 +2207,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1231248
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -2216,7 +2216,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12314309
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Na2CO3
 - Yield %: 89
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK], Na2CO3 (497-19-8) [BASE]
 - Solvents: HOAc (64-19-7), MeCN (75-05-8), water (7732-18-5), 1,4-Dioxane (123-91-1)
@@ -2225,7 +2225,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12321249
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 98
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -2234,7 +2234,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12337317
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Yield %: 83
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -2243,7 +2243,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12337775
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/H2
 - Catalytic System: 7440-06-4
 - Yield %: 80
 - Reagents: HCl (7647-01-0) [ACID], H2 (1333-74-0) [REDUCTANT]
@@ -2253,7 +2253,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12366725
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: O=Cc1ccccc1.CC[C@@H](N)CO>>CC[C@H](CO)NCc1ccccc1
@@ -2261,7 +2261,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12392395
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 70
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -2270,7 +2270,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12394567
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 30
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -2280,7 +2280,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12402355
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/NaHCO3/HOAc
 - Yield %: 89
 - Reagents: HOAc (64-19-7) [ADDITIVE], DIPEA (7087-68-5) [BASE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -2289,7 +2289,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12406242
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/water
 - Yield %: 92
 - Reagents: 56553-60-7 (56553-60-7) [UNK], Et3N (121-44-8) [BASE], water (7732-18-5) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -2298,7 +2298,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12408647
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Yield %: 95
 - Reagents: HCl (7647-01-0) [ACID], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: PhMe (108-88-3), EtOH (64-17-5), 1,4-Dioxane (123-91-1)
@@ -2307,7 +2307,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12443322
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 100
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5), CHCl3 (67-66-3)
@@ -2316,7 +2316,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12448402
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/NH4Cl
 - Yield %: 91
 - Reagents: 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], NH4Cl (12125-02-9) [ADDITIVE], NH4OH (1336-21-6) [BASE], 6381-59-5 (6381-59-5) [UNK]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -2325,7 +2325,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12458445
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 32
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -2334,7 +2334,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12458701
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 88
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9)
@@ -2343,7 +2343,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12464599
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 36
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -2361,7 +2361,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12482299
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaOH/HOAc/BOP-Cl
 - Yield %: 57
 - Reagents: Et3N (121-44-8) [BASE], BOP-Cl (68641-49-6) [COUPLING_REAGENT], HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), MeOH (67-56-1), TFA (76-05-1), water (7732-18-5)
@@ -2370,7 +2370,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12497320
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/LiAlH4
 - Reagents: Et3N (121-44-8) [BASE], LiAlH4 (16853-85-3) [REDUCTANT], 3164-29-2 (3164-29-2) [UNK]
 - Solvents: DCM (75-09-2), THF (109-99-9), EtOAc (141-78-6), water (7732-18-5)
 - SMILES: Oc1ccc2c(c1)[C@@]13CCCC[C@H]1[C@@H](C2)NCC3.O=C(Cl)C1CCC1>>O=C(O)[C@@H](O)c1ccccc1.Oc1ccc2c(c1)[C@@]13CCCC[C@H]1[C@@H](C2)N(CC1CCC1)CC3
@@ -2378,7 +2378,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12502943
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: CC(C)(C)OC(=O)N1CC(=O)C1.CCO[C@@H]([C@H]1C[C@@H](C)[C@H]2[C@H](O1)[C@H](O)[C@@]1(C)[C@@H]3CC[C@H]4C(C)(C)[C@@H](O[C@H]5CNCCO5)CC[C@@]45C[C@@]35CC[C@]21C)C(C)(C)O>>CCO[C@@H]([C@H]1C[C@@H](C)[C@H]2[C@H](O1)[C@H](O)[C@@]1(C)[C@@H]3CC[C@H]4C(C)(C)[C@@H](O[C@H]5CN(C6CN(C(=O)OC(C)(C)C)C6)CCO5)CC[C@@]45C[C@@]35CC[C@]21C)C(C)(C)O
@@ -2386,7 +2386,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12505431
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 80
 - Reagents: 56553-60-7 (56553-60-7) [UNK], Et3N (121-44-8) [BASE]
 - Solvents: EtOH (64-17-5), DCM (75-09-2)
@@ -2395,7 +2395,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12507729
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc(Br)cc(Br)c1O.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>O=c1cc(-c2ccccc2)oc2ccc(N3COc4c(Br)cc(Br)cc4C3)cc12
@@ -2411,7 +2411,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1251804
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc([N+](=O)[O-])ccc1O.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>O=c1cc(-c2ccccc2)oc2ccc(N3COc4ccc([N+](=O)[O-])cc4C3)cc12
@@ -2434,7 +2434,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12581212
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 86
 - Reagents: HOAc (64-19-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT]
@@ -2444,7 +2444,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12616354
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3
 - Yield %: 90
 - Reagents: 56553-60-7 (56553-60-7) [UNK], K2CO3 (584-08-7) [BASE]
 - Solvents: EtOAc (141-78-6), water (7732-18-5)
@@ -2453,7 +2453,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12625194
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: DCM (75-09-2)
 - SMILES: O=C1CCCCC1.NC[C@@H](O)Cn1c2ccc(Br)cc2c2cc(Br)ccc21>>O[C@H](CNC1CCCCC1)Cn1c2ccc(Br)cc2c2cc(Br)ccc21
@@ -2461,7 +2461,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12646445
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 83
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -2470,7 +2470,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12652505
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 48
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -2480,7 +2480,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12654290
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: O=CCCCC=O.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>O=C(O)C(F)(F)F.O=C1C[C@@H](N2CCCCC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -2488,7 +2488,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12659846
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC1(C)OCC(=O)CO1.Cc1c(-c2noc(-c3ccc(OC(C)C)c(C#N)c3)n2)ccc2c1CCNC2.Cl>>Cc1c(-c2noc(-c3ccc(OC(C)C)c(C#N)c3)n2)ccc2c1CCN(C1COC(C)(C)OC1)C2
@@ -2496,7 +2496,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12660953
 
 - Type: original_dataset
-- Condition Core: Additive: TFA
+- Condition Core: TFA
 - Yield %: 98
 - Reagents: TFA (76-05-1) [ADDITIVE], 110-51-0 (110-51-0) [UNK]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -2505,7 +2505,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12674702
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 45
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -2523,7 +2523,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12679995
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6)
 - SMILES: CC=O.C[C@@H]1C(=O)NN=C2COc3cc(-c4ccccc4F)c([C@@H]4CCNC[C@@H]4C)cc3N21>>CCN1CC[C@@H](c2cc3c(cc2-c2ccccc2F)OCC2=NNC(=O)[C@@H](C)N23)[C@@H](C)C1.Cl
@@ -2539,7 +2539,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12719058
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 78
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -2549,7 +2549,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12742762
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 87
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EtOH (64-17-5), EDC (107-06-2), water (7732-18-5)
@@ -2558,7 +2558,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12745903
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, 7440-06-4
 - Yield %: 66
 - Reagents: HOAc (64-19-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT], HCl (7647-01-0) [ACID]
@@ -2568,7 +2568,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12754441
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Catalytic System: HOAc
 - Yield %: 68
 - Reagents: Et3N (121-44-8) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -2585,7 +2585,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12780195
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 89
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), water (7732-18-5), EtOAc (141-78-6)
@@ -2594,7 +2594,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12787231
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 68
 - Reagents: Et3N (121-44-8) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -2603,7 +2603,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12796636
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], 546-68-9 (546-68-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5)
 - SMILES: CN.Cl.CC(C)C(=O)Cc1ccccc1>>CNC(Cc1ccccc1)C(C)C
@@ -2619,7 +2619,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12833768
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1ccccc1F.NCCc1cccs1>>Fc1ccccc1C1NCCc2sccc21
@@ -2627,7 +2627,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12853665
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 97
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: THF (109-99-9)
@@ -2636,7 +2636,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12856343
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 15
 - Reagents: HCl (7647-01-0) [ACID], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: Et2O (60-29-7), DCM (75-09-2), HOAc (64-19-7), iPrOH (67-63-0), water (7732-18-5)
@@ -2653,7 +2653,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12858602
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/NaOH/EDCIHCl/LiAlH4
 - Yield %: 67
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), THF (109-99-9), water (7732-18-5)
@@ -2685,7 +2685,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12901919
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/NaOH
 - Catalytic System: 9028-85-7, 9082-71-7
 - Yield %: 83
 - Reagents: 540-69-2 (540-69-2) [UNK], NaOH (1310-73-2) [BASE], 53-84-9 (53-84-9) [UNK], 3483-12-3 (3483-12-3) [UNK], H2SO4 (7664-93-9) [ACID]
@@ -2703,7 +2703,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12932187
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -2712,7 +2712,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12948853
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 91
 - Reagents: 64-18-6 (64-18-6) [UNK], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: water (7732-18-5)
@@ -2721,7 +2721,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12949495
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 41
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -2730,7 +2730,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12962308
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 56
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -2739,7 +2739,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-12989529
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 67
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -2749,7 +2749,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13011032
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 79
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -2758,7 +2758,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13021406
 
 - Type: original_dataset
-- Condition Core: Base: NaOMe
+- Condition Core: NaOMe/NaBH4
 - Yield %: 10
 - Reagents: NaOMe (124-41-4) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -2775,7 +2775,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13033683
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 93
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], 77-92-9 (77-92-9) [UNK]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -2792,7 +2792,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13115580
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 30
 - Reagents: HOAc (64-19-7) [ADDITIVE], 122-51-0 (122-51-0) [UNK], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DMF (68-12-2)
@@ -2809,7 +2809,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1313011
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/NMM
 - Catalytic System: DMAP
 - Yield %: 56
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], NMM (109-02-4) [BASE], 7803-49-8 (7803-49-8) [UNK], HCl (7647-01-0) [ACID]
@@ -2819,7 +2819,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13146339
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 54
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -2828,7 +2828,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13162859
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 84
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -2846,7 +2846,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13198525
 
 - Type: original_dataset
-- Condition Core: Base: Na2CO3
+- Condition Core: Na2CO3/H2
 - Catalytic System: 34068-64-9, 850253-53-1
 - Yield %: 84
 - Reagents: 528-94-9 (528-94-9) [UNK], H2 (1333-74-0) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
@@ -2856,7 +2856,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13201921
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water/NaBH4
 - Yield %: 40
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], water (7732-18-5) [ADDITIVE]
 - Solvents: EtOH (64-17-5)
@@ -2865,7 +2865,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13231487
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 62
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -2874,7 +2874,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13251725
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 65
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -2883,7 +2883,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13289951
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 33
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -2892,7 +2892,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13294291
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 58
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -2901,7 +2901,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13295410
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 91
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -2910,7 +2910,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1330882
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/NaBH4
 - Yield %: 71
 - Reagents: NaOAc (127-09-3) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -2926,7 +2926,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13336869
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: c1cn(CCN2CCNCC2)cn1.COC(=O)C1(COc2ccc(C#Cc3ccc(C=O)cc3)cc2)CCOCC1>>COC(=O)C1(COc2ccc(C#Cc3ccc(CN4CCN(CCn5ccnc5)CC4)cc3)cc2)CCOCC1
@@ -2934,7 +2934,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13337864
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 99
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9), water (7732-18-5)
@@ -2943,7 +2943,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13353726
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/EDCIHCl/LiAlH4
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9)
 - SMILES: O=C(O)c1cc2ccccc2[nH]1.Fc1ccc(C(OCCC2CCNCC2)c2ccc(F)cc2)cc1.O=C(O)C(=O)O>>Fc1ccc(C(OCCC2CCN(Cc3cc4ccccc4[nH]3)CC2)c2ccc(F)cc2)cc1
@@ -2951,7 +2951,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13375553
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: 3087-36-3
 - Yield %: 80
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], 79-14-1 (79-14-1) [UNK], 2836-32-0 (2836-32-0) [UNK]
@@ -2961,7 +2961,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13383278
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 57
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -2970,7 +2970,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1339206
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 98
 - Reagents: 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID], H2 (1333-74-0) [REDUCTANT]
@@ -2980,7 +2980,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13399418
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/EDCIHCl/LiAlH4
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9)
 - SMILES: O=C(O)/C=C/c1cccs1.Fc1ccc(C(OCCC2CCNCC2)c2ccc(F)cc2)cc1.O=C(O)C(=O)O>>Fc1ccc(C(OCCC2CCN(C/C=C/c3cccs3)CC2)c2ccc(F)cc2)cc1
@@ -2995,7 +2995,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13415753
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 55
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -3004,7 +3004,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13428128
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 55
 - Reagents: 7772-99-8 (7772-99-8) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: PhH (71-43-2), MeOH (67-56-1), THF (109-99-9)
@@ -3020,7 +3020,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13448357
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 81
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DMF (68-12-2)
@@ -3037,7 +3037,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13484895
 
 - Type: original_dataset
-- Condition Core: Base: Na2CO3
+- Condition Core: Na2CO3/H2
 - Catalytic System: 34068-64-9, 850253-53-1
 - Yield %: 88
 - Reagents: 528-94-9 (528-94-9) [UNK], H2 (1333-74-0) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
@@ -3047,7 +3047,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13488073
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 63
 - Reagents: NaOH (1310-73-2) [BASE], 25895-60-7 (25895-60-7) [UNK], HOAc (64-19-7) [ADDITIVE]
 - Solvents: MeCN (75-05-8), water (7732-18-5)
@@ -3056,7 +3056,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13503289
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/SodiumChloride
 - Yield %: 74
 - Reagents: 50-99-7 (50-99-7) [UNK], 53-84-9 (53-84-9) [UNK], 54-47-7 (54-47-7) [UNK], 338-69-2 (338-69-2) [UNK], NaOH (1310-73-2) [BASE], 7558-79-4 (7558-79-4) [UNK], HCl (7647-01-0) [ACID], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: water (7732-18-5)
@@ -3065,7 +3065,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13511478
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 51
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -3074,7 +3074,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1352738
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Catalytic System: 9028-85-7, 9082-71-7
 - Yield %: 99
 - Reagents: 540-69-2 (540-69-2) [UNK], NaOH (1310-73-2) [BASE], 53-84-9 (53-84-9) [UNK], 3483-12-3 (3483-12-3) [UNK]
@@ -3084,7 +3084,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13539649
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 85
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -3093,7 +3093,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1355770
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Yield %: 45
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -3102,7 +3102,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13567519
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 61
 - Reagents: 149-73-5 (149-73-5) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: THF (109-99-9), MeOH (67-56-1)
@@ -3119,7 +3119,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13608731
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 28
 - Reagents: 631-61-8 (631-61-8) [UNK], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3136,7 +3136,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13625798
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
 - SMILES: O=C(O)CNC(=O)OCC1c2ccccc2-c2ccccc21.COc1ccc(C(NCCC[C@H](NC(=O)OCC2c3ccccc3-c3ccccc32)C(=O)O)(c2ccccc2)c2ccccc2)cc1.O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21.O=C(N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.O=C(C[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O)NC(c1ccccc1)(c1ccccc1)c1ccccc1.NC(=O)CC[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.CC[C@H](C)[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.O=C(N[C@@H](Cc1cccs1)C(=O)O)OCC1c2ccccc2-c2ccccc21.CC(C)(C)OC(=O)N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O.CC(C)=O>>CC[C@H](C)[C@@H]1NC(=O)[C@H](Cc2cccs2)NC(=O)[C@@H](N)CSSC[C@@H](C(=O)N2CCC[C@H]2C(=O)N[C@@H](CCCNC(C)C)C(=O)NCC(N)=O)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CCC(N)=O)NC1=O
@@ -3144,7 +3144,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1362957
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/water/LiAlH4
 - Yield %: 50
 - Reagents: NaOAc (127-09-3) [BASE], 5470-11-1 (5470-11-1) [UNK], LiAlH4 (16853-85-3) [REDUCTANT], water (7732-18-5) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: EtOH (64-17-5), THF (109-99-9), Et2O (60-29-7)
@@ -3153,7 +3153,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13657003
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 34
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9), water (7732-18-5)
@@ -3162,7 +3162,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1365821
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3/HOAc
 - Yield %: 94
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], K2CO3 (584-08-7) [BASE]
 - Solvents: MeOH (67-56-1), DMF (68-12-2), DCM (75-09-2), water (7732-18-5)
@@ -3171,7 +3171,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13675795
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 70
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), MeOH (67-56-1), water (7732-18-5)
@@ -3180,7 +3180,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13685037
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 67
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -3189,7 +3189,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13691055
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 17
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3198,7 +3198,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13708909
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/NaBH4
 - Yield %: 78
 - Reagents: 546-68-9 (546-68-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT], NH4OH (7664-41-7) [BASE]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -3207,7 +3207,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13713568
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 82
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -3224,7 +3224,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13755888
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/TFA/NaBH4
 - Yield %: 51
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], Et3N (121-44-8) [BASE], TFA (76-05-1) [ADDITIVE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), THF (109-99-9)
@@ -3240,7 +3240,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13761800
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/K2CO3/LiAlH4
 - Catalytic System: DMAP
 - Yield %: 75
 - Reagents: Et3N (121-44-8) [BASE], K2CO3 (584-08-7) [BASE], LiAlH4 (16853-85-3) [REDUCTANT]
@@ -3250,7 +3250,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13762678
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 60
 - Reagents: 7757-82-6 (7757-82-6) [UNK], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: HOAc (64-19-7), water (7732-18-5)
@@ -3259,7 +3259,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13773246
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 46
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -3269,7 +3269,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13804235
 
 - Type: original_dataset
-- Condition Core: Base: Pip
+- Condition Core: Pip
 - Catalytic System: p-TsOH
 - Reagents: Pip (110-89-4) [BASE]
 - Solvents: PhMe (108-88-3), DCM (75-09-2)
@@ -3278,7 +3278,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13815119
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 98
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -3288,7 +3288,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13836352
 
 - Type: original_dataset
-- Condition Core: Base: NaOMe
+- Condition Core: NaOMe/HOAc
 - Yield %: 78
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOMe (124-41-4) [BASE], 124-38-9 (124-38-9) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -3297,7 +3297,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13921058
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaH/LithiumHydroxide/NMM/HOAc/HATU
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaH (7646-69-7) [BASE], LithiumHydroxide (1310-65-2) [BASE], NMM (109-02-4) [BASE], HATU (148893-10-1) [COUPLING_REAGENT]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), Xylenes (1330-20-7), THF (109-99-9), EtOH (64-17-5), water (7732-18-5), DMF (68-12-2)
 - SMILES: CNC1(C(=O)O)CCCC1.CC(C)(C)OC(=O)NC(C)(C=O)c1cc(F)cc(F)c1.CCOC(=O)CBr.Nc1ccc2c(c1)C[C@@]1(C2)C(=O)Nc2ncccc21>>CN1C[C@@](C)(c2cc(F)cc(F)c2)N(CC(=O)Nc2ccc3c(c2)C[C@@]2(C3)C(=O)Nc3ncccc32)C(=O)C12CCCC2
@@ -3305,7 +3305,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13922009
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaH/LithiumHydroxide/NMM/HOAc/HATU
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaH (7646-69-7) [BASE], LithiumHydroxide (1310-65-2) [BASE], NMM (109-02-4) [BASE], HATU (148893-10-1) [COUPLING_REAGENT]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), Xylenes (1330-20-7), THF (109-99-9), EtOH (64-17-5), water (7732-18-5), DMF (68-12-2)
 - SMILES: CNC(C)(C)C(=O)OC.CC(C)(C)OC(=O)NC(C)(C=O)c1cc(F)cc(F)c1.CCOC(=O)CBr.Nc1ccc2c(c1)C[C@@]1(C2)C(=O)Nc2ncccc21>>CN1C[C@@](C)(c2cc(F)cc(F)c2)N(CC(=O)Nc2ccc3c(c2)C[C@@]2(C3)C(=O)Nc3ncccc32)C(=O)C1(C)C.Cl
@@ -3313,7 +3313,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1396411
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/HOAc
 - Yield %: 49
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -3322,7 +3322,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-13964306
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 73
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -3331,7 +3331,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1398028
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: O=CCNCC=O.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>O=C(O)C(F)(F)F.O=C1C[C@@H](N2CCNCC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -3347,7 +3347,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14019995
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 93
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -3356,7 +3356,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14036314
 
 - Type: original_dataset
-- Condition Core: Reductant: H2
+- Condition Core: H2
 - Catalytic System: 7440-06-4
 - Yield %: 46
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -3366,7 +3366,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14043386
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -3375,7 +3375,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1404705
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/NaH/NaBH4
 - Yield %: 59
 - Reagents: DIPEA (7087-68-5) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT], NaH (7646-69-7) [BASE], 77-92-9 (77-92-9) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3384,7 +3384,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14064317
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 4
 - Reagents: Et3N (121-44-8) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5), THF (109-99-9), water (7732-18-5)
@@ -3393,7 +3393,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14066327
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/NaHCO3
 - Yield %: 58
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], 77-92-9 (77-92-9) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5), PhMe (108-88-3)
@@ -3402,7 +3402,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14071131
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 50
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -3411,7 +3411,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1410527
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 28
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -3420,7 +3420,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14107499
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 10
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: water (7732-18-5)
@@ -3437,7 +3437,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14142969
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: O=CCOCC=O.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>O=C(O)C(F)(F)F.O=C1C[C@@H](N2CCOCC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -3445,7 +3445,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-141579
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -3454,7 +3454,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14185963
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 65
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -3463,7 +3463,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14214955
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 43
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -3472,7 +3472,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14217118
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 74
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -3481,7 +3481,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14244855
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/NaOH/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 122-51-0 (122-51-0) [UNK], 25895-60-7 (25895-60-7) [UNK], DIPEA (7087-68-5) [BASE], NaOH (1310-73-2) [BASE]
 - Solvents: DMF (68-12-2), MeCN (75-05-8), 1,4-Dioxane (123-91-1), water (7732-18-5)
 - SMILES: Nc1ccc(C2CCCCC2)cc1.COC(=O)CCNC(=O)c1ccc(C=O)cc1.O=C=Nc1ccc(OC(F)(F)F)cc1>>O=C(O)CCNC(=O)c1ccc(CN(C(=O)Nc2ccc(OC(F)(F)F)cc2)c2ccc(C3CCCCC3)cc2)cc1
@@ -3489,7 +3489,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14289410
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 96
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -3498,7 +3498,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14291890
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 61
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3507,7 +3507,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14292678
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: O=Cc1ccc(Oc2ccc(C(=O)O)cc2)cc1.O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCNCC1>>O=C(O)c1ccc(Oc2ccc(CN3CCC(N4C(=O)N(C5CCCCC5)C[C@H]4c4ccccc4)CC3)cc2)cc1
@@ -3515,7 +3515,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14295508
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 72
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: THF (109-99-9), water (7732-18-5), MeOH (67-56-1)
@@ -3524,7 +3524,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14297788
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/DIPEA
 - Yield %: 81
 - Reagents: DIPEA (7087-68-5) [BASE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: DCM (75-09-2), water (7732-18-5), 107-03-9 (107-03-9)
@@ -3533,7 +3533,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14300639
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NMM/HOAc/TFA/EDCIHCl
 - Yield %: 59
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], Et3N (121-44-8) [BASE], 24424-99-5 (24424-99-5) [UNK], NMM (109-02-4) [BASE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 31938-11-1 (31938-11-1) [UNK], 80029-43-2 (80029-43-2) [UNK], TFA (76-05-1) [ADDITIVE]
 - Solvents: MeOH (67-56-1), water (7732-18-5), 1,4-Dioxane (123-91-1), DMF (68-12-2)
@@ -3542,7 +3542,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14301083
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Et3N
 - Yield %: 37
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), Et2O (60-29-7)
@@ -3551,7 +3551,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14301185
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 94
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -3560,7 +3560,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14311368
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/LiAlH4/NaBH4
 - Yield %: 53
 - Reagents: HOAc (64-19-7) [ADDITIVE], LiAlH4 (16853-85-3) [REDUCTANT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: PhH (71-43-2), Et2O (60-29-7), iPrOH (67-63-0)
@@ -3569,7 +3569,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14317341
 
 - Type: original_dataset
-- Condition Core: Additive: MeOH
+- Condition Core: MeOH
 - Yield %: 86
 - Reagents: 14044-65-6 (14044-65-6) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: THF (109-99-9)
@@ -3578,7 +3578,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14317533
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: Cc1ccc(O)c(C=O)c1.Nc1ccc2c(=O)cc(-c3ccccc3)oc2c1.C=O>>Cc1ccc2c(c1)CN(c1ccc3c(c1)OC(c1ccccc1)CC3=O)CO2
@@ -3586,7 +3586,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14318785
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 86
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3595,7 +3595,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14339093
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)NCCC=O.CCC(N)c1nc2ccsc2c(=O)n1Cc1ccncc1>>CCC(NCCCNC(=O)OC(C)(C)C)c1nc2ccsc2c(=O)n1Cc1ccncc1
@@ -3603,7 +3603,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14360304
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water/NaBH4
 - Yield %: 64
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1), MeCN (75-05-8)
@@ -3612,7 +3612,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14393488
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Py/CDI
 - Reagents: Py (110-86-1) [BASE], HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK], CDI (530-62-1) [COUPLING_REAGENT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), DCM (75-09-2)
 - SMILES: Cl.NOCc1ccccc1.CCOP(=O)(OCC)C(CC=O)c1ccc(Cl)c(Cl)c1.O=CO>>CCOP(=O)(OCC)C(CCN(C=O)OCc1ccccc1)c1ccc(Cl)c(Cl)c1
@@ -3620,7 +3620,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14410571
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Et3N
 - Yield %: 100
 - Reagents: Et3N (121-44-8) [BASE], HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -3629,7 +3629,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14426905
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)N[C@@H](CC=O)c1cccc(F)c1.Cc1ncnc(C)c1C(=O)N1C[C@H]2CNC[C@H]2C1.O=C(O)C(Cc1ccccc1)C(=O)O>>Cc1ncnc(C)c1C(=O)N1C[C@H]2CN(CC[C@H](NC(=O)OC(C)(C)C)c3cccc(F)c3)C[C@H]2C1
@@ -3637,7 +3637,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14433917
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc
 - Yield %: 44
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -3646,7 +3646,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14443725
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Na2CO3
 - Yield %: 100
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK], Na2CO3 (497-19-8) [BASE]
 - Solvents: HOAc (64-19-7), MeCN (75-05-8), water (7732-18-5), 1,4-Dioxane (123-91-1)
@@ -3655,7 +3655,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-144605
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Reagents: H2 (1333-74-0) [REDUCTANT], Lutidine (108-48-5) [BASE], TFA (76-05-1) [ADDITIVE], NaHCO3 (144-55-8) [BASE], 56553-60-7 (56553-60-7) [UNK], 304-59-6 (304-59-6) [UNK]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), DCM (75-09-2), water (7732-18-5), EDC (107-06-2)
@@ -3664,7 +3664,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14489555
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 99
 - Reagents: 109-06-8 (109-06-8) [UNK], 3999-38-0 (3999-38-0) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1)
@@ -3673,7 +3673,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14505958
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3/HOAc
 - Catalytic System: 54-47-7, 55467-49-7
 - Reagents: HOAc (64-19-7) [ADDITIVE], K2CO3 (584-08-7) [BASE], 2627-86-3 (2627-86-3) [UNK], 7778-77-0 (7778-77-0) [UNK]
 - Solvents: PhMe (108-88-3), water (7732-18-5)
@@ -3682,7 +3682,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14513857
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 23
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -3692,7 +3692,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14521000
 
 - Type: original_dataset
-- Condition Core: Additive: LiCl
+- Condition Core: LiCl/NaBH4
 - Yield %: 64
 - Reagents: LiCl (7447-41-8) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -3701,7 +3701,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14528139
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 62
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -3710,7 +3710,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14544407
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/ZnCl2
 - Yield %: 87
 - Reagents: ZnCl2 (7646-85-7) [ADDITIVE], HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3719,7 +3719,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1454580
 
 - Type: original_dataset
-- Condition Core: Base: KOH
+- Condition Core: KOH/LiAlH4
 - Yield %: 33
 - Reagents: LiAlH4 (16853-85-3) [REDUCTANT], KOH (1310-58-3) [BASE]
 - Solvents: Py (110-86-1), THF (109-99-9), water (7732-18-5)
@@ -3728,7 +3728,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1454670
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc
 - Yield %: 70
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -3745,7 +3745,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14585045
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/K2CO3
 - Yield %: 80
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], K2CO3 (584-08-7) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -3754,7 +3754,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14597037
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/Et3N/water/NaBH4
 - Catalytic System: 768-66-1
 - Yield %: 18
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], Et3N (121-44-8) [BASE], water (7732-18-5) [ADDITIVE]
@@ -3764,7 +3764,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14601995
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 38
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -3773,7 +3773,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14624288
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 67
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -3782,7 +3782,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14641095
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/HOAc/DIC
 - Yield %: 60
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaOAc (127-09-3) [BASE], 56553-60-7 (56553-60-7) [UNK], DIC (693-13-0) [COUPLING_REAGENT]
 - Solvents: DCM (75-09-2)
@@ -3791,7 +3791,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14644403
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 54
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3800,7 +3800,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14648069
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc(Cl)cc(Cl)c1O.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>O=c1cc(-c2ccccc2)oc2ccc(N3COc4c(Cl)cc(Cl)cc4C3)cc12
@@ -3808,7 +3808,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14720575
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/NaBH4
 - Yield %: 50
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), water (7732-18-5)
@@ -3832,7 +3832,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14739878
 
 - Type: original_dataset
-- Condition Core: Additive: MeOH
+- Condition Core: MeOH
 - Yield %: 49
 - Reagents: 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: THF (109-99-9)
@@ -3841,7 +3841,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14753890
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 84
 - Reagents: 631-61-8 (631-61-8) [UNK], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -3874,7 +3874,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14793044
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 39
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -3883,7 +3883,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14793378
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 22
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -3893,7 +3893,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14794326
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O.NC(CC=O)CC=O>>NC1CCN([C@@H]2CC(=O)N[C@@H](Cc3c[nH]c4ccccc34)C(=O)N[C@@H](Cc3ccccc3)C(=O)N[C@H](Cc3ccccc3)CNC2=O)CC1.O=C(O)C(F)(F)F
@@ -3901,7 +3901,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14795789
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: DCM (75-09-2)
 - SMILES: CNCC(C)C.O=Cc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1>>CC(C)CN(C)Cc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1
@@ -3917,7 +3917,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14810760
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 69
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -3927,7 +3927,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14818615
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/NaBH4
 - Yield %: 70
 - Reagents: NaOH (1310-73-2) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: water (7732-18-5)
@@ -3936,7 +3936,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14824127
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 75
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -3953,7 +3953,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14850183
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 30
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -3963,7 +3963,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14853728
 
 - Type: original_dataset
-- Condition Core: Additive: LiCl
+- Condition Core: LiCl/NaBH4
 - Reagents: LiCl (7447-41-8) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
 - SMILES: O=Cc1ccccc1.CCCN>>OCc1ccccc1.CCCNCc1ccccc1
@@ -3978,7 +3978,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14859759
 
 - Type: original_dataset
-- Condition Core: Base: KOH
+- Condition Core: KOH/LiAlH4
 - Yield %: 37
 - Reagents: LiAlH4 (16853-85-3) [REDUCTANT], KOH (1310-58-3) [BASE]
 - Solvents: Py (110-86-1), THF (109-99-9), water (7732-18-5)
@@ -4010,7 +4010,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14914750
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/NaBH4
 - Yield %: 97
 - Reagents: H2SO4 (7664-93-9) [ACID], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -4019,7 +4019,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14923202
 
 - Type: original_dataset
-- Condition Core: Base: KOH
+- Condition Core: KOH/HOAc/water
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], 302-01-2 (302-01-2) [UNK], KOH (1310-58-3) [BASE]
 - Solvents: THF (109-99-9), EG (107-21-1)
 - SMILES: COC(=O)Cc1ccc(N)cc1.O=Cc1cccc(-c2c(C(=O)c3ccccc3)cnc3c(C(F)(F)F)cccc23)c1>>O=C(O)Cc1ccc(NCc2cccc(-c3c(Cc4ccccc4)cnc4c(C(F)(F)F)cccc34)c2)cc1
@@ -4027,7 +4027,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14943840
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 12
 - Reagents: Et3N (121-44-8) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4036,7 +4036,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14961792
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1cccc(F)c1.NCCc1cccs1>>Fc1cccc(C2NCCc3sccc32)c1
@@ -4044,7 +4044,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14973236
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 90
 - Time (h): 0.167
 - Reagents: 13762-51-1 (13762-51-1) [UNK], NaHCO3 (144-55-8) [BASE], HCl (7647-01-0) [ACID]
@@ -4054,7 +4054,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14988320
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 54
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -4063,7 +4063,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14989462
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 92
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), EtOH (64-17-5)
@@ -4072,7 +4072,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-14993143
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Reagents: H2 (1333-74-0) [REDUCTANT], Lutidine (108-48-5) [BASE], TFA (76-05-1) [ADDITIVE], NaHCO3 (144-55-8) [BASE], 56553-60-7 (56553-60-7) [UNK], 304-59-6 (304-59-6) [UNK]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), DCM (75-09-2), water (7732-18-5), EDC (107-06-2)
@@ -4088,7 +4088,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15031018
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 84
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1)
@@ -4105,7 +4105,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15061509
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -4123,7 +4123,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15091755
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 47
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -4132,7 +4132,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15106676
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 18
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), Et2O (60-29-7)
@@ -4141,7 +4141,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15122084
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NMM/HOAc/TFA/EDCIHCl
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], Et3N (121-44-8) [BASE], 24424-99-5 (24424-99-5) [UNK], NMM (109-02-4) [BASE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 31938-11-1 (31938-11-1) [UNK], 80029-43-2 (80029-43-2) [UNK], TFA (76-05-1) [ADDITIVE]
 - Solvents: MeOH (67-56-1), water (7732-18-5), 1,4-Dioxane (123-91-1), DMF (68-12-2)
 - SMILES: c1ccc2c3c([nH]c2c1)CNCC3.COC(=O)/C=C/c1ccc(C=O)cc1>>O=C(/C=C/c1ccc(CN2CCc3c([nH]c4ccccc34)C2)cc1)NO
@@ -4149,7 +4149,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15127905
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 70
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -4159,7 +4159,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15156735
 
 - Type: original_dataset
-- Condition Core: Base: NaOMe
+- Condition Core: NaOMe/NaBH4
 - Yield %: 56
 - Reagents: NaOMe (124-41-4) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -4176,7 +4176,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15180412
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 75
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), DCM (75-09-2)
@@ -4185,7 +4185,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15214622
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 62
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -4201,7 +4201,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15237834
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 32
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: DCM (75-09-2)
@@ -4210,7 +4210,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15249572
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 74
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -4226,7 +4226,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15264432
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 85
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1), water (7732-18-5), Et2O (60-29-7)
@@ -4242,7 +4242,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15270549
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: O=C1CCC2(CC1)OCCO2.CC(C)(O)[C@@H](N)c1ccccc1>>CC(C)(O)[C@@H](NC1CCC2(CC1)OCCO2)c1ccccc1
@@ -4250,7 +4250,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15275716
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 48
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -4267,7 +4267,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15333813
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Yield %: 97
 - Reagents: 7487-88-9 (7487-88-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: CHCl3 (67-66-3), MeOH (67-56-1), EtOAc (141-78-6), water (7732-18-5), Et2O (60-29-7)
@@ -4276,7 +4276,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15336257
 
 - Type: original_dataset
-- Condition Core: Base: Na2CO3
+- Condition Core: Na2CO3/H2
 - Catalytic System: 34068-64-9, 850253-53-1
 - Yield %: 83
 - Reagents: 528-94-9 (528-94-9) [UNK], H2 (1333-74-0) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
@@ -4286,7 +4286,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15339505
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water/NaBH4
 - Yield %: 61
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], water (7732-18-5) [ADDITIVE]
 - Solvents: EtOH (64-17-5)
@@ -4303,7 +4303,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15347920
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH
 - Yield %: 94
 - Reagents: 4637-24-5 (4637-24-5) [UNK], NH4OH (1336-21-6) [BASE]
 - Solvents: DMAc (127-19-5), water (7732-18-5)
@@ -4312,7 +4312,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15356337
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/NH4OH/HOAc
 - Yield %: 55
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NH4OH (7664-41-7) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -4321,7 +4321,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15358891
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 55
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: PhH (71-43-2), MeOH (67-56-1), water (7732-18-5)
@@ -4330,7 +4330,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1536727
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -4339,7 +4339,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15368543
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/H2
 - Catalytic System: p-TsOH, 1314-15-4
 - Reagents: H2 (1333-74-0) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: PhH (71-43-2), EtOH (64-17-5), water (7732-18-5)
@@ -4348,7 +4348,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15376146
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 46
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -4357,7 +4357,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15380368
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 77
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -4366,7 +4366,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15384235
 
 - Type: original_dataset
-- Condition Core: Additive: TFA
+- Condition Core: TFA
 - Yield %: 45
 - Reagents: TFA (76-05-1) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: PhH (71-43-2), MeOH (67-56-1)
@@ -4375,7 +4375,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15416416
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 18
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -4384,7 +4384,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15427036
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 24
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -4393,7 +4393,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15432789
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/HOAc
 - Yield %: 58
 - Reagents: DIPEA (7087-68-5) [BASE], 7487-88-9 (7487-88-9) [UNK], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -4402,7 +4402,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15433144
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: HOAc (64-19-7), iPrOH (67-63-0)
 - SMILES: CCOC(=O)C[C@H](N)c1ccc(OC)nc1.CC(C)(C)OC(=O)N(CC=O)CCCC1=CC=C2CCCN=C2N1>>CCOC(=O)C[C@H](NCCN(CCCC1=CC=C2CCCN=C2N1)C(=O)OC(C)(C)C)c1ccc(OC)nc1
@@ -4410,7 +4410,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15436399
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 36
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -4419,7 +4419,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1543875
 
 - Type: original_dataset
-- Condition Core: Additive: SodiumChloride
+- Condition Core: SodiumChloride
 - Catalytic System: p-TsOH
 - Yield %: 36
 - Reagents: 25895-60-7 (25895-60-7) [UNK], SodiumChloride (7647-14-5) [ADDITIVE]
@@ -4429,7 +4429,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15445570
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 59
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), Et2O (60-29-7), EtOAc (141-78-6)
@@ -4438,7 +4438,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15458673
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 65
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -4448,7 +4448,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15460199
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/HOBt/TFA/HOAc/MeOH/EDCIHCl
 - Reagents: Et3N (121-44-8) [BASE], HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], TFA (76-05-1) [ADDITIVE], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: DMF (68-12-2), DCM (75-09-2), THF (109-99-9), water (7732-18-5)
 - SMILES: O=C(O)c1cc(=O)c2cc(Cl)ccc2o1.CC(C)(C)OC(=O)N1CCC(N)CC1.O=Cc1ccc2c(c1)OCO2>>O=C(NC1CCN(Cc2ccc3c(c2)OCO3)CC1)c1cc(=O)c2cc(Cl)ccc2o1
@@ -4456,7 +4456,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15468792
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: NCCCCNc1ccnc2cc(Cl)ccc12.CC(=O)O[C@@H]1CC[C@@]2(C)[C@@H](C1)C[C@@H](OC(C)=O)[C@@H]1[C@@H]2C[C@H](OC(C)=O)[C@]2(C)[C@@H]([C@H](C)CCC=O)CC[C@@H]12>>CC(=O)O[C@@H]1CC[C@@]2(C)[C@@H](C1)C[C@@H](OC(C)=O)[C@@H]1[C@@H]2C[C@H](OC(C)=O)[C@]2(C)[C@@H]([C@H](C)CCCNCCCCNc3ccnc4cc(Cl)ccc34)CC[C@@H]12
@@ -4464,7 +4464,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1547180
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/K2CO3
 - Yield %: 86
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], K2CO3 (584-08-7) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -4473,7 +4473,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-154764
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 56
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -4482,7 +4482,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-15484356
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 32
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -4499,7 +4499,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-155349
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 30
 - Reagents: 631-61-8 (631-61-8) [UNK], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4508,7 +4508,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1558069
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 14
 - Reagents: Et3N (121-44-8) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4517,7 +4517,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1564606
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 95
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -4526,7 +4526,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1569393
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.COc1cc(C=O)c(O)c(OC)c1.C=O>>COc1cc2c(c(OC)c1)OCN(c1ccc3oc(-c4ccccc4)cc(=O)c3c1)C2
@@ -4534,7 +4534,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1585436
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/LiAlH4/NaBH4
 - Yield %: 48
 - Reagents: HOAc (64-19-7) [ADDITIVE], LiAlH4 (16853-85-3) [REDUCTANT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: PhH (71-43-2), Et2O (60-29-7), iPrOH (67-63-0)
@@ -4543,7 +4543,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1593108
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Et3N
 - Yield %: 59
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), Et2O (60-29-7)
@@ -4552,7 +4552,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1595104
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1ccc(F)cc1.NCCc1cccs1>>Fc1ccc(C2NCCc3sccc32)cc1
@@ -4560,7 +4560,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1599473
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1ccccc1O.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>O=c1cc(-c2ccccc2)oc2ccc(N3COc4ccccc4C3)cc12
@@ -4568,7 +4568,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1604315
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Catalytic System: HOAc
 - Yield %: 72
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
@@ -4578,7 +4578,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1629786
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 58
 - Reagents: 64-18-6 (64-18-6) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: water (7732-18-5)
@@ -4595,7 +4595,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1644028
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 50
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1)
@@ -4611,7 +4611,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1666787
 
 - Type: original_dataset
-- Condition Core: Base: NaOMe
+- Condition Core: NaOMe/HOAc
 - Yield %: 80
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaOMe (124-41-4) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4628,7 +4628,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1677880
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: COC1CCNCC1.O=Cc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1>>COC1CCN(Cc2ccc(-c3ccccc3S(=O)(=O)N3CCCC3)cc2)CC1
@@ -4636,7 +4636,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1682394
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O.O=CCC(CC=O)N1CCCCC1>>O=C(O)C(F)(F)F.O=C1C[C@@H](N2CCC(N3CCCCC3)CC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -4651,7 +4651,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1698858
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 42
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -4668,7 +4668,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1714870
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 74
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -4677,7 +4677,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1716516
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 75
 - Reagents: 7757-82-6 (7757-82-6) [UNK], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -4702,7 +4702,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1744836
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 14
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -4711,7 +4711,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1748730
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 73
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -4721,7 +4721,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1768596
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 77
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4746,7 +4746,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18075501
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 96
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4763,7 +4763,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18078923
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Reagents: 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: C=O.Cl.Nc1nc2ccc(S(=O)(=O)C3CCNCC3)cc2s1>>CN1CCC(S(=O)(=O)c2ccc3nc(N)sc3c2)CC1
@@ -4771,7 +4771,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18082971
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
 - SMILES: C=O.CC1(c2cc(F)cc(F)c2)CNC2(CCCC2)C(=O)N1>>CN1C[C@@](C)(c2cc(F)cc(F)c2)NC(=O)C12CCCC2
@@ -4787,7 +4787,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18101207
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/NaOH
 - Yield %: 62
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -4796,7 +4796,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18125558
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 57
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4846,7 +4846,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18184599
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 51
 - Reagents: 50-00-0 (50-00-0) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -4855,7 +4855,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18215619
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Reagents: 64-18-6 (64-18-6) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: water (7732-18-5)
 - SMILES: C=O.O=C(NC(=O)c1cc(N2CCOCC2)ccc1Cl)Nc1nc2ccc(S(=O)(=O)C3CCNCC3)cc2s1>>CN1CCC(S(=O)(=O)c2ccc3nc(NC(=O)NC(=O)c4cc(N5CCOCC5)ccc4Cl)sc3c2)CC1
@@ -4879,7 +4879,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-18246102
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 54
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeCN (75-05-8), THF (109-99-9), water (7732-18-5)
@@ -4888,7 +4888,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1836608
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 52
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -4897,7 +4897,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1838061
 
 - Type: original_dataset
-- Condition Core: Additive: TFA
+- Condition Core: TFA/NaBH4
 - Yield %: 33
 - Reagents: TFA (76-05-1) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4906,16 +4906,16 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1843585
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
-- Reagents: 7719-09-7 (7719-09-7) [UNK], Et3N (121-44-8) [BASE], 75-24-1 (75-24-1) [UNK], MeOH (67-56-1) [ADDITIVE], H2 (1333-74-0) [REDUCTANT]
+- Reagents: SOCl2 (7719-09-7) [COUPLING_REAGENT], Et3N (121-44-8) [BASE], 75-24-1 (75-24-1) [UNK], MeOH (67-56-1) [ADDITIVE], H2 (1333-74-0) [REDUCTANT]
 - Solvents: DMF (68-12-2), THF (109-99-9), EtOAc (141-78-6), DCM (75-09-2), 108-95-2 (108-95-2)
 - SMILES: O=C(O)c1cc2cc([N+](=O)[O-])ccc2o1.COC[C@H]1CCCN1.COC(=O)c1sc(-c2ccc(Cl)cc2)cc1/N=C/N(C)C.O=C(O)/C=C\C(=O)O>>COCC1CCCN1Cc1cc2cc(-n3cnc4cc(-c5ccc(Cl)cc5)sc4c3=O)ccc2o1.O=C(O)/C=C\C(=O)O
 
 ## Reaction 31-313-CAS-186761
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/NaBH4
 - Yield %: 75
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -4924,7 +4924,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1872450
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 90
 - Reagents: NH4OH (7664-41-7) [BASE], H2 (1333-74-0) [REDUCTANT]
@@ -4941,7 +4941,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1897646
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/TFA/NaBH4
 - Yield %: 94
 - Reagents: TFA (76-05-1) [ADDITIVE], NaOH (1310-73-2) [BASE], NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: water (7732-18-5), MeOH (67-56-1)
@@ -4950,7 +4950,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1913206
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: CC(=O)N1CCNCC1.COC(=O)C1(COc2ccc(C#Cc3ccc(C=O)cc3)cc2)CCOCC1>>COC(=O)C1(COc2ccc(C#Cc3ccc(CN4CCN(C(C)=O)CC4)cc3)cc2)CCOCC1
@@ -4958,7 +4958,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1922732
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), 1,4-Dioxane (123-91-1), water (7732-18-5)
 - SMILES: O=Cc1cccc(Oc2ccccc2)c1.CC(C)(C)OC(=O)NC1CCNCC1>>Cl.NC1CCN(Cc2cccc(Oc3ccccc3)c2)CC1
@@ -4974,7 +4974,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1946981
 
 - Type: original_dataset
-- Condition Core: Base: Na2CO3
+- Condition Core: Na2CO3/H2
 - Catalytic System: 34068-64-9, 850253-53-1
 - Yield %: 89
 - Reagents: 528-94-9 (528-94-9) [UNK], H2 (1333-74-0) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
@@ -4984,7 +4984,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1950713
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 76
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -4993,7 +4993,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1953131
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water/NaBH4
 - Yield %: 86
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], water (7732-18-5) [ADDITIVE]
 - Solvents: EtOH (64-17-5)
@@ -5002,7 +5002,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1963313
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Catalytic System: HOAc
 - Yield %: 63
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
@@ -5012,7 +5012,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-19948966
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 45
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EDC (107-06-2), MeOH (67-56-1)
@@ -5021,7 +5021,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-1995257
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 87
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -5030,7 +5030,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2015233
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 60
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), Et2O (60-29-7)
@@ -5039,7 +5039,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2032490
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 48
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -5055,7 +5055,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2057461
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 94
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5064,7 +5064,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2064109
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3
 - Yield %: 90
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -5073,7 +5073,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2064299
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 100
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -5082,7 +5082,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2065572
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 56
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -5092,7 +5092,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2092604
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 95
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -5101,7 +5101,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2093830
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 81
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5110,7 +5110,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-21283429
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/TFA
 - Yield %: 57
 - Reagents: TFA (76-05-1) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EtOH (64-17-5), water (7732-18-5), HOAc (64-19-7)
@@ -5127,7 +5127,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-21283842
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/TFA
 - Yield %: 53
 - Reagents: TFA (76-05-1) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EtOH (64-17-5), water (7732-18-5), HOAc (64-19-7)
@@ -5144,7 +5144,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-21315695
 
 - Type: original_dataset
-- Condition Core: Reductant: H2
+- Condition Core: H2
 - Catalytic System: 12135-22-7
 - Yield %: 90
 - Reagents: H2 (1333-74-0) [REDUCTANT], 124-40-3 (124-40-3) [UNK]
@@ -5162,7 +5162,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2134738
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 68
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -5171,7 +5171,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-21432315
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 56
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -5180,7 +5180,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2145226
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/K2CO3/DIPEA/NaOH/DMAP
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], K2CO3 (584-08-7) [BASE], DMAP (1122-58-3) [ADDITIVE], DIPEA (7087-68-5) [BASE], 7693-46-1 (7693-46-1) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: HOAc (64-19-7), iPrOH (67-63-0), EtOAc (141-78-6), water (7732-18-5), EDC (107-06-2), MeOH (67-56-1)
 - SMILES: CCOC(=O)C[C@H](N)c1ccc(OC)c(F)c1.CC(C)(C)OC(=O)N(CC=O)CCCC1=CC=C2CCCN=C2N1>>COc1ccc([C@H](CC(=O)O)N2CCN(CCCC3=CC=C4CCCN=C4N3)C2=O)cc1F
@@ -5188,7 +5188,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2150807
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 71
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -5197,7 +5197,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2156786
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 19
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -5206,7 +5206,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2157779
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 84
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -5223,7 +5223,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2224454
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/TFA/water
 - Yield %: 95
 - Reagents: TFA (76-05-1) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NaOH (1310-73-2) [BASE]
 - Solvents: EtOAc (141-78-6), water (7732-18-5)
@@ -5232,7 +5232,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2227029
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 78
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -5242,7 +5242,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2230626
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/Na2CO3/HOAc
 - Yield %: 61
 - Reagents: Et3N (121-44-8) [BASE], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], Na2CO3 (497-19-8) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -5251,7 +5251,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2238554
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 60
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -5260,7 +5260,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2241914
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 42
 - Reagents: 25895-60-7 (25895-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5269,7 +5269,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2245186
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 90
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5278,7 +5278,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2249670
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3/HOAc
 - Yield %: 77
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], K2CO3 (584-08-7) [BASE]
 - Solvents: MeCN (75-05-8), water (7732-18-5)
@@ -5287,7 +5287,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2265832
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/H2
 - Catalytic System: 7440-06-4
 - Yield %: 87
 - Reagents: HOAc (64-19-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT]
@@ -5297,7 +5297,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2270705
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -5314,7 +5314,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2316665
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 73
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -5323,7 +5323,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-233998
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/NaBH4
 - Yield %: 63
 - Reagents: 546-68-9 (546-68-9) [UNK], NH4OH (7664-41-7) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -5340,7 +5340,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2359998
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 68
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -5349,7 +5349,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2370393
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 91
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -5358,7 +5358,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2374415
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
 - SMILES: O=C(O)CNC(=O)OCC1c2ccccc2-c2ccccc21.COc1ccc(C(NCCC[C@H](NC(=O)OCC2c3ccccc3-c3ccccc32)C(=O)O)(c2ccccc2)c2ccccc2)cc1.O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21.O=C(N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.O=C(C[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O)NC(c1ccccc1)(c1ccccc1)c1ccccc1.CC[C@H](C)[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.O=C(N[C@@H](Cc1cccs1)C(=O)O)OCC1c2ccccc2-c2ccccc21.CC(C)(C)OC(=O)N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O.CC(C)=O>>CC[C@H](C)[C@@H]1NC(=O)[C@H](Cc2cccs2)NC(=O)[C@@H](N)CSSC[C@@H](C(=O)N2CCC[C@H]2C(=O)N[C@@H](CCCNC(C)C)C(=O)NCC(N)=O)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CC(N)=O)NC1=O
@@ -5366,7 +5366,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-238160
 
 - Type: original_dataset
-- Condition Core: Reductant: LiAlH4
+- Condition Core: LiAlH4
 - Reagents: LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: THF (109-99-9), Et2O (60-29-7)
 - SMILES: CCOC(=O)Cl.CC(C)(C)NS(=O)(=O)c1ccccc1-c1ccc(N)cc1>>CNc1ccc(-c2ccccc2S(=O)(=O)NC(C)(C)C)cc1
@@ -5374,7 +5374,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2391671
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 100
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5383,7 +5383,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2393098
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 80
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9), water (7732-18-5)
@@ -5392,7 +5392,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2395826
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 61
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5), CHCl3 (67-66-3)
@@ -5401,7 +5401,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2404380
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/LiAlH4
 - Yield %: 54
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], LiAlH4 (16853-85-3) [REDUCTANT], 7757-82-6 (7757-82-6) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -5410,7 +5410,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-240469
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 66
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -5426,7 +5426,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2415581
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NMM/NaHCO3/TFA/MeOH/i‑BuOCOCl
 - Reagents: NMM (109-02-4) [BASE], i‑BuOCOCl (543-27-1) [COUPLING_REAGENT], TFA (76-05-1) [ADDITIVE], NaHCO3 (144-55-8) [BASE], 14044-65-6 (14044-65-6) [UNK], MeOH (67-56-1) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: THF (109-99-9), DCM (75-09-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)N[C@@H](C(=O)O)c1cccnc1.NC1CCCCC1>>NC(CNC1CCCCC1)c1cccnc1
@@ -5434,7 +5434,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2420159
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/EDCIHCl/LiAlH4
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9)
 - SMILES: O=C(O)c1cc2ccccc2o1.Fc1ccc(C(OCCC2CCNCC2)c2ccc(F)cc2)cc1.O=C(O)C(=O)O>>Fc1ccc(C(OCCC2CCN(Cc3cc4ccccc4o3)CC2)c2ccc(F)cc2)cc1
@@ -5450,7 +5450,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2426442
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 66
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -5459,7 +5459,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2428022
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 31
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -5468,7 +5468,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2428033
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 78
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5477,7 +5477,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2433810
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc
 - Yield %: 21
 - Reagents: HCl (7647-01-0) [ACID], HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: PhMe (108-88-3), water (7732-18-5), MeOH (67-56-1), Et2O (60-29-7)
@@ -5486,7 +5486,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2457258
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/DIPEA/LithiumHydroxide/water
 - Yield %: 86
 - Reagents: DIPEA (7087-68-5) [BASE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], LithiumHydroxide (1310-65-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: 462-95-3 (462-95-3), MeOH (67-56-1), water (7732-18-5)
@@ -5495,7 +5495,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2463400
 
 - Type: original_dataset
-- Condition Core: Base: LithiumHydroxide
+- Condition Core: LithiumHydroxide/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], LithiumHydroxide (1310-65-2) [BASE]
 - Solvents: DMF (68-12-2), water (7732-18-5), 1,4-Dioxane (123-91-1)
 - SMILES: CC(C)=O.COC(=O)c1c(NS(=O)(=O)c2ccccc2NCC2CCNCC2)ccc2c1CCCC2>>CC(C)N1CCC(CNc2ccccc2S(=O)(=O)Nc2ccc3c(c2C(=O)O)CCCC3)CC1
@@ -5503,7 +5503,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2467948
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 69
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DMF (68-12-2)
@@ -5512,7 +5512,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2476164
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 63
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -5521,7 +5521,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2512938
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 75
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -5531,7 +5531,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2528689
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 63
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -5540,7 +5540,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2532940
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 90
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -5549,7 +5549,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2545396
 
 - Type: original_dataset
-- Condition Core: Base: Na2CO3
+- Condition Core: Na2CO3/H2
 - Catalytic System: 34068-64-9, 850253-53-1
 - Yield %: 95
 - Reagents: 528-94-9 (528-94-9) [UNK], H2 (1333-74-0) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
@@ -5559,7 +5559,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2547010
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], 546-68-9 (546-68-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5)
 - SMILES: CC(=O)CC1CCCCC1.CN.Cl>>CNC(C)CC1CCCCC1
@@ -5567,7 +5567,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-255926
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 75
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -5576,7 +5576,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2583282
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 90
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -5585,7 +5585,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2609489
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeCN (75-05-8), EtOH (64-17-5), iPrOH (67-63-0)
@@ -5602,7 +5602,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2629649
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 88
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -5611,7 +5611,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2639445
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Catalytic System: HOAc
 - Yield %: 94
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
@@ -5628,7 +5628,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-265728
 
 - Type: original_dataset
-- Condition Core: Additive: PivOH
+- Condition Core: PivOH
 - Yield %: 99
 - Reagents: PivOH (75-98-9) [ADDITIVE], 1016558-24-9 (1016558-24-9) [UNK]
 - Solvents: PhMe (108-88-3)
@@ -5637,7 +5637,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2664012
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 80
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), PhMe (108-88-3), water (7732-18-5)
@@ -5646,7 +5646,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2667341
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Catalytic System: HOAc
 - Yield %: 95
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
@@ -5656,7 +5656,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2673126
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 92
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -5665,7 +5665,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2700200
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 67
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -5674,7 +5674,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2700631
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
 - SMILES: O=C(O)CNC(=O)OCC1c2ccccc2-c2ccccc21.COc1ccc(C(NCCC[C@H](NC(=O)OCC2c3ccccc3-c3ccccc32)C(=O)O)(c2ccccc2)c2ccccc2)cc1.O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21.O=C(N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.O=C(C[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O)NC(c1ccccc1)(c1ccccc1)c1ccccc1.CC[C@H](C)[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.O=C(N[C@@H](Cc1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.CC(C)(C)OC(=O)N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O.CC(C)=O>>CC[C@H](C)[C@@H]1NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@@H](N)CSSC[C@@H](C(=O)N2CCC[C@H]2C(=O)N[C@@H](CCCNC(C)C)C(=O)NCC(N)=O)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CC(N)=O)NC1=O
@@ -5682,7 +5682,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2727211
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 47
 - Reagents: 56553-60-7 (56553-60-7) [UNK], HOAc (64-19-7) [ADDITIVE]
 - Solvents: EDC (107-06-2), EtOAc (141-78-6)
@@ -5699,7 +5699,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2766183
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/TFA/HOAc/water
 - Yield %: 66
 - Reagents: TFA (76-05-1) [ADDITIVE], HOAc (64-19-7) [ADDITIVE], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -5708,7 +5708,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2788408
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 8
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeCN (75-05-8), THF (109-99-9), water (7732-18-5)
@@ -5717,7 +5717,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2792434
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 21
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -5726,7 +5726,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2797913
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NH4Cl/NaBH4
 - Yield %: 48
 - Reagents: 1191-15-7 (1191-15-7) [UNK], HCl (7647-01-0) [ACID], NH4Cl (12125-02-9) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: PhMe (108-88-3), Hex (110-54-3), water (7732-18-5), DCM (75-09-2), MeOH (67-56-1)
@@ -5735,7 +5735,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2823875
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 59
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -5744,7 +5744,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2832118
 
 - Type: original_dataset
-- Condition Core: Additive: Zn
+- Condition Core: Zn
 - Reagents: 5470-11-1 (5470-11-1) [UNK], Zn (7440-66-6) [ADDITIVE]
 - Solvents: MeOH (67-56-1), water (7732-18-5), HOAc (64-19-7)
 - SMILES: CC(C)(C)OC(=O)c1ccc(C=O)s1>>CC(C)(C)OC(=O)c1ccc(CN)s1
@@ -5752,15 +5752,15 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2833556
 
 - Type: original_dataset
-- Condition Core: Base: NMM
-- Reagents: 7719-09-7 (7719-09-7) [UNK], 105-58-8 (105-58-8) [UNK], NMM (109-02-4) [BASE], HOBt (2592-95-2) [ADDITIVE]
+- Condition Core: NMM/HOBt/SOCl2
+- Reagents: SOCl2 (7719-09-7) [COUPLING_REAGENT], 105-58-8 (105-58-8) [UNK], NMM (109-02-4) [BASE], HOBt (2592-95-2) [ADDITIVE]
 - Solvents: DMF (68-12-2)
 - SMILES: O=C1c2ccc(Cl)c(F)c2CCc2cc(Br)cnc21.C1CNCCN1.O=C(O)Cc1cc[n+]([O-])cc1>>O=C(Cc1cc[n+]([O-])cc1)N1CCN(C2c3ccc(Cl)c(F)c3CCc3cc(Br)cnc32)CC1
 
 ## Reaction 31-313-CAS-2919838
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 52
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -5769,7 +5769,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2926449
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: p-TsOH
 - Yield %: 64
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -5787,7 +5787,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-297139
 
 - Type: original_dataset
-- Condition Core: Reductant: H2
+- Condition Core: H2
 - Catalytic System: 7440-06-4
 - Yield %: 85
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -5797,7 +5797,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-2977109
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
 - SMILES: O=C(O)CNC(=O)OCC1c2ccccc2-c2ccccc21.COc1ccc(C(NCCC[C@H](NC(=O)OCC2c3ccccc3-c3ccccc32)C(=O)O)(c2ccccc2)c2ccccc2)cc1.O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21.O=C(N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.O=C(C[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O)NC(c1ccccc1)(c1ccccc1)c1ccccc1.NC(=O)CC[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.CC[C@H](C)[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.CC(C)(C)OC(=O)N[C@@H](Cc1ccco1)C(=O)O.CC(C)(C)OC(=O)N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O.CC(C)=O>>CC[C@H](C)[C@@H]1NC(=O)[C@H](Cc2ccco2)NC(=O)[C@@H](N)CSSC[C@@H](C(=O)N2CCC[C@H]2C(=O)N[C@@H](CCCNC(C)C)C(=O)NCC(N)=O)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CCC(N)=O)NC1=O
@@ -5805,7 +5805,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3009762
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 34
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -5814,7 +5814,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3017034
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 79
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -5823,7 +5823,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3025704
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 72
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5832,7 +5832,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3029515
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NMM/HOAc/TFA/EDCIHCl
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], Et3N (121-44-8) [BASE], 24424-99-5 (24424-99-5) [UNK], NMM (109-02-4) [BASE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 31938-11-1 (31938-11-1) [UNK], 80029-43-2 (80029-43-2) [UNK], TFA (76-05-1) [ADDITIVE]
 - Solvents: MeOH (67-56-1), water (7732-18-5), 1,4-Dioxane (123-91-1), DMF (68-12-2)
 - SMILES: NCCOc1ccccc1.COC(=O)/C=C/c1ccc(C=O)cc1>>O=C(/C=C/c1ccc(CNCCOc2ccccc2)cc1)NO
@@ -5848,7 +5848,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3034800
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 76
 - Reagents: 110-51-0 (110-51-0) [UNK], 12408-02-5 (12408-02-5) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), water (7732-18-5)
@@ -5857,15 +5857,15 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3038203
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
-- Reagents: 1191-15-7 (1191-15-7) [UNK], 7719-09-7 (7719-09-7) [UNK], Et3N (121-44-8) [BASE]
+- Condition Core: Et3N/SOCl2
+- Reagents: 1191-15-7 (1191-15-7) [UNK], SOCl2 (7719-09-7) [COUPLING_REAGENT], Et3N (121-44-8) [BASE]
 - Solvents: THF (109-99-9), EtOAc (141-78-6), DCM (75-09-2)
 - SMILES: COC(=O)c1ccc(Cl)nc1.CC(C)(C)NC(=O)[C@@H]1CNCCN1C[C@@H](O)C[C@@H](Cc1ccccc1)C(=O)N[C@H]1c2ccccc2C[C@H]1O>>CC(C)(C)NC(=O)[C@@H]1CN(Cc2ccc(Cl)nc2)CCN1C[C@@H](O)C[C@@H](Cc1ccccc1)C(=O)N[C@H]1c2ccccc2C[C@H]1O
 
 ## Reaction 31-313-CAS-304136
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 62
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), DCM (75-09-2)
@@ -5874,7 +5874,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3048483
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: Nc1ccc2c(=O)cc(-c3ccccc3)oc2c1.COc1cc(C=O)c(O)c(OC)c1.C=O>>COc1cc2c(c(OC)c1)OCN(c1ccc3c(=O)cc(-c4ccccc4)oc3c1)C2
@@ -5882,7 +5882,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3077274
 
 - Type: original_dataset
-- Condition Core: Ni
+- Condition Core: Ni/Nickel
 - Catalytic System: Nickel
 - Yield %: 89
 - Reagents: Al(HCO3)3 (1066-33-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT], 24424-99-5 (24424-99-5) [UNK], NaBH4 (16940-66-2) [REDUCTANT], MeOH (67-56-1) [ADDITIVE], Me2CO (67-64-1) [SOLVENT], HCl (7647-01-0) [ACID], 1037032-40-8 (1037032-40-8) [UNK], NH4OH (7664-41-7) [BASE]
@@ -5892,7 +5892,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3079333
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 75
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -5901,7 +5901,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3080223
 
 - Type: original_dataset
-- Condition Core: Additive: Zn
+- Condition Core: Zn
 - Yield %: 85
 - Reagents: Zn (7440-66-6) [ADDITIVE]
 - Solvents: HOAc (64-19-7)
@@ -5910,8 +5910,8 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3083453
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
-- Catalytic System: 7719-09-7
+- Condition Core: NaHCO3/NaOH/MeOH
+- Catalytic System: SOCl2
 - Yield %: 80
 - Reagents: 25895-60-7 (25895-60-7) [UNK], MeOH (67-56-1) [ADDITIVE], NaHCO3 (144-55-8) [BASE], NaOH (1310-73-2) [BASE]
 - Solvents: MeCN (75-05-8), water (7732-18-5), HOAc (64-19-7), MeOH (67-56-1)
@@ -5928,7 +5928,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3155008
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/water
 - Yield %: 43
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -5937,7 +5937,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3167967
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 47
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -5946,7 +5946,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-320011
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/EDCIHCl/LiAlH4
 - Yield %: 67
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9), Me2CO (67-64-1)
@@ -5955,7 +5955,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3200767
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: CN1CCC(=O)CC1.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>CN1CCC(N[C@@H]2CC(=O)N[C@@H](Cc3c[nH]c4ccccc34)C(=O)N[C@@H](Cc3ccccc3)C(=O)N[C@H](Cc3ccccc3)CNC2=O)CC1.O=C(O)C(F)(F)F
@@ -5963,7 +5963,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-32163
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/HOAc
 - Yield %: 83
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5), Et2O (60-29-7), EtOAc (141-78-6)
@@ -5980,7 +5980,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3239666
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 32
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -5989,7 +5989,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3243842
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 65
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), CHCl3 (67-66-3), water (7732-18-5)
@@ -5998,7 +5998,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3253535
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 73
 - Reagents: HOAc (64-19-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT]
@@ -6008,7 +6008,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3264447
 
 - Type: original_dataset
-- Condition Core: Additive: LiCl
+- Condition Core: LiCl/NaBH4
 - Yield %: 37
 - Reagents: LiCl (7447-41-8) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -6033,7 +6033,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-332195
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 97
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -6042,7 +6042,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3338359
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/water
 - Yield %: 54
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: THF (109-99-9)
@@ -6051,7 +6051,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3341859
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 67
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -6060,7 +6060,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3348171
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 70
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -6069,7 +6069,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3348928
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 36
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -6078,7 +6078,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3358460
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Et3N
 - Yield %: 48
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), Et2O (60-29-7)
@@ -6087,7 +6087,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-336722
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: Cc1ncc(C=O)cn1.C[C@@H]1CNC[C@H]1c1nc(=O)c2cnn(C3CCOCC3)c2[nH]1.Cl>>Cc1ncc(CN2C[C@@H](C)[C@H](c3nc(=O)c4cnn(C5CCOCC5)c4[nH]3)C2)cn1
@@ -6095,7 +6095,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3367523
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: Cc1ccc(O)c(C=O)c1.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>Cc1ccc2c(c1)CN(c1ccc3oc(-c4ccccc4)cc(=O)c3c1)CO2
@@ -6103,7 +6103,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3374675
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/water
 - Yield %: 32
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -6112,7 +6112,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3375233
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 87
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeCN (75-05-8), water (7732-18-5)
@@ -6121,7 +6121,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3381251
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/HOAc
 - Yield %: 46
 - Reagents: Et3N (121-44-8) [BASE], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -6137,7 +6137,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3400990
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/NaHCO3
 - Yield %: 39
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], 77-92-9 (77-92-9) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5), PhMe (108-88-3)
@@ -6146,7 +6146,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-342660
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 29
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -6155,7 +6155,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3431730
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/NaOH
 - Yield %: 40
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE], 537704-27-1 (537704-27-1) [UNK]
 - Solvents: EtOH (64-17-5), water (7732-18-5), MeOH (67-56-1)
@@ -6172,7 +6172,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3473158
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -6181,7 +6181,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3477236
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 50
 - Reagents: NaOH (1310-73-2) [BASE], 5470-11-1 (5470-11-1) [UNK], 7440-23-5 (7440-23-5) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EtOH (64-17-5), water (7732-18-5), n-PrOH (71-23-8), PhMe (108-88-3), iPrOH (67-63-0), THF (109-99-9)
@@ -6190,7 +6190,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3485550
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 83
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -6207,7 +6207,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3500211
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/water/LiAlH4
 - Reagents: NaOAc (127-09-3) [BASE], 5470-11-1 (5470-11-1) [UNK], LiAlH4 (16853-85-3) [REDUCTANT], water (7732-18-5) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: EtOH (64-17-5), THF (109-99-9), Et2O (60-29-7)
 - SMILES: COc1ccc2c(c1)CCC(=O)C2>>COc1ccc2c(c1)CCC(N)C2.Cl
@@ -6215,7 +6215,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3522382
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O.CN(CC=O)CC=O>>CN1CCN([C@@H]2CC(=O)N[C@@H](Cc3c[nH]c4ccccc34)C(=O)N[C@@H](Cc3ccccc3)C(=O)N[C@H](Cc3ccccc3)CNC2=O)CC1.O=C(O)C(F)(F)F
@@ -6223,7 +6223,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-354705
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 74
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), THF (109-99-9), water (7732-18-5)
@@ -6232,7 +6232,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3581689
 
 - Type: original_dataset
-- Condition Core: Additive: LiCl
+- Condition Core: LiCl/NaBH4
 - Yield %: 86
 - Reagents: LiCl (7447-41-8) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -6241,7 +6241,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3589115
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 27
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -6251,7 +6251,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-362606
 
 - Type: original_dataset
-- Condition Core: Base: Pip
+- Condition Core: Pip
 - Catalytic System: p-TsOH
 - Reagents: Pip (110-89-4) [BASE]
 - Solvents: PhMe (108-88-3), DCM (75-09-2)
@@ -6260,7 +6260,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3656926
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 93
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -6269,7 +6269,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3689786
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 86
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -6278,7 +6278,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-36953
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 68
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -6295,7 +6295,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3708735
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: C[C@@H]1CNC[C@H](C)O1.COC(=O)C1(COc2ccc(C#Cc3ccc(C=O)cc3)cc2)CCOCC1>>COC(=O)C1(COc2ccc(C#Cc3ccc(CN4C[C@@H](C)O[C@@H](C)C4)cc3)cc2)CCOCC1
@@ -6303,7 +6303,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3728208
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: NNC(=O)c1ccccc1.O=C1CCN(Cc2ccccc2)CC1>>O=C(NNC1CCN(Cc2ccccc2)CC1)c1ccccc1
@@ -6311,7 +6311,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3731452
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 63
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), EtOH (64-17-5)
@@ -6320,7 +6320,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3750903
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 88
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: PhMe (108-88-3), EtOH (64-17-5)
@@ -6337,7 +6337,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3808082
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3/HOAc
 - Yield %: 36
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], K2CO3 (584-08-7) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -6346,7 +6346,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3811730
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O.O=CCC(CC=O)N1CCOCC1>>O=C(O)C(F)(F)F.O=C1C[C@@H](N2CCC(N3CCOCC3)CC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -6354,7 +6354,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3814015
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Yield %: 75
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -6363,7 +6363,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3815504
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/water
 - Yield %: 63
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: DCM (75-09-2), Et2O (60-29-7), MeOH (67-56-1)
@@ -6372,7 +6372,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-381688
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/H2/LiAlH4
 - Catalytic System: 1314-15-4
 - Yield %: 77
 - Reagents: Et3N (121-44-8) [BASE], H2 (1333-74-0) [REDUCTANT], LiAlH4 (16853-85-3) [REDUCTANT]
@@ -6382,7 +6382,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3817346
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 40
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -6391,7 +6391,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3838614
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/HOAc
 - Yield %: 60
 - Reagents: DIPEA (7087-68-5) [BASE], 7487-88-9 (7487-88-9) [UNK], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -6408,7 +6408,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3867069
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 27
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -6417,7 +6417,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3869395
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 70
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -6427,7 +6427,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3877894
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 42
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -6436,7 +6436,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3893875
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE], H2 (1333-74-0) [REDUCTANT]
 - Solvents: DCM (75-09-2), water (7732-18-5), EtOH (64-17-5)
@@ -6445,7 +6445,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3905905
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 36
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -6470,7 +6470,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-391414
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 88
 - Reagents: HOAc (64-19-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
@@ -6480,7 +6480,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3926726
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 48
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -6489,7 +6489,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3929097
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 92
 - Reagents: 64-18-6 (64-18-6) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: water (7732-18-5)
@@ -6498,7 +6498,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3956048
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/NaBH4
 - Yield %: 45
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: water (7732-18-5)
@@ -6507,7 +6507,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-3999892
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/HOBt/EDCIHCl
 - Yield %: 97
 - Reagents: HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 13292-87-0 (13292-87-0) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
@@ -6516,7 +6516,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4000685
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 98
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -6532,7 +6532,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-402907
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 89
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -6542,7 +6542,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-403823
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 53
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -6551,7 +6551,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4039280
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, water
 - Yield %: 75
 - Solvents: THF (109-99-9)
@@ -6560,7 +6560,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4042075
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), 1,4-Dioxane (123-91-1), water (7732-18-5)
 - SMILES: COc1ccccc1Oc1cccc(C=O)c1.CC(C)(C)OC(=O)NC1CCNCC1>>COc1ccccc1Oc1cccc(CN2CCC(N)CC2)c1.Cl
@@ -6568,7 +6568,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4047149
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/NaOH/Fe
 - Yield %: 3
 - Reagents: H2SO4 (7664-93-9) [ACID], Fe (7439-89-6) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -6577,7 +6577,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4065916
 
 - Type: original_dataset
-- Condition Core: Base: Na2CO3
+- Condition Core: Na2CO3/H2
 - Catalytic System: 34068-64-9, 850253-53-1
 - Yield %: 75
 - Reagents: 528-94-9 (528-94-9) [UNK], H2 (1333-74-0) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
@@ -6587,7 +6587,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4076208
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc/TFA
 - Yield %: 59
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], TFA (76-05-1) [ADDITIVE], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -6596,7 +6596,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-408322
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/NaBH4
 - Yield %: 85
 - Reagents: 546-68-9 (546-68-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: THF (109-99-9), EtOH (64-17-5), water (7732-18-5)
@@ -6613,7 +6613,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4119267
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 21
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -6622,7 +6622,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4120731
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -6639,7 +6639,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4139265
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 48
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -6648,7 +6648,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4154214
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 37
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -6657,7 +6657,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4158098
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 43
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -6681,7 +6681,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4180251
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 15
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -6690,7 +6690,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4182507
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: CC(=O)O[C@@H]1CC[C@@]2(C)[C@@H](C1)C[C@@H](OC(C)=O)[C@@H]1[C@@H]2C[C@H](OC(C)=O)[C@]2(C)[C@@H]([C@H](C)CCC=O)CC[C@@H]12.NCCCCCCNc1ccnc2cc(Cl)ccc12>>CC(=O)O[C@@H]1CC[C@@]2(C)[C@@H](C1)C[C@@H](OC(C)=O)[C@@H]1[C@@H]2C[C@H](OC(C)=O)[C@]2(C)[C@@H]([C@H](C)CCCNCCCCCCNc3ccnc4cc(Cl)ccc34)CC[C@@H]12
@@ -6698,7 +6698,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4183459
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 97
 - Reagents: HOAc (64-19-7) [ADDITIVE], 74-94-2 (74-94-2) [UNK], 7664-38-2 (7664-38-2) [UNK]
 - Solvents: iPrOH (67-63-0), DMSO (67-68-5), water (7732-18-5)
@@ -6715,7 +6715,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4197163
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 86
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), Et2O (60-29-7), EtOAc (141-78-6)
@@ -6724,7 +6724,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4199982
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 42
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -6733,7 +6733,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4202634
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 72
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -6743,7 +6743,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4232430
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 36
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DMF (68-12-2), THF (109-99-9)
@@ -6752,7 +6752,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4241000
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 63
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -6761,7 +6761,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4263774
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/K2CO3/DIPEA/NaOH/DMAP
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], K2CO3 (584-08-7) [BASE], DMAP (1122-58-3) [ADDITIVE], DIPEA (7087-68-5) [BASE], 7693-46-1 (7693-46-1) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: HOAc (64-19-7), iPrOH (67-63-0), EtOAc (141-78-6), water (7732-18-5), EDC (107-06-2), MeOH (67-56-1)
 - SMILES: CCOC(=O)C[C@H](N)c1cccnc1.CC(C)(C)OC(=O)N(CC=O)CCCC1=CC=C2CCCN=C2N1>>O=C(O)C[C@@H](c1cccnc1)N1CCN(CCCC2=CC=C3CCCN=C3N2)C1=O
@@ -6769,7 +6769,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4282666
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1cccc(C(F)(F)F)c1.NCCc1cccs1>>FC(F)(F)c1cccc(C2NCCc3sccc32)c1
@@ -6777,7 +6777,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4297620
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: CC(C)N1CCNCC1.COC(=O)C1(COc2ccc(C#Cc3ccc(C=O)cc3)cc2)CCOCC1>>COC(=O)C1(COc2ccc(C#Cc3ccc(CN4CCN(C(C)C)CC4)cc3)cc2)CCOCC1
@@ -6785,7 +6785,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4304664
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/HOBt/EDCIHCl
 - Yield %: 91
 - Reagents: HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 13292-87-0 (13292-87-0) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
@@ -6794,7 +6794,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4306203
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, water
 - Yield %: 83
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -6804,7 +6804,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4307698
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: HOAc
 - Yield %: 43
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -6814,7 +6814,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4332688
 
 - Type: original_dataset
-- Condition Core: Ni
+- Condition Core: Ni/Nickel
 - Catalytic System: Nickel
 - Reagents: H2 (1333-74-0) [REDUCTANT], NH4OH (7664-41-7) [BASE]
 - Solvents: MeOH (67-56-1)
@@ -6823,7 +6823,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4359094
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 82
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -6840,7 +6840,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4404463
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -6857,7 +6857,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4412886
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC1(C)OCC(=O)CO1.CC(C)Oc1ccc(-c2nc(-c3ccc4c(c3)CCNCC4)no2)cc1C#N.Cl>>CC(C)Oc1ccc(-c2nc(-c3ccc4c(c3)CCN(C3COC(C)(C)OC3)CC4)no2)cc1C#N
@@ -6865,7 +6865,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4429850
 
 - Type: original_dataset
-- Condition Core: Additive: MeOH
+- Condition Core: MeOH
 - Yield %: 89
 - Reagents: 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: DCM (75-09-2)
@@ -6874,7 +6874,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4438036
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 85
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -6883,7 +6883,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4454699
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 46
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), Et2O (60-29-7)
@@ -6892,7 +6892,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4466240
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 50
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -6909,7 +6909,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4476008
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), DCM (75-09-2), 1,4-Dioxane (123-91-1)
 - SMILES: O=Cc1cccc2ccccc12.COc1ccc(CN)cc1>>COc1ccc(CNCc2cccc3ccccc23)cc1.Cl
@@ -6917,7 +6917,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4488683
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 60
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -6926,7 +6926,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4526334
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 100
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -6935,7 +6935,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4528480
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/EDCIHCl/H2
 - Catalytic System: 1314-15-4, HOAc
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2 (1333-74-0) [REDUCTANT], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeCN (75-05-8), HOAc (64-19-7), DCM (75-09-2), Et2O (60-29-7)
@@ -6944,7 +6944,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4537411
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3/HOAc
 - Yield %: 85
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], K2CO3 (584-08-7) [BASE]
 - Solvents: MeCN (75-05-8), water (7732-18-5)
@@ -6953,7 +6953,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4547837
 
 - Type: original_dataset
-- Condition Core: Base: NaH
+- Condition Core: NaH/NH4Cl
 - Reagents: NaH (7646-69-7) [BASE], NH4Cl (12125-02-9) [ADDITIVE]
 - Solvents: THF (109-99-9), DMF (68-12-2), water (7732-18-5)
 - SMILES: Cc1ccccc1CCNC(=O)OC(C)(C)C.CI>>CNCCc1ccccc1C.Cl
@@ -6961,7 +6961,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4548361
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: CN(C)CC1CNCCO1.COC(=O)C1(COc2ccc(C#Cc3ccc(C=O)cc3)cc2)CCOCC1>>COC(=O)C1(COc2ccc(C#Cc3ccc(CN4CCOC(CN(C)C)C4)cc3)cc2)CCOCC1
@@ -6969,7 +6969,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4559457
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/HOAc
 - Yield %: 85
 - Reagents: NaOH (1310-73-2) [BASE], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: water (7732-18-5), THF (109-99-9)
@@ -6978,7 +6978,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4567467
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 80
 - Reagents: 540-69-2 (540-69-2) [UNK]
@@ -6995,7 +6995,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4623504
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 15
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -7004,7 +7004,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4643713
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 49
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -7014,7 +7014,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4653290
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 33
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), THF (109-99-9), water (7732-18-5)
@@ -7023,7 +7023,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4653962
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 50
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9)
@@ -7040,7 +7040,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4667870
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 55
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -7050,7 +7050,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4692172
 
 - Type: original_dataset
-- Condition Core: Additive: ZnCl2
+- Condition Core: ZnCl2
 - Yield %: 72
 - Reagents: ZnCl2 (7646-85-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -7059,7 +7059,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4705573
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 75
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeCN (75-05-8), EtOH (64-17-5), iPrOH (67-63-0)
@@ -7068,7 +7068,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-472217
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 83
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -7084,7 +7084,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4758356
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 65
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -7093,7 +7093,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-476339
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 97
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], H2 (1333-74-0) [REDUCTANT]
@@ -7111,7 +7111,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4827037
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 50
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -7120,7 +7120,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4832375
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/Na2CO3/NaBH4
 - Yield %: 72
 - Reagents: NaOH (1310-73-2) [BASE], NaBH4 (16940-66-2) [REDUCTANT], Na2CO3 (497-19-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5), THF (109-99-9)
@@ -7137,7 +7137,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4843701
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Et3N/Na2CO3/BOP
 - Yield %: 80
 - Reagents: Et3N (121-44-8) [BASE], BOP (56602-33-6) [COUPLING_REAGENT], 13292-87-0 (13292-87-0) [UNK], HCl (7647-01-0) [ACID], Na2CO3 (497-19-8) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -7146,7 +7146,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4846886
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 74
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -7155,7 +7155,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-485343
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 100
 - Reagents: Et3N (121-44-8) [BASE]
 - Solvents: DCM (75-09-2)
@@ -7164,7 +7164,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4858576
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/TFA
 - Reagents: TFA (76-05-1) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC#CC(=O)CN(CCNC(=O)OC(C)(C)C)C(=O)OCc1ccccc1>>CC#CC1CN(C(=O)OCc2ccccc2)CCN1
@@ -7172,7 +7172,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-488575
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 51
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -7181,7 +7181,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4890947
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 83
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -7190,7 +7190,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4899987
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 19
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -7199,7 +7199,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4908020
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 75
 - Reagents: NaOH (1310-73-2) [BASE], H2 (1333-74-0) [REDUCTANT]
@@ -7209,7 +7209,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4927608
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/TFA
 - Yield %: 100
 - Reagents: HCl (7647-01-0) [ACID], TFA (76-05-1) [ADDITIVE], 7337-45-3 (7337-45-3) [UNK]
 - Solvents: MeOH (67-56-1), DMF (68-12-2), DCM (75-09-2), MeCN (75-05-8), EtOAc (141-78-6)
@@ -7226,7 +7226,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-4984762
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 46
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -7235,7 +7235,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5026279
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: p-TsOH
 - Yield %: 67
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -7245,7 +7245,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5027081
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 46
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeCN (75-05-8), EtOH (64-17-5), iPrOH (67-63-0)
@@ -7254,7 +7254,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5030338
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 24
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -7263,7 +7263,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5039828
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 59
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -7272,7 +7272,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5053374
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 76
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EDC (107-06-2), MeOH (67-56-1)
@@ -7306,7 +7306,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5130588
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: CC(C)(C)OC(=O)N1CCC(=O)CC1.CC(C)(C)NC[C@H](N)c1ccccc1>>CC(C)(C)NC[C@H](NC1CCN(C(=O)OC(C)(C)C)CC1)c1ccccc1
@@ -7322,7 +7322,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5132227
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 79
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -7331,7 +7331,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5151002
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 27
 - Reagents: 631-61-8 (631-61-8) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -7340,7 +7340,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5151882
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 84
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -7356,7 +7356,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5163774
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 96
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -7365,7 +7365,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5171248
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 78
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -7374,7 +7374,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5181436
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 18
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -7383,7 +7383,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5188636
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 45
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -7392,7 +7392,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5229344
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 78
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), EtOH (64-17-5)
@@ -7417,7 +7417,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5288920
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 90
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -7426,7 +7426,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5312234
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/K2CO3/HOAc
 - Yield %: 51
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID], K2CO3 (584-08-7) [BASE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DMF (68-12-2)
@@ -7435,7 +7435,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5330285
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 67
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -7444,7 +7444,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5340716
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 97
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -7453,7 +7453,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5366687
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 81
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -7462,7 +7462,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-537529
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 54
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -7471,7 +7471,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5377419
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/MeOH
 - Yield %: 49
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -7480,7 +7480,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5432574
 
 - Type: original_dataset
-- Condition Core: Base: KOH
+- Condition Core: KOH/LiAlH4
 - Yield %: 35
 - Reagents: LiAlH4 (16853-85-3) [REDUCTANT], KOH (1310-58-3) [BASE]
 - Solvents: Py (110-86-1), THF (109-99-9), water (7732-18-5)
@@ -7489,7 +7489,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5434916
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 62
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOAc (141-78-6), water (7732-18-5)
@@ -7498,7 +7498,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5442442
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/H2
 - Catalytic System: 7440-06-4
 - Yield %: 61
 - Reagents: 546-68-9 (546-68-9) [UNK], H2 (1333-74-0) [REDUCTANT], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
@@ -7508,7 +7508,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5445740
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 34
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -7518,7 +7518,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5452685
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Yield %: 80
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -7527,7 +7527,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-545708
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 37
 - Reagents: 7757-82-6 (7757-82-6) [UNK], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: HOAc (64-19-7), water (7732-18-5)
@@ -7536,7 +7536,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5466255
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 60
 - Reagents: HOAc (64-19-7) [ADDITIVE], 3999-38-0 (3999-38-0) [UNK]
 - Solvents: water (7732-18-5)
@@ -7545,7 +7545,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-546879
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 34
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), Et2O (60-29-7)
@@ -7554,7 +7554,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5470389
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 83
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9)
@@ -7563,7 +7563,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5470537
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 99
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -7572,7 +7572,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5481015
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 79
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -7581,7 +7581,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-548660
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 26
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -7590,7 +7590,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5491132
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3/TFA
 - Yield %: 99
 - Reagents: TFA (76-05-1) [ADDITIVE], Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), THF (109-99-9)
@@ -7599,7 +7599,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5494403
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: Cc1cccc(C=O)c1O.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>Cc1cccc2c1OCN(c1ccc3oc(-c4ccccc4)cc(=O)c3c1)C2
@@ -7607,7 +7607,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5506562
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 66
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -7616,7 +7616,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5513288
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 48
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeCN (75-05-8), EtOH (64-17-5), iPrOH (67-63-0)
@@ -7625,7 +7625,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5521394
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 83
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: TFA (76-05-1)
@@ -7634,7 +7634,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5582602
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 63
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -7643,7 +7643,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5604936
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 68
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -7652,7 +7652,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5629312
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/water/LiAlH4
 - Reagents: NaOAc (127-09-3) [BASE], 5470-11-1 (5470-11-1) [UNK], LiAlH4 (16853-85-3) [REDUCTANT], water (7732-18-5) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: EtOH (64-17-5), THF (109-99-9), Et2O (60-29-7)
 - SMILES: COc1ccc2c(c1)CC(=O)CC2>>COc1ccc2c(c1)CC(N)CC2.Cl
@@ -7660,7 +7660,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5629528
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -7669,7 +7669,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5630957
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/DIPEA/LithiumHydroxide/TFA/HOAc/HATU
 - Reagents: DIPEA (7087-68-5) [BASE], HATU (148893-10-1) [COUPLING_REAGENT], TFA (76-05-1) [ADDITIVE], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], LithiumHydroxide (1310-65-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: DMF (68-12-2), DCM (75-09-2), MeOH (67-56-1), PhMe (108-88-3), THF (109-99-9), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)N1CC[C@@H](C(=O)O)C1.Nc1ccc(O)c(Cl)c1.CCOC(=O)C=O.CC(=O)c1ccc(N2CCNCC2)cc1>>CC(=O)c1ccc(N2CCN(C(=O)CN3CC[C@@H](C(=O)Nc4ccc(O)c(Cl)c4)C3)CC2)cc1
@@ -7677,7 +7677,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5655561
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 67
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -7694,7 +7694,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5664792
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: CC(=O)N(CC=O)CC=O.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>CC(=O)N1CCN([C@@H]2CC(=O)N[C@@H](Cc3c[nH]c4ccccc34)C(=O)N[C@@H](Cc3ccccc3)C(=O)N[C@H](Cc3ccccc3)CNC2=O)CC1.O=C(O)C(F)(F)F
@@ -7702,7 +7702,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5667701
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: NC1CCOCC1.O=Cc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1>>O=S(=O)(c1ccccc1-c1ccc(CNC2CCOCC2)cc1)N1CCCC1
@@ -7718,7 +7718,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5692579
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 38
 - Reagents: HCl (7647-01-0) [ACID], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), water (7732-18-5)
@@ -7727,7 +7727,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5692884
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/NaH/NaBH4
 - Yield %: 73
 - Reagents: DIPEA (7087-68-5) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT], NaH (7646-69-7) [BASE], 77-92-9 (77-92-9) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -7736,7 +7736,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5742574
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 90
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -7745,7 +7745,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5750084
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/NH4Cl
 - Catalytic System: 20816-12-0
 - Yield %: 35
 - Time (h): 4.0
@@ -7756,7 +7756,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-575169
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaOH/HOAc
 - Yield %: 80
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -7765,7 +7765,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5760037
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 79
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -7774,7 +7774,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5762555
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: O=Cc1ccc(Oc2ccccc2)cc1.O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCNCC1>>O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCN(Cc2ccc(Oc3ccccc3)cc2)CC1
@@ -7782,7 +7782,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5780410
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Et3N
 - Yield %: 44
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), Et2O (60-29-7)
@@ -7791,7 +7791,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5786092
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAt
 - Yield %: 40
 - Reagents: 1892-57-5 (1892-57-5) [UNK], HOAt (39968-33-7) [ADDITIVE], 13283-31-3 (13283-31-3) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
@@ -7800,7 +7800,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5789889
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc(Br)ccc1O.Nc1ccc2c(=O)cc(-c3ccccc3)oc2c1.C=O>>O=c1cc(-c2ccccc2)oc2cc(N3COc4ccc(Br)cc4C3)ccc12
@@ -7816,7 +7816,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5810197
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)NCCC=O.CCC(N)c1nc2ccsc2c(=O)n1CC1CC1>>CCC(NCCCNC(=O)OC(C)(C)C)c1nc2ccsc2c(=O)n1CC1CC1
@@ -7832,7 +7832,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5839755
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Catalytic System: p-TsOH
 - Yield %: 56
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
@@ -7842,7 +7842,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5848816
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: 6192-52-5
 - Yield %: 74
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -7852,7 +7852,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5868951
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 62
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), Et2O (60-29-7), EtOAc (141-78-6)
@@ -7861,7 +7861,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5897263
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 62
 - Reagents: HOAc (64-19-7) [ADDITIVE], 7757-82-6 (7757-82-6) [UNK], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -7870,7 +7870,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5903588
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Yield %: 67
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: PhMe (108-88-3), EtOH (64-17-5), water (7732-18-5)
@@ -7895,7 +7895,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5942874
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/TFA
 - Reagents: TFA (76-05-1) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: COc1ccc(COC(=O)N[C@H](CCC(=O)Cc2ccc([N+](=O)[O-])cc2)[C@H](O[Si](C)(C)C(C)(C)C)c2cccc(Cl)c2)cc1>>CC(C)(C)[Si](C)(C)O[C@H](c1cccc(Cl)c1)[C@H]1CC[C@@H](Cc2ccc([N+](=O)[O-])cc2)N1.CC(C)(C)[Si](C)(C)O[C@H](c1cccc(Cl)c1)[C@H]1CC[C@H](Cc2ccc([N+](=O)[O-])cc2)N1
@@ -7903,7 +7903,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5955037
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: O=C1CCSCC1.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>O=C(O)C(F)(F)F.O=C1C[C@@H](NC2CCSCC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -7911,7 +7911,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-5965566
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC1(CN)COC1.O=Cc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1>>CC1(CNCc2ccc(-c3ccccc3S(=O)(=O)N3CCCC3)cc2)COC1
@@ -7926,7 +7926,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6006702
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 54
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -7936,7 +7936,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6015492
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 82
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -7945,7 +7945,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6020160
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 68
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeCN (75-05-8)
@@ -7962,7 +7962,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6052105
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 80
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -7972,7 +7972,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-606539
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 85
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -7981,7 +7981,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6103048
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EtOH (64-17-5), THF (109-99-9)
 - SMILES: CN.O=C[C@H]([C@@H](O)C1CCCCC1)N1C(=O)c2ccccc2C1=O>>CNC[C@H]([C@@H](O)C1CCCCC1)N1C(=O)c2ccccc2C1=O
@@ -7989,7 +7989,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-610566
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3/NaBH4
 - Yield %: 80
 - Reagents: Et3N (121-44-8) [BASE], 7487-88-9 (7487-88-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -7998,7 +7998,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6109422
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 90
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -8007,7 +8007,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6111533
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 64
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -8016,7 +8016,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-614317
 
 - Type: original_dataset
-- Condition Core: Reductant: H2
+- Condition Core: H2
 - Catalytic System: 7440-06-4
 - Yield %: 53
 - Reagents: 546-68-9 (546-68-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -8026,7 +8026,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6152247
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: THF (109-99-9)
 - SMILES: C1CCNCC1.O=CCCN1CCC2(C=Cc3ccccc32)CC1>>C1=CC2(CCN(CCCN3CCCCC3)CC2)c2ccccc21
@@ -8034,7 +8034,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6152421
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 98
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -8043,7 +8043,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6166496
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/HOAc
 - Yield %: 50
 - Reagents: HOAc (64-19-7) [ADDITIVE], Et3N (121-44-8) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -8052,7 +8052,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6175126
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: EDC (107-06-2), 1,4-Dioxane (123-91-1), water (7732-18-5)
 - SMILES: O=Cc1cccc(Oc2ccccc2Cl)c1.CC(C)(C)OC(=O)NC1CCNCC1>>Cl.NC1CCN(Cc2cccc(Oc3ccccc3Cl)c2)CC1
@@ -8060,7 +8060,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6185947
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 100
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8069,7 +8069,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-618803
 
 - Type: original_dataset
-- Condition Core: Base: Na2CO3
+- Condition Core: Na2CO3/NaHCO3
 - Yield %: 88
 - Reagents: Na2CO3 (497-19-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -8078,7 +8078,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6189705
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 96
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8095,7 +8095,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6214639
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 84
 - Reagents: HOAc (64-19-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT], NaOH (1310-73-2) [BASE], 7440-44-0 (7440-44-0) [UNK]
@@ -8105,7 +8105,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-622686
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 90
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8114,7 +8114,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6228532
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Et3N/HOAc
 - Yield %: 67
 - Reagents: HCl (7647-01-0) [ACID], Et3N (121-44-8) [BASE], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -8123,7 +8123,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6259382
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -8132,7 +8132,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6277192
 
 - Type: original_dataset
-- Condition Core: Base: Pip
+- Condition Core: Pip
 - Yield %: 56
 - Reagents: Pip (110-89-4) [BASE]
 - Solvents: 1,4-Dioxane (123-91-1)
@@ -8141,7 +8141,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6284377
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: DCM (75-09-2)
 - SMILES: NC1CCCC1.CC(C)N(C)S(=O)(=O)c1ccccc1-c1ccc(C=O)cc1>>CC(C)N(C)S(=O)(=O)c1ccccc1-c1ccc(CNC2CCCC2)cc1
@@ -8149,7 +8149,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6303490
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/water
 - Yield %: 80
 - Reagents: 56553-60-7 (56553-60-7) [UNK], Et3N (121-44-8) [BASE], water (7732-18-5) [ADDITIVE]
 - Solvents: EDC (107-06-2)
@@ -8174,7 +8174,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6324316
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 56
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -8184,7 +8184,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6331685
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 49
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -8200,7 +8200,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6352069
 
 - Type: original_dataset
-- Condition Core: Additive: Zn
+- Condition Core: Zn
 - Yield %: 62
 - Reagents: 513-77-9 (513-77-9) [UNK], 5470-11-1 (5470-11-1) [UNK], Zn (7440-66-6) [ADDITIVE]
 - Solvents: MeOH (67-56-1), HOAc (64-19-7)
@@ -8209,7 +8209,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6352615
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/HOAc
 - Yield %: 46
 - Reagents: HOAc (64-19-7) [ADDITIVE], DIPEA (7087-68-5) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -8218,7 +8218,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6354251
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 100
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8227,7 +8227,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6390440
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Catalytic System: HOAc
 - Reagents: 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: DCM (75-09-2), Et2O (60-29-7)
@@ -8236,7 +8236,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6417586
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 55
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -8254,7 +8254,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6434210
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1ccc(C(F)(F)F)cc1.NCCc1cccs1>>FC(F)(F)c1ccc(C2NCCc3sccc32)cc1
@@ -8262,7 +8262,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6441768
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 51
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -8271,7 +8271,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6442505
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: C1CN(CCN2CCOCC2)CCN1.COC(=O)C1(COc2ccc(C#Cc3ccc(C=O)cc3)cc2)CCOCC1>>COC(=O)C1(COc2ccc(C#Cc3ccc(CN4CCN(CCN5CCOCC5)CC4)cc3)cc2)CCOCC1
@@ -8279,7 +8279,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6457410
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/HOBt/EDCIHCl
 - Yield %: 94
 - Reagents: HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 13292-87-0 (13292-87-0) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
@@ -8288,7 +8288,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-646544
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 17
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8297,7 +8297,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6466572
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Catalytic System: HOAc
 - Yield %: 42
 - Reagents: Et3N (121-44-8) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
@@ -8307,7 +8307,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6466853
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 52
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), EtOH (64-17-5)
@@ -8324,7 +8324,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6496644
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 79
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -8333,7 +8333,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6521703
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 95
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8350,7 +8350,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6541508
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -8367,7 +8367,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-654585
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeCN (75-05-8), THF (109-99-9), water (7732-18-5)
@@ -8376,7 +8376,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6577671
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 69
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -8394,7 +8394,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6605794
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/water/NaBH4
 - Yield %: 24
 - Reagents: H2SO4 (7664-93-9) [ACID], NaBH4 (16940-66-2) [REDUCTANT], water (7732-18-5) [ADDITIVE]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1)
@@ -8403,7 +8403,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6617591
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 45
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -8412,7 +8412,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6622474
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 87
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -8421,7 +8421,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6639077
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 100
 - Reagents: HCl (7647-01-0) [ACID], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5), EtOH (64-17-5)
@@ -8430,7 +8430,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6660914
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/MeOH
 - Yield %: 81
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -8439,7 +8439,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6661682
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 7
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9), water (7732-18-5)
@@ -8448,7 +8448,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6680261
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 78
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8473,7 +8473,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-673747
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/SodiumChloride
 - Yield %: 88
 - Reagents: Pent (109-66-0) [SOLVENT], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -8482,7 +8482,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6744751
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 74
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6)
@@ -8491,7 +8491,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6760736
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/H2
 - Catalytic System: 7440-06-4
 - Yield %: 100
 - Reagents: HCl (7647-01-0) [ACID], H2 (1333-74-0) [REDUCTANT]
@@ -8501,7 +8501,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6771844
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: NMP (872-50-4)
 - SMILES: O=Cc1cccc(O)c1.CC(C)OC(=O)c1ccc(NC(=O)N[C@@H](Cc2ccc(OC(C)(C)C)cc2)C(=O)N[C@H]2CCCNC2)cc1>>CC(C)OC(=O)c1ccc(NC(=O)N[C@@H](Cc2ccc(OC(C)(C)C)cc2)C(=O)N[C@H]2CCCN(Cc3cccc(O)c3)C2)cc1
@@ -8509,7 +8509,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6773420
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 87
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -8519,7 +8519,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6788272
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 71
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -8528,7 +8528,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6790064
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 38
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), THF (109-99-9), water (7732-18-5)
@@ -8537,7 +8537,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6800210
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA
 - Yield %: 90
 - Reagents: DIPEA (7087-68-5) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -8546,7 +8546,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6826125
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 90
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -8555,7 +8555,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6857283
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 78
 - Time (h): 3.0
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
@@ -8565,7 +8565,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6881142
 
 - Type: original_dataset
-- Condition Core: Base: NMM
+- Condition Core: NMM/Py/EDCIHCl
 - Yield %: 46
 - Reagents: NMM (109-02-4) [BASE], 7487-88-9 (7487-88-9) [UNK], 25895-60-7 (25895-60-7) [UNK], Py (110-86-1) [BASE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), water (7732-18-5)
@@ -8574,7 +8574,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6897972
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 26
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -8583,7 +8583,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6924580
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaH/LithiumHydroxide/NMM/HOAc/HATU
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaH (7646-69-7) [BASE], LithiumHydroxide (1310-65-2) [BASE], NMM (109-02-4) [BASE], HATU (148893-10-1) [COUPLING_REAGENT]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), Xylenes (1330-20-7), THF (109-99-9), EtOH (64-17-5), water (7732-18-5), DMF (68-12-2)
 - SMILES: CNC1(C(=O)O)CCCC1.CC(C)(C)OC(=O)NC(C)(C=O)c1cc(F)cc(F)c1.CCOC(=O)CBr.Nc1cnc2c(c1)C[C@@]1(C2)C(=O)Nc2ncccc21>>CN1C[C@@](C)(c2cc(F)cc(F)c2)N(CC(=O)Nc2cnc3c(c2)C[C@@]2(C3)C(=O)Nc3ncccc32)C(=O)C12CCCC2
@@ -8591,7 +8591,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6937242
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Catalytic System: HOAc
 - Yield %: 95
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
@@ -8601,7 +8601,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6968991
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/EDCIHCl/LiAlH4
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9)
 - SMILES: O=C(O)c1cc2ccccc2s1.Fc1ccc(C(OCCC2CCNCC2)c2ccc(F)cc2)cc1.O=C(O)C(=O)O>>Fc1ccc(C(OCCC2CCN(Cc3cc4ccccc4s3)CC2)c2ccc(F)cc2)cc1
@@ -8609,7 +8609,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6971593
 
 - Type: original_dataset
-- Condition Core: Base: DBU
+- Condition Core: DBU/NH4OH/NH4Cl/DPPA/LiAlH4
 - Reagents: LiAlH4 (16853-85-3) [REDUCTANT], NH4Cl (12125-02-9) [ADDITIVE], DPPA (26386-88-9) [COUPLING_REAGENT], DBU (6674-22-2) [BASE], PPh3 (603-35-0) [LIGAND], NH4OH (1336-21-6) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5)
 - SMILES: CC(=O)c1ccc2nccn2c1>>CC(N)c1ccc2nccn2c1
@@ -8617,7 +8617,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-697890
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: CC(C)(C)OC(=O)N1CCNCC1.O=Cc1cc2nc(Cl)nc(N3CCOCC3)c2s1>>CC(C)(C)OC(=O)N1CCN(Cc2cc3nc(Cl)nc(N4CCOCC4)c3s2)CC1
@@ -8625,7 +8625,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-6981559
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 37
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -8650,7 +8650,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7044597
 
 - Type: original_dataset
-- Condition Core: Base: K2CO3
+- Condition Core: K2CO3
 - Yield %: 40
 - Reagents: K2CO3 (584-08-7) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -8659,7 +8659,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7049534
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 83
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -8668,7 +8668,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7058196
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, HOAc, NaOMe
 - Yield %: 68
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], H2 (1333-74-0) [REDUCTANT]
@@ -8678,7 +8678,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7061643
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/NaOH/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaOAc (127-09-3) [BASE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: CC(=O)CCN(CCN)c1nc2cc(Cl)ccc2o1.CS(=O)(=O)O>>CC1CCN(c2nc3cc(Cl)ccc3o2)CCN1
@@ -8686,7 +8686,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7102410
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 87
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -8695,7 +8695,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7103940
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 76
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -8704,7 +8704,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7119961
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 82
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: EtOH (64-17-5)
@@ -8713,7 +8713,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7147915
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/EDCIHCl/LiAlH4
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9)
 - SMILES: O=C(O)C=Cc1ccco1.Fc1ccc(C(OCCC2CCNCC2)c2ccc(F)cc2)cc1.O=C(O)C(=O)O>>Fc1ccc(C(OCCC2CCN(C/C=C/c3ccco3)CC2)c2ccc(F)cc2)cc1
@@ -8729,7 +8729,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7166077
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 37
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8738,7 +8738,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7183487
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: p-TsOH
 - Yield %: 60
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -8748,7 +8748,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7185419
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 85
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9)
@@ -8757,7 +8757,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7188309
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 52
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -8766,7 +8766,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7197258
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 86
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -8775,7 +8775,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7198384
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 38
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -8784,7 +8784,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7227606
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 61
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -8793,7 +8793,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-722790
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaBH4
 - Yield %: 52
 - Reagents: Et3N (121-44-8) [BASE], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeOH (67-56-1)
@@ -8802,7 +8802,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7246006
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
 - SMILES: O=C(O)CNC(=O)OCC1c2ccccc2-c2ccccc21.COc1ccc(C(NCCC[C@H](NC(=O)OCC2c3ccccc3-c3ccccc32)C(=O)O)(c2ccccc2)c2ccccc2)cc1.O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21.O=C(N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.O=C(C[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O)NC(c1ccccc1)(c1ccccc1)c1ccccc1.CC[C@H](C)[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.CC(C)(C)OC(=O)N[C@@H](Cc1ccco1)C(=O)O.CC(C)(C)OC(=O)N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O.CC(C)=O>>CC[C@H](C)[C@@H]1NC(=O)[C@H](Cc2ccco2)NC(=O)[C@@H](N)CSSC[C@@H](C(=O)N2CCC[C@H]2C(=O)N[C@@H](CCCNC(C)C)C(=O)NCC(N)=O)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CC(N)=O)NC1=O
@@ -8810,7 +8810,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7273045
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/NaOH/water
 - Reagents: DIPEA (7087-68-5) [BASE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], 5949-29-1 (5949-29-1) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOAc (141-78-6), water (7732-18-5)
 - SMILES: COC(=O)[C@H](N)CC(C)C.Cl.CCOC(=O)[C@](CC=O)(NC(=O)OC(C)(C)C)c1ccc(OCc2cc(C)nc3ccccc23)cc1>>CCOC(=O)[C@](CCN[C@H](CC(C)C)C(=O)OC)(NC(=O)OC(C)(C)C)c1ccc(OCc2cc(C)nc3ccccc23)cc1
@@ -8818,7 +8818,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7286682
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 60
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: THF (109-99-9), MeOH (67-56-1), water (7732-18-5)
@@ -8827,7 +8827,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7314125
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 47
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -8843,7 +8843,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7318442
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 65
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeCN (75-05-8)
@@ -8852,7 +8852,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7333605
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/KOH/HOBt/EDCIHCl/LiAlH4
 - Yield %: 87
 - Reagents: Et3N (121-44-8) [BASE], HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], LiAlH4 (16853-85-3) [REDUCTANT], KOH (1310-58-3) [BASE]
 - Solvents: THF (109-99-9), water (7732-18-5), iPrOH (67-63-0), EtOAc (141-78-6)
@@ -8861,7 +8861,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7353955
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 59
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8878,7 +8878,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7449095
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 68
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -8887,7 +8887,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7461306
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 69
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -8896,7 +8896,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7464020
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4
 - Yield %: 35
 - Reagents: 25895-60-7 (25895-60-7) [UNK], H2SO4 (7664-93-9) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -8905,7 +8905,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-747225
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/MeOH
 - Yield %: 20
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -8914,7 +8914,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7489857
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 76
 - Reagents: Et3N (121-44-8) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5), THF (109-99-9), water (7732-18-5)
@@ -8923,7 +8923,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7505255
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 99
 - Reagents: Et3N (121-44-8) [BASE]
 - Solvents: DCM (75-09-2)
@@ -8947,7 +8947,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7573809
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Yield %: 30
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
@@ -8956,7 +8956,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-758227
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 78
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8965,7 +8965,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7609841
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: O=Cc1ccc(N2CCOCC2)cc1.O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCNCC1>>O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCN(Cc2ccc(N3CCOCC3)cc2)CC1
@@ -8973,7 +8973,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7609912
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 94
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -8982,7 +8982,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7620040
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc/water/NaBH4
 - Yield %: 92
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT], water (7732-18-5) [ADDITIVE], NaOH (1310-73-2) [BASE]
 - Solvents: EtOH (64-17-5), PhMe (108-88-3), THF (109-99-9), water (7732-18-5)
@@ -8991,7 +8991,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7632006
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 85
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), MeOH (67-56-1), water (7732-18-5)
@@ -9000,7 +9000,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7645665
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 72
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -9009,7 +9009,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7648722
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: COc1ccc(O)c(C=O)c1.Nc1ccc2oc(-c3ccccc3)cc(=O)c2c1.C=O>>COc1ccc2c(c1)CN(c1ccc3oc(-c4ccccc4)cc(=O)c3c1)CO2
@@ -9017,7 +9017,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7650902
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Na2CO3/HOAc
 - Yield %: 87
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], HCl (7647-01-0) [ACID], Na2CO3 (497-19-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -9026,7 +9026,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7675475
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc/NaHCO3
 - Yield %: 39
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], 77-92-9 (77-92-9) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5), PhMe (108-88-3)
@@ -9042,7 +9042,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7709358
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 96
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: PhMe (108-88-3), water (7732-18-5), THF (109-99-9)
@@ -9051,7 +9051,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7722197
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/NaBH4
 - Yield %: 96
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: CHCl3 (67-66-3), water (7732-18-5)
@@ -9060,7 +9060,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7738889
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA/HOAc/NaBH4
 - Reagents: HOAc (64-19-7) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT], DIPEA (7087-68-5) [BASE], 937-14-4 (937-14-4) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9), DCM (75-09-2)
 - SMILES: CC(C)N.CSc1ncc(C=O)c(Nc2cccc(NC(=O)OC(C)(C)C)c2)n1.O=C(OC(Cl)(Cl)Cl)OC(Cl)(Cl)Cl>>CC(C)N1Cc2cnc(S(C)(=O)=O)nc2N(c2cccc(NC(=O)OC(C)(C)C)c2)C1=O
@@ -9068,7 +9068,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-774437
 
 - Type: original_dataset
-- Condition Core: Acid: BF3.Et2O
+- Condition Core: BF3.Et2O/NaBH4
 - Reagents: BF3.Et2O (109-63-7) [ACID], 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: EtOH (64-17-5)
 - SMILES: CC=O.C[C@@H](N)[C@@H](O)c1ccccc1>>CCN[C@H](C)[C@@H](O)c1ccccc1
@@ -9076,7 +9076,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7747904
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -9085,7 +9085,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7754414
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/water/LiAlH4
 - Reagents: NaOAc (127-09-3) [BASE], 5470-11-1 (5470-11-1) [UNK], LiAlH4 (16853-85-3) [REDUCTANT], water (7732-18-5) [ADDITIVE], HCl (7647-01-0) [ACID]
 - Solvents: EtOH (64-17-5), THF (109-99-9), Et2O (60-29-7)
 - SMILES: COc1cccc2c1CC(=O)CC2>>COc1cccc2c1CC(N)CC2.Cl
@@ -9093,7 +9093,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7759447
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/H2
 - Catalytic System: 364622-30-0
 - Yield %: 45
 - Reagents: 631-61-8 (631-61-8) [UNK], H2 (1333-74-0) [REDUCTANT], HCl (7647-01-0) [ACID]
@@ -9103,7 +9103,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7783037
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 88
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -9112,7 +9112,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7784319
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/water/LiAlH4
 - Yield %: 60
 - Reagents: 622-30-0 (622-30-0) [UNK], LiAlH4 (16853-85-3) [REDUCTANT], water (7732-18-5) [ADDITIVE], NaOH (1310-73-2) [BASE]
 - Solvents: Py (110-86-1), THF (109-99-9), water (7732-18-5)
@@ -9121,7 +9121,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7803423
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O.CS(=O)(=O)N(CC=O)CC=O>>CS(=O)(=O)N1CCN([C@@H]2CC(=O)N[C@@H](Cc3c[nH]c4ccccc34)C(=O)N[C@@H](Cc3ccccc3)C(=O)N[C@H](Cc3ccccc3)CNC2=O)CC1.O=C(O)C(F)(F)F
@@ -9129,7 +9129,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7806293
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: COC[C@H](C)N.O=Cc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1>>COC[C@H](C)NCc1ccc(-c2ccccc2S(=O)(=O)N2CCCC2)cc1
@@ -9146,7 +9146,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7810717
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 100
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeCN (75-05-8)
@@ -9155,7 +9155,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-781146
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 78
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -9164,7 +9164,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7824395
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 85
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -9173,7 +9173,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7830293
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 83
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -9182,7 +9182,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7832268
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 69
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -9191,7 +9191,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-785540
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 53
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -9200,7 +9200,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7885343
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/NH4Cl
 - Catalytic System: 20816-12-0
 - Yield %: 54
 - Reagents: 7790-28-5 (7790-28-5) [UNK], 7772-98-7 (7772-98-7) [UNK], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NH4Cl (12125-02-9) [ADDITIVE]
@@ -9210,7 +9210,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7886185
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/water
 - Yield %: 45
 - Reagents: 14044-65-6 (14044-65-6) [UNK], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NaHCO3 (144-55-8) [BASE]
 - Solvents: THF (109-99-9), EtOAc (141-78-6), water (7732-18-5)
@@ -9219,7 +9219,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7886505
 
 - Type: original_dataset
-- Condition Core: Additive: Zn
+- Condition Core: Zn
 - Yield %: 68
 - Reagents: 3087-36-3 (3087-36-3) [UNK], Zn (7440-66-6) [ADDITIVE]
 - Solvents: THF (109-99-9), HOAc (64-19-7)
@@ -9228,7 +9228,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7899297
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
 - SMILES: CNC(=O)c1ccc(Oc2ccc(C=O)cc2)cc1.O=C1N(C2CCCCC2)C[C@@H](c2ccccc2)N1C1CCNCC1>>CNC(=O)c1ccc(Oc2ccc(CN3CCC(N4C(=O)N(C5CCCCC5)C[C@H]4c4ccccc4)CC3)cc2)cc1
@@ -9236,7 +9236,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7910109
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Reagents: 613-94-5 (613-94-5) [UNK], NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: O=C1CCN(Cc2ccccc2)CC1>>Cl.NNC1CCN(Cc2ccccc2)CC1
@@ -9244,7 +9244,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7922576
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAt
 - Reagents: 1892-57-5 (1892-57-5) [UNK], HOAt (39968-33-7) [ADDITIVE], 13283-31-3 (13283-31-3) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
 - SMILES: Nc1ccccn1.O=C(O)C1CCN(C(=O)OCc2ccccc2)CC1>>O=C(O)C(=O)O.O=C(OCc1ccccc1)N1CCC(CNc2ccccn2)CC1
@@ -9252,7 +9252,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7925990
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: O=Cc1cc(Br)cc(Br)c1O.Nc1ccc2c(=O)cc(-c3ccccc3)oc2c1.C=O>>O=c1cc(-c2ccccc2)oc2cc(N3COc4c(Br)cc(Br)cc4C3)ccc12
@@ -9260,7 +9260,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-792839
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: p-TsOH
 - Yield %: 72
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -9270,7 +9270,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7941073
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/NaHCO3
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)NCCC=O.CCC(N)c1nc2ccsc2c(=O)n1Cc1cc(C)on1>>CCC(NCCCNC(=O)OC(C)(C)C)c1nc2ccsc2c(=O)n1Cc1cc(C)on1
@@ -9278,7 +9278,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7953477
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N
 - Yield %: 69
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -9287,7 +9287,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7964791
 
 - Type: original_dataset
-- Condition Core: Base: NaOMe
+- Condition Core: NaOMe/NaBH4
 - Yield %: 58
 - Reagents: NaOMe (124-41-4) [BASE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -9296,7 +9296,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7976199
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 59
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -9305,7 +9305,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-7984345
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/NaOH/EDCIHCl/LiAlH4
 - Yield %: 66
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT], NaOH (1310-73-2) [BASE]
 - Solvents: DCM (75-09-2), THF (109-99-9), water (7732-18-5)
@@ -9321,7 +9321,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-80165
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 91
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -9338,7 +9338,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-806499
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 96
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -9348,7 +9348,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8081259
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
 - SMILES: O=C1CCS(=O)CC1.N[C@@H]1CC(=O)N[C@@H](Cc2c[nH]c3ccccc23)C(=O)N[C@@H](Cc2ccccc2)C(=O)N[C@H](Cc2ccccc2)CNC1=O>>O=C(O)C(F)(F)F.O=C1C[C@@H](NC2CCS(=O)CC2)C(=O)NC[C@@H](Cc2ccccc2)NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@H](Cc2c[nH]c3ccccc23)N1
@@ -9356,7 +9356,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8108800
 
 - Type: original_dataset
-- Condition Core: Base: PotassiumBicarbonate
+- Condition Core: PotassiumBicarbonate
 - Reagents: 100-39-0 (100-39-0) [UNK], PotassiumBicarbonate (298-14-6) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DMF (68-12-2), MeOH (67-56-1)
 - SMILES: O=Cc1ccc(O)c(C(=O)O)c1.CO.CNC>>COC(=O)c1cc(CN(C)C)ccc1O
@@ -9364,7 +9364,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8129034
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 37
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -9374,7 +9374,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8140750
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 51
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeCN (75-05-8)
@@ -9383,7 +9383,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8151895
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/water
 - Yield %: 92
 - Reagents: Et3N (121-44-8) [BASE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: PhMe (108-88-3)
@@ -9392,7 +9392,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8174279
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 78
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), DCM (75-09-2)
@@ -9401,7 +9401,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8183380
 
 - Type: original_dataset
-- Condition Core: Additive: TFA
+- Condition Core: TFA
 - Reagents: TFA (76-05-1) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DCM (75-09-2), HOAc (64-19-7), MeOH (67-56-1), water (7732-18-5)
 - SMILES: CC(C)(C)OC(=O)N1CC[C@@](NC(=O)OCC2c3ccccc3-c3ccccc32)(C(=O)O)C1.C=O>>CN1CC[C@@](NC(=O)OCC2c3ccccc3-c3ccccc32)(C(=O)O)C1
@@ -9409,7 +9409,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8185185
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Reagents: 64-18-6 (64-18-6) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: water (7732-18-5)
 - SMILES: C=O.Cc1ccc(CNCCc2ccc([N+](=O)[O-])cc2)cc1.Cl>>Cc1ccc(CN(C)CCc2ccc([N+](=O)[O-])cc2)cc1.Cl
@@ -9425,7 +9425,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-824272
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/water/HOAc/NH4Cl
 - Yield %: 35
 - Reagents: Et3N (121-44-8) [BASE], 26412-87-3 (26412-87-3) [UNK], water (7732-18-5) [ADDITIVE], HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NH4Cl (12125-02-9) [ADDITIVE]
 - Solvents: DMSO (67-68-5), DCM (75-09-2), THF (109-99-9), water (7732-18-5)
@@ -9434,7 +9434,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8256001
 
 - Type: original_dataset
-- Condition Core: Additive: NH4Cl
+- Condition Core: NH4Cl/NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NH4Cl (12125-02-9) [ADDITIVE]
 - Solvents: EtOH (64-17-5), MeOH (67-56-1), EtOAc (141-78-6), water (7732-18-5)
 - SMILES: CN.CC(=O)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.O=C(O)C[C@H](O)C(=O)O>>CN[C@H](C)c1cc(C(F)(F)F)cc(C(F)(F)F)c1.O=C(O)C[C@H](O)C(=O)O
@@ -9442,7 +9442,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8264417
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 100
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -9451,7 +9451,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8265294
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/K2CO3/DIPEA/NaOH/DMAP
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], K2CO3 (584-08-7) [BASE], DMAP (1122-58-3) [ADDITIVE], DIPEA (7087-68-5) [BASE], 7693-46-1 (7693-46-1) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: HOAc (64-19-7), iPrOH (67-63-0), EtOAc (141-78-6), water (7732-18-5), EDC (107-06-2), MeOH (67-56-1)
 - SMILES: CCOC(=O)C[C@H](N)c1ccc2c(c1)OCC2.CC(C)(C)OC(=O)N(CC=O)CCCC1=CC=C2CCCN=C2N1>>O=C(O)C[C@@H](c1ccc2c(c1)OCC2)N1CCN(CCCC2=CC=C3CCCN=C3N2)C1=O
@@ -9459,7 +9459,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8286586
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: CCCC(=O)Cl.NCCc1cccs1>>CCCC1NCCc2sccc21
@@ -9475,7 +9475,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8320199
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 78
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -9484,7 +9484,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8329934
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/TFA
 - Reagents: TFA (76-05-1) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: COc1ccc(COC(=O)N[C@H](CCC(=O)Cc2ccc([N+](=O)[O-])cc2)[C@H](O[Si](C)(C)C(C)(C)C)c2ccc(Cl)nc2)cc1>>CC(C)(C)[Si](C)(C)O[C@H](c1ccc(Cl)nc1)[C@H]1CC[C@@H](Cc2ccc([N+](=O)[O-])cc2)N1.CC(C)(C)[Si](C)(C)O[C@H](c1ccc(Cl)nc1)[C@H]1CC[C@H](Cc2ccc([N+](=O)[O-])cc2)N1
@@ -9500,7 +9500,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8370532
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 77
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -9509,7 +9509,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8371313
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/K2CO3/HOAc
 - Catalytic System: 54-47-7, 55467-49-7
 - Yield %: 77
 - Reagents: HOAc (64-19-7) [ADDITIVE], K2CO3 (584-08-7) [BASE], 2627-86-3 (2627-86-3) [UNK], 7778-77-0 (7778-77-0) [UNK], 24424-99-5 (24424-99-5) [UNK], HCl (7647-01-0) [ACID]
@@ -9519,7 +9519,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8377970
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 75
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -9528,7 +9528,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8398450
 
 - Type: original_dataset
-- Condition Core: Additive: ZnCl2
+- Condition Core: ZnCl2/water
 - Reagents: ZnCl2 (7646-85-7) [ADDITIVE], 540-69-2 (540-69-2) [UNK], 25895-60-7 (25895-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: Et2O (60-29-7), MeOH (67-56-1)
 - SMILES: O=C1C2CCN(CC2)C1Cc1cccnc1>>NC1C2CCN(CC2)C1Cc1cccnc1
@@ -9536,7 +9536,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-840196
 
 - Type: original_dataset
-- Condition Core: Additive: MeOH
+- Condition Core: MeOH
 - Yield %: 40
 - Reagents: 1191-15-7 (1191-15-7) [UNK], MeOH (67-56-1) [ADDITIVE]
 - Solvents: Et2O (60-29-7), PhMe (108-88-3)
@@ -9545,7 +9545,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8408482
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/water
 - Yield %: 70
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE], NH4OH (1336-21-6) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -9554,7 +9554,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8409752
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/water
 - Catalytic System: 24057-28-1
 - Yield %: 81
 - Reagents: HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
@@ -9564,7 +9564,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8428336
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 65
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -9581,7 +9581,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8447820
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/HOAc
 - Yield %: 59
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], Et3N (121-44-8) [BASE]
 - Solvents: MeOH (67-56-1), 1,4-Dioxane (123-91-1), water (7732-18-5)
@@ -9590,7 +9590,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8454285
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, DMAP
 - Yield %: 73
 - Reagents: Et3N (121-44-8) [BASE], 18107-18-1 (18107-18-1) [UNK], HOAc (64-19-7) [ADDITIVE], 141-52-6 (141-52-6) [UNK], H2 (1333-74-0) [REDUCTANT], NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
@@ -9600,7 +9600,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8462141
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/LiAlH4
 - Yield %: 52
 - Reagents: Et3N (121-44-8) [BASE], LiAlH4 (16853-85-3) [REDUCTANT], 3164-29-2 (3164-29-2) [UNK]
 - Solvents: DCM (75-09-2), THF (109-99-9), EtOAc (141-78-6), water (7732-18-5)
@@ -9609,7 +9609,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-846829
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/water
 - Yield %: 41
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -9618,7 +9618,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8468578
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3
 - Yield %: 71
 - Reagents: 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -9627,7 +9627,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8469542
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
 - SMILES: O=C(CN1CCNCC1)N1CCOCC1.COC(=O)C1(COc2ccc(C#Cc3ccc(C=O)cc3)cc2)CCOCC1>>COC(=O)C1(COc2ccc(C#Cc3ccc(CN4CCN(CC(=O)N5CCOCC5)CC4)cc3)cc2)CCOCC1
@@ -9635,7 +9635,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8469918
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 88
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeCN (75-05-8), water (7732-18-5), EtOH (64-17-5), iPrOH (67-63-0)
@@ -9644,7 +9644,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8472808
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 53
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -9653,7 +9653,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8484608
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 58
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -9662,7 +9662,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8506024
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 36
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -9671,7 +9671,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8569774
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/POC/NaBH4
 - Reagents: Et3N (121-44-8) [BASE], POC (10025-87-3) [COUPLING_REAGENT], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: DCM (75-09-2), MeCN (75-05-8), MeOH (67-56-1)
 - SMILES: O=C(Cl)c1ccccc1Cl.NCCc1cccs1>>Clc1ccccc1C1NCCc2sccc21
@@ -9679,7 +9679,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8580247
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH/HOBt/EDCIHCl
 - Yield %: 93
 - Reagents: HOBt (2592-95-2) [ADDITIVE], EDCI·HCl (25952-53-8) [COUPLING_REAGENT], 13292-87-0 (13292-87-0) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE]
 - Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
@@ -9704,7 +9704,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-865425
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 99
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EtOAc (141-78-6), THF (109-99-9), water (7732-18-5)
@@ -9713,7 +9713,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8655120
 
 - Type: original_dataset
-- Condition Core: Ni
+- Condition Core: Ni/Nickel
 - Catalytic System: Nickel
 - Yield %: 91
 - Reagents: H2 (1333-74-0) [REDUCTANT], NH4OH (7664-41-7) [BASE], HCl (7647-01-0) [ACID]
@@ -9723,7 +9723,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8655995
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/TFA
 - Reagents: TFA (76-05-1) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
 - SMILES: COc1ccc(COC(=O)N[C@H](CCC(=O)Cc2ccc([N+](=O)[O-])cc2)[C@H](O[Si](C)(C)C(C)(C)C)c2ccccc2)cc1>>CC(C)(C)[Si](C)(C)O[C@H](c1ccccc1)[C@H]1CC[C@@H](Cc2ccc([N+](=O)[O-])cc2)N1.CC(C)(C)[Si](C)(C)O[C@H](c1ccccc1)[C@H]1CC[C@H](Cc2ccc([N+](=O)[O-])cc2)N1
@@ -9739,7 +9739,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8671254
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: HOAc (64-19-7), MeOH (67-56-1)
@@ -9748,7 +9748,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8674560
 
 - Type: original_dataset
-- Condition Core: Additive: ZnCl2
+- Condition Core: ZnCl2
 - Yield %: 26
 - Reagents: ZnCl2 (7646-85-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -9757,7 +9757,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8676220
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaBH4
 - Yield %: 93
 - Reagents: 7487-88-9 (7487-88-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID]
 - Solvents: CHCl3 (67-66-3), MeOH (67-56-1), EtOAc (141-78-6), water (7732-18-5), Et2O (60-29-7)
@@ -9766,7 +9766,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8685872
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium, Et3N
 - Yield %: 92
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -9776,7 +9776,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8686
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOH
 - Yield %: 60
 - Reagents: 631-61-8 (631-61-8) [UNK], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5), Et2O (60-29-7), 1,4-Dioxane (123-91-1), EtOAc (141-78-6)
@@ -9793,7 +9793,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8700140
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 28
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -9802,7 +9802,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8701149
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 62
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -9811,7 +9811,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8709327
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl
 - Yield %: 50
 - Reagents: 540-69-2 (540-69-2) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: water (7732-18-5)
@@ -9828,7 +9828,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8744812
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 52
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: THF (109-99-9), water (7732-18-5)
@@ -9837,7 +9837,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8762314
 
 - Type: original_dataset
-- Condition Core: Acid: H2SO4
+- Condition Core: H2SO4/EDCIHCl/LiAlH4
 - Reagents: EDCI·HCl (25952-53-8) [COUPLING_REAGENT], H2SO4 (7664-93-9) [ACID], LiAlH4 (16853-85-3) [REDUCTANT]
 - Solvents: DCM (75-09-2), THF (109-99-9)
 - SMILES: O=C(O)c1ccc2ccccc2c1.Fc1ccc(C(OCCC2CCNCC2)c2ccc(F)cc2)cc1.O=C(O)C(=O)O>>Fc1ccc(C(OCCC2CCN(Cc3ccc4ccccc4c3)CC2)c2ccc(F)cc2)cc1
@@ -9853,7 +9853,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8786706
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 75
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), DCM (75-09-2)
@@ -9862,7 +9862,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8817403
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 66
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -9871,7 +9871,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8820081
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/HOAc/SodiumChloride
 - Yield %: 46
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE], SodiumChloride (7647-14-5) [ADDITIVE]
 - Solvents: EDC (107-06-2), MeOH (67-56-1), water (7732-18-5), DCM (75-09-2)
@@ -9888,7 +9888,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8871319
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 65
 - Reagents: HOAc (64-19-7) [ADDITIVE], 546-68-9 (546-68-9) [UNK], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -9897,7 +9897,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-888420
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 37
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -9906,7 +9906,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8897216
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 92
 - Reagents: 7487-88-9 (7487-88-9) [UNK], H2 (1333-74-0) [REDUCTANT]
@@ -9916,7 +9916,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8901040
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: HOAc
 - Yield %: 58
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -9926,7 +9926,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8945019
 
 - Type: original_dataset
-- Condition Core: Additive: ZnCl2
+- Condition Core: ZnCl2
 - Yield %: 75
 - Reagents: ZnCl2 (7646-85-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -9935,7 +9935,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-8971085
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 87
 - Reagents: HOAc (64-19-7) [ADDITIVE], H2 (1333-74-0) [REDUCTANT], LiAlH4 (16853-85-3) [REDUCTANT], water (7732-18-5) [ADDITIVE], NaOH (1310-73-2) [BASE], HCl (7647-01-0) [ACID]
@@ -9945,7 +9945,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9009099
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 51
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -9962,7 +9962,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9023
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 73
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -9971,7 +9971,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9023124
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 92
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: DCM (75-09-2)
@@ -9980,7 +9980,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9032929
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 24
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -9989,7 +9989,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9037645
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
 - SMILES: O=C(O)CNC(=O)OCC1c2ccccc2-c2ccccc21.COc1ccc(C(NCCC[C@H](NC(=O)OCC2c3ccccc3-c3ccccc32)C(=O)O)(c2ccccc2)c2ccccc2)cc1.O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21.O=C(N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.O=C(C[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O)NC(c1ccccc1)(c1ccccc1)c1ccccc1.CC[C@H](C)[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.O=C(N[C@@H](CC1CCCCC1)C(=O)O)OCC1c2ccccc2-c2ccccc21.CC(C)(C)OC(=O)N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O.CC(C)=O>>CC[C@H](C)[C@@H]1NC(=O)[C@H](CC2CCCCC2)NC(=O)[C@@H](N)CSSC[C@@H](C(=O)N2CCC[C@H]2C(=O)N[C@@H](CCCNC(C)C)C(=O)NCC(N)=O)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CC(N)=O)NC1=O
@@ -10013,7 +10013,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-907230
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 86
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -10022,7 +10022,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9072336
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 40
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: PhH (71-43-2), MeOH (67-56-1)
@@ -10031,7 +10031,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9088888
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaHCO3/NaBH4
 - Yield %: 90
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], HCl (7647-01-0) [ACID], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -10048,7 +10048,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9138322
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: 546-68-9 (546-68-9) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: CN.CC1CCN(Cc2ccccc2)CC1=O>>CN[C@H]1CN(Cc2ccccc2)CC[C@H]1C.CN[C@@H]1CN(Cc2ccccc2)CC[C@@H]1C.CN[C@H]1CN(Cc2ccccc2)CC[C@@H]1C.CN[C@@H]1CN(Cc2ccccc2)CC[C@H]1C
@@ -10056,7 +10056,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9140979
 
 - Type: original_dataset
-- Condition Core: Base: NaOMe
+- Condition Core: NaOMe/TFA/HOAc
 - Yield %: 58
 - Reagents: TFA (76-05-1) [ADDITIVE], NaOMe (124-41-4) [BASE], HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: DCM (75-09-2), MeOH (67-56-1), water (7732-18-5)
@@ -10065,7 +10065,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9144729
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: NC1CC1.CS(=O)(=O)c1ccc(F)cc1C(=O)N1CCC(=O)CC1>>CS(=O)(=O)c1ccc(F)cc1C(=O)N1CCC(NC2CC2)CC1
@@ -10073,7 +10073,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-915844
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 82
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -10097,7 +10097,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9192960
 
 - Type: original_dataset
-- Condition Core: Reductant: H2
+- Condition Core: H2
 - Catalytic System: 916197-27-8
 - Yield %: 91
 - Reagents: H2 (1333-74-0) [REDUCTANT]
@@ -10107,7 +10107,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9237511
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 32
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -10116,7 +10116,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9241746
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 72
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: EtOH (64-17-5)
@@ -10141,7 +10141,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9279094
 
 - Type: original_dataset
-- Condition Core: Base: Et3N
+- Condition Core: Et3N/H2/LiAlH4
 - Catalytic System: 1314-15-4
 - Yield %: 37
 - Reagents: Et3N (121-44-8) [BASE], H2 (1333-74-0) [REDUCTANT], LiAlH4 (16853-85-3) [REDUCTANT]
@@ -10151,7 +10151,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9291893
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 79
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -10160,7 +10160,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9306213
 
 - Type: original_dataset
-- Condition Core: Additive: ZnCl2
+- Condition Core: ZnCl2/water
 - Yield %: 85
 - Reagents: ZnCl2 (7646-85-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -10169,7 +10169,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-930798
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), CHCl3 (67-66-3), water (7732-18-5)
 - SMILES: Nc1ccc2c(=O)cc(-c3ccccc3)oc2c1.Cc1cc(C)c(O)c(C=O)c1.C=O>>Cc1cc(C)c2c(c1)CN(c1ccc3c(=O)cc(-c4ccccc4)oc3c1)CO2
@@ -10177,7 +10177,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9318977
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Catalytic System: p-TsOH
 - Yield %: 59
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
@@ -10187,7 +10187,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9396461
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 38
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), THF (109-99-9), water (7732-18-5)
@@ -10204,7 +10204,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9420867
 
 - Type: original_dataset
-- Condition Core: Base: DIPEA
+- Condition Core: DIPEA
 - Reagents: 56553-60-7 (56553-60-7) [UNK], DIPEA (7087-68-5) [BASE]
 - Solvents: DMF (68-12-2), EDC (107-06-2), DMSO (67-68-5), water (7732-18-5)
 - SMILES: Cn1c(C=O)nc2ccccc21.Cl.Fc1cccc(C2CCNCC2)c1>>Cn1c(CN2CCC(c3cccc(F)c3)CC2)nc2ccccc21
@@ -10212,7 +10212,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9425752
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/NaBH4
 - Yield %: 71
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeOH (67-56-1), DCM (75-09-2), water (7732-18-5)
@@ -10221,7 +10221,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9445893
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
 - SMILES: NCCCNc1ccnc2cc(Cl)ccc12.CC(=O)O[C@H]1C[C@H]2[C@@H]([C@H](OC(C)=O)C[C@@H]3C[C@H](NC(=O)OC(C)(C)C)CC[C@@]32C)[C@@H]2CC[C@H]([C@H](C)CCC=O)[C@@]12C>>CC(=O)O[C@H]1C[C@H]2[C@@H]([C@H](OC(C)=O)C[C@@H]3C[C@H](NC(=O)OC(C)(C)C)CC[C@@]32C)[C@@H]2CC[C@H]([C@H](C)CCCNCCCNc3ccnc4cc(Cl)ccc34)[C@@]12C
@@ -10236,7 +10236,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9461252
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 93
 - Reagents: HOAc (64-19-7) [ADDITIVE]
 - Solvents: MeOH (67-56-1)
@@ -10245,7 +10245,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9493592
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 66
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK]
 - Solvents: EDC (107-06-2)
@@ -10254,7 +10254,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9501044
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 98
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), EtOH (64-17-5)
@@ -10263,7 +10263,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9507961
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 76
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -10272,7 +10272,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9521278
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 50
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -10281,7 +10281,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9558957
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 15
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeCN (75-05-8), EtOH (64-17-5), iPrOH (67-63-0)
@@ -10290,7 +10290,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9567908
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3/HOAc
 - Yield %: 18
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -10299,7 +10299,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-95943
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 80
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: EtOH (64-17-5)
@@ -10308,7 +10308,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9595532
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 77
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -10317,7 +10317,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9595866
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc
 - Yield %: 86
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -10326,7 +10326,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9596499
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH
 - Yield %: 85
 - Reagents: 64-18-6 (64-18-6) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: iPrOH (67-63-0), water (7732-18-5), iPrOAc (108-21-4)
@@ -10343,7 +10343,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9656384
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 82
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: DCM (75-09-2), water (7732-18-5)
@@ -10359,7 +10359,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9668078
 
 - Type: original_dataset
-- Condition Core: Additive: LiCl
+- Condition Core: LiCl/NaBH4
 - Yield %: 45
 - Reagents: LiCl (7447-41-8) [ADDITIVE], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1), THF (109-99-9)
@@ -10375,7 +10375,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9690868
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/water
 - Yield %: 53
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: DCM (75-09-2)
@@ -10384,7 +10384,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9705147
 
 - Type: original_dataset
-- Condition Core: Base: NH4OH
+- Condition Core: NH4OH/HOBt/TFA/DIC
 - Reagents: DIC (693-13-0) [COUPLING_REAGENT], HOBt (2592-95-2) [ADDITIVE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK], 149-73-5 (149-73-5) [UNK], 56553-60-7 (56553-60-7) [UNK], 7553-56-2 (7553-56-2) [UNK], 50-81-7 (50-81-7) [UNK], NH4OH (7664-41-7) [BASE]
 - Solvents: DCM (75-09-2), EDC (107-06-2), water (7732-18-5), MeOH (67-56-1)
 - SMILES: O=C(O)CNC(=O)OCC1c2ccccc2-c2ccccc21.CC(C)(C)OC(=O)N[C@@H](CCNC(=O)OCc1ccccc1)C(=O)O.O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21.O=C(N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.O=C(C[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O)NC(c1ccccc1)(c1ccccc1)c1ccccc1.NC(=O)CCC[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.CC[C@H](C)[C@H](NC(=O)OCC1c2ccccc2-c2ccccc21)C(=O)O.O=C(N[C@@H](Cc1ccccc1)C(=O)O)OCC1c2ccccc2-c2ccccc21.CC(C)(C)OC(=O)N[C@@H](CSC(c1ccccc1)(c1ccccc1)c1ccccc1)C(=O)O.CC(C)=O>>CC[C@H](C)[C@@H]1NC(=O)[C@H](Cc2ccccc2)NC(=O)[C@@H](N)CSSC[C@@H](C(=O)N2CCC[C@H]2C(=O)N[C@@H](CCNC(C)C)C(=O)NCC(N)=O)NC(=O)[C@H](CC(N)=O)NC(=O)[C@H](CCCC(N)=O)NC1=O
@@ -10399,7 +10399,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9719929
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaH/LithiumHydroxide/NMM/HOAc/HATU
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaH (7646-69-7) [BASE], LithiumHydroxide (1310-65-2) [BASE], NMM (109-02-4) [BASE], HATU (148893-10-1) [COUPLING_REAGENT]
 - Solvents: MeOH (67-56-1), EtOAc (141-78-6), Xylenes (1330-20-7), THF (109-99-9), EtOH (64-17-5), water (7732-18-5), DMF (68-12-2)
 - SMILES: COC(=O)C(C)(C)N.CC(C)(C)OC(=O)NC(C)(C=O)c1cc(F)cc(F)c1.CCOC(=O)CBr.Nc1ccc2c(c1)C[C@@]1(C2)C(=O)Nc2ncccc21>>CC1(C)NC[C@@](C)(c2cc(F)cc(F)c2)N(CC(=O)Nc2ccc3c(c2)C[C@@]2(C3)C(=O)Nc3ncccc32)C1=O
@@ -10407,7 +10407,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9762044
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 67
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -10416,7 +10416,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9785850
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 22
 - Reagents: HOAc (64-19-7) [ADDITIVE], 56553-60-7 (56553-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: EDC (107-06-2), water (7732-18-5)
@@ -10425,7 +10425,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9809588
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 88
 - Reagents: NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -10434,7 +10434,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9820380
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/NaOAc/NaOH
 - Yield %: 38
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID], NaOH (1310-73-2) [BASE], 537704-27-1 (537704-27-1) [UNK]
 - Solvents: EtOH (64-17-5), water (7732-18-5), MeOH (67-56-1)
@@ -10451,7 +10451,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9834960
 
 - Type: original_dataset
-- Condition Core: Base: NaOAc
+- Condition Core: NaOAc
 - Yield %: 51
 - Reagents: NaOAc (127-09-3) [BASE], 25895-60-7 (25895-60-7) [UNK]
 - Solvents: MeOH (67-56-1)
@@ -10460,7 +10460,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9874761
 
 - Type: original_dataset
-- Condition Core: Base: NaOH
+- Condition Core: NaOH/HOAc
 - Yield %: 96
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], NaOH (1310-73-2) [BASE]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -10469,7 +10469,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9875640
 
 - Type: original_dataset
-- Condition Core: Reductant: NaBH4
+- Condition Core: NaBH4
 - Yield %: 47
 - Reagents: 7757-82-6 (7757-82-6) [UNK], NaBH4 (16940-66-2) [REDUCTANT]
 - Solvents: MeOH (67-56-1)
@@ -10486,7 +10486,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9882565
 
 - Type: original_dataset
-- Condition Core: Additive: HOAc
+- Condition Core: HOAc/Zn
 - Yield %: 75
 - Reagents: HOAc (64-19-7) [ADDITIVE], Zn (7440-66-6) [ADDITIVE]
 - Solvents: 1,4-Dioxane (123-91-1), water (7732-18-5)
@@ -10495,7 +10495,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9883537
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/HOAc
 - Yield %: 40
 - Reagents: HOAc (64-19-7) [ADDITIVE], 25895-60-7 (25895-60-7) [UNK], HCl (7647-01-0) [ACID]
 - Solvents: MeOH (67-56-1), water (7732-18-5)
@@ -10504,7 +10504,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9901550
 
 - Type: original_dataset
-- Condition Core: Additive: water
+- Condition Core: water
 - Yield %: 96
 - Reagents: 56553-60-7 (56553-60-7) [UNK], water (7732-18-5) [ADDITIVE]
 - Solvents: THF (109-99-9)
@@ -10513,7 +10513,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-996032
 
 - Type: original_dataset
-- Condition Core: Pd
+- Condition Core: Pd/Palladium
 - Catalytic System: Palladium
 - Yield %: 90
 - Time (h): 4.5
@@ -10524,7 +10524,7 @@ Total reactions: 1201
 ## Reaction 31-313-CAS-9982209
 
 - Type: original_dataset
-- Condition Core: Base: NaHCO3
+- Condition Core: NaHCO3
 - Yield %: 77
 - Reagents: 56553-60-7 (56553-60-7) [UNK], NaHCO3 (144-55-8) [BASE]
 - Solvents: MeCN (75-05-8), water (7732-18-5)
@@ -10533,7 +10533,7 @@ Total reactions: 1201
 ## Reaction 31-614-CAS-25138627
 
 - Type: original_dataset
-- Condition Core: Acid: HCl
+- Condition Core: HCl/Py/H2
 - Catalytic System: DMF, 7440-06-4
 - Yield %: 57
 - Reagents: 79-37-8 (79-37-8) [UNK], Py (110-86-1) [BASE], 870-46-2 (870-46-2) [UNK], HCl (7647-01-0) [ACID], H2 (1333-74-0) [REDUCTANT]
