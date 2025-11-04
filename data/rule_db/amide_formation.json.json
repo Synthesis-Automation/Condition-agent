@@ -1,0 +1,413 @@
+{
+  "name": "Amide Bond Formation (Carboxylic Acid + Amine)",
+  "reaction_type": "Amide Formation",
+  "version": "2025-11-04",
+  "evaluation": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: prefer safer/operable systems (Oxyma/COMU, T3P, acyl‑fluoride) over legacy benzotriazoles; keep activations cold/short for α‑chiral acids; free alcohols/phenols favor acyl‑fluoride routes.\n",
+  "applies_if": {
+    "all": [
+      "carboxylic_acid_present",
+      "amine_present"
+    ],
+    "any": [
+      "amine_primary_aliphatic_present",
+      "amine_secondary_aliphatic_present",
+      "aniline_present",
+      "sulfonamide_present",
+      "hydroxylamine_present",
+      "diamine_present"
+    ]
+  },
+  "default_rule": {
+    "id": "DEF_AMIDE_EDC_OXYMA",
+    "description": "General amidation (EDC·HCl + Oxyma + DIPEA).",
+    "conditions": {
+      "reagent": "EDC·HCl",
+      "additive": "Oxyma",
+      "base": "DIPEA",
+      "solvent": "MeCN / DMF / DCM",
+      "concentration_M": "0.15",
+      "temperature_C": "0–25",
+      "time_h": "2–18",
+      "stoichiometry_eq": {
+        "acid": 1.0,
+        "amine": 1.1,
+        "reagent": 1.2,
+        "additive": 1.2,
+        "base": 2.0
+      },
+      "charge_order": "acid + Oxyma → EDC → base → slow add amine (0–5 °C if α‑chiral)"
+    }
+  },
+  "base_rules": [
+    {
+      "name": "EDC·HCl + Oxyma (general)",
+      "id": "BR_EDC_OXYMA_GENERAL",
+      "description": "Balanced general method; low urea waste; manageable racemization risk.",
+      "reactant_features": {
+        "all": [
+          "functional:alcohols_free_false"
+        ],
+        "any": [
+          "acid_aliphatic",
+          "acid_benzoic",
+          "acid_heteroaromatic"
+        ],
+        "any_amine": [
+          "amine_primary_aliphatic",
+          "amine_secondary_aliphatic",
+          "aniline"
+        ]
+      },
+      "conditions": {
+        "reagent": "EDC·HCl",
+        "additive": "Oxyma",
+        "base": "DIPEA",
+        "solvent": "MeCN / DMF / DCM",
+        "concentration_M": "0.15",
+        "temperature_C": "0–25",
+        "time_h": "2–18"
+      }
+    },
+    {
+      "name": "COMU + DIPEA (for moderate/poor nucleophiles)",
+      "id": "BR_COMU_FAST",
+      "description": "Fast, often lower racemization than some uroniums; good for hindered acids/anilines.",
+      "reactant_features": {
+        "none": [
+          "acid_alpha_chiral"
+        ],
+        "any": [
+          "amine_nucleophilicity_moderate",
+          "amine_nucleophilicity_poor"
+        ]
+      },
+      "conditions": {
+        "reagent": "COMU",
+        "base": "DIPEA",
+        "solvent": "DMF / MeCN / 2‑MeTHF",
+        "concentration_M": "0.15",
+        "temperature_C": "0–40",
+        "time_h": "1–12"
+      }
+    },
+    {
+      "name": "HATU + base (hindered/electron‑poor acids)",
+      "id": "BR_HATU_HINDERED",
+      "description": "For hindered/electron‑poor acids with secondary aliphatic or aniline nucleophiles.",
+      "reactant_features": {
+        "any": [
+          "acid_hindered",
+          "acid_electron_poor"
+        ],
+        "any_amine": [
+          "amine_secondary_aliphatic",
+          "aniline"
+        ],
+        "any_sterics": [
+          "amine_steric_moderate",
+          "amine_steric_hindered"
+        ]
+      },
+      "conditions": {
+        "reagent": "HATU",
+        "base": "DIPEA or NMM",
+        "solvent": "DMF / NMP / DCM:DMF 1:1",
+        "concentration_M": "0.15",
+        "temperature_C": "0–40",
+        "time_h": "1–18",
+        "safety_penalty_if": [
+          "need_green",
+          "acid_alpha_chiral"
+        ]
+      }
+    },
+    {
+      "name": "Hindered aliphatic acids + good primary amines",
+      "id": "BR_HINDERED_PRIMARY_COMU_T3P",
+      "description": "Two pragmatic cores—COMU/DIPEA or T3P/DIPEA; scale‑friendly.",
+      "reactant_features": {
+        "all": [
+          "acid_hindered",
+          "amine_primary_aliphatic",
+          "amine_nucleophilicity_good"
+        ],
+        "none": [
+          "acid_alpha_chiral"
+        ]
+      },
+      "conditions": {
+        "core_options": [
+          {
+            "core": "COMU + DIPEA",
+            "solvent": "DMF / MeCN",
+            "temperature_C": "25–60",
+            "time_h": "1–8"
+          },
+          {
+            "core": "T3P (50% in EtOAc/MeCN) + DIPEA",
+            "solvent": "EtOAc / MeCN / 2‑MeTHF",
+            "temperature_C": "25–80",
+            "time_h": "1–10"
+          }
+        ]
+      }
+    },
+    {
+      "name": "T3P for scale/greener workups",
+      "id": "BR_T3P_SCALE_GREEN",
+      "description": "Easy workup; aqueous bicarbonate pulls phosphorus byproducts.",
+      "reactant_features": {
+        "all": [
+          "process_scale_ge_50g",
+          "need_green_true"
+        ]
+      },
+      "conditions": {
+        "reagent": "T3P (50% in EtOAc or MeCN)",
+        "base": "DIPEA or pyridine",
+        "solvent": "EtOAc / MeCN / 2‑MeTHF",
+        "concentration_M": "0.15",
+        "temperature_C": "0–80",
+        "time_h": "1–16",
+        "workup": "Quench into sat. NaHCO3; extract."
+      }
+    },
+    {
+      "name": "DIC + Oxyma (homogeneous carbodiimide)",
+      "id": "BR_DIC_OXYMA",
+      "description": "Homogeneous amidation with Oxyma to suppress O→N acylurea.",
+      "reactant_features": {
+        "all": [
+          "process_water_tolerance_false"
+        ],
+        "any": [
+          "functional:alcohols_free_true",
+          "functional:alcohols_free_false"
+        ]
+      },
+      "conditions": {
+        "reagent": "DIC",
+        "additive": "Oxyma",
+        "base": "DIPEA",
+        "solvent": "DCM / DMF / THF",
+        "concentration_M": "0.15",
+        "temperature_C": "0–25",
+        "time_h": "2–18"
+      }
+    },
+    {
+      "name": "CDI preactivation (imidazolide)",
+      "id": "BR_CDI_IMIDAZOLIDE",
+      "description": "Premix acid+CDI until CO2 ceases; add amine; heat for anilines.",
+      "reactant_features": {
+        "all": [
+          "need_green_true",
+          "functional:alcohols_free_false"
+        ]
+      },
+      "conditions": {
+        "reagent": "CDI (preactivation)",
+        "solvent": "THF / MeCN / DMF",
+        "concentration_M": "0.15",
+        "temperature_C": "0–25 (40–60 if aniline)",
+        "time_h": "0.5–2"
+      }
+    },
+    {
+      "name": "Acid chloride route (oxalyl chloride/SOCl2)",
+      "id": "BR_ACID_CHLORIDE",
+      "description": "For very poor nucleophiles; use traps and ventilation; consider acyl fluoride for selectivity.",
+      "reactant_features": {
+        "all": [
+          "amine_nucleophilicity_poor",
+          "functional:alcohols_free_true"
+        ]
+      },
+      "conditions": {
+        "activator": "oxalyl chloride (cat. DMF) or SOCl2",
+        "base": "DIPEA or pyridine",
+        "solvent": "DCM / THF",
+        "concentration_M": "0.15",
+        "temperature_C": "-20–25",
+        "time_h": "0.5–4"
+      }
+    },
+    {
+      "name": "Mixed anhydride (IBCF) for α‑chiral acids",
+      "id": "BR_IBCF_MIXED_ANHYDRIDE",
+      "description": "Low racemization when formed cold; rapid amine capture.",
+      "reactant_features": {
+        "all": [
+          "acid_alpha_chiral"
+        ]
+      },
+      "conditions": {
+        "activator": "isobutyl chloroformate (IBCF)",
+        "base": "NMM",
+        "solvent": "THF",
+        "concentration_M": "0.15",
+        "temperature_C": "-20–0",
+        "time_h": "0.5–4"
+      }
+    },
+    {
+      "name": "Acyl fluoride (TFFH/BTFFH)",
+      "id": "BR_ACYL_FLUORIDE",
+      "description": "High chemoselectivity; often reduced racemization vs acid chlorides.",
+      "reactant_features": {
+        "all": [
+          "functional:alcohols_free_true"
+        ]
+      },
+      "conditions": {
+        "reagent": "TFFH or BTFFH",
+        "base": "DIPEA or pyridine",
+        "solvent": "DCM / MeCN",
+        "concentration_M": "0.15",
+        "temperature_C": "0–25",
+        "time_h": "0.5–4",
+        "procedure_hint": "Form acyl fluoride (IR 1810–1840 cm⁻1) at 0–25 °C → add amine at 0–10 °C."
+      }
+    },
+    {
+      "name": "Aqueous amidation (DMTMM·Cl)",
+      "id": "BR_DMTMM_AQUEOUS",
+      "description": "Water‑tolerant amidation; good for biopolymer conjugations.",
+      "reactant_features": {
+        "all": [
+          "process_water_tolerance_true"
+        ]
+      },
+      "conditions": {
+        "reagent": "DMTMM·Cl",
+        "base": "Et3N (optional)",
+        "solvent": "H2O / MeCN:H2O / EtOH:H2O",
+        "concentration_M": "0.15",
+        "temperature_C": "20–40",
+        "time_h": "1–16",
+        "pH": "7–8"
+      }
+    },
+    {
+      "name": "α‑Amino acids (protected α‑NH)",
+      "id": "BR_ALPHA_AA_PROTECTED",
+      "description": "Favor cold/short activation to minimize epimerization.",
+      "reactant_features": {
+        "all": [
+          "acid_is_alpha_amino_acid",
+          "alpha_internal_amine_protected"
+        ]
+      },
+      "conditions": {
+        "preferred_routes": "COMU/DIPEA (DMF/MeCN) or TFFH/BTFFH (DCM/MeCN) or IBCF/NMM (THF, −20–0 °C)",
+        "temperature_C_cap": "≤25",
+        "time_h_cap": "≤6"
+      }
+    },
+    {
+      "name": "α‑Amino acids (unprotected α‑NH)",
+      "id": "BR_ALPHA_AA_UNPROTECTED",
+      "description": "Buffer near neutral; minimize dimerization; consider temporary protection if selectivity poor.",
+      "reactant_features": {
+        "all": [
+          "acid_is_alpha_amino_acid",
+          "alpha_internal_amine_free"
+        ]
+      },
+      "conditions": {
+        "preferred_routes": "DMTMM·Cl (pH 7–8, aqueous/MeCN‑H2O) or EDC·HCl + Oxyma (buffered, 0–10 °C)",
+        "temperature_C": "0–30",
+        "time_h": "1–6"
+      }
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "MOD_benzotriazole_explosive",
+      "when": [
+        "reagent_or_additive in {HOBt, HOAt, HBTU, HATU, TBTU}"
+      ],
+      "suggest": "Prefer Oxyma/COMU or T3P when feasible; handle benzotriazoles wet and in small scale."
+    },
+    {
+      "id": "MOD_acid_chloride_gas",
+      "when": [
+        "activator in {oxalyl_chloride, SOCl2}"
+      ],
+      "suggest": "CO/CO2/HCl evolved—use traps and strong ventilation; consider acyl‑fluoride instead."
+    },
+    {
+      "id": "MOD_cdi_vs_alcohols",
+      "when": [
+        "route:CDI",
+        "functional:alcohols_free_true"
+      ],
+      "suggest": "Avoid CDI with free alcohols/phenols—favor acyl‑fluoride or EDC/Oxyma."
+    },
+    {
+      "id": "MOD_dcc_no_additive",
+      "when": [
+        "reagent:DCC",
+        "no_additive:true"
+      ],
+      "suggest": "Add Oxyma (≥1.2 eq) to suppress O→N acylurea; or switch to DIC/EDC/T3P."
+    },
+    {
+      "id": "MOD_diamine_overacylation",
+      "when": [
+        "diamine_present"
+      ],
+      "suggest": "Slow addition, ≤0 °C, avoid large excess base; consider temporary mono‑protection."
+    },
+    {
+      "id": "MOD_alpha_chiral_guard",
+      "when": [
+        "acid_alpha_chiral"
+      ],
+      "suggest": "Cap temp ≤25 °C and time ≤6 h; prefer acyl‑fluoride or mixed‑anhydride; sample chiral HPLC."
+    },
+    {
+      "id": "MOD_low_conversion",
+      "when": [
+        "outcome:low_conversion"
+      ],
+      "suggest": "Raise temp +10 °C (if stable); increase amine +0.3 eq and reagent +0.2 eq; switch solvent (DMF↔MeCN↔DCM); switch reagent (EDC/Oxyma→HATU→T3P); preactivate (CDI/IBCF/acyl fluoride); add DMAP 5–10 mol% for anhydrides/acyl chlorides."
+    },
+    {
+      "id": "MOD_racemization",
+      "when": [
+        "outcome in {low_ee, dr_erosion}"
+      ],
+      "suggest": "Cool to 0–5 °C; shorten activation to ≤2 h; switch to IBCF (cold) or acyl‑fluoride; replace base DIPEA→NMM/pyridine; ensure Oxyma ≥1.2 eq."
+    },
+    {
+      "id": "MOD_heterogeneous_or_clumping",
+      "when": [
+        "outcome in {heterogeneous_mixture, filtration_clogging}"
+      ],
+      "suggest": "Switch reagent DCC→DIC/EDC/T3P; add 10–30% DMF/NMP co‑solvent; warm to 40–60 °C if stable."
+    },
+    {
+      "id": "MOD_urea_residues",
+      "when": [
+        "outcome:urea/EDU_carryover"
+      ],
+      "suggest": "Do 0.5 M HCl wash; carbon treatment or silica plug; consider DCM↔EtOAc swap before washes."
+    },
+    {
+      "id": "MOD_benzylic_amine_boost",
+      "when": [
+        "amine_benzylic",
+        "acid_hindered"
+      ],
+      "suggest": "Favor COMU/DIPEA or acyl‑fluoride."
+    },
+    {
+      "id": "MOD_scale_preference",
+      "when": [
+        "process_scale_ge_50g"
+      ],
+      "suggest": "Favor T3P or EDC/Oxyma for easy workup and benign byproducts."
+    }
+  ]
+}
