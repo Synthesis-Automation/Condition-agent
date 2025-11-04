@@ -842,6 +842,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                 ("ENZYME", "Enzyme"),
             )
 
+            # Collect all reagent tokens for uncatalyzed reactions
+            reagent_tokens = []
             for role_key, label in fallback_roles:
                 for idx, item in enumerate(reag_list or []):
                     role = (role_list[idx] if idx < len(role_list) else "").upper()
@@ -849,9 +851,12 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         continue
                     obj = item if isinstance(item, dict) else self._pair_to_obj(item)
                     token = _token_from_item(obj)
-                    if token:
-                        # For uncatalyzed reactions, return reagent name without the role type
-                        return token
+                    if token and token not in reagent_tokens:
+                        reagent_tokens.append(token)
+            
+            # Return all reagent names separated by "/"
+            if reagent_tokens:
+                return "/".join(reagent_tokens)
 
             return ""
 
