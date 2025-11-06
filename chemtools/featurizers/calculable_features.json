@@ -636,7 +636,7 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
-          "C(=O)O[H]"
+          "C(=O)[OH]"
         ]
       },
       "why": "Carboxylic acids"

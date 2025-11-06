@@ -24,6 +24,10 @@ def _family_text(family: str) -> str:
     if fl in {"buchwald_cn", "buchwald c鈥搉", "buchwald c-n", "buchwald"}:
         return "C_N_Coupling_Pd"
     
+    # Amide formation aliases
+    if fl in {"amide_coupling", "amidation", "amide"}:
+        return "Amide_formation"
+    
     return f
 
 
