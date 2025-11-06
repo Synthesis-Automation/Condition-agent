@@ -1,13 +1,13 @@
 # ChemTools LangChain Integration
 
-This directory contains a **LangChain/LangGraph wrapper** for ChemTools, exposing existing chemistry functions as AI-callable tools and providing a ReAct agent for intelligent chemistry analysis.
+This directory contains a **LangChain/LangGraph wrapper** for ChemTools, exposing existing chemistry functions as AI-callable tools and providing an adaptive agent for intelligent chemistry analysis.
 
 ## 🎯 Overview
 
 The integration enables:
 
 - **LangChain Tools**: ChemTools functions wrapped as LangChain `@tool` decorators
-- **ReAct Agent**: LangGraph agent that reasons about chemistry problems and calls tools
+- **LangGraph agent**: Automatically selects tool-calling or ReAct planning to solve chemistry problems
 - **No Code Changes**: Pure wrapper - doesn't modify existing chemtools code
 - **Interactive CLI**: Command-line interface for conversational chemistry queries
 
@@ -17,7 +17,7 @@ The integration enables:
 
 lang_chain/
 ├── chemtools_wrapper.py   # LangChain tool wrappers for chemtools
-├── chemtools_agent.py     # LangGraph ReAct agent
+├── chemtools_agent.py     # LangGraph agent wrapper
 ├── chemtools_cli.py       # Interactive CLI
 ├── lang_test.py           # Original LangChain test (DataGen example)
 └── README.md              # This file
@@ -186,7 +186,7 @@ print(family)
 
 ```python
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
+from langgraph.prebuilt import create_agent
 from lang_chain.chemtools_wrapper import (
     normalize_smiles_tool,
     recommend_conditions_tool
@@ -195,7 +195,7 @@ from lang_chain.chemtools_wrapper import (
 llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
 # Agent with only 2 tools
-custom_agent = create_react_agent(
+custom_agent = create_agent(
     llm,
     [normalize_smiles_tool, recommend_conditions_tool],
     prompt="You are a chemistry assistant focused on SMILES and recommendations."
@@ -206,10 +206,12 @@ result = custom_agent.invoke({
 })
 ```
 
+Older LangGraph releases only expose `create_react_agent`; the ChemTools wrapper falls back to it automatically when the newer helper is unavailable.
+
 ## Key Features (Updated)
 
 - ✅ **No code changes** to existing chemtools
-- ✅ **ReAct agent** combines LLM reasoning with deterministic chemistry
+- ✅ **LangGraph agent** combines LLM reasoning with deterministic chemistry
 - ✅ **8 chemistry tools** wrapped and ready to use
 - ✅ **Conversational interface** with history
 - ✅ **Animated spinner** provides visual feedback during processing

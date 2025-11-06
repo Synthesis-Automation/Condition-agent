@@ -21,12 +21,12 @@
 │                  ChemToolsAgent.run()                           │
 │  - Merges session + call constraints                            │
 │  - Adds constraint prompt to messages                           │
-│  - Calls LangGraph ReAct agent                                  │
+│  - Calls LangGraph agent                                        │
 └────────────────────────┬────────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│            LangGraph create_react_agent()                       │
+│            LangGraph create_agent()                               │
 │  - Reasoning and Acting loop                                    │
 │  - LLM decides which tools to call                              │
 │  - Executes tool calls                                          │
@@ -171,10 +171,12 @@ class ChemToolsAgent:
         # System prompt defines tools and behavior
         self.system_prompt = CHEMISTRY_SYSTEM_PROMPT
 
-        # Create ReAct agent with LangGraph
-        self.agent = create_react_agent(
+        self.agent_factory_name = _LANGGRAPH_AGENT_FACTORY_NAME
+
+        # Create LangGraph agent (prefers create_agent when available)
+        self.agent = LANGGRAPH_AGENT_FACTORY(
             self.llm,
-            CHEMTOOLS_TOOLS,  # ← All tools registered here
+            CHEMTOOLS_TOOLS,  # ✅ All tools registered here
             prompt=self.system_prompt
         )
 
@@ -204,7 +206,7 @@ class ChemToolsAgent:
 **Key Responsibilities**:
 
 - ✅ LLM client setup (OpenAI/Aliyun)
-- ✅ Creates LangGraph ReAct agent
+- ✅ Creates LangGraph agent (auto tool-calling)
 - ✅ Manages conversation context
 - ✅ Handles constraint merging
 - ✅ Invokes agent execution loop
@@ -321,15 +323,15 @@ CHEMTOOLS_TOOLS = [
 
 ---
 
-### 4. **LangGraph ReAct Loop**
+### 4. **LangGraph Agent Factory**
 
-**Library**: `langgraph.prebuilt.create_react_agent`
+**Library**: Prefers `langgraph.prebuilt.create_agent`; falls back to `langgraph.prebuilt.create_react_agent` on older LangGraph versions.
 
-This is a built-in LangGraph function that creates a ReAct (Reasoning + Acting) agent:
+This built-in LangGraph helper wires up the agent graph and automatically selects ReAct vs. native tool-calling based on LLM capabilities:
 
 ```python
 # Pseudo-code of what LangGraph does internally
-def create_react_agent(llm, tools, prompt):
+def create_agent(llm, tools, prompt):
     graph = StateGraph()
 
     # Add nodes
