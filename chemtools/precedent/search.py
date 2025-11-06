@@ -385,7 +385,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     
     # ⏱️ TIME: Result preparation
     t_start_prep = time.time()
-    top = [r for _, r in scored[: max(1, k)]]
+    top = scored[: max(1, k)]  # Keep (score, row) tuples
     support = len(scored)
 
     # Prototype id is a stable-ish hash of family+bin
@@ -406,7 +406,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             return rsmi, "", ""
 
     precedents = []
-    for r in top[:10]:
+    for score, r in top[:10]:
         rsmi = r.get("reaction_smiles") or ""
         reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
         precedents.append({
@@ -414,6 +414,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             "reaction_smiles": rsmi,
             "reactants_smiles": reactants_smi,
             "products_smiles": products_smi,
+            "similarity": round(score, 4),  # Add similarity score from scored tuple
             "condition_core": r.get("condition_core"),
             "yield": r.get("yield_value"),
             "core": r.get("condition_core"),
@@ -437,16 +438,20 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
         try:
             from ..reagent import filter_precedents_by_database_availability
             
-            # Get full precedent data for filtering (top contains all needed fields)
-            precedents_for_filter = [r for r in top]
+            # Get full precedent data for filtering (top contains (score, row) tuples)
+            precedents_for_filter = [r for score, r in top]
             filtered = filter_precedents_by_database_availability(
                 precedents_for_filter,
                 require_all_in_database=True
             )
             
-            # Rebuild precedents list from filtered results
+            # Create a mapping of reaction_id -> score for filtered results
+            filtered_ids = {r.get("reaction_id") for r in filtered}
+            filtered_with_scores = [(score, r) for score, r in top if r.get("reaction_id") in filtered_ids]
+            
+            # Rebuild precedents list from filtered results with scores
             precedents = []
-            for r in filtered[:10]:  # Still limit to top 10
+            for score, r in filtered_with_scores[:10]:  # Still limit to top 10
                 rsmi = r.get("reaction_smiles") or ""
                 reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
                 precedents.append({
@@ -454,6 +459,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                     "reaction_smiles": rsmi,
                     "reactants_smiles": reactants_smi,
                     "products_smiles": products_smi,
+                    "similarity": round(score, 4),  # Add similarity score
                     "condition_core": r.get("condition_core"),
                     "yield": r.get("yield_value"),
                     "core": r.get("condition_core"),

@@ -100,17 +100,23 @@ _RULE_DB_SEARCH_PATHS: List[Path] = [
 ]
 
 _FAMILY_TO_RULE_DB = {
-    "cn_coupling": "buchwald_cn",
-    "c_n_coupling": "buchwald_cn",
-    "buchwald_cn": "buchwald_cn",
-    "buchwald_hartwig": "buchwald_cn",
-    "buchwald_hartwig_cn": "buchwald_cn",
-    "buchwald_hartwig_c_n": "buchwald_cn",
-    "buchwald-hartwig": "buchwald_cn",
-    "suzuki": "suzuki",
-    "suzuki_coupling": "suzuki",
-    "suzuki_miyaura": "suzuki",
-    "suzuki-miyaura": "suzuki",
+    "cn_coupling": "C_N_Coupling_Cu_db",
+    "c_n_coupling": "C_N_Coupling_Pd_db",
+    "buchwald_cn": "C_N_Coupling_Pd_db",
+    "buchwald_hartwig": "C_N_Coupling_Pd_db",
+    "buchwald_hartwig_cn": "C_N_Coupling_Pd_db",
+    "buchwald_hartwig_c_n": "C_N_Coupling_Pd_db",
+    "buchwald-hartwig": "C_N_Coupling_Pd_db",
+    "ullmann": "C_N_Coupling_Cu_db",
+    "ullmann_cn": "C_N_Coupling_Cu_db",
+    "suzuki": "Suzuki_db",
+    "suzuki_coupling": "Suzuki_db",
+    "suzuki_miyaura": "Suzuki_db",
+    "suzuki-miyaura": "Suzuki_db",
+    "amide_formation": "amide_formation_db",
+    "amide_coupling": "amide_formation_db",
+    "amidation": "amide_formation_db",
+    "amide": "amide_formation_db",
 }
 
 _RULE_ENGINE_CACHE: "OrderedDict[Path, RuleEngine]" = OrderedDict()
@@ -1855,28 +1861,80 @@ def search_precedents_tool(
             family = detection.get("family", "Unknown")
         
         # Use relax parameter for DRFP-based search
+        # Disable reagent database filtering for families with specialized coupling reagents
+        # (e.g., amide formation uses HATU, COMU, EDC which may not be in general database)
+        disable_filter_families = ["amide_formation", "amide_coupling", "amidation"]
+        filter_by_db = family.lower() not in disable_filter_families
+        
         result = precedent_knn(
             family=family,
             features={},  # DRFP uses reaction fingerprint, not substrate features
             k=k,
-            relax={"use_drfp": True, "reaction_smiles": reaction_smiles}
+            relax={
+                "use_drfp": True, 
+                "reaction_smiles": reaction_smiles,
+                "filter_by_reagent_database": filter_by_db
+            }
         )
         
         # Simplify precedent data
         precedents = result.get("precedents", [])
         simplified_precedents = []
         for p in precedents[:k]:
+            # Extract reagent information from reagents list if available
+            reagents = p.get("reagents", [])
+            base = p.get("base", "")
+            catalyst = p.get("catalyst", "")
+            solvent = p.get("solvent", "")
+            coupling_reagent = ""
+            additives = []
+            
+            # Parse reagents list for amide formation reactions
+            if isinstance(reagents, list):
+                for r in reagents:
+                    role = r.get("role", "").upper()
+                    name = r.get("name") or r.get("abbreviation") or r.get("original_name", "")
+                    if role == "BASE" and not base:
+                        base = name
+                    elif role == "CATALYST" and not catalyst:
+                        catalyst = name
+                    elif role == "SOLVENT" and not solvent:
+                        solvent = name
+                    elif role == "COUPLING_REAGENT":
+                        coupling_reagent = name
+                    elif role == "ADDITIVE":
+                        additives.append(name)
+            
+            # Also check solvents list
+            if not solvent:
+                solvents = p.get("solvents", [])
+                if isinstance(solvents, list) and solvents:
+                    solvent = solvents[0].get("name", "") if isinstance(solvents[0], dict) else str(solvents[0])
+            
+            # Build conditions dict
+            conditions = {}
+            if catalyst and catalyst != {} and str(catalyst).strip():
+                conditions["catalyst"] = catalyst
+            if base:
+                conditions["base"] = base
+            if solvent:
+                conditions["solvent"] = solvent
+            if coupling_reagent:
+                conditions["coupling_reagent"] = coupling_reagent
+            if additives:
+                conditions["additives"] = ", ".join(additives)
+            
+            # Add temperature and time if available
+            if p.get("T_C") is not None:
+                conditions["temperature_C"] = p.get("T_C")
+            if p.get("time_h") is not None:
+                conditions["time_h"] = p.get("time_h")
+            
             simplified_precedents.append({
                 "similarity": round(p.get("similarity", 0), 3),
-                "conditions": {
-                    "catalyst": p.get("catalyst", ""),
-                    "base": p.get("base", ""),
-                    "solvent": p.get("solvent", ""),
-                    "temperature_C": p.get("T_C", ""),
-                    "time_h": p.get("time_h", "")
-                },
+                "conditions": conditions,
                 "yield": p.get("yield", ""),
-                "reaction": p.get("rxn_smiles", "")[:100]  # Truncate long SMILES
+                "reaction": p.get("reaction_smiles", "")[:100]  # Truncate long SMILES
             })
         
         return _success_response({
@@ -2410,11 +2468,50 @@ def _simplify_recommendation(raw: Dict[str, Any]) -> Dict[str, Any]:
     elif reasons_src:
         reasons_list = [str(reasons_src)]
 
+    # Get base recommendation
+    recommendation = dict(raw.get("recommendation", {}) or {})
+    
+    # For amide formation reactions, extract coupling reagents and additives from precedents
+    family = str(raw.get("family", "")).lower()
+    is_amide = any(term in family for term in ["amide", "amidation"])
+    
+    if is_amide and not recommendation.get("coupling_reagent"):
+        # Extract reagent information from top precedents
+        precedent_pack = raw.get("precedent_pack", {})
+        precedents = precedent_pack.get("precedents", [])
+        
+        if precedents:
+            # Analyze top precedents to find most common coupling reagents and additives
+            coupling_reagents = {}
+            additives = {}
+            
+            for prec in precedents[:10]:  # Check top 10 precedents
+                reagents = prec.get("reagents", [])
+                if isinstance(reagents, list):
+                    for r in reagents:
+                        role = r.get("role", "").upper()
+                        name = r.get("name") or r.get("abbreviation") or r.get("original_name", "")
+                        
+                        if role == "COUPLING_REAGENT" and name:
+                            coupling_reagents[name] = coupling_reagents.get(name, 0) + 1
+                        elif role == "ADDITIVE" and name:
+                            additives[name] = additives.get(name, 0) + 1
+            
+            # Add most common coupling reagent to recommendation
+            if coupling_reagents:
+                top_coupling = max(coupling_reagents.items(), key=lambda x: x[1])[0]
+                recommendation["coupling_reagent"] = top_coupling
+            
+            # Add most common additives to recommendation
+            if additives:
+                top_additives = sorted(additives.items(), key=lambda x: x[1], reverse=True)
+                recommendation["additives"] = ", ".join([name for name, _ in top_additives[:2]])
+
     return {
         "family": raw.get("family", "Unknown"),
         "detected_family": raw.get("detected_family"),
         "search_all_families": raw.get("search_all_families", False),
-        "recommendation": raw.get("recommendation", {}) or {},
+        "recommendation": recommendation,
         "alternatives": raw.get("alternatives", {}) or {},
         "reasons": reasons_list[:5],
         "precedent_count": len(raw.get("precedent_pack", {}).get("precedents", [])),
