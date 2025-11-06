@@ -2471,6 +2471,26 @@ def _simplify_recommendation(raw: Dict[str, Any]) -> Dict[str, Any]:
     # Get base recommendation
     recommendation = dict(raw.get("recommendation", {}) or {})
     
+    # Resolve base and solvent names from UIDs
+    base_uid = recommendation.get("base_uid")
+    solvent_uid = recommendation.get("solvent_uid")
+    
+    if base_uid and not recommendation.get("base"):
+        try:
+            base_info = find_reagent(str(base_uid), "base")
+            if isinstance(base_info, dict) and not base_info.get("error"):
+                recommendation["base"] = base_info.get("name") or base_info.get("abbreviation")
+        except Exception:
+            pass
+    
+    if solvent_uid and not recommendation.get("solvent"):
+        try:
+            solvent_info = find_reagent(str(solvent_uid), "solvent")
+            if isinstance(solvent_info, dict) and not solvent_info.get("error"):
+                recommendation["solvent"] = solvent_info.get("name") or solvent_info.get("abbreviation")
+        except Exception:
+            pass
+    
     # For amide formation reactions, extract coupling reagents and additives from precedents
     family = str(raw.get("family", "")).lower()
     is_amide = any(term in family for term in ["amide", "amidation"])
