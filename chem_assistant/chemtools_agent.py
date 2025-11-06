@@ -1,9 +1,8 @@
 """
-LangGraph ReAct agent for ChemTools.
+LangGraph agent for ChemTools.
 
-This module provides a ReAct (Reasoning + Acting) agent that can use
-ChemTools functions to analyze reactions, recommend conditions, and
-answer chemistry questions.
+This module provides an agent that can use ChemTools functions to analyze
+reactions, recommend conditions, and answer chemistry questions.
 
 The agent can:
     - Normalize SMILES and reaction SMILES
@@ -15,17 +14,16 @@ The agent can:
 
 Usage:
     from lang_chain.chemtools_agent import ChemToolsAgent
-    
+
     agent = ChemToolsAgent()
     result = agent.run("What conditions should I use for this reaction: Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1")
     print(result)
 """
 
 import os
-from typing import List, Optional, Union
+from typing import Callable, List, Optional, Union
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
-from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv
 
 from .chemtools_wrapper import CHEMTOOLS_TOOLS
@@ -35,6 +33,15 @@ from .constraint_parser import (
     format_constraints_for_prompt,
     merge_specs,
 )
+
+try:
+    from langgraph.prebuilt import create_agent as _langgraph_agent_factory
+    _LANGGRAPH_AGENT_FACTORY_NAME = "create_agent"
+except (ImportError, AttributeError):
+    from langgraph.prebuilt import create_react_agent as _langgraph_agent_factory  # type: ignore[attr-defined]
+    _LANGGRAPH_AGENT_FACTORY_NAME = "create_react_agent"
+
+LANGGRAPH_AGENT_FACTORY: Callable[..., object] = _langgraph_agent_factory
 
 
 # Load environment variables
@@ -182,16 +189,17 @@ Remember: You're helping chemists design better experiments!
 
 class ChemToolsAgent:
     """
-    ReAct agent for chemistry tasks using ChemTools.
-    
-    This agent combines LLM reasoning with deterministic ChemTools functions
-    to provide accurate chemistry analysis and recommendations.
-    
+    LangGraph agent for chemistry tasks using ChemTools.
+
+    This agent combines LLM reasoning with deterministic ChemTools functions.
+    It prefers LangGraph's `create_agent` helper (auto-selecting tool-calling
+    vs. ReAct) and falls back to `create_react_agent` on older releases.
+
     Example:
         >>> agent = ChemToolsAgent()
         >>> result = agent.run("Recommend conditions for Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1")
         >>> print(result)
-        
+
         >>> # With conversation history
         >>> history = []
         >>> result = agent.run("What is the CAS number for Cs2CO3?", history=history)
@@ -221,9 +229,10 @@ class ChemToolsAgent:
         self.system_prompt = system_prompt or CHEMISTRY_SYSTEM_PROMPT
         self.verbose = verbose
         self.session_constraints = self._coerce_constraints(session_constraints)
+        self.agent_factory_name = _LANGGRAPH_AGENT_FACTORY_NAME
         
-        # Create ReAct agent with tools
-        self.agent = create_react_agent(
+        # Create agent graph with tools (prefers LangGraph create_agent when available)
+        self.agent = LANGGRAPH_AGENT_FACTORY(
             self.llm,
             CHEMTOOLS_TOOLS,
             prompt=self.system_prompt

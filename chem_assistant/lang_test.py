@@ -7,8 +7,13 @@ from datetime import datetime, timedelta
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
 
+try:
+    from langgraph.prebuilt import create_agent as _create_langgraph_agent
+except (ImportError, AttributeError):
+    from langgraph.prebuilt import create_react_agent as _create_langgraph_agent  # type: ignore[attr-defined]
+
+LANGGRAPH_AGENT_FACTORY = _create_langgraph_agent
 
 
 # -------- API Configuration --------
@@ -143,7 +148,7 @@ SYSTEM_MESSAGE = (
     "Always follow this two-step process. Fill in the user details yourself without asking for them."
 )
 
-agent = create_react_agent(llm, TOOLS, prompt=SYSTEM_MESSAGE)
+agent = LANGGRAPH_AGENT_FACTORY(llm, TOOLS, prompt=SYSTEM_MESSAGE)
 
 
 def run_agent(user_input: str, history: List[BaseMessage]) -> AIMessage:

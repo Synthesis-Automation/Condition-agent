@@ -25,9 +25,9 @@ Available Tools:
 
 Usage:
     from lang_chain.chemtools_wrapper import CHEMTOOLS_TOOLS
-    from langgraph.prebuilt import create_react_agent
-    
-    agent = create_react_agent(llm, CHEMTOOLS_TOOLS)
+    from langgraph.prebuilt import create_agent
+
+    agent = create_agent(llm, CHEMTOOLS_TOOLS)
 """
 
 from typing import Dict, Any, List, Optional, Sequence, Tuple, Union, Literal

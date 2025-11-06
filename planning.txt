@@ -1,6 +1,6 @@
 LLM Planning Today
 
-The current agent already lets the model decide multi-step tool usage: ChemToolsAgent builds a LangGraph ReAct executor with create_react_agent(...) and the full tool registry (CHEMTOOLS_TOOLS) at import time (lang_chain/chemtools_agent.py (lines 24-125), lang_chain/chemtools_wrapper.py (lines 22-159)). Every query is handled by the LLM selecting and sequencing tools on the fly, so routine “small” workflows (normalize → classify → recommend → explain) are already model-planned rather than hard-coded.
+The current agent already lets the model decide multi-step tool usage: ChemToolsAgent builds a LangGraph agent executor with create_agent(...) (falling back to create_react_agent when needed) and the full tool registry (CHEMTOOLS_TOOLS) at import time (lang_chain/chemtools_agent.py (lines 24-125), lang_chain/chemtools_wrapper.py (lines 22-159)). Every query is handled by the LLM selecting and sequencing tools on the fly, so routine “small” workflows (normalize → classify → recommend → explain) are already model-planned rather than hard-coded.
 You can see a lighter-weight example of this pattern in lang_chain/lang_test.py (lines 146-160), where the system prompt forces a two-step plan (generate → save). That demonstrates how far prompt engineering alone can push the built-in planner.
 Beyond ReAct — richer workflows
 
