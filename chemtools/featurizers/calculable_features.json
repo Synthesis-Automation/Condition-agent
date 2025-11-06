@@ -542,6 +542,18 @@
       "why": "Anilines"
     },
     {
+      "token": "ammonia_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[NH3]",
+          "[NH4+]"
+        ]
+      },
+      "why": "Ammonia (NH3) or ammonium salt; used as nitrogen source in arylation reactions (Ullmann, Buchwald-Hartwig)"
+    },
+    {
       "token": "boc_present",
       "type": "bool",
       "scope": "global",

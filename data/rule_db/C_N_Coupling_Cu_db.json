@@ -125,7 +125,7 @@
       },
       "electrophile_features": {
         "any": [
-          "aryl_chloride_present"
+          "sp2_chloride_present"
         ]
       },
       "conditions": {
@@ -198,7 +198,7 @@
     {
       "id": "MOD_oxalamide_for_chloride",
       "when": [
-        "aryl_chloride_present"
+        "sp2_chloride_present"
       ],
       "suggest": "Use oxalamide (or NHC/Cu) ligands with K3PO4 in dioxane; plan 110–130 °C."
     },
@@ -222,7 +222,7 @@
       "id": "MOD_pyridine_chelators",
       "when": [
         "pyridine_poison_risk",
-        "strong_chelator_present"
+        "bidentate_chelator_present"
       ],
       "suggest": "Increase Cu/ligand loading slightly (e.g., +2–3 mol% Cu), use diamine or phenanthroline ligand, and consider more polar solvent."
     },
