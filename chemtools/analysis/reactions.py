@@ -41,6 +41,18 @@ FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     
     # Amide Coupling
     "Amide_Coupling": "amide_coupling",
+    
+    # SNAr reactions
+    "S_NAr": "snar",
+    "SNAr": "snar",
+    "snar": "snar",  # Lowercase variant from detection engine
+    "s_nar": "snar",
+    "Aromatic_Nucleophilic_Substitution": "snar",
+    "aromatic_nucleophilic_substitution": "snar",
+    
+    # Reductive Amination
+    "Reductive_Amination": "reductive_amination",
+    "reductive_amination": "reductive_amination",  # Lowercase variant
 }
 
 CN_FAMILIES_CANONICAL: Set[str] = {

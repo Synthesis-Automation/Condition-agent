@@ -15,6 +15,7 @@ import os
 import re
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
+from ..util.functional_groups import detect_all as detect_functional_groups
 
 try:  # Optional role-aware vectors
     from chemtools.features.role import featurize_mol as _role_feat  # type: ignore
@@ -376,6 +377,114 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     }
 
 
+def _enrich_with_functional_groups(
+    features: Dict[str, Any],
+    electrophile: str,
+    nucleophile: str
+) -> Dict[str, Any]:
+    """
+    Enrich feature dict with comprehensive functional group detection.
+    
+    Adds <group_name>_present boolean tokens for all detected functional groups,
+    plus special tokens for SNAr and reductive amination reactions.
+    
+    Args:
+        features: Base feature dictionary to enrich
+        electrophile: SMILES string of electrophile
+        nucleophile: SMILES string of nucleophile
+        
+    Returns:
+        Enriched feature dictionary with functional group tokens
+    """
+    enriched = dict(features)
+    
+    # Detect functional groups in both reactants
+    if electrophile:
+        elec_groups = detect_functional_groups(electrophile)
+        for group, present in elec_groups.items():
+            if present:
+                enriched[f"{group}_present"] = True
+    
+    if nucleophile:
+        nuc_groups = detect_functional_groups(nucleophile)
+        for group, present in nuc_groups.items():
+            if present:
+                enriched[f"{group}_present"] = True
+    
+    # Add convenience aliases for common patterns
+    # Primary/secondary/tertiary amine detection
+    if enriched.get("amine_primary_present"):
+        enriched["primary_amine_present"] = True
+    if enriched.get("amine_secondary_present"):
+        enriched["secondary_amine_present"] = True
+    if enriched.get("amine_tertiary_present"):
+        enriched["tertiary_amine_present"] = True
+    
+    # Aniline is both an amine and aromatic
+    if enriched.get("aniline_present"):
+        enriched["primary_amine_present"] = True
+    
+    # Amide convenience tokens
+    if enriched.get("amide_primary_present"):
+        enriched["primary_amide_present"] = True
+    if enriched.get("amide_secondary_present"):
+        enriched["secondary_amide_present"] = True
+    
+    # General amine nucleophile token (any N-nucleophile)
+    if any(enriched.get(k) for k in [
+        "amine_primary_present", "amine_secondary_present", "amine_tertiary_present",
+        "aniline_present", "primary_amine_present", "secondary_amine_present"
+    ]):
+        enriched["amine_nucleophile_present"] = True
+    
+    # Alcohol/phenol/thiol tokens
+    if enriched.get("alcohol_present") or enriched.get("phenol_present"):
+        enriched["o_nucleophile_present"] = True
+    if enriched.get("thiol_present"):
+        enriched["s_nucleophile_present"] = True
+    
+    # Carbonyl tokens for reductive amination
+    if enriched.get("aldehyde_present") or enriched.get("ketone_present"):
+        enriched["carbonyl_present"] = True
+    
+    # SNAr-specific electrophile detection
+    # Activated aryl halides or heteroaryls suitable for SNAr
+    is_heteroaryl = enriched.get("heteroaryl", False) or enriched.get("heteroaryl_present", False)
+    has_aryl_halide = any(enriched.get(k) for k in [
+        "aryl_chloride_present", "aryl_bromide_present", 
+        "aryl_fluoride_present", "aryl_iodide_present",
+        "aryl_halide_present"  # Also check general aryl halide token
+    ])
+    has_strong_ewg = any(enriched.get(k) for k in [
+        "nitro_present", "nitrile_present", "carbonyl_present"
+    ])
+    
+    # Aromatic electrophile present if heteroaryl or aryl halide
+    if is_heteroaryl or has_aryl_halide:
+        enriched["aromatic_electrophile_present"] = True
+    
+    # SNAr applicable if heteroaryl (intrinsically activated) or aryl halide with EWG
+    if is_heteroaryl or (has_aryl_halide and has_strong_ewg):
+        enriched["snar_applicable_electrophile_present"] = True
+    # Special case: heteroaryl halides are ALWAYS SNAr-applicable even without additional EWGs
+    if is_heteroaryl and has_aryl_halide:
+        enriched["snar_applicable_electrophile_present"] = True
+    
+    # Aryl halide general token
+    if has_aryl_halide:
+        enriched["aryl_halide_present"] = True
+    
+    # sp2 halide token (for Suzuki/cross-coupling)
+    if has_aryl_halide or enriched.get("vinyl_halide_present"):
+        enriched["sp2_halide_present"] = True
+    
+    # Boron reagent tokens (for Suzuki)
+    if any(enriched.get(k) for k in ["boronic_acid_present", "boronic_ester_present"]):
+        enriched["sp2_boron_present"] = True
+    
+    return enriched
+
+
 def featurize(
     electrophile: str,
     nucleophile: str,
@@ -407,6 +516,10 @@ def featurize(
     """
     base = _featurize_cached(electrophile, nucleophile)
     out = dict(base)
+
+    # Enrich with comprehensive functional group detection
+    # This adds <group>_present tokens needed by rule databases
+    out = _enrich_with_functional_groups(out, electrophile, nucleophile)
 
     # Attach calculable features when explicitly enabled via env or parameter
     if include_calculable is None:
