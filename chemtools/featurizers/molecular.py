@@ -235,14 +235,16 @@ def _detect_electrophile(mol) -> Dict[str, Any]:
             ortho_count = sum(1 for a in ortho_atoms if is_substituted(a))
 
     # para EWG approximation: check presence of any EWG anywhere on molecule
+    # BUT only relevant for aryl/vinyl electrophiles WITH a leaving group (not carbonyl compounds)
     para_ewg = False
-    for patt in ewg_smarts:
-        try:
-            if mol.HasSubstructMatch(patt):
-                para_ewg = True
-                break
-        except Exception:
-            continue
+    if lg != "UNK" and elec_class in ("aryl", "vinyl", "alkenyl"):
+        for patt in ewg_smarts:
+            try:
+                if mol.HasSubstructMatch(patt):
+                    para_ewg = True
+                    break
+            except Exception:
+                continue
 
     res.update({
         "LG": lg,
