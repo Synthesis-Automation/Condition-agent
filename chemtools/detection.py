@@ -18,8 +18,7 @@ import logging
 
 from .smiles import normalize_reaction
 from .router import (
-    _compile_smarts,
-    _SMARTS,
+    _SMARTS_PATTERNS,
     _rule_hits,
     _detect_agent_metals,
     _detect_reducing_agent,
@@ -27,6 +26,7 @@ from .router import (
     _detect_strong_base,
     _detect_radical_initiator,
 )
+from .util.smarts_cache import compile_smarts
 from .detection_mapper import (
     resolve_to_taxonomy,
     calculate_confidence_adjustment,

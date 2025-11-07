@@ -35,6 +35,61 @@
 - Naming: `snake_case` (functions/vars), `PascalCase` (classes), `UPPER_SNAKE` (constants).
 - Keep API contracts in sync with `chemtools/contracts.py`; prefer simple, explicit data models.
 
+### SMARTS Pattern Compilation
+
+**Always use the centralized cache** for SMARTS pattern compilation:
+
+```python
+from chemtools.util.smarts_cache import compile_smarts
+
+# Compile a single pattern (cached automatically)
+pattern = compile_smarts("[CX4][Cl,Br,I]", validate=False)
+if pattern and mol.HasSubstructMatch(pattern):
+    # Match found
+    pass
+```
+
+**Best Practices:**
+
+1. **Module-level pattern definitions**: Define SMARTS strings as module-level constants:
+   ```python
+   _MY_PATTERNS = {
+       "aryl_halide": "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",
+       "alcohol": "[OX2H]",
+   }
+   ```
+
+2. **Lazy compilation**: Compile patterns only when needed, not at module import:
+   ```python
+   # Good: Lazy compilation via centralized cache
+   def detect_feature(mol):
+       pattern = compile_smarts(_MY_PATTERNS["aryl_halide"], validate=False)
+       return mol.HasSubstructMatch(pattern) if pattern else False
+   
+   # Bad: Eager compilation at module load
+   _PATTERN = Chem.MolFromSmarts("[CX4][Cl,Br,I]")  # ❌ Don't do this
+   ```
+
+3. **Validation**: Use `validate=True` for critical patterns, `validate=False` for speed:
+   ```python
+   # Development: Validate new patterns
+   pattern = compile_smarts(smarts, validate=True)
+   
+   # Production: Skip validation for known-good patterns
+   pattern = compile_smarts(smarts, validate=False)
+   ```
+
+4. **Never call `Chem.MolFromSmarts()` directly** - always use `compile_smarts()` to benefit from global caching.
+
+5. **Batch compilation**: For multiple patterns at startup:
+   ```python
+   from chemtools.util.smarts_cache import compile_smarts_batch
+   
+   patterns = compile_smarts_batch(_MY_PATTERNS, skip_invalid=True)
+   ```
+
+**Benefits**: 1024-entry global LRU cache provides 10-100× speedup for repeated patterns, shared across all modules.
+
 ## Testing Guidelines
 
 - Framework: `pytest`; tests live in `tests/test_*.py` mirroring module names.

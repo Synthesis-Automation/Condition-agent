@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 from typing import Dict, List, Optional, Tuple
 from .rdkit_helpers import rdkit_available, parse_smiles
+from .smarts_cache import compile_smarts
 
 
 # ============================================================================
@@ -179,11 +180,6 @@ TEXT_PATTERNS = {
 
 def _detect_with_rdkit(smiles: str, patterns: Dict[str, str]) -> Dict[str, bool]:
     """Detect functional groups using RDKit SMARTS matching."""
-    try:
-        from rdkit import Chem  # type: ignore
-    except Exception:
-        return {}
-    
     mol = parse_smiles(smiles)
     if mol is None:
         return {}
@@ -191,7 +187,7 @@ def _detect_with_rdkit(smiles: str, patterns: Dict[str, str]) -> Dict[str, bool]
     results = {}
     for name, smarts in patterns.items():
         try:
-            pattern = Chem.MolFromSmarts(smarts)
+            pattern = compile_smarts(smarts, validate=False)
             if pattern is not None:
                 results[name] = mol.HasSubstructMatch(pattern)
             else:
@@ -335,12 +331,11 @@ def count_functional_groups(smiles: Optional[str], group_name: str) -> int:
         return 1 if has_functional_group(smiles, group_name) else 0
     
     try:
-        from rdkit import Chem  # type: ignore
         mol = parse_smiles(smiles)
         if mol is None:
             return 0
         
-        pattern = Chem.MolFromSmarts(FUNCTIONAL_GROUP_SMARTS[group_name])
+        pattern = compile_smarts(FUNCTIONAL_GROUP_SMARTS[group_name], validate=False)
         if pattern is None:
             return 0
         
