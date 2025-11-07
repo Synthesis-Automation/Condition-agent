@@ -8,10 +8,14 @@ from typing import Any, Dict, Mapping
 from rdkit import Chem
 from rdkit.Chem.rdchem import Atom, Mol
 
+from .util.smarts_cache import compile_smarts
 
-_PHENOL = Chem.MolFromSmarts("[cX3][OX2H]")
-_FREE_ALCOHOL = Chem.MolFromSmarts("[CX4;!$([CX3](=O)[OX2H0-,OX1-])][OX2H]")
-_CARBOXYLIC_ACID = Chem.MolFromSmarts("C(=O)[OX2H1]")
+
+# SMARTS patterns for functional group detection
+# Compiled lazily via centralized cache
+_PHENOL_SMARTS = "[cX3][OX2H]"
+_FREE_ALCOHOL_SMARTS = "[CX4;!$([CX3](=O)[OX2H0-,OX1-])][OX2H]"
+_CARBOXYLIC_ACID_SMARTS = "C(=O)[OX2H1]"
 
 
 @dataclass(slots=True)
@@ -36,7 +40,12 @@ def _mol_from_smiles(smiles: Any) -> Mol | None:
 
 
 def _alpha_amino_context(mol: Mol | None) -> _AlphaAmineInfo:
-    if mol is None or _CARBOXYLIC_ACID is None:
+    if mol is None:
+        return _AlphaAmineInfo(False, False, False)
+
+    # Compile carboxylic acid pattern lazily
+    carboxylic_acid_pattern = compile_smarts(_CARBOXYLIC_ACID_SMARTS, validate=False)
+    if carboxylic_acid_pattern is None:
         return _AlphaAmineInfo(False, False, False)
 
     is_alpha_amino = False
@@ -44,7 +53,7 @@ def _alpha_amino_context(mol: Mol | None) -> _AlphaAmineInfo:
     beta_hetero = False
 
     try:
-        matches = mol.GetSubstructMatches(_CARBOXYLIC_ACID)
+        matches = mol.GetSubstructMatches(carboxylic_acid_pattern)
     except Exception:
         matches = ()
 
@@ -98,11 +107,13 @@ def _any_substructure(mol: Mol | None, pattern: Mol | None) -> bool:
 
 
 def _has_phenol(smiles: str) -> bool:
-    return _any_substructure(_mol_from_smiles(smiles), _PHENOL)
+    pattern = compile_smarts(_PHENOL_SMARTS, validate=False)
+    return _any_substructure(_mol_from_smiles(smiles), pattern)
 
 
 def _has_free_alcohol(smiles: str) -> bool:
-    return _any_substructure(_mol_from_smiles(smiles), _FREE_ALCOHOL)
+    pattern = compile_smarts(_FREE_ALCOHOL_SMARTS, validate=False)
+    return _any_substructure(_mol_from_smiles(smiles), pattern)
 
 
 def _choose_acid_class(acid_ctx: Mapping[str, Any], rule_features: Mapping[str, Any]) -> str:

@@ -28,7 +28,22 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set, Any
 from .rdkit_helpers import rdkit_available, parse_smiles
+from .smarts_cache import compile_smarts
 from .functional_groups import detect_all, get_functional_groups
+
+
+# ============================================================================
+# Module-level SMARTS pattern definitions (compiled lazily via cache)
+# ============================================================================
+
+_SPECIAL_POSITION_SMARTS = {
+    'benzylic': "[CX4;H1,H2,H3]-[c,$(C=C-c)]",  # CH next to aromatic
+    'allylic': "[CX4;H1,H2,H3]-[CX3]=[CX3]",    # CH next to C=C
+    'propargylic': "[CX4;H1,H2,H3]-[CX2]#[CX2]",  # CH next to C≡C
+    'alpha_to_carbonyl': "[CX4;H1,H2,H3]-[CX3]=[OX1]",  # CH next to C=O
+}
+
+_ORTHO_HETEROATOM_SMARTS = "c1ccccc1"  # Simple benzene ring
 
 
 # ============================================================================
@@ -229,17 +244,9 @@ class SubstrateClassifier:
         if not self._rdkit_available:
             return positions
         
-        from rdkit import Chem
-        
-        # SMARTS patterns for special positions
-        patterns = {
-            'benzylic': Chem.MolFromSmarts("[CX4;H1,H2,H3]-[c,$(C=C-c)]"),  # CH next to aromatic
-            'allylic': Chem.MolFromSmarts("[CX4;H1,H2,H3]-[CX3]=[CX3]"),    # CH next to C=C
-            'propargylic': Chem.MolFromSmarts("[CX4;H1,H2,H3]-[CX2]#[CX2]"),  # CH next to C≡C
-            'alpha_to_carbonyl': Chem.MolFromSmarts("[CX4;H1,H2,H3]-[CX3]=[OX1]"),  # CH next to C=O
-        }
-        
-        for pos_type, pattern in patterns.items():
+        # Compile patterns from module-level definitions (cached globally)
+        for pos_type, smarts in _SPECIAL_POSITION_SMARTS.items():
+            pattern = compile_smarts(smarts, validate=False)
             if pattern:
                 matches = mol.GetSubstructMatches(pattern)
                 # First atom in match is the special position
@@ -247,7 +254,7 @@ class SubstrateClassifier:
                 setattr(positions, pos_type, sorted(set(atom_indices)))
         
         # Ortho to heteroatom on aromatic ring
-        ortho_pattern = Chem.MolFromSmarts("c1ccccc1")  # Simple benzene
+        ortho_pattern = compile_smarts(_ORTHO_HETEROATOM_SMARTS, validate=False)
         if ortho_pattern:
             ring_matches = mol.GetSubstructMatches(ortho_pattern)
             ortho_atoms = []
@@ -276,7 +283,6 @@ class SubstrateClassifier:
         if not self._rdkit_available:
             return []
         
-        from rdkit import Chem
         reactive = []
         
         # Priority order: heteroatoms > special carbons
@@ -290,7 +296,7 @@ class SubstrateClassifier:
         ]
         
         for smarts, _ in heteroatom_patterns:
-            pattern = Chem.MolFromSmarts(smarts)
+            pattern = compile_smarts(smarts, validate=False)
             if pattern:
                 matches = mol.GetSubstructMatches(pattern)
                 for match in matches:
@@ -351,7 +357,6 @@ class SubstrateClassifier:
         if not self._rdkit_available:
             return {}
         
-        from rdkit import Chem
         from .functional_groups import FUNCTIONAL_GROUP_SMARTS
         
         fg_atoms = {}
@@ -364,7 +369,7 @@ class SubstrateClassifier:
             if not smarts:
                 continue
             
-            pattern = Chem.MolFromSmarts(smarts)
+            pattern = compile_smarts(smarts, validate=False)
             if not pattern:
                 continue
             
@@ -523,10 +528,9 @@ class SubstrateClassifier:
         # Determine substitution (primary, secondary, tertiary)
         # This requires analyzing the carbon bearing the halogen
         if info.mol and self._rdkit_available:
-            from rdkit import Chem
             # Find halogen atom
             halogen_symbol = {'iodide': 'I', 'bromide': 'Br', 'chloride': 'Cl', 'fluoride': 'F'}[halogen]
-            pattern = Chem.MolFromSmarts(f"[CX4]-[{halogen_symbol}]")
+            pattern = compile_smarts(f"[CX4]-[{halogen_symbol}]", validate=False)
             if pattern:
                 matches = info.mol.GetSubstructMatches(pattern)
                 if matches:

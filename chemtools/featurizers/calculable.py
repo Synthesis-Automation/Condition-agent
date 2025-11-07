@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
+from ..util.smarts_cache import compile_smarts as _compile_smarts
 
 # Path to the feature specification JSON
 _SPEC_PATH = Path(__file__).parent / "calculable_features.json"
@@ -55,21 +56,9 @@ def get_feature_spec() -> Dict[str, Any]:
 
 
 # ============================================================================
-# SMARTS Pattern Compilation and Caching
+# SMARTS Pattern Compilation and Caching (now uses centralized cache)
 # ============================================================================
-
-@lru_cache(maxsize=512)
-def _compile_smarts(smarts: str):
-    """Compile a SMARTS pattern with caching. Returns None if RDKit unavailable or invalid."""
-    if not rdkit_available():
-        return None
-    
-    try:
-        from rdkit import Chem
-        pattern = Chem.MolFromSmarts(smarts)
-        return pattern
-    except Exception:
-        return None
+# Note: _compile_smarts is now imported from util.smarts_cache for global caching
 
 
 # ============================================================================

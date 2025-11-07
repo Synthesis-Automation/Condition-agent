@@ -16,6 +16,7 @@ import re
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
 from ..util.functional_groups import detect_all as detect_functional_groups
+from ..util.smarts_cache import compile_smarts
 
 try:  # Optional role-aware vectors
     from chemtools.features.role import featurize_mol as _role_feat  # type: ignore
@@ -139,6 +140,22 @@ def _guess_lg_text(s: str) -> str:
     return "UNK"
 
 
+# SMARTS patterns for electrophile detection
+_ELECTROPHILE_PATTERNS = {
+    "aryl_halide": "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",
+    "triflate": "OS(=O)(=O)C(F)(F)F",
+    "vinyl_halide": "C=C[Cl,Br,I]",
+    "alkyl_halide": "[CX4][Cl,Br,I]",
+}
+
+_EWG_PATTERNS = [
+    "[N+](=O)[O-]",  # Nitro
+    "C#N",           # Cyano
+    "C(F)(F)F",      # CF3
+    "C(=O)[!O]"      # Carbonyl (not ester)
+]
+
+
 def _detect_electrophile(mol) -> Dict[str, Any]:
     """Extract electrophile features (LG, class, ortho substitution, EWG, heteroaryl)."""
     # Default values
@@ -151,24 +168,16 @@ def _detect_electrophile(mol) -> Dict[str, Any]:
     }
     if mol is None or not rdkit_available():
         return res
-    try:
-        from rdkit import Chem  # type: ignore
-    except Exception:
-        return res
 
-    # SMARTS patterns
-    patt_aryl_halide = Chem.MolFromSmarts("[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]")
-    patt_triflate = Chem.MolFromSmarts("OS(=O)(=O)C(F)(F)F")
-    patt_vinyl_halide = Chem.MolFromSmarts("C=C[Cl,Br,I]")
-    patt_alkyl_halide = Chem.MolFromSmarts("[CX4][Cl,Br,I]")
+    # Compile SMARTS patterns lazily via centralized cache
+    patt_aryl_halide = compile_smarts(_ELECTROPHILE_PATTERNS["aryl_halide"], validate=False)
+    patt_triflate = compile_smarts(_ELECTROPHILE_PATTERNS["triflate"], validate=False)
+    patt_vinyl_halide = compile_smarts(_ELECTROPHILE_PATTERNS["vinyl_halide"], validate=False)
+    patt_alkyl_halide = compile_smarts(_ELECTROPHILE_PATTERNS["alkyl_halide"], validate=False)
 
-    # EWG patterns (anywhere on ring; approximate)
-    ewg_smarts = [
-        Chem.MolFromSmarts("[N+](=O)[O-]"),
-        Chem.MolFromSmarts("C#N"),
-        Chem.MolFromSmarts("C(F)(F)F"),
-        Chem.MolFromSmarts("C(=O)[!O]")
-    ]
+    # Compile EWG patterns
+    ewg_smarts = [compile_smarts(p, validate=False) for p in _EWG_PATTERNS]
+    ewg_smarts = [p for p in ewg_smarts if p is not None]
 
     # Determine LG and class
     lg = "UNK"
@@ -199,8 +208,8 @@ def _detect_electrophile(mol) -> Dict[str, Any]:
     # Halides
     if lg == "UNK":
         for sym in ("I", "Br", "Cl"):
-            patt = Chem.MolFromSmarts(f"[c,C][{sym}]")
-            if mol.HasSubstructMatch(patt):
+            patt = compile_smarts(f"[c,C][{sym}]", validate=False)
+            if patt and mol.HasSubstructMatch(patt):
                 lg = sym
                 # pick a match
                 mi = mol.GetSubstructMatch(patt)
@@ -276,6 +285,17 @@ def _nuc_class_text(s: str) -> str:
     return "amine"
 
 
+# SMARTS patterns for nucleophile detection
+_NUCLEOPHILE_PATTERNS = {
+    "aniline": "[$([NX3;H1][c]),$([NX3]([c])[H])]",
+    "indole": "[nH]",
+    "phenol": "c[OH]",
+    "amide": "N[C;X3](=O)",
+    "sec_amine": "[NX3;H1]([!#6])([#6])",
+    "prim_amine": "[NX3;H2][#6]",
+}
+
+
 def _nucleophile_features(mol, text: str) -> Dict[str, Any]:
     """Extract nucleophile features (class, basicity, sterics)."""
     nuc_class = _nuc_class_text(text)
@@ -293,35 +313,30 @@ def _nucleophile_features(mol, text: str) -> Dict[str, Any]:
             n_basicity = "deactivated"
         return {"nuc_class": nuc_class, "n_basicity": n_basicity, "steric_alpha": steric_alpha}
 
-    try:
-        from rdkit import Chem  # type: ignore
-    except Exception:
-        return {"nuc_class": nuc_class, "n_basicity": n_basicity, "steric_alpha": steric_alpha}
+    # Compile SMARTS patterns lazily via centralized cache
+    patt_aniline = compile_smarts(_NUCLEOPHILE_PATTERNS["aniline"], validate=False)
+    patt_indole = compile_smarts(_NUCLEOPHILE_PATTERNS["indole"], validate=False)
+    patt_phenol = compile_smarts(_NUCLEOPHILE_PATTERNS["phenol"], validate=False)
+    patt_amide = compile_smarts(_NUCLEOPHILE_PATTERNS["amide"], validate=False)
+    patt_sec_amine = compile_smarts(_NUCLEOPHILE_PATTERNS["sec_amine"], validate=False)
+    patt_prim_amine = compile_smarts(_NUCLEOPHILE_PATTERNS["prim_amine"], validate=False)
 
-    # SMARTS patterns
-    patt_aniline = Chem.MolFromSmarts("[$([NX3;H1][c]),$([NX3]([c])[H])]")
-    patt_indole = Chem.MolFromSmarts("[nH]")
-    patt_phenol = Chem.MolFromSmarts("c[OH]")
-    patt_amide = Chem.MolFromSmarts("N[C;X3](=O)")
-    patt_sec_amine = Chem.MolFromSmarts("[NX3;H1]([!#6])([#6])")
-    patt_prim_amine = Chem.MolFromSmarts("[NX3;H2][#6]")
-
-    if mol.HasSubstructMatch(patt_indole):
+    if patt_indole and mol.HasSubstructMatch(patt_indole):
         nuc_class = "indole"
         n_basicity = "deactivated"
-    elif mol.HasSubstructMatch(patt_aniline):
+    elif patt_aniline and mol.HasSubstructMatch(patt_aniline):
         nuc_class = "aniline"
         n_basicity = "aromatic_primary"
-    elif mol.HasSubstructMatch(patt_phenol):
+    elif patt_phenol and mol.HasSubstructMatch(patt_phenol):
         nuc_class = "phenol"
         n_basicity = "deactivated"
-    elif mol.HasSubstructMatch(patt_amide):
+    elif patt_amide and mol.HasSubstructMatch(patt_amide):
         nuc_class = "amide_deactivated"
         n_basicity = "deactivated"
-    elif mol.HasSubstructMatch(patt_sec_amine):
+    elif patt_sec_amine and mol.HasSubstructMatch(patt_sec_amine):
         nuc_class = "amine_secondary"
         n_basicity = "secondary"
-    elif mol.HasSubstructMatch(patt_prim_amine):
+    elif patt_prim_amine and mol.HasSubstructMatch(patt_prim_amine):
         nuc_class = "amine_primary"
         n_basicity = "aliphatic_primary"
     else:

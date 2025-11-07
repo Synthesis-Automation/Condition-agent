@@ -16,64 +16,57 @@ from .analysis.reactions import (
     resolve_reaction_family as _resolve_reaction_family,
 )
 from .util.rdkit_helpers import rdkit_available, parse_smiles
+from .util.smarts_cache import compile_smarts
 from .smiles import normalize_reaction as _normalize_reaction
 
 
-def _compile_smarts():
-    if not rdkit_available():
-        return None
-    try:
-        from rdkit import Chem  # type: ignore
-    except Exception:
-        return None
-    smarts = {
-        # Aryl halide: aromatic carbon bound to Cl/Br/I
-        "aryl_halide": Chem.MolFromSmarts("[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]") ,
-        # Vinyl halide/triflate (simple patterns)
-        "vinyl_halide": Chem.MolFromSmarts("C=C[Cl,Br,I]"),
-        "triflate": Chem.MolFromSmarts("OS(=O)(=O)C(F)(F)F"),
-        # Boron partners (boronic acids/esters)
-        "boron": Chem.MolFromSmarts("[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]"),
-        # Terminal alkyne
-        "terminal_alkyne": Chem.MolFromSmarts("C#C[H]") or Chem.MolFromSmarts("[C;H]#C"),
-        # Carboxylic acid
-        "acid": Chem.MolFromSmarts("C(=O)[OH]"),
-        # N-nucleophile (amine/anilines, simple)
-        "nucleophile_n": Chem.MolFromSmarts("[NX3;H1,H2]"),
-        # Phenoxide/alcohol O-H (for C-O coupling)
-        "nucleophile_o": Chem.MolFromSmarts("[OX2H]"),
-        # Thiol S-H (for C-S coupling)
-        "nucleophile_s": Chem.MolFromSmarts("[SX2H]"),
-        
-        # Phase 2 additions - carbonyl compounds
-        "carbonyl": Chem.MolFromSmarts("[CX3]=O"),  # Ketone, aldehyde, or ester carbonyl
-        "aldehyde": Chem.MolFromSmarts("[CX3H](=O)"),  # Aldehyde specifically
-        "ketone": Chem.MolFromSmarts("[CX3](=O)[C]"),  # Ketone specifically
-        "ester": Chem.MolFromSmarts("[CX3](=O)[OX2][C,H]"),  # Ester
-        "acyl_halide": Chem.MolFromSmarts("[CX3](=O)[Cl,Br]"),  # Acyl chloride/bromide
-        
-        # Phase 2 additions - nucleophiles and organometallics
-        "alcohol": Chem.MolFromSmarts("[CX4][OX2H]"),  # Aliphatic alcohol
-        "grignard": Chem.MolFromSmarts("[C,c][Mg][Br,Cl,I]"),  # Grignard reagent
-        "organozinc": Chem.MolFromSmarts("[C,c][Zn][Br,Cl,I]"),  # Organozinc (Negishi)
-        "organolithium": Chem.MolFromSmarts("[C,c][Li]"),  # Organolithium
-        "cyanide": Chem.MolFromSmarts("[C-]#N"),  # Cyanide anion
-        "iodide": Chem.MolFromSmarts("[I-]"),  # Iodide anion
-        "alkoxide": Chem.MolFromSmarts("[O-][C,H]"),  # Alkoxide anion
-        
-        # Phase 2 additions - alkyl halides and alkenes
-        "alkyl_halide": Chem.MolFromSmarts("[CX4][Cl,Br,I]"),  # Alkyl halide (not aromatic)
-        "alkene": Chem.MolFromSmarts("C=C"),  # Simple alkene
-        "conjugated_diene": Chem.MolFromSmarts("C=C-C=C"),  # Conjugated diene
-        "alpha_beta_unsaturated": Chem.MolFromSmarts("C=C-[CX3]=O"),  # α,β-unsaturated carbonyl
-        
-        # Phase 2 additions - boron reagents
-        "borane": Chem.MolFromSmarts("[BH3,BH2,BH]"),  # Borane (BH3, B2H6, etc.)
-    }
-    return smarts
-
-
-_SMARTS = _compile_smarts()
+# SMARTS patterns for substrate classification
+# These are compiled lazily via the centralized cache
+_SMARTS_PATTERNS = {
+    # Aryl halide: aromatic carbon bound to Cl/Br/I
+    "aryl_halide": "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",
+    # Vinyl halide/triflate (simple patterns)
+    "vinyl_halide": "C=C[Cl,Br,I]",
+    "triflate": "OS(=O)(=O)C(F)(F)F",
+    # Boron partners (boronic acids/esters)
+    "boron": "[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]",
+    # Terminal alkyne
+    "terminal_alkyne": "C#C[H]",  # Note: will try this first, fallback handled in usage
+    "terminal_alkyne_alt": "[C;H]#C",  # Alternative pattern
+    # Carboxylic acid
+    "acid": "C(=O)[OH]",
+    # N-nucleophile (amine/anilines, simple)
+    "nucleophile_n": "[NX3;H1,H2]",
+    # Phenoxide/alcohol O-H (for C-O coupling)
+    "nucleophile_o": "[OX2H]",
+    # Thiol S-H (for C-S coupling)
+    "nucleophile_s": "[SX2H]",
+    
+    # Phase 2 additions - carbonyl compounds
+    "carbonyl": "[CX3]=O",  # Ketone, aldehyde, or ester carbonyl
+    "aldehyde": "[CX3H](=O)",  # Aldehyde specifically
+    "ketone": "[CX3](=O)[C]",  # Ketone specifically
+    "ester": "[CX3](=O)[OX2][C,H]",  # Ester
+    "acyl_halide": "[CX3](=O)[Cl,Br]",  # Acyl chloride/bromide
+    
+    # Phase 2 additions - nucleophiles and organometallics
+    "alcohol": "[CX4][OX2H]",  # Aliphatic alcohol
+    "grignard": "[C,c][Mg][Br,Cl,I]",  # Grignard reagent
+    "organozinc": "[C,c][Zn][Br,Cl,I]",  # Organozinc (Negishi)
+    "organolithium": "[C,c][Li]",  # Organolithium
+    "cyanide": "[C-]#N",  # Cyanide anion
+    "iodide": "[I-]",  # Iodide anion
+    "alkoxide": "[O-][C,H]",  # Alkoxide anion
+    
+    # Phase 2 additions - alkyl halides and alkenes
+    "alkyl_halide": "[CX4][Cl,Br,I]",  # Alkyl halide (not aromatic)
+    "alkene": "C=C",  # Simple alkene
+    "conjugated_diene": "C=C-C=C",  # Conjugated diene
+    "alpha_beta_unsaturated": "C=C-[CX3]=O",  # α,β-unsaturated carbonyl
+    
+    # Phase 2 additions - boron reagents
+    "borane": "[BH3,BH2,BH]",  # Borane (BH3, B2H6, etc.)
+}
 
 
 def resolve_reaction_family(family: Optional[str]) -> Optional[str]:
@@ -181,17 +174,27 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
     }
 
     # RDKit SMARTS matching when available; OR with text_hits to be robust to parse failures
-    if _SMARTS is not None and rdkit_available():
-        try:
-            from rdkit import Chem  # type: ignore
-        except Exception:
-            Chem = None  # type: ignore
+    if rdkit_available():
         mols = [parse_smiles(s) for s in reactants]
         mols = [m for m in mols if m is not None]
+        
         def any_match(key: str) -> bool:
-            patt = _SMARTS.get(key)
-            if patt is None:
+            """Check if any molecule matches the SMARTS pattern for the given key."""
+            smarts = _SMARTS_PATTERNS.get(key)
+            if not smarts:
                 return False
+            
+            # Compile pattern lazily via centralized cache
+            patt = compile_smarts(smarts, validate=False)
+            if patt is None:
+                # For terminal_alkyne, try alternative pattern if first fails
+                if key == "terminal_alkyne":
+                    alt_smarts = _SMARTS_PATTERNS.get("terminal_alkyne_alt")
+                    if alt_smarts:
+                        patt = compile_smarts(alt_smarts, validate=False)
+                if patt is None:
+                    return False
+            
             for m in mols:
                 try:
                     if m.HasSubstructMatch(patt):
@@ -199,6 +202,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
                 except Exception:
                     continue
             return False
+        
         # RDKit SMARTS matching when available; OR with text_hits to be robust to parse failures
         rdkit_hits = {
             "aryl_halide": any_match("aryl_halide"),
