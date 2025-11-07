@@ -54,21 +54,29 @@ _FAMILY_TO_MECHANISM: Dict[str, str] = {
     "negishi": "transmetalation_coupling",
     "stille": "transmetalation_coupling",
     "sonogashira": "transmetalation_coupling",
+    "co_coupling": "transmetalation_coupling",  # Added: C-O coupling often Suzuki
     "amide_formation": "nucleophilic_acyl_substitution",
+    "amide_coupling": "nucleophilic_acyl_substitution",  # Added: amide coupling variant
     "nucleophilic_acyl_substitution": "nucleophilic_acyl_substitution",
     "knoevenagel": "nucleophilic_acyl_substitution",
+    "reductive_amination": "nucleophilic_acyl_substitution",  # Added: treat as acyl substitution for now
     "sn2_alkylation": "sn2",
     "williamson_ether": "sn2",
+    "nitrile_formation": "sn2",  # Added: alkyl halide + cyanide
+    "finkelstein": "sn2",  # Added: halide exchange
     "sn2": "sn2",
     "sn1": "sn1",
     "snar": "addition_elimination_aromatic",
     "e1": "carbocation_elimination",
     "e2": "beta_elimination",
+    "e2_elimination": "beta_elimination",  # Added: e2 elimination variant
     "elimination": "beta_elimination",
     "heck": "migratory_insertion_beta_hydride",
     "diels_alder": "pericyclic_cycloaddition",
     "cope": "pericyclic_cycloaddition",
     "radical_chain": "radical_chain",
+    "radical_halogenation": "radical_chain",  # Added: radical halogenation
+    "radical_addition": "radical_chain",  # Added: radical addition
     "photoredox_single_electron": "photoredox_single_electron",
     "cu_azide_alkyne_click": "copper_click_cycloaddition",
 }

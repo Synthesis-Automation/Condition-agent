@@ -50,6 +50,7 @@ def _compile_smarts():
         "aldehyde": Chem.MolFromSmarts("[CX3H](=O)"),  # Aldehyde specifically
         "ketone": Chem.MolFromSmarts("[CX3](=O)[C]"),  # Ketone specifically
         "ester": Chem.MolFromSmarts("[CX3](=O)[OX2][C,H]"),  # Ester
+        "acyl_halide": Chem.MolFromSmarts("[CX3](=O)[Cl,Br]"),  # Acyl chloride/bromide
         
         # Phase 2 additions - nucleophiles and organometallics
         "alcohol": Chem.MolFromSmarts("[CX4][OX2H]"),  # Aliphatic alcohol
@@ -164,6 +165,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
         "aldehyde": has("c(=o)") and (has("c(=o)h") or has("ch=o")),
         "ketone": has("c(=o)c") or has("cc(=o)c"),
         "ester": has("c(=o)o") and not has("c(=o)oh"),
+        "acyl_halide": has("c(=o)cl") or has("c(=o)br") or has("cocl") or has("cobr"),
         "alcohol": has("co") or has("oh"),
         "grignard": has("[mg]") or has("mgbr") or has("mgcl"),
         "organozinc": has("[zn]") or has("znbr") or has("zncl") or has("rzn"),
@@ -213,6 +215,7 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
             "aldehyde": any_match("aldehyde"),
             "ketone": any_match("ketone"),
             "ester": any_match("ester"),
+            "acyl_halide": any_match("acyl_halide"),
             "alcohol": any_match("alcohol"),
             "grignard": any_match("grignard"),
             "organozinc": any_match("organozinc"),
@@ -290,6 +293,39 @@ def _detect_strong_base(reactants: List[str]) -> bool:
     strong_bases = ["kot-bu", "kotbu", "koh", "naoh", "nah", "lda", "lhmds", "khmds", "dbu", 
                     "naome", "naoet", "[oh-]", "[o-]", "hydroxide", "alkoxide"]
     return any(base in reactant_text for base in strong_bases)
+
+
+def _detect_radical_initiator(reactants: List[str]) -> Optional[str]:
+    """Detect radical initiators and halogen sources for radical reactions."""
+    reactant_text = " ".join(reactants).lower()
+    
+    # Radical initiators
+    if "aibn" in reactant_text or "azobisisobutyronitrile" in reactant_text:
+        return "AIBN"
+    if "bpo" in reactant_text or "benzoyl peroxide" in reactant_text:
+        return "BPO"
+    
+    # Halogen sources for radical halogenation
+    if "ccl4" in reactant_text or "carbon tetrachloride" in reactant_text:
+        return "CCl4"
+    if "cbr4" in reactant_text or "carbon tetrabromide" in reactant_text:
+        return "CBr4"
+    if "nbs" in reactant_text or "n-bromosuccinimide" in reactant_text:
+        return "NBS"
+    
+    # Check SMILES patterns for halogen sources
+    for r in reactants:
+        r_lower = r.lower()
+        # CCl4, CBr4 patterns
+        if "c(cl)(cl)(cl)cl" in r_lower or "ccl4" in r_lower:
+            return "CCl4"
+        if "c(br)(br)(br)br" in r_lower or "cbr4" in r_lower:
+            return "CBr4"
+        # Br2, Cl2
+        if r in ("BrBr", "[Br][Br]", "ClCl", "[Cl][Cl]"):
+            return "Br2/Cl2"
+    
+    return None
 
 
 # Old detection functions removed - use chemtools.detect_reaction() instead

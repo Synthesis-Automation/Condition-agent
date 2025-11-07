@@ -1,8 +1,8 @@
 {
   "name": "Buchwald–Hartwig C–N Coupling",
   "reaction_type": "Buchwald–Hartwig C–N",
-  "version": "2025-11-02",
-  "evaluation": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: prefer ligand‑containing precatalysts (avoid Pd2(dba)3). Degas BEFORE adding base. 3 equiv base, 8 mol% Pd, ~10 vol solvent, start at 80 °C; for Arom.NH start ~100 °C. Water (5–10 equiv) aids heterogeneous bases and scale‑up in apolar media.\n",
+  "version": "2025-11-07",
+  "evaluation": "Updated with HTE-reported top-hit condition families (RuPhos–Pd G3/LiHMDS; BrettPhos–Pd G3/Cs2CO3 or LiHMDS; Pd2(dba)3/Me4tBuXPhos/LiHMDS; BINAP–Pd G3/Cs2CO3; XPhos–Pd G3/Cs2CO3). Use LiHMDS sets where substrate/FG compatibility allows; otherwise favor Cs2CO3 or K3PO4. Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: prefer ligand‑containing precatalysts (avoid Pd2(dba)3). Degas BEFORE adding base. 3 equiv base, 8 mol% Pd, ~10 vol solvent, start at 80 °C; for Arom.NH start ~100 °C. Water (5–10 equiv) aids heterogeneous bases and scale‑up in apolar media.\n",
   "applies_if": {
     "all": [
       "aryl_halide_present"
@@ -176,6 +176,301 @@
         "thiol_poison_risk"
       ],
       "suggest": "Protect/remove thiol (e.g., Ag2O scavenging) or adjust conditions; strong Pd binding expected."
+    },
+    {
+      "id": "MOD_5member_heteroaryl_halide_pref_lihmds",
+      "when": [
+        "five_member_heteroaryl_halide_present"
+      ],
+      "suggest": "Prioritize RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS in dioxane (80–105 °C). If strong base incompatible, try BrettPhos–Pd G3/Cs2CO3."
+    },
+    {
+      "id": "MOD_hard_aryl_chloride_or_ortho_block",
+      "when": [
+        "sp2_chloride_present",
+        "ortho_substitution_present"
+      ],
+      "suggest": "Favor dialkylbiaryl systems at ≥100 °C: RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS; otherwise BrettPhos–Pd G3/Cs2CO3 or XPhos–Pd G3/Cs2CO3."
+    },
+    {
+      "id": "MOD_strong_base_window",
+      "when": [
+        "strong_base_compatible"
+      ],
+      "suggest": "Test LiHMDS sets (RuPhos–Pd G3/LiHMDS; BrettPhos–Pd G3/LiHMDS)."
+    },
+    {
+      "id": "MOD_binap_option_selectivity",
+      "when": [
+        "symptom:over‑arylation/chemo‑selectivity issues"
+      ],
+      "suggest": "Include BINAP–Pd G3/Cs2CO3 (dioxane, ~90–105 °C) among trials; often ranks in top‑hits with milder profile."
+    }
+  ],
+  "hte_screening_conditions": [
+    {
+      "id": "HTE_01",
+      "label": "RuPhos–Pd G3 / LiHMDS / dioxane",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "RuPhos–Pd G3",
+      "ligand": "RuPhos",
+      "base": "LiHMDS",
+      "note": "Top hits leader"
+    },
+    {
+      "id": "HTE_02",
+      "label": "BrettPhos–Pd G3 / LiHMDS / dioxane",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "BrettPhos–Pd G3",
+      "ligand": "BrettPhos",
+      "base": "LiHMDS",
+      "note": "Top hits"
+    },
+    {
+      "id": "HTE_03",
+      "label": "BrettPhos–Pd G3 / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "BrettPhos–Pd G3",
+      "ligand": "BrettPhos",
+      "base": "Cs2CO3",
+      "note": "Top hits"
+    },
+    {
+      "id": "HTE_04",
+      "label": "XPhos–Pd G3 / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "XPhos–Pd G3",
+      "ligand": "XPhos",
+      "base": "Cs2CO3",
+      "note": "Top hits"
+    },
+    {
+      "id": "HTE_05",
+      "label": "RuPhos–Pd G3 / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "RuPhos–Pd G3",
+      "ligand": "RuPhos",
+      "base": "Cs2CO3",
+      "note": "Frequent high"
+    },
+    {
+      "id": "HTE_06",
+      "label": "BINAP–Pd G3 / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "BINAP–Pd G3",
+      "ligand": "BINAP",
+      "base": "Cs2CO3",
+      "note": "Selectivity option"
+    },
+    {
+      "id": "HTE_07",
+      "label": "BrettPhos–Pd G3 / K3PO4 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "BrettPhos–Pd G3",
+      "ligand": "BrettPhos",
+      "base": "K3PO4",
+      "note": "Milder base track"
+    },
+    {
+      "id": "HTE_08",
+      "label": "XPhos–Pd G3 / K3PO4 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "XPhos–Pd G3",
+      "ligand": "XPhos",
+      "base": "K3PO4",
+      "note": "Milder base track"
+    },
+    {
+      "id": "HTE_09",
+      "label": "RuPhos–Pd G3 / K3PO4 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "RuPhos–Pd G3",
+      "ligand": "RuPhos",
+      "base": "K3PO4",
+      "note": "Milder base track"
+    },
+    {
+      "id": "HTE_10",
+      "label": "BrettPhos–Pd G3 / K3PO4 / t‑amylOH",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "BrettPhos–Pd G3",
+      "ligand": "BrettPhos",
+      "base": "K3PO4",
+      "note": "Solvent variant"
+    },
+    {
+      "id": "HTE_11",
+      "label": "RuPhos–Pd G3 / LiHMDS / t‑amylOH",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "RuPhos–Pd G3",
+      "ligand": "RuPhos",
+      "base": "LiHMDS",
+      "note": "Solvent variant"
+    },
+    {
+      "id": "HTE_12",
+      "label": "BrettPhos–Pd G3 / LiHMDS / t‑amylOH",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "BrettPhos–Pd G3",
+      "ligand": "BrettPhos",
+      "base": "LiHMDS",
+      "note": "Solvent variant"
+    },
+    {
+      "id": "HTE_13",
+      "label": "Pd2(dba)3 / Me4tBuXPhos / LiHMDS / t‑amylOH",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "Pd2(dba)3",
+      "ligand": "Me4tBuXPhos",
+      "base": "LiHMDS",
+      "note": "High rank (in‑situ)"
+    },
+    {
+      "id": "HTE_14",
+      "label": "Pd2(dba)3 / BrettPhos / LiHMDS / t‑amylOH",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "Pd2(dba)3",
+      "ligand": "BrettPhos",
+      "base": "LiHMDS",
+      "note": "In‑situ variant"
+    },
+    {
+      "id": "HTE_15",
+      "label": "Pd(OAc)2 / BrettPhos / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "Pd(OAc)2",
+      "ligand": "BrettPhos",
+      "base": "Cs2CO3",
+      "note": "In‑situ variant"
+    },
+    {
+      "id": "HTE_16",
+      "label": "Pd(OAc)2 / RuPhos / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "Pd(OAc)2",
+      "ligand": "RuPhos",
+      "base": "Cs2CO3",
+      "note": "In‑situ variant"
+    },
+    {
+      "id": "HTE_17",
+      "label": "BrettPhos–Pd G3 / KOtBu / t‑amylOH",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "BrettPhos–Pd G3",
+      "ligand": "BrettPhos",
+      "base": "KOtBu",
+      "note": "Strong base window"
+    },
+    {
+      "id": "HTE_18",
+      "label": "RuPhos–Pd G3 / KOtBu / t‑amylOH",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "RuPhos–Pd G3",
+      "ligand": "RuPhos",
+      "base": "KOtBu",
+      "note": "Strong base window"
+    },
+    {
+      "id": "HTE_19",
+      "label": "XPhos–Pd G3 / KOtBu / t‑amylOH",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "t‑amyl alcohol",
+      "precatalyst": "XPhos–Pd G3",
+      "ligand": "XPhos",
+      "base": "KOtBu",
+      "note": "Strong base window"
+    },
+    {
+      "id": "HTE_20",
+      "label": "tBuBrettPhos–Pd G3 / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "tBuBrettPhos–Pd G3",
+      "ligand": "tBuBrettPhos",
+      "base": "Cs2CO3",
+      "note": "Coverage"
+    },
+    {
+      "id": "HTE_21",
+      "label": "tBuBrettPhos–Pd G3 / LiHMDS / dioxane",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "tBuBrettPhos–Pd G3",
+      "ligand": "tBuBrettPhos",
+      "base": "LiHMDS",
+      "note": "Coverage"
+    },
+    {
+      "id": "HTE_22",
+      "label": "DavePhos–Pd G3 / Cs2CO3 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "DavePhos–Pd G3",
+      "ligand": "DavePhos",
+      "base": "Cs2CO3",
+      "note": "Coverage"
+    },
+    {
+      "id": "HTE_23",
+      "label": "DavePhos–Pd G3 / K3PO4 / dioxane",
+      "temperature_C": "90–110",
+      "time_h": "2–6",
+      "solvent": "1,4-dioxane",
+      "precatalyst": "DavePhos–Pd G3",
+      "ligand": "DavePhos",
+      "base": "K3PO4",
+      "note": "Coverage"
+    },
+    {
+      "id": "HTE_24",
+      "label": "RuPhos–Pd G3 / LiHMDS / toluene",
+      "temperature_C": "80–105",
+      "time_h": "1–4",
+      "solvent": "toluene",
+      "precatalyst": "RuPhos–Pd G3",
+      "ligand": "RuPhos",
+      "base": "LiHMDS",
+      "note": "Solvent variant"
     }
   ]
 }
