@@ -4,24 +4,28 @@ LangChain tool wrappers for ChemTools functions.
 This module exposes existing chemtools functionality as LangChain tools
 without modifying the original chemtools codebase.
 
-Available Tools:
+Available Tools (21 total):
     - normalize_smiles_tool: Canonicalize SMILES strings
     - normalize_reaction_tool: Canonicalize reaction SMILES
     - detect_reaction_family_tool: Detect reaction family/type
-    - recommend_conditions_tool: Get ML-based condition recommendations
-    - rule_based_conditions_tool: Deterministic rule-engine condition guidance (NEW)
-    - enhanced_cross_family_recommend_tool: Cross-family precedent search with mechanism filters
-    - search_precedents_tool: Search for similar precedent reactions
-    - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
-    - find_reagent_tool: Look up reagent information from database
-    - reagent_database_analytics_tool: Summarize reagent registry statistics
-    - list_supported_cores_tool: Enumerate catalyst cores observed in precedents
-    - add_reagent_tool: Insert or preview reagent taxonomy entries
     - classify_reactant_tool: Classify reactant type (aryl halide, amine, etc.)
     - get_functional_groups_tool: Detect functional groups in a molecule
     - calculable_features_tool: Evaluate curated calculable feature library for a molecule
     - molpipeline_featurize_tool: Generate molecular features with optional MolPipeline vectors
-    - analyze_bond_changes_tool: Analyze bond breaking/formation in reactions (NEW)
+    - analyze_bond_changes_tool: Analyze bond breaking/formation in reactions
+    - analyze_mechanism_tool: Identify mechanism archetype + narrative evidence (NEW)
+    - reaction_similarity_tool: Compare two reactions using DRFP similarity (NEW)
+    - recommend_conditions_tool: Get ML-based condition recommendations
+    - rule_based_conditions_tool: Deterministic rule-engine condition guidance
+    - enhanced_cross_family_recommend_tool: Cross-family precedent search with mechanism filters
+    - search_precedents_tool: Search for similar precedent reactions
+    - protocol_recommendation_tool: Find full experimental protocols from literature (NEW)
+    - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
+    - find_reagent_tool: Look up reagent information from database
+    - reagent_database_analytics_tool: Summarize reagent registry statistics
+    - list_supported_cores_tool: Enumerate catalyst cores observed in precedents
+    - list_all_families_tool: List all available reaction families in dataset (NEW)
+    - add_reagent_tool: Insert or preview reagent taxonomy entries
 
 Usage:
     from lang_chain.chemtools_wrapper import CHEMTOOLS_TOOLS
@@ -31,6 +35,7 @@ Usage:
 """
 
 from typing import Dict, Any, List, Optional, Sequence, Tuple, Union, Literal
+import copy
 import json
 import time
 from dataclasses import dataclass
@@ -41,7 +46,8 @@ from langchain_core.tools import tool
 
 # Import chemtools functions
 from chemtools.smiles import normalize, normalize_reaction
-from chemtools import detect_reaction
+from chemtools import detect_reaction, classify_mechanism_simple
+from chemtools.mechanism.renderer import build_mechanism_narrative
 from chemtools.output_formatter import ensure_standard_output
 from chemtools.recommend.modules import recommend_from_reaction
 from chemtools.precedent import knn as precedent_knn
@@ -79,6 +85,23 @@ from chemtools import (
     analyze_bond_changes_hybrid,
     rxnmapper_available,
 )
+
+# Import protocol recommendation (NEW)
+try:
+    from chemtools.protocol import ProtocolRecommender, recommend_protocol
+    PROTOCOL_AVAILABLE = True
+except ImportError:
+    PROTOCOL_AVAILABLE = False
+    ProtocolRecommender = None
+    recommend_protocol = None
+
+# Import reaction similarity (NEW)
+try:
+    from chemtools.reaction_similarity import compute_drfp_similarity
+    DRFP_SIMILARITY_AVAILABLE = True
+except ImportError:
+    DRFP_SIMILARITY_AVAILABLE = False
+    compute_drfp_similarity = None
 
 REAGENT_RESOLVER_TIMEOUT = 6.0
 
@@ -127,6 +150,9 @@ _FAMILY_TO_RULE_DB = {
 _RULE_ENGINE_CACHE: "OrderedDict[Path, RuleEngine]" = OrderedDict()
 _RULE_ENGINE_CACHE_SIZE = 4
 
+_MECHANISM_CACHE: "OrderedDict[str, Dict[str, Any]]" = OrderedDict()
+_MECHANISM_CACHE_SIZE = 32
+
 
 class RuleDatabaseResolutionError(FileNotFoundError):
     """Raised when a rule database cannot be located from provided identifiers."""
@@ -172,6 +198,27 @@ class DetectReactionFamilyInput(BaseModel):
     """Schema for reaction family detection."""
 
     reaction_smiles: str = Field(..., description="Reaction SMILES to analyze.")
+
+
+class MechanismAnalysisInput(BaseModel):
+    """Schema for mechanism analysis tool."""
+
+    reaction_smiles: str = Field(
+        ...,
+        description="Reaction SMILES in 'reactants>>products' or 'reactants>agents>products' format.",
+    )
+    context: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Optional metadata such as solvent, temperature, or catalyst.",
+    )
+    detail_level: Literal["summary", "standard", "high"] = Field(
+        default="standard",
+        description="Controls how many mechanistic steps are returned.",
+    )
+    include_bond_changes: bool = Field(
+        default=True,
+        description="If True, run bond analysis to supply evidence.",
+    )
 
 
 class ClassifyReactantInput(BaseModel):
@@ -505,6 +552,53 @@ class AddReagentInput(BaseModel):
         gt=0,
         description="Timeout (seconds) for CAS resolution attempts.",
     )
+
+
+class ProtocolRecommendInput(BaseModel):
+    """Schema for protocol-based recommendation."""
+
+    reaction_smiles: str = Field(
+        ...,
+        description="Reaction SMILES string to match against protocol database."
+    )
+    k: int = Field(
+        5,
+        gt=0,
+        le=20,
+        description="Number of protocol recommendations to return (1-20)."
+    )
+    family_filter: Optional[str] = Field(
+        None,
+        description="Optional reaction family filter (e.g., 'Suzuki', 'Buchwald_CN', 'Amide_formation')."
+    )
+    use_smarts_filter: bool = Field(
+        True,
+        description="Enable SMARTS-based structural pre-filtering for better matches."
+    )
+    min_similarity: float = Field(
+        0.3,
+        ge=0.0,
+        le=1.0,
+        description="Minimum DRFP similarity threshold (0.0-1.0). Lower values return more results."
+    )
+
+
+class ReactionSimilarityInput(BaseModel):
+    """Schema for computing reaction similarity."""
+
+    reaction1_smiles: str = Field(
+        ...,
+        description="First reaction SMILES string."
+    )
+    reaction2_smiles: str = Field(
+        ...,
+        description="Second reaction SMILES string."
+    )
+
+
+class ListAllFamiliesInput(BaseModel):
+    """Schema for listing all reaction families in the dataset."""
+    pass  # No parameters needed
 
 
 # ============================================================================
@@ -1263,6 +1357,187 @@ def analyze_bond_changes_tool(reaction_smiles: str, use_hybrid: bool = True) -> 
             
     except Exception as e:
         return _error_response(str(e), {'reaction_smiles': reaction_smiles})
+
+
+def _mechanism_cache_key(
+    reaction_smiles: str,
+    detail_level: str,
+    include_bond_changes: bool,
+    context: Optional[Dict[str, Any]],
+) -> str:
+    cache_payload = {
+        "reaction_smiles": reaction_smiles,
+        "detail_level": detail_level,
+        "include_bond_changes": include_bond_changes,
+        "context": context or {},
+    }
+    return json.dumps(cache_payload, sort_keys=True, default=str)
+
+
+def _mechanism_cache_get(cache_key: str) -> Optional[Dict[str, Any]]:
+    cached = _MECHANISM_CACHE.get(cache_key)
+    if cached is None:
+        return None
+    _MECHANISM_CACHE.move_to_end(cache_key)
+    cached_copy = copy.deepcopy(cached)
+    telemetry = cached_copy.setdefault("telemetry", {})
+    telemetry["cache_hit"] = True
+    return cached_copy
+
+
+def _mechanism_cache_set(cache_key: str, payload: Dict[str, Any]) -> None:
+    _MECHANISM_CACHE[cache_key] = copy.deepcopy(payload)
+    _MECHANISM_CACHE.move_to_end(cache_key)
+    if len(_MECHANISM_CACHE) > _MECHANISM_CACHE_SIZE:
+        _MECHANISM_CACHE.popitem(last=False)
+
+
+def _run_mechanism_bond_analysis(reaction_smiles: str) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
+    try:
+        if rxnmapper_available():
+            raw = analyze_bond_changes_hybrid(
+                reaction_smiles,
+                use_rxnmapper=True,
+                use_mcs=True,
+                use_manual=True,
+                auto_map=True,
+            )
+        else:
+            raw = analyze_bond_changes(reaction_smiles, auto_map=True)
+    except Exception as exc:
+        return None, f"Bond analysis failed: {exc}"
+
+    if not raw:
+        return None, "Bond analysis returned no data."
+
+    if raw.get("success") is False and not raw.get("recommended_result"):
+        return None, raw.get("error", "Bond analysis failed.")
+
+    selected = raw.get("recommended_result") or raw
+
+    def _as_list(value: Any) -> Any:
+        if isinstance(value, (list, tuple)):
+            return list(value)
+        if isinstance(value, set):
+            return list(value)
+        return value
+
+    payload: Dict[str, Any] = {
+        "method": raw.get("method", selected.get("method")),
+        "combined_confidence": raw.get("combined_confidence", selected.get("mapping_confidence")),
+        "broken_bonds": selected.get("broken_bonds", []),
+        "formed_bonds": selected.get("formed_bonds", []),
+        "changed_atoms": _as_list(selected.get("changed_atoms", [])),
+        "leaving_groups": selected.get("leaving_groups", []),
+        "joining_groups": selected.get("joining_groups", []),
+    }
+
+    if raw.get("agreement") is not None:
+        payload["agreement"] = raw.get("agreement")
+    if raw.get("validation"):
+        payload["validation"] = raw.get("validation")
+
+    return payload, None
+
+
+def _merge_warnings(primary: List[str], extra: List[str]) -> List[str]:
+    merged: List[str] = []
+    for warning in (primary or []) + (extra or []):
+        if warning and warning not in merged:
+            merged.append(warning)
+    return merged
+
+
+@tool(args_schema=MechanismAnalysisInput)
+def analyze_mechanism_tool(
+    reaction_smiles: str,
+    context: Optional[Dict[str, Any]] = None,
+    detail_level: str = "standard",
+    include_bond_changes: bool = True,
+) -> Dict[str, Any]:
+    """
+    Analyze a reaction mechanism by combining detection, bond analysis, and heuristics.
+
+    Returns a structured payload the agent can narrate, including mechanism
+    archetype, ordered steps, evidence references, and telemetry.
+    """
+
+    context = context or {}
+
+    try:
+        normalization_result = normalize_reaction(reaction_smiles)
+        normalized_smiles = normalization_result.get("normalized") or reaction_smiles
+    except Exception as exc:
+        return _error_response(
+            f"Failed to normalize reaction SMILES: {exc}",
+            {"reaction_smiles": reaction_smiles},
+        )
+
+    cache_key = _mechanism_cache_key(normalized_smiles, detail_level, include_bond_changes, context)
+    cached = _mechanism_cache_get(cache_key)
+    if cached:
+        return cached
+
+    start_ts = time.perf_counter()
+
+    try:
+        detection = detect_reaction(normalized_smiles)
+    except Exception as exc:
+        return _error_response(
+            f"Reaction detection failed: {exc}",
+            {"reaction_smiles": reaction_smiles},
+        )
+
+    bond_changes: Optional[Dict[str, Any]] = None
+    extra_warnings: List[str] = []
+    if include_bond_changes:
+        bond_changes, warning = _run_mechanism_bond_analysis(normalized_smiles)
+        if warning:
+            extra_warnings.append(warning)
+
+    mechanism = classify_mechanism_simple(
+        detection.get("family"),
+        bond_changes,
+        detail_level=detail_level,
+    )
+
+    narrative = build_mechanism_narrative(
+        mechanism,
+        detection=detection,
+        bond_changes=bond_changes or {},
+        context=context,
+    )
+
+    combined_warnings = _merge_warnings(
+        mechanism.get("warnings", []),
+        extra_warnings + (narrative.get("warnings") or []),
+    )
+
+    payload = {
+        "mechanism_type": mechanism.get("mechanism_type"),
+        "description": mechanism.get("description"),
+        "confidence": mechanism.get("confidence"),
+        "detail_level": mechanism.get("detail_level"),
+        "steps": mechanism.get("steps", []),
+        "evidence_refs": mechanism.get("evidence_refs", []),
+        "warnings": combined_warnings,
+        "narrative": narrative.get("narrative", ""),
+        "highlights": narrative.get("highlights", []),
+        "reaction_family": detection.get("family"),
+        "detection": detection,
+        "bond_changes": bond_changes or {},
+        "context": context,
+        "normalized_reaction": normalized_smiles,
+        "normalization": normalization_result,
+        "telemetry": {
+            "analysis_ms": round((time.perf_counter() - start_ts) * 1000, 2),
+            "cache_hit": False,
+        },
+    }
+
+    response = _success_response(payload)
+    _mechanism_cache_set(cache_key, response)
+    return response
 
 
 # ============================================================================
@@ -2305,6 +2580,182 @@ def add_reagent_tool(
         return _error_response(str(exc))
 
 
+@tool(args_schema=ProtocolRecommendInput)
+def protocol_recommendation_tool(
+    reaction_smiles: str,
+    k: int = 5,
+    family_filter: Optional[str] = None,
+    use_smarts_filter: bool = True,
+    min_similarity: float = 0.3
+) -> Dict[str, Any]:
+    """
+    Find experimental protocols for reactions similar to the query.
+    
+    Returns complete procedure information including:
+    - Step-by-step experimental instructions
+    - Reagent amounts and equivalents
+    - Reaction conditions (temperature, time, atmosphere)
+    - Workup and purification procedures
+    - Literature references and sources
+    
+    This is complementary to ML-based condition recommendations - it provides
+    full experimental procedures from literature rather than just reagent suggestions.
+    
+    Args:
+        reaction_smiles: Reaction SMILES to match against protocol database
+        k: Number of protocol recommendations to return (default 5, max 20)
+        family_filter: Optional reaction family filter (e.g. "Suzuki", "Buchwald_CN")
+        use_smarts_filter: Enable SMARTS-based structural filtering for better matches
+        min_similarity: Minimum DRFP similarity threshold (0.0-1.0, default 0.3)
+    
+    Returns:
+        Dict with ranked protocol recommendations including full procedures
+    
+    Example:
+        >>> protocol_recommendation_tool(
+        ...     reaction_smiles='CCBr.c1ccccc1B(O)O>>CCc1ccccc1',
+        ...     k=3,
+        ...     family_filter='Suzuki'
+        ... )
+    """
+    if not PROTOCOL_AVAILABLE:
+        return _error_response(
+            "Protocol recommendation module not available. "
+            "The protocol database may not be installed or accessible.",
+            {"feature": "protocol_recommendation", "available": False}
+        )
+    
+    try:
+        recommender = ProtocolRecommender()
+        results = recommender.recommend(
+            reaction_smiles=reaction_smiles,
+            k=k,
+            reaction_family=family_filter,  # Use correct parameter name
+            use_smarts_filter=use_smarts_filter,
+            min_similarity=min_similarity
+        )
+        return _success_response(results)
+    except FileNotFoundError as e:
+        return _error_response(
+            f"Protocol database not found: {str(e)}",
+            {"hint": "Run 'python -m chemtools.protocol.cli build' to create the index"}
+        )
+    except Exception as e:
+        return _error_response(str(e), {"reaction_smiles": reaction_smiles})
+
+
+@tool(args_schema=ReactionSimilarityInput)
+def reaction_similarity_tool(
+    reaction1_smiles: str,
+    reaction2_smiles: str
+) -> Dict[str, Any]:
+    """
+    Calculate DRFP-based similarity between two reactions.
+    
+    Returns Tanimoto coefficient (0.0-1.0) measuring reaction similarity:
+    - 1.0 = identical reactions
+    - 0.8-1.0 = very similar reactions (likely analogous)
+    - 0.6-0.8 = moderately similar (same general transformation)
+    - 0.4-0.6 = somewhat related
+    - 0.0-0.4 = different reactions
+    
+    Useful for:
+    - Comparing user's reaction to literature precedents
+    - Assessing whether two reactions are analogous
+    - Finding reaction analogs for optimization
+    
+    Args:
+        reaction1_smiles: First reaction SMILES string
+        reaction2_smiles: Second reaction SMILES string
+    
+    Returns:
+        Dict with similarity score and interpretation
+    
+    Example:
+        >>> reaction_similarity_tool(
+        ...     'CCBr.c1ccccc1B(O)O>>CCc1ccccc1',
+        ...     'c1ccccc1Br.CCB(O)O>>CCc1ccccc1'
+        ... )
+    """
+    if not DRFP_SIMILARITY_AVAILABLE:
+        return _error_response(
+            "Reaction similarity module not available. "
+            "DRFP fingerprinting may not be installed.",
+            {"feature": "reaction_similarity", "available": False}
+        )
+    
+    try:
+        similarity = compute_drfp_similarity(reaction1_smiles, reaction2_smiles)
+        
+        # Provide interpretation
+        if similarity >= 0.8:
+            interpretation = "Very similar reactions - likely analogous transformations"
+            category = "very_similar"
+        elif similarity >= 0.6:
+            interpretation = "Moderately similar - same general reaction type"
+            category = "moderately_similar"
+        elif similarity >= 0.4:
+            interpretation = "Somewhat related reactions"
+            category = "somewhat_related"
+        else:
+            interpretation = "Different reactions"
+            category = "different"
+        
+        return _success_response({
+            "reaction1": reaction1_smiles,
+            "reaction2": reaction2_smiles,
+            "similarity": round(float(similarity), 4),
+            "interpretation": interpretation,
+            "category": category
+        })
+    except Exception as e:
+        return _error_response(str(e), {
+            "reaction1": reaction1_smiles,
+            "reaction2": reaction2_smiles
+        })
+
+
+@tool(args_schema=ListAllFamiliesInput)
+def list_all_families_tool() -> Dict[str, Any]:
+    """
+    List all reaction families available in the precedent dataset.
+    
+    Returns a comprehensive list of reaction family names that can be used
+    for filtering recommendations, searching precedents, and understanding
+    the scope of available data.
+    
+    Useful for:
+    - Understanding what reaction types are supported
+    - Choosing appropriate family filters for searches
+    - Exploring available precedent data coverage
+    
+    Returns:
+        Dict with list of family names and counts
+    
+    Example:
+        >>> list_all_families_tool()
+        {
+            "success": True,
+            "families": ["Suzuki", "Buchwald_CN", "Amide_formation", ...],
+            "count": 15
+        }
+    """
+    try:
+        families = get_all_families()
+        
+        # Convert to list if it's a set or other iterable
+        if not isinstance(families, list):
+            families = sorted(list(families))
+        
+        return _success_response({
+            "families": families,
+            "count": len(families),
+            "note": "Use these family names as filters in recommendation and search tools"
+        })
+    except Exception as e:
+        return _error_response(str(e))
+
+
 # ============================================================================
 # Tool Collection
 # ============================================================================
@@ -2320,19 +2771,23 @@ CHEMTOOLS_TOOLS = [
     molpipeline_featurize_tool,
     get_functional_groups_tool,
     calculable_features_tool,
-    analyze_bond_changes_tool,  # NEW: Bond breaking/formation analysis
+    analyze_bond_changes_tool,  # Bond breaking/formation analysis
+    analyze_mechanism_tool,  # NEW: Mechanism classification + narrative evidence
+    reaction_similarity_tool,  # NEW: DRFP-based reaction comparison
     
     # Recommendation tools
     recommend_conditions_tool,
     rule_based_conditions_tool,
     enhanced_cross_family_recommend_tool,
     search_precedents_tool,
+    protocol_recommendation_tool,  # NEW: Protocol-based recommendations with full procedures
     
     # Database tools
     reaction_dataset_analytics_tool,
     find_reagent_tool,
     reagent_database_analytics_tool,
     list_supported_cores_tool,
+    list_all_families_tool,  # NEW: List all available reaction families
     add_reagent_tool,
 ]
 

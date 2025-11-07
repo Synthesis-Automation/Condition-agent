@@ -53,6 +53,7 @@ from .util.reaction_center_detector import (
     identify_changed_atoms_from_mapped_smiles,
     compare_unmapped_reaction_to_find_changes,
 )
+from .mechanism import classify_mechanism_simple
 
 # Primary exports - ChemTools is the recommended interface
 __all__ = [
@@ -68,6 +69,7 @@ __all__ = [
     "identify_changed_atoms_from_mapped_smiles",  # Low-level bond analysis
     "compare_unmapped_reaction_to_find_changes",  # Auto-map then analyze
     "rxnmapper_available",  # Check if RXNMapper is installed
+    "classify_mechanism_simple",  # Lightweight mechanism classifier
 ]
 
 # Version info

@@ -409,8 +409,7 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
-          "[#6]B([OH])([OH])",
-          "[#6]B(O[H])(O[H])"
+          "[#6]B([OH])([OH])"
         ]
       },
       "why": "Free boronic acid (not ester); hygroscopic, air-sensitive"
@@ -630,6 +629,39 @@
         ]
       },
       "why": "Aliphatic alcohol; less acidic than phenol"
+    },
+    {
+      "token": "primary_alcohol_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[OX2H][CH2X4]"
+        ]
+      },
+      "why": "Primary alcohol (RCH2OH); good nucleophile, easily oxidized"
+    },
+    {
+      "token": "secondary_alcohol_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[OX2H][CHX4]"
+        ]
+      },
+      "why": "Secondary alcohol (R2CHOH); moderate nucleophilicity, oxidizable to ketone"
+    },
+    {
+      "token": "tertiary_alcohol_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "smarts_any": [
+          "[OX2H][CX4]([CX4])([CX4])[CX4]"
+        ]
+      },
+      "why": "Tertiary alcohol (R3COH); poor nucleophile, prone to elimination"
     },
     {
       "token": "thiol_present",
@@ -1034,9 +1066,11 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
-          "O[H]",
-          "S[H]",
-          "P(=O)(O)O"
+          "[OH]",
+          "[SH]",
+          "P(=O)([OH])[OH]",
+          "C(=O)[OH]",
+          "S(=O)(=O)[OH]"
         ]
       },
       "why": "Base consumption / salts"
@@ -1831,6 +1865,18 @@
       "why": "\u03b1-Halo carbonyl; electrophilic, alkylating agent, lachrymator potential"
     },
     {
+      "token": "cyclopropane_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "reactive_intermediates",
+      "detect": {
+        "smarts_any": [
+          "C1CC1"
+        ]
+      },
+      "why": "Cyclopropane ring; highly strained (27.6 kcal/mol), unique reactivity, bent bonds"
+    },
+    {
       "token": "strained_ring_present",
       "type": "bool",
       "scope": "global",
@@ -1949,6 +1995,18 @@
         "heuristic": "has both acidic and basic ionizable groups"
       },
       "why": "Potential zwitterion; both acidic and basic groups present (amino acids, etc.)"
+    },
+    {
+      "token": "aromatic_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "unsaturation",
+      "detect": {
+        "smarts_any": [
+          "a"
+        ]
+      },
+      "why": "Aromatic ring present (simple boolean for convenience)"
     },
     {
       "token": "aromatic_ring_count",
@@ -2591,6 +2649,11 @@
       "token": "electrophilic_warhead_present",
       "derive": "epoxide_present OR aziridine_present OR alpha_halo_carbonyl_present OR acyl_chloride_present OR isocyanate_present OR michael_acceptor_present",
       "why": "Electrophilic warhead for covalent inhibition or alkylation"
+    },
+    {
+      "token": "alpha_chiral_center_present",
+      "derive": "chiral_center_present AND (carbonyl_present OR alcohol_present OR aliphatic_amine_present OR carboxylic_acid_present OR ester_present OR amide_present)",
+      "why": "Likely has chiral center adjacent to functional group (approximation for stereochemical considerations)"
     },
     {
       "token": "metabolic_soft_spot_present",
