@@ -184,7 +184,24 @@ class _DetectionEngine:
         elif is_aryl_or_vinyl_electrophile and h.get("alkene") and not h.get("boron"):
             fam, conf = "heck", 0.80
         
-        # PRIORITY 3: C-N/C-O/C-S Couplings
+        # PRIORITY 3: SNAr (Aromatic Nucleophilic Substitution) - BEFORE metal-catalyzed couplings
+        # SNAr requires activated aryl system (heteroaryl or electron-withdrawing groups) without metal catalyst
+        # Check for heteroaryl (n, o, s in aromatic ring) or strong EWG activation
+        is_heteroaryl = any(x in rs for x in ["c1nc", "c1oc", "c1sc", "n1c", "nc(", "pyrid", "pyrim", "triaz"])
+        has_strong_ewg = any(x in rs for x in ["[n+](=o)[o-]", "c#n", "c(f)(f)f", "s(=o)(=o)", "c(=o)c"])
+        is_snar_electrophile = is_heteroaryl or (h.get("aryl_halide") and has_strong_ewg)
+        has_nucleophile = h.get("nucleophile_n") or h.get("nucleophile_o") or h.get("nucleophile_s")
+        no_metal_catalyst = not self.catalysts  # SNAr doesn't need metal catalyst
+        
+        if is_snar_electrophile and has_nucleophile and no_metal_catalyst:
+            # High confidence for heteroaryls (intrinsically activated)
+            # Medium confidence for EWG-activated aryl halides
+            if is_heteroaryl:
+                fam, conf = "snar", 0.90
+            else:
+                fam, conf = "snar", 0.75
+        
+        # PRIORITY 4: Metal-catalyzed C-N/C-O/C-S Couplings (after SNAr check)
         elif is_aryl_or_vinyl_electrophile and h.get("nucleophile_n"):
             fam, conf = "cn_coupling", 0.9 if h.get("aryl_halide") else 0.8
         
@@ -194,14 +211,24 @@ class _DetectionEngine:
         elif is_aryl_or_vinyl_electrophile and h.get("nucleophile_s"):
             fam, conf = "cs_coupling", 0.85 if h.get("aryl_halide") else 0.75
         
-        # PRIORITY 4: Amide/Ester formation
+        # PRIORITY 5: Amide/Ester formation
         elif h.get("acid") and h.get("nucleophile_n"):
             fam, conf = "amide_coupling", 0.8
         
         elif h.get("acid") and h.get("alcohol"):
             fam, conf = "esterification", 0.85
         
-        # PRIORITY 5: SN2 reactions
+        # PRIORITY 6: Reductive Amination (carbonyl + amine)
+        elif h.get("carbonyl") and h.get("nucleophile_n"):
+            # Check if reducing agent present
+            reducing_agent = _detect_reducing_agent(self.reactants)
+            if reducing_agent in ("NaBH4", "NaBH(OAc)3", "NaBH3CN", "BH3"):
+                fam, conf = "reductive_amination", 0.85
+            else:
+                # Could be imine formation or reductive amination
+                fam, conf = "reductive_amination", 0.65
+        
+        # PRIORITY 7: SN2 reactions
         elif h.get("alkene") and h.get("borane"):
             fam, conf = "hydroboration", 0.85
         
@@ -214,14 +241,14 @@ class _DetectionEngine:
         elif h.get("alkyl_halide") and (h.get("alkoxide") or h.get("alcohol")):
             fam, conf = "williamson_ether", 0.85
         
-        # PRIORITY 6: Condensation reactions
+        # PRIORITY 8: Condensation reactions
         elif h.get("ester") and rs.count("c(=o)o") >= 2:
             fam, conf = "claisen_condensation", 0.70
         
         elif h.get("alpha_beta_unsaturated"):
             fam, conf = "michael_addition", 0.65
         
-        # PRIORITY 7: Cycloaddition
+        # PRIORITY 9: Cycloaddition
         elif h.get("conjugated_diene") and h.get("alkene"):
             fam, conf = "diels_alder", 0.85
         

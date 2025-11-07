@@ -10,6 +10,7 @@ from typing import Dict, Any, List, Tuple, Optional
 import logging
 
 from ..featurizers.calculable import detect_all_features
+from ..featurizers.molecular import featurize as molecular_featurize
 from ..analysis.smiles import normalize_reaction
 
 logger = logging.getLogger(__name__)
@@ -55,7 +56,18 @@ class FeatureAnalyzer:
                 logger.warning(f"No reactants found in reaction: {reaction_smiles}")
                 return {}
             
-            # Detect features for each reactant
+            # Special case: For 2-component reactions (electrophile + nucleophile),
+            # use the full molecular featurizer which includes functional group enrichment
+            if len(reactants) == 2:
+                try:
+                    features = molecular_featurize(reactants[0], reactants[1])
+                    logger.debug(f"Used molecular featurizer: {sum(1 for v in features.values() if v)} features detected")
+                    return features
+                except Exception as e:
+                    logger.warning(f"Molecular featurizer failed, falling back to calculable: {e}")
+                    # Fall through to calculable featurizer below
+            
+            # Detect features for each reactant using calculable featurizer
             reactant_features = []
             for i, reactant in enumerate(reactants):
                 try:

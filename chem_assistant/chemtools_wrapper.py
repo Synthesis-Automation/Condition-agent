@@ -117,6 +117,11 @@ _FAMILY_TO_RULE_DB = {
     "amide_coupling": "amide_formation_db",
     "amidation": "amide_formation_db",
     "amide": "amide_formation_db",
+    "snar": "SNAr_db",
+    "s_nar": "SNAr_db",
+    "aromatic_nucleophilic_substitution": "SNAr_db",
+    "nucleophilic_aromatic_substitution": "SNAr_db",
+    "reductive_amination": "reductive_amination_db",
 }
 
 _RULE_ENGINE_CACHE: "OrderedDict[Path, RuleEngine]" = OrderedDict()

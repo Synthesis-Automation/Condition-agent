@@ -82,6 +82,16 @@ FUNCTIONAL_GROUP_SMARTS = {
     "phosphine_oxide": "[PX4](=O)",
     "phosphate": "[PX4](=O)([OX2H,OX1-])([OX2H,OX1-])[OX2]",
     
+    # Boron-containing groups (for cross-coupling)
+    "boronic_acid": "[BX3](O)(O)",
+    "boronic_ester": "[BX3](O[#6])(O[#6])",
+    "boron_reagent": "[B]",
+    
+    # Vinyl halides (for cross-coupling)
+    "vinyl_halide": "[CX3]=[CX3][F,Cl,Br,I]",
+    "vinyl_chloride": "[CX3]=[CX3][Cl]",
+    "vinyl_bromide": "[CX3]=[CX3][Br]",
+    
     # Other common groups
     "epoxide": "[OX2r3]1[#6][#6]1",
     "aziridine": "[NX3r3]1[#6][#6]1",
@@ -156,6 +166,10 @@ TEXT_PATTERNS = {
     "alkene": ["c=c"],
     "alkyne": ["c#c"],
     "triflate": ["otf", "oso2cf3"],
+    "boronic_acid": ["b(o)o", "b(oh)oh"],
+    "boronic_ester": ["b(o"],
+    "vinyl_chloride": ["c=ccl"],
+    "vinyl_bromide": ["c=cbr"],
 }
 
 
