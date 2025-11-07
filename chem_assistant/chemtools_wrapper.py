@@ -46,8 +46,14 @@ from langchain_core.tools import tool
 
 # Import chemtools functions
 from chemtools.smiles import normalize, normalize_reaction
-from chemtools import detect_reaction, classify_mechanism_simple
+from chemtools import (
+    detect_reaction,
+    classify_mechanism_simple,
+    predict_electron_flow,
+    predict_intermediates,
+)
 from chemtools.mechanism.renderer import build_mechanism_narrative
+from chemtools.mechanism.flower_utils import compute_electron_balance
 from chemtools.output_formatter import ensure_standard_output
 from chemtools.recommend.modules import recommend_from_reaction
 from chemtools.precedent import knn as precedent_knn
@@ -218,6 +224,18 @@ class MechanismAnalysisInput(BaseModel):
     include_bond_changes: bool = Field(
         default=True,
         description="If True, run bond analysis to supply evidence.",
+    )
+    include_electron_flow: bool = Field(
+        default=True,
+        description="If True, add rule-based electron flow descriptors.",
+    )
+    include_intermediates: bool = Field(
+        default=True,
+        description="If True, predict likely intermediates.",
+    )
+    include_precedents: bool = Field(
+        default=True,
+        description="If True, attach nearest precedent snippets for citation.",
     )
 
 
@@ -1363,12 +1381,18 @@ def _mechanism_cache_key(
     reaction_smiles: str,
     detail_level: str,
     include_bond_changes: bool,
+    include_electron_flow: bool,
+    include_intermediates: bool,
+    include_precedents: bool,
     context: Optional[Dict[str, Any]],
 ) -> str:
     cache_payload = {
         "reaction_smiles": reaction_smiles,
         "detail_level": detail_level,
         "include_bond_changes": include_bond_changes,
+        "include_electron_flow": include_electron_flow,
+        "include_intermediates": include_intermediates,
+        "include_precedents": include_precedents,
         "context": context or {},
     }
     return json.dumps(cache_payload, sort_keys=True, default=str)
@@ -1448,12 +1472,65 @@ def _merge_warnings(primary: List[str], extra: List[str]) -> List[str]:
     return merged
 
 
+def _fetch_mechanism_precedents(
+    reaction_smiles: str,
+    family: Optional[str],
+    limit: int = 3,
+) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """Return simplified precedent snippets or an error message."""
+    if not family:
+        return [], "Cannot fetch precedents without detected family."
+    try:
+        result = precedent_knn(
+            family=family,
+            features={},
+            k=limit,
+            relax={
+                "use_drfp": True,
+                "reaction_smiles": reaction_smiles,
+                "filter_by_reagent_database": True,
+            },
+        )
+    except Exception as exc:
+        return [], f"Precedent lookup failed: {exc}"
+
+    precedents_raw = result.get("precedents") or []
+    precedents: List[Dict[str, Any]] = []
+    for entry in precedents_raw[:limit]:
+        conditions: Dict[str, Any] = {}
+        for key in ("catalyst", "ligand", "base", "solvent"):
+            value = entry.get(key)
+            if value:
+                conditions[key] = value
+        if entry.get("T_C") is not None:
+            conditions["temperature_C"] = entry["T_C"]
+        if entry.get("time_h") is not None:
+            conditions["time_h"] = entry["time_h"]
+
+        precedents.append(
+            {
+                "similarity": round(entry.get("similarity", 0.0), 3),
+                "yield": entry.get("yield"),
+                "conditions": conditions,
+                "reaction": (entry.get("reaction_smiles") or "")[:140],
+            }
+        )
+
+    if not precedents:
+        return [], "No precedents found for detected family."
+
+    return precedents, None
+
+
 @tool(args_schema=MechanismAnalysisInput)
 def analyze_mechanism_tool(
     reaction_smiles: str,
     context: Optional[Dict[str, Any]] = None,
     detail_level: str = "standard",
     include_bond_changes: bool = True,
+    include_electron_flow: bool = True,
+    include_intermediates: bool = True,
+    include_precedents: bool = True,
 ) -> Dict[str, Any]:
     """
     Analyze a reaction mechanism by combining detection, bond analysis, and heuristics.
@@ -1473,7 +1550,15 @@ def analyze_mechanism_tool(
             {"reaction_smiles": reaction_smiles},
         )
 
-    cache_key = _mechanism_cache_key(normalized_smiles, detail_level, include_bond_changes, context)
+    cache_key = _mechanism_cache_key(
+        normalized_smiles,
+        detail_level,
+        include_bond_changes,
+        include_electron_flow,
+        include_intermediates,
+        include_precedents,
+        context,
+    )
     cached = _mechanism_cache_get(cache_key)
     if cached:
         return cached
@@ -1501,11 +1586,47 @@ def analyze_mechanism_tool(
         detail_level=detail_level,
     )
 
+    electron_balance: Optional[Dict[str, Any]] = None
+    if include_electron_flow:
+        try:
+            electron_balance = compute_electron_balance(reaction_smiles)
+        except Exception as balance_exc:
+            extra_warnings.append(str(balance_exc))
+
+    electron_flow = (
+        predict_electron_flow(mechanism.get("mechanism_type"), bond_changes, electron_balance)
+        if include_electron_flow
+        else {}
+    )
+
+    intermediates = (
+        predict_intermediates(
+            mechanism.get("mechanism_type"),
+            detection.get("family"),
+            context=context,
+        )
+        if include_intermediates
+        else []
+    )
+
+    precedents: List[Dict[str, Any]] = []
+    if include_precedents:
+        precedents, precedents_warning = _fetch_mechanism_precedents(
+            normalized_smiles,
+            detection.get("family"),
+        )
+        if precedents_warning:
+            extra_warnings.append(precedents_warning)
+
     narrative = build_mechanism_narrative(
         mechanism,
         detection=detection,
         bond_changes=bond_changes or {},
         context=context,
+        electron_flow=electron_flow,
+        intermediates=intermediates,
+        precedents=precedents,
+        electron_balance=electron_balance,
     )
 
     combined_warnings = _merge_warnings(
@@ -1523,6 +1644,10 @@ def analyze_mechanism_tool(
         "warnings": combined_warnings,
         "narrative": narrative.get("narrative", ""),
         "highlights": narrative.get("highlights", []),
+        "electron_flow": electron_flow,
+        "intermediates": intermediates,
+        "electron_balance": electron_balance,
+        "precedents": precedents,
         "reaction_family": detection.get("family"),
         "detection": detection,
         "bond_changes": bond_changes or {},

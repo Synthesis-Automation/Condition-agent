@@ -401,4 +401,7 @@ def _summarize_bond_changes(
     }
 
 
-__all__ = ["classify_mechanism_simple"]
+from .electron_flow import predict_electron_flow
+from .intermediates import predict_intermediates
+
+__all__ = ["classify_mechanism_simple", "predict_electron_flow", "predict_intermediates"]
