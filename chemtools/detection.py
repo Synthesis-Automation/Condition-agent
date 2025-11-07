@@ -25,6 +25,7 @@ from .router import (
     _detect_reducing_agent,
     _detect_oxidizing_agent,
     _detect_strong_base,
+    _detect_radical_initiator,
 )
 from .detection_mapper import (
     resolve_to_taxonomy,
@@ -159,6 +160,14 @@ class _DetectionEngine:
         rs = " ".join(self.reactants).lower()
         is_aryl_or_vinyl_electrophile = h.get("aryl_halide") or h.get("vinyl_halide") or h.get("triflate")
         
+        # Compute SNAr conditions (used later in priority chain)
+        is_heteroaryl = any(x in rs for x in ["c1nc", "c1oc", "c1sc", "n1c", "nc(", "pyrid", "pyrim", "triaz"])
+        has_strong_ewg = any(x in rs for x in ["[n+](=o)[o-]", "c#n", "c(f)(f)f", "s(=o)(=o)", "c(=o)c"])
+        is_snar_electrophile = is_heteroaryl or (h.get("aryl_halide") and has_strong_ewg)
+        has_nucleophile = h.get("nucleophile_n") or h.get("nucleophile_o") or h.get("nucleophile_s")
+        no_metal_catalyst = not self.catalysts  # SNAr doesn't need metal catalyst
+        is_snar = is_snar_electrophile and has_nucleophile and no_metal_catalyst
+        
         # PRIORITY 1: Grignard/organometallic addition to carbonyl (HIGHEST PRIORITY)
         if h.get("carbonyl") and (h.get("grignard") or h.get("organolithium") or h.get("organozinc")):
             if h.get("grignard"):
@@ -184,16 +193,15 @@ class _DetectionEngine:
         elif is_aryl_or_vinyl_electrophile and h.get("alkene") and not h.get("boron"):
             fam, conf = "heck", 0.80
         
-        # PRIORITY 3: SNAr (Aromatic Nucleophilic Substitution) - BEFORE metal-catalyzed couplings
-        # SNAr requires activated aryl system (heteroaryl or electron-withdrawing groups) without metal catalyst
-        # Check for heteroaryl (n, o, s in aromatic ring) or strong EWG activation
-        is_heteroaryl = any(x in rs for x in ["c1nc", "c1oc", "c1sc", "n1c", "nc(", "pyrid", "pyrim", "triaz"])
-        has_strong_ewg = any(x in rs for x in ["[n+](=o)[o-]", "c#n", "c(f)(f)f", "s(=o)(=o)", "c(=o)c"])
-        is_snar_electrophile = is_heteroaryl or (h.get("aryl_halide") and has_strong_ewg)
-        has_nucleophile = h.get("nucleophile_n") or h.get("nucleophile_o") or h.get("nucleophile_s")
-        no_metal_catalyst = not self.catalysts  # SNAr doesn't need metal catalyst
+        # PRIORITY 2.5: Acyl substitution (BEFORE reductive amination check)
+        elif h.get("acyl_halide") and (h.get("nucleophile_n") or h.get("nucleophile_o")):
+            if h.get("nucleophile_n"):
+                fam, conf = "amide_formation", 0.90
+            else:
+                fam, conf = "ester_formation", 0.90
         
-        if is_snar_electrophile and has_nucleophile and no_metal_catalyst:
+        # PRIORITY 3: SNAr (Aromatic Nucleophilic Substitution) - BEFORE metal-catalyzed couplings
+        elif is_snar:
             # High confidence for heteroaryls (intrinsically activated)
             # Medium confidence for EWG-activated aryl halides
             if is_heteroaryl:
@@ -217,6 +225,10 @@ class _DetectionEngine:
         
         elif h.get("acid") and h.get("alcohol"):
             fam, conf = "esterification", 0.85
+        
+        # PRIORITY 5.5: SN2 with alkyl halides (BEFORE reductive amination, BUT exclude acyl halides)
+        elif h.get("alkyl_halide") and not h.get("acyl_halide") and (h.get("nucleophile_n") or h.get("nucleophile_o") or h.get("nucleophile_s")):
+            fam, conf = "sn2_alkylation", 0.85
         
         # PRIORITY 6: Reductive Amination (carbonyl + amine)
         elif h.get("carbonyl") and h.get("nucleophile_n"):
@@ -274,6 +286,17 @@ class _DetectionEngine:
         if _detect_strong_base(self.reactants) and h.get("alkyl_halide") and not h.get("cyanide"):
             if fam is None or conf < 0.75:
                 fam, conf = "e2_elimination", 0.80
+        
+        # Radical chain reactions (halogenation, polymerization)
+        radical_initiator = _detect_radical_initiator(self.reactants)
+        if radical_initiator:
+            # Radical halogenation (e.g., CCl4, NBS)
+            if radical_initiator in ("CCl4", "CBr4", "NBS", "Br2/Cl2"):
+                if fam is None or conf < 0.70:
+                    fam, conf = "radical_halogenation", 0.75
+            # Other radical reactions (e.g., AIBN, BPO)
+            elif fam is None or conf < 0.60:
+                fam, conf = "radical_chain", 0.65
         
         # Map to taxonomy
         canonical_family = resolve_to_taxonomy(

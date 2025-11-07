@@ -115,11 +115,15 @@ def resolve_to_taxonomy(
             "ullmann_ether": "ullmann_ether",
             "cs_coupling": "cs_coupling",
             "amide_coupling": "amide_coupling",
+            "amide_formation": "amide_formation",
             "snar": "snar",
             "s_nar": "snar",
             "aromatic_nucleophilic_substitution": "snar",
             "reductive_amination": "reductive_amination",
             "esterification": "esterification",
+            "ester_formation": "ester_formation",
+            "sn2_alkylation": "sn2_substitution",
+            "sn2": "sn2_substitution",
             "grignard_addition": "grignard_addition",
             "organozinc_addition": "organozinc_addition",
             "organolithium_addition": "organolithium_addition",
@@ -137,6 +141,8 @@ def resolve_to_taxonomy(
             "claisen_condensation": "claisen_condensation",
             "aldol_condensation": "aldol_condensation",
             "wittig": "wittig",
+            "radical_halogenation": "radical_halogenation",
+            "radical_chain": "radical_chain",
         }
         if raw_prediction.lower() in fallback_map:
             return fallback_map[raw_prediction.lower()]
