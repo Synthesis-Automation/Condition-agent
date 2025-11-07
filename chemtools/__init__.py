@@ -54,6 +54,8 @@ from .util.reaction_center_detector import (
     compare_unmapped_reaction_to_find_changes,
 )
 from .mechanism import classify_mechanism_simple
+from .mechanism.electron_flow import predict_electron_flow
+from .mechanism.intermediates import predict_intermediates
 
 # Primary exports - ChemTools is the recommended interface
 __all__ = [
@@ -70,6 +72,8 @@ __all__ = [
     "compare_unmapped_reaction_to_find_changes",  # Auto-map then analyze
     "rxnmapper_available",  # Check if RXNMapper is installed
     "classify_mechanism_simple",  # Lightweight mechanism classifier
+    "predict_electron_flow",  # Rule-based electron flow heuristics
+    "predict_intermediates",  # Mechanistic intermediate heuristics
 ]
 
 # Version info
