@@ -2700,5 +2700,1133 @@
       "derive": "azide_present OR diazo_compound_present OR peroxide_present OR nitro_present",
       "why": "Potentially explosive functional groups present; handle with caution"
     }
+  ],
+  "functional_groups": [
+    {
+      "name": "acyl_chloride",
+      "label": "Acyl Chloride",
+      "detect": {
+        "smarts_any": [
+          "[CX3](=O)[Cl]"
+        ]
+      }
+    },
+    {
+      "name": "acyl_halide",
+      "label": "Acyl Halide",
+      "detect": {
+        "smarts_any": [
+          "[CX3](=O)[F,Cl,Br,I]"
+        ]
+      },
+      "category_tags": [
+        "halides",
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "alcohol",
+      "label": "Alcohol",
+      "detect": {
+        "smarts_any": [
+          "[OX2H]"
+        ]
+      },
+      "text_patterns": [
+        "oh",
+        "[oh]"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "aldehyde",
+      "label": "Aldehyde",
+      "detect": {
+        "smarts_any": [
+          "[CX3H1](=O)[#6]"
+        ]
+      },
+      "text_patterns": [
+        "c(=o)h",
+        "c=oh"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "alkene",
+      "label": "Alkene",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[CX3]"
+        ]
+      },
+      "text_patterns": [
+        "c=c"
+      ],
+      "category_tags": [
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "alkyl_bromide",
+      "label": "Alkyl Bromide",
+      "detect": {
+        "smarts_any": [
+          "[CX4][Br]"
+        ]
+      },
+      "text_patterns": [
+        "cbr"
+      ],
+      "category_tags": [
+        "halides",
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "alkyl_chloride",
+      "label": "Alkyl Chloride",
+      "detect": {
+        "smarts_any": [
+          "[CX4][Cl]"
+        ]
+      },
+      "text_patterns": [
+        "ccl"
+      ],
+      "category_tags": [
+        "halides",
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "alkyl_fluoride",
+      "label": "Alkyl Fluoride",
+      "detect": {
+        "smarts_any": [
+          "[CX4][F]"
+        ]
+      },
+      "text_patterns": [
+        "cf"
+      ],
+      "category_tags": [
+        "halides",
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "alkyl_iodide",
+      "label": "Alkyl Iodide",
+      "detect": {
+        "smarts_any": [
+          "[CX4][I]"
+        ]
+      },
+      "text_patterns": [
+        "ci"
+      ],
+      "category_tags": [
+        "halides",
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "alkyne",
+      "label": "Alkyne",
+      "detect": {
+        "smarts_any": [
+          "[CX2]#[CX2]"
+        ]
+      },
+      "text_patterns": [
+        "c#c"
+      ],
+      "category_tags": [
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "allylic",
+      "label": "Allylic",
+      "detect": {
+        "smarts_any": [
+          "[#6][CX3]=[CX3]"
+        ]
+      },
+      "category_tags": [
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "amide",
+      "label": "Amide",
+      "detect": {
+        "smarts_any": [
+          "[NX3][CX3](=[OX1])"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "amide_primary",
+      "label": "Amide Primary",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H2][CX3](=[OX1])"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "amide_secondary",
+      "label": "Amide Secondary",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H1][CX3](=[OX1])"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "amide_tertiary",
+      "label": "Amide Tertiary",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H0][CX3](=[OX1])"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "amine_primary",
+      "label": "Amine Primary",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H2;!$(NC=O)]"
+        ]
+      },
+      "text_patterns": [
+        "nh2",
+        "[nh2]"
+      ],
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "amine_secondary",
+      "label": "Amine Secondary",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H1;!$(NC=O)]"
+        ]
+      },
+      "text_patterns": [
+        "nh",
+        "[nh]"
+      ],
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "amine_tertiary",
+      "label": "Amine Tertiary",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H0;!$(NC=O);!$(N=*)]"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "anhydride",
+      "label": "Anhydride",
+      "detect": {
+        "smarts_any": [
+          "[CX3](=O)[OX2][CX3](=O)"
+        ]
+      },
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "aniline",
+      "label": "Aniline",
+      "detect": {
+        "smarts_any": [
+          "c[NX3;H2,H1;!$(NC=O)]"
+        ]
+      },
+      "category_tags": [
+        "aromatic",
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "aromatic",
+      "label": "Aromatic",
+      "detect": {
+        "smarts_any": [
+          "a"
+        ]
+      },
+      "category_tags": [
+        "aromatic"
+      ]
+    },
+    {
+      "name": "aryl_bromide",
+      "label": "Aryl Bromide",
+      "detect": {
+        "smarts_any": [
+          "c[Br]"
+        ]
+      },
+      "text_patterns": [
+        "c1ccc(br)"
+      ],
+      "category_tags": [
+        "halides"
+      ]
+    },
+    {
+      "name": "aryl_chloride",
+      "label": "Aryl Chloride",
+      "detect": {
+        "smarts_any": [
+          "c[Cl]"
+        ]
+      },
+      "text_patterns": [
+        "c1ccc(cl)"
+      ],
+      "category_tags": [
+        "halides"
+      ]
+    },
+    {
+      "name": "aryl_fluoride",
+      "label": "Aryl Fluoride",
+      "detect": {
+        "smarts_any": [
+          "c[F]"
+        ]
+      },
+      "category_tags": [
+        "halides"
+      ]
+    },
+    {
+      "name": "aryl_iodide",
+      "label": "Aryl Iodide",
+      "detect": {
+        "smarts_any": [
+          "c[I]"
+        ]
+      },
+      "text_patterns": [
+        "c1ccc(i)"
+      ],
+      "category_tags": [
+        "halides"
+      ]
+    },
+    {
+      "name": "azide",
+      "label": "Azide",
+      "detect": {
+        "smarts_any": [
+          "[NX2]=[NX2]=[NX1]"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "aziridine",
+      "label": "Aziridine",
+      "detect": {
+        "smarts_any": [
+          "[NX3r3]1[#6][#6]1"
+        ]
+      }
+    },
+    {
+      "name": "benzylic",
+      "label": "Benzylic",
+      "detect": {
+        "smarts_any": [
+          "[#6]a"
+        ]
+      },
+      "category_tags": [
+        "aromatic"
+      ]
+    },
+    {
+      "name": "boc",
+      "label": "Boc",
+      "detect": {
+        "smarts_any": [
+          "[$(C(=O)OC(C)(C)C)]"
+        ]
+      },
+      "category_tags": [
+        "protecting_groups"
+      ]
+    },
+    {
+      "name": "boron_reagent",
+      "label": "Boron Reagent",
+      "detect": {
+        "smarts_any": [
+          "[B]"
+        ]
+      }
+    },
+    {
+      "name": "boronic_acid",
+      "label": "Boronic Acid",
+      "detect": {
+        "smarts_any": [
+          "[BX3](O)(O)"
+        ]
+      },
+      "text_patterns": [
+        "b(o)o",
+        "b(oh)oh"
+      ]
+    },
+    {
+      "name": "boronic_ester",
+      "label": "Boronic Ester",
+      "detect": {
+        "smarts_any": [
+          "[BX3](O[#6])(O[#6])"
+        ]
+      },
+      "text_patterns": [
+        "b(o"
+      ]
+    },
+    {
+      "name": "carbamate",
+      "label": "Carbamate",
+      "detect": {
+        "smarts_any": [
+          "[NX3][CX3](=[OX1])[OX2]"
+        ]
+      }
+    },
+    {
+      "name": "carbonate",
+      "label": "Carbonate",
+      "detect": {
+        "smarts_any": [
+          "[OX2][CX3](=[OX1])[OX2]"
+        ]
+      }
+    },
+    {
+      "name": "carbonyl",
+      "label": "Carbonyl",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[OX1]"
+        ]
+      },
+      "text_patterns": [
+        "c(=o)",
+        "c=o"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "carboxylic_acid",
+      "label": "Carboxylic Acid",
+      "detect": {
+        "smarts_any": [
+          "[CX3](=O)[OX2H1]"
+        ]
+      },
+      "text_patterns": [
+        "c(=o)o",
+        "cooh"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "cbz",
+      "label": "Cbz",
+      "detect": {
+        "smarts_any": [
+          "[$(C(=O)OCc1ccccc1)]"
+        ]
+      },
+      "category_tags": [
+        "protecting_groups"
+      ]
+    },
+    {
+      "name": "disulfide",
+      "label": "Disulfide",
+      "detect": {
+        "smarts_any": [
+          "[SX2][SX2]"
+        ]
+      },
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "enamine",
+      "label": "Enamine",
+      "detect": {
+        "smarts_any": [
+          "[NX3][#6]=[#6]"
+        ]
+      },
+      "category_tags": [
+        "nitrogen",
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "enol",
+      "label": "Enol",
+      "detect": {
+        "smarts_any": [
+          "[OX2H][#6]=[#6]"
+        ]
+      },
+      "category_tags": [
+        "oxygen",
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "epoxide",
+      "label": "Epoxide",
+      "detect": {
+        "smarts_any": [
+          "[OX2r3]1[#6][#6]1"
+        ]
+      },
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "ester",
+      "label": "Ester",
+      "detect": {
+        "smarts_any": [
+          "[#6][CX3](=O)[OX2][#6]"
+        ]
+      },
+      "text_patterns": [
+        "oc(=o)",
+        "c(=o)o"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "ether",
+      "label": "Ether",
+      "detect": {
+        "smarts_any": [
+          "[OD2]([#6])[#6]"
+        ]
+      },
+      "text_patterns": [
+        "oc",
+        "co"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "fmoc",
+      "label": "Fmoc",
+      "detect": {
+        "smarts_any": [
+          "[$(C(=O)OCC1c2ccccc2-c2ccccc12)]"
+        ]
+      },
+      "category_tags": [
+        "protecting_groups"
+      ]
+    },
+    {
+      "name": "furan",
+      "label": "Furan",
+      "detect": {
+        "smarts_any": [
+          "o1cccc1"
+        ]
+      },
+      "category_tags": [
+        "aromatic"
+      ]
+    },
+    {
+      "name": "hydrazine",
+      "label": "Hydrazine",
+      "detect": {
+        "smarts_any": [
+          "[NX3][NX3]"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "hydroxylamine",
+      "label": "Hydroxylamine",
+      "detect": {
+        "smarts_any": [
+          "[NX3][OX2H]"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "imidazole",
+      "label": "Imidazole",
+      "detect": {
+        "smarts_any": [
+          "n1c[nH]cc1"
+        ]
+      },
+      "category_tags": [
+        "aromatic",
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "imide",
+      "label": "Imide",
+      "detect": {
+        "smarts_any": [
+          "[CX3](=O)[NX3][CX3](=O)"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "imine",
+      "label": "Imine",
+      "detect": {
+        "smarts_any": [
+          "[NX2]=[CX3]"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "imine_n_oxide",
+      "label": "Imine N Oxide",
+      "detect": {
+        "smarts_any": [
+          "[NX3+]([O-])=[CX3]"
+        ]
+      },
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "isocyanate",
+      "label": "Isocyanate",
+      "detect": {
+        "smarts_any": [
+          "N=C=O"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "ketone",
+      "label": "Ketone",
+      "detect": {
+        "smarts_any": [
+          "[#6][CX3](=O)[#6]"
+        ]
+      },
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "lactam",
+      "label": "Lactam",
+      "detect": {
+        "smarts_any": [
+          "[NX3r][CX3](=O)"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "lactone",
+      "label": "Lactone",
+      "detect": {
+        "smarts_any": [
+          "[OX2r][CX3](=O)"
+        ]
+      },
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "mesylate",
+      "label": "Mesylate",
+      "detect": {
+        "smarts_any": [
+          "[$(S(=O)(=O)(O[#6])C)]"
+        ]
+      },
+      "category_tags": [
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "n_oxide",
+      "label": "N Oxide",
+      "detect": {
+        "smarts_any": [
+          "[$([#7+][O-]),$([#7v5]=[O])]"
+        ]
+      },
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "nitrile",
+      "label": "Nitrile",
+      "detect": {
+        "smarts_any": [
+          "[NX1]#[CX2]"
+        ]
+      },
+      "text_patterns": [
+        "c#n"
+      ],
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "nitro",
+      "label": "Nitro",
+      "detect": {
+        "smarts_any": [
+          "[$([NX3](=O)=O),$([NX3+](=O)[O-])][!#8]"
+        ]
+      },
+      "text_patterns": [
+        "n(=o)=o",
+        "[n+](=o)[o-]"
+      ],
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "oxazole",
+      "label": "Oxazole",
+      "detect": {
+        "smarts_any": [
+          "n1ccoc1"
+        ]
+      },
+      "category_tags": [
+        "aromatic",
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "peroxide",
+      "label": "Peroxide",
+      "detect": {
+        "smarts_any": [
+          "[OX2][OX2]"
+        ]
+      },
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "phenol",
+      "label": "Phenol",
+      "detect": {
+        "smarts_any": [
+          "c[OX2H]"
+        ]
+      },
+      "text_patterns": [
+        "coh",
+        "c[oh]"
+      ],
+      "category_tags": [
+        "aromatic",
+        "oxygen"
+      ]
+    },
+    {
+      "name": "phosphate",
+      "label": "Phosphate",
+      "detect": {
+        "smarts_any": [
+          "[PX4](=O)([OX2H,OX1-])([OX2H,OX1-])[OX2]"
+        ]
+      },
+      "category_tags": [
+        "phosphorus"
+      ]
+    },
+    {
+      "name": "phosphine",
+      "label": "Phosphine",
+      "detect": {
+        "smarts_any": [
+          "[PX3]"
+        ]
+      },
+      "category_tags": [
+        "phosphorus"
+      ]
+    },
+    {
+      "name": "phosphine_oxide",
+      "label": "Phosphine Oxide",
+      "detect": {
+        "smarts_any": [
+          "[PX4](=O)"
+        ]
+      },
+      "category_tags": [
+        "phosphorus"
+      ]
+    },
+    {
+      "name": "propargylic",
+      "label": "Propargylic",
+      "detect": {
+        "smarts_any": [
+          "[#6][CX2]#[CX2]"
+        ]
+      },
+      "category_tags": [
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "pyridine",
+      "label": "Pyridine",
+      "detect": {
+        "smarts_any": [
+          "n1ccccc1"
+        ]
+      },
+      "category_tags": [
+        "aromatic"
+      ]
+    },
+    {
+      "name": "pyrrole",
+      "label": "Pyrrole",
+      "detect": {
+        "smarts_any": [
+          "[nH]1cccc1"
+        ]
+      },
+      "category_tags": [
+        "aromatic"
+      ]
+    },
+    {
+      "name": "silyl_ether",
+      "label": "Silyl Ether",
+      "detect": {
+        "smarts_any": [
+          "[$(O[Si])]"
+        ]
+      },
+      "category_tags": [
+        "protecting_groups"
+      ]
+    },
+    {
+      "name": "sulfate",
+      "label": "Sulfate",
+      "detect": {
+        "smarts_any": [
+          "[SX4](=O)(=O)([OX2H,OX1-])[OX2][#6]"
+        ]
+      },
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "sulfide",
+      "label": "Sulfide",
+      "detect": {
+        "smarts_any": [
+          "[#6][SX2][#6]"
+        ]
+      },
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "sulfonamide",
+      "label": "Sulfonamide",
+      "detect": {
+        "smarts_any": [
+          "[SX4](=O)(=O)[NX3]"
+        ]
+      },
+      "text_patterns": [
+        "s(=o)(=o)n",
+        "so2n"
+      ],
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "sulfone",
+      "label": "Sulfone",
+      "detect": {
+        "smarts_any": [
+          "[$([SX4](=O)(=O)([#6])[#6]),$([SX4+2]([O-])([O-])([#6])[#6])]"
+        ]
+      },
+      "text_patterns": [
+        "s(=o)(=o)",
+        "so2"
+      ],
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "sulfonic_acid",
+      "label": "Sulfonic Acid",
+      "detect": {
+        "smarts_any": [
+          "[SX4](=O)(=O)[OX2H]"
+        ]
+      },
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "sulfonyl_chloride",
+      "label": "Sulfonyl Chloride",
+      "detect": {
+        "smarts_any": [
+          "[SX4](=O)(=O)[Cl]"
+        ]
+      },
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "sulfoxide",
+      "label": "Sulfoxide",
+      "detect": {
+        "smarts_any": [
+          "[$([SX3](=O)[#6]),$([SX3+]([O-])[#6])]"
+        ]
+      },
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "thiazole",
+      "label": "Thiazole",
+      "detect": {
+        "smarts_any": [
+          "n1ccsc1"
+        ]
+      },
+      "category_tags": [
+        "aromatic",
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "thioester",
+      "label": "Thioester",
+      "detect": {
+        "smarts_any": [
+          "[#6][CX3](=O)[SX2][#6]"
+        ]
+      },
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "thiol",
+      "label": "Thiol",
+      "detect": {
+        "smarts_any": [
+          "[SX2H]"
+        ]
+      },
+      "text_patterns": [
+        "sh",
+        "[sh]"
+      ],
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "thiophene",
+      "label": "Thiophene",
+      "detect": {
+        "smarts_any": [
+          "s1cccc1"
+        ]
+      },
+      "category_tags": [
+        "aromatic",
+        "sulfur"
+      ]
+    },
+    {
+      "name": "tosylate",
+      "label": "Tosylate",
+      "detect": {
+        "smarts_any": [
+          "[$(S(=O)(=O)(O[#6])c1ccc(C)cc1)]"
+        ]
+      },
+      "category_tags": [
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "triflate",
+      "label": "Triflate",
+      "detect": {
+        "smarts_any": [
+          "[$(S(=O)(=O)(O[#6])C(F)(F)F)]"
+        ]
+      },
+      "text_patterns": [
+        "otf",
+        "oso2cf3"
+      ],
+      "category_tags": [
+        "leaving_groups"
+      ]
+    },
+    {
+      "name": "urea",
+      "label": "Urea",
+      "detect": {
+        "smarts_any": [
+          "[NX3][CX3](=[OX1])[NX3]"
+        ]
+      },
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "vinyl_bromide",
+      "label": "Vinyl Bromide",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[CX3][Br]"
+        ]
+      },
+      "text_patterns": [
+        "c=cbr"
+      ],
+      "category_tags": [
+        "halides",
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "vinyl_chloride",
+      "label": "Vinyl Chloride",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[CX3][Cl]"
+        ]
+      },
+      "text_patterns": [
+        "c=ccl"
+      ],
+      "category_tags": [
+        "halides",
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "vinyl_halide",
+      "label": "Vinyl Halide",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[CX3][F,Cl,Br,I]"
+        ]
+      },
+      "category_tags": [
+        "halides",
+        "unsaturated"
+      ]
+    }
   ]
 }

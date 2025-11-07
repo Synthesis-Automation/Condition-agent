@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import re
 
@@ -15,6 +15,7 @@ from .analysis.reactions import (
     canonical_family_label,
     resolve_reaction_family as _resolve_reaction_family,
 )
+from .util import functional_groups as _functional_groups
 from .util.rdkit_helpers import rdkit_available, parse_smiles
 from .util.smarts_cache import compile_smarts
 from .smiles import normalize_reaction as _normalize_reaction
@@ -31,8 +32,7 @@ _SMARTS_PATTERNS = {
     # Boron partners (boronic acids/esters)
     "boron": "[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]",
     # Terminal alkyne
-    "terminal_alkyne": "C#C[H]",  # Note: will try this first, fallback handled in usage
-    "terminal_alkyne_alt": "[C;H]#C",  # Alternative pattern
+    "terminal_alkyne": ("C#C[H]", "[C;H]#C"),
     # Carboxylic acid
     "acid": "C(=O)[OH]",
     # N-nucleophile (amine/anilines, simple)
@@ -67,6 +67,25 @@ _SMARTS_PATTERNS = {
     # Phase 2 additions - boron reagents
     "borane": "[BH3,BH2,BH]",  # Borane (BH3, B2H6, etc.)
 }
+
+
+def _get_smarts_patterns(name: str) -> Tuple[str, ...]:
+    """
+    Retrieve SMARTS patterns for the given key from the shared functional group spec
+    with router-specific fallbacks.
+    """
+    definition = _functional_groups.get_group_definition(name)
+    if definition:
+        return definition.smarts
+
+    pattern = _SMARTS_PATTERNS.get(name)
+    if pattern is None:
+        return ()
+    if isinstance(pattern, str):
+        return (pattern,)
+    if isinstance(pattern, (list, tuple)):
+        return tuple(pattern)
+    return ()
 
 
 def resolve_reaction_family(family: Optional[str]) -> Optional[str]:
@@ -179,28 +198,21 @@ def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
         mols = [m for m in mols if m is not None]
         
         def any_match(key: str) -> bool:
-            """Check if any molecule matches the SMARTS pattern for the given key."""
-            smarts = _SMARTS_PATTERNS.get(key)
-            if not smarts:
+            """Check if any molecule matches the SMARTS pattern(s) for the given key."""
+            smarts_patterns = _get_smarts_patterns(key)
+            if not smarts_patterns:
                 return False
-            
-            # Compile pattern lazily via centralized cache
-            patt = compile_smarts(smarts, validate=False)
-            if patt is None:
-                # For terminal_alkyne, try alternative pattern if first fails
-                if key == "terminal_alkyne":
-                    alt_smarts = _SMARTS_PATTERNS.get("terminal_alkyne_alt")
-                    if alt_smarts:
-                        patt = compile_smarts(alt_smarts, validate=False)
-                if patt is None:
-                    return False
-            
+
             for m in mols:
-                try:
-                    if m.HasSubstructMatch(patt):
-                        return True
-                except Exception:
-                    continue
+                for smarts in smarts_patterns:
+                    patt = compile_smarts(smarts, validate=False)
+                    if patt is None:
+                        continue
+                    try:
+                        if m.HasSubstructMatch(patt):
+                            return True
+                    except Exception:
+                        continue
             return False
         
         # RDKit SMARTS matching when available; OR with text_hits to be robust to parse failures
