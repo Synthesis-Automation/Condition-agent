@@ -365,18 +365,29 @@ class SubstrateClassifier:
             if not is_present:
                 continue
             
-            smarts = FUNCTIONAL_GROUP_SMARTS.get(fg_name)
-            if not smarts:
+            smarts_patterns = FUNCTIONAL_GROUP_SMARTS.get(fg_name)
+            if not smarts_patterns:
                 continue
             
-            pattern = compile_smarts(smarts, validate=False)
-            if not pattern:
-                continue
+            if isinstance(smarts_patterns, str):
+                pattern_list = (smarts_patterns,)
+            else:
+                pattern_list = tuple(smarts_patterns)
             
-            matches = mol.GetSubstructMatches(pattern)
-            if matches:
-                # Flatten all matches
-                atoms = sorted(set(atom_idx for match in matches for atom_idx in match))
+            raw_matches: List[Tuple[int, ...]] = []
+            for smarts in pattern_list:
+                pattern = compile_smarts(smarts, validate=False)
+                if not pattern:
+                    continue
+                try:
+                    matches = mol.GetSubstructMatches(pattern)
+                except Exception:
+                    matches = ()
+                if matches:
+                    raw_matches.extend(matches)
+            
+            if raw_matches:
+                atoms = sorted(set(atom_idx for match in raw_matches for atom_idx in match))
                 fg_atoms[fg_name] = atoms
         
         return fg_atoms

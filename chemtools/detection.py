@@ -18,7 +18,6 @@ import logging
 
 from .smiles import normalize_reaction
 from .router import (
-    _SMARTS_PATTERNS,
     _rule_hits,
     _detect_agent_metals,
     _detect_reducing_agent,

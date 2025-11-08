@@ -9,13 +9,16 @@ steric properties. Conditionally attaches role-aware vectors when available.
 
 from __future__ import annotations
 
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Sequence, Tuple
 from functools import lru_cache
 import os
 import re
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
-from ..util.functional_groups import detect_all as detect_functional_groups
+from ..util.functional_groups import (
+    detect_all as detect_functional_groups,
+    FUNCTIONAL_GROUP_SMARTS,
+)
 from ..util.smarts_cache import compile_smarts
 
 try:  # Optional role-aware vectors
@@ -36,6 +39,28 @@ _DEFAULT_MOLPIPELINE_DESCRIPTOR_LIST = [
     "NumHAcceptors",
     "NumHDonors",
 ]
+
+_HALOGEN_GROUPS: Tuple[Tuple[str, Tuple[str, ...]], ...] = (
+    ("I", ("aryl_iodide", "vinyl_iodide", "alkyl_iodide", "iodide")),
+    ("Br", ("aryl_bromide", "vinyl_bromide", "alkyl_bromide")),
+    ("Cl", ("aryl_chloride", "vinyl_chloride", "alkyl_chloride")),
+)
+
+_ARYL_GROUPS = ("aryl_halide", "aryl_chloride", "aryl_bromide", "aryl_iodide")
+_VINYL_GROUPS = ("vinyl_halide", "vinyl_chloride", "vinyl_bromide", "vinyl_iodide")
+_ALKYL_GROUPS = ("alkyl_halide", "alkyl_chloride", "alkyl_bromide", "alkyl_iodide")
+
+_EWG_GROUPS = ("nitro", "nitrile", "carbonyl", "trifluoromethyl")
+
+_NUCLEOPHILE_PRIORITY: Tuple[Tuple[Tuple[str, ...], str, str], ...] = (
+    (("indole",), "indole", "deactivated"),
+    (("aniline",), "aniline", "aromatic_primary"),
+    (("phenol",), "phenol", "deactivated"),
+    (("amide", "amide_primary", "amide_secondary"), "amide_deactivated", "deactivated"),
+    (("amine_secondary",), "amine_secondary", "secondary"),
+    (("amine_primary",), "amine_primary", "aliphatic_primary"),
+    (("amine_tertiary",), "amine_tertiary", "tertiary"),
+)
 
 
 def _get_env_bool(name: str, default: bool = False) -> bool:
@@ -140,129 +165,172 @@ def _guess_lg_text(s: str) -> str:
     return "UNK"
 
 
-# SMARTS patterns for electrophile detection
-_ELECTROPHILE_PATTERNS = {
-    "aryl_halide": "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",
-    "triflate": "OS(=O)(=O)C(F)(F)F",
-    "vinyl_halide": "C=C[Cl,Br,I]",
-    "alkyl_halide": "[CX4][Cl,Br,I]",
-}
-
-_EWG_PATTERNS = [
-    "[N+](=O)[O-]",  # Nitro
-    "C#N",           # Cyano
-    "C(F)(F)F",      # CF3
-    "C(=O)[!O]"      # Carbonyl (not ester)
-]
+def _fg_smarts(name: str, fallback: Optional[Sequence[str]] = None) -> Tuple[str, ...]:
+    patterns = FUNCTIONAL_GROUP_SMARTS.get(name)
+    if patterns:
+        return tuple(patterns)
+    if fallback:
+        return tuple(fallback)
+    return ()
 
 
-def _detect_electrophile(mol) -> Dict[str, Any]:
+def _iter_matches(mol, name: str, fallback: Optional[Sequence[str]] = None):
+    for smarts in _fg_smarts(name, fallback):
+        patt = compile_smarts(smarts, validate=False)
+        if patt is None:
+            continue
+        try:
+            matches = mol.GetSubstructMatches(patt)
+        except Exception:
+            continue
+        for match in matches:
+            yield match
+
+
+def _find_halide_ipso(mol, halogen: str):
+    for atom in mol.GetAtoms():
+        if atom.GetSymbol() != halogen:
+            continue
+        for nb in atom.GetNeighbors():
+            if nb.GetAtomicNum() == 6:
+                return nb
+    return None
+
+
+def _find_triflate_ipso(mol):
+    for match in _iter_matches(mol, "triflate", ("OS(=O)(=O)C(F)(F)F",)):
+        for idx in match:
+            atom = mol.GetAtomWithIdx(idx)
+            if atom.GetSymbol() != "O":
+                continue
+            for nb in atom.GetNeighbors():
+                if nb.GetAtomicNum() == 6 and nb.GetIdx() not in match:
+                    return nb
+    return None
+
+
+def _infer_leaving_group(fg_hits: Dict[str, bool], smiles: str) -> Tuple[str, Optional[str]]:
+    text_guess = _guess_lg_text(smiles)
+    if fg_hits.get("triflate"):
+        return "OTf", "aryl"
+
+    for symbol, names in _HALOGEN_GROUPS:
+        for name in names:
+            if fg_hits.get(name):
+                if "aryl" in name:
+                    return symbol, "aryl"
+                if "vinyl" in name:
+                    return symbol, "vinyl"
+                if "alkyl" in name:
+                    return symbol, "alkyl"
+                return symbol, None
+
+    if fg_hits.get("aryl_halide"):
+        return text_guess, "aryl"
+    if fg_hits.get("vinyl_halide"):
+        return text_guess, "vinyl"
+    if fg_hits.get("alkyl_halide"):
+        return text_guess, "alkyl"
+
+    return text_guess, None
+
+
+def _has_ewg(fg_hits: Dict[str, bool], smiles: str) -> bool:
+    if any(fg_hits.get(name) for name in _EWG_GROUPS):
+        return True
+    t = (smiles or "").lower()
+    return any(token in t for token in ("[n+](=o)[o-]", "c#n", "c(f)(f)f", "s(=o)(=o)"))
+
+
+def _infer_class_from_hits(fg_hits: Dict[str, bool], fallback: Optional[str]) -> str:
+    if fallback:
+        return fallback
+    if any(fg_hits.get(name) for name in _ARYL_GROUPS):
+        return "aryl"
+    if any(fg_hits.get(name) for name in _VINYL_GROUPS):
+        return "vinyl"
+    if any(fg_hits.get(name) for name in _ALKYL_GROUPS):
+        return "alkyl"
+    return "aryl"
+
+
+def _detect_electrophile(
+    mol,
+    fg_hits: Optional[Dict[str, bool]] = None,
+    smiles_text: str = ""
+) -> Dict[str, Any]:
     """Extract electrophile features (LG, class, ortho substitution, EWG, heteroaryl)."""
-    # Default values
-    res = {
-        "LG": "UNK",
-        "elec_class": "aryl",
+    fg_hits = fg_hits or {}
+    lg, class_hint = _infer_leaving_group(fg_hits, smiles_text)
+    elec_class = _infer_class_from_hits(fg_hits, class_hint)
+    para_ewg = _has_ewg(fg_hits, smiles_text)
+
+    result = {
+        "LG": lg,
+        "elec_class": elec_class,
         "ortho_count": "0",
-        "para_EWG": False,
+        "para_EWG": para_ewg if (lg != "UNK" and elec_class in ("aryl", "vinyl", "alkenyl")) else False,
         "heteroaryl": False,
     }
+
     if mol is None or not rdkit_available():
-        return res
+        return result
 
-    # Compile SMARTS patterns lazily via centralized cache
-    patt_aryl_halide = compile_smarts(_ELECTROPHILE_PATTERNS["aryl_halide"], validate=False)
-    patt_triflate = compile_smarts(_ELECTROPHILE_PATTERNS["triflate"], validate=False)
-    patt_vinyl_halide = compile_smarts(_ELECTROPHILE_PATTERNS["vinyl_halide"], validate=False)
-    patt_alkyl_halide = compile_smarts(_ELECTROPHILE_PATTERNS["alkyl_halide"], validate=False)
-
-    # Compile EWG patterns
-    ewg_smarts = [compile_smarts(p, validate=False) for p in _EWG_PATTERNS]
-    ewg_smarts = [p for p in ewg_smarts if p is not None]
-
-    # Determine LG and class
-    lg = "UNK"
-    elec_class = "aryl"
     ipso_atom = None
-    # Triflate attached to oxygen; find directly
-    if mol.HasSubstructMatch(patt_triflate):
-        lg = "OTf"
-        # class heuristic: assume aryl/vinyl via presence of aromatic neighbor
-        for match in mol.GetSubstructMatches(patt_triflate):
-            # match gives atoms of triflate; find the oxygen index connected outward
-            for ai in match:
-                a = mol.GetAtomWithIdx(ai)
-                if a.GetSymbol() == 'O':
-                    for nb in a.GetNeighbors():
-                        if nb.GetAtomicNum() == 6:
-                            if nb.GetIsAromatic():
-                                elec_class = "aryl"
-                                ipso_atom = nb
-                            else:
-                                # approximate vinyl/alkyl
-                                elec_class = "vinyl" if any(b.GetAtomicNum()==6 and b.GetIsAromatic()==False and any(x.GetSymbol()=="C" and x.GetIsAromatic()==False for x in nb.GetNeighbors()) for b in [nb]) else "alkyl"
-                            break
-                    if ipso_atom:
-                        break
-            if ipso_atom:
-                break
-    # Halides
-    if lg == "UNK":
-        for sym in ("I", "Br", "Cl"):
-            patt = compile_smarts(f"[c,C][{sym}]", validate=False)
-            if patt and mol.HasSubstructMatch(patt):
-                lg = sym
-                # pick a match
-                mi = mol.GetSubstructMatch(patt)
-                if mi:
-                    c_idx = mi[0]
-                    c_atom = mol.GetAtomWithIdx(c_idx)
-                    ipso_atom = c_atom
-                    elec_class = "aryl" if c_atom.GetIsAromatic() else "alkenyl" if any(b.GetIsAromatic()==False and b.GetTotalDegree()==3 for b in c_atom.GetNeighbors()) else "alkyl"
+    if lg == "OTf":
+        ipso_atom = _find_triflate_ipso(mol)
+    elif lg in {"Cl", "Br", "I"}:
+        ipso_atom = _find_halide_ipso(mol, lg)
+
+    if ipso_atom is None:
+        for symbol, _ in _HALOGEN_GROUPS:
+            candidate = _find_halide_ipso(mol, symbol)
+            if candidate is not None:
+                if lg == "UNK":
+                    lg = symbol
+                ipso_atom = candidate
                 break
 
-    # Ortho count and heteroaryl using a 6-member aromatic ring if present
     ortho_count = 0
     heteroaryl = False
     if ipso_atom is not None and ipso_atom.GetIsAromatic():
+        elec_class = "aryl"
         ri = ipso_atom.GetOwningMol().GetRingInfo()
         atom_idx = ipso_atom.GetIdx()
         rings = [r for r in ri.AtomRings() if atom_idx in r and len(r) == 6]
         if rings:
             ring = rings[0]
             pos = ring.index(atom_idx)
-            # ortho positions are pos-1 and pos+1
-            ortho_atoms = [mol.GetAtomWithIdx(ring[(pos - 1) % 6]), mol.GetAtomWithIdx(ring[(pos + 1) % 6])]
-            # heteroaryl if any atom in ring is hetero
+            ortho_atoms = [
+                mol.GetAtomWithIdx(ring[(pos - 1) % 6]),
+                mol.GetAtomWithIdx(ring[(pos + 1) % 6]),
+            ]
             heteroaryl = any(mol.GetAtomWithIdx(i).GetAtomicNum() not in (6, 1) for i in ring)
+
             def is_substituted(ar_atom):
-                # count non-ring heavy neighbors not in ring
-                cnt = 0
+                count = 0
                 for nb in ar_atom.GetNeighbors():
                     if nb.GetIdx() not in ring and nb.GetAtomicNum() > 1:
-                        cnt += 1
-                return cnt > 0
-            ortho_count = sum(1 for a in ortho_atoms if is_substituted(a))
+                        count += 1
+                return count > 0
 
-    # para EWG approximation: check presence of any EWG anywhere on molecule
-    # BUT only relevant for aryl/vinyl electrophiles WITH a leaving group (not carbonyl compounds)
-    para_ewg = False
-    if lg != "UNK" and elec_class in ("aryl", "vinyl", "alkenyl"):
-        for patt in ewg_smarts:
-            try:
-                if mol.HasSubstructMatch(patt):
-                    para_ewg = True
-                    break
-            except Exception:
-                continue
+            ortho_count = sum(1 for atom in ortho_atoms if is_substituted(atom))
+    else:
+        if any(fg_hits.get(name) for name in _VINYL_GROUPS):
+            elec_class = "vinyl"
+        elif any(fg_hits.get(name) for name in _ALKYL_GROUPS):
+            elec_class = "alkyl"
 
-    res.update({
+    para_ewg_flag = para_ewg if (lg != "UNK" and elec_class in ("aryl", "vinyl", "alkenyl")) else False
+
+    result.update({
         "LG": lg,
-        "elec_class": "aryl" if (ipso_atom is not None and ipso_atom.GetIsAromatic()) else ("vinyl" if mol.HasSubstructMatch(patt_vinyl_halide) else ("alkyl" if mol.HasSubstructMatch(patt_alkyl_halide) else elec_class)),
+        "elec_class": elec_class,
         "ortho_count": "2+" if ortho_count >= 2 else ("1" if ortho_count == 1 else "0"),
-        "para_EWG": para_ewg,
+        "para_EWG": para_ewg_flag,
         "heteroaryl": heteroaryl,
     })
-    return res
+    return result
 
 
 def _nuc_class_text(s: str) -> str:
@@ -285,24 +353,26 @@ def _nuc_class_text(s: str) -> str:
     return "amine"
 
 
-# SMARTS patterns for nucleophile detection
-_NUCLEOPHILE_PATTERNS = {
-    "aniline": "[$([NX3;H1][c]),$([NX3]([c])[H])]",
-    "indole": "[nH]",
-    "phenol": "c[OH]",
-    "amide": "N[C;X3](=O)",
-    "sec_amine": "[NX3;H1]([!#6])([#6])",
-    "prim_amine": "[NX3;H2][#6]",
-}
-
-
-def _nucleophile_features(mol, text: str) -> Dict[str, Any]:
+def _nucleophile_features(
+    mol,
+    text: str,
+    fg_hits: Optional[Dict[str, bool]] = None
+) -> Dict[str, Any]:
     """Extract nucleophile features (class, basicity, sterics)."""
-    nuc_class = _nuc_class_text(text)
+    fg_hits = fg_hits or {}
+    nuc_class: Optional[str] = None
     n_basicity = "unknown"
     steric_alpha = "low"
 
-    if mol is None or not rdkit_available():
+    for group_names, cls, basicity in _NUCLEOPHILE_PRIORITY:
+        if any(fg_hits.get(name) for name in group_names):
+            nuc_class = cls
+            n_basicity = basicity
+            break
+
+    if nuc_class is None:
+        nuc_class = _nuc_class_text(text)
+        lowered = (text or "").lower()
         if nuc_class == "aniline":
             n_basicity = "aromatic_primary"
         elif nuc_class == "amine_primary":
@@ -311,42 +381,15 @@ def _nucleophile_features(mol, text: str) -> Dict[str, Any]:
             n_basicity = "secondary"
         elif nuc_class == "phenol":
             n_basicity = "deactivated"
-        return {"nuc_class": nuc_class, "n_basicity": n_basicity, "steric_alpha": steric_alpha}
-
-    # Compile SMARTS patterns lazily via centralized cache
-    patt_aniline = compile_smarts(_NUCLEOPHILE_PATTERNS["aniline"], validate=False)
-    patt_indole = compile_smarts(_NUCLEOPHILE_PATTERNS["indole"], validate=False)
-    patt_phenol = compile_smarts(_NUCLEOPHILE_PATTERNS["phenol"], validate=False)
-    patt_amide = compile_smarts(_NUCLEOPHILE_PATTERNS["amide"], validate=False)
-    patt_sec_amine = compile_smarts(_NUCLEOPHILE_PATTERNS["sec_amine"], validate=False)
-    patt_prim_amine = compile_smarts(_NUCLEOPHILE_PATTERNS["prim_amine"], validate=False)
-
-    if patt_indole and mol.HasSubstructMatch(patt_indole):
-        nuc_class = "indole"
-        n_basicity = "deactivated"
-    elif patt_aniline and mol.HasSubstructMatch(patt_aniline):
-        nuc_class = "aniline"
-        n_basicity = "aromatic_primary"
-    elif patt_phenol and mol.HasSubstructMatch(patt_phenol):
-        nuc_class = "phenol"
-        n_basicity = "deactivated"
-    elif patt_amide and mol.HasSubstructMatch(patt_amide):
-        nuc_class = "amide_deactivated"
-        n_basicity = "deactivated"
-    elif patt_sec_amine and mol.HasSubstructMatch(patt_sec_amine):
-        nuc_class = "amine_secondary"
-        n_basicity = "secondary"
-    elif patt_prim_amine and mol.HasSubstructMatch(patt_prim_amine):
-        nuc_class = "amine_primary"
-        n_basicity = "aliphatic_primary"
-    else:
-        # Fallback categorization
-        if "n" in text.lower():
+        elif "n" in lowered:
             nuc_class = "amine_primary"
             n_basicity = "aliphatic_primary"
-        elif "o" in text.lower():
+        elif "o" in lowered:
             nuc_class = "phenol"
             n_basicity = "deactivated"
+
+    if mol is None or not rdkit_available():
+        return {"nuc_class": nuc_class, "n_basicity": n_basicity, "steric_alpha": steric_alpha}
 
     # Sterics at alpha: approximate via heavy neighbor count of the nucleophilic heteroatom (N/O)
     steric_level = 0
@@ -367,20 +410,11 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     emol = parse_smiles(electrophile)
     nmol = parse_smiles(nucleophile)
 
-    # Electrophile features
-    if emol is not None and rdkit_available():
-        elec = _detect_electrophile(emol)
-    else:
-        elec = {
-            "LG": _guess_lg_text(electrophile),
-            "elec_class": "aryl",
-            "ortho_count": "0",
-            "para_EWG": any(x in (electrophile or '').lower() for x in ("[n+](=o)[o-]", "c#n", "c(f)(f)f")),
-            "heteroaryl": False,
-        }
+    elec_groups = detect_functional_groups(electrophile)
+    nuc_groups = detect_functional_groups(nucleophile)
 
-    # Nucleophile features
-    nuc = _nucleophile_features(nmol, nucleophile)
+    elec = _detect_electrophile(emol, elec_groups, electrophile)
+    nuc = _nucleophile_features(nmol, nucleophile, nuc_groups)
 
     # Compose bin key (coarse)
     lg = elec.get("LG", "UNK")
@@ -397,7 +431,9 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
 def _enrich_with_functional_groups(
     features: Dict[str, Any],
     electrophile: str,
-    nucleophile: str
+    nucleophile: str,
+    elec_groups: Optional[Dict[str, bool]] = None,
+    nuc_groups: Optional[Dict[str, bool]] = None,
 ) -> Dict[str, Any]:
     """
     Enrich feature dict with comprehensive functional group detection.
@@ -416,17 +452,18 @@ def _enrich_with_functional_groups(
     enriched = dict(features)
     
     # Detect functional groups in both reactants
-    if electrophile:
+    if elec_groups is None:
         elec_groups = detect_functional_groups(electrophile)
-        for group, present in elec_groups.items():
-            if present:
-                enriched[f"{group}_present"] = True
-    
-    if nucleophile:
+    if nuc_groups is None:
         nuc_groups = detect_functional_groups(nucleophile)
-        for group, present in nuc_groups.items():
-            if present:
-                enriched[f"{group}_present"] = True
+
+    for group, present in elec_groups.items():
+        if present:
+            enriched[f"{group}_present"] = True
+    
+    for group, present in nuc_groups.items():
+        if present:
+            enriched[f"{group}_present"] = True
     
     # Add convenience aliases for common patterns
     # Primary/secondary/tertiary amine detection
@@ -536,7 +573,7 @@ def featurize(
 
     # Enrich with comprehensive functional group detection
     # This adds <group>_present tokens needed by rule databases
-    out = _enrich_with_functional_groups(out, electrophile, nucleophile)
+    out = _enrich_with_functional_groups(out, electrophile, nucleophile, elec_groups, nuc_groups)
 
     # Attach calculable features when explicitly enabled via env or parameter
     if include_calculable is None:

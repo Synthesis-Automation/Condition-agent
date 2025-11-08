@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 import re
 
@@ -16,76 +16,38 @@ from .analysis.reactions import (
     resolve_reaction_family as _resolve_reaction_family,
 )
 from .util import functional_groups as _functional_groups
-from .util.rdkit_helpers import rdkit_available, parse_smiles
-from .util.smarts_cache import compile_smarts
+from .util.rdkit_helpers import parse_smiles
 from .smiles import normalize_reaction as _normalize_reaction
 
 
-# SMARTS patterns for substrate classification
-# These are compiled lazily via the centralized cache
-_SMARTS_PATTERNS = {
-    # Aryl halide: aromatic carbon bound to Cl/Br/I
-    "aryl_halide": "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",
-    # Vinyl halide/triflate (simple patterns)
-    "vinyl_halide": "C=C[Cl,Br,I]",
-    "triflate": "OS(=O)(=O)C(F)(F)F",
-    # Boron partners (boronic acids/esters)
-    "boron": "[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]",
-    # Terminal alkyne
-    "terminal_alkyne": ("C#C[H]", "[C;H]#C"),
-    # Carboxylic acid
-    "acid": "C(=O)[OH]",
-    # N-nucleophile (amine/anilines, simple)
-    "nucleophile_n": "[NX3;H1,H2]",
-    # Phenoxide/alcohol O-H (for C-O coupling)
-    "nucleophile_o": "[OX2H]",
-    # Thiol S-H (for C-S coupling)
-    "nucleophile_s": "[SX2H]",
-    
-    # Phase 2 additions - carbonyl compounds
-    "carbonyl": "[CX3]=O",  # Ketone, aldehyde, or ester carbonyl
-    "aldehyde": "[CX3H](=O)",  # Aldehyde specifically
-    "ketone": "[CX3](=O)[C]",  # Ketone specifically
-    "ester": "[CX3](=O)[OX2][C,H]",  # Ester
-    "acyl_halide": "[CX3](=O)[Cl,Br]",  # Acyl chloride/bromide
-    
-    # Phase 2 additions - nucleophiles and organometallics
-    "alcohol": "[CX4][OX2H]",  # Aliphatic alcohol
-    "grignard": "[C,c][Mg][Br,Cl,I]",  # Grignard reagent
-    "organozinc": "[C,c][Zn][Br,Cl,I]",  # Organozinc (Negishi)
-    "organolithium": "[C,c][Li]",  # Organolithium
-    "cyanide": "[C-]#N",  # Cyanide anion
-    "iodide": "[I-]",  # Iodide anion
-    "alkoxide": "[O-][C,H]",  # Alkoxide anion
-    
-    # Phase 2 additions - alkyl halides and alkenes
-    "alkyl_halide": "[CX4][Cl,Br,I]",  # Alkyl halide (not aromatic)
-    "alkene": "C=C",  # Simple alkene
-    "conjugated_diene": "C=C-C=C",  # Conjugated diene
-    "alpha_beta_unsaturated": "C=C-[CX3]=O",  # α,β-unsaturated carbonyl
-    
-    # Phase 2 additions - boron reagents
-    "borane": "[BH3,BH2,BH]",  # Borane (BH3, B2H6, etc.)
-}
-
-
-def _get_smarts_patterns(name: str) -> Tuple[str, ...]:
-    """
-    Retrieve SMARTS patterns for the given key from the shared functional group spec
-    with router-specific fallbacks.
-    """
-    definition = _functional_groups.get_group_definition(name)
-    if definition:
-        return definition.smarts
-
-    pattern = _SMARTS_PATTERNS.get(name)
-    if pattern is None:
-        return ()
-    if isinstance(pattern, str):
-        return (pattern,)
-    if isinstance(pattern, (list, tuple)):
-        return tuple(pattern)
-    return ()
+_ROUTER_GROUPS = (
+    "acid",
+    "acyl_halide",
+    "alcohol",
+    "aldehyde",
+    "alkene",
+    "alkoxide",
+    "alkyl_halide",
+    "alpha_beta_unsaturated",
+    "aryl_halide",
+    "borane",
+    "boron",
+    "carbonyl",
+    "conjugated_diene",
+    "cyanide",
+    "ester",
+    "grignard",
+    "iodide",
+    "ketone",
+    "nucleophile_n",
+    "nucleophile_o",
+    "nucleophile_s",
+    "organolithium",
+    "organozinc",
+    "terminal_alkyne",
+    "triflate",
+    "vinyl_halide",
+)
 
 
 def resolve_reaction_family(family: Optional[str]) -> Optional[str]:
@@ -156,99 +118,7 @@ def _detect_agent_metals(agents: List[Dict[str, Any]]) -> Set[str]:
 
 
 def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
-    # Text fallback heuristic (used when RDKit unavailable, or to augment matches when some tokens fail to parse)
-    rs = " ".join(reactants).lower()
-    def has(pattern: str) -> bool:
-        return pattern in rs
-    text_hits = {
-        "aryl_halide": (has("cl") or has("br") or has(" i")) and ("c1" in rs or "c2" in rs or "c[" in rs),
-        "vinyl_halide": (has("c=ccl") or has("c=cbr") or has("c=ci")),
-        "triflate": has("os(=o)(=o)c(f)(f)f") or has("otf"),
-        # Accept both common orders: 'b(o)o' and 'ob(o)' (RDKit canonicalization may reorder)
-        "boron": has("b(") or has("b[") or has("b(o)o") or has("ob(o)"),
-        "nucleophile_n": has("n") or has("nh"),
-        "nucleophile_o": has("o") or has("oh"),
-        "nucleophile_s": has("s") or has("sh"),
-        "terminal_alkyne": has("c#c") or has("c#cc"),
-        "acid": has("c(=o)oh") or has("c(=o)o") or has("oc(=o)"),
-        
-        # Phase 2 additions
-        "carbonyl": has("c(=o)") or has("c=o"),
-        "aldehyde": has("c(=o)") and (has("c(=o)h") or has("ch=o")),
-        "ketone": has("c(=o)c") or has("cc(=o)c"),
-        "ester": has("c(=o)o") and not has("c(=o)oh"),
-        "acyl_halide": has("c(=o)cl") or has("c(=o)br") or has("cocl") or has("cobr"),
-        "alcohol": has("co") or has("oh"),
-        "grignard": has("[mg]") or has("mgbr") or has("mgcl"),
-        "organozinc": has("[zn]") or has("znbr") or has("zncl") or has("rzn"),
-        "organolithium": has("[li]") or has("li"),
-        "cyanide": has("[c-]#n") or has("cn-") or has("nacn") or has("kcn"),
-        "iodide": has("[i-]") or has("nai") or has("ki"),
-        "alkoxide": has("[o-]") or has("naome") or has("kome") or has("naoh") or has("koh"),
-        "alkyl_halide": (has("cl") or has("br") or has("i")) and has("c"),
-        "alkene": has("c=c"),
-        "conjugated_diene": has("c=c") and rs.count("c=c") >= 2,
-        "alpha_beta_unsaturated": has("c=c") and has("c(=o)"),
-        "borane": has("bh3") or has("b2h6") or has("bh2") or has("[bh"),
-    }
-
-    # RDKit SMARTS matching when available; OR with text_hits to be robust to parse failures
-    if rdkit_available():
-        mols = [parse_smiles(s) for s in reactants]
-        mols = [m for m in mols if m is not None]
-        
-        def any_match(key: str) -> bool:
-            """Check if any molecule matches the SMARTS pattern(s) for the given key."""
-            smarts_patterns = _get_smarts_patterns(key)
-            if not smarts_patterns:
-                return False
-
-            for m in mols:
-                for smarts in smarts_patterns:
-                    patt = compile_smarts(smarts, validate=False)
-                    if patt is None:
-                        continue
-                    try:
-                        if m.HasSubstructMatch(patt):
-                            return True
-                    except Exception:
-                        continue
-            return False
-        
-        # RDKit SMARTS matching when available; OR with text_hits to be robust to parse failures
-        rdkit_hits = {
-            "aryl_halide": any_match("aryl_halide"),
-            "vinyl_halide": any_match("vinyl_halide"),
-            "triflate": any_match("triflate"),
-            "boron": any_match("boron"),
-            "nucleophile_n": any_match("nucleophile_n"),
-            "nucleophile_o": any_match("nucleophile_o"),
-            "nucleophile_s": any_match("nucleophile_s"),
-            "terminal_alkyne": any_match("terminal_alkyne"),
-            "acid": any_match("acid"),
-            # Phase 2 additions
-            "carbonyl": any_match("carbonyl"),
-            "aldehyde": any_match("aldehyde"),
-            "ketone": any_match("ketone"),
-            "ester": any_match("ester"),
-            "acyl_halide": any_match("acyl_halide"),
-            "alcohol": any_match("alcohol"),
-            "grignard": any_match("grignard"),
-            "organozinc": any_match("organozinc"),
-            "organolithium": any_match("organolithium"),
-            "cyanide": any_match("cyanide"),
-            "iodide": any_match("iodide"),
-            "alkoxide": any_match("alkoxide"),
-            "alkyl_halide": any_match("alkyl_halide"),
-            "alkene": any_match("alkene"),
-            "conjugated_diene": any_match("conjugated_diene"),
-            "alpha_beta_unsaturated": any_match("alpha_beta_unsaturated"),
-            "borane": any_match("borane"),
-        }
-        # Combine conservatively (logical OR)
-        return {k: bool(rdkit_hits.get(k) or text_hits.get(k)) for k in text_hits.keys()}
-
-    return text_hits
+    return _functional_groups.detect_any(reactants, group_subset=_ROUTER_GROUPS)
 
 
 def _detect_reducing_agent(reactants: List[str]) -> Optional[str]:
@@ -343,5 +213,3 @@ def _detect_radical_initiator(reactants: List[str]) -> Optional[str]:
     
     return None
 
-
-# Old detection functions removed - use chemtools.detect_reaction() instead

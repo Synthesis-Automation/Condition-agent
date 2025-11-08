@@ -1,27 +1,80 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from functools import lru_cache
+from typing import Any, Dict, List, Sequence, Tuple
 
 from chemtools.util.rdkit_helpers import rdkit_available, parse_smiles
 from chemtools.util.smarts_cache import compile_smarts
+from chemtools.util.functional_groups import FUNCTIONAL_GROUP_SMARTS
 
 
-# SMARTS patterns for role-based features
-_SMARTS_PATTERNS = {
-    # Amines (primary/secondary/tertiary)
+_ROLE_TO_SPEC = {
+    "amine_prim": ("amine_primary",),
+    "amine_sec": ("amine_secondary",),
+    "amine_tert": ("amine_tertiary",),
+    "aniline": ("aniline",),
+    "alcohol": ("alcohol", "phenol"),
+    "aryl_F": ("aryl_fluoride",),
+    "aryl_Cl": ("aryl_chloride",),
+    "aryl_Br": ("aryl_bromide",),
+    "aryl_I": ("aryl_iodide",),
+}
+
+_FALLBACK_SMARTS = {
     "amine_prim": "[NX3;H2][#6]",
     "amine_sec": "[NX3;H1]([#6])[#6]",
     "amine_tert": "[NX3]([#6])([#6])[#6]",
-    # Aniline-like
     "aniline": "[$([NX3;H1][c]),$([NX3]([c])[H])]",
-    # Alcohol OH
     "alcohol": "[OX2H]",
-    # Aryl halide: aromatic carbon attached to halogen
     "aryl_F": "cF",
     "aryl_Cl": "cCl",
     "aryl_Br": "cBr",
     "aryl_I": "cI",
 }
+
+
+def _as_tuple(value: Sequence[str] | str | None) -> Tuple[str, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, str):
+        return (value,)
+    return tuple(value)
+
+
+@lru_cache(maxsize=None)
+def _patterns_for(key: str) -> Tuple[str, ...]:
+    patterns: List[str] = []
+    for spec_name in _ROLE_TO_SPEC.get(key, ()):
+        spec_patterns = FUNCTIONAL_GROUP_SMARTS.get(spec_name)
+        if spec_patterns:
+            patterns.extend(_as_tuple(spec_patterns))
+    if not patterns:
+        patterns.extend(_as_tuple(_FALLBACK_SMARTS.get(key)))
+    # Remove duplicates while preserving order
+    seen = set()
+    deduped: List[str] = []
+    for smarts in patterns:
+        if smarts in seen:
+            continue
+        seen.add(smarts)
+        deduped.append(smarts)
+    return tuple(deduped)
+
+
+def _match_atom_indices(mol, key: str) -> List[int]:
+    atoms: List[int] = []
+    for smarts in _patterns_for(key):
+        patt = compile_smarts(smarts, validate=False)
+        if patt is None:
+            continue
+        try:
+            matches = mol.GetSubstructMatches(patt)
+        except Exception:
+            continue
+        for match in matches:
+            if match:
+                atoms.append(match[0])
+    return atoms
 
 
 def find_centers(mol_or_smiles: Any) -> Dict[str, Dict[str, List[int]]]:
@@ -36,31 +89,17 @@ def find_centers(mol_or_smiles: Any) -> Dict[str, Dict[str, List[int]]]:
         
         am_atoms: List[int] = []
         for key in ("amine_tert", "amine_sec", "amine_prim"):
-            smarts = _SMARTS_PATTERNS.get(key)
-            if smarts:
-                patt = compile_smarts(smarts, validate=False)
-                if patt is not None:
-                    for match in mol.GetSubstructMatches(patt):
-                        am_atoms.append(match[0])
+            am_atoms.extend(_match_atom_indices(mol, key))
         
         al_atoms: List[int] = []
-        alcohol_smarts = _SMARTS_PATTERNS.get("alcohol")
-        if alcohol_smarts:
-            patt_al = compile_smarts(alcohol_smarts, validate=False)
-            if patt_al is not None:
-                for match in mol.GetSubstructMatches(patt_al):
-                    al_atoms.append(match[0])
+        al_atoms.extend(_match_atom_indices(mol, "alcohol"))
         
         ar_atoms: List[int] = []
         for key in ("aryl_I", "aryl_Br", "aryl_Cl", "aryl_F"):
-            smarts = _SMARTS_PATTERNS.get(key)
-            if smarts:
-                patt = compile_smarts(smarts, validate=False)
-                if patt is not None and mol.HasSubstructMatch(patt):
-                    for m in mol.GetSubstructMatches(patt):
-                        # ipso carbon index is first in patterns above
-                        ar_atoms.append(m[0])
-                    break
+            matches = _match_atom_indices(mol, key)
+            if matches:
+                ar_atoms.extend(matches)
+                break
         
         return {
             "amine": {"atoms": sorted(set(am_atoms))},
