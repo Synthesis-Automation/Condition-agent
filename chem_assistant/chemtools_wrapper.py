@@ -151,6 +151,15 @@ _FAMILY_TO_RULE_DB = {
     "aromatic_nucleophilic_substitution": "SNAr_db",
     "nucleophilic_aromatic_substitution": "SNAr_db",
     "reductive_amination": "reductive_amination_db",
+    # New rule databases
+    "sonogashira": "sonogashira_db",
+    "sonogashira_coupling": "sonogashira_db",
+    "c_o_coupling": "C_O_coupling_db",
+    "co_coupling": "C_O_coupling_db",
+    "c_o": "C_O_coupling_db",
+    "rcm": "RCM_db",
+    "ring_closing_metathesis": "RCM_db",
+    "metathesis": "RCM_db",
 }
 
 _RULE_ENGINE_CACHE: "OrderedDict[Path, RuleEngine]" = OrderedDict()
