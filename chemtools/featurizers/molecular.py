@@ -425,6 +425,8 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
         **elec,
         **nuc,
         "bin": bin_key,
+        "_elec_groups": elec_groups,
+        "_nuc_groups": nuc_groups,
     }
 
 
@@ -438,8 +440,8 @@ def _enrich_with_functional_groups(
     """
     Enrich feature dict with comprehensive functional group detection.
     
-    Adds <group_name>_present boolean tokens for all detected functional groups,
-    plus special tokens for SNAr and reductive amination reactions.
+    Adds functional-group detection tokens (already normalized as *_present)
+    plus special aliases for SNAr and reductive amination reactions.
     
     Args:
         features: Base feature dictionary to enrich
@@ -459,11 +461,11 @@ def _enrich_with_functional_groups(
 
     for group, present in elec_groups.items():
         if present:
-            enriched[f"{group}_present"] = True
+            enriched[group] = True
     
     for group, present in nuc_groups.items():
         if present:
-            enriched[f"{group}_present"] = True
+            enriched[group] = True
     
     # Add convenience aliases for common patterns
     # Primary/secondary/tertiary amine detection
@@ -569,9 +571,12 @@ def featurize(
     base = _featurize_cached(electrophile, nucleophile)
     out = dict(base)
 
-    # Recompute functional-group detections for enrichment (cached internally)
-    elec_groups = detect_functional_groups(electrophile)
-    nuc_groups = detect_functional_groups(nucleophile)
+    elec_groups = out.pop("_elec_groups", None)
+    nuc_groups = out.pop("_nuc_groups", None)
+    if elec_groups is None:
+        elec_groups = detect_functional_groups(electrophile)
+    if nuc_groups is None:
+        nuc_groups = detect_functional_groups(nucleophile)
 
     # Enrich with comprehensive functional group detection
     # This adds <group>_present tokens needed by rule databases
