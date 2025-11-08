@@ -77,7 +77,7 @@ def test_sonogashira_mapping():
                 
                 # Check file content
                 import json
-                with open(rule_file, 'r') as f:
+                with open(rule_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     schema_version = data.get("schema_version", "unknown")
                     source_type = data.get("source_type", "unknown")
@@ -105,11 +105,11 @@ def test_unified_recommender_validation():
     print("(Sonogashira coupling: aryl bromide + terminal alkyne)")
     
     try:
-        result = unified_recommender_tool(
-            reaction_smiles=rxn,
-            top_k=3,
-            validate_rules=True
-        )
+        result = unified_recommender_tool.run({
+            "reaction_smiles": rxn,
+            "top_k": 3,
+            "validate_rules": True
+        })
         
         if result.get("success"):
             recs = result.get("recommendations", [])
@@ -159,18 +159,18 @@ def test_validation_parameter():
     
     try:
         # Test with validation enabled
-        result_validated = unified_recommender_tool(
-            reaction_smiles=rxn,
-            top_k=10,
-            validate_rules=True
-        )
+        result_validated = unified_recommender_tool.run({
+            "reaction_smiles": rxn,
+            "top_k": 10,
+            "validate_rules": True
+        })
         
         # Test with validation disabled
-        result_unvalidated = unified_recommender_tool(
-            reaction_smiles=rxn,
-            top_k=10,
-            validate_rules=False
-        )
+        result_unvalidated = unified_recommender_tool.run({
+            "reaction_smiles": rxn,
+            "top_k": 10,
+            "validate_rules": False
+        })
         
         count_validated = len(result_validated.get("recommendations", []))
         count_unvalidated = len(result_unvalidated.get("recommendations", []))
