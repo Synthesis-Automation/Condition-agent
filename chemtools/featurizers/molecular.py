@@ -1,10 +1,10 @@
 """
-Molecular featurizer for C-N coupling substrates.
+General molecular featurizer for electrophile/nucleophile pairs.
 
-Extracts structural and chemical features from electrophile/nucleophile pairs
-for C-N coupling reactions (both Ullmann and Buchwald-Hartwig). Features include
-leaving group type, electrophile classification, nucleophile basicity, and
-steric properties. Conditionally attaches role-aware vectors when available.
+Extracts structural and chemical features across cross-coupling and related
+reaction spaces (C–N, C–O, C–S, etc.). Features include leaving-group type,
+electrophile classification, nucleophile basicity, steric properties, and
+optional role-aware/descriptor attachments.
 """
 
 from __future__ import annotations
@@ -546,30 +546,32 @@ def featurize(
     include_molpipeline: Optional[bool] = None,
     include_calculable: Optional[bool] = None,
 ) -> Dict[str, Any]:
-    """Featurize electrophile/nucleophile pair for C-N coupling reactions.
-    
+    """Featurize electrophile/nucleophile inputs for cross-coupling models.
+
     Extracts structural and chemical features including:
-    - Leaving group type (Br, Cl, I, OTf)
+    - Leaving-group class (halide, sulfonate, etc.)
     - Electrophile classification (aryl, vinyl, alkyl)
-    - Ortho substitution count
-    - Para electron-withdrawing groups
-    - Nucleophile class and basicity
-    - Steric hindrance
-    
-    Optionally attaches role-aware feature vectors when CHEMTOOLS_ATTACH_ROLE_AWARE=1.
-    Optionally includes calculable features when CHEMTOOLS_INCLUDE_CALCULABLE_FEATURES=1.
-    
+    - Ortho substitution count + para EWG flags
+    - Nucleophile class/basicity and steric hindrance
+
+    Optionally attaches role-aware vectors (`CHEMTOOLS_ATTACH_ROLE_AWARE=1`),
+    MolPipeline descriptors, and calculable feature blocks.
+
     Args:
-        electrophile: SMILES string of electrophile (aryl halide, triflate, etc.)
-        nucleophile: SMILES string of nucleophile (amine, alcohol, etc.)
-        include_molpipeline: Include MolPipeline features (fingerprints, descriptors)
-        include_calculable: Include calculable features from calculable_features.json
-        
+        electrophile: SMILES for the electrophile partner
+        nucleophile: SMILES for the nucleophile partner
+        include_molpipeline: Add MolPipeline descriptors if True/flagged
+        include_calculable: Add calculable feature bundles when True
+
     Returns:
-        Dictionary with extracted features and optional role-aware vectors
+        Dictionary with extracted features and optional attachments.
     """
     base = _featurize_cached(electrophile, nucleophile)
     out = dict(base)
+
+    # Recompute functional-group detections for enrichment (cached internally)
+    elec_groups = detect_functional_groups(electrophile)
+    nuc_groups = detect_functional_groups(nucleophile)
 
     # Enrich with comprehensive functional group detection
     # This adds <group>_present tokens needed by rule databases
