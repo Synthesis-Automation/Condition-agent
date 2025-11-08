@@ -26,7 +26,7 @@ Who uses this:
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Any
+from typing import Dict, List, Optional, Set, Any, Tuple
 from .rdkit_helpers import rdkit_available, parse_smiles
 from .smarts_cache import compile_smarts
 from .functional_groups import detect_all, get_functional_groups

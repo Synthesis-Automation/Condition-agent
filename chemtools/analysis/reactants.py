@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from ..util import rdkit_helpers
+from ..util.smarts_cache import compile_smarts
 from ._registry import clear_registry_cache, get_registry
 
 TAXONOMY_DATA_DIR = Path(__file__).resolve().parent.parent / "taxonomy" / "data"
@@ -313,7 +314,7 @@ def iter_reactant_matches(
             if not smarts:
                 continue
 
-            pattern = rdkit_helpers.parse_smarts(smarts)
+            pattern = compile_smarts(smarts, validate=False)
             if pattern is None:
                 continue
 
