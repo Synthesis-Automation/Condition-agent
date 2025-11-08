@@ -53,6 +53,11 @@ FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     # Reductive Amination
     "Reductive_Amination": "reductive_amination",
     "reductive_amination": "reductive_amination",  # Lowercase variant
+    
+    # Ring-Closing Metathesis
+    "RCM": "ring_closing_metathesis",
+    "Ring_Closing_Metathesis": "ring_closing_metathesis",
+    "ring_closing_metathesis": "ring_closing_metathesis",  # Lowercase variant
 }
 
 CN_FAMILIES_CANONICAL: Set[str] = {
@@ -69,6 +74,7 @@ SUZUKI_FAMILIES_CANONICAL: Set[str] = {"suzuki_miyaura", "suzuki_miyaura_in_situ
 NEGISHI_FAMILIES_CANONICAL: Set[str] = {"negishi", "negishi_in_situ"}
 STILLE_FAMILIES_CANONICAL: Set[str] = {"stille"}
 HECK_FAMILIES_CANONICAL: Set[str] = {"heck"}
+RCM_FAMILIES_CANONICAL: Set[str] = {"ring_closing_metathesis"}
 ULLMANN_SPECIFIC_CANONICAL: Set[str] = {"ullmann_cn"}
 BUCHWALD_SPECIFIC_CANONICAL: Set[str] = {"buchwald_hartwig_c_n"}
 
@@ -145,6 +151,7 @@ __all__ = [
     "NEGISHI_FAMILIES_CANONICAL",
     "STILLE_FAMILIES_CANONICAL",
     "HECK_FAMILIES_CANONICAL",
+    "RCM_FAMILIES_CANONICAL",
     "ULLMANN_SPECIFIC_CANONICAL",
     "BUCHWALD_SPECIFIC_CANONICAL",
     "slugify_family",

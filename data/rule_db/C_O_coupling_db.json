@@ -1,0 +1,304 @@
+{
+  "name": "C–O Coupling (Aryl–O bond formation)",
+  "reaction_type": "C–O coupling",
+  "version": "2025-11-08",
+  "evaluation": "Schema mirrors prior C_N coupling rule file to maintain compatibility. HTE-informed condition families for C–O coupling are incorporated, with Pd/biaryl phosphine systems and complementary Cu/ligand sets. Part of the HTE frequency ranking (RockPhos, BippyPhos, tBuXPhos; and CuI with diamines, phenanthroline, L-proline; Cu2O/salicylaldoxime) derives from Table 5 (top-hit counts) of the AbbVie HTE platform report covering 2017–2023 screens. fileciteturn0file0 Field names, token style, and sectioning follow the example C_N coupling JSON. fileciteturn0file1\n\nGeneral guidance: Start with Pd/biaryl phosphine + Cs2CO3 in toluene at 90–110 °C for phenols and less hindered alcohols; pivot to Cu/ligand sets (acetonitrile/DMF/DMSO; KOtBu/K3PO4/Cs2CO3) when Pd sets fail or for base‑tolerant aliphatic alcohols. Alkyl (esp. tertiary) alcohol O‑arylation remains challenging and may show low success; screen Cu sets early.",
+  "applies_if": {
+    "all": [
+      "aryl_halide_present"
+    ],
+    "any": [
+      "phenol_present",
+      "aliphatic_alcohol_present",
+      "hindered_alcohol_present"
+    ]
+  },
+  "default_rule": {
+    "id": "DEF_CO_general",
+    "description": "General starter for Ar–O coupling. Pd/biaryl phosphine + Cs2CO3 in toluene; seal and heat.",
+    "conditions": {
+      "metal": "Pd",
+      "pd_precatalyst": "Buchwald-type precatalyst (G-series/allyl/crotyl) with RockPhos/BippyPhos/tBuXPhos",
+      "ligand": "RockPhos or BippyPhos or tBuXPhos",
+      "pd_loading_molpct": "6–10 (8 default)",
+      "base": "Cs2CO3 (3.0 equiv)",
+      "solvent": "toluene",
+      "solvent_volume_mL_per_mmol": "8–12",
+      "temperature_C": "90–110",
+      "time_h": "2–16",
+      "atmosphere": "N2 or Ar",
+      "notes": "Dry glassware; strong agitation. If stalled by 6–8 h, add 2–4 mol% Pd."
+    }
+  },
+  "base_rules": [
+    {
+      "name": "Phenols / ArOH (best case for Pd)",
+      "id": "BR_phenols",
+      "description": "Unhindered phenols with aryl bromides/iodides; Pd + Cs2CO3/toluene frequently ranks top in HTE.",
+      "reactant_features": {
+        "all": [
+          "phenol_present"
+        ],
+        "any": [
+          "aryl_bromide_present",
+          "aryl_iodide_present",
+          "activated_aryl_chloride_present"
+        ]
+      },
+      "conditions": {
+        "metal": "Pd",
+        "pd_precatalyst": "G-series/allyl/crotyl Pd with RockPhos or BippyPhos",
+        "ligand": "RockPhos or BippyPhos",
+        "base": "Cs2CO3 (2.5–3.0 equiv)",
+        "solvent": "toluene",
+        "temperature_C": "90–110",
+        "time_h": "2–10"
+      }
+    },
+    {
+      "name": "Aliphatic alcohols (ROH)",
+      "id": "BR_aliphatic_alcohols",
+      "description": "More challenging; Cu/ligand sets often outperform Pd. Pre-form alkoxide in situ where compatible.",
+      "reactant_features": {
+        "all": [
+          "aliphatic_alcohol_present"
+        ]
+      },
+      "conditions": {
+        "metal": "Cu",
+        "cu_source": "CuI or Cu2O",
+        "ligand": "trans-1,2-cyclohexane-dimethanamine or 1,10-phenanthroline or L-proline or salicylaldoxime",
+        "base": "KOtBu (strong) or K3PO4 or Cs2CO3",
+        "solvent": "acetonitrile or DMF or DMSO",
+        "cu_loading_molpct": "10–30",
+        "temperature_C": "80–110",
+        "time_h": "4–18"
+      }
+    },
+    {
+      "name": "Hindered or tertiary alcohols",
+      "id": "BR_hindered_alcohols",
+      "description": "Low reactivity; try Pd biaryl phosphines first, then Cu sets. Expect modest yields; consider alternate routes.",
+      "reactant_features": {
+        "any": [
+          "hindered_alcohol_present",
+          "tertiary_alcohol_present",
+          "steric_hindrance_high"
+        ]
+      },
+      "conditions": {
+        "metal": "Pd",
+        "pd_precatalyst": "G-series/allyl/crotyl Pd",
+        "ligand": "tBuXPhos or RockPhos",
+        "base": "Cs2CO3 (3.0 equiv)",
+        "solvent": "toluene",
+        "temperature_C": "100–115",
+        "time_h": "8–18"
+      }
+    },
+    {
+      "name": "Aryl chlorides or five‑member heteroaryl halides",
+      "id": "BR_harder_halides",
+      "description": "More demanding electrophiles; use more active Pd systems and higher temperature.",
+      "reactant_features": {
+        "any": [
+          "sp2_chloride_present",
+          "five_member_heteroaryl_halide_present"
+        ]
+      },
+      "conditions": {
+        "metal": "Pd",
+        "pd_precatalyst": "G-series/allyl/crotyl Pd",
+        "ligand": "tBuXPhos or RockPhos or JosiPhos",
+        "base": "Cs2CO3 (3.0 equiv)",
+        "solvent": "toluene",
+        "temperature_C": "100–115",
+        "time_h": "6–16"
+      }
+    },
+    {
+      "name": "Pd in situ (no precatalyst vial)",
+      "id": "BR_palladium_in_situ",
+      "description": "In-situ Pd source where precatalyst unavailable; slower start-up; watch for dba inhibition.",
+      "reactant_features": {
+        "any": [
+          "phenol_present",
+          "aliphatic_alcohol_present"
+        ]
+      },
+      "conditions": {
+        "metal": "Pd",
+        "pd_source": "Pd(OAc)2 or Pd2(dba)3",
+        "ligand": "BippyPhos or CataCXium PIntB",
+        "base": "Cs2CO3 (2.5–3.0 equiv)",
+        "solvent": "toluene",
+        "temperature_C": "95–110",
+        "time_h": "4–16"
+      }
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "MOD_raise_temperature_if_safe",
+      "when": [
+        "symptom:slow or no conversion by 6–8 h"
+      ],
+      "suggest": "Raise to 110–120 °C (sealed vial, pressure-rated) if substrate stability allows."
+    },
+    {
+      "id": "MOD_switch_to_cu_if_pd_fails",
+      "when": [
+        "symptom:pd_set_no_hit"
+      ],
+      "suggest": "Switch to CuI/Cu2O with diamine/phenanthroline/L-proline/salicylaldoxime in MeCN/DMF/DMSO; base KOtBu or K3PO4/Cs2CO3."
+    },
+    {
+      "id": "MOD_poor_solubility",
+      "when": [
+        "symptom:heterogeneous slurry persists"
+      ],
+      "suggest": "Increase solvent volume or change to MeCN/DMF; ensure strong agitation (vortex or overhead)."
+    },
+    {
+      "id": "MOD_base_sensitive_fg",
+      "when": [
+        "base_sensitive"
+      ],
+      "suggest": "Use K3PO4 over KOtBu; lower temperature and shorten time; consider Pd path with milder base."
+    },
+    {
+      "id": "MOD_halide_order",
+      "when": [
+        "any"
+      ],
+      "suggest": "Reactivity trend I ≈ Br ≫ Cl; prefer ArBr/I for C–O. For ArCl, use more active Pd ligand (tBuXPhos/RockPhos) and higher T."
+    },
+    {
+      "id": "MOD_water_exclusion",
+      "when": [
+        "any"
+      ],
+      "suggest": "Keep water low for C–O; dry glassware; avoid wet carbonate slurries unless specifically validated."
+    },
+    {
+      "id": "MOD_add_catalyst_if_stalled",
+      "when": [
+        "symptom:stalled"
+      ],
+      "suggest": "Add 2–4 mol% additional Pd or 5–10 mol% Cu and continue heating."
+    }
+  ],
+  "hte_screening_conditions": [
+    {
+      "id": "HTE_CO_01",
+      "label": "RockPhos–Pd G3 / Cs2CO3 / toluene",
+      "metal": "Pd",
+      "precatalyst": "RockPhos–Pd G3",
+      "ligand": "RockPhos",
+      "base": "Cs2CO3",
+      "solvent": "toluene",
+      "temperature_C": "95–110",
+      "time_h": "2–10",
+      "note": "Top-hit family per HTE"
+    },
+    {
+      "id": "HTE_CO_02",
+      "label": "Pd(OAc)2 / BippyPhos / Cs2CO3 / toluene",
+      "metal": "Pd",
+      "precatalyst": "Pd(OAc)2",
+      "ligand": "BippyPhos",
+      "base": "Cs2CO3",
+      "solvent": "toluene",
+      "temperature_C": "95–110",
+      "time_h": "4–12"
+    },
+    {
+      "id": "HTE_CO_03",
+      "label": "tBuXPhos–Pd G3 / Cs2CO3 / toluene",
+      "metal": "Pd",
+      "precatalyst": "tBuXPhos–Pd G3",
+      "ligand": "tBuXPhos",
+      "base": "Cs2CO3",
+      "solvent": "toluene",
+      "temperature_C": "95–110",
+      "time_h": "3–12"
+    },
+    {
+      "id": "HTE_CO_04",
+      "label": "JosiPhos–Pd G3 / Cs2CO3 / toluene",
+      "metal": "Pd",
+      "precatalyst": "JosiPhos–Pd G3",
+      "ligand": "JosiPhos",
+      "base": "Cs2CO3",
+      "solvent": "toluene",
+      "temperature_C": "95–110",
+      "time_h": "3–12"
+    },
+    {
+      "id": "HTE_CO_05",
+      "label": "CuI / trans-1,2-cyclohexane-dimethanamine / KOtBu / MeCN",
+      "metal": "Cu",
+      "precatalyst": "CuI",
+      "ligand": "trans-1,2-cyclohexane-dimethanamine",
+      "base": "KOtBu",
+      "solvent": "acetonitrile",
+      "temperature_C": "80–100",
+      "time_h": "6–18"
+    },
+    {
+      "id": "HTE_CO_06",
+      "label": "CuI / 2,6-dimethoxyanilino(oxo)acetic acid / K3PO4 / DMSO",
+      "metal": "Cu",
+      "precatalyst": "CuI",
+      "ligand": "2,6-dimethoxyanilino(oxo)acetic acid",
+      "base": "K3PO4",
+      "solvent": "DMSO",
+      "temperature_C": "90–110",
+      "time_h": "6–18"
+    },
+    {
+      "id": "HTE_CO_07",
+      "label": "CuI / 1,10-phenanthroline / Cs2CO3 / toluene",
+      "metal": "Cu",
+      "precatalyst": "CuI",
+      "ligand": "1,10-phenanthroline",
+      "base": "Cs2CO3",
+      "solvent": "toluene",
+      "temperature_C": "90–110",
+      "time_h": "6–18"
+    },
+    {
+      "id": "HTE_CO_08",
+      "label": "CuI / L-Proline / Cs2CO3 / DMF",
+      "metal": "Cu",
+      "precatalyst": "CuI",
+      "ligand": "L-Proline",
+      "base": "Cs2CO3",
+      "solvent": "DMF",
+      "temperature_C": "90–110",
+      "time_h": "6–18"
+    },
+    {
+      "id": "HTE_CO_09",
+      "label": "Pd2(dba)3 / CataCXium PIntB / Cs2CO3 / toluene",
+      "metal": "Pd",
+      "precatalyst": "Pd2(dba)3",
+      "ligand": "CataCXium PIntB",
+      "base": "Cs2CO3",
+      "solvent": "toluene",
+      "temperature_C": "95–110",
+      "time_h": "4–16"
+    },
+    {
+      "id": "HTE_CO_10",
+      "label": "Cu2O / salicylaldoxime / Cs2CO3 / MeCN",
+      "metal": "Cu",
+      "precatalyst": "Cu2O",
+      "ligand": "salicylaldoxime",
+      "base": "Cs2CO3",
+      "solvent": "acetonitrile",
+      "temperature_C": "90–110",
+      "time_h": "6–18"
+    }
+  ]
+}
