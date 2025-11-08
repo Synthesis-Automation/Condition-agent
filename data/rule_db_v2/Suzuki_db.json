@@ -1,8 +1,38 @@
 {
-  "name": "Suzuki-Miyaura Coupling (Improved, HTE-ready)",
-  "reaction_type": "Suzuki-Miyaura",
-  "version": "2025-11-07",
-  "evaluation": "Updated using reported HTE trends: top-performing condition families across many discovery plates favor dtbpf- or dialkylbiaryl-phosphine–Pd systems with aqueous K3PO4 or Cs2CO3 in dioxane/H2O (~4–5:1). Default prioritizes dtbpf/K3PO4; base_rules enumerate frequently winning alternatives (P(tBu)3–Pd G3, XPhos–Pd G3, CataCXium A–Pd G3, and dppf variants). Modifiers re-rank for hard substrates (aryl chlorides, ortho-blocked, five-member heteroaryl) and lab symptoms (hydrodehalogenation, boronate dimer). Includes an 'hte_supply' section with screenable 6-pack and stock definitions for 1 µmol scale provisioning.",
+  "schema_version": "2.0",
+  "source_type": "rule",
+  "metadata": {
+    "id": "suzuki_v2",
+    "name": "Suzuki-Miyaura Coupling (Improved, HTE-ready)",
+    "version": "v2.0",
+    "created_date": "2025-11-08",
+    "status": "active",
+    "tags": [
+      "suzuki",
+      "palladium",
+      "cross-coupling",
+      "boronic-acid"
+    ]
+  },
+  "reaction": {
+    "family": "Suzuki_Miyaura",
+    "reference_reactions": [
+      "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+      "Clc1ccc(C(F)(F)F)cc1.OB(O)c1ccncc1>>c1ccc(-c2ccncc2)cc1",
+      "Ic1ccc(C#N)cc1.c1ccc(B2OC(C)(C)C(C)(C)O2)cc1>>N#Cc1ccc(-c2ccccc2)cc1",
+      "Brc1cccnc1.OB(O)c1ccc(OC)cc1>>COc1ccc(-c2cccnc2)cc1",
+      "BrC=Cc1ccccc1.OB(O)c1ccc(C)cc1>>Cc1ccc(/C=C/c2ccccc2)cc1",
+      "O=S(=O)(Oc1ccccc1)C(F)(F)F.OB(O)c1ccc(F)cc1>>Fc1ccc(-c2ccccc2)cc1",
+      "Brc1ccccc1C.OB(O)c1ccccc1>>Cc1ccccc1-c1ccccc1",
+      "Clc1ccc(OC)cc1.OB(O)c1ccc(C(C)(C)C)cc1>>COc1ccc(-c2ccc(C(C)(C)C)cc2)cc1"
+    ],
+    "scope": {
+      "scope_type": "broad",
+      "compatible_functional_groups": [],
+      "incompatible_functional_groups": []
+    },
+    "notes": "Updated using reported HTE trends: top-performing condition families across many discovery plates favor dtbpf- or dialkylbiaryl-phosphine–Pd systems with aqueous K3PO4 or Cs2CO3 in dioxane/H2O (~4–5:1). Default prioritizes dtbpf/K3PO4; base_rules enumerate frequently winning alternatives (P(tBu)3–Pd G3, XPhos–Pd G3, CataCXium A–Pd G3, and dppf variants). Modifiers re-rank for hard substrates (aryl chlorides, ortho-blocked, five-member heteroaryl) and lab symptoms (hydrodehalogenation, boronate dimer). Includes an 'hte_supply' section with screenable 6-pack and stock definitions for 1 µmol scale provisioning."
+  },
   "applies_if": {
     "all": [
       "sp2_halide_present",
@@ -199,118 +229,5 @@
       ],
       "suggest": "Improve exclusion of air; lower catalyst loading to 0.5–1.0 mol%; use freshly prepared boronate; consider neop-boronate surrogate."
     }
-  ],
-  "hte_screening_conditions": [
-    {
-      "id": "HTE_01",
-      "label": "CataCXium A–Pd G3 / Cs2CO3",
-      "base": "Cs2CO3",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "precatalyst": "CataCXium A–Pd G3",
-      "ligand": "CataCXium A",
-      "note": "Top (6‑member heterocycles)"
-    },
-    {
-      "id": "HTE_02",
-      "label": "PdCl2(PPh3)2 / Cs2CO3",
-      "base": "Cs2CO3",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "pd_source": "PdCl2(PPh3)2",
-      "ligand": "PPh3",
-      "note": "Top (6‑member heterocycles)"
-    },
-    {
-      "id": "HTE_03",
-      "label": "PdCl2(dtbpf) / Cs2CO3",
-      "base": "Cs2CO3",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "pd_source": "PdCl2(dtbpf)",
-      "ligand": "dtbpf",
-      "note": "Top (6‑member heterocycles)"
-    },
-    {
-      "id": "HTE_04",
-      "label": "XPhos–Pd G3 / K3PO4",
-      "base": "K3PO4",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "precatalyst": "XPhos–Pd G3",
-      "ligand": "XPhos",
-      "note": "Top (6‑member aryl halides)"
-    },
-    {
-      "id": "HTE_05",
-      "label": "Pd(Amphos)Cl2 / K2CO3",
-      "base": "K2CO3",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "pd_source": "Pd(Amphos)Cl2",
-      "ligand": "AmPhos",
-      "note": "Top (6‑member aryl halides)"
-    },
-    {
-      "id": "HTE_06",
-      "label": "PdCl2(dtbpf) / K2CO3",
-      "base": "K2CO3",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "pd_source": "PdCl2(dtbpf)",
-      "ligand": "dtbpf",
-      "note": "Top (6‑member aryl halides)"
-    },
-    {
-      "id": "HTE_07",
-      "label": "PdCl2(dtbpf) / K3PO4",
-      "base": "K3PO4",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "pd_source": "PdCl2(dtbpf)",
-      "ligand": "dtbpf",
-      "note": "Top (6‑member aryl halides)"
-    },
-    {
-      "id": "HTE_08",
-      "label": "P(tBu)3–Pd G3 / K3PO4",
-      "base": "K3PO4",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "precatalyst": "P(tBu)3–Pd G3",
-      "ligand": "P(tBu)3",
-      "note": "Top (6‑member heteroaryl boronates)"
-    },
-    {
-      "id": "HTE_09",
-      "label": "Pd(dppf)Cl2-CH2Cl2 / Cs2CO3",
-      "base": "Cs2CO3",
-      "solvent": "1,4-dioxane/H2O 4:1",
-      "temperature_C": "90–110",
-      "time_h": "2–6",
-      "pd_source": "Pd(dppf)Cl2-CH2Cl2",
-      "ligand": "dppf",
-      "note": "Top (6‑member aryl boronates)"
-    }
-  ],
-  "reaction": {
-    "reference_reactions": [
-      "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
-      "Clc1ccc(C(F)(F)F)cc1.OB(O)c1ccncc1>>c1ccc(-c2ccncc2)cc1",
-      "Ic1ccc(C#N)cc1.c1ccc(B2OC(C)(C)C(C)(C)O2)cc1>>N#Cc1ccc(-c2ccccc2)cc1",
-      "Brc1cccnc1.OB(O)c1ccc(OC)cc1>>COc1ccc(-c2cccnc2)cc1",
-      "BrC=Cc1ccccc1.OB(O)c1ccc(C)cc1>>Cc1ccc(/C=C/c2ccccc2)cc1",
-      "O=S(=O)(Oc1ccccc1)C(F)(F)F.OB(O)c1ccc(F)cc1>>Fc1ccc(-c2ccccc2)cc1",
-      "Brc1ccccc1C.OB(O)c1ccccc1>>Cc1ccccc1-c1ccccc1",
-      "Clc1ccc(OC)cc1.OB(O)c1ccc(C(C)(C)C)cc1>>COc1ccc(-c2ccc(C(C)(C)C)cc2)cc1"
-    ]
-  }
+  ]
 }

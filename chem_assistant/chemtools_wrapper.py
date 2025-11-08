@@ -4,7 +4,7 @@ LangChain tool wrappers for ChemTools functions.
 This module exposes existing chemtools functionality as LangChain tools
 without modifying the original chemtools codebase.
 
-Available Tools (21 total):
+Available Tools (22 total):
     - normalize_smiles_tool: Canonicalize SMILES strings
     - normalize_reaction_tool: Canonicalize reaction SMILES
     - detect_reaction_family_tool: Detect reaction family/type
@@ -13,18 +13,19 @@ Available Tools (21 total):
     - calculable_features_tool: Evaluate curated calculable feature library for a molecule
     - molpipeline_featurize_tool: Generate molecular features with optional MolPipeline vectors
     - analyze_bond_changes_tool: Analyze bond breaking/formation in reactions
-    - analyze_mechanism_tool: Identify mechanism archetype + narrative evidence (NEW)
-    - reaction_similarity_tool: Compare two reactions using DRFP similarity (NEW)
+    - analyze_mechanism_tool: Identify mechanism archetype + narrative evidence
+    - reaction_similarity_tool: Compare two reactions using DRFP similarity
     - recommend_conditions_tool: Get ML-based condition recommendations
     - rule_based_conditions_tool: Deterministic rule-engine condition guidance
     - enhanced_cross_family_recommend_tool: Cross-family precedent search with mechanism filters
     - search_precedents_tool: Search for similar precedent reactions
-    - protocol_recommendation_tool: Find full experimental protocols from literature (NEW)
+    - protocol_recommendation_tool: Find full experimental protocols from literature
+    - unified_recommender_tool: Unified DRFP-based protocol + rule search (NEW)
     - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
     - find_reagent_tool: Look up reagent information from database
     - reagent_database_analytics_tool: Summarize reagent registry statistics
     - list_supported_cores_tool: Enumerate catalyst cores observed in precedents
-    - list_all_families_tool: List all available reaction families in dataset (NEW)
+    - list_all_families_tool: List all available reaction families in dataset
     - add_reagent_tool: Insert or preview reagent taxonomy entries
 
 Usage:
@@ -108,6 +109,14 @@ try:
 except ImportError:
     DRFP_SIMILARITY_AVAILABLE = False
     compute_drfp_similarity = None
+
+# Import unified recommender (NEW)
+try:
+    from chemtools.recommend import UnifiedRecommender
+    UNIFIED_RECOMMENDER_AVAILABLE = True
+except ImportError:
+    UNIFIED_RECOMMENDER_AVAILABLE = False
+    UnifiedRecommender = None
 
 REAGENT_RESOLVER_TIMEOUT = 6.0
 
@@ -2891,6 +2900,130 @@ def list_all_families_tool() -> Dict[str, Any]:
 
 
 # ============================================================================
+# Unified Recommender Tool (Protocol + Rule Search)
+# ============================================================================
+
+class UnifiedRecommenderInput(BaseModel):
+    """Input schema for unified_recommender_tool."""
+    reaction_smiles: str = Field(..., description="Full reaction SMILES string (reactants>>products)")
+    top_k: int = Field(default=5, description="Number of recommendations to return (max 10)", ge=1, le=10)
+    min_similarity: float = Field(default=0.0, description="Minimum DRFP similarity threshold (0.0-1.0)", ge=0.0, le=1.0)
+    source_type: Optional[str] = Field(default=None, description="Filter by source: 'protocol' (full experimental procedures) or 'rule' (general guidelines)")
+
+
+@tool(args_schema=UnifiedRecommenderInput)
+def unified_recommender_tool(
+    reaction_smiles: str,
+    top_k: int = 5,
+    min_similarity: float = 0.0,
+    source_type: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Find similar reactions and condition recommendations using DRFP similarity.
+    
+    This tool provides a unified search across both:
+    - **Protocols**: Full experimental procedures from literature
+    - **Rules**: General reaction guidelines and best practices
+    
+    Uses DRFP (Differentiable Reaction Fingerprints) for reaction similarity,
+    providing highly relevant matches based on structural similarity.
+    
+    **When to use this tool:**
+    - Need recommendations for an unfamiliar reaction
+    - Want to find similar precedents from literature
+    - Looking for general reaction guidelines
+    - Comparing different condition options
+    
+    **Source types:**
+    - `protocol`: Returns only full experimental procedures (e.g., from Org. Synth.)
+    - `rule`: Returns only general reaction guidelines
+    - None (default): Returns both protocols and rules, ranked by similarity
+    
+    Args:
+        reaction_smiles: Full reaction SMILES (reactants>>products)
+        top_k: Number of results to return (1-10, default 5)
+        min_similarity: Minimum similarity threshold (0.0-1.0, default 0.0)
+        source_type: Filter by 'protocol', 'rule', or None for both
+    
+    Returns:
+        Dict with ranked recommendations including similarity scores, metadata,
+        and source attribution
+    
+    Example:
+        >>> unified_recommender_tool(
+        ...     reaction_smiles="Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+        ...     top_k=3,
+        ...     min_similarity=0.3
+        ... )
+        {
+            "success": True,
+            "recommendations": [
+                {
+                    "rank": 1,
+                    "name": "Buchwald–Hartwig C–N Coupling",
+                    "source_type": "rule",
+                    "family": "Buchwald–Hartwig_C–N",
+                    "similarity": 0.82,
+                    "tags": ["C-N-coupling", "amination", "cross-coupling"]
+                },
+                ...
+            ],
+            "query": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+            "count": 3
+        }
+    """
+    if not UNIFIED_RECOMMENDER_AVAILABLE:
+        return _error_response(
+            "Unified recommender not available. Install DRFP: pip install drfp"
+        )
+    
+    try:
+        # Initialize recommender (uses default index)
+        recommender = UnifiedRecommender()
+        
+        # Convert source_type to list format
+        source_types = None
+        if source_type:
+            source_types = [source_type.lower()]
+        
+        # Get recommendations
+        results = recommender.recommend(
+            reaction_smiles=reaction_smiles,
+            top_k=top_k,
+            min_similarity=min_similarity,
+            source_types=source_types
+        )
+        
+        # Format results for LLM
+        formatted_results = []
+        for result in results:
+            formatted_results.append({
+                "rank": result.rank,
+                "id": result.id,
+                "name": result.name,
+                "source_type": result.source_type,
+                "family": result.family,
+                "similarity": round(result.similarity, 3),
+                "tags": result.tags,
+                "version": result.version,
+            })
+        
+        return _success_response({
+            "recommendations": formatted_results,
+            "query": reaction_smiles,
+            "count": len(formatted_results),
+            "filters": {
+                "top_k": top_k,
+                "min_similarity": min_similarity,
+                "source_type": source_type or "all"
+            }
+        })
+    
+    except Exception as e:
+        return _error_response(f"Unified recommendation failed: {str(e)}")
+
+
+# ============================================================================
 # Tool Collection
 # ============================================================================
 
@@ -2915,6 +3048,7 @@ CHEMTOOLS_TOOLS = [
     enhanced_cross_family_recommend_tool,
     search_precedents_tool,
     protocol_recommendation_tool,  # NEW: Protocol-based recommendations with full procedures
+    unified_recommender_tool,  # NEW: Unified DRFP-based protocol + rule search
     
     # Database tools
     reaction_dataset_analytics_tool,

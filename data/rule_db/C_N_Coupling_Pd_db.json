@@ -472,5 +472,15 @@
       "base": "LiHMDS",
       "note": "Solvent variant"
     }
-  ]
+  ],
+  "reaction": {
+    "reference_reactions": [
+      "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+      "Clc1ccc(C(F)(F)F)cc1.CN(C)C>>CN(C)c1ccc(C(F)(F)F)cc1",
+      "Brc1ccncc1.NCc1ccccc1>>c1ccc(CNc2ccncc2)cc1",
+      "Ic1ccc(C#N)cc1.C1COCCN1>>N#Cc1ccc(N2CCOCC2)cc1",
+      "Brc1ccccc1.CC(C)(C)OC(=O)N>>CC(C)(C)OC(=O)Nc1ccccc1",
+      "Brc1ccccc1C.Nc1ccc(OC)cc1>>COc1ccc(Nc2ccccc2C)cc1"
+    ]
+  }
 }
