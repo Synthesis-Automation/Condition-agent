@@ -15,7 +15,7 @@ from scripts.recommendation_cli_utils import REACTION_TYPE_CHOICES
 import pytest
 from chemtools import detect_reaction
 
-SCDB_DIR = Path("data/rule_db")
+SCDB_DIR = Path("data/rule_db_v2")  # Updated to v2
 
 def _ensure_rule_db(filenames):
     missing = [SCDB_DIR / name for name in filenames if not (SCDB_DIR / name).exists()]

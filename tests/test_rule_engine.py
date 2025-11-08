@@ -396,9 +396,9 @@ class TestIntegration:
         """Test loading the real suzuki.json database."""
         # Try to find suzuki.json
         possible_paths = [
-            Path("data/rule_db/suzuki.json"),
+            Path("data/rule_db_v2/suzuki.json"),  # Updated to v2
             Path("data/suzuki.json"),
-            Path("data/protocol_db/suzuki.json")
+            Path("data/protocol_db_v2/suzuki.json")  # Updated to v2
         ]
         
         suzuki_path = None
@@ -424,9 +424,9 @@ class TestIntegration:
         """Test full recommendation workflow with suzuki.json."""
         # Try to find suzuki.json
         possible_paths = [
-            Path("data/rule_db/suzuki.json"),
+            Path("data/rule_db_v2/suzuki.json"),  # Updated to v2
             Path("data/suzuki.json"),
-            Path("data/protocol_db/suzuki.json")
+            Path("data/protocol_db_v2/suzuki.json")  # Updated to v2
         ]
         
         suzuki_path = None
