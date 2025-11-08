@@ -95,11 +95,107 @@ def format_result(result: RecommendationResult, rank: int, show_details: bool = 
     return "\n".join(lines)
 
 
+def display_detailed_conditions(recommender: UnifiedRecommender, result: RecommendationResult):
+    """Display detailed recommended conditions for a source."""
+    details = recommender.get_source_details(result.id)
+    
+    if not details:
+        print(f"  {Fore.YELLOW if HAS_COLOR else ''}(No detailed conditions available){Style.RESET_ALL if HAS_COLOR else ''}")
+        return
+    
+    # Extract key condition fields based on source type
+    if result.source_type == "protocol":
+        # Protocol has structured conditions
+        if 'conditions' in details:
+            cond = details['conditions']
+            print(f"  {Fore.CYAN if HAS_COLOR else ''}Recommended Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
+            
+            if 'solvent' in cond and cond['solvent']:
+                print(f"    • Solvent: {cond['solvent']}")
+            if 'temperature' in cond and cond['temperature']:
+                print(f"    • Temperature: {cond['temperature']}")
+            if 'catalyst' in cond and cond['catalyst']:
+                print(f"    • Catalyst: {cond['catalyst']}")
+            if 'ligand' in cond and cond['ligand']:
+                print(f"    • Ligand: {cond['ligand']}")
+            if 'base' in cond and cond['base']:
+                print(f"    • Base: {cond['base']}")
+            if 'time' in cond and cond['time']:
+                print(f"    • Time: {cond['time']}")
+            if 'atmosphere' in cond and cond['atmosphere']:
+                print(f"    • Atmosphere: {cond['atmosphere']}")
+        
+        # Show yield if available
+        if 'yield_range' in details and details['yield_range']:
+            print(f"    • Expected Yield: {details['yield_range']}")
+    
+    elif result.source_type == "rule":
+        # Rule has default_rule and base_rules with conditions
+        # Show default rule conditions
+        if 'default_rule' in details and 'conditions' in details['default_rule']:
+            cond = details['default_rule']['conditions']
+            rule_desc = details['default_rule'].get('description', 'Default conditions')
+            print(f"  {Fore.CYAN if HAS_COLOR else ''}Default Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
+            print(f"    {Fore.YELLOW if HAS_COLOR else ''}({rule_desc}){Style.RESET_ALL if HAS_COLOR else ''}")
+            
+            if 'pd_source' in cond and cond['pd_source']:
+                print(f"    • Pd Source: {cond['pd_source']}")
+            if 'precatalyst' in cond and cond['precatalyst']:
+                print(f"    • Precatalyst: {cond['precatalyst']}")
+            if 'catalyst_loading_molpct' in cond and cond['catalyst_loading_molpct']:
+                print(f"    • Catalyst Loading: {cond['catalyst_loading_molpct']} mol%")
+            if 'ligand' in cond and cond['ligand']:
+                print(f"    • Ligand: {cond['ligand']}")
+            if 'solvent' in cond and cond['solvent']:
+                print(f"    • Solvent: {cond['solvent']}")
+            if 'base' in cond and cond['base']:
+                print(f"    • Base: {cond['base']}")
+            if 'base_equiv' in cond and cond['base_equiv']:
+                print(f"    • Base Equivalents: {cond['base_equiv']}")
+            if 'temperature_C' in cond and cond['temperature_C']:
+                print(f"    • Temperature: {cond['temperature_C']} °C")
+            if 'time_h' in cond and cond['time_h']:
+                print(f"    • Time: {cond['time_h']} h")
+            if 'atmosphere' in cond and cond['atmosphere']:
+                print(f"    • Atmosphere: {cond['atmosphere']}")
+        
+        # Show alternative base rules (top 3)
+        if 'base_rules' in details and details['base_rules']:
+            print(f"\n  {Fore.MAGENTA if HAS_COLOR else ''}Alternative Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
+            for i, rule in enumerate(details['base_rules'][:3], 1):
+                rule_name = rule.get('name', f'Alternative {i}')
+                rule_desc = rule.get('description', '')
+                print(f"    {i}. {Fore.YELLOW if HAS_COLOR else ''}{rule_name}{Style.RESET_ALL if HAS_COLOR else ''}")
+                if rule_desc:
+                    print(f"       {rule_desc}")
+                
+                if 'conditions' in rule:
+                    cond = rule['conditions']
+                    # Show key differences from default
+                    key_conditions = []
+                    if 'pd_source' in cond:
+                        key_conditions.append(f"Pd: {cond['pd_source']}")
+                    if 'precatalyst' in cond:
+                        key_conditions.append(f"Catalyst: {cond['precatalyst']}")
+                    if 'ligand' in cond:
+                        key_conditions.append(f"Ligand: {cond['ligand']}")
+                    if 'base' in cond:
+                        key_conditions.append(f"Base: {cond['base']}")
+                    if 'temperature_C' in cond:
+                        key_conditions.append(f"Temp: {cond['temperature_C']} °C")
+                    
+                    if key_conditions:
+                        print(f"       {' | '.join(key_conditions)}")
+                print()
+
+
 def display_results(
     results: List[RecommendationResult],
     reaction: str,
     show_details: bool = False,
-    compact: bool = False
+    compact: bool = False,
+    show_top_split: bool = False,
+    recommender: Optional[UnifiedRecommender] = None
 ):
     """Display recommendation results."""
     if compact:
@@ -107,6 +203,58 @@ def display_results(
         for r in results:
             icon = "📋" if r.source_type == "protocol" else "📖"
             print(f"{icon} [{r.rank}] {r.name} (sim: {r.similarity:.3f}, family: {r.family})")
+    
+    elif show_top_split and recommender:
+        # Show top protocol and top rule separately with detailed conditions
+        print()
+        print_separator(color=Fore.CYAN if HAS_COLOR else "")
+        print(f"Query: {reaction}")
+        print_separator(color=Fore.CYAN if HAS_COLOR else "")
+        print()
+        
+        # Find top protocol and top rule
+        top_protocol = None
+        top_rule = None
+        
+        for r in results:
+            if r.source_type == "protocol" and top_protocol is None:
+                top_protocol = r
+            elif r.source_type == "rule" and top_rule is None:
+                top_rule = r
+            
+            if top_protocol and top_rule:
+                break
+        
+        # Display top protocol
+        if top_protocol:
+            print(f"{Fore.GREEN if HAS_COLOR else ''}━━━ TOP PROTOCOL ━━━{Style.RESET_ALL if HAS_COLOR else ''}")
+            print(f"📋 {Fore.YELLOW if HAS_COLOR else ''}{top_protocol.name}{Style.RESET_ALL if HAS_COLOR else ''}")
+            print(f"   Similarity: {Fore.GREEN if HAS_COLOR else ''}{top_protocol.similarity:.3f}{Style.RESET_ALL if HAS_COLOR else ''}")
+            print(f"   Family: {top_protocol.family}")
+            print(f"   ID: {top_protocol.id}")
+            print()
+            display_detailed_conditions(recommender, top_protocol)
+            print()
+        else:
+            print(f"{Fore.YELLOW if HAS_COLOR else ''}No protocol recommendations found.{Style.RESET_ALL if HAS_COLOR else ''}")
+            print()
+        
+        # Display top rule
+        if top_rule:
+            print(f"{Fore.GREEN if HAS_COLOR else ''}━━━ TOP RULE ━━━{Style.RESET_ALL if HAS_COLOR else ''}")
+            print(f"📖 {Fore.YELLOW if HAS_COLOR else ''}{top_rule.name}{Style.RESET_ALL if HAS_COLOR else ''}")
+            print(f"   Similarity: {Fore.GREEN if HAS_COLOR else ''}{top_rule.similarity:.3f}{Style.RESET_ALL if HAS_COLOR else ''}")
+            print(f"   Family: {top_rule.family}")
+            print(f"   ID: {top_rule.id}")
+            print()
+            display_detailed_conditions(recommender, top_rule)
+            print()
+        else:
+            print(f"{Fore.YELLOW if HAS_COLOR else ''}No rule recommendations found.{Style.RESET_ALL if HAS_COLOR else ''}")
+            print()
+        
+        print_separator(color=Fore.CYAN if HAS_COLOR else "")
+    
     else:
         # Full mode
         print()
@@ -191,6 +339,7 @@ def interactive_mode(
     print("  /type <protocol|rule|all> -> filter by source type (current: %s)" % (initial_type or "all"))
     print("  /details on|off       -> toggle detailed output (current: off)")
     print("  /compact on|off       -> toggle compact mode (current: off)")
+    print("  /split on|off         -> toggle top protocol + top rule split view (current: off)")
     print("  /stats                -> show index statistics")
     print("  /load <id>            -> load full source details by ID")
     print("  /show                 -> display current settings")
@@ -205,6 +354,7 @@ def interactive_mode(
     source_type = initial_type
     show_details = False
     compact_mode = False
+    split_mode = False
     
     while True:
         try:
@@ -233,6 +383,7 @@ def interactive_mode(
                 print("  /type <protocol|rule|all> -> filter by source type")
                 print("  /details on|off       -> toggle detailed output")
                 print("  /compact on|off       -> toggle compact mode")
+                print("  /split on|off         -> toggle top protocol + top rule split view")
                 print("  /stats                -> show index statistics")
                 print("  /load <id>            -> load full source details")
                 print("  /show                 -> display current settings")
@@ -294,6 +445,7 @@ def interactive_mode(
                     arg_lower = arg.lower()
                     if arg_lower == "on":
                         compact_mode = True
+                        split_mode = False  # Disable split mode
                         print("Compact mode enabled")
                     elif arg_lower == "off":
                         compact_mode = False
@@ -302,7 +454,27 @@ def interactive_mode(
                         print("Usage: /compact on|off")
                 else:
                     compact_mode = not compact_mode
+                    if compact_mode:
+                        split_mode = False
                     print(f"Compact mode {'enabled' if compact_mode else 'disabled'}")
+            
+            elif cmd == "/split":
+                if arg:
+                    arg_lower = arg.lower()
+                    if arg_lower == "on":
+                        split_mode = True
+                        compact_mode = False  # Disable compact mode
+                        print("Split mode enabled - will show top protocol and top rule with detailed conditions")
+                    elif arg_lower == "off":
+                        split_mode = False
+                        print("Split mode disabled")
+                    else:
+                        print("Usage: /split on|off")
+                else:
+                    split_mode = not split_mode
+                    if split_mode:
+                        compact_mode = False
+                    print(f"Split mode {'enabled' if split_mode else 'disabled'}")
             
             elif cmd == "/stats":
                 display_statistics(recommender)
@@ -319,7 +491,8 @@ def interactive_mode(
                 print(f"  min_similarity: {min_sim}")
                 print(f"  source_type: {source_type or 'all'}")
                 print(f"  show_details: {show_details}")
-                print(f"  compact_mode: {compact_mode}\n")
+                print(f"  compact_mode: {compact_mode}")
+                print(f"  split_mode: {split_mode}\n")
             
             else:
                 print(f"Unknown command: {cmd}. Type /help for available commands.")
@@ -348,7 +521,14 @@ def interactive_mode(
                 print(f"\n{Fore.YELLOW if HAS_COLOR else ''}No recommendations found matching criteria.{Style.RESET_ALL if HAS_COLOR else ''}")
                 print("Try lowering min_similarity or changing source_type filter.\n")
             else:
-                display_results(results, reaction_smiles, show_details=show_details, compact=compact_mode)
+                display_results(
+                    results, 
+                    reaction_smiles, 
+                    show_details=show_details, 
+                    compact=compact_mode,
+                    show_top_split=split_mode,
+                    recommender=recommender
+                )
         
         except Exception as e:
             print(f"{Fore.RED if HAS_COLOR else ''}Error: {str(e)}{Style.RESET_ALL if HAS_COLOR else ''}")
@@ -412,6 +592,11 @@ Examples:
         "--compact",
         action="store_true",
         help="Use compact output mode"
+    )
+    parser.add_argument(
+        "--split",
+        action="store_true",
+        help="Show top protocol and top rule separately with detailed conditions"
     )
     parser.add_argument(
         "--stats",
@@ -483,7 +668,14 @@ Examples:
                 if not results:
                     print(f"{Fore.YELLOW if HAS_COLOR else ''}No recommendations found matching criteria.{Style.RESET_ALL if HAS_COLOR else ''}")
                 else:
-                    display_results(results, args.rxn, show_details=args.details, compact=args.compact)
+                    display_results(
+                        results, 
+                        args.rxn, 
+                        show_details=args.details, 
+                        compact=args.compact,
+                        show_top_split=args.split,
+                        recommender=recommender
+                    )
         
         except Exception as e:
             print(f"Error: {e}", file=sys.stderr)
