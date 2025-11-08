@@ -2,6 +2,12 @@
 
 **TL;DR:** Always use `compile_smarts()` instead of `Chem.MolFromSmarts()` - it provides automatic caching across the entire codebase.
 
+## Centralized SMARTS Source
+
+- All canonical SMARTS (functional groups, coupling handles, nucleophiles, etc.) now live in `chemtools/featurizers/calculable_features.json`. Update that file once and every consumer (router, detection, featurizers, substrate classifier) picks up the change automatically.
+- Use `chemtools.util.functional_groups.detect_all()` / `detect_any()` to reuse cached detections sourced from the JSON spec instead of defining ad-hoc SMARTS dictionaries.
+- Need the raw SMARTS for mapping atoms? Import `FUNCTIONAL_GROUP_SMARTS` from `chemtools.util.functional_groups` for a read-only `{name: tuple(smarts)}` view that is always in sync with the spec.
+
 ## Quick Start
 
 ### Basic Usage

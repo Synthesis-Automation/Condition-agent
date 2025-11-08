@@ -12,7 +12,8 @@ import json
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from types import MappingProxyType
+from typing import Dict, Iterable, List, Optional, Tuple, Mapping
 
 from .rdkit_helpers import rdkit_available, parse_smiles
 from .smarts_cache import compile_smarts
@@ -42,6 +43,7 @@ _CATEGORY_PREFERRED_ORDER = [
 ]
 _UNCATEGORIZED_TAG = "other"
 _SPEC_PATH = Path(__file__).resolve().parents[1] / "featurizers" / "calculable_features.json"
+_DETECTION_CACHE_SIZE = 4096
 
 
 @lru_cache(maxsize=1)
@@ -79,6 +81,12 @@ def _load_group_definitions() -> Dict[str, FunctionalGroupDef]:
     return defs
 
 
+def _build_smarts_index() -> Dict[str, Tuple[str, ...]]:
+    """Materialize a name -> SMARTS tuple mapping for downstream consumers."""
+    defs = _load_group_definitions()
+    return {name: definition.smarts for name, definition in defs.items()}
+
+
 def get_group_definition(name: str) -> Optional[FunctionalGroupDef]:
     """Return the FunctionalGroupDef for a given canonical name."""
     return _load_group_definitions().get(name)
@@ -87,6 +95,10 @@ def get_group_definition(name: str) -> Optional[FunctionalGroupDef]:
 def iter_group_definitions() -> Iterable[FunctionalGroupDef]:
     """Yield all functional group definitions."""
     return _load_group_definitions().values()
+
+
+# Expose immutable SMARTS lookup for consumers that need raw patterns
+FUNCTIONAL_GROUP_SMARTS: Mapping[str, Tuple[str, ...]] = MappingProxyType(_build_smarts_index())
 
 
 @lru_cache(maxsize=1)
@@ -107,6 +119,11 @@ def _ordered_category_keys() -> List[str]:
 def _default_result_map() -> Dict[str, bool]:
     """Return a default result dict with all functional groups set to False."""
     return {name: False for name in _load_group_definitions().keys()}
+
+
+def _normalized_smiles(smiles: Optional[str]) -> str:
+    """Normalize SMILES input for caching (empty string represents None)."""
+    return (smiles or "").strip()
 
 
 def _has_smarts_match(mol, smarts_patterns: Tuple[str, ...]) -> bool:
@@ -151,16 +168,8 @@ def _detect_with_text(smiles: str) -> Dict[str, bool]:
     return results
 
 
-def detect_all(smiles: Optional[str]) -> Dict[str, bool]:
-    """
-    Detect all functional groups for a SMILES string.
-
-    Args:
-        smiles: Molecule SMILES.
-
-    Returns:
-        Mapping of functional group name to detection boolean.
-    """
+def _detect_all_impl(smiles: str) -> Dict[str, bool]:
+    """Internal detection implementation without caching."""
     if not smiles:
         return _default_result_map()
 
@@ -172,10 +181,64 @@ def detect_all(smiles: Optional[str]) -> Dict[str, bool]:
         return _detect_with_text(smiles)
 
     defs = _load_group_definitions()
-    results: Dict[str, bool] = {}
-    for name, definition in defs.items():
-        results[name] = _has_smarts_match(mol, definition.smarts)
-    return results
+    return {name: _has_smarts_match(mol, definition.smarts) for name, definition in defs.items()}
+
+
+@lru_cache(maxsize=_DETECTION_CACHE_SIZE)
+def _detect_all_cached(smiles: str) -> Tuple[Tuple[str, bool], ...]:
+    """LRU-cached detection results keyed by normalized SMILES."""
+    return tuple(_detect_all_impl(smiles).items())
+
+
+def detect_all(smiles: Optional[str]) -> Dict[str, bool]:
+    """
+    Detect all functional groups for a SMILES string.
+
+    Args:
+        smiles: Molecule SMILES.
+
+    Returns:
+        Mapping of functional group name to detection boolean.
+    """
+    key = _normalized_smiles(smiles)
+    if not key:
+        return _default_result_map()
+    return dict(_detect_all_cached(key))
+
+
+def detect_any(smiles_list: Iterable[Optional[str]], *, group_subset: Optional[Iterable[str]] = None) -> Dict[str, bool]:
+    """
+    Detect functional groups across multiple SMILES strings (logical OR of detections).
+
+    Args:
+        smiles_list: Iterable of SMILES strings.
+        group_subset: Optional subset of group names to report (improves performance).
+
+    Returns:
+        Mapping of group name to boolean indicating presence in ANY provided SMILES.
+    """
+    if group_subset:
+        ordered_subset = list(dict.fromkeys(group_subset))
+        aggregate: Dict[str, bool] = {name: False for name in ordered_subset}
+    else:
+        aggregate = _default_result_map()
+
+    for smiles in smiles_list:
+        key = _normalized_smiles(smiles)
+        if not key:
+            continue
+        detections = detect_all(key)
+        if group_subset:
+            for name in ordered_subset:
+                if aggregate[name]:
+                    continue
+                if detections.get(name):
+                    aggregate[name] = True
+        else:
+            for name, present in detections.items():
+                if present:
+                    aggregate[name] = True
+    return aggregate
 
 
 def get_functional_groups(smiles: Optional[str]) -> List[str]:

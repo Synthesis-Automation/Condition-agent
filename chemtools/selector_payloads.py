@@ -9,13 +9,11 @@ from rdkit import Chem
 from rdkit.Chem.rdchem import Atom, Mol
 
 from .util.smarts_cache import compile_smarts
-
-
-# SMARTS patterns for functional group detection
-# Compiled lazily via centralized cache
-_PHENOL_SMARTS = "[cX3][OX2H]"
-_FREE_ALCOHOL_SMARTS = "[CX4;!$([CX3](=O)[OX2H0-,OX1-])][OX2H]"
-_CARBOXYLIC_ACID_SMARTS = "C(=O)[OX2H1]"
+from .util.functional_groups import (
+    FUNCTIONAL_GROUP_SMARTS,
+    has_free_alcohol,
+    has_phenol,
+)
 
 
 @dataclass(slots=True)
@@ -38,13 +36,25 @@ def _mol_from_smiles(smiles: Any) -> Mol | None:
     except Exception:
         return None
 
+def _get_smarts_from_spec(name: str):
+    patterns = FUNCTIONAL_GROUP_SMARTS.get(name)
+    if not patterns:
+        return ()
+    if isinstance(patterns, str):
+        return (patterns,)
+    return tuple(patterns)
+
 
 def _alpha_amino_context(mol: Mol | None) -> _AlphaAmineInfo:
     if mol is None:
         return _AlphaAmineInfo(False, False, False)
 
-    # Compile carboxylic acid pattern lazily
-    carboxylic_acid_pattern = compile_smarts(_CARBOXYLIC_ACID_SMARTS, validate=False)
+    carboxylic_acid_pattern = None
+    for smarts in _get_smarts_from_spec("carboxylic_acid"):
+        carboxylic_acid_pattern = compile_smarts(smarts, validate=False)
+        if carboxylic_acid_pattern is not None:
+            break
+
     if carboxylic_acid_pattern is None:
         return _AlphaAmineInfo(False, False, False)
 
@@ -107,13 +117,11 @@ def _any_substructure(mol: Mol | None, pattern: Mol | None) -> bool:
 
 
 def _has_phenol(smiles: str) -> bool:
-    pattern = compile_smarts(_PHENOL_SMARTS, validate=False)
-    return _any_substructure(_mol_from_smiles(smiles), pattern)
+    return has_phenol(smiles)
 
 
 def _has_free_alcohol(smiles: str) -> bool:
-    pattern = compile_smarts(_FREE_ALCOHOL_SMARTS, validate=False)
-    return _any_substructure(_mol_from_smiles(smiles), pattern)
+    return has_free_alcohol(smiles)
 
 
 def _choose_acid_class(acid_ctx: Mapping[str, Any], rule_features: Mapping[str, Any]) -> str:

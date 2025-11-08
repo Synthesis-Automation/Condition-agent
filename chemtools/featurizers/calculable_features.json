@@ -3760,7 +3760,7 @@
       "label": "Triflate",
       "detect": {
         "smarts_any": [
-          "[$(S(=O)(=O)(O[#6])C(F)(F)F)]"
+          "OS(=O)(=O)C(F)(F)F"
         ]
       },
       "text_patterns": [
@@ -3769,6 +3769,22 @@
       ],
       "category_tags": [
         "leaving_groups"
+      ]
+    },
+    {
+      "name": "trifluoromethyl",
+      "label": "Trifluoromethyl",
+      "detect": {
+        "smarts_any": [
+          "[CX4](F)(F)F"
+        ]
+      },
+      "text_patterns": [
+        "c(f)(f)f",
+        "cf3"
+      ],
+      "category_tags": [
+        "halides"
       ]
     },
     {
@@ -3816,6 +3832,22 @@
       ]
     },
     {
+      "name": "vinyl_iodide",
+      "label": "Vinyl Iodide",
+      "detect": {
+        "smarts_any": [
+          "[CX3]=[CX3][I]"
+        ]
+      },
+      "text_patterns": [
+        "c=ci"
+      ],
+      "category_tags": [
+        "halides",
+        "unsaturated"
+      ]
+    },
+    {
       "name": "vinyl_halide",
       "label": "Vinyl Halide",
       "detect": {
@@ -3825,6 +3857,296 @@
       },
       "category_tags": [
         "halides",
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "acid",
+      "label": "Carboxylic Acid",
+      "detect": {
+        "smarts_any": [
+          "C(=O)[OH]"
+        ]
+      },
+      "text_patterns": [
+        "c(=o)oh",
+        "c(=o)o",
+        "oc(=o)"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "alkoxide",
+      "label": "Alkoxide",
+      "detect": {
+        "smarts_any": [
+          "[O-][C,H]"
+        ]
+      },
+      "text_patterns": [
+        "[o-]",
+        "naome",
+        "kome",
+        "naoh",
+        "koh"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "alkyl_halide",
+      "label": "Alkyl Halide",
+      "detect": {
+        "smarts_any": [
+          "[CX4][Cl,Br,I]"
+        ]
+      },
+      "text_patterns": [
+        "ccl",
+        "cbr",
+        "ci"
+      ],
+      "category_tags": [
+        "halides"
+      ]
+    },
+    {
+      "name": "alpha_beta_unsaturated",
+      "label": "Alpha Beta Unsaturated",
+      "detect": {
+        "smarts_any": [
+          "C=C-[CX3]=O"
+        ]
+      },
+      "category_tags": [
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "aryl_halide",
+      "label": "Aryl Halide",
+      "detect": {
+        "smarts_any": [
+          "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]"
+        ]
+      },
+      "text_patterns": [
+        "ccl",
+        "cbr",
+        "c i",
+        "c[cl",
+        "c[br",
+        "c[i"
+      ],
+      "category_tags": [
+        "halides",
+        "aromatic"
+      ]
+    },
+    {
+      "name": "borane",
+      "label": "Borane",
+      "detect": {
+        "smarts_any": [
+          "[BH3,BH2,BH]"
+        ]
+      },
+      "text_patterns": [
+        "bh3",
+        "b2h6",
+        "bh2",
+        "[bh"
+      ],
+      "category_tags": [
+        "boron"
+      ]
+    },
+    {
+      "name": "boron",
+      "label": "Boron Reagent",
+      "detect": {
+        "smarts_any": [
+          "[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]"
+        ]
+      },
+      "text_patterns": [
+        "b(",
+        "b[",
+        "b(o)o",
+        "ob(o)"
+      ],
+      "category_tags": [
+        "boron"
+      ]
+    },
+    {
+      "name": "conjugated_diene",
+      "label": "Conjugated Diene",
+      "detect": {
+        "smarts_any": [
+          "C=C-C=C"
+        ]
+      },
+      "text_patterns": [
+        "c=c-c=c"
+      ],
+      "category_tags": [
+        "unsaturated"
+      ]
+    },
+    {
+      "name": "cyanide",
+      "label": "Cyanide",
+      "detect": {
+        "smarts_any": [
+          "[C-]#N"
+        ]
+      },
+      "text_patterns": [
+        "[c-]#n",
+        "cn-",
+        "nacn",
+        "kcn"
+      ],
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "grignard",
+      "label": "Grignard",
+      "detect": {
+        "smarts_any": [
+          "[C,c][Mg][Br,Cl,I]"
+        ]
+      },
+      "text_patterns": [
+        "[mg]",
+        "mgbr",
+        "mgcl"
+      ],
+      "category_tags": [
+        "organometallics"
+      ]
+    },
+    {
+      "name": "iodide",
+      "label": "Iodide",
+      "detect": {
+        "smarts_any": [
+          "[I-]"
+        ]
+      },
+      "text_patterns": [
+        "[i-]",
+        "nai",
+        "ki"
+      ],
+      "category_tags": [
+        "halides"
+      ]
+    },
+    {
+      "name": "nucleophile_n",
+      "label": "Nitrogen Nucleophile",
+      "detect": {
+        "smarts_any": [
+          "[NX3;H1,H2]"
+        ]
+      },
+      "text_patterns": [
+        "nh",
+        "nH",
+        "[nH]"
+      ],
+      "category_tags": [
+        "nitrogen"
+      ]
+    },
+    {
+      "name": "nucleophile_o",
+      "label": "Oxygen Nucleophile",
+      "detect": {
+        "smarts_any": [
+          "[OX2H]"
+        ]
+      },
+      "text_patterns": [
+        "[oh]",
+        "oh",
+        "[ox2h]"
+      ],
+      "category_tags": [
+        "oxygen"
+      ]
+    },
+    {
+      "name": "nucleophile_s",
+      "label": "Sulfur Nucleophile",
+      "detect": {
+        "smarts_any": [
+          "[SX2H]"
+        ]
+      },
+      "text_patterns": [
+        "sh",
+        "[sh]"
+      ],
+      "category_tags": [
+        "sulfur"
+      ]
+    },
+    {
+      "name": "organolithium",
+      "label": "Organolithium",
+      "detect": {
+        "smarts_any": [
+          "[C,c][Li]"
+        ]
+      },
+      "text_patterns": [
+        "[li]",
+        "li"
+      ],
+      "category_tags": [
+        "organometallics"
+      ]
+    },
+    {
+      "name": "organozinc",
+      "label": "Organozinc",
+      "detect": {
+        "smarts_any": [
+          "[C,c][Zn][Br,Cl,I]"
+        ]
+      },
+      "text_patterns": [
+        "[zn]",
+        "znbr",
+        "zncl",
+        "rzn"
+      ],
+      "category_tags": [
+        "organometallics"
+      ]
+    },
+    {
+      "name": "terminal_alkyne",
+      "label": "Terminal Alkyne",
+      "detect": {
+        "smarts_any": [
+          "C#C[H]",
+          "[C;H]#C"
+        ]
+      },
+      "text_patterns": [
+        "c#c",
+        "c#cc"
+      ],
+      "category_tags": [
         "unsaturated"
       ]
     }

@@ -24,7 +24,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Sequence, Tuple
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -34,27 +34,35 @@ from chemtools.util.smarts_cache import compile_smarts, clear_smarts_cache
 from chemtools.util.rdkit_helpers import rdkit_available
 
 
-def load_router_patterns() -> Dict[str, str]:
-    """Load SMARTS patterns from router.py."""
+def load_router_patterns() -> Dict[str, Sequence[str]]:
+    """Load SMARTS patterns used by router via the shared functional-group spec."""
     try:
-        from chemtools.router import _SMARTS_PATTERNS
-        return dict(_SMARTS_PATTERNS)
-    except ImportError:
-        print("Warning: Could not import router module", file=sys.stderr)
+        from chemtools.router import _ROUTER_GROUPS
+        from chemtools.util.functional_groups import get_group_definition
+    except ImportError as exc:
+        print(f"Warning: Could not import router dependencies: {exc}", file=sys.stderr)
         return {}
 
+    patterns: Dict[str, Sequence[str]] = {}
+    for name in _ROUTER_GROUPS:
+        definition = get_group_definition(name)
+        if not definition:
+            continue
+        patterns[name] = definition.smarts
+    return patterns
 
-def load_functional_group_patterns() -> Dict[str, str]:
+
+def load_functional_group_patterns() -> Dict[str, Sequence[str]]:
     """Load SMARTS patterns from functional_groups.py."""
     try:
         from chemtools.util.functional_groups import FUNCTIONAL_GROUP_SMARTS
-        return dict(FUNCTIONAL_GROUP_SMARTS)
-    except ImportError:
-        print("Warning: Could not import functional_groups module", file=sys.stderr)
+        return {name: tuple(smarts) for name, smarts in FUNCTIONAL_GROUP_SMARTS.items()}
+    except ImportError as exc:
+        print(f"Warning: Could not import functional_groups module: {exc}", file=sys.stderr)
         return {}
 
 
-def load_calculable_features_patterns() -> Dict[str, str]:
+def load_calculable_features_patterns() -> Dict[str, Sequence[str]]:
     """Load SMARTS patterns from calculable_features.json."""
     json_path = PROJECT_ROOT / "chemtools" / "featurizers" / "calculable_features.json"
     
@@ -66,16 +74,30 @@ def load_calculable_features_patterns() -> Dict[str, str]:
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        patterns = {}
+        patterns: Dict[str, Sequence[str]] = {}
         for feature in data.get("features", []):
-            if feature.get("type") == "bool" and "smarts" in feature:
-                name = feature.get("token", "unknown")
-                smarts_list = feature["smarts"]
-                # Store first pattern (others are alternatives)
-                if isinstance(smarts_list, list) and smarts_list:
-                    patterns[name] = smarts_list[0]
-                elif isinstance(smarts_list, str):
-                    patterns[name] = smarts_list
+            if feature.get("type") != "bool":
+                continue
+            detect = feature.get("detect") or {}
+            smarts_list = detect.get("smarts_any") or detect.get("smarts_all")
+            if not smarts_list:
+                continue
+            name = feature.get("token", "unknown_feature")
+            if isinstance(smarts_list, str):
+                patterns[name] = (smarts_list,)
+            else:
+                patterns[name] = tuple(smarts_list)
+        
+        for entry in data.get("functional_groups", []):
+            detect = entry.get("detect") or {}
+            smarts_list = detect.get("smarts_any")
+            if not smarts_list:
+                continue
+            name = entry.get("name", "functional_group")
+            if isinstance(smarts_list, str):
+                patterns[name] = (smarts_list,)
+            else:
+                patterns[name] = tuple(smarts_list)
         
         return patterns
     except Exception as e:
@@ -113,8 +135,15 @@ def load_selector_payloads_patterns() -> Dict[str, str]:
         return {}
 
 
+def _ensure_sequence(value: Sequence[str] | str) -> List[str]:
+    """Normalize SMARTS entries to a list for validation."""
+    if isinstance(value, str):
+        return [value]
+    return [item for item in value if item]
+
+
 def validate_patterns(
-    patterns: Dict[str, str],
+    patterns: Dict[str, Sequence[str] | str],
     category: str,
     verbose: bool = False
 ) -> Tuple[int, int, List[str]]:
@@ -126,30 +155,38 @@ def validate_patterns(
     """
     valid = 0
     invalid = 0
-    errors = []
+    errors: List[str] = []
     
     if verbose:
         print(f"\nValidating {category} ({len(patterns)} patterns)...")
     
-    for name, smarts in patterns.items():
-        try:
-            pattern = compile_smarts(smarts, validate=True)
-            if pattern is None:
-                error = f"{category}/{name}: Pattern compiled to None"
+    for name, smarts_value in patterns.items():
+        if not smarts_value:
+            continue
+        variants = _ensure_sequence(smarts_value)
+        if not variants:
+            continue
+        
+        for idx, smarts in enumerate(variants):
+            label = f"{name}[{idx}]" if len(variants) > 1 else name
+            try:
+                pattern = compile_smarts(smarts, validate=True)
+                if pattern is None:
+                    error = f"{category}/{label}: Pattern compiled to None"
+                    errors.append(error)
+                    invalid += 1
+                    if verbose:
+                        print(f"  ✗ {label}: {error}")
+                else:
+                    valid += 1
+                    if verbose:
+                        print(f"  ✓ {label}")
+            except Exception as e:
+                error = f"{category}/{label}: {e}"
                 errors.append(error)
                 invalid += 1
                 if verbose:
-                    print(f"  ✗ {name}: {error}")
-            else:
-                valid += 1
-                if verbose:
-                    print(f"  ✓ {name}")
-        except Exception as e:
-            error = f"{category}/{name}: {e}"
-            errors.append(error)
-            invalid += 1
-            if verbose:
-                print(f"  ✗ {name}: {e}")
+                    print(f"  ✗ {label}: {e}")
     
     return valid, invalid, errors
 
