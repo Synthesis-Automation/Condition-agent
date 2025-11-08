@@ -24,6 +24,7 @@ class FunctionalGroupDef:
     """Structured functional group information sourced from the feature spec."""
 
     name: str
+    token: str
     label: str
     smarts: Tuple[str, ...]
     text_patterns: Tuple[str, ...]
@@ -57,39 +58,96 @@ def _load_feature_spec() -> Dict[str, object]:
 def _load_group_definitions() -> Dict[str, FunctionalGroupDef]:
     """Load functional group definitions from the shared feature specification."""
     spec = _load_feature_spec()
-    entries = spec.get("functional_groups") or []
     defs: Dict[str, FunctionalGroupDef] = {}
 
-    for entry in entries:
-        name = entry.get("name")
+    def register(entry: Dict[str, object]) -> None:
         detect = entry.get("detect") or {}
-        smarts = tuple(detect.get("smarts_any") or [])
-        if not name or not smarts:
-            # Skip malformed entries rather than crashing downstream code.
-            continue
-        label = entry.get("label") or name.replace("_", " ").title()
-        text_patterns = tuple(entry.get("text_patterns") or [])
-        category_tags = tuple(entry.get("category_tags") or [])
+        smarts_list = detect.get("smarts_any") or []
+        if isinstance(smarts_list, str):
+            smarts_list = [smarts_list]
+        smarts = tuple(smarts_list or [])
+        if not smarts:
+            return
+
+        token = entry.get("token")
+        name = entry.get("name")
+        if not name:
+            if isinstance(token, str) and token.endswith("_present"):
+                name = token[:-8]
+            elif isinstance(token, str):
+                name = token
+        if not isinstance(name, str) or not name:
+            return
+
+        if name in defs:
+            return  # Prefer explicitly-declared functional_groups entries
+
+        label = entry.get("label") or entry.get("why") or name.replace("_", " ").title()
+        text_patterns = tuple(entry.get("text_patterns") or detect.get("text_patterns") or [])
+        category_tags = entry.get("category_tags")
+        if not category_tags:
+            cat = entry.get("category")
+            if cat:
+                category_tags = [cat]
+        category_tags = tuple(category_tags or [])
+        token_value = token or f"{name}_present"
+
         defs[name] = FunctionalGroupDef(
             name=name,
-            label=label,
+            token=token_value,
+            label=str(label),
             smarts=smarts,
             text_patterns=text_patterns,
             category_tags=category_tags,
         )
 
+    for entry in spec.get("functional_groups") or []:
+        register(entry)
+
+    for feature in spec.get("features") or []:
+        if feature.get("type") != "bool":
+            continue
+        if not isinstance(feature.get("detect"), dict):
+            continue
+        register(feature)
+
     return defs
 
 
-def _build_smarts_index() -> Dict[str, Tuple[str, ...]]:
-    """Materialize a name -> SMARTS tuple mapping for downstream consumers."""
+@lru_cache(maxsize=1)
+def _definitions_by_token() -> Dict[str, FunctionalGroupDef]:
     defs = _load_group_definitions()
-    return {name: definition.smarts for name, definition in defs.items()}
+    return {definition.token: definition for definition in defs.values()}
+
+
+def _build_smarts_index() -> Dict[str, Tuple[str, ...]]:
+    """Materialize a name/token -> SMARTS tuple mapping for downstream consumers."""
+    defs = _load_group_definitions()
+    mapping: Dict[str, Tuple[str, ...]] = {}
+    for name, definition in defs.items():
+        mapping[name] = definition.smarts
+        mapping[definition.token] = definition.smarts
+    return mapping
 
 
 def get_group_definition(name: str) -> Optional[FunctionalGroupDef]:
     """Return the FunctionalGroupDef for a given canonical name."""
-    return _load_group_definitions().get(name)
+    defs = _load_group_definitions()
+    if name in defs:
+        return defs[name]
+    return _definitions_by_token().get(name)
+
+
+def _resolve_group_token(name: str) -> Optional[str]:
+    """Map a legacy group name or token to the canonical token string."""
+    if not name:
+        return None
+    defs = _load_group_definitions()
+    if name in defs:
+        return defs[name].token
+    if name in _definitions_by_token():
+        return name
+    return None
 
 
 def iter_group_definitions() -> Iterable[FunctionalGroupDef]:
@@ -118,7 +176,7 @@ def _ordered_category_keys() -> List[str]:
 
 def _default_result_map() -> Dict[str, bool]:
     """Return a default result dict with all functional groups set to False."""
-    return {name: False for name in _load_group_definitions().keys()}
+    return {definition.token: False for definition in _definitions_by_token().values()}
 
 
 def _normalized_smiles(smiles: Optional[str]) -> str:
@@ -162,9 +220,9 @@ def _detect_with_text(smiles: str) -> Dict[str, bool]:
     results: Dict[str, bool] = {}
     for name, definition in defs.items():
         if not definition.text_patterns:
-            results[name] = False
+            results[definition.token] = False
             continue
-        results[name] = any(pattern in lower for pattern in definition.text_patterns)
+        results[definition.token] = any(pattern in lower for pattern in definition.text_patterns)
     return results
 
 
@@ -181,7 +239,10 @@ def _detect_all_impl(smiles: str) -> Dict[str, bool]:
         return _detect_with_text(smiles)
 
     defs = _load_group_definitions()
-    return {name: _has_smarts_match(mol, definition.smarts) for name, definition in defs.items()}
+    return {
+        definition.token: _has_smarts_match(mol, definition.smarts)
+        for definition in defs.values()
+    }
 
 
 @lru_cache(maxsize=_DETECTION_CACHE_SIZE)
@@ -198,7 +259,7 @@ def detect_all(smiles: Optional[str]) -> Dict[str, bool]:
         smiles: Molecule SMILES.
 
     Returns:
-        Mapping of functional group name to detection boolean.
+        Mapping of functional-group tokens (``<name>_present``) to booleans.
     """
     key = _normalized_smiles(smiles)
     if not key:
@@ -218,8 +279,12 @@ def detect_any(smiles_list: Iterable[Optional[str]], *, group_subset: Optional[I
         Mapping of group name to boolean indicating presence in ANY provided SMILES.
     """
     if group_subset:
-        ordered_subset = list(dict.fromkeys(group_subset))
-        aggregate: Dict[str, bool] = {name: False for name in ordered_subset}
+        ordered_subset: List[str] = []
+        for name in group_subset:
+            token = _resolve_group_token(name)
+            if token and token not in ordered_subset:
+                ordered_subset.append(token)
+        aggregate = {name: False for name in ordered_subset}
     else:
         aggregate = _default_result_map()
 
@@ -230,7 +295,7 @@ def detect_any(smiles_list: Iterable[Optional[str]], *, group_subset: Optional[I
         detections = detect_all(key)
         if group_subset:
             for name in ordered_subset:
-                if aggregate[name]:
+                if aggregate.get(name):
                     continue
                 if detections.get(name):
                     aggregate[name] = True
@@ -249,17 +314,19 @@ def get_functional_groups(smiles: Optional[str]) -> List[str]:
 
 def has_functional_group(smiles: Optional[str], group_name: str) -> bool:
     """Check whether the molecule contains the specified functional group."""
-    defs = _load_group_definitions()
-    if group_name not in defs:
+    token = _resolve_group_token(group_name)
+    if not token:
         return False
     result = detect_all(smiles)
-    return result.get(group_name, False)
+    return result.get(token, False)
 
 
 def count_functional_groups(smiles: Optional[str], group_name: str) -> int:
     """Count occurrences of the specified functional group."""
     defs = _load_group_definitions()
     definition = defs.get(group_name)
+    if definition is None:
+        definition = _definitions_by_token().get(group_name)
     if not smiles or definition is None or not rdkit_available():
         return 0
     mol = parse_smiles(smiles)
@@ -275,12 +342,12 @@ def get_group_categories(smiles: Optional[str]) -> Dict[str, List[str]]:
     Returns:
         Dictionary mapping category tag -> list of group names within that category.
     """
-    defs = _load_group_definitions()
+    defs_by_token = _definitions_by_token()
     detections = get_functional_groups(smiles)
     categories = {tag: [] for tag in _ordered_category_keys()}
 
     for group in detections:
-        definition = defs.get(group)
+        definition = defs_by_token.get(group)
         if not definition:
             continue
         tags = definition.category_tags or ()
