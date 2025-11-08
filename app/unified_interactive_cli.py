@@ -99,7 +99,7 @@ def format_result(result: RecommendationResult, rank: int, show_details: bool = 
     return "\n".join(lines)
 
 
-def display_detailed_conditions(recommender: UnifiedRecommender, result: RecommendationResult):
+def display_detailed_conditions(recommender: UnifiedRecommender, result: RecommendationResult, reaction_smiles: str = None):
     """Display detailed recommended conditions for a source."""
     details = recommender.get_source_details(result.id)
     
@@ -165,12 +165,93 @@ def display_detailed_conditions(recommender: UnifiedRecommender, result: Recomme
     
     elif result.source_type == "rule":
         # Rule has default_rule and base_rules with conditions
-        # Show default rule conditions
-        if 'default_rule' in details and 'conditions' in details['default_rule']:
-            cond = details['default_rule']['conditions']
-            rule_desc = details['default_rule'].get('description', 'Default conditions')
-            print(f"  {Fore.CYAN if HAS_COLOR else ''}Default Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
-            print(f"    {Fore.YELLOW if HAS_COLOR else ''}({rule_desc}){Style.RESET_ALL if HAS_COLOR else ''}")
+        # Try to find the most suitable base_rule using RuleEngine
+        best_rule = None
+        matched_features = []
+        
+        if reaction_smiles and 'base_rules' in details:
+            try:
+                from chemtools.rule.analyzer import FeatureAnalyzer
+                analyzer = FeatureAnalyzer()
+                
+                # Analyze reaction features
+                features = analyzer.analyze_reaction(reaction_smiles, combine_method="union")
+                
+                if features:
+                    # Evaluate each base_rule to find the best match
+                    # Scoring: Prefer more specific features over general ones
+                    # Feature specificity hierarchy (higher = more specific):
+                    feature_specificity = {
+                        'sp2_chloride_present': 10,
+                        'sp2_bromide_present': 10,
+                        'sp2_iodide_present': 10,
+                        'ortho_substitution_present': 8,
+                        'electron_poor_boronate_present': 8,
+                        'five_member_heteroaryl_halide_present': 8,
+                        'base_sensitive_functionality_present': 7,
+                        'acid_labile_group_present': 7,
+                        'sp2_halide_present': 3,
+                        'sp2_boron_present': 3,
+                    }
+                    
+                    rule_scores = []
+                    
+                    for rule in details.get('base_rules', []):
+                        if 'reactant_features' in rule:
+                            rule_features = rule['reactant_features']
+                            matches = []
+                            specificity_score = 0
+                            
+                            # Check 'all' conditions (must all match)
+                            if 'all' in rule_features:
+                                all_conditions = rule_features['all']
+                                all_match = all(features.get(f, False) for f in all_conditions)
+                                if all_match:
+                                    matches.extend(all_conditions)
+                                    # Sum specificity of matched features
+                                    specificity_score = sum(feature_specificity.get(f, 1) for f in all_conditions)
+                            
+                            # Check 'any' conditions (at least one must match)
+                            elif 'any' in rule_features:
+                                any_conditions = rule_features['any']
+                                any_matches = [f for f in any_conditions if features.get(f, False)]
+                                if any_matches:
+                                    matches.extend(any_matches)
+                                    # Use the highest specificity among matched features
+                                    specificity_score = max(feature_specificity.get(f, 1) for f in any_matches)
+                            
+                            # Score: (specificity, matched_count, -total_conditions)
+                            # Prefer: higher specificity first (better for challenging substrates), 
+                            # then more matches, then fewer total conditions (more focused)
+                            if matches:
+                                score = (specificity_score, len(matches), -len(rule_features.get('all', rule_features.get('any', []))))
+                                rule_scores.append((score, rule, matches))
+                    
+                    # Sort by score (descending) and pick the best
+                    if rule_scores:
+                        rule_scores.sort(key=lambda x: x[0], reverse=True)
+                        best_rule = rule_scores[0][1]
+                        matched_features = rule_scores[0][2]
+            except Exception as e:
+                # Silently fall back to default rule if feature analysis fails
+                pass
+        
+        # Use best matched rule or fall back to default
+        selected_rule = best_rule if best_rule else details.get('default_rule')
+        
+        if selected_rule and 'conditions' in selected_rule:
+            cond = selected_rule['conditions']
+            rule_name = selected_rule.get('name', 'Default conditions')
+            rule_desc = selected_rule.get('description', '')
+            
+            if best_rule and matched_features:
+                print(f"  {Fore.GREEN if HAS_COLOR else ''}✓ Best Matched Conditions:{Style.RESET_ALL if HAS_COLOR else ''} {Fore.YELLOW if HAS_COLOR else ''}{rule_name}{Style.RESET_ALL if HAS_COLOR else ''}")
+                print(f"    {Fore.CYAN if HAS_COLOR else ''}Matched features: {', '.join(matched_features)}{Style.RESET_ALL if HAS_COLOR else ''}")
+                if rule_desc:
+                    print(f"    ({rule_desc})")
+            else:
+                print(f"  {Fore.CYAN if HAS_COLOR else ''}Default Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
+                print(f"    {Fore.YELLOW if HAS_COLOR else ''}({rule_desc or rule_name}){Style.RESET_ALL if HAS_COLOR else ''}")
             
             if 'pd_source' in cond and cond['pd_source']:
                 print(f"    • Pd Source: {cond['pd_source']}")
@@ -193,15 +274,34 @@ def display_detailed_conditions(recommender: UnifiedRecommender, result: Recomme
             if 'atmosphere' in cond and cond['atmosphere']:
                 print(f"    • Atmosphere: {cond['atmosphere']}")
         
-        # Show alternative base rules (top 3)
+        # Show alternative base rules (top 3, excluding the best matched one)
         if 'base_rules' in details and details['base_rules']:
-            print(f"\n  {Fore.MAGENTA if HAS_COLOR else ''}Alternative Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
-            for i, rule in enumerate(details['base_rules'][:3], 1):
-                rule_name = rule.get('name', f'Alternative {i}')
-                rule_desc = rule.get('description', '')
-                print(f"    {i}. {Fore.YELLOW if HAS_COLOR else ''}{rule_name}{Style.RESET_ALL if HAS_COLOR else ''}")
-                if rule_desc:
-                    print(f"       {rule_desc}")
+            # Filter out the best matched rule if it was selected
+            alternative_rules = [r for r in details['base_rules'] if r != best_rule][:3]
+            
+            if alternative_rules:
+                print(f"\n  {Fore.MAGENTA if HAS_COLOR else ''}Alternative Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
+                for i, rule in enumerate(alternative_rules, 1):
+                    rule_name = rule.get('name', f'Alternative {i}')
+                    rule_desc = rule.get('description', '')
+                    
+                    # Check if this rule would match the substrate
+                    is_applicable = False
+                    if reaction_smiles and 'reactant_features' in rule:
+                        try:
+                            if features:  # Use features from above if available
+                                rule_features = rule['reactant_features']
+                                if 'all' in rule_features:
+                                    is_applicable = all(features.get(f, False) for f in rule_features['all'])
+                                elif 'any' in rule_features:
+                                    is_applicable = any(features.get(f, False) for f in rule_features['any'])
+                        except:
+                            pass
+                    
+                    match_indicator = f" {Fore.GREEN if HAS_COLOR else ''}✓{Style.RESET_ALL if HAS_COLOR else ''}" if is_applicable else ""
+                    print(f"    {i}. {Fore.YELLOW if HAS_COLOR else ''}{rule_name}{Style.RESET_ALL if HAS_COLOR else ''}{match_indicator}")
+                    if rule_desc:
+                        print(f"       {rule_desc}")
                 
                 if 'conditions' in rule:
                     cond = rule['conditions']
@@ -267,7 +367,7 @@ def display_results(
             print(f"   Family: {top_protocol.family}")
             print(f"   ID: {top_protocol.id}")
             print()
-            display_detailed_conditions(recommender, top_protocol)
+            display_detailed_conditions(recommender, top_protocol, reaction)
             print()
         else:
             print(f"{Fore.YELLOW if HAS_COLOR else ''}No protocol recommendations found.{Style.RESET_ALL if HAS_COLOR else ''}")
@@ -281,7 +381,7 @@ def display_results(
             print(f"   Family: {top_rule.family}")
             print(f"   ID: {top_rule.id}")
             print()
-            display_detailed_conditions(recommender, top_rule)
+            display_detailed_conditions(recommender, top_rule, reaction)
             print()
         else:
             print(f"{Fore.YELLOW if HAS_COLOR else ''}No rule recommendations found.{Style.RESET_ALL if HAS_COLOR else ''}")

@@ -206,6 +206,7 @@ class UnifiedRecommender:
         top_k: int = 5,
         min_similarity: float = 0.0,
         source_types: Optional[List[str]] = None,
+        validate_rules: bool = True,
     ) -> List[RecommendationResult]:
         """
         Recommend conditions for a reaction using DRFP similarity.
@@ -215,9 +216,19 @@ class UnifiedRecommender:
             top_k: Number of recommendations to return
             min_similarity: Minimum similarity threshold (0.0-1.0)
             source_types: Filter by source type(s): ["protocol"], ["rule"], or None (both)
+            validate_rules: If True, validates sources post-similarity:
+                - Rules: checks applies_if criteria (functional groups)
+                - Protocols: checks reaction_SMARTS patterns (exact transformations)
+                Default: True (recommended for chemical accuracy)
         
         Returns:
             List of RecommendationResult objects, sorted by similarity (descending)
+            
+        Note:
+            Post-similarity validation provides chemical appropriateness filtering:
+            - Rules use applies_if (functional group detection) to verify substrates
+            - Protocols use reaction_SMARTS (transformation matching) for exact validation
+            Both mechanisms fail-open if validation cannot be performed.
         
         Example:
             >>> results = recommender.recommend(
@@ -253,6 +264,20 @@ class UnifiedRecommender:
             (source, sim) for source, sim in source_similarities
             if sim >= min_similarity
         ]
+        
+        # Validate rules' applies_if criteria if requested
+        if validate_rules:
+            source_similarities = self._validate_rule_applicability(
+                source_similarities, 
+                reaction_smiles
+            )
+        
+        # Validate protocols' reaction_SMARTS patterns if requested
+        if validate_rules:
+            source_similarities = self._validate_protocol_smarts(
+                source_similarities,
+                reaction_smiles
+            )
         
         # Sort by similarity (descending) and take top_k
         source_similarities.sort(key=lambda x: x[1], reverse=True)
@@ -334,6 +359,236 @@ class UnifiedRecommender:
                     source_similarities.append((source, max_similarity))
         
         return source_similarities
+    
+    def _validate_rule_applicability(
+        self,
+        source_similarities: List[Tuple[Dict[str, Any], float]],
+        reaction_smiles: str
+    ) -> List[Tuple[Dict[str, Any], float]]:
+        """
+        Validate that rules meet their applies_if criteria based on detected features.
+        
+        This acts as a post-similarity filter to ensure recommended rules are
+        chemically appropriate for the query reaction.
+        
+        Args:
+            source_similarities: List of (source, similarity) tuples
+            reaction_smiles: Query reaction SMILES
+        
+        Returns:
+            Filtered list containing only rules that pass applies_if validation
+            (protocols are always included)
+        """
+        try:
+            from ..rule.analyzer import FeatureAnalyzer
+            analyzer = FeatureAnalyzer()
+            
+            # Detect features from the query reaction
+            features = analyzer.analyze_reaction(reaction_smiles, combine_method="union")
+            
+            if not features:
+                # If feature detection fails, return all sources (fail open)
+                return source_similarities
+            
+            validated = []
+            
+            for source, similarity in source_similarities:
+                # Protocols don't have applies_if - always include
+                if source['source_type'] == 'protocol':
+                    validated.append((source, similarity))
+                    continue
+                
+                # For rules, check applies_if criteria
+                if source['source_type'] == 'rule':
+                    # Load full rule details to get applies_if
+                    rule_details = self.get_source_details(source['id'])
+                    
+                    if not rule_details or 'applies_if' not in rule_details:
+                        # If no applies_if, include the rule (permissive)
+                        validated.append((source, similarity))
+                        continue
+                    
+                    applies_if = rule_details['applies_if']
+                    
+                    # Check if applies_if criteria are met
+                    if self._check_applies_if(features, applies_if):
+                        validated.append((source, similarity))
+                    # If not met, silently exclude this rule
+            
+            return validated
+            
+        except Exception:
+            # If validation fails for any reason, fail open (return all sources)
+            return source_similarities
+    
+    def _check_applies_if(self, features: Dict[str, bool], applies_if: Dict[str, Any]) -> bool:
+        """
+        Check if detected features satisfy applies_if criteria.
+        
+        Args:
+            features: Dictionary of detected features {feature_name: bool}
+            applies_if: applies_if dictionary with 'all' and/or 'any' keys
+        
+        Returns:
+            True if criteria are met, False otherwise
+        """
+        # Check 'all' conditions (all must be true)
+        if 'all' in applies_if:
+            all_conditions = applies_if['all']
+            if not all(features.get(condition, False) for condition in all_conditions):
+                return False
+        
+        # Check 'any' conditions (at least one must be true)
+        if 'any' in applies_if:
+            any_conditions = applies_if['any']
+            if not any(features.get(condition, False) for condition in any_conditions):
+                return False
+        
+        # If we get here, all criteria are satisfied
+        return True
+    
+    def _validate_protocol_smarts(
+        self,
+        source_similarities: List[Tuple[Dict[str, Any], float]],
+        reaction_smiles: str
+    ) -> List[Tuple[Dict[str, Any], float]]:
+        """
+        Validate protocols against their reaction_SMARTS patterns.
+        
+        For protocols with reaction_SMARTS field, checks if the pattern matches
+        the query reaction. This provides more accurate filtering than DRFP
+        similarity alone, as it verifies the exact transformation.
+        
+        Args:
+            source_similarities: List of (source, similarity) tuples
+            reaction_smiles: Query reaction SMILES
+        
+        Returns:
+            Filtered list excluding protocols whose reaction_SMARTS don't match
+            
+        Note:
+            - Fails open: if RDKit unavailable or matching fails, includes the protocol
+            - Rules are always included (no reaction_SMARTS validation)
+            - Protocols without reaction_SMARTS are always included
+        """
+        try:
+            from rdkit import Chem
+            from rdkit.Chem import AllChem
+        except ImportError:
+            # RDKit not available - fail open
+            return source_similarities
+        
+        try:
+            # Parse query reaction
+            if '>>' not in reaction_smiles:
+                # Invalid reaction SMILES - fail open
+                return source_similarities
+            
+            parts = reaction_smiles.split('>>')
+            reactants_smiles = parts[0].split('>')[-1]  # Handle agents if present
+            products_smiles = parts[1].split('>')[0]
+            
+            # Parse reactants
+            query_reactants = []
+            for r_smi in reactants_smiles.split('.'):
+                r_smi = r_smi.strip()
+                if r_smi:
+                    mol = Chem.MolFromSmiles(r_smi)
+                    if mol:
+                        query_reactants.append(mol)
+            
+            if not query_reactants:
+                # Can't parse reactants - fail open
+                return source_similarities
+            
+            validated = []
+            
+            for source, similarity in source_similarities:
+                # Rules don't have reaction_SMARTS - always include
+                if source['source_type'] == 'rule':
+                    validated.append((source, similarity))
+                    continue
+                
+                # For protocols, check reaction_SMARTS if present
+                if source['source_type'] == 'protocol':
+                    # Load full protocol details to get reaction_SMARTS
+                    protocol_details = self.get_source_details(source['id'])
+                    
+                    if not protocol_details:
+                        # Can't load details - fail open
+                        validated.append((source, similarity))
+                        continue
+                    
+                    reaction_data = protocol_details.get('reaction', {})
+                    reaction_smarts_list = reaction_data.get('reaction_SMARTS', [])
+                    
+                    if not reaction_smarts_list:
+                        # No reaction_SMARTS - include protocol (permissive)
+                        validated.append((source, similarity))
+                        continue
+                    
+                    # Try to match any of the reaction_SMARTS patterns
+                    matches = False
+                    for smarts in reaction_smarts_list:
+                        if self._check_reaction_smarts_match(smarts, query_reactants):
+                            matches = True
+                            break
+                    
+                    if matches:
+                        validated.append((source, similarity))
+                    # If no patterns match, silently exclude this protocol
+            
+            return validated
+            
+        except Exception:
+            # If validation fails for any reason, fail open (return all sources)
+            return source_similarities
+    
+    def _check_reaction_smarts_match(
+        self,
+        smarts: str,
+        query_reactants: List[Any]
+    ) -> bool:
+        """
+        Check if a reaction SMARTS pattern matches query reactants.
+        
+        Args:
+            smarts: Reaction SMARTS string (e.g., "IC=C.CC(O)(C#N)C>>N#CC=C")
+            query_reactants: List of RDKit Mol objects for query reactants
+        
+        Returns:
+            True if pattern matches, False otherwise
+        """
+        try:
+            from rdkit.Chem import AllChem
+            
+            # Parse reaction SMARTS
+            rxn = AllChem.ReactionFromSmarts(smarts)
+            if rxn is None:
+                # Invalid SMARTS - fail open
+                return True
+            
+            # Try to match reactants with pattern
+            # RunReactants returns products if reactants match the pattern
+            try:
+                products = rxn.RunReactants(tuple(query_reactants))
+                # If we get any products, the pattern matched
+                return len(products) > 0
+            except Exception:
+                # Matching failed - try reverse order of reactants
+                if len(query_reactants) >= 2:
+                    try:
+                        products = rxn.RunReactants(tuple(reversed(query_reactants)))
+                        return len(products) > 0
+                    except Exception:
+                        pass
+                
+                # Could not match - fail open (include protocol)
+                return True
+            
+        except Exception:
+            # Any error - fail open
+            return True
     
     def get_source_details(self, source_id: str) -> Optional[Dict[str, Any]]:
         """
