@@ -4,10 +4,9 @@
   "version": "2025-11-08",
   "evaluation": "Draft RCM rule derived to mirror the structure and intent of the C–N coupling rule file. Apply only when intramolecular alkene–alkene closure is plausible. Choose the first matching base_rule (top→down); if none match, use default_rule. Then apply any matching modifiers (tokens or plain‑text heuristics). Notes: Ru–NHC Hoveyda/Grubbs catalysts are broadly tolerant; remove ethylene to drive equilibrium; high dilution/slow addition for medium/large rings; benzoquinone (BQ) suppresses Ru–hydride isomerization; protect or attenuate strongly coordinating amines/thiols. Quench with ethyl vinyl ether at completion to deactivate Ru.",
   "applies_if": {
-    "all": [
-      "diene_present"
-    ],
     "any": [
+      "diene_present",
+      "alkene_present",
       "terminal_alkene_present",
       "internal_alkene_present"
     ]
