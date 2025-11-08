@@ -1173,20 +1173,21 @@ new_derived = [
     },
 ]
 
+expanded_features.setdefault("derived_shortcuts", [])
+existing_data.setdefault("derived_shortcuts", [])
 expanded_features["derived_shortcuts"].extend(new_derived)
 
 # Save the expanded JSON
 output_file = Path(__file__).parent.parent / "chemtools" / "featurizers" / "calculable_features.json"
 with open(output_file, 'w', encoding='utf-8') as f:
     json.dump(expanded_features, f, indent=2)
-
-print(f"✓ Expanded calculable_features.json")
+print("Expanded calculable_features.json")
 print(f"  Original features: {len(existing_data['features'])}")
 print(f"  New features added: {len(all_new_features)}")
 print(f"  Total features: {len(expanded_features['features'])}")
-print(f"  Original derived shortcuts: {len(existing_data['derived_shortcuts'])}")
+print(f"  Original derived shortcuts: {len(existing_data.get('derived_shortcuts', []))}")
 print(f"  New derived shortcuts: {len(new_derived)}")
-print(f"  Total derived shortcuts: {len(expanded_features['derived_shortcuts'])}")
+print(f"  Total derived shortcuts: {len(expanded_features.get('derived_shortcuts', []))}")
 print(f"  Version: {expanded_features['version']}")
 print(f"\nCategories added:")
 for cat in expanded_features['schema_notes']['categories']:

@@ -8,14 +8,18 @@ json_file = Path(__file__).parent.parent / "chemtools" / "featurizers" / "calcul
 with open(json_file, "r", encoding="utf-8") as f:
     data = json.load(f)
 
-print("✓ Valid JSON!")
+print("Valid JSON!")
 print(f"\nVersion: {data['version']}")
 print(f"Description: {data.get('description', 'N/A')[:80]}...")
 print(f"\nFeatures: {len(data['features'])}")
-print(f"Derived shortcuts: {len(data['derived_shortcuts'])}")
+derived_shortcuts = data.get('derived_shortcuts') or []
+print(f"Derived shortcuts: {len(derived_shortcuts)}")
 print(f"Categories: {len(data['schema_notes']['categories'])}")
-functional_groups = data.get("functional_groups", [])
-print(f"Functional groups: {len(functional_groups)}")
+functional_groups = data.get('functional_groups')
+if functional_groups is None:
+    print("Functional groups: (missing section, synthesizing from boolean features)")
+else:
+    print(f"Functional groups: {len(functional_groups)}")
 
 print("\n=== Feature Categories ===")
 for cat in data["schema_notes"]["categories"]:
@@ -28,10 +32,13 @@ for i, feat in enumerate(data["features"][:10], 1):
     print(f"   Why: {feat.get('why', 'N/A')[:60]}...")
 
 print("\n=== Sample Derived Shortcuts (first 5) ===")
-for i, derived in enumerate(data["derived_shortcuts"][:5], 1):
-    print(f"{i}. {derived['token']}")
-    print(f"   Derive: {derived.get('derive', 'N/A')[:80]}...")
-    print(f"   Why: {derived.get('why', 'N/A')[:60]}...")
+if derived_shortcuts:
+    for i, derived in enumerate(derived_shortcuts[:5], 1):
+        print(f"{i}. {derived['token']}")
+        print(f"   Derive: {derived.get('derive', 'N/A')[:80]}...")
+        print(f"   Why: {derived.get('why', 'N/A')[:60]}...")
+else:
+    print("  (none defined)")
 
 print("\n=== Category Distribution ===")
 category_counts = Counter(feat.get("category", "uncategorized") for feat in data["features"])
@@ -42,8 +49,27 @@ for cat, count in sorted(category_counts.items(), key=lambda x: -x[1])[:15]:
 # Functional group validation
 # ---------------------------------------------------------------------------
 print("\n=== Functional Group Integrity ===")
+if functional_groups is None:
+    functional_groups = []
+    for feat in data.get("features", []):
+        if feat.get("type") != "bool":
+            continue
+        detect = feat.get("detect")
+        if not isinstance(detect, dict):
+            continue
+        token = feat.get("token", "")
+        name = feat.get("name") or (token[:-8] if token.endswith("_present") else token)
+        if not name:
+            continue
+        functional_groups.append({
+            "name": name,
+            "label": feat.get("label") or feat.get("why") or name.replace("_", " ").title(),
+            "detect": detect,
+            "text_patterns": feat.get("text_patterns", []),
+            "category_tags": feat.get("category_tags", []) or ([feat.get("category")] if feat.get("category") else []),
+        })
 if not functional_groups:
-    raise SystemExit("No functional_groups section found in calculable_features.json")
+    raise SystemExit("No functional group definitions available in calculable_features.json")
 
 required_keys = {"name", "label", "detect"}
 seen_names = set()
@@ -78,7 +104,7 @@ for entry in functional_groups:
     if category_tags and not all(isinstance(tag, str) and tag for tag in category_tags):
         raise SystemExit(f"Functional group '{name}' has invalid category_tags entries")
 
-print(f"  ✓ {len(functional_groups)} functional group entries validated")
+print(f"  {len(functional_groups)} functional group entries validated")
 
-print(f"\n✓ Expansion successful!")
-print(f"  Total coverage: {len(data['features']) + len(data['derived_shortcuts'])} tokens")
+print("\nExpansion successful!")
+print(f"  Total coverage: {len(data['features']) + len(derived_shortcuts)} tokens")

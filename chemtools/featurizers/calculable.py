@@ -50,7 +50,8 @@ def get_feature_spec() -> Dict[str, Any]:
     Return the loaded feature specification JSON.
     
     Returns:
-        Dictionary containing version, schema_notes, features, and derived_shortcuts
+        Dictionary containing version, schema_notes, features, and optional
+        derived_shortcuts.
     """
     return _load_feature_spec()
 
