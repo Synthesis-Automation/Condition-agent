@@ -1,8 +1,30 @@
 {
-  "name": "Ullmann–Goldberg (Cu) C–N Coupling",
-  "reaction_type": "Ullmann C–N",
-  "version": "2025-11-06",
-  "evaluation": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: Ullmann/Goldberg systems are sensitive to base/solubility and mass transfer. Start with 5–10 mol% Cu(I) (CuI or Cu2O) and 10–40 mol% ligand (2–4× Cu). Use 2–3 equiv carbonate/phosphate base, ~10 vol solvent, 0.1–0.3 M, 90–110 °C for Ar–Br/I (110–130 °C for harder cases). Inert atmosphere preferred; modest water (5–10 equiv) can improve heterogeneous bases.",
+  "schema_version": "2.0",
+  "source_type": "rule",
+  "metadata": {
+    "id": "c_n_coupling_cu_v2",
+    "name": "Ullmann–Goldberg (Cu) C–N Coupling",
+    "version": "v2.0",
+    "created_date": "2025-11-08",
+    "status": "active",
+    "tags": []
+  },
+  "reaction": {
+    "family": "Ullmann_C–N",
+    "reference_reactions": [
+      "Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+      "Brc1ccc(C(F)(F)F)cc1.NCCCC>>c1ccc(NCCCC)cc1",
+      "Ic1ccncc1.NCc1ccccc1>>c1ccc(CNc2ccncc2)cc1",
+      "Ic1ccc(C#N)cc1.CN(C)C>>CN(C)c1ccc(C#N)cc1",
+      "Brc1ccccc1.c1cnccn1>>n1ccnc(-c2ccccc2)c1"
+    ],
+    "scope": {
+      "scope_type": "broad",
+      "compatible_functional_groups": [],
+      "incompatible_functional_groups": []
+    },
+    "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: Ullmann/Goldberg systems are sensitive to base/solubility and mass transfer. Start with 5–10 mol% Cu(I) (CuI or Cu2O) and 10–40 mol% ligand (2–4× Cu). Use 2–3 equiv carbonate/phosphate base, ~10 vol solvent, 0.1–0.3 M, 90–110 °C for Ar–Br/I (110–130 °C for harder cases). Inert atmosphere preferred; modest water (5–10 equiv) can improve heterogeneous bases."
+  },
   "applies_if": {
     "all": [
       "aryl_halide_present"
@@ -32,7 +54,9 @@
       "solvent_volume_vol_per_g": "≈10",
       "temperature_C": "90–110 for Ar–Br/I; 110–130 for difficult cases",
       "time_h": "6–18",
-      "additives": "Optional 5–10 equiv H2O to aid heterogeneous bases",
+      "additives": [
+        "Optional 5–10 equiv H2O to aid heterogeneous bases"
+      ],
       "atmosphere": "N2 or Ar (preferred)"
     }
   },
@@ -240,14 +264,5 @@
       ],
       "suggest": "Reactivity typically follows Ar–I ≫ Ar–Br » Ar–Cl. For bromides/iodides, try 90–110 °C; for chlorides, use oxalamide/NHC systems."
     }
-  ],
-  "reaction": {
-    "reference_reactions": [
-      "Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
-      "Brc1ccc(C(F)(F)F)cc1.NCCCC>>c1ccc(NCCCC)cc1",
-      "Ic1ccncc1.NCc1ccccc1>>c1ccc(CNc2ccncc2)cc1",
-      "Ic1ccc(C#N)cc1.CN(C)C>>CN(C)c1ccc(C#N)cc1",
-      "Brc1ccccc1.c1cnccn1>>n1ccnc(-c2ccccc2)c1"
-    ]
-  }
+  ]
 }

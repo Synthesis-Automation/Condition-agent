@@ -1,8 +1,30 @@
 {
-  "name": "S_NAr – Aromatic Nucleophilic Substitution",
-  "reaction_type": "S_NAr",
-  "version": "2025-11-07",
-  "evaluation": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nCore heuristics:\n• Activation governs rate: o/p‑NO2, CN, CF3, SO2R, COR/CO2R, N‑oxide, or heteroaryl (e.g., pyrimidines, triazines) enable S_NAr.\n• Leaving group trend (S_NAr): F ≫ Cl ≳ NO2 ≫ Br, I (rarely operative unless strongly activated).\n• Solvent: dry, polar aprotic (DMSO, DMF, DMAc, NMP). Keep water low.\n• Base: generate the conjugate base in situ (phenoxide/thiolate/amide/alkoxide). Adjust strength to nucleophile acidity and electrophile activation.\n• Steric hindrance near the reaction site or bulky nucleophiles typically require stronger base and/or higher temperature.\n• If no strong activation is present, consider metal‑catalyzed alternatives (Pd/Cu/Ni) instead of S_NAr.",
+  "schema_version": "2.0",
+  "source_type": "rule",
+  "metadata": {
+    "id": "snar_v2",
+    "name": "S_NAr – Aromatic Nucleophilic Substitution",
+    "version": "v2.0",
+    "created_date": "2025-11-08",
+    "status": "active",
+    "tags": []
+  },
+  "reaction": {
+    "family": "S_NAr",
+    "reference_reactions": [
+      "Fc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>O=[N+]([O-])c1ccc(Nc2ccccc2)cc1",
+      "Clc1ccnc(Cl)c1.NCCCC>>c1cc(NCCCC)nc(Cl)c1",
+      "Clc1cc([N+](=O)[O-])cc([N+](=O)[O-])c1.Oc1ccccc1>>O=[N+]([O-])c1cc(Oc2ccccc2)cc([N+](=O)[O-])c1",
+      "Clc1cccc[n+]1[O-].Nc1ccccc1>>c1ccc(Nc2cccc[n+]2[O-])cc1",
+      "Clc1c([N+](=O)[O-])cccc1[N+](=O)[O-].SCc1ccccc1>>O=[N+]([O-])c1cccc([N+](=O)[O-])c1SCc1ccccc1"
+    ],
+    "scope": {
+      "scope_type": "broad",
+      "compatible_functional_groups": [],
+      "incompatible_functional_groups": []
+    },
+    "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nCore heuristics:\n• Activation governs rate: o/p‑NO2, CN, CF3, SO2R, COR/CO2R, N‑oxide, or heteroaryl (e.g., pyrimidines, triazines) enable S_NAr.\n• Leaving group trend (S_NAr): F ≫ Cl ≳ NO2 ≫ Br, I (rarely operative unless strongly activated).\n• Solvent: dry, polar aprotic (DMSO, DMF, DMAc, NMP). Keep water low.\n• Base: generate the conjugate base in situ (phenoxide/thiolate/amide/alkoxide). Adjust strength to nucleophile acidity and electrophile activation.\n• Steric hindrance near the reaction site or bulky nucleophiles typically require stronger base and/or higher temperature.\n• If no strong activation is present, consider metal‑catalyzed alternatives (Pd/Cu/Ni) instead of S_NAr."
+  },
   "applies_if": {
     "all": [
       "aromatic_electrophile_present",
@@ -213,14 +235,5 @@
       ],
       "suggest": "Use milder base (K2CO3) at lower temperature, shorter times; for O‑nucleophiles prefer NaHCO3 where feasible."
     }
-  ],
-  "reaction": {
-    "reference_reactions": [
-      "Fc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>O=[N+]([O-])c1ccc(Nc2ccccc2)cc1",
-      "Clc1ccnc(Cl)c1.NCCCC>>c1cc(NCCCC)nc(Cl)c1",
-      "Clc1cc([N+](=O)[O-])cc([N+](=O)[O-])c1.Oc1ccccc1>>O=[N+]([O-])c1cc(Oc2ccccc2)cc([N+](=O)[O-])c1",
-      "Clc1cccc[n+]1[O-].Nc1ccccc1>>c1ccc(Nc2cccc[n+]2[O-])cc1",
-      "Clc1c([N+](=O)[O-])cccc1[N+](=O)[O-].SCc1ccccc1>>O=[N+]([O-])c1cccc([N+](=O)[O-])c1SCc1ccccc1"
-    ]
-  }
+  ]
 }

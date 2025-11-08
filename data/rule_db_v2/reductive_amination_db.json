@@ -1,8 +1,33 @@
 {
-  "name": "Reductive Amination (one-pot)",
-  "reaction_type": "Reductive Amination",
-  "version": "2025-11-07",
-  "evaluation": "Use this rule set ONLY if 'applies_if' tokens are present.\nEvaluate base_rules top→down; if none match, use default_rule.\nAfter choosing a rule, scan all modifiers and apply any whose 'when' tokens or symptoms match.\nGeneral guidance: form the imine/iminium efficiently (remove water or use a Lewis acid), keep pH ~5–6 for borohydrides, and avoid H2 routes when benzyl/CBz/nitro must survive.\n",
+  "schema_version": "2.0",
+  "source_type": "rule",
+  "metadata": {
+    "id": "reductive_amination_v2",
+    "name": "Reductive Amination (one-pot)",
+    "version": "v2.0",
+    "created_date": "2025-11-08",
+    "status": "active",
+    "tags": [
+      "reductive-amination",
+      "amine-synthesis"
+    ]
+  },
+  "reaction": {
+    "family": "Reductive_Amination",
+    "reference_reactions": [
+      "O=Cc1ccccc1.Nc1ccccc1>>c1ccc(NCc2ccccc2)cc1",
+      "O=CCCCC.NCc1ccccc1>>c1ccc(CNCCCCC)cc1",
+      "O=C(C)c1ccccc1.CN(C)C>>CN(C)C(C)c1ccccc1",
+      "O=C1CCCCC1.Nc1ccccc1>>c1ccc(NC2CCCCC2)cc1",
+      "O=Cc1ccc(OC)cc1.C1CCNCC1>>COc1ccc(CN2CCCCC2)cc1"
+    ],
+    "scope": {
+      "scope_type": "broad",
+      "compatible_functional_groups": [],
+      "incompatible_functional_groups": []
+    },
+    "notes": "Use this rule set ONLY if 'applies_if' tokens are present.\nEvaluate base_rules top→down; if none match, use default_rule.\nAfter choosing a rule, scan all modifiers and apply any whose 'when' tokens or symptoms match.\nGeneral guidance: form the imine/iminium efficiently (remove water or use a Lewis acid), keep pH ~5–6 for borohydrides, and avoid H2 routes when benzyl/CBz/nitro must survive.\n"
+  },
   "applies_if": {
     "all": [
       "carbonyl_present",
@@ -23,7 +48,9 @@
     "conditions": {
       "reducing_agent": "NaBH(OAc)3 (STAB) 1.5–2.5 equiv",
       "acid_or_buffer": "AcOH 0.5–2.0 equiv (target pH 5–6)",
-      "additives": "3 Å MS optional; dry glassware",
+      "additives": [
+        "3 Å MS optional; dry glassware"
+      ],
       "solvent": "DCE or MeCN (dry)",
       "solvent_volume_vol_per_g": "≈8–12",
       "temperature_C": "0–25",
@@ -91,7 +118,9 @@
       "conditions": {
         "lewis_acid": "Ti(OiPr)4 1.2–2.0 equiv",
         "reducing_agent": "NaBH(OAc)3 2.0–2.5 equiv",
-        "additives": "4 Å MS optional",
+        "additives": [
+          "4 Å MS optional"
+        ],
         "solvent": "THF or DCE (dry)",
         "temperature_C": "40–60",
         "time_h": "4–16",
@@ -291,14 +320,5 @@
       ],
       "suggest": "Use DCE or toluene; add sieves or Ti(OiPr)4 to drive imine formation."
     }
-  ],
-  "reaction": {
-    "reference_reactions": [
-      "O=Cc1ccccc1.Nc1ccccc1>>c1ccc(NCc2ccccc2)cc1",
-      "O=CCCCC.NCc1ccccc1>>c1ccc(CNCCCCC)cc1",
-      "O=C(C)c1ccccc1.CN(C)C>>CN(C)C(C)c1ccccc1",
-      "O=C1CCCCC1.Nc1ccccc1>>c1ccc(NC2CCCCC2)cc1",
-      "O=Cc1ccc(OC)cc1.C1CCNCC1>>COc1ccc(CN2CCCCC2)cc1"
-    ]
-  }
+  ]
 }

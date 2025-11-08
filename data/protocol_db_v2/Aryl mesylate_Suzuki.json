@@ -1,0 +1,205 @@
+[
+  {
+    "schema_version": "2.0",
+    "source_type": "protocol",
+    "metadata": {
+      "id": "palladium_catalyzed_buchwald_hartwig_amination_and",
+      "name": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
+      "version": "2015.92.0",
+      "description": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
+      "tags": [
+        "Suzuki",
+        "aryl mesylate",
+        "phenylboronic acid",
+        "Pd(OAc)2",
+        "CM-phos",
+        "K3PO4",
+        "tert-butanol",
+        "OrgSyn v92p0195 Step C",
+        "Suzuki_Miyaura_Cross_Coupling_OMs"
+      ],
+      "created_date": "2025-11-08T20:06:45.971712",
+      "last_modified": "2025-11-08T20:06:45.971712",
+      "source_reference": {
+        "title": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
+        "journal": "Organic Syntheses",
+        "volume": 92,
+        "pages": "195-212",
+        "year": 2015,
+        "doi": "10.15227/orgsyn.092.0195",
+        "url": "https://www.orgsyn.org/demo.aspx?prep=v92p0195"
+      }
+    },
+    "reaction": {
+      "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
+      "family": "Suzuki_Miyaura_Cross_Coupling_OMs",
+      "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 °C, 24 h.",
+      "reaction_SMARTS": [
+        "[c,n,o,s]OS(=O)(=O)C.OB(O)[c,n,o,s]>>[c,n,o,s][c,n,o,s]"
+      ],
+      "compatible_functional_groups": [
+        "aromatic"
+      ],
+      "incompatible_functional_groups": [
+        "carboxylic acid"
+      ]
+    },
+    "reaction_setup": [
+      {
+        "chemicals": [
+          {
+            "name": "Palladium(II) acetate",
+            "abbreviation": "Pd(OAc)2",
+            "cas": "3375-31-3",
+            "smiles": "CC(=O)[O-].[O-]C(=O)C.[Pd+2]",
+            "amount": {
+              "weight_g": 0.0393,
+              "mmol": 0.175,
+              "volume_ml": null,
+              "equivalents": 0.01
+            },
+            "role": "metal_catalyst"
+          },
+          {
+            "name": "CM-phos",
+            "abbreviation": null,
+            "cas": null,
+            "smiles": null,
+            "amount": {
+              "weight_g": 0.282,
+              "mmol": 0.7,
+              "volume_ml": null,
+              "equivalents": 0.04
+            },
+            "role": "ligand"
+          },
+          {
+            "name": "Dichloromethane",
+            "abbreviation": "CH2Cl2",
+            "cas": "75-09-2",
+            "smiles": "ClCCl",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 18.0,
+              "equivalents": null
+            },
+            "role": "solvent"
+          },
+          {
+            "name": "Triethylamine",
+            "abbreviation": "Et3N",
+            "cas": "121-44-8",
+            "smiles": "CCN(CC)CC",
+            "amount": {
+              "weight_g": 1.31,
+              "mmol": 12.9,
+              "volume_ml": 1.8,
+              "equivalents": 0.74
+            },
+            "role": "base"
+          },
+          {
+            "name": "Potassium phosphate (tribasic)",
+            "abbreviation": "K3PO4",
+            "cas": "7778-53-2",
+            "smiles": null,
+            "amount": {
+              "weight_g": 11.1,
+              "mmol": 52.5,
+              "volume_ml": null,
+              "equivalents": 3.0
+            },
+            "role": "base"
+          },
+          {
+            "name": "Phenylboronic acid",
+            "abbreviation": null,
+            "cas": "98-80-6",
+            "smiles": "B(O)(O)c1ccccc1",
+            "amount": {
+              "weight_g": 4.27,
+              "mmol": 35.0,
+              "volume_ml": null,
+              "equivalents": 2.0
+            },
+            "role": "starting_material"
+          },
+          {
+            "name": "4-(tert-Butyl)phenyl methanesulfonate",
+            "abbreviation": null,
+            "cas": null,
+            "smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1",
+            "amount": {
+              "weight_g": 3.99,
+              "mmol": 17.5,
+              "volume_ml": null,
+              "equivalents": 1.0
+            },
+            "role": "starting_material"
+          },
+          {
+            "name": "tert-Butyl alcohol",
+            "abbreviation": "tBuOH",
+            "cas": "75-65-0",
+            "smiles": "CC(C)(C)O",
+            "amount": {
+              "weight_g": null,
+              "mmol": null,
+              "volume_ml": 88.0,
+              "equivalents": null
+            },
+            "role": "solvent"
+          }
+        ],
+        "conditions": [
+          {
+            "temperature_C": 50.0,
+            "time_h": 0.083,
+            "atmosphere": "N2; pre-activation in CH2Cl2/Et3N (sealed flask)"
+          },
+          {
+            "temperature_C": 25.0,
+            "time_h": 0.167,
+            "atmosphere": "N2; after adding tBuOH, pre-stir 10 min at rt"
+          },
+          {
+            "temperature_C": 120.0,
+            "time_h": 24.0,
+            "atmosphere": "N2; oil bath; sealed Schlenk flask"
+          }
+        ]
+      }
+    ],
+    "workup_and_purification": [
+      {
+        "quench": [],
+        "workup": [
+          {
+            "step": "Liquid–liquid extraction",
+            "details": "Transfer to separatory funnel; rinse flask with diethyl ether (2 × 50 mL), brine (2 × 50 mL), water (50 mL), and ether (50 mL); separate layers; extract aqueous with ether (2 × 50 mL)."
+          },
+          {
+            "step": "Drying",
+            "details": "Dry combined organic extracts over anhydrous sodium sulfate (5 g); filter and wash sodium sulfate with ether (50 mL)."
+          },
+          {
+            "step": "Concentration",
+            "details": "Concentrate under reduced pressure (40 °C, 15 mmHg) to give brown oil."
+          }
+        ],
+        "purification": [
+          {
+            "method": "Flash column chromatography",
+            "stationary_phase": "Silica gel (100 g; column 4.5 cm × 12 cm)",
+            "eluent": "Hexane (start with 75 mL; continue with hexane until product elutes)",
+            "fractions": "Collect 100-mL fractions; combine product-containing fractions"
+          }
+        ],
+        "notes": [
+          "Product: 4-(tert-Butyl)-1,1'-biphenyl obtained as white solid, 2.20–2.90 g (60–79%)."
+        ]
+      }
+    ]
+  }
+]
