@@ -13,12 +13,16 @@ Usage:
     # Direct query
     python app/unified_interactive_cli.py --rxn "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
     
+    # Split mode - show top protocol and top rule with detailed conditions
+    python app/unified_interactive_cli.py --rxn "..." --split
+    
     # With custom parameters
     python app/unified_interactive_cli.py --rxn "..." -k 5 --min-sim 0.5 --type rule
 
 Features:
     - Interactive REPL with command history
     - Real-time parameter adjustment
+    - Split mode: Shows top protocol + top rule with full detailed conditions
     - Detailed or compact output modes
     - Full source detail loading
     - Statistics display
@@ -105,29 +109,59 @@ def display_detailed_conditions(recommender: UnifiedRecommender, result: Recomme
     
     # Extract key condition fields based on source type
     if result.source_type == "protocol":
-        # Protocol has structured conditions
-        if 'conditions' in details:
-            cond = details['conditions']
-            print(f"  {Fore.CYAN if HAS_COLOR else ''}Recommended Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
-            
-            if 'solvent' in cond and cond['solvent']:
-                print(f"    • Solvent: {cond['solvent']}")
-            if 'temperature' in cond and cond['temperature']:
-                print(f"    • Temperature: {cond['temperature']}")
-            if 'catalyst' in cond and cond['catalyst']:
-                print(f"    • Catalyst: {cond['catalyst']}")
-            if 'ligand' in cond and cond['ligand']:
-                print(f"    • Ligand: {cond['ligand']}")
-            if 'base' in cond and cond['base']:
-                print(f"    • Base: {cond['base']}")
-            if 'time' in cond and cond['time']:
-                print(f"    • Time: {cond['time']}")
-            if 'atmosphere' in cond and cond['atmosphere']:
-                print(f"    • Atmosphere: {cond['atmosphere']}")
+        # Protocol has reaction_setup with chemicals and conditions
+        print(f"  {Fore.CYAN if HAS_COLOR else ''}Protocol Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
         
-        # Show yield if available
-        if 'yield_range' in details and details['yield_range']:
-            print(f"    • Expected Yield: {details['yield_range']}")
+        if 'reaction_setup' in details and details['reaction_setup']:
+            setup = details['reaction_setup'][0]  # First setup step
+            
+            # Extract chemicals by role
+            chemicals = setup.get('chemicals', [])
+            catalyst_chems = [c for c in chemicals if 'catalyst' in c.get('role', '').lower()]
+            solvent_chems = [c for c in chemicals if 'solvent' in c.get('role', '').lower()]
+            base_chems = [c for c in chemicals if 'base' in c.get('role', '').lower()]
+            ligand_chems = [c for c in chemicals if 'ligand' in c.get('role', '').lower()]
+            
+            if catalyst_chems:
+                cat_names = ', '.join([c['name'] for c in catalyst_chems])
+                print(f"    • Catalyst: {cat_names}")
+            
+            if ligand_chems:
+                lig_names = ', '.join([c['name'] for c in ligand_chems])
+                print(f"    • Ligand: {lig_names}")
+            
+            if solvent_chems:
+                solv_names = ', '.join([c['name'] for c in solvent_chems])
+                print(f"    • Solvent: {solv_names}")
+            
+            if base_chems:
+                base_names = ', '.join([c['name'] for c in base_chems])
+                print(f"    • Base: {base_names}")
+            
+            # Extract conditions (temperature, time, atmosphere)
+            conditions = setup.get('conditions', [])
+            if conditions:
+                # Show main reaction conditions (usually last step)
+                main_cond = conditions[-1] if conditions else {}
+                
+                if 'temperature_C' in main_cond:
+                    print(f"    • Temperature: {main_cond['temperature_C']} °C")
+                if 'time_h' in main_cond:
+                    print(f"    • Time: {main_cond['time_h']} h")
+                if 'atmosphere' in main_cond:
+                    atm = main_cond['atmosphere']
+                    # Simplify atmosphere display
+                    if 'N2' in atm or 'nitrogen' in atm.lower():
+                        atm_simple = 'N₂ (inert atmosphere)'
+                    elif 'Ar' in atm or 'argon' in atm.lower():
+                        atm_simple = 'Ar (inert atmosphere)'
+                    else:
+                        atm_simple = atm
+                    print(f"    • Atmosphere: {atm_simple}")
+        
+        # Show yield if available in metadata
+        if 'metadata' in details and 'yield_percent' in details['metadata']:
+            print(f"    • Reported Yield: {details['metadata']['yield_percent']}%")
     
     elif result.source_type == "rule":
         # Rule has default_rule and base_rules with conditions
