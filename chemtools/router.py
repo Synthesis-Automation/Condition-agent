@@ -118,7 +118,15 @@ def _detect_agent_metals(agents: List[Dict[str, Any]]) -> Set[str]:
 
 
 def _rule_hits(reactants: List[str]) -> Dict[str, bool]:
-    return _functional_groups.detect_any(reactants, group_subset=_ROUTER_GROUPS)
+    token_hits = _functional_groups.detect_any(reactants, group_subset=_ROUTER_GROUPS)
+    result: Dict[str, bool] = {}
+    for legacy in _ROUTER_GROUPS:
+        token = _functional_groups._resolve_group_token(legacy)  # type: ignore[attr-defined]
+        if token is None:
+            result[legacy] = False
+        else:
+            result[legacy] = bool(token_hits.get(token))
+    return result
 
 
 def _detect_reducing_agent(reactants: List[str]) -> Optional[str]:

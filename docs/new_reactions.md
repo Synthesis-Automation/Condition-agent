@@ -1,3 +1,12 @@
+pls follow the example of C_N coupling rule json, make json rule for ring closing metathesis
+
+
+
+it could inlcude pd, cu and other metal catalyzed reactions. part of data could be use table 5 in the attached pdf file. 
+
+
+
+
 
 
 for Ullman C-N bond formation reaction (copper catalyzed), please list several most common conditions and when they should be used (e.g. chiral acids, reaction of steric substrate)

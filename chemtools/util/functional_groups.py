@@ -46,6 +46,36 @@ _UNCATEGORIZED_TAG = "other"
 _SPEC_PATH = Path(__file__).resolve().parents[1] / "featurizers" / "calculable_features.json"
 _DETECTION_CACHE_SIZE = 4096
 
+# Fallback SMARTS for legacy group names still referenced by router/tests
+_LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
+    "acid": ("C(=O)[OH]",),
+    "acyl_halide": ("[CX3](=O)[Cl,Br]",),
+    "alcohol": ("[CX4][OX2H]",),
+    "aldehyde": ("[CX3H](=O)",),
+    "alkene": ("C=C",),
+    "alkoxide": ("[O-][C,H]",),
+    "alkyl_halide": ("[CX4][Cl,Br,I]",),
+    "alpha_beta_unsaturated": ("C=C-[CX3]=O",),
+    "aryl_halide": ("[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",),
+    "borane": ("[BH3,BH2,BH]",),
+    "boron": ("[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]",),
+    "carbonyl": ("[CX3]=O",),
+    "conjugated_diene": ("C=C-C=C",),
+    "cyanide": ("[C-]#N",),
+    "ester": ("[CX3](=O)[OX2][C,H]",),
+    "grignard": ("[C,c][Mg][Br,Cl,I]",),
+    "iodide": ("[I-]",),
+    "ketone": ("[CX3](=O)[C]",),
+    "nucleophile_n": ("[NX3;H1,H2]", "[nH]"),
+    "nucleophile_o": ("[OX2H]",),
+    "nucleophile_s": ("[SX2H]",),
+    "organolithium": ("[C,c][Li]",),
+    "organozinc": ("[C,c][Zn][Br,Cl,I]",),
+    "terminal_alkyne": ("C#C[H]", "[C;H]#C"),
+    "triflate": ("OS(=O)(=O)C(F)(F)F",),
+    "vinyl_halide": ("C=C[Cl,Br,I]",),
+}
+
 
 @lru_cache(maxsize=1)
 def _load_feature_spec() -> Dict[str, object]:
@@ -110,6 +140,19 @@ def _load_group_definitions() -> Dict[str, FunctionalGroupDef]:
         if not isinstance(feature.get("detect"), dict):
             continue
         register(feature)
+
+    for legacy_name, patterns in _LEGACY_GROUP_FALLBACKS.items():
+        if legacy_name in defs:
+            continue
+        smarts = tuple(patterns)
+        defs[legacy_name] = FunctionalGroupDef(
+            name=legacy_name,
+            token=f"{legacy_name}_present",
+            label=legacy_name.replace("_", " ").title(),
+            smarts=smarts,
+            text_patterns=(),
+            category_tags=(),
+        )
 
     return defs
 
