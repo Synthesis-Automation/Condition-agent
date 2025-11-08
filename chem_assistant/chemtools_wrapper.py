@@ -129,10 +129,10 @@ from .constraint_parser import (
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _RULE_DB_SEARCH_PATHS: List[Path] = [
-    _REPO_ROOT / "data" / "rule_db",
+    _REPO_ROOT / "data" / "rule_db_v2",  # Updated to v2
     _REPO_ROOT / "data",
     _REPO_ROOT,
-    Path.cwd() / "data" / "rule_db",
+    Path.cwd() / "data" / "rule_db_v2",  # Updated to v2
     Path.cwd() / "data",
     Path.cwd(),
 ]
@@ -2909,6 +2909,7 @@ class UnifiedRecommenderInput(BaseModel):
     top_k: int = Field(default=5, description="Number of recommendations to return (max 10)", ge=1, le=10)
     min_similarity: float = Field(default=0.0, description="Minimum DRFP similarity threshold (0.0-1.0)", ge=0.0, le=1.0)
     source_type: Optional[str] = Field(default=None, description="Filter by source: 'protocol' (full experimental procedures) or 'rule' (general guidelines)")
+    validate_rules: bool = Field(default=True, description="Enable chemical validation: applies_if for rules, reaction_SMARTS for protocols")
 
 
 @tool(args_schema=UnifiedRecommenderInput)
@@ -2916,17 +2917,20 @@ def unified_recommender_tool(
     reaction_smiles: str,
     top_k: int = 5,
     min_similarity: float = 0.0,
-    source_type: Optional[str] = None
+    source_type: Optional[str] = None,
+    validate_rules: bool = True
 ) -> Dict[str, Any]:
     """
-    Find similar reactions and condition recommendations using DRFP similarity.
+    Find similar reactions and condition recommendations using DRFP similarity with chemical validation.
     
     This tool provides a unified search across both:
     - **Protocols**: Full experimental procedures from literature
     - **Rules**: General reaction guidelines and best practices
     
     Uses DRFP (Differentiable Reaction Fingerprints) for reaction similarity,
-    providing highly relevant matches based on structural similarity.
+    with optional post-similarity validation for chemical appropriateness:
+    - **Protocols**: Validated using reaction_SMARTS patterns (exact transformation matching)
+    - **Rules**: Validated using applies_if criteria (functional group detection)
     
     **When to use this tool:**
     - Need recommendations for an unfamiliar reaction
@@ -2939,11 +2943,18 @@ def unified_recommender_tool(
     - `rule`: Returns only general reaction guidelines
     - None (default): Returns both protocols and rules, ranked by similarity
     
+    **Validation (default: enabled):**
+    - Filters out chemically inappropriate recommendations
+    - Protocols: Checks if reaction_SMARTS patterns match the query transformation
+    - Rules: Checks if detected features meet applies_if criteria
+    - Recommended to keep enabled for chemical accuracy
+    
     Args:
         reaction_smiles: Full reaction SMILES (reactants>>products)
         top_k: Number of results to return (1-10, default 5)
         min_similarity: Minimum similarity threshold (0.0-1.0, default 0.0)
         source_type: Filter by 'protocol', 'rule', or None for both
+        validate_rules: Enable chemical validation (default True, recommended)
     
     Returns:
         Dict with ranked recommendations including similarity scores, metadata,
@@ -2953,7 +2964,8 @@ def unified_recommender_tool(
         >>> unified_recommender_tool(
         ...     reaction_smiles="Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
         ...     top_k=3,
-        ...     min_similarity=0.3
+        ...     min_similarity=0.3,
+        ...     validate_rules=True
         ... )
         {
             "success": True,
@@ -2964,12 +2976,14 @@ def unified_recommender_tool(
                     "source_type": "rule",
                     "family": "Buchwald–Hartwig_C–N",
                     "similarity": 0.82,
-                    "tags": ["C-N-coupling", "amination", "cross-coupling"]
+                    "tags": ["C-N-coupling", "amination", "cross-coupling"],
+                    "validated": true
                 },
                 ...
             ],
             "query": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
-            "count": 3
+            "count": 3,
+            "validation_enabled": true
         }
     """
     if not UNIFIED_RECOMMENDER_AVAILABLE:
@@ -2986,12 +3000,13 @@ def unified_recommender_tool(
         if source_type:
             source_types = [source_type.lower()]
         
-        # Get recommendations
+        # Get recommendations with validation
         results = recommender.recommend(
             reaction_smiles=reaction_smiles,
             top_k=top_k,
             min_similarity=min_similarity,
-            source_types=source_types
+            source_types=source_types,
+            validate_rules=validate_rules  # Enable chemical validation
         )
         
         # Format results for LLM
@@ -3006,12 +3021,14 @@ def unified_recommender_tool(
                 "similarity": round(result.similarity, 3),
                 "tags": result.tags,
                 "version": result.version,
+                "validated": validate_rules  # Indicate if validation was applied
             })
         
         return _success_response({
             "recommendations": formatted_results,
             "query": reaction_smiles,
             "count": len(formatted_results),
+            "validation_enabled": validate_rules,
             "filters": {
                 "top_k": top_k,
                 "min_similarity": min_similarity,
