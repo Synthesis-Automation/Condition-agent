@@ -61,6 +61,7 @@ _LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
     "boron": ("[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]",),
     "carbonyl": ("[CX3]=O",),
     "conjugated_diene": ("C=C-C=C",),
+    "diene": ("C=C",),  # General diene pattern - molecule with two or more alkene groups
     "cyanide": ("[C-]#N",),
     "ester": ("[CX3](=O)[OX2][C,H]",),
     "grignard": ("[C,c][Mg][Br,Cl,I]",),
@@ -71,6 +72,8 @@ _LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
     "nucleophile_s": ("[SX2H]",),
     "organolithium": ("[C,c][Li]",),
     "organozinc": ("[C,c][Zn][Br,Cl,I]",),
+    "phenol": ("[OH;$([OH]c1ccccc1)]",),  # Phenol pattern
+    "terminal_alkene": ("C=C",),  # Terminal alkene pattern
     "terminal_alkyne": ("C#C[H]", "[C;H]#C"),
     "triflate": ("OS(=O)(=O)C(F)(F)F",),
     "vinyl_halide": ("C=C[Cl,Br,I]",),

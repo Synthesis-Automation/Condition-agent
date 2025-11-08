@@ -259,7 +259,18 @@ class _DetectionEngine:
         elif h.get("alpha_beta_unsaturated"):
             fam, conf = "michael_addition", 0.65
         
-        # PRIORITY 9: Cycloaddition
+        # PRIORITY 9: Ring-Closing Metathesis (RCM)
+        # RCM involves diene substrate (intramolecular) with Ru catalyst
+        elif h.get("diene") or (h.get("alkene") and len(self.reactants) == 1):
+            # Check for Ru catalyst indicators
+            is_ru_catalyst = any("ru" in agent.get("input", "").lower() or 
+                                "grubbs" in agent.get("input", "").lower() or
+                                "hoveyda" in agent.get("input", "").lower()
+                                for agent in self.agents)
+            if is_ru_catalyst:
+                fam, conf = "ring_closing_metathesis", 0.88
+        
+        # PRIORITY 10: Cycloaddition
         elif h.get("conjugated_diene") and h.get("alkene"):
             fam, conf = "diels_alder", 0.85
         
