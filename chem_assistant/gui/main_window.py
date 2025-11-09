@@ -360,8 +360,68 @@ class ChemAssistantWindow(QMainWindow):
             return
         self.history = history
         clean_response = self._process_agent_image_markup(response)
+        
+        # Auto-detect and render SMILES from response
+        self._auto_render_from_response(response)
+        
         self.append_chat("Agent", clean_response)
         self.append_log("Agent response received.")
+
+    def _auto_render_from_response(self, text: str) -> None:
+        """Automatically detect and render SMILES strings from agent response."""
+        if not text:
+            return
+        
+        # Pattern to match SMILES strings in various contexts
+        # Look for reaction SMILES (contains >>)
+        reaction_patterns = [
+            r'(?:reaction|rxn)[\s:=]+([A-Za-z0-9@+\-\[\]\(\)=#$\.>]+>>[\S]+)',
+            r'(?:SMILES|smiles)[\s:=]+([A-Za-z0-9@+\-\[\]\(\)=#$\.>]+>>[\S]+)',
+            r'`([A-Za-z0-9@+\-\[\]\(\)=#$\.>]+>>[A-Za-z0-9@+\-\[\]\(\)=#$\.>]+)`',
+            r'"([A-Za-z0-9@+\-\[\]\(\)=#$\.>]+>>[A-Za-z0-9@+\-\[\]\(\)=#$\.>]+)"',
+            r'\b([A-Za-z][A-Za-z0-9@+\-\[\]\(\)=#$\.]{10,}>>[A-Za-z0-9@+\-\[\]\(\)=#$\.>]+)\b',
+        ]
+        
+        # Look for molecule SMILES (no >>)
+        molecule_patterns = [
+            r'(?:compound|molecule|structure)[\s:=]+([A-Za-z0-9@+\-\[\]\(\)=#$\.]{3,})',
+            r'(?:SMILES|smiles)[\s:=]+([A-Za-z][A-Za-z0-9@+\-\[\]\(\)=#$\.]{2,})',
+            r'`([A-Za-z][A-Za-z0-9@+\-\[\]\(\)=#$\.]{5,})`',
+        ]
+        
+        # Try to find reaction SMILES first (higher priority)
+        for pattern in reaction_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                smiles = match.group(1).strip()
+                # Validate it looks like a reaction
+                if '>>' in smiles and len(smiles) > 10:
+                    self.render_image_from_smiles(
+                        "reaction",
+                        smiles,
+                        source="auto-detected",
+                        silent=True
+                    )
+                    return
+        
+        # If no reaction found, try molecule SMILES
+        for pattern in molecule_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                smiles = match.group(1).strip()
+                # Skip if it contains reaction arrow or looks like plain text
+                if '>>' not in smiles and len(smiles) >= 5:
+                    # Basic validation: should start with letter or bracket
+                    # and contain typical SMILES characters
+                    if (smiles[0].isalpha() or smiles[0] in '[(') and \
+                       any(c in smiles for c in '()[]=#123456'):
+                        self.render_image_from_smiles(
+                            "molecule",
+                            smiles,
+                            source="auto-detected",
+                            silent=True
+                        )
+                        return
 
     def _process_agent_image_markup(self, text: str) -> str:
         if not text:
