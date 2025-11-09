@@ -1,0 +1,5 @@
+/automation on
+/scale 2.0
+/k 3
+CCBr.c1ccccc1B(O)O>>CCc1ccccc1
+/exit
