@@ -459,16 +459,28 @@ def _evaluate_derived_feature(derive_expr: str, base_features: Dict[str, Any]) -
     # Replace all comparisons with True/False
     expr = re.sub(comparison_pattern, evaluate_comparison, expr)
     
-    # Handle parentheses recursively
-    while '(' in expr:
-        # Find innermost parenthesized expression
-        start = expr.rfind('(')
-        end = expr.find(')', start)
-        if end == -1:
+    # Handle parentheses recursively - but only expression grouping parens,
+    # not parentheses that are part of token names (e.g., ArB(OH)2_reactant)
+    # Strategy: Look for '(' preceded by whitespace or start of string, 
+    # or '(' at position 0, indicating expression grouping.
+    # Token-name parens will always have a word character before them.
+    max_iterations = 100  # Prevent infinite loops
+    iteration = 0
+    while iteration < max_iterations:
+        iteration += 1
+        # Find parentheses that are expression grouping (preceded by space, operator, or start)
+        # Pattern: (?:^|[\s]) means start of string or whitespace
+        match = re.search(r'(\s|^)\(([^()]+)\)', expr)
+        if not match:
             break
-        inner_expr = expr[start+1:end]
+        
+        # Extract and evaluate the inner expression
+        prefix = match.group(1) if match.group(1) else ''
+        inner_expr = match.group(2)
         inner_result = _evaluate_derived_feature(inner_expr, base_features)
-        expr = expr[:start] + str(inner_result) + expr[end+1:]
+        
+        # Replace the matched portion
+        expr = expr[:match.start()] + prefix + str(inner_result) + expr[match.end():]
     
     # Replace True/False strings with actual booleans
     expr = expr.replace('True', 'true_token').replace('False', 'false_token')
@@ -722,6 +734,170 @@ def feature_summary(smiles: str) -> str:
     return "\n".join(lines)
 
 
+# ============================================================================
+# Reactant Type Utility Functions
+# ============================================================================
+
+def get_reactant_type_features(smiles: str) -> Dict[str, Any]:
+    """
+    Extract only reactant type features from a molecule.
+    
+    Returns dict with both member-level and category-level reactant types:
+    {
+        'ArBr_reactant': True,
+        'ArX_reactant': True,
+        'member_types': ['ArBr'],
+        'categories': ['ArX*'],
+        ...
+    }
+    
+    Args:
+        smiles: SMILES string of the molecule
+        
+    Returns:
+        Dictionary with reactant type features and metadata
+        
+    Examples:
+        >>> get_reactant_type_features("c1ccc(Br)cc1")
+        {'ArBr_reactant': True, 'ArX_reactant': True, 'member_types': ['ArBr'], ...}
+    """
+    all_features = detect_all_features(smiles)
+    
+    # Extract reactant features (those ending with _reactant)
+    reactant_features = {
+        token: value 
+        for token, value in all_features.items() 
+        if token.endswith('_reactant') and value
+    }
+    
+    # Extract member types and categories from metadata
+    spec = _load_feature_spec()
+    member_types = []
+    categories = []
+    
+    for feature in spec.get("features", []):
+        token = feature.get("token")
+        if token in reactant_features and reactant_features[token]:
+            metadata = feature.get("metadata", {})
+            if "reactant_member" in metadata:
+                member_types.append(metadata["reactant_member"])
+            if "reactant_category" in metadata:
+                cat = metadata["reactant_category"]
+                if cat not in categories:
+                    categories.append(cat)
+    
+    # Add derived category features
+    for derived in spec.get("derived_shortcuts", []):
+        token = derived.get("token")
+        if token in reactant_features and reactant_features[token]:
+            metadata = derived.get("metadata", {})
+            if "reactant_category" in metadata:
+                cat = metadata["reactant_category"]
+                if cat not in categories:
+                    categories.append(cat)
+    
+    reactant_features["member_types"] = member_types
+    reactant_features["categories"] = categories
+    
+    return reactant_features
+
+
+def classify_reactant_smiles(smiles: str) -> Optional[Dict[str, Any]]:
+    """
+    Backward-compatible wrapper for reactant classification.
+    
+    Returns a dict similar to the legacy ReactantMatch structure:
+    {
+        'category': 'ArX*',
+        'member_type': 'ArBr',
+        'name': 'aryl bromide',
+        'smarts': 'c[Br]',
+        'coupling_role': 'electrophile',
+        ...
+    }
+    
+    Args:
+        smiles: SMILES string of the molecule
+        
+    Returns:
+        Dictionary with reactant match info, or None if no match
+        
+    Examples:
+        >>> classify_reactant_smiles("c1ccc(Br)cc1")
+        {'category': 'ArX*', 'member_type': 'ArBr', 'name': 'aryl bromide', ...}
+    """
+    reactant_features = get_reactant_type_features(smiles)
+    
+    # If no reactant types detected, return None
+    if not reactant_features.get("member_types"):
+        return None
+    
+    # Find the most specific member match
+    spec = _load_feature_spec()
+    
+    # Priority: prefer more specific members (longer SMARTS patterns)
+    best_match = None
+    best_specificity = 0
+    
+    for feature in spec.get("features", []):
+        token = feature.get("token")
+        if token.endswith("_reactant") and reactant_features.get(token):
+            metadata = feature.get("metadata", {})
+            smarts = feature.get("detect", {}).get("smarts_any", [""])[0]
+            specificity = len(smarts)
+            
+            if specificity > best_specificity:
+                best_specificity = specificity
+                best_match = {
+                    "category": metadata.get("reactant_category", ""),
+                    "member_type": metadata.get("reactant_member", ""),
+                    "name": metadata.get("reactant_name", ""),
+                    "category_name": metadata.get("category_name", ""),
+                    "smarts": smarts,
+                    "coupling_role": metadata.get("coupling_role", ""),
+                    "description": metadata.get("category_description", ""),
+                    "specificity": specificity,
+                }
+    
+    return best_match
+
+
+def get_reactant_categories(smiles: str) -> List[str]:
+    """
+    Get list of reactant categories that match a molecule.
+    
+    Args:
+        smiles: SMILES string
+        
+    Returns:
+        List of category IDs (e.g., ['ArX*', 'HetAr-X'])
+        
+    Examples:
+        >>> get_reactant_categories("c1ccc(Br)cc1")
+        ['ArX*']
+    """
+    features = get_reactant_type_features(smiles)
+    return features.get("categories", [])
+
+
+def get_reactant_members(smiles: str) -> List[str]:
+    """
+    Get list of reactant member types that match a molecule.
+    
+    Args:
+        smiles: SMILES string
+        
+    Returns:
+        List of member IDs (e.g., ['ArBr', 'ArCl'])
+        
+    Examples:
+        >>> get_reactant_members("c1ccc(Br)cc1")
+        ['ArBr']
+    """
+    features = get_reactant_type_features(smiles)
+    return features.get("member_types", [])
+
+
 __all__ = [
     "detect_all_features",
     "detect_feature",
@@ -729,4 +905,9 @@ __all__ = [
     "get_present_features",
     "feature_summary",
     "get_feature_spec",
+    # Reactant type functions
+    "get_reactant_type_features",
+    "classify_reactant_smiles",
+    "get_reactant_categories",
+    "get_reactant_members",
 ]
