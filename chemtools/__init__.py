@@ -56,6 +56,7 @@ from .util.reaction_center_detector import (
 from .mechanism import classify_mechanism_simple
 from .mechanism.electron_flow import predict_electron_flow
 from .mechanism.intermediates import predict_intermediates
+from .visualization import render_molecule_image, render_reaction_image
 
 # Primary exports - ChemTools is the recommended interface
 __all__ = [
@@ -74,6 +75,8 @@ __all__ = [
     "classify_mechanism_simple",  # Lightweight mechanism classifier
     "predict_electron_flow",  # Rule-based electron flow heuristics
     "predict_intermediates",  # Mechanistic intermediate heuristics
+    "render_molecule_image",  # Molecule drawing helper (RDKit)
+    "render_reaction_image",  # Reaction drawing helper (RDKit)
 ]
 
 # Version info
