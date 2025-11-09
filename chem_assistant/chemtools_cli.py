@@ -238,14 +238,14 @@ class ChemToolsCLI:
         print(f"\n{Colors.OKBLUE}Constraint commands:{Colors.ENDC}")
         print("  constraints show          - Display active constraints")
         print("  constraints set Pd-free   - Replace with new preferences")
-          print("  constraints allow Cu Ni   - Override allowed metals")
-          print("  constraints cross on      - Enable cross-family search")
-          print(f"\n{Colors.OKBLUE}Cache commands:{Colors.ENDC}")
-          print("  cache show                - Display cached recommendation entries")
-          print("  cache clear               - Flush cached entries")
-          print(f"\n{Colors.OKBLUE}Rule builder:{Colors.ENDC}")
-          print("  builder                   - Launch guided rule DB wizard")
-          print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
+        print("  constraints allow Cu Ni   - Override allowed metals")
+        print("  constraints cross on      - Enable cross-family search")
+        print(f"\n{Colors.OKBLUE}Cache commands:{Colors.ENDC}")
+        print("  cache show                - Display cached recommendation entries")
+        print("  cache clear               - Flush cached entries")
+        print(f"\n{Colors.OKBLUE}Rule builder:{Colors.ENDC}")
+        print("  builder                   - Launch guided rule DB wizard")
+        print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
     def print_tools(self):
         """Print available tools."""
