@@ -835,31 +835,41 @@ def classify_reactant_smiles(smiles: str) -> Optional[Dict[str, Any]]:
     # Find the most specific member match
     spec = _load_feature_spec()
     
-    # Priority: prefer more specific members (longer SMARTS patterns)
-    best_match = None
-    best_specificity = 0
+    # General categories that should be deprioritized
+    GENERAL_REACTANT_CATEGORIES = {"Alkyl-C-H", "ArH"}
+    
+    # Priority: prefer non-general categories, then longer SMARTS patterns
+    candidates = []
     
     for feature in spec.get("features", []):
         token = feature.get("token")
         if token.endswith("_reactant") and reactant_features.get(token):
             metadata = feature.get("metadata", {})
             smarts = feature.get("detect", {}).get("smarts_any", [""])[0]
-            specificity = len(smarts)
+            category = metadata.get("reactant_category", "")
+            member_type = metadata.get("reactant_member", "")
+            is_general = category in GENERAL_REACTANT_CATEGORIES
             
-            if specificity > best_specificity:
-                best_specificity = specificity
-                best_match = {
-                    "category": metadata.get("reactant_category", ""),
-                    "member_type": metadata.get("reactant_member", ""),
-                    "name": metadata.get("reactant_name", ""),
-                    "category_name": metadata.get("category_name", ""),
-                    "smarts": smarts,
-                    "coupling_role": metadata.get("coupling_role", ""),
-                    "description": metadata.get("category_description", ""),
-                    "specificity": specificity,
-                }
+            candidates.append({
+                "category": category,
+                "member_type": member_type,
+                "name": metadata.get("reactant_name", ""),
+                "category_name": metadata.get("category_name", ""),
+                "smarts": smarts,
+                "coupling_role": metadata.get("coupling_role", ""),
+                "description": metadata.get("category_description", ""),
+                "specificity": len(smarts),
+                "is_general": is_general,
+                "group": metadata.get("group", ""),
+                "category_smarts": metadata.get("category_smarts"),
+            })
     
-    return best_match
+    if not candidates:
+        return None
+    
+    # Sort by (general? -> False first, specificity descending, member type for determinism)
+    candidates.sort(key=lambda m: (m["is_general"], -m["specificity"], m["member_type"]))
+    return candidates[0]
 
 
 def get_reactant_categories(smiles: str) -> List[str]:

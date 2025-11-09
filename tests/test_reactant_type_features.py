@@ -27,10 +27,10 @@ def test_member_features():
     test_cases = [
         ("c1ccc(Br)cc1", "ArBr_reactant", "aryl bromide"),
         ("c1ccc(Cl)cc1", "ArCl_reactant", "aryl chloride"),
-        ("c1ccccc1B(O)O", "ArB_OH_2_reactant", "aryl boronic acid"),
+        ("c1ccccc1B(O)O", "ArB(OH)2_reactant", "aryl boronic acid"),  # Correct token with parentheses
         ("CCN", "RNH2_reactant", "primary aliphatic amine"),
         ("c1ccccc1N", "ArNH2_reactant", "aniline"),
-        ("C#CC", "terminal_alkyne_reactant", "terminal alkyne"),
+        ("C#CC", "terminal-alkyne_reactant", "terminal alkyne"),  # Correct token with hyphen
     ]
     
     passed = 0
