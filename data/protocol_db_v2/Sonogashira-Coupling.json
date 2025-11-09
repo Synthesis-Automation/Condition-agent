@@ -87,7 +87,7 @@
             "role": "metal_catalyst"
           },
           {
-            "name": "N,N-Dimethylformamide (anhydrous)",
+            "name": "N,N-Dimethylformamide",
             "abbreviation": "DMF",
             "cas": "68-12-2",
             "smiles": "CN(C)C=O",

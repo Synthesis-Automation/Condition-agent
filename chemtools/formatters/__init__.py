@@ -48,6 +48,11 @@ from chemtools.formatters.ml_output import (
     format_rule_match_result,
 )
 
+# From rule_to_protocol.py
+from chemtools.formatters.rule_to_protocol import (
+    rule_conditions_to_reaction_setup,
+)
+
 # From utils.py
 from chemtools.formatters.utils import (
     enrich_reagent,

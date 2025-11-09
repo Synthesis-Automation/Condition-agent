@@ -7,6 +7,8 @@
   - `condition_core.py` and `featurizers/molecular.py` for C-N coupling substrate features.
   - `util/functional_groups.py`: Comprehensive functional group detection (80+ groups) using SMARTS patterns.
   - `protocol/`: Protocol-based recommendation using DRFP similarity.
+  - `recommend/unified.py`: Unified recommendation engine with DRFP similarity, supports automation format.
+  - `formatters/rule_to_protocol.py`: Converts rule conditions to protocol-compatible format with ordered addition sequences.
   - `cli/registry.py`: CLI entrypoint (`chem-registry`).
 - `llmtools/`: LLM integration for advanced operations (`clients.py`, `agents.py`, `prompts.py`).
   - Multi-provider support (OpenAI, Aliyun/DeepSeek).
@@ -14,8 +16,12 @@
   - See `llmtools/README.md` for details.
 - `tests/`: Pytest suite (`test_*.py`, fixtures in `conftest.py`).
 - `data/`: Small JSONL samples for demos (`registry_sample.jsonl`, `reactions_sample.jsonl`).
-  - `protocol_db/`: Protocol database for protocol-based recommendations.
+  - `protocol_db_v2/`: Protocol database for protocol-based recommendations (validated schema).
+  - `rule_db_v2/`: Rule database with standardized types (9 reaction families).
 - `scripts/`: Lightweight dev helpers and CLI tools.
+- `docs/`: Documentation for features and usage.
+  - `AUTOMATION_FORMAT.md`: Automation-ready condition format with ordered addition sequences.
+  - `AUTOMATION_QUICKSTART.md`: Quick start guide for automation format.
 
 ## Build, Test, and Development Commands
 

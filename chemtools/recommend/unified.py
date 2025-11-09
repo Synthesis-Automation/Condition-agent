@@ -33,6 +33,8 @@ import json
 import numpy as np
 from dataclasses import dataclass
 
+# Import rule-to-protocol converter
+from chemtools.formatters.rule_to_protocol import rule_conditions_to_reaction_setup
 
 # Check DRFP availability
 try:
@@ -207,6 +209,8 @@ class UnifiedRecommender:
         min_similarity: float = 0.0,
         source_types: Optional[List[str]] = None,
         validate_rules: bool = True,
+        format_for_automation: bool = False,
+        scale_mmol: float = 1.0,
     ) -> List[RecommendationResult]:
         """
         Recommend conditions for a reaction using DRFP similarity.
@@ -220,6 +224,10 @@ class UnifiedRecommender:
                 - Rules: checks applies_if criteria (functional groups)
                 - Protocols: checks reaction_SMARTS patterns (exact transformations)
                 Default: True (recommended for chemical accuracy)
+            format_for_automation: If True, converts rule conditions to protocol-compatible
+                reaction_setup format with ordered addition sequences. Protocols already
+                have this structure. Default: False
+            scale_mmol: Reaction scale in mmol for automated format. Default: 1.0
         
         Returns:
             List of RecommendationResult objects, sorted by similarity (descending)
@@ -229,15 +237,23 @@ class UnifiedRecommender:
             - Rules use applies_if (functional group detection) to verify substrates
             - Protocols use reaction_SMARTS (transformation matching) for exact validation
             Both mechanisms fail-open if validation cannot be performed.
+            
+            When format_for_automation=True, both rules and protocols will have a
+            "reaction_setup" field with ordered chemicals and conditions for automation.
         
         Example:
             >>> results = recommender.recommend(
             ...     "CCBr.c1ccccc1B(O)O>>CCc1ccccc1",
             ...     top_k=3,
-            ...     min_similarity=0.5
+            ...     min_similarity=0.5,
+            ...     format_for_automation=True,
+            ...     scale_mmol=1.0
             ... )
             >>> for r in results:
             ...     print(f"{r.name}: {r.similarity:.3f}")
+            ...     if hasattr(r, 'full_data') and 'reaction_setup' in r.full_data:
+            ...         setup = r.full_data['reaction_setup'][0]
+            ...         print(f"  Chemicals: {[c['name'] for c in setup['chemicals']]}")
         """
         # Compute DRFP for query reaction
         try:
@@ -297,6 +313,34 @@ class UnifiedRecommender:
                 version=source.get('version', ''),
                 source_file=source.get('source_file', ''),
             )
+            
+            # Load and format full data if automation format requested
+            if format_for_automation:
+                full_data = self.get_source_data(source['id'])
+                if full_data:
+                    # For rules: convert to protocol-compatible format
+                    if source['source_type'] == 'rule':
+                        conditions = full_data.get('default_rule', {}).get('conditions', {})
+                        if conditions:
+                            formatted = rule_conditions_to_reaction_setup(
+                                conditions=conditions,
+                                scale_mmol=scale_mmol,
+                                reaction_family=source['family']
+                            )
+                            result.full_data = formatted
+                    
+                    # For protocols: use existing reaction_setup
+                    elif source['source_type'] == 'protocol':
+                        # Protocols already have reaction_setup structure
+                        result.full_data = {
+                            'reaction_setup': full_data.get('reaction_setup', []),
+                            'metadata': {
+                                'generated_from': 'protocol',
+                                'format': 'protocol-native',
+                                'scale_mmol': scale_mmol
+                            }
+                        }
+            
             results.append(result)
         
         return results
