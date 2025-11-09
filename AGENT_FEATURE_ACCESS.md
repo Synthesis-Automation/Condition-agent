@@ -179,6 +179,25 @@ unified_recommender_tool(
 
 **CLI Shortcut**:
 ```
+
+### 6. ✅ Desktop Agent UI (NEW)
+**Location**: `chem_assistant/gui/app.py`
+
+- ✅ PyQt6 desktop experience mirroring Copilot/Codex UX
+- ✅ Reuses ChemToolsAgent, constraint manager, cache utilities, rule builder editor, and autofill tool
+- ✅ Launch via `python -m chem_assistant.gui.app`
+
+**UI Highlights**
+- Left panel: conversational history with the agent (multi-line input supported)
+- Right panel: constraint summary, cache stats, and system log
+- Bottom controls:
+  1. Manage constraints (same behavior as CLI `constraints` commands)
+  2. Check/clear cache
+  3. Inspect available LangChain tools
+  4. Open the form-based Rule Builder Editor (load/save/validate JSON)
+  5. Run the `rule_builder_autofill_tool` through a dedicated dialog and push drafts directly into the editor
+
+This gives the agent full GUI parity with the CLI, making it easier to paste long protocol text, inspect validation warnings, and curate rule databases without terminal gymnastics.
 > builder
 # Launches guided wizard (load existing or start new) with validation + diff preview
 ```
