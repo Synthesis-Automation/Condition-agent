@@ -763,36 +763,35 @@ def get_reactant_type_features(smiles: str) -> Dict[str, Any]:
     """
     all_features = detect_all_features(smiles)
     
-    # Extract reactant features (those ending with _reactant)
-    reactant_features = {
-        token: value 
-        for token, value in all_features.items() 
-        if token.endswith('_reactant') and value
-    }
-    
-    # Extract member types and categories from metadata
+    # Extract reactant features (those with reactant_metadata)
     spec = _load_feature_spec()
+    reactant_features = {}
     member_types = []
     categories = []
     
     for feature in spec.get("features", []):
         token = feature.get("token")
-        if token in reactant_features and reactant_features[token]:
-            metadata = feature.get("metadata", {})
-            if "reactant_member" in metadata:
-                member_types.append(metadata["reactant_member"])
-            if "reactant_category" in metadata:
-                cat = metadata["reactant_category"]
+        reactant_meta = feature.get("reactant_metadata")
+        
+        if reactant_meta and all_features.get(token):
+            reactant_features[token] = all_features[token]
+            
+            # Extract member type from metadata
+            if "reactant_member" in reactant_meta:
+                member_types.append(reactant_meta["reactant_member"])
+            if "reactant_category" in reactant_meta:
+                cat = reactant_meta["reactant_category"]
                 if cat not in categories:
                     categories.append(cat)
     
     # Add derived category features
     for derived in spec.get("derived_shortcuts", []):
         token = derived.get("token")
-        if token in reactant_features and reactant_features[token]:
-            metadata = derived.get("metadata", {})
-            if "reactant_category" in metadata:
-                cat = metadata["reactant_category"]
+        reactant_meta = derived.get("reactant_metadata")
+        
+        if reactant_meta and reactant_features.get(token):
+            if "reactant_category" in reactant_meta:
+                cat = reactant_meta["reactant_category"]
                 if cat not in categories:
                     categories.append(cat)
     
@@ -843,25 +842,26 @@ def classify_reactant_smiles(smiles: str) -> Optional[Dict[str, Any]]:
     
     for feature in spec.get("features", []):
         token = feature.get("token")
-        if token.endswith("_reactant") and reactant_features.get(token):
-            metadata = feature.get("metadata", {})
+        reactant_meta = feature.get("reactant_metadata")
+        
+        if reactant_meta and reactant_features.get(token):
             smarts = feature.get("detect", {}).get("smarts_any", [""])[0]
-            category = metadata.get("reactant_category", "")
-            member_type = metadata.get("reactant_member", "")
+            category = reactant_meta.get("reactant_category", "")
+            member_type = reactant_meta.get("reactant_member", "")
             is_general = category in GENERAL_REACTANT_CATEGORIES
             
             candidates.append({
                 "category": category,
                 "member_type": member_type,
-                "name": metadata.get("reactant_name", ""),
-                "category_name": metadata.get("category_name", ""),
+                "name": reactant_meta.get("compound_type", ""),
+                "category_name": category,
                 "smarts": smarts,
-                "coupling_role": metadata.get("coupling_role", ""),
-                "description": metadata.get("category_description", ""),
+                "coupling_role": reactant_meta.get("coupling_role", ""),
+                "description": "",
                 "specificity": len(smarts),
                 "is_general": is_general,
-                "group": metadata.get("group", ""),
-                "category_smarts": metadata.get("category_smarts"),
+                "group": "",
+                "category_smarts": "",
             })
     
     if not candidates:
