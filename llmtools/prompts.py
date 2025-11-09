@@ -804,3 +804,64 @@ RULES: Respect constraints. Cite sources. Use chemistry guidelines for substrate
     constraints="None specified",
 )
 
+
+# =============================================================================
+# RULE BUILDER EXTRACTION
+# =============================================================================
+
+RULE_BUILDER_EXTRACTION = PromptTemplate(
+    template="""You are a synthetic chemistry knowledge engineer tasked with
+generating structured rule-database content for the "{family}" family.
+
+Reference reactions:
+{reference_block}
+
+Protocol trends and notes:
+{protocol_text}
+
+Focus / constraints:
+{focus}
+
+Produce STRICT JSON with these keys:
+{{
+  "notes": "Concise rationale for this rule database",
+  "scope": {{"scope_type": "...", "compatible_functional_groups": [], "incompatible_functional_groups": []}},
+  "applies_if": {{"all": [], "any": []}},
+  "default_rule": {{
+    "id": "identifier",
+    "description": "short text",
+    "conditions": {{"pd_source": "...", "ligand": "...", "base": "...", "temperature_C": "...", "time_h": "..."}}
+  }},
+  "base_rules": [
+    {{
+      "id": "lower_snake_case_id",
+      "name": "Readable name",
+      "description": "1-2 sentence guidance",
+      "reactant_features": {{"all": [], "any": []}},
+      "conditions": {{"pd_source": "...", "ligand": "...", "base": "...", "temperature_C": "...", "time_h": "...", "solvent": "...", "additive": "... optional"}},
+      "priority": 0
+    }}
+  ],
+  "modifiers": [
+    {{
+      "id": "modifier_id",
+      "when": ["feature_or_symptom", "symptom:hydrodehalogenation_observed"],
+      "suggest": "Actionable recommendation",
+      "rationale": "Optional explanation"
+    }}
+  ]
+}}
+
+Rules:
+- Create at least 1 base rule and at most {max_base_rules}.
+- Each conditions dict must include catalyst/precatalyst, ligand (if applicable), base, solvent, temperature, and time.
+- Use lower_snake_case for IDs, camel case is not allowed.
+- Use short lists for applies_if/reactant_features; do NOT embed prose.
+- Modifiers should use "symptom:" prefixes when referencing lab observations.
+- Return JSON ONLY. No markdown fences, commentary, or trailing text.
+""",
+    reference_block="- None provided",
+    protocol_text="(no protocol text)",
+    focus="None specified",
+    max_base_rules=4,
+)
