@@ -27,6 +27,7 @@ from .engine import RuleEngine
 from .database import RuleDatabase
 from .analyzer import FeatureAnalyzer
 from .models import ConditionRecommendation, AppliedRule, AppliedModifier
+from .builder import RuleBuilder, ValidationIssue
 
 __all__ = [
     "RuleEngine",
@@ -35,6 +36,8 @@ __all__ = [
     "ConditionRecommendation",
     "AppliedRule",
     "AppliedModifier",
+    "RuleBuilder",
+    "ValidationIssue",
 ]
 
 __version__ = "1.0.0"

@@ -152,6 +152,37 @@ unified_recommender_tool(
 # Returns: Top 3 rules only ✅
 ```
 
+### 5. ✅ Rule Builder Autodraft (NEW)
+**Location**: `chem_assistant/chemtools_wrapper.py` (`rule_builder_autofill_tool`)
+
+- ✅ LLM-assisted drafting wired directly into the agent tool registry
+- ✅ Reuses the deterministic `RuleBuilder` for schema, diffing, and validation
+- ✅ Accepts metadata + reference reactions + protocol text + focus hints
+- ✅ Returns serialized JSON plus validation issues for review before saving
+
+**Agent Can**:
+- Call `rule_builder_autofill_tool` with:
+  ```python
+  rule_builder_autofill_tool(
+      family="Suzuki_Miyaura",
+      metadata_id="suzuki_auto_v3",
+      metadata_name="Suzuki-Miyaura Draft v3",
+      metadata_version="v3-draft",
+      reference_reactions=["Brc1...>>...", "..."],
+      protocol_text="HTE plates favored dtbpf/K3PO4...",
+      desired_focus="Stress aryl chlorides and boronate stability",
+      applies_if_hints=["sp2_halide_present", "sp2_boron_present"]
+  )
+  ```
+- Inspect the returned `issues` list to decide if further manual edits are needed
+- Pipe the result into the CLI wizard (`builder` command) for iterative tweaks
+
+**CLI Shortcut**:
+```
+> builder
+# Launches guided wizard (load existing or start new) with validation + diff preview
+```
+
 ## Files Modified Today
 
 ### 1. Core Recommender (Automation Format)

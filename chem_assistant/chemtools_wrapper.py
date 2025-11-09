@@ -4,7 +4,7 @@ LangChain tool wrappers for ChemTools functions.
 This module exposes existing chemtools functionality as LangChain tools
 without modifying the original chemtools codebase.
 
-Available Tools (22 total):
+Available Tools (23 total):
     - normalize_smiles_tool: Canonicalize SMILES strings
     - normalize_reaction_tool: Canonicalize reaction SMILES
     - detect_reaction_family_tool: Detect reaction family/type
@@ -27,6 +27,7 @@ Available Tools (22 total):
     - list_supported_cores_tool: Enumerate catalyst cores observed in precedents
     - list_all_families_tool: List all available reaction families in dataset
     - add_reagent_tool: Insert or preview reagent taxonomy entries
+    - rule_builder_autofill_tool: LLM-assisted drafting of rule database JSON
 
 Usage:
     from lang_chain.chemtools_wrapper import CHEMTOOLS_TOOLS
@@ -38,12 +39,16 @@ Usage:
 from typing import Dict, Any, List, Optional, Sequence, Tuple, Union, Literal
 import copy
 import json
+import os
 import time
+from datetime import date
 from dataclasses import dataclass
 from collections import OrderedDict
 from pathlib import Path
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
+from llmtools.clients import LLMClient, RECOMMENDED_MODELS
+from llmtools.prompts import RULE_BUILDER_EXTRACTION
 
 # Import chemtools functions
 from chemtools.smiles import normalize, normalize_reaction
@@ -84,7 +89,7 @@ from chemtools.featurizers import molecular as molecular_featurizer
 from chemtools.featurizers import calculable as calculable_features
 
 # Rule-based recommendation engine
-from chemtools.rule import RuleEngine
+from chemtools.rule import RuleEngine, RuleBuilder
 
 # Import bond analysis tools (NEW)
 from chemtools import (
@@ -119,6 +124,10 @@ except ImportError:
     UnifiedRecommender = None
 
 REAGENT_RESOLVER_TIMEOUT = 6.0
+RULE_BUILDER_SYSTEM_PROMPT = (
+    "You are an expert synthetic chemistry knowledge engineer who converts "
+    "protocol notes into structured rule databases. Output JSON only."
+)
 
 from .constraint_parser import (
     ConstraintSpec,
@@ -440,6 +449,70 @@ class RuleRecommendInput(BaseModel):
     include_summary: bool = Field(
         True,
         description="Include a formatted text summary of the recommendation.",
+    )
+
+
+class RuleBuilderAutoInput(BaseModel):
+    """Schema for LLM-assisted rule database drafting."""
+
+    family: str = Field(
+        ...,
+        description="Reaction family/taxonomy identifier (e.g., 'Suzuki_Miyaura').",
+    )
+    metadata_id: str = Field(
+        ...,
+        description="Unique metadata id for the rule database (lower_snake_case recommended).",
+    )
+    metadata_name: str = Field(
+        ...,
+        description="Human-readable name for the rule database.",
+    )
+    metadata_version: str = Field(
+        ...,
+        description="Version string to embed in metadata (e.g., 'v1.0-draft').",
+    )
+    created_date: Optional[str] = Field(
+        None,
+        description="Creation date (YYYY-MM-DD). Defaults to today when omitted.",
+    )
+    status: Optional[str] = Field(
+        "draft",
+        description="Metadata status tag (draft, active, deprecated, etc.).",
+    )
+    tags: Optional[List[str]] = Field(
+        None,
+        description="Optional metadata tags (e.g., ['suzuki', 'hte']).",
+    )
+    reference_reactions: List[str] = Field(
+        ...,
+        min_length=1,
+        description="Representative reaction SMILES strings (reactants>>products).",
+    )
+    protocol_text: str = Field(
+        ...,
+        description="Natural-language summary of protocols, screens, or precedent trends.",
+    )
+    notes: Optional[str] = Field(
+        None,
+        description="Optional override for reaction notes (LLM output used otherwise).",
+    )
+    desired_focus: Optional[str] = Field(
+        None,
+        description="Optional focus instructions (e.g., 'stress aryl chloride cases').",
+    )
+    applies_if_hints: Optional[List[str]] = Field(
+        None,
+        description="Feature tokens to force into applies_if.all (e.g., ['sp2_halide_present']).",
+    )
+    modifier_hints: Optional[List[str]] = Field(
+        None,
+        description="Symptom triggers the model should cover (e.g., ['symptom:hydrodehalogenation_observed']).",
+    )
+    max_base_rules: int = Field(
+        4,
+        ge=1,
+        le=8,
+        description="Maximum number of base rules to propose.",
     )
 
 
@@ -2122,6 +2195,20 @@ def rule_based_conditions_tool(
         return _error_response(str(exc), details)
 
 
+@tool(args_schema=RuleBuilderAutoInput)
+def rule_builder_autofill_tool(
+    params: RuleBuilderAutoInput,
+) -> Dict[str, Any]:
+    """
+    Auto-draft a rule database JSON using protocol text and reference reactions.
+
+    This tool orchestrates an LLM extraction pass plus the deterministic
+    RuleBuilder to emit a validated draft. Outputs include the serialized rule
+    database dictionary, validation issues, and any parsing errors.
+    """
+    return run_rule_builder_autofill(params)
+
+
 @tool(args_schema=EnhancedCrossFamilyInput)
 def enhanced_cross_family_recommend_tool(
     reaction_smiles: str,
@@ -3081,6 +3168,7 @@ CHEMTOOLS_TOOLS = [
     search_precedents_tool,
     protocol_recommendation_tool,  # NEW: Protocol-based recommendations with full procedures
     unified_recommender_tool,  # NEW: Unified DRFP-based protocol + rule search
+    rule_builder_autofill_tool,  # NEW: LLM-assisted rule database drafting
     
     # Database tools
     reaction_dataset_analytics_tool,
@@ -3362,3 +3450,203 @@ def _apply_core_constraints(
 
     note = "; ".join(note_bits) if note_bits else None
     return simplified, note
+
+
+def run_rule_builder_autofill(params: RuleBuilderAutoInput) -> Dict[str, Any]:
+    """Generate a rule database draft from protocol text programmatically."""
+    builder = RuleBuilder.new(params.family)
+    tags = params.tags if params.tags else [params.family.lower()]
+    created_date = params.created_date or date.today().isoformat()
+    builder.set_metadata(
+        id=params.metadata_id,
+        name=params.metadata_name,
+        version=params.metadata_version,
+        created_date=created_date,
+        status=params.status or "draft",
+        tags=tags,
+    )
+    builder.add_reference_reactions(params.reference_reactions)
+    if params.notes:
+        builder.set_notes(params.notes.strip())
+
+    focus_bits: List[str] = []
+    if params.desired_focus:
+        focus_bits.append(f"Focus: {params.desired_focus}")
+    if params.applies_if_hints:
+        focus_bits.append(
+            "Required applies_if features: " + ", ".join(params.applies_if_hints)
+        )
+    if params.modifier_hints:
+        focus_bits.append(
+            "Modifier triggers to include: " + ", ".join(params.modifier_hints)
+        )
+    focus_block = "\n".join(focus_bits) if focus_bits else "None specified"
+    reference_block = "\n".join(f"- {rxn}" for rxn in params.reference_reactions) or "- None provided"
+
+    prompt = RULE_BUILDER_EXTRACTION.format(
+        family=params.family,
+        reference_block=reference_block,
+        protocol_text=params.protocol_text.strip(),
+        focus=focus_block,
+        max_base_rules=params.max_base_rules,
+    )
+
+    try:
+        llm_response = _invoke_rule_builder_llm(prompt)
+    except Exception as exc:  # pragma: no cover - network failures handled at runtime
+        return _error_response(f"LLM call failed: {exc}")
+
+    payload_text = _strip_json_fences(llm_response)
+    try:
+        structured = json.loads(payload_text)
+    except json.JSONDecodeError as exc:
+        return _error_response(
+            "LLM response could not be parsed as JSON.",
+            {"raw_response": llm_response, "parse_error": str(exc)},
+        )
+
+    if not isinstance(structured, dict):
+        return _error_response(
+            "LLM response did not produce a JSON object.",
+            {"raw_response": llm_response},
+        )
+
+    _apply_rule_builder_payload(builder, structured, params)
+    if params.applies_if_hints:
+        _ensure_applies_if_hints(builder, params.applies_if_hints)
+
+    issues = builder.validate(strict=False)
+    result = {
+        "rule_database": builder.to_dict(),
+        "issues": _issues_to_dicts(issues),
+    }
+    result["message"] = "Draft created" if not issues else "Draft created with warnings"
+    return _success_response(result)
+
+
+def _apply_rule_builder_payload(
+    builder: RuleBuilder,
+    payload: Dict[str, Any],
+    params: RuleBuilderAutoInput,
+) -> None:
+    """Map LLM output into the deterministic builder."""
+    scope = payload.get("scope")
+    if isinstance(scope, dict):
+        builder.set_scope(
+            scope_type=scope.get("scope_type"),
+            compatible=scope.get("compatible_functional_groups"),
+            incompatible=scope.get("incompatible_functional_groups"),
+        )
+
+    notes = payload.get("notes")
+    if notes and not params.notes:
+        builder.set_notes(str(notes))
+
+    applies = payload.get("applies_if")
+    if isinstance(applies, dict):
+        builder.set_applies_if(raw=applies)
+
+    default_rule = payload.get("default_rule") or {}
+    conditions = default_rule.get("conditions") or {}
+    if conditions:
+        builder.set_default_rule(
+            rule_id=default_rule.get("id"),
+            description=default_rule.get("description"),
+            conditions=conditions,
+        )
+
+    base_rules = payload.get("base_rules") or []
+    for idx, rule in enumerate(base_rules, 1):
+        if not isinstance(rule, dict):
+            continue
+        rule_id = rule.get("id") or f"auto_rule_{idx}"
+        builder.upsert_base_rule(
+            rule_id,
+            name=rule.get("name") or rule_id,
+            description=rule.get("description") or "",
+            reactant_features=rule.get("reactant_features") or {},
+            conditions=rule.get("conditions") or {},
+            priority=rule.get("priority"),
+        )
+
+    modifiers = payload.get("modifiers") or []
+    for idx, modifier in enumerate(modifiers, 1):
+        if not isinstance(modifier, dict):
+            continue
+        mod_id = modifier.get("id") or f"auto_modifier_{idx}"
+        when = modifier.get("when") or []
+        suggestion = modifier.get("suggest") or modifier.get("suggestion")
+        if not when or not suggestion:
+            continue
+        builder.upsert_modifier(
+            mod_id,
+            when=when,
+            suggestion=suggestion,
+            rationale=modifier.get("rationale"),
+        )
+
+    # Fallback: ensure at least one base rule exists
+    if not builder.data.get("base_rules"):
+        default_conditions = (builder.data.get("default_rule") or {}).get("conditions") or {}
+        if default_conditions:
+            builder.upsert_base_rule(
+                "auto_base_rule",
+                name="Auto Base Rule",
+                description="Generated from default rule conditions.",
+                reactant_features=builder.data.get("applies_if") or {},
+                conditions=default_conditions,
+            )
+
+
+def _ensure_applies_if_hints(builder: RuleBuilder, hints: List[str]) -> None:
+    applies = builder.data.get("applies_if") or {}
+    existing_all = applies.get("all") or []
+    merged = list(dict.fromkeys(existing_all + hints))
+    applies["all"] = merged
+    builder.set_applies_if(raw=applies)
+
+
+def _issues_to_dicts(issues: List[Any]) -> List[Dict[str, Any]]:
+    return [
+        {
+            "field": getattr(issue, "field", ""),
+            "message": getattr(issue, "message", ""),
+            "severity": getattr(issue, "severity", "error"),
+        }
+        for issue in issues
+    ]
+
+
+def _strip_json_fences(text: str) -> str:
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        lines = stripped.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].startswith("```"):
+            lines = lines[:-1]
+        stripped = "\n".join(lines).strip()
+    return stripped
+
+
+def _invoke_rule_builder_llm(prompt: str) -> str:
+    client = _get_rule_builder_llm_client()
+    response = client.chat(
+        prompt=prompt,
+        system=RULE_BUILDER_SYSTEM_PROMPT,
+        temperature=0.1,
+        max_tokens=2200,
+    )
+    return response.content.strip()
+
+
+def _get_rule_builder_llm_client() -> LLMClient:
+    provider = os.getenv("LLM_PROVIDER", "openai")
+    model = os.getenv("LLM_MODEL")
+    if not model:
+        model = (
+            RECOMMENDED_MODELS.get(provider, {}).get("reasoning")
+            or RECOMMENDED_MODELS.get(provider, {}).get("balanced")
+            or "gpt-4o"
+        )
+    return LLMClient(provider=provider, model=model, temperature=0.1, max_tokens=2000)

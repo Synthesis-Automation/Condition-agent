@@ -129,9 +129,10 @@ You have access to the following tools:
 9. **search_precedents_tool**: Find similar precedent reactions
 10. **reaction_dataset_analytics_tool**: Summarize reaction dataset composition, yields, and popular reagents
 11. **find_reagent_tool**: Look up reagent information from database
-12. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
-13. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
-14. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
+  12. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
+  13. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
+  14. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
+  15. **rule_builder_autofill_tool**: Convert protocol text into draft rule databases (LLM-assisted + deterministic validation)
 
 **How to help users:**
 

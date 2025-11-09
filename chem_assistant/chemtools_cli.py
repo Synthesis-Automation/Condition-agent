@@ -22,6 +22,7 @@ Commands:
     clear, cls     - Clear conversation history
     help           - Show help and examples
     tools          - List available tools
+    builder        - Launch rule-builder wizard (create or edit rule DBs)
     verbose on/off - Toggle verbose mode
 """
 
@@ -29,7 +30,7 @@ import sys
 import os
 import re
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import threading
 import time
 
@@ -51,6 +52,8 @@ from chem_assistant.constraint_parser import (
     format_constraints_for_prompt,
     merge_specs,
 )
+from chem_assistant.rule_builder_session import RuleBuilderSession
+from chemtools.rule import RuleBuilder
 
 # ============================================================================
 # Colors for Terminal Output
@@ -235,12 +238,14 @@ class ChemToolsCLI:
         print(f"\n{Colors.OKBLUE}Constraint commands:{Colors.ENDC}")
         print("  constraints show          - Display active constraints")
         print("  constraints set Pd-free   - Replace with new preferences")
-        print("  constraints allow Cu Ni   - Override allowed metals")
-        print("  constraints cross on      - Enable cross-family search")
-        print(f"\n{Colors.OKBLUE}Cache commands:{Colors.ENDC}")
-        print("  cache show                - Display cached recommendation entries")
-        print("  cache clear               - Flush cached entries")
-        print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
+          print("  constraints allow Cu Ni   - Override allowed metals")
+          print("  constraints cross on      - Enable cross-family search")
+          print(f"\n{Colors.OKBLUE}Cache commands:{Colors.ENDC}")
+          print("  cache show                - Display cached recommendation entries")
+          print("  cache clear               - Flush cached entries")
+          print(f"\n{Colors.OKBLUE}Rule builder:{Colors.ENDC}")
+          print("  builder                   - Launch guided rule DB wizard")
+          print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}\n")
     
     def print_tools(self):
         """Print available tools."""
@@ -466,6 +471,73 @@ class ChemToolsCLI:
             "Usage examples: 'constraints show', 'constraints set Pd-free', "
             "'constraints allow Pd', 'constraints cross on'.{Colors.ENDC}\n"
         )
+
+    def launch_rule_builder(self) -> None:
+        """Launch the rule-builder wizard from the CLI."""
+        print(f"\n{Colors.HEADER}{Colors.BOLD}Rule Builder Wizard{Colors.ENDC}")
+        print(
+            "Guided workflow for rule databases.\n"
+            "Hint: baseline JSON lives in data/rule_db_v2/.\n"
+        )
+        choice = input("Load existing file (L) or create new (N)? [L]: ").strip().lower()
+        target_path: Optional[Path]
+
+        try:
+            if choice in {"", "l", "load"}:
+                load_path = input("Path to existing rule DB JSON: ").strip()
+                if not load_path:
+                    print(f"{Colors.WARNING}No path provided. Aborting builder.{Colors.ENDC}\n")
+                    return
+                source_path = Path(load_path).expanduser().resolve()
+                if not source_path.exists():
+                    print(f"{Colors.FAIL}File not found: {source_path}{Colors.ENDC}\n")
+                    return
+                builder = RuleBuilder.from_file(source_path)
+                new_path = input(f"Save changes to path [{source_path}]: ").strip()
+                target_path = Path(new_path).expanduser() if new_path else source_path
+                print(f"{Colors.OKCYAN}Loaded {source_path}{Colors.ENDC}\n")
+            else:
+                family = input("Reaction family (e.g., Suzuki_Miyaura): ").strip()
+                if not family:
+                    print(f"{Colors.WARNING}Family is required to start a new rule DB.{Colors.ENDC}\n")
+                    return
+                builder = RuleBuilder.new(family)
+                suggested = Path("data") / "rule_db_v2" / f"{family}_draft.json"
+                out_path = input(f"Output path [{suggested}]: ").strip()
+                target_path = Path(out_path).expanduser() if out_path else suggested
+
+            session = RuleBuilderSession(builder)
+            session.run_wizard()
+
+            print(f"{Colors.OKCYAN}Running validation...{Colors.ENDC}")
+            issues = builder.validate(strict=False)
+            if issues:
+                print(f"{Colors.WARNING}Validation findings:{Colors.ENDC}")
+                for issue in issues:
+                    mark = "!" if issue.severity == "error" else "-"
+                    print(f"  {mark} [{issue.severity}] {issue.field}: {issue.message}")
+                if any(i.severity == "error" for i in issues):
+                    print(f"{Colors.FAIL}Errors detected. Resolve them before saving.{Colors.ENDC}\n")
+                    return
+            else:
+                print(f"{Colors.OKGREEN}No validation issues detected.{Colors.ENDC}")
+
+            diff_text = builder.diff()
+            if diff_text.strip():
+                print(f"\n{Colors.OKCYAN}Change preview:{Colors.ENDC}\n{diff_text}\n")
+            else:
+                print(f"{Colors.WARNING}No changes detected relative to source.{Colors.ENDC}\n")
+
+            confirm = input(f"Save to {target_path}? (y/n) [y]: ").strip().lower()
+            if confirm in {"", "y", "yes"}:
+                builder.save(target_path)
+                print(f"{Colors.OKGREEN}Saved rule database to {target_path}{Colors.ENDC}\n")
+            else:
+                print(f"{Colors.WARNING}Save skipped. No files were written.{Colors.ENDC}\n")
+        except KeyboardInterrupt:
+            print(f"\n{Colors.WARNING}Rule builder cancelled by user.{Colors.ENDC}\n")
+        except Exception as exc:
+            print(f"\n{Colors.FAIL}Rule builder error: {exc}{Colors.ENDC}\n")
     
     def handle_command(self, user_input: str) -> bool:
         """
@@ -485,6 +557,10 @@ class ChemToolsCLI:
 
         if cmd.startswith('cache'):
             self.handle_cache_command(user_input)
+            return False
+
+        if cmd.startswith('builder'):
+            self.launch_rule_builder()
             return False
         
         # Exit commands
