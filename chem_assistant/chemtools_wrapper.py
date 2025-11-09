@@ -2910,6 +2910,8 @@ class UnifiedRecommenderInput(BaseModel):
     min_similarity: float = Field(default=0.0, description="Minimum DRFP similarity threshold (0.0-1.0)", ge=0.0, le=1.0)
     source_type: Optional[str] = Field(default=None, description="Filter by source: 'protocol' (full experimental procedures) or 'rule' (general guidelines)")
     validate_rules: bool = Field(default=True, description="Enable chemical validation: applies_if for rules, reaction_SMARTS for protocols")
+    format_for_automation: bool = Field(default=False, description="Format conditions with ordered addition sequences for automated execution")
+    scale_mmol: float = Field(default=1.0, description="Reaction scale in mmol (for automation format)", ge=0.1, le=1000.0)
 
 
 @tool(args_schema=UnifiedRecommenderInput)
@@ -2918,7 +2920,9 @@ def unified_recommender_tool(
     top_k: int = 5,
     min_similarity: float = 0.0,
     source_type: Optional[str] = None,
-    validate_rules: bool = True
+    validate_rules: bool = True,
+    format_for_automation: bool = False,
+    scale_mmol: float = 1.0
 ) -> Dict[str, Any]:
     """
     Find similar reactions and condition recommendations using DRFP similarity with chemical validation.
@@ -3006,13 +3010,15 @@ def unified_recommender_tool(
             top_k=top_k,
             min_similarity=min_similarity,
             source_types=source_types,
-            validate_rules=validate_rules  # Enable chemical validation
+            validate_rules=validate_rules,  # Enable chemical validation
+            format_for_automation=format_for_automation,
+            scale_mmol=scale_mmol
         )
         
         # Format results for LLM
         formatted_results = []
         for result in results:
-            formatted_results.append({
+            result_dict = {
                 "rank": result.rank,
                 "id": result.id,
                 "name": result.name,
@@ -3022,17 +3028,26 @@ def unified_recommender_tool(
                 "tags": result.tags,
                 "version": result.version,
                 "validated": validate_rules  # Indicate if validation was applied
-            })
+            }
+            
+            # Add automation format if requested
+            if format_for_automation and result.full_data:
+                result_dict["reaction_setup"] = result.full_data.get("reaction_setup", [])
+                result_dict["metadata"] = result.full_data.get("metadata", {})
+            
+            formatted_results.append(result_dict)
         
         return _success_response({
             "recommendations": formatted_results,
             "query": reaction_smiles,
             "count": len(formatted_results),
             "validation_enabled": validate_rules,
+            "automation_format": format_for_automation,
             "filters": {
                 "top_k": top_k,
                 "min_similarity": min_similarity,
-                "source_type": source_type or "all"
+                "source_type": source_type or "all",
+                "scale_mmol": scale_mmol if format_for_automation else None
             }
         })
     
