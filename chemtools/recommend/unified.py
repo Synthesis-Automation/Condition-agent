@@ -316,7 +316,7 @@ class UnifiedRecommender:
             
             # Load and format full data if automation format requested
             if format_for_automation:
-                full_data = self.get_source_data(source['id'])
+                full_data = self.get_source_details(source['id'])
                 if full_data:
                     # For rules: convert to protocol-compatible format
                     if source['source_type'] == 'rule':

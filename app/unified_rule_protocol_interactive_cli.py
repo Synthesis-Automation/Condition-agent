@@ -99,6 +99,59 @@ def format_result(result: RecommendationResult, rank: int, show_details: bool = 
     return "\n".join(lines)
 
 
+def display_automation_format(result: RecommendationResult):
+    """Display automation format with addition sequence if available."""
+    if not result.full_data or 'reaction_setup' not in result.full_data:
+        print(f"    {Fore.YELLOW if HAS_COLOR else ''}(Automation format not available){Style.RESET_ALL if HAS_COLOR else ''}")
+        return
+    
+    setup = result.full_data['reaction_setup'][0]
+    chemicals = setup.get('chemicals', [])
+    conditions = setup.get('conditions', [])
+    metadata = result.full_data.get('metadata', {})
+    
+    print(f"    {Fore.CYAN if HAS_COLOR else ''}🤖 Automation Format:{Style.RESET_ALL if HAS_COLOR else ''}")
+    print(f"    {Fore.MAGENTA if HAS_COLOR else ''}Addition Sequence:{Style.RESET_ALL if HAS_COLOR else ''}")
+    
+    for i, chem in enumerate(chemicals, 1):
+        name = chem['name']
+        role = chem['role']
+        amount = chem.get('amount', {})
+        
+        # Format amount
+        amount_str = ""
+        if 'equivalents' in amount:
+            equiv = amount['equivalents']
+            mmol = amount.get('mmol', '')
+            amount_str = f" ({equiv} equiv"
+            if mmol:
+                amount_str += f", {mmol} mmol"
+            amount_str += ")"
+        elif 'volume_ml' in amount:
+            vol = amount.get('volume_ml')
+            if vol:
+                amount_str = f" ({vol} mL)"
+            else:
+                amount_str = " (volume TBD)"
+        
+        print(f"      {i}. {name} [{role}]{amount_str}")
+    
+    if conditions:
+        cond = conditions[0]
+        print(f"    {Fore.MAGENTA if HAS_COLOR else ''}Reaction Conditions:{Style.RESET_ALL if HAS_COLOR else ''}")
+        if 'temperature_C' in cond:
+            print(f"      • Temperature: {cond['temperature_C']} °C")
+        if 'time_h' in cond:
+            print(f"      • Time: {cond['time_h']} h")
+        if 'atmosphere' in cond:
+            print(f"      • Atmosphere: {cond['atmosphere']}")
+    
+    # Show metadata
+    gen_from = metadata.get('generated_from', 'unknown')
+    scale = metadata.get('scale_mmol', 'N/A')
+    print(f"    {Fore.CYAN if HAS_COLOR else ''}Generated from: {gen_from} | Scale: {scale} mmol{Style.RESET_ALL if HAS_COLOR else ''}")
+
+
 def display_detailed_conditions(recommender: UnifiedRecommender, result: RecommendationResult, reaction_smiles: str = None):
     """Display detailed recommended conditions for a source."""
     details = recommender.get_source_details(result.id)
@@ -400,6 +453,12 @@ def display_results(
         
         for r in results:
             print(format_result(r, r.rank, show_details=show_details))
+            
+            # Show automation format if enabled and available
+            if hasattr(r, 'full_data') and r.full_data:
+                print()
+                display_automation_format(r)
+            
             print()
 
 
@@ -474,6 +533,8 @@ def interactive_mode(
     print("  /details on|off       -> toggle detailed output (current: off)")
     print("  /compact on|off       -> toggle compact mode (current: off)")
     print("  /split on|off         -> toggle top protocol + top rule split view (current: off)")
+    print("  /automation on|off    -> toggle automation format with addition sequences (current: off)")
+    print("  /scale <float>        -> set reaction scale in mmol (current: 1.0)")
     print("  /stats                -> show index statistics")
     print("  /load <id>            -> load full source details by ID")
     print("  /show                 -> display current settings")
@@ -489,6 +550,8 @@ def interactive_mode(
     show_details = False
     compact_mode = False
     split_mode = False
+    automation_format = False
+    scale_mmol = 1.0
     
     while True:
         try:
@@ -518,6 +581,8 @@ def interactive_mode(
                 print("  /details on|off       -> toggle detailed output")
                 print("  /compact on|off       -> toggle compact mode")
                 print("  /split on|off         -> toggle top protocol + top rule split view")
+                print("  /automation on|off    -> toggle automation format with addition sequences")
+                print("  /scale <float>        -> set reaction scale in mmol")
                 print("  /stats                -> show index statistics")
                 print("  /load <id>            -> load full source details")
                 print("  /show                 -> display current settings")
@@ -610,6 +675,39 @@ def interactive_mode(
                         compact_mode = False
                     print(f"Split mode {'enabled' if split_mode else 'disabled'}")
             
+            elif cmd == "/automation":
+                if arg:
+                    arg_lower = arg.lower()
+                    if arg_lower == "on":
+                        automation_format = True
+                        print(f"🤖 Automation format enabled - will show ordered addition sequences (scale: {scale_mmol} mmol)")
+                    elif arg_lower == "off":
+                        automation_format = False
+                        print("Automation format disabled")
+                    else:
+                        print("Usage: /automation on|off")
+                else:
+                    automation_format = not automation_format
+                    print(f"🤖 Automation format {'enabled' if automation_format else 'disabled'}")
+                    if automation_format:
+                        print(f"   Scale: {scale_mmol} mmol")
+            
+            elif cmd == "/scale":
+                if arg:
+                    try:
+                        scale_mmol = float(arg)
+                        if scale_mmol > 0:
+                            print(f"Set reaction scale = {scale_mmol} mmol")
+                            if automation_format:
+                                print("  (Will apply to automation format output)")
+                        else:
+                            print("Error: scale must be positive")
+                            scale_mmol = 1.0
+                    except ValueError:
+                        print("Usage: /scale <float>")
+                else:
+                    print("Usage: /scale <float>")
+            
             elif cmd == "/stats":
                 display_statistics(recommender)
             
@@ -626,7 +724,11 @@ def interactive_mode(
                 print(f"  source_type: {source_type or 'all'}")
                 print(f"  show_details: {show_details}")
                 print(f"  compact_mode: {compact_mode}")
-                print(f"  split_mode: {split_mode}\n")
+                print(f"  split_mode: {split_mode}")
+                print(f"  automation_format: {automation_format}")
+                if automation_format:
+                    print(f"  scale_mmol: {scale_mmol}")
+                print()
             
             else:
                 print(f"Unknown command: {cmd}. Type /help for available commands.")
@@ -648,7 +750,9 @@ def interactive_mode(
                 reaction_smiles=reaction_smiles,
                 top_k=k,
                 min_similarity=min_sim,
-                source_types=source_types
+                source_types=source_types,
+                format_for_automation=automation_format,
+                scale_mmol=scale_mmol
             )
             
             if not results:
