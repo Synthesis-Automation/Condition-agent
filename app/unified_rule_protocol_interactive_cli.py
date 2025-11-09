@@ -515,7 +515,7 @@ def load_and_display_source(recommender: UnifiedRecommender, source_id: str):
 
 def interactive_mode(
     recommender: UnifiedRecommender,
-    initial_k: int = 5,
+    initial_k: int = 1,
     initial_min_sim: float = 0.0,
     initial_type: Optional[str] = None
 ):
@@ -802,8 +802,8 @@ Examples:
     parser.add_argument(
         "-k", "--top-k",
         type=int,
-        default=5,
-        help="Number of recommendations to return (default: 5)"
+        default=1,
+        help="Number of recommendations to return (default: 1)"
     )
     parser.add_argument(
         "--min-sim",
