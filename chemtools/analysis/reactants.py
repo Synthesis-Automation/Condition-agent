@@ -2,17 +2,24 @@
 Reactant and reaction type utilities shared across ChemTools and HTE pipelines.
 
 This module centralises the SMARTS-driven reactant classification helpers using
-the unified taxonomy registry (``chemtools.taxonomy``) as the single source of
-truth for reactant and reaction definitions.
+the unified feature detection system (``chemtools.featurizers.calculable``) as
+the single source of truth for reactant identification.
+
+Note: This module now delegates reactant classification to the unified feature
+system while maintaining backward compatibility with the legacy API.
 """
 
 from __future__ import annotations
 
 import copy
+import warnings
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..featurizers import calculable as _calculable
 
 from ..util import rdkit_helpers
 from ..util.smarts_cache import compile_smarts
@@ -24,6 +31,12 @@ REACTION_TYPES_FILE = TAXONOMY_DATA_DIR / "reaction_types.json"
 
 # General categories that should be deprioritised when picking the "best" match.
 GENERAL_REACTANT_CATEGORIES = {"Alkyl-C-H", "ArH"}
+
+
+def _get_calculable() -> Any:
+    """Lazy import of the calculable module to avoid circular imports."""
+    from ..featurizers import calculable as _calc
+    return _calc
 
 # Manual overrides sourced from the original z-score pipeline.
 CSV_REACTANT_OVERRIDES: Dict[str, str] = {
@@ -290,75 +303,140 @@ def reactant_category_for(match: ReactantMatch) -> str:
 def iter_reactant_matches(
     smiles: str, reactant_types: Optional[Dict[str, dict]] = None
 ) -> List[ReactantMatch]:
-    """Return all SMARTS matches for ``smiles``."""
+    """
+    Return all SMARTS matches for ``smiles``.
+    
+    Now uses the unified feature system for detection, returning all matching
+    reactant types as ReactantMatch objects.
+    
+    Args:
+        smiles: SMILES string to analyze
+        reactant_types: Deprecated, no longer used (for backward compatibility only)
+    
+    Returns:
+        List of ReactantMatch objects for all detected reactant types
+    """
+    if reactant_types is not None:
+        warnings.warn(
+            "The 'reactant_types' parameter is deprecated and will be ignored. "
+            "Classification now uses the unified feature system.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    
     smiles = (smiles or "").strip()
     if not smiles:
         return []
 
-    mol = rdkit_helpers.parse_smiles(smiles)
-    if mol is None:
+    # Use the unified feature system to get all reactant type features
+    _calc = _get_calculable()
+    reactant_features = _calc.get_reactant_type_features(smiles)
+    if not reactant_features:
         return []
-
-    definitions = reactant_types if reactant_types is not None else _load_reactant_types_raw()
+    
     matches: List[ReactantMatch] = []
-
-    for category_id, data in definitions.items():
-        legacy_category = data.get("legacy_id") or category_id
-        category_smarts = data.get("smarts")
-        category_description = data.get("description", "")
-        group = data.get("group", "")
-        is_general = legacy_category in GENERAL_REACTANT_CATEGORIES
-
-        for member in data.get("members", []):
-            smarts = member.get("smarts")
-            if not smarts:
-                continue
-
-            pattern = compile_smarts(smarts, validate=False)
-            if pattern is None:
-                continue
-
-            try:
-                has_match = mol.HasSubstructMatch(pattern)
-            except Exception:
-                has_match = False
-
-            if has_match:
-                matches.append(
-                    ReactantMatch(
-                        category=legacy_category,
-                        member_type=member.get("id", ""),
-                        name=member.get("name", ""),
-                        group=group,
-                        smarts=smarts,
-                        category_smarts=category_smarts,
-                        description=category_description,
-                        specificity=len(smarts),
-                        is_general=is_general,
-                    )
-                )
-
+    
+    # Get all detected member types
+    member_types = reactant_features.get("member_types", [])
+    categories = reactant_features.get("categories", [])
+    
+    # Load feature specs to get metadata
+    spec = _calc._load_feature_spec()
+    features_by_token = {f["token"]: f for f in spec.get("features", [])}
+    
+    # Build matches from detected member-level features
+    for member_id in member_types:
+        token = f"{member_id}_reactant"
+        if not reactant_features.get(token, False):
+            continue
+        
+        feature_spec = features_by_token.get(token, {})
+        metadata = feature_spec.get("metadata", {})
+        
+        # Extract SMARTS pattern
+        detect = feature_spec.get("detect", {})
+        smarts_patterns = detect.get("smarts_any", [])
+        smarts = smarts_patterns[0] if smarts_patterns else ""
+        
+        category = metadata.get("reactant_category", "")
+        is_general = category in GENERAL_REACTANT_CATEGORIES
+        
+        matches.append(
+            ReactantMatch(
+                category=category,
+                member_type=member_id,
+                name=metadata.get("member_name", metadata.get("name", "")),
+                group=metadata.get("group", ""),
+                smarts=smarts,
+                category_smarts=metadata.get("category_smarts"),
+                description=metadata.get("description", ""),
+                specificity=len(smarts) if smarts else 0,
+                is_general=is_general,
+            )
+        )
+    
+    # Sort by (general? -> False first, specificity descending, member id for determinism)
+    matches.sort(key=lambda m: (m.is_general, -m.specificity, m.member_type))
+    
     return matches
 
 
 def classify_reactant_smiles(
     smiles: str, reactant_types: Optional[Dict[str, dict]] = None
 ) -> Optional[ReactantMatch]:
-    """Return the most specific SMARTS match for the SMILES input."""
-    matches = iter_reactant_matches(smiles, reactant_types)
-    if not matches:
+    """
+    Return the most specific SMARTS match for the SMILES input.
+    
+    Now delegates to the unified feature system (chemtools.featurizers.calculable)
+    for reactant detection, but maintains backward compatibility by returning
+    a ReactantMatch with the expected structure.
+    
+    Args:
+        smiles: SMILES string to classify
+        reactant_types: Deprecated, no longer used (for backward compatibility only)
+    
+    Returns:
+        ReactantMatch with category, member_type, name, etc., or None if no match
+    """
+    if reactant_types is not None:
+        warnings.warn(
+            "The 'reactant_types' parameter is deprecated and will be ignored. "
+            "Classification now uses the unified feature system.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    
+    # Use the unified feature system
+    _calc = _get_calculable()
+    result = _calc.classify_reactant_smiles(smiles)
+    if result is None:
         return None
-
-    # Sort by (general? -> False first, specificity descending, member id for determinism).
-    matches.sort(key=lambda m: (m.is_general, -m.specificity, m.member_type))
-    return matches[0]
+    
+    # Convert to ReactantMatch structure expected by this module
+    return ReactantMatch(
+        category=result.get("category", ""),
+        member_type=result.get("member_type", ""),
+        name=result.get("name", ""),
+        group=result.get("group", ""),
+        smarts=result.get("smarts", ""),
+        category_smarts=result.get("category_smarts"),
+        description=result.get("description", ""),
+        specificity=result.get("specificity", 0),
+        is_general=result.get("is_general", False),
+    )
 
 
 def classify_reactant_category(
     smiles: str, reactant_types: Optional[Dict[str, dict]] = None
 ) -> Optional[str]:
     """Convenience shortcut returning only the category id."""
-    best = classify_reactant_smiles(smiles, reactant_types)
+    if reactant_types is not None:
+        warnings.warn(
+            "The 'reactant_types' parameter is deprecated and will be ignored.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    best = classify_reactant_smiles(smiles)
     return best.category if best else None
 
 
@@ -366,7 +444,13 @@ def classify_reactant_group(
     smiles: str, reactant_types: Optional[Dict[str, dict]] = None
 ) -> Optional[str]:
     """Convenience shortcut returning the functional group label."""
-    best = classify_reactant_smiles(smiles, reactant_types)
+    if reactant_types is not None:
+        warnings.warn(
+            "The 'reactant_types' parameter is deprecated and will be ignored.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    best = classify_reactant_smiles(smiles)
     return best.group if best else None
 
 
@@ -374,22 +458,44 @@ def classify_reactant_batch(
     smiles_list: Iterable[str], reactant_types: Optional[Dict[str, dict]] = None
 ) -> List[Optional[ReactantMatch]]:
     """Batch classification wrapper mirroring the legacy helper."""
-    return [classify_reactant_smiles(smiles, reactant_types) for smiles in smiles_list]
+    if reactant_types is not None:
+        warnings.warn(
+            "The 'reactant_types' parameter is deprecated and will be ignored.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    return [classify_reactant_smiles(smiles) for smiles in smiles_list]
 
 
 def get_reactant_category_matches(
     smiles: str, reactant_types: Optional[Dict[str, dict]] = None
 ) -> List[str]:
     """Return the set of categories matched by the SMARTS hierarchy."""
-    matches = iter_reactant_matches(smiles, reactant_types)
-    return sorted({match.category for match in matches})
+    if reactant_types is not None:
+        warnings.warn(
+            "The 'reactant_types' parameter is deprecated and will be ignored.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    # Use unified feature system directly
+    _calc = _get_calculable()
+    reactant_features = _calc.get_reactant_type_features(smiles)
+    if not reactant_features:
+        return []
+    return sorted(reactant_features.get("categories", []))
 
 
 def get_all_reactant_matches(
     smiles: str, reactant_types: Optional[Dict[str, dict]] = None
 ) -> List[ReactantMatch]:
     """Alias retained for backwards compatibility with HTE scripts."""
-    return iter_reactant_matches(smiles, reactant_types)
+    if reactant_types is not None:
+        warnings.warn(
+            "The 'reactant_types' parameter is deprecated and will be ignored.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+    return iter_reactant_matches(smiles)
 
 
 @lru_cache(maxsize=1)
