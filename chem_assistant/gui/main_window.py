@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import html
+import re
+import tempfile
 import traceback
+from pathlib import Path
 from typing import List, Optional, Tuple
+from urllib.parse import parse_qs, urlparse
+from uuid import uuid4
 
 from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal, QTimer
 from PyQt6.QtWidgets import (
@@ -19,11 +24,11 @@ from PyQt6.QtWidgets import (
     QSplitter,
     QStatusBar,
     QTextEdit,
-    QPlainTextEdit,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QPixmap
 
 from langchain_core.messages import BaseMessage
 
@@ -42,6 +47,19 @@ from chem_assistant.gui.dialogs import (
     RuleBuilderAutofillDialog,
     RuleBuilderDialog,
 )
+from chemtools.visualization import render_molecule_image, render_reaction_image
+
+IMAGE_MARKUP = re.compile(
+    r"\[\[(reaction|molecule)_image:(.+?)\]\]", re.IGNORECASE | re.DOTALL
+)
+MARKDOWN_IMAGE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
+IMAGE_COMMAND_PATTERNS = [
+    r"^(?:/)?image\s+(reaction|molecule|compound)\s*[:=]\s*(.+)$",
+    r"^(?:/)?image\s+(?:for\s+)?(reaction|molecule|compound)\s*[:=]\s*(.+)$",
+    r"^(?:show|display)\s+image(?:\s+of|\s+for)?\s*(?:a|the)?\s*(reaction|molecule|compound)?[:=]?\s*(.+)$",
+    r"^(?:show|display)\s+(?:me\s+)?an?\s+image\s*(?:of|for)?\s*(reaction|molecule|compound)?[:=]?\s*(.+)$",
+]
+URL_SMILES_KEYS = ("smiles", "model", "structure", "mol", "target")
 
 
 class WorkerSignals(QObject):
@@ -103,6 +121,7 @@ class ChemAssistantWindow(QMainWindow):
         self.history: List[BaseMessage] = []
         self.constraint_spec = ConstraintSpec()
         self.constraint_text = ""
+        self.current_image_path: Optional[Path] = None
 
         self.thread_pool = QThreadPool()
         self._build_ui()
@@ -155,10 +174,29 @@ class ChemAssistantWindow(QMainWindow):
         const_layout.addWidget(self.cache_label, 1, 1)
         info_layout.addWidget(constraint_box)
 
-        self.log_view = QPlainTextEdit()
-        self.log_view.setReadOnly(True)
-        self.log_view.setPlaceholderText("System log...")
-        info_layout.addWidget(self.log_view)
+        image_box = QGroupBox("Image Preview")
+        image_layout = QVBoxLayout(image_box)
+        self.image_label = QLabel("No image rendered yet.")
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_label.setStyleSheet(
+            "QLabel { background-color: #1e1f23; border: 1px dashed #555; color: #888; }"
+        )
+        self.image_label.setMinimumSize(320, 220)
+        self.image_label.setMaximumHeight(320)
+        self.image_label.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
+        self.image_label.setScaledContents(False)
+        image_layout.addWidget(self.image_label)
+
+        self.image_caption = QLabel(
+            "Use the 'image' command or let the agent emit "
+            "[[reaction_image:...]] tokens to preview chemistry diagrams."
+        )
+        self.image_caption.setWordWrap(True)
+        image_layout.addWidget(self.image_caption)
+
+        info_layout.addWidget(image_box)
         info_layout.addStretch()
 
         splitter.addWidget(self.info_panel)
@@ -189,6 +227,10 @@ class ChemAssistantWindow(QMainWindow):
         clear_btn = QPushButton("Clear Chat")
         clear_btn.clicked.connect(self.clear_chat)
         button_row.addWidget(clear_btn)
+
+        clear_image_btn = QPushButton("Clear Image")
+        clear_image_btn.clicked.connect(self.clear_image_preview)
+        button_row.addWidget(clear_image_btn)
 
         constraint_btn = QPushButton("Manage Constraints")
         constraint_btn.clicked.connect(self.manage_constraints)
@@ -241,13 +283,18 @@ class ChemAssistantWindow(QMainWindow):
         self.chat_view.append(html_block)
 
     def append_log(self, text: str) -> None:
-        self.log_view.appendPlainText(text.strip())
+        message = text.strip()
+        if not message:
+            return
+        self.statusBar().showMessage(message, 5000)
 
     def send_message(self) -> None:
         content = self.input_edit.toPlainText().strip()
         if not content:
             return
         self.input_edit.clear()
+        if self.handle_local_command(content):
+            return
         self.append_chat("You", content)
         self.statusBar().showMessage("Agent is thinking... |")
         self.set_input_enabled(False)
@@ -265,6 +312,46 @@ class ChemAssistantWindow(QMainWindow):
         worker.signals.finished.connect(self.reset_after_task)
         self.thread_pool.start(worker)
 
+    def handle_local_command(self, content: str) -> bool:
+        command_text = content.strip()
+        if not command_text:
+            return False
+        parsed = self._extract_image_request(command_text)
+        if parsed:
+            target, smiles = parsed
+            self._execute_image_request(target, smiles, log_to_chat=True)
+            return True
+        return False
+
+    def handle_image_command(self, command: str) -> None:
+        parsed = self._extract_image_request(command)
+        if not parsed:
+            self.append_chat(
+                "System",
+                "Usage: image <reaction|molecule> <SMILES>. Example: "
+                "image reaction BrC1(c2ccccc2)CC1.c1ccc(B(O)O)cc1>>...",
+            )
+            return
+        target, smiles = parsed
+        self._execute_image_request(target, smiles, log_to_chat=True)
+
+    def _execute_image_request(
+        self,
+        target: str,
+        smiles: str,
+        *,
+        log_to_chat: bool = False,
+    ) -> None:
+        if not smiles:
+            self.append_chat("System", "Provide a SMILES string to render.")
+            return
+        if self.render_image_from_smiles(target, smiles, source="command"):
+            if log_to_chat:
+                self.append_chat(
+                    "System",
+                    f"{target.title()} image rendered in the preview panel.",
+                )
+
     def handle_agent_result(self, payload: Tuple[str, List[BaseMessage]]) -> None:
         try:
             response, history = payload
@@ -272,8 +359,96 @@ class ChemAssistantWindow(QMainWindow):
             self.append_log("Unexpected agent payload.")
             return
         self.history = history
-        self.append_chat("Agent", response)
+        clean_response = self._process_agent_image_markup(response)
+        self.append_chat("Agent", clean_response)
         self.append_log("Agent response received.")
+
+    def _process_agent_image_markup(self, text: str) -> str:
+        if not text:
+            return text
+
+        def directive_replacer(match: re.Match[str]) -> str:
+            kind = match.group(1).lower()
+            smiles = match.group(2).strip()
+            normalized_kind = "reaction" if "reaction" in kind else "molecule"
+            success = self.render_image_from_smiles(
+                normalized_kind,
+                smiles,
+                source="agent",
+                silent=True,
+            )
+            return "[image rendered]" if success else "[image unavailable]"
+
+        interim = IMAGE_MARKUP.sub(directive_replacer, text)
+
+        def markdown_replacer(match: re.Match[str]) -> str:
+            url = match.group(1)
+            if self._handle_markdown_image_url(url):
+                return "[image rendered]"
+            return match.group(0)
+
+        return MARKDOWN_IMAGE.sub(markdown_replacer, interim)
+
+    def _extract_image_request(self, content: str) -> Optional[Tuple[str, str]]:
+        normalized = content.strip()
+        if normalized.startswith("/"):
+            normalized = normalized[1:].lstrip()
+        for pattern in IMAGE_COMMAND_PATTERNS:
+            match = re.match(pattern, normalized, re.IGNORECASE)
+            if not match:
+                continue
+            type_token = match.group(1) or ""
+            smiles = match.group(2).strip() if match.lastindex and match.lastindex >= 2 else ""
+            target = self._normalize_image_target(type_token, smiles)
+            if not smiles:
+                return None
+            if target is None:
+                self.append_chat(
+                    "System",
+                    "Unknown image target. Use 'reaction' or 'molecule'.",
+                )
+                return None
+            return target, smiles
+        return None
+
+    def _normalize_image_target(
+        self,
+        type_token: str,
+        smiles: str,
+    ) -> Optional[str]:
+        token = (type_token or "").strip().lower()
+        if token in {"reaction", "rxn"}:
+            return "reaction"
+        if token in {"molecule", "compound", "mol"}:
+            return "molecule"
+        if not token:
+            return "reaction" if ">" in smiles else "molecule"
+        return None
+
+    def _handle_markdown_image_url(self, url: str) -> bool:
+        try:
+            parsed = urlparse(url)
+        except Exception:
+            return False
+        query = parse_qs(parsed.query)
+        smiles = ""
+        for key in URL_SMILES_KEYS:
+            values = query.get(key)
+            if values:
+                smiles = values[0].strip()
+                if smiles:
+                    break
+        if not smiles:
+            return False
+        if not smiles:
+            return False
+        target = "reaction" if ">" in smiles else "molecule"
+        return self.render_image_from_smiles(
+            target,
+            smiles,
+            source="agent",
+            silent=True,
+        )
 
     def handle_agent_error(self, trace: str) -> None:
         QMessageBox.critical(self, "Agent error", trace)
@@ -291,6 +466,82 @@ class ChemAssistantWindow(QMainWindow):
     def clear_chat(self) -> None:
         self.chat_view.clear()
         self.history = []
+        self.append_log("Chat cleared.")
+
+    def clear_image_preview(self) -> None:
+        self.current_image_path = None
+        self.image_label.setPixmap(QPixmap())
+        self.image_label.setText("No image rendered yet.")
+        self.image_caption.setText(
+            "Use the 'image' command or agent directives to render previews."
+        )
+
+    def render_image_from_smiles(
+        self,
+        target: str,
+        smiles: str,
+        *,
+        source: str,
+        silent: bool = False,
+    ) -> bool:
+        try:
+            image_path = self._generate_image_file(target, smiles)
+        except ValueError as exc:
+            if not silent:
+                QMessageBox.warning(self, "Invalid SMILES", str(exc))
+            else:
+                self.append_log(f"Image render failed: {exc}")
+            return False
+        except RuntimeError as exc:
+            if not silent:
+                QMessageBox.warning(self, "Rendering unavailable", str(exc))
+            else:
+                self.append_log(str(exc))
+            return False
+        except Exception as exc:
+            if not silent:
+                QMessageBox.warning(self, "Image rendering error", str(exc))
+            else:
+                self.append_log(f"Image render error: {exc}")
+            return False
+
+        try:
+            self.display_image(image_path, f"{target.title()} ({source})")
+        except ValueError as exc:
+            if not silent:
+                QMessageBox.warning(self, "Image preview error", str(exc))
+            else:
+                self.append_log(f"Image preview error: {exc}")
+            return False
+        return True
+
+    def _generate_image_file(self, target: str, smiles: str) -> Path:
+        if not smiles:
+            raise ValueError("SMILES string cannot be empty.")
+        destination = Path(tempfile.gettempdir()) / f"chemtools_{target}_{uuid4().hex}.png"
+        if target == "reaction":
+            render_reaction_image(smiles, destination, image_format="png")
+        else:
+            render_molecule_image(smiles, destination, image_format="png")
+        return destination
+
+    def display_image(self, image_path: Path, caption: str) -> None:
+        pixmap = QPixmap(str(image_path))
+        if pixmap.isNull():
+            raise ValueError("Unable to load rendered image.")
+        target_rect = self.image_label.contentsRect()
+        width = target_rect.width() or self.image_label.size().width() or 320
+        height = target_rect.height() or self.image_label.size().height() or 220
+        scaled = pixmap.scaled(
+            width,
+            height,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+        self.image_label.setPixmap(scaled)
+        self.image_label.setText("")
+        self.image_caption.setText(caption)
+        self.current_image_path = image_path
 
     # ------------------------------------------------------------------ #
     # Constraints / cache / tools
