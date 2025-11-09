@@ -2906,7 +2906,7 @@ def list_all_families_tool() -> Dict[str, Any]:
 class UnifiedRecommenderInput(BaseModel):
     """Input schema for unified_recommender_tool."""
     reaction_smiles: str = Field(..., description="Full reaction SMILES string (reactants>>products)")
-    top_k: int = Field(default=5, description="Number of recommendations to return (max 10)", ge=1, le=10)
+    top_k: int = Field(default=1, description="Number of recommendations to return (max 10)", ge=1, le=10)
     min_similarity: float = Field(default=0.0, description="Minimum DRFP similarity threshold (0.0-1.0)", ge=0.0, le=1.0)
     source_type: Optional[str] = Field(default=None, description="Filter by source: 'protocol' (full experimental procedures) or 'rule' (general guidelines)")
     validate_rules: bool = Field(default=True, description="Enable chemical validation: applies_if for rules, reaction_SMARTS for protocols")
@@ -2917,7 +2917,7 @@ class UnifiedRecommenderInput(BaseModel):
 @tool(args_schema=UnifiedRecommenderInput)
 def unified_recommender_tool(
     reaction_smiles: str,
-    top_k: int = 5,
+    top_k: int = 1,
     min_similarity: float = 0.0,
     source_type: Optional[str] = None,
     validate_rules: bool = True,
@@ -2955,7 +2955,7 @@ def unified_recommender_tool(
     
     Args:
         reaction_smiles: Full reaction SMILES (reactants>>products)
-        top_k: Number of results to return (1-10, default 5)
+        top_k: Number of results to return (1-10, default 1)
         min_similarity: Minimum similarity threshold (0.0-1.0, default 0.0)
         source_type: Filter by 'protocol', 'rule', or None for both
         validate_rules: Enable chemical validation (default True, recommended)
