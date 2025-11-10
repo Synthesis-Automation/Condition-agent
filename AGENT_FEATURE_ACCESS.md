@@ -195,12 +195,24 @@ unified_recommender_tool(
   2. Check/clear cache
   3. Inspect available LangChain tools
   4. Open the form-based Rule Builder Editor (load/save/validate JSON)
-  5. Run the `rule_builder_autofill_tool` through a dedicated dialog and push drafts directly into the editor
+5. Run the `rule_builder_autofill_tool` through a dedicated dialog and push drafts directly into the editor
 
 This gives the agent full GUI parity with the CLI, making it easier to paste long protocol text, inspect validation warnings, and curate rule databases without terminal gymnastics.
 > builder
 # Launches guided wizard (load existing or start new) with validation + diff preview
 ```
+
+### 7. Protocol Draft Builder (NEW)
+**Location**: `chem_assistant/gui/dialogs.py` (`ProtocolDraftDialog`) + `chem_assistant/protocol_builder.py`
+
+- Collects reaction SMILES + procedure text, normalizes the reaction, and derives an ordered addition sequence
+- Produces schema_version 2.0 protocol JSON compatible with `protocol_db_v2` (chemicals, conditions, workup, original text)
+- Saves directly into `data/protocol_db_v2/` and reminds users to rebuild the protocol index for DRFP search
+- Optional LLM extraction (OpenAI/Aliyun via `llmtools.clients`) auto-builds addition sequences and captures metadata; falls back to heuristic parser when disabled
+- Agent trigger token: `[[protocol_draft_request:{"reaction_smiles":"A.B>>C","procedure_text":"Add DMF..."}]]`
+  - Dialog opens with payload prefilled; once accepted, the chat log is updated with a summary + first addition steps
+- Also available as a toolbar button (**Protocol Draft**) for manual launches
+
 
 ## Files Modified Today
 

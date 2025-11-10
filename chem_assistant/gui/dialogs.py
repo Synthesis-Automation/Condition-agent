@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List, Optional
 
 from PyQt6.QtCore import Qt
@@ -11,6 +13,7 @@ from PyQt6.QtWidgets import (
     QCheckBox,
     QDialog,
     QDialogButtonBox,
+    QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
     QGroupBox,
@@ -29,6 +32,14 @@ from chemtools.rule import RuleBuilder
 from chem_assistant.chemtools_wrapper import (
     RuleBuilderAutoInput,
     run_rule_builder_autofill,
+)
+from chem_assistant.protocol_builder import (
+    ProtocolDraftError,
+    ProtocolDraftInput,
+    ProtocolDraftResult,
+    LLM_AVAILABLE,
+    generate_protocol_draft,
+    to_json_file,
 )
 
 
@@ -568,3 +579,272 @@ class RuleBuilderAutofillDialog(QDialog):
             return
         self.accept()
 
+
+class ProtocolDraftDialog(QDialog):
+    """Dialog for generating protocol drafts from reaction SMILES + procedure text."""
+
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+        initial_data: Optional[Dict[str, object]] = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle("Protocol Draft Builder")
+        self.resize(900, 760)
+        self.latest_result: Optional[ProtocolDraftResult] = None
+        self.accepted_payload: Optional[Dict[str, object]] = None
+        self._default_protocol_dir = Path.cwd() / "data" / "protocol_db_v2"
+        self.saved_path: Optional[str] = None
+
+        layout = QVBoxLayout(self)
+
+        layout.addWidget(self._build_metadata_group())
+        layout.addWidget(self._build_reaction_group())
+        layout.addWidget(self._build_hint_group())
+        layout.addWidget(self._build_llm_group())
+        layout.addWidget(self._build_procedure_group())
+        layout.addWidget(self._build_status_group())
+
+        button_row = QHBoxLayout()
+        gen_btn = QPushButton("Generate Draft")
+        gen_btn.clicked.connect(self.run_generation)
+        button_row.addWidget(gen_btn)
+
+        save_btn = QPushButton("Save Protocol...")
+        save_btn.clicked.connect(self.save_protocol)
+        button_row.addWidget(save_btn)
+
+        accept_btn = QPushButton("Send to Agent / Accept")
+        accept_btn.clicked.connect(self.accept_draft)
+        button_row.addWidget(accept_btn)
+
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.reject)
+        button_row.addWidget(close_btn)
+        button_row.addStretch()
+        layout.addLayout(button_row)
+
+        if initial_data:
+            self._apply_initial(initial_data)
+
+    def _build_metadata_group(self) -> QGroupBox:
+        group = QGroupBox("Metadata")
+        form = QFormLayout(group)
+        self.title_edit = QLineEdit()
+        self.metadata_id_edit = QLineEdit()
+        self.family_edit = QLineEdit()
+        self.tags_edit = QLineEdit()
+        form.addRow("Title:", self.title_edit)
+        form.addRow("Metadata ID (optional):", self.metadata_id_edit)
+        form.addRow("Reaction family:", self.family_edit)
+        form.addRow("Tags (comma separated):", self.tags_edit)
+        return group
+
+    def _build_reaction_group(self) -> QGroupBox:
+        group = QGroupBox("Reaction Details")
+        form = QFormLayout(group)
+        self.reaction_smiles_edit = QLineEdit()
+        self.scale_spin = QDoubleSpinBox()
+        self.scale_spin.setRange(0.1, 1000.0)
+        self.scale_spin.setValue(2.0)
+        self.scale_spin.setSuffix(" mmol")
+        self.atmosphere_edit = QLineEdit()
+        form.addRow("Reaction SMILES:", self.reaction_smiles_edit)
+        form.addRow("Scale:", self.scale_spin)
+        form.addRow("Atmosphere hint:", self.atmosphere_edit)
+        return group
+
+    def _build_hint_group(self) -> QGroupBox:
+        group = QGroupBox("Optional Hints")
+        form = QFormLayout(group)
+        self.solvent_edit = QLineEdit()
+        self.base_edit = QLineEdit()
+        self.catalyst_edit = QLineEdit()
+        self.additive_edit = QLineEdit()
+        self.temperature_edit = QLineEdit()
+        self.time_edit = QLineEdit()
+        form.addRow("Solvent:", self.solvent_edit)
+        form.addRow("Base:", self.base_edit)
+        form.addRow("Catalyst:", self.catalyst_edit)
+        form.addRow("Additive / modifier:", self.additive_edit)
+        form.addRow("Temperature (°C):", self.temperature_edit)
+        form.addRow("Time (h):", self.time_edit)
+        return group
+
+    def _build_llm_group(self) -> QGroupBox:
+        group = QGroupBox("LLM Extraction (optional)")
+        form = QFormLayout(group)
+        self.llm_checkbox = QCheckBox("Use LLM to parse procedure text into structured steps")
+        if not LLM_AVAILABLE:
+            self.llm_checkbox.setChecked(False)
+            self.llm_checkbox.setEnabled(False)
+            self.llm_checkbox.setToolTip("LLM client unavailable (install llmtools dependencies and set API keys).")
+        default_provider = os.getenv("LLM_PROVIDER", "openai")
+        default_model = os.getenv("LLM_MODEL", "")
+        self.llm_provider_edit = QLineEdit(default_provider)
+        self.llm_model_edit = QLineEdit(default_model)
+        form.addRow(self.llm_checkbox)
+        form.addRow("Provider:", self.llm_provider_edit)
+        form.addRow("Model:", self.llm_model_edit)
+        self.llm_checkbox.toggled.connect(self._update_llm_controls)
+        self._update_llm_controls(self.llm_checkbox.isChecked())
+        return group
+
+    def _build_procedure_group(self) -> QGroupBox:
+        group = QGroupBox("Operation Procedure")
+        layout = QVBoxLayout(group)
+        self.procedure_edit = QPlainTextEdit()
+        self.procedure_edit.setPlaceholderText(
+            "Paste operation procedure text here. Use explicit 'Add ...' statements for better extraction."
+        )
+        layout.addWidget(self.procedure_edit)
+        load_btn = QPushButton("Load text from file...")
+        load_btn.clicked.connect(self.load_procedure_from_file)
+        layout.addWidget(load_btn)
+        return group
+
+    def _build_status_group(self) -> QGroupBox:
+        group = QGroupBox("Draft Preview")
+        layout = QVBoxLayout(group)
+        self.issues_display = QPlainTextEdit()
+        self.issues_display.setReadOnly(True)
+        self.issues_display.setPlaceholderText("Validation issues will appear here.")
+        self.preview_display = QPlainTextEdit()
+        self.preview_display.setReadOnly(True)
+        layout.addWidget(QLabel("Issues:"))
+        layout.addWidget(self.issues_display, stretch=1)
+        layout.addWidget(QLabel("Draft JSON Preview:"))
+        layout.addWidget(self.preview_display, stretch=2)
+        return group
+
+    def _apply_initial(self, data: Dict[str, object]) -> None:
+        self.reaction_smiles_edit.setText(str(data.get("reaction_smiles", "")))
+        self.procedure_edit.setPlainText(str(data.get("procedure_text", "")))
+        self.title_edit.setText(str(data.get("title", "")))
+        self.family_edit.setText(str(data.get("reaction_family", "")))
+        tags = data.get("tags")
+        if isinstance(tags, (list, tuple)):
+            self.tags_edit.setText(", ".join(str(tag) for tag in tags))
+        elif isinstance(tags, str):
+            self.tags_edit.setText(tags)
+        for key, widget in (
+            ("solvent", self.solvent_edit),
+            ("base", self.base_edit),
+            ("catalyst", self.catalyst_edit),
+            ("additive", self.additive_edit),
+            ("temperature", self.temperature_edit),
+            ("time_h", self.time_edit),
+        ):
+            if key in data:
+                widget.setText(str(data[key]))
+        if data.get("use_llm") and self.llm_checkbox.isEnabled():
+            self.llm_checkbox.setChecked(True)
+        provider = data.get("llm_provider")
+        if provider and isinstance(provider, str):
+            self.llm_provider_edit.setText(provider)
+        model = data.get("llm_model")
+        if model and isinstance(model, str):
+            self.llm_model_edit.setText(model)
+
+    def load_procedure_from_file(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Load procedure text", "", "Text/Markdown (*.txt *.md);;All files (*.*)"
+        )
+        if not path:
+            return
+        try:
+            with open(path, "r", encoding="utf-8") as handle:
+                self.procedure_edit.setPlainText(handle.read())
+        except Exception as exc:
+            QMessageBox.critical(self, "Load failed", str(exc))
+
+    def _update_llm_controls(self, checked: bool) -> None:
+        enabled = checked and self.llm_checkbox.isEnabled()
+        self.llm_provider_edit.setEnabled(enabled)
+        self.llm_model_edit.setEnabled(enabled)
+
+    def run_generation(self) -> None:
+        try:
+            use_llm = self.llm_checkbox.isEnabled() and self.llm_checkbox.isChecked()
+            provider = self.llm_provider_edit.text().strip() or None
+            model = self.llm_model_edit.text().strip() or None
+            params = ProtocolDraftInput(
+                reaction_smiles=self.reaction_smiles_edit.text().strip(),
+                procedure_text=self.procedure_edit.toPlainText().strip(),
+                title=self.title_edit.text().strip() or None,
+                metadata_id=self.metadata_id_edit.text().strip() or None,
+                reaction_family=self.family_edit.text().strip() or None,
+                tags=_split_csv(self.tags_edit.text()),
+                solvent_hint=self.solvent_edit.text().strip() or None,
+                base_hint=self.base_edit.text().strip() or None,
+                catalyst_hint=self.catalyst_edit.text().strip() or None,
+                additive_hint=self.additive_edit.text().strip() or None,
+                temperature_hint=self.temperature_edit.text().strip() or None,
+                time_hint=self.time_edit.text().strip() or None,
+                scale_mmol=self.scale_spin.value(),
+                atmosphere_hint=self.atmosphere_edit.text().strip() or None,
+                use_llm=use_llm,
+                llm_provider=provider if self.llm_provider_edit.isEnabled() else None,
+                llm_model=model if self.llm_model_edit.isEnabled() else None,
+            )
+        except Exception as exc:  # pragma: no cover - defensive
+            QMessageBox.critical(self, "Invalid input", str(exc))
+            return
+
+        try:
+            result = generate_protocol_draft(params)
+        except ProtocolDraftError as exc:
+            QMessageBox.warning(self, "Draft error", str(exc))
+            return
+
+        self.latest_result = result
+        self.preview_display.setPlainText(json.dumps(result.draft, indent=2, ensure_ascii=False))
+        if result.issues:
+            self.issues_display.setPlainText("\n".join(f"- {issue}" for issue in result.issues))
+        else:
+            self.issues_display.setPlainText("No blocking issues detected.")
+        if result.llm_used:
+            meta = result.llm_metadata
+            details = (
+                f"LLM extraction via {meta.get('provider') or 'unknown'} / "
+                f"{meta.get('model') or 'model?'} (tokens: {meta.get('tokens')})"
+            )
+            if self.issues_display.toPlainText():
+                self.issues_display.appendPlainText("")
+            self.issues_display.appendPlainText(details)
+
+    def save_protocol(self) -> None:
+        if not self.latest_result:
+            QMessageBox.information(self, "No draft", "Generate a draft first.")
+            return
+        default_name = self.latest_result.draft["metadata"]["id"] + ".json"
+        directory = str(self._default_protocol_dir)
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save protocol draft",
+            str(Path(directory) / default_name),
+            "JSON files (*.json)",
+        )
+        if not path:
+            return
+        try:
+            to_json_file(self.latest_result.draft, Path(path))
+        except Exception as exc:
+            QMessageBox.critical(self, "Save failed", str(exc))
+            return
+        self.saved_path = path
+        QMessageBox.information(self, "Saved", f"Draft saved to {path}")
+
+    def accept_draft(self) -> None:
+        if not self.latest_result:
+            QMessageBox.information(self, "No draft", "Generate a draft first.")
+            return
+        self.accepted_payload = {
+            "draft": self.latest_result.draft,
+            "issues": self.latest_result.issues,
+            "addition_sequence": self.latest_result.addition_sequence,
+            "saved_path": self.saved_path,
+            "llm_used": self.latest_result.llm_used,
+            "llm_metadata": self.latest_result.llm_metadata,
+        }
+        self.accept()
