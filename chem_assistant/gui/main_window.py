@@ -15,14 +15,11 @@ from uuid import uuid4
 from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal, QTimer
 from PyQt6.QtWidgets import (
     QDialog,
-    QGridLayout,
-    QGroupBox,
     QHBoxLayout,
     QLabel,
     QMainWindow,
     QMessageBox,
     QPushButton,
-    QSplitter,
     QStatusBar,
     QTextEdit,
     QSizePolicy,
@@ -61,8 +58,8 @@ PROTOCOL_PROMPT = re.compile(
 IMAGE_COMMAND_PATTERNS = [
     r"^(?:/)?image\s+(reaction|molecule|compound)\s*[:=]\s*(.+)$",
     r"^(?:/)?image\s+(?:for\s+)?(reaction|molecule|compound)\s*[:=]\s*(.+)$",
-    r"^(?:show|display)\s+image(?:\s+of|\s+for)?\s*(?:a|the)?\s*(reaction|molecule|compound)?[:=]?\s*(.+)$",
-    r"^(?:show|display)\s+(?:me\s+)?an?\s+image\s*(?:of|for)?\s*(reaction|molecule|compound)?[:=]?\s*(.+)$",
+    r"^(?:show|display)\s+(?:the\s+)?image(?:\s+of|\s+for)?\s*(?:a|the)?\s*(reaction|molecule|compound)?[:=]?\s*(.+)$",
+    r"^(?:show|display)\s+(?:me\s+)?(?:an?\s+|the\s+)?image\s*(?:of|for)?\s*(reaction|molecule|compound)?[:=]?\s*(.+)$",
 ]
 URL_SMILES_KEYS = ("smiles", "model", "structure", "mol", "target")
 
@@ -113,6 +110,64 @@ class ChatInput(QTextEdit):
         super().keyPressEvent(event)
 
 
+class ImagePreviewWindow(QDialog):
+    """Standalone window that renders a chemistry image."""
+
+    def __init__(
+        self,
+        pixmap: QPixmap,
+        caption: str,
+        *,
+        parent: Optional[QWidget] = None,
+    ) -> None:
+        super().__init__(parent)
+        self.setWindowTitle(caption or "ChemTools Image Preview")
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
+        self.setWindowModality(Qt.WindowModality.NonModal)
+
+        self._original_pixmap = pixmap
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 12, 12, 12)
+
+        self.image_label = QLabel()
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_label.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        layout.addWidget(self.image_label)
+
+        if caption:
+            caption_label = QLabel(caption)
+            caption_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            caption_label.setWordWrap(True)
+            caption_label.setStyleSheet("font-weight: 600; padding-top: 6px;")
+            layout.addWidget(caption_label)
+
+        self.resize(
+            max(420, pixmap.width() + 64),
+            max(360, pixmap.height() + 96),
+        )
+        self._update_pixmap()
+
+    def resizeEvent(self, event):  # type: ignore[override]
+        super().resizeEvent(event)
+        self._update_pixmap()
+
+    def _update_pixmap(self) -> None:
+        if self._original_pixmap.isNull():
+            return
+        target_size = self.image_label.size()
+        if not target_size.isValid():
+            return
+        scaled = self._original_pixmap.scaled(
+            target_size,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+        self.image_label.setPixmap(scaled)
+
+
 class ChemAssistantWindow(QMainWindow):
     """Main application window."""
 
@@ -127,6 +182,7 @@ class ChemAssistantWindow(QMainWindow):
         self.constraint_spec = ConstraintSpec()
         self.constraint_text = ""
         self.current_image_path: Optional[Path] = None
+        self._image_windows: List[ImagePreviewWindow] = []
 
         self.thread_pool = QThreadPool()
         self._build_ui()
@@ -153,62 +209,14 @@ class ChemAssistantWindow(QMainWindow):
         central = QWidget()
         central_layout = QVBoxLayout(central)
         central_layout.setContentsMargins(8, 8, 8, 8)
+        central_layout.setSpacing(8)
 
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        splitter.setChildrenCollapsible(False)
-
-        # Chat log
         self.chat_view = QTextEdit()
         self.chat_view.setReadOnly(True)
         self.chat_view.setAcceptRichText(True)
         self.chat_view.setPlaceholderText("Conversation history will appear here.")
         self.chat_view.setMinimumHeight(480)
-        splitter.addWidget(self.chat_view)
-
-        # Info panel
-        self.info_panel = QWidget()
-        info_layout = QVBoxLayout(self.info_panel)
-
-        self.constraint_label = QLabel()
-        self.cache_label = QLabel()
-
-        constraint_box = QGroupBox("Constraints")
-        const_layout = QGridLayout(constraint_box)
-        const_layout.addWidget(self.constraint_label, 0, 0, 1, 2)
-        const_layout.addWidget(QLabel("Cache status:"), 1, 0)
-        const_layout.addWidget(self.cache_label, 1, 1)
-        info_layout.addWidget(constraint_box)
-
-        image_box = QGroupBox("Image Preview")
-        image_layout = QVBoxLayout(image_box)
-        self.image_label = QLabel("No image rendered yet.")
-        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setStyleSheet(
-            "QLabel { background-color: #1e1f23; border: 1px dashed #555; color: #888; }"
-        )
-        self.image_label.setMinimumSize(320, 220)
-        self.image_label.setMaximumHeight(320)
-        self.image_label.setSizePolicy(
-            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
-        )
-        self.image_label.setScaledContents(False)
-        image_layout.addWidget(self.image_label)
-
-        self.image_caption = QLabel(
-            "Use the 'image' command or let the agent emit "
-            "[[reaction_image:...]] tokens to preview chemistry diagrams."
-        )
-        self.image_caption.setWordWrap(True)
-        image_layout.addWidget(self.image_caption)
-
-        info_layout.addWidget(image_box)
-        info_layout.addStretch()
-
-        splitter.addWidget(self.info_panel)
-        splitter.setStretchFactor(0, 3)
-        splitter.setStretchFactor(1, 2)
-
-        central_layout.addWidget(splitter)
+        central_layout.addWidget(self.chat_view)
 
         # Input area
         self.input_edit = ChatInput()
@@ -232,10 +240,6 @@ class ChemAssistantWindow(QMainWindow):
         clear_btn = QPushButton("Clear Chat")
         clear_btn.clicked.connect(self.clear_chat)
         button_row.addWidget(clear_btn)
-
-        clear_image_btn = QPushButton("Clear Image")
-        clear_image_btn.clicked.connect(self.clear_image_preview)
-        button_row.addWidget(clear_image_btn)
 
         constraint_btn = QPushButton("Manage Constraints")
         constraint_btn.clicked.connect(self.manage_constraints)
@@ -358,7 +362,7 @@ class ChemAssistantWindow(QMainWindow):
             if log_to_chat:
                 self.append_chat(
                     "System",
-                    f"{target.title()} image rendered in the preview panel.",
+                    f"{target.title()} image opened in a pop-out preview.",
                 )
 
     def handle_agent_result(self, payload: Tuple[str, List[BaseMessage]]) -> None:
@@ -549,14 +553,6 @@ class ChemAssistantWindow(QMainWindow):
         self.history = []
         self.append_log("Chat cleared.")
 
-    def clear_image_preview(self) -> None:
-        self.current_image_path = None
-        self.image_label.setPixmap(QPixmap())
-        self.image_label.setText("No image rendered yet.")
-        self.image_caption.setText(
-            "Use the 'image' command or agent directives to render previews."
-        )
-
     def render_image_from_smiles(
         self,
         target: str,
@@ -610,19 +606,25 @@ class ChemAssistantWindow(QMainWindow):
         pixmap = QPixmap(str(image_path))
         if pixmap.isNull():
             raise ValueError("Unable to load rendered image.")
-        target_rect = self.image_label.contentsRect()
-        width = target_rect.width() or self.image_label.size().width() or 320
-        height = target_rect.height() or self.image_label.size().height() or 220
-        scaled = pixmap.scaled(
-            width,
-            height,
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation,
-        )
-        self.image_label.setPixmap(scaled)
-        self.image_label.setText("")
-        self.image_caption.setText(caption)
+        preview = ImagePreviewWindow(pixmap, caption, parent=self)
+        self._register_image_window(preview)
+        preview.show()
         self.current_image_path = image_path
+        self.append_log(f"Image preview opened: {caption or image_path.name}")
+
+    def _register_image_window(self, window: ImagePreviewWindow) -> None:
+        self._image_windows.append(window)
+
+        def _cleanup(_: QObject, target: ImagePreviewWindow = window) -> None:
+            self._unregister_image_window(target)
+
+        window.destroyed.connect(_cleanup)
+
+    def _unregister_image_window(self, window: ImagePreviewWindow) -> None:
+        try:
+            self._image_windows.remove(window)
+        except ValueError:
+            pass
 
     # ------------------------------------------------------------------ #
     # Constraints / cache / tools
@@ -638,9 +640,10 @@ class ChemAssistantWindow(QMainWindow):
 
     def _update_constraint_summary(self) -> None:
         summary = self.constraint_spec.formatted_summary()
-        if summary == "none":
-            summary = "None"
-        self.constraint_label.setText(summary or "None")
+        display = summary or ""
+        if not display or display.strip().lower() == "none":
+            display = "None"
+        self.append_log(f"Constraints: {display}")
 
         prompt = format_constraints_for_prompt(self.constraint_spec)
         if prompt:
@@ -648,8 +651,8 @@ class ChemAssistantWindow(QMainWindow):
 
     def show_cache_stats(self) -> None:
         stats = recommendation_cache_stats()
-        self.cache_label.setText(
-            f"{stats['entries']} entries, {stats['hits']} hits"
+        self.append_log(
+            f"Cache status -> entries: {stats['entries']} | hits: {stats['hits']}"
         )
         QMessageBox.information(
             self,
@@ -659,7 +662,7 @@ class ChemAssistantWindow(QMainWindow):
 
     def clear_cache(self) -> None:
         clear_recommendation_cache()
-        self.cache_label.setText("Cache cleared.")
+        self.append_log("Recommendation cache cleared.")
         QMessageBox.information(self, "Cache", "Recommendation cache cleared.")
 
     def show_tool_summary(self) -> None:
