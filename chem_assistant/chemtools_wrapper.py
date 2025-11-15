@@ -4,7 +4,7 @@ LangChain tool wrappers for ChemTools functions.
 This module exposes existing chemtools functionality as LangChain tools
 without modifying the original chemtools codebase.
 
-Available Tools (25 total):
+Available Tools (26 total):
     - normalize_smiles_tool: Canonicalize SMILES strings
     - normalize_reaction_tool: Canonicalize reaction SMILES
     - detect_reaction_family_tool: Detect reaction family/type
@@ -24,6 +24,7 @@ Available Tools (25 total):
     - rule_builder_autofill_tool: LLM-assisted drafting of rule database JSON
     - hte_recommend_tool: HTE-based condition recommendations (66K experiments, catalyst filtering)
     - hte_analytics_tool: HTE database analytics (reactant pairs, catalysts, metal usage)
+    - hte_conditions_tool: Detailed conditions for specific substrate pair (top-k conditions query)
     - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
     - find_reagent_tool: Look up reagent information from database
     - reagent_database_analytics_tool: Summarize reagent registry statistics
@@ -47,6 +48,7 @@ from datetime import date
 from dataclasses import dataclass
 from collections import OrderedDict
 from pathlib import Path
+import pandas as pd
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 from llmtools.clients import LLMClient, RECOMMENDED_MODELS
@@ -755,6 +757,43 @@ class HTERecommendInput(BaseModel):
     )
 
 
+class HTEConditionsInput(BaseModel):
+    """Schema for querying specific substrate pair conditions from HTE database."""
+    
+    reactant_a_type: str = Field(
+        ...,
+        description="Reactant A type (e.g., 'ArI', 'ArBr', 'ArCl'). Use exact type from database."
+    )
+    reactant_b_type: str = Field(
+        ...,
+        description="Reactant B type (e.g., 'Carbamate', 'RNH2', 'arom-NH', 'Lactam')."
+    )
+    reaction_type: Optional[str] = Field(
+        None,
+        description="Reaction type filter (e.g., 'C-N', 'Suzuki'). Optional."
+    )
+    catalyst_filter: Optional[str] = Field(
+        None,
+        description="Catalyst metal filter (e.g., 'Pd', 'Cu', 'Ni'). Optional."
+    )
+    top_k: int = Field(
+        10,
+        ge=1,
+        le=50,
+        description="Number of top conditions to return (1-50)."
+    )
+    min_experiments: int = Field(
+        1,
+        ge=1,
+        le=100,
+        description="Minimum experiments per condition (default 1)."
+    )
+    sort_by: str = Field(
+        "count",
+        description="Sort by 'count' (experiments), 'success' (success rate), or 'yield' (avg yield)."
+    )
+
+
 class HTEAnalyticsInput(BaseModel):
     """Schema for HTE database analytics queries."""
     
@@ -779,10 +818,10 @@ class HTEAnalyticsInput(BaseModel):
         description="Filter by reactant B type (e.g., 'RNH2', 'ArB(OH)2')."
     )
     min_experiments: int = Field(
-        10,
+        5,
         ge=1,
         le=1000,
-        description="Minimum number of experiments for inclusion in results."
+        description="Minimum number of experiments for inclusion in results. Default 5 to capture sparse data."
     )
     top_n: int = Field(
         20,
@@ -3366,7 +3405,7 @@ def hte_analytics_tool(
     catalyst_filter: Optional[str] = None,
     reactant_a_type: Optional[str] = None,
     reactant_b_type: Optional[str] = None,
-    min_experiments: int = 10,
+    min_experiments: int = 5,
     top_n: int = 20,
     sort_by: str = "count",
     similarity_criteria: Optional[str] = None
@@ -3395,11 +3434,16 @@ def hte_analytics_tool(
     
     Args:
         query_type: Type of analysis ('list_pairs', 'catalysts', 'reactions', 'metals', 'similar_pairs')
-        reaction_type: Filter by reaction type (e.g., 'Suzuki', 'C-N')
-        catalyst_filter: Filter by catalyst metal (e.g., 'Pd', 'Cu')
+        reaction_type: Filter by reaction type. Supported formats:
+            - 'Suzuki', 'Buchwald', 'Sonogashira' (common name)
+            - 'C-N', 'C-N coupling' → C_N_Coupling
+            - 'C-O', 'C-O coupling' → CO-Coupling (Ullmann)
+            - 'C-C', 'C-C coupling' → CC-Coupling
+            - 'C-S', 'C-S coupling' → CS-Coupling
+        catalyst_filter: Filter by catalyst metal (e.g., 'Pd', 'Cu', 'Ni')
         reactant_a_type: Filter by reactant A type (e.g., 'ArBr')
         reactant_b_type: Filter by reactant B type (e.g., 'RNH2')
-        min_experiments: Minimum experiments for inclusion (default 10)
+        min_experiments: Minimum experiments for inclusion (default 5)
         top_n: Maximum results to return (default 20)
         sort_by: Sort by 'count' or 'success_rate' (default 'count')
         similarity_criteria: For similar_pairs: 'reaction_type', 'catalyst', or 'both'
@@ -3442,6 +3486,39 @@ def hte_analytics_tool(
     
     try:
         analytics = HTEAnalytics()
+        
+        # Normalize reaction type name to handle common variations
+        # The HTE database uses underscores (e.g., "C_N_Coupling", "CO-Coupling")
+        # Users might input "C-N" or "C-N coupling", so normalize to match
+        if reaction_type:
+            # Common mappings for user-friendly names
+            reaction_type_map = {
+                'c-n': 'C_N',
+                'cn': 'C_N',
+                'c-n coupling': 'C_N_Coupling',
+                'cn coupling': 'C_N_Coupling',
+                'buchwald': 'Buchwald',
+                'buchwald-hartwig': 'Buchwald',
+                'c-o': 'CO',
+                'co': 'CO',
+                'c-o coupling': 'CO-Coupling',
+                'co coupling': 'CO-Coupling',
+                'ullmann': 'CO-Coupling',
+                'c-c': 'CC',
+                'cc': 'CC',
+                'c-c coupling': 'CC-Coupling',
+                'cc coupling': 'CC-Coupling',
+                'c-s': 'CS',
+                'cs': 'CS',
+                'c-s coupling': 'CS-Coupling',
+                'cs coupling': 'CS-Coupling',
+            }
+            
+            # Try exact match first (case-insensitive)
+            reaction_lower = reaction_type.lower().strip()
+            if reaction_lower in reaction_type_map:
+                reaction_type = reaction_type_map[reaction_lower]
+            # Otherwise use as-is and rely on str.contains() matching
         
         if query_type == "list_pairs":
             df = analytics.list_reactant_pairs(
@@ -3597,6 +3674,220 @@ def hte_analytics_tool(
         return _error_response(f"HTE analytics failed: {str(e)}")
 
 
+@tool(args_schema=HTEConditionsInput)
+def hte_conditions_tool(
+    reactant_a_type: str,
+    reactant_b_type: str,
+    reaction_type: Optional[str] = None,
+    catalyst_filter: Optional[str] = None,
+    top_k: int = 10,
+    min_experiments: int = 1,
+    sort_by: str = "count"
+) -> Dict[str, Any]:
+    """
+    Get detailed experimental conditions for a specific substrate pair from HTE database.
+    
+    This tool retrieves all tested conditions (catalyst, ligand, base, solvent combinations)
+    for a specific pair of reactant types. Use this when you need to see what specific
+    conditions were tested for a particular substrate combination.
+    
+    **Use when:**
+    - User asks for "top conditions" for specific substrates
+    - Need detailed breakdown of tested catalyst/ligand/base/solvent combinations
+    - Comparing different conditions for the same substrate pair
+    - Finding best performing conditions for specific reactants
+    
+    **Example queries this tool answers:**
+    - "What are the top 10 conditions for ArI + Carbamate with copper catalyst?"
+    - "Show me all conditions tested for ArBr + RNH2 in C-N coupling"
+    - "What ligands work best with palladium for ArCl + Boronic acid?"
+    
+    Args:
+        reactant_a_type: Reactant A type (e.g., 'ArI', 'ArBr', 'ArCl')
+        reactant_b_type: Reactant B type (e.g., 'Carbamate', 'RNH2', 'arom-NH', 'Lactam')
+        reaction_type: Optional reaction type filter (e.g., 'C-N', 'Suzuki')
+        catalyst_filter: Optional catalyst metal filter (e.g., 'Pd', 'Cu', 'Ni')
+        top_k: Number of top conditions to return (default 10)
+        min_experiments: Minimum experiments per condition (default 1)
+        sort_by: Sort by 'count', 'success', or 'yield' (default 'count')
+    
+    Returns:
+        Dict with top conditions including catalyst, ligand, base, solvent, statistics
+    
+    Example:
+        >>> hte_conditions_tool(
+        ...     reactant_a_type="ArI",
+        ...     reactant_b_type="Carbamate",
+        ...     catalyst_filter="Cu",
+        ...     top_k=10
+        ... )
+        {
+            "success": True,
+            "reactant_pair": "ArI + Carbamate",
+            "filters": {"catalyst": "Cu"},
+            "total_experiments": 736,
+            "total_conditions": 45,
+            "conditions": [
+                {
+                    "rank": 1,
+                    "catalyst": "CuI",
+                    "ligand": "L1",
+                    "base": "Cs2CO3",
+                    "solvent": "Dioxane",
+                    "experiments": 24,
+                    "avg_yield": 68.5,
+                    "success_rate": 75.0
+                },
+                ...
+            ]
+        }
+    """
+    if not HTE_AVAILABLE:
+        return _error_response(
+            "HTE tools not available. Install with: pip install chemtools[hte]",
+            {"recommendation": "Install HTE dependencies"}
+        )
+    
+    try:
+        from chemtools.HTE import HTERecommender
+        
+        recommender = HTERecommender()
+        df = recommender.df.copy()
+        
+        # Apply filters
+        # Filter by reactant types
+        df = df[
+            (df['Reactant_A_Type'] == reactant_a_type) &
+            (df['Reactant_B_Type'] == reactant_b_type)
+        ]
+        
+        if len(df) == 0:
+            return _error_response(
+                f"No experiments found for {reactant_a_type} + {reactant_b_type}",
+                {
+                    "suggestion": "Check reactant type names. Use hte_analytics_tool with query_type='list_pairs' to see available pairs."
+                }
+            )
+        
+        # Normalize reaction type if provided
+        if reaction_type:
+            reaction_type_map = {
+                'c-n': 'C_N', 'cn': 'C_N',
+                'c-n coupling': 'C_N_Coupling', 'cn coupling': 'C_N_Coupling',
+                'c-o': 'CO', 'co': 'CO',
+                'c-o coupling': 'CO-Coupling', 'co coupling': 'CO-Coupling',
+                'ullmann': 'CO-Coupling',
+                'buchwald': 'Buchwald', 'buchwald-hartwig': 'Buchwald',
+            }
+            reaction_lower = reaction_type.lower().strip()
+            if reaction_lower in reaction_type_map:
+                reaction_type = reaction_type_map[reaction_lower]
+            
+            df = df[df['Reaction_Type_Standardized'].str.contains(reaction_type, case=False, na=False)]
+        
+        # Filter by catalyst if provided
+        if catalyst_filter:
+            metal_map = {
+                'palladium': 'Pd', 'copper': 'Cu', 'nickel': 'Ni',
+                'iridium': 'Ir', 'rhodium': 'Rh', 'platinum': 'Pt'
+            }
+            filter_lower = catalyst_filter.lower()
+            search_term = metal_map.get(filter_lower, catalyst_filter)
+            df = df[df['Catalyst'].str.contains(search_term, case=False, na=False)]
+        
+        if len(df) == 0:
+            return _error_response(
+                f"No experiments found with applied filters",
+                {
+                    "reactant_pair": f"{reactant_a_type} + {reactant_b_type}",
+                    "filters": {
+                        "reaction_type": reaction_type,
+                        "catalyst": catalyst_filter
+                    },
+                    "suggestion": "Try removing filters or use different catalyst type."
+                }
+            )
+        
+        # Group by condition components
+        condition_cols = ['Catalyst', 'Ligand', 'Base', 'Solvent']
+        
+        # Calculate statistics for each condition
+        grouped = df.groupby(condition_cols).agg({
+            'AREA_TOTAL_REDUCED': ['count', 'mean', 'median', 'std']
+        }).reset_index()
+        
+        grouped.columns = condition_cols + ['Count', 'Avg_Yield', 'Median_Yield', 'Std_Yield']
+        
+        # Calculate success rate (yield > 50)
+        success_rates = df.groupby(condition_cols)['AREA_TOTAL_REDUCED'].apply(
+            lambda x: (x > 50).sum() / len(x) * 100
+        ).reset_index(name='Success_Rate')
+        
+        grouped = grouped.merge(success_rates, on=condition_cols)
+        
+        # Filter by min_experiments
+        grouped = grouped[grouped['Count'] >= min_experiments]
+        
+        # Sort based on user preference
+        if sort_by == "success":
+            grouped = grouped.sort_values(['Success_Rate', 'Count'], ascending=[False, False])
+        elif sort_by == "yield":
+            grouped = grouped.sort_values(['Avg_Yield', 'Count'], ascending=[False, False])
+        else:  # count (default)
+            grouped = grouped.sort_values('Count', ascending=False)
+        
+        # Format results
+        conditions = []
+        for i, (_, row) in enumerate(grouped.head(top_k).iterrows(), 1):
+            condition = {
+                "rank": i,
+                "catalyst": row['Catalyst'],
+                "ligand": row['Ligand'] if pd.notna(row['Ligand']) else None,
+                "base": row['Base'] if pd.notna(row['Base']) else None,
+                "solvent": row['Solvent'] if pd.notna(row['Solvent']) else None,
+                "experiments": int(row['Count']),
+                "avg_yield": round(row['Avg_Yield'], 1),
+                "median_yield": round(row['Median_Yield'], 1),
+                "success_rate": round(row['Success_Rate'], 1)
+            }
+            
+            # Add optional components from original data
+            condition_df = df[
+                (df['Catalyst'] == row['Catalyst']) &
+                (df['Ligand'] == row['Ligand']) &
+                (df['Base'] == row['Base']) &
+                (df['Solvent'] == row['Solvent'])
+            ]
+            
+            # Check for secondary solvent, additive, coupling reagent
+            if 'Secondary Solvent' in condition_df.columns:
+                sec_solv = condition_df['Secondary Solvent'].dropna().mode()
+                if len(sec_solv) > 0:
+                    condition['secondary_solvent'] = sec_solv.iloc[0]
+            
+            if 'Additive' in condition_df.columns:
+                additive = condition_df['Additive'].dropna().mode()
+                if len(additive) > 0:
+                    condition['additive'] = additive.iloc[0]
+            
+            conditions.append(condition)
+        
+        return _success_response({
+            "reactant_pair": f"{reactant_a_type} + {reactant_b_type}",
+            "filters": {
+                "reaction_type": reaction_type,
+                "catalyst": catalyst_filter
+            },
+            "total_experiments": len(df),
+            "total_conditions": len(grouped),
+            "conditions": conditions,
+            "sort_by": sort_by
+        })
+    
+    except Exception as e:
+        return _error_response(f"Failed to query HTE conditions: {str(e)}")
+
+
 # ============================================================================
 # Tool Collection
 # ============================================================================
@@ -3626,6 +3917,7 @@ CHEMTOOLS_TOOLS = [
     rule_builder_autofill_tool,  # NEW: LLM-assisted rule database drafting
     hte_recommend_tool,  # NEW: HTE-based condition recommendations with catalyst filtering
     hte_analytics_tool,  # NEW: HTE database analytics (pairs, catalysts, metals)
+    hte_conditions_tool,  # NEW: Detailed conditions for specific substrate pairs
     
     # Database tools
     reaction_dataset_analytics_tool,
