@@ -17,8 +17,11 @@ Examples:
   # C-N Coupling
   python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" -k 5
   
-  # Suzuki Coupling
-  python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki
+  # Suzuki Coupling with palladium catalysts only
+  python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki --catalyst Pd
+  
+  # C-N Coupling with copper catalysts only
+  python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --catalyst copper
   
   # Single reactant
   python -m chemtools.HTE.cli -a "c1ccc(Br)cc1"
@@ -62,6 +65,11 @@ Examples:
         '--reaction',
         type=str,
         help='Filter by reaction type (e.g., Suzuki, C_N_Coupling)'
+    )
+    parser.add_argument(
+        '--catalyst',
+        type=str,
+        help='Filter by catalyst metal type (e.g., Pd, Cu, Ni, palladium, copper)'
     )
     parser.add_argument(
         '--db-path',
@@ -120,7 +128,7 @@ Examples:
         if args.batch:
             return process_batch(
                 recommender, args.batch, output, 
-                args.top_k, args.min_exp, args.reaction,
+                args.top_k, args.min_exp, args.reaction, args.catalyst,
                 args.json, args.compact
             )
         
@@ -134,7 +142,8 @@ Examples:
             reactant_b_smiles=args.reactant_b,
             top_k=args.top_k,
             min_experiments=args.min_exp,
-            reaction_type_filter=args.reaction
+            reaction_type_filter=args.reaction,
+            catalyst_filter=args.catalyst
         )
         
         if args.json:
@@ -153,7 +162,7 @@ Examples:
 
 def process_batch(
     recommender, batch_file, output, 
-    top_k, min_exp, reaction_filter,
+    top_k, min_exp, reaction_filter, catalyst_filter,
     json_format, compact
 ):
     """Process batch file with reactant pairs"""
@@ -182,7 +191,8 @@ def process_batch(
             reactant_b_smiles=reactant_b,
             top_k=top_k,
             min_experiments=min_exp,
-            reaction_type_filter=reaction_filter
+            reaction_type_filter=reaction_filter,
+            catalyst_filter=catalyst_filter
         )
         
         results.append(result)

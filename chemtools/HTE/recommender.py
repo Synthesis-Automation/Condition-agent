@@ -134,6 +134,44 @@ class HTERecommender:
             return result.member_type, result.category
         return None, None
     
+    def _filter_by_catalyst(self, df: pd.DataFrame, catalyst_filter: str) -> pd.DataFrame:
+        """
+        Filter dataframe by catalyst metal type.
+        
+        Args:
+            df: DataFrame to filter
+            catalyst_filter: Metal type or symbol (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
+        
+        Returns:
+            Filtered DataFrame
+        """
+        # Normalize filter term
+        filter_lower = catalyst_filter.lower()
+        
+        # Map common names to symbols
+        metal_map = {
+            'palladium': 'Pd',
+            'copper': 'Cu',
+            'nickel': 'Ni',
+            'iridium': 'Ir',
+            'rhodium': 'Rh',
+            'ruthenium': 'Ru',
+            'platinum': 'Pt',
+            'gold': 'Au',
+            'silver': 'Ag',
+            'iron': 'Fe',
+            'cobalt': 'Co',
+            'zinc': 'Zn'
+        }
+        
+        # Get the search term (symbol or name)
+        search_term = metal_map.get(filter_lower, catalyst_filter)
+        
+        # Filter catalyst column (case-insensitive)
+        mask = df['Catalyst'].str.contains(search_term, case=False, na=False)
+        
+        return df[mask]
+    
     def _predict_reaction_type(
         self, 
         type_a: str, 
@@ -289,7 +327,8 @@ class HTERecommender:
         reactant_b_smiles: Optional[str] = None,
         top_k: int = 10,
         min_experiments: int = 2,
-        reaction_type_filter: Optional[str] = None
+        reaction_type_filter: Optional[str] = None,
+        catalyst_filter: Optional[str] = None
     ) -> HTERecommendationResult:
         """
         Recommend conditions based on reactant SMILES.
@@ -300,6 +339,7 @@ class HTERecommender:
             top_k: Number of recommendations to return
             min_experiments: Minimum experiments for a condition to be recommended
             reaction_type_filter: Optional filter for specific reaction type
+            catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
         
         Returns:
             HTERecommendationResult with ranked condition recommendations
@@ -343,6 +383,10 @@ class HTERecommender:
         # Apply reaction type filter if specified
         if reaction_type_filter:
             matched_df = matched_df[matched_df['Reaction_Type_Standardized'] == reaction_type_filter]
+        
+        # Apply catalyst filter if specified
+        if catalyst_filter:
+            matched_df = self._filter_by_catalyst(matched_df, catalyst_filter)
         
         result.total_matching_experiments = len(matched_df)
         result.database_coverage = (len(matched_df) / len(self.df)) * 100.0
