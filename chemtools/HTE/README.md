@@ -37,6 +37,7 @@ print(format_result(result))
 ```
 
 **Output**:
+
 ```
 Reactant A: ArBr (ArX*)
 Reactant B: RNH2 (RNH2/R2NH)
@@ -56,13 +57,24 @@ Reactant B: RNH2 (RNH2/R2NH)
 
 ## 📋 Features
 
+### Recommendation System
+
 ✅ **66,308 experimental results** across 41 reaction types  
 ✅ **Fast**: <100ms query time, O(1) lookup  
 ✅ **No reaction SMILES needed** - works with just reactants  
 ✅ **Statistical confidence** - success rates & sample sizes  
 ✅ **Multiple output formats** - Python API, CLI, JSON  
 ✅ **Batch processing** - process multiple queries at once  
-✅ **Flexible filtering** - by reaction type, confidence, etc.  
+✅ **Flexible filtering** - by reaction type, catalyst metal, confidence  
+
+### Analytics Tools (NEW! 🎉)
+
+✅ **List reactant pairs** by reaction type and/or catalyst  
+✅ **Analyze catalyst statistics** for specific reactions or substrates  
+✅ **Summarize reaction types** in the database  
+✅ **Analyze metal usage patterns** across reactions  
+✅ **Find similar reactant pairs** based on reaction type or catalyst  
+✅ **Export filtered datasets** for further analysis  
 
 ---
 
@@ -130,6 +142,7 @@ c1ccc(Br)cc1 c1ccc(B(O)O)cc1
 ```
 
 Process:
+
 ```bash
 python -m chemtools.HTE.cli --batch examples/hte_queries.txt -o results.txt
 ```
@@ -192,6 +205,7 @@ confidence = (
 ```
 
 Balances:
+
 - **Success rate** (primary): % yield > 50%
 - **Sample size** (reliability): number of experiments
 - **Average yield** (performance): mean yield
@@ -226,15 +240,18 @@ Balances:
 ## 📚 Documentation
 
 ### Quick Reference
+
 - **This file** - Quick start and overview
 - `quickstart_hte.py` - 5-minute interactive demo
 
 ### Complete Guides
+
 - `docs/HTE_RECOMMENDER.md` - Full user guide (400+ lines)
 - `HTE_PROPOSAL_AND_IMPLEMENTATION.md` - Technical details
 - `HTE_IMPLEMENTATION_SUMMARY.md` - Architecture summary
 
 ### Examples
+
 - `demo_hte_recommender.py` - 6 comprehensive test cases
 - `examples/hte_queries.txt` - Sample batch queries
 
@@ -269,10 +286,12 @@ Detection coverage: **98.7%** on common substrates
 ### With Rule-Based System
 
 Complementary approach:
+
 - **Rule-based**: Requires reaction SMILES, uses templates
 - **HTE-based**: Only needs reactants, uses experimental data
 
 Can combine for validation:
+
 ```python
 # Get both
 rule_recs = recommend_conditions_unified("rxn_smiles")
@@ -459,13 +478,118 @@ Demo scripts:
 
 ---
 
+## 🆕 Analytics Tools
+
+### Overview
+
+New analytics tools for exploring and understanding the HTE database!
+
+```python
+from chemtools.HTE import HTEAnalytics
+
+analytics = HTEAnalytics()
+
+# List all Suzuki reactant pairs with Pd catalysts
+pairs = analytics.list_reactant_pairs(
+    reaction_type="Suzuki",
+    catalyst_filter="Pd",
+    min_experiments=50
+)
+
+# Analyze catalyst statistics
+catalysts = analytics.get_catalyst_stats(
+    reaction_type="C-N",
+    catalyst_filter="Cu"
+)
+
+# Get reaction type summary
+reactions = analytics.get_reaction_type_summary()
+
+# Analyze metal usage
+metals = analytics.analyze_metal_usage()
+
+# Export filtered dataset
+count = analytics.export_subset(
+    output_path="suzuki_pd.csv",
+    reaction_type="Suzuki",
+    catalyst_filter="Pd",
+    min_yield=80
+)
+```
+
+### CLI Usage
+
+```bash
+# List Suzuki reactant pairs with Pd catalysts
+python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10
+
+# Analyze Cu catalysts
+python -m chemtools.HTE.analytics_cli catalysts --reaction "C-N" --catalyst Cu --compact
+
+# View reaction type summary
+python -m chemtools.HTE.analytics_cli reactions --top 20
+
+# Analyze metal usage
+python -m chemtools.HTE.analytics_cli metals --detailed
+
+# Export filtered dataset
+python -m chemtools.HTE.analytics_cli export suzuki_pd.csv --reaction Suzuki --catalyst Pd --min-yield 50
+```
+
+### Example Output
+
+```
+================================================================================
+📋 REACTANT PAIR ANALYSIS
+================================================================================
+Reaction Type: Suzuki
+Catalyst Filter: Pd
+
+Found 16 reactant pair combinations
+
+1. ArCl + ArB(OR)2
+   Reaction: Suzuki
+   Experiments: 2528, Avg Yield: 30.4%, Success Rate: 25.9%
+   Top Catalyst: dtbpfPdCl2
+
+2. ArBr + ArB(OH)2
+   Reaction: Suzuki
+   Experiments: 1908, Avg Yield: 33.3%, Success Rate: 32.6%
+   Top Catalyst: dtbpfPdCl2
+...
+```
+
+### Documentation
+
+**Complete guide**: `docs/HTE_ANALYTICS.md` (comprehensive API reference, use cases, examples)
+
+**Demo script**: `demo_hte_analytics.py` (6 different analytics demos)
+
+### Use Cases
+
+- **Catalyst Selection**: Find the most successful catalyst for specific substrates
+- **Reaction Scope**: Identify what reactant pairs work with different catalysts
+- **Database Exploration**: Discover trends and patterns in the data
+- **Literature Prep**: Export filtered datasets for analysis or publication
+- **Metal Comparison**: Compare Pd vs Cu vs Ni usage across reactions
+
+---
+
 ## 📞 Support
+
+### Recommendation System
 
 - **Documentation**: `docs/HTE_RECOMMENDER.md`
 - **Examples**: Run `python demo_hte_recommender.py`
 - **Quick Start**: Run `python quickstart_hte.py`
 - **CLI Help**: `python -m chemtools.HTE.cli --help`
 
+### Analytics Tools
+
+- **Documentation**: `docs/HTE_ANALYTICS.md`
+- **Demo**: Run `python demo_hte_analytics.py`
+- **CLI Help**: `python -m chemtools.HTE.analytics_cli --help`
+
 ---
 
-*Last updated: November 11, 2025*
+**Last updated:** November 15, 2025

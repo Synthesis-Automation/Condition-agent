@@ -11,11 +11,13 @@ from .recommender import (
     format_recommendation,
     format_result
 )
+from .analytics import HTEAnalytics
 
 __all__ = [
     'HTERecommender',
     'HTERecommendationResult',
     'ConditionRecommendation',
     'format_recommendation',
-    'format_result'
+    'format_result',
+    'HTEAnalytics'
 ]
