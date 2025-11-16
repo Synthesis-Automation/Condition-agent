@@ -6,6 +6,7 @@ Recommendations are primarily based on reactant types since no reaction SMILES i
 
 Key Features:
 - Reactant type-based matching using existing chemtools detection
+- Z-score based ranking (primary metric for condition success)
 - Success-weighted condition selection (yield > 50% threshold)
 - Statistical ranking with confidence scores
 - Multi-reaction type support with automatic detection
@@ -23,7 +24,11 @@ from chemtools.analysis.reactants import classify_reactant_smiles
 
 @dataclass
 class ConditionRecommendation:
-    """Single condition recommendation with metadata"""
+    """Single condition recommendation with metadata
+    
+    Recommendations are ranked primarily by avg_z_score, which measures
+    the success of a condition relative to all experiments in the database.
+    """
     catalyst: str
     ligand: str
     base: str
@@ -37,7 +42,8 @@ class ConditionRecommendation:
     avg_yield: float = 0.0
     median_yield: float = 0.0
     num_experiments: int = 0
-    confidence_score: float = 0.0  # Weighted score considering success rate and sample size
+    avg_z_score: float = 0.0  # Average z-score (PRIMARY ranking metric for condition success)
+    confidence_score: float = 0.0  # Secondary score considering z-score and sample size
     
     # Metadata
     reaction_type: Optional[str] = None
@@ -203,29 +209,32 @@ class HTERecommender:
     
     def _calculate_confidence_score(
         self,
-        success_rate: float,
+        avg_z_score: float,
         num_experiments: int,
         avg_yield: float
     ) -> float:
         """
         Calculate confidence score combining multiple factors.
         
-        Formula: weighted combination of success rate, sample size, and avg yield
+        Formula: weighted combination of z-score (primary), sample size, and avg yield
+        Z-score is the primary metric as it measures the success of a condition.
         """
         # Normalize sample size (log scale, cap at 100)
         sample_score = min(num_experiments, 100) / 100.0
         
-        # Success rate weight (primary factor)
-        success_weight = success_rate / 100.0
+        # Z-score weight (primary factor)
+        # Normalize z-score: typical range is -3 to +3, scale to 0-1
+        # Values above 3 are capped at 1.0, below -3 at 0.0
+        z_score_normalized = max(0.0, min(1.0, (avg_z_score + 3.0) / 6.0))
         
         # Average yield weight (secondary factor)
         yield_weight = avg_yield / 100.0
         
         # Combined score with weights
         confidence = (
-            0.5 * success_weight +  # 50% from success rate
-            0.3 * sample_score +     # 30% from sample size
-            0.2 * yield_weight       # 20% from avg yield
+            0.6 * z_score_normalized +  # 60% from z-score (primary)
+            0.25 * sample_score +        # 25% from sample size
+            0.15 * yield_weight          # 15% from avg yield
         ) * 100.0
         
         return confidence
@@ -241,10 +250,11 @@ class HTERecommender:
         
         Strategy:
         1. Group by (catalyst, ligand, base, solvent) combination
-        2. Calculate success rate (yield > 50)
-        3. Calculate avg/median yield
-        4. Compute confidence score
-        5. Rank by confidence score
+        2. Calculate z-score statistics (primary ranking metric)
+        3. Calculate success rate (yield > 50)
+        4. Calculate avg/median yield
+        5. Compute confidence score (weighted by z-score)
+        6. Rank by average z-score (primary), then confidence score
         """
         recommendations = []
         
@@ -277,14 +287,15 @@ class HTERecommender:
             avg_yield = yields.mean()
             median_yield = yields.median()
             
-            # Z-score range
+            # Z-score statistics (primary ranking metric)
             z_scores = group_df['z-Score']
+            avg_z_score = z_scores.mean()
             z_min = z_scores.min()
             z_max = z_scores.max()
             
-            # Confidence score
+            # Confidence score (uses z-score as primary factor)
             confidence = self._calculate_confidence_score(
-                success_rate, num_exp, avg_yield
+                avg_z_score, num_exp, avg_yield
             )
             
             # Reaction type (most common)
@@ -308,6 +319,7 @@ class HTERecommender:
                 avg_yield=avg_yield,
                 median_yield=median_yield,
                 num_experiments=num_exp,
+                avg_z_score=avg_z_score,
                 confidence_score=confidence,
                 reaction_type=reaction_type,
                 reactant_types=reactant_types,
@@ -316,8 +328,8 @@ class HTERecommender:
             
             recommendations.append(rec)
         
-        # Sort by confidence score
-        recommendations.sort(key=lambda x: x.confidence_score, reverse=True)
+        # Sort by average z-score (primary metric), then confidence score
+        recommendations.sort(key=lambda x: (x.avg_z_score, x.confidence_score), reverse=True)
         
         return recommendations[:top_k]
     
@@ -423,6 +435,7 @@ def format_recommendation(rec: ConditionRecommendation, rank: int = 1) -> str:
         f"\n{'='*80}",
         f"Recommendation #{rank}",
         f"{'='*80}",
+        f"⭐ Avg Z-Score: {rec.avg_z_score:.2f} (Primary Ranking Metric)",
         f"Confidence Score: {rec.confidence_score:.1f}/100",
         f"Success Rate: {rec.success_rate:.1f}% ({rec.num_experiments} experiments)",
         f"Avg Yield: {rec.avg_yield:.1f}% | Median: {rec.median_yield:.1f}%",
@@ -445,7 +458,7 @@ def format_recommendation(rec: ConditionRecommendation, rank: int = 1) -> str:
         f"",
         f"📊 STATISTICS:",
         f"  Reaction Type: {rec.reaction_type}",
-        f"  Z-Score Range: {rec.z_score_range[0]:.2f} to {rec.z_score_range[1]:.2f}",
+        f"  Z-Score: Avg={rec.avg_z_score:.2f}, Range=[{rec.z_score_range[0]:.2f}, {rec.z_score_range[1]:.2f}]",
         f"  Reactant Types: {rec.reactant_types[0]} + {rec.reactant_types[1]}"
     ])
     
@@ -478,6 +491,7 @@ def format_result(result: HTERecommendationResult) -> str:
         f"   ({result.database_coverage:.2f}% of database)",
         f"",
         f"🏆 TOP RECOMMENDATIONS: {len(result.recommendations)} conditions found",
+        f"   (Ranked by Average Z-Score)",
         "="*80
     ])
     
