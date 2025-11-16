@@ -25,6 +25,7 @@ Available Tools (26 total):
     - hte_recommend_tool: HTE-based condition recommendations (66K experiments, catalyst filtering)
     - hte_analytics_tool: HTE database analytics (reactant pairs, catalysts, metal usage)
     - hte_conditions_tool: Detailed conditions for specific substrate pair (top-k conditions query)
+    - hte_screening_set_tool: Generate diverse condition sets for HTE screening plates (up to 24)
     - reaction_dataset_analytics_tool: Analyze reaction dataset frequency/yield statistics
     - find_reagent_tool: Look up reagent information from database
     - reagent_database_analytics_tool: Summarize reagent registry statistics
@@ -727,13 +728,17 @@ class ListAllFamiliesInput(BaseModel):
 class HTERecommendInput(BaseModel):
     """Schema for HTE-based condition recommendation."""
     
-    reactant_a_smiles: str = Field(
-        ...,
-        description="SMILES string of first reactant (e.g., aryl halide, aryl boronic acid)."
+    reactant_a_smiles: Optional[str] = Field(
+        None,
+        description="SMILES string of first reactant (e.g., aryl halide, aryl boronic acid). Use either this OR reaction_smiles."
     )
     reactant_b_smiles: Optional[str] = Field(
         None,
         description="SMILES string of second reactant (e.g., amine, boronic acid). Optional for some reactions."
+    )
+    reaction_smiles: Optional[str] = Field(
+        None,
+        description="Complete reaction SMILES (reactants>>products). If provided, reactants will be auto-extracted. Use this OR reactant_a_smiles."
     )
     top_k: int = Field(
         5,
@@ -3277,10 +3282,11 @@ def unified_recommender_tool(
 
 @tool(args_schema=HTERecommendInput)
 def hte_recommend_tool(
-    reactant_a_smiles: str,
+    reactant_a_smiles: Optional[str] = None,
     reactant_b_smiles: Optional[str] = None,
+    reaction_smiles: Optional[str] = None,
     top_k: int = 5,
-    min_experiments: int = 2,
+    min_experiments: int = 1,
     reaction_type_filter: Optional[str] = None,
     catalyst_filter: Optional[str] = None
 ) -> Dict[str, Any]:
@@ -3288,12 +3294,13 @@ def hte_recommend_tool(
     Recommend reaction conditions based on HTE (High-Throughput Experimentation) data.
     
     This tool provides condition recommendations based on **66,308 experimental results**
-    across **41 reaction types**. Unlike ML-based tools, this works **without reaction SMILES**
-    by matching reactant types detected from starting materials.
+    across **41 reaction types**. Can work with either individual reactants OR complete
+    reaction SMILES (reactants will be auto-extracted).
     
     **Key Features:**
     - Fast: <100ms query time
-    - No reaction SMILES needed - works with just reactants
+    - Works with reaction SMILES OR individual reactants
+    - Z-score based ranking (primary metric)
     - Statistical confidence with success rates & sample sizes
     - Covers Suzuki, C-N coupling, Buchwald-Hartwig, amide formation, and 37+ more
     
@@ -3304,42 +3311,38 @@ def hte_recommend_tool(
     - Want data-backed recommendations with success statistics
     
     Args:
-        reactant_a_smiles: First reactant SMILES (e.g., aryl bromide, aryl chloride)
-        reactant_b_smiles: Second reactant SMILES (e.g., amine, boronic acid). Optional.
+        reactant_a_smiles: First reactant SMILES (e.g., aryl bromide). Use this OR reaction_smiles.
+        reactant_b_smiles: Second reactant SMILES (e.g., amine). Optional.
+        reaction_smiles: Complete reaction SMILES (reactants>>products). Reactants auto-extracted.
         top_k: Number of recommendations to return (1-20, default 5)
         min_experiments: Minimum experiments required per condition (default 2)
-        reaction_type_filter: Optional reaction filter ("Suzuki", "C-N", "Buchwald", etc.)
-        catalyst_filter: Optional catalyst metal filter ("Pd", "Cu", "Ni", "palladium", etc.)
+        reaction_type_filter: Optional reaction filter ("Suzuki", "C-N", "C_N_Coupling", "Buchwald", etc.)
+        catalyst_filter: Optional catalyst metal filter ("Pd", "Cu", "Ni", "copper", "palladium", etc.)
     
     Returns:
-        Dict with ranked condition recommendations including catalyst, ligand, base,
-        solvent, success rates, and statistical confidence scores
+        Dict with 'success' boolean, 'matching_experiments' count, 'recommendations' list,
+        and reactant type information. When successful with data, 'matching_experiments' > 0
+        and 'recommendations' contains ranked conditions with Z-scores, yields, and reagents.
+        
+        CRITICAL: If 'success' is True and 'matching_experiments' > 0, DATA WAS FOUND!
+        The 'recommendations' list contains actual experimental conditions to use.
     
-    Example:
+    Examples:
+        >>> # With individual reactants
         >>> hte_recommend_tool(
-        ...     reactant_a_smiles="Brc1ccccc1",  # Bromobenzene
-        ...     reactant_b_smiles="CCN",  # Ethylamine
+        ...     reactant_a_smiles="Brc1ccccc1",
+        ...     reactant_b_smiles="CCN",
         ...     top_k=3
         ... )
-        {
-            "success": True,
-            "predicted_reaction_type": "C_N_Coupling",
-            "matching_experiments": 1080,
-            "recommendations": [
-                {
-                    "rank": 1,
-                    "catalyst": "XantPhos Pd(allyl)Cl",
-                    "ligand": "XantPhos",
-                    "base": "Cs2CO3",
-                    "solvent": "Dioxane",
-                    "success_rate": 100.0,
-                    "avg_yield": 73.3,
-                    "num_experiments": 2,
-                    "confidence_score": 65.3
-                },
-                ...
-            ]
-        }
+        
+        >>> # With reaction SMILES (auto-extracts reactants)
+        >>> hte_recommend_tool(
+        ...     reaction_smiles="Brc1ccco1.Nc1ccccc1>>c1ccccc1Nc1ccco1",
+        ...     reaction_type_filter="C_N_Coupling",
+        ...     catalyst_filter="Cu",
+        ...     top_k=10,
+        ...     min_experiments=1
+        ... )
     """
     if not HTE_AVAILABLE:
         return _error_response(
@@ -3348,6 +3351,36 @@ def hte_recommend_tool(
         )
     
     try:
+        # Parse reaction SMILES if provided
+        if reaction_smiles:
+            from chemtools.analysis.smiles import _split_reaction_smiles
+            
+            parts = _split_reaction_smiles(reaction_smiles.strip())
+            reactants_str = parts[0] if len(parts) > 0 else ""
+            
+            if not reactants_str:
+                return _error_response(
+                    "Could not extract reactants from reaction SMILES. Check format (should be reactants>>products)."
+                )
+            
+            # Split reactants by dot notation
+            reactant_list = [r.strip() for r in reactants_str.split(".") if r.strip()]
+            
+            if len(reactant_list) >= 1:
+                reactant_a_smiles = reactant_list[0]
+            if len(reactant_list) >= 2:
+                reactant_b_smiles = reactant_list[1]
+            
+            # If more than 2 reactants, log but use first two
+            if len(reactant_list) > 2:
+                print(f"Note: Reaction has {len(reactant_list)} reactants, using first two for HTE lookup.")
+        
+        # Validate we have at least one reactant
+        if not reactant_a_smiles:
+            return _error_response(
+                "Must provide either reactant_a_smiles or reaction_smiles."
+            )
+        
         recommender = HTERecommender()
         
         result = recommender.recommend(
@@ -3364,6 +3397,7 @@ def hte_recommend_tool(
         for i, rec in enumerate(result.recommendations, 1):
             rec_dict = {
                 "rank": i,
+                "avg_z_score": round(rec.avg_z_score, 2),
                 "catalyst": rec.catalyst,
                 "ligand": rec.ligand,
                 "base": rec.base,
@@ -3385,9 +3419,54 @@ def hte_recommend_tool(
             
             recommendations.append(rec_dict)
         
+        # Check if we have any recommendations
+        if result.total_matching_experiments == 0 or len(recommendations) == 0:
+            # Provide helpful error with detected types
+            error_msg = (
+                f"No HTE data found for reactant combination: {result.reactant_a_type} + {result.reactant_b_type}"
+            )
+            
+            # Add filter information if applicable
+            filters_applied = []
+            if reaction_type_filter:
+                filters_applied.append(f"reaction type '{reaction_type_filter}'")
+            if catalyst_filter:
+                filters_applied.append(f"catalyst '{catalyst_filter}'")
+            
+            if filters_applied:
+                error_msg += f" with {' and '.join(filters_applied)}"
+            
+            # Suggest checking available data
+            suggestion = (
+                f"The reactants were successfully classified as {result.reactant_a_type} and {result.reactant_b_type}, "
+                f"but this specific combination has no matching experiments in the HTE database. "
+                f"Try: (1) removing filters to see if data exists without restrictions, "
+                f"(2) using the hte_analytics_tool to explore available reactant pairs for this reaction type, "
+                f"or (3) checking if the reactant types are common in the database."
+            )
+            
+            return _error_response(
+                error_msg,
+                {
+                    "reactant_a_type": result.reactant_a_type,
+                    "reactant_b_type": result.reactant_b_type,
+                    "reactant_a_smiles": reactant_a_smiles,
+                    "reactant_b_smiles": reactant_b_smiles,
+                    "predicted_reaction_type": result.predicted_reaction_type,
+                    "matching_experiments": 0,
+                    "suggestion": suggestion,
+                    "filters_applied": {
+                        "reaction_type": reaction_type_filter,
+                        "catalyst": catalyst_filter
+                    }
+                }
+            )
+        
         return _success_response({
             "reactant_a_type": result.reactant_a_type,
             "reactant_b_type": result.reactant_b_type,
+            "reactant_a_smiles": reactant_a_smiles,
+            "reactant_b_smiles": reactant_b_smiles,
             "predicted_reaction_type": result.predicted_reaction_type,
             "reaction_confidence": round(result.reaction_type_confidence * 100, 1),
             "matching_experiments": result.total_matching_experiments,
@@ -3888,6 +3967,229 @@ def hte_conditions_tool(
         return _error_response(f"Failed to query HTE conditions: {str(e)}")
 
 
+@tool
+def hte_screening_set_tool(
+    reactant_a_smiles: Optional[str] = None,
+    reactant_b_smiles: Optional[str] = None,
+    reaction_smiles: Optional[str] = None,
+    num_conditions: int = 24,
+    min_experiments: int = 1,
+    reaction_type_filter: Optional[str] = None,
+    catalyst_filter: Optional[str] = None,
+    diversity_strategy: str = "balanced"
+) -> Dict[str, Any]:
+    """
+    Generate a diverse set of conditions for HTE screening plates (up to 24 conditions).
+    
+    **PRIMARY HTE USE CASE**: Generate a group of diverse conditions to test in parallel
+    on a screening plate (e.g., 4x6 = 24 wells, 8x12 = 96 wells).
+    
+    This tool is specifically designed for:
+    - Planning HTE screening experiments
+    - Generating diverse condition sets for parallel testing
+    - Balancing top performers with exploratory conditions
+    - Optimizing plate layouts with reagent diversity
+    
+    **Key Features:**
+    - Generates up to 24 conditions (standard 4x6 plate) or custom amounts
+    - Three diversity strategies: balanced, top_performers, diverse
+    - Ensures reagent variation across catalyst, ligand, base, solvent
+    - Based on 66,308 experiments with z-score ranking
+    
+    **Diversity Strategies:**
+    - "balanced" (DEFAULT): Mix of top ~8 performers + 16 diverse alternatives
+    - "top_performers": Focus on highest z-score conditions (best for optimization)
+    - "diverse": Maximize reagent diversity (best for broad exploration)
+    
+    **Use when:**
+    - Setting up HTE screening plates
+    - Need 12-24 conditions for parallel testing
+    - Want to explore reagent space systematically
+    - Designing hit-finding experiments
+    
+    Args:
+        reactant_a_smiles: SMILES of first reactant
+        reactant_b_smiles: SMILES of second reactant (optional)
+        reaction_smiles: Complete reaction SMILES (alternative to separate reactants)
+        num_conditions: Number of conditions to generate (default 24 for 4x6 plate)
+        min_experiments: Minimum experiments for a condition to be included (default 1)
+        reaction_type_filter: Optional filter for reaction type (e.g., 'C_N_Coupling', 'Suzuki')
+        catalyst_filter: Optional filter by metal (e.g., 'Pd', 'Cu', 'Ni')
+        diversity_strategy: Selection strategy ('balanced', 'top_performers', 'diverse')
+    
+    Returns:
+        Dict with diverse condition set including z-scores, yields, and statistics
+    
+    Example:
+        >>> hte_screening_set_tool(
+        ...     reaction_smiles="Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+        ...     num_conditions=24,
+        ...     reaction_type_filter="C_N_Coupling",
+        ...     catalyst_filter="Cu",
+        ...     diversity_strategy="balanced"
+        ... )
+        {
+            "success": True,
+            "reactant_a_type": "ArBr",
+            "reactant_b_type": "ArNH2",
+            "matching_experiments": 112,
+            "num_conditions": 24,
+            "diversity_strategy": "balanced",
+            "screening_conditions": [
+                {
+                    "rank": 1,
+                    "plate_position": "A1",
+                    "catalyst": "CuI",
+                    "ligand": "PPBO",
+                    "base": "NaOtBu",
+                    "solvent": "tAmOH",
+                    "avg_z_score": 2.61,
+                    "avg_yield": 49.8,
+                    "confidence_score": 63.8
+                },
+                ...
+            ]
+        }
+    """
+    if not HTE_AVAILABLE:
+        return _error_response(
+            "HTE tools not available. Install with: pip install chemtools[hte]",
+            {"recommendation": "Install HTE dependencies"}
+        )
+    
+    try:
+        # Parse reaction SMILES if provided
+        if reaction_smiles:
+            from chemtools.analysis.smiles import _split_reaction_smiles
+            
+            parts = _split_reaction_smiles(reaction_smiles.strip())
+            reactants_str = parts[0] if len(parts) > 0 else ""
+            
+            if not reactants_str:
+                return _error_response(
+                    "Could not extract reactants from reaction SMILES. Check format (should be reactants>>products)."
+                )
+            
+            # Split reactants by dot notation
+            reactant_list = [r.strip() for r in reactants_str.split(".") if r.strip()]
+            
+            if len(reactant_list) >= 1:
+                reactant_a_smiles = reactant_list[0]
+            if len(reactant_list) >= 2:
+                reactant_b_smiles = reactant_list[1]
+            
+            if len(reactant_list) > 2:
+                print(f"Note: Reaction has {len(reactant_list)} reactants, using first two for HTE lookup.")
+        
+        # Validate we have at least one reactant
+        if not reactant_a_smiles:
+            return _error_response(
+                "Must provide either reactant_a_smiles or reaction_smiles."
+            )
+        
+        recommender = HTERecommender()
+        
+        result = recommender.generate_screening_set(
+            reactant_a_smiles=reactant_a_smiles,
+            reactant_b_smiles=reactant_b_smiles,
+            num_conditions=num_conditions,
+            min_experiments=min_experiments,
+            reaction_type_filter=reaction_type_filter,
+            catalyst_filter=catalyst_filter,
+            diversity_strategy=diversity_strategy
+        )
+        
+        # Check if we have any recommendations
+        if result.total_matching_experiments == 0 or len(result.recommendations) == 0:
+            error_msg = (
+                f"No HTE data found for reactant combination: {result.reactant_a_type} + {result.reactant_b_type}"
+            )
+            
+            filters_applied = []
+            if reaction_type_filter:
+                filters_applied.append(f"reaction type '{reaction_type_filter}'")
+            if catalyst_filter:
+                filters_applied.append(f"catalyst '{catalyst_filter}'")
+            
+            if filters_applied:
+                error_msg += f" with {' and '.join(filters_applied)}"
+            
+            suggestion = (
+                f"The reactants were successfully classified as {result.reactant_a_type} and {result.reactant_b_type}, "
+                f"but this specific combination has no matching experiments in the HTE database. "
+                f"Try: (1) removing filters, (2) using hte_analytics_tool to explore available pairs, "
+                f"or (3) checking if the reactant types are common in the database."
+            )
+            
+            return _error_response(
+                error_msg,
+                {
+                    "reactant_a_type": result.reactant_a_type,
+                    "reactant_b_type": result.reactant_b_type,
+                    "matching_experiments": 0,
+                    "suggestion": suggestion
+                }
+            )
+        
+        # Convert to screening format with plate positions
+        # Generate plate positions (A1-D6 for 24-well, can extend to A1-H12 for 96-well)
+        rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        cols = list(range(1, 13))  # 1-12
+        
+        plate_positions = []
+        for row in rows:
+            for col in cols:
+                plate_positions.append(f"{row}{col}")
+                if len(plate_positions) >= num_conditions:
+                    break
+            if len(plate_positions) >= num_conditions:
+                break
+        
+        screening_conditions = []
+        for i, rec in enumerate(result.recommendations, 1):
+            condition = {
+                "rank": i,
+                "plate_position": plate_positions[i-1] if i <= len(plate_positions) else None,
+                "catalyst": rec.catalyst,
+                "ligand": rec.ligand,
+                "base": rec.base,
+                "solvent": rec.solvent,
+                "avg_z_score": round(rec.avg_z_score, 2),
+                "avg_yield": round(rec.avg_yield, 1),
+                "median_yield": round(rec.median_yield, 1),
+                "success_rate": round(rec.success_rate, 1),
+                "num_experiments": rec.num_experiments,
+                "confidence_score": round(rec.confidence_score, 1)
+            }
+            
+            # Add optional components
+            if rec.secondary_solvent:
+                condition["secondary_solvent"] = rec.secondary_solvent
+            if rec.additive:
+                condition["additive"] = rec.additive
+            if rec.coupling_reagent:
+                condition["coupling_reagent"] = rec.coupling_reagent
+            
+            screening_conditions.append(condition)
+        
+        return _success_response({
+            "reactant_a_type": result.reactant_a_type,
+            "reactant_b_type": result.reactant_b_type,
+            "reactant_a_smiles": reactant_a_smiles,
+            "reactant_b_smiles": reactant_b_smiles,
+            "predicted_reaction_type": result.predicted_reaction_type,
+            "reaction_confidence": round(result.reaction_type_confidence * 100, 1),
+            "matching_experiments": result.total_matching_experiments,
+            "num_conditions": len(screening_conditions),
+            "diversity_strategy": diversity_strategy,
+            "screening_conditions": screening_conditions,
+            "plate_format": f"{len([p for p in plate_positions if p[0] <= 'D'])//6}x6" if num_conditions <= 24 else "8x12"
+        })
+    
+    except Exception as e:
+        return _error_response(f"HTE screening set generation failed: {str(e)}")
+
+
 # ============================================================================
 # Tool Collection
 # ============================================================================
@@ -3918,6 +4220,7 @@ CHEMTOOLS_TOOLS = [
     hte_recommend_tool,  # NEW: HTE-based condition recommendations with catalyst filtering
     hte_analytics_tool,  # NEW: HTE database analytics (pairs, catalysts, metals)
     hte_conditions_tool,  # NEW: Detailed conditions for specific substrate pairs
+    hte_screening_set_tool,  # NEW: Generate diverse condition sets for HTE screening plates (up to 24)
     
     # Database tools
     reaction_dataset_analytics_tool,

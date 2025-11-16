@@ -177,7 +177,7 @@ class ChemAssistantWindow(QMainWindow):
         self.resize(1200, 800)
         self._apply_default_font()
 
-        self.agent = ChemToolsAgent(verbose=False)
+        self.agent = ChemToolsAgent(verbose=True)
         self.history: List[BaseMessage] = []
         self.constraint_spec = ConstraintSpec()
         self.constraint_text = ""

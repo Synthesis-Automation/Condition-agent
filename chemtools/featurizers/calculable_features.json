@@ -3523,10 +3523,10 @@
       "category": "reactant_types",
       "detect": {
         "smarts_any": [
-          "[CX4;H1,H2,H3]c.[Br]"
+          "c[CX4;H1,H2][Br]"
         ]
       },
-      "why": "benzylic bromide - benzylic halide",
+      "why": "benzylic bromide - benzylic halide (aromatic-CH2-Br)",
       "reactant_metadata": {
         "is_reactant": true,
         "compound_type": "benzylic bromide",
@@ -3543,10 +3543,10 @@
       "category": "reactant_types",
       "detect": {
         "smarts_any": [
-          "[CX4;H1,H2,H3]c.[Cl]"
+          "c[CX4;H1,H2][Cl]"
         ]
       },
-      "why": "benzylic chloride - benzylic halide",
+      "why": "benzylic chloride - benzylic halide (aromatic-CH2-Cl)",
       "reactant_metadata": {
         "is_reactant": true,
         "compound_type": "benzylic chloride",
@@ -3563,10 +3563,10 @@
       "category": "reactant_types",
       "detect": {
         "smarts_any": [
-          "[CX4;H1,H2,H3]c.[I]"
+          "c[CX4;H1,H2][I]"
         ]
       },
-      "why": "benzylic iodide - benzylic halide",
+      "why": "benzylic iodide - benzylic halide (aromatic-CH2-I)",
       "reactant_metadata": {
         "is_reactant": true,
         "compound_type": "benzylic iodide",
