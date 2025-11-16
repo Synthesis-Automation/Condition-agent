@@ -411,6 +411,158 @@ class HTERecommender:
         
         return result
     
+    def generate_screening_set(
+        self,
+        reactant_a_smiles: str,
+        reactant_b_smiles: Optional[str] = None,
+        num_conditions: int = 24,
+        min_experiments: int = 1,
+        reaction_type_filter: Optional[str] = None,
+        catalyst_filter: Optional[str] = None,
+        diversity_strategy: str = "balanced"
+    ) -> HTERecommendationResult:
+        """
+        Generate a diverse set of conditions for HTE screening (up to 24 for standard plate).
+        
+        This is the PRIMARY use case for HTE systems - generating a group of diverse conditions
+        to test in parallel on a screening plate.
+        
+        Args:
+            reactant_a_smiles: SMILES of first reactant
+            reactant_b_smiles: SMILES of second reactant (optional)
+            num_conditions: Number of conditions to generate (default 24 for 4x6 plate)
+            min_experiments: Minimum experiments for a condition to be included
+            reaction_type_filter: Optional filter for specific reaction type
+            catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni')
+            diversity_strategy: Strategy for condition selection:
+                - "balanced": Mix of top performers + diverse alternatives
+                - "top_performers": Focus on highest z-score conditions
+                - "diverse": Maximize diversity across reagent space
+        
+        Returns:
+            HTERecommendationResult with up to num_conditions diverse conditions
+        """
+        # Get initial recommendations with larger pool
+        initial_top_k = max(num_conditions * 3, 50)  # Get 3x more for diversity selection
+        
+        result = self.recommend(
+            reactant_a_smiles=reactant_a_smiles,
+            reactant_b_smiles=reactant_b_smiles,
+            top_k=initial_top_k,
+            min_experiments=min_experiments,
+            reaction_type_filter=reaction_type_filter,
+            catalyst_filter=catalyst_filter
+        )
+        
+        if len(result.recommendations) == 0:
+            return result
+        
+        # Apply diversity strategy
+        if diversity_strategy == "top_performers":
+            # Simply take top N by z-score
+            selected = result.recommendations[:num_conditions]
+        
+        elif diversity_strategy == "diverse":
+            # Maximize diversity across all reagent dimensions
+            selected = self._select_diverse_conditions(
+                result.recommendations, 
+                num_conditions,
+                prioritize_performance=False
+            )
+        
+        else:  # "balanced" (default)
+            # Take top performers + diverse alternatives
+            num_top = min(num_conditions // 3, len(result.recommendations))  # ~1/3 top performers
+            num_diverse = num_conditions - num_top
+            
+            top_performers = result.recommendations[:num_top]
+            remaining = result.recommendations[num_top:]
+            
+            if remaining:
+                diverse_picks = self._select_diverse_conditions(
+                    remaining, 
+                    num_diverse,
+                    prioritize_performance=True
+                )
+                selected = top_performers + diverse_picks
+            else:
+                selected = top_performers
+        
+        result.recommendations = selected[:num_conditions]
+        return result
+    
+    def _select_diverse_conditions(
+        self, 
+        conditions: List[ConditionRecommendation],
+        num_to_select: int,
+        prioritize_performance: bool = True
+    ) -> List[ConditionRecommendation]:
+        """
+        Select diverse conditions maximizing reagent variation.
+        
+        Args:
+            conditions: Pool of conditions to select from
+            num_to_select: Number of conditions to select
+            prioritize_performance: If True, weight selection by z-score
+        
+        Returns:
+            List of diverse conditions
+        """
+        if len(conditions) <= num_to_select:
+            return conditions
+        
+        selected = []
+        remaining = list(conditions)
+        
+        # Track used reagents for diversity
+        used_catalysts = set()
+        used_ligands = set()
+        used_bases = set()
+        used_solvents = set()
+        
+        while len(selected) < num_to_select and remaining:
+            best_score = -1
+            best_idx = 0
+            
+            for i, cond in enumerate(remaining):
+                # Calculate diversity score (how many new reagents does this add?)
+                diversity_score = 0
+                if cond.catalyst not in used_catalysts:
+                    diversity_score += 1
+                if cond.ligand not in used_ligands:
+                    diversity_score += 1
+                if cond.base not in used_bases:
+                    diversity_score += 1
+                if cond.solvent not in used_solvents:
+                    diversity_score += 1
+                
+                # Combine diversity with performance if requested
+                if prioritize_performance:
+                    # Normalize z-score to 0-1 range (assuming typical range -3 to +3)
+                    normalized_zscore = (cond.avg_z_score + 3) / 6.0
+                    normalized_zscore = max(0, min(1, normalized_zscore))
+                    
+                    # 60% diversity, 40% performance
+                    combined_score = (diversity_score / 4.0) * 0.6 + normalized_zscore * 0.4
+                else:
+                    combined_score = diversity_score
+                
+                if combined_score > best_score:
+                    best_score = combined_score
+                    best_idx = i
+            
+            # Select best condition
+            selected_cond = remaining.pop(best_idx)
+            selected.append(selected_cond)
+            
+            # Update used reagents
+            used_catalysts.add(selected_cond.catalyst)
+            used_ligands.add(selected_cond.ligand)
+            used_bases.add(selected_cond.base)
+            used_solvents.add(selected_cond.solvent)
+        
+        return selected
+    
     def get_statistics(self) -> Dict[str, Any]:
         """Get database statistics"""
         if self.df is None:
