@@ -231,7 +231,7 @@ def format_compact(result) -> str:
         rec = result.recommendations[0]
         lines.extend([
             "",
-            f"TOP RECOMMENDATION (Score: {rec.confidence_score:.1f}/100)",
+            f"TOP RECOMMENDATION (Z-Score: {rec.avg_z_score:.2f}, Confidence: {rec.confidence_score:.1f}/100)",
             f"  Catalyst: {rec.catalyst}",
             f"  Ligand: {rec.ligand}",
             f"  Base: {rec.base}",
@@ -268,6 +268,7 @@ def result_to_dict(result) -> dict:
         'recommendations': [
             {
                 'rank': i + 1,
+                'avg_z_score': rec.avg_z_score,
                 'confidence_score': rec.confidence_score,
                 'success_rate': rec.success_rate,
                 'avg_yield': rec.avg_yield,

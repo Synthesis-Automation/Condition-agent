@@ -60,12 +60,13 @@ Reactant B: RNH2 (RNH2/R2NH)
 ### Recommendation System
 
 ✅ **66,308 experimental results** across 41 reaction types  
+✅ **Z-Score ranking** - conditions ranked by statistical performance (primary metric)  
 ✅ **Fast**: <100ms query time, O(1) lookup  
 ✅ **No reaction SMILES needed** - works with just reactants  
 ✅ **Statistical confidence** - success rates & sample sizes  
 ✅ **Multiple output formats** - Python API, CLI, JSON  
 ✅ **Batch processing** - process multiple queries at once  
-✅ **Flexible filtering** - by reaction type, catalyst metal, confidence  
+✅ **Flexible filtering** - by reaction type, catalyst metal (Cu, Pd, Ni, etc.), confidence
 
 ### Analytics Tools (NEW! 🎉)
 
@@ -74,7 +75,7 @@ Reactant B: RNH2 (RNH2/R2NH)
 ✅ **Summarize reaction types** in the database  
 ✅ **Analyze metal usage patterns** across reactions  
 ✅ **Find similar reactant pairs** based on reaction type or catalyst  
-✅ **Export filtered datasets** for further analysis  
+✅ **Export filtered datasets** for further analysis
 
 ---
 
@@ -87,14 +88,14 @@ from chemtools.HTE import HTERecommender
 
 recommender = HTERecommender()
 
-# C-N Coupling
+# Basic C-N Coupling query
 result = recommender.recommend(
     reactant_a_smiles="c1ccc(Br)cc1",
     reactant_b_smiles="CCN",
     top_k=5
 )
 
-# Suzuki with reaction filter
+# Filter by reaction type
 result = recommender.recommend(
     reactant_a_smiles="c1ccc(Cl)cc1",
     reactant_b_smiles="c1ccc(B(O)O)cc1",
@@ -102,32 +103,140 @@ result = recommender.recommend(
     top_k=5
 )
 
-# Access programmatically
+# Filter by catalyst metal
+result = recommender.recommend(
+    reactant_a_smiles="c1ccc(Br)cc1",
+    reactant_b_smiles="c1ccc(N)cc1",
+    catalyst_filter="Cu",  # Copper catalysts only
+    top_k=10,
+    min_experiments=1
+)
+
+# Combine filters: Copper-catalyzed C-N coupling
+result = recommender.recommend(
+    reactant_a_smiles="c1ccc(Br)cc1",
+    reactant_b_smiles="c1ccc(N)cc1",
+    reaction_type_filter="C_N_Coupling",
+    catalyst_filter="Cu",
+    top_k=10,
+    min_experiments=1
+)
+
+# Access results (ranked by Z-Score)
 for i, rec in enumerate(result.recommendations, 1):
-    print(f"{i}. {rec.catalyst} / {rec.ligand}")
+    print(f"{i}. Z-Score: {rec.avg_z_score:.2f}")
+    print(f"   {rec.catalyst} / {rec.ligand} / {rec.base} / {rec.solvent}")
     print(f"   Success: {rec.success_rate:.1f}% (avg yield: {rec.avg_yield:.1f}%)")
+    print(f"   Experiments: {rec.num_experiments}")
 ```
 
 ### Command Line Interface
 
+#### Basic Queries
+
 ```bash
-# Basic query
+# Basic query with reactant SMILES
 python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" -k 5
 
-# Compact output
+# Single reactant (will match any reaction with this reactant type)
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -k 5
+
+# Get top 10 recommendations with minimum 1 experiment per condition
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" -k 10 --min-exp 1
+```
+
+#### Filtering by Reaction Type
+
+```bash
+# Filter Suzuki coupling reactions
+python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki
+
+# Filter C-N coupling reactions
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --reaction C_N_Coupling
+
+# Filter amide formation reactions
+python -m chemtools.HTE.cli -a "c1ccccc1C(=O)O" -b "CCN" --reaction amide_formation
+```
+
+#### Filtering by Catalyst Type
+
+```bash
+# Copper-catalyzed reactions only
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --catalyst Cu
+
+# Palladium-catalyzed reactions only
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(B(O)O)cc1" --catalyst Pd
+
+# Nickel-catalyzed reactions only
+python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "CCN" --catalyst Ni
+
+# Use full catalyst name (case-insensitive)
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --catalyst copper
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --catalyst palladium
+```
+
+#### Combined Filters (Reaction Type + Catalyst)
+
+```bash
+# Copper-catalyzed C-N coupling specifically
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
+    --reaction C_N_Coupling --catalyst Cu -k 10 --min-exp 1
+
+# Palladium-catalyzed Suzuki coupling
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(B(O)O)cc1" \
+    --reaction Suzuki --catalyst Pd -k 10
+
+# Nickel-catalyzed C-O coupling
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCO" \
+    --reaction CO-Coupling --catalyst Ni
+```
+
+#### Output Formats
+
+```bash
+# Compact output (top condition only)
 python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --compact
 
 # JSON export
 python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --json -o output.json
 
-# Filter by reaction type
-python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki
+# JSON with filters
+python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
+    --catalyst Cu --json -o cu_cn_results.json
+```
 
-# Batch processing
+#### Batch Processing
+
+```bash
+# Process multiple queries from file
 python -m chemtools.HTE.cli --batch examples/hte_queries.txt -o results.txt
 
-# Database statistics
+# Batch with filters applied to all queries
+python -m chemtools.HTE.cli --batch examples/hte_queries.txt \
+    --catalyst Pd --reaction Suzuki -o suzuki_results.txt
+```
+
+#### Database Information
+
+```bash
+# Show database statistics
 python -m chemtools.HTE.cli --stats
+```
+
+#### Full Example with All Options
+
+```bash
+# Get top 20 copper-catalyzed C-N coupling conditions
+# Include single-experiment conditions, output to JSON
+python -m chemtools.HTE.cli 
+    -a "c1ccc(Br)cc1" \
+    -b "c1ccc(N)cc1" \
+    --reaction C_N_Coupling \
+    --catalyst Cu \
+    -k 20 \
+    --min-exp 1 \
+    --json \
+    -o cu_cn_coupling_conditions.json
 ```
 
 ### Batch Processing
@@ -153,21 +262,21 @@ python -m chemtools.HTE.cli --batch examples/hte_queries.txt -o results.txt
 
 ### Statistics
 
-| Metric                  | Value   |
-|------------------------|---------|
-| Total experiments      | 66,308  |
-| Reaction types         | 41      |
-| Unique catalysts       | 229     |
-| Unique ligands         | 153     |
-| Unique bases           | 132     |
-| Unique solvents        | 67      |
-| Type combinations      | 71      |
-| Overall success rate   | 18.8%   |
+| Metric               | Value  |
+| -------------------- | ------ |
+| Total experiments    | 66,308 |
+| Reaction types       | 41     |
+| Unique catalysts     | 229    |
+| Unique ligands       | 153    |
+| Unique bases         | 132    |
+| Unique solvents      | 67     |
+| Type combinations    | 71     |
+| Overall success rate | 18.8%  |
 
 ### Top Reaction Types
 
-| Reaction Type         | Experiments | Success Rate |
-|----------------------|-------------|--------------|
+| Reaction Type        | Experiments | Success Rate |
+| -------------------- | ----------- | ------------ |
 | C_N_Coupling         | 24,012      | 16.7%        |
 | Suzuki               | 11,588      | 27.4%        |
 | Arylation-acidic-C-H | 4,152       | 22.7%        |
@@ -194,21 +303,32 @@ Rank by Confidence Score
 Return Top-K Recommendations
 ```
 
-### Confidence Scoring
+### Ranking & Scoring
+
+**Primary Ranking**: Conditions are sorted by **Average Z-Score**, which measures how successful a condition is relative to all experiments in the database.
+
+**Z-Score Interpretation**:
+
+- **Z > 2.0**: Excellent condition (top ~2.5%)
+- **Z > 1.0**: Good condition (better than ~84%)
+- **Z = 0.0**: Average condition
+- **Z < 0.0**: Below average condition
+
+**Confidence Score** (secondary metric):
 
 ```python
 confidence = (
-    0.5 * (success_rate / 100) +      # 50% weight
-    0.3 * min(num_exp, 100) / 100 +   # 30% weight
-    0.2 * (avg_yield / 100)           # 20% weight
+    0.6 * z_score_normalized +        # 60% weight (primary)
+    0.25 * min(num_exp, 100) / 100 +  # 25% weight
+    0.15 * (avg_yield / 100)          # 15% weight
 ) * 100
 ```
 
 Balances:
 
-- **Success rate** (primary): % yield > 50%
-- **Sample size** (reliability): number of experiments
-- **Average yield** (performance): mean yield
+- **Z-Score** (primary): Statistical performance vs. database
+- **Sample size** (reliability): Number of experiments
+- **Average yield** (performance): Mean yield
 
 ---
 
@@ -259,12 +379,12 @@ Balances:
 
 ## ⚡ Performance
 
-| Metric           | Value                |
-|------------------|----------------------|
-| Initialization   | ~1-2 seconds         |
-| Query time       | <100ms               |
-| Batch throughput | ~100 queries/second  |
-| Memory footprint | ~50MB                |
+| Metric           | Value               |
+| ---------------- | ------------------- |
+| Initialization   | ~1-2 seconds        |
+| Query time       | <100ms              |
+| Batch throughput | ~100 queries/second |
+| Memory footprint | ~50MB               |
 
 ---
 
@@ -305,15 +425,18 @@ hte_recs = hte_recommender.recommend(smiles_a, smiles_b)
 ## ⚠️ Limitations
 
 1. **Reactant type dependency**: Requires successful type detection
+
    - 98.7% coverage on common substrates
    - Gracefully returns empty for undetected types
 
 2. **No substrate-specific information**:
+
    - Cannot account for sterics (bulky groups)
    - Cannot account for electronics (EWG/EDG)
    - Provides multiple options for user selection
 
 3. **Missing experimental details**:
+
    - No temperature, time, concentration in database
    - Recommendations serve as starting points
    - Users should optimize for specific substrates
@@ -332,16 +455,17 @@ hte_recs = hte_recommender.recommend(smiles_a, smiles_b)
 ```python
 class HTERecommender:
     def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.csv")
-    
+
     def recommend(
         self,
         reactant_a_smiles: str,
         reactant_b_smiles: Optional[str] = None,
         top_k: int = 10,
         min_experiments: int = 2,
-        reaction_type_filter: Optional[str] = None
+        reaction_type_filter: Optional[str] = None,
+        catalyst_filter: Optional[str] = None  # e.g., 'Cu', 'Pd', 'Ni', 'copper', 'palladium'
     ) -> HTERecommendationResult
-    
+
     def get_statistics(self) -> Dict[str, Any]
 ```
 
@@ -379,7 +503,8 @@ class ConditionRecommendation:
     avg_yield: float
     median_yield: float
     num_experiments: int
-    confidence_score: float
+    avg_z_score: float  # PRIMARY ranking metric - statistical performance
+    confidence_score: float  # Secondary metric
     reaction_type: Optional[str]
     reactant_types: Tuple[str, str]
     z_score_range: Tuple[float, float]
@@ -472,7 +597,7 @@ Demo scripts:
 ✅ Provides statistically-validated recommendations  
 ✅ Offers flexible usage (Python + CLI)  
 ✅ Integrates seamlessly with existing systems  
-✅ Includes comprehensive documentation  
+✅ Includes comprehensive documentation
 
 **Ready to use today!** 🚀
 
