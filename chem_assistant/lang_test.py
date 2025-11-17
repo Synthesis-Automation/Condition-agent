@@ -11,7 +11,7 @@ from langchain_core.tools import tool
 try:
     from langgraph.prebuilt import create_agent as _create_langgraph_agent
 except (ImportError, AttributeError):
-    from langgraph.prebuilt import create_react_agent as _create_langgraph_agent  # type: ignore[attr-defined]
+    from langchain.agents import create_agent as _create_langgraph_agent  # type: ignore[attr-defined]
 
 LANGGRAPH_AGENT_FACTORY = _create_langgraph_agent
 

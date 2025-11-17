@@ -127,11 +127,11 @@ if USE_AGENT:
     
     try:
         from langchain_openai import ChatOpenAI
-        from langgraph.prebuilt import create_react_agent
+        from langchain.agents import create_agent
         
         print("\n🤖 Initializing LangChain agent with GPT-4...")
         llm = ChatOpenAI(model="gpt-4", temperature=0)
-        agent = create_react_agent(llm, CHEMTOOLS_TOOLS)
+        agent = create_agent(llm, CHEMTOOLS_TOOLS)
         
         print("✓ Agent created with 25 chemistry tools\n")
         

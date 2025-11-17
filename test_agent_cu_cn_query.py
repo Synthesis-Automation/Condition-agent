@@ -63,26 +63,14 @@ if not os.getenv("OPENAI_API_KEY"):
 else:
     try:
         from langchain_openai import ChatOpenAI
-        from langchain.agents import create_react_agent
-        from langchain.prompts import PromptTemplate
-        from langchain import hub
+        from langchain.agents import create_agent
         from chem_assistant.chemtools_wrapper import CHEMTOOLS_TOOLS
         
         print("🤖 Creating agent with GPT-4...")
         llm = ChatOpenAI(model="gpt-4", temperature=0)
         
-        # Create agent
-        prompt = hub.pull("hwchase17/react")
-        agent = create_react_agent(llm, CHEMTOOLS_TOOLS, prompt)
-        
-        from langchain.agents import AgentExecutor
-        agent_executor = AgentExecutor(
-            agent=agent,
-            tools=CHEMTOOLS_TOOLS,
-            verbose=True,
-            max_iterations=5,
-            handle_parsing_errors=True
-        )
+        # Create agent (new API - no need for prompt or AgentExecutor)
+        agent = create_agent(llm, CHEMTOOLS_TOOLS)
         
         print("✓ Agent ready\n")
         
@@ -92,11 +80,11 @@ else:
         print(f"User Query: {user_query}")
         print("-" * 80)
         
-        response = agent_executor.invoke({"input": user_query})
+        response = agent.invoke({"messages": [user_query]})
         
         print("\nAgent Response:")
         print("=" * 80)
-        print(response["output"])
+        print(response["messages"][-1].content)
         print("=" * 80)
         
     except ImportError as e:

@@ -1,4 +1,11 @@
 """Smoke test for the LLM-callable auto-conditions tool."""
+import sys
+from pathlib import Path
+
+# Add parent directory to path
+parent_dir = Path(__file__).parent.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
 
 from chem_assistant.chemtools_wrapper import auto_conditions_llm_tool
 from chem_assistant.chemtools_wrapper import (
