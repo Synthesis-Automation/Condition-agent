@@ -54,6 +54,14 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 from llmtools.clients import LLMClient, RECOMMENDED_MODELS
 from llmtools.prompts import RULE_BUILDER_EXTRACTION
+from chem_assistant.planner import (
+    ReactionInput,
+    auto_conditions,
+    detect_family as planner_detect_family,
+    fetch_rule_candidates,
+    find_similar_protocols,
+    fetch_hte_stats,
+)
 
 # Import chemtools functions
 from chemtools.smiles import normalize, normalize_reaction
@@ -3135,6 +3143,49 @@ class UnifiedRecommenderInput(BaseModel):
     scale_mmol: float = Field(default=1.0, description="Reaction scale in mmol (for automation format)", ge=0.1, le=1000.0)
 
 
+class AutoConditionsLLMInput(BaseModel):
+    """Schema for deterministic auto-conditions pipeline (LLM-callable)."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+    top_k_protocols: int = Field(
+        default=5,
+        ge=1,
+        le=10,
+        description="Maximum DRFP precedent candidates to retrieve.",
+    )
+    max_protocols: int = Field(
+        default=3,
+        ge=1,
+        le=5,
+        description="Maximum number of protocols to format.",
+    )
+
+
+class PlannerDetectInput(BaseModel):
+    """Schema for planner family detection."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+
+
+class PlannerRuleCandidatesInput(BaseModel):
+    """Schema for planner rule candidate fetch."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+
+
+class PlannerProtocolCandidatesInput(BaseModel):
+    """Schema for planner DRFP protocol candidates."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+    top_k: int = Field(5, ge=1, le=10, description="Number of DRFP candidates to retrieve.")
+
+
+class PlannerHTEInput(BaseModel):
+    """Schema for planner HTE summary fetch."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+
+
 @tool(args_schema=UnifiedRecommenderInput)
 def unified_recommender_tool(
     reaction_smiles: str,
@@ -3274,6 +3325,84 @@ def unified_recommender_tool(
     
     except Exception as e:
         return _error_response(f"Unified recommendation failed: {str(e)}")
+
+
+# ============================================================================
+# Auto-Conditions Deterministic Pipeline (LLM-callable)
+# ============================================================================
+
+@tool(args_schema=AutoConditionsLLMInput)
+def auto_conditions_llm_tool(
+    reaction_smiles: str,
+    top_k_protocols: int = 5,
+    max_protocols: int = 3,
+) -> Dict[str, Any]:
+    """
+    Deterministic auto-conditions pipeline for LLM agents.
+
+    Chains family detection → rule candidates → DRFP precedents → HTE summary →
+    heuristic/ML scoring → fusion → automation-ready protocol formatting.
+    """
+    try:
+        rxn_input = ReactionInput(reaction_smiles=reaction_smiles)
+        result = auto_conditions(
+            rxn_input,
+            top_k_protocols=top_k_protocols,
+            max_protocols=max_protocols,
+            build_protocols=True,
+        )
+        payload = result.model_dump()
+        return _success_response(payload)
+    except Exception as e:
+        return _error_response(str(e))
+
+
+# ============================================================================
+# Planner Building Blocks (LLM-callable)
+# ============================================================================
+
+
+@tool(args_schema=PlannerDetectInput)
+def planner_detect_family_tool(reaction_smiles: str) -> Dict[str, Any]:
+    """Detect reaction family using the deterministic planner router."""
+    result = planner_detect_family(ReactionInput(reaction_smiles=reaction_smiles))
+    return _success_response(result.model_dump())
+
+
+@tool(args_schema=PlannerRuleCandidatesInput)
+def planner_rule_candidates_tool(reaction_smiles: str) -> Dict[str, Any]:
+    """Fetch rule-based candidates for a reaction (auto-detected family)."""
+    rxn = ReactionInput(reaction_smiles=reaction_smiles)
+    family = planner_detect_family(rxn)
+    candidates = fetch_rule_candidates(rxn, family)
+    return _success_response(
+        {
+            "family": family.model_dump(),
+            "candidates": [c.model_dump() for c in candidates],
+        }
+    )
+
+
+@tool(args_schema=PlannerProtocolCandidatesInput)
+def planner_protocol_candidates_tool(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any]:
+    """Fetch DRFP precedent/protocol candidates for a reaction."""
+    rxn = ReactionInput(reaction_smiles=reaction_smiles)
+    candidates = find_similar_protocols(rxn, top_k=top_k)
+    return _success_response({"candidates": [c.model_dump() for c in candidates]})
+
+
+@tool(args_schema=PlannerHTEInput)
+def planner_hte_summary_tool(reaction_smiles: str) -> Dict[str, Any]:
+    """Fetch HTE summary for the detected family."""
+    rxn = ReactionInput(reaction_smiles=reaction_smiles)
+    family = planner_detect_family(rxn)
+    summary = fetch_hte_stats(rxn, family)
+    return _success_response(
+        {
+            "family": family.model_dump(),
+            "hte_summary": summary.model_dump() if summary else None,
+        }
+    )
 
 
 # ============================================================================
@@ -4229,6 +4358,11 @@ CHEMTOOLS_TOOLS = [
     list_supported_cores_tool,
     list_all_families_tool,  # NEW: List all available reaction families
     add_reagent_tool,
+    auto_conditions_llm_tool,
+    planner_detect_family_tool,
+    planner_rule_candidates_tool,
+    planner_protocol_candidates_tool,
+    planner_hte_summary_tool,
 ]
 
 

@@ -1,6 +1,6 @@
 # ChemTools LangChain Integration
 
-This directory contains a **LangChain/LangGraph wrapper** for ChemTools, exposing existing chemistry functions as AI-callable tools and providing an adaptive agent for intelligent chemistry analysis.
+This directory contains a **LangChain/LangGraph wrapper** for ChemTools, exposing existing chemistry functions as AI-callable tools and providing an adaptive agent for intelligent chemistry analysis. It now also ships a deterministic **auto-conditions** pipeline (rules → DRFP precedents → HTE summary → fusion → automation formatting) that can run without an LLM when you want fast, reproducible recommendations.
 
 ## 🎯 Overview
 
@@ -20,6 +20,9 @@ lang_chain/
 ├── chemtools_agent.py     # LangGraph agent wrapper
 ├── chemtools_cli.py       # Interactive CLI
 ├── lang_test.py           # Original LangChain test (DataGen example)
+├── planner/               # Auto-conditions pipelines (deterministic + LLM-assisted)
+├── planner/cli.py         # CLI for auto-conditions (deterministic)
+├── planner/llm_agent_cli.py# LLM-assisted auto-conditions (falls back to deterministic)
 └── README.md              # This file
 ```
 
@@ -76,6 +79,31 @@ ALIYUN_API_KEY=sk-your-key-here
 ```
 
 ### Usage Examples
+
+#### 0. Deterministic Auto-Conditions (no LLM)
+
+```bash
+# From project root
+python -m chem_assistant.planner.cli \
+  --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" \
+  --top-k 3 \
+  --max-protocols 2 \
+  --json
+```
+
+Outputs the detected family, rule/precedent candidates, optional HTE summary, and formatted protocol additions (per `docs/AUTOMATION_FORMAT.md`). Add `--out result.json` to save the payload.
+
+#### 0b. LLM-Assisted Auto-Conditions (with fallback)
+
+```bash
+# Uses OpenAI if OPENAI_API_KEY is set; otherwise falls back to deterministic summary
+python -m chem_assistant.planner.llm_agent_cli \
+  --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" \
+  --top-k 3 \
+  --max-protocols 2
+```
+
+If no LLM/key is present, it prints the deterministic family, counts, and top protocol steps. With an LLM/key, it drives the `auto_conditions_llm_tool` via a simple ReAct agent.
 
 #### 1. Interactive CLI (Recommended)
 
@@ -212,12 +240,13 @@ Older LangGraph releases only expose `create_react_agent`; the ChemTools wrapper
 
 - ✅ **No code changes** to existing chemtools
 - ✅ **LangGraph agent** combines LLM reasoning with deterministic chemistry
-- ✅ **8 chemistry tools** wrapped and ready to use
+- ✅ **26 chemistry tools** wrapped and ready to use
 - ✅ **Conversational interface** with history
 - ✅ **Animated spinner** provides visual feedback during processing
 - ✅ **Multi-provider support** (OpenAI, Aliyun)
 - ✅ **Comprehensive docs** with examples
 - ✅ **Interactive CLI** for exploration
+- ✅ **Deterministic auto-conditions** pipeline with rule/precedent/HTE fusion and automation formatting
 
 ### normalize_smiles_tool
 
@@ -233,6 +262,13 @@ normalize_reaction_tool.invoke({
     "reaction_smiles": "CCBr.CCO>>CCOCC"
 })
 # Returns: normalized reaction SMILES
+```
+
+### Auto-conditions CLI (deterministic)
+
+```bash
+python -m chem_assistant.planner.cli --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1"
+# Prints family, candidate counts, and top protocol steps
 ```
 
 ### detect_reaction_family_tool
@@ -312,6 +348,7 @@ add_reagent_tool.invoke({
 ```
 
 Key parameters:
+
 - `allow_default_family`: Permit fallback when the heuristics cannot confidently assign a family.
 - `dry_run`: Preview the entry without writing to disk (recommended before persistence).
 - `taxonomy_dir`: Optional path to a writable taxonomy directory (defaults to project data).
