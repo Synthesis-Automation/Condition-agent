@@ -6,6 +6,8 @@ from chem_assistant.chemtools_wrapper import (
     planner_rule_candidates_tool,
     planner_protocol_candidates_tool,
     planner_hte_summary_tool,
+    planner_score_candidates_tool,
+    planner_fuse_tool,
 )
 
 
@@ -39,3 +41,20 @@ def test_planner_tools_individual_calls() -> None:
 
     hte = planner_hte_summary_tool.invoke({"reaction_smiles": reaction_smiles})
     assert hte["success"]
+
+    # Score and fuse
+    scores = planner_score_candidates_tool.invoke(
+        {
+            "reaction_smiles": reaction_smiles,
+            "candidates": [
+                {"candidate_id": "rule_a", "source": "rule", "components": {"base": "Cs2CO3"}},
+                {"candidate_id": "proto_b", "source": "protocol", "components": {"solvent": "DMSO"}, "raw_score": 0.6},
+            ],
+        }
+    )
+    assert scores["success"]
+    assert scores["scores"]
+
+    fused = planner_fuse_tool.invoke({"reaction_smiles": reaction_smiles, "top_k_protocols": 1})
+    assert fused["success"]
+    assert fused["fused"]

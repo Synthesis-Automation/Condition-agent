@@ -22,7 +22,7 @@ lang_chain/
 ├── lang_test.py           # Original LangChain test (DataGen example)
 ├── planner/               # Auto-conditions pipelines (deterministic + LLM-assisted)
 ├── planner/cli.py         # CLI for auto-conditions (deterministic)
-├── planner/llm_agent_cli.py# LLM-assisted auto-conditions (falls back to deterministic)
+├── planner/llm_agent_cli.py# LLM-assisted auto-conditions (multi-tool, with fallback)
 └── README.md              # This file
 ```
 
@@ -103,7 +103,7 @@ python -m chem_assistant.planner.llm_agent_cli \
   --max-protocols 2
 ```
 
-If no LLM/key is present, it prints the deterministic family, counts, and top protocol steps. With an LLM/key, it drives the `auto_conditions_llm_tool` via a simple ReAct agent.
+If no LLM/key is present, it prints the deterministic family, counts, and top protocol steps. With an LLM/key, it drives a ReAct agent over planner tools (detect family, rule/DRFP/HTE, score/fuse, or `auto_conditions_llm_tool` fallback) and returns a rationale plus steps.
 
 #### 1. Interactive CLI (Recommended)
 

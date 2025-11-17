@@ -61,6 +61,9 @@ from chem_assistant.planner import (
     fetch_rule_candidates,
     find_similar_protocols,
     fetch_hte_stats,
+    score_ml_candidates,
+    fuse_scores,
+    CandidateCondition,
 )
 
 # Import chemtools functions
@@ -3186,6 +3189,23 @@ class PlannerHTEInput(BaseModel):
     reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
 
 
+class PlannerScoreInput(BaseModel):
+    """Schema for ML scoring of arbitrary candidates."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+    candidates: List[Dict[str, Any]] = Field(
+        ...,
+        description="List of candidate condition dicts (candidate_id, source, components, raw_score optional).",
+    )
+
+
+class PlannerFuseInput(BaseModel):
+    """Schema for fuse step on auto-generated candidates."""
+
+    reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+    top_k_protocols: int = Field(5, ge=1, le=10, description="DRFP candidates to fetch.")
+
+
 @tool(args_schema=UnifiedRecommenderInput)
 def unified_recommender_tool(
     reaction_smiles: str,
@@ -3401,6 +3421,48 @@ def planner_hte_summary_tool(reaction_smiles: str) -> Dict[str, Any]:
         {
             "family": family.model_dump(),
             "hte_summary": summary.model_dump() if summary else None,
+        }
+    )
+
+
+@tool(args_schema=PlannerScoreInput)
+def planner_score_candidates_tool(reaction_smiles: str, candidates: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Score arbitrary candidates with the planner heuristic/ML stub."""
+    rxn = ReactionInput(reaction_smiles=reaction_smiles)
+    candidate_objs: List[CandidateCondition] = []
+    for c in candidates:
+        candidate_objs.append(
+            CandidateCondition(
+                candidate_id=c.get("candidate_id", f"cand_{len(candidate_objs)}"),
+                components=c.get("components", {}),
+                source=c.get("source", "unknown"),
+                raw_score=c.get("raw_score"),
+                metadata=c.get("metadata", {}),
+            )
+        )
+    scores = score_ml_candidates(candidate_objs, rxn)
+    return _success_response({"scores": [s.model_dump() for s in scores]})
+
+
+@tool(args_schema=PlannerFuseInput)
+def planner_fuse_tool(reaction_smiles: str, top_k_protocols: int = 5) -> Dict[str, Any]:
+    """
+    Generate candidates (rules + DRFP), score, and fuse into a ranked list.
+
+    Returns fused ranking and provenance without formatting protocol steps.
+    """
+    rxn = ReactionInput(reaction_smiles=reaction_smiles)
+    family = planner_detect_family(rxn)
+    rule_candidates = fetch_rule_candidates(rxn, family)
+    protocol_candidates = find_similar_protocols(rxn, top_k=top_k_protocols)
+    hte_summary = fetch_hte_stats(rxn, family)
+    ml_scores = score_ml_candidates(rule_candidates + protocol_candidates, rxn)
+    fused = fuse_scores(rule_candidates, protocol_candidates, hte_summary, ml_scores)
+    return _success_response(
+        {
+            "family": family.model_dump(),
+            "fused": [c.model_dump() for c in fused.ranked],
+            "provenance": fused.provenance,
         }
     )
 
@@ -4363,6 +4425,8 @@ CHEMTOOLS_TOOLS = [
     planner_rule_candidates_tool,
     planner_protocol_candidates_tool,
     planner_hte_summary_tool,
+    planner_score_candidates_tool,
+    planner_fuse_tool,
 ]
 
 
