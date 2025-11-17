@@ -13,7 +13,15 @@ import os
 from typing import Any, Dict, List
 
 from chem_assistant.planner import ReactionInput, auto_conditions
-from chem_assistant.chemtools_wrapper import auto_conditions_llm_tool
+from chem_assistant.chemtools_wrapper import (
+    auto_conditions_llm_tool,
+    planner_detect_family_tool,
+    planner_rule_candidates_tool,
+    planner_protocol_candidates_tool,
+    planner_hte_summary_tool,
+    planner_score_candidates_tool,
+    planner_fuse_tool,
+)
 
 try:  # Optional: only used when key + deps present
     from langchain_openai import ChatOpenAI
@@ -98,8 +106,22 @@ def run_cli() -> int:
 
     # LLM path
     llm = ChatOpenAI(model=args.llm_model, temperature=0)
-    agent = create_react_agent(llm, [auto_conditions_llm_tool])
-    user_query = f"Recommend conditions for: {args.reaction}"
+    tools = [
+        auto_conditions_llm_tool,
+        planner_detect_family_tool,
+        planner_rule_candidates_tool,
+        planner_protocol_candidates_tool,
+        planner_hte_summary_tool,
+        planner_score_candidates_tool,
+        planner_fuse_tool,
+    ]
+    agent = create_react_agent(llm, tools)
+    user_query = (
+        "Recommend reaction conditions with rationale and provide up to 3 protocol steps. "
+        "Use planner tools to detect family, gather rule/precedent/HTE signals, "
+        "score/fuse candidates, and fall back to auto_conditions_llm_tool if needed. "
+        f"Reaction: {args.reaction}"
+    )
     response = agent.invoke({"input": user_query})
     print(response["output"])
     return 0
