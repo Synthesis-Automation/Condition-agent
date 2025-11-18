@@ -696,7 +696,7 @@ python -m lang_chain.chemtools_cli
 ```
 
 
- python -m chem_assistant.planner.llm_agent_cli --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" --top-k 2 --max-protocols 1
+python -m chem_assistant.planner.llm_agent_cli --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" --top-k 2 --max-protocols 1
 
 
 Happy chemistry! 🧪✨
