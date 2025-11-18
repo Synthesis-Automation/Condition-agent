@@ -93,17 +93,34 @@ python -m chem_assistant.planner.cli \
 
 Outputs the detected family, rule/precedent candidates, optional HTE summary, and formatted protocol additions (per `docs/AUTOMATION_FORMAT.md`). Add `--out result.json` to save the payload.
 
-#### 0b. LLM-Assisted Auto-Conditions (with fallback)
+#### 0b. LLM-Assisted Auto-Conditions (Comprehensive Multi-Database Analysis)
 
 ```bash
-# Uses OpenAI if OPENAI_API_KEY is set; otherwise falls back to deterministic summary
+# Comprehensive analysis using ALL available databases and tools
 python -m chem_assistant.planner.llm_agent_cli \
   --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" \
-  --top-k 3 \
-  --max-protocols 2
+  --top-k 5 \
+  --max-protocols 2 \
+  --verbose
+
+# Options:
+# --llm-model gpt-4o         # Best quality (default)
+# --llm-model gpt-4o-mini    # Fast & cheap
+# --llm-model gpt-4-turbo    # Maximum intelligence
+# --temperature 0.0          # Deterministic (default)
+# --verbose                  # Show agent reasoning
 ```
 
-If no LLM/key is present, it prints the deterministic family, counts, and top protocol steps. With an LLM/key, it drives a ReAct agent over planner tools (detect family, rule/DRFP/HTE, score/fuse, or `auto_conditions_llm_tool` fallback) and returns a rationale plus steps.
+**What This Does**:
+
+- **Phase 1**: Structural analysis (reaction family, reactant classification, functional groups, mechanism)
+- **Phase 2**: Query ALL databases: Rule DB, ML precedents, Protocols, HTE (66K experiments), Dataset analytics
+- **Phase 3**: Evidence synthesis - compare sources, identify consensus & conflicts, rank by evidence strength
+- **Phase 4**: Final recommendations with complete setup, evidence citations, rationale, and practical notes
+
+**Fallback**: If no LLM/key is present, uses deterministic pipeline with basic summary.
+
+**See**: `docs/COMPREHENSIVE_AGENT_USAGE.md` for detailed documentation
 
 #### 1. Interactive CLI (Recommended)
 
@@ -695,8 +712,16 @@ $env:OPENAI_API_KEY = "sk-your-key-here"
 python -m lang_chain.chemtools_cli
 ```
 
-
 python -m chem_assistant.planner.llm_agent_cli --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" --top-k 2 --max-protocols 1
 
-
 Happy chemistry! 🧪✨
+
+# Comprehensive multi-database analysis
+
+python -m chem_assistant.planner.llm_agent_cli \
+  --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" \
+  --verbose
+
+# Maximum intelligence
+
+python -m chem_assistant.planner.llm_agent_cli   --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1"   --llm-model gpt-4-turbo   --top-k 10   --max-protocols 3   --verbose
