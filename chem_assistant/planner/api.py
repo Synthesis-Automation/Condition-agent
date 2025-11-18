@@ -8,7 +8,7 @@ returns structured payloads that higher-level agents or UIs can consume.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Tuple
 import logging
 from pathlib import Path
 
@@ -20,6 +20,9 @@ from chemtools.formatters.rule_to_protocol import rule_conditions_to_reaction_se
 
 logger = logging.getLogger(__name__)
 
+if TYPE_CHECKING:
+    from chemtools.recommend import RecommendationResult
+
 try:
     from chemtools.recommend import UnifiedRecommender, RecommendationResult
 
@@ -27,7 +30,7 @@ try:
 except Exception as exc:  # pragma: no cover - import-time guard
     UNIFIED_AVAILABLE = False
     UnifiedRecommender = None  # type: ignore
-    RecommendationResult = None  # type: ignore
+    RecommendationResult = Any  # type: ignore
     logger.debug("UnifiedRecommender unavailable: %s", exc)
 
 try:

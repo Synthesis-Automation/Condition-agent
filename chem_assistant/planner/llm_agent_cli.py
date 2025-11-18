@@ -84,8 +84,19 @@ def run_cli() -> int:
     )
     parser.add_argument(
         "--llm-model",
-        default="gpt-4o-mini",
+        default="gpt-4o",
         help="LLM model for agent mode (requires API key and langchain_openai).",
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.0,
+        help="LLM temperature (0.0=deterministic, higher=more creative).",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show agent reasoning steps and tool calls.",
     )
     args = parser.parse_args()
 
@@ -104,8 +115,8 @@ def run_cli() -> int:
                 print(f"    • {step}")
         return 0
 
-    # LLM path
-    llm = ChatOpenAI(model=args.llm_model, temperature=0)
+    # LLM path with enhanced system prompt
+    llm = ChatOpenAI(model=args.llm_model, temperature=args.temperature)
     tools = [
         auto_conditions_llm_tool,
         planner_detect_family_tool,
@@ -115,14 +126,60 @@ def run_cli() -> int:
         planner_score_candidates_tool,
         planner_fuse_tool,
     ]
-    agent = create_agent(llm, tools)
-    user_query = (
-        "Recommend reaction conditions with rationale and provide up to 3 protocol steps. "
-        "Use planner tools to detect family, gather rule/precedent/HTE signals, "
-        "score/fuse candidates, and fall back to auto_conditions_llm_tool if needed. "
-        f"Reaction: {args.reaction}"
-    )
+    
+    # Enhanced system prompt for better chemistry reasoning
+    system_prompt = """You are an expert chemistry assistant specializing in organic synthesis and reaction condition optimization.
+
+Your goal is to recommend reliable, practical reaction conditions based on:
+1. Rule-based knowledge from validated reaction databases
+2. Similar precedent reactions (DRFP similarity search)
+3. High-throughput experimentation (HTE) statistics
+4. Synthesis best practices and safety considerations
+
+When analyzing a reaction:
+- First detect the reaction family to understand the transformation
+- Gather evidence from multiple sources (rules, precedents, HTE data)
+- Compare and synthesize information critically
+- Prioritize conditions with strong experimental support
+- Explain your reasoning clearly, citing evidence sources
+- Consider practical factors: scalability, cost, safety, availability
+- Provide specific, actionable recommendations with quantities and conditions
+- Highlight any uncertainties or alternative approaches
+
+Always use the available tools systematically to build a comprehensive recommendation."""
+
+    agent = create_agent(llm, tools, system_prompt=system_prompt)
+    
+    # Enhanced user query with clearer instructions
+    user_query = f"""Analyze this reaction and recommend optimal conditions:
+
+Reaction SMILES: {args.reaction}
+
+Please:
+1. Detect the reaction family and confidence
+2. Find rule-based conditions if available
+3. Search for similar precedent reactions (top {args.top_k})
+4. Check HTE database for statistical insights
+5. Score and rank all candidates
+6. Provide your top {args.max_protocols} recommendations with:
+   - Complete reaction setup (reagents, catalyst, ligand, base, solvent)
+   - Specific quantities and conditions (temperature, time, concentration)
+   - Success rate or yield expectations from evidence
+   - Brief rationale explaining why these conditions are recommended
+   - Any important considerations (safety, handling, alternatives)
+
+Be specific and practical - a chemist should be able to run this reaction from your recommendations."""
+
+    if args.verbose:
+        print("🤖 Agent thinking...\n")
+    
     response = agent.invoke({"messages": [user_query]})
+    
+    if args.verbose:
+        print("\n" + "="*80)
+        print("AGENT RESPONSE:")
+        print("="*80)
+    
     print(response["messages"][-1].content)
     return 0
 
