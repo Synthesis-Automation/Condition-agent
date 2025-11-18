@@ -1,0 +1,6365 @@
+$RDFILE 1
+$DATM 11/11/2025 14:32:00
+$RFMT $RIREG SCHEME1 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+Methyl 4-methylbenzoate
+C9H10O2
+99-75-2 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 2.3101 1.3337 0.0 0
+M  V30 2 O 1.5400 2.6673 0.0 0
+M  V30 3 O 1.5400 0.0000 0.0 0
+M  V30 4 C 0.0000 2.6673 0.0 0
+M  V30 5 C 8.4702 1.3337 0.0 0
+M  V30 6 C 3.8501 1.3337 0.0 0
+M  V30 7 C 4.6201 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 6.1601 0.0000 0.0 0
+M  V30 10 C 6.1601 2.6673 0.0 0
+M  V30 11 C 6.9302 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 2 4
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Monomethyl terephthalate
+C9H8O4
+1679-64-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  13 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.6685 4.6201 0.0 0
+M  V30 2 O 8.0023 3.8501 0.0 0
+M  V30 3 O 6.6685 6.1601 0.0 0
+M  V30 4 C 9.3360 4.6201 0.0 0
+M  V30 5 C 1.3337 1.5400 0.0 0
+M  V30 6 O 1.3337 0.0000 0.0 0
+M  V30 7 O 0.0000 2.3101 0.0 0
+M  V30 8 C 5.3348 3.8501 0.0 0
+M  V30 9 C 4.0012 4.6201 0.0 0
+M  V30 10 C 5.3348 2.3101 0.0 0
+M  V30 11 C 2.6675 3.8501 0.0 0
+M  V30 12 C 4.0012 1.5400 0.0 0
+M  V30 13 C 2.6675 2.3101 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 8
+M  V30 4 1 2 4
+M  V30 5 1 5 6
+M  V30 6 2 5 7
+M  V30 7 1 5 13
+M  V30 8 2 8 9
+M  V30 9 1 8 10
+M  V30 10 1 9 11
+M  V30 11 2 10 12
+M  V30 12 2 11 13
+M  V30 13 1 12 13
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 99-75-2
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 1679-64-7
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-4494966
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 99
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7758-02-3
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 37222-66-5
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7757-83-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-09-2
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):EXP_PROC
+$DATUM General/Typical Procedure: 3. General Procedure for Direct Benzylic
+Oxidation of Alkylarenes (1) Using KBr/Oxone® System under Photochemical
+Conditions (Method B) (Table 2). To the solution of 1b (37.8 mg, 0.25
+mmol) and Oxone® (184.4 mg, 0.30 mmol) in a mixture of CH2Cl2 (1.35 mL)
+and H2O (0.15 mL) was added KBr (37.5 mg, 0.30 mmol) at room temperature
+and stirred under visible light irradiation for 24 h. Saturated Na2SO3
+aqueous solution (10 mL) was added to the reaction mixture and the
+product was extracted with AcOEt (15 mL × 3). The combined extracts were
+washed by brine (10 mL) and dried over Na2SO4. The organic phase was
+concentrated under reduced pressure and the crude product was purified by
+silica gel column chromatography (eluent: hexane/AcOEt = 20/1), to give
+the desired product 2b. 4-Nitroacetophenone (2b, commercially available)
+Monomethyl terephthalate (2z, commercially available) Yield &gt;99%. 1H
+NMR (400 MHz, DMSO-d6) δ 3.36 (brs, 1H), 3.89 (s, 3H), 8.07 (s, 4H). 13C
+NMR (400 MHz, DMSO-d6) δ 52.7, 129.6 (2C), 129.8 (2C), 133.4, 135.0,
+165.8, 166.8. IR (KBr) 2834, 1723, 1693, 1429, 1279, 1106 cm-1.
+$DTYPE RXN:VAR(1):NOTES
+$DATUM photochemical, radical mechanism, product depends on amount of oxidant,
+amount of KBr, solvent and reaction mechanism, visible light used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Direct and Selective Benzylic Oxidation of Alkylarenes via C-H
+Abstraction Using Alkali Metal Bromides
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Moriyama, Katsuhiko; Takemura, Misato; Togo, Hideo
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Organic Letters (2012), 14(9), 2414-2417
+
+$RFMT $RIREG SCHEME2 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Chlorotoluene
+C7H7Cl
+106-43-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 Cl 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Chlorobenzoic acid
+C7H5ClO2
+74-11-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 Cl 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-43-4
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 74-11-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-8756059
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 99
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7758-02-3
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 37222-66-5
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7757-83-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-09-2
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):EXP_PROC
+$DATUM General/Typical Procedure: 3. General Procedure for Direct Benzylic
+Oxidation of Alkylarenes (1) Using KBr/Oxone® System under Photochemical
+Conditions (Method B) (Table 2). To the solution of 1b (37.8 mg, 0.25
+mmol) and Oxone® (184.4 mg, 0.30 mmol) in a mixture of CH2Cl2 (1.35 mL)
+and H2O (0.15 mL) was added KBr (37.5 mg, 0.30 mmol) at room temperature
+and stirred under visible light irradiation for 24 h. Saturated Na2SO3
+aqueous solution (10 mL) was added to the reaction mixture and the
+product was extracted with AcOEt (15 mL × 3). The combined extracts were
+washed by brine (10 mL) and dried over Na2SO4. The organic phase was
+concentrated under reduced pressure and the crude product was purified by
+silica gel column chromatography (eluent: hexane/AcOEt = 20/1), to give
+the desired product 2b. 4-Nitroacetophenone (2b, commercially available)
+4-Chlorobenzoic acid (2aa, commercially available) Yield &gt;99%. 1H NMR
+(400 MHz, CDCl3) δ 3.35 (brs, 1H), 7.58 (d, J = 8.6 Hz, 2H), 7.94 (d, J =
+8.6 Hz, 2H). 13C NMR (100 MHz, CDCl3) δ 128.8 (2C), 129.6, 131.2 (2C),
+137.8, 166.5. IR (KBr) 2839, 1685, 1592, 1425, 1324, 1092 cm-1.
+$DTYPE RXN:VAR(1):NOTES
+$DATUM photochemical, radical mechanism, product depends on amount of oxidant,
+amount of KBr, solvent and reaction mechanism, visible light used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Direct and Selective Benzylic Oxidation of Alkylarenes via C-H
+Abstraction Using Alkali Metal Bromides
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Moriyama, Katsuhiko; Takemura, Misato; Togo, Hideo
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Organic Letters (2012), 14(9), 2414-2417
+
+$RFMT $RIREG SCHEME2 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Chlorotoluene
+C7H7Cl
+106-43-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 Cl 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Chlorobenzoic acid
+C7H5ClO2
+74-11-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 Cl 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-43-4
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 74-11-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375709
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 95
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME3 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Nitrotoluene
+C7H7NO2
+99-99-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 N 0.7700 1.3337 0.0 0 VAL=5
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Nitrobenzoic acid
+C7H5NO4
+62-23-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.6686 1.5400 0.0 0
+M  V30 2 O 8.0022 2.3100 0.0 0
+M  V30 3 O 6.6686 0.0000 0.0 0
+M  V30 4 N 1.3337 4.6201 0.0 0 VAL=5
+M  V30 5 O 0.0000 3.8500 0.0 0
+M  V30 6 O 1.3337 6.1601 0.0 0
+M  V30 7 C 5.3348 2.3100 0.0 0
+M  V30 8 C 4.0011 1.5400 0.0 0
+M  V30 9 C 5.3348 3.8500 0.0 0
+M  V30 10 C 2.6675 2.3100 0.0 0
+M  V30 11 C 4.0011 4.6201 0.0 0
+M  V30 12 C 2.6675 3.8500 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 2 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 99-99-0
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 62-23-7
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-11469892
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 99
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7758-02-3
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 37222-66-5
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7757-83-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-09-2
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):EXP_PROC
+$DATUM General/Typical Procedure: 3. General Procedure for Direct Benzylic
+Oxidation of Alkylarenes (1) Using KBr/Oxone® System under Photochemical
+Conditions (Method B) (Table 2). To the solution of 1b (37.8 mg, 0.25
+mmol) and Oxone® (184.4 mg, 0.30 mmol) in a mixture of CH2Cl2 (1.35 mL)
+and H2O (0.15 mL) was added KBr (37.5 mg, 0.30 mmol) at room temperature
+and stirred under visible light irradiation for 24 h. Saturated Na2SO3
+aqueous solution (10 mL) was added to the reaction mixture and the
+product was extracted with AcOEt (15 mL × 3). The combined extracts were
+washed by brine (10 mL) and dried over Na2SO4. The organic phase was
+concentrated under reduced pressure and the crude product was purified by
+silica gel column chromatography (eluent: hexane/AcOEt = 20/1), to give
+the desired product 2b. 4-Nitroacetophenone (2b, commercially available)
+4-Nitrobenzoic acid (2y, commercially available) Yield &gt;99%. 1H NMR
+(400 MHz, DMSO-d6) δ 3.37 (brs, 1H), 8.10 (d, J = 8.3 Hz, 2H), 8.26 (d, J
+= 8.3 Hz, 2H). 13C NMR (100 MHz, DMSO-d6) δ 123.9 (2C), 130.9 (2C),
+136.6, 150.2, 166.0. IR (KBr) 2834, 1696, 1606, 1544, 1294 cm-1.
+$DTYPE RXN:VAR(1):NOTES
+$DATUM photochemical, sunlight used, radical mechanism, optimized on light
+source for yield and oxidation selectivity, optimization study
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Direct and Selective Benzylic Oxidation of Alkylarenes via C-H
+Abstraction Using Alkali Metal Bromides
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Moriyama, Katsuhiko; Takemura, Misato; Togo, Hideo
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Organic Letters (2012), 14(9), 2414-2417
+
+$RFMT $RIREG SCHEME4 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+1,2,3,4-Tetrahydro-6-methoxy-1,1,4,4,7-pentamethylnaphthalene
+C16H24O
+22825-12-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  17 18 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 2.7197 0.0000 0.0 0
+M  V30 2 C 4.4342 0.9899 0.0 0
+M  V30 3 C 1.7145 5.7007 0.0 0
+M  V30 4 C 0.0000 4.7108 0.0 0
+M  V30 5 O 7.6071 4.1841 0.0 0
+M  V30 6 C 8.3771 2.8504 0.0 0
+M  V30 7 C 6.0671 6.8515 0.0 0
+M  V30 8 C 3.7570 2.8504 0.0 0
+M  V30 9 C 2.9870 4.1841 0.0 0
+M  V30 10 C 5.2970 2.8504 0.0 0
+M  V30 11 C 2.9870 1.5168 0.0 0
+M  V30 12 C 1.4470 4.1841 0.0 0
+M  V30 13 C 3.7570 5.5177 0.0 0
+M  V30 14 C 6.0671 4.1841 0.0 0
+M  V30 15 C 1.4470 1.5168 0.0 0
+M  V30 16 C 0.6770 2.8504 0.0 0
+M  V30 17 C 5.2970 5.5177 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 11
+M  V30 2 1 2 11
+M  V30 3 1 3 12
+M  V30 4 1 4 12
+M  V30 5 1 5 6
+M  V30 6 1 5 14
+M  V30 7 1 7 17
+M  V30 8 1 8 9
+M  V30 9 2 8 10
+M  V30 10 1 8 11
+M  V30 11 1 9 12
+M  V30 12 2 9 13
+M  V30 13 1 10 14
+M  V30 14 1 11 15
+M  V30 15 1 12 16
+M  V30 16 1 13 17
+M  V30 17 2 14 17
+M  V30 18 1 15 16
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+5,6,7,8-Tetrahydro-3-methoxy-5,5,8,8-tetramethyl-2-naphthalenecarboxylic acid
+C16H22O3
+203856-58-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  19 20 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 3.4744 0.0 0
+M  V30 2 C 1.7145 2.4845 0.0 0
+M  V30 3 C 4.4341 7.1952 0.0 0
+M  V30 4 C 2.7196 8.1851 0.0 0
+M  V30 5 C 6.0670 1.3338 0.0 0
+M  V30 6 O 5.2970 0.0000 0.0 0
+M  V30 7 O 7.6070 1.3338 0.0 0
+M  V30 8 O 7.6070 4.0011 0.0 0
+M  V30 9 C 8.3770 5.3347 0.0 0
+M  V30 10 C 2.9870 4.0011 0.0 0
+M  V30 11 C 3.7570 5.3347 0.0 0
+M  V30 12 C 3.7570 2.6674 0.0 0
+M  V30 13 C 1.4470 4.0011 0.0 0
+M  V30 14 C 5.2970 5.3347 0.0 0
+M  V30 15 C 2.9870 6.6685 0.0 0
+M  V30 16 C 5.2970 2.6674 0.0 0
+M  V30 17 C 0.6770 5.3347 0.0 0
+M  V30 18 C 6.0670 4.0011 0.0 0
+M  V30 19 C 1.4470 6.6685 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 13
+M  V30 2 1 2 13
+M  V30 3 1 3 15
+M  V30 4 1 4 15
+M  V30 5 1 5 6
+M  V30 6 2 5 7
+M  V30 7 1 5 16
+M  V30 8 1 8 9
+M  V30 9 1 8 18
+M  V30 10 1 10 11
+M  V30 11 2 10 12
+M  V30 12 1 10 13
+M  V30 13 2 11 14
+M  V30 14 1 11 15
+M  V30 15 1 12 16
+M  V30 16 1 13 17
+M  V30 17 1 14 18
+M  V30 18 1 15 19
+M  V30 19 2 16 18
+M  V30 20 1 17 19
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 22825-12-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 203856-58-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-955771
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 95
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 106-95-6
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 141-78-6
+$DTYPE RXN:VAR(1):EXP_PROC
+$DATUM 3-Methoxy-5,5,8,8-tetramethyl-6,7-dihydronaphthalene-2-carboxylic acid
+(2). Allyl bromide (110 mL, 1.29 mmol, 0.3 equiv.) was added to a
+solution of tetralin 3 (1.00 g, 4.3 mmol) in EtOAc (20 mL) and the
+solution purged with oxygen gas for several minutes. The mixture was then
+irradiated with a 400 W medium pressure mercury lamp under an atmosphere
+of oxygen gas. The reaction mixture was intermittently purged with oxygen
+gas during the course of the reaction and the progress of the reaction
+was monitored by HPLC-MS where the complete conversion through to acid 2
+was reached after 48 hours of irradiation. The solvents were then
+evaporated and the residue portioned between aqueous NaOH (2M) and Et2O.
+The aqueous phase was separated, washed with Et2O, acidified with HCl
+(2M) and extracted with EtOAc. The combined organic extracts weredried
+(MgSO4) and evaporated. 2 (1.07 g, 4.07 mmol, 95%) as a yellow solid. 1H
+(400 MHz, CDCl3) δ 10.70 (br, 1H), 8.11 (s, 1H), 6.90 (s, 1H), 4.03 (s,
+3H), 1.71-1.61 (m, 4H), 1.29 (s, 6H), 1.27 (s, 6H); LCMS (ES) m/z 263
+(MH+).
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-process simplification, photochemical, medium pressure
+mercury lamp (400 W) used, key step, alternatively reaction carried out
+with KMnO4 in aqueous NaOH-pyridine decreased yield
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Concise synthesis of the retinoic acid receptor (RAR) agonist AGN-193836
+utilizing a photochemical benzylic oxidation
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Fish, Paul V.; Ralph, Michael J.
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry Letters and Reviews (2012), 5(4), 535-538
+
+$RFMT $RIREG SCHEME5 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Fluorotoluene
+C7H7F
+352-32-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 F 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Fluorobenzoic acid
+C7H5FO2
+456-22-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 F 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 352-32-9
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 456-22-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375711
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 94
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME6 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+p-Methylacetophenone
+C9H10O
+122-00-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Acetylbenzoic acid
+C9H8O3
+586-89-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.6686 1.5400 0.0 0
+M  V30 2 C 8.0022 2.3100 0.0 0
+M  V30 3 O 6.6686 0.0000 0.0 0
+M  V30 4 C 1.3337 4.6201 0.0 0
+M  V30 5 O 0.0000 3.8500 0.0 0
+M  V30 6 O 1.3337 6.1601 0.0 0
+M  V30 7 C 5.3348 2.3100 0.0 0
+M  V30 8 C 4.0011 1.5400 0.0 0
+M  V30 9 C 5.3348 3.8500 0.0 0
+M  V30 10 C 2.6675 2.3100 0.0 0
+M  V30 11 C 4.0011 4.6201 0.0 0
+M  V30 12 C 2.6675 3.8500 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 122-00-9
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 586-89-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375719
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 94
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME7 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+3-Bromotoluene
+C7H7Br
+591-17-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Br 0.0000 3.0800 0.0 0
+M  V30 2 C 5.3349 3.0800 0.0 0
+M  V30 3 C 2.6675 3.0800 0.0 0
+M  V30 4 C 1.3338 2.3100 0.0 0
+M  V30 5 C 4.0011 2.3100 0.0 0
+M  V30 6 C 1.3338 0.7700 0.0 0
+M  V30 7 C 4.0011 0.7700 0.0 0
+M  V30 8 C 2.6675 0.0000 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+3-Bromobenzoic acid
+C7H5BrO2
+585-76-2 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3338 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3100 0.0 0
+M  V30 3 O 1.3338 0.0000 0.0 0
+M  V30 4 Br 6.6686 1.5400 0.0 0
+M  V30 5 C 2.6675 2.3100 0.0 0
+M  V30 6 C 4.0011 1.5400 0.0 0
+M  V30 7 C 2.6675 3.8500 0.0 0
+M  V30 8 C 5.3348 2.3100 0.0 0
+M  V30 9 C 4.0011 4.6201 0.0 0
+M  V30 10 C 5.3348 3.8500 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 8
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 591-17-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 585-76-2
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-9034326
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 93
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7758-02-3
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 37222-66-5
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7757-83-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-09-2
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):EXP_PROC
+$DATUM General/Typical Procedure: 3. General Procedure for Direct Benzylic
+Oxidation of Alkylarenes (1) Using KBr/Oxone® System under Photochemical
+Conditions (Method B) (Table 2). To the solution of 1b (37.8 mg, 0.25
+mmol) and Oxone® (184.4 mg, 0.30 mmol) in a mixture of CH2Cl2 (1.35 mL)
+and H2O (0.15 mL) was added KBr (37.5 mg, 0.30 mmol) at room temperature
+and stirred under visible light irradiation for 24 h. Saturated Na2SO3
+aqueous solution (10 mL) was added to the reaction mixture and the
+product was extracted with AcOEt (15 mL × 3). The combined extracts were
+washed by brine (10 mL) and dried over Na2SO4. The organic phase was
+concentrated under reduced pressure and the crude product was purified by
+silica gel column chromatography (eluent: hexane/AcOEt = 20/1), to give
+the desired product 2b. 4-Nitroacetophenone (2b, commercially available)
+3-Bromobenzoic acid (2ab, commercially available) Yield 93%. 1H NMR (400
+MHz, CDCl3) δ 7.37 (t, J = 8.0 Hz, 1H), 7.75 (d, J = 8.0 Hz, 1H), 8.05
+(d, J = 8.0 Hz, 1H), 8.26 (s, 1H). 13C NMR (100 MHz, CDCl3) δ 122.6,
+128.8, 130.1, 131.1, 133.2, 136.8, 170.6. IR (KBr) 2836, 1688, 1568,
+1438, 1311 cm-1.
+$DTYPE RXN:VAR(1):NOTES
+$DATUM photochemical, radical mechanism, product depends on amount of oxidant,
+amount of KBr, solvent and reaction mechanism, visible light used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Direct and Selective Benzylic Oxidation of Alkylarenes via C-H
+Abstraction Using Alkali Metal Bromides
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Moriyama, Katsuhiko; Takemura, Misato; Togo, Hideo
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Organic Letters (2012), 14(9), 2414-2417
+
+$RFMT $RIREG SCHEME8 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylbiphenyl
+C13H12
+644-08-6 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  13 14 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 9.2402 1.3337 0.0 0
+M  V30 2 C 4.6201 1.3337 0.0 0
+M  V30 3 C 5.3901 2.6673 0.0 0
+M  V30 4 C 5.3901 0.0000 0.0 0
+M  V30 5 C 6.9302 2.6673 0.0 0
+M  V30 6 C 6.9302 0.0000 0.0 0
+M  V30 7 C 7.7002 1.3337 0.0 0
+M  V30 8 C 3.0801 1.3337 0.0 0
+M  V30 9 C 2.3101 0.0000 0.0 0
+M  V30 10 C 2.3101 2.6673 0.0 0
+M  V30 11 C 0.7700 0.0000 0.0 0
+M  V30 12 C 0.7700 2.6673 0.0 0
+M  V30 13 C 0.0000 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 7
+M  V30 2 2 2 3
+M  V30 3 1 2 4
+M  V30 4 1 2 8
+M  V30 5 1 3 5
+M  V30 6 2 4 6
+M  V30 7 2 5 7
+M  V30 8 1 6 7
+M  V30 9 2 8 9
+M  V30 10 1 8 10
+M  V30 11 1 9 11
+M  V30 12 2 10 12
+M  V30 13 2 11 13
+M  V30 14 1 12 13
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+[1,1′-Biphenyl]-4-carboxylic acid
+C13H10O2
+92-92-2 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  15 16 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 O 0.0000 0.0000 0.0 0
+M  V30 4 C 5.3901 1.3337 0.0 0
+M  V30 5 C 4.6201 0.0000 0.0 0
+M  V30 6 C 4.6201 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 3.0801 2.6673 0.0 0
+M  V30 9 C 2.3101 1.3337 0.0 0
+M  V30 10 C 6.9302 1.3337 0.0 0
+M  V30 11 C 7.7002 2.6673 0.0 0
+M  V30 12 C 7.7002 0.0000 0.0 0
+M  V30 13 C 9.2402 2.6673 0.0 0
+M  V30 14 C 9.2402 0.0000 0.0 0
+M  V30 15 C 10.0102 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 4 10
+M  V30 7 1 5 7
+M  V30 8 2 6 8
+M  V30 9 2 7 9
+M  V30 10 1 8 9
+M  V30 11 2 10 11
+M  V30 12 1 10 12
+M  V30 13 1 11 13
+M  V30 14 2 12 14
+M  V30 15 2 13 15
+M  V30 16 1 14 15
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 644-08-6
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 92-92-2
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375708
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 93
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME9 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Bromotoluene
+C7H7Br
+106-38-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Br 0.0000 1.3337 0.0 0
+M  V30 2 C 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Bromobenzoic acid
+C7H5BrO2
+586-76-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 Br 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-38-7
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 586-76-5
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375713
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 93
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME10 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+3,4-Dichlorotoluene
+C7H6Cl2
+95-75-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Cl 1.5400 0.0000 0.0 0
+M  V30 2 Cl 0.0000 2.6673 0.0 0
+M  V30 3 C 6.1601 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 1.5400 2.6673 0.0 0
+M  V30 6 C 3.8501 1.3337 0.0 0
+M  V30 7 C 2.3101 4.0010 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 3.8501 4.0010 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 1 3 8
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+3,4-Dichlorobenzoic acid
+C7H4Cl2O2
+51-44-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 2.6673 0.0 0
+M  V30 2 O 0.0000 4.0010 0.0 0
+M  V30 3 O 0.0000 1.3337 0.0 0
+M  V30 4 Cl 5.3901 0.0000 0.0 0
+M  V30 5 Cl 6.9302 2.6673 0.0 0
+M  V30 6 C 2.3101 2.6673 0.0 0
+M  V30 7 C 3.0801 1.3337 0.0 0
+M  V30 8 C 3.0801 4.0010 0.0 0
+M  V30 9 C 4.6201 1.3337 0.0 0
+M  V30 10 C 4.6201 4.0010 0.0 0
+M  V30 11 C 5.3901 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 9
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 95-75-0
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 51-44-5
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375717
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 92
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME11 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+Toluene
+C7H8
+108-88-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  7 7 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 1.3337 0.0 0
+M  V30 2 C 2.3101 0.0000 0.0 0
+M  V30 3 C 3.0801 1.3337 0.0 0
+M  V30 4 C 0.7700 0.0000 0.0 0
+M  V30 5 C 2.3101 2.6673 0.0 0
+M  V30 6 C 0.0000 1.3337 0.0 0
+M  V30 7 C 0.7700 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 2 2 3
+M  V30 3 1 2 4
+M  V30 4 1 3 5
+M  V30 5 2 4 6
+M  V30 6 2 5 7
+M  V30 7 1 6 7
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Benzoic acid
+C7H6O2
+65-85-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 O 0.0000 0.0000 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 0.0000 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 4.6201 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 4
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 108-88-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 65-85-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375706
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 91
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+optimization study, optimized on catalyst and solvent, scalable
+(gram-scale), the catalyst can be recycled and reused 5 times without
+significant loss of activity, alternative preparation shown, ionic liquid
+used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME12 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2-Chloro-4-fluoro-1-methylbenzene
+C7H6ClF
+452-73-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Cl 1.5400 0.0000 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 F 6.1601 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 1.5400 2.6673 0.0 0
+M  V30 6 C 3.8501 1.3337 0.0 0
+M  V30 7 C 2.3101 4.0010 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 3.8501 4.0010 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 1 3 8
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-Chloro-4-fluorobenzoic acid
+C7H4ClFO2
+2252-51-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 2.6673 0.0 0
+M  V30 2 O 0.0000 4.0010 0.0 0
+M  V30 3 O 0.0000 1.3337 0.0 0
+M  V30 4 Cl 2.3101 0.0000 0.0 0
+M  V30 5 F 6.9302 2.6673 0.0 0
+M  V30 6 C 2.3101 2.6673 0.0 0
+M  V30 7 C 3.0801 1.3337 0.0 0
+M  V30 8 C 3.0801 4.0010 0.0 0
+M  V30 9 C 4.6201 1.3337 0.0 0
+M  V30 10 C 4.6201 4.0010 0.0 0
+M  V30 11 C 5.3901 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 7
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 452-73-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 2252-51-9
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375716
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 90
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME13 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+1-Methyl-4-(trifluoromethyl)benzene
+C8H7F3
+6140-17-6 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 1.5400 0.0 0
+M  V30 2 F 1.5400 3.0800 0.0 0
+M  V30 3 F 0.0000 1.5400 0.0 0
+M  V30 4 F 1.5400 0.0000 0.0 0
+M  V30 5 C 7.7000 1.5400 0.0 0
+M  V30 6 C 3.0800 1.5400 0.0 0
+M  V30 7 C 3.8500 0.2064 0.0 0
+M  V30 8 C 3.8500 2.8736 0.0 0
+M  V30 9 C 5.3900 0.2064 0.0 0
+M  V30 10 C 5.3900 2.8736 0.0 0
+M  V30 11 C 6.1600 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 6
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-(Trifluoromethyl)benzoic acid
+C8H5F3O2
+455-24-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  13 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.9300 1.5400 0.0 0
+M  V30 2 F 6.9300 3.0800 0.0 0
+M  V30 3 F 8.4700 1.5400 0.0 0
+M  V30 4 F 6.9300 0.0000 0.0 0
+M  V30 5 C 0.7700 1.5400 0.0 0
+M  V30 6 O 0.0000 0.2064 0.0 0
+M  V30 7 O 0.0000 2.8736 0.0 0
+M  V30 8 C 5.3900 1.5400 0.0 0
+M  V30 9 C 4.6200 0.2064 0.0 0
+M  V30 10 C 4.6200 2.8736 0.0 0
+M  V30 11 C 3.0800 0.2064 0.0 0
+M  V30 12 C 3.0800 2.8736 0.0 0
+M  V30 13 C 2.3100 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 8
+M  V30 5 1 5 6
+M  V30 6 2 5 7
+M  V30 7 1 5 13
+M  V30 8 2 8 9
+M  V30 9 1 8 10
+M  V30 10 1 9 11
+M  V30 11 2 10 12
+M  V30 12 2 11 13
+M  V30 13 1 12 13
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 6140-17-6
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 455-24-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375718
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 90
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME14 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2-Chlorotoluene
+C7H7Cl
+95-49-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 2.6673 0.0 0
+M  V30 2 Cl 3.0801 0.0000 0.0 0
+M  V30 3 C 3.0801 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 2.3101 4.0010 0.0 0
+M  V30 6 C 0.7700 1.3337 0.0 0
+M  V30 7 C 0.7700 4.0010 0.0 0
+M  V30 8 C 0.0000 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 4
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-Chlorobenzoic acid
+C7H5ClO2
+118-91-2 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 2.6673 0.0 0
+M  V30 2 O 0.0000 4.0010 0.0 0
+M  V30 3 O 0.0000 1.3337 0.0 0
+M  V30 4 Cl 2.3101 0.0000 0.0 0
+M  V30 5 C 2.3101 2.6673 0.0 0
+M  V30 6 C 3.0801 1.3337 0.0 0
+M  V30 7 C 3.0801 4.0010 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 9 C 4.6201 4.0010 0.0 0
+M  V30 10 C 5.3901 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 6
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 95-49-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 118-91-2
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375712
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 90
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME15 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-tert-Butyltoluene
+C11H16
+98-51-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 1.5400 0.0 0
+M  V30 2 C 1.5400 0.0000 0.0 0
+M  V30 3 C 0.0000 1.5400 0.0 0
+M  V30 4 C 1.5400 3.0800 0.0 0
+M  V30 5 C 7.7000 1.5400 0.0 0
+M  V30 6 C 3.0800 1.5400 0.0 0
+M  V30 7 C 3.8500 2.8736 0.0 0
+M  V30 8 C 3.8500 0.2064 0.0 0
+M  V30 9 C 5.3900 2.8736 0.0 0
+M  V30 10 C 5.3900 0.2064 0.0 0
+M  V30 11 C 6.1600 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 6
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-tert-Butylbenzoic acid
+C11H14O2
+98-73-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  13 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.9300 1.5400 0.0 0
+M  V30 2 C 6.9300 3.0800 0.0 0
+M  V30 3 C 8.4700 1.5400 0.0 0
+M  V30 4 C 6.9300 0.0000 0.0 0
+M  V30 5 C 0.7700 1.5400 0.0 0
+M  V30 6 O 0.0000 0.2064 0.0 0
+M  V30 7 O 0.0000 2.8736 0.0 0
+M  V30 8 C 5.3900 1.5400 0.0 0
+M  V30 9 C 4.6200 2.8736 0.0 0
+M  V30 10 C 4.6200 0.2064 0.0 0
+M  V30 11 C 3.0800 2.8736 0.0 0
+M  V30 12 C 3.0800 0.2064 0.0 0
+M  V30 13 C 2.3100 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 8
+M  V30 5 1 5 6
+M  V30 6 2 5 7
+M  V30 7 1 5 13
+M  V30 8 2 8 9
+M  V30 9 1 8 10
+M  V30 10 1 9 11
+M  V30 11 2 10 12
+M  V30 12 2 11 13
+M  V30 13 1 12 13
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 98-51-1
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 98-73-7
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375707
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 89
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME16 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2-Methylthiophene
+C5H6S
+554-14-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  6 6 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 3.9098 1.2459 0.0 0
+M  V30 2 C 2.3698 1.2459 0.0 0
+M  V30 3 C 1.4645 2.4917 0.0 0
+M  V30 4 S 1.4645 0.0000 0.0 0
+M  V30 5 C 0.0000 2.0159 0.0 0
+M  V30 6 C 0.0000 0.4759 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 2 3
+M  V30 3 1 2 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 6
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-Thiophenecarboxylic acid
+C5H4O2S
+527-72-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 3.7710 1.5400 0.0 0
+M  V30 2 O 5.1048 2.3100 0.0 0
+M  V30 3 O 3.7710 0.0000 0.0 0
+M  V30 4 C 2.4374 2.3100 0.0 0
+M  V30 5 C 1.0306 1.6835 0.0 0
+M  V30 6 S 2.2764 3.8416 0.0 0
+M  V30 7 C 0.0000 2.8281 0.0 0
+M  V30 8 C 0.7700 4.1617 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 4
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 554-14-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 527-72-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375728
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 88
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME17 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+1,2-Difluoro-4-methylbenzene
+C7H6F2
+2927-34-6 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 F 1.5400 0.0000 0.0 0
+M  V30 2 F 0.0000 2.6673 0.0 0
+M  V30 3 C 6.1601 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 1.5400 2.6673 0.0 0
+M  V30 6 C 3.8501 1.3337 0.0 0
+M  V30 7 C 2.3101 4.0010 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 3.8501 4.0010 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 1 3 8
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+3,4-Difluorobenzoic acid
+C7H4F2O2
+455-86-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 2.6673 0.0 0
+M  V30 2 O 0.0000 4.0010 0.0 0
+M  V30 3 O 0.0000 1.3337 0.0 0
+M  V30 4 F 5.3901 0.0000 0.0 0
+M  V30 5 F 6.9302 2.6673 0.0 0
+M  V30 6 C 2.3101 2.6673 0.0 0
+M  V30 7 C 3.0801 1.3337 0.0 0
+M  V30 8 C 3.0801 4.0010 0.0 0
+M  V30 9 C 4.6201 1.3337 0.0 0
+M  V30 10 C 4.6201 4.0010 0.0 0
+M  V30 11 C 5.3901 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 9
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 2927-34-6
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 455-86-7
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375714
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 87
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME18 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylanisole
+C8H10O
+104-93-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methoxybenzoic acid
+C8H8O3
+100-09-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3337 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3101 0.0 0
+M  V30 3 O 1.3337 0.0000 0.0 0
+M  V30 4 O 6.6687 4.6201 0.0 0
+M  V30 5 C 8.0023 3.8501 0.0 0
+M  V30 6 C 2.6675 2.3101 0.0 0
+M  V30 7 C 4.0012 1.5400 0.0 0
+M  V30 8 C 2.6675 3.8501 0.0 0
+M  V30 9 C 5.3348 2.3101 0.0 0
+M  V30 10 C 4.0012 4.6201 0.0 0
+M  V30 11 C 5.3348 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 5
+M  V30 5 1 4 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 104-93-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-09-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375710
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 87
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME18 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylanisole
+C8H10O
+104-93-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methoxybenzoic acid
+C8H8O3
+100-09-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3337 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3101 0.0 0
+M  V30 3 O 1.3337 0.0000 0.0 0
+M  V30 4 O 6.6687 4.6201 0.0 0
+M  V30 5 C 8.0023 3.8501 0.0 0
+M  V30 6 C 2.6675 2.3101 0.0 0
+M  V30 7 C 4.0012 1.5400 0.0 0
+M  V30 8 C 2.6675 3.8501 0.0 0
+M  V30 9 C 5.3348 2.3101 0.0 0
+M  V30 10 C 4.0012 4.6201 0.0 0
+M  V30 11 C 5.3348 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 5
+M  V30 5 1 4 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 104-93-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-09-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35034782
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 80
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 1310-58-3
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 1450840-09-1
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7757-83-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 14592-56-4
+$DTYPE RXN:VAR(1):NOTES
+$DATUM chemoselective, explosion, safety,
+trans-3,5-dihydroperoxy3,5-dimethyl-1,2-dioxolane, it is potentially
+explosive and should be handled with precautions
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Chemoselective benzylic oxidation of alkyl-substituted aromatics with
+singlet molecular oxygen generated from trans-3,5 hydroperoxy-3,5
+dimethyl-1,2-dioxolan-3-yl ethaneperoxate
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Najminejad, Zohreh
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Synthetic Communications (2022), 52(24), 2301-2310
+
+$RFMT $RIREG SCHEME18 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylanisole
+C8H10O
+104-93-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methoxybenzoic acid
+C8H8O3
+100-09-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3337 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3101 0.0 0
+M  V30 3 O 1.3337 0.0000 0.0 0
+M  V30 4 O 6.6687 4.6201 0.0 0
+M  V30 5 C 8.0023 3.8501 0.0 0
+M  V30 6 C 2.6675 2.3101 0.0 0
+M  V30 7 C 4.0012 1.5400 0.0 0
+M  V30 8 C 2.6675 3.8501 0.0 0
+M  V30 9 C 5.3348 2.3101 0.0 0
+M  V30 10 C 4.0012 4.6201 0.0 0
+M  V30 11 C 5.3348 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 5
+M  V30 5 1 4 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 104-93-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-09-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-33766772
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 80
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 1262958-39-3
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 7757-83-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):NOTES
+$DATUM chemoselective, safety, DHPDMDO potentially explosive
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Chemoselective Benzylic Oxidation of Alkyl-Substituted Aromatics to
+Ketones with trans-3,5-Dihydroperoxy-3,5 Dimethyl-1,2-Dioxolane
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Najminejad, Z.; Ghanipour, M.
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Organic Preparations and Procedures International (2022), 54(6), 511-516
+
+$RFMT $RIREG SCHEME18 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylanisole
+C8H10O
+104-93-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methoxybenzoic acid
+C8H8O3
+100-09-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3337 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3101 0.0 0
+M  V30 3 O 1.3337 0.0000 0.0 0
+M  V30 4 O 6.6687 4.6201 0.0 0
+M  V30 5 C 8.0023 3.8501 0.0 0
+M  V30 6 C 2.6675 2.3101 0.0 0
+M  V30 7 C 4.0012 1.5400 0.0 0
+M  V30 8 C 2.6675 3.8501 0.0 0
+M  V30 9 C 5.3348 2.3101 0.0 0
+M  V30 10 C 4.0012 4.6201 0.0 0
+M  V30 11 C 5.3348 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 5
+M  V30 5 1 4 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 104-93-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-09-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-7179296
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 64
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 75-91-2
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 1384190-41-3
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):NOTES
+$DATUM sealed vial used, other products also detected
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Dirhodium(II) Complexes of 2-(Sulfonylimino)pyrrolidine: Synthesis and
+Application in Catalytic Benzylic Oxidation
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wusiman, Abudureheman; Tusun, Xiarepati; Lu, Chong-Dao
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM European Journal of Organic Chemistry (2012), 2012(16), 3088-3092,
+S3088/1-S3088/45
+
+$RFMT $RIREG SCHEME18 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylanisole
+C8H10O
+104-93-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methoxybenzoic acid
+C8H8O3
+100-09-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3337 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3101 0.0 0
+M  V30 3 O 1.3337 0.0000 0.0 0
+M  V30 4 O 6.6687 4.6201 0.0 0
+M  V30 5 C 8.0023 3.8501 0.0 0
+M  V30 6 C 2.6675 2.3101 0.0 0
+M  V30 7 C 4.0012 1.5400 0.0 0
+M  V30 8 C 2.6675 3.8501 0.0 0
+M  V30 9 C 5.3348 2.3101 0.0 0
+M  V30 10 C 4.0012 4.6201 0.0 0
+M  V30 11 C 5.3348 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 5
+M  V30 5 1 4 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 104-93-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-09-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-7310967
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 58
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 75-91-2
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 110-86-1
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):RGT(4):CAS_RN
+$DATUM 7647-01-0
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 13682-61-6
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 110-86-1
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 124-18-5
+$DTYPE RXN:VAR(1):SOL(3):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Gold-catalyzed benzylic oxidation to carbonyl compounds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Li, Huanrong; Li, Zhiping; Shi, Zhangjie
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Tetrahedron (2009), 65(9), 1856-1858
+
+$RFMT $RIREG SCHEME18 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylanisole
+C8H10O
+104-93-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methoxybenzoic acid
+C8H8O3
+100-09-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3337 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3101 0.0 0
+M  V30 3 O 1.3337 0.0000 0.0 0
+M  V30 4 O 6.6687 4.6201 0.0 0
+M  V30 5 C 8.0023 3.8501 0.0 0
+M  V30 6 C 2.6675 2.3101 0.0 0
+M  V30 7 C 4.0012 1.5400 0.0 0
+M  V30 8 C 2.6675 3.8501 0.0 0
+M  V30 9 C 5.3348 2.3101 0.0 0
+M  V30 10 C 4.0012 4.6201 0.0 0
+M  V30 11 C 5.3348 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 5
+M  V30 5 1 4 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 104-93-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-09-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-12208043
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 53
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 75-91-2
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 7647-01-0
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 10025-77-1
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 110-86-1
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry, optimization study
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Iron-catalyzed benzylic oxidation with aqueous tert-butyl hydroperoxide
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Nakanishi, Masafumi; Bolm, Carsten
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Advanced Synthesis & Catalysis (2007), 349(6), 861-864
+
+$RFMT $RIREG SCHEME19 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+1-Methyl-4-(trifluoromethoxy)benzene
+C8H7F3O
+706-27-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 2.3101 2.6673 0.0 0
+M  V30 2 C 1.5400 1.3337 0.0 0
+M  V30 3 F 0.0000 1.3337 0.0 0
+M  V30 4 F 0.7700 0.0000 0.0 0
+M  V30 5 F 2.3101 0.0000 0.0 0
+M  V30 6 C 8.4702 2.6673 0.0 0
+M  V30 7 C 3.8501 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 9 C 4.6201 4.0010 0.0 0
+M  V30 10 C 6.1601 1.3337 0.0 0
+M  V30 11 C 6.1601 4.0010 0.0 0
+M  V30 12 C 6.9302 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 7
+M  V30 3 1 2 3
+M  V30 4 1 2 4
+M  V30 5 1 2 5
+M  V30 6 1 6 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-(Trifluoromethoxy)benzoic acid
+C8H5F3O3
+330-12-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  14 14 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 2.6675 4.6201 0.0 0
+M  V30 2 C 1.3337 3.8501 0.0 0
+M  V30 3 F 0.0000 4.6201 0.0 0
+M  V30 4 F 0.0000 3.0801 0.0 0
+M  V30 5 F 1.3337 2.3101 0.0 0
+M  V30 6 C 8.0023 1.5400 0.0 0
+M  V30 7 O 9.3360 2.3101 0.0 0
+M  V30 8 O 8.0023 0.0000 0.0 0
+M  V30 9 C 4.0012 3.8501 0.0 0
+M  V30 10 C 4.0012 2.3101 0.0 0
+M  V30 11 C 5.3348 4.6201 0.0 0
+M  V30 12 C 5.3348 1.5400 0.0 0
+M  V30 13 C 6.6685 3.8501 0.0 0
+M  V30 14 C 6.6685 2.3101 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 9
+M  V30 3 1 2 3
+M  V30 4 1 2 4
+M  V30 5 1 2 5
+M  V30 6 1 6 7
+M  V30 7 2 6 8
+M  V30 8 1 6 14
+M  V30 9 2 9 10
+M  V30 10 1 9 11
+M  V30 11 1 10 12
+M  V30 12 2 11 13
+M  V30 13 2 12 14
+M  V30 14 1 13 14
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 706-27-4
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 330-12-1
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375734
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 86
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME20 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+Dibenzyl
+C14H14
+103-29-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  14 15 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 2.6673 0.0 0
+M  V30 2 C 5.3901 1.3337 0.0 0
+M  V30 3 C 3.0801 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 2.3101 4.0010 0.0 0
+M  V30 6 C 0.7700 1.3337 0.0 0
+M  V30 7 C 0.7700 4.0010 0.0 0
+M  V30 8 C 0.0000 2.6673 0.0 0
+M  V30 9 C 6.9302 1.3337 0.0 0
+M  V30 10 C 7.7002 2.6673 0.0 0
+M  V30 11 C 7.7002 0.0000 0.0 0
+M  V30 12 C 9.2402 2.6673 0.0 0
+M  V30 13 C 9.2402 0.0000 0.0 0
+M  V30 14 C 10.0102 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 2 9
+M  V30 4 2 3 4
+M  V30 5 1 3 5
+M  V30 6 1 4 6
+M  V30 7 2 5 7
+M  V30 8 2 6 8
+M  V30 9 1 7 8
+M  V30 10 2 9 10
+M  V30 11 1 9 11
+M  V30 12 1 10 12
+M  V30 13 2 11 13
+M  V30 14 2 12 14
+M  V30 15 1 13 14
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Benzoic acid
+C7H6O2
+65-85-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 O 0.0000 0.0000 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 0.0000 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 4.6201 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 4
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 103-29-7
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 65-85-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375749
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 86
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+alternative preparation shown, ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME20 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+Dibenzyl
+C14H14
+103-29-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  14 15 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 2.6673 0.0 0
+M  V30 2 C 5.3901 1.3337 0.0 0
+M  V30 3 C 3.0801 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 2.3101 4.0010 0.0 0
+M  V30 6 C 0.7700 1.3337 0.0 0
+M  V30 7 C 0.7700 4.0010 0.0 0
+M  V30 8 C 0.0000 2.6673 0.0 0
+M  V30 9 C 6.9302 1.3337 0.0 0
+M  V30 10 C 7.7002 2.6673 0.0 0
+M  V30 11 C 7.7002 0.0000 0.0 0
+M  V30 12 C 9.2402 2.6673 0.0 0
+M  V30 13 C 9.2402 0.0000 0.0 0
+M  V30 14 C 10.0102 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 2 9
+M  V30 4 2 3 4
+M  V30 5 1 3 5
+M  V30 6 1 4 6
+M  V30 7 2 5 7
+M  V30 8 2 6 8
+M  V30 9 1 7 8
+M  V30 10 2 9 10
+M  V30 11 1 9 11
+M  V30 12 1 10 12
+M  V30 13 2 11 13
+M  V30 14 2 12 14
+M  V30 15 1 13 14
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Benzoic acid
+C7H6O2
+65-85-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 O 0.0000 0.0000 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 0.0000 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 4.6201 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 4
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 103-29-7
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 65-85-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-5454124
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 46
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 75-91-2
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 110-86-1
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):RGT(4):CAS_RN
+$DATUM 7647-01-0
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 13682-61-6
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 110-86-1
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 124-18-5
+$DTYPE RXN:VAR(1):SOL(3):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Gold-catalyzed benzylic oxidation to carbonyl compounds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Li, Huanrong; Li, Zhiping; Shi, Zhangjie
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Tetrahedron (2009), 65(9), 1856-1858
+
+$RFMT $RIREG SCHEME21 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+o-Xylene
+C8H10
+95-47-6 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 2.6673 0.0 0
+M  V30 2 C 3.0801 0.0000 0.0 0
+M  V30 3 C 3.0801 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 2.3101 4.0010 0.0 0
+M  V30 6 C 0.7700 1.3337 0.0 0
+M  V30 7 C 0.7700 4.0010 0.0 0
+M  V30 8 C 0.0000 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 4
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Phthalic acid
+C8H6O4
+88-99-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 4.0011 0.0 0
+M  V30 2 O 0.0000 4.0011 0.0 0
+M  V30 3 O 2.3100 5.3349 0.0 0
+M  V30 4 C 4.6200 4.0011 0.0 0
+M  V30 5 O 3.8500 5.3349 0.0 0
+M  V30 6 O 6.1600 4.0011 0.0 0
+M  V30 7 C 2.3100 2.6674 0.0 0
+M  V30 8 C 3.8500 2.6674 0.0 0
+M  V30 9 C 1.5400 1.3338 0.0 0
+M  V30 10 C 4.6200 1.3338 0.0 0
+M  V30 11 C 2.3100 0.0000 0.0 0
+M  V30 12 C 3.8500 0.0000 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 8
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 95-47-6
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 88-99-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375730
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 84
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+alternative preparation shown, ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME22 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Methylbenzonitrile
+C8H7N
+104-85-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.1600 1.3336 0.0 0
+M  V30 2 N 7.7000 1.3336 0.0 0
+M  V30 3 C 0.0000 1.3336 0.0 0
+M  V30 4 C 4.6200 1.3336 0.0 0
+M  V30 5 C 3.8500 0.0000 0.0 0
+M  V30 6 C 3.8500 2.6673 0.0 0
+M  V30 7 C 2.3100 0.0000 0.0 0
+M  V30 8 C 2.3100 2.6673 0.0 0
+M  V30 9 C 1.5400 1.3336 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 3 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Cyanobenzoic acid
+C8H5NO2
+619-65-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 O 0.0000 0.0000 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 N 8.4702 1.3337 0.0 0
+M  V30 6 C 2.3101 1.3337 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 3.0801 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 4.6201 2.6673 0.0 0
+M  V30 11 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 3 4 5
+M  V30 5 1 4 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 104-85-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 619-65-8
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375715
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 84
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME23 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2,4-Difluoro-1-methylbenzene
+C7H6F2
+452-76-6 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 F 1.5400 0.0000 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 F 6.1601 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 1.5400 2.6673 0.0 0
+M  V30 6 C 3.8501 1.3337 0.0 0
+M  V30 7 C 2.3101 4.0010 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 3.8501 4.0010 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 1 3 8
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2,4-Difluorobenzoic acid
+C7H4F2O2
+1583-58-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 2.6673 0.0 0
+M  V30 2 O 0.0000 4.0010 0.0 0
+M  V30 3 O 0.0000 1.3337 0.0 0
+M  V30 4 F 2.3101 0.0000 0.0 0
+M  V30 5 F 6.9302 2.6673 0.0 0
+M  V30 6 C 2.3101 2.6673 0.0 0
+M  V30 7 C 3.0801 1.3337 0.0 0
+M  V30 8 C 3.0801 4.0010 0.0 0
+M  V30 9 C 4.6201 1.3337 0.0 0
+M  V30 10 C 4.6201 4.0010 0.0 0
+M  V30 11 C 5.3901 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 7
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 452-76-6
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 1583-58-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375722
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 83
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME24 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+p-Acetotoluidide
+C9H11NO
+103-89-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 N 6.1601 2.6673 0.0 0
+M  V30 2 C 6.9302 1.3337 0.0 0
+M  V30 3 C 6.1601 0.0000 0.0 0
+M  V30 4 O 8.4702 1.3337 0.0 0
+M  V30 5 C 0.0000 2.6673 0.0 0
+M  V30 6 C 4.6201 2.6673 0.0 0
+M  V30 7 C 3.8501 4.0010 0.0 0
+M  V30 8 C 3.8501 1.3337 0.0 0
+M  V30 9 C 2.3101 4.0010 0.0 0
+M  V30 10 C 2.3101 1.3337 0.0 0
+M  V30 11 C 1.5400 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 6
+M  V30 3 1 2 3
+M  V30 4 2 2 4
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+p-Acetamidobenzoic acid
+C9H9NO3
+556-08-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  13 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 N 6.6685 4.6201 0.0 0
+M  V30 2 C 8.0023 3.8501 0.0 0
+M  V30 3 C 8.0023 2.3101 0.0 0
+M  V30 4 O 9.3360 4.6201 0.0 0
+M  V30 5 C 1.3337 1.5400 0.0 0
+M  V30 6 O 0.0000 2.3101 0.0 0
+M  V30 7 O 1.3337 0.0000 0.0 0
+M  V30 8 C 5.3348 3.8501 0.0 0
+M  V30 9 C 5.3348 2.3101 0.0 0
+M  V30 10 C 4.0012 4.6201 0.0 0
+M  V30 11 C 4.0012 1.5400 0.0 0
+M  V30 12 C 2.6675 3.8501 0.0 0
+M  V30 13 C 2.6675 2.3101 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 8
+M  V30 3 1 2 3
+M  V30 4 2 2 4
+M  V30 5 1 5 6
+M  V30 6 2 5 7
+M  V30 7 1 5 13
+M  V30 8 2 8 9
+M  V30 9 1 8 10
+M  V30 10 1 9 11
+M  V30 11 2 10 12
+M  V30 12 2 11 13
+M  V30 13 1 12 13
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 103-89-9
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 556-08-1
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375723
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 83
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME25 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2,4-Dichlorotoluene
+C7H6Cl2
+95-73-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Cl 1.5400 0.0000 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 Cl 6.1601 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 1.5400 2.6673 0.0 0
+M  V30 6 C 3.8501 1.3337 0.0 0
+M  V30 7 C 2.3101 4.0010 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 3.8501 4.0010 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 1 3 8
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2,4-Dichlorobenzoic acid
+C7H4Cl2O2
+50-84-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 2.6673 0.0 0
+M  V30 2 O 0.0000 4.0010 0.0 0
+M  V30 3 O 0.0000 1.3337 0.0 0
+M  V30 4 Cl 2.3101 0.0000 0.0 0
+M  V30 5 Cl 6.9302 2.6673 0.0 0
+M  V30 6 C 2.3101 2.6673 0.0 0
+M  V30 7 C 3.0801 1.3337 0.0 0
+M  V30 8 C 3.0801 4.0010 0.0 0
+M  V30 9 C 4.6201 1.3337 0.0 0
+M  V30 10 C 4.6201 4.0010 0.0 0
+M  V30 11 C 5.3901 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 7
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 95-73-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 50-84-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375724
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 82
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME26 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+p-Toluic acid
+C8H8O2
+99-94-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Terephthalic acid
+C8H6O4
+100-21-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.6686 1.5400 0.0 0
+M  V30 2 O 8.0022 2.3100 0.0 0
+M  V30 3 O 6.6686 0.0000 0.0 0
+M  V30 4 C 1.3337 4.6201 0.0 0
+M  V30 5 O 0.0000 3.8500 0.0 0
+M  V30 6 O 1.3337 6.1601 0.0 0
+M  V30 7 C 5.3348 2.3100 0.0 0
+M  V30 8 C 4.0011 1.5400 0.0 0
+M  V30 9 C 5.3348 3.8500 0.0 0
+M  V30 10 C 2.6675 2.3100 0.0 0
+M  V30 11 C 4.0011 4.6201 0.0 0
+M  V30 12 C 2.6675 3.8500 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 99-94-5
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-21-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375733
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 82
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+alternative preparation shown, ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME27 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+Indane
+C9H10
+496-11-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 2.6673 2.3101 0.0 0
+M  V30 2 C 2.6673 0.7700 0.0 0
+M  V30 3 C 4.1321 2.7859 0.0 0
+M  V30 4 C 1.3337 3.0801 0.0 0
+M  V30 5 C 4.1321 0.2941 0.0 0
+M  V30 6 C 1.3337 0.0000 0.0 0
+M  V30 7 C 5.0371 1.5400 0.0 0
+M  V30 8 C 0.0000 2.3101 0.0 0
+M  V30 9 C 0.0000 0.7700 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 2 1 4
+M  V30 4 1 2 5
+M  V30 5 2 2 6
+M  V30 6 1 3 7
+M  V30 7 1 4 8
+M  V30 8 1 5 7
+M  V30 9 1 6 9
+M  V30 10 2 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Phthalic acid
+C8H6O4
+88-99-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 4.0011 0.0 0
+M  V30 2 O 0.0000 4.0011 0.0 0
+M  V30 3 O 2.3100 5.3349 0.0 0
+M  V30 4 C 4.6200 4.0011 0.0 0
+M  V30 5 O 3.8500 5.3349 0.0 0
+M  V30 6 O 6.1600 4.0011 0.0 0
+M  V30 7 C 2.3100 2.6674 0.0 0
+M  V30 8 C 3.8500 2.6674 0.0 0
+M  V30 9 C 1.5400 1.3338 0.0 0
+M  V30 10 C 4.6200 1.3338 0.0 0
+M  V30 11 C 2.3100 0.0000 0.0 0
+M  V30 12 C 3.8500 0.0000 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 8
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 496-11-7
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 88-99-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375743
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 81
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+alternative preparation shown, ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME28 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2,5-Dichlorotoluene
+C7H6Cl2
+19398-61-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 0.0000 0.0 0
+M  V30 2 Cl 0.0000 2.6673 0.0 0
+M  V30 3 Cl 6.1601 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 1.5400 2.6673 0.0 0
+M  V30 6 C 3.8501 1.3337 0.0 0
+M  V30 7 C 2.3101 4.0010 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 3.8501 4.0010 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 1 3 8
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2,5-Dichlorobenzoic acid
+C7H4Cl2O2
+50-79-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3338 1.5400 0.0 0
+M  V30 2 O 1.3338 0.0000 0.0 0
+M  V30 3 O 0.0000 2.3101 0.0 0
+M  V30 4 Cl 1.3338 4.6201 0.0 0
+M  V30 5 Cl 6.6687 1.5400 0.0 0
+M  V30 6 C 2.6675 2.3101 0.0 0
+M  V30 7 C 2.6675 3.8501 0.0 0
+M  V30 8 C 4.0012 1.5400 0.0 0
+M  V30 9 C 4.0012 4.6201 0.0 0
+M  V30 10 C 5.3348 2.3101 0.0 0
+M  V30 11 C 5.3348 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 6
+M  V30 4 1 4 7
+M  V30 5 1 5 10
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 19398-61-9
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 50-79-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375720
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 80
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME29 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+p-Xylene
+C8H10
+106-42-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 C 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Terephthalic acid
+C8H6O4
+100-21-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.6686 1.5400 0.0 0
+M  V30 2 O 8.0022 2.3100 0.0 0
+M  V30 3 O 6.6686 0.0000 0.0 0
+M  V30 4 C 1.3337 4.6201 0.0 0
+M  V30 5 O 0.0000 3.8500 0.0 0
+M  V30 6 O 1.3337 6.1601 0.0 0
+M  V30 7 C 5.3348 2.3100 0.0 0
+M  V30 8 C 4.0011 1.5400 0.0 0
+M  V30 9 C 5.3348 3.8500 0.0 0
+M  V30 10 C 2.6675 2.3100 0.0 0
+M  V30 11 C 4.0011 4.6201 0.0 0
+M  V30 12 C 2.6675 3.8500 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-42-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 100-21-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375721
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 80
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+alternative preparation shown, ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME30 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+Tetralin
+C10H12
+119-64-2 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 2.3101 1.3337 0.0 0
+M  V30 2 C 3.0801 2.6673 0.0 0
+M  V30 3 C 0.7700 1.3337 0.0 0
+M  V30 4 C 3.0801 0.0000 0.0 0
+M  V30 5 C 4.6201 2.6673 0.0 0
+M  V30 6 C 2.3101 4.0010 0.0 0
+M  V30 7 C 0.0000 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 10 C 0.7700 4.0010 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 2 1 4
+M  V30 4 2 2 5
+M  V30 5 1 2 6
+M  V30 6 1 3 7
+M  V30 7 1 4 8
+M  V30 8 1 5 9
+M  V30 9 1 6 10
+M  V30 10 1 7 10
+M  V30 11 2 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Phthalic acid
+C8H6O4
+88-99-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 4.0011 0.0 0
+M  V30 2 O 0.0000 4.0011 0.0 0
+M  V30 3 O 2.3100 5.3349 0.0 0
+M  V30 4 C 4.6200 4.0011 0.0 0
+M  V30 5 O 3.8500 5.3349 0.0 0
+M  V30 6 O 6.1600 4.0011 0.0 0
+M  V30 7 C 2.3100 2.6674 0.0 0
+M  V30 8 C 3.8500 2.6674 0.0 0
+M  V30 9 C 1.5400 1.3338 0.0 0
+M  V30 10 C 4.6200 1.3338 0.0 0
+M  V30 11 C 2.3100 0.0000 0.0 0
+M  V30 12 C 3.8500 0.0000 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 8
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 119-64-2
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 88-99-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375751
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 78
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+alternative preparation shown, ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME31 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+4-Bromo-2-methylthiophene
+C5H5BrS
+29421-92-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  7 7 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Br 0.0000 2.6218 0.0 0
+M  V30 2 C 5.3026 1.4946 0.0 0
+M  V30 3 C 2.7406 2.4782 0.0 0
+M  V30 4 C 1.3337 1.8517 0.0 0
+M  V30 5 C 3.7711 1.3337 0.0 0
+M  V30 6 C 1.4946 0.3202 0.0 0
+M  V30 7 S 3.0011 0.0000 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 4
+M  V30 2 1 2 5
+M  V30 3 1 3 4
+M  V30 4 2 3 5
+M  V30 5 2 4 6
+M  V30 6 1 5 7
+M  V30 7 1 6 7
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Bromo-2-thiophenecarboxylic acid
+C5H3BrO2S
+16694-18-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.3337 1.5400 0.0 0
+M  V30 2 O 0.0000 2.3101 0.0 0
+M  V30 3 O 1.3337 0.0000 0.0 0
+M  V30 4 Br 6.6363 2.6672 0.0 0
+M  V30 5 C 2.6673 2.3101 0.0 0
+M  V30 6 C 4.0743 1.6836 0.0 0
+M  V30 7 S 2.8284 3.8416 0.0 0
+M  V30 8 C 5.1048 2.8281 0.0 0
+M  V30 9 C 4.3347 4.1618 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 8
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 29421-92-9
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 16694-18-1
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375725
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 74
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME32 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2-Methylbenzofuran
+C9H8O
+4265-25-2 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.5772 1.5400 0.0 0
+M  V30 2 C 2.6673 2.3101 0.0 0
+M  V30 3 C 2.6673 0.7700 0.0 0
+M  V30 4 C 4.1321 2.7859 0.0 0
+M  V30 5 C 1.3337 3.0801 0.0 0
+M  V30 6 O 4.1321 0.2941 0.0 0
+M  V30 7 C 1.3337 0.0000 0.0 0
+M  V30 8 C 5.0371 1.5400 0.0 0
+M  V30 9 C 0.0000 2.3101 0.0 0
+M  V30 10 C 0.0000 0.7700 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 8
+M  V30 2 1 2 3
+M  V30 3 1 2 4
+M  V30 4 2 2 5
+M  V30 5 1 3 6
+M  V30 6 2 3 7
+M  V30 7 2 4 8
+M  V30 8 1 5 9
+M  V30 9 1 6 8
+M  V30 10 1 7 10
+M  V30 11 2 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-Benzofurancarboxylic acid
+C9H6O3
+496-41-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.0811 1.5400 0.0 0
+M  V30 2 O 7.4149 2.3100 0.0 0
+M  V30 3 O 6.0811 0.0000 0.0 0
+M  V30 4 C 2.3100 2.8281 0.0 0
+M  V30 5 C 3.0800 4.1618 0.0 0
+M  V30 6 C 3.3406 1.6836 0.0 0
+M  V30 7 C 0.7700 2.8281 0.0 0
+M  V30 8 O 4.5865 3.8416 0.0 0
+M  V30 9 C 2.3100 5.4954 0.0 0
+M  V30 10 C 4.7474 2.3100 0.0 0
+M  V30 11 C 0.0000 4.1618 0.0 0
+M  V30 12 C 0.7700 5.4954 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 10
+M  V30 4 1 4 5
+M  V30 5 1 4 6
+M  V30 6 2 4 7
+M  V30 7 1 5 8
+M  V30 8 2 5 9
+M  V30 9 2 6 10
+M  V30 10 1 7 11
+M  V30 11 1 8 10
+M  V30 12 1 9 12
+M  V30 13 2 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 4265-25-2
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 496-41-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375726
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 74
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME33 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+2-Methylfuran
+C5H6O
+534-22-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  6 6 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 3.9098 1.2459 0.0 0
+M  V30 2 C 2.3698 1.2459 0.0 0
+M  V30 3 C 1.4645 2.4917 0.0 0
+M  V30 4 O 1.4645 0.0000 0.0 0
+M  V30 5 C 0.0000 2.0159 0.0 0
+M  V30 6 C 0.0000 0.4759 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 2 3
+M  V30 3 1 2 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 6
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-Furancarboxylic acid
+C5H4O3
+88-14-2 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 3.7710 1.5400 0.0 0
+M  V30 2 O 5.1048 2.3100 0.0 0
+M  V30 3 O 3.7710 0.0000 0.0 0
+M  V30 4 C 2.4374 2.3100 0.0 0
+M  V30 5 C 1.0306 1.6835 0.0 0
+M  V30 6 O 2.2764 3.8416 0.0 0
+M  V30 7 C 0.0000 2.8281 0.0 0
+M  V30 8 C 0.7700 4.1617 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 4
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 534-22-5
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 88-14-2
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375732
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 57
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 855785-75-0
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (UV irradiation (365 nm, 8 W)),
+ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME34 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+o-Xylene
+C8H10
+95-47-6 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 2.6673 0.0 0
+M  V30 2 C 3.0801 0.0000 0.0 0
+M  V30 3 C 3.0801 2.6673 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 2.3101 4.0010 0.0 0
+M  V30 6 C 0.7700 1.3337 0.0 0
+M  V30 7 C 0.7700 4.0010 0.0 0
+M  V30 8 C 0.0000 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 4
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-Methylbenzoic acid
+C8H8O2
+118-90-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 2.6673 0.0 0
+M  V30 2 O 0.0000 4.0010 0.0 0
+M  V30 3 O 0.0000 1.3337 0.0 0
+M  V30 4 C 2.3101 0.0000 0.0 0
+M  V30 5 C 2.3101 2.6673 0.0 0
+M  V30 6 C 3.0801 1.3337 0.0 0
+M  V30 7 C 3.0801 4.0010 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 9 C 4.6201 4.0010 0.0 0
+M  V30 10 C 5.3901 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 6
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 95-47-6
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 118-90-1
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-4081608
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 55
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 75-91-2
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 14024-48-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 67-64-1
+$DTYPE RXN:VAR(1):EXP_PROC
+$DATUM General/Typical Procedure: Allylic and Benzylic Oxidation Mediated by
+Co(acac)2/tert-Butyl Hydroperoxide; General Procedure. To a soln of
+substrate 1 or 3 (10 mmol) and Co(acac)2 (257mg, 1 mmol) in acetone (20
+mL), TBHP (5.14 g, 4.0 mmol, 4 equiv, 70%) was added dropwise and the
+mixture was stirred for at r.t. for 15 h. To the mixture was added aq
+brine and the soln was extracted Et2O (3 ×). The combined extracts were
+dried (anhyd MgSO4) and filtered, and the filtrate condensed under
+reduced pressure to give a crude product that was purified by column
+chromatography. Substrate: 3m, 2-Methylbenzoic Acid (4m), White solid;
+yield: 0.75 g (55%).Temperature: 28°C. 1H NMR (300 MHz, CDCl3, 25 °C): δ
+= 8.09-8.06 (m, 1 H), 7.48-7.43 (m, 1 H), 7.31-7.25 (m, 2 H), 2.66 (s, 3
+H).
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Co(acac)2-catalyzed allylic and benzylic oxidation by tert-butyl
+hydroperoxide
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Han, Xiaoqiang; Zhou, Ziyuan; Wan, Chuan; Xiao, Yumei; Qin, Zhaohai
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Synthesis (2013), 45(5), 615-620
+
+$RFMT $RIREG SCHEME35 STEP1
+$RXN
+
+
+
+  1  1
+$MOL
+Phenylacetonitrile
+C8H7N
+140-29-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.0011 3.0800 0.0 0
+M  V30 2 C 5.3347 2.3100 0.0 0
+M  V30 3 N 6.6685 1.5400 0.0 0
+M  V30 4 C 2.6674 2.3100 0.0 0
+M  V30 5 C 1.3338 3.0800 0.0 0
+M  V30 6 C 2.6674 0.7700 0.0 0
+M  V30 7 C 0.0000 2.3100 0.0 0
+M  V30 8 C 1.3338 0.0000 0.0 0
+M  V30 9 C 0.0000 0.7700 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 3 2 3
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Benzoic acid
+C7H6O2
+65-85-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 O 0.0000 0.0000 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 0.0000 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 4.6201 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 4
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 140-29-4
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 65-85-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-16599714
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 46
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 75-91-2
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 151-21-3
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 10028-22-5
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):NOTES
+$DATUM sealed vessel used, conversion (100%), alternative preparation shown
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Iron-surfactant nanocomposite-catalyzed benzylic oxidation in water
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Szabo, Fruzsina; Petho, Balint; Gonda, Zsombor; Novak, Zoltan
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM RSC Advances (2013), 3(15), 4903-4908
+
+$RFMT $RIREG SCHEME36 STEP1
+$RXN
+
+
+
+  1  2
+$MOL
+1-Ethyl-4-methylbenzene
+C9H12
+622-96-8 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+p-Methylacetophenone
+C9H10O
+122-00-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 C 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Acetylbenzoic acid
+C9H8O3
+586-89-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.6686 1.5400 0.0 0
+M  V30 2 C 8.0022 2.3100 0.0 0
+M  V30 3 O 6.6686 0.0000 0.0 0
+M  V30 4 C 1.3337 4.6201 0.0 0
+M  V30 5 O 0.0000 3.8500 0.0 0
+M  V30 6 O 1.3337 6.1601 0.0 0
+M  V30 7 C 5.3348 2.3100 0.0 0
+M  V30 8 C 4.0011 1.5400 0.0 0
+M  V30 9 C 5.3348 3.8500 0.0 0
+M  V30 10 C 2.6675 2.3100 0.0 0
+M  V30 11 C 4.0011 4.6201 0.0 0
+M  V30 12 C 2.6675 3.8500 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 4 5
+M  V30 5 2 4 6
+M  V30 6 1 4 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 622-96-8
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 122-00-9
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 586-89-0
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-33766774
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 85
+$DTYPE RXN:VAR(1):PRO(2):YIELD
+$DATUM 10
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 1262958-39-3
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 7757-83-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):NOTES
+$DATUM chemoselective, safety, DHPDMDO potentially explosive
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Chemoselective Benzylic Oxidation of Alkyl-Substituted Aromatics to
+Ketones with trans-3,5-Dihydroperoxy-3,5 Dimethyl-1,2-Dioxolane
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Najminejad, Z.; Ghanipour, M.
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Organic Preparations and Procedures International (2022), 54(6), 511-516
+
+$RFMT $RIREG SCHEME37 STEP1
+$RXN
+
+
+
+  1  2
+$MOL
+Toluene
+C7H8
+108-88-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  7 7 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 1.3337 0.0 0
+M  V30 2 C 2.3101 0.0000 0.0 0
+M  V30 3 C 3.0801 1.3337 0.0 0
+M  V30 4 C 0.7700 0.0000 0.0 0
+M  V30 5 C 2.3101 2.6673 0.0 0
+M  V30 6 C 0.0000 1.3337 0.0 0
+M  V30 7 C 0.7700 2.6673 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 2 2 3
+M  V30 3 1 2 4
+M  V30 4 1 3 5
+M  V30 5 2 4 6
+M  V30 6 2 5 7
+M  V30 7 1 6 7
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Benzoic acid
+C7H6O2
+65-85-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 O 0.0000 0.0000 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 0.0000 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 4.6201 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 4
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Benzyl chloride
+C7H7Cl
+100-44-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.6201 1.3337 0.0 0
+M  V30 2 Cl 5.3901 2.6673 0.0 0
+M  V30 3 C 3.0801 1.3337 0.0 0
+M  V30 4 C 2.3101 0.0000 0.0 0
+M  V30 5 C 2.3101 2.6673 0.0 0
+M  V30 6 C 0.7700 0.0000 0.0 0
+M  V30 7 C 0.7700 2.6673 0.0 0
+M  V30 8 C 0.0000 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 108-88-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 65-85-0
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 100-44-7
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-35375744
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 54
+$DTYPE RXN:VAR(1):PRO(2):YIELD
+$DATUM 2
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7647-01-0
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):NOTES
+$DATUM photochemical (UV irradiation (365 nm, 8 W)), HPLC yields, 50% isolated
+yield for benzoic acid, ionic liquid used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Bronsted acid-catalysed aerobic photo-oxygenation of benzylic C-H bonds
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wu, Jieqing; Chen, Jiwei; Wang, Lei; Zhu, Hongjun; Liu, Rui; Song,
+Guangliang; Feng, Chao; Li, Yufeng
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Green Chemistry (2023), 25(3), 940-945
+
+$RFMT $RIREG SCHEME38 STEP1
+$RXN
+
+
+
+  1  2
+$MOL
+4-Bromotoluene
+C7H7Br
+106-38-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 Br 0.0000 1.3337 0.0 0
+M  V30 2 C 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Bromobenzoic acid
+C7H5BrO2
+586-76-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 Br 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Bromobenzaldehyde
+C7H5BrO
+1122-91-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 Br 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-38-7
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 586-76-5
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 1122-91-4
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-9304506
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 2
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 41
+$DTYPE RXN:VAR(1):PRO(2):YIELD
+$DATUM 17
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 75-91-2
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 1384190-41-3
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 7732-18-5
+$DTYPE RXN:VAR(1):NOTES
+$DATUM sealed vial used
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Dirhodium(II) Complexes of 2-(Sulfonylimino)pyrrolidine: Synthesis and
+Application in Catalytic Benzylic Oxidation
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Wusiman, Abudureheman; Tusun, Xiarepati; Lu, Chong-Dao
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM European Journal of Organic Chemistry (2012), 2012(16), 3088-3092,
+S3088/1-S3088/45
+
+$RFMT $RIREG SCHEME39 STEP1
+$RXN
+
+
+
+  2  3
+$MOL
+4-tert-Butyltoluene
+C11H16
+98-51-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 1.5400 0.0 0
+M  V30 2 C 1.5400 0.0000 0.0 0
+M  V30 3 C 0.0000 1.5400 0.0 0
+M  V30 4 C 1.5400 3.0800 0.0 0
+M  V30 5 C 7.7000 1.5400 0.0 0
+M  V30 6 C 3.0800 1.5400 0.0 0
+M  V30 7 C 3.8500 2.8736 0.0 0
+M  V30 8 C 3.8500 0.2064 0.0 0
+M  V30 9 C 5.3900 2.8736 0.0 0
+M  V30 10 C 5.3900 0.2064 0.0 0
+M  V30 11 C 6.1600 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 6
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+N-Hydroxyphthalimide
+C8H5NO3
+524-38-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 4.6078 0.0000 0.0 0
+M  V30 2 O 4.6078 5.4211 0.0 0
+M  V30 3 O 6.5770 2.7106 0.0 0
+M  V30 4 C 2.6673 1.9406 0.0 0
+M  V30 5 C 2.6673 3.4806 0.0 0
+M  V30 6 C 4.1320 1.4647 0.0 0
+M  V30 7 C 1.3336 1.1706 0.0 0
+M  V30 8 C 4.1320 3.9564 0.0 0
+M  V30 9 C 1.3336 4.2506 0.0 0
+M  V30 10 N 5.0370 2.7106 0.0 0
+M  V30 11 C 0.0000 1.9406 0.0 0
+M  V30 12 C 0.0000 3.4806 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 6
+M  V30 2 2 2 8
+M  V30 3 1 3 10
+M  V30 4 1 4 5
+M  V30 5 1 4 6
+M  V30 6 2 4 7
+M  V30 7 1 5 8
+M  V30 8 2 5 9
+M  V30 9 1 6 10
+M  V30 10 1 7 11
+M  V30 11 1 8 10
+M  V30 12 1 9 12
+M  V30 13 2 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-tert-Butylbenzoic acid
+C11H14O2
+98-73-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  13 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.9300 1.5400 0.0 0
+M  V30 2 C 6.9300 3.0800 0.0 0
+M  V30 3 C 8.4700 1.5400 0.0 0
+M  V30 4 C 6.9300 0.0000 0.0 0
+M  V30 5 C 0.7700 1.5400 0.0 0
+M  V30 6 O 0.0000 0.2064 0.0 0
+M  V30 7 O 0.0000 2.8736 0.0 0
+M  V30 8 C 5.3900 1.5400 0.0 0
+M  V30 9 C 4.6200 2.8736 0.0 0
+M  V30 10 C 4.6200 0.2064 0.0 0
+M  V30 11 C 3.0800 2.8736 0.0 0
+M  V30 12 C 3.0800 0.2064 0.0 0
+M  V30 13 C 2.3100 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 8
+M  V30 5 1 5 6
+M  V30 6 2 5 7
+M  V30 7 1 5 13
+M  V30 8 2 8 9
+M  V30 9 1 8 10
+M  V30 10 1 9 11
+M  V30 11 2 10 12
+M  V30 12 2 11 13
+M  V30 13 1 12 13
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-tert-Butylbenzaldehyde
+C11H14O
+939-97-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 1.5400 0.0 0
+M  V30 2 C 1.5400 0.0000 0.0 0
+M  V30 3 C 0.0000 1.5400 0.0 0
+M  V30 4 C 1.5400 3.0800 0.0 0
+M  V30 5 C 7.7000 1.5400 0.0 0
+M  V30 6 O 8.4700 2.8736 0.0 0
+M  V30 7 C 3.0800 1.5400 0.0 0
+M  V30 8 C 3.8500 0.2064 0.0 0
+M  V30 9 C 3.8500 2.8736 0.0 0
+M  V30 10 C 5.3900 0.2064 0.0 0
+M  V30 11 C 5.3900 2.8736 0.0 0
+M  V30 12 C 6.1600 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 7
+M  V30 5 2 5 6
+M  V30 6 1 5 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-[[4-(1,1-Dimethylethyl)phenyl]methoxy]-1H-isoindole-1,3(2H)-dione
+C19H19NO3
+1262052-38-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  23 25 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 4.6078 0.0000 0.0 0
+M  V30 2 O 4.6078 5.4210 0.0 0
+M  V30 3 O 6.5770 2.7104 0.0 0
+M  V30 4 C 7.3470 4.0440 0.0 0
+M  V30 5 C 13.5070 4.0442 0.0 0
+M  V30 6 C 13.5070 2.5040 0.0 0
+M  V30 7 C 15.0470 4.0442 0.0 0
+M  V30 8 C 13.5070 5.5840 0.0 0
+M  V30 9 C 2.6673 1.9404 0.0 0
+M  V30 10 C 2.6673 3.4804 0.0 0
+M  V30 11 C 4.1320 1.4645 0.0 0
+M  V30 12 C 1.3336 1.1704 0.0 0
+M  V30 13 C 4.1320 3.9563 0.0 0
+M  V30 14 C 1.3336 4.2504 0.0 0
+M  V30 15 N 5.0370 2.7104 0.0 0
+M  V30 16 C 0.0000 1.9404 0.0 0
+M  V30 17 C 0.0000 3.4804 0.0 0
+M  V30 18 C 8.8870 4.0440 0.0 0
+M  V30 19 C 9.6570 2.7104 0.0 0
+M  V30 20 C 9.6570 5.3778 0.0 0
+M  V30 21 C 11.1970 2.7104 0.0 0
+M  V30 22 C 11.1970 5.3778 0.0 0
+M  V30 23 C 11.9670 4.0440 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 11
+M  V30 2 2 2 13
+M  V30 3 1 3 4
+M  V30 4 1 3 15
+M  V30 5 1 4 18
+M  V30 6 1 5 6
+M  V30 7 1 5 7
+M  V30 8 1 5 8
+M  V30 9 1 5 23
+M  V30 10 1 9 10
+M  V30 11 1 9 11
+M  V30 12 2 9 12
+M  V30 13 1 10 13
+M  V30 14 2 10 14
+M  V30 15 1 11 15
+M  V30 16 1 12 16
+M  V30 17 1 13 15
+M  V30 18 1 14 17
+M  V30 19 2 16 17
+M  V30 20 2 18 19
+M  V30 21 1 18 20
+M  V30 22 1 19 21
+M  V30 23 2 20 22
+M  V30 24 2 21 23
+M  V30 25 1 22 23
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 98-51-1
+$DTYPE RXN:RCT(2):CAS_RN
+$DATUM 524-38-9
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 98-73-7
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 939-97-9
+$DTYPE RXN:PRO(3):CAS_RN
+$DATUM 1262052-38-9
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-33763331
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 7
+$DTYPE RXN:VAR(1):PRO(2):YIELD
+$DATUM 9
+$DTYPE RXN:VAR(1):PRO(3):YIELD
+$DATUM 2
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 110-86-1
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 505-07-7
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 75-09-2
+$DTYPE RXN:VAR(1):NOTES
+$DATUM electrochemical, undivided cell used, constant current (10mA), platinum
+wire cathode and reticulated vitreous carbon anode used, cutoff potential
+at 0.5 to 0.8 V used, conversion 50%
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Electrochemical PINOylation of Methylarenes: Improving the Scope and
+Utility of Benzylic Oxidation through Mediated Electrolysis
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Hoque, Asmaul Md; Twilton, Jack; Zhu, Jieru; Graaf, Matthew D.; Harper,
+Kaid C.; Tuca, Emilian; DiLabio, Gino A.; Stahl, Shannon S.
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Journal of the American Chemical Society (2022), 144(33), 15295-15302
+
+$RFMT $RIREG SCHEME40 STEP1
+$RXN
+
+
+
+  2  4
+$MOL
+4-tert-Butyltoluene
+C11H16
+98-51-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  11 11 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 1.5400 0.0 0
+M  V30 2 C 1.5400 0.0000 0.0 0
+M  V30 3 C 0.0000 1.5400 0.0 0
+M  V30 4 C 1.5400 3.0800 0.0 0
+M  V30 5 C 7.7000 1.5400 0.0 0
+M  V30 6 C 3.0800 1.5400 0.0 0
+M  V30 7 C 3.8500 2.8736 0.0 0
+M  V30 8 C 3.8500 0.2064 0.0 0
+M  V30 9 C 5.3900 2.8736 0.0 0
+M  V30 10 C 5.3900 0.2064 0.0 0
+M  V30 11 C 6.1600 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 6
+M  V30 5 1 5 11
+M  V30 6 2 6 7
+M  V30 7 1 6 8
+M  V30 8 1 7 9
+M  V30 9 2 8 10
+M  V30 10 2 9 11
+M  V30 11 1 10 11
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+N-Hydroxyphthalimide
+C8H5NO3
+524-38-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 4.6078 0.0000 0.0 0
+M  V30 2 O 4.6078 5.4211 0.0 0
+M  V30 3 O 6.5770 2.7106 0.0 0
+M  V30 4 C 2.6673 1.9406 0.0 0
+M  V30 5 C 2.6673 3.4806 0.0 0
+M  V30 6 C 4.1320 1.4647 0.0 0
+M  V30 7 C 1.3336 1.1706 0.0 0
+M  V30 8 C 4.1320 3.9564 0.0 0
+M  V30 9 C 1.3336 4.2506 0.0 0
+M  V30 10 N 5.0370 2.7106 0.0 0
+M  V30 11 C 0.0000 1.9406 0.0 0
+M  V30 12 C 0.0000 3.4806 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 6
+M  V30 2 2 2 8
+M  V30 3 1 3 10
+M  V30 4 1 4 5
+M  V30 5 1 4 6
+M  V30 6 2 4 7
+M  V30 7 1 5 8
+M  V30 8 2 5 9
+M  V30 9 1 6 10
+M  V30 10 1 7 11
+M  V30 11 1 8 10
+M  V30 12 1 9 12
+M  V30 13 2 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-tert-Butylbenzoic acid
+C11H14O2
+98-73-7 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  13 13 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.9300 1.5400 0.0 0
+M  V30 2 C 6.9300 3.0800 0.0 0
+M  V30 3 C 8.4700 1.5400 0.0 0
+M  V30 4 C 6.9300 0.0000 0.0 0
+M  V30 5 C 0.7700 1.5400 0.0 0
+M  V30 6 O 0.0000 0.2064 0.0 0
+M  V30 7 O 0.0000 2.8736 0.0 0
+M  V30 8 C 5.3900 1.5400 0.0 0
+M  V30 9 C 4.6200 2.8736 0.0 0
+M  V30 10 C 4.6200 0.2064 0.0 0
+M  V30 11 C 3.0800 2.8736 0.0 0
+M  V30 12 C 3.0800 0.2064 0.0 0
+M  V30 13 C 2.3100 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 8
+M  V30 5 1 5 6
+M  V30 6 2 5 7
+M  V30 7 1 5 13
+M  V30 8 2 8 9
+M  V30 9 1 8 10
+M  V30 10 1 9 11
+M  V30 11 2 10 12
+M  V30 12 2 11 13
+M  V30 13 1 12 13
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-tert-Butylbenzaldehyde
+C11H14O
+939-97-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  12 12 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 1.5400 1.5400 0.0 0
+M  V30 2 C 1.5400 0.0000 0.0 0
+M  V30 3 C 0.0000 1.5400 0.0 0
+M  V30 4 C 1.5400 3.0800 0.0 0
+M  V30 5 C 7.7000 1.5400 0.0 0
+M  V30 6 O 8.4700 2.8736 0.0 0
+M  V30 7 C 3.0800 1.5400 0.0 0
+M  V30 8 C 3.8500 0.2064 0.0 0
+M  V30 9 C 3.8500 2.8736 0.0 0
+M  V30 10 C 5.3900 0.2064 0.0 0
+M  V30 11 C 5.3900 2.8736 0.0 0
+M  V30 12 C 6.1600 1.5400 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 3
+M  V30 3 1 1 4
+M  V30 4 1 1 7
+M  V30 5 2 5 6
+M  V30 6 1 5 12
+M  V30 7 2 7 8
+M  V30 8 1 7 9
+M  V30 9 1 8 10
+M  V30 10 2 9 11
+M  V30 11 2 10 12
+M  V30 12 1 11 12
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+2-[[4-(1,1-Dimethylethyl)phenyl]methoxy]-1H-isoindole-1,3(2H)-dione
+C19H19NO3
+1262052-38-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  23 25 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 4.6078 0.0000 0.0 0
+M  V30 2 O 4.6078 5.4210 0.0 0
+M  V30 3 O 6.5770 2.7104 0.0 0
+M  V30 4 C 7.3470 4.0440 0.0 0
+M  V30 5 C 13.5070 4.0442 0.0 0
+M  V30 6 C 13.5070 2.5040 0.0 0
+M  V30 7 C 15.0470 4.0442 0.0 0
+M  V30 8 C 13.5070 5.5840 0.0 0
+M  V30 9 C 2.6673 1.9404 0.0 0
+M  V30 10 C 2.6673 3.4804 0.0 0
+M  V30 11 C 4.1320 1.4645 0.0 0
+M  V30 12 C 1.3336 1.1704 0.0 0
+M  V30 13 C 4.1320 3.9563 0.0 0
+M  V30 14 C 1.3336 4.2504 0.0 0
+M  V30 15 N 5.0370 2.7104 0.0 0
+M  V30 16 C 0.0000 1.9404 0.0 0
+M  V30 17 C 0.0000 3.4804 0.0 0
+M  V30 18 C 8.8870 4.0440 0.0 0
+M  V30 19 C 9.6570 2.7104 0.0 0
+M  V30 20 C 9.6570 5.3778 0.0 0
+M  V30 21 C 11.1970 2.7104 0.0 0
+M  V30 22 C 11.1970 5.3778 0.0 0
+M  V30 23 C 11.9670 4.0440 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 11
+M  V30 2 2 2 13
+M  V30 3 1 3 4
+M  V30 4 1 3 15
+M  V30 5 1 4 18
+M  V30 6 1 5 6
+M  V30 7 1 5 7
+M  V30 8 1 5 8
+M  V30 9 1 5 23
+M  V30 10 1 9 10
+M  V30 11 1 9 11
+M  V30 12 2 9 12
+M  V30 13 1 10 13
+M  V30 14 2 10 14
+M  V30 15 1 11 15
+M  V30 16 1 12 16
+M  V30 17 1 13 15
+M  V30 18 1 14 17
+M  V30 19 2 16 17
+M  V30 20 2 18 19
+M  V30 21 1 18 20
+M  V30 22 1 19 21
+M  V30 23 2 20 22
+M  V30 24 2 21 23
+M  V30 25 1 22 23
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+3-[[4-(1,1-Dimethylethyl)phenyl]methyl]-1H-2,3-benzoxazine-1,4(3H)-dione
+C19H19NO3
+2820070-07-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  23 25 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 O 4.0010 0.0000 0.0 0
+M  V30 2 O 4.0010 6.1601 0.0 0
+M  V30 3 C 6.6685 1.5400 0.0 0
+M  V30 4 C 12.0033 4.6201 0.0 0
+M  V30 5 C 13.3370 3.8501 0.0 0
+M  V30 6 C 13.3370 5.3901 0.0 0
+M  V30 7 C 12.0033 6.1601 0.0 0
+M  V30 8 C 2.6673 2.3101 0.0 0
+M  V30 9 C 2.6673 3.8501 0.0 0
+M  V30 10 C 4.0010 1.5400 0.0 0
+M  V30 11 C 1.3337 1.5400 0.0 0
+M  V30 12 C 4.0010 4.6201 0.0 0
+M  V30 13 C 1.3337 4.6201 0.0 0
+M  V30 14 N 5.3348 2.3101 0.0 0
+M  V30 15 C 0.0000 2.3101 0.0 0
+M  V30 16 O 5.3348 3.8501 0.0 0
+M  V30 17 C 0.0000 3.8501 0.0 0
+M  V30 18 C 8.0022 2.3101 0.0 0
+M  V30 19 C 8.0022 3.8501 0.0 0
+M  V30 20 C 9.3360 1.5400 0.0 0
+M  V30 21 C 9.3360 4.6201 0.0 0
+M  V30 22 C 10.6697 2.3101 0.0 0
+M  V30 23 C 10.6697 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 10
+M  V30 2 2 2 12
+M  V30 3 1 3 14
+M  V30 4 1 3 18
+M  V30 5 1 4 5
+M  V30 6 1 4 6
+M  V30 7 1 4 7
+M  V30 8 1 4 23
+M  V30 9 1 8 9
+M  V30 10 1 8 10
+M  V30 11 2 8 11
+M  V30 12 1 9 12
+M  V30 13 2 9 13
+M  V30 14 1 10 14
+M  V30 15 1 11 15
+M  V30 16 1 12 16
+M  V30 17 1 13 17
+M  V30 18 1 14 16
+M  V30 19 2 15 17
+M  V30 20 2 18 19
+M  V30 21 1 18 20
+M  V30 22 1 19 21
+M  V30 23 2 20 22
+M  V30 24 2 21 23
+M  V30 25 1 22 23
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 98-51-1
+$DTYPE RXN:RCT(2):CAS_RN
+$DATUM 524-38-9
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 98-73-7
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 939-97-9
+$DTYPE RXN:PRO(3):CAS_RN
+$DATUM 1262052-38-9
+$DTYPE RXN:PRO(4):CAS_RN
+$DATUM 2820070-07-1
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-614-CAS-33763334
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):PRO(1):YIELD
+$DATUM 8
+$DTYPE RXN:VAR(1):PRO(2):YIELD
+$DATUM 10
+$DTYPE RXN:VAR(1):PRO(3):YIELD
+$DATUM 8
+$DTYPE RXN:VAR(1):PRO(4):YIELD
+$DATUM 3
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 110-86-1
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 505-07-7
+$DTYPE RXN:VAR(1):RGT(3):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):SOL(1):CAS_RN
+$DATUM 75-05-8
+$DTYPE RXN:VAR(1):SOL(2):CAS_RN
+$DATUM 75-09-2
+$DTYPE RXN:VAR(1):NOTES
+$DATUM electrochemical, undivided cell used, constant current (10mA), platinum
+wire cathode and reticulated vitreous carbon anode used, cutoff potential
+at 0.5 to 0.8 V used, conversion 70%
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Electrochemical PINOylation of Methylarenes: Improving the Scope and
+Utility of Benzylic Oxidation through Mediated Electrolysis
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Hoque, Asmaul Md; Twilton, Jack; Zhu, Jieru; Graaf, Matthew D.; Harper,
+Kaid C.; Tuca, Emilian; DiLabio, Gino A.; Stahl, Shannon S.
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Journal of the American Chemical Society (2022), 144(33), 15295-15302
+
+$RFMT $RIREG SCHEME41 STEP1
+$RXN
+
+
+
+  1  4
+$MOL
+p-Xylene
+C8H10
+106-42-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 C 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+p-Toluic acid
+C8H8O2
+99-94-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzaldehyde
+C8H8O
+104-87-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzyl alcohol
+C8H10O
+589-18-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+(4-Methylphenyl)methyl hydroperoxide
+C8H10O2
+7523-31-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.1601 1.3337 0.0 0
+M  V30 2 O 6.9301 2.6673 0.0 0
+M  V30 3 O 8.4701 2.6673 0.0 0
+M  V30 4 C 0.0000 1.3337 0.0 0
+M  V30 5 C 4.6201 1.3337 0.0 0
+M  V30 6 C 3.8500 2.6673 0.0 0
+M  V30 7 C 3.8500 0.0000 0.0 0
+M  V30 8 C 2.3100 2.6673 0.0 0
+M  V30 9 C 2.3100 0.0000 0.0 0
+M  V30 10 C 1.5400 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 5
+M  V30 3 1 2 3
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-42-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 99-94-5
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 104-87-0
+$DTYPE RXN:PRO(3):CAS_RN
+$DATUM 589-18-4
+$DTYPE RXN:PRO(4):CAS_RN
+$DATUM 7523-31-1
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-207-CAS-15199607
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 7782-42-5
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Benzylic oxidation and photooxidation by air in the presence of graphite
+and cyclohexene
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Sereda, Grigoriy; Rajpara, Vikul
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Tetrahedron Letters (2007), 48(19), 3417-3421
+
+$RFMT $RIREG SCHEME41 STEP1
+$RXN
+
+
+
+  1  4
+$MOL
+p-Xylene
+C8H10
+106-42-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 C 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+p-Toluic acid
+C8H8O2
+99-94-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzaldehyde
+C8H8O
+104-87-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzyl alcohol
+C8H10O
+589-18-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+(4-Methylphenyl)methyl hydroperoxide
+C8H10O2
+7523-31-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.1601 1.3337 0.0 0
+M  V30 2 O 6.9301 2.6673 0.0 0
+M  V30 3 O 8.4701 2.6673 0.0 0
+M  V30 4 C 0.0000 1.3337 0.0 0
+M  V30 5 C 4.6201 1.3337 0.0 0
+M  V30 6 C 3.8500 2.6673 0.0 0
+M  V30 7 C 3.8500 0.0000 0.0 0
+M  V30 8 C 2.3100 2.6673 0.0 0
+M  V30 9 C 2.3100 0.0000 0.0 0
+M  V30 10 C 1.5400 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 5
+M  V30 3 1 2 3
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-42-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 99-94-5
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 104-87-0
+$DTYPE RXN:PRO(3):CAS_RN
+$DATUM 589-18-4
+$DTYPE RXN:PRO(4):CAS_RN
+$DATUM 7523-31-1
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-207-CAS-13070619
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 110-83-8
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Benzylic oxidation and photooxidation by air in the presence of graphite
+and cyclohexene
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Sereda, Grigoriy; Rajpara, Vikul
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Tetrahedron Letters (2007), 48(19), 3417-3421
+
+$RFMT $RIREG SCHEME42 STEP1
+$RXN
+
+
+
+  1  4
+$MOL
+p-Xylene
+C8H10
+106-42-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 C 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+p-Toluic acid
+C8H8O2
+99-94-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzaldehyde
+C8H8O
+104-87-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzyl alcohol
+C8H10O
+589-18-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+(4-Methylphenyl)methyl 4-methylbenzoate
+C16H16O2
+21086-87-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  18 19 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 5.3348 1.5400 0.0 0
+M  V30 2 O 6.6685 2.3101 0.0 0
+M  V30 3 O 5.3348 0.0000 0.0 0
+M  V30 4 C 8.0022 1.5400 0.0 0
+M  V30 5 C 0.0000 4.6201 0.0 0
+M  V30 6 C 13.3370 4.6201 0.0 0
+M  V30 7 C 4.0010 2.3101 0.0 0
+M  V30 8 C 4.0010 3.8501 0.0 0
+M  V30 9 C 2.6673 1.5400 0.0 0
+M  V30 10 C 2.6673 4.6201 0.0 0
+M  V30 11 C 1.3337 2.3101 0.0 0
+M  V30 12 C 1.3337 3.8501 0.0 0
+M  V30 13 C 9.3360 2.3101 0.0 0
+M  V30 14 C 9.3360 3.8501 0.0 0
+M  V30 15 C 10.6697 1.5400 0.0 0
+M  V30 16 C 10.6697 4.6201 0.0 0
+M  V30 17 C 12.0033 2.3101 0.0 0
+M  V30 18 C 12.0033 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 2 4
+M  V30 5 1 4 13
+M  V30 6 1 5 12
+M  V30 7 1 6 18
+M  V30 8 2 7 8
+M  V30 9 1 7 9
+M  V30 10 1 8 10
+M  V30 11 2 9 11
+M  V30 12 2 10 12
+M  V30 13 1 11 12
+M  V30 14 2 13 14
+M  V30 15 1 13 15
+M  V30 16 1 14 16
+M  V30 17 2 15 17
+M  V30 18 2 16 18
+M  V30 19 1 17 18
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-42-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 99-94-5
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 104-87-0
+$DTYPE RXN:PRO(3):CAS_RN
+$DATUM 589-18-4
+$DTYPE RXN:PRO(4):CAS_RN
+$DATUM 21086-87-3
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-488-CAS-10933722
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 110-83-8
+$DTYPE RXN:VAR(1):RGT(2):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):CAT(1):CAS_RN
+$DATUM 7782-42-5
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Benzylic oxidation and photooxidation by air in the presence of graphite
+and cyclohexene
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Sereda, Grigoriy; Rajpara, Vikul
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Tetrahedron Letters (2007), 48(19), 3417-3421
+
+$RFMT $RIREG SCHEME43 STEP1
+$RXN
+
+
+
+  1  7
+$MOL
+p-Xylene
+C8H10
+106-42-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  8 8 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.0000 1.3337 0.0 0
+M  V30 2 C 6.1601 1.3337 0.0 0
+M  V30 3 C 1.5400 1.3337 0.0 0
+M  V30 4 C 2.3100 0.0000 0.0 0
+M  V30 5 C 2.3100 2.6673 0.0 0
+M  V30 6 C 3.8500 0.0000 0.0 0
+M  V30 7 C 3.8500 2.6673 0.0 0
+M  V30 8 C 4.6201 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 3
+M  V30 2 1 2 8
+M  V30 3 2 3 4
+M  V30 4 1 3 5
+M  V30 5 1 4 6
+M  V30 6 2 5 7
+M  V30 7 2 6 8
+M  V30 8 1 7 8
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+p-Toluic acid
+C8H8O2
+99-94-5 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 0.0000 0.0 0
+M  V30 3 O 0.0000 2.6673 0.0 0
+M  V30 4 C 6.9302 1.3337 0.0 0
+M  V30 5 C 2.3101 1.3337 0.0 0
+M  V30 6 C 3.0801 2.6673 0.0 0
+M  V30 7 C 3.0801 0.0000 0.0 0
+M  V30 8 C 4.6201 2.6673 0.0 0
+M  V30 9 C 4.6201 0.0000 0.0 0
+M  V30 10 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 5
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzaldehyde
+C8H8O
+104-87-0 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 2 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+4-Methylbenzyl alcohol
+C8H10O
+589-18-4 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  9 9 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 0.7700 1.3337 0.0 0
+M  V30 2 O 0.0000 2.6673 0.0 0
+M  V30 3 C 6.9302 1.3337 0.0 0
+M  V30 4 C 2.3101 1.3337 0.0 0
+M  V30 5 C 3.0801 2.6673 0.0 0
+M  V30 6 C 3.0801 0.0000 0.0 0
+M  V30 7 C 4.6201 2.6673 0.0 0
+M  V30 8 C 4.6201 0.0000 0.0 0
+M  V30 9 C 5.3901 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 4
+M  V30 3 1 3 9
+M  V30 4 2 4 5
+M  V30 5 1 4 6
+M  V30 6 1 5 7
+M  V30 7 2 6 8
+M  V30 8 2 7 9
+M  V30 9 1 8 9
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+1,4-Dimethyl-2-[(4-methylphenyl)methyl]benzene
+C16H18
+721-45-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  16 17 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 4.0011 4.6200 0.0 0
+M  V30 2 C 1.3336 6.1600 0.0 0
+M  V30 3 C 1.3336 0.0000 0.0 0
+M  V30 4 C 9.3358 1.5400 0.0 0
+M  V30 5 C 2.6674 3.8500 0.0 0
+M  V30 6 C 1.3336 4.6200 0.0 0
+M  V30 7 C 2.6674 2.3100 0.0 0
+M  V30 8 C 0.0000 3.8500 0.0 0
+M  V30 9 C 1.3336 1.5400 0.0 0
+M  V30 10 C 0.0000 2.3100 0.0 0
+M  V30 11 C 5.3347 3.8500 0.0 0
+M  V30 12 C 6.6684 4.6200 0.0 0
+M  V30 13 C 5.3347 2.3100 0.0 0
+M  V30 14 C 8.0021 3.8500 0.0 0
+M  V30 15 C 6.6684 1.5400 0.0 0
+M  V30 16 C 8.0021 2.3100 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 5
+M  V30 2 1 1 11
+M  V30 3 1 2 6
+M  V30 4 1 3 9
+M  V30 5 1 4 16
+M  V30 6 2 5 6
+M  V30 7 1 5 7
+M  V30 8 1 6 8
+M  V30 9 2 7 9
+M  V30 10 2 8 10
+M  V30 11 1 9 10
+M  V30 12 2 11 12
+M  V30 13 1 11 13
+M  V30 14 1 12 14
+M  V30 15 2 13 15
+M  V30 16 2 14 16
+M  V30 17 1 15 16
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+(4-Methylphenyl)methyl hydroperoxide
+C8H10O2
+7523-31-1 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  10 10 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 6.1601 1.3337 0.0 0
+M  V30 2 O 6.9301 2.6673 0.0 0
+M  V30 3 O 8.4701 2.6673 0.0 0
+M  V30 4 C 0.0000 1.3337 0.0 0
+M  V30 5 C 4.6201 1.3337 0.0 0
+M  V30 6 C 3.8500 2.6673 0.0 0
+M  V30 7 C 3.8500 0.0000 0.0 0
+M  V30 8 C 2.3100 2.6673 0.0 0
+M  V30 9 C 2.3100 0.0000 0.0 0
+M  V30 10 C 1.5400 1.3337 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 5
+M  V30 3 1 2 3
+M  V30 4 1 4 10
+M  V30 5 2 5 6
+M  V30 6 1 5 7
+M  V30 7 1 6 8
+M  V30 8 2 7 9
+M  V30 9 2 8 10
+M  V30 10 1 9 10
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+(4-Methylphenyl)methyl 4-methylbenzoate
+C16H16O2
+21086-87-3 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  18 19 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 5.3348 1.5400 0.0 0
+M  V30 2 O 6.6685 2.3101 0.0 0
+M  V30 3 O 5.3348 0.0000 0.0 0
+M  V30 4 C 8.0022 1.5400 0.0 0
+M  V30 5 C 0.0000 4.6201 0.0 0
+M  V30 6 C 13.3370 4.6201 0.0 0
+M  V30 7 C 4.0010 2.3101 0.0 0
+M  V30 8 C 4.0010 3.8501 0.0 0
+M  V30 9 C 2.6673 1.5400 0.0 0
+M  V30 10 C 2.6673 4.6201 0.0 0
+M  V30 11 C 1.3337 2.3101 0.0 0
+M  V30 12 C 1.3337 3.8501 0.0 0
+M  V30 13 C 9.3360 2.3101 0.0 0
+M  V30 14 C 9.3360 3.8501 0.0 0
+M  V30 15 C 10.6697 1.5400 0.0 0
+M  V30 16 C 10.6697 4.6201 0.0 0
+M  V30 17 C 12.0033 2.3101 0.0 0
+M  V30 18 C 12.0033 3.8501 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 2 1 3
+M  V30 3 1 1 7
+M  V30 4 1 2 4
+M  V30 5 1 4 13
+M  V30 6 1 5 12
+M  V30 7 1 6 18
+M  V30 8 2 7 8
+M  V30 9 1 7 9
+M  V30 10 1 8 10
+M  V30 11 2 9 11
+M  V30 12 2 10 12
+M  V30 13 1 11 12
+M  V30 14 2 13 14
+M  V30 15 1 13 15
+M  V30 16 1 14 16
+M  V30 17 2 15 17
+M  V30 18 2 16 18
+M  V30 19 1 17 18
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$MOL
+Bis(p-methylbenzyl) ether
+C16H18O
+38460-98-9 Copyright (C) 2025 ACS
+  0  0  0     0  0            999 V3000
+M  V30 BEGIN CTAB
+M  V30 COUNTS  17 18 0 0 0
+M  V30 BEGIN ATOM
+M  V30 1 C 5.3348 3.0801 0.0 0
+M  V30 2 O 6.6685 2.3101 0.0 0
+M  V30 3 C 8.0022 3.0801 0.0 0
+M  V30 4 C 0.0000 0.0000 0.0 0
+M  V30 5 C 13.3370 0.0000 0.0 0
+M  V30 6 C 4.0010 2.3101 0.0 0
+M  V30 7 C 4.0010 0.7700 0.0 0
+M  V30 8 C 2.6673 3.0801 0.0 0
+M  V30 9 C 2.6673 0.0000 0.0 0
+M  V30 10 C 1.3337 2.3101 0.0 0
+M  V30 11 C 1.3337 0.7700 0.0 0
+M  V30 12 C 9.3360 2.3101 0.0 0
+M  V30 13 C 10.6697 3.0801 0.0 0
+M  V30 14 C 9.3360 0.7700 0.0 0
+M  V30 15 C 12.0033 2.3101 0.0 0
+M  V30 16 C 10.6697 0.0000 0.0 0
+M  V30 17 C 12.0033 0.7700 0.0 0
+M  V30 END ATOM
+M  V30 BEGIN BOND
+M  V30 1 1 1 2
+M  V30 2 1 1 6
+M  V30 3 1 2 3
+M  V30 4 1 3 12
+M  V30 5 1 4 11
+M  V30 6 1 5 17
+M  V30 7 2 6 7
+M  V30 8 1 6 8
+M  V30 9 1 7 9
+M  V30 10 2 8 10
+M  V30 11 2 9 11
+M  V30 12 1 10 11
+M  V30 13 2 12 13
+M  V30 14 1 12 14
+M  V30 15 1 13 15
+M  V30 16 2 14 16
+M  V30 17 2 15 17
+M  V30 18 1 16 17
+M  V30 END BOND
+M  V30 END CTAB
+M  END
+$DTYPE RXN:RCT(1):CAS_RN
+$DATUM 106-42-3
+$DTYPE RXN:PRO(1):CAS_RN
+$DATUM 99-94-5
+$DTYPE RXN:PRO(2):CAS_RN
+$DATUM 104-87-0
+$DTYPE RXN:PRO(3):CAS_RN
+$DATUM 589-18-4
+$DTYPE RXN:PRO(4):CAS_RN
+$DATUM 721-45-9
+$DTYPE RXN:PRO(5):CAS_RN
+$DATUM 7523-31-1
+$DTYPE RXN:PRO(6):CAS_RN
+$DATUM 21086-87-3
+$DTYPE RXN:PRO(7):CAS_RN
+$DATUM 38460-98-9
+$DTYPE RXN:VAR(1):CAS_Reaction_Number
+$DATUM 31-207-CAS-10834198
+$DTYPE RXN:VAR(1):STEPS
+$DATUM 1
+$DTYPE RXN:VAR(1):STAGES
+$DATUM 1
+$DTYPE RXN:VAR(1):RGT(1):CAS_RN
+$DATUM 7782-44-7
+$DTYPE RXN:VAR(1):NOTES
+$DATUM green chemistry-catalyst, photochemical (ambient light), multiwall carbon
+nanotubes used as catalyst, reaction carried out in absence of light did
+not produce hydroperoxide product, optimization study, optimized on
+catalyst, mechanism studied, scalable
+$DTYPE RXN:VAR(1):REFERENCE(1):TITLE
+$DATUM Photoactivated and photopassivated benzylic oxidation catalyzed by
+pristine and oxidized carbons
+$DTYPE RXN:VAR(1):REFERENCE(1):AUTHOR
+$DATUM Sereda, Grigoriy; Rajpara, Vikul
+$DTYPE RXN:VAR(1):REFERENCE(1):CITATION
+$DATUM Catalysis Communications (2011), 12(7), 669-672
+
