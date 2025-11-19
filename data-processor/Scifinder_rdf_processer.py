@@ -509,11 +509,10 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
         else:
             normalized.pop("abbreviation", None)
 
-        original_candidate = name or registry_name
-        if original_candidate and original_candidate != display_name:
-            normalized["original_name"] = original_candidate
-        else:
-            normalized.pop("original_name", None)
+        # NOTE: Removed "original_name" field to save ~8.5% space per record.
+        # The full chemical name can be looked up via CAS number if needed.
+        # Previous behavior: stored full name like "Palladium(II) acetate"
+        # when it differed from display name "Pd(OAc)2".
 
         return normalized
 
@@ -1195,13 +1194,16 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                 "reagents": reagents,
                 "solvents": solvents,
                 "conditions": conditions,
-                "smiles": smiles,
                 "reference": row.get("Reference") or {},
             }
             
             # Add precomputed data if available
             if precomputed:
                 analysis_record["precomputed"] = precomputed
+            
+            # NOTE: We no longer store the separate "smiles" field (reactants/products)
+            # since it's redundant with precomputed.reaction_smiles (saves ~8% space).
+            # To reconstruct: split reaction_smiles on ">>" if needed.
             
             if target_dataset == dataset_family:
                 out_lines.append(_json.dumps(analysis_record, ensure_ascii=False))

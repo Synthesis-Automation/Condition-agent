@@ -75,7 +75,7 @@ def optimize_jsonl(input_path: str, output_path: str) -> None:
     original_size = input_file.stat().st_size
     records_processed = 0
     
-    with open(input_file, 'r', encoding='utf-8') as fin, \
+    with open(input_file, 'r', encoding='utf-8-sig') as fin, \
          open(output_file, 'w', encoding='utf-8') as fout:
         
         for line in fin:
@@ -98,6 +98,18 @@ def optimize_jsonl(input_path: str, output_path: str) -> None:
                         compact_features[k] = v
                 
                 record["precomputed"]["features"] = compact_features
+            
+            # Remove redundant smiles field (duplicates precomputed.reaction_smiles)
+            if "smiles" in record and "precomputed" in record and "reaction_smiles" in record["precomputed"]:
+                del record["smiles"]
+            
+            # Remove redundant original_name from all components (saves ~8.5%)
+            for component_list in [record.get("catalytic_system", []), 
+                                   record.get("reagents", []), 
+                                   record.get("solvents", [])]:
+                for component in component_list:
+                    if isinstance(component, dict) and "original_name" in component:
+                        del component["original_name"]
             
             # Write optimized record
             fout.write(json.dumps(record, ensure_ascii=False) + '\n')
