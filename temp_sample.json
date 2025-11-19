@@ -1,0 +1,75 @@
+﻿{
+    "reaction_id":  "31-001-CAS-19873838",
+    "reaction_type":  "Suzuki",
+    "condition_core":  "Pd/II",
+    "catalytic_system":  [
+                             {
+                                 "name":  "Pd(OAc)2",
+                                 "cas":  "3375-31-3",
+                                 "abbreviation":  "Pd(OAc)2",
+                                 "original_name":  "Palladium(II) acetate"
+                             }
+                         ],
+    "reagents":  [
+                     {
+                         "name":  "Na2CO3",
+                         "cas":  "497-19-8",
+                         "abbreviation":  "Na2CO3",
+                         "original_name":  "Sodium carbonate",
+                         "role":  "BASE"
+                     }
+                 ],
+    "solvents":  [
+                     {
+                         "name":  "water",
+                         "cas":  "7732-18-5"
+                     }
+                 ],
+    "conditions":  {
+                       "temperature_c":  null,
+                       "time_h":  null,
+                       "yield_pct":  99.0
+                   },
+    "smiles":  {
+                   "reactants":  "CC1(C)OB(c2ccc(CBr)cc2)OC1(C)C.Ic1ccc(-[n+]2ccc(-c3ccncc3)cc2)cc1.[Cl-]",
+                   "products":  "OCc1ccc(-c2ccc(-[n+]3ccc(-c4ccncc4)cc3)cc2)cc1.[Cl-]"
+               },
+    "reference":  "Strong Emission Enhancement in pH-Responsive 2:2 Cucurbit[8]uril Complexes | Schoder, Stefan; Schroeder, Hendrik V.; Cera, Luca; Puttreddy, Rakesh; Guettler, Arne; Resch-Genger, Ute; Rissanen, Kari; Schalley, Christoph A. | Chemistry - A European Journal (2019), 25(13), 3257-3261",
+    "precomputed":  {
+                        "reaction_smiles":  "CC1(C)OB(c2ccc(CBr)cc2)OC1(C)C.Ic1ccc(-[n+]2ccc(-c3ccncc3)cc2)cc1.[Cl-]\u003e\u003eOCc1ccc(-c2ccc(-[n+]3ccc(-c4ccncc4)cc3)cc2)cc1.[Cl-]",
+                        "features":  {
+                                         "LG":  "Br",
+                                         "elec_class":  "aryl",
+                                         "ortho_count":  "0",
+                                         "para_EWG":  false,
+                                         "heteroaryl":  false,
+                                         "nuc_class":  "aniline",
+                                         "n_basicity":  "aromatic_primary",
+                                         "steric_alpha":  "high",
+                                         "bin":  "LG:Br|NUC:aniline",
+                                         "sp3_bromide_present":  true,
+                                         "benzylic_halide_present":  true,
+                                         "sp2_boron_present":  true,
+                                         "tert_butyl_present":  true,
+                                         "boron_neop_present":  true,
+                                         "boronic_ester_present":  true,
+                                         "aromatic_present":  true,
+                                         "benzylic_ch_present":  true,
+                                         "aryl_boron_present":  true,
+                                         "Alkyl-Br_present":  true,
+                                         "Bn-Br_present":  true,
+                                         "ArB(OR)2_present":  true,
+                                         "Alkyl-H_present":  true,
+                                         "alkyl_halide_present":  true,
+                                         "boron_present":  true,
+                                         "sp2_iodide_present":  true,
+                                         "aryl_halide_present":  true,
+                                         "pyridine_present":  true,
+                                         "heteroaryl_present":  true,
+                                         "ArI_present":  true,
+                                         "aromatic_electrophile_present":  true,
+                                         "snar_applicable_electrophile_present":  true,
+                                         "sp2_halide_present":  true
+                                     }
+                    }
+}

@@ -1125,6 +1125,18 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         if isinstance(features, dict):
                             # Remove role_aware and molpipeline (contains large fingerprints)
                             features = {k: v for k, v in features.items() if k not in ("role_aware", "molpipeline")}
+                            
+                            # Optimization: Store only True boolean values to reduce JSON size by ~50%
+                            # Missing keys are implicitly False (standard sparse representation)
+                            compact_features = {}
+                            for k, v in features.items():
+                                if isinstance(v, bool):
+                                    if v:  # Only store True values
+                                        compact_features[k] = True
+                                else:
+                                    # Keep non-boolean values as-is (strings, numbers)
+                                    compact_features[k] = v
+                            features = compact_features
                         
                         # 4. Precompute DRFP fingerprint (optional but highly recommended)
                         # NOTE: DRFP is saved to a separate binary file, not embedded in JSONL
@@ -1272,6 +1284,14 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     print(f"  Binary file size: {npz_size_mb:.2f} MB ({npz_size_mb/len(drfp_reaction_ids)*1000:.1f} KB per reaction)")
                 except Exception as e:
                     print(f"\nWARNING: Failed to save DRFP binary file: {e}")
+            
+            # Print file size statistics
+            jsonl_size_mb = os.path.getsize(output_path) / (1024 * 1024)
+            print(f"\n*JSONL file size: {jsonl_size_mb:.2f} MB ({jsonl_size_mb/len(rows)*1000:.1f} KB per reaction)")
+            if drfp_fingerprints:
+                combined_size_mb = jsonl_size_mb + (os.path.getsize(npz_path) / (1024 * 1024) if os.path.exists(npz_path) else 0)
+                print(f"  Combined size (JSONL + NPZ): {combined_size_mb:.2f} MB")
+                print(f"  Space saved by binary DRFP: ~{npz_size_mb*8:.0f} MB (would be embedded as JSON)")
             
             # Print preprocessing statistics
             if chemtools_available:
