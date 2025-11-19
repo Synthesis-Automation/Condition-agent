@@ -1120,10 +1120,11 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                             else:
                                 elec_smi, nuc_smi = r0, r1
                         
-                        # Featurize (keep only hashable features)
+                        # Featurize (keep only categorical features, exclude fingerprints)
                         features = feat_molecular.featurize(elec_smi, nuc_smi)
-                        if isinstance(features, dict) and "role_aware" in features:
-                            features = {k: v for k, v in features.items() if k != "role_aware"}
+                        if isinstance(features, dict):
+                            # Remove role_aware and molpipeline (contains large fingerprints)
+                            features = {k: v for k, v in features.items() if k not in ("role_aware", "molpipeline")}
                         
                         # 4. Precompute DRFP fingerprint (optional but highly recommended)
                         # NOTE: DRFP is saved to a separate binary file, not embedded in JSONL
@@ -1347,6 +1348,263 @@ class RDFWorker(QtCore.QObject):
             except Exception:
                 pass
 
+    def _get_reaction_type_subfolders(self) -> List[Tuple[str, str]]:
+        """Detect if we have multiple reaction type subfolders to process separately.
+        
+        Returns:
+            List of (subfolder_path, reaction_type_name) tuples.
+            Empty list if this is a single reaction folder.
+        """
+        if not os.path.isdir(self.folder_path):
+            return []
+        
+        try:
+            # Check if this folder has subfolders with RDF files
+            immediate_subdirs = []
+            has_rdf_in_root = False
+            
+            for entry in os.scandir(self.folder_path):
+                if entry.is_file() and entry.name.lower().endswith('.rdf'):
+                    has_rdf_in_root = True
+                elif entry.is_dir():
+                    # Check if this subfolder has RDF files
+                    has_rdf = any(
+                        f.lower().endswith('.rdf')
+                        for root, _, files in os.walk(entry.path)
+                        for f in files
+                    )
+                    if has_rdf:
+                        immediate_subdirs.append((entry.path, entry.name))
+            
+            # If root has RDF files, treat as single folder
+            # If we have 2+ subfolders with RDF files and no RDF in root, batch process
+            if has_rdf_in_root or len(immediate_subdirs) <= 1:
+                return []
+            
+            return sorted(immediate_subdirs, key=lambda x: x[1])
+            
+        except Exception as e:
+            self._emit(f"Warning: Error detecting subfolders: {e}")
+            return []
+    
+    def _batch_process_subfolders(self, subfolders: List[Tuple[str, str]]) -> None:
+        """Process multiple reaction type subfolders separately."""
+        import time
+        
+        total_folders = len(subfolders)
+        successful = 0
+        failed = 0
+        results = []
+        
+        start_time = time.time()
+        self._emit(f"\n{'='*70}")
+        self._emit(f"BATCH PROCESSING STARTED: {total_folders} reaction type folders detected")
+        self._emit(f"{'='*70}\n")
+        
+        for idx, (subfolder_path, reaction_type) in enumerate(subfolders, 1):
+            folder_start_time = time.time()
+            progress_pct = int((idx - 1) / total_folders * 100)
+            
+            self._emit(f"\n{'='*70}")
+            self._emit(f"[{progress_pct}%] Folder {idx}/{total_folders}: {reaction_type}")
+            self._emit(f"{'='*70}")
+            self._emit(f"Path: {subfolder_path}")
+            self._emit(f"Progress: {successful} successful, {failed} failed so far\n")
+            
+            try:
+                # Process this subfolder
+                success = self._process_single_reaction_type(subfolder_path, reaction_type)
+                
+                folder_elapsed = time.time() - folder_start_time
+                
+                if success:
+                    successful += 1
+                    results.append(f"✓ {reaction_type}")
+                    self._emit(f"\n✓ {reaction_type} completed in {folder_elapsed:.1f}s")
+                else:
+                    failed += 1
+                    results.append(f"✗ {reaction_type} (no reactions)")
+                    self._emit(f"\n✗ {reaction_type} - no valid reactions found")
+            except Exception as e:
+                failed += 1
+                folder_elapsed = time.time() - folder_start_time
+                error_msg = str(e).split('\n')[0][:100]  # First line, truncated
+                results.append(f"✗ {reaction_type} (error: {error_msg})")
+                self._emit(f"\n✗ {reaction_type} failed after {folder_elapsed:.1f}s")
+                self._emit(f"   Error: {error_msg}")
+            
+            # Estimated time remaining
+            if idx < total_folders:
+                elapsed_total = time.time() - start_time
+                avg_time_per_folder = elapsed_total / idx
+                remaining_folders = total_folders - idx
+                eta_seconds = avg_time_per_folder * remaining_folders
+                eta_minutes = int(eta_seconds / 60)
+                eta_seconds_remainder = int(eta_seconds % 60)
+                
+                self._emit(f"\nEstimated time remaining: {eta_minutes}m {eta_seconds_remainder}s")
+                self._emit(f"(Average: {avg_time_per_folder:.1f}s per folder)")
+        
+        # Summary
+        self._emit(f"\n{'='*60}")
+        self._emit("BATCH PROCESSING COMPLETE")
+        self._emit(f"{'='*60}")
+        self._emit(f"Total: {total_folders} | Success: {successful} | Failed: {failed}\n")
+        self._emit("Results:")
+        for result in results:
+            self._emit(f"  {result}")
+        
+        if self.finished:
+            if successful > 0:
+                self.finished.emit(
+                    True,
+                    f"Batch processing complete.\n\n"
+                    f"Processed {total_folders} reaction types\n"
+                    f"Successful: {successful}\n"
+                    f"Failed: {failed}\n\n"
+                    f"Output files saved to:\n"
+                    f"  - data/reaction_dataset/<ReactionType>.jsonl\n"
+                    f"  - {self.folder_path}/<ReactionType>/<ReactionType>.md"
+                )
+            else:
+                self.finished.emit(
+                    False,
+                    f"Batch processing failed: No reactions found in any subfolder."
+                )
+    
+    def _process_single_reaction_type(self, folder_path: str, reaction_type: str) -> bool:
+        """Process a single reaction type folder.
+        
+        Returns:
+            True if reactions were successfully processed, False otherwise.
+        """
+        # Temporarily set folder path
+        original_folder = self.folder_path
+        self.folder_path = folder_path
+        
+        try:
+            # Find RDF files in this subfolder
+            self._emit(f"[1/7] Scanning for RDF files...")
+            self.rdf_files = self._find_rdf_files()
+            
+            if not self.rdf_files:
+                self._emit(f"      No RDF files found")
+                return False
+            
+            self._emit(f"      Found {len(self.rdf_files)} RDF files")
+            
+            # Process RDF files
+            self._emit(f"[2/7] Parsing RDF files...")
+            combined_rdf_map = self._process_rdf_files()
+            
+            if not combined_rdf_map:
+                self._emit(f"      No valid reactions parsed")
+                return False
+            
+            # Count MOL blocks
+            rct_mol_count = sum(1 for v in combined_rdf_map.values() if v.get('rct_mol'))
+            pro_mol_count = sum(1 for v in combined_rdf_map.values() if v.get('pro_mol'))
+            self._emit(f"      Parsed {len(combined_rdf_map)} reactions")
+            self._emit(f"      MOL blocks: {rct_mol_count} reactants, {pro_mol_count} products")
+            
+            # Load taxonomy if not already loaded
+            if not hasattr(self, '_taxonomy_index'):
+                self._emit(f"[3/7] Loading compound taxonomy (first run only)...")
+                taxonomy = self._load_taxonomy()
+                self._taxonomy_index = taxonomy
+                self._emit(f"      Loaded {len(taxonomy.cas_map)} compounds from registry")
+            else:
+                self._emit(f"[3/7] Using cached taxonomy (already loaded)")
+                taxonomy = self._taxonomy_index
+            
+            cas_map = taxonomy.cas_map
+            
+            # Create minimal TXT map
+            self._emit(f"[4/7] Creating condition mappings...")
+            txt_map = self._create_minimal_txt_map(combined_rdf_map)
+            self._emit(f"      Mapped {len(txt_map)} reaction conditions")
+            
+            # Assemble rows
+            self._emit(f"[5/7] Assembling reaction data structures...")
+            rows = assemble_rows(txt_map, combined_rdf_map, cas_map, txt_preferred=False)
+            self._emit(f"      Assembled {len(rows)} reaction records")
+            
+            if not rows:
+                self._emit(f"      No valid reaction records assembled")
+                return False
+            
+            # Set reaction type for all rows
+            for row in rows:
+                row['ReactionType'] = reaction_type
+            
+            # Post-process reagent roles
+            self._emit(f"[6/7] Assigning reagent roles via taxonomy...")
+            self._reassign_reagent_roles_via_taxonomy(rows, taxonomy)
+            
+            # Count unknowns captured
+            if self.process_unknowns:
+                unknowns_before = len(self._undetermined_new_map)
+                self._persist_undetermined_reagents()
+                unknowns_added = len(self._undetermined_new_map) - unknowns_before
+                if unknowns_added > 0:
+                    self._emit(f"      Captured {unknowns_added} unknown reagents")
+            
+            # Inject suggested ligands
+            self._emit(f"      Suggesting ligands for catalyst systems...")
+            try:
+                n = self._inject_suggested_ligands_via_taxonomy(rows, taxonomy)
+                if n > 0:
+                    self._emit(f"      Added suggested ligands to {n} reactions")
+            except Exception as e:
+                self._emit(f"      Ligand suggestion skipped: {str(e)[:80]}")
+            
+            # Calculate output paths for this reaction type
+            self._emit(f"[7/7] Generating output files...")
+            repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
+            os.makedirs(dataset_dir, exist_ok=True)
+            
+            # Use reaction_type as filename (sanitized)
+            import re as _re
+            safe_name = _re.sub(r'[^A-Za-z0-9_-]+', '', _re.sub(r'\s+', '_', reaction_type))
+            
+            output_jsonl = os.path.join(dataset_dir, f"{safe_name}.jsonl")
+            output_md = os.path.join(folder_path, f"{safe_name}.md")
+            
+            # Generate outputs
+            generator = ReactionMarkdownGenerator(taxonomy=taxonomy)
+            generator.cas_map = cas_map
+            
+            source_name = f"RDF_{reaction_type}"
+            
+            self._emit(f"      Generating Markdown report...")
+            generator.generate_markdown_report(rows, output_md, source_name)
+            
+            self._emit(f"      Generating JSONL and DRFP fingerprints...")
+            generator.generate_jsonl_export(rows, output_jsonl, source_name)
+            
+            # Show file sizes for verification
+            try:
+                jsonl_size = os.path.getsize(output_jsonl) / 1024  # KB
+                md_size = os.path.getsize(output_md) / 1024  # KB
+                self._emit(f"\n      ✓ Successfully saved {len(rows)} reactions:")
+                self._emit(f"        JSONL: {output_jsonl} ({jsonl_size:.1f} KB)")
+                self._emit(f"        MD:    {output_md} ({md_size:.1f} KB)")
+                drfp_path = output_jsonl.rsplit('.', 1)[0] + '_drfp.npz'
+                if os.path.exists(drfp_path):
+                    drfp_size = os.path.getsize(drfp_path) / 1024  # KB
+                    self._emit(f"        DRFP:  {drfp_path} ({drfp_size:.1f} KB)")
+            except Exception:
+                self._emit(f"\n      ✓ Saved {len(rows)} reactions")
+                self._emit(f"        JSONL: {output_jsonl}")
+                self._emit(f"        MD: {output_md}")
+            
+            return True
+            
+        finally:
+            # Restore original folder path
+            self.folder_path = original_folder
+    
     def _find_rdf_files(self) -> List[str]:
         """Find all RDF files in the specified folder and its subfolders (recursive)"""
         rdf_files = []
@@ -2162,9 +2420,16 @@ class RDFWorker(QtCore.QObject):
         """Process all RDF files and combine them into a single RDF map"""
         combined_rdf_map: Dict[str, Dict[str, Any]] = {}
         seen_ids: set[str] = set()
+        total_files = len(self.rdf_files)
+        
         for i, rdf_file in enumerate(self.rdf_files, 1):
             filename = os.path.basename(rdf_file)
-            self._emit(f"[{i}/{len(self.rdf_files)}] Processing {filename}...")
+            progress_pct = int(i / total_files * 100)
+            
+            # Show progress every file (for small batches) or every 10% (for large batches)
+            if total_files <= 20 or i % max(1, total_files // 10) == 0 or i == total_files:
+                self._emit(f"      [{progress_pct}%] File {i}/{total_files}: {filename}")
+            
             try:
                 # Parse individual RDF file
                 rdf_map = parse_rdf(rdf_file)
@@ -2179,14 +2444,20 @@ class RDFWorker(QtCore.QObject):
                     seen_ids.add(rid)
                     combined_rdf_map[rid] = data
                     added += 1
-                msg_tail = f" (added {added}"
-                if skipped:
-                    msg_tail += f", skipped dups {skipped}"
-                msg_tail += ")"
-                self._emit(f"  Found {len(rdf_map)} reactions in {filename}{msg_tail}")
+                
+                # Only show details if reactions were found or errors occurred
+                if len(rdf_map) > 0:
+                    msg_tail = f" ({added} new"
+                    if skipped:
+                        msg_tail += f", {skipped} dups"
+                    msg_tail += ")"
+                    if total_files <= 20:  # Show details for small batches
+                        self._emit(f"           {len(rdf_map)} reactions{msg_tail}")
             except Exception as e:
-                self._emit(f"  Error processing {filename}: {e}")
+                self._emit(f"           Error: {str(e)[:80]}")
                 continue
+        
+        self._emit(f"      Total: {len(combined_rdf_map)} unique reactions from {total_files} files")
         return combined_rdf_map
 
     def _generate_outputs(self, rows: List[Dict[str, Any]], cas_map: Dict[str, Dict[str, str]]) -> None:
@@ -2214,6 +2485,15 @@ class RDFWorker(QtCore.QObject):
     def run(self):
         """Main processing function"""
         try:
+            # Check if we should batch-process multiple subfolders
+            subfolders = self._get_reaction_type_subfolders()
+            
+            if len(subfolders) > 1:
+                self._emit(f"Detected {len(subfolders)} reaction type subfolders. Processing each separately...")
+                self._batch_process_subfolders(subfolders)
+                return
+            
+            # Single folder processing (original behavior)
             # Find all RDF files
             self._emit("Scanning folder for RDF files...")
             self.rdf_files = self._find_rdf_files()
