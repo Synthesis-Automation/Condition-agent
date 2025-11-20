@@ -59,7 +59,6 @@ __pycache__/
 *$py.class
 *.so
 
-# ALL_FAMILIES_drfp.npz
 
 # Python Distribution / Packaging
 .Python
