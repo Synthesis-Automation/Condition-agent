@@ -7,6 +7,7 @@ This directory contains tools to reorganize RDF files from a complex nested stru
 ## Problem
 
 The `original_dataset/` folder had a complex structure:
+
 - Multiple levels of nesting (reaction types → subfolders → year folders → RDF files)
 - Year-based subfolders (e.g., `2020-2024/`, `2023-2025/`)
 - Duplicate filenames across different year folders (e.g., `1000.rdf` in both `2020-2024/` and `2023-2025/`)
@@ -15,6 +16,7 @@ The `original_dataset/` folder had a complex structure:
 ## Solution
 
 The `reorganize_rdf_files.py` script flattens the structure to:
+
 ```
 reorganized/
 ├── Amide_formation/
@@ -94,6 +96,7 @@ Flat structure with all RDF files organized by reaction type.
 Location: `data-processor/reorganization_mapping_YYYYMMDD_HHMMSS.json`
 
 Contains complete tracking information:
+
 - Timestamp of reorganization
 - Source and destination paths
 - Statistics per reaction type
@@ -101,6 +104,7 @@ Contains complete tracking information:
 - Metadata (year folders, parent folders, relative paths)
 
 Example mapping entry:
+
 ```json
 {
   "C:\\...\\C_N_Coupling\\2020-2024\\1000.rdf": {
@@ -124,6 +128,7 @@ From the latest analysis:
 - **Files Preserved**: 534 (85%)
 
 Top reaction types by file count:
+
 1. Suzuki: 113 files (0 renamed)
 2. Amide_formation: 86 files (0 renamed)
 3. C_N_Coupling: 81 files (40 renamed)
@@ -143,12 +148,15 @@ Top reaction types by file count:
 ## Troubleshooting
 
 ### "Source directory not found"
+
 Ensure you're running from `data-processor/` or specify `--source` with correct path.
 
 ### Files not showing up
+
 Check if files are in deeper subfolders - the script recursively scans all levels.
 
 ### Duplicate name conflicts
+
 The script automatically handles this - check the mapping file to see how files were renamed.
 
 ## Example Workflow
@@ -176,6 +184,7 @@ cat reorganization_mapping_*.json
 ## Future Improvements
 
 Potential enhancements:
+
 - [ ] Add option to move instead of copy
 - [ ] Support for excluding specific folders
 - [ ] Progress bar for large datasets
@@ -185,6 +194,7 @@ Potential enhancements:
 ## Questions?
 
 Contact the maintainer or check the script's `--help`:
+
 ```bash
 python reorganize_rdf_files.py --help
 ```
