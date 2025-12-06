@@ -366,5 +366,5 @@ print(f'Found {len(result.recommendations)} recommendations')
 ## References
 
 - HTE Database: `data/HTE_db/HTE_0.csv`
-- Reactant Type System: `chemtools/featurizers/calculable_features.json`
+- Reactant Type System: `chemtools/taxonomy/data/calculable_features.json`
 - Classification: `chemtools/analysis/reactants.py`

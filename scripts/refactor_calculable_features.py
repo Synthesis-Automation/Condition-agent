@@ -183,7 +183,7 @@ def refactor_features(json_path: Path) -> Dict[str, int]:
     return data, stats
 
 def main():
-    json_path = Path(__file__).parent.parent / 'chemtools' / 'featurizers' / 'calculable_features.json'
+    json_path = Path(__file__).parent.parent / 'chemtools' / 'taxonomy' / 'data' / 'calculable_features.json'
     
     print(f"Refactoring: {json_path}")
     

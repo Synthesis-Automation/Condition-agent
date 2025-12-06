@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 
 # Load both versions
-v2_file = Path("chemtools/featurizers/calculable_features_v2.2_backup.json")
-v3_file = Path("chemtools/featurizers/calculable_features.json")
+v2_file = Path("chemtools/taxonomy/data/calculable_features_v2.2_backup.json")
+v3_file = Path("chemtools/taxonomy/data/calculable_features.json")
 
 with open(v2_file, 'r', encoding='utf-8') as f:
     v2_data = json.load(f)

@@ -31,7 +31,7 @@ REMOVE_SPECIFIC_COMPOUNDS = {
 }
 
 def main():
-    json_path = Path('chemtools/featurizers/calculable_features.json')
+    json_path = Path('chemtools/taxonomy/data/calculable_features.json')
     backup_path = json_path.with_suffix('.json.v4-backup')
     
     # Restore from backup

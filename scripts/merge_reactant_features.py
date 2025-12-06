@@ -8,9 +8,9 @@ from pathlib import Path
 
 # Paths
 REPO_ROOT = Path(__file__).parent.parent
-CALCULABLE_FILE = REPO_ROOT / "chemtools" / "featurizers" / "calculable_features.json"
+CALCULABLE_FILE = REPO_ROOT / "chemtools" / "taxonomy" / "data" / "calculable_features.json"
 GENERATED_FILE = REPO_ROOT / "scripts" / "reactant_features_generated.json"
-BACKUP_FILE = REPO_ROOT / "chemtools" / "featurizers" / "calculable_features_backup.json"
+BACKUP_FILE = REPO_ROOT / "chemtools" / "taxonomy" / "data" / "calculable_features_backup.json"
 
 def main():
     print("=" * 80)

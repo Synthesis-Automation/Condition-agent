@@ -30,7 +30,7 @@ REMOVE_TOKENS = {
 }
 
 def main():
-    json_path = Path('chemtools/featurizers/calculable_features.json')
+    json_path = Path('chemtools/taxonomy/data/calculable_features.json')
     
     # Create backup
     backup_path = json_path.with_suffix('.json.v4-backup')

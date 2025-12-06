@@ -4,7 +4,7 @@
 
 ### Bug 1: Benzylic Halide Classification ✅ FIXED
 **Problem:** 4-bromotoluene misclassified as Bn-Br instead of ArBr  
-**Fix:** Updated SMARTS patterns in `chemtools/featurizers/calculable_features.json`  
+**Fix:** Updated SMARTS patterns in `chemtools/taxonomy/data/calculable_features.json`  
 **Status:** ✅ Verified working
 
 ### Bug 2: Missing HTE Tools in Agent System Prompt ✅ FIXED
@@ -14,7 +14,7 @@
 
 ## What Was Changed
 
-### File 1: `chemtools/featurizers/calculable_features.json`
+### File 1: `chemtools/taxonomy/data/calculable_features.json`
 Fixed benzylic halide SMARTS patterns:
 - `Bn-Br`: `[CX4;H1,H2,H3]c.[Br]` → `c[CX4;H1,H2][Br]`
 - `Bn-Cl`: `[CX4;H1,H2,H3]c.[Cl]` → `c[CX4;H1,H2][Cl]`

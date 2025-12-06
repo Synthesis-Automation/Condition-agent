@@ -30,8 +30,8 @@ from typing import Any, Dict, List, Optional, Union
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
 from ..util.smarts_cache import compile_smarts as _compile_smarts
 
-# Path to the feature specification JSON
-_SPEC_PATH = Path(__file__).parent / "calculable_features.json"
+# Path to the feature specification JSON (centralized in taxonomy/data)
+_SPEC_PATH = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "calculable_features.json"
 
 
 # ============================================================================

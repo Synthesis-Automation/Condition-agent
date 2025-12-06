@@ -4,7 +4,7 @@
 4-Bromotoluene (`Brc1ccc(C)cc1`) was incorrectly classified as "Bn-Br" (benzyl bromide) instead of "ArBr" (aryl bromide), causing the HTE system to return "no data" even though 112 experiments exist for ArBr + ArNH2 with copper catalyst.
 
 ## Root Cause
-SMARTS patterns for benzylic halides in `chemtools/featurizers/calculable_features.json` were too broad:
+SMARTS patterns for benzylic halides in `chemtools/taxonomy/data/calculable_features.json` were too broad:
 
 **OLD (Buggy):**
 ```
@@ -22,7 +22,7 @@ This requires: aromatic carbon → CH2 → Br (the correct benzylic structure)
 
 ## What Was Fixed
 
-**File:** `chemtools/featurizers/calculable_features.json`
+**File:** `chemtools/taxonomy/data/calculable_features.json`
 
 **Changes:**
 1. `Bn-Br_present`: `[CX4;H1,H2,H3]c.[Br]` → `c[CX4;H1,H2][Br]`
@@ -102,7 +102,7 @@ Catalyst: copper
 
 ## Files Modified
 
-1. `chemtools/featurizers/calculable_features.json` - Fixed SMARTS patterns
+1. `chemtools/taxonomy/data/calculable_features.json` - Fixed SMARTS patterns
 2. `test_classification_fix.py` - Verification script (new)
 3. `clear_cache.py` - Cache clearing utility (new)
 
@@ -126,7 +126,7 @@ Catalyst: copper
 
 4. **Check JSON file has correct patterns:**
    ```bash
-   grep -A 3 "Bn-Br_present" chemtools/featurizers/calculable_features.json
+   grep -A 3 "Bn-Br_present" chemtools/taxonomy/data/calculable_features.json
    ```
    Should show: `"c[CX4;H1,H2][Br]"`
 

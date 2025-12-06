@@ -1433,7 +1433,7 @@ def calculable_features_tool(
     Detect calculable features for a molecule using the curated feature library.
 
     Features cover SMARTS-derived motifs, integer counts, and heuristic properties
-    defined in ``chemtools/featurizers/calculable_features.json``. When ``feature_tokens``
+    defined in ``chemtools/taxonomy/data/calculable_features.json``. When ``feature_tokens``
     is supplied the output is restricted to those tokens (missing entries are
     reported separately). Setting ``only_present`` filters the result to features
     that evaluate to ``True`` or positive integers.

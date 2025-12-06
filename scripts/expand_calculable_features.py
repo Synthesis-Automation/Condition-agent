@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 # Load the existing features
-existing_file = Path(__file__).parent.parent / "chemtools" / "featurizers" / "calculable_features.json"
+existing_file = Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "calculable_features.json"
 with open(existing_file, 'r', encoding='utf-8') as f:
     existing_data = json.load(f)
 
@@ -1178,7 +1178,7 @@ existing_data.setdefault("derived_shortcuts", [])
 expanded_features["derived_shortcuts"].extend(new_derived)
 
 # Save the expanded JSON
-output_file = Path(__file__).parent.parent / "chemtools" / "featurizers" / "calculable_features.json"
+output_file = Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "calculable_features.json"
 with open(output_file, 'w', encoding='utf-8') as f:
     json.dump(expanded_features, f, indent=2)
 print("Expanded calculable_features.json")

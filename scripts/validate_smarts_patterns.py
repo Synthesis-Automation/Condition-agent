@@ -5,7 +5,7 @@ Validate all SMARTS patterns used across the Condition-agent codebase.
 This script discovers and validates SMARTS patterns from:
 - chemtools/router.py
 - chemtools/util/functional_groups.py
-- chemtools/featurizers/calculable_features.json
+- chemtools/taxonomy/data/calculable_features.json
 - chemtools/selector_payloads.py
 - Other modules using SMARTS
 
@@ -64,7 +64,7 @@ def load_functional_group_patterns() -> Dict[str, Sequence[str]]:
 
 def load_calculable_features_patterns() -> Dict[str, Sequence[str]]:
     """Load SMARTS patterns from calculable_features.json."""
-    json_path = PROJECT_ROOT / "chemtools" / "featurizers" / "calculable_features.json"
+    json_path = PROJECT_ROOT / "chemtools" / "taxonomy" / "data" / "calculable_features.json"
     
     if not json_path.exists():
         print(f"Warning: {json_path} not found", file=sys.stderr)

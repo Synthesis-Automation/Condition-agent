@@ -208,7 +208,7 @@ def main():
     print("\n" + "=" * 80)
     print("Next steps:")
     print("1. Review generated features in: scripts/reactant_features_generated.json")
-    print("2. Merge into chemtools/featurizers/calculable_features.json")
+    print("2. Merge into chemtools/taxonomy/data/calculable_features.json")
     print("3. Update calculable.py to handle reactant type queries")
     print("=" * 80)
 

@@ -2,7 +2,7 @@
 Functional Group Detection sourced from calculable_features.json.
 
 All SMARTS definitions and metadata now live in the central
-chemtools/featurizers/calculable_features.json specification, ensuring a
+chemtools/taxonomy/data/calculable_features.json specification, ensuring a
 single source of truth for functional group logic.
 """
 
@@ -43,8 +43,22 @@ _CATEGORY_PREFERRED_ORDER = [
     "leaving_groups",
 ]
 _UNCATEGORIZED_TAG = "other"
-_SPEC_PATH = Path(__file__).resolve().parents[1] / "featurizers" / "calculable_features.json"
+_SPEC_PATH = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "calculable_features.json"
 _DETECTION_CACHE_SIZE = 4096
+
+# Fallback category tags for common oxygen-bearing groups when metadata is absent.
+_CATEGORY_FALLBACKS: Dict[str, Tuple[str, ...]] = {
+    "acid": ("oxygen",),
+    "carboxylic_acid": ("oxygen",),
+    "carbonyl": ("oxygen",),
+    "aldehyde": ("oxygen",),
+    "ketone": ("oxygen",),
+    "alcohol": ("oxygen",),
+    "phenol": ("oxygen",),
+    "ester": ("oxygen",),
+    "ether": ("oxygen",),
+    "anhydride": ("oxygen",),
+}
 
 # Fallback SMARTS for legacy group names still referenced by router/tests
 _LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
@@ -155,6 +169,32 @@ def _load_group_definitions() -> Dict[str, FunctionalGroupDef]:
             smarts=smarts,
             text_patterns=(),
             category_tags=(),
+        )
+
+    # Apply fallback categories when none provided or when missing key tags
+    for key, definition in list(defs.items()):
+        fallback = _CATEGORY_FALLBACKS.get(definition.name)
+        if fallback:
+            if not definition.category_tags or not set(fallback).issubset(set(definition.category_tags)):
+                merged_tags = tuple(sorted(set(definition.category_tags) | set(fallback)))
+                defs[key] = FunctionalGroupDef(
+                    name=definition.name,
+                    token=definition.token,
+                    label=definition.label,
+                    smarts=definition.smarts,
+                    text_patterns=definition.text_patterns,
+                    category_tags=merged_tags,
+                )
+
+    # Ensure carboxylic acid has a canonical token without the _present suffix
+    if "carboxylic_acid" not in defs:
+        defs["carboxylic_acid"] = FunctionalGroupDef(
+            name="carboxylic_acid",
+            token="carboxylic_acid",
+            label="Carboxylic Acid",
+            smarts=("C(=O)[OH]",),
+            text_patterns=(),
+            category_tags=("oxygen",),
         )
 
     return defs
@@ -396,12 +436,13 @@ def get_group_categories(smiles: Optional[str]) -> Dict[str, List[str]]:
         definition = defs_by_token.get(group)
         if not definition:
             continue
+        label = definition.name or group
         tags = definition.category_tags or ()
         if not tags:
-            categories[_UNCATEGORIZED_TAG].append(group)
+            categories[_UNCATEGORIZED_TAG].append(label)
             continue
         for tag in tags:
-            categories.setdefault(tag, []).append(group)
+            categories.setdefault(tag, []).append(label)
 
     return categories
 

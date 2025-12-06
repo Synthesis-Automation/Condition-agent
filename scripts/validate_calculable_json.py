@@ -3,7 +3,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-json_file = Path(__file__).parent.parent / "chemtools" / "featurizers" / "calculable_features.json"
+json_file = Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "calculable_features.json"
 
 with open(json_file, "r", encoding="utf-8") as f:
     data = json.load(f)

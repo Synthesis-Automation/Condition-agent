@@ -1363,5 +1363,165 @@
         }
       }
     ]
+  },
+  {
+    "id": "RCO2H-activated",
+    "name": "activated carboxylic acid",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "RCO2H-activated",
+        "name": "activated carboxylic acid",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "H2",
+    "name": "molecular hydrogen",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "H2",
+        "name": "molecular hydrogen",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "Metal-H",
+    "name": "metal hydride",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "Metal-H",
+        "name": "metal hydride",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "Oxidant",
+    "name": "oxidant",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "Oxidant",
+        "name": "oxidant",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "RMgX",
+    "name": "Grignard reagent",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "RMgX",
+        "name": "Grignard reagent",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "Borane",
+    "name": "borane",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "Borane",
+        "name": "borane",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "RLi",
+    "name": "organolithium",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "RLi",
+        "name": "organolithium",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "CN-",
+    "name": "cyanide",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "CN-",
+        "name": "cyanide",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "I-",
+    "name": "iodide",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "I-",
+        "name": "iodide",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
+  },
+  {
+    "id": "RO-",
+    "name": "alkoxide",
+    "description": "Stub entry to satisfy reaction taxonomy references.",
+    "category": null,
+    "aliases": [],
+    "metadata": {},
+    "members": [
+      {
+        "id": "RO-",
+        "name": "alkoxide",
+        "aliases": [],
+        "metadata": {}
+      }
+    ]
   }
 ]

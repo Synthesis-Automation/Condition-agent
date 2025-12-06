@@ -1,6 +1,6 @@
 """
 Regenerate ``chemtools/taxonomy/data/reactant_types.json`` from the
-reactant metadata defined in ``chemtools/featurizers/calculable_features.json``.
+reactant metadata defined in ``chemtools/taxonomy/data/calculable_features.json``.
 
 This keeps the calculable feature spec as the single source of truth for
 reactant SMARTS and membership, while carrying forward human-friendly labels,
@@ -18,7 +18,7 @@ from typing import Dict, List, Optional
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC_PATH = ROOT / "chemtools" / "featurizers" / "calculable_features.json"
+SPEC_PATH = ROOT / "chemtools" / "taxonomy" / "data" / "calculable_features.json"
 OUTPUT_PATH = ROOT / "chemtools" / "taxonomy" / "data" / "reactant_types.json"
 
 

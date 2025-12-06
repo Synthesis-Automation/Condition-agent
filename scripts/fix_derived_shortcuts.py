@@ -41,7 +41,7 @@ def update_derived_shortcuts(json_path: Path):
     return updated_count
 
 def main():
-    json_path = Path('chemtools/featurizers/calculable_features.json')
+    json_path = Path('chemtools/taxonomy/data/calculable_features.json')
     print(f"Updating derived_shortcuts in: {json_path}\n")
     
     count = update_derived_shortcuts(json_path)

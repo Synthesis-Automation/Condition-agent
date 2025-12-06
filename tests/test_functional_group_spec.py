@@ -1,6 +1,6 @@
 """
 Lightweight integrity tests for functional group definitions sourced from
-chemtools/featurizers/calculable_features.json.
+chemtools/taxonomy/data/calculable_features.json.
 """
 
 import pytest

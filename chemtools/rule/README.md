@@ -145,7 +145,7 @@ Applied if any condition matches:
 
 ## Feature System Integration
 
-The system uses **108 calculable features** from `chemtools/featurizers/calculable_features.json`:
+The system uses **108 calculable features** from `chemtools/taxonomy/data/calculable_features.json`:
 
 ### Key Feature Categories
 
@@ -242,7 +242,7 @@ pytest tests/test_rule_engine.py -v
 
 ### Adding New Features
 
-1. Edit `chemtools/featurizers/calculable_features.json`
+1. Edit `chemtools/taxonomy/data/calculable_features.json`
 2. Add feature definition with SMARTS or derivation logic
 3. Features are automatically available to all rule databases
 4. Use in `reactant_features` or `when` conditions
