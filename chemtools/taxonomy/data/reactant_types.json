@@ -46,18 +46,7 @@
       "aromatic aldehyde",
       "aromatic aldehydes"
     ],
-    "metadata": {
-      "smartsrx_feature_map": {
-        "RCHO": {
-          "saturated_aliphatic": "aldehyde_saturated_aliphatic_present",
-          "unsaturated_aliphatic": "aldehyde_unsaturated_aliphatic_present"
-        },
-        "ArCHO": {
-          "aromatic": "aldehyde_aromatic_present",
-          "heteroaromatic": "aldehyde_heteroaromatic_present"
-        }
-      }
-    },
+    "metadata": {},
     "members": [
       {
         "id": "ArCHO",
@@ -1002,18 +991,7 @@
       "ketone",
       "ketones"
     ],
-    "metadata": {
-      "smartsrx_feature_map": {
-        "RCOR": {
-          "aliphatic_cyclic": "ketone_aliphatic_cyclic_present",
-          "aliphatic_acyclic": "ketone_aliphatic_acyclic_present"
-        },
-        "ArCOR": {
-          "aromatic_cyclic": "ketone_aromatic_cyclic_present",
-          "aromatic_acyclic": "ketone_aromatic_acyclic_present"
-        }
-      }
-    },
+    "metadata": {},
     "members": [
       {
         "id": "ArCOR",
