@@ -4,24 +4,28 @@
     "name": "acyl electrophile",
     "description": "Activated acyl electrophiles for amide/ester formation.",
     "category": null,
-    "aliases": [],
+    "aliases": [
+      "acyl chloride",
+      "acyl chlorides",
+      "acyl electrophiles"
+    ],
     "metadata": {},
     "members": [
-      {
-        "id": "PivCl",
-        "name": "pivaloyl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "pivaloyl chloride",
-          "coupling_role": "electrophile"
-        }
-      },
       {
         "id": "RCOCl",
         "name": "acyl chloride",
         "aliases": [],
         "metadata": {
           "compound_type": "acyl chloride",
+          "coupling_role": "electrophile"
+        }
+      },
+      {
+        "id": "PivCl",
+        "name": "pivaloyl chloride",
+        "aliases": [],
+        "metadata": {
+          "compound_type": "pivaloyl chloride",
           "coupling_role": "electrophile"
         }
       }
@@ -32,13 +36,40 @@
     "name": "aldehyde",
     "description": "Aldehydes as electrophiles or directing groups.",
     "category": null,
-    "aliases": [],
-    "metadata": {},
+    "aliases": [
+      "aldehyde",
+      "aldehydes",
+      "aliphatic aldehyde",
+      "aliphatic aldehydes",
+      "alkyl aldehyde",
+      "alkyl aldehydes",
+      "aromatic aldehyde",
+      "aromatic aldehydes"
+    ],
+    "metadata": {
+      "smartsrx_feature_map": {
+        "RCHO": {
+          "saturated_aliphatic": "aldehyde_saturated_aliphatic_present",
+          "unsaturated_aliphatic": "aldehyde_unsaturated_aliphatic_present"
+        },
+        "ArCHO": {
+          "aromatic": "aldehyde_aromatic_present",
+          "heteroaromatic": "aldehyde_heteroaromatic_present"
+        }
+      }
+    },
     "members": [
       {
         "id": "ArCHO",
         "name": "aromatic aldehyde",
-        "aliases": [],
+        "aliases": [
+          "aromatic aldehyde",
+          "aromatic aldehydes",
+          "aromatic ring aldehyde",
+          "aryl aldehyde",
+          "aryl aldehydes",
+          "benzaldehyde-type aldehyde"
+        ],
         "metadata": {
           "compound_type": "aromatic aldehyde",
           "coupling_role": "electrophile"
@@ -47,7 +78,15 @@
       {
         "id": "RCHO",
         "name": "aliphatic aldehyde",
-        "aliases": [],
+        "aliases": [
+          "aliphatic aldehyde",
+          "aliphatic aldehydes",
+          "aliphatic chain aldehyde",
+          "alkyl aldehyde",
+          "alkyl aldehydes",
+          "saturated aliphatic aldehyde",
+          "saturated aliphatic aldehydes"
+        ],
         "metadata": {
           "compound_type": "aliphatic aldehyde",
           "coupling_role": "electrophile"
@@ -122,26 +161,26 @@
   {
     "id": "Alkyl-C-H",
     "name": "alkyl C-H donor",
-    "description": "Aliphatic C\u2013H donors; acidic/activated variants for C\u2013H activation.",
+    "description": "Aliphatic C–H donors; acidic/activated variants for C–H activation.",
     "category": null,
     "aliases": [],
     "metadata": {},
     "members": [
       {
         "id": "Alkyl-H",
-        "name": "aliphatic C\u2013H donor",
+        "name": "aliphatic C–H donor",
         "aliases": [],
         "metadata": {
-          "compound_type": "aliphatic C\u2013H donor",
+          "compound_type": "aliphatic C–H donor",
           "coupling_role": "other"
         }
       },
       {
         "id": "Alkyl-H-acidic",
-        "name": "acidic aliphatic C\u2013H donor (\u03b1 to EWG)",
+        "name": "acidic aliphatic C–H donor (α to EWG)",
         "aliases": [],
         "metadata": {
-          "compound_type": "acidic aliphatic C\u2013H donor (\u03b1 to EWG)",
+          "compound_type": "acidic aliphatic C–H donor (α to EWG)",
           "coupling_role": "other"
         }
       }
@@ -221,28 +260,28 @@
       },
       {
         "id": "acetylene",
-        "name": "acetylene (HC\u2261CH)",
+        "name": "acetylene (HC≡CH)",
         "aliases": [],
         "metadata": {
-          "compound_type": "acetylene (HC\u2261CH)",
+          "compound_type": "acetylene (HC≡CH)",
           "coupling_role": "both"
         }
       },
       {
         "id": "internal-alkyne",
-        "name": "internal alkyne (R-C\u2261C-R)",
+        "name": "internal alkyne (R-C≡C-R)",
         "aliases": [],
         "metadata": {
-          "compound_type": "internal alkyne (R-C\u2261C-R)",
+          "compound_type": "internal alkyne (R-C≡C-R)",
           "coupling_role": "both"
         }
       },
       {
         "id": "terminal-alkyne",
-        "name": "terminal alkyne (R-C\u2261CH)",
+        "name": "terminal alkyne (R-C≡CH)",
         "aliases": [],
         "metadata": {
-          "compound_type": "terminal alkyne (R-C\u2261CH)",
+          "compound_type": "terminal alkyne (R-C≡CH)",
           "coupling_role": "both"
         }
       }
@@ -389,26 +428,26 @@
   {
     "id": "ArH",
     "name": "aryl C-H donor",
-    "description": "Aryl and heteroaryl C\u2013H donors for direct arylation.",
+    "description": "Aryl and heteroaryl C–H donors for direct arylation.",
     "category": null,
     "aliases": [],
     "metadata": {},
     "members": [
       {
         "id": "Ar-H",
-        "name": "aryl C\u2013H donor",
+        "name": "aryl C–H donor",
         "aliases": [],
         "metadata": {
-          "compound_type": "aryl C\u2013H donor",
+          "compound_type": "aryl C–H donor",
           "coupling_role": "other"
         }
       },
       {
         "id": "Hetero-ArH",
-        "name": "heteroaryl C\u2013H donor",
+        "name": "heteroaryl C–H donor",
         "aliases": [],
         "metadata": {
-          "compound_type": "heteroaryl C\u2013H donor",
+          "compound_type": "heteroaryl C–H donor",
           "coupling_role": "other"
         }
       }
@@ -682,10 +721,10 @@
     "members": [
       {
         "id": "activated-dienophile",
-        "name": "\u03b1,\u03b2-unsaturated carbonyl",
+        "name": "α,β-unsaturated carbonyl",
         "aliases": [],
         "metadata": {
-          "compound_type": "\u03b1,\u03b2-unsaturated carbonyl",
+          "compound_type": "α,β-unsaturated carbonyl",
           "coupling_role": "dienophile"
         }
       },
@@ -765,10 +804,10 @@
     "members": [
       {
         "id": "beta_dicarbonyl",
-        "name": "\u03b2-dicarbonyl compound",
+        "name": "β-dicarbonyl compound",
         "aliases": [],
         "metadata": {
-          "compound_type": "\u03b2-dicarbonyl compound",
+          "compound_type": "β-dicarbonyl compound",
           "coupling_role": "other"
         }
       },
@@ -953,13 +992,40 @@
     "name": "ketone",
     "description": "Ketones as electrophiles or directing groups.",
     "category": null,
-    "aliases": [],
-    "metadata": {},
+    "aliases": [
+      "aliphatic ketone",
+      "aliphatic ketones",
+      "alkyl ketone",
+      "alkyl ketones",
+      "aromatic ketone",
+      "aromatic ketones",
+      "ketone",
+      "ketones"
+    ],
+    "metadata": {
+      "smartsrx_feature_map": {
+        "RCOR": {
+          "aliphatic_cyclic": "ketone_aliphatic_cyclic_present",
+          "aliphatic_acyclic": "ketone_aliphatic_acyclic_present"
+        },
+        "ArCOR": {
+          "aromatic_cyclic": "ketone_aromatic_cyclic_present",
+          "aromatic_acyclic": "ketone_aromatic_acyclic_present"
+        }
+      }
+    },
     "members": [
       {
         "id": "ArCOR",
         "name": "aromatic ketone",
-        "aliases": [],
+        "aliases": [
+          "aromatic ketone",
+          "aromatic ketones",
+          "aryl aryl ketone",
+          "aryl ketone",
+          "aryl ketones",
+          "benzophenone-type ketone"
+        ],
         "metadata": {
           "compound_type": "aromatic ketone",
           "coupling_role": "electrophile"
@@ -968,7 +1034,12 @@
       {
         "id": "RCOR",
         "name": "aliphatic ketone",
-        "aliases": [],
+        "aliases": [
+          "aliphatic ketone",
+          "aliphatic ketones",
+          "alkyl ketone",
+          "alkyl ketones"
+        ],
         "metadata": {
           "compound_type": "aliphatic ketone",
           "coupling_role": "electrophile"
@@ -1127,7 +1198,7 @@
   {
     "id": "RNH2/R2NH",
     "name": "aliphatic amine",
-    "description": "Aliphatic primary/secondary/tertiary amines (including \u03b1-branched variants).",
+    "description": "Aliphatic primary/secondary/tertiary amines (including α-branched variants).",
     "category": null,
     "aliases": [],
     "metadata": {},
@@ -1143,10 +1214,10 @@
       },
       {
         "id": "R2NH-a-branch",
-        "name": "secondary aliphatic amine (\u03b1-branched)",
+        "name": "secondary aliphatic amine (α-branched)",
         "aliases": [],
         "metadata": {
-          "compound_type": "secondary aliphatic amine (\u03b1-branched)",
+          "compound_type": "secondary aliphatic amine (α-branched)",
           "coupling_role": "nucleophile"
         }
       },
@@ -1170,10 +1241,10 @@
       },
       {
         "id": "RNH2-a-branch",
-        "name": "primary aliphatic amine (\u03b1-branched)",
+        "name": "primary aliphatic amine (α-branched)",
         "aliases": [],
         "metadata": {
-          "compound_type": "primary aliphatic amine (\u03b1-branched)",
+          "compound_type": "primary aliphatic amine (α-branched)",
           "coupling_role": "nucleophile"
         }
       }
@@ -1182,17 +1253,17 @@
   {
     "id": "ROH",
     "name": "aliphatic alcohol",
-    "description": "Aliphatic alcohols (primary, secondary, tertiary, and \u03b1-branched).",
+    "description": "Aliphatic alcohols (primary, secondary, tertiary, and α-branched).",
     "category": null,
     "aliases": [],
     "metadata": {},
     "members": [
       {
         "id": "ROH-a-branch",
-        "name": "aliphatic alcohol (\u03b1-branched)",
+        "name": "aliphatic alcohol (α-branched)",
         "aliases": [],
         "metadata": {
-          "compound_type": "aliphatic alcohol (\u03b1-branched)",
+          "compound_type": "aliphatic alcohol (α-branched)",
           "coupling_role": "nucleophile"
         }
       },
