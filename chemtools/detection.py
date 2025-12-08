@@ -182,7 +182,6 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
                 continue
             
             # Check if reactants match the pattern
-            # Try running the reaction on our reactants
             try:
                 # Get number of reactant templates
                 num_reactant_templates = rxn_pattern.GetNumReactantTemplates()
@@ -190,24 +189,55 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
                 if num_reactant_templates == 0:
                     continue
                 
-                # Simple check: see if reactant templates match our reactants
-                matched = True
+                # Better matching: Each template must match EXACTLY ONE reactant
+                # and each reactant should match at most one template (bijective matching)
+                template_matches = []  # List of sets: which reactants each template matches
+                
                 for i in range(num_reactant_templates):
                     template = rxn_pattern.GetReactantTemplate(i)
-                    template_matched = False
-                    for mol in reactant_mols:
+                    matching_reactants = set()
+                    for j, mol in enumerate(reactant_mols):
                         if mol.HasSubstructMatch(template):
-                            template_matched = True
+                            matching_reactants.add(j)
+                    template_matches.append(matching_reactants)
+                
+                # All templates must have at least one match
+                if any(len(m) == 0 for m in template_matches):
+                    continue
+                
+                # Try to find a valid assignment (simple greedy for 2 templates)
+                matched = False
+                if num_reactant_templates == 1:
+                    matched = len(template_matches[0]) > 0
+                elif num_reactant_templates == 2:
+                    # Check if we can assign different reactants to each template
+                    for r1 in template_matches[0]:
+                        for r2 in template_matches[1]:
+                            if r1 != r2:
+                                matched = True
+                                break
+                        if matched:
                             break
-                    if not template_matched:
-                        matched = False
-                        break
+                    # Also accept if we have exactly 2 reactants and each matches its template
+                    if not matched and len(reactant_mols) == 2:
+                        if 0 in template_matches[0] and 1 in template_matches[1]:
+                            matched = True
+                        elif 1 in template_matches[0] and 0 in template_matches[1]:
+                            matched = True
+                else:
+                    # For 3+ templates, use simple check: all have matches
+                    matched = all(len(m) > 0 for m in template_matches)
                 
                 if matched:
                     # Calculate confidence based on specificity
                     # More specific patterns (longer SMARTS) get higher confidence
-                    specificity = min(len(smarts) / 100.0, 1.0)
-                    confidence = 0.80 + (0.15 * specificity)
+                    specificity = min(len(smarts) / 150.0, 1.0)  # Adjusted scale
+                    
+                    # Bonus for exact number of reactant match
+                    if len(reactant_mols) == num_reactant_templates:
+                        specificity = min(specificity + 0.1, 1.0)
+                    
+                    confidence = 0.75 + (0.20 * specificity)
                     
                     matches.append((rxn_id, info["name"], confidence))
                     
@@ -217,6 +247,7 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
                 
         except Exception as e:
             logger.debug(f"Failed to match SMARTS for {rxn_id}: {e}")
+            continue
             continue
     
     # Sort by confidence (highest first)
@@ -604,6 +635,38 @@ class _DetectionEngine:
             "mapping_method": mapping_method,
         }
     
+    def _taxonomy_smarts_detection(self) -> Dict[str, Any]:
+        """
+        Taxonomy SMARTS-based detection using reaction_types.json SMARTS patterns.
+        
+        Uses the SMARTS patterns defined in reaction_types.json to match the reaction
+        against known reaction type signatures.
+        
+        Returns:
+            {
+                "matches": list,           # List of (reaction_type_id, name, confidence)
+                "best_family": str | None, # Best matching reaction type
+                "confidence": float | None,
+            }
+        """
+        try:
+            matches = detect_by_taxonomy_smarts(self.reaction_smiles)
+            if matches:
+                best = matches[0]  # Already sorted by confidence
+                return {
+                    "matches": matches,
+                    "best_family": best[0],  # reaction_type_id
+                    "confidence": best[2],   # confidence score
+                }
+        except Exception as e:
+            logger.warning(f"Taxonomy SMARTS detection failed: {e}")
+        
+        return {
+            "matches": [],
+            "best_family": None,
+            "confidence": None,
+        }
+    
     def _apply_catalyst_overrides(self, family: Optional[str], confidence: float) -> tuple[Optional[str], float]:
         """
         Apply catalyst-based family overrides.
@@ -652,7 +715,7 @@ class _DetectionEngine:
         
         return family, confidence
     
-    def detect(self, use_ml: bool = True) -> Dict[str, Any]:
+    def detect(self, use_ml: bool = True, use_taxonomy_smarts: bool = True) -> Dict[str, Any]:
         """
         Main detection orchestrator - combines all detection methods.
         
@@ -660,17 +723,20 @@ class _DetectionEngine:
         1. Catalyst Detection (ALWAYS)
         2. Functional Group Detection (ALWAYS) 
         3. Rule-Based Detection (ALWAYS) - SMARTS patterns
-        4. ML Detection (OPTIONAL) - rxn-insight if use_ml=True
-        5. Catalyst Overrides (ALWAYS) - metal-based refinements
-        6. Result Merging - choose best prediction
+        4. Taxonomy SMARTS Detection (OPTIONAL) - reaction_types.json patterns
+        5. ML Detection (OPTIONAL) - rxn-insight if use_ml=True
+        6. Catalyst Overrides (ALWAYS) - metal-based refinements
+        7. Result Merging - choose best prediction
         
         Priority:
         - Catalyst override (highest)
+        - Taxonomy SMARTS match (highest confidence, exact match)
         - ML detection (if available and confident)
         - Rule-based detection (fallback)
         
         Args:
             use_ml: Use ML detection if available (default: True)
+            use_taxonomy_smarts: Use taxonomy SMARTS detection (default: True)
             
         Returns:
             Unified detection result with all metadata
@@ -684,6 +750,17 @@ class _DetectionEngine:
         fam_rule = rule_result["family"]
         conf_rule = rule_result["confidence"]
         
+        # Step 3.5: Taxonomy SMARTS detection (OPTIONAL)
+        taxonomy_result = None
+        fam_taxonomy = None
+        conf_taxonomy = None
+        
+        if use_taxonomy_smarts:
+            taxonomy_result = self._taxonomy_smarts_detection()
+            if taxonomy_result.get("best_family"):
+                fam_taxonomy = taxonomy_result["best_family"]
+                conf_taxonomy = taxonomy_result["confidence"]
+        
         # Step 4: ML detection (OPTIONAL)
         ml_result = None
         fam_ml = None
@@ -696,15 +773,28 @@ class _DetectionEngine:
                 conf_ml = ml_result["confidence"]
         
         # Step 5: Choose best prediction
+        # Priority: taxonomy_smarts (high conf) > C-O/C-S rule > ML > rule_based
+        
+        # First check taxonomy SMARTS (exact pattern match is very reliable)
+        if fam_taxonomy and conf_taxonomy is not None and conf_taxonomy >= 0.8:
+            fam_final = fam_taxonomy
+            conf_final = conf_taxonomy
+            method = "taxonomy_smarts"
         # Prefer C-O/C-S rule-based detection (more specific)
-        if (fam_rule in CO_FAMILIES_CANONICAL or fam_rule in CS_FAMILIES_CANONICAL) and conf_rule >= 0.75:
+        elif (fam_rule in CO_FAMILIES_CANONICAL or fam_rule in CS_FAMILIES_CANONICAL) and conf_rule >= 0.75:
             fam_final = fam_rule
             conf_final = conf_rule
             method = "rule_based"
+        # Check ML detection
         elif fam_ml and conf_ml is not None and conf_ml > 0.5:
             fam_final = fam_ml
             conf_final = conf_ml
             method = "ml"
+        # Check taxonomy SMARTS with lower confidence
+        elif fam_taxonomy and conf_taxonomy is not None and conf_taxonomy >= 0.5:
+            fam_final = fam_taxonomy
+            conf_final = conf_taxonomy
+            method = "taxonomy_smarts"
         else:
             fam_final = fam_rule
             conf_final = conf_rule
@@ -733,6 +823,14 @@ class _DetectionEngine:
             }
         }
         
+        # Add taxonomy SMARTS prediction if available
+        if taxonomy_result and taxonomy_result.get("best_family"):
+            result["details"]["taxonomy_smarts_prediction"] = {
+                "family": fam_taxonomy,
+                "confidence": conf_taxonomy,
+                "all_matches": taxonomy_result.get("matches", []),
+            }
+        
         if ml_result and ml_result.get("available"):
             result["details"]["ml_prediction"] = {
                 "family": fam_ml,
@@ -756,19 +854,21 @@ class _DetectionEngine:
         return result
 
 
-def detect_reaction(reaction_smiles: str, use_ml: bool = True) -> Dict[str, Any]:
+def detect_reaction(reaction_smiles: str, use_ml: bool = True, use_taxonomy_smarts: bool = True) -> Dict[str, Any]:
     """
     Detect reaction family from reaction SMILES.
     
     This is the MAIN entry point for all reaction detection. It consolidates
-    SMARTS-based rules, ML predictions, and catalyst-based overrides into
-    a single unified API with consistent outputs.
+    SMARTS-based rules, ML predictions, taxonomy SMARTS matching, and catalyst-based 
+    overrides into a single unified API with consistent outputs.
     
     All outputs are validated against the unified taxonomy in
     chemtools/taxonomy/data/reaction_types.json (80+ canonical reaction types).
     
     Args:
         reaction_smiles: Full reaction SMILES (reactants>>products)
+        use_ml: Use ML-based detection if available (default: True)
+        use_taxonomy_smarts: Use taxonomy SMARTS matching (default: True)
         use_ml: Use ML-based detection if available (default: True)
         
     Returns:
@@ -783,6 +883,7 @@ def detect_reaction(reaction_smiles: str, use_ml: bool = True) -> Dict[str, Any]
                 "catalysts": [...],
                 "functional_groups": {...},
                 "rule_prediction": {...},
+                "taxonomy_smarts_prediction": {...},  # If taxonomy SMARTS matched
                 "ml_prediction": {...}  # If ML was used
             }
         }
@@ -806,6 +907,11 @@ def detect_reaction(reaction_smiles: str, use_ml: bool = True) -> Dict[str, Any]
         >>> result = detect_reaction("Brc1ccccc1.c1ccccc1B(O)O>>...", use_ml=False)
         >>> result["method"]
         "rule_based"
+        
+        >>> # Taxonomy SMARTS detection
+        >>> result = detect_reaction("Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
+        >>> result["method"]
+        "taxonomy_smarts"
     """
     engine = _DetectionEngine(reaction_smiles)
-    return engine.detect(use_ml=use_ml)
+    return engine.detect(use_ml=use_ml, use_taxonomy_smarts=use_taxonomy_smarts)
