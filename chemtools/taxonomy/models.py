@@ -43,6 +43,23 @@ class ReactionRoleRequirement:
 
 
 @dataclass(slots=True)
+class ReactionPattern:
+    """A SMARTS pattern for reaction matching."""
+    id: str
+    smarts: str
+    source: Optional[str] = None
+    scope: Optional[str] = None
+
+
+@dataclass(slots=True)
+class ReactionExample:
+    """Example reactants for a reaction type."""
+    reactant1: str
+    reactant2: Optional[str] = None
+    source: Optional[str] = None
+
+
+@dataclass(slots=True)
 class ReactionType:
     id: str
     category_id: str
@@ -51,6 +68,10 @@ class ReactionType:
     aliases: List[str] = field(default_factory=list)
     reactants: List[ReactionReactantRequirement] = field(default_factory=list)
     required_roles: List[ReactionRoleRequirement] = field(default_factory=list)
+    patterns: List[ReactionPattern] = field(default_factory=list)
+    examples: List[ReactionExample] = field(default_factory=list)
+    catalysts: List[str] = field(default_factory=list)
+    conditions: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     source_ids: List[str] = field(default_factory=list)
 

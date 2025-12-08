@@ -13,8 +13,9 @@ Internal:
 All outputs are validated against the unified taxonomy in chemtools/taxonomy/.
 """
 
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 import logging
+from pathlib import Path
 
 from .smiles import normalize_reaction
 from .router import (
@@ -39,6 +40,189 @@ from .analysis.reactions import (
 )
 
 logger = logging.getLogger(__name__)
+
+# ============================================================================
+# Taxonomy SMARTS Cache (loaded once)
+# ============================================================================
+_TAXONOMY_SMARTS_CACHE: Optional[Dict[str, Any]] = None
+
+
+def _load_taxonomy_smarts() -> Dict[str, Any]:
+    """
+    Load SMARTS patterns from reaction_types.json taxonomy file.
+    
+    Returns:
+        Dict mapping reaction_type_id to {smarts, name, category}
+    """
+    global _TAXONOMY_SMARTS_CACHE
+    
+    if _TAXONOMY_SMARTS_CACHE is not None:
+        return _TAXONOMY_SMARTS_CACHE
+    
+    import json
+    
+    taxonomy_path = Path(__file__).parent / "taxonomy" / "data" / "reaction_types.json"
+    
+    if not taxonomy_path.exists():
+        logger.warning(f"Taxonomy file not found: {taxonomy_path}")
+        _TAXONOMY_SMARTS_CACHE = {}
+        return _TAXONOMY_SMARTS_CACHE
+    
+    try:
+        with open(taxonomy_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        _TAXONOMY_SMARTS_CACHE = {}
+        for entry in data:
+            rxn_id = entry.get("id")
+            smarts = entry.get("smarts")
+            if rxn_id and smarts:
+                _TAXONOMY_SMARTS_CACHE[rxn_id] = {
+                    "smarts": smarts,
+                    "name": entry.get("name", rxn_id),
+                    "category": entry.get("category", ""),
+                    "aliases": entry.get("aliases", []),
+                }
+        
+        logger.debug(f"Loaded {len(_TAXONOMY_SMARTS_CACHE)} reaction SMARTS from taxonomy")
+        return _TAXONOMY_SMARTS_CACHE
+        
+    except Exception as e:
+        logger.warning(f"Failed to load taxonomy SMARTS: {e}")
+        _TAXONOMY_SMARTS_CACHE = {}
+        return _TAXONOMY_SMARTS_CACHE
+
+
+def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, float]]:
+    """
+    Detect reaction type by matching against taxonomy SMARTS patterns.
+    
+    This function uses the SMARTS patterns defined in reaction_types.json
+    to identify the reaction type. Each pattern is a reaction SMARTS that
+    describes the transformation.
+    
+    Args:
+        reaction_smiles: Full reaction SMILES (reactants>>products)
+        
+    Returns:
+        List of (reaction_type_id, name, confidence) tuples, sorted by confidence.
+        Empty list if no matches found.
+        
+    Example:
+        >>> matches = detect_by_taxonomy_smarts("Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
+        >>> matches[0]
+        ('suzuki_miyaura', 'Suzuki-Miyaura Coupling', 0.95)
+    """
+    try:
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+    except ImportError:
+        logger.warning("RDKit not available for taxonomy SMARTS matching")
+        return []
+    
+    taxonomy = _load_taxonomy_smarts()
+    if not taxonomy:
+        return []
+    
+    matches: List[Tuple[str, str, float]] = []
+    
+    # Parse reaction SMILES
+    try:
+        rxn_mol = AllChem.ReactionFromSmarts(reaction_smiles, useSmiles=True)
+        if rxn_mol is None:
+            # Try parsing as regular reaction
+            parts = reaction_smiles.split(">>")
+            if len(parts) != 2:
+                return []
+            reactants_smiles, products_smiles = parts
+    except Exception:
+        # Fallback: parse reactants and products separately
+        parts = reaction_smiles.split(">>")
+        if len(parts) != 2:
+            return []
+        reactants_smiles, products_smiles = parts
+    
+    # Parse reactants and products as molecules
+    try:
+        parts = reaction_smiles.split(">>")
+        if len(parts) != 2:
+            return []
+        
+        reactants_smiles, products_smiles = parts
+        
+        # Parse individual reactants
+        reactant_mols = []
+        for smi in reactants_smiles.split("."):
+            mol = Chem.MolFromSmiles(smi)
+            if mol:
+                reactant_mols.append(mol)
+        
+        # Parse products
+        product_mols = []
+        for smi in products_smiles.split("."):
+            mol = Chem.MolFromSmiles(smi)
+            if mol:
+                product_mols.append(mol)
+        
+        if not reactant_mols or not product_mols:
+            return []
+            
+    except Exception as e:
+        logger.debug(f"Failed to parse reaction: {e}")
+        return []
+    
+    # Try matching each taxonomy SMARTS
+    for rxn_id, info in taxonomy.items():
+        smarts = info["smarts"]
+        
+        try:
+            # Compile reaction SMARTS
+            rxn_pattern = AllChem.ReactionFromSmarts(smarts)
+            if rxn_pattern is None:
+                continue
+            
+            # Check if reactants match the pattern
+            # Try running the reaction on our reactants
+            try:
+                # Get number of reactant templates
+                num_reactant_templates = rxn_pattern.GetNumReactantTemplates()
+                
+                if num_reactant_templates == 0:
+                    continue
+                
+                # Simple check: see if reactant templates match our reactants
+                matched = True
+                for i in range(num_reactant_templates):
+                    template = rxn_pattern.GetReactantTemplate(i)
+                    template_matched = False
+                    for mol in reactant_mols:
+                        if mol.HasSubstructMatch(template):
+                            template_matched = True
+                            break
+                    if not template_matched:
+                        matched = False
+                        break
+                
+                if matched:
+                    # Calculate confidence based on specificity
+                    # More specific patterns (longer SMARTS) get higher confidence
+                    specificity = min(len(smarts) / 100.0, 1.0)
+                    confidence = 0.80 + (0.15 * specificity)
+                    
+                    matches.append((rxn_id, info["name"], confidence))
+                    
+            except Exception:
+                # Reaction running failed, try simple substructure matching
+                continue
+                
+        except Exception as e:
+            logger.debug(f"Failed to match SMARTS for {rxn_id}: {e}")
+            continue
+    
+    # Sort by confidence (highest first)
+    matches.sort(key=lambda x: x[2], reverse=True)
+    
+    return matches
 
 
 class _DetectionEngine:

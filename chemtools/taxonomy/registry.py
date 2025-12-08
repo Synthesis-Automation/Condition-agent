@@ -293,15 +293,34 @@ def _load_reaction_types(
 ) -> Dict[str, models.ReactionType]:
     reaction_types: Dict[str, models.ReactionType] = {}
     for entry in _load_json(path):
-        reactant_reqs = [
-            models.ReactionReactantRequirement(
-                reactant_type_id=item["reactant_type_id"],
-                stoichiometry=item.get("stoichiometry"),
-                notes=item.get("notes"),
-                original_tokens=item.get("original_tokens", []),
-            )
-            for item in entry.get("reactants", [])
-        ]
+        # Support multiple formats for reactants:
+        # - Simplified: ["ArX*", "RB*"]
+        # - Old object: [{"type": "ArX*"}, {"reactant_type_id": "ArB*"}]
+        reactant_reqs = []
+        for item in entry.get("reactants", []):
+            if isinstance(item, str):
+                # Ultra-simplified format: just a string
+                reactant_reqs.append(
+                    models.ReactionReactantRequirement(
+                        reactant_type_id=item,
+                        stoichiometry=None,
+                        notes=None,
+                        original_tokens=[],
+                    )
+                )
+            else:
+                # Old format: dict with type/reactant_type_id
+                type_id = item.get("type") or item.get("reactant_type_id", "")
+                tokens = item.get("aliases") or item.get("original_tokens", [])
+                reactant_reqs.append(
+                    models.ReactionReactantRequirement(
+                        reactant_type_id=type_id,
+                        stoichiometry=item.get("stoichiometry"),
+                        notes=item.get("notes"),
+                        original_tokens=tokens,
+                    )
+                )
+        
         role_reqs = [
             models.ReactionRoleRequirement(
                 role_id=item["role_id"],
@@ -311,14 +330,89 @@ def _load_reaction_types(
             )
             for item in entry.get("required_roles", [])
         ]
+        
+        # Load SMARTS - support multiple formats:
+        # - Ultra-simplified: top-level "smarts" string
+        # - Old format: "patterns" array with objects
+        smarts = entry.get("smarts", "")
+        patterns = []
+        if entry.get("patterns"):
+            for p in entry["patterns"]:
+                pat_smarts = p.get("smarts") or p.get("smirks", "")
+                pattern_id = p.get("id") or p.get("pattern_id", "")
+                patterns.append(
+                    models.ReactionPattern(
+                        id=pattern_id,
+                        smarts=pat_smarts,
+                        source=p.get("source"),
+                        scope=p.get("scope"),
+                    )
+                )
+        elif smarts:
+            # Create a single pattern from top-level smarts
+            patterns.append(
+                models.ReactionPattern(
+                    id=f"{entry['id']}_pattern",
+                    smarts=smarts,
+                    source=None,
+                    scope=None,
+                )
+            )
+        
+        # Load examples - support multiple formats:
+        # - Ultra-simplified: "reference_reactions" list of full reaction SMILES (reactants>>product)
+        # - Old format: "examples" or "example_reactants" with objects
+        examples = []
+        if entry.get("reference_reactions"):
+            # Ultra-simplified format: list of full reaction SMILES
+            for rxn in entry["reference_reactions"]:
+                # Store full reaction SMILES as reactant1, product info extracted if needed
+                examples.append(
+                    models.ReactionExample(
+                        reactant1=rxn,  # Full reaction SMILES
+                        reactant2=None,
+                        source=None,
+                    )
+                )
+        else:
+            # Old format: examples or example_reactants
+            example_data = entry.get("examples") or entry.get("example_reactants", [])
+            for e in example_data:
+                r1 = e.get("reactant1") or e.get("educt1_smiles", "")
+                r2 = e.get("reactant2") or e.get("educt2_smiles")
+                examples.append(
+                    models.ReactionExample(
+                        reactant1=r1,
+                        reactant2=r2,
+                        source=e.get("source"),
+                    )
+                )
+        
+        # Support both old format (category_id) and new format (category)
+        category_id = entry.get("category") or entry.get("category_id", "")
+        
+        # Catalysts: new format has top-level, old format has in metadata
+        catalysts = entry.get("catalysts", [])
+        if not catalysts and entry.get("metadata"):
+            catalysts = entry["metadata"].get("typical_catalysts", [])
+        
+        # Conditions: new format has top-level, old format has in metadata
+        conditions = entry.get("conditions")
+        if not conditions and entry.get("metadata"):
+            conditions = entry["metadata"].get("typical_conditions")
+        
         obj = models.ReactionType(
             id=entry["id"],
-            category_id=entry["category_id"],
+            category_id=category_id,
             name=entry.get("name", entry["id"]),
             description=entry.get("description"),
             aliases=entry.get("aliases", []),
             reactants=reactant_reqs,
             required_roles=role_reqs,
+            patterns=patterns,
+            examples=examples,
+            catalysts=catalysts,
+            conditions=conditions,
             metadata=entry.get("metadata") or {},
             source_ids=entry.get("source_ids", []),
         )
