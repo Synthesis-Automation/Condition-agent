@@ -41,7 +41,7 @@ See CHEMTOOLS_QUICKSTART.md for more examples.
 """
 
 from .context import ChemTools, chem, ResourceConfig
-from .detection import detect_reaction
+from .reaction_type_detection import detect_reaction
 from ._atom_mapping import (
     add_atom_mapping,
     analyze_bond_changes,

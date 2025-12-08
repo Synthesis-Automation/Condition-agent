@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
 
-from chemtools.detection import detect_reaction  # New unified API
+from chemtools.reaction_type_detection import detect_reaction  # New unified API
 
 from .base import SchemaStamped, pick_first, validate_payload
 

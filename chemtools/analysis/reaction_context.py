@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional
 from .reactants import ReactantMatch, iter_reactant_matches
 from .smiles import normalize_reaction
 from ._registry import get_registry
-from ..detection import detect_reaction  # New unified API
+from ..reaction_type_detection import detect_reaction  # New unified API
 
 
 @dataclass
