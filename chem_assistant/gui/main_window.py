@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import html
-import json
 import re
 import shlex
 import tempfile
@@ -32,11 +31,6 @@ from PyQt6.QtGui import QFont, QPixmap
 from langchain_core.messages import BaseMessage
 
 from chem_assistant.chemtools_agent import ChemToolsAgent
-from chem_assistant.chemtools_wrapper import (
-    get_tool_descriptions,
-    clear_recommendation_cache,
-    recommendation_cache_stats,
-)
 from chem_assistant.constraint_parser import (
     ConstraintSpec,
     format_constraints_for_prompt,
@@ -44,9 +38,6 @@ from chem_assistant.constraint_parser import (
 from chem_assistant.gui.dialogs import (
     ConstraintDialog,
     LLMConfigDialog,
-    RuleBuilderAutofillDialog,
-    RuleBuilderDialog,
-    ProtocolDraftDialog,
 )
 from chemtools.visualization import render_molecule_image, render_reaction_image
 
@@ -54,9 +45,6 @@ IMAGE_MARKUP = re.compile(
     r"\[\[(reaction|molecule)_image:(.+?)\]\]", re.IGNORECASE | re.DOTALL
 )
 MARKDOWN_IMAGE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
-PROTOCOL_PROMPT = re.compile(
-    r"\[\[protocol_draft_request(?::(.*?))?\]\]", re.IGNORECASE | re.DOTALL
-)
 IMAGE_COMMAND_PATTERNS = [
     r"^(?:/)?image\s+(reaction|molecule|compound)\s*[:=]\s*(.+)$",
     r"^(?:/)?image\s+(?:for\s+)?(reaction|molecule|compound)\s*[:=]\s*(.+)$",
@@ -253,29 +241,9 @@ class ChemAssistantWindow(QMainWindow):
         constraint_btn.clicked.connect(self.manage_constraints)
         button_row.addWidget(constraint_btn)
 
-        cache_btn = QPushButton("Cache Status")
-        cache_btn.clicked.connect(self.show_cache_stats)
-        button_row.addWidget(cache_btn)
-
         llm_btn = QPushButton("LLM Mode")
         llm_btn.clicked.connect(self.configure_llm_mode)
         button_row.addWidget(llm_btn)
-
-        cache_clear_btn = QPushButton("Clear Cache")
-        cache_clear_btn.clicked.connect(self.clear_cache)
-        button_row.addWidget(cache_clear_btn)
-
-        builder_btn = QPushButton("Rule Builder Editor")
-        builder_btn.clicked.connect(self.open_rule_builder_dialog)
-        button_row.addWidget(builder_btn)
-
-        autofill_btn = QPushButton("Autofill Draft")
-        autofill_btn.clicked.connect(self.open_autofill_dialog)
-        button_row.addWidget(autofill_btn)
-
-        protocol_btn = QPushButton("Protocol Draft")
-        protocol_btn.clicked.connect(self.open_protocol_draft_dialog)
-        button_row.addWidget(protocol_btn)
 
         button_row.addStretch()
         central_layout.addLayout(button_row)
@@ -588,18 +556,7 @@ class ChemAssistantWindow(QMainWindow):
             return match.group(0)
 
         interim = MARKDOWN_IMAGE.sub(markdown_replacer, interim)
-        return PROTOCOL_PROMPT.sub(self._handle_protocol_prompt_directive, interim)
-
-    def _handle_protocol_prompt_directive(self, match: re.Match[str]) -> str:
-        raw_payload = (match.group(1) or "").strip()
-        data: Optional[dict] = None
-        if raw_payload:
-            try:
-                data = json.loads(raw_payload)
-            except json.JSONDecodeError:
-                data = {"procedure_text": raw_payload}
-        QTimer.singleShot(0, lambda: self.open_protocol_draft_dialog(data))
-        return "[protocol draft dialog opened]"
+        return interim
 
     def _extract_image_request(self, content: str) -> Optional[Tuple[str, str]]:
         normalized = content.strip()
@@ -754,7 +711,7 @@ class ChemAssistantWindow(QMainWindow):
             pass
 
     # ------------------------------------------------------------------ #
-    # Constraints / cache / tools
+    # Constraints
     # ------------------------------------------------------------------ #
 
     def manage_constraints(self) -> None:
@@ -775,79 +732,6 @@ class ChemAssistantWindow(QMainWindow):
         prompt = format_constraints_for_prompt(self.constraint_spec)
         if prompt:
             self.append_log(f"Constraint prompt: {prompt}")
-
-    def show_cache_stats(self) -> None:
-        stats = recommendation_cache_stats()
-        self.append_log(
-            f"Cache status -> entries: {stats['entries']} | hits: {stats['hits']}"
-        )
-        QMessageBox.information(
-            self,
-            "Cache status",
-            "\n".join(f"{k}: {v}" for k, v in stats.items()),
-        )
-
-    def clear_cache(self) -> None:
-        clear_recommendation_cache()
-        self.append_log("Recommendation cache cleared.")
-        QMessageBox.information(self, "Cache", "Recommendation cache cleared.")
-
-    def show_tool_summary(self) -> None:
-        tools = get_tool_descriptions()
-        lines = [f"{entry['name']}: {entry['description']}" for entry in tools]
-        QMessageBox.information(self, "Available tools", "\n\n".join(lines))
-
-    # ------------------------------------------------------------------ #
-    # Builder dialogs
-    # ------------------------------------------------------------------ #
-
-    def open_rule_builder_dialog(self, initial_data: Optional[dict] = None) -> None:
-        dialog = RuleBuilderDialog(self, initial_data=initial_data)
-        dialog.exec()
-
-    def open_autofill_dialog(self) -> None:
-        dialog = RuleBuilderAutofillDialog(self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:  # type: ignore[attr-defined]
-            if dialog.accepted_data:
-                QMessageBox.information(
-                    self,
-                    "Autofill draft ready",
-                    "Opening draft in editor...",
-                )
-                self.open_rule_builder_dialog(dialog.accepted_data)
-
-    def open_protocol_draft_dialog(self, initial_data: Optional[dict] = None) -> None:
-        dialog = ProtocolDraftDialog(self, initial_data=initial_data)
-        if dialog.exec() != QDialog.DialogCode.Accepted:  # type: ignore[attr-defined]
-            return
-        payload = dialog.accepted_payload or {}
-        draft = payload.get("draft") or {}
-        metadata = draft.get("metadata") or {}
-        name = metadata.get("name") or metadata.get("id") or "protocol draft"
-        issues = payload.get("issues") or []
-        summary = f"Protocol draft ready: {name}."
-        if issues:
-            summary += f" Outstanding issues: {len(issues)} (see preview for details)."
-        self.append_chat("System", summary)
-        if payload.get("llm_used"):
-            meta = payload.get("llm_metadata") or {}
-            self.append_chat(
-                "System",
-                "LLM extraction used "
-                f"({meta.get('provider') or 'provider?'} / {meta.get('model') or 'model?'}).",
-            )
-        saved_path = payload.get("saved_path")
-        if saved_path:
-            self.append_chat("System", f"Draft saved to {saved_path}. Rebuild the protocol index to use it.")
-        addition_sequence = payload.get("addition_sequence") or []
-        if addition_sequence:
-            first_steps = ", ".join(
-                step.get("material", step.get("action", "step")).strip()
-                for step in addition_sequence[:3]
-                if step.get("material") or step.get("action")
-            )
-            if first_steps:
-                self.append_chat("System", f"First addition steps: {first_steps}")
 
     # ------------------------------------------------------------------ #
     # Spinner helpers
