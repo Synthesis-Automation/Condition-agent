@@ -1014,6 +1014,7 @@
       "detect": {
         "smarts_any": [
           "n1cnccc1",
+          "n1cnccn1",
           "n1ccncc1"
         ]
       },
@@ -1845,6 +1846,7 @@
       "detect": {
         "smarts_any": [
           "n1cnccc1",
+          "n1cnccn1",
           "n1ccncc1"
         ]
       },

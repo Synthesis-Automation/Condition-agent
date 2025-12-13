@@ -18,6 +18,7 @@ _REACTANT_TYPES_FILE = "reactant_types.json"
 _REAGENT_ROLES_FILE = "reagent_roles.json"
 _REAGENT_FAMILIES_FILE = "reagent_families.json"
 _ALIASES_FILE = "aliases.json"
+_CHEM_TERMS_FILE = "chem_terms.json"
 
 
 class TaxonomyRegistry:
@@ -36,6 +37,7 @@ class TaxonomyRegistry:
         reagent_roles: Dict[str, models.ReagentRole],
         reagent_families: Dict[str, models.ReagentFamily],
         aliases: Dict[str, models.AliasRecord],
+        chem_terms: Dict[str, models.ChemTerm],
     ) -> None:
         self.root = root
         self.manifest = manifest
@@ -45,6 +47,7 @@ class TaxonomyRegistry:
         self.reagent_roles = reagent_roles
         self.reagent_families = reagent_families
         self.aliases = aliases
+        self.chem_terms = chem_terms
 
     # ------------------------------------------------------------------ #
     # Construction
@@ -70,6 +73,7 @@ class TaxonomyRegistry:
             reagent_roles=reagent_roles,
         )
         aliases = _load_aliases(root / _ALIASES_FILE)
+        chem_terms = _load_chem_terms(root / _CHEM_TERMS_FILE)
 
         registry = cls(
             root=root,
@@ -80,6 +84,7 @@ class TaxonomyRegistry:
             reagent_roles=reagent_roles,
             reagent_families=reagent_families,
             aliases=aliases,
+            chem_terms=chem_terms,
         )
         registry._validate_integrity()
         return registry
@@ -126,6 +131,12 @@ class TaxonomyRegistry:
     def resolve_alias(self, alias: str) -> Optional[models.AliasRecord]:
         return self.aliases.get(alias.lower())
 
+    def get_chem_term(self, term_id: str) -> Optional[models.ChemTerm]:
+        return self.chem_terms.get(term_id)
+
+    def iter_chem_terms(self) -> Iterable[models.ChemTerm]:
+        return self.chem_terms.values()
+
     # ------------------------------------------------------------------ #
     # Export helpers
     # ------------------------------------------------------------------ #
@@ -138,6 +149,7 @@ class TaxonomyRegistry:
             "reactant_types": [asdict(rt) for rt in self.reactant_types.values()],
             "reagent_roles": [asdict(rr) for rr in self.reagent_roles.values()],
             "reagent_families": [asdict(rf) for rf in self.reagent_families.values()],
+            "chem_terms": [asdict(term) for term in self.chem_terms.values()],
             "aliases": [asdict(alias) for alias in self.aliases.values()],
         }
 
@@ -183,6 +195,8 @@ class TaxonomyRegistry:
                 errors.append(f"Alias '{alias.alias}' targets unknown reagent role '{alias.entity_id}'")
             elif alias.entity_type == "reagent_family" and alias.entity_id not in self.reagent_families:
                 errors.append(f"Alias '{alias.alias}' targets unknown reagent family '{alias.entity_id}'")
+            elif alias.entity_type == "chem_term" and alias.entity_id not in self.chem_terms:
+                errors.append(f"Alias '{alias.alias}' targets unknown chem term '{alias.entity_id}'")
 
         if errors:
             raise ValueError("Taxonomy integrity check failed:\n- " + "\n- ".join(errors))
@@ -207,6 +221,44 @@ def _load_manifest(path: Path) -> models.TaxonomyManifest:
         source=payload.get("source"),
         notes=payload.get("notes"),
     )
+
+
+def _load_chem_terms(path: Path) -> Dict[str, models.ChemTerm]:
+    """
+    Load optional chemistry term definitions.
+
+    This file is intentionally optional to keep the unified taxonomy compatible
+    with older generated payloads.
+    """
+    if not path.exists():
+        return {}
+    payload = _load_json(path)
+    if not isinstance(payload, dict):
+        raise ValueError(f"chem_terms payload must be an object: {path}")
+    raw_terms = payload.get("terms") or []
+    if not isinstance(raw_terms, list):
+        raise ValueError(f"chem_terms.terms must be a list: {path}")
+
+    terms: Dict[str, models.ChemTerm] = {}
+    for entry in raw_terms:
+        if not isinstance(entry, dict):
+            continue
+        term_id = entry.get("id")
+        if not term_id:
+            continue
+        obj = models.ChemTerm(
+            id=str(term_id),
+            name=entry.get("name", str(term_id)),
+            kind=entry.get("kind", "unknown"),
+            definition=entry.get("definition"),
+            aliases=list(entry.get("aliases") or []),
+            rule=entry.get("rule"),
+            metadata=entry.get("metadata") or {},
+            examples_pos=list(entry.get("examples_pos") or []),
+            examples_neg=list(entry.get("examples_neg") or []),
+        )
+        terms[obj.id] = obj
+    return terms
 
 
 def _load_reaction_categories(path: Path) -> Dict[str, models.ReactionCategory]:

@@ -1,0 +1,60 @@
+{
+  "schema_version": "0.1.0",
+  "description": "Data-driven chemistry terms expressed as boolean rules over calculable feature tokens.",
+  "terms": [
+    {
+      "id": "electron_poor_arene",
+      "name": "electron-poor arene",
+      "kind": "electronic",
+      "aliases": [
+        "electron poor arene",
+        "electron-deficient arene",
+        "electron deficient arene"
+      ],
+      "definition": "Arene bearing strong electron-withdrawing substituent(s).",
+      "rule": "aromatic_present AND strong_ewg_present",
+      "examples_pos": [
+        "O=[N+]([O-])c1ccccc1"
+      ],
+      "examples_neg": [
+        "COc1ccccc1"
+      ]
+    },
+    {
+      "id": "electron_poor_aldehyde",
+      "name": "electron-poor aldehyde",
+      "kind": "electronic",
+      "aliases": [
+        "electron poor aldehyde",
+        "electron-deficient aldehyde",
+        "electron deficient aldehyde"
+      ],
+      "definition": "Aldehyde with adjacent/aryl EWG patterns that typically increase electrophilicity.",
+      "rule": "aldehyde_present AND strong_ewg_present",
+      "examples_pos": [
+        "O=CC1=CC=C([N+](=O)[O-])C=C1"
+      ],
+      "examples_neg": [
+        "CCCC=O"
+      ]
+    },
+    {
+      "id": "sterically_bulky_carbonyl",
+      "name": "sterically bulky carbonyl",
+      "kind": "steric",
+      "aliases": [
+        "bulky carbonyl",
+        "hindered carbonyl",
+        "sterically hindered carbonyl"
+      ],
+      "definition": "Carbonyl in a locally crowded environment (proxy rules; scorer-based refinement recommended).",
+      "rule": "carbonyl_present AND (tert_butyl_present OR quaternary_carbon_present OR ortho_substitution_present)",
+      "examples_pos": [
+        "CC(C)(C)C(=O)C"
+      ],
+      "examples_neg": [
+        "CC(=O)C"
+      ]
+    }
+  ]
+}

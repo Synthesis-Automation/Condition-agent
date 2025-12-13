@@ -25,6 +25,7 @@ def validate(root: Optional[Path] = None) -> None:
     print(f"  Reactant types: {len(list(registry.iter_reactant_types()))}")
     print(f"  Reagent roles: {len(list(registry.iter_reagent_roles()))}")
     print(f"  Reagent families: {len(list(registry.iter_reagent_families()))}")
+    print(f"  Chem terms: {len(list(registry.iter_chem_terms()))}")
     print(f"  Aliases: {len(registry.aliases)}")
 
 

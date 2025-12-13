@@ -130,3 +130,23 @@ class AliasRecord:
     entity_id: str
     source: Optional[str] = None
     notes: Optional[str] = None
+
+
+@dataclass(slots=True)
+class ChemTerm:
+    """
+    A chemistry term defined via deterministic rules over feature tokens.
+
+    Terms are intended to capture fuzzy chemist language (e.g., "electron-poor",
+    "sterically bulky") in a maintainable, data-driven way.
+    """
+
+    id: str
+    name: str
+    kind: str
+    definition: Optional[str] = None
+    aliases: List[str] = field(default_factory=list)
+    rule: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    examples_pos: List[str] = field(default_factory=list)
+    examples_neg: List[str] = field(default_factory=list)

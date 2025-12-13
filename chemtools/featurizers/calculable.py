@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
 from ..util.smarts_cache import compile_smarts as _compile_smarts
+from ..util.boolean_expr import evaluate as _eval_bool_expr
 
 # Path to the feature specification JSON (centralized in taxonomy/data)
 _SPEC_PATH = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "calculable_features.json"
@@ -54,6 +55,58 @@ def get_feature_spec() -> Dict[str, Any]:
         derived_shortcuts.
     """
     return _load_feature_spec()
+
+
+@lru_cache(maxsize=1)
+def _get_derived_rules() -> List[tuple[str, str]]:
+    """
+    Collect all derived boolean rules from the feature spec.
+
+    The spec currently supports two encodings:
+      - `features[].derive` or `features[].derived`
+      - `derived_shortcuts[].derive`
+
+    This helper normalizes both into a single ordered list.
+    """
+    spec = _load_feature_spec()
+    rules: List[tuple[str, str]] = []
+
+    for entry in spec.get("features", []):
+        token = entry.get("token")
+        if not token:
+            continue
+        expr = entry.get("derive") or entry.get("derived")
+        if isinstance(expr, str) and expr.strip():
+            rules.append((str(token), expr.strip()))
+
+    for entry in spec.get("derived_shortcuts", []):
+        token = entry.get("token")
+        expr = entry.get("derive")
+        if not token:
+            continue
+        if isinstance(expr, str) and expr.strip():
+            rules.append((str(token), expr.strip()))
+
+    return rules
+
+
+def _apply_derived_rules(result: Dict[str, Any], rules: List[tuple[str, str]]) -> None:
+    """
+    Apply derived boolean rules in a small fixed-point loop.
+
+    Some derived tokens depend on other derived tokens. Instead of relying on
+    ordering in JSON, iterate until values stabilize (or a small cap).
+    """
+    max_passes = 8
+    for _ in range(max_passes):
+        changed = False
+        for token, expr in rules:
+            value = _eval_bool_expr(expr, result)
+            if result.get(token) is not value:
+                result[token] = value
+                changed = True
+        if not changed:
+            return
 
 
 # ============================================================================
@@ -424,104 +477,7 @@ def _evaluate_derived_feature(derive_expr: str, base_features: Dict[str, Any]) -
     Returns:
         Boolean result of the expression
     """
-    import re
-    
-    # Normalize expression
-    expr = derive_expr.strip()
-    
-    # Handle comparisons (>=, <=, >, <, ==, !=)
-    comparison_pattern = r'(\w+)\s*(>=|<=|>|<|==|!=)\s*(\d+)'
-    
-    def evaluate_comparison(match):
-        """Evaluate a comparison and return 'True' or 'False' string."""
-        feature = match.group(1)
-        operator = match.group(2)
-        value = int(match.group(3))
-        feature_value = base_features.get(feature, 0)
-        
-        if operator == '>=':
-            result = feature_value >= value
-        elif operator == '<=':
-            result = feature_value <= value
-        elif operator == '>':
-            result = feature_value > value
-        elif operator == '<':
-            result = feature_value < value
-        elif operator == '==':
-            result = feature_value == value
-        elif operator == '!=':
-            result = feature_value != value
-        else:
-            result = False
-        
-        return 'True' if result else 'False'
-    
-    # Replace all comparisons with True/False
-    expr = re.sub(comparison_pattern, evaluate_comparison, expr)
-    
-    # Handle parentheses recursively - but only expression grouping parens,
-    # not parentheses that are part of token names (e.g., ArB(OH)2_reactant)
-    # Strategy: Look for '(' preceded by whitespace or start of string, 
-    # or '(' at position 0, indicating expression grouping.
-    # Token-name parens will always have a word character before them.
-    max_iterations = 100  # Prevent infinite loops
-    iteration = 0
-    while iteration < max_iterations:
-        iteration += 1
-        # Find parentheses that are expression grouping (preceded by space, operator, or start)
-        # Pattern: (?:^|[\s]) means start of string or whitespace
-        match = re.search(r'(\s|^)\(([^()]+)\)', expr)
-        if not match:
-            break
-        
-        # Extract and evaluate the inner expression
-        prefix = match.group(1) if match.group(1) else ''
-        inner_expr = match.group(2)
-        inner_result = _evaluate_derived_feature(inner_expr, base_features)
-        
-        # Replace the matched portion
-        expr = expr[:match.start()] + prefix + str(inner_result) + expr[match.end():]
-    
-    # Replace True/False strings with actual booleans
-    expr = expr.replace('True', 'true_token').replace('False', 'false_token')
-    
-    # Split on OR first (lower precedence)
-    if ' OR ' in expr:
-        or_parts = [part.strip() for part in expr.split(' OR ')]
-        result = False
-        for part in or_parts:
-            part_result = _evaluate_derived_feature(part, base_features)
-            result = result or part_result
-            if result:  # Short-circuit on true
-                return True
-        return result
-    
-    # Split on AND
-    and_parts = [part.strip() for part in expr.split(' AND ')]
-    
-    result = True
-    for part in and_parts:
-        # Handle boolean tokens from parentheses
-        if part == 'true_token':
-            continue
-        if part == 'false_token':
-            return False
-            
-        # Check for NOT
-        if part.startswith('NOT '):
-            feature_name = part[4:].strip()
-            feature_value = base_features.get(feature_name, False)
-            result = result and (not feature_value)
-        else:
-            feature_name = part
-            feature_value = base_features.get(feature_name, False)
-            result = result and feature_value
-        
-        # Short-circuit on false
-        if not result:
-            return False
-    
-    return result
+    return _eval_bool_expr(derive_expr, base_features)
 
 
 
@@ -564,8 +520,8 @@ def detect_all_features(smiles: str) -> Dict[str, Any]:
             token = feature.get("token")
             ftype = feature.get("type", "bool")
             result[token] = False if ftype == "bool" else 0
-        for derived in spec.get("derived_shortcuts", []):
-            result[derived.get("token")] = False
+        for token, _expr in _get_derived_rules():
+            result[token] = False
         return result
     
     mol = parse_smiles(smiles)
@@ -577,8 +533,8 @@ def detect_all_features(smiles: str) -> Dict[str, Any]:
             token = feature.get("token")
             ftype = feature.get("type", "bool")
             result[token] = False if ftype == "bool" else 0
-        for derived in spec.get("derived_shortcuts", []):
-            result[derived.get("token")] = False
+        for token, _expr in _get_derived_rules():
+            result[token] = False
         return result
     
     spec = _load_feature_spec()
@@ -611,13 +567,10 @@ def detect_all_features(smiles: str) -> Dict[str, Any]:
         else:
             # Unknown detection method - return safe default
             result[token] = False if ftype == "bool" else 0
-    
-    # Process derived features
-    for derived in spec.get("derived_shortcuts", []):
-        token = derived.get("token")
-        derive_expr = derived.get("derive", "")
-        result[token] = _evaluate_derived_feature(derive_expr, result)
-    
+
+    # Process all derived features (both features[].derive and derived_shortcuts[]).
+    _apply_derived_rules(result, _get_derived_rules())
+
     return result
 
 

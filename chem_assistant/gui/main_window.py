@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import json
 import re
+import shlex
 import tempfile
 import traceback
 from pathlib import Path
@@ -171,23 +172,26 @@ class ImagePreviewWindow(QDialog):
 class ChemAssistantWindow(QMainWindow):
     """Main application window."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, startup_message: str | None = None) -> None:
         super().__init__()
         self.setWindowTitle("ChemTools Assistant")
         self.resize(1200, 800)
         self._apply_default_font()
 
-        self.agent = ChemToolsAgent(verbose=True)
+        self.agent: Optional[ChemToolsAgent] = None
         self.history: List[BaseMessage] = []
         self.constraint_spec = ConstraintSpec()
         self.constraint_text = ""
         self.current_image_path: Optional[Path] = None
         self._image_windows: List[ImagePreviewWindow] = []
+        self._startup_message = (startup_message or "").strip()
 
         self.thread_pool = QThreadPool()
         self._build_ui()
         self._update_constraint_summary()
-        self.statusBar().showMessage("Ready")
+        self.statusBar().showMessage(self._startup_message or "Ready")
+        if self._startup_message:
+            self.append_log(self._startup_message)
 
     # ------------------------------------------------------------------ #
     # Styling helpers
@@ -257,6 +261,10 @@ class ChemAssistantWindow(QMainWindow):
         tools_btn.clicked.connect(self.show_tool_summary)
         button_row.addWidget(tools_btn)
 
+        taxonomy_btn = QPushButton("Taxonomy Status")
+        taxonomy_btn.clicked.connect(self.show_taxonomy_status)
+        button_row.addWidget(taxonomy_btn)
+
         builder_btn = QPushButton("Rule Builder Editor")
         builder_btn.clicked.connect(self.open_rule_builder_dialog)
         button_row.addWidget(builder_btn)
@@ -309,12 +317,15 @@ class ChemAssistantWindow(QMainWindow):
         if self.handle_local_command(content):
             return
         self.append_chat("You", content)
+        if not self._ensure_agent():
+            self.append_log("Agent unavailable; use local commands.")
+            return
         self.statusBar().showMessage("Agent is thinking... |")
         self.set_input_enabled(False)
         self.start_spinner("Agent is thinking")
 
         worker = Worker(
-            self.agent.chat,
+            self.agent.chat,  # type: ignore[union-attr]
             content,
             self.history,
             15,
@@ -329,12 +340,102 @@ class ChemAssistantWindow(QMainWindow):
         command_text = content.strip()
         if not command_text:
             return False
+
+        parsed_tokens = None
+        if command_text.startswith("/"):
+            try:
+                parsed_tokens = shlex.split(command_text)
+            except ValueError:
+                parsed_tokens = [command_text]
+        if parsed_tokens:
+            cmd = parsed_tokens[0].lstrip("/").lower()
+            args = parsed_tokens[1:]
+            if cmd in {"taxonomy", "tax"}:
+                self._handle_taxonomy_command()
+                return True
+            if cmd in {"terms", "term"}:
+                self._handle_terms_command(cmd, args)
+                return True
+
         parsed = self._extract_image_request(command_text)
         if parsed:
             target, smiles = parsed
             self._execute_image_request(target, smiles, log_to_chat=True)
             return True
         return False
+
+    def _ensure_agent(self) -> bool:
+        if self.agent is not None:
+            return True
+        try:
+            self.agent = ChemToolsAgent(verbose=True)
+        except Exception as exc:  # pragma: no cover - UI feedback
+            self.append_chat(
+                "System",
+                "LLM agent is not available.\n"
+                f"Reason: {exc}\n\n"
+                "You can still use local commands:\n"
+                "- `/taxonomy` (show taxonomy status)\n"
+                "- `/terms <SMILES>` (evaluate chemistry terms)\n"
+                "- `image <reaction|molecule> <SMILES>`",
+            )
+            return False
+        return True
+
+    def show_taxonomy_status(self) -> None:
+        self._handle_taxonomy_command()
+
+    def _handle_taxonomy_command(self) -> None:
+        try:
+            from chemtools.taxonomy import load_registry
+
+            registry = load_registry()
+            term_count = len(list(registry.iter_chem_terms()))
+            self.append_chat(
+                "System",
+                "Taxonomy loaded.\n"
+                f"- taxonomy_version: {registry.manifest.taxonomy_version}\n"
+                f"- schema_version: {registry.manifest.schema_version}\n"
+                f"- chem_terms: {term_count}",
+            )
+        except Exception as exc:  # pragma: no cover - UI feedback
+            self.append_chat("System", f"Taxonomy load failed: {exc}")
+
+    def _handle_terms_command(self, cmd: str, args: List[str]) -> None:
+        if cmd == "term":
+            if len(args) < 2:
+                self.append_chat("System", "Usage: `/term <term_id> <SMILES>`")
+                return
+            term_ids = [args[0]]
+            smiles = " ".join(args[1:]).strip()
+        else:
+            if not args:
+                self.append_chat("System", "Usage: `/terms <SMILES>`")
+                return
+            term_ids = None
+            smiles = " ".join(args).strip()
+
+        try:
+            from chemtools.taxonomy import load_registry
+            from chemtools.taxonomy.terms import evaluate_terms_from_smiles
+
+            registry = load_registry()
+            results = evaluate_terms_from_smiles(smiles, term_ids=term_ids)
+            hits = [term_id for term_id, ok in results.items() if ok]
+            if not hits:
+                self.append_chat("System", "No chem-term matches.")
+                return
+
+            lines = []
+            for term_id in hits:
+                term = registry.get_chem_term(term_id)
+                if term is None:
+                    lines.append(f"- {term_id}")
+                else:
+                    lines.append(f"- {term_id}: {term.name}")
+            self.append_chat("System", "Chem-term matches:\n" + "\n".join(lines))
+        except Exception as exc:  # pragma: no cover - UI feedback
+            self.append_chat("System", f"Term evaluation failed: {exc}")
 
     def handle_image_command(self, command: str) -> None:
         parsed = self._extract_image_request(command)

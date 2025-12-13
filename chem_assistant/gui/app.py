@@ -26,7 +26,22 @@ except ImportError:
 def main() -> None:
     """Launch the Qt application."""
     app = QApplication(sys.argv)
-    window = ChemAssistantWindow()
+
+    startup_message = None
+    try:
+        from chemtools.taxonomy import load_registry
+
+        registry = load_registry()
+        term_count = len(list(registry.iter_chem_terms()))
+        startup_message = (
+            f"Taxonomy v{registry.manifest.taxonomy_version} "
+            f"(schema {registry.manifest.schema_version}) | "
+            f"chem terms: {term_count}"
+        )
+    except Exception as exc:
+        startup_message = f"Taxonomy unavailable: {exc}"
+
+    window = ChemAssistantWindow(startup_message=startup_message)
     window.show()
     sys.exit(app.exec())
 
