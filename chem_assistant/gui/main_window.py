@@ -265,14 +265,6 @@ class ChemAssistantWindow(QMainWindow):
         cache_clear_btn.clicked.connect(self.clear_cache)
         button_row.addWidget(cache_clear_btn)
 
-        tools_btn = QPushButton("List Tools")
-        tools_btn.clicked.connect(self.show_tool_summary)
-        button_row.addWidget(tools_btn)
-
-        taxonomy_btn = QPushButton("Taxonomy Status")
-        taxonomy_btn.clicked.connect(self.show_taxonomy_status)
-        button_row.addWidget(taxonomy_btn)
-
         builder_btn = QPushButton("Rule Builder Editor")
         builder_btn.clicked.connect(self.open_rule_builder_dialog)
         button_row.addWidget(builder_btn)

@@ -21,9 +21,11 @@ Usage:
 """
 
 import os
-from typing import Callable, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Union
+
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.tools import BaseTool, StructuredTool
 from dotenv import load_dotenv
 
 from .chemtools_wrapper import CHEMTOOLS_TOOLS
@@ -127,20 +129,28 @@ You have access to the following tools:
 3. **detect_reaction_family_tool**: Identify reaction type (Suzuki, Buchwald, etc.)
 4. **classify_reactant_tool**: Classify reactant types (aryl halide, amine, etc.)
 5. **get_functional_groups_tool**: Detect functional groups in molecules
-6. **recommend_conditions_tool**: Get ML-based condition recommendations
-7. **rule_based_conditions_tool**: Deterministic rule-engine guidance with feature-level reasoning
-8. **enhanced_cross_family_recommend_tool**: Cross-family precedent search with mechanism-aware filtering
-9. **search_precedents_tool**: Find similar precedent reactions
-10. **reaction_dataset_analytics_tool**: Summarize reaction dataset composition, yields, and popular reagents
-11. **find_reagent_tool**: Look up reagent information from database
-  12. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
-  13. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
-  14. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
-  15. **rule_builder_autofill_tool**: Convert protocol text into draft rule databases (LLM-assisted + deterministic validation)
-  16. **hte_recommend_tool**: Get data-driven condition recommendations from 66K+ HTE experiments with catalyst/reaction filtering
-  17. **hte_analytics_tool**: Explore HTE database reactant pairs, catalysts, and success patterns
-  18. **hte_conditions_tool**: Get detailed experimental conditions for specific substrate combinations
-  19. **hte_screening_set_tool**: Generate diverse condition sets for HTE screening plates (up to 24 conditions for parallel testing)
+6. **calculable_features_tool**: Evaluate curated calculable feature library for a molecule
+7. **molpipeline_featurize_tool**: Generate molecular features (optional MolPipeline vectors)
+8. **analyze_bond_changes_tool**: Analyze bond breaking/formation in reactions
+9. **analyze_mechanism_tool**: Identify mechanism archetype + narrative evidence
+10. **reaction_similarity_tool**: Compare two reactions using DRFP similarity
+11. **recommend_conditions_tool**: Get ML-based condition recommendations
+12. **rule_based_conditions_tool**: Deterministic rule-engine guidance with feature-level reasoning
+13. **enhanced_cross_family_recommend_tool**: Cross-family precedent search with mechanism-aware filtering
+14. **search_precedents_tool**: Find similar precedent reactions
+15. **protocol_recommendation_tool**: Retrieve full experimental protocols from literature
+16. **unified_recommender_tool**: Unified protocol + rule search (DRFP similarity)
+17. **reaction_dataset_analytics_tool**: Summarize reaction dataset composition, yields, and popular reagents
+18. **find_reagent_tool**: Look up reagent information from database
+19. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
+20. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
+21. **list_all_families_tool**: List all reaction families available in the dataset
+22. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
+23. **rule_builder_autofill_tool**: Convert protocol text into draft rule databases (LLM-assisted + deterministic validation)
+24. **hte_recommend_tool**: Get data-driven condition recommendations from 66K+ HTE experiments with catalyst/reaction filtering
+25. **hte_analytics_tool**: Explore HTE database reactant pairs, catalysts, and success patterns
+26. **hte_conditions_tool**: Get detailed experimental conditions for specific substrate combinations
+27. **hte_screening_set_tool**: Generate diverse condition sets for HTE screening plates (up to 24 conditions for parallel testing)
 
 **How to help users:**
 
@@ -150,6 +160,8 @@ For reaction condition recommendations:
 3. Choose the appropriate recommendation tool:
    - **hte_screening_set_tool**: For generating DIVERSE condition sets for HTE screening plates (12-24 conditions for parallel testing). USE THIS when users want to "screen", "test multiple conditions", "set up a plate", or need a "group of conditions". This is the PRIMARY HTE use case.
    - **hte_recommend_tool**: For data-driven top-K recommendations from 66K+ HTE experiments (fast, <100ms, statistical evidence with Z-scores). USE THIS when users explicitly mention "HTE system" or want experimental data-backed conditions for a SINGLE best condition or small set.
+   - **unified_recommender_tool**: Default best-effort protocol + rule search when users want practical conditions and/or automation-ready output.
+   - **protocol_recommendation_tool**: For full literature protocols (stepwise procedures) when users ask for "protocol", "procedure", or "paper conditions".
    - **recommend_conditions_tool**: For ML-based predictions with diverse precedent coverage
    - **rule_based_conditions_tool**: For deterministic guidance with feature-level reasoning
    - **enhanced_cross_family_recommend_tool**: For cross-family exploration with mechanism insights
@@ -209,6 +221,25 @@ For HTE (High-Throughput Experimentation) queries:
 Remember: You're helping chemists design better experiments!
 """
 
+_CONSTRAINT_TOOL_FIELDS: Set[str] = {
+    "allow_metals",
+    "exclude_metals",
+    "prefer_metals",
+    "search_all_families",
+    "constraint_rules",
+}
+
+
+def _schema_field_names(args_schema: object) -> Set[str]:
+    """Return pydantic model field names (v1/v2 compatible)."""
+    fields = getattr(args_schema, "model_fields", None)
+    if isinstance(fields, dict):
+        return set(fields.keys())
+    legacy_fields = getattr(args_schema, "__fields__", None)
+    if isinstance(legacy_fields, dict):
+        return set(legacy_fields.keys())
+    return set()
+
 
 # ============================================================================
 # ChemTools Agent Class
@@ -257,11 +288,13 @@ class ChemToolsAgent:
         self.verbose = verbose
         self.session_constraints = self._coerce_constraints(session_constraints)
         self.agent_factory_name = _LANGGRAPH_AGENT_FACTORY_NAME
+        self._active_constraints = ConstraintSpec()
         
         # Create agent graph with tools (prefers LangGraph create_agent when available)
+        self.tools = self._wrap_tools_with_constraint_defaults(CHEMTOOLS_TOOLS)
         self.agent = LANGGRAPH_AGENT_FACTORY(
             self.llm,
-            CHEMTOOLS_TOOLS,
+            self.tools,
             prompt=self.system_prompt
         )
     
@@ -296,11 +329,12 @@ class ChemToolsAgent:
             active_spec = merge_specs(self.session_constraints, call_spec)
             constraint_prompt = format_constraints_for_prompt(active_spec)
             if constraint_prompt:
-                messages.append(HumanMessage(content=constraint_prompt))
+                messages.insert(0, SystemMessage(content=constraint_prompt))
 
             messages.append(HumanMessage(content=query))
         
             # Invoke agent with query and history
+            self._active_constraints = active_spec
             result = self.agent.invoke(
                 {"messages": messages},
                 config={"recursion_limit": recursion_limit}
@@ -319,6 +353,8 @@ class ChemToolsAgent:
             if self.verbose:
                 print(f"Agent error: {e}")
             return error_msg
+        finally:
+            self._active_constraints = ConstraintSpec()
     
     def chat(
         self,
@@ -399,6 +435,102 @@ class ChemToolsAgent:
     def clear_session_constraints(self) -> None:
         """Remove all stored session-level constraints."""
         self.session_constraints = ConstraintSpec()
+
+    # ======================================================================
+    # Tool wrapping (constraint defaults)
+    # ======================================================================
+
+    def _wrap_tools_with_constraint_defaults(self, tools: List[BaseTool]) -> List[BaseTool]:
+        """Wrap tools so constraint fields default to the active ConstraintSpec."""
+        wrapped: List[BaseTool] = []
+        for tool_obj in tools:
+            args_schema = getattr(tool_obj, "args_schema", None)
+            if not args_schema:
+                wrapped.append(tool_obj)
+                continue
+
+            schema_fields = _schema_field_names(args_schema)
+            if not (schema_fields & _CONSTRAINT_TOOL_FIELDS):
+                wrapped.append(tool_obj)
+                continue
+
+            wrapped.append(self._make_constrained_tool(tool_obj, schema_fields, args_schema))
+        return wrapped
+
+    def _make_constrained_tool(
+        self,
+        tool_obj: BaseTool,
+        schema_fields: Set[str],
+        args_schema: object,
+    ) -> BaseTool:
+        """Create a new tool object that injects defaults from active constraints."""
+
+        def _call(**kwargs: Any) -> Any:
+            merged_payload = self._merge_constraints_into_payload(dict(kwargs), schema_fields)
+            return tool_obj.invoke(merged_payload)
+
+        return StructuredTool.from_function(
+            func=_call,
+            name=tool_obj.name,
+            description=tool_obj.description,
+            args_schema=args_schema,  # type: ignore[arg-type]
+            return_direct=getattr(tool_obj, "return_direct", False),
+            infer_schema=False,
+        )
+
+    def _merge_constraints_into_payload(
+        self,
+        payload: Dict[str, Any],
+        schema_fields: Set[str],
+    ) -> Dict[str, Any]:
+        """Merge the active ConstraintSpec into a tool payload."""
+        spec = self._active_constraints
+        if not isinstance(spec, ConstraintSpec):
+            return payload
+
+        merged = dict(payload)
+
+        if "allow_metals" in schema_fields and spec.allow_metals:
+            existing_allow = merged.get("allow_metals")
+            existing_allow_set = (
+                set(existing_allow or []) if isinstance(existing_allow, (list, tuple, set)) else set()
+            )
+            merged_allow = existing_allow_set & spec.allow_metals if existing_allow_set else set(spec.allow_metals)
+            merged["allow_metals"] = sorted(merged_allow or spec.allow_metals)
+
+        if "exclude_metals" in schema_fields and spec.exclude_metals:
+            existing_exclude = merged.get("exclude_metals")
+            existing_exclude_set = (
+                set(existing_exclude or []) if isinstance(existing_exclude, (list, tuple, set)) else set()
+            )
+            merged["exclude_metals"] = sorted(existing_exclude_set | spec.exclude_metals)
+
+        if "prefer_metals" in schema_fields and spec.prefer_metals:
+            existing_prefer = merged.get("prefer_metals")
+            existing_prefer_set = (
+                set(existing_prefer or []) if isinstance(existing_prefer, (list, tuple, set)) else set()
+            )
+            merged["prefer_metals"] = sorted(existing_prefer_set | spec.prefer_metals)
+
+        if "search_all_families" in schema_fields and spec.search_all_families:
+            merged["search_all_families"] = True
+
+        if "constraint_rules" in schema_fields and spec.constraint_rules:
+            existing_rules = merged.get("constraint_rules")
+            merged_rules: Dict[str, Any] = dict(existing_rules) if isinstance(existing_rules, dict) else {}
+            merged_rules.update(spec.constraint_rules)
+            merged["constraint_rules"] = merged_rules
+
+        # Keep allow/exclude consistent when both fields exist.
+        if "allow_metals" in schema_fields and "exclude_metals" in schema_fields:
+            allow_values = merged.get("allow_metals")
+            exclude_values = merged.get("exclude_metals")
+            allow_set = set(allow_values or []) if isinstance(allow_values, (list, tuple, set)) else set()
+            exclude_set = set(exclude_values or []) if isinstance(exclude_values, (list, tuple, set)) else set()
+            if allow_set and exclude_set:
+                merged["exclude_metals"] = sorted(exclude_set - allow_set)
+
+        return merged
 
 
 # ============================================================================
