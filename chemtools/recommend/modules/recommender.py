@@ -11,7 +11,7 @@ from typing import Dict, Any, List, Optional
 from collections import Counter
 
 from ...smiles import normalize_reaction
-from ...detection import detect_reaction  # New unified API
+from ...reaction_type_detection import detect_reaction  # New unified API
 from ...router import resolve_reaction_family
 from ... import precedent, explain
 from ..utils import canonical_family, median, pick_with_constraints

@@ -38,8 +38,12 @@ try:
     from langgraph.prebuilt import create_agent as _langgraph_agent_factory
     _LANGGRAPH_AGENT_FACTORY_NAME = "create_agent"
 except (ImportError, AttributeError):
-    from langchain.agents import create_agent as _langgraph_agent_factory  # type: ignore[attr-defined]
-    _LANGGRAPH_AGENT_FACTORY_NAME = "create_react_agent"
+    try:
+        from langgraph.prebuilt import create_react_agent as _langgraph_agent_factory  # type: ignore[attr-defined]
+        _LANGGRAPH_AGENT_FACTORY_NAME = "create_react_agent"
+    except (ImportError, AttributeError):
+        from langchain.agents import create_agent as _langgraph_agent_factory  # type: ignore[attr-defined]
+        _LANGGRAPH_AGENT_FACTORY_NAME = "create_react_agent"
 
 LANGGRAPH_AGENT_FACTORY: Callable[..., object] = _langgraph_agent_factory
 

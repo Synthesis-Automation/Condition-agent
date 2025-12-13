@@ -10,6 +10,9 @@ if __name__ == "__main__":
     project_root = Path(__file__).parent.parent.parent
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
+    # Enable relative imports when executed as a script (bypass package __init__)
+    if __package__ is None:
+        __package__ = "chem_assistant.gui"
 
 from PyQt6.QtWidgets import QApplication
 
