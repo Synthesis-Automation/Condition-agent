@@ -65,7 +65,7 @@ PROVIDERS = ("aliyun", "openai")
 AVAILABLE_MODELS = {
     "aliyun": [
         "deepseek-r1-distill-qwen-7b",
-        "deepseek-v3.2-exp",
+        "deepseek-v3.2",
         "deepseek-v3.1",
         "deepseek-r1",
         "deepseek-r1-0528",

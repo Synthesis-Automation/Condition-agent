@@ -36,8 +36,8 @@ RECOMMENDED_MODELS = {
     "aliyun": {
         "reasoning": "deepseek-r1",  # Best reasoning
         "fast": "deepseek-r1-distill-qwen-7b",  # Fast distilled
-        "balanced": "deepseek-v3.2-exp",  # Latest balanced (v3.2 experimental)
-        "experimental": "deepseek-v3.2-exp",  # Latest experimental
+        "balanced": "deepseek-v3.2",  # Latest balanced (v3.2 experimental)
+        "experimental": "deepseek-v3.2",  # Latest experimental
     },
     "openai": {
         "reasoning": "o3-mini",  # Best reasoning
@@ -51,7 +51,7 @@ RECOMMENDED_MODELS = {
 AVAILABLE_MODELS = {
     "aliyun": [
         "deepseek-r1-distill-qwen-7b",
-        "deepseek-v3.2-exp",
+        "deepseek-v3.2",
         "deepseek-v3.1",
         "deepseek-r1",
         "deepseek-r1-0528",

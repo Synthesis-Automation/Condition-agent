@@ -420,7 +420,7 @@ IF Backup 2 fails:
 
 ### Test Environment
 
-- LLM: deepseek-v3.2-exp
+- LLM: deepseek-v3.2
 - Temperature: 0.2
 - Max tokens: 1500
 - Provider: Aliyun

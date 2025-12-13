@@ -145,7 +145,7 @@ def synthesize_recommendations_llm(
             
     Example:
         >>> from llmtools.clients import LLMClient
-        >>> llm = LLMClient(provider="aliyun", model="deepseek-v3.2-exp")
+        >>> llm = LLMClient(provider="aliyun", model="deepseek-v3.2")
         >>> result = synthesize_recommendations_llm(
         ...     reaction_smiles="Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1",
         ...     ml_results=ml_recs,

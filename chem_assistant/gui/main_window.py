@@ -43,6 +43,7 @@ from chem_assistant.constraint_parser import (
 )
 from chem_assistant.gui.dialogs import (
     ConstraintDialog,
+    LLMConfigDialog,
     RuleBuilderAutofillDialog,
     RuleBuilderDialog,
     ProtocolDraftDialog,
@@ -179,6 +180,9 @@ class ChemAssistantWindow(QMainWindow):
         self._apply_default_font()
 
         self.agent: Optional[ChemToolsAgent] = None
+        self.llm_provider: Optional[str] = None
+        self.llm_model: Optional[str] = None
+        self.llm_temperature: float = 0.0
         self.history: List[BaseMessage] = []
         self.constraint_spec = ConstraintSpec()
         self.constraint_text = ""
@@ -252,6 +256,10 @@ class ChemAssistantWindow(QMainWindow):
         cache_btn = QPushButton("Cache Status")
         cache_btn.clicked.connect(self.show_cache_stats)
         button_row.addWidget(cache_btn)
+
+        llm_btn = QPushButton("LLM Mode")
+        llm_btn.clicked.connect(self.configure_llm_mode)
+        button_row.addWidget(llm_btn)
 
         cache_clear_btn = QPushButton("Clear Cache")
         cache_clear_btn.clicked.connect(self.clear_cache)
@@ -368,7 +376,12 @@ class ChemAssistantWindow(QMainWindow):
         if self.agent is not None:
             return True
         try:
-            self.agent = ChemToolsAgent(verbose=True)
+            self.agent = ChemToolsAgent(
+                verbose=True,
+                provider=self.llm_provider,
+                model=self.llm_model,
+                temperature=self.llm_temperature,
+            )
         except Exception as exc:  # pragma: no cover - UI feedback
             self.append_chat(
                 "System",
@@ -381,6 +394,27 @@ class ChemAssistantWindow(QMainWindow):
             )
             return False
         return True
+
+    def configure_llm_mode(self) -> None:
+        dialog = LLMConfigDialog(
+            provider=self.llm_provider,
+            model=self.llm_model,
+            temperature=self.llm_temperature,
+            parent=self,
+        )
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        config = dialog.get_config()
+        self.llm_provider = config.provider
+        self.llm_model = config.model
+        self.llm_temperature = config.temperature
+
+        # Recreate agent lazily with the new settings on next send.
+        self.agent = None
+        self.append_log(
+            f"LLM mode set: {self.llm_provider}/{self.llm_model} (T={self.llm_temperature:g})"
+        )
 
     def show_taxonomy_status(self) -> None:
         self._handle_taxonomy_command()

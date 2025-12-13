@@ -406,7 +406,7 @@ class NaturalLanguageParser:
     def __init__(
         self,
         provider: str = "aliyun",
-        model: str = "deepseek-v3.2-exp",
+        model: str = "deepseek-v3.2",
         api_key: Optional[str] = None,
     ):
         self.client: LLMClient = LLMClient(
@@ -926,8 +926,8 @@ Examples:
     )
     parser.add_argument(
         "--model",
-        default="deepseek-v3.2-exp",
-        help="LLM model name (default: deepseek-v3.2-exp)",
+        default="deepseek-v3.2",
+        help="LLM model name (default: deepseek-v3.2)",
     )
     parser.add_argument(
         "--api-key",

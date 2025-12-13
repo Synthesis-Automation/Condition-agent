@@ -60,7 +60,7 @@ def canonical_role(role: str) -> str:
 DEFAULT_LLM_MODELS: Dict[str, List[str]] = {
     "aliyun": [
         "deepseek-r1-distill-qwen-7b",
-        "deepseek-v3.2-exp",
+        "deepseek-v3.2",
         "deepseek-v3.1",
         "deepseek-r1",
         "deepseek-r1-0528",
@@ -94,8 +94,8 @@ DEFAULT_LLM_RECOMMENDED: Dict[str, Dict[str, str]] = {
     "aliyun": {
         "reasoning": "deepseek-r1",
         "fast": "deepseek-r1-distill-qwen-7b",
-        "balanced": "deepseek-v3.2-exp",
-        "experimental": "deepseek-v3.2-exp",
+        "balanced": "deepseek-v3.2",
+        "experimental": "deepseek-v3.2",
     },
     "openai": {
         "reasoning": "o3-mini",
