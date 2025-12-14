@@ -72,7 +72,10 @@ _LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
     "alpha_beta_unsaturated": ("C=C-[CX3]=O",),
     "aryl_halide": ("[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",),
     "borane": ("[BH3,BH2,BH]",),
-    "boron": ("[BX3;$(B(O)O),$(B(O)O),$(B(O)O)]",),
+    # Boron: Any boron atom (boronic acids, trifluoroborates, pinacol boronates, etc.)
+    "boron": (
+        "[B]",                    # Any boron atom (simple, catches all boron species)
+    ),
     "carbonyl": ("[CX3]=O",),
     "conjugated_diene": ("C=C-C=C",),
     "diene": ("C=C",),  # General diene pattern - molecule with two or more alkene groups
@@ -82,9 +85,11 @@ _LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
     "iodide": ("[I-]",),
     "ketone": ("[CX3](=O)[C]",),
     "nucleophile_n": ("[NX3;H1,H2]", "[nH]"),
-    "nucleophile_o": ("[OX2H]",),
+    # Exclude boronic acid -OH groups from nucleophile detection
+    "nucleophile_o": ("[OX2H;!$(OB)]",),
     "nucleophile_s": ("[SX2H]",),
     "organolithium": ("[C,c][Li]",),
+    "organostannane": ("[C,c][Sn]",),  # Stille coupling partner (organotin)
     "organozinc": ("[C,c][Zn][Br,Cl,I]",),
     "phenol": ("[OH;$([OH]c1ccccc1)]",),  # Phenol pattern
     "terminal_alkene": ("C=C",),  # Terminal alkene pattern

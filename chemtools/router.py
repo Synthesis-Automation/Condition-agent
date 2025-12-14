@@ -45,6 +45,7 @@ _ROUTER_GROUPS = (
     "nucleophile_o",
     "nucleophile_s",
     "organolithium",
+    "organostannane",
     "organozinc",
     "phenol",
     "terminal_alkene",

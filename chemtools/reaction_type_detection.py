@@ -279,9 +279,11 @@ class _DetectionEngine:
         self.reaction_smiles = reaction_smiles
         self.normalized: Optional[Dict[str, Any]] = None
         self.reactants: List[str] = []
+        self.products: List[str] = []  # NEW: Track products for validation
         self.agents: List[Dict[str, Any]] = []
         self.catalysts: Set[str] = set()
         self.functional_groups: Dict[str, bool] = {}
+        self.product_functional_groups: Dict[str, bool] = {}  # NEW: Product FGs
         
         # Normalize reaction and extract components
         self._normalize()
@@ -298,6 +300,13 @@ class _DetectionEngine:
             ]
             self.reactants = [s for s in self.reactants if s]
             
+            # NEW: Extract products for validation
+            self.products = [
+                (p.get("smiles_norm") or p.get("largest_smiles") or p.get("input") or "")
+                for p in (self.normalized.get("products") or [])
+            ]
+            self.products = [s for s in self.products if s]
+            
             # Extract agents
             self.agents = self.normalized.get("agents") or []
             
@@ -305,13 +314,16 @@ class _DetectionEngine:
             logger.warning(f"Failed to normalize reaction: {e}")
             self.normalized = {}
             self.reactants = []
+            self.products = []
             self.agents = []
     
     def _detect_catalysts(self) -> Set[str]:
         """
-        Detect catalyst metals from agents.
+        Detect catalyst metals from agents AND reactants.
         
-        Extracts Pd, Cu, Ni, Co from agent SMILES and names.
+        Extracts Pd, Cu, Ni, Co, Ru, Rh, Ir, Fe from:
+        - Agent position (between > and >)
+        - Reactant position (some reactions have catalyst in reactants)
         
         Returns:
             Set of metal symbols (e.g., {"Pd", "Cu"})
@@ -319,8 +331,26 @@ class _DetectionEngine:
         try:
             self.catalysts = _detect_agent_metals(self.agents)
         except Exception as e:
-            logger.warning(f"Failed to detect catalysts: {e}")
+            logger.warning(f"Failed to detect catalysts from agents: {e}")
             self.catalysts = set()
+        
+        # NEW: Also check reactants for metal catalysts
+        # (Some reactions encode catalyst in reactant position)
+        metal_patterns = {
+            "Pd": ["[Pd]", "Pd(", "pd(", "palladium"],
+            "Cu": ["[Cu]", "Cu(", "cu(", "copper", "CuI", "CuBr", "CuCl"],
+            "Ni": ["[Ni]", "Ni(", "ni(", "nickel"],
+            "Co": ["[Co]", "Co(", "co(", "cobalt"],
+            "Ru": ["[Ru]", "Ru(", "ru(", "ruthenium", "grubbs", "hoveyda"],
+            "Rh": ["[Rh]", "Rh(", "rh(", "rhodium"],
+            "Ir": ["[Ir]", "Ir(", "ir(", "iridium"],
+            "Fe": ["[Fe]", "Fe(", "fe(", "iron", "FeCl"],
+        }
+        
+        reactants_str = " ".join(self.reactants).lower()
+        for metal, patterns in metal_patterns.items():
+            if any(p.lower() in reactants_str for p in patterns):
+                self.catalysts.add(metal)
         
         return self.catalysts
     
@@ -343,12 +373,21 @@ class _DetectionEngine:
             logger.warning(f"Failed to detect functional groups: {e}")
             self.functional_groups = {}
         
+        # NEW: Also detect functional groups in products for validation
+        try:
+            self.product_functional_groups = _rule_hits(self.products) if self.products else {}
+        except Exception as e:
+            logger.warning(f"Failed to detect product functional groups: {e}")
+            self.product_functional_groups = {}
+        
         # Add catalyst info to functional groups
         if self.catalysts:
             self.functional_groups["catalyst_pd"] = "Pd" in self.catalysts
             self.functional_groups["catalyst_cu"] = "Cu" in self.catalysts
             self.functional_groups["catalyst_ni"] = "Ni" in self.catalysts
             self.functional_groups["catalyst_co"] = "Co" in self.catalysts
+            self.functional_groups["catalyst_ru"] = "Ru" in self.catalysts
+            self.functional_groups["catalyst_rh"] = "Rh" in self.catalysts
         
         return self.functional_groups
     
@@ -392,7 +431,7 @@ class _DetectionEngine:
                 fam, conf = "organolithium_addition", 0.90
         
         # PRIORITY 2: C-C Couplings
-        elif h.get("aryl_halide") and h.get("boron"):
+        elif (h.get("aryl_halide") or h.get("vinyl_halide")) and h.get("boron"):
             fam, conf = "suzuki_miyaura", 0.9
         
         elif is_aryl_or_vinyl_electrophile and h.get("terminal_alkyne"):
@@ -403,6 +442,9 @@ class _DetectionEngine:
         
         elif is_aryl_or_vinyl_electrophile and h.get("organozinc"):
             fam, conf = "negishi", 0.85
+        
+        elif is_aryl_or_vinyl_electrophile and h.get("organostannane"):
+            fam, conf = "stille", 0.85
         
         elif is_aryl_or_vinyl_electrophile and h.get("alkene") and not h.get("boron"):
             fam, conf = "heck", 0.80
@@ -715,6 +757,57 @@ class _DetectionEngine:
         
         return family, confidence
     
+    def _validate_with_product(self, family: str, confidence: float) -> Tuple[str, float]:
+        """
+        NEW: Validate/adjust prediction based on product analysis.
+        
+        Checks if product structure is consistent with predicted reaction type:
+        - C-N coupling → product should have C-N bond (no N nucleophile remaining)
+        - Suzuki → product should be biaryl (no boron remaining)
+        - Reduction → carbonyl consumed
+        
+        Args:
+            family: Predicted family
+            confidence: Current confidence
+            
+        Returns:
+            (validated_family, adjusted_confidence)
+        """
+        if not self.product_functional_groups or not family:
+            return family, confidence
+        
+        r_fg = self.functional_groups
+        p_fg = self.product_functional_groups
+        
+        # C-N Coupling validation: N-nucleophile should be consumed
+        if family in CN_FAMILIES_CANONICAL or family == "cn_coupling":
+            # If product still has free N-nucleophile, maybe not C-N coupling
+            if r_fg.get("nucleophile_n") and p_fg.get("nucleophile_n"):
+                # N-nucleophile wasn't consumed - lower confidence slightly
+                confidence = max(confidence - 0.1, 0.5)
+            elif r_fg.get("nucleophile_n") and not p_fg.get("nucleophile_n"):
+                # N-nucleophile was consumed - boost confidence
+                confidence = min(confidence + 0.05, 1.0)
+        
+        # Suzuki validation: boron should be consumed
+        if family == "suzuki_miyaura":
+            if r_fg.get("boron") and not p_fg.get("boron"):
+                # Boron consumed - confirms Suzuki
+                confidence = min(confidence + 0.05, 1.0)
+            elif r_fg.get("boron") and p_fg.get("boron"):
+                # Boron still present - lower confidence
+                confidence = max(confidence - 0.1, 0.5)
+        
+        # Aryl halide should be consumed in coupling reactions
+        coupling_families = {"suzuki_miyaura", "sonogashira", "heck", "negishi", 
+                            "kumada", "stille", "buchwald_hartwig_c_n", "ullmann_cn"}
+        if family in coupling_families:
+            if r_fg.get("aryl_halide") and not p_fg.get("aryl_halide"):
+                # Halide consumed - consistent with coupling
+                confidence = min(confidence + 0.03, 1.0)
+        
+        return family, confidence
+
     def detect(self, use_ml: bool = True, use_taxonomy_smarts: bool = True) -> Dict[str, Any]:
         """
         Main detection orchestrator - combines all detection methods.
@@ -774,9 +867,35 @@ class _DetectionEngine:
         
         # Step 5: Choose best prediction
         # Priority: taxonomy_smarts (high conf) > C-O/C-S rule > ML > rule_based
+        # EXCEPTION: If rule-based detects C-N/C-O/C-S coupling with nucleophile,
+        # prefer it over taxonomy C-C coupling (e.g., avoid Negishi misclassification)
         
-        # First check taxonomy SMARTS (exact pattern match is very reliable)
-        if fam_taxonomy and conf_taxonomy is not None and conf_taxonomy >= 0.8:
+        # Check if rule-based detected a heteroatom coupling with clear evidence
+        is_rule_heteroatom_coupling = (
+            fam_rule in CN_FAMILIES_CANONICAL or 
+            fam_rule in CO_FAMILIES_CANONICAL or 
+            fam_rule in CS_FAMILIES_CANONICAL or
+            fam_rule in ("cn_coupling", "co_coupling", "cs_coupling")
+        ) and conf_rule >= 0.85
+        
+        # Check if taxonomy is suggesting a C-C coupling (potential misclassification)
+        taxonomy_is_cc_coupling = (
+            fam_taxonomy in ("negishi", "kumada", "suzuki_miyaura", "stille", "heck", "sonogashira")
+        ) if fam_taxonomy else False
+        
+        # If rule says heteroatom coupling but taxonomy says C-C coupling, trust rule
+        if is_rule_heteroatom_coupling and taxonomy_is_cc_coupling:
+            fam_final = fam_rule
+            conf_final = conf_rule
+            method = "rule_based"
+        # Prefer C-C coupling rule-based detection (very specific patterns)
+        # This protects against generic taxonomy patterns like hydrogenation/grignard
+        elif fam_rule in ("suzuki_miyaura", "heck", "sonogashira", "negishi", "kumada", "stille") and conf_rule >= 0.75:
+            fam_final = fam_rule
+            conf_final = conf_rule
+            method = "rule_based"
+        # Then check taxonomy SMARTS (exact pattern match is very reliable)
+        elif fam_taxonomy and conf_taxonomy is not None and conf_taxonomy >= 0.8:
             fam_final = fam_taxonomy
             conf_final = conf_taxonomy
             method = "taxonomy_smarts"
@@ -806,6 +925,10 @@ class _DetectionEngine:
             (fam_final != fam_rule or fam_final != fam_ml)):
             method = method + "+catalyst"
         
+        # Step 7: Validate with product analysis (NEW)
+        if self.products:
+            fam_final, conf_final = self._validate_with_product(fam_final, conf_final)
+        
         # Build unified result
         result: Dict[str, Any] = {
             "family": fam_final or "Unknown",
@@ -813,8 +936,10 @@ class _DetectionEngine:
             "method": method,
             "details": {
                 "reactants": self.reactants,
+                "products": self.products,  # NEW: Include products
                 "catalysts": sorted(self.catalysts) if self.catalysts else [],
                 "functional_groups": self.functional_groups,
+                "product_functional_groups": self.product_functional_groups if self.product_functional_groups else None,  # NEW
                 "rule_prediction": {
                     "family": fam_rule,
                     "confidence": conf_rule,

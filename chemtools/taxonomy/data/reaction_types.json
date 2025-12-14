@@ -47,7 +47,7 @@
       "Negishi cross-coupling"
     ],
     "description": "Pd or Ni-catalyzed cross-coupling of organozinc reagents with organic halides",
-    "smarts": "[#6;$([#6]~[#6]);!$([#6]~[S,N,O,P]):1][Cl,Br,I].[Cl,Br,I][#6;$([#6]~[#6]);!$([#6]~[S,N,O,P]):2]>>[#6:2][#6:1]",
+    "smarts": "[#6:1][Cl,Br,I].[#6:2][Zn]>>[#6:1][#6:2]",
     "reference_reactions": [
       "Brc1ccccc1.[Zn]Cc1ccccc1>>Cc1ccccc1c1ccccc1"
     ],
@@ -344,7 +344,7 @@
       "Aryl ether formation"
     ],
     "description": "Formation of C-O bonds (aryl ethers, alkyl aryl ethers)",
-    "smarts": "[c:1][Cl,Br,I].[O;H1:2]>>[c:1][O:2]",
+    "smarts": "[c:1][Cl,Br,I].[O;H1;!$(OB):2]>>[c:1][O:2]",
     "reference_reactions": [
       "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1",
       "Ic1ccccc1.CO>>COc1ccccc1"
@@ -1034,7 +1034,7 @@
       "Alkene epoxidation"
     ],
     "description": "Formation of epoxides from alkenes using peroxy acids or other oxidants",
-    "smarts": "[#6:1]=[#6:2]>>[#6:1]1-[O]-[#6:2]-1",
+    "smarts": "[C:1]=[C:2]>>[C:1]1[O][C:2]1",
     "reference_reactions": [
       "C=Cc1ccccc1>>c1ccc(C2OC2)cc1",
       "CC=CC>>CC1OC1C"
