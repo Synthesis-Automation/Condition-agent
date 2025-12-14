@@ -10,6 +10,9 @@ Public Functions:
 Internal:
     _DetectionEngine class (consolidates all detection logic)
 
+Taxonomy-based detection (SMARTS matching, DRFP similarity) is handled by
+the chemtools.taxonomy.detection module.
+
 All outputs are validated against the unified taxonomy in chemtools/taxonomy/.
 """
 
@@ -39,12 +42,100 @@ from .analysis.reactions import (
     AMIDE_FAMILIES_CANONICAL,
 )
 
+# Import taxonomy-based detection functions from the dedicated module
+from .taxonomy.detection import (
+    detect_by_taxonomy_smarts,
+    detect_by_drfp_similarity,
+    _load_taxonomy_smarts,
+    _load_reference_reactions,
+    _compute_drfp_fingerprint,
+    _get_reference_drfp_index,
+    _validate_reaction_by_running,
+    clear_caches as clear_taxonomy_caches,
+)
+
 logger = logging.getLogger(__name__)
 
-# ============================================================================
-# Taxonomy SMARTS Cache (loaded once)
-# ============================================================================
-_TAXONOMY_SMARTS_CACHE: Optional[Dict[str, Any]] = None
+
+# Note: Taxonomy-based detection functions (detect_by_taxonomy_smarts, detect_by_drfp_similarity,
+# _load_taxonomy_smarts, _load_reference_reactions, _compute_drfp_fingerprint, _get_reference_drfp_index,
+# _validate_reaction_by_running) are now imported from chemtools.taxonomy.detection module.
+
+
+class _DetectionEngine:
+    """
+    Internal detection engine that consolidates all detection methods.
+    
+    This class orchestrates:
+    - Reaction normalization
+    - Catalyst detection
+    - Functional group detection (SMARTS)
+    - Rule-based family detection
+    - ML-based detection (optional, via rxn-insight)
+    - Catalyst-based overrides
+    """
+    
+    def __init__(self, reaction_smiles: str):
+    reaction_smiles: str,
+    threshold: float = 0.3,
+    top_k: int = 3
+) -> List[Tuple[str, str, float]]:
+    """
+    Detect reaction type by DRFP similarity to reference reactions.
+    
+    Computes the DRFP fingerprint of the query reaction and compares it
+    to precomputed fingerprints of reference reactions in the taxonomy.
+    
+    Args:
+        reaction_smiles: Query reaction SMILES
+        threshold: Minimum similarity threshold (0.0 - 1.0)
+        top_k: Maximum number of matches to return
+        
+    Returns:
+        List of (reaction_type_id, name, similarity) tuples, sorted by similarity
+    """
+    try:
+        import numpy as np
+    except ImportError:
+        logger.debug("NumPy not available for DRFP similarity")
+        return []
+    
+    # Compute query DRFP
+    query_drfp = _compute_drfp_fingerprint(reaction_smiles)
+    if query_drfp is None:
+        return []
+    
+    # Get reference DRFP index
+    ref_index = _get_reference_drfp_index()
+    if not ref_index:
+        return []
+    
+    # Load taxonomy for names
+    taxonomy = _load_taxonomy_smarts()
+    
+    # Compute similarities to all reference reactions
+    matches = []
+    
+    for rxn_type, ref_list in ref_index.items():
+        best_sim = 0.0
+        for ref_smiles, ref_drfp in ref_list:
+            # Cosine similarity
+            dot = np.dot(query_drfp, ref_drfp)
+            norm_q = np.linalg.norm(query_drfp)
+            norm_r = np.linalg.norm(ref_drfp)
+            
+            if norm_q > 0 and norm_r > 0:
+                sim = dot / (norm_q * norm_r)
+                best_sim = max(best_sim, sim)
+        
+        if best_sim >= threshold:
+            name = taxonomy.get(rxn_type, {}).get("name", rxn_type)
+            matches.append((rxn_type, name, best_sim))
+    
+    # Sort by similarity (highest first)
+    matches.sort(key=lambda x: x[2], reverse=True)
+    
+    return matches[:top_k]
 
 
 def _load_taxonomy_smarts() -> Dict[str, Any]:
@@ -91,6 +182,118 @@ def _load_taxonomy_smarts() -> Dict[str, Any]:
         logger.warning(f"Failed to load taxonomy SMARTS: {e}")
         _TAXONOMY_SMARTS_CACHE = {}
         return _TAXONOMY_SMARTS_CACHE
+
+
+def _validate_reaction_by_running(
+    rxn_pattern,
+    reactant_mols: List,
+    product_mols: List,
+    max_product_sets: int = 50
+) -> Tuple[bool, float]:
+    """
+    Validate a reaction by running the SMARTS and comparing predicted vs actual products.
+    
+    This is more rigorous than just checking substructure matches because it:
+    1. Runs the reaction SMARTS on reactant molecules
+    2. Generates predicted product structures
+    3. Compares predicted products with actual products
+    
+    Args:
+        rxn_pattern: RDKit ChemicalReaction object
+        reactant_mols: List of reactant RDKit Mol objects
+        product_mols: List of actual product RDKit Mol objects
+        max_product_sets: Maximum number of product sets to check
+        
+    Returns:
+        (is_match, confidence_boost)
+        - is_match: True if predicted products match actual products
+        - confidence_boost: Additional confidence based on match quality
+    """
+    try:
+        from rdkit import Chem
+        from itertools import permutations
+        
+        if not reactant_mols or not product_mols:
+            return False, 0.0
+        
+        num_templates = rxn_pattern.GetNumReactantTemplates()
+        if num_templates == 0:
+            return False, 0.0
+        
+        # Get canonical SMILES of actual products for comparison
+        actual_product_smiles = set()
+        for mol in product_mols:
+            try:
+                smi = Chem.MolToSmiles(mol, canonical=True)
+                actual_product_smiles.add(smi)
+            except Exception:
+                continue
+        
+        if not actual_product_smiles:
+            return False, 0.0
+        
+        # Try different orderings of reactants (in case order matters)
+        # Limit to reasonable number of permutations
+        reactant_orderings = []
+        if len(reactant_mols) <= 4:
+            for perm in permutations(range(len(reactant_mols))):
+                if len(perm) >= num_templates:
+                    reactant_orderings.append([reactant_mols[i] for i in perm[:num_templates]])
+                if len(reactant_orderings) >= 10:  # Limit permutations
+                    break
+        else:
+            # Just use first N reactants
+            reactant_orderings.append(reactant_mols[:num_templates])
+        
+        # Run reaction and check if any predicted products match actual products
+        best_match_score = 0.0
+        
+        for reactants in reactant_orderings:
+            if len(reactants) != num_templates:
+                continue
+            
+            try:
+                product_sets = rxn_pattern.RunReactants(tuple(reactants))
+            except Exception:
+                continue
+            
+            # Check each product set
+            for prod_set in product_sets[:max_product_sets]:
+                predicted_smiles = set()
+                for pred_mol in prod_set:
+                    try:
+                        # Sanitize the predicted product
+                        Chem.SanitizeMol(pred_mol)
+                        smi = Chem.MolToSmiles(pred_mol, canonical=True)
+                        predicted_smiles.add(smi)
+                    except Exception:
+                        continue
+                
+                if not predicted_smiles:
+                    continue
+                
+                # Calculate overlap between predicted and actual products
+                # Match score = intersection / union (Jaccard similarity)
+                intersection = predicted_smiles & actual_product_smiles
+                union = predicted_smiles | actual_product_smiles
+                
+                if intersection:
+                    match_score = len(intersection) / len(union)
+                    best_match_score = max(best_match_score, match_score)
+                    
+                    # If we found a perfect or near-perfect match, return early
+                    if match_score >= 0.8:
+                        return True, match_score * 0.15  # Up to +0.15 confidence boost
+        
+        # Return result based on best match
+        if best_match_score >= 0.5:
+            return True, best_match_score * 0.15
+        
+        return False, 0.0
+        
+    except Exception as e:
+        logger.debug(f"Reaction validation failed: {e}")
+        return False, 0.0
 
 
 def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, float]]:
@@ -181,16 +384,17 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
             if rxn_pattern is None:
                 continue
             
-            # Check if reactants match the pattern
+            # Check if reactants AND products match the pattern
             try:
-                # Get number of reactant templates
+                # Get number of reactant and product templates
                 num_reactant_templates = rxn_pattern.GetNumReactantTemplates()
+                num_product_templates = rxn_pattern.GetNumProductTemplates()
                 
                 if num_reactant_templates == 0:
                     continue
                 
-                # Better matching: Each template must match EXACTLY ONE reactant
-                # and each reactant should match at most one template (bijective matching)
+                # === STEP 1: Match reactant templates ===
+                # Each template must match at least one reactant
                 template_matches = []  # List of sets: which reactants each template matches
                 
                 for i in range(num_reactant_templates):
@@ -201,34 +405,79 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
                             matching_reactants.add(j)
                     template_matches.append(matching_reactants)
                 
-                # All templates must have at least one match
+                # All reactant templates must have at least one match
                 if any(len(m) == 0 for m in template_matches):
                     continue
                 
                 # Try to find a valid assignment (simple greedy for 2 templates)
-                matched = False
+                reactants_matched = False
                 if num_reactant_templates == 1:
-                    matched = len(template_matches[0]) > 0
+                    reactants_matched = len(template_matches[0]) > 0
                 elif num_reactant_templates == 2:
                     # Check if we can assign different reactants to each template
                     for r1 in template_matches[0]:
                         for r2 in template_matches[1]:
                             if r1 != r2:
-                                matched = True
+                                reactants_matched = True
                                 break
-                        if matched:
+                        if reactants_matched:
                             break
                     # Also accept if we have exactly 2 reactants and each matches its template
-                    if not matched and len(reactant_mols) == 2:
+                    if not reactants_matched and len(reactant_mols) == 2:
                         if 0 in template_matches[0] and 1 in template_matches[1]:
-                            matched = True
+                            reactants_matched = True
                         elif 1 in template_matches[0] and 0 in template_matches[1]:
-                            matched = True
+                            reactants_matched = True
                 else:
                     # For 3+ templates, use simple check: all have matches
-                    matched = all(len(m) > 0 for m in template_matches)
+                    reactants_matched = all(len(m) > 0 for m in template_matches)
                 
-                if matched:
+                if not reactants_matched:
+                    continue
+                
+                # === STEP 2: Match product templates (NEW) ===
+                # Each product template must match at least one product
+                products_matched = True  # Default to True if no product templates
+                
+                if num_product_templates > 0 and product_mols:
+                    product_template_matches = []
+                    
+                    for i in range(num_product_templates):
+                        template = rxn_pattern.GetProductTemplate(i)
+                        matching_products = set()
+                        for j, mol in enumerate(product_mols):
+                            if mol.HasSubstructMatch(template):
+                                matching_products.add(j)
+                        product_template_matches.append(matching_products)
+                    
+                    # All product templates must have at least one match
+                    if any(len(m) == 0 for m in product_template_matches):
+                        products_matched = False
+                    else:
+                        # For multiple product templates, check valid assignment
+                        if num_product_templates == 1:
+                            products_matched = len(product_template_matches[0]) > 0
+                        elif num_product_templates == 2:
+                            # Check if we can assign different products to each template
+                            products_matched = False
+                            for p1 in product_template_matches[0]:
+                                for p2 in product_template_matches[1]:
+                                    if p1 != p2:
+                                        products_matched = True
+                                        break
+                                if products_matched:
+                                    break
+                            # Also accept if exactly 2 products match their templates
+                            if not products_matched and len(product_mols) == 2:
+                                if 0 in product_template_matches[0] and 1 in product_template_matches[1]:
+                                    products_matched = True
+                                elif 1 in product_template_matches[0] and 0 in product_template_matches[1]:
+                                    products_matched = True
+                        else:
+                            products_matched = all(len(m) > 0 for m in product_template_matches)
+                
+                # === STEP 3: Only match if BOTH reactants AND products match ===
+                if reactants_matched and products_matched:
                     # Calculate confidence based on specificity
                     # More specific patterns (longer SMARTS) get higher confidence
                     specificity = min(len(smarts) / 150.0, 1.0)  # Adjusted scale
@@ -237,9 +486,23 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
                     if len(reactant_mols) == num_reactant_templates:
                         specificity = min(specificity + 0.1, 1.0)
                     
+                    # Bonus for product validation (more reliable match)
+                    if num_product_templates > 0 and products_matched:
+                        specificity = min(specificity + 0.05, 1.0)
+                    
+                    # === STEP 4: Run reaction to validate predicted products match actual ===
+                    # This is the most rigorous validation - actually run the reaction
+                    reaction_validated, validation_boost = _validate_reaction_by_running(
+                        rxn_pattern, reactant_mols, product_mols
+                    )
+                    
+                    if reaction_validated:
+                        # Strong boost for reactions that produce matching products
+                        specificity = min(specificity + validation_boost, 1.0)
+                    
                     confidence = 0.75 + (0.20 * specificity)
                     
-                    matches.append((rxn_id, info["name"], confidence))
+                    matches.append((rxn_id, info["name"], confidence, reaction_validated))
                     
             except Exception:
                 # Reaction running failed, try simple substructure matching
@@ -250,10 +513,11 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
             continue
             continue
     
-    # Sort by confidence (highest first)
-    matches.sort(key=lambda x: x[2], reverse=True)
+    # Sort by: 1) reaction_validated (True first), 2) confidence (highest first)
+    matches.sort(key=lambda x: (x[3] if len(x) > 3 else False, x[2]), reverse=True)
     
-    return matches
+    # Return without the validation flag (keep API compatible)
+    return [(m[0], m[1], m[2]) for m in matches]
 
 
 class _DetectionEngine:
@@ -709,6 +973,49 @@ class _DetectionEngine:
             "confidence": None,
         }
     
+    def _drfp_similarity_detection(self) -> Dict[str, Any]:
+        """
+        DRFP similarity-based detection using reference reactions.
+        
+        Computes DRFP fingerprint of the query reaction and compares to
+        precomputed fingerprints of reference reactions in the taxonomy.
+        This provides a complementary ML-based detection method.
+        
+        Returns:
+            {
+                "matches": list,           # List of (reaction_type_id, name, similarity)
+                "best_family": str | None, # Best matching reaction type
+                "confidence": float | None,
+                "available": bool,         # Whether DRFP is available
+            }
+        """
+        try:
+            matches = detect_by_drfp_similarity(
+                self.reaction_smiles,
+                threshold=0.3,
+                top_k=5
+            )
+            if matches:
+                best = matches[0]  # Already sorted by similarity
+                # Convert similarity (0-1) to confidence
+                # DRFP similarity of 0.5+ is quite good for reaction matching
+                confidence = min(best[2] * 1.2, 1.0)  # Slight boost, cap at 1.0
+                return {
+                    "matches": matches,
+                    "best_family": best[0],
+                    "confidence": confidence,
+                    "available": True,
+                }
+        except Exception as e:
+            logger.debug(f"DRFP similarity detection failed: {e}")
+        
+        return {
+            "matches": [],
+            "best_family": None,
+            "confidence": None,
+            "available": False,
+        }
+    
     def _apply_catalyst_overrides(self, family: Optional[str], confidence: float) -> tuple[Optional[str], float]:
         """
         Apply catalyst-based family overrides.
@@ -779,17 +1086,17 @@ class _DetectionEngine:
         r_fg = self.functional_groups
         p_fg = self.product_functional_groups
         
-        # C-N Coupling validation: N-nucleophile should be consumed
+        # C-N Coupling validation: 
+        # The nitrogen is NOT consumed - it's still in the product, bonded to aryl carbon
+        # We check: 1) aryl halide consumed, 2) product has aryl-N bond
         if family in CN_FAMILIES_CANONICAL or family == "cn_coupling":
-            # If product still has free N-nucleophile, maybe not C-N coupling
-            if r_fg.get("nucleophile_n") and p_fg.get("nucleophile_n"):
-                # N-nucleophile wasn't consumed - lower confidence slightly
-                confidence = max(confidence - 0.1, 0.5)
-            elif r_fg.get("nucleophile_n") and not p_fg.get("nucleophile_n"):
-                # N-nucleophile was consumed - boost confidence
+            # Aryl halide should be consumed
+            halide_consumed = r_fg.get("aryl_halide") and not p_fg.get("aryl_halide")
+            if halide_consumed:
                 confidence = min(confidence + 0.05, 1.0)
+            # Note: We can't easily check for aryl-N bond formation without more complex analysis
         
-        # Suzuki validation: boron should be consumed
+        # Suzuki validation: boron should be consumed (not present in product)
         if family == "suzuki_miyaura":
             if r_fg.get("boron") and not p_fg.get("boron"):
                 # Boron consumed - confirms Suzuki
@@ -798,13 +1105,28 @@ class _DetectionEngine:
                 # Boron still present - lower confidence
                 confidence = max(confidence - 0.1, 0.5)
         
-        # Aryl halide should be consumed in coupling reactions
+        # Aryl/vinyl halide should be consumed in coupling reactions
         coupling_families = {"suzuki_miyaura", "sonogashira", "heck", "negishi", 
-                            "kumada", "stille", "buchwald_hartwig_c_n", "ullmann_cn"}
+                            "kumada", "stille", "buchwald_hartwig_c_n", "ullmann_cn",
+                            "cn_coupling", "co_coupling", "cs_coupling"}
         if family in coupling_families:
-            if r_fg.get("aryl_halide") and not p_fg.get("aryl_halide"):
+            halide_consumed = (
+                (r_fg.get("aryl_halide") and not p_fg.get("aryl_halide")) or
+                (r_fg.get("vinyl_halide") and not p_fg.get("vinyl_halide"))
+            )
+            if halide_consumed:
                 # Halide consumed - consistent with coupling
                 confidence = min(confidence + 0.03, 1.0)
+        
+        # Hydrogenation validation: alkene should be consumed
+        if family == "hydrogenation":
+            if r_fg.get("alkene") and p_fg.get("alkene"):
+                # Alkene still present in product - NOT hydrogenation
+                # This is likely Heck or other reaction that preserves alkene
+                confidence = max(confidence - 0.5, 0.0)  # Strong penalty
+            elif r_fg.get("alkene") and not p_fg.get("alkene"):
+                # Alkene consumed - confirms hydrogenation
+                confidence = min(confidence + 0.1, 1.0)
         
         return family, confidence
 
@@ -865,6 +1187,17 @@ class _DetectionEngine:
                 fam_ml = ml_result["family"]
                 conf_ml = ml_result["confidence"]
         
+        # Step 4.5: DRFP similarity detection (NEW - uses reference reactions)
+        # DRFP is fast (fingerprint comparison) and always runs
+        drfp_result = None
+        fam_drfp = None
+        conf_drfp = None
+        
+        drfp_result = self._drfp_similarity_detection()
+        if drfp_result.get("available") and drfp_result.get("best_family"):
+            fam_drfp = drfp_result["best_family"]
+            conf_drfp = drfp_result["confidence"]
+        
         # Step 5: Choose best prediction
         # Priority: taxonomy_smarts (high conf) > C-O/C-S rule > ML > rule_based
         # EXCEPTION: If rule-based detects C-N/C-O/C-S coupling with nucleophile,
@@ -883,11 +1216,28 @@ class _DetectionEngine:
             fam_taxonomy in ("negishi", "kumada", "suzuki_miyaura", "stille", "heck", "sonogashira")
         ) if fam_taxonomy else False
         
+        # Check if DRFP detects a C-C coupling (useful for unusual substrates)
+        drfp_is_cc_coupling = (
+            fam_drfp in ("negishi", "kumada", "suzuki_miyaura", "stille", "heck", "sonogashira")
+        ) if fam_drfp else False
+        
+        # Check if DRFP suggests Suzuki and boron is present (strong signal)
+        drfp_suzuki_with_boron = (
+            fam_drfp == "suzuki_miyaura" and 
+            "boron" in self.functional_groups
+        ) if fam_drfp else False
+        
         # If rule says heteroatom coupling but taxonomy says C-C coupling, trust rule
         if is_rule_heteroatom_coupling and taxonomy_is_cc_coupling:
             fam_final = fam_rule
             conf_final = conf_rule
             method = "rule_based"
+        # DRFP Suzuki with boron present beats generic taxonomy (e.g., sn2_substitution)
+        # This handles unusual electrophiles like cyclopropyl bromide
+        elif drfp_suzuki_with_boron and fam_drfp != fam_taxonomy and conf_drfp >= 0.4:
+            fam_final = fam_drfp
+            conf_final = conf_drfp + 0.1  # Boost confidence since boron confirms
+            method = "drfp_similarity+boron"
         # Prefer C-C coupling rule-based detection (very specific patterns)
         # This protects against generic taxonomy patterns like hydrogenation/grignard
         elif fam_rule in ("suzuki_miyaura", "heck", "sonogashira", "negishi", "kumada", "stille") and conf_rule >= 0.75:
@@ -904,11 +1254,26 @@ class _DetectionEngine:
             fam_final = fam_rule
             conf_final = conf_rule
             method = "rule_based"
-        # Check ML detection
+        # Check ML detection (high confidence)
+        elif fam_ml and conf_ml is not None and conf_ml > 0.7:
+            fam_final = fam_ml
+            conf_final = conf_ml
+            method = "ml"
+        # Check DRFP similarity detection (NEW - good for specific reaction types)
+        elif fam_drfp and conf_drfp is not None and conf_drfp >= 0.7:
+            fam_final = fam_drfp
+            conf_final = conf_drfp
+            method = "drfp_similarity"
+        # Check ML detection with lower confidence
         elif fam_ml and conf_ml is not None and conf_ml > 0.5:
             fam_final = fam_ml
             conf_final = conf_ml
             method = "ml"
+        # Check DRFP with moderate confidence
+        elif fam_drfp and conf_drfp is not None and conf_drfp >= 0.5:
+            fam_final = fam_drfp
+            conf_final = conf_drfp
+            method = "drfp_similarity"
         # Check taxonomy SMARTS with lower confidence
         elif fam_taxonomy and conf_taxonomy is not None and conf_taxonomy >= 0.5:
             fam_final = fam_taxonomy
@@ -963,6 +1328,15 @@ class _DetectionEngine:
                 "rxn_class": ml_result.get("rxn_class"),
                 "rxn_name": ml_result.get("rxn_name"),
                 "mapping_method": ml_result.get("mapping_method"),
+            }
+        
+        # Add DRFP similarity prediction if available (NEW)
+        if drfp_result and drfp_result.get("available"):
+            result["details"]["drfp_prediction"] = {
+                "family": fam_drfp,
+                "confidence": conf_drfp,
+                "matched_reference": drfp_result.get("matched_reference"),
+                "similarity_score": drfp_result.get("similarity"),
             }
         
         # Add agreement status

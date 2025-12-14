@@ -10,7 +10,12 @@
     "description": "Pd-catalyzed cross-coupling of aryl/vinyl halides with organoboron compounds",
     "smarts": "[#6;H0;D3;$([#6](~[#6])~[#6]):1]B(O)O.[#6;H0;D3;$([#6](~[#6])~[#6]):2][Cl,Br,I]>>[#6:2][#6:1]",
     "reference_reactions": [
-      "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+      "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+      "Clc1ccc(C#N)cc1.c1ccc(B(O)O)cc1>>N#Cc1ccc(-c2ccccc2)cc1",
+      "C/C=C/Br.C=CB(O)O>>C/C=C/C=C",
+      "BrC1(c2ccccc2)CC1.c1ccc(B(O)O)cc1>>c1ccc(C2(c3ccccc3)CC2)cc1",
+      "Brc1ccncc1.c1csc(B(O)O)c1>>c1cc(-c2cccs2)ccn1",
+      "Brc1ccc(OC)cc1.[K+].[B-](F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1"
     ],
     "reactants": [
       "ArX*",
@@ -49,7 +54,11 @@
     "description": "Pd or Ni-catalyzed cross-coupling of organozinc reagents with organic halides",
     "smarts": "[#6:1][Cl,Br,I].[#6:2][Zn]>>[#6:1][#6:2]",
     "reference_reactions": [
-      "Brc1ccccc1.[Zn]Cc1ccccc1>>Cc1ccccc1c1ccccc1"
+      "Brc1ccccc1.[Zn]Cc1ccccc1>>Cc1ccccc1c1ccccc1",
+      "Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1",
+      "Ic1ccncc1.C=C[Zn]Br>>C=Cc1ccncc1",
+      "Brc1ccc(C(F)(F)F)cc1.c1ccc([Zn]Cl)cc1>>FC(F)(F)c1ccc(-c2ccccc2)cc1",
+      "Clc1ccc(C#N)cc1.CC[Zn]Br>>CCc1ccc(C#N)cc1"
     ],
     "reactants": [
       "ArX*",
@@ -92,7 +101,11 @@
     "description": "Pd-catalyzed coupling of aryl halides with alkenes",
     "smarts": "[#6;c,$(C(=O)O),$(C#N):3][#6;H1:2]=[#6;H2:1].[#6;$([#6]=[#6]),$(c:c):4][Cl,Br,I]>>[#6:4]/[#6:1]=[#6:2]/[#6:3]",
     "reference_reactions": [
-      "Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1"
+      "Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1",
+      "Ic1ccc(C=O)cc1.C=CC(=O)OCC>>CCOC(=O)/C=C/c1ccc(C=O)cc1",
+      "Brc1ccncc1.C=CC#N>>N#C/C=C/c1ccncc1",
+      "Brc1ccc(OC)cc1.C=CC(=O)OC>>COc1ccc(/C=C/C(=O)OC)cc1",
+      "Brc1cccs1.C=CC(=O)N>>NC(=O)/C=C/c1cccs1"
     ],
     "reactants": [
       "ArX*",
@@ -113,7 +126,11 @@
     "description": "Pd/Cu-catalyzed coupling of terminal alkynes with aryl/vinyl halides",
     "smarts": "[#6;$(C=C-[#6]),$(c:c):1][Br,I].[CH1;$(C#CC):2]>>[#6:1][C:2]",
     "reference_reactions": [
-      "Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1"
+      "Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1",
+      "Ic1ccncc1.C#CC>>C#Cc1ccncc1",
+      "Clc1ccc(C#N)cc1.C#CC(C)(C)C>>CC(C)(C)C#Cc1ccc(C#N)cc1",
+      "Brc1ccc(OC)cc1.C#Cc1ccccc1>>COc1ccc(C#Cc2ccccc2)cc1",
+      "Brc1cccs1.C#Cc1ccccc1>>c1cc(C#Cc2ccccc2)sc1"
     ],
     "reactants": [
       "ArX*",
@@ -136,7 +153,9 @@
     "description": "Pd-catalyzed coupling of organostannanes with aryl/vinyl halides",
     "smarts": "[#6;$(C=C-[#6]),$(c:c):1][Br,I].[Cl,Br,I][c:2]>>[c:2][#6:1]",
     "reference_reactions": [
-      "Brc1ccccc1.[Sn](C)(C)(C)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+      "Brc1ccccc1.[Sn](C)(C)(C)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+      "Brc1ccccc1.c1ccc([Sn](C)(C)C)cc1>>c1ccc(-c2ccccc2)cc1",
+      "Ic1ccncc1.C=C[Sn](C)(C)C>>C=Cc1ccncc1"
     ],
     "reactants": [
       "ArX*",
@@ -157,7 +176,11 @@
     "description": "Ni or Pd-catalyzed coupling of Grignard reagents with aryl/vinyl halides",
     "smarts": "[#6:1][Mg][Cl,Br,I].[#6;$(c1ccccc1),$(C=C):2][Cl,Br,I]>>[#6:2][#6:1]",
     "reference_reactions": [
-      "Brc1ccccc1.[Mg]Cc1ccccc1>>Cc1ccccc1c1ccccc1"
+      "Brc1ccccc1.[Mg]Cc1ccccc1>>Cc1ccccc1c1ccccc1",
+      "Brc1ccccc1.c1ccc([Mg]Br)cc1>>c1ccc(-c2ccccc2)cc1",
+      "Ic1ccncc1.C=C[Mg]Cl>>C=Cc1ccncc1",
+      "Brc1ccc(OC)cc1.CC[Mg]Br>>CCc1ccc(OC)cc1",
+      "Clc1ccc(C#N)cc1.c1ccc([Mg]Br)cc1>>N#Cc1ccc(-c2ccccc2)cc1"
     ],
     "reactants": [
       "ArX*",
@@ -237,7 +260,12 @@
     "description": "Pd-catalyzed cross-coupling of amines with aryl halides",
     "smarts": "[Cl,Br,I][c;$(c1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):1].[N;$(NC)&!$(N=*)&!$([N-])&!$(N#*)&!$([ND3])&!$([ND4])&!$(N[c,O])&!$(N[C,S]=[S,O,N]),H2&$(Nc1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):2]>>[c:1][N:2]",
     "reference_reactions": [
-      "Brc1ccccc1.CNc1ccccc1>>CN(c1ccccc1)c1ccccc1"
+      "Brc1ccccc1.CNc1ccccc1>>CN(c1ccccc1)c1ccccc1",
+      "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+      "Clc1ccncc1.NCC>>CCNc1ccncc1",
+      "Brc1ccc(C(F)(F)F)cc1.NC1CCCCC1>>FC(F)(F)c1ccc(NC2CCCCC2)cc1",
+      "Brc1ccccc1.N1CCOCC1>>c1ccccc1N1CCOCC1",
+      "Brc1ccccc1.N1CCCCC1>>c1ccccc1N1CCCCC1"
     ],
     "reactants": [
       "ArX*",
@@ -302,7 +330,11 @@
     "smarts": "[c:1][Cl,Br,I].[N;H2,H1;!$(NC=O):2]>>[c:1][N:2]",
     "reference_reactions": [
       "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
-      "Ic1ccccc1.N1CCCCC1>>c1ccc(N2CCCCC2)cc1"
+      "Ic1ccccc1.N1CCCCC1>>c1ccc(N2CCCCC2)cc1",
+      "Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1",
+      "Brc1ccccc1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1ccccc1",
+      "Brc1ccccc1.c1c[nH]nc1>>c1ccccc1n1ccnc1",
+      "Brc1ccccc1.NC(=O)C>>CC(=O)Nc1ccccc1"
     ],
     "reactants": [
       "ArX*",
@@ -324,7 +356,10 @@
     "description": "Cu-catalyzed oxidative coupling of boronic acids with amines/amides",
     "smarts": "[c:1]B(O)O.[nH1;+0;r5;!$(n[#6]=[O,S,N]);!$(n~n~n);!$(n~n~c~n);!$(n~c~n~n):2]>>[c:1][n:2]",
     "reference_reactions": [
-      "OB(O)c1ccccc1.c1cnc[nH]1>>c1ccc(-n2ccnc2)cc1"
+      "OB(O)c1ccccc1.c1cnc[nH]1>>c1ccc(-n2ccnc2)cc1",
+      "c1ccccc1B(O)O.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+      "c1ccc(OC)cc1B(O)O.Nc1ccccc1>>COc1ccc(Nc2ccccc2)cc1",
+      "c1ccncc1B(O)O.Nc1ccccc1>>c1ccccc1Nc1ccncc1"
     ],
     "reactants": [
       "ArB*",
@@ -347,7 +382,10 @@
     "smarts": "[c:1][Cl,Br,I].[O;H1;!$(OB):2]>>[c:1][O:2]",
     "reference_reactions": [
       "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1",
-      "Ic1ccccc1.CO>>COc1ccccc1"
+      "Ic1ccccc1.CO>>COc1ccccc1",
+      "Ic1ccncc1.OCC>>CCOc1ccncc1",
+      "Brc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1",
+      "Clc1ccc(C#N)cc1.OC>>COc1ccc(C#N)cc1"
     ],
     "reactants": [
       "ArX*",
