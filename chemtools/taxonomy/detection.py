@@ -224,8 +224,12 @@ def _load_taxonomy_smarts() -> Dict[str, Any]:
     """
     Load SMARTS patterns from reaction_types.json taxonomy file.
     
+    DEPRECATED: The 'smarts' field has been removed from reaction_types.json.
+    This function will return an empty dict. Use data-driven detection instead.
+    
     Returns:
         Dict mapping reaction_type_id to {smarts, name, category, aliases}
+        (empty if no smarts fields exist in taxonomy)
     """
     global _TAXONOMY_SMARTS_CACHE
     
@@ -257,7 +261,10 @@ def _load_taxonomy_smarts() -> Dict[str, Any]:
                     "aliases": entry.get("aliases", []),
                 }
         
-        logger.debug(f"Loaded {len(_TAXONOMY_SMARTS_CACHE)} reaction SMARTS from taxonomy")
+        if not _TAXONOMY_SMARTS_CACHE:
+            logger.debug("No SMARTS patterns found in taxonomy (field removed)")
+        else:
+            logger.debug(f"Loaded {len(_TAXONOMY_SMARTS_CACHE)} reaction SMARTS from taxonomy")
         return _TAXONOMY_SMARTS_CACHE
         
     except Exception as e:
@@ -398,31 +405,42 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
     """
     Detect reaction type by matching against taxonomy SMARTS patterns.
     
-    This function uses the SMARTS patterns defined in reaction_types.json
-    to identify the reaction type. Each pattern is a reaction SMARTS that
-    describes the transformation.
+    DEPRECATED: This function is deprecated as the `smarts` field has been
+    removed from reaction_types.json. Use data-driven detection via
+    `chemtools.taxonomy.data_driven_detection.detect_by_reactants()` instead,
+    or use DRFP similarity matching via `detect_by_drfp_similarity()`.
     
     Args:
         reaction_smiles: Full reaction SMILES (reactants>>products)
         
     Returns:
-        List of (reaction_type_id, name, confidence) tuples, sorted by confidence.
-        Empty list if no matches found.
+        Empty list (smarts field removed from taxonomy).
         
-    Example:
-        >>> matches = detect_by_taxonomy_smarts("Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
-        >>> matches[0]
-        ('suzuki_miyaura', 'Suzuki-Miyaura Coupling', 0.95)
+    See Also:
+        - detect_by_drfp_similarity: For similarity-based detection
+        - chemtools.taxonomy.data_driven_detection.detect_by_reactants: For data-driven detection
     """
+    import warnings
+    warnings.warn(
+        "detect_by_taxonomy_smarts is deprecated. The 'smarts' field has been removed "
+        "from reaction_types.json. Use detect_by_drfp_similarity() or "
+        "data_driven_detection.detect_by_reactants() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    # Load taxonomy - will return empty if no smarts fields exist
+    taxonomy = _load_taxonomy_smarts()
+    if not taxonomy:
+        logger.debug("No SMARTS patterns found in taxonomy - returning empty")
+        return []
+    
+    # Original implementation follows (for backwards compatibility if smarts exist)
     try:
         from rdkit import Chem
         from rdkit.Chem import AllChem
     except ImportError:
         logger.warning("RDKit not available for taxonomy SMARTS matching")
-        return []
-    
-    taxonomy = _load_taxonomy_smarts()
-    if not taxonomy:
         return []
     
     matches: List[Tuple[str, str, float, bool]] = []

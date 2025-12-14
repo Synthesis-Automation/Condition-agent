@@ -51,6 +51,9 @@ _ROUTER_GROUPS = (
     "terminal_alkene",
     "terminal_alkyne",
     "triflate",
+    "mesylate",
+    "tosylate",
+    "aryl_sulfonate",
     "vinyl_halide",
 )
 

@@ -8,7 +8,6 @@
       "Suzuki coupling"
     ],
     "description": "Pd-catalyzed cross-coupling of aryl/vinyl halides with organoboron compounds",
-    "smarts": "[#6;H0;D3;$([#6](~[#6])~[#6]):1]B(O)O.[#6;H0;D3;$([#6](~[#6])~[#6]):2][Cl,Br,I]>>[#6:2][#6:1]",
     "reference_reactions": [
       "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
       "Clc1ccc(C#N)cc1.c1ccc(B(O)O)cc1>>N#Cc1ccc(-c2ccccc2)cc1",
@@ -52,7 +51,6 @@
       "Negishi cross-coupling"
     ],
     "description": "Pd or Ni-catalyzed cross-coupling of organozinc reagents with organic halides",
-    "smarts": "[#6:1][Cl,Br,I].[#6:2][Zn]>>[#6:1][#6:2]",
     "reference_reactions": [
       "Brc1ccccc1.[Zn]Cc1ccccc1>>Cc1ccccc1c1ccccc1",
       "Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1",
@@ -99,7 +97,6 @@
       "Heck coupling"
     ],
     "description": "Pd-catalyzed coupling of aryl halides with alkenes",
-    "smarts": "[#6;c,$(C(=O)O),$(C#N):3][#6;H1:2]=[#6;H2:1].[#6;$([#6]=[#6]),$(c:c):4][Cl,Br,I]>>[#6:4]/[#6:1]=[#6:2]/[#6:3]",
     "reference_reactions": [
       "Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1",
       "Ic1ccc(C=O)cc1.C=CC(=O)OCC>>CCOC(=O)/C=C/c1ccc(C=O)cc1",
@@ -124,7 +121,6 @@
       "Sonogashira cross-coupling"
     ],
     "description": "Pd/Cu-catalyzed coupling of terminal alkynes with aryl/vinyl halides",
-    "smarts": "[#6;$(C=C-[#6]),$(c:c):1][Br,I].[CH1;$(C#CC):2]>>[#6:1][C:2]",
     "reference_reactions": [
       "Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1",
       "Ic1ccncc1.C#CC>>C#Cc1ccncc1",
@@ -151,7 +147,6 @@
       "Migita-Kosugi-Stille coupling"
     ],
     "description": "Pd-catalyzed coupling of organostannanes with aryl/vinyl halides",
-    "smarts": "[#6;$(C=C-[#6]),$(c:c):1][Br,I].[Cl,Br,I][c:2]>>[c:2][#6:1]",
     "reference_reactions": [
       "Brc1ccccc1.[Sn](C)(C)(C)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
       "Brc1ccccc1.c1ccc([Sn](C)(C)C)cc1>>c1ccc(-c2ccccc2)cc1",
@@ -174,7 +169,6 @@
       "Kumada-Corriu coupling"
     ],
     "description": "Ni or Pd-catalyzed coupling of Grignard reagents with aryl/vinyl halides",
-    "smarts": "[#6:1][Mg][Cl,Br,I].[#6;$(c1ccccc1),$(C=C):2][Cl,Br,I]>>[#6:2][#6:1]",
     "reference_reactions": [
       "Brc1ccccc1.[Mg]Cc1ccccc1>>Cc1ccccc1c1ccccc1",
       "Brc1ccccc1.c1ccc([Mg]Br)cc1>>c1ccc(-c2ccccc2)cc1",
@@ -200,7 +194,6 @@
       "Reformatsky addition"
     ],
     "description": "Zn-mediated addition of α-halo esters to carbonyl compounds",
-    "smarts": "[#6:1][C:2](=[O:3])[O:4][#6].[#6,H:5][C:6](=[O:7])>>[#6:1][C:2]([O:3])([O:4][#6])[C:6]([#6,H:5])[OH]",
     "reference_reactions": [
       "BrCC(=O)OCC.CC=O>>CCOC(=O)CC(C)O"
     ],
@@ -258,7 +251,6 @@
       "Pd-catalyzed amination"
     ],
     "description": "Pd-catalyzed cross-coupling of amines with aryl halides",
-    "smarts": "[Cl,Br,I][c;$(c1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):1].[N;$(NC)&!$(N=*)&!$([N-])&!$(N#*)&!$([ND3])&!$([ND4])&!$(N[c,O])&!$(N[C,S]=[S,O,N]),H2&$(Nc1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):2]>>[c:1][N:2]",
     "reference_reactions": [
       "Brc1ccccc1.CNc1ccccc1>>CN(c1ccccc1)c1ccccc1",
       "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
@@ -304,7 +296,6 @@
       "Aromatic nucleophilic substitution with amines"
     ],
     "description": "Direct nucleophilic substitution on electron-deficient aryl halides with nitrogen nucleophiles",
-    "smarts": "[c;!$(c1ccccc1);$(c1[n,c]c[n,c]c[n,c]1):1][Cl,F].[N;$(NC);!$(N=*);!$([N-]);!$(N#*);!$([ND3]);!$([ND4]);!$(N[c,O]);!$(N[C,S]=[S,O,N]):2]>>[c:1][N:2]",
     "reference_reactions": [
       "Fc1ccncc1.CNC>>CNc1ccncc1",
       "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1"
@@ -327,7 +318,6 @@
       "Cu-catalyzed amination"
     ],
     "description": "Cu-catalyzed coupling of amines with aryl halides",
-    "smarts": "[c:1][Cl,Br,I].[N;H2,H1;!$(NC=O):2]>>[c:1][N:2]",
     "reference_reactions": [
       "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
       "Ic1ccccc1.N1CCCCC1>>c1ccc(N2CCCCC2)cc1",
@@ -354,7 +344,6 @@
       "Oxidative C-N coupling"
     ],
     "description": "Cu-catalyzed oxidative coupling of boronic acids with amines/amides",
-    "smarts": "[c:1]B(O)O.[nH1;+0;r5;!$(n[#6]=[O,S,N]);!$(n~n~n);!$(n~n~c~n);!$(n~c~n~n):2]>>[c:1][n:2]",
     "reference_reactions": [
       "OB(O)c1ccccc1.c1cnc[nH]1>>c1ccc(-n2ccnc2)cc1",
       "c1ccccc1B(O)O.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
@@ -379,7 +368,6 @@
       "Aryl ether formation"
     ],
     "description": "Formation of C-O bonds (aryl ethers, alkyl aryl ethers)",
-    "smarts": "[c:1][Cl,Br,I].[O;H1;!$(OB):2]>>[c:1][O:2]",
     "reference_reactions": [
       "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1",
       "Ic1ccccc1.CO>>COc1ccccc1",
@@ -405,7 +393,6 @@
       "Mitsunobu esterification"
     ],
     "description": "Dehydrative coupling of alcohols with nucleophiles (often with inversion)",
-    "smarts": "[C;H1&$(C([#6])[#6]),H2&$(C[#6]):1][OH1].[NH1;$(N(C=O)C=O):2]>>[C:1][N:2]",
     "reference_reactions": [
       "CC(C)O.c1ccccc1O>>CC(C)Oc1ccccc1",
       "CC(C)O.CC(=O)NC(=O)C>>CC(=O)N(C(C)C)C(C)=O"
@@ -446,7 +433,6 @@
       "Cu-catalyzed ether formation"
     ],
     "description": "Cu-catalyzed coupling of phenols/alcohols with aryl halides to form ethers",
-    "smarts": "[c:1][Cl,Br,I].[c:2][OH]>>[c:1][O][c:2]",
     "reference_reactions": [
       "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1"
     ],
@@ -468,7 +454,6 @@
       "Aromatic nucleophilic substitution with alcohols"
     ],
     "description": "Direct nucleophilic substitution on electron-deficient aryl halides with oxygen nucleophiles",
-    "smarts": "[c;$(c1ncccn1),$(c1nccnc1),$(c([N+](=O)[O-])):1][F,Cl].[O;H1:2]>>[c:1][O:2]",
     "reference_reactions": [
       "Fc1ccncc1.CO>>COc1ccncc1",
       "Fc1ccc([N+](=O)[O-])cc1.CO>>COc1ccc([N+](=O)[O-])cc1"
@@ -491,7 +476,6 @@
       "Thioether formation"
     ],
     "description": "Formation of C-S bonds (aryl/alkyl thioethers)",
-    "smarts": "[c:1][Cl,Br,I].[S;H1:2]>>[c:1][S:2]",
     "reference_reactions": [
       "Brc1ccccc1.Sc1ccccc1>>c1ccc(Sc2ccccc2)cc1",
       "Ic1ccccc1.CS>>CSc1ccccc1"
@@ -515,7 +499,6 @@
       "Aromatic nucleophilic substitution with thiols"
     ],
     "description": "Direct nucleophilic substitution on electron-deficient aryl halides with sulfur nucleophiles",
-    "smarts": "[c;$(c1ncccn1),$(c1nccnc1),$(c([N+](=O)[O-])):1][F,Cl].[S;H1:2]>>[c:1][S:2]",
     "reference_reactions": [
       "Fc1ccncc1.CS>>CSc1ccncc1",
       "Fc1ccc([N+](=O)[O-])cc1.Sc1ccccc1>>c1ccc(Sc2ccc([N+](=O)[O-])cc2)cc1"
@@ -538,7 +521,6 @@
       "Peptide coupling"
     ],
     "description": "Formation of amide bonds from carboxylic acids/esters and amines",
-    "smarts": "[#6:1][C:2](=[O:3])[OH].[N;H2,H1;!$(NC=O):4]>>[#6:1][C:2](=[O:3])[N:4]",
     "reference_reactions": [
       "O=C(O)c1ccccc1.NCc1ccccc1>>O=C(NCc1ccccc1)c1ccccc1",
       "CC(=O)O.NC1CCCCC1>>CC(=O)NC1CCCCC1"
@@ -579,7 +561,6 @@
       "Wittig olefination"
     ],
     "description": "Formation of alkenes from aldehydes/ketones and phosphonium ylides",
-    "smarts": "[#6:3]-[C;H1,$([CH0](-[#6])[#6]);!$(CC=O):1]=[OD1].[Cl,Br,I][C;H2;$(C-[#6]);!$(CC[I,Br]);!$(CCO[CH3]):2]>>[C:3][C:1]=[C:2]",
     "reference_reactions": [
       "CC=O.BrCc1ccccc1>>CC=Cc1ccccc1"
     ],
@@ -982,7 +963,6 @@
       "DA reaction"
     ],
     "description": "[4+2] cycloaddition of a conjugated diene with a dienophile to form a six-membered ring",
-    "smarts": "[#6:1]=[#6:2]-[#6:3]=[#6:4].[#6:5]=[#6:6]>>[#6:1]1-[#6:2]=[#6:3]-[#6:4]-[#6:6]-[#6:5]-1",
     "reference_reactions": [
       "C=CC=C.C=CC=O>>O=CC1CC=CCC1"
     ],
@@ -1004,7 +984,6 @@
       "H2 reduction"
     ],
     "description": "Catalytic addition of hydrogen to unsaturated bonds or reduction of functional groups",
-    "smarts": "[#6:1]=[#6:2]>>[#6:1]-[#6:2]",
     "reference_reactions": [
       "C=Cc1ccccc1>>CCc1ccccc1",
       "c1ccc(C=C)cc1>>c1ccc(CC)cc1"
@@ -1030,7 +1009,6 @@
       "Aldehyde reduction"
     ],
     "description": "Reduction of carbonyl compounds using metal hydrides",
-    "smarts": "[#6:1][C:2](=[O])[#6,H:3]>>[#6:1][C:2]([OH])[#6,H:3]",
     "reference_reactions": [
       "CC(=O)c1ccccc1>>CC(O)c1ccccc1",
       "O=Cc1ccccc1>>OCc1ccccc1"
@@ -1072,7 +1050,6 @@
       "Alkene epoxidation"
     ],
     "description": "Formation of epoxides from alkenes using peroxy acids or other oxidants",
-    "smarts": "[C:1]=[C:2]>>[C:1]1[O][C:2]1",
     "reference_reactions": [
       "C=Cc1ccccc1>>c1ccc(C2OC2)cc1",
       "CC=CC>>CC1OC1C"
@@ -1115,7 +1092,6 @@
       "Nucleophilic substitution bimolecular"
     ],
     "description": "Bimolecular nucleophilic substitution at saturated carbon",
-    "smarts": "[Cl,Br,I][#6;H2,H1:1].[N,O,S;H1,H2:2]>>[#6:1][*:2]",
     "reference_reactions": [
       "BrCC.N>>NCC",
       "ClCc1ccccc1.O>>OCc1ccccc1"
@@ -1137,7 +1113,6 @@
       "Beta elimination"
     ],
     "description": "Bimolecular elimination to form alkenes",
-    "smarts": "[#6:1][#6:2]([H])[#6:3][Cl,Br,I]>>[#6:1][#6:2]=[#6:3]",
     "reference_reactions": [
       "CC(Br)CC>>C=CCC",
       "c1ccc(C(Br)C)cc1>>c1ccc(C=C)cc1"
@@ -1159,7 +1134,6 @@
       "Aldol addition"
     ],
     "description": "Addition of an enolate to a carbonyl compound",
-    "smarts": "[#6:1][CH2:2][C:3](=[O:4])[#6,H:5].[#6,H:6][C:7](=[O:8])[H]>>[#6:1][CH:2]([C:3](=[O:4])[#6,H:5])[C:7]([#6,H:6])[OH]",
     "reference_reactions": [
       "CC=O.CC=O>>CC(O)CC=O",
       "CC(=O)C.c1ccccc1C=O>>CC(=O)C(O)c1ccccc1"
@@ -1182,7 +1156,6 @@
       "Imine reduction"
     ],
     "description": "Formation of amines from aldehydes/ketones and amines via imine intermediates",
-    "smarts": "[#6:4]-[C;H1,$([CH0](-[#6])[#6]):1]=[OD1].[N;H2,$([NH1;D2](C)C);!$(N-[#6]=[*]):3]-[C:5]>>[#6:4][C:1]-[N:3]-[C:5]",
     "reference_reactions": [
       "O=Cc1ccccc1.NCc1ccccc1>>c1ccc(CNCc2ccccc2)cc1"
     ],
@@ -1257,7 +1230,6 @@
       "PS reaction"
     ],
     "description": "Acid-catalyzed cyclization of β-arylethylamines with carbonyl compounds to form tetrahydroisoquinolines or β-carbolines",
-    "smarts": "[cH1:1]1:[c:2](-[CH2:7]-[CH2:8]-[NH2:9]):[c:3]:[c:4]:[c:5]:[c:6]:1.[#6:11]-[CH1;R0:10]=[OD1]>>[c:1]12:[c:2](-[CH2:7]-[CH2:8]-[NH1:9]-[C:10]-2(-[#6:11])):[c:3]:[c:4]:[c:5]:[c:6]:1",
     "reference_reactions": [
       "NCCc1ccccc1.CC=O>>CC1NCCc2ccccc21"
     ],
@@ -1298,7 +1270,6 @@
       "Ester formation"
     ],
     "description": "Formation of esters from carboxylic acids or acid chlorides with alcohols",
-    "smarts": "[#6:1][C:2](=[O:3])[OH].[#6:4][OH]>>[#6:1][C:2](=[O:3])[O][#6:4]",
     "reference_reactions": [
       "CC(=O)O.CCO>>CC(=O)OCC",
       "O=C(O)c1ccccc1.CO>>COC(=O)c1ccccc1"
@@ -1323,7 +1294,6 @@
       "Grignard ketone addition"
     ],
     "description": "Nucleophilic addition of Grignard reagents to aldehydes, ketones, or esters",
-    "smarts": "[#6:1][C:2]#[#7;D1].[Cl,Br,I][#6;$([#6]~[#6]);!$([#6]([Cl,Br,I])[Cl,Br,I]);!$([#6]=O):3]>>[#6:1][C:2](=O)[#6:3]",
     "reference_reactions": [
       "O=Cc1ccccc1.BrMg(C)>>CC(O)c1ccccc1",
       "CC(C)=O.[Mg]Cc1ccccc1>>CC(C)(O)Cc1ccccc1"
@@ -1382,7 +1352,6 @@
       "Conjugate addition"
     ],
     "description": "Nucleophilic addition to α,β-unsaturated carbonyl compounds (1,4-addition)",
-    "smarts": "[#6:1][C:2]([H])=[C:3][C:4](=[O])[#6,O:5].[#6:6][C:7]([H])([H])[C:8](=[O])[#6,O:9]>>[#6:1][C:2]([H])([C:7]([#6:6])[C:8](=[O])[#6,O:9])[C:3][C:4](=[O])[#6,O:5]",
     "reference_reactions": [
       "C=CC(=O)C.CC(=O)CC>>CC(=O)CCC(C)C(=O)C"
     ],
@@ -1422,7 +1391,6 @@
       "Cyanation"
     ],
     "description": "SN2 substitution with cyanide to form nitriles",
-    "smarts": "[#6:1][Cl,Br,I].[C-]#N>>[#6:1]C#N",
     "reference_reactions": [
       "BrCC.[Na+].[C-]#N>>CCC#N",
       "ClCc1ccccc1.[K+].[C-]#N>>N#CCc1ccccc1"
@@ -1445,7 +1413,6 @@
       "Halide exchange"
     ],
     "description": "SN2 halide exchange reaction, typically Cl/Br to I using NaI",
-    "smarts": "[#6:1][Cl,Br].[I-]>>[#6:1][I]",
     "reference_reactions": [
       "ClCC.[Na+].[I-]>>ICC",
       "BrCc1ccccc1.[Na+].[I-]>>ICc1ccccc1"
@@ -1468,7 +1435,6 @@
       "Williamson synthesis"
     ],
     "description": "SN2 ether formation from alkoxide and alkyl halide",
-    "smarts": "[#6;$([#6]~[#6]);!$([#6]=O):2][#8;H1:3].[Cl,Br,I][#6;H2;$([#6]~[#6]):4]>>[CH2:4][O:3][#6:2]",
     "reference_reactions": [
       "CCO.BrCc1ccccc1>>CCOCc1ccccc1"
     ],

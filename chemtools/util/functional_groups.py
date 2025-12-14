@@ -94,7 +94,10 @@ _LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
     "phenol": ("[OH;$([OH]c1ccccc1)]",),  # Phenol pattern
     "terminal_alkene": ("C=C",),  # Terminal alkene pattern
     "terminal_alkyne": ("C#C[H]", "[C;H]#C"),
-    "triflate": ("OS(=O)(=O)C(F)(F)F",),
+    "triflate": ("[OX2]S(=O)(=O)C(F)(F)F",),  # Triflate (OTf) - updated pattern
+    "mesylate": ("[OX2]S(=O)(=O)C",),  # Mesylate (OMs)
+    "tosylate": ("[OX2]S(=O)(=O)c1ccc(C)cc1",),  # Tosylate (OTs)
+    "aryl_sulfonate": ("[OX2]S(=O)(=O)[C,c]",),  # Generic aryl/alkyl sulfonate
     "vinyl_halide": ("C=C[Cl,Br,I]",),
 }
 
