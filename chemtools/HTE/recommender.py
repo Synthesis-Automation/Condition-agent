@@ -16,10 +16,44 @@ Key Features:
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple, Any
 from collections import defaultdict, Counter
+from functools import lru_cache
 import pandas as pd
 from pathlib import Path
 
 from chemtools.analysis.reactants import classify_reactant_smiles
+
+
+@lru_cache(maxsize=4)
+def _load_hte_database_cached(
+    hte_db_path: str,
+) -> Tuple[pd.DataFrame, Dict[Tuple[str, str], pd.DataFrame], Dict[Tuple[str, str], Counter]]:
+    """Load and index the HTE database once per path (cached)."""
+    db_path = Path(hte_db_path)
+    if not db_path.exists():
+        raise FileNotFoundError(f"HTE database not found: {db_path}")
+
+    df = pd.read_csv(db_path)
+    print(f"Loaded HTE database: {len(df)} experiments")
+
+    indexed_data: Dict[Tuple[str, str], pd.DataFrame] = {}
+    reaction_type_patterns: Dict[Tuple[str, str], Counter] = {}
+
+    print("Building reactant type indices...")
+    grouped = df.groupby(["Reactant_A_Type", "Reactant_B_Type"])
+    for (type_a, type_b), group_df in grouped:
+        if pd.isna(type_a):
+            type_a = ""
+        if pd.isna(type_b):
+            type_b = ""
+
+        key = (type_a, type_b)
+        indexed_data[key] = group_df
+
+        rxn_types = group_df["Reaction_Type_Standardized"].value_counts()
+        reaction_type_patterns[key] = Counter(rxn_types.to_dict())
+
+    print(f"Indexed {len(indexed_data)} unique reactant type combinations")
+    return df, indexed_data, reaction_type_patterns
 
 
 @dataclass
@@ -93,9 +127,11 @@ class HTERecommender:
         self.df: Optional[pd.DataFrame] = None
         self.indexed_data: Dict[Tuple[str, str], pd.DataFrame] = {}
         self.reaction_type_patterns: Dict[Tuple[str, str], Counter] = {}
-        
-        self._load_database()
-        self._build_indices()
+
+        df, indexed_data, patterns = _load_hte_database_cached(str(self.db_path))
+        self.df = df
+        self.indexed_data = dict(indexed_data)
+        self.reaction_type_patterns = dict(patterns)
     
     def _load_database(self):
         """Load HTE database"""

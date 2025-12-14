@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import html
+import json
 import re
 import shlex
 import tempfile
 import traceback
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
@@ -33,7 +34,9 @@ from langchain_core.messages import BaseMessage
 from chem_assistant.chemtools_agent import ChemToolsAgent
 from chem_assistant.constraint_parser import (
     ConstraintSpec,
+    build_constraint_spec,
     format_constraints_for_prompt,
+    merge_specs,
 )
 from chem_assistant.gui.dialogs import (
     ConstraintDialog,
@@ -52,6 +55,22 @@ IMAGE_COMMAND_PATTERNS = [
     r"^(?:show|display)\s+(?:me\s+)?(?:an?\s+|the\s+)?image\s*(?:of|for)?\s*(reaction|molecule|compound)?[:=]?\s*(.+)$",
 ]
 URL_SMILES_KEYS = ("smiles", "model", "structure", "mol", "target")
+REACTION_SMILES = re.compile(
+    r"([A-Za-z0-9@+\-\[\]\(\)=#$\.]+>>[A-Za-z0-9@+\-\[\]\(\)=#$\.]+)"
+)
+CONDITION_KEYWORDS = (
+    "condition",
+    "conditions",
+    "recommend",
+    "recommendation",
+    "setup",
+    "protocol",
+    "hte",
+    "catalyst",
+    "ligand",
+    "base",
+    "solvent",
+)
 
 
 class WorkerSignals(QObject):
@@ -216,7 +235,9 @@ class ChemAssistantWindow(QMainWindow):
 
         # Input area
         self.input_edit = ChatInput()
-        self.input_edit.setPlaceholderText("Type a question or command...")
+        self.input_edit.setPlaceholderText(
+            "Type a question, use /conditions <reaction_smiles>, or paste a reaction SMILES..."
+        )
         self.input_edit.setMinimumHeight(60)
         self.input_edit.setMaximumHeight(140)
         self.input_edit.setStyleSheet(
@@ -284,6 +305,8 @@ class ChemAssistantWindow(QMainWindow):
         self.input_edit.clear()
         if self.handle_local_command(content):
             return
+        if self._maybe_start_conditions_workflow(content):
+            return
         self.append_chat("You", content)
         if not self._ensure_agent():
             self.append_log("Agent unavailable; use local commands.")
@@ -324,6 +347,9 @@ class ChemAssistantWindow(QMainWindow):
             if cmd in {"terms", "term"}:
                 self._handle_terms_command(cmd, args)
                 return True
+            if cmd in {"conditions", "condition", "cond", "auto", "recommend"}:
+                self._handle_conditions_command(command_text, args)
+                return True
 
         parsed = self._extract_image_request(command_text)
         if parsed:
@@ -331,6 +357,578 @@ class ChemAssistantWindow(QMainWindow):
             self._execute_image_request(target, smiles, log_to_chat=True)
             return True
         return False
+
+    def _extract_reaction_smiles(self, content: str) -> Optional[str]:
+        """Return a best-effort reaction SMILES substring (reactants>>products)."""
+        text = (content or "").strip()
+        if not text or ">>" not in text:
+            return None
+
+        # Strip common wrappers to support inputs like "`A.B>>C`".
+        if len(text) > 2 and text[0] == text[-1] and text[0] in {"`", '"', "'"}:
+            text = text[1:-1].strip()
+
+        match = REACTION_SMILES.search(text)
+        if match:
+            return match.group(1).strip()
+
+        # Fallback: accept a whitespace-free token containing ">>".
+        if " " not in text and "\t" not in text and "\n" not in text:
+            return text
+        return None
+
+    def _is_conditions_intent(self, content: str, reaction_smiles: str) -> bool:
+        normalized = (content or "").strip()
+        if not normalized:
+            return False
+
+        # If user only pasted a reaction SMILES, assume they want conditions.
+        wrapper_stripped = normalized
+        if (
+            len(wrapper_stripped) > 2
+            and wrapper_stripped[0] == wrapper_stripped[-1]
+            and wrapper_stripped[0] in {"`", '"', "'"}
+        ):
+            wrapper_stripped = wrapper_stripped[1:-1].strip()
+        if wrapper_stripped == reaction_smiles:
+            return True
+
+        lowered = normalized.lower()
+        return any(keyword in lowered for keyword in CONDITION_KEYWORDS)
+
+    def _handle_conditions_command(self, raw_command: str, args: List[str]) -> None:
+        if not args:
+            self.append_chat(
+                "System",
+                "Usage: `/conditions <reaction_smiles> [optional constraint text]`.\n"
+                "Tip: you can also paste a bare reaction SMILES to trigger this mode.",
+            )
+            return
+
+        joined = " ".join(args).strip()
+        reaction_smiles = self._extract_reaction_smiles(joined)
+        if not reaction_smiles:
+            self.append_chat(
+                "System",
+                "No reaction SMILES detected. Expected `reactants>>products`.\n"
+                "Example: `/conditions Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1`",
+            )
+            return
+
+        inline_text = joined.replace(reaction_smiles, " ").strip() or None
+        inline_spec = build_constraint_spec(text=inline_text) if inline_text else ConstraintSpec()
+        active_spec = merge_specs(self.constraint_spec, inline_spec)
+
+        self.append_chat("You", raw_command)
+        self._start_conditions_workflow(reaction_smiles, active_spec, inline_text=inline_text)
+
+    def _maybe_start_conditions_workflow(self, content: str) -> bool:
+        reaction_smiles = self._extract_reaction_smiles(content)
+        if not reaction_smiles:
+            return False
+        if not self._is_conditions_intent(content, reaction_smiles):
+            return False
+
+        inline_text = content.replace(reaction_smiles, " ").strip() or None
+        inline_spec = build_constraint_spec(text=inline_text) if inline_text else ConstraintSpec()
+        active_spec = merge_specs(self.constraint_spec, inline_spec)
+
+        self.append_chat("You", content)
+        self._start_conditions_workflow(reaction_smiles, active_spec, inline_text=inline_text)
+        return True
+
+    def _start_conditions_workflow(
+        self,
+        reaction_smiles: str,
+        constraints: ConstraintSpec,
+        *,
+        inline_text: Optional[str] = None,
+    ) -> None:
+        """Run a comprehensive, multi-database conditions workflow in the background."""
+        constraint_summary = constraints.formatted_summary()
+        constraint_display = constraint_summary if constraint_summary != "none" else "None"
+        self.append_chat(
+            "System",
+            "Auto-conditions mode started.\n"
+            f"- reaction: {reaction_smiles}\n"
+            f"- constraints: {constraint_display}",
+        )
+
+        # Best-effort image preview for the query reaction.
+        self.render_image_from_smiles(
+            "reaction",
+            reaction_smiles,
+            source="query",
+            silent=True,
+        )
+
+        self.set_input_enabled(False)
+        self.start_spinner("Searching rules/ML/protocol/HTE")
+
+        worker = Worker(
+            self._run_conditions_workflow,
+            reaction_smiles,
+            constraints,
+            inline_text=inline_text,
+        )
+        worker.signals.result.connect(self._handle_conditions_workflow_result)
+        worker.signals.error.connect(self.handle_agent_error)
+        worker.signals.finished.connect(self.reset_after_task)
+        self.thread_pool.start(worker)
+
+    def _handle_conditions_workflow_result(self, payload: Dict[str, Any]) -> None:
+        response = str(payload.get("response_text") or "").strip()
+        details_path = payload.get("details_path")
+        if details_path:
+            response = response + f"\n\nDetails JSON saved to: {details_path}"
+
+        if not response:
+            self.append_chat("System", "Auto-conditions workflow returned no output.")
+            return
+
+        self.append_chat("Agent", response)
+        self.append_log("Auto-conditions report ready.")
+
+    def _run_conditions_workflow(
+        self,
+        reaction_smiles: str,
+        constraints: ConstraintSpec,
+        *,
+        inline_text: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Blocking worker: collect evidence from tools and synthesize a report."""
+        from langchain_core.messages import HumanMessage, SystemMessage
+
+        from chem_assistant.chemtools_agent import get_llm_client
+        from chem_assistant.chemtools_wrapper import (
+            detect_reaction_family_tool,
+            hte_recommend_tool,
+            protocol_recommendation_tool,
+            recommend_conditions_tool,
+            rule_based_conditions_tool,
+            unified_recommender_tool,
+        )
+
+        def safe_invoke(tool_obj: Any, tool_input: Dict[str, Any]) -> Dict[str, Any]:
+            try:
+                result = tool_obj.invoke(tool_input)
+            except Exception as exc:
+                return {"success": False, "error": str(exc)}
+            return result if isinstance(result, dict) else {"success": True, "data": result}
+
+        constraint_payload: Dict[str, Any] = {}
+        if constraints.allow_metals:
+            constraint_payload["allow_metals"] = sorted(constraints.allow_metals)
+        if constraints.exclude_metals:
+            constraint_payload["exclude_metals"] = sorted(constraints.exclude_metals)
+        if constraints.prefer_metals:
+            constraint_payload["prefer_metals"] = sorted(constraints.prefer_metals)
+        if constraints.search_all_families:
+            constraint_payload["search_all_families"] = True
+        if constraints.constraint_rules:
+            constraint_payload["constraint_rules"] = dict(constraints.constraint_rules)
+
+        # Query all sources (best-effort; each call may fail independently).
+        family = safe_invoke(detect_reaction_family_tool, {"reaction_smiles": reaction_smiles})
+
+        rule = safe_invoke(
+            rule_based_conditions_tool,
+            {"reaction_smiles": reaction_smiles, "include_summary": True},
+        )
+
+        ml = safe_invoke(
+            recommend_conditions_tool,
+            {
+                "reaction_smiles": reaction_smiles,
+                "k": 25,
+                "max_variants": 3,
+                "rerank_strategy": "rule",
+                **constraint_payload,
+            }
+        )
+
+        unified = safe_invoke(
+            unified_recommender_tool,
+            {
+                "reaction_smiles": reaction_smiles,
+                "top_k": 5,
+                "min_similarity": 0.3,
+                "validate_rules": True,
+            }
+        )
+
+        protocols = safe_invoke(
+            protocol_recommendation_tool,
+            {
+                "reaction_smiles": reaction_smiles,
+                "k": 3,
+                "min_similarity": 0.3,
+                "use_smarts_filter": True,
+            }
+        )
+
+        # HTE: pull a larger set then filter/reorder by metal constraints.
+        hte_raw = safe_invoke(
+            hte_recommend_tool,
+            {
+                "reaction_smiles": reaction_smiles,
+                "top_k": 20,
+                "min_experiments": 1,
+            }
+        )
+        hte = self._apply_hte_constraints(hte_raw, constraints, top_k=5)
+
+        details = {
+            "reaction_smiles": reaction_smiles,
+            "inline_text": inline_text,
+            "constraints": {
+                "allow_metals": sorted(constraints.allow_metals),
+                "exclude_metals": sorted(constraints.exclude_metals),
+                "prefer_metals": sorted(constraints.prefer_metals),
+                "search_all_families": constraints.search_all_families,
+                "constraint_rules": dict(constraints.constraint_rules),
+            },
+            "results": {
+                "family": family,
+                "rule": rule,
+                "ml": ml,
+                "unified": unified,
+                "protocols": protocols,
+                "hte": hte,
+            },
+        }
+
+        details_jsonable = self._to_jsonable(details)
+        details_path = (
+            Path(tempfile.gettempdir())
+            / f"chemtools_conditions_{uuid4().hex}.json"
+        )
+        details_path.write_text(json.dumps(details_jsonable, indent=2), encoding="utf-8")
+
+        summary = self._build_conditions_report(
+            reaction_smiles=reaction_smiles,
+            constraints=constraints,
+            family=family,
+            rule=rule,
+            ml=ml,
+            protocols=protocols,
+            unified=unified,
+            hte=hte,
+        )
+
+        llm_report = self._maybe_llm_summarize_conditions(
+            reaction_smiles=reaction_smiles,
+            constraints=constraints,
+            family=family,
+            rule=rule,
+            ml=ml,
+            protocols=protocols,
+            unified=unified,
+            hte=hte,
+            get_llm_client=get_llm_client,
+            SystemMessage=SystemMessage,
+            HumanMessage=HumanMessage,
+        )
+
+        return {
+            "response_text": llm_report or summary,
+            "details_path": str(details_path),
+        }
+
+    def _apply_hte_constraints(
+        self,
+        payload: Dict[str, Any],
+        constraints: ConstraintSpec,
+        *,
+        top_k: int = 5,
+    ) -> Dict[str, Any]:
+        """Filter/reorder HTE recommendations by allow/exclude/prefer metals."""
+        if not isinstance(payload, dict):
+            return payload
+        if not payload.get("success"):
+            return payload
+        recs = payload.get("recommendations")
+        if not isinstance(recs, list) or not recs:
+            return payload
+        if not (constraints.allow_metals or constraints.exclude_metals or constraints.prefer_metals):
+            payload["recommendations"] = self._to_jsonable(recs[:top_k])
+            return payload
+
+        def matches_any(catalyst: str, metals: set[str]) -> bool:
+            upper = (catalyst or "").upper()
+            return any(metal in upper for metal in metals)
+
+        allow = set(constraints.allow_metals or set())
+        exclude = set(constraints.exclude_metals or set())
+        prefer = set(constraints.prefer_metals or set())
+
+        filtered: List[Dict[str, Any]] = []
+        for rec in recs:
+            if not isinstance(rec, dict):
+                continue
+            catalyst = str(rec.get("catalyst") or "")
+            if exclude and matches_any(catalyst, exclude):
+                continue
+            if allow and not matches_any(catalyst, allow):
+                continue
+            filtered.append(rec)
+
+        if not filtered:
+            filtered = [rec for rec in recs if isinstance(rec, dict)]
+
+        if prefer:
+            preferred = [rec for rec in filtered if matches_any(str(rec.get("catalyst") or ""), prefer)]
+            others = [rec for rec in filtered if rec not in preferred]
+            filtered = preferred + others
+
+        payload["recommendations"] = self._to_jsonable(filtered[:top_k])
+        payload["hte_constraints_applied"] = constraints.formatted_summary()
+        return payload
+
+    def _build_conditions_report(
+        self,
+        *,
+        reaction_smiles: str,
+        constraints: ConstraintSpec,
+        family: Dict[str, Any],
+        rule: Dict[str, Any],
+        ml: Dict[str, Any],
+        protocols: Dict[str, Any],
+        unified: Dict[str, Any],
+        hte: Dict[str, Any],
+    ) -> str:
+        """Create a concise, human-readable summary from collected tool outputs."""
+        lines: List[str] = []
+        lines.append("COMPREHENSIVE CONDITIONS REPORT")
+        lines.append("=" * 72)
+        lines.append(f"Reaction: {reaction_smiles}")
+        summary = constraints.formatted_summary()
+        if summary != "none":
+            lines.append(f"Constraints: {summary}")
+        lines.append("")
+
+        # Family
+        if family.get("success"):
+            fam = family.get("family")
+            conf = family.get("confidence")
+            method = family.get("method")
+            lines.append(f"Detected family: {fam} (confidence={conf}, method={method})")
+        else:
+            lines.append(f"Detected family: unavailable ({family.get('error')})")
+        lines.append("")
+
+        # Rule
+        lines.append("[Rule DB]")
+        if rule.get("success"):
+            rule_summary = str(rule.get("summary") or "").strip()
+            if rule_summary:
+                lines.append(rule_summary)
+            else:
+                lines.append("Rule engine returned no summary.")
+        else:
+            lines.append(f"Rule engine error: {rule.get('error')}")
+        lines.append("")
+
+        # ML / DRFP
+        lines.append("[ML/DRFP Precedents]")
+        if ml.get("success"):
+            rec = ml.get("recommendation") or {}
+            core = rec.get("core")
+            base = rec.get("base") or rec.get("base_uid")
+            solv = rec.get("solvent") or rec.get("solvent_uid")
+            temp = rec.get("T_C")
+            time_h = rec.get("time_h")
+            conf = rec.get("confidence")
+            lines.append(f"- core: {core}")
+            lines.append(f"- base: {base}")
+            lines.append(f"- solvent: {solv}")
+            if temp is not None:
+                lines.append(f"- temperature_C: {temp}")
+            if time_h is not None:
+                lines.append(f"- time_h: {time_h}")
+            if conf is not None:
+                lines.append(f"- confidence: {conf}")
+            alt = ml.get("alternatives") or {}
+            cores = alt.get("cores") or []
+            if cores:
+                lines.append(f"- alternative cores: {', '.join(str(c[0]) for c in cores[:5] if c)}")
+        else:
+            lines.append(f"ML/DRFP recommendation error: {ml.get('error')}")
+        lines.append("")
+
+        # HTE
+        lines.append("[HTE (66k experiments)]")
+        if hte.get("success") and (hte.get("matching_experiments") or 0) > 0:
+            lines.append(
+                f"Matches: {hte.get('matching_experiments')} | predicted type: {hte.get('predicted_reaction_type')}"
+            )
+            recs = hte.get("recommendations") or []
+            if isinstance(recs, list) and recs:
+                lines.append("Top HTE conditions:")
+                for rec in recs[:5]:
+                    if not isinstance(rec, dict):
+                        continue
+                    lines.append(
+                        f"- #{rec.get('rank')}: {rec.get('catalyst')} / {rec.get('ligand')} | "
+                        f"{rec.get('base')} | {rec.get('solvent')} | "
+                        f"succ={rec.get('success_rate')}% (n={rec.get('num_experiments')}) | "
+                        f"avg_yield={rec.get('avg_yield')} | z={rec.get('avg_z_score')}"
+                    )
+            else:
+                lines.append("No HTE condition list returned.")
+        elif hte.get("success"):
+            lines.append("No matching HTE experiments found for this substrate pairing.")
+        else:
+            lines.append(f"HTE error: {hte.get('error')}")
+        lines.append("")
+
+        # Protocol DB
+        lines.append("[Protocol DB]")
+        if protocols.get("success"):
+            count = protocols.get("count") or len(protocols.get("recommendations") or [])
+            lines.append(f"Protocols found: {count}")
+        else:
+            hint = protocols.get("hint")
+            lines.append(f"Protocol search unavailable: {protocols.get('error')}")
+            if hint:
+                lines.append(f"Hint: {hint}")
+        lines.append("")
+
+        # Unified (rules/protocols search)
+        lines.append("[Unified DRFP Search]")
+        if unified.get("success"):
+            recs = unified.get("recommendations") or []
+            if isinstance(recs, list) and recs:
+                for item in recs[:5]:
+                    if not isinstance(item, dict):
+                        continue
+                    lines.append(
+                        f"- #{item.get('rank')}: {item.get('name')} ({item.get('source_type')}) "
+                        f"sim={item.get('similarity')}"
+                    )
+            else:
+                lines.append("Unified search returned no items.")
+        else:
+            lines.append(f"Unified search error: {unified.get('error')}")
+        lines.append("")
+
+        # Simple deterministic pick
+        lines.append("[Recommended Starting Point]")
+        best = None
+        if hte.get("success") and isinstance(hte.get("recommendations"), list) and hte["recommendations"]:
+            best = hte["recommendations"][0]
+            lines.append(
+                f"HTE-backed: {best.get('catalyst')} / {best.get('ligand')} | "
+                f"{best.get('base')} | {best.get('solvent')} "
+                f"(succ={best.get('success_rate')}%, n={best.get('num_experiments')})"
+            )
+        elif rule.get("success") and rule.get("summary"):
+            lines.append("Rule-backed: use the Rule DB recommendation above as the primary starting point.")
+        elif ml.get("success") and ml.get("recommendation"):
+            rec = ml.get("recommendation") or {}
+            lines.append(
+                f"Precedent-backed: core={rec.get('core')}, base={rec.get('base') or rec.get('base_uid')}, "
+                f"solvent={rec.get('solvent') or rec.get('solvent_uid')} (confidence={rec.get('confidence')})"
+            )
+        else:
+            lines.append("No successful recommendation sources available; check tool errors above.")
+
+        return "\n".join(str(line) for line in lines if line is not None)
+
+    def _maybe_llm_summarize_conditions(
+        self,
+        *,
+        reaction_smiles: str,
+        constraints: ConstraintSpec,
+        family: Dict[str, Any],
+        rule: Dict[str, Any],
+        ml: Dict[str, Any],
+        protocols: Dict[str, Any],
+        unified: Dict[str, Any],
+        hte: Dict[str, Any],
+        get_llm_client: Any,
+        SystemMessage: Any,
+        HumanMessage: Any,
+    ) -> Optional[str]:
+        """Use the configured LLM (no tools) to synthesize a ranked recommendation."""
+        try:
+            llm = get_llm_client(self.llm_provider, self.llm_model, self.llm_temperature)
+        except Exception:
+            return None
+
+        # Build a compact evidence payload (avoid giant vector dumps).
+        evidence: Dict[str, Any] = {
+            "reaction_smiles": reaction_smiles,
+            "constraints": constraints.formatted_summary(),
+            "family": family if family.get("success") else {"success": False, "error": family.get("error")},
+            "rule_summary": rule.get("summary") if rule.get("success") else {"error": rule.get("error")},
+            "ml_recommendation": ml.get("recommendation") if ml.get("success") else {"error": ml.get("error")},
+            "ml_alternatives": (ml.get("alternatives") or {}) if ml.get("success") else None,
+            "hte": {
+                "predicted_reaction_type": hte.get("predicted_reaction_type"),
+                "matching_experiments": hte.get("matching_experiments"),
+                "recommendations": hte.get("recommendations"),
+                "error": None if hte.get("success") else hte.get("error"),
+            },
+            "protocols_status": {
+                "success": bool(protocols.get("success")),
+                "error": protocols.get("error"),
+                "hint": protocols.get("hint"),
+            },
+            "unified_top": unified.get("recommendations") if unified.get("success") else {"error": unified.get("error")},
+        }
+
+        system = (
+            "You are an expert synthetic chemist. You will be given tool outputs from:\n"
+            "- Rule DB (deterministic rules)\n"
+            "- ML/DRFP precedent recommender\n"
+            "- Protocol DB (may be unavailable)\n"
+            "- HTE database (66k experiments)\n"
+            "- A deterministic planner fusion snapshot\n\n"
+            "Task:\n"
+            "1) Briefly summarize the reaction family and constraints.\n"
+            "2) Compare evidence across sources.\n"
+            "3) Provide 2-3 ranked, executable condition recommendations.\n"
+            "4) For each recommendation: catalyst/ligand/base/solvent, temperature/time if available, and cite which sources support it.\n"
+            "5) Do not invent missing values; if not available, say 'not provided'.\n"
+        )
+        user = "Tool evidence (JSON):\n" + json.dumps(self._to_jsonable(evidence), indent=2)
+
+        try:
+            response = llm.invoke([SystemMessage(content=system), HumanMessage(content=user)])
+        except Exception:
+            return None
+
+        content = getattr(response, "content", None)
+        return str(content).strip() if content else None
+
+    def _to_jsonable(self, obj: Any) -> Any:
+        """Best-effort conversion of tool outputs into JSON-serializable structures."""
+        if obj is None:
+            return None
+        if isinstance(obj, (str, int, float, bool)):
+            return obj
+        if isinstance(obj, Path):
+            return str(obj)
+        if isinstance(obj, dict):
+            return {str(k): self._to_jsonable(v) for k, v in obj.items()}
+        if isinstance(obj, (list, tuple, set)):
+            return [self._to_jsonable(v) for v in obj]
+        if hasattr(obj, "model_dump"):
+            try:
+                return self._to_jsonable(obj.model_dump())  # type: ignore[attr-defined]
+            except Exception:
+                return str(obj)
+        if hasattr(obj, "item"):
+            try:
+                return obj.item()  # type: ignore[no-any-return]
+            except Exception:
+                pass
+        try:
+            json.dumps(obj)
+            return obj
+        except TypeError:
+            return str(obj)
 
     def _ensure_agent(self) -> bool:
         if self.agent is not None:
@@ -350,6 +948,7 @@ class ChemAssistantWindow(QMainWindow):
                 "You can still use local commands:\n"
                 "- `/taxonomy` (show taxonomy status)\n"
                 "- `/terms <SMILES>` (evaluate chemistry terms)\n"
+                "- `/conditions <reaction_smiles>` (multi-tool conditions search)\n"
                 "- `image <reaction|molecule> <SMILES>`",
             )
             return False

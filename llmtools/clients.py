@@ -60,7 +60,7 @@ AVAILABLE_MODELS = {
         "deepseek-r1-distill-llama-70b",
     ],
     "openai": [
-        "gpt-5",
+        "gpt-5.2",
         "gpt-5-pro",
         "gpt-5-mini",
         "gpt-5-nano",
@@ -72,6 +72,7 @@ AVAILABLE_MODELS = {
         "o3-deep-research",
         "o4-mini-deep-research",
         "gpt-4o",
+        "gpt-4.1",
         "gpt-4o-mini",
         "gpt-4.1-mini",
         "gpt-4.1-nano",
