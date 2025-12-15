@@ -53,7 +53,8 @@ class ReactionRequirement:
     @property
     def requires_catalyst(self) -> bool:
         """Returns True if this reaction requires a metal catalyst."""
-        return len(self.catalysts) > 0
+        metal_catalysts = set(self.catalysts) & _KNOWN_METAL_CATALYSTS
+        return bool(metal_catalysts)
 
 
 @dataclass
@@ -71,6 +72,10 @@ class DetectionMatch:
 # Module-level caches
 # ============================================================================
 _REACTION_REQUIREMENTS_CACHE: Optional[Dict[str, ReactionRequirement]] = None
+
+# Catalyst tokens in `reaction_types.json` are not uniformly structured; treat only
+# known metal symbols as strict catalyst requirements/evidence.
+_KNOWN_METAL_CATALYSTS: Set[str] = {"Pd", "Cu", "Ni", "Co"}
 
 
 def _get_taxonomy_path() -> Path:
@@ -239,16 +244,27 @@ def detect_by_reactants(
         )
         
         # Also check legacy feature mapping
-        legacy_satisfied = _check_legacy_features(features, req.reactants)
+        legacy_matches = _match_legacy_features(features, req.reactants)
+        legacy_satisfied = all(bool(legacy_matches.get(cat_id)) for cat_id in req.reactants)
         
         if not satisfied and not legacy_satisfied:
             continue
+
+        # Merge legacy matches into the main matched_cats so confidence and reasons
+        # remain meaningful when the upstream feature detector provides legacy tokens.
+        merged_matches = dict(matched_cats)
+        for cat_id in req.reactants:
+            if merged_matches.get(cat_id):
+                continue
+            legacy_hits = legacy_matches.get(cat_id) or []
+            if legacy_hits:
+                merged_matches[cat_id] = legacy_hits
         
         # Calculate confidence based on number of matched categories and catalysts
         base_confidence = 0.7
         
         # Boost for each matched category
-        matched_count = sum(1 for hits in matched_cats.values() if hits)
+        matched_count = sum(1 for hits in merged_matches.values() if hits)
         required_count = len(req.reactants)
         
         if required_count > 0:
@@ -259,27 +275,28 @@ def detect_by_reactants(
         
         # Check catalyst match
         catalyst_match = False
-        if req.catalysts:
-            if catalysts & set(req.catalysts):
+        required_metals = set(req.catalysts) & _KNOWN_METAL_CATALYSTS
+        if catalysts and required_metals:
+            if catalysts & required_metals:
                 catalyst_match = True
                 confidence = min(confidence + 0.1, 0.98)
-            elif req.requires_catalyst and not catalysts:
-                # Reaction needs catalyst but none detected - lower confidence
-                confidence = max(confidence - 0.2, 0.4)
+            else:
+                # Contradiction: detected metal catalyst doesn't match this reaction's typical metal.
+                confidence = max(confidence - 0.1, 0.4)
         
         # Build reasons
         reasons = []
-        for cat_id, hits in matched_cats.items():
+        for cat_id, hits in merged_matches.items():
             if hits:
                 reasons.append(f"{cat_id}: {', '.join(hits[:3])}")
         if catalyst_match:
-            reasons.append(f"catalyst: {catalysts & set(req.catalysts)}")
+            reasons.append(f"catalyst: {catalysts & required_metals}")
         
         matches.append(DetectionMatch(
             reaction_type=rxn_id,
             name=req.name,
             confidence=confidence,
-            matched_categories=matched_cats,
+            matched_categories=merged_matches,
             catalyst_match=catalyst_match,
             reasons=reasons,
         ))
@@ -299,10 +316,24 @@ def _check_legacy_features(
     
     Maps legacy features like "aryl_halide" to categories like "ArX*".
     """
-    # Mapping from category IDs to legacy feature names
+    matches = _match_legacy_features(features, required_categories)
+    return all(bool(matches.get(cat_id)) for cat_id in required_categories)
+
+
+def _match_legacy_features(
+    features: Dict[str, bool],
+    required_categories: List[str],
+) -> Dict[str, List[str]]:
+    """
+    Return the legacy feature keys that satisfy each required category.
+
+    This is used when the upstream feature detector emits coarse tokens (e.g.
+    `aryl_halide`, `nucleophile_n`) instead of the fine-grained member tokens
+    used by `reactant_mapper.expand_category_to_features(...)`.
+    """
     category_to_legacy = {
         "ArX*": ["aryl_halide", "vinyl_halide", "triflate"],
-        "HetAr-X": ["aryl_halide"],  # HetAr halides detected as aryl_halide
+        "HetAr-X": ["aryl_halide"],
         "Vinyl-X": ["vinyl_halide"],
         "ArB*": ["boron"],
         "RB*": ["boron"],
@@ -311,26 +342,24 @@ def _check_legacy_features(
         "R-M": ["grignard", "organozinc", "organolithium", "organostannane"],
         "Amine": ["nucleophile_n"],
         "ArNH*": ["nucleophile_n"],
-        "RNH2/R2NH": ["nucleophile_n"],  # Aliphatic amines for C-N coupling
+        "RNH2/R2NH": ["nucleophile_n"],
         "Alcohol": ["nucleophile_o", "alcohol"],
-        "ROH": ["nucleophile_o", "alcohol"],  # For C-O coupling
+        "ROH": ["nucleophile_o", "alcohol"],
         "Thiol": ["nucleophile_s"],
-        "RSH": ["nucleophile_s"],  # For C-S coupling
+        "RSH": ["nucleophile_s"],
         "Carboxylic-acid": ["acid"],
         "Alkyl-X": ["alkyl_halide"],
         "Aldehyde": ["carbonyl", "aldehyde"],
         "Ketone": ["carbonyl", "ketone"],
         "Acyl-electrophile": ["acyl_halide"],
     }
-    
-    # Check if all required categories are satisfied by legacy features
+
+    matched: Dict[str, List[str]] = {}
     for cat_id in required_categories:
         legacy_names = category_to_legacy.get(cat_id, [])
-        if not any(features.get(name) for name in legacy_names):
-            # Category not satisfied by legacy features
-            return False
-    
-    return True
+        hits = [name for name in legacy_names if features.get(name)]
+        matched[cat_id] = hits
+    return matched
 
 
 def get_reaction_requirement(reaction_type: str) -> Optional[ReactionRequirement]:

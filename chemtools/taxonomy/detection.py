@@ -2,7 +2,7 @@
 Taxonomy-based reaction type detection.
 
 This module provides reaction type detection using:
-1. SMARTS pattern matching against taxonomy definitions
+1. SMARTS pattern matching against taxonomy definitions (if patterns exist)
 2. DRFP (Differential Reaction Fingerprint) similarity to reference reactions
 3. Reaction running validation (comparing predicted vs actual products)
 
@@ -19,16 +19,28 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+try:
+    from . import load_registry
+except Exception:  # pragma: no cover - defensive import guard
+    load_registry = None  # type: ignore[assignment]
+
 # ============================================================================
 # Module-level caches (loaded once)
 # ============================================================================
 _TAXONOMY_SMARTS_CACHE: Optional[Dict[str, Any]] = None
 _REFERENCE_REACTIONS_CACHE: Optional[Dict[str, List[str]]] = None
 _REFERENCE_DRFP_CACHE: Optional[Dict[str, Any]] = None
+_DRFP_ENCODER_CACHE: Any = None
 
 
 def _get_taxonomy_path() -> Path:
     """Get path to reaction_types.json taxonomy file."""
+    if load_registry is not None:
+        try:
+            registry = load_registry()
+            return registry.root / "reaction_types.json"
+        except Exception:
+            pass
     return Path(__file__).parent / "data" / "reaction_types.json"
 
 
@@ -47,29 +59,55 @@ def _load_reference_reactions() -> Dict[str, List[str]]:
     
     if _REFERENCE_REACTIONS_CACHE is not None:
         return _REFERENCE_REACTIONS_CACHE
-    
+
+    # Prefer the unified taxonomy registry (supports alternate roots and a single
+    # canonical parser for reaction_types.json).
+    if load_registry is not None:
+        try:
+            registry = load_registry()
+            reference_map: Dict[str, List[str]] = {}
+            for reaction_type in registry.iter_reaction_types():
+                refs: List[str] = []
+                for ex in reaction_type.examples or []:
+                    rxn = (ex.reactant1 or "").strip()
+                    if ">>" in rxn or rxn.count(">") >= 2:
+                        refs.append(rxn)
+                if refs:
+                    reference_map[reaction_type.id] = refs
+            _REFERENCE_REACTIONS_CACHE = reference_map
+            logger.debug(
+                "Loaded reference reactions for %s reaction types (registry)",
+                len(_REFERENCE_REACTIONS_CACHE),
+            )
+            return _REFERENCE_REACTIONS_CACHE
+        except Exception as exc:
+            logger.debug("Registry reference reaction loading failed: %s", exc)
+
     import json
-    
+
     taxonomy_path = _get_taxonomy_path()
-    
+
     if not taxonomy_path.exists():
         _REFERENCE_REACTIONS_CACHE = {}
         return _REFERENCE_REACTIONS_CACHE
-    
+
     try:
         with open(taxonomy_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        
+
         _REFERENCE_REACTIONS_CACHE = {}
         for entry in data:
             rxn_id = entry.get("id")
             refs = entry.get("reference_reactions", [])
             if rxn_id and refs:
                 _REFERENCE_REACTIONS_CACHE[rxn_id] = refs
-        
-        logger.debug(f"Loaded reference reactions for {len(_REFERENCE_REACTIONS_CACHE)} reaction types")
+
+        logger.debug(
+            "Loaded reference reactions for %s reaction types (json)",
+            len(_REFERENCE_REACTIONS_CACHE),
+        )
         return _REFERENCE_REACTIONS_CACHE
-        
+
     except Exception as e:
         logger.warning(f"Failed to load reference reactions: {e}")
         _REFERENCE_REACTIONS_CACHE = {}
@@ -80,6 +118,20 @@ def _load_reference_reactions() -> Dict[str, List[str]]:
 # DRFP Fingerprint Functions
 # ============================================================================
 
+def _get_drfp_encoder():
+    """Return a cached DRFP encoder instance, or None if DRFP is unavailable."""
+    global _DRFP_ENCODER_CACHE
+    if _DRFP_ENCODER_CACHE is not None:
+        return _DRFP_ENCODER_CACHE
+    try:
+        from drfp import DrfpEncoder
+
+        _DRFP_ENCODER_CACHE = DrfpEncoder()
+        return _DRFP_ENCODER_CACHE
+    except Exception:
+        return None
+
+
 def _compute_drfp_fingerprint(reaction_smiles: str):
     """
     Compute DRFP fingerprint for a reaction SMILES.
@@ -88,10 +140,12 @@ def _compute_drfp_fingerprint(reaction_smiles: str):
         numpy array or None if computation fails
     """
     try:
-        from drfp import DrfpEncoder
         import numpy as np
-        
-        encoder = DrfpEncoder()
+
+        encoder = _get_drfp_encoder()
+        if encoder is None:
+            return None
+
         fps = encoder.encode([reaction_smiles])
         return np.array(fps[0]) if fps else None
     except ImportError:
@@ -138,10 +192,11 @@ def _get_reference_drfp_index() -> Dict[str, List[Tuple[str, Any]]]:
 
 def clear_caches():
     """Clear all module caches. Useful for testing or reloading taxonomy."""
-    global _TAXONOMY_SMARTS_CACHE, _REFERENCE_REACTIONS_CACHE, _REFERENCE_DRFP_CACHE
+    global _TAXONOMY_SMARTS_CACHE, _REFERENCE_REACTIONS_CACHE, _REFERENCE_DRFP_CACHE, _DRFP_ENCODER_CACHE
     _TAXONOMY_SMARTS_CACHE = None
     _REFERENCE_REACTIONS_CACHE = None
     _REFERENCE_DRFP_CACHE = None
+    _DRFP_ENCODER_CACHE = None
 
 
 # ============================================================================
@@ -224,27 +279,46 @@ def _load_taxonomy_smarts() -> Dict[str, Any]:
     """
     Load SMARTS patterns from reaction_types.json taxonomy file.
     
-    DEPRECATED: The 'smarts' field has been removed from reaction_types.json.
-    This function will return an empty dict. Use data-driven detection instead.
-    
     Returns:
-        Dict mapping reaction_type_id to {smarts, name, category, aliases}
-        (empty if no smarts fields exist in taxonomy)
+        Dict mapping reaction_type_id to {name, category, aliases, patterns}
     """
     global _TAXONOMY_SMARTS_CACHE
     
     if _TAXONOMY_SMARTS_CACHE is not None:
         return _TAXONOMY_SMARTS_CACHE
-    
+
+    # Prefer the unified taxonomy registry (also supports custom roots).
+    if load_registry is not None:
+        try:
+            registry = load_registry()
+            _TAXONOMY_SMARTS_CACHE = {}
+            for reaction_type in registry.iter_reaction_types():
+                patterns = [p.smarts for p in reaction_type.patterns or [] if p.smarts]
+                _TAXONOMY_SMARTS_CACHE[reaction_type.id] = {
+                    "name": reaction_type.name,
+                    "category": reaction_type.category_id,
+                    "aliases": list(reaction_type.aliases or []),
+                    "patterns": patterns,
+                    # Backwards-compatible single-pattern key.
+                    "smarts": patterns[0] if patterns else None,
+                }
+            logger.debug(
+                "Loaded %s reaction type entries from taxonomy registry",
+                len(_TAXONOMY_SMARTS_CACHE),
+            )
+            return _TAXONOMY_SMARTS_CACHE
+        except Exception as exc:
+            logger.debug("Failed to load taxonomy registry: %s", exc)
+
     import json
-    
+
     taxonomy_path = _get_taxonomy_path()
-    
+
     if not taxonomy_path.exists():
         logger.warning(f"Taxonomy file not found: {taxonomy_path}")
         _TAXONOMY_SMARTS_CACHE = {}
         return _TAXONOMY_SMARTS_CACHE
-    
+
     try:
         with open(taxonomy_path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -252,23 +326,32 @@ def _load_taxonomy_smarts() -> Dict[str, Any]:
         _TAXONOMY_SMARTS_CACHE = {}
         for entry in data:
             rxn_id = entry.get("id")
-            smarts = entry.get("smarts")
-            if rxn_id and smarts:
-                _TAXONOMY_SMARTS_CACHE[rxn_id] = {
-                    "smarts": smarts,
-                    "name": entry.get("name", rxn_id),
-                    "category": entry.get("category", ""),
-                    "aliases": entry.get("aliases", []),
-                }
+            if not rxn_id:
+                continue
+
+            patterns: List[str] = []
+            for pat in entry.get("patterns") or []:
+                if not isinstance(pat, dict):
+                    continue
+                smarts = pat.get("smarts") or pat.get("smirks")
+                if smarts:
+                    patterns.append(smarts)
+            if not patterns and entry.get("smarts"):
+                patterns = [entry["smarts"]]
+
+            _TAXONOMY_SMARTS_CACHE[rxn_id] = {
+                "name": entry.get("name", rxn_id),
+                "category": entry.get("category", ""),
+                "aliases": entry.get("aliases", []),
+                "patterns": patterns,
+                "smarts": patterns[0] if patterns else None,
+            }
         
-        if not _TAXONOMY_SMARTS_CACHE:
-            logger.debug("No SMARTS patterns found in taxonomy (field removed)")
-        else:
-            logger.debug(f"Loaded {len(_TAXONOMY_SMARTS_CACHE)} reaction SMARTS from taxonomy")
+        logger.debug(f"Loaded {len(_TAXONOMY_SMARTS_CACHE)} reaction type entries from taxonomy JSON")
         return _TAXONOMY_SMARTS_CACHE
         
     except Exception as e:
-        logger.warning(f"Failed to load taxonomy SMARTS: {e}")
+        logger.warning(f"Failed to load taxonomy patterns: {e}")
         _TAXONOMY_SMARTS_CACHE = {}
         return _TAXONOMY_SMARTS_CACHE
 
@@ -405,34 +488,23 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
     """
     Detect reaction type by matching against taxonomy SMARTS patterns.
     
-    DEPRECATED: This function is deprecated as the `smarts` field has been
-    removed from reaction_types.json. Use data-driven detection via
-    `chemtools.taxonomy.data_driven_detection.detect_by_reactants()` instead,
-    or use DRFP similarity matching via `detect_by_drfp_similarity()`.
-    
     Args:
         reaction_smiles: Full reaction SMILES (reactants>>products)
         
     Returns:
-        Empty list (smarts field removed from taxonomy).
+        List of (reaction_type_id, name, confidence) tuples. Returns an empty
+        list when no reaction patterns are present in the taxonomy.
         
     See Also:
         - detect_by_drfp_similarity: For similarity-based detection
         - chemtools.taxonomy.data_driven_detection.detect_by_reactants: For data-driven detection
     """
-    import warnings
-    warnings.warn(
-        "detect_by_taxonomy_smarts is deprecated. The 'smarts' field has been removed "
-        "from reaction_types.json. Use detect_by_drfp_similarity() or "
-        "data_driven_detection.detect_by_reactants() instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
-    
-    # Load taxonomy - will return empty if no smarts fields exist
     taxonomy = _load_taxonomy_smarts()
     if not taxonomy:
-        logger.debug("No SMARTS patterns found in taxonomy - returning empty")
+        return []
+
+    has_any_patterns = any(bool(entry.get("patterns")) for entry in taxonomy.values())
+    if not has_any_patterns:
         return []
     
     # Original implementation follows (for backwards compatibility if smarts exist)
@@ -445,12 +517,17 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
     
     matches: List[Tuple[str, str, float, bool]] = []
     
-    # Parse reaction SMILES
-    parts = reaction_smiles.split(">>")
-    if len(parts) != 2:
+    # Parse reaction SMILES (support both ">>" and "reactants>agents>products").
+    reactants_smiles = ""
+    products_smiles = ""
+    if ">>" in reaction_smiles:
+        parts = reaction_smiles.split(">>", 1)
+        reactants_smiles, products_smiles = parts[0], parts[1]
+    elif reaction_smiles.count(">") >= 2:
+        parts = reaction_smiles.split(">")
+        reactants_smiles, products_smiles = parts[0], parts[-1]
+    else:
         return []
-    
-    reactants_smiles, products_smiles = parts
     
     # Parse reactants and products as molecules
     try:
@@ -475,115 +552,122 @@ def detect_by_taxonomy_smarts(reaction_smiles: str) -> List[Tuple[str, str, floa
     
     # Try matching each taxonomy SMARTS
     for rxn_id, info in taxonomy.items():
-        smarts = info["smarts"]
-        
-        try:
-            rxn_pattern = AllChem.ReactionFromSmarts(smarts)
-            if rxn_pattern is None:
-                continue
-            
-            num_reactant_templates = rxn_pattern.GetNumReactantTemplates()
-            num_product_templates = rxn_pattern.GetNumProductTemplates()
-            
-            if num_reactant_templates == 0:
-                continue
-            
-            # === STEP 1: Match reactant templates ===
-            template_matches = []
-            for i in range(num_reactant_templates):
-                template = rxn_pattern.GetReactantTemplate(i)
-                matching_reactants = set()
-                for j, mol in enumerate(reactant_mols):
-                    if mol.HasSubstructMatch(template):
-                        matching_reactants.add(j)
-                template_matches.append(matching_reactants)
-            
-            if any(len(m) == 0 for m in template_matches):
-                continue
-            
-            # Check valid assignment
-            reactants_matched = False
-            if num_reactant_templates == 1:
-                reactants_matched = len(template_matches[0]) > 0
-            elif num_reactant_templates == 2:
-                for r1 in template_matches[0]:
-                    for r2 in template_matches[1]:
-                        if r1 != r2:
-                            reactants_matched = True
-                            break
-                    if reactants_matched:
-                        break
-                if not reactants_matched and len(reactant_mols) == 2:
-                    if 0 in template_matches[0] and 1 in template_matches[1]:
-                        reactants_matched = True
-                    elif 1 in template_matches[0] and 0 in template_matches[1]:
-                        reactants_matched = True
-            else:
-                reactants_matched = all(len(m) > 0 for m in template_matches)
-            
-            if not reactants_matched:
-                continue
-            
-            # === STEP 2: Match product templates ===
-            products_matched = True
-            
-            if num_product_templates > 0 and product_mols:
-                product_template_matches = []
-                for i in range(num_product_templates):
-                    template = rxn_pattern.GetProductTemplate(i)
-                    matching_products = set()
-                    for j, mol in enumerate(product_mols):
-                        if mol.HasSubstructMatch(template):
-                            matching_products.add(j)
-                    product_template_matches.append(matching_products)
-                
-                if any(len(m) == 0 for m in product_template_matches):
-                    products_matched = False
-                else:
-                    if num_product_templates == 1:
-                        products_matched = len(product_template_matches[0]) > 0
-                    elif num_product_templates == 2:
-                        products_matched = False
-                        for p1 in product_template_matches[0]:
-                            for p2 in product_template_matches[1]:
-                                if p1 != p2:
-                                    products_matched = True
-                                    break
-                            if products_matched:
-                                break
-                        if not products_matched and len(product_mols) == 2:
-                            if 0 in product_template_matches[0] and 1 in product_template_matches[1]:
-                                products_matched = True
-                            elif 1 in product_template_matches[0] and 0 in product_template_matches[1]:
-                                products_matched = True
-                    else:
-                        products_matched = all(len(m) > 0 for m in product_template_matches)
-            
-            # === STEP 3: Calculate confidence ===
-            if reactants_matched and products_matched:
-                specificity = min(len(smarts) / 150.0, 1.0)
-                
-                if len(reactant_mols) == num_reactant_templates:
-                    specificity = min(specificity + 0.1, 1.0)
-                
-                if num_product_templates > 0 and products_matched:
-                    specificity = min(specificity + 0.05, 1.0)
-                
-                # === STEP 4: Validate by running reaction ===
-                reaction_validated, validation_boost = _validate_reaction_by_running(
-                    rxn_pattern, reactant_mols, product_mols
-                )
-                
-                if reaction_validated:
-                    specificity = min(specificity + validation_boost, 1.0)
-                
-                confidence = 0.75 + (0.20 * specificity)
-                
-                matches.append((rxn_id, info["name"], confidence, reaction_validated))
-                
-        except Exception as e:
-            logger.debug(f"Failed to match SMARTS for {rxn_id}: {e}")
+        pattern_smarts_list = info.get("patterns") or []
+        if not pattern_smarts_list:
+            legacy_smarts = info.get("smarts")
+            if legacy_smarts:
+                pattern_smarts_list = [legacy_smarts]
+        if not pattern_smarts_list:
             continue
+        
+        for smarts in pattern_smarts_list:
+            try:
+                rxn_pattern = AllChem.ReactionFromSmarts(smarts)
+                if rxn_pattern is None:
+                    continue
+                
+                num_reactant_templates = rxn_pattern.GetNumReactantTemplates()
+                num_product_templates = rxn_pattern.GetNumProductTemplates()
+                
+                if num_reactant_templates == 0:
+                    continue
+                
+                # === STEP 1: Match reactant templates ===
+                template_matches = []
+                for i in range(num_reactant_templates):
+                    template = rxn_pattern.GetReactantTemplate(i)
+                    matching_reactants = set()
+                    for j, mol in enumerate(reactant_mols):
+                        if mol.HasSubstructMatch(template):
+                            matching_reactants.add(j)
+                    template_matches.append(matching_reactants)
+                
+                if any(len(m) == 0 for m in template_matches):
+                    continue
+                
+                # Check valid assignment
+                reactants_matched = False
+                if num_reactant_templates == 1:
+                    reactants_matched = len(template_matches[0]) > 0
+                elif num_reactant_templates == 2:
+                    for r1 in template_matches[0]:
+                        for r2 in template_matches[1]:
+                            if r1 != r2:
+                                reactants_matched = True
+                                break
+                        if reactants_matched:
+                            break
+                    if not reactants_matched and len(reactant_mols) == 2:
+                        if 0 in template_matches[0] and 1 in template_matches[1]:
+                            reactants_matched = True
+                        elif 1 in template_matches[0] and 0 in template_matches[1]:
+                            reactants_matched = True
+                else:
+                    reactants_matched = all(len(m) > 0 for m in template_matches)
+                
+                if not reactants_matched:
+                    continue
+                
+                # === STEP 2: Match product templates ===
+                products_matched = True
+                
+                if num_product_templates > 0 and product_mols:
+                    product_template_matches = []
+                    for i in range(num_product_templates):
+                        template = rxn_pattern.GetProductTemplate(i)
+                        matching_products = set()
+                        for j, mol in enumerate(product_mols):
+                            if mol.HasSubstructMatch(template):
+                                matching_products.add(j)
+                        product_template_matches.append(matching_products)
+                    
+                    if any(len(m) == 0 for m in product_template_matches):
+                        products_matched = False
+                    else:
+                        if num_product_templates == 1:
+                            products_matched = len(product_template_matches[0]) > 0
+                        elif num_product_templates == 2:
+                            products_matched = False
+                            for p1 in product_template_matches[0]:
+                                for p2 in product_template_matches[1]:
+                                    if p1 != p2:
+                                        products_matched = True
+                                        break
+                                if products_matched:
+                                    break
+                            if not products_matched and len(product_mols) == 2:
+                                if 0 in product_template_matches[0] and 1 in product_template_matches[1]:
+                                    products_matched = True
+                                elif 1 in product_template_matches[0] and 0 in product_template_matches[1]:
+                                    products_matched = True
+                        else:
+                            products_matched = all(len(m) > 0 for m in product_template_matches)
+                
+                # === STEP 3: Calculate confidence ===
+                if reactants_matched and products_matched:
+                    specificity = min(len(smarts) / 150.0, 1.0)
+                    
+                    if len(reactant_mols) == num_reactant_templates:
+                        specificity = min(specificity + 0.1, 1.0)
+                    
+                    if num_product_templates > 0 and products_matched:
+                        specificity = min(specificity + 0.05, 1.0)
+                    
+                    # === STEP 4: Validate by running reaction ===
+                    reaction_validated, validation_boost = _validate_reaction_by_running(
+                        rxn_pattern, reactant_mols, product_mols
+                    )
+                    
+                    if reaction_validated:
+                        specificity = min(specificity + validation_boost, 1.0)
+                    
+                    confidence = 0.75 + (0.20 * specificity)
+                    
+                    matches.append((rxn_id, info["name"], confidence, reaction_validated))
+                    
+            except Exception as e:
+                logger.debug(f"Failed to match SMARTS for {rxn_id}: {e}")
+                continue
     
     # Sort by validation first, then confidence
     matches.sort(key=lambda x: (x[3], x[2]), reverse=True)
