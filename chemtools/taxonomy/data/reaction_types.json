@@ -23,7 +23,10 @@
     "catalysts": [
       "Pd"
     ],
-    "conditions": "Base, ligand (phosphine), solvent"
+    "conditions": "Base, ligand (phosphine), solvent",
+    "metadata": {
+      "rule_db_v2": "Suzuki_db"
+    }
   },
   {
     "id": "suzuki_miyaura_in_situ",
@@ -41,7 +44,10 @@
     "catalysts": [
       "Pd"
     ],
-    "conditions": "Base, ligand, solvent"
+    "conditions": "Base, ligand, solvent",
+    "metadata": {
+      "rule_db_v2": "Suzuki_db"
+    }
   },
   {
     "id": "negishi",
@@ -136,7 +142,10 @@
       "Pd",
       "Cu"
     ],
-    "conditions": "Base, amine solvent or co-catalyst"
+    "conditions": "Base, amine solvent or co-catalyst",
+    "metadata": {
+      "rule_db_v2": "sonogashira_v2"
+    }
   },
   {
     "id": "stille",
@@ -266,7 +275,10 @@
     "catalysts": [
       "Pd"
     ],
-    "conditions": "Base, bulky phosphine ligand, elevated temperature"
+    "conditions": "Base, bulky phosphine ligand, elevated temperature",
+    "metadata": {
+      "rule_db_v2": "C_N_Coupling_Pd_db"
+    }
   },
   {
     "id": "cn_coupling",
@@ -285,7 +297,10 @@
       "Cu",
       "Ni"
     ],
-    "conditions": "Base, ligand"
+    "conditions": "Base, ligand",
+    "metadata": {
+      "rule_db_v2": "C_N_Coupling_Cu_db"
+    }
   },
   {
     "id": "snar_cn",
@@ -307,7 +322,10 @@
     "catalysts": [
       "None (thermal) or metal catalyst"
     ],
-    "conditions": "Base, polar solvent, elevated temperature"
+    "conditions": "Base, polar solvent, elevated temperature",
+    "metadata": {
+      "rule_db_v2": "SNAr_db"
+    }
   },
   {
     "id": "ullmann_cn",
@@ -333,7 +351,10 @@
     "catalysts": [
       "Cu"
     ],
-    "conditions": "Base, ligand, elevated temperature"
+    "conditions": "Base, ligand, elevated temperature",
+    "metadata": {
+      "rule_db_v2": "C_N_Coupling_Cu_db"
+    }
   },
   {
     "id": "chan_lam",
@@ -383,7 +404,10 @@
       "Cu",
       "Pd"
     ],
-    "conditions": "Base, ligand, polar solvent"
+    "conditions": "Base, ligand, polar solvent",
+    "metadata": {
+      "rule_db_v2": "C_O_coupling_db"
+    }
   },
   {
     "id": "mitsunobu",
@@ -443,7 +467,10 @@
     "catalysts": [
       "Cu"
     ],
-    "conditions": "Base, ligand, elevated temperature"
+    "conditions": "Base, ligand, elevated temperature",
+    "metadata": {
+      "rule_db_v2": "C_O_coupling_db"
+    }
   },
   {
     "id": "snar_co",
@@ -465,7 +492,10 @@
     "catalysts": [
       "None (thermal) or metal catalyst"
     ],
-    "conditions": "Base, polar solvent, elevated temperature"
+    "conditions": "Base, polar solvent, elevated temperature",
+    "metadata": {
+      "rule_db_v2": "SNAr_db"
+    }
   },
   {
     "id": "cs_coupling",
@@ -510,7 +540,10 @@
     "catalysts": [
       "None (thermal) or metal catalyst"
     ],
-    "conditions": "Base, polar solvent, elevated temperature"
+    "conditions": "Base, polar solvent, elevated temperature",
+    "metadata": {
+      "rule_db_v2": "SNAr_db"
+    }
   },
   {
     "id": "amide_coupling",
@@ -532,7 +565,10 @@
     "catalysts": [
       "Coupling reagents (EDC, DIC, HATU, T3P, etc.)"
     ],
-    "conditions": "Base (tertiary amine), room temperature"
+    "conditions": "Base (tertiary amine), room temperature",
+    "metadata": {
+      "rule_db_v2": "amide_formation_db"
+    }
   },
   {
     "id": "condensation",
@@ -1167,7 +1203,10 @@
     "catalysts": [
       "None"
     ],
-    "conditions": "Reducing agent (NaBH4, NaBH(OAc)3, H2/Pd)"
+    "conditions": "Reducing agent (NaBH4, NaBH(OAc)3, H2/Pd)",
+    "metadata": {
+      "rule_db_v2": "reductive_amination_db"
+    }
   },
   {
     "id": "ring_closing_metathesis",
@@ -1185,7 +1224,10 @@
       "Grubbs catalyst",
       "Hoveyda-Grubbs"
     ],
-    "conditions": "Ru catalyst, inert atmosphere"
+    "conditions": "Ru catalyst, inert atmosphere",
+    "metadata": {
+      "rule_db_v2": "RCM_db"
+    }
   },
   {
     "id": "cross_metathesis",

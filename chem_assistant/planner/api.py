@@ -15,6 +15,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field, field_validator
 
 from chemtools import detect_reaction
+from chemtools.taxonomy.rule_db import resolve_rule_db_v2
 from chemtools.rule import RuleEngine
 from chemtools.formatters.rule_to_protocol import rule_conditions_to_reaction_setup
 
@@ -48,28 +49,6 @@ _RULE_DB_SEARCH_PATHS: Tuple[Path, ...] = (
     _REPO_ROOT.parent / "data" / "rule_db_v2",
     Path.cwd() / "data" / "rule_db_v2",
 )
-_FAMILY_TO_RULE_DB = {
-    "cn_coupling": "C_N_Coupling_Cu_db",
-    "c_n_coupling": "C_N_Coupling_Pd_db",
-    "buchwald_cn": "C_N_Coupling_Pd_db",
-    "buchwald_hartwig": "C_N_Coupling_Pd_db",
-    "ullmann": "C_N_Coupling_Cu_db",
-    "ullmann_cn": "C_N_Coupling_Cu_db",
-    "sonogashira": "sonogashira_v2",
-    "sonogashira_coupling": "sonogashira_v2",
-    "suzuki": "Suzuki_db",
-    "suzuki_miyaura": "Suzuki_db",
-    "amide_formation": "amide_formation_db",
-    "amide_coupling": "amide_formation_db",
-    "amidation": "amide_formation_db",
-    "snar": "SNAr_db",
-    "s_nar": "SNAr_db",
-    "aromatic_nucleophilic_substitution": "SNAr_db",
-    "reductive_amination": "reductive_amination_db",
-    "c_o_coupling": "C_O_coupling_db",
-    "co_coupling": "C_O_coupling_db",
-    "rcm": "RCM_db",
-}
 
 _FAMILY_TO_HTE_TYPE = {
     "cn_coupling": "C_N_Coupling",
@@ -222,8 +201,15 @@ def detect_family(reaction: ReactionInput) -> DetectedFamily:
         return DetectedFamily(family=None, method="missing_input", raw={})
     try:
         result = detect_reaction(rxn, use_ml=False)
+        family = result.get("family")
+        catalysts = (result.get("details") or {}).get("catalysts") or []
+
+        # Planner-facing behavior: if no catalyst evidence exists, avoid over-specific
+        # Pd/Cu subclassing for C-N couplings and fall back to the generic family.
+        if not catalysts and family in {"buchwald_hartwig_c_n", "ullmann_cn"}:
+            family = "cn_coupling"
         return DetectedFamily(
-            family=result.get("family"),
+            family=family,
             confidence=result.get("confidence"),
             method=result.get("method"),
             raw=result,
@@ -241,14 +227,17 @@ def _normalize_family_label(family: Optional[str]) -> Optional[str]:
 
 def _resolve_rule_database(family: Optional[str]) -> Optional[Path]:
     """Map a family hint to a concrete rule database path."""
-    normalized = _normalize_family_label(family)
-    if not normalized:
+    if not family:
         return None
-    db_name = _FAMILY_TO_RULE_DB.get(normalized)
-    if not db_name:
+    try:
+        db_stem = resolve_rule_db_v2(family)
+    except Exception as exc:  # pragma: no cover - defensive
+        logger.debug("Rule DB resolution failed: %s", exc)
+        return None
+    if not db_stem:
         return None
     for base in _RULE_DB_SEARCH_PATHS:
-        candidate = base / f"{db_name}.json"
+        candidate = base / f"{db_stem}.json"
         if candidate.exists():
             return candidate
     return None

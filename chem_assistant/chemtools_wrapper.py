@@ -103,6 +103,7 @@ from chemtools.reagent.analytics import (
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
 from chemtools.featurizers import molecular as molecular_featurizer
 from chemtools.featurizers import calculable as calculable_features
+from chemtools.taxonomy.rule_db import resolve_rule_db_v2
 
 # Rule-based recommendation engine
 from chemtools.rule import RuleEngine, RuleBuilder
@@ -1024,6 +1025,18 @@ def _normalize_family_label(value: Optional[str]) -> Optional[str]:
 
 def _map_family_to_db_name(value: Optional[str]) -> Optional[str]:
     """Map a reaction family label to the configured rule database name."""
+    if not value:
+        return None
+
+    # Prefer taxonomy metadata mapping (source of truth).
+    try:
+        mapped = resolve_rule_db_v2(str(value))
+    except Exception:
+        mapped = None
+    if mapped:
+        return mapped
+
+    # Legacy fallback mapping (kept for non-taxonomy aliases).
     normalized = _normalize_family_label(value)
     if not normalized:
         return None
