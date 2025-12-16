@@ -1,0 +1,102 @@
+[
+  {
+    "description": "Carbon-carbon bond forming reactions including Suzuki, Negishi, Heck, Sonogashira, Stille, and Kumada couplings",
+    "id": "c_c_coupling_reactions",
+    "name": "C-C Coupling Reactions"
+  },
+  {
+    "description": "General cross-coupling reactions that don't fit into specific C-C, C-N, C-O, or C-S categories",
+    "id": "cross_coupling_reactions",
+    "name": "Cross-Coupling Reactions (General)"
+  },
+  {
+    "description": null,
+    "id": "c_n_coupling_reactions",
+    "name": "C-N Coupling Reactions"
+  },
+  {
+    "description": null,
+    "id": "c_o_coupling_reactions",
+    "name": "C-O Coupling Reactions"
+  },
+  {
+    "description": null,
+    "id": "c_s_coupling_reactions",
+    "name": "C-S Coupling Reactions"
+  },
+  {
+    "description": null,
+    "id": "amide_and_carbonyl_chemistry",
+    "name": "Amide and Carbonyl Chemistry"
+  },
+  {
+    "description": null,
+    "id": "c_h_activation_and_functionalization",
+    "name": "C-H Activation and Functionalization"
+  },
+  {
+    "description": null,
+    "id": "functional_group_transformations",
+    "name": "Functional Group Transformations"
+  },
+  {
+    "description": null,
+    "id": "protection_and_deprotection",
+    "name": "Protection and Deprotection"
+  },
+  {
+    "description": null,
+    "id": "hydrolysis_and_water_chemistry",
+    "name": "Hydrolysis and Water Chemistry"
+  },
+  {
+    "description": null,
+    "id": "miscellaneous_reactions",
+    "name": "Miscellaneous Reactions"
+  },
+  {
+    "description": "Cycloaddition reactions including Diels-Alder and 1,3-dipolar cycloadditions",
+    "id": "cycloaddition_reactions",
+    "name": "Cycloaddition Reactions"
+  },
+  {
+    "description": "Reduction reactions including hydrogenation, metal hydride reductions, and dissolving metal reductions",
+    "id": "reduction_reactions",
+    "name": "Reduction Reactions"
+  },
+  {
+    "description": "Oxidation reactions including alcohol oxidations, epoxidations, and Baeyer-Villiger oxidations",
+    "id": "oxidation_reactions",
+    "name": "Oxidation Reactions"
+  },
+  {
+    "description": "Nucleophilic substitution reactions including SN1 and SN2 mechanisms",
+    "id": "substitution_reactions",
+    "name": "Substitution Reactions"
+  },
+  {
+    "description": "Elimination reactions including E1, E2, and dehydration reactions",
+    "id": "elimination_reactions",
+    "name": "Elimination Reactions"
+  },
+  {
+    "description": "Carbonyl chemistry including aldol condensations, Claisen reactions, and related transformations",
+    "id": "carbonyl_reactions",
+    "name": "Carbonyl Reactions"
+  },
+  {
+    "description": "Olefin metathesis reactions including RCM, CM, and ROMP",
+    "id": "metathesis_reactions",
+    "name": "Metathesis Reactions"
+  },
+  {
+    "description": "Ring-forming reactions and cyclization transformations",
+    "id": "cyclization_reactions",
+    "name": "Cyclization Reactions"
+  },
+  {
+    "description": "C-H activation and functionalization reactions",
+    "id": "ch_activation_reactions",
+    "name": "C-H Activation Reactions"
+  }
+]

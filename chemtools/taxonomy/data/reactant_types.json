@@ -1,1576 +1,867 @@
-[
-  {
-    "id": "Acyl-electrophile",
-    "name": "acyl electrophile",
-    "description": "Activated acyl electrophiles for amide/ester formation.",
-    "category": null,
-    "aliases": [
-      "acyl chloride",
-      "acyl chlorides",
-      "acyl electrophiles"
-    ],
-    "metadata": {},
-    "members": [
-      {
-        "id": "RCOCl",
-        "name": "acyl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "acyl chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "PivCl",
-        "name": "pivaloyl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "pivaloyl chloride",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Aldehyde",
-    "name": "aldehyde",
-    "description": "Aldehydes as electrophiles or directing groups.",
-    "category": null,
-    "aliases": [
-      "aldehyde",
-      "aldehydes",
-      "aliphatic aldehyde",
-      "aliphatic aldehydes",
-      "alkyl aldehyde",
-      "alkyl aldehydes",
-      "aromatic aldehyde",
-      "aromatic aldehydes"
-    ],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ArCHO",
-        "name": "aromatic aldehyde",
-        "aliases": [
-          "aromatic aldehyde",
-          "aromatic aldehydes",
-          "aromatic ring aldehyde",
-          "aryl aldehyde",
-          "aryl aldehydes",
-          "benzaldehyde-type aldehyde"
-        ],
-        "metadata": {
-          "compound_type": "aromatic aldehyde",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "RCHO",
-        "name": "aliphatic aldehyde",
-        "aliases": [
-          "aliphatic aldehyde",
-          "aliphatic aldehydes",
-          "aliphatic chain aldehyde",
-          "alkyl aldehyde",
-          "alkyl aldehydes",
-          "saturated aliphatic aldehyde",
-          "saturated aliphatic aldehydes"
-        ],
-        "metadata": {
-          "compound_type": "aliphatic aldehyde",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Alkene",
-    "name": "alkene",
-    "description": "Alkenes and enol ethers for addition, metathesis, or Heck reactions.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Ar-alkene",
-        "name": "aryl-substituted alkene (styrene-type)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl-substituted alkene (styrene-type)",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "R-alkene",
-        "name": "alkyl-substituted alkene",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl-substituted alkene",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "enol-ether",
-        "name": "enol ether",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "enol ether",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "ethene",
-        "name": "ethene (H2C=CH2)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "ethene (H2C=CH2)",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "internal-alkene",
-        "name": "internal alkene (R-CH=CH-R)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "internal alkene (R-CH=CH-R)",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "terminal-alkene",
-        "name": "terminal alkene (R-CH=CH2)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "terminal alkene (R-CH=CH2)",
-          "coupling_role": "both"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Alkyl-C-H",
-    "name": "alkyl C-H donor",
-    "description": "Aliphatic C–H donors; acidic/activated variants for C–H activation.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Alkyl-H",
-        "name": "aliphatic C–H donor",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aliphatic C–H donor",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "Alkyl-H-acidic",
-        "name": "acidic aliphatic C–H donor (α to EWG)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "acidic aliphatic C–H donor (α to EWG)",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Alkyl-X",
-    "name": "alkyl (pseudo)halide",
-    "description": "Alkyl halides and alkyl sulfonates.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Alkyl-Br",
-        "name": "alkyl bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Alkyl-Cl",
-        "name": "alkyl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Alkyl-I",
-        "name": "alkyl iodide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl iodide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Alkyl-OSO2R",
-        "name": "alkyl sulfonate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl sulfonate",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Alkyne",
-    "name": "alkyne",
-    "description": "Alkynes for Sonogashira, cycloaddition, or hydrogenation.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Ar-alkyne",
-        "name": "aryl-substituted alkyne",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl-substituted alkyne",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "R-alkyne",
-        "name": "alkyl-substituted alkyne",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl-substituted alkyne",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "acetylene",
-        "name": "acetylene (HC≡CH)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "acetylene (HC≡CH)",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "internal-alkyne",
-        "name": "internal alkyne (R-C≡C-R)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "internal alkyne (R-C≡C-R)",
-          "coupling_role": "both"
-        }
-      },
-      {
-        "id": "terminal-alkyne",
-        "name": "terminal alkyne (R-C≡CH)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "terminal alkyne (R-C≡CH)",
-          "coupling_role": "both"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Allylic-X",
-    "name": "allylic halide",
-    "description": "Allylic halides and leaving groups - undergo SN2', allylic substitution, and cross-coupling with retention or inversion.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Allyl-Br",
-        "name": "allylic bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "allylic bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Allyl-Cl",
-        "name": "allylic chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "allylic chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Allyl-I",
-        "name": "allylic iodide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "allylic iodide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Allyl-OAc",
-        "name": "allylic acetate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "allylic acetate",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Allyl-OCO2R",
-        "name": "allylic carbonate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "allylic carbonate",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Amide",
-    "name": "amide",
-    "description": "Neutral amide-like groups (amides, ureas, lactams, carbamates, sulfonamides).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Lactam",
-        "name": "lactam",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "lactam",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "RCONH2",
-        "name": "primary amide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "primary amide",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "RCONHR",
-        "name": "secondary amide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "secondary amide",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "Sulfonyl-amide",
-        "name": "sulfonyl amide (RSO2NR2)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "sulfonyl amide (RSO2NR2)",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ArB*",
-    "name": "aryl boron reagent",
-    "description": "Aryl boron reagents (boronic acids/esters/trifluoroborates).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ArB(OH)2",
-        "name": "aryl boronic acid",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl boronic acid",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "ArB(OR)2",
-        "name": "aryl boronate ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl boronate ester",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "ArBF3K",
-        "name": "aryl trifluoroborate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl trifluoroborate",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ArH",
-    "name": "aryl C-H donor",
-    "description": "Aryl and heteroaryl C–H donors for direct arylation.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Ar-H",
-        "name": "aryl C–H donor",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl C–H donor",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "Hetero-ArH",
-        "name": "heteroaryl C–H donor",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "heteroaryl C–H donor",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ArNH2/Ar2NH",
-    "name": "aniline-type amine",
-    "description": "Aniline-class amines and heteroaromatic NH nucleophiles.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Ar2NH",
-        "name": "diarylamine (secondary)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "diarylamine (secondary)",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "ArNH2",
-        "name": "aniline (primary)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aniline (primary)",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "ArNHR",
-        "name": "N-alkyl aniline (secondary)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "N-alkyl aniline (secondary)",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "arom-NH",
-        "name": "aromatic NH (heteroaromatic)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aromatic NH (heteroaromatic)",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ArOH",
-    "name": "phenol",
-    "description": "Phenols and naphthols.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ArOH",
-        "name": "phenol",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "phenol",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ArX*",
-    "name": "aryl (pseudo)halide",
-    "description": "Aryl halides and aryl sulfonates (pseudohalides).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ArBr",
-        "name": "aryl bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ArCl",
-        "name": "aryl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ArF",
-        "name": "aryl fluoride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl fluoride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ArI",
-        "name": "aryl iodide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl iodide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ArOMs",
-        "name": "aryl mesylate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl mesylate",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ArOSO2R",
-        "name": "aryl sulfonate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl sulfonate",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ArOTf",
-        "name": "aryl triflate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl triflate",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ArOTs",
-        "name": "aryl tosylate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl tosylate",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Azide",
-    "name": "azide",
-    "description": "Azides - versatile nucleophiles for click chemistry, reduction to amines, and cycloadditions.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Ar-N3",
-        "name": "aryl azide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl azide",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "R-N3",
-        "name": "alkyl azide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl azide",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Benzylic-X",
-    "name": "benzylic halide",
-    "description": "Benzylic halides - more reactive than simple alkyl halides due to resonance stabilization of carbocation/radical intermediates.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Bn-Br",
-        "name": "benzylic bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "benzylic bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Bn-Cl",
-        "name": "benzylic chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "benzylic chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "Bn-I",
-        "name": "benzylic iodide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "benzylic iodide",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Diene",
-    "name": "diene",
-    "description": "1,3-conjugated dienes for Diels-Alder cycloaddition reactions.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "anthracene",
-        "name": "anthracene (polycyclic diene)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "anthracene (polycyclic diene)",
-          "coupling_role": "dienophile"
-        }
-      },
-      {
-        "id": "conjugated-diene",
-        "name": "1,3-conjugated diene",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "1,3-conjugated diene",
-          "coupling_role": "dienophile"
-        }
-      },
-      {
-        "id": "cyclopentadiene",
-        "name": "cyclopentadiene",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "cyclopentadiene",
-          "coupling_role": "dienophile"
-        }
-      },
-      {
-        "id": "furan-diene",
-        "name": "furan (aromatic diene)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "furan (aromatic diene)",
-          "coupling_role": "dienophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Dienophile",
-    "name": "dienophile",
-    "description": "Dienophiles (alkenes/alkynes) for Diels-Alder reactions.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "activated-dienophile",
-        "name": "α,β-unsaturated carbonyl",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "α,β-unsaturated carbonyl",
-          "coupling_role": "dienophile"
-        }
-      },
-      {
-        "id": "alkyne-dienophile",
-        "name": "alkyne dienophile",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyne dienophile",
-          "coupling_role": "dienophile"
-        }
-      },
-      {
-        "id": "maleic-anhydride",
-        "name": "maleic anhydride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "maleic anhydride",
-          "coupling_role": "dienophile"
-        }
-      },
-      {
-        "id": "simple-dienophile",
-        "name": "simple alkene",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "simple alkene",
-          "coupling_role": "dienophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Enamine",
-    "name": "enamine",
-    "description": "Enamines - versatile carbon nucleophiles formed from aldehydes/ketones and secondary amines; used in organocatalysis and C-C bond formation.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "enamine",
-        "name": "enamine (R2C=C-NR2)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "enamine (R2C=C-NR2)",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "morpholine-enamine",
-        "name": "morpholine-derived enamine",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "morpholine-derived enamine",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "pyrrolidine-enamine",
-        "name": "pyrrolidine-derived enamine",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "pyrrolidine-derived enamine",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Enolate",
-    "name": "enolate",
-    "description": "Enolates and enol equivalents for nucleophilic addition reactions.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "beta_dicarbonyl",
-        "name": "β-dicarbonyl compound",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "β-dicarbonyl compound",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "enolate",
-        "name": "enolate ion",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "enolate ion",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "silyl_enol_ether",
-        "name": "silyl enol ether",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "silyl enol ether",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Ester",
-    "name": "ester",
-    "description": "Esters for transesterification, aminolysis, or Claisen condensation.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ArCOOR",
-        "name": "aromatic ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aromatic ester",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "RCOOR",
-        "name": "aliphatic ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aliphatic ester",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "activated_ester",
-        "name": "activated ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "activated ester",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "HetAr-X",
-    "name": "heteroaryl (pseudo)halide",
-    "description": "Heteroaryl halides (pyridines, pyrimidines, thiazoles, indoles, etc.) - often more challenging than simple ArX due to electronic effects and coordination.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "HetArBr",
-        "name": "heteroaryl bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "heteroaryl bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "HetArCl",
-        "name": "heteroaryl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "heteroaryl chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "HetArI",
-        "name": "heteroaryl iodide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "heteroaryl iodide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "HetArOTf",
-        "name": "heteroaryl triflate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "heteroaryl triflate",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "IndoleBr",
-        "name": "indole bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "indole bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "PyridineBr",
-        "name": "pyridine bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "pyridine bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "PyrimidineCl",
-        "name": "pyrimidine chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "pyrimidine chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "ThiazoleBr",
-        "name": "thiazole bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "thiazole bromide",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Imine",
-    "name": "imine",
-    "description": "Imines and Schiff bases - electrophilic and nucleophilic depending on activation; common in reductive amination and cycloadditions.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Ar-imine",
-        "name": "aromatic imine",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aromatic imine",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "N-protected-imine",
-        "name": "N-protected imine (e.g., N-Ts, N-Boc)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "N-protected imine (e.g., N-Ts, N-Boc)",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "imine",
-        "name": "imine (R2C=NR)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "imine (R2C=NR)",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Ketone",
-    "name": "ketone",
-    "description": "Ketones as electrophiles or directing groups.",
-    "category": null,
-    "aliases": [
-      "aliphatic ketone",
-      "aliphatic ketones",
-      "alkyl ketone",
-      "alkyl ketones",
-      "aromatic ketone",
-      "aromatic ketones",
-      "ketone",
-      "ketones"
-    ],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ArCOR",
-        "name": "aromatic ketone",
-        "aliases": [
-          "aromatic ketone",
-          "aromatic ketones",
-          "aryl aryl ketone",
-          "aryl ketone",
-          "aryl ketones",
-          "benzophenone-type ketone"
-        ],
-        "metadata": {
-          "compound_type": "aromatic ketone",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "RCOR",
-        "name": "aliphatic ketone",
-        "aliases": [
-          "aliphatic ketone",
-          "aliphatic ketones",
-          "alkyl ketone",
-          "alkyl ketones"
-        ],
-        "metadata": {
-          "compound_type": "aliphatic ketone",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Nitrile",
-    "name": "nitrile",
-    "description": "Nitriles - directing groups for C-H activation and precursors to amides, amines, carboxylic acids.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Ar-CN",
-        "name": "aryl nitrile",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl nitrile",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "R-CN",
-        "name": "alkyl nitrile",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl nitrile",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "R-M",
-    "name": "organometallic reagent",
-    "description": "Organometallic reagents (Grignard, organozinc, organolithium, etc.).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Alkyl-M",
-        "name": "alkyl organometallic (Grignard, organozinc, etc.)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl organometallic (Grignard, organozinc, etc.)",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "Ar-M",
-        "name": "aryl organometallic (Grignard, organozinc, etc.)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aryl organometallic (Grignard, organozinc, etc.)",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "RB*",
-    "name": "alkyl/alkenyl boron reagent",
-    "description": "Alkyl or alkenyl boron reagents (boronic acids/esters/trifluoroborates).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Alkyl-B(OH)2",
-        "name": "alkyl boronic acid",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl boronic acid",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "Alkyl-B(OR)2",
-        "name": "alkyl boronate ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl boronate ester",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "Alkyl-BF3K",
-        "name": "alkyl trifluoroborate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkyl trifluoroborate",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "alkeneB(OH)2",
-        "name": "alkenyl boronic acid",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkenyl boronic acid",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "alkeneB(OR)2",
-        "name": "alkenyl boronate ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "alkenyl boronate ester",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "RCO2H",
-    "name": "carboxylic acid",
-    "description": "Carboxylic acids, salts, and esters as acyl sources or directing groups.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "RCO2H",
-        "name": "carboxylic acid",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "carboxylic acid",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "RCO2M",
-        "name": "carboxylate salt",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "carboxylate salt",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "RCO2OR",
-        "name": "carboxylic acid ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "carboxylic acid ester",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "RNH2/R2NH",
-    "name": "aliphatic amine",
-    "description": "Aliphatic primary/secondary/tertiary amines (including α-branched variants).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "R2NH",
-        "name": "secondary aliphatic amine",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "secondary aliphatic amine",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "R2NH-a-branch",
-        "name": "secondary aliphatic amine (α-branched)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "secondary aliphatic amine (α-branched)",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "R3N",
-        "name": "tertiary aliphatic amine",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "tertiary aliphatic amine",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "RNH2",
-        "name": "primary aliphatic amine",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "primary aliphatic amine",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "RNH2-a-branch",
-        "name": "primary aliphatic amine (α-branched)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "primary aliphatic amine (α-branched)",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ROH",
-    "name": "aliphatic alcohol",
-    "description": "Aliphatic alcohols (primary, secondary, tertiary, and α-branched).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ROH-a-branch",
-        "name": "aliphatic alcohol (α-branched)",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "aliphatic alcohol (α-branched)",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "ROH-primary",
-        "name": "primary aliphatic alcohol",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "primary aliphatic alcohol",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "ROH-secondary",
-        "name": "secondary aliphatic alcohol",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "secondary aliphatic alcohol",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "ROH-tertiary",
-        "name": "tertiary aliphatic alcohol",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "tertiary aliphatic alcohol",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "RSH",
-    "name": "thiol",
-    "description": "Thiols (aliphatic and aromatic).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "ArSH",
-        "name": "thiophenol",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "thiophenol",
-          "coupling_role": "nucleophile"
-        }
-      },
-      {
-        "id": "RSH",
-        "name": "thiol",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "thiol",
-          "coupling_role": "nucleophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "RSO2Cl",
-    "name": "sulfonyl chloride",
-    "description": "Sulfonyl chlorides (acylating/electrophilic sulfur).",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "MsCl",
-        "name": "methanesulfonyl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "methanesulfonyl chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "RSO2Cl",
-        "name": "sulfonyl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "sulfonyl chloride",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "VinylX*",
-    "name": "vinyl (pseudo)halide",
-    "description": "Vinyl halides and vinyl triflates.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "VinylOTf",
-        "name": "vinyl triflate",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "vinyl triflate",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "alkene-Br",
-        "name": "vinyl bromide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "vinyl bromide",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "alkene-Cl",
-        "name": "vinyl chloride",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "vinyl chloride",
-          "coupling_role": "electrophile"
-        }
-      },
-      {
-        "id": "alkene-I",
-        "name": "vinyl iodide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "vinyl iodide",
-          "coupling_role": "electrophile"
-        }
-      }
-    ]
-  },
-  {
-    "id": "Ylide",
-    "name": "ylide/phosphonate",
-    "description": "Phosphorus ylides and phosphonates for Wittig and HWE olefination reactions.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "HWE-phosphonate",
-        "name": "phosphonate ester",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "phosphonate ester",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "Wittig-ylide",
-        "name": "phosphonium ylide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "phosphonium ylide",
-          "coupling_role": "other"
-        }
-      },
-      {
-        "id": "stabilized-ylide",
-        "name": "stabilized ylide",
-        "aliases": [],
-        "metadata": {
-          "compound_type": "stabilized ylide",
-          "coupling_role": "other"
-        }
-      }
-    ]
-  },
-  {
-    "id": "RCO2H-activated",
-    "name": "activated carboxylic acid",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "RCO2H-activated",
-        "name": "activated carboxylic acid",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "H2",
-    "name": "molecular hydrogen",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "H2",
-        "name": "molecular hydrogen",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "Metal-H",
-    "name": "metal hydride",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Metal-H",
-        "name": "metal hydride",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "Oxidant",
-    "name": "oxidant",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Oxidant",
-        "name": "oxidant",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "RMgX",
-    "name": "Grignard reagent",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "RMgX",
-        "name": "Grignard reagent",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "Borane",
-    "name": "borane",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "Borane",
-        "name": "borane",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "RLi",
-    "name": "organolithium",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "RLi",
-        "name": "organolithium",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "CN-",
-    "name": "cyanide",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "CN-",
-        "name": "cyanide",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "I-",
-    "name": "iodide",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "I-",
-        "name": "iodide",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  },
-  {
-    "id": "RO-",
-    "name": "alkoxide",
-    "description": "Stub entry to satisfy reaction taxonomy references.",
-    "category": null,
-    "aliases": [],
-    "metadata": {},
-    "members": [
-      {
-        "id": "RO-",
-        "name": "alkoxide",
-        "aliases": [],
-        "metadata": {}
-      }
-    ]
-  }
-]
+{
+  "version": "v1.1_feature_tokens",
+  "description": "A taxonomy of common reactant types used in organic synthesis. It will be based on the calculable_features.json (Updated: all entries/members include feature_token mapped to calculable_features tokens.)",
+  "entries": [
+    {
+      "id": "Aldehyde",
+      "name": "aldehyde",
+      "feature_token": "aldehyde_present",
+      "members": [
+        {
+          "id": "ArCHO",
+          "name": "aromatic aldehyde",
+          "feature_token": "aromatic_aldehyde_present"
+        },
+        {
+          "id": "RCHO",
+          "name": "aliphatic aldehyde",
+          "feature_token": "aliphatic_aldehyde_present"
+        }
+      ]
+    },
+    {
+      "id": "Alkene",
+      "name": "alkene",
+      "members": [
+        {
+          "id": "Ar-alkene",
+          "name": "aryl-substituted alkene (styrene-type)",
+          "feature_token": "Ar-alkene_present"
+        },
+        {
+          "id": "R-alkene",
+          "name": "alkyl-substituted alkene",
+          "feature_token": "R-alkene_present"
+        },
+        {
+          "id": "enol-ether",
+          "name": "enol ether",
+          "feature_token": "enol-ether_present"
+        },
+        {
+          "id": "ethene",
+          "name": "ethene (H2C=CH2)",
+          "feature_token": "ethene_present"
+        },
+        {
+          "id": "internal-alkene",
+          "name": "internal alkene (R-CH=CH-R)",
+          "feature_token": "internal-alkene_present"
+        },
+        {
+          "id": "terminal-alkene",
+          "name": "terminal alkene (R-CH=CH2)",
+          "feature_token": "terminal-alkene_present"
+        }
+      ],
+      "feature_token": "alkene_present"
+    },
+    {
+      "id": "Alkane",
+      "name": "alkane",
+      "feature_token": "Alkyl-H_present",
+      "members": [
+        {
+          "id": "Alkyl-H",
+          "name": "aliphatic C–H donor",
+          "feature_token": "Alkyl-H_present"
+        },
+        {
+          "id": "Alkyl-H-acidic",
+          "name": "acidic aliphatic C–H donor (α to EWG)",
+          "feature_token": "Alkyl-H-acidic_present"
+        }
+      ]
+    },
+    {
+      "id": "Alkyl-X*",
+      "name": "alkyl (pseudo)halide",
+      "feature_token": "alkyl_pseudohalide_present",
+      "members": [
+        {
+          "id": "Alkyl-Br",
+          "name": "alkyl bromide",
+          "feature_token": "Alkyl-Br_present"
+        },
+        {
+          "id": "Alkyl-Cl",
+          "name": "alkyl chloride",
+          "feature_token": "Alkyl-Cl_present"
+        },
+        {
+          "id": "Alkyl-I",
+          "name": "alkyl iodide",
+          "feature_token": "Alkyl-I_present"
+        },
+        {
+          "id": "Alkyl-OSO2R",
+          "name": "alkyl sulfonate",
+          "feature_token": "Alkyl-OSO2R_present"
+        }
+      ]
+    },
+    {
+      "id": "Alkyne",
+      "name": "alkyne",
+      "members": [
+        {
+          "id": "Ar-alkyne",
+          "name": "aryl-substituted alkyne",
+          "feature_token": "Ar-alkyne_present"
+        },
+        {
+          "id": "R-alkyne",
+          "name": "alkyl-substituted alkyne",
+          "feature_token": "R-alkyne_present"
+        },
+        {
+          "id": "acetylene",
+          "name": "acetylene (HC≡CH)",
+          "feature_token": "acetylene_present"
+        },
+        {
+          "id": "internal-alkyne",
+          "name": "internal alkyne (R-C≡C-R)",
+          "feature_token": "internal-alkyne_present"
+        },
+        {
+          "id": "terminal-alkyne",
+          "name": "terminal alkyne (R-C≡CH)",
+          "feature_token": "terminal-alkyne_present"
+        }
+      ],
+      "feature_token": "alkyne_present"
+    },
+    {
+      "id": "Allylic-X*",
+      "name": "allylic halide",
+      "members": [
+        {
+          "id": "Allyl-Br",
+          "name": "allylic bromide",
+          "feature_token": "Allyl-Br_present"
+        },
+        {
+          "id": "Allyl-Cl",
+          "name": "allylic chloride",
+          "feature_token": "Allyl-Cl_present"
+        },
+        {
+          "id": "Allyl-I",
+          "name": "allylic iodide",
+          "feature_token": "Allyl-I_present"
+        },
+        {
+          "id": "Allyl-OAc",
+          "name": "allylic acetate",
+          "feature_token": "Allyl-OAc_present"
+        },
+        {
+          "id": "Allyl-OCO2R",
+          "name": "allylic carbonate",
+          "feature_token": "Allyl-OCO2R_present"
+        }
+      ],
+      "feature_token": "allylic_leaving_group_present"
+    },
+    {
+      "id": "Amide",
+      "name": "amide",
+      "members": [
+        {
+          "id": "Lactam",
+          "name": "lactam",
+          "feature_token": "Lactam_present"
+        },
+        {
+          "id": "RCONH2",
+          "name": "primary amide",
+          "feature_token": "RCONH2_present"
+        },
+        {
+          "id": "RCONHR",
+          "name": "secondary amide",
+          "feature_token": "RCONHR_present"
+        },
+        {
+          "id": "Sulfonyl-amide",
+          "name": "sulfonyl amide (RSO2NR2)",
+          "feature_token": "Sulfonyl-amide_present"
+        }
+      ],
+      "feature_token": "amide_present"
+    },
+    {
+      "id": "ArB*",
+      "name": "aryl boron reagent",
+      "members": [
+        {
+          "id": "ArB(OH)2",
+          "name": "aryl boronic acid",
+          "feature_token": "ArB(OH)2_present"
+        },
+        {
+          "id": "ArB(OR)2",
+          "name": "aryl boronate ester",
+          "feature_token": "ArB(OR)2_present"
+        },
+        {
+          "id": "ArBF3K",
+          "name": "aryl trifluoroborate",
+          "feature_token": "ArBF3K_present"
+        }
+      ],
+      "feature_token": "aryl_boron_reagent_present"
+    },
+    {
+      "id": "ArH",
+      "name": "aryl C-H donor",
+      "members": [
+        {
+          "id": "Ar-H",
+          "name": "aryl C–H donor",
+          "feature_token": "Ar-H_present"
+        },
+        {
+          "id": "Hetero-ArH",
+          "name": "heteroaryl C–H donor",
+          "feature_token": "Hetero-ArH_present"
+        }
+      ],
+      "feature_token": "Ar-H_present"
+    },
+    {
+      "id": "ArNH2/Ar2NH",
+      "name": "aniline-type amine",
+      "members": [
+        {
+          "id": "Ar2NH",
+          "name": "diarylamine (secondary)",
+          "feature_token": "Ar2NH_present"
+        },
+        {
+          "id": "ArNH2",
+          "name": "aniline (primary)",
+          "feature_token": "ArNH2_present"
+        },
+        {
+          "id": "ArNHR",
+          "name": "N-alkyl aniline (secondary)",
+          "feature_token": "ArNHR_present"
+        },
+        {
+          "id": "arom-NH",
+          "name": "aromatic NH (heteroaromatic)",
+          "feature_token": "arom-NH_present"
+        }
+      ],
+      "feature_token": "aniline_present"
+    },
+    {
+      "id": "ArOH",
+      "name": "phenol",
+      "members": [
+        {
+          "id": "ArOH",
+          "name": "phenol",
+          "feature_token": "ArOH_present"
+        }
+      ],
+      "feature_token": "ArOH_present"
+    },
+    {
+      "id": "ArX*",
+      "name": "aryl (pseudo)halide",
+      "members": [
+        {
+          "id": "ArBr",
+          "name": "aryl bromide",
+          "feature_token": "ArBr_present"
+        },
+        {
+          "id": "ArCl",
+          "name": "aryl chloride",
+          "feature_token": "ArCl_present"
+        },
+        {
+          "id": "ArF",
+          "name": "aryl fluoride",
+          "feature_token": "ArF_present"
+        },
+        {
+          "id": "ArI",
+          "name": "aryl iodide",
+          "feature_token": "ArI_present"
+        },
+        {
+          "id": "ArOMs",
+          "name": "aryl mesylate",
+          "feature_token": "ArOMs_present"
+        },
+        {
+          "id": "ArOSO2R",
+          "name": "aryl sulfonate",
+          "feature_token": "ArOSO2R_present"
+        },
+        {
+          "id": "ArOTf",
+          "name": "aryl triflate",
+          "feature_token": "ArOTf_present"
+        },
+        {
+          "id": "ArOTs",
+          "name": "aryl tosylate",
+          "feature_token": "ArOTs_present"
+        }
+      ],
+      "feature_token": "aryl_halide_present"
+    },
+    {
+      "id": "Azide",
+      "name": "azide",
+      "members": [
+        {
+          "id": "Ar-N3",
+          "name": "aryl azide",
+          "feature_token": "Ar-N3_present"
+        },
+        {
+          "id": "R-N3",
+          "name": "alkyl azide",
+          "feature_token": "R-N3_present"
+        }
+      ],
+      "feature_token": "azide_present"
+    },
+    {
+      "id": "Benzylic-X",
+      "name": "benzylic halide",
+      "members": [
+        {
+          "id": "Bn-Br",
+          "name": "benzylic bromide",
+          "feature_token": "Bn-Br_present"
+        },
+        {
+          "id": "Bn-Cl",
+          "name": "benzylic chloride",
+          "feature_token": "Bn-Cl_present"
+        },
+        {
+          "id": "Bn-I",
+          "name": "benzylic iodide",
+          "feature_token": "Bn-I_present"
+        }
+      ],
+      "feature_token": "benzylic_halide_present"
+    },
+    {
+      "id": "Diene",
+      "name": "diene",
+      "members": [
+        {
+          "id": "anthracene",
+          "name": "anthracene (polycyclic diene)",
+          "feature_token": "anthracene_present"
+        },
+        {
+          "id": "conjugated-diene",
+          "name": "1,3-conjugated diene",
+          "feature_token": "conjugated-diene_present"
+        },
+        {
+          "id": "cyclopentadiene",
+          "name": "cyclopentadiene",
+          "feature_token": "cyclopentadiene_present"
+        },
+        {
+          "id": "furan-diene",
+          "name": "furan (aromatic diene)",
+          "feature_token": "furan-diene_present"
+        }
+      ],
+      "feature_token": "diene_present"
+    },
+    {
+      "id": "Dienophile",
+      "name": "dienophile",
+      "members": [
+        {
+          "id": "activated-dienophile",
+          "name": "α,β-unsaturated carbonyl",
+          "feature_token": "activated-dienophile_present"
+        },
+        {
+          "id": "alkyne-dienophile",
+          "name": "alkyne dienophile",
+          "feature_token": "alkyne-dienophile_present"
+        },
+        {
+          "id": "maleic-anhydride",
+          "name": "maleic anhydride",
+          "feature_token": "maleic-anhydride_present"
+        },
+        {
+          "id": "simple-dienophile",
+          "name": "simple alkene",
+          "feature_token": "simple-dienophile_present"
+        }
+      ],
+      "feature_token": "dienophile_present"
+    },
+    {
+      "id": "Enamine",
+      "name": "enamine",
+      "members": [
+        {
+          "id": "enamine",
+          "name": "enamine (R2C=C-NR2)",
+          "feature_token": "enamine_present"
+        },
+        {
+          "id": "morpholine-enamine",
+          "name": "morpholine-derived enamine",
+          "feature_token": "morpholine-enamine_present"
+        },
+        {
+          "id": "pyrrolidine-enamine",
+          "name": "pyrrolidine-derived enamine",
+          "feature_token": "pyrrolidine-enamine_present"
+        }
+      ],
+      "feature_token": "enamine_present"
+    },
+    {
+      "id": "Enolate",
+      "name": "enolate",
+      "members": [
+        {
+          "id": "beta_dicarbonyl",
+          "name": "β-dicarbonyl compound",
+          "feature_token": "beta_dicarbonyl_present"
+        },
+        {
+          "id": "enolate",
+          "name": "enolate ion",
+          "feature_token": "enolate_present"
+        },
+        {
+          "id": "silyl_enol_ether",
+          "name": "silyl enol ether",
+          "feature_token": "silyl_enol_ether_present"
+        }
+      ],
+      "feature_token": "enolate_present"
+    },
+    {
+      "id": "Ester",
+      "name": "ester",
+      "members": [
+        {
+          "id": "ArCOOR",
+          "name": "aromatic ester",
+          "feature_token": "ArCOOR_present"
+        },
+        {
+          "id": "RCOOR",
+          "name": "aliphatic ester",
+          "feature_token": "RCOOR_present"
+        },
+        {
+          "id": "activated_ester",
+          "name": "activated ester",
+          "feature_token": "activated_ester_present"
+        }
+      ],
+      "feature_token": "ester_present"
+    },
+    {
+      "id": "HetAr-X",
+      "name": "heteroaryl (pseudo)halide",
+      "members": [
+        {
+          "id": "HetArBr",
+          "name": "heteroaryl bromide",
+          "feature_token": "HetArBr_present"
+        },
+        {
+          "id": "HetArCl",
+          "name": "heteroaryl chloride",
+          "feature_token": "HetArCl_present"
+        },
+        {
+          "id": "HetArI",
+          "name": "heteroaryl iodide",
+          "feature_token": "HetArI_present"
+        },
+        {
+          "id": "HetArOTf",
+          "name": "heteroaryl triflate",
+          "feature_token": "HetArOTf_present"
+        },
+        {
+          "id": "IndoleBr",
+          "name": "indole bromide",
+          "feature_token": "IndoleBr_present"
+        },
+        {
+          "id": "PyridineBr",
+          "name": "pyridine bromide",
+          "feature_token": "PyridineBr_present"
+        },
+        {
+          "id": "PyrimidineCl",
+          "name": "pyrimidine chloride",
+          "feature_token": "PyrimidineCl_present"
+        },
+        {
+          "id": "ThiazoleBr",
+          "name": "thiazole bromide",
+          "feature_token": "ThiazoleBr_present"
+        }
+      ],
+      "feature_token": "heteroaryl_halide_present"
+    },
+    {
+      "id": "Imine",
+      "name": "imine",
+      "members": [
+        {
+          "id": "Ar-imine",
+          "name": "aromatic imine",
+          "feature_token": "Ar-imine_present"
+        },
+        {
+          "id": "N-protected-imine",
+          "name": "N-protected imine (e.g., N-Ts, N-Boc)",
+          "feature_token": "N-protected-imine_present"
+        },
+        {
+          "id": "imine",
+          "name": "imine (R2C=NR)",
+          "feature_token": "imine_present"
+        }
+      ],
+      "feature_token": "imine_present"
+    },
+    {
+      "id": "Ketone",
+      "name": "ketone",
+      "members": [
+        {
+          "id": "ArCOR",
+          "name": "aromatic ketone",
+          "feature_token": "ArCOR_present"
+        },
+        {
+          "id": "RCOR",
+          "name": "aliphatic ketone",
+          "feature_token": "RCOR_present"
+        }
+      ],
+      "feature_token": "ketone_present"
+    },
+    {
+      "id": "Nitrile",
+      "name": "nitrile",
+      "members": [
+        {
+          "id": "Ar-CN",
+          "name": "aryl nitrile",
+          "feature_token": "Ar-CN_present"
+        },
+        {
+          "id": "R-CN",
+          "name": "alkyl nitrile",
+          "feature_token": "R-CN_present"
+        }
+      ],
+      "feature_token": "nitrile_present"
+    },
+    {
+      "id": "R-M",
+      "name": "organometallic reagent",
+      "members": [
+        {
+          "id": "Alkyl-M",
+          "name": "alkyl organometallic (Grignard, organozinc, etc.)",
+          "feature_token": "Alkyl-M_present"
+        },
+        {
+          "id": "Ar-M",
+          "name": "aryl organometallic (Grignard, organozinc, etc.)",
+          "feature_token": "Ar-M_present"
+        }
+      ],
+      "feature_token": "organometallic_reagent_present"
+    },
+    {
+      "id": "RB*",
+      "name": "alkyl/alkenyl boron reagent",
+      "members": [
+        {
+          "id": "Alkyl-B(OH)2",
+          "name": "alkyl boronic acid",
+          "feature_token": "Alkyl-B(OH)2_present"
+        },
+        {
+          "id": "Alkyl-B(OR)2",
+          "name": "alkyl boronate ester",
+          "feature_token": "Alkyl-B(OR)2_present"
+        },
+        {
+          "id": "Alkyl-BF3K",
+          "name": "alkyl trifluoroborate",
+          "feature_token": "Alkyl-BF3K_present"
+        },
+        {
+          "id": "alkeneB(OH)2",
+          "name": "alkenyl boronic acid",
+          "feature_token": "alkeneB(OH)2_present"
+        },
+        {
+          "id": "alkeneB(OR)2",
+          "name": "alkenyl boronate ester",
+          "feature_token": "alkeneB(OR)2_present"
+        }
+      ],
+      "feature_token": "alkyl_alkenyl_boron_reagent_present"
+    },
+    {
+      "id": "RCO2H",
+      "name": "carboxylic acid",
+      "members": [
+        {
+          "id": "RCO2H",
+          "name": "carboxylic acid",
+          "feature_token": "RCO2H_present"
+        },
+        {
+          "id": "RCO2M",
+          "name": "carboxylate salt",
+          "feature_token": "RCO2M_present"
+        },
+        {
+          "id": "RCO2OR",
+          "name": "carboxylic acid ester",
+          "feature_token": "RCO2OR_present"
+        }
+      ],
+      "feature_token": "RCO2H_present"
+    },
+    {
+      "id": "RNH2/R2NH",
+      "name": "aliphatic amine",
+      "members": [
+        {
+          "id": "R2NH",
+          "name": "secondary aliphatic amine",
+          "feature_token": "R2NH_present"
+        },
+        {
+          "id": "R2NH-a-branch",
+          "name": "secondary aliphatic amine (α-branched)",
+          "feature_token": "R2NH-a-branch_present"
+        },
+        {
+          "id": "R3N",
+          "name": "tertiary aliphatic amine",
+          "feature_token": "R3N_present"
+        },
+        {
+          "id": "RNH2",
+          "name": "primary aliphatic amine",
+          "feature_token": "RNH2_present"
+        },
+        {
+          "id": "RNH2-a-branch",
+          "name": "primary aliphatic amine (α-branched)",
+          "feature_token": "RNH2-a-branch_present"
+        }
+      ],
+      "feature_token": "aliphatic_amine_present"
+    },
+    {
+      "id": "ROH",
+      "name": "aliphatic alcohol",
+      "members": [
+        {
+          "id": "ROH-a-branch",
+          "name": "aliphatic alcohol (α-branched)",
+          "feature_token": "ROH-a-branch_present"
+        },
+        {
+          "id": "ROH-primary",
+          "name": "primary aliphatic alcohol",
+          "feature_token": "ROH-primary_present"
+        },
+        {
+          "id": "ROH-secondary",
+          "name": "secondary aliphatic alcohol",
+          "feature_token": "ROH-secondary_present"
+        },
+        {
+          "id": "ROH-tertiary",
+          "name": "tertiary aliphatic alcohol",
+          "feature_token": "ROH-tertiary_present"
+        }
+      ],
+      "feature_token": "aliphatic_alcohol_present"
+    },
+    {
+      "id": "RSH",
+      "name": "thiol",
+      "members": [
+        {
+          "id": "ArSH",
+          "name": "thiophenol",
+          "feature_token": "ArSH_present"
+        },
+        {
+          "id": "RSH",
+          "name": "thiol",
+          "feature_token": "RSH_present"
+        }
+      ],
+      "feature_token": "RSH_present"
+    },
+    {
+      "id": "RSO2Cl",
+      "name": "sulfonyl chloride",
+      "members": [
+        {
+          "id": "MsCl",
+          "name": "methanesulfonyl chloride",
+          "feature_token": "MsCl_present"
+        },
+        {
+          "id": "RSO2Cl",
+          "name": "sulfonyl chloride",
+          "feature_token": "RSO2Cl_present"
+        }
+      ],
+      "feature_token": "RSO2Cl_present"
+    },
+    {
+      "id": "VinylX*",
+      "name": "vinyl (pseudo)halide",
+      "members": [
+        {
+          "id": "VinylOTf",
+          "name": "vinyl triflate",
+          "feature_token": "VinylOTf_present"
+        },
+        {
+          "id": "alkene-Br",
+          "name": "vinyl bromide",
+          "feature_token": "alkene-Br_present"
+        },
+        {
+          "id": "alkene-Cl",
+          "name": "vinyl chloride",
+          "feature_token": "alkene-Cl_present"
+        },
+        {
+          "id": "alkene-I",
+          "name": "vinyl iodide",
+          "feature_token": "alkene-I_present"
+        }
+      ],
+      "feature_token": "vinyl_halide_present"
+    },
+    {
+      "id": "Ylide",
+      "name": "ylide/phosphonate",
+      "members": [
+        {
+          "id": "HWE-phosphonate",
+          "name": "phosphonate ester",
+          "feature_token": "HWE-phosphonate_present"
+        },
+        {
+          "id": "Wittig-ylide",
+          "name": "phosphonium ylide",
+          "feature_token": "Wittig-ylide_present"
+        },
+        {
+          "id": "stabilized-ylide",
+          "name": "stabilized ylide",
+          "feature_token": "stabilized-ylide_present"
+        }
+      ],
+      "feature_token": "ylide_phosphonate_present"
+    },
+    {
+      "id": "RCO2H-activated",
+      "name": "activated carboxylic acid",
+      "members": [
+        {
+          "id": "RCO2H-activated",
+          "name": "activated carboxylic acid",
+          "feature_token": "activated_carboxylic_acid_present"
+        }
+      ],
+      "feature_token": "activated_carboxylic_acid_present"
+    },
+    {
+      "id": "Metal-H",
+      "name": "metal hydride",
+      "members": [
+        {
+          "id": "Metal-H",
+          "name": "metal hydride",
+          "feature_token": "metal_hydride_present"
+        }
+      ],
+      "feature_token": "metal_hydride_present"
+    },
+    {
+      "id": "Oxidant",
+      "name": "oxidant",
+      "members": [
+        {
+          "id": "Oxidant",
+          "name": "oxidant",
+          "feature_token": "oxidant_present"
+        }
+      ],
+      "feature_token": "oxidant_present"
+    },
+    {
+      "id": "RMgX",
+      "name": "Grignard reagent",
+      "members": [
+        {
+          "id": "RMgX",
+          "name": "Grignard reagent",
+          "feature_token": "grignard_present"
+        }
+      ],
+      "feature_token": "grignard_present"
+    },
+    {
+      "id": "RLi",
+      "name": "organolithium",
+      "members": [
+        {
+          "id": "RLi",
+          "name": "organolithium",
+          "feature_token": "organolithium_present"
+        }
+      ],
+      "feature_token": "organolithium_present"
+    },
+    {
+      "id": "Acyl-electrophile",
+      "name": "acyl electrophile",
+      "members": [
+        {
+          "id": "RCOCl",
+          "name": "acyl chloride",
+          "feature_token": "RCOCl_present"
+        }
+      ],
+      "feature_token": "acyl_electrophile_present"
+    }
+  ]
+}
