@@ -156,7 +156,7 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
-          "[CH2,CH,CH3][Cl]"
+          "[CX4][Cl]"
         ]
       },
       "why": "Alkyl chloride",
@@ -169,7 +169,7 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
-          "[CH2,CH,CH3][Br]"
+          "[CX4][Br]"
         ]
       },
       "why": "Alkyl bromide",
@@ -182,7 +182,7 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
-          "[CH2,CH,CH3][I]"
+          "[CX4][I]"
         ]
       },
       "why": "Alkyl iodide",
@@ -433,7 +433,7 @@
       "scope": "global",
       "detect": {
         "smarts_any": [
-          "B(OC(C)(C)C)(OC(C)(C)C)"
+          "B1OC(C)(C)C(C)(C)O1"
         ]
       },
       "why": "BPin",
@@ -879,7 +879,8 @@
       "detect": {
         "smarts_any": [
           "[NX3][CX3](=[OX1])[#6]",
-          "[NX3][CX3](=[OX1])[H]"
+          "[NX3][CX3](=[OX1])[H]",
+          "[NX3][CX3](=[OX1])[OX2]"
         ]
       },
       "why": "Amide group; resonance-stabilized, low nucleophilicity",
@@ -1087,7 +1088,8 @@
           "c[CX2]#[NX1]",
           "c[CX3](=[OX1])[F,Cl]",
           "cS(=O)(=O)[#6]",
-          "c[CX3](=O)O"
+          "c[CX3](=O)O",
+          "c(F)c(F)c(F)"
         ]
       },
       "why": "Strong electron-withdrawing group on aryl ring (nitro, nitrile, acyl halide, sulfonyl, carboxylic acid)",
@@ -1255,6 +1257,8 @@
         "smarts_any": [
           "[OH]",
           "[SH]",
+          "[NX3;H1,H2]",
+          "[nH]",
           "P(=O)([OH])[OH]",
           "C(=O)[OH]",
           "S(=O)(=O)[OH]"
@@ -1302,7 +1306,7 @@
       "why": "Strong metal-binding risk",
       "category": "sulfur_phosphorus_boron",
       "id": "thiol_poison_risk",
-      "derive": "thiol_present"
+      "derive": "thiol_present OR sulfide_present OR disulfide_present"
     },
     {
       "token": "methyl_ether_present",
@@ -2273,6 +2277,19 @@
       "id": "aromatic_present"
     },
     {
+      "token": "aromatic_heteroatom_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "unsaturation",
+      "detect": {
+        "smarts_any": [
+          "[n,o,s]"
+        ]
+      },
+      "why": "Aromatic heteroatom present (n/o/s); coarse heteroaromatic indicator",
+      "id": "aromatic_heteroatom_present"
+    },
+    {
       "token": "aromatic_ring_count",
       "type": "int",
       "scope": "global",
@@ -3060,7 +3077,7 @@
       "category": "reactant_types",
       "detect": {
         "smarts_any": [
-          "c[OX2][SX4](=O)(=O)[CF3]"
+          "c[OX2][SX4](=O)(=O)C(F)(F)F"
         ]
       },
       "why": "aryl triflate - aryl (pseudo)halide",
@@ -3160,7 +3177,7 @@
       "category": "reactant_types",
       "detect": {
         "smarts_any": [
-          "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[OX2][SX4](=O)(=O)[CF3]"
+          "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[OX2][SX4](=O)(=O)C(F)(F)F"
         ]
       },
       "why": "heteroaryl triflate - heteroaryl (pseudo)halide",
@@ -3314,13 +3331,40 @@
       "id": "alkene_cl_present"
     },
     {
+      "token": "VinylBr_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "halides_and_leaving_groups",
+      "derived": "alkene-Br_present",
+      "why": "Alias: vinyl bromide (compatibility token)",
+      "id": "vinylbr_present"
+    },
+    {
+      "token": "VinylCl_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "halides_and_leaving_groups",
+      "derived": "alkene-Cl_present",
+      "why": "Alias: vinyl chloride (compatibility token)",
+      "id": "vinylcl_present"
+    },
+    {
+      "token": "VinylI_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "halides_and_leaving_groups",
+      "derived": "alkene-I_present",
+      "why": "Alias: vinyl iodide (compatibility token)",
+      "id": "vinyli_present"
+    },
+    {
       "token": "VinylOTf_present",
       "type": "bool",
       "scope": "global",
       "category": "reactant_types",
       "detect": {
         "smarts_any": [
-          "[CX3]=[CX3][OX2][SX4](=O)(=O)[CF3]"
+          "[CX3]=[CX3][OX2][SX4](=O)(=O)C(F)(F)F"
         ]
       },
       "why": "vinyl triflate - vinyl (pseudo)halide",
@@ -5617,6 +5661,15 @@
       "notes": [
         "Added derived_shortcuts for activated ester handles, benzylic amines, and acidic nitrogen functionality.",
         "These are intended to support rule logic in amide/peptide coupling, benzylic C–N functionalisation, and acidity-related heuristics."
+      ]
+    },
+    {
+      "version": "v6.0_simple",
+      "date": "2025-12-16",
+      "notes": [
+        "Removed the smartsrx-derived reactant-type expansion layer (PFAS and heteroaryl leaving-group super-patterns).",
+        "Kept taxonomy-mapped reactant members via reactant_metadata and lightweight derived logic.",
+        "Adjusted a few core detectors for sample compatibility (acidic_proton_present includes N-H; amide_present includes carbamates; strong_ewg_present detects polyfluoro aryl; thiol_poison_risk includes thioethers)."
       ]
     }
   ]
