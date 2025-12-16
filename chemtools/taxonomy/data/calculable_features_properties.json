@@ -1,0 +1,292 @@
+{
+  "version": "v6.0_simple",
+  "layer": "properties",
+  "features": [
+    {
+      "token": "sp2_halide_site_count",
+      "type": "int",
+      "scope": "global",
+      "detect": {
+        "heuristic": "count [cX3]-[Cl,Br,I,F] plus [C;X2]=[C;X2]-[Cl,Br,I,F]"
+      },
+      "why": "Total sp2 C–Hal sites",
+      "category": "halides_and_leaving_groups",
+      "id": "sp2_halide_site_count"
+    },
+    {
+      "token": "sp2_sulfonate_site_count",
+      "type": "int",
+      "scope": "global",
+      "detect": {
+        "heuristic": "count sp2-OS(=O)(=O)R sites"
+      },
+      "why": "Total sp2 sulfonate (OTf/OTs/OMs) sites",
+      "category": "halides_and_leaving_groups",
+      "id": "sp2_sulfonate_site_count"
+    },
+    {
+      "token": "low_molecular_weight",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "molecular_weight < 200"
+      },
+      "why": "Low MW; volatile, potential loss during workup",
+      "category": "physicochemical_properties",
+      "id": "low_molecular_weight"
+    },
+    {
+      "token": "high_molecular_weight",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "molecular_weight > 500"
+      },
+      "why": "High MW; potential solubility issues",
+      "category": "physicochemical_properties",
+      "id": "high_molecular_weight"
+    },
+    {
+      "token": "fused_ring_system",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "has fused ring system"
+      },
+      "why": "Fused rings; increased rigidity, π-system extension (naphthalene, quinoline, etc.)",
+      "category": "unsaturation_and_pi_systems",
+      "id": "fused_ring_system"
+    },
+    {
+      "token": "chiral_center_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "has stereogenic center"
+      },
+      "why": "Chirality; potential racemization or stereoselective requirements",
+      "category": "stereochemistry_and_topology",
+      "id": "chiral_center_present"
+    },
+    {
+      "token": "chiral_center_count",
+      "type": "int",
+      "scope": "global",
+      "detect": {
+        "heuristic": "count stereogenic centers"
+      },
+      "why": "Number of chiral centers; diastereomer complexity",
+      "category": "stereochemistry_and_topology",
+      "id": "chiral_center_count"
+    },
+    {
+      "token": "polarity_high",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "TPSA≥50 or (HBA+HBD)≥4"
+      },
+      "why": "Solvent matching",
+      "category": "physicochemical_properties",
+      "id": "polarity_high"
+    },
+    {
+      "token": "polarity_low",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "TPSA≤20 and (HBA+HBD)≤2"
+      },
+      "why": "Solvent matching",
+      "category": "physicochemical_properties",
+      "id": "polarity_low"
+    },
+    {
+      "token": "beta_hydride_possible",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "exists sp3 C–LG with β-C bearing ≥1 H"
+      },
+      "why": "Isomerization/elimination risk",
+      "category": "electrophile_nucleophile_scales",
+      "id": "beta_hydride_possible"
+    },
+    {
+      "token": "ortho_substitution_present",
+      "type": "bool",
+      "scope": "global",
+      "detect": {
+        "heuristic": "ortho-disubstituted benzene ring"
+      },
+      "why": "Steric hindrance from ortho substituents on aromatic rings",
+      "category": "electrophile_nucleophile_scales",
+      "id": "ortho_substitution_present"
+    },
+    {
+      "token": "strained_ring_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "reactive_intermediates_and_instability",
+      "detect": {
+        "heuristic": "contains 3-membered or 4-membered ring"
+      },
+      "why": "Strained small ring (3-4 membered); high ring strain energy, reactive",
+      "id": "strained_ring_present"
+    },
+    {
+      "token": "lipinski_hbd_compliant",
+      "type": "bool",
+      "scope": "global",
+      "category": "physicochemical",
+      "detect": {
+        "heuristic": "HBD <= 5"
+      },
+      "why": "Lipinski rule: ≤5 hydrogen bond donors for oral bioavailability",
+      "id": "lipinski_hbd_compliant"
+    },
+    {
+      "token": "lipinski_hba_compliant",
+      "type": "bool",
+      "scope": "global",
+      "category": "physicochemical",
+      "detect": {
+        "heuristic": "HBA <= 10"
+      },
+      "why": "Lipinski rule: ≤10 hydrogen bond acceptors for oral bioavailability",
+      "id": "lipinski_hba_compliant"
+    },
+    {
+      "token": "lipinski_mw_compliant",
+      "type": "bool",
+      "scope": "global",
+      "category": "physicochemical",
+      "detect": {
+        "heuristic": "molecular_weight < 500"
+      },
+      "why": "Lipinski rule: MW < 500 Da for oral bioavailability",
+      "id": "lipinski_mw_compliant"
+    },
+    {
+      "token": "lipinski_logp_compliant",
+      "type": "bool",
+      "scope": "global",
+      "category": "physicochemical",
+      "detect": {
+        "heuristic": "logP < 5"
+      },
+      "why": "Lipinski rule: logP < 5 for oral bioavailability",
+      "id": "lipinski_logp_compliant"
+    },
+    {
+      "token": "veber_rotb_compliant",
+      "type": "bool",
+      "scope": "global",
+      "category": "physicochemical",
+      "detect": {
+        "heuristic": "rotatable_bonds <= 10"
+      },
+      "why": "Veber rule: ≤10 rotatable bonds for oral bioavailability",
+      "id": "veber_rotb_compliant"
+    },
+    {
+      "token": "veber_tpsa_compliant",
+      "type": "bool",
+      "scope": "global",
+      "category": "physicochemical",
+      "detect": {
+        "heuristic": "TPSA <= 140"
+      },
+      "why": "Veber rule: TPSA ≤ 140 Ų for oral bioavailability",
+      "id": "veber_tpsa_compliant"
+    },
+    {
+      "token": "zwitterion_potential",
+      "type": "bool",
+      "scope": "global",
+      "category": "physicochemical",
+      "detect": {
+        "heuristic": "has both acidic and basic ionizable groups"
+      },
+      "why": "Potential zwitterion; both acidic and basic groups present (amino acids, etc.)",
+      "id": "zwitterion_potential"
+    },
+    {
+      "token": "aromatic_ring_count",
+      "type": "int",
+      "scope": "global",
+      "category": "medicinal_chemistry",
+      "detect": {
+        "heuristic": "count aromatic rings"
+      },
+      "why": "Number of aromatic rings; affects lipophilicity, π-π interactions",
+      "id": "aromatic_ring_count"
+    },
+    {
+      "token": "fsp3_high",
+      "type": "bool",
+      "scope": "global",
+      "category": "medicinal_chemistry",
+      "detect": {
+        "heuristic": "fraction sp3 carbons > 0.5"
+      },
+      "why": "High Fsp3 (>50%); 3D character, improved solubility, ADME properties",
+      "id": "fsp3_high"
+    },
+    {
+      "token": "fsp3_low",
+      "type": "bool",
+      "scope": "global",
+      "category": "medicinal_chemistry",
+      "detect": {
+        "heuristic": "fraction sp3 carbons < 0.3"
+      },
+      "why": "Low Fsp3 (<30%); flat, aromatic character, potential solubility issues",
+      "id": "fsp3_low"
+    },
+    {
+      "token": "alkene_e_isomer_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "stereochemistry_and_topology",
+      "detect": {
+        "heuristic": "has E-configured alkene"
+      },
+      "why": "E-alkene (trans); more stable isomer, different reactivity than Z",
+      "id": "alkene_e_isomer_present"
+    },
+    {
+      "token": "alkene_z_isomer_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "stereochemistry_and_topology",
+      "detect": {
+        "heuristic": "has Z-configured alkene"
+      },
+      "why": "Z-alkene (cis); less stable, different reactivity, proximity effects",
+      "id": "alkene_z_isomer_present"
+    },
+    {
+      "token": "atropisomer_potential",
+      "type": "bool",
+      "scope": "global",
+      "category": "stereochemistry_and_topology",
+      "detect": {
+        "heuristic": "ortho,ortho-disubstituted biaryl with restricted rotation"
+      },
+      "why": "Potential atropisomerism; axial chirality from hindered rotation",
+      "id": "atropisomer_potential"
+    },
+    {
+      "token": "extended_conjugation_present",
+      "type": "bool",
+      "scope": "global",
+      "category": "redox_and_photochemistry",
+      "detect": {
+        "heuristic": "3+ contiguous sp2/aromatic atoms"
+      },
+      "why": "Extended π-conjugation; chromophore, potential photoreactivity, UV-active",
+      "id": "extended_conjugation_present"
+    }
+  ]
+}

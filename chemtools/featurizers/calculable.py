@@ -21,18 +21,14 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import re
 from functools import lru_cache
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
 from ..util.smarts_cache import compile_smarts as _compile_smarts
 from ..util.boolean_expr import evaluate as _eval_bool_expr
-
-# Path to the feature specification JSON (centralized in taxonomy/data)
-_SPEC_PATH = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "calculable_features.json"
+from ..taxonomy.calculable_spec import load_calculable_feature_spec
 
 
 # ============================================================================
@@ -41,9 +37,8 @@ _SPEC_PATH = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "calcul
 
 @lru_cache(maxsize=1)
 def _load_feature_spec() -> Dict[str, Any]:
-    """Load and cache the feature specification JSON."""
-    with open(_SPEC_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """Load and cache the merged (layered) feature specification JSON."""
+    return load_calculable_feature_spec()
 
 
 def get_feature_spec() -> Dict[str, Any]:

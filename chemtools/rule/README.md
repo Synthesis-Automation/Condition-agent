@@ -145,7 +145,7 @@ Applied if any condition matches:
 
 ## Feature System Integration
 
-The system uses **108 calculable features** from `chemtools/taxonomy/data/calculable_features.json`:
+The system uses calculable features loaded from the layered spec under `chemtools/taxonomy/data/` (merged at runtime via `chemtools.taxonomy.calculable_spec`):
 
 ### Key Feature Categories
 
@@ -242,8 +242,11 @@ pytest tests/test_rule_engine.py -v
 
 ### Adding New Features
 
-1. Edit `chemtools/taxonomy/data/calculable_features.json`
-2. Add feature definition with SMARTS or derivation logic
+1. Edit the appropriate layer:
+   - Atomic SMARTS/count detectors: `chemtools/taxonomy/data/calculable_features.json`
+   - Heuristic/descriptor features: `chemtools/taxonomy/data/calculable_features_properties.json`
+   - Derived boolean rules/shortcuts: `chemtools/taxonomy/data/calculable_features_derived.json`
+2. Add feature definition with SMARTS, heuristic, or derivation logic
 3. Features are automatically available to all rule databases
 4. Use in `reactant_features` or `when` conditions
 

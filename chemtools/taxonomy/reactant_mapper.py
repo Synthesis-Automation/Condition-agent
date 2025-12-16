@@ -38,6 +38,8 @@ try:
 except Exception:  # pragma: no cover - defensive import guard
     load_registry = None  # type: ignore[assignment]
 
+from .calculable_spec import load_calculable_feature_spec
+
 
 def _resolve_data_root(root: Optional[Path] = None) -> Path:
     """
@@ -110,17 +112,9 @@ def _build_member_to_token_map_cached(root: Path) -> Dict[str, str]:
     Returns:
         Dict: {"ArBr": "ArBr_present", "ArCl": "ArCl_present", ...}
     """
-    path = _get_data_path("calculable_features.json", root=root)
-
-    if not path.exists():
-        logger.warning(f"calculable_features.json not found at {path}")
-        return {}
-
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        
-        features = data.get("features", []) if isinstance(data, dict) else data
+        spec = load_calculable_feature_spec(root)
+        features = spec.get("features", [])
 
         mapping: Dict[str, str] = {}
         for feat in features:

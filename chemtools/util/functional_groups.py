@@ -1,20 +1,19 @@
 """
-Functional Group Detection sourced from calculable_features.json.
+Functional Group Detection sourced from the calculable feature specification.
 
-All SMARTS definitions and metadata now live in the central
-chemtools/taxonomy/data/calculable_features.json specification, ensuring a
-single source of truth for functional group logic.
+SMARTS definitions and metadata live in the layered calculable feature spec
+under `chemtools/taxonomy/data/` and are loaded via
+`chemtools.taxonomy.calculable_spec.load_calculable_feature_spec`.
 """
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 from types import MappingProxyType
 from typing import Dict, Iterable, List, Optional, Tuple, Mapping
 
+from ..taxonomy.calculable_spec import load_calculable_feature_spec
 from .rdkit_helpers import rdkit_available, parse_smiles
 from .smarts_cache import compile_smarts
 
@@ -43,7 +42,6 @@ _CATEGORY_PREFERRED_ORDER = [
     "leaving_groups",
 ]
 _UNCATEGORIZED_TAG = "other"
-_SPEC_PATH = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "calculable_features.json"
 _DETECTION_CACHE_SIZE = 4096
 
 # Fallback category tags for common oxygen-bearing groups when metadata is absent.
@@ -104,9 +102,8 @@ _LEGACY_GROUP_FALLBACKS: Dict[str, Tuple[str, ...]] = {
 
 @lru_cache(maxsize=1)
 def _load_feature_spec() -> Dict[str, object]:
-    """Load the shared calculable feature specification from disk."""
-    with _SPEC_PATH.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+    """Load the shared calculable feature specification (merged layered spec)."""
+    return load_calculable_feature_spec()
 
 
 @lru_cache(maxsize=1)
