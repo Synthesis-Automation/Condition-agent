@@ -33,7 +33,8 @@
       "Features are designed for both deterministic detection and LLM-based reasoning about synthetic feasibility."
     ],
     "expansion_notes": [
-      "Expanded from 107 to 300+ features",
+      "the primary philosophy is create a calculable, extensible, and interpretable feature set using simple SMARTS patterns and their logic combinations instead of complex smarts pattern which are hard to maintain",
+      "e.g., sp2_chloride_present = ArCl + VinylCl, instead of complex SMARTS for both",
       "Added comprehensive protecting group library",
       "Added detailed heterocycle detection",
       "Added ADME-relevant features",
@@ -41,6 +42,7 @@
       "Added reactive intermediate markers",
       "Added medicinal chemistry filters",
       "Added reactant type features from taxonomy (ArBr_reactant, ArX_reactant, etc.)"
+      
     ]
   },
   "features": [
