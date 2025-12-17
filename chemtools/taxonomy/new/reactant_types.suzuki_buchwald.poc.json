@@ -1,0 +1,155 @@
+[
+  {
+    "id": "CrossCouplingElectrophile",
+    "name": "cross-coupling electrophile",
+    "feature_token": "sp2_electrophile_present",
+    "members": [
+      {
+        "id": "AromaticHalide",
+        "name": "aromatic halide (Cl/Br/I)",
+        "feature_token": "aromatic_halide_present",
+        "members": [
+          {
+            "id": "ArCl",
+            "name": "aromatic chloride",
+            "feature_token": "aromatic_chloride_present"
+          },
+          {
+            "id": "ArBr",
+            "name": "aromatic bromide",
+            "feature_token": "aromatic_bromide_present"
+          },
+          {
+            "id": "ArI",
+            "name": "aromatic iodide",
+            "feature_token": "aromatic_iodide_present"
+          }
+        ]
+      },
+      {
+        "id": "VinylHalide",
+        "name": "vinyl halide (Cl/Br/I)",
+        "feature_token": "vinyl_halide_present",
+        "members": [
+          {
+            "id": "VinylCl",
+            "name": "vinyl chloride",
+            "feature_token": "vinyl_chloride_present"
+          },
+          {
+            "id": "VinylBr",
+            "name": "vinyl bromide",
+            "feature_token": "vinyl_bromide_present"
+          },
+          {
+            "id": "VinylI",
+            "name": "vinyl iodide",
+            "feature_token": "vinyl_iodide_present"
+          }
+        ]
+      },
+      {
+        "id": "AromaticSulfonate",
+        "name": "aromatic sulfonate pseudohalide (OTf/OTs/OMs)",
+        "feature_token": "aromatic_sulfonate_present",
+        "members": [
+          {
+            "id": "ArOTf",
+            "name": "aromatic triflate",
+            "feature_token": "aromatic_triflate_present"
+          },
+          {
+            "id": "ArOTs",
+            "name": "aromatic tosylate",
+            "feature_token": "aromatic_tosylate_present"
+          },
+          {
+            "id": "ArOMs",
+            "name": "aromatic mesylate",
+            "feature_token": "aromatic_mesylate_present"
+          }
+        ]
+      },
+      {
+        "id": "VinylSulfonate",
+        "name": "vinyl sulfonate pseudohalide (OTf/OTs/OMs)",
+        "feature_token": "vinyl_sulfonate_present",
+        "members": [
+          {
+            "id": "VinylOTf",
+            "name": "vinyl triflate",
+            "feature_token": "vinyl_triflate_present"
+          },
+          {
+            "id": "VinylOTs",
+            "name": "vinyl tosylate",
+            "feature_token": "vinyl_tosylate_present"
+          },
+          {
+            "id": "VinylOMs",
+            "name": "vinyl mesylate",
+            "feature_token": "vinyl_mesylate_present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "SuzukiPartner",
+    "name": "Suzuki organoboron partner",
+    "feature_token": "suzuki_boron_partner_present",
+    "members": [
+      {
+        "id": "AromaticBoron",
+        "name": "aromatic organoboron",
+        "feature_token": "aromatic_boron_partner_present",
+        "members": [
+          {
+            "id": "ArB(OH)2",
+            "name": "aromatic boronic acid",
+            "feature_token": "aromatic_boronic_acid_present"
+          },
+          {
+            "id": "ArBpin",
+            "name": "aromatic Bpin",
+            "feature_token": "aromatic_bpin_present"
+          }
+        ]
+      },
+      {
+        "id": "VinylBoron",
+        "name": "vinyl organoboron",
+        "feature_token": "vinyl_boron_partner_present",
+        "members": [
+          {
+            "id": "VinylB(OH)2",
+            "name": "vinyl boronic acid",
+            "feature_token": "vinyl_boronic_acid_present"
+          },
+          {
+            "id": "VinylBpin",
+            "name": "vinyl Bpin",
+            "feature_token": "vinyl_bpin_present"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "BuchwaldAminePartner",
+    "name": "Buchwald–Hartwig amination partner",
+    "feature_token": "buchwald_amine_partner_present",
+    "members": [
+      {
+        "id": "AmineNH",
+        "name": "amine (has N–H)",
+        "feature_token": "amine_with_nh_present"
+      },
+      {
+        "id": "TertiaryAmine",
+        "name": "tertiary amine (no N–H)",
+        "feature_token": "tertiary_amine_present"
+      }
+    ]
+  }
+]

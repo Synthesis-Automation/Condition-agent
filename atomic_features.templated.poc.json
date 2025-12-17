@@ -1,0 +1,274 @@
+[
+  {
+    "token": "aromatic_chloride_present",
+    "type": "bool",
+    "description": "aromatic sp2 chloride",
+    "detect": {
+      "smarts_any": [
+        "[a:1][Cl]"
+      ]
+    },
+    "generated_from": {
+      "template": "core_halide",
+      "fragments": [
+        "AromaticCore",
+        "Cl"
+      ]
+    }
+  },
+  {
+    "token": "aromatic_bromide_present",
+    "type": "bool",
+    "description": "aromatic sp2 bromide",
+    "detect": {
+      "smarts_any": [
+        "[a:1][Br]"
+      ]
+    },
+    "generated_from": {
+      "template": "core_halide",
+      "fragments": [
+        "AromaticCore",
+        "Br"
+      ]
+    }
+  },
+  {
+    "token": "aromatic_iodide_present",
+    "type": "bool",
+    "description": "aromatic sp2 iodide",
+    "detect": {
+      "smarts_any": [
+        "[a:1][I]"
+      ]
+    },
+    "generated_from": {
+      "template": "core_halide",
+      "fragments": [
+        "AromaticCore",
+        "I"
+      ]
+    }
+  },
+  {
+    "token": "aromatic_triflate_present",
+    "type": "bool",
+    "description": "aromatic sp2 triflate pseudohalide",
+    "detect": {
+      "smarts_any": [
+        "[a:1]OS(=O)(=O)C(F)(F)F"
+      ]
+    },
+    "generated_from": {
+      "template": "core_sulfonate",
+      "fragments": [
+        "AromaticCore",
+        "OTfTail"
+      ]
+    }
+  },
+  {
+    "token": "aromatic_tosylate_present",
+    "type": "bool",
+    "description": "aromatic sp2 tosylate pseudohalide",
+    "detect": {
+      "smarts_any": [
+        "[a:1]OS(=O)(=O)c1ccc(C)cc1"
+      ]
+    },
+    "generated_from": {
+      "template": "core_sulfonate",
+      "fragments": [
+        "AromaticCore",
+        "OTsTail"
+      ]
+    }
+  },
+  {
+    "token": "aromatic_mesylate_present",
+    "type": "bool",
+    "description": "aromatic sp2 mesylate pseudohalide",
+    "detect": {
+      "smarts_any": [
+        "[a:1]OS(=O)(=O)C"
+      ]
+    },
+    "generated_from": {
+      "template": "core_sulfonate",
+      "fragments": [
+        "AromaticCore",
+        "OMsTail"
+      ]
+    }
+  },
+  {
+    "token": "aromatic_boronic_acid_present",
+    "type": "bool",
+    "description": "aromatic organoboron partner: boronic_acid",
+    "detect": {
+      "smarts_any": [
+        "[a:1][B](O)O"
+      ]
+    },
+    "generated_from": {
+      "template": "core_boron",
+      "fragments": [
+        "AromaticCore",
+        "BoronicAcid"
+      ]
+    }
+  },
+  {
+    "token": "aromatic_bpin_present",
+    "type": "bool",
+    "description": "aromatic organoboron partner: bpin",
+    "detect": {
+      "smarts_any": [
+        "[a:1][B]1OC(C)(C)C(C)(C)O1"
+      ]
+    },
+    "generated_from": {
+      "template": "core_boron",
+      "fragments": [
+        "AromaticCore",
+        "Bpin"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_chloride_present",
+    "type": "bool",
+    "description": "vinyl sp2 chloride",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3][Cl]"
+      ]
+    },
+    "generated_from": {
+      "template": "core_halide",
+      "fragments": [
+        "VinylCore",
+        "Cl"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_bromide_present",
+    "type": "bool",
+    "description": "vinyl sp2 bromide",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3][Br]"
+      ]
+    },
+    "generated_from": {
+      "template": "core_halide",
+      "fragments": [
+        "VinylCore",
+        "Br"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_iodide_present",
+    "type": "bool",
+    "description": "vinyl sp2 iodide",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3][I]"
+      ]
+    },
+    "generated_from": {
+      "template": "core_halide",
+      "fragments": [
+        "VinylCore",
+        "I"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_triflate_present",
+    "type": "bool",
+    "description": "vinyl sp2 triflate pseudohalide",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3]OS(=O)(=O)C(F)(F)F"
+      ]
+    },
+    "generated_from": {
+      "template": "core_sulfonate",
+      "fragments": [
+        "VinylCore",
+        "OTfTail"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_tosylate_present",
+    "type": "bool",
+    "description": "vinyl sp2 tosylate pseudohalide",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3]OS(=O)(=O)c1ccc(C)cc1"
+      ]
+    },
+    "generated_from": {
+      "template": "core_sulfonate",
+      "fragments": [
+        "VinylCore",
+        "OTsTail"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_mesylate_present",
+    "type": "bool",
+    "description": "vinyl sp2 mesylate pseudohalide",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3]OS(=O)(=O)C"
+      ]
+    },
+    "generated_from": {
+      "template": "core_sulfonate",
+      "fragments": [
+        "VinylCore",
+        "OMsTail"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_boronic_acid_present",
+    "type": "bool",
+    "description": "vinyl organoboron partner: boronic_acid",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3][B](O)O"
+      ]
+    },
+    "generated_from": {
+      "template": "core_boron",
+      "fragments": [
+        "VinylCore",
+        "BoronicAcid"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_bpin_present",
+    "type": "bool",
+    "description": "vinyl organoboron partner: bpin",
+    "detect": {
+      "smarts_any": [
+        "[C;X3:1]=[C;X3][B]1OC(C)(C)C(C)(C)O1"
+      ]
+    },
+    "generated_from": {
+      "template": "core_boron",
+      "fragments": [
+        "VinylCore",
+        "Bpin"
+      ]
+    }
+  }
+]

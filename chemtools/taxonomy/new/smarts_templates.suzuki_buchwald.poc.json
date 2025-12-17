@@ -1,0 +1,209 @@
+{
+  "version": "poc-1",
+  "focus": [
+    "SuzukiMiyaura",
+    "BuchwaldHartwigAmination"
+  ],
+  "fragments": {
+    "AromaticCore": {
+      "smarts": "[a:1]",
+      "description": "Aromatic atom attachment point (includes heteroaromatics)"
+    },
+    "VinylCore": {
+      "smarts": "[C;X3:1]=[C;X3]",
+      "description": "Vinyl attachment point (first alkene carbon is attachment)"
+    },
+    "Cl": {
+      "smarts": "[Cl]",
+      "description": "Chloride leaving group"
+    },
+    "Br": {
+      "smarts": "[Br]",
+      "description": "Bromide leaving group"
+    },
+    "I": {
+      "smarts": "[I]",
+      "description": "Iodide leaving group"
+    },
+    "OTfTail": {
+      "smarts": "S(=O)(=O)C(F)(F)F",
+      "description": "Triflate tail"
+    },
+    "OTsTail": {
+      "smarts": "S(=O)(=O)c1ccc(C)cc1",
+      "description": "Tosylate tail"
+    },
+    "OMsTail": {
+      "smarts": "S(=O)(=O)C",
+      "description": "Mesylate tail"
+    },
+    "BoronicAcid": {
+      "smarts": "[B](O)O",
+      "description": "Boronic acid group"
+    },
+    "Bpin": {
+      "smarts": "[B]1OC(C)(C)C(C)(C)O1",
+      "description": "Pinacol boronate ester (Bpin)"
+    }
+  },
+  "templates": {
+    "core_halide": {
+      "pattern": "{core}{lg}",
+      "description": "sp2 electrophile: core directly bonded to halide"
+    },
+    "core_sulfonate": {
+      "pattern": "{core}O{tail}",
+      "description": "sp2 pseudohalide: core bonded to O-sulfonate tail"
+    },
+    "core_boron": {
+      "pattern": "{core}{boron}",
+      "description": "Suzuki partner: core directly bonded to boron group"
+    }
+  },
+  "generated_atomic_features": [
+    {
+      "token": "aromatic_chloride_present",
+      "smarts": "[a:1][Cl]",
+      "template": "core_halide",
+      "fragments": [
+        "AromaticCore",
+        "Cl"
+      ]
+    },
+    {
+      "token": "aromatic_bromide_present",
+      "smarts": "[a:1][Br]",
+      "template": "core_halide",
+      "fragments": [
+        "AromaticCore",
+        "Br"
+      ]
+    },
+    {
+      "token": "aromatic_iodide_present",
+      "smarts": "[a:1][I]",
+      "template": "core_halide",
+      "fragments": [
+        "AromaticCore",
+        "I"
+      ]
+    },
+    {
+      "token": "vinyl_chloride_present",
+      "smarts": "[C;X3:1]=[C;X3][Cl]",
+      "template": "core_halide",
+      "fragments": [
+        "VinylCore",
+        "Cl"
+      ]
+    },
+    {
+      "token": "vinyl_bromide_present",
+      "smarts": "[C;X3:1]=[C;X3][Br]",
+      "template": "core_halide",
+      "fragments": [
+        "VinylCore",
+        "Br"
+      ]
+    },
+    {
+      "token": "vinyl_iodide_present",
+      "smarts": "[C;X3:1]=[C;X3][I]",
+      "template": "core_halide",
+      "fragments": [
+        "VinylCore",
+        "I"
+      ]
+    },
+    {
+      "token": "aromatic_triflate_present",
+      "smarts": "[a:1]OS(=O)(=O)C(F)(F)F",
+      "template": "core_sulfonate",
+      "fragments": [
+        "AromaticCore",
+        "OTfTail"
+      ]
+    },
+    {
+      "token": "aromatic_tosylate_present",
+      "smarts": "[a:1]OS(=O)(=O)c1ccc(C)cc1",
+      "template": "core_sulfonate",
+      "fragments": [
+        "AromaticCore",
+        "OTsTail"
+      ]
+    },
+    {
+      "token": "aromatic_mesylate_present",
+      "smarts": "[a:1]OS(=O)(=O)C",
+      "template": "core_sulfonate",
+      "fragments": [
+        "AromaticCore",
+        "OMsTail"
+      ]
+    },
+    {
+      "token": "vinyl_triflate_present",
+      "smarts": "[C;X3:1]=[C;X3]OS(=O)(=O)C(F)(F)F",
+      "template": "core_sulfonate",
+      "fragments": [
+        "VinylCore",
+        "OTfTail"
+      ]
+    },
+    {
+      "token": "vinyl_tosylate_present",
+      "smarts": "[C;X3:1]=[C;X3]OS(=O)(=O)c1ccc(C)cc1",
+      "template": "core_sulfonate",
+      "fragments": [
+        "VinylCore",
+        "OTsTail"
+      ]
+    },
+    {
+      "token": "vinyl_mesylate_present",
+      "smarts": "[C;X3:1]=[C;X3]OS(=O)(=O)C",
+      "template": "core_sulfonate",
+      "fragments": [
+        "VinylCore",
+        "OMsTail"
+      ]
+    },
+    {
+      "token": "aromatic_boronic_acid_present",
+      "smarts": "[a:1][B](O)O",
+      "template": "core_boron",
+      "fragments": [
+        "AromaticCore",
+        "BoronicAcid"
+      ]
+    },
+    {
+      "token": "aromatic_bpin_present",
+      "smarts": "[a:1][B]1OC(C)(C)C(C)(C)O1",
+      "template": "core_boron",
+      "fragments": [
+        "AromaticCore",
+        "Bpin"
+      ]
+    },
+    {
+      "token": "vinyl_boronic_acid_present",
+      "smarts": "[C;X3:1]=[C;X3][B](O)O",
+      "template": "core_boron",
+      "fragments": [
+        "VinylCore",
+        "BoronicAcid"
+      ]
+    },
+    {
+      "token": "vinyl_bpin_present",
+      "smarts": "[C;X3:1]=[C;X3][B]1OC(C)(C)C(C)(C)O1",
+      "template": "core_boron",
+      "fragments": [
+        "VinylCore",
+        "Bpin"
+      ]
+    }
+  ]
+}
