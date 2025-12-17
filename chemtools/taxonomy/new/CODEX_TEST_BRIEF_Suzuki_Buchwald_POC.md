@@ -211,3 +211,22 @@ Please implement:
 3) a CLI that prints classification + reasoning tokens
 
 Keep everything UTF-8.
+
+## Reference Implementation (this repo)
+
+- Feature engine + validator: `chemtools/taxonomy/new/feature_engine.py`
+- CLI demo: `chemtools/taxonomy/new/rxn_classifier.py`
+- Unit tests: `tests/test_suzuki_buchwald_poc.py`
+
+### Run the CLI (from repo root)
+
+```bash
+python -m chemtools.taxonomy.new.rxn_classifier --reactant "Brc1ccccc1" --reactant "OB(O)c1ccccc1"
+python -m chemtools.taxonomy.new.rxn_classifier --reactant "Brc1ccccc1" --reactant "Nc1ccccc1"
+```
+
+### Run the tests
+
+```bash
+pytest -q tests/test_suzuki_buchwald_poc.py
+```
