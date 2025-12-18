@@ -1,0 +1,163 @@
+[
+  {
+    "token": "aryl_halide_present",
+    "type": "bool",
+    "description": "Any aryl halide (Ar–Cl/Br/I)",
+    "derive": {
+      "any_of": [
+        "aryl_chloride_present",
+        "aryl_bromide_present",
+        "aryl_iodide_present"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_halide_present",
+    "type": "bool",
+    "description": "Any vinyl halide (Vinyl–Cl/Br/I)",
+    "derive": {
+      "any_of": [
+        "vinyl_chloride_present",
+        "vinyl_bromide_present",
+        "vinyl_iodide_present"
+      ]
+    }
+  },
+  {
+    "token": "sp2_halide_present",
+    "type": "bool",
+    "description": "Any sp2 halide electrophile (aryl or vinyl)",
+    "derive": {
+      "any_of": [
+        "aryl_halide_present",
+        "vinyl_halide_present"
+      ]
+    }
+  },
+  {
+    "token": "aryl_pseudohalide_present",
+    "type": "bool",
+    "description": "Any aryl pseudohalide (Ar–OTf/OTs/OMs)",
+    "derive": {
+      "any_of": [
+        "aryl_triflate_present",
+        "aryl_tosylate_present",
+        "aryl_mesylate_present"
+      ]
+    }
+  },
+  {
+    "token": "vinyl_pseudohalide_present",
+    "type": "bool",
+    "description": "Any vinyl pseudohalide (Vinyl–OTf/OTs/OMs)",
+    "derive": {
+      "any_of": [
+        "vinyl_triflate_present",
+        "vinyl_tosylate_present",
+        "vinyl_mesylate_present"
+      ]
+    }
+  },
+  {
+    "token": "sp2_pseudohalide_present",
+    "type": "bool",
+    "description": "Any sp2 pseudohalide electrophile (aryl/vinyl sulfonate)",
+    "derive": {
+      "any_of": [
+        "aryl_pseudohalide_present",
+        "vinyl_pseudohalide_present"
+      ]
+    }
+  },
+  {
+    "token": "sp2_electrophile_present",
+    "type": "bool",
+    "description": "Any sp2 electrophile for cross-coupling (halide or pseudohalide)",
+    "derive": {
+      "any_of": [
+        "sp2_halide_present",
+        "sp2_pseudohalide_present"
+      ]
+    }
+  },
+  {
+    "token": "organoboron_partner_present",
+    "type": "bool",
+    "description": "Any organoboron coupling partner (boronic acid or Bpin; aryl/vinyl)",
+    "derive": {
+      "any_of": [
+        "aryl_boronic_acid_present",
+        "aryl_bpin_present",
+        "vinyl_boronic_acid_present",
+        "vinyl_bpin_present"
+      ]
+    }
+  },
+  {
+    "token": "n_h_nucleophile_present",
+    "type": "bool",
+    "description": "Any N–H nucleophile (amine/amide/sulfonamide with N–H)",
+    "derive": {
+      "any_of": [
+        "amine_nh_present",
+        "amide_nh_present",
+        "sulfonamide_nh_present"
+      ]
+    }
+  },
+  {
+    "token": "acyl_electrophile_present",
+    "type": "bool",
+    "description": "Activated acyl electrophile (acid chloride or anhydride)",
+    "derive": {
+      "any_of": [
+        "acyl_chloride_present",
+        "anhydride_present"
+      ]
+    }
+  },
+  {
+    "token": "carboxylic_acid_or_activated_acyl_present",
+    "type": "bool",
+    "description": "Carboxylic acid or activated acyl electrophile present",
+    "derive": {
+      "any_of": [
+        "carboxylic_acid_present",
+        "acyl_electrophile_present"
+      ]
+    }
+  },
+  {
+    "token": "suzuki_possible_present",
+    "type": "bool",
+    "description": "Suzuki–Miyaura possible (sp2 electrophile + organoboron)",
+    "derive": {
+      "all_of": [
+        "sp2_electrophile_present",
+        "organoboron_partner_present"
+      ]
+    }
+  },
+  {
+    "token": "buchwald_hartwig_amination_possible_present",
+    "type": "bool",
+    "description": "Buchwald–Hartwig amination possible (sp2 electrophile + N–H nucleophile)",
+    "derive": {
+      "all_of": [
+        "sp2_electrophile_present",
+        "n_h_nucleophile_present"
+      ]
+    }
+  },
+  {
+    "token": "amide_formation_possible_present",
+    "type": "bool",
+    "description": "Amide formation possible (carboxylic acid/activated acyl + amine N–H)",
+    "derive": {
+      "all_of": [
+        "carboxylic_acid_or_activated_acyl_present",
+        "amine_nh_present"
+      ]
+    }
+  }
+]

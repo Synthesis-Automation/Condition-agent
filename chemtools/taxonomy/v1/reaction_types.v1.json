@@ -1,0 +1,29 @@
+[
+  {
+    "id": "SuzukiMiyaura",
+    "name": "Suzuki–Miyaura coupling",
+    "feature_token": "suzuki_possible_present",
+    "requires_all": [
+      "sp2_electrophile_present",
+      "organoboron_partner_present"
+    ]
+  },
+  {
+    "id": "BuchwaldHartwigAmination",
+    "name": "Buchwald–Hartwig amination",
+    "feature_token": "buchwald_hartwig_amination_possible_present",
+    "requires_all": [
+      "sp2_electrophile_present",
+      "n_h_nucleophile_present"
+    ]
+  },
+  {
+    "id": "AmideFormation",
+    "name": "amide formation (amine + carboxylic acid/activated acyl)",
+    "feature_token": "amide_formation_possible_present",
+    "requires_all": [
+      "carboxylic_acid_or_activated_acyl_present",
+      "amine_nh_present"
+    ]
+  }
+]

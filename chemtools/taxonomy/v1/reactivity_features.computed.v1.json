@@ -1,0 +1,56 @@
+{
+  "version": "reactivity-computed-v1-2025-12-18",
+  "scope": "POC steric analysis for Ar- context (ortho substitution counts)",
+  "computed_features": [
+    {
+      "token": "aryl_anchor_site_count",
+      "type": "int",
+      "description": "Number of detected Ar-* anchor sites in the molecule (from templated Ar-* atomic features).",
+      "compute": {
+        "method": "count_anchor_sites",
+        "anchor": {
+          "context_group_id": "Ar",
+          "context_atom_map_num": 1,
+          "source": "templated_atomic_features"
+        }
+      }
+    },
+    {
+      "token": "aryl_ortho_sub_count_list",
+      "type": "list[int]",
+      "description": "List of ortho substitution counts (0/1/2) for each detected Ar-* anchor site.",
+      "compute": {
+        "method": "aryl_ortho_substitution_count",
+        "anchor": {
+          "context_group_id": "Ar",
+          "context_atom_map_num": 1,
+          "source": "templated_atomic_features"
+        },
+        "per_site": true,
+        "definition": "Ortho position counted as substituted if the ortho ring atom has total H count == 0 (blocked by substituent, fusion, or hetero)."
+      }
+    },
+    {
+      "token": "aryl_ortho_sub_count_max",
+      "type": "int",
+      "description": "Maximum ortho substitution count across Ar-* anchor sites.",
+      "compute": {
+        "method": "aggregate_max",
+        "from": "aryl_ortho_sub_count_list"
+      }
+    },
+    {
+      "token": "aryl_ortho_sub_count_sum",
+      "type": "int",
+      "description": "Sum of ortho substitution counts across Ar-* anchor sites.",
+      "compute": {
+        "method": "aggregate_sum",
+        "from": "aryl_ortho_sub_count_list"
+      }
+    }
+  ],
+  "notes": [
+    "This layer is computed from RDKit graph analysis, anchored on Ar-* sites detected via templated atomic features (e.g., Ar-Br, Ar-CHO, Ar-OTf).",
+    "The same code path works for Ar-Br and Ar-CHO because the Ar- anchor atom is found via atom-map :1 in the templated SMARTS."
+  ]
+}
