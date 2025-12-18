@@ -20,19 +20,35 @@ This keeps code reusable across Ar-Br / Ar-CHO / Ar-OTf / Ar-CN / etc.
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Set
+from typing import Any, Dict, List, Optional, Tuple
 import json
 from pathlib import Path
+import sys
 
-def _require_rdkit():
-    try:
-        from rdkit import Chem  # type: ignore
-        return Chem
-    except Exception as e:
-        raise RuntimeError(
-            "RDKit is required. Install via conda/pip. "
-            f"Original import error: {e}"
-        )
+
+def _ensure_repo_root_on_syspath() -> None:
+    """
+    Allow running this module as a script from within `chemtools/taxonomy/v1/`.
+
+    When executed directly (e.g. `python ar_context_sterics_v1.py`), Python's
+    `sys.path[0]` is this folder, so `import chemtools...` would fail unless the
+    repo root is also on `sys.path`.
+    """
+    root = Path(__file__).resolve().parents[3]
+    root_str = str(root)
+    if root_str not in sys.path:
+        sys.path.insert(0, root_str)
+
+
+try:
+    from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
+    from chemtools.util.smarts_cache import compile_smarts
+except Exception:
+    _ensure_repo_root_on_syspath()
+    from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
+    from chemtools.util.smarts_cache import compile_smarts
+
+DEFAULT_DATA_DIR = Path(__file__).resolve().parent
 
 @dataclass(frozen=True)
 class AnchorSite:
@@ -42,11 +58,30 @@ class AnchorSite:
     match_atoms: Tuple[int, ...]
     smarts: str
 
+def _read_json(path: Path) -> Dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Expected JSON object in {path}, got {type(payload).__name__}")
+    return payload
+
 def load_compiled_features(path: Path) -> Dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return _read_json(path)
 
 def load_groups(path: Path) -> Dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return _read_json(path)
+
+
+def resolve_data_path(path: Path, *, base_dir: Path = DEFAULT_DATA_DIR) -> Path:
+    """
+    Resolve a data file path robustly.
+
+    If `path` is relative and doesn't exist in the current working directory,
+    try relative to `base_dir` (this module's folder).
+    """
+    candidate = path
+    if not candidate.is_absolute() and not candidate.exists():
+        candidate = base_dir / candidate
+    return candidate
 
 def _compose_label(left: str, right: str) -> str:
     if left.endswith("-") and right.startswith("-"):
@@ -105,14 +140,11 @@ def find_ar_anchor_sites(
     context_group_id: str = "Ar",
     context_atom_map_num: int = 1,
 ) -> List[AnchorSite]:
-    Chem = _require_rdkit()
-
     # Build group label index for composing label
     g_by_id = {g["id"]: g for g in groups_doc.get("groups", [])}
     left_label = g_by_id.get(context_group_id, {}).get("name", f"{context_group_id}-")
 
     sites: List[AnchorSite] = []
-    smarts_cache: Dict[str, Any] = {}
 
     atomic = compiled_features.get("atomic", [])
     for feat in atomic:
@@ -128,25 +160,31 @@ def find_ar_anchor_sites(
         smarts_list = detect.get("smarts_any", []) or []
         if not smarts_list:
             continue
-        # In this POC, templated entries have a single SMARTS
-        smarts = smarts_list[0]
-
-        if smarts not in smarts_cache:
-            qmol = Chem.MolFromSmarts(smarts)
-            if qmol is None:
-                raise ValueError(f"Invalid SMARTS for {token}: {smarts}")
-            smarts_cache[smarts] = qmol
-        qmol = smarts_cache[smarts]
-
-        anchor_qidx = _find_anchor_qidx_by_mapnum(qmol, context_atom_map_num)
 
         right_id = gids[1] if len(gids) > 1 else ""
         right_label = g_by_id.get(right_id, {}).get("name", right_id)
         label = _compose_label(left_label, right_label) if right_label else left_label
 
-        for match in mol.GetSubstructMatches(qmol):
-            ipso_idx = match[anchor_qidx]
-            sites.append(AnchorSite(token=token, label=label, ipso_idx=ipso_idx, match_atoms=tuple(match), smarts=smarts))
+        for smarts in smarts_list:
+            if not isinstance(smarts, str) or not smarts.strip():
+                continue
+            qmol = compile_smarts(smarts, validate=True)
+            if qmol is None:
+                raise ValueError(f"SMARTS compiled to None for {token}: {smarts}")
+
+            anchor_qidx = _find_anchor_qidx_by_mapnum(qmol, context_atom_map_num)
+
+            for match in mol.GetSubstructMatches(qmol):
+                ipso_idx = match[anchor_qidx]
+                sites.append(
+                    AnchorSite(
+                        token=token,
+                        label=label,
+                        ipso_idx=ipso_idx,
+                        match_atoms=tuple(match),
+                        smarts=smarts,
+                    )
+                )
 
     # De-duplicate sites by (ipso_idx, token) to avoid double counting if multiple matches identical
     seen = set()
@@ -164,13 +202,18 @@ def analyze_smiles_ortho_counts(
     compiled_features_path: Path,
     groups_path: Path,
 ) -> Dict[str, Any]:
-    Chem = _require_rdkit()
-    mol = Chem.MolFromSmiles(smiles)
+    if not rdkit_available():
+        return {"smiles": smiles, "error": "RDKit is not available"}
+
+    mol = parse_smiles(smiles)
     if mol is None:
         return {"smiles": smiles, "error": "Invalid SMILES"}
 
-    compiled = load_compiled_features(compiled_features_path)
-    groups_doc = load_groups(groups_path)
+    compiled_path = resolve_data_path(compiled_features_path)
+    groups_path_resolved = resolve_data_path(groups_path)
+
+    compiled = load_compiled_features(compiled_path)
+    groups_doc = load_groups(groups_path_resolved)
 
     sites = find_ar_anchor_sites(mol, compiled, groups_doc, context_group_id="Ar", context_atom_map_num=1)
 
@@ -178,14 +221,12 @@ def analyze_smiles_ortho_counts(
     ortho_list: List[int] = []
     for s in sites:
         c = ortho_substitution_count(mol, s.ipso_idx)
-        if c is None:
-            continue
-        ortho_list.append(int(c))
+        ortho_list.append(int(c) if c is not None else 0)
         site_results.append({
             "label": s.label,
             "feature_token": s.token,
             "ipso_atom_idx": s.ipso_idx,
-            "ortho_sub_count": int(c),
+            "ortho_sub_count": int(c) if c is not None else 0,
         })
 
     out: Dict[str, Any] = {
