@@ -47,4 +47,3 @@ Output fields include:
 - `aryl_electron_poor_score_0_10_list`, `aryl_electron_poor_score_0_10_max`
 - `aryl_ipso_gasteiger_charge_list`, `aryl_ring_mean_gasteiger_charge_list`, `aryl_delta_gasteiger_charge_list`
 - `sites` (per-site explain payload)
-
