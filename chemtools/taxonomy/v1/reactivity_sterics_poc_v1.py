@@ -27,11 +27,11 @@ except Exception:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("smiles", nargs="+", help="One or more SMILES to analyze.")
-    ap.add_argument("--compiled", default="calculable_features.compiled.v1.json", help="Compiled features JSON.")
-    ap.add_argument("--groups", default="organic_groups.v1.json", help="Groups JSON.")
+    ap.add_argument("--compiled", default="specs/calculable_features.compiled.v1.json", help="Compiled features JSON.")
+    ap.add_argument("--groups", default="specs/organic_groups.v1.json", help="Groups JSON.")
     ap.add_argument(
         "--computed",
-        default="reactivity_features.computed.v1.json",
+        default="specs/reactivity_features.computed.v1.json",
         help="Computed-feature spec JSON (POC v1).",
     )
     ap.add_argument(

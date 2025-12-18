@@ -80,11 +80,11 @@ def compute_reactivity_sterics_poc_v1(
     - `sites`: per-anchor site debug/explainability payload
     """
     if compiled_features_path is None:
-        compiled_features_path = DEFAULT_DATA_DIR / "calculable_features.compiled.v1.json"
+        compiled_features_path = DEFAULT_DATA_DIR / "specs" / "calculable_features.compiled.v1.json"
     if groups_path is None:
-        groups_path = DEFAULT_DATA_DIR / "organic_groups.v1.json"
+        groups_path = DEFAULT_DATA_DIR / "specs" / "organic_groups.v1.json"
     if computed_spec_path is None:
-        computed_spec_path = DEFAULT_DATA_DIR / "reactivity_features.computed.v1.json"
+        computed_spec_path = DEFAULT_DATA_DIR / "specs" / "reactivity_features.computed.v1.json"
 
     compiled_path = resolve_data_path(compiled_features_path)
     groups_path_resolved = resolve_data_path(groups_path)

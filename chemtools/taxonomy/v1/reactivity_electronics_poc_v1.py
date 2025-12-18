@@ -22,8 +22,8 @@ except Exception:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("smiles", nargs="+", help="One or more SMILES to analyze.")
-    ap.add_argument("--compiled", default="calculable_features.compiled.v1.json", help="Compiled features JSON.")
-    ap.add_argument("--groups", default="organic_groups.v1.json", help="Groups JSON.")
+    ap.add_argument("--compiled", default="specs/calculable_features.compiled.v1.json", help="Compiled features JSON.")
+    ap.add_argument("--groups", default="specs/organic_groups.v1.json", help="Groups JSON.")
     ap.add_argument("--k", default=25.0, type=float, help="Scaling factor for score mapping (raw = 5 + k*delta_q).")
     args = ap.parse_args()
 
@@ -41,4 +41,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

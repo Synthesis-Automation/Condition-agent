@@ -76,12 +76,20 @@ def resolve_data_path(path: Path, *, base_dir: Path = DEFAULT_DATA_DIR) -> Path:
     Resolve a data file path robustly.
 
     If `path` is relative and doesn't exist in the current working directory,
-    try relative to `base_dir` (this module's folder).
+    try relative to `base_dir` (this module's folder) and `base_dir/specs/`.
     """
-    candidate = path
-    if not candidate.is_absolute() and not candidate.exists():
-        candidate = base_dir / candidate
-    return candidate
+    if path.is_absolute() or path.exists():
+        return path
+
+    candidates = [
+        base_dir / path,
+        base_dir / "specs" / path,
+        base_dir / "specs" / path.name,
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return candidates[-1]
 
 def _compose_label(left: str, right: str) -> str:
     if left.endswith("-") and right.startswith("-"):

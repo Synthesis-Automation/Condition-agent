@@ -46,10 +46,18 @@ class AnchorSite:
 
 
 def resolve_data_path(path: Path, *, base_dir: Path = DEFAULT_DATA_DIR) -> Path:
-    candidate = path
-    if not candidate.is_absolute() and not candidate.exists():
-        candidate = base_dir / candidate
-    return candidate
+    if path.is_absolute() or path.exists():
+        return path
+
+    candidates = [
+        base_dir / path,
+        base_dir / "specs" / path,
+        base_dir / "specs" / path.name,
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return candidates[-1]
 
 
 def _read_json_object(path: Path) -> Dict[str, Any]:
@@ -188,8 +196,8 @@ def _safe_float_prop(atom: Any, prop: str) -> Optional[float]:
 def analyze_smiles_reactivity_electronics_v1(
     smiles: str,
     *,
-    compiled_features_path: Path = Path("calculable_features.compiled.v1.json"),
-    groups_path: Path = Path("organic_groups.v1.json"),
+    compiled_features_path: Path = Path("specs/calculable_features.compiled.v1.json"),
+    groups_path: Path = Path("specs/organic_groups.v1.json"),
     k: float = 25.0,
 ) -> Dict[str, Any]:
     if not rdkit_available():
@@ -277,4 +285,3 @@ def analyze_smiles_reactivity_electronics_v1(
         "sites": site_payloads,
         "params": {"k": float(k)},
     }
-

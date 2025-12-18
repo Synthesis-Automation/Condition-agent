@@ -10,14 +10,14 @@ Anchor sites are detected the same way as sterics: templated SMARTS encodes the 
 
 ## Files
 
-- `reactivity_features.electronics.computed.v1.json` — computed-feature spec (electronics)
+- `chemtools/taxonomy/v1/specs/reactivity_features.electronics.computed.v1.json` — computed-feature spec (electronics)
 - `ar_context_electronics_v1.py` — Ar- analysis module (anchor extraction + Gasteiger + scoring)
 - `reactivity_electronics_poc_v1.py` — CLI runner
 
 These reuse:
 
-- `calculable_features.compiled.v1.json`
-- `organic_groups.v1.json`
+- `chemtools/taxonomy/v1/specs/calculable_features.compiled.v1.json`
+- `chemtools/taxonomy/v1/specs/organic_groups.v1.json`
 
 ## Definition (POC v1)
 

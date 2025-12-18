@@ -58,10 +58,18 @@ def _read_json_object(path: Path) -> Dict[str, Any]:
 
 
 def resolve_data_path(path: Path, *, base_dir: Path = DEFAULT_DATA_DIR) -> Path:
-    candidate = path
-    if not candidate.is_absolute() and not candidate.exists():
-        candidate = base_dir / candidate
-    return candidate
+    if path.is_absolute() or path.exists():
+        return path
+
+    candidates = [
+        base_dir / path,
+        base_dir / "specs" / path,
+        base_dir / "specs" / path.name,
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return candidates[-1]
 
 
 def load_compiled_features(path: Path) -> Dict[str, Any]:
@@ -292,8 +300,8 @@ def find_ar_anchor_sites(
 def analyze_smiles_reactivity_sterics_v2(
     smiles: str,
     *,
-    compiled_features_path: Path = Path("calculable_features.compiled.v1.json"),
-    groups_path: Path = Path("organic_groups.v1.json"),
+    compiled_features_path: Path = Path("specs/calculable_features.compiled.v1.json"),
+    groups_path: Path = Path("specs/organic_groups.v1.json"),
     max_depth: int = 4,
     max_atoms: int = 50,
     blocked_value: int = 2,
@@ -359,4 +367,3 @@ def analyze_smiles_reactivity_sterics_v2(
         "aryl_steric_score_0_10_max": int(max(steric_score_list) if steric_score_list else 0),
         "sites": site_payloads,
     }
-

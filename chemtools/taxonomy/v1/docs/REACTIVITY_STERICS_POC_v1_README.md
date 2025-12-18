@@ -16,14 +16,14 @@ We detect anchor sites from those templated features, then compute sterics aroun
 
 ## Files
 
-- `reactivity_features.computed.v1.json` — computed-feature specification (steric layer)
+- `chemtools/taxonomy/v1/specs/reactivity_features.computed.v1.json` — computed-feature specification (steric layer)
 - `ar_context_sterics_v1.py` — Ar- analysis module (anchor extraction + ortho count)
 - `reactivity_sterics_poc_v1.py` — CLI runner
 
 These require:
 
-- `calculable_features.compiled.v1.json`
-- `organic_groups.v1.json`
+- `chemtools/taxonomy/v1/specs/calculable_features.compiled.v1.json`
+- `chemtools/taxonomy/v1/specs/organic_groups.v1.json`
 
 ## Definition (POC)
 

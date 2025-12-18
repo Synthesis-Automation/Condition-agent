@@ -17,24 +17,24 @@ Outputs should include:
 
 Use these v1 files (assume they exist in working directory):
 
-- `calculable_features.compiled.v1.json`
+- `chemtools/taxonomy/v1/specs/calculable_features.compiled.v1.json`
   - contains `atomic` list; templated atomic features have `source.kind="templated"` and `source.groups=["Ar", "<core>"]`
   - templated SMARTS contains atom-map label `:1` on Ar- anchor atom (e.g., `[c:1][Br]`, `[c:1][CX3H1](=O)`)
-- `organic_groups.v1.json`
+- `chemtools/taxonomy/v1/specs/organic_groups.v1.json`
   - group labels, `id` -> `name` (chemist style): `Ar-`, `-Br`, `-CHO`, `-OTf`, ...
 
 Optional (not required for sterics):
 
-- `reactant_types.v1.json`
+- `chemtools/taxonomy/v1/specs/reactant_types.v1.json`
 
 ## Deliverables
 
 Create:
 
-1) `reactivity_features.computed.v2.json` (spec file, see below)
+1) `chemtools/taxonomy/v1/specs/reactivity_features.computed.v2.json` (spec file, see below)
 2) `ar_context_sterics_v2.py` (module)
 3) `reactivity_sterics_poc_v2.py` (CLI)
-4) `REACTIVITY_STERICS_POC_v2_README.md`
+4) `chemtools/taxonomy/v1/docs/REACTIVITY_STERICS_POC_v2_README.md`
 
 All files UTF-8.
 
@@ -155,8 +155,8 @@ Create a JSON containing:
 
 Arguments:
 
-- `--compiled` default `calculable_features.compiled.v1.json`
-- `--groups` default `organic_groups.v1.json`
+- `--compiled` default `specs/calculable_features.compiled.v1.json`
+- `--groups` default `specs/organic_groups.v1.json`
 
 Print JSON to stdout.
 

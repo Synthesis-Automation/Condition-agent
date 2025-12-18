@@ -6,18 +6,18 @@ Generated: 2025-12-18
 
 Provide a fast, topological steric descriptor around **Ar-** anchor sites that works uniformly for any **Ar-* templated feature** (Ar–Br, Ar–CHO, Ar–OTf, Ar–CN, …).
 
-This implements `CODEX_IMPL_ReactivitySterics_v2.md`.
+This implements `chemtools/taxonomy/v1/docs/CODEX_IMPL_ReactivitySterics_v2.md`.
 
 ## Files
 
-- `reactivity_features.computed.v2.json` — computed-feature spec (v2)
+- `chemtools/taxonomy/v1/specs/reactivity_features.computed.v2.json` — computed-feature spec (v2)
 - `ar_context_sterics_v2.py` — Ar- analysis module (anchor extraction + ortho + bulk + score)
 - `reactivity_sterics_poc_v2.py` — CLI runner
 
 These reuse:
 
-- `calculable_features.compiled.v1.json`
-- `organic_groups.v1.json`
+- `chemtools/taxonomy/v1/specs/calculable_features.compiled.v1.json`
+- `chemtools/taxonomy/v1/specs/organic_groups.v1.json`
 
 ## Definition (v2)
 
@@ -51,4 +51,3 @@ Output fields include:
 - `aryl_steric_score_0_10_list`
 - `aryl_steric_score_0_10_max`
 - `sites` (per-site explain payload)
-

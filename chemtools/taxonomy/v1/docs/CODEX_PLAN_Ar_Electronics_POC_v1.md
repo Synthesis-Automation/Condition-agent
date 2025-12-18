@@ -16,10 +16,10 @@ Deliver a **0–10 scale** electronic score per Ar-* site plus interpretable raw
 
 Assume these files exist in the working directory:
 
-- `calculable_features.compiled.v1.json`
+- `chemtools/taxonomy/v1/specs/calculable_features.compiled.v1.json`
   - templated atomic features have `source.kind="templated"` and `source.groups=["Ar", "<core>"]`
   - templated SMARTS includes atom-map `:1` on Ar- anchor (e.g., `[c:1][Br]`, `[c:1][CX3H1](=O)`)
-- `organic_groups.v1.json` for labels (`Ar-`, `-Br`, `-CHO`, `-OTf`, …)
+- `chemtools/taxonomy/v1/specs/organic_groups.v1.json` for labels (`Ar-`, `-Br`, `-CHO`, `-OTf`, …)
 
 Optional:
 
@@ -31,10 +31,10 @@ Optional:
 
 Create:
 
-1) `reactivity_features.electronics.computed.v1.json` (spec)
+1) `chemtools/taxonomy/v1/specs/reactivity_features.electronics.computed.v1.json` (spec)
 2) `ar_context_electronics_v1.py` (module)
 3) `reactivity_electronics_poc_v1.py` (CLI)
-4) `REACTIVITY_ELECTRONICS_POC_v1_README.md`
+4) `chemtools/taxonomy/v1/docs/REACTIVITY_ELECTRONICS_POC_v1_README.md`
 
 All UTF-8.
 
@@ -156,8 +156,8 @@ For molecules with multiple Ar-* sites, lists must align with `sites` order.
 
 Args:
 
-- `--compiled` default `calculable_features.compiled.v1.json`
-- `--groups` default `organic_groups.v1.json`
+- `--compiled` default `specs/calculable_features.compiled.v1.json`
+- `--groups` default `specs/organic_groups.v1.json`
 - `--k` default `25` (scaling factor)
 
 Print JSON to stdout.
