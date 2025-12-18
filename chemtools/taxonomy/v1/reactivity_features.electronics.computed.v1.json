@@ -1,0 +1,46 @@
+{
+  "version": "reactivity-electronics-computed-v1-2025-12-18",
+  "scope": "POC Ar- electronics via Gasteiger delta charge at ipso",
+  "computed_features": [
+    {
+      "token": "aryl_anchor_site_count",
+      "type": "int",
+      "description": "Number of detected Ar-* anchor sites in the molecule (from templated Ar-* atomic features)."
+    },
+    {
+      "token": "aryl_electron_poor_score_0_10_list",
+      "type": "list[int]",
+      "description": "Per-site electron-poor score (0..10) from Gasteiger delta charge (delta_q), mapped by round(5 + k*delta_q) and clamped."
+    },
+    {
+      "token": "aryl_electron_poor_score_0_10_max",
+      "type": "int",
+      "description": "Maximum electron-poor score (0..10) across Ar-* sites."
+    },
+    {
+      "token": "aryl_ipso_gasteiger_charge_list",
+      "type": "list[float|null]",
+      "description": "Per-site Gasteiger charge on the Ar ipso atom (q_ipso)."
+    },
+    {
+      "token": "aryl_ring_mean_gasteiger_charge_list",
+      "type": "list[float|null]",
+      "description": "Per-site mean Gasteiger charge across the smallest aromatic ring containing ipso (q_ring_mean)."
+    },
+    {
+      "token": "aryl_delta_gasteiger_charge_list",
+      "type": "list[float|null]",
+      "description": "Per-site delta_q = q_ipso - q_ring_mean when ring is found, else delta_q = q_ipso."
+    }
+  ],
+  "params": {
+    "k_default": 25
+  },
+  "notes": [
+    "Anchor detection follows sterics workflow: compiled.atomic entries with source.kind='templated' and source.groups[0]='Ar', using atom-map ':1' to locate ipso in matches.",
+    "Ring mean uses the smallest aromatic ring containing ipso (all ring atoms aromatic).",
+    "Interpretation (POC): more positive delta_q => more electron-poor aryl.",
+    "Mapping: raw = 5 + k*delta_q; score = clamp(round(raw), 0, 10). Recommended starting k=25."
+  ]
+}
+
