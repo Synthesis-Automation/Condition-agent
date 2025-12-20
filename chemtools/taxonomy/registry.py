@@ -275,17 +275,38 @@ def _load_reaction_categories(path: Path) -> Dict[str, models.ReactionCategory]:
 
 def _load_reactant_types(path: Path) -> Dict[str, models.ReactantType]:
     reactants: Dict[str, models.ReactantType] = {}
-    for entry in _load_json(path):
-        members = [
-            models.ReactantTypeMember(
-                id=item["id"],
-                name=item.get("name", item["id"]),
-                smarts=item.get("smarts"),
-                aliases=item.get("aliases", []),
-                metadata=item.get("metadata") or {},
+    payload = _load_json(path)
+    if isinstance(payload, dict):
+        entries = payload.get("entries") or []
+    else:
+        entries = payload
+
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        entry_meta = dict(entry.get("metadata") or {})
+        feature_token = entry.get("feature_token")
+        if feature_token and "feature_token" not in entry_meta:
+            entry_meta["feature_token"] = feature_token
+
+        members = []
+        for item in entry.get("members", []):
+            if not isinstance(item, dict):
+                continue
+            member_meta = dict(item.get("metadata") or {})
+            member_token = item.get("feature_token")
+            if member_token and "feature_token" not in member_meta:
+                member_meta["feature_token"] = member_token
+            members.append(
+                models.ReactantTypeMember(
+                    id=item["id"],
+                    name=item.get("name", item["id"]),
+                    smarts=item.get("smarts"),
+                    aliases=item.get("aliases", []),
+                    metadata=member_meta,
+                )
             )
-            for item in entry.get("members", [])
-        ]
+
         obj = models.ReactantType(
             id=entry["id"],
             name=entry.get("name", entry["id"]),
@@ -294,7 +315,7 @@ def _load_reactant_types(path: Path) -> Dict[str, models.ReactantType]:
             smarts=entry.get("smarts"),
             members=members,
             aliases=entry.get("aliases", []),
-            metadata=entry.get("metadata") or {},
+            metadata=entry_meta,
         )
         reactants[obj.id] = obj
     return reactants

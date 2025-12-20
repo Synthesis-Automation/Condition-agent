@@ -11,7 +11,8 @@ from typing import Any, Dict, Iterable, List, Optional
 from . import reactions as _reactions
 from . import reactants as _reactants
 from . import smiles as _smiles
-from ._registry import get_registry
+from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
+from ..taxonomy.v2.reaction_detection import detect_reaction_types_from_smiles
 
 __all__ = [
     "normalize",
@@ -80,6 +81,7 @@ def analyze_reaction(
     norm = normalize_reaction(reaction_smiles)
 
     reactant_results: List[Dict[str, Any]] = []
+    reactant_smiles_for_detection: List[str] = []
     for item in norm.get("reactants") or []:
         smiles_value = (
             item.get("smiles_norm")
@@ -87,6 +89,8 @@ def analyze_reaction(
             or item.get("input")
             or ""
         )
+        if smiles_value:
+            reactant_smiles_for_detection.append(smiles_value)
         best = classify_reactant_smiles(smiles_value)
         all_matches = _reactants.get_all_reactant_matches(smiles_value)
         categories = _reactants.get_reactant_category_matches(smiles_value)
@@ -101,49 +105,31 @@ def analyze_reaction(
             }
         )
 
-    # Detect reaction family using existing router heuristics.
-    from .. import router as _router  # Local import to avoid circular dependency.
+    detection_result = detect_reaction_types_from_smiles(reactant_smiles_for_detection)
+    detection_payload = detection_result.to_dict()
+    matches = detection_result.matches
+    canonical_family = matches[0].reaction_type if matches else None
 
-    detection = _router.detect_family_from_reaction(
-        reaction_smiles, use_rxn_insight=use_rxn_insight
-    )
-    canonical_family = resolve_reaction_family(detection.get("family"))
-
-    registry = get_registry()
     reaction_type_meta: Optional[Dict[str, Any]] = None
-    required_roles: List[Dict[str, Any]] = []
-    reactant_requirements: Optional[List[Dict[str, Any]]] = None
+    slot_evidence: Optional[Dict[str, List[str]]] = None
 
-    if registry and canonical_family:
-        rt = registry.reaction_types.get(canonical_family)
+    if canonical_family:
+        rt = _reaction_catalog.get_reaction_type(canonical_family)
         if rt:
             reaction_type_meta = {
                 "id": rt.id,
                 "name": rt.name,
-                "category_id": rt.category_id,
+                "category": rt.category,
                 "description": rt.description,
                 "aliases": list(rt.aliases),
                 "metadata": dict(rt.metadata),
-                "source_ids": list(rt.source_ids),
+                "catalysts": list(rt.catalysts),
+                "conditions": rt.conditions,
+                "reactants": {slot: list(values) for slot, values in rt.reactants.items()},
+                "reference_reactions": list(rt.reference_reactions),
+                "notes": rt.notes,
             }
-            required_roles = [
-                {
-                    "role_id": req.role_id,
-                    "required": bool(req.required),
-                    "default_family_id": req.default_family_id,
-                    "notes": req.notes,
-                }
-                for req in rt.required_roles
-            ]
-            reactant_requirements = [
-                {
-                    "reactant_type_id": req.reactant_type_id,
-                    "stoichiometry": req.stoichiometry,
-                    "notes": req.notes,
-                    "original_tokens": list(req.original_tokens),
-                }
-                for req in rt.reactants
-            ]
+        slot_evidence = {slot: list(values) for slot, values in matches[0].slot_evidence.items()}
 
     return {
         "input": reaction_smiles,
@@ -152,11 +138,10 @@ def analyze_reaction(
         "agents": norm.get("agents") or [],
         "products": norm.get("products") or [],
         "family": {
-            "detected": detection,
+            "detected": detection_payload,
             "canonical_id": canonical_family,
             "reaction_type": reaction_type_meta,
-            "required_roles": required_roles,
-            "reactant_requirements": reactant_requirements,
+            "slot_evidence": slot_evidence,
         },
     }
 

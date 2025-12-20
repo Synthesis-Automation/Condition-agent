@@ -12,6 +12,8 @@ system while maintaining backward compatibility with the legacy API.
 from __future__ import annotations
 
 import copy
+import json
+import re
 import warnings
 from dataclasses import dataclass
 from functools import lru_cache
@@ -21,13 +23,14 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from ..featurizers import calculable as _calculable
 
+from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
 from ..util import rdkit_helpers
 from ..util.smarts_cache import compile_smarts
 from ._registry import clear_registry_cache, get_registry
 
 TAXONOMY_DATA_DIR = Path(__file__).resolve().parent.parent / "taxonomy" / "data"
 REACTANT_TYPES_FILE = TAXONOMY_DATA_DIR / "reactant_types.json"
-REACTION_TYPES_FILE = TAXONOMY_DATA_DIR / "reaction_types.json"
+REACTION_TYPES_FILE = _reaction_catalog.REACTION_TYPES_FILE
 
 # General categories that should be deprioritised when picking the "best" match.
 GENERAL_REACTANT_CATEGORIES = {"Alkyl-C-H", "ArH"}
@@ -196,7 +199,7 @@ def _pick_legacy_alias(entity_type: str, entity_id: str) -> Optional[str]:
 def _load_reactant_types_raw() -> Dict[str, dict]:
     registry = get_registry()
     if registry is None:
-        return {}
+        return _load_reactant_types_from_file(REACTANT_TYPES_FILE)
 
     definitions: Dict[str, dict] = {}
     for reactant_id, reactant in registry.reactant_types.items():
@@ -224,6 +227,66 @@ def _load_reactant_types_raw() -> Dict[str, dict]:
             "members": members,
             "legacy_id": legacy_id,
         }
+    return definitions
+
+
+def _load_reactant_types_from_file(path: Path) -> Dict[str, dict]:
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+
+    if isinstance(payload, dict):
+        entries = payload.get("entries") or []
+    else:
+        entries = payload
+
+    definitions: Dict[str, dict] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        entry_id = entry.get("id")
+        if not entry_id:
+            continue
+        entry_meta = dict(entry.get("metadata") or {})
+        feature_token = entry.get("feature_token")
+        if feature_token and "feature_token" not in entry_meta:
+            entry_meta["feature_token"] = feature_token
+
+        members: List[dict] = []
+        for member in entry.get("members", []):
+            if not isinstance(member, dict):
+                continue
+            member_id = member.get("id")
+            if not member_id:
+                continue
+            member_meta = dict(member.get("metadata") or {})
+            member_token = member.get("feature_token")
+            if member_token and "feature_token" not in member_meta:
+                member_meta["feature_token"] = member_token
+            members.append(
+                {
+                    "id": member_id,
+                    "name": member.get("name", member_id),
+                    "smarts": member.get("smarts"),
+                    "aliases": list(member.get("aliases", [])),
+                    "metadata": member_meta,
+                }
+            )
+
+        definitions[entry_id] = {
+            "id": entry_id,
+            "name": entry.get("name", entry_id),
+            "description": entry.get("description"),
+            "category": entry.get("category"),
+            "smarts": entry.get("smarts"),
+            "group": (entry_meta or {}).get("group", ""),
+            "aliases": list(entry.get("aliases", [])),
+            "metadata": entry_meta,
+            "members": members,
+            "legacy_id": entry.get("legacy_id") or entry_id,
+        }
+
     return definitions
 
 
@@ -500,77 +563,36 @@ def get_all_reactant_matches(
 
 @lru_cache(maxsize=1)
 def _load_reaction_types_raw() -> Dict[str, dict]:
-    registry = get_registry()
-    if registry is None:
-        return {}
-
+    definitions, _ = _reaction_catalog.load_reaction_catalog()
     categories: Dict[str, dict] = {}
-    for category_id, category in registry.reaction_categories.items():
-        categories[category_id] = {
-            "category_id": category_id,
-            "category": category.name or category_id,
-            "description": category.description,
-            "reactions": [],
-        }
 
-    for reaction in registry.reaction_types.values():
-        category_id = reaction.category_id or "uncategorised"
-        legacy_reaction_id = _pick_legacy_alias("reaction_type", reaction.id) or reaction.id
+    for reaction in definitions.values():
+        category_id = reaction.category or "uncategorised"
         bucket = categories.setdefault(
             category_id,
             {
                 "category_id": category_id,
-                "category": (
-                    registry.reaction_categories.get(category_id).name
-                    if registry and category_id in registry.reaction_categories
-                    else category_id
-                ),
-                "description": (
-                    registry.reaction_categories.get(category_id).description
-                    if registry and category_id in registry.reaction_categories
-                    else None
-                ),
+                "category": category_id,
+                "description": None,
                 "reactions": [],
             },
         )
-
-        reactant_blocks: List[List[str]] = []
-        for requirement in reaction.reactants:
-            tokens = list(requirement.original_tokens or [])
-            if not tokens and requirement.reactant_type_id:
-                tokens = [requirement.reactant_type_id]
-
-            normalized_tokens: List[str] = []
-            for token in tokens:
-                alias = _pick_legacy_alias("reactant_type", token)
-                if alias:
-                    normalized_tokens.append(alias)
-                else:
-                    normalized_tokens.append(token)
-            if normalized_tokens:
-                reactant_blocks.append(normalized_tokens)
-
         bucket["reactions"].append(
             {
-                "id": legacy_reaction_id,
+                "id": reaction.id,
                 "canonical_id": reaction.id,
                 "name": reaction.name,
                 "aliases": list(reaction.aliases),
                 "description": reaction.description,
-                "reactants": reactant_blocks,
-                "required_roles": [
-                    {
-                        "role_id": role.role_id,
-                        "required": bool(role.required),
-                        "default_family_id": role.default_family_id,
-                        "notes": role.notes,
-                    }
-                    for role in reaction.required_roles
-                ],
+                "reactants": copy.deepcopy(reaction.reactants),
                 "metadata": copy.deepcopy(reaction.metadata),
-                "source_ids": list(reaction.source_ids),
+                "catalysts": list(reaction.catalysts),
+                "conditions": reaction.conditions,
+                "reference_reactions": list(reaction.reference_reactions),
+                "notes": reaction.notes,
             }
         )
+
     return categories
 
 
@@ -609,7 +631,6 @@ def _reaction_indices() -> Tuple[Dict[str, dict], Dict[str, str]]:
             reaction_id = reaction.get("id")
             if not reaction_id:
                 continue
-            canonical_id = reaction.get("canonical_id") or reaction_id
 
             metadata = copy.deepcopy(reaction)
             metadata["category_key"] = category_key
@@ -617,13 +638,9 @@ def _reaction_indices() -> Tuple[Dict[str, dict], Dict[str, str]]:
             id_to_meta[reaction_id] = metadata
 
             register_alias(reaction_id, reaction_id)
-            register_alias(canonical_id, reaction_id)
             register_alias(reaction.get("name", ""), reaction_id)
             for alias in reaction.get("aliases", []):
                 register_alias(alias, reaction_id)
-
-    for alias, canonical in CSV_REACTION_OVERRIDES.items():
-        register_alias(alias, canonical)
 
     return id_to_meta, alias_to_id
 
@@ -644,8 +661,18 @@ def normalize_reaction_type(label: str) -> Optional[str]:
     """Normalise a raw reaction descriptor (name/alias/id) to the canonical id."""
     if not label:
         return None
+    label = label.strip()
+    if not label:
+        return None
     _, alias_to_id = _reaction_indices()
-    return alias_to_id.get(label.strip().lower())
+    key = label.lower()
+    resolved = alias_to_id.get(key)
+    if resolved:
+        return resolved
+    slug = re.sub(r"[^0-9a-z]+", "_", key).strip("_")
+    if not slug:
+        return None
+    return alias_to_id.get(slug)
 
 
 def build_reaction_lookup() -> Tuple[Dict[str, dict], Dict[str, str]]:
@@ -663,17 +690,18 @@ def iter_reactions_for_category(category_key: str) -> List[dict]:
     return copy.deepcopy(category.get("reactions", []))
 
 
-def required_reactant_categories(reaction_id: str) -> Optional[List[List[str]]]:
+def required_reactant_categories(reaction_id: str) -> Optional[Dict[str, List[str]]]:
     """
-    Return the reactant category requirements for a reaction id.
+    Return the reactant slot requirements for a reaction id.
 
-    The JSON schema stores reactant pairs as ``[[...electrophile...], [...nucleophile...]]``.
+    The taxonomy v2 schema stores reactants as slot lists, e.g.
+    ``{"electrophiles": [...], "nucleophiles": [...], "acids": [...]}``.
     """
     metadata = describe_reaction_type(reaction_id)
     if not metadata:
         return None
     reactants = metadata.get("reactants")
-    if isinstance(reactants, list):
+    if isinstance(reactants, dict):
         return copy.deepcopy(reactants)
     return None
 

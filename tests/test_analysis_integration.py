@@ -46,11 +46,18 @@ class TestAnalyzeReaction:
         family = result["family"]
         assert "detected" in family
         assert "canonical_id" in family
-        
-        # Should detect as C-N coupling or Buchwald-Hartwig
-        canonical = family.get("canonical_id")
-        if canonical:
-            assert "cn" in canonical.lower() or "buchwald" in canonical.lower()
+
+        detected = family.get("detected") or {}
+        if detected.get("error") == "rdkit_unavailable":
+            pytest.skip("RDKit unavailable for motif detection")
+
+        matches = detected.get("matches") or []
+        assert matches
+        assert family.get("canonical_id") == "c_n_cross_coupling"
+
+        slot_evidence = family.get("slot_evidence") or {}
+        assert "electrophiles" in slot_evidence
+        assert "nucleophiles" in slot_evidence
     
     def test_suzuki_reaction(self):
         """Analyze a Suzuki-Miyaura coupling."""
@@ -64,9 +71,12 @@ class TestAnalyzeReaction:
         
         # Should detect as Suzuki
         family = result["family"]
-        canonical = family.get("canonical_id")
-        if canonical:
-            assert "suzuki" in canonical.lower()
+        detected = family.get("detected") or {}
+        if detected.get("error") == "rdkit_unavailable":
+            pytest.skip("RDKit unavailable for motif detection")
+        matches = detected.get("matches") or []
+        assert matches
+        assert family.get("canonical_id") == "suzuki_miyaura"
     
     def test_reaction_with_agents(self):
         """Analyze reaction with explicit agents/catalysts."""
@@ -99,16 +109,18 @@ class TestAnalyzeReaction:
         family = result["family"]
         
         # If a canonical family is detected, check metadata
+        detected = family.get("detected") or {}
+        if detected.get("error") == "rdkit_unavailable":
+            pytest.skip("RDKit unavailable for motif detection")
+
         if family.get("canonical_id"):
             # Should have reaction type info
             assert "reaction_type" in family
-            # May be None if not in taxonomy
-            
-            # Should have required roles info
-            assert "required_roles" in family
-            
-            # Should have reactant requirements
-            assert "reactant_requirements" in family
+            reaction_type = family.get("reaction_type")
+            if reaction_type:
+                assert "reactants" in reaction_type
+                assert isinstance(reaction_type["reactants"], dict)
+                assert "catalysts" in reaction_type
     
     def test_use_rxn_insight_flag(self):
         """Test that use_rxn_insight flag is passed through."""
@@ -250,43 +262,6 @@ class TestEdgeCases:
         assert "reactants" in result
         assert "agents" in result
         assert "products" in result
-
-
-class TestRequiredRoles:
-    """Test required roles metadata when available."""
-    
-    def test_required_roles_structure(self):
-        """Required roles should have expected structure."""
-        rxn_smiles = "c1ccccc1Br.c1ccccc1B(O)O>>c1ccccc1c1ccccc1"
-        
-        result = analyze_reaction(rxn_smiles)
-        
-        family = result["family"]
-        required_roles = family.get("required_roles")
-        
-        if required_roles:
-            assert isinstance(required_roles, list)
-            for role in required_roles:
-                assert "role_id" in role
-                assert "required" in role
-
-
-class TestReactantRequirements:
-    """Test reactant requirements metadata when available."""
-    
-    def test_reactant_requirements_structure(self):
-        """Reactant requirements should have expected structure."""
-        rxn_smiles = "c1ccccc1Br.c1ccccc1B(O)O>>c1ccccc1c1ccccc1"
-        
-        result = analyze_reaction(rxn_smiles)
-        
-        family = result["family"]
-        reactant_reqs = family.get("reactant_requirements")
-        
-        if reactant_reqs:
-            assert isinstance(reactant_reqs, list)
-            for req in reactant_reqs:
-                assert "reactant_type_id" in req
 
 
 if __name__ == "__main__":

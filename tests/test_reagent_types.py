@@ -24,20 +24,21 @@ def test_build_reactant_lookup_contains_core_alias():
 
 def test_build_reaction_lookup_aliases():
     id_to_meta, alias_map = build_reaction_lookup()
-    assert alias_map["suzuki-miyaura"] == "Suzuki-Miyaura"
-    assert alias_map["suzuki-miyaura coupling"] == "Suzuki-Miyaura"
-    assert id_to_meta["Suzuki-Miyaura"]["category"] == "Cross-Coupling Reactions"
+    assert alias_map["suzuki"] == "suzuki_miyaura"
+    assert alias_map["buchwald-hartwig"] == "c_n_cross_coupling"
+    assert id_to_meta["suzuki_miyaura"]["category"] == "c_c_coupling_reactions"
 
 
 def test_normalize_reaction_type_alias():
-    assert normalize_reaction_type("Suzuki-Miyaura, in situ") == "Suzuki-Miyaura-in-situ"
+    assert normalize_reaction_type("Suzuki-Miyaura, in situ") is None
 
 
 def test_required_reactant_categories_structure():
-    required = required_reactant_categories("Suzuki-Miyaura")
+    required = required_reactant_categories("suzuki_miyaura")
     assert required is not None
-    assert required[0][0] == "ArX*"
-    assert required[1][0].startswith("ArB")
+    assert "electrophiles" in required
+    assert "nucleophiles" in required
+    assert required["electrophiles"][0].startswith("Ar-")
 
 
 @pytest.mark.parametrize("smiles", ["c1ccccc1Br", "CCBr"])

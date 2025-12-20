@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 from typing import Optional, Dict, Set
 
-from ._registry import get_registry
+from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
 
 FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     # C-N Coupling reactions
@@ -92,21 +92,15 @@ def canonical_family_label(family: Optional[str]) -> Optional[str]:
     if not family:
         return None
 
-    registry = get_registry()
-    if registry:
-        if family in registry.reaction_types:
-            return family
-        alias = registry.resolve_alias(family)
-        if alias and alias.entity_type == "reaction_type":
-            return alias.entity_id
-        alias = registry.resolve_alias(family.lower())
-        if alias and alias.entity_type == "reaction_type":
-            return alias.entity_id
-        slug = slugify_family(family)
-        alias = registry.resolve_alias(slug)
-        if alias and alias.entity_type == "reaction_type":
-            return alias.entity_id
-    return FAMILY_ALIAS_OVERRIDES.get(family)
+    canonical = _reaction_catalog.resolve_reaction_type(family)
+    if canonical:
+        return canonical
+    slug = slugify_family(family)
+    if slug and slug != family:
+        canonical = _reaction_catalog.resolve_reaction_type(slug)
+        if canonical:
+            return canonical
+    return None
 
 
 def resolve_reaction_family(family: Optional[str]) -> Optional[str]:
