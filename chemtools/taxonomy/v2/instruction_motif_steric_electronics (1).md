@@ -10,6 +10,7 @@ Implement a **chemist-intuitive** analysis pipeline that:
    - **Electronic score** (0–10) around the same reactive center (simple tag-weighted + optional Gasteiger)
 
 This system **avoids calculable_features**. It uses only:
+
 - `organic_groups.v1.2.json`
 - `smarts_templates.v1.json`
 - `organic_compounds.v1.2.json`
@@ -31,6 +32,7 @@ For motifs like `Ar-X` / `Arom-X` / `R-X` where `X` may be `Br`, `CHO`, `OH`, et
   - optionally compute a separate **group bulk** for the `:2` branch, but still without recognizing what X is
 
 Therefore, output **both**:
+
 - `scaffold_*` scores (default, excludes `:2` branch)
 - optional `group_*` descriptors (computed generically from the `:2` branch)
 
@@ -39,6 +41,7 @@ Therefore, output **both**:
 ## Input Files
 
 ### 1) `organic_groups.v1.2.json`
+
 - Contains group SMARTS and lightweight `tags`.
 - Use tags for simple electronics strength:
   - `ewg_strong` → +2.0
@@ -46,11 +49,13 @@ Therefore, output **both**:
   - (future) `edg_moderate` → -1.0, `edg_strong` → -2.0
 
 ### 2) `smarts_templates.v1.json`
+
 - String templates connecting group SMARTS, e.g.:
   - `single_bond`: `"{A}{B}"`
   - `via_oxygen`: `"{A}O{B}"`
 
 ### 3) `organic_compounds.v1.2.json`
+
 - Each compound has:
   - `id` like `Ar-Br`, `Ar-CHO`, `R-OTs`, `Ar-CCH`…
   - `template`, `A`, `B`
@@ -100,6 +105,7 @@ Therefore, output **both**:
 ```
 
 Notes:
+
 - `steric.scaffold_score_0_10` excludes the `:2` branch (agnostic).
 - `steric.group_bulk_0_10` measures size of the `:2` branch generically (optional).
 - `electronic.scaffold_score_0_10` excludes the ipso/alpha `:2` group contribution.
@@ -114,6 +120,7 @@ Notes:
 Compile `compound_id → (queryMol, A, B, B_tags)`.
 
 Steps:
+
 1. Load groups into dict `groups[group_id]`.
 2. Load templates into dict `templates[template_id]`.
 3. For each compound:
@@ -166,12 +173,14 @@ elif compound_id.startswith(("R-", "Bn-", "Allyl-")):
 5) `scaffold_score_0_10 = round(10 * bulk_total / 20, 1)`
 
 **Optional** `group_bulk_0_10`:
+
 - BFS from `x_root` outward, do not traverse back through `anchor`.
 - Compute `heavy_atoms + ring_penalty + branching` and scale to 0–10.
 
 ### Alkyl scaffold steric (`R-*` / `Bn-*` / `Allyl-*`)
 
 Delegate to the alkyl plan (see separate MD), but enforce the same principle:
+
 - alpha substituents = neighbors of anchor excluding `x_root`
 - compute a radius-2 bulk sum + baseline by substitution degree
 - optional `group_bulk_0_10` for the X branch
@@ -196,15 +205,18 @@ This is primarily useful for `Ar-*` / `Arom-*`.
    - `E_including` including it (optional)
 
 Convert to 0–10:
+
 - `score = clamp(round(5 + E, 1), 0, 10)`
 
 Output:
+
 - `scaffold_score_0_10` (default)
 - `including_group_score_0_10` (optional, but recommended to return both)
 
 ### Optional: Gasteiger
 
 If enabled:
+
 - compute Gasteiger charges
 - report `q_anchor`
 
@@ -224,6 +236,7 @@ def analyze_smiles(smiles: str, registry_paths: dict, options: dict) -> dict:
 ```
 
 Options:
+
 - `include_gasteiger: bool`
 - `electronics_include_ipso_group: bool | "both"` (default `"both"`; always compute scaffold score)
 - `max_hits_per_compound: int` (optional)
@@ -233,17 +246,20 @@ Options:
 ## Tests (trend-based)
 
 1) `Brc1ccccc1` (bromobenzene)
+
 - detect `Ar-Br`
 - steric scaffold ~0
 - electronics scaffold ~5
 
-2) `O=CC1=CC=CC=C1` (benzaldehyde)
+1) `O=CC1=CC=CC=C1` (benzaldehyde)
+
 - detect `Ar-CHO`
 - steric scaffold ~0
 - electronics scaffold ~5 (since scaffold excludes CHO branch)
 - electronics including_group > 5
 
-3) `O=[N+]([O-])c1ccc(Br)cc1` (p-nitro bromobenzene)
+1) `O=[N+]([O-])c1ccc(Br)cc1` (p-nitro bromobenzene)
+
 - electronics scaffold > 5 due to NO2 substituent (not the Br)
 
 ---

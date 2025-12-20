@@ -58,6 +58,7 @@ For motifs like `R-X`, `Bn-X`, `Allyl-X` where `X` can be `Br`, `CHO`, `OH`, etc
 ## Step 1 — Decide which motifs use Alkyl Steric
 
 Dispatcher rule:
+
 - if `compound_id` starts with `R-`, `Bn-`, or `Allyl-` → run alkyl steric analyzer
 - `Ar-*` / `Arom-*` handled elsewhere
 
@@ -66,20 +67,24 @@ Dispatcher rule:
 ## Step 2 — Alpha-carbon classification (methyl/primary/secondary/tertiary)
 
 Let:
+
 - `alpha = hit.a_atom_idx`
 - `x_root = hit.b_atom_idx` (mapped `:2`)
 
 Compute:
+
 - `degree = alpha_atom.GetDegree()` (includes X branch)
 - `carbon_subs = number of carbon neighbors of alpha excluding x_root`
 
 Classification:
+
 - methyl if `carbon_subs == 0`
 - primary if `carbon_subs == 1`
 - secondary if `carbon_subs == 2`
 - tertiary if `carbon_subs >= 3`
 
 Flags:
+
 - `benzylic = True` if any neighbor (excluding x_root) is aromatic
 - `allylic = True` if alpha is adjacent to a C=C (simple: any neighbor has a DOUBLE bond to carbon)
 
@@ -96,11 +101,13 @@ Flags:
 For each substituent neighbor `s`:
 
 Local set within radius 2 (from alpha via s):
+
 - include `s`
 - include neighbors of `s` excluding `alpha`
 - do not traverse into the X branch (`x_root`)
 
 Compute:
+
 - `heavy_atoms_r2 = count(atomNum > 1 in local set)`
 - `branching = 1 if s has >=2 heavy neighbors excluding alpha else 0`
 - `has_ring = True if any atom in local set is in a ring`
@@ -109,9 +116,11 @@ Compute:
 ### 3.3 Combine and scale
 
 Baseline by substitution class:
+
 - `baseline = {methyl:0, primary:2, secondary:4, tertiary:7}`
 
 Then:
+
 - `bulk_total = sum(sub.bulk)`
 - `raw = baseline + bulk_total` (cap 20)
 - `scaffold_score_0_10 = round(10 * raw / 20, 1)`
@@ -119,6 +128,7 @@ Then:
 ### Optional: neopentyl bonus (recommended)
 
 Detect:
+
 - alpha is primary
 - the beta carbon (the only carbon substituent) is tertiary
 
@@ -149,6 +159,7 @@ This is optional and must not require recognizing what X is.
 7) `C=CCBr` allyl: low/moderate, allylic flag true
 
 Assertions:
+
 - tert-butyl > isopropyl > ethyl > methyl
 - neopentyl > ethyl
 - benzyl includes ring penalty
