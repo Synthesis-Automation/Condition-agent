@@ -1,10 +1,12 @@
 {
-  "version": "1.0",
+  "version": "1.2",
   "naming_set": "chemist_style",
   "notes": [
     "Chemist-facing compound motifs derived from organic_groups via simple connection templates.",
     "A/B are group IDs from organic_groups.v1.json; template is a key in smarts_templates.v1.json.",
-    "Entries prefixed with 'Any-' use A='R' (generic attachment) to indicate a global functional-group presence without specifying alkyl vs aryl."
+    "Entries prefixed with 'Any-' use A='R' (generic attachment) to indicate a global functional-group presence without specifying alkyl vs aryl.",
+    "v1.1: added R–X (alkyl halides), R–OTf/OTs/OMs (alkyl sulfonates), and terminal alkyne/alkene motifs to support Sonogashira/Heck/SN2 typing.",
+    "v1.2: no motif list changes; this version pairs with organic_groups.v1.2 tags to auto-generate reaction roles."
   ],
   "compounds": [
     {
@@ -884,6 +886,166 @@
       "aliases": [
         "AcylBr"
       ]
+    },
+    {
+      "id": "R-Cl",
+      "name": "R-Cl",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Cl",
+      "description": "Alkyl chloride (R–Cl).",
+      "aliases": [
+        "RCl",
+        "alkyl chloride"
+      ]
+    },
+    {
+      "id": "R-Br",
+      "name": "R-Br",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Br",
+      "description": "Alkyl bromide (R–Br).",
+      "aliases": [
+        "RBr",
+        "alkyl bromide"
+      ]
+    },
+    {
+      "id": "R-I",
+      "name": "R-I",
+      "template": "single_bond",
+      "A": "R",
+      "B": "I",
+      "description": "Alkyl iodide (R–I).",
+      "aliases": [
+        "RI",
+        "alkyl iodide"
+      ]
+    },
+    {
+      "id": "R-F",
+      "name": "R-F",
+      "template": "single_bond",
+      "A": "R",
+      "B": "F",
+      "description": "Alkyl fluoride (R–F).",
+      "aliases": [
+        "RF",
+        "alkyl fluoride"
+      ]
+    },
+    {
+      "id": "R-OTf",
+      "name": "R-OTf",
+      "template": "via_oxygen",
+      "A": "R",
+      "B": "OTf",
+      "description": "Alkyl triflate (R–OTf, i.e., R–O–SO2CF3).",
+      "aliases": [
+        "ROTf",
+        "alkyl triflate"
+      ]
+    },
+    {
+      "id": "R-OTs",
+      "name": "R-OTs",
+      "template": "via_oxygen",
+      "A": "R",
+      "B": "OTs",
+      "description": "Alkyl tosylate (R–OTs, i.e., R–O–SO2Ar).",
+      "aliases": [
+        "ROTs",
+        "alkyl tosylate"
+      ]
+    },
+    {
+      "id": "R-OMs",
+      "name": "R-OMs",
+      "template": "via_oxygen",
+      "A": "R",
+      "B": "OMs",
+      "description": "Alkyl mesylate (R–OMs, i.e., R–O–SO2Me).",
+      "aliases": [
+        "ROMs",
+        "alkyl mesylate"
+      ]
+    },
+    {
+      "id": "Ar-CCH",
+      "name": "Ar-CCH",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "CCH",
+      "description": "Aryl terminal alkyne (Ar–C#CH).",
+      "aliases": [
+        "ArCCH",
+        "terminal alkyne"
+      ]
+    },
+    {
+      "id": "Arom-CCH",
+      "name": "Arom-CCH",
+      "template": "single_bond",
+      "A": "Arom",
+      "B": "CCH",
+      "description": "Aromatic terminal alkyne (Arom–C#CH).",
+      "aliases": [
+        "AromCCH",
+        "terminal alkyne"
+      ]
+    },
+    {
+      "id": "R-CCH",
+      "name": "R-CCH",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CCH",
+      "description": "Alkyl terminal alkyne (R–C#CH).",
+      "aliases": [
+        "RCCH",
+        "terminal alkyne"
+      ]
+    },
+    {
+      "id": "Ar-CHCH2",
+      "name": "Ar-CHCH2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "CHCH2",
+      "description": "Aryl terminal alkene (Ar–CH=CH2).",
+      "aliases": [
+        "ArCHCH2",
+        "terminal alkene"
+      ]
+    },
+    {
+      "id": "Arom-CHCH2",
+      "name": "Arom-CHCH2",
+      "template": "single_bond",
+      "A": "Arom",
+      "B": "CHCH2",
+      "description": "Aromatic terminal alkene (Arom–CH=CH2).",
+      "aliases": [
+        "AromCHCH2",
+        "terminal alkene"
+      ]
+    },
+    {
+      "id": "R-CHCH2",
+      "name": "R-CHCH2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CHCH2",
+      "description": "Alkyl terminal alkene (R–CH=CH2).",
+      "aliases": [
+        "RCHCH2",
+        "terminal alkene"
+      ]
     }
-  ]
+  ],
+  "depends_on": {
+    "organic_groups": "organic_groups.v1.2.json",
+    "smarts_templates": "smarts_templates.v1.json"
+  }
 }

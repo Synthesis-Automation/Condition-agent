@@ -1,0 +1,624 @@
+{
+  "version": "3.3",
+  "depends_on": {
+    "organic_groups": "organic_groups.v1.2.json",
+    "smarts_templates": "smarts_templates.v1.json",
+    "organic_compounds": "organic_compounds.v1.2.json",
+    "source_reaction_types_old": "reaction_types -old.json"
+  },
+  "design": {
+    "principle": "Avoid calculable_features. Reaction typing is defined by explicit reactant motif lists (from organic_compounds).",
+    "how_to_edit": [
+      "Edit reaction_types[*].reactants.<slot> lists directly (add/remove compound IDs like 'Ar-OMs').",
+      "Use reactants.nucleophiles as the second-component list for cross-couplings (e.g., organoboron, terminal alkyne, alkene) and for classical nucleophiles (amines, alcohols, thiols).",
+      "motif_sets are optional convenience lists; you may copy them into reactants slots and customize per reaction."
+    ],
+    "slots": [
+      "electrophiles",
+      "nucleophiles",
+      "acids",
+      "activators"
+    ],
+    "field_name": "reactants"
+  },
+  "motif_sets": {
+    "sp2_electrophiles_default": [
+      "Ar-Br",
+      "Ar-Cl",
+      "Ar-F",
+      "Ar-I",
+      "Ar-OMs",
+      "Ar-OTf",
+      "Ar-OTs",
+      "Arom-Br",
+      "Arom-Cl",
+      "Arom-F",
+      "Arom-I",
+      "Arom-OMs",
+      "Arom-OTf",
+      "Arom-OTs",
+      "Vinyl-Br",
+      "Vinyl-Cl",
+      "Vinyl-F",
+      "Vinyl-I",
+      "Vinyl-OMs",
+      "Vinyl-OTf",
+      "Vinyl-OTs"
+    ],
+    "sp2_electrophiles_halides": [
+      "Ar-Br",
+      "Ar-Cl",
+      "Ar-F",
+      "Ar-I",
+      "Arom-Br",
+      "Arom-Cl",
+      "Arom-F",
+      "Arom-I",
+      "Vinyl-Br",
+      "Vinyl-Cl",
+      "Vinyl-F",
+      "Vinyl-I"
+    ],
+    "sp2_electrophiles_pseudohalides": [
+      "Ar-OMs",
+      "Ar-OTf",
+      "Ar-OTs",
+      "Arom-OMs",
+      "Arom-OTf",
+      "Arom-OTs",
+      "Vinyl-OMs",
+      "Vinyl-OTf",
+      "Vinyl-OTs"
+    ],
+    "organoboron_default": [
+      "Ar-B(OH)2",
+      "Ar-Bpin",
+      "Arom-B(OH)2",
+      "Arom-Bpin",
+      "Vinyl-B(OH)2",
+      "Vinyl-Bpin"
+    ],
+    "terminal_alkynes_default": [
+      "Ar-CCH",
+      "Arom-CCH",
+      "R-CCH"
+    ],
+    "terminal_alkenes_default": [
+      "Ar-CHCH2",
+      "Arom-CHCH2",
+      "R-CHCH2"
+    ],
+    "amines_nh_default": [
+      "Allyl-NH2",
+      "Allyl-NHR",
+      "Any-NH2",
+      "Ar-NH2",
+      "Ar-NHR",
+      "Arom-NH2",
+      "Arom-NHR",
+      "Bn-NH2",
+      "Bn-NHR",
+      "Vinyl-NH2"
+    ],
+    "alcohols_oh_default": [
+      "Allyl-OH",
+      "Any-OH",
+      "Ar-OH",
+      "Arom-OH",
+      "Bn-OH",
+      "Vinyl-OH"
+    ],
+    "thiols_sh_default": [
+      "Any-SH",
+      "Ar-SH",
+      "Arom-SH"
+    ],
+    "carboxylic_acids_default": [
+      "Any-CO2H",
+      "Ar-CO2H",
+      "Arom-CO2H",
+      "Vinyl-CO2H"
+    ],
+    "acyl_halides_default": [
+      "Acyl-Br",
+      "Acyl-Cl",
+      "Any-COCl",
+      "Ar-COCl",
+      "Arom-COCl"
+    ],
+    "esters_default": [
+      "Any-CO2R",
+      "Ar-CO2R",
+      "Arom-CO2R",
+      "Vinyl-CO2R"
+    ],
+    "amides_default": [
+      "Any-CONHR",
+      "Ar-CONHR",
+      "Arom-CONHR"
+    ],
+    "aromatic_halides_for_snar": [
+      "Ar-Br",
+      "Ar-Cl",
+      "Ar-F",
+      "Arom-Br",
+      "Arom-Cl",
+      "Arom-F"
+    ],
+    "aromatic_ewg_for_snar": [
+      "Ar-CHO",
+      "Ar-CN",
+      "Ar-NO2",
+      "Arom-CHO",
+      "Arom-CN",
+      "Arom-NO2"
+    ],
+    "alkyl_halides_default": [
+      "Allyl-Br",
+      "Allyl-Cl",
+      "Allyl-I",
+      "Bn-Br",
+      "Bn-Cl",
+      "Bn-I",
+      "R-Br",
+      "R-Cl",
+      "R-I"
+    ],
+    "alkyl_sulfonates_default": [
+      "R-OMs",
+      "R-OTf",
+      "R-OTs"
+    ]
+  },
+  "reaction_types": [
+    {
+      "id": "suzuki_miyaura",
+      "name": "Suzuki–Miyaura coupling",
+      "category": "c_c_coupling_reactions",
+      "aliases": [
+        "Suzuki",
+        "Suzuki coupling"
+      ],
+      "description": "Pd-catalyzed cross-coupling of aryl/vinyl halides with organoboron compounds",
+      "reference_reactions": [
+        "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        "Clc1ccc(C#N)cc1.c1ccc(B(O)O)cc1>>N#Cc1ccc(-c2ccccc2)cc1",
+        "C/C=C/Br.C=CB(O)O>>C/C=C/C=C",
+        "BrC1(c2ccccc2)CC1.c1ccc(B(O)O)cc1>>c1ccc(C2(c3ccccc3)CC2)cc1",
+        "Brc1ccncc1.c1csc(B(O)O)c1>>c1cc(-c2cccs2)ccn1",
+        "Brc1ccc(OC)cc1.[K+].[B-](F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1"
+      ],
+      "catalysts": [
+        "Pd"
+      ],
+      "conditions": "Base, ligand (phosphine), solvent",
+      "metadata": {
+        "rule_db_v2": "Suzuki_db"
+      },
+      "reactants": {
+        "electrophiles": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-F",
+          "Ar-I",
+          "Ar-OMs",
+          "Ar-OTf",
+          "Ar-OTs",
+          "Arom-Br",
+          "Arom-Cl",
+          "Arom-F",
+          "Arom-I",
+          "Arom-OMs",
+          "Arom-OTf",
+          "Arom-OTs",
+          "Vinyl-Br",
+          "Vinyl-Cl",
+          "Vinyl-F",
+          "Vinyl-I",
+          "Vinyl-OMs",
+          "Vinyl-OTf",
+          "Vinyl-OTs"
+        ],
+        "nucleophiles": [
+          "Ar-B(OH)2",
+          "Ar-Bpin",
+          "Arom-B(OH)2",
+          "Arom-Bpin",
+          "Vinyl-B(OH)2",
+          "Vinyl-Bpin"
+        ]
+      },
+      "edit_hint": "To exclude a class (e.g., Ar-OMs), delete it from allowlists.electrophiles.",
+      "notes": "Motif typing: electrophile ∈ sp2_electrophiles_default AND partner ∈ organoboron_default."
+    },
+    {
+      "id": "c_n_cross_coupling",
+      "name": "C–N cross-coupling (sp2 electrophile + amine)",
+      "category": "c_n_coupling_reactions",
+      "aliases": [
+        "Buchwald-Hartwig",
+        "BH coupling",
+        "Pd-catalyzed amination"
+      ],
+      "description": "Pd-catalyzed cross-coupling of amines with aryl halides",
+      "reference_reactions": [
+        "Brc1ccccc1.CNc1ccccc1>>CN(c1ccccc1)c1ccccc1",
+        "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
+        "Clc1ccncc1.NCC>>CCNc1ccncc1",
+        "Brc1ccc(C(F)(F)F)cc1.NC1CCCCC1>>FC(F)(F)c1ccc(NC2CCCCC2)cc1",
+        "Brc1ccccc1.N1CCOCC1>>c1ccccc1N1CCOCC1",
+        "Brc1ccccc1.N1CCCCC1>>c1ccccc1N1CCCCC1"
+      ],
+      "catalysts": [
+        "Pd"
+      ],
+      "conditions": "Base, bulky phosphine ligand, elevated temperature",
+      "metadata": {
+        "rule_db_v2": "C_N_Coupling_Pd_db"
+      },
+      "reactants": {
+        "electrophiles": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-F",
+          "Ar-I",
+          "Ar-OMs",
+          "Ar-OTf",
+          "Ar-OTs",
+          "Arom-Br",
+          "Arom-Cl",
+          "Arom-F",
+          "Arom-I",
+          "Arom-OMs",
+          "Arom-OTf",
+          "Arom-OTs",
+          "Vinyl-Br",
+          "Vinyl-Cl",
+          "Vinyl-F",
+          "Vinyl-I",
+          "Vinyl-OMs",
+          "Vinyl-OTf",
+          "Vinyl-OTs"
+        ],
+        "nucleophiles": [
+          "Allyl-NH2",
+          "Allyl-NHR",
+          "Any-NH2",
+          "Ar-NH2",
+          "Ar-NHR",
+          "Arom-NH2",
+          "Arom-NHR",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Vinyl-NH2"
+        ]
+      },
+      "edit_hint": "Remove F electrophiles if you do not want Ar-F counted as coupling electrophiles.",
+      "notes": "Catalyst family (Pd/Cu/Ni) is not inferred here; this is motif-based reaction type classification."
+    },
+    {
+      "id": "sonogashira",
+      "name": "Sonogashira coupling (sp2 electrophile + terminal alkyne)",
+      "category": "c_c_coupling_reactions",
+      "aliases": [
+        "Sonogashira cross-coupling"
+      ],
+      "description": "Pd/Cu-catalyzed coupling of terminal alkynes with aryl/vinyl halides",
+      "reference_reactions": [
+        "Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1",
+        "Ic1ccncc1.C#CC>>C#Cc1ccncc1",
+        "Clc1ccc(C#N)cc1.C#CC(C)(C)C>>CC(C)(C)C#Cc1ccc(C#N)cc1",
+        "Brc1ccc(OC)cc1.C#Cc1ccccc1>>COc1ccc(C#Cc2ccccc2)cc1",
+        "Brc1cccs1.C#Cc1ccccc1>>c1cc(C#Cc2ccccc2)sc1"
+      ],
+      "catalysts": [
+        "Pd",
+        "Cu"
+      ],
+      "conditions": "Base, amine solvent or co-catalyst",
+      "metadata": {
+        "rule_db_v2": "sonogashira_v2"
+      },
+      "reactants": {
+        "electrophiles": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-I",
+          "Ar-OMs",
+          "Ar-OTf",
+          "Ar-OTs",
+          "Arom-Br",
+          "Arom-Cl",
+          "Arom-I",
+          "Arom-OMs",
+          "Arom-OTf",
+          "Arom-OTs",
+          "Vinyl-Br",
+          "Vinyl-Cl",
+          "Vinyl-I",
+          "Vinyl-OMs",
+          "Vinyl-OTf",
+          "Vinyl-OTs"
+        ],
+        "nucleophiles": [
+          "Ar-CCH",
+          "Arom-CCH",
+          "R-CCH"
+        ]
+      },
+      "notes": "Minimal alkynes: *-CCH motifs currently represent terminal alkynes."
+    },
+    {
+      "id": "heck",
+      "name": "Heck coupling (sp2 electrophile + alkene)",
+      "category": "c_c_coupling_reactions",
+      "aliases": [
+        "Mizoroki-Heck",
+        "Heck coupling"
+      ],
+      "description": "Pd-catalyzed coupling of aryl halides with alkenes",
+      "reference_reactions": [
+        "Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1",
+        "Ic1ccc(C=O)cc1.C=CC(=O)OCC>>CCOC(=O)/C=C/c1ccc(C=O)cc1",
+        "Brc1ccncc1.C=CC#N>>N#C/C=C/c1ccncc1",
+        "Brc1ccc(OC)cc1.C=CC(=O)OC>>COc1ccc(/C=C/C(=O)OC)cc1",
+        "Brc1cccs1.C=CC(=O)N>>NC(=O)/C=C/c1cccs1"
+      ],
+      "catalysts": [
+        "Pd"
+      ],
+      "conditions": "Base, ligand, high temperature",
+      "reactants": {
+        "electrophiles": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-I",
+          "Ar-OMs",
+          "Ar-OTf",
+          "Ar-OTs",
+          "Arom-Br",
+          "Arom-Cl",
+          "Arom-I",
+          "Arom-OMs",
+          "Arom-OTf",
+          "Arom-OTs",
+          "Vinyl-Br",
+          "Vinyl-Cl",
+          "Vinyl-I",
+          "Vinyl-OMs",
+          "Vinyl-OTf",
+          "Vinyl-OTs"
+        ],
+        "nucleophiles": [
+          "Ar-CHCH2",
+          "Arom-CHCH2",
+          "R-CHCH2"
+        ]
+      },
+      "notes": "Minimal alkenes: *-CHCH2 motifs currently represent terminal alkenes (expand later for disubstituted/internal alkenes)."
+    },
+    {
+      "id": "snar_cn",
+      "name": "SNAr amination (activated aromatic halide + amine)",
+      "category": "c_n_coupling_reactions",
+      "aliases": [
+        "SNAr C-N",
+        "Aromatic nucleophilic substitution with amines"
+      ],
+      "description": "Direct nucleophilic substitution on electron-deficient aryl halides with nitrogen nucleophiles",
+      "reference_reactions": [
+        "Fc1ccncc1.CNC>>CNc1ccncc1",
+        "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1"
+      ],
+      "catalysts": [
+        "None (thermal) or metal catalyst"
+      ],
+      "conditions": "Base, polar solvent, elevated temperature",
+      "metadata": {
+        "rule_db_v2": "SNAr_db"
+      },
+      "reactants": {
+        "electrophiles": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-F",
+          "Arom-Br",
+          "Arom-Cl",
+          "Arom-F"
+        ],
+        "activators": [
+          "Ar-CHO",
+          "Ar-CN",
+          "Ar-NO2",
+          "Arom-CHO",
+          "Arom-CN",
+          "Arom-NO2"
+        ],
+        "nucleophiles": [
+          "Allyl-NH2",
+          "Allyl-NHR",
+          "Any-NH2",
+          "Ar-NH2",
+          "Ar-NHR",
+          "Arom-NH2",
+          "Arom-NHR",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Vinyl-NH2"
+        ]
+      },
+      "notes": "Activation is set-level: presence of an activator EWG in reactants triggers SNAr typing (not necessarily same ring)."
+    },
+    {
+      "id": "sn2_substitution",
+      "name": "SN2 substitution / alkylation (alkyl electrophile present)",
+      "category": "substitution_reactions",
+      "aliases": [
+        "SN2",
+        "Nucleophilic substitution bimolecular"
+      ],
+      "description": "Bimolecular nucleophilic substitution at saturated carbon",
+      "reference_reactions": [
+        "BrCC.N>>NCC",
+        "ClCc1ccccc1.O>>OCc1ccccc1"
+      ],
+      "catalysts": [
+        "None"
+      ],
+      "conditions": "Polar aprotic solvent, good nucleophile",
+      "reactants": {
+        "electrophiles": [
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-I",
+          "Bn-Br",
+          "Bn-Cl",
+          "Bn-I",
+          "R-Br",
+          "R-Cl",
+          "R-I",
+          "R-OMs",
+          "R-OTf",
+          "R-OTs"
+        ],
+        "nucleophiles": []
+      },
+      "edit_hint": "Add/remove electrophiles freely (e.g., remove R-OMs if you don't want to treat mesylates as electrophiles here).",
+      "notes": "Nucleophile identity is not constrained by default; define specialized types (N-alkylation, O-alkylation) if desired."
+    },
+    {
+      "id": "amide_coupling",
+      "name": "Amide formation (carboxylic acid + amine)",
+      "category": "amide_and_carbonyl_chemistry",
+      "aliases": [
+        "Amide formation",
+        "Peptide coupling"
+      ],
+      "description": "Formation of amide bonds from carboxylic acids/esters and amines",
+      "reference_reactions": [
+        "O=C(O)c1ccccc1.NCc1ccccc1>>O=C(NCc1ccccc1)c1ccccc1",
+        "CC(=O)O.NC1CCCCC1>>CC(=O)NC1CCCCC1"
+      ],
+      "catalysts": [
+        "Coupling reagents (EDC, DIC, HATU, T3P, etc.)"
+      ],
+      "conditions": "Base (tertiary amine), room temperature",
+      "metadata": {
+        "rule_db_v2": "amide_formation_db"
+      },
+      "reactants": {
+        "acids": [
+          "Any-CO2H",
+          "Ar-CO2H",
+          "Arom-CO2H",
+          "Vinyl-CO2H"
+        ],
+        "nucleophiles": [
+          "Allyl-NH2",
+          "Allyl-NHR",
+          "Any-NH2",
+          "Ar-NH2",
+          "Ar-NHR",
+          "Arom-NH2",
+          "Arom-NHR",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Vinyl-NH2"
+        ]
+      },
+      "notes": "Coupling reagents are not inferred; this is substrate-based typing."
+    },
+    {
+      "id": "esterification",
+      "name": "Esterification (carboxylic acid + alcohol/phenol)",
+      "category": "carbonyl_reactions",
+      "aliases": [
+        "Fischer esterification",
+        "Ester formation"
+      ],
+      "description": "Formation of esters from carboxylic acids or acid chlorides with alcohols",
+      "reference_reactions": [
+        "CC(=O)O.CCO>>CC(=O)OCC",
+        "O=C(O)c1ccccc1.CO>>COC(=O)c1ccccc1"
+      ],
+      "catalysts": [
+        "Acid (H2SO4, HCl)",
+        "DCC",
+        "EDC"
+      ],
+      "conditions": "Acid catalyst or coupling reagent",
+      "reactants": {
+        "acids": [
+          "Any-CO2H",
+          "Ar-CO2H",
+          "Arom-CO2H",
+          "Vinyl-CO2H"
+        ],
+        "nucleophiles": [
+          "Allyl-OH",
+          "Any-OH",
+          "Ar-OH",
+          "Arom-OH",
+          "Bn-OH",
+          "Vinyl-OH"
+        ]
+      },
+      "notes": "Substrate-based typing; acid-catalyzed vs reagent-mediated not distinguished."
+    },
+    {
+      "id": "acylation_acyl_halide_amide",
+      "name": "Amide formation (acyl halide + amine)",
+      "family": "acyl_substitution",
+      "reactants": {
+        "electrophiles": [
+          "Acyl-Br",
+          "Acyl-Cl",
+          "Any-COCl",
+          "Ar-COCl",
+          "Arom-COCl"
+        ],
+        "nucleophiles": [
+          "Allyl-NH2",
+          "Allyl-NHR",
+          "Any-NH2",
+          "Ar-NH2",
+          "Ar-NHR",
+          "Arom-NH2",
+          "Arom-NHR",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Vinyl-NH2"
+        ]
+      },
+      "notes": "Covers acid chloride/bromide amidation; optional product confirmation via amide motifs."
+    },
+    {
+      "id": "acylation_acyl_halide_ester",
+      "name": "Ester formation (acyl halide + alcohol/phenol)",
+      "family": "acyl_substitution",
+      "reactants": {
+        "electrophiles": [
+          "Acyl-Br",
+          "Acyl-Cl",
+          "Any-COCl",
+          "Ar-COCl",
+          "Arom-COCl"
+        ],
+        "nucleophiles": [
+          "Allyl-OH",
+          "Any-OH",
+          "Ar-OH",
+          "Arom-OH",
+          "Bn-OH",
+          "Vinyl-OH"
+        ]
+      },
+      "notes": "Covers acid chloride/bromide esterification; optional product confirmation via ester motifs."
+    }
+  ],
+  "notes": [
+    "v3.1: removed 'reactants' field from reaction_types; allowlists.* slots are the canonical substrate definition.",
+    "v3.2: renamed per-reaction field 'allowlists' to 'reactants' (structured slots).",
+    "v3.3: removed reactants.partners; merged partner lists into reactants.nucleophiles for cross-coupling style reactions."
+  ]
+}
