@@ -7,11 +7,7 @@
     "version": "v2.0",
     "created_date": "2025-11-08",
     "status": "active",
-    "tags": [
-      "C-N-coupling",
-      "amination",
-      "cross-coupling"
-    ]
+    "tags": ["C-N-coupling", "amination", "cross-coupling"]
   },
   "reaction": {
     "family": "Buchwald–Hartwig_C–N",
@@ -31,17 +27,7 @@
     "notes": "Updated with HTE-reported top-hit condition families (RuPhos–Pd G3/LiHMDS; BrettPhos–Pd G3/Cs2CO3 or LiHMDS; Pd2(dba)3/Me4tBuXPhos/LiHMDS; BINAP–Pd G3/Cs2CO3; XPhos–Pd G3/Cs2CO3). Use LiHMDS sets where substrate/FG compatibility allows; otherwise favor Cs2CO3 or K3PO4. Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: prefer ligand‑containing precatalysts (avoid Pd2(dba)3). Degas BEFORE adding base. 3 equiv base, 8 mol% Pd, ~10 vol solvent, start at 80 °C; for Arom.NH start ~100 °C. Water (5–10 equiv) aids heterogeneous bases and scale‑up in apolar media.\n"
   },
   "applies_if": {
-    "all": [
-      "aryl_halide_present"
-    ],
-    "any": [
-      "primary_amine_present",
-      "secondary_amine_present",
-      "aniline_present",
-      "indole_present",
-      "primary_amide_present",
-      "secondary_amide_present"
-    ]
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Arom-Br OR Arom-Cl OR Arom-F OR Arom-I OR Arom-OMs OR Arom-OTf OR Arom-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND ((primary_amine_present OR aniline_present OR Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (secondary_amine_present OR Any-NHR OR Ar-NHR OR Arom-NHR OR Bn-NHR OR Allyl-NHR) OR indole_present OR (primary_amide_present OR secondary_amide_present OR amide_present OR Any-CONHR OR Ar-CONHR OR Arom-CONHR))"
   },
   "default_rule": {
     "id": "DEF_CN_general",
@@ -65,10 +51,7 @@
       "id": "BR_primary_amines",
       "description": "Primary NH2 nucleophiles (aliphatic or aryl). First shot: t‑AmOH/Cs2CO3.",
       "reactant_features": {
-        "any": [
-          "primary_amine_present",
-          "aniline_present"
-        ]
+        "expr": "(primary_amine_present OR aniline_present OR Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2)"
       },
       "conditions": {
         "pd_precatalyst": "Buchwald (allyl/crotyl or G-series)",
@@ -83,9 +66,7 @@
       "id": "BR_secondary_amines",
       "description": "Secondary NHR nucleophiles. Weak base often Cs2CO3; strong base if needed.",
       "reactant_features": {
-        "any": [
-          "secondary_amine_present"
-        ]
+        "expr": "(secondary_amine_present OR Any-NHR OR Ar-NHR OR Arom-NHR OR Bn-NHR OR Allyl-NHR)"
       },
       "conditions": {
         "pd_precatalyst": "Buchwald (allyl/crotyl or G-series)",
@@ -100,10 +81,7 @@
       "id": "BR_heteroaromatic_NH",
       "description": "Heteroaryl N–H coupling; Arom.NH often needs hotter start (~100 °C).",
       "reactant_features": {
-        "any": [
-          "indole_present",
-          "heteroaryl_present"
-        ]
+        "expr": "indole_present OR heteroaryl_present"
       },
       "conditions": {
         "pd_precatalyst": "Buchwald (allyl/crotyl or G-series)",
@@ -118,11 +96,7 @@
       "id": "BR_amides",
       "description": "Low‑nucleophilicity N; stronger ligand systems helpful.",
       "reactant_features": {
-        "any": [
-          "primary_amide_present",
-          "secondary_amide_present",
-          "amide_present"
-        ]
+        "expr": "(primary_amide_present OR secondary_amide_present OR amide_present OR Any-CONHR OR Ar-CONHR OR Arom-CONHR)"
       },
       "conditions": {
         "pd_precatalyst": "Buchwald (allyl/crotyl or G-series)",
@@ -143,94 +117,67 @@
     },
     {
       "id": "MOD_degas_before_base",
-      "when": [
-        "always"
-      ],
+      "when": ["always"],
       "suggest": "Degas the solution BEFORE adding base; maintain N2/Ar atmosphere."
     },
     {
       "id": "MOD_selectivity_less_active",
-      "when": [
-        "symptom:over‑arylation/chemo‑selectivity issues"
-      ],
+      "when": ["symptom:over‑arylation/chemo‑selectivity issues"],
       "suggest": "Switch to a less active system (e.g., XantPhos or QPhos)."
     },
     {
       "id": "MOD_additional_catalyst_if_stalled",
-      "when": [
-        "symptom:conversion stalls after ~4 h"
-      ],
+      "when": ["symptom:conversion stalls after ~4 h"],
       "suggest": "Charge an additional 2–4 mol% Pd precatalyst."
     },
     {
       "id": "MOD_precatalyst_activity_rank",
-      "when": [
-        "any"
-      ],
+      "when": ["any"],
       "suggest": "Prefer allyl/crotyl precatalysts > Buchwald G1–G4 > LxPdCl2. Avoid Pd2(dba)3."
     },
     {
       "id": "MOD_base_sensitive_substrates",
-      "when": [
-        "base_sensitive"
-      ],
+      "when": ["base_sensitive"],
       "suggest": "Use milder base (K3PO4(aq) or Cs2CO3), reduce H2O, and/or lower temperature."
     },
     {
       "id": "MOD_polarity_match_solvent",
-      "when": [
-        "polarity_high"
-      ],
+      "when": ["polarity_high"],
       "suggest": "Favor MeCN or t‑AmOH; avoid very apolar media."
     },
     {
       "id": "MOD_polarity_low_switch",
-      "when": [
-        "polarity_low"
-      ],
+      "when": ["polarity_low"],
       "suggest": "Favor toluene or dioxane; consider biphasic dioxane/H2O for bases."
     },
     {
       "id": "MOD_pyridine_poisoning",
-      "when": [
-        "pyridine_poison_risk"
-      ],
+      "when": ["pyridine_poison_risk"],
       "suggest": "Increase Pd loading (e.g., +2–4 mol%) and/or use a stronger donor ligand (tBuBrettPhos)."
     },
     {
       "id": "MOD_thiol_poisoning",
-      "when": [
-        "thiol_poison_risk"
-      ],
+      "when": ["thiol_poison_risk"],
       "suggest": "Protect/remove thiol (e.g., Ag2O scavenging) or adjust conditions; strong Pd binding expected."
     },
     {
       "id": "MOD_5member_heteroaryl_halide_pref_lihmds",
-      "when": [
-        "five_member_heteroaryl_halide_present"
-      ],
+      "when": ["five_member_heteroaryl_halide_present"],
       "suggest": "Prioritize RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS in dioxane (80–105 °C). If strong base incompatible, try BrettPhos–Pd G3/Cs2CO3."
     },
     {
       "id": "MOD_hard_aryl_chloride_or_ortho_block",
-      "when": [
-        "sp2_chloride_present",
-        "ortho_substitution_present"
-      ],
+      "when": ["sp2_chloride_present", "ortho_substitution_present"],
       "suggest": "Favor dialkylbiaryl systems at ≥100 °C: RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS; otherwise BrettPhos–Pd G3/Cs2CO3 or XPhos–Pd G3/Cs2CO3."
     },
     {
       "id": "MOD_strong_base_window",
-      "when": [
-        "strong_base_compatible"
-      ],
+      "when": ["strong_base_compatible"],
       "suggest": "Test LiHMDS sets (RuPhos–Pd G3/LiHMDS; BrettPhos–Pd G3/LiHMDS)."
     },
     {
       "id": "MOD_binap_option_selectivity",
-      "when": [
-        "symptom:over‑arylation/chemo‑selectivity issues"
-      ],
+      "when": ["symptom:over‑arylation/chemo‑selectivity issues"],
       "suggest": "Include BINAP–Pd G3/Cs2CO3 (dioxane, ~90–105 °C) among trials; often ranks in top‑hits with milder profile."
     }
   ]
