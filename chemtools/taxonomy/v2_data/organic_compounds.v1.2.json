@@ -1130,6 +1130,18 @@
       }
     },
     {
+      "id": "Any-CO-R",
+      "name": "Any-CO-R",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CO",
+      "description": "ketone functional group anywhere (generic).",
+      "anchors": {
+        "core": "A",
+        "fg": "B"
+      }
+    },
+    {
       "id": "Any-CN",
       "name": "Any-CN",
       "template": "single_bond",

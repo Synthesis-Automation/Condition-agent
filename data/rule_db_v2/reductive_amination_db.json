@@ -29,18 +29,7 @@
     "notes": "Use this rule set ONLY if 'applies_if' tokens are present.\nEvaluate base_rules top→down; if none match, use default_rule.\nAfter choosing a rule, scan all modifiers and apply any whose 'when' tokens or symptoms match.\nGeneral guidance: form the imine/iminium efficiently (remove water or use a Lewis acid), keep pH ~5–6 for borohydrides, and avoid H2 routes when benzyl/CBz/nitro must survive.\n"
   },
   "applies_if": {
-    "all": [
-      "carbonyl_present",
-      "amine_nucleophile_present"
-    ],
-    "any": [
-      "aldehyde_present",
-      "ketone_present",
-      "primary_amine_present",
-      "secondary_amine_present",
-      "aniline_present",
-      "ammonium_source_present"
-    ]
+    "expr": "(Any-CHO OR Ar-CHO OR Arom-CHO OR Vinyl-CHO OR ketone_present) AND (Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2 OR Any-NHR OR Ar-NHR OR Arom-NHR OR Bn-NHR OR Allyl-NHR OR ammonium_source_present)"
   },
   "default_rule": {
     "id": "DEF_RA_STAB_general",
@@ -66,7 +55,10 @@
       "description": "Broadly effective; chemoselective for iminium. Suitable for aldehydes and many ketones.",
       "reactant_features": {
         "any": [
-          "aldehyde_present",
+          "Any-CHO",
+          "Ar-CHO",
+          "Arom-CHO",
+          "Vinyl-CHO",
           "ketone_present"
         ]
       },
@@ -89,7 +81,10 @@
           "ammonium_source_present"
         ],
         "any": [
-          "aldehyde_present",
+          "Any-CHO",
+          "Ar-CHO",
+          "Arom-CHO",
+          "Vinyl-CHO",
           "ketone_present"
         ]
       },

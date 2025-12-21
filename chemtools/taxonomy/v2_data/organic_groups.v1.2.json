@@ -476,6 +476,21 @@
         "alkene",
         "terminal_alkene"
       ]
+    },
+    {
+      "id": "CO",
+      "name": "-CO-",
+      "kind": "core",
+      "attach_points": 1,
+      "attach_labels": [
+        2
+      ],
+      "smarts": "[CX3:2](=O)[#6]",
+      "description": "Ketone core; attach via carbonyl carbon (-CO-R).",
+      "tags": [
+        "ketone",
+        "ewg_moderate"
+      ]
     }
   ]
 }

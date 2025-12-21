@@ -551,7 +551,11 @@
           "Ar-NO2",
           "Arom-CHO",
           "Arom-CN",
-          "Arom-NO2"
+          "Arom-NO2",
+          "Pyridine",
+          "Pyrimidine",
+          "Quinoline",
+          "Isoquinoline"
         ],
         "nucleophiles": [
           "Allyl-NH2",
@@ -712,6 +716,9 @@
       "id": "acylation_acyl_halide_amide",
       "name": "Amide formation (acyl halide + amine)",
       "family": "acyl_substitution",
+      "metadata": {
+        "rule_db_v2": "amide_formation_db"
+      },
       "reactants": {
         "electrophiles": [
           "Acyl-Br",
@@ -746,6 +753,53 @@
         ]
       },
       "notes": "Covers acid chloride/bromide amidation; optional product confirmation via amide motifs."
+    },
+    {
+      "id": "reductive_amination",
+      "name": "Reductive amination (aldehyde/ketone + amine)",
+      "category": "c_n_coupling_reactions",
+      "metadata": {
+        "rule_db_v2": "reductive_amination_db"
+      },
+      "reactants": {
+        "electrophiles": [
+          "Any-CHO",
+          "Any-CO-R",
+          "Ar-CHO",
+          "Arom-CHO",
+          "Vinyl-CHO"
+        ],
+        "nucleophiles": [
+          "Allyl-NH2",
+          "Allyl-NHR",
+          "Any-NH2",
+          "Any-NHR",
+          "Ar-NH2",
+          "Ar-NHR",
+          "Arom-NH2",
+          "Arom-NHR",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Vinyl-NH2"
+        ]
+      }
+    },
+    {
+      "id": "ring_closing_metathesis",
+      "name": "Ring-closing metathesis (diene)",
+      "category": "c_c_coupling_reactions",
+      "metadata": {
+        "rule_db_v2": "RCM_db"
+      },
+      "reactants": {
+        "nucleophiles": [
+          "Any-CHCH2",
+          "Ar-CHCH2",
+          "Arom-CHCH2",
+          "R-CHCH2"
+        ]
+      },
+      "notes": "Requires at least two alkene motifs (handled by detection logic)."
     },
     {
       "id": "acylation_acyl_halide_ester",

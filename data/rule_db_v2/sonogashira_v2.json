@@ -28,15 +28,7 @@
     "notes": "Electrophile reactivity: Ar-I ≈ vinyl-OTf > Ar-Br > Ar-Cl. Aryl chlorides need stronger ligands (XPhos/SPhos, PtBu3, NHC) and higher temperatures. Copper-free variants available to reduce Glaser coupling."
   },
   "applies_if": {
-    "all": [
-      "terminal_alkyne_present"
-    ],
-    "any": [
-      "aryl_halide_present",
-      "vinyl_halide_present",
-      "aryl_triflate_present",
-      "vinyl_triflate_present"
-    ]
+    "expr": "(Ar-CCH OR Arom-CCH OR R-CCH) AND (Ar-Br OR Ar-Cl OR Ar-I OR Ar-OTf OR Arom-Br OR Arom-Cl OR Arom-I OR Arom-OTf OR Vinyl-Br OR Vinyl-Cl OR Vinyl-I OR Vinyl-OTf)"
   },
   "default_rule": {
     "id": "DEF_sonogashira_general",
@@ -61,8 +53,10 @@
       "description": "Fast track with mild bases. CuI typically helpful but optional if Glaser coupling is problematic.",
       "reactant_features": {
         "any": [
-          "sp2_bromide_present",
-          "sp2_iodide_present"
+          "Ar-Br",
+          "Ar-I",
+          "Arom-Br",
+          "Arom-I"
         ]
       },
       "conditions": {
@@ -81,7 +75,9 @@
       "description": "Hard electrophiles requiring stronger ligation and higher temperature. Copper-free preferred to avoid side reactions.",
       "reactant_features": {
         "any": [
-          "sp2_chloride_present",
+          "Ar-Cl",
+          "Arom-Cl",
+          "Vinyl-Cl",
           "ortho_substitution_present",
           "strongly_electron_withdrawing_ring_present"
         ]
@@ -102,8 +98,10 @@
       "description": "Clean at lower temperatures. Monitor for isomerization under strongly basic or high-temperature conditions.",
       "reactant_features": {
         "any": [
-          "vinyl_halide_present",
-          "vinyl_triflate_present"
+          "Vinyl-Br",
+          "Vinyl-Cl",
+          "Vinyl-I",
+          "Vinyl-OTf"
         ]
       },
       "conditions": {
