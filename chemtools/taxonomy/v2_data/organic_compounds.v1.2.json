@@ -1166,6 +1166,18 @@
       }
     },
     {
+      "id": "Any-NHR",
+      "name": "Any-NHR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NHR",
+      "description": "secondary amine functional group anywhere (generic).",
+      "anchors": {
+        "core": "A",
+        "fg": "B"
+      }
+    },
+    {
       "id": "Any-OH",
       "name": "Any-OH",
       "template": "single_bond",
@@ -1475,6 +1487,153 @@
         "core": "A",
         "fg": "B"
       }
+    },
+    {
+      "id": "Indole",
+      "name": "Indole",
+      "smarts": [
+        "c1ccc2[nH]ccc2c1"
+      ],
+      "description": "Indole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Pyrrole",
+      "name": "Pyrrole",
+      "smarts": [
+        "[nH]1cccc1"
+      ],
+      "description": "Pyrrole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Imidazole",
+      "name": "Imidazole",
+      "smarts": [
+        "[nH]1cncc1",
+        "n1c[nH]cc1"
+      ],
+      "description": "Imidazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Triazole",
+      "name": "Triazole",
+      "smarts": [
+        "[nH]1nncn1",
+        "[nH]1nncc1"
+      ],
+      "description": "Triazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Tetrazole",
+      "name": "Tetrazole",
+      "smarts": [
+        "n1nnn[nH]1",
+        "n1[nH]nnn1"
+      ],
+      "description": "Tetrazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Benzimidazole",
+      "name": "Benzimidazole",
+      "smarts": [
+        "[nH]1cnc2ccccc12"
+      ],
+      "description": "Benzimidazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Purine",
+      "name": "Purine",
+      "smarts": [
+        "n1cnc2[nH]cnc12"
+      ],
+      "description": "Purine (NH-heteroaromatic)."
+    },
+    {
+      "id": "Furan",
+      "name": "Furan",
+      "smarts": [
+        "o1cccc1"
+      ],
+      "description": "Furan (O-heteroaromatic)."
+    },
+    {
+      "id": "Thiophene",
+      "name": "Thiophene",
+      "smarts": [
+        "s1cccc1"
+      ],
+      "description": "Thiophene (S-heteroaromatic)."
+    },
+    {
+      "id": "Oxazole",
+      "name": "Oxazole",
+      "smarts": [
+        "o1ccnc1",
+        "o1cncc1"
+      ],
+      "description": "Oxazole (O,N-heteroaromatic)."
+    },
+    {
+      "id": "Thiazole",
+      "name": "Thiazole",
+      "smarts": [
+        "s1ccnc1",
+        "s1cncc1"
+      ],
+      "description": "Thiazole (S,N-heteroaromatic)."
+    },
+    {
+      "id": "Pyridine",
+      "name": "Pyridine",
+      "smarts": [
+        "n1ccccc1"
+      ],
+      "description": "Pyridine (N-heteroaromatic)."
+    },
+    {
+      "id": "Pyrimidine",
+      "name": "Pyrimidine",
+      "smarts": [
+        "n1cnccc1",
+        "n1cnccn1",
+        "n1ccncc1"
+      ],
+      "description": "Pyrimidine (N-heteroaromatic)."
+    },
+    {
+      "id": "Quinoline",
+      "name": "Quinoline",
+      "smarts": [
+        "c1ccc2ncccc2c1",
+        "n1cccc2ccccc12"
+      ],
+      "description": "Quinoline (fused N-heteroaromatic)."
+    },
+    {
+      "id": "Isoquinoline",
+      "name": "Isoquinoline",
+      "smarts": [
+        "c1ccc2cnccc2c1",
+        "n1ccc2ccccc2c1"
+      ],
+      "description": "Isoquinoline (fused N-heteroaromatic)."
+    },
+    {
+      "id": "Benzofuran",
+      "name": "Benzofuran",
+      "smarts": [
+        "o1ccc2ccccc12",
+        "c1ccc2occc2c1"
+      ],
+      "description": "Benzofuran (fused O-heteroaromatic)."
+    },
+    {
+      "id": "Benzothiophene",
+      "name": "Benzothiophene",
+      "smarts": [
+        "s1ccc2ccccc12",
+        "c1ccc2sccc2c1"
+      ],
+      "description": "Benzothiophene (fused S-heteroaromatic)."
     }
   ],
   "depends_on": {

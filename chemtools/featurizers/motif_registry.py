@@ -44,6 +44,38 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         compound_id = entry.get("id")
         if not compound_id:
             continue
+        direct_smarts = entry.get("smarts")
+        smarts_any = entry.get("smarts_any")
+        smarts_list: List[str] = []
+        if isinstance(direct_smarts, str):
+            smarts_list = [direct_smarts]
+        elif isinstance(direct_smarts, list):
+            smarts_list = [s for s in direct_smarts if isinstance(s, str)]
+        elif isinstance(smarts_any, list):
+            smarts_list = [s for s in smarts_any if isinstance(s, str)]
+
+        if smarts_list:
+            for smarts in smarts_list:
+                smarts = smarts.strip()
+                if not smarts:
+                    continue
+                if not _has_atom_map(smarts):
+                    smarts = _inject_map_on_first_atom(smarts, map_num=1)
+                query = compile_smarts(smarts, validate=False)
+                if query is None:
+                    continue
+                pattern = CompoundPattern(
+                    compound_id=compound_id,
+                    smarts=smarts,
+                    query=query,
+                    group_a=str(entry.get("A") or ""),
+                    group_b=str(entry.get("B") or ""),
+                    b_tags=list(entry.get("tags") or []),
+                )
+                compiled.append(pattern)
+                compound_map[compound_id] = pattern
+            continue
+
         template_id = entry.get("template", "")
         template_format = templates.get(template_id)
         if not template_format:
