@@ -106,15 +106,26 @@ class RuleDatabase:
                 logger.error(f"Error parsing modifier: {e}")
                 logger.debug(f"Modifier data: {mod_data}")
         
-        # Extract metadata
-        metadata = {}
+        # Extract metadata (supports both legacy flat schema and v2.0 schema).
+        metadata: Dict[str, Any] = {}
+
+        meta_block = data.get("metadata")
+        if isinstance(meta_block, dict):
+            metadata.update({k: v for k, v in meta_block.items() if v is not None})
+
+        reaction_block = data.get("reaction")
+        if isinstance(reaction_block, dict):
+            family = reaction_block.get("family")
+            if isinstance(family, str) and family.strip():
+                metadata.setdefault("reaction_family", family.strip())
+
         for key in ["name", "reaction_type", "description", "version", "author", "reference"]:
-            if key in data:
-                metadata[key] = data[key]
-        
-        # Use reaction_type as name if name not present
-        if "name" not in metadata and "reaction_type" in metadata:
-            metadata["name"] = metadata["reaction_type"]
+            if key in data and data[key] is not None:
+                metadata.setdefault(key, data[key])
+
+        # Use a reasonable fallback label if none exists.
+        if "name" not in metadata:
+            metadata["name"] = metadata.get("reaction_family") or metadata.get("reaction_type") or "Unnamed"
         
         return cls(
             applies_if=data.get("applies_if", {}),
@@ -218,14 +229,35 @@ class RuleDatabase:
                 logger.debug(f"Matched rule '{rule.name}' with features: {matched_features}")
                 return rule
         
-        # Fall back to default_rule if available
+        # Fall back to default_rule if available.
         if use_default and self.default_rule:
             logger.debug("No base_rules matched, using default_rule")
-            # Convert default_rule dict to RuleSpec
+            default_rule = self.default_rule
+
+            # Schema v2.0 default_rule: {"id": "...", "description": "...", "conditions": {...}}
+            default_conditions: Dict[str, Any] = {}
+            default_id: Optional[str] = None
+            default_description: Optional[str] = None
+
+            if isinstance(default_rule, dict):
+                default_id = default_rule.get("id") if isinstance(default_rule.get("id"), str) else None
+                default_description = (
+                    default_rule.get("description")
+                    if isinstance(default_rule.get("description"), str)
+                    else None
+                )
+                if isinstance(default_rule.get("conditions"), dict):
+                    default_conditions = default_rule["conditions"]
+                else:
+                    default_conditions = default_rule
+
+            name = default_description or default_id or "default"
             return RuleSpec(
-                name="default",
-                conditions=self.default_rule,
-                reactant_features={}
+                name=name,
+                conditions=default_conditions,
+                reactant_features={},
+                rule_id=default_id,
+                description=default_description,
             )
         
         return None

@@ -141,7 +141,9 @@ class RuleEngine:
             name=matching_rule.name,
             conditions=matching_rule.conditions,
             matched_features=matched_features if include_reasoning else [],
-            confidence=1.0  # Can be enhanced with scoring logic
+            confidence=1.0,  # Can be enhanced with scoring logic
+            rule_id=getattr(matching_rule, "rule_id", None),
+            description=getattr(matching_rule, "description", None),
         )
         
         logger.info(f"Matched rule: {matching_rule.name}")
@@ -226,7 +228,7 @@ class RuleEngine:
                         name="error",
                         conditions={"error": str(e)},
                         matched_features=[],
-                        confidence=0.0
+                        confidence=0.0,
                     ),
                     modifiers=[],
                     detected_features={}

@@ -13,6 +13,7 @@ from ..featurizers.calculable import detect_all_features
 from ..featurizers.reaction_pair import featurize_pair as molecular_featurize
 from ..featurizers.reaction_detection import detect_motif_ids_from_smiles
 from ..analysis.smiles import normalize_reaction
+from ..util.functional_groups import detect_all as detect_functional_groups
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,46 @@ class FeatureAnalyzer:
     def __init__(self):
         """Initialize the feature analyzer."""
         pass
+
+    @staticmethod
+    def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
+        """Heuristically pick electrophile/nucleophile ordering for 2-component reactions."""
+        if len(reactants) != 2:
+            return (reactants[0] if reactants else ""), (reactants[1] if len(reactants) > 1 else "")
+
+        first, second = reactants[0], reactants[1]
+        fg_first = detect_functional_groups(first)
+        fg_second = detect_functional_groups(second)
+
+        def elec_score(fg: Dict[str, bool]) -> int:
+            score = 0
+            if fg.get("sp2_halide_present") or fg.get("sp2_pseudohalide_present"):
+                score += 10
+            if fg.get("sp3_halide_present") or fg.get("sp3_pseudohalide_present"):
+                score += 8
+            if fg.get("acyl_halide_present"):
+                score += 9
+            if fg.get("aryl_halide_present") or fg.get("vinyl_halide_present") or fg.get("alkyl_halide_present"):
+                score += 2
+            return score
+
+        def nuc_score(fg: Dict[str, bool]) -> int:
+            score = 0
+            if fg.get("sp2_boron_present"):
+                score += 10
+            if fg.get("amine_nucleophile_present") or fg.get("aniline_present"):
+                score += 9
+            if fg.get("o_nucleophile_present") or fg.get("s_nucleophile_present"):
+                score += 8
+            if fg.get("terminal_alkyne_present") or fg.get("terminal-alkyne_present"):
+                score += 9
+            return score
+
+        score_forward = elec_score(fg_first) + nuc_score(fg_second)
+        score_reverse = elec_score(fg_second) + nuc_score(fg_first)
+        if score_reverse > score_forward:
+            return second, first
+        return first, second
     
     def analyze_reaction(
         self,
@@ -67,7 +108,8 @@ class FeatureAnalyzer:
             # use the full molecular featurizer which includes functional group enrichment
             if len(reactants) == 2:
                 try:
-                    result = molecular_featurize(reactants[0], reactants[1])
+                    elec, nuc = self._pick_electrophile_nucleophile(reactants)
+                    result = molecular_featurize(elec, nuc)
                     features = result.get("flat", {})
                     for motif_id in motif_ids:
                         features[motif_id] = True

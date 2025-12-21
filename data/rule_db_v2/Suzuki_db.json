@@ -7,15 +7,10 @@
     "version": "v2.0",
     "created_date": "2025-11-08",
     "status": "active",
-    "tags": [
-      "suzuki",
-      "palladium",
-      "cross-coupling",
-      "boronic-acid"
-    ]
+    "tags": ["suzuki", "palladium", "cross-coupling", "boronic-acid"]
   },
   "reaction": {
-    "family": "Suzuki_Miyaura",
+    "family": "suzuki_miyaura",
     "reference_reactions": [
       "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
       "Clc1ccc(C(F)(F)F)cc1.OB(O)c1ccncc1>>c1ccc(-c2ccncc2)cc1",
@@ -34,10 +29,7 @@
     "notes": "Updated using reported HTE trends: top-performing condition families across many discovery plates favor dtbpf- or dialkylbiaryl-phosphine–Pd systems with aqueous K3PO4 or Cs2CO3 in dioxane/H2O (~4–5:1). Default prioritizes dtbpf/K3PO4; base_rules enumerate frequently winning alternatives (P(tBu)3–Pd G3, XPhos–Pd G3, CataCXium A–Pd G3, and dppf variants). Modifiers re-rank for hard substrates (aryl chlorides, ortho-blocked, five-member heteroaryl) and lab symptoms (hydrodehalogenation, boronate dimer). Includes an 'hte_supply' section with screenable 6-pack and stock definitions for 1 µmol scale provisioning."
   },
   "applies_if": {
-    "all": [
-      "sp2_halide_present",
-      "sp2_boron_present"
-    ]
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Arom-Br OR Arom-Cl OR Arom-F OR Arom-I OR Arom-OMs OR Arom-OTf OR Arom-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Arom-B(OH)2 OR Arom-Bpin OR Vinyl-B(OH)2 OR Vinyl-Bpin)"
   },
   "default_rule": {
     "id": "DEF_sp2_general",
@@ -61,10 +53,7 @@
       "id": "BR_dtbpf_K3PO4",
       "description": "General, scalable; good for broad aryl bromide/iodide and many aryl chloride cases.",
       "reactant_features": {
-        "all": [
-          "sp2_halide_present",
-          "sp2_boron_present"
-        ]
+        "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Arom-Br OR Arom-Cl OR Arom-F OR Arom-I OR Arom-OMs OR Arom-OTf OR Arom-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Arom-B(OH)2 OR Arom-Bpin OR Vinyl-B(OH)2 OR Vinyl-Bpin)"
       },
       "conditions": {
         "pd_source": "PdCl2(dtbpf)",
@@ -82,11 +71,7 @@
       "id": "BR_PtBu3_G3_K3PO4",
       "description": "Excellent for hindered aryl chlorides and electron-poor boronates; fast at elevated T.",
       "reactant_features": {
-        "any": [
-          "sp2_chloride_present",
-          "ortho_substitution_present",
-          "electron_poor_boronate_present"
-        ]
+        "expr": "(Ar-Cl OR Arom-Cl OR Vinyl-Cl) OR ortho_1 OR ortho_2plus OR ortho_hindered OR electron_poor_aryl OR electron_poor_boronate_present"
       },
       "conditions": {
         "precatalyst": "Pd-PEPPSI-type G3 with P(tBu)3 (representative)",
@@ -104,11 +89,7 @@
       "id": "BR_XPhos_G3_K3PO4",
       "description": "Dialkylbiaryl phosphine platform; reliable on aryl bromides and many chlorides.",
       "reactant_features": {
-        "any": [
-          "sp2_bromide_present",
-          "sp2_chloride_present",
-          "five_member_heteroaryl_halide_present"
-        ]
+        "expr": "(Ar-Br OR Arom-Br OR Vinyl-Br OR Ar-Cl OR Arom-Cl OR Vinyl-Cl) OR heteroaryl_present"
       },
       "conditions": {
         "precatalyst": "XPhos–Pd G3",
@@ -126,10 +107,7 @@
       "id": "BR_dtbpf_Cs2CO3",
       "description": "Alternative base that often ranks highly; useful when K3PO4 underperforms.",
       "reactant_features": {
-        "all": [
-          "sp2_halide_present",
-          "sp2_boron_present"
-        ]
+        "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Arom-Br OR Arom-Cl OR Arom-F OR Arom-I OR Arom-OMs OR Arom-OTf OR Arom-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Arom-B(OH)2 OR Arom-Bpin OR Vinyl-B(OH)2 OR Vinyl-Bpin)"
       },
       "conditions": {
         "pd_source": "PdCl2(dtbpf)",
@@ -147,10 +125,7 @@
       "id": "BR_CataCXiumA_G3_Cs2CO3",
       "description": "Frequently near the top; complementary to XPhos/P(tBu)3 choices.",
       "reactant_features": {
-        "any": [
-          "sp2_bromide_present",
-          "sp2_chloride_present"
-        ]
+        "expr": "(Ar-Br OR Arom-Br OR Vinyl-Br OR Ar-Cl OR Arom-Cl OR Vinyl-Cl)"
       },
       "conditions": {
         "precatalyst": "CataCXium A–Pd G3",
@@ -168,10 +143,7 @@
       "id": "BR_dppf_K2CO3",
       "description": "Lower basicity; try for base-sensitive partners or when hydrolysis observed.",
       "reactant_features": {
-        "any": [
-          "base_sensitive_functionality_present",
-          "acid_labile_group_present"
-        ]
+        "expr": "boc_present OR acetal_present OR silyl_ether_present OR ester_present"
       },
       "conditions": {
         "pd_source": "PdCl2(dppf)",
@@ -189,44 +161,33 @@
     {
       "id": "MOD_hard_substrate_rerank",
       "when": [
-        "sp2_chloride_present",
-        "ortho_substitution_present"
+        "(Ar-Cl OR Arom-Cl OR Vinyl-Cl) OR ortho_1 OR ortho_2plus OR ortho_hindered"
       ],
       "suggest": "Prefer P(tBu)3–Pd G3 or XPhos–Pd G3 at 100–110 °C; increase catalyst to 2.0 mol% if sluggish."
     },
     {
       "id": "MOD_five_member_heteroaryl",
-      "when": [
-        "five_member_heteroaryl_halide_present"
-      ],
+      "when": ["heteroaryl_present"],
       "suggest": "Keep dtbpf and XPhos in top slots; avoid overly polar co-solvents early; maintain H2O ~20–25% v/v."
     },
     {
       "id": "MOD_electron_poor_boronate",
-      "when": [
-        "electron_poor_boronate_present"
-      ],
+      "when": ["electron_poor_boronate_present"],
       "suggest": "Favor dtbpf or P(tBu)3 systems; ensure thorough degassing; shorten reaction time to limit protodeboronation."
     },
     {
       "id": "MOD_hydrodehalogenation_TBAB",
-      "when": [
-        "symptom:hydrodehalogenation_observed"
-      ],
+      "when": ["symptom:hydrodehalogenation_observed"],
       "suggest": "Add TBAB 0.5–1.0 equiv and/or lower temperature by 10–15 °C."
     },
     {
       "id": "MOD_fg_sensitive_to_aq_base",
-      "when": [
-        "fg_sensitive_to_base_present"
-      ],
+      "when": ["boc_present OR acetal_present OR silyl_ether_present"],
       "suggest": "Reduce base strength/equiv, increase organic fraction (e.g., dioxane/H2O 9:1), and consider dppf/K2CO3."
     },
     {
       "id": "MOD_boron_dimer",
-      "when": [
-        "symptom:boronate_dimer_observed"
-      ],
+      "when": ["symptom:boronate_dimer_observed"],
       "suggest": "Improve exclusion of air; lower catalyst loading to 0.5–1.0 mol%; use freshly prepared boronate; consider neop-boronate surrogate."
     }
   ]

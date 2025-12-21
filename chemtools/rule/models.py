@@ -20,15 +20,22 @@ class AppliedRule:
     conditions: Dict[str, Any]
     matched_features: List[str] = field(default_factory=list)
     confidence: float = 1.0
+    rule_id: Optional[str] = None
+    description: Optional[str] = None
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
-        return {
+        result = {
             "name": self.name,
             "conditions": self.conditions,
             "matched_features": self.matched_features,
             "confidence": self.confidence,
         }
+        if self.rule_id:
+            result["id"] = self.rule_id
+        if self.description:
+            result["description"] = self.description
+        return result
 
 
 @dataclass
@@ -127,6 +134,8 @@ class RuleSpec:
     conditions: Dict[str, Any]
     reactant_features: Optional[Dict[str, Any]] = None
     priority: int = 0
+    rule_id: Optional[str] = None
+    description: Optional[str] = None
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> RuleSpec:
@@ -135,7 +144,11 @@ class RuleSpec:
             name=data.get("name", "unnamed"),
             conditions=data.get("conditions", {}),
             reactant_features=data.get("reactant_features"),
-            priority=data.get("priority", 0)
+            priority=data.get("priority", 0),
+            rule_id=data.get("id") if isinstance(data.get("id"), str) else None,
+            description=data.get("description")
+            if isinstance(data.get("description"), str)
+            else None,
         )
     
     def to_dict(self) -> Dict[str, Any]:
@@ -144,6 +157,10 @@ class RuleSpec:
             "name": self.name,
             "conditions": self.conditions,
         }
+        if self.rule_id:
+            result["id"] = self.rule_id
+        if self.description:
+            result["description"] = self.description
         if self.reactant_features:
             result["reactant_features"] = self.reactant_features
         if self.priority != 0:

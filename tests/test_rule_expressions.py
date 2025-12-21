@@ -44,10 +44,51 @@ def test_rule_spec_matches_expr():
     assert matched
 
 
+def test_rule_spec_from_dict_preserves_v2_fields():
+    rule = RuleSpec.from_dict(
+        {
+            "id": "BR_test",
+            "name": "Example Rule",
+            "description": "Hello",
+            "reactant_features": {"expr": "Ar-Br"},
+            "conditions": {"base": "K2CO3"},
+        }
+    )
+    assert rule.rule_id == "BR_test"
+    assert rule.description == "Hello"
+    dumped = rule.to_dict()
+    assert dumped["id"] == "BR_test"
+    assert dumped["description"] == "Hello"
+
+
+def test_rule_database_v2_default_rule_fallback_uses_conditions_only():
+    db = RuleDatabase.from_dict(
+        {
+            "schema_version": "2.0",
+            "source_type": "rule",
+            "metadata": {"id": "demo", "name": "Demo DB", "version": "v2"},
+            "reaction": {"family": "suzuki_miyaura"},
+            "applies_if": {"expr": "Ar-Br"},
+            "default_rule": {
+                "id": "DEF_demo",
+                "description": "Default starter",
+                "conditions": {"base": "K2CO3"},
+            },
+            "base_rules": [],
+            "modifiers": [],
+        }
+    )
+    assert db.metadata.get("name") == "Demo DB"
+    assert db.check_applies({"Ar-Br": True}) is True
+    matched = db.find_matching_rule({"Ar-Br": True})
+    assert matched is not None
+    assert matched.conditions == {"base": "K2CO3"}
+    assert matched.rule_id == "DEF_demo"
+
+
 @pytest.mark.skipif(not rdkit_available(), reason="RDKit not available")
 def test_feature_analyzer_includes_taxonomy_motif_ids():
     analyzer = FeatureAnalyzer()
     features = analyzer.analyze_reaction("Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1")
     assert features.get("Ar-Br") is True
     assert features.get("Ar-NH2") is True
-

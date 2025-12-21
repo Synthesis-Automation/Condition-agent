@@ -658,6 +658,18 @@ def featurize_flat(
         )
     )
 
+    nuc_group_map = nuc_groups if isinstance(nuc_groups, dict) else {}
+    boron_on_nucleophile = any(
+        bool(nuc_group_map.get(token))
+        for token in ("sp2_boron_present", "boronic_acid_present", "boronic_ester_present")
+    )
+    ewg_on_nucleophile = any(
+        bool(nuc_group_map.get(token))
+        for token in ("nitro_present", "nitrile_present", "trifluoromethyl_present", "carbonyl_present")
+    )
+    out["electron_poor_boronate"] = bool(boron_on_nucleophile and ewg_on_nucleophile)
+    out["electron_poor_boronate_present"] = out["electron_poor_boronate"]
+
     return out
 
 
