@@ -5,8 +5,8 @@ This package hosts the new taxonomy system. Python modules live at
 
 - `chemtools/taxonomy/v2_data/`: JSON data used by v2 modules.
 - `chemtools/taxonomy/v2_docs/`: Spec and design notes.
-- `chemtools/taxonomy/archive/`: Legacy registry and data (kept for compatibility
-  with older tooling; not part of the v2 core).
+- `chemtools/taxonomy/archive/`: Legacy registry and data (reference only; not
+  part of the v2 core).
 
 The v2 system is intentionally small and deterministic, and includes:
 
@@ -63,13 +63,13 @@ reaction_id = resolve_reaction_type("Suzuki coupling")
 
 ### Reaction detection (motif-based)
 
-- `chemtools/taxonomy/reaction_detection.py`
+- `chemtools/featurizers/reaction_detection.py`
   - Uses motif detection to map reactant SMILES to reaction types.
 
 Example:
 
 ```python
-from chemtools.taxonomy.reaction_detection import detect_reaction_types
+from chemtools.featurizers.reaction_detection import detect_reaction_types
 
 result = detect_reaction_types("Brc1ccccc1.O=B(O)O[Na]>>")
 print(result.to_dict())
@@ -77,22 +77,22 @@ print(result.to_dict())
 
 ### Organic groups, compounds, and motif registry
 
-- `chemtools/taxonomy/motif_registry.py`
+- `chemtools/featurizers/motif_registry.py`
   - Loads organic groups + compounds + SMARTS templates, then compiles the
     motif registry used across detection and analysis.
 
 ### Steric and electronic factor analysis
 
-- `chemtools/taxonomy/analyze.py`
+- `chemtools/featurizers/structural.py`
   - Computes motif hits and steric/electronic descriptors for aryl and alkyl
     systems using the organic group/compound registry.
 
 Example:
 
 ```python
-from chemtools.taxonomy.analyze import analyze_smiles
+from chemtools.featurizers.structural import featurize_molecule
 
-analysis = analyze_smiles("c1ccccc1Br")
+analysis = featurize_molecule("c1ccccc1Br")
 ```
 
 ### Rule DB lookup

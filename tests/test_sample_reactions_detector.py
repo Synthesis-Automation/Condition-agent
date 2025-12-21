@@ -5,8 +5,10 @@ Test sample reactions with the updated reaction type detector.
 import sys
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project root and examples directory to path
+root = Path(__file__).parent.parent
+sys.path.insert(0, str(root))
+sys.path.insert(0, str(root / "examples"))
 
 from sample_reactions import SAMPLE_REACTIONS
 from chemtools import detect_reaction

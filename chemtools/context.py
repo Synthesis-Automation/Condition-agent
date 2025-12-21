@@ -674,13 +674,14 @@ class FeaturizersNamespace:
         self._ctx = context
     
     def molecular(self, **kwargs) -> Any:
-        """Access molecular featurizer for C-N coupling substrates.
-        
-        Returns:
-            Molecular featurizer namespace
-        """
+        """Access pair featurizer for electrophile/nucleophile substrates."""
         from . import featurizers as _featurizers
-        return _featurizers.molecular
+        return _featurizers.reaction_pair
+
+    def structural(self, **kwargs) -> Any:
+        """Access motif-based steric/electronic analysis for single molecules."""
+        from . import featurizers as _featurizers
+        return _featurizers.structural
 
 
 class FeaturesNamespace:

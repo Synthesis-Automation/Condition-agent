@@ -101,7 +101,7 @@ from chemtools.reagent.analytics import (
     get_missing_data_report,
 )
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
-from chemtools.featurizers import molecular as molecular_featurizer
+from chemtools.featurizers import reaction_pair as molecular_featurizer
 from chemtools.featurizers import calculable as calculable_features
 from chemtools.taxonomy.rule_db import resolve_rule_db_v2
 
@@ -1421,11 +1421,12 @@ def molpipeline_featurize_tool(
         Dict[str, Any]: Feature dictionary wrapped in a success payload.
     """
     try:
-        features = molecular_featurizer.featurize(
+        feat_result = molecular_featurizer.featurize_pair(
             electrophile,
             nucleophile,
             include_molpipeline=include_molpipeline,
         )
+        features = feat_result.get("flat", {})
         return _success_response(features)
     except Exception as e:
         return _error_response(

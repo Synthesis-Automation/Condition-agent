@@ -16,7 +16,7 @@ from .motif_detect import detect_motifs
 from .motif_registry import build_compound_registry
 
 
-def analyze_smiles(
+def featurize_molecule(
     smiles: str,
     registry_paths: Optional[Dict[str, str | Path]] = None,
     options: Optional[Dict[str, Any]] = None,
@@ -24,12 +24,31 @@ def analyze_smiles(
     """
     Analyze motifs, sterics, and electronics for a SMILES string.
     """
-    if not rdkit_available():
-        return {"smiles": smiles, "motifs": [], "analyses": [], "error": "rdkit_unavailable"}
+    meta = {"rdkit_available": rdkit_available(), "error": None}
+    if not meta["rdkit_available"]:
+        meta["error"] = "rdkit_unavailable"
+        return {
+            "schema_version": "v2",
+            "smiles": smiles,
+            "motifs": [],
+            "steric": {"aryl": [], "alkyl": []},
+            "electronics": {"aryl": []},
+            "analyses": [],
+            "meta": meta,
+        }
 
     mol = parse_smiles(smiles)
     if mol is None:
-        return {"smiles": smiles, "motifs": [], "analyses": [], "error": "invalid_smiles"}
+        meta["error"] = "invalid_smiles"
+        return {
+            "schema_version": "v2",
+            "smiles": smiles,
+            "motifs": [],
+            "steric": {"aryl": [], "alkyl": []},
+            "electronics": {"aryl": []},
+            "analyses": [],
+            "meta": meta,
+        }
 
     registry_paths = registry_paths or _default_registry_paths()
     registry = build_compound_registry(registry_paths)
@@ -91,7 +110,45 @@ def analyze_smiles(
                 }
             )
 
-    return {"smiles": smiles, "motifs": motifs, "analyses": analyses}
+    steric_payload = {"aryl": [], "alkyl": []}
+    electronic_payload = {"aryl": []}
+    for analysis in analyses:
+        steric_entry = {
+            "compound_id": analysis.get("compound_id"),
+            "center": analysis.get("center"),
+            "result": analysis.get("steric"),
+        }
+        if analysis.get("compound_id", "").startswith(("Ar-", "Arom-")):
+            steric_payload["aryl"].append(steric_entry)
+        else:
+            steric_payload["alkyl"].append(steric_entry)
+        if "electronic" in analysis:
+            electronic_payload["aryl"].append(
+                {
+                    "compound_id": analysis.get("compound_id"),
+                    "center": analysis.get("center"),
+                    "result": analysis.get("electronic"),
+                }
+            )
+
+    return {
+        "schema_version": "v2",
+        "smiles": smiles,
+        "motifs": motifs,
+        "steric": steric_payload,
+        "electronics": electronic_payload,
+        "analyses": analyses,
+        "meta": meta,
+    }
+
+
+def analyze_smiles(
+    smiles: str,
+    registry_paths: Optional[Dict[str, str | Path]] = None,
+    options: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Compatibility wrapper for motif/steric/electronic analysis."""
+    return featurize_molecule(smiles, registry_paths=registry_paths, options=options)
 
 
 def _filter_arom_duplicates(motifs: list[Dict[str, Any]]) -> list[Dict[str, Any]]:
@@ -121,9 +178,12 @@ def _filter_arom_duplicates(motifs: list[Dict[str, Any]]) -> list[Dict[str, Any]
 
 
 def _default_registry_paths() -> Dict[str, Path]:
-    base = Path(__file__).resolve().parent / "v2_data"
+    base = Path(__file__).resolve().parent.parent / "taxonomy" / "v2_data"
     return {
         "groups": base / "organic_groups.v1.2.json",
         "compounds": base / "organic_compounds.v1.2.json",
         "templates": base / "smarts_templates.v1.json",
     }
+
+
+__all__ = ["featurize_molecule", "analyze_smiles"]

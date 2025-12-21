@@ -42,7 +42,7 @@ def featurize_molecular(req: FeaturizeUllmannRequest) -> Dict[str, Any]:
     if not req.nucleophile or not req.nucleophile.strip():
         raise ValidationError("Nucleophile SMILES cannot be empty")
     
-    return featurizers.molecular.featurize(req.electrophile, req.nucleophile)
+    return featurizers.reaction_pair.featurize_pair(req.electrophile, req.nucleophile)
 
 
 def featurize_role_aware_molecule(req: RoleAwareMolRequest) -> Dict[str, Any]:

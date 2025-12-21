@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 from pydantic import BaseModel, Field
 
-from chemtools.featurizers import molecular as feat_molecular
+from chemtools.featurizers import reaction_pair as feat_pair
 
 from .base import SchemaStamped, pick_first, validate_payload
 
@@ -51,10 +51,18 @@ def featurize_substrates(data: Dict[str, Any]) -> Dict[str, Any]:
 
     payload = validate_payload(FeaturizeInput, data)
     electrophile, nucleophile = _select_substrates(payload.reactants)
-    descriptors = feat_molecular.featurize(electrophile, nucleophile)
+    descriptors = feat_pair.featurize_pair(electrophile, nucleophile)
     # Drop role-aware block to keep output deterministic
-    if isinstance(descriptors, dict) and "role_aware" in descriptors:
-        descriptors = {k: v for k, v in descriptors.items() if k != "role_aware"}
+    if isinstance(descriptors, dict):
+        flat = descriptors.get("flat")
+        if isinstance(flat, dict) and "role_aware" in flat:
+            flat.pop("role_aware", None)
+        elec = descriptors.get("electrophile")
+        if isinstance(elec, dict) and "role_aware" in elec:
+            elec.pop("role_aware", None)
+        nuc = descriptors.get("nucleophile")
+        if isinstance(nuc, dict) and "role_aware" in nuc:
+            nuc.pop("role_aware", None)
 
     output = FeaturizeOutput(
         electrophile=electrophile,

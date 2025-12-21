@@ -709,7 +709,8 @@ def _get_precedents_for_reaction(
                 r0, r1 = reactants[0], reactants[1]
                 elec_smi, nuc_smi = (r0, r1) if is_electrophile(r0) else ((r1, r0) if is_electrophile(r1) else (r0, r1))
             
-            feat = featurizers.molecular.featurize(elec_smi, nuc_smi)
+            feat_result = featurizers.reaction_pair.featurize_pair(elec_smi, nuc_smi)
+            feat = feat_result.get("flat", {})
         except Exception as e:
             return f"Could not featurize reaction: {e}", ""
     
@@ -1441,7 +1442,8 @@ def search_precedents(
                 r0, r1 = reactants[0], reactants[1]
                 elec, nuc = (r0, r1) if is_electrophile(r0) else ((r1, r0) if is_electrophile(r1) else (r0, r1))
             
-            features = featurizers.molecular.featurize(elec, nuc)
+            feat_result = featurizers.reaction_pair.featurize_pair(elec, nuc)
+            features = feat_result.get("flat", {})
             
             # Drop nested role_aware to keep features hashable
             if isinstance(features, dict) and "role_aware" in features:

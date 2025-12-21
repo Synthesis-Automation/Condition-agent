@@ -227,11 +227,19 @@ Do not make it required.
 ## Public API
 
 ```python
-def analyze_smiles(smiles: str, registry_paths: dict, options: dict) -> dict:
+def featurize_molecule(
+    smiles: str,
+    registry_paths: dict | None = None,
+    options: dict | None = None,
+) -> dict:
     # {
+    #   "schema_version": "v2",
     #   "smiles": "...",
     #   "motifs": [...],
-    #   "analyses": [...]
+    #   "steric": {...},
+    #   "electronics": {...},
+    #   "analyses": [...],
+    #   "meta": {...},
     # }
 ```
 

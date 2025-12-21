@@ -6,7 +6,7 @@ Usage:
         --electrophile Brc1ccccc1 \
         --nucleophile Nc1ccccc1
 
-The script prints the standard C–N coupling feature dictionary and, when
+The script prints the standard C-N coupling feature dictionary and, when
 MolPipeline is installed, the richer fingerprint/descriptor payload that is now
 available via ``include_molpipeline=True``.
 """
@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from chemtools.featurizers.molecular import featurize
+from chemtools.featurizers.reaction_pair import featurize_pair
 
 try:
     from chemtools.integrations import molpipeline as mp
@@ -34,7 +34,7 @@ except Exception:  # pragma: no cover - MolPipeline optional
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Demonstrate ChemTools ↔ MolPipeline integration.",
+        description="Demonstrate ChemTools to MolPipeline integration.",
     )
     parser.add_argument(
         "--electrophile",
@@ -61,12 +61,12 @@ def main(argv: list[str] | None = None) -> int:
     include_vectors = bool(mp and mp.is_available())
     if not include_vectors:
         print(
-            "MolPipeline not detected – standard ChemTools features will be returned "
+            "MolPipeline not detected - standard ChemTools features will be returned "
             "without the optional fingerprint payload.",
             file=sys.stderr,
         )
 
-    features = featurize(
+    features = featurize_pair(
         args.electrophile,
         args.nucleophile,
         include_molpipeline=include_vectors,

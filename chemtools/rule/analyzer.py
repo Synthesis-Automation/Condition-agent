@@ -10,7 +10,7 @@ from typing import Dict, Any, List, Tuple, Optional
 import logging
 
 from ..featurizers.calculable import detect_all_features
-from ..featurizers.molecular import featurize as molecular_featurize
+from ..featurizers.reaction_pair import featurize_pair as molecular_featurize
 from ..analysis.smiles import normalize_reaction
 
 logger = logging.getLogger(__name__)
@@ -60,8 +60,12 @@ class FeatureAnalyzer:
             # use the full molecular featurizer which includes functional group enrichment
             if len(reactants) == 2:
                 try:
-                    features = molecular_featurize(reactants[0], reactants[1])
-                    logger.debug(f"Used molecular featurizer: {sum(1 for v in features.values() if v)} features detected")
+                    result = molecular_featurize(reactants[0], reactants[1])
+                    features = result.get("flat", {})
+                    logger.debug(
+                        "Used molecular featurizer: %s features detected",
+                        sum(1 for v in features.values() if v),
+                    )
                     return features
                 except Exception as e:
                     logger.warning(f"Molecular featurizer failed, falling back to calculable: {e}")

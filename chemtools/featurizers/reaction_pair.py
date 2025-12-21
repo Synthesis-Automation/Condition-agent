@@ -2,7 +2,7 @@
 General molecular featurizer for electrophile/nucleophile pairs.
 
 Extracts structural and chemical features across cross-coupling and related
-reaction spaces (C–N, C–O, C–S, etc.). Features include leaving-group type,
+reaction spaces (C-N, C-O, C-S, etc.). Features include leaving-group type,
 electrophile classification, nucleophile basicity, steric properties, and
 optional role-aware/descriptor attachments.
 """
@@ -149,6 +149,21 @@ def _molpipeline_vectors(smiles: str) -> Optional[Dict[str, Any]]:
         return None
     result["_settings"] = settings
     return result
+
+
+def _present_groups(groups: Dict[str, bool]) -> List[str]:
+    return sorted(name for name, present in groups.items() if present)
+
+
+def _maybe_structural(smiles: str) -> Optional[Dict[str, Any]]:
+    try:
+        from .structural import featurize_molecule
+    except Exception:
+        return None
+    try:
+        return featurize_molecule(smiles)
+    except Exception:
+        return None
 
 
 def _guess_lg_text(s: str) -> str:
@@ -541,33 +556,14 @@ def _enrich_with_functional_groups(
     return enriched
 
 
-def featurize(
+def featurize_flat(
     electrophile: str,
     nucleophile: str,
     *,
     include_molpipeline: Optional[bool] = None,
     include_calculable: Optional[bool] = None,
 ) -> Dict[str, Any]:
-    """Featurize electrophile/nucleophile inputs for cross-coupling models.
-
-    Extracts structural and chemical features including:
-    - Leaving-group class (halide, sulfonate, etc.)
-    - Electrophile classification (aryl, vinyl, alkyl)
-    - Ortho substitution count + para EWG flags
-    - Nucleophile class/basicity and steric hindrance
-
-    Optionally attaches role-aware vectors (`CHEMTOOLS_ATTACH_ROLE_AWARE=1`),
-    MolPipeline descriptors, and calculable feature blocks.
-
-    Args:
-        electrophile: SMILES for the electrophile partner
-        nucleophile: SMILES for the nucleophile partner
-        include_molpipeline: Add MolPipeline descriptors if True/flagged
-        include_calculable: Add calculable feature bundles when True
-
-    Returns:
-        Dictionary with extracted features and optional attachments.
-    """
+    """Return the legacy flat feature dictionary for a reactant pair."""
     base = _featurize_cached(electrophile, nucleophile)
     out = dict(base)
 
@@ -578,11 +574,10 @@ def featurize(
     if nuc_groups is None:
         nuc_groups = detect_functional_groups(nucleophile)
 
-    # Enrich with comprehensive functional group detection
-    # This adds <group>_present tokens needed by rule databases
+    # Enrich with comprehensive functional group detection.
     out = _enrich_with_functional_groups(out, electrophile, nucleophile, elec_groups, nuc_groups)
 
-    # Attach calculable features when explicitly enabled via env or parameter
+    # Attach calculable features when explicitly enabled via env or parameter.
     if include_calculable is None:
         include_calculable = _get_env_bool("CHEMTOOLS_INCLUDE_CALCULABLE_FEATURES", False)
     
@@ -599,7 +594,7 @@ def featurize(
         except Exception:
             pass  # Graceful degradation if calculable module unavailable
 
-    # Attach role-aware only when explicitly enabled via env (default off for speed)
+    # Attach role-aware only when explicitly enabled via env (default off for speed).
     attach_flag = (os.environ.get("CHEMTOOLS_ATTACH_ROLE_AWARE", "").strip().lower() in {"1", "true", "yes", "on"})
     if attach_flag and _HAS_ROLE_FEATS and _role_feat is not None:
         try:
@@ -644,4 +639,149 @@ def featurize(
     return out
 
 
-__all__ = ["featurize"]
+def featurize_pair(
+    electrophile: str,
+    nucleophile: str,
+    *,
+    include_molpipeline: Optional[bool] = None,
+    include_calculable: Optional[bool] = None,
+    include_structural: Optional[bool] = None,
+) -> Dict[str, Any]:
+    """Return canonical, structured features for an electrophile/nucleophile pair."""
+    errors: List[str] = []
+    if not (electrophile or nucleophile):
+        errors.append("empty_inputs")
+
+    flat = featurize_flat(
+        electrophile,
+        nucleophile,
+        include_molpipeline=include_molpipeline,
+        include_calculable=include_calculable,
+    )
+
+    elec_groups = detect_functional_groups(electrophile)
+    nuc_groups = detect_functional_groups(nucleophile)
+
+    if include_structural is None:
+        include_structural = _get_env_bool("CHEMTOOLS_INCLUDE_STRUCTURAL_FEATURES", False)
+
+    resolved_include_molpipeline = (
+        include_molpipeline if include_molpipeline is not None else ("molpipeline" in flat)
+    )
+    resolved_include_calculable = (
+        include_calculable if include_calculable is not None else ("calculable" in flat)
+    )
+
+    elec_structural = _maybe_structural(electrophile) if include_structural and electrophile else None
+    nuc_structural = _maybe_structural(nucleophile) if include_structural and nucleophile else None
+
+    elec_features = {
+        "LG": flat.get("LG"),
+        "elec_class": flat.get("elec_class"),
+        "ortho_count": flat.get("ortho_count"),
+        "para_EWG": flat.get("para_EWG"),
+        "heteroaryl": flat.get("heteroaryl"),
+    }
+    nuc_features = {
+        "nuc_class": flat.get("nuc_class"),
+        "n_basicity": flat.get("n_basicity"),
+        "steric_alpha": flat.get("steric_alpha"),
+    }
+
+    molpipeline_block = flat.get("molpipeline")
+    calculable_block = flat.get("calculable")
+    role_aware_block = flat.get("role_aware")
+
+    elec_payload: Dict[str, Any] = {
+        "smiles": electrophile,
+        "features": elec_features,
+        "functional_groups": _present_groups(elec_groups),
+        "functional_group_map": elec_groups,
+    }
+    nuc_payload: Dict[str, Any] = {
+        "smiles": nucleophile,
+        "features": nuc_features,
+        "functional_groups": _present_groups(nuc_groups),
+        "functional_group_map": nuc_groups,
+    }
+
+    if isinstance(molpipeline_block, dict):
+        elec_mp = molpipeline_block.get("electrophile")
+        nuc_mp = molpipeline_block.get("nucleophile")
+        if elec_mp:
+            elec_payload["molpipeline"] = elec_mp
+        if nuc_mp:
+            nuc_payload["molpipeline"] = nuc_mp
+
+    if isinstance(calculable_block, dict):
+        elec_calc = calculable_block.get("electrophile")
+        nuc_calc = calculable_block.get("nucleophile")
+        if elec_calc:
+            elec_payload["calculable"] = elec_calc
+        if nuc_calc:
+            nuc_payload["calculable"] = nuc_calc
+
+    if isinstance(role_aware_block, dict):
+        elec_ra = role_aware_block.get("electrophile")
+        nuc_ra = role_aware_block.get("nucleophile")
+        if elec_ra:
+            elec_payload["role_aware"] = elec_ra
+        if nuc_ra:
+            nuc_payload["role_aware"] = nuc_ra
+
+    if elec_structural:
+        elec_payload["structural"] = elec_structural
+    if nuc_structural:
+        nuc_payload["structural"] = nuc_structural
+
+    pair_features = {
+        "LG": flat.get("LG"),
+        "elec_class": flat.get("elec_class"),
+        "ortho_count": flat.get("ortho_count"),
+        "para_EWG": flat.get("para_EWG"),
+        "heteroaryl": flat.get("heteroaryl"),
+        "nuc_class": flat.get("nuc_class"),
+        "n_basicity": flat.get("n_basicity"),
+        "steric_alpha": flat.get("steric_alpha"),
+    }
+
+    return {
+        "schema_version": "v2",
+        "electrophile": elec_payload,
+        "nucleophile": nuc_payload,
+        "pair": {
+            "bin": flat.get("bin"),
+            "features": pair_features,
+        },
+        "flat": flat,
+        "meta": {
+            "rdkit_available": rdkit_available(),
+            "errors": errors,
+            "options": {
+                "include_molpipeline": resolved_include_molpipeline,
+                "include_calculable": resolved_include_calculable,
+                "include_structural": include_structural,
+            },
+        },
+    }
+
+
+def featurize(
+    electrophile: str,
+    nucleophile: str,
+    *,
+    include_molpipeline: Optional[bool] = None,
+    include_calculable: Optional[bool] = None,
+    include_structural: Optional[bool] = None,
+) -> Dict[str, Any]:
+    """Alias for featurize_pair."""
+    return featurize_pair(
+        electrophile,
+        nucleophile,
+        include_molpipeline=include_molpipeline,
+        include_calculable=include_calculable,
+        include_structural=include_structural,
+    )
+
+
+__all__ = ["featurize", "featurize_pair", "featurize_flat"]

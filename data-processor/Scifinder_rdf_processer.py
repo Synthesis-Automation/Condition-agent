@@ -935,7 +935,7 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                 sys.path.insert(0, repo_root)
             from chemtools.smiles import normalize_reaction
             from chemtools import router, reaction_similarity as rs
-            from chemtools.featurizers import molecular as feat_molecular
+            from chemtools.featurizers import reaction_pair as feat_pair
             chemtools_available = True
             drfp_available = rs.drfp_available()
         except Exception as e:
@@ -1120,7 +1120,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                                 elec_smi, nuc_smi = r0, r1
                         
                         # Featurize (keep only categorical features, exclude fingerprints)
-                        features = feat_molecular.featurize(elec_smi, nuc_smi)
+                        feat_result = feat_pair.featurize_pair(elec_smi, nuc_smi)
+                        features = feat_result.get("flat", {})
                         if isinstance(features, dict):
                             # Remove role_aware and molpipeline (contains large fingerprints)
                             features = {k: v for k, v in features.items() if k not in ("role_aware", "molpipeline")}

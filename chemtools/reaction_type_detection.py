@@ -2,7 +2,7 @@
 Unified reaction detection API (taxonomy v2).
 
 This module exposes ``detect_reaction`` for compatibility, but detection now
-uses motif-slot evidence from ``chemtools.taxonomy``. ML/SMARTS toggles are
+uses motif-slot evidence from ``chemtools.featurizers``. ML/SMARTS toggles are
 accepted for backwards compatibility and ignored.
 """
 
@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from .taxonomy.reaction_detection import detect_reaction_types
+from .featurizers.reaction_detection import detect_reaction_types
 
 
 def _confidence_from_match(matched_slots: int, required_slots: int) -> float:

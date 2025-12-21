@@ -12,7 +12,7 @@ from . import reactions as _reactions
 from . import reactants as _reactants
 from . import smiles as _smiles
 from ..taxonomy import reaction_catalog as _reaction_catalog
-from ..taxonomy.reaction_detection import detect_reaction_types_from_smiles
+from ..featurizers.reaction_detection import detect_reaction_types_from_smiles
 
 __all__ = [
     "normalize",

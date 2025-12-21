@@ -40,7 +40,7 @@ pip install molpipeline
 With MolPipeline present:
 
 - `chemtools.smiles.normalize` accepts broader formats (InChI, SDF, binary) before falling back to legacy heuristics.
-- `chemtools.featurizers.molecular.featurize(..., include_molpipeline=True)` appends Morgan fingerprints and RDKit phys-chem descriptors per reactant (returned both as lists and descriptor-name maps). Enabled automatically when MolPipeline is present; set `CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES=0` to opt out globally.
+- `chemtools.featurizers.reaction_pair.featurize_pair(..., include_molpipeline=True)` appends Morgan fingerprints and RDKit phys-chem descriptors per reactant (returned both as lists and descriptor-name maps). The structured output includes a `flat` block for legacy feature vectors. Enabled automatically when MolPipeline is present; set `CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES=0` to opt out globally.
 - `scripts/showcase_molpipeline_features.py` prints an enriched feature bundle for any substrate pair.
 
 ---

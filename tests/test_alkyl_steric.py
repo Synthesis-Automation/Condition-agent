@@ -1,6 +1,6 @@
 import pytest
 
-from chemtools.taxonomy.analyze import analyze_smiles
+from chemtools.featurizers.structural import featurize_molecule
 from chemtools.util.rdkit_helpers import rdkit_available
 
 
@@ -12,7 +12,7 @@ def _analysis_for_prefix(result, prefix: str):
 
 
 def _scaffold_score(smiles: str, prefix: str):
-    result = analyze_smiles(smiles)
+    result = featurize_molecule(smiles)
     analysis = _analysis_for_prefix(result, prefix)
     assert analysis is not None
     return analysis["steric"]["scaffold_score_0_10"], analysis
@@ -33,7 +33,7 @@ def test_alkyl_scaffold_trends():
 
 @pytest.mark.skipif(not rdkit_available(), reason="RDKit not available")
 def test_benzyl_ring_penalty():
-    result = analyze_smiles("c1ccccc1CBr")
+    result = featurize_molecule("c1ccccc1CBr")
     analysis = _analysis_for_prefix(result, "Bn-") or _analysis_for_prefix(result, "R-")
     assert analysis is not None
     assert any(sub["has_ring"] for sub in analysis["steric"]["substituents"])
@@ -41,7 +41,7 @@ def test_benzyl_ring_penalty():
 
 @pytest.mark.skipif(not rdkit_available(), reason="RDKit not available")
 def test_allyl_flag():
-    result = analyze_smiles("C=CCBr")
+    result = featurize_molecule("C=CCBr")
     analysis = _analysis_for_prefix(result, "Allyl-") or _analysis_for_prefix(result, "R-")
     assert analysis is not None
     assert analysis["steric"]["alpha"]["allylic"] is True

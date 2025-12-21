@@ -91,7 +91,7 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     try:
         # Import featurizers here to avoid circular dependency
-        from ..featurizers import molecular as feat_molecular
+        from ..featurizers import reaction_pair as feat_pair
         
         rxn_id = rec.get("reaction_id")
         rt = rec.get("reaction_type")
@@ -134,7 +134,8 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             rcts = (smiles_block.get("reactants") or "").strip()
             reactants_list = [p for p in (rcts.split('.') if rcts else []) if p]
             elec, nuc = _pick_electrophile_nucleophile(reactants_list)
-            features = feat_molecular.featurize(elec, nuc)
+            feat_result = feat_pair.featurize_pair(elec, nuc)
+            features = feat_result.get("flat", {})
         
         # Build uniform row
         catalyst_obj = rec.get("catalyst") or {}
