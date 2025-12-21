@@ -86,7 +86,7 @@
       "id": "BR_hindered_alcohols",
       "description": "Low reactivity; try Pd biaryl phosphines first, then Cu sets. Expect modest yields; consider alternate routes.",
       "reactant_features": {
-        "expr": "tertiary_alcohol_present OR secondary_alcohol_present"
+        "expr": "Any-OH"
       },
       "conditions": {
         "metal": "Pd",
@@ -103,7 +103,7 @@
       "id": "BR_harder_halides",
       "description": "More demanding electrophiles; use more active Pd systems and higher temperature.",
       "reactant_features": {
-        "expr": "Ar-Cl OR Arom-Cl OR Vinyl-Cl OR heteroaryl_halide_present"
+        "expr": "Ar-Cl OR Arom-Cl OR Vinyl-Cl"
       },
       "conditions": {
         "metal": "Pd",
