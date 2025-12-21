@@ -1,0 +1,173 @@
+{
+  "schema_version": "2.0",
+  "source_type": "rule",
+  "metadata": {
+    "id": "sonogashira_v2",
+    "name": "Sonogashira Coupling Guidelines (Pd-Cu / Cu-free)",
+    "version": "v2.0",
+    "created_date": "2025-11-08",
+    "status": "active",
+    "tags": ["sonogashira", "palladium", "copper", "alkyne", "C-C-coupling", "cross-coupling"]
+  },
+  "reaction": {
+    "family": "Sonogashira",
+    "reference_reactions": [
+      "Ic1ccccc1.C#Cc1ccccc1>>C(#Cc1ccccc1)c1ccccc1",
+      "Brc1ccc(C(F)(F)F)cc1.C#CCCCCC>>C(#CCCCCC)c1ccc(C(F)(F)F)cc1",
+      "Clc1cccc(C)c1.C#Cc1cccnc1>>C(#Cc1cccnc1)c1cccc(C)c1",
+      "Brc1cccnc1.C#CC(C)(C)C>>C(#CC(C)(C)C)c1cccnc1",
+      "IC=Cc1ccccc1.C#Cc1ccc(OC)cc1>>C(#Cc1ccc(OC)cc1)C=Cc1ccccc1"
+    ],
+    "reaction_smarts": ["[Br,I,Cl,$(OS(=O)(=O)C(F)(F)F)][c,$(C=C)].C#C>>[c,$(C=C)]C#C"],
+    "scope": {
+      "scope_type": "broad",
+      "compatible_functional_groups": ["aryl_halide", "vinyl_halide", "terminal_alkyne", "ester", "ketone", "nitrile", "ether"],
+      "incompatible_functional_groups": ["strong_acid", "unprotected_amine_with_copper"],
+      "substrate_limitations": "Couples aryl/vinyl (pseudo)halides with terminal alkynes. Requires terminal C≡C-H. Oxygen promotes Glaser homocoupling - run under inert atmosphere with thorough degassing."
+    },
+    "notes": "Electrophile reactivity: Ar-I ≈ vinyl-OTf > Ar-Br > Ar-Cl. Aryl chlorides need stronger ligands (XPhos/SPhos, PtBu3, NHC) and higher temperatures. Copper-free variants available to reduce Glaser coupling."
+  },
+  "applies_if": {
+    "all": [
+      "terminal_alkyne_present"
+    ],
+    "any": [
+      "aryl_halide_present",
+      "vinyl_halide_present",
+      "aryl_triflate_present",
+      "vinyl_triflate_present"
+    ]
+  },
+  "default_rule": {
+    "id": "DEF_sonogashira_general",
+    "description": "General Sonogashira coupling with CuI cocatalyst and amine base. Thoroughly degassed conditions.",
+    "conditions": {
+      "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2·DCM",
+      "catalyst_loading_molpct": "0.5-2.0",
+      "ligand": "Built-in (PPh3 or dppf)",
+      "base": "Et3N or DIPEA",
+      "base_equiv": "2.0-3.0",
+      "solvent": "THF, toluene, or DMF",
+      "temperature_C": "40-80",
+      "time_h": "1-8",
+      "atmosphere": "N2 or Ar; thoroughly degassed",
+      "additives": ["CuI (2-5 mol%)"]
+    }
+  },
+  "base_rules": [
+    {
+      "name": "Aryl iodides/bromides (standard reactivity)",
+      "id": "BR_ArI_ArBr_standard",
+      "description": "Fast track with mild bases. CuI typically helpful but optional if Glaser coupling is problematic.",
+      "reactant_features": {
+        "any": [
+          "sp2_bromide_present",
+          "sp2_iodide_present"
+        ]
+      },
+      "conditions": {
+        "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2·DCM",
+        "catalyst_loading_molpct": "0.5-1.5",
+        "base": "Et3N or DIPEA",
+        "base_equiv": "2.0-3.0",
+        "solvent": "THF, toluene, or DMF",
+        "temperature_C": "40-70",
+        "additives": ["CuI (2-5 mol%, optional)"]
+      }
+    },
+    {
+      "name": "Aryl chlorides or deactivated/ortho-blocked aryls",
+      "id": "BR_ArCl_hard",
+      "description": "Hard electrophiles requiring stronger ligation and higher temperature. Copper-free preferred to avoid side reactions.",
+      "reactant_features": {
+        "any": [
+          "sp2_chloride_present",
+          "ortho_substitution_present",
+          "strongly_electron_withdrawing_ring_present"
+        ]
+      },
+      "conditions": {
+        "catalyst": "XPhos-Pd G3 or SPhos-Pd G3",
+        "catalyst_loading_molpct": "1.0-3.0",
+        "base": "DIPEA or Cs2CO3",
+        "base_equiv": "2.0-3.0",
+        "solvent": "1,4-dioxane, toluene, or DMF",
+        "temperature_C": "80-110",
+        "additives": ["CuI (<2 mol%, optional)"]
+      }
+    },
+    {
+      "name": "Vinyl halides/triflates",
+      "id": "BR_vinyl_electrophiles",
+      "description": "Clean at lower temperatures. Monitor for isomerization under strongly basic or high-temperature conditions.",
+      "reactant_features": {
+        "any": [
+          "vinyl_halide_present",
+          "vinyl_triflate_present"
+        ]
+      },
+      "conditions": {
+        "catalyst": "PdCl2(PPh3)2 or Pd(PPh3)4",
+        "catalyst_loading_molpct": "0.5-2.0",
+        "base": "Et3N or DIPEA",
+        "base_equiv": "2.0-3.0",
+        "solvent": "THF or toluene",
+        "temperature_C": "25-60",
+        "additives": ["CuI (2-5 mol%)"]
+      }
+    },
+    {
+      "name": "Electron-rich aryl halides",
+      "id": "BR_electron_rich",
+      "description": "Slow oxidative addition. Use more electron-rich/bulky ligands and slightly elevated catalyst loading.",
+      "reactant_features": {
+        "any": [
+          "strongly_electron_donating_ring_present",
+          "ortho_dimethoxy_present"
+        ]
+      },
+      "conditions": {
+        "catalyst": "Pd(OAc)2 or Pd2(dba)3",
+        "catalyst_loading_molpct": "2.0-5.0",
+        "ligand": "XPhos or SPhos (4-10 mol%)",
+        "base": "DIPEA or K2CO3",
+        "base_equiv": "2.0-3.0",
+        "solvent": "DMF or 1,4-dioxane",
+        "temperature_C": "60-90",
+        "additives": ["CuI (2-5 mol%)"]
+      }
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "MOD_glaser_suppression",
+      "when": ["glaser_coupling_observed", "diyne_byproduct"],
+      "suggest": "Use copper-free conditions or reduce CuI loading to <1 mol%. Ensure thorough degassing and use freshly distilled reagents.",
+      "priority": 9
+    },
+    {
+      "id": "MOD_slow_conversion",
+      "when": ["incomplete_conversion", "slow_reaction"],
+      "suggest": "Increase catalyst loading to 2-5 mol%, raise temperature by 10-20°C, or extend reaction time. Check for catalyst poisoning.",
+      "priority": 7
+    },
+    {
+      "id": "MOD_protodehalogenation",
+      "when": ["protodehalogenation_observed", "aryl_H_product"],
+      "suggest": "Use drier solvents and bases. Consider switching to inorganic base (K2CO3, Cs2CO3) if using amine base.",
+      "priority": 8
+    },
+    {
+      "id": "MOD_base_solvent",
+      "when": ["amine_incompatible", "sensitive_functional_groups"],
+      "suggest": "Switch from amine base (Et3N/DIPEA) to inorganic base (K2CO3, Cs2CO3) with aprotic solvent (DMF, 1,4-dioxane).",
+      "priority": 6
+    },
+    {
+      "id": "MOD_temperature_reduction",
+      "when": ["decomposition", "side_product_formation"],
+      "suggest": "Lower temperature to 40-60°C and extend reaction time. Consider using more active catalyst (Pd-PEPPSI or Pd-G3 precatalysts).",
+      "priority": 7
+    }
+  ]
+}

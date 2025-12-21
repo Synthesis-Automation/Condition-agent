@@ -1,0 +1,268 @@
+{
+  "schema_version": "2.0",
+  "source_type": "rule",
+  "metadata": {
+    "id": "c_n_coupling_cu_v2",
+    "name": "Ullmann–Goldberg (Cu) C–N Coupling",
+    "version": "v2.0",
+    "created_date": "2025-11-08",
+    "status": "active",
+    "tags": []
+  },
+  "reaction": {
+    "family": "Ullmann_C–N",
+    "reference_reactions": [
+      "Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+      "Brc1ccc(C(F)(F)F)cc1.NCCCC>>c1ccc(NCCCC)cc1",
+      "Ic1ccncc1.NCc1ccccc1>>c1ccc(CNc2ccncc2)cc1",
+      "Ic1ccc(C#N)cc1.CN(C)C>>CN(C)c1ccc(C#N)cc1",
+      "Brc1ccccc1.c1cnccn1>>n1ccnc(-c2ccccc2)c1"
+    ],
+    "scope": {
+      "scope_type": "broad",
+      "compatible_functional_groups": [],
+      "incompatible_functional_groups": []
+    },
+    "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: Ullmann/Goldberg systems are sensitive to base/solubility and mass transfer. Start with 5–10 mol% Cu(I) (CuI or Cu2O) and 10–40 mol% ligand (2–4× Cu). Use 2–3 equiv carbonate/phosphate base, ~10 vol solvent, 0.1–0.3 M, 90–110 °C for Ar–Br/I (110–130 °C for harder cases). Inert atmosphere preferred; modest water (5–10 equiv) can improve heterogeneous bases."
+  },
+  "applies_if": {
+    "all": [
+      "aryl_halide_present"
+    ],
+    "any": [
+      "primary_amine_present",
+      "secondary_amine_present",
+      "aniline_present",
+      "heteroaryl_present",
+      "indole_present",
+      "primary_amide_present",
+      "secondary_amide_present",
+      "amide_present",
+      "sulfonamide_present",
+      "ammonia_present",
+      "azole_present"
+    ]
+  },
+  "default_rule": {
+    "id": "DEF_CuCN_general",
+    "description": "General starter for Ullmann/Goldberg C–N (CuI or Cu2O; amino‑acid or diamine ligand; carbonate base).",
+    "conditions": {
+      "cu_source": "CuI or Cu2O (5–10 mol%)",
+      "ligand": "L‑proline or DMEDA (20–40 mol%)",
+      "base": "K2CO3 or Cs2CO3 2.0–3.0 equiv (alt: K3PO4)",
+      "solvent": "Dioxane or toluene (alt: DMSO/DMF for polar substrates)",
+      "solvent_volume_vol_per_g": "≈10",
+      "temperature_C": "90–110 for Ar–Br/I; 110–130 for difficult cases",
+      "time_h": "6–18",
+      "additives": [
+        "Optional 5–10 equiv H2O to aid heterogeneous bases"
+      ],
+      "atmosphere": "N2 or Ar (preferred)"
+    }
+  },
+  "base_rules": [
+    {
+      "name": "Primary/secondary aliphatic amines",
+      "id": "BR_aliphatic_amines",
+      "description": "Broad coupling of primary/secondary aliphatic amines. Diamines excel for less nucleophilic or hindered cases.",
+      "reactant_features": {
+        "any": [
+          "primary_amine_present",
+          "secondary_amine_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5–10 mol%)",
+        "ligand": "DMEDA or trans‑N,N′‑dimethyl‑1,2‑cyclohexanediamine (DMCyDA) 20–40 mol%",
+        "base": "Cs2CO3 or K2CO3 2.0–3.0 equiv",
+        "solvent": "Toluene or dioxane (alt: DMSO for polar cases)",
+        "temperature_C": "90–110"
+      }
+    },
+    {
+      "name": "Anilines and less hindered amines",
+      "id": "BR_aniline_primary_general",
+      "description": "Economical first pass; amino‑acid ligands promote rate and robustness.",
+      "reactant_features": {
+        "any": [
+          "aniline_present",
+          "primary_amine_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5–10 mol%)",
+        "ligand": "L‑proline or N,N‑dimethylglycine (DMG) 20–40 mol%",
+        "base": "K2CO3 2.0–3.0 equiv (alt: K3PO4)",
+        "solvent": "Dioxane or toluene (alt: DMSO)",
+        "temperature_C": "90–110"
+      }
+    },
+    {
+      "name": "Heteroaromatic N–H (indoles, imidazoles, benzimidazoles)",
+      "id": "BR_azoles_phenanthroline",
+      "description": "Phenanthroline‑type ligands often enable milder temps and higher selectivity with azoles.",
+      "reactant_features": {
+        "any": [
+          "indole_present",
+          "azole_present",
+          "heteroaryl_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5–10 mol%)",
+        "ligand": "4,7‑dimethoxy‑1,10‑phenanthroline (DMPhen) 10–30 mol%",
+        "base": "Cs2CO3 2.0–3.0 equiv",
+        "solvent": "Toluene (alt: dioxane)",
+        "temperature_C": "60–100"
+      }
+    },
+    {
+      "name": "Goldberg amidation (amides and sulfonamides)",
+      "id": "BR_amides_sulfonamides",
+      "description": "Low‑nucleophilicity N; diamines or simple amino‑acids are effective.",
+      "reactant_features": {
+        "any": [
+          "amide_present",
+          "primary_amide_present",
+          "secondary_amide_present",
+          "sulfonamide_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5–10 mol%)",
+        "ligand": "DMG or DMEDA 20–40 mol%",
+        "base": "Cs2CO3 or K3PO4 2.0–3.0 equiv",
+        "solvent": "Dioxane (alt: toluene)",
+        "temperature_C": "100–120"
+      }
+    },
+    {
+      "name": "Aryl chlorides (Cu, challenging)",
+      "id": "BR_aryl_chlorides_oxalamide",
+      "description": "Use oxalamide (or NHC/Cu) systems; higher temp and strong base often required.",
+      "reactant_features": {
+        "any": [
+          "primary_amine_present",
+          "secondary_amine_present",
+          "aniline_present"
+        ]
+      },
+      "electrophile_features": {
+        "any": [
+          "sp2_chloride_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5–10 mol%)",
+        "ligand": "Oxalamide ligand (e.g., N‑naphthyl‑N′‑alkyl oxalamide) 10–30 mol%",
+        "base": "K3PO4 2.0–3.0 equiv",
+        "solvent": "Dioxane (alt: polar aprotic)",
+        "temperature_C": "110–130"
+      }
+    },
+    {
+      "name": "Ammonia as N‑source",
+      "id": "BR_ammonia",
+      "description": "Direct arylation of NH3; consider oxalamide or robust diamine ligands.",
+      "reactant_features": {
+        "any": [
+          "ammonia_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5–10 mol%)",
+        "ligand": "Oxalamide or DMEDA 20–40 mol%",
+        "base": "K3PO4 2.0–3.0 equiv",
+        "solvent": "Dioxane (alt: MeOH/THF variants exist)",
+        "temperature_C": "80–100"
+      }
+    },
+    {
+      "name": "Hindered secondary aliphatic amines",
+      "id": "BR_hindered_secondary_amines",
+      "description": "Ligand systems such as DMPAO (Ma) enable milder temps for historically tough aliphatic secondary amines.",
+      "reactant_features": {
+        "any": [
+          "secondary_amine_present"
+        ]
+      },
+      "conditions": {
+        "cu_source": "CuI (5–10 mol%)",
+        "ligand": "DMPAO 10–30 mol%",
+        "base": "Mild carbonate (K2CO3/Cs2CO3) 2.0–3.0 equiv",
+        "solvent": "Polar aprotic (e.g., DMSO/DMF)",
+        "temperature_C": "≤100"
+      }
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "MOD_water_for_heterogeneous_bases",
+      "when": [
+        "symptom:heterogeneous base (carbonate/phosphate) or scale‑up in apolar solvent"
+      ],
+      "suggest": "Add 5–10 equiv H2O or switch to a more polar co‑solvent to improve mass transfer."
+    },
+    {
+      "id": "MOD_diamine_for_hindered",
+      "when": [
+        "steric_hindrance_high",
+        "secondary_amine_present"
+      ],
+      "suggest": "Use diamine ligand (DMEDA/DMCyDA), raise temperature toward 110–120 °C, and choose Cs2CO3."
+    },
+    {
+      "id": "MOD_phen_for_azoles",
+      "when": [
+        "azole_present",
+        "indole_present"
+      ],
+      "suggest": "Switch to phenanthroline‑type ligands (DMPhen) and toluene; temps can often drop to 60–90 °C."
+    },
+    {
+      "id": "MOD_oxalamide_for_chloride",
+      "when": [
+        "sp2_chloride_present"
+      ],
+      "suggest": "Use oxalamide (or NHC/Cu) ligands with K3PO4 in dioxane; plan 110–130 °C."
+    },
+    {
+      "id": "MOD_air_moisture",
+      "when": [
+        "any"
+      ],
+      "suggest": "Run under N2/Ar; many systems tolerate trace air/moisture, but inert handling improves reproducibility."
+    },
+    {
+      "id": "MOD_low_solubility_substrates",
+      "when": [
+        "polarity_high",
+        "polarity_mismatch",
+        "solubility_poor"
+      ],
+      "suggest": "Increase dilution (12–15 vol), add a polar co‑solvent (DMSO/DMF), or warm pre‑mix to dissolve salts."
+    },
+    {
+      "id": "MOD_pyridine_chelators",
+      "when": [
+        "pyridine_poison_risk",
+        "bidentate_chelator_present"
+      ],
+      "suggest": "Increase Cu/ligand loading slightly (e.g., +2–3 mol% Cu), use diamine or phenanthroline ligand, and consider more polar solvent."
+    },
+    {
+      "id": "MOD_halide_salt_inhibition",
+      "when": [
+        "symptom:induction period or salt caking"
+      ],
+      "suggest": "Add 5–10 equiv water, reduce base particle size, or switch to partially soluble base to shorten induction."
+    },
+    {
+      "id": "MOD_leaving_group_order",
+      "when": [
+        "any"
+      ],
+      "suggest": "Reactivity typically follows Ar–I ≫ Ar–Br » Ar–Cl. For bromides/iodides, try 90–110 °C; for chlorides, use oxalamide/NHC systems."
+    }
+  ]
+}
