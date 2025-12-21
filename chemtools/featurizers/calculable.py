@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Union
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
 from ..util.smarts_cache import compile_smarts as _compile_smarts
 from ..util.boolean_expr import evaluate as _eval_bool_expr
-from ..taxonomy.calculable_spec import load_calculable_feature_spec
+from ..taxonomy.archive.calculable_spec import load_calculable_feature_spec
 
 
 # ============================================================================

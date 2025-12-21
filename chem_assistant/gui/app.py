@@ -29,7 +29,7 @@ def main() -> None:
 
     startup_message = None
     try:
-        from chemtools.taxonomy import load_registry
+        from chemtools.taxonomy.archive import load_registry
 
         registry = load_registry()
         term_count = len(list(registry.iter_chem_terms()))

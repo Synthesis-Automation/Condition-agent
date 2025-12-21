@@ -9,9 +9,8 @@ reagents through a single, documented API.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence
 
-from .constants import ROLE_FILES
 from .registry_store import (
     ROLE_CONFIG as FLAT_ROLE_CONFIG,
     RegistryStore,
@@ -22,14 +21,12 @@ from .registry_store import (
 from .taxonomy_store import RoleHeuristics, TaxonomyStore
 from .taxonomy_utils import (
     DEFAULT_RESOLVER_TIMEOUT,
-    build_entry,
     dedupe_synonyms,
     normalize_cas,
     resolve_identity_from_cas,
     tokenize_all,
 )
 
-DEFAULT_TAXONOMY_DIR = Path("data/compound_taxonomy")
 DEFAULT_FLAT_REGISTRY_DIR = Path("data/reagent_db")
 
 
@@ -60,39 +57,20 @@ def _resolve_identity(cas: str, *, enabled: bool, timeout: float) -> Dict[str, A
     return resolved or {}
 
 
-def _load_store(taxonomy_dir: Optional[Path]) -> Tuple[Any, str]:
-    """
-    Attempt to load either the legacy taxonomy store or the flattened registry.
+def _load_taxonomy(taxonomy_dir: Optional[Path]) -> TaxonomyStore:
+    """Load reagent taxonomy v2 for family/role inference."""
+    target = taxonomy_dir.expanduser() if taxonomy_dir is not None else None
+    try:
+        return TaxonomyStore(target)
+    except FileNotFoundError as exc:
+        raise ReagentAdditionError(f"Unable to load reagent taxonomy v2: {exc}") from exc
 
-    Returns:
-        (store_instance, "taxonomy" | "flat")
-    """
-    candidates: List[Optional[Path]] = []
-    if taxonomy_dir is not None:
-        candidates.append(taxonomy_dir.expanduser())
-    candidates.extend([DEFAULT_TAXONOMY_DIR, DEFAULT_FLAT_REGISTRY_DIR])
 
-    errors: List[str] = []
-    for candidate in candidates:
-        if candidate is None:
-            continue
-        if not Path(candidate).exists():
-            continue
-        try:
-            return TaxonomyStore(candidate), "taxonomy"
-        except FileNotFoundError as exc:
-            errors.append(str(exc))
-        try:
-            return RegistryStore(candidate), "flat"
-        except FileNotFoundError as exc:
-            errors.append(str(exc))
-
-    raise ReagentAdditionError(
-        "Unable to load reagent taxonomy data. "
-        "Provide a valid `taxonomy_dir` pointing to either the legacy taxonomy "
-        "directory (data/compound_taxonomy) or the flattened registry (data/reagent_db). "
-        f"Errors: {'; '.join(errors)}"
-    )
+def _load_registry(registry_dir: Optional[Path]) -> RegistryStore:
+    """Load the flattened reagent registry used for storage."""
+    if registry_dir is not None:
+        return RegistryStore(registry_dir.expanduser())
+    return RegistryStore(DEFAULT_FLAT_REGISTRY_DIR)
 
 
 def add_reagent_entry(
@@ -111,12 +89,12 @@ def add_reagent_entry(
     resolver_timeout: float = DEFAULT_RESOLVER_TIMEOUT,
 ) -> Dict[str, Any]:
     """
-    Add a reagent entry to the taxonomy registry.
+    Add a reagent entry to the flattened registry using v2 taxonomy for classification.
 
     Args:
         cas: CAS registry identifier (required).
-        taxonomy_dir: Optional path to the compound taxonomy directory. When not supplied
-            or missing, the unified taxonomy bundled with chemtools is used.
+        taxonomy_dir: Optional path to the reagent taxonomy v2 directory. When not supplied,
+            the packaged v2 taxonomy is used.
         name: Preferred reagent name. If omitted, an online resolver is used when permitted.
         synonyms: Optional list of synonyms/aliases.
         abbreviation: Explicit abbreviation override. Defaults to the reagent name.
@@ -142,9 +120,9 @@ def add_reagent_entry(
     normalized_cas = normalize_cas(cas)
     taxonomy_path = Path(taxonomy_dir).expanduser() if taxonomy_dir else None
 
-    store, store_kind = _load_store(taxonomy_path)
-    use_flat_registry = store_kind == "flat"
-    heuristics = RoleHeuristics(store)
+    taxonomy = _load_taxonomy(taxonomy_path)
+    registry = _load_registry(None)
+    heuristics = RoleHeuristics(taxonomy)
 
     resolved_identity = _resolve_identity(normalized_cas, enabled=auto_resolve, timeout=resolver_timeout)
     resolved_name = resolved_identity.get("name")
@@ -171,7 +149,7 @@ def add_reagent_entry(
     used_default = False
 
     if family_id:
-        family_role = store.role_for_family(family_id)
+        family_role = taxonomy.role_for_family(family_id)
         if not family_role:
             raise ReagentAdditionError(f"Unknown family '{family_id}'.")
         if role and role != family_role:
@@ -190,7 +168,7 @@ def add_reagent_entry(
         raise ReagentAdditionError(
             "Unable to determine reagent role. Provide it explicitly or supply additional synonyms."
         )
-    valid_roles = set(FLAT_ROLE_CONFIG.keys()) if use_flat_registry else set(ROLE_FILES.keys())
+    valid_roles = set(FLAT_ROLE_CONFIG.keys())
     if role not in valid_roles:
         raise ReagentAdditionError(f"Unsupported role '{role}'.")
 
@@ -208,9 +186,7 @@ def add_reagent_entry(
         default_family = heuristics.default_family_for_role(role) if allow_default_family else None
         if default_family:
             use_default = False
-            if use_flat_registry:
-                use_default = True
-            elif token_set and store.family_token_overlap(role, default_family, token_set):
+            if token_set and taxonomy.family_token_overlap(role, default_family, token_set):
                 use_default = True
             if use_default:
                 family_id = default_family
@@ -226,20 +202,17 @@ def add_reagent_entry(
             "Unable to determine family. Provide it explicitly or enable default fallback."
         )
 
-    if hasattr(store, 'suggest_families'):
-        suggestions = store.suggest_families(role, token_set, limit=5)
-        if suggestions:
-            family_candidates = suggestions
-    if use_flat_registry:
-        family_entry = store.family_entry(role, family_id)
-        if not family_entry:
-            raise ReagentAdditionError(f"Family '{family_id}' not found for role '{role}'.")
-        numeric_features = None
-    else:
-        family_entry = store.family_data(role, family_id)
-        numeric_features = store.numeric_baseline(role, family_id)
+    suggestions = taxonomy.suggest_families(role, token_set, limit=5)
+    if suggestions:
+        family_candidates = suggestions
 
-    existing = store.find_by_cas(normalized_cas)
+    family_entry = registry.family_entry(role, family_id)
+    if not family_entry:
+        family_entry = taxonomy.family_data(role, family_id)
+    if not family_entry:
+        raise ReagentAdditionError(f"Family '{family_id}' not found for role '{role}'.")
+
+    existing = registry.find_by_cas(normalized_cas)
     if existing:
         existing_role, existing_family, data = existing
         result = {
@@ -248,11 +221,9 @@ def add_reagent_entry(
             "name": data.get("name"),
             "role": existing_role,
             "family_id": existing_family,
-            "registry_type": store_kind,
-            "registry_file": str(store.file_for_role(existing_role)),
+            "registry_type": "flat",
+            "registry_file": str(registry.file_for_role(existing_role)),
         }
-        if not use_flat_registry:
-            result["taxonomy_file"] = result["registry_file"]
         if family_tokens:
             result["family_tokens"] = family_tokens
         if role_reason:
@@ -260,50 +231,36 @@ def add_reagent_entry(
         return result
 
     final_smiles = smiles or resolved_smiles
-    if use_flat_registry:
-        role_payload = store.build_role_payload(role, family_id)
-        abbreviations = infer_abbreviations(final_name, combined_synonyms)
-        aliases = build_aliases(final_name, normalized_cas, abbreviations, combined_synonyms)
-        inchi_key = resolved_identity.get("inchi_key") if resolved_identity else None
-        entry_id = inchi_key or f"cas-{normalized_cas}"
-        entry = build_registry_entry(
-            entry_id=entry_id,
-            name=final_name,
-            abbreviations=abbreviations,
-            aliases=aliases,
-            cas=normalized_cas,
-            smiles=final_smiles,
-            inchi_key=inchi_key,
-            role=role,
-            role_payload=role_payload,
-            family_entry=family_entry,
-            synonyms=list(combined_synonyms),
-        )
-    else:
-        entry = build_entry(
-            role=role,
-            family=family_entry,
-            cas=normalized_cas,
-            name=final_name,
-            abbr=abbr,
-            synonyms=list(combined_synonyms),
-            smiles=final_smiles,
-            numeric_features=numeric_features,
-        )
+    role_payload = registry.build_role_payload(role, family_id)
+    abbreviations = infer_abbreviations(final_name, combined_synonyms)
+    aliases = build_aliases(final_name, normalized_cas, abbreviations, combined_synonyms)
+    inchi_key = resolved_identity.get("inchi_key") if resolved_identity else None
+    entry_id = inchi_key or f"cas-{normalized_cas}"
+    entry = build_registry_entry(
+        entry_id=entry_id,
+        name=final_name,
+        abbreviations=abbreviations,
+        aliases=aliases,
+        cas=normalized_cas,
+        smiles=final_smiles,
+        inchi_key=inchi_key,
+        role=role,
+        role_payload=role_payload,
+        family_entry=family_entry,
+        synonyms=list(combined_synonyms),
+    )
 
     result: Dict[str, Any] = {
         "cas": normalized_cas,
         "name": final_name,
         "role": role,
         "family_id": family_id,
-        "registry_type": store_kind,
-        "registry_file": str(store.file_for_role(role)),
+        "registry_type": "flat",
+        "registry_file": str(registry.file_for_role(role)),
         "dry_run": dry_run,
         "used_default_family": used_default,
         "entry_preview": entry,
     }
-    if not use_flat_registry:
-        result["taxonomy_file"] = result["registry_file"]
     if family_candidates:
         result["family_candidates"] = family_candidates
     if auto_resolve_source:
@@ -321,11 +278,8 @@ def add_reagent_entry(
         result["status"] = "dry_run"
         return result
 
-    if use_flat_registry:
-        store.add_entry(role, entry)
-    else:
-        store.add_entry(role, family_id, entry)
-    path = store.save_role(role)
+    registry.add_entry(role, entry)
+    path = registry.save_role(role)
     result["status"] = "written"
     result["written_to"] = str(path)
     return result
@@ -336,13 +290,13 @@ def list_available_families(taxonomy_dir: Optional[Path | str] = None) -> List[D
     Return metadata for all known families.
 
     Args:
-        taxonomy_dir: Optional path to taxonomy directory.
+        taxonomy_dir: Optional path to reagent taxonomy v2 directory.
 
     Returns:
         List of dictionaries describing families (role, id, label).
     """
     taxonomy_path = Path(taxonomy_dir).expanduser() if taxonomy_dir else None
-    store, _ = _load_store(taxonomy_path)
+    store = _load_taxonomy(taxonomy_path)
     try:
         families = store.list_families()
         if families and isinstance(families[0], tuple):

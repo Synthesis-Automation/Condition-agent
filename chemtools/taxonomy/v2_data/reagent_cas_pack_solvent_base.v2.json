@@ -1,0 +1,940 @@
+[
+  {
+    "cas": "106-42-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "107-06-2",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "halogenated_aliphatics"
+    ]
+  },
+  {
+    "cas": "107-21-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "glycol_ethers_polyols"
+    ]
+  },
+  {
+    "cas": "1076-43-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "deuterated"
+    ]
+  },
+  {
+    "cas": "108-10-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ketones"
+    ]
+  },
+  {
+    "cas": "108-20-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_acyclic"
+    ]
+  },
+  {
+    "cas": "108-21-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "esters_anhydrides"
+    ]
+  },
+  {
+    "cas": "108-24-7",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "esters_anhydrides"
+    ]
+  },
+  {
+    "cas": "108-38-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "108-48-5",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "aromatic_tertiary_amines"
+    ]
+  },
+  {
+    "cas": "108-67-8",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "108-88-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "108-90-7",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "halogenated_aromatics"
+    ]
+  },
+  {
+    "cas": "108-94-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ketones"
+    ]
+  },
+  {
+    "cas": "109-02-4",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "aromatic_tertiary_amines"
+    ]
+  },
+  {
+    "cas": "109-66-0",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aliphatic_linear"
+    ]
+  },
+  {
+    "cas": "109-72-8",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "organolithiums"
+    ]
+  },
+  {
+    "cas": "109-86-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "glycol_ethers_polyols"
+    ]
+  },
+  {
+    "cas": "109-99-9",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_cyclic_glymes"
+    ]
+  },
+  {
+    "cas": "110-54-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aliphatic_linear"
+    ]
+  },
+  {
+    "cas": "110-71-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_cyclic_glymes"
+    ]
+  },
+  {
+    "cas": "110-80-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "glycol_ethers_polyols"
+    ]
+  },
+  {
+    "cas": "110-82-7",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_cycloaliphatic"
+    ]
+  },
+  {
+    "cas": "110-86-1",
+    "roles": [
+      "base",
+      "solvent"
+    ],
+    "family_ids": [
+      "amines_tertiary",
+      "aromatic_tertiary_amines"
+    ]
+  },
+  {
+    "cas": "110-89-4",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "secondary_amines_cyclic"
+    ]
+  },
+  {
+    "cas": "111-46-6",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "glycol_ethers_polyols"
+    ]
+  },
+  {
+    "cas": "1122-58-3",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "nucleophilic_catalyst_bases"
+    ]
+  },
+  {
+    "cas": "121-44-8",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "amines_tertiary"
+    ]
+  },
+  {
+    "cas": "123-86-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "esters_anhydrides"
+    ]
+  },
+  {
+    "cas": "123-91-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "glycol_ethers_polyols"
+    ]
+  },
+  {
+    "cas": "124-41-4",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "alkoxides_primary"
+    ]
+  },
+  {
+    "cas": "127-08-2",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_carboxylates"
+    ]
+  },
+  {
+    "cas": "127-09-3",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_carboxylates"
+    ]
+  },
+  {
+    "cas": "127-18-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "halogenated_aliphatics"
+    ]
+  },
+  {
+    "cas": "127-19-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "amides_dipolar_aprotic"
+    ]
+  },
+  {
+    "cas": "1310-58-3",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydroxides"
+    ]
+  },
+  {
+    "cas": "1310-65-2",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydroxides"
+    ]
+  },
+  {
+    "cas": "1310-66-3",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydroxides"
+    ]
+  },
+  {
+    "cas": "1310-73-2",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydroxides"
+    ]
+  },
+  {
+    "cas": "1330-20-7",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "1336-21-6",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "ammonia_aqueous"
+    ]
+  },
+  {
+    "cas": "141-78-6",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "esters_anhydrides"
+    ]
+  },
+  {
+    "cas": "142-82-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aliphatic_linear"
+    ]
+  },
+  {
+    "cas": "142-96-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_acyclic"
+    ]
+  },
+  {
+    "cas": "144-55-8",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_carbonates_bicarbonate"
+    ]
+  },
+  {
+    "cas": "15519-28-5",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "1634-04-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_acyclic"
+    ]
+  },
+  {
+    "cas": "17194-00-2",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydroxides"
+    ]
+  },
+  {
+    "cas": "1907-33-1",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "25322-68-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "glycol_ethers_polyols"
+    ]
+  },
+  {
+    "cas": "280-57-9",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "29166-72-1",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "298-14-6",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "3001-72-7",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "amidine_guanidine_bases"
+    ]
+  },
+  {
+    "cas": "35103-79-8",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "4039-32-1",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "metal_amides_silylamides"
+    ]
+  },
+  {
+    "cas": "471-34-1",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "497-19-8",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_carbonates_bicarbonate"
+    ]
+  },
+  {
+    "cas": "516-12-1",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "534-17-8",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_carbonates_bicarbonate"
+    ]
+  },
+  {
+    "cas": "546-89-4",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_carboxylates"
+    ]
+  },
+  {
+    "cas": "56-23-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "halogenated_aliphatics"
+    ]
+  },
+  {
+    "cas": "5614-37-9",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_cyclic_glymes"
+    ]
+  },
+  {
+    "cas": "584-08-7",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_carbonates_bicarbonate"
+    ]
+  },
+  {
+    "cas": "60-29-7",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_acyclic"
+    ]
+  },
+  {
+    "cas": "64-17-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_primary"
+    ]
+  },
+  {
+    "cas": "64-19-7",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "carboxylic_acids"
+    ]
+  },
+  {
+    "cas": "6674-22-2",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "amidine_guanidine_bases"
+    ]
+  },
+  {
+    "cas": "67-56-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_primary"
+    ]
+  },
+  {
+    "cas": "67-63-0",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_secondary"
+    ]
+  },
+  {
+    "cas": "67-64-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ketones"
+    ]
+  },
+  {
+    "cas": "67-66-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "halogenated_aliphatics"
+    ]
+  },
+  {
+    "cas": "67-68-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "sulfoxides_dipolar_aprotic"
+    ]
+  },
+  {
+    "cas": "68-12-2",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "amides_dipolar_aprotic"
+    ]
+  },
+  {
+    "cas": "7087-68-5",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "71-23-8",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_primary"
+    ]
+  },
+  {
+    "cas": "71-36-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_primary"
+    ]
+  },
+  {
+    "cas": "71-43-2",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "75-05-8",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "nitriles"
+    ]
+  },
+  {
+    "cas": "75-09-2",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "halogenated_aliphatics"
+    ]
+  },
+  {
+    "cas": "75-50-3",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydroxides"
+    ]
+  },
+  {
+    "cas": "75-52-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "nitro_solvents"
+    ]
+  },
+  {
+    "cas": "75-65-0",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_tertiary"
+    ]
+  },
+  {
+    "cas": "75-85-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_tertiary"
+    ]
+  },
+  {
+    "cas": "75-89-8",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "fluorinated_alcohols"
+    ]
+  },
+  {
+    "cas": "7558-80-7",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydroxides"
+    ]
+  },
+  {
+    "cas": "76-05-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "carboxylic_acids"
+    ]
+  },
+  {
+    "cas": "7646-69-7",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "hydrides"
+    ]
+  },
+  {
+    "cas": "7732-18-5",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "water"
+    ]
+  },
+  {
+    "cas": "7778-53-2",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "inorg_phosphates"
+    ]
+  },
+  {
+    "cas": "78-83-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_primary"
+    ]
+  },
+  {
+    "cas": "78-92-2",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "alcohols_secondary"
+    ]
+  },
+  {
+    "cas": "78-93-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ketones"
+    ]
+  },
+  {
+    "cas": "79-09-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "carboxylic_acids"
+    ]
+  },
+  {
+    "cas": "80-70-6",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "tertiary_amines_aliphatic"
+    ]
+  },
+  {
+    "cas": "865-47-4",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "alkoxides_hindered"
+    ]
+  },
+  {
+    "cas": "865-48-5",
+    "roles": [
+      "base"
+    ],
+    "family_ids": [
+      "alkoxides_hindered"
+    ]
+  },
+  {
+    "cas": "872-50-4",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "amides_dipolar_aprotic"
+    ]
+  },
+  {
+    "cas": "920-66-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "fluorinated_alcohols"
+    ]
+  },
+  {
+    "cas": "95-47-6",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "95-50-1",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "halogenated_aromatics"
+    ]
+  },
+  {
+    "cas": "96-47-9",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "ethers_cyclic_glymes"
+    ]
+  },
+  {
+    "cas": "98-08-8",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "hydrocarbons_aromatic"
+    ]
+  },
+  {
+    "cas": "98-95-3",
+    "roles": [
+      "solvent"
+    ],
+    "family_ids": [
+      "nitro_solvents"
+    ]
+  }
+]

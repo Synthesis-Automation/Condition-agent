@@ -35,7 +35,7 @@ def main() -> int:
         "--root",
         type=Path,
         default=None,
-        help="Directory containing taxonomy JSON files (defaults to chemtools/taxonomy/data).",
+        help="Directory containing taxonomy JSON files (defaults to chemtools/taxonomy/archive/data).",
     )
     parser.add_argument(
         "--reset-cache",

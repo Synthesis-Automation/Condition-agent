@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 
-REACTION_TYPES_FILE = Path(__file__).resolve().parent / "reaction_types.v3.3.json"
+REACTION_TYPES_FILE = Path(__file__).resolve().parent / "v2_data" / "reaction_types.v3.3.json"
 _DEFAULT_SLOTS = ("electrophiles", "nucleophiles", "acids", "activators")
 
 

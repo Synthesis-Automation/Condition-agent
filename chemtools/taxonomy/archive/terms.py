@@ -4,7 +4,7 @@ Chemistry term evaluation.
 This module adds a maintainable layer for "fuzzy" organic chemistry language
 such as "electron-poor aldehyde" or "sterically bulky carbonyl".
 
-Terms are stored in `chemtools/taxonomy/data/chem_terms.json` and expressed as
+Terms are stored in `chemtools/taxonomy/archive/data/chem_terms.json` and expressed as
 boolean rules over existing feature tokens (primarily from
 `calculable_features.json`).
 """
@@ -74,4 +74,3 @@ def evaluate_terms_from_smiles(
 
     features = calculable.detect_all_features(smiles)
     return evaluate_terms(features, term_ids=term_ids)
-

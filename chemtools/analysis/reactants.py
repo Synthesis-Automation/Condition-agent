@@ -23,12 +23,12 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from ..featurizers import calculable as _calculable
 
-from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
+from ..taxonomy import reaction_catalog as _reaction_catalog
 from ..util import rdkit_helpers
 from ..util.smarts_cache import compile_smarts
 from ._registry import clear_registry_cache, get_registry
 
-TAXONOMY_DATA_DIR = Path(__file__).resolve().parent.parent / "taxonomy" / "data"
+TAXONOMY_DATA_DIR = Path(__file__).resolve().parent.parent / "taxonomy" / "archive" / "data"
 REACTANT_TYPES_FILE = TAXONOMY_DATA_DIR / "reactant_types.json"
 REACTION_TYPES_FILE = _reaction_catalog.REACTION_TYPES_FILE
 

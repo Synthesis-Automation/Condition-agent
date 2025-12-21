@@ -1,0 +1,73 @@
+[
+  {
+    "id": "ligand",
+    "name": "Ligand",
+    "priority": 0,
+    "default_family_id": "trialkyl_triaryl_phosphines"
+  },
+  {
+    "id": "metal_catalyst",
+    "name": "Metal Catalyst",
+    "priority": 1,
+    "description": "Unified role covering precursor salts and pre-formed catalyst complexes.",
+    "default_family_id": "pd_ii_salts"
+  },
+  {
+    "id": "base",
+    "name": "Base",
+    "priority": 2,
+    "default_family_id": "tertiary_amines_aliphatic"
+  },
+  {
+    "id": "acid",
+    "name": "Acid",
+    "priority": 3,
+    "default_family_id": "mineral_acids"
+  },
+  {
+    "id": "condensation_agent",
+    "name": "Condensation Agent",
+    "priority": 4,
+    "default_family_id": "carbodiimides"
+  },
+  {
+    "id": "oxidant",
+    "name": "Oxidant",
+    "priority": 5,
+    "default_family_id": "o2_gas"
+  },
+  {
+    "id": "reductant",
+    "name": "Reductant",
+    "priority": 6,
+    "default_family_id": "metal_powders"
+  },
+  {
+    "id": "additive",
+    "name": "Additive",
+    "priority": 7,
+    "default_family_id": "quaternary_ammonium_ptc"
+  },
+  {
+    "id": "solvent",
+    "name": "Solvent",
+    "priority": 8,
+    "default_family_id": "hydrocarbons_aromatic"
+  },
+  {
+    "id": "other_reagent",
+    "name": "Other Reagent",
+    "priority": 9,
+    "default_family_id": "misc_general"
+  },
+  {
+    "id": "enzyme",
+    "name": "Enzyme",
+    "priority": 100
+  },
+  {
+    "id": "organo_catalyst",
+    "name": "Organo Catalyst",
+    "priority": 100
+  }
+]

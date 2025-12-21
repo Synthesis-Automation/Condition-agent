@@ -16,12 +16,12 @@ import json
 import sys
 from pathlib import Path
 
-from .constants import ROLE_FILES
 from .registry_addition import (
     ReagentAdditionError,
     add_reagent_entry,
     list_available_families,
 )
+from .taxonomy_utils import DEFAULT_RESOLVER_TIMEOUT
 
 # Ensure UTF-8 encoding for output
 for _stream in ("stdout", "stderr"):
@@ -64,17 +64,13 @@ Examples:
         default=[],
         help="Additional synonym (repeatable)."
     )
-    parser.add_argument(
-        "--role",
-        choices=sorted(ROLE_FILES.keys()),
-        help="Override detected role."
-    )
+    parser.add_argument("--role", help="Override detected role.")
     parser.add_argument("--family", help="Explicit family identifier to use.")
     parser.add_argument("--smiles", help="Optional SMILES string to store with the entry.")
     parser.add_argument(
         "--taxonomy-dir",
-        default="data/compound_taxonomy",
-        help="Path to taxonomy directory."
+        default=None,
+        help="Path to reagent taxonomy v2 directory (defaults to packaged v2 data)."
     )
     parser.add_argument(
         "--dry-run",
@@ -113,7 +109,7 @@ Examples:
 def main() -> None:
     """Main CLI entry point."""
     args = parse_args()
-    taxonomy_path = Path(args.taxonomy_dir).expanduser()
+    taxonomy_path = Path(args.taxonomy_dir).expanduser() if args.taxonomy_dir else None
 
     if args.list_families:
         families = list_available_families(taxonomy_path)

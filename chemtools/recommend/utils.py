@@ -10,8 +10,8 @@ from functools import lru_cache
 from typing import Dict, Any, List, Tuple, Optional
 
 from .. import constraints
-from ..taxonomy import load_registry
-from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
+from ..taxonomy.archive import load_registry
+from ..taxonomy import reaction_catalog as _reaction_catalog
 
 
 # Family name normalization

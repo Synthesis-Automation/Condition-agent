@@ -149,7 +149,7 @@ def main() -> int:
     if args.input is not None:
         payload = json.loads(args.input.resolve().read_text(encoding="utf-8"))
     else:
-        from chemtools.taxonomy.calculable_spec import load_calculable_feature_spec
+        from chemtools.taxonomy.archive.calculable_spec import load_calculable_feature_spec
 
         payload = load_calculable_feature_spec(root)
     foundation_spec, properties_spec, derived_spec = split_spec(payload)

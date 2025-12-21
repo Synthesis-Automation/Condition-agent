@@ -1,6 +1,6 @@
 import pytest
 
-from chemtools.taxonomy.v2.analyze import analyze_smiles
+from chemtools.taxonomy.analyze import analyze_smiles
 from chemtools.util.rdkit_helpers import rdkit_available
 
 

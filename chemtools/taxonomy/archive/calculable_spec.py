@@ -2,7 +2,7 @@
 Layered loader for the calculable feature specification.
 
 The feature system is intentionally split into layers (see
-`chemtools/taxonomy/data/new_system.md`):
+`chemtools/taxonomy/archive/data/new_system.md`):
   - `calculable_features.json` (foundation): atomic SMARTS/count detectors
   - `calculable_features_properties.json`: heuristic/descriptor features
   - `calculable_features_derived.json`: boolean composition + derived_shortcuts
@@ -53,7 +53,7 @@ def load_calculable_feature_spec(root: Optional[Path] = None) -> Dict[str, Any]:
 
     Args:
         root: Optional path to a taxonomy data directory containing the layered
-              JSON files. Defaults to `chemtools/taxonomy/data`.
+              JSON files. Defaults to `chemtools/taxonomy/archive/data`.
 
     Returns:
         A merged spec dict with keys: version, description, schema_notes,
@@ -95,4 +95,3 @@ def load_calculable_feature_spec(root: Optional[Path] = None) -> Dict[str, Any]:
 
 
 __all__ = ["load_calculable_feature_spec"]
-

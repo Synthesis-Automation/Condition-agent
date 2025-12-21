@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 from typing import Optional, Dict, Set
 
-from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
+from ..taxonomy import reaction_catalog as _reaction_catalog
 
 FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     # C-N Coupling reactions (legacy -> v2)

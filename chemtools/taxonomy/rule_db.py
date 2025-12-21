@@ -13,7 +13,7 @@ from pathlib import Path
 import re
 from typing import Any, Iterable, List, Optional
 
-from .v2 import reaction_catalog
+from . import reaction_catalog
 from ..analysis.reactions import canonical_family_label
 
 

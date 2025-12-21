@@ -980,7 +980,7 @@ class ChemAssistantWindow(QMainWindow):
 
     def _handle_taxonomy_command(self) -> None:
         try:
-            from chemtools.taxonomy import load_registry
+            from chemtools.taxonomy.archive import load_registry
 
             registry = load_registry()
             term_count = len(list(registry.iter_chem_terms()))
@@ -1009,8 +1009,8 @@ class ChemAssistantWindow(QMainWindow):
             smiles = " ".join(args).strip()
 
         try:
-            from chemtools.taxonomy import load_registry
-            from chemtools.taxonomy.terms import evaluate_terms_from_smiles
+            from chemtools.taxonomy.archive import load_registry
+            from chemtools.taxonomy.archive.terms import evaluate_terms_from_smiles
 
             registry = load_registry()
             results = evaluate_terms_from_smiles(smiles, term_ids=term_ids)

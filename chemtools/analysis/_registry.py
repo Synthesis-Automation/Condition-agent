@@ -10,8 +10,8 @@ registry instance without introducing circular imports.
 
 from typing import Optional
 
-from ..taxonomy import load_registry
-from ..taxonomy.registry import TaxonomyRegistry
+from ..taxonomy.archive import load_registry
+from ..taxonomy.archive.registry import TaxonomyRegistry
 
 _REGISTRY_CACHE: Optional[TaxonomyRegistry] = None
 _REGISTRY_LOAD_FAILED = False
@@ -40,4 +40,3 @@ def clear_registry_cache() -> None:
 
 
 __all__ = ["get_registry", "clear_registry_cache"]
-

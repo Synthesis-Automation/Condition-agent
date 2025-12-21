@@ -8,38 +8,9 @@ must use these functions to ensure taxonomy alignment.
 
 from typing import Optional, Set, Dict
 import re
-import warnings
 
-from .taxonomy import load_registry
-from .taxonomy.registry import TaxonomyRegistry
+from .taxonomy import reaction_catalog
 from .analysis.reactions import canonical_family_label
-
-
-_registry_cache: Optional[TaxonomyRegistry] = None
-_registry_load_attempted = False
-
-
-def get_taxonomy_registry() -> Optional[TaxonomyRegistry]:
-    """
-    Get cached taxonomy registry.
-    
-    Returns None if taxonomy cannot be loaded (allows graceful degradation).
-    """
-    global _registry_cache, _registry_load_attempted
-    if not _registry_load_attempted:
-        _registry_load_attempted = True
-        try:
-            _registry_cache = load_registry()
-        except Exception as e:
-            # Taxonomy validation errors should not break detection
-            # Fall back to FAMILY_ALIAS_OVERRIDES in canonical_family_label
-            warnings.warn(
-                f"Failed to load taxonomy registry: {e}\n"
-                "Detection will use fallback hardcoded mappings.",
-                UserWarning,
-                stacklevel=2
-            )
-    return _registry_cache
 
 
 def resolve_to_taxonomy(
@@ -56,7 +27,7 @@ def resolve_to_taxonomy(
     detection results to taxonomy IDs. It provides robust mapping
     with three-layer strategy:
     
-    1. Exact alias resolution via TaxonomyRegistry
+    1. Exact alias resolution via reaction catalog aliases
     2. Keyword pattern matching for common variations
     3. Context-aware inference using catalysts + functional groups
     
@@ -95,61 +66,62 @@ def resolve_to_taxonomy(
     if canonical:
         return canonical
     
-    # If taxonomy unavailable, use fallback hardcoded mapping
-    registry = get_taxonomy_registry()
-    if not registry:
-        # Fallback to basic mapping when taxonomy is unavailable
-        fallback_map = {
-            "suzuki_miyaura": "suzuki_miyaura",
-            "suzuki": "suzuki_miyaura",
-            "negishi": "negishi",
-            "sonogashira": "sonogashira",
-            "heck": "heck",
-            "stille": "stille",
-            "kumada": "kumada",
-            "cn_coupling": "cn_coupling",
-            "buchwald_hartwig_c_n": "buchwald_hartwig_c_n",
-            "ullmann_cn": "ullmann_cn",
-            "chan_lam": "chan_lam",
-            "co_coupling": "co_coupling",
-            "ullmann_ether": "ullmann_ether",
-            "cs_coupling": "cs_coupling",
-            "amide_coupling": "amide_coupling",
-            "amide_formation": "amide_formation",
-            "snar": "snar",
-            "s_nar": "snar",
-            "aromatic_nucleophilic_substitution": "snar",
-            "reductive_amination": "reductive_amination",
-            "esterification": "esterification",
-            "ester_formation": "ester_formation",
-            "sn2_alkylation": "sn2_substitution",
-            "sn2": "sn2_substitution",
-            "grignard_addition": "grignard_addition",
-            "organozinc_addition": "organozinc_addition",
-            "organolithium_addition": "organolithium_addition",
-            "hydrogenation": "hydrogenation",
-            "carbonyl_reduction": "carbonyl_reduction",
-            "alcohol_oxidation": "alcohol_oxidation",
-            "epoxidation": "epoxidation",
-            "e2_elimination": "e2_elimination",
-            "williamson_ether": "williamson_ether",
-            "finkelstein": "finkelstein",
-            "nitrile_formation": "nitrile_formation",
-            "hydroboration": "hydroboration",
-            "diels_alder": "diels_alder",
-            "michael_addition": "michael_addition",
-            "claisen_condensation": "claisen_condensation",
-            "aldol_condensation": "aldol_condensation",
-            "wittig": "wittig",
-            "radical_halogenation": "radical_halogenation",
-            "radical_chain": "radical_chain",
-        }
-        if raw_prediction.lower() in fallback_map:
-            return fallback_map[raw_prediction.lower()]
-        # Try without underscores
-        cleaned = raw_prediction.lower().replace("-", "_").replace(" ", "_")
-        if cleaned in fallback_map:
-            return fallback_map[cleaned]
+    # Fallback to basic mapping when alias resolution fails
+    fallback_map = {
+        "suzuki_miyaura": "suzuki_miyaura",
+        "suzuki": "suzuki_miyaura",
+        "negishi": "negishi",
+        "sonogashira": "sonogashira",
+        "heck": "heck",
+        "stille": "stille",
+        "kumada": "kumada",
+        "cn_coupling": "cn_coupling",
+        "buchwald_hartwig_c_n": "buchwald_hartwig_c_n",
+        "ullmann_cn": "ullmann_cn",
+        "chan_lam": "chan_lam",
+        "co_coupling": "co_coupling",
+        "ullmann_ether": "ullmann_ether",
+        "cs_coupling": "cs_coupling",
+        "amide_coupling": "amide_coupling",
+        "amide_formation": "amide_formation",
+        "snar": "snar",
+        "s_nar": "snar",
+        "aromatic_nucleophilic_substitution": "snar",
+        "reductive_amination": "reductive_amination",
+        "esterification": "esterification",
+        "ester_formation": "esterification",
+        "sn2_alkylation": "sn2_substitution",
+        "sn2": "sn2_substitution",
+        "grignard_addition": "grignard_addition",
+        "organozinc_addition": "organozinc_addition",
+        "organolithium_addition": "organolithium_addition",
+        "hydrogenation": "hydrogenation",
+        "carbonyl_reduction": "carbonyl_reduction",
+        "alcohol_oxidation": "alcohol_oxidation",
+        "epoxidation": "epoxidation",
+        "e2_elimination": "e2_elimination",
+        "williamson_ether": "williamson_ether",
+        "finkelstein": "finkelstein",
+        "nitrile_formation": "nitrile_formation",
+        "hydroboration": "hydroboration",
+        "diels_alder": "diels_alder",
+        "michael_addition": "michael_addition",
+        "claisen_condensation": "claisen_condensation",
+        "aldol_condensation": "aldol_condensation",
+        "wittig": "wittig",
+        "radical_halogenation": "radical_halogenation",
+        "radical_chain": "radical_chain",
+    }
+    if raw_prediction.lower() in fallback_map:
+        candidate = fallback_map[raw_prediction.lower()]
+        if reaction_catalog.get_reaction_type(candidate):
+            return candidate
+    # Try without underscores
+    cleaned = raw_prediction.lower().replace("-", "_").replace(" ", "_")
+    if cleaned in fallback_map:
+        candidate = fallback_map[cleaned]
+        if reaction_catalog.get_reaction_type(candidate):
+            return candidate
     
     # Layer 2: Try case-insensitive and slug variations
     lower_pred = raw_prediction.lower()
@@ -197,12 +169,7 @@ def resolve_to_taxonomy(
     
     for keyword, family_id in keyword_map.items():
         if keyword in lower_pred:
-            # Verify it exists in taxonomy (if available)
-            registry = get_taxonomy_registry()
-            if registry and registry.get_reaction_type(family_id):
-                return family_id
-            elif not registry:
-                # Taxonomy unavailable, trust the mapping
+            if reaction_catalog.get_reaction_type(family_id):
                 return family_id
     
     # Layer 4: Context-aware inference for ambiguous predictions
