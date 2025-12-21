@@ -9,6 +9,20 @@ def _family_text(family: str) -> str:
     """Map API family tokens to canonical family names (new naming convention)."""
     f = (family or "").strip()
     fl = f.lower()
+
+    # Taxonomy v2 identifiers
+    if fl == "c_n_cross_coupling":
+        return "C_N_Coupling"
+    if fl == "suzuki_miyaura":
+        return "Suzuki"
+    if fl == "sonogashira":
+        return "Sonogashira_coupling"
+    if fl == "heck":
+        return "HeckMizoroki_coupling"
+    if fl == "snar_cn":
+        return "SNAr-CN"
+    if fl == "amide_coupling":
+        return "Amide_formation"
     
     # New systematic naming
     if fl in {"c_n_coupling_cu", "c_n_coupling_cu_ullmann"}:

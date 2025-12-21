@@ -57,6 +57,7 @@ _FAMILY_TO_HTE_TYPE = {
     "buchwald_hartwig": "C_N_Coupling",
     "ullmann": "C_N_Coupling",
     "ullmann_cn": "C_N_Coupling",
+    "c_n_cross_coupling": "C_N_Coupling",
     "sonogashira": "Sonogashira",
     "sonogashira_coupling": "Sonogashira",
     "suzuki": "Suzuki",
@@ -66,6 +67,7 @@ _FAMILY_TO_HTE_TYPE = {
     "amidation": "amide_formation",
     "snar": "SNAr",
     "s_nar": "SNAr",
+    "snar_cn": "SNAr",
     "aromatic_nucleophilic_substitution": "SNAr",
     "c_o_coupling": "CO-Coupling",
     "co_coupling": "CO-Coupling",
@@ -202,12 +204,6 @@ def detect_family(reaction: ReactionInput) -> DetectedFamily:
     try:
         result = detect_reaction(rxn, use_ml=False)
         family = result.get("family")
-        catalysts = (result.get("details") or {}).get("catalysts") or []
-
-        # Planner-facing behavior: if no catalyst evidence exists, avoid over-specific
-        # Pd/Cu subclassing for C-N couplings and fall back to the generic family.
-        if not catalysts and family in {"buchwald_hartwig_c_n", "ullmann_cn"}:
-            family = "cn_coupling"
         return DetectedFamily(
             family=family,
             confidence=result.get("confidence"),

@@ -81,7 +81,7 @@ def list_reaction_types() -> None:
             'organolithium_addition', 'reformatsky', 'cc_coupling'
         ],
         'C-N Coupling': [
-            'buchwald_hartwig_c_n', 'chan_lam', 'ullmann_cn', 'cn_coupling',
+            'c_n_cross_coupling', 'snar_cn', 'sn2_substitution',
             'reductive_amination', 'cyanation'
         ],
         'C-O Coupling': [
@@ -168,7 +168,7 @@ def get_reaction_type_choice() -> tuple[Optional[str], bool]:
         return None, False  # Auto-detect rule-based only
     
     elif choice == '3':
-        reaction_type = input("Enter reaction type (e.g., suzuki_miyaura, buchwald_hartwig_c_n): ").strip()
+        reaction_type = input("Enter reaction type (e.g., suzuki_miyaura, c_n_cross_coupling): ").strip()
         if reaction_type:
             return reaction_type, True
         return None, True
@@ -267,14 +267,14 @@ def _display_reactant_classification(family: str, details: dict) -> None:
     # Map internal family names to taxonomy reaction IDs
     reaction_id_map = {
         'suzuki_miyaura': 'Suzuki-Miyaura',
-        'buchwald_hartwig_c_n': 'Buchwald-Hartwig-C-N',
-        'ullmann_cn': 'Ullmann-CN',
+        'c_n_cross_coupling': 'C-N Cross-Coupling',
         'ullmann_co': 'Ullmann-CO',
         'sonogashira': 'Sonogashira',
         'negishi': 'Negishi',
         'heck': 'Heck',
         'stille': 'Stille',
-        'cn_coupling': 'Buchwald-Hartwig-C-N',  # Generic C-N coupling
+        'snar_cn': 'SNAr Amination',
+        'sn2_substitution': 'SN2 Substitution',
         'co_coupling': 'Ullmann-CO',  # Generic C-O coupling
         'aldol_condensation': 'Aldol',
         'wittig': 'Wittig',
@@ -726,7 +726,7 @@ def show_examples() -> None:
         
         ("Buchwald-Hartwig C-N",
          "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
-         "buchwald_hartwig_c_n"),
+         "c_n_cross_coupling"),
         
         ("Sonogashira",
          "Brc1ccccc1.C#Cc1ccccc1>>C(#Cc1ccccc1)c1ccccc1",

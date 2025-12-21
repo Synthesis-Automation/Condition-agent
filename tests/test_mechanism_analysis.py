@@ -79,8 +79,8 @@ def test_analyze_mechanism_tool_returns_structured_payload(golden_reactions: lis
 
 
 def test_renderer_adds_context_and_warnings() -> None:
-    mechanism = classify_mechanism_simple("snar")
-    detection = {"family": "snar", "status": "conflict"}
+    mechanism = classify_mechanism_simple("snar_cn")
+    detection = {"family": "snar_cn", "status": "conflict"}
     bond_changes = {"broken_bonds": [], "formed_bonds": []}
     context = {"solvent": "DMF", "temperature_c": 90}
 
@@ -123,7 +123,7 @@ def test_predict_electron_flow_adds_notes() -> None:
 def test_predict_intermediates_includes_context_notes() -> None:
     entries = predict_intermediates(
         "oxidative_addition_reductive_elimination",
-        reaction_family="buchwald_hartwig_c_n",
+        reaction_family="c_n_cross_coupling",
         context={"catalyst": "Pd(PPh3)4"},
     )
     assert entries

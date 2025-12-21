@@ -416,9 +416,9 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
     Detect reaction type and map to both ML and rule-based naming conventions.
     
     Returns dict with:
-        - detected_family: str - The detected chemtools family (e.g., "Buchwald_CN", "Ullmann_CN")
-        - ml_family: str - ML API family name (e.g., "C_N_Coupling_Pd", "C_N_Coupling_Cu")
-        - rule_db_name: str - Rule database name (e.g., "C-N Coupling (Pd)", "C-N Coupling (Cu)")
+        - detected_family: str - v2 family id (e.g., "c_n_cross_coupling", "suzuki_miyaura")
+        - ml_family: str - ML API family name (e.g., "C_N_Coupling_Pd", "Suzuki_CC")
+        - rule_db_name: str - Rule database name (e.g., "C-N Coupling (Pd)", "Suzuki Coupling")
         - confidence: float - Detection confidence
         - method: str - Detection method used
         - success: bool - Whether detection succeeded
@@ -437,7 +437,7 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
             "message": f"Using user-specified type: {requested_type}",
         }
     
-    # Try ML-enhanced detection first (more accurate)
+    # Try detection first (slot evidence; ML support optional)
     if DETECTOR_AVAILABLE and detect_reaction:
         try:
             result = detect_reaction(reaction_smiles, use_ml=True)
@@ -446,22 +446,18 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
                 confidence = result.get("confidence", 0.8)
                 method = result.get("method", "unknown")
                 details = result.get("details", {})
-                
-                ml_pred = details.get("ml_prediction", {})
-                rxn_class = ml_pred.get("rxn_class") if ml_pred else None
-                rxn_name = ml_pred.get("rxn_name") if ml_pred else None
-                catalysts = details.get("catalysts", [])
+                slot_evidence = details.get("slot_evidence") or {}
+                matched_slots = details.get("matched_slots")
+                required_slots = details.get("required_slots")
 
                 # Map to ML and rule database names
                 ml_family = None
                 rule_db_name = None
 
                 family_display_map = {
-                    "buchwald_hartwig_c_n": ("C_N_Coupling_Pd", "C-N Coupling (Pd)", "Buchwald_CN (Pd-catalyzed)"),
-                    "ullmann_cn": ("C_N_Coupling_Cu", "C-N Coupling (Cu)", "Ullmann_CN (Cu-catalyzed)"),
-                    "cn_coupling": ("C_N_Coupling", "C-N Coupling (General)", "C_N_Coupling"),
-                    "suzuki_miyaura": ("Suzuki_CC", "Suzuki Coupling", "Suzuki_CC"),
-                    "amide_coupling": ("Amide_Coupling", "Amide Formation", "Amide_Coupling"),
+                    "c_n_cross_coupling": ("C_N_Coupling_Pd", "C-N Coupling (Pd)", "C–N Cross-Coupling"),
+                    "suzuki_miyaura": ("Suzuki_CC", "Suzuki Coupling", "Suzuki–Miyaura Coupling"),
+                    "amide_coupling": ("Amide_Coupling", "Amide Formation", "Amide Formation"),
                 }
 
                 entry = family_display_map.get(detected_family)
@@ -472,12 +468,11 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
                     
                 # Build message
                 msg_parts = []
-                if rxn_class:
-                    msg_parts.append(f"Class: {rxn_class}")
-                if rxn_name:
-                    msg_parts.append(f"Name: {rxn_name}")
-                if catalysts:
-                    msg_parts.append(f"Catalysts: {', '.join(catalysts)}")
+                if isinstance(matched_slots, int) and isinstance(required_slots, int) and required_slots > 0:
+                    msg_parts.append(f"Slots: {matched_slots}/{required_slots}")
+                elif slot_evidence:
+                    slot_keys = ", ".join(sorted(slot_evidence.keys()))
+                    msg_parts.append(f"Slots: {slot_keys}")
                 
                 message = f"**Auto-detected ({method}):** {display_name}\n"
                 if msg_parts:
@@ -505,35 +500,15 @@ def detect_and_map_reaction_type(reaction_smiles: str, requested_type: str) -> D
         detected_family = result.get("family", "Unknown")
         confidence = result.get("confidence", 0.0)
         
-        # Map router family names to ML and rule DB names
+        # Map v2 family names to ML and rule DB names
         family_to_ml = {
-            "C_N_Coupling_Cu": "C_N_Coupling_Cu",
-            "C_N_Coupling_Pd": "C_N_Coupling_Pd",
-            "C_N_Coupling_Ni": "C_N_Coupling_Ni",
-            "Ullmann_CN": "C_N_Coupling_Cu",
-            "Buchwald_CN": "C_N_Coupling_Pd",
-            "Amide_Coupling": "Amide_Coupling",
-            "Suzuki_CC": "Suzuki_CC",
-            "Suzuki": "Suzuki_CC",
-            "cn_coupling": "C_N_Coupling",
-            "ullmann_cn": "C_N_Coupling_Cu",
-            "buchwald_hartwig_c_n": "C_N_Coupling_Pd",
+            "c_n_cross_coupling": "C_N_Coupling_Pd",
             "suzuki_miyaura": "Suzuki_CC",
             "amide_coupling": "Amide_Coupling",
         }
         
         family_to_db = {
-            "C_N_Coupling_Cu": "C-N Coupling (Cu)",
-            "C_N_Coupling_Pd": "C-N Coupling (Pd)",
-            "C_N_Coupling_Ni": "C-N Coupling (Ni)",
-            "Ullmann_CN": "C-N Coupling (Cu)",
-            "Buchwald_CN": "C-N Coupling (Pd)",
-            "Amide_Coupling": "Amide Formation",
-            "Suzuki_CC": "Suzuki Coupling",
-            "Suzuki": "Suzuki Coupling",
-            "cn_coupling": "C-N Coupling (General)",
-            "ullmann_cn": "C-N Coupling (Cu)",
-            "buchwald_hartwig_c_n": "C-N Coupling (Pd)",
+            "c_n_cross_coupling": "C-N Coupling (Pd)",
             "suzuki_miyaura": "Suzuki Coupling",
             "amide_coupling": "Amide Formation",
         }

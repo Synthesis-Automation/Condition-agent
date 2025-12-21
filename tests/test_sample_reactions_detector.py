@@ -53,19 +53,14 @@ def test_sample_reactions():
             elif 'Stille' in desc:
                 expected = 'stille'
             elif 'Buchwald' in desc or 'B-H' in desc:
-                expected = 'buchwald_hartwig_c_n'
+                expected = 'c_n_cross_coupling'
             elif 'C-N' in desc:
-                expected = 'cn_coupling'  # or buchwald/ullmann
+                expected = 'c_n_cross_coupling'
             
             # Check match
             is_correct = False
             if expected:
-                if expected == 'cn_coupling':
-                    is_correct = family in ('cn_coupling', 'buchwald_hartwig_c_n', 'ullmann_cn')
-                elif expected == 'buchwald_hartwig_c_n':
-                    is_correct = family in ('cn_coupling', 'buchwald_hartwig_c_n', 'ullmann_cn')
-                else:
-                    is_correct = (family == expected)
+                is_correct = (family == expected)
             
             status = '✓' if is_correct else ('?' if not expected else '✗')
             if is_correct:

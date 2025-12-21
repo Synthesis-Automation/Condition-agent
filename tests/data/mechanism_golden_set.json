@@ -2,7 +2,7 @@
   {
     "name": "Buchwald-Hartwig diphenylamine",
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
-    "expected_family": "cn_coupling",
+    "expected_family": "c_n_cross_coupling",
     "expected_mechanism": "oxidative_addition_reductive_elimination"
   },
   {
@@ -14,19 +14,19 @@
   {
     "name": "Amide formation (acetyl chloride + amine)",
     "reaction_smiles": "CC(=O)Cl.NCC>>CC(=O)NCC",
-    "expected_family": "amide_formation",
+    "expected_family": "amide_coupling",
     "expected_mechanism": "nucleophilic_acyl_substitution"
   },
   {
     "name": "SN2 alkylation (alkyl bromide + amine)",
     "reaction_smiles": "CBr.NCC>>CCNCC",
-    "expected_family": "sn2_alkylation",
+    "expected_family": "sn2_substitution",
     "expected_mechanism": "sn2"
   },
   {
     "name": "SNAr on dinitro aryl fluoride",
     "reaction_smiles": "[O-][N+](=O)c1ccc([N+](=O)[O-])cc1F.NH2C2H4OH>>[O-][N+](=O)c1ccc([N+](=O)[O-])cc1NCCO",
-    "expected_family": "snar",
+    "expected_family": "snar_cn",
     "expected_mechanism": "addition_elimination_aromatic"
   },
   {

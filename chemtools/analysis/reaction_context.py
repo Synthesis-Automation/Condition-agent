@@ -139,7 +139,7 @@ def classify_reactants_with_context(
         >>> result = classify_reactants_with_context(
         ...     "Brc1ccccc1.Nc1ccc(Br)cc1.[Pd]>>..."
         ... )
-        >>> result.reaction_type          # "buchwald_hartwig_c_n" (auto-detected)
+        >>> result.reaction_type          # "c_n_cross_coupling" (auto-detected)
         >>> result.reactants[1].category  # "ArNH2/Ar2NH" (NH2 is reactive in BH)
     """
     # Step 1: Normalize reaction

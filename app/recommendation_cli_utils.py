@@ -22,7 +22,7 @@ FUSION_VARIANTS_DEFAULT = 5
 REACTION_TYPE_CHOICES: Tuple[Tuple[str, Optional[str]], ...] = (
     ("Auto-detect (server decides)", None),
     ("Suzuki Coupling", "suzuki_miyaura"),
-    ("C–N Coupling (unified)", "cn_coupling"),
+    ("C–N Coupling (unified)", "c_n_cross_coupling"),
     ("Amide Formation", "amide_coupling"),
 )
 

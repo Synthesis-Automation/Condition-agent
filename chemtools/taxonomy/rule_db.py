@@ -1,17 +1,10 @@
 """
 Helpers for integrating taxonomy reaction types with rule database assets.
 
-This module provides lightweight resolution utilities that map a detected (or
-user-provided) reaction family label to a rule database identifier stored in
-the taxonomy metadata.
-
-The intended source of truth is `chemtools/taxonomy/data/reaction_types.json`,
-where each reaction type may define:
+This module resolves a detected (or user-provided) reaction family label to a
+rule database identifier stored in taxonomy v2 metadata:
 
     "metadata": {"rule_db_v2": "<db_stem_or_filename>"}
-
-The resolver is tolerant of common label variants (case, hyphens, underscores),
-and falls back to taxonomy alias resolution when available.
 """
 
 from __future__ import annotations
@@ -20,8 +13,8 @@ from pathlib import Path
 import re
 from typing import Any, Iterable, List, Optional
 
-from . import load_registry
-from .registry import TaxonomyRegistry
+from .v2 import reaction_catalog
+from ..analysis.reactions import canonical_family_label
 
 
 _RULE_DB_V2_METADATA_KEY = "rule_db_v2"
@@ -71,24 +64,15 @@ def _reaction_type_candidates(label: str) -> List[str]:
     return _dedupe(variants)
 
 
-def resolve_reaction_type_id(
-    label: str,
-    *,
-    registry: Optional[TaxonomyRegistry] = None,
-) -> Optional[str]:
-    """
-    Resolve an arbitrary reaction family label to a canonical taxonomy reaction type id.
-    """
-    reg = registry or load_registry()
+def resolve_reaction_type_id(label: str) -> Optional[str]:
+    """Resolve a reaction family label to a canonical taxonomy v2 reaction id."""
+    canonical = canonical_family_label(label)
+    if canonical:
+        return canonical
     for candidate in _reaction_type_candidates(label):
-        if candidate in reg.reaction_types:
-            return candidate
-
-    for candidate in _reaction_type_candidates(label):
-        alias = reg.resolve_alias(candidate)
-        if alias and alias.entity_type == "reaction_type":
-            return alias.entity_id
-
+        resolved = reaction_catalog.resolve_reaction_type(candidate)
+        if resolved:
+            return resolved
     return None
 
 
@@ -101,23 +85,18 @@ def _normalize_rule_db_identifier(value: str) -> Optional[str]:
     return text
 
 
-def resolve_rule_db_v2(
-    family: str,
-    *,
-    registry: Optional[TaxonomyRegistry] = None,
-) -> Optional[str]:
+def resolve_rule_db_v2(family: str) -> Optional[str]:
     """
     Resolve a reaction family label to a `data/rule_db_v2` database stem.
 
     The returned value is a file *stem* (without `.json`) suitable for looking up
     `data/rule_db_v2/<stem>.json`.
     """
-    reg = registry or load_registry()
-    reaction_type_id = resolve_reaction_type_id(family, registry=reg)
+    reaction_type_id = resolve_reaction_type_id(family)
     if not reaction_type_id:
         return None
 
-    reaction_type = reg.get_reaction_type(reaction_type_id)
+    reaction_type = reaction_catalog.get_reaction_type(reaction_type_id)
     if reaction_type is None:
         return None
 
@@ -134,4 +113,3 @@ def resolve_rule_db_v2(
         return None
 
     return None
-

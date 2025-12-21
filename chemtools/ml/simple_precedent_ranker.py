@@ -48,13 +48,16 @@ def rerank_by_rules(
         'C_N_Coupling_Pd': 'C_N_Coupling_Pd_db.json',
         'C_N_Coupling_Cu': 'C_N_Coupling_Cu_db.json',
         'C_N_Coupling_Ni': 'C_N_Coupling_Ni_db.json',
+        'c_n_cross_coupling': 'C_N_Coupling_Pd_db.json',
         # Suzuki
-        'Suzuki': 'suzuki_db.json',
-        'Suzuki_CC': 'suzuki_db.json',
-        'Suzuki_Miyaura': 'suzuki_db.json',
+        'Suzuki': 'Suzuki_db.json',
+        'Suzuki_CC': 'Suzuki_db.json',
+        'Suzuki_Miyaura': 'Suzuki_db.json',
+        'suzuki_miyaura': 'Suzuki_db.json',
         # Amide formation
         'Amide_Formation': 'amide_formation_db.json',
         'Amide_Coupling': 'amide_formation_db.json',
+        'amide_coupling': 'amide_formation_db.json',
     }
     
     db_file = family_to_db.get(family)

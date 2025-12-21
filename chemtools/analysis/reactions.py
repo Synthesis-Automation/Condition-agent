@@ -14,69 +14,55 @@ from typing import Optional, Dict, Set
 from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
 
 FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
-    # C-N Coupling reactions
-    "C_N_Coupling": "cn_coupling",
-    "Buchwald_CN": "buchwald_hartwig_c_n",
-    "Buchwald-Hartwig": "buchwald_hartwig_c_n",
-    "Ullmann_CN": "ullmann_cn",
-    "Chan_Lam_CN": "chan_lam",
-    "chan_lam_cn": "chan_lam",  # Legacy alias
-    
-    # C-O Coupling reactions
-    "C_O_Coupling": "co_coupling",
-    "Ullmann_CO": "ullmann_ether",
-    
-    # C-S Coupling reactions
-    "C_S_Coupling": "cs_coupling",
+    # C-N Coupling reactions (legacy -> v2)
+    "C_N_Coupling": "c_n_cross_coupling",
+    "Buchwald_CN": "c_n_cross_coupling",
+    "Buchwald-Hartwig": "c_n_cross_coupling",
+    "Ullmann_CN": "c_n_cross_coupling",
+    "Chan_Lam_CN": "c_n_cross_coupling",
+    "chan_lam_cn": "c_n_cross_coupling",
+    "cn_coupling": "c_n_cross_coupling",
+    "buchwald_hartwig_c_n": "c_n_cross_coupling",
+    "ullmann_cn": "c_n_cross_coupling",
     
     # C-C Coupling reactions
     "Suzuki_CC": "suzuki_miyaura",
     "Suzuki": "suzuki_miyaura",
     "Suzuki-Miyaura": "suzuki_miyaura",
-    "Negishi": "negishi",
     "Sonogashira_CC": "sonogashira",
     "Sonogashira": "sonogashira",
-    "Stille": "stille",
     "Heck": "heck",
     
     # Amide Coupling
     "Amide_Coupling": "amide_coupling",
+    "Amide_formation": "amide_coupling",
+    "amide_formation": "amide_coupling",
     
-    # SNAr reactions
-    "S_NAr": "snar",
-    "SNAr": "snar",
-    "snar": "snar",  # Lowercase variant from detection engine
-    "s_nar": "snar",
-    "Aromatic_Nucleophilic_Substitution": "snar",
-    "aromatic_nucleophilic_substitution": "snar",
+    # SNAr reactions (legacy -> v2)
+    "S_NAr": "snar_cn",
+    "SNAr": "snar_cn",
+    "snar": "snar_cn",
+    "s_nar": "snar_cn",
+    "Aromatic_Nucleophilic_Substitution": "snar_cn",
+    "aromatic_nucleophilic_substitution": "snar_cn",
     
-    # Reductive Amination
-    "Reductive_Amination": "reductive_amination",
-    "reductive_amination": "reductive_amination",  # Lowercase variant
-    
-    # Ring-Closing Metathesis
-    "RCM": "ring_closing_metathesis",
-    "Ring_Closing_Metathesis": "ring_closing_metathesis",
-    "ring_closing_metathesis": "ring_closing_metathesis",  # Lowercase variant
+    # Esterification
+    "Esterification": "esterification",
+    "Ester_formation": "esterification",
 }
 
-CN_FAMILIES_CANONICAL: Set[str] = {
-    "cn_coupling",
-    "buchwald_hartwig_c_n",
-    "ullmann_cn",
-    "chan_lam",
-}
-CO_FAMILIES_CANONICAL: Set[str] = {"co_coupling", "ullmann_ether"}
-CS_FAMILIES_CANONICAL: Set[str] = {"cs_coupling"}
+CN_FAMILIES_CANONICAL: Set[str] = {"c_n_cross_coupling", "snar_cn"}
+CO_FAMILIES_CANONICAL: Set[str] = set()
+CS_FAMILIES_CANONICAL: Set[str] = set()
 AMIDE_FAMILIES_CANONICAL: Set[str] = {"amide_coupling"}
 SONOGASHIRA_FAMILIES_CANONICAL: Set[str] = {"sonogashira"}
-SUZUKI_FAMILIES_CANONICAL: Set[str] = {"suzuki_miyaura", "suzuki_miyaura_in_situ"}
-NEGISHI_FAMILIES_CANONICAL: Set[str] = {"negishi", "negishi_in_situ"}
-STILLE_FAMILIES_CANONICAL: Set[str] = {"stille"}
+SUZUKI_FAMILIES_CANONICAL: Set[str] = {"suzuki_miyaura"}
+NEGISHI_FAMILIES_CANONICAL: Set[str] = set()
+STILLE_FAMILIES_CANONICAL: Set[str] = set()
 HECK_FAMILIES_CANONICAL: Set[str] = {"heck"}
-RCM_FAMILIES_CANONICAL: Set[str] = {"ring_closing_metathesis"}
-ULLMANN_SPECIFIC_CANONICAL: Set[str] = {"ullmann_cn"}
-BUCHWALD_SPECIFIC_CANONICAL: Set[str] = {"buchwald_hartwig_c_n"}
+RCM_FAMILIES_CANONICAL: Set[str] = set()
+ULLMANN_SPECIFIC_CANONICAL: Set[str] = set()
+BUCHWALD_SPECIFIC_CANONICAL: Set[str] = set()
 
 
 def slugify_family(value: str) -> str:
@@ -95,11 +81,17 @@ def canonical_family_label(family: Optional[str]) -> Optional[str]:
     canonical = _reaction_catalog.resolve_reaction_type(family)
     if canonical:
         return canonical
+    override = _resolve_family_override(family)
+    if override:
+        return override
     slug = slugify_family(family)
     if slug and slug != family:
         canonical = _reaction_catalog.resolve_reaction_type(slug)
         if canonical:
             return canonical
+        override = _resolve_family_override(slug)
+        if override:
+            return override
     return None
 
 
@@ -120,18 +112,19 @@ def apply_catalyst_override(
     canonical = family or "Unknown"
     if not metals:
         return canonical
-
-    # Pd present suggests Buchwald-Hartwig unless strongly Ullmann-specific.
-    if "Pd" in metals:
-        if canonical in ULLMANN_SPECIFIC_CANONICAL and "Cu" not in metals:
-            return canonical
-        if canonical in CN_FAMILIES_CANONICAL or is_cn_coupling:
-            return "buchwald_hartwig_c_n"
-    # Cu without Pd leans toward Ullmann.
-    if "Cu" in metals and canonical in CN_FAMILIES_CANONICAL:
-        if canonical not in BUCHWALD_SPECIFIC_CANONICAL:
-            return "ullmann_cn"
+    if canonical in CN_FAMILIES_CANONICAL or is_cn_coupling:
+        return "c_n_cross_coupling"
     return canonical
+
+
+def _resolve_family_override(family: str) -> Optional[str]:
+    for candidate in (family, family.lower(), slugify_family(family)):
+        if not candidate:
+            continue
+        override = FAMILY_ALIAS_OVERRIDES.get(candidate)
+        if override and _reaction_catalog.get_reaction_type(override):
+            return override
+    return None
 
 
 __all__ = [

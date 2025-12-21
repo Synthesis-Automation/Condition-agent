@@ -92,10 +92,10 @@ def test_rule_based_conditions_tool_autodetects_database():
         {"reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"}
     )
     assert payload["success"], payload
-    assert payload.get("database_name") == "buchwald_cn"
+    assert payload.get("database_name") == "C_N_Coupling_Pd_db"
     assert payload.get("base_rule", {}).get("name"), "Expected base rule name in response"
     detection = payload.get("family_detection") or {}
-    assert detection.get("family") in {"cn_coupling", "buchwald_cn"}
+    assert detection.get("family") == "c_n_cross_coupling"
     assert payload.get("summary", "").startswith("=")
 
 

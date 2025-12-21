@@ -24,8 +24,8 @@ except Exception:
 
 # Default database path from environment
 _SCDB_DEFAULT_DB = (
-    os.environ.get("SCDB_MATCH_DB_PATH", "cn_coupling_pd_db.json").strip()
-    or "cn_coupling_pd_db.json"
+    os.environ.get("SCDB_MATCH_DB_PATH", "C_N_Coupling_Pd_db.json").strip()
+    or "C_N_Coupling_Pd_db.json"
 )
 
 

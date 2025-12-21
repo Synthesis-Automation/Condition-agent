@@ -158,27 +158,29 @@ class TaxonomyRegistry:
     # ------------------------------------------------------------------ #
     def _validate_integrity(self) -> None:
         errors: List[str] = []
-
-        for rt in self.reaction_types.values():
-            if rt.category_id not in self.reaction_categories:
-                errors.append(f"ReactionType '{rt.id}' references unknown category '{rt.category_id}'")
-            for req in rt.reactants:
-                if req.reactant_type_id not in self.reactant_types:
+        if self.reaction_types:
+            for rt in self.reaction_types.values():
+                if self.reaction_categories and rt.category_id not in self.reaction_categories:
                     errors.append(
-                        f"ReactionType '{rt.id}' references unknown reactant '{req.reactant_type_id}'"
+                        f"ReactionType '{rt.id}' references unknown category '{rt.category_id}'"
                     )
-            for role_req in rt.required_roles:
-                if role_req.role_id not in self.reagent_roles:
-                    errors.append(
-                        f"ReactionType '{rt.id}' references unknown reagent role '{role_req.role_id}'"
-                    )
-                if (
-                    role_req.default_family_id
-                    and role_req.default_family_id not in self.reagent_families
-                ):
-                    errors.append(
-                        f"ReactionType '{rt.id}' references unknown reagent family '{role_req.default_family_id}'"
-                    )
+                for req in rt.reactants:
+                    if req.reactant_type_id not in self.reactant_types:
+                        errors.append(
+                            f"ReactionType '{rt.id}' references unknown reactant '{req.reactant_type_id}'"
+                        )
+                for role_req in rt.required_roles:
+                    if role_req.role_id not in self.reagent_roles:
+                        errors.append(
+                            f"ReactionType '{rt.id}' references unknown reagent role '{role_req.role_id}'"
+                        )
+                    if (
+                        role_req.default_family_id
+                        and role_req.default_family_id not in self.reagent_families
+                    ):
+                        errors.append(
+                            f"ReactionType '{rt.id}' references unknown reagent family '{role_req.default_family_id}'"
+                        )
 
         for family in self.reagent_families.values():
             if family.role_id not in self.reagent_roles:
@@ -187,8 +189,11 @@ class TaxonomyRegistry:
                 )
 
         for alias in self.aliases.values():
-            if alias.entity_type == "reaction_type" and alias.entity_id not in self.reaction_types:
-                errors.append(f"Alias '{alias.alias}' targets unknown reaction type '{alias.entity_id}'")
+            if alias.entity_type == "reaction_type":
+                if self.reaction_types and alias.entity_id not in self.reaction_types:
+                    errors.append(
+                        f"Alias '{alias.alias}' targets unknown reaction type '{alias.entity_id}'"
+                    )
             elif alias.entity_type == "reactant_type" and alias.entity_id not in self.reactant_types:
                 errors.append(f"Alias '{alias.alias}' targets unknown reactant type '{alias.entity_id}'")
             elif alias.entity_type == "reagent_role" and alias.entity_id not in self.reagent_roles:
@@ -262,6 +267,8 @@ def _load_chem_terms(path: Path) -> Dict[str, models.ChemTerm]:
 
 
 def _load_reaction_categories(path: Path) -> Dict[str, models.ReactionCategory]:
+    if not path.exists():
+        return {}
     categories: Dict[str, models.ReactionCategory] = {}
     for entry in _load_json(path):
         obj = models.ReactionCategory(
@@ -364,6 +371,8 @@ def _load_reaction_types(
     reactant_types: Dict[str, models.ReactantType],
     reagent_roles: Dict[str, models.ReagentRole],
 ) -> Dict[str, models.ReactionType]:
+    if not path.exists():
+        return {}
     reaction_types: Dict[str, models.ReactionType] = {}
     for entry in _load_json(path):
         # Support multiple formats for reactants:

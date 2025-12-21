@@ -20,10 +20,14 @@ from chemtools import detect_reaction
 _RULE_DIR = Path("data") / "rule_db_v2"
 _FAMILY_TO_FILE = {
     "suzuki_miyaura": "Suzuki_db.json",
-    "cn_coupling": "C_N_Coupling_Cu_db.json",
+    "c_n_cross_coupling": "C_N_Coupling_Pd_db.json",
+    "snar_cn": "SNAr_db.json",
+    "sonogashira": "sonogashira_v2.json",
+    "amide_coupling": "amide_formation_db.json",
+    # Legacy aliases for compatibility
+    "cn_coupling": "C_N_Coupling_Pd_db.json",
     "ullmann_cn": "C_N_Coupling_Cu_db.json",
-    "buchwald_hartwig_c_n": "C_N_Coupling_Cu_db.json",
-    "amide_coupling": "Amide_db.json",
+    "buchwald_hartwig_c_n": "C_N_Coupling_Pd_db.json",
 }
 
 

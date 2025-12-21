@@ -395,19 +395,3 @@ def build_formatted_output(
         },
         "precedents_used": build_precedent_details(precs, chosen_core, group),
     }
-FAMILY_LABELS = {
-    "cn_coupling": "C–N Coupling",
-    "buchwald_hartwig_c_n": "Buchwald–Hartwig C–N Coupling",
-    "ullmann_cn": "Ullmann C–N Coupling",
-    "chan_lam": "Chan–Lam Coupling",
-    "chan_lam_cn": "Chan–Lam Coupling",  # Legacy alias
-    "co_coupling": "C–O Coupling",
-    "ullmann_ether": "Ullmann Ether Synthesis",
-    "cs_coupling": "C–S Coupling",
-    "suzuki_miyaura": "Suzuki–Miyaura Coupling",
-    "negishi": "Negishi Coupling",
-    "sonogashira": "Sonogashira Coupling",
-    "stille": "Stille Coupling",
-    "heck": "Heck Reaction",
-    "amide_coupling": "Amide Formation",
-}

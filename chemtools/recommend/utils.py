@@ -11,6 +11,7 @@ from typing import Dict, Any, List, Tuple, Optional
 
 from .. import constraints
 from ..taxonomy import load_registry
+from ..taxonomy.v2 import reaction_catalog as _reaction_catalog
 
 
 # Family name normalization
@@ -39,6 +40,8 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "ullmann_cn": "C_N_Coupling",
     "chan_lam": "C_N_Coupling",
     "chan_lam_cn": "C_N_Coupling",  # Legacy alias
+    "c_n_cross_coupling": "C_N_Coupling",
+    "snar_cn": "SNAr-CN",
     # C-O Coupling variants -> canonical dataset name
     "C_O_Coupling": "C_O_Coupling",
     "Ullmann_CO": "C_O_Coupling",
@@ -53,27 +56,41 @@ _FAMILY_ALIASES: Dict[str, str] = {
     # Sonogashira variants
     "Sonogashira_CC": "Sonogashira_CC",
     "sonogashira": "Sonogashira_CC",
+    "sonogashira_coupling": "Sonogashira_coupling",
     # Amide variants -> canonical dataset name
     "Amide_Coupling": "Amide_formation",
     "Amide_formation": "Amide_formation",
     "amide_coupling": "Amide_formation",
+    "amide_formation": "Amide_formation",
+    # v2 IDs mapped to dataset names
+    "suzuki_miyaura": "Suzuki",
+    "sonogashira": "Sonogashira_coupling",
+    "heck": "HeckMizoroki_coupling",
+    "amide_coupling": "Amide_formation",
 }
 
 _FAMILY_LABELS: Dict[str, str] = {
+    "c_n_cross_coupling": "C–N Cross-Coupling",
+    "snar_cn": "SNAr Amination",
+    "sn2_substitution": "SN2 Substitution",
+    "suzuki_miyaura": "Suzuki–Miyaura Coupling",
+    "sonogashira": "Sonogashira Coupling",
+    "heck": "Heck Reaction",
+    "amide_coupling": "Amide Formation",
+    "esterification": "Esterification",
+    "acylation_acyl_halide_amide": "Acyl Halide Amidation",
+    "acylation_acyl_halide_ester": "Acyl Halide Esterification",
+    # Legacy aliases
     "cn_coupling": "C–N Coupling",
     "buchwald_hartwig_c_n": "Buchwald–Hartwig C–N Coupling",
     "ullmann_cn": "Ullmann C–N Coupling",
     "chan_lam": "Chan–Lam Coupling",
-    "chan_lam_cn": "Chan–Lam Coupling",  # Legacy alias
+    "chan_lam_cn": "Chan–Lam Coupling",
     "co_coupling": "C–O Coupling",
     "ullmann_ether": "Ullmann Ether Synthesis",
     "cs_coupling": "C–S Coupling",
-    "suzuki_miyaura": "Suzuki–Miyaura Coupling",
     "negishi": "Negishi Coupling",
-    "sonogashira": "Sonogashira Coupling",
     "stille": "Stille Coupling",
-    "heck": "Heck Reaction",
-    "amide_coupling": "Amide Formation",
 }
 
 
@@ -104,7 +121,7 @@ def _cached_registry():
 def _taxonomy_family_label(family: str) -> Optional[str]:
     registry = _cached_registry()
     if registry is None:
-        return None
+        return _v2_family_label(family)
     record = registry.get_reaction_type(family)
     if record is not None:
         return record.name
@@ -113,6 +130,15 @@ def _taxonomy_family_label(family: str) -> Optional[str]:
         target = registry.get_reaction_type(alias.entity_id)
         if target is not None:
             return target.name
+    return _v2_family_label(family)
+
+
+def _v2_family_label(family: str) -> Optional[str]:
+    resolved = _reaction_catalog.resolve_reaction_type(family)
+    if resolved:
+        record = _reaction_catalog.get_reaction_type(resolved)
+        if record is not None:
+            return record.name
     return None
 
 
