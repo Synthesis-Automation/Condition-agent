@@ -117,6 +117,17 @@ def detect_reaction_types_from_smiles(
     return ReactionDetectionResult(matches=matches)
 
 
+def detect_motif_ids_from_smiles(
+    reactant_smiles: Iterable[str],
+    *,
+    max_hits_per_compound: Optional[int] = None,
+) -> Set[str]:
+    """Return the set of organic-compound motif IDs detected in the reactants."""
+    if not rdkit_available():
+        return set()
+    return _detect_motif_ids(reactant_smiles, max_hits_per_compound=max_hits_per_compound)
+
+
 def _detect_motif_ids(
     reactant_smiles: Iterable[str],
     *,

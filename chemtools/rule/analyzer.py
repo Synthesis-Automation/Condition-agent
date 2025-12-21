@@ -11,6 +11,7 @@ import logging
 
 from ..featurizers.calculable import detect_all_features
 from ..featurizers.reaction_pair import featurize_pair as molecular_featurize
+from ..featurizers.reaction_detection import detect_motif_ids_from_smiles
 from ..analysis.smiles import normalize_reaction
 
 logger = logging.getLogger(__name__)
@@ -56,12 +57,20 @@ class FeatureAnalyzer:
                 logger.warning(f"No reactants found in reaction: {reaction_smiles}")
                 return {}
             
+            motif_ids = set()
+            try:
+                motif_ids = detect_motif_ids_from_smiles(reactants)
+            except Exception:
+                motif_ids = set()
+
             # Special case: For 2-component reactions (electrophile + nucleophile),
             # use the full molecular featurizer which includes functional group enrichment
             if len(reactants) == 2:
                 try:
                     result = molecular_featurize(reactants[0], reactants[1])
                     features = result.get("flat", {})
+                    for motif_id in motif_ids:
+                        features[motif_id] = True
                     logger.debug(
                         "Used molecular featurizer: %s features detected",
                         sum(1 for v in features.values() if v),
@@ -84,13 +93,17 @@ class FeatureAnalyzer:
             
             # Combine features based on method
             if combine_method == "separate":
-                return {"reactants": reactant_features}
+                return {"reactants": reactant_features, "motifs": sorted(motif_ids)}
             elif combine_method == "first":
-                return reactant_features[0] if reactant_features else {}
+                combined = reactant_features[0] if reactant_features else {}
             elif combine_method == "all":
-                return self._combine_features_all(reactant_features)
+                combined = self._combine_features_all(reactant_features)
             else:  # union (default)
-                return self._combine_features_union(reactant_features)
+                combined = self._combine_features_union(reactant_features)
+
+            for motif_id in motif_ids:
+                combined[motif_id] = True
+            return combined
         
         except Exception as e:
             logger.error(f"Error analyzing reaction {reaction_smiles}: {e}")

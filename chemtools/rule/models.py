@@ -9,6 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional
 
+from ..util.boolean_expr import evaluate as _eval_bool_expr
+
 
 @dataclass
 class AppliedRule:
@@ -157,6 +159,18 @@ class RuleSpec:
         """
         if not self.reactant_features:
             return True, []
+
+        # Expression form: allow reactant_features to be a string or {"expr": "..."}
+        expr: Optional[str] = None
+        if isinstance(self.reactant_features, str):
+            expr = self.reactant_features
+        elif isinstance(self.reactant_features, dict):
+            expr_value = self.reactant_features.get("expr")
+            if isinstance(expr_value, str):
+                expr = expr_value
+
+        if isinstance(expr, str) and expr.strip():
+            return _eval_bool_expr(expr, features), [f"expr:{expr}"]
         
         matched = []
         
@@ -175,7 +189,16 @@ class RuleSpec:
             for feat in options:
                 if features.get(feat, False):
                     matched.append(feat)
-            return len(matched) > 0, matched
+            if not matched:
+                return False, []
+
+            required = self.reactant_features.get("all")
+            if isinstance(required, list) and required:
+                for feat in required:
+                    if not features.get(feat, False):
+                        return False, []
+                    matched.append(feat)
+            return True, matched
         
         # Handle ALL logic (explicit)
         if "all" in self.reactant_features:
@@ -241,6 +264,11 @@ class ModifierSpec:
                 if any(symptom_text.lower() in s.lower() for s in symptoms):
                     return True
             # Check for feature-based conditions
+            elif isinstance(condition, str) and (
+                " AND " in condition or " OR " in condition or condition.strip().startswith("NOT ")
+            ):
+                if _eval_bool_expr(condition, features):
+                    return True
             elif features.get(condition, False):
                 return True
         

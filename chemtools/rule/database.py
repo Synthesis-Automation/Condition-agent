@@ -12,6 +12,7 @@ import json
 import logging
 
 from .models import RuleSpec, ModifierSpec
+from ..util.boolean_expr import evaluate as _eval_bool_expr
 
 logger = logging.getLogger(__name__)
 
@@ -156,22 +157,37 @@ class RuleDatabase:
         if not self.applies_if:
             # No conditions means always applies
             return True
+
+        # Expression form: applies_if can be a string or {"expr": "..."}
+        expr: Optional[str] = None
+        if isinstance(self.applies_if, str):
+            expr = self.applies_if
+        elif isinstance(self.applies_if, dict):
+            expr_value = self.applies_if.get("expr")
+            if isinstance(expr_value, str):
+                expr = expr_value
+
+        if isinstance(expr, str) and expr.strip():
+            if not _eval_bool_expr(expr, features):
+                return False
         
-        # Handle "all" logic
-        if "all" in self.applies_if:
-            required_features = self.applies_if["all"]
-            if isinstance(required_features, list):
-                return all(features.get(feat, False) for feat in required_features)
+        if not isinstance(self.applies_if, dict):
+            return True
+
+        # Combine "all" and "any" constraints when both exist.
+        required_all = self.applies_if.get("all")
+        if isinstance(required_all, list) and required_all:
+            if not all(features.get(feat, False) for feat in required_all):
+                return False
         
-        # Handle "any" logic
-        if "any" in self.applies_if:
-            required_features = self.applies_if["any"]
-            if isinstance(required_features, list):
-                return any(features.get(feat, False) for feat in required_features)
+        required_any = self.applies_if.get("any")
+        if isinstance(required_any, list) and required_any:
+            if not any(features.get(feat, False) for feat in required_any):
+                return False
         
         # Handle direct feature requirements
         for key, value in self.applies_if.items():
-            if key not in ["all", "any"]:
+            if key not in ["all", "any", "expr"]:
                 if features.get(key) != value:
                     return False
         

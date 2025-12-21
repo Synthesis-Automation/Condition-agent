@@ -636,6 +636,28 @@ def featurize_flat(
                 molpipeline_data["settings"] = settings_snapshot
             out["molpipeline"] = molpipeline_data
 
+    # Standardized substrate-tag tokens (expandable).
+    ortho = out.get("ortho_count")
+    if isinstance(ortho, str):
+        out["ortho_0"] = ortho == "0"
+        out["ortho_1"] = ortho == "1"
+        out["ortho_2plus"] = ortho == "2+"
+        out["ortho_hindered"] = ortho == "2+"
+
+    elec_group_map = elec_groups if isinstance(elec_groups, dict) else {}
+    ewg_on_electrophile = any(
+        bool(elec_group_map.get(token))
+        for token in ("nitro_present", "nitrile_present", "trifluoromethyl_present", "carbonyl_present")
+    )
+    out["electron_poor_aryl"] = bool(
+        out.get("elec_class") == "aryl"
+        and (
+            bool(out.get("heteroaryl"))
+            or bool(out.get("para_EWG"))
+            or ewg_on_electrophile
+        )
+    )
+
     return out
 
 

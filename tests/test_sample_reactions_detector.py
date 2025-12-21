@@ -114,7 +114,7 @@ def test_sample_reactions():
         print(f"  ✓ {d['desc']}")
         print(f"    Detected: {d['detected']} (conf: {d['confidence']:.2f})")
     
-    return results
+    assert isinstance(results, dict)
 
 
 if __name__ == '__main__':
