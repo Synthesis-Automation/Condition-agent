@@ -92,6 +92,7 @@
       "Allyl-NH2",
       "Allyl-NHR",
       "Any-NH2",
+      "Any-NHR",
       "Ar-NH2",
       "Ar-NHR",
       "Arom-NH2",
@@ -284,17 +285,135 @@
           "Allyl-NH2",
           "Allyl-NHR",
           "Any-NH2",
+          "Any-NHR",
           "Ar-NH2",
           "Ar-NHR",
           "Arom-NH2",
           "Arom-NHR",
           "Bn-NH2",
           "Bn-NHR",
-          "Vinyl-NH2"
+          "Vinyl-NH2",
+          "Indole",
+          "Pyrrole",
+          "Imidazole",
+          "Pyrazole",
+          "Triazole",
+          "Tetrazole",
+          "Benzimidazole",
+          "Purine",
+          "Any-CONHR",
+          "Ar-CONHR",
+          "Arom-CONHR"
         ]
       },
       "edit_hint": "Remove F electrophiles if you do not want Ar-F counted as coupling electrophiles.",
       "notes": "Catalyst family (Pd/Cu/Ni) is not inferred here; this is motif-based reaction type classification."
+    },
+    {
+      "id": "chan_lam_cn",
+      "name": "Chan-Lam C-N coupling (boronic acid + amine)",
+      "category": "c_n_coupling_reactions",
+      "aliases": [
+        "Chan-Lam amination"
+      ],
+      "description": "Cu-catalyzed oxidative coupling of boronic acids with amines/N-heterocycles",
+      "reference_reactions": [
+        "c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1",
+        "c1ccccc1B(O)O.N1CCOCC1.[O]>>c1ccccc1N1CCOCC1"
+      ],
+      "catalysts": [
+        "Cu"
+      ],
+      "conditions": "Cu catalyst, base, oxygen/air",
+      "metadata": {
+        "rule_db_v2": "chan_lam_cn_db"
+      },
+      "reactants": {
+        "electrophiles": [
+          "Ar-B(OH)2",
+          "Arom-B(OH)2",
+          "Vinyl-B(OH)2"
+        ],
+        "nucleophiles": [
+          "Allyl-NH2",
+          "Allyl-NHR",
+          "Any-NH2",
+          "Any-NHR",
+          "Ar-NH2",
+          "Ar-NHR",
+          "Arom-NH2",
+          "Arom-NHR",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Vinyl-NH2",
+          "Indole",
+          "Pyrrole",
+          "Imidazole",
+          "Pyrazole",
+          "Triazole",
+          "Tetrazole",
+          "Benzimidazole",
+          "Purine",
+          "Any-CONHR",
+          "Ar-CONHR",
+          "Arom-CONHR"
+        ]
+      }
+    },
+    {
+      "id": "c_o_coupling",
+      "name": "C-O coupling (ether synthesis)",
+      "category": "c_o_coupling_reactions",
+      "aliases": [
+        "Ullmann ether synthesis",
+        "Buchwald-Hartwig C-O coupling"
+      ],
+      "description": "Metal-catalyzed coupling of aryl/vinyl electrophiles with alcohols/phenols",
+      "reference_reactions": [
+        "Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1",
+        "Ic1ccncc1.OCC>>CCOc1ccncc1"
+      ],
+      "catalysts": [
+        "Pd",
+        "Cu"
+      ],
+      "conditions": "Metal catalyst, base, elevated temperature",
+      "metadata": {
+        "rule_db_v2": "C_O_coupling_db"
+      },
+      "reactants": {
+        "electrophiles": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-F",
+          "Ar-I",
+          "Ar-OMs",
+          "Ar-OTf",
+          "Ar-OTs",
+          "Arom-Br",
+          "Arom-Cl",
+          "Arom-F",
+          "Arom-I",
+          "Arom-OMs",
+          "Arom-OTf",
+          "Arom-OTs",
+          "Vinyl-Br",
+          "Vinyl-Cl",
+          "Vinyl-F",
+          "Vinyl-I",
+          "Vinyl-OMs",
+          "Vinyl-OTf",
+          "Vinyl-OTs"
+        ],
+        "nucleophiles": [
+          "Any-OH",
+          "Ar-OH",
+          "Arom-OH",
+          "Bn-OH",
+          "Allyl-OH",
+          "Vinyl-OH"
+        ]
+      }
     },
     {
       "id": "sonogashira",
@@ -438,13 +557,25 @@
           "Allyl-NH2",
           "Allyl-NHR",
           "Any-NH2",
+          "Any-NHR",
           "Ar-NH2",
           "Ar-NHR",
           "Arom-NH2",
           "Arom-NHR",
           "Bn-NH2",
           "Bn-NHR",
-          "Vinyl-NH2"
+          "Vinyl-NH2",
+          "Indole",
+          "Pyrrole",
+          "Imidazole",
+          "Pyrazole",
+          "Triazole",
+          "Tetrazole",
+          "Benzimidazole",
+          "Purine",
+          "Any-CONHR",
+          "Ar-CONHR",
+          "Arom-CONHR"
         ]
       },
       "notes": "Activation is set-level: presence of an activator EWG in reactants triggers SNAr typing (not necessarily same ring)."
@@ -517,13 +648,25 @@
           "Allyl-NH2",
           "Allyl-NHR",
           "Any-NH2",
+          "Any-NHR",
           "Ar-NH2",
           "Ar-NHR",
           "Arom-NH2",
           "Arom-NHR",
           "Bn-NH2",
           "Bn-NHR",
-          "Vinyl-NH2"
+          "Vinyl-NH2",
+          "Indole",
+          "Pyrrole",
+          "Imidazole",
+          "Pyrazole",
+          "Triazole",
+          "Tetrazole",
+          "Benzimidazole",
+          "Purine",
+          "Any-CONHR",
+          "Ar-CONHR",
+          "Arom-CONHR"
         ]
       },
       "notes": "Coupling reagents are not inferred; this is substrate-based typing."
@@ -581,13 +724,25 @@
           "Allyl-NH2",
           "Allyl-NHR",
           "Any-NH2",
+          "Any-NHR",
           "Ar-NH2",
           "Ar-NHR",
           "Arom-NH2",
           "Arom-NHR",
           "Bn-NH2",
           "Bn-NHR",
-          "Vinyl-NH2"
+          "Vinyl-NH2",
+          "Indole",
+          "Pyrrole",
+          "Imidazole",
+          "Pyrazole",
+          "Triazole",
+          "Tetrazole",
+          "Benzimidazole",
+          "Purine",
+          "Any-CONHR",
+          "Ar-CONHR",
+          "Arom-CONHR"
         ]
       },
       "notes": "Covers acid chloride/bromide amidation; optional product confirmation via amide motifs."

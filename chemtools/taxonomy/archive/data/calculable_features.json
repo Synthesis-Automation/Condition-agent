@@ -458,6 +458,16 @@
       "description": "Secondary amine (NHR); not amide/sulfonamide"
     },
     {
+      "token": "heteroaromatic_nh_present",
+      "type": "bool",
+      "detect": {
+        "smarts_any": [
+          "[n;H1]"
+        ]
+      },
+      "description": "NH-heteroaromatic (pyrrole, indole, imidazole, etc.)"
+    },
+    {
       "token": "tertiary_amine_present",
       "type": "bool",
       "detect": {

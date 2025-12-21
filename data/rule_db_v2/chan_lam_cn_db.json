@@ -1,0 +1,78 @@
+{
+  "schema_version": "2.0",
+  "source_type": "rule",
+  "metadata": {
+    "id": "chan_lam_cn_v2",
+    "name": "Chan-Lam C-N Coupling",
+    "version": "v2.0",
+    "created_date": "2025-11-08",
+    "status": "active",
+    "tags": [
+      "C-N-coupling",
+      "amination",
+      "copper-catalyzed",
+      "oxidative"
+    ]
+  },
+  "reaction": {
+    "family": "Chan-Lam_C–N",
+    "reference_reactions": [
+      "c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1",
+      "c1ccc(OC)cc1B(O)O.Nc1ccccc1.[O]>>COc1ccc(Nc2ccccc2)cc1",
+      "c1ccncc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccncc1"
+    ],
+    "scope": {
+      "scope_type": "broad",
+      "compatible_functional_groups": [],
+      "incompatible_functional_groups": []
+    },
+    "notes": "Chan-Lam coupling uses Cu(II) or Cu(I) with air/O2 as oxidant. Typical conditions: Cu(OAc)2 (10-20 mol%), pyridine or TEA (2 equiv), DCM or MeOH, RT to 50 °C. Open to air or O2 balloon."
+  },
+  "applies_if": {
+    "expr": "(Ar-B(OH)2 OR Arom-B(OH)2 OR Vinyl-B(OH)2) AND ((Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Arom-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR OR Arom-CONHR))"
+  },
+  "default_rule": {
+    "id": "DEF_ChanLam_general",
+    "description": "General starter for Chan-Lam C-N (Cu(OAc)2; pyridine; DCM; air).",
+    "conditions": {
+      "cu_source": "Cu(OAc)2 (10–20 mol%)",
+      "base": "Pyridine or Et3N (2.0 equiv)",
+      "solvent": "DCM or MeOH",
+      "temperature_C": "25–50",
+      "atmosphere": "Air or O2 balloon",
+      "time_h": "12–48"
+    }
+  },
+  "base_rules": [
+    {
+      "name": "Anilines and Aliphatic Amines",
+      "id": "BR_chan_lam_amines",
+      "description": "Standard Chan-Lam for primary/secondary amines.",
+      "reactant_features": {
+        "expr": "(Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Any-NHR OR Ar-NHR OR Arom-NHR)"
+      },
+      "conditions": {
+        "cu_source": "Cu(OAc)2 (10–20 mol%)",
+        "base": "Pyridine (2.0 equiv)",
+        "solvent": "DCM",
+        "temperature_C": "25",
+        "atmosphere": "Air"
+      }
+    },
+    {
+      "name": "N-Heterocycles (Azoles)",
+      "id": "BR_chan_lam_azoles",
+      "description": "Chan-Lam for indoles, imidazoles, etc. Often benefits from MeOH or slightly higher temp.",
+      "reactant_features": {
+        "expr": "Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine"
+      },
+      "conditions": {
+        "cu_source": "Cu(OAc)2 (20 mol%)",
+        "base": "Pyridine or Et3N (2.0 equiv)",
+        "solvent": "MeOH or DCM",
+        "temperature_C": "25–50",
+        "atmosphere": "O2 balloon"
+      }
+    }
+  ]
+}

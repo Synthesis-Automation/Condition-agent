@@ -36,7 +36,9 @@
       "thiol_present",
       "primary_amine_present",
       "secondary_amine_present",
-      "aniline_present"
+      "aniline_present",
+      "heteroaromatic_nh_present",
+      "amide_present"
     ]
   },
   "default_rule": {

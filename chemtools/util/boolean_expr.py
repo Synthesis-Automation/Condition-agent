@@ -44,10 +44,10 @@ def _reduce_grouping_parentheses(expression: str, values: Mapping[str, Any]) -> 
 
         for idx, ch in enumerate(current):
             if ch == "(":
-                if idx == 0 or current[idx - 1].isspace():
+                if idx == 0 or current[idx - 1].isspace() or current[idx - 1] == "(":
                     stack.append(idx)
             elif ch == ")":
-                if stack and (idx == length - 1 or current[idx + 1].isspace()):
+                if stack and (idx == length - 1 or current[idx + 1].isspace() or current[idx + 1] == ")"):
                     start = stack.pop()
                     pairs.append((start, idx))
 

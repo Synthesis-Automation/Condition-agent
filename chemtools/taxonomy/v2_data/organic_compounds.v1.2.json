@@ -1514,11 +1514,22 @@
       "description": "Imidazole (NH-heteroaromatic)."
     },
     {
+      "id": "Pyrazole",
+      "name": "Pyrazole",
+      "smarts": [
+        "[nH]1nccc1",
+        "n1[nH]ccc1"
+      ],
+      "description": "Pyrazole (NH-heteroaromatic)."
+    },
+    {
       "id": "Triazole",
       "name": "Triazole",
       "smarts": [
-        "[nH]1nncn1",
-        "[nH]1nncc1"
+        "[nH]1cncn1",
+        "n1c[nH]nc1",
+        "[nH]1nncc1",
+        "n1[nH]ncc1"
       ],
       "description": "Triazole (NH-heteroaromatic)."
     },

@@ -158,7 +158,7 @@ SAMPLE_REACTIONS = [
     "Clc1ccc(C#N)cc1.CC(C)N>>CC(C)Nc1ccc(C#N)cc1 (C-N - 4-Cl-benzonitrile + isopropylamine)",
     
     # Secondary aliphatic amines
-    "Brc1ccccc1.CCN(CC)CC>>CCN(CC)c1ccccc1 (C-N - Ph-Br + diethylamine)",
+    "Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1 (C-N - Ph-Br + diethylamine)",
     
     # Cyclic amines (heterocycles)
     "Brc1ccccc1.N1CCCC1>>c1ccccc1N1CCCC1 (C-N - Ph-Br + pyrrolidine)",
