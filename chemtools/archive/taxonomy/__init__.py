@@ -2,7 +2,7 @@
 Legacy taxonomy registry loader (archived).
 
 This package preserves the historical registry API backed by the archived
-taxonomy data under ``chemtools/taxonomy/archive/data``.
+taxonomy data under ``chemtools/archive/taxonomy/data``.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ def load_registry(root: Optional[Path] = None) -> TaxonomyRegistry:
 
     Args:
         root: Optional path to the directory containing taxonomy data files.
-              Defaults to ``chemtools/taxonomy/archive/data``.
+              Defaults to ``chemtools/archive/taxonomy/data``.
 
     Returns:
         TaxonomyRegistry: Shared registry instance rooted at ``root``.

@@ -5,8 +5,8 @@ This module provides utilities to expand reactant categories (e.g., "ArX*")
 into their constituent feature tokens (e.g., ["ArBr_present", "ArCl_present", ...]).
 
 The mapping is driven by:
-- chemtools/taxonomy/archive/data/reactant_types.json: Defines reactant categories and members
-- chemtools/taxonomy/archive/data/calculable_features.json: Maps members to feature tokens
+- chemtools/archive/taxonomy/data/reactant_types.json: Defines reactant categories and members
+- chemtools/archive/taxonomy/data/calculable_features.json: Maps members to feature tokens
 
 Public Functions:
     load_reactant_taxonomy() -> Dict[str, List[str]]

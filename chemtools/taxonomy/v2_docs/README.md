@@ -5,7 +5,7 @@ This package hosts the new taxonomy system. Python modules live at
 
 - `chemtools/taxonomy/v2_data/`: JSON data used by v2 modules.
 - `chemtools/taxonomy/v2_docs/`: Spec and design notes.
-- `chemtools/taxonomy/archive/`: Legacy registry and data (reference only; not
+- `chemtools/archive/taxonomy/`: Legacy registry and data (reference only; not
   part of the v2 core).
 
 The v2 system is intentionally small and deterministic, and includes:
@@ -120,6 +120,6 @@ db_id = resolve_rule_db_v2("Suzuki")
 ## Legacy Archive
 
 Legacy registry modules and data are preserved under
-`chemtools/taxonomy/archive/`. New code should use v2 modules instead of the
+`chemtools/archive/taxonomy/`. New code should use v2 modules instead of the
 archived registry. For legacy tooling, import from `chemtools.taxonomy.archive`
 explicitly.

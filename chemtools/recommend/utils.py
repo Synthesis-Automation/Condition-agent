@@ -10,7 +10,7 @@ from functools import lru_cache
 from typing import Dict, Any, List, Tuple, Optional
 
 from .. import constraints
-from ..taxonomy.archive import load_registry
+from ..archive.taxonomy import load_registry
 from ..taxonomy import reaction_catalog as _reaction_catalog
 
 
