@@ -12,7 +12,7 @@ from typing import Any, Dict, Iterable, List, Mapping
 
 from chemtools.util.smarts_cache import compile_smarts
 
-_MAP_RE = re.compile(r":\d+")
+_MAP_RE = re.compile(r":\d+(?=\])")
 
 
 @dataclass(frozen=True)
@@ -36,6 +36,8 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
     groups = _load_groups(groups_path)
     templates = _load_templates(templates_path)
     compounds = _load_compounds(compounds_path)
+    _validate_group_maps(groups)
+    _validate_compound_templates(compounds, templates)
 
     compiled: List[CompoundPattern] = []
     compound_map: Dict[str, CompoundPattern] = {}
@@ -44,21 +46,9 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         compound_id = entry.get("id")
         if not compound_id:
             continue
-        direct_smarts = entry.get("smarts")
-        smarts_any = entry.get("smarts_any")
-        smarts_list: List[str] = []
-        if isinstance(direct_smarts, str):
-            smarts_list = [direct_smarts]
-        elif isinstance(direct_smarts, list):
-            smarts_list = [s for s in direct_smarts if isinstance(s, str)]
-        elif isinstance(smarts_any, list):
-            smarts_list = [s for s in smarts_any if isinstance(s, str)]
-
+        smarts_list = _extract_compound_smarts(entry)
         if smarts_list:
             for smarts in smarts_list:
-                smarts = smarts.strip()
-                if not smarts:
-                    continue
                 if not _has_atom_map(smarts):
                     smarts = _inject_map_on_first_atom(smarts, map_num=1)
                 query = compile_smarts(smarts, validate=False)
@@ -96,7 +86,6 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
             continue
 
         compound_smarts = _format_compound_smarts(
-            template_id=template_id,
             template_format=template_format,
             a_smarts=a_smarts,
             b_smarts=b_smarts,
@@ -142,7 +131,13 @@ def _load_templates(path: Path) -> Dict[str, str]:
 
 def _load_compounds(path: Path) -> List[Dict[str, Any]]:
     payload = _load_json(path)
-    return list(payload.get("compounds") or [])
+    compounds = list(payload.get("compounds") or [])
+    for entry in compounds:
+        if not isinstance(entry, dict):
+            continue
+        if "anchors" not in entry:
+            entry["anchors"] = {"core": "A", "fg": "B"}
+    return compounds
 
 
 def _load_json(path: Path) -> Dict[str, Any]:
@@ -154,22 +149,25 @@ def _load_json(path: Path) -> Dict[str, Any]:
 
 def _format_compound_smarts(
     *,
-    template_id: str,
     template_format: str,
     a_smarts: str,
     b_smarts: str,
 ) -> str:
-    if template_id == "via_oxygen" and not _has_atom_map(b_smarts):
-        return f"{a_smarts}[O:2]{b_smarts}"
-
-    if template_id == "single_bond" and not _has_atom_map(b_smarts):
-        b_smarts = _inject_map_on_first_atom(b_smarts, map_num=2)
-
     return template_format.format(A=a_smarts, B=b_smarts)
 
 
 def _has_atom_map(smarts: str) -> bool:
     return bool(_MAP_RE.search(smarts))
+
+
+def strip_atom_maps(smarts: str) -> str:
+    return _MAP_RE.sub("", smarts)
+
+
+def _has_map(smarts: str, *, map_num: int) -> bool:
+    if not smarts:
+        return False
+    return bool(re.search(rf":{map_num}(?=\])", smarts))
 
 
 def _inject_map_on_first_atom(smarts: str, *, map_num: int) -> str:
@@ -186,3 +184,51 @@ def _inject_map_on_first_atom(smarts: str, *, map_num: int) -> str:
         return smarts
     atom = match.group(1)
     return f"[{atom}:{map_num}]{smarts[len(atom):]}"
+
+
+def _extract_compound_smarts(entry: Mapping[str, Any]) -> List[str]:
+    direct_smarts = entry.get("smarts")
+    smarts_any = entry.get("smarts_any")
+    smarts_list: List[str] = []
+    if isinstance(direct_smarts, str):
+        smarts_list = [direct_smarts]
+    elif isinstance(direct_smarts, list):
+        smarts_list = [s for s in direct_smarts if isinstance(s, str)]
+    elif isinstance(smarts_any, list):
+        smarts_list = [s for s in smarts_any if isinstance(s, str)]
+    return [s.strip() for s in smarts_list if isinstance(s, str) and s.strip()]
+
+
+def _validate_group_maps(groups: Mapping[str, Mapping[str, Any]]) -> None:
+    errors: List[str] = []
+    for group_id, group in groups.items():
+        if not isinstance(group, Mapping):
+            continue
+        kind = str(group.get("kind") or "")
+        smarts = str(group.get("smarts") or "")
+        if not kind or not smarts:
+            continue
+        expected_map = 1 if kind == "context" else 2
+        if not _has_map(smarts, map_num=expected_map):
+            errors.append(f"{group_id} (kind={kind}, expected :{expected_map})")
+    if errors:
+        joined = ", ".join(sorted(errors))
+        raise ValueError(f"Group SMARTS missing required attach maps: {joined}")
+
+
+def _validate_compound_templates(
+    compounds: Iterable[Dict[str, Any]],
+    templates: Mapping[str, str],
+) -> None:
+    missing: set[str] = set()
+    for entry in compounds:
+        if not isinstance(entry, dict):
+            continue
+        if _extract_compound_smarts(entry):
+            continue
+        template_id = entry.get("template")
+        if template_id and template_id not in templates:
+            missing.add(str(template_id))
+    if missing:
+        joined = ", ".join(sorted(missing))
+        raise ValueError(f"Compound templates missing from registry: {joined}")

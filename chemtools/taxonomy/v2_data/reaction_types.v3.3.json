@@ -1,9 +1,9 @@
 {
   "version": "3.3",
   "depends_on": {
-    "organic_groups": "organic_groups.v1.2.json",
+    "organic_groups": "organic_groups.v1.3.json",
     "smarts_templates": "smarts_templates.v1.json",
-    "organic_compounds": "organic_compounds.v1.2.json",
+    "organic_compounds": "organic_compounds.v1.3.json",
     "source_reaction_types_old": "reaction_types -old.json"
   },
   "design": {

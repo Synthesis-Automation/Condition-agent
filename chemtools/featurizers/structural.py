@@ -180,8 +180,8 @@ def _filter_arom_duplicates(motifs: list[Dict[str, Any]]) -> list[Dict[str, Any]
 def _default_registry_paths() -> Dict[str, Path]:
     base = Path(__file__).resolve().parent.parent / "taxonomy" / "v2_data"
     return {
-        "groups": base / "organic_groups.v1.2.json",
-        "compounds": base / "organic_compounds.v1.2.json",
+        "groups": base / "organic_groups.v1.3.json",
+        "compounds": base / "organic_compounds.v1.3.json",
         "templates": base / "smarts_templates.v1.json",
     }
 

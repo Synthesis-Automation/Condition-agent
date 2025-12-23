@@ -50,8 +50,8 @@ class ReactionDetectionResult:
 def _load_compound_registry() -> Dict[str, Any]:
     base = Path(__file__).resolve().parent.parent / "taxonomy" / "v2_data"
     registry_paths = {
-        "groups": base / "organic_groups.v1.2.json",
-        "compounds": base / "organic_compounds.v1.2.json",
+        "groups": base / "organic_groups.v1.3.json",
+        "compounds": base / "organic_compounds.v1.3.json",
         "templates": base / "smarts_templates.v1.json",
     }
     return build_compound_registry(registry_paths)
