@@ -1,23 +1,12 @@
 {
-  "version": "1.2",
+  "version": "v1.3",
   "naming_set": "chemist_style",
-  "notes": [
-    "Use group.name for chemist-facing labels (Ar-, Vinyl-, -CHO, -CN, -NO2, -B(OH)2, -Bpin, -OTf, ...).",
-    "Use group.id as a stable, code-friendly key.",
-    "Context groups represent the attachment environment; core/tail groups represent substituent cores.",
-    "v1.1: added minimal cores for terminal alkyne (CCH) and terminal alkene (CHCH2) to support Sonogashira/Heck/SN2 typing.",
-    "v1.2: added minimal 'tags' (lightweight categories) to each group for chemist-friendly filtering and auto-building reaction roles.",
-    "Tags are intentionally shallow (no hierarchy). Use them to generate roles like sp2_electrophile, organoboron_partner, etc."
-  ],
+  "notes": "Mapping-only attachpoint convention:\n- Context groups (kind=context): the attach atom is the atom mapped as :1 in `smarts`.\n- Core/tail groups (kind=core|tail): the attach atom is the atom mapped as :2 in `smarts`.\n- If a group has multiple attachpoints, it may contain both :1 and :2 (or multiple mapped atoms) in `smarts`.\nThe legacy fields `attach_points` and `attach_labels` were removed; attachpoints are inferred from atom-maps in `smarts`.",
   "groups": [
     {
       "id": "Ar",
       "name": "Ar-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[c:1]",
       "description": "Aryl attachment via aromatic carbon (Ar-).",
       "tags": [
@@ -30,10 +19,6 @@
       "id": "Arom",
       "name": "Arom-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[a:1]",
       "description": "Any aromatic attachment (includes heteroaromatic attachment via any aromatic atom).",
       "tags": [
@@ -46,10 +31,6 @@
       "id": "Vinyl",
       "name": "Vinyl-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[C;X3:1]=[C;X3]",
       "description": "Vinylic (alkenyl) attachment at an sp2 carbon.",
       "tags": [
@@ -62,10 +43,6 @@
       "id": "R",
       "name": "R-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[CX4:1]",
       "description": "Alkyl (sp3 carbon) attachment point (R-).",
       "tags": [
@@ -78,10 +55,6 @@
       "id": "Bn",
       "name": "Bn-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[CH2:1][c]",
       "description": "Benzylic CH2 attachment (Bn-).",
       "tags": [
@@ -94,10 +67,6 @@
       "id": "Allyl",
       "name": "Allyl-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[CH2:1][CH]=[CH2]",
       "description": "Allylic CH2 attachment (Allyl-).",
       "tags": [
@@ -110,10 +79,6 @@
       "id": "Alkynyl",
       "name": "Alkynyl-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[#6:1]#[#6]",
       "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal).",
       "tags": [
@@ -126,10 +91,6 @@
       "id": "Acyl",
       "name": "Acyl-",
       "kind": "context",
-      "attach_points": 1,
-      "attach_labels": [
-        1
-      ],
       "smarts": "[CX3:1](=O)",
       "description": "Acyl carbon attachment point (Acyl-), used for acyl electrophiles/features.",
       "tags": [
@@ -142,9 +103,7 @@
       "id": "Cl",
       "name": "-Cl",
       "kind": "core",
-      "attach_points": 0,
-      "attach_labels": [],
-      "smarts": "[Cl]",
+      "smarts": "[Cl:2]",
       "description": "Chloro substituent core (-Cl).",
       "tags": [
         "halide",
@@ -156,9 +115,7 @@
       "id": "Br",
       "name": "-Br",
       "kind": "core",
-      "attach_points": 0,
-      "attach_labels": [],
-      "smarts": "[Br]",
+      "smarts": "[Br:2]",
       "description": "Bromo substituent core (-Br).",
       "tags": [
         "halide",
@@ -170,9 +127,7 @@
       "id": "I",
       "name": "-I",
       "kind": "core",
-      "attach_points": 0,
-      "attach_labels": [],
-      "smarts": "[I]",
+      "smarts": "[I:2]",
       "description": "Iodo substituent core (-I).",
       "tags": [
         "halide",
@@ -184,9 +139,7 @@
       "id": "F",
       "name": "-F",
       "kind": "core",
-      "attach_points": 0,
-      "attach_labels": [],
-      "smarts": "[F]",
+      "smarts": "[F:2]",
       "description": "Fluoro substituent core (-F).",
       "tags": [
         "halide",
@@ -198,10 +151,6 @@
       "id": "CHO",
       "name": "-CHO",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX3H1:2](=O)",
       "description": "Aldehyde core; attach via formyl carbon (-CHO).",
       "tags": [
@@ -213,10 +162,6 @@
       "id": "CN",
       "name": "-CN",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[#6:2]#N",
       "description": "Nitrile core; attach via cyano carbon (-CN).",
       "tags": [
@@ -227,10 +172,6 @@
       "id": "NO2",
       "name": "-NO2",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[N+:2](=O)[O-]",
       "description": "Nitro core; attach via nitro nitrogen (-NO2).",
       "tags": [
@@ -241,10 +182,6 @@
       "id": "B(OH)2",
       "name": "-B(OH)2",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[B:2](O)O",
       "description": "Boronic acid core; attach via boron (-B(OH)2).",
       "tags": [
@@ -256,10 +193,6 @@
       "id": "Bpin",
       "name": "-Bpin",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[B:2]1OC(C)(C)C(C)(C)O1",
       "description": "Bpin core; attach via boron (-Bpin).",
       "tags": [
@@ -271,10 +204,6 @@
       "id": "NH2",
       "name": "-NH2",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[NX3;H2:2]",
       "description": "Primary amine N core (-NH2).",
       "tags": [
@@ -287,10 +216,6 @@
       "id": "NHR",
       "name": "-NHR",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[NX3;H1:2]",
       "description": "Secondary amine N core with one N-H (-NHR).",
       "tags": [
@@ -303,10 +228,6 @@
       "id": "NR2",
       "name": "-NR2",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[NX3;H0:2]",
       "description": "Tertiary amine N core, no N-H (-NR2).",
       "tags": [
@@ -318,10 +239,6 @@
       "id": "OH",
       "name": "-OH",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[OX2H:2]",
       "description": "Hydroxy core (-OH).",
       "tags": [
@@ -334,10 +251,6 @@
       "id": "SH",
       "name": "-SH",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[SX2H:2]",
       "description": "Thiol core (-SH).",
       "tags": [
@@ -350,10 +263,6 @@
       "id": "CO2H",
       "name": "-CO2H",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX3:2](=O)[OX2H]",
       "description": "Carboxylic acid core (-CO2H), attach via carbonyl carbon.",
       "tags": [
@@ -366,10 +275,6 @@
       "id": "COCl",
       "name": "-COCl",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX3:2](=O)Cl",
       "description": "Acyl chloride core (-COCl), attach via carbonyl carbon.",
       "tags": [
@@ -382,10 +287,6 @@
       "id": "CO2R",
       "name": "-CO2R",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX3:2](=O)O[#6]",
       "description": "Ester core (-CO2R), attach via carbonyl carbon.",
       "tags": [
@@ -397,10 +298,6 @@
       "id": "CONHR",
       "name": "-CONHR",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX3:2](=O)[NX3;H1,H2]",
       "description": "Amide with N-H (generic -CONHR/-CONH2); attach via carbonyl carbon.",
       "tags": [
@@ -412,9 +309,7 @@
       "id": "OTf",
       "name": "-OTf",
       "kind": "tail",
-      "attach_points": 0,
-      "attach_labels": [],
-      "smarts": "S(=O)(=O)C(F)(F)F",
+      "smarts": "[S:2](=O)(=O)C(F)(F)F",
       "description": "Triflate tail for Ar-OTf/Vinyl-OTf via oxygen linker.",
       "tags": [
         "sulfonate_leaving_group",
@@ -425,9 +320,7 @@
       "id": "OTs",
       "name": "-OTs",
       "kind": "tail",
-      "attach_points": 0,
-      "attach_labels": [],
-      "smarts": "S(=O)(=O)c1ccc(C)cc1",
+      "smarts": "[S:2](=O)(=O)c1ccc(C)cc1",
       "description": "Tosylate tail via oxygen linker.",
       "tags": [
         "sulfonate_leaving_group",
@@ -438,9 +331,7 @@
       "id": "OMs",
       "name": "-OMs",
       "kind": "tail",
-      "attach_points": 0,
-      "attach_labels": [],
-      "smarts": "S(=O)(=O)C",
+      "smarts": "[S:2](=O)(=O)C",
       "description": "Mesylate tail via oxygen linker.",
       "tags": [
         "sulfonate_leaving_group",
@@ -451,10 +342,6 @@
       "id": "CCH",
       "name": "-C#CH",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX2:2]#[CX2H]",
       "description": "Terminal alkyne core (-C#CH), attach via substituted sp carbon.",
       "tags": [
@@ -466,10 +353,6 @@
       "id": "CHCH2",
       "name": "-CH=CH2",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX3H1:2]=[CX3H2]",
       "description": "Terminal alkene core (-CH=CH2), attach via substituted sp2 carbon (monosubstituted alkene).",
       "tags": [
@@ -481,10 +364,6 @@
       "id": "CO",
       "name": "-CO-",
       "kind": "core",
-      "attach_points": 1,
-      "attach_labels": [
-        2
-      ],
       "smarts": "[CX3:2](=O)[#6]",
       "description": "Ketone core; attach via carbonyl carbon (-CO-R).",
       "tags": [
