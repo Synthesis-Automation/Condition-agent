@@ -5,6 +5,7 @@ A feature-driven condition recommendation engine for synthetic chemistry.
 ## Overview
 
 This system provides automated condition recommendations based on:
+
 - **Calculable molecular features** (v2.2 with 108 features)
 - **Rule databases** in JSON format (e.g., `suzuki.json`)
 - **Modifier logic** for handling symptoms and edge cases
@@ -159,6 +160,7 @@ The system uses calculable features loaded from the layered spec under `chemtool
 ### Derived Shortcuts
 
 Some features are computed from others:
+
 ```json
 {
   "name": "sp2_halide_present",
@@ -185,6 +187,7 @@ rec = engine.recommend("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1")
 ```
 
 **Output:**
+
 - Detects: `sp2_bromide_present`, `sp2_boron_present`, `aryl_halide_present`
 - Matches: Default rule (no specific base_rules match)
 - Conditions: PdCl2(dtbpf), K3PO4, dioxane/H2O, 80-100°C
@@ -196,6 +199,7 @@ rec = engine.recommend("Clc1ccc(C(=O)O)cc1.OB(O)c1ccccc1>>...")
 ```
 
 **Output:**
+
 - Detects: `sp2_chloride_present`, `strong_ewg_present`, `sp2_boron_present`
 - Matches: "Aryl Chloride (Unhindered/EWG)" base rule
 - Conditions: Pd(dba)2, XPhos, K3PO4, 100-120°C
@@ -210,17 +214,20 @@ rec = engine.recommend(
 ```
 
 **Output:**
+
 - Applies symptom-based modifiers
 - Suggests: Temperature increase, extended reaction time, etc.
 
 ## Testing
 
 Run the test suite:
+
 ```bash
 pytest tests/test_rule_engine.py -v
 ```
 
 **Test Coverage:**
+
 - ✅ Model serialization/deserialization
 - ✅ Feature matching logic (AND/OR/ALL)
 - ✅ Database loading and validation

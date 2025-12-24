@@ -9,9 +9,9 @@
   "design": {
     "principle": "Avoid calculable_features. Reaction typing is defined by explicit reactant motif lists (from organic_compounds).",
     "how_to_edit": [
-      "Edit reaction_types[*].reactants.<slot> lists directly (add/remove compound IDs like 'Ar-OMs').",
+      "Define reaction_types[*].reactants.<slot> as a list of compound IDs or an object with motif_sets/include/exclude.",
       "Use reactants.nucleophiles as the second-component list for cross-couplings (e.g., organoboron, terminal alkyne, alkene) and for classical nucleophiles (amines, alcohols, thiols).",
-      "motif_sets are optional convenience lists; you may copy them into reactants slots and customize per reaction."
+      "Prefer motif_sets for shared lists; use include/exclude for per-reaction tweaks."
     ],
     "slots": [
       "electrophiles",
@@ -138,6 +138,13 @@
       "Ar-CONHR",
       "Arom-CONHR"
     ],
+    "carbonyls_reductive_amination_default": [
+      "Any-CHO",
+      "Any-CO-R",
+      "Ar-CHO",
+      "Arom-CHO",
+      "Vinyl-CHO"
+    ],
     "aromatic_halides_for_snar": [
       "Ar-Br",
       "Ar-Cl",
@@ -174,7 +181,7 @@
   "reaction_types": [
     {
       "id": "suzuki_miyaura",
-      "name": "Suzuki–Miyaura coupling",
+      "name": "Suzuki\u2013Miyaura coupling",
       "category": "c_c_coupling_reactions",
       "aliases": [
         "Suzuki",
@@ -197,44 +204,23 @@
         "rule_db_v2": "Suzuki_db"
       },
       "reactants": {
-        "electrophiles": [
-          "Ar-Br",
-          "Ar-Cl",
-          "Ar-F",
-          "Ar-I",
-          "Ar-OMs",
-          "Ar-OTf",
-          "Ar-OTs",
-          "Arom-Br",
-          "Arom-Cl",
-          "Arom-F",
-          "Arom-I",
-          "Arom-OMs",
-          "Arom-OTf",
-          "Arom-OTs",
-          "Vinyl-Br",
-          "Vinyl-Cl",
-          "Vinyl-F",
-          "Vinyl-I",
-          "Vinyl-OMs",
-          "Vinyl-OTf",
-          "Vinyl-OTs"
-        ],
-        "nucleophiles": [
-          "Ar-B(OH)2",
-          "Ar-Bpin",
-          "Arom-B(OH)2",
-          "Arom-Bpin",
-          "Vinyl-B(OH)2",
-          "Vinyl-Bpin"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "sp2_electrophiles_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "organoboron_default"
+          ]
+        }
       },
-      "edit_hint": "To exclude a class (e.g., Ar-OMs), delete it from allowlists.electrophiles.",
-      "notes": "Motif typing: electrophile ∈ sp2_electrophiles_default AND partner ∈ organoboron_default."
+      "edit_hint": "To exclude a class (e.g., Ar-OMs), add it to reactants.electrophiles.exclude or remove it from motif_sets.",
+      "notes": "Motif typing: electrophile \u2208 sp2_electrophiles_default AND partner \u2208 organoboron_default."
     },
     {
       "id": "c_n_cross_coupling",
-      "name": "C–N cross-coupling (sp2 electrophile + amine)",
+      "name": "C\u2013N cross-coupling (sp2 electrophile + amine)",
       "category": "c_n_coupling_reactions",
       "aliases": [
         "Buchwald-Hartwig",
@@ -258,55 +244,29 @@
         "rule_db_v2": "C_N_Coupling_Pd_db"
       },
       "reactants": {
-        "electrophiles": [
-          "Ar-Br",
-          "Ar-Cl",
-          "Ar-F",
-          "Ar-I",
-          "Ar-OMs",
-          "Ar-OTf",
-          "Ar-OTs",
-          "Arom-Br",
-          "Arom-Cl",
-          "Arom-F",
-          "Arom-I",
-          "Arom-OMs",
-          "Arom-OTf",
-          "Arom-OTs",
-          "Vinyl-Br",
-          "Vinyl-Cl",
-          "Vinyl-F",
-          "Vinyl-I",
-          "Vinyl-OMs",
-          "Vinyl-OTf",
-          "Vinyl-OTs"
-        ],
-        "nucleophiles": [
-          "Allyl-NH2",
-          "Allyl-NHR",
-          "Any-NH2",
-          "Any-NHR",
-          "Ar-NH2",
-          "Ar-NHR",
-          "Arom-NH2",
-          "Arom-NHR",
-          "Bn-NH2",
-          "Bn-NHR",
-          "Vinyl-NH2",
-          "Indole",
-          "Pyrrole",
-          "Imidazole",
-          "Pyrazole",
-          "Triazole",
-          "Tetrazole",
-          "Benzimidazole",
-          "Purine",
-          "Any-CONHR",
-          "Ar-CONHR",
-          "Arom-CONHR"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "sp2_electrophiles_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "amines_nh_default",
+            "amides_default"
+          ],
+          "include": [
+            "Indole",
+            "Pyrrole",
+            "Imidazole",
+            "Pyrazole",
+            "Triazole",
+            "Tetrazole",
+            "Benzimidazole",
+            "Purine"
+          ]
+        }
       },
-      "edit_hint": "Remove F electrophiles if you do not want Ar-F counted as coupling electrophiles.",
+      "edit_hint": "Exclude F electrophiles via reactants.electrophiles.exclude if you do not want Ar-F counted here.",
       "notes": "Catalyst family (Pd/Cu/Ni) is not inferred here; this is motif-based reaction type classification."
     },
     {
@@ -329,35 +289,32 @@
         "rule_db_v2": "chan_lam_cn_db"
       },
       "reactants": {
-        "electrophiles": [
-          "Ar-B(OH)2",
-          "Arom-B(OH)2",
-          "Vinyl-B(OH)2"
-        ],
-        "nucleophiles": [
-          "Allyl-NH2",
-          "Allyl-NHR",
-          "Any-NH2",
-          "Any-NHR",
-          "Ar-NH2",
-          "Ar-NHR",
-          "Arom-NH2",
-          "Arom-NHR",
-          "Bn-NH2",
-          "Bn-NHR",
-          "Vinyl-NH2",
-          "Indole",
-          "Pyrrole",
-          "Imidazole",
-          "Pyrazole",
-          "Triazole",
-          "Tetrazole",
-          "Benzimidazole",
-          "Purine",
-          "Any-CONHR",
-          "Ar-CONHR",
-          "Arom-CONHR"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "organoboron_default"
+          ],
+          "exclude": [
+            "Ar-Bpin",
+            "Arom-Bpin",
+            "Vinyl-Bpin"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "amines_nh_default",
+            "amides_default"
+          ],
+          "include": [
+            "Indole",
+            "Pyrrole",
+            "Imidazole",
+            "Pyrazole",
+            "Triazole",
+            "Tetrazole",
+            "Benzimidazole",
+            "Purine"
+          ]
+        }
       }
     },
     {
@@ -382,37 +339,16 @@
         "rule_db_v2": "C_O_coupling_db"
       },
       "reactants": {
-        "electrophiles": [
-          "Ar-Br",
-          "Ar-Cl",
-          "Ar-F",
-          "Ar-I",
-          "Ar-OMs",
-          "Ar-OTf",
-          "Ar-OTs",
-          "Arom-Br",
-          "Arom-Cl",
-          "Arom-F",
-          "Arom-I",
-          "Arom-OMs",
-          "Arom-OTf",
-          "Arom-OTs",
-          "Vinyl-Br",
-          "Vinyl-Cl",
-          "Vinyl-F",
-          "Vinyl-I",
-          "Vinyl-OMs",
-          "Vinyl-OTf",
-          "Vinyl-OTs"
-        ],
-        "nucleophiles": [
-          "Any-OH",
-          "Ar-OH",
-          "Arom-OH",
-          "Bn-OH",
-          "Allyl-OH",
-          "Vinyl-OH"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "sp2_electrophiles_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "alcohols_oh_default"
+          ]
+        }
       }
     },
     {
@@ -439,31 +375,21 @@
         "rule_db_v2": "sonogashira_v2"
       },
       "reactants": {
-        "electrophiles": [
-          "Ar-Br",
-          "Ar-Cl",
-          "Ar-I",
-          "Ar-OMs",
-          "Ar-OTf",
-          "Ar-OTs",
-          "Arom-Br",
-          "Arom-Cl",
-          "Arom-I",
-          "Arom-OMs",
-          "Arom-OTf",
-          "Arom-OTs",
-          "Vinyl-Br",
-          "Vinyl-Cl",
-          "Vinyl-I",
-          "Vinyl-OMs",
-          "Vinyl-OTf",
-          "Vinyl-OTs"
-        ],
-        "nucleophiles": [
-          "Ar-CCH",
-          "Arom-CCH",
-          "R-CCH"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "sp2_electrophiles_default"
+          ],
+          "exclude": [
+            "Ar-F",
+            "Arom-F",
+            "Vinyl-F"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "terminal_alkynes_default"
+          ]
+        }
       },
       "notes": "Minimal alkynes: *-CCH motifs currently represent terminal alkynes."
     },
@@ -488,31 +414,21 @@
       ],
       "conditions": "Base, ligand, high temperature",
       "reactants": {
-        "electrophiles": [
-          "Ar-Br",
-          "Ar-Cl",
-          "Ar-I",
-          "Ar-OMs",
-          "Ar-OTf",
-          "Ar-OTs",
-          "Arom-Br",
-          "Arom-Cl",
-          "Arom-I",
-          "Arom-OMs",
-          "Arom-OTf",
-          "Arom-OTs",
-          "Vinyl-Br",
-          "Vinyl-Cl",
-          "Vinyl-I",
-          "Vinyl-OMs",
-          "Vinyl-OTf",
-          "Vinyl-OTs"
-        ],
-        "nucleophiles": [
-          "Ar-CHCH2",
-          "Arom-CHCH2",
-          "R-CHCH2"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "sp2_electrophiles_default"
+          ],
+          "exclude": [
+            "Ar-F",
+            "Arom-F",
+            "Vinyl-F"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "terminal_alkenes_default"
+          ]
+        }
       },
       "notes": "Minimal alkenes: *-CHCH2 motifs currently represent terminal alkenes (expand later for disubstituted/internal alkenes)."
     },
@@ -537,50 +453,38 @@
         "rule_db_v2": "SNAr_db"
       },
       "reactants": {
-        "electrophiles": [
-          "Ar-Br",
-          "Ar-Cl",
-          "Ar-F",
-          "Arom-Br",
-          "Arom-Cl",
-          "Arom-F"
-        ],
-        "activators": [
-          "Ar-CHO",
-          "Ar-CN",
-          "Ar-NO2",
-          "Arom-CHO",
-          "Arom-CN",
-          "Arom-NO2",
-          "Pyridine",
-          "Pyrimidine",
-          "Quinoline",
-          "Isoquinoline"
-        ],
-        "nucleophiles": [
-          "Allyl-NH2",
-          "Allyl-NHR",
-          "Any-NH2",
-          "Any-NHR",
-          "Ar-NH2",
-          "Ar-NHR",
-          "Arom-NH2",
-          "Arom-NHR",
-          "Bn-NH2",
-          "Bn-NHR",
-          "Vinyl-NH2",
-          "Indole",
-          "Pyrrole",
-          "Imidazole",
-          "Pyrazole",
-          "Triazole",
-          "Tetrazole",
-          "Benzimidazole",
-          "Purine",
-          "Any-CONHR",
-          "Ar-CONHR",
-          "Arom-CONHR"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "aromatic_halides_for_snar"
+          ]
+        },
+        "activators": {
+          "motif_sets": [
+            "aromatic_ewg_for_snar"
+          ],
+          "include": [
+            "Pyridine",
+            "Pyrimidine",
+            "Quinoline",
+            "Isoquinoline"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "amines_nh_default",
+            "amides_default"
+          ],
+          "include": [
+            "Indole",
+            "Pyrrole",
+            "Imidazole",
+            "Pyrazole",
+            "Triazole",
+            "Tetrazole",
+            "Benzimidazole",
+            "Purine"
+          ]
+        }
       },
       "notes": "Activation is set-level: presence of an activator EWG in reactants triggers SNAr typing (not necessarily same ring)."
     },
@@ -602,23 +506,15 @@
       ],
       "conditions": "Polar aprotic solvent, good nucleophile",
       "reactants": {
-        "electrophiles": [
-          "Allyl-Br",
-          "Allyl-Cl",
-          "Allyl-I",
-          "Bn-Br",
-          "Bn-Cl",
-          "Bn-I",
-          "R-Br",
-          "R-Cl",
-          "R-I",
-          "R-OMs",
-          "R-OTf",
-          "R-OTs"
-        ],
+        "electrophiles": {
+          "motif_sets": [
+            "alkyl_halides_default",
+            "alkyl_sulfonates_default"
+          ]
+        },
         "nucleophiles": []
       },
-      "edit_hint": "Add/remove electrophiles freely (e.g., remove R-OMs if you don't want to treat mesylates as electrophiles here).",
+      "edit_hint": "Add/remove electrophiles via reactants.electrophiles.include/exclude (e.g., exclude R-OMs to drop mesylates).",
       "notes": "Nucleophile identity is not constrained by default; define specialized types (N-alkylation, O-alkylation) if desired."
     },
     {
@@ -642,36 +538,27 @@
         "rule_db_v2": "amide_formation_db"
       },
       "reactants": {
-        "acids": [
-          "Any-CO2H",
-          "Ar-CO2H",
-          "Arom-CO2H",
-          "Vinyl-CO2H"
-        ],
-        "nucleophiles": [
-          "Allyl-NH2",
-          "Allyl-NHR",
-          "Any-NH2",
-          "Any-NHR",
-          "Ar-NH2",
-          "Ar-NHR",
-          "Arom-NH2",
-          "Arom-NHR",
-          "Bn-NH2",
-          "Bn-NHR",
-          "Vinyl-NH2",
-          "Indole",
-          "Pyrrole",
-          "Imidazole",
-          "Pyrazole",
-          "Triazole",
-          "Tetrazole",
-          "Benzimidazole",
-          "Purine",
-          "Any-CONHR",
-          "Ar-CONHR",
-          "Arom-CONHR"
-        ]
+        "acids": {
+          "motif_sets": [
+            "carboxylic_acids_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "amines_nh_default",
+            "amides_default"
+          ],
+          "include": [
+            "Indole",
+            "Pyrrole",
+            "Imidazole",
+            "Pyrazole",
+            "Triazole",
+            "Tetrazole",
+            "Benzimidazole",
+            "Purine"
+          ]
+        }
       },
       "notes": "Coupling reagents are not inferred; this is substrate-based typing."
     },
@@ -695,20 +582,16 @@
       ],
       "conditions": "Acid catalyst or coupling reagent",
       "reactants": {
-        "acids": [
-          "Any-CO2H",
-          "Ar-CO2H",
-          "Arom-CO2H",
-          "Vinyl-CO2H"
-        ],
-        "nucleophiles": [
-          "Allyl-OH",
-          "Any-OH",
-          "Ar-OH",
-          "Arom-OH",
-          "Bn-OH",
-          "Vinyl-OH"
-        ]
+        "acids": {
+          "motif_sets": [
+            "carboxylic_acids_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "alcohols_oh_default"
+          ]
+        }
       },
       "notes": "Substrate-based typing; acid-catalyzed vs reagent-mediated not distinguished."
     },
@@ -720,37 +603,27 @@
         "rule_db_v2": "amide_formation_db"
       },
       "reactants": {
-        "electrophiles": [
-          "Acyl-Br",
-          "Acyl-Cl",
-          "Any-COCl",
-          "Ar-COCl",
-          "Arom-COCl"
-        ],
-        "nucleophiles": [
-          "Allyl-NH2",
-          "Allyl-NHR",
-          "Any-NH2",
-          "Any-NHR",
-          "Ar-NH2",
-          "Ar-NHR",
-          "Arom-NH2",
-          "Arom-NHR",
-          "Bn-NH2",
-          "Bn-NHR",
-          "Vinyl-NH2",
-          "Indole",
-          "Pyrrole",
-          "Imidazole",
-          "Pyrazole",
-          "Triazole",
-          "Tetrazole",
-          "Benzimidazole",
-          "Purine",
-          "Any-CONHR",
-          "Ar-CONHR",
-          "Arom-CONHR"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "acyl_halides_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "amines_nh_default",
+            "amides_default"
+          ],
+          "include": [
+            "Indole",
+            "Pyrrole",
+            "Imidazole",
+            "Pyrazole",
+            "Triazole",
+            "Tetrazole",
+            "Benzimidazole",
+            "Purine"
+          ]
+        }
       },
       "notes": "Covers acid chloride/bromide amidation; optional product confirmation via amide motifs."
     },
@@ -762,26 +635,16 @@
         "rule_db_v2": "reductive_amination_db"
       },
       "reactants": {
-        "electrophiles": [
-          "Any-CHO",
-          "Any-CO-R",
-          "Ar-CHO",
-          "Arom-CHO",
-          "Vinyl-CHO"
-        ],
-        "nucleophiles": [
-          "Allyl-NH2",
-          "Allyl-NHR",
-          "Any-NH2",
-          "Any-NHR",
-          "Ar-NH2",
-          "Ar-NHR",
-          "Arom-NH2",
-          "Arom-NHR",
-          "Bn-NH2",
-          "Bn-NHR",
-          "Vinyl-NH2"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "carbonyls_reductive_amination_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "amines_nh_default"
+          ]
+        }
       }
     },
     {
@@ -792,12 +655,14 @@
         "rule_db_v2": "RCM_db"
       },
       "reactants": {
-        "nucleophiles": [
-          "Any-CHCH2",
-          "Ar-CHCH2",
-          "Arom-CHCH2",
-          "R-CHCH2"
-        ]
+        "nucleophiles": {
+          "motif_sets": [
+            "terminal_alkenes_default"
+          ],
+          "include": [
+            "Any-CHCH2"
+          ]
+        }
       },
       "notes": "Requires at least two alkene motifs (handled by detection logic)."
     },
@@ -806,21 +671,16 @@
       "name": "Ester formation (acyl halide + alcohol/phenol)",
       "family": "acyl_substitution",
       "reactants": {
-        "electrophiles": [
-          "Acyl-Br",
-          "Acyl-Cl",
-          "Any-COCl",
-          "Ar-COCl",
-          "Arom-COCl"
-        ],
-        "nucleophiles": [
-          "Allyl-OH",
-          "Any-OH",
-          "Ar-OH",
-          "Arom-OH",
-          "Bn-OH",
-          "Vinyl-OH"
-        ]
+        "electrophiles": {
+          "motif_sets": [
+            "acyl_halides_default"
+          ]
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "alcohols_oh_default"
+          ]
+        }
       },
       "notes": "Covers acid chloride/bromide esterification; optional product confirmation via ester motifs."
     }

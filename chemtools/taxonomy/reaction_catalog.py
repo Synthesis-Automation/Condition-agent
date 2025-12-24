@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
 
 REACTION_TYPES_FILE = Path(__file__).resolve().parent / "v2_data" / "reaction_types.v3.3.json"
@@ -45,20 +45,62 @@ def _clean_list(values: Any) -> List[str]:
     return []
 
 
-def _normalize_reactants(raw: Any) -> Dict[str, List[str]]:
+def _coerce_list(values: Any) -> List[str]:
+    if isinstance(values, list):
+        return [str(v) for v in values if isinstance(v, str) and v.strip()]
+    if isinstance(values, str):
+        value = values.strip()
+        return [value] if value else []
+    return []
+
+
+def _dedupe(values: Iterable[str]) -> List[str]:
+    seen: Set[str] = set()
+    result: List[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        result.append(value)
+    return result
+
+
+def _expand_reactant_slot(
+    values: Any,
+    motif_sets: Mapping[str, Iterable[str]],
+) -> List[str]:
+    if isinstance(values, dict):
+        expanded: List[str] = []
+        for set_name in _coerce_list(values.get("motif_sets") or values.get("motif_set")):
+            expanded.extend(_coerce_list(motif_sets.get(set_name)))
+        expanded.extend(_coerce_list(values.get("include")))
+        exclude = set(_coerce_list(values.get("exclude")))
+        if exclude:
+            expanded = [value for value in expanded if value not in exclude]
+        return _dedupe(expanded)
+    if isinstance(values, list):
+        return _clean_list(values)
+    return []
+
+
+def _normalize_reactants(
+    raw: Any,
+    motif_sets: Optional[Mapping[str, Iterable[str]]] = None,
+) -> Dict[str, List[str]]:
     if not isinstance(raw, dict):
         return {}
 
+    motif_sets = motif_sets or {}
     reactants: Dict[str, List[str]] = {}
     for slot in _DEFAULT_SLOTS:
         if slot in raw:
-            reactants[slot] = _clean_list(raw.get(slot))
+            reactants[slot] = _expand_reactant_slot(raw.get(slot), motif_sets)
 
     for slot, values in raw.items():
         if slot in reactants:
             continue
-        cleaned = _clean_list(values)
-        if cleaned or isinstance(values, list):
+        cleaned = _expand_reactant_slot(values, motif_sets)
+        if cleaned or isinstance(values, (list, dict)):
             reactants[slot] = cleaned
     return reactants
 
@@ -69,6 +111,7 @@ def load_reaction_catalog(
 ) -> Tuple[Dict[str, ReactionTypeDefinition], Dict[str, str]]:
     payload = _load_payload(path or REACTION_TYPES_FILE)
     reactions = payload.get("reaction_types") or []
+    motif_sets = payload.get("motif_sets") or {}
 
     definitions: Dict[str, ReactionTypeDefinition] = {}
     alias_map: Dict[str, str] = {}
@@ -88,7 +131,7 @@ def load_reaction_catalog(
         category = str(entry.get("category") or "")
         aliases = [str(a) for a in (entry.get("aliases") or []) if isinstance(a, str)]
         description = entry.get("description")
-        reactants = _normalize_reactants(entry.get("reactants"))
+        reactants = _normalize_reactants(entry.get("reactants"), motif_sets)
         catalysts = [str(c) for c in (entry.get("catalysts") or []) if isinstance(c, str)]
         conditions = entry.get("conditions")
         metadata = dict(entry.get("metadata") or {})
