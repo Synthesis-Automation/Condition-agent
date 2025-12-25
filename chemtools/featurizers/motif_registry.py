@@ -318,15 +318,13 @@ def choose_best_compound_hit(
     direct_ids = direct_ids or set()
 
     def prefix_rank(hit: str) -> int:
-        if hit.startswith("Arom-"):
-            return 0
         if hit.startswith("Ar-"):
-            return 1
+            return 0
         if hit.startswith("Vinyl-"):
-            return 2
+            return 1
         if hit.startswith(("R-", "Bn-", "Allyl-")):
-            return 3
-        return 4
+            return 2
+        return 3
 
     def rank(hit: str) -> tuple[int, int, int, str]:
         direct_rank = 0 if prefer_direct and hit in direct_ids else 1

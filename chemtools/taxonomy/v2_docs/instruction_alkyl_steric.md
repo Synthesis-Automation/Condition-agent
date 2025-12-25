@@ -60,7 +60,7 @@ For motifs like `R-X`, `Bn-X`, `Allyl-X` where `X` can be `Br`, `CHO`, `OH`, etc
 Dispatcher rule:
 
 - if `compound_id` starts with `R-`, `Bn-`, or `Allyl-` → run alkyl steric analyzer
-- `Ar-*` / `Arom-*` handled elsewhere
+- `Ar-*` handled elsewhere
 
 ---
 

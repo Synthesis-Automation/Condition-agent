@@ -29,7 +29,7 @@
     "notes": "Chan-Lam coupling uses Cu(II) or Cu(I) with air/O2 as oxidant. Typical conditions: Cu(OAc)2 (10-20 mol%), pyridine or TEA (2 equiv), DCM or MeOH, RT to 50 °C. Open to air or O2 balloon."
   },
   "applies_if": {
-    "expr": "(Ar-B(OH)2 OR Arom-B(OH)2 OR Vinyl-B(OH)2) AND ((Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Arom-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR OR Arom-CONHR))"
+    "expr": "(Ar-B(OH)2 OR Vinyl-B(OH)2) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR))"
   },
   "default_rule": {
     "id": "DEF_ChanLam_general",
@@ -49,7 +49,7 @@
       "id": "BR_chan_lam_amines",
       "description": "Standard Chan-Lam for primary/secondary amines.",
       "reactant_features": {
-        "expr": "(Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Any-NHR OR Ar-NHR OR Arom-NHR)"
+        "expr": "(Any-NH2 OR Ar-NH2 OR Any-NHR OR Ar-NHR)"
       },
       "conditions": {
         "cu_source": "Cu(OAc)2 (10–20 mol%)",

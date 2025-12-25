@@ -26,7 +26,7 @@
     "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nCore heuristics:\n• Activation governs rate: o/p‑NO2, CN, CF3, SO2R, COR/CO2R, N‑oxide, or heteroaryl (e.g., pyrimidines, triazines) enable S_NAr.\n• Leaving group trend (S_NAr): F ≫ Cl ≳ NO2 ≫ Br, I (rarely operative unless strongly activated).\n• Solvent: dry, polar aprotic (DMSO, DMF, DMAc, NMP). Keep water low.\n• Base: generate the conjugate base in situ (phenoxide/thiolate/amide/alkoxide). Adjust strength to nucleophile acidity and electrophile activation.\n• Steric hindrance near the reaction site or bulky nucleophiles typically require stronger base and/or higher temperature.\n• If no strong activation is present, consider metal‑catalyzed alternatives (Pd/Cu/Ni) instead of S_NAr."
   },
   "applies_if": {
-    "expr": "(Ar-F OR Arom-F OR Ar-Cl OR Arom-Cl OR Ar-NO2 OR Arom-NO2) AND (Any-OH OR Ar-OH OR Arom-OH OR Any-SH OR Ar-SH OR Arom-SH OR Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Any-NHR OR Ar-NHR OR Arom-NHR OR heteroaromatic_nh_present OR amide_present)"
+    "expr": "(Ar-F OR Ar-Cl OR Ar-NO2) AND (Any-OH OR Ar-OH OR Any-SH OR Ar-SH OR Any-NH2 OR Ar-NH2 OR Any-NHR OR Ar-NHR OR heteroaromatic_nh_present OR amide_present)"
   },
   "default_rule": {
     "id": "DEF_SNAr_general",
@@ -48,8 +48,7 @@
       "description": "Phenoxide S_NAr. Works well with aryl F and multi‑EWG aryl/heteroaryl chlorides.",
       "reactant_features": {
         "any": [
-          "Ar-OH",
-          "Arom-OH"
+          "Ar-OH"
         ]
       },
       "conditions": {
@@ -68,7 +67,6 @@
         "any": [
           "Any-SH",
           "Ar-SH",
-          "Arom-SH",
           "Bn-SH",
           "Allyl-SH",
           "Vinyl-SH"
@@ -90,13 +88,11 @@
         "any": [
           "Any-NH2",
           "Ar-NH2",
-          "Arom-NH2",
           "Bn-NH2",
           "Allyl-NH2",
           "Vinyl-NH2",
           "Any-NHR",
           "Ar-NHR",
-          "Arom-NHR",
           "Bn-NHR",
           "Allyl-NHR"
         ]

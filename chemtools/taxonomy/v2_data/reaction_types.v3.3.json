@@ -30,13 +30,6 @@
       "Ar-OMs",
       "Ar-OTf",
       "Ar-OTs",
-      "Arom-Br",
-      "Arom-Cl",
-      "Arom-F",
-      "Arom-I",
-      "Arom-OMs",
-      "Arom-OTf",
-      "Arom-OTs",
       "Vinyl-Br",
       "Vinyl-Cl",
       "Vinyl-F",
@@ -50,10 +43,6 @@
       "Ar-Cl",
       "Ar-F",
       "Ar-I",
-      "Arom-Br",
-      "Arom-Cl",
-      "Arom-F",
-      "Arom-I",
       "Vinyl-Br",
       "Vinyl-Cl",
       "Vinyl-F",
@@ -63,9 +52,6 @@
       "Ar-OMs",
       "Ar-OTf",
       "Ar-OTs",
-      "Arom-OMs",
-      "Arom-OTf",
-      "Arom-OTs",
       "Vinyl-OMs",
       "Vinyl-OTf",
       "Vinyl-OTs"
@@ -73,19 +59,15 @@
     "organoboron_default": [
       "Ar-B(OH)2",
       "Ar-Bpin",
-      "Arom-B(OH)2",
-      "Arom-Bpin",
       "Vinyl-B(OH)2",
       "Vinyl-Bpin"
     ],
     "terminal_alkynes_default": [
       "Ar-CCH",
-      "Arom-CCH",
       "R-CCH"
     ],
     "terminal_alkenes_default": [
       "Ar-CHCH2",
-      "Arom-CHCH2",
       "R-CHCH2"
     ],
     "amines_nh_default": [
@@ -95,8 +77,6 @@
       "Any-NHR",
       "Ar-NH2",
       "Ar-NHR",
-      "Arom-NH2",
-      "Arom-NHR",
       "Bn-NH2",
       "Bn-NHR",
       "Vinyl-NH2"
@@ -105,61 +85,48 @@
       "Allyl-OH",
       "Any-OH",
       "Ar-OH",
-      "Arom-OH",
       "Bn-OH",
       "Vinyl-OH"
     ],
     "thiols_sh_default": [
       "Any-SH",
-      "Ar-SH",
-      "Arom-SH"
+      "Ar-SH"
     ],
     "carboxylic_acids_default": [
       "Any-CO2H",
       "Ar-CO2H",
-      "Arom-CO2H",
       "Vinyl-CO2H"
     ],
     "acyl_halides_default": [
       "Acyl-Br",
       "Acyl-Cl",
       "Any-COCl",
-      "Ar-COCl",
-      "Arom-COCl"
+      "Ar-COCl"
     ],
     "esters_default": [
       "Any-CO2R",
       "Ar-CO2R",
-      "Arom-CO2R",
       "Vinyl-CO2R"
     ],
     "amides_default": [
       "Any-CONHR",
-      "Ar-CONHR",
-      "Arom-CONHR"
+      "Ar-CONHR"
     ],
     "carbonyls_reductive_amination_default": [
       "Any-CHO",
       "Any-CO-R",
       "Ar-CHO",
-      "Arom-CHO",
       "Vinyl-CHO"
     ],
     "aromatic_halides_for_snar": [
       "Ar-Br",
       "Ar-Cl",
-      "Ar-F",
-      "Arom-Br",
-      "Arom-Cl",
-      "Arom-F"
+      "Ar-F"
     ],
     "aromatic_ewg_for_snar": [
       "Ar-CHO",
       "Ar-CN",
-      "Ar-NO2",
-      "Arom-CHO",
-      "Arom-CN",
-      "Arom-NO2"
+      "Ar-NO2"
     ],
     "alkyl_halides_default": [
       "Allyl-Br",
@@ -181,7 +148,7 @@
   "reaction_types": [
     {
       "id": "suzuki_miyaura",
-      "name": "Suzuki\u2013Miyaura coupling",
+      "name": "Suzuki–Miyaura coupling",
       "category": "c_c_coupling_reactions",
       "aliases": [
         "Suzuki",
@@ -216,11 +183,11 @@
         }
       },
       "edit_hint": "To exclude a class (e.g., Ar-OMs), add it to reactants.electrophiles.exclude or remove it from motif_sets.",
-      "notes": "Motif typing: electrophile \u2208 sp2_electrophiles_default AND partner \u2208 organoboron_default."
+      "notes": "Motif typing: electrophile ∈ sp2_electrophiles_default AND partner ∈ organoboron_default."
     },
     {
       "id": "c_n_cross_coupling",
-      "name": "C\u2013N cross-coupling (sp2 electrophile + amine)",
+      "name": "C–N cross-coupling (sp2 electrophile + amine)",
       "category": "c_n_coupling_reactions",
       "aliases": [
         "Buchwald-Hartwig",
@@ -295,7 +262,6 @@
           ],
           "exclude": [
             "Ar-Bpin",
-            "Arom-Bpin",
             "Vinyl-Bpin"
           ]
         },
@@ -381,7 +347,6 @@
           ],
           "exclude": [
             "Ar-F",
-            "Arom-F",
             "Vinyl-F"
           ]
         },
@@ -420,7 +385,6 @@
           ],
           "exclude": [
             "Ar-F",
-            "Arom-F",
             "Vinyl-F"
           ]
         },

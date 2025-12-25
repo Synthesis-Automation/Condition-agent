@@ -9,7 +9,7 @@ Purpose: keep the definition JSONs **simple to maintain**, while still making **
 **Attachpoint is encoded only via atom-mapping inside `group.smarts`.**  
 No extra fields are needed.
 
-- **Context groups** (e.g., `Ar`, `Arom`, `Vinyl`, `R`): attach atom is mapped as `:1`
+- **Context groups** (e.g., `Ar`, `Vinyl`, `R`): attach atom is mapped as `:1`
   - Example: `Ar.smarts = "[c:1]"`
 
 - **Core/tail groups** (e.g., `Br`, `Cl`, `OTf`, `B(OH)2`, `CHO`, `CO2H`, `NH2`): attach atom is mapped as `:2`
@@ -144,8 +144,8 @@ For each SMILES:
 
 Return:
 
-- `hits` (list of motif IDs like `["Ar-Br", "Arom-Br"]`)
-- optional `best_hit` chosen by your precedence rules (e.g., prefer `Arom-*` when ring contains hetero atoms).
+- `hits` (list of motif IDs like `["Ar-Br"]`)
+- optional `best_hit` chosen by your precedence rules (e.g., prefer heteroaryl motifs like `Pyridine` over generic `Ar-*`).
 
 ---
 

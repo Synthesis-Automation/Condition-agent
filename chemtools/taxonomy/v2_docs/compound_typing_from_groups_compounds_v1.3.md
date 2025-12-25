@@ -39,8 +39,8 @@ For each input SMILES, return:
 {
   "smiles": "...",
   "ok": true,
-  "hits": ["Ar-Br", "Arom-Br", "Pyridine", "..."],
-  "best": "Arom-Br"
+  "hits": ["Ar-Br", "Pyridine", "..."],
+  "best": "Ar-Br"
 }
 ```
 
@@ -90,7 +90,7 @@ For each SMILES:
 ### Step 4 — Choose an optional “best” label (if needed)
 
 Many motifs overlap. Example:
-- bromopyridine may match `Ar-Br`, `Arom-Br`, and `Pyridine`.
+- bromopyridine may match `Ar-Br` and `Pyridine`.
 
 Two common policies:
 
@@ -99,9 +99,9 @@ Two common policies:
 
 **Policy B: compute `best` using precedence rules.**
 Typical precedence heuristics:
-1) prefer more specific heteroaromatic types (`Arom-*`) over generic (`Ar-*`)
+1) optionally prefer direct SMARTS motifs (e.g., `Pyridine`) when present
 2) prefer longer/more specific motif IDs
-3) optionally prefer direct SMARTS motifs (e.g., `Pyridine`) when present
+3) prefer context prefixes (`Ar-*`, `Vinyl-*`, `R-*`) over `Any-*` when both appear
 
 ---
 
@@ -174,12 +174,8 @@ def classify_smiles(smiles: str, query_index: dict[str, list[Chem.Mol]]) -> tupl
 def choose_best(hits: list[str]) -> str | None:
     if not hits:
         return None
-    # Prefer heteroaromatic-labeled motifs when present
     for h in hits:
-        if h.startswith("Arom-"):
-            return h
-    for h in hits:
-        if h.startswith("Ar-") or h.startswith("Vinyl-") or h.startswith("R-"):
+        if h.startswith(("Ar-", "Vinyl-", "R-", "Bn-", "Allyl-")):
             return h
     return hits[0]
 ```
@@ -206,9 +202,8 @@ If your list is huge (millions):
 1) **Multiple matches**
    - Always keep `hits` list; don’t force a single label unless needed.
 
-2) **Overlapping definitions (Ar vs Arom)**
-   - If you need a single label, compute “best” using heteroatom-in-ring logic:
-     - identify the ring atom bonded to halide; if same ring contains N/O/S aromatic atom → prefer `Arom-*`.
+2) **Overlapping definitions (Ar vs heteroaryl motifs)**
+   - If you need a single label, prefer ring-specific motifs (e.g., `Pyridine`, `Quinoline`) over generic `Ar-*`.
 
 3) **Invalid SMILES**
    - return `ok=false` and store an error message if desired.
@@ -222,7 +217,7 @@ If your list is huge (millions):
 ## Quick test set (sanity)
 
 - `Brc1ccccc1` should hit `Ar-Br`
-- `Brc1ccncc1` should hit `Arom-Br` (and possibly `Ar-Br` depending on `Ar` definition)
+- `Brc1ccncc1` should hit `Ar-Br` and `Pyridine`
 - `OB(O)c1ccccc1` should hit `Ar-B(OH)2`
 - `Brc1ccc(OC)cc1` should hit `Ar-Br` and also `Ar-OMe` if you have that motif
 

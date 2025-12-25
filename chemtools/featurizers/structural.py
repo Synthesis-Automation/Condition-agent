@@ -61,11 +61,10 @@ def featurize_molecule(
     max_hits = options.get("max_hits_per_compound")
 
     motifs = detect_motifs(mol, compiled, max_hits_per_compound=max_hits)
-    motifs = _filter_arom_duplicates(motifs)
     analyses = []
     for hit in motifs:
         compound_id = hit["compound_id"]
-        if compound_id.startswith(("Ar-", "Arom-")):
+        if compound_id.startswith("Ar-"):
             steric = analyze_aryl_steric(mol, hit)
             if include_ipso_group == "both":
                 electronic = [
@@ -118,7 +117,7 @@ def featurize_molecule(
             "center": analysis.get("center"),
             "result": analysis.get("steric"),
         }
-        if analysis.get("compound_id", "").startswith(("Ar-", "Arom-")):
+        if analysis.get("compound_id", "").startswith("Ar-"):
             steric_payload["aryl"].append(steric_entry)
         else:
             steric_payload["alkyl"].append(steric_entry)
@@ -149,32 +148,6 @@ def analyze_smiles(
 ) -> Dict[str, Any]:
     """Compatibility wrapper for motif/steric/electronic analysis."""
     return featurize_molecule(smiles, registry_paths=registry_paths, options=options)
-
-
-def _filter_arom_duplicates(motifs: list[Dict[str, Any]]) -> list[Dict[str, Any]]:
-    ar_hits = set()
-    for hit in motifs:
-        compound_id = hit.get("compound_id", "")
-        if not compound_id.startswith("Ar-"):
-            continue
-        suffix = compound_id[3:]
-        a_idx = hit.get("a_atom_idx")
-        b_idx = hit.get("b_atom_idx")
-        if a_idx is None or b_idx is None:
-            continue
-        ar_hits.add((suffix, a_idx, b_idx))
-
-    filtered: list[Dict[str, Any]] = []
-    for hit in motifs:
-        compound_id = hit.get("compound_id", "")
-        if compound_id.startswith("Arom-"):
-            suffix = compound_id[5:]
-            a_idx = hit.get("a_atom_idx")
-            b_idx = hit.get("b_atom_idx")
-            if a_idx is not None and b_idx is not None and (suffix, a_idx, b_idx) in ar_hits:
-                continue
-        filtered.append(hit)
-    return filtered
 
 
 def _default_registry_paths() -> Dict[str, Path]:

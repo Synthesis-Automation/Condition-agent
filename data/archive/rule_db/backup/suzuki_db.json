@@ -689,7 +689,6 @@
           "role": "metal_source",
           "amount": "5%"
         },
-
         {
           "name": "KOAc",
           "role": "base",
@@ -1364,7 +1363,7 @@
           "name": "K3PO4",
           "role": "base",
           "amount": "200%"
-        },        
+        },
         {
           "name": "dioxane/H2O (15:1)",
           "role": "solvent",

@@ -26,7 +26,7 @@
     "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: Ullmann/Goldberg systems are sensitive to base/solubility and mass transfer. Start with 5–10 mol% Cu(I) (CuI or Cu2O) and 10–40 mol% ligand (2–4× Cu). Use 2–3 equiv carbonate/phosphate base, ~10 vol solvent, 0.1–0.3 M, 90–110 °C for Ar–Br/I (110–130 °C for harder cases). Inert atmosphere preferred; modest water (5–10 equiv) can improve heterogeneous bases."
   },
   "applies_if": {
-    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Arom-Br OR Arom-Cl OR Arom-F OR Arom-I OR Arom-OMs OR Arom-OTf OR Arom-OTs) AND ((Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Arom-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR OR Arom-CONHR) OR sulfonamide_present OR ammonia_present)"
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR) OR sulfonamide_present OR ammonia_present)"
   },
   "default_rule": {
     "id": "DEF_CuCN_general",
@@ -76,7 +76,6 @@
       "reactant_features": {
         "any": [
           "Ar-NH2",
-          "Arom-NH2",
           "Any-NH2"
         ]
       },
@@ -120,7 +119,6 @@
         "any": [
           "Any-CONHR",
           "Ar-CONHR",
-          "Arom-CONHR",
           "sulfonamide_present"
         ]
       },
@@ -141,9 +139,7 @@
           "Any-NH2",
           "Any-NHR",
           "Ar-NH2",
-          "Arom-NH2",
           "Ar-NHR",
-          "Arom-NHR",
           "Bn-NH2",
           "Bn-NHR",
           "Allyl-NH2",

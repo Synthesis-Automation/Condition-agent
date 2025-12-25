@@ -21,7 +21,7 @@ All outputs must be **explainable** (include per-position contributions).
 
 ## Critical Requirement: Analysis must be agnostic to X (functional group identity)
 
-For motifs like `Ar-X` / `Arom-X` / `R-X` where `X` may be `Br`, `CHO`, `OH`, etc.:
+For motifs like `Ar-X` / `R-X` where `X` may be `Br`, `CHO`, `OH`, etc.:
 
 - **Never branch logic on the identity of `X`** (no special cases for halides vs aldehydes vs alcohols).
 - Always anchor analysis on the motif match atom maps:
@@ -146,7 +146,7 @@ Steps:
 Dispatch only on **context prefix** (A), never on X:
 
 ```python
-if compound_id.startswith(("Ar-", "Arom-")):
+if compound_id.startswith("Ar-"):
     analyze_aryl(...)
 elif compound_id.startswith(("R-", "Bn-", "Allyl-")):
     analyze_alkyl(...)
@@ -162,7 +162,7 @@ elif compound_id.startswith(("R-", "Bn-", "Allyl-")):
 - When exploring substituents to compute **scaffold steric**, never traverse into `x_root`.
 - If you compute `group_bulk_0_10`, do it by exploring only the `x_root` branch away from `anchor`.
 
-### Aryl scaffold steric (`Ar-*` / `Arom-*`)
+### Aryl scaffold steric (`Ar-*`)
 
 1) Find aromatic ring containing `anchor` (choose smallest aromatic ring containing anchor).
 2) Find ortho ring atoms: ring neighbors of anchor (typically 2).
@@ -189,7 +189,7 @@ Delegate to the alkyl plan (see separate MD), but enforce the same principle:
 
 ## Electronic Analyzer (Agnostic): scaffold default
 
-This is primarily useful for `Ar-*` / `Arom-*`.
+This is primarily useful for `Ar-*`.
 
 ### Aryl electronics (tag-weighted)
 

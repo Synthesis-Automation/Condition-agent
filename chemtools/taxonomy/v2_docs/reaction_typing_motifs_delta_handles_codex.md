@@ -287,10 +287,10 @@ Start with motif-ID buckets (less code complexity):
 ```python
 BUCKETS = {
   "sp2_electrophile": {"Ar-Br","Ar-Cl","Ar-I","Ar-OTf","Ar-OTs","Ar-OMs",
-                      "Arom-Br","Arom-Cl","Arom-I","Arom-OTf","Vinyl-Br","Vinyl-Cl","Vinyl-I"},
-  "organoboron": {"Ar-B(OH)2","Ar-Bpin","Arom-B(OH)2","Arom-Bpin","Vinyl-B(OH)2","Vinyl-Bpin"},
-  "amine": {"R-NH2","R-NHR","Ar-NH2","Ar-NHR","Arom-NH2","Arom-NHR"},  # adapt to your real motif IDs
-  "acid_or_acyl": {"R-CO2H","Ar-CO2H","Arom-CO2H","R-COCl","Ar-COCl","Arom-COCl"},  # adapt
+                      "Vinyl-Br","Vinyl-Cl","Vinyl-I"},
+  "organoboron": {"Ar-B(OH)2","Ar-Bpin","Vinyl-B(OH)2","Vinyl-Bpin"},
+  "amine": {"R-NH2","R-NHR","Ar-NH2","Ar-NHR"},  # adapt to your real motif IDs
+  "acid_or_acyl": {"R-CO2H","Ar-CO2H","R-COCl","Ar-COCl"},  # adapt
 }
 ```
 

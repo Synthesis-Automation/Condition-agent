@@ -16,18 +16,6 @@
       ]
     },
     {
-      "id": "Arom",
-      "name": "Arom-",
-      "kind": "context",
-      "smarts": "[a:1]",
-      "description": "Any aromatic attachment (includes heteroaromatic attachment via any aromatic atom).",
-      "tags": [
-        "context",
-        "aromatic",
-        "sp2"
-      ]
-    },
-    {
       "id": "Vinyl",
       "name": "Vinyl-",
       "kind": "context",

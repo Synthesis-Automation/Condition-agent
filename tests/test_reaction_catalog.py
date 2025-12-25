@@ -18,7 +18,7 @@ def test_reaction_catalog_expands_motif_sets() -> None:
 
     cn = definitions["c_n_cross_coupling"]
     assert "Ar-NH2" in cn.reactants["nucleophiles"]
-    assert "Arom-CONHR" in cn.reactants["nucleophiles"]
+    assert "Ar-CONHR" in cn.reactants["nucleophiles"]
     assert "Indole" in cn.reactants["nucleophiles"]
 
     sn2 = definitions["sn2_substitution"]

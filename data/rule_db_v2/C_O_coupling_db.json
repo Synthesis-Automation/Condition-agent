@@ -26,7 +26,7 @@
     "notes": "Schema mirrors prior C_N coupling rule file to maintain compatibility. HTE-informed condition families for C–O coupling are incorporated, with Pd/biaryl phosphine systems and complementary Cu/ligand sets. Part of the HTE frequency ranking (RockPhos, BippyPhos, tBuXPhos; and CuI with diamines, phenanthroline, L-proline; Cu2O/salicylaldoxime) derives from Table 5 (top-hit counts) of the AbbVie HTE platform report covering 2017–2023 screens. fileciteturn0file0 Field names, token style, and sectioning follow the example C_N coupling JSON. fileciteturn0file1\n\nGeneral guidance: Start with Pd/biaryl phosphine + Cs2CO3 in toluene at 90–110 °C for phenols and less hindered alcohols; pivot to Cu/ligand sets (acetonitrile/DMF/DMSO; KOtBu/K3PO4/Cs2CO3) when Pd sets fail or for base‑tolerant aliphatic alcohols. Alkyl (esp. tertiary) alcohol O‑arylation remains challenging and may show low success; screen Cu sets early."
   },
   "applies_if": {
-    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Arom-Br OR Arom-Cl OR Arom-F OR Arom-I OR Arom-OMs OR Arom-OTf OR Arom-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Any-OH OR Ar-OH OR Arom-OH OR Bn-OH OR Allyl-OH OR Vinyl-OH)"
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Any-OH OR Ar-OH OR Bn-OH OR Allyl-OH OR Vinyl-OH)"
   },
   "default_rule": {
     "id": "DEF_CO_general",
@@ -51,7 +51,7 @@
       "id": "BR_phenols",
       "description": "Unhindered phenols with aryl bromides/iodides; Pd + Cs2CO3/toluene frequently ranks top in HTE.",
       "reactant_features": {
-        "expr": "(Ar-OH OR Arom-OH) AND (Ar-Br OR Ar-I OR Arom-Br OR Arom-I)"
+        "expr": "(Ar-OH) AND (Ar-Br OR Ar-I)"
       },
       "conditions": {
         "metal": "Pd",
@@ -103,7 +103,7 @@
       "id": "BR_harder_halides",
       "description": "More demanding electrophiles; use more active Pd systems and higher temperature.",
       "reactant_features": {
-        "expr": "Ar-Cl OR Arom-Cl OR Vinyl-Cl"
+        "expr": "Ar-Cl OR Vinyl-Cl"
       },
       "conditions": {
         "metal": "Pd",
@@ -120,7 +120,7 @@
       "id": "BR_palladium_in_situ",
       "description": "In-situ Pd source where precatalyst unavailable; slower start-up; watch for dba inhibition.",
       "reactant_features": {
-        "expr": "Ar-OH OR Arom-OH OR Any-OH"
+        "expr": "Ar-OH OR Any-OH"
       },
       "conditions": {
         "metal": "Pd",

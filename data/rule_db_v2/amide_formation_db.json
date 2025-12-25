@@ -30,7 +30,7 @@
     "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: prefer Oxyma (vs HOBt/HOAt) for safety and lower epimerization. Minimize pre‑activation time for α‑chiral acids. Avoid catalytic DMAP when α‑stereocenters are present. For difficult pairs, consider acyl fluoride or acid chloride routes with strict temperature control.\n"
   },
   "applies_if": {
-    "expr": "(Any-CO2H OR Ar-CO2H OR Arom-CO2H OR Vinyl-CO2H OR Any-COCl OR Ar-COCl OR Arom-COCl) AND (Any-NH2 OR Ar-NH2 OR Arom-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2 OR Any-NHR OR Ar-NHR OR Arom-NHR OR Bn-NHR OR Allyl-NHR)"
+    "expr": "(Any-CO2H OR Ar-CO2H OR Vinyl-CO2H OR Any-COCl OR Ar-COCl) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
   },
   "default_rule": {
     "id": "DEF_amide_general",
@@ -76,11 +76,9 @@
           "steric_very_high",
           "Any-NHR",
           "Ar-NHR",
-          "Arom-NHR",
           "Bn-NHR",
           "Allyl-NHR",
           "Ar-NH2",
-          "Arom-NH2",
           "electron_poor_amine_present"
         ]
       },
