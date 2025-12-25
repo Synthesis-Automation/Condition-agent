@@ -136,6 +136,17 @@
       ]
     },
     {
+      "id": "H",
+      "name": "-H",
+      "kind": "core",
+      "smarts": "[H:2]",
+      "description": "Hydrogen substituent core (-H).",
+      "tags": [
+        "hydrogen",
+        "proton"
+      ]
+    },
+    {
       "id": "CHO",
       "name": "-CHO",
       "kind": "core",

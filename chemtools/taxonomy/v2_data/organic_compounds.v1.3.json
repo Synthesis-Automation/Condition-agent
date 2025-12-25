@@ -52,6 +52,19 @@
       ]
     },
     {
+      "id": "Ar-H",
+      "name": "Ar-H",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "H",
+      "description": "Aryl C-H (Ar–H).",
+      "aliases": [
+        "ArH",
+        "aryl C-H",
+        "aryl hydrogen"
+      ]
+    },
+    {
       "id": "Vinyl-Cl",
       "name": "Vinyl-Cl",
       "template": "single_bond",

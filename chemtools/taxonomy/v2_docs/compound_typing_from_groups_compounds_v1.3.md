@@ -61,6 +61,7 @@ For each input SMILES, return:
 Create `compound_id -> list[query_mol]` where each query is an RDKit SMARTS query.
 
 For each compound entry:
+
 - If it has `smarts`:
   - compile each SMARTS to a query
 - Else if it has `template` + `A` + `B`:
@@ -71,15 +72,18 @@ For each compound entry:
     - `via_oxygen`: `A_smarts + "O" + B_smarts`
 
 **Then strip atom-maps for detection:**
+
 - `"[c:1][Br:2]" -> "[c][Br]"`
 - `"[c:1]O[S:2](=O)(=O)..." -> "[c]O[S](=O)(=O)..."`
 
 Why strip:
+
 - mapping is only for attachpoint semantics; classification uses substructure matching.
 
 ### Step 3 — Classify each SMILES
 
 For each SMILES:
+
 1) `mol = Chem.MolFromSmiles(smiles)`
 2) If `mol is None`: mark `ok=false`, `hits=[]`
 3) Else:
@@ -90,15 +94,18 @@ For each SMILES:
 ### Step 4 — Choose an optional “best” label (if needed)
 
 Many motifs overlap. Example:
+
 - bromopyridine may match `Ar-Br` and `Pyridine`.
 
 Two common policies:
 
 **Policy A (recommended): keep `hits` only.**
+
 - downstream logic decides based on use case.
 
 **Policy B: compute `best` using precedence rules.**
 Typical precedence heuristics:
+
 1) optionally prefer direct SMARTS motifs (e.g., `Pyridine`) when present
 2) prefer longer/more specific motif IDs
 3) prefer context prefixes (`Ar-*`, `Vinyl-*`, `R-*`) over `Any-*` when both appear
@@ -185,6 +192,7 @@ def choose_best(hits: list[str]) -> str | None:
 ## Performance notes (important for large vendor catalogs)
 
 If you have >100k SMILES:
+
 - Precompile all SMARTS once (already done above).
 - Consider an RDKit prefilter to avoid checking every query:
   - use `rdMolDescriptors.PatternFingerprint` on both molecules and queries,
@@ -192,6 +200,7 @@ If you have >100k SMILES:
 - Or use `rdkit.Chem.rdSubstructLibrary.SubstructLibrary` for batch search patterns (depends on RDKit build).
 
 If your list is huge (millions):
+
 - Use multiprocessing to parallelize SMILES parsing + matching.
 - Persist compiled query SMARTS and/or fingerprints to disk (pickle) to avoid recompiling.
 
@@ -232,4 +241,3 @@ If your list is huge (millions):
   - template-based compounds (`single_bond`, `via_oxygen`)
   - direct SMARTS compounds (field `smarts`)
 - Always strip atom-maps for detection matching.
-
