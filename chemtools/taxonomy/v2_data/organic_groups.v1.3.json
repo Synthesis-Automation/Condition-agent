@@ -271,6 +271,18 @@
       ]
     },
     {
+      "id": "SO3H",
+      "name": "-SO3H",
+      "kind": "core",
+      "smarts": "[S:2](=O)(=O)[OX2H]",
+      "description": "Sulfonic acid core (-SO3H), attach via sulfur.",
+      "tags": [
+        "sulfonic_acid",
+        "acid",
+        "ewg_strong"
+      ]
+    },
+    {
       "id": "COCl",
       "name": "-COCl",
       "kind": "core",
