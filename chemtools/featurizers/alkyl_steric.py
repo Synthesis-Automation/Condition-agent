@@ -24,6 +24,7 @@ def analyze_alkyl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "scaffold_score_0_10": 0.0,
             "group_bulk_0_10": 0.0,
+            "description": "no steric",
             "method": _METHOD,
             "classification": "unknown",
             "alpha": {},
@@ -55,9 +56,17 @@ def analyze_alkyl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
     scaffold_score = round(10.0 * raw / _RAW_CAP, 1)
     group_bulk = _group_bulk_score(mol, x_root, alpha)
 
+    if scaffold_score < 1.0:
+        desc = "no steric"
+    elif scaffold_score < 3.0:
+        desc = "moderately steric"
+    else:
+        desc = "highly steric"
+
     return {
         "scaffold_score_0_10": scaffold_score,
         "group_bulk_0_10": group_bulk,
+        "description": desc,
         "method": _METHOD,
         "classification": classification,
         "alpha": {

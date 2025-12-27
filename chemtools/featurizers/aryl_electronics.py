@@ -30,6 +30,7 @@ def analyze_aryl_electronics(
     if ipso is None:
         return {
             "score_0_10": 5.0,
+            "description": "neutral",
             "method": _ELECTRONICS_METHOD,
             "including_group": include_ipso_group,
             "contributions": [],
@@ -39,6 +40,7 @@ def analyze_aryl_electronics(
     if not ring_atoms:
         return {
             "score_0_10": 5.0,
+            "description": "neutral",
             "method": _ELECTRONICS_METHOD,
             "including_group": include_ipso_group,
             "contributions": [],
@@ -52,6 +54,28 @@ def analyze_aryl_electronics(
     for ring_atom in sorted(ring_atoms, key=lambda idx: (ring_dist.get(idx, 99), idx)):
         if ring_atom != ipso and ring_atom not in ring_dist:
             continue
+
+        # 1. Check for ring heteroatoms (e.g., Pyridine N)
+        atom = mol.GetAtomWithIdx(ring_atom)
+        symbol = atom.GetSymbol()
+        if symbol == "N" and ring_atom != ipso:
+            pos = _position_for_distance(ring_dist[ring_atom])
+            if pos:
+                strength = 1.0  # Moderate EWG for ring nitrogen
+                weight = _WEIGHTS.get(pos, 0.0)
+                term = round(weight * strength, 3)
+                e_sum += term
+                contributions.append(
+                    {
+                        "pos": pos,
+                        "group_id": f"Ring-{symbol}",
+                        "strength": strength,
+                        "weight": weight,
+                        "term": term,
+                    }
+                )
+
+        # 2. Check for external substituents
         for nbr in mol.GetAtomWithIdx(ring_atom).GetNeighbors():
             nbr_idx = nbr.GetIdx()
             if nbr_idx in ring_atoms:
@@ -82,8 +106,17 @@ def analyze_aryl_electronics(
             )
 
     score = _clamp(round(5.0 + e_sum, 1), 0.0, 10.0)
+    
+    if score > 5.2:
+        desc = "electron poor"
+    elif score < 4.8:
+        desc = "electron rich"
+    else:
+        desc = "neutral"
+
     result: Dict[str, Any] = {
         "score_0_10": score,
+        "description": desc,
         "method": _ELECTRONICS_METHOD,
         "including_group": include_ipso_group,
         "contributions": contributions,

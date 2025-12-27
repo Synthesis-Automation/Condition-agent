@@ -18,11 +18,21 @@ def analyze_aryl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
     """
     ipso = hit.get("a_atom_idx")
     if ipso is None:
-        return {"score_0_10": 0.0, "method": _STERICS_METHOD, "ortho": []}
+        return {
+            "score_0_10": 0.0,
+            "description": "no steric",
+            "method": _STERICS_METHOD,
+            "ortho": [],
+        }
 
     ring_atoms = _find_aryl_ring(mol, ipso)
     if not ring_atoms:
-        return {"score_0_10": 0.0, "method": _STERICS_METHOD, "ortho": []}
+        return {
+            "score_0_10": 0.0,
+            "description": "no steric",
+            "method": _STERICS_METHOD,
+            "ortho": [],
+        }
 
     ortho_atoms = [
         nbr.GetIdx()
@@ -39,7 +49,19 @@ def analyze_aryl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
         bulk_total = _BULK_CAP_TOTAL
     score = round(10.0 * bulk_total / _BULK_CAP_TOTAL, 1)
 
-    return {"score_0_10": score, "method": _STERICS_METHOD, "ortho": ortho_entries}
+    if score < 1.0:
+        desc = "no steric"
+    elif score < 3.0:
+        desc = "moderately steric"
+    else:
+        desc = "highly steric"
+
+    return {
+        "score_0_10": score,
+        "description": desc,
+        "method": _STERICS_METHOD,
+        "ortho": ortho_entries,
+    }
 
 
 def _find_aryl_ring(mol: Any, ipso: int) -> Optional[Set[int]]:

@@ -64,7 +64,7 @@ def featurize_molecule(
     analyses = []
     for hit in motifs:
         compound_id = hit["compound_id"]
-        if compound_id.startswith("Ar-"):
+        if compound_id.startswith(("Ar-", "AromN-")):
             steric = analyze_aryl_steric(mol, hit)
             if include_ipso_group == "both":
                 electronic = [
@@ -117,7 +117,7 @@ def featurize_molecule(
             "center": analysis.get("center"),
             "result": analysis.get("steric"),
         }
-        if analysis.get("compound_id", "").startswith("Ar-"):
+        if analysis.get("compound_id", "").startswith(("Ar-", "AromN-")):
             steric_payload["aryl"].append(steric_entry)
         else:
             steric_payload["alkyl"].append(steric_entry)

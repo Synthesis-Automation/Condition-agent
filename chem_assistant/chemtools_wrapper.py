@@ -102,11 +102,13 @@ from chemtools.reagent.analytics import (
 )
 from chemtools.util.functional_groups import detect_all as detect_functional_groups
 from chemtools.featurizers import reaction_pair as molecular_featurizer
-from chemtools.featurizers import calculable as calculable_features
 from chemtools.taxonomy.rule_db import resolve_rule_db_v2
 
 # Rule-based recommendation engine
-from chemtools.rule import RuleEngine, RuleBuilder
+from chemtools.rule import RuleEngine, RuleBuilder, FeatureAnalyzer
+
+# Global analyzer instance for tools
+_FEATURE_ANALYZER = FeatureAnalyzer()
 
 # Import bond analysis tools (NEW)
 from chemtools import (
@@ -1450,13 +1452,13 @@ def calculable_features_tool(
     Detect calculable features for a molecule using the curated feature library.
 
     Features cover SMARTS-derived motifs, integer counts, and heuristic properties
-    defined in ``chemtools/taxonomy/data/calculable_features.json``. When ``feature_tokens``
+    defined in the V2 taxonomy. When ``feature_tokens``
     is supplied the output is restricted to those tokens (missing entries are
     reported separately). Setting ``only_present`` filters the result to features
     that evaluate to ``True`` or positive integers.
     """
     try:
-        all_features = calculable_features.detect_all_features(smiles)
+        all_features = _FEATURE_ANALYZER.analyze_reactant(smiles)
         filtered = dict(all_features)
         missing: List[str] = []
         if feature_tokens:
@@ -1472,26 +1474,27 @@ def calculable_features_tool(
                 token: value
                 for token, value in filtered.items()
                 if (isinstance(value, bool) and value)
-                or (isinstance(value, int) and value > 0)
+                or (isinstance(value, (int, float)) and value > 0)
             }
 
-        present_tokens = calculable_features.get_present_features(smiles)
+        present_tokens = [k for k, v in all_features.items() if v is True]
 
         steric_tokens = {
-            "ortho_substitution_present": bool(all_features.get("ortho_substitution_present")),
-            "tert_butyl_present": bool(all_features.get("tert_butyl_present")),
-            "isopropyl_present": bool(all_features.get("isopropyl_present")),
+            "ortho_hindered": bool(all_features.get("ortho_hindered")),
+            "ortho_very_hindered": bool(all_features.get("ortho_very_hindered")),
+            "ortho_1": bool(all_features.get("ortho_1")),
         }
         # Lightweight textual fallback when RDKit unavailable
-        if not steric_tokens["isopropyl_present"] and "C(C)C" in smiles:
-            steric_tokens["isopropyl_present"] = True
-        if not steric_tokens["tert_butyl_present"] and "C(C)(C)C" in smiles:
-            steric_tokens["tert_butyl_present"] = True
+        if not steric_tokens["ortho_1"] and "C(C)C" in smiles:
+            steric_tokens["ortho_1"] = True
+        
         steric_indicators = [
             token for token, present in steric_tokens.items() if present
         ]
         steric_level = "low"
-        if steric_tokens["ortho_substitution_present"] or len(steric_indicators) >= 2:
+        if steric_tokens["ortho_very_hindered"]:
+            steric_level = "very high"
+        elif steric_tokens["ortho_hindered"]:
             steric_level = "high"
         elif steric_indicators:
             steric_level = "moderate"
@@ -1503,7 +1506,7 @@ def calculable_features_tool(
         if missing:
             payload["missing_tokens"] = missing
         if include_summary:
-            payload["summary"] = calculable_features.feature_summary(smiles)
+            payload["summary"] = ", ".join(present_tokens)
         payload["steric_hindrance"] = {
             "level": steric_level,
             "indicators": steric_indicators,
