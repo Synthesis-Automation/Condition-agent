@@ -9,11 +9,7 @@ from __future__ import annotations
 from typing import Dict, Any, List, Tuple, Optional
 import logging
 
-from ..featurizers.calculable import detect_all_features
-from ..featurizers.reaction_pair import featurize_pair as molecular_featurize
-from ..featurizers.reaction_detection import detect_motif_ids_from_smiles
-from ..analysis.smiles import normalize_reaction
-from ..util.functional_groups import detect_all as detect_functional_groups
+from ..featurizers.structural import featurize_reaction, featurize_molecule
 
 logger = logging.getLogger(__name__)
 
@@ -25,46 +21,6 @@ class FeatureAnalyzer:
         """Initialize the feature analyzer."""
         pass
 
-    @staticmethod
-    def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
-        """Heuristically pick electrophile/nucleophile ordering for 2-component reactions."""
-        if len(reactants) != 2:
-            return (reactants[0] if reactants else ""), (reactants[1] if len(reactants) > 1 else "")
-
-        first, second = reactants[0], reactants[1]
-        fg_first = detect_functional_groups(first)
-        fg_second = detect_functional_groups(second)
-
-        def elec_score(fg: Dict[str, bool]) -> int:
-            score = 0
-            if fg.get("sp2_halide_present") or fg.get("sp2_pseudohalide_present"):
-                score += 10
-            if fg.get("sp3_halide_present") or fg.get("sp3_pseudohalide_present"):
-                score += 8
-            if fg.get("acyl_halide_present"):
-                score += 9
-            if fg.get("aryl_halide_present") or fg.get("vinyl_halide_present") or fg.get("alkyl_halide_present"):
-                score += 2
-            return score
-
-        def nuc_score(fg: Dict[str, bool]) -> int:
-            score = 0
-            if fg.get("sp2_boron_present"):
-                score += 10
-            if fg.get("amine_nucleophile_present") or fg.get("aniline_present"):
-                score += 9
-            if fg.get("o_nucleophile_present") or fg.get("s_nucleophile_present"):
-                score += 8
-            if fg.get("terminal_alkyne_present") or fg.get("terminal-alkyne_present"):
-                score += 9
-            return score
-
-        score_forward = elec_score(fg_first) + nuc_score(fg_second)
-        score_reverse = elec_score(fg_second) + nuc_score(fg_first)
-        if score_reverse > score_forward:
-            return second, first
-        return first, second
-    
     def analyze_reaction(
         self,
         reaction_smiles: str,
@@ -83,59 +39,25 @@ class FeatureAnalyzer:
         
         Returns:
             Dictionary of combined features
-        
-        Example:
-            >>> analyzer = FeatureAnalyzer()
-            >>> features = analyzer.analyze_reaction("Brc1ccccc1.OB(O)c1ccccc1>>...")
-            >>> features['sp2_halide_present']
-            True
         """
         try:
-            # Parse reaction SMILES
-            reactants, products = self._parse_reaction(reaction_smiles)
+            # Use the new unified featurizer
+            analysis = featurize_reaction(reaction_smiles)
             
-            if not reactants:
-                logger.warning(f"No reactants found in reaction: {reaction_smiles}")
-                return {}
-            
-            motif_ids = set()
-            try:
-                motif_ids = detect_motif_ids_from_smiles(reactants)
-            except Exception:
-                motif_ids = set()
-
-            # Special case: For 2-component reactions (electrophile + nucleophile),
-            # use the full molecular featurizer which includes functional group enrichment
-            if len(reactants) == 2:
-                try:
-                    elec, nuc = self._pick_electrophile_nucleophile(reactants)
-                    result = molecular_featurize(elec, nuc)
-                    features = result.get("flat", {})
-                    for motif_id in motif_ids:
-                        features[motif_id] = True
-                    logger.debug(
-                        "Used molecular featurizer: %s features detected",
-                        sum(1 for v in features.values() if v),
-                    )
-                    return features
-                except Exception as e:
-                    logger.warning(f"Molecular featurizer failed, falling back to calculable: {e}")
-                    # Fall through to calculable featurizer below
-            
-            # Detect features for each reactant using calculable featurizer
             reactant_features = []
-            for i, reactant in enumerate(reactants):
-                try:
-                    features = detect_all_features(reactant)
-                    reactant_features.append(features)
-                    logger.debug(f"Reactant {i+1} ({reactant}): {sum(1 for v in features.values() if v)} features detected")
-                except Exception as e:
-                    logger.error(f"Error detecting features for reactant {reactant}: {e}")
-                    reactant_features.append({})
+            all_motifs = set()
+            
+            for r_entry in analysis.get("reactants", []):
+                r_analysis = r_entry.get("analysis", {})
+                r_feat = self._flatten_analysis(r_analysis)
+                reactant_features.append(r_feat)
+                
+                for motif in r_analysis.get("motifs", []):
+                    all_motifs.add(motif["compound_id"])
             
             # Combine features based on method
             if combine_method == "separate":
-                return {"reactants": reactant_features, "motifs": sorted(motif_ids)}
+                return {"reactants": reactant_features, "motifs": sorted(list(all_motifs))}
             elif combine_method == "first":
                 combined = reactant_features[0] if reactant_features else {}
             elif combine_method == "all":
@@ -143,8 +65,19 @@ class FeatureAnalyzer:
             else:  # union (default)
                 combined = self._combine_features_union(reactant_features)
 
-            for motif_id in motif_ids:
+            # Add reaction detection results
+            detection = analysis.get("detection", {})
+            for match in detection.get("matches", []):
+                combined[f"rxn_{match['reaction_type']}"] = True
+                combined[match['reaction_type']] = True
+            
+            # Add all motifs to the flat dict
+            for motif_id in all_motifs:
                 combined[motif_id] = True
+                
+            # Add legacy mappings for backward compatibility
+            self._add_legacy_mappings(combined)
+            
             return combined
         
         except Exception as e:
@@ -162,11 +95,105 @@ class FeatureAnalyzer:
             Dictionary of detected features
         """
         try:
-            return detect_all_features(smiles)
+            analysis = featurize_molecule(smiles)
+            features = self._flatten_analysis(analysis)
+            self._add_legacy_mappings(features)
+            return features
         except Exception as e:
             logger.error(f"Error analyzing reactant {smiles}: {e}")
             return {}
-    
+
+    def _flatten_analysis(self, analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """Flatten V2 analysis into a boolean feature dictionary."""
+        features = {}
+        
+        # 1. Motifs
+        for motif in analysis.get("motifs", []):
+            motif_id = motif["compound_id"]
+            features[motif_id] = True
+            
+            # Add category as a feature
+            if "category" in motif:
+                cat_feature = motif["category"].lower().replace(" ", "_").replace("-", "_") + "_present"
+                features[cat_feature] = True
+
+        # 2. Sterics (Aryl)
+        for entry in analysis.get("steric", {}).get("aryl", []):
+            res = entry.get("result", {})
+            score = res.get("score_0_10", 0)
+            ortho = res.get("ortho", [])
+            
+            num_ortho_subs = sum(1 for o in ortho if o.get("bulk", 0) > 0)
+            if num_ortho_subs >= 1:
+                features["ortho_1"] = True
+            if num_ortho_subs >= 2:
+                features["ortho_2plus"] = True
+            
+            if score >= 4.0:
+                features["ortho_hindered"] = True
+            if score >= 7.0:
+                features["ortho_very_hindered"] = True
+            
+            # Add raw score for numeric rules
+            features["aryl_steric_score"] = max(features.get("aryl_steric_score", 0), score)
+
+        # 3. Electronics (Aryl)
+        for entry in analysis.get("electronics", {}).get("aryl", []):
+            res = entry.get("result", {})
+            score = res.get("score_0_10", 5.0)
+            
+            if score > 6.5:
+                features["electron_poor_aryl"] = True
+            if score > 8.5:
+                features["very_electron_poor_aryl"] = True
+            if score < 3.5:
+                features["electron_rich_aryl"] = True
+            
+            # Add raw score
+            features["aryl_electronic_score"] = max(features.get("aryl_electronic_score", 0), score)
+
+        # 4. Sterics (Alkyl)
+        for entry in analysis.get("steric", {}).get("alkyl", []):
+            res = entry.get("result", {})
+            score = res.get("score_0_10", 0)
+            if score >= 5.0:
+                features["alkyl_hindered"] = True
+            features["alkyl_steric_score"] = max(features.get("alkyl_steric_score", 0), score)
+
+        return features
+
+    def _add_legacy_mappings(self, features: Dict[str, Any]) -> None:
+        """Add legacy feature names for backward compatibility with old rules."""
+        
+        # Halide mappings
+        halides = ["Ar-Br", "Ar-Cl", "Ar-I", "Ar-F", "Ar-OTf", "Ar-OMs", "Ar-OTs"]
+        if any(features.get(h) for h in halides):
+            features["aryl_halide_present"] = True
+            
+        vinyl_halides = ["Vinyl-Br", "Vinyl-Cl", "Vinyl-I", "Vinyl-F", "Vinyl-OTf", "Vinyl-OMs", "Vinyl-OTs"]
+        if any(features.get(vh) for vh in vinyl_halides):
+            features["vinyl_halide_present"] = True
+            
+        # Boron mappings
+        boron = ["Ar-B(OH)2", "Ar-Bpin", "Ar-BF3K", "Ar-B(OR)2", "Vinyl-B(OH)2", "Vinyl-Bpin"]
+        if any(features.get(b) for b in boron):
+            features["aryl_boron_reagent_present"] = True
+            features["boron_present"] = True
+
+        # Heteroaryl mappings
+        hetero = ["Pyridine", "Indole", "Imidazole", "Thiophene", "Furan", "Pyrrole", "Thiazole", "Oxazole", "Quinoline", "Isoquinoline"]
+        if any(features.get(h) for h in hetero):
+            features["heteroaryl_present"] = True
+
+        # Amine mappings
+        amines = ["Ar-NH2", "Ar-NHR", "Ar-NR2", "R-NH2", "R-NHR", "R-NR2", "Any-NH2", "Any-NHR"]
+        if any(features.get(a) for a in amines):
+            features["amine_present"] = True
+            if any(features.get(a) for a in ["Ar-NH2", "R-NH2", "Any-NH2"]):
+                features["primary_amine_present"] = True
+            if any(features.get(a) for a in ["Ar-NHR", "R-NHR", "Any-NHR"]):
+                features["secondary_amine_present"] = True
+
     def _parse_reaction(self, reaction_smiles: str) -> Tuple[List[str], List[str]]:
         """
         Parse reaction SMILES into reactants and products.

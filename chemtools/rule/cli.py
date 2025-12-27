@@ -41,7 +41,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def find_database(name: str = "suzuki") -> Path:
+def find_database(name: str = "Suzuki") -> Path:
     """
     Find a database file by name.
     
@@ -53,13 +53,15 @@ def find_database(name: str = "suzuki") -> Path:
     """
     # Try common locations
     locations = [
+        Path(f"data/rule_db_v2/{name}_db.json"),
+        Path(f"data/rule_db_v2/{name}.json"),
         Path(f"data/rule_db/{name}.json"),
         Path(f"data/{name}.json"),
         Path(f"data/protocol_db/{name}.json"),
         Path(f"{name}.json"),
+        Path(__file__).parent.parent.parent / "data" / "rule_db_v2" / f"{name}_db.json",
+        Path(__file__).parent.parent.parent / "data" / "rule_db_v2" / f"{name}.json",
         Path(__file__).parent.parent.parent / "data" / "rule_db" / f"{name}.json",
-        Path(__file__).parent.parent.parent / "data" / f"{name}.json",
-        Path(__file__).parent.parent.parent / "data" / "protocol_db" / f"{name}.json"
     ]
     
     for path in locations:

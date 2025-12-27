@@ -18,7 +18,7 @@ Main Components:
 
 Example Usage:
     >>> from chemtools.rule import RuleEngine
-    >>> engine = RuleEngine.from_database("suzuki")
+    >>> engine = RuleEngine.from_file("data/rule_db_v2/Suzuki_db.json")
     >>> recommendation = engine.recommend("Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
     >>> print(recommendation.to_dict())
 """
