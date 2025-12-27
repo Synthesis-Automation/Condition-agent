@@ -1210,6 +1210,14 @@
       "description": "Lactam (cyclic amide) functional group (Any–Lactam)."
     },
     {
+      "id": "Ar-Lactam",
+      "name": "Ar-Lactam",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Lactam",
+      "description": "N-Aryl lactam (Ar–Lactam)."
+    },
+    {
       "id": "Ar-NHAr",
       "name": "Ar-NHAr",
       "template": "single_bond",
@@ -1230,12 +1238,28 @@
       "description": "Phosphonium salt (Any–PR3+)."
     },
     {
+      "id": "Ar-Phosphonium",
+      "name": "Ar-Phosphonium",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Phosphonium",
+      "description": "Aryl phosphonium salt (Ar–PR3+)."
+    },
+    {
       "id": "Any-Imine",
       "name": "Any-Imine",
       "template": "single_bond",
       "A": "R",
       "B": "Imine",
       "description": "Imine functional group (Any–Imine)."
+    },
+    {
+      "id": "Ar-Imine",
+      "name": "Ar-Imine",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Imine",
+      "description": "Aryl imine (Ar–Imine)."
     },
     {
       "id": "Any-B(OR)2",
