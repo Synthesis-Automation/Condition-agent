@@ -26,7 +26,7 @@
     "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: Ullmann/Goldberg systems are sensitive to base/solubility and mass transfer. Start with 5–10 mol% Cu(I) (CuI or Cu2O) and 10–40 mol% ligand (2–4× Cu). Use 2–3 equiv carbonate/phosphate base, ~10 vol solvent, 0.1–0.3 M, 90–110 °C for Ar–Br/I (110–130 °C for harder cases). Inert atmosphere preferred; modest water (5–10 equiv) can improve heterogeneous bases."
   },
   "applies_if": {
-    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR) OR sulfonamide_present OR ammonia_present)"
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR) OR (Any-SO2NH2 OR Any-SO2NHR) OR ammonia_present)"
   },
   "default_rule": {
     "id": "DEF_CuCN_general",
@@ -116,11 +116,7 @@
       "id": "BR_amides_sulfonamides",
       "description": "Low‑nucleophilicity N; diamines or simple amino‑acids are effective.",
       "reactant_features": {
-        "any": [
-          "Any-CONHR",
-          "Ar-CONHR",
-          "sulfonamide_present"
-        ]
+        "expr": "Any-CONHR OR Ar-CONHR OR Any-SO2NH2 OR Any-SO2NHR"
       },
       "conditions": {
         "cu_source": "CuI (5–10 mol%)",
@@ -135,22 +131,7 @@
       "id": "BR_aryl_chlorides_oxalamide",
       "description": "Use oxalamide (or NHC/Cu) systems; higher temp and strong base often required.",
       "reactant_features": {
-        "any": [
-          "Any-NH2",
-          "Any-NHR",
-          "Ar-NH2",
-          "Ar-NHR",
-          "Bn-NH2",
-          "Bn-NHR",
-          "Allyl-NH2",
-          "Allyl-NHR",
-          "Vinyl-NH2"
-        ]
-      },
-      "electrophile_features": {
-        "any": [
-          "sp2_chloride_present"
-        ]
+        "expr": "(Any-NH2 OR Any-NHR OR Ar-NH2 OR Ar-NHR OR Bn-NH2 OR Bn-NHR OR Allyl-NH2 OR Allyl-NHR OR Vinyl-NH2) AND (Ar-Cl OR Vinyl-Cl)"
       },
       "conditions": {
         "cu_source": "CuI (5–10 mol%)",
@@ -221,22 +202,21 @@
     {
       "id": "MOD_oxalamide_for_chloride",
       "when": [
-        "sp2_chloride_present"
+        "Ar-Cl OR Vinyl-Cl"
       ],
       "suggest": "Use oxalamide (or NHC/Cu) ligands with K3PO4 in dioxane; plan 110–130 °C."
     },
     {
       "id": "MOD_air_moisture",
       "when": [
-        "any"
+        "always"
       ],
       "suggest": "Run under N2/Ar; many systems tolerate trace air/moisture, but inert handling improves reproducibility."
     },
     {
       "id": "MOD_low_solubility_substrates",
       "when": [
-        "polarity_high",
-        "polarity_mismatch",
+        "electron_poor_aryl OR heteroaryl_present",
         "solubility_poor"
       ],
       "suggest": "Increase dilution (12–15 vol), add a polar co‑solvent (DMSO/DMF), or warm pre‑mix to dissolve salts."
@@ -244,8 +224,7 @@
     {
       "id": "MOD_pyridine_chelators",
       "when": [
-        "pyridine_poison_risk",
-        "bidentate_chelator_present"
+        "Pyridine"
       ],
       "suggest": "Increase Cu/ligand loading slightly (e.g., +2–3 mol% Cu), use diamine or phenanthroline ligand, and consider more polar solvent."
     },

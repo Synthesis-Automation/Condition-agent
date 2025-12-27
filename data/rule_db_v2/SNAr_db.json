@@ -26,7 +26,7 @@
     "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nCore heuristics:\n• Activation governs rate: o/p‑NO2, CN, CF3, SO2R, COR/CO2R, N‑oxide, or heteroaryl (e.g., pyrimidines, triazines) enable S_NAr.\n• Leaving group trend (S_NAr): F ≫ Cl ≳ NO2 ≫ Br, I (rarely operative unless strongly activated).\n• Solvent: dry, polar aprotic (DMSO, DMF, DMAc, NMP). Keep water low.\n• Base: generate the conjugate base in situ (phenoxide/thiolate/amide/alkoxide). Adjust strength to nucleophile acidity and electrophile activation.\n• Steric hindrance near the reaction site or bulky nucleophiles typically require stronger base and/or higher temperature.\n• If no strong activation is present, consider metal‑catalyzed alternatives (Pd/Cu/Ni) instead of S_NAr."
   },
   "applies_if": {
-    "expr": "(Ar-F OR Ar-Cl OR Ar-NO2) AND (Any-OH OR Ar-OH OR Any-SH OR Ar-SH OR Any-NH2 OR Ar-NH2 OR Any-NHR OR Ar-NHR OR heteroaromatic_nh_present OR amide_present)"
+    "expr": "(Ar-F OR Ar-Cl OR Ar-NO2) AND (Any-OH OR Ar-OH OR Any-SH OR Ar-SH OR Any-NH2 OR Ar-NH2 OR Any-NHR OR Ar-NHR OR Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine OR Any-CONHR OR Ar-CONHR)"
   },
   "default_rule": {
     "id": "DEF_SNAr_general",
@@ -110,9 +110,7 @@
       "id": "BR_snar_alcohols",
       "description": "Alkoxide S_NAr. Requires stronger base than phenols, particularly for secondary/tertiary alcohols.",
       "reactant_features": {
-        "any": [
-          "alcohol_present"
-        ]
+        "expr": "Any-OH"
       },
       "conditions": {
         "base": "NaH or KOtBu (1.5–2.0 equiv); alt: K2CO3/Cs2CO3 for activated aryl F",
@@ -127,17 +125,7 @@
       "id": "BR_snar_heteroaryl_general",
       "description": "Highly activated electrophiles that react with O/N/S nucleophiles under milder conditions.",
       "reactant_features": {
-        "all": [
-          "heteroaryl_activated_halide_present"
-        ],
-        "any": [
-          "phenol_present",
-          "alcohol_present",
-          "thiol_present",
-          "primary_amine_present",
-          "secondary_amine_present",
-          "aniline_present"
-        ]
+        "expr": "heteroaryl_activated_halide_present AND (Ar-OH OR Any-OH OR Any-SH OR Ar-SH OR Any-NH2 OR Ar-NH2 OR Any-NHR OR Ar-NHR)"
       },
       "conditions": {
         "base": "K2CO3 (2.0–3.0 equiv) or Et3N (3.0 equiv)",
@@ -152,14 +140,14 @@
     {
       "id": "MOD_leaving_group_F_advantage",
       "when": [
-        "leaving_group_F"
+        "Ar-F"
       ],
       "suggest": "Lower temperature and/or weaker base often sufficient (try 60–90 °C, Cs2CO3)."
     },
     {
       "id": "MOD_poor_LG_or_weak_activation",
       "when": [
-        "leaving_group_Cl",
+        "Ar-Cl",
         "weak_activation"
       ],
       "suggest": "Increase temperature (120–160 °C, sealed in DMAc/NMP) and/or use stronger base (NaH/KOtBu). If still sluggish, consider metal‑catalyzed coupling."
@@ -174,7 +162,7 @@
     {
       "id": "MOD_ortho_steric_hindrance",
       "when": [
-        "ortho_steric_bulk"
+        "ortho_1 OR ortho_hindered"
       ],
       "suggest": "Stronger base (NaH/KOtBu) and higher temperature; choose higher‑boiling solvent (DMAc/NMP)."
     },
@@ -195,7 +183,7 @@
     {
       "id": "MOD_thiol_oxidation_care",
       "when": [
-        "thiol_present"
+        "Any-SH OR Ar-SH"
       ],
       "suggest": "Exclude air; consider small amount of reducing agent or antioxidant; avoid prolonged exposure to O2 to prevent disulfide formation."
     },
@@ -230,7 +218,7 @@
     {
       "id": "MOD_base_sensitive_substrates",
       "when": [
-        "base_sensitive"
+        "Any-CO2R OR Any-CHO OR Any-CN OR Any-COCl OR Any-CO2H"
       ],
       "suggest": "Use milder base (K2CO3) at lower temperature, shorter times; for O‑nucleophiles prefer NaHCO3 where feasible."
     }

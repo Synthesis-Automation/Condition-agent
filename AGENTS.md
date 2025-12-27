@@ -58,6 +58,7 @@ if pattern and mol.HasSubstructMatch(pattern):
 **Best Practices:**
 
 1. **Module-level pattern definitions**: Define SMARTS strings as module-level constants:
+
    ```python
    _MY_PATTERNS = {
        "aryl_halide": "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",
@@ -66,6 +67,7 @@ if pattern and mol.HasSubstructMatch(pattern):
    ```
 
 2. **Lazy compilation**: Compile patterns only when needed, not at module import:
+
    ```python
    # Good: Lazy compilation via centralized cache
    def detect_feature(mol):
@@ -77,6 +79,7 @@ if pattern and mol.HasSubstructMatch(pattern):
    ```
 
 3. **Validation**: Use `validate=True` for critical patterns, `validate=False` for speed:
+
    ```python
    # Development: Validate new patterns
    pattern = compile_smarts(smarts, validate=True)
@@ -88,6 +91,7 @@ if pattern and mol.HasSubstructMatch(pattern):
 4. **Never call `Chem.MolFromSmarts()` directly** - always use `compile_smarts()` to benefit from global caching.
 
 5. **Batch compilation**: For multiple patterns at startup:
+
    ```python
    from chemtools.util.smarts_cache import compile_smarts_batch
    

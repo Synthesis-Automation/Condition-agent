@@ -148,7 +148,7 @@
       "id": "BR_dppf_K2CO3",
       "description": "Lower basicity; try for base-sensitive partners or when hydrolysis observed.",
       "reactant_features": {
-        "expr": "boc_present OR acetal_present OR silyl_ether_present OR ester_present"
+        "expr": "Any-CO2R OR Any-CHO OR Any-CN OR Any-COCl OR Any-CO2H"
       },
       "conditions": {
         "pd_source": "PdCl2(dppf)",

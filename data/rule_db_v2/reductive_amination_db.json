@@ -29,7 +29,7 @@
     "notes": "Use this rule set ONLY if 'applies_if' tokens are present.\nEvaluate base_rules top→down; if none match, use default_rule.\nAfter choosing a rule, scan all modifiers and apply any whose 'when' tokens or symptoms match.\nGeneral guidance: form the imine/iminium efficiently (remove water or use a Lewis acid), keep pH ~5–6 for borohydrides, and avoid H2 routes when benzyl/CBz/nitro must survive.\n"
   },
   "applies_if": {
-    "expr": "(Any-CHO OR Ar-CHO OR Vinyl-CHO OR ketone_present) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR OR ammonium_source_present)"
+    "expr": "(Any-CHO OR Ar-CHO OR Vinyl-CHO OR Any-CO-R) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
   },
   "default_rule": {
     "id": "DEF_RA_STAB_general",
@@ -58,7 +58,7 @@
           "Any-CHO",
           "Ar-CHO",
           "Vinyl-CHO",
-          "ketone_present"
+          "Any-CO-R"
         ]
       },
       "conditions": {
@@ -255,10 +255,7 @@
     {
       "id": "MOD_avoid_H2_if_benzyl_or_nitro",
       "when": [
-        "benzyl_pg_present",
-        "cbz_present",
-        "benzyl_ether_present",
-        "nitro_present"
+        "Ar-NO2"
       ],
       "suggest": "Avoid H2/Pd or Raney-Ni; prefer STAB/NaBH3CN/Ti(OiPr)4 routes."
     },
@@ -280,8 +277,7 @@
     {
       "id": "MOD_scale_up_choice",
       "when": [
-        "scale_up",
-        "aliphatic_ketone_present"
+        "Any-CO-R"
       ],
       "suggest": "Consider H2/Raney-Ni or H2/Pd-C if FG set allows; otherwise keep STAB and emphasize water removal."
     },

@@ -99,8 +99,8 @@
         "any": [
           "Ar-Cl",
           "Vinyl-Cl",
-          "ortho_substitution_present",
-          "strongly_electron_withdrawing_ring_present"
+          "ortho_1",
+          "electron_poor_aryl"
         ]
       },
       "conditions": {
@@ -145,8 +145,8 @@
       "description": "Slow oxidative addition. Use more electron-rich/bulky ligands and slightly elevated catalyst loading.",
       "reactant_features": {
         "any": [
-          "strongly_electron_donating_ring_present",
-          "ortho_dimethoxy_present"
+          "electron_rich_aryl",
+          "ortho_1"
         ]
       },
       "conditions": {

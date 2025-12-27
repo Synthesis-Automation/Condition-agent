@@ -53,8 +53,7 @@
       "description": "Low‑epimerization systems and cold/short activation.",
       "reactant_features": {
         "any": [
-          "alpha_chiral_acid_present",
-          "racemization_risk_high"
+          "Any-CO2H"
         ]
       },
       "conditions": {
@@ -72,14 +71,14 @@
       "description": "Fast, strong activators; escalate if sluggish.",
       "reactant_features": {
         "any": [
-          "steric_high",
-          "steric_very_high",
+          "ortho_hindered",
+          "ortho_very_hindered",
           "Any-NHR",
           "Ar-NHR",
           "Bn-NHR",
           "Allyl-NHR",
           "Ar-NH2",
-          "electron_poor_amine_present"
+          "electron_poor_aryl"
         ]
       },
       "conditions": {
@@ -96,8 +95,8 @@
       "id": "BR_anilides",
       "description": "Aromatic amines (low nucleophilicity).",
       "reactant_features": {
-        "all": [
-          "aniline_present"
+        "any": [
+          "Ar-NH2"
         ]
       },
       "conditions": {
@@ -115,9 +114,9 @@
       "description": "Neutral/mild profiles to protect sensitive motifs.",
       "reactant_features": {
         "any": [
-          "acid_sensitive",
-          "base_sensitive",
-          "protecting_group_labile"
+          "Any-CO2R",
+          "Any-CHO",
+          "Any-CN"
         ]
       },
       "conditions": {
@@ -174,9 +173,8 @@
       "description": "Escalation to acyl halide/fluoride with strict temp control.",
       "reactant_features": {
         "any": [
-          "steric_very_high",
-          "electron_poor_amine_present",
-          "weak_nucleophile_present"
+          "ortho_very_hindered",
+          "electron_poor_aryl"
         ]
       },
       "conditions": {

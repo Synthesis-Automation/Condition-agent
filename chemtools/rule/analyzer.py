@@ -75,9 +75,6 @@ class FeatureAnalyzer:
             for motif_id in all_motifs:
                 combined[motif_id] = True
                 
-            # Add legacy mappings for backward compatibility
-            self._add_legacy_mappings(combined)
-            
             return combined
         
         except Exception as e:
@@ -97,7 +94,6 @@ class FeatureAnalyzer:
         try:
             analysis = featurize_molecule(smiles)
             features = self._flatten_analysis(analysis)
-            self._add_legacy_mappings(features)
             return features
         except Exception as e:
             logger.error(f"Error analyzing reactant {smiles}: {e}")
@@ -162,68 +158,6 @@ class FeatureAnalyzer:
 
         return features
 
-    def _add_legacy_mappings(self, features: Dict[str, Any]) -> None:
-        """Add legacy feature names for backward compatibility with old rules."""
-        
-        # Halide mappings
-        halides = ["Ar-Br", "Ar-Cl", "Ar-I", "Ar-F", "Ar-OTf", "Ar-OMs", "Ar-OTs"]
-        if any(features.get(h) for h in halides):
-            features["aryl_halide_present"] = True
-            
-        vinyl_halides = ["Vinyl-Br", "Vinyl-Cl", "Vinyl-I", "Vinyl-F", "Vinyl-OTf", "Vinyl-OMs", "Vinyl-OTs"]
-        if any(features.get(vh) for vh in vinyl_halides):
-            features["vinyl_halide_present"] = True
-            
-        # Boron mappings
-        boron = ["Ar-B(OH)2", "Ar-Bpin", "Ar-BF3K", "Ar-B(OR)2", "Vinyl-B(OH)2", "Vinyl-Bpin"]
-        if any(features.get(b) for b in boron):
-            features["aryl_boron_reagent_present"] = True
-            features["boron_present"] = True
-
-        # Heteroaryl mappings
-        hetero = ["Pyridine", "Indole", "Imidazole", "Thiophene", "Furan", "Pyrrole", "Thiazole", "Oxazole", "Quinoline", "Isoquinoline"]
-        if any(features.get(h) for h in hetero):
-            features["heteroaryl_present"] = True
-
-        # Amine mappings
-        amines = ["Ar-NH2", "Ar-NHR", "Ar-NR2", "R-NH2", "R-NHR", "R-NR2", "Any-NH2", "Any-NHR"]
-        if any(features.get(a) for a in amines):
-            features["amine_present"] = True
-            if any(features.get(a) for a in ["Ar-NH2", "R-NH2", "Any-NH2"]):
-                features["primary_amine_present"] = True
-            if any(features.get(a) for a in ["Ar-NHR", "R-NHR", "Any-NHR"]):
-                features["secondary_amine_present"] = True
-
-    def _parse_reaction(self, reaction_smiles: str) -> Tuple[List[str], List[str]]:
-        """
-        Parse reaction SMILES into reactants and products.
-        
-        Args:
-            reaction_smiles: Full reaction SMILES
-        
-        Returns:
-            (reactants_list, products_list)
-        """
-        # Handle simple >> splitting
-        if ">>" in reaction_smiles:
-            parts = reaction_smiles.split(">>")
-            reactant_part = parts[0]
-            product_part = parts[1] if len(parts) > 1 else ""
-        elif ">" in reaction_smiles:
-            # Handle single > (reactants>reagents>products)
-            parts = reaction_smiles.split(">")
-            reactant_part = parts[0]
-            product_part = parts[-1] if len(parts) > 2 else ""
-        else:
-            # No reaction arrow, treat as single molecule
-            return [reaction_smiles], []
-        
-        # Split reactants by period
-        reactants = [r.strip() for r in reactant_part.split(".") if r.strip()]
-        products = [p.strip() for p in product_part.split(".") if p.strip()]
-        
-        return reactants, products
-    
     def _combine_features_union(self, feature_dicts: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Combine features using union logic (OR).

@@ -150,57 +150,57 @@
     {
       "id": "MOD_base_sensitive_substrates",
       "when": [
-        "base_sensitive"
+        "Any-CO2R OR Any-CHO OR Any-CN OR Any-COCl OR Any-CO2H"
       ],
       "suggest": "Use milder base (K3PO4(aq) or Cs2CO3), reduce H2O, and/or lower temperature."
     },
     {
       "id": "MOD_polarity_match_solvent",
       "when": [
-        "polarity_high"
+        "electron_poor_aryl OR heteroaryl_present"
       ],
       "suggest": "Favor MeCN or t‑AmOH; avoid very apolar media."
     },
     {
       "id": "MOD_polarity_low_switch",
       "when": [
-        "polarity_low"
+        "NOT (electron_poor_aryl OR heteroaryl_present)"
       ],
       "suggest": "Favor toluene or dioxane; consider biphasic dioxane/H2O for bases."
     },
     {
       "id": "MOD_pyridine_poisoning",
       "when": [
-        "pyridine_poison_risk"
+        "Pyridine"
       ],
       "suggest": "Increase Pd loading (e.g., +2–4 mol%) and/or use a stronger donor ligand (tBuBrettPhos)."
     },
     {
       "id": "MOD_thiol_poisoning",
       "when": [
-        "thiol_poison_risk"
+        "Any-SH"
       ],
       "suggest": "Protect/remove thiol (e.g., Ag2O scavenging) or adjust conditions; strong Pd binding expected."
     },
     {
       "id": "MOD_5member_heteroaryl_halide_pref_lihmds",
       "when": [
-        "five_member_heteroaryl_halide_present"
+        "(Thiophene OR Furan OR Pyrrole OR Thiazole OR Oxazole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole) AND (Ar-Br OR Ar-Cl OR Ar-I OR Ar-F OR Ar-OTf OR Ar-OMs OR Ar-OTs)"
       ],
       "suggest": "Prioritize RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS in dioxane (80–105 °C). If strong base incompatible, try BrettPhos–Pd G3/Cs2CO3."
     },
     {
       "id": "MOD_hard_aryl_chloride_or_ortho_block",
       "when": [
-        "sp2_chloride_present",
-        "ortho_substitution_present"
+        "Ar-Cl OR Vinyl-Cl",
+        "ortho_1 OR ortho_hindered"
       ],
       "suggest": "Favor dialkylbiaryl systems at ≥100 °C: RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS; otherwise BrettPhos–Pd G3/Cs2CO3 or XPhos–Pd G3/Cs2CO3."
     },
     {
       "id": "MOD_strong_base_window",
       "when": [
-        "strong_base_compatible"
+        "NOT (Any-CO2R OR Any-CHO OR Any-CN OR Any-COCl OR Any-CO2H)"
       ],
       "suggest": "Test LiHMDS sets (RuPhos–Pd G3/LiHMDS; BrettPhos–Pd G3/LiHMDS)."
     },
