@@ -30,6 +30,9 @@
       "Ar-OMs",
       "Ar-OTf",
       "Ar-OTs",
+      "AromN-Br",
+      "AromN-Cl",
+      "AromN-I",
       "Vinyl-Br",
       "Vinyl-Cl",
       "Vinyl-F",
@@ -43,6 +46,9 @@
       "Ar-Cl",
       "Ar-F",
       "Ar-I",
+      "AromN-Br",
+      "AromN-Cl",
+      "AromN-I",
       "Vinyl-Br",
       "Vinyl-Cl",
       "Vinyl-F",
@@ -59,6 +65,8 @@
     "organoboron_default": [
       "Ar-B(OH)2",
       "Ar-Bpin",
+      "Ar-B(OR)2",
+      "Any-B(OR)2",
       "Vinyl-B(OH)2",
       "Vinyl-Bpin"
     ],
@@ -75,8 +83,11 @@
       "Allyl-NHR",
       "Any-NH2",
       "Any-NHR",
+      "Any-Lactam",
       "Ar-NH2",
       "Ar-NHR",
+      "Ar-NHAr",
+      "AromN-H",
       "Bn-NH2",
       "Bn-NHR",
       "Vinyl-NH2"
@@ -85,7 +96,11 @@
       "Allyl-OH",
       "Any-OH",
       "Ar-OH",
+      "AromN-OH",
       "Bn-OH",
+      "RCH2-OH",
+      "R2CH-OH",
+      "R3C-OH",
       "Vinyl-OH"
     ],
     "thiols_sh_default": [

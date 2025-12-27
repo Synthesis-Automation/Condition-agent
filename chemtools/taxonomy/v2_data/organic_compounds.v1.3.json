@@ -40,6 +40,54 @@
       ]
     },
     {
+      "id": "AromN-Cl",
+      "name": "AromN-Cl",
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "Cl",
+      "description": "Aromatic N-chloride (AromN–Cl)."
+    },
+    {
+      "id": "AromN-Br",
+      "name": "AromN-Br",
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "Br",
+      "description": "Aromatic N-bromide (AromN–Br)."
+    },
+    {
+      "id": "AromN-I",
+      "name": "AromN-I",
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "I",
+      "description": "Aromatic N-iodide (AromN–I)."
+    },
+    {
+      "id": "AromN-NH2",
+      "name": "AromN-NH2",
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "NH2",
+      "description": "Aromatic N-amine (e.g., N-amino pyrrole) (AromN–NH2)."
+    },
+    {
+      "id": "AromN-OH",
+      "name": "AromN-OH",
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "OH",
+      "description": "Aromatic N-hydroxyl (e.g., N-hydroxy pyrrole) (AromN–OH)."
+    },
+    {
+      "id": "AromN-H",
+      "name": "AromN-H",
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "H",
+      "description": "Aromatic N-H (e.g., pyrrole, indole N-H) (AromN–H)."
+    },
+    {
       "id": "Ar-F",
       "name": "Ar-F",
       "template": "single_bond",
@@ -187,7 +235,7 @@
     {
       "id": "Ar-OTf",
       "name": "Ar-OTf",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Ar",
       "B": "OTf",
       "description": "Aryl triflate (Ar–OTf); Aryl–O–triflate motif.",
@@ -198,7 +246,7 @@
     {
       "id": "Ar-OTs",
       "name": "Ar-OTs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Ar",
       "B": "OTs",
       "description": "Aryl tosylate (Ar–OTs); Aryl–O–tosylate motif.",
@@ -209,7 +257,7 @@
     {
       "id": "Ar-OMs",
       "name": "Ar-OMs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Ar",
       "B": "OMs",
       "description": "Aryl mesylate (Ar–OMs); Aryl–O–mesylate motif.",
@@ -220,7 +268,7 @@
     {
       "id": "Vinyl-OTf",
       "name": "Vinyl-OTf",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Vinyl",
       "B": "OTf",
       "description": "Vinyl/alkenyl triflate (Vinyl–OTf); Vinyl/alkenyl–O–triflate motif.",
@@ -231,7 +279,7 @@
     {
       "id": "Vinyl-OTs",
       "name": "Vinyl-OTs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Vinyl",
       "B": "OTs",
       "description": "Vinyl/alkenyl tosylate (Vinyl–OTs); Vinyl/alkenyl–O–tosylate motif.",
@@ -242,7 +290,7 @@
     {
       "id": "Vinyl-OMs",
       "name": "Vinyl-OMs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Vinyl",
       "B": "OMs",
       "description": "Vinyl/alkenyl mesylate (Vinyl–OMs); Vinyl/alkenyl–O–mesylate motif.",
@@ -253,7 +301,7 @@
     {
       "id": "Bn-OTf",
       "name": "Bn-OTf",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Bn",
       "B": "OTf",
       "description": "Benzylic triflate (Bn–OTf); Benzylic–O–triflate motif.",
@@ -264,7 +312,7 @@
     {
       "id": "Bn-OTs",
       "name": "Bn-OTs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Bn",
       "B": "OTs",
       "description": "Benzylic tosylate (Bn–OTs); Benzylic–O–tosylate motif.",
@@ -275,7 +323,7 @@
     {
       "id": "Bn-OMs",
       "name": "Bn-OMs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Bn",
       "B": "OMs",
       "description": "Benzylic mesylate (Bn–OMs); Benzylic–O–mesylate motif.",
@@ -286,7 +334,7 @@
     {
       "id": "Allyl-OTf",
       "name": "Allyl-OTf",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Allyl",
       "B": "OTf",
       "description": "Allyl triflate (Allyl–OTf); Allyl–O–triflate motif.",
@@ -297,7 +345,7 @@
     {
       "id": "Allyl-OTs",
       "name": "Allyl-OTs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Allyl",
       "B": "OTs",
       "description": "Allyl tosylate (Allyl–OTs); Allyl–O–tosylate motif.",
@@ -308,7 +356,7 @@
     {
       "id": "Allyl-OMs",
       "name": "Allyl-OMs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Allyl",
       "B": "OMs",
       "description": "Allyl mesylate (Allyl–OMs); Allyl–O–mesylate motif.",
@@ -455,6 +503,70 @@
       "A": "Ar",
       "B": "CONHR",
       "description": "Aryl amide (CONHR) (Ar–CONHR)."
+    },
+    {
+      "id": "Ar-CONR2",
+      "name": "Ar-CONR2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "CONR2",
+      "description": "Aryl tertiary amide (Ar–CONR2)."
+    },
+    {
+      "id": "Ar-SO2NH2",
+      "name": "Ar-SO2NH2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "SO2NH2",
+      "description": "Aryl primary sulfonamide (Ar–SO2NH2)."
+    },
+    {
+      "id": "Ar-SO2NHR",
+      "name": "Ar-SO2NHR",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "SO2NHR",
+      "description": "Aryl secondary sulfonamide (Ar–SO2NHR)."
+    },
+    {
+      "id": "Ar-SO2NR2",
+      "name": "Ar-SO2NR2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "SO2NR2",
+      "description": "Aryl tertiary sulfonamide (Ar–SO2NR2)."
+    },
+    {
+      "id": "Ar-SO2Cl",
+      "name": "Ar-SO2Cl",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "SO2Cl",
+      "description": "Aryl sulfonyl chloride (Ar–SO2Cl)."
+    },
+    {
+      "id": "Ar-Sulfamide",
+      "name": "Ar-Sulfamide",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Sulfamide",
+      "description": "Aryl sulfamide (Ar–Sulfamide)."
+    },
+    {
+      "id": "Ar-Urea",
+      "name": "Ar-Urea",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Urea",
+      "description": "Aryl urea (Ar–Urea)."
+    },
+    {
+      "id": "Ar-Carbamate",
+      "name": "Ar-Carbamate",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Carbamate",
+      "description": "Aryl carbamate (Ar–Carbamate)."
     },
     {
       "id": "Vinyl-CHO",
@@ -649,6 +761,30 @@
       "description": "alcohol functional group anywhere (generic)."
     },
     {
+      "id": "RCH2-OH",
+      "name": "RCH2-OH",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "OH",
+      "description": "Primary alcohol functional group (generic)."
+    },
+    {
+      "id": "R2CH-OH",
+      "name": "R2CH-OH",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "OH",
+      "description": "Secondary alcohol functional group (generic)."
+    },
+    {
+      "id": "R3C-OH",
+      "name": "R3C-OH",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "OH",
+      "description": "Tertiary alcohol functional group (generic)."
+    },
+    {
       "id": "Any-SH",
       "name": "Any-SH",
       "template": "single_bond",
@@ -687,6 +823,70 @@
       "A": "R",
       "B": "CONHR",
       "description": "amide (CONHR) functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-CONR2",
+      "name": "Any-CONR2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CONR2",
+      "description": "tertiary amide functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-SO2NH2",
+      "name": "Any-SO2NH2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2NH2",
+      "description": "primary sulfonamide functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-SO2NHR",
+      "name": "Any-SO2NHR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2NHR",
+      "description": "secondary sulfonamide functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-SO2NR2",
+      "name": "Any-SO2NR2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2NR2",
+      "description": "tertiary sulfonamide functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-SO2Cl",
+      "name": "Any-SO2Cl",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2Cl",
+      "description": "sulfonyl chloride functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-Sulfamide",
+      "name": "Any-Sulfamide",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Sulfamide",
+      "description": "sulfamide functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-Urea",
+      "name": "Any-Urea",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Urea",
+      "description": "urea functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-Carbamate",
+      "name": "Any-Carbamate",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Carbamate",
+      "description": "carbamate functional group anywhere (generic)."
     },
     {
       "id": "Acyl-Cl",
@@ -762,7 +962,7 @@
     {
       "id": "R-OTf",
       "name": "R-OTf",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "R",
       "B": "OTf",
       "description": "Alkyl triflate (R–OTf, i.e., R–O–SO2CF3).",
@@ -774,7 +974,7 @@
     {
       "id": "R-OTs",
       "name": "R-OTs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "R",
       "B": "OTs",
       "description": "Alkyl tosylate (R–OTs, i.e., R–O–SO2Ar).",
@@ -786,7 +986,7 @@
     {
       "id": "R-OMs",
       "name": "R-OMs",
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "R",
       "B": "OMs",
       "description": "Alkyl mesylate (R–OMs, i.e., R–O–SO2Me).",
@@ -1000,6 +1200,58 @@
         "c1ccc2sccc2c1"
       ],
       "description": "Benzothiophene (fused S-heteroaromatic)."
+    },
+    {
+      "id": "Any-Lactam",
+      "name": "Any-Lactam",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Lactam",
+      "description": "Lactam (cyclic amide) functional group (Any–Lactam)."
+    },
+    {
+      "id": "Ar-NHAr",
+      "name": "Ar-NHAr",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "NHAr",
+      "description": "Diaryl amine (Ar–NHAr).",
+      "aliases": [
+        "Ar2NH",
+        "diaryl amine"
+      ]
+    },
+    {
+      "id": "Any-Phosphonium",
+      "name": "Any-Phosphonium",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Phosphonium",
+      "description": "Phosphonium salt (Any–PR3+)."
+    },
+    {
+      "id": "Any-Imine",
+      "name": "Any-Imine",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Imine",
+      "description": "Imine functional group (Any–Imine)."
+    },
+    {
+      "id": "Any-B(OR)2",
+      "name": "Any-B(OR)2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "B(OR)2",
+      "description": "Generic boronate ester (Any–B(OR)2)."
+    },
+    {
+      "id": "Ar-B(OR)2",
+      "name": "Ar-B(OR)2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "B(OR)2",
+      "description": "Aryl boronate ester (Ar–B(OR)2)."
     }
   ],
   "depends_on": {

@@ -16,6 +16,18 @@
       ]
     },
     {
+      "id": "AromN",
+      "name": "AromN-",
+      "kind": "context",
+      "smarts": "[n:1]",
+      "description": "Aromatic attachment via aromatic nitrogen (e.g., N-substituted pyrroles, indoles) (AromN-).",
+      "tags": [
+        "context",
+        "aromatic",
+        "heteroatom"
+      ]
+    },
+    {
       "id": "Vinyl",
       "name": "Vinyl-",
       "kind": "context",
@@ -37,6 +49,45 @@
         "context",
         "alkyl",
         "sp3"
+      ]
+    },
+    {
+      "id": "RCH2",
+      "name": "RCH2-",
+      "kind": "context",
+      "smarts": "[CX4H2:1]",
+      "description": "Primary alkyl (sp3 CH2) attachment point.",
+      "tags": [
+        "context",
+        "alkyl",
+        "sp3",
+        "primary"
+      ]
+    },
+    {
+      "id": "R2CH",
+      "name": "R2CH-",
+      "kind": "context",
+      "smarts": "[CX4H1:1]",
+      "description": "Secondary alkyl (sp3 CH) attachment point.",
+      "tags": [
+        "context",
+        "alkyl",
+        "sp3",
+        "secondary"
+      ]
+    },
+    {
+      "id": "R3C",
+      "name": "R3C-",
+      "kind": "context",
+      "smarts": "[CX4H0:1]",
+      "description": "Tertiary alkyl (sp3 C) attachment point.",
+      "tags": [
+        "context",
+        "alkyl",
+        "sp3",
+        "tertiary"
       ]
     },
     {
@@ -317,6 +368,95 @@
       ]
     },
     {
+      "id": "CONR2",
+      "name": "-CONR2",
+      "kind": "core",
+      "smarts": "[CX3:2](=O)[NX3;H0]",
+      "description": "Tertiary amide core (no N-H); attach via carbonyl carbon.",
+      "tags": [
+        "amide",
+        "ewg_moderate"
+      ]
+    },
+    {
+      "id": "SO2NH2",
+      "name": "-SO2NH2",
+      "kind": "core",
+      "smarts": "[SX4:2](=O)(=O)[NX3;H2]",
+      "description": "Primary sulfonamide core; attach via sulfur.",
+      "tags": [
+        "sulfonamide",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "SO2NHR",
+      "name": "-SO2NHR",
+      "kind": "core",
+      "smarts": "[SX4:2](=O)(=O)[NX3;H1]",
+      "description": "Secondary sulfonamide core; attach via sulfur.",
+      "tags": [
+        "sulfonamide",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "SO2NR2",
+      "name": "-SO2NR2",
+      "kind": "core",
+      "smarts": "[SX4:2](=O)(=O)[NX3;H0]",
+      "description": "Tertiary sulfonamide core; attach via sulfur.",
+      "tags": [
+        "sulfonamide",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "SO2Cl",
+      "name": "-SO2Cl",
+      "kind": "core",
+      "smarts": "[SX4:2](=O)(=O)Cl",
+      "description": "Sulfonyl chloride core; attach via sulfur.",
+      "tags": [
+        "sulfonyl_halide",
+        "leaving_group",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "Sulfamide",
+      "name": "-NHSO2NH2",
+      "kind": "core",
+      "smarts": "[NX3;H1:2][SX4](=O)(=O)[NX3;H2]",
+      "description": "Sulfamide core (primary); attach via nitrogen.",
+      "tags": [
+        "sulfamide",
+        "nitrogen_group"
+      ]
+    },
+    {
+      "id": "Urea",
+      "name": "-NHCONH2",
+      "kind": "core",
+      "smarts": "[NX3;H1:2][CX3](=O)[NX3;H2]",
+      "description": "Urea core (primary); attach via nitrogen.",
+      "tags": [
+        "urea",
+        "nitrogen_group"
+      ]
+    },
+    {
+      "id": "Carbamate",
+      "name": "-NHCO2R",
+      "kind": "core",
+      "smarts": "[NX3;H1:2][CX3](=O)[OX2][#6]",
+      "description": "Carbamate core; attach via nitrogen.",
+      "tags": [
+        "carbamate",
+        "nitrogen_group"
+      ]
+    },
+    {
       "id": "OTf",
       "name": "-OTf",
       "kind": "tail",
@@ -380,6 +520,61 @@
       "tags": [
         "ketone",
         "ewg_moderate"
+      ]
+    },
+    {
+      "id": "Lactam",
+      "name": "Lactam",
+      "kind": "core",
+      "smarts": "[NX3;r;H1,H0:2][CX3;r]=O",
+      "description": "Lactam core (cyclic amide); attach via nitrogen.",
+      "tags": [
+        "amide",
+        "cyclic",
+        "lactam"
+      ]
+    },
+    {
+      "id": "NHAr",
+      "name": "-NHAr",
+      "kind": "core",
+      "smarts": "[NX3;H1:2][c]",
+      "description": "Secondary amine with aryl substituent; attach via nitrogen.",
+      "tags": [
+        "amine",
+        "aniline"
+      ]
+    },
+    {
+      "id": "Phosphonium",
+      "name": "-PR3+",
+      "kind": "core",
+      "smarts": "[PX4+:2]([#6])([#6])[#6]",
+      "description": "Phosphonium salt core; attach via phosphorus.",
+      "tags": [
+        "phosphorus",
+        "cation"
+      ]
+    },
+    {
+      "id": "Imine",
+      "name": "Imine",
+      "kind": "core",
+      "smarts": "[CX3:2]=[NX3,NX2]",
+      "description": "Imine core; attach via carbon.",
+      "tags": [
+        "imine"
+      ]
+    },
+    {
+      "id": "B(OR)2",
+      "name": "-B(OR)2",
+      "kind": "core",
+      "smarts": "[B:2](O[#6])O[#6]",
+      "description": "Generic boronate ester core; attach via boron.",
+      "tags": [
+        "boron_handle",
+        "organoboron"
       ]
     }
   ]
