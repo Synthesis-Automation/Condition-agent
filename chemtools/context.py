@@ -683,6 +683,11 @@ class FeaturizersNamespace:
         from . import featurizers as _featurizers
         return _featurizers.structural
 
+    def reaction(self, reaction_smiles: str, **kwargs) -> Dict[str, Any]:
+        """Systematically analyze a reaction: detect type and featurize all reactants."""
+        from . import featurizers as _featurizers
+        return _featurizers.structural.featurize_reaction(reaction_smiles, **kwargs)
+
 
 class FeaturesNamespace:
     """Advanced feature extraction (optional dependency).

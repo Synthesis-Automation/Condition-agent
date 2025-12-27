@@ -141,6 +141,44 @@ def featurize_molecule(
     }
 
 
+def featurize_reaction(
+    reaction_smiles: str,
+    registry_paths: Optional[Dict[str, str | Path]] = None,
+    options: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Systematically analyze a reaction: detect type and featurize all reactants.
+    """
+    from chemtools.smiles import normalize_reaction
+
+    from .reaction_detection import detect_reaction_types
+
+    # 1. Detect reaction types
+    max_hits = (options or {}).get("max_hits_per_compound")
+    detection = detect_reaction_types(reaction_smiles, max_hits_per_compound=max_hits)
+
+    # 2. Normalize and extract reactants
+    normalized = normalize_reaction(reaction_smiles)
+    reactants = normalized.get("reactants") or []
+
+    # 3. Featurize each reactant
+    reactant_analyses = []
+    for r in reactants:
+        smiles = r.get("smiles_norm") or r.get("input")
+        if smiles:
+            analysis = featurize_molecule(
+                smiles, registry_paths=registry_paths, options=options
+            )
+            reactant_analyses.append({"smiles": smiles, "analysis": analysis})
+
+    return {
+        "reaction_smiles": reaction_smiles,
+        "detection": detection.to_dict(),
+        "reactants": reactant_analyses,
+        "meta": {"normalized_reaction": normalized},
+    }
+
+
 def analyze_smiles(
     smiles: str,
     registry_paths: Optional[Dict[str, str | Path]] = None,
@@ -159,4 +197,4 @@ def _default_registry_paths() -> Dict[str, Path]:
     }
 
 
-__all__ = ["featurize_molecule", "analyze_smiles"]
+__all__ = ["featurize_molecule", "featurize_reaction", "analyze_smiles"]
