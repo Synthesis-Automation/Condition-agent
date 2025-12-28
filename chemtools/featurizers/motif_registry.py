@@ -206,7 +206,7 @@ def _load_compounds(path: Path) -> List[Dict[str, Any]]:
         if not isinstance(entry, dict):
             continue
         if "anchors" not in entry:
-            entry["anchors"] = {"core": "A", "fg": "B"}
+            entry["anchors"] = {"scaffold": "A", "substituent": "B"}
     return compounds
 
 
@@ -377,7 +377,7 @@ def _validate_group_maps(groups: Mapping[str, Mapping[str, Any]]) -> None:
         smarts = str(group.get("smarts") or "")
         if not kind or not smarts:
             continue
-        expected_map = 1 if kind == "context" else 2
+        expected_map = 1 if kind == "scaffold" else 2
         if not _has_map(smarts, map_num=expected_map):
             errors.append(f"{group_id} (kind={kind}, expected :{expected_map})")
     if errors:

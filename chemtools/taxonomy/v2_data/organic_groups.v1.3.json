@@ -1,16 +1,16 @@
 {
   "version": "v1.3",
   "naming_set": "chemist_style",
-  "notes": "Mapping-only attachpoint convention:\n- Context groups (kind=context): the attach atom is the atom mapped as :1 in `smarts`.\n- Core/tail groups (kind=core|tail): the attach atom is the atom mapped as :2 in `smarts`.\n- If a group has multiple attachpoints, it may contain both :1 and :2 (or multiple mapped atoms) in `smarts`.\nThe legacy fields `attach_points` and `attach_labels` were removed; attachpoints are inferred from atom-maps in `smarts`.",
+  "notes": "Mapping-only attachpoint convention:\n- Scaffold groups (kind=scaffold): the attach atom is the atom mapped as :1 in `smarts`.\n- Substituent groups (kind=substituent): the attach atom is the atom mapped as :2 in `smarts`.\n- If a group has multiple attachpoints, it may contain both :1 and :2 (or multiple mapped atoms) in `smarts`.\nThe legacy fields `attach_points` and `attach_labels` were removed; attachpoints are inferred from atom-maps in `smarts`.",
   "groups": [
     {
       "id": "Ar",
       "name": "Ar-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[c:1]",
       "description": "Aryl attachment via aromatic carbon (Ar-).",
       "tags": [
-        "context",
+        "scaffold",
         "aromatic",
         "sp2"
       ]
@@ -18,11 +18,11 @@
     {
       "id": "AromN",
       "name": "AromN-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[n:1]",
       "description": "Aromatic attachment via aromatic nitrogen (e.g., N-substituted pyrroles, indoles) (AromN-).",
       "tags": [
-        "context",
+        "scaffold",
         "aromatic",
         "heteroatom"
       ]
@@ -30,11 +30,11 @@
     {
       "id": "Vinyl",
       "name": "Vinyl-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[C;X3:1]=[C;X3]",
       "description": "Vinylic (alkenyl) attachment at an sp2 carbon.",
       "tags": [
-        "context",
+        "scaffold",
         "vinyl",
         "sp2"
       ]
@@ -42,11 +42,11 @@
     {
       "id": "R",
       "name": "R-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[CX4:1]",
       "description": "Alkyl (sp3 carbon) attachment point (R-).",
       "tags": [
-        "context",
+        "scaffold",
         "alkyl",
         "sp3"
       ]
@@ -54,11 +54,11 @@
     {
       "id": "RCH2",
       "name": "RCH2-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[CX4H2:1]",
       "description": "Primary alkyl (sp3 CH2) attachment point.",
       "tags": [
-        "context",
+        "scaffold",
         "alkyl",
         "sp3",
         "primary"
@@ -67,11 +67,11 @@
     {
       "id": "R2CH",
       "name": "R2CH-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[CX4H1:1]",
       "description": "Secondary alkyl (sp3 CH) attachment point.",
       "tags": [
-        "context",
+        "scaffold",
         "alkyl",
         "sp3",
         "secondary"
@@ -80,11 +80,11 @@
     {
       "id": "R3C",
       "name": "R3C-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[CX4H0:1]",
       "description": "Tertiary alkyl (sp3 C) attachment point.",
       "tags": [
-        "context",
+        "scaffold",
         "alkyl",
         "sp3",
         "tertiary"
@@ -93,11 +93,11 @@
     {
       "id": "Bn",
       "name": "Bn-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[CH2:1][c]",
       "description": "Benzylic CH2 attachment (Bn-).",
       "tags": [
-        "context",
+        "scaffold",
         "benzylic",
         "sp3"
       ]
@@ -105,11 +105,11 @@
     {
       "id": "Allyl",
       "name": "Allyl-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[CH2:1][CH]=[CH2]",
       "description": "Allylic CH2 attachment (Allyl-).",
       "tags": [
-        "context",
+        "scaffold",
         "allylic",
         "sp2_sp3_mixed"
       ]
@@ -117,11 +117,11 @@
     {
       "id": "Alkynyl",
       "name": "Alkynyl-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[#6:1]#[#6]",
       "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal).",
       "tags": [
-        "context",
+        "scaffold",
         "alkynyl",
         "sp"
       ]
@@ -129,11 +129,11 @@
     {
       "id": "Acyl",
       "name": "Acyl-",
-      "kind": "context",
+      "kind": "scaffold",
       "smarts": "[CX3:1](=O)",
       "description": "Acyl carbon attachment point (Acyl-), used for acyl electrophiles/features.",
       "tags": [
-        "context",
+        "scaffold",
         "acyl",
         "carbonyl"
       ]
@@ -141,9 +141,9 @@
     {
       "id": "Cl",
       "name": "-Cl",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[Cl:2]",
-      "description": "Chloro substituent core (-Cl).",
+      "description": "Chloro substituent substituent (-Cl).",
       "tags": [
         "halide",
         "x_group",
@@ -153,9 +153,9 @@
     {
       "id": "Br",
       "name": "-Br",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[Br:2]",
-      "description": "Bromo substituent core (-Br).",
+      "description": "Bromo substituent substituent (-Br).",
       "tags": [
         "halide",
         "x_group",
@@ -165,9 +165,9 @@
     {
       "id": "I",
       "name": "-I",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[I:2]",
-      "description": "Iodo substituent core (-I).",
+      "description": "Iodo substituent substituent (-I).",
       "tags": [
         "halide",
         "x_group",
@@ -177,9 +177,9 @@
     {
       "id": "F",
       "name": "-F",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[F:2]",
-      "description": "Fluoro substituent core (-F).",
+      "description": "Fluoro substituent substituent (-F).",
       "tags": [
         "halide",
         "x_group",
@@ -189,9 +189,9 @@
     {
       "id": "H",
       "name": "-H",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[H:2]",
-      "description": "Hydrogen substituent core (-H).",
+      "description": "Hydrogen substituent substituent (-H).",
       "tags": [
         "hydrogen",
         "proton"
@@ -200,7 +200,7 @@
     {
       "id": "CHO",
       "name": "-CHO",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3H1:2](=O)",
       "description": "Aldehyde core; attach via formyl carbon (-CHO).",
       "tags": [
@@ -211,7 +211,7 @@
     {
       "id": "CN",
       "name": "-CN",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[#6:2]#N",
       "description": "Nitrile core; attach via cyano carbon (-CN).",
       "tags": [
@@ -221,7 +221,7 @@
     {
       "id": "NO2",
       "name": "-NO2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[N+:2](=O)[O-]",
       "description": "Nitro core; attach via nitro nitrogen (-NO2).",
       "tags": [
@@ -231,7 +231,7 @@
     {
       "id": "B(OH)2",
       "name": "-B(OH)2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[B:2](O)O",
       "description": "Boronic acid core; attach via boron (-B(OH)2).",
       "tags": [
@@ -242,7 +242,7 @@
     {
       "id": "Bpin",
       "name": "-Bpin",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[B:2]1OC(C)(C)C(C)(C)O1",
       "description": "Bpin core; attach via boron (-Bpin).",
       "tags": [
@@ -253,7 +253,7 @@
     {
       "id": "Sn",
       "name": "-SnR3",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[Sn:2]",
       "description": "Stannyl group (-SnR3).",
       "tags": [
@@ -264,7 +264,7 @@
     {
       "id": "Si",
       "name": "-SiR3",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[Si:2]",
       "description": "Silyl group (-SiR3).",
       "tags": [
@@ -275,7 +275,7 @@
     {
       "id": "Zn",
       "name": "-ZnX",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[Zn:2]",
       "description": "Zincate group (-ZnX).",
       "tags": [
@@ -286,7 +286,7 @@
     {
       "id": "Mg",
       "name": "-MgX",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[Mg:2]",
       "description": "Grignard group (-MgX).",
       "tags": [
@@ -297,9 +297,9 @@
     {
       "id": "BF3K",
       "name": "-BF3K",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[B-:2](F)(F)F",
-      "description": "Trifluoroborate core (-BF3K).",
+      "description": "Trifluoroborate substituent (-BF3K).",
       "tags": [
         "boron_handle",
         "organoboron"
@@ -308,7 +308,7 @@
     {
       "id": "SMe",
       "name": "-SMe",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[S:2]C",
       "description": "Methylthio group (-SMe).",
       "tags": [
@@ -319,9 +319,9 @@
     {
       "id": "NH2",
       "name": "-NH2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;H2:2]",
-      "description": "Primary amine N core (-NH2).",
+      "description": "Primary amine N substituent (-NH2).",
       "tags": [
         "amine",
         "nucleophile",
@@ -331,9 +331,9 @@
     {
       "id": "NHR",
       "name": "-NHR",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;H1:2]",
-      "description": "Secondary amine N core with one N-H (-NHR).",
+      "description": "Secondary amine N substituent with one N-H (-NHR).",
       "tags": [
         "amine",
         "nucleophile",
@@ -343,7 +343,7 @@
     {
       "id": "NR2",
       "name": "-NR2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;H0:2]",
       "description": "Tertiary amine N core, no N-H (-NR2).",
       "tags": [
@@ -354,9 +354,9 @@
     {
       "id": "OH",
       "name": "-OH",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[OX2H:2]",
-      "description": "Hydroxy core (-OH).",
+      "description": "Hydroxy substituent (-OH).",
       "tags": [
         "alcohol",
         "nucleophile",
@@ -366,9 +366,9 @@
     {
       "id": "SH",
       "name": "-SH",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[SX2H:2]",
-      "description": "Thiol core (-SH).",
+      "description": "Thiol substituent (-SH).",
       "tags": [
         "thiol",
         "nucleophile",
@@ -378,9 +378,9 @@
     {
       "id": "CO2H",
       "name": "-CO2H",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3:2](=O)[OX2H]",
-      "description": "Carboxylic acid core (-CO2H), attach via carbonyl carbon.",
+      "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon.",
       "tags": [
         "carboxylic_acid",
         "acid",
@@ -390,9 +390,9 @@
     {
       "id": "SO3H",
       "name": "-SO3H",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[S:2](=O)(=O)[OX2H]",
-      "description": "Sulfonic acid core (-SO3H), attach via sulfur.",
+      "description": "Sulfonic acid substituent (-SO3H), attach via sulfur.",
       "tags": [
         "sulfonic_acid",
         "acid",
@@ -402,9 +402,9 @@
     {
       "id": "COCl",
       "name": "-COCl",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3:2](=O)Cl",
-      "description": "Acyl chloride core (-COCl), attach via carbonyl carbon.",
+      "description": "Acyl chloride substituent (-COCl), attach via carbonyl carbon.",
       "tags": [
         "acyl_electrophile",
         "leaving_group",
@@ -414,9 +414,9 @@
     {
       "id": "CO2R",
       "name": "-CO2R",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3:2](=O)O[#6]",
-      "description": "Ester core (-CO2R), attach via carbonyl carbon.",
+      "description": "Ester substituent (-CO2R), attach via carbonyl carbon.",
       "tags": [
         "ester",
         "ewg_moderate"
@@ -425,7 +425,7 @@
     {
       "id": "CONHR",
       "name": "-CONHR",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3:2](=O)[NX3;H1,H2]",
       "description": "Amide with N-H (generic -CONHR/-CONH2); attach via carbonyl carbon.",
       "tags": [
@@ -436,9 +436,9 @@
     {
       "id": "CONR2",
       "name": "-CONR2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3:2](=O)[NX3;H0]",
-      "description": "Tertiary amide core (no N-H); attach via carbonyl carbon.",
+      "description": "Tertiary amide substituent (no N-H); attach via carbonyl carbon.",
       "tags": [
         "amide",
         "ewg_moderate"
@@ -447,7 +447,7 @@
     {
       "id": "SO2NH2",
       "name": "-SO2NH2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[SX4:2](=O)(=O)[NX3;H2]",
       "description": "Primary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -458,7 +458,7 @@
     {
       "id": "SO2NHR",
       "name": "-SO2NHR",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[SX4:2](=O)(=O)[NX3;H1]",
       "description": "Secondary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -469,7 +469,7 @@
     {
       "id": "SO2NR2",
       "name": "-SO2NR2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[SX4:2](=O)(=O)[NX3;H0]",
       "description": "Tertiary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -480,7 +480,7 @@
     {
       "id": "SO2Cl",
       "name": "-SO2Cl",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[SX4:2](=O)(=O)Cl",
       "description": "Sulfonyl chloride core; attach via sulfur.",
       "tags": [
@@ -492,9 +492,9 @@
     {
       "id": "Sulfamide",
       "name": "-NHSO2NH2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;H1:2][SX4](=O)(=O)[NX3;H2]",
-      "description": "Sulfamide core (primary); attach via nitrogen.",
+      "description": "Sulfamide substituent (primary); attach via nitrogen.",
       "tags": [
         "sulfamide",
         "nitrogen_group"
@@ -503,9 +503,9 @@
     {
       "id": "Urea",
       "name": "-NHCONH2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;H1:2][CX3](=O)[NX3;H2]",
-      "description": "Urea core (primary); attach via nitrogen.",
+      "description": "Urea substituent (primary); attach via nitrogen.",
       "tags": [
         "urea",
         "nitrogen_group"
@@ -514,7 +514,7 @@
     {
       "id": "Carbamate",
       "name": "-NHCO2R",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;H1:2][CX3](=O)[OX2][#6]",
       "description": "Carbamate core; attach via nitrogen.",
       "tags": [
@@ -525,9 +525,9 @@
     {
       "id": "OTf",
       "name": "-OTf",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[S:2](=O)(=O)C(F)(F)F",
-      "description": "Triflate tail for Ar-OTf/Vinyl-OTf via oxygen linker.",
+      "description": "Triflate substituent for Ar-OTf/Vinyl-OTf via oxygen linker.",
       "tags": [
         "sulfonate_leaving_group",
         "leaving_group"
@@ -536,9 +536,9 @@
     {
       "id": "OTs",
       "name": "-OTs",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[S:2](=O)(=O)c1ccc(C)cc1",
-      "description": "Tosylate tail via oxygen linker.",
+      "description": "Tosylate substituent via oxygen linker.",
       "tags": [
         "sulfonate_leaving_group",
         "leaving_group"
@@ -547,9 +547,9 @@
     {
       "id": "OMs",
       "name": "-OMs",
-      "kind": "tail",
+      "kind": "substituent",
       "smarts": "[S:2](=O)(=O)C",
-      "description": "Mesylate tail via oxygen linker.",
+      "description": "Mesylate substituent via oxygen linker.",
       "tags": [
         "sulfonate_leaving_group",
         "leaving_group"
@@ -558,9 +558,9 @@
     {
       "id": "CCH",
       "name": "-C#CH",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX2:2]#[CX2H]",
-      "description": "Terminal alkyne core (-C#CH), attach via substituted sp carbon.",
+      "description": "Terminal alkyne substituent (-C#CH), attach via substituted sp carbon.",
       "tags": [
         "alkyne",
         "terminal_alkyne"
@@ -569,9 +569,9 @@
     {
       "id": "CHCH2",
       "name": "-CH=CH2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3H1:2]=[CX3H2]",
-      "description": "Terminal alkene core (-CH=CH2), attach via substituted sp2 carbon (monosubstituted alkene).",
+      "description": "Terminal alkene substituent (-CH=CH2), attach via substituted sp2 carbon (monosubstituted alkene).",
       "tags": [
         "alkene",
         "terminal_alkene"
@@ -580,7 +580,7 @@
     {
       "id": "CO",
       "name": "-CO-",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3:2](=O)[#6]",
       "description": "Ketone core; attach via carbonyl carbon (-CO-R).",
       "tags": [
@@ -591,9 +591,9 @@
     {
       "id": "Lactam",
       "name": "Lactam",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;r;H1,H0:2][CX3;r]=O",
-      "description": "Lactam core (cyclic amide); attach via nitrogen.",
+      "description": "Lactam substituent (cyclic amide); attach via nitrogen.",
       "tags": [
         "amide",
         "cyclic",
@@ -603,7 +603,7 @@
     {
       "id": "NHAr",
       "name": "-NHAr",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[NX3;H1:2][c]",
       "description": "Secondary amine with aryl substituent; attach via nitrogen.",
       "tags": [
@@ -614,7 +614,7 @@
     {
       "id": "Phosphonium",
       "name": "-PR3+",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[PX4+:2]([#6])([#6])[#6]",
       "description": "Phosphonium salt core; attach via phosphorus.",
       "tags": [
@@ -625,7 +625,7 @@
     {
       "id": "Imine",
       "name": "Imine",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[CX3:2]=[NX3,NX2]",
       "description": "Imine core; attach via carbon.",
       "tags": [
@@ -635,7 +635,7 @@
     {
       "id": "B(OR)2",
       "name": "-B(OR)2",
-      "kind": "core",
+      "kind": "substituent",
       "smarts": "[B:2](O[#6])O[#6]",
       "description": "Generic boronate ester core; attach via boron.",
       "tags": [

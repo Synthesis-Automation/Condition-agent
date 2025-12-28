@@ -13,8 +13,8 @@ We only use **molecule SMARTS** (`MolFromSmarts` + `HasSubstructMatch`).
   - top-level key: `groups` (list)
   - each group has `id`, `kind`, `smarts`, plus `tags/description`
   - **Attachpoints are encoded only by atom-maps in `smarts`**
-    - context groups use `:1` (e.g., `Ar = [c:1]`)
-    - core/tail groups use `:2` (e.g., `Br = [Br:2]`)
+    - scaffold groups use `:1` (e.g., `Ar = [c:1]`)
+    - substituent groups use `:2` (e.g., `Br = [Br:2]`)
   - For **classification**, atom-maps are optional; we typically strip them.
 
 - `organic_compounds.v1.3.json`

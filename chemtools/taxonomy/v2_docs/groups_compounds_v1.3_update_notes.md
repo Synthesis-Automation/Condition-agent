@@ -9,10 +9,10 @@ Purpose: keep the definition JSONs **simple to maintain**, while still making **
 **Attachpoint is encoded only via atom-mapping inside `group.smarts`.**  
 No extra fields are needed.
 
-- **Context groups** (e.g., `Ar`, `Vinyl`, `R`): attach atom is mapped as `:1`
+- **Scaffold groups** (e.g., `Ar`, `Vinyl`, `R`): attach atom is mapped as `:1`
   - Example: `Ar.smarts = "[c:1]"`
 
-- **Core/tail groups** (e.g., `Br`, `Cl`, `OTf`, `B(OH)2`, `CHO`, `CO2H`, `NH2`): attach atom is mapped as `:2`
+- **Substituent groups** (e.g., `Br`, `Cl`, `OTf`, `B(OH)2`, `CHO`, `CO2H`, `NH2`): attach atom is mapped as `:2`
   - Example: `Br.smarts = "[Br:2]`
 
 > Practical implication: code can always find the attach atom by scanning SMARTS for `:1` or `:2`.
@@ -31,8 +31,8 @@ Removed fields (no longer present):
 New expectation:
 
 - Every attachable group must have its attach atom mapped in `smarts`:
-  - `:1` for context groups
-  - `:2` for core/tail groups
+  - `:1` for scaffold groups
+  - `:2` for substituent groups
 
 ### 2.2 `organic_compounds`
 
@@ -43,8 +43,8 @@ Removed field where it was redundant:
 New expectation:
 
 - If `anchors` is missing, assume:
-  - `anchors.core = "A"`
-  - `anchors.fg = "B"`
+  - `anchors.scaffold = "A"`
+  - `anchors.substituent = "B"`
 
 No other compound fields changed.
 
@@ -164,8 +164,8 @@ Return:
 
 4) **Sanity checks**
    - ensure each group `smarts` contains:
-     - `:1` for context groups (kind == "context")
-     - `:2` for core/tail groups (kind != "context")
+     - `:1` for scaffold groups (kind == "context")
+     - `:2` for substituent groups (kind != "context")
    - ensure all template IDs used in compounds exist in your templates registry
 
 ---

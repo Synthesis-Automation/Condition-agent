@@ -1,7 +1,7 @@
 {
   "version": "v1.3",
   "naming_set": "chemist_style",
-  "notes": "Compound motifs are built from `A` (context) and `B` (core/tail) with `template`.\nFor most motifs, `A` is the scaffold side and `B` is the functional group side; therefore `anchors` is optional.\nWhen present, `anchors` may override defaults; if absent, assume anchors.core='A' and anchors.fg='B'.\nAttachpoints are inferred from atom-maps in the referenced group `smarts` (see organic_groups v1.3).",
+  "notes": "Compound motifs are built from `A` (scaffold) and `B` (substituent) with `template`.\nFor most motifs, `A` is the scaffold side and `B` is the functional group side; therefore `anchors` is optional.\nWhen present, `anchors` may override defaults; if absent, assume anchors.core='A' and anchors.fg='B'.\nAttachpoints are inferred from atom-maps in the referenced group `smarts` (see organic_groups v1.3).",
   "compounds": [
     {
       "id": "Ar-Cl",
