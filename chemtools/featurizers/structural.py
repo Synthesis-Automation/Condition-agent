@@ -12,6 +12,7 @@ from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
 from .alkyl_steric import analyze_alkyl_steric
 from .aryl_electronics import analyze_aryl_electronics
 from .aryl_steric import analyze_aryl_steric
+from .nearby_groups import analyze_nearby_groups
 from .motif_detect import detect_motifs
 from .motif_registry import build_compound_registry
 
@@ -91,26 +92,31 @@ def featurize_molecule(
                     include_ipso_group=bool(include_ipso_group),
                     include_gasteiger=include_gasteiger,
                 )
+            nearby = analyze_nearby_groups(mol, hit, motifs, groups)
             analyses.append(
                 {
                     "compound_id": compound_id,
                     "center": {"ipso": hit["a_atom_idx"], "bond": hit["bond"]},
                     "steric": steric,
                     "electronic": electronic,
+                    "nearby_groups": nearby,
                 }
             )
         elif compound_id.startswith(("R-", "Bn-", "Allyl-")):
             steric = analyze_alkyl_steric(mol, hit)
+            nearby = analyze_nearby_groups(mol, hit, motifs, groups)
             analyses.append(
                 {
                     "compound_id": compound_id,
                     "center": {"alpha_c": hit["a_atom_idx"], "bond": hit["bond"]},
                     "steric": steric,
+                    "nearby_groups": nearby,
                 }
             )
 
     steric_payload = {"aryl": [], "alkyl": []}
     electronic_payload = {"aryl": []}
+    nearby_payload = []
     for analysis in analyses:
         steric_entry = {
             "compound_id": analysis.get("compound_id"),
@@ -129,6 +135,14 @@ def featurize_molecule(
                     "result": analysis.get("electronic"),
                 }
             )
+        if "nearby_groups" in analysis:
+            nearby_payload.append(
+                {
+                    "compound_id": analysis.get("compound_id"),
+                    "center": analysis.get("center"),
+                    "result": analysis.get("nearby_groups"),
+                }
+            )
 
     return {
         "schema_version": "v2",
@@ -136,6 +150,7 @@ def featurize_molecule(
         "motifs": motifs,
         "steric": steric_payload,
         "electronics": electronic_payload,
+        "nearby": nearby_payload,
         "analyses": analyses,
         "meta": meta,
     }

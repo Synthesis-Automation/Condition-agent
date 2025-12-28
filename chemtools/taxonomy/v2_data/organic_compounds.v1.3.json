@@ -100,6 +100,38 @@
       ]
     },
     {
+      "id": "Vinyl-Cl",
+      "name": "Vinyl-Cl",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "Cl",
+      "description": "Vinyl chloride (Vinyl–Cl)."
+    },
+    {
+      "id": "Vinyl-Br",
+      "name": "Vinyl-Br",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "Br",
+      "description": "Vinyl bromide (Vinyl–Br)."
+    },
+    {
+      "id": "Vinyl-I",
+      "name": "Vinyl-I",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "I",
+      "description": "Vinyl iodide (Vinyl–I)."
+    },
+    {
+      "id": "Vinyl-OTf",
+      "name": "Vinyl-OTf",
+      "template": "via_oxygen",
+      "A": "Vinyl",
+      "B": "OTf",
+      "description": "Vinyl triflate (Vinyl–OTf)."
+    },
+    {
       "id": "Ar-H",
       "name": "Ar-H",
       "template": "single_bond",
@@ -235,7 +267,7 @@
     {
       "id": "Ar-OTf",
       "name": "Ar-OTf",
-      "template": "single_bond",
+      "template": "via_oxygen",
       "A": "Ar",
       "B": "OTf",
       "description": "Aryl triflate (Ar–OTf); Aryl–O–triflate motif.",
@@ -246,7 +278,7 @@
     {
       "id": "Ar-OTs",
       "name": "Ar-OTs",
-      "template": "single_bond",
+      "template": "via_oxygen",
       "A": "Ar",
       "B": "OTs",
       "description": "Aryl tosylate (Ar–OTs); Aryl–O–tosylate motif.",
@@ -257,7 +289,7 @@
     {
       "id": "Ar-OMs",
       "name": "Ar-OMs",
-      "template": "single_bond",
+      "template": "via_oxygen",
       "A": "Ar",
       "B": "OMs",
       "description": "Aryl mesylate (Ar–OMs); Aryl–O–mesylate motif.",
@@ -268,7 +300,7 @@
     {
       "id": "Vinyl-OTf",
       "name": "Vinyl-OTf",
-      "template": "single_bond",
+      "template": "via_oxygen",
       "A": "Vinyl",
       "B": "OTf",
       "description": "Vinyl/alkenyl triflate (Vinyl–OTf); Vinyl/alkenyl–O–triflate motif.",
@@ -279,7 +311,7 @@
     {
       "id": "Vinyl-OTs",
       "name": "Vinyl-OTs",
-      "template": "single_bond",
+      "template": "via_oxygen",
       "A": "Vinyl",
       "B": "OTs",
       "description": "Vinyl/alkenyl tosylate (Vinyl–OTs); Vinyl/alkenyl–O–tosylate motif.",
@@ -290,7 +322,7 @@
     {
       "id": "Vinyl-OMs",
       "name": "Vinyl-OMs",
-      "template": "single_bond",
+      "template": "via_oxygen",
       "A": "Vinyl",
       "B": "OMs",
       "description": "Vinyl/alkenyl mesylate (Vinyl–OMs); Vinyl/alkenyl–O–mesylate motif.",
@@ -376,6 +408,78 @@
       ]
     },
     {
+      "id": "Ar-BF3K",
+      "name": "Ar-BF3K",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "BF3K",
+      "description": "Aryl trifluoroborate (Ar–BF3K)."
+    },
+    {
+      "id": "R-B(OH)2",
+      "name": "R-B(OH)2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "B(OH)2",
+      "description": "Alkyl boronic acid (R–B(OH)2)."
+    },
+    {
+      "id": "R-Bpin",
+      "name": "R-Bpin",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Bpin",
+      "description": "Alkyl boronate (Bpin) (R–Bpin)."
+    },
+    {
+      "id": "R-Sn",
+      "name": "R-Sn",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Sn",
+      "description": "Alkyl stannane (R–SnR3)."
+    },
+    {
+      "id": "R-Si",
+      "name": "R-Si",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Si",
+      "description": "Alkyl silane (R–SiR3)."
+    },
+    {
+      "id": "R-Zn",
+      "name": "R-Zn",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Zn",
+      "description": "Alkyl zincate (R–ZnX)."
+    },
+    {
+      "id": "R-Mg",
+      "name": "R-Mg",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Mg",
+      "description": "Alkyl Grignard (R–MgX)."
+    },
+    {
+      "id": "Alkynyl-Si",
+      "name": "Alkynyl-Si",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "Si",
+      "description": "Alkynyl silane (Alkynyl–SiR3)."
+    },
+    {
+      "id": "Ar-SMe",
+      "name": "Ar-SMe",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "SMe",
+      "description": "Aryl methyl thioether (Ar–SMe)."
+    },
+    {
       "id": "Ar-Bpin",
       "name": "Ar-Bpin",
       "template": "single_bond",
@@ -407,6 +511,70 @@
       "aliases": [
         "VinylBpin"
       ]
+    },
+    {
+      "id": "Ar-Sn",
+      "name": "Ar-Sn",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Sn",
+      "description": "Aryl stannane (Ar–SnR3)."
+    },
+    {
+      "id": "Ar-Si",
+      "name": "Ar-Si",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Si",
+      "description": "Aryl silane (Ar–SiR3)."
+    },
+    {
+      "id": "Ar-Zn",
+      "name": "Ar-Zn",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Zn",
+      "description": "Aryl zincate (Ar–ZnX)."
+    },
+    {
+      "id": "Ar-Mg",
+      "name": "Ar-Mg",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Mg",
+      "description": "Aryl Grignard (Ar–MgX)."
+    },
+    {
+      "id": "Vinyl-Sn",
+      "name": "Vinyl-Sn",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "Sn",
+      "description": "Vinyl/alkenyl stannane (Vinyl–SnR3)."
+    },
+    {
+      "id": "Vinyl-Si",
+      "name": "Vinyl-Si",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "Si",
+      "description": "Vinyl/alkenyl silane (Vinyl–SiR3)."
+    },
+    {
+      "id": "Vinyl-Zn",
+      "name": "Vinyl-Zn",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "Zn",
+      "description": "Vinyl/alkenyl zincate (Vinyl–ZnX)."
+    },
+    {
+      "id": "Vinyl-Mg",
+      "name": "Vinyl-Mg",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "Mg",
+      "description": "Vinyl/alkenyl Grignard (Vinyl–MgX)."
     },
     {
       "id": "Ar-CHO",

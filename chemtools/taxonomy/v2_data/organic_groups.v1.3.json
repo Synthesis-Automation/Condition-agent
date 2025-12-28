@@ -251,6 +251,72 @@
       ]
     },
     {
+      "id": "Sn",
+      "name": "-SnR3",
+      "kind": "tail",
+      "smarts": "[Sn:2]",
+      "description": "Stannyl group (-SnR3).",
+      "tags": [
+        "organometallic",
+        "stannane"
+      ]
+    },
+    {
+      "id": "Si",
+      "name": "-SiR3",
+      "kind": "tail",
+      "smarts": "[Si:2]",
+      "description": "Silyl group (-SiR3).",
+      "tags": [
+        "organometallic",
+        "silane"
+      ]
+    },
+    {
+      "id": "Zn",
+      "name": "-ZnX",
+      "kind": "tail",
+      "smarts": "[Zn:2]",
+      "description": "Zincate group (-ZnX).",
+      "tags": [
+        "organometallic",
+        "zinc"
+      ]
+    },
+    {
+      "id": "Mg",
+      "name": "-MgX",
+      "kind": "tail",
+      "smarts": "[Mg:2]",
+      "description": "Grignard group (-MgX).",
+      "tags": [
+        "organometallic",
+        "magnesium"
+      ]
+    },
+    {
+      "id": "BF3K",
+      "name": "-BF3K",
+      "kind": "core",
+      "smarts": "[B-:2](F)(F)F",
+      "description": "Trifluoroborate core (-BF3K).",
+      "tags": [
+        "boron_handle",
+        "organoboron"
+      ]
+    },
+    {
+      "id": "SMe",
+      "name": "-SMe",
+      "kind": "tail",
+      "smarts": "[S:2]C",
+      "description": "Methylthio group (-SMe).",
+      "tags": [
+        "sulfur",
+        "thioether"
+      ]
+    },
+    {
       "id": "NH2",
       "name": "-NH2",
       "kind": "core",

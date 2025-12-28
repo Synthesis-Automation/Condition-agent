@@ -55,13 +55,19 @@ def analyze_aryl_electronics(
         if ring_atom != ipso and ring_atom not in ring_dist:
             continue
 
-        # 1. Check for ring heteroatoms (e.g., Pyridine N)
+        # 1. Check for ring heteroatoms (e.g., Pyridine N, Furan O, Thiophene S)
         atom = mol.GetAtomWithIdx(ring_atom)
         symbol = atom.GetSymbol()
-        if symbol == "N" and ring_atom != ipso:
+        if symbol in ["N", "O", "S"] and ring_atom != ipso:
             pos = _position_for_distance(ring_dist[ring_atom])
             if pos:
-                strength = 1.0  # Moderate EWG for ring nitrogen
+                # Strengths for ring heteroatoms (EWG-centric model)
+                # Pyridine N is 1.0. O and S are also electronegative.
+                # Note: In 5-membered rings these are technically EDG by resonance,
+                # but for this simple tag-weighted model we treat them as EWG contributors.
+                strength_map = {"N": 1.0, "O": 0.8, "S": 0.4}
+                strength = strength_map.get(symbol, 0.0)
+
                 weight = _WEIGHTS.get(pos, 0.0)
                 term = round(weight * strength, 3)
                 e_sum += term
