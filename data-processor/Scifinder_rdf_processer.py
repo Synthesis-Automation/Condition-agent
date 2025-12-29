@@ -47,6 +47,11 @@ except Exception as e:
     sys.exit(1)
 
 try:
+    from v2_processor_core import V2Processor
+except ImportError:
+    V2Processor = None
+
+try:
     # We import but will prefer our taxonomy-aware generator for this GUI tool.
     from reaction_markdown_generator import ReactionMarkdownGenerator as _ExternalReactionMarkdownGenerator  # type: ignore
 except Exception:
@@ -924,356 +929,123 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             pass
 
     def generate_jsonl_export(self, rows, output_path: str, source_folder: str):
-        """Generate JSONL export with precomputed normalization and features."""
+        """Generate JSONL export with precomputed normalization and features using V2 Processor."""
         
-        # Import chemtools for preprocessing
+        # Initialize V2 Processor
+        processor = None
+        if V2Processor:
+            try:
+                processor = V2Processor()
+                print("  V2 Processor initialized successfully.")
+            except Exception as e:
+                print(f"  Warning: Failed to initialize V2 Processor: {e}")
+        
+        # Import chemtools for DRFP
         try:
-            import sys
-            import os
-            repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            if repo_root not in sys.path:
-                sys.path.insert(0, repo_root)
-            from chemtools.smiles import normalize_reaction
-            from chemtools import router, reaction_similarity as rs
-            from chemtools.featurizers import reaction_pair as feat_pair
-            chemtools_available = True
+            from chemtools import reaction_similarity as rs
             drfp_available = rs.drfp_available()
-        except Exception as e:
-            print(f"Warning: chemtools not available for preprocessing: {e}")
-            chemtools_available = False
+        except Exception:
             drfp_available = False
         
         out_lines: List[str] = []
         precompute_stats = {"success": 0, "failed": 0, "skipped": 0, "drfp_computed": 0}
-        family_sources = {"scifinder": 0, "scifinder_partial": 0, "scifinder_unmapped": 0, "unknown": 0}
-        snar_map = {
-            "C_N_Coupling": "SNAr-CN",
-            "C_O_Coupling": "SNAr-CO",
-            "C_S_Coupling": "SNAr-CS",
-        }
-        snar_outputs: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
-        snar_counts: Dict[str, int] = defaultdict(int)
-        dropped_no_catalyst = 0
-        dataset_family = os.path.splitext(os.path.basename(output_path))[0] or source_folder
         
         # Collect DRFP fingerprints for binary storage
-        drfp_fingerprints = []  # List of numpy arrays
-        drfp_reaction_ids = []  # Corresponding reaction IDs
+        drfp_fingerprints = []
+        drfp_reaction_ids = []
         
         for idx, row in enumerate(rows, 1):
             rid = row.get("ReactionID", "")
-            rtype = row.get("ReactionType", "")
-            full_system_list = self._collect_full_catalytic_system(row)
-            condition_core = self._compute_condition_core(row, full_system_list)
-
-            # Process catalytic system (same format as reagents)
-            catalytic_system = [
-                self._normalize_component(self._component_from_item(x))
-                for x in full_system_list
-            ]
-            if dataset_family == "Suzuki" and not catalytic_system:
-                dropped_no_catalyst += 1
+            reactants_smi = row.get("ReactantSMILES", "")
+            products_smi = row.get("ProductSMILES", "")
+            
+            if not reactants_smi or not products_smi:
                 precompute_stats["skipped"] += 1
                 continue
 
+            reaction_smiles = f"{reactants_smi}>>{products_smi}"
+            
+            # Prepare data for V2 Processor
             reag_list = self._safe_json_list(row.get("Reagent", "[]"))
-            role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
             reagents = []
-            for i, item in enumerate(reag_list):
+            for item in reag_list:
                 obj = self._normalize_component(self._component_from_item(item))
-                role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
-                obj["role"] = role
-                reagents.append(obj)
+                reagents.append({"name": obj.get("name", ""), "cas": obj.get("cas", "")})
 
             solv_list = self._safe_json_list(row.get("Solvent", "[]"))
-            solvents = [
-                self._normalize_component(self._component_from_item(x))
-                for x in solv_list
-            ]
+            solvents = []
+            for item in solv_list:
+                obj = self._normalize_component(self._component_from_item(item))
+                solvents.append({"name": obj.get("name", ""), "cas": obj.get("cas", "")})
 
             def _num(x):
                 try:
                     return float(x)
-                except Exception:
+                except:
                     return None
-            conditions = {
-                "temperature_c": _num(row.get("Temperature_C")),
-                "time_h": _num(row.get("Time_h")),
-                "yield_pct": _num(row.get("Yield_%")),
-            }
 
-            reactants_smi = row.get("ReactantSMILES", "")
-            products_smi = row.get("ProductSMILES", "")
-            smiles = {
-                "reactants": reactants_smi,
-                "products": products_smi,
-            }
-            
-            # PRECOMPUTE: Normalize reaction, detect family, and featurize
-            precomputed = {}
-            if chemtools_available and reactants_smi and products_smi:
-                try:
-                    # Build reaction SMILES
-                    reaction_smiles = f"{reactants_smi}>>{products_smi}"
-                    
-                    # 1. Normalize reaction
-                    norm_result = normalize_reaction(reaction_smiles)
-                    normalized_rxn = norm_result.get("normalized", "")
-                    
-                    # Extract normalized reactants
-                    reactants_normalized = [
-                        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
-                        for r in (norm_result.get("reactants") or [])
-                    ]
-                    
-                    if reactants_normalized:
-                        # 2. Use existing reaction type from SciFinder (primary source)
-                        # Map SciFinder naming to our family names
-                        scifinder_type = (rtype or "").strip()
-                        detected_family = "Unknown"
-                        family_confidence = 0.0
-                        family_source = "unknown"
-                        
-                        # Map common SciFinder reaction type names
-                        scifinder_map = {
-                            # C-N Coupling variations (unified dataset)
-                            "buchwald": "C_N_Coupling",
-                            "buchwald-hartwig": "C_N_Coupling",
-                            "buchwald c-n": "C_N_Coupling",
-                            "buchwald_cn": "C_N_Coupling",
-                            "ullmann": "C_N_Coupling",
-                            "ullmann c-n": "C_N_Coupling",
-                            "ullmann_cn": "C_N_Coupling",
-                            "goldberg": "C_N_Coupling",
-                            "c-n coupling": "C_N_Coupling",
-                            "c-n cross-coupling": "C_N_Coupling",
-                            # C-O Coupling variations
-                            "c-o coupling": "C_O_Coupling",
-                            "c-o cross-coupling": "C_O_Coupling",
-                            "ullmann c-o": "C_O_Coupling",
-                            "ullmann_co": "C_O_Coupling",
-                            "ullmann ether": "C_O_Coupling",
-                            # C-S Coupling variations
-                            "c-s coupling": "C_S_Coupling",
-                            "c-s cross-coupling": "C_S_Coupling",
-                            "ullmann c-s": "C_S_Coupling",
-                            "ullmann_cs": "C_S_Coupling",
-                            "ullmann thioether": "C_S_Coupling",
-                            # Suzuki
-                            "suzuki": "Suzuki_CC",
-                            "suzuki-miyaura": "Suzuki_CC",
-                            "suzuki coupling": "Suzuki_CC",
-                            # Others
-                            "sonogashira": "Sonogashira_CC",
-                            "amide": "Amide_Coupling",
-                            "amide coupling": "Amide_Coupling",
-                            "amide formation": "Amide_Coupling",
-                        }
-                        
-                        scifinder_lower = scifinder_type.lower()
-                        if scifinder_lower in scifinder_map:
-                            # Exact match - highest confidence
-                            detected_family = scifinder_map[scifinder_lower]
-                            family_source = "scifinder"
-                            family_confidence = 1.0
-                        elif scifinder_type:
-                            # Try partial match
-                            for key, family in scifinder_map.items():
-                                if key in scifinder_lower or scifinder_lower in key:
-                                    detected_family = family
-                                    family_source = "scifinder_partial"
-                                    family_confidence = 0.8
-                                    break
-                        
-                        # Note: We do NOT run SMARTS detection here!
-                        # SMARTS detection is expensive and only needed for user queries.
-                        # For datasets with SciFinder metadata, we either:
-                        #   1. Match SciFinder type to our families (above), or
-                        #   2. Leave as "Unknown" - can be reviewed/corrected manually
-                        # 
-                        # If you need SMARTS detection, it should be done:
-                        #   - On-demand for user input (in recommend.py, router.py)
-                        #   - Not during bulk dataset preprocessing
-                        
-                        if detected_family == "Unknown" and scifinder_type:
-                            # Keep SciFinder name even if we don't recognize it
-                            # This helps manual review/mapping later
-                            family_source = "scifinder_unmapped"
-                            family_confidence = 0.0
-                        
-                        # 3. Featurize substrates (for categorical similarity fallback)
-                        # Pick electrophile and nucleophile
-                        def is_electrophile(s: str) -> bool:
-                            t = (s or "").lower()
-                            return ("br" in t) or ("cl" in t) or (" i" in t) or ("os(=o)(=o)c(f)(f)f" in t) or ("otf" in t)
-                        
-                        elec_smi, nuc_smi = "", ""
-                        if len(reactants_normalized) == 1:
-                            elec_smi = reactants_normalized[0]
-                        elif len(reactants_normalized) >= 2:
-                            r0, r1 = reactants_normalized[0], reactants_normalized[1]
-                            if is_electrophile(r0):
-                                elec_smi, nuc_smi = r0, r1
-                            elif is_electrophile(r1):
-                                elec_smi, nuc_smi = r1, r0
-                            else:
-                                elec_smi, nuc_smi = r0, r1
-                        
-                        # Featurize (keep only categorical features, exclude fingerprints)
-                        feat_result = feat_pair.featurize_pair(elec_smi, nuc_smi)
-                        features = feat_result.get("flat", {})
-                        if isinstance(features, dict):
-                            # Remove role_aware and molpipeline (contains large fingerprints)
-                            features = {k: v for k, v in features.items() if k not in ("role_aware", "molpipeline")}
-                            
-                            # Optimization: Store only True boolean values to reduce JSON size by ~50%
-                            # Missing keys are implicitly False (standard sparse representation)
-                            compact_features = {}
-                            for k, v in features.items():
-                                if isinstance(v, bool):
-                                    if v:  # Only store True values
-                                        compact_features[k] = True
-                                else:
-                                    # Keep non-boolean values as-is (strings, numbers)
-                                    compact_features[k] = v
-                            features = compact_features
-                        
-                        # 4. Precompute DRFP fingerprint (optional but highly recommended)
-                        # NOTE: DRFP is saved to a separate binary file, not embedded in JSONL
-                        drfp_fp = None
-                        if drfp_available and reaction_smiles:
-                            try:
-                                fp_array = rs.encode_drfp(reaction_smiles, n_bits=4096, radius=3)
-                                if fp_array is not None:
-                                    # Keep as numpy array for later binary storage
-                                    drfp_fp = fp_array
-                                    precompute_stats["drfp_computed"] += 1
-                            except Exception:
-                                pass  # DRFP computation failed, skip
-                        
-                        # Store precomputed data (without DRFP - saved separately)
-                        precomputed = {
-                            "reaction_smiles": reaction_smiles,
-                            "features": features,
-                        }
-                        
-                        # DO NOT add DRFP to JSONL - it will be saved to binary .npz file
-                        # This saves ~90% space (e.g., 670 MB ->70 MB + 12 MB .npz)
-                        
-                        # Collect DRFP for later binary storage
-                        if drfp_fp is not None:
-                            drfp_fingerprints.append(drfp_fp)
-                            drfp_reaction_ids.append(rid)
-                        
-                        precompute_stats["success"] += 1
-                        
-                        # Track family source for statistics
-                        family_sources[family_source] = family_sources.get(family_source, 0) + 1
-                        
-                        if idx % 100 == 0:
-                            print(f"  Preprocessed {idx}/{len(rows)} reactions...")
-                    else:
-                        precompute_stats["skipped"] += 1
-                        
-                except Exception as e:
-                    precompute_stats["failed"] += 1
-                    if precompute_stats["failed"] <= 5:  # Only show first 5 errors
-                        print(f"  Warning: Failed to preprocess reaction {rid}: {e}")
-            elif not chemtools_available:
-                precompute_stats["skipped"] += 1
-
-            target_dataset = dataset_family
-            if not catalytic_system and dataset_family in snar_map:
-                target_dataset = snar_map[dataset_family]
-                snar_counts[target_dataset] += 1
-
-            analysis_record = {
+            reaction_data = {
                 "reaction_id": rid,
-                "reaction_type": target_dataset,
-                "condition_core": condition_core,
-                "catalytic_system": catalytic_system,
+                "reaction_smiles": reaction_smiles,
                 "reagents": reagents,
                 "solvents": solvents,
-                "conditions": conditions,
-                "reference": row.get("Reference") or {},
+                "conditions": {
+                    "temperature_c": _num(row.get("Temperature_C")),
+                    "yield_pct": _num(row.get("Yield_%"))
+                },
+                "reference": row.get("Reference") or {}
             }
+
+            # Process with V2 Processor
+            v2_entry = {}
+            if processor:
+                try:
+                    v2_entry = processor.process_reaction(reaction_data)
+                    if v2_entry:
+                        precompute_stats["success"] += 1
+                except Exception as e:
+                    precompute_stats["failed"] += 1
+                    if precompute_stats["failed"] <= 5:
+                        print(f"  Warning: V2 processing failed for {rid}: {e}")
             
-            # Add precomputed data if available
-            if precomputed:
-                analysis_record["precomputed"] = precomputed
+            if not v2_entry:
+                # Fallback to minimal entry if processor fails or is unavailable
+                v2_entry = {
+                    "reaction_id": rid,
+                    "reaction_smiles": reaction_smiles,
+                    "conditions": reaction_data["conditions"],
+                    "reference": reaction_data["reference"]
+                }
+
+            # DRFP Fingerprint (Optional but useful)
+            if drfp_available:
+                try:
+                    from chemtools import reaction_similarity as rs
+                    fp_array = rs.encode_drfp(reaction_smiles, n_bits=4096, radius=3)
+                    if fp_array is not None:
+                        drfp_fingerprints.append(fp_array)
+                        drfp_reaction_ids.append(rid)
+                        precompute_stats["drfp_computed"] += 1
+                except:
+                    pass
+
+            out_lines.append(_json.dumps(v2_entry, ensure_ascii=False, separators=(',', ':')))
             
-            # NOTE: We no longer store the separate "smiles" field (reactants/products)
-            # since it's redundant with precomputed.reaction_smiles (saves ~8% space).
-            # To reconstruct: split reaction_smiles on ">>" if needed.
-            
-            if target_dataset == dataset_family:
-                out_lines.append(_json.dumps(analysis_record, ensure_ascii=False))
-            else:
-                snar_outputs[target_dataset].append(analysis_record)
+            if idx % 100 == 0:
+                print(f"  Processed {idx}/{len(rows)} reactions...")
 
         # Write output file
         try:
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
             
-            # Persist routed SNAr reactions to dedicated datasets
-            if snar_outputs:
-                dataset_dir = os.path.dirname(output_path)
-                for snar_type, records in snar_outputs.items():
-                    if not records:
-                        continue
-                    snar_path = os.path.join(dataset_dir, f"{snar_type}.jsonl")
-                    existing_ids: Set[str] = set()
-                    if os.path.exists(snar_path):
-                        try:
-                            with open(snar_path, "r", encoding="utf-8") as existing_file:
-                                for line in existing_file:
-                                    line = line.strip()
-                                    if not line:
-                                        continue
-                                    try:
-                                        rid_val = _json.loads(line).get("reaction_id")
-                                    except Exception:
-                                        continue
-                                    if rid_val:
-                                        existing_ids.add(str(rid_val))
-                        except Exception:
-                            existing_ids = set()
-                    new_lines: List[str] = []
-                    for record in records:
-                        rid_val = str(record.get("reaction_id") or "")
-                        if rid_val and rid_val in existing_ids:
-                            continue
-                        if rid_val:
-                            existing_ids.add(rid_val)
-                        new_lines.append(_json.dumps(record, ensure_ascii=False))
-                    if not new_lines:
-                        continue
-                    mode = "a"
-                    need_newline = False
-                    if not os.path.exists(snar_path) or os.path.getsize(snar_path) == 0:
-                        mode = "w"
-                    else:
-                        need_newline = True
-                    with open(snar_path, mode, encoding="utf-8") as snar_file:
-                        if need_newline:
-                            snar_file.write("\n")
-                        snar_file.write("\n".join(new_lines))
-                    print(f"  Routed {len(new_lines)} reactions to {snar_type} dataset ({snar_path})")
-            
             # Save DRFP fingerprints to binary NPZ file
             if drfp_fingerprints and drfp_reaction_ids:
-                # Determine NPZ output path (same as JSONL but with .npz extension)
                 npz_path = output_path.rsplit('.', 1)[0] + '_drfp.npz'
-                
                 try:
                     import numpy as np
-                    
-                    # Stack fingerprints into matrix
                     fps_matrix = np.vstack(drfp_fingerprints)
                     reaction_ids_array = np.array(drfp_reaction_ids, dtype=object)
-                    
-                    # Save as compressed NPZ
                     np.savez_compressed(
                         npz_path,
                         fps=fps_matrix,
@@ -1281,50 +1053,20 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         n_bits=np.array(4096, dtype='int32'),
                         radius=np.array(3, dtype='int32')
                     )
-                    
-                    npz_size_mb = os.path.getsize(npz_path) / (1024 * 1024)
-                    print(f"\n*Saved {len(drfp_reaction_ids)} DRFP fingerprints to {npz_path}")
-                    print(f"  Binary file size: {npz_size_mb:.2f} MB ({npz_size_mb/len(drfp_reaction_ids)*1000:.1f} KB per reaction)")
+                    print(f"  Saved {len(drfp_reaction_ids)} DRFP fingerprints to {npz_path}")
                 except Exception as e:
-                    print(f"\nWARNING: Failed to save DRFP binary file: {e}")
-            
-            # Print file size statistics
-            jsonl_size_mb = os.path.getsize(output_path) / (1024 * 1024)
-            print(f"\n*JSONL file size: {jsonl_size_mb:.2f} MB ({jsonl_size_mb/len(rows)*1000:.1f} KB per reaction)")
-            if drfp_fingerprints:
-                combined_size_mb = jsonl_size_mb + (os.path.getsize(npz_path) / (1024 * 1024) if os.path.exists(npz_path) else 0)
-                print(f"  Combined size (JSONL + NPZ): {combined_size_mb:.2f} MB")
-                print(f"  Space saved by binary DRFP: ~{npz_size_mb*8:.0f} MB (would be embedded as JSON)")
-            
-            # Print preprocessing statistics
-            if chemtools_available:
-                total = len(rows)
-                print(f"\n{'='*60}")
-                print(f"PREPROCESSING STATISTICS")
-                print(f"{'='*60}")
-                print(f"Total reactions:           {total}")
-                print(f"Successfully preprocessed: {precompute_stats['success']} ({precompute_stats['success']/total*100:.1f}%)")
-                print(f"Failed:                    {precompute_stats['failed']} ({precompute_stats['failed']/total*100:.1f}%)")
-                print(f"Skipped:                   {precompute_stats['skipped']} ({precompute_stats['skipped']/total*100:.1f}%)")
-                if drfp_available:
-                    print(f"DRFP fingerprints:         {precompute_stats['drfp_computed']} ({precompute_stats['drfp_computed']/max(1,precompute_stats['success'])*100:.1f}%)")
-                print(f"\nFamily Detection Sources:")
-                print(f"  SciFinder exact match:   {family_sources['scifinder']} ({family_sources['scifinder']/max(1,precompute_stats['success'])*100:.1f}%)")
-                print(f"  SciFinder partial match: {family_sources['scifinder_partial']} ({family_sources['scifinder_partial']/max(1,precompute_stats['success'])*100:.1f}%)")
-                print(f"  SciFinder unmapped:      {family_sources['scifinder_unmapped']} ({family_sources['scifinder_unmapped']/max(1,precompute_stats['success'])*100:.1f}%)")
-                print(f"  Unknown/Missing:         {family_sources['unknown']} ({family_sources['unknown']/max(1,precompute_stats['success'])*100:.1f}%)")
-                if dropped_no_catalyst:
-                    print(f"\nExcluded (no catalyst, Suzuki): {dropped_no_catalyst}")
-                if snar_counts:
-                    print("\nSNAr routing summary:")
-                    for snar_type, count in snar_counts.items():
-                        print(f"  {snar_type}: {count}")
-                print(f"{'='*60}")
-                print(f"*Dataset saved with precomputed normalization and features!")
-                print(f"*DRFP fingerprints saved to separate binary .npz file (saves ~90% space)")
-                print(f"*Family names from SciFinder metadata (no SMARTS detection)")
-                print(f"*Unmapped types can be added to scifinder_map for next import")
-                print(f"*SMARTS detection will run on-demand for user queries only")
+                    print(f"  Warning: Failed to save DRFP binary file: {e}")
+
+            # Print statistics
+            total = len(rows)
+            print(f"\n{'='*60}")
+            print(f"V2 PROCESSING STATISTICS")
+            print(f"{'='*60}")
+            print(f"Total reactions:           {total}")
+            print(f"Successfully processed:    {precompute_stats['success']} ({precompute_stats['success']/total*100:.1f}%)")
+            print(f"Failed:                    {precompute_stats['failed']} ({precompute_stats['failed']/total*100:.1f}%)")
+            print(f"Skipped:                   {precompute_stats['skipped']} ({precompute_stats['skipped']/total*100:.1f}%)")
+            print(f"{'='*60}")
             
         except Exception as e:
             print(f"Error writing JSONL: {e}")

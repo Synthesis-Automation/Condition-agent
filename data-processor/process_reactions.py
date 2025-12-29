@@ -42,6 +42,11 @@ try:
 except Exception:
     chemtools_registry = None
 
+try:
+    from v2_processor_core import V2Processor
+except ImportError:
+    V2Processor = None
+
 # Import reactant classifier if available
 try:
     import sys
@@ -333,8 +338,32 @@ def _is_condition_token(tok: str) -> bool:
 
 def _classify_catalyst_or_ligand(name: str) -> Tuple[str, str]:
     """Return (kind, generic) where kind in {"core", "ligand"} and generic metal tag.
-    generic may be "Pd", "Cu(I)", "Cu(II)", "Cu", "Ni", "Ir", "Rh", or "".
+    Uses V2 taxonomy if available, otherwise falls back to heuristics.
     """
+    if V2Processor:
+        try:
+            # Lazy init processor to avoid overhead if not needed
+            if not hasattr(_classify_catalyst_or_ligand, "_processor"):
+                _classify_catalyst_or_ligand._processor = V2Processor()
+            
+            res = _classify_catalyst_or_ligand._processor.classify_reagent(name)
+            role = res.get("role", "UNKNOWN")
+            
+            # Map V2 roles to legacy "core"/"ligand"
+            if role == "metal_catalyst":
+                # Extract metal from name or family if possible
+                metal = ""
+                n = name.lower()
+                if "pd" in n or "palladium" in n: metal = "Pd"
+                elif "cu" in n or "copper" in n: metal = "Cu"
+                elif "ni" in n or "nickel" in n: metal = "Ni"
+                return "core", metal
+            elif role == "ligand":
+                return "ligand", ""
+        except Exception:
+            pass
+
+    # Fallback to legacy heuristics
     n = name.lower()
     metal = ""
     if any(x in n for x in ["palladium", "pd("]):
@@ -352,18 +381,16 @@ def _classify_catalyst_or_ligand(name: str) -> Tuple[str, str]:
     elif "copper" in n or n.startswith("cu ") or n.startswith("cu-") or n == "cu":
         metal = "Cu"
 
-    # Decide ligand-like patterns (typical Pd/Cu ligands): phosphines, bipyridines, phenanthrolines, common trade names
+    # Decide ligand-like patterns
     ligand_keywords = [
-        "xphos", "sphos", "ruph", "brettphos", "johnphos", "tbu xphos", "ruphose", "ruphose",
-        "binap", "segphos", "xantphos", "dppf", "dppe", "dppp", "dppb", "pph3", "pcy3", "p(o)ph3",
+        "xphos", "sphos", "ruph", "brettphos", "johnphos", "tbu xphos", "ruphose",
+        "binap", "segphos", "xantphos", "dppf", "dppe", "dppp", "dppb", "pph3", "pcy3",
         "phosphine", "phosphite", "phosphonite",
         "bpy", "bipyridine", "2,2'-bipyridine", "phenanthroline", "phen",
         "imes", "ipr", "simes", "nhc",
     ]
     ligand_like = any(k in n for k in ligand_keywords)
-    # Metal catalysts (cores) include explicit metal salts/precursors
     is_metal_catalyst = bool(metal) or (any(k in n for k in ["oxide", "bromide", "iodide", "chloride", "acetate", "triflate", "acac", "sulfate"]) and ("copper" in n or "palladium" in n or "nickel" in n))
-    # Heuristic: if it looks like those ligands, call it ligand; otherwise treat as core (covers organocatalysts like DMAP)
     kind = "ligand" if (ligand_like and not is_metal_catalyst) else "core"
     return kind, metal
 
@@ -1744,6 +1771,33 @@ def assemble_rows(txt: Dict[str, Dict[str, Any]], rdf: Dict[str, Dict[str, Any]]
                 'notes': r.get('notes'),
             }
         }
+        # Build V2 structured conditions if processor is available
+        conditions_v2 = {}
+        if V2Processor:
+            try:
+                if not hasattr(_classify_catalyst_or_ligand, "_processor"):
+                    _classify_catalyst_or_ligand._processor = V2Processor()
+                
+                # Prepare reagents for V2 processor
+                v2_reagents = []
+                for p in reagent_pairs:
+                    nm, _, cs = p.partition('|')
+                    v2_reagents.append({"name": nm.strip(), "cas": cs.strip()})
+                for p in combined_pairs:
+                    nm, _, cs = p.partition('|')
+                    v2_reagents.append({"name": nm.strip(), "cas": cs.strip()})
+                
+                v2_solvents = []
+                for p in solvent_pairs:
+                    nm, _, cs = p.partition('|')
+                    v2_solvents.append({"name": nm.strip(), "cas": cs.strip()})
+                
+                conditions_v2 = _classify_catalyst_or_ligand._processor._standardize_conditions(
+                    v2_reagents, v2_solvents, {"conditions": {"temperature_c": temp_c, "yield_pct": yield_pct}}
+                )
+            except Exception:
+                pass
+
         row = {
             'ReactionID': rid,
             'ReactionType': infer_reaction_type(core_generic),
@@ -1774,6 +1828,8 @@ def assemble_rows(txt: Dict[str, Dict[str, Any]], rdf: Dict[str, Dict[str, Any]]
             # Reactant type classification (added for recommendation system)
             'ReactantTypes': _json_list(reactant_types),
             'ReactantCategories': _json_list(reactant_categories),
+            # V2 Structured Conditions
+            'ConditionsV2': json.dumps(conditions_v2, ensure_ascii=False) if conditions_v2 else '',
             # Original text preservation
             'original_text': t.get('original_text', []),
         }
@@ -1799,6 +1855,7 @@ def write_csv(rows: List[Dict[str, Any]], out_path: str) -> None:
     'RCTName', 'PROName', 'RGTName', 'CATName', 'SOLName',
         # reactant type classification (for recommendation system)
         'ReactantTypes', 'ReactantCategories',
+        'ConditionsV2',
     ]
     with open(out_path, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=cols)
