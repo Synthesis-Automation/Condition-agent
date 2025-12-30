@@ -15,6 +15,11 @@ from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
 
 _MAP_RE = re.compile(r":\d+(?=\])")
 
+_DEFAULT_TEMPLATES = {
+    "single_bond": "{A}{B}",
+    "via_oxygen": "{A}O{B}",
+}
+
 
 @dataclass(frozen=True)
 class CompoundPattern:
@@ -31,7 +36,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
     Load group/template/compound files and compile compound SMARTS queries.
     """
     groups_path = Path(registry_paths["groups"])
-    templates_path = Path(registry_paths["templates"])
+    templates_path = Path(registry_paths["templates"]) if "templates" in registry_paths else None
     compounds_path = Path(registry_paths["compounds"])
 
     groups = _load_groups(groups_path)
@@ -121,7 +126,7 @@ def build_compound_detect_registry(registry_paths: Mapping[str, str | Path]) -> 
     Detect SMARTS strips atom-map labels for pure substructure matching.
     """
     groups_path = Path(registry_paths["groups"])
-    templates_path = Path(registry_paths["templates"])
+    templates_path = Path(registry_paths["templates"]) if "templates" in registry_paths else None
     compounds_path = Path(registry_paths["compounds"])
 
     groups = _load_groups(groups_path)
@@ -189,10 +194,13 @@ def _load_groups(path: Path) -> Dict[str, Dict[str, Any]]:
     return {group["id"]: group for group in groups if isinstance(group, dict) and group.get("id")}
 
 
-def _load_templates(path: Path) -> Dict[str, str]:
+def _load_templates(path: Optional[Path]) -> Dict[str, str]:
+    if path is None or not path.exists():
+        return dict(_DEFAULT_TEMPLATES)
+
     payload = _load_json(path)
     templates = payload.get("templates", {})
-    formatted: Dict[str, str] = {}
+    formatted: Dict[str, str] = dict(_DEFAULT_TEMPLATES)
     for template_id, entry in templates.items():
         if isinstance(entry, dict) and "format" in entry:
             formatted[template_id] = str(entry["format"])
@@ -408,5 +416,4 @@ def _default_registry_paths() -> Dict[str, Path]:
     return {
         "groups": base / "organic_groups.v1.3.json",
         "compounds": base / "organic_compounds.v1.3.json",
-        "templates": base / "smarts_templates.v1.json",
     }

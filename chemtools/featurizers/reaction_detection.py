@@ -52,7 +52,6 @@ def _load_compound_registry() -> Dict[str, Any]:
     registry_paths = {
         "groups": base / "organic_groups.v1.3.json",
         "compounds": base / "organic_compounds.v1.3.json",
-        "templates": base / "smarts_templates.v1.json",
     }
     return build_compound_registry(registry_paths)
 

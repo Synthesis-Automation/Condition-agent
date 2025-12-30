@@ -40,46 +40,6 @@
       ]
     },
     {
-      "id": "AromN-Cl",
-      "name": "AromN-Cl",
-      "template": "single_bond",
-      "A": "AromN",
-      "B": "Cl",
-      "description": "Aromatic N-chloride (AromN–Cl)."
-    },
-    {
-      "id": "AromN-Br",
-      "name": "AromN-Br",
-      "template": "single_bond",
-      "A": "AromN",
-      "B": "Br",
-      "description": "Aromatic N-bromide (AromN–Br)."
-    },
-    {
-      "id": "AromN-I",
-      "name": "AromN-I",
-      "template": "single_bond",
-      "A": "AromN",
-      "B": "I",
-      "description": "Aromatic N-iodide (AromN–I)."
-    },
-    {
-      "id": "AromN-NH2",
-      "name": "AromN-NH2",
-      "template": "single_bond",
-      "A": "AromN",
-      "B": "NH2",
-      "description": "Aromatic N-amine (e.g., N-amino pyrrole) (AromN–NH2)."
-    },
-    {
-      "id": "AromN-OH",
-      "name": "AromN-OH",
-      "template": "single_bond",
-      "A": "AromN",
-      "B": "OH",
-      "description": "Aromatic N-hydroxyl (e.g., N-hydroxy pyrrole) (AromN–OH)."
-    },
-    {
       "id": "AromN-H",
       "name": "AromN-H",
       "template": "single_bond",
