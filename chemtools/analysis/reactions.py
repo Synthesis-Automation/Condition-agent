@@ -24,6 +24,8 @@ FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     "cn_coupling": "c_n_cross_coupling",
     "buchwald_hartwig_c_n": "c_n_cross_coupling",
     "ullmann_cn": "c_n_cross_coupling",
+    "ChanLam_Narylation": "c_n_cross_coupling",
+    "UllmannGoldberg_Narylation": "c_n_cross_coupling",
     
     # C-C Coupling reactions
     "Suzuki_CC": "suzuki_miyaura",
@@ -31,12 +33,28 @@ FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     "Suzuki-Miyaura": "suzuki_miyaura",
     "Sonogashira_CC": "sonogashira",
     "Sonogashira": "sonogashira",
+    "Sonogashira_coupling": "sonogashira",
     "Heck": "heck",
+    "HeckMizoroki_coupling": "heck",
+    "Stille_coupling": "suzuki_miyaura",
+    "Negishi_coupling": "suzuki_miyaura",
+    "Kumada_coupling": "suzuki_miyaura",
+    "Hiyama_coupling": "suzuki_miyaura",
+    "Miyaura_borylation": "suzuki_miyaura",
+    "Stille": "suzuki_miyaura",
+    "Negishi": "suzuki_miyaura",
+    "Kumada": "suzuki_miyaura",
+    "Hiyama": "suzuki_miyaura",
+    "Miyaura": "suzuki_miyaura",
+    "Olefin_metathesis": "ring_closing_metathesis",
+    "RCM": "ring_closing_metathesis",
     
     # Amide Coupling
     "Amide_Coupling": "amide_coupling",
     "Amide_formation": "amide_coupling",
     "amide_formation": "amide_coupling",
+    "CDI-mediated_amidation": "amide_coupling",
+    "Weinreb_amide": "amide_coupling",
     
     # SNAr reactions (legacy -> v2)
     "S_NAr": "snar_cn",
@@ -45,10 +63,62 @@ FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     "s_nar": "snar_cn",
     "Aromatic_Nucleophilic_Substitution": "snar_cn",
     "aromatic_nucleophilic_substitution": "snar_cn",
+    "SNAr_amination": "snar_cn",
+    "SNAr-CN": "snar_cn",
+    "SNAr-CO": "snar_cn",
+    "SNAr-CS": "snar_cn",
     
     # Esterification
     "Esterification": "esterification",
     "Ester_formation": "esterification",
+    "Fischer_esterification": "esterification",
+    "Steglich_esterification": "esterification",
+
+    # Reductive Amination
+    "Reductive_amination": "reductive_amination",
+
+    # C-O Coupling
+    "C_O_Coupling": "c_o_coupling",
+
+    # Oxidation
+    "Swern_oxidation": "oxidation_alcohol_to_carbonyl",
+    "Jones_oxidation": "oxidation_alcohol_to_carbonyl",
+    "DessMartin_periodinane_DMP_Alcohols__aldehydesketones": "oxidation_alcohol_to_carbonyl",
+    "Oxidation-BAIB": "oxidation_alcohol_to_carbonyl",
+    "Oxidation_IBX": "oxidation_alcohol_to_carbonyl",
+    "Oxidation_of_Aromatic_Side_Chains": "oxidation_alcohol_to_carbonyl",
+    "Oxidation_of_Arylmethanes_to_Aldehydes": "oxidation_alcohol_to_carbonyl",
+    "Riley_oxidation": "oxidation_alcohol_to_carbonyl",
+    "TEMPObleach_Oxidations_Primary_alcohols__aldehydesacids": "oxidation_alcohol_to_carbonyl",
+    "TPAPNMO_Catalytic_Ru_oxidations": "oxidation_alcohol_to_carbonyl",
+    "Wacker_oxidation_Alkene__ketone_PdCl2_CuCl_O2": "oxidation_alcohol_to_carbonyl",
+    "Benzylic_oxidation": "oxidation_alcohol_to_carbonyl",
+
+    # Reduction
+    "NaBH4_carbonyl_reductions": "reduction_carbonyl_to_alcohol",
+    "Reduction_LAH_LiAlH4": "reduction_carbonyl_to_alcohol",
+    "Reduction_NaBHOAc3_NaBH3CN": "reduction_carbonyl_to_alcohol",
+    "Reduction-Borane": "reduction_carbonyl_to_alcohol",
+    "DIBALH_Partial_reductions": "reduction_carbonyl_to_alcohol",
+    "Clemmensen_reduction": "reduction_carbonyl_to_alcohol",
+    "Rosenmund_reduction": "reduction_carbonyl_to_alcohol",
+    "WolffKishner": "reduction_carbonyl_to_alcohol",
+    "Catalytic_hydrogenation": "reduction_nitro_to_amine",
+    "Staudinger_reduction": "reduction_nitro_to_amine",
+    "Birch_reduction": "reduction_carbonyl_to_alcohol",
+
+    # Halogenation
+    "NBS_NCS_NIS_halogenation": "halogenation_aromatic",
+    "Sandmeyer_reactions": "halogenation_aromatic",
+    "Appel_halogenation": "halogenation_aromatic",
+    "Aromatic_Halogen_Exchange": "halogenation_aromatic",
+    "BalzSchiemann": "halogenation_aromatic",
+    "Chlorination_SOCl2_oxalyl_chloride": "halogenation_aromatic",
+    "Deoxy_fluorination": "halogenation_aromatic",
+    "Electrophilic_fluorination": "halogenation_aromatic",
+    "Trifluoromethylation": "halogenation_aromatic",
+    "Difluoromethylation": "halogenation_aromatic",
+    "Aliphatic_Halide_Exchange": "halogenation_aromatic",
 }
 
 CN_FAMILIES_CANONICAL: Set[str] = {"c_n_cross_coupling", "snar_cn"}

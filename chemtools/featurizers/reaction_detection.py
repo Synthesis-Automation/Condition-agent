@@ -161,6 +161,9 @@ def _match_reaction_definition(
     required_slots = 0
     matched_slots = 0
 
+    if not definition.reactants:
+        return None
+
     for slot, allowed in definition.reactants.items():
         if not allowed:
             continue

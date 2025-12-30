@@ -94,10 +94,8 @@
     {
       "id": "Ar-H",
       "name": "Ar-H",
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "H",
-      "description": "Aryl C-H (Ar–H).",
+      "smarts": "[c:1]~[c:2]",
+      "description": "Aryl C-H (Ar–H) - approximated by aromatic bond for detection.",
       "aliases": [
         "ArH",
         "aryl C-H",

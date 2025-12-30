@@ -152,6 +152,14 @@
       "R-OMs",
       "R-OTf",
       "R-OTs"
+    ],
+    "nitro_default": [
+      "Any-NO2",
+      "Ar-NO2",
+      "Vinyl-NO2"
+    ],
+    "aromatic_default": [
+      "Ar-H"
     ]
   },
   "reaction_types": [
@@ -656,6 +664,80 @@
         }
       },
       "notes": "Covers acid chloride/bromide esterification; optional product confirmation via ester motifs."
+    },
+    {
+      "id": "oxidation_alcohol_to_carbonyl",
+      "name": "Alcohol oxidation (alcohol -> aldehyde/ketone)",
+      "category": "oxidation_reactions",
+      "aliases": [
+        "Swern oxidation",
+        "Jones oxidation",
+        "Dess-Martin oxidation",
+        "Ley-Griffith oxidation"
+      ],
+      "description": "Oxidation of primary or secondary alcohols to aldehydes or ketones",
+      "reactants": {
+        "substrate": {
+          "motif_sets": [
+            "alcohols_oh_default"
+          ]
+        }
+      },
+      "notes": "Broad category for alcohol oxidation; specific reagents (DMP, PCC, etc.) are not inferred."
+    },
+    {
+      "id": "reduction_carbonyl_to_alcohol",
+      "name": "Carbonyl reduction (aldehyde/ketone -> alcohol)",
+      "category": "reduction_reactions",
+      "aliases": [
+        "NaBH4 reduction",
+        "LAH reduction",
+        "Meerwein-Ponndorf-Verley reduction"
+      ],
+      "description": "Reduction of aldehydes or ketones to primary or secondary alcohols",
+      "reactants": {
+        "substrate": {
+          "motif_sets": [
+            "carbonyls_reductive_amination_default"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reduction_nitro_to_amine",
+      "name": "Nitro reduction (nitro -> amine)",
+      "category": "reduction_reactions",
+      "aliases": [
+        "Catalytic hydrogenation of nitro",
+        "Bechamp reduction",
+        "Zinin reduction"
+      ],
+      "description": "Reduction of nitro groups to primary amines",
+      "reactants": {
+        "substrate": {
+          "motif_sets": [
+            "nitro_default"
+          ]
+        }
+      }
+    },
+    {
+      "id": "halogenation_aromatic",
+      "name": "Aromatic halogenation (Ar-H -> Ar-X)",
+      "category": "halogenation_reactions",
+      "aliases": [
+        "Electrophilic aromatic substitution halogenation",
+        "Sandmeyer reaction (from diazonium)"
+      ],
+      "description": "Introduction of halogen atoms into aromatic rings",
+      "reactants": {
+        "substrate": {
+          "motif_sets": [
+            "aromatic_default"
+          ]
+        }
+      },
+      "notes": "Covers both direct halogenation and displacement of diazonium salts."
     }
   ],
   "notes": [
