@@ -121,5 +121,5 @@ db_id = resolve_rule_db_v2("Suzuki")
 
 Legacy registry modules and data are preserved under
 `chemtools/archive/taxonomy/`. New code should use v2 modules instead of the
-archived registry. For legacy tooling, import from `chemtools.taxonomy.archive`
+archived registry. For legacy tooling, import from `chemtools.archive.taxonomy`
 explicitly.

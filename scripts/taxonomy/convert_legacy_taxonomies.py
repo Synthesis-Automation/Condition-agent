@@ -25,8 +25,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from chemtools.reagent import constants as reagent_constants  # type: ignore  # noqa: E402
-from chemtools.taxonomy.archive import load_registry as load_unified_registry  # type: ignore  # noqa: E402
-from chemtools.taxonomy.archive.registry import TaxonomyRegistry  # type: ignore  # noqa: E402
+from chemtools.archive.taxonomy import load_registry as load_unified_registry  # type: ignore  # noqa: E402
+from chemtools.archive.taxonomy.registry import TaxonomyRegistry  # type: ignore  # noqa: E402
 
 LEGACY_REACTANT_TYPES = REPO_ROOT / "chemtools" / "reagent" / "data" / "reactant_types.json"
 LEGACY_REACTION_TYPES = REPO_ROOT / "chemtools" / "reagent" / "data" / "reaction_types.json"

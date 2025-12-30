@@ -100,7 +100,11 @@ from chemtools.reagent.analytics import (
     get_family_statistics,
     get_missing_data_report,
 )
-from chemtools.util.functional_groups import detect_all as detect_functional_groups
+from chemtools.util.functional_groups import (
+    detect_all as detect_functional_groups,
+    summarize_functional_groups,
+)
+from chemtools.util.reaction_center_detector import identify_changed_atoms_from_mapped_smiles
 from chemtools.featurizers import reaction_pair as molecular_featurizer
 from chemtools.taxonomy.rule_db import resolve_rule_db_v2
 
@@ -1397,6 +1401,55 @@ def get_functional_groups_tool(smiles: str) -> Dict[str, Any]:
         return _success_response({"functional_groups": result})
     except Exception as e:
         return _error_response(str(e), {"smiles": smiles})
+
+
+@tool(args_schema=FunctionalGroupInput)
+def summarize_functional_groups_tool(smiles: str) -> Dict[str, Any]:
+    """
+    Provide a human-readable summary of functional groups in a molecule.
+    
+    Categorizes detected groups (e.g., Oxygen-bearing, Nitrogen-bearing, etc.)
+    and returns a formatted string summary.
+    
+    Args:
+        smiles: SMILES string to analyze
+    
+    Returns:
+        Dict[str, Any]: Formatted summary string with success flag.
+    """
+    try:
+        summary = summarize_functional_groups(smiles)
+        return _success_response({"summary": summary})
+    except Exception as e:
+        return _error_response(str(e), {"smiles": smiles})
+
+
+class ReactionCenterInput(BaseModel):
+    """Schema for reaction center identification."""
+    mapped_smiles: str = Field(..., description="Atom-mapped reaction SMILES (e.g., [C:1]#[C:2].[c:3][I:4]>>[C:1]#[C:2]-[c:3])")
+
+
+@tool(args_schema=ReactionCenterInput)
+def identify_reaction_center_tool(mapped_smiles: str) -> Dict[str, Any]:
+    """
+    Identify the reaction center from an atom-mapped reaction SMILES.
+    
+    Detects which atoms and bonds are broken or formed during the reaction.
+    This helps focus analysis on the actual transformation rather than spectator groups.
+    
+    Args:
+        mapped_smiles: Reaction SMILES with atom mapping
+    
+    Returns:
+        Dict[str, Any]: Lists of changed atoms, broken bonds, and formed bonds.
+    """
+    try:
+        result = identify_changed_atoms_from_mapped_smiles(mapped_smiles)
+        if "error" in result:
+            return _error_response(result["error"])
+        return _success_response(result)
+    except Exception as e:
+        return _error_response(str(e))
 
 
 @tool(args_schema=MolPipelineFeaturizeInput)
@@ -3170,6 +3223,10 @@ class AutoConditionsLLMInput(BaseModel):
     """Schema for deterministic auto-conditions pipeline (LLM-callable)."""
 
     reaction_smiles: str = Field(..., description="Reaction SMILES (reactants>>products).")
+    constraints: Optional[str] = Field(
+        default=None,
+        description="Natural language constraints (e.g., 'no palladium', 'prefer copper', 'avoid chlorinated solvents').",
+    )
     top_k_protocols: int = Field(
         default=5,
         ge=1,
@@ -3374,6 +3431,7 @@ def unified_recommender_tool(
 @tool(args_schema=AutoConditionsLLMInput)
 def auto_conditions_llm_tool(
     reaction_smiles: str,
+    constraints: Optional[str] = None,
     top_k_protocols: int = 5,
     max_protocols: int = 3,
 ) -> Dict[str, Any]:
@@ -3382,11 +3440,15 @@ def auto_conditions_llm_tool(
 
     Chains family detection → rule candidates → DRFP precedents → HTE summary →
     heuristic/ML scoring → fusion → automation-ready protocol formatting.
+    
+    Supports natural language constraints like 'no palladium' or 'prefer copper'.
     """
     try:
+        spec = build_constraint_spec(text=constraints) if constraints else None
         rxn_input = ReactionInput(reaction_smiles=reaction_smiles)
         result = auto_conditions(
             rxn_input,
+            constraints=spec,
             top_k_protocols=top_k_protocols,
             max_protocols=max_protocols,
             build_protocols=True,
@@ -4415,8 +4477,10 @@ CHEMTOOLS_TOOLS = [
     classify_reactant_tool,
     molpipeline_featurize_tool,
     get_functional_groups_tool,
+    summarize_functional_groups_tool,  # NEW: Human-readable functional group summary
     calculable_features_tool,
     analyze_bond_changes_tool,  # Bond breaking/formation analysis
+    identify_reaction_center_tool,  # NEW: Reaction center identification from atom mapping
     analyze_mechanism_tool,  # NEW: Mechanism classification + narrative evidence
     reaction_similarity_tool,  # NEW: DRFP-based reaction comparison
     

@@ -29,17 +29,23 @@ def main() -> None:
 
     startup_message = None
     try:
-        from chemtools.taxonomy.archive import load_registry
+        from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
+        from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2
 
-        registry = load_registry()
-        term_count = len(list(registry.iter_chem_terms()))
+        # Load new taxonomy v2
+        rxn_defs, _ = load_reaction_catalog()
+        reagent_tax = ReagentTaxonomyV2.from_path()
+
+        rxn_count = len(rxn_defs)
+        reagent_count = len(list(reagent_tax.iter_families()))
+
         startup_message = (
-            f"Taxonomy v{registry.manifest.taxonomy_version} "
-            f"(schema {registry.manifest.schema_version}) | "
-            f"chem terms: {term_count}"
+            f"Taxonomy v2 | "
+            f"Reactions: {rxn_count} | "
+            f"Reagent Families: {reagent_count}"
         )
     except Exception as exc:
-        startup_message = f"Taxonomy unavailable: {exc}"
+        startup_message = f"Taxonomy v2 unavailable: {exc}"
 
     window = ChemAssistantWindow(startup_message=startup_message)
     window.show()

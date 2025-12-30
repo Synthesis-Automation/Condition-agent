@@ -535,6 +535,7 @@ def plan_workflow(reaction: ReactionInput) -> PlannerPlan:
 def auto_conditions(
     reaction: ReactionInput,
     *,
+    constraints: Optional[ConstraintSpec] = None,
     top_k_protocols: int = 5,
     build_protocols: bool = True,
     max_protocols: int = 3,
@@ -551,6 +552,20 @@ def auto_conditions(
     rule_candidates = fetch_rule_candidates(reaction, family)
     protocol_candidates = find_similar_protocols(reaction, top_k=top_k_protocols)
     hte_summary = fetch_hte_stats(reaction, family)
+    
+    # Apply constraints to candidates if provided
+    if constraints:
+        # Filter rule candidates
+        rule_candidates = [
+            c for c in rule_candidates 
+            if _matches_constraints(c, constraints)
+        ]
+        # Filter protocol candidates
+        protocol_candidates = [
+            c for c in protocol_candidates 
+            if _matches_constraints(c, constraints)
+        ]
+
     ml_scores = score_ml_candidates(rule_candidates + protocol_candidates, reaction)
 
     fused = fuse_scores(rule_candidates, protocol_candidates, hte_summary, ml_scores)
@@ -569,3 +584,28 @@ def auto_conditions(
         fused=fused,
         protocols=protocols,
     )
+
+
+def _matches_constraints(candidate: CandidateCondition, constraints: ConstraintSpec) -> bool:
+    """Check if a candidate condition matches the provided constraints."""
+    components = candidate.components
+    catalyst = str(components.get("catalyst") or components.get("core") or "").upper()
+    solvent = str(components.get("solvent") or "").upper()
+    
+    # Metal constraints
+    if constraints.exclude_metals:
+        if any(m.upper() in catalyst for m in constraints.exclude_metals):
+            return False
+    
+    if constraints.allow_metals:
+        if not any(m.upper() in catalyst for m in constraints.allow_metals):
+            return False
+            
+    # Rule constraints (e.g., no_chlorinated)
+    if constraints.constraint_rules:
+        if constraints.constraint_rules.get("no_chlorinated"):
+            chlorinated = {"DCM", "CHLOROFORM", "DCE", "CH2CL2", "CHCL3"}
+            if any(c in solvent for c in chlorinated):
+                return False
+                
+    return True

@@ -16,6 +16,7 @@ from uuid import uuid4
 from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal, QTimer
 from PyQt6.QtWidgets import (
     QDialog,
+    QDialogButtonBox,
     QHBoxLayout,
     QLabel,
     QMainWindow,
@@ -43,6 +44,8 @@ from chem_assistant.gui.dialogs import (
     LLMConfigDialog,
 )
 from chemtools.visualization import render_molecule_image, render_reaction_image
+from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
+from chemtools.featurizers.reaction_detection import detect_reaction_types
 
 IMAGE_MARKUP = re.compile(
     r"\[\[(reaction|molecule)_image:(.+?)\]\]", re.IGNORECASE | re.DOTALL
@@ -79,6 +82,7 @@ class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
     result = pyqtSignal(object)
+    progress = pyqtSignal(str)
 
 
 class Worker(QRunnable):
@@ -93,6 +97,9 @@ class Worker(QRunnable):
 
     def run(self) -> None:
         try:
+            # Inject progress callback if the function accepts it
+            if "progress_callback" in self.fn.__code__.co_varnames:
+                self.kwargs["progress_callback"] = self.signals.progress.emit
             result = self.fn(*self.args, **self.kwargs)
         except Exception as exc:  # pragma: no cover - UI feedback
             trace = "".join(traceback.format_exception(exc))
@@ -177,6 +184,32 @@ class ImagePreviewWindow(QDialog):
         self.image_label.setPixmap(scaled)
 
 
+class JsonViewerDialog(QDialog):
+    """Simple dialog to view JSON content."""
+
+    def __init__(self, data: Dict[str, Any], title: str = "JSON Viewer", parent: Optional[QWidget] = None) -> None:
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.resize(800, 600)
+        layout = QVBoxLayout(self)
+        
+        self.text_edit = QTextEdit()
+        self.text_edit.setReadOnly(True)
+        self.text_edit.setPlainText(json.dumps(data, indent=2))
+        
+        # Use a monospace font
+        font = QFont("Courier New")
+        font.setStyleHint(QFont.StyleHint.Monospace)
+        font.setPointSize(10)
+        self.text_edit.setFont(font)
+        
+        layout.addWidget(self.text_edit)
+        
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+
 class ChemAssistantWindow(QMainWindow):
     """Main application window."""
 
@@ -194,12 +227,14 @@ class ChemAssistantWindow(QMainWindow):
         self.constraint_spec = ConstraintSpec()
         self.constraint_text = ""
         self.current_image_path: Optional[Path] = None
+        self.last_details_path: Optional[str] = None
         self._image_windows: List[ImagePreviewWindow] = []
         self._startup_message = (startup_message or "").strip()
 
         self.thread_pool = QThreadPool()
         self._build_ui()
         self._update_constraint_summary()
+        self.setAcceptDrops(True)
         self.statusBar().showMessage(self._startup_message or "Ready")
         if self._startup_message:
             self.append_log(self._startup_message)
@@ -247,7 +282,12 @@ class ChemAssistantWindow(QMainWindow):
         input_font.setPointSize(input_font.pointSize() + 1)
         self.input_edit.setFont(input_font)
         self.input_edit.sendRequested.connect(self.send_message)
+        self.input_edit.textChanged.connect(self._on_input_changed)
         central_layout.addWidget(self.input_edit)
+
+        self.validation_label = QLabel("")
+        self.validation_label.setStyleSheet("color: #888; font-size: 10pt;")
+        central_layout.addWidget(self.validation_label)
 
         button_row = QHBoxLayout()
         self.send_btn = QPushButton("Send")
@@ -265,6 +305,11 @@ class ChemAssistantWindow(QMainWindow):
         llm_btn = QPushButton("LLM Mode")
         llm_btn.clicked.connect(self.configure_llm_mode)
         button_row.addWidget(llm_btn)
+
+        self.view_results_btn = QPushButton("View Last Results")
+        self.view_results_btn.clicked.connect(self.view_last_results)
+        self.view_results_btn.setEnabled(False)
+        button_row.addWidget(self.view_results_btn)
 
         button_row.addStretch()
         central_layout.addLayout(button_row)
@@ -297,6 +342,52 @@ class ChemAssistantWindow(QMainWindow):
         if not message:
             return
         self.statusBar().showMessage(message, 5000)
+
+    def _on_input_changed(self) -> None:
+        content = self.input_edit.toPlainText().strip()
+        if not content:
+            self.validation_label.setText("")
+            return
+
+        # Check for reaction SMILES
+        reaction_smiles = self._extract_reaction_smiles(content)
+        if reaction_smiles:
+            if ">>" in reaction_smiles:
+                parts = reaction_smiles.split(">>")
+                if len(parts) == 2:
+                    reactants, products = parts
+                    r_mol = parse_smiles(reactants)
+                    p_mol = parse_smiles(products)
+                    if r_mol and p_mol:
+                        # Try to detect reaction type
+                        try:
+                            detection = detect_reaction_types(reaction_smiles)
+                            if detection.matches:
+                                best = detection.matches[0]
+                                self.validation_label.setText(f"✓ Valid Reaction: {best.name} detected")
+                            else:
+                                self.validation_label.setText("✓ Valid Reaction SMILES detected")
+                        except Exception:
+                            self.validation_label.setText("✓ Valid Reaction SMILES detected")
+                        
+                        self.validation_label.setStyleSheet("color: #4cd137;")
+                        return
+            elif parse_smiles(reaction_smiles):
+                self.validation_label.setText("✓ Valid Molecule SMILES detected")
+                self.validation_label.setStyleSheet("color: #4cd137;")
+                return
+
+        # If it looks like a command, don't show validation error
+        if content.startswith("/"):
+            self.validation_label.setText("")
+            return
+
+        # If it's long and doesn't look like SMILES, clear
+        if len(content) > 10 and not any(c in content for c in "()[]=#123456"):
+            self.validation_label.setText("")
+            return
+
+        self.validation_label.setText("")
 
     def send_message(self) -> None:
         content = self.input_edit.toPlainText().strip()
@@ -471,15 +562,23 @@ class ChemAssistantWindow(QMainWindow):
             constraints,
             inline_text=inline_text,
         )
+        worker.signals.progress.connect(self.update_spinner_message)
         worker.signals.result.connect(self._handle_conditions_workflow_result)
         worker.signals.error.connect(self.handle_agent_error)
         worker.signals.finished.connect(self.reset_after_task)
         self.thread_pool.start(worker)
 
+    def update_spinner_message(self, message: str) -> None:
+        """Update the message shown next to the spinner."""
+        self.spinner_message = message
+        self._update_spinner()
+
     def _handle_conditions_workflow_result(self, payload: Dict[str, Any]) -> None:
         response = str(payload.get("response_text") or "").strip()
         details_path = payload.get("details_path")
         if details_path:
+            self.last_details_path = details_path
+            self.view_results_btn.setEnabled(True)
             response = response + f"\n\nDetails JSON saved to: {details_path}"
 
         if not response:
@@ -495,9 +594,14 @@ class ChemAssistantWindow(QMainWindow):
         constraints: ConstraintSpec,
         *,
         inline_text: Optional[str] = None,
+        progress_callback: Optional[callable] = None,
     ) -> Dict[str, Any]:
         """Blocking worker: collect evidence from tools and synthesize a report."""
         from langchain_core.messages import HumanMessage, SystemMessage
+
+        def report_progress(msg: str) -> None:
+            if progress_callback:
+                progress_callback(msg)
 
         from chem_assistant.chemtools_agent import get_llm_client
         from chem_assistant.chemtools_wrapper import (
@@ -509,7 +613,8 @@ class ChemAssistantWindow(QMainWindow):
             unified_recommender_tool,
         )
 
-        def safe_invoke(tool_obj: Any, tool_input: Dict[str, Any]) -> Dict[str, Any]:
+        def safe_invoke(tool_obj: Any, tool_input: Dict[str, Any], label: str) -> Dict[str, Any]:
+            report_progress(f"Running {label}...")
             try:
                 result = tool_obj.invoke(tool_input)
             except Exception as exc:
@@ -517,6 +622,7 @@ class ChemAssistantWindow(QMainWindow):
             return result if isinstance(result, dict) else {"success": True, "data": result}
 
         constraint_payload: Dict[str, Any] = {}
+        # ... (rest of the logic)
         if constraints.allow_metals:
             constraint_payload["allow_metals"] = sorted(constraints.allow_metals)
         if constraints.exclude_metals:
@@ -529,11 +635,12 @@ class ChemAssistantWindow(QMainWindow):
             constraint_payload["constraint_rules"] = dict(constraints.constraint_rules)
 
         # Query all sources (best-effort; each call may fail independently).
-        family = safe_invoke(detect_reaction_family_tool, {"reaction_smiles": reaction_smiles})
+        family = safe_invoke(detect_reaction_family_tool, {"reaction_smiles": reaction_smiles}, "reaction family detection")
 
         rule = safe_invoke(
             rule_based_conditions_tool,
             {"reaction_smiles": reaction_smiles, "include_summary": True},
+            "rule-based engine"
         )
 
         ml = safe_invoke(
@@ -544,7 +651,8 @@ class ChemAssistantWindow(QMainWindow):
                 "max_variants": 3,
                 "rerank_strategy": "rule",
                 **constraint_payload,
-            }
+            },
+            "ML/DRFP recommender"
         )
 
         unified = safe_invoke(
@@ -554,7 +662,8 @@ class ChemAssistantWindow(QMainWindow):
                 "top_k": 5,
                 "min_similarity": 0.3,
                 "validate_rules": True,
-            }
+            },
+            "unified search"
         )
 
         protocols = safe_invoke(
@@ -564,7 +673,8 @@ class ChemAssistantWindow(QMainWindow):
                 "k": 3,
                 "min_similarity": 0.3,
                 "use_smarts_filter": True,
-            }
+            },
+            "protocol database"
         )
 
         # HTE: pull a larger set then filter/reorder by metal constraints.
@@ -574,9 +684,12 @@ class ChemAssistantWindow(QMainWindow):
                 "reaction_smiles": reaction_smiles,
                 "top_k": 20,
                 "min_experiments": 1,
-            }
+            },
+            "HTE database"
         )
         hte = self._apply_hte_constraints(hte_raw, constraints, top_k=5)
+
+        report_progress("Synthesizing report")
 
         details = {
             "reaction_smiles": reaction_smiles,
@@ -954,6 +1067,18 @@ class ChemAssistantWindow(QMainWindow):
             return False
         return True
 
+    def view_last_results(self) -> None:
+        if not self.last_details_path or not Path(self.last_details_path).exists():
+            QMessageBox.warning(self, "No results", "No recent condition results found.")
+            return
+        
+        try:
+            data = json.loads(Path(self.last_details_path).read_text(encoding="utf-8"))
+            dialog = JsonViewerDialog(data, title="Condition Search Details", parent=self)
+            dialog.exec()
+        except Exception as exc:
+            QMessageBox.critical(self, "Error", f"Failed to load results: {exc}")
+
     def configure_llm_mode(self) -> None:
         dialog = LLMConfigDialog(
             provider=self.llm_provider,
@@ -980,19 +1105,23 @@ class ChemAssistantWindow(QMainWindow):
 
     def _handle_taxonomy_command(self) -> None:
         try:
-            from chemtools.taxonomy.archive import load_registry
+            from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
+            from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2
 
-            registry = load_registry()
-            term_count = len(list(registry.iter_chem_terms()))
+            rxn_defs, _ = load_reaction_catalog()
+            reagent_tax = ReagentTaxonomyV2.from_path()
+
+            rxn_count = len(rxn_defs)
+            reagent_count = len(list(reagent_tax.iter_families()))
+
             self.append_chat(
                 "System",
-                "Taxonomy loaded.\n"
-                f"- taxonomy_version: {registry.manifest.taxonomy_version}\n"
-                f"- schema_version: {registry.manifest.schema_version}\n"
-                f"- chem_terms: {term_count}",
+                "Taxonomy v2 loaded.\n"
+                f"- reaction_types: {rxn_count}\n"
+                f"- reagent_families: {reagent_count}",
             )
         except Exception as exc:  # pragma: no cover - UI feedback
-            self.append_chat("System", f"Taxonomy load failed: {exc}")
+            self.append_chat("System", f"Taxonomy v2 load failed: {exc}")
 
     def _handle_terms_command(self, cmd: str, args: List[str]) -> None:
         if cmd == "term":
@@ -1009,24 +1138,19 @@ class ChemAssistantWindow(QMainWindow):
             smiles = " ".join(args).strip()
 
         try:
-            from chemtools.taxonomy.archive import load_registry
-            from chemtools.taxonomy.archive.terms import evaluate_terms_from_smiles
+            from chemtools.util.functional_groups import detect_all, summarize_functional_groups
 
-            registry = load_registry()
-            results = evaluate_terms_from_smiles(smiles, term_ids=term_ids)
-            hits = [term_id for term_id, ok in results.items() if ok]
-            if not hits:
-                self.append_chat("System", "No chem-term matches.")
-                return
-
-            lines = []
-            for term_id in hits:
-                term = registry.get_chem_term(term_id)
-                if term is None:
-                    lines.append(f"- {term_id}")
-                else:
-                    lines.append(f"- {term_id}: {term.name}")
-            self.append_chat("System", "Chem-term matches:\n" + "\n".join(lines))
+            if term_ids:
+                results = detect_all(smiles)
+                hits = [tid for tid in term_ids if results.get(tid)]
+                if not hits:
+                    self.append_chat("System", f"No matches for requested terms: {', '.join(term_ids)}")
+                    return
+                lines = [f"- {tid}" for tid in sorted(hits)]
+                self.append_chat("System", "Matches:\n" + "\n".join(lines))
+            else:
+                summary = summarize_functional_groups(smiles)
+                self.append_chat("System", f"Functional Groups:\n{summary}")
         except Exception as exc:  # pragma: no cover - UI feedback
             self.append_chat("System", f"Term evaluation failed: {exc}")
 
@@ -1356,3 +1480,30 @@ class ChemAssistantWindow(QMainWindow):
         self.statusBar().showMessage(
             f"{self.spinner_message}... {self.spinner_chars[self.spinner_index]}"
         )
+
+    # ------------------------------------------------------------------ #
+    # Drag and Drop
+    # ------------------------------------------------------------------ #
+
+    def dragEnterEvent(self, event) -> None:
+        if event.mimeData().hasFormat("text/plain") or event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event) -> None:
+        text = ""
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                path = Path(url.toLocalFile())
+                if path.suffix.lower() in {".smiles", ".txt", ".mol", ".sdf"}:
+                    try:
+                        text = path.read_text(encoding="utf-8").strip()
+                        break
+                    except Exception:
+                        pass
+        elif event.mimeData().hasFormat("text/plain"):
+            text = event.mimeData().text().strip()
+
+        if text:
+            self.input_edit.setPlainText(text)
+            self.append_log(f"Dropped content loaded into input.")
+            event.acceptProposedAction()

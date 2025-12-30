@@ -101,10 +101,45 @@ class ConstraintDialog(QDialog):
 
         layout.addLayout(form)
 
+        button_row = QHBoxLayout()
+        self.parse_btn = QPushButton("Parse Text to Fields")
+        self.parse_btn.clicked.connect(self.parse_text)
+        button_row.addWidget(self.parse_btn)
+        button_row.addStretch()
+        layout.addLayout(button_row)
+
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
+
+    def parse_text(self) -> None:
+        """Parse the natural language text and update the fields."""
+        text = self.text_edit.toPlainText().strip()
+        if not text:
+            return
+        
+        spec = build_constraint_spec(text=text)
+        
+        # Update fields if they were empty or if we found something new
+        if spec.allow_metals:
+            current = set(_split_csv(self.allow_edit.text()))
+            self.allow_edit.setText(", ".join(sorted(current | spec.allow_metals)))
+            
+        if spec.exclude_metals:
+            current = set(_split_csv(self.exclude_edit.text()))
+            self.exclude_edit.setText(", ".join(sorted(current | spec.exclude_metals)))
+            
+        if spec.prefer_metals:
+            current = set(_split_csv(self.prefer_edit.text()))
+            self.prefer_edit.setText(", ".join(sorted(current | spec.prefer_metals)))
+            
+        if spec.search_all_families:
+            self.cross_checkbox.setChecked(True)
+            
+        if spec.constraint_rules:
+            current = set(_split_csv(self.rules_edit.text()))
+            self.rules_edit.setText(", ".join(sorted(current | set(spec.constraint_rules.keys()))))
 
     def build_spec(self) -> ConstraintSpec:
         """Return the updated constraint spec."""
