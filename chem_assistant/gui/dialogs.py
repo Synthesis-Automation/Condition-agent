@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QDoubleSpinBox,
+    QSpinBox,
     QFileDialog,
     QFormLayout,
     QGroupBox,
@@ -907,6 +908,10 @@ class LLMConfig:
     provider: str
     model: str
     temperature: float
+    proactive: bool
+    proactive_top_k: int
+    proactive_max_protocols: int
+    proactive_build_protocols: bool
 
 
 class LLMConfigDialog(QDialog):
@@ -918,6 +923,10 @@ class LLMConfigDialog(QDialog):
         provider: Optional[str] = None,
         model: Optional[str] = None,
         temperature: float = 0.0,
+        proactive: bool = False,
+        proactive_top_k: int = 5,
+        proactive_max_protocols: int = 3,
+        proactive_build_protocols: bool = True,
         parent: Optional[QWidget] = None,
     ) -> None:
         super().__init__(parent)
@@ -949,7 +958,31 @@ class LLMConfigDialog(QDialog):
 
         layout.addLayout(form)
 
+        proactive_group = QGroupBox("Proactive Preflight")
+        proactive_form = QFormLayout(proactive_group)
+        self.proactive_checkbox = QCheckBox("Enable deterministic preflight (auto_conditions)")
+        self.proactive_checkbox.setChecked(bool(proactive))
+        proactive_form.addRow(self.proactive_checkbox)
+
+        self.proactive_top_k_spin = QSpinBox()
+        self.proactive_top_k_spin.setRange(1, 200)
+        self.proactive_top_k_spin.setValue(int(proactive_top_k))
+        proactive_form.addRow("Top-k protocols:", self.proactive_top_k_spin)
+
+        self.proactive_max_protocols_spin = QSpinBox()
+        self.proactive_max_protocols_spin.setRange(1, 10)
+        self.proactive_max_protocols_spin.setValue(int(proactive_max_protocols))
+        proactive_form.addRow("Max protocols to format:", self.proactive_max_protocols_spin)
+
+        self.proactive_build_checkbox = QCheckBox("Build protocol additions in preflight")
+        self.proactive_build_checkbox.setChecked(bool(proactive_build_protocols))
+        proactive_form.addRow(self.proactive_build_checkbox)
+
+        layout.addWidget(proactive_group)
+
         self.provider_combo.currentTextChanged.connect(self._on_provider_changed)
+        self.proactive_checkbox.toggled.connect(self._update_proactive_controls)
+        self._update_proactive_controls(self.proactive_checkbox.isChecked())
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -981,9 +1014,19 @@ class LLMConfigDialog(QDialog):
     def _on_provider_changed(self, provider: str) -> None:
         self._populate_models_for_provider(provider)
 
+    def _update_proactive_controls(self, enabled: bool) -> None:
+        is_enabled = bool(enabled)
+        self.proactive_top_k_spin.setEnabled(is_enabled)
+        self.proactive_max_protocols_spin.setEnabled(is_enabled)
+        self.proactive_build_checkbox.setEnabled(is_enabled)
+
     def get_config(self) -> LLMConfig:
         return LLMConfig(
             provider=self.provider_combo.currentText().strip() or "openai",
             model=self.model_combo.currentText().strip() or "gpt-4o",
             temperature=float(self.temperature_spin.value()),
+            proactive=self.proactive_checkbox.isChecked(),
+            proactive_top_k=int(self.proactive_top_k_spin.value()),
+            proactive_max_protocols=int(self.proactive_max_protocols_spin.value()),
+            proactive_build_protocols=self.proactive_build_checkbox.isChecked(),
         )

@@ -223,6 +223,10 @@ class ChemAssistantWindow(QMainWindow):
         self.llm_provider: Optional[str] = None
         self.llm_model: Optional[str] = None
         self.llm_temperature: float = 0.0
+        self.proactive_enabled: bool = False
+        self.proactive_top_k: int = 5
+        self.proactive_max_protocols: int = 3
+        self.proactive_build_protocols: bool = True
         self.history: List[BaseMessage] = []
         self.constraint_spec = ConstraintSpec()
         self.constraint_text = ""
@@ -1052,6 +1056,10 @@ class ChemAssistantWindow(QMainWindow):
                 provider=self.llm_provider,
                 model=self.llm_model,
                 temperature=self.llm_temperature,
+                proactive=self.proactive_enabled,
+                proactive_top_k=self.proactive_top_k,
+                proactive_max_protocols=self.proactive_max_protocols,
+                proactive_build_protocols=self.proactive_build_protocols,
             )
         except Exception as exc:  # pragma: no cover - UI feedback
             self.append_chat(
@@ -1084,6 +1092,10 @@ class ChemAssistantWindow(QMainWindow):
             provider=self.llm_provider,
             model=self.llm_model,
             temperature=self.llm_temperature,
+            proactive=self.proactive_enabled,
+            proactive_top_k=self.proactive_top_k,
+            proactive_max_protocols=self.proactive_max_protocols,
+            proactive_build_protocols=self.proactive_build_protocols,
             parent=self,
         )
         if dialog.exec() != QDialog.DialogCode.Accepted:
@@ -1093,11 +1105,18 @@ class ChemAssistantWindow(QMainWindow):
         self.llm_provider = config.provider
         self.llm_model = config.model
         self.llm_temperature = config.temperature
+        self.proactive_enabled = config.proactive
+        self.proactive_top_k = config.proactive_top_k
+        self.proactive_max_protocols = config.proactive_max_protocols
+        self.proactive_build_protocols = config.proactive_build_protocols
 
         # Recreate agent lazily with the new settings on next send.
         self.agent = None
+        proactive_status = "on" if self.proactive_enabled else "off"
         self.append_log(
-            f"LLM mode set: {self.llm_provider}/{self.llm_model} (T={self.llm_temperature:g})"
+            "LLM mode set: "
+            f"{self.llm_provider}/{self.llm_model} (T={self.llm_temperature:g}); "
+            f"proactive preflight {proactive_status}"
         )
 
     def show_taxonomy_status(self) -> None:
