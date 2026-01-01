@@ -49,42 +49,81 @@ def _iter_dataset_files() -> List[str]:
     return sorted(files)
 
 
-def _dataset_family_map(raw: str) -> str:
+def _dataset_family_map(raw: Optional[str], fallback: Optional[str] = None) -> str:
     """Normalize dataset reaction_type to API family text.
     
     Maps both legacy and new naming conventions to canonical family names.
     """
     t = (raw or "").strip()
+    if not t and fallback:
+        t = fallback.strip()
+    if not t:
+        return ""
     tl = t.lower()
     
     # New systematic naming (preferred)
-    if tl in {"c_n_coupling_cu_ullmann", "c_n_coupling_cu"}:
-        return "C_N_Coupling_Cu"
-    if tl in {"c_n_coupling_pd_buchwald", "c_n_coupling_pd"}:
-        return "C_N_Coupling_Pd"
-    if tl in {"c_n_coupling_ni"}:
-        return "C_N_Coupling_Ni"
+    if tl in {
+        "c_n_cross_coupling",
+        "c_n_coupling",
+        "c_n_coupling_cu",
+        "c_n_coupling_cu_ullmann",
+        "c_n_coupling_pd",
+        "c_n_coupling_pd_buchwald",
+        "c_n_coupling_ni",
+    }:
+        return "C_N_Coupling"
+    if tl in {"snar_cn", "snar_cn_coupling", "snar c-n"}:
+        return "SNAr-CN"
+    if tl in {"snar_co", "snar_co_coupling", "snar c-o"}:
+        return "SNAr-CO"
+    if tl in {"snar_cs", "snar_cs_coupling", "snar c-s"}:
+        return "SNAr-CS"
     
     # Legacy naming (supported for backward compatibility)
-    if tl in {"ullman", "ullmann", "ullman-c-n", "ullmann-c-n", "ullmann c-n", "ullmann_cn"}:
-        return "C_N_Coupling_Cu"
+    if tl in {
+        "ullman",
+        "ullmann",
+        "ullman-c-n",
+        "ullmann-c-n",
+        "ullmann c-n",
+        "ullmann_cn",
+    }:
+        return "C_N_Coupling"
     if tl in {"buchwald", "buchwald-c-n", "buchwald c-n", "buchwald_cn"}:
-        return "C_N_Coupling_Pd"
+        return "C_N_Coupling"
     
     # Other reaction types - use exact dataset file names
-    if tl in {"suzuki", "suzuki-miyaura", "suzuki cc", "suzuki_cc", "suzuki_coupling"}:
+    if tl in {
+        "suzuki",
+        "suzuki-miyaura",
+        "suzuki_miyaura",
+        "suzuki cc",
+        "suzuki_cc",
+        "suzuki_coupling",
+    }:
         return "Suzuki"
+    if tl in {"sonogashira", "sonogashira_coupling", "sonogashira cc", "sonogashira_cc"}:
+        return "Sonogashira_coupling"
+    if tl in {"heck", "heck_mizoroki", "heckmizoroki", "heckmizoroki_coupling"}:
+        return "HeckMizoroki_coupling"
     if tl in {"amide-formation", "amide formation", "amideformation", "amide", "amide coupling", "amide_coupling"}:
+        return "Amide_formation"
+    if tl in {"amide_formation"}:
         return "Amide_formation"
     
     return t
 
 
-def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _make_row_from_dataset(
+    rec: Dict[str, Any],
+    *,
+    file_family: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
     """Transform a raw dataset record into the standardized precedent format.
     
     Args:
         rec: Raw record from JSONL dataset
+        file_family: Optional filename-derived family name for fallback mapping
         
     Returns:
         Standardized precedent row dict, or None if transformation fails
@@ -93,30 +132,102 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # Import featurizers here to avoid circular dependency
         from ..featurizers import reaction_pair as feat_pair
         
+        payload = rec.get("recommendation_payload") or {}
         rxn_id = rec.get("reaction_id")
-        rt = rec.get("reaction_type")
-        fam_txt = _dataset_family_map(rt)
+        rt = rec.get("reaction_type") or payload.get("family") or rec.get("reaction_family") or rec.get("family")
+        fam_txt = _dataset_family_map(rt, fallback=file_family)
         cond = rec.get("conditions") or {}
         y = cond.get("yield_pct")
+        if y is None:
+            y = cond.get("yield")
+        if y is None:
+            y = cond.get("yield_percent")
         T_C = cond.get("temperature_c")
+        if T_C is None:
+            T_C = cond.get("temp_c")
+        if T_C is None:
+            T_C = cond.get("T_C")
         time_h = cond.get("time_h")
-        core = rec.get("condition_core")
+        if time_h is None:
+            time_h = cond.get("time_hours")
+        core = rec.get("condition_core") or rec.get("core")
+        
+        def _coerce_list(value: Any) -> List[str]:
+            if not value:
+                return []
+            if isinstance(value, list):
+                out = []
+                for item in value:
+                    if isinstance(item, (str, int, float)):
+                        text = str(item).strip()
+                        if text:
+                            out.append(text)
+                    elif isinstance(item, dict):
+                        text = item.get("name") or item.get("cas") or item.get("uid")
+                        if text:
+                            out.append(str(text).strip())
+                return out
+            if isinstance(value, str):
+                text = value.strip()
+                return [text] if text else []
+            return []
+        
+        def _first_value(value: Any) -> Optional[str]:
+            items = _coerce_list(value)
+            return items[0] if items else None
+        
+        def _extract_uid(entry: Any) -> Optional[str]:
+            if isinstance(entry, dict):
+                return entry.get("cas") or entry.get("uid") or entry.get("name")
+            if isinstance(entry, str):
+                return entry.strip() or None
+            return None
         
         # Base/Solvent: take first entries' CAS where present
         base_uid = None
-        for rg in rec.get("reagents", []) or []:
+        reagents = rec.get("reagents")
+        if not isinstance(reagents, list):
+            reagents = []
+        elif reagents and isinstance(reagents[0], str):
+            reagents = [{"name": name, "role": ""} for name in reagents if str(name).strip()]
+        
+        if not reagents:
+            for key, role in {
+                "base": "BASE",
+                "additive": "ADDITIVE",
+                "acid": "ACID",
+                "oxidant": "OXIDANT",
+                "reductant": "REDUCTANT",
+            }.items():
+                for name in _coerce_list(cond.get(key)):
+                    reagents.append({"name": name, "role": role})
+        
+        for rg in reagents or []:
             if (rg.get("role") or "").upper() == "BASE":
-                base_uid = rg.get("cas") or rg.get("uid") or rg.get("name")
+                base_uid = _extract_uid(rg)
                 if base_uid:
                     break
+        if not base_uid:
+            base_uid = _first_value(cond.get("base"))
         solvent_uid = None
-        sols = rec.get("solvents", []) or []
-        if sols:
-            solvent_uid = sols[0].get("cas") or sols[0].get("uid") or sols[0].get("name")
+        solvents = rec.get("solvents")
+        if not isinstance(solvents, list):
+            solvents = []
+        elif solvents and isinstance(solvents[0], str):
+            solvents = [{"name": name} for name in solvents if str(name).strip()]
+        
+        if not solvents:
+            for name in _coerce_list(cond.get("solvent") or cond.get("solvents")):
+                solvents.append({"name": name})
+        
+        if solvents:
+            solvent_uid = _extract_uid(solvents[0])
+        if not solvent_uid:
+            solvent_uid = _first_value(cond.get("solvent") or cond.get("solvents"))
         
         # Reaction SMILES: try precomputed normalized first, fallback to building from raw
         precomputed = rec.get("precomputed") or {}
-        rxn_smiles = precomputed.get("reaction_smiles")
+        rxn_smiles = rec.get("reaction_smiles") or precomputed.get("reaction_smiles")
         
         if not rxn_smiles:
             # Fallback: build from raw reactants>>products
@@ -126,16 +237,19 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             rxn_smiles = f"{rcts}>>{prods}"
         
         # Features: use precomputed if available, otherwise compute
-        features = precomputed.get("features")
+        features = precomputed.get("features") or payload.get("features") or rec.get("features")
         
         if not features:
             # Fallback: compute features on-the-fly (legacy datasets)
             smiles_block = rec.get("smiles") or {}
             rcts = (smiles_block.get("reactants") or "").strip()
-            reactants_list = [p for p in (rcts.split('.') if rcts else []) if p]
-            elec, nuc = _pick_electrophile_nucleophile(reactants_list)
-            feat_result = feat_pair.featurize_pair(elec, nuc)
-            features = feat_result.get("flat", {})
+            if rcts:
+                reactants_list = [p for p in (rcts.split('.') if rcts else []) if p]
+                elec, nuc = _pick_electrophile_nucleophile(reactants_list)
+                feat_result = feat_pair.featurize_pair(elec, nuc)
+                features = feat_result.get("flat", {})
+            else:
+                features = {}
         
         # Build uniform row
         catalyst_obj = rec.get("catalyst") or {}
@@ -156,8 +270,8 @@ def _make_row_from_dataset(rec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "condition_core": core,
             "base_uid": base_uid,
             "solvent_uid": solvent_uid,
-            "reagents": rec.get("reagents") or [],
-            "solvents": rec.get("solvents") or [],
+            "reagents": reagents,
+            "solvents": solvents,
             "reference": rec.get("reference") or {},
             "conditions": cond,
             "catalyst": catalyst_obj,
@@ -245,7 +359,7 @@ def _load_selective(families: Optional[List[str]] = None) -> List[Dict[str, Any]
                             rec = json.loads(line)
                         except Exception:
                             continue
-                        row = _make_row_from_dataset(rec)
+                        row = _make_row_from_dataset(rec, file_family=file_family)
                         if row is not None:
                             # Double-check family filter on row data
                             if family_filter:

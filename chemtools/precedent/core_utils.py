@@ -11,7 +11,15 @@ def _family_text(family: str) -> str:
     fl = f.lower()
 
     # Taxonomy v2 identifiers
-    if fl == "c_n_cross_coupling":
+    if fl in {
+        "c_n_cross_coupling",
+        "c_n_coupling",
+        "c_n_coupling_cu",
+        "c_n_coupling_cu_ullmann",
+        "c_n_coupling_pd",
+        "c_n_coupling_pd_buchwald",
+        "c_n_coupling_ni",
+    }:
         return "C_N_Coupling"
     if fl == "suzuki_miyaura":
         return "Suzuki"
@@ -21,22 +29,18 @@ def _family_text(family: str) -> str:
         return "HeckMizoroki_coupling"
     if fl == "snar_cn":
         return "SNAr-CN"
+    if fl == "snar_co":
+        return "SNAr-CO"
+    if fl == "snar_cs":
+        return "SNAr-CS"
     if fl == "amide_coupling":
         return "Amide_formation"
     
-    # New systematic naming
-    if fl in {"c_n_coupling_cu", "c_n_coupling_cu_ullmann"}:
-        return "C_N_Coupling_Cu"
-    if fl in {"c_n_coupling_pd", "c_n_coupling_pd_buchwald"}:
-        return "C_N_Coupling_Pd"
-    if fl == "c_n_coupling_ni":
-        return "C_N_Coupling_Ni"
-    
     # Legacy naming → new naming
     if fl in {"ullmann_cn", "ullmann c鈥搉", "ullmann c-n", "ullmann"}:
-        return "C_N_Coupling_Cu"
+        return "C_N_Coupling"
     if fl in {"buchwald_cn", "buchwald c鈥搉", "buchwald c-n", "buchwald"}:
-        return "C_N_Coupling_Pd"
+        return "C_N_Coupling"
     
     # Amide formation aliases
     if fl in {"amide_coupling", "amidation", "amide"}:

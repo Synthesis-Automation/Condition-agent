@@ -42,6 +42,8 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "chan_lam_cn": "C_N_Coupling",  # Legacy alias
     "c_n_cross_coupling": "C_N_Coupling",
     "snar_cn": "SNAr-CN",
+    "snar_co": "SNAr-CO",
+    "snar_cs": "SNAr-CS",
     # C-O Coupling variants -> canonical dataset name
     "C_O_Coupling": "C_O_Coupling",
     "Ullmann_CO": "C_O_Coupling",
@@ -54,7 +56,7 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "Ullmann C?S": "C_S_Coupling",
     "cs_coupling": "C_S_Coupling",
     # Sonogashira variants
-    "Sonogashira_CC": "Sonogashira_CC",
+    "Sonogashira_CC": "Sonogashira_coupling",
     "sonogashira": "Sonogashira_CC",
     "sonogashira_coupling": "Sonogashira_coupling",
     # Amide variants -> canonical dataset name
@@ -66,6 +68,7 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "suzuki_miyaura": "Suzuki",
     "sonogashira": "Sonogashira_coupling",
     "heck": "HeckMizoroki_coupling",
+    "Heck": "HeckMizoroki_coupling",
     "amide_coupling": "Amide_formation",
 }
 
