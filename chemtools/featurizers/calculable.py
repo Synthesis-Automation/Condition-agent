@@ -3,11 +3,9 @@ from __future__ import annotations
 import logging
 import re
 from functools import lru_cache
-from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
 
-from ..archive.taxonomy import load_registry
-from ..archive.taxonomy.calculable_spec import load_calculable_feature_spec
+from ..taxonomy.calculable_spec import load_calculable_feature_spec
 from ..util import rdkit_helpers
 from ..util.boolean_expr import evaluate as evaluate_rule
 from ..util.smarts_cache import compile_smarts
@@ -31,65 +29,6 @@ def _normalize_heuristic(text: str) -> str:
     return text.translate(_HEURISTIC_NORMALIZE).strip()
 
 
-def _load_reactant_types_from_registry() -> List[dict]:
-    try:
-        registry = load_registry()
-    except Exception:
-        return []
-
-    entries: List[dict] = []
-    for reactant in registry.reactant_types.values():
-        members = []
-        for member in reactant.members:
-            meta = member.metadata or {}
-            members.append(
-                {
-                    "id": member.id,
-                    "name": member.name,
-                    "feature_token": meta.get("feature_token"),
-                    "metadata": dict(meta),
-                }
-            )
-        entries.append(
-            {
-                "id": reactant.id,
-                "name": reactant.name,
-                "description": reactant.description,
-                "category": reactant.category,
-                "feature_token": (reactant.metadata or {}).get("feature_token"),
-                "metadata": dict(reactant.metadata or {}),
-                "members": members,
-            }
-        )
-    return entries
-
-
-def _load_reactant_types_from_file(path: Path) -> List[dict]:
-    if not path.exists():
-        return []
-    try:
-        import json
-        with path.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
-        return []
-
-    if isinstance(payload, dict):
-        entries = payload.get("entries") or []
-    else:
-        entries = payload
-    return [entry for entry in entries if isinstance(entry, dict)]
-
-
-@lru_cache(maxsize=1)
-def _load_reactant_types() -> List[dict]:
-    entries = _load_reactant_types_from_registry()
-    if entries:
-        return entries
-    data_dir = Path(__file__).resolve().parent.parent / "archive" / "taxonomy" / "data"
-    return _load_reactant_types_from_file(data_dir / "reactant_types.json")
-
-
 def _extract_smarts_any(feature: dict) -> List[str]:
     detect = feature.get("detect") or {}
     smarts_any = detect.get("smarts_any") or []
@@ -102,50 +41,65 @@ def _extract_smarts_any(feature: dict) -> List[str]:
 def _load_feature_spec() -> Dict[str, Any]:
     spec = load_calculable_feature_spec()
     features = list(spec.get("features", []) or [])
-    features_by_token = {
-        item.get("token"): item
-        for item in features
-        if isinstance(item, dict) and item.get("token")
-    }
+    spec = dict(spec)
+    spec["features"] = features
+    return spec
 
-    for entry in _load_reactant_types():
-        category_id = entry.get("id")
-        category_name = entry.get("name", category_id)
-        category_token = entry.get("feature_token")
-        category_smarts = ""
-        if category_token:
-            category_smarts_list = _extract_smarts_any(features_by_token.get(category_token, {}))
-            if category_smarts_list:
-                category_smarts = category_smarts_list[0]
 
-        for member in entry.get("members", []) or []:
-            member_id = member.get("id")
-            if not member_id:
-                continue
-            member_token = member.get("feature_token")
-            detect = {}
-            if member_token:
-                smarts_any = _extract_smarts_any(features_by_token.get(member_token, {}))
-                if smarts_any:
-                    detect["smarts_any"] = smarts_any
-            metadata = {
-                "reactant_category": category_id,
-                "category_name": category_name,
-                "member_name": member.get("name", member_id),
-                "group": (entry.get("metadata") or {}).get("group", ""),
-                "description": entry.get("description", ""),
-                "category_smarts": category_smarts,
+@lru_cache(maxsize=1)
+def _reactant_feature_index() -> Dict[str, Any]:
+    spec = _load_feature_spec()
+    features = spec.get("features", []) or []
+    derived_shortcuts = spec.get("derived_shortcuts", []) or []
+
+    members: List[Dict[str, Any]] = []
+    categories: Dict[str, Dict[str, Any]] = {}
+
+    for feature in features:
+        if not isinstance(feature, dict):
+            continue
+        token = feature.get("token")
+        if not token:
+            continue
+        meta = feature.get("metadata") or {}
+        member_id = meta.get("reactant_member")
+        category_id = meta.get("reactant_category")
+        if not member_id or not category_id:
+            continue
+        members.append(
+            {
+                "token": token,
+                "member_id": member_id,
+                "member_name": meta.get("reactant_name") or meta.get("member_name") or member_id,
+                "category_id": category_id,
+                "category_name": meta.get("category_name") or category_id,
+                "group": meta.get("group", ""),
+                "description": meta.get("category_description") or meta.get("description") or "",
+                "smarts": (_extract_smarts_any(feature) or [""])[0],
             }
-            features.append(
-                {
-                    "token": f"{member_id}_reactant",
-                    "type": "bool",
-                    "detect": detect,
-                    "metadata": metadata,
-                }
-            )
+        )
+        if category_id not in categories:
+            categories[category_id] = {
+                "category_id": category_id,
+                "category_name": meta.get("category_name") or category_id,
+                "token": None,
+            }
 
-    return {**spec, "features": features}
+    for shortcut in derived_shortcuts:
+        if not isinstance(shortcut, dict):
+            continue
+        token = shortcut.get("token")
+        meta = shortcut.get("metadata") or {}
+        category_id = meta.get("reactant_category")
+        if not token or not category_id:
+            continue
+        entry = categories.setdefault(
+            category_id,
+            {"category_id": category_id, "category_name": meta.get("category_name") or category_id},
+        )
+        entry["token"] = token
+
+    return {"members": members, "categories": categories}
 
 
 def _get_property_values(mol: Any) -> Dict[str, float]:
@@ -347,26 +301,28 @@ def get_reactant_type_features(smiles: str) -> Dict[str, Any]:
     out = dict(features)
     member_types: List[str] = []
     categories: List[str] = []
+    categories_seen = set()
 
-    for entry in _load_reactant_types():
-        category_id = entry.get("id")
-        if not category_id:
+    index = _reactant_feature_index()
+    for member in index.get("members", []):
+        token = member.get("token")
+        member_id = member.get("member_id")
+        category_id = member.get("category_id")
+        if not token or not member_id:
             continue
-        category_token = entry.get("feature_token")
-        category_present = bool(features.get(category_token, False)) if category_token else False
-        member_present = False
-        for member in entry.get("members", []) or []:
-            member_id = member.get("id")
-            member_token = member.get("feature_token")
-            if not member_id or not member_token:
-                continue
-            if features.get(member_token, False):
-                member_present = True
-                if member_id not in member_types:
-                    member_types.append(member_id)
-                out[f"{member_id}_reactant"] = True
-        if category_present or member_present:
+        if features.get(token, False):
+            member_types.append(member_id)
+            if category_id and category_id not in categories_seen:
+                categories.append(category_id)
+                categories_seen.add(category_id)
+
+    for category_id, entry in index.get("categories", {}).items():
+        token = entry.get("token")
+        if not token:
+            continue
+        if features.get(token, False) and category_id not in categories_seen:
             categories.append(category_id)
+            categories_seen.add(category_id)
 
     out["member_types"] = member_types
     out["categories"] = categories
@@ -384,61 +340,61 @@ def classify_reactant_smiles(smiles: str) -> Optional[Dict[str, Any]]:
     if not reactant_features:
         return None
 
-    features_by_token = _member_feature_lookup()
+    index = _reactant_feature_index()
+    categories = index.get("categories", {})
     best: Optional[Dict[str, Any]] = None
     best_key: Optional[tuple] = None
 
-    for entry in _load_reactant_types():
-        category_id = entry.get("id")
-        if not category_id:
+    for member in index.get("members", []):
+        token = member.get("token")
+        member_id = member.get("member_id")
+        category_id = member.get("category_id")
+        if not token or not member_id or not category_id:
             continue
-        category_name = entry.get("name", category_id)
-        category_token = entry.get("feature_token")
+        if not reactant_features.get(token, False):
+            continue
+        category_entry = categories.get(category_id, {})
+        category_token = category_entry.get("token")
         category_present = bool(reactant_features.get(category_token, False)) if category_token else False
-        for member in entry.get("members", []) or []:
-            member_id = member.get("id")
-            member_token = member.get("feature_token")
-            if not member_id or not member_token:
-                continue
-            if not reactant_features.get(member_token, False):
-                continue
-            member_feature = features_by_token.get(member_token, {})
-            smarts_list = _extract_smarts_any(member_feature)
-            smarts = smarts_list[0] if smarts_list else ""
-            specificity = len(smarts) if smarts else 0
-            is_general = category_id in _GENERAL_REACTANT_CATEGORIES
-            match = {
-                "category": category_id,
-                "member_type": member_id,
-                "name": member.get("name", member_id),
-                "group": (entry.get("metadata") or {}).get("group", ""),
-                "smarts": smarts,
-                "category_smarts": "",
-                "description": entry.get("description", ""),
-                "specificity": specificity,
-                "is_general": is_general,
-                "category_name": category_name,
-                "category_present": category_present,
-            }
-            sort_key = (is_general, -specificity, member_id)
-            if best is None or sort_key < best_key:
-                best = match
-                best_key = sort_key
+        smarts = member.get("smarts", "")
+        specificity = len(smarts) if smarts else 0
+        is_general = category_id in _GENERAL_REACTANT_CATEGORIES
+        match = {
+            "category": category_id,
+            "member_type": member_id,
+            "name": member.get("member_name", member_id),
+            "group": member.get("group", ""),
+            "smarts": smarts,
+            "category_smarts": "",
+            "description": member.get("description", ""),
+            "specificity": specificity,
+            "is_general": is_general,
+            "category_name": category_entry.get("category_name") or member.get("category_name", category_id),
+            "category_present": category_present,
+        }
+        sort_key = (is_general, -specificity, member_id)
+        if best is None or sort_key < best_key:
+            best = match
+            best_key = sort_key
 
-        if best is None and category_present:
+    if best is None:
+        for category_id, entry in categories.items():
+            token = entry.get("token")
+            if not token or not reactant_features.get(token, False):
+                continue
             is_general = category_id in _GENERAL_REACTANT_CATEGORIES
             match = {
                 "category": category_id,
                 "member_type": category_id,
-                "name": category_name,
-                "group": (entry.get("metadata") or {}).get("group", ""),
+                "name": entry.get("category_name", category_id),
+                "group": "",
                 "smarts": "",
                 "category_smarts": "",
-                "description": entry.get("description", ""),
+                "description": "",
                 "specificity": 0,
                 "is_general": is_general,
-                "category_name": category_name,
-                "category_present": category_present,
+                "category_name": entry.get("category_name", category_id),
+                "category_present": True,
             }
             sort_key = (is_general, 0, category_id)
             if best is None or sort_key < best_key:

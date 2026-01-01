@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 
 from .. import constraints
-from ..archive.taxonomy import load_registry
 from ..taxonomy import reaction_catalog as _reaction_catalog
 
 
@@ -155,26 +154,7 @@ def canonical_family(family: str | None) -> str:
     return candidate
 
 
-@lru_cache(maxsize=1)
-def _cached_registry():
-    try:
-        return load_registry()
-    except Exception:
-        return None
-
-
 def _taxonomy_family_label(family: str) -> Optional[str]:
-    registry = _cached_registry()
-    if registry is None:
-        return _v2_family_label(family)
-    record = registry.get_reaction_type(family)
-    if record is not None:
-        return record.name
-    alias = registry.resolve_alias(family)
-    if alias and alias.entity_type == "reaction_type":
-        target = registry.get_reaction_type(alias.entity_id)
-        if target is not None:
-            return target.name
     return _v2_family_label(family)
 
 

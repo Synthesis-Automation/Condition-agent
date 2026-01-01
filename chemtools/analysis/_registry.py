@@ -8,10 +8,9 @@ This module mirrors the lightweight caching that previously lived in
 registry instance without introducing circular imports.
 """
 
-from typing import Optional
+from typing import Optional, Any
 
-from ..archive.taxonomy import load_registry
-from ..archive.taxonomy.registry import TaxonomyRegistry
+TaxonomyRegistry = Any
 
 _REGISTRY_CACHE: Optional[TaxonomyRegistry] = None
 _REGISTRY_LOAD_FAILED = False
@@ -25,7 +24,8 @@ def get_registry() -> Optional[TaxonomyRegistry]:
     if _REGISTRY_LOAD_FAILED:
         return None
     try:
-        _REGISTRY_CACHE = load_registry()
+        from ..taxonomy import registry as _registry
+        _REGISTRY_CACHE = _registry.load_registry()
         return _REGISTRY_CACHE
     except Exception:
         _REGISTRY_LOAD_FAILED = True

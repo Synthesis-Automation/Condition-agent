@@ -2,8 +2,8 @@
 Functional Group Detection sourced from the calculable feature specification.
 
 SMARTS definitions and metadata live in the layered calculable feature spec
-under `chemtools/archive/taxonomy/data/` and are loaded via
-`chemtools.archive.taxonomy.calculable_spec.load_calculable_feature_spec`.
+under `chemtools/taxonomy/data/` and are loaded via
+`chemtools.taxonomy.calculable_spec.load_calculable_feature_spec`.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from functools import lru_cache
 from types import MappingProxyType
 from typing import Dict, Iterable, List, Optional, Tuple, Mapping
 
-from ..archive.taxonomy.calculable_spec import load_calculable_feature_spec
+from ..taxonomy.calculable_spec import load_calculable_feature_spec
 from .rdkit_helpers import rdkit_available, parse_smiles
 from .smarts_cache import compile_smarts
 
