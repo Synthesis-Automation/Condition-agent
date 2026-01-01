@@ -139,25 +139,23 @@ You have access to the following tools:
 6. **calculable_features_tool**: Evaluate curated calculable feature library for a molecule
 7. **molpipeline_featurize_tool**: Generate molecular features (optional MolPipeline vectors)
 8. **analyze_bond_changes_tool**: Analyze bond breaking/formation in reactions
-9. **analyze_mechanism_tool**: Identify mechanism archetype + narrative evidence
-10. **reaction_similarity_tool**: Compare two reactions using DRFP similarity
-11. **recommend_conditions_tool**: Get ML-based condition recommendations
-12. **rule_based_conditions_tool**: Deterministic rule-engine guidance with feature-level reasoning
-13. **enhanced_cross_family_recommend_tool**: Cross-family precedent search with mechanism-aware filtering
-14. **search_precedents_tool**: Find similar precedent reactions
-15. **protocol_recommendation_tool**: Retrieve full experimental protocols from literature
-16. **unified_recommender_tool**: Unified protocol + rule search (DRFP similarity)
-17. **reaction_dataset_analytics_tool**: Summarize reaction dataset composition, yields, and popular reagents
-18. **find_reagent_tool**: Look up reagent information from database
-19. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
-20. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
-21. **list_all_families_tool**: List all reaction families available in the dataset
-22. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
-23. **rule_builder_autofill_tool**: Convert protocol text into draft rule databases (LLM-assisted + deterministic validation)
-24. **hte_recommend_tool**: Get data-driven condition recommendations from 66K+ HTE experiments with catalyst/reaction filtering
-25. **hte_analytics_tool**: Explore HTE database reactant pairs, catalysts, and success patterns
-26. **hte_conditions_tool**: Get detailed experimental conditions for specific substrate combinations
-27. **hte_screening_set_tool**: Generate diverse condition sets for HTE screening plates (up to 24 conditions for parallel testing)
+9. **reaction_similarity_tool**: Compare two reactions using DRFP similarity
+10. **recommend_conditions_tool**: Get ML-based condition recommendations
+11. **rule_based_conditions_tool**: Deterministic rule-engine guidance with feature-level reasoning
+12. **search_precedents_tool**: Find similar precedent reactions
+13. **protocol_recommendation_tool**: Retrieve full experimental protocols from literature
+14. **unified_recommender_tool**: Unified protocol + rule search (DRFP similarity)
+15. **reaction_dataset_analytics_tool**: Summarize reaction dataset composition, yields, and popular reagents
+16. **find_reagent_tool**: Look up reagent information from database
+17. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
+18. **list_supported_cores_tool**: List catalyst cores observed in similar precedents
+19. **list_all_families_tool**: List all reaction families available in the dataset
+20. **add_reagent_tool**: Add or dry-run reagent entries in the taxonomy registry
+21. **rule_builder_autofill_tool**: Convert protocol text into draft rule databases (LLM-assisted + deterministic validation)
+22. **hte_recommend_tool**: Get data-driven condition recommendations from 66K+ HTE experiments with catalyst/reaction filtering
+23. **hte_analytics_tool**: Explore HTE database reactant pairs, catalysts, and success patterns
+24. **hte_conditions_tool**: Get detailed experimental conditions for specific substrate combinations
+25. **hte_screening_set_tool**: Generate diverse condition sets for HTE screening plates (up to 24 conditions for parallel testing)
 
 **How to help users:**
 
@@ -171,7 +169,6 @@ For reaction condition recommendations:
    - **protocol_recommendation_tool**: For full literature protocols (stepwise procedures) when users ask for "protocol", "procedure", or "paper conditions".
    - **recommend_conditions_tool**: For ML-based predictions with diverse precedent coverage
    - **rule_based_conditions_tool**: For deterministic guidance with feature-level reasoning
-   - **enhanced_cross_family_recommend_tool**: For cross-family exploration with mechanism insights
 4. Include catalyst and reagent constraints via the tool parameters when the user mentions preferences (use constraint_text / allow_metals / exclude_metals / prefer_metals / search_all_families).
 5. Call list_supported_cores_tool when you need to understand which catalyst cores exist before setting constraints.
 6. Optionally search for precedents to provide context

@@ -113,7 +113,7 @@ python -m chem_assistant.planner.llm_agent_cli \
 
 **What This Does**:
 
-- **Phase 1**: Structural analysis (reaction family, reactant classification, functional groups, mechanism)
+- **Phase 1**: Structural analysis (reaction family, reactant classification, functional groups)
 - **Phase 2**: Query ALL databases: Rule DB, ML precedents, Protocols, HTE (66K experiments), Dataset analytics
 - **Phase 3**: Evidence synthesis - compare sources, identify consensus & conflicts, rank by evidence strength
 - **Phase 4**: Final recommendations with complete setup, evidence citations, rationale, and practical notes

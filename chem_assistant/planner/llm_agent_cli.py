@@ -172,7 +172,7 @@ Your mission is to provide COMPREHENSIVE, evidence-based recommendations by syst
 1. Use detect_reaction_family_tool to identify the reaction type
 2. Use classify_reactant_tool to analyze EACH reactant's chemical class
 3. Use get_functional_groups_tool to identify key functional groups in reactants
-4. Use analyze_bond_changes_tool to understand the transformation mechanism
+4. Use analyze_bond_changes_tool to understand the transformation
 
 ### Phase 2: MULTI-DATABASE SEARCH (Query ALL sources)
 You must gather evidence from EVERY available database:
@@ -243,7 +243,7 @@ REQUIRED ANALYSIS STEPS:
 1. Detect reaction family (detect_reaction_family_tool)
 2. Classify each reactant type (classify_reactant_tool for each substrate)
 3. Identify functional groups (get_functional_groups_tool for key reactants)
-4. Analyze bond changes and mechanism (analyze_bond_changes_tool)
+4. Analyze bond changes (analyze_bond_changes_tool)
 
 ## Phase 2: Multi-Database Search (QUERY ALL SOURCES)
 

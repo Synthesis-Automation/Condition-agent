@@ -53,9 +53,27 @@ from .util.reaction_center_detector import (
     identify_changed_atoms_from_mapped_smiles,
     compare_unmapped_reaction_to_find_changes,
 )
-from .mechanism import classify_mechanism_simple
-from .mechanism.electron_flow import predict_electron_flow
-from .mechanism.intermediates import predict_intermediates
+try:
+    from .mechanism import classify_mechanism_simple
+    from .mechanism.electron_flow import predict_electron_flow
+    from .mechanism.intermediates import predict_intermediates
+    _MECHANISM_AVAILABLE = True
+except Exception:  # pragma: no cover - optional dependency
+    _MECHANISM_AVAILABLE = False
+
+    def _missing_mechanism(name: str):
+        raise ImportError(
+            f"{name} unavailable because chemtools.mechanism is not installed."
+        )
+
+    def classify_mechanism_simple(*args, **kwargs):
+        return _missing_mechanism("classify_mechanism_simple")
+
+    def predict_electron_flow(*args, **kwargs):
+        return _missing_mechanism("predict_electron_flow")
+
+    def predict_intermediates(*args, **kwargs):
+        return _missing_mechanism("predict_intermediates")
 from .visualization import render_molecule_image, render_reaction_image
 
 # Primary exports - ChemTools is the recommended interface
