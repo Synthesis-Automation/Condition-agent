@@ -175,14 +175,16 @@ EXAMPLE_QUERIES = [
 class ChemToolsCLI:
     """Interactive command-line interface for ChemTools agent."""
     
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False, proactive: bool = False):
         """
         Initialize CLI.
         
         Args:
             verbose: Show detailed tool execution
+            proactive: Enable deterministic preflight for reaction queries
         """
         self.verbose = verbose
+        self.proactive = proactive
         self.history: List[BaseMessage] = []
         self.agent = None
         self.constraint_spec = ConstraintSpec()
@@ -194,6 +196,7 @@ class ChemToolsCLI:
             try:
                 self.agent = ChemToolsAgent(
                     verbose=self.verbose,
+                    proactive=self.proactive,
                     session_constraints=self.constraint_spec
                 )
                 print(f"{Colors.OKGREEN}Agent ready!{Colors.ENDC}\n")
@@ -211,6 +214,8 @@ class ChemToolsCLI:
         print(f"{Colors.BOLD}{'=' * 70}{Colors.ENDC}")
         print()
         print("Ask chemistry questions and get AI-powered answers backed by ChemTools.")
+        if self.proactive:
+            print("Proactive mode: ON (deterministic preflight enabled)")
         print()
         print(f"{Colors.OKBLUE}Commands:{Colors.ENDC}")
         print("  help           - Show example queries")
@@ -703,11 +708,16 @@ Environment Variables:
         action='store_true',
         help='Enable verbose output (show tool execution details)'
     )
+    parser.add_argument(
+        '--proactive',
+        action='store_true',
+        help='Enable deterministic preflight for reaction queries'
+    )
     
     args = parser.parse_args()
     
     # Create and run CLI
-    cli = ChemToolsCLI(verbose=args.verbose)
+    cli = ChemToolsCLI(verbose=args.verbose, proactive=args.proactive)
     cli.run()
 
 

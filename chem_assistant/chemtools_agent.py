@@ -20,7 +20,9 @@ Usage:
     print(result)
 """
 
+import json
 import os
+import re
 from typing import Any, Callable, Dict, List, Optional, Set, Union
 
 from langchain_openai import ChatOpenAI
@@ -29,6 +31,7 @@ from langchain_core.tools import BaseTool, StructuredTool
 from dotenv import load_dotenv
 
 from .chemtools_wrapper import CHEMTOOLS_TOOLS
+from .planner import ReactionInput, auto_conditions
 from .constraint_parser import (
     ConstraintSpec,
     build_constraint_spec,
@@ -60,6 +63,10 @@ load_dotenv()
 
 DEFAULT_ALIYUN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+
+_REACTION_SMILES_RE = re.compile(
+    r"([A-Za-z0-9@+\-\[\]\(\)=#%/.]+>>[A-Za-z0-9@+\-\[\]\(\)=#%/.]*)"
+)
 
 
 def get_llm_client(
@@ -271,6 +278,10 @@ class ChemToolsAgent:
         temperature: float = 0,
         system_prompt: Optional[str] = None,
         verbose: bool = False,
+        proactive: bool = False,
+        proactive_top_k: int = 5,
+        proactive_max_protocols: int = 3,
+        proactive_build_protocols: bool = True,
         session_constraints: Optional[Union[ConstraintSpec, dict, str]] = None,
     ):
         """
@@ -282,10 +293,18 @@ class ChemToolsAgent:
             temperature: Sampling temperature (0.0-1.0)
             system_prompt: Custom system prompt (default: CHEMISTRY_SYSTEM_PROMPT)
             verbose: Print debug information
+            proactive: If True, precompute deterministic auto-conditions for reactions
+            proactive_top_k: Number of DRFP protocols to retrieve in preflight
+            proactive_max_protocols: Number of protocols to format in preflight
+            proactive_build_protocols: Whether to build protocol additions in preflight
         """
         self.llm = get_llm_client(provider, model, temperature)
         self.system_prompt = system_prompt or CHEMISTRY_SYSTEM_PROMPT
         self.verbose = verbose
+        self.proactive = proactive
+        self.proactive_top_k = proactive_top_k
+        self.proactive_max_protocols = proactive_max_protocols
+        self.proactive_build_protocols = proactive_build_protocols
         self.session_constraints = self._coerce_constraints(session_constraints)
         self.agent_factory_name = _LANGGRAPH_AGENT_FACTORY_NAME
         self._active_constraints = ConstraintSpec()
@@ -327,10 +346,17 @@ class ChemToolsAgent:
             # Merge session and call-specific constraints.
             call_spec = self._coerce_constraints(constraints)
             active_spec = merge_specs(self.session_constraints, call_spec)
+
+            system_messages: List[BaseMessage] = []
             constraint_prompt = format_constraints_for_prompt(active_spec)
             if constraint_prompt:
-                messages.insert(0, SystemMessage(content=constraint_prompt))
+                system_messages.append(SystemMessage(content=constraint_prompt))
 
+            preflight = self._maybe_run_proactive_preflight(query, active_spec)
+            if preflight:
+                system_messages.append(SystemMessage(content=preflight))
+
+            messages = system_messages + messages
             messages.append(HumanMessage(content=query))
         
             # Invoke agent with query and history
@@ -437,6 +463,81 @@ class ChemToolsAgent:
         self.session_constraints = ConstraintSpec()
 
     # ======================================================================
+    # Proactive preflight helpers
+    # ======================================================================
+
+    @staticmethod
+    def _extract_reaction_smiles(text: str) -> Optional[str]:
+        """Extract a reaction SMILES from free-form text."""
+        match = _REACTION_SMILES_RE.search(text)
+        if not match:
+            return None
+        return match.group(1)
+
+    @staticmethod
+    def _model_to_dict(obj: Any) -> Dict[str, Any]:
+        """Convert a pydantic model to a plain dict (v1/v2 compatible)."""
+        if hasattr(obj, "model_dump"):
+            return obj.model_dump()  # type: ignore[no-any-return]
+        if hasattr(obj, "dict"):
+            return obj.dict()  # type: ignore[no-any-return]
+        return dict(obj) if isinstance(obj, dict) else {"value": obj}
+
+    def _maybe_run_proactive_preflight(
+        self,
+        query: str,
+        constraints: ConstraintSpec,
+    ) -> Optional[str]:
+        """Run deterministic auto-conditions and return a summary string."""
+        if not self.proactive:
+            return None
+
+        reaction_smiles = self._extract_reaction_smiles(query)
+        if not reaction_smiles:
+            return None
+
+        try:
+            result = auto_conditions(
+                ReactionInput(reaction_smiles=reaction_smiles),
+                constraints=constraints,
+                top_k_protocols=self.proactive_top_k,
+                build_protocols=self.proactive_build_protocols,
+                max_protocols=self.proactive_max_protocols,
+            )
+        except Exception as exc:
+            if self.verbose:
+                print(f"Proactive preflight failed: {exc}")
+            return None
+
+        summary: Dict[str, Any] = {
+            "reaction_smiles": reaction_smiles,
+            "family": self._model_to_dict(result.family),
+            "plan": self._model_to_dict(result.plan),
+            "counts": {
+                "rule_candidates": len(result.rule_candidates),
+                "protocol_candidates": len(result.protocol_candidates),
+            },
+            "hte_summary": self._model_to_dict(result.hte_summary) if result.hte_summary else None,
+            "top_protocols": [],
+        }
+        for proto in result.protocols:
+            summary["top_protocols"].append(
+                {
+                    "candidate_id": proto.candidate_id,
+                    "source": proto.source,
+                    "additions": proto.additions[:6],
+                    "notes": proto.notes,
+                }
+            )
+
+        payload = json.dumps(summary, indent=2, sort_keys=True)
+        return (
+            "Deterministic preflight summary (auto_conditions):\n"
+            f"{payload}\n"
+            "Use this to guide tool selection and explanations."
+        )
+
+    # ======================================================================
     # Tool wrapping (constraint defaults)
     # ======================================================================
 
@@ -540,6 +641,10 @@ class ChemToolsAgent:
 def create_agent(
     provider: Optional[str] = None,
     model: Optional[str] = None,
+    proactive: bool = False,
+    proactive_top_k: int = 5,
+    proactive_max_protocols: int = 3,
+    proactive_build_protocols: bool = True,
     session_constraints: Optional[Union[ConstraintSpec, dict, str]] = None,
     **kwargs
 ) -> ChemToolsAgent:
@@ -558,6 +663,10 @@ def create_agent(
     return ChemToolsAgent(
         provider=provider,
         model=model,
+        proactive=proactive,
+        proactive_top_k=proactive_top_k,
+        proactive_max_protocols=proactive_max_protocols,
+        proactive_build_protocols=proactive_build_protocols,
         session_constraints=session_constraints,
         **kwargs
     )
@@ -566,6 +675,10 @@ def create_agent(
 def quick_query(
     query: str,
     constraints: Optional[Union[ConstraintSpec, dict, str]] = None,
+    proactive: bool = False,
+    proactive_top_k: int = 5,
+    proactive_max_protocols: int = 3,
+    proactive_build_protocols: bool = True,
     **kwargs
 ) -> str:
     """
@@ -583,7 +696,13 @@ def quick_query(
         >>> from lang_chain.chemtools_agent import quick_query
         >>> result = quick_query("Recommend conditions for Suzuki coupling")
     """
-    agent = ChemToolsAgent(**kwargs)
+    agent = ChemToolsAgent(
+        proactive=proactive,
+        proactive_top_k=proactive_top_k,
+        proactive_max_protocols=proactive_max_protocols,
+        proactive_build_protocols=proactive_build_protocols,
+        **kwargs,
+    )
     return agent.run(query, constraints=constraints)
 
 
