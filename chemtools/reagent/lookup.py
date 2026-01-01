@@ -7,6 +7,7 @@ from the JSON databases in data/reagent_db/.
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from functools import lru_cache
@@ -57,10 +58,23 @@ def normalize_name(name: str) -> str:
         return ""
     # Lowercase, remove extra whitespace, remove common parentheticals
     normalized = name.lower().strip()
+    normalized = normalized.replace("\u00b7", ".")
+    normalized = re.sub(r"\([^)]*\)", "", normalized)
+    normalized = re.sub(r"\[[^]]*\]", "", normalized)
+    normalized = re.sub(r"\b(anhydrous|dry|aqueous|aq|solution|soln)\b", "", normalized)
+    normalized = re.sub(r"\b\d+(?:\.\d+)?\s*m\b", "", normalized)
+    normalized = re.sub(r"(\.|\u00b7)\s*h2o$", "", normalized)
     normalized = ' '.join(normalized.split())  # Collapse whitespace
     # Remove common formatting differences
     normalized = normalized.replace(',', '').replace('-', '').replace('_', '')
     return normalized
+
+
+def _split_reagent_name(name: str) -> List[str]:
+    if not name:
+        return []
+    parts = re.split(r"[;/]", name)
+    return [part.strip() for part in parts if part and part.strip()]
 
 
 def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
@@ -108,6 +122,14 @@ def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
         reagent_name = normalize_name(reagent.get('name', ''))
         if search_name in reagent_name or reagent_name in search_name:
             return reagent
+
+    # Try splitting composite names (e.g., "DMF/H2O")
+    if any(sep in name for sep in ["/", ";"]):
+        for part in _split_reagent_name(name):
+            if part and part != name:
+                hit = find_reagent(part, reagent_type)
+                if hit:
+                    return hit
     
     return None
 

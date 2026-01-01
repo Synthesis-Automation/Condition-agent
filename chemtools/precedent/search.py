@@ -240,7 +240,11 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     # Optional DRFP re-ranking (best-effort)
     use_drfp = bool(relax.get("use_drfp", False))
     rsmi_query = str(relax.get("reaction_smiles") or "")
-    drfp_w = float(relax.get("drfp_weight", 0.4))
+    drfp_w = float(relax.get("drfp_weight", 0.7))
+    if drfp_w < 0.0:
+        drfp_w = 0.0
+    elif drfp_w > 1.0:
+        drfp_w = 1.0
     drfp_bits = int(relax.get("drfp_n_bits", 4096))
     drfp_radius = int(relax.get("drfp_radius", 3))
     q_fp = None
@@ -365,7 +369,11 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                     sim_fp = float(sim_fp)
                 except Exception:
                     sim_fp = 0.0
-                sim_total = max(0.0, min(1.0, sim_fp))
+                sim_fp = max(0.0, min(1.0, sim_fp))
+                if sim_cat > 0:
+                    sim_total = (drfp_w * sim_fp) + ((1.0 - drfp_w) * sim_cat)
+                else:
+                    sim_total = sim_fp
         if sim_total <= 0:
             if sim_cat > 0:
                 sim_total = sim_cat

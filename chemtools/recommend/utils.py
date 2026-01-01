@@ -7,6 +7,7 @@ Helper functions for family normalization, reactant analysis, and constraint han
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 
 from .. import constraints
@@ -57,7 +58,7 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "cs_coupling": "C_S_Coupling",
     # Sonogashira variants
     "Sonogashira_CC": "Sonogashira_coupling",
-    "sonogashira": "Sonogashira_CC",
+    "sonogashira": "Sonogashira_coupling",
     "sonogashira_coupling": "Sonogashira_coupling",
     # Amide variants -> canonical dataset name
     "Amide_Coupling": "Amide_formation",
@@ -71,6 +72,8 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "Heck": "HeckMizoroki_coupling",
     "amide_coupling": "Amide_formation",
 }
+
+_ALIAS_CASEFOLD = {k.lower(): v for k, v in _FAMILY_ALIASES.items()}
 
 _FAMILY_LABELS: Dict[str, str] = {
     "c_n_cross_coupling": "C–N Cross-Coupling",
@@ -97,6 +100,14 @@ _FAMILY_LABELS: Dict[str, str] = {
 }
 
 
+@lru_cache(maxsize=1)
+def _dataset_family_index() -> Dict[str, str]:
+    base = Path(__file__).resolve().parent.parent.parent / "data" / "reaction_dataset"
+    if not base.exists():
+        return {}
+    return {path.stem.lower(): path.stem for path in base.glob("*.jsonl")}
+
+
 def canonical_family(family: str | None) -> str:
     """
     Normalize family name to canonical form.
@@ -110,7 +121,38 @@ def canonical_family(family: str | None) -> str:
     if not family:
         return "Unknown"
     fam = str(family).strip()
-    return _FAMILY_ALIASES.get(fam, fam)
+    if not fam:
+        return "Unknown"
+
+    resolved = _reaction_catalog.resolve_reaction_type(fam)
+    if resolved is None:
+        resolved = _reaction_catalog.resolve_reaction_type(fam.lower())
+    if resolved:
+        fam = resolved
+
+    mapped = _FAMILY_ALIASES.get(fam) or _ALIAS_CASEFOLD.get(fam.lower())
+    candidate = mapped or fam
+
+    dataset_index = _dataset_family_index()
+    if dataset_index:
+        direct = dataset_index.get(candidate.lower())
+        if direct:
+            return direct
+        direct = dataset_index.get(fam.lower())
+        if direct:
+            return direct
+        variants = {
+            candidate.replace(" ", "_"),
+            candidate.replace(" ", "-"),
+            candidate.replace("_", "-"),
+            candidate.replace("-", "_"),
+        }
+        for variant in variants:
+            direct = dataset_index.get(variant.lower())
+            if direct:
+                return direct
+
+    return candidate
 
 
 @lru_cache(maxsize=1)

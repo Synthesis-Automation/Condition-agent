@@ -23,7 +23,7 @@ def _similarity(a: Dict[str, Any], b: Dict[str, Any]) -> float:
     if (a.get("bin") or "") == (b.get("bin") or "") and a.get("bin"):
         return 1.0
 
-    # Weighted categorical matching
+    # Weighted categorical matching (legacy features)
     weights = {
         "LG": 0.35,
         "nuc_class": 0.35,
@@ -32,10 +32,13 @@ def _similarity(a: Dict[str, Any], b: Dict[str, Any]) -> float:
         "heteroaryl": 0.10,
     }
     score = 0.0
-    total = sum(weights.values())
+    total = 0.0
     for k, w in weights.items():
         av = a.get(k)
         bv = b.get(k)
+        if av is None or bv is None:
+            continue
+        total += w
         # Normalize bools to exact equality
         if isinstance(av, bool) or isinstance(bv, bool):
             if bool(av) == bool(bv):
@@ -44,11 +47,27 @@ def _similarity(a: Dict[str, Any], b: Dict[str, Any]) -> float:
             if av is not None and bv is not None and str(av).lower() == str(bv).lower():
                 score += w
 
+    # Taxonomy-aware categorical matching
+    taxonomy_keys = {
+        "reaction_type": 0.20,
+        "reaction_category": 0.10,
+    }
+    for key, weight in taxonomy_keys.items():
+        av = a.get(key)
+        bv = b.get(key)
+        if av is None or bv is None:
+            continue
+        total += weight
+        if str(av).lower() == str(bv).lower():
+            score += weight
+
     # Optional small numeric distances if present in feature dicts
-    # Use an exponential decay mapped to <= 0.15 extra credit total
+    # Use an exponential decay mapped to <= 0.25 extra credit total
     numeric_keys: List[Tuple[str, float, float]] = [
         ("T_C", 50.0, 0.10),  # (scale, weight)
         ("time_h", 8.0, 0.05),
+        ("max_aryl_steric", 6.0, 0.05),
+        ("avg_aryl_electronic", 5.0, 0.05),
     ]
     for key, scale, w in numeric_keys:
         if key in a and key in b:
@@ -62,6 +81,17 @@ def _similarity(a: Dict[str, Any], b: Dict[str, Any]) -> float:
             except Exception:
                 # ignore numeric similarity if non-numeric
                 pass
+
+    # Boolean feature overlap (new taxonomy payloads)
+    bool_keys = [
+        key for key in a.keys() & b.keys()
+        if isinstance(a.get(key), bool) and isinstance(b.get(key), bool)
+    ]
+    if bool_keys:
+        matches = sum(1 for key in bool_keys if bool(a.get(key)) == bool(b.get(key)))
+        weight = 0.25
+        score += weight * (matches / max(1, len(bool_keys)))
+        total += weight
 
     if total <= 0:
         return 0.0

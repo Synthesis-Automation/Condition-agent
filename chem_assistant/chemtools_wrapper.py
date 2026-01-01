@@ -78,6 +78,7 @@ from chemtools.mechanism.renderer import build_mechanism_narrative
 from chemtools.mechanism.flower_utils import compute_electron_balance
 from chemtools.output_formatter import ensure_standard_output
 from chemtools.recommend.modules import recommend_from_reaction
+from chemtools.recommend.utils import canonical_family
 from chemtools.precedent import knn as precedent_knn
 from chemtools.dataset_analytics import (
     get_dataset_stats,
@@ -106,6 +107,7 @@ from chemtools.util.functional_groups import (
 )
 from chemtools.util.reaction_center_detector import identify_changed_atoms_from_mapped_smiles
 from chemtools.featurizers import reaction_pair as molecular_featurizer
+from chemtools.taxonomy import reaction_catalog as _reaction_catalog
 from chemtools.taxonomy.rule_db import resolve_rule_db_v2
 
 # Rule-based recommendation engine
@@ -1334,8 +1336,10 @@ def detect_reaction_family_tool(reaction_smiles: str) -> Dict[str, Any]:
     """
     try:
         result = detect_reaction(reaction_smiles, use_ml=False)
+        detected = result.get("family")
         payload = {
-            "family": result.get("family"),
+            "family": detected,
+            "dataset_family": canonical_family(detected),
             "confidence": result.get("confidence"),
             "method": result.get("method"),
         }
@@ -2583,20 +2587,40 @@ def search_precedents_tool(
         }
     """
     try:
+        detected_family_id = None
+        dataset_family = None
+
         # Auto-detect family if not provided
         if family is None:
             detection = detect_reaction(reaction_smiles, use_ml=False)
-            family = detection.get("family", "Unknown")
+            detected_family_id = detection.get("family", "Unknown")
+            dataset_family = canonical_family(detected_family_id)
+        else:
+            detected_family_id = family
+            dataset_family = canonical_family(family)
+        family = dataset_family or detected_family_id or "Unknown"
         
         # Use relax parameter for DRFP-based search
         # Disable reagent database filtering for families with specialized coupling reagents
         # (e.g., amide formation uses HATU, COMU, EDC which may not be in general database)
         disable_filter_families = ["amide_formation", "amide_coupling", "amidation"]
-        filter_by_db = family.lower() not in disable_filter_families
+        family_key = (dataset_family or detected_family_id or family or "").lower()
+        filter_by_db = family_key not in disable_filter_families
         
+        features: Dict[str, Any] = {}
+        if detected_family_id and detected_family_id != "Unknown":
+            features["reaction_type"] = detected_family_id
+            resolved_id = _reaction_catalog.resolve_reaction_type(detected_family_id)
+            if resolved_id is None:
+                resolved_id = _reaction_catalog.resolve_reaction_type(str(detected_family_id).lower())
+            if resolved_id:
+                record = _reaction_catalog.get_reaction_type(resolved_id)
+                if record and record.category:
+                    features["reaction_category"] = record.category
+
         result = precedent_knn(
             family=family,
-            features={},  # DRFP uses reaction fingerprint, not substrate features
+            features=features,
             k=k,
             relax={
                 "use_drfp": True, 
@@ -2667,6 +2691,8 @@ def search_precedents_tool(
         
         return _success_response({
             "family": family,
+            "detected_family_id": detected_family_id,
+            "dataset_family": dataset_family,
             "precedent_count": len(simplified_precedents),
             "precedents": simplified_precedents
         })

@@ -14,6 +14,7 @@ from ...smiles import normalize_reaction
 from ...reaction_type_detection import detect_reaction  # New unified API
 from ...router import resolve_reaction_family
 from ... import precedent, explain
+from ...taxonomy import reaction_catalog as _reaction_catalog
 from ..utils import canonical_family, median, pick_with_constraints
 
 # No longer needed - use unified detect_reaction() API instead
@@ -162,9 +163,10 @@ def recommend_from_reaction(
     
     # Prioritize: user override > analysis module > rule-based
     if not fam_override_clean:
-        fam = auto_family or rule_family or "Unknown"
+        detected_id = auto_family or rule_family or "Unknown"
     else:
-        fam = fam_override_clean
+        detected_id = fam_override_clean
+    fam = detected_id
     
     # Normalize to canonical precedent database family name
     # (e.g., ullmann_cn -> C_N_Coupling, suzuki_miyaura -> Suzuki)
@@ -174,15 +176,23 @@ def recommend_from_reaction(
     if search_all_families:
         # Keep detection metadata but set fam to None for cross-family precedent search
         detection_source = "cross_family_search"
-        detected_fam = canonical_fam  # Store the canonical family for metadata
+        detected_fam = canonical_fam  # Store dataset family for metadata
         fam = None  # Signal for cross-family search in precedent.knn()
     else:
         detected_fam = canonical_fam
         fam = canonical_fam
     
-    # 3) Features: Keep empty for DRFP-based search (default)
-    # DRFP uses reaction_smiles directly, no need for complex substrate featurization
+    # 3) Features: Include taxonomy-aware metadata for similarity fallback
     features: Dict[str, Any] = {}
+    if detected_id and detected_id != "Unknown":
+        features["reaction_type"] = detected_id
+        resolved_id = _reaction_catalog.resolve_reaction_type(detected_id)
+        if resolved_id is None:
+            resolved_id = _reaction_catalog.resolve_reaction_type(str(detected_id).lower())
+        if resolved_id:
+            record = _reaction_catalog.get_reaction_type(resolved_id)
+            if record and record.category:
+                features["reaction_category"] = record.category
     
     # 4) Retrieve precedents using DRFP-based k-NN search
     relax.setdefault("reaction_smiles", rxn_smiles_norm)
@@ -227,7 +237,7 @@ def recommend_from_reaction(
     
     relax.setdefault("precompute_drfp", False)  # Use binary NPZ files (faster)
     relax.setdefault("selective_loading", True)  # Load only needed family
-    relax.setdefault("filter_by_reagent_database", False)  # Disable DB filter (we filter later if needed)
+    relax.setdefault("filter_by_reagent_database", bool(filter_unknown_reagents))
     
     pack = precedent.knn(family=fam, features=features, k=int(k), relax=relax)
     
@@ -238,7 +248,7 @@ def recommend_from_reaction(
     rerank_reasons = []
     
     # 5) Optional filtering: Remove precedents with unknown reagents
-    if filter_unknown_reagents and precs:
+    if filter_unknown_reagents and precs and not relax.get("filter_by_reagent_database", False):
         try:
             from ... import reagent
             
@@ -490,7 +500,8 @@ def recommend_from_reaction(
     detection_meta = {
         "auto_family": auto_family,
         "rule_family": rule_family,
-        "detected_family": detected_fam,  # The actual detected family (before canonical mapping)
+        "detected_family": detected_fam,  # Dataset family used for precedent search
+        "detected_family_id": detected_id,  # Taxonomy family ID (if detected)
         "source": detection_source,
         "search_mode": "cross_family" if search_all_families else "family_specific",
         "analysis_module_used": analysis_result is not None,
