@@ -3,7 +3,7 @@ from __future__ import annotations
 import importlib
 from typing import List
 
-__all__ = ["molpipeline", "reaction_detection", "reaction_pair", "structural"]
+__all__ = ["calculable", "molpipeline", "reaction_detection", "reaction_pair", "structural"]
 
 
 def __getattr__(name: str):

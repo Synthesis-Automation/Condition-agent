@@ -1,7 +1,0 @@
-{
-  "generated_at": "2025-10-25T13:46:46Z",
-  "notes": "Generated from legacy chemtools taxonomy assets.",
-  "schema_version": "0.1.0",
-  "source": "scripts/taxonomy/convert_legacy_taxonomies.py",
-  "taxonomy_version": "0.1.0"
-}

@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
-from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal, QTimer
+from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal, QTimer, QSize
 from PyQt6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -129,6 +129,8 @@ class ChatInput(QTextEdit):
 class ImagePreviewWindow(QDialog):
     """Standalone window that renders a chemistry image."""
 
+    _SCALE_FACTOR = 0.5
+
     def __init__(
         self,
         pixmap: QPixmap,
@@ -142,6 +144,8 @@ class ImagePreviewWindow(QDialog):
         self.setWindowModality(Qt.WindowModality.NonModal)
 
         self._original_pixmap = pixmap
+        self._max_width = max(1, int(pixmap.width() * self._SCALE_FACTOR))
+        self._max_height = max(1, int(pixmap.height() * self._SCALE_FACTOR))
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 12, 12, 12)
@@ -161,8 +165,8 @@ class ImagePreviewWindow(QDialog):
             layout.addWidget(caption_label)
 
         self.resize(
-            max(420, pixmap.width() + 64),
-            max(360, pixmap.height() + 96),
+            max(420, self._max_width + 64),
+            max(360, self._max_height + 96),
         )
         self._update_pixmap()
 
@@ -176,8 +180,14 @@ class ImagePreviewWindow(QDialog):
         target_size = self.image_label.size()
         if not target_size.isValid():
             return
+        bounded = QSize(
+            min(target_size.width(), self._max_width),
+            min(target_size.height(), self._max_height),
+        )
+        if not bounded.isValid():
+            return
         scaled = self._original_pixmap.scaled(
-            target_size,
+            bounded,
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
         )
