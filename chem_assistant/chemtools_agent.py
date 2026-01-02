@@ -129,7 +129,7 @@ Response templates:
 - Molecule:
   - Input: <smiles>
   - Highlights: motifs, functional groups, key RDKit props
-  - Workflow: list workflow.steps with step names
+  - Workflow: render workflow.steps from the tool output in order with data (no paraphrasing)
   - Notes: any errors or assumptions
 - Reaction:
   - Input: <reaction_smiles>
@@ -148,6 +148,7 @@ Guidelines:
 - Use reaction_pair tools when the user provides electrophile/nucleophile pairs.
 - If MolPipeline is unavailable, explain the limitation and provide what you can.
 - Keep answers concise and focused on the analysis output.
+- When workflow.steps is available, output it with the actual data (or a clearly labeled, truncated subset). Do not narrate or invent details.
 """
 
 
