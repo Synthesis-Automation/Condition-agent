@@ -15,28 +15,46 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from chemtools.featurizers.structural import featurize_reaction
-from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2, classify_reagent_v2
+from chemtools.reagent.taxonomy_store import RoleHeuristics, TaxonomyStore
 from chemtools.util.rdkit_helpers import parse_smiles
 
 class V2Processor:
     def __init__(self):
-        self.taxonomy = ReagentTaxonomyV2.from_path()
-        self.roles = self.taxonomy.roles
-        self.families = self.taxonomy.families
+        self.store = TaxonomyStore()
+        self.taxonomy = self.store.taxonomy
+        if self.taxonomy:
+            self.roles = self.taxonomy.roles
+            self.families = self.taxonomy.families
+        else:
+            self.roles = {}
+            self.families = {}
+        self.heuristics = RoleHeuristics(self.store)
 
     def classify_reagent(self, name: str, cas: str = "", smiles: str = "") -> Dict[str, Any]:
         """Classify a reagent using the V2 taxonomy."""
-        record = {"name": name, "cas": cas, "smiles": smiles}
-        match = classify_reagent_v2(record, self.roles, self.families)
+        match = self.store.classify_reagent(name=name, cas=cas, smiles=smiles)
         
         if match:
             return {
                 "name": name,
                 "cas": cas,
-                "role": match.role_id,
-                "family": match.family_id,
-                "match_kind": match.match_kind
+                "role": match["role_id"],
+                "family": match["family_id"],
+                "match_kind": match["match_kind"]
             }
+            
+        # Fallback to heuristics if taxonomy match fails
+        inferred = self.heuristics.infer_role(name, [])
+        if inferred:
+            role, pattern = inferred
+            return {
+                "name": name,
+                "cas": cas,
+                "role": role,
+                "family": "INFERRED",
+                "match_kind": "heuristic"
+            }
+
         return {
             "name": name,
             "cas": cas,
@@ -100,38 +118,82 @@ class V2Processor:
         
         # Sterics (Rounded to 2 decimal places)
         steric = analysis.get("steric", {})
-        aryl_sterics = [s.get("result", {}).get("score_0_10", 0) for s in steric.get("aryl", [])]
-        alkyl_sterics = [s.get("result", {}).get("score_0_10", 0) for s in steric.get("alkyl", [])]
+        aryl_sterics = []
+        for s in steric.get("aryl", []):
+            if isinstance(s, dict):
+                res = s.get("result", {})
+                if isinstance(res, dict):
+                    aryl_sterics.append(res.get("score_0_10", 0))
+        
+        alkyl_sterics = []
+        for s in steric.get("alkyl", []):
+            if isinstance(s, dict):
+                res = s.get("result", {})
+                if isinstance(res, dict):
+                    alkyl_sterics.append(res.get("score_0_10", 0))
+                    
         features["max_aryl_steric"] = round(max(aryl_sterics), 2) if aryl_sterics else 0
         features["max_alkyl_steric"] = round(max(alkyl_sterics), 2) if alkyl_sterics else 0
         
         # Electronics (Rounded to 2 decimal places)
         electronics = analysis.get("electronics", {})
-        aryl_elec = [e.get("result", {}).get("score_0_10", 5.0) for e in electronics.get("aryl", [])]
+        aryl_elec = []
+        for e in electronics.get("aryl", []):
+            if isinstance(e, dict):
+                res = e.get("result", {})
+                if isinstance(res, dict):
+                    aryl_elec.append(res.get("score_0_10", 5.0))
+                elif isinstance(res, list) and res:
+                    # Handle "both" case where result is a list of dicts
+                    first_res = res[0]
+                    if isinstance(first_res, dict):
+                        aryl_elec.append(first_res.get("score_0_10", 5.0))
+
         features["avg_aryl_electronic"] = round(sum(aryl_elec) / len(aryl_elec), 2) if aryl_elec else 5.0
         
         # Chelators
         nearby = analysis.get("nearby", [])
         has_chelator = False
         for n in nearby:
-            for res in n.get("result", []):
-                tags = res.get("tags", [])
-                if "bidentate_chelator" in tags or "chelator" in tags:
-                    has_chelator = True
-                    break
+            if not isinstance(n, dict):
+                continue
+            result = n.get("result", [])
+            if not isinstance(result, list):
+                continue
+            for res in result:
+                if isinstance(res, dict):
+                    tags = res.get("tags", [])
+                    if "bidentate_chelator" in tags or "chelator" in tags:
+                        has_chelator = True
+                        break
+                elif isinstance(res, str):
+                    # Fallback for string labels
+                    if "chelator" in res.lower():
+                        has_chelator = True
+                        break
+            if has_chelator:
+                break
         if has_chelator:
             features["has_chelator"] = True
         
         # Motifs (Sparse: only store True)
         motifs = analysis.get("motifs", [])
+        reactant_types = []
         for m in motifs:
-            features[f"has_{m['compound_id']}"] = True
+            if isinstance(m, dict) and "compound_id" in m:
+                cid = m['compound_id']
+                features[f"has_{cid}"] = True
+                if cid not in reactant_types:
+                    reactant_types.append(cid)
+        
+        if reactant_types:
+            features["reactant_type"] = reactant_types
             
         return features
 
     def _standardize_conditions(self, raw_reagents: List[Dict[str, str]], raw_solvents: List[Dict[str, str]], reaction_data: Dict[str, Any]) -> Dict[str, Any]:
         conditions = {
-            "metal": None,
+            "catalyst": None,
             "ligand": [],
             "base": [],
             "additive": [],
@@ -148,7 +210,7 @@ class V2Processor:
             role = classification["role"]
             
             if role == "metal_catalyst":
-                conditions["metal"] = name
+                conditions["catalyst"] = name
             elif role == "ligand":
                 conditions["ligand"].append(name)
             elif role == "base":

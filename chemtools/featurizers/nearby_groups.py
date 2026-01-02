@@ -12,9 +12,9 @@ def analyze_nearby_groups(
     all_motifs: List[Dict[str, Any]],
     groups_dict: Dict[str, Dict[str, Any]],
     compound_map: Optional[Dict[str, Any]] = None,
-) -> List[str]:
+) -> List[Dict[str, Any]]:
     """
-    Identify functional groups near the reaction center (simple labels).
+    Identify functional groups near the reaction center.
     """
     center_ipso = hit.get("a_atom_idx")
     center_fg = hit.get("b_atom_idx")
@@ -22,7 +22,7 @@ def analyze_nearby_groups(
         return []
 
     seen: Set[str] = set()
-    labels: List[str] = []
+    results: List[Dict[str, Any]] = []
 
     for other in all_motifs:
         # Skip the current reaction center itself
@@ -43,9 +43,13 @@ def analyze_nearby_groups(
 
         if label not in seen:
             seen.add(label)
-            labels.append(label)
+            results.append({
+                "name": label,
+                "group_id": group_id,
+                "tags": group_info.get("tags", [])
+            })
 
-    return sorted(labels)
+    return sorted(results, key=lambda x: x["name"])
 
 
 def _resolve_group_id(compound_id: str, compound_map: Optional[Dict[str, Any]]) -> Optional[str]:
