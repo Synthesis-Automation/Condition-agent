@@ -9,7 +9,10 @@ from __future__ import annotations
 from typing import Dict, Any, List, Tuple, Optional
 import logging
 
-from ..featurizers.structural import featurize_reaction, featurize_molecule
+from ..featurizers.unified import (
+    featurize_reaction as featurize_unified_reaction,
+    featurize_molecule as featurize_unified_molecule,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +44,15 @@ class FeatureAnalyzer:
             Dictionary of combined features
         """
         try:
-            # Use the new unified featurizer
-            analysis = featurize_reaction(reaction_smiles)
+            # Use the unified featurizer bundle
+            bundle = featurize_unified_reaction(reaction_smiles)
+            reaction_payload = bundle.get("reaction") or bundle
             
             reactant_features = []
             all_motifs = set()
             
-            for r_entry in analysis.get("reactants", []):
-                r_analysis = r_entry.get("analysis", {})
+            for r_entry in reaction_payload.get("reactants", []):
+                r_analysis = self._extract_reactant_analysis(r_entry)
                 r_feat = self._flatten_analysis(r_analysis)
                 reactant_features.append(r_feat)
                 
@@ -66,7 +70,7 @@ class FeatureAnalyzer:
                 combined = self._combine_features_union(reactant_features)
 
             # Add reaction detection results
-            detection = analysis.get("detection", {})
+            detection = reaction_payload.get("detection", {})
             for match in detection.get("matches", []):
                 combined[f"rxn_{match['reaction_type']}"] = True
                 combined[match['reaction_type']] = True
@@ -92,12 +96,21 @@ class FeatureAnalyzer:
             Dictionary of detected features
         """
         try:
-            analysis = featurize_molecule(smiles)
+            bundle = featurize_unified_molecule(smiles)
+            analysis = bundle.get("molecule") or bundle
             features = self._flatten_analysis(analysis)
             return features
         except Exception as e:
             logger.error(f"Error analyzing reactant {smiles}: {e}")
             return {}
+
+    def _extract_reactant_analysis(self, entry: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle both legacy and unified reactant bundle shapes."""
+        if "analysis" in entry and isinstance(entry.get("analysis"), dict):
+            return entry["analysis"]
+        if "molecule" in entry and isinstance(entry.get("molecule"), dict):
+            return entry["molecule"]
+        return entry
 
     def _flatten_analysis(self, analysis: Dict[str, Any]) -> Dict[str, Any]:
         """Flatten V2 analysis into a boolean feature dictionary."""

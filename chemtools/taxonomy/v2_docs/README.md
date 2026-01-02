@@ -83,14 +83,14 @@ print(result.to_dict())
 
 ### Steric and electronic factor analysis
 
-- `chemtools/featurizers/structural.py`
+- `chemtools/featurizers/molecule.py`
   - Computes motif hits and steric/electronic descriptors for aryl and alkyl
     systems using the organic group/compound registry.
 
 Example:
 
 ```python
-from chemtools.featurizers.structural import featurize_molecule
+from chemtools.featurizers.molecule import featurize_molecule
 
 analysis = featurize_molecule("c1ccccc1Br")
 ```

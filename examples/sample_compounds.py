@@ -1,5 +1,4 @@
-"""
-Sample Compounds Data
+"""Sample Compounds Data
 ====================
 
 This file contains comprehensive sample compound SMILES with known reaction types
@@ -10,1413 +9,984 @@ Each compound is annotated with:
 - Common name or description
 - Typical reaction role (electrophile, nucleophile, coupling partner)
 - Expected reaction types
-- Key structural features
-"""
+- Key structural features"""
 
 from typing import Dict, List, Any
 
+ARYL_HALIDES = [{'features': ['ArBr_reactant'],
+  'name': 'Bromobenzene',
+  'notes': 'Standard aryl bromide for all cross-coupling reactions',
+  'reaction_types': ['Suzuki-Miyaura',
+                     'Buchwald-Hartwig',
+                     'Ullmann',
+                     'Sonogashira',
+                     'Heck',
+                     'Stille',
+                     'Negishi',
+                     'Kumada'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccccc1'},
+ {'features': ['ArCl_reactant'],
+  'name': 'Chlorobenzene',
+  'notes': 'Less reactive; requires activated catalyst systems',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Ullmann', 'Sonogashira', 'Heck'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccccc1'},
+ {'features': ['ArI_reactant'],
+  'name': 'Iodobenzene',
+  'notes': 'Most reactive aryl halide',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira', 'Heck', 'Stille', 'Negishi', 'Kumada'],
+  'role': 'electrophile',
+  'smiles': 'Ic1ccccc1'},
+ {'features': ['ArF_reactant'],
+  'name': 'Fluorobenzene',
+  'notes': 'Requires strong nucleophiles for SNAr; not for standard cross-coupling',
+  'reaction_types': ['SNAr'],
+  'role': 'electrophile',
+  'smiles': 'Fc1ccccc1'},
+ {'features': ['Ar-CN_reactant', 'ArBr_reactant'],
+  'name': '4-Bromobenzonitrile',
+  'notes': 'Electron-poor aryl bromide; more reactive',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(C#N)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '4-Bromoanisole',
+  'notes': 'Electron-rich aryl bromide; standard substrate',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira', 'Heck'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(OC)cc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '4-Bromonitrobenzene',
+  'notes': 'Highly electron-poor; very reactive',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'SNAr'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc([N+](=O)[O-])cc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '4-Bromobenzotrifluoride',
+  'notes': 'Electron-poor CF3 substituent',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(C(F)(F)F)cc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '1,3,5-Tribromobenzene',
+  'notes': 'Multiple coupling sites; sp2_halide_site_count = 3',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cc(Br)cc(Br)c1'},
+ {'features': ['ArCl_reactant'],
+  'name': '1,4-Dichlorobenzene',
+  'notes': 'Di-functionalization substrate',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccc(Cl)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Bn-Br_reactant'],
+  'name': '2-Bromotoluene',
+  'notes': 'Ortho-substituted; sterically hindered',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccccc1C'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Bn-Br_reactant'],
+  'name': '3,5-Dimethylbromobenzene',
+  'notes': 'Meta-substituted; moderate sterics',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cc(C)cc(C)c1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Bn-Br_reactant'],
+  'name': 'Pentamethylbromobenzene',
+  'notes': 'Highly sterically hindered',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1c(C)c(C)c(C)c(C)c1C'},
+ {'features': ['ArBr_reactant'],
+  'name': '2-Bromonaphthalene',
+  'notes': 'Fused aromatic system',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc2ccccc2c1'},
+ {'features': ['ArCl_reactant'],
+  'name': '2-Chloronaphthalene',
+  'notes': 'Activated chloride on naphthalene',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccc2ccccc2c1'},
+ {'features': ['ArBr_reactant'],
+  'name': '1-Bromonaphthalene',
+  'notes': 'Peri-position naphthyl bromide',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cccc2c1cccc2'},
+ {'features': ['ArBr_reactant'],
+  'name': '4-Bromopyridine',
+  'notes': 'Heteroaryl halide; pyridine can poison some catalysts',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira', 'Stille', 'Negishi'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccncc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '3-Bromopyridine',
+  'notes': 'Meta-bromo pyridine',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cccnc1'},
+ {'features': ['ArBr_reactant', 'HetArBr_reactant', 'PyridineBr_reactant'],
+  'name': '2-Bromopyridine',
+  'notes': 'Ortho-bromo pyridine; strong chelation',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccccn1'},
+ {'features': ['ArCl_reactant'],
+  'name': '4-Chloropyridine',
+  'notes': 'Activated heterocyclic chloride',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccncc1'},
+ {'features': ['ArBr_reactant', 'HetArBr_reactant'],
+  'name': '5-Bromopyrimidine',
+  'notes': 'Diazine substrate',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cnccn1'},
+ {'features': ['ArBr_reactant'],
+  'name': '2-Bromothiophene',
+  'notes': 'Five-membered heterocycle',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira', 'Stille'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cccs1'},
+ {'features': ['ArBr_reactant', 'furan-diene_reactant'],
+  'name': '2-Bromofuran',
+  'notes': 'Oxygen heterocycle',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccco1'},
+ {'features': ['ArBr_reactant'],
+  'name': '3-Bromopyrrole',
+  'notes': 'NH heterocycle; acidic proton',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cc[nH]c1'},
+ {'features': ['ArBr_reactant'],
+  'name': '5-Bromoindole',
+  'notes': 'Indole scaffold; NH can coordinate',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc2[nH]ccc2c1'},
+ {'features': ['ArBr_reactant', 'ThiazoleBr_reactant'],
+  'name': '2-Bromobenzothiazole',
+  'notes': 'Fused bicyclic heterocycle',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1nc2ccccc2s1'},
+ {'features': ['ArI_reactant'],
+  'name': '2-Iodobenzoxazole',
+  'notes': 'Oxygen-containing fused heterocycle',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Ic1nc2ccccc2o1'},
+ {'features': ['ArBr_reactant'],
+  'name': '3-Bromoquinoline',
+  'notes': 'Quinoline scaffold',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccnc2ccccc12'},
+ {'features': ['ArBr_reactant', 'HetArBr_reactant'],
+  'name': '3-Bromoquinoxaline',
+  'notes': 'Diaza-naphthalene',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cnc2ccccc2n1'},
+ {'features': ['ArCl_reactant', 'HetArCl_reactant'],
+  'name': '2,5-Dichloropyridine',
+  'notes': 'Selective coupling possible at different positions',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccc(Cl)nc1'},
+ {'features': ['ArOSO2R_reactant'],
+  'name': 'Phenyl triflate',
+  'notes': 'Excellent leaving group; very reactive',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira', 'Heck'],
+  'role': 'electrophile',
+  'smiles': 'c1ccc(OS(=O)(=O)C(F)(F)F)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArOSO2R_reactant'],
+  'name': '4-Methoxyphenyl triflate',
+  'notes': 'Electron-rich triflate',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'COc1ccc(OS(=O)(=O)C(F)(F)F)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArOSO2R_reactant', 'ArOTs_reactant'],
+  'name': 'Phenyl tosylate',
+  'notes': 'Good leaving group; cheaper than triflate',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'c1ccc(OS(=O)(=O)c2ccc(C)cc2)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArOMs_reactant', 'ArOSO2R_reactant'],
+  'name': 'Phenyl mesylate',
+  'notes': 'Mesylate leaving group',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'c1ccc(OS(=O)(=O)C)cc1'},
+ {'features': ['Ar-CN_reactant', 'ArOSO2R_reactant'],
+  'name': '4-Cyanophenyl triflate',
+  'notes': 'Electron-poor triflate; highly reactive',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'N#Cc1ccc(OS(=O)(=O)C(F)(F)F)cc1'},
+ {'features': ['alkene-Br_reactant', 'simple-dienophile_reactant'],
+  'name': 'Vinyl bromide',
+  'notes': 'Simple vinyl halide',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira', 'Heck', 'Stille', 'Negishi', 'Kumada'],
+  'role': 'electrophile',
+  'smiles': 'C=CBr'},
+ {'features': ['alkene-Cl_reactant', 'simple-dienophile_reactant'],
+  'name': 'Vinyl chloride',
+  'notes': 'Less reactive vinyl halide',
+  'reaction_types': ['Suzuki-Miyaura', 'Heck'],
+  'role': 'electrophile',
+  'smiles': 'C=CCl'},
+ {'features': ['alkene-I_reactant', 'simple-dienophile_reactant'],
+  'name': 'Vinyl iodide',
+  'notes': 'Most reactive vinyl halide',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira', 'Heck', 'Stille'],
+  'role': 'electrophile',
+  'smiles': 'C=CI'},
+ {'features': ['Alkyl-H_reactant', 'Allyl-Br_reactant', 'alkene-Br_reactant', 'simple-dienophile_reactant'],
+  'name': '(E)-1-Bromopropene',
+  'notes': 'Stereodefined vinyl bromide',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira', 'Heck'],
+  'role': 'electrophile',
+  'smiles': 'C/C=C/Br'},
+ {'features': ['Alkyl-H_reactant',
+               'Allyl-Br_reactant',
+               'alkene-Br_reactant',
+               'simple-dienophile_reactant',
+               'terminal-alkene_reactant'],
+  'name': '2-Bromopropene',
+  'notes': 'Geminal disubstituted vinyl bromide',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'C=C(Br)C'},
+ {'features': ['Ar-alkene_reactant', 'alkene-Br_reactant', 'simple-dienophile_reactant', 'terminal-alkene_reactant'],
+  'name': 'α-Bromostyrene',
+  'notes': 'Aryl-substituted vinyl bromide',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'BrC(=C)c1ccccc1'},
+ {'features': ['Alkyl-Br_reactant', 'Alkyl-H_reactant'],
+  'name': 'Ethyl bromide',
+  'notes': 'Simple primary alkyl bromide; β-hydride elimination risk',
+  'reaction_types': ['Suzuki-Miyaura', 'Negishi', 'Kumada', 'SN2'],
+  'role': 'electrophile',
+  'smiles': 'CCBr'},
+ {'features': ['Alkyl-Cl_reactant', 'Alkyl-H_reactant'],
+  'name': 'Ethyl chloride',
+  'notes': 'Primary alkyl chloride',
+  'reaction_types': ['Negishi', 'Kumada', 'SN2'],
+  'role': 'electrophile',
+  'smiles': 'CCCl'},
+ {'features': ['Alkyl-H_reactant', 'Alkyl-I_reactant'],
+  'name': 'Ethyl iodide',
+  'notes': 'Most reactive primary alkyl halide',
+  'reaction_types': ['Suzuki-Miyaura', 'Negishi', 'Kumada', 'SN2'],
+  'role': 'electrophile',
+  'smiles': 'CCI'},
+ {'features': ['Alkyl-Br_reactant', 'Alkyl-H_reactant'],
+  'name': 'Isopropyl bromide',
+  'notes': 'Secondary alkyl bromide; high β-hydride risk',
+  'reaction_types': ['Negishi', 'Kumada'],
+  'role': 'electrophile',
+  'smiles': 'CC(C)Br'},
+ {'features': ['Alkyl-Br_reactant', 'Alkyl-H_reactant'],
+  'name': 'tert-Butyl bromide',
+  'notes': 'Tertiary alkyl bromide; no β-hydride; SN1 mechanism',
+  'reaction_types': ['SN1'],
+  'role': 'electrophile',
+  'smiles': 'CC(C)(C)Br'},
+ {'features': ['Alkyl-Br_reactant', 'Alkyl-H_reactant', 'Bn-Br_reactant'],
+  'name': 'Benzyl bromide',
+  'notes': 'Benzylic position; activated sp3 halide',
+  'reaction_types': ['Suzuki-Miyaura', 'SN2', 'Negishi'],
+  'role': 'electrophile',
+  'smiles': 'BrCc1ccccc1'},
+ {'features': ['Alkyl-Br_reactant', 'Alkyl-H_reactant', 'Bn-Br_reactant'],
+  'name': '2-Phenylethyl bromide',
+  'notes': 'Primary alkyl bromide with aryl substituent',
+  'reaction_types': ['SN2', 'Negishi', 'Kumada'],
+  'role': 'electrophile',
+  'smiles': 'C(Br)Cc1ccccc1'},
+ {'features': ['Alkyl-Br_reactant',
+               'Alkyl-H_reactant',
+               'Allyl-Br_reactant',
+               'simple-dienophile_reactant',
+               'terminal-alkene_reactant'],
+  'name': '4-Bromo-1-butene',
+  'notes': 'Homoallylic bromide',
+  'reaction_types': ['SN2', 'Negishi'],
+  'role': 'electrophile',
+  'smiles': 'C=CCCBr'},
+ {'features': ['Alkyl-Br_reactant',
+               'Alkyl-H_reactant',
+               'Allyl-Br_reactant',
+               'simple-dienophile_reactant',
+               'terminal-alkene_reactant'],
+  'name': '3-Bromo-2-methylpropene (allylic)',
+  'notes': 'Allylic bromide; can undergo allylic substitution',
+  'reaction_types': ['SN2', 'Allylic-substitution'],
+  'role': 'electrophile',
+  'smiles': 'C=C(C)CBr'},
+ {'features': ['Alkyl-Br_reactant', 'Alkyl-H_reactant'],
+  'name': 'Neopentyl bromide',
+  'notes': 'No β-hydrogens; minimal elimination risk',
+  'reaction_types': ['Suzuki-Miyaura', 'Negishi'],
+  'role': 'electrophile',
+  'smiles': 'CC(C)(C)CBr'},
+ {'features': ['ArB(OH)2_reactant'],
+  'name': 'Phenylboronic acid',
+  'notes': 'Standard boronic acid coupling partner',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc(B(O)O)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArB(OH)2_reactant'],
+  'name': '4-Methoxyphenylboronic acid',
+  'notes': 'Electron-rich boronic acid',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'COc1ccc(B(O)O)cc1'},
+ {'features': ['Ar-CN_reactant', 'ArB(OH)2_reactant'],
+  'name': '4-Cyanophenylboronic acid',
+  'notes': 'Electron-poor boronic acid',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'N#Cc1ccc(B(O)O)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArB(OR)2_reactant'],
+  'name': 'Phenylboronic acid pinacol ester',
+  'notes': 'Protected boronic acid; more stable',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc(B2OC(C)(C)C(C)(C)O2)cc1'},
+ {'features': ['ArBF3K_reactant'],
+  'name': 'Potassium phenyltrifluoroborate',
+  'notes': 'BF3K salt; air-stable boronate',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc([B-](F)(F)F)cc1.[K+]'},
+ {'features': ['alkeneB(OH)2_reactant', 'simple-dienophile_reactant'],
+  'name': 'Vinylboronic acid',
+  'notes': 'Vinyl boronic acid',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'C=CB(O)O'},
+ {'features': ['Alkyl-H_reactant', 'alkeneB(OH)2_reactant', 'simple-dienophile_reactant'],
+  'name': '(E)-Propenylboronic acid',
+  'notes': 'Stereodefined vinyl boronic acid',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'C/C=C/B(O)O'},
+ {'features': ['Alkyl-B(OH)2_reactant', 'Alkyl-H_reactant'],
+  'name': 'Ethylboronic acid',
+  'notes': 'Alkyl boronic acid; prone to β-hydride issues',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'CCB(O)O'},
+ {'features': ['ArB(OH)2_reactant'],
+  'name': 'Pyridine-4-boronic acid',
+  'notes': 'Heteroaryl boronic acid; pyridine coordination risk',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccncc1B(O)O'},
+ {'features': ['ArB(OH)2_reactant', 'furan-diene_reactant'],
+  'name': 'Furan-2-boronic acid',
+  'notes': 'Five-membered heterocyclic boronic acid',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'c1coc(B(O)O)c1'},
+ {'features': ['ArB(OH)2_reactant'],
+  'name': 'Thiophene-2-boronic acid',
+  'notes': 'Thiophene boronic acid; sulfur can coordinate',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'nucleophile',
+  'smiles': 'c1csc(B(O)O)c1'},
+ {'features': ['ArNH2_reactant'],
+  'name': 'Aniline',
+  'notes': 'Aromatic primary amine; standard C-N coupling partner',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann', 'SNAr'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc(N)cc1'},
+ {'features': ['Alkyl-H_reactant', 'RNH2_reactant'],
+  'name': 'Ethylamine',
+  'notes': 'Primary aliphatic amine',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann', 'SNAr'],
+  'role': 'nucleophile',
+  'smiles': 'CCN'},
+ {'features': ['Alkyl-H_reactant', 'RNH2-a-branch_reactant', 'RNH2_reactant'],
+  'name': 'Isopropylamine',
+  'notes': 'Branched primary amine; α-branching',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'CC(C)N'},
+ {'features': ['Alkyl-H_reactant', 'RNH2_reactant'],
+  'name': 'tert-Butylamine',
+  'notes': 'Highly hindered primary amine',
+  'reaction_types': ['Buchwald-Hartwig'],
+  'role': 'nucleophile',
+  'smiles': 'CC(C)(C)N'},
+ {'features': ['Alkyl-H_reactant', 'R2NH_reactant'],
+  'name': 'N-Methylethylamine',
+  'notes': 'Secondary aliphatic amine',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'CCNC'},
+ {'features': ['Alkyl-H_reactant', 'ArNHR_reactant'],
+  'name': 'N-Methylaniline',
+  'notes': 'Secondary aromatic amine',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc(NC)cc1'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': 'N,N-Dimethylaniline',
+  'notes': 'Tertiary amine; not reactive in C-N coupling',
+  'reaction_types': [],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc(N(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArNH2_reactant'],
+  'name': '4-Methoxyaniline',
+  'notes': 'Electron-rich aniline',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'COc1ccc(N)cc1'},
+ {'features': ['Ar-CN_reactant', 'ArNH2_reactant'],
+  'name': '4-Aminobenzonitrile',
+  'notes': 'Electron-poor aniline; less nucleophilic',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'N#Cc1ccc(N)cc1'},
+ {'features': ['ArNH2_reactant'],
+  'name': '4-Aminopyridine',
+  'notes': 'Heteroaryl amine; pyridine coordination',
+  'reaction_types': ['Buchwald-Hartwig'],
+  'role': 'nucleophile',
+  'smiles': 'Nc1ccncc1'},
+ {'features': [],
+  'name': 'Indole',
+  'notes': 'NH heterocycle; can act as nucleophile',
+  'reaction_types': ['Buchwald-Hartwig', 'C-H activation'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc2[nH]ccc2c1'},
+ {'features': ['ArNH2_reactant'],
+  'name': '3-Aminopyrrole',
+  'notes': 'Heteroaryl amine with NH',
+  'reaction_types': ['Buchwald-Hartwig'],
+  'role': 'nucleophile',
+  'smiles': 'c1c[nH]c(N)c1'},
+ {'features': ['Alkyl-H_reactant', 'ArNH2_reactant'],
+  'name': '2-Methylaniline',
+  'notes': 'Ortho-substituted aniline; sterically hindered',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'Nc1ccccc1C'},
+ {'features': ['Alkyl-H_reactant', 'ArNH2_reactant'],
+  'name': '3,5-Dimethylaniline',
+  'notes': 'Meta-substituted aniline',
+  'reaction_types': ['Buchwald-Hartwig'],
+  'role': 'nucleophile',
+  'smiles': 'Nc1cc(C)cc(C)c1'},
+ {'features': ['Alkyl-H_reactant', 'RNH2_reactant'],
+  'name': 'Benzylamine',
+  'notes': 'Benzylic amine; aliphatic but stabilized',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'NCc1ccccc1'},
+ {'features': ['ArOH_reactant'],
+  'name': 'Phenol',
+  'notes': 'Aromatic alcohol; C-O coupling partner',
+  'reaction_types': ['Ullmann', 'SNAr', 'Mitsunobu'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc(O)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ROH-primary_reactant'],
+  'name': 'Ethanol',
+  'notes': 'Simple aliphatic alcohol',
+  'reaction_types': ['Ullmann', 'Mitsunobu'],
+  'role': 'nucleophile',
+  'smiles': 'CCO'},
+ {'features': ['Alkyl-H_reactant', 'ROH-a-branch_reactant', 'ROH-secondary_reactant', 'isopropanol_reactant'],
+  'name': 'Isopropanol',
+  'notes': 'Secondary alcohol',
+  'reaction_types': ['Ullmann', 'Mitsunobu'],
+  'role': 'nucleophile',
+  'smiles': 'CC(C)O'},
+ {'features': ['Alkyl-H_reactant', 'ROH-tertiary_reactant', 'isopropanol_reactant'],
+  'name': 'tert-Butanol',
+  'notes': 'Tertiary alcohol; sterically hindered',
+  'reaction_types': ['Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'CC(C)(C)O'},
+ {'features': ['Alkyl-H_reactant', 'ArOH_reactant'],
+  'name': '4-Methoxyphenol',
+  'notes': 'Electron-rich phenol',
+  'reaction_types': ['Ullmann', 'SNAr'],
+  'role': 'nucleophile',
+  'smiles': 'COc1ccc(O)cc1'},
+ {'features': ['Ar-CN_reactant', 'ArOH_reactant'],
+  'name': '4-Hydroxybenzonitrile',
+  'notes': 'Electron-poor phenol; more acidic',
+  'reaction_types': ['Ullmann', 'SNAr'],
+  'role': 'nucleophile',
+  'smiles': 'N#Cc1ccc(O)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ROH-primary_reactant'],
+  'name': 'Benzyl alcohol',
+  'notes': 'Benzylic alcohol',
+  'reaction_types': ['Ullmann', 'Mitsunobu'],
+  'role': 'nucleophile',
+  'smiles': 'OCc1ccccc1'},
+ {'features': ['ArOH_reactant'],
+  'name': '4-Hydroxypyridine',
+  'notes': 'Heteroaryl phenol',
+  'reaction_types': ['Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'Oc1ccncc1'},
+ {'features': ['ArSH_reactant', 'RSH_reactant'],
+  'name': 'Thiophenol',
+  'notes': 'Aromatic thiol; strong nucleophile; catalyst poison risk',
+  'reaction_types': ['Ullmann', 'SNAr'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc(S)cc1'},
+ {'features': ['Alkyl-H_reactant', 'RSH_reactant'],
+  'name': 'Ethanethiol',
+  'notes': 'Aliphatic thiol; catalyst poison',
+  'reaction_types': ['Ullmann', 'SNAr'],
+  'role': 'nucleophile',
+  'smiles': 'CCS'},
+ {'features': ['Alkyl-H_reactant', 'RSH_reactant'],
+  'name': '2-Propanethiol',
+  'notes': 'Secondary thiol',
+  'reaction_types': ['Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'CC(C)S'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': 'Thioanisole',
+  'notes': 'Sulfide; not nucleophilic but can poison catalysts',
+  'reaction_types': [],
+  'role': 'none',
+  'smiles': 'CSc1ccccc1'},
+ {'features': ['acetylene_reactant', 'alkyne-dienophile_reactant'],
+  'name': 'Acetylene',
+  'notes': 'Simplest terminal alkyne',
+  'reaction_types': ['Sonogashira'],
+  'role': 'nucleophile',
+  'smiles': 'C#C'},
+ {'features': ['Ar-alkyne_reactant', 'alkyne-dienophile_reactant', 'terminal-alkyne_reactant'],
+  'name': 'Phenylacetylene',
+  'notes': 'Aryl-substituted terminal alkyne',
+  'reaction_types': ['Sonogashira'],
+  'role': 'nucleophile',
+  'smiles': 'C#Cc1ccccc1'},
+ {'features': ['Alkyl-H_reactant', 'R-alkyne_reactant', 'alkyne-dienophile_reactant', 'terminal-alkyne_reactant'],
+  'name': '3,3-Dimethylbut-1-yne',
+  'notes': 'Sterically hindered terminal alkyne',
+  'reaction_types': ['Sonogashira'],
+  'role': 'nucleophile',
+  'smiles': 'C#CC(C)(C)C'},
+ {'features': ['Alkyl-H_reactant', 'alkyne-dienophile_reactant'],
+  'name': 'Trimethylsilylacetylene',
+  'notes': 'TMS-protected alkyne; deprotectable',
+  'reaction_types': ['Sonogashira'],
+  'role': 'nucleophile',
+  'smiles': 'C#C[Si](C)(C)C'},
+ {'features': ['Alkyl-H_reactant', 'R-alkyne_reactant', 'alkyne-dienophile_reactant', 'terminal-alkyne_reactant'],
+  'name': 'Methyl propargyl ether',
+  'notes': 'Ether-substituted alkyne',
+  'reaction_types': ['Sonogashira'],
+  'role': 'nucleophile',
+  'smiles': 'C#CCOC'},
+ {'features': ['Ar-alkyne_reactant', 'alkyne-dienophile_reactant', 'terminal-alkyne_reactant'],
+  'name': '4-Ethynylpyridine',
+  'notes': 'Heteroaryl terminal alkyne',
+  'reaction_types': ['Sonogashira'],
+  'role': 'nucleophile',
+  'smiles': 'C#Cc1ccncc1'},
+ {'features': ['ArBr_reactant'],
+  'name': 'Phenylmagnesium bromide',
+  'notes': 'Grignard reagent for Kumada coupling',
+  'reaction_types': ['Kumada'],
+  'role': 'nucleophile',
+  'smiles': '[Mg]Brc1ccccc1'},
+ {'features': ['Alkyl-H_reactant', 'Alkyl-M_reactant', 'RMgBr_reactant'],
+  'name': 'Ethylmagnesium bromide',
+  'notes': 'Alkyl Grignard',
+  'reaction_types': ['Kumada'],
+  'role': 'nucleophile',
+  'smiles': 'CC[Mg]Br'},
+ {'features': ['Ar-M_reactant', 'RZnCl_reactant'],
+  'name': 'Phenylzinc chloride',
+  'notes': 'Organozinc for Negishi coupling',
+  'reaction_types': ['Negishi'],
+  'role': 'nucleophile',
+  'smiles': 'Cl[Zn]c1ccccc1'},
+ {'features': ['Alkyl-H_reactant', 'Alkyl-M_reactant', 'RZnBr_reactant'],
+  'name': 'Ethylzinc bromide',
+  'notes': 'Alkylzinc reagent',
+  'reaction_types': ['Negishi'],
+  'role': 'nucleophile',
+  'smiles': 'CC[Zn]Br'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': 'Phenyltrimethylstannane',
+  'notes': 'Organotin for Stille coupling',
+  'reaction_types': ['Stille'],
+  'role': 'nucleophile',
+  'smiles': 'c1ccc([Sn](C)(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'simple-dienophile_reactant'],
+  'name': 'Vinyltrimethylstannane',
+  'notes': 'Vinyl stannane',
+  'reaction_types': ['Stille'],
+  'role': 'nucleophile',
+  'smiles': 'C=C[Sn](C)(C)C'},
+ {'features': ['ArB(OH)2_reactant', 'ArBr_reactant'],
+  'name': '4-Bromophenylboronic acid',
+  'notes': 'Can act as both electrophile and nucleophile; selective coupling',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'bifunctional',
+  'smiles': 'Brc1ccc(B(O)O)cc1'},
+ {'features': ['ArBr_reactant', 'ArNH2_reactant'],
+  'name': '4-Bromoaniline',
+  'notes': 'Both electrophile (Br) and nucleophile (NH2); orthogonal protection needed',
+  'reaction_types': ['Buchwald-Hartwig', 'Suzuki-Miyaura'],
+  'role': 'bifunctional',
+  'smiles': 'Brc1ccc(N)cc1'},
+ {'features': ['ArBr_reactant', 'ArOH_reactant'],
+  'name': '4-Bromophenol',
+  'notes': 'Both electrophile (Br) and nucleophile (OH)',
+  'reaction_types': ['Ullmann', 'Suzuki-Miyaura'],
+  'role': 'bifunctional',
+  'smiles': 'Brc1ccc(O)cc1'},
+ {'features': ['Ar-alkyne_reactant', 'ArBr_reactant', 'alkyne-dienophile_reactant', 'terminal-alkyne_reactant'],
+  'name': '4-Bromophenylacetylene',
+  'notes': 'Both electrophile (Br) and nucleophile (alkyne)',
+  'reaction_types': ['Sonogashira', 'Suzuki-Miyaura'],
+  'role': 'bifunctional',
+  'smiles': 'Brc1ccc(C#C)cc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '1,4-Dibromobenzene',
+  'notes': 'Two identical electrophilic sites; sp2_halide_site_count = 2',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'di-electrophile',
+  'smiles': 'Brc1ccc(Br)cc1'},
+ {'features': ['ArNH2_reactant'],
+  'name': '1,4-Phenylenediamine',
+  'notes': 'Two identical nucleophilic sites',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'di-nucleophile',
+  'smiles': 'Nc1ccc(N)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Carbamate_reactant'],
+  'name': '4-Bromo-N-Boc-aniline',
+  'notes': 'Boc-protected amine; prevents C-N coupling',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(NC(=O)OC(C)(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '4-Bromo-TBS-phenol',
+  'notes': 'TBS-protected phenol',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'ArCOOR_reactant', 'RCO2H_reactant', 'RCO2OR_reactant'],
+  'name': 'Methyl 4-bromobenzoate',
+  'notes': 'Ester-protected carboxylic acid',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(C(=O)OC)cc1'},
+ {'features': ['ArBr_reactant', 'ArCHO_reactant'],
+  'name': '4-Bromobenzaldehyde',
+  'notes': 'Aldehyde functional group; can be reduced/oxidized',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(C=O)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Bn-Br_reactant'],
+  'name': 'Pentamethylbromobenzene',
+  'notes': 'Extremely sterically hindered; requires bulky ligands',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1c(C)c(C)c(C)c(C)c1C'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '4-Bromo-tert-butylbenzene',
+  'notes': 'Para-tert-butyl substituent',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(C(C)(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'RNH2_reactant'],
+  'name': 'tert-Butylamine',
+  'notes': 'Highly hindered primary amine; challenging substrate',
+  'reaction_types': ['Buchwald-Hartwig'],
+  'role': 'nucleophile',
+  'smiles': 'CC(C)(C)N'},
+ {'features': ['Alkyl-H_reactant', 'ArNH2_reactant'],
+  'name': '4-tert-Butylaniline',
+  'notes': 'Sterically hindered aniline',
+  'reaction_types': ['Buchwald-Hartwig', 'Ullmann'],
+  'role': 'nucleophile',
+  'smiles': 'CC(C)(C)c1ccc(N)cc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '4-Bromonitrobenzene',
+  'notes': 'Highly electron-poor; very reactive in SNAr',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig', 'SNAr'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc([N+](=O)[O-])cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '4-Bromo-N,N-dimethylaniline',
+  'notes': 'Highly electron-rich; tertiary amine substituent',
+  'reaction_types': ['Suzuki-Miyaura', 'Sonogashira'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(N(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '1-Bromo-2,3,4,5-tetramethoxybenzene',
+  'notes': 'Extremely electron-rich; multiple methoxy groups',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'COc1cc(OC)c(Br)c(OC)c1OC'},
+ {'features': ['ArBr_reactant', 'ArF_reactant'],
+  'name': 'Pentafluorobromobenzene',
+  'notes': 'Extremely electron-poor; multiple fluorines',
+  'reaction_types': ['Suzuki-Miyaura', 'SNAr'],
+  'role': 'electrophile',
+  'smiles': 'Fc1c(F)c(F)c(Br)c(F)c1F'}]
 
-# ═══════════════════════════════════════════════════════════
-# ELECTROPHILES - Aryl Halides
-# ═══════════════════════════════════════════════════════════
+PHASE_3_4_COMPOUNDS = [{'features': ['ArBr_reactant'],
+  'name': '1,3,5-Tribromobenzene',
+  'notes': 'Polyhalogenated substrate; halogen_count=3',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1cc(Br)cc(Br)c1'},
+ {'features': ['ArBr_reactant', 'ArF_reactant'],
+  'name': 'Pentafluorobromobenzene',
+  'notes': 'Polyhalogenated with fluorine EWG; halogen_count=6',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Fc1c(F)c(F)c(Br)c(F)c1F'},
+ {'features': ['ArCl_reactant', 'HetArCl_reactant'],
+  'name': '2,5-Dichloropyridine',
+  'notes': 'Polyhalogenated heteroaryl; halogen_count=2',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccc(Cl)nc1'},
+ {'features': ['ArCl_reactant', 'ArI_reactant'],
+  'name': '2,6-Dichloro-iodobenzene',
+  'notes': 'Mixed halides with ortho substitution; halogen_count=3',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Ic1c(Cl)cccc1Cl'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '2-tert-Butylbromobenzene',
+  'notes': 'Sterically hindered ortho-tert-butyl',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccccc1C(C)(C)C'},
+ {'features': ['Alkyl-H_reactant', 'ArCl_reactant', 'Bn-Cl_reactant'],
+  'name': '3,5-Diisopropylchlorobenzene',
+  'notes': 'Multiple isopropyl substituents',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Clc1cc(C(C)C)ccc1C(C)C'},
+ {'features': ['Alkyl-H_reactant', 'ArI_reactant'],
+  'name': '2,6-Dimethoxyiodobenzene',
+  'notes': 'Ortho-disubstituted with electron-donating groups',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Ic1c(OC)cccc1OC'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Bn-Br_reactant'],
+  'name': 'Pentamethylbromobenzene',
+  'notes': 'Extremely sterically hindered; all positions substituted',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1c(C)c(C)c(C)c(C)c1C'},
+ {'features': ['Alkyl-H_reactant', 'ArI_reactant', 'Carbamate_reactant'],
+  'name': '4-Iodo-N-Boc-aniline',
+  'notes': 'BOC-protected aniline',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Ic1ccc(NC(=O)OC(C)(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Bn-Br_reactant', 'Carbamate_reactant'],
+  'name': '4-Bromo-N-Cbz-aniline',
+  'notes': 'CBZ-protected aniline',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(NC(=O)OCc2ccccc2)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArCl_reactant', 'Bn-Cl_reactant', 'Carbamate_reactant'],
+  'name': '4-Chloro-N-Fmoc-aniline',
+  'notes': 'FMOC-protected aniline with fluorenyl group',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '4-Bromo-TBS-phenol',
+  'notes': 'TBS-protected phenol',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArI_reactant'],
+  'name': '4-Iodo-TIPS-phenol',
+  'notes': 'TIPS-protected phenol',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '4-Bromonitrobenzene',
+  'notes': 'Strong electron-withdrawing nitro group',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc([N+](=O)[O-])cc1'},
+ {'features': ['Ar-CN_reactant', 'ArCl_reactant'],
+  'name': '4-Chlorobenzonitrile',
+  'notes': 'Strong electron-withdrawing nitrile group',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccc(C#N)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant'],
+  'name': '4-Bromo-N,N-dimethylaniline',
+  'notes': 'Strong electron-donating dialkylamino group',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(N(C)C)cc1'},
+ {'features': ['Alkyl-H_reactant', 'ArI_reactant'],
+  'name': '4-Iodoanisole',
+  'notes': 'Strong electron-donating methoxy group',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Ic1ccc(OC)cc1'},
+ {'features': ['ArBr_reactant'],
+  'name': '2-Bromophenyl diphenylphosphine',
+  'notes': 'Ortho-phosphine for ligand synthesis; note: not itself a bidentate chelator',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'bifunctional',
+  'smiles': 'Brc1ccccc1P(c2ccccc2)c2ccccc2'},
+ {'features': ['Alkyl-H-acidic_reactant',
+               'Alkyl-H_reactant',
+               'RCO2H_reactant',
+               'RNH2-a-branch_reactant',
+               'RNH2_reactant'],
+  'name': 'Phenylalanine',
+  'notes': 'Amino acid with bidentate chelating ability; chiral_center_count=1',
+  'reaction_types': ['Peptide coupling'],
+  'role': 'nucleophile',
+  'smiles': 'NC(Cc1ccccc1)C(=O)O'},
+ {'features': [],
+  'name': 'Triphenylphosphine',
+  'notes': 'Common phosphine ligand',
+  'reaction_types': ['Various cross-couplings'],
+  'role': 'ligand',
+  'smiles': 'c1ccc(P(c2ccccc2)c2ccccc2)cc1'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': '1,8-Bis(dimethylphosphino)naphthalene',
+  'notes': "Bidentate phosphine ligand (note: current SMARTS doesn't capture P-P bidentate pattern)",
+  'reaction_types': ['Various cross-couplings'],
+  'role': 'ligand',
+  'smiles': 'c1ccc2c(c1)c(P(C)C)ccc2P(C)C'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': 'Ethane',
+  'notes': 'MW=30; low molecular weight test',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'CC'},
+ {'features': ['anthracene_reactant'],
+  'name': 'Anthracene',
+  'notes': 'MW=178; medium molecular weight; fused rings',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'c1ccc2cc3ccccc3cc2c1'},
+ {'features': ['anthracene_reactant'],
+  'name': 'Coronene',
+  'notes': 'MW=300; large polycyclic aromatic (note: not high_molecular_weight which requires MW>500)',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'c1ccc2cc3ccc4ccc5ccc6ccc1c7c2c3c4c5c67'},
+ {'features': ['ArBr_reactant'],
+  'name': '2-Bromonaphthalene',
+  'notes': 'Fused bicyclic aromatic system',
+  'reaction_types': ['Suzuki-Miyaura', 'Buchwald-Hartwig'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc2ccccc2c1'},
+ {'features': ['ArCl_reactant'],
+  'name': '9-Chloroanthracene',
+  'notes': 'Tricyclic fused aromatic system',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Clc1ccc2c3ccccc3ccc2c1'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': 'Spiro[5.5]undecane',
+  'notes': 'Spirocyclic aliphatic system',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'C1CCC2(CC1)CCCC2'},
+ {'features': ['Alkyl-H_reactant', 'ArBr_reactant', 'Bn-Br_reactant'],
+  'name': "6-Bromo-spiro[chroman-2,1'-cyclohexane]",
+  'notes': 'Spirocyclic with aryl bromide',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc2c(c1)C1(CCCC1)CCCC2'},
+ {'features': ['Alkyl-H-acidic_reactant',
+               'Alkyl-H_reactant',
+               'RCO2H_reactant',
+               'RNH2-a-branch_reactant',
+               'RNH2_reactant'],
+  'name': '(S)-Alanine',
+  'notes': 'Chiral amino acid; chiral_center_count=1',
+  'reaction_types': ['Peptide coupling'],
+  'role': 'nucleophile',
+  'smiles': 'C[C@H](N)C(=O)O'},
+ {'features': ['Alkyl-H_reactant', 'ROH-a-branch_reactant', 'ROH-secondary_reactant', 'isopropanol_reactant'],
+  'name': '(2R,3R)-Butane-2,3-diol',
+  'notes': 'Two chiral centers; chiral_center_count=2',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'C[C@H](O)[C@H](C)O'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': '(1R,3R,5S)-1,3,5-Trimethylcyclohexane',
+  'notes': 'Three chiral centers; chiral_center_count=3',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'C[C@H]1CC[C@@H](C)C[C@H]1C'},
+ {'features': ['Alkyl-Br_reactant', 'Alkyl-Cl_reactant', 'Alkyl-H_reactant'],
+  'name': '(R)-Bromochlorofluoromethane',
+  'notes': 'Chiral halomethane; chiral_center_count=1; halogen_count=3',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'Br[C@H](Cl)F'},
+ {'features': ['ArBr_reactant', 'ArCl_reactant'],
+  'name': '2,4,5,6-Tetrachlorobromobenzene',
+  'notes': 'Highly polyhalogenated; halogen_count=5',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Clc1cc(Cl)c(Br)c(Cl)c1'},
+ {'features': ['ArBr_reactant', 'RCONHR_reactant'],
+  'name': '4-Bromo-N-benzoylaniline',
+  'notes': 'Amide-protected aniline derivative',
+  'reaction_types': ['Suzuki-Miyaura'],
+  'role': 'electrophile',
+  'smiles': 'Brc1ccc(NC(=O)c2ccccc2)cc1'},
+ {'features': ['Alkyl-H_reactant'],
+  'name': '(1S,2R,5S)-1,2,5-Trimethylcyclohexane',
+  'notes': 'Multiple stereogenic centers; chiral_center_count=3',
+  'reaction_types': [],
+  'role': 'reference',
+  'smiles': 'C[C@@H]1CCC[C@@H](C)[C@@H]1C'}]
 
-ARYL_HALIDES = [
-    {
-        "smiles": "Brc1ccccc1",
-        "name": "Bromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Ullmann", "Sonogashira", "Heck", "Stille", "Negishi", "Kumada"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Standard aryl bromide for all cross-coupling reactions"
-    },
-    {
-        "smiles": "Clc1ccccc1",
-        "name": "Chlorobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Ullmann", "Sonogashira", "Heck"],
-        "features": ["sp2_chloride_present", "aryl_halide_present", "ArCl_present"],
-        "notes": "Less reactive; requires activated catalyst systems"
-    },
-    {
-        "smiles": "Ic1ccccc1",
-        "name": "Iodobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira", "Heck", "Stille", "Negishi", "Kumada"],
-        "features": ["sp2_iodide_present", "aryl_halide_present", "ArI_present"],
-        "notes": "Most reactive aryl halide"
-    },
-    {
-        "smiles": "Fc1ccccc1",
-        "name": "Fluorobenzene",
-        "role": "electrophile",
-        "reaction_types": ["SNAr"],
-        "features": ["sp2_fluoride_present", "aryl_halide_present", "ArF_present"],
-        "notes": "Requires strong nucleophiles for SNAr; not for standard cross-coupling"
-    },
-    {
-        "smiles": "Brc1ccc(C#N)cc1",
-        "name": "4-Bromobenzonitrile",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Electron-poor aryl bromide; more reactive"
-    },
-    {
-        "smiles": "Brc1ccc(OC)cc1",
-        "name": "4-Bromoanisole",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira", "Heck"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Electron-rich aryl bromide; standard substrate"
-    },
-    {
-        "smiles": "Brc1ccc([N+](=O)[O-])cc1",
-        "name": "4-Bromonitrobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "SNAr"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Highly electron-poor; very reactive"
-    },
-    {
-        "smiles": "Brc1ccc(C(F)(F)F)cc1",
-        "name": "4-Bromobenzotrifluoride",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Electron-poor CF3 substituent"
-    },
-    {
-        "smiles": "Brc1cc(Br)cc(Br)c1",
-        "name": "1,3,5-Tribromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Multiple coupling sites; sp2_halide_site_count = 3"
-    },
-    {
-        "smiles": "Clc1ccc(Cl)cc1",
-        "name": "1,4-Dichlorobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_chloride_present", "aryl_halide_present", "ArCl_present"],
-        "notes": "Di-functionalization substrate"
-    },
-    {
-        "smiles": "Brc1ccccc1C",
-        "name": "2-Bromotoluene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Ortho-substituted; sterically hindered"
-    },
-    {
-        "smiles": "Brc1cc(C)cc(C)c1",
-        "name": "3,5-Dimethylbromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Meta-substituted; moderate sterics"
-    },
-    {
-        "smiles": "Brc1c(C)c(C)c(C)c(C)c1C",
-        "name": "Pentamethylbromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Highly sterically hindered"
-    },
-    {
-        "smiles": "Brc1ccc2ccccc2c1",
-        "name": "2-Bromonaphthalene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Fused aromatic system"
-    },
-    {
-        "smiles": "Clc1ccc2ccccc2c1",
-        "name": "2-Chloronaphthalene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_chloride_present", "aryl_halide_present", "ArCl_present"],
-        "notes": "Activated chloride on naphthalene"
-    },
-    {
-        "smiles": "Brc1cccc2c1cccc2",
-        "name": "1-Bromonaphthalene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Peri-position naphthyl bromide"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # ELECTROPHILES - Heteroaryl Halides
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "Brc1ccncc1",
-        "name": "4-Bromopyridine",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira", "Stille", "Negishi"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present", "pyridine_present", "pyridine_poison_risk"],
-        "notes": "Heteroaryl halide; pyridine can poison some catalysts"
-    },
-    {
-        "smiles": "Brc1cccnc1",
-        "name": "3-Bromopyridine",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present", "pyridine_present", "pyridine_poison_risk"],
-        "notes": "Meta-bromo pyridine"
-    },
-    {
-        "smiles": "Brc1ccccn1",
-        "name": "2-Bromopyridine",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present", "pyridine_present", "pyridine_poison_risk"],
-        "notes": "Ortho-bromo pyridine; strong chelation"
-    },
-    {
-        "smiles": "Clc1ccncc1",
-        "name": "4-Chloropyridine",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_chloride_present", "heteroaryl_halide_present", "pyridine_present"],
-        "notes": "Activated heterocyclic chloride"
-    },
-    {
-        "smiles": "Brc1cnccn1",
-        "name": "5-Bromopyrimidine",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present", "pyrimidine_present"],
-        "notes": "Diazine substrate"
-    },
-    {
-        "smiles": "Brc1cccs1",
-        "name": "2-Bromothiophene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira", "Stille"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present"],
-        "notes": "Five-membered heterocycle"
-    },
-    {
-        "smiles": "Brc1ccco1",
-        "name": "2-Bromofuran",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present"],
-        "notes": "Oxygen heterocycle"
-    },
-    {
-        "smiles": "Brc1cc[nH]c1",
-        "name": "3-Bromopyrrole",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present"],
-        "notes": "NH heterocycle; acidic proton"
-    },
-    {
-        "smiles": "Brc1ccc2[nH]ccc2c1",
-        "name": "5-Bromoindole",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present", "indole_present"],
-        "notes": "Indole scaffold; NH can coordinate"
-    },
-    {
-        "smiles": "Brc1nc2ccccc2s1",
-        "name": "2-Bromobenzothiazole",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present"],
-        "notes": "Fused bicyclic heterocycle"
-    },
-    {
-        "smiles": "Ic1nc2ccccc2o1",
-        "name": "2-Iodobenzoxazole",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_iodide_present", "heteroaryl_halide_present"],
-        "notes": "Oxygen-containing fused heterocycle"
-    },
-    {
-        "smiles": "Brc1ccnc2ccccc12",
-        "name": "3-Bromoquinoline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present"],
-        "notes": "Quinoline scaffold"
-    },
-    {
-        "smiles": "Brc1cnc2ccccc2n1",
-        "name": "3-Bromoquinoxaline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "heteroaryl_halide_present"],
-        "notes": "Diaza-naphthalene"
-    },
-    {
-        "smiles": "Clc1ccc(Cl)nc1",
-        "name": "2,5-Dichloropyridine",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_chloride_present", "heteroaryl_halide_present", "pyridine_present"],
-        "notes": "Selective coupling possible at different positions"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # ELECTROPHILES - Aryl Sulfonates (Pseudohalides)
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "c1ccc(OS(=O)(=O)C(F)(F)F)cc1",
-        "name": "Phenyl triflate",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira", "Heck"],
-        "features": ["sp2_triflate_present", "aryl_halide_present", "ArOTf_present", "sp2_pseudohalide_present"],
-        "notes": "Excellent leaving group; very reactive"
-    },
-    {
-        "smiles": "COc1ccc(OS(=O)(=O)C(F)(F)F)cc1",
-        "name": "4-Methoxyphenyl triflate",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_triflate_present", "aryl_halide_present", "ArOTf_present"],
-        "notes": "Electron-rich triflate"
-    },
-    {
-        "smiles": "c1ccc(OS(=O)(=O)c2ccc(C)cc2)cc1",
-        "name": "Phenyl tosylate",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_tosylate_present", "aryl_halide_present", "ArOTs_present", "sp2_pseudohalide_present"],
-        "notes": "Good leaving group; cheaper than triflate"
-    },
-    {
-        "smiles": "c1ccc(OS(=O)(=O)C)cc1",
-        "name": "Phenyl mesylate",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_mesylate_present", "aryl_halide_present", "ArOMs_present", "sp2_pseudohalide_present"],
-        "notes": "Mesylate leaving group"
-    },
-    {
-        "smiles": "N#Cc1ccc(OS(=O)(=O)C(F)(F)F)cc1",
-        "name": "4-Cyanophenyl triflate",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_triflate_present", "aryl_halide_present", "ArOTf_present"],
-        "notes": "Electron-poor triflate; highly reactive"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # ELECTROPHILES - Vinyl Halides
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "C=CBr",
-        "name": "Vinyl bromide",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira", "Heck", "Stille", "Negishi", "Kumada"],
-        "features": ["sp2_bromide_present", "vinyl_halide_present", "VinylBr_present", "alkene_present", "terminal_alkene_present"],
-        "notes": "Simple vinyl halide"
-    },
-    {
-        "smiles": "C=CCl",
-        "name": "Vinyl chloride",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Heck"],
-        "features": ["sp2_chloride_present", "vinyl_halide_present", "VinylCl_present", "alkene_present"],
-        "notes": "Less reactive vinyl halide"
-    },
-    {
-        "smiles": "C=CI",
-        "name": "Vinyl iodide",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira", "Heck", "Stille"],
-        "features": ["sp2_iodide_present", "vinyl_halide_present", "VinylI_present", "alkene_present"],
-        "notes": "Most reactive vinyl halide"
-    },
-    {
-        "smiles": "C/C=C/Br",
-        "name": "(E)-1-Bromopropene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira", "Heck"],
-        "features": ["sp2_bromide_present", "vinyl_halide_present", "VinylBr_present", "alkene_present"],
-        "notes": "Stereodefined vinyl bromide"
-    },
-    {
-        "smiles": "C=C(Br)C",
-        "name": "2-Bromopropene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira"],
-        "features": ["sp2_bromide_present", "vinyl_halide_present", "alkene_present"],
-        "notes": "Geminal disubstituted vinyl bromide"
-    },
-    {
-        "smiles": "BrC(=C)c1ccccc1",
-        "name": "α-Bromostyrene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira"],
-        "features": ["sp2_bromide_present", "vinyl_halide_present", "alkene_present"],
-        "notes": "Aryl-substituted vinyl bromide"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # ELECTROPHILES - Alkyl Halides (sp3)
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "CCBr",
-        "name": "Ethyl bromide",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Negishi", "Kumada", "SN2"],
-        "features": ["sp3_bromide_present", "beta_hydride_possible"],
-        "notes": "Simple primary alkyl bromide; β-hydride elimination risk"
-    },
-    {
-        "smiles": "CCCl",
-        "name": "Ethyl chloride",
-        "role": "electrophile",
-        "reaction_types": ["Negishi", "Kumada", "SN2"],
-        "features": ["sp3_chloride_present", "beta_hydride_possible"],
-        "notes": "Primary alkyl chloride"
-    },
-    {
-        "smiles": "CCI",
-        "name": "Ethyl iodide",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Negishi", "Kumada", "SN2"],
-        "features": ["sp3_iodide_present", "beta_hydride_possible"],
-        "notes": "Most reactive primary alkyl halide"
-    },
-    {
-        "smiles": "CC(C)Br",
-        "name": "Isopropyl bromide",
-        "role": "electrophile",
-        "reaction_types": ["Negishi", "Kumada"],
-        "features": ["sp3_bromide_present", "beta_hydride_possible"],
-        "notes": "Secondary alkyl bromide; high β-hydride risk"
-    },
-    {
-        "smiles": "CC(C)(C)Br",
-        "name": "tert-Butyl bromide",
-        "role": "electrophile",
-        "reaction_types": ["SN1"],
-        "features": ["sp3_bromide_present"],
-        "notes": "Tertiary alkyl bromide; no β-hydride; SN1 mechanism"
-    },
-    {
-        "smiles": "BrCc1ccccc1",
-        "name": "Benzyl bromide",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "SN2", "Negishi"],
-        "features": ["sp3_bromide_present", "benzylic_halide_present"],
-        "notes": "Benzylic position; activated sp3 halide"
-    },
-    {
-        "smiles": "C(Br)Cc1ccccc1",
-        "name": "2-Phenylethyl bromide",
-        "role": "electrophile",
-        "reaction_types": ["SN2", "Negishi", "Kumada"],
-        "features": ["sp3_bromide_present", "beta_hydride_possible"],
-        "notes": "Primary alkyl bromide with aryl substituent"
-    },
-    {
-        "smiles": "C=CCCBr",
-        "name": "4-Bromo-1-butene",
-        "role": "electrophile",
-        "reaction_types": ["SN2", "Negishi"],
-        "features": ["sp3_bromide_present", "alkene_present", "beta_hydride_possible"],
-        "notes": "Homoallylic bromide"
-    },
-    {
-        "smiles": "C=C(C)CBr",
-        "name": "3-Bromo-2-methylpropene (allylic)",
-        "role": "electrophile",
-        "reaction_types": ["SN2", "Allylic-substitution"],
-        "features": ["sp3_bromide_present", "allylic_halide_present", "alkene_present"],
-        "notes": "Allylic bromide; can undergo allylic substitution"
-    },
-    {
-        "smiles": "CC(C)(C)CBr",
-        "name": "Neopentyl bromide",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Negishi"],
-        "features": ["sp3_bromide_present"],
-        "notes": "No β-hydrogens; minimal elimination risk"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # NUCLEOPHILES - Boronic Acids and Esters (Suzuki)
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "c1ccc(B(O)O)cc1",
-        "name": "Phenylboronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present"],
-        "notes": "Standard boronic acid coupling partner"
-    },
-    {
-        "smiles": "COc1ccc(B(O)O)cc1",
-        "name": "4-Methoxyphenylboronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present"],
-        "notes": "Electron-rich boronic acid"
-    },
-    {
-        "smiles": "N#Cc1ccc(B(O)O)cc1",
-        "name": "4-Cyanophenylboronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present"],
-        "notes": "Electron-poor boronic acid"
-    },
-    {
-        "smiles": "c1ccc(B2OC(C)(C)C(C)(C)O2)cc1",
-        "name": "Phenylboronic acid pinacol ester",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present", "boron_bpin_present"],
-        "notes": "Protected boronic acid; more stable"
-    },
-    {
-        "smiles": "c1ccc([B-](F)(F)F)cc1.[K+]",
-        "name": "Potassium phenyltrifluoroborate",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present", "boron_bf3k_present"],
-        "notes": "BF3K salt; air-stable boronate"
-    },
-    {
-        "smiles": "C=CB(O)O",
-        "name": "Vinylboronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present", "alkene_present", "terminal_alkene_present"],
-        "notes": "Vinyl boronic acid"
-    },
-    {
-        "smiles": "C/C=C/B(O)O",
-        "name": "(E)-Propenylboronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present", "alkene_present"],
-        "notes": "Stereodefined vinyl boronic acid"
-    },
-    {
-        "smiles": "CCB(O)O",
-        "name": "Ethylboronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp3_boron_present"],
-        "notes": "Alkyl boronic acid; prone to β-hydride issues"
-    },
-    {
-        "smiles": "c1ccncc1B(O)O",
-        "name": "Pyridine-4-boronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present", "pyridine_present", "pyridine_poison_risk"],
-        "notes": "Heteroaryl boronic acid; pyridine coordination risk"
-    },
-    {
-        "smiles": "c1coc(B(O)O)c1",
-        "name": "Furan-2-boronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present"],
-        "notes": "Five-membered heterocyclic boronic acid"
-    },
-    {
-        "smiles": "c1csc(B(O)O)c1",
-        "name": "Thiophene-2-boronic acid",
-        "role": "nucleophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_boron_present"],
-        "notes": "Thiophene boronic acid; sulfur can coordinate"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # NUCLEOPHILES - Amines (Buchwald-Hartwig, Ullmann)
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "c1ccc(N)cc1",
-        "name": "Aniline",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann", "SNAr"],
-        "features": ["aniline_present", "aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Aromatic primary amine; standard C-N coupling partner"
-    },
-    {
-        "smiles": "CCN",
-        "name": "Ethylamine",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann", "SNAr"],
-        "features": ["aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Primary aliphatic amine"
-    },
-    {
-        "smiles": "CC(C)N",
-        "name": "Isopropylamine",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Branched primary amine; α-branching"
-    },
-    {
-        "smiles": "CC(C)(C)N",
-        "name": "tert-Butylamine",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig"],
-        "features": ["aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Highly hindered primary amine"
-    },
-    {
-        "smiles": "CCNC",
-        "name": "N-Methylethylamine",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Secondary aliphatic amine"
-    },
-    {
-        "smiles": "c1ccc(NC)cc1",
-        "name": "N-Methylaniline",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aniline_present", "aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Secondary aromatic amine"
-    },
-    {
-        "smiles": "c1ccc(N(C)C)cc1",
-        "name": "N,N-Dimethylaniline",
-        "role": "nucleophile",
-        "reaction_types": [],
-        "features": ["aniline_present", "aliphatic_amine_present"],
-        "notes": "Tertiary amine; not reactive in C-N coupling"
-    },
-    {
-        "smiles": "COc1ccc(N)cc1",
-        "name": "4-Methoxyaniline",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aniline_present", "aliphatic_amine_present"],
-        "notes": "Electron-rich aniline"
-    },
-    {
-        "smiles": "N#Cc1ccc(N)cc1",
-        "name": "4-Aminobenzonitrile",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aniline_present", "aliphatic_amine_present"],
-        "notes": "Electron-poor aniline; less nucleophilic"
-    },
-    {
-        "smiles": "Nc1ccncc1",
-        "name": "4-Aminopyridine",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig"],
-        "features": ["aliphatic_amine_present", "pyridine_present", "pyridine_poison_risk"],
-        "notes": "Heteroaryl amine; pyridine coordination"
-    },
-    {
-        "smiles": "c1ccc2[nH]ccc2c1",
-        "name": "Indole",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "C-H activation"],
-        "features": ["indole_present", "acidic_proton_present"],
-        "notes": "NH heterocycle; can act as nucleophile"
-    },
-    {
-        "smiles": "c1c[nH]c(N)c1",
-        "name": "3-Aminopyrrole",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig"],
-        "features": ["aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Heteroaryl amine with NH"
-    },
-    {
-        "smiles": "Nc1ccccc1C",
-        "name": "2-Methylaniline",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aniline_present", "aliphatic_amine_present"],
-        "notes": "Ortho-substituted aniline; sterically hindered"
-    },
-    {
-        "smiles": "Nc1cc(C)cc(C)c1",
-        "name": "3,5-Dimethylaniline",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig"],
-        "features": ["aniline_present", "aliphatic_amine_present"],
-        "notes": "Meta-substituted aniline"
-    },
-    {
-        "smiles": "NCc1ccccc1",
-        "name": "Benzylamine",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aliphatic_amine_present", "acidic_proton_present"],
-        "notes": "Benzylic amine; aliphatic but stabilized"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # NUCLEOPHILES - Alcohols and Phenols (C-O Coupling)
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "c1ccc(O)cc1",
-        "name": "Phenol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "SNAr", "Mitsunobu"],
-        "features": ["phenol_present", "acidic_proton_present"],
-        "notes": "Aromatic alcohol; C-O coupling partner"
-    },
-    {
-        "smiles": "CCO",
-        "name": "Ethanol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "Mitsunobu"],
-        "features": ["alcohol_present", "acidic_proton_present"],
-        "notes": "Simple aliphatic alcohol"
-    },
-    {
-        "smiles": "CC(C)O",
-        "name": "Isopropanol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "Mitsunobu"],
-        "features": ["alcohol_present", "acidic_proton_present"],
-        "notes": "Secondary alcohol"
-    },
-    {
-        "smiles": "CC(C)(C)O",
-        "name": "tert-Butanol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann"],
-        "features": ["alcohol_present", "acidic_proton_present"],
-        "notes": "Tertiary alcohol; sterically hindered"
-    },
-    {
-        "smiles": "COc1ccc(O)cc1",
-        "name": "4-Methoxyphenol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "SNAr"],
-        "features": ["phenol_present", "acidic_proton_present"],
-        "notes": "Electron-rich phenol"
-    },
-    {
-        "smiles": "N#Cc1ccc(O)cc1",
-        "name": "4-Hydroxybenzonitrile",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "SNAr"],
-        "features": ["phenol_present", "acidic_proton_present"],
-        "notes": "Electron-poor phenol; more acidic"
-    },
-    {
-        "smiles": "OCc1ccccc1",
-        "name": "Benzyl alcohol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "Mitsunobu"],
-        "features": ["alcohol_present", "acidic_proton_present"],
-        "notes": "Benzylic alcohol"
-    },
-    {
-        "smiles": "Oc1ccncc1",
-        "name": "4-Hydroxypyridine",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann"],
-        "features": ["phenol_present", "pyridine_present", "acidic_proton_present"],
-        "notes": "Heteroaryl phenol"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # NUCLEOPHILES - Thiols (C-S Coupling)
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "c1ccc(S)cc1",
-        "name": "Thiophenol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "SNAr"],
-        "features": ["thiol_present", "thiol_poison_risk", "acidic_proton_present"],
-        "notes": "Aromatic thiol; strong nucleophile; catalyst poison risk"
-    },
-    {
-        "smiles": "CCS",
-        "name": "Ethanethiol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann", "SNAr"],
-        "features": ["thiol_present", "thiol_poison_risk", "acidic_proton_present"],
-        "notes": "Aliphatic thiol; catalyst poison"
-    },
-    {
-        "smiles": "CC(C)S",
-        "name": "2-Propanethiol",
-        "role": "nucleophile",
-        "reaction_types": ["Ullmann"],
-        "features": ["thiol_present", "thiol_poison_risk", "acidic_proton_present"],
-        "notes": "Secondary thiol"
-    },
-    {
-        "smiles": "CSc1ccccc1",
-        "name": "Thioanisole",
-        "role": "none",
-        "reaction_types": [],
-        "features": ["thiol_poison_risk"],
-        "notes": "Sulfide; not nucleophilic but can poison catalysts"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # NUCLEOPHILES - Terminal Alkynes (Sonogashira)
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "C#C",
-        "name": "Acetylene",
-        "role": "nucleophile",
-        "reaction_types": ["Sonogashira"],
-        "features": ["alkyne_present", "terminal_alkyne_present"],
-        "notes": "Simplest terminal alkyne"
-    },
-    {
-        "smiles": "C#Cc1ccccc1",
-        "name": "Phenylacetylene",
-        "role": "nucleophile",
-        "reaction_types": ["Sonogashira"],
-        "features": ["alkyne_present", "terminal_alkyne_present"],
-        "notes": "Aryl-substituted terminal alkyne"
-    },
-    {
-        "smiles": "C#CC(C)(C)C",
-        "name": "3,3-Dimethylbut-1-yne",
-        "role": "nucleophile",
-        "reaction_types": ["Sonogashira"],
-        "features": ["alkyne_present", "terminal_alkyne_present"],
-        "notes": "Sterically hindered terminal alkyne"
-    },
-    {
-        "smiles": "C#C[Si](C)(C)C",
-        "name": "Trimethylsilylacetylene",
-        "role": "nucleophile",
-        "reaction_types": ["Sonogashira"],
-        "features": ["alkyne_present", "terminal_alkyne_present", "organosilane_present", "base_sensitive"],
-        "notes": "TMS-protected alkyne; deprotectable"
-    },
-    {
-        "smiles": "C#CCOC",
-        "name": "Methyl propargyl ether",
-        "role": "nucleophile",
-        "reaction_types": ["Sonogashira"],
-        "features": ["alkyne_present", "terminal_alkyne_present"],
-        "notes": "Ether-substituted alkyne"
-    },
-    {
-        "smiles": "C#Cc1ccncc1",
-        "name": "4-Ethynylpyridine",
-        "role": "nucleophile",
-        "reaction_types": ["Sonogashira"],
-        "features": ["alkyne_present", "terminal_alkyne_present", "pyridine_present"],
-        "notes": "Heteroaryl terminal alkyne"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # NUCLEOPHILES - Organometallic Reagents
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "[Mg]Brc1ccccc1",
-        "name": "Phenylmagnesium bromide",
-        "role": "nucleophile",
-        "reaction_types": ["Kumada"],
-        "features": ["grignard_present"],
-        "notes": "Grignard reagent for Kumada coupling"
-    },
-    {
-        "smiles": "CC[Mg]Br",
-        "name": "Ethylmagnesium bromide",
-        "role": "nucleophile",
-        "reaction_types": ["Kumada"],
-        "features": ["grignard_present"],
-        "notes": "Alkyl Grignard"
-    },
-    {
-        "smiles": "Cl[Zn]c1ccccc1",
-        "name": "Phenylzinc chloride",
-        "role": "nucleophile",
-        "reaction_types": ["Negishi"],
-        "features": ["organozinc_present"],
-        "notes": "Organozinc for Negishi coupling"
-    },
-    {
-        "smiles": "CC[Zn]Br",
-        "name": "Ethylzinc bromide",
-        "role": "nucleophile",
-        "reaction_types": ["Negishi"],
-        "features": ["organozinc_present"],
-        "notes": "Alkylzinc reagent"
-    },
-    {
-        "smiles": "c1ccc([Sn](C)(C)C)cc1",
-        "name": "Phenyltrimethylstannane",
-        "role": "nucleophile",
-        "reaction_types": ["Stille"],
-        "features": ["stannane_present"],
-        "notes": "Organotin for Stille coupling"
-    },
-    {
-        "smiles": "C=C[Sn](C)(C)C",
-        "name": "Vinyltrimethylstannane",
-        "role": "nucleophile",
-        "reaction_types": ["Stille"],
-        "features": ["stannane_present", "alkene_present"],
-        "notes": "Vinyl stannane"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # SPECIAL CASES - Multifunctional Compounds
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "Brc1ccc(B(O)O)cc1",
-        "name": "4-Bromophenylboronic acid",
-        "role": "bifunctional",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "sp2_boron_present", "aryl_halide_present"],
-        "notes": "Can act as both electrophile and nucleophile; selective coupling"
-    },
-    {
-        "smiles": "Brc1ccc(N)cc1",
-        "name": "4-Bromoaniline",
-        "role": "bifunctional",
-        "reaction_types": ["Buchwald-Hartwig", "Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "aniline_present", "aryl_halide_present", "aliphatic_amine_present"],
-        "notes": "Both electrophile (Br) and nucleophile (NH2); orthogonal protection needed"
-    },
-    {
-        "smiles": "Brc1ccc(O)cc1",
-        "name": "4-Bromophenol",
-        "role": "bifunctional",
-        "reaction_types": ["Ullmann", "Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "phenol_present", "aryl_halide_present"],
-        "notes": "Both electrophile (Br) and nucleophile (OH)"
-    },
-    {
-        "smiles": "Brc1ccc(C#C)cc1",
-        "name": "4-Bromophenylacetylene",
-        "role": "bifunctional",
-        "reaction_types": ["Sonogashira", "Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "alkyne_present", "terminal_alkyne_present", "aryl_halide_present"],
-        "notes": "Both electrophile (Br) and nucleophile (alkyne)"
-    },
-    {
-        "smiles": "Brc1ccc(Br)cc1",
-        "name": "1,4-Dibromobenzene",
-        "role": "di-electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "ArBr_present"],
-        "notes": "Two identical electrophilic sites; sp2_halide_site_count = 2"
-    },
-    {
-        "smiles": "Nc1ccc(N)cc1",
-        "name": "1,4-Phenylenediamine",
-        "role": "di-nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aniline_present", "aliphatic_amine_present"],
-        "notes": "Two identical nucleophilic sites"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # PROTECTED COMPOUNDS
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "Brc1ccc(NC(=O)OC(C)(C)C)cc1",
-        "name": "4-Bromo-N-Boc-aniline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira"],
-        "features": ["sp2_bromide_present", "aryl_halide_present"],
-        "notes": "Boc-protected amine; prevents C-N coupling"
-    },
-    {
-        "smiles": "Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1",
-        "name": "4-Bromo-TBS-phenol",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "organosilane_present", "base_sensitive"],
-        "notes": "TBS-protected phenol"
-    },
-    {
-        "smiles": "Brc1ccc(C(=O)OC)cc1",
-        "name": "Methyl 4-bromobenzoate",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "aryl_halide_present"],
-        "notes": "Ester-protected carboxylic acid"
-    },
-    {
-        "smiles": "Brc1ccc(C=O)cc1",
-        "name": "4-Bromobenzaldehyde",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "Sonogashira"],
-        "features": ["sp2_bromide_present", "aryl_halide_present"],
-        "notes": "Aldehyde functional group; can be reduced/oxidized"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # STERICALLY DEMANDING SUBSTRATES
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "Brc1c(C)c(C)c(C)c(C)c1C",
-        "name": "Pentamethylbromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "aryl_halide_present"],
-        "notes": "Extremely sterically hindered; requires bulky ligands"
-    },
-    {
-        "smiles": "Brc1ccc(C(C)(C)C)cc1",
-        "name": "4-Bromo-tert-butylbenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["sp2_bromide_present", "aryl_halide_present"],
-        "notes": "Para-tert-butyl substituent"
-    },
-    {
-        "smiles": "CC(C)(C)N",
-        "name": "tert-Butylamine",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig"],
-        "features": ["aliphatic_amine_present"],
-        "notes": "Highly hindered primary amine; challenging substrate"
-    },
-    {
-        "smiles": "CC(C)(C)c1ccc(N)cc1",
-        "name": "4-tert-Butylaniline",
-        "role": "nucleophile",
-        "reaction_types": ["Buchwald-Hartwig", "Ullmann"],
-        "features": ["aniline_present", "aliphatic_amine_present"],
-        "notes": "Sterically hindered aniline"
-    },
-
-
-    # ═══════════════════════════════════════════════════════════
-    # ELECTRON-RICH/POOR SUBSTRATES
-    # ═══════════════════════════════════════════════════════════
-
-    {
-        "smiles": "Brc1ccc([N+](=O)[O-])cc1",
-        "name": "4-Bromonitrobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig", "SNAr"],
-        "features": ["sp2_bromide_present", "aryl_halide_present"],
-        "notes": "Highly electron-poor; very reactive in SNAr"
-    },
-    {
-        "smiles": "Brc1ccc(N(C)C)cc1",
-        "name": "4-Bromo-N,N-dimethylaniline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Sonogashira"],
-        "features": ["sp2_bromide_present", "aryl_halide_present", "aniline_present"],
-        "notes": "Highly electron-rich; tertiary amine substituent"
-    },
-    {
-        "smiles": "COc1cc(OC)c(Br)c(OC)c1OC",
-        "name": "1-Bromo-2,3,4,5-tetramethoxybenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["sp2_bromide_present", "aryl_halide_present"],
-        "notes": "Extremely electron-rich; multiple methoxy groups"
-    },
-    {
-        "smiles": "Fc1c(F)c(F)c(Br)c(F)c1F",
-        "name": "Pentafluorobromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "SNAr"],
-        "features": ["sp2_bromide_present", "sp2_fluoride_present", "aryl_halide_present"],
-        "notes": "Extremely electron-poor; multiple fluorines"
-    },
-]
-
-
-# Convenience function to get compounds by role
 def get_compounds_by_role(role: str) -> List[Dict[str, Any]]:
-    """
-    Get all compounds matching a specific role.
-    
-    Args:
-        role: 'electrophile', 'nucleophile', 'bifunctional', or 'di-electrophile'
-    
-    Returns:
-        List of compound dictionaries
-    """
+    """Get all compounds matching a specific role."""
     return [c for c in ARYL_HALIDES if c.get("role") == role]
 
-
-# Convenience function to get compounds by reaction type
 def get_compounds_by_reaction(reaction_type: str) -> List[Dict[str, Any]]:
-    """
-    Get all compounds suitable for a specific reaction type.
-    
-    Args:
-        reaction_type: e.g., 'Suzuki-Miyaura', 'Buchwald-Hartwig', etc.
-    
-    Returns:
-        List of compound dictionaries
-    """
+    """Get all compounds suitable for a specific reaction type."""
     return [c for c in ARYL_HALIDES if reaction_type in c.get("reaction_types", [])]
 
-
-# ═══════════════════════════════════════════════════════════
-# PHASE 3/4 TEST COMPOUNDS - Advanced Features
-# ═══════════════════════════════════════════════════════════
-
-PHASE_3_4_COMPOUNDS = [
-    # Phase 3: Halogen counting & polyhalogenated
-    {
-        "smiles": "Brc1cc(Br)cc(Br)c1",
-        "name": "1,3,5-Tribromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "polyhalogenated"],
-        "notes": "Polyhalogenated substrate; halogen_count=3"
-    },
-    {
-        "smiles": "Fc1c(F)c(F)c(Br)c(F)c1F",
-        "name": "Pentafluorobromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "polyhalogenated", "strong_ewg_present"],
-        "notes": "Polyhalogenated with fluorine EWG; halogen_count=6"
-    },
-    {
-        "smiles": "Clc1ccc(Cl)nc1",
-        "name": "2,5-Dichloropyridine",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["heteroaryl_halide_present", "sp2_chloride_present", "ArCl_present", "polyhalogenated", "pyridine_present"],
-        "notes": "Polyhalogenated heteroaryl; halogen_count=2"
-    },
-    {
-        "smiles": "Ic1c(Cl)cccc1Cl",
-        "name": "2,6-Dichloro-iodobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "sp2_chloride_present", "polyhalogenated", "ortho_substitution_present"],
-        "notes": "Mixed halides with ortho substitution; halogen_count=3"
-    },
-    
-    # Phase 3: Steric hindrance (tert-butyl, isopropyl, ortho)
-    {
-        "smiles": "Brc1ccccc1C(C)(C)C",
-        "name": "2-tert-Butylbromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "tert_butyl_present", "ortho_substitution_present"],
-        "notes": "Sterically hindered ortho-tert-butyl"
-    },
-    {
-        "smiles": "Clc1cc(C(C)C)ccc1C(C)C",
-        "name": "3,5-Diisopropylchlorobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "isopropyl_present"],
-        "notes": "Multiple isopropyl substituents"
-    },
-    {
-        "smiles": "Ic1c(OC)cccc1OC",
-        "name": "2,6-Dimethoxyiodobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "ortho_substitution_present", "strong_edg_present"],
-        "notes": "Ortho-disubstituted with electron-donating groups"
-    },
-    {
-        "smiles": "Brc1c(C)c(C)c(C)c(C)c1C",
-        "name": "Pentamethylbromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "ortho_substitution_present"],
-        "notes": "Extremely sterically hindered; all positions substituted"
-    },
-    
-    # Phase 3: Protecting groups (BOC, CBZ, FMOC, silyl ethers)
-    {
-        "smiles": "Ic1ccc(NC(=O)OC(C)(C)C)cc1",
-        "name": "4-Iodo-N-Boc-aniline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "boc_present", "amide_present"],
-        "notes": "BOC-protected aniline"
-    },
-    {
-        "smiles": "Brc1ccc(NC(=O)OCc2ccccc2)cc1",
-        "name": "4-Bromo-N-Cbz-aniline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "cbz_present", "amide_present"],
-        "notes": "CBZ-protected aniline"
-    },
-    {
-        "smiles": "Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1",
-        "name": "4-Chloro-N-Fmoc-aniline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "fmoc_present", "amide_present", "fused_ring_system"],
-        "notes": "FMOC-protected aniline with fluorenyl group"
-    },
-    {
-        "smiles": "Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1",
-        "name": "4-Bromo-TBS-phenol",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "silyl_ether_present", "tert_butyl_present"],
-        "notes": "TBS-protected phenol"
-    },
-    {
-        "smiles": "Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1",
-        "name": "4-Iodo-TIPS-phenol",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "silyl_ether_present", "isopropyl_present"],
-        "notes": "TIPS-protected phenol"
-    },
-    
-    # Phase 4: Strong EWG/EDG
-    {
-        "smiles": "Brc1ccc([N+](=O)[O-])cc1",
-        "name": "4-Bromonitrobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "nitro_present", "strong_ewg_present"],
-        "notes": "Strong electron-withdrawing nitro group"
-    },
-    {
-        "smiles": "Clc1ccc(C#N)cc1",
-        "name": "4-Chlorobenzonitrile",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "nitrile_present", "strong_ewg_present"],
-        "notes": "Strong electron-withdrawing nitrile group"
-    },
-    {
-        "smiles": "Brc1ccc(N(C)C)cc1",
-        "name": "4-Bromo-N,N-dimethylaniline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "tertiary_amine_present", "strong_edg_present"],
-        "notes": "Strong electron-donating dialkylamino group"
-    },
-    {
-        "smiles": "Ic1ccc(OC)cc1",
-        "name": "4-Iodoanisole",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_iodide_present", "ArI_present", "strong_edg_present"],
-        "notes": "Strong electron-donating methoxy group"
-    },
-    
-    # Phase 4: Chelating groups (bidentate, phosphine)
-    {
-        "smiles": "Brc1ccccc1P(c2ccccc2)c2ccccc2",
-        "name": "2-Bromophenyl diphenylphosphine",
-        "role": "bifunctional",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "phosphine_present", "ortho_substitution_present"],
-        "notes": "Ortho-phosphine for ligand synthesis; note: not itself a bidentate chelator"
-    },
-    {
-        "smiles": "NC(Cc1ccccc1)C(=O)O",
-        "name": "Phenylalanine",
-        "role": "nucleophile",
-        "reaction_types": ["Peptide coupling"],
-        "features": ["primary_amine_present", "carboxylic_acid_present", "bidentate_chelator_present", "chiral_center_present"],
-        "notes": "Amino acid with bidentate chelating ability; chiral_center_count=1"
-    },
-    {
-        "smiles": "c1ccc(P(c2ccccc2)c2ccccc2)cc1",
-        "name": "Triphenylphosphine",
-        "role": "ligand",
-        "reaction_types": ["Various cross-couplings"],
-        "features": ["phosphine_present"],
-        "notes": "Common phosphine ligand"
-    },
-    {
-        "smiles": "c1ccc2c(c1)c(P(C)C)ccc2P(C)C",
-        "name": "1,8-Bis(dimethylphosphino)naphthalene",
-        "role": "ligand",
-        "reaction_types": ["Various cross-couplings"],
-        "features": ["phosphine_present", "fused_ring_system"],
-        "notes": "Bidentate phosphine ligand (note: current SMARTS doesn't capture P-P bidentate pattern)"
-    },
-    
-    # Phase 4: Molecular weight categories
-    {
-        "smiles": "CC",
-        "name": "Ethane",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["low_molecular_weight"],
-        "notes": "MW=30; low molecular weight test"
-    },
-    {
-        "smiles": "c1ccc2cc3ccccc3cc2c1",
-        "name": "Anthracene",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["fused_ring_system"],
-        "notes": "MW=178; medium molecular weight; fused rings"
-    },
-    {
-        "smiles": "c1ccc2cc3ccc4ccc5ccc6ccc1c7c2c3c4c5c67",
-        "name": "Coronene",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["fused_ring_system"],
-        "notes": "MW=300; large polycyclic aromatic (note: not high_molecular_weight which requires MW>500)"
-    },
-    
-    # Phase 4: Ring complexity (fused, spirocyclic)
-    {
-        "smiles": "Brc1ccc2ccccc2c1",
-        "name": "2-Bromonaphthalene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura", "Buchwald-Hartwig"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "fused_ring_system"],
-        "notes": "Fused bicyclic aromatic system"
-    },
-    {
-        "smiles": "Clc1ccc2c3ccccc3ccc2c1",
-        "name": "9-Chloroanthracene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_chloride_present", "ArCl_present", "fused_ring_system"],
-        "notes": "Tricyclic fused aromatic system"
-    },
-    {
-        "smiles": "C1CCC2(CC1)CCCC2",
-        "name": "Spiro[5.5]undecane",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["spirocyclic_present"],
-        "notes": "Spirocyclic aliphatic system"
-    },
-    {
-        "smiles": "Brc1ccc2c(c1)C1(CCCC1)CCCC2",
-        "name": "6-Bromo-spiro[chroman-2,1'-cyclohexane]",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "spirocyclic_present"],
-        "notes": "Spirocyclic with aryl bromide"
-    },
-    
-    # Phase 4: Chirality
-    {
-        "smiles": "C[C@H](N)C(=O)O",
-        "name": "(S)-Alanine",
-        "role": "nucleophile",
-        "reaction_types": ["Peptide coupling"],
-        "features": ["primary_amine_present", "carboxylic_acid_present", "chiral_center_present", "bidentate_chelator_present", "low_molecular_weight"],
-        "notes": "Chiral amino acid; chiral_center_count=1"
-    },
-    {
-        "smiles": "C[C@H](O)[C@H](C)O",
-        "name": "(2R,3R)-Butane-2,3-diol",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["alcohol_present", "chiral_center_present", "low_molecular_weight"],
-        "notes": "Two chiral centers; chiral_center_count=2"
-    },
-    {
-        "smiles": "C[C@H]1CC[C@@H](C)C[C@H]1C",
-        "name": "(1R,3R,5S)-1,3,5-Trimethylcyclohexane",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["chiral_center_present"],
-        "notes": "Three chiral centers; chiral_center_count=3"
-    },
-    {
-        "smiles": "Br[C@H](Cl)F",
-        "name": "(R)-Bromochlorofluoromethane",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["chiral_center_present", "polyhalogenated", "low_molecular_weight"],
-        "notes": "Chiral halomethane; chiral_center_count=1; halogen_count=3"
-    },
-    
-    # Additional Phase 3/4 compounds
-    {
-        "smiles": "Clc1cc(Cl)c(Br)c(Cl)c1",
-        "name": "2,4,5,6-Tetrachlorobromobenzene",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "sp2_chloride_present", "polyhalogenated", "ortho_substitution_present"],
-        "notes": "Highly polyhalogenated; halogen_count=5"
-    },
-    {
-        "smiles": "Brc1ccc(NC(=O)c2ccccc2)cc1",
-        "name": "4-Bromo-N-benzoylaniline",
-        "role": "electrophile",
-        "reaction_types": ["Suzuki-Miyaura"],
-        "features": ["aryl_halide_present", "sp2_bromide_present", "ArBr_present", "amide_present", "secondary_amide_present", "carbonyl_present"],
-        "notes": "Amide-protected aniline derivative"
-    },
-    {
-        "smiles": "C[C@@H]1CCC[C@@H](C)[C@@H]1C",
-        "name": "(1S,2R,5S)-1,2,5-Trimethylcyclohexane",
-        "role": "reference",
-        "reaction_types": [],
-        "features": ["chiral_center_present"],
-        "notes": "Multiple stereogenic centers; chiral_center_count=3"
-    },
-]
-
-
-# Convenience function to get compounds by feature
 def get_compounds_by_feature(feature: str) -> List[Dict[str, Any]]:
-    """
-    Get all compounds with a specific calculable feature.
-    
-    Args:
-        feature: e.g., 'sp2_bromide_present', 'ArBr_present', etc.
-    
-    Returns:
-        List of compound dictionaries
-    """
+    """Get all compounds with a specific calculable feature."""
     all_compounds = ARYL_HALIDES + PHASE_3_4_COMPOUNDS
     return [c for c in all_compounds if feature in c.get("features", [])]
 
-
-# Export all compounds as flat list
 ALL_SAMPLE_COMPOUNDS = ARYL_HALIDES + PHASE_3_4_COMPOUNDS
-
 
 if __name__ == "__main__":
     print(f"Total sample compounds: {len(ALL_SAMPLE_COMPOUNDS)}")
-    print(f"\nBreakdown by role:")
+    print("\nBreakdown by role:")
     print(f"  Electrophiles: {len(get_compounds_by_role('electrophile'))}")
     print(f"  Nucleophiles: {len(get_compounds_by_role('nucleophile'))}")
     print(f"  Bifunctional: {len(get_compounds_by_role('bifunctional'))}")
-    print(f"\nSample compounds for Suzuki-Miyaura: {len(get_compounds_by_reaction('Suzuki-Miyaura'))}")
-    print(f"Sample compounds for Buchwald-Hartwig: {len(get_compounds_by_reaction('Buchwald-Hartwig'))}")
+    print("\nSample compounds for Suzuki-Miyaura: " + str(len(get_compounds_by_reaction('Suzuki-Miyaura'))))
+    print("Sample compounds for Buchwald-Hartwig: " + str(len(get_compounds_by_reaction('Buchwald-Hartwig'))))
+

@@ -146,7 +146,7 @@ Applied if any condition matches:
 
 ## Feature System Integration
 
-The system uses calculable features loaded from the layered spec under `chemtools/taxonomy/data/` (merged at runtime via `chemtools.taxonomy.calculable_spec`):
+The system uses calculable features loaded from the layered spec under `chemtools/taxonomy/data/` (merged at runtime via `chemtools.taxonomy.calculable_spec`), with reactant types generated from `reactant_types.json`:
 
 ### Key Feature Categories
 
@@ -250,7 +250,7 @@ pytest tests/test_rule_engine.py -v
 ### Adding New Features
 
 1. Edit the appropriate layer:
-   - Atomic SMARTS/count detectors: `chemtools/taxonomy/data/calculable_features.json`
+   - Reactant type SMARTS: `chemtools/taxonomy/data/reactant_types.json`
    - Heuristic/descriptor features: `chemtools/taxonomy/data/calculable_features_properties.json`
    - Derived boolean rules/shortcuts: `chemtools/taxonomy/data/calculable_features_derived.json`
 2. Add feature definition with SMARTS, heuristic, or derivation logic

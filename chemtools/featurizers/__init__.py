@@ -6,10 +6,13 @@ from typing import List
 __all__ = [
     "analysis",
     "calculable",
+    "molecule",
     "molpipeline",
+    "reaction",
     "reaction_detection",
     "reaction_pair",
     "structural",
+    "unified",
 ]
 
 

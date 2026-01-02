@@ -156,7 +156,7 @@
   {
     "id": "Alkyl-C-H",
     "name": "alkyl C-H donor",
-    "description": "Aliphatic C–H donors; acidic/activated variants for C–H activation.",
+    "description": "Aliphatic C\u2013H donors; acidic/activated variants for C\u2013H activation.",
     "category": "",
     "smarts": "",
     "aliases": [],
@@ -164,7 +164,7 @@
     "members": [
       {
         "id": "Alkyl-H",
-        "name": "aliphatic C–H donor",
+        "name": "aliphatic C\u2013H donor",
         "smarts": "[CX4;H1,H2,H3]",
         "aliases": [],
         "metadata": {
@@ -175,7 +175,7 @@
       },
       {
         "id": "Alkyl-H-acidic",
-        "name": "acidic aliphatic C–H donor (α to EWG)",
+        "name": "acidic aliphatic C\u2013H donor (\u03b1 to EWG)",
         "smarts": "[CX4;H1,H2,H3][CX3]=O",
         "aliases": [],
         "metadata": {
@@ -274,7 +274,7 @@
       },
       {
         "id": "acetylene",
-        "name": "acetylene (HC≡CH)",
+        "name": "acetylene (HC\u2261CH)",
         "smarts": "[CX2;H1]#[CX2;H1]",
         "aliases": [],
         "metadata": {
@@ -285,7 +285,7 @@
       },
       {
         "id": "internal-alkyne",
-        "name": "internal alkyne (R-C≡C-R)",
+        "name": "internal alkyne (R-C\u2261C-R)",
         "smarts": "[#6][CX2;H0]#[CX2;H0][#6]",
         "aliases": [],
         "metadata": {
@@ -296,7 +296,7 @@
       },
       {
         "id": "terminal-alkyne",
-        "name": "terminal alkyne (R-C≡CH)",
+        "name": "terminal alkyne (R-C\u2261CH)",
         "smarts": "[#6][CX2]#[CX2;H1]",
         "aliases": [],
         "metadata": {
@@ -497,7 +497,7 @@
   {
     "id": "ArH",
     "name": "aryl C-H donor",
-    "description": "Aryl and heteroaryl C–H donors for direct arylation.",
+    "description": "Aryl and heteroaryl C\u2013H donors for direct arylation.",
     "category": "",
     "smarts": "",
     "aliases": [],
@@ -505,7 +505,7 @@
     "members": [
       {
         "id": "Ar-H",
-        "name": "aryl C–H donor",
+        "name": "aryl C\u2013H donor",
         "smarts": "c[H]",
         "aliases": [],
         "metadata": {
@@ -516,7 +516,7 @@
       },
       {
         "id": "Hetero-ArH",
-        "name": "heteroaryl C–H donor",
+        "name": "heteroaryl C\u2013H donor",
         "smarts": "[n,o,s]1:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:[c,n,o,s]:1[H]",
         "aliases": [],
         "metadata": {
@@ -814,7 +814,7 @@
       {
         "id": "B2H6",
         "name": "diborane",
-        "smarts": "[B]",
+        "smarts": "[BH3][BH3]",
         "aliases": [],
         "metadata": {
           "coupling_role": "other",
@@ -1000,7 +1000,7 @@
     "members": [
       {
         "id": "activated-dienophile",
-        "name": "α,β-unsaturated carbonyl",
+        "name": "\u03b1,\u03b2-unsaturated carbonyl",
         "smarts": "[#6]=[#6][CX3]=O",
         "aliases": [],
         "metadata": {
@@ -1099,7 +1099,7 @@
     "members": [
       {
         "id": "beta_dicarbonyl",
-        "name": "β-dicarbonyl compound",
+        "name": "\u03b2-dicarbonyl compound",
         "smarts": "[CX3](=O)[CX4][CX3](=O)",
         "aliases": [],
         "metadata": {
@@ -1238,17 +1238,6 @@
           "coupling_role": "reductant",
           "legacy_taxonomy_id": "formic_acid",
           "feature_token": "formic_acid_reactant"
-        }
-      },
-      {
-        "id": "isopropanol",
-        "name": "isopropanol (H-donor)",
-        "smarts": "CC(C)O",
-        "aliases": [],
-        "metadata": {
-          "coupling_role": "reductant",
-          "legacy_taxonomy_id": "isopropanol",
-          "feature_token": "isopropanol_reactant"
         }
       }
     ]
@@ -2092,7 +2081,7 @@
   {
     "id": "RNH2/R2NH",
     "name": "aliphatic amine",
-    "description": "Aliphatic primary/secondary/tertiary amines (including α-branched variants).",
+    "description": "Aliphatic primary/secondary/tertiary amines (including \u03b1-branched variants).",
     "category": "",
     "smarts": "",
     "aliases": [],
@@ -2111,7 +2100,7 @@
       },
       {
         "id": "R2NH-a-branch",
-        "name": "secondary aliphatic amine (α-branched)",
+        "name": "secondary aliphatic amine (\u03b1-branched)",
         "smarts": "[CX4;H1]([#6])([#6])[NX3;H1;!$(NC=O)]",
         "aliases": [],
         "metadata": {
@@ -2144,7 +2133,7 @@
       },
       {
         "id": "RNH2-a-branch",
-        "name": "primary aliphatic amine (α-branched)",
+        "name": "primary aliphatic amine (\u03b1-branched)",
         "smarts": "[CX4;H1]([#6])([#6])[NX3;H2;!$(NC=O)]",
         "aliases": [],
         "metadata": {
@@ -2213,7 +2202,7 @@
   {
     "id": "ROH",
     "name": "aliphatic alcohol",
-    "description": "Aliphatic alcohols (primary, secondary, tertiary, and α-branched).",
+    "description": "Aliphatic alcohols (primary, secondary, tertiary, and \u03b1-branched).",
     "category": "",
     "smarts": "",
     "aliases": [],
@@ -2221,7 +2210,7 @@
     "members": [
       {
         "id": "ROH-a-branch",
-        "name": "aliphatic alcohol (α-branched)",
+        "name": "aliphatic alcohol (\u03b1-branched)",
         "smarts": "[CX4;H1]([#6])([#6])[OX2H]",
         "aliases": [],
         "metadata": {
@@ -2261,6 +2250,17 @@
           "coupling_role": "nucleophile",
           "legacy_taxonomy_id": "ROH-tertiary",
           "feature_token": "ROH-tertiary_reactant"
+        }
+      },
+      {
+        "id": "isopropanol",
+        "name": "isopropanol (H-donor)",
+        "smarts": "CC(C)[OX2H]",
+        "aliases": [],
+        "metadata": {
+          "coupling_role": "reductant",
+          "legacy_taxonomy_id": "isopropanol",
+          "feature_token": "isopropanol_reactant"
         }
       }
     ]
