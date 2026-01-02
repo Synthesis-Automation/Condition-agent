@@ -1011,7 +1011,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             if reaction_type:
                 v2_entry["reaction_type"] = reaction_type
 
-            out_lines.append(_json.dumps(v2_entry, ensure_ascii=False, separators=(',', ':')))
+            # Use separators with spaces to make it "less messy" while remaining valid JSONL
+            out_lines.append(_json.dumps(v2_entry, ensure_ascii=False, separators=(', ', ': ')))
             
             if idx % 100 == 0:
                 print(f"  Processed {idx}/{len(rows)} reactions...")

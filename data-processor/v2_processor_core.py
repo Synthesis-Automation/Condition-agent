@@ -6,6 +6,7 @@ Uses taxonomy-based classification and structural featurization.
 import json
 import os
 import sys
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -32,6 +33,10 @@ class V2Processor:
 
     def classify_reagent(self, name: str, cas: str = "", smiles: str = "") -> Dict[str, Any]:
         """Classify a reagent using the V2 taxonomy."""
+        # If name looks like a CAS and cas is empty, swap them
+        if not cas and name and re.match(r'^\d{2,7}-\d{2}-\d$', name):
+            cas = name
+
         match = self.store.classify_reagent(name=name, cas=cas, smiles=smiles)
         
         if match:
@@ -44,14 +49,29 @@ class V2Processor:
             }
             
         # Fallback to heuristics if taxonomy match fails
-        inferred = self.heuristics.infer_role(name, [])
+        # Try both name and cas (if cas was swapped from name)
+        inferred = self.heuristics.infer_family(name, [])
+        if not inferred:
+            inferred_role = self.heuristics.infer_role(name, [])
+            if inferred_role:
+                role, pattern = inferred_role
+                inferred = (role, "INFERRED", [pattern])
+                
+        if not inferred and cas:
+            inferred = self.heuristics.infer_family(cas, [])
+            if not inferred:
+                inferred_role = self.heuristics.infer_role(cas, [])
+                if inferred_role:
+                    role, pattern = inferred_role
+                    inferred = (role, "INFERRED", [pattern])
+            
         if inferred:
-            role, pattern = inferred
+            role, family_id, matches = inferred
             return {
                 "name": name,
                 "cas": cas,
                 "role": role,
-                "family": "INFERRED",
+                "family": family_id,
                 "match_kind": "heuristic"
             }
 
@@ -193,7 +213,7 @@ class V2Processor:
 
     def _standardize_conditions(self, raw_reagents: List[Dict[str, str]], raw_solvents: List[Dict[str, str]], reaction_data: Dict[str, Any]) -> Dict[str, Any]:
         conditions = {
-            "catalyst": None,
+            "catalyst": [],
             "ligand": [],
             "base": [],
             "additive": [],
@@ -210,7 +230,7 @@ class V2Processor:
             role = classification["role"]
             
             if role == "metal_catalyst":
-                conditions["catalyst"] = name
+                conditions["catalyst"].append(name)
             elif role == "ligand":
                 conditions["ligand"].append(name)
             elif role == "base":
