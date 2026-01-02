@@ -454,7 +454,7 @@ hte_recs = hte_recommender.recommend(smiles_a, smiles_b)
 
 ```python
 class HTERecommender:
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.csv")
+    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.jsonl")
 
     def recommend(
         self,

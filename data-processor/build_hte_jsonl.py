@@ -43,6 +43,13 @@ _HTE_REACTION_OVERRIDES = {
     "sonogashira": "sonogashira",
     "heck": "heck",
     "amide_formation": "amide_coupling",
+    "arylation_acidic_c_h": "c_h_activation",
+    "ch_activation": "c_h_activation",
+    "condensation": "condensation",
+    "cyclization": "cyclization",
+    "borylation_miyaura": "miyaura_borylation",
+    "negishi_in_situ": "negishi_coupling",
+    "negishi": "negishi_coupling",
 }
 
 _HTE_ORGANIC_OVERRIDES = {
@@ -166,12 +173,6 @@ def _canonical_member(
     return None
 
 
-def _categories_from_types(
-    tokens: Iterable[str],
-) -> List[str]:
-    return _unique_list([token.strip() for token in tokens if token.strip()])
-
-
 def _load_organic_compounds_aliases() -> Dict[str, str]:
     if not _ORGANIC_COMPOUNDS_FILE.exists():
         return {}
@@ -243,8 +244,6 @@ def build_hte_jsonl(
 
                 reactant_types = _unique_list(reactant_types)
 
-                reactant_categories = _categories_from_types(reactant_types)
-
                 conditions = {
                     "catalyst": _unique_list(_split_values(row.get("Catalyst"))),
                     "ligand": _unique_list(_split_values(row.get("Ligand"))),
@@ -265,7 +264,6 @@ def build_hte_jsonl(
                 entry = {
                     "reaction_type": reaction_type,
                     "reactant_types": reactant_types,
-                    "reactant_categories": sorted(reactant_categories),
                     "conditions": conditions,
                     "metrics": metrics,
                 }

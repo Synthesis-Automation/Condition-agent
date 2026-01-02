@@ -24,13 +24,11 @@ Key Components:
 
 ## Database Structure
 
-**HTE_0.csv** (66,308 experiments):
-- **Reaction_Type_Standardized**: 41 types (C_N_Coupling, Suzuki, CH-Activation, etc.)
-- **AREA_TOTAL_REDUCED**: Yield/conversion (0-100%)
-- **Reactant_A/B_Type**: Detected member types (ArBr, RNH2, ArB(OH)2, etc.)
-- **Reactant_A/B_Category**: Higher-level categories (ArX*, RNH2/R2NH, ArB*, etc.)
-- **Catalyst, Ligand, Base, Solvent**: Condition components
-- **Secondary Solvent, Additive, Coupling Reagent**: Optional components
+**HTE_0.jsonl** (66,308 experiments):
+- **reaction_type**: 41 types (c_n_cross_coupling, suzuki_miyaura, c_h_activation, etc.)
+- **reactant_types**: Detected member types (Ar-Br, Any-NH2, Ar-B(OH)2, etc.)
+- **conditions**: catalyst, ligand, base, solvent, secondary_solvent, additive, coupling_reagent
+- **metrics**: area_total_reduced, z_score
 
 **Statistics**:
 - Success rate (yield > 50%): 18.8% overall
@@ -188,7 +186,7 @@ print(stats)
 
 ```python
 class HTERecommender:
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.csv")
+    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.jsonl")
     
     def recommend(
         self,
@@ -365,6 +363,6 @@ print(f'Found {len(result.recommendations)} recommendations')
 
 ## References
 
-- HTE Database: `data/HTE_db/HTE_0.csv`
+- HTE Database: `data/HTE_db/HTE_0.jsonl`
 - Reactant Type System: `chemtools/taxonomy/data/reactant_types.json`
 - Classification: `chemtools/analysis/reactants.py`

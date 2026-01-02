@@ -75,16 +75,16 @@ python -m chemtools.HTE.analytics_cli export suzuki_pd.csv --reaction Suzuki --c
 
 ### HTEAnalytics Class
 
-#### `__init__(hte_db_path="data/HTE_db/HTE_0.csv")`
+#### `__init__(hte_db_path="data/HTE_db/HTE_0.jsonl")`
 
 Initialize analytics with HTE database.
 
 **Parameters:**
-- `hte_db_path` (str): Path to HTE database CSV file
+- `hte_db_path` (str): Path to HTE database JSONL file
 
 **Example:**
 ```python
-analytics = HTEAnalytics("data/HTE_db/HTE_0.csv")
+analytics = HTEAnalytics("data/HTE_db/HTE_0.jsonl")
 ```
 
 ---
@@ -550,21 +550,12 @@ print(f"  Ratio: {pd_count/cu_count:.2f}:1 (Pd:Cu)")
 
 ## Database Schema
 
-The HTE database (`HTE_0.csv`) contains the following columns:
+The HTE database (`HTE_0.jsonl`) contains the following fields:
 
-- `Reaction_Type_Standardized`: Standardized reaction type name
-- `AREA_TOTAL_REDUCED`: Yield/response (0-100)
-- `z-Score`: Statistical z-score for the experiment
-- `Reactant_A`, `Reactant_B`: SMILES strings
-- `Reactant_A_Type`, `Reactant_B_Type`: Classified reactant types
-- `Reactant_A_Category`, `Reactant_B_Category`: Broader categories
-- `Catalyst`: Catalyst name
-- `Ligand`: Ligand name
-- `Base`: Base name
-- `Solvent`: Primary solvent
-- `Secondary Solvent`: Secondary solvent (if used)
-- `Additive`: Additive (if used)
-- `Coupling Reagent`: Coupling reagent (if used)
+- `reaction_type`: Standardized reaction type name
+- `reactant_types`: Classified reactant types
+- `conditions`: Condition components (catalyst, ligand, base, solvent, secondary_solvent, additive, coupling_reagent)
+- `metrics`: Yield/response metrics (area_total_reduced, z_score)
 
 **Total:** 66,308 experiments across 41 reaction types
 

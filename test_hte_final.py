@@ -10,8 +10,8 @@ from examples.sample_reactions import SAMPLE_REACTIONS
 from chemtools.smiles import normalize_reaction
 
 def test_hte_recommender_full():
-    # Initialize with the V2 database
-    recommender = HTERecommender(hte_db_path="data/HTE_db/HTE_V2_Full.csv")
+    # Initialize with the JSONL database
+    recommender = HTERecommender(hte_db_path="data/HTE_db/HTE_0.jsonl")
     
     # Test a diverse set of reactions from sample_reactions.py
     # We'll pick a few from different categories

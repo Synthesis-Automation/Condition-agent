@@ -10,8 +10,77 @@ Provides analytical functions to explore and understand the HTE database:
 
 from typing import List, Dict, Optional, Tuple, Any
 from collections import defaultdict, Counter
+import json
 import pandas as pd
 from pathlib import Path
+
+
+def _ensure_list(values: Any) -> List[str]:
+    if values is None:
+        return []
+    if isinstance(values, list):
+        return [str(v).strip() for v in values if str(v).strip()]
+    if isinstance(values, str):
+        text = values.strip()
+        return [text] if text else []
+    text = str(values).strip()
+    return [text] if text else []
+
+
+def _dedupe_list(values: List[str]) -> List[str]:
+    seen = set()
+    out: List[str] = []
+    for value in values:
+        if not value:
+            continue
+        if value in seen:
+            continue
+        seen.add(value)
+        out.append(value)
+    return out
+
+
+def _format_list(values: Any) -> str:
+    items = _dedupe_list(_ensure_list(values))
+    return " / ".join(items)
+
+
+def _load_hte_jsonl(path: Path) -> pd.DataFrame:
+    rows: List[Dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            reactant_types = _ensure_list(record.get("reactant_types"))
+            reactant_categories = _ensure_list(record.get("reactant_categories"))
+            conditions = record.get("conditions") or {}
+            metrics = record.get("metrics") or {}
+
+            row = {
+                "Reaction_Type_Standardized": record.get("reaction_type") or "Unknown",
+                "Reactant_A_Type": reactant_types[0] if len(reactant_types) > 0 else "",
+                "Reactant_B_Type": reactant_types[1] if len(reactant_types) > 1 else "",
+                "Reactant_A_Category": reactant_categories[0] if len(reactant_categories) > 0 else "",
+                "Reactant_B_Category": reactant_categories[1] if len(reactant_categories) > 1 else "",
+                "Catalyst": _format_list(conditions.get("catalyst")),
+                "Ligand": _format_list(conditions.get("ligand")),
+                "Base": _format_list(conditions.get("base")),
+                "Solvent": _format_list(conditions.get("solvent")),
+                "Secondary Solvent": _format_list(conditions.get("secondary_solvent")),
+                "Additive": _format_list(conditions.get("additive")),
+                "Coupling Reagent": _format_list(conditions.get("coupling_reagent")),
+                "AREA_TOTAL_REDUCED": metrics.get("area_total_reduced"),
+                "z-Score": metrics.get("z_score"),
+            }
+            rows.append(row)
+
+    return pd.DataFrame(rows)
 
 
 class HTEAnalytics:
@@ -25,7 +94,7 @@ class HTEAnalytics:
     - Statistical distributions
     """
     
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.csv"):
+    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.jsonl"):
         """Initialize analytics with HTE database"""
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
@@ -36,7 +105,10 @@ class HTEAnalytics:
         if not self.db_path.exists():
             raise FileNotFoundError(f"HTE database not found: {self.db_path}")
         
-        self.df = pd.read_csv(self.db_path)
+        if self.db_path.suffix.lower() == ".jsonl":
+            self.df = _load_hte_jsonl(self.db_path)
+        else:
+            self.df = pd.read_csv(self.db_path)
         print(f"📊 Loaded HTE database: {len(self.df):,} experiments")
     
     def list_reactant_pairs(

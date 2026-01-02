@@ -14,11 +14,12 @@ Key Features:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Tuple, Any
+from typing import List, Dict, Optional, Tuple, Any, Iterable
 from collections import defaultdict, Counter
 from functools import lru_cache
 import pandas as pd
 from pathlib import Path
+import json
 
 from chemtools.featurizers.structural import featurize_molecule
 
@@ -26,31 +27,31 @@ from chemtools.featurizers.structural import featurize_molecule
 @lru_cache(maxsize=4)
 def _load_hte_database_cached(
     hte_db_path: str,
-) -> Tuple[pd.DataFrame, Dict[Tuple[str, str], pd.DataFrame], Dict[Tuple[str, str], Counter]]:
+) -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame], Dict[str, Counter]]:
     """Load and index the HTE database once per path (cached)."""
     db_path = Path(hte_db_path)
     if not db_path.exists():
         raise FileNotFoundError(f"HTE database not found: {db_path}")
 
-    df = pd.read_csv(db_path)
+    if db_path.suffix.lower() == ".jsonl":
+        df = _load_hte_jsonl(db_path)
+    else:
+        df = pd.read_csv(db_path)
+        if "Reactant_Types_Key" not in df.columns:
+            df["Reactant_Types_Key"] = df.apply(
+                lambda row: _reactant_key([row.get("Reactant_A_Type"), row.get("Reactant_B_Type")]),
+                axis=1,
+            )
     print(f"Loaded HTE database: {len(df)} experiments")
 
-    indexed_data: Dict[Tuple[str, str], pd.DataFrame] = {}
-    reaction_type_patterns: Dict[Tuple[str, str], Counter] = {}
+    indexed_data: Dict[str, pd.DataFrame] = {}
+    reaction_type_patterns: Dict[str, Counter] = {}
 
-    # Use V2 Motifs if available, otherwise fallback to legacy types
-    col_a = "Reactant_A_Motifs" if "Reactant_A_Motifs" in df.columns else "Reactant_A_Type"
-    col_b = "Reactant_B_Motifs" if "Reactant_B_Motifs" in df.columns else "Reactant_B_Type"
+    print("Building reactant type indices using Reactant_Types_Key...")
 
-    print(f"Building reactant type indices using {col_a} and {col_b}...")
-    
-    # Fill NaN with empty string for motifs
-    df[col_a] = df[col_a].fillna("")
-    df[col_b] = df[col_b].fillna("")
-    
-    grouped = df.groupby([col_a, col_b])
-    for (type_a, type_b), group_df in grouped:
-        key = (type_a, type_b)
+    df["Reactant_Types_Key"] = df["Reactant_Types_Key"].fillna("")
+    grouped = df.groupby(["Reactant_Types_Key"])
+    for key, group_df in grouped:
         indexed_data[key] = group_df
 
         rxn_types = group_df["Reaction_Type_Standardized"].value_counts()
@@ -58,6 +59,80 @@ def _load_hte_database_cached(
 
     print(f"Indexed {len(indexed_data)} unique reactant type combinations")
     return df, indexed_data, reaction_type_patterns
+
+
+def _ensure_list(values: Any) -> List[str]:
+    if values is None:
+        return []
+    if isinstance(values, list):
+        return [str(v).strip() for v in values if str(v).strip()]
+    if isinstance(values, str):
+        text = values.strip()
+        return [text] if text else []
+    text = str(values).strip()
+    return [text] if text else []
+
+
+def _dedupe_list(values: Iterable[str]) -> List[str]:
+    seen = set()
+    out: List[str] = []
+    for value in values:
+        if not value:
+            continue
+        if value in seen:
+            continue
+        seen.add(value)
+        out.append(value)
+    return out
+
+
+def _format_list(values: Any) -> str:
+    items = _dedupe_list(_ensure_list(values))
+    return " / ".join(items)
+
+
+def _reactant_key(values: Iterable[Optional[str]]) -> str:
+    items = _dedupe_list([str(v).strip() for v in values if v])
+    return "|".join(sorted(items))
+
+
+def _load_hte_jsonl(path: Path) -> pd.DataFrame:
+    rows: List[Dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            reactant_types = _ensure_list(record.get("reactant_types"))
+            reactant_categories = _ensure_list(record.get("reactant_categories"))
+            conditions = record.get("conditions") or {}
+            metrics = record.get("metrics") or {}
+
+            row = {
+                "Reaction_Type_Standardized": record.get("reaction_type") or "Unknown",
+                "Reactant_A_Type": reactant_types[0] if len(reactant_types) > 0 else "",
+                "Reactant_B_Type": reactant_types[1] if len(reactant_types) > 1 else "",
+                "Reactant_A_Category": reactant_categories[0] if len(reactant_categories) > 0 else "",
+                "Reactant_B_Category": reactant_categories[1] if len(reactant_categories) > 1 else "",
+                "Reactant_Types_Key": _reactant_key(reactant_types),
+                "Catalyst": _format_list(conditions.get("catalyst")),
+                "Ligand": _format_list(conditions.get("ligand")),
+                "Base": _format_list(conditions.get("base")),
+                "Solvent": _format_list(conditions.get("solvent")),
+                "Secondary Solvent": _format_list(conditions.get("secondary_solvent")),
+                "Additive": _format_list(conditions.get("additive")),
+                "Coupling Reagent": _format_list(conditions.get("coupling_reagent")),
+                "AREA_TOTAL_REDUCED": metrics.get("area_total_reduced"),
+                "z-Score": metrics.get("z_score"),
+            }
+            rows.append(row)
+
+    return pd.DataFrame(rows)
 
 
 @dataclass
@@ -127,7 +202,7 @@ class HTERecommender:
     5. Return top-k recommendations
     """
     
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_V2_Full.csv"):
+    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.jsonl"):
         """Initialize recommender with HTE database"""
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
@@ -139,26 +214,27 @@ class HTERecommender:
         self.indexed_data = dict(indexed_data)
         self.reaction_type_patterns = dict(patterns)
     
-    def _detect_reactant_types(self, smiles: str) -> Tuple[Optional[str], Optional[str]]:
+    def _detect_reactant_types(self, smiles: str) -> Tuple[List[str], Optional[str]]:
         """
         Detect reactant motifs and categories from SMILES using V2 Taxonomy.
         
         Returns:
-            (motifs_str, category) e.g., ("Ar-Br,Ar-OH", "Aryl Halide")
+            (motifs, category) e.g., (["Ar-Br", "Ar-OH"], "Aryl Halide")
         """
         if not smiles:
-            return None, None
+            return [], None
             
         analysis = featurize_molecule(smiles)
         
         # Extract motif IDs (e.g., "Ar-Br")
-        motifs = sorted(list(set(m["compound_id"] for m in analysis.get("motifs", []))))
-        motifs_str = ",".join(motifs) if motifs else ""
+        motifs = _dedupe_list(
+            [m.get("compound_id", "") for m in analysis.get("motifs", []) if m.get("compound_id")]
+        )
         
         # Use the first motif's category as a general category
         category = analysis.get("motifs", [{}])[0].get("category", "Unknown") if analysis.get("motifs") else "Unknown"
         
-        return motifs_str, category
+        return motifs, category
     
     def _filter_by_catalyst(self, df: pd.DataFrame, catalyst_filter: str) -> pd.DataFrame:
         """
@@ -199,21 +275,21 @@ class HTERecommender:
         return df[mask]
     
     def _predict_reaction_type(
-        self, 
-        type_a: str, 
-        type_b: str
+        self,
+        type_a: str,
+        type_b: str,
     ) -> Tuple[Optional[str], float]:
         """
         Predict reaction type based on reactant type combination.
-        
+
         Returns:
             (reaction_type, confidence_score)
         """
-        key = (type_a, type_b)
-        
+        key = _reactant_key([type_a, type_b])
+
         if key not in self.reaction_type_patterns:
             return None, 0.0
-        
+
         rxn_counts = self.reaction_type_patterns[key]
         if not rxn_counts:
             return None, 0.0
@@ -383,15 +459,15 @@ class HTERecommender:
         
         # Step 1: Detect reactant types
         type_a, cat_a = self._detect_reactant_types(reactant_a_smiles)
-        result.reactant_a_type = type_a
+        result.reactant_a_type = ",".join(type_a) if type_a else ""
         result.reactant_a_category = cat_a
         
         if reactant_b_smiles:
             type_b, cat_b = self._detect_reactant_types(reactant_b_smiles)
-            result.reactant_b_type = type_b
+            result.reactant_b_type = ",".join(type_b) if type_b else ""
             result.reactant_b_category = cat_b
         else:
-            type_b, cat_b = "", ""
+            type_b, cat_b = [], ""
             result.reactant_b_type = ""
             result.reactant_b_category = ""
         
@@ -400,44 +476,36 @@ class HTERecommender:
             return result
         
         # Step 3: Match against database
-        key = (type_a or "", type_b or "")
+        key = _reactant_key(list(type_a) + list(type_b))
         
         matched_df = None
         if key in self.indexed_data:
             matched_df = self.indexed_data[key].copy()
-            result.matched_motifs = key
+            result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
         else:
-            # Hierarchical Fallback: Try swapped key
-            swapped_key = (type_b or "", type_a or "")
-            if swapped_key in self.indexed_data:
-                matched_df = self.indexed_data[swapped_key].copy()
-                result.matched_motifs = swapped_key
-                result.is_fallback_match = True
-            
-            # Hierarchical Fallback: Try individual motifs if multiple are present
-            if matched_df is None:
-                list_a = type_a.split(",") if type_a else [""]
-                list_b = type_b.split(",") if type_b else [""]
-                
-                for ma in list_a:
-                    for mb in list_b:
-                        if not ma and not mb: continue
-                        for k in [(ma, mb), (mb, ma)]:
-                            if k in self.indexed_data:
-                                matched_df = self.indexed_data[k].copy()
-                                result.matched_motifs = k
-                                result.is_fallback_match = True
-                                print(f"   (Fallback match: {k[0]} + {k[1]})")
-                                break
-                        if matched_df is not None: break
-                    if matched_df is not None: break
+            list_a = type_a or [""]
+            list_b = type_b or [""]
+            for ma in list_a:
+                for mb in list_b:
+                    if not ma and not mb:
+                        continue
+                    candidate = _reactant_key([ma, mb])
+                    if candidate in self.indexed_data:
+                        matched_df = self.indexed_data[candidate].copy()
+                        result.matched_motifs = (ma, mb)
+                        result.is_fallback_match = True
+                        break
+                if matched_df is not None:
+                    break
 
         if matched_df is None:
             return result
         
         # Step 2: Predict reaction type (using matched motifs)
         if result.matched_motifs:
-            pred_rxn, rxn_conf = self._predict_reaction_type(result.matched_motifs[0], result.matched_motifs[1])
+            pred_rxn, rxn_conf = self._predict_reaction_type(
+                result.reactant_a_type, result.reactant_b_type
+            )
             result.predicted_reaction_type = pred_rxn
             result.reaction_type_confidence = rxn_conf
         
