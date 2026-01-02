@@ -2,7 +2,6 @@
   "version": "3.3",
   "depends_on": {
     "organic_groups": "organic_groups.v1.3.json",
-    "smarts_templates": "smarts_templates.v1.json",
     "organic_compounds": "organic_compounds.v1.3.json",
     "source_reaction_types_old": "reaction_types -old.json"
   },
@@ -90,7 +89,6 @@
       "Allyl-OH",
       "Any-OH",
       "Ar-OH",
-      "AromN-OH",
       "Bn-OH",
       "RCH2-OH",
       "R2CH-OH",
@@ -165,7 +163,7 @@
   "reaction_types": [
     {
       "id": "suzuki_miyaura",
-      "name": "Suzuki–Miyaura coupling",
+      "name": "Suzuki\u2013Miyaura coupling",
       "category": "c_c_coupling_reactions",
       "aliases": [
         "Suzuki",
@@ -200,11 +198,11 @@
         }
       },
       "edit_hint": "To exclude a class (e.g., Ar-OMs), add it to reactants.electrophiles.exclude or remove it from motif_sets.",
-      "notes": "Motif typing: electrophile ∈ sp2_electrophiles_default AND partner ∈ organoboron_default."
+      "notes": "Motif typing: electrophile \u2208 sp2_electrophiles_default AND partner \u2208 organoboron_default."
     },
     {
       "id": "c_n_cross_coupling",
-      "name": "C–N cross-coupling (sp2 electrophile + amine)",
+      "name": "C\u2013N cross-coupling (sp2 electrophile + amine)",
       "category": "c_n_coupling_reactions",
       "aliases": [
         "Buchwald-Hartwig",

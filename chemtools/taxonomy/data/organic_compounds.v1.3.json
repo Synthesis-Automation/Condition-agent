@@ -9,7 +9,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Cl",
-      "description": "Aryl chloride (Ar–Cl).",
+      "description": "Aryl chloride (Ar\u2013Cl).",
       "aliases": [
         "ArCl",
         "aryl chloride"
@@ -21,7 +21,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Br",
-      "description": "Aryl bromide (Ar–Br).",
+      "description": "Aryl bromide (Ar\u2013Br).",
       "aliases": [
         "ArBr",
         "aryl bromide"
@@ -33,7 +33,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "I",
-      "description": "Aryl iodide (Ar–I).",
+      "description": "Aryl iodide (Ar\u2013I).",
       "aliases": [
         "ArI",
         "aryl iodide"
@@ -45,7 +45,7 @@
       "template": "single_bond",
       "A": "AromN",
       "B": "H",
-      "description": "Aromatic N-H (e.g., pyrrole, indole N-H) (AromN–H)."
+      "description": "Aromatic N-H (e.g., pyrrole, indole N-H) (AromN\u2013H)."
     },
     {
       "id": "Ar-F",
@@ -53,7 +53,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "F",
-      "description": "Aryl fluoride (Ar–F).",
+      "description": "Aryl fluoride (Ar\u2013F).",
       "aliases": [
         "ArF",
         "aryl fluoride"
@@ -65,7 +65,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "Cl",
-      "description": "Vinyl chloride (Vinyl–Cl)."
+      "description": "Vinyl chloride (Vinyl\u2013Cl)."
     },
     {
       "id": "Vinyl-Br",
@@ -73,7 +73,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "Br",
-      "description": "Vinyl bromide (Vinyl–Br)."
+      "description": "Vinyl bromide (Vinyl\u2013Br)."
     },
     {
       "id": "Vinyl-I",
@@ -81,7 +81,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "I",
-      "description": "Vinyl iodide (Vinyl–I)."
+      "description": "Vinyl iodide (Vinyl\u2013I)."
     },
     {
       "id": "Vinyl-OTf",
@@ -89,53 +89,17 @@
       "template": "via_oxygen",
       "A": "Vinyl",
       "B": "OTf",
-      "description": "Vinyl triflate (Vinyl–OTf)."
+      "description": "Vinyl triflate (Vinyl\u2013OTf)."
     },
     {
       "id": "Ar-H",
       "name": "Ar-H",
       "smarts": "[c:1]~[c:2]",
-      "description": "Aryl C-H (Ar–H) - approximated by aromatic bond for detection.",
+      "description": "Aryl C-H (Ar\u2013H) - approximated by aromatic bond for detection.",
       "aliases": [
         "ArH",
         "aryl C-H",
         "aryl hydrogen"
-      ]
-    },
-    {
-      "id": "Vinyl-Cl",
-      "name": "Vinyl-Cl",
-      "template": "single_bond",
-      "A": "Vinyl",
-      "B": "Cl",
-      "description": "Vinyl/alkenyl chloride (Vinyl–Cl).",
-      "aliases": [
-        "VinylCl",
-        "vinyl/alkenyl chloride"
-      ]
-    },
-    {
-      "id": "Vinyl-Br",
-      "name": "Vinyl-Br",
-      "template": "single_bond",
-      "A": "Vinyl",
-      "B": "Br",
-      "description": "Vinyl/alkenyl bromide (Vinyl–Br).",
-      "aliases": [
-        "VinylBr",
-        "vinyl/alkenyl bromide"
-      ]
-    },
-    {
-      "id": "Vinyl-I",
-      "name": "Vinyl-I",
-      "template": "single_bond",
-      "A": "Vinyl",
-      "B": "I",
-      "description": "Vinyl/alkenyl iodide (Vinyl–I).",
-      "aliases": [
-        "VinylI",
-        "vinyl/alkenyl iodide"
       ]
     },
     {
@@ -144,7 +108,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "F",
-      "description": "Vinyl/alkenyl fluoride (Vinyl–F).",
+      "description": "Vinyl/alkenyl fluoride (Vinyl\u2013F).",
       "aliases": [
         "VinylF",
         "vinyl/alkenyl fluoride"
@@ -156,7 +120,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "Cl",
-      "description": "Benzylic chloride (Bn–Cl)."
+      "description": "Benzylic chloride (Bn\u2013Cl)."
     },
     {
       "id": "Bn-Br",
@@ -164,7 +128,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "Br",
-      "description": "Benzylic bromide (Bn–Br)."
+      "description": "Benzylic bromide (Bn\u2013Br)."
     },
     {
       "id": "Bn-I",
@@ -172,7 +136,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "I",
-      "description": "Benzylic iodide (Bn–I)."
+      "description": "Benzylic iodide (Bn\u2013I)."
     },
     {
       "id": "Allyl-Cl",
@@ -180,7 +144,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "Cl",
-      "description": "Allyl chloride (Allyl–Cl)."
+      "description": "Allyl chloride (Allyl\u2013Cl)."
     },
     {
       "id": "Allyl-Br",
@@ -188,7 +152,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "Br",
-      "description": "Allyl bromide (Allyl–Br)."
+      "description": "Allyl bromide (Allyl\u2013Br)."
     },
     {
       "id": "Allyl-I",
@@ -196,7 +160,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "I",
-      "description": "Allyl iodide (Allyl–I)."
+      "description": "Allyl iodide (Allyl\u2013I)."
     },
     {
       "id": "Alkynyl-Cl",
@@ -204,7 +168,7 @@
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Cl",
-      "description": "Alkynyl chloride (Alkynyl–Cl)."
+      "description": "Alkynyl chloride (Alkynyl\u2013Cl)."
     },
     {
       "id": "Alkynyl-Br",
@@ -212,7 +176,7 @@
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Br",
-      "description": "Alkynyl bromide (Alkynyl–Br)."
+      "description": "Alkynyl bromide (Alkynyl\u2013Br)."
     },
     {
       "id": "Alkynyl-I",
@@ -220,7 +184,7 @@
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "I",
-      "description": "Alkynyl iodide (Alkynyl–I)."
+      "description": "Alkynyl iodide (Alkynyl\u2013I)."
     },
     {
       "id": "Ar-OTf",
@@ -228,7 +192,7 @@
       "template": "via_oxygen",
       "A": "Ar",
       "B": "OTf",
-      "description": "Aryl triflate (Ar–OTf); Aryl–O–triflate motif.",
+      "description": "Aryl triflate (Ar\u2013OTf); Aryl\u2013O\u2013triflate motif.",
       "aliases": [
         "ArOTf"
       ]
@@ -239,7 +203,7 @@
       "template": "via_oxygen",
       "A": "Ar",
       "B": "OTs",
-      "description": "Aryl tosylate (Ar–OTs); Aryl–O–tosylate motif.",
+      "description": "Aryl tosylate (Ar\u2013OTs); Aryl\u2013O\u2013tosylate motif.",
       "aliases": [
         "ArOTs"
       ]
@@ -250,20 +214,9 @@
       "template": "via_oxygen",
       "A": "Ar",
       "B": "OMs",
-      "description": "Aryl mesylate (Ar–OMs); Aryl–O–mesylate motif.",
+      "description": "Aryl mesylate (Ar\u2013OMs); Aryl\u2013O\u2013mesylate motif.",
       "aliases": [
         "ArOMs"
-      ]
-    },
-    {
-      "id": "Vinyl-OTf",
-      "name": "Vinyl-OTf",
-      "template": "via_oxygen",
-      "A": "Vinyl",
-      "B": "OTf",
-      "description": "Vinyl/alkenyl triflate (Vinyl–OTf); Vinyl/alkenyl–O–triflate motif.",
-      "aliases": [
-        "VinylOTf"
       ]
     },
     {
@@ -272,7 +225,7 @@
       "template": "via_oxygen",
       "A": "Vinyl",
       "B": "OTs",
-      "description": "Vinyl/alkenyl tosylate (Vinyl–OTs); Vinyl/alkenyl–O–tosylate motif.",
+      "description": "Vinyl/alkenyl tosylate (Vinyl\u2013OTs); Vinyl/alkenyl\u2013O\u2013tosylate motif.",
       "aliases": [
         "VinylOTs"
       ]
@@ -283,7 +236,7 @@
       "template": "via_oxygen",
       "A": "Vinyl",
       "B": "OMs",
-      "description": "Vinyl/alkenyl mesylate (Vinyl–OMs); Vinyl/alkenyl–O–mesylate motif.",
+      "description": "Vinyl/alkenyl mesylate (Vinyl\u2013OMs); Vinyl/alkenyl\u2013O\u2013mesylate motif.",
       "aliases": [
         "VinylOMs"
       ]
@@ -294,7 +247,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "OTf",
-      "description": "Benzylic triflate (Bn–OTf); Benzylic–O–triflate motif.",
+      "description": "Benzylic triflate (Bn\u2013OTf); Benzylic\u2013O\u2013triflate motif.",
       "aliases": [
         "BnOTf"
       ]
@@ -305,7 +258,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "OTs",
-      "description": "Benzylic tosylate (Bn–OTs); Benzylic–O–tosylate motif.",
+      "description": "Benzylic tosylate (Bn\u2013OTs); Benzylic\u2013O\u2013tosylate motif.",
       "aliases": [
         "BnOTs"
       ]
@@ -316,7 +269,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "OMs",
-      "description": "Benzylic mesylate (Bn–OMs); Benzylic–O–mesylate motif.",
+      "description": "Benzylic mesylate (Bn\u2013OMs); Benzylic\u2013O\u2013mesylate motif.",
       "aliases": [
         "BnOMs"
       ]
@@ -327,7 +280,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "OTf",
-      "description": "Allyl triflate (Allyl–OTf); Allyl–O–triflate motif.",
+      "description": "Allyl triflate (Allyl\u2013OTf); Allyl\u2013O\u2013triflate motif.",
       "aliases": [
         "AllylOTf"
       ]
@@ -338,7 +291,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "OTs",
-      "description": "Allyl tosylate (Allyl–OTs); Allyl–O–tosylate motif.",
+      "description": "Allyl tosylate (Allyl\u2013OTs); Allyl\u2013O\u2013tosylate motif.",
       "aliases": [
         "AllylOTs"
       ]
@@ -349,7 +302,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "OMs",
-      "description": "Allyl mesylate (Allyl–OMs); Allyl–O–mesylate motif.",
+      "description": "Allyl mesylate (Allyl\u2013OMs); Allyl\u2013O\u2013mesylate motif.",
       "aliases": [
         "AllylOMs"
       ]
@@ -360,7 +313,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "B(OH)2",
-      "description": "Aryl boronic acid (Ar–B(OH)2).",
+      "description": "Aryl boronic acid (Ar\u2013B(OH)2).",
       "aliases": [
         "ArB(OH)2"
       ]
@@ -371,7 +324,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "BF3K",
-      "description": "Aryl trifluoroborate (Ar–BF3K)."
+      "description": "Aryl trifluoroborate (Ar\u2013BF3K)."
     },
     {
       "id": "R-B(OH)2",
@@ -379,7 +332,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "B(OH)2",
-      "description": "Alkyl boronic acid (R–B(OH)2)."
+      "description": "Alkyl boronic acid (R\u2013B(OH)2)."
     },
     {
       "id": "R-Bpin",
@@ -387,7 +340,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Bpin",
-      "description": "Alkyl boronate (Bpin) (R–Bpin)."
+      "description": "Alkyl boronate (Bpin) (R\u2013Bpin)."
     },
     {
       "id": "R-Sn",
@@ -395,7 +348,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Sn",
-      "description": "Alkyl stannane (R–SnR3)."
+      "description": "Alkyl stannane (R\u2013SnR3)."
     },
     {
       "id": "R-Si",
@@ -403,7 +356,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Si",
-      "description": "Alkyl silane (R–SiR3)."
+      "description": "Alkyl silane (R\u2013SiR3)."
     },
     {
       "id": "R-Zn",
@@ -411,7 +364,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Zn",
-      "description": "Alkyl zincate (R–ZnX)."
+      "description": "Alkyl zincate (R\u2013ZnX)."
     },
     {
       "id": "R-Mg",
@@ -419,7 +372,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Mg",
-      "description": "Alkyl Grignard (R–MgX)."
+      "description": "Alkyl Grignard (R\u2013MgX)."
     },
     {
       "id": "Alkynyl-Si",
@@ -427,7 +380,7 @@
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Si",
-      "description": "Alkynyl silane (Alkynyl–SiR3)."
+      "description": "Alkynyl silane (Alkynyl\u2013SiR3)."
     },
     {
       "id": "Ar-SMe",
@@ -435,7 +388,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "SMe",
-      "description": "Aryl methyl thioether (Ar–SMe)."
+      "description": "Aryl methyl thioether (Ar\u2013SMe)."
     },
     {
       "id": "Ar-Bpin",
@@ -443,7 +396,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Bpin",
-      "description": "Aryl boronate (Bpin) (Ar–Bpin).",
+      "description": "Aryl boronate (Bpin) (Ar\u2013Bpin).",
       "aliases": [
         "ArBpin"
       ]
@@ -454,7 +407,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "B(OH)2",
-      "description": "Vinyl/alkenyl boronic acid (Vinyl–B(OH)2).",
+      "description": "Vinyl/alkenyl boronic acid (Vinyl\u2013B(OH)2).",
       "aliases": [
         "VinylB(OH)2"
       ]
@@ -465,7 +418,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "Bpin",
-      "description": "Vinyl/alkenyl boronate (Bpin) (Vinyl–Bpin).",
+      "description": "Vinyl/alkenyl boronate (Bpin) (Vinyl\u2013Bpin).",
       "aliases": [
         "VinylBpin"
       ]
@@ -476,7 +429,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Sn",
-      "description": "Aryl stannane (Ar–SnR3)."
+      "description": "Aryl stannane (Ar\u2013SnR3)."
     },
     {
       "id": "Ar-Si",
@@ -484,7 +437,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Si",
-      "description": "Aryl silane (Ar–SiR3)."
+      "description": "Aryl silane (Ar\u2013SiR3)."
     },
     {
       "id": "Ar-Zn",
@@ -492,7 +445,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Zn",
-      "description": "Aryl zincate (Ar–ZnX)."
+      "description": "Aryl zincate (Ar\u2013ZnX)."
     },
     {
       "id": "Ar-Mg",
@@ -500,7 +453,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Mg",
-      "description": "Aryl Grignard (Ar–MgX)."
+      "description": "Aryl Grignard (Ar\u2013MgX)."
     },
     {
       "id": "Vinyl-Sn",
@@ -508,7 +461,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "Sn",
-      "description": "Vinyl/alkenyl stannane (Vinyl–SnR3)."
+      "description": "Vinyl/alkenyl stannane (Vinyl\u2013SnR3)."
     },
     {
       "id": "Vinyl-Si",
@@ -516,7 +469,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "Si",
-      "description": "Vinyl/alkenyl silane (Vinyl–SiR3)."
+      "description": "Vinyl/alkenyl silane (Vinyl\u2013SiR3)."
     },
     {
       "id": "Vinyl-Zn",
@@ -524,7 +477,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "Zn",
-      "description": "Vinyl/alkenyl zincate (Vinyl–ZnX)."
+      "description": "Vinyl/alkenyl zincate (Vinyl\u2013ZnX)."
     },
     {
       "id": "Vinyl-Mg",
@@ -532,7 +485,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "Mg",
-      "description": "Vinyl/alkenyl Grignard (Vinyl–MgX)."
+      "description": "Vinyl/alkenyl Grignard (Vinyl\u2013MgX)."
     },
     {
       "id": "Ar-CHO",
@@ -540,7 +493,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CHO",
-      "description": "Aryl aldehyde (Ar–CHO)."
+      "description": "Aryl aldehyde (Ar\u2013CHO)."
     },
     {
       "id": "Ar-CN",
@@ -548,7 +501,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CN",
-      "description": "Aryl nitrile (Ar–CN)."
+      "description": "Aryl nitrile (Ar\u2013CN)."
     },
     {
       "id": "Ar-NO2",
@@ -556,7 +509,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "NO2",
-      "description": "Aryl nitro (Ar–NO2)."
+      "description": "Aryl nitro (Ar\u2013NO2)."
     },
     {
       "id": "Ar-NH2",
@@ -564,7 +517,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "NH2",
-      "description": "Aryl primary amine (Ar–NH2)."
+      "description": "Aryl primary amine (Ar\u2013NH2)."
     },
     {
       "id": "Ar-NHR",
@@ -572,7 +525,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "NHR",
-      "description": "Aryl secondary amine (NHR) (Ar–NHR)."
+      "description": "Aryl secondary amine (NHR) (Ar\u2013NHR)."
     },
     {
       "id": "Ar-NR2",
@@ -580,7 +533,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "NR2",
-      "description": "Aryl tertiary amine (NR2) (Ar–NR2)."
+      "description": "Aryl tertiary amine (NR2) (Ar\u2013NR2)."
     },
     {
       "id": "Ar-OH",
@@ -588,7 +541,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "OH",
-      "description": "Aryl alcohol/phenol (Ar–OH)."
+      "description": "Aryl alcohol/phenol (Ar\u2013OH)."
     },
     {
       "id": "Ar-SH",
@@ -596,7 +549,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "SH",
-      "description": "Aryl thiol (Ar–SH)."
+      "description": "Aryl thiol (Ar\u2013SH)."
     },
     {
       "id": "Ar-CO2H",
@@ -604,7 +557,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CO2H",
-      "description": "Aryl carboxylic acid (Ar–CO2H)."
+      "description": "Aryl carboxylic acid (Ar\u2013CO2H)."
     },
     {
       "id": "Ar-COCl",
@@ -612,7 +565,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "COCl",
-      "description": "Aryl acid chloride (Ar–COCl)."
+      "description": "Aryl acid chloride (Ar\u2013COCl)."
     },
     {
       "id": "Ar-CO2R",
@@ -620,7 +573,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CO2R",
-      "description": "Aryl ester (Ar–CO2R)."
+      "description": "Aryl ester (Ar\u2013CO2R)."
     },
     {
       "id": "Ar-CONHR",
@@ -628,7 +581,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CONHR",
-      "description": "Aryl amide (CONHR) (Ar–CONHR)."
+      "description": "Aryl amide (CONHR) (Ar\u2013CONHR)."
     },
     {
       "id": "Ar-CONR2",
@@ -636,7 +589,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CONR2",
-      "description": "Aryl tertiary amide (Ar–CONR2)."
+      "description": "Aryl tertiary amide (Ar\u2013CONR2)."
     },
     {
       "id": "Ar-SO2NH2",
@@ -644,7 +597,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2NH2",
-      "description": "Aryl primary sulfonamide (Ar–SO2NH2)."
+      "description": "Aryl primary sulfonamide (Ar\u2013SO2NH2)."
     },
     {
       "id": "Ar-SO2NHR",
@@ -652,7 +605,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2NHR",
-      "description": "Aryl secondary sulfonamide (Ar–SO2NHR)."
+      "description": "Aryl secondary sulfonamide (Ar\u2013SO2NHR)."
     },
     {
       "id": "Ar-SO2NR2",
@@ -660,7 +613,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2NR2",
-      "description": "Aryl tertiary sulfonamide (Ar–SO2NR2)."
+      "description": "Aryl tertiary sulfonamide (Ar\u2013SO2NR2)."
     },
     {
       "id": "Ar-SO2Cl",
@@ -668,7 +621,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2Cl",
-      "description": "Aryl sulfonyl chloride (Ar–SO2Cl)."
+      "description": "Aryl sulfonyl chloride (Ar\u2013SO2Cl)."
     },
     {
       "id": "Ar-Sulfamide",
@@ -676,7 +629,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Sulfamide",
-      "description": "Aryl sulfamide (Ar–Sulfamide)."
+      "description": "Aryl sulfamide (Ar\u2013Sulfamide)."
     },
     {
       "id": "Ar-Urea",
@@ -684,7 +637,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Urea",
-      "description": "Aryl urea (Ar–Urea)."
+      "description": "Aryl urea (Ar\u2013Urea)."
     },
     {
       "id": "Ar-Carbamate",
@@ -692,7 +645,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Carbamate",
-      "description": "Aryl carbamate (Ar–Carbamate)."
+      "description": "Aryl carbamate (Ar\u2013Carbamate)."
     },
     {
       "id": "Vinyl-CHO",
@@ -700,7 +653,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "CHO",
-      "description": "Vinyl/alkenyl aldehyde (Vinyl–CHO)."
+      "description": "Vinyl/alkenyl aldehyde (Vinyl\u2013CHO)."
     },
     {
       "id": "Vinyl-CN",
@@ -708,7 +661,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "CN",
-      "description": "Vinyl/alkenyl nitrile (Vinyl–CN)."
+      "description": "Vinyl/alkenyl nitrile (Vinyl\u2013CN)."
     },
     {
       "id": "Vinyl-NO2",
@@ -716,7 +669,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "NO2",
-      "description": "Vinyl/alkenyl nitro (Vinyl–NO2)."
+      "description": "Vinyl/alkenyl nitro (Vinyl\u2013NO2)."
     },
     {
       "id": "Vinyl-NH2",
@@ -724,7 +677,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "NH2",
-      "description": "Vinyl/alkenyl primary amine (Vinyl–NH2)."
+      "description": "Vinyl/alkenyl primary amine (Vinyl\u2013NH2)."
     },
     {
       "id": "Vinyl-OH",
@@ -732,7 +685,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "OH",
-      "description": "Vinyl/alkenyl alcohol/enol (Vinyl–OH)."
+      "description": "Vinyl/alkenyl alcohol/enol (Vinyl\u2013OH)."
     },
     {
       "id": "Vinyl-CO2H",
@@ -740,7 +693,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "CO2H",
-      "description": "Vinyl/alkenyl carboxylic acid (Vinyl–CO2H)."
+      "description": "Vinyl/alkenyl carboxylic acid (Vinyl\u2013CO2H)."
     },
     {
       "id": "Vinyl-CO2R",
@@ -748,7 +701,7 @@
       "template": "single_bond",
       "A": "Vinyl",
       "B": "CO2R",
-      "description": "Vinyl/alkenyl ester (Vinyl–CO2R)."
+      "description": "Vinyl/alkenyl ester (Vinyl\u2013CO2R)."
     },
     {
       "id": "Bn-OH",
@@ -756,7 +709,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "OH",
-      "description": "Benzylic alcohol (Bn–OH)."
+      "description": "Benzylic alcohol (Bn\u2013OH)."
     },
     {
       "id": "Bn-NH2",
@@ -764,7 +717,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "NH2",
-      "description": "Benzylic amine (Bn–NH2)."
+      "description": "Benzylic amine (Bn\u2013NH2)."
     },
     {
       "id": "Bn-NHR",
@@ -772,7 +725,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "NHR",
-      "description": "Benzylic amine (NHR) (Bn–NHR)."
+      "description": "Benzylic amine (NHR) (Bn\u2013NHR)."
     },
     {
       "id": "Bn-NR2",
@@ -780,7 +733,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "NR2",
-      "description": "Benzylic amine (NR2) (Bn–NR2)."
+      "description": "Benzylic amine (NR2) (Bn\u2013NR2)."
     },
     {
       "id": "Bn-CN",
@@ -788,7 +741,7 @@
       "template": "single_bond",
       "A": "Bn",
       "B": "CN",
-      "description": "Benzylic nitrile (Bn–CN)."
+      "description": "Benzylic nitrile (Bn\u2013CN)."
     },
     {
       "id": "Allyl-OH",
@@ -796,7 +749,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "OH",
-      "description": "Allyl alcohol (Allyl–OH)."
+      "description": "Allyl alcohol (Allyl\u2013OH)."
     },
     {
       "id": "Allyl-NH2",
@@ -804,7 +757,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "NH2",
-      "description": "Allyl amine (Allyl–NH2)."
+      "description": "Allyl amine (Allyl\u2013NH2)."
     },
     {
       "id": "Allyl-NHR",
@@ -812,7 +765,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "NHR",
-      "description": "Allyl amine (NHR) (Allyl–NHR)."
+      "description": "Allyl amine (NHR) (Allyl\u2013NHR)."
     },
     {
       "id": "Allyl-NR2",
@@ -820,7 +773,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "NR2",
-      "description": "Allyl amine (NR2) (Allyl–NR2)."
+      "description": "Allyl amine (NR2) (Allyl\u2013NR2)."
     },
     {
       "id": "Allyl-CN",
@@ -828,7 +781,7 @@
       "template": "single_bond",
       "A": "Allyl",
       "B": "CN",
-      "description": "Allyl nitrile (Allyl–CN)."
+      "description": "Allyl nitrile (Allyl\u2013CN)."
     },
     {
       "id": "Any-CHO",
@@ -1020,7 +973,7 @@
       "template": "single_bond",
       "A": "Acyl",
       "B": "Cl",
-      "description": "Acyl chloride motif (C(=O)–Cl).",
+      "description": "Acyl chloride motif (C(=O)\u2013Cl).",
       "aliases": [
         "AcylCl",
         "acid chloride motif"
@@ -1032,7 +985,7 @@
       "template": "single_bond",
       "A": "Acyl",
       "B": "Br",
-      "description": "Acyl bromide motif (C(=O)–Br).",
+      "description": "Acyl bromide motif (C(=O)\u2013Br).",
       "aliases": [
         "AcylBr"
       ]
@@ -1043,7 +996,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Cl",
-      "description": "Alkyl chloride (R–Cl).",
+      "description": "Alkyl chloride (R\u2013Cl).",
       "aliases": [
         "RCl",
         "alkyl chloride"
@@ -1055,7 +1008,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Br",
-      "description": "Alkyl bromide (R–Br).",
+      "description": "Alkyl bromide (R\u2013Br).",
       "aliases": [
         "RBr",
         "alkyl bromide"
@@ -1067,7 +1020,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "I",
-      "description": "Alkyl iodide (R–I).",
+      "description": "Alkyl iodide (R\u2013I).",
       "aliases": [
         "RI",
         "alkyl iodide"
@@ -1079,7 +1032,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "F",
-      "description": "Alkyl fluoride (R–F).",
+      "description": "Alkyl fluoride (R\u2013F).",
       "aliases": [
         "RF",
         "alkyl fluoride"
@@ -1091,7 +1044,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "OTf",
-      "description": "Alkyl triflate (R–OTf, i.e., R–O–SO2CF3).",
+      "description": "Alkyl triflate (R\u2013OTf, i.e., R\u2013O\u2013SO2CF3).",
       "aliases": [
         "ROTf",
         "alkyl triflate"
@@ -1103,7 +1056,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "OTs",
-      "description": "Alkyl tosylate (R–OTs, i.e., R–O–SO2Ar).",
+      "description": "Alkyl tosylate (R\u2013OTs, i.e., R\u2013O\u2013SO2Ar).",
       "aliases": [
         "ROTs",
         "alkyl tosylate"
@@ -1115,7 +1068,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "OMs",
-      "description": "Alkyl mesylate (R–OMs, i.e., R–O–SO2Me).",
+      "description": "Alkyl mesylate (R\u2013OMs, i.e., R\u2013O\u2013SO2Me).",
       "aliases": [
         "ROMs",
         "alkyl mesylate"
@@ -1127,7 +1080,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CCH",
-      "description": "Aryl terminal alkyne (Ar–C#CH).",
+      "description": "Aryl terminal alkyne (Ar\u2013C#CH).",
       "aliases": [
         "ArCCH",
         "terminal alkyne"
@@ -1139,7 +1092,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "CCH",
-      "description": "Alkyl terminal alkyne (R–C#CH).",
+      "description": "Alkyl terminal alkyne (R\u2013C#CH).",
       "aliases": [
         "RCCH",
         "terminal alkyne"
@@ -1151,7 +1104,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CHCH2",
-      "description": "Aryl terminal alkene (Ar–CH=CH2).",
+      "description": "Aryl terminal alkene (Ar\u2013CH=CH2).",
       "aliases": [
         "ArCHCH2",
         "terminal alkene"
@@ -1163,9 +1116,21 @@
       "template": "single_bond",
       "A": "R",
       "B": "CHCH2",
-      "description": "Alkyl terminal alkene (R–CH=CH2).",
+      "description": "Alkyl terminal alkene (R\u2013CH=CH2).",
       "aliases": [
         "RCHCH2",
+        "terminal alkene"
+      ]
+    },
+    {
+      "id": "Any-CHCH2",
+      "name": "Any-CHCH2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CHCH2",
+      "description": "Generic terminal alkene (Any\u2013CH=CH2).",
+      "aliases": [
+        "AnyCHCH2",
         "terminal alkene"
       ]
     },
@@ -1333,7 +1298,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Lactam",
-      "description": "Lactam (cyclic amide) functional group (Any–Lactam)."
+      "description": "Lactam (cyclic amide) functional group (Any\u2013Lactam)."
     },
     {
       "id": "Ar-Lactam",
@@ -1341,7 +1306,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Lactam",
-      "description": "N-Aryl lactam (Ar–Lactam)."
+      "description": "N-Aryl lactam (Ar\u2013Lactam)."
     },
     {
       "id": "Ar-NHAr",
@@ -1349,7 +1314,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "NHAr",
-      "description": "Diaryl amine (Ar–NHAr).",
+      "description": "Diaryl amine (Ar\u2013NHAr).",
       "aliases": [
         "Ar2NH",
         "diaryl amine"
@@ -1361,7 +1326,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Phosphonium",
-      "description": "Phosphonium salt (Any–PR3+)."
+      "description": "Phosphonium salt (Any\u2013PR3+)."
     },
     {
       "id": "Ar-Phosphonium",
@@ -1369,7 +1334,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Phosphonium",
-      "description": "Aryl phosphonium salt (Ar–PR3+)."
+      "description": "Aryl phosphonium salt (Ar\u2013PR3+)."
     },
     {
       "id": "Any-Imine",
@@ -1377,7 +1342,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "Imine",
-      "description": "Imine functional group (Any–Imine)."
+      "description": "Imine functional group (Any\u2013Imine)."
     },
     {
       "id": "Ar-Imine",
@@ -1385,7 +1350,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Imine",
-      "description": "Aryl imine (Ar–Imine)."
+      "description": "Aryl imine (Ar\u2013Imine)."
     },
     {
       "id": "Any-B(OR)2",
@@ -1393,7 +1358,7 @@
       "template": "single_bond",
       "A": "R",
       "B": "B(OR)2",
-      "description": "Generic boronate ester (Any–B(OR)2)."
+      "description": "Generic boronate ester (Any\u2013B(OR)2)."
     },
     {
       "id": "Ar-B(OR)2",
@@ -1401,7 +1366,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "B(OR)2",
-      "description": "Aryl boronate ester (Ar–B(OR)2)."
+      "description": "Aryl boronate ester (Ar\u2013B(OR)2)."
     }
   ],
   "depends_on": {

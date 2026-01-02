@@ -125,6 +125,8 @@ def _load_roles(path: Path) -> Dict[str, ReagentRoleV2]:
 
 
 def _load_families(path: Path) -> Dict[str, ReagentFamilyV2]:
+    if not path.exists():
+        return {}
     payload = _read_json(path)
     families: Dict[str, ReagentFamilyV2] = {}
     for entry in payload:
