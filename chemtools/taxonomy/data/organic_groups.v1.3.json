@@ -219,6 +219,26 @@
       ]
     },
     {
+      "id": "SCN",
+      "name": "-SCN",
+      "kind": "substituent",
+      "smarts": "[S:2]C#N",
+      "description": "Thiocyanate core; attach via sulfur (-SCN).",
+      "tags": [
+        "thiocyanate"
+      ]
+    },
+    {
+      "id": "NCS",
+      "name": "-NCS",
+      "kind": "substituent",
+      "smarts": "[N:2]=C=S",
+      "description": "Isothiocyanate core; attach via nitrogen (-NCS).",
+      "tags": [
+        "isothiocyanate"
+      ]
+    },
+    {
       "id": "NO2",
       "name": "-NO2",
       "kind": "substituent",
@@ -295,6 +315,16 @@
       ]
     },
     {
+      "id": "M",
+      "name": "-M",
+      "kind": "substituent",
+      "smarts": "[Li,Na,K,Mg,Zn,Cu,Ag:2]",
+      "description": "Generic organometallic substituent (-M).",
+      "tags": [
+        "organometallic"
+      ]
+    },
+    {
       "id": "BF3K",
       "name": "-BF3K",
       "kind": "substituent",
@@ -341,6 +371,18 @@
       ]
     },
     {
+      "id": "Hydrazine",
+      "name": "-NHNH2",
+      "kind": "substituent",
+      "smarts": "[NX3;H1:2][NX3;H2]",
+      "description": "Hydrazine substituent (-NHNH2).",
+      "tags": [
+        "amine",
+        "nucleophile",
+        "hydrazine"
+      ]
+    },
+    {
       "id": "NR2",
       "name": "-NR2",
       "kind": "substituent",
@@ -361,6 +403,16 @@
         "alcohol",
         "nucleophile",
         "o_h_nucleophile"
+      ]
+    },
+    {
+      "id": "OR",
+      "name": "-OR",
+      "kind": "substituent",
+      "smarts": "[OX2:2][#6]",
+      "description": "Ether substituent (-OR).",
+      "tags": [
+        "ether"
       ]
     },
     {
@@ -445,6 +497,17 @@
       ]
     },
     {
+      "id": "Hydrazide",
+      "name": "-CONHNH2",
+      "kind": "substituent",
+      "smarts": "[CX3:2](=O)[NX3;H1][NX3;H2]",
+      "description": "Hydrazide core; attach via carbonyl carbon.",
+      "tags": [
+        "hydrazide",
+        "amide"
+      ]
+    },
+    {
       "id": "SO2NH2",
       "name": "-SO2NH2",
       "kind": "substituent",
@@ -490,6 +553,28 @@
       ]
     },
     {
+      "id": "SO2F",
+      "name": "-SO2F",
+      "kind": "substituent",
+      "smarts": "[SX4:2](=O)(=O)F",
+      "description": "Sulfonyl fluoride core; attach via sulfur.",
+      "tags": [
+        "sulfonyl_halide",
+        "leaving_group",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "SO2H",
+      "name": "-SO2H",
+      "kind": "substituent",
+      "smarts": "[SX3:2](=O)[OX2H]",
+      "description": "Sulfinic acid core; attach via sulfur.",
+      "tags": [
+        "sulfinic_acid"
+      ]
+    },
+    {
       "id": "Sulfamide",
       "name": "-NHSO2NH2",
       "kind": "substituent",
@@ -508,6 +593,17 @@
       "description": "Urea substituent (primary); attach via nitrogen.",
       "tags": [
         "urea",
+        "nitrogen_group"
+      ]
+    },
+    {
+      "id": "Thiourea",
+      "name": "-NHCSNH2",
+      "kind": "substituent",
+      "smarts": "[NX3;H1:2][CX3](=S)[NX3;H2]",
+      "description": "Thiourea substituent (primary); attach via nitrogen.",
+      "tags": [
+        "thiourea",
         "nitrogen_group"
       ]
     },
@@ -550,6 +646,17 @@
       "kind": "substituent",
       "smarts": "[S:2](=O)(=O)C",
       "description": "Mesylate substituent via oxygen linker.",
+      "tags": [
+        "sulfonate_leaving_group",
+        "leaving_group"
+      ]
+    },
+    {
+      "id": "OSO2R",
+      "name": "-OSO2R",
+      "kind": "substituent",
+      "smarts": "[S:2](=O)(=O)[#6]",
+      "description": "Generic sulfonate substituent via oxygen linker (-OSO2R).",
       "tags": [
         "sulfonate_leaving_group",
         "leaving_group"
@@ -620,6 +727,17 @@
       "tags": [
         "phosphorus",
         "cation"
+      ]
+    },
+    {
+      "id": "Phosphine",
+      "name": "-PR3",
+      "kind": "substituent",
+      "smarts": "[PX3:2]([#6])([#6])[#6]",
+      "description": "Phosphine core; attach via phosphorus.",
+      "tags": [
+        "phosphorus",
+        "ligand"
       ]
     },
     {

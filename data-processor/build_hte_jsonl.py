@@ -16,22 +16,70 @@ import json
 import sys
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chemtools.reagent import (
-    build_reactant_lookup,
-    get_reactant_type_definitions,
-    normalize_reaction_type,
-)
-from chemtools.featurizers.analysis.reactants import CSV_REACTANT_OVERRIDES
+from chemtools.reagent import normalize_reaction_type
 from chemtools.recommend.utils import canonical_family
 
 
 _DEFAULT_INPUT = "data/HTE_db/HTE_0.csv"
 _DEFAULT_OUTPUT = "data/HTE_db/HTE_0.jsonl"
 _PROGRESS_EVERY = 5000
+
+_ORGANIC_COMPOUNDS_FILE = (
+    ROOT / "chemtools" / "taxonomy" / "data" / "organic_compounds.v1.3.json"
+)
+
+_HTE_REACTION_OVERRIDES = {
+    "c_n_coupling": "c_n_cross_coupling",
+    "cn_coupling": "c_n_cross_coupling",
+    "c_o_coupling": "c_o_coupling",
+    "co_coupling": "c_o_coupling",
+    "suzuki": "suzuki_miyaura",
+    "suzuki_in_situ": "suzuki_miyaura",
+    "sonogashira": "sonogashira",
+    "heck": "heck",
+    "amide_formation": "amide_coupling",
+}
+
+_HTE_ORGANIC_OVERRIDES = {
+    "rnh2-a-branch": "Any-NH2",
+    "rnh2 a-branch": "Any-NH2",
+    "r2nh-a-branch": "Any-NHR",
+    "r2nh a-branch": "Any-NHR",
+    "rnh2": "Any-NH2",
+    "r2nh": "Any-NHR",
+    "rconh2": "Any-CONHR",
+    "rconhr": "Any-CONHR",
+    "rco2h or m": "Any-CO2H",
+    "rco2h": "Any-CO2H",
+    "rco2r": "Any-CO2R",
+    "alkyl-cl": "R-Cl",
+    "alkyl-br": "R-Br",
+    "alkyl-i": "R-I",
+    "alkyl-oh a-branch": "R2CH-OH",
+    "roh-a-branch": "R2CH-OH",
+    "alkyl-oh primary": "RCH2-OH",
+    "alkene": "Any-Alkene",
+    "arh": "Ar-H",
+    "arnh2": "Ar-NH2",
+    "arnhr": "Ar-NHR",
+    "arb(or)2": "Ar-B(OR)2",
+    "arbf3k": "Ar-BF3K",
+    "aroh": "Ar-OH",
+    "aroso2r": "Ar-OTs",
+    "alkyl-b(oh)2": "R-B(OH)2",
+    "alkyl-b(or)2": "Any-B(OR)2",
+    "urea": "Any-Urea",
+    "lactam": "Any-Lactam",
+    "rcn": "Any-CN",
+    "r2co": "Any-CO-R",
+    "r2cnr": "Any-Imine",
+    "rch2pph3x": "Any-Phosphonium",
+}
 
 
 def _split_values(value: Optional[str]) -> List[str]:
@@ -73,6 +121,11 @@ def _normalize_reaction(raw: str) -> Tuple[Optional[str], Optional[str]]:
     raw = (raw or "").strip()
     if not raw:
         return None, None
+    raw_key = raw.lower()
+    raw_slug = re.sub(r"[^0-9a-z]+", "_", raw_key).strip("_")
+    override = _HTE_REACTION_OVERRIDES.get(raw_key) or _HTE_REACTION_OVERRIDES.get(raw_slug)
+    if override:
+        return override, canonical_family(override)
     normalized = normalize_reaction_type(raw)
     family = canonical_family(normalized or raw)
     return normalized or None, family or None
@@ -97,45 +150,45 @@ def _canonical_member(
     token: str,
     *,
     alias_map: Dict[str, str],
-    id_to_category: Dict[str, str],
     override_map: Dict[str, str],
-    category_ids: Set[str],
 ) -> Optional[str]:
     if not token:
         return None
 
     for candidate in _candidate_variants(token):
-        if candidate in id_to_category:
-            return candidate
-        if candidate in category_ids:
-            return candidate
-        mapped = alias_map.get(candidate.lower())
+        key = candidate.lower()
+        override = override_map.get(key)
+        if override:
+            return override
+        mapped = alias_map.get(key)
         if mapped:
             return mapped
-        override = override_map.get(candidate.lower())
-        if override:
-            if override in id_to_category:
-                return override
-            if override in category_ids:
-                return override
-            mapped = alias_map.get(override.lower())
-            if mapped:
-                return mapped
     return None
 
 
 def _categories_from_types(
     tokens: Iterable[str],
-    *,
-    id_to_category: Dict[str, str],
 ) -> List[str]:
-    categories: List[str] = []
-    for token in tokens:
-        token = token.strip()
-        if not token:
+    return _unique_list([token.strip() for token in tokens if token.strip()])
+
+
+def _load_organic_compounds_aliases() -> Dict[str, str]:
+    if not _ORGANIC_COMPOUNDS_FILE.exists():
+        return {}
+    payload = json.loads(_ORGANIC_COMPOUNDS_FILE.read_text(encoding="utf-8"))
+    aliases: Dict[str, str] = {}
+    for entry in payload.get("compounds", []):
+        compound_id = entry.get("id")
+        if not compound_id:
             continue
-        categories.append(id_to_category.get(token, token))
-    return _unique_list(categories)
+        aliases[compound_id.lower()] = compound_id
+        name = entry.get("name")
+        if name:
+            aliases[str(name).lower()] = compound_id
+        for alias in entry.get("aliases", []):
+            if alias:
+                aliases[str(alias).lower()] = compound_id
+    return aliases
 
 
 def build_hte_jsonl(
@@ -144,9 +197,8 @@ def build_hte_jsonl(
     *,
     max_rows: Optional[int] = None,
 ) -> None:
-    alias_map, id_to_category = build_reactant_lookup()
-    override_map = {k.lower(): v for k, v in CSV_REACTANT_OVERRIDES.items()}
-    category_ids = set(get_reactant_type_definitions().keys())
+    alias_map = _load_organic_compounds_aliases()
+    override_map = dict(_HTE_ORGANIC_OVERRIDES)
 
     total = 0
     written = 0
@@ -164,9 +216,10 @@ def build_hte_jsonl(
 
                 reaction_raw = (row.get("Reaction_Type_Standardized") or "").strip()
                 reaction_type, _ = _normalize_reaction(reaction_raw)
-                if not reaction_type and reaction_raw:
-                    unmapped_reactions.add(reaction_raw)
-                    reaction_type = reaction_raw
+                if not reaction_type:
+                    if reaction_raw:
+                        unmapped_reactions.add(reaction_raw)
+                    reaction_type = "Unknown"
 
                 reactant_a_tokens = _split_values(row.get("Reactant_A"))
                 if not reactant_a_tokens:
@@ -181,9 +234,7 @@ def build_hte_jsonl(
                     canonical = _canonical_member(
                         token,
                         alias_map=alias_map,
-                        id_to_category=id_to_category,
                         override_map=override_map,
-                        category_ids=category_ids,
                     )
                     if canonical:
                         reactant_types.append(canonical)
@@ -192,10 +243,7 @@ def build_hte_jsonl(
 
                 reactant_types = _unique_list(reactant_types)
 
-                reactant_categories = _categories_from_types(
-                    reactant_types,
-                    id_to_category=id_to_category,
-                )
+                reactant_categories = _categories_from_types(reactant_types)
 
                 conditions = {
                     "catalyst": _unique_list(_split_values(row.get("Catalyst"))),
