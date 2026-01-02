@@ -371,9 +371,9 @@ class PrecedentNamespace:
 
 
 class RecommendNamespace:
-    """ML-based and rule-based condition recommendations.
-    
-    Stateful operations that use cached ML models and rule databases.
+    """Unified condition recommendations.
+
+    Stateful operations that use the unified recommendation index.
     """
     
     def __init__(self, context: 'ChemTools'):
@@ -386,7 +386,7 @@ class RecommendNamespace:
                    filter_unknown_reagents: bool = False,
                    search_all_families: bool = False,
                    **kwargs) -> Dict[str, Any]:
-        """Get ML-based condition recommendations.
+        """Get unified condition recommendations.
         
         Args:
             reaction: Reaction SMILES
@@ -395,9 +395,9 @@ class RecommendNamespace:
             limit: Maximum recommendations to return
             relax: Relaxation rules
             constraints: Constraint rules
-            rerank_strategy: 'rule', 'analytics', or 'none' (default: 'rule')
-            filter_unknown_reagents: Filter precedents with unknown reagents (default: False)
-            search_all_families: Search across all reaction datasets (default: False)
+            rerank_strategy: Legacy parameter (ignored by unified recommender)
+            filter_unknown_reagents: Legacy parameter (ignored by unified recommender)
+            search_all_families: Legacy parameter (ignored by unified recommender)
             **kwargs: Additional parameters
             
         Returns:
@@ -418,13 +418,13 @@ class RecommendNamespace:
     
     def from_reaction(self, reaction: str, k: int = 5, relax: Optional[Dict] = None,
                      constraint_rules: Optional[Dict] = None) -> Dict[str, Any]:
-        """Get recommendations from reaction SMILES.
+        """Get unified recommendations from reaction SMILES.
         
         Args:
             reaction: Reaction SMILES
             k: Number of precedents per recommendation
-            relax: Relaxation rules
-            constraint_rules: Constraint rules
+            relax: Legacy parameter (ignored by unified recommender)
+            constraint_rules: Legacy parameter (ignored by unified recommender)
             
         Returns:
             Dict with recommendations

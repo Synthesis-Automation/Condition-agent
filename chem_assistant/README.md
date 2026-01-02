@@ -1,6 +1,6 @@
 # ChemTools LangChain Integration
 
-This directory contains a **LangChain/LangGraph wrapper** for ChemTools, exposing existing chemistry functions as AI-callable tools and providing an adaptive agent for intelligent chemistry analysis. It now also ships a deterministic **auto-conditions** pipeline (rules → DRFP precedents → HTE summary → fusion → automation formatting) that can run without an LLM when you want fast, reproducible recommendations.
+This directory contains a **LangChain/LangGraph wrapper** for ChemTools, exposing existing chemistry functions as AI-callable tools and providing an adaptive agent for intelligent chemistry analysis. It now also ships a deterministic **auto-conditions** pipeline (rules → DRFP precedents → HTE summary → fusion → formatted protocol additions) that can run without an LLM when you want fast, reproducible recommendations.
 
 ## 🎯 Overview
 
@@ -91,7 +91,7 @@ python -m chem_assistant.planner.cli \
   --json
 ```
 
-Outputs the detected family, rule/precedent candidates, optional HTE summary, and formatted protocol additions (per `docs/AUTOMATION_FORMAT.md`). Add `--out result.json` to save the payload.
+Outputs the detected family, rule/precedent candidates, optional HTE summary, and formatted protocol additions. Add `--out result.json` to save the payload.
 
 #### 0b. LLM-Assisted Auto-Conditions (Comprehensive Multi-Database Analysis)
 
@@ -263,7 +263,7 @@ Older LangGraph releases only expose `create_react_agent`; the ChemTools wrapper
 - ✅ **Multi-provider support** (OpenAI, Aliyun)
 - ✅ **Comprehensive docs** with examples
 - ✅ **Interactive CLI** for exploration
-- ✅ **Deterministic auto-conditions** pipeline with rule/precedent/HTE fusion and automation formatting
+- ✅ **Deterministic auto-conditions** pipeline with rule/precedent/HTE fusion and protocol formatting
 
 ### normalize_smiles_tool
 

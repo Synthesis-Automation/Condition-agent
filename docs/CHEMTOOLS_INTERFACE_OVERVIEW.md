@@ -24,7 +24,7 @@ Implemented in `app/main.py`; each endpoint returns the same payloads as the Pyt
 | Reaction utilities | `POST /normalize`, `POST /detect_family`, `POST /detect_type` | SMILES normalization and family/type detection |
 | Featurization | `POST /featurize/molecular`, `POST /featurize/role-aware` | Deterministic feature vectors |
 | Precedents | `POST /precedent/knn`, `POST /precedent/filters`, `POST /precedent/explain` | DRFP-powered precedent search |
-| Recommendations | `POST /api/v1/recommend`, `/recommend/conditions`, `/recommend/fusion` | Unified recommender output (dataset + protocol + HTE) |
+| Recommendations | `POST /api/v1/recommend`, `/recommend/conditions` | Unified recommender output (dataset + protocol + HTE) |
 | Plate design | `POST /api/v1/design_plate` | Deprecated (unavailable in unified system) |
 | Core search | `POST /api/v1/core/search` | Catalyst core lookup |
 | Registry | `POST /match`, `POST /registry` | SCDB matcher and reagent registry |

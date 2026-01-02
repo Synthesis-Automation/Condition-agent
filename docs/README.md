@@ -8,7 +8,7 @@ ChemTools is a deterministic toolkit for reaction-condition design and analysis,
 
 - **Reaction normalization** – canonicalize SMILES/reaction SMILES with graceful fallbacks when RDKit is absent. Automatically leverages MolPipeline’s `AutoToMol` reader when available.
 - **Molecular feature extraction** – fingerprint/descriptor generation for electrophile–nucleophile pairs with optional MolPipeline-backed vectors (`include_molpipeline=True`).
-- **Rule-based routing & precedent search** – deterministic family detection, DRFP similarity lookup, constraint filters, and Laplace-smoothed voting for condition recall.
+- **Unified recommendations** – DRFP + feature-tag similarity over reaction datasets, protocols, and HTE screens.
 - **Protocol & taxonomy utilities** – curated reagent registries, taxonomy schemas, and protocol discovery/SMARTS tooling for experimental planning.
 - **LLM extensions** – chemistry-aware agent orchestration with multi-provider support (OpenAI, Aliyun/DeepSeek) via `llmtools`.
 

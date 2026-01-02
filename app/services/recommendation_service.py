@@ -1,10 +1,8 @@
 """
-Recommendation Service - ML-based and rule-based condition recommendations.
+Recommendation Service - unified condition recommendations.
 
 This service handles:
-- ML-based condition recommendations
-- Rule-based recommendations with reranking
-- Plate design from reactions
+- Unified dataset/protocol/HTE recommendations
 - Recommendation formatting and post-processing
 """
 
@@ -42,23 +40,18 @@ def recommend_conditions(req: RecommendConditionsRequest) -> Dict[str, Any]:
 
 def recommend_from_reaction(req: RecommendFromReactionRequest) -> Dict[str, Any]:
     """
-    Get recommendations from a reaction using ML or rule-based strategies.
-    
-    Supports multiple reranking strategies:
-    - 'ml': ML-based reranking (default)
-    - 'rule': Rule-based reranking
-    - 'drfp': DRFP similarity-based reranking
-    
+    Get unified recommendations from a reaction.
+
     Args:
         req: RecommendFromReactionRequest with reaction and parameters
-        
+
     Returns:
         Standardized recommendation output with:
         - input: Input reaction info
         - detection: Reaction type detection
         - recommendations: List of recommended conditions
         - meta: Processing metadata
-        
+
     Raises:
         ValidationError: If reaction SMILES is invalid
     """

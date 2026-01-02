@@ -663,7 +663,6 @@ detection = detect_reaction(reaction_smiles, use_ml=True)  # ML-enabled
 
 - Update `REACTION_DETECTION_METHODS.md` to focus on `detect_reaction()`
 - Update `README.md` examples
-- Update API docs in `API_TESTING_GUIDE.md`
 - Create migration guide for users
 
 ### Phase 5: Testing & Validation (Week 4)

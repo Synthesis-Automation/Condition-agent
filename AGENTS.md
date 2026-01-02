@@ -7,7 +7,7 @@
   - `condition_core.py` and `featurizers/molecular.py` for C-N coupling substrate features.
   - `util/functional_groups.py`: Comprehensive functional group detection (80+ groups) using SMARTS patterns.
   - `protocol/`: Protocol-based recommendation using DRFP similarity.
-  - `recommend/unified.py`: Unified recommendation engine with DRFP similarity, supports automation format.
+- `recommend/unified.py`: Unified recommendation engine using DRFP + feature tags.
   - `formatters/rule_to_protocol.py`: Converts rule conditions to protocol-compatible format with ordered addition sequences.
   - `cli/registry.py`: CLI entrypoint (`chem-registry`).
 - `llmtools/`: LLM integration for advanced operations (`clients.py`, `agents.py`, `prompts.py`).
@@ -20,8 +20,6 @@
   - `rule_db_v2/`: Rule database with standardized types (9 reaction families).
 - `scripts/`: Lightweight dev helpers and CLI tools.
 - `docs/`: Documentation for features and usage.
-  - `AUTOMATION_FORMAT.md`: Automation-ready condition format with ordered addition sequences.
-  - `AUTOMATION_QUICKSTART.md`: Quick start guide for automation format.
 
 ## Build, Test, and Development Commands
 
