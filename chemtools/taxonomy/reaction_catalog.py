@@ -37,6 +37,11 @@ class SlotRequirement:
     min_hits: int = 1
     min_reactants: int = 1
 
+    def __contains__(self, item: object) -> bool:
+        if not isinstance(item, str):
+            return False
+        return item in self.allowed
+
 
 def _load_payload(path: Path) -> dict:
     if not path.exists():
