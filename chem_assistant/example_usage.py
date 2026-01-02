@@ -1,11 +1,5 @@
 """
-Simple example demonstrating ChemTools LangChain integration.
-
-This script shows how to use the ChemTools agent for common chemistry tasks
-without needing the interactive CLI.
-
-Usage:
-    python lang_chain/example_usage.py
+Simple examples demonstrating ChemTools featurization/analysis integration.
 """
 
 import os
@@ -18,174 +12,139 @@ if str(parent_dir) not in sys.path:
     sys.path.insert(0, str(parent_dir))
 
 
-def check_api_key():
+def check_api_key() -> bool:
     """Check if API key is configured."""
     provider = os.getenv("LLM_PROVIDER", "openai")
-    
+
     if provider == "openai":
         if not os.getenv("OPENAI_API_KEY"):
-            print("❌ Error: OPENAI_API_KEY not set")
-            print("\nSet your API key:")
+            print("Error: OPENAI_API_KEY not set")
+            print("Set your API key:")
             print('  $env:OPENAI_API_KEY = "sk-your-key-here"  # PowerShell')
             print('  export OPENAI_API_KEY="sk-your-key-here"  # Bash')
             return False
     elif provider == "aliyun":
         if not os.getenv("ALIYUN_API_KEY"):
-            print("❌ Error: ALIYUN_API_KEY not set")
+            print("Error: ALIYUN_API_KEY not set")
             return False
-    
+
     return True
 
 
-def example_1_normalize_smiles():
+def example_1_normalize_smiles() -> None:
     """Example 1: Normalize SMILES strings."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Example 1: Normalize SMILES")
-    print("="*70)
-    
+    print("=" * 70)
+
     from chem_assistant.chemtools_agent import quick_query
-    
+
     query = "Normalize this SMILES: c1ccccc1"
     print(f"\nQuery: {query}")
-    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
-    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
     print("Agent Response:")
     print(response)
 
 
-def example_2_detect_reaction():
-    """Example 2: Detect reaction family."""
-    print("\n" + "="*70)
-    print("Example 2: Detect Reaction Family")
-    print("="*70)
-    
+def example_2_analyze_reaction() -> None:
+    """Example 2: Analyze reaction (taxonomy + family)."""
+    print("\n" + "=" * 70)
+    print("Example 2: Analyze Reaction")
+    print("=" * 70)
+
     from chem_assistant.chemtools_agent import quick_query
-    
-    query = "What reaction family is this: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
+
+    query = "Analyze reaction: Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
     print(f"\nQuery: {query}")
-    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
-    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
     print("Agent Response:")
     print(response)
 
 
-def example_3_recommend_conditions():
-    """Example 3: Recommend reaction conditions."""
-    print("\n" + "="*70)
-    print("Example 3: Recommend Conditions")
-    print("="*70)
-    
+def example_3_featurize_molecule() -> None:
+    """Example 3: Unified molecule featurization."""
+    print("\n" + "=" * 70)
+    print("Example 3: Unified Molecule Featurization")
+    print("=" * 70)
+
     from chem_assistant.chemtools_agent import quick_query
-    
-    query = "Recommend optimal conditions for this Buchwald coupling: Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+
+    query = "Featurize molecule: c1ccccc1O"
     print(f"\nQuery: {query}")
-    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
-    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
     print("Agent Response:")
     print(response)
 
 
-def example_4_reagent_lookup():
-    """Example 4: Look up reagent information."""
-    print("\n" + "="*70)
-    print("Example 4: Reagent Lookup")
-    print("="*70)
-    
+def example_4_featurize_reaction_pair() -> None:
+    """Example 4: Reaction pair featurization."""
+    print("\n" + "=" * 70)
+    print("Example 4: Reaction Pair Featurization")
+    print("=" * 70)
+
     from chem_assistant.chemtools_agent import quick_query
-    
-    query = "What is the CAS number and role of Cs2CO3?"
+
+    query = "Featurize pair: electrophile=Brc1ccccc1 nucleophile=Nc1ccccc1"
     print(f"\nQuery: {query}")
-    print("\n🤖 Agent is working...", end="", flush=True)
     response = quick_query(query)
-    print("\r" + " " * 30 + "\r", end="")  # Clear the working message
     print("Agent Response:")
     print(response)
 
 
-def example_5_conversational():
+def example_5_conversational() -> None:
     """Example 5: Multi-turn conversation."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Example 5: Conversational Agent")
-    print("="*70)
-    
+    print("=" * 70)
+
     from chem_assistant.chemtools_agent import ChemToolsAgent
-    
+
     agent = ChemToolsAgent()
     history = []
-    
+
     queries = [
         "What functional groups are in CCO?",
-        "Is it an alcohol?",
-        "What about c1ccccc1O?",
+        "Featurize molecule: c1ccccc1O",
+        "Analyze reaction: Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
     ]
-    
+
     for query in queries:
         print(f"\nYou: {query}")
         response, history = agent.chat(query, history)
         print(f"Agent: {response}")
 
 
-def example_6_custom_agent():
-    """Example 6: Custom agent configuration."""
-    print("\n" + "="*70)
-    print("Example 6: Custom Agent Configuration")
-    print("="*70)
-    
-    from chem_assistant.chemtools_agent import ChemToolsAgent
-    
-    # Create agent with custom settings
-    agent = ChemToolsAgent(
-        model="gpt-4o",
-        temperature=0.1,
-        verbose=True  # Show tool execution
-    )
-    
-    query = "Classify this reactant: Brc1ccccc1"
-    print(f"\nQuery: {query}")
-    print("\nAgent Response (with verbose output):")
-    response = agent.run(query)
-    print(response)
-
-
-def main():
+def main() -> None:
     """Run all examples."""
-    print("\n" + "="*70)
-    print("ChemTools LangChain Integration - Examples")
-    print("="*70)
-    
-    # Check API key
+    print("\n" + "=" * 70)
+    print("ChemTools Featurization Examples")
+    print("=" * 70)
+
     if not check_api_key():
         sys.exit(1)
-    
+
     print("\nRunning examples...")
-    print("Note: Each example will call the LLM API (may take a few seconds)")
-    
+    print("Note: Each example will call the LLM API.")
+
     try:
-        # Run examples
         example_1_normalize_smiles()
-        example_2_detect_reaction()
-        example_3_recommend_conditions()
-        example_4_reagent_lookup()
+        example_2_analyze_reaction()
+        example_3_featurize_molecule()
+        example_4_featurize_reaction_pair()
         example_5_conversational()
-        # example_6_custom_agent()  # Uncomment for verbose output
-        
-        print("\n" + "="*70)
-        print("✅ All examples completed successfully!")
-        print("="*70)
+
+        print("\n" + "=" * 70)
+        print("All examples completed successfully")
+        print("=" * 70)
         print("\nNext steps:")
-        print("  - Try the interactive CLI: python -m lang_chain.chemtools_cli")
-        print("  - Read the docs: lang_chain/README.md")
-        print("  - Build your own agent with custom tools")
-        
-    except Exception as e:
-        print(f"\n❌ Error running examples: {e}")
+        print("  - Try the CLI: python -m chem_assistant.chemtools_cli")
+        print("  - Read the docs: chem_assistant/README.md")
+    except Exception as exc:
+        print(f"\nError running examples: {exc}")
         print("\nTroubleshooting:")
         print("  - Ensure API key is set correctly")
         print("  - Check internet connection")
-        print("  - Verify LangChain packages are installed: pip install -r lang_chain/requirements.txt")
+        print("  - Verify dependencies: pip install -r requirements.txt")
         sys.exit(1)
 
 
