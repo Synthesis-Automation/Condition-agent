@@ -16,9 +16,9 @@ assistant integrations.
 - **Top-level fields:** `schema_version`, `source_type`, `metadata`, `reaction`,
   `applies_if`, `default_rule`, `base_rules`, `modifiers`.
 - **Families covered:** Suzuki, Sonogashira, SNAr, Pd/Cu C–N coupling, C–O
-  coupling, amide formation, reductive amination, RCM. Any builder output must
-  slot directly into the unified index consumed by
-  `chemtools.recommend.unified.UnifiedRecommender`.
+  coupling, amide formation, reductive amination, RCM. Rule outputs are
+  intended for the next-stage rule system; the current unified recommender
+  indexes datasets, protocols, and HTE only.
 
 # Field Inventory
 

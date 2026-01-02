@@ -217,7 +217,7 @@ RULE_FIELD_TO_ROLE = {
    - Protocols pass through with existing structure
 
 2. **LangChain Wrapper** (`chem_assistant/chemtools_wrapper.py`):
-   - `unified_recommender_tool` supports automation format
+   - `unified_recommender_tool` automation hooks are legacy (not in current unified index)
    - Includes `reaction_setup` in response when enabled
 
 ## Example Output
@@ -292,3 +292,6 @@ All tests should pass with ✅.
 - Rule format: `data/rule_db_v2/*.json`
 - Converter implementation: `chemtools/formatters/rule_to_protocol.py`
 - Integration: `chemtools/recommend/unified.py`
+# NOTE: This document describes legacy rule/protocol automation formatting.
+# The current unified recommender focuses on dataset/protocol/HTE indexing and
+# does not provide automation formatting through UnifiedRecommender.

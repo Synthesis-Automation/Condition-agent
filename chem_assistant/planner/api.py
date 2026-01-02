@@ -287,7 +287,7 @@ def _get_unified_recommender() -> Tuple[Optional[Any], Optional[str]]:
     if not UNIFIED_AVAILABLE:
         return None, "UnifiedRecommender not available"
 
-    default_index = _REPO_ROOT / "build" / "unified_index_complete"
+    default_index = _REPO_ROOT / "build" / "unified_recommendation_index"
     if not default_index.exists():
         return None, f"Unified index missing at {default_index}"
 
@@ -299,17 +299,32 @@ def _get_unified_recommender() -> Tuple[Optional[Any], Optional[str]]:
         return None, str(exc)
 
 
-def _convert_protocol_result(result: Any) -> CandidateCondition:
-    components: Dict[str, Any] = {}
-    metadata: Dict[str, Any] = {}
-    if hasattr(result, "full_data") and result.full_data:
-        components = result.full_data.get("conditions", {}) or {}
-        metadata = {
-            "family": result.family,
-            "source_file": result.full_data.get("source_file"),
+def _extract_unified_components(result: Any) -> Dict[str, Any]:
+    if not hasattr(result, "full_data") or not result.full_data:
+        return {}
+    data = result.full_data
+    if result.source_type == "dataset":
+        return data.get("conditions", {}) or {}
+    if result.source_type == "protocol":
+        return data.get("conditions") or data.get("reaction_setup") or {}
+    if result.source_type == "hte":
+        return {
+            "catalyst": data.get("Catalyst"),
+            "ligand": data.get("Ligand"),
+            "base": data.get("Base"),
+            "solvent": data.get("Solvent"),
+            "secondary_solvent": data.get("Secondary Solvent"),
+            "additive": data.get("Additive"),
+            "coupling_reagent": data.get("Coupling Reagent"),
         }
-    else:
-        metadata = {"family": getattr(result, "family", None)}
+    return {}
+
+
+def _convert_protocol_result(result: Any) -> CandidateCondition:
+    components = _extract_unified_components(result)
+    metadata: Dict[str, Any] = {"family": getattr(result, "family", None)}
+    if hasattr(result, "full_data") and result.full_data:
+        metadata["source_file"] = result.full_data.get("source_file")
     return CandidateCondition(
         candidate_id=f"{result.source_type}::{result.id}",
         components=components,
@@ -326,7 +341,7 @@ def _convert_protocol_result(result: Any) -> CandidateCondition:
 def find_similar_protocols(
     reaction: ReactionInput, *, top_k: int = 5
 ) -> List[CandidateCondition]:
-    """Retrieve DRFP-similar precedent protocols or rules."""
+    """Retrieve unified recommendations (dataset/protocol/HTE) via DRFP similarity."""
     rxn = reaction.as_reaction_smiles()
     if not rxn:
         return []
@@ -338,7 +353,7 @@ def find_similar_protocols(
 
     try:
         results: Sequence[RecommendationResult] = recommender.recommend(
-            rxn, top_k=top_k, validate_rules=False, format_for_automation=True
+            reaction_smiles=rxn, top_k=top_k, include_details=True
         )
     except Exception as exc:
         logger.warning("DRFP recommendation failed: %s", exc)

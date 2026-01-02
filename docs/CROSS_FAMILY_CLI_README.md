@@ -111,7 +111,7 @@ or
 
 ```
 ⚠️  Unified DRFP index not found - using feature-based similarity
-   To enable DRFP: python scripts/build_unified_drfp_index.py
+   To enable DRFP: python data-processor/build_unified_recommendation_index.py
 ```
 
 ### Rich Output
@@ -205,7 +205,7 @@ python app/cross_family_recommendation_cli.py --rxn "..." --no-drfp
 
 2. **Build unified DRFP index (recommended):**
    ```bash
-   python scripts/build_unified_drfp_index.py
+   python data-processor/build_unified_recommendation_index.py
    ```
    
    Without this, the CLI will use feature-based similarity (faster but less accurate).
@@ -225,7 +225,7 @@ python app/cross_family_recommendation_cli.py --help
 
 1. **For best accuracy**: Build the unified DRFP index first
    ```bash
-   python scripts/build_unified_drfp_index.py
+   python data-processor/build_unified_recommendation_index.py
    ```
 
 2. **For faster results**: Use `--no-drfp` flag (trades accuracy for speed)
@@ -244,7 +244,7 @@ python app/cross_family_recommendation_cli.py --help
 - Invalid reaction SMILES
 
 **Solutions:**
-1. Build unified index: `python scripts/build_unified_drfp_index.py`
+1. Build unified index: `python data-processor/build_unified_recommendation_index.py`
 2. Increase k value: `--k 100`
 3. Validate reaction SMILES format
 
@@ -252,7 +252,7 @@ python app/cross_family_recommendation_cli.py --help
 
 **Solution:**
 ```bash
-python scripts/build_unified_drfp_index.py
+python data-processor/build_unified_recommendation_index.py
 ```
 
 Then run the recommendation again.
@@ -310,7 +310,7 @@ print(result)
 ## See Also
 
 - [`local_recommendation_cli.py`](local_recommendation_cli.py) - Full-featured CLI with all options
-- [`scripts/build_unified_drfp_index.py`](../scripts/build_unified_drfp_index.py) - Build unified DRFP index
+- [`data-processor/build_unified_recommendation_index.py`](../data-processor/build_unified_recommendation_index.py) - Build unified DRFP index
 - [`docs/UNIFIED_DRFP_INDEX_GUIDE.md`](../docs/UNIFIED_DRFP_INDEX_GUIDE.md) - Unified index documentation
 - [`docs/CROSS_FAMILY_SEARCH.md`](../docs/CROSS_FAMILY_SEARCH.md) - Cross-family search details
 
@@ -324,3 +324,5 @@ python app/cross_family_recommendation_cli.py "reaction>>product"
 ```
 
 No catalyst selection, no family specification, no output file management - just simple, fast recommendations! 🚀
+# NOTE: This document refers to the legacy precedent search CLI.
+# The unified recommender now uses `build_unified_recommendation_index.py`.

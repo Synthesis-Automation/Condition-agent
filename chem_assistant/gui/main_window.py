@@ -675,7 +675,7 @@ class ChemAssistantWindow(QMainWindow):
                 "reaction_smiles": reaction_smiles,
                 "top_k": 5,
                 "min_similarity": 0.3,
-                "validate_rules": True,
+                "include_details": False,
             },
             "unified search"
         )

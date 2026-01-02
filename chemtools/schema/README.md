@@ -356,3 +356,5 @@ The build system generates comprehensive statistics:
 - JSON Schema spec: `condition_source_v2.json`
 - Example protocol (v2): `data/protocol_db/alpha_arylation_dong_v100p0099_v2.json`
 - Example rule (v2): `data/rule_db/sonogashira_v2.json`
+# NOTE: This schema/tooling targets legacy protocol/rule indexing.
+# The current unified recommender uses `build/unified_recommendation_index`.

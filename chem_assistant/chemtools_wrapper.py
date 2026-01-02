@@ -18,7 +18,7 @@ Available Tools:
     - rule_based_conditions_tool: Deterministic rule-engine condition guidance
     - search_precedents_tool: Search for similar precedent reactions
     - protocol_recommendation_tool: Find full experimental protocols from literature
-    - unified_recommender_tool: Unified DRFP-based protocol + rule search
+    - unified_recommender_tool: Unified dataset/protocol/HTE search
     - rule_builder_autofill_tool: LLM-assisted drafting of rule database JSON
     - hte_recommend_tool: HTE-based condition recommendations (66K experiments, catalyst filtering)
     - hte_analytics_tool: HTE database analytics (reactant pairs, catalysts, metal usage)
@@ -68,7 +68,7 @@ from chemtools.smiles import normalize, normalize_reaction
 from chemtools import (
     detect_reaction,
 )
-from chemtools.recommend.modules import recommend_from_reaction
+from chemtools.recommend import recommend_from_reaction
 from chemtools.recommend.utils import canonical_family
 from chemtools.precedent import knn as precedent_knn
 from chemtools.dataset_analytics import (
@@ -2531,18 +2531,19 @@ def list_all_families_tool() -> Dict[str, Any]:
 
 
 # ============================================================================
-# Unified Recommender Tool (Protocol + Rule Search)
+# Unified Recommender Tool (Dataset + Protocol + HTE)
 # ============================================================================
 
 class UnifiedRecommenderInput(BaseModel):
     """Input schema for unified_recommender_tool."""
     reaction_smiles: str = Field(..., description="Full reaction SMILES string (reactants>>products)")
     top_k: int = Field(default=1, description="Number of recommendations to return (max 10)", ge=1, le=10)
-    min_similarity: float = Field(default=0.0, description="Minimum DRFP similarity threshold (0.0-1.0)", ge=0.0, le=1.0)
-    source_type: Optional[str] = Field(default=None, description="Filter by source: 'protocol' (full experimental procedures) or 'rule' (general guidelines)")
-    validate_rules: bool = Field(default=True, description="Enable chemical validation: applies_if for rules, reaction_SMARTS for protocols")
-    format_for_automation: bool = Field(default=False, description="Format conditions with ordered addition sequences for automated execution")
-    scale_mmol: float = Field(default=1.0, description="Reaction scale in mmol (for automation format)", ge=0.1, le=1000.0)
+    min_similarity: float = Field(default=0.0, description="Minimum similarity threshold (0.0-1.0)", ge=0.0, le=1.0)
+    source_type: Optional[str] = Field(
+        default=None,
+        description="Filter by source: 'protocol', 'dataset', or 'hte' (default: all)",
+    )
+    include_details: bool = Field(default=False, description="Include full source details in the output")
 
 
 class AutoConditionsLLMInput(BaseModel):
@@ -2615,76 +2616,14 @@ def unified_recommender_tool(
     top_k: int = 1,
     min_similarity: float = 0.0,
     source_type: Optional[str] = None,
-    validate_rules: bool = True,
-    format_for_automation: bool = False,
-    scale_mmol: float = 1.0
+    include_details: bool = False,
 ) -> Dict[str, Any]:
     """
-    Find similar reactions and condition recommendations using DRFP similarity with chemical validation.
-    
-    This tool provides a unified search across both:
-    - **Protocols**: Full experimental procedures from literature
-    - **Rules**: General reaction guidelines and best practices
-    
-    Uses DRFP (Differentiable Reaction Fingerprints) for reaction similarity,
-    with optional post-similarity validation for chemical appropriateness:
-    - **Protocols**: Validated using reaction_SMARTS patterns (exact transformation matching)
-    - **Rules**: Validated using applies_if criteria (functional group detection)
-    
-    **When to use this tool:**
-    - Need recommendations for an unfamiliar reaction
-    - Want to find similar precedents from literature
-    - Looking for general reaction guidelines
-    - Comparing different condition options
-    
-    **Source types:**
-    - `protocol`: Returns only full experimental procedures (e.g., from Org. Synth.)
-    - `rule`: Returns only general reaction guidelines
-    - None (default): Returns both protocols and rules, ranked by similarity
-    
-    **Validation (default: enabled):**
-    - Filters out chemically inappropriate recommendations
-    - Protocols: Checks if reaction_SMARTS patterns match the query transformation
-    - Rules: Checks if detected features meet applies_if criteria
-    - Recommended to keep enabled for chemical accuracy
-    
-    Args:
-        reaction_smiles: Full reaction SMILES (reactants>>products)
-        top_k: Number of results to return (1-10, default 1)
-        min_similarity: Minimum similarity threshold (0.0-1.0, default 0.0)
-        source_type: Filter by 'protocol', 'rule', or None for both
-        validate_rules: Enable chemical validation (default True, recommended)
-    
-    Returns:
-        Dict with ranked recommendations including similarity scores, metadata,
-        and source attribution
-    
-    Example:
-        >>> unified_recommender_tool(
-        ...     reaction_smiles="Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
-        ...     top_k=3,
-        ...     min_similarity=0.3,
-        ...     validate_rules=True
-        ... )
-        {
-            "success": True,
-            "recommendations": [
-                {
-                    "rank": 1,
-                    "name": "Buchwald–Hartwig C–N Coupling",
-                    "source_type": "rule",
-                    "family": "Buchwald–Hartwig_C–N",
-                    "similarity": 0.82,
-                    "tags": ["C-N-coupling", "amination", "cross-coupling"],
-                    "validated": true
-                },
-                ...
-            ],
-            "query": "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1",
-            "count": 3,
-            "validation_enabled": true
-        }
-    """
+Find similar reactions and condition recommendations across dataset, protocol, and HTE sources.
+
+Uses DRFP similarity when reaction SMILES are available and feature-tag similarity
+for HTE records that only include reactant type labels.
+"""
     if not UNIFIED_RECOMMENDER_AVAILABLE:
         return _error_response(
             "Unified recommender not available. Install DRFP: pip install drfp"
@@ -2699,15 +2638,13 @@ def unified_recommender_tool(
         if source_type:
             source_types = [source_type.lower()]
         
-        # Get recommendations with validation
+        # Get recommendations
         results = recommender.recommend(
             reaction_smiles=reaction_smiles,
             top_k=top_k,
             min_similarity=min_similarity,
             source_types=source_types,
-            validate_rules=validate_rules,  # Enable chemical validation
-            format_for_automation=format_for_automation,
-            scale_mmol=scale_mmol
+            include_details=include_details,
         )
         
         # Format results for LLM
@@ -2720,15 +2657,12 @@ def unified_recommender_tool(
                 "source_type": result.source_type,
                 "family": result.family,
                 "similarity": round(result.similarity, 3),
-                "tags": result.tags,
-                "version": result.version,
-                "validated": validate_rules  # Indicate if validation was applied
+                "drfp_similarity": result.drfp_similarity,
+                "feature_similarity": result.feature_similarity,
+                "source_file": result.source_file,
             }
-            
-            # Add automation format if requested
-            if format_for_automation and result.full_data:
-                result_dict["reaction_setup"] = result.full_data.get("reaction_setup", [])
-                result_dict["metadata"] = result.full_data.get("metadata", {})
+            if include_details and result.full_data is not None:
+                result_dict["details"] = result.full_data
             
             formatted_results.append(result_dict)
         
@@ -2736,13 +2670,11 @@ def unified_recommender_tool(
             "recommendations": formatted_results,
             "query": reaction_smiles,
             "count": len(formatted_results),
-            "validation_enabled": validate_rules,
-            "automation_format": format_for_automation,
             "filters": {
                 "top_k": top_k,
                 "min_similarity": min_similarity,
                 "source_type": source_type or "all",
-                "scale_mmol": scale_mmol if format_for_automation else None
+                "include_details": include_details,
             }
         })
     
@@ -3814,7 +3746,7 @@ CHEMTOOLS_TOOLS = [
     rule_based_conditions_tool,
     search_precedents_tool,
     protocol_recommendation_tool,  # NEW: Protocol-based recommendations with full procedures
-    unified_recommender_tool,  # NEW: Unified DRFP-based protocol + rule search
+    unified_recommender_tool,  # NEW: Unified dataset/protocol/HTE search
     rule_builder_autofill_tool,  # NEW: LLM-assisted rule database drafting
     hte_recommend_tool,  # NEW: HTE-based condition recommendations with catalyst filtering
     hte_analytics_tool,  # NEW: HTE database analytics (pairs, catalysts, metals)
@@ -3974,75 +3906,27 @@ def _simplify_recommendation(raw: Dict[str, Any]) -> Dict[str, Any]:
     elif reasons_src:
         reasons_list = [str(reasons_src)]
 
-    # Get base recommendation
-    recommendation = dict(raw.get("recommendation", {}) or {})
-    
-    # Resolve base and solvent names from UIDs
-    base_uid = recommendation.get("base_uid")
-    solvent_uid = recommendation.get("solvent_uid")
-    
-    if base_uid and not recommendation.get("base"):
-        try:
-            base_info = find_reagent(str(base_uid), "base")
-            if isinstance(base_info, dict) and not base_info.get("error"):
-                recommendation["base"] = base_info.get("name") or base_info.get("abbreviation")
-        except Exception:
-            pass
-    
-    if solvent_uid and not recommendation.get("solvent"):
-        try:
-            solvent_info = find_reagent(str(solvent_uid), "solvent")
-            if isinstance(solvent_info, dict) and not solvent_info.get("error"):
-                recommendation["solvent"] = solvent_info.get("name") or solvent_info.get("abbreviation")
-        except Exception:
-            pass
-    
-    # For amide formation reactions, extract coupling reagents and additives from precedents
-    family = str(raw.get("family", "")).lower()
-    is_amide = any(term in family for term in ["amide", "amidation"])
-    
-    if is_amide and not recommendation.get("coupling_reagent"):
-        # Extract reagent information from top precedents
-        precedent_pack = raw.get("precedent_pack", {})
-        precedents = precedent_pack.get("precedents", [])
-        
-        if precedents:
-            # Analyze top precedents to find most common coupling reagents and additives
-            coupling_reagents = {}
-            additives = {}
-            
-            for prec in precedents[:10]:  # Check top 10 precedents
-                reagents = prec.get("reagents", [])
-                if isinstance(reagents, list):
-                    for r in reagents:
-                        role = r.get("role", "").upper()
-                        name = r.get("name") or r.get("abbreviation") or r.get("original_name", "")
-                        
-                        if role == "COUPLING_REAGENT" and name:
-                            coupling_reagents[name] = coupling_reagents.get(name, 0) + 1
-                        elif role == "ADDITIVE" and name:
-                            additives[name] = additives.get(name, 0) + 1
-            
-            # Add most common coupling reagent to recommendation
-            if coupling_reagents:
-                top_coupling = max(coupling_reagents.items(), key=lambda x: x[1])[0]
-                recommendation["coupling_reagent"] = top_coupling
-            
-            # Add most common additives to recommendation
-            if additives:
-                top_additives = sorted(additives.items(), key=lambda x: x[1], reverse=True)
-                recommendation["additives"] = ", ".join([name for name, _ in top_additives[:2]])
+    recommendations = list(raw.get("recommended_conditions") or raw.get("recommendations") or [])
+    top = recommendations[0] if recommendations else {}
+    recommendation = dict(top.get("conditions") or {})
+    if top:
+        recommendation.setdefault("source_type", top.get("source_type"))
+        recommendation.setdefault("similarity", top.get("similarity"))
+
+    detection = raw.get("detection", {}) or {}
+    family = (
+        detection.get("detected_reaction_type")
+        or raw.get("family")
+        or "Unknown"
+    )
 
     return {
-        "family": raw.get("family", "Unknown"),
-        "detected_family": raw.get("detected_family"),
-        "search_all_families": raw.get("search_all_families", False),
+        "family": family,
         "recommendation": recommendation,
-        "alternatives": raw.get("alternatives", {}) or {},
+        "recommendations": recommendations,
         "reasons": reasons_list[:5],
-        "precedent_count": len(raw.get("precedent_pack", {}).get("precedents", [])),
-        "detection": raw.get("detection", {}),
-        "constraint_filters": raw.get("constraint_filters"),
+        "detection": detection,
+        "meta": raw.get("meta", {}),
     }
 
 

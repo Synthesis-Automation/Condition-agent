@@ -144,7 +144,7 @@ You have access to the following tools:
 11. **rule_based_conditions_tool**: Deterministic rule-engine guidance with feature-level reasoning
 12. **search_precedents_tool**: Find similar precedent reactions
 13. **protocol_recommendation_tool**: Retrieve full experimental protocols from literature
-14. **unified_recommender_tool**: Unified protocol + rule search (DRFP similarity)
+14. **unified_recommender_tool**: Unified dataset/protocol/HTE search (DRFP + tags)
 15. **reaction_dataset_analytics_tool**: Summarize reaction dataset composition, yields, and popular reagents
 16. **find_reagent_tool**: Look up reagent information from database
 17. **reagent_database_analytics_tool**: Summarize reagent database composition and completeness
@@ -165,7 +165,7 @@ For reaction condition recommendations:
 3. Choose the appropriate recommendation tool:
    - **hte_screening_set_tool**: For generating DIVERSE condition sets for HTE screening plates (12-24 conditions for parallel testing). USE THIS when users want to "screen", "test multiple conditions", "set up a plate", or need a "group of conditions". This is the PRIMARY HTE use case.
    - **hte_recommend_tool**: For data-driven top-K recommendations from 66K+ HTE experiments (fast, <100ms, statistical evidence with Z-scores). USE THIS when users explicitly mention "HTE system" or want experimental data-backed conditions for a SINGLE best condition or small set.
-   - **unified_recommender_tool**: Default best-effort protocol + rule search when users want practical conditions and/or automation-ready output.
+   - **unified_recommender_tool**: Default best-effort dataset/protocol/HTE search when users want practical conditions.
    - **protocol_recommendation_tool**: For full literature protocols (stepwise procedures) when users ask for "protocol", "procedure", or "paper conditions".
    - **recommend_conditions_tool**: For ML-based predictions with diverse precedent coverage
    - **rule_based_conditions_tool**: For deterministic guidance with feature-level reasoning

@@ -45,7 +45,7 @@ The agent queries EVERY available knowledge source:
 
 - **recommend_conditions_tool** - ML-ranked precedents
 - **search_precedents_tool** - Detailed precedent exploration
-- **unified_recommender_tool** - DRFP-based unified search
+- **unified_recommender_tool** - Unified dataset/protocol/HTE search
 
 #### C. Protocol Database
 

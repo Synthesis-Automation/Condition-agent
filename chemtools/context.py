@@ -434,19 +434,10 @@ class RecommendNamespace:
     
     def design_plate(self, reaction: str, plate_size: int = 96,
                     relax: Optional[Dict] = None, constraint_rules: Optional[Dict] = None) -> Dict[str, Any]:
-        """Design experimental plate layout.
-        
-        Args:
-            reaction: Reaction SMILES
-            plate_size: Plate size (96 or 384)
-            relax: Relaxation rules
-            constraint_rules: Constraint rules
-            
-        Returns:
-            Dict with plate design
-        """
-        from . import recommend as _recommend
-        return _recommend.design_plate_from_reaction(reaction, plate_size, relax or {}, constraint_rules or {})
+        """Design experimental plate layout (not available in unified recommender)."""
+        raise NotImplementedError(
+            "Plate design is not available in the unified recommendation system."
+        )
 
 
 class ReagentNamespace:

@@ -209,6 +209,6 @@ np.savez_compressed(
 
 ## See Also
 
-- `Build_unified_drfp_index.py` - Combines NPZ files for cross-family search
+- `build_unified_recommendation_index.py` - Builds the unified recommendation index
 - `AUTOMATION_FORMAT.md` - Structure of JSONL records
 - `chemtools/featurizers/molecular.py` - Feature generation

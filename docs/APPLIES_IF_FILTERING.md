@@ -274,3 +274,5 @@ pytest tests/test_rule_validation.py -v
 ✅ **Fail-safe**: Fails open if detection fails  
 
 **The system is production-ready and working correctly!**
+# NOTE: Applies-if filtering was part of the legacy rule-based recommender.
+# The unified recommender no longer applies rule filtering by default.

@@ -24,17 +24,16 @@ Implemented in `app/main.py`; each endpoint returns the same payloads as the Pyt
 | Reaction utilities | `POST /normalize`, `POST /detect_family`, `POST /detect_type` | SMILES normalization and family/type detection |
 | Featurization | `POST /featurize/molecular`, `POST /featurize/role-aware` | Deterministic feature vectors |
 | Precedents | `POST /precedent/knn`, `POST /precedent/filters`, `POST /precedent/explain` | DRFP-powered precedent search |
-| Recommendations | `POST /api/v1/recommend`, `/recommend/conditions`, `/recommend/fusion` | Rule/ML fusion outputs |
-| Plate design | `POST /api/v1/design_plate` | Grid design from recommendation results |
+| Recommendations | `POST /api/v1/recommend`, `/recommend/conditions`, `/recommend/fusion` | Unified recommender output (dataset + protocol + HTE) |
+| Plate design | `POST /api/v1/design_plate` | Deprecated (unavailable in unified system) |
 | Core search | `POST /api/v1/core/search` | Catalyst core lookup |
 | Registry | `POST /match`, `POST /registry` | SCDB matcher and reagent registry |
 | Protocol | `POST /protocol/recommend` (via CLI/SDK) | DRFP similarity-based protocol suggestion |
 
 ## Recommendation Engines
 
-- **Rule-based**: `chemtools.recommend.core.recommend_conditions()` orchestrates deterministic selection; helper utilities live under `chemtools.recommend.families` and `chemtools.recommend.modules`.
-- **ML Fusion**: `chemtools.recommend.ml.predict_conditions()` mixes DRFP scorers and rule outputs.
-- **Protocol**: `chemtools.protocol.ProtocolRecommender.recommend(reaction_smiles, k)` loads/stores DRFP indexes and returns standard JSON payloads.
+- **Unified**: `chemtools.recommend.UnifiedRecommender` uses a single index spanning datasets, protocols, and HTE data.
+- Legacy rule/ML fusion entry points were removed during consolidation.
 
 ## Precedent & Routing Utilities
 

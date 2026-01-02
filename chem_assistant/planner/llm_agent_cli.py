@@ -23,7 +23,7 @@ from chem_assistant.chemtools_wrapper import (
     # Recommendation tools from all databases
     recommend_conditions_tool,          # ML-based precedent search
     rule_based_conditions_tool,         # Rule database
-    unified_recommender_tool,           # Unified DRFP search
+    unified_recommender_tool,           # Unified dataset/protocol/HTE search
     search_precedents_tool,             # Precedent database
     protocol_recommendation_tool,       # Protocol database
     hte_recommend_tool,                 # HTE database (66K experiments)
@@ -147,7 +147,7 @@ def run_cli() -> int:
         # Phase 2: Multi-Database Search
         recommend_conditions_tool,          # ML precedent database
         rule_based_conditions_tool,         # Rule database
-        unified_recommender_tool,           # Unified DRFP search
+        unified_recommender_tool,           # Unified dataset/protocol/HTE search
         search_precedents_tool,             # Precedent reactions
         protocol_recommendation_tool,       # Full protocols
         hte_recommend_tool,                 # HTE experiments (66K+)
@@ -186,7 +186,7 @@ B. ML Precedent Database:
    
 C. Protocol Database:
    - Use protocol_recommendation_tool for complete experimental protocols
-   - Use unified_recommender_tool for DRFP-based protocol search
+   - Use unified_recommender_tool for unified dataset/protocol/HTE search
    
 D. HTE Database (66,308 experiments):
    - Use hte_recommend_tool for HTE-based recommendations with catalyst filtering

@@ -131,3 +131,5 @@ python test_simple_conversion.py
 ---
 
 **Ready to automate your chemistry!** 🤖⚗️
+# NOTE: This document references legacy UnifiedRecommender automation hooks.
+# The current unified recommender indexes dataset/protocol/HTE sources only.
