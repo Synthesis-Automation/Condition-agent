@@ -940,24 +940,14 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             except Exception as e:
                 print(f"  Warning: Failed to initialize V2 Processor: {e}")
         
-        # Import chemtools for DRFP
-        try:
-            from chemtools import reaction_similarity as rs
-            drfp_available = rs.drfp_available()
-        except Exception:
-            drfp_available = False
-        
         out_lines: List[str] = []
-        precompute_stats = {"success": 0, "failed": 0, "skipped": 0, "drfp_computed": 0}
-        
-        # Collect DRFP fingerprints for binary storage
-        drfp_fingerprints = []
-        drfp_reaction_ids = []
+        precompute_stats = {"success": 0, "failed": 0, "skipped": 0}
         
         for idx, row in enumerate(rows, 1):
             rid = row.get("ReactionID", "")
             reactants_smi = row.get("ReactantSMILES", "")
             products_smi = row.get("ProductSMILES", "")
+            reaction_type = (row.get("ReactionType") or row.get("reaction_type") or "").strip()
             
             if not reactants_smi or not products_smi:
                 precompute_stats["skipped"] += 1
@@ -987,6 +977,7 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             reaction_data = {
                 "reaction_id": rid,
                 "reaction_smiles": reaction_smiles,
+                "reaction_type": reaction_type,
                 "reagents": reagents,
                 "solvents": solvents,
                 "conditions": {
@@ -1017,17 +1008,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     "reference": reaction_data["reference"]
                 }
 
-            # DRFP Fingerprint (Optional but useful)
-            if drfp_available:
-                try:
-                    from chemtools import reaction_similarity as rs
-                    fp_array = rs.encode_drfp(reaction_smiles, n_bits=4096, radius=3)
-                    if fp_array is not None:
-                        drfp_fingerprints.append(fp_array)
-                        drfp_reaction_ids.append(rid)
-                        precompute_stats["drfp_computed"] += 1
-                except:
-                    pass
+            if reaction_type:
+                v2_entry["reaction_type"] = reaction_type
 
             out_lines.append(_json.dumps(v2_entry, ensure_ascii=False, separators=(',', ':')))
             
@@ -1039,24 +1021,6 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
             
-            # Save DRFP fingerprints to binary NPZ file
-            if drfp_fingerprints and drfp_reaction_ids:
-                npz_path = output_path.rsplit('.', 1)[0] + '_drfp.npz'
-                try:
-                    import numpy as np
-                    fps_matrix = np.vstack(drfp_fingerprints)
-                    reaction_ids_array = np.array(drfp_reaction_ids, dtype=object)
-                    np.savez_compressed(
-                        npz_path,
-                        fps=fps_matrix,
-                        reaction_ids=reaction_ids_array,
-                        n_bits=np.array(4096, dtype='int32'),
-                        radius=np.array(3, dtype='int32')
-                    )
-                    print(f"  Saved {len(drfp_reaction_ids)} DRFP fingerprints to {npz_path}")
-                except Exception as e:
-                    print(f"  Warning: Failed to save DRFP binary file: {e}")
-
             # Print statistics
             total = len(rows)
             print(f"\n{'='*60}")
@@ -1345,7 +1309,7 @@ class RDFWorker(QtCore.QObject):
             self._emit(f"      Generating Markdown report...")
             generator.generate_markdown_report(rows, output_md, source_name)
             
-            self._emit(f"      Generating JSONL and DRFP fingerprints...")
+            self._emit(f"      Generating JSONL export...")
             generator.generate_jsonl_export(rows, output_jsonl, source_name)
             
             # Show file sizes for verification
@@ -1355,10 +1319,6 @@ class RDFWorker(QtCore.QObject):
                 self._emit(f"\n      ✓ Successfully saved {len(rows)} reactions:")
                 self._emit(f"        JSONL: {output_jsonl} ({jsonl_size:.1f} KB)")
                 self._emit(f"        MD:    {output_md} ({md_size:.1f} KB)")
-                drfp_path = output_jsonl.rsplit('.', 1)[0] + '_drfp.npz'
-                if os.path.exists(drfp_path):
-                    drfp_size = os.path.getsize(drfp_path) / 1024  # KB
-                    self._emit(f"        DRFP:  {drfp_path} ({drfp_size:.1f} KB)")
             except Exception:
                 self._emit(f"\n      ✓ Saved {len(rows)} reactions")
                 self._emit(f"        JSONL: {output_jsonl}")
@@ -2244,7 +2204,6 @@ class RDFWorker(QtCore.QObject):
         
         # NOTE: No need to call export_jsonl_for_chemtools anymore
         # We now save directly to data/reaction_dataset/ instead of copying
-        # The DRFP binary file (.npz) is also saved alongside the JSONL automatically
 
     @Slot() if Slot else (lambda f: f)
     def run(self):
@@ -2370,8 +2329,7 @@ class RDFWorker(QtCore.QObject):
                     (
                         f"Successfully processed {len(self.rdf_files)} RDF files with {len(rows)} reactions.\n\n"
                         f"Markdown (records): {self.output_md_path}\n"
-                        f"JSONL (chemtools): {self.output_jsonl_path}\n"
-                        f"DRFP binary: {self.output_jsonl_path.rsplit('.', 1)[0] + '_drfp.npz'}"
+                        f"JSONL (chemtools): {self.output_jsonl_path}"
                     ),
                 )
                 

@@ -4,7 +4,7 @@ Build a unified recommendation index from reaction datasets, protocols, and HTE 
 This builder consolidates three source types into a single index:
   - reaction_dataset JSONL files (conditions + reaction SMILES)
   - protocol_db_v2 JSON files (detailed procedures + reaction SMILES)
-  - HTE CSV files (reactant-type based screens, no reaction SMILES)
+  - HTE CSV/JSONL files (reactant-type based screens, no reaction SMILES)
 
 Outputs:
   - index.jsonl: one line per entry with tags and source locator
@@ -121,6 +121,39 @@ def _hte_name(row: Dict[str, str]) -> str:
     solvent = (row.get("Solvent") or "").strip()
     parts = [part for part in (catalyst, ligand, base, solvent) if part]
     return " / ".join(parts) if parts else "HTE condition"
+
+
+def _hte_name_from_record(record: Dict[str, Any]) -> str:
+    name = (record.get("name") or "").strip() if isinstance(record.get("name"), str) else None
+    if name:
+        return name
+    conditions = record.get("conditions") or {}
+    parts: List[str] = []
+    for key in ("catalyst", "ligand", "base", "solvent"):
+        value = conditions.get(key)
+        if isinstance(value, list):
+            text = ", ".join([str(v).strip() for v in value if str(v).strip()])
+        else:
+            text = str(value).strip() if value is not None else ""
+        if text:
+            parts.append(text)
+    return " / ".join(parts) if parts else "HTE condition"
+
+
+def _hte_tags_from_record(record: Dict[str, Any]) -> List[str]:
+    tags = set(record.get("tags") or [])
+    if tags:
+        return sorted(tags)
+    reaction_type = record.get("reaction_type") or record.get("reaction_family") or ""
+    if reaction_type and reaction_type != "Unknown":
+        tags.add(f"rxn_type:{reaction_type}")
+    for token in record.get("reactant_types") or []:
+        if token:
+            tags.add(f"reactant:{token}")
+    for token in record.get("reactant_categories") or []:
+        if token:
+            tags.add(f"reactant_cat:{token}")
+    return sorted(tags)
 
 
 class UnifiedRecommendationIndexBuilder:
@@ -301,6 +334,14 @@ class UnifiedRecommendationIndexBuilder:
             return
 
         print(f"Loading HTE data from: {hte_dir}")
+        jsonl_paths = sorted(hte_dir.glob("*.jsonl"))
+        if jsonl_paths:
+            preferred = [path for path in jsonl_paths if path.stem.lower() == "hte_0"]
+            if preferred:
+                jsonl_paths = preferred
+            self._load_hte_jsonl(entries, jsonl_paths)
+            return
+
         local_count = 0
         for path in sorted(hte_dir.glob("*.csv")):
             print(f"  File: {path.name}")
@@ -316,6 +357,44 @@ class UnifiedRecommendationIndexBuilder:
                     entry = {
                         "id": entry_id,
                         "name": _hte_name(row),
+                        "source_type": "hte",
+                        "family": family or "Unknown",
+                        "tags": tags,
+                        "source_file": str(path),
+                        "record_index": row_idx,
+                    }
+                    entries.append(entry)
+                    self.stats.record_source("hte")
+                    self.stats.total_entries += 1
+                    local_count += 1
+                    if local_count % _PROGRESS_EVERY == 0:
+                        print(f"  ...loaded {local_count} HTE entries")
+
+    def _load_hte_jsonl(self, entries: List[Dict[str, Any]], paths: List[Path]) -> None:
+        local_count = 0
+        for path in paths:
+            print(f"  File: {path.name}")
+            with path.open("r", encoding="utf-8") as handle:
+                for row_idx, line in enumerate(handle):
+                    if self.config.max_records and self.stats.total_entries >= self.config.max_records:
+                        print("  Reached max_records limit, stopping.")
+                        return
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        record = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+
+                    tags = _hte_tags_from_record(record)
+                    family_raw = record.get("reaction_family") or record.get("reaction_type")
+                    family = canonical_family(str(family_raw)) if family_raw else "Unknown"
+                    entry_id = record.get("hte_id") or record.get("id") or f"{path.stem}:{row_idx}"
+
+                    entry = {
+                        "id": str(entry_id),
+                        "name": _hte_name_from_record(record),
                         "source_type": "hte",
                         "family": family or "Unknown",
                         "tags": tags,
