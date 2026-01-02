@@ -10,7 +10,7 @@ from typing import Optional, Set, Dict
 import re
 
 from .taxonomy import reaction_catalog
-from .analysis.reactions import canonical_family_label
+from .featurizers.analysis.reactions import canonical_family_label
 
 
 def resolve_to_taxonomy(

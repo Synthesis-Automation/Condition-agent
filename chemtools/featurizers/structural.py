@@ -241,7 +241,7 @@ def analyze_smiles(
 
 
 def _default_registry_paths() -> Dict[str, Path]:
-    base = Path(__file__).resolve().parent.parent / "taxonomy" / "v2_data"
+    base = Path(__file__).resolve().parent.parent / "taxonomy" / "data"
     return {
         "groups": base / "organic_groups.v1.3.json",
         "compounds": base / "organic_compounds.v1.3.json",

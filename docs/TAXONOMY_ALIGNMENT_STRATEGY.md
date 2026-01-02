@@ -102,7 +102,7 @@ All detection logic must use these functions to ensure taxonomy alignment.
 from typing import Optional, Set
 from .taxonomy import load_registry
 from .taxonomy.registry import TaxonomyRegistry
-from .analysis.reactions import canonical_family_label
+from chemtools.featurizers.analysis.reactions import canonical_family_label
 
 _registry: Optional[TaxonomyRegistry] = None
 
@@ -179,7 +179,7 @@ def apply_catalyst_override_with_taxonomy(
     
     Ensures returned ID exists in taxonomy.
     """
-    from .analysis.reactions import apply_catalyst_override, CN_FAMILIES_CANONICAL
+    from chemtools.featurizers.analysis.reactions import apply_catalyst_override, CN_FAMILIES_CANONICAL
     
     override = apply_catalyst_override(family, catalysts, is_cn_coupling=is_cn_coupling)
     

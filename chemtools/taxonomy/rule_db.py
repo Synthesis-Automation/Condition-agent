@@ -14,7 +14,7 @@ import re
 from typing import Any, Iterable, List, Optional
 
 from . import reaction_catalog
-from ..analysis.reactions import canonical_family_label
+from ..featurizers.analysis.reactions import canonical_family_label
 
 
 _RULE_DB_V2_METADATA_KEY = "rule_db_v2"

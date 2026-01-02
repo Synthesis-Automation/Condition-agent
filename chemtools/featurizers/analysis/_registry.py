@@ -24,7 +24,7 @@ def get_registry() -> Optional[TaxonomyRegistry]:
     if _REGISTRY_LOAD_FAILED:
         return None
     try:
-        from ..taxonomy import registry as _registry
+        from ...taxonomy import registry as _registry
         _REGISTRY_CACHE = _registry.load_registry()
         return _REGISTRY_CACHE
     except Exception:

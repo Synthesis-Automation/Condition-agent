@@ -48,7 +48,7 @@ class ReactionDetectionResult:
 
 @lru_cache(maxsize=1)
 def _load_compound_registry() -> Dict[str, Any]:
-    base = Path(__file__).resolve().parent.parent / "taxonomy" / "v2_data"
+    base = Path(__file__).resolve().parent.parent / "taxonomy" / "data"
     registry_paths = {
         "groups": base / "organic_groups.v1.3.json",
         "compounds": base / "organic_compounds.v1.3.json",

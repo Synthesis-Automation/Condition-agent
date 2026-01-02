@@ -13,8 +13,8 @@ ChemTools provides **multiple methods** for detecting and classifying reaction t
 | **Rule-Based SMARTS** | `router.detect_family()` | Deterministic | High | Fast | RDKit (optional) |
 | **Full Reaction Analysis** | `router.detect_family_from_reaction()` | Hybrid | Very High | Fast | RDKit (optional) |
 | **ML-Based (rxn-insight)** | `reaction_type_detector.detect_reaction_type()` | ML | Very High | Medium | rxn-insight |
-| **Reactant Classification** | `analysis.reactants` | Taxonomy | High | Fast | None |
-| **Context-Aware Classification** | `analysis.reaction_context` | Advanced | Very High | Medium | RDKit |
+| **Reactant Classification** | `featurizers.analysis.reactants` | Taxonomy | High | Fast | RDKit |
+| **Context-Aware Classification** | `featurizers.analysis.reaction_context` | Advanced | Very High | Medium | RDKit |
 
 ---
 
@@ -260,7 +260,7 @@ The ML detector maps rxn-insight classes to ChemTools families:
 
 ## 4. Reactant Classification
 
-### `chemtools.analysis.reactants.classify_reactant_smiles(smiles: str)`
+### `chemtools.featurizers.analysis.reactants.classify_reactant_smiles(smiles: str)`
 
 **Taxonomy-based reactant classification** for identifying reactant types.
 
@@ -309,7 +309,7 @@ result = classify_reactant_smiles("Brc1ccccc1")
 
 ## 5. Context-Aware Classification
 
-### `chemtools.analysis.reaction_context.classify_reactants_with_context(reaction_smiles: str)`
+### `chemtools.featurizers.analysis.reaction_context.classify_reactants_with_context(reaction_smiles: str)`
 
 **Advanced method** combining SMILES normalization, reactant classification, and reaction family detection.
 
@@ -323,7 +323,7 @@ result = classify_reactant_smiles("Brc1ccccc1")
 #### Usage Example
 
 ```python
-from chemtools.analysis.reaction_context import classify_reactants_with_context
+from chemtools.featurizers.analysis.reaction_context import classify_reactants_with_context
 
 result = classify_reactants_with_context("Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1")
 
@@ -381,7 +381,7 @@ result = detect_reaction_type(reaction_smiles)
 
 **For complete context analysis:**
 ```python
-from chemtools.analysis.reaction_context import classify_reactants_with_context
+from chemtools.featurizers.analysis.reaction_context import classify_reactants_with_context
 
 result = classify_reactants_with_context(reaction_smiles)
 ```

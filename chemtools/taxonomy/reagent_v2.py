@@ -13,7 +13,7 @@ from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 from chemtools.util.rdkit_helpers import parse_smiles
 from chemtools.util.smarts_cache import compile_smarts
 
-DEFAULT_REAGENT_V2_DIR = Path(__file__).resolve().parent / "v2_data"
+DEFAULT_REAGENT_V2_DIR = Path(__file__).resolve().parent / "data"
 _ROLES_FILE = "reagent_roles.v2.json"
 _FAMILIES_FILE = "reagent_families.v2_cas.json"
 _CAS_PACK_FILE = "reagent_cas_pack_solvent_base.v2.json"

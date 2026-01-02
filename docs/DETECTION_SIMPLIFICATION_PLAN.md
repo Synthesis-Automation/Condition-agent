@@ -26,6 +26,7 @@ class _DetectionEngine:
 ```
 
 **File Migration:**
+
 ```
 BEFORE:
 chemtools/router.py (548 lines) ────────┐
@@ -84,16 +85,19 @@ Which function should I use?
 ### Code Duplication
 
 **Catalyst detection** - duplicated in:
+
 - `router.py::_detect_agent_metals()`
 - `reaction_type_detector.py::detect_reaction_type()` (indirectly via imports)
 - `router.py::detect_family_from_reaction()` (calls _detect_agent_metals)
 
 **Family mapping** - duplicated in:
+
 - `reaction_type_detector.py::_map_to_family()`
 - `router.py::resolve_reaction_family()`
 - `analysis/reactions.py::resolve_reaction_family()`
 
 **Confidence calculation** - scattered across:
+
 - `router.py::detect_family()` (hardcoded values)
 - `reaction_type_detector.py::_refine_cn_family()` (override logic)
 - `router.py::detect_family_from_reaction()` (merging logic)
@@ -342,6 +346,7 @@ def detect_reaction(reaction_smiles: str, use_ml: bool = True) -> dict:
 ### 🤖 Where rxn-insight ML Goes
 
 **Current situation (confusing):**
+
 ```
 chemtools/
 ├── router.py                    ← Rule-based detection
@@ -357,6 +362,7 @@ chemtools/
 ```
 
 **New unified approach (clear):**
+
 ```
 chemtools/
 ├── detection.py                 ← EVERYTHING in one file
@@ -391,6 +397,7 @@ chemtools/
    - **ML predictions mapped to taxonomy IDs using `canonical_family_label()`**
 
 3. **Transparent integration**
+
    ```python
    # User doesn't need to know about rxn-insight
    result = detect_reaction(rxn)  # Uses ML if available, rules otherwise
@@ -406,10 +413,11 @@ chemtools/
 4. **All ML logic in `_ml_detection()` method**
    - Consolidates entire `reaction_type_detector.py` (~304 lines)
    - Includes: `_call_insight()`, `_extract_fields()`, `_map_to_taxonomy()`, `_refine_cn_family()`
-   - **Uses `chemtools.analysis.reactions.canonical_family_label()` for mapping**
+   - **Uses `chemtools.featurizers.analysis.reactions.canonical_family_label()` for mapping**
    - Single responsibility: call rxn-insight and map to unified taxonomy
 
 5. **Detection pipeline priority**
+
    ```
    Priority 1 (Highest): Catalyst Override
    ├─ If Pd + C-N → "buchwald_hartwig_c_n" (conf: 0.95)
@@ -709,6 +717,7 @@ method = result["method"]  # "rule+catalyst"
 ### Quick Migration
 
 **Old code:**
+
 ```python
 from chemtools.router import detect_family_from_reaction
 result = detect_family_from_reaction(reaction, use_rxn_insight=True)
@@ -716,6 +725,7 @@ family = result["family"]
 ```
 
 **New code:**
+
 ```python
 from chemtools import detect_reaction
 result = detect_reaction(reaction, use_ml=True)
@@ -723,6 +733,7 @@ family = result["family"]
 ```
 
 **Changes:**
+
 - Import from `chemtools` (top-level) instead of `chemtools.router`
 - Rename `use_rxn_insight` → `use_ml` (clearer name)
 - Same output schema for `family` and `confidence` keys
@@ -747,23 +758,27 @@ family = result["family"]
 ## 📈 Expected Benefits
 
 ### Code Reduction
+
 - **Before**: ~850 lines across 3 files
 - **After**: ~400 lines in 1 file
 - **Savings**: 53% less code to maintain
 
 ### Performance
+
 - **No redundant normalization** (currently done multiple times)
 - **Cached functional group detection**
 - **Single pass through reaction components**
 - **Estimated speedup**: 20-30% faster
 
 ### User Experience
+
 - **1 function to learn** vs 5
 - **1 output schema** vs 4 different schemas
 - **Clear documentation** - one page, not scattered
 - **Easier debugging** - single code path
 
 ### Maintainability
+
 - **Single source of truth** for detection logic
 - **Easier to add new families** (one place to update)
 - **Simpler testing** (one function to test thoroughly)
@@ -776,6 +791,7 @@ family = result["family"]
 ### Risk: Breaking Changes
 
 **Mitigation:**
+
 - Keep old functions working with deprecation warnings
 - Provide clear migration guide
 - Version bump to v2.0 for removals
@@ -784,6 +800,7 @@ family = result["family"]
 ### Risk: Performance Regression
 
 **Mitigation:**
+
 - Benchmark before/after
 - Profile code paths
 - Optimize critical sections
@@ -792,6 +809,7 @@ family = result["family"]
 ### Risk: Missing Edge Cases
 
 **Mitigation:**
+
 - Comprehensive test suite (100+ test cases)
 - Test against existing production data
 - Gradual rollout (opt-in beta period)
@@ -802,17 +820,20 @@ family = result["family"]
 ## 🚀 Implementation Priority
 
 ### Must Have (Phase 1-2)
+
 ✅ Create `chemtools/detection.py` with `detect_reaction()`  
 ✅ Consolidate all detection logic into `_DetectionEngine`  
 ✅ Add deprecation warnings to old functions  
 ✅ Ensure backwards compatibility  
 
 ### Should Have (Phase 3)
+
 ✅ Update all internal consumers (API, CLI, LangChain)  
 ✅ Update documentation  
 ✅ Write comprehensive tests  
 
 ### Nice to Have (Phase 4)
+
 ✅ Performance optimizations (caching, vectorization)  
 ✅ Enhanced ML integration (multiple models)  
 ✅ Interactive detection visualizer  

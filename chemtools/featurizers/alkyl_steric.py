@@ -23,6 +23,7 @@ def analyze_alkyl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
     if alpha is None or x_root is None:
         return {
             "scaffold_score_0_10": 0.0,
+            "score_0_10": 0.0,
             "group_bulk_0_10": 0.0,
             "description": "no steric",
             "method": _METHOD,
@@ -65,6 +66,7 @@ def analyze_alkyl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
 
     return {
         "scaffold_score_0_10": scaffold_score,
+        "score_0_10": scaffold_score,
         "group_bulk_0_10": group_bulk,
         "description": desc,
         "method": _METHOD,

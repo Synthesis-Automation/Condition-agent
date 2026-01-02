@@ -2952,7 +2952,7 @@ def hte_recommend_tool(
     try:
         # Parse reaction SMILES if provided
         if reaction_smiles:
-            from chemtools.analysis.smiles import _split_reaction_smiles
+            from chemtools.featurizers.analysis.smiles import _split_reaction_smiles
             
             parts = _split_reaction_smiles(reaction_smiles.strip())
             reactants_str = parts[0] if len(parts) > 0 else ""
@@ -3659,7 +3659,7 @@ def hte_screening_set_tool(
     try:
         # Parse reaction SMILES if provided
         if reaction_smiles:
-            from chemtools.analysis.smiles import _split_reaction_smiles
+            from chemtools.featurizers.analysis.smiles import _split_reaction_smiles
             
             parts = _split_reaction_smiles(reaction_smiles.strip())
             reactants_str = parts[0] if len(parts) > 0 else ""

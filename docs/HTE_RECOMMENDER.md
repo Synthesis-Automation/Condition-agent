@@ -42,10 +42,10 @@ Key Components:
 
 ### 1. Reactant Type Detection
 
-Uses existing `chemtools.analysis.reactants.classify_reactant_smiles()`:
+Uses existing `chemtools.featurizers.analysis.reactants.classify_reactant_smiles()`:
 
 ```python
-from chemtools.analysis.reactants import classify_reactant_smiles
+from chemtools.featurizers.analysis.reactants import classify_reactant_smiles
 
 # Detect types
 result_a = classify_reactant_smiles("c1ccc(Br)cc1")  # ArBr (ArX*)

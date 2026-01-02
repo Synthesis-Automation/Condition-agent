@@ -11,8 +11,8 @@ from typing import Any, Dict, Iterable, List, Optional
 from . import reactions as _reactions
 from . import reactants as _reactants
 from . import smiles as _smiles
-from ..taxonomy import reaction_catalog as _reaction_catalog
-from ..featurizers.reaction_detection import detect_reaction_types_from_smiles
+from ...taxonomy import reaction_catalog as _reaction_catalog
+from ..reaction_detection import detect_reaction_types_from_smiles
 
 __all__ = [
     "normalize",

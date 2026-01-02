@@ -3,7 +3,7 @@
 This package hosts the new taxonomy system. Python modules live at
 `chemtools/taxonomy/`, while data assets are separated into:
 
-- `chemtools/taxonomy/v2_data/`: JSON data used by v2 modules.
+- `chemtools/taxonomy/data/`: JSON data used by v2 modules.
 - `chemtools/taxonomy/v2_docs/`: Spec and design notes.
 - `chemtools/archive/taxonomy/`: Legacy registry and data (reference only; not
   part of the v2 core).
@@ -39,7 +39,7 @@ Example:
 ```python
 from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2
 
-taxonomy = ReagentTaxonomyV2.from_path()  # defaults to v2_data
+taxonomy = ReagentTaxonomyV2.from_path()  # defaults to taxonomy/data
 match = taxonomy.classify({
     "name": "triethylamine",
     "cas": "121-44-8",
@@ -108,7 +108,7 @@ from chemtools.taxonomy.rule_db import resolve_rule_db_v2
 db_id = resolve_rule_db_v2("Suzuki")
 ```
 
-## Data Files (v2_data)
+## Data Files (taxonomy/data)
 
 - `reagent_roles.v2.json`: Role definitions (id, priority, default family).
 - `reagent_families.v2_cas.json`: Families with allowlists and optional SMARTS.

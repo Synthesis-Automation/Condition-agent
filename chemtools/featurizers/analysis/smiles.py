@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List
 
-from ..util.rdkit_helpers import (
+from ...util.rdkit_helpers import (
     canonical_smiles,
     choose_largest_organic_fragment,
     mol_to_canonical_smiles,

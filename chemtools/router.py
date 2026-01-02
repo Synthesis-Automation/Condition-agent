@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional, Set
 
 import re
 
-from .analysis.reactions import (
+from .featurizers.analysis.reactions import (
     AMIDE_FAMILIES_CANONICAL,
     BUCHWALD_SPECIFIC_CANONICAL,
     CN_FAMILIES_CANONICAL,

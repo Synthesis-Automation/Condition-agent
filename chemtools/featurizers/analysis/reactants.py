@@ -21,14 +21,14 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..featurizers import calculable as _calculable
+    from .. import calculable as _calculable
 
-from ..taxonomy import reaction_catalog as _reaction_catalog
-from ..util import rdkit_helpers
-from ..util.smarts_cache import compile_smarts
+from ...taxonomy import reaction_catalog as _reaction_catalog
+from ...util import rdkit_helpers
+from ...util.smarts_cache import compile_smarts
 from ._registry import clear_registry_cache, get_registry
 
-TAXONOMY_DATA_DIR = Path(__file__).resolve().parent.parent / "taxonomy" / "data"
+TAXONOMY_DATA_DIR = Path(__file__).resolve().parents[2] / "taxonomy" / "data"
 REACTANT_TYPES_FILE = TAXONOMY_DATA_DIR / "reactant_types.json"
 REACTION_TYPES_FILE = _reaction_catalog.REACTION_TYPES_FILE
 
@@ -38,7 +38,7 @@ GENERAL_REACTANT_CATEGORIES = {"Alkyl-C-H", "ArH"}
 
 def _get_calculable() -> Any:
     """Lazy import of the calculable module to avoid circular imports."""
-    from ..featurizers import calculable as _calc
+    from .. import calculable as _calc
     return _calc
 
 # Manual overrides sourced from the original z-score pipeline.

@@ -22,7 +22,7 @@ from ..utils import canonical_family, median, pick_with_constraints
 
 # New analysis module integration for improved reaction type detection and reactant classification
 try:
-    from ...analysis.reaction_context import classify_reactants_with_context
+    from ...featurizers.analysis.reaction_context import classify_reactants_with_context
     _HAS_ANALYSIS_MODULE = True
 except Exception:
     _HAS_ANALYSIS_MODULE = False
@@ -511,7 +511,7 @@ def recommend_from_reaction(
     # Add reactant classification info from analysis module
     if analysis_result is not None:
         try:
-            from ...analysis.reaction_context import get_reactant_summary
+            from ...featurizers.analysis.reaction_context import get_reactant_summary
             detection_meta["reactant_classification"] = get_reactant_summary(analysis_result)
         except Exception:
             pass  # Ignore serialization errors

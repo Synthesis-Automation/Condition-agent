@@ -392,10 +392,10 @@ Balances:
 
 ### With Existing Reactant System
 
-Uses existing `chemtools.analysis.reactants.classify_reactant_smiles()`:
+Uses existing `chemtools.featurizers.analysis.reactants.classify_reactant_smiles()`:
 
 ```python
-from chemtools.analysis.reactants import classify_reactant_smiles
+from chemtools.featurizers.analysis.reactants import classify_reactant_smiles
 
 result = classify_reactant_smiles("c1ccc(Br)cc1")
 # ReactantMatch(member_type='ArBr', category='ArX*', ...)
