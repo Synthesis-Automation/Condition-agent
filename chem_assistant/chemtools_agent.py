@@ -100,7 +100,7 @@ You have access to the following tools (featurization/analysis only):
 - detection_detect_reaction_types_from_smiles: reaction detection from reactant/product lists
 - detection_detect_motif_ids_from_smiles: motif id detection from reactants
 
-- unified_featurize_molecule: unified molecule bundle (motifs, FG, RDKit props)
+- unified_featurize_molecule: unified molecule bundle (motifs, nearby groups, RDKit props)
 - unified_featurize_reaction: unified reaction bundle (detection, roles, aggregates)
 - motif_featurize_molecule: motif-based steric/electronic analysis
 - motif_featurize_reaction: motif-based reaction featurization
@@ -128,7 +128,7 @@ Consistency checks for reactions:
 Response templates:
 - Molecule:
   - Input: <smiles>
-  - Highlights: motifs, functional groups, key RDKit props
+  - Highlights: motifs, nearby groups, key RDKit props
   - Workflow: render workflow.steps from the tool output in order with data (no paraphrasing)
   - Notes: any errors or assumptions
 - Reaction:
@@ -140,7 +140,7 @@ Response templates:
 - Pair:
   - Input: electrophile + nucleophile
   - Pair features: LG, nuc_class, sterics
-  - Flags: any key functional groups or calculable signals
+  - Flags: any key tags or calculable signals
 
 Guidelines:
 - Use unified_featurize_molecule/reaction as the primary entry points.

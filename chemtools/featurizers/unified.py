@@ -11,7 +11,6 @@ from typing import Any, Dict, Iterable, List, Optional
 from chemtools.smiles import normalize_reaction
 from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2
 from chemtools.util import rdkit_helpers
-from chemtools.util.functional_groups import detect_all, get_functional_groups
 
 from .analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
 from .molecule import featurize_molecule as _featurize_molecule
@@ -77,17 +76,12 @@ def _molecule_bundle(
 ) -> Dict[str, Any]:
     options = options or {}
     include_rdkit_props = _to_bool(options.get("include_rdkit_props"), default=True)
-    include_functional_groups = _to_bool(options.get("include_functional_groups"), default=True)
 
     analysis = _featurize_molecule(smiles, registry_paths=registry_paths, options=options)
 
-    fg_map = detect_all(smiles) if include_functional_groups else {}
-    fg_list = get_functional_groups(smiles) if include_functional_groups else []
     rdkit_props = _rdkit_props(smiles) if include_rdkit_props else {}
 
     molecule = dict(analysis)
-    molecule["functional_group_map"] = fg_map
-    molecule["functional_groups"] = sorted(fg_list)
     molecule["rdkit_props"] = rdkit_props
     workflow = molecule.get("workflow")
     if not isinstance(workflow, dict):
@@ -239,7 +233,6 @@ def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[st
     alkyl_scores: List[float] = []
     electronic_scores: List[float] = []
     motifs: set[str] = set()
-    functional_groups: set[str] = set()
 
     for reactant in reactant_list:
         for entry in reactant.get("steric", {}).get("aryl", []):
@@ -252,10 +245,6 @@ def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[st
             compound_id = motif.get("compound_id")
             if compound_id:
                 motifs.add(str(compound_id))
-        fg_map = reactant.get("functional_group_map") or {}
-        for token, present in fg_map.items():
-            if present:
-                functional_groups.add(token)
 
     avg_electronic = None
     if electronic_scores:
@@ -264,7 +253,6 @@ def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[st
     return {
         "reactant_count": len(reactant_list),
         "motif_ids": sorted(motifs),
-        "functional_group_ids": sorted(functional_groups),
         "max_aryl_steric": max(aryl_scores) if aryl_scores else 0.0,
         "max_alkyl_steric": max(alkyl_scores) if alkyl_scores else 0.0,
         "avg_aryl_electronic": avg_electronic if avg_electronic is not None else 5.0,

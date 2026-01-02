@@ -15,10 +15,6 @@ import os
 import re
 
 from ..util.rdkit_helpers import rdkit_available, parse_smiles
-from ..util.functional_groups import (
-    detect_all as detect_functional_groups,
-    FUNCTIONAL_GROUP_SMARTS,
-)
 from ..util.smarts_cache import compile_smarts
 
 try:  # Optional role-aware vectors
@@ -151,10 +147,6 @@ def _molpipeline_vectors(smiles: str) -> Optional[Dict[str, Any]]:
     return result
 
 
-def _present_groups(groups: Dict[str, bool]) -> List[str]:
-    return sorted(name for name, present in groups.items() if present)
-
-
 def _maybe_structural(smiles: str) -> Optional[Dict[str, Any]]:
     try:
         from .structural import featurize_molecule
@@ -180,17 +172,9 @@ def _guess_lg_text(s: str) -> str:
     return "UNK"
 
 
-def _fg_smarts(name: str, fallback: Optional[Sequence[str]] = None) -> Tuple[str, ...]:
-    patterns = FUNCTIONAL_GROUP_SMARTS.get(name)
-    if patterns:
-        return tuple(patterns)
-    if fallback:
-        return tuple(fallback)
-    return ()
-
-
 def _iter_matches(mol, name: str, fallback: Optional[Sequence[str]] = None):
-    for smarts in _fg_smarts(name, fallback):
+    patterns = tuple(fallback or ())
+    for smarts in patterns:
         patt = compile_smarts(smarts, validate=False)
         if patt is None:
             continue
@@ -255,6 +239,12 @@ def _has_ewg(fg_hits: Dict[str, bool], smiles: str) -> bool:
         return True
     t = (smiles or "").lower()
     return any(token in t for token in ("[n+](=o)[o-]", "c#n", "c(f)(f)f", "s(=o)(=o)"))
+
+
+def _has_boron(smiles: str) -> bool:
+    if not smiles:
+        return False
+    return re.search(r"B(?!r)", smiles) is not None
 
 
 def _infer_class_from_hits(fg_hits: Dict[str, bool], fallback: Optional[str]) -> str:
@@ -425,11 +415,8 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
     emol = parse_smiles(electrophile)
     nmol = parse_smiles(nucleophile)
 
-    elec_groups = detect_functional_groups(electrophile)
-    nuc_groups = detect_functional_groups(nucleophile)
-
-    elec = _detect_electrophile(emol, elec_groups, electrophile)
-    nuc = _nucleophile_features(nmol, nucleophile, nuc_groups)
+    elec = _detect_electrophile(emol, {}, electrophile)
+    nuc = _nucleophile_features(nmol, nucleophile, {})
 
     # Compose bin key (coarse)
     lg = elec.get("LG", "UNK")
@@ -440,120 +427,7 @@ def _featurize_cached(electrophile: str, nucleophile: str) -> Dict[str, Any]:
         **elec,
         **nuc,
         "bin": bin_key,
-        "_elec_groups": elec_groups,
-        "_nuc_groups": nuc_groups,
     }
-
-
-def _enrich_with_functional_groups(
-    features: Dict[str, Any],
-    electrophile: str,
-    nucleophile: str,
-    elec_groups: Optional[Dict[str, bool]] = None,
-    nuc_groups: Optional[Dict[str, bool]] = None,
-) -> Dict[str, Any]:
-    """
-    Enrich feature dict with comprehensive functional group detection.
-    
-    Adds functional-group detection tokens (already normalized as *_present)
-    plus special aliases for SNAr and reductive amination reactions.
-    
-    Args:
-        features: Base feature dictionary to enrich
-        electrophile: SMILES string of electrophile
-        nucleophile: SMILES string of nucleophile
-        
-    Returns:
-        Enriched feature dictionary with functional group tokens
-    """
-    enriched = dict(features)
-    
-    # Detect functional groups in both reactants
-    if elec_groups is None:
-        elec_groups = detect_functional_groups(electrophile)
-    if nuc_groups is None:
-        nuc_groups = detect_functional_groups(nucleophile)
-
-    for group, present in elec_groups.items():
-        if present:
-            enriched[group] = True
-    
-    for group, present in nuc_groups.items():
-        if present:
-            enriched[group] = True
-    
-    # Add convenience aliases for common patterns
-    # Primary/secondary/tertiary amine detection
-    if enriched.get("amine_primary_present"):
-        enriched["primary_amine_present"] = True
-    if enriched.get("amine_secondary_present"):
-        enriched["secondary_amine_present"] = True
-    if enriched.get("amine_tertiary_present"):
-        enriched["tertiary_amine_present"] = True
-    
-    # Aniline is both an amine and aromatic
-    if enriched.get("aniline_present"):
-        enriched["primary_amine_present"] = True
-    
-    # Amide convenience tokens
-    if enriched.get("amide_primary_present"):
-        enriched["primary_amide_present"] = True
-    if enriched.get("amide_secondary_present"):
-        enriched["secondary_amide_present"] = True
-    
-    # General amine nucleophile token (any N-nucleophile)
-    if any(enriched.get(k) for k in [
-        "amine_primary_present", "amine_secondary_present", "amine_tertiary_present",
-        "aniline_present", "primary_amine_present", "secondary_amine_present"
-    ]):
-        enriched["amine_nucleophile_present"] = True
-    
-    # Alcohol/phenol/thiol tokens
-    if enriched.get("alcohol_present") or enriched.get("phenol_present"):
-        enriched["o_nucleophile_present"] = True
-    if enriched.get("thiol_present"):
-        enriched["s_nucleophile_present"] = True
-    
-    # Carbonyl tokens for reductive amination
-    if enriched.get("aldehyde_present") or enriched.get("ketone_present"):
-        enriched["carbonyl_present"] = True
-    
-    # SNAr-specific electrophile detection
-    # Activated aryl halides or heteroaryls suitable for SNAr
-    is_heteroaryl = enriched.get("heteroaryl", False) or enriched.get("heteroaryl_present", False)
-    has_aryl_halide = any(enriched.get(k) for k in [
-        "aryl_chloride_present", "aryl_bromide_present", 
-        "aryl_fluoride_present", "aryl_iodide_present",
-        "aryl_halide_present"  # Also check general aryl halide token
-    ])
-    has_strong_ewg = any(enriched.get(k) for k in [
-        "nitro_present", "nitrile_present", "carbonyl_present"
-    ])
-    
-    # Aromatic electrophile present if heteroaryl or aryl halide
-    if is_heteroaryl or has_aryl_halide:
-        enriched["aromatic_electrophile_present"] = True
-    
-    # SNAr applicable if heteroaryl (intrinsically activated) or aryl halide with EWG
-    if is_heteroaryl or (has_aryl_halide and has_strong_ewg):
-        enriched["snar_applicable_electrophile_present"] = True
-    # Special case: heteroaryl halides are ALWAYS SNAr-applicable even without additional EWGs
-    if is_heteroaryl and has_aryl_halide:
-        enriched["snar_applicable_electrophile_present"] = True
-    
-    # Aryl halide general token
-    if has_aryl_halide:
-        enriched["aryl_halide_present"] = True
-    
-    # sp2 halide token (for Suzuki/cross-coupling)
-    if has_aryl_halide or enriched.get("vinyl_halide_present"):
-        enriched["sp2_halide_present"] = True
-    
-    # Boron reagent tokens (for Suzuki)
-    if any(enriched.get(k) for k in ["boronic_acid_present", "boronic_ester_present"]):
-        enriched["sp2_boron_present"] = True
-    
-    return enriched
 
 
 def featurize_flat(
@@ -566,16 +440,6 @@ def featurize_flat(
     """Return the legacy flat feature dictionary for a reactant pair."""
     base = _featurize_cached(electrophile, nucleophile)
     out = dict(base)
-
-    elec_groups = out.pop("_elec_groups", None)
-    nuc_groups = out.pop("_nuc_groups", None)
-    if elec_groups is None:
-        elec_groups = detect_functional_groups(electrophile)
-    if nuc_groups is None:
-        nuc_groups = detect_functional_groups(nucleophile)
-
-    # Enrich with comprehensive functional group detection.
-    out = _enrich_with_functional_groups(out, electrophile, nucleophile, elec_groups, nuc_groups)
 
     # Attach calculable features when explicitly enabled via env or parameter.
     if include_calculable is None:
@@ -644,11 +508,7 @@ def featurize_flat(
         out["ortho_2plus"] = ortho == "2+"
         out["ortho_hindered"] = ortho == "2+"
 
-    elec_group_map = elec_groups if isinstance(elec_groups, dict) else {}
-    ewg_on_electrophile = any(
-        bool(elec_group_map.get(token))
-        for token in ("nitro_present", "nitrile_present", "trifluoromethyl_present", "carbonyl_present")
-    )
+    ewg_on_electrophile = _has_ewg({}, electrophile)
     out["electron_poor_aryl"] = bool(
         out.get("elec_class") == "aryl"
         and (
@@ -658,15 +518,8 @@ def featurize_flat(
         )
     )
 
-    nuc_group_map = nuc_groups if isinstance(nuc_groups, dict) else {}
-    boron_on_nucleophile = any(
-        bool(nuc_group_map.get(token))
-        for token in ("sp2_boron_present", "boronic_acid_present", "boronic_ester_present")
-    )
-    ewg_on_nucleophile = any(
-        bool(nuc_group_map.get(token))
-        for token in ("nitro_present", "nitrile_present", "trifluoromethyl_present", "carbonyl_present")
-    )
+    boron_on_nucleophile = _has_boron(nucleophile)
+    ewg_on_nucleophile = _has_ewg({}, nucleophile)
     out["electron_poor_boronate"] = bool(boron_on_nucleophile and ewg_on_nucleophile)
     out["electron_poor_boronate_present"] = out["electron_poor_boronate"]
 
@@ -692,9 +545,6 @@ def featurize_pair(
         include_molpipeline=include_molpipeline,
         include_calculable=include_calculable,
     )
-
-    elec_groups = detect_functional_groups(electrophile)
-    nuc_groups = detect_functional_groups(nucleophile)
 
     if include_structural is None:
         include_structural = _get_env_bool("CHEMTOOLS_INCLUDE_STRUCTURAL_FEATURES", False)
@@ -729,14 +579,10 @@ def featurize_pair(
     elec_payload: Dict[str, Any] = {
         "smiles": electrophile,
         "features": elec_features,
-        "functional_groups": _present_groups(elec_groups),
-        "functional_group_map": elec_groups,
     }
     nuc_payload: Dict[str, Any] = {
         "smiles": nucleophile,
         "features": nuc_features,
-        "functional_groups": _present_groups(nuc_groups),
-        "functional_group_map": nuc_groups,
     }
 
     if isinstance(molpipeline_block, dict):

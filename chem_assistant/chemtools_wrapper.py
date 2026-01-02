@@ -167,7 +167,7 @@ class UnifiedFeaturizeMoleculeInput(BaseModel):
     )
     options: Optional[Dict[str, Any]] = Field(
         None,
-        description="Optional feature toggles (rdkit props, functional groups, etc.).",
+        description="Optional feature toggles (rdkit props, etc.).",
     )
 
 

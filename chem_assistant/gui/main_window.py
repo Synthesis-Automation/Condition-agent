@@ -411,31 +411,47 @@ class ChemAssistantWindow(QMainWindow):
     def _handle_terms_command(self, cmd: str, args: List[str]) -> None:
         if cmd == "term":
             if len(args) < 2:
-                self.append_chat("System", "Usage: /term <term_id> <SMILES>")
+                self.append_chat("System", "Usage: /term <motif_id> <SMILES>")
                 return
-            term_ids = [args[0]]
+            motif_id = args[0]
             smiles = " ".join(args[1:]).strip()
         else:
             if not args:
                 self.append_chat("System", "Usage: /terms <SMILES>")
                 return
-            term_ids = None
+            motif_id = None
             smiles = " ".join(args).strip()
 
         try:
-            from chemtools.util.functional_groups import detect_all, summarize_functional_groups
+            from chemtools.featurizers.molecule import featurize_molecule
 
-            if term_ids:
-                results = detect_all(smiles)
-                hits = [tid for tid in term_ids if results.get(tid)]
-                if not hits:
-                    self.append_chat("System", f"No matches for requested terms: {', '.join(term_ids)}")
+            payload = featurize_molecule(smiles)
+            meta = payload.get("meta", {}) if isinstance(payload, dict) else {}
+            error = meta.get("error") if isinstance(meta, dict) else None
+            if error:
+                self.append_chat("System", f"Motif analysis failed: {error}")
+                return
+
+            analyses = payload.get("analyses") or []
+            if motif_id:
+                analyses = [entry for entry in analyses if entry.get("compound_id") == motif_id]
+                if not analyses:
+                    self.append_chat("System", f"No motif matches for {motif_id}.")
                     return
-                lines = [f"- {tid}" for tid in sorted(hits)]
-                self.append_chat("System", "Matches:\n" + "\n".join(lines))
-            else:
-                summary = summarize_functional_groups(smiles)
-                self.append_chat("System", f"Functional Groups:\n{summary}")
+
+            if not analyses:
+                self.append_chat("System", "No motifs detected.")
+                return
+
+            lines = []
+            for entry in analyses:
+                compound_id = entry.get("compound_id", "unknown")
+                groups = entry.get("nearby_groups") or []
+                group_text = ", ".join(groups) if groups else "none"
+                lines.append(f"- {compound_id}: {group_text}")
+
+            header = "Nearby Groups (per motif):"
+            self.append_chat("System", header + "\n" + "\n".join(lines))
         except Exception as exc:  # pragma: no cover - UI feedback
             self.append_chat("System", f"Term evaluation failed: {exc}")
 
@@ -731,7 +747,9 @@ class ChemAssistantWindow(QMainWindow):
                 f"Reason: {exc}\n\n"
                 "You can still use local commands:\n"
                 "- /taxonomy (show taxonomy status)\n"
-                "- /terms <SMILES> (functional group summary)\n"
+                "- /terms <SMILES> (nearby groups per motif)\n"
+                "- /term <motif_id> <SMILES> (nearby groups for one motif)\n"
+                "- /term <motif_id> <SMILES> (nearby groups for one motif)\n"
                 "- image <reaction|molecule> <SMILES>",
             )
             return False

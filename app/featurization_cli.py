@@ -55,11 +55,6 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         print("Motifs:")
         print(_format_list(lines))
 
-    functional_groups = molecule.get("functional_groups") or []
-    if functional_groups:
-        print("Functional Groups:")
-        print(_format_list([str(name) for name in functional_groups]))
-
     steric = molecule.get("steric", {})
     aryl = steric.get("aryl", []) if isinstance(steric, dict) else []
     alkyl = steric.get("alkyl", []) if isinstance(steric, dict) else []
@@ -99,7 +94,16 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
 
     nearby = molecule.get("nearby", [])
     if nearby:
-        print(f"Nearby Groups: {len(nearby)} entries")
+        print("Nearby Groups (per motif):")
+        entries = []
+        for entry in nearby:
+            compound_id = entry.get("compound_id", "unknown")
+            groups = entry.get("result") or []
+            if groups:
+                entries.append(f"{compound_id}: {', '.join(groups)}")
+            else:
+                entries.append(f"{compound_id}: none")
+        print(_format_list(entries))
 
     workflow = molecule.get("workflow") or {}
     steps = workflow.get("steps") or []

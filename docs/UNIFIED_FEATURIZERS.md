@@ -25,8 +25,7 @@ Key `molecule` fields:
 
 - `smiles`: input SMILES
 - `motifs`: motif hits from organic compound registry
-- `steric`, `electronics`, `nearby`, `analyses`: motif-based analysis payloads
-- `functional_group_map`, `functional_groups`: taxonomy functional group detection
+- `steric`, `electronics`, `nearby`, `analyses`: motif-based analysis payloads (including nearby groups per motif)
 - `rdkit_props`: core RDKit descriptors (MW, logP, TPSA, HBA/HBD, rings, etc.)
 
 ## Reaction bundle (v1)
@@ -75,7 +74,6 @@ agents by SMARTS when possible. It includes:
 `options` is a dict with feature toggles:
 
 - `include_rdkit_props` (default: True)
-- `include_functional_groups` (default: True)
 - `include_roles` (default: True)
 - `include_agent_roles` (default: True)
 - `max_hits_per_compound` (optional cap for motif detection)

@@ -13,7 +13,9 @@ def test_unified_molecule_bundle_shape():
     assert molecule["smiles"]
     assert "rdkit_props" in molecule
     assert molecule["rdkit_props"]["molecular_weight"] > 0
-    assert isinstance(molecule["functional_groups"], list)
+    assert isinstance(molecule["nearby"], list)
+    assert "functional_groups" not in molecule
+    assert "functional_group_map" not in molecule
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="RDKit not available")
