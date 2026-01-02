@@ -3,10 +3,11 @@ LangGraph agent for ChemTools featurization and analysis.
 """
 
 import os
+import re
 from typing import Any, Callable, List, Optional
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from .chemtools_wrapper import CHEMTOOLS_TOOLS
@@ -28,6 +29,9 @@ load_dotenv()
 
 DEFAULT_ALIYUN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+_REACTION_SMILES_RE = re.compile(
+    r"([A-Za-z0-9@+\-\[\]\(\)=#%/.]+>>[A-Za-z0-9@+\-\[\]\(\)=#%/.]*)"
+)
 
 
 def get_llm_client(
@@ -108,11 +112,41 @@ You have access to the following tools (featurization/analysis only):
 - molpipeline_morgan_fingerprint: Morgan fingerprints via MolPipeline
 - molpipeline_physchem_features: MolPipeline physchem descriptors
 
+Tool selection rubric:
+- Molecule question -> unified_featurize_molecule first. Add motif_featurize_molecule or calculable_* only if asked.
+- Reaction question -> unified_featurize_reaction first.
+  - Also run analysis_analyze_reaction for taxonomy context.
+  - If the user wants reactant roles, add analysis_classify_reactants_with_context or analysis_reactant_summary.
+- Electrophile/nucleophile pair -> reaction_pair_featurize_pair (or reaction_pair_featurize_flat for compact output).
+- Only use detection_* tools when the user asks for reaction typing without full featurization.
+- Only use molpipeline_* tools when the user explicitly asks for fingerprints/descriptors.
+
+Consistency checks for reactions:
+- Compare unified_featurize_reaction.reaction.reaction_type with analysis_analyze_reaction.family.canonical_id.
+- If they disagree or confidence is low, report both and state uncertainty explicitly.
+
+Response templates:
+- Molecule:
+  - Input: <smiles>
+  - Highlights: motifs, functional groups, key RDKit props
+  - Workflow: list workflow.steps with step names
+  - Notes: any errors or assumptions
+- Reaction:
+  - Input: <reaction_smiles>
+  - Type: unified reaction_type + analysis family (and confidence)
+  - Reactants: key roles or categories
+  - Aggregates: max steric/electronic summary
+  - Notes: disagreements or edge cases
+- Pair:
+  - Input: electrophile + nucleophile
+  - Pair features: LG, nuc_class, sterics
+  - Flags: any key functional groups or calculable signals
+
 Guidelines:
 - Use unified_featurize_molecule/reaction as the primary entry points.
 - Use analysis tools for normalization and taxonomy-level reasoning.
 - Use reaction_pair tools when the user provides electrophile/nucleophile pairs.
-- If RDKit or MolPipeline are unavailable, explain the limitation and provide what you can.
+- If MolPipeline is unavailable, explain the limitation and provide what you can.
 - Keep answers concise and focused on the analysis output.
 """
 
@@ -127,10 +161,12 @@ class ChemToolsAgent:
         temperature: float = 0,
         system_prompt: Optional[str] = None,
         verbose: bool = False,
+        auto_check: bool = True,
     ):
         self.llm = get_llm_client(provider, model, temperature)
         self.system_prompt = system_prompt or CHEMISTRY_SYSTEM_PROMPT
         self.verbose = verbose
+        self.auto_check = auto_check
         self.agent_factory_name = _LANGGRAPH_AGENT_FACTORY_NAME
         self.tools = CHEMTOOLS_TOOLS
         self.agent = LANGGRAPH_AGENT_FACTORY(
@@ -147,6 +183,9 @@ class ChemToolsAgent:
     ) -> str:
         try:
             messages = list(history or [])
+            preflight = self._maybe_run_preflight(query)
+            if preflight:
+                messages.append(SystemMessage(content=preflight))
             messages.append(HumanMessage(content=query))
 
             result = self.agent.invoke(
@@ -161,6 +200,86 @@ class ChemToolsAgent:
             if self.verbose:
                 print(f"Agent error: {exc}")
             return f"Error: {exc}\n\nPlease rephrase your question or provide more details."
+
+    @staticmethod
+    def _extract_reaction_smiles(text: str) -> Optional[str]:
+        match = _REACTION_SMILES_RE.search(text or "")
+        if match:
+            return match.group(1).strip()
+        return None
+
+    def _maybe_run_preflight(self, query: str) -> Optional[str]:
+        if not self.auto_check:
+            return None
+        reaction_smiles = self._extract_reaction_smiles(query)
+        if not reaction_smiles:
+            return None
+
+        from chem_assistant.chemtools_wrapper import (
+            analysis_analyze_reaction,
+            unified_featurize_reaction,
+        )
+
+        unified_payload = None
+        analysis_payload = None
+        unified_error = None
+        analysis_error = None
+
+        try:
+            unified_result = unified_featurize_reaction.invoke(
+                {"reaction_smiles": reaction_smiles}
+            )
+            if unified_result.get("success"):
+                unified_payload = unified_result
+            else:
+                unified_error = unified_result.get("error")
+        except Exception as exc:
+            unified_error = str(exc)
+
+        try:
+            analysis_result = analysis_analyze_reaction.invoke(
+                {"reaction_smiles": reaction_smiles}
+            )
+            if analysis_result.get("success"):
+                analysis_payload = analysis_result
+            else:
+                analysis_error = analysis_result.get("error")
+        except Exception as exc:
+            analysis_error = str(exc)
+
+        unified_type = None
+        unified_conf = None
+        if unified_payload:
+            reaction = unified_payload.get("reaction") or {}
+            reaction_type = reaction.get("reaction_type") or {}
+            unified_type = reaction_type.get("reaction_type") or reaction_type.get("name")
+            unified_conf = reaction_type.get("confidence")
+
+        analysis_family = None
+        if analysis_payload:
+            family = analysis_payload.get("family") or {}
+            analysis_family = family.get("canonical_id")
+
+        agree = (
+            unified_type is not None
+            and analysis_family is not None
+            and unified_type == analysis_family
+        )
+
+        lines = [
+            "Preflight reaction cross-check (auto):",
+            f"- reaction_smiles: {reaction_smiles}",
+            f"- unified.reaction_type: {unified_type or 'unknown'}"
+            + (f" (confidence {unified_conf})" if unified_conf is not None else ""),
+            f"- analysis.family.canonical_id: {analysis_family or 'unknown'}",
+            f"- agree: {'yes' if agree else 'no'}",
+        ]
+        if unified_error:
+            lines.append(f"- unified error: {unified_error}")
+        if analysis_error:
+            lines.append(f"- analysis error: {analysis_error}")
+
+        return "\n".join(lines)
 
     def chat(
         self,

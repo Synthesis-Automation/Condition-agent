@@ -27,8 +27,10 @@ def analyze_aryl_electronics(
     Compute tag-weighted electronics around the ipso carbon.
     """
     ipso = hit.get("a_atom_idx")
-    if ipso is None:
+    x_root = hit.get("b_atom_idx")
+    if ipso is None or x_root is None:
         return {
+            "scaffold_score_0_10": 5.0,
             "score_0_10": 5.0,
             "description": "neutral",
             "method": _ELECTRONICS_METHOD,
@@ -39,6 +41,7 @@ def analyze_aryl_electronics(
     ring_atoms = _find_aryl_ring(mol, ipso)
     if not ring_atoms:
         return {
+            "scaffold_score_0_10": 5.0,
             "score_0_10": 5.0,
             "description": "neutral",
             "method": _ELECTRONICS_METHOD,
@@ -48,6 +51,68 @@ def analyze_aryl_electronics(
 
     ring_dist = _ring_distances(mol, ring_atoms, ipso)
     group_by_atom = _map_group_matches(mol, groups_dict)
+    scaffold_sum, scaffold_contrib = _compute_electronics(
+        mol,
+        ring_atoms,
+        ring_dist,
+        group_by_atom,
+        groups_dict,
+        ipso,
+        x_root,
+        include_ipso_group=False,
+    )
+    scaffold_score = _clamp(round(5.0 + scaffold_sum, 1), 0.0, 10.0)
+
+    if scaffold_score > 5.2:
+        desc = "electron poor"
+    elif scaffold_score < 4.8:
+        desc = "electron rich"
+    else:
+        desc = "neutral"
+
+    result: Dict[str, Any] = {
+        "scaffold_score_0_10": scaffold_score,
+        "score_0_10": scaffold_score,
+        "description": desc,
+        "method": _ELECTRONICS_METHOD,
+        "including_group": include_ipso_group,
+        "contributions": scaffold_contrib,
+    }
+
+    if include_ipso_group:
+        include_sum, include_contrib = _compute_electronics(
+            mol,
+            ring_atoms,
+            ring_dist,
+            group_by_atom,
+            groups_dict,
+            ipso,
+            x_root,
+            include_ipso_group=True,
+        )
+        include_score = _clamp(round(5.0 + include_sum, 1), 0.0, 10.0)
+        result["including_group_score_0_10"] = include_score
+        result["including_group_contributions"] = include_contrib
+
+    if include_gasteiger:
+        gasteiger = _gasteiger_charge(mol, ipso)
+        if gasteiger is not None:
+            result["optional"] = {"gasteiger": {"q_ipso": gasteiger}}
+
+    return result
+
+
+def _compute_electronics(
+    mol: Any,
+    ring_atoms: Set[int],
+    ring_dist: Dict[int, int],
+    group_by_atom: Dict[int, str],
+    groups_dict: Dict[str, Dict[str, Any]],
+    ipso: int,
+    x_root: int,
+    *,
+    include_ipso_group: bool,
+) -> Tuple[float, List[Dict[str, Any]]]:
     contributions: List[Dict[str, Any]] = []
     e_sum = 0.0
 
@@ -55,19 +120,13 @@ def analyze_aryl_electronics(
         if ring_atom != ipso and ring_atom not in ring_dist:
             continue
 
-        # 1. Check for ring heteroatoms (e.g., Pyridine N, Furan O, Thiophene S)
         atom = mol.GetAtomWithIdx(ring_atom)
         symbol = atom.GetSymbol()
         if symbol in ["N", "O", "S"] and ring_atom != ipso:
             pos = _position_for_distance(ring_dist[ring_atom])
             if pos:
-                # Strengths for ring heteroatoms (EWG-centric model)
-                # Pyridine N is 1.0. O and S are also electronegative.
-                # Note: In 5-membered rings these are technically EDG by resonance,
-                # but for this simple tag-weighted model we treat them as EWG contributors.
                 strength_map = {"N": 1.0, "O": 0.8, "S": 0.4}
                 strength = strength_map.get(symbol, 0.0)
-
                 weight = _WEIGHTS.get(pos, 0.0)
                 term = round(weight * strength, 3)
                 e_sum += term
@@ -81,15 +140,14 @@ def analyze_aryl_electronics(
                     }
                 )
 
-        # 2. Check for external substituents
         for nbr in mol.GetAtomWithIdx(ring_atom).GetNeighbors():
             nbr_idx = nbr.GetIdx()
             if nbr_idx in ring_atoms:
                 continue
+            if ring_atom == ipso and not include_ipso_group and nbr_idx == x_root:
+                continue
             group_id = group_by_atom.get(nbr_idx)
             if not group_id:
-                continue
-            if ring_atom == ipso and not include_ipso_group:
                 continue
 
             pos = "ipso" if ring_atom == ipso else _position_for_distance(ring_dist[ring_atom])
@@ -111,29 +169,7 @@ def analyze_aryl_electronics(
                 }
             )
 
-    score = _clamp(round(5.0 + e_sum, 1), 0.0, 10.0)
-    
-    if score > 5.2:
-        desc = "electron poor"
-    elif score < 4.8:
-        desc = "electron rich"
-    else:
-        desc = "neutral"
-
-    result: Dict[str, Any] = {
-        "score_0_10": score,
-        "description": desc,
-        "method": _ELECTRONICS_METHOD,
-        "including_group": include_ipso_group,
-        "contributions": contributions,
-    }
-
-    if include_gasteiger:
-        gasteiger = _gasteiger_charge(mol, ipso)
-        if gasteiger is not None:
-            result["optional"] = {"gasteiger": {"q_ipso": gasteiger}}
-
-    return result
+    return e_sum, contributions
 
 
 def _find_aryl_ring(mol: Any, ipso: int) -> Optional[Set[int]]:

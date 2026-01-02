@@ -89,6 +89,17 @@ def _molecule_bundle(
     molecule["functional_group_map"] = fg_map
     molecule["functional_groups"] = sorted(fg_list)
     molecule["rdkit_props"] = rdkit_props
+    workflow = molecule.get("workflow")
+    if not isinstance(workflow, dict):
+        workflow = {"steps": []}
+    steps = workflow.get("steps")
+    if not isinstance(steps, list):
+        steps = []
+    steps.append(
+        {"step": 4, "name": "rdkit_props", "data": rdkit_props}
+    )
+    workflow["steps"] = steps
+    molecule["workflow"] = workflow
     return molecule
 
 

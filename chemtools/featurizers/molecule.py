@@ -153,6 +153,13 @@ def featurize_molecule(
         "electronics": electronic_payload,
         "nearby": nearby_payload,
         "analyses": analyses,
+        "workflow": {
+            "steps": [
+                {"step": 1, "name": "motifs", "data": motifs},
+                {"step": 2, "name": "steric_electronic", "data": analyses},
+                {"step": 3, "name": "nearby_groups", "data": nearby_payload},
+            ],
+        },
         "meta": meta,
     }
 
