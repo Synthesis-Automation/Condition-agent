@@ -71,6 +71,9 @@
       "Ar-CHCH2",
       "R-CHCH2"
     ],
+    "alkenes_any": [
+      "Any-Alkene"
+    ],
     "amines_nh_default": [
       "Allyl-NH2",
       "Allyl-NHR",
@@ -158,6 +161,86 @@
     ],
     "aromatic_default": [
       "Ar-H"
+    ],
+    "terminal_alkenes_any": [
+      "Ar-CHCH2",
+      "R-CHCH2",
+      "Any-CHCH2"
+    ],
+    "nitriles_default": [
+      "Any-CN",
+      "Ar-CN",
+      "Vinyl-CN",
+      "Bn-CN",
+      "Allyl-CN"
+    ],
+    "hydrogenation_reductants": [
+      "H2"
+    ],
+    "hydride_reductants": [
+      "NaBH4",
+      "LiAlH4"
+    ],
+    "hydrogenation_substrates": [
+      "Ar-CCH",
+      "R-CCH",
+      "Any-Alkene",
+      "Ar-CHCH2",
+      "R-CHCH2",
+      "Any-CHCH2",
+      "Any-Diene",
+      "Any-CHO",
+      "Any-CO-R",
+      "Ar-CHO",
+      "Vinyl-CHO",
+      "Any-NO2",
+      "Ar-NO2",
+      "Vinyl-NO2",
+      "Any-CN",
+      "Ar-CN",
+      "Vinyl-CN",
+      "Bn-CN",
+      "Allyl-CN"
+    ],
+    "hydride_reduction_substrates": [
+      "Any-CHO",
+      "Any-CO-R",
+      "Ar-CHO",
+      "Vinyl-CHO",
+      "Any-CO2R",
+      "Ar-CO2R",
+      "Vinyl-CO2R",
+      "Any-CONHR",
+      "Ar-CONHR",
+      "Any-CN",
+      "Ar-CN",
+      "Vinyl-CN",
+      "Bn-CN",
+      "Allyl-CN"
+    ],
+    "epoxidation_oxidants": [
+      "Oxidant-O"
+    ],
+    "epoxidation_products": [
+      "Epoxide"
+    ],
+    "dienes_default": [
+      "Any-Diene"
+    ],
+    "dienophiles_default": [
+      "Any-Dienophile"
+    ],
+    "diels_alder_products": [
+      "Cyclohexene"
+    ],
+    "azides_default": [
+      "Any-N3"
+    ],
+    "rearrangement_substrates": [
+      "Any-CO2M",
+      "Any-CO2H",
+      "Ar-CO2H",
+      "Vinyl-CO2H"
     ]
   },
   "reaction_types": [
@@ -736,6 +819,199 @@
         }
       },
       "notes": "Covers both direct halogenation and displacement of diazonium salts."
+    },
+    {
+      "id": "hydrogenation",
+      "name": "Hydrogenation (H2)",
+      "category": "reduction_reactions",
+      "aliases": [
+        "Catalytic hydrogenation"
+      ],
+      "description": "Hydrogenation of unsaturated substrates using H2.",
+      "reactants": {
+        "reagent": {
+          "motif_sets": [
+            "hydrogenation_reductants"
+          ]
+        },
+        "substrate": {
+          "motif_sets": [
+            "hydrogenation_substrates"
+          ]
+        }
+      },
+      "notes": "Requires explicit H2 plus substrate motifs."
+    },
+    {
+      "id": "hydride_reduction",
+      "name": "Hydride reduction (NaBH4 / LiAlH4)",
+      "category": "reduction_reactions",
+      "aliases": [
+        "NaBH4 reduction",
+        "LiAlH4 reduction",
+        "LAH reduction"
+      ],
+      "description": "Hydride reduction of carbonyls, esters, amides, and nitriles.",
+      "reactants": {
+        "reagent": {
+          "motif_sets": [
+            "hydride_reductants"
+          ]
+        },
+        "substrate": {
+          "motif_sets": [
+            "hydride_reduction_substrates"
+          ]
+        }
+      }
+    },
+    {
+      "id": "epoxidation",
+      "name": "Epoxidation (alkene -> epoxide)",
+      "category": "oxidation_reactions",
+      "aliases": [
+        "mCPBA epoxidation"
+      ],
+      "description": "Oxidation of alkenes to epoxides.",
+      "reactants": {
+        "substrate": {
+          "motif_sets": [
+            "alkenes_any"
+          ]
+        },
+        "oxidant": {
+          "motif_sets": [
+            "epoxidation_oxidants"
+          ]
+        }
+      },
+      "products": {
+        "product": {
+          "motif_sets": [
+            "epoxidation_products"
+          ]
+        }
+      }
+    },
+    {
+      "id": "diels_alder",
+      "name": "Diels-Alder cycloaddition",
+      "category": "cycloaddition_reactions",
+      "aliases": [
+        "Diels-Alder"
+      ],
+      "description": "Cycloaddition of a conjugated diene with a dienophile.",
+      "reactants": {
+        "diene": {
+          "motif_sets": [
+            "dienes_default"
+          ]
+        },
+        "dienophile": {
+          "motif_sets": [
+            "dienophiles_default"
+          ]
+        }
+      },
+      "products": {
+        "product": {
+          "motif_sets": [
+            "diels_alder_products"
+          ]
+        }
+      },
+      "notes": "Dienophile motif excludes conjugated dienes to avoid self-matching."
+    },
+    {
+      "id": "click_cuaac",
+      "name": "Azide-alkyne cycloaddition (click)",
+      "category": "cycloaddition_reactions",
+      "aliases": [
+        "CuAAC",
+        "Click chemistry"
+      ],
+      "description": "1,3-dipolar cycloaddition between azides and terminal alkynes.",
+      "reactants": {
+        "alkynes": {
+          "motif_sets": [
+            "terminal_alkynes_default"
+          ]
+        },
+        "azides": {
+          "motif_sets": [
+            "azides_default"
+          ]
+        }
+      }
+    },
+    {
+      "id": "claisen_condensation",
+      "name": "Claisen condensation (ester + ester)",
+      "category": "carbonyl_reactions",
+      "aliases": [
+        "Claisen condensation"
+      ],
+      "description": "Base-promoted condensation of esters to beta-keto esters.",
+      "reactants": {
+        "electrophiles": {
+          "motif_sets": [
+            "esters_default"
+          ],
+          "min_hits": 2,
+          "min_reactants": 2
+        },
+        "nucleophiles": {
+          "motif_sets": [
+            "esters_default"
+          ],
+          "min_hits": 2,
+          "min_reactants": 2
+        }
+      },
+      "notes": "Heuristic: requires at least two ester motif hits."
+    },
+    {
+      "id": "cross_metathesis",
+      "name": "Cross metathesis (alkene exchange)",
+      "category": "metathesis_reactions",
+      "aliases": [
+        "Metathesis"
+      ],
+      "description": "Olefin metathesis between alkenes.",
+      "reactants": {
+        "alkenes": {
+          "motif_sets": [
+            "alkenes_any"
+          ],
+          "min_hits": 2,
+          "min_reactants": 2
+        }
+      },
+      "products": {
+        "product": {
+          "motif_sets": [
+            "alkenes_any"
+          ],
+          "exclude": [
+            "Cyclohexene"
+          ]
+        }
+      },
+      "notes": "Heuristic: requires at least two alkene motif hits."
+    },
+    {
+      "id": "rearrangement_generic",
+      "name": "Rearrangement",
+      "category": "rearrangement_reactions",
+      "description": "Generic rearrangement placeholder based on substrate motifs.",
+      "reactants": {
+        "substrate": {
+          "motif_sets": [
+            "rearrangement_substrates"
+          ]
+        }
+      },
+      "notes": "Heuristic placeholder; expand with specific rearrangements as needed."
     }
   ],
   "notes": [

@@ -105,7 +105,16 @@ def analyze_reaction(
             }
         )
 
-    detection_result = detect_reaction_types_from_smiles(reactant_smiles_for_detection)
+    product_smiles_for_detection = [
+        item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
+        for item in (norm.get("products") or [])
+    ]
+    product_smiles_for_detection = [s for s in product_smiles_for_detection if s]
+
+    detection_result = detect_reaction_types_from_smiles(
+        reactant_smiles_for_detection,
+        product_smiles=product_smiles_for_detection,
+    )
     detection_payload = detection_result.to_dict()
     matches = detection_result.matches
     canonical_family = matches[0].reaction_type if matches else None
@@ -125,7 +134,8 @@ def analyze_reaction(
                 "metadata": dict(rt.metadata),
                 "catalysts": list(rt.catalysts),
                 "conditions": rt.conditions,
-                "reactants": {slot: list(values) for slot, values in rt.reactants.items()},
+                "reactants": {slot: list(req.allowed) for slot, req in rt.reactants.items()},
+                "products": {slot: list(req.allowed) for slot, req in rt.products.items()},
                 "reference_reactions": list(rt.reference_reactions),
                 "notes": rt.notes,
             }

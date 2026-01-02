@@ -74,16 +74,24 @@ def detect_reaction_types(
         for item in reactants
     ]
     reactant_smiles = [s for s in reactant_smiles if s]
+    product_smiles = [
+        item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
+        for item in (normalized.get("products") or [])
+    ]
+    product_smiles = [s for s in product_smiles if s]
     if not reactant_smiles:
         return ReactionDetectionResult(matches=[], error="no_reactants")
     return detect_reaction_types_from_smiles(
-        reactant_smiles, max_hits_per_compound=max_hits_per_compound
+        reactant_smiles,
+        product_smiles=product_smiles,
+        max_hits_per_compound=max_hits_per_compound,
     )
 
 
 def detect_reaction_types_from_smiles(
     reactant_smiles: Iterable[str],
     *,
+    product_smiles: Optional[Iterable[str]] = None,
     max_hits_per_compound: Optional[int] = None,
 ) -> ReactionDetectionResult:
     """
@@ -92,17 +100,23 @@ def detect_reaction_types_from_smiles(
     if not rdkit_available():
         return ReactionDetectionResult(matches=[], error="rdkit_unavailable")
 
-    detected_motifs = _detect_motif_ids(
+    detected_profile = _detect_motif_profile(
         reactant_smiles, max_hits_per_compound=max_hits_per_compound
     )
-    if not detected_motifs:
+    if not detected_profile:
         return ReactionDetectionResult(matches=[])
+
+    product_profile = (
+        _detect_motif_profile(product_smiles, max_hits_per_compound=max_hits_per_compound)
+        if product_smiles
+        else {}
+    )
 
     definitions, _ = load_reaction_catalog()
     matches: List[ReactionMatch] = []
 
     for definition in definitions.values():
-        match = _match_reaction_definition(definition, detected_motifs)
+        match = _match_reaction_definition(definition, detected_profile, product_profile)
         if match is not None:
             matches.append(match)
 
@@ -124,19 +138,23 @@ def detect_motif_ids_from_smiles(
     """Return the set of organic-compound motif IDs detected in the reactants."""
     if not rdkit_available():
         return set()
-    return _detect_motif_ids(reactant_smiles, max_hits_per_compound=max_hits_per_compound)
+    return set(
+        _detect_motif_profile(
+            reactant_smiles, max_hits_per_compound=max_hits_per_compound
+        ).keys()
+    )
 
 
-def _detect_motif_ids(
+def _detect_motif_profile(
     reactant_smiles: Iterable[str],
     *,
     max_hits_per_compound: Optional[int] = None,
-) -> Set[str]:
+) -> Dict[str, Dict[str, Any]]:
     registry = _load_compound_registry()
     compiled = registry["compiled_compounds"]
-    detected: Set[str] = set()
+    detected: Dict[str, Dict[str, Any]] = {}
 
-    for smiles in reactant_smiles:
+    for idx, smiles in enumerate(reactant_smiles):
         mol = parse_smiles(smiles)
         if mol is None:
             continue
@@ -148,31 +166,68 @@ def _detect_motif_ids(
         for hit in hits:
             compound_id = hit.get("compound_id")
             if compound_id:
-                detected.add(compound_id)
+                entry = detected.setdefault(
+                    compound_id,
+                    {"count": 0, "molecules": set()},
+                )
+                entry["count"] += 1
+                entry["molecules"].add(idx)
 
     return detected
 
 
 def _match_reaction_definition(
     definition: ReactionTypeDefinition,
-    detected_motifs: Set[str],
+    detected_motifs: Dict[str, Dict[str, Any]],
+    detected_products: Dict[str, Dict[str, Any]],
 ) -> Optional[ReactionMatch]:
     slot_evidence: Dict[str, List[str]] = {}
     required_slots = 0
     matched_slots = 0
 
-    if not definition.reactants:
+    if not definition.reactants and not definition.products:
         return None
 
-    for slot, allowed in definition.reactants.items():
-        if not allowed:
-            continue
-        required_slots += 1
-        hits = [motif for motif in allowed if motif in detected_motifs]
-        if not hits:
-            return None
-        slot_evidence[slot] = hits
-        matched_slots += 1
+    def apply_requirements(
+        requirements: Dict[str, Any],
+        profile: Dict[str, Dict[str, Any]],
+        slot_prefix: str = "",
+    ) -> bool:
+        nonlocal required_slots, matched_slots
+        for slot, requirement in requirements.items():
+            allowed = requirement.allowed
+            if not allowed:
+                continue
+            required_slots += 1
+            hits = [
+                motif
+                for motif in allowed
+                if profile.get(motif, {}).get("count", 0) > 0
+            ]
+            if not hits:
+                return False
+            total_hits = sum(profile.get(motif, {}).get("count", 0) for motif in allowed)
+            if total_hits < requirement.min_hits:
+                return False
+            if requirement.min_reactants > 1:
+                molecule_indices = set()
+                for motif in allowed:
+                    entry = profile.get(motif)
+                    if entry:
+                        molecule_indices.update(entry.get("molecules") or set())
+                if len(molecule_indices) < requirement.min_reactants:
+                    return False
+            slot_name = f"{slot_prefix}{slot}" if slot_prefix else slot
+            slot_evidence[slot_name] = hits
+            matched_slots += 1
+        return True
+
+    if definition.reactants and not apply_requirements(definition.reactants, detected_motifs):
+        return None
+    if definition.products and not apply_requirements(
+        definition.products, detected_products, slot_prefix="product:"
+    ):
+        return None
 
     if required_slots == 0:
         return None

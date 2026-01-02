@@ -22,12 +22,20 @@ class ReactionTypeDefinition:
     category: str
     aliases: List[str]
     description: Optional[str]
-    reactants: Dict[str, List[str]]
+    reactants: Dict[str, "SlotRequirement"]
+    products: Dict[str, "SlotRequirement"]
     catalysts: List[str]
     conditions: Optional[str]
     metadata: Dict[str, Any]
     reference_reactions: List[str]
     notes: Optional[str]
+
+
+@dataclass(frozen=True)
+class SlotRequirement:
+    allowed: List[str]
+    min_hits: int = 1
+    min_reactants: int = 1
 
 
 def _load_payload(path: Path) -> dict:
@@ -68,7 +76,9 @@ def _dedupe(values: Iterable[str]) -> List[str]:
 def _expand_reactant_slot(
     values: Any,
     motif_sets: Mapping[str, Iterable[str]],
-) -> List[str]:
+) -> SlotRequirement:
+    min_hits = 1
+    min_reactants = 1
     if isinstance(values, dict):
         expanded: List[str] = []
         for set_name in _coerce_list(values.get("motif_sets") or values.get("motif_set")):
@@ -77,21 +87,27 @@ def _expand_reactant_slot(
         exclude = set(_coerce_list(values.get("exclude")))
         if exclude:
             expanded = [value for value in expanded if value not in exclude]
-        return _dedupe(expanded)
+        min_hits = int(values.get("min_hits") or 1)
+        min_reactants = int(values.get("min_reactants") or 1)
+        return SlotRequirement(
+            allowed=_dedupe(expanded),
+            min_hits=max(min_hits, 1),
+            min_reactants=max(min_reactants, 1),
+        )
     if isinstance(values, list):
-        return _clean_list(values)
-    return []
+        return SlotRequirement(allowed=_clean_list(values), min_hits=1, min_reactants=1)
+    return SlotRequirement(allowed=[], min_hits=1, min_reactants=1)
 
 
 def _normalize_reactants(
     raw: Any,
     motif_sets: Optional[Mapping[str, Iterable[str]]] = None,
-) -> Dict[str, List[str]]:
+) -> Dict[str, SlotRequirement]:
     if not isinstance(raw, dict):
         return {}
 
     motif_sets = motif_sets or {}
-    reactants: Dict[str, List[str]] = {}
+    reactants: Dict[str, SlotRequirement] = {}
     for slot in _DEFAULT_SLOTS:
         if slot in raw:
             reactants[slot] = _expand_reactant_slot(raw.get(slot), motif_sets)
@@ -100,7 +116,7 @@ def _normalize_reactants(
         if slot in reactants:
             continue
         cleaned = _expand_reactant_slot(values, motif_sets)
-        if cleaned or isinstance(values, (list, dict)):
+        if cleaned.allowed or isinstance(values, (list, dict)):
             reactants[slot] = cleaned
     return reactants
 
@@ -132,6 +148,7 @@ def load_reaction_catalog(
         aliases = [str(a) for a in (entry.get("aliases") or []) if isinstance(a, str)]
         description = entry.get("description")
         reactants = _normalize_reactants(entry.get("reactants"), motif_sets)
+        products = _normalize_reactants(entry.get("products"), motif_sets)
         catalysts = [str(c) for c in (entry.get("catalysts") or []) if isinstance(c, str)]
         conditions = entry.get("conditions")
         metadata = dict(entry.get("metadata") or {})
@@ -147,6 +164,7 @@ def load_reaction_catalog(
             aliases=aliases,
             description=description,
             reactants=reactants,
+            products=products,
             catalysts=catalysts,
             conditions=conditions,
             metadata=metadata,

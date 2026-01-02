@@ -36,6 +36,10 @@ def detect_motifs(
                 b_idx = _infer_b_idx(mol, query, match, a_idx)
                 if b_idx is not None:
                     match_atom_map["2"] = b_idx
+            if b_idx is None and _find_query_map_atom(query, map_num=2) is None:
+                # Allow single-atom motifs (e.g., reagents) to reuse the A atom as B.
+                b_idx = a_idx
+                match_atom_map["2"] = a_idx
             if b_idx is None:
                 continue
             key = (compound.compound_id, a_idx, b_idx)

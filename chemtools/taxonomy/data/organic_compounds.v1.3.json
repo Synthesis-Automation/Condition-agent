@@ -1367,6 +1367,75 @@
       "A": "Ar",
       "B": "B(OR)2",
       "description": "Aryl boronate ester (Ar\u2013B(OR)2)."
+    },
+    {
+      "id": "H2",
+      "name": "H2",
+      "smarts": "[H][H]",
+      "description": "Hydrogen gas (H2) reagent."
+    },
+    {
+      "id": "NaBH4",
+      "name": "NaBH4",
+      "smarts": "[BH4-]",
+      "description": "Sodium borohydride (BH4-) hydride reagent."
+    },
+    {
+      "id": "LiAlH4",
+      "name": "LiAlH4",
+      "smarts": "[AlH4-]",
+      "description": "Lithium aluminum hydride (AlH4-) hydride reagent."
+    },
+    {
+      "id": "Oxidant-O",
+      "name": "Oxidant-O",
+      "smarts": "[O;X0]",
+      "description": "Atomic oxygen oxidant placeholder."
+    },
+    {
+      "id": "Any-N3",
+      "name": "Any-N3",
+      "smarts_any": [
+        "[N-]=[N+]=N",
+        "[N-][N+]#N"
+      ],
+      "description": "Organic azide (-N3) substituent."
+    },
+    {
+      "id": "Any-Diene",
+      "name": "Any-Diene",
+      "smarts": "[CX3]=[CX3][CX3]=[CX3]",
+      "description": "Conjugated diene motif (C=C-C=C)."
+    },
+    {
+      "id": "Any-Alkene",
+      "name": "Any-Alkene",
+      "smarts": "[CX3:1]=[CX3]",
+      "description": "Generic alkene motif (C=C)."
+    },
+    {
+      "id": "Any-Dienophile",
+      "name": "Any-Dienophile",
+      "smarts": "[CX3:1]=[CX3]",
+      "description": "Alkene motif for dienophiles (non-conjugated)."
+    },
+    {
+      "id": "Epoxide",
+      "name": "Epoxide",
+      "smarts": "C1OC1",
+      "description": "Epoxide (oxirane) ring motif."
+    },
+    {
+      "id": "Cyclohexene",
+      "name": "Cyclohexene",
+      "smarts": "[C;R]=[C;R]",
+      "description": "Ring alkene motif (Diels-Alder product proxy)."
+    },
+    {
+      "id": "Any-CO2M",
+      "name": "Any-CO2M",
+      "smarts": "[CX3](=O)[O-]",
+      "description": "Carboxylate (deprotonated carboxylic acid)."
     }
   ],
   "depends_on": {
