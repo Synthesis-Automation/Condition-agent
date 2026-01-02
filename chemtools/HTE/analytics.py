@@ -59,6 +59,7 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
 
             reactant_types = _ensure_list(record.get("reactant_types"))
             reactant_categories = _ensure_list(record.get("reactant_categories"))
+            catalyst_types = _ensure_list(record.get("catalyst_type"))
             conditions = record.get("conditions") or {}
             metrics = record.get("metrics") or {}
 
@@ -68,6 +69,7 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
                 "Reactant_B_Type": reactant_types[1] if len(reactant_types) > 1 else "",
                 "Reactant_A_Category": reactant_categories[0] if len(reactant_categories) > 0 else "",
                 "Reactant_B_Category": reactant_categories[1] if len(reactant_categories) > 1 else "",
+                "Catalyst_Type": _format_list(catalyst_types),
                 "Catalyst": _format_list(conditions.get("catalyst")),
                 "Ligand": _format_list(conditions.get("ligand")),
                 "Base": _format_list(conditions.get("base")),
@@ -111,6 +113,35 @@ class HTEAnalytics:
             self.df = pd.read_csv(self.db_path)
         print(f"📊 Loaded HTE database: {len(self.df):,} experiments")
     
+    def _filter_by_catalyst_type(self, df: pd.DataFrame, catalyst_filter: str) -> pd.DataFrame:
+        if not catalyst_filter:
+            return df
+        filter_lower = catalyst_filter.lower()
+        metal_map = {
+            "palladium": "Pd",
+            "copper": "Cu",
+            "nickel": "Ni",
+            "iridium": "Ir",
+            "rhodium": "Rh",
+            "ruthenium": "Ru",
+            "platinum": "Pt",
+            "gold": "Au",
+            "silver": "Ag",
+            "iron": "Fe",
+            "cobalt": "Co",
+            "zinc": "Zn",
+            "organocatalyst": "organocatalyst",
+            "organic catalyst": "organocatalyst",
+        }
+        search_term = metal_map.get(filter_lower, catalyst_filter)
+
+        if "Catalyst_Type" in df.columns:
+            mask = df["Catalyst_Type"].str.contains(search_term, case=False, na=False)
+            if mask.any():
+                return df[mask]
+
+        return df[df["Catalyst"].str.contains(search_term, case=False, na=False)]
+
     def list_reactant_pairs(
         self,
         reaction_type: Optional[str] = None,
@@ -144,16 +175,7 @@ class HTEAnalytics:
             df = df[df['Reaction_Type_Standardized'].str.contains(reaction_type, case=False, na=False)]
         
         if catalyst_filter:
-            # Map common names to symbols
-            filter_lower = catalyst_filter.lower()
-            metal_map = {
-                'palladium': 'Pd', 'copper': 'Cu', 'nickel': 'Ni',
-                'iridium': 'Ir', 'rhodium': 'Rh', 'ruthenium': 'Ru',
-                'platinum': 'Pt', 'gold': 'Au', 'silver': 'Ag',
-                'iron': 'Fe', 'cobalt': 'Co', 'zinc': 'Zn'
-            }
-            search_term = metal_map.get(filter_lower, catalyst_filter)
-            df = df[df['Catalyst'].str.contains(search_term, case=False, na=False)]
+            df = self._filter_by_catalyst_type(df, catalyst_filter)
         
         # Group by reactant pairs
         grouped = df.groupby(['Reactant_A_Type', 'Reactant_B_Type', 'Reaction_Type_Standardized']).agg({
@@ -435,15 +457,7 @@ class HTEAnalytics:
             df = df[df['Reaction_Type_Standardized'].str.contains(reaction_type, case=False, na=False)]
         
         if catalyst_filter:
-            filter_lower = catalyst_filter.lower()
-            metal_map = {
-                'palladium': 'Pd', 'copper': 'Cu', 'nickel': 'Ni',
-                'iridium': 'Ir', 'rhodium': 'Rh', 'ruthenium': 'Ru',
-                'platinum': 'Pt', 'gold': 'Au', 'silver': 'Ag',
-                'iron': 'Fe', 'cobalt': 'Co', 'zinc': 'Zn'
-            }
-            search_term = metal_map.get(filter_lower, catalyst_filter)
-            df = df[df['Catalyst'].str.contains(search_term, case=False, na=False)]
+            df = self._filter_by_catalyst_type(df, catalyst_filter)
         
         if reactant_a_type:
             df = df[df['Reactant_A_Type'] == reactant_a_type]

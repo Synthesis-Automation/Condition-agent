@@ -554,6 +554,7 @@ The HTE database (`HTE_0.jsonl`) contains the following fields:
 
 - `reaction_type`: Standardized reaction type name
 - `reactant_types`: Classified reactant types
+- `catalyst_type`: Catalyst type tags (Pd, Cu, Ni, organocatalyst, etc.)
 - `conditions`: Condition components (catalyst, ligand, base, solvent, secondary_solvent, additive, coupling_reagent)
 - `metrics`: Yield/response metrics (area_total_reduced, z_score)
 

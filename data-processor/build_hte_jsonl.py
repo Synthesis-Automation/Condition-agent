@@ -88,6 +88,29 @@ _HTE_ORGANIC_OVERRIDES = {
     "rch2pph3x": "Any-Phosphonium",
 }
 
+_CATALYST_TYPE_RULES = [
+    ("Pd", re.compile(r"Pd(?![a-z])"), ["palladium"]),
+    ("Cu", re.compile(r"Cu(?![a-z])"), ["copper"]),
+    ("Ni", re.compile(r"Ni(?![a-z])"), ["nickel"]),
+    ("Fe", re.compile(r"Fe(?![a-z])"), ["iron"]),
+    ("Co", re.compile(r"Co(?![a-z])"), ["cobalt"]),
+    ("Ru", re.compile(r"Ru(?![a-z])"), ["ruthenium"]),
+    ("Rh", re.compile(r"Rh(?![a-z])"), ["rhodium"]),
+    ("Ir", re.compile(r"Ir(?![a-z])"), ["iridium"]),
+    ("Pt", re.compile(r"Pt(?![a-z])"), ["platinum"]),
+    ("Au", re.compile(r"Au(?![a-z])"), ["gold"]),
+    ("Ag", re.compile(r"Ag(?![a-z])"), ["silver"]),
+    ("Zn", re.compile(r"Zn(?![a-z])"), ["zinc"]),
+    ("Mn", re.compile(r"Mn(?![a-z])"), ["manganese"]),
+    ("Cr", re.compile(r"Cr(?![a-z])"), ["chromium"]),
+    ("Ti", re.compile(r"Ti(?![a-z])"), ["titanium"]),
+    ("Mo", re.compile(r"Mo(?![a-z])"), ["molybdenum"]),
+    ("W", re.compile(r"W(?![a-z])"), ["tungsten"]),
+    ("Al", re.compile(r"Al(?![a-z])"), ["aluminum", "aluminium"]),
+    ("Sn", re.compile(r"Sn(?![a-z])"), ["tin", "stannous", "stannic"]),
+    ("Mg", re.compile(r"Mg(?![a-z])"), ["magnesium"]),
+]
+
 
 def _split_values(value: Optional[str]) -> List[str]:
     if value is None:
@@ -173,6 +196,29 @@ def _canonical_member(
     return None
 
 
+def _detect_catalyst_types(catalysts: Iterable[str]) -> List[str]:
+    found: Set[str] = set()
+    has_text = False
+    for catalyst in catalysts:
+        text = str(catalyst).strip()
+        if not text:
+            continue
+        has_text = True
+        text_lower = text.lower()
+        if "organocatalyst" in text_lower or "organic catalyst" in text_lower:
+            found.add("organocatalyst")
+        for symbol, pattern, names in _CATALYST_TYPE_RULES:
+            if pattern.search(text):
+                found.add(symbol)
+                continue
+            if any(name in text_lower for name in names):
+                found.add(symbol)
+
+    if has_text and not found:
+        found.add("organocatalyst")
+    return sorted(found)
+
+
 def _load_organic_compounds_aliases() -> Dict[str, str]:
     if not _ORGANIC_COMPOUNDS_FILE.exists():
         return {}
@@ -254,6 +300,7 @@ def build_hte_jsonl(
                     "coupling_reagent": _unique_list(_split_values(row.get("Coupling Reagent"))),
                 }
                 conditions = {k: v for k, v in conditions.items() if v}
+                catalyst_types = _detect_catalyst_types(conditions.get("catalyst", []))
 
                 metrics = {
                     "area_total_reduced": _to_float(row.get("AREA_TOTAL_REDUCED")),
@@ -264,6 +311,7 @@ def build_hte_jsonl(
                 entry = {
                     "reaction_type": reaction_type,
                     "reactant_types": reactant_types,
+                    "catalyst_type": catalyst_types,
                     "conditions": conditions,
                     "metrics": metrics,
                 }

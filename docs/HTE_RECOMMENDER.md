@@ -27,6 +27,7 @@ Key Components:
 **HTE_0.jsonl** (66,308 experiments):
 - **reaction_type**: 41 types (c_n_cross_coupling, suzuki_miyaura, c_h_activation, etc.)
 - **reactant_types**: Detected member types (Ar-Br, Any-NH2, Ar-B(OH)2, etc.)
+- **catalyst_type**: Catalyst type tags (Pd, Cu, Ni, organocatalyst, etc.)
 - **conditions**: catalyst, ligand, base, solvent, secondary_solvent, additive, coupling_reagent
 - **metrics**: area_total_reduced, z_score
 

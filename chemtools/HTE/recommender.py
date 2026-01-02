@@ -50,7 +50,7 @@ def _load_hte_database_cached(
     print("Building reactant type indices using Reactant_Types_Key...")
 
     df["Reactant_Types_Key"] = df["Reactant_Types_Key"].fillna("")
-    grouped = df.groupby(["Reactant_Types_Key"])
+    grouped = df.groupby("Reactant_Types_Key")
     for key, group_df in grouped:
         indexed_data[key] = group_df
 
@@ -110,6 +110,7 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
 
             reactant_types = _ensure_list(record.get("reactant_types"))
             reactant_categories = _ensure_list(record.get("reactant_categories"))
+            catalyst_types = _ensure_list(record.get("catalyst_type"))
             conditions = record.get("conditions") or {}
             metrics = record.get("metrics") or {}
 
@@ -120,6 +121,7 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
                 "Reactant_A_Category": reactant_categories[0] if len(reactant_categories) > 0 else "",
                 "Reactant_B_Category": reactant_categories[1] if len(reactant_categories) > 1 else "",
                 "Reactant_Types_Key": _reactant_key(reactant_types),
+                "Catalyst_Type": _format_list(catalyst_types),
                 "Catalyst": _format_list(conditions.get("catalyst")),
                 "Ligand": _format_list(conditions.get("ligand")),
                 "Base": _format_list(conditions.get("base")),
@@ -249,29 +251,35 @@ class HTERecommender:
         """
         # Normalize filter term
         filter_lower = catalyst_filter.lower()
-        
+
         # Map common names to symbols
         metal_map = {
-            'palladium': 'Pd',
-            'copper': 'Cu',
-            'nickel': 'Ni',
-            'iridium': 'Ir',
-            'rhodium': 'Rh',
-            'ruthenium': 'Ru',
-            'platinum': 'Pt',
-            'gold': 'Au',
-            'silver': 'Ag',
-            'iron': 'Fe',
-            'cobalt': 'Co',
-            'zinc': 'Zn'
+            "palladium": "Pd",
+            "copper": "Cu",
+            "nickel": "Ni",
+            "iridium": "Ir",
+            "rhodium": "Rh",
+            "ruthenium": "Ru",
+            "platinum": "Pt",
+            "gold": "Au",
+            "silver": "Ag",
+            "iron": "Fe",
+            "cobalt": "Co",
+            "zinc": "Zn",
+            "organocatalyst": "organocatalyst",
+            "organic catalyst": "organocatalyst",
         }
-        
+
         # Get the search term (symbol or name)
         search_term = metal_map.get(filter_lower, catalyst_filter)
-        
-        # Filter catalyst column (case-insensitive)
-        mask = df['Catalyst'].str.contains(search_term, case=False, na=False)
-        
+
+        if "Catalyst_Type" in df.columns:
+            mask = df["Catalyst_Type"].str.contains(search_term, case=False, na=False)
+            if mask.any():
+                return df[mask]
+
+        # Fallback to catalyst names (case-insensitive)
+        mask = df["Catalyst"].str.contains(search_term, case=False, na=False)
         return df[mask]
     
     def _predict_reaction_type(
