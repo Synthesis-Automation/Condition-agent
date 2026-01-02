@@ -7,6 +7,13 @@ This enables hierarchical matching:
 """
 
 import json
+from pathlib import Path
+
+_REACTANT_TYPES_PATH = Path(__file__).resolve().parents[2] / "chemtools" / "taxonomy" / "data" / "reactant_types.json"
+if not _REACTANT_TYPES_PATH.exists():
+    raise SystemExit(
+        "Legacy script: reactant_types.json has been removed; use organic_compounds.v1.3.json instead."
+    )
 
 from chemtools.reagent import (
     clear_reactant_type_cache,

@@ -3,7 +3,7 @@ Reactant and reaction type utilities shared across ChemTools and HTE pipelines.
 
 This module centralises the SMARTS-driven reactant classification helpers using
 the unified feature detection system (``chemtools.featurizers.calculable``) as
-the single source of truth for reactant identification.
+the single source of truth for reactant identification (organic_compounds).
 
 Note: This module now delegates reactant classification to the unified feature
 system while maintaining backward compatibility with the legacy API.
@@ -29,11 +29,11 @@ from ...util.smarts_cache import compile_smarts
 from ._registry import clear_registry_cache, get_registry
 
 TAXONOMY_DATA_DIR = Path(__file__).resolve().parents[2] / "taxonomy" / "data"
-REACTANT_TYPES_FILE = TAXONOMY_DATA_DIR / "reactant_types.json"
+REACTANT_TYPES_FILE = TAXONOMY_DATA_DIR / "organic_compounds.v1.3.json"
 REACTION_TYPES_FILE = _reaction_catalog.REACTION_TYPES_FILE
 
 # General categories that should be deprioritised when picking the "best" match.
-GENERAL_REACTANT_CATEGORIES = {"Alkyl-C-H", "ArH"}
+GENERAL_REACTANT_CATEGORIES = {"R-H", "Ar-H"}
 
 
 def _get_calculable() -> Any:
@@ -43,48 +43,48 @@ def _get_calculable() -> Any:
 
 # Manual overrides sourced from the original z-score pipeline.
 CSV_REACTANT_OVERRIDES: Dict[str, str] = {
-    "ArBr": "ArBr",
-    "ArCl": "ArCl",
-    "ArI": "ArI",
-    "ArF": "ArF",
-    "ArOH": "ArOH",
-    "ArOSO2R": "ArOSO2R",
-    "Alkyl-Br": "Alkyl-Br",
-    "Alkyl-Cl": "Alkyl-Cl",
-    "Alkyl-I": "Alkyl-I",
-    "Alkyl-OSO2R": "Alkyl-OSO2R",
-    "alkene-Br": "alkene-Br",
-    "alkene-I": "alkene-I",
-    "ArB(OR)2": "ArB(OR)2",
-    "ArB(OH)2": "ArB(OH)2",
-    "ArBF3K": "ArBF3K",
-    "RNH2 a-branch": "RNH2-a-branch",
-    "RNH2": "RNH2",
-    "R2NH a-branch": "R2NH-a-branch",
-    "R2NH": "R2NH",
-    "ArNH2": "ArNH2",
-    "ArNHR": "ArNHR",
-    "Ar2NH": "Ar2NH",
-    "arom. NH": "arom-NH",
-    "alkeneB(OR)2": "alkeneB(OR)2",
-    "Alkyl-B(OH)2": "Alkyl-B(OH)2",
-    "Alkyl-B(OR)2": "Alkyl-B(OR)2",
-    "Alkyl-BF3K": "Alkyl-BF3K",
-    "Alkyl-OH a-branch": "ROH-a-branch",
-    "Alkyl-OH primary": "ROH-primary",
-    "Lactam": "Lactam",
-    "RCONH2": "RCONH2",
-    "ROC(O)NR2": "Carbamate",
-    "Urea": "Urea",
-    "Alkyl-M": "Alkyl-M",
-    "Alkyl-H acidic": "Alkyl-H-acidic",
-    "Alkyl-H": "Alkyl-H",
-    "alkene": "alkene",
-    "alkyne": "alkyne",
+    "ArBr": "Ar-Br",
+    "ArCl": "Ar-Cl",
+    "ArI": "Ar-I",
+    "ArF": "Ar-F",
+    "ArOH": "Ar-OH",
+    "ArOSO2R": "Ar-OTs",
+    "Alkyl-Br": "R-Br",
+    "Alkyl-Cl": "R-Cl",
+    "Alkyl-I": "R-I",
+    "Alkyl-OSO2R": "R-OSO2R",
+    "alkene-Br": "Vinyl-Br",
+    "alkene-I": "Vinyl-I",
+    "ArB(OR)2": "Ar-B(OR)2",
+    "ArB(OH)2": "Ar-B(OH)2",
+    "ArBF3K": "Ar-BF3K",
+    "RNH2 a-branch": "Any-NH2",
+    "RNH2": "Any-NH2",
+    "R2NH a-branch": "Any-NHR",
+    "R2NH": "Any-NHR",
+    "ArNH2": "Ar-NH2",
+    "ArNHR": "Ar-NHR",
+    "Ar2NH": "Ar-NHAr",
+    "arom. NH": "AromN-H",
+    "alkeneB(OR)2": "Vinyl-B(OR)2",
+    "Alkyl-B(OH)2": "R-B(OH)2",
+    "Alkyl-B(OR)2": "Any-B(OR)2",
+    "Alkyl-BF3K": "R-BF3K",
+    "Alkyl-OH a-branch": "R2CH-OH",
+    "Alkyl-OH primary": "RCH2-OH",
+    "Lactam": "Any-Lactam",
+    "RCONH2": "Any-CONHR",
+    "ROC(O)NR2": "Any-Carbamate",
+    "Urea": "Any-Urea",
+    "Alkyl-M": "R-M",
+    "Alkyl-H acidic": "R-H-acidic",
+    "Alkyl-H": "R-H",
+    "alkene": "Any-Alkene",
+    "alkyne": "Any-Alkyne",
     "Ar-H": "Ar-H",
-    "enolether": "enol-ether",
-    "RSH": "RSH",
-    "RCO2H or M": "RCO2H",
+    "enolether": "Any-EnolEther",
+    "RSH": "Any-SH",
+    "RCO2H or M": "Any-CO2H",
 }
 
 CSV_REACTION_OVERRIDES: Dict[str, str] = {
@@ -236,6 +236,9 @@ def _load_reactant_types_from_file(path: Path) -> Dict[str, dict]:
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
 
+    if isinstance(payload, dict) and "compounds" in payload:
+        return _load_reactant_types_from_compounds(payload.get("compounds") or [])
+
     if isinstance(payload, dict):
         entries = payload.get("entries") or []
     else:
@@ -290,13 +293,56 @@ def _load_reactant_types_from_file(path: Path) -> Dict[str, dict]:
     return definitions
 
 
+def _load_reactant_types_from_compounds(compounds: Iterable[dict]) -> Dict[str, dict]:
+    definitions: Dict[str, dict] = {}
+    for entry in compounds:
+        if not isinstance(entry, dict):
+            continue
+        compound_id = entry.get("id")
+        if not compound_id:
+            continue
+        name = entry.get("name", compound_id)
+        aliases = list(entry.get("aliases") or [])
+        smarts_any = entry.get("smarts_any") or entry.get("smarts")
+        smarts_list: List[str] = []
+        if isinstance(smarts_any, str):
+            smarts_list = [smarts_any]
+        elif isinstance(smarts_any, list):
+            smarts_list = [s for s in smarts_any if isinstance(s, str)]
+        smarts = smarts_list[0] if smarts_list else ""
+        group = str(entry.get("B") or "")
+
+        definitions[compound_id] = {
+            "id": compound_id,
+            "name": name,
+            "description": entry.get("description"),
+            "category": compound_id,
+            "smarts": smarts,
+            "group": group,
+            "aliases": aliases,
+            "metadata": {"group": group},
+            "members": [
+                {
+                    "id": compound_id,
+                    "name": name,
+                    "smarts": smarts,
+                    "aliases": aliases,
+                    "metadata": {"legacy_taxonomy_id": compound_id, "group": group},
+                }
+            ],
+            "legacy_id": compound_id,
+        }
+
+    return definitions
+
+
 def get_reactant_type_definitions() -> Dict[str, dict]:
-    """Return a deep copy of the reactant type taxonomy."""
+    """Return a deep copy of the reactant type taxonomy (organic_compounds-backed)."""
     return copy.deepcopy(_load_reactant_types_raw())
 
 
 def get_reactant_types_file() -> Path:
-    """Return the path to the canonical reactant type JSON file."""
+    """Return the path to the canonical reactant type JSON file (organic_compounds)."""
     return REACTANT_TYPES_FILE
 
 

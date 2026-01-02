@@ -1,3 +1,5 @@
+Legacy note: reactant_types.json has been removed; use organic_compounds.v1.3.json for reactant type definitions.
+
 # How to Test the Simple Condition Recommender
 
 ## Quick Start - 3 Ways to Test

@@ -1,4 +1,12 @@
+from pathlib import Path
+
 from chemtools.reagent import get_reactant_type_definitions
+
+_REACTANT_TYPES_PATH = Path(__file__).resolve().parents[2] / "chemtools" / "taxonomy" / "data" / "reactant_types.json"
+if not _REACTANT_TYPES_PATH.exists():
+    raise SystemExit(
+        "Legacy script: reactant_types.json has been removed; use organic_compounds.v1.3.json instead."
+    )
 
 # Load the updated reactant_types.json
 data = get_reactant_type_definitions()

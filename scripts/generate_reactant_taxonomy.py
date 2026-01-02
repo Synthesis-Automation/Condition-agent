@@ -1,13 +1,8 @@
 """
-Regenerate ``chemtools/taxonomy/data/reactant_types.json`` from the
-reactant metadata defined in ``chemtools/taxonomy/data/calculable_features.json``.
+Legacy: reactant_types.json is retired.
 
-This keeps the calculable feature spec as the single source of truth for
-reactant SMARTS and membership, while carrying forward human-friendly labels,
-descriptions, aliases, and metadata from the existing taxonomy file when
-present. SMARTS fields are intentionally omitted in the generated taxonomy
-payload to avoid duplication; detection already relies on the calculable
-feature spec.
+Reactant type SMARTS are now derived from organic_compounds.v1.3.json via
+chemtools.taxonomy.calculable_spec. This script is kept for reference only.
 """
 
 from __future__ import annotations
@@ -20,6 +15,11 @@ from typing import Dict, List, Optional
 ROOT = Path(__file__).resolve().parents[1]
 SPEC_PATH = ROOT / "chemtools" / "taxonomy" / "data" / "calculable_features.json"
 OUTPUT_PATH = ROOT / "chemtools" / "taxonomy" / "data" / "reactant_types.json"
+
+if not OUTPUT_PATH.exists():
+    raise SystemExit(
+        "reactant_types.json has been removed; use organic_compounds.v1.3.json instead."
+    )
 
 
 def _load_existing() -> Dict[str, dict]:

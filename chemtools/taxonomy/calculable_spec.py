@@ -2,8 +2,9 @@
 Loader for calculable feature specifications.
 
 This version targets taxonomy v2 data. Reactant type features are generated
-from ``reactant_types.json`` to avoid duplicating SMARTS definitions. Optional
-property and derived overlays are loaded from layered files when present.
+from ``organic_compounds.v1.3.json`` (with group templates) to avoid duplicating
+SMARTS definitions. Optional property and derived overlays are loaded from
+layered files when present.
 """
 
 from __future__ import annotations
@@ -16,40 +17,12 @@ from typing import Any, Dict, Optional
 _BASE_FILE = "calculable_features.json"
 _PROPERTIES_FILE = "calculable_features_properties.json"
 _DERIVED_FILE = "calculable_features_derived.json"
-_REACTANT_TYPES_FILE = "reactant_types.json"
+_ORGANIC_COMPOUNDS_FILE = "organic_compounds.v1.3.json"
+_ORGANIC_GROUPS_FILE = "organic_groups.v1.3.json"
 
-_ROLE_MAPPING = {
-    "ArX*": "electrophile",
-    "HetAr-X": "electrophile",
-    "VinylX*": "electrophile",
-    "Alkyl-X": "electrophile",
-    "Allylic-X": "electrophile",
-    "Benzylic-X": "electrophile",
-    "RSO2Cl": "electrophile",
-    "Acyl-electrophile": "electrophile",
-    "ArB*": "nucleophile",
-    "RB*": "nucleophile",
-    "R-M": "nucleophile",
-    "RMgX": "nucleophile",
-    "RZnX": "nucleophile",
-    "RLi": "nucleophile",
-    "RNH2/R2NH": "nucleophile",
-    "ArNH2/Ar2NH": "nucleophile",
-    "ROH": "nucleophile",
-    "ArOH": "nucleophile",
-    "RSH": "nucleophile",
-    "Alkyne": "both",
-    "Alkene": "both",
-    "Aldehyde": "electrophile",
-    "Ketone": "electrophile",
-    "Ester": "electrophile",
-    "RCO2H": "nucleophile",
-    "Amide": "nucleophile",
-    "Metal-H": "reductant",
-    "H2": "reductant",
-    "Oxidant": "oxidant",
-    "Diene": "dienophile",
-    "Dienophile": "dienophile",
+_DEFAULT_TEMPLATES = {
+    "single_bond": "{A}{B}",
+    "via_oxygen": "{A}O{B}",
 }
 
 
@@ -75,17 +48,35 @@ def _coerce_feature_list(value: Any, *, path: Path) -> list[dict[str, Any]]:
     return [item for item in value if isinstance(item, dict)]
 
 
-def _load_reactant_types(path: Path) -> list[dict[str, Any]]:
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
-    if not isinstance(payload, list):
-        raise ValueError(f"Expected a JSON list at {path}")
-    return [item for item in payload if isinstance(item, dict)]
+def _load_groups(path: Path) -> Dict[str, Dict[str, Any]]:
+    payload = _safe_load_json(path)
+    groups = payload.get("groups", [])
+    return {
+        group["id"]: group
+        for group in groups
+        if isinstance(group, dict) and group.get("id")
+    }
+
+
+def _load_compounds(path: Path) -> list[dict[str, Any]]:
+    payload = _safe_load_json(path)
+    compounds = payload.get("compounds") or []
+    return [item for item in compounds if isinstance(item, dict)]
+
+
+def _extract_compound_smarts(entry: dict[str, Any]) -> list[str]:
+    smarts_any = entry.get("smarts_any") or entry.get("smarts")
+    if isinstance(smarts_any, str):
+        return [smarts_any]
+    if isinstance(smarts_any, list):
+        return [s for s in smarts_any if isinstance(s, str) and s.strip()]
+    return []
 
 
 def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
-    reactant_path = data_root / _REACTANT_TYPES_FILE
-    if not reactant_path.exists():
+    compounds_path = data_root / _ORGANIC_COMPOUNDS_FILE
+    groups_path = data_root / _ORGANIC_GROUPS_FILE
+    if not compounds_path.exists() or not groups_path.exists():
         return {
             "version": "empty",
             "description": "Fallback empty calculable feature spec.",
@@ -93,70 +84,58 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
             "derived_shortcuts": [],
         }
 
-    reactant_data = _load_reactant_types(reactant_path)
+    compounds = _load_compounds(compounds_path)
+    groups = _load_groups(groups_path)
+    templates = dict(_DEFAULT_TEMPLATES)
     features: list[dict[str, Any]] = []
     derived_shortcuts: list[dict[str, Any]] = []
 
-    for category in reactant_data:
-        cat_id = category.get("id") or ""
-        cat_name = category.get("name") or cat_id
-        cat_desc = category.get("description") or ""
-        members = category.get("members") or []
+    for entry in compounds:
+        compound_id = entry.get("id") or ""
+        if not compound_id:
+            continue
+        compound_name = entry.get("name") or compound_id
+        compound_desc = entry.get("description") or ""
+        group_b = entry.get("B") or ""
 
-        member_tokens: list[str] = []
-        for member in members:
-            member_id = member.get("id") or ""
-            smarts = member.get("smarts") or ""
-            if not member_id or not smarts:
-                continue
-            member_name = member.get("name") or member_id
-            meta = member.get("metadata") or {}
-            token = meta.get("feature_token") or f"{member_id}_reactant"
-            legacy_id = meta.get("legacy_taxonomy_id") or member_id
-            coupling_role = meta.get("coupling_role") or _ROLE_MAPPING.get(cat_id, "other")
+        smarts_list = _extract_compound_smarts(entry)
+        if not smarts_list:
+            template_id = entry.get("template") or ""
+            template_format = templates.get(template_id)
+            group_a = entry.get("A")
+            group_b_id = entry.get("B")
+            if template_format and group_a and group_b_id:
+                group_a_record = groups.get(group_a, {})
+                group_b_record = groups.get(group_b_id, {})
+                a_smarts = group_a_record.get("smarts") or ""
+                b_smarts = group_b_record.get("smarts") or ""
+                if a_smarts and b_smarts:
+                    smarts_list = [template_format.format(A=a_smarts, B=b_smarts)]
+
+        if smarts_list:
             feature = {
-                "token": token,
+                "token": f"{compound_id}_reactant",
                 "type": "bool",
                 "scope": "global",
                 "category": "reactant_types",
-                "detect": {"smarts_any": [smarts]},
-                "why": f"{member_name} - {cat_name}",
+                "detect": {"smarts_any": smarts_list},
+                "why": compound_name,
                 "metadata": {
-                    "reactant_category": cat_id,
-                    "reactant_member": member_id,
-                    "reactant_name": member_name,
-                    "category_name": cat_name,
-                    "coupling_role": coupling_role,
-                    "legacy_taxonomy_id": legacy_id,
-                    "category_description": cat_desc,
+                    "reactant_category": compound_id,
+                    "reactant_member": compound_id,
+                    "reactant_name": compound_name,
+                    "category_name": compound_name,
+                    "coupling_role": "other",
+                    "legacy_taxonomy_id": compound_id,
+                    "category_description": compound_desc,
+                    "group": group_b,
                 },
             }
             features.append(feature)
-            member_tokens.append(token)
-
-        if member_tokens:
-            safe_cat_id = (
-                cat_id.replace("*", "")
-                .replace("-", "_")
-                .replace("/", "_")
-            )
-            derived_shortcuts.append(
-                {
-                    "token": f"{safe_cat_id}_reactant",
-                    "derive": " OR ".join(member_tokens),
-                    "why": f"Category-level: {cat_name}",
-                    "metadata": {
-                        "reactant_category": cat_id,
-                        "category_name": cat_name,
-                        "is_category_level": True,
-                        "member_count": len(member_tokens),
-                    },
-                }
-            )
 
     return {
-        "version": "reactant_types_generated",
-        "description": "Reactant feature spec generated from reactant_types.json.",
+        "version": "organic_compounds_generated",
+        "description": "Reactant feature spec generated from organic_compounds.v1.3.json.",
         "features": features,
         "derived_shortcuts": derived_shortcuts,
     }
@@ -178,7 +157,7 @@ def load_calculable_feature_spec(root: Optional[Path] = None) -> Dict[str, Any]:
     else:
         base = _build_reactant_spec(data_root)
         merged = dict(base)
-        merged["features"] = _coerce_feature_list(base.get("features"), path=data_root / _REACTANT_TYPES_FILE)
+        merged["features"] = _coerce_feature_list(base.get("features"), path=data_root / _ORGANIC_COMPOUNDS_FILE)
         derived_shortcuts = [
             item for item in (base.get("derived_shortcuts") or []) if isinstance(item, dict)
         ]

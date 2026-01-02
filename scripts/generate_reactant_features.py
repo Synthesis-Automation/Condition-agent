@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Generate reactant type features for calculable_features.json
+Legacy: reactant_types.json is retired.
 
-This script extracts all reactant types from reactant_types.json and generates:
-1. Individual member features (e.g., ArBr_reactant)
-2. Category-level derived features (e.g., ArX_reactant)
+Reactant type SMARTS are now derived from organic_compounds.v1.3.json via
+chemtools.taxonomy.calculable_spec. This script is kept for reference only.
 """
 
 import json
@@ -61,6 +60,10 @@ ROLE_MAPPING = {
 
 def load_reactant_types() -> List[dict]:
     """Load reactant types from JSON."""
+    if not REACTANT_TYPES_FILE.exists():
+        raise SystemExit(
+            "reactant_types.json has been removed; use organic_compounds.v1.3.json instead."
+        )
     with open(REACTANT_TYPES_FILE) as f:
         return json.load(f)
 
