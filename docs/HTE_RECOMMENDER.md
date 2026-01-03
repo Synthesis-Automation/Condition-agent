@@ -5,6 +5,7 @@
 The HTE (High-Throughput Experimentation) module provides condition recommendations based on reactant types using a database of 66,308 experimental results covering 41 reaction types.
 
 **Key Innovation**: Since no reaction SMILES is provided in the HTE database, recommendations are made by:
+
 1. Detecting reactant types from input SMILES using existing `chemtools` reactant classification
 2. Matching against experimental conditions indexed by reactant type combinations
 3. Ranking conditions by success rate, sample size, and average yield
@@ -25,6 +26,7 @@ Key Components:
 ## Database Structure
 
 **HTE_canonical.csv** (65,468 experiments):
+
 - **reaction_type**: 41 types (c_n_cross_coupling, suzuki_miyaura, c_h_activation, etc.)
 - **reactant_types**: Detected member types (Ar-Br, Any-NH2, Ar-B(OH)2, etc.)
 - **catalyst_type**: Catalyst type tags (Pd, Cu, Ni, organocatalyst, etc.)
@@ -32,6 +34,7 @@ Key Components:
 - **metrics**: area_total_reduced, z_score
 
 **Statistics**:
+
 - Success rate (yield > 50%): 18.8% overall
 - Top reactions: C_N_Coupling (24,012), Suzuki (11,588), Arylation-acidic-C-H (4,152)
 - 229 catalysts, 153 ligands, 132 bases, 67 solvents
@@ -54,6 +57,7 @@ result_b = classify_reactant_smiles("CCN")  # RNH2 (RNH2/R2NH)
 ### 2. Database Indexing
 
 On initialization, the recommender builds indices:
+
 - **By reactant type combination**: `(ArBr, RNH2)` → DataFrame subset
 - **Reaction type patterns**: `(ArBr, RNH2)` → `{C_N_Coupling: 1080, ...}`
 
@@ -62,12 +66,14 @@ This enables O(1) lookup by reactant types.
 ### 3. Condition Aggregation
 
 For matched experiments:
+
 1. Group by `(catalyst, ligand, base, solvent)` combination
 2. Calculate statistics per combination:
    - **Success rate**: % with yield > 50%
    - **Average/median yield**
    - **Sample size**: number of experiments
 3. Compute **confidence score**:
+
    ```
    confidence = 0.5 * (success_rate/100)
               + 0.3 * min(num_experiments, 100)/100
@@ -100,6 +106,7 @@ print(format_result(result))
 ```
 
 **Output**:
+
 ```
 Reactant A: c1ccc(Br)cc1
   Type: ArBr (ArX*)
@@ -265,6 +272,7 @@ class ConditionRecommendation:
 ### C-N Coupling (ArBr + RNH2)
 
 **Input**: Bromobenzene + Ethylamine
+
 - **Match**: 1,080 experiments (1.63% of DB)
 - **Predicted**: C_N_Coupling (100% confidence)
 - **Top condition**: XantPhos Pd(allyl)Cl / XantPhos / Cs2CO3 / Dioxane
@@ -275,6 +283,7 @@ class ConditionRecommendation:
 ### Suzuki Coupling (ArCl + ArB(OH)2)
 
 **Input**: Chlorobenzene + Phenylboronic acid
+
 - **Match**: 960 experiments (1.45% of DB)
 - **Predicted**: Suzuki (100% confidence)
 - **Top condition**: Pd-PEPPSI-IPent / IPENT Cl / Cs2CO3 / Brij 35
@@ -285,6 +294,7 @@ class ConditionRecommendation:
 ### C-N Coupling (ArCl + ArNH2)
 
 **Input**: Chlorobenzene + Aniline
+
 - **Match**: 2,009 experiments (3.03% of DB)
 - **Predicted**: C_N_Coupling (100% confidence)
 - **Top condition**: tBuBrettPhos Pd(allyl)OTf / tBuBrettPhos / K3PO4 / MeCN

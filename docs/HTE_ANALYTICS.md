@@ -5,6 +5,7 @@ Comprehensive analytics interface for exploring and analyzing the HTE database.
 ## Overview
 
 The HTE Analytics module provides tools to:
+
 - **List reactant pairs** by reaction type and/or catalyst
 - **Analyze catalyst statistics** for specific reactions or substrates
 - **Summarize reaction types** in the database
@@ -80,9 +81,11 @@ python -m chemtools.HTE.analytics_cli export suzuki_pd.csv --reaction Suzuki --c
 Initialize analytics with HTE database.
 
 **Parameters:**
+
 - `hte_db_path` (str): Path to HTE database JSONL file
 
 **Example:**
+
 ```python
 analytics = HTEAnalytics("data/HTE_db/HTE_canonical.csv")
 ```
@@ -94,12 +97,14 @@ analytics = HTEAnalytics("data/HTE_db/HTE_canonical.csv")
 List all reactant type pairs in the database with optional filters.
 
 **Parameters:**
+
 - `reaction_type` (str, optional): Filter by reaction type (e.g., "Suzuki", "C-N Coupling")
 - `catalyst_filter` (str, optional): Filter by catalyst metal (e.g., "Pd", "Cu", "palladium")
 - `min_experiments` (int): Minimum number of experiments for inclusion (default: 1)
 - `sort_by` (str): Sort by "count" or "success_rate" (default: "count")
 
 **Returns:**
+
 - `pd.DataFrame` with columns:
   - `Reactant_A_Type`: Type of reactant A
   - `Reactant_B_Type`: Type of reactant B
@@ -111,6 +116,7 @@ List all reactant type pairs in the database with optional filters.
   - `Top_Catalyst`: Most frequently used catalyst
 
 **Example:**
+
 ```python
 # Find common Suzuki pairs with Pd catalysts
 df = analytics.list_reactant_pairs(
@@ -128,6 +134,7 @@ for _, row in df.head(5).iterrows():
 ```
 
 **Output:**
+
 ```
 Found 14 pairs
 ArCl + ArB(OR)2
@@ -146,11 +153,13 @@ ArBr + ArB(OH)2
 Get catalyst usage statistics with optional filters.
 
 **Parameters:**
+
 - `reaction_type` (str, optional): Filter by reaction type
 - `reactant_a_type` (str, optional): Filter by reactant A type
 - `reactant_b_type` (str, optional): Filter by reactant B type
 
 **Returns:**
+
 - `pd.DataFrame` with columns:
   - `Catalyst`: Catalyst name
   - `Metal`: Extracted metal symbol (Pd, Cu, Ni, etc.)
@@ -160,6 +169,7 @@ Get catalyst usage statistics with optional filters.
   - `Reaction_Types`: Comma-separated list of reaction types
 
 **Example:**
+
 ```python
 # Find top Pd catalysts for Suzuki
 df = analytics.get_catalyst_stats(reaction_type="Suzuki")
@@ -170,6 +180,7 @@ for _, row in df_pd.head(10).iterrows():
 ```
 
 **Output:**
+
 ```
 dtbpfPdCl2: 1635 exp, 33.4% avg
 P(tBu)3 Pd(crotyl)Cl: 999 exp, 26.2% avg
@@ -184,6 +195,7 @@ SPhos Pd(crotyl)Cl: 815 exp, 35.2% avg
 Get summary statistics for all reaction types in the database.
 
 **Returns:**
+
 - `pd.DataFrame` with columns:
   - `Reaction_Type`: Reaction type name
   - `Num_Experiments`: Total experiments
@@ -195,6 +207,7 @@ Get summary statistics for all reaction types in the database.
   - `Top_Reactant_Pair`: Most common reactant pair
 
 **Example:**
+
 ```python
 df = analytics.get_reaction_type_summary()
 
@@ -205,6 +218,7 @@ for _, row in df.head(10).iterrows():
 ```
 
 **Output:**
+
 ```
 C_N_Coupling: 24,012 exp
   Pairs: 38, Catalysts: 111
@@ -222,12 +236,14 @@ Suzuki: 11,588 exp
 Analyze metal usage across the entire database.
 
 **Returns:**
+
 - `dict` with:
   - `metal_distribution`: DataFrame with metal counts and percentages
   - `by_reaction_type`: Dict mapping metals to reaction type counts
   - `total_experiments`: Total number of experiments
 
 **Example:**
+
 ```python
 result = analytics.analyze_metal_usage()
 
@@ -243,6 +259,7 @@ for rxn, count in sorted(pd_reactions.items(), key=lambda x: x[1], reverse=True)
 ```
 
 **Output:**
+
 ```
 Total: 66,308 experiments
 
@@ -263,6 +280,7 @@ Cu: 5,478 (8.3%)
 Find reactant pairs similar to the given pair.
 
 **Parameters:**
+
 - `reactant_a_type` (str): Reactant A type to search for
 - `reactant_b_type` (str): Reactant B type to search for
 - `similarity_criteria` (str): How to define similarity:
@@ -271,9 +289,11 @@ Find reactant pairs similar to the given pair.
   - `"both"`: Same reaction type AND catalyst metal
 
 **Returns:**
+
 - `pd.DataFrame` of similar reactant pairs with statistics
 
 **Example:**
+
 ```python
 # Find pairs similar to ArCl + ArB(OH)2 by reaction type
 df = analytics.find_similar_pairs(
@@ -295,6 +315,7 @@ for _, row in df.head(5).iterrows():
 Export a filtered subset of the database to CSV.
 
 **Parameters:**
+
 - `output_path` (str): Path to save the CSV file
 - `reaction_type` (str, optional): Filter by reaction type
 - `catalyst_filter` (str, optional): Filter by catalyst metal
@@ -303,9 +324,11 @@ Export a filtered subset of the database to CSV.
 - `min_yield` (float, optional): Minimum yield threshold
 
 **Returns:**
+
 - `int`: Number of experiments exported
 
 **Example:**
+
 ```python
 # Export high-performing Suzuki data
 count = analytics.export_subset(
@@ -330,6 +353,7 @@ python -m chemtools.HTE.analytics_cli pairs [OPTIONS]
 ```
 
 **Options:**
+
 - `--reaction TEXT`: Filter by reaction type
 - `--catalyst TEXT`: Filter by catalyst metal (e.g., Pd, Cu)
 - `--min-experiments INT`: Minimum number of experiments (default: 1)
@@ -339,6 +363,7 @@ python -m chemtools.HTE.analytics_cli pairs [OPTIONS]
 - `-o, --output PATH`: Save results to CSV
 
 **Examples:**
+
 ```bash
 # Top 10 Suzuki pairs with Pd catalysts
 python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10 --compact
@@ -359,6 +384,7 @@ python -m chemtools.HTE.analytics_cli catalysts [OPTIONS]
 ```
 
 **Options:**
+
 - `--reaction TEXT`: Filter by reaction type
 - `--reactant-a TEXT`: Filter by reactant A type
 - `--reactant-b TEXT`: Filter by reactant B type
@@ -367,6 +393,7 @@ python -m chemtools.HTE.analytics_cli catalysts [OPTIONS]
 - `-o, --output PATH`: Save results to CSV
 
 **Examples:**
+
 ```bash
 # Top Pd catalysts for Suzuki
 python -m chemtools.HTE.analytics_cli catalysts --reaction Suzuki --compact
@@ -384,11 +411,13 @@ python -m chemtools.HTE.analytics_cli reactions [OPTIONS]
 ```
 
 **Options:**
+
 - `--top INT`: Number of results to show (default: 20)
 - `--compact`: Use compact output format
 - `-o, --output PATH`: Save results to CSV
 
 **Examples:**
+
 ```bash
 # View top 15 reaction types
 python -m chemtools.HTE.analytics_cli reactions --top 15 --compact
@@ -406,10 +435,12 @@ python -m chemtools.HTE.analytics_cli metals [OPTIONS]
 ```
 
 **Options:**
+
 - `--detailed`: Show detailed breakdown by reaction type
 - `-o, --output PATH`: Save results to CSV
 
 **Examples:**
+
 ```bash
 # Basic metal distribution
 python -m chemtools.HTE.analytics_cli metals
@@ -427,6 +458,7 @@ python -m chemtools.HTE.analytics_cli export OUTPUT_PATH [OPTIONS]
 ```
 
 **Options:**
+
 - `--reaction TEXT`: Filter by reaction type
 - `--catalyst TEXT`: Filter by catalyst metal
 - `--reactant-a TEXT`: Filter by reactant A type
@@ -434,6 +466,7 @@ python -m chemtools.HTE.analytics_cli export OUTPUT_PATH [OPTIONS]
 - `--min-yield FLOAT`: Minimum yield threshold
 
 **Examples:**
+
 ```bash
 # Export high-yield Suzuki data
 python -m chemtools.HTE.analytics_cli export suzuki_high.csv --reaction Suzuki --min-yield 80
@@ -502,6 +535,7 @@ python -m chemtools.HTE.analytics_cli reactions --top 15 --compact
 ```
 
 Output:
+
 ```
 1. C_N_Coupling
    Experiments: 24,012, Pairs: 38, Catalysts: 111
@@ -583,6 +617,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
 ### Performance
 
 1. **Cache the analytics object** if making multiple queries:
+
    ```python
    analytics = HTEAnalytics()  # Load once
    
@@ -592,6 +627,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
    ```
 
 2. **Use CLI for quick exploration**, Python API for automation:
+
    ```bash
    # Quick check
    python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --top 5
@@ -601,6 +637,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
    ```
 
 3. **Export filtered datasets** for external analysis (Excel, R, etc.):
+
    ```bash
    python -m chemtools.HTE.analytics_cli export my_data.csv --reaction Suzuki --catalyst Pd
    ```
@@ -614,6 +651,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
 **Problem:** Query returns 0 results
 
 **Solutions:**
+
 1. Check reaction type spelling (use `reactions` command to see available types)
 2. Verify catalyst filter (use `metals` command to see available metals)
 3. Lower `min_experiments` threshold
@@ -624,6 +662,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
 **Problem:** Queries take a long time
 
 **Solutions:**
+
 1. Add more specific filters (reaction type, catalyst, etc.)
 2. Use `min_experiments` to reduce result size
 3. Limit results with `--top` in CLI
@@ -634,6 +673,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
 **Problem:** Catalyst appears in multiple metal categories
 
 **Explanation:** Some catalysts contain multiple metals (e.g., "CuI, PPh3)2PdCl2")
+
 - Metal extraction finds the first match
 - Use `get_catalyst_stats()` to see full catalyst names
 - Filter by exact catalyst name if needed
@@ -643,6 +683,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
 ## Future Enhancements
 
 Planned features:
+
 - [ ] Ligand usage analysis
 - [ ] Base/solvent combination analysis
 - [ ] Time-series analysis (if timestamp data added)
