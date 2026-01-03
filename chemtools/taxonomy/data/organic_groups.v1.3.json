@@ -31,7 +31,7 @@
       "id": "Ar",
       "name": "Ar-",
       "kind": "scaffold",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[c:1]",
       "description": "Aryl attachment via aromatic carbon (Ar-).",
       "tags": [
@@ -44,7 +44,7 @@
       "id": "AromN",
       "name": "AromN-",
       "kind": "scaffold",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[n:1]",
       "description": "Aromatic attachment via aromatic nitrogen (e.g., N-substituted pyrroles, indoles) (AromN-).",
       "tags": [
@@ -57,7 +57,7 @@
       "id": "Vinyl",
       "name": "Vinyl-",
       "kind": "scaffold",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[C;X3]=[C;X3:1]",
       "description": "Vinylic (alkenyl) attachment at an sp2 carbon.",
       "tags": [
@@ -83,7 +83,7 @@
       "id": "RCH2",
       "name": "RCH2-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 3,
       "smarts": "[CX4H2:1]",
       "description": "Primary alkyl (sp3 CH2) attachment point.",
       "tags": [
@@ -97,7 +97,7 @@
       "id": "R2CH",
       "name": "R2CH-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 3,
       "smarts": "[CX4H1:1]",
       "description": "Secondary alkyl (sp3 CH) attachment point.",
       "tags": [
@@ -111,7 +111,7 @@
       "id": "R3C",
       "name": "R3C-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 3,
       "smarts": "[CX4H0:1]",
       "description": "Tertiary alkyl (sp3 C) attachment point.",
       "tags": [
@@ -871,7 +871,7 @@
       "id": "OTf",
       "name": "-OTf",
       "kind": "substituent",
-      "priority": 2,
+      "priority": 4,
       "smarts": "[S:2](=O)(=O)C(F)(F)F",
       "description": "Triflate substituent for Ar-OTf/Vinyl-OTf via oxygen linker.",
       "tags": [
@@ -883,7 +883,7 @@
       "id": "OTs",
       "name": "-OTs",
       "kind": "substituent",
-      "priority": 2,
+      "priority": 3,
       "smarts": "[S:2](=O)(=O)c1ccc(C)cc1",
       "description": "Tosylate substituent via oxygen linker.",
       "tags": [
@@ -907,7 +907,7 @@
       "id": "OSO2R",
       "name": "-OSO2R",
       "kind": "substituent",
-      "priority": 2,
+      "priority": 1,
       "smarts": "[S:2](=O)(=O)[#6]",
       "description": "Generic sulfonate substituent via oxygen linker (-OSO2R).",
       "tags": [

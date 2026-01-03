@@ -1,0 +1,155 @@
+name,smiles,role,reaction_types,notes
+Bromobenzene,Brc1ccccc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Ullmann; Sonogashira; Heck; Stille; Negishi; Kumada,Standard aryl bromide for all cross-coupling reactions
+Chlorobenzene,Clc1ccccc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Ullmann; Sonogashira; Heck,Less reactive; requires activated catalyst systems
+Iodobenzene,Ic1ccccc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Heck; Stille; Negishi; Kumada,Most reactive aryl halide
+Fluorobenzene,Fc1ccccc1,electrophile,SNAr,Requires strong nucleophiles for SNAr; not for standard cross-coupling
+4-Bromobenzonitrile,Brc1ccc(C#N)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Electron-poor aryl bromide; more reactive
+4-Bromoanisole,Brc1ccc(OC)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Heck,Electron-rich aryl bromide; standard substrate
+4-Bromonitrobenzene,Brc1ccc([N+](=O)[O-])cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; SNAr,Highly electron-poor; very reactive
+4-Bromobenzotrifluoride,Brc1ccc(C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Electron-poor CF3 substituent
+"1,3,5-Tribromobenzene",Brc1cc(Br)cc(Br)c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Multiple coupling sites; sp2_halide_site_count = 3
+"1,4-Dichlorobenzene",Clc1ccc(Cl)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Di-functionalization substrate
+2-Bromotoluene,Brc1ccccc1C,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Ortho-substituted; sterically hindered
+"3,5-Dimethylbromobenzene",Brc1cc(C)cc(C)c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Meta-substituted; moderate sterics
+Pentamethylbromobenzene,Brc1c(C)c(C)c(C)c(C)c1C,electrophile,Suzuki-Miyaura,Highly sterically hindered
+2-Bromonaphthalene,Brc1ccc2ccccc2c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Fused aromatic system
+2-Chloronaphthalene,Clc1ccc2ccccc2c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Activated chloride on naphthalene
+1-Bromonaphthalene,Brc1cccc2c1cccc2,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Peri-position naphthyl bromide
+4-Bromopyridine,Brc1ccncc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Stille; Negishi,Heteroaryl halide; pyridine can poison some catalysts
+3-Bromopyridine,Brc1cccnc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Meta-bromo pyridine
+2-Bromopyridine,Brc1ccccn1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Ortho-bromo pyridine; strong chelation
+4-Chloropyridine,Clc1ccncc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Activated heterocyclic chloride
+5-Bromopyrimidine,Brc1cnccn1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Diazine substrate
+2-Bromothiophene,Brc1cccs1,electrophile,Suzuki-Miyaura; Sonogashira; Stille,Five-membered heterocycle
+2-Bromofuran,Brc1ccco1,electrophile,Suzuki-Miyaura; Sonogashira,Oxygen heterocycle
+3-Bromopyrrole,Brc1cc[nH]c1,electrophile,Suzuki-Miyaura,NH heterocycle; acidic proton
+5-Bromoindole,Brc1ccc2[nH]ccc2c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Indole scaffold; NH can coordinate
+2-Bromobenzothiazole,Brc1nc2ccccc2s1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Fused bicyclic heterocycle
+2-Iodobenzoxazole,Ic1nc2ccccc2o1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Oxygen-containing fused heterocycle
+3-Bromoquinoline,Brc1ccnc2ccccc12,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Quinoline scaffold
+3-Bromoquinoxaline,Brc1cnc2ccccc2n1,electrophile,Suzuki-Miyaura,Diaza-naphthalene
+"2,5-Dichloropyridine",Clc1ccc(Cl)nc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Selective coupling possible at different positions
+Phenyl triflate,c1ccc(OS(=O)(=O)C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Heck,Excellent leaving group; very reactive
+4-Methoxyphenyl triflate,COc1ccc(OS(=O)(=O)C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Electron-rich triflate
+Phenyl tosylate,c1ccc(OS(=O)(=O)c2ccc(C)cc2)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Good leaving group; cheaper than triflate
+Phenyl mesylate,c1ccc(OS(=O)(=O)C)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Mesylate leaving group
+4-Cyanophenyl triflate,N#Cc1ccc(OS(=O)(=O)C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Electron-poor triflate; highly reactive
+Vinyl bromide,C=CBr,electrophile,Suzuki-Miyaura; Sonogashira; Heck; Stille; Negishi; Kumada,Simple vinyl halide
+Vinyl chloride,C=CCl,electrophile,Suzuki-Miyaura; Heck,Less reactive vinyl halide
+Vinyl iodide,C=CI,electrophile,Suzuki-Miyaura; Sonogashira; Heck; Stille,Most reactive vinyl halide
+(E)-1-Bromopropene,C/C=C/Br,electrophile,Suzuki-Miyaura; Sonogashira; Heck,Stereodefined vinyl bromide
+2-Bromopropene,C=C(Br)C,electrophile,Suzuki-Miyaura; Sonogashira,Geminal disubstituted vinyl bromide
+α-Bromostyrene,BrC(=C)c1ccccc1,electrophile,Suzuki-Miyaura; Sonogashira,Aryl-substituted vinyl bromide
+Ethyl bromide,CCBr,electrophile,Suzuki-Miyaura; Negishi; Kumada; SN2,Simple primary alkyl bromide; β-hydride elimination risk
+Ethyl chloride,CCCl,electrophile,Negishi; Kumada; SN2,Primary alkyl chloride
+Ethyl iodide,CCI,electrophile,Suzuki-Miyaura; Negishi; Kumada; SN2,Most reactive primary alkyl halide
+Isopropyl bromide,CC(C)Br,electrophile,Negishi; Kumada,Secondary alkyl bromide; high β-hydride risk
+tert-Butyl bromide,CC(C)(C)Br,electrophile,SN1,Tertiary alkyl bromide; no β-hydride; SN1 mechanism
+Benzyl bromide,BrCc1ccccc1,electrophile,Suzuki-Miyaura; SN2; Negishi,Benzylic position; activated sp3 halide
+2-Phenylethyl bromide,C(Br)Cc1ccccc1,electrophile,SN2; Negishi; Kumada,Primary alkyl bromide with aryl substituent
+4-Bromo-1-butene,C=CCCBr,electrophile,SN2; Negishi,Homoallylic bromide
+3-Bromo-2-methylpropene (allylic),C=C(C)CBr,electrophile,SN2; Allylic-substitution,Allylic bromide; can undergo allylic substitution
+Neopentyl bromide,CC(C)(C)CBr,electrophile,Suzuki-Miyaura; Negishi,No β-hydrogens; minimal elimination risk
+Phenylboronic acid,c1ccc(B(O)O)cc1,nucleophile,Suzuki-Miyaura,Standard boronic acid coupling partner
+4-Methoxyphenylboronic acid,COc1ccc(B(O)O)cc1,nucleophile,Suzuki-Miyaura,Electron-rich boronic acid
+4-Cyanophenylboronic acid,N#Cc1ccc(B(O)O)cc1,nucleophile,Suzuki-Miyaura,Electron-poor boronic acid
+Phenylboronic acid pinacol ester,c1ccc(B2OC(C)(C)C(C)(C)O2)cc1,nucleophile,Suzuki-Miyaura,Protected boronic acid; more stable
+Potassium phenyltrifluoroborate,c1ccc([B-](F)(F)F)cc1.[K+],nucleophile,Suzuki-Miyaura,BF3K salt; air-stable boronate
+Vinylboronic acid,C=CB(O)O,nucleophile,Suzuki-Miyaura,Vinyl boronic acid
+(E)-Propenylboronic acid,C/C=C/B(O)O,nucleophile,Suzuki-Miyaura,Stereodefined vinyl boronic acid
+Ethylboronic acid,CCB(O)O,nucleophile,Suzuki-Miyaura,Alkyl boronic acid; prone to β-hydride issues
+Pyridine-4-boronic acid,c1ccncc1B(O)O,nucleophile,Suzuki-Miyaura,Heteroaryl boronic acid; pyridine coordination risk
+Furan-2-boronic acid,c1coc(B(O)O)c1,nucleophile,Suzuki-Miyaura,Five-membered heterocyclic boronic acid
+Thiophene-2-boronic acid,c1csc(B(O)O)c1,nucleophile,Suzuki-Miyaura,Thiophene boronic acid; sulfur can coordinate
+Aniline,c1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann; SNAr,Aromatic primary amine; standard C-N coupling partner
+Ethylamine,CCN,nucleophile,Buchwald-Hartwig; Ullmann; SNAr,Primary aliphatic amine
+Isopropylamine,CC(C)N,nucleophile,Buchwald-Hartwig; Ullmann,Branched primary amine; α-branching
+tert-Butylamine,CC(C)(C)N,nucleophile,Buchwald-Hartwig,Highly hindered primary amine
+N-Methylethylamine,CCNC,nucleophile,Buchwald-Hartwig; Ullmann,Secondary aliphatic amine
+N-Methylaniline,c1ccc(NC)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Secondary aromatic amine
+"N,N-Dimethylaniline",c1ccc(N(C)C)cc1,nucleophile,,Tertiary amine; not reactive in C-N coupling
+4-Methoxyaniline,COc1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Electron-rich aniline
+4-Aminobenzonitrile,N#Cc1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Electron-poor aniline; less nucleophilic
+4-Aminopyridine,Nc1ccncc1,nucleophile,Buchwald-Hartwig,Heteroaryl amine; pyridine coordination
+Indole,c1ccc2[nH]ccc2c1,nucleophile,Buchwald-Hartwig; C-H activation,NH heterocycle; can act as nucleophile
+3-Aminopyrrole,c1c[nH]c(N)c1,nucleophile,Buchwald-Hartwig,Heteroaryl amine with NH
+2-Methylaniline,Nc1ccccc1C,nucleophile,Buchwald-Hartwig; Ullmann,Ortho-substituted aniline; sterically hindered
+"3,5-Dimethylaniline",Nc1cc(C)cc(C)c1,nucleophile,Buchwald-Hartwig,Meta-substituted aniline
+Benzylamine,NCc1ccccc1,nucleophile,Buchwald-Hartwig; Ullmann,Benzylic amine; aliphatic but stabilized
+Phenol,c1ccc(O)cc1,nucleophile,Ullmann; SNAr; Mitsunobu,Aromatic alcohol; C-O coupling partner
+Ethanol,CCO,nucleophile,Ullmann; Mitsunobu,Simple aliphatic alcohol
+Isopropanol,CC(C)O,nucleophile,Ullmann; Mitsunobu,Secondary alcohol
+tert-Butanol,CC(C)(C)O,nucleophile,Ullmann,Tertiary alcohol; sterically hindered
+4-Methoxyphenol,COc1ccc(O)cc1,nucleophile,Ullmann; SNAr,Electron-rich phenol
+4-Hydroxybenzonitrile,N#Cc1ccc(O)cc1,nucleophile,Ullmann; SNAr,Electron-poor phenol; more acidic
+Benzyl alcohol,OCc1ccccc1,nucleophile,Ullmann; Mitsunobu,Benzylic alcohol
+4-Hydroxypyridine,Oc1ccncc1,nucleophile,Ullmann,Heteroaryl phenol
+Thiophenol,c1ccc(S)cc1,nucleophile,Ullmann; SNAr,Aromatic thiol; strong nucleophile; catalyst poison risk
+Ethanethiol,CCS,nucleophile,Ullmann; SNAr,Aliphatic thiol; catalyst poison
+2-Propanethiol,CC(C)S,nucleophile,Ullmann,Secondary thiol
+Thioanisole,CSc1ccccc1,none,,Sulfide; not nucleophilic but can poison catalysts
+Acetylene,C#C,nucleophile,Sonogashira,Simplest terminal alkyne
+Phenylacetylene,C#Cc1ccccc1,nucleophile,Sonogashira,Aryl-substituted terminal alkyne
+"3,3-Dimethylbut-1-yne",C#CC(C)(C)C,nucleophile,Sonogashira,Sterically hindered terminal alkyne
+Trimethylsilylacetylene,C#C[Si](C)(C)C,nucleophile,Sonogashira,TMS-protected alkyne; deprotectable
+Methyl propargyl ether,C#CCOC,nucleophile,Sonogashira,Ether-substituted alkyne
+4-Ethynylpyridine,C#Cc1ccncc1,nucleophile,Sonogashira,Heteroaryl terminal alkyne
+Phenylmagnesium bromide,[Mg]Brc1ccccc1,nucleophile,Kumada,Grignard reagent for Kumada coupling
+Ethylmagnesium bromide,CC[Mg]Br,nucleophile,Kumada,Alkyl Grignard
+Phenylzinc chloride,Cl[Zn]c1ccccc1,nucleophile,Negishi,Organozinc for Negishi coupling
+Ethylzinc bromide,CC[Zn]Br,nucleophile,Negishi,Alkylzinc reagent
+Phenyltrimethylstannane,c1ccc([Sn](C)(C)C)cc1,nucleophile,Stille,Organotin for Stille coupling
+Vinyltrimethylstannane,C=C[Sn](C)(C)C,nucleophile,Stille,Vinyl stannane
+4-Bromophenylboronic acid,Brc1ccc(B(O)O)cc1,bifunctional,Suzuki-Miyaura,Can act as both electrophile and nucleophile; selective coupling
+4-Bromoaniline,Brc1ccc(N)cc1,bifunctional,Buchwald-Hartwig; Suzuki-Miyaura,Both electrophile (Br) and nucleophile (NH2); orthogonal protection needed
+4-Bromophenol,Brc1ccc(O)cc1,bifunctional,Ullmann; Suzuki-Miyaura,Both electrophile (Br) and nucleophile (OH)
+4-Bromophenylacetylene,Brc1ccc(C#C)cc1,bifunctional,Sonogashira; Suzuki-Miyaura,Both electrophile (Br) and nucleophile (alkyne)
+"1,4-Dibromobenzene",Brc1ccc(Br)cc1,di-electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Two identical electrophilic sites; sp2_halide_site_count = 2
+"1,4-Phenylenediamine",Nc1ccc(N)cc1,di-nucleophile,Buchwald-Hartwig; Ullmann,Two identical nucleophilic sites
+4-Bromo-N-Boc-aniline,Brc1ccc(NC(=O)OC(C)(C)C)cc1,electrophile,Suzuki-Miyaura; Sonogashira,Boc-protected amine; prevents C-N coupling
+4-Bromo-TBS-phenol,Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1,electrophile,Suzuki-Miyaura; Sonogashira,TBS-protected phenol
+Methyl 4-bromobenzoate,Brc1ccc(C(=O)OC)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Ester-protected carboxylic acid
+4-Bromobenzaldehyde,Brc1ccc(C=O)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Aldehyde functional group; can be reduced/oxidized
+Pentamethylbromobenzene,Brc1c(C)c(C)c(C)c(C)c1C,electrophile,Suzuki-Miyaura,Extremely sterically hindered; requires bulky ligands
+4-Bromo-tert-butylbenzene,Brc1ccc(C(C)(C)C)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Para-tert-butyl substituent
+tert-Butylamine,CC(C)(C)N,nucleophile,Buchwald-Hartwig,Highly hindered primary amine; challenging substrate
+4-tert-Butylaniline,CC(C)(C)c1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Sterically hindered aniline
+4-Bromonitrobenzene,Brc1ccc([N+](=O)[O-])cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; SNAr,Highly electron-poor; very reactive in SNAr
+"4-Bromo-N,N-dimethylaniline",Brc1ccc(N(C)C)cc1,electrophile,Suzuki-Miyaura; Sonogashira,Highly electron-rich; tertiary amine substituent
+"1-Bromo-2,3,4,5-tetramethoxybenzene",COc1cc(OC)c(Br)c(OC)c1OC,electrophile,Suzuki-Miyaura,Extremely electron-rich; multiple methoxy groups
+Pentafluorobromobenzene,Fc1c(F)c(F)c(Br)c(F)c1F,electrophile,Suzuki-Miyaura; SNAr,Extremely electron-poor; multiple fluorines
+"1,3,5-Tribromobenzene",Brc1cc(Br)cc(Br)c1,electrophile,Suzuki-Miyaura,Polyhalogenated substrate; halogen_count=3
+Pentafluorobromobenzene,Fc1c(F)c(F)c(Br)c(F)c1F,electrophile,Suzuki-Miyaura,Polyhalogenated with fluorine EWG; halogen_count=6
+"2,5-Dichloropyridine",Clc1ccc(Cl)nc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Polyhalogenated heteroaryl; halogen_count=2
+"2,6-Dichloro-iodobenzene",Ic1c(Cl)cccc1Cl,electrophile,Suzuki-Miyaura,Mixed halides with ortho substitution; halogen_count=3
+2-tert-Butylbromobenzene,Brc1ccccc1C(C)(C)C,electrophile,Suzuki-Miyaura,Sterically hindered ortho-tert-butyl
+"3,5-Diisopropylchlorobenzene",Clc1cc(C(C)C)ccc1C(C)C,electrophile,Suzuki-Miyaura,Multiple isopropyl substituents
+"2,6-Dimethoxyiodobenzene",Ic1c(OC)cccc1OC,electrophile,Suzuki-Miyaura,Ortho-disubstituted with electron-donating groups
+Pentamethylbromobenzene,Brc1c(C)c(C)c(C)c(C)c1C,electrophile,Suzuki-Miyaura,Extremely sterically hindered; all positions substituted
+4-Iodo-N-Boc-aniline,Ic1ccc(NC(=O)OC(C)(C)C)cc1,electrophile,Suzuki-Miyaura,BOC-protected aniline
+4-Bromo-N-Cbz-aniline,Brc1ccc(NC(=O)OCc2ccccc2)cc1,electrophile,Suzuki-Miyaura,CBZ-protected aniline
+4-Chloro-N-Fmoc-aniline,Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1,electrophile,Suzuki-Miyaura,FMOC-protected aniline with fluorenyl group
+4-Bromo-TBS-phenol,Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1,electrophile,Suzuki-Miyaura,TBS-protected phenol
+4-Iodo-TIPS-phenol,Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1,electrophile,Suzuki-Miyaura,TIPS-protected phenol
+4-Bromonitrobenzene,Brc1ccc([N+](=O)[O-])cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Strong electron-withdrawing nitro group
+4-Chlorobenzonitrile,Clc1ccc(C#N)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Strong electron-withdrawing nitrile group
+"4-Bromo-N,N-dimethylaniline",Brc1ccc(N(C)C)cc1,electrophile,Suzuki-Miyaura,Strong electron-donating dialkylamino group
+4-Iodoanisole,Ic1ccc(OC)cc1,electrophile,Suzuki-Miyaura,Strong electron-donating methoxy group
+2-Bromophenyl diphenylphosphine,Brc1ccccc1P(c2ccccc2)c2ccccc2,bifunctional,Suzuki-Miyaura,Ortho-phosphine for ligand synthesis; note: not itself a bidentate chelator
+Phenylalanine,NC(Cc1ccccc1)C(=O)O,nucleophile,Peptide coupling,Amino acid with bidentate chelating ability; chiral_center_count=1
+Triphenylphosphine,c1ccc(P(c2ccccc2)c2ccccc2)cc1,ligand,Various cross-couplings,Common phosphine ligand
+"1,8-Bis(dimethylphosphino)naphthalene",c1ccc2c(c1)c(P(C)C)ccc2P(C)C,ligand,Various cross-couplings,Bidentate phosphine ligand (note: current SMARTS doesn't capture P-P bidentate pattern)
+Ethane,CC,reference,,MW=30; low molecular weight test
+Anthracene,c1ccc2cc3ccccc3cc2c1,reference,,MW=178; medium molecular weight; fused rings
+Coronene,c1ccc2cc3ccc4ccc5ccc6ccc1c7c2c3c4c5c67,reference,,MW=300; large polycyclic aromatic (note: not high_molecular_weight which requires MW>500)
+2-Bromonaphthalene,Brc1ccc2ccccc2c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Fused bicyclic aromatic system
+9-Chloroanthracene,Clc1ccc2c3ccccc3ccc2c1,electrophile,Suzuki-Miyaura,Tricyclic fused aromatic system
+Spiro[5.5]undecane,C1CCC2(CC1)CCCC2,reference,,Spirocyclic aliphatic system
+"6-Bromo-spiro[chroman-2,1'-cyclohexane]",Brc1ccc2c(c1)C1(CCCC1)CCCC2,electrophile,Suzuki-Miyaura,Spirocyclic with aryl bromide
+(S)-Alanine,C[C@H](N)C(=O)O,nucleophile,Peptide coupling,Chiral amino acid; chiral_center_count=1
+"(2R,3R)-Butane-2,3-diol",C[C@H](O)[C@H](C)O,reference,,Two chiral centers; chiral_center_count=2
+"(1R,3R,5S)-1,3,5-Trimethylcyclohexane",C[C@H]1CC[C@@H](C)C[C@H]1C,reference,,Three chiral centers; chiral_center_count=3
+(R)-Bromochlorofluoromethane,Br[C@H](Cl)F,reference,,Chiral halomethane; chiral_center_count=1; halogen_count=3
+"2,4,5,6-Tetrachlorobromobenzene",Clc1cc(Cl)c(Br)c(Cl)c1,electrophile,Suzuki-Miyaura,Highly polyhalogenated; halogen_count=5
+4-Bromo-N-benzoylaniline,Brc1ccc(NC(=O)c2ccccc2)cc1,electrophile,Suzuki-Miyaura,Amide-protected aniline derivative
+"(1S,2R,5S)-1,2,5-Trimethylcyclohexane",C[C@@H]1CCC[C@@H](C)[C@@H]1C,reference,,Multiple stereogenic centers; chiral_center_count=3

@@ -59,6 +59,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
 
     compiled: List[CompoundPattern] = []
     compound_map: Dict[str, CompoundPattern] = {}
+    combination_map: Dict[Tuple[str, str], str] = {}
 
     for entry in compounds:
         compound_id = entry.get("id")
@@ -67,6 +68,9 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         
         group_a = str(entry.get("A") or "")
         group_b = str(entry.get("B") or "")
+        if group_a and group_b:
+            combination_map[(group_a, group_b)] = compound_id
+
         # Calculate priority: Priority(A) + Priority(B)
         priority = priorities.get(group_a, 1) + priorities.get(group_b, 1)
 
@@ -154,6 +158,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         "templates": templates,
         "compiled_compounds": compiled,
         "compound_map": compound_map,
+        "combination_map": combination_map,
         "priorities": priorities,
         "compiled_groups": compiled_groups,
     }
