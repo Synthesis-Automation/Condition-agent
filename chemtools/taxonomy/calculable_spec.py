@@ -17,6 +17,8 @@ from typing import Any, Dict, Optional
 _BASE_FILE = "calculable_features.json"
 _PROPERTIES_FILE = "calculable_features_properties.json"
 _DERIVED_FILE = "calculable_features_derived.json"
+_GROUP_LOGIC_FILE = "group_logic.json"
+_COMPOUND_LOGIC_FILE = "compound_logic.json"
 _ORGANIC_COMPOUNDS_FILE = "organic_compounds.v1.3.json"
 _ORGANIC_GROUPS_FILE = "organic_groups.v1.3.json"
 
@@ -76,6 +78,8 @@ def _extract_compound_smarts(entry: dict[str, Any]) -> list[str]:
 def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
     compounds_path = data_root / _ORGANIC_COMPOUNDS_FILE
     groups_path = data_root / _ORGANIC_GROUPS_FILE
+    group_logic_path = data_root / _GROUP_LOGIC_FILE
+
     if not compounds_path.exists() or not groups_path.exists():
         return {
             "version": "empty",
@@ -86,9 +90,37 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
 
     compounds = _load_compounds(compounds_path)
     groups = _load_groups(groups_path)
+    
+    group_sets = {}
+    if group_logic_path.exists():
+        try:
+            logic = _safe_load_json(group_logic_path)
+            group_sets = logic.get("group_sets") or {}
+        except Exception:
+            pass
+
     templates = dict(_DEFAULT_TEMPLATES)
     features: list[dict[str, Any]] = []
     derived_shortcuts: list[dict[str, Any]] = []
+
+    def get_group_smarts(group_id: str) -> str:
+        if group_id in groups:
+            return groups[group_id].get("smarts") or ""
+        if group_id in group_sets:
+            entry = group_sets[group_id]
+            members = entry.get("members") if isinstance(entry, dict) else entry
+            if isinstance(members, list):
+                member_smarts = []
+                for m in members:
+                    s = get_group_smarts(m)
+                    if s:
+                        member_smarts.append(s)
+                if member_smarts:
+                    # Combine multiple SMARTS using recursive $(...) or simple OR if possible
+                    # For simplicity in this context, we use $(s1),$(s2) style if they are atoms
+                    # but RDKit SMARTS for "any of these" is often [$(s1),$(s2)]
+                    return "[" + ",".join(f"$({s})" for s in member_smarts) + "]"
+        return ""
 
     for entry in compounds:
         compound_id = entry.get("id") or ""
@@ -105,10 +137,8 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
             group_a = entry.get("A")
             group_b_id = entry.get("B")
             if template_format and group_a and group_b_id:
-                group_a_record = groups.get(group_a, {})
-                group_b_record = groups.get(group_b_id, {})
-                a_smarts = group_a_record.get("smarts") or ""
-                b_smarts = group_b_record.get("smarts") or ""
+                a_smarts = get_group_smarts(group_a)
+                b_smarts = get_group_smarts(group_b_id)
                 if a_smarts and b_smarts:
                     smarts_list = [template_format.format(A=a_smarts, B=b_smarts)]
 
@@ -162,7 +192,7 @@ def load_calculable_feature_spec(root: Optional[Path] = None) -> Dict[str, Any]:
             item for item in (base.get("derived_shortcuts") or []) if isinstance(item, dict)
         ]
 
-    for overlay_path in (data_root / _PROPERTIES_FILE, data_root / _DERIVED_FILE):
+    for overlay_path in (data_root / _PROPERTIES_FILE, data_root / _DERIVED_FILE, data_root / _GROUP_LOGIC_FILE, data_root / _COMPOUND_LOGIC_FILE):
         if not overlay_path.exists():
             continue
         overlay = _safe_load_json(overlay_path)

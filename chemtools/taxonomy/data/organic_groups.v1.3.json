@@ -4,6 +4,28 @@
   "notes": "Mapping-only attachpoint convention:\n- Scaffold groups (kind=scaffold): the attach atom is the atom mapped as :1 in `smarts`.\n- Substituent groups (kind=substituent): the attach atom is the atom mapped as :2 in `smarts`.\n- If a group has multiple attachpoints, it may contain both :1 and :2 (or multiple mapped atoms) in `smarts`.\nThe legacy fields `attach_points` and `attach_labels` were removed; attachpoints are inferred from atom-maps in `smarts`.",
   "groups": [
     {
+      "id": "Any_Scaffold",
+      "name": "Any-",
+      "kind": "scaffold",
+      "smarts": "[*:1]",
+      "description": "Wildcard for any scaffold attachment point (any atom).",
+      "tags": [
+        "scaffold",
+        "wildcard"
+      ]
+    },
+    {
+      "id": "Any_Substituent",
+      "name": "-Any",
+      "kind": "substituent",
+      "smarts": "[*:2]",
+      "description": "Wildcard for any substituent attachment point (any atom).",
+      "tags": [
+        "substituent",
+        "wildcard"
+      ]
+    },
+    {
       "id": "Ar",
       "name": "Ar-",
       "kind": "scaffold",
@@ -336,11 +358,11 @@
       ]
     },
     {
-      "id": "SMe",
-      "name": "-SMe",
+      "id": "SR",
+      "name": "-SR",
       "kind": "substituent",
-      "smarts": "[S:2]C",
-      "description": "Methylthio group (-SMe).",
+      "smarts": "[S:2][#6]",
+      "description": "Sulfide/thioether group (-SR).",
       "tags": [
         "sulfur",
         "thioether"
@@ -464,7 +486,43 @@
       ]
     },
     {
-      "id": "CO2R",
+      "id": "COF",
+      "name": "-COF",
+      "kind": "substituent",
+      "smarts": "[CX3:2](=O)F",
+      "description": "Acyl fluoride substituent (-COF), attach via carbonyl carbon.",
+      "tags": [
+        "acyl_electrophile",
+        "leaving_group",
+        "carbonyl"
+      ]
+    },
+    {
+      "id": "COBr",
+      "name": "-COBr",
+      "kind": "substituent",
+      "smarts": "[CX3:2](=O)Br",
+      "description": "Acyl bromide substituent (-COBr), attach via carbonyl carbon.",
+      "tags": [
+        "acyl_electrophile",
+        "leaving_group",
+        "carbonyl"
+      ]
+    },
+    {
+      "id": "COI",
+      "name": "-COI",
+      "kind": "substituent",
+      "smarts": "[CX3:2](=O)I",
+      "description": "Acyl iodide substituent (-COI), attach via carbonyl carbon.",
+      "tags": [
+        "acyl_electrophile",
+        "leaving_group",
+        "carbonyl"
+      ]
+    },
+    {
+      "id": "Ester",
       "name": "-CO2R",
       "kind": "substituent",
       "smarts": "[CX3:2](=O)O[#6]",
@@ -475,11 +533,22 @@
       ]
     },
     {
+      "id": "CONH2",
+      "name": "-CONH2",
+      "kind": "substituent",
+      "smarts": "[CX3:2](=O)[NX3;H2]",
+      "description": "Primary amide substituent (-CONH2); attach via carbonyl carbon.",
+      "tags": [
+        "amide",
+        "ewg_moderate"
+      ]
+    },
+    {
       "id": "CONHR",
       "name": "-CONHR",
       "kind": "substituent",
-      "smarts": "[CX3:2](=O)[NX3;H1,H2]",
-      "description": "Amide with N-H (generic -CONHR/-CONH2); attach via carbonyl carbon.",
+      "smarts": "[CX3:2](=O)[NX3;H1]",
+      "description": "Secondary amide substituent (-CONHR); attach via carbonyl carbon.",
       "tags": [
         "amide",
         "ewg_moderate"
@@ -558,6 +627,30 @@
       "kind": "substituent",
       "smarts": "[SX4:2](=O)(=O)F",
       "description": "Sulfonyl fluoride core; attach via sulfur.",
+      "tags": [
+        "sulfonyl_halide",
+        "leaving_group",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "SO2Br",
+      "name": "-SO2Br",
+      "kind": "substituent",
+      "smarts": "[SX4:2](=O)(=O)Br",
+      "description": "Sulfonyl bromide core; attach via sulfur.",
+      "tags": [
+        "sulfonyl_halide",
+        "leaving_group",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "SO2I",
+      "name": "-SO2I",
+      "kind": "substituent",
+      "smarts": "[SX4:2](=O)(=O)I",
+      "description": "Sulfonyl iodide core; attach via sulfur.",
       "tags": [
         "sulfonyl_halide",
         "leaving_group",
@@ -697,7 +790,7 @@
     },
     {
       "id": "Lactam",
-      "name": "Lactam",
+      "name": "-Lactam",
       "kind": "substituent",
       "smarts": "[NX3;r;H1,H0:2][CX3;r]=O",
       "description": "Lactam substituent (cyclic amide); attach via nitrogen.",
@@ -705,17 +798,6 @@
         "amide",
         "cyclic",
         "lactam"
-      ]
-    },
-    {
-      "id": "NHAr",
-      "name": "-NHAr",
-      "kind": "substituent",
-      "smarts": "[NX3;H1:2][c]",
-      "description": "Secondary amine with aryl substituent; attach via nitrogen.",
-      "tags": [
-        "amine",
-        "aniline"
       ]
     },
     {
@@ -730,24 +812,25 @@
       ]
     },
     {
-      "id": "Phosphine",
-      "name": "-PR3",
+      "id": "Phosphino",
+      "name": "-PR2",
       "kind": "substituent",
-      "smarts": "[PX3:2]([#6])([#6])[#6]",
-      "description": "Phosphine core; attach via phosphorus.",
+      "smarts": "[PX3:2]([#6])[#6]",
+      "description": "Phosphino group (-PR2); attach via phosphorus.",
       "tags": [
         "phosphorus",
         "ligand"
       ]
     },
     {
-      "id": "Imine",
-      "name": "Imine",
+      "id": "Imino",
+      "name": "-C=N",
       "kind": "substituent",
       "smarts": "[CX3:2]=[NX3,NX2]",
-      "description": "Imine core; attach via carbon.",
+      "description": "Imino group (C=N core); attach via carbon.",
       "tags": [
-        "imine"
+        "imine",
+        "imino"
       ]
     },
     {

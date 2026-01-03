@@ -4,6 +4,123 @@
   "notes": "Compound motifs are built from `A` (scaffold) and `B` (substituent) with `template`.\nFor most motifs, `A` is the scaffold side and `B` is the functional group side; therefore `anchors` is optional.\nWhen present, `anchors` may override defaults; if absent, assume anchors.core='A' and anchors.fg='B'.\nAttachpoints are inferred from atom-maps in the referenced group `smarts` (see organic_groups v1.3).",
   "compounds": [
     {
+      "id": "Any-X",
+      "name": "Any-X",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "X",
+      "description": "Any halide (F, Cl, Br, I) on any scaffold.",
+      "aliases": ["halide"]
+    },
+    {
+      "id": "sp2-X",
+      "name": "sp2-X",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "X",
+      "description": "Aryl or vinyl halide (F, Cl, Br, I).",
+      "aliases": ["sp2 halide"]
+    },
+    {
+      "id": "Any-Sulfonate",
+      "name": "Any-Sulfonate",
+      "template": "via_oxygen",
+      "A": "Any_Scaffold",
+      "B": "Sulfonate",
+      "description": "Any sulfonate leaving group (OTf, OTs, OMs, etc.) on any scaffold."
+    },
+    {
+      "id": "Any-SO2X",
+      "name": "Any-SO2X",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "SO2X",
+      "description": "Any sulfonyl halide (F, Cl, Br, I) on any scaffold."
+    },
+    {
+      "id": "Any-COX",
+      "name": "Any-COX",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "COX",
+      "description": "Any acyl halide (F, Cl, Br, I) on any scaffold."
+    },
+    {
+      "id": "sp2-Sulfonate",
+      "name": "sp2-Sulfonate",
+      "template": "via_oxygen",
+      "A": "sp2_Carbon",
+      "B": "Sulfonate",
+      "description": "Aryl or vinyl sulfonate leaving group."
+    },
+    {
+      "id": "sp2-B(OR)2",
+      "name": "sp2-B(OR)2",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "B(OR)2",
+      "description": "Aryl or vinyl boronate ester."
+    },
+    {
+      "id": "sp2-B(OH)2",
+      "name": "sp2-B(OH)2",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "B(OH)2",
+      "description": "Aryl or vinyl boronic acid."
+    },
+    {
+      "id": "sp2-Sn",
+      "name": "sp2-Sn",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "Sn",
+      "description": "Aryl or vinyl stannane."
+    },
+    {
+      "id": "sp2-Zn",
+      "name": "sp2-Zn",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "Zn",
+      "description": "Aryl or vinyl zincate."
+    },
+    {
+      "id": "sp2-Mg",
+      "name": "sp2-Mg",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "Mg",
+      "description": "Aryl or vinyl Grignard."
+    },
+    {
+      "id": "sp2-Si",
+      "name": "sp2-Si",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "Si",
+      "description": "Aryl or vinyl silane."
+    },
+    {
+      "id": "sp2-M",
+      "name": "sp2-M",
+      "template": "single_bond",
+      "A": "sp2_Carbon",
+      "B": "M",
+      "description": "Aryl or vinyl organometallic (Li, Na, K, Mg, Zn, Cu, Ag)."
+    },
+    {
+      "id": "Ar-X",
+      "name": "Ar-X",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "X",
+      "description": "Aryl halide (Ar-X).",
+      "aliases": [
+        "aryl halide"
+      ]
+    },
+    {
       "id": "Ar-Cl",
       "name": "Ar-Cl",
       "template": "single_bond",
@@ -113,16 +230,7 @@
         "aryl hydrogen"
       ]
     },
-    {
-      "id": "R-H",
-      "name": "R-H",
-      "smarts": "[CX4:1]",
-      "description": "Alkyl C-H (R-H) - approximated by sp3 carbon for detection.",
-      "aliases": [
-        "Alkyl-H",
-        "alkyl C-H"
-      ]
-    },
+
     {
       "id": "Vinyl-F",
       "name": "Vinyl-F",
@@ -135,6 +243,20 @@
         "vinyl/alkenyl fluoride"
       ]
     },
+
+
+    {
+      "id": "R-H",
+      "name": "R-H",
+      "smarts": "[CX4:1]",
+      "description": "Alkyl C-H (R-H) - approximated by sp3 carbon for detection.",
+      "aliases": [
+        "Alkyl-H",
+        "alkyl C-H"
+      ]
+    },
+
+
     {
       "id": "Bn-Cl",
       "name": "Bn-Cl",
@@ -429,12 +551,12 @@
       "description": "Alkynyl silane (Alkynyl\u2013SiR3)."
     },
     {
-      "id": "Ar-SMe",
-      "name": "Ar-SMe",
+      "id": "Ar-SR",
+      "name": "Ar-SR",
       "template": "single_bond",
       "A": "Ar",
-      "B": "SMe",
-      "description": "Aryl methyl thioether (Ar\u2013SMe)."
+      "B": "SR",
+      "description": "Aryl thioether (Ar\u2013SR)."
     },
     {
       "id": "Ar-Bpin",
@@ -626,12 +748,20 @@
       "description": "Aryl acid chloride (Ar\u2013COCl)."
     },
     {
-      "id": "Ar-CO2R",
-      "name": "Ar-CO2R",
+      "id": "Ar-Ester",
+      "name": "Ar-Ester",
       "template": "single_bond",
       "A": "Ar",
-      "B": "CO2R",
+      "B": "Ester",
       "description": "Aryl ester (Ar\u2013CO2R)."
+    },
+    {
+      "id": "Ar-CONH2",
+      "name": "Ar-CONH2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "CONH2",
+      "description": "Aryl primary amide (Ar\u2013CONH2)."
     },
     {
       "id": "Ar-CONHR",
@@ -639,7 +769,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CONHR",
-      "description": "Aryl amide (CONHR) (Ar\u2013CONHR)."
+      "description": "Aryl secondary amide (Ar\u2013CONHR)."
     },
     {
       "id": "Ar-CONR2",
@@ -754,11 +884,11 @@
       "description": "Vinyl/alkenyl carboxylic acid (Vinyl\u2013CO2H)."
     },
     {
-      "id": "Vinyl-CO2R",
-      "name": "Vinyl-CO2R",
+      "id": "Vinyl-Ester",
+      "name": "Vinyl-Ester",
       "template": "single_bond",
       "A": "Vinyl",
-      "B": "CO2R",
+      "B": "Ester",
       "description": "Vinyl/alkenyl ester (Vinyl\u2013CO2R)."
     },
     {
@@ -845,7 +975,7 @@
       "id": "Any-CHO",
       "name": "Any-CHO",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "CHO",
       "description": "aldehyde functional group anywhere (generic).",
       "aliases": [
@@ -856,7 +986,7 @@
       "id": "Any-CO-R",
       "name": "Any-CO-R",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "CO",
       "description": "ketone functional group anywhere (generic)."
     },
@@ -864,7 +994,7 @@
       "id": "Any-CN",
       "name": "Any-CN",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "CN",
       "description": "nitrile functional group anywhere (generic)."
     },
@@ -872,7 +1002,7 @@
       "id": "Any-SCN",
       "name": "Any-SCN",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "SCN",
       "description": "thiocyanate functional group anywhere (generic).",
       "aliases": [
@@ -884,7 +1014,7 @@
       "id": "Any-NCS",
       "name": "Any-NCS",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "NCS",
       "description": "isothiocyanate functional group anywhere (generic).",
       "aliases": [
@@ -895,7 +1025,7 @@
       "id": "Any-NO2",
       "name": "Any-NO2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "NO2",
       "description": "nitro functional group anywhere (generic)."
     },
@@ -903,7 +1033,7 @@
       "id": "Any-NH2",
       "name": "Any-NH2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "NH2",
       "description": "primary amine functional group anywhere (generic)."
     },
@@ -911,7 +1041,7 @@
       "id": "Any-NHR",
       "name": "Any-NHR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "NHR",
       "description": "secondary amine functional group anywhere (generic)."
     },
@@ -919,7 +1049,7 @@
       "id": "Any-NR2",
       "name": "Any-NR2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "NR2",
       "description": "tertiary amine functional group anywhere (generic).",
       "aliases": [
@@ -931,7 +1061,7 @@
       "id": "Any-OH",
       "name": "Any-OH",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "OH",
       "description": "alcohol functional group anywhere (generic)."
     },
@@ -939,12 +1069,68 @@
       "id": "Any-OR",
       "name": "Any-OR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "OR",
       "description": "ether functional group anywhere (generic).",
       "aliases": [
         "ROR"
       ]
+    },
+    {
+      "id": "Any-SH",
+      "name": "Any-SH",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "SH",
+      "description": "thiol functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-SR",
+      "name": "Any-SR",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "SR",
+      "description": "sulfide functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-Sn",
+      "name": "Any-Sn",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "Sn",
+      "description": "stannane functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-Zn",
+      "name": "Any-Zn",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "Zn",
+      "description": "organozinc functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-Mg",
+      "name": "Any-Mg",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "Mg",
+      "description": "Grignard functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-Si",
+      "name": "Any-Si",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "Si",
+      "description": "silane functional group anywhere (generic)."
+    },
+    {
+      "id": "Any-M",
+      "name": "Any-M",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "M",
+      "description": "organometallic functional group anywhere (generic)."
     },
     {
       "id": "RCH2-OH",
@@ -971,21 +1157,10 @@
       "description": "Tertiary alcohol functional group (generic)."
     },
     {
-      "id": "Any-SH",
-      "name": "Any-SH",
-      "template": "single_bond",
-      "A": "R",
-      "B": "SH",
-      "description": "thiol functional group anywhere (generic).",
-      "aliases": [
-        "RSH"
-      ]
-    },
-    {
       "id": "Any-CO2H",
       "name": "Any-CO2H",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "CO2H",
       "description": "carboxylic acid functional group anywhere (generic)."
     },
@@ -993,16 +1168,16 @@
       "id": "Any-COCl",
       "name": "Any-COCl",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "COCl",
       "description": "acid chloride functional group anywhere (generic)."
     },
     {
-      "id": "Any-CO2R",
-      "name": "Any-CO2R",
+      "id": "Any-Ester",
+      "name": "Any-Ester",
       "template": "single_bond",
-      "A": "R",
-      "B": "CO2R",
+      "A": "Any_Scaffold",
+      "B": "Ester",
       "description": "ester functional group anywhere (generic)."
     },
     {
@@ -1015,18 +1190,26 @@
       ]
     },
     {
+      "id": "Any-CONH2",
+      "name": "Any-CONH2",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "CONH2",
+      "description": "Primary amide functional group anywhere (generic)."
+    },
+    {
       "id": "Any-CONHR",
       "name": "Any-CONHR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "CONHR",
-      "description": "amide (CONHR) functional group anywhere (generic)."
+      "description": "Secondary amide functional group anywhere (generic)."
     },
     {
       "id": "Any-CONR2",
       "name": "Any-CONR2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "CONR2",
       "description": "tertiary amide functional group anywhere (generic)."
     },
@@ -1034,7 +1217,7 @@
       "id": "Any-SO2NH2",
       "name": "Any-SO2NH2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "SO2NH2",
       "description": "primary sulfonamide functional group anywhere (generic)."
     },
@@ -1042,7 +1225,7 @@
       "id": "Any-SO2NHR",
       "name": "Any-SO2NHR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "SO2NHR",
       "description": "secondary sulfonamide functional group anywhere (generic).",
       "aliases": [
@@ -1053,7 +1236,7 @@
       "id": "Any-SO2NR2",
       "name": "Any-SO2NR2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "SO2NR2",
       "description": "tertiary sulfonamide functional group anywhere (generic)."
     },
@@ -1061,7 +1244,7 @@
       "id": "Any-SO2Cl",
       "name": "Any-SO2Cl",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "SO2Cl",
       "description": "sulfonyl chloride functional group anywhere (generic).",
       "aliases": [
@@ -1072,7 +1255,7 @@
       "id": "Any-SO2F",
       "name": "Any-SO2F",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "SO2F",
       "description": "sulfonyl fluoride functional group anywhere (generic).",
       "aliases": [
@@ -1083,7 +1266,7 @@
       "id": "Any-SO2H",
       "name": "Any-SO2H",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "SO2H",
       "description": "sulfinic acid functional group anywhere (generic).",
       "aliases": [
@@ -1095,7 +1278,7 @@
       "id": "Any-Sulfamide",
       "name": "Any-Sulfamide",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Sulfamide",
       "description": "sulfamide functional group anywhere (generic)."
     },
@@ -1103,7 +1286,7 @@
       "id": "Any-Urea",
       "name": "Any-Urea",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Urea",
       "description": "urea functional group anywhere (generic)."
     },
@@ -1111,7 +1294,7 @@
       "id": "Any-Thiourea",
       "name": "Any-Thiourea",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Thiourea",
       "description": "thiourea functional group anywhere (generic).",
       "aliases": [
@@ -1122,7 +1305,7 @@
       "id": "Any-Hydrazine",
       "name": "Any-Hydrazine",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Hydrazine",
       "description": "hydrazine functional group anywhere (generic).",
       "aliases": [
@@ -1133,7 +1316,7 @@
       "id": "Any-Hydrazide",
       "name": "Any-Hydrazide",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Hydrazide",
       "description": "hydrazide functional group anywhere (generic).",
       "aliases": [
@@ -1144,7 +1327,7 @@
       "id": "Any-Carbamate",
       "name": "Any-Carbamate",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Carbamate",
       "description": "carbamate functional group anywhere (generic).",
       "aliases": [
@@ -1492,7 +1675,7 @@
       "id": "Any-Lactam",
       "name": "Any-Lactam",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Lactam",
       "description": "Lactam (cyclic amide) functional group (Any\u2013Lactam)."
     },
@@ -1505,35 +1688,23 @@
       "description": "N-Aryl lactam (Ar\u2013Lactam)."
     },
     {
-      "id": "Ar-NHAr",
-      "name": "Ar-NHAr",
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "NHAr",
-      "description": "Diaryl amine (Ar\u2013NHAr).",
-      "aliases": [
-        "Ar2NH",
-        "diaryl amine"
-      ]
-    },
-    {
       "id": "Any-Phosphonium",
       "name": "Any-Phosphonium",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "Phosphonium",
       "description": "Phosphonium salt (Any\u2013PR3+)."
     },
     {
-      "id": "Any-Phosphine",
-      "name": "Any-Phosphine",
+      "id": "Any-Phosphino",
+      "name": "Any-Phosphino",
       "template": "single_bond",
-      "A": "R",
-      "B": "Phosphine",
-      "description": "Phosphine functional group (Any\u2013PR3).",
+      "A": "Any_Scaffold",
+      "B": "Phosphino",
+      "description": "Phosphino functional group (Any\u2013PR2).",
       "aliases": [
-        "phosphine",
-        "PR3"
+        "phosphino",
+        "PR2"
       ]
     },
     {
@@ -1545,26 +1716,26 @@
       "description": "Aryl phosphonium salt (Ar\u2013PR3+)."
     },
     {
-      "id": "Any-Imine",
-      "name": "Any-Imine",
+      "id": "Any-Imino",
+      "name": "Any-Imino",
       "template": "single_bond",
-      "A": "R",
-      "B": "Imine",
-      "description": "Imine functional group (Any\u2013Imine)."
+      "A": "Any_Scaffold",
+      "B": "Imino",
+      "description": "Imino functional group (Any\u2013Imino)."
     },
     {
-      "id": "Ar-Imine",
-      "name": "Ar-Imine",
+      "id": "Ar-Imino",
+      "name": "Ar-Imino",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Imine",
-      "description": "Aryl imine (Ar\u2013Imine)."
+      "B": "Imino",
+      "description": "Aryl imino group (Ar\u2013Imino)."
     },
     {
       "id": "Any-B(OR)2",
       "name": "Any-B(OR)2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Any_Scaffold",
       "B": "B(OR)2",
       "description": "Generic boronate ester (Any\u2013B(OR)2)."
     },

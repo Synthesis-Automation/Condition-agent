@@ -12,6 +12,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
 
 REACTION_TYPES_FILE = Path(__file__).resolve().parent / "data" / "reaction_types.v3.3.json"
+COMPOUND_LOGIC_FILE = Path(__file__).resolve().parent / "data" / "compound_logic.json"
 _DEFAULT_SLOTS = ("electrophiles", "nucleophiles", "acids", "activators", "substrate", "reagent")
 
 
@@ -87,7 +88,11 @@ def _expand_reactant_slot(
     if isinstance(values, dict):
         expanded: List[str] = []
         for set_name in _coerce_list(values.get("motif_sets") or values.get("motif_set")):
-            expanded.extend(_coerce_list(motif_sets.get(set_name)))
+            entry = motif_sets.get(set_name)
+            if isinstance(entry, dict):
+                expanded.extend(_coerce_list(entry.get("members")))
+            else:
+                expanded.extend(_coerce_list(entry))
         expanded.extend(_coerce_list(values.get("include")))
         exclude = set(_coerce_list(values.get("exclude")))
         if exclude:
@@ -133,6 +138,20 @@ def load_reaction_catalog(
     payload = _load_payload(path or REACTION_TYPES_FILE)
     reactions = payload.get("reaction_types") or []
     motif_sets = payload.get("motif_sets") or {}
+
+    # Load centralized compound logic if available
+    logic_path = COMPOUND_LOGIC_FILE
+    if logic_path.exists():
+        try:
+            with logic_path.open("r", encoding="utf-8") as h:
+                logic_payload = json.load(h)
+                logic_motif_sets = logic_payload.get("motif_sets") or {}
+                # Merge logic_motif_sets into motif_sets (logic supplements)
+                for k, v in logic_motif_sets.items():
+                    if k not in motif_sets:
+                        motif_sets[k] = v
+        except Exception:
+            pass
 
     definitions: Dict[str, ReactionTypeDefinition] = {}
     alias_map: Dict[str, str] = {}
