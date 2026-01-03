@@ -579,6 +579,15 @@
       "aliases": ["ArOMs"]
     },
     {
+      "id": "Ar-OSO2R",
+      "name": "Ar-OSO2R",
+      "template": "via_oxygen",
+      "A": "Ar",
+      "B": "OSO2R",
+      "description": "Aryl sulfonate (Ar-OSO2R).",
+      "aliases": ["Aryl-OSO2R"]
+    },
+    {
       "id": "Alkenyl-OTs",
       "name": "Alkenyl-OTs",
       "template": "via_oxygen",
@@ -1391,6 +1400,30 @@
       "description": "Tertiary alkyl tertiary amine (R3C-NR2)."
     },
     {
+      "id": "R-NH2",
+      "name": "R-NH2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NH2",
+      "description": "Generic alkyl primary amine (R-NH2)."
+    },
+    {
+      "id": "R-NHR",
+      "name": "R-NHR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NHR",
+      "description": "Generic alkyl secondary amine (R-NHR)."
+    },
+    {
+      "id": "R-NR2",
+      "name": "R-NR2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NR2",
+      "description": "Generic alkyl tertiary amine (R-NR2)."
+    },
+    {
       "id": "Any-NH2",
       "name": "Any-NH2",
       "template": "single_bond",
@@ -1947,6 +1980,86 @@
       "B": "CCH",
       "description": "Alkyl terminal alkyne (R-C#CH).",
       "aliases": ["RCCH", "terminal alkyne"]
+    },
+    {
+      "id": "R-OH",
+      "name": "R-OH",
+      "template": "single_bond",
+      "A": "R",
+      "B": "OH",
+      "description": "Alkyl alcohol (R-OH)."
+    },
+    {
+      "id": "R-SH",
+      "name": "R-SH",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SH",
+      "description": "Alkyl thiol (R-SH)."
+    },
+    {
+      "id": "R-CN",
+      "name": "R-CN",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CN",
+      "description": "Alkyl nitrile (R-CN)."
+    },
+    {
+      "id": "R-CO2H",
+      "name": "R-CO2H",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CO2H",
+      "description": "Alkyl carboxylic acid (R-CO2H)."
+    },
+    {
+      "id": "R-CHO",
+      "name": "R-CHO",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CHO",
+      "description": "Alkyl aldehyde (R-CHO)."
+    },
+    {
+      "id": "R-COR",
+      "name": "R-COR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "COR",
+      "description": "Alkyl ketone (R-COR)."
+    },
+    {
+      "id": "R-Ester",
+      "name": "R-Ester",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Ester",
+      "description": "Alkyl ester (R-CO2R)."
+    },
+    {
+      "id": "R-CONH2",
+      "name": "R-CONH2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CONH2",
+      "description": "Alkyl primary amide (R-CONH2)."
+    },
+    {
+      "id": "R-CONHR",
+      "name": "R-CONHR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CONHR",
+      "description": "Alkyl secondary amide (R-CONHR)."
+    },
+    {
+      "id": "R-CONR2",
+      "name": "R-CONR2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "CONR2",
+      "description": "Alkyl tertiary amide (R-CONR2)."
     },
     {
       "id": "Ar-CHCH2",
