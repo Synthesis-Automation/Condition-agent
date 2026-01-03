@@ -1,0 +1,252 @@
+{
+  "version": "v1.3",
+  "naming_set": "chemist_style",
+  "notes": "Scaffold motifs and complex functional groups that cannot be easily represented as A-B connections.\nThese use direct SMARTS patterns for detection.",
+  "compounds": [
+    {
+      "id": "Any-Thiocarbonate",
+      "name": "Any-Thiocarbonate",
+      "smarts": "O[CX3](=S)S[#6]",
+      "description": "Thiocarbonate/xanthate motif (RO-C(=S)-SR).",
+      "aliases": [
+        "ROCSSR"
+      ]
+    },
+    {
+      "id": "Indole",
+      "name": "Indole",
+      "smarts": [
+        "c1ccc2[nH]ccc2c1"
+      ],
+      "description": "Indole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Pyrrole",
+      "name": "Pyrrole",
+      "smarts": [
+        "[nH]1cccc1"
+      ],
+      "description": "Pyrrole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Imidazole",
+      "name": "Imidazole",
+      "smarts": [
+        "[nH]1cncc1",
+        "n1c[nH]cc1"
+      ],
+      "description": "Imidazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Pyrazole",
+      "name": "Pyrazole",
+      "smarts": [
+        "[nH]1nccc1",
+        "n1[nH]ccc1"
+      ],
+      "description": "Pyrazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Triazole",
+      "name": "Triazole",
+      "smarts": [
+        "[nH]1cncn1",
+        "n1c[nH]nc1",
+        "[nH]1nncc1",
+        "n1[nH]ncc1"
+      ],
+      "description": "Triazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Tetrazole",
+      "name": "Tetrazole",
+      "smarts": [
+        "n1nnn[nH]1",
+        "n1[nH]nnn1"
+      ],
+      "description": "Tetrazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Benzimidazole",
+      "name": "Benzimidazole",
+      "smarts": [
+        "[nH]1cnc2ccccc12"
+      ],
+      "description": "Benzimidazole (NH-heteroaromatic)."
+    },
+    {
+      "id": "Purine",
+      "name": "Purine",
+      "smarts": [
+        "n1cnc2[nH]cnc12"
+      ],
+      "description": "Purine (NH-heteroaromatic)."
+    },
+    {
+      "id": "Furan",
+      "name": "Furan",
+      "smarts": [
+        "o1cccc1"
+      ],
+      "description": "Furan (O-heteroaromatic)."
+    },
+    {
+      "id": "Thiophene",
+      "name": "Thiophene",
+      "smarts": [
+        "s1cccc1"
+      ],
+      "description": "Thiophene (S-heteroaromatic)."
+    },
+    {
+      "id": "Oxazole",
+      "name": "Oxazole",
+      "smarts": [
+        "o1ccnc1",
+        "o1cncc1"
+      ],
+      "description": "Oxazole (O,N-heteroaromatic)."
+    },
+    {
+      "id": "Thiazole",
+      "name": "Thiazole",
+      "smarts": [
+        "s1ccnc1",
+        "s1cncc1"
+      ],
+      "description": "Thiazole (S,N-heteroaromatic)."
+    },
+    {
+      "id": "Pyridine",
+      "name": "Pyridine",
+      "smarts": [
+        "n1ccccc1"
+      ],
+      "description": "Pyridine (N-heteroaromatic)."
+    },
+    {
+      "id": "Pyrimidine",
+      "name": "Pyrimidine",
+      "smarts": [
+        "n1cnccc1",
+        "n1cnccn1",
+        "n1ccncc1"
+      ],
+      "description": "Pyrimidine (N-heteroaromatic)."
+    },
+    {
+      "id": "Quinoline",
+      "name": "Quinoline",
+      "smarts": [
+        "c1ccc2ncccc2c1",
+        "n1cccc2ccccc12"
+      ],
+      "description": "Quinoline (fused N-heteroaromatic)."
+    },
+    {
+      "id": "Isoquinoline",
+      "name": "Isoquinoline",
+      "smarts": [
+        "c1ccc2cnccc2c1",
+        "n1ccc2ccccc2c1"
+      ],
+      "description": "Isoquinoline (fused N-heteroaromatic)."
+    },
+    {
+      "id": "Benzofuran",
+      "name": "Benzofuran",
+      "smarts": [
+        "o1ccc2ccccc12",
+        "c1ccc2occc2c1"
+      ],
+      "description": "Benzofuran (fused O-heteroaromatic)."
+    },
+    {
+      "id": "Benzothiophene",
+      "name": "Benzothiophene",
+      "smarts": [
+        "s1ccc2ccccc12",
+        "c1ccc2sccc2c1"
+      ],
+      "description": "Benzothiophene (fused S-heteroaromatic)."
+    },
+    {
+      "id": "H2",
+      "name": "H2",
+      "smarts": "[H][H]",
+      "description": "Hydrogen gas (reductant)."
+    },
+    {
+      "id": "NaBH4",
+      "name": "NaBH4",
+      "smarts": "[BH4-]",
+      "description": "Sodium borohydride (hydride reductant)."
+    },
+    {
+      "id": "LiAlH4",
+      "name": "LiAlH4",
+      "smarts": "[AlH4-]",
+      "description": "Lithium aluminum hydride (strong hydride reductant)."
+    },
+    {
+      "id": "Oxidant-O",
+      "name": "Oxidant-O",
+      "smarts": "[O;X0]",
+      "description": "Atomic oxygen oxidant placeholder."
+    },
+    {
+      "id": "Any-Diene",
+      "name": "Any-Diene",
+      "smarts": "[CX3]=[CX3][CX3]=[CX3]",
+      "description": "Conjugated diene motif (C=C-C=C)."
+    },
+    {
+      "id": "Any-Alkene",
+      "name": "Any-Alkene",
+      "smarts": "[CX3:1]=[CX3]",
+      "description": "Generic alkene motif (C=C)."
+    },
+    {
+      "id": "Any-Alkyne",
+      "name": "Any-Alkyne",
+      "smarts": "[CX2:1]#[CX2]",
+      "description": "Generic alkyne motif (C#C).",
+      "aliases": [
+        "alkyne"
+      ]
+    },
+    {
+      "id": "Any-EnolEther",
+      "name": "Any-EnolEther",
+      "smarts": "[CX3:1]=[CX3][OX2][#6]",
+      "description": "Enol ether motif (C=C-O-R).",
+      "aliases": [
+        "enolether"
+      ]
+    },
+    {
+      "id": "Any-Dienophile",
+      "name": "Any-Dienophile",
+      "smarts": "[CX3:1]=[CX3]",
+      "description": "Alkene motif for dienophiles (non-conjugated)."
+    },
+    {
+      "id": "Epoxide",
+      "name": "Epoxide",
+      "smarts": "C1OC1",
+      "description": "Epoxide (oxirane) ring motif."
+    },
+    {
+      "id": "Cyclohexene",
+      "name": "Cyclohexene",
+      "smarts": "[C;R]=[C;R]",
+      "description": "Ring alkene motif (Diels-Alder product proxy)."
+    },
+    {
+      "id": "Any-CO2M",
+      "name": "Any-CO2M",
+      "smarts": "[CX3](=O)[O-]",
+      "description": "Carboxylate (deprotonated carboxylic acid)."
+    }
+  ]
+}

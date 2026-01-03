@@ -15,55 +15,55 @@
     "sp2_electrophiles_default": {
       "name": "sp2 Electrophiles (Default)",
       "members": [
-        "sp2-X", "sp2-Sulfonate"
+        "Csp2-X", "Csp2-Sulfonate"
       ]
     },
     "sp2_electrophiles_halides": {
       "name": "sp2 Electrophiles (Halides)",
       "members": [
-        "sp2-X"
+        "Csp2-X"
       ]
     },
     "sp2_electrophiles_pseudohalides": {
       "name": "sp2 Electrophiles (Pseudohalides)",
       "members": [
-        "sp2-Sulfonate"
+        "Csp2-Sulfonate"
       ]
     },
     "organoboron_default": {
       "name": "Organoboron (Default)",
       "members": [
-        "sp2-B(OH)2", "sp2-B(OR)2", "Any-B(OR)2"
+        "Csp2-B(OH)2", "Csp2-B(OR)2", "Any-B(OR)2", "Any-B(OH)2", "Any-Bpin"
       ]
     },
     "organotin_default": {
       "name": "Organotin (Default)",
       "members": [
-        "sp2-Sn", "Any-Sn"
+        "Csp2-Sn", "Any-Sn"
       ]
     },
     "organozinc_default": {
       "name": "Organozinc (Default)",
       "members": [
-        "sp2-Zn", "Any-Zn"
+        "Csp2-Zn", "Any-Zn"
       ]
     },
     "organomagnesium_default": {
       "name": "Organomagnesium (Default)",
       "members": [
-        "sp2-Mg", "Any-Mg"
+        "Csp2-Mg", "Any-Mg"
       ]
     },
     "organosilicon_default": {
       "name": "Organosilicon (Default)",
       "members": [
-        "sp2-Si", "Any-Si"
+        "Csp2-Si", "Any-Si"
       ]
     },
     "organometallic_generic_default": {
       "name": "Generic Organometallic (Default)",
       "members": [
-        "sp2-M", "Any-M"
+        "Csp2-M", "Any-M"
       ]
     },
     "terminal_alkynes_default": {
@@ -113,7 +113,11 @@
     },
     "acyl_halides_default": {
       "name": "Acyl Halides",
-      "members": ["Acyl-Br", "Acyl-Cl", "Any-COCl", "Ar-COCl"]
+      "members": ["Any-COX", "Ar-COX", "Any-COCl", "Ar-COCl", "Any-COF", "Ar-COF", "Any-COBr", "Ar-COBr", "Any-COI", "Ar-COI"]
+    },
+    "sulfonyl_halides_default": {
+      "name": "Sulfonyl Halides",
+      "members": ["Any-SO2X", "Ar-SO2X", "Any-SO2Cl", "Ar-SO2Cl", "Any-SO2F", "Ar-SO2F", "Any-SO2Br", "Ar-SO2Br", "Any-SO2I", "Ar-SO2I"]
     },
     "esters_default": {
       "name": "Esters",
@@ -204,7 +208,7 @@
     },
     "azides_default": {
       "name": "Azides",
-      "members": ["Any-N3"]
+      "members": ["Any-N3", "Ar-N3"]
     },
     "rearrangement_substrates": {
       "name": "Rearrangement Substrates",

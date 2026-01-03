@@ -271,6 +271,17 @@
       ]
     },
     {
+      "id": "N3",
+      "name": "-N3",
+      "kind": "substituent",
+      "smarts": "[N:2]=[N+]=[N-]",
+      "description": "Azide substituent (-N3); attach via nitrogen.",
+      "tags": [
+        "azide",
+        "nitrogen_group"
+      ]
+    },
+    {
       "id": "B(OH)2",
       "name": "-B(OH)2",
       "kind": "substituent",
