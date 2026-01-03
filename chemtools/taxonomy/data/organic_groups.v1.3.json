@@ -84,8 +84,8 @@
       "name": "RCH2-",
       "kind": "scaffold",
       "priority": 3,
-      "smarts": "[CX4H2:1]",
-      "description": "Primary alkyl (sp3 CH2) attachment point.",
+      "smarts": "[CX4H2,CX4H3:1]",
+      "description": "Primary alkyl (sp3 CH2 or CH3) attachment point.",
       "tags": [
         "scaffold",
         "alkyl",

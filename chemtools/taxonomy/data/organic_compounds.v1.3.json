@@ -112,12 +112,60 @@
       "description": "Aryl or vinyl boronate ester."
     },
     {
+      "id": "RCH2-B(OR)2",
+      "name": "RCH2-B(OR)2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "B(OR)2",
+      "description": "Primary alkyl boronate ester (RCH2-B(OR)2)."
+    },
+    {
+      "id": "R2CH-B(OR)2",
+      "name": "R2CH-B(OR)2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "B(OR)2",
+      "description": "Secondary alkyl boronate ester (R2CH-B(OR)2)."
+    },
+    {
+      "id": "R3C-B(OR)2",
+      "name": "R3C-B(OR)2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "B(OR)2",
+      "description": "Tertiary alkyl boronate ester (R3C-B(OR)2)."
+    },
+    {
       "id": "Csp2-B(OH)2",
       "name": "Csp2-B(OH)2",
       "template": "single_bond",
       "A": "sp2_Carbon",
       "B": "B(OH)2",
       "description": "Aryl or vinyl boronic acid."
+    },
+    {
+      "id": "RCH2-B(OH)2",
+      "name": "RCH2-B(OH)2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "B(OH)2",
+      "description": "Primary alkyl boronic acid (RCH2-B(OH)2)."
+    },
+    {
+      "id": "R2CH-B(OH)2",
+      "name": "R2CH-B(OH)2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "B(OH)2",
+      "description": "Secondary alkyl boronic acid (R2CH-B(OH)2)."
+    },
+    {
+      "id": "R3C-B(OH)2",
+      "name": "R3C-B(OH)2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "B(OH)2",
+      "description": "Tertiary alkyl boronic acid (R3C-B(OH)2)."
     },
     {
       "id": "Csp2-Sn",
@@ -128,6 +176,30 @@
       "description": "Aryl or vinyl stannane."
     },
     {
+      "id": "RCH2-Sn",
+      "name": "RCH2-Sn",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "Sn",
+      "description": "Primary alkyl stannane (RCH2-Sn)."
+    },
+    {
+      "id": "R2CH-Sn",
+      "name": "R2CH-Sn",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "Sn",
+      "description": "Secondary alkyl stannane (R2CH-Sn)."
+    },
+    {
+      "id": "R3C-Sn",
+      "name": "R3C-Sn",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "Sn",
+      "description": "Tertiary alkyl stannane (R3C-Sn)."
+    },
+    {
       "id": "Csp2-Zn",
       "name": "Csp2-Zn",
       "template": "single_bond",
@@ -136,12 +208,60 @@
       "description": "Aryl or vinyl zincate."
     },
     {
+      "id": "RCH2-Zn",
+      "name": "RCH2-Zn",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "Zn",
+      "description": "Primary alkyl zincate (RCH2-Zn)."
+    },
+    {
+      "id": "R2CH-Zn",
+      "name": "R2CH-Zn",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "Zn",
+      "description": "Secondary alkyl zincate (R2CH-Zn)."
+    },
+    {
+      "id": "R3C-Zn",
+      "name": "R3C-Zn",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "Zn",
+      "description": "Tertiary alkyl zincate (R3C-Zn)."
+    },
+    {
       "id": "Csp2-Mg",
       "name": "Csp2-Mg",
       "template": "single_bond",
       "A": "sp2_Carbon",
       "B": "Mg",
       "description": "Aryl or vinyl Grignard."
+    },
+    {
+      "id": "RCH2-Mg",
+      "name": "RCH2-Mg",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "Mg",
+      "description": "Primary alkyl Grignard (RCH2-Mg)."
+    },
+    {
+      "id": "R2CH-Mg",
+      "name": "R2CH-Mg",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "Mg",
+      "description": "Secondary alkyl Grignard (R2CH-Mg)."
+    },
+    {
+      "id": "R3C-Mg",
+      "name": "R3C-Mg",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "Mg",
+      "description": "Tertiary alkyl Grignard (R3C-Mg)."
     },
     {
       "id": "Csp2-Si",
@@ -1471,6 +1591,102 @@
       "A": "R3C",
       "B": "CO2H",
       "description": "Tertiary alkyl carboxylic acid (R3C-CO2H)."
+    },
+    {
+      "id": "RCH2-CHO",
+      "name": "RCH2-CHO",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "CHO",
+      "description": "Primary alkyl aldehyde (RCH2-CHO)."
+    },
+    {
+      "id": "R2CH-CHO",
+      "name": "R2CH-CHO",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "CHO",
+      "description": "Secondary alkyl aldehyde (R2CH-CHO)."
+    },
+    {
+      "id": "R3C-CHO",
+      "name": "R3C-CHO",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "CHO",
+      "description": "Tertiary alkyl aldehyde (R3C-CHO)."
+    },
+    {
+      "id": "RCH2-Ester",
+      "name": "RCH2-Ester",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "Ester",
+      "description": "Primary alkyl ester (RCH2-Ester)."
+    },
+    {
+      "id": "R2CH-Ester",
+      "name": "R2CH-Ester",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "Ester",
+      "description": "Secondary alkyl ester (R2CH-Ester)."
+    },
+    {
+      "id": "R3C-Ester",
+      "name": "R3C-Ester",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "Ester",
+      "description": "Tertiary alkyl ester (R3C-Ester)."
+    },
+    {
+      "id": "RCH2-X",
+      "name": "RCH2-X",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "X",
+      "description": "Primary alkyl halide (RCH2-X)."
+    },
+    {
+      "id": "R2CH-X",
+      "name": "R2CH-X",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "X",
+      "description": "Secondary alkyl halide (R2CH-X)."
+    },
+    {
+      "id": "R3C-X",
+      "name": "R3C-X",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "X",
+      "description": "Tertiary alkyl halide (R3C-X)."
+    },
+    {
+      "id": "RCH2-NO2",
+      "name": "RCH2-NO2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NO2",
+      "description": "Primary alkyl nitro (RCH2-NO2)."
+    },
+    {
+      "id": "R2CH-NO2",
+      "name": "R2CH-NO2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NO2",
+      "description": "Secondary alkyl nitro (R2CH-NO2)."
+    },
+    {
+      "id": "R3C-NO2",
+      "name": "R3C-NO2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NO2",
+      "description": "Tertiary alkyl nitro (R3C-NO2)."
     },
     {
       "id": "Any-CO2H",
