@@ -46,9 +46,12 @@ _COMPOUND_MAPPING = {
     "arots": "Ar-OTs",
     "arotf": "Ar-OTf",
     "aroms": "Ar-OMs",
-    "alkyl-cl": "RCH2-X",
-    "alkyl-br": "RCH2-X",
-    "alkyl-i": "RCH2-X",
+    "alkyl-oso2r": "R-OSO2R",
+    "alkyl-cl": "R-Cl",
+    "alkyl-br": "R-Br",
+    "alkyl-i": "R-I",
+    "alkyl-f": "R-F",
+    "alkyl-x": "R-X",
     "alkene-i": "Alkenyl-I",
     "alkene-br": "Alkenyl-Br",
     
@@ -75,9 +78,12 @@ _COMPOUND_MAPPING = {
     "r2nh-a-branch": "R2CH-NHR",
     "rnh2a-branch": "R2CH-NH2",
     "r2nha-branch": "R2CH-NHR",
-    "rconh2": "Any-CONH2",
+    "rnhnh2": "R-Hydrazine",
+    "rconh2": "R-CONH2",
     "lactam": "Any-CONHR",
-    "carbamate": "Any-Carbamate",
+    "carbamate": "R-Carbamate",
+    "roconr2": "R-Carbamate",
+    "roc(o)nr2": "R-Carbamate",
     "urea": "Any-Urea",
     
     # Oxygen/Sulfur
@@ -89,6 +95,8 @@ _COMPOUND_MAPPING = {
     "alkyl-oh": "R-OH",
     "rco2h": "R-CO2H",
     "rco2horm": "R-CO2H",
+    "rco2r": "R-Ester",
+    "rcho": "R-CHO",
     "rsh": "R-SH",
     
     # Hydrocarbons

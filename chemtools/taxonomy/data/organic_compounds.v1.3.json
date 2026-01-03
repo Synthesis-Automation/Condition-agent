@@ -1682,6 +1682,38 @@
       "description": "Primary alkyl halide (RCH2-X)."
     },
     {
+      "id": "RCH2-Cl",
+      "name": "RCH2-Cl",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "Cl",
+      "description": "Primary alkyl chloride (RCH2-Cl)."
+    },
+    {
+      "id": "RCH2-Br",
+      "name": "RCH2-Br",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "Br",
+      "description": "Primary alkyl bromide (RCH2-Br)."
+    },
+    {
+      "id": "RCH2-I",
+      "name": "RCH2-I",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "I",
+      "description": "Primary alkyl iodide (RCH2-I)."
+    },
+    {
+      "id": "RCH2-F",
+      "name": "RCH2-F",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "F",
+      "description": "Primary alkyl fluoride (RCH2-F)."
+    },
+    {
       "id": "R2CH-X",
       "name": "R2CH-X",
       "template": "single_bond",
@@ -1690,12 +1722,76 @@
       "description": "Secondary alkyl halide (R2CH-X)."
     },
     {
+      "id": "R2CH-Cl",
+      "name": "R2CH-Cl",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "Cl",
+      "description": "Secondary alkyl chloride (R2CH-Cl)."
+    },
+    {
+      "id": "R2CH-Br",
+      "name": "R2CH-Br",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "Br",
+      "description": "Secondary alkyl bromide (R2CH-Br)."
+    },
+    {
+      "id": "R2CH-I",
+      "name": "R2CH-I",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "I",
+      "description": "Secondary alkyl iodide (R2CH-I)."
+    },
+    {
+      "id": "R2CH-F",
+      "name": "R2CH-F",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "F",
+      "description": "Secondary alkyl fluoride (R2CH-F)."
+    },
+    {
       "id": "R3C-X",
       "name": "R3C-X",
       "template": "single_bond",
       "A": "R3C",
       "B": "X",
       "description": "Tertiary alkyl halide (R3C-X)."
+    },
+    {
+      "id": "R3C-Cl",
+      "name": "R3C-Cl",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "Cl",
+      "description": "Tertiary alkyl chloride (R3C-Cl)."
+    },
+    {
+      "id": "R3C-Br",
+      "name": "R3C-Br",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "Br",
+      "description": "Tertiary alkyl bromide (R3C-Br)."
+    },
+    {
+      "id": "R3C-I",
+      "name": "R3C-I",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "I",
+      "description": "Tertiary alkyl iodide (R3C-I)."
+    },
+    {
+      "id": "R3C-F",
+      "name": "R3C-F",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "F",
+      "description": "Tertiary alkyl fluoride (R3C-F)."
     },
     {
       "id": "RCH2-NO2",
@@ -1856,6 +1952,22 @@
       "aliases": ["RNHNH2"]
     },
     {
+      "id": "R-Hydrazine",
+      "name": "R-Hydrazine",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Hydrazine",
+      "description": "Alkyl hydrazine (R-NHNH2)."
+    },
+    {
+      "id": "Ar-Hydrazine",
+      "name": "Ar-Hydrazine",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Hydrazine",
+      "description": "Aryl hydrazine (Ar-NHNH2)."
+    },
+    {
       "id": "Any-Hydrazide",
       "name": "Any-Hydrazide",
       "template": "single_bond",
@@ -1863,6 +1975,31 @@
       "B": "Hydrazide",
       "description": "hydrazide functional group anywhere (generic).",
       "aliases": ["hydrazide"]
+    },
+    {
+      "id": "R-Hydrazide",
+      "name": "R-Hydrazide",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Hydrazide",
+      "description": "Alkyl hydrazide (R-CONHNH2)."
+    },
+    {
+      "id": "Ar-Hydrazide",
+      "name": "Ar-Hydrazide",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Hydrazide",
+      "description": "Aryl hydrazide (Ar-CONHNH2)."
+    },
+    {
+      "id": "R-Carbamate",
+      "name": "R-Carbamate",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Carbamate",
+      "description": "Alkyl carbamate (R-OC(O)NR2).",
+      "aliases": ["ROC(O)NR2", "ROCONR2"]
     },
     {
       "id": "Any-Carbamate",
@@ -1926,6 +2063,15 @@
       "B": "F",
       "description": "Alkyl fluoride (R-F).",
       "aliases": ["RF", "alkyl fluoride"]
+    },
+    {
+      "id": "R-X",
+      "name": "R-X",
+      "template": "single_bond",
+      "A": "R",
+      "B": "X",
+      "description": "Alkyl halide (R-X).",
+      "aliases": ["RX", "alkyl halide"]
     },
     {
       "id": "R-OTf",
