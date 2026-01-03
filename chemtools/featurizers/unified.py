@@ -13,6 +13,7 @@ from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2
 from chemtools.util import rdkit_helpers
 
 from .analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
+from .analysis.feasibility import analyze_snar_feasibility, analyze_molecule_snar_feasibility
 from .molecule import featurize_molecule as _featurize_molecule
 from .reaction_detection import detect_reaction_types
 
@@ -83,17 +84,6 @@ def _molecule_bundle(
 
     molecule = dict(analysis)
     molecule["rdkit_props"] = rdkit_props
-    workflow = molecule.get("workflow")
-    if not isinstance(workflow, dict):
-        workflow = {"steps": []}
-    steps = workflow.get("steps")
-    if not isinstance(steps, list):
-        steps = []
-    steps.append(
-        {"step": 4, "name": "rdkit_props", "data": rdkit_props}
-    )
-    workflow["steps"] = steps
-    molecule["workflow"] = workflow
     return molecule
 
 
@@ -187,6 +177,12 @@ def featurize_molecule(
         "rdkit_available": rdkit_helpers.rdkit_available(),
         "errors": [molecule.get("meta", {}).get("error")] if molecule.get("meta", {}).get("error") else [],
     }
+
+    # Add SNAr feasibility check for molecules
+    snar_feasibility = analyze_molecule_snar_feasibility(molecule)
+    if snar_feasibility:
+        molecule["snar_feasibility"] = snar_feasibility
+
     return {
         "schema_version": "v1",
         "kind": "molecule",
@@ -316,6 +312,11 @@ def featurize_reaction(
         "roles": roles_summary,
         "agent_roles": agent_roles,
     }
+
+    # Add feasibility analysis for specific reaction types
+    rt_id = reaction_type.get("reaction_type")
+    if rt_id == "snar_cn" or rt_id == "c_n_cross_coupling":
+        reaction["feasibility"] = analyze_snar_feasibility(reaction)
 
     meta = {
         "rdkit_available": rdkit_helpers.rdkit_available(),

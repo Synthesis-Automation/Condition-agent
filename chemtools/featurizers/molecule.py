@@ -62,7 +62,41 @@ def featurize_molecule(
     include_ipso_group = options.get("electronics_include_ipso_group", True)
     max_hits = options.get("max_hits_per_compound")
 
-    motifs = detect_motifs(mol, compiled, max_hits_per_compound=max_hits)
+    all_motifs = detect_motifs(mol, compiled, max_hits_per_compound=max_hits)
+    motifs = list(all_motifs)
+
+    # Filter by target groups if provided
+    target_groups = options.get("target_groups")
+    if target_groups:
+        if isinstance(target_groups, str):
+            target_groups = [target_groups]
+        
+        filtered_motifs = []
+        for m in motifs:
+            cid = m.get("compound_id", "")
+            # Match if cid matches target exactly, or ends with "-target", 
+            # or ends with "target" if target already starts with "-"
+            for tg in target_groups:
+                if cid == tg:
+                    filtered_motifs.append(m)
+                    break
+                if cid.endswith("-" + tg):
+                    filtered_motifs.append(m)
+                    break
+                if tg.startswith("-") and cid.endswith(tg):
+                    filtered_motifs.append(m)
+                    break
+        
+        # Only apply filter if we actually found matches for the target groups
+        if filtered_motifs:
+            motifs = filtered_motifs
+
+    # Filter Ar-H motifs if other motifs exist, unless explicitly requested
+    if not options.get("include_ar_h", False) and not target_groups:
+        non_h_motifs = [m for m in motifs if m.get("compound_id") != "Ar-H"]
+        if non_h_motifs:
+            motifs = non_h_motifs
+
     analyses = []
     for hit in motifs:
         compound_id = hit["compound_id"]
@@ -93,7 +127,7 @@ def featurize_molecule(
                     include_ipso_group=bool(include_ipso_group),
                     include_gasteiger=include_gasteiger,
                 )
-            nearby = analyze_nearby_groups(mol, hit, motifs, groups, compound_map)
+            nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)
             analyses.append(
                 {
                     "compound_id": compound_id,
@@ -105,7 +139,7 @@ def featurize_molecule(
             )
         elif compound_id.startswith(("R-", "Bn-", "Allyl-")):
             steric = analyze_alkyl_steric(mol, hit)
-            nearby = analyze_nearby_groups(mol, hit, motifs, groups, compound_map)
+            nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)
             analyses.append(
                 {
                     "compound_id": compound_id,
@@ -153,13 +187,6 @@ def featurize_molecule(
         "electronics": electronic_payload,
         "nearby": nearby_payload,
         "analyses": analyses,
-        "workflow": {
-            "steps": [
-                {"step": 1, "name": "motifs", "data": motifs},
-                {"step": 2, "name": "steric_electronic", "data": analyses},
-                {"step": 3, "name": "nearby_groups", "data": nearby_payload},
-            ],
-        },
         "meta": meta,
     }
 

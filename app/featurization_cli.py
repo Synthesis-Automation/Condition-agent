@@ -107,19 +107,13 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
                 entries.append(f"{compound_id}: none")
         print(_format_list(entries))
 
-    workflow = molecule.get("workflow") or {}
-    steps = workflow.get("steps") or []
-    if steps:
-        print("Workflow Steps:")
-        for step in steps:
-            name = step.get("name")
-            data = step.get("data")
-            size = "n/a"
-            if isinstance(data, list):
-                size = str(len(data))
-            elif isinstance(data, dict):
-                size = str(len(data))
-            print(f"  {step.get('step')}. {name} (items={size})")
+    snar = molecule.get("snar_feasibility")
+    if snar:
+        print("SNAr Feasibility:")
+        for item in snar:
+            status = "YES" if item.get("feasible") else "NO"
+            print(f"  - {item.get('motif')}: {status} (confidence: {item.get('confidence')})")
+            print(f"    Reason: {item.get('reason')}")
 
 
 def _print_reaction_summary(payload: Dict[str, Any]) -> None:
@@ -149,6 +143,13 @@ def _print_reaction_summary(payload: Dict[str, Any]) -> None:
         print("Aggregates:")
         for key, value in aggregates.items():
             print(f"  - {key}: {value}")
+
+    feasibility = reaction.get("feasibility")
+    if feasibility:
+        print("Feasibility Analysis:")
+        status = "YES" if feasibility.get("feasible") else "NO"
+        print(f"  - Possible: {status} (confidence: {feasibility.get('confidence')})")
+        print(f"  - Reason: {feasibility.get('reason')}")
 
 
 def _print_readable(payload: Dict[str, Any]) -> None:
@@ -187,11 +188,29 @@ def _parse_args() -> argparse.Namespace:
         choices=["summary", "full-json", "both"],
         help="Output format (default: summary).",
     )
+    parser.add_argument(
+        "--include-ar-h",
+        action="store_true",
+        help="Include Ar-H motifs even if other motifs are present.",
+    )
+    parser.add_argument(
+        "--target-groups",
+        help="Focus on specific motifs (e.g., 'Br', 'H', 'CN'). Comma-separated.",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = _parse_args()
+    
+    target_groups = None
+    if args.target_groups:
+        target_groups = [tg.strip() for tg in args.target_groups.split(",")]
+
+    options = {
+        "include_ar_h": args.include_ar_h,
+        "target_groups": target_groups,
+    }
     print("ChemTools Featurization CLI")
     print("Enter 'q' to quit.")
 
@@ -212,11 +231,16 @@ def main() -> int:
         if smiles.lower() in {"q", "quit", "exit"}:
             return 0
 
+        targets = _prompt("Target Groups (optional, e.g. Br,CN): ").strip()
+        current_options = dict(options)
+        if targets:
+            current_options["target_groups"] = [tg.strip() for tg in targets.split(",")]
+
         try:
             if mode in {"reaction", "r"} or (mode == "auto" and ">" in smiles):
-                payload = featurize_reaction(smiles)
+                payload = featurize_reaction(smiles, options=current_options)
             else:
-                payload = featurize_molecule(smiles)
+                payload = featurize_molecule(smiles, options=current_options)
         except Exception as exc:
             print(f"Error: {exc}")
             continue
