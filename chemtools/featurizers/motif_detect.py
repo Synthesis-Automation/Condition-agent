@@ -73,26 +73,41 @@ def detect_motifs(
         raw_hits.extend(undocumented)
 
     # Filter by subsumption: if hit A's atoms are a subset of hit B's atoms, 
-    # and B has higher priority, remove A.
+    # then B is more specific. If they match the same atoms, use priority.
     filtered_raw = []
     for i, h1 in enumerate(raw_hits):
         subsumed = False
         for j, h2 in enumerate(raw_hits):
             if i == j:
                 continue
-            # If h1 is a subset of h2 and h2 has higher priority
-            if h1["atoms"].issubset(h2["atoms"]) and h1["priority"] < h2["priority"]:
-                subsumed = True
-                break
+            
+            h1_atoms = h1["atoms"]
+            h2_atoms = h2["atoms"]
+            
+            if h1_atoms.issubset(h2_atoms):
+                if h1_atoms == h2_atoms:
+                    # Identical atom sets: use priority as tie-breaker
+                    if h1["priority"] < h2["priority"]:
+                        subsumed = True
+                        break
+                    elif h1["priority"] == h2["priority"]:
+                        # If priorities are equal, prefer documented over undocumented
+                        if h1.get("undocumented") and not h2.get("undocumented"):
+                            subsumed = True
+                            break
+                else:
+                    # h1 is a proper subset of h2. h2 is more specific.
+                    subsumed = True
+                    break
         if not subsumed:
             filtered_raw.append(h1)
     
     raw_hits = filtered_raw
 
-    # Filter by bond: keep only highest priority per site
-    sites: Dict[Tuple[int, ...], List[Dict[str, Any]]] = {}
+    # Filter by substituent atom: keep only highest priority per functional group attachment
+    sites: Dict[int, List[Dict[str, Any]]] = {}
     for hit in raw_hits:
-        site = hit["bond"]
+        site = hit["b_atom_idx"]
         if site not in sites:
             sites[site] = []
         sites[site].append(hit)

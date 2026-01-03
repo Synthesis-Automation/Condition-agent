@@ -42,19 +42,18 @@ with open(input_file, mode="r", encoding="utf-8") as f:
             motifs = payload.get("motifs", [])
             
             # Extract names and flag undocumented
-            motif_names = []
+            documented = []
             undocumented = []
             
             for m in motifs:
                 cid = m.get("compound_id", "unknown")
-                is_undoc = m.get("undocumented", False)
-                
-                motif_names.append(cid)
-                if is_undoc:
+                if m.get("undocumented", False):
                     undocumented.append(cid)
+                else:
+                    documented.append(cid)
             
             # Unique the lists for the summary CSV to reduce noise
-            row["detected_motifs"] = "; ".join(sorted(list(set(motif_names))))
+            row["detected_motifs"] = "; ".join(sorted(list(set(documented))))
             row["undocumented_motifs"] = "; ".join(sorted(list(set(undocumented))))
             
         except Exception as e:

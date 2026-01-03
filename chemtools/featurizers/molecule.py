@@ -51,6 +51,9 @@ def featurize_molecule(
             "meta": meta,
         }
 
+    from rdkit import Chem
+    mol = Chem.AddHs(mol)
+
     registry_paths = registry_paths or _default_registry_paths()
     registry = build_compound_registry(registry_paths)
     compiled = registry["compiled_compounds"]

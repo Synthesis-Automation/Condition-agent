@@ -125,7 +125,7 @@
       "id": "Bn",
       "name": "Bn-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 4,
       "smarts": "[c][CH2:1]",
       "description": "Benzylic CH2 attachment (Bn-).",
       "tags": [
@@ -138,7 +138,7 @@
       "id": "Allyl",
       "name": "Allyl-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 4,
       "smarts": "[CH2]=[CH][CH2:1]",
       "description": "Allylic CH2 attachment (Allyl-).",
       "tags": [
@@ -151,7 +151,7 @@
       "id": "Propargyl",
       "name": "Propargyl-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 4,
       "smarts": "[C]#[C][CH2:1]",
       "description": "Propargylic CH2 attachment (Propargyl-).",
       "tags": [
