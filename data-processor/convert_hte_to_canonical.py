@@ -80,6 +80,7 @@ _COMPOUND_MAPPING = {
     "r2nha-branch": "R2CH-NHR",
     "rnhnh2": "R-Hydrazine",
     "rconh2": "R-CONH2",
+    "rconhr": "R-CONHR",
     "lactam": "Any-CONHR",
     "carbamate": "R-Carbamate",
     "roconr2": "R-Carbamate",
@@ -93,11 +94,14 @@ _COMPOUND_MAPPING = {
     "alkyl-ohprimary": "RCH2-OH",
     "alkyl-oha-branch": "R2CH-OH",
     "alkyl-oh": "R-OH",
+    "ror": "R-OR",
     "rco2h": "R-CO2H",
     "rco2horm": "R-CO2H",
     "rco2r": "R-Ester",
     "rcho": "R-CHO",
     "rsh": "R-SH",
+    "rso2cl": "R-SO2Cl",
+    "rsnr3": "R-Sn",
     
     # Hydrocarbons
     "arh": "Ar-H",

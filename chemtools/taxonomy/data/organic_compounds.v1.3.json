@@ -2338,6 +2338,46 @@
       "A": "Ar",
       "B": "N3",
       "description": "Aryl azide (Ar-N3)."
+    },
+    {
+      "id": "R-OR",
+      "name": "R-OR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "OR",
+      "description": "Alkyl ether (R-OR)."
+    },
+    {
+      "id": "R-SO2Cl",
+      "name": "R-SO2Cl",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2Cl",
+      "description": "Alkyl sulfonyl chloride (R-SO2Cl)."
+    },
+    {
+      "id": "R-SO2NR2",
+      "name": "R-SO2NR2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2NR2",
+      "description": "Alkyl tertiary sulfonamide (R-SO2NR2)."
+    },
+    {
+      "id": "R-SO2NHR",
+      "name": "R-SO2NHR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2NHR",
+      "description": "Alkyl secondary sulfonamide (R-SO2NHR)."
+    },
+    {
+      "id": "R-SO2NH2",
+      "name": "R-SO2NH2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2NH2",
+      "description": "Alkyl primary sulfonamide (R-SO2NH2)."
     }
   ],
   "depends_on": {
