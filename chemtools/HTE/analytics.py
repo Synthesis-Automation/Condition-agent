@@ -96,7 +96,7 @@ class HTEAnalytics:
     - Statistical distributions
     """
     
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.jsonl"):
+    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_canonical.csv"):
         """Initialize analytics with HTE database"""
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
@@ -111,6 +111,35 @@ class HTEAnalytics:
             self.df = _load_hte_jsonl(self.db_path)
         else:
             self.df = pd.read_csv(self.db_path)
+            
+            # Map new canonical CSV columns to internal standard names
+            column_mapping = {
+                "reaction_type": "Reaction_Type_Standardized",
+                "reactant_1": "Reactant_A_Type",
+                "reactant_2": "Reactant_B_Type",
+                "yield": "AREA_TOTAL_REDUCED",
+                "z_score": "z-Score",
+                "catalyst": "Catalyst",
+                "ligand": "Ligand",
+                "base": "Base",
+                "solvent": "Solvent",
+                "additive": "Additive"
+            }
+            
+            # Rename columns if they exist
+            self.df = self.df.rename(columns={k: v for k, v in column_mapping.items() if k in self.df.columns})
+            
+            # Ensure missing columns are present
+            required_cols = [
+                "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
+                "Catalyst", "Ligand", "Base", "Solvent", "Additive",
+                "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
+                "Reactant_A_Category", "Reactant_B_Category"
+            ]
+            for col in required_cols:
+                if col not in self.df.columns:
+                    self.df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
+
         print(f"📊 Loaded HTE database: {len(self.df):,} experiments")
     
     def _filter_by_catalyst_type(self, df: pd.DataFrame, catalyst_filter: str) -> pd.DataFrame:
@@ -180,7 +209,7 @@ class HTEAnalytics:
         # Group by reactant pairs
         grouped = df.groupby(['Reactant_A_Type', 'Reactant_B_Type', 'Reaction_Type_Standardized']).agg({
             'AREA_TOTAL_REDUCED': ['count', 'mean', 'median', lambda x: (x > 50).sum() / len(x) * 100],
-            'Catalyst': lambda x: x.mode()[0] if len(x) > 0 else None
+            'Catalyst': lambda x: x.mode().iloc[0] if not x.mode().empty else None
         }).reset_index()
         
         # Flatten column names
@@ -380,7 +409,7 @@ class HTEAnalytics:
             return pd.DataFrame()
         
         # Get the dominant reaction type and catalyst
-        dominant_reaction = query_df['Reaction_Type_Standardized'].mode()[0] if len(query_df) > 0 else None
+        dominant_reaction = query_df['Reaction_Type_Standardized'].mode().iloc[0] if not query_df['Reaction_Type_Standardized'].mode().empty else None
         
         def extract_metal(catalyst_name):
             if pd.isna(catalyst_name):
@@ -392,7 +421,7 @@ class HTEAnalytics:
             return 'Other'
         
         query_df['Metal'] = query_df['Catalyst'].apply(extract_metal)
-        dominant_metal = query_df['Metal'].mode()[0] if len(query_df) > 0 else None
+        dominant_metal = query_df['Metal'].mode().iloc[0] if not query_df['Metal'].mode().empty else None
         
         # Find similar pairs
         similar_df = self.df.copy()
@@ -417,7 +446,7 @@ class HTEAnalytics:
         # Group by reactant pairs
         grouped = similar_df.groupby(['Reactant_A_Type', 'Reactant_B_Type', 'Reaction_Type_Standardized']).agg({
             'AREA_TOTAL_REDUCED': ['count', 'mean', lambda x: (x > 50).sum() / len(x) * 100],
-            'Catalyst': lambda x: x.mode()[0] if len(x) > 0 else None
+            'Catalyst': lambda x: x.mode().iloc[0] if not x.mode().empty else None
         }).reset_index()
         
         grouped.columns = [

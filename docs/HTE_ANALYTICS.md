@@ -75,7 +75,7 @@ python -m chemtools.HTE.analytics_cli export suzuki_pd.csv --reaction Suzuki --c
 
 ### HTEAnalytics Class
 
-#### `__init__(hte_db_path="data/HTE_db/HTE_0.jsonl")`
+#### `__init__(hte_db_path="data/HTE_db/HTE_canonical.csv")`
 
 Initialize analytics with HTE database.
 
@@ -84,7 +84,7 @@ Initialize analytics with HTE database.
 
 **Example:**
 ```python
-analytics = HTEAnalytics("data/HTE_db/HTE_0.jsonl")
+analytics = HTEAnalytics("data/HTE_db/HTE_canonical.csv")
 ```
 
 ---
@@ -550,7 +550,7 @@ print(f"  Ratio: {pd_count/cu_count:.2f}:1 (Pd:Cu)")
 
 ## Database Schema
 
-The HTE database (`HTE_0.jsonl`) contains the following fields:
+The HTE database (`HTE_canonical.csv`) contains the following fields:
 
 - `reaction_type`: Standardized reaction type name
 - `reactant_types`: Classified reactant types

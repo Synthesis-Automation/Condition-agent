@@ -74,8 +74,8 @@ Examples:
     parser.add_argument(
         '--db-path',
         type=str,
-        default='data/HTE_db/HTE_0.jsonl',
-        help='Path to HTE database JSONL (default: data/HTE_db/HTE_0.jsonl)'
+        default='data/HTE_db/HTE_canonical.csv',
+        help='Path to HTE database CSV/JSONL (default: data/HTE_db/HTE_canonical.csv)'
     )
     
     # Output options

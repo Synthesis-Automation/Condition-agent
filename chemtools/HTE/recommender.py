@@ -37,6 +37,35 @@ def _load_hte_database_cached(
         df = _load_hte_jsonl(db_path)
     else:
         df = pd.read_csv(db_path)
+        
+        # Map new canonical CSV columns to internal standard names
+        column_mapping = {
+            "reaction_type": "Reaction_Type_Standardized",
+            "reactant_1": "Reactant_A_Type",
+            "reactant_2": "Reactant_B_Type",
+            "yield": "AREA_TOTAL_REDUCED",
+            "z_score": "z-Score",
+            "catalyst": "Catalyst",
+            "ligand": "Ligand",
+            "base": "Base",
+            "solvent": "Solvent",
+            "additive": "Additive"
+        }
+        
+        # Rename columns if they exist
+        df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
+        
+        # Ensure missing columns are present
+        required_cols = [
+            "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
+            "Catalyst", "Ligand", "Base", "Solvent", "Additive",
+            "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
+            "Reactant_A_Category", "Reactant_B_Category"
+        ]
+        for col in required_cols:
+            if col not in df.columns:
+                df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
+
         if "Reactant_Types_Key" not in df.columns:
             df["Reactant_Types_Key"] = df.apply(
                 lambda row: _reactant_key([row.get("Reactant_A_Type"), row.get("Reactant_B_Type")]),
@@ -204,7 +233,7 @@ class HTERecommender:
     5. Return top-k recommendations
     """
     
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.jsonl"):
+    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_canonical.csv"):
         """Initialize recommender with HTE database"""
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None

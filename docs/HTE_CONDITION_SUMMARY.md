@@ -257,6 +257,6 @@ Avg Yield: 49.8% | Median: 49.8%
 
 ## References
 
-- HTE database: `data/HTE_db/HTE_0.jsonl` (66,308 experiments)
+- HTE database: `data/HTE_db/HTE_canonical.csv` (65,468 experiments)
 - Reactant detection: `chemtools.featurizers.analysis.reactants.classify_reactant_smiles`
 - Implementation: `chemtools/HTE/recommender.py`, `chemtools/HTE/analytics.py`

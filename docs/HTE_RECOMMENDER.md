@@ -24,7 +24,7 @@ Key Components:
 
 ## Database Structure
 
-**HTE_0.jsonl** (66,308 experiments):
+**HTE_canonical.csv** (65,468 experiments):
 - **reaction_type**: 41 types (c_n_cross_coupling, suzuki_miyaura, c_h_activation, etc.)
 - **reactant_types**: Detected member types (Ar-Br, Any-NH2, Ar-B(OH)2, etc.)
 - **catalyst_type**: Catalyst type tags (Pd, Cu, Ni, organocatalyst, etc.)
@@ -187,7 +187,7 @@ print(stats)
 
 ```python
 class HTERecommender:
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_0.jsonl")
+    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_canonical.csv")
     
     def recommend(
         self,
@@ -364,6 +364,6 @@ print(f'Found {len(result.recommendations)} recommendations')
 
 ## References
 
-- HTE Database: `data/HTE_db/HTE_0.jsonl`
+- HTE Database: `data/HTE_db/HTE_canonical.csv`
 - Reactant Type System: `chemtools/taxonomy/data/organic_compounds.v1.3.json`
 - Classification: `chemtools/analysis/reactants.py`
