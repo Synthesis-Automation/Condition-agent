@@ -4,15 +4,6 @@
   "notes": "Scaffold motifs and complex functional groups that cannot be easily represented as A-B connections.\nThese use direct SMARTS patterns for detection.",
   "compounds": [
     {
-      "id": "Any-Thiocarbonate",
-      "name": "Any-Thiocarbonate",
-      "smarts": "O[CX3](=S)S[#6]",
-      "description": "Thiocarbonate/xanthate motif (RO-C(=S)-SR).",
-      "aliases": [
-        "ROCSSR"
-      ]
-    },
-    {
       "id": "Indole",
       "name": "Indole",
       "smarts": [

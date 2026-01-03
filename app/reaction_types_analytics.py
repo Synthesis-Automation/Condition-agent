@@ -49,7 +49,7 @@ try:
     DEFAULT_REACTION_TYPES_PATH = _reaction_catalog.REACTION_TYPES_FILE
 except Exception:
     DEFAULT_REACTION_TYPES_PATH = (
-        Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "reaction_types.v3.3.json"
+        Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "reaction_types.v4.0.json"
     )
 
 LEGACY_REACTION_TYPES_PATH = Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "reaction_types.json"

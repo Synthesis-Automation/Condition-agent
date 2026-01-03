@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
 
-REACTION_TYPES_FILE = Path(__file__).resolve().parent / "data" / "reaction_types.v3.3.json"
+REACTION_TYPES_FILE = Path(__file__).resolve().parent / "data" / "reaction_types.v4.0.json"
 COMPOUND_LOGIC_FILE = Path(__file__).resolve().parent / "data" / "compound_logic.json"
 _DEFAULT_SLOTS = ("electrophiles", "nucleophiles", "acids", "activators", "substrate", "reagent")
 
@@ -30,6 +30,7 @@ class ReactionTypeDefinition:
     metadata: Dict[str, Any]
     reference_reactions: List[str]
     notes: Optional[str]
+    constraints: Dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -85,6 +86,30 @@ def _expand_reactant_slot(
 ) -> SlotRequirement:
     min_hits = 1
     min_reactants = 1
+
+    def resolve_value(v: str) -> List[str]:
+        if v.startswith("@"):
+            set_name = v[1:]
+            entry = motif_sets.get(set_name)
+            if entry:
+                if isinstance(entry, dict):
+                    return _coerce_list(entry.get("members"))
+                return _coerce_list(entry)
+        return [v]
+
+    if isinstance(values, str):
+        expanded = resolve_value(values)
+        return SlotRequirement(allowed=_dedupe(expanded), min_hits=1, min_reactants=1)
+
+    if isinstance(values, list):
+        expanded = []
+        for v in values:
+            if isinstance(v, str):
+                expanded.extend(resolve_value(v))
+            else:
+                expanded.append(str(v))
+        return SlotRequirement(allowed=_dedupe(expanded), min_hits=1, min_reactants=1)
+
     if isinstance(values, dict):
         expanded: List[str] = []
         for set_name in _coerce_list(values.get("motif_sets") or values.get("motif_set")):
@@ -93,10 +118,14 @@ def _expand_reactant_slot(
                 expanded.extend(_coerce_list(entry.get("members")))
             else:
                 expanded.extend(_coerce_list(entry))
-        expanded.extend(_coerce_list(values.get("include")))
+
+        for v in _coerce_list(values.get("include")):
+            expanded.extend(resolve_value(v))
+
         exclude = set(_coerce_list(values.get("exclude")))
         if exclude:
             expanded = [value for value in expanded if value not in exclude]
+
         min_hits = int(values.get("min_hits") or 1)
         min_reactants = int(values.get("min_reactants") or 1)
         return SlotRequirement(
@@ -104,8 +133,6 @@ def _expand_reactant_slot(
             min_hits=max(min_hits, 1),
             min_reactants=max(min_reactants, 1),
         )
-    if isinstance(values, list):
-        return SlotRequirement(allowed=_clean_list(values), min_hits=1, min_reactants=1)
     return SlotRequirement(allowed=[], min_hits=1, min_reactants=1)
 
 
@@ -176,6 +203,7 @@ def load_reaction_catalog(
         catalysts = [str(c) for c in (entry.get("catalysts") or []) if isinstance(c, str)]
         conditions = entry.get("conditions")
         metadata = dict(entry.get("metadata") or {})
+        constraints = dict(entry.get("constraints") or {})
         reference_reactions = [
             str(r) for r in (entry.get("reference_reactions") or []) if isinstance(r, str)
         ]
@@ -194,6 +222,7 @@ def load_reaction_catalog(
             metadata=metadata,
             reference_reactions=reference_reactions,
             notes=notes,
+            constraints=constraints,
         )
 
         register_alias(rxn_id, rxn_id)

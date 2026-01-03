@@ -232,6 +232,25 @@ def _match_reaction_definition(
     if required_slots == 0:
         return None
 
+    # Apply top-level constraints
+    constraints = definition.constraints
+    if constraints:
+        total_hits = 0
+        all_molecule_indices = set()
+        for slot_name, hits in slot_evidence.items():
+            # Determine if this was a reactant or product slot
+            profile = detected_products if slot_name.startswith("product:") else detected_motifs
+            for motif in hits:
+                entry = profile.get(motif)
+                if entry:
+                    total_hits += entry.get("count", 0)
+                    all_molecule_indices.update(entry.get("molecules") or set())
+
+        if "min_hits" in constraints and total_hits < int(constraints["min_hits"]):
+            return None
+        if "min_reactants" in constraints and len(all_molecule_indices) < int(constraints["min_reactants"]):
+            return None
+
     return ReactionMatch(
         reaction_type=definition.id,
         name=definition.name,
