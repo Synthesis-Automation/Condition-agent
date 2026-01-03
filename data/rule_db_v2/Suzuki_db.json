@@ -31,14 +31,14 @@
       "compatible_functional_groups": [],
       "incompatible_functional_groups": []
     },
-    "notes": "Updated using reported HTE trends: top-performing condition families across many discovery plates favor dtbpf- or dialkylbiaryl-phosphine–Pd systems with aqueous K3PO4 or Cs2CO3 in dioxane/H2O (~4–5:1). Default prioritizes dtbpf/K3PO4; base_rules enumerate frequently winning alternatives (P(tBu)3–Pd G3, XPhos–Pd G3, CataCXium A–Pd G3, and dppf variants). Modifiers re-rank for hard substrates (aryl chlorides, ortho-blocked, five-member heteroaryl) and lab symptoms (hydrodehalogenation, boronate dimer). Includes an 'hte_supply' section with screenable 6-pack and stock definitions for 1 µmol scale provisioning."
+    "notes": "Updated using reported HTE trends: top-performing condition families across many discovery plates favor dtbpf- or dialkylbiaryl-phosphine鈥揚d systems with aqueous K3PO4 or Cs2CO3 in dioxane/H2O (~4鈥?:1). Default prioritizes dtbpf/K3PO4; base_rules enumerate frequently winning alternatives (P(tBu)3鈥揚d G3, XPhos鈥揚d G3, CataCXium A鈥揚d G3, and dppf variants). Modifiers re-rank for hard substrates (aryl chlorides, ortho-blocked, five-member heteroaryl) and lab symptoms (hydrodehalogenation, boronate dimer). Includes an 'hte_supply' section with screenable 6-pack and stock definitions for 1 碌mol scale provisioning."
   },
   "applies_if": {
-    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Vinyl-B(OH)2 OR Vinyl-Bpin OR aryl_boron_reagent_present)"
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-F OR Alkenyl-I OR Alkenyl-OMs OR Alkenyl-OTf OR Alkenyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Alkenyl-B(OH)2 OR Alkenyl-Bpin OR aryl_boron_reagent_present)"
   },
   "default_rule": {
     "id": "DEF_sp2_general",
-    "description": "General starter for sp2–sp2 Suzuki; robust across many substrates.",
+    "description": "General starter for sp2鈥搒p2 Suzuki; robust across many substrates.",
     "conditions": {
       "pd_source": "PdCl2(dtbpf)",
       "ligand": "dtbpf",
@@ -47,18 +47,18 @@
       "base_equiv": "2.0",
       "solvent": "1,4-dioxane/H2O 4:1",
       "solvent_volume_mL_per_mmol": "2.0",
-      "temperature_C": "80–100",
-      "time_h": "1–6",
+      "temperature_C": "80鈥?00",
+      "time_h": "1鈥?",
       "atmosphere": "N2 or Ar"
     }
   },
   "base_rules": [
     {
-      "name": "P(tBu)3–Pd G3 / K3PO4 (hard substrates)",
+      "name": "P(tBu)3鈥揚d G3 / K3PO4 (hard substrates)",
       "id": "BR_PtBu3_G3_K3PO4",
       "description": "Excellent for hindered aryl chlorides and electron-poor boronates; fast at elevated T.",
       "reactant_features": {
-        "expr": "(Ar-Cl OR Vinyl-Cl) OR ortho_1 OR ortho_2plus OR ortho_hindered OR electron_poor_aryl OR electron_poor_boronate_present"
+        "expr": "(Ar-Cl OR Alkenyl-Cl) OR ortho_1 OR ortho_2plus OR ortho_hindered OR electron_poor_aryl OR electron_poor_boronate_present"
       },
       "conditions": {
         "precatalyst": "Pd-PEPPSI-type G3 with P(tBu)3 (representative)",
@@ -67,8 +67,8 @@
         "base": "K3PO4 (aq, 3.25 M)",
         "base_equiv": "2.0",
         "solvent": "1,4-dioxane/H2O 4:1",
-        "temperature_C": "90–110",
-        "time_h": "1–4"
+        "temperature_C": "90鈥?10",
+        "time_h": "1鈥?"
       }
     },
     {
@@ -76,7 +76,7 @@
       "id": "BR_dtbpf_K3PO4",
       "description": "General, scalable; good for broad aryl bromide/iodide and many aryl chloride cases.",
       "reactant_features": {
-        "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Vinyl-B(OH)2 OR Vinyl-Bpin OR aryl_boron_reagent_present)"
+        "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-F OR Alkenyl-I OR Alkenyl-OMs OR Alkenyl-OTf OR Alkenyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Alkenyl-B(OH)2 OR Alkenyl-Bpin OR aryl_boron_reagent_present)"
       },
       "conditions": {
         "pd_source": "PdCl2(dtbpf)",
@@ -85,26 +85,26 @@
         "base": "K3PO4 (aq, 3.25 M)",
         "base_equiv": "2.0",
         "solvent": "1,4-dioxane/H2O 4:1",
-        "temperature_C": "80–100",
-        "time_h": "1–6"
+        "temperature_C": "80鈥?00",
+        "time_h": "1鈥?"
       }
     },
     {
-      "name": "XPhos–Pd G3 / K3PO4",
+      "name": "XPhos鈥揚d G3 / K3PO4",
       "id": "BR_XPhos_G3_K3PO4",
       "description": "Dialkylbiaryl phosphine platform; reliable on aryl bromides and many chlorides.",
       "reactant_features": {
-        "expr": "(Ar-Br OR Vinyl-Br OR Ar-Cl OR Vinyl-Cl) OR heteroaryl_present"
+        "expr": "(Ar-Br OR Alkenyl-Br OR Ar-Cl OR Alkenyl-Cl) OR heteroaryl_present"
       },
       "conditions": {
-        "precatalyst": "XPhos–Pd G3",
+        "precatalyst": "XPhos鈥揚d G3",
         "ligand": "XPhos",
         "catalyst_loading_molpct": "1.0",
         "base": "K3PO4 (aq, 3.25 M)",
         "base_equiv": "2.0",
         "solvent": "1,4-dioxane/H2O 4:1",
-        "temperature_C": "90–110",
-        "time_h": "1–6"
+        "temperature_C": "90鈥?10",
+        "time_h": "1鈥?"
       }
     },
     {
@@ -112,7 +112,7 @@
       "id": "BR_dtbpf_Cs2CO3",
       "description": "Alternative base that often ranks highly; useful when K3PO4 underperforms.",
       "reactant_features": {
-        "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Vinyl-B(OH)2 OR Vinyl-Bpin OR aryl_boron_reagent_present)"
+        "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-F OR Alkenyl-I OR Alkenyl-OMs OR Alkenyl-OTf OR Alkenyl-OTs) AND (Ar-B(OH)2 OR Ar-Bpin OR Alkenyl-B(OH)2 OR Alkenyl-Bpin OR aryl_boron_reagent_present)"
       },
       "conditions": {
         "pd_source": "PdCl2(dtbpf)",
@@ -121,26 +121,26 @@
         "base": "Cs2CO3 (aq ~2.0 M)",
         "base_equiv": "2.0",
         "solvent": "1,4-dioxane/H2O 4:1",
-        "temperature_C": "80–105",
-        "time_h": "1–6"
+        "temperature_C": "80鈥?05",
+        "time_h": "1鈥?"
       }
     },
     {
-      "name": "CataCXium A–Pd G3 / Cs2CO3",
+      "name": "CataCXium A鈥揚d G3 / Cs2CO3",
       "id": "BR_CataCXiumA_G3_Cs2CO3",
       "description": "Frequently near the top; complementary to XPhos/P(tBu)3 choices.",
       "reactant_features": {
-        "expr": "(Ar-Br OR Vinyl-Br OR Ar-Cl OR Vinyl-Cl)"
+        "expr": "(Ar-Br OR Alkenyl-Br OR Ar-Cl OR Alkenyl-Cl)"
       },
       "conditions": {
-        "precatalyst": "CataCXium A–Pd G3",
+        "precatalyst": "CataCXium A鈥揚d G3",
         "ligand": "CataCXium A",
         "catalyst_loading_molpct": "1.0",
         "base": "Cs2CO3 (aq ~2.0 M)",
         "base_equiv": "2.0",
         "solvent": "1,4-dioxane/H2O 4:1",
-        "temperature_C": "90–110",
-        "time_h": "1–6"
+        "temperature_C": "90鈥?10",
+        "time_h": "1鈥?"
       }
     },
     {
@@ -157,8 +157,8 @@
         "base": "K2CO3 (aq ~2.0 M)",
         "base_equiv": "2.0",
         "solvent": "THF/H2O 4:1",
-        "temperature_C": "60–90",
-        "time_h": "2–12"
+        "temperature_C": "60鈥?0",
+        "time_h": "2鈥?2"
       }
     }
   ],
@@ -166,16 +166,16 @@
     {
       "id": "MOD_hard_substrate_rerank",
       "when": [
-        "(Ar-Cl OR Vinyl-Cl) OR ortho_1 OR ortho_2plus OR ortho_hindered"
+        "(Ar-Cl OR Alkenyl-Cl) OR ortho_1 OR ortho_2plus OR ortho_hindered"
       ],
-      "suggest": "Prefer P(tBu)3–Pd G3 or XPhos–Pd G3 at 100–110 °C; increase catalyst to 2.0 mol% if sluggish."
+      "suggest": "Prefer P(tBu)3鈥揚d G3 or XPhos鈥揚d G3 at 100鈥?10 掳C; increase catalyst to 2.0 mol% if sluggish."
     },
     {
       "id": "MOD_five_member_heteroaryl",
       "when": [
         "heteroaryl_present"
       ],
-      "suggest": "Keep dtbpf and XPhos in top slots; avoid overly polar co-solvents early; maintain H2O ~20–25% v/v."
+      "suggest": "Keep dtbpf and XPhos in top slots; avoid overly polar co-solvents early; maintain H2O ~20鈥?5% v/v."
     },
     {
       "id": "MOD_electron_poor_boronate",
@@ -189,7 +189,7 @@
       "when": [
         "symptom:hydrodehalogenation_observed"
       ],
-      "suggest": "Add TBAB 0.5–1.0 equiv and/or lower temperature by 10–15 °C."
+      "suggest": "Add TBAB 0.5鈥?.0 equiv and/or lower temperature by 10鈥?5 掳C."
     },
     {
       "id": "MOD_fg_sensitive_to_aq_base",
@@ -203,7 +203,7 @@
       "when": [
         "symptom:boronate_dimer_observed"
       ],
-      "suggest": "Improve exclusion of air; lower catalyst loading to 0.5–1.0 mol%; use freshly prepared boronate; consider neop-boronate surrogate."
+      "suggest": "Improve exclusion of air; lower catalyst loading to 0.5鈥?.0 mol%; use freshly prepared boronate; consider neop-boronate surrogate."
     }
   ]
 }

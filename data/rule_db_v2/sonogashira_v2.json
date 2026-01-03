@@ -32,7 +32,7 @@
       "scope_type": "broad",
       "compatible_functional_groups": [
         "aryl_halide",
-        "vinyl_halide",
+        "Alkenyl_halide",
         "terminal_alkyne",
         "ester",
         "ketone",
@@ -43,18 +43,18 @@
         "strong_acid",
         "unprotected_amine_with_copper"
       ],
-      "substrate_limitations": "Couples aryl/vinyl (pseudo)halides with terminal alkynes. Requires terminal C≡C-H. Oxygen promotes Glaser homocoupling - run under inert atmosphere with thorough degassing."
+      "substrate_limitations": "Couples aryl/Alkenyl (pseudo)halides with terminal alkynes. Requires terminal C鈮-H. Oxygen promotes Glaser homocoupling - run under inert atmosphere with thorough degassing."
     },
-    "notes": "Electrophile reactivity: Ar-I ≈ vinyl-OTf > Ar-Br > Ar-Cl. Aryl chlorides need stronger ligands (XPhos/SPhos, PtBu3, NHC) and higher temperatures. Copper-free variants available to reduce Glaser coupling."
+    "notes": "Electrophile reactivity: Ar-I 鈮?Alkenyl-OTf > Ar-Br > Ar-Cl. Aryl chlorides need stronger ligands (XPhos/SPhos, PtBu3, NHC) and higher temperatures. Copper-free variants available to reduce Glaser coupling."
   },
   "applies_if": {
-    "expr": "(Ar-CCH OR R-CCH) AND (Ar-Br OR Ar-Cl OR Ar-I OR Ar-OTf OR Vinyl-Br OR Vinyl-Cl OR Vinyl-I OR Vinyl-OTf)"
+    "expr": "(Ar-CCH OR R-CCH) AND (Ar-Br OR Ar-Cl OR Ar-I OR Ar-OTf OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-I OR Alkenyl-OTf)"
   },
   "default_rule": {
     "id": "DEF_sonogashira_general",
     "description": "General Sonogashira coupling with CuI cocatalyst and amine base. Thoroughly degassed conditions.",
     "conditions": {
-      "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2·DCM",
+      "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2路DCM",
       "catalyst_loading_molpct": "0.5-2.0",
       "ligand": "Built-in (PPh3 or dppf)",
       "base": "Et3N or DIPEA",
@@ -80,7 +80,7 @@
         ]
       },
       "conditions": {
-        "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2·DCM",
+        "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2路DCM",
         "catalyst_loading_molpct": "0.5-1.5",
         "base": "Et3N or DIPEA",
         "base_equiv": "2.0-3.0",
@@ -98,7 +98,7 @@
       "reactant_features": {
         "any": [
           "Ar-Cl",
-          "Vinyl-Cl",
+          "Alkenyl-Cl",
           "ortho_1",
           "electron_poor_aryl"
         ]
@@ -116,15 +116,15 @@
       }
     },
     {
-      "name": "Vinyl halides/triflates",
-      "id": "BR_vinyl_electrophiles",
+      "name": "Alkenyl halides/triflates",
+      "id": "BR_Alkenyl_electrophiles",
       "description": "Clean at lower temperatures. Monitor for isomerization under strongly basic or high-temperature conditions.",
       "reactant_features": {
         "any": [
-          "Vinyl-Br",
-          "Vinyl-Cl",
-          "Vinyl-I",
-          "Vinyl-OTf"
+          "Alkenyl-Br",
+          "Alkenyl-Cl",
+          "Alkenyl-I",
+          "Alkenyl-OTf"
         ]
       },
       "conditions": {
@@ -179,7 +179,7 @@
         "incomplete_conversion",
         "slow_reaction"
       ],
-      "suggest": "Increase catalyst loading to 2-5 mol%, raise temperature by 10-20°C, or extend reaction time. Check for catalyst poisoning.",
+      "suggest": "Increase catalyst loading to 2-5 mol%, raise temperature by 10-20掳C, or extend reaction time. Check for catalyst poisoning.",
       "priority": 7
     },
     {
@@ -206,7 +206,7 @@
         "decomposition",
         "side_product_formation"
       ],
-      "suggest": "Lower temperature to 40-60°C and extend reaction time. Consider using more active catalyst (Pd-PEPPSI or Pd-G3 precatalysts).",
+      "suggest": "Lower temperature to 40-60掳C and extend reaction time. Consider using more active catalyst (Pd-PEPPSI or Pd-G3 precatalysts).",
       "priority": 7
     }
   ]

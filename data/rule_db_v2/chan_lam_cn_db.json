@@ -15,7 +15,7 @@
     ]
   },
   "reaction": {
-    "family": "Chan-Lam_C–N",
+    "family": "Chan-Lam_C鈥揘",
     "reference_reactions": [
       "c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1",
       "c1ccc(OC)cc1B(O)O.Nc1ccccc1.[O]>>COc1ccc(Nc2ccccc2)cc1",
@@ -26,21 +26,21 @@
       "compatible_functional_groups": [],
       "incompatible_functional_groups": []
     },
-    "notes": "Chan-Lam coupling uses Cu(II) or Cu(I) with air/O2 as oxidant. Typical conditions: Cu(OAc)2 (10-20 mol%), pyridine or TEA (2 equiv), DCM or MeOH, RT to 50 °C. Open to air or O2 balloon."
+    "notes": "Chan-Lam coupling uses Cu(II) or Cu(I) with air/O2 as oxidant. Typical conditions: Cu(OAc)2 (10-20 mol%), pyridine or TEA (2 equiv), DCM or MeOH, RT to 50 掳C. Open to air or O2 balloon."
   },
   "applies_if": {
-    "expr": "(Ar-B(OH)2 OR Vinyl-B(OH)2) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR))"
+    "expr": "(Ar-B(OH)2 OR Alkenyl-B(OH)2) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Alkenyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR))"
   },
   "default_rule": {
     "id": "DEF_ChanLam_general",
     "description": "General starter for Chan-Lam C-N (Cu(OAc)2; pyridine; DCM; air).",
     "conditions": {
-      "cu_source": "Cu(OAc)2 (10–20 mol%)",
+      "cu_source": "Cu(OAc)2 (10鈥?0 mol%)",
       "base": "Pyridine or Et3N (2.0 equiv)",
       "solvent": "DCM or MeOH",
-      "temperature_C": "25–50",
+      "temperature_C": "25鈥?0",
       "atmosphere": "Air or O2 balloon",
-      "time_h": "12–48"
+      "time_h": "12鈥?8"
     }
   },
   "base_rules": [
@@ -52,7 +52,7 @@
         "expr": "(Any-NH2 OR Ar-NH2 OR Any-NHR OR Ar-NHR)"
       },
       "conditions": {
-        "cu_source": "Cu(OAc)2 (10–20 mol%)",
+        "cu_source": "Cu(OAc)2 (10鈥?0 mol%)",
         "base": "Pyridine (2.0 equiv)",
         "solvent": "DCM",
         "temperature_C": "25",
@@ -70,7 +70,7 @@
         "cu_source": "Cu(OAc)2 (20 mol%)",
         "base": "Pyridine or Et3N (2.0 equiv)",
         "solvent": "MeOH or DCM",
-        "temperature_C": "25–50",
+        "temperature_C": "25鈥?0",
         "atmosphere": "O2 balloon"
       }
     }

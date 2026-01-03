@@ -3,14 +3,14 @@
   "source_type": "rule",
   "metadata": {
     "id": "c_o_coupling_v2",
-    "name": "C–O Coupling (Aryl–O bond formation)",
+    "name": "C鈥揙 Coupling (Aryl鈥揙 bond formation)",
     "version": "v2.0",
     "created_date": "2025-11-08",
     "status": "active",
     "tags": []
   },
   "reaction": {
-    "family": "C–O_coupling",
+    "family": "C鈥揙_coupling",
     "reference_reactions": [
       "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1",
       "Clc1ccc(C(F)(F)F)cc1.OCCCC>>c1ccc(OCCCC)cc1",
@@ -23,26 +23,26 @@
       "compatible_functional_groups": [],
       "incompatible_functional_groups": []
     },
-    "notes": "Schema mirrors prior C_N coupling rule file to maintain compatibility. HTE-informed condition families for C–O coupling are incorporated, with Pd/biaryl phosphine systems and complementary Cu/ligand sets. Part of the HTE frequency ranking (RockPhos, BippyPhos, tBuXPhos; and CuI with diamines, phenanthroline, L-proline; Cu2O/salicylaldoxime) derives from Table 5 (top-hit counts) of the AbbVie HTE platform report covering 2017–2023 screens. fileciteturn0file0 Field names, token style, and sectioning follow the example C_N coupling JSON. fileciteturn0file1\n\nGeneral guidance: Start with Pd/biaryl phosphine + Cs2CO3 in toluene at 90–110 °C for phenols and less hindered alcohols; pivot to Cu/ligand sets (acetonitrile/DMF/DMSO; KOtBu/K3PO4/Cs2CO3) when Pd sets fail or for base‑tolerant aliphatic alcohols. Alkyl (esp. tertiary) alcohol O‑arylation remains challenging and may show low success; screen Cu sets early."
+    "notes": "Schema mirrors prior C_N coupling rule file to maintain compatibility. HTE-informed condition families for C鈥揙 coupling are incorporated, with Pd/biaryl phosphine systems and complementary Cu/ligand sets. Part of the HTE frequency ranking (RockPhos, BippyPhos, tBuXPhos; and CuI with diamines, phenanthroline, L-proline; Cu2O/salicylaldoxime) derives from Table 5 (top-hit counts) of the AbbVie HTE platform report covering 2017鈥?023 screens. 顖€filecite顖倀urn0file0顖?Field names, token style, and sectioning follow the example C_N coupling JSON. 顖€filecite顖倀urn0file1顖乗n\nGeneral guidance: Start with Pd/biaryl phosphine + Cs2CO3 in toluene at 90鈥?10 掳C for phenols and less hindered alcohols; pivot to Cu/ligand sets (acetonitrile/DMF/DMSO; KOtBu/K3PO4/Cs2CO3) when Pd sets fail or for base鈥憈olerant aliphatic alcohols. Alkyl (esp. tertiary) alcohol O鈥慳rylation remains challenging and may show low success; screen Cu sets early."
   },
   "applies_if": {
-    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND (Any-OH OR Ar-OH OR Bn-OH OR Allyl-OH OR Vinyl-OH)"
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-F OR Alkenyl-I OR Alkenyl-OMs OR Alkenyl-OTf OR Alkenyl-OTs) AND (Any-OH OR Ar-OH OR Bn-OH OR Allyl-OH OR Alkenyl-OH)"
   },
   "default_rule": {
     "id": "DEF_CO_general",
-    "description": "General starter for Ar–O coupling. Pd/biaryl phosphine + Cs2CO3 in toluene; seal and heat.",
+    "description": "General starter for Ar鈥揙 coupling. Pd/biaryl phosphine + Cs2CO3 in toluene; seal and heat.",
     "conditions": {
       "metal": "Pd",
       "pd_precatalyst": "Buchwald-type precatalyst (G-series/allyl/crotyl) with RockPhos/BippyPhos/tBuXPhos",
       "ligand": "RockPhos or BippyPhos or tBuXPhos",
-      "pd_loading_molpct": "6–10 (8 default)",
+      "pd_loading_molpct": "6鈥?0 (8 default)",
       "base": "Cs2CO3 (3.0 equiv)",
       "solvent": "toluene",
-      "solvent_volume_mL_per_mmol": "8–12",
-      "temperature_C": "90–110",
-      "time_h": "2–16",
+      "solvent_volume_mL_per_mmol": "8鈥?2",
+      "temperature_C": "90鈥?10",
+      "time_h": "2鈥?6",
       "atmosphere": "N2 or Ar",
-      "notes": "Dry glassware; strong agitation. If stalled by 6–8 h, add 2–4 mol% Pd."
+      "notes": "Dry glassware; strong agitation. If stalled by 6鈥? h, add 2鈥? mol% Pd."
     }
   },
   "base_rules": [
@@ -57,10 +57,10 @@
         "metal": "Pd",
         "pd_precatalyst": "G-series/allyl/crotyl Pd with RockPhos or BippyPhos",
         "ligand": "RockPhos or BippyPhos",
-        "base": "Cs2CO3 (2.5–3.0 equiv)",
+        "base": "Cs2CO3 (2.5鈥?.0 equiv)",
         "solvent": "toluene",
-        "temperature_C": "90–110",
-        "time_h": "2–10"
+        "temperature_C": "90鈥?10",
+        "time_h": "2鈥?0"
       }
     },
     {
@@ -68,7 +68,7 @@
       "id": "BR_aliphatic_alcohols",
       "description": "More challenging; Cu/ligand sets often outperform Pd. Pre-form alkoxide in situ where compatible.",
       "reactant_features": {
-        "expr": "Any-OH OR Bn-OH OR Allyl-OH OR Vinyl-OH"
+        "expr": "Any-OH OR Bn-OH OR Allyl-OH OR Alkenyl-OH"
       },
       "conditions": {
         "metal": "Cu",
@@ -76,9 +76,9 @@
         "ligand": "trans-1,2-cyclohexane-dimethanamine or 1,10-phenanthroline or L-proline or salicylaldoxime",
         "base": "KOtBu (strong) or K3PO4 or Cs2CO3",
         "solvent": "acetonitrile or DMF or DMSO",
-        "cu_loading_molpct": "10–30",
-        "temperature_C": "80–110",
-        "time_h": "4–18"
+        "cu_loading_molpct": "10鈥?0",
+        "temperature_C": "80鈥?10",
+        "time_h": "4鈥?8"
       }
     },
     {
@@ -94,16 +94,16 @@
         "ligand": "tBuXPhos or RockPhos",
         "base": "Cs2CO3 (3.0 equiv)",
         "solvent": "toluene",
-        "temperature_C": "100–115",
-        "time_h": "8–18"
+        "temperature_C": "100鈥?15",
+        "time_h": "8鈥?8"
       }
     },
     {
-      "name": "Aryl chlorides or five‑member heteroaryl halides",
+      "name": "Aryl chlorides or five鈥憁ember heteroaryl halides",
       "id": "BR_harder_halides",
       "description": "More demanding electrophiles; use more active Pd systems and higher temperature.",
       "reactant_features": {
-        "expr": "Ar-Cl OR Vinyl-Cl"
+        "expr": "Ar-Cl OR Alkenyl-Cl"
       },
       "conditions": {
         "metal": "Pd",
@@ -111,8 +111,8 @@
         "ligand": "tBuXPhos or RockPhos or JosiPhos",
         "base": "Cs2CO3 (3.0 equiv)",
         "solvent": "toluene",
-        "temperature_C": "100–115",
-        "time_h": "6–16"
+        "temperature_C": "100鈥?15",
+        "time_h": "6鈥?6"
       }
     },
     {
@@ -126,10 +126,10 @@
         "metal": "Pd",
         "pd_source": "Pd(OAc)2 or Pd2(dba)3",
         "ligand": "BippyPhos or CataCXium PIntB",
-        "base": "Cs2CO3 (2.5–3.0 equiv)",
+        "base": "Cs2CO3 (2.5鈥?.0 equiv)",
         "solvent": "toluene",
-        "temperature_C": "95–110",
-        "time_h": "4–16"
+        "temperature_C": "95鈥?10",
+        "time_h": "4鈥?6"
       }
     }
   ],
@@ -137,9 +137,9 @@
     {
       "id": "MOD_raise_temperature_if_safe",
       "when": [
-        "symptom:slow or no conversion by 6–8 h"
+        "symptom:slow or no conversion by 6鈥? h"
       ],
-      "suggest": "Raise to 110–120 °C (sealed vial, pressure-rated) if substrate stability allows."
+      "suggest": "Raise to 110鈥?20 掳C (sealed vial, pressure-rated) if substrate stability allows."
     },
     {
       "id": "MOD_switch_to_cu_if_pd_fails",
@@ -167,21 +167,21 @@
       "when": [
         "any"
       ],
-      "suggest": "Reactivity trend I ≈ Br ≫ Cl; prefer ArBr/I for C–O. For ArCl, use more active Pd ligand (tBuXPhos/RockPhos) and higher T."
+      "suggest": "Reactivity trend I 鈮?Br 鈮?Cl; prefer ArBr/I for C鈥揙. For ArCl, use more active Pd ligand (tBuXPhos/RockPhos) and higher T."
     },
     {
       "id": "MOD_water_exclusion",
       "when": [
         "any"
       ],
-      "suggest": "Keep water low for C–O; dry glassware; avoid wet carbonate slurries unless specifically validated."
+      "suggest": "Keep water low for C鈥揙; dry glassware; avoid wet carbonate slurries unless specifically validated."
     },
     {
       "id": "MOD_add_catalyst_if_stalled",
       "when": [
         "symptom:stalled"
       ],
-      "suggest": "Add 2–4 mol% additional Pd or 5–10 mol% Cu and continue heating."
+      "suggest": "Add 2鈥? mol% additional Pd or 5鈥?0 mol% Cu and continue heating."
     }
   ]
 }

@@ -27,30 +27,30 @@
       "compatible_functional_groups": [],
       "incompatible_functional_groups": []
     },
-    "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: prefer Oxyma (vs HOBt/HOAt) for safety and lower epimerization. Minimize pre‑activation time for α‑chiral acids. Avoid catalytic DMAP when α‑stereocenters are present. For difficult pairs, consider acyl fluoride or acid chloride routes with strict temperature control.\n"
+    "notes": "Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top鈫抎own). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain鈥憈ext heuristics).\nNotes: prefer Oxyma (vs HOBt/HOAt) for safety and lower epimerization. Minimize pre鈥慳ctivation time for 伪鈥慶hiral acids. Avoid catalytic DMAP when 伪鈥憇tereocenters are present. For difficult pairs, consider acyl fluoride or acid chloride routes with strict temperature control.\n"
   },
   "applies_if": {
-    "expr": "(Any-CO2H OR Ar-CO2H OR Vinyl-CO2H OR Any-COCl OR Ar-COCl) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
+    "expr": "(Any-CO2H OR Ar-CO2H OR Alkenyl-CO2H OR Any-COCl OR Ar-COCl) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Alkenyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
   },
   "default_rule": {
     "id": "DEF_amide_general",
     "description": "General amidation via EDCI + Oxyma under mild basic conditions (low epimerization).",
     "conditions": {
-      "coupling_system": "EDCI·HCl + Oxyma + base",
-      "stoichiometry_equiv": "Acid 1.00, Amine 1.2, EDCI 1.2–1.5, Oxyma 1.1–1.5, Base (DIPEA/NMM) 2–3",
+      "coupling_system": "EDCI路HCl + Oxyma + base",
+      "stoichiometry_equiv": "Acid 1.00, Amine 1.2, EDCI 1.2鈥?.5, Oxyma 1.1鈥?.5, Base (DIPEA/NMM) 2鈥?",
       "solvent": "DMF or MeCN (alt: DMF/DCM 1:1)",
-      "solvent_volume_vol_per_g": "≈8–12",
-      "temperature_C": "0–25 (start cold for α‑chiral acids)",
-      "time_h": "1–6 (monitor; quench promptly upon completion)",
-      "order_of_addition": "Acid + Oxyma + base (cold, 5–10 min) → add EDCI (brief pre‑activation) → add amine",
-      "notes": "Use Oxyma to suppress N‑acylurea/O→N acyl transfer. Avoid long pre‑activation."
+      "solvent_volume_vol_per_g": "鈮?鈥?2",
+      "temperature_C": "0鈥?5 (start cold for 伪鈥慶hiral acids)",
+      "time_h": "1鈥? (monitor; quench promptly upon completion)",
+      "order_of_addition": "Acid + Oxyma + base (cold, 5鈥?0 min) 鈫?add EDCI (brief pre鈥慳ctivation) 鈫?add amine",
+      "notes": "Use Oxyma to suppress N鈥慳cylurea/O鈫扤 acyl transfer. Avoid long pre鈥慳ctivation."
     }
   },
   "base_rules": [
     {
-      "name": "α‑Chiral acids (minimize epimerization)",
+      "name": "伪鈥慍hiral acids (minimize epimerization)",
       "id": "BR_alpha_chiral_low_epi",
-      "description": "Low‑epimerization systems and cold/short activation.",
+      "description": "Low鈥慹pimerization systems and cold/short activation.",
       "reactant_features": {
         "any": [
           "Any-CO2H"
@@ -58,11 +58,11 @@
       },
       "conditions": {
         "coupling_system": "EDCI + Oxyma (preferred); alt: T3P or DMTMM; alt2: TFFH (acyl fluoride)",
-        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, EDCI 1.2–1.5, Oxyma 1.1–1.5, Base 2.0–2.5",
+        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, EDCI 1.2鈥?.5, Oxyma 1.1鈥?.5, Base 2.0鈥?.5",
         "solvent": "MeCN or DMF (dry)",
-        "temperature_C": "0–10 (pre‑activation ≤10 min)",
-        "time_h": "1–4",
-        "notes": "Avoid DMAP. For very hindered cases but still chiral, consider acyl fluoride (TFFH) at 0–5 °C."
+        "temperature_C": "0鈥?0 (pre鈥慳ctivation 鈮?0 min)",
+        "time_h": "1鈥?",
+        "notes": "Avoid DMAP. For very hindered cases but still chiral, consider acyl fluoride (TFFH) at 0鈥? 掳C."
       }
     },
     {
@@ -83,11 +83,11 @@
       },
       "conditions": {
         "coupling_system": "HATU or COMU + DIPEA",
-        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, HATU/COMU 1.05–1.2, DIPEA 2–3",
+        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, HATU/COMU 1.05鈥?.2, DIPEA 2鈥?",
         "solvent": "DMF or NMP (alt: DMAc)",
-        "temperature_C": "0–25 (start cold; warm to 40–60 °C if needed)",
-        "time_h": "0.5–4",
-        "notes": "Short pre‑activation (≤5–10 min). If still slow, escalate to acyl chloride or acyl fluoride route (see BR_acyl_halide_like)."
+        "temperature_C": "0鈥?5 (start cold; warm to 40鈥?0 掳C if needed)",
+        "time_h": "0.5鈥?",
+        "notes": "Short pre鈥慳ctivation (鈮?鈥?0 min). If still slow, escalate to acyl chloride or acyl fluoride route (see BR_acyl_halide_like)."
       }
     },
     {
@@ -100,16 +100,16 @@
         ]
       },
       "conditions": {
-        "coupling_system": "HATU or COMU + DIPEA; optional catalytic DMAP 5–10 mol% if no α‑stereocenter",
+        "coupling_system": "HATU or COMU + DIPEA; optional catalytic DMAP 5鈥?0 mol% if no 伪鈥憇tereocenter",
         "stoichiometry_equiv": "Acid 1.00, Aniline 1.3, HATU/COMU 1.1, DIPEA 3.0",
         "solvent": "DMF or MeCN",
-        "temperature_C": "20–60",
-        "time_h": "1–6",
-        "notes": "If α‑chiral acid: omit DMAP and run ≤10 °C with brief activation."
+        "temperature_C": "20鈥?0",
+        "time_h": "1鈥?",
+        "notes": "If 伪鈥慶hiral acid: omit DMAP and run 鈮?0 掳C with brief activation."
       }
     },
     {
-      "name": "Acid‑ or base‑sensitive functionality",
+      "name": "Acid鈥?or base鈥憇ensitive functionality",
       "id": "BR_acid_or_base_sensitive",
       "description": "Neutral/mild profiles to protect sensitive motifs.",
       "reactant_features": {
@@ -121,15 +121,15 @@
       },
       "conditions": {
         "coupling_system": "CDI (acyl imidazole) then amine; alt: DMTMM (mild, often no added base)",
-        "stoichiometry_equiv": "CDI 1.1–1.5 eq (pre‑form acyl imidazole), then amine 1.2 eq; optional base 1–2 eq",
+        "stoichiometry_equiv": "CDI 1.1鈥?.5 eq (pre鈥慺orm acyl imidazole), then amine 1.2 eq; optional base 1鈥? eq",
         "solvent": "THF or DMF (for CDI); MeOH/MeCN/H2O mixes for DMTMM",
-        "temperature_C": "0–25",
-        "time_h": "1–6",
-        "notes": "CO₂ evolution with CDI; neutral to mildly basic conditions. Good chemoselectivity with DMTMM."
+        "temperature_C": "0鈥?5",
+        "time_h": "1鈥?",
+        "notes": "CO鈧?evolution with CDI; neutral to mildly basic conditions. Good chemoselectivity with DMTMM."
       }
     },
     {
-      "name": "Aqueous / bioconjugation‑leaning or late‑stage",
+      "name": "Aqueous / bioconjugation鈥憀eaning or late鈥憇tage",
       "id": "BR_aqueous_or_bioconj",
       "description": "Buffered or wet media; amide over ester selectivity.",
       "reactant_features": {
@@ -140,16 +140,16 @@
         ]
       },
       "conditions": {
-        "coupling_system": "EDCI + Oxyma or NHS in buffered aqueous‑organic (pH 5–6); alt: DMTMM in MeOH/H₂O",
-        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, EDCI 1.2–1.5, Oxyma/NHS 1.1–1.5, Buffer to pH 5–6",
-        "solvent": "H₂O/MeCN or H₂O/DMF; for DMTMM: MeOH/H₂O",
-        "temperature_C": "0–25",
-        "time_h": "0.5–4",
+        "coupling_system": "EDCI + Oxyma or NHS in buffered aqueous鈥憃rganic (pH 5鈥?); alt: DMTMM in MeOH/H鈧侽",
+        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, EDCI 1.2鈥?.5, Oxyma/NHS 1.1鈥?.5, Buffer to pH 5鈥?",
+        "solvent": "H鈧侽/MeCN or H鈧侽/DMF; for DMTMM: MeOH/H鈧侽",
+        "temperature_C": "0鈥?5",
+        "time_h": "0.5鈥?",
         "notes": "pH control critical. Adjust buffer to bias amide formation."
       }
     },
     {
-      "name": "Green / scale‑up friendly workups",
+      "name": "Green / scale鈥憉p friendly workups",
       "id": "BR_green_scale",
       "description": "Greener solvents and easy separations.",
       "reactant_features": {
@@ -159,12 +159,12 @@
         ]
       },
       "conditions": {
-        "coupling_system": "T3P (50% in EtOAc) ± base; alt: DIC + Oxyma (filter DCU)",
-        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, T3P (50%) 1.5–2.0; optional base 0–2 eq",
-        "solvent": "EtOAc or 2‑MeTHF (alt: MeCN/DMF)",
-        "temperature_C": "rt–60",
-        "time_h": "1–6",
-        "notes": "T3P gives water‑soluble phosphate residues; DCU from DIC can be filtered."
+        "coupling_system": "T3P (50% in EtOAc) 卤 base; alt: DIC + Oxyma (filter DCU)",
+        "stoichiometry_equiv": "Acid 1.00, Amine 1.2, T3P (50%) 1.5鈥?.0; optional base 0鈥? eq",
+        "solvent": "EtOAc or 2鈥慚eTHF (alt: MeCN/DMF)",
+        "temperature_C": "rt鈥?0",
+        "time_h": "1鈥?",
+        "notes": "T3P gives water鈥憇oluble phosphate residues; DCU from DIC can be filtered."
       }
     },
     {
@@ -178,18 +178,18 @@
         ]
       },
       "conditions": {
-        "coupling_system": "Acid chloride (SOCl2/oxalyl chloride, cat. DMF) or acyl fluoride (TFFH) → amine + base",
-        "stoichiometry_equiv": "Acid 1.00 → acyl halide; then Amine 1.2, base (Et3N or 2,6‑lutidine) 2–3",
+        "coupling_system": "Acid chloride (SOCl2/oxalyl chloride, cat. DMF) or acyl fluoride (TFFH) 鈫?amine + base",
+        "stoichiometry_equiv": "Acid 1.00 鈫?acyl halide; then Amine 1.2, base (Et3N or 2,6鈥憀utidine) 2鈥?",
         "solvent": "DCM or toluene for halide formation; then DCM/THF",
-        "temperature_C": "−20–0 for addition (then 0–25)",
-        "time_h": "0.5–3",
-        "notes": "Highest racemization risk—avoid for α‑chiral acids unless essential; prefer acyl fluoride over chloride when possible."
+        "temperature_C": "鈭?0鈥? for addition (then 0鈥?5)",
+        "time_h": "0.5鈥?",
+        "notes": "Highest racemization risk鈥攁void for 伪鈥慶hiral acids unless essential; prefer acyl fluoride over chloride when possible."
       }
     },
     {
-      "name": "Peptide‑like, low‑temperature mixed anhydride",
+      "name": "Peptide鈥憀ike, low鈥憈emperature mixed anhydride",
       "id": "BR_mixed_anhydride_lowT",
-      "description": "Clean conversions at sub‑zero temps.",
+      "description": "Clean conversions at sub鈥憐ero temps.",
       "reactant_features": {
         "any": [
           "peptide_like",
@@ -197,11 +197,11 @@
         ]
       },
       "conditions": {
-        "coupling_system": "Mixed anhydride via IBCF + DIPEA (−20→0 °C) → add amine",
-        "stoichiometry_equiv": "Acid 1.00, IBCF 1.05–1.2, DIPEA 2–3; then Amine 1.2",
+        "coupling_system": "Mixed anhydride via IBCF + DIPEA (鈭?0鈫? 掳C) 鈫?add amine",
+        "stoichiometry_equiv": "Acid 1.00, IBCF 1.05鈥?.2, DIPEA 2鈥?; then Amine 1.2",
         "solvent": "THF",
-        "temperature_C": "−20→0 (then 0–10 during amine addition)",
-        "time_h": "0.5–3",
+        "temperature_C": "鈭?0鈫? (then 0鈥?0 during amine addition)",
+        "time_h": "0.5鈥?",
         "notes": "Lower epimerization than acid chlorides; maintain low temp."
       }
     }
@@ -212,7 +212,7 @@
       "when": [
         "any"
       ],
-      "suggest": "Use Oxyma (vs HOBt/HOAt) for safety and to suppress O→N acyl transfer and N‑acylurea formation."
+      "suggest": "Use Oxyma (vs HOBt/HOAt) for safety and to suppress O鈫扤 acyl transfer and N鈥慳cylurea formation."
     },
     {
       "id": "MOD_avoid_dmap_with_chiral",
@@ -227,7 +227,7 @@
         "racemization_risk_high",
         "alpha_chiral_acid_present"
       ],
-      "suggest": "Limit pre‑activation to ≤5–10 min at 0–10 °C; add amine promptly."
+      "suggest": "Limit pre鈥慳ctivation to 鈮?鈥?0 min at 0鈥?0 掳C; add amine promptly."
     },
     {
       "id": "MOD_solvent_polarity_match",
@@ -242,7 +242,7 @@
         "symptom:sluggish_with_uronium",
         "steric_very_high"
       ],
-      "suggest": "Consider acyl fluoride (TFFH) at 0–5 °C for hindered substrates with better control vs acid chlorides."
+      "suggest": "Consider acyl fluoride (TFFH) at 0鈥? 掳C for hindered substrates with better control vs acid chlorides."
     },
     {
       "id": "MOD_anilide_catalysis",
@@ -250,7 +250,7 @@
         "aniline_present",
         "no_alpha_chiral_center"
       ],
-      "suggest": "Add 5–10 mol% DMAP to accelerate anilide formation; omit if α‑stereocenter exists."
+      "suggest": "Add 5鈥?0 mol% DMAP to accelerate anilide formation; omit if 伪鈥憇tereocenter exists."
     },
     {
       "id": "MOD_carbodiimide_workup",
@@ -271,14 +271,14 @@
       "when": [
         "alpha_chiral_acid_present"
       ],
-      "suggest": "Verify ee after coupling (e.g., chiral HPLC or Mosher amide analysis) on a small‑scale scout run."
+      "suggest": "Verify ee after coupling (e.g., chiral HPLC or Mosher amide analysis) on a small鈥憇cale scout run."
     },
     {
       "id": "MOD_temperature_escalation",
       "when": [
         "symptom:slow_conversion_after_2h"
       ],
-      "suggest": "Increase temperature stepwise (e.g., +10–20 °C) or switch to a stronger activation system."
+      "suggest": "Increase temperature stepwise (e.g., +10鈥?0 掳C) or switch to a stronger activation system."
     },
     {
       "id": "MOD_water_content_control",
@@ -292,7 +292,7 @@
       "when": [
         "green_priority"
       ],
-      "suggest": "Prefer 2‑MeTHF or EtOAc when compatible; avoid chlorinated solvents unless necessary for acyl halide formation."
+      "suggest": "Prefer 2鈥慚eTHF or EtOAc when compatible; avoid chlorinated solvents unless necessary for acyl halide formation."
     }
   ]
 }

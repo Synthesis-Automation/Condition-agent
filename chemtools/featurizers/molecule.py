@@ -101,11 +101,25 @@ def featurize_molecule(
         if filtered_motifs:
             motifs = filtered_motifs
 
-    # Filter Ar-H motifs if other motifs exist, unless explicitly requested
-    if not options.get("include_ar_h", False) and not target_groups:
-        non_h_motifs = [m for m in motifs if m.get("compound_id") != "Ar-H"]
-        if non_h_motifs:
-            motifs = non_h_motifs
+    # Identify background motifs (H-motifs)
+    background_ids = {"Ar-H", "R-H", "Any-H", "Alkenyl-H", "Alkynyl-H"}
+    
+    # Determine which motifs were explicitly requested via target_groups
+    requested_ids = set()
+    if target_groups:
+        for m in motifs:
+            cid = m.get("compound_id", "")
+            for tg in target_groups:
+                if cid == tg or cid.endswith("-" + tg) or (tg.startswith("-") and cid.endswith(tg)):
+                    requested_ids.add(cid)
+                    break
+
+    # Filter background motifs if other motifs exist, unless explicitly requested or include_h_motifs is True
+    if not options.get("include_h_motifs", False):
+        non_bg_motifs = [m for m in motifs if m.get("compound_id") not in background_ids]
+        if non_bg_motifs:
+            # Keep non-background motifs + any background motifs that were explicitly requested
+            motifs = [m for m in motifs if m.get("compound_id") not in background_ids or m.get("compound_id") in requested_ids]
 
     analyses = []
     for hit in motifs:

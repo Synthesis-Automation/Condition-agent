@@ -11,7 +11,7 @@
         "nucleophile": "@organoboron"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"]
@@ -81,7 +81,7 @@
         "nucleophile": "@terminal_alkenes"
       },
       "products": {
-        "product": ["Ar-CHCH2", "Vinyl-Vinyl"]
+        "product": ["Ar-CHCH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1"]
@@ -95,7 +95,7 @@
         "nucleophile": "@organozinc"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd", "Ni"],
       "examples": ["Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -109,7 +109,7 @@
         "nucleophile": "@organotin"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.c1ccc(Sn(C)C)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -123,7 +123,7 @@
         "nucleophile": "@organomagnesium"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Ni", "Pd"],
       "examples": ["Brc1ccccc1.c1ccc(MgBr)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -137,7 +137,7 @@
         "nucleophile": "@organosilicon"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.c1ccc(Si(OC)3)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -151,6 +151,9 @@
         "activator": "@aromatic_activators",
         "nucleophile": "@amines_nh"
       },
+      "products": {
+        "product": "@aryl_amines"
+      },
       "examples": ["Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1"]
     },
     {
@@ -160,6 +163,9 @@
       "reactants": {
         "acid": "@carboxylic_acids",
         "nucleophile": "@amines_nh"
+      },
+      "products": {
+        "product": "@amides"
       },
       "examples": ["O=C(O)c1ccccc1.NCc1ccccc1>>O=C(NCc1ccccc1)c1ccccc1"]
     },
@@ -171,6 +177,9 @@
         "acid": "@carboxylic_acids",
         "nucleophile": "@alcohols_oh"
       },
+      "products": {
+        "product": "@esters"
+      },
       "examples": ["CC(=O)O.CCO>>CC(=O)OCC"]
     },
     {
@@ -181,6 +190,9 @@
         "electrophile": "@acyl_halides",
         "nucleophile": "@amines_nh"
       },
+      "products": {
+        "product": "@amides"
+      },
       "examples": ["CC(=O)Cl.Nc1ccccc1>>CC(=O)Nc1ccccc1"]
     },
     {
@@ -190,6 +202,9 @@
       "reactants": {
         "electrophile": "@carbonyls",
         "nucleophile": "@amines_nh"
+      },
+      "products": {
+        "product": ["Any-NHR", "Any-NR2", "Ar-NHR", "Ar-NR2"]
       },
       "examples": ["c1ccccc1C=O.NCC>>c1ccccc1CNCC"]
     },
@@ -234,6 +249,9 @@
       "reactants": {
         "electrophile": "@acyl_halides",
         "nucleophile": "@alcohols_oh"
+      },
+      "products": {
+        "product": "@esters"
       },
       "examples": ["CC(=O)Cl.CCO>>CC(=O)OCC"]
     },

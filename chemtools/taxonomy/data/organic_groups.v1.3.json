@@ -54,15 +54,15 @@
       ]
     },
     {
-      "id": "Vinyl",
-      "name": "Vinyl-",
+      "id": "Alkenyl",
+      "name": "Alkenyl-",
       "kind": "scaffold",
       "priority": 2,
       "smarts": "[C;X3]=[C;X3:1]",
-      "description": "Vinylic (alkenyl) attachment at an sp2 carbon.",
+      "description": "Alkenyl (vinylic) attachment at an sp2 carbon.",
       "tags": [
         "scaffold",
-        "vinyl",
+        "alkenyl",
         "sp2"
       ]
     },
@@ -269,7 +269,7 @@
       "name": "-CHO",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[CX3H1:2](=O)",
+      "smarts": "[C:2]([H])=O",
       "description": "Aldehyde core; attach via formyl carbon (-CHO).",
       "tags": [
         "aldehyde",
@@ -350,7 +350,7 @@
       "name": "-B(OH)2",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[B:2](O)O",
+      "smarts": "[B:2](O[H])O[H]",
       "description": "Boronic acid core; attach via boron (-B(OH)2).",
       "tags": [
         "boron_handle",
@@ -455,7 +455,7 @@
       "id": "NH2",
       "name": "-NH2",
       "kind": "substituent",
-      "smarts": "[NX3;H2:2]",
+      "smarts": "[N:2]([H])[H]",
       "description": "Primary amine N substituent (-NH2).",
       "tags": [
         "amine",
@@ -467,7 +467,7 @@
       "id": "NHR",
       "name": "-NHR",
       "kind": "substituent",
-      "smarts": "[NX3;H1:2]",
+      "smarts": "[N:2][H]",
       "description": "Secondary amine N substituent with one N-H (-NHR).",
       "tags": [
         "amine",
@@ -502,7 +502,7 @@
       "id": "OH",
       "name": "-OH",
       "kind": "substituent",
-      "smarts": "[OX2H:2]",
+      "smarts": "[O:2][H]",
       "description": "Hydroxy substituent (-OH).",
       "tags": [
         "alcohol",
@@ -534,7 +534,7 @@
       "name": "-SH",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[SX2H:2]",
+      "smarts": "[S:2][H]",
       "description": "Thiol substituent (-SH).",
       "tags": [
         "thiol",
@@ -547,7 +547,7 @@
       "name": "-CO2H",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[CX3:2](=O)[OX2H]",
+      "smarts": "[C:2](=O)O[H]",
       "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon.",
       "tags": [
         "carboxylic_acid",
@@ -881,7 +881,7 @@
       "kind": "substituent",
       "priority": 4,
       "smarts": "[S:2](=O)(=O)C(F)(F)F",
-      "description": "Triflate substituent for Ar-OTf/Vinyl-OTf via oxygen linker.",
+      "description": "Triflate substituent for Ar-OTf/Alkenyl-OTf via oxygen linker.",
       "tags": [
         "sulfonate_leaving_group",
         "leaving_group"
@@ -927,8 +927,8 @@
       "id": "CCH",
       "name": "-C#CH",
       "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX2:2]#[CX2H]",
+      "priority": 2,
+      "smarts": "[C:2]#[C][H]",
       "description": "Terminal alkyne substituent (-C#CH), attach via substituted sp carbon.",
       "tags": [
         "alkyne",
@@ -939,8 +939,8 @@
       "id": "CHCH2",
       "name": "-CH=CH2",
       "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX3H1:2]=[CX3H2]",
+      "priority": 3,
+      "smarts": "[C:2]([H])=[C]([H])[H]",
       "description": "Terminal alkene substituent (-CH=CH2), attach via substituted sp2 carbon (monosubstituted alkene).",
       "tags": [
         "alkene",

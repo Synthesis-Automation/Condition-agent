@@ -26,24 +26,24 @@
       "compatible_functional_groups": [],
       "incompatible_functional_groups": []
     },
-    "notes": "Use this rule set ONLY if 'applies_if' tokens are present.\nEvaluate base_rules top→down; if none match, use default_rule.\nAfter choosing a rule, scan all modifiers and apply any whose 'when' tokens or symptoms match.\nGeneral guidance: form the imine/iminium efficiently (remove water or use a Lewis acid), keep pH ~5–6 for borohydrides, and avoid H2 routes when benzyl/CBz/nitro must survive.\n"
+    "notes": "Use this rule set ONLY if 'applies_if' tokens are present.\nEvaluate base_rules top鈫抎own; if none match, use default_rule.\nAfter choosing a rule, scan all modifiers and apply any whose 'when' tokens or symptoms match.\nGeneral guidance: form the imine/iminium efficiently (remove water or use a Lewis acid), keep pH ~5鈥? for borohydrides, and avoid H2 routes when benzyl/CBz/nitro must survive.\n"
   },
   "applies_if": {
-    "expr": "(Any-CHO OR Ar-CHO OR Vinyl-CHO OR Any-CO-R) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
+    "expr": "(Any-CHO OR Ar-CHO OR Alkenyl-CHO OR Any-CO-R) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Alkenyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
   },
   "default_rule": {
     "id": "DEF_RA_STAB_general",
     "description": "General starter: NaBH(OAc)3 (STAB) + AcOH in DCE/MeCN; good for aldehydes and many ketones.",
     "conditions": {
-      "reducing_agent": "NaBH(OAc)3 (STAB) 1.5–2.5 equiv",
-      "acid_or_buffer": "AcOH 0.5–2.0 equiv (target pH 5–6)",
+      "reducing_agent": "NaBH(OAc)3 (STAB) 1.5鈥?.5 equiv",
+      "acid_or_buffer": "AcOH 0.5鈥?.0 equiv (target pH 5鈥?)",
       "additives": [
-        "3 Å MS optional; dry glassware"
+        "3 脜 MS optional; dry glassware"
       ],
       "solvent": "DCE or MeCN (dry)",
-      "solvent_volume_vol_per_g": "≈8–12",
-      "temperature_C": "0–25",
-      "time_h": "2–16",
+      "solvent_volume_vol_per_g": "鈮?鈥?2",
+      "temperature_C": "0鈥?5",
+      "time_h": "2鈥?6",
       "atmosphere": "N2/Ar",
       "notes": "Charge carbonyl + amine first, adjust with AcOH, then add STAB portionwise."
     }
@@ -57,18 +57,18 @@
         "any": [
           "Any-CHO",
           "Ar-CHO",
-          "Vinyl-CHO",
+          "Alkenyl-CHO",
           "Any-CO-R"
         ]
       },
       "conditions": {
-        "reducing_agent": "NaBH(OAc)3 1.5–2.5 equiv",
-        "acid_or_buffer": "AcOH 0.5–2.0 equiv (pH ~5–6)",
+        "reducing_agent": "NaBH(OAc)3 1.5鈥?.5 equiv",
+        "acid_or_buffer": "AcOH 0.5鈥?.0 equiv (pH ~5鈥?)",
         "solvent": "DCE or MeCN",
-        "temperature_C": "rt (0–25)",
-        "time_h": "2–16",
-        "water_control": "3–4 Å sieves recommended for ketones",
-        "solvent_volume_vol_per_g": "≈8–12"
+        "temperature_C": "rt (0鈥?5)",
+        "time_h": "2鈥?6",
+        "water_control": "3鈥? 脜 sieves recommended for ketones",
+        "solvent_volume_vol_per_g": "鈮?鈥?2"
       }
     },
     {
@@ -82,17 +82,17 @@
         "any": [
           "Any-CHO",
           "Ar-CHO",
-          "Vinyl-CHO",
+          "Alkenyl-CHO",
           "ketone_present"
         ]
       },
       "conditions": {
-        "reducing_agent": "NaBH3CN 1.5–2.0 equiv",
-        "acid_or_buffer": "NH4OAc 2–4 equiv (or NH3), maintain pH 5–6",
+        "reducing_agent": "NaBH3CN 1.5鈥?.0 equiv",
+        "acid_or_buffer": "NH4OAc 2鈥? equiv (or NH3), maintain pH 5鈥?",
         "solvent": "MeOH or MeOH/THF (1:1)",
-        "temperature_C": "0–25",
-        "time_h": "2–16",
-        "solvent_volume_vol_per_g": "≈8–12",
+        "temperature_C": "0鈥?5",
+        "time_h": "2鈥?6",
+        "solvent_volume_vol_per_g": "鈮?鈥?2",
         "notes": "Avoid strong acid; add base carefully at quench."
       }
     },
@@ -109,22 +109,22 @@
         ]
       },
       "conditions": {
-        "lewis_acid": "Ti(OiPr)4 1.2–2.0 equiv",
-        "reducing_agent": "NaBH(OAc)3 2.0–2.5 equiv",
+        "lewis_acid": "Ti(OiPr)4 1.2鈥?.0 equiv",
+        "reducing_agent": "NaBH(OAc)3 2.0鈥?.5 equiv",
         "additives": [
-          "4 Å MS optional"
+          "4 脜 MS optional"
         ],
         "solvent": "THF or DCE (dry)",
-        "temperature_C": "40–60",
-        "time_h": "4–16",
-        "solvent_volume_vol_per_g": "≈8–12",
-        "notes": "Mix carbonyl + amine + Ti(OiPr)4 (30–60 min) before adding STAB."
+        "temperature_C": "40鈥?0",
+        "time_h": "4鈥?6",
+        "solvent_volume_vol_per_g": "鈮?鈥?2",
+        "notes": "Mix carbonyl + amine + Ti(OiPr)4 (30鈥?0 min) before adding STAB."
       }
     },
     {
       "name": "Alternative for hindered systems (borohydride + Lewis acid)",
       "id": "BR_NaBH4_TiOiPr4_alt",
-      "description": "NaBH4 with Ti(OiPr)4; effective but less chemoselective—control addition and temperature.",
+      "description": "NaBH4 with Ti(OiPr)4; effective but less chemoselective鈥攃ontrol addition and temperature.",
       "reactant_features": {
         "any": [
           "steric_hindrance_high",
@@ -133,18 +133,18 @@
         ]
       },
       "conditions": {
-        "lewis_acid": "Ti(OiPr)4 1.2–2.0 equiv",
-        "reducing_agent": "NaBH4 1.5–2.5 equiv (portionwise at 0 °C)",
+        "lewis_acid": "Ti(OiPr)4 1.2鈥?.0 equiv",
+        "reducing_agent": "NaBH4 1.5鈥?.5 equiv (portionwise at 0 掳C)",
         "solvent": "THF or i-PrOH (dry)",
-        "temperature_C": "0 → rt",
-        "time_h": "2–6",
-        "solvent_volume_vol_per_g": "≈8–12"
+        "temperature_C": "0 鈫?rt",
+        "time_h": "2鈥?",
+        "solvent_volume_vol_per_g": "鈮?鈥?2"
       }
     },
     {
       "name": "Very hindered tertiary amines",
       "id": "BR_BH3_tertiary",
-      "description": "BH3·THF (or BH3·SMe2) excels for secondary amine + hindered ketone → tertiary amine.",
+      "description": "BH3路THF (or BH3路SMe2) excels for secondary amine + hindered ketone 鈫?tertiary amine.",
       "reactant_features": {
         "all": [
           "tertiary_amine_target"
@@ -155,12 +155,12 @@
         ]
       },
       "conditions": {
-        "reducing_agent": "BH3·THF 2.0–3.0 equiv (1.0 M solution)",
+        "reducing_agent": "BH3路THF 2.0鈥?.0 equiv (1.0 M solution)",
         "solvent": "THF (dry)",
-        "temperature_C": "0 → 40–60",
-        "time_h": "2–6",
-        "solvent_volume_vol_per_g": "≈8–12",
-        "notes": "Quench cautiously with MeOH at 0 °C; BH3 reduces many FGs."
+        "temperature_C": "0 鈫?40鈥?0",
+        "time_h": "2鈥?",
+        "solvent_volume_vol_per_g": "鈮?鈥?2",
+        "notes": "Quench cautiously with MeOH at 0 掳C; BH3 reduces many FGs."
       }
     },
     {
@@ -180,13 +180,13 @@
         ]
       },
       "conditions": {
-        "metal_catalyst": "10% Pd/C 5–10 wt% vs substrate",
+        "metal_catalyst": "10% Pd/C 5鈥?0 wt% vs substrate",
         "hydrogen_source": "H2",
-        "pressure_bar": "1–3 (balloon to 3 bar)",
+        "pressure_bar": "1鈥? (balloon to 3 bar)",
         "solvent": "EtOH or EtOH/AcOH (9:1)",
-        "temperature_C": "rt–40",
-        "time_h": "2–16",
-        "solvent_volume_vol_per_g": "≈10–15"
+        "temperature_C": "rt鈥?0",
+        "time_h": "2鈥?6",
+        "solvent_volume_vol_per_g": "鈮?0鈥?5"
       }
     },
     {
@@ -202,13 +202,13 @@
         ]
       },
       "conditions": {
-        "metal_catalyst": "Raney-Ni (50% slurry) 20–30 wt% vs substrate",
+        "metal_catalyst": "Raney-Ni (50% slurry) 20鈥?0 wt% vs substrate",
         "hydrogen_source": "H2",
-        "pressure_bar": "5–30",
+        "pressure_bar": "5鈥?0",
         "solvent": "EtOH or i-PrOH",
-        "temperature_C": "40–80",
-        "time_h": "2–8",
-        "solvent_volume_vol_per_g": "≈10–15",
+        "temperature_C": "40鈥?0",
+        "time_h": "2鈥?",
+        "solvent_volume_vol_per_g": "鈮?0鈥?5",
         "notes": "Filter wet (pyrophoric when dry)."
       }
     },
@@ -223,12 +223,12 @@
         ]
       },
       "conditions": {
-        "hydrogen_source": "HCO2H/Et3N (ca. 5:2) 5–8 equiv HCO2H, 2–3 equiv Et3N",
-        "metal_catalyst": "10% Pd/C 5–10 wt% vs substrate",
+        "hydrogen_source": "HCO2H/Et3N (ca. 5:2) 5鈥? equiv HCO2H, 2鈥? equiv Et3N",
+        "metal_catalyst": "10% Pd/C 5鈥?0 wt% vs substrate",
         "solvent": "MeCN or EtOH",
-        "temperature_C": "50–80",
-        "time_h": "2–8",
-        "solvent_volume_vol_per_g": "≈8–12",
+        "temperature_C": "50鈥?0",
+        "time_h": "2鈥?",
+        "solvent_volume_vol_per_g": "鈮?鈥?2",
         "notes": "Minor N-formyl intermediates may appear and collapse under the conditions."
       }
     }
@@ -242,7 +242,7 @@
         "steric_hindrance_high",
         "symptom:slow imine formation"
       ],
-      "suggest": "Pre-mix carbonyl + amine with 3–4 Å MS or Ti(OiPr)4 (1.2–2.0 equiv) 30–60 min before adding reductant; warm to 40–60 °C if needed."
+      "suggest": "Pre-mix carbonyl + amine with 3鈥? 脜 MS or Ti(OiPr)4 (1.2鈥?.0 equiv) 30鈥?0 min before adding reductant; warm to 40鈥?0 掳C if needed."
     },
     {
       "id": "MOD_pH_window_borohydrides",
@@ -250,7 +250,7 @@
         "reducing_agent:NaBH3CN",
         "reducing_agent:NaBH(OAc)3"
       ],
-      "suggest": "Maintain pH ≈5–6. Too acidic → cyanide risk (NaBH3CN) / over-acetylation; too basic → slow imine formation."
+      "suggest": "Maintain pH 鈮?鈥?. Too acidic 鈫?cyanide risk (NaBH3CN) / over-acetylation; too basic 鈫?slow imine formation."
     },
     {
       "id": "MOD_avoid_H2_if_benzyl_or_nitro",
@@ -264,7 +264,7 @@
       "when": [
         "target_primary_amine"
       ],
-      "suggest": "Use NH4OAc/NH3 with NaBH3CN (or STAB at lower AcOH) and keep pH 5–6."
+      "suggest": "Use NH4OAc/NH3 with NaBH3CN (or STAB at lower AcOH) and keep pH 5鈥?."
     },
     {
       "id": "MOD_formyl_carryover_fix",
@@ -293,7 +293,7 @@
       "when": [
         "reducing_agent:BH3"
       ],
-      "suggest": "BH3 is reactive/pyrophoric; cool, add slowly, and quench with MeOH at 0 °C before aqueous workup."
+      "suggest": "BH3 is reactive/pyrophoric; cool, add slowly, and quench with MeOH at 0 掳C before aqueous workup."
     },
     {
       "id": "MOD_polarity_match_solvent",

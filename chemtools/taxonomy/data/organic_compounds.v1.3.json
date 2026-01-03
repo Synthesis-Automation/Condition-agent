@@ -39,12 +39,20 @@
       "aliases": ["Alkyl-H", "alkyl C-H"]
     },
     {
-      "id": "Vinyl-H",
-      "name": "Vinyl-H",
+      "id": "Alkenyl-H",
+      "name": "Alkenyl-H",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "H",
       "description": "Vinylic C-H bond."
+    },
+    {
+      "id": "Alkynyl-H",
+      "name": "Alkynyl-H",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "H",
+      "description": "Acetylenic C-H bond."
     },
     {
       "id": "Csp2-X",
@@ -161,21 +169,21 @@
       "aliases": ["biaryl", "Ar-Ar"]
     },
     {
-      "id": "Ar-Vinyl",
-      "name": "Vinyl-Arene",
+      "id": "Ar-Alkenyl",
+      "name": "Alkenyl-Arene",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Vinyl",
-      "description": "Aryl-Vinyl bond (e.g., styrene).",
+      "B": "Alkenyl",
+      "description": "Aryl-Alkenyl bond (e.g., styrene).",
       "aliases": ["styrene", "vinyl-arene"]
     },
     {
-      "id": "Vinyl-Vinyl",
+      "id": "Alkenyl-Alkenyl",
       "name": "1,3-Diene",
       "template": "single_bond",
-      "A": "Vinyl",
-      "B": "Vinyl",
-      "description": "Vinyl-Vinyl bond (1,3-diene).",
+      "A": "Alkenyl",
+      "B": "Alkenyl",
+      "description": "Alkenyl-Alkenyl bond (1,3-diene).",
       "aliases": ["diene", "1,3-diene"]
     },
     {
@@ -195,6 +203,15 @@
       "B": "Alkynyl",
       "description": "Aryl-Alkynyl bond (internal or terminal).",
       "aliases": ["aryl-alkyne"]
+    },
+    {
+      "id": "Ar-R",
+      "name": "Aryl-Alkyl",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "R",
+      "description": "Aryl-Alkyl bond (e.g., toluene, ethylbenzene).",
+      "aliases": ["alkyl-arene"]
     },
     {
       "id": "Ar-X",
@@ -251,46 +268,46 @@
       "aliases": ["ArF", "aryl fluoride"]
     },
     {
-      "id": "Vinyl-Cl",
-      "name": "Vinyl-Cl",
+      "id": "Alkenyl-Cl",
+      "name": "Alkenyl-Cl",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Cl",
-      "description": "Vinyl chloride (Vinyl-Cl)."
+      "description": "Vinyl chloride (Alkenyl-Cl)."
     },
     {
-      "id": "Vinyl-Br",
-      "name": "Vinyl-Br",
+      "id": "Alkenyl-Br",
+      "name": "Alkenyl-Br",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Br",
-      "description": "Vinyl bromide (Vinyl-Br).",
+      "description": "Vinyl bromide (Alkenyl-Br).",
       "aliases": ["alkene-Br"]
     },
     {
-      "id": "Vinyl-I",
-      "name": "Vinyl-I",
+      "id": "Alkenyl-I",
+      "name": "Alkenyl-I",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "I",
-      "description": "Vinyl iodide (Vinyl-I).",
+      "description": "Vinyl iodide (Alkenyl-I).",
       "aliases": ["alkene-I"]
     },
     {
-      "id": "Vinyl-OTf",
-      "name": "Vinyl-OTf",
+      "id": "Alkenyl-OTf",
+      "name": "Alkenyl-OTf",
       "template": "via_oxygen",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "OTf",
-      "description": "Vinyl triflate (Vinyl-OTf)."
+      "description": "Vinyl triflate (Alkenyl-OTf)."
     },
     {
-      "id": "Vinyl-F",
-      "name": "Vinyl-F",
+      "id": "Alkenyl-F",
+      "name": "Alkenyl-F",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "F",
-      "description": "Vinyl/alkenyl fluoride (Vinyl-F).",
+      "description": "Vinyl/alkenyl fluoride (Alkenyl-F).",
       "aliases": ["VinylF", "vinyl/alkenyl fluoride"]
     },
 
@@ -442,21 +459,21 @@
       "aliases": ["ArOMs"]
     },
     {
-      "id": "Vinyl-OTs",
-      "name": "Vinyl-OTs",
+      "id": "Alkenyl-OTs",
+      "name": "Alkenyl-OTs",
       "template": "via_oxygen",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "OTs",
-      "description": "Vinyl/alkenyl tosylate (Vinyl-OTs); Vinyl/alkenyl-O-tosylate motif.",
+      "description": "Vinyl/alkenyl tosylate (Alkenyl-OTs); Vinyl/alkenyl-O-tosylate motif.",
       "aliases": ["VinylOTs"]
     },
     {
-      "id": "Vinyl-OMs",
-      "name": "Vinyl-OMs",
+      "id": "Alkenyl-OMs",
+      "name": "Alkenyl-OMs",
       "template": "via_oxygen",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "OMs",
-      "description": "Vinyl/alkenyl mesylate (Vinyl-OMs); Vinyl/alkenyl-O-mesylate motif.",
+      "description": "Vinyl/alkenyl mesylate (Alkenyl-OMs); Vinyl/alkenyl-O-mesylate motif.",
       "aliases": ["VinylOMs"]
     },
     {
@@ -623,30 +640,30 @@
       "aliases": ["ArBpin"]
     },
     {
-      "id": "Vinyl-B(OH)2",
-      "name": "Vinyl-B(OH)2",
+      "id": "Alkenyl-B(OH)2",
+      "name": "Alkenyl-B(OH)2",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "B(OH)2",
-      "description": "Vinyl/alkenyl boronic acid (Vinyl-B(OH)2).",
+      "description": "Vinyl/alkenyl boronic acid (Alkenyl-B(OH)2).",
       "aliases": ["VinylB(OH)2"]
     },
     {
-      "id": "Vinyl-Bpin",
-      "name": "Vinyl-Bpin",
+      "id": "Alkenyl-Bpin",
+      "name": "Alkenyl-Bpin",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Bpin",
-      "description": "Vinyl/alkenyl boronate (Bpin) (Vinyl-Bpin).",
+      "description": "Vinyl/alkenyl boronate (Bpin) (Alkenyl-Bpin).",
       "aliases": ["VinylBpin"]
     },
     {
-      "id": "Vinyl-B(OR)2",
-      "name": "Vinyl-B(OR)2",
+      "id": "Alkenyl-B(OR)2",
+      "name": "Alkenyl-B(OR)2",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "B(OR)2",
-      "description": "Vinyl/alkenyl boronate ester (Vinyl-B(OR)2).",
+      "description": "Vinyl/alkenyl boronate ester (Alkenyl-B(OR)2).",
       "aliases": ["VinylB(OR)2", "alkeneB(OR)2"]
     },
     {
@@ -682,36 +699,36 @@
       "description": "Aryl Grignard (Ar-MgX)."
     },
     {
-      "id": "Vinyl-Sn",
-      "name": "Vinyl-Sn",
+      "id": "Alkenyl-Sn",
+      "name": "Alkenyl-Sn",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Sn",
-      "description": "Vinyl/alkenyl stannane (Vinyl-SnR3)."
+      "description": "Vinyl/alkenyl stannane (Alkenyl-SnR3)."
     },
     {
-      "id": "Vinyl-Si",
-      "name": "Vinyl-Si",
+      "id": "Alkenyl-Si",
+      "name": "Alkenyl-Si",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Si",
-      "description": "Vinyl/alkenyl silane (Vinyl-SiR3)."
+      "description": "Vinyl/alkenyl silane (Alkenyl-SiR3)."
     },
     {
-      "id": "Vinyl-Zn",
-      "name": "Vinyl-Zn",
+      "id": "Alkenyl-Zn",
+      "name": "Alkenyl-Zn",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Zn",
-      "description": "Vinyl/alkenyl zincate (Vinyl-ZnX)."
+      "description": "Vinyl/alkenyl zincate (Alkenyl-ZnX)."
     },
     {
-      "id": "Vinyl-Mg",
-      "name": "Vinyl-Mg",
+      "id": "Alkenyl-Mg",
+      "name": "Alkenyl-Mg",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Mg",
-      "description": "Vinyl/alkenyl Grignard (Vinyl-MgX)."
+      "description": "Vinyl/alkenyl Grignard (Alkenyl-MgX)."
     },
     {
       "id": "Ar-CHO",
@@ -955,60 +972,60 @@
       "description": "Aryl carbamate (Ar-Carbamate)."
     },
     {
-      "id": "Vinyl-CHO",
-      "name": "Vinyl-CHO",
+      "id": "Alkenyl-CHO",
+      "name": "Alkenyl-CHO",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "CHO",
-      "description": "Vinyl/alkenyl aldehyde (Vinyl-CHO)."
+      "description": "Vinyl/alkenyl aldehyde (Alkenyl-CHO)."
     },
     {
-      "id": "Vinyl-CN",
-      "name": "Vinyl-CN",
+      "id": "Alkenyl-CN",
+      "name": "Alkenyl-CN",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "CN",
-      "description": "Vinyl/alkenyl nitrile (Vinyl-CN)."
+      "description": "Vinyl/alkenyl nitrile (Alkenyl-CN)."
     },
     {
-      "id": "Vinyl-NO2",
-      "name": "Vinyl-NO2",
+      "id": "Alkenyl-NO2",
+      "name": "Alkenyl-NO2",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "NO2",
-      "description": "Vinyl/alkenyl nitro (Vinyl-NO2)."
+      "description": "Vinyl/alkenyl nitro (Alkenyl-NO2)."
     },
     {
-      "id": "Vinyl-NH2",
-      "name": "Vinyl-NH2",
+      "id": "Alkenyl-NH2",
+      "name": "Alkenyl-NH2",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "NH2",
-      "description": "Vinyl/alkenyl primary amine (Vinyl-NH2)."
+      "description": "Vinyl/alkenyl primary amine (Alkenyl-NH2)."
     },
     {
-      "id": "Vinyl-OH",
-      "name": "Vinyl-OH",
+      "id": "Alkenyl-OH",
+      "name": "Alkenyl-OH",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "OH",
-      "description": "Vinyl/alkenyl alcohol/enol (Vinyl-OH)."
+      "description": "Vinyl/alkenyl alcohol/enol (Alkenyl-OH)."
     },
     {
-      "id": "Vinyl-CO2H",
-      "name": "Vinyl-CO2H",
+      "id": "Alkenyl-CO2H",
+      "name": "Alkenyl-CO2H",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "CO2H",
-      "description": "Vinyl/alkenyl carboxylic acid (Vinyl-CO2H)."
+      "description": "Vinyl/alkenyl carboxylic acid (Alkenyl-CO2H)."
     },
     {
-      "id": "Vinyl-Ester",
-      "name": "Vinyl-Ester",
+      "id": "Alkenyl-Ester",
+      "name": "Alkenyl-Ester",
       "template": "single_bond",
-      "A": "Vinyl",
+      "A": "Alkenyl",
       "B": "Ester",
-      "description": "Vinyl/alkenyl ester (Vinyl-CO2R)."
+      "description": "Vinyl/alkenyl ester (Alkenyl-CO2R)."
     },
     {
       "id": "Bn-OH",
@@ -1124,6 +1141,30 @@
       "description": "ketone functional group anywhere (generic)."
     },
     {
+      "id": "RCH2-CN",
+      "name": "RCH2-CN",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "CN",
+      "description": "Primary alkyl nitrile (RCH2-CN)."
+    },
+    {
+      "id": "R2CH-CN",
+      "name": "R2CH-CN",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "CN",
+      "description": "Secondary alkyl nitrile (R2CH-CN)."
+    },
+    {
+      "id": "R3C-CN",
+      "name": "R3C-CN",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "CN",
+      "description": "Tertiary alkyl nitrile (R3C-CN)."
+    },
+    {
       "id": "Any-CN",
       "name": "Any-CN",
       "template": "single_bond",
@@ -1156,6 +1197,78 @@
       "A": "Any_Scaffold",
       "B": "NO2",
       "description": "nitro functional group anywhere (generic)."
+    },
+    {
+      "id": "RCH2-NH2",
+      "name": "RCH2-NH2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NH2",
+      "description": "Primary alkyl primary amine (RCH2-NH2)."
+    },
+    {
+      "id": "R2CH-NH2",
+      "name": "R2CH-NH2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NH2",
+      "description": "Secondary alkyl primary amine (R2CH-NH2)."
+    },
+    {
+      "id": "R3C-NH2",
+      "name": "R3C-NH2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NH2",
+      "description": "Tertiary alkyl primary amine (R3C-NH2)."
+    },
+    {
+      "id": "RCH2-NHR",
+      "name": "RCH2-NHR",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NHR",
+      "description": "Primary alkyl secondary amine (RCH2-NHR)."
+    },
+    {
+      "id": "R2CH-NHR",
+      "name": "R2CH-NHR",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NHR",
+      "description": "Secondary alkyl secondary amine (R2CH-NHR)."
+    },
+    {
+      "id": "R3C-NHR",
+      "name": "R3C-NHR",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NHR",
+      "description": "Tertiary alkyl secondary amine (R3C-NHR)."
+    },
+    {
+      "id": "RCH2-NR2",
+      "name": "RCH2-NR2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NR2",
+      "description": "Primary alkyl tertiary amine (RCH2-NR2)."
+    },
+    {
+      "id": "R2CH-NR2",
+      "name": "R2CH-NR2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NR2",
+      "description": "Secondary alkyl tertiary amine (R2CH-NR2)."
+    },
+    {
+      "id": "R3C-NR2",
+      "name": "R3C-NR2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NR2",
+      "description": "Tertiary alkyl tertiary amine (R3C-NR2)."
     },
     {
       "id": "Any-NH2",
@@ -1199,6 +1312,30 @@
       "description": "Epoxide (oxirane) ring."
     },
     {
+      "id": "RCH2-OR",
+      "name": "RCH2-OR",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "OR",
+      "description": "Primary alkyl ether (RCH2-OR)."
+    },
+    {
+      "id": "R2CH-OR",
+      "name": "R2CH-OR",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "OR",
+      "description": "Secondary alkyl ether (R2CH-OR)."
+    },
+    {
+      "id": "R3C-OR",
+      "name": "R3C-OR",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "OR",
+      "description": "Tertiary alkyl ether (R3C-OR)."
+    },
+    {
       "id": "Any-OR",
       "name": "Any-OR",
       "template": "single_bond",
@@ -1206,6 +1343,30 @@
       "B": "OR",
       "description": "ether functional group anywhere (generic).",
       "aliases": ["ROR"]
+    },
+    {
+      "id": "RCH2-SH",
+      "name": "RCH2-SH",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "SH",
+      "description": "Primary alkyl thiol (RCH2-SH)."
+    },
+    {
+      "id": "R2CH-SH",
+      "name": "R2CH-SH",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "SH",
+      "description": "Secondary alkyl thiol (R2CH-SH)."
+    },
+    {
+      "id": "R3C-SH",
+      "name": "R3C-SH",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "SH",
+      "description": "Tertiary alkyl thiol (R3C-SH)."
     },
     {
       "id": "Any-SH",
@@ -1286,6 +1447,30 @@
       "A": "R3C",
       "B": "OH",
       "description": "Tertiary alcohol functional group (generic)."
+    },
+    {
+      "id": "RCH2-CO2H",
+      "name": "RCH2-CO2H",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "CO2H",
+      "description": "Primary alkyl carboxylic acid (RCH2-CO2H)."
+    },
+    {
+      "id": "R2CH-CO2H",
+      "name": "R2CH-CO2H",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "CO2H",
+      "description": "Secondary alkyl carboxylic acid (R2CH-CO2H)."
+    },
+    {
+      "id": "R3C-CO2H",
+      "name": "R3C-CO2H",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "CO2H",
+      "description": "Tertiary alkyl carboxylic acid (R3C-CO2H)."
     },
     {
       "id": "Any-CO2H",

@@ -3,7 +3,7 @@
   "source_type": "rule",
   "metadata": {
     "id": "c_n_coupling_pd_v2",
-    "name": "Buchwald–Hartwig C–N Coupling",
+    "name": "Buchwald鈥揌artwig C鈥揘 Coupling",
     "version": "v2.0",
     "created_date": "2025-11-08",
     "status": "active",
@@ -14,7 +14,7 @@
     ]
   },
   "reaction": {
-    "family": "Buchwald–Hartwig_C–N",
+    "family": "Buchwald鈥揌artwig_C鈥揘",
     "reference_reactions": [
       "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
       "Clc1ccc(C(F)(F)F)cc1.CN(C)C>>CN(C)c1ccc(C(F)(F)F)cc1",
@@ -28,24 +28,24 @@
       "compatible_functional_groups": [],
       "incompatible_functional_groups": []
     },
-    "notes": "Updated with HTE-reported top-hit condition families (RuPhos–Pd G3/LiHMDS; BrettPhos–Pd G3/Cs2CO3 or LiHMDS; Pd2(dba)3/Me4tBuXPhos/LiHMDS; BINAP–Pd G3/Cs2CO3; XPhos–Pd G3/Cs2CO3). Use LiHMDS sets where substrate/FG compatibility allows; otherwise favor Cs2CO3 or K3PO4. Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top→down). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain‑text heuristics).\nNotes: prefer ligand‑containing precatalysts (avoid Pd2(dba)3). Degas BEFORE adding base. 3 equiv base, 8 mol% Pd, ~10 vol solvent, start at 80 °C; for heteroaryl N-H start ~100 °C. Water (5–10 equiv) aids heterogeneous bases and scale‑up in apolar media.\n"
+    "notes": "Updated with HTE-reported top-hit condition families (RuPhos鈥揚d G3/LiHMDS; BrettPhos鈥揚d G3/Cs2CO3 or LiHMDS; Pd2(dba)3/Me4tBuXPhos/LiHMDS; BINAP鈥揚d G3/Cs2CO3; XPhos鈥揚d G3/Cs2CO3). Use LiHMDS sets where substrate/FG compatibility allows; otherwise favor Cs2CO3 or K3PO4. Use this file ONLY if 'applies_if' tokens are present.\nThen try base_rules (top鈫抎own). If none match, use default_rule.\nAfter picking a rule, scan all modifiers and apply those that match (tokens OR plain鈥憈ext heuristics).\nNotes: prefer ligand鈥慶ontaining precatalysts (avoid Pd2(dba)3). Degas BEFORE adding base. 3 equiv base, 8 mol% Pd, ~10 vol solvent, start at 80 掳C; for heteroaryl N-H start ~100 掳C. Water (5鈥?0 equiv) aids heterogeneous bases and scale鈥憉p in apolar media.\n"
   },
   "applies_if": {
-    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Vinyl-Br OR Vinyl-Cl OR Vinyl-F OR Vinyl-I OR Vinyl-OMs OR Vinyl-OTf OR Vinyl-OTs) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR))"
+    "expr": "(Ar-Br OR Ar-Cl OR Ar-F OR Ar-I OR Ar-OMs OR Ar-OTf OR Ar-OTs OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-F OR Alkenyl-I OR Alkenyl-OMs OR Alkenyl-OTf OR Alkenyl-OTs) AND ((Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Alkenyl-NH2) OR (Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR) OR (Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine) OR (Any-CONHR OR Ar-CONHR))"
   },
   "default_rule": {
     "id": "DEF_CN_general",
-    "description": "General starter for Buchwald–Hartwig C–N (weak aqueous base; ligand precatalyst).",
+    "description": "General starter for Buchwald鈥揌artwig C鈥揘 (weak aqueous base; ligand precatalyst).",
     "conditions": {
-      "pd_precatalyst": "Buchwald precatalyst (allyl/crotyl > G1–G4 > LxPdCl2; avoid Pd2(dba)3)",
-      "ligand": "match selected base_rule (default tBuBrettPhos‑class)",
-      "pd_loading_molpct": "6–10 (8 default)",
+      "pd_precatalyst": "Buchwald precatalyst (allyl/crotyl > G1鈥揋4 > LxPdCl2; avoid Pd2(dba)3)",
+      "ligand": "match selected base_rule (default tBuBrettPhos鈥慶lass)",
+      "pd_loading_molpct": "6鈥?0 (8 default)",
       "base": "K3PO4 (aq, ~3.25 M) 3.0 equiv (or Cs2CO3)",
-      "solvent": "MeCN / t‑AmOH / dioxane / toluene (match polarity)",
-      "solvent_volume_vol_per_g": "≈10",
-      "temperature_C": "80 start (80–110 typical; heteroaryl N-H often 100 start)",
-      "time_h": "2–8 (if stalled after ~4 h, add 2–4 mol% Pd)",
-      "water_equiv": "5–10 when using heterogeneous bases or scaling in apolar media",
+      "solvent": "MeCN / t鈥慉mOH / dioxane / toluene (match polarity)",
+      "solvent_volume_vol_per_g": "鈮?0",
+      "temperature_C": "80 start (80鈥?10 typical; heteroaryl N-H often 100 start)",
+      "time_h": "2鈥? (if stalled after ~4 h, add 2鈥? mol% Pd)",
+      "water_equiv": "5鈥?0 when using heterogeneous bases or scaling in apolar media",
       "atmosphere": "N2 or Ar; degas before base addition"
     }
   },
@@ -53,16 +53,16 @@
     {
       "name": "Primary amines (aliphatic or aniline)",
       "id": "BR_primary_amines",
-      "description": "Primary NH2 nucleophiles (aliphatic or aryl). First shot: t‑AmOH/Cs2CO3.",
+      "description": "Primary NH2 nucleophiles (aliphatic or aryl). First shot: t鈥慉mOH/Cs2CO3.",
       "reactant_features": {
-        "expr": "(Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Vinyl-NH2)"
+        "expr": "(Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Alkenyl-NH2)"
       },
       "conditions": {
         "pd_precatalyst": "Buchwald (allyl/crotyl or G-series)",
         "ligand": "tBuBrettPhos or BippyPhos",
         "base": "K3PO4 (aq) or Cs2CO3; alt: NaOtBu or KHMDS (strong)",
-        "solvent": "MeCN, t‑AmOH, dioxane, or toluene",
-        "temperature_C": "80–100"
+        "solvent": "MeCN, t鈥慉mOH, dioxane, or toluene",
+        "temperature_C": "80鈥?00"
       }
     },
     {
@@ -77,28 +77,28 @@
         "ligand": "QPhos, XantPhos, or tBuBrettPhos",
         "base": "Cs2CO3 (weak); alt: KHMDS or NaOtBu (strong)",
         "solvent": "Dioxane, MeCN, or THF",
-        "temperature_C": "80–105"
+        "temperature_C": "80鈥?05"
       }
     },
     {
       "name": "Heteroaromatic NH (indoles, pyrazoles, etc.)",
       "id": "BR_heteroaromatic_NH",
-      "description": "Heteroaryl N–H coupling; heteroaryl N-H often needs hotter start (~100 °C).",
+      "description": "Heteroaryl N鈥揌 coupling; heteroaryl N-H often needs hotter start (~100 掳C).",
       "reactant_features": {
         "expr": "Indole OR Pyrrole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole OR Benzimidazole OR Purine"
       },
       "conditions": {
         "pd_precatalyst": "Buchwald (allyl/crotyl or G-series)",
-        "ligand": "Josiphos SL‑J009‑1, tBuBrettPhos, or XantPhos",
+        "ligand": "Josiphos SL鈥慗009鈥?, tBuBrettPhos, or XantPhos",
         "base": "K3PO4 (aq) or Cs2CO3; alt: NaOtBu",
-        "solvent": "Dioxane or t‑AmOH",
-        "temperature_C": "100–110 (start ~100 for heteroaryl N-H)"
+        "solvent": "Dioxane or t鈥慉mOH",
+        "temperature_C": "100鈥?10 (start ~100 for heteroaryl N-H)"
       }
     },
     {
       "name": "Amides (CONH2 / CONHR)",
       "id": "BR_amides",
-      "description": "Low‑nucleophilicity N; stronger ligand systems helpful.",
+      "description": "Low鈥憂ucleophilicity N; stronger ligand systems helpful.",
       "reactant_features": {
         "expr": "(Any-CONHR OR Ar-CONHR)"
       },
@@ -106,8 +106,8 @@
         "pd_precatalyst": "Buchwald (allyl/crotyl or G-series)",
         "ligand": "tBuXPhos, tBuBrettPhos, or AlPhos",
         "base": "K3PO4 (aq) or Cs2CO3; alt: NaOtBu",
-        "solvent": "Dioxane or t‑AmOH",
-        "temperature_C": "90–110"
+        "solvent": "Dioxane or t鈥慉mOH",
+        "temperature_C": "90鈥?10"
       }
     }
   ],
@@ -115,9 +115,9 @@
     {
       "id": "MOD_water_for_heterogeneous_bases",
       "when": [
-        "symptom:heterogeneous base (carbonate/phosphate) or scale‑up in apolar solvent"
+        "symptom:heterogeneous base (carbonate/phosphate) or scale鈥憉p in apolar solvent"
       ],
-      "suggest": "Add 5–10 equiv H2O or use a more polar co‑solvent to aid mass transfer."
+      "suggest": "Add 5鈥?0 equiv H2O or use a more polar co鈥憇olvent to aid mass transfer."
     },
     {
       "id": "MOD_degas_before_base",
@@ -129,7 +129,7 @@
     {
       "id": "MOD_selectivity_less_active",
       "when": [
-        "symptom:over‑arylation/chemo‑selectivity issues"
+        "symptom:over鈥慳rylation/chemo鈥憇electivity issues"
       ],
       "suggest": "Switch to a less active system (e.g., XantPhos or QPhos)."
     },
@@ -138,14 +138,14 @@
       "when": [
         "symptom:conversion stalls after ~4 h"
       ],
-      "suggest": "Charge an additional 2–4 mol% Pd precatalyst."
+      "suggest": "Charge an additional 2鈥? mol% Pd precatalyst."
     },
     {
       "id": "MOD_precatalyst_activity_rank",
       "when": [
         "any"
       ],
-      "suggest": "Prefer allyl/crotyl precatalysts > Buchwald G1–G4 > LxPdCl2. Avoid Pd2(dba)3."
+      "suggest": "Prefer allyl/crotyl precatalysts > Buchwald G1鈥揋4 > LxPdCl2. Avoid Pd2(dba)3."
     },
     {
       "id": "MOD_base_sensitive_substrates",
@@ -159,7 +159,7 @@
       "when": [
         "electron_poor_aryl OR heteroaryl_present"
       ],
-      "suggest": "Favor MeCN or t‑AmOH; avoid very apolar media."
+      "suggest": "Favor MeCN or t鈥慉mOH; avoid very apolar media."
     },
     {
       "id": "MOD_polarity_low_switch",
@@ -173,7 +173,7 @@
       "when": [
         "Pyridine"
       ],
-      "suggest": "Increase Pd loading (e.g., +2–4 mol%) and/or use a stronger donor ligand (tBuBrettPhos)."
+      "suggest": "Increase Pd loading (e.g., +2鈥? mol%) and/or use a stronger donor ligand (tBuBrettPhos)."
     },
     {
       "id": "MOD_thiol_poisoning",
@@ -187,29 +187,29 @@
       "when": [
         "(Thiophene OR Furan OR Pyrrole OR Thiazole OR Oxazole OR Imidazole OR Pyrazole OR Triazole OR Tetrazole) AND (Ar-Br OR Ar-Cl OR Ar-I OR Ar-F OR Ar-OTf OR Ar-OMs OR Ar-OTs)"
       ],
-      "suggest": "Prioritize RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS in dioxane (80–105 °C). If strong base incompatible, try BrettPhos–Pd G3/Cs2CO3."
+      "suggest": "Prioritize RuPhos鈥揚d G3/LiHMDS or BrettPhos鈥揚d G3/LiHMDS in dioxane (80鈥?05 掳C). If strong base incompatible, try BrettPhos鈥揚d G3/Cs2CO3."
     },
     {
       "id": "MOD_hard_aryl_chloride_or_ortho_block",
       "when": [
-        "Ar-Cl OR Vinyl-Cl",
+        "Ar-Cl OR Alkenyl-Cl",
         "ortho_1 OR ortho_hindered"
       ],
-      "suggest": "Favor dialkylbiaryl systems at ≥100 °C: RuPhos–Pd G3/LiHMDS or BrettPhos–Pd G3/LiHMDS; otherwise BrettPhos–Pd G3/Cs2CO3 or XPhos–Pd G3/Cs2CO3."
+      "suggest": "Favor dialkylbiaryl systems at 鈮?00 掳C: RuPhos鈥揚d G3/LiHMDS or BrettPhos鈥揚d G3/LiHMDS; otherwise BrettPhos鈥揚d G3/Cs2CO3 or XPhos鈥揚d G3/Cs2CO3."
     },
     {
       "id": "MOD_strong_base_window",
       "when": [
         "NOT (Any-CO2R OR Any-CHO OR Any-CN OR Any-COCl OR Any-CO2H)"
       ],
-      "suggest": "Test LiHMDS sets (RuPhos–Pd G3/LiHMDS; BrettPhos–Pd G3/LiHMDS)."
+      "suggest": "Test LiHMDS sets (RuPhos鈥揚d G3/LiHMDS; BrettPhos鈥揚d G3/LiHMDS)."
     },
     {
       "id": "MOD_binap_option_selectivity",
       "when": [
-        "symptom:over‑arylation/chemo‑selectivity issues"
+        "symptom:over鈥慳rylation/chemo鈥憇electivity issues"
       ],
-      "suggest": "Include BINAP–Pd G3/Cs2CO3 (dioxane, ~90–105 °C) among trials; often ranks in top‑hits with milder profile."
+      "suggest": "Include BINAP鈥揚d G3/Cs2CO3 (dioxane, ~90鈥?05 掳C) among trials; often ranks in top鈥慼its with milder profile."
     }
   ]
 }

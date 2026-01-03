@@ -24,67 +24,67 @@
       "compatible_functional_groups": [],
       "incompatible_functional_groups": []
     },
-    "notes": "Draft RCM rule derived to mirror the structure and intent of the C–N coupling rule file. Apply only when intramolecular alkene–alkene closure is plausible. Choose the first matching base_rule (top→down); if none match, use default_rule. Then apply any matching modifiers (tokens or plain‑text heuristics). Notes: Ru–NHC Hoveyda/Grubbs catalysts are broadly tolerant; remove ethylene to drive equilibrium; high dilution/slow addition for medium/large rings; benzoquinone (BQ) suppresses Ru–hydride isomerization; protect or attenuate strongly coordinating amines/thiols. Quench with ethyl vinyl ether at completion to deactivate Ru."
+    "notes": "Draft RCM rule derived to mirror the structure and intent of the C鈥揘 coupling rule file. Apply only when intramolecular alkene鈥揳lkene closure is plausible. Choose the first matching base_rule (top鈫抎own); if none match, use default_rule. Then apply any matching modifiers (tokens or plain鈥憈ext heuristics). Notes: Ru鈥揘HC Hoveyda/Grubbs catalysts are broadly tolerant; remove ethylene to drive equilibrium; high dilution/slow addition for medium/large rings; benzoquinone (BQ) suppresses Ru鈥揾ydride isomerization; protect or attenuate strongly coordinating amines/thiols. Quench with ethyl Alkenyl ether at completion to deactivate Ru."
   },
   "applies_if": {
     "expr": "Any-CHCH2 OR Ar-CHCH2 OR R-CHCH2"
   },
   "default_rule": {
     "id": "DEF_RCM_general",
-    "description": "General RCM using HG‑II at moderate dilution; remove ethylene.",
+    "description": "General RCM using HG鈥慖I at moderate dilution; remove ethylene.",
     "conditions": {
-      "ru_catalyst": "Hoveyda–Grubbs II (HG‑II)",
-      "catalyst_loading_molpct": "5 (2–10)",
-      "solvent": "CH2Cl2 or toluene (or DCE / 2‑MeTHF)",
-      "substrate_concentration_mM": "10–50",
-      "temperature_C": "25–60",
-      "time_h": "0.5–6",
+      "ru_catalyst": "Hoveyda鈥揋rubbs II (HG鈥慖I)",
+      "catalyst_loading_molpct": "5 (2鈥?0)",
+      "solvent": "CH2Cl2 or toluene (or DCE / 2鈥慚eTHF)",
+      "substrate_concentration_mM": "10鈥?0",
+      "temperature_C": "25鈥?0",
+      "time_h": "0.5鈥?",
       "ethylene_removal": "slow N2 sweep or vented sealed tube",
       "atmosphere": "N2 or Ar; dry glassware"
     }
   },
   "base_rules": [
     {
-      "name": "Small/medium rings (5–7‑member) from dienes",
+      "name": "Small/medium rings (5鈥?鈥憁ember) from dienes",
       "id": "BR_RCM_5_7",
-      "description": "Typical intramolecular diene closures to 5–7 rings.",
+      "description": "Typical intramolecular diene closures to 5鈥? rings.",
       "reactant_features": {
         "any": [
           "Any-CHCH2"
         ]
       },
       "conditions": {
-        "ru_catalyst": "Hoveyda–Grubbs II (HG‑II) or Grubbs II (G‑II)",
-        "catalyst_loading_molpct": "2–5",
+        "ru_catalyst": "Hoveyda鈥揋rubbs II (HG鈥慖I) or Grubbs II (G鈥慖I)",
+        "catalyst_loading_molpct": "2鈥?",
         "solvent": "CH2Cl2 (preferred) or toluene",
-        "substrate_concentration_mM": "20–50",
-        "temperature_C": "25–40",
-        "time_h": "0.5–4",
+        "substrate_concentration_mM": "20鈥?0",
+        "temperature_C": "25鈥?0",
+        "time_h": "0.5鈥?",
         "ethylene_removal": "slow N2 sweep"
       }
     },
     {
-      "name": "Medium rings (8–12‑member)",
+      "name": "Medium rings (8鈥?2鈥憁ember)",
       "id": "BR_RCM_8_12",
-      "description": "Use faster‑initiating catalysts; dilution and slow addition reduce oligomerization.",
+      "description": "Use faster鈥慽nitiating catalysts; dilution and slow addition reduce oligomerization.",
       "reactant_features": {
         "any": [
           "Any-CHCH2"
         ]
       },
       "conditions": {
-        "ru_catalyst": "Nitro‑Grela / Grela (fast‑initiating Hoveyda) or HG‑II",
-        "catalyst_loading_molpct": "5–10",
-        "solvent": "toluene or DCE (alt: CH2Cl2, 2‑MeTHF)",
-        "substrate_concentration_mM": "5–20",
-        "temperature_C": "40–80",
-        "time_h": "2–12",
+        "ru_catalyst": "Nitro鈥慓rela / Grela (fast鈥慽nitiating Hoveyda) or HG鈥慖I",
+        "catalyst_loading_molpct": "5鈥?0",
+        "solvent": "toluene or DCE (alt: CH2Cl2, 2鈥慚eTHF)",
+        "substrate_concentration_mM": "5鈥?0",
+        "temperature_C": "40鈥?0",
+        "time_h": "2鈥?2",
         "addition_mode": "slow addition via syringe pump (optional)",
         "ethylene_removal": "continuous N2 sweep"
       }
     },
     {
-      "name": "Macrocycles (≥13‑member)",
+      "name": "Macrocycles (鈮?3鈥憁ember)",
       "id": "BR_RCM_macrocycle_13plus",
       "description": "Very high dilution and slow addition; consider higher loadings and longer times.",
       "reactant_features": {
@@ -97,12 +97,12 @@
         ]
       },
       "conditions": {
-        "ru_catalyst": "Hoveyda–Grubbs II (HG‑II) or Grela",
-        "catalyst_loading_molpct": "5–15",
+        "ru_catalyst": "Hoveyda鈥揋rubbs II (HG鈥慖I) or Grela",
+        "catalyst_loading_molpct": "5鈥?5",
         "solvent": "toluene or CH2Cl2",
-        "substrate_concentration_mM": "0.5–2",
-        "temperature_C": "40–80",
-        "time_h": "6–24",
+        "substrate_concentration_mM": "0.5鈥?",
+        "temperature_C": "40鈥?0",
+        "time_h": "6鈥?4",
         "addition_mode": "slow addition (syringe pump)",
         "ethylene_removal": "N2 sweep or intermittent vacuum/vent"
       }
@@ -110,44 +110,44 @@
     {
       "name": "Hindered targets (tri/tetrasubstituted internal alkene)",
       "id": "BR_RCM_hindered_internal",
-      "description": "Use very fast‑initiating Ru catalysts; higher temperature and loadings are often needed.",
+      "description": "Use very fast鈥慽nitiating Ru catalysts; higher temperature and loadings are often needed.",
       "reactant_features": {
         "any": [
           "Any-CHCH2"
         ]
       },
       "conditions": {
-        "ru_catalyst": "Stewart–Grubbs / Nitro‑Grela / Umicore M2 (fast‑initiating)",
-        "catalyst_loading_molpct": "7–15",
+        "ru_catalyst": "Stewart鈥揋rubbs / Nitro鈥慓rela / Umicore M2 (fast鈥慽nitiating)",
+        "catalyst_loading_molpct": "7鈥?5",
         "solvent": "toluene (alt: DCE)",
-        "substrate_concentration_mM": "5–20",
-        "temperature_C": "70–110",
-        "time_h": "4–16",
-        "additive": "1,4‑benzoquinone (2–5 mol%) to suppress isomerization",
+        "substrate_concentration_mM": "5鈥?0",
+        "temperature_C": "70鈥?10",
+        "time_h": "4鈥?6",
+        "additive": "1,4鈥慴enzoquinone (2鈥? mol%) to suppress isomerization",
         "ethylene_removal": "continuous N2 sweep"
       }
     },
     {
       "name": "Enyne RCM (enyne cycloisomerization)",
       "id": "BR_RCM_enyne",
-      "description": "Intramolecular alkene–alkyne closure to 1,3‑diene products.",
+      "description": "Intramolecular alkene鈥揳lkyne closure to 1,3鈥慸iene products.",
       "reactant_features": {
         "expr": "Any-CHCH2 AND Any-CCH"
       },
       "conditions": {
-        "ru_catalyst": "Hoveyda–Grubbs II (HG‑II) or Grubbs II (G‑II)",
-        "catalyst_loading_molpct": "2–8",
+        "ru_catalyst": "Hoveyda鈥揋rubbs II (HG鈥慖I) or Grubbs II (G鈥慖I)",
+        "catalyst_loading_molpct": "2鈥?",
         "solvent": "toluene or CH2Cl2",
-        "substrate_concentration_mM": "10–30",
-        "temperature_C": "25–80",
-        "time_h": "1–8",
+        "substrate_concentration_mM": "10鈥?0",
+        "temperature_C": "25鈥?0",
+        "time_h": "1鈥?",
         "ethylene_removal": "vent or N2 sweep"
       }
     },
     {
-      "name": "Lewis‑basic / heteroatom‑rich substrates",
+      "name": "Lewis鈥慴asic / heteroatom鈥憆ich substrates",
       "id": "BR_RCM_heteroatom_rich",
-      "description": "Mitigate Ru–hydride isomerization and coordination by heteroatoms (amines, pyridines, sulfides).",
+      "description": "Mitigate Ru鈥揾ydride isomerization and coordination by heteroatoms (amines, pyridines, sulfides).",
       "reactant_features": {
         "any": [
           "free_amine_present",
@@ -158,13 +158,13 @@
         ]
       },
       "conditions": {
-        "ru_catalyst": "Hoveyda–Grubbs II (HG‑II)",
-        "catalyst_loading_molpct": "5–10",
+        "ru_catalyst": "Hoveyda鈥揋rubbs II (HG鈥慖I)",
+        "catalyst_loading_molpct": "5鈥?0",
         "solvent": "toluene or DCE",
-        "substrate_concentration_mM": "10–30",
-        "temperature_C": "40–80",
-        "time_h": "2–12",
-        "additive": "1,4‑benzoquinone (2–5 mol%)",
+        "substrate_concentration_mM": "10鈥?0",
+        "temperature_C": "40鈥?0",
+        "time_h": "2鈥?2",
+        "additive": "1,4鈥慴enzoquinone (2鈥? mol%)",
         "note": "Protect free amines (e.g., Boc/CBz) or attenuate coordination; avoid excess base"
       }
     }
@@ -183,7 +183,7 @@
         "macrocycle_target",
         "oligomerization_symptom"
       ],
-      "suggest": "Use ≤2 mM substrate and slow addition (syringe pump) to favor intramolecular closure."
+      "suggest": "Use 鈮? mM substrate and slow addition (syringe pump) to favor intramolecular closure."
     },
     {
       "id": "MOD_RCM_isomerization_control",
@@ -192,7 +192,7 @@
         "allylic_alcohol_present",
         "aldehyde_present"
       ],
-      "suggest": "Add 1,4‑benzoquinone 2–5 mol% (or a trace acid such as AcOH 0.1–1 equiv) to suppress Ru–hydride isomerization."
+      "suggest": "Add 1,4鈥慴enzoquinone 2鈥? mol% (or a trace acid such as AcOH 0.1鈥? equiv) to suppress Ru鈥揾ydride isomerization."
     },
     {
       "id": "MOD_RCM_fast_initiation",
@@ -200,7 +200,7 @@
         "slow_initiation_symptom",
         "tetrasubstituted_alkene_target"
       ],
-      "suggest": "Switch to fast‑initiating catalysts (Nitro‑Grela, Stewart–Grubbs, Umicore M2) and raise temperature."
+      "suggest": "Switch to fast鈥慽nitiating catalysts (Nitro鈥慓rela, Stewart鈥揋rubbs, Umicore M2) and raise temperature."
     },
     {
       "id": "MOD_RCM_free_amine_poisoning",
@@ -221,28 +221,28 @@
       "when": [
         "low_solubility_symptom"
       ],
-      "suggest": "Switch solvent (toluene ↔ CH2Cl2 ↔ DCE ↔ 2‑MeTHF) or add co‑solvent to reach the target dilution."
+      "suggest": "Switch solvent (toluene 鈫?CH2Cl2 鈫?DCE 鈫?2鈥慚eTHF) or add co鈥憇olvent to reach the target dilution."
     },
     {
       "id": "MOD_RCM_quench",
       "when": [
         "always"
       ],
-      "suggest": "Quench residual Ru with ethyl vinyl ether (5–10 equiv) at completion, then concentrate under reduced pressure."
+      "suggest": "Quench residual Ru with ethyl Alkenyl ether (5鈥?0 equiv) at completion, then concentrate under reduced pressure."
     },
     {
       "id": "MOD_RCM_Z_selective_option",
       "when": [
         "Z_selective_desired"
       ],
-      "suggest": "Use Z‑selective Ru–dithiolate Hoveyda‑type catalysts; operate at lower temperature and higher dilution."
+      "suggest": "Use Z鈥憇elective Ru鈥揹ithiolate Hoveyda鈥憈ype catalysts; operate at lower temperature and higher dilution."
     },
     {
       "id": "MOD_RCM_tolerance_water_trace",
       "when": [
         "trace_water_present"
       ],
-      "suggest": "Trace moisture is usually tolerated with Ru–NHC catalysts; dry glassware remains recommended."
+      "suggest": "Trace moisture is usually tolerated with Ru鈥揘HC catalysts; dry glassware remains recommended."
     }
   ]
 }

@@ -6,31 +6,31 @@
       "name": "sp2 Electrophiles",
       "members": [
         "Ar-I", "Ar-Br", "Ar-Cl", "Ar-OTf", "Ar-OMs", "Ar-OTs",
-        "Vinyl-I", "Vinyl-Br", "Vinyl-Cl", "Vinyl-OTf", "Vinyl-OMs", "Vinyl-OTs"
+        "Alkenyl-I", "Alkenyl-Br", "Alkenyl-Cl", "Alkenyl-OTf", "Alkenyl-OMs", "Alkenyl-OTs"
       ]
     },
     "organoboron": {
       "name": "Organoboron",
       "members": [
         "Ar-B(OH)2", "Ar-Bpin", "Ar-BF3K", "Ar-B(OR)2",
-        "Vinyl-B(OH)2", "Vinyl-Bpin", "Vinyl-BF3K", "Vinyl-B(OR)2"
+        "Alkenyl-B(OH)2", "Alkenyl-Bpin", "Alkenyl-BF3K", "Alkenyl-B(OR)2"
       ]
     },
     "organozinc": {
       "name": "Organozinc",
-      "members": ["Ar-Zn", "Vinyl-Zn", "R-Zn"]
+      "members": ["Ar-Zn", "Alkenyl-Zn", "R-Zn"]
     },
     "organotin": {
       "name": "Organotin",
-      "members": ["Ar-Sn", "Vinyl-Sn", "R-Sn"]
+      "members": ["Ar-Sn", "Alkenyl-Sn", "R-Sn"]
     },
     "organomagnesium": {
       "name": "Organomagnesium",
-      "members": ["Ar-Mg", "Vinyl-Mg", "R-Mg"]
+      "members": ["Ar-Mg", "Alkenyl-Mg", "R-Mg"]
     },
     "organosilicon": {
       "name": "Organosilicon",
-      "members": ["Ar-Si", "Vinyl-Si"]
+      "members": ["Ar-Si", "Alkenyl-Si"]
     },
     "amines_nh": {
       "name": "Amines (N-H)",
@@ -63,7 +63,7 @@
     },
     "terminal_alkenes": {
       "name": "Terminal Alkenes",
-      "members": ["Ar-CHCH2", "R-CHCH2", "Any-CHCH2", "Vinyl-H"]
+      "members": ["Ar-CHCH2", "R-CHCH2", "Any-CHCH2", "Alkenyl-H"]
     },
     "carbonyls": {
       "name": "Carbonyls",
@@ -91,13 +91,17 @@
       "name": "Esters",
       "members": ["Ar-Ester", "Any-Ester"]
     },
+    "amides": {
+      "name": "Amides",
+      "members": ["Any-CONH2", "Any-CONHR", "Any-CONR2", "Ar-CONH2", "Ar-CONHR", "Ar-CONR2"]
+    },
     "hydrogenation_substrates": {
       "name": "Hydrogenation Substrates",
       "members": ["Ar-CCH", "R-CCH", "Ar-CHCH2", "R-CHCH2", "Ar-NO2", "R-NO2", "Any-Alkene"]
     },
     "cross_coupling_products": {
       "name": "Cross-Coupling Products",
-      "members": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl", "Ar-Alkynyl"],
+      "members": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl", "Ar-Alkynyl"],
       "description": "Common products of C-C cross-coupling reactions."
     },
     "aryl_amines": {

@@ -75,8 +75,8 @@
     "sp2_Carbon": {
       "name": "sp2 Carbon Scaffold",
       "priority": 0,
-      "members": ["Ar", "Vinyl"],
-      "description": "Aromatic or vinylic carbon attachment points."
+      "members": ["Ar", "Alkenyl"],
+      "description": "Aromatic or alkenyl carbon attachment points."
     },
     "sp3_Carbon": {
       "name": "sp3 Carbon Scaffold",
