@@ -511,6 +511,14 @@
       ]
     },
     {
+      "id": "Epoxide_Group",
+      "name": "epoxide",
+      "kind": "substituent",
+      "smarts": "[O;R1]1[C;R1][C;R1:2]1",
+      "description": "Epoxide (oxirane) ring substituent.",
+      "tags": ["epoxide", "oxirane"]
+    },
+    {
       "id": "OR",
       "name": "-OR",
       "kind": "substituent",
