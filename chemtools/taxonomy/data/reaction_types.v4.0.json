@@ -10,6 +10,9 @@
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organoboron"
       },
+      "products": {
+        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+      },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"]
     },
@@ -20,6 +23,9 @@
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@amines_nh"
+      },
+      "products": {
+        "product": "@aryl_amines"
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"]
@@ -32,6 +38,9 @@
         "electrophile": "@organoboron",
         "nucleophile": "@amines_nh"
       },
+      "products": {
+        "product": "@aryl_amines"
+      },
       "catalysts": ["Cu"],
       "examples": ["c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1"]
     },
@@ -42,6 +51,9 @@
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@alcohols_oh"
+      },
+      "products": {
+        "product": "@aryl_ethers"
       },
       "catalysts": ["Cu", "Pd"],
       "examples": ["Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1"]
@@ -54,6 +66,9 @@
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@terminal_alkynes"
       },
+      "products": {
+        "product": ["Ar-Alkynyl"]
+      },
       "catalysts": ["Pd", "Cu"],
       "examples": ["Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1"]
     },
@@ -65,8 +80,67 @@
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@terminal_alkenes"
       },
+      "products": {
+        "product": ["Ar-CHCH2", "Vinyl-Vinyl"]
+      },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1"]
+    },
+    {
+      "id": "negishi",
+      "name": "Negishi",
+      "category": "C-C Coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "@organozinc"
+      },
+      "products": {
+        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+      },
+      "catalysts": ["Pd", "Ni"],
+      "examples": ["Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1"]
+    },
+    {
+      "id": "stille",
+      "name": "Stille",
+      "category": "C-C Coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "@organotin"
+      },
+      "products": {
+        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+      },
+      "catalysts": ["Pd"],
+      "examples": ["Brc1ccccc1.c1ccc(Sn(C)C)cc1>>c1ccc(-c2ccccc2)cc1"]
+    },
+    {
+      "id": "kumada",
+      "name": "Kumada",
+      "category": "C-C Coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "@organomagnesium"
+      },
+      "products": {
+        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+      },
+      "catalysts": ["Ni", "Pd"],
+      "examples": ["Brc1ccccc1.c1ccc(MgBr)cc1>>c1ccc(-c2ccccc2)cc1"]
+    },
+    {
+      "id": "hiyama",
+      "name": "Hiyama",
+      "category": "C-C Coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "@organosilicon"
+      },
+      "products": {
+        "product": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl"]
+      },
+      "catalysts": ["Pd"],
+      "examples": ["Brc1ccccc1.c1ccc(Si(OC)3)cc1>>c1ccc(-c2ccccc2)cc1"]
     },
     {
       "id": "snar_cn",

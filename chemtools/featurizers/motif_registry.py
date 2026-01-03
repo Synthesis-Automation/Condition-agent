@@ -16,7 +16,7 @@ from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
 _MAP_RE = re.compile(r":\d+(?=\])")
 
 _DEFAULT_TEMPLATES = {
-    "single_bond": "{A}{B}",
+    "single_bond": "{A}-{B}",
     "via_oxygen": "{A}O{B}",
 }
 

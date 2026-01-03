@@ -1,4 +1,4 @@
-notation,expected,detected_ids,detected_names,smiles
+example,expected,detected_ids,detected_names,smiles
 Simple Ph-Ph,Suzuki,suzuki_miyaura|ullmann_ether|halogenation_aromatic|oxidation_alcohol,Suzuki-Miyaura|Ullmann Ether Synthesis|Aromatic Halogenation|Alcohol Oxidation,Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1
 Electron-poor ArCl,Suzuki,suzuki_miyaura|ullmann_ether|halogenation_aromatic|oxidation_alcohol,Suzuki-Miyaura|Ullmann Ether Synthesis|Aromatic Halogenation|Alcohol Oxidation,Clc1ccc(C#N)cc1.c1ccc(B(O)O)cc1>>N#Cc1ccc(-c2ccccc2)cc1
 Electron-rich ArBr,Suzuki,suzuki_miyaura|ullmann_ether|halogenation_aromatic|oxidation_alcohol,Suzuki-Miyaura|Ullmann Ether Synthesis|Aromatic Halogenation|Alcohol Oxidation,Brc1ccc(OC)cc1.c1ccc(B(O)O)cc1>>COc1ccc(-c2ccccc2)cc1
@@ -71,138 +71,138 @@ Alkyl Grignard,Kumada,kumada|halogenation_aromatic,Kumada|Aromatic Halogenation,
 Activated ArCl,Kumada,kumada|halogenation_aromatic,Kumada|Aromatic Halogenation,Clc1ccc(C#N)cc1.c1ccc([Mg]Br)cc1>>N#Cc1ccc(-c2ccccc2)cc1
 Diphenylamine,Buchwald-Hartwig,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
 Pyridine ethylamine,Buchwald-Hartwig,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccncc1.NCC>>CCNc1ccncc1
-Cyclohexylamine,B-H,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.NC1CCCCC1>>FC(F)(F)c1ccc(NC2CCCCC2)cc1
-Aldehyde substrate,B-H,buchwald_hartwig|reductive_amination|halogenation_aromatic,Buchwald-Hartwig|Reductive Amination|Aromatic Halogenation,Ic1ccc(C=O)cc1.Nc1ccccc1>>O=Cc1ccc(Nc2ccccc2)cc1
-Naphthylamine,B-H,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc2ccccc2c1.NCC>>CCNc1ccc2ccccc2c1
-Benzimidazole,B-H,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1nc2ccccc2[nH]1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2[nH]1
-Ph-Br + aniline → diphenylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
-Ph-Cl + aniline → diphenylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
-Ph-I + aniline → diphenylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Ic1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
-4-MeO-Ph-Br + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.Nc1ccccc1>>COc1ccc(Nc2ccccc2)cc1
-4-Me-Ph-Br + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C)cc1.Nc1ccccc1>>Cc1ccc(Nc2ccccc2)cc1
-4-CF3-Ph-Br + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.Nc1ccccc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1
-4-CN-Ph-Br + aniline,C-N,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C#N)cc1.Nc1ccccc1>>N#Cc1ccc(Nc2ccccc2)cc1
-4-NO2-Ph-Br + aniline,C-N,snar_cn|buchwald_hartwig|halogenation_aromatic|reduction_nitro,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation|Nitro Reduction,Brc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(Nc2ccccc2)cc1
-4-acetyl-Ph-Br + aniline,C-N,buchwald_hartwig|reductive_amination|halogenation_aromatic,Buchwald-Hartwig|Reductive Amination|Aromatic Halogenation,Brc1ccc(C(=O)C)cc1.Nc1ccccc1>>CC(=O)c1ccc(Nc2ccccc2)cc1
-4-F-Ph-Br + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(F)cc1.Nc1ccccc1>>Fc1ccc(Nc2ccccc2)cc1
-4-Cl-pyridine + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1
-4-Br-pyridine + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1
-3-Cl-pyridine + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cccnc1.Nc1ccccc1>>c1ccccc1Nc1cccnc1
-2-Br-pyrimidine + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1cnccn1.Nc1ccccc1>>c1ccccc1Nc1cnccn1
-4-Cl-quinoline + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cccc2ncccc12.Nc1ccccc1>>c1ccccc1Nc1cccc2ncccc12
-5-Br-indole + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc2[nH]ccc2c1.Nc1ccccc1>>c1ccccc1Nc1ccc2[nH]ccc2c1
-3-Br-furan + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccco1.Nc1ccccc1>>c1ccccc1Nc1ccco1
-2-Cl-thiophene + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cccs1.Nc1ccccc1>>c1ccccc1Nc1cccs1
-2-Br-4-methylpyrimidine + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1cnc(C)cn1.Nc1ccccc1>>Cc1cnc(Nc2ccccc2)cn1
-Ph-Br + 4-methylaniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(C)cc1>>Cc1ccc(Nc2ccccc2)cc1
-Ph-Br + 4-methoxyaniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(OC)cc1>>COc1ccc(Nc2ccccc2)cc1
-Ph-Br + 4-fluoroaniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(F)cc1>>Fc1ccc(Nc2ccccc2)cc1
-Ph-Br + 4-CF3-aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(C(F)(F)F)cc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1
-Ph-Br + 3-methylaniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1cccc(C)c1>>Cc1cccc(Nc2ccccc2)c1
-"Ph-Br + 3,5-dimethylaniline",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1cc(C)cc(C)c1>>Cc1cc(C)cc(Nc2ccccc2)c1
-Ph-Br + methylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CN>>CNc1ccccc1
-Ph-Br + ethylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CCN>>CCNc1ccccc1
-Ph-Br + propylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CCCN>>CCCNc1ccccc1
-Ph-Br + isopropylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CC(C)N>>CC(C)Nc1ccccc1
-Ph-Br + tert-butylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CC(C)(C)N>>CC(C)(C)Nc1ccccc1
-Ph-Br + benzylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1
-Ph-Br + 2-methoxyethylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NCCOC>>COCCNc1ccccc1
-4-Br-pyridine + propylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.NCCC>>CCCNc1ccncc1
-4-Cl-benzonitrile + isopropylamine,C-N,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C#N)cc1.CC(C)N>>CC(C)Nc1ccc(C#N)cc1
-Ph-Br + diethylamine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1
-Ph-Br + pyrrolidine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCCC1>>c1ccccc1N1CCCC1
-Ph-Br + piperidine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCCCC1>>c1ccccc1N1CCCCC1
-Ph-Br + morpholine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCOCC1>>c1ccccc1N1CCOCC1
-Ph-Br + N-methylpiperazine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCN(C)CC1>>CN1CCN(c2ccccc2)CC1
-Ph-Br + 4-hydroxypiperidine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCC(O)CC1>>OC1CCN(c2ccccc2)CC1
-Ph-Br + tetrahydroisoquinoline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1Cc2ccccc2C1>>c1ccccc1N1Cc2ccccc2C1
-4-Br-pyridine + pyrrolidine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.N1CCCC1>>c1ccncc1N1CCCC1
-4-Cl-benzotrifluoride + morpholine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C(F)(F)F)cc1.N1CCOCC1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
-4-Br-anisole + piperidine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.N1CCCCC1>>COc1ccc(N2CCCCC2)cc1
-"1,4-dibromobenzene + aniline",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(Br)cc1.Nc1ccccc1>>c1ccc(Nc2ccc(Nc3ccccc3)cc2)cc1
-2-methylbromobenzene + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1C.Nc1ccccc1>>Cc1ccccc1Nc1ccccc1
-2-bromoanisole + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1OC.Nc1ccccc1>>COc1ccccc1Nc1ccccc1
-2-bromoacetophenone + aniline,C-N,buchwald_hartwig|reductive_amination|halogenation_aromatic,Buchwald-Hartwig|Reductive Amination|Aromatic Halogenation,Brc1ccccc1C(=O)C.Nc1ccccc1>>CC(=O)c1ccccc1Nc1ccccc1
-"4,7-dichloroquinoline + aniline",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc2nc(Cl)ccc2c1.Nc1ccccc1>>c1ccc(Nc2ccc3cc(Nc4ccccc4)ccc3n2)cc1
-"5-bromobenzo[d][1,3]dioxole + aniline",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc2c(c1)OCO2.Nc1ccccc1>>c1ccc(Nc2ccc3c(c2)OCO3)cc1
-2-chlorobenzothiazole + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1nc2ccccc2s1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2s1
-2-bromobenzoxazole + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1nc2ccccc2o1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2o1
-2-chloroquinoxaline + aniline,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cnc2ccccc2n1.Nc1ccccc1>>c1ccccc1Nc1cnc2ccccc2n1
-Ph-Br + pyrrole → N-phenylpyrrole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1cc[nH]c1>>c1ccccc1n1cccc1
-4-bromotoluene + pyrrole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C)cc1.c1cc[nH]c1>>Cc1ccc(n2cccc2)cc1
-4-chlorobenzonitrile + pyrrole,C-N,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(C#N)cc1.c1cc[nH]c1>>N#Cc1ccc(n2cccc2)cc1
-Ph-Br + indole → N-phenylindole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1ccccc1
-4-bromoanisole + indole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.c1ccc2[nH]ccc2c1>>COc1ccc(n2ccc3ccccc32)cc1
-4-chloropyridine + indole,C-N,halogenation_aromatic,Aromatic Halogenation,Clc1ccncc1.c1ccc2[nH]ccc2c1>>c1ccncc1n1ccc2ccccc21
-4-bromobenzotrifluoride + indole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.c1ccc2[nH]ccc2c1>>FC(F)(F)c1ccc(n2ccc3ccccc32)cc1
-4-iodopyridine + indole,C-N,halogenation_aromatic,Aromatic Halogenation,Ic1ccncc1.c1ccc2[nH]ccc2c1>>c1ccncc1n1ccc2ccccc21
-Ph-Br + pyrazole → N-phenylpyrazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1c[nH]nc1>>c1ccccc1n1ccnc1
-4-bromochlorobenzene + pyrazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(Cl)cc1.c1c[nH]nc1>>Clc1ccc(n2ccnc2)cc1
-4-bromopyridine + pyrazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccncc1.c1c[nH]nc1>>c1ccncc1n1ccnc1
-4-bromonitrobenzene + pyrazole,C-N,halogenation_aromatic|reduction_nitro,Aromatic Halogenation|Nitro Reduction,Brc1ccc([N+](=O)[O-])cc1.c1c[nH]nc1>>[O-][N+](=O)c1ccc(n2ccnc2)cc1
-Ph-Br + 3-methylpyrazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1c[nH]nc1C>>Cc1nn(c2ccccc2)cc1
-4-chloroanisole + 3-methylpyrazole,C-N,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(OC)cc1.c1c[nH]nc1C>>Cc1nn(c2ccc(OC)cc2)cc1
-Ph-Br + imidazole → N-phenylimidazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1cnc[nH]1>>c1ccccc1n1cncc1
-4-bromofluorobenzene + imidazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(F)cc1.c1cnc[nH]1>>Fc1ccc(n2cncc2)cc1
-4-chloropyridine + imidazole,C-N,halogenation_aromatic,Aromatic Halogenation,Clc1ccncc1.c1cnc[nH]1>>c1ccncc1n1cncc1
-Ph-Br + carbazole → N-phenylcarbazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1ccc2c(c1)c1ccccc1[nH]2>>c1ccc2c(c1)c1ccccc1n2c1ccccc1
-4-bromotoluene + carbazole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>Cc1ccc(n2c3ccccc3c3ccccc32)cc1
-4-iodoanisole + carbazole,C-N,halogenation_aromatic,Aromatic Halogenation,Ic1ccc(OC)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>COc1ccc(n2c3ccccc3c3ccccc32)cc1
-"Ph-Br + 1,2,4-triazole → N-phenyltriazole",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1nc[nH]n1>>c1ccccc1n1ncnc1
-"4-bromobenzonitrile + 1,2,4-triazole",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C#N)cc1.c1nc[nH]n1>>N#Cc1ccc(n2ncnc2)cc1
-Ph-Br + 2-aminopyrimidine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.c1ncncc1N>>Nc1cnccn1c1ccccc1
-4-chloropyridine + 2-aminopyrimidine,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccncc1.c1ncncc1N>>Nc1cnccn1c1ccncc1
-"4-bromoanisole + 1,2,4-triazole",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.c1cn[nH]c1>>COc1ccc(n2nccn2)cc1
-"2-bromotoluene + indole, ortho-substituted",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1C.c1ccc2[nH]ccc2c1>>Cc1ccccc1n1ccc2ccccc21
-"2,6-dimethylbromobenzene + indole, sterically hindered",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1c(C)cccc1C.c1ccc2[nH]ccc2c1>>Cc1cccc(C)c1n1ccc2ccccc21
-"2-bromoanisole + pyrrole, ortho-substituted",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1OC.c1cc[nH]c1>>COc1ccccc1n1cccc1
-"2-bromonaphthalene + indole, fused ring",C-N,halogenation_aromatic,Aromatic Halogenation,Ic1ccc2ccccc2c1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)c2ccccc12
-"1,4-dibromobenzene + indole, bis-coupling",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(Br)cc1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)cc1n1ccc2ccccc21
-"1,3-dibromobenzene + pyrrole, bis-coupling",C-N,halogenation_aromatic,Aromatic Halogenation,Brc1cccc(Br)c1.c1cc[nH]c1>>c1cccc(n2cccc2)c1n1cccc1
-3-bromoquinoxaline + indole,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1cnc2ccccc2n1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1cnc2ccccc2n1
-4-chloroindole + bromobenzene,C-N,halogenation_aromatic,Aromatic Halogenation,Clc1cccc2c1cc[nH]2.c1ccccc1Br>>c1ccccc1n1ccc2c(Cl)cccc21
-Ph-Br + acetamide → N-phenylacetamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)C>>CC(=O)Nc1ccccc1
-4-bromotoluene + acetamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C)cc1.NC(=O)C>>CC(=O)Nc1ccc(C)cc1
-4-chloroanisole + acetamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(OC)cc1.NC(=O)C>>CC(=O)Nc1ccc(OC)cc1
-4-bromopyridine + acetamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.NC(=O)C>>CC(=O)Nc1ccncc1
-4-iodobenzotrifluoride + acetamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Ic1ccc(C(F)(F)F)cc1.NC(=O)C>>CC(=O)Nc1ccc(C(F)(F)F)cc1
-Ph-Br + propionamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)CC>>CCC(=O)Nc1ccccc1
-4-bromochlorobenzene + propionamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(Cl)cc1.NC(=O)CC>>CCC(=O)Nc1ccc(Cl)cc1
-Ph-Br + benzamide → N-phenylbenzamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccccc1>>O=C(Nc1ccccc1)c1ccccc1
-4-bromoanisole + benzamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.NC(=O)c1ccccc1>>COc1ccc(NC(=O)c2ccccc2)cc1
-4-chloropyridine + benzamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccncc1.NC(=O)c1ccccc1>>O=C(Nc1ccncc1)c1ccccc1
-4-bromobenzonitrile + benzamide,C-N,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C#N)cc1.NC(=O)c1ccccc1>>N#Cc1ccc(NC(=O)c2ccccc2)cc1
-Ph-Br + 4-methoxybenzamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccc(OC)cc1>>COc1ccc(C(=O)Nc2ccccc2)cc1
-4-bromofluorobenzene + 4-fluorobenzamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(F)cc1.NC(=O)c1ccc(F)cc1>>Fc1ccc(C(=O)Nc2ccc(F)cc2)cc1
-Ph-Br + isobutyramide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccccc1
-Ph-Br + pivalamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)C(C)(C)C>>CC(C)(C)C(=O)Nc1ccccc1
-4-chlorobenzotrifluoride + isobutyramide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C(F)(F)F)cc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccc(C(F)(F)F)cc1
-Ph-Br + hydrocinnamamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)CCc1ccccc1>>O=C(CCc1ccccc1)Nc1ccccc1
-4-bromoanisole + hydrocinnamamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.NC(=O)CCc1ccccc1>>COc1ccc(NC(=O)CCc2ccccc2)cc1
-Ph-Br + 2-pyrrolidinone → N-phenyl-2-pyrrolidinone,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.C1CCNC1=O>>O=C1CCCN1c1ccccc1
-4-bromotoluene + 2-pyrrolidinone,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C)cc1.C1CCNC1=O>>Cc1ccc(N2CCCC2=O)cc1
-4-chloropyridine + 2-pyrrolidinone,C-N,halogenation_aromatic,Aromatic Halogenation,Clc1ccncc1.C1CCNC1=O>>O=C1CCCN1c1ccncc1
-Ph-Br + caprolactam → N-phenylcaprolactam,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.C1CCCCNC1=O>>O=C1CCCCN1c1ccccc1
-4-bromoanisole + caprolactam,C-N,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.C1CCCCNC1=O>>COc1ccc(N2CCCCC2=O)cc1
-4-iodobenzotrifluoride + caprolactam,C-N,halogenation_aromatic,Aromatic Halogenation,Ic1ccc(C(F)(F)F)cc1.C1CCCCNC1=O>>FC(F)(F)c1ccc(N2CCCCC2=O)cc1
-"Ph-Br + acetamide, alternative",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(C)=O>>CC(=O)Nc1ccccc1
-Ph-Br + isonicotinamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccncc1>>O=C(Nc1ccccc1)c1ccncc1
-4-chlorobenzonitrile + isonicotinamide,C-N,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C#N)cc1.NC(=O)c1ccncc1>>N#Cc1ccc(NC(=O)c2ccncc2)cc1
-Ph-Br + thiophene-3-carboxamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1cccs1>>O=C(Nc1ccccc1)c1cccs1
-4-bromoanisole + thiophene-3-carboxamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.NC(=O)c1cccs1>>COc1ccc(NC(=O)c2cccs2)cc1
-Ph-Br + furan-3-carboxamide,C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccco1>>O=C(Nc1ccccc1)c1ccco1
-"2-bromotoluene + acetamide, ortho-substituted",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1C.NC(=O)C>>CC(=O)Nc1ccccc1C
-"2,6-dimethylbromobenzene + benzamide, sterically hindered",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1c(C)cccc1C.NC(=O)c1ccccc1>>Cc1cccc(C)c1NC(=O)c1ccccc1
-"2-iodonaphthalene + acetamide, fused ring",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Ic1ccc2ccccc2c1.NC(=O)C>>CC(=O)Nc1ccc2ccccc2c1
-"1,4-dibromobenzene + acetamide, bis-coupling",C-N,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(Br)cc1.NC(=O)C>>CC(=O)Nc1ccc(NC(C)=O)cc1
-Oxidative,Chan-Lam,chan_lam_cn|halogenation_aromatic|oxidation_alcohol,Chan-Lam C-N|Aromatic Halogenation|Alcohol Oxidation,c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1
-Methoxy boronic acid,Chan-Lam,chan_lam_cn|halogenation_aromatic|oxidation_alcohol,Chan-Lam C-N|Aromatic Halogenation|Alcohol Oxidation,c1ccc(OC)cc1B(O)O.Nc1ccccc1.[O]>>COc1ccc(Nc2ccccc2)cc1
-Pyridine boronic acid,Chan-Lam,chan_lam_cn|halogenation_aromatic|oxidation_alcohol,Chan-Lam C-N|Aromatic Halogenation|Alcohol Oxidation,c1ccncc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccncc1
-Diphenyl ether,Ullmann Ether,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1
-Ethyl pyridyl ether,Ullmann Ether,halogenation_aromatic,Aromatic Halogenation,Ic1ccncc1.OCC>>CCOc1ccncc1
-CF3 substrate,Ullmann Ether,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1
-Methoxy benzonitrile,Ullmann Ether,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(C#N)cc1.OC>>COc1ccc(C#N)cc1
-Thiophene ether,Ullmann Ether,halogenation_aromatic,Aromatic Halogenation,Brc1cccs1.Oc1ccccc1>>c1cc(Oc2ccccc2)sc1
+Cyclohexylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.NC1CCCCC1>>FC(F)(F)c1ccc(NC2CCCCC2)cc1
+Aldehyde substrate,BuchwaldâHartwig amination,buchwald_hartwig|reductive_amination|halogenation_aromatic,Buchwald-Hartwig|Reductive Amination|Aromatic Halogenation,Ic1ccc(C=O)cc1.Nc1ccccc1>>O=Cc1ccc(Nc2ccccc2)cc1
+Naphthylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc2ccccc2c1.NCC>>CCNc1ccc2ccccc2c1
+Benzimidazole,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1nc2ccccc2[nH]1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2[nH]1
+Ph-Br + aniline â?diphenylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
+Ph-Cl + aniline â?diphenylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
+Ph-I + aniline â?diphenylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Ic1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1
+4-MeO-Ph-Br + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.Nc1ccccc1>>COc1ccc(Nc2ccccc2)cc1
+4-Me-Ph-Br + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C)cc1.Nc1ccccc1>>Cc1ccc(Nc2ccccc2)cc1
+4-CF3-Ph-Br + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.Nc1ccccc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1
+4-CN-Ph-Br + aniline,BuchwaldâHartwig amination,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C#N)cc1.Nc1ccccc1>>N#Cc1ccc(Nc2ccccc2)cc1
+4-NO2-Ph-Br + aniline,BuchwaldâHartwig amination,snar_cn|buchwald_hartwig|halogenation_aromatic|reduction_nitro,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation|Nitro Reduction,Brc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(Nc2ccccc2)cc1
+4-acetyl-Ph-Br + aniline,BuchwaldâHartwig amination,buchwald_hartwig|reductive_amination|halogenation_aromatic,Buchwald-Hartwig|Reductive Amination|Aromatic Halogenation,Brc1ccc(C(=O)C)cc1.Nc1ccccc1>>CC(=O)c1ccc(Nc2ccccc2)cc1
+4-F-Ph-Br + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(F)cc1.Nc1ccccc1>>Fc1ccc(Nc2ccccc2)cc1
+4-Cl-pyridine + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1
+4-Br-pyridine + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1
+3-Cl-pyridine + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cccnc1.Nc1ccccc1>>c1ccccc1Nc1cccnc1
+2-Br-pyrimidine + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1cnccn1.Nc1ccccc1>>c1ccccc1Nc1cnccn1
+4-Cl-quinoline + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cccc2ncccc12.Nc1ccccc1>>c1ccccc1Nc1cccc2ncccc12
+5-Br-indole + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc2[nH]ccc2c1.Nc1ccccc1>>c1ccccc1Nc1ccc2[nH]ccc2c1
+3-Br-furan + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccco1.Nc1ccccc1>>c1ccccc1Nc1ccco1
+2-Cl-thiophene + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cccs1.Nc1ccccc1>>c1ccccc1Nc1cccs1
+2-Br-4-methylpyrimidine + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1cnc(C)cn1.Nc1ccccc1>>Cc1cnc(Nc2ccccc2)cn1
+Ph-Br + 4-methylaniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(C)cc1>>Cc1ccc(Nc2ccccc2)cc1
+Ph-Br + 4-methoxyaniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(OC)cc1>>COc1ccc(Nc2ccccc2)cc1
+Ph-Br + 4-fluoroaniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(F)cc1>>Fc1ccc(Nc2ccccc2)cc1
+Ph-Br + 4-CF3-aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1ccc(C(F)(F)F)cc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1
+Ph-Br + 3-methylaniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1cccc(C)c1>>Cc1cccc(Nc2ccccc2)c1
+"Ph-Br + 3,5-dimethylaniline",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.Nc1cc(C)cc(C)c1>>Cc1cc(C)cc(Nc2ccccc2)c1
+Ph-Br + methylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CN>>CNc1ccccc1
+Ph-Br + ethylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CCN>>CCNc1ccccc1
+Ph-Br + propylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CCCN>>CCCNc1ccccc1
+Ph-Br + isopropylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CC(C)N>>CC(C)Nc1ccccc1
+Ph-Br + tert-butylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CC(C)(C)N>>CC(C)(C)Nc1ccccc1
+Ph-Br + benzylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1
+Ph-Br + 2-methoxyethylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NCCOC>>COCCNc1ccccc1
+4-Br-pyridine + propylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.NCCC>>CCCNc1ccncc1
+4-Cl-benzonitrile + isopropylamine,BuchwaldâHartwig amination,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C#N)cc1.CC(C)N>>CC(C)Nc1ccc(C#N)cc1
+Ph-Br + diethylamine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1
+Ph-Br + pyrrolidine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCCC1>>c1ccccc1N1CCCC1
+Ph-Br + piperidine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCCCC1>>c1ccccc1N1CCCCC1
+Ph-Br + morpholine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCOCC1>>c1ccccc1N1CCOCC1
+Ph-Br + N-methylpiperazine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCN(C)CC1>>CN1CCN(c2ccccc2)CC1
+Ph-Br + 4-hydroxypiperidine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1CCC(O)CC1>>OC1CCN(c2ccccc2)CC1
+Ph-Br + tetrahydroisoquinoline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.N1Cc2ccccc2C1>>c1ccccc1N1Cc2ccccc2C1
+4-Br-pyridine + pyrrolidine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.N1CCCC1>>c1ccncc1N1CCCC1
+4-Cl-benzotrifluoride + morpholine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C(F)(F)F)cc1.N1CCOCC1>>FC(F)(F)c1ccc(N2CCOCC2)cc1
+4-Br-anisole + piperidine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.N1CCCCC1>>COc1ccc(N2CCCCC2)cc1
+"1,4-dibromobenzene + aniline",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(Br)cc1.Nc1ccccc1>>c1ccc(Nc2ccc(Nc3ccccc3)cc2)cc1
+2-methylbromobenzene + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1C.Nc1ccccc1>>Cc1ccccc1Nc1ccccc1
+2-bromoanisole + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1OC.Nc1ccccc1>>COc1ccccc1Nc1ccccc1
+2-bromoacetophenone + aniline,BuchwaldâHartwig amination,buchwald_hartwig|reductive_amination|halogenation_aromatic,Buchwald-Hartwig|Reductive Amination|Aromatic Halogenation,Brc1ccccc1C(=O)C.Nc1ccccc1>>CC(=O)c1ccccc1Nc1ccccc1
+"4,7-dichloroquinoline + aniline",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc2nc(Cl)ccc2c1.Nc1ccccc1>>c1ccc(Nc2ccc3cc(Nc4ccccc4)ccc3n2)cc1
+"5-bromobenzo[d][1,3]dioxole + aniline",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc2c(c1)OCO2.Nc1ccccc1>>c1ccc(Nc2ccc3c(c2)OCO3)cc1
+2-chlorobenzothiazole + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1nc2ccccc2s1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2s1
+2-bromobenzoxazole + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1nc2ccccc2o1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2o1
+2-chloroquinoxaline + aniline,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1cnc2ccccc2n1.Nc1ccccc1>>c1ccccc1Nc1cnc2ccccc2n1
+Ph-Br + pyrrole â?N-phenylpyrrole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1cc[nH]c1>>c1ccccc1n1cccc1
+4-bromotoluene + pyrrole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C)cc1.c1cc[nH]c1>>Cc1ccc(n2cccc2)cc1
+4-chlorobenzonitrile + pyrrole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(C#N)cc1.c1cc[nH]c1>>N#Cc1ccc(n2cccc2)cc1
+Ph-Br + indole â?N-phenylindole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1ccccc1
+4-bromoanisole + indole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.c1ccc2[nH]ccc2c1>>COc1ccc(n2ccc3ccccc32)cc1
+4-chloropyridine + indole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Clc1ccncc1.c1ccc2[nH]ccc2c1>>c1ccncc1n1ccc2ccccc21
+4-bromobenzotrifluoride + indole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.c1ccc2[nH]ccc2c1>>FC(F)(F)c1ccc(n2ccc3ccccc32)cc1
+4-iodopyridine + indole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Ic1ccncc1.c1ccc2[nH]ccc2c1>>c1ccncc1n1ccc2ccccc21
+Ph-Br + pyrazole â?N-phenylpyrazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1c[nH]nc1>>c1ccccc1n1ccnc1
+4-bromochlorobenzene + pyrazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(Cl)cc1.c1c[nH]nc1>>Clc1ccc(n2ccnc2)cc1
+4-bromopyridine + pyrazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccncc1.c1c[nH]nc1>>c1ccncc1n1ccnc1
+4-bromonitrobenzene + pyrazole,BuchwaldâHartwig amination,halogenation_aromatic|reduction_nitro,Aromatic Halogenation|Nitro Reduction,Brc1ccc([N+](=O)[O-])cc1.c1c[nH]nc1>>[O-][N+](=O)c1ccc(n2ccnc2)cc1
+Ph-Br + 3-methylpyrazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1c[nH]nc1C>>Cc1nn(c2ccccc2)cc1
+4-chloroanisole + 3-methylpyrazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(OC)cc1.c1c[nH]nc1C>>Cc1nn(c2ccc(OC)cc2)cc1
+Ph-Br + imidazole â?N-phenylimidazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1cnc[nH]1>>c1ccccc1n1cncc1
+4-bromofluorobenzene + imidazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(F)cc1.c1cnc[nH]1>>Fc1ccc(n2cncc2)cc1
+4-chloropyridine + imidazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Clc1ccncc1.c1cnc[nH]1>>c1ccncc1n1cncc1
+Ph-Br + carbazole â?N-phenylcarbazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1ccc2c(c1)c1ccccc1[nH]2>>c1ccc2c(c1)c1ccccc1n2c1ccccc1
+4-bromotoluene + carbazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>Cc1ccc(n2c3ccccc3c3ccccc32)cc1
+4-iodoanisole + carbazole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Ic1ccc(OC)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>COc1ccc(n2c3ccccc3c3ccccc32)cc1
+"Ph-Br + 1,2,4-triazole â?N-phenyltriazole",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.c1nc[nH]n1>>c1ccccc1n1ncnc1
+"4-bromobenzonitrile + 1,2,4-triazole",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C#N)cc1.c1nc[nH]n1>>N#Cc1ccc(n2ncnc2)cc1
+Ph-Br + 2-aminopyrimidine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.c1ncncc1N>>Nc1cnccn1c1ccccc1
+4-chloropyridine + 2-aminopyrimidine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccncc1.c1ncncc1N>>Nc1cnccn1c1ccncc1
+"4-bromoanisole + 1,2,4-triazole",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.c1cn[nH]c1>>COc1ccc(n2nccn2)cc1
+"2-bromotoluene + indole, ortho-substituted",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1C.c1ccc2[nH]ccc2c1>>Cc1ccccc1n1ccc2ccccc21
+"2,6-dimethylbromobenzene + indole, sterically hindered",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1c(C)cccc1C.c1ccc2[nH]ccc2c1>>Cc1cccc(C)c1n1ccc2ccccc21
+"2-bromoanisole + pyrrole, ortho-substituted",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1OC.c1cc[nH]c1>>COc1ccccc1n1cccc1
+"2-bromonaphthalene + indole, fused ring",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Ic1ccc2ccccc2c1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)c2ccccc12
+"1,4-dibromobenzene + indole, bis-coupling",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(Br)cc1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)cc1n1ccc2ccccc21
+"1,3-dibromobenzene + pyrrole, bis-coupling",BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1cccc(Br)c1.c1cc[nH]c1>>c1cccc(n2cccc2)c1n1cccc1
+3-bromoquinoxaline + indole,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1cnc2ccccc2n1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1cnc2ccccc2n1
+4-chloroindole + bromobenzene,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Clc1cccc2c1cc[nH]2.c1ccccc1Br>>c1ccccc1n1ccc2c(Cl)cccc21
+Ph-Br + acetamide â?N-phenylacetamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)C>>CC(=O)Nc1ccccc1
+4-bromotoluene + acetamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C)cc1.NC(=O)C>>CC(=O)Nc1ccc(C)cc1
+4-chloroanisole + acetamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(OC)cc1.NC(=O)C>>CC(=O)Nc1ccc(OC)cc1
+4-bromopyridine + acetamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccncc1.NC(=O)C>>CC(=O)Nc1ccncc1
+4-iodobenzotrifluoride + acetamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Ic1ccc(C(F)(F)F)cc1.NC(=O)C>>CC(=O)Nc1ccc(C(F)(F)F)cc1
+Ph-Br + propionamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)CC>>CCC(=O)Nc1ccccc1
+4-bromochlorobenzene + propionamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(Cl)cc1.NC(=O)CC>>CCC(=O)Nc1ccc(Cl)cc1
+Ph-Br + benzamide â?N-phenylbenzamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccccc1>>O=C(Nc1ccccc1)c1ccccc1
+4-bromoanisole + benzamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.NC(=O)c1ccccc1>>COc1ccc(NC(=O)c2ccccc2)cc1
+4-chloropyridine + benzamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccncc1.NC(=O)c1ccccc1>>O=C(Nc1ccncc1)c1ccccc1
+4-bromobenzonitrile + benzamide,BuchwaldâHartwig amination,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(C#N)cc1.NC(=O)c1ccccc1>>N#Cc1ccc(NC(=O)c2ccccc2)cc1
+Ph-Br + 4-methoxybenzamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccc(OC)cc1>>COc1ccc(C(=O)Nc2ccccc2)cc1
+4-bromofluorobenzene + 4-fluorobenzamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(F)cc1.NC(=O)c1ccc(F)cc1>>Fc1ccc(C(=O)Nc2ccc(F)cc2)cc1
+Ph-Br + isobutyramide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccccc1
+Ph-Br + pivalamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)C(C)(C)C>>CC(C)(C)C(=O)Nc1ccccc1
+4-chlorobenzotrifluoride + isobutyramide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C(F)(F)F)cc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccc(C(F)(F)F)cc1
+Ph-Br + hydrocinnamamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)CCc1ccccc1>>O=C(CCc1ccccc1)Nc1ccccc1
+4-bromoanisole + hydrocinnamamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.NC(=O)CCc1ccccc1>>COc1ccc(NC(=O)CCc2ccccc2)cc1
+Ph-Br + 2-pyrrolidinone â?N-phenyl-2-pyrrolidinone,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.C1CCNC1=O>>O=C1CCCN1c1ccccc1
+4-bromotoluene + 2-pyrrolidinone,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C)cc1.C1CCNC1=O>>Cc1ccc(N2CCCC2=O)cc1
+4-chloropyridine + 2-pyrrolidinone,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Clc1ccncc1.C1CCNC1=O>>O=C1CCCN1c1ccncc1
+Ph-Br + caprolactam â?N-phenylcaprolactam,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.C1CCCCNC1=O>>O=C1CCCCN1c1ccccc1
+4-bromoanisole + caprolactam,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.C1CCCCNC1=O>>COc1ccc(N2CCCCC2=O)cc1
+4-iodobenzotrifluoride + caprolactam,BuchwaldâHartwig amination,halogenation_aromatic,Aromatic Halogenation,Ic1ccc(C(F)(F)F)cc1.C1CCCCNC1=O>>FC(F)(F)c1ccc(N2CCCCC2=O)cc1
+"Ph-Br + acetamide, alternative",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(C)=O>>CC(=O)Nc1ccccc1
+Ph-Br + isonicotinamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccncc1>>O=C(Nc1ccccc1)c1ccncc1
+4-chlorobenzonitrile + isonicotinamide,BuchwaldâHartwig amination,snar_cn|buchwald_hartwig|halogenation_aromatic,SNAr C-N|Buchwald-Hartwig|Aromatic Halogenation,Clc1ccc(C#N)cc1.NC(=O)c1ccncc1>>N#Cc1ccc(NC(=O)c2ccncc2)cc1
+Ph-Br + thiophene-3-carboxamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1cccs1>>O=C(Nc1ccccc1)c1cccs1
+4-bromoanisole + thiophene-3-carboxamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(OC)cc1.NC(=O)c1cccs1>>COc1ccc(NC(=O)c2cccs2)cc1
+Ph-Br + furan-3-carboxamide,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.NC(=O)c1ccco1>>O=C(Nc1ccccc1)c1ccco1
+"2-bromotoluene + acetamide, ortho-substituted",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1C.NC(=O)C>>CC(=O)Nc1ccccc1C
+"2,6-dimethylbromobenzene + benzamide, sterically hindered",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1c(C)cccc1C.NC(=O)c1ccccc1>>Cc1cccc(C)c1NC(=O)c1ccccc1
+"2-iodonaphthalene + acetamide, fused ring",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Ic1ccc2ccccc2c1.NC(=O)C>>CC(=O)Nc1ccc2ccccc2c1
+"1,4-dibromobenzene + acetamide, bis-coupling",BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccc(Br)cc1.NC(=O)C>>CC(=O)Nc1ccc(NC(C)=O)cc1
+Oxidative,ChanâLam coupling,chan_lam_cn|halogenation_aromatic|oxidation_alcohol,Chan-Lam C-N|Aromatic Halogenation|Alcohol Oxidation,c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1
+Methoxy boronic acid,ChanâLam coupling,chan_lam_cn|halogenation_aromatic|oxidation_alcohol,Chan-Lam C-N|Aromatic Halogenation|Alcohol Oxidation,c1ccc(OC)cc1B(O)O.Nc1ccccc1.[O]>>COc1ccc(Nc2ccccc2)cc1
+Pyridine boronic acid,ChanâLam coupling,chan_lam_cn|halogenation_aromatic|oxidation_alcohol,Chan-Lam C-N|Aromatic Halogenation|Alcohol Oxidation,c1ccncc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccncc1
+Diphenyl ether,Ullmann CâO coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1
+Ethyl pyridyl ether,Ullmann CâO coupling,halogenation_aromatic,Aromatic Halogenation,Ic1ccncc1.OCC>>CCOc1ccncc1
+CF3 substrate,Ullmann CâO coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1
+Methoxy benzonitrile,Ullmann CâO coupling,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(C#N)cc1.OC>>COc1ccc(C#N)cc1
+Thiophene ether,Ullmann CâO coupling,halogenation_aromatic,Aromatic Halogenation,Brc1cccs1.Oc1ccccc1>>c1cc(Oc2ccccc2)sc1
 Ethyl acetate,Esterification,,,CC(=O)O.CCO>>CC(=O)OCC
 Ethyl benzoate,Esterification,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(=O)O)cc1.OCC>>c1ccc(C(=O)OCC)cc1
 ,Acyl chloride esterification,,,CC(=O)Cl.CCO>>CC(=O)OCC
@@ -216,69 +216,69 @@ Nitro to amine,Hydrogenation,halogenation_aromatic|reduction_nitro,Aromatic Halo
 Nitrile to benzylamine,Hydrogenation,halogenation_aromatic,Aromatic Halogenation,c1ccc(C#N)cc1.[H][H]>>c1ccc(CN)cc1
 Cyclohexanone to cyclohexanol,Hydrogenation,,,O=C1CCCCC1.[H][H]>>OC1CCCCC1
 Cinnamic acid,Hydrogenation,epoxidation|halogenation_aromatic|ring_closing_metathesis,Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,C1=CC=C(C=C1)C=CC(=O)O.[H][H]>>c1ccc(CCC(=O)O)cc1
-Benzaldehyde reduction,NaBH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.[BH4-].[Na+]>>c1ccc(CO)cc1
-Acetophenone,NaBH4,halogenation_aromatic,Aromatic Halogenation,CC(=O)c1ccccc1.[BH4-].[Na+]>>CC(O)c1ccccc1
-Ketone reduction,LiAlH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(=O)C)cc1.[AlH4-].[Li+]>>c1ccc(C(O)C)cc1
-Ester to alcohol,LiAlH4,,,CC(=O)OCC.[AlH4-].[Li+]>>CCO
-Nitrile reduction,LiAlH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C#N)cc1.[AlH4-].[Li+]>>c1ccc(CN)cc1
-Amide to amine,LiAlH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(=O)Nc2ccccc2)cc1.[AlH4-].[Li+]>>c1ccccc1CNc1ccccc1
-Lactone to diol,LiAlH4,claisen_condensation,Claisen Condensation,O=C1CCC(=O)O1.[AlH4-].[Li+]>>OCCCO
-Selective reduction,NaBH4,claisen_condensation,Claisen Condensation,CC(=O)OC(=O)C.[BH4-].[Na+]>>CC(=O)CO
-Acetophenone,Transfer Hydrogenation,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,CC(=O)c1ccccc1.C1CCNC1>>[Ir]>>CC(O)c1ccccc1
-Benzaldehyde,Transfer Hydrogenation,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.CCOC(=O)C=O>>[Ru]>>c1ccc(CO)cc1
-Nitro reduction,Zn/HCl,halogenation_aromatic|reduction_nitro,Aromatic Halogenation|Nitro Reduction,c1ccc([N+](=O)[O-])cc1.[Zn].[HCl]>>c1ccc(N)cc1
-Benzene to cyclohexadiene,Birch Reduction,halogenation_aromatic,Aromatic Halogenation,C1=CC=CC=C1>>[Na].[NH3]>>C1CCC=CC1
-Anisole,Birch Reduction,halogenation_aromatic,Aromatic Halogenation,c1ccc(OC)cc1>>[Na].[NH3]>>COC1C=CCC=C1
-Selective ketone,NaBH(OAc)3,epoxidation|halogenation_aromatic|ring_closing_metathesis,Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,c1ccc(C(=O)C=C)cc1.[NaBH(OAc)3]>>c1ccc(C(O)C=C)cc1
-Ketone selective,DIBAL,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,CC(=O)CC=C.[DIBAL]>>CC(O)CC=C
-Ester to aldehyde,DIBAL,,,CC(=O)OCC.[DIBAL]>>CC=O
+Benzaldehyde reduction,NaBH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.[Na+]>>c1ccc(CO)cc1
+Acetophenone,NaBH4,halogenation_aromatic,Aromatic Halogenation,CC(=O)c1ccccc1.[Na+]>>CC(O)c1ccccc1
+Ketone reduction,LiAlH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(=O)C)cc1.[Li+]>>c1ccc(C(O)C)cc1
+Ester to alcohol,LiAlH4,,,CC(=O)OCC.[Li+]>>CCO
+Nitrile reduction,LiAlH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C#N)cc1.[Li+]>>c1ccc(CN)cc1
+Amide to amine,LiAlH4,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(=O)Nc2ccccc2)cc1.[Li+]>>c1ccccc1CNc1ccccc1
+Lactone to diol,LiAlH4,claisen_condensation,Claisen Condensation,O=C1CCC(=O)O1.[Li+]>>OCCCO
+Selective reduction,NaBH4,claisen_condensation,Claisen Condensation,CC(=O)OC(=O)C.[Na+]>>CC(=O)CO
+Acetophenone,Transfer Hydrogenation,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,CC(=O)c1ccccc1.C1CCNC1>>CC(O)c1ccccc1
+Benzaldehyde,Transfer Hydrogenation,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.CCOC(=O)C=O>>c1ccc(CO)cc1
+Nitro reduction,Zn/HCl,halogenation_aromatic|reduction_nitro,Aromatic Halogenation|Nitro Reduction,c1ccc([N+](=O)[O-])cc1.[Zn]>>c1ccc(N)cc1
+Benzene to cyclohexadiene,Birch Reduction,halogenation_aromatic,Aromatic Halogenation,C1=CC=CC=C1>>C1CCC=CC1
+Anisole,Birch Reduction,halogenation_aromatic,Aromatic Halogenation,c1ccc(OC)cc1>>COC1C=CCC=C1
+Selective ketone,NaBH(OAc)3,epoxidation|halogenation_aromatic|ring_closing_metathesis,Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,c1ccc(C(=O)C=C)cc1>>c1ccc(C(O)C=C)cc1
+Ketone selective,DIBAL,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,CC(=O)CC=C>>CC(O)CC=C
+Ester to aldehyde,DIBAL,,,CC(=O)OCC>>CC=O
 Benzyl alcohol to aldehyde,Oxidation,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1.[O]>>c1ccc(C=O)cc1
 Secondary alcohol to ketone,Oxidation,halogenation_aromatic,Aromatic Halogenation,CC(O)c1ccccc1.[O]>>CC(=O)c1ccccc1
 Ethanol to acetaldehyde,Oxidation,,,CCO.[O]>>CC=O
 ,PCC Oxidation,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1.Cl[Cr](=O)(=O)OC(C)(C)C>>c1ccc(C=O)cc1
 ,Swern-type oxidation,,,CCO.OS(=O)(=O)O>>CC=O
-Benzyl alcohol oxidation,MnO2,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1.[MnO2]>>c1ccc(C=O)cc1
-Acetone,Jones Oxidation,,,CC(O)C.[CrO3]>>CC(=O)C
-Acetophenone,Dess-Martin,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(O)C)cc1.[Dess-Martin]>>c1ccc(C(=O)C)cc1
-Diol to diketone,IBX,,,CC(O)CCO.[IBX]>>CC(=O)CC=O
-Alcohol to acid,TEMPO,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1.[TEMPO].[NaOCl]>>c1ccc(C(=O)O)cc1
-Cyclohexylmethanol,PCC,,,C1CCC(CO)CC1.[PCC]>>C1CCC(C=O)CC1
+Benzyl alcohol oxidation,MnO2,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1>>c1ccc(C=O)cc1
+Acetone,Jones Oxidation,,,CC(O)C>>CC(=O)C
+Acetophenone,Dess-Martin,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(O)C)cc1>>c1ccc(C(=O)C)cc1
+Diol to diketone,IBX,,,CC(O)CCO>>CC(=O)CC=O
+Alcohol to acid,TEMPO,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1>>c1ccc(C(=O)O)cc1
+Cyclohexylmethanol,PCC,,,C1CCC(CO)CC1>>C1CCC(C=O)CC1
 Styrene epoxidation,mCPBA,epoxidation|ring_closing_metathesis|halogenation_aromatic,Epoxidation|Ring-Closing Metathesis|Aromatic Halogenation,C=Cc1ccccc1.[O]>>C1OC1c1ccccc1
 Isobutylene oxide,mCPBA,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=C(C)C.[O]>>CC1(C)CO1
 Diepoxide,mCPBA,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CCCCCC=C.[O]>>C1OC1CCCCC1CO1
 Phenyl acetate,Baeyer-Villiger,halogenation_aromatic,Aromatic Halogenation,CC(=O)c1ccccc1.[O]>>CC(=O)Oc1ccccc1
 Caprolactone,Baeyer-Villiger,,,O=C1CCCCC1.[O]>>O=C1OCCCC1
 ,Sulfide to sulfoxide,halogenation_aromatic,Aromatic Halogenation,CSc1ccccc1.[O]>>CS(=O)c1ccccc1
-,Sulfide to sulfone,halogenation_aromatic,Aromatic Halogenation,CSc1ccccc1.[mCPBA].[O]>>CS(=O)(=O)c1ccccc1
-Simple,Diels-Alder,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CC=C.C=C>>C1C=CCC1
-Substituted,Diels-Alder,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CC(=C)C.C=CC(=O)OCC>>CC1=CC(C(=O)OCC)CC(C)=C1
-Naphthyl,Diels-Alder,epoxidation|halogenation_aromatic|ring_closing_metathesis,Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,c1ccc2ccccc2c1C=CC=C.C=CC(=O)C>>O=C1CCc2c(ccc3ccccc23)C1
+,Sulfide to sulfone,halogenation_aromatic,Aromatic Halogenation,CSc1ccccc1.[O]>>CS(=O)(=O)c1ccccc1
+Simple,DielsâAlder,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CC=C.C=C>>C1C=CCC1
+Substituted,DielsâAlder,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CC(=C)C.C=CC(=O)OCC>>CC1=CC(C(=O)OCC)CC(C)=C1
+Naphthyl,DielsâAlder,epoxidation|halogenation_aromatic|ring_closing_metathesis,Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,c1ccc2ccccc2c1C=CC=C.C=CC(=O)C>>O=C1CCc2c(ccc3ccccc23)C1
 Triazole,CuAAC Click,halogenation_aromatic,Aromatic Halogenation,C#CCO.c1ccc([N-][N+]#N)cc1>>c1ccccc1n1cc(CO)nn1
 Phenyl triazole,Click,halogenation_aromatic,Aromatic Halogenation,C#Cc1ccccc1.C[N-][N+]#N>>Cc1nnn(-c2ccccc2)c1
 Ether-substituted triazole,Click,,,C#CCCOC.CC[N-][N+]#N>>CCn1ncc(CCOC)n1
 Benzyl azide + propargyl alcohol,Click,halogenation_aromatic,Aromatic Halogenation,C#CC(C)(C)O.c1ccc(C[N-][N+]#N)cc1>>CC(C)(O)Cn1cc(Cc2ccccc2)nn1
-Primary alcohol,SN2,,,CCCCBr.[OH-]>>CCCCO
-isopropyl alcohol,SN2,,,CC(Br)C.[OH-]>>CC(O)C
+Primary alcohol,SN2,,,CCCCBr>>CCCCO
+isopropyl alcohol,SN2,,,CC(Br)C>>CC(O)C
 Nitrile formation,SN2,,,CCBr.N#C>>CCC#N
 Phenoxide,SN2,halogenation_aromatic,Aromatic Halogenation,CCCCBr.Oc1ccccc1>>CCCCOc1ccccc1
 Thioether formation,SN2,,,CI.SC>>CSC
 Finkelstein halide exchange,SN2,,,CCCBr.[I-]>>CCCI
 Dinitrile,SN2,,,BrCCCCCl.[C-]#N>>N#CCCCCCN
-Benzyl alcohol,SN2,halogenation_aromatic,Aromatic Halogenation,ICc1ccccc1.[OH-]>>OCc1ccccc1
+Benzyl alcohol,SN2,halogenation_aromatic,Aromatic Halogenation,ICc1ccccc1>>OCc1ccccc1
 Azide substitution,SN2,,,BrCC(=O)OC.[N-]=[N+]=[N-]>>[N-]=[N+]=[N-]CC(=O)OC
-Thioether Formation,C-S Coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.Sc1ccccc1>>c1ccccc1Sc1ccccc1
-Thioether Formation,C-S Coupling,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(C)cc1.Sc1ccccc1>>Cc1ccc(Sc2ccccc2)cc1
-Pyridine thioether,C-S Coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccncc1.SCC>>CCSc1ccncc1
-Benzyl thioether,C-S Coupling,halogenation_aromatic,Aromatic Halogenation,Ic1ccc(C(F)(F)F)cc1.SCc1ccccc1>>FC(F)(F)c1ccc(SCc2ccccc2)cc1
-Methyl thioether,C-S Coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.SC>>CSc1ccc(OC)cc1
+Thioether Formation,CâS coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.Sc1ccccc1>>c1ccccc1Sc1ccccc1
+Thioether Formation,CâS coupling,halogenation_aromatic,Aromatic Halogenation,Clc1ccc(C)cc1.Sc1ccccc1>>Cc1ccc(Sc2ccccc2)cc1
+Pyridine thioether,CâS coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccncc1.SCC>>CCSc1ccncc1
+Benzyl thioether,CâS coupling,halogenation_aromatic,Aromatic Halogenation,Ic1ccc(C(F)(F)F)cc1.SCc1ccccc1>>FC(F)(F)c1ccc(SCc2ccccc2)cc1
+Methyl thioether,CâS coupling,halogenation_aromatic,Aromatic Halogenation,Brc1ccc(OC)cc1.SC>>CSc1ccc(OC)cc1
 tert-Butyl,SN1,,,CC(C)(C)Br.O>>CC(C)(C)O
 Benzyl tertiary,SN1,halogenation_aromatic,Aromatic Halogenation,c1ccc(C(C)(C)Cl)cc1.O>>c1ccc(C(C)(C)O)cc1
-Nitrofluorobenzene,SNAr,halogenation_aromatic|reduction_nitro,Aromatic Halogenation|Nitro Reduction,Fc1ccc([N+](=O)[O-])cc1.[OH-]>>[O-][N+](=O)c1ccc(O)cc1
+Nitrofluorobenzene,SNAr,halogenation_aromatic|reduction_nitro,Aromatic Halogenation|Nitro Reduction,Fc1ccc([N+](=O)[O-])cc1>>[O-][N+](=O)c1ccc(O)cc1
 Cyanuric chloride,SNAr,,,Clc1nc(Cl)nc(Cl)n1.OC>>COc1nc(Cl)nc(Cl)n1
 Dinitrofluorobenzene,SNAr,snar_cn|halogenation_aromatic|reduction_nitro,SNAr C-N|Aromatic Halogenation|Nitro Reduction,Fc1cc([N+](=O)[O-])cc([N+](=O)[O-])c1.NC>>[O-][N+](=O)c1cc([N+](=O)[O-])cc(NC)c1
 Trifluoromethyl activation,SNAr,halogenation_aromatic,Aromatic Halogenation,Fc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1
 Pyridine,SNAr,halogenation_aromatic,Aromatic Halogenation,Clc1ccncc1.OC>>COc1ccncc1
-,Allylic SN2,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CCC(Br)C.[OH-]>>C=CCC(C)O
+,Allylic SN2,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CCC(Br)C>>C=CCC(C)O
 Thiol,Allylic substitution,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CCCC(Cl)C.SC>>C=CCCC(C)SC
 Iodide exchange,Finkelstein,,,CCCCBr.[I-]>>CCCCI
 Benzyl,Finkelstein,halogenation_aromatic,Aromatic Halogenation,c1ccc(CCl)cc1.[I-]>>c1ccc(CI)cc1
@@ -296,10 +296,10 @@ Mixed aldol,Aldol,,,CC(=O)C.CC=O>>CC(O)C(C)C=O
 Benzaldehyde,Aldol,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.CC(=O)C>>c1ccc(C(O)C(C)C=O)cc1
 Propionaldehyde,Aldol,,,CCC=O.CC(=O)C>>CCC(O)C(C)C=O
 Dehydration to cinnamaldehyde,Aldol,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.CC=O>>c1ccc(/C=C/C=O)cc1
-Propene,Wittig,halogenation_aromatic,Aromatic Halogenation,CC=O.C[P+](c1ccccc1)(c1ccccc1)c1ccccc1.[base]>>C=CC
+Propene,Wittig,halogenation_aromatic,Aromatic Halogenation,CC=O.C[P+](c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC
 Diene,Wittig,epoxidation|halogenation_aromatic|ring_closing_metathesis,Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,c1ccc(C=O)cc1.C=C[P+](c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(/C=C/C=C)cc1
-"α,β-Unsaturated ester",Wittig,halogenation_aromatic,Aromatic Halogenation,CC(=O)C.CCOC(=O)C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>CCOC(=O)C=C(C)C
-Propiophenone,Wittig,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.[Ph3P]=CHC>>c1ccc(C=CC)cc1
+"Î±,Î²-Unsaturated ester",Wittig,halogenation_aromatic,Aromatic Halogenation,CC(=O)C.CCOC(=O)C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>CCOC(=O)C=C(C)C
+Propiophenone,Wittig,halogenation_aromatic,Aromatic Halogenation,c1ccc(C=O)cc1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(C=CC)cc1
 Simple,Mannich,reductive_amination,Reductive Amination,CC=O.NC.C=O>>CC(=O)CN
 Pyrrolidine,Mannich,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,c1ccc(C=O)cc1.C1CCNC1.C=O>>c1ccc(C(=O)CN1CCCC1)cc1
 "Benzaldehyde + aniline, secondary amine",Reductive Amination,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,O=Cc1ccccc1.Nc1ccccc1>>c1ccc(CNc2ccccc2)cc1
@@ -362,7 +362,7 @@ Acetaldehyde,Biginelli,reductive_amination,Reductive Amination,O=C(N)N.CC(=O)CC(
 ,Fischer Indole,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,c1ccc(C(C)=O)cc1.c1ccc(NN)cc1>>Cc1c2ccccc2[nH]c1-c1ccccc1
 3-Ethyl,Fischer Indole,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,CC(=O)CC.c1ccccc1NN>>CCc1c2ccccc2[nH]c1C
 Tetrahydroisoquinoline,Pictet-Spengler,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,NCCc1ccc(O)cc1.CC=O>>Cc1nccc2ccc(O)cc12
-β-Carboline,Pictet-Spengler,halogenation_aromatic,Aromatic Halogenation,NCCc1c[nH]c2ccccc12.C=O>>c1ccc2[nH]cc3c2c1CCN3
+Î²-Carboline,Pictet-Spengler,halogenation_aromatic,Aromatic Halogenation,NCCc1c[nH]c2ccccc12.C=O>>c1ccc2[nH]cc3c2c1CCN3
 ,Benzimidazole from o-phenylenediamine,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,c1ccc(c(N)c1)N.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3[nH]2)cc1
 Acetic acid,Benzimidazole,amide_coupling|halogenation_aromatic,Amide Coupling|Aromatic Halogenation,c1ccc(c(N)c1)N.CC(=O)O>>Cc1nc2ccccc2[nH]1
 ,Benzoxazole,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,c1ccc(c(N)c1)O.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3o2)cc1
@@ -371,17 +371,17 @@ Acetic acid,Benzoxazole,amide_coupling|halogenation_aromatic,Amide Coupling|Arom
 ,Imidazole,reductive_amination,Reductive Amination,CC(=O)C=O.NC=O.N>>Cc1nccn1C
 Aniline,Boc Protection,claisen_condensation|halogenation_aromatic,Claisen Condensation|Aromatic Halogenation,c1ccc(N)cc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)Nc1ccccc1
 Phenethylamine,Boc Protection,claisen_condensation|halogenation_aromatic,Claisen Condensation|Aromatic Halogenation,NCCc1ccccc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NCCc1ccccc1
-TFA or HCl,Boc Deprotection,halogenation_aromatic,Aromatic Halogenation,CC(C)(C)OC(=O)Nc1ccccc1.[HCl]>>c1ccc(N)cc1
+TFA or HCl,Boc Deprotection,halogenation_aromatic,Aromatic Halogenation,CC(C)(C)OC(=O)Nc1ccccc1>>c1ccc(N)cc1
 Aniline,Cbz Protection,claisen_condensation|halogenation_aromatic,Claisen Condensation|Aromatic Halogenation,c1ccc(N)cc1.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(Nc1ccccc1)OCc1ccccc1
 Glycine,Cbz Protection,amide_coupling|claisen_condensation|halogenation_aromatic,Amide Coupling|Claisen Condensation|Aromatic Halogenation,NCC(=O)O.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(NCC(=O)O)OCc1ccccc1
 Hydrogenolysis,Cbz Deprotection,halogenation_aromatic,Aromatic Halogenation,O=C(Nc1ccccc1)OCc1ccccc1.[H][H].[Pd]>>c1ccc(N)cc1
 ,FMOC Protection,claisen_condensation|halogenation_aromatic,Claisen Condensation|Aromatic Halogenation,c1ccc(N)cc1.O=C1OC(=O)c2ccccc21>>O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21
-Base,FMOC Deprotection,halogenation_aromatic,Aromatic Halogenation,O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21.[Base]>>c1ccc(N)cc1
+Base,FMOC Deprotection,halogenation_aromatic,Aromatic Halogenation,O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21>>c1ccc(N)cc1
 Benzyl alcohol,TBS Protection,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1.CC(C)(C)[Si](C)(C)Cl>>CC(C)(C)[Si](C)(C)OCc1ccccc1
 Diol,TBS Protection,,,OCCO.CC(C)(C)[Si](C)(C)Cl>>CC(C)(C)[Si](C)(C)OCCO[Si](C)(C)C(C)(C)C
 TBAF,TBS Deprotection,halogenation_aromatic,Aromatic Halogenation,CC(C)(C)[Si](C)(C)OCc1ccccc1.[F-]>>c1ccc(CO)cc1
 ,PMB Protection,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1.BrCc1ccc(OC)cc1>>COc1ccc(COCc2ccccc2)cc1
-DDQ,PMB Deprotection,halogenation_aromatic,Aromatic Halogenation,COc1ccc(COCc2ccccc2)cc1.[DDQ]>>c1ccc(CO)cc1
+DDQ,PMB Deprotection,halogenation_aromatic,Aromatic Halogenation,COc1ccc(COCc2ccccc2)cc1>>c1ccc(CO)cc1
 Glycerol,Acetonide Protection,,,OCC(O)CO.CC(=O)C>>CC1(C)OCC(CO)O1
 Acid,Acetonide Deprotection,,,CC1(C)OCC(CO)O1.[H+]>>OCC(O)CO
 ,Bn Protection,halogenation_aromatic|oxidation_alcohol,Aromatic Halogenation|Alcohol Oxidation,c1ccc(CO)cc1.BrCc1ccccc1>>c1ccc(COCc2ccccc2)cc1
@@ -409,9 +409,42 @@ Hydrogenolysis,Bn Deprotection,halogenation_aromatic,Aromatic Halogenation,c1ccc
 ,Amide: Cyclohexanecarboxylic acid + tryptamine,amide_coupling|halogenation_aromatic,Amide Coupling|Aromatic Halogenation,O=C(O)C1CCCCC1.NCCc1ccc[nH]1>>O=C(NCCc1ccc[nH]1)C1CCCCC1
 ,Amide: Leucine + benzylamine,amide_coupling|halogenation_aromatic,Amide Coupling|Aromatic Halogenation,CC(C)CC(N)C(=O)O.NCc1ccccc1>>CC(C)CC(N)C(=O)NCc1ccccc1
 ,Amide: Phenylalanine + cyclohexylamine,amide_coupling|halogenation_aromatic,Amide Coupling|Aromatic Halogenation,N[C@@H](Cc1ccccc1)C(=O)O.NC1CCCCC1>>N[C@@H](Cc1ccccc1)C(=O)N1CCCCC1
-,"Amide: Benzoic acid + N,N-dimethylaniline → tertiary amide",halogenation_aromatic,Aromatic Halogenation,O=C(O)c1ccccc1.CN(C)c1ccccc1>>CN(C)c1ccccc1.O=C(N(C)c1ccccc1)c1ccccc1
+,"Amide: Benzoic acid + N,N-dimethylaniline â?tertiary amide",halogenation_aromatic,Aromatic Halogenation,O=C(O)c1ccccc1.CN(C)c1ccccc1>>CN(C)c1ccccc1.O=C(N(C)c1ccccc1)c1ccccc1
 ,Amide: Acetic acid + pyrrolidine,amide_coupling,Amide Coupling,CC(=O)O.N1CCCC1>>CC(=O)N1CCCC1
 ,Amide: 4-Bromobenzoic acid + morpholine,amide_coupling|buchwald_hartwig|halogenation_aromatic,Amide Coupling|Buchwald-Hartwig|Aromatic Halogenation,O=C(O)c1ccc(Br)cc1.N1CCOCC1>>O=C(N1CCOCC1)c1ccc(Br)cc1
 ,Amide: EDC/HOBt coupling,amide_coupling|halogenation_aromatic,Amide Coupling|Aromatic Halogenation,O=C(O)c1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccccc1
 ,Amide: DCC/NHS coupling,amide_coupling|halogenation_aromatic,Amide Coupling|Aromatic Halogenation,CC(C)(C)C(=O)O.NCc1ccccc1>>CC(C)(C)C(=O)NCc1ccccc1
 ,Amide: HATU/DIPEA coupling,amide_coupling|halogenation_aromatic,Amide Coupling|Aromatic Halogenation,O=C(O)c1ccc(OC)cc1.NC1CCCCC1>>COc1ccc(C(=O)N1CCCCC1)cc1
+Bromoethane â?propionitrile,SN2 substitution,,,CCBr.[C-]#N>>CCC#N
+tert-Butyl chloride â?tert-butanol,SN1 substitution,,,CC(C)(C)Cl.O>>CC(C)(C)O
+2-bromobutane â?but-2-ene,E2 elimination,,,CCC(Br)C.CC(C)(C)[O-]>>CC=CC
+Styrene â?ethylbenzene,Hydrogenation,epoxidation|ring_closing_metathesis|halogenation_aromatic,Epoxidation|Ring-Closing Metathesis|Aromatic Halogenation,C=CC1=CC=CC=C1>>CCc1ccccc1
+1-hexene â?1-hexanol,Hydroboration-oxidation,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,CCCCCC=C>>CCCCCCO
+Cyclohexene â?cyclohexene oxide,Epoxidation,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C1=CCCCC1>>O1CCCCC1
+"Cyclohexene â?cis-1,2-diol",Dihydroxylation,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C1=CCCCC1>>OC1CCCCC1O
+Acetone + formaldehyde,Aldol addition,,,CC(=O)C.C=O>>CC(=O)CCO
+Acetone self-condensation,Aldol condensation,,,CC(=O)C.CC(=O)C>>CC(=O)C=C(C)C
+Benzaldehyde + MeMgBr,Grignard addition,halogenation_aromatic,Aromatic Halogenation,O=CC1=CC=CC=C1.C[Mg]Br>>CC(O)c1ccccc1
+Cyclohexanone + methylamine,Reductive amination,reductive_amination,Reductive Amination,O=C1CCCCC1.CNC>>CNC1CCCCC1
+Benzaldehyde + aniline,Imine formation,reductive_amination|halogenation_aromatic,Reductive Amination|Aromatic Halogenation,O=CC1=CC=CC=C1.Nc1ccccc1>>c1ccc(/C=N\c2ccccc2)cc1
+Benzaldehyde â?styrene,Wittig,halogenation_aromatic,Aromatic Halogenation,O=CC1=CC=CC=C1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC1=CC=CC=C1
+Benzaldehyde â?cinnamate,HWE olefination,epoxidation|halogenation_aromatic,Epoxidation|Aromatic Halogenation,O=CC1=CC=CC=C1.CCOP(=O)(OCC)C=C(C(=O)OCC)[O-]>>CCOC(=O)C=CC1=CC=CC=C1
+Benzene + tert-butyl chloride,FriedelâCrafts alkylation,halogenation_aromatic,Aromatic Halogenation,c1ccccc1.CC(C)(C)Cl>>CC(C)(C)c1ccccc1
+Benzene + acetyl chloride,FriedelâCrafts acylation,halogenation_aromatic,Aromatic Halogenation,c1ccccc1.CC(=O)Cl>>CC(=O)c1ccccc1
+Benzene â?nitrobenzene,Electrophilic nitration,halogenation_aromatic,Aromatic Halogenation,c1ccccc1>>O=[N+]([O-])c1ccccc1
+Benzene â?bromobenzene,Electrophilic bromination,halogenation_aromatic,Aromatic Halogenation,c1ccccc1>>Brc1ccccc1
+Bromobenzene + ethene â?styrene,Heck,heck|epoxidation|halogenation_aromatic|ring_closing_metathesis,Heck|Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,Brc1ccccc1.C=C>>C=CC1=CC=CC=C1
+Bromobenzene + acetylene â?phenylacetylene,Sonogashira,halogenation_aromatic,Aromatic Halogenation,Brc1ccccc1.C#C>>C#Cc1ccccc1
+Bromobenzene + morpholine,BuchwaldâHartwig amination,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Brc1ccccc1.O1CCNCC1>>c1ccc(N2CCOCC2)cc1
+Bromobenzene + phenylboronic acid,Suzuki,suzuki_miyaura|ullmann_ether|halogenation_aromatic|oxidation_alcohol,Suzuki-Miyaura|Ullmann Ether Synthesis|Aromatic Halogenation|Alcohol Oxidation,Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1
+Bromobenzene + ethylzinc bromide,Negishi,negishi|halogenation_aromatic,Negishi|Aromatic Halogenation,Brc1ccccc1.CC[Zn]Br>>CCc1ccccc1
+Bromobenzene + ethylmagnesium bromide,Kumada,kumada|halogenation_aromatic,Kumada|Aromatic Halogenation,Brc1ccccc1.CC[Mg]Br>>CCc1ccccc1
+Bromobenzene + vinylstannane,Stille,heck|stille|epoxidation|halogenation_aromatic|ring_closing_metathesis,Heck|Stille|Epoxidation|Aromatic Halogenation|Ring-Closing Metathesis,Brc1ccccc1.C=C[Sn](C)(C)C>>C=CC1=CC=CC=C1
+Phenylboronic acid + aniline,ChanâLam,chan_lam_cn|halogenation_aromatic|oxidation_alcohol,Chan-Lam C-N|Aromatic Halogenation|Alcohol Oxidation,Nc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(Nc2ccccc2)cc1
+Iodobenzene + aniline,Ullmann CâN,buchwald_hartwig|halogenation_aromatic,Buchwald-Hartwig|Aromatic Halogenation,Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1
+Cyclopentadiene + maleic anhydride,DielsâAlder,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C1=CC=CC1.C1(=O)OC(=O)C=CC1=O>>O=C1OC(=O)C2C=CC1C2
+Diallyl ether â?dihydropyran,Ring-closing metathesis,epoxidation|ring_closing_metathesis,Epoxidation|Ring-Closing Metathesis,C=CCOCC=C>>C1=CCOCC1
+1-butanol â?butanal,Swern oxidation,,,CCCCO>>CCCC=O
+Acetophenone â?1-phenylethanol,NaBH4 reduction,halogenation_aromatic,Aromatic Halogenation,CC(=O)c1ccccc1>>CC(O)c1ccccc1
+Ethyl benzoate â?benzyl alcohol,LiAlH4 reduction,halogenation_aromatic,Aromatic Halogenation,CCOC(=O)c1ccccc1>>OCCc1ccccc1
+Styrene â?benzaldehyde + formaldehyde,Ozonolysis,epoxidation|ring_closing_metathesis|halogenation_aromatic,Epoxidation|Ring-Closing Metathesis|Aromatic Halogenation,C=CC1=CC=CC=C1>>O=CC1=CC=CC=C1.C=O

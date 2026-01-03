@@ -152,6 +152,51 @@
       "description": "Aryl or vinyl organometallic (Li, Na, K, Mg, Zn, Cu, Ag)."
     },
     {
+      "id": "Ar-Ar",
+      "name": "Biaryl",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Ar",
+      "description": "Biaryl (Ar-Ar) bond.",
+      "aliases": ["biaryl", "Ar-Ar"]
+    },
+    {
+      "id": "Ar-Vinyl",
+      "name": "Vinyl-Arene",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Vinyl",
+      "description": "Aryl-Vinyl bond (e.g., styrene).",
+      "aliases": ["styrene", "vinyl-arene"]
+    },
+    {
+      "id": "Vinyl-Vinyl",
+      "name": "1,3-Diene",
+      "template": "single_bond",
+      "A": "Vinyl",
+      "B": "Vinyl",
+      "description": "Vinyl-Vinyl bond (1,3-diene).",
+      "aliases": ["diene", "1,3-diene"]
+    },
+    {
+      "id": "Ar-Alkyne",
+      "name": "Aryl-Alkyne",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "CCH",
+      "description": "Aryl-Alkyne bond.",
+      "aliases": ["aryl-alkyne"]
+    },
+    {
+      "id": "Ar-Alkynyl",
+      "name": "Aryl-Alkynyl",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Alkynyl",
+      "description": "Aryl-Alkynyl bond (internal or terminal).",
+      "aliases": ["aryl-alkyne"]
+    },
+    {
       "id": "Ar-X",
       "name": "Ar-X",
       "template": "single_bond",
@@ -723,6 +768,15 @@
       "A": "Ar",
       "B": "OH",
       "description": "Aryl alcohol/phenol (Ar-OH)."
+    },
+    {
+      "id": "Ar-OR",
+      "name": "Aryl-Ether",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "OR",
+      "description": "Aryl ether (Ar-OR).",
+      "aliases": ["aryl ether"]
     },
     {
       "id": "Ar-SH",

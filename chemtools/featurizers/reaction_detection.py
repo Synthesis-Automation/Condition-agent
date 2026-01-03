@@ -74,11 +74,16 @@ def detect_reaction_types(
         for item in reactants
     ]
     reactant_smiles = [s for s in reactant_smiles if s]
-    product_smiles = [
-        item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
-        for item in (normalized.get("products") or [])
-    ]
-    product_smiles = [s for s in product_smiles if s]
+
+    # Only consider products if the reaction SMILES explicitly contains them (via > or >>)
+    product_smiles = None
+    if ">" in reaction_smiles:
+        product_smiles = [
+            item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
+            for item in (normalized.get("products") or [])
+        ]
+        product_smiles = [s for s in product_smiles if s]
+
     if not reactant_smiles:
         return ReactionDetectionResult(matches=[], error="no_reactants")
     return detect_reaction_types_from_smiles(
@@ -108,8 +113,8 @@ def detect_reaction_types_from_smiles(
 
     product_profile = (
         _detect_motif_profile(product_smiles, max_hits_per_compound=max_hits_per_compound)
-        if product_smiles
-        else {}
+        if product_smiles is not None
+        else None
     )
 
     definitions, _ = load_reaction_catalog()
@@ -158,6 +163,10 @@ def _detect_motif_profile(
         mol = parse_smiles(smiles)
         if mol is None:
             continue
+        
+        from rdkit import Chem
+        mol = Chem.AddHs(mol)
+        
         hits = detect_motifs(
             mol,
             compiled,
@@ -179,7 +188,7 @@ def _detect_motif_profile(
 def _match_reaction_definition(
     definition: ReactionTypeDefinition,
     detected_motifs: Dict[str, Dict[str, Any]],
-    detected_products: Dict[str, Dict[str, Any]],
+    detected_products: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> Optional[ReactionMatch]:
     slot_evidence: Dict[str, List[str]] = {}
     required_slots = 0
@@ -224,10 +233,11 @@ def _match_reaction_definition(
 
     if definition.reactants and not apply_requirements(definition.reactants, detected_motifs):
         return None
-    if definition.products and not apply_requirements(
-        definition.products, detected_products, slot_prefix="product:"
-    ):
-        return None
+    
+    # Only check products if they were provided in the input
+    if definition.products and detected_products is not None:
+        if not apply_requirements(definition.products, detected_products, slot_prefix="product:"):
+            return None
 
     if required_slots == 0:
         return None
@@ -239,9 +249,15 @@ def _match_reaction_definition(
         all_molecule_indices = set()
         for slot_name, hits in slot_evidence.items():
             # Determine if this was a reactant or product slot
-            profile = detected_products if slot_name.startswith("product:") else detected_motifs
+            is_product_slot = slot_name.startswith("product:")
+            profile = detected_products if is_product_slot else detected_motifs
+            
+            # If it's a product slot but no products were provided, skip counting
+            if is_product_slot and profile is None:
+                continue
+                
             for motif in hits:
-                entry = profile.get(motif)
+                entry = profile.get(motif) if profile else None
                 if entry:
                     total_hits += entry.get("count", 0)
                     all_molecule_indices.update(entry.get("molecules") or set())

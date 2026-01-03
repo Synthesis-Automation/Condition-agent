@@ -16,6 +16,22 @@
         "Vinyl-B(OH)2", "Vinyl-Bpin", "Vinyl-BF3K", "Vinyl-B(OR)2"
       ]
     },
+    "organozinc": {
+      "name": "Organozinc",
+      "members": ["Ar-Zn", "Vinyl-Zn", "R-Zn"]
+    },
+    "organotin": {
+      "name": "Organotin",
+      "members": ["Ar-Sn", "Vinyl-Sn", "R-Sn"]
+    },
+    "organomagnesium": {
+      "name": "Organomagnesium",
+      "members": ["Ar-Mg", "Vinyl-Mg", "R-Mg"]
+    },
+    "organosilicon": {
+      "name": "Organosilicon",
+      "members": ["Ar-Si", "Vinyl-Si"]
+    },
     "amines_nh": {
       "name": "Amines (N-H)",
       "members": [
@@ -47,7 +63,7 @@
     },
     "terminal_alkenes": {
       "name": "Terminal Alkenes",
-      "members": ["Ar-CHCH2", "R-CHCH2"]
+      "members": ["Ar-CHCH2", "R-CHCH2", "Any-CHCH2", "Vinyl-H"]
     },
     "carbonyls": {
       "name": "Carbonyls",
@@ -78,6 +94,21 @@
     "hydrogenation_substrates": {
       "name": "Hydrogenation Substrates",
       "members": ["Ar-CCH", "R-CCH", "Ar-CHCH2", "R-CHCH2", "Ar-NO2", "R-NO2", "Any-Alkene"]
+    },
+    "cross_coupling_products": {
+      "name": "Cross-Coupling Products",
+      "members": ["Ar-Ar", "Ar-CHCH2", "Vinyl-Vinyl", "Ar-Alkynyl"],
+      "description": "Common products of C-C cross-coupling reactions."
+    },
+    "aryl_amines": {
+      "name": "Aryl Amines",
+      "members": ["Ar-NH2", "Ar-NHR", "Ar-NR2"],
+      "description": "Products of C-N coupling."
+    },
+    "aryl_ethers": {
+      "name": "Aryl Ethers",
+      "members": ["Ar-OR"],
+      "description": "Products of C-O coupling."
     }
   }
 }
