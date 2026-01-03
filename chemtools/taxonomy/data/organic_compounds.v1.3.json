@@ -124,16 +124,6 @@
       ]
     },
     {
-      "id": "R-H-acidic",
-      "name": "R-H-acidic",
-      "smarts": "[CX4:1]",
-      "description": "Acidic alkyl C-H (R-H-acidic).",
-      "aliases": [
-        "Alkyl-H acidic",
-        "alkyl C-H acidic"
-      ]
-    },
-    {
       "id": "Vinyl-F",
       "name": "Vinyl-F",
       "template": "single_bond",

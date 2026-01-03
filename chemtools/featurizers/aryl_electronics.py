@@ -10,9 +10,37 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from chemtools.util.smarts_cache import compile_smarts
 
 _ELECTRONICS_METHOD = "tag_weighted_v1"
-_ELECTRONIC_GROUP_IDS = ["NO2", "CN", "CHO", "CO2R", "CO2H", "CONHR"]
+_ELECTRONIC_GROUP_IDS = [
+    "NO2", "CN", "CHO", "CO2R", "CO2H", "CONHR",
+    "NR2", "NHR", "NH2", "OR", "OH", "F", "Cl", "Br", "I"
+]
 _WEIGHTS = {"ortho": 1.0, "meta": 0.6, "para": 1.2, "ipso": 1.0}
-_STRENGTHS = {"ewg_strong": 2.0, "ewg_moderate": 1.0}
+_STRENGTHS = {
+    "ewg_strong": 2.0,
+    "ewg_moderate": 1.0,
+    "ewg_weak": 0.5,
+    "edg_strong": -2.0,
+    "edg_moderate": -1.0,
+    "edg_weak": -0.5,
+}
+
+_GROUP_STRENGTH_MAP = {
+    "NO2": "ewg_strong",
+    "CN": "ewg_strong",
+    "CHO": "ewg_moderate",
+    "CO2R": "ewg_moderate",
+    "CO2H": "ewg_moderate",
+    "CONHR": "ewg_moderate",
+    "F": "ewg_weak",
+    "Cl": "ewg_weak",
+    "Br": "ewg_weak",
+    "I": "ewg_weak",
+    "NR2": "edg_strong",
+    "NHR": "edg_strong",
+    "NH2": "edg_strong",
+    "OR": "edg_moderate",
+    "OH": "edg_moderate",
+}
 
 
 def analyze_aryl_electronics(
@@ -153,7 +181,7 @@ def _compute_electronics(
             pos = "ipso" if ring_atom == ipso else _position_for_distance(ring_dist[ring_atom])
             if pos is None:
                 continue
-            strength = _strength_from_tags(groups_dict.get(group_id, {}).get("tags") or [])
+            strength = _strength_from_tags(group_id, groups_dict.get(group_id, {}).get("tags") or [])
             weight = _WEIGHTS.get(pos, 0.0)
             if strength == 0.0 or weight == 0.0:
                 continue
@@ -244,10 +272,17 @@ def _query_map_atom(pattern: Any, *, map_num: int) -> Optional[int]:
     return None
 
 
-def _strength_from_tags(tags: List[str]) -> float:
+def _strength_from_tags(group_id: str, tags: List[str]) -> float:
+    # 1. Check tags first (if any)
     for tag in tags:
         if tag in _STRENGTHS:
             return _STRENGTHS[tag]
+
+    # 2. Fallback to hardcoded group mapping
+    strength_key = _GROUP_STRENGTH_MAP.get(group_id)
+    if strength_key:
+        return _STRENGTHS.get(strength_key, 0.0)
+
     return 0.0
 
 

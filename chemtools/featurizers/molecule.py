@@ -100,7 +100,11 @@ def featurize_molecule(
     analyses = []
     for hit in motifs:
         compound_id = hit["compound_id"]
-        if compound_id.startswith(("Ar-", "AromN-")):
+        # Aryl/Heteroaryl motifs
+        if compound_id.startswith((
+            "Ar-", "AromN-", "Pyridine-", "Pyrimidine-", "Pyrrole-", "Indole-", 
+            "Thiophene-", "Furan-", "Imidazole-", "Quinoline-", "Isoquinoline-"
+        )):
             steric = analyze_aryl_steric(mol, hit)
             if include_ipso_group == "both":
                 electronic = [
@@ -137,7 +141,11 @@ def featurize_molecule(
                     "nearby_groups": nearby,
                 }
             )
-        elif compound_id.startswith(("R-", "Bn-", "Allyl-")):
+        # Alkyl/Generic motifs
+        elif compound_id.startswith((
+            "R-", "Bn-", "Allyl-", "Any-", "RCH2-", "R2CH-", "R3C-", 
+            "Vinyl-", "Alkynyl-", "Acyl-", "Propargyl-"
+        )):
             steric = analyze_alkyl_steric(mol, hit)
             nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)
             analyses.append(
