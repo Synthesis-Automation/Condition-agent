@@ -4,26 +4,31 @@
   "group_sets": {
     "X": {
       "name": "Halogen",
+      "priority": 0,
       "members": ["F", "Cl", "Br", "I"],
       "description": "Common halogen substituents (F, Cl, Br, I)."
     },
     "SO2X": {
       "name": "Sulfonyl Halide",
+      "priority": 0,
       "members": ["SO2F", "SO2Cl", "SO2Br", "SO2I"],
       "description": "Sulfonyl halides (F, Cl, Br, I)."
     },
     "COX": {
       "name": "Acyl Halide",
+      "priority": 0,
       "members": ["COF", "COCl", "COBr", "COI"],
       "description": "Acyl halides (F, Cl, Br, I)."
     },
     "Sulfonate": {
       "name": "Sulfonate",
+      "priority": 0,
       "members": ["OTf", "OTs", "OMs", "OSO2R"],
       "description": "Sulfonate leaving groups (Triflate, Tosylate, Mesylate, etc.)."
     },
     "LeavingGroup": {
       "name": "Leaving Group",
+      "priority": 0,
       "members": ["X", "Sulfonate", "SO2X", "COX"],
       "description": "Combined halogens, sulfonates, and other common leaving groups."
     },
@@ -69,11 +74,13 @@
     },
     "sp2_Carbon": {
       "name": "sp2 Carbon Scaffold",
+      "priority": 0,
       "members": ["Ar", "Vinyl"],
       "description": "Aromatic or vinylic carbon attachment points."
     },
     "sp3_Carbon": {
       "name": "sp3 Carbon Scaffold",
+      "priority": 0,
       "members": ["R", "RCH2", "R2CH", "R3C", "Bn", "Allyl"],
       "description": "Alkyl (sp3 carbon) attachment points."
     },

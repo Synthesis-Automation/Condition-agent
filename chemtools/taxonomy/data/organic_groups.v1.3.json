@@ -7,6 +7,7 @@
       "id": "Any_Scaffold",
       "name": "Any-",
       "kind": "scaffold",
+      "priority": 0,
       "smarts": "[*:1]",
       "description": "Wildcard for any scaffold attachment point (any atom).",
       "tags": [
@@ -18,6 +19,7 @@
       "id": "Any_Substituent",
       "name": "-Any",
       "kind": "substituent",
+      "priority": 0,
       "smarts": "[*:2]",
       "description": "Wildcard for any substituent attachment point (any atom).",
       "tags": [
@@ -29,6 +31,7 @@
       "id": "Ar",
       "name": "Ar-",
       "kind": "scaffold",
+      "priority": 1,
       "smarts": "[c:1]",
       "description": "Aryl attachment via aromatic carbon (Ar-).",
       "tags": [
@@ -41,6 +44,7 @@
       "id": "AromN",
       "name": "AromN-",
       "kind": "scaffold",
+      "priority": 1,
       "smarts": "[n:1]",
       "description": "Aromatic attachment via aromatic nitrogen (e.g., N-substituted pyrroles, indoles) (AromN-).",
       "tags": [
@@ -53,6 +57,7 @@
       "id": "Vinyl",
       "name": "Vinyl-",
       "kind": "scaffold",
+      "priority": 1,
       "smarts": "[C;X3:1]=[C;X3]",
       "description": "Vinylic (alkenyl) attachment at an sp2 carbon.",
       "tags": [
@@ -65,6 +70,7 @@
       "id": "R",
       "name": "R-",
       "kind": "scaffold",
+      "priority": 1,
       "smarts": "[CX4:1]",
       "description": "Alkyl (sp3 carbon) attachment point (R-).",
       "tags": [
@@ -77,6 +83,7 @@
       "id": "RCH2",
       "name": "RCH2-",
       "kind": "scaffold",
+      "priority": 2,
       "smarts": "[CX4H2:1]",
       "description": "Primary alkyl (sp3 CH2) attachment point.",
       "tags": [
@@ -90,6 +97,7 @@
       "id": "R2CH",
       "name": "R2CH-",
       "kind": "scaffold",
+      "priority": 2,
       "smarts": "[CX4H1:1]",
       "description": "Secondary alkyl (sp3 CH) attachment point.",
       "tags": [
@@ -103,6 +111,7 @@
       "id": "R3C",
       "name": "R3C-",
       "kind": "scaffold",
+      "priority": 2,
       "smarts": "[CX4H0:1]",
       "description": "Tertiary alkyl (sp3 C) attachment point.",
       "tags": [
@@ -116,6 +125,7 @@
       "id": "Bn",
       "name": "Bn-",
       "kind": "scaffold",
+      "priority": 2,
       "smarts": "[CH2:1][c]",
       "description": "Benzylic CH2 attachment (Bn-).",
       "tags": [
@@ -128,6 +138,7 @@
       "id": "Allyl",
       "name": "Allyl-",
       "kind": "scaffold",
+      "priority": 2,
       "smarts": "[CH2:1][CH]=[CH2]",
       "description": "Allylic CH2 attachment (Allyl-).",
       "tags": [
@@ -140,6 +151,7 @@
       "id": "Alkynyl",
       "name": "Alkynyl-",
       "kind": "scaffold",
+      "priority": 1,
       "smarts": "[#6:1]#[#6]",
       "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal).",
       "tags": [
@@ -152,6 +164,7 @@
       "id": "Acyl",
       "name": "Acyl-",
       "kind": "scaffold",
+      "priority": 1,
       "smarts": "[CX3:1](=O)",
       "description": "Acyl carbon attachment point (Acyl-), used for acyl electrophiles/features.",
       "tags": [
@@ -161,9 +174,24 @@
       ]
     },
     {
+      "id": "X",
+      "name": "-X",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[F,Cl,Br,I:2]",
+      "description": "Generic halide substituent (-X).",
+      "tags": [
+        "halide",
+        "x_group",
+        "leaving_group",
+        "wildcard"
+      ]
+    },
+    {
       "id": "Cl",
       "name": "-Cl",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[Cl:2]",
       "description": "Chloro substituent substituent (-Cl).",
       "tags": [
@@ -176,6 +204,7 @@
       "id": "Br",
       "name": "-Br",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[Br:2]",
       "description": "Bromo substituent substituent (-Br).",
       "tags": [
@@ -188,6 +217,7 @@
       "id": "I",
       "name": "-I",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[I:2]",
       "description": "Iodo substituent substituent (-I).",
       "tags": [
@@ -200,6 +230,7 @@
       "id": "F",
       "name": "-F",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[F:2]",
       "description": "Fluoro substituent substituent (-F).",
       "tags": [
@@ -212,6 +243,7 @@
       "id": "H",
       "name": "-H",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[H:2]",
       "description": "Hydrogen substituent substituent (-H).",
       "tags": [
@@ -223,6 +255,7 @@
       "id": "CHO",
       "name": "-CHO",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3H1:2](=O)",
       "description": "Aldehyde core; attach via formyl carbon (-CHO).",
       "tags": [
@@ -234,6 +267,7 @@
       "id": "CN",
       "name": "-CN",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[#6:2]#N",
       "description": "Nitrile core; attach via cyano carbon (-CN).",
       "tags": [
@@ -244,6 +278,7 @@
       "id": "SCN",
       "name": "-SCN",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[S:2]C#N",
       "description": "Thiocyanate core; attach via sulfur (-SCN).",
       "tags": [
@@ -254,6 +289,7 @@
       "id": "NCS",
       "name": "-NCS",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[N:2]=C=S",
       "description": "Isothiocyanate core; attach via nitrogen (-NCS).",
       "tags": [
@@ -264,6 +300,7 @@
       "id": "NO2",
       "name": "-NO2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[N+:2](=O)[O-]",
       "description": "Nitro core; attach via nitro nitrogen (-NO2).",
       "tags": [
@@ -274,6 +311,7 @@
       "id": "N3",
       "name": "-N3",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[N:2]=[N+]=[N-]",
       "description": "Azide substituent (-N3); attach via nitrogen.",
       "tags": [
@@ -282,9 +320,23 @@
       ]
     },
     {
+      "id": "B_Any",
+      "name": "-B(R)2",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[B:2]",
+      "description": "Generic boron substituent (-B(R)2).",
+      "tags": [
+        "boron_handle",
+        "organoboron",
+        "wildcard"
+      ]
+    },
+    {
       "id": "B(OH)2",
       "name": "-B(OH)2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[B:2](O)O",
       "description": "Boronic acid core; attach via boron (-B(OH)2).",
       "tags": [
@@ -296,6 +348,7 @@
       "id": "Bpin",
       "name": "-Bpin",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[B:2]1OC(C)(C)C(C)(C)O1",
       "description": "Bpin core; attach via boron (-Bpin).",
       "tags": [
@@ -307,6 +360,7 @@
       "id": "Sn",
       "name": "-SnR3",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[Sn:2]",
       "description": "Stannyl group (-SnR3).",
       "tags": [
@@ -318,6 +372,7 @@
       "id": "Si",
       "name": "-SiR3",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[Si:2]",
       "description": "Silyl group (-SiR3).",
       "tags": [
@@ -329,6 +384,7 @@
       "id": "Zn",
       "name": "-ZnX",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[Zn:2]",
       "description": "Zincate group (-ZnX).",
       "tags": [
@@ -340,6 +396,7 @@
       "id": "Mg",
       "name": "-MgX",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[Mg:2]",
       "description": "Grignard group (-MgX).",
       "tags": [
@@ -351,10 +408,12 @@
       "id": "M",
       "name": "-M",
       "kind": "substituent",
+      "priority": 0,
       "smarts": "[Li,Na,K,Mg,Zn,Cu,Ag:2]",
       "description": "Generic organometallic substituent (-M).",
       "tags": [
-        "organometallic"
+        "organometallic",
+        "wildcard"
       ]
     },
     {
@@ -442,6 +501,7 @@
       "id": "OR",
       "name": "-OR",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[OX2:2][#6]",
       "description": "Ether substituent (-OR).",
       "tags": [
@@ -452,6 +512,7 @@
       "id": "SH",
       "name": "-SH",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX2H:2]",
       "description": "Thiol substituent (-SH).",
       "tags": [
@@ -464,6 +525,7 @@
       "id": "CO2H",
       "name": "-CO2H",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)[OX2H]",
       "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon.",
       "tags": [
@@ -476,6 +538,7 @@
       "id": "SO3H",
       "name": "-SO3H",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[S:2](=O)(=O)[OX2H]",
       "description": "Sulfonic acid substituent (-SO3H), attach via sulfur.",
       "tags": [
@@ -485,9 +548,24 @@
       ]
     },
     {
+      "id": "COX",
+      "name": "-COX",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[CX3:2](=O)[F,Cl,Br,I]",
+      "description": "Generic acyl halide substituent (-COX).",
+      "tags": [
+        "acyl_electrophile",
+        "leaving_group",
+        "carbonyl",
+        "wildcard"
+      ]
+    },
+    {
       "id": "COCl",
       "name": "-COCl",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)Cl",
       "description": "Acyl chloride substituent (-COCl), attach via carbonyl carbon.",
       "tags": [
@@ -500,6 +578,7 @@
       "id": "COF",
       "name": "-COF",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)F",
       "description": "Acyl fluoride substituent (-COF), attach via carbonyl carbon.",
       "tags": [
@@ -512,6 +591,7 @@
       "id": "COBr",
       "name": "-COBr",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)Br",
       "description": "Acyl bromide substituent (-COBr), attach via carbonyl carbon.",
       "tags": [
@@ -524,6 +604,7 @@
       "id": "COI",
       "name": "-COI",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)I",
       "description": "Acyl iodide substituent (-COI), attach via carbonyl carbon.",
       "tags": [
@@ -536,6 +617,7 @@
       "id": "Ester",
       "name": "-CO2R",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)O[#6]",
       "description": "Ester substituent (-CO2R), attach via carbonyl carbon.",
       "tags": [
@@ -569,6 +651,7 @@
       "id": "CONR2",
       "name": "-CONR2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)[NX3;H0]",
       "description": "Tertiary amide substituent (no N-H); attach via carbonyl carbon.",
       "tags": [
@@ -580,6 +663,7 @@
       "id": "Hydrazide",
       "name": "-CONHNH2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)[NX3;H1][NX3;H2]",
       "description": "Hydrazide core; attach via carbonyl carbon.",
       "tags": [
@@ -591,6 +675,7 @@
       "id": "SO2NH2",
       "name": "-SO2NH2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX4:2](=O)(=O)[NX3;H2]",
       "description": "Primary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -602,6 +687,7 @@
       "id": "SO2NHR",
       "name": "-SO2NHR",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX4:2](=O)(=O)[NX3;H1]",
       "description": "Secondary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -613,6 +699,7 @@
       "id": "SO2NR2",
       "name": "-SO2NR2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX4:2](=O)(=O)[NX3;H0]",
       "description": "Tertiary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -621,9 +708,24 @@
       ]
     },
     {
+      "id": "SO2X",
+      "name": "-SO2X",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[SX4:2](=O)(=O)[F,Cl,Br,I]",
+      "description": "Generic sulfonyl halide substituent (-SO2X).",
+      "tags": [
+        "sulfonyl_halide",
+        "leaving_group",
+        "ewg_strong",
+        "wildcard"
+      ]
+    },
+    {
       "id": "SO2Cl",
       "name": "-SO2Cl",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX4:2](=O)(=O)Cl",
       "description": "Sulfonyl chloride core; attach via sulfur.",
       "tags": [
@@ -636,6 +738,7 @@
       "id": "SO2F",
       "name": "-SO2F",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX4:2](=O)(=O)F",
       "description": "Sulfonyl fluoride core; attach via sulfur.",
       "tags": [
@@ -648,6 +751,7 @@
       "id": "SO2Br",
       "name": "-SO2Br",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX4:2](=O)(=O)Br",
       "description": "Sulfonyl bromide core; attach via sulfur.",
       "tags": [
@@ -660,6 +764,7 @@
       "id": "SO2I",
       "name": "-SO2I",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[SX4:2](=O)(=O)I",
       "description": "Sulfonyl iodide core; attach via sulfur.",
       "tags": [
@@ -723,9 +828,23 @@
       ]
     },
     {
+      "id": "Sulfonate",
+      "name": "-OSO2R",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[S:2](=O)(=O)O",
+      "description": "Generic sulfonate substituent (-OSO2R).",
+      "tags": [
+        "sulfonate_leaving_group",
+        "leaving_group",
+        "wildcard"
+      ]
+    },
+    {
       "id": "OTf",
       "name": "-OTf",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[S:2](=O)(=O)C(F)(F)F",
       "description": "Triflate substituent for Ar-OTf/Vinyl-OTf via oxygen linker.",
       "tags": [
@@ -737,6 +856,7 @@
       "id": "OTs",
       "name": "-OTs",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[S:2](=O)(=O)c1ccc(C)cc1",
       "description": "Tosylate substituent via oxygen linker.",
       "tags": [
@@ -748,6 +868,7 @@
       "id": "OMs",
       "name": "-OMs",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[S:2](=O)(=O)C",
       "description": "Mesylate substituent via oxygen linker.",
       "tags": [
@@ -759,6 +880,7 @@
       "id": "OSO2R",
       "name": "-OSO2R",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[S:2](=O)(=O)[#6]",
       "description": "Generic sulfonate substituent via oxygen linker (-OSO2R).",
       "tags": [
@@ -770,6 +892,7 @@
       "id": "CCH",
       "name": "-C#CH",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX2:2]#[CX2H]",
       "description": "Terminal alkyne substituent (-C#CH), attach via substituted sp carbon.",
       "tags": [
@@ -781,6 +904,7 @@
       "id": "CHCH2",
       "name": "-CH=CH2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3H1:2]=[CX3H2]",
       "description": "Terminal alkene substituent (-CH=CH2), attach via substituted sp2 carbon (monosubstituted alkene).",
       "tags": [
@@ -792,6 +916,7 @@
       "id": "CO",
       "name": "-CO-",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2](=O)[#6]",
       "description": "Ketone core; attach via carbonyl carbon (-CO-R).",
       "tags": [
@@ -803,6 +928,7 @@
       "id": "Lactam",
       "name": "-Lactam",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[NX3;r;H1,H0:2][CX3;r]=O",
       "description": "Lactam substituent (cyclic amide); attach via nitrogen.",
       "tags": [
@@ -815,6 +941,7 @@
       "id": "Phosphonium",
       "name": "-PR3+",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[PX4+:2]([#6])([#6])[#6]",
       "description": "Phosphonium salt core; attach via phosphorus.",
       "tags": [
@@ -826,6 +953,7 @@
       "id": "Phosphino",
       "name": "-PR2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[PX3:2]([#6])[#6]",
       "description": "Phosphino group (-PR2); attach via phosphorus.",
       "tags": [
@@ -837,6 +965,7 @@
       "id": "Imino",
       "name": "-C=N",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[CX3:2]=[NX3,NX2]",
       "description": "Imino group (C=N core); attach via carbon.",
       "tags": [
@@ -848,6 +977,7 @@
       "id": "B(OR)2",
       "name": "-B(OR)2",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[B:2](O[#6])O[#6]",
       "description": "Generic boronate ester core; attach via boron.",
       "tags": [
