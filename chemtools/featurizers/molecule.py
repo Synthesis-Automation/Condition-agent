@@ -149,6 +149,7 @@ def featurize_molecule(
                     "steric": steric,
                     "electronic": electronic,
                     "nearby_groups": nearby,
+                    "undocumented": hit.get("undocumented", False),
                 }
             )
         # Alkyl/Generic motifs
@@ -164,6 +165,7 @@ def featurize_molecule(
                     "center": {"alpha_c": hit["a_atom_idx"], "bond": hit["bond"]},
                     "steric": steric,
                     "nearby_groups": nearby,
+                    "undocumented": hit.get("undocumented", False),
                 }
             )
 
@@ -175,6 +177,7 @@ def featurize_molecule(
             "compound_id": analysis.get("compound_id"),
             "center": analysis.get("center"),
             "result": analysis.get("steric"),
+            "undocumented": analysis.get("undocumented", False),
         }
         if analysis.get("compound_id", "").startswith(("Ar-", "AromN-")):
             steric_payload["aryl"].append(steric_entry)
@@ -186,6 +189,7 @@ def featurize_molecule(
                     "compound_id": analysis.get("compound_id"),
                     "center": analysis.get("center"),
                     "result": analysis.get("electronic"),
+                    "undocumented": analysis.get("undocumented", False),
                 }
             )
         if "nearby_groups" in analysis:
@@ -194,6 +198,7 @@ def featurize_molecule(
                     "compound_id": analysis.get("compound_id"),
                     "center": analysis.get("center"),
                     "result": analysis.get("nearby_groups"),
+                    "undocumented": analysis.get("undocumented", False),
                 }
             )
 

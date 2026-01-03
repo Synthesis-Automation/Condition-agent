@@ -68,8 +68,11 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         entries = []
         for entry in aryl:
             result = entry.get("result", {})
+            cid = entry.get("compound_id", "unknown")
+            if entry.get("undocumented"):
+                cid += " [UNDOCUMENTED]"
             entries.append(
-                f"{entry.get('compound_id', 'unknown')}: score={result.get('score_0_10')}, "
+                f"{cid}: score={result.get('score_0_10')}, "
                 f"ortho_subs={result.get('ortho_substituent_count')}"
             )
         print(_format_list(entries))
@@ -78,8 +81,11 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         entries = []
         for entry in alkyl:
             result = entry.get("result", {})
+            cid = entry.get("compound_id", "unknown")
+            if entry.get("undocumented"):
+                cid += " [UNDOCUMENTED]"
             entries.append(
-                f"{entry.get('compound_id', 'unknown')}: score={result.get('score_0_10')}"
+                f"{cid}: score={result.get('score_0_10')}"
             )
         print(_format_list(entries))
 
@@ -90,10 +96,13 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         entries = []
         for entry in aryl_elec:
             result = entry.get("result", {})
+            cid = entry.get("compound_id", "unknown")
+            if entry.get("undocumented"):
+                cid += " [UNDOCUMENTED]"
             include_score = result.get("including_group_score_0_10")
             suffix = f", including_group={include_score}" if include_score is not None else ""
             entries.append(
-                f"{entry.get('compound_id', 'unknown')}: score={result.get('score_0_10')}{suffix}"
+                f"{cid}: score={result.get('score_0_10')}{suffix}"
             )
         print(_format_list(entries))
 
@@ -103,6 +112,8 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         entries = []
         for entry in nearby:
             compound_id = entry.get("compound_id", "unknown")
+            if entry.get("undocumented"):
+                compound_id += " [UNDOCUMENTED]"
             groups = entry.get("result") or []
             if groups:
                 # groups is a list of dicts with 'name' key
