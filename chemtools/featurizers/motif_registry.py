@@ -29,6 +29,7 @@ class CompoundPattern:
     group_a: str
     group_b: str
     b_tags: List[str]
+    priority: int = 1
 
 
 def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[str, Any]:
@@ -38,10 +39,21 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
     groups_path = Path(registry_paths["groups"])
     templates_path = Path(registry_paths["templates"]) if "templates" in registry_paths else None
     compounds_path = Path(registry_paths["compounds"])
+    logic_path = Path(registry_paths["logic"]) if "logic" in registry_paths else None
 
     groups = _load_groups(groups_path)
     templates = _load_templates(templates_path)
     compounds = _load_compounds(compounds_path)
+    
+    # Load priorities from groups and logic sets
+    priorities = {g_id: g.get("priority", 1) for g_id, g in groups.items()}
+    if logic_path and logic_path.exists():
+        logic_data = _load_json(logic_path)
+        group_sets = logic_data.get("group_sets", {})
+        for set_id, set_data in group_sets.items():
+            if "priority" in set_data:
+                priorities[set_id] = set_data["priority"]
+
     _validate_group_maps(groups)
     _validate_compound_templates(compounds, templates)
 
@@ -52,6 +64,12 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         compound_id = entry.get("id")
         if not compound_id:
             continue
+        
+        group_a = str(entry.get("A") or "")
+        group_b = str(entry.get("B") or "")
+        # Calculate priority: Priority(A) + Priority(B)
+        priority = priorities.get(group_a, 1) + priorities.get(group_b, 1)
+
         smarts_list = _extract_compound_smarts(entry)
         if smarts_list:
             for smarts in smarts_list:
@@ -64,9 +82,10 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
                     compound_id=compound_id,
                     smarts=smarts,
                     query=query,
-                    group_a=str(entry.get("A") or ""),
-                    group_b=str(entry.get("B") or ""),
+                    group_a=group_a,
+                    group_b=group_b,
                     b_tags=list(entry.get("tags") or []),
+                    priority=priority,
                 )
                 compiled.append(pattern)
                 compound_map[compound_id] = pattern
@@ -77,12 +96,16 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         if not template_format:
             continue
 
-        group_a = entry.get("A")
-        group_b = entry.get("B")
         if not group_a or not group_b:
             continue
         group_a_record = groups.get(group_a)
         group_b_record = groups.get(group_b)
+        
+        # If not in groups, check if it's a logic set (we already have its priority)
+        # But we need SMARTS to build the compound SMARTS.
+        # For now, we assume A and B are either in groups or we skip if SMARTS can't be built.
+        # (The existing logic already does this)
+
         if not group_a_record or not group_b_record:
             continue
 
@@ -107,84 +130,32 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
             group_a=group_a,
             group_b=group_b,
             b_tags=list(group_b_record.get("tags") or []),
+            priority=priority,
         )
         compiled.append(pattern)
         compound_map[compound_id] = pattern
+
+    compiled_groups: Dict[str, Dict[str, Any]] = {}
+    for group_id, group in groups.items():
+        smarts = group.get("smarts")
+        if smarts:
+            query = compile_smarts(smarts, validate=False)
+            if query:
+                compiled_groups[group_id] = {
+                    "id": group_id,
+                    "kind": group.get("kind"),
+                    "query": query,
+                    "priority": priorities.get(group_id, 1),
+                    "tags": list(group.get("tags") or []),
+                }
 
     return {
         "groups": groups,
         "templates": templates,
         "compiled_compounds": compiled,
         "compound_map": compound_map,
-    }
-
-
-def build_compound_detect_registry(registry_paths: Mapping[str, str | Path]) -> Dict[str, Any]:
-    """
-    Load group/template/compound files and compile detect SMARTS queries.
-
-    Detect SMARTS strips atom-map labels for pure substructure matching.
-    """
-    groups_path = Path(registry_paths["groups"])
-    templates_path = Path(registry_paths["templates"]) if "templates" in registry_paths else None
-    compounds_path = Path(registry_paths["compounds"])
-
-    groups = _load_groups(groups_path)
-    templates = _load_templates(templates_path)
-    compounds = _load_compounds(compounds_path)
-    _validate_group_maps(groups)
-    _validate_compound_templates(compounds, templates)
-
-    compiled: Dict[str, List[Any]] = {}
-    direct_compounds: Set[str] = set()
-
-    for entry in compounds:
-        compound_id = entry.get("id")
-        if not compound_id:
-            continue
-
-        smarts_list = _extract_compound_smarts(entry)
-        if smarts_list:
-            direct_compounds.add(compound_id)
-        else:
-            template_id = entry.get("template", "")
-            template_format = templates.get(template_id)
-            if not template_format:
-                continue
-            group_a = entry.get("A")
-            group_b = entry.get("B")
-            if not group_a or not group_b:
-                continue
-            group_a_record = groups.get(group_a)
-            group_b_record = groups.get(group_b)
-            if not group_a_record or not group_b_record:
-                continue
-            a_smarts = group_a_record.get("smarts", "")
-            b_smarts = group_b_record.get("smarts", "")
-            if not a_smarts or not b_smarts:
-                continue
-            smarts_list = [
-                _format_compound_smarts(
-                    template_format=template_format,
-                    a_smarts=a_smarts,
-                    b_smarts=b_smarts,
-                )
-            ]
-
-        detect_smarts_list = [strip_atom_maps(s) for s in smarts_list]
-        queries: List[Any] = []
-        for smarts in detect_smarts_list:
-            query = compile_smarts(smarts, validate=False)
-            if query is not None:
-                queries.append(query)
-        if queries:
-            compiled[compound_id] = queries
-
-    return {
-        "groups": groups,
-        "templates": templates,
-        "compiled_compounds": compiled,
-        "direct_compounds": direct_compounds,
+        "priorities": priorities,
+        "compiled_groups": compiled_groups,
     }
 
 
@@ -238,17 +209,12 @@ def _has_atom_map(smarts: str) -> bool:
     return bool(_MAP_RE.search(smarts))
 
 
-def strip_atom_maps(smarts: str) -> str:
-    return _MAP_RE.sub("", smarts)
-
-
 def classify_compound_smiles(
     smiles: str,
     *,
     registry: Optional[Mapping[str, Any]] = None,
     registry_paths: Optional[Mapping[str, str | Path]] = None,
     include_best: bool = True,
-    prefer_direct: bool = False,
 ) -> Dict[str, Any]:
     """
     Classify a SMILES string into compound motif IDs using detect SMARTS.
@@ -265,21 +231,22 @@ def classify_compound_smiles(
 
     if registry is None:
         registry_paths = registry_paths or _default_registry_paths()
-        registry = build_compound_detect_registry(registry_paths)
+        registry = build_compound_registry(registry_paths)
 
-    compiled = registry.get("compiled_compounds") or {}
+    compiled = registry.get("compiled_compounds") or []
     hits: List[str] = []
-    for compound_id, queries in compiled.items():
-        if any(mol.HasSubstructMatch(query) for query in queries):
-            hits.append(compound_id)
+    
+    # Use the compiled patterns which now include priority
+    for pattern in compiled:
+        if mol.HasSubstructMatch(pattern.query):
+            hits.append(pattern.compound_id)
 
     result["ok"] = True
-    result["hits"] = hits
+    result["hits"] = list(set(hits))
     if include_best:
         best = choose_best_compound_hit(
-            hits,
-            direct_ids=set(registry.get("direct_compounds") or []),
-            prefer_direct=prefer_direct,
+            result["hits"],
+            compound_map=registry.get("compound_map"),
         )
         result["best"] = best
     return result
@@ -291,21 +258,19 @@ def classify_compound_batch(
     registry: Optional[Mapping[str, Any]] = None,
     registry_paths: Optional[Mapping[str, str | Path]] = None,
     include_best: bool = True,
-    prefer_direct: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Classify a batch of SMILES strings into compound motif IDs.
     """
     if registry is None:
         registry_paths = registry_paths or _default_registry_paths()
-        registry = build_compound_detect_registry(registry_paths)
+        registry = build_compound_registry(registry_paths)
 
     return [
         classify_compound_smiles(
             smiles,
             registry=registry,
             include_best=include_best,
-            prefer_direct=prefer_direct,
         )
         for smiles in smiles_list
     ]
@@ -314,31 +279,26 @@ def classify_compound_batch(
 def choose_best_compound_hit(
     hits: Iterable[str],
     *,
-    direct_ids: Optional[Set[str]] = None,
-    prefer_direct: bool = False,
+    compound_map: Optional[Mapping[str, CompoundPattern]] = None,
 ) -> Optional[str]:
     """
-    Choose a single motif label using simple precedence heuristics.
+    Choose the most specific motif label based on priority score.
     """
     hits_list = [h for h in hits if h]
     if not hits_list:
         return None
-    direct_ids = direct_ids or set()
+    
+    if not compound_map:
+        # Fallback to alphabetical if no map provided
+        return sorted(hits_list)[0]
 
-    def prefix_rank(hit: str) -> int:
-        if hit.startswith("Ar-"):
-            return 0
-        if hit.startswith("Vinyl-"):
-            return 1
-        if hit.startswith(("R-", "Bn-", "Allyl-")):
-            return 2
-        return 3
+    def score_rank(hit: str) -> tuple[int, int, str]:
+        pattern = compound_map.get(hit)
+        priority = pattern.priority if pattern else 0
+        # Higher priority first, then longer ID as tie-breaker, then alphabetical
+        return (-priority, -len(hit), hit)
 
-    def rank(hit: str) -> tuple[int, int, int, str]:
-        direct_rank = 0 if prefer_direct and hit in direct_ids else 1
-        return (direct_rank, prefix_rank(hit), -len(hit), hit)
-
-    return sorted(hits_list, key=rank)[0]
+    return sorted(hits_list, key=score_rank)[0]
 
 
 def _has_map(smarts: str, *, map_num: int) -> bool:
@@ -416,4 +376,5 @@ def _default_registry_paths() -> Dict[str, Path]:
     return {
         "groups": base / "organic_groups.v1.3.json",
         "compounds": base / "organic_compounds.v1.3.json",
+        "logic": base / "group_logic.json",
     }

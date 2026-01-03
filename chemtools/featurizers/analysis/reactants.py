@@ -32,14 +32,12 @@ TAXONOMY_DATA_DIR = Path(__file__).resolve().parents[2] / "taxonomy" / "data"
 REACTANT_TYPES_FILE = TAXONOMY_DATA_DIR / "organic_compounds.v1.3.json"
 REACTION_TYPES_FILE = _reaction_catalog.REACTION_TYPES_FILE
 
-# General categories that should be deprioritised when picking the "best" match.
-GENERAL_REACTANT_CATEGORIES = {"R-H", "Ar-H"}
-
 
 def _get_calculable() -> Any:
     """Lazy import of the calculable module to avoid circular imports."""
     from .. import calculable as _calc
     return _calc
+
 
 # Manual overrides sourced from the original z-score pipeline.
 CSV_REACTANT_OVERRIDES: Dict[str, str] = {
@@ -468,7 +466,7 @@ def iter_reactant_matches(
         smarts = smarts_patterns[0] if smarts_patterns else ""
         
         category = metadata.get("reactant_category", "")
-        is_general = category in GENERAL_REACTANT_CATEGORIES
+        priority = metadata.get("priority", 1)
         
         matches.append(
             ReactantMatch(
@@ -479,13 +477,13 @@ def iter_reactant_matches(
                 smarts=smarts,
                 category_smarts=metadata.get("category_smarts"),
                 description=metadata.get("description", ""),
-                specificity=len(smarts) if smarts else 0,
-                is_general=is_general,
+                specificity=priority,  # Use priority as specificity
+                is_general=priority < 2,  # Heuristic: priority 1 is general
             )
         )
     
-    # Sort by (general? -> False first, specificity descending, member id for determinism)
-    matches.sort(key=lambda m: (m.is_general, -m.specificity, m.member_type))
+    # Sort by (priority descending, member id for determinism)
+    matches.sort(key=lambda m: (-m.specificity, m.member_type))
     
     return matches
 

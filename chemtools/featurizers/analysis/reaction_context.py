@@ -79,29 +79,54 @@ def _infer_reactant_role(reactant_type_id: str, reaction_type: str) -> Optional[
     This is a heuristic based on common reaction patterns.
     """
     # Common electrophile patterns
-    if reactant_type_id in {"ArX*", "Alkyl-X", "VinylX*", "HetAr-X", "Allylic-X", "Benzylic-X"}:
+    if reactant_type_id in {
+        "ArX*", "Alkyl-X", "VinylX*", "HetAr-X", "Allylic-X", "Benzylic-X",
+        "Ar-X", "Ar-Br", "Ar-Cl", "Ar-I", "Ar-F",
+        "R-X", "R-Br", "R-Cl", "R-I", "R-F",
+        "Vinyl-X", "Vinyl-Br", "Vinyl-Cl", "Vinyl-I",
+        "HetAr-X", "HetAr-Br", "HetAr-Cl", "HetAr-I",
+        "Allyl-X", "Allyl-Br", "Allyl-Cl", "Allyl-I",
+        "Bn-X", "Bn-Br", "Bn-Cl", "Bn-I",
+        "Propargyl-X", "Propargyl-Br", "Propargyl-Cl", "Propargyl-I", "Propargyl-OTf", "Propargyl-Sulfonate",
+        "Alkynyl-X", "Alkynyl-Br", "Alkynyl-Cl", "Alkynyl-I", "Alkynyl-OTf", "Alkynyl-Sulfonate",
+        "Csp2-X", "Csp2-Sulfonate", "Any-Sulfonate", "Ar-OTf", "Ar-OTs", "Ar-OMs",
+        "R-OTf", "R-OTs", "R-OMs"
+    }:
         return "electrophile"
     
     # Common nucleophile patterns
-    if reactant_type_id in {"RNH2/R2NH", "ArNH2/Ar2NH", "ROH", "ArOH", "RSH"}:
+    if reactant_type_id in {
+        "RNH2/R2NH", "ArNH2/Ar2NH", "ROH", "ArOH", "RSH",
+        "Any-NH2", "Any-NHR", "Ar-NH2", "Ar-NHR", "Ar-NHAr", "AromN-H",
+        "R-OH", "Ar-OH", "R2CH-OH", "RCH2-OH", "Any-SH",
+        "Bn-NH2", "Bn-NHR", "Allyl-NH2", "Allyl-NHR", "Propargyl-NH2", "Propargyl-NHR",
+        "Bn-OH", "Allyl-OH", "Propargyl-OH"
+    }:
         return "nucleophile"
     
     # Organometallic coupling partners
-    if reactant_type_id in {"ArB*", "RB*", "RMgX", "RZnX", "RLi", "R-M"}:
+    if reactant_type_id in {
+        "ArB*", "RB*", "RMgX", "RZnX", "RLi", "R-M",
+        "Ar-B(OH)2", "Ar-B(OR)2", "R-B(OH)2", "R-B(OR)2", "Ar-BF3K", "R-BF3K",
+        "Vinyl-B(OR)2", "R-MgX", "R-ZnX", "R-Li", "R-M", "Ar-MgX", "Ar-ZnX", "Ar-Li", "Ar-M"
+    }:
         return "coupling_partner"
     
     # Carbonyl compounds (often electrophiles or undergo addition)
-    if reactant_type_id in {"Aldehyde", "Ketone"}:
+    if reactant_type_id in {
+        "Aldehyde", "Ketone", "Any-Aldehyde", "Any-Ketone",
+        "Any-CO2H", "Ar-CO2H", "R-CO2H", "Any-Ester", "Ar-Ester", "Any-CHO", "Any-CO-R"
+    }:
         return "electrophile"
     
     # Alkenes (Heck, metathesis, addition)
-    if reactant_type_id == "Alkene":
+    if reactant_type_id in {"Alkene", "Any-Alkene"}:
         if "heck" in reaction_type.lower():
             return "coupling_partner"
         return "substrate"
     
     # Alkynes (Sonogashira)
-    if reactant_type_id == "Alkyne":
+    if reactant_type_id in {"Alkyne", "Any-Alkyne"}:
         if "sonogashira" in reaction_type.lower():
             return "coupling_partner"
         return "substrate"

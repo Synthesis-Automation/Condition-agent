@@ -92,10 +92,15 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
     groups = _load_groups(groups_path)
     
     group_sets = {}
+    priorities = {g_id: g.get("priority", 1) for g_id, g in groups.items()}
+    
     if group_logic_path.exists():
         try:
             logic = _safe_load_json(group_logic_path)
             group_sets = logic.get("group_sets") or {}
+            for set_id, set_data in group_sets.items():
+                if "priority" in set_data:
+                    priorities[set_id] = set_data["priority"]
         except Exception:
             pass
 
@@ -128,17 +133,19 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
             continue
         compound_name = entry.get("name") or compound_id
         compound_desc = entry.get("description") or ""
-        group_b = entry.get("B") or ""
+        group_a = entry.get("A")
+        group_b = entry.get("B")
+        
+        # Calculate priority: Priority(A) + Priority(B)
+        priority = priorities.get(group_a, 1) + priorities.get(group_b, 1)
 
         smarts_list = _extract_compound_smarts(entry)
         if not smarts_list:
             template_id = entry.get("template") or ""
             template_format = templates.get(template_id)
-            group_a = entry.get("A")
-            group_b_id = entry.get("B")
-            if template_format and group_a and group_b_id:
+            if template_format and group_a and group_b:
                 a_smarts = get_group_smarts(group_a)
-                b_smarts = get_group_smarts(group_b_id)
+                b_smarts = get_group_smarts(group_b)
                 if a_smarts and b_smarts:
                     smarts_list = [template_format.format(A=a_smarts, B=b_smarts)]
 
@@ -159,6 +166,7 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
                     "legacy_taxonomy_id": compound_id,
                     "category_description": compound_desc,
                     "group": group_b,
+                    "priority": priority,
                 },
             }
             features.append(feature)

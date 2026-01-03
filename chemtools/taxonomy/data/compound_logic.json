@@ -82,7 +82,8 @@
       "name": "Amines (N-H Default)",
       "members": [
         "Allyl-NH2", "Allyl-NHR", "Any-NH2", "Any-NHR", "Any-Lactam",
-        "Ar-NH2", "Ar-NHR", "AromN-H", "Bn-NH2", "Bn-NHR", "Vinyl-NH2"
+        "Ar-NH2", "Ar-NHR", "Ar-NHAr", "AromN-H", "Bn-NH2", "Bn-NHR", "Vinyl-NH2",
+        "Propargyl-NH2", "Propargyl-NHR"
       ]
     },
     "amides_nh_default": {
@@ -100,7 +101,7 @@
     "alcohols_oh_default": {
       "name": "Alcohols (O-H Default)",
       "members": [
-        "Allyl-OH", "Any-OH", "Ar-OH", "Bn-OH", "RCH2-OH", "R2CH-OH", "R3C-OH", "Vinyl-OH"
+        "Allyl-OH", "Any-OH", "Ar-OH", "Bn-OH", "RCH2-OH", "R2CH-OH", "R3C-OH", "Vinyl-OH", "Propargyl-OH"
       ]
     },
     "thiols_sh_default": {
@@ -141,11 +142,11 @@
     },
     "alkyl_halides_default": {
       "name": "Alkyl Halides",
-      "members": ["Allyl-Br", "Allyl-Cl", "Allyl-I", "Bn-Br", "Bn-Cl", "Bn-I", "R-Br", "R-Cl", "R-I"]
+      "members": ["Allyl-Br", "Allyl-Cl", "Allyl-I", "Bn-Br", "Bn-Cl", "Bn-I", "R-Br", "R-Cl", "R-I", "Propargyl-Br", "Propargyl-Cl", "Propargyl-I"]
     },
     "alkyl_sulfonates_default": {
       "name": "Alkyl Sulfonates",
-      "members": ["R-OMs", "R-OTf", "R-OTs"]
+      "members": ["R-OMs", "R-OTf", "R-OTs", "Propargyl-OTf", "Propargyl-Sulfonate"]
     },
     "nitro_default": {
       "name": "Nitro Compounds",
@@ -161,7 +162,7 @@
     },
     "nitriles_default": {
       "name": "Nitriles",
-      "members": ["Any-CN", "Ar-CN", "Vinyl-CN", "Bn-CN", "Allyl-CN"]
+      "members": ["Any-CN", "Ar-CN", "Vinyl-CN", "Bn-CN", "Allyl-CN", "Propargyl-CN"]
     },
     "hydrogenation_reductants": {
       "name": "Hydrogenation Reductants",

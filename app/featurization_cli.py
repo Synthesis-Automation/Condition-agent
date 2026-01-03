@@ -51,7 +51,12 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
             compound_id = motif.get("compound_id", "unknown")
             a_idx = motif.get("a_atom_idx")
             b_idx = motif.get("b_atom_idx")
-            lines.append(f"{compound_id} (a={a_idx}, b={b_idx})")
+            
+            # Highlight undocumented motifs
+            is_undocumented = motif.get("undocumented", False)
+            suffix = " [UNDOCUMENTED]" if is_undocumented else ""
+            
+            lines.append(f"{compound_id}{suffix} (a={a_idx}, b={b_idx})")
         print("Motifs:")
         print(_format_list(lines))
 
@@ -194,6 +199,11 @@ def _parse_args() -> argparse.Namespace:
         help="Include Ar-H motifs even if other motifs are present.",
     )
     parser.add_argument(
+        "--discovery",
+        action="store_true",
+        help="Enable discovery mode for undocumented motifs.",
+    )
+    parser.add_argument(
         "--target-groups",
         help="Focus on specific motifs (e.g., 'Br', 'H', 'CN'). Comma-separated.",
     )
@@ -210,6 +220,7 @@ def main() -> int:
     options = {
         "include_ar_h": args.include_ar_h,
         "target_groups": target_groups,
+        "discovery_mode": args.discovery,
     }
     print("ChemTools Featurization CLI")
     print("Enter 'q' to quit.")

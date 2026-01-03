@@ -58,7 +58,7 @@
       "name": "Vinyl-",
       "kind": "scaffold",
       "priority": 1,
-      "smarts": "[C;X3:1]=[C;X3]",
+      "smarts": "[C;X3]=[C;X3:1]",
       "description": "Vinylic (alkenyl) attachment at an sp2 carbon.",
       "tags": [
         "scaffold",
@@ -126,7 +126,7 @@
       "name": "Bn-",
       "kind": "scaffold",
       "priority": 2,
-      "smarts": "[CH2:1][c]",
+      "smarts": "[c][CH2:1]",
       "description": "Benzylic CH2 attachment (Bn-).",
       "tags": [
         "scaffold",
@@ -139,7 +139,7 @@
       "name": "Allyl-",
       "kind": "scaffold",
       "priority": 2,
-      "smarts": "[CH2:1][CH]=[CH2]",
+      "smarts": "[CH2]=[CH][CH2:1]",
       "description": "Allylic CH2 attachment (Allyl-).",
       "tags": [
         "scaffold",
@@ -148,11 +148,24 @@
       ]
     },
     {
+      "id": "Propargyl",
+      "name": "Propargyl-",
+      "kind": "scaffold",
+      "priority": 2,
+      "smarts": "[C]#[C][CH2:1]",
+      "description": "Propargylic CH2 attachment (Propargyl-).",
+      "tags": [
+        "scaffold",
+        "propargylic",
+        "sp_sp3_mixed"
+      ]
+    },
+    {
       "id": "Alkynyl",
       "name": "Alkynyl-",
       "kind": "scaffold",
       "priority": 1,
-      "smarts": "[#6:1]#[#6]",
+      "smarts": "[#6]#[#6:1]",
       "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal).",
       "tags": [
         "scaffold",
@@ -255,7 +268,7 @@
       "id": "CHO",
       "name": "-CHO",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[CX3H1:2](=O)",
       "description": "Aldehyde core; attach via formyl carbon (-CHO).",
       "tags": [
@@ -267,7 +280,7 @@
       "id": "CN",
       "name": "-CN",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[#6:2]#N",
       "description": "Nitrile core; attach via cyano carbon (-CN).",
       "tags": [
@@ -300,7 +313,7 @@
       "id": "NO2",
       "name": "-NO2",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[N+:2](=O)[O-]",
       "description": "Nitro core; attach via nitro nitrogen (-NO2).",
       "tags": [
@@ -311,7 +324,7 @@
       "id": "N3",
       "name": "-N3",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[N:2]=[N+]=[N-]",
       "description": "Azide substituent (-N3); attach via nitrogen.",
       "tags": [
@@ -336,7 +349,7 @@
       "id": "B(OH)2",
       "name": "-B(OH)2",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[B:2](O)O",
       "description": "Boronic acid core; attach via boron (-B(OH)2).",
       "tags": [
@@ -348,7 +361,7 @@
       "id": "Bpin",
       "name": "-Bpin",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[B:2]1OC(C)(C)C(C)(C)O1",
       "description": "Bpin core; attach via boron (-Bpin).",
       "tags": [
@@ -525,7 +538,7 @@
       "id": "CO2H",
       "name": "-CO2H",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[CX3:2](=O)[OX2H]",
       "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon.",
       "tags": [
@@ -617,7 +630,7 @@
       "id": "Ester",
       "name": "-CO2R",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[CX3:2](=O)O[#6]",
       "description": "Ester substituent (-CO2R), attach via carbonyl carbon.",
       "tags": [
@@ -629,6 +642,7 @@
       "id": "CONH2",
       "name": "-CONH2",
       "kind": "substituent",
+      "priority": 2,
       "smarts": "[CX3:2](=O)[NX3;H2]",
       "description": "Primary amide substituent (-CONH2); attach via carbonyl carbon.",
       "tags": [
@@ -640,6 +654,7 @@
       "id": "CONHR",
       "name": "-CONHR",
       "kind": "substituent",
+      "priority": 2,
       "smarts": "[CX3:2](=O)[NX3;H1]",
       "description": "Secondary amide substituent (-CONHR); attach via carbonyl carbon.",
       "tags": [
@@ -651,7 +666,7 @@
       "id": "CONR2",
       "name": "-CONR2",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[CX3:2](=O)[NX3;H0]",
       "description": "Tertiary amide substituent (no N-H); attach via carbonyl carbon.",
       "tags": [
@@ -675,7 +690,7 @@
       "id": "SO2NH2",
       "name": "-SO2NH2",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[SX4:2](=O)(=O)[NX3;H2]",
       "description": "Primary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -687,7 +702,7 @@
       "id": "SO2NHR",
       "name": "-SO2NHR",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[SX4:2](=O)(=O)[NX3;H1]",
       "description": "Secondary sulfonamide core; attach via sulfur.",
       "tags": [
@@ -699,11 +714,23 @@
       "id": "SO2NR2",
       "name": "-SO2NR2",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[SX4:2](=O)(=O)[NX3;H0]",
       "description": "Tertiary sulfonamide core; attach via sulfur.",
       "tags": [
         "sulfonamide",
+        "ewg_strong"
+      ]
+    },
+    {
+      "id": "SO2R",
+      "name": "-SO2R",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[SX4:2](=O)(=O)[#6]",
+      "description": "Sulfone substituent (-SO2R); attach via sulfur.",
+      "tags": [
+        "sulfone",
         "ewg_strong"
       ]
     },
@@ -844,7 +871,7 @@
       "id": "OTf",
       "name": "-OTf",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[S:2](=O)(=O)C(F)(F)F",
       "description": "Triflate substituent for Ar-OTf/Vinyl-OTf via oxygen linker.",
       "tags": [
@@ -856,7 +883,7 @@
       "id": "OTs",
       "name": "-OTs",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[S:2](=O)(=O)c1ccc(C)cc1",
       "description": "Tosylate substituent via oxygen linker.",
       "tags": [
@@ -868,7 +895,7 @@
       "id": "OMs",
       "name": "-OMs",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[S:2](=O)(=O)C",
       "description": "Mesylate substituent via oxygen linker.",
       "tags": [
@@ -880,7 +907,7 @@
       "id": "OSO2R",
       "name": "-OSO2R",
       "kind": "substituent",
-      "priority": 1,
+      "priority": 2,
       "smarts": "[S:2](=O)(=O)[#6]",
       "description": "Generic sulfonate substituent via oxygen linker (-OSO2R).",
       "tags": [

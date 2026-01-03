@@ -12,7 +12,6 @@ from ..util.smarts_cache import compile_smarts
 
 logger = logging.getLogger(__name__)
 
-_GENERAL_REACTANT_CATEGORIES = {"Alkyl-C-H", "ArH"}
 _HEURISTIC_NORMALIZE = str.maketrans(
     {
         "\u2265": ">=",
@@ -76,6 +75,7 @@ def _reactant_feature_index() -> Dict[str, Any]:
                 "group": meta.get("group", ""),
                 "description": meta.get("category_description") or meta.get("description") or "",
                 "smarts": (_extract_smarts_any(feature) or [""])[0],
+                "priority": meta.get("priority", 1),
             }
         )
         if category_id not in categories:
@@ -356,23 +356,23 @@ def classify_reactant_smiles(smiles: str) -> Optional[Dict[str, Any]]:
         category_entry = categories.get(category_id, {})
         category_token = category_entry.get("token")
         category_present = bool(reactant_features.get(category_token, False)) if category_token else False
-        smarts = member.get("smarts", "")
-        specificity = len(smarts) if smarts else 0
-        is_general = category_id in _GENERAL_REACTANT_CATEGORIES
+        
+        priority = member.get("priority", 1)
+        
         match = {
             "category": category_id,
             "member_type": member_id,
             "name": member.get("member_name", member_id),
             "group": member.get("group", ""),
-            "smarts": smarts,
+            "smarts": member.get("smarts", ""),
             "category_smarts": "",
             "description": member.get("description", ""),
-            "specificity": specificity,
-            "is_general": is_general,
+            "priority": priority,
             "category_name": category_entry.get("category_name") or member.get("category_name", category_id),
             "category_present": category_present,
         }
-        sort_key = (is_general, -specificity, member_id)
+        # Higher priority first, then longer ID as tie-breaker
+        sort_key = (-priority, -len(member_id), member_id)
         if best is None or sort_key < best_key:
             best = match
             best_key = sort_key
@@ -382,7 +382,6 @@ def classify_reactant_smiles(smiles: str) -> Optional[Dict[str, Any]]:
             token = entry.get("token")
             if not token or not reactant_features.get(token, False):
                 continue
-            is_general = category_id in _GENERAL_REACTANT_CATEGORIES
             match = {
                 "category": category_id,
                 "member_type": category_id,
@@ -391,12 +390,11 @@ def classify_reactant_smiles(smiles: str) -> Optional[Dict[str, Any]]:
                 "smarts": "",
                 "category_smarts": "",
                 "description": "",
-                "specificity": 0,
-                "is_general": is_general,
+                "priority": 0,
                 "category_name": entry.get("category_name", category_id),
                 "category_present": True,
             }
-            sort_key = (is_general, 0, category_id)
+            sort_key = (0, -len(category_id), category_id)
             if best is None or sort_key < best_key:
                 best = match
                 best_key = sort_key

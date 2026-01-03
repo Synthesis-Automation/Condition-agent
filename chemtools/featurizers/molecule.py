@@ -61,8 +61,15 @@ def featurize_molecule(
     include_gasteiger = bool(options.get("include_gasteiger", False))
     include_ipso_group = options.get("electronics_include_ipso_group", True)
     max_hits = options.get("max_hits_per_compound")
+    discovery_mode = bool(options.get("discovery_mode", False))
 
-    all_motifs = detect_motifs(mol, compiled, max_hits_per_compound=max_hits)
+    all_motifs = detect_motifs(
+        mol,
+        compiled,
+        max_hits_per_compound=max_hits,
+        registry=registry,
+        discovery_mode=discovery_mode,
+    )
     motifs = list(all_motifs)
 
     # Filter by target groups if provided

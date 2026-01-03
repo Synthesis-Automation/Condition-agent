@@ -64,6 +64,14 @@
       "description": "Any sulfonate leaving group (OTf, OTs, OMs, etc.) on any scaffold."
     },
     {
+      "id": "Any-SO2R",
+      "name": "Any-SO2R",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "SO2R",
+      "description": "Any sulfone."
+    },
+    {
       "id": "Any-SO2X",
       "name": "Any-SO2X",
       "template": "single_bond",
@@ -288,6 +296,54 @@
       "A": "Allyl",
       "B": "I",
       "description": "Allyl iodide (Allyl-I)."
+    },
+    {
+      "id": "Propargyl-Cl",
+      "name": "Propargyl-Cl",
+      "template": "single_bond",
+      "A": "Propargyl",
+      "B": "Cl",
+      "description": "Propargylic chloride (Propargyl-Cl)."
+    },
+    {
+      "id": "Propargyl-Br",
+      "name": "Propargyl-Br",
+      "template": "single_bond",
+      "A": "Propargyl",
+      "B": "Br",
+      "description": "Propargylic bromide (Propargyl-Br)."
+    },
+    {
+      "id": "Propargyl-I",
+      "name": "Propargyl-I",
+      "template": "single_bond",
+      "A": "Propargyl",
+      "B": "I",
+      "description": "Propargylic iodide (Propargyl-I)."
+    },
+    {
+      "id": "Propargyl-H",
+      "name": "Propargyl-H",
+      "template": "single_bond",
+      "A": "Propargyl",
+      "B": "H",
+      "description": "Propargylic C-H bond."
+    },
+    {
+      "id": "Propargyl-OTf",
+      "name": "Propargyl-OTf",
+      "template": "via_oxygen",
+      "A": "Propargyl",
+      "B": "OTf",
+      "description": "Propargylic triflate (Propargyl-OTf)."
+    },
+    {
+      "id": "Propargyl-Sulfonate",
+      "name": "Propargyl-Sulfonate",
+      "template": "via_oxygen",
+      "A": "Propargyl",
+      "B": "Sulfonate",
+      "description": "Propargylic sulfonate (OTf, OTs, OMs)."
     },
     {
       "id": "Alkynyl-Cl",
@@ -955,6 +1011,22 @@
       "A": "Allyl",
       "B": "NH2",
       "description": "Allyl amine (Allyl-NH2)."
+    },
+    {
+      "id": "Propargyl-OH",
+      "name": "Propargyl-OH",
+      "template": "single_bond",
+      "A": "Propargyl",
+      "B": "OH",
+      "description": "Propargylic alcohol (Propargyl-OH)."
+    },
+    {
+      "id": "Propargyl-NH2",
+      "name": "Propargyl-NH2",
+      "template": "single_bond",
+      "A": "Propargyl",
+      "B": "NH2",
+      "description": "Propargylic amine (Propargyl-NH2)."
     },
     {
       "id": "Allyl-NHR",
