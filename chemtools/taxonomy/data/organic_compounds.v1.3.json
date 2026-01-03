@@ -1191,6 +1191,14 @@
       "description": "alcohol functional group anywhere (generic)."
     },
     {
+      "id": "Epoxide",
+      "name": "Epoxide",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "Epoxide_Group",
+      "description": "Epoxide (oxirane) ring."
+    },
+    {
       "id": "Any-OR",
       "name": "Any-OR",
       "template": "single_bond",
