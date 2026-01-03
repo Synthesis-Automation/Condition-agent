@@ -4,7 +4,7 @@
 Reaction Types Database Analytics and Summary Tool
 ===================================================
 
-This tool provides comprehensive analytics and exploration of the reaction_types.json database:
+This tool provides comprehensive analytics and exploration of the reaction types taxonomy database:
 1. Providing comprehensive database statistics
 2. Listing reaction types by category
 3. Showing SMARTS pattern coverage
@@ -44,17 +44,65 @@ except ImportError:
         BRIGHT = RESET_ALL = ""
 
 
-# Path to reaction_types.json
-REACTION_TYPES_PATH = Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "reaction_types.json"
+try:
+    from chemtools.taxonomy import reaction_catalog as _reaction_catalog
+    DEFAULT_REACTION_TYPES_PATH = _reaction_catalog.REACTION_TYPES_FILE
+except Exception:
+    DEFAULT_REACTION_TYPES_PATH = (
+        Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "reaction_types.v3.3.json"
+    )
+
+LEGACY_REACTION_TYPES_PATH = Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "reaction_types.json"
+REACTION_TYPES_PATH = DEFAULT_REACTION_TYPES_PATH
+
+
+def resolve_reaction_types_path() -> Path:
+    """Resolve the reaction types taxonomy file."""
+    candidates = [DEFAULT_REACTION_TYPES_PATH, LEGACY_REACTION_TYPES_PATH]
+    for path in candidates:
+        if path and path.exists():
+            return path
+    tried = ", ".join(str(path) for path in candidates if path)
+    raise FileNotFoundError(f"Reaction types file not found. Tried: {tried}")
 
 
 def load_reaction_types() -> List[Dict[str, Any]]:
     """Load reaction types from JSON file."""
-    if not REACTION_TYPES_PATH.exists():
-        raise FileNotFoundError(f"Reaction types file not found: {REACTION_TYPES_PATH}")
-    
-    with open(REACTION_TYPES_PATH, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    path = resolve_reaction_types_path()
+    global REACTION_TYPES_PATH
+    REACTION_TYPES_PATH = path
+
+    with open(path, 'r', encoding='utf-8') as f:
+        payload = json.load(f)
+
+    if isinstance(payload, list):
+        return payload
+
+    if isinstance(payload, dict):
+        reaction_types = payload.get("reaction_types")
+        if isinstance(reaction_types, list):
+            return reaction_types
+        reaction_types = payload.get("reactions")
+        if isinstance(reaction_types, list):
+            return reaction_types
+
+        flattened: List[Dict[str, Any]] = []
+        for category, category_payload in payload.items():
+            if not isinstance(category_payload, dict):
+                continue
+            reactions = category_payload.get("reactions")
+            if not isinstance(reactions, list):
+                continue
+            for entry in reactions:
+                if not isinstance(entry, dict):
+                    continue
+                normalized = dict(entry)
+                normalized.setdefault("category", category)
+                flattened.append(normalized)
+        if flattened:
+            return flattened
+
+    raise ValueError(f"Unrecognized reaction types JSON layout in {path}")
 
 
 def print_section(title: str, color=None):
@@ -88,7 +136,7 @@ def format_reaction_type(rtype: Dict[str, Any], compact: bool = False) -> str:
     aliases_str = f" {Fore.LIGHTBLUE_EX}({', '.join(aliases[:2])}){Style.RESET_ALL}" if aliases else ""
     
     if compact:
-        has_smarts = "✓" if rtype.get('smarts') else "✗"
+        has_smarts = "Y" if rtype.get('smarts') else "N"
         smarts_color = Fore.GREEN if rtype.get('smarts') else Fore.RED
         return f"{Fore.WHITE}{name}{Style.RESET_ALL}{aliases_str} {smarts_color}[SMARTS: {has_smarts}]{Style.RESET_ALL}"
     
@@ -113,8 +161,13 @@ def format_reaction_type(rtype: Dict[str, Any], compact: bool = False) -> str:
         for rxn in rtype['reference_reactions'][:2]:
             lines.append(f"    {Fore.LIGHTBLACK_EX}{rxn}{Style.RESET_ALL}")
     
-    if rtype.get('reactants'):
-        lines.append(f"  {Fore.CYAN}Reactants:{Style.RESET_ALL} {Fore.WHITE}{', '.join(rtype['reactants'])}{Style.RESET_ALL}")
+    reactants = rtype.get('reactants')
+    if isinstance(reactants, list) and reactants:
+        lines.append(f"  {Fore.CYAN}Reactants:{Style.RESET_ALL} {Fore.WHITE}{', '.join(reactants)}{Style.RESET_ALL}")
+    elif isinstance(reactants, dict) and reactants:
+        slots = ", ".join(sorted(reactants.keys()))
+        if slots:
+            lines.append(f"  {Fore.CYAN}Reactants:{Style.RESET_ALL} {Fore.WHITE}{slots}{Style.RESET_ALL}")
     
     if rtype.get('catalysts'):
         lines.append(f"  {Fore.CYAN}Catalysts:{Style.RESET_ALL} {Fore.YELLOW}{', '.join(rtype['catalysts'])}{Style.RESET_ALL}")
@@ -218,7 +271,7 @@ def show_reactions_by_category(reaction_types: List[Dict[str, Any]], filter_cate
             print(f"{Fore.RED}No categories matching '{filter_category}'{Style.RESET_ALL}")
             print(f"\n{Fore.CYAN}Available categories:{Style.RESET_ALL}")
             for cat in sorted(by_category.keys()):
-                print(f"  {Fore.LIGHTBLACK_EX}•{Style.RESET_ALL} {cat}")
+                print(f"  {Fore.LIGHTBLACK_EX}-{Style.RESET_ALL} {cat}")
             return
         by_category = matching
     
@@ -230,7 +283,7 @@ def show_reactions_by_category(reaction_types: List[Dict[str, Any]], filter_cate
         for r in sorted(reactions, key=lambda x: x.get('name', '')):
             name = r.get('name', 'Unknown')
             rid = r.get('id', 'no-id')
-            has_smarts = "✓" if r.get('smarts') else "✗"
+            has_smarts = "Y" if r.get('smarts') else "N"
             smarts_color = Fore.GREEN if r.get('smarts') else Fore.RED
             aliases = r.get('aliases', [])
             alias_str = f" {Fore.LIGHTBLACK_EX}({aliases[0]}){Style.RESET_ALL}" if aliases else ""
@@ -269,7 +322,7 @@ def show_smarts_coverage(reaction_types: List[Dict[str, Any]]):
         cat_display = cat.replace('_', ' ').title()
         print(f"\n  {Fore.MAGENTA}{cat_display}:{Style.RESET_ALL}")
         for name in sorted(names):
-            print(f"    {Fore.RED}✗{Style.RESET_ALL} {Fore.WHITE}{name}{Style.RESET_ALL}")
+            print(f"    {Fore.RED}-{Style.RESET_ALL} {Fore.WHITE}{name}{Style.RESET_ALL}")
 
 
 def search_reaction_types(reaction_types: List[Dict[str, Any]], query: str):
@@ -309,7 +362,7 @@ def search_reaction_types(reaction_types: List[Dict[str, Any]], query: str):
         # Suggest similar
         print(f"\n{Fore.CYAN}Available reaction type IDs:{Style.RESET_ALL}")
         for r in reaction_types[:10]:
-            print(f"  {Fore.LIGHTBLACK_EX}•{Style.RESET_ALL} {r.get('id', 'no-id')}")
+            print(f"  {Fore.LIGHTBLACK_EX}-{Style.RESET_ALL} {r.get('id', 'no-id')}")
         if len(reaction_types) > 10:
             print(f"  {Fore.LIGHTBLACK_EX}... and {len(reaction_types) - 10} more{Style.RESET_ALL}")
 
@@ -330,7 +383,7 @@ def show_reaction_details(reaction_types: List[Dict[str, Any]], reaction_id: str
     if similar:
         print(f"\n{Fore.CYAN}Did you mean:{Style.RESET_ALL}")
         for sid in similar[:5]:
-            print(f"  {Fore.LIGHTBLACK_EX}•{Style.RESET_ALL} {sid}")
+            print(f"  {Fore.LIGHTBLACK_EX}-{Style.RESET_ALL} {sid}")
 
 
 def export_summary(reaction_types: List[Dict[str, Any]], output_file: str):
@@ -422,7 +475,7 @@ Examples:
     
     # Default: run full analytics
     print_section("REACTION TYPES DATABASE ANALYTICS", Fore.CYAN + Style.BRIGHT)
-    print(f"\n{Fore.WHITE}This tool provides analytics for the {Fore.CYAN + Style.BRIGHT}reaction_types.json{Style.RESET_ALL + Fore.WHITE} database:{Style.RESET_ALL}")
+    print(f"\n{Fore.WHITE}This tool provides analytics for the {Fore.CYAN + Style.BRIGHT}{REACTION_TYPES_PATH.name}{Style.RESET_ALL + Fore.WHITE} database:{Style.RESET_ALL}")
     print(f"  {Fore.GREEN}1.{Style.RESET_ALL} Database statistics and coverage")
     print(f"  {Fore.GREEN}2.{Style.RESET_ALL} Reaction types by category")
     print(f"  {Fore.GREEN}3.{Style.RESET_ALL} SMARTS pattern analysis")

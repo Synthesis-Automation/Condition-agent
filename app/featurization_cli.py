@@ -100,7 +100,9 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
             compound_id = entry.get("compound_id", "unknown")
             groups = entry.get("result") or []
             if groups:
-                entries.append(f"{compound_id}: {', '.join(groups)}")
+                # groups is a list of dicts with 'name' key
+                group_names = [g.get("name", "unknown") if isinstance(g, dict) else str(g) for g in groups]
+                entries.append(f"{compound_id}: {', '.join(group_names)}")
             else:
                 entries.append(f"{compound_id}: none")
         print(_format_list(entries))
@@ -174,16 +176,16 @@ def _parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Formats:\n"
-            "  summary     - readable summary only\n"
+            "  summary     - readable summary only (default)\n"
             "  full-json   - full JSON payload only\n"
             "  both        - summary + full JSON\n"
         ),
     )
     parser.add_argument(
         "--format",
-        default="both",
+        default="summary",
         choices=["summary", "full-json", "both"],
-        help="Output format (default: both).",
+        help="Output format (default: summary).",
     )
     return parser.parse_args()
 
