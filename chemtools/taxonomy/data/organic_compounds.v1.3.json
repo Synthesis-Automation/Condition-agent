@@ -39,6 +39,15 @@
       "aliases": ["Alkyl-H", "alkyl C-H"]
     },
     {
+      "id": "R-H-acidic",
+      "name": "R-H-acidic",
+      "template": "single_bond",
+      "A": "R_acidic",
+      "B": "H",
+      "description": "Acidic alkyl C-H bond (alpha to EWG).",
+      "aliases": ["Alkyl-H-acidic", "acidic C-H"]
+    },
+    {
       "id": "Alkenyl-H",
       "name": "Alkenyl-H",
       "template": "single_bond",

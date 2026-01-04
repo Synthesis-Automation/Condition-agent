@@ -161,6 +161,20 @@
       ]
     },
     {
+      "id": "R_acidic",
+      "name": "R_acidic-",
+      "kind": "scaffold",
+      "priority": 4,
+      "smarts": "[$(C=O),$(S(=O)=O),$(C#N),$(N(=O)[O-]),$([N+](=O)[O-])][CX4:1]",
+      "description": "Acidic alkyl (sp3 carbon) attached to an electron-withdrawing group (e.g., alpha to carbonyl, nitrile, sulfone, nitro).",
+      "tags": [
+        "scaffold",
+        "alkyl",
+        "sp3",
+        "acidic"
+      ]
+    },
+    {
       "id": "Alkynyl",
       "name": "Alkynyl-",
       "kind": "scaffold",
