@@ -97,7 +97,7 @@
     },
     "hydrogenation_substrates": {
       "name": "Hydrogenation Substrates",
-      "members": ["Ar-CCH", "R-CCH", "Ar-CHCH2", "R-CHCH2", "Ar-NO2", "R-NO2", "Any-Alkene"]
+      "members": ["Ar-CCH", "R-CCH", "Ar-CHCH2", "R-CHCH2", "Any-Alkene"]
     },
     "cross_coupling_products": {
       "name": "Cross-Coupling Products",
