@@ -42,7 +42,7 @@
         "product": "@aryl_amines"
       },
       "catalysts": ["Cu"],
-      "examples": ["c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1"]
+      "examples": ["c1ccccc1B(O)O.Nc1ccccc1>>c1ccccc1Nc1ccccc1"]
     },
     {
       "id": "ullmann_ether",
@@ -229,7 +229,7 @@
         "substrate": "@hydrogenation_substrates",
         "reagent": ["H2"]
       },
-      "examples": ["C=C.CC.[H][H]>>CCCC"]
+      "examples": ["C=C.[H][H]>>CC"]
     },
     {
       "id": "click_cuaac",
@@ -240,7 +240,7 @@
         "azide": "@azides"
       },
       "catalysts": ["Cu"],
-      "examples": ["C#Cc1ccccc1.CN3>>Cn1cc(-c2ccccc2)nn1"]
+      "examples": ["C#Cc1ccccc1.CN=[N+]=[N-]>>Cn1cc(-c2ccccc2)nn1"]
     },
     {
       "id": "acylation_ester",
