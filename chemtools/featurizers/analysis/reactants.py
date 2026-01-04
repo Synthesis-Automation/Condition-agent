@@ -752,7 +752,6 @@ def required_reactant_categories(reaction_id: str) -> Optional[Dict[str, List[st
 
 __all__ = [
     "ReactantMatch",
-    "GENERAL_REACTANT_CATEGORIES",
     "CSV_REACTANT_OVERRIDES",
     "CSV_REACTION_OVERRIDES",
     "get_reactant_type_definitions",

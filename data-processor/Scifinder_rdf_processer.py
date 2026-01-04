@@ -929,110 +929,90 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             pass
 
     def generate_jsonl_export(self, rows, output_path: str, source_folder: str):
-        """Generate JSONL export with precomputed normalization and features using V2 Processor."""
-        
-        # Initialize V2 Processor
-        processor = None
-        if V2Processor:
-            try:
-                processor = V2Processor()
-                print("  V2 Processor initialized successfully.")
-            except Exception as e:
-                print(f"  Warning: Failed to initialize V2 Processor: {e}")
-        
+        """Generate simplified JSONL export matching the Markdown report structure."""
         out_lines: List[str] = []
-        precompute_stats = {"success": 0, "failed": 0, "skipped": 0}
         
         for idx, row in enumerate(rows, 1):
             rid = row.get("ReactionID", "")
-            reactants_smi = row.get("ReactantSMILES", "")
-            products_smi = row.get("ProductSMILES", "")
-            reaction_type = (row.get("ReactionType") or row.get("reaction_type") or "").strip()
-            
-            if not reactants_smi or not products_smi:
-                precompute_stats["skipped"] += 1
-                continue
-
-            reaction_smiles = f"{reactants_smi}>>{products_smi}"
-            
-            # Prepare data for V2 Processor
+            rtype = row.get("ReactionType", "")
             reag_list = self._safe_json_list(row.get("Reagent", "[]"))
-            reagents = []
-            for item in reag_list:
-                obj = self._normalize_component(self._component_from_item(item))
-                reagents.append({"name": obj.get("name", ""), "cas": obj.get("cas", "")})
-
+            role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
             solv_list = self._safe_json_list(row.get("Solvent", "[]"))
+            
+            full_system_list = self._collect_full_catalytic_system(row)
+            catalytic_system = self._join_names(full_system_list)
+            disp_core = self._compute_condition_core(row, full_system_list)
+            
+            y = row.get("Yield_%", "")
+            r_smi = row.get("ReactantSMILES", "")
+            p_smi = row.get("ProductSMILES", "")
+            
+            # Reagents with CAS and Role
+            reagents = []
+            for i, item in enumerate(reag_list):
+                obj = self._normalize_component(self._component_from_item(item))
+                role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
+                reagents.append({
+                    "name": obj.get("name", "?"),
+                    "cas": obj.get("cas", ""),
+                    "role": role
+                })
+                
+            # Solvents with CAS
             solvents = []
             for item in solv_list:
                 obj = self._normalize_component(self._component_from_item(item))
-                solvents.append({"name": obj.get("name", ""), "cas": obj.get("cas", "")})
-
-            def _num(x):
-                try:
-                    return float(x)
-                except:
-                    return None
-
-            reaction_data = {
+                solvents.append({
+                    "name": obj.get("name", "?"),
+                    "cas": obj.get("cas", "")
+                })
+                
+            # Simplified Reference (Journal, Year, Pages)
+            citation = ""
+            raw_data_str = row.get("RawData", "{}")
+            try:
+                raw_data = _json.loads(raw_data_str)
+                # Try to get citation from txt block if available
+                citation = raw_data.get("txt", {}).get("citation", "")
+            except:
+                pass
+            
+            if not citation:
+                # Fallback: try to extract from Reference string
+                ref_str = row.get("Reference", "")
+                if ref_str:
+                    parts = [p.strip() for p in ref_str.split("|")]
+                    # Heuristic: citation usually has a year in parentheses and is not the DOI
+                    for p in parts:
+                        if "(" in p and ")" in p and not p.startswith("10."):
+                            citation = p
+                            break
+                    if not citation and len(parts) >= 3:
+                        citation = parts[2]
+            
+            entry = {
                 "reaction_id": rid,
-                "reaction_smiles": reaction_smiles,
-                "reaction_type": reaction_type,
+                "type": rtype,
+                "condition_core": disp_core,
+                "catalytic_system": catalytic_system,
+                "yield": y,
                 "reagents": reagents,
                 "solvents": solvents,
-                "conditions": {
-                    "temperature_c": _num(row.get("Temperature_C")),
-                    "yield_pct": _num(row.get("Yield_%"))
-                },
-                "reference": row.get("Reference") or {}
+                "smiles": f"{r_smi}>>{p_smi}" if r_smi or p_smi else "",
+                "reference": citation
             }
-
-            # Process with V2 Processor
-            v2_entry = {}
-            if processor:
-                try:
-                    v2_entry = processor.process_reaction(reaction_data)
-                    if v2_entry:
-                        precompute_stats["success"] += 1
-                except Exception as e:
-                    precompute_stats["failed"] += 1
-                    if precompute_stats["failed"] <= 5:
-                        print(f"  Warning: V2 processing failed for {rid}: {e}")
             
-            if not v2_entry:
-                # Fallback to minimal entry if processor fails or is unavailable
-                v2_entry = {
-                    "reaction_id": rid,
-                    "reaction_smiles": reaction_smiles,
-                    "conditions": reaction_data["conditions"],
-                    "reference": reaction_data["reference"]
-                }
-
-            if reaction_type:
-                v2_entry["reaction_type"] = reaction_type
-
             # Use separators with spaces to make it "less messy" while remaining valid JSONL
-            out_lines.append(_json.dumps(v2_entry, ensure_ascii=False, separators=(', ', ': ')))
+            out_lines.append(_json.dumps(entry, ensure_ascii=False, separators=(', ', ': ')))
             
             if idx % 100 == 0:
-                print(f"  Processed {idx}/{len(rows)} reactions...")
+                print(f"  Processed {idx}/{len(rows)} reactions for JSONL...")
 
         # Write output file
         try:
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
-            
-            # Print statistics
-            total = len(rows)
-            print(f"\n{'='*60}")
-            print(f"V2 PROCESSING STATISTICS")
-            print(f"{'='*60}")
-            print(f"Total reactions:           {total}")
-            print(f"Successfully processed:    {precompute_stats['success']} ({precompute_stats['success']/total*100:.1f}%)")
-            print(f"Failed:                    {precompute_stats['failed']} ({precompute_stats['failed']/total*100:.1f}%)")
-            print(f"Skipped:                   {precompute_stats['skipped']} ({precompute_stats['skipped']/total*100:.1f}%)")
-            print(f"{'='*60}")
-            
+            print(f"  Successfully wrote {len(out_lines)} reactions to {output_path}")
         except Exception as e:
             print(f"Error writing JSONL: {e}")
 
