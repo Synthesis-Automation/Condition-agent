@@ -104,13 +104,16 @@ def detect_motifs(
     
     raw_hits = filtered_raw
 
-    # Filter by substituent atom: keep only highest priority per functional group attachment
-    sites: Dict[int, List[Dict[str, Any]]] = {}
+    # Filter by substituent atom and scaffold atom: 
+    # keep only highest priority per (functional group, scaffold) pair.
+    # This allows a single atom (e.g. Nitrogen) to be part of multiple motifs 
+    # if it's attached to different scaffold atoms (e.g. an Ar and an R).
+    sites: Dict[Tuple[int, int], List[Dict[str, Any]]] = {}
     for hit in raw_hits:
-        site = hit["b_atom_idx"]
-        if site not in sites:
-            sites[site] = []
-        sites[site].append(hit)
+        site_key = (hit["b_atom_idx"], hit["a_atom_idx"])
+        if site_key not in sites:
+            sites[site_key] = []
+        sites[site_key].append(hit)
     
     final_hits = []
     for site_hits in sites.values():

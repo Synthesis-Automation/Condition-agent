@@ -14,7 +14,7 @@ Key Features:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Tuple, Any, Iterable
+from typing import List, Dict, Optional, Tuple, Any, Iterable, Set
 from collections import defaultdict, Counter
 from functools import lru_cache
 import pandas as pd
@@ -27,7 +27,7 @@ from chemtools.featurizers.structural import featurize_molecule
 @lru_cache(maxsize=4)
 def _load_hte_database_cached(
     hte_db_path: str,
-) -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame], Dict[str, Counter]]:
+) -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame], Dict[str, Counter], Dict[str, pd.DataFrame]]:
     """Load and index the HTE database once per path (cached)."""
     db_path = Path(hte_db_path)
     if not db_path.exists():
@@ -75,8 +75,9 @@ def _load_hte_database_cached(
 
     indexed_data: Dict[str, pd.DataFrame] = {}
     reaction_type_patterns: Dict[str, Counter] = {}
+    transformation_indices: Dict[str, pd.DataFrame] = {}
 
-    print("Building reactant type indices using Reactant_Types_Key...")
+    print("Building reactant type indices...")
 
     df["Reactant_Types_Key"] = df["Reactant_Types_Key"].fillna("")
     grouped = df.groupby("Reactant_Types_Key")
@@ -85,9 +86,15 @@ def _load_hte_database_cached(
 
         rxn_types = group_df["Reaction_Type_Standardized"].value_counts()
         reaction_type_patterns[key] = Counter(rxn_types.to_dict())
+    
+    # Build transformation-aware index
+    df["Reaction_Type_Standardized"] = df["Reaction_Type_Standardized"].fillna("Unknown")
+    grouped_rxn = df.groupby("Reaction_Type_Standardized")
+    for key, group_df in grouped_rxn:
+        transformation_indices[key] = group_df
 
-    print(f"Indexed {len(indexed_data)} unique reactant type combinations")
-    return df, indexed_data, reaction_type_patterns
+    print(f"Indexed {len(indexed_data)} reactant combinations and {len(transformation_indices)} transformation types")
+    return df, indexed_data, reaction_type_patterns, transformation_indices
 
 
 def _ensure_list(values: Any) -> List[str]:
@@ -123,6 +130,45 @@ def _format_list(values: Any) -> str:
 def _reactant_key(values: Iterable[Optional[str]]) -> str:
     items = _dedupe_list([str(v).strip() for v in values if v])
     return "|".join(sorted(items))
+
+
+def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
+    """
+    Parse transformation key format: [Reacted] -> [Formed] || [Spectators]
+    
+    Returns:
+        (reacted_set, formed_set, spectators_set)
+    """
+    if " -> " not in key or " || " not in key:
+        # Fallback for old flat keys (treat all as reacted)
+        return set(key.split("|")), set(), set()
+    
+    try:
+        parts = key.split(" || ")
+        
+        def parse_part(p):
+            p = p.strip()
+            if p == "[]" or p == "None" or not p:
+                return set()
+            # Remove brackets if present
+            if p.startswith("[") and p.endswith("]"):
+                p = p[1:-1]
+            # Split by either | or ,
+            if "|" in p:
+                return set(item.strip() for item in p.split("|") if item.strip())
+            else:
+                return set(item.strip() for item in p.split(",") if item.strip())
+
+        spectators = parse_part(parts[1])
+        
+        rxn_parts = parts[0].split(" -> ")
+        reacted = parse_part(rxn_parts[0])
+        formed = parse_part(rxn_parts[1])
+        
+        return reacted, formed, spectators
+    except:
+        # Robust fallback
+        return set(key.split("|")), set(), set()
 
 
 def _load_hte_jsonl(path: Path) -> pd.DataFrame:
@@ -188,6 +234,7 @@ class ConditionRecommendation:
     num_experiments: int = 0
     avg_z_score: float = 0.0  # Average z-score (PRIMARY ranking metric for condition success)
     confidence_score: float = 0.0  # Secondary score considering z-score and sample size
+    match_score: float = 1.0  # How well the transformation matched the query
     
     # Metadata
     reaction_type: Optional[str] = None
@@ -239,11 +286,13 @@ class HTERecommender:
         self.df: Optional[pd.DataFrame] = None
         self.indexed_data: Dict[Tuple[str, str], pd.DataFrame] = {}
         self.reaction_type_patterns: Dict[Tuple[str, str], Counter] = {}
+        self.transformation_indices: Dict[str, pd.DataFrame] = {}
 
-        df, indexed_data, patterns = _load_hte_database_cached(str(self.db_path))
+        df, indexed_data, patterns, trans_indices = _load_hte_database_cached(str(self.db_path))
         self.df = df
         self.indexed_data = dict(indexed_data)
         self.reaction_type_patterns = dict(patterns)
+        self.transformation_indices = dict(trans_indices)
     
     def _detect_reactant_types(self, smiles: str) -> Tuple[List[str], Optional[str]]:
         """
@@ -340,6 +389,44 @@ class HTERecommender:
         
         return reaction_type, confidence
     
+    def _score_transformation_match(
+        self, 
+        query_motifs: Set[str], 
+        db_key: str
+    ) -> float:
+        """
+        Score how well a database entry matches the query motifs.
+        
+        Logic:
+        1. Must match the 'reacted' core motifs.
+        2. Higher score for matching 'spectator' motifs.
+        3. Penalty for query motifs not present in the database entry (potential interference).
+        """
+        reacted, formed, spectators = _parse_transformation_key(db_key)
+        
+        # 1. Core match: query must contain all 'reacted' motifs
+        if not reacted or not reacted.issubset(query_motifs):
+            return 0.0
+            
+        # 2. Spectator match
+        query_spectators = query_motifs - reacted
+        
+        if not spectators and not query_spectators:
+            spectator_score = 1.0
+        elif not spectators:
+            # Query has spectators but DB doesn't (clean substrate match)
+            spectator_score = 0.3
+        elif not query_spectators:
+            # DB has spectators but query doesn't
+            spectator_score = 0.5
+        else:
+            intersection = spectators & query_spectators
+            union = spectators | query_spectators
+            spectator_score = len(intersection) / len(union)
+            
+        # Final score: 0.5 (base for core match) + 0.5 * spectator_score
+        return 0.5 + (0.5 * spectator_score)
+    
     def _calculate_confidence_score(
         self,
         avg_z_score: float,
@@ -422,7 +509,14 @@ class HTERecommender:
             
             # Z-score statistics (primary ranking metric)
             z_scores = group_df['z-Score']
-            avg_z_score = z_scores.mean()
+            
+            # If match_score is present, weight the z-score
+            if 'match_score' in group_df.columns:
+                # Weighted average z-score
+                avg_z_score = (z_scores * group_df['match_score']).sum() / group_df['match_score'].sum()
+            else:
+                avg_z_score = z_scores.mean()
+                
             z_min = z_scores.min()
             z_max = z_scores.max()
             
@@ -440,6 +534,8 @@ class HTERecommender:
                 group_df.iloc[0]['Reactant_B_Type']
             )
             
+            match_score = group_df['match_score'].iloc[0] if 'match_score' in group_df.columns else 1.0
+            
             rec = ConditionRecommendation(
                 catalyst=catalyst if pd.notna(catalyst) else "",
                 ligand=ligand if pd.notna(ligand) else "",
@@ -454,6 +550,7 @@ class HTERecommender:
                 num_experiments=num_exp,
                 avg_z_score=avg_z_score,
                 confidence_score=confidence,
+                match_score=match_score,
                 reaction_type=reaction_type,
                 reactant_types=reactant_types,
                 z_score_range=(z_min, z_max)
@@ -513,33 +610,56 @@ class HTERecommender:
             return result
         
         # Step 3: Match against database
-        key = _reactant_key(list(type_a) + list(type_b))
+        query_motifs = set(type_a) | set(type_b)
+        
+        scored_matches = []
+        for db_key, group_df in self.transformation_indices.items():
+            score = self._score_transformation_match(query_motifs, db_key)
+            if score > 0:
+                # Weight the z-score by the match score
+                temp_df = group_df.copy()
+                temp_df['match_score'] = score
+                scored_matches.append(temp_df)
         
         matched_df = None
-        if key in self.indexed_data:
-            matched_df = self.indexed_data[key].copy()
-            result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
+        if scored_matches:
+            matched_df = pd.concat(scored_matches)
+            result.is_fallback_match = False
+            # Use the highest scoring transformation as the "matched motifs" for display
+            best_key = max(scored_matches, key=lambda x: x['match_score'].iloc[0])['Reaction_Type_Standardized'].iloc[0]
+            result.matched_motifs = (best_key, "")
+            result.total_matching_experiments = len(matched_df)
         else:
-            list_a = type_a or [""]
-            list_b = type_b or [""]
-            for ma in list_a:
-                for mb in list_b:
-                    if not ma and not mb:
-                        continue
-                    candidate = _reactant_key([ma, mb])
-                    if candidate in self.indexed_data:
-                        matched_df = self.indexed_data[candidate].copy()
-                        result.matched_motifs = (ma, mb)
-                        result.is_fallback_match = True
+            # Fallback to old motif-based matching if no transformation match found
+            key = _reactant_key(list(type_a) + list(type_b))
+            if key in self.indexed_data:
+                matched_df = self.indexed_data[key].copy()
+                matched_df['match_score'] = 1.0
+                result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
+                result.total_matching_experiments = len(matched_df)
+            else:
+                list_a = type_a or [""]
+                list_b = type_b or [""]
+                for ma in list_a:
+                    for mb in list_b:
+                        if not ma and not mb:
+                            continue
+                        candidate = _reactant_key([ma, mb])
+                        if candidate in self.indexed_data:
+                            matched_df = self.indexed_data[candidate].copy()
+                            matched_df['match_score'] = 1.0
+                            result.matched_motifs = (ma, mb)
+                            result.is_fallback_match = True
+                            result.total_matching_experiments = len(matched_df)
+                            break
+                    if matched_df is not None:
                         break
-                if matched_df is not None:
-                    break
 
         if matched_df is None:
             return result
         
         # Step 2: Predict reaction type (using matched motifs)
-        if result.matched_motifs:
+        if result.matched_motifs and not result.predicted_reaction_type:
             pred_rxn, rxn_conf = self._predict_reaction_type(
                 result.reactant_a_type, result.reactant_b_type
             )
@@ -745,6 +865,7 @@ def format_recommendation(rec: ConditionRecommendation, rank: int = 1) -> str:
         f"Confidence Score: {rec.confidence_score:.1f}/100",
         f"Success Rate: {rec.success_rate:.1f}% ({rec.num_experiments} experiments)",
         f"Avg Yield: {rec.avg_yield:.1f}% | Median: {rec.median_yield:.1f}%",
+        f"Match Score: {rec.match_score:.2f}",
         f"",
         f"🧪 CONDITIONS:",
         f"  Catalyst: {rec.catalyst}",
@@ -791,6 +912,12 @@ def format_result(result: HTERecommendationResult) -> str:
         f"",
         f"🎯 PREDICTED REACTION TYPE: {result.predicted_reaction_type}",
         f"   Confidence: {result.reaction_type_confidence*100:.1f}%",
+    ])
+
+    if result.matched_motifs and result.matched_motifs[0]:
+        lines.append(f"   Matched Transformation: {result.matched_motifs[0]}")
+
+    lines.extend([
         f"",
         f"📊 DATABASE MATCH:",
         f"   {result.total_matching_experiments} matching experiments",

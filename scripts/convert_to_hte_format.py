@@ -104,7 +104,7 @@ def process_reaction_dataset(input_path: str, output_path: str):
         if ">>" not in smiles:
             continue
             
-        reactants_part = smiles.split(">>")[0]
+        reactants_part, products_part = smiles.split(">>")
         reactants = reactants_part.split(".")
         
         motif_ids = []
@@ -117,11 +117,9 @@ def process_reaction_dataset(input_path: str, output_path: str):
                 motifs = analysis.get("motifs", [])
                 
                 r_motifs = _dedupe_list([m.get("compound_id", "") for m in motifs if m.get("compound_id")])
-                r_cat = motifs[0].get("category", "Unknown") if motifs else "Unknown"
                 
                 reactant_data.append({
-                    "motifs": r_motifs,
-                    "category": r_cat
+                    "motifs": r_motifs
                 })
                 motif_ids.extend(r_motifs)
             except Exception as e:
@@ -130,6 +128,49 @@ def process_reaction_dataset(input_path: str, output_path: str):
             
         if not reactant_data:
             continue
+
+        # Product motif analysis
+        product_motifs = []
+        try:
+            p_analysis = cached_featurize(products_part)
+            p_motifs = p_analysis.get("motifs", [])
+            product_motifs = [m.get("compound_id", "") for m in p_motifs if m.get("compound_id")]
+        except:
+            pass
+
+        # Transformation analysis using counts to handle motifs that exist in both
+        from collections import Counter
+        r_counts = Counter(motif_ids)
+        p_counts = Counter(product_motifs)
+        
+        reacted_set = set()
+        formed_set = set()
+        spectators_set = set()
+        
+        all_motifs = set(r_counts.keys()) | set(p_counts.keys())
+        for m in all_motifs:
+            rc = r_counts.get(m, 0)
+            pc = p_counts.get(m, 0)
+            
+            if pc > rc:
+                formed_set.add(m)
+                if rc > 0:
+                    spectators_set.add(m)
+            elif pc < rc:
+                reacted_set.add(m)
+                if pc > 0:
+                    spectators_set.add(m)
+            else:
+                if rc > 0:
+                    spectators_set.add(m)
+        
+        # Construct the new informative key
+        # Format: [Reacted] -> [Formed] || [Spectators]
+        reacted_str = _reactant_key(list(reacted_set)) or "None"
+        formed_str = _reactant_key(list(formed_set)) or "None"
+        spectators_str = _reactant_key(list(spectators_set)) or "None"
+        
+        transformation_key = f"{reacted_str} -> {formed_str} || {spectators_str}"
             
         # Map to A and B slots (standard for HTE recommender)
         type_a = ",".join(reactant_data[0]["motifs"]) if len(reactant_data) > 0 else ""
@@ -139,10 +180,10 @@ def process_reaction_dataset(input_path: str, output_path: str):
         reagents = extract_reagents(record)
         
         row = {
-            "Reaction_Type_Standardized": record.get("type", "Unknown"),
+            "Reaction_Type_Standardized": transformation_key,
             "Reactant_A_Type": type_a,
             "Reactant_B_Type": type_b,
-            "Reactant_Types_Key": _reactant_key(motif_ids),
+            "Reactant_Types_Key": _reactant_key([type_a, type_b]),
             "yield": record.get("yield", 0.0),
             "smiles": smiles,
             **reagents
