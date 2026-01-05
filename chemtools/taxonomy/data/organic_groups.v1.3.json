@@ -466,6 +466,19 @@
       ]
     },
     {
+      "id": "AromN_Subst",
+      "name": "-AromN",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[n:2]",
+      "description": "Aromatic nitrogen substituent (e.g., in N-aryl pyrroles, indoles) (-AromN).",
+      "tags": [
+        "aromatic",
+        "heteroatom",
+        "nitrogen_group"
+      ]
+    },
+    {
       "id": "NH2",
       "name": "-NH2",
       "kind": "substituent",

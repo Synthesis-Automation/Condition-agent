@@ -106,7 +106,7 @@
     },
     "aryl_amines": {
       "name": "Aryl Amines",
-      "members": ["Ar-NH2", "Ar-NHR", "Ar-NR2"],
+      "members": ["Ar-NH2", "Ar-NHR", "Ar-NR2", "Ar-AromN"],
       "description": "Products of C-N coupling."
     },
     "aryl_ethers": {

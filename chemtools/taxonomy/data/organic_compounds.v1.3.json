@@ -21,6 +21,14 @@
       "description": "Any C-H bond on any scaffold."
     },
     {
+      "id": "Any-AromN",
+      "name": "Any-AromN",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "AromN_Subst",
+      "description": "Any aromatic nitrogen substituent on any scaffold."
+    },
+    {
       "id": "Ar-H",
       "name": "Ar-H",
       "template": "single_bond",
@@ -917,6 +925,14 @@
       "description": "Aryl tertiary amine (NR2) (Ar-NR2)."
     },
     {
+      "id": "Ar-AromN",
+      "name": "Ar-AromN",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "AromN_Subst",
+      "description": "Aryl-substituted aromatic nitrogen (e.g., N-phenylpyrrole)."
+    },
+    {
       "id": "Ar-OH",
       "name": "Ar-OH",
       "template": "single_bond",
@@ -1431,6 +1447,14 @@
       "A": "R",
       "B": "NR2",
       "description": "Generic alkyl tertiary amine (R-NR2)."
+    },
+    {
+      "id": "R-AromN",
+      "name": "R-AromN",
+      "template": "single_bond",
+      "A": "R",
+      "B": "AromN_Subst",
+      "description": "Alkyl-substituted aromatic nitrogen (e.g., N-methylpyrrole)."
     },
     {
       "id": "Any-NH2",

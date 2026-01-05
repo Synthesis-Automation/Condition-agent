@@ -45,6 +45,10 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
     templates = _load_templates(templates_path)
     compounds = _load_compounds(compounds_path)
     
+    if "scaffold_motifs" in registry_paths:
+        scaffold_path = Path(registry_paths["scaffold_motifs"])
+        compounds.extend(_load_compounds(scaffold_path))
+    
     # Load priorities from groups and logic sets
     priorities = {g_id: g.get("priority", 1) for g_id, g in groups.items()}
     if logic_path and logic_path.exists():
@@ -381,5 +385,6 @@ def _default_registry_paths() -> Dict[str, Path]:
     return {
         "groups": base / "organic_groups.v1.3.json",
         "compounds": base / "organic_compounds.v1.3.json",
+        "scaffold_motifs": base / "scaffold_motifs.v1.3.json",
         "logic": base / "group_logic.json",
     }

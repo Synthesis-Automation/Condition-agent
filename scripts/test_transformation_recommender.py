@@ -38,14 +38,15 @@ def test_recommender():
             print(f"{i+1}. Catalyst: {rec.catalyst}, Ligand: {rec.ligand}, Base: {rec.base}, Solvent: {rec.solvent}")
             print(f"   Avg Z-score: {rec.avg_z_score:.2f}, Confidence: {rec.confidence_score:.1f}%")
     
-    # Test Case 2: Substrate with spectator group
-    # 4-Bromophenol + Aniline (Phenol is a spectator in C-N coupling usually)
-    r3 = "Oc1ccc(Br)cc1"
-    r4 = "c1ccccc1N"
+    # Test Case 2: Complex piperazine substrate
+    # 1-phenylpiperazine + 4-fluorophenylboronic acid
+    r3 = "c1ccc(N2CCNCC2)cc1"
+    r4 = "OB(O)c1ccc(F)cc1"
     
     print(f"\n--- Test Case 2: {r3} + {r4} ---")
     result2 = recommender.recommend(r3, r4)
     print(f"Detected Reactant A: {result2.reactant_a_type}")
+    print(f"Detected Reactant B: {result2.reactant_b_type}")
     if result2.matched_motifs:
         print(f"Matched Transformation: {result2.matched_motifs[0]}")
     else:
