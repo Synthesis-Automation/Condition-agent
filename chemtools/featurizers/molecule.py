@@ -14,7 +14,7 @@ from .aryl_electronics import analyze_aryl_electronics
 from .aryl_steric import analyze_aryl_steric
 from .nearby_groups import analyze_nearby_groups
 from .motif_detect import detect_motifs
-from .motif_registry import build_compound_registry
+from .motif_registry import build_compound_registry, _default_registry_paths
 
 
 def featurize_molecule(
@@ -65,6 +65,7 @@ def featurize_molecule(
     include_ipso_group = options.get("electronics_include_ipso_group", True)
     max_hits = options.get("max_hits_per_compound")
     discovery_mode = bool(options.get("discovery_mode", False))
+    site_filter = options.get("motif_site_filter", "bond")
 
     all_motifs = detect_motifs(
         mol,
@@ -72,6 +73,7 @@ def featurize_molecule(
         max_hits_per_compound=max_hits,
         registry=registry,
         discovery_mode=discovery_mode,
+        site_filter=site_filter,
     )
     motifs = list(all_motifs)
 
@@ -235,14 +237,6 @@ def analyze_smiles(
 ) -> Dict[str, Any]:
     """Compatibility wrapper for motif/steric/electronic analysis."""
     return featurize_molecule(smiles, registry_paths=registry_paths, options=options)
-
-
-def _default_registry_paths() -> Dict[str, Path]:
-    base = Path(__file__).resolve().parent.parent / "taxonomy" / "data"
-    return {
-        "groups": base / "organic_groups.v1.3.json",
-        "compounds": base / "organic_compounds.v1.3.json",
-    }
 
 
 __all__ = ["featurize_molecule", "analyze_smiles"]

@@ -31,7 +31,7 @@
       "id": "Ar",
       "name": "Ar-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 5,
       "smarts": "[c:1]",
       "description": "Aryl attachment via aromatic carbon (Ar-).",
       "tags": [
@@ -44,7 +44,7 @@
       "id": "AromN",
       "name": "AromN-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 5,
       "smarts": "[n:1]",
       "description": "Aromatic attachment via aromatic nitrogen (e.g., N-substituted pyrroles, indoles) (AromN-).",
       "tags": [
@@ -57,7 +57,7 @@
       "id": "Alkenyl",
       "name": "Alkenyl-",
       "kind": "scaffold",
-      "priority": 2,
+      "priority": 5,
       "smarts": "[C;X3]=[C;X3:1]",
       "description": "Alkenyl (vinylic) attachment at an sp2 carbon.",
       "tags": [
@@ -178,7 +178,7 @@
       "id": "Alkynyl",
       "name": "Alkynyl-",
       "kind": "scaffold",
-      "priority": 1,
+      "priority": 5,
       "smarts": "[#6]#[#6:1]",
       "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal).",
       "tags": [
@@ -191,7 +191,7 @@
       "id": "Acyl",
       "name": "Acyl-",
       "kind": "scaffold",
-      "priority": 1,
+      "priority": 5,
       "smarts": "[CX3:1](=O)",
       "description": "Acyl carbon attachment point (Acyl-), used for acyl electrophiles/features.",
       "tags": [

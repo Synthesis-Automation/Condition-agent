@@ -11,7 +11,10 @@ from chemtools.featurizers.structural import featurize_molecule
 @lru_cache(maxsize=10000)
 def cached_featurize(smiles: str):
     """Cache featurization results to speed up processing of repeated reactants."""
-    return featurize_molecule(smiles)
+    # Use substituent-level filtering to avoid redundant labels (e.g., Ar-NR2 and RCH2-NR2)
+    # also ensures that Aromatic scaffolds win over Aliphatic ones due to updated priorities.
+    options = {"motif_site_filter": "substituent"}
+    return featurize_molecule(smiles, options=options)
 
 def _dedupe_list(values: Iterable[str]) -> List[str]:
     seen = set()
@@ -116,10 +119,11 @@ def process_reaction_dataset(input_path: str, output_path: str):
                 analysis = cached_featurize(r_smiles)
                 motifs = analysis.get("motifs", [])
                 
-                r_motifs = _dedupe_list([m.get("compound_id", "") for m in motifs if m.get("compound_id")])
+                # Keep raw motifs for stoichiometry counts
+                r_motifs = [m.get("compound_id", "") for m in motifs if m.get("compound_id")]
                 
                 reactant_data.append({
-                    "motifs": r_motifs
+                    "motifs": _dedupe_list(r_motifs) # Dedupe for the per-reactant display
                 })
                 motif_ids.extend(r_motifs)
             except Exception as e:

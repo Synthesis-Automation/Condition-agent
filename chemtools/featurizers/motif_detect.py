@@ -16,10 +16,20 @@ def detect_motifs(
     max_hits_per_compound: Optional[int] = None,
     registry: Optional[Dict[str, Any]] = None,
     discovery_mode: bool = False,
+    site_filter: str = "bond",
 ) -> List[Dict[str, Any]]:
     """
     Detect motif hits using compiled compound SMARTS.
     Only returns the most specific matches (highest priority) per bond/site.
+    
+    Args:
+        mol: RDKit molecule
+        compiled_compounds: List of CompoundPattern
+        max_hits_per_compound: Limit hits per compound type
+        registry: Full registry (required for discovery_mode)
+        discovery_mode: Whether to find undocumented motifs
+        site_filter: "bond" (default) keeps best per (scaffold, substituent) bond.
+                     "substituent" keeps best per substituent atom (collapses redundant scaffolds).
     """
     raw_hits: List[Dict[str, Any]] = []
     seen: Set[Tuple[str, int, int]] = set()
@@ -108,9 +118,13 @@ def detect_motifs(
     # keep only highest priority per (functional group, scaffold) pair.
     # This allows a single atom (e.g. Nitrogen) to be part of multiple motifs 
     # if it's attached to different scaffold atoms (e.g. an Ar and an R).
-    sites: Dict[Tuple[int, int], List[Dict[str, Any]]] = {}
+    sites: Dict[Any, List[Dict[str, Any]]] = {}
     for hit in raw_hits:
-        site_key = (hit["b_atom_idx"], hit["a_atom_idx"])
+        if site_filter == "substituent":
+            site_key = hit["b_atom_idx"]
+        else:
+            site_key = (hit["b_atom_idx"], hit["a_atom_idx"])
+            
         if site_key not in sites:
             sites[site_key] = []
         sites[site_key].append(hit)
@@ -121,6 +135,19 @@ def detect_motifs(
         # Keep all hits that share the maximum priority for this site
         # If multiple hits have same priority, prefer documented ones
         best_hits = [h for h in site_hits if h["priority"] == max_priority]
+        
+        # In substituent mode, if multiple bonds have the same priority,
+        # we still want to keep the unique compound_ids to avoid losing info,
+        # but deduplicate them to avoid "Ar-NR2 + Ar-NR2".
+        if site_filter == "substituent":
+            unique_best = []
+            seen_ids = set()
+            for h in sorted(best_hits, key=lambda x: (not x.get("undocumented"), x["compound_id"])):
+                if h["compound_id"] not in seen_ids:
+                    unique_best.append(h)
+                    seen_ids.add(h["compound_id"])
+            best_hits = unique_best
+
         documented_best = [h for h in best_hits if not h.get("undocumented")]
         if documented_best:
             final_hits.extend(documented_best)
