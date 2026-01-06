@@ -147,6 +147,14 @@ def process_reaction_dataset(input_path: str, output_path: str):
         r_counts = Counter(motif_ids)
         p_counts = Counter(product_motifs)
         
+        # Heuristic: certain common heterocycles often appear as reagents/bases/solvents
+        # and may be missing from the product SMILES even if they don't react.
+        # We treat them as persistent spectators if they disappear.
+        PERSISTENT_HETEROCYCLES = {"Pyridine", "Quinoline", "Isoquinoline", "Pyrimidine", "Pyrazine", "Pyridazine"}
+        for h_id in PERSISTENT_HETEROCYCLES:
+            if r_counts[h_id] > 0 and p_counts[h_id] < r_counts[h_id]:
+                p_counts[h_id] = r_counts[h_id]
+
         reacted_set = set()
         formed_set = set()
         spectators_set = set()
