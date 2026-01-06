@@ -238,3 +238,9 @@ if __name__ == "__main__":
         "data/reaction_dataset/C_N_Coupling.jsonl",
         "data/HTE_db/C_N_Coupling_canonical.csv"
     )
+
+    # Process the C-O Coupling dataset
+    process_reaction_dataset(
+        "data/reaction_dataset/C_O_Coupling.jsonl",
+        "data/HTE_db/C_O_Coupling_canonical.csv"
+    )
