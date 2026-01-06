@@ -190,9 +190,12 @@ def process_reaction_dataset(input_path: str, output_path: str):
         type_b = ",".join(reactant_data[1]["motifs"]) if len(reactant_data) > 1 else ""
         
         reagents = extract_reagents(record)
-        
+        if not reagents.get("Catalyst"):
+            continue
+            
         row = {
             "Reaction_Type_Standardized": transformation_key,
+            "Is_Intramolecular": len(reactants) == 1,
             "Reactant_A_Type": type_a,
             "Reactant_B_Type": type_b,
             "Reactant_Types_Key": _reactant_key([type_a, type_b]),
