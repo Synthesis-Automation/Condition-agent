@@ -1,35 +1,23 @@
-# Taxonomy System Overview (Living Doc)
+# Organic Chemistry Taxonomy System Overview (Living Doc)
 
-Chemistry-first introduction
+Last updated: 2026-01-07
+Owner: Chemistry data platform team
 
-This taxonomy treats reactions as transformations between functional motifs,
-not just strings. We define a controlled vocabulary of organic groups and
+Chemistry introduction
+
+We define a controlled vocabulary of organic groups and
 compound motifs (e.g., Ar-Br, Ar-B(OH)2, Ar-NH2), then use those motifs to
 describe reaction families (e.g., Suzuki, Buchwald-Hartwig) and the roles of
 reagents (catalyst, ligand, base, solvent). The goal is to capture organic
 reactivity in a standard, machine-readable form so that condition extraction,
 recommendation, and dataset analytics reflect chemical meaning rather than
-dataset-specific labels.
+black-box labels.
 
-Purpose
+Purpose and scope
 
 - Document how taxonomy data and code work together across typing, extraction, and recommendation.
 - Provide a single reference for extension and alignment decisions.
-
-Scope
-
-- Reaction taxonomy, organic groups and compounds, reagent taxonomy, and downstream usage.
-
-Last updated: 2026-01-07
-Owner: Chemistry data platform team
-
----
-
-## Core principles
-
-- Single source of truth: taxonomy JSON files in `chemtools/taxonomy/data`.
-- Deterministic, cacheable: SMARTS compilation uses `chemtools/util/smarts_cache.py`.
-- Canonical IDs only: detection outputs should resolve to taxonomy IDs.
+- Cover reaction taxonomy, organic groups and compounds, reagent taxonomy, and downstream usage.
 
 ---
 
@@ -49,6 +37,8 @@ Owner: Chemistry data platform team
 - It generates human-readable tags and descriptors (e.g., sterically demanding
   aryl chloride) that map to well-defined motif and steric/electronic analysis,
   keeping tag meaning explicit and reproducible.
+- These meaning tags make it easier for LLMs to access structured chemistry
+  context and reason from well-defined signals instead of raw data such as smiles strings.
 
 ---
 
@@ -172,6 +162,14 @@ Build or refresh unified recommendation index
 
 ---
 
+## Core principles
+
+- Single source of truth: taxonomy JSON files in `chemtools/taxonomy/data`.
+- Deterministic, cacheable: SMARTS compilation uses `chemtools/util/smarts_cache.py`.
+- Canonical IDs only: detection outputs should resolve to taxonomy IDs.
+
+---
+
 ## Future directions (aligning to program goals)
 
 - Canonicalization and standardization
@@ -191,8 +189,8 @@ Build or refresh unified recommendation index
 
 ## Open questions and risks
 
-- Reagent v2 data completeness: ensure family and CAS pack files are deployed.
-- Reagent coverage depends on legacy registry content and heuristic patterns.
+- Reagent coverage depends on legacy registry content and heuristic patterns; CAS
+  data lives in files such as `data/reagent_db/condensation_agent.json`.
 - Motif overlap: confirm priority rules are consistent for ambiguous sites.
 - Reaction typing coverage: expand motif sets as new families are added.
 

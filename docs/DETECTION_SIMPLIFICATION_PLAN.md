@@ -11,13 +11,13 @@ class _DetectionEngine:
     def _ml_detection(self) -> dict:
         """
         rxn-insight ML detection - ALL ML logic goes here.
-        
+
         Consolidates from reaction_type_detector.py:
         - _call_insight() → calls rxn-insight library
-        - _extract_fields() → parses ML response  
+        - _extract_fields() → parses ML response
         - _map_to_family() → maps to unified taxonomy (via resolve_to_taxonomy())
         - _refine_cn_family() → catalyst-aware refinements
-        
+
         ALL outputs validated against chemtools/taxonomy/data/reaction_types.json
         """
         # ~150 lines of consolidated ML logic
@@ -88,7 +88,7 @@ Which function should I use?
 
 - `router.py::_detect_agent_metals()`
 - `reaction_type_detector.py::detect_reaction_type()` (indirectly via imports)
-- `router.py::detect_family_from_reaction()` (calls _detect_agent_metals)
+- `router.py::detect_family_from_reaction()` (calls \_detect_agent_metals)
 
 **Family mapping** - duplicated in:
 
@@ -137,7 +137,7 @@ result = detect_reaction(
 ✅ **Smart defaults** - automatically uses best available method  
 ✅ **Clear output** - consistent schema always  
 ✅ **Backwards compatible** - old functions still work, deprecated gradually  
-✅ **Less code** - consolidate duplicated logic  
+✅ **Less code** - consolidate duplicated logic
 
 ---
 
@@ -186,14 +186,14 @@ Unified reaction detection API.
 
 Public Functions:
     detect_reaction(reaction_smiles, use_ml=True) -> dict
-    
+
 Internal:
     _DetectionEngine class (consolidates all detection logic)
 """
 
 class _DetectionEngine:
     """Internal engine - consolidates all detection logic."""
-    
+
     def __init__(self, reaction_smiles: str):
         self.reaction = reaction_smiles
         self.normalized = None
@@ -201,33 +201,33 @@ class _DetectionEngine:
         self.agents = []
         self.catalysts = set()
         self._normalize()
-        
+
     def _normalize(self):
         """Normalize reaction and extract components."""
         # Consolidate normalization logic
-        
+
     def _detect_catalysts(self):
         """Detect catalyst metals - single implementation."""
         # Move from router._detect_agent_metals()
-        
+
     def _detect_functional_groups(self):
         """Detect functional groups in reactants."""
         # Move from router._rule_hits()
-        
+
     def _rule_based_detection(self) -> dict:
         """Rule-based SMARTS detection."""
         # Consolidate router.detect_family() logic
-        
+
     def _ml_detection(self) -> dict:
         """
         ML-based detection via rxn-insight (optional).
-        
+
         This wraps the rxn-insight library to provide:
         - Broad reaction class (e.g., "C-C Coupling")
         - Specific reaction name (e.g., "Suzuki coupling with boronic acids")
         - Confidence score from ML model
         - Automatic mapping to ChemTools family taxonomy
-        
+
         Returns:
             {
                 "available": bool,      # Is rxn-insight installed?
@@ -242,24 +242,24 @@ class _DetectionEngine:
         # - _extract_fields() - parses ML response
         # - _map_to_family() - maps to ChemTools taxonomy
         # - _refine_cn_family() - applies catalyst-aware refinements
-        
+
     def _apply_catalyst_overrides(self, family: str) -> str:
         """
         Apply catalyst-based family overrides.
-        
+
         For C-N coupling reactions:
             Pd catalyst → buchwald_cn
             Cu catalyst → ullmann_cn
-            
+
         For C-C couplings:
             Preserves specific family (suzuki, sonogashira, etc.)
         """
         # Consolidate override logic from router.py
-        
+
     def detect(self, use_ml: bool = True) -> dict:
         """
         Main detection orchestrator - combines all detection methods.
-        
+
         Detection Pipeline:
         ┌──────────────────────────────────────┐
         │ 1. Rule-Based Detection (ALWAYS)     │ ← SMARTS patterns, fast
@@ -296,10 +296,10 @@ class _DetectionEngine:
         │    - Return highest confidence       │
         │    - Include all metadata            │
         └──────────────────────────────────────┘
-        
+
         Args:
             use_ml: Use ML detection if available (default: True)
-            
+
         Returns:
             Unified detection result with all metadata
         """
@@ -309,13 +309,13 @@ class _DetectionEngine:
 def detect_reaction(reaction_smiles: str, use_ml: bool = True) -> dict:
     """
     Detect reaction family from reaction SMILES.
-    
+
     This is the MAIN entry point for all reaction detection.
-    
+
     Args:
         reaction_smiles: Full reaction SMILES (reactants>>products)
         use_ml: Use ML-based detection if available (default: True)
-        
+
     Returns:
         {
             "family": str,           # Canonical family label
@@ -335,13 +335,13 @@ def detect_reaction(reaction_smiles: str, use_ml: bool = True) -> dict:
 
 **Consolidation Map:**
 
-| Current Location | New Location | Purpose |
-|------------------|--------------|---------|
-| `router._detect_agent_metals()` | `_DetectionEngine._detect_catalysts()` | Metal extraction from agents |
-| `router._rule_hits()` | `_DetectionEngine._detect_functional_groups()` | SMARTS pattern matching |
-| `router.detect_family()` | `_DetectionEngine._rule_based_detection()` | Deterministic rule engine |
-| `reaction_type_detector.py` (entire file) | `_DetectionEngine._ml_detection()` | **rxn-insight ML integration** |
-| `router.detect_family_from_reaction()` | `_DetectionEngine.detect()` | Main orchestration |
+| Current Location                          | New Location                                   | Purpose                        |
+| ----------------------------------------- | ---------------------------------------------- | ------------------------------ |
+| `router._detect_agent_metals()`           | `_DetectionEngine._detect_catalysts()`         | Metal extraction from agents   |
+| `router._rule_hits()`                     | `_DetectionEngine._detect_functional_groups()` | SMARTS pattern matching        |
+| `router.detect_family()`                  | `_DetectionEngine._rule_based_detection()`     | Deterministic rule engine      |
+| `reaction_type_detector.py` (entire file) | `_DetectionEngine._ml_detection()`             | **rxn-insight ML integration** |
+| `router.detect_family_from_reaction()`    | `_DetectionEngine.detect()`                    | Main orchestration             |
 
 ### 🤖 Where rxn-insight ML Goes
 
@@ -385,12 +385,14 @@ chemtools/
 **Key Design Principles:**
 
 1. **Unified Taxonomy is the Single Source of Truth**
+
    - All detection methods MUST return IDs from `chemtools/taxonomy/data/reaction_types.json`
    - 80+ canonical reaction types (suzuki_miyaura, buchwald_hartwig_c_n, heck, etc.)
    - Aliases automatically resolved via `TaxonomyRegistry.resolve_alias()`
    - No hardcoded mappings scattered across files
 
 2. **rxn-insight is an ENHANCEMENT, not a replacement**
+
    - Rule-based detection ALWAYS runs (fast, deterministic baseline)
    - ML detection adds refinement when available
    - System works perfectly without rxn-insight installed
@@ -401,16 +403,17 @@ chemtools/
    ```python
    # User doesn't need to know about rxn-insight
    result = detect_reaction(rxn)  # Uses ML if available, rules otherwise
-   
+
    # Power users can control it
    result = detect_reaction(rxn, use_ml=True)   # Prefer ML
    result = detect_reaction(rxn, use_ml=False)  # Rules only
-   
+
    # ALWAYS returns canonical taxonomy IDs
    result["family"]  # e.g., "buchwald_hartwig_c_n" (not "Buchwald_CN")
    ```
 
 4. **All ML logic in `_ml_detection()` method**
+
    - Consolidates entire `reaction_type_detector.py` (~304 lines)
    - Includes: `_call_insight()`, `_extract_fields()`, `_map_to_taxonomy()`, `_refine_cn_family()`
    - **Uses `chemtools.featurizers.analysis.reactions.canonical_family_label()` for mapping**
@@ -422,13 +425,13 @@ chemtools/
    Priority 1 (Highest): Catalyst Override
    ├─ If Pd + C-N → "buchwald_hartwig_c_n" (conf: 0.95)
    └─ If Cu + C-N → "ullmann_cn" (conf: 0.90)
-   
+
    Priority 2: ML Detection (if available)
    └─ rxn-insight → mapped via taxonomy registry
-   
+
    Priority 3 (Baseline): Rule-Based
    └─ SMARTS → mapped via taxonomy registry (conf: 0.7-0.9)
-   
+
    ALL outputs validated against reaction_types.json
    ```
 
@@ -439,15 +442,15 @@ class _DetectionEngine:
     def _ml_detection(self) -> dict:
         """
         Optional ML enhancement via rxn-insight.
-        
+
         IMPORTANT: rxn-insight is an ML model and returns UNPREDICTABLE names:
         - "Suzuki coupling" vs "Suzuki-Miyaura" vs "Cross-coupling"
         - "Buchwald-Hartwig" vs "Pd-catalyzed amination" vs "C-N coupling"
         - Names vary between runs and versions
-        
+
         Solution: Robust mapping with context + conservative fallback
         """
-        
+
         # Check if rxn-insight is available
         try:
             import rxn_insight
@@ -457,16 +460,16 @@ class _DetectionEngine:
                 "family": None,
                 "confidence": None
             }
-        
+
         # Call rxn-insight (consolidated from reaction_type_detector.py)
         try:
             raw = self._call_rxn_insight()  # API wrapper
             rxn_class, rxn_name, ml_conf = self._extract_ml_fields(raw)
-            
+
             # CRITICAL: rxn_name is unpredictable!
-            # Could be: "Suzuki coupling", "Cross-coupling reaction", 
+            # Could be: "Suzuki coupling", "Cross-coupling reaction",
             #           "Pd-catalyzed C-C bond formation", etc.
-            
+
             # Use robust mapping with functional group + catalyst context
             family = resolve_to_taxonomy(
                 rxn_name or rxn_class,
@@ -474,7 +477,7 @@ class _DetectionEngine:
                 is_cn_coupling="c-n" in (rxn_class or "").lower(),
                 functional_groups=self.functional_groups  # Context helps!
             )
-            
+
             # Adjust confidence based on mapping certainty
             # (registry exact match vs keyword fallback vs failed)
             confidence = self._calculate_ml_confidence(
@@ -482,7 +485,7 @@ class _DetectionEngine:
                 family,
                 ml_conf or 0.5
             )
-            
+
             return {
                 "available": True,
                 "family": family,  # May be None if unmappable
@@ -501,7 +504,7 @@ class _DetectionEngine:
                 "confidence": None,
                 "error": str(e)
             }
-    
+
     def _get_mapping_method(self, ml_name: str, mapped_family: Optional[str]) -> str:
         """Track HOW we mapped unpredictable ML name."""
         if not mapped_family:
@@ -536,7 +539,7 @@ from .detection import detect_reaction
 def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool = True):
     """
     DEPRECATED: Use chemtools.detect_reaction() instead.
-    
+
     This function will be removed in v2.0.
     """
     warnings.warn(
@@ -556,7 +559,7 @@ def detect_family_from_reaction(reaction_smiles: str, *, use_rxn_insight: bool =
 def detect_family(reactants: List[str]):
     """
     DEPRECATED: Use chemtools.detect_reaction() instead.
-    
+
     This function will be removed in v2.0.
     """
     warnings.warn(
@@ -583,7 +586,7 @@ from .detection import detect_reaction
 def detect_reaction_type(reaction_smiles: str):
     """
     DEPRECATED: Use chemtools.detect_reaction() instead.
-    
+
     This function will be removed in v2.0.
     """
     warnings.warn(
@@ -634,10 +637,10 @@ from chemtools import detect_reaction
 def detect_reaction_family_tool(reaction_smiles: str) -> str:
     """
     Detect reaction family from reaction SMILES.
-    
+
     Args:
         reaction_smiles: Full reaction SMILES string
-        
+
     Returns:
         JSON with family, confidence, and detection details
     """
@@ -739,12 +742,12 @@ family = result["family"]
 
 ### Detailed Migration Table
 
-| Old Function | New Function | Notes |
-|-------------|--------------|-------|
-| `detect_family(reactants)` | `detect_reaction(".".join(reactants) + ">>")` | Convert reactant list to pseudo-reaction |
-| `detect_family_from_reaction(rxn, use_rxn_insight=True)` | `detect_reaction(rxn, use_ml=True)` | Direct replacement |
-| `detect_reaction_type(rxn)` | `detect_reaction(rxn, use_ml=True)` | Same function, different output schema |
-| `classify_reactants_with_context(rxn)` | `detect_reaction(rxn)` then access `result["details"]["reactants"]` | Details now in nested structure |
+| Old Function                                             | New Function                                                        | Notes                                    |
+| -------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------- |
+| `detect_family(reactants)`                               | `detect_reaction(".".join(reactants) + ">>")`                       | Convert reactant list to pseudo-reaction |
+| `detect_family_from_reaction(rxn, use_rxn_insight=True)` | `detect_reaction(rxn, use_ml=True)`                                 | Direct replacement                       |
+| `detect_reaction_type(rxn)`                              | `detect_reaction(rxn, use_ml=True)`                                 | Same function, different output schema   |
+| `classify_reactants_with_context(rxn)`                   | `detect_reaction(rxn)` then access `result["details"]["reactants"]` | Details now in nested structure          |
 
 ### Deprecation Timeline
 
@@ -823,19 +826,19 @@ family = result["family"]
 ✅ Create `chemtools/detection.py` with `detect_reaction()`  
 ✅ Consolidate all detection logic into `_DetectionEngine`  
 ✅ Add deprecation warnings to old functions  
-✅ Ensure backwards compatibility  
+✅ Ensure backwards compatibility
 
 ### Should Have (Phase 3)
 
 ✅ Update all internal consumers (API, CLI, LangChain)  
 ✅ Update documentation  
-✅ Write comprehensive tests  
+✅ Write comprehensive tests
 
 ### Nice to Have (Phase 4)
 
 ✅ Performance optimizations (caching, vectorization)  
 ✅ Enhanced ML integration (multiple models)  
-✅ Interactive detection visualizer  
+✅ Interactive detection visualizer
 
 ---
 
@@ -864,7 +867,7 @@ family = result["family"]
 **Status**: 📋 **Proposal - Pending Approval**  
 **Est. Implementation Time**: 4 weeks  
 **Breaking Changes**: Yes (in v2.0, with 6-month deprecation)  
-**Backwards Compatibility**: Yes (until v2.0)  
+**Backwards Compatibility**: Yes (until v2.0)
 
 ---
 
@@ -880,15 +883,15 @@ family = result["family"]
 
 ### File Consolidation Map
 
-| What | From (Current) | To (New) | Lines |
-|------|----------------|----------|-------|
-| **Public API** | `router.detect_family_from_reaction()` | `detection.detect_reaction()` | Main entry |
-| **Rule Detection** | `router.detect_family()` | `_DetectionEngine._rule_based_detection()` | ~150 |
-| **SMARTS Patterns** | `router._rule_hits()` | `_DetectionEngine._detect_functional_groups()` | ~80 |
-| **Catalyst Extraction** | `router._detect_agent_metals()` | `_DetectionEngine._detect_catalysts()` | ~60 |
-| **🤖 ML Detection** | `reaction_type_detector.py` (entire file) | `_DetectionEngine._ml_detection()` | **~150** |
-| **Catalyst Overrides** | `router.detect_family_from_reaction()` | `_DetectionEngine._apply_catalyst_overrides()` | ~40 |
-| **Normalization** | `router.detect_family_from_reaction()` | `_DetectionEngine._normalize()` | ~30 |
+| What                    | From (Current)                            | To (New)                                       | Lines      |
+| ----------------------- | ----------------------------------------- | ---------------------------------------------- | ---------- |
+| **Public API**          | `router.detect_family_from_reaction()`    | `detection.detect_reaction()`                  | Main entry |
+| **Rule Detection**      | `router.detect_family()`                  | `_DetectionEngine._rule_based_detection()`     | ~150       |
+| **SMARTS Patterns**     | `router._rule_hits()`                     | `_DetectionEngine._detect_functional_groups()` | ~80        |
+| **Catalyst Extraction** | `router._detect_agent_metals()`           | `_DetectionEngine._detect_catalysts()`         | ~60        |
+| **🤖 ML Detection**     | `reaction_type_detector.py` (entire file) | `_DetectionEngine._ml_detection()`             | **~150**   |
+| **Catalyst Overrides**  | `router.detect_family_from_reaction()`    | `_DetectionEngine._apply_catalyst_overrides()` | ~40        |
+| **Normalization**       | `router.detect_family_from_reaction()`    | `_DetectionEngine._normalize()`                | ~30        |
 
 **Total consolidation**: ~850 lines → ~400 lines (53% reduction)
 
@@ -916,7 +919,7 @@ _DetectionEngine(rxn)                      ← Internal class
 def _ml_detection(self) -> dict:
     """
     Optional ML detection using rxn-insight library.
-    
+
     Consolidates from reaction_type_detector.py:
     ───────────────────────────────────────────────
     Line 74-97:   _call_insight() → Try different API entrypoints
@@ -924,7 +927,7 @@ def _ml_detection(self) -> dict:
     Line 172-203: _map_to_family() → Map to taxonomy
     Line 206-235: _refine_cn_family() → Catalyst refinements
     Line 238-304: detect_reaction_type() → Main orchestrator
-    
+
     Returns:
     ───────
     {
