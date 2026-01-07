@@ -10,9 +10,9 @@ This package hosts the new taxonomy system. Python modules live at
 
 The v2 system is intentionally small and deterministic, and includes:
 
-- **Reagent taxonomy v2**: Minimal roles and families with allowlists and SMARTS
-  detection (`reagent_roles.v2.json`, `reagent_families.v2_cas.json`, and the
-  merged CAS pack).
+- **Reagent taxonomy v2**: Minimal reagent roles for classification and
+  condition extraction (`reagent_roles.v2.json`). Family allowlists are handled
+  outside the v2 core.
 - **Reaction catalog**: Canonical reaction IDs and aliases from
   `reaction_types.v4.0.json`.
 - **Organic groups and compounds**: Template-based motif definitions from
@@ -111,8 +111,6 @@ db_id = resolve_rule_db_v2("Suzuki")
 ## Data Files (taxonomy/data)
 
 - `reagent_roles.v2.json`: Role definitions (id, priority, default family).
-- `reagent_families.v2_cas.json`: Families with allowlists and optional SMARTS.
-- `reagent_cas_pack_solvent_base.v2.json`: CAS pack merged into allowlists.
 - `reaction_types.v4.0.json`: Canonical taxonomy for reaction types.
 - `organic_groups.v1.2.json`, `organic_compounds.v1.2.json`,
   `smarts_templates.v1.json`: Motif registry sources.

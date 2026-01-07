@@ -15,8 +15,6 @@ from chemtools.util.smarts_cache import compile_smarts
 
 DEFAULT_REAGENT_V2_DIR = Path(__file__).resolve().parent / "data"
 _ROLES_FILE = "reagent_roles.v2.json"
-_FAMILIES_FILE = "reagent_families.v2_cas.json"
-_CAS_PACK_FILE = "reagent_cas_pack_solvent_base.v2.json"
 
 _NAME_SANITIZE = re.compile(r"[^a-z0-9]+")
 
@@ -80,8 +78,7 @@ class ReagentTaxonomyV2:
     def from_path(cls, root: Optional[Path] = None) -> "ReagentTaxonomyV2":
         base = root or DEFAULT_REAGENT_V2_DIR
         roles = _load_roles(base / _ROLES_FILE)
-        families = _load_families(base / _FAMILIES_FILE)
-        _merge_cas_pack(families, base / _CAS_PACK_FILE)
+        families: Dict[str, ReagentFamilyV2] = {}
         return cls(roles=roles, families=families)
 
     def iter_roles(self) -> Iterable[ReagentRoleV2]:
@@ -156,21 +153,6 @@ def _load_families(path: Path) -> Dict[str, ReagentFamilyV2]:
         families[family.id] = family
     return families
 
-
-def _merge_cas_pack(families: Dict[str, ReagentFamilyV2], path: Path) -> None:
-    if not path.exists():
-        return
-    payload = _read_json(path)
-    for entry in payload:
-        cas = str(entry.get("cas") or "").strip()
-        if not cas:
-            continue
-        family_ids = entry.get("family_ids") or []
-        for family_id in family_ids:
-            family = families.get(family_id)
-            if family is None:
-                raise ValueError(f"CAS pack references unknown family '{family_id}'")
-            family.allowlists.cas.add(cas)
 
 
 def _normalize_name(name: str) -> str:

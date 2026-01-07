@@ -720,7 +720,7 @@ class TaxonomyStore:
         """Get file path for a role."""
         if role not in self.role_data:
             raise KeyError(f"Unknown role '{role}'")
-        return self.base_dir / "reagent_families.v2_cas.json"
+        raise RuntimeError("Reagent taxonomy v2 no longer uses per-role family files.")
 
     def save_role(self, role: str) -> Path:
         """Save role data to file."""
