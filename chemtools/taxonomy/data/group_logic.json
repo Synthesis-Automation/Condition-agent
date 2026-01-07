@@ -74,7 +74,7 @@
     },
     "Carbamate_All": {
       "name": "Carbamate (All)",
-      "members": ["Carbamate_NH", "Carbamate_NR"],
+      "members": ["NHCO2R", "NRCO2R"],
       "description": "Secondary and tertiary carbamates."
     },
     "Fluorinated_Group": {
@@ -136,13 +136,13 @@
     },
     "Alkyne_All": {
       "name": "Alkyne (All)",
-      "members": ["Alkynyl_Terminal", "Alkynyl_Internal"],
+      "members": ["-C#CH", "-C#C"],
       "description": "Terminal and internal alkynes."
     },
     "Alkenyl_All": {
       "name": "Alkenyl (All)",
-      "members": ["Alkenyl_Terminal", "Alkenyl_Internal"],
-      "description": "Terminal and internal alkenes."
+      "members": ["-C=CH2", "-C=C"],
+      "description": "Terminal and general alkenes."
     }
   }
 }

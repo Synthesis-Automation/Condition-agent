@@ -29,7 +29,7 @@
     "notes": "Use this rule set ONLY if 'applies_if' tokens are present.\nEvaluate base_rules top鈫抎own; if none match, use default_rule.\nAfter choosing a rule, scan all modifiers and apply any whose 'when' tokens or symptoms match.\nGeneral guidance: form the imine/iminium efficiently (remove water or use a Lewis acid), keep pH ~5鈥? for borohydrides, and avoid H2 routes when benzyl/CBz/nitro must survive.\n"
   },
   "applies_if": {
-    "expr": "(Any-CHO OR Ar-CHO OR Alkenyl-CHO OR Any-CO-R) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Alkenyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
+    "expr": "(Any-CHO OR Ar-CHO OR Alkenyl-CHO OR Any-COR) AND (Any-NH2 OR Ar-NH2 OR Bn-NH2 OR Allyl-NH2 OR Alkenyl-NH2 OR Any-NHR OR Ar-NHR OR Bn-NHR OR Allyl-NHR)"
   },
   "default_rule": {
     "id": "DEF_RA_STAB_general",
@@ -58,7 +58,7 @@
           "Any-CHO",
           "Ar-CHO",
           "Alkenyl-CHO",
-          "Any-CO-R"
+          "Any-COR"
         ]
       },
       "conditions": {
@@ -277,7 +277,7 @@
     {
       "id": "MOD_scale_up_choice",
       "when": [
-        "Any-CO-R"
+        "Any-COR"
       ],
       "suggest": "Consider H2/Raney-Ni or H2/Pd-C if FG set allows; otherwise keep STAB and emphasize water removal."
     },

@@ -59,16 +59,16 @@
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
-      "members": ["Ar-CCH", "R-CCH"]
+      "members": ["Ar-C#CH", "R-C#CH"]
     },
     "terminal_alkenes": {
       "name": "Terminal Alkenes",
-      "members": ["Ar-CHCH2", "R-CHCH2", "Any-CHCH2", "Alkenyl-H"]
+      "members": ["Ar-C=CH2", "R-C=CH2", "Any-C=CH2", "Alkenyl-H"]
     },
     "carbonyls": {
       "name": "Carbonyls",
       "members": [
-        "Ar-CHO", "Any-CHO", "Any-CO-R"
+        "Ar-CHO", "Any-CHO", "Any-COR"
       ]
     },
     "aromatic_halides": {
@@ -89,7 +89,7 @@
     },
     "esters": {
       "name": "Esters",
-      "members": ["Ar-Ester", "Any-Ester"]
+      "members": ["Ar-CO2R", "Any-CO2R"]
     },
     "amides": {
       "name": "Amides",
@@ -97,11 +97,11 @@
     },
     "hydrogenation_substrates": {
       "name": "Hydrogenation Substrates",
-      "members": ["Ar-CCH", "R-CCH", "Ar-CHCH2", "R-CHCH2", "Any-Alkene"]
+      "members": ["Ar-C#CH", "R-C#CH", "Ar-C=CH2", "R-C=CH2", "Any-C=C"]
     },
     "cross_coupling_products": {
       "name": "Cross-Coupling Products",
-      "members": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl", "Ar-Alkynyl"],
+      "members": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl", "Ar-C#C"],
       "description": "Common products of C-C cross-coupling reactions."
     },
     "aryl_amines": {

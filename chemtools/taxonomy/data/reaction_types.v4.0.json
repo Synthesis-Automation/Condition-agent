@@ -11,7 +11,7 @@
         "nucleophile": "@organoboron"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
+        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"]
@@ -67,7 +67,7 @@
         "nucleophile": "@terminal_alkynes"
       },
       "products": {
-        "product": ["Ar-Alkynyl"]
+        "product": ["Ar-C#C"]
       },
       "catalysts": ["Pd", "Cu"],
       "examples": ["Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1"]
@@ -81,7 +81,7 @@
         "nucleophile": "@terminal_alkenes"
       },
       "products": {
-        "product": ["Ar-CHCH2", "Alkenyl-Alkenyl"]
+        "product": ["Ar-C=CH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1"]
@@ -95,7 +95,7 @@
         "nucleophile": "@organozinc"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
+        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd", "Ni"],
       "examples": ["Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -109,7 +109,7 @@
         "nucleophile": "@organotin"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
+        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.c1ccc(Sn(C)C)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -123,7 +123,7 @@
         "nucleophile": "@organomagnesium"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
+        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Ni", "Pd"],
       "examples": ["Brc1ccccc1.c1ccc(MgBr)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -137,7 +137,7 @@
         "nucleophile": "@organosilicon"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-CHCH2", "Alkenyl-Alkenyl"]
+        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
       },
       "catalysts": ["Pd"],
       "examples": ["Brc1ccccc1.c1ccc(Si(OC)3)cc1>>c1ccc(-c2ccccc2)cc1"]
@@ -296,7 +296,7 @@
       "name": "Epoxidation",
       "category": "Oxidation",
       "reactants": {
-        "substrate": ["@terminal_alkenes", "Any-Alkene"]
+        "substrate": ["@terminal_alkenes", "Any-C=C"]
       },
       "products": {
         "product": ["Epoxide"]

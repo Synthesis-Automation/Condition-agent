@@ -5,7 +5,7 @@
   "compounds": [
     {
       "id": "Any-X",
-      "name": "*-X",
+      "name": "-X",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "X",
@@ -16,7 +16,7 @@
     },
     {
       "id": "Any-H",
-      "name": "*-H",
+      "name": "-H",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "H",
@@ -24,7 +24,7 @@
     },
     {
       "id": "Any-AromN",
-      "name": "*-AromN",
+      "name": "-AromN",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "AromN_Subst",
@@ -97,7 +97,7 @@
     },
     {
       "id": "Any-Sulfonate",
-      "name": "*-Sulfonate",
+      "name": "-Sulfonate",
       "template": "via_oxygen",
       "A": "Any_Scaffold",
       "B": "Sulfonate",
@@ -105,7 +105,7 @@
     },
     {
       "id": "Any-SO2R",
-      "name": "*-SO2R",
+      "name": "-SO2R",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2R",
@@ -113,7 +113,7 @@
     },
     {
       "id": "Any-SO2X",
-      "name": "*-SO2X",
+      "name": "-SO2X",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2X",
@@ -121,7 +121,7 @@
     },
     {
       "id": "Any-COX",
-      "name": "*-COX",
+      "name": "-COX",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "COX",
@@ -348,11 +348,11 @@
       ]
     },
     {
-      "id": "Ar-Alkynyl_Terminal",
+      "id": "Ar-C#CH",
       "name": "Aryl-C#CH",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Alkynyl_Terminal",
+      "B": "-C#CH",
       "description": "Aryl terminal alkyne (Ar-C#CH).",
       "aliases": [
         "ArCCH",
@@ -360,12 +360,12 @@
       ]
     },
     {
-      "id": "Ar-Alkynyl_Internal",
-      "name": "Aryl-C#CR",
+      "id": "Ar-C#C",
+      "name": "Aryl-C#C",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Alkynyl_Internal",
-      "description": "Aryl internal alkyne (Ar-C#CR).",
+      "B": "-C#C",
+      "description": "Aryl internal alkyne (Ar-C#C).",
       "aliases": [
         "ArCCR",
         "internal alkyne"
@@ -1134,11 +1134,11 @@
       "description": "Aryl acyl halide (Ar-COX)."
     },
     {
-      "id": "Ar-Ester",
-      "name": "Ar-Ester",
+      "id": "Ar-CO2R",
+      "name": "Ar-CO2R",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Ester",
+      "B": "CO2R",
       "description": "Aryl ester (Ar-CO2R)."
     },
     {
@@ -1231,7 +1231,7 @@
     },
     {
       "id": "Ar-Sulfamide",
-      "name": "Ar-Sulfamide",
+      "name": "Ar-NHSO2N<",
       "template": "single_bond",
       "A": "Ar",
       "B": "Sulfamide",
@@ -1239,7 +1239,7 @@
     },
     {
       "id": "Ar-Urea",
-      "name": "Ar-Urea",
+      "name": "Ar-NHCON<",
       "template": "single_bond",
       "A": "Ar",
       "B": "Urea",
@@ -1318,11 +1318,11 @@
       "description": "Vinyl/alkenyl carboxylic acid (Alkenyl-CO2H)."
     },
     {
-      "id": "Alkenyl-Ester",
-      "name": "Alkenyl-Ester",
+      "id": "Alkenyl-CO2R",
+      "name": "Alkenyl-CO2R",
       "template": "single_bond",
       "A": "Alkenyl",
-      "B": "Ester",
+      "B": "CO2R",
       "description": "Vinyl/alkenyl ester (Alkenyl-CO2R)."
     },
     {
@@ -1423,9 +1423,9 @@
     },
     {
       "id": "Any-CHO",
-      "name": "*-CHO",
+      "name": "-CHO",
       "template": "single_bond",
-      "A": "Any_Scaffold",
+      "A": "C_Any",
       "B": "CHO",
       "description": "aldehyde functional group anywhere (generic).",
       "aliases": [
@@ -1433,10 +1433,10 @@
       ]
     },
     {
-      "id": "Any-CO-R",
-      "name": "*-CO-R",
+      "id": "Any-COR",
+      "name": "-COR",
       "template": "single_bond",
-      "A": "Any_Scaffold",
+      "A": "C_Any",
       "B": "COR",
       "description": "ketone functional group anywhere (generic)."
     },
@@ -1466,7 +1466,7 @@
     },
     {
       "id": "Any-CN",
-      "name": "*-CN",
+      "name": "-CN",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "CN",
@@ -1474,7 +1474,7 @@
     },
     {
       "id": "Any-SCN",
-      "name": "*-SCN",
+      "name": "-SCN",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SCN",
@@ -1486,7 +1486,7 @@
     },
     {
       "id": "Any-NCS",
-      "name": "*-NCS",
+      "name": "-NCS",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "NCS",
@@ -1497,7 +1497,7 @@
     },
     {
       "id": "Any-NO2",
-      "name": "*-NO2",
+      "name": "-NO2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "NO2",
@@ -1609,7 +1609,7 @@
     },
     {
       "id": "Any-NH2",
-      "name": "*-NH2",
+      "name": "-NH2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "NH2",
@@ -1617,7 +1617,7 @@
     },
     {
       "id": "Any-NHR",
-      "name": "*-NHR",
+      "name": "-NHR",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "NHR",
@@ -1625,7 +1625,7 @@
     },
     {
       "id": "Any-NR2",
-      "name": "*-NR2",
+      "name": "-NR2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "NR2",
@@ -1637,7 +1637,7 @@
     },
     {
       "id": "Any-OH",
-      "name": "*-OH",
+      "name": "-OH",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "OH",
@@ -1677,7 +1677,7 @@
     },
     {
       "id": "Any-OR",
-      "name": "*-OR",
+      "name": "-OR",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "OR",
@@ -1712,7 +1712,7 @@
     },
     {
       "id": "Any-SH",
-      "name": "*-SH",
+      "name": "-SH",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SH",
@@ -1720,7 +1720,7 @@
     },
     {
       "id": "Any-SR",
-      "name": "*-SR",
+      "name": "-SR",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SR",
@@ -1728,7 +1728,7 @@
     },
     {
       "id": "Any-Sn",
-      "name": "*-Sn",
+      "name": "-Sn",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Sn",
@@ -1736,7 +1736,7 @@
     },
     {
       "id": "Any-Zn",
-      "name": "*-Zn",
+      "name": "-Zn",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Zn",
@@ -1744,7 +1744,7 @@
     },
     {
       "id": "Any-Mg",
-      "name": "*-Mg",
+      "name": "-Mg",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Mg",
@@ -1752,7 +1752,7 @@
     },
     {
       "id": "Any-Si",
-      "name": "*-Si",
+      "name": "-Si",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Si",
@@ -1760,7 +1760,7 @@
     },
     {
       "id": "Any-M",
-      "name": "*-M",
+      "name": "-M",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "M",
@@ -1839,27 +1839,27 @@
       "description": "Tertiary alkyl aldehyde (R3C-CHO)."
     },
     {
-      "id": "RCH2-Ester",
-      "name": "RCH2-Ester",
+      "id": "RCH2-CO2R",
+      "name": "RCH2-CO2R",
       "template": "single_bond",
       "A": "RCH2",
-      "B": "Ester",
+      "B": "CO2R",
       "description": "Primary alkyl ester (RCH2-Ester)."
     },
     {
-      "id": "R2CH-Ester",
-      "name": "R2CH-Ester",
+      "id": "R2CH-CO2R",
+      "name": "R2CH-CO2R",
       "template": "single_bond",
       "A": "R2CH",
-      "B": "Ester",
+      "B": "CO2R",
       "description": "Secondary alkyl ester (R2CH-Ester)."
     },
     {
-      "id": "R3C-Ester",
-      "name": "R3C-Ester",
+      "id": "R3C-CO2R",
+      "name": "R3C-CO2R",
       "template": "single_bond",
       "A": "R3C",
-      "B": "Ester",
+      "B": "CO2R",
       "description": "Tertiary alkyl ester (R3C-Ester)."
     },
     {
@@ -2008,31 +2008,31 @@
     },
     {
       "id": "Any-CO2H",
-      "name": "*-CO2H",
+      "name": "-CO2H",
       "template": "single_bond",
-      "A": "Any_Scaffold",
+      "A": "C_Any",
       "B": "CO2H",
       "description": "carboxylic acid functional group anywhere (generic)."
     },
     {
       "id": "Any-COCl",
-      "name": "*-COCl",
+      "name": "-COCl",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "COCl",
       "description": "acid chloride functional group anywhere (generic)."
     },
     {
-      "id": "Any-Ester",
-      "name": "*-Ester",
+      "id": "Any-CO2R",
+      "name": "-Ester",
       "template": "single_bond",
       "A": "Any_Scaffold",
-      "B": "Ester",
+      "B": "CO2R",
       "description": "ester functional group anywhere (generic)."
     },
     {
       "id": "Any-CONH2",
-      "name": "*-CONH2",
+      "name": "-CONH2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "CONH2",
@@ -2040,7 +2040,7 @@
     },
     {
       "id": "Any-CONHR",
-      "name": "*-CONHR",
+      "name": "-CONHR",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "CONHR",
@@ -2048,7 +2048,7 @@
     },
     {
       "id": "Any-CONR2",
-      "name": "*-CONR2",
+      "name": "-CONR2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "CONR2",
@@ -2056,7 +2056,7 @@
     },
     {
       "id": "Any-SO2NH2",
-      "name": "*-SO2NH2",
+      "name": "-SO2NH2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2NH2",
@@ -2064,7 +2064,7 @@
     },
     {
       "id": "Any-SO2NHR",
-      "name": "*-SO2NHR",
+      "name": "-SO2NHR",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2NHR",
@@ -2075,7 +2075,7 @@
     },
     {
       "id": "Any-SO2NR2",
-      "name": "*-SO2NR2",
+      "name": "-SO2NR2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2NR2",
@@ -2083,7 +2083,7 @@
     },
     {
       "id": "Any-SO2Cl",
-      "name": "*-SO2Cl",
+      "name": "-SO2Cl",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2Cl",
@@ -2094,7 +2094,7 @@
     },
     {
       "id": "Any-SO2F",
-      "name": "*-SO2F",
+      "name": "-SO2F",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2F",
@@ -2105,7 +2105,7 @@
     },
     {
       "id": "Any-SO2H",
-      "name": "*-SO2H",
+      "name": "-SO2H",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "SO2H",
@@ -2117,7 +2117,7 @@
     },
     {
       "id": "Any-Sulfamide",
-      "name": "*-Sulfamide",
+      "name": "-NHSO2N<",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Sulfamide",
@@ -2125,7 +2125,7 @@
     },
     {
       "id": "Any-Urea",
-      "name": "*-Urea",
+      "name": "-NHCON<",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Urea",
@@ -2133,7 +2133,7 @@
     },
     {
       "id": "Any-Thiourea",
-      "name": "*-Thiourea",
+      "name": "-NHCSN<",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Thiourea",
@@ -2144,7 +2144,7 @@
     },
     {
       "id": "Any-Hydrazine",
-      "name": "*-Hydrazine",
+      "name": "-NHN<",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Hydrazine",
@@ -2156,7 +2156,7 @@
     },
     {
       "id": "R-Hydrazine",
-      "name": "R-Hydrazine",
+      "name": "R-NHN<",
       "template": "single_bond",
       "A": "R",
       "B": "Hydrazine",
@@ -2164,7 +2164,7 @@
     },
     {
       "id": "Ar-Hydrazine",
-      "name": "Ar-Hydrazine",
+      "name": "Ar-NHN<",
       "template": "single_bond",
       "A": "Ar",
       "B": "Hydrazine",
@@ -2172,7 +2172,7 @@
     },
     {
       "id": "Any-Hydrazide",
-      "name": "*-Hydrazide",
+      "name": "-CONHNH<",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Hydrazide",
@@ -2183,7 +2183,7 @@
     },
     {
       "id": "R-Hydrazide",
-      "name": "R-Hydrazide",
+      "name": "R-CONHNH<",
       "template": "single_bond",
       "A": "R",
       "B": "Hydrazide",
@@ -2191,7 +2191,7 @@
     },
     {
       "id": "Ar-Hydrazide",
-      "name": "Ar-Hydrazide",
+      "name": "Ar-CONHNH<",
       "template": "single_bond",
       "A": "Ar",
       "B": "Hydrazide",
@@ -2215,7 +2215,7 @@
     },
     {
       "id": "Any-Carbamate_NH",
-      "name": "*-Carbamate_NH",
+      "name": "-Carbamate_NH",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Carbamate_NH",
@@ -2223,7 +2223,7 @@
     },
     {
       "id": "Any-Carbamate_NR",
-      "name": "*-Carbamate_NR",
+      "name": "-Carbamate_NR",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Carbamate_NR",
@@ -2371,11 +2371,11 @@
       ]
     },
     {
-      "id": "R-Alkynyl_Terminal",
+      "id": "R-C#CH",
       "name": "R-C#CH",
       "template": "single_bond",
       "A": "R",
-      "B": "Alkynyl_Terminal",
+      "B": "-C#CH",
       "description": "Alkyl terminal alkyne (R-C#CH).",
       "aliases": [
         "RCCH",
@@ -2383,12 +2383,12 @@
       ]
     },
     {
-      "id": "R-Alkynyl_Internal",
-      "name": "R-C#CR",
+      "id": "R-C#C",
+      "name": "R-C#C",
       "template": "single_bond",
       "A": "R",
-      "B": "Alkynyl_Internal",
-      "description": "Alkyl internal alkyne (R-C#CR).",
+      "B": "-C#C",
+      "description": "Alkyl internal alkyne (R-C#C).",
       "aliases": [
         "RCCR",
         "internal alkyne"
@@ -2447,7 +2447,7 @@
       "name": "R-Ester",
       "template": "single_bond",
       "A": "R",
-      "B": "Ester",
+      "B": "CO2R",
       "description": "Alkyl ester (R-CO2R)."
     },
     {
@@ -2475,12 +2475,12 @@
       "description": "Alkyl tertiary amide (R-CONR2)."
     },
     {
-      "id": "Ar-Alkenyl_Terminal",
-      "name": "Ar-C*=CH2",
+      "id": "Ar-C=CH2",
+      "name": "Ar-C=CH2",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Alkenyl_Terminal",
-      "description": "Aryl terminal alkene (Ar-C*=CH2).",
+      "B": "-C=CH2",
+      "description": "Aryl terminal alkene (Ar-C=CH2).",
       "aliases": [
         "ArCHCH2",
         "styrene",
@@ -2488,60 +2488,60 @@
       ]
     },
     {
-      "id": "Ar-Alkenyl_Internal",
-      "name": "Ar-CH=CR2",
+      "id": "Ar-C=C",
+      "name": "Ar-C=C",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Alkenyl_Internal",
-      "description": "Aryl internal/substituted alkene (Ar-CH=CR2).",
+      "B": "-C=C",
+      "description": "Aryl general alkene (Ar-C=C).",
       "aliases": [
         "ArCHCR2",
         "internal alkene"
       ]
     },
     {
-      "id": "R-Alkenyl_Terminal",
-      "name": "R-C*=CH2",
+      "id": "R-C=CH2",
+      "name": "R-C=CH2",
       "template": "single_bond",
       "A": "R",
-      "B": "Alkenyl_Terminal",
-      "description": "Alkyl terminal alkene (R-C*=CH2).",
+      "B": "-C=CH2",
+      "description": "Alkyl terminal alkene (R-C=CH2).",
       "aliases": [
         "RCHCH2",
         "terminal alkene"
       ]
     },
     {
-      "id": "R-Alkenyl_Internal",
-      "name": "R-CH=CR2",
+      "id": "R-C=C",
+      "name": "R-C=C",
       "template": "single_bond",
       "A": "R",
-      "B": "Alkenyl_Internal",
-      "description": "Alkyl internal/substituted alkene (R-CH=CR2).",
+      "B": "-C=C",
+      "description": "Alkyl general alkene (R-C=C).",
       "aliases": [
         "RCHCR2",
         "internal alkene"
       ]
     },
     {
-      "id": "Any-Alkenyl_Terminal",
-      "name": "*-C*=CH2",
+      "id": "Any-C=CH2",
+      "name": "-C=CH2",
       "template": "single_bond",
       "A": "Any_Scaffold",
-      "B": "Alkenyl_Terminal",
-      "description": "Generic terminal alkene (*-C*=CH2).",
+      "B": "-C=CH2",
+      "description": "Generic terminal alkene (-C=CH2).",
       "aliases": [
         "AnyCHCH2",
         "terminal alkene"
       ]
     },
     {
-      "id": "Any-Alkenyl_Internal",
-      "name": "*-CH=CR2",
+      "id": "Any-C=C",
+      "name": "-C=C",
       "template": "single_bond",
       "A": "Any_Scaffold",
-      "B": "Alkenyl_Internal",
-      "description": "Generic internal/substituted alkene (*-CH=CR2).",
+      "B": "-C=C",
+      "description": "Generic general alkene (-C=C).",
       "aliases": [
         "AnyCHCR2",
         "internal alkene"
@@ -2549,7 +2549,7 @@
     },
     {
       "id": "Any-LactamN",
-      "name": "*-LactamN",
+      "name": "-LactamN",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "LactamN",
@@ -2565,7 +2565,7 @@
     },
     {
       "id": "Any-Phosphonium",
-      "name": "*-Phosphonium",
+      "name": "-Phosphonium",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Phosphonium",
@@ -2573,7 +2573,7 @@
     },
     {
       "id": "Any-Phosphino",
-      "name": "*-Phosphino",
+      "name": "-Phosphino",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Phosphino",
@@ -2593,7 +2593,7 @@
     },
     {
       "id": "Any-Imino",
-      "name": "*-Imino",
+      "name": "-Imino",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Imino",
@@ -2609,7 +2609,7 @@
     },
     {
       "id": "Any-B(OR)2",
-      "name": "*-B(OR)2",
+      "name": "-B(OR)2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "B(OR)2",
@@ -2617,7 +2617,7 @@
     },
     {
       "id": "Any-B(OH)2",
-      "name": "*-B(OH)2",
+      "name": "-B(OH)2",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "B(OH)2",
@@ -2625,7 +2625,7 @@
     },
     {
       "id": "Any-Bpin",
-      "name": "*-Bpin",
+      "name": "-Bpin",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "Bpin",
@@ -2641,7 +2641,7 @@
     },
     {
       "id": "Any-N3",
-      "name": "*-N3",
+      "name": "-N3",
       "template": "single_bond",
       "A": "Any_Scaffold",
       "B": "N3",
@@ -2694,6 +2694,1366 @@
       "A": "R",
       "B": "SO2NH2",
       "description": "Alkyl primary sulfonamide (R-SO2NH2)."
+    },
+    {
+      "id": "R-N3",
+      "name": "R-N3",
+      "template": "single_bond",
+      "A": "R",
+      "B": "N3",
+      "description": "R group paired with N3 substituent."
+    },
+    {
+      "id": "RCH2-N3",
+      "name": "RCH2-N3",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "N3",
+      "description": "RCH2 group paired with N3 substituent."
+    },
+    {
+      "id": "R2CH-N3",
+      "name": "R2CH-N3",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "N3",
+      "description": "R2CH group paired with N3 substituent."
+    },
+    {
+      "id": "R3C-N3",
+      "name": "R3C-N3",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "N3",
+      "description": "R3C group paired with N3 substituent."
+    },
+    {
+      "id": "Bn-N3",
+      "name": "Bn-N3",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "N3",
+      "description": "Bn group paired with N3 substituent."
+    },
+    {
+      "id": "Allyl-N3",
+      "name": "Allyl-N3",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "N3",
+      "description": "Allyl group paired with N3 substituent."
+    },
+    {
+      "id": "Alkenyl-N3",
+      "name": "Alkenyl-N3",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "N3",
+      "description": "Alkenyl group paired with N3 substituent."
+    },
+    {
+      "id": "Alkynyl-N3",
+      "name": "Alkynyl-N3",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "N3",
+      "description": "Alkynyl group paired with N3 substituent."
+    },
+    {
+      "id": "RCH2-CONHR",
+      "name": "RCH2-CONHR",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "CONHR",
+      "description": "RCH2 group paired with CONHR substituent."
+    },
+    {
+      "id": "R2CH-CONHR",
+      "name": "R2CH-CONHR",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "CONHR",
+      "description": "R2CH group paired with CONHR substituent."
+    },
+    {
+      "id": "R3C-CONHR",
+      "name": "R3C-CONHR",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "CONHR",
+      "description": "R3C group paired with CONHR substituent."
+    },
+    {
+      "id": "Bn-CONHR",
+      "name": "Bn-CONHR",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "CONHR",
+      "description": "Bn group paired with CONHR substituent."
+    },
+    {
+      "id": "Allyl-CONHR",
+      "name": "Allyl-CONHR",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "CONHR",
+      "description": "Allyl group paired with CONHR substituent."
+    },
+    {
+      "id": "Alkenyl-CONHR",
+      "name": "Alkenyl-CONHR",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "CONHR",
+      "description": "Alkenyl group paired with CONHR substituent."
+    },
+    {
+      "id": "Alkynyl-CONHR",
+      "name": "Alkynyl-CONHR",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "CONHR",
+      "description": "Alkynyl group paired with CONHR substituent."
+    },
+    {
+      "id": "RCH2-CONH2",
+      "name": "RCH2-CONH2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "CONH2",
+      "description": "RCH2 group paired with CONH2 substituent."
+    },
+    {
+      "id": "R2CH-CONH2",
+      "name": "R2CH-CONH2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "CONH2",
+      "description": "R2CH group paired with CONH2 substituent."
+    },
+    {
+      "id": "R3C-CONH2",
+      "name": "R3C-CONH2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "CONH2",
+      "description": "R3C group paired with CONH2 substituent."
+    },
+    {
+      "id": "Bn-CONH2",
+      "name": "Bn-CONH2",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "CONH2",
+      "description": "Bn group paired with CONH2 substituent."
+    },
+    {
+      "id": "Allyl-CONH2",
+      "name": "Allyl-CONH2",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "CONH2",
+      "description": "Allyl group paired with CONH2 substituent."
+    },
+    {
+      "id": "Alkenyl-CONH2",
+      "name": "Alkenyl-CONH2",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "CONH2",
+      "description": "Alkenyl group paired with CONH2 substituent."
+    },
+    {
+      "id": "Alkynyl-CONH2",
+      "name": "Alkynyl-CONH2",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "CONH2",
+      "description": "Alkynyl group paired with CONH2 substituent."
+    },
+    {
+      "id": "RCH2-CONR2",
+      "name": "RCH2-CONR2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "CONR2",
+      "description": "RCH2 group paired with CONR2 substituent."
+    },
+    {
+      "id": "R2CH-CONR2",
+      "name": "R2CH-CONR2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "CONR2",
+      "description": "R2CH group paired with CONR2 substituent."
+    },
+    {
+      "id": "R3C-CONR2",
+      "name": "R3C-CONR2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "CONR2",
+      "description": "R3C group paired with CONR2 substituent."
+    },
+    {
+      "id": "Bn-CONR2",
+      "name": "Bn-CONR2",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "CONR2",
+      "description": "Bn group paired with CONR2 substituent."
+    },
+    {
+      "id": "Allyl-CONR2",
+      "name": "Allyl-CONR2",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "CONR2",
+      "description": "Allyl group paired with CONR2 substituent."
+    },
+    {
+      "id": "Alkenyl-CONR2",
+      "name": "Alkenyl-CONR2",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "CONR2",
+      "description": "Alkenyl group paired with CONR2 substituent."
+    },
+    {
+      "id": "Alkynyl-CONR2",
+      "name": "Alkynyl-CONR2",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "CONR2",
+      "description": "Alkynyl group paired with CONR2 substituent."
+    },
+    {
+      "id": "Bn-CO2R",
+      "name": "Bn-CO2R",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "CO2R",
+      "description": "Bn group paired with CO2R substituent."
+    },
+    {
+      "id": "Allyl-CO2R",
+      "name": "Allyl-CO2R",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "CO2R",
+      "description": "Allyl group paired with CO2R substituent."
+    },
+    {
+      "id": "Alkynyl-CO2R",
+      "name": "Alkynyl-CO2R",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "CO2R",
+      "description": "Alkynyl group paired with CO2R substituent."
+    },
+    {
+      "id": "RCH2-COR",
+      "name": "RCH2-COR",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "COR",
+      "description": "RCH2 group paired with COR substituent."
+    },
+    {
+      "id": "R2CH-COR",
+      "name": "R2CH-COR",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "COR",
+      "description": "R2CH group paired with COR substituent."
+    },
+    {
+      "id": "R3C-COR",
+      "name": "R3C-COR",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "COR",
+      "description": "R3C group paired with COR substituent."
+    },
+    {
+      "id": "Bn-COR",
+      "name": "Bn-COR",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "COR",
+      "description": "Bn group paired with COR substituent."
+    },
+    {
+      "id": "Allyl-COR",
+      "name": "Allyl-COR",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "COR",
+      "description": "Allyl group paired with COR substituent."
+    },
+    {
+      "id": "Alkynyl-COR",
+      "name": "Alkynyl-COR",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "COR",
+      "description": "Alkynyl group paired with COR substituent."
+    },
+    {
+      "id": "Alkynyl-CN",
+      "name": "Alkynyl-CN",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "CN",
+      "description": "Alkynyl group paired with CN substituent."
+    },
+    {
+      "id": "R-NO2",
+      "name": "R-NO2",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NO2",
+      "description": "R group paired with NO2 substituent."
+    },
+    {
+      "id": "Bn-NO2",
+      "name": "Bn-NO2",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NO2",
+      "description": "Bn group paired with NO2 substituent."
+    },
+    {
+      "id": "Allyl-NO2",
+      "name": "Allyl-NO2",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NO2",
+      "description": "Allyl group paired with NO2 substituent."
+    },
+    {
+      "id": "Alkynyl-NO2",
+      "name": "Alkynyl-NO2",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NO2",
+      "description": "Alkynyl group paired with NO2 substituent."
+    },
+    {
+      "id": "Bn-OR",
+      "name": "Bn-OR",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "OR",
+      "description": "Bn group paired with OR substituent."
+    },
+    {
+      "id": "Allyl-OR",
+      "name": "Allyl-OR",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "OR",
+      "description": "Allyl group paired with OR substituent."
+    },
+    {
+      "id": "Alkenyl-OR",
+      "name": "Alkenyl-OR",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "OR",
+      "description": "Alkenyl group paired with OR substituent."
+    },
+    {
+      "id": "Alkynyl-OR",
+      "name": "Alkynyl-OR",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "OR",
+      "description": "Alkynyl group paired with OR substituent."
+    },
+    {
+      "id": "R-SR",
+      "name": "R-SR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SR",
+      "description": "R group paired with SR substituent."
+    },
+    {
+      "id": "RCH2-SR",
+      "name": "RCH2-SR",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "SR",
+      "description": "RCH2 group paired with SR substituent."
+    },
+    {
+      "id": "R2CH-SR",
+      "name": "R2CH-SR",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "SR",
+      "description": "R2CH group paired with SR substituent."
+    },
+    {
+      "id": "R3C-SR",
+      "name": "R3C-SR",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "SR",
+      "description": "R3C group paired with SR substituent."
+    },
+    {
+      "id": "Bn-SR",
+      "name": "Bn-SR",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "SR",
+      "description": "Bn group paired with SR substituent."
+    },
+    {
+      "id": "Allyl-SR",
+      "name": "Allyl-SR",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "SR",
+      "description": "Allyl group paired with SR substituent."
+    },
+    {
+      "id": "Alkenyl-SR",
+      "name": "Alkenyl-SR",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "SR",
+      "description": "Alkenyl group paired with SR substituent."
+    },
+    {
+      "id": "Alkynyl-SR",
+      "name": "Alkynyl-SR",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "SR",
+      "description": "Alkynyl group paired with SR substituent."
+    },
+    {
+      "id": "R-SO2R",
+      "name": "R-SO2R",
+      "template": "single_bond",
+      "A": "R",
+      "B": "SO2R",
+      "description": "R group paired with SO2R substituent."
+    },
+    {
+      "id": "RCH2-SO2R",
+      "name": "RCH2-SO2R",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "SO2R",
+      "description": "RCH2 group paired with SO2R substituent."
+    },
+    {
+      "id": "R2CH-SO2R",
+      "name": "R2CH-SO2R",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "SO2R",
+      "description": "R2CH group paired with SO2R substituent."
+    },
+    {
+      "id": "R3C-SO2R",
+      "name": "R3C-SO2R",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "SO2R",
+      "description": "R3C group paired with SO2R substituent."
+    },
+    {
+      "id": "Bn-SO2R",
+      "name": "Bn-SO2R",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "SO2R",
+      "description": "Bn group paired with SO2R substituent."
+    },
+    {
+      "id": "Allyl-SO2R",
+      "name": "Allyl-SO2R",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "SO2R",
+      "description": "Allyl group paired with SO2R substituent."
+    },
+    {
+      "id": "Alkenyl-SO2R",
+      "name": "Alkenyl-SO2R",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "SO2R",
+      "description": "Alkenyl group paired with SO2R substituent."
+    },
+    {
+      "id": "Alkynyl-SO2R",
+      "name": "Alkynyl-SO2R",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "SO2R",
+      "description": "Alkynyl group paired with SO2R substituent."
+    },
+    {
+      "id": "RCH2-SO2NHR",
+      "name": "RCH2-SO2NHR",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "SO2NHR",
+      "description": "RCH2 group paired with SO2NHR substituent."
+    },
+    {
+      "id": "R2CH-SO2NHR",
+      "name": "R2CH-SO2NHR",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "SO2NHR",
+      "description": "R2CH group paired with SO2NHR substituent."
+    },
+    {
+      "id": "R3C-SO2NHR",
+      "name": "R3C-SO2NHR",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "SO2NHR",
+      "description": "R3C group paired with SO2NHR substituent."
+    },
+    {
+      "id": "Bn-SO2NHR",
+      "name": "Bn-SO2NHR",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "SO2NHR",
+      "description": "Bn group paired with SO2NHR substituent."
+    },
+    {
+      "id": "Allyl-SO2NHR",
+      "name": "Allyl-SO2NHR",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "SO2NHR",
+      "description": "Allyl group paired with SO2NHR substituent."
+    },
+    {
+      "id": "Alkenyl-SO2NHR",
+      "name": "Alkenyl-SO2NHR",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "SO2NHR",
+      "description": "Alkenyl group paired with SO2NHR substituent."
+    },
+    {
+      "id": "Alkynyl-SO2NHR",
+      "name": "Alkynyl-SO2NHR",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "SO2NHR",
+      "description": "Alkynyl group paired with SO2NHR substituent."
+    },
+    {
+      "id": "RCH2-SO2NR2",
+      "name": "RCH2-SO2NR2",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "SO2NR2",
+      "description": "RCH2 group paired with SO2NR2 substituent."
+    },
+    {
+      "id": "R2CH-SO2NR2",
+      "name": "R2CH-SO2NR2",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "SO2NR2",
+      "description": "R2CH group paired with SO2NR2 substituent."
+    },
+    {
+      "id": "R3C-SO2NR2",
+      "name": "R3C-SO2NR2",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "SO2NR2",
+      "description": "R3C group paired with SO2NR2 substituent."
+    },
+    {
+      "id": "Bn-SO2NR2",
+      "name": "Bn-SO2NR2",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "SO2NR2",
+      "description": "Bn group paired with SO2NR2 substituent."
+    },
+    {
+      "id": "Allyl-SO2NR2",
+      "name": "Allyl-SO2NR2",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "SO2NR2",
+      "description": "Allyl group paired with SO2NR2 substituent."
+    },
+    {
+      "id": "Alkenyl-SO2NR2",
+      "name": "Alkenyl-SO2NR2",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "SO2NR2",
+      "description": "Alkenyl group paired with SO2NR2 substituent."
+    },
+    {
+      "id": "Alkynyl-SO2NR2",
+      "name": "Alkynyl-SO2NR2",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "SO2NR2",
+      "description": "Alkynyl group paired with SO2NR2 substituent."
+    },
+    {
+      "id": "Alkenyl-NHR",
+      "name": "Alkenyl-NHR",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NHR",
+      "description": "Alkenyl group paired with NHR substituent."
+    },
+    {
+      "id": "Alkynyl-NHR",
+      "name": "Alkynyl-NHR",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NHR",
+      "description": "Alkynyl group paired with NHR substituent."
+    },
+    {
+      "id": "Alkynyl-NH2",
+      "name": "Alkynyl-NH2",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NH2",
+      "description": "Alkynyl group paired with NH2 substituent."
+    },
+    {
+      "id": "Alkenyl-NR2",
+      "name": "Alkenyl-NR2",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NR2",
+      "description": "Alkenyl group paired with NR2 substituent."
+    },
+    {
+      "id": "Alkynyl-NR2",
+      "name": "Alkynyl-NR2",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NR2",
+      "description": "Alkynyl group paired with NR2 substituent."
+    },
+    {
+      "id": "Alkynyl-OH",
+      "name": "Alkynyl-OH",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "OH",
+      "description": "Alkynyl group paired with OH substituent."
+    },
+    {
+      "id": "Bn-SH",
+      "name": "Bn-SH",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "SH",
+      "description": "Bn group paired with SH substituent."
+    },
+    {
+      "id": "Allyl-SH",
+      "name": "Allyl-SH",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "SH",
+      "description": "Allyl group paired with SH substituent."
+    },
+    {
+      "id": "Alkenyl-SH",
+      "name": "Alkenyl-SH",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "SH",
+      "description": "Alkenyl group paired with SH substituent."
+    },
+    {
+      "id": "Alkynyl-SH",
+      "name": "Alkynyl-SH",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "SH",
+      "description": "Alkynyl group paired with SH substituent."
+    },
+    {
+      "id": "Bn-F",
+      "name": "Bn-F",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "F",
+      "description": "Bn group paired with F substituent."
+    },
+    {
+      "id": "Allyl-F",
+      "name": "Allyl-F",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "F",
+      "description": "Allyl group paired with F substituent."
+    },
+    {
+      "id": "Alkynyl-F",
+      "name": "Alkynyl-F",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "F",
+      "description": "Alkynyl group paired with F substituent."
+    },
+    {
+      "id": "R-LactamN",
+      "name": "R-LactamN",
+      "template": "single_bond",
+      "A": "R",
+      "B": "LactamN",
+      "description": "R group paired with LactamN substituent."
+    },
+    {
+      "id": "RCH2-LactamN",
+      "name": "RCH2-LactamN",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "LactamN",
+      "description": "RCH2 group paired with LactamN substituent."
+    },
+    {
+      "id": "R2CH-LactamN",
+      "name": "R2CH-LactamN",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "LactamN",
+      "description": "R2CH group paired with LactamN substituent."
+    },
+    {
+      "id": "R3C-LactamN",
+      "name": "R3C-LactamN",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "LactamN",
+      "description": "R3C group paired with LactamN substituent."
+    },
+    {
+      "id": "Bn-LactamN",
+      "name": "Bn-LactamN",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "LactamN",
+      "description": "Bn group paired with LactamN substituent."
+    },
+    {
+      "id": "Allyl-LactamN",
+      "name": "Allyl-LactamN",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "LactamN",
+      "description": "Allyl group paired with LactamN substituent."
+    },
+    {
+      "id": "Alkenyl-LactamN",
+      "name": "Alkenyl-LactamN",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "LactamN",
+      "description": "Alkenyl group paired with LactamN substituent."
+    },
+    {
+      "id": "Alkynyl-LactamN",
+      "name": "Alkynyl-LactamN",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "LactamN",
+      "description": "Alkynyl group paired with LactamN substituent."
+    },
+    {
+      "id": "R-NHBoc",
+      "name": "R-NHBoc",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NHBoc",
+      "description": "R group paired with NHBoc substituent."
+    },
+    {
+      "id": "RCH2-NHBoc",
+      "name": "RCH2-NHBoc",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NHBoc",
+      "description": "RCH2 group paired with NHBoc substituent."
+    },
+    {
+      "id": "R2CH-NHBoc",
+      "name": "R2CH-NHBoc",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NHBoc",
+      "description": "R2CH group paired with NHBoc substituent."
+    },
+    {
+      "id": "R3C-NHBoc",
+      "name": "R3C-NHBoc",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NHBoc",
+      "description": "R3C group paired with NHBoc substituent."
+    },
+    {
+      "id": "Bn-NHBoc",
+      "name": "Bn-NHBoc",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NHBoc",
+      "description": "Bn group paired with NHBoc substituent."
+    },
+    {
+      "id": "Allyl-NHBoc",
+      "name": "Allyl-NHBoc",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NHBoc",
+      "description": "Allyl group paired with NHBoc substituent."
+    },
+    {
+      "id": "Alkenyl-NHBoc",
+      "name": "Alkenyl-NHBoc",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NHBoc",
+      "description": "Alkenyl group paired with NHBoc substituent."
+    },
+    {
+      "id": "Alkynyl-NHBoc",
+      "name": "Alkynyl-NHBoc",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NHBoc",
+      "description": "Alkynyl group paired with NHBoc substituent."
+    },
+    {
+      "id": "R-NHCbz",
+      "name": "R-NHCbz",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NHCbz",
+      "description": "R group paired with NHCbz substituent."
+    },
+    {
+      "id": "RCH2-NHCbz",
+      "name": "RCH2-NHCbz",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NHCbz",
+      "description": "RCH2 group paired with NHCbz substituent."
+    },
+    {
+      "id": "R2CH-NHCbz",
+      "name": "R2CH-NHCbz",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NHCbz",
+      "description": "R2CH group paired with NHCbz substituent."
+    },
+    {
+      "id": "R3C-NHCbz",
+      "name": "R3C-NHCbz",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NHCbz",
+      "description": "R3C group paired with NHCbz substituent."
+    },
+    {
+      "id": "Bn-NHCbz",
+      "name": "Bn-NHCbz",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NHCbz",
+      "description": "Bn group paired with NHCbz substituent."
+    },
+    {
+      "id": "Allyl-NHCbz",
+      "name": "Allyl-NHCbz",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NHCbz",
+      "description": "Allyl group paired with NHCbz substituent."
+    },
+    {
+      "id": "Alkenyl-NHCbz",
+      "name": "Alkenyl-NHCbz",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NHCbz",
+      "description": "Alkenyl group paired with NHCbz substituent."
+    },
+    {
+      "id": "Alkynyl-NHCbz",
+      "name": "Alkynyl-NHCbz",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NHCbz",
+      "description": "Alkynyl group paired with NHCbz substituent."
+    },
+    {
+      "id": "R-NHAc",
+      "name": "R-NHAc",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NHAc",
+      "description": "R group paired with NHAc substituent."
+    },
+    {
+      "id": "RCH2-NHAc",
+      "name": "RCH2-NHAc",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NHAc",
+      "description": "RCH2 group paired with NHAc substituent."
+    },
+    {
+      "id": "R2CH-NHAc",
+      "name": "R2CH-NHAc",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NHAc",
+      "description": "R2CH group paired with NHAc substituent."
+    },
+    {
+      "id": "R3C-NHAc",
+      "name": "R3C-NHAc",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NHAc",
+      "description": "R3C group paired with NHAc substituent."
+    },
+    {
+      "id": "Bn-NHAc",
+      "name": "Bn-NHAc",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NHAc",
+      "description": "Bn group paired with NHAc substituent."
+    },
+    {
+      "id": "Allyl-NHAc",
+      "name": "Allyl-NHAc",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NHAc",
+      "description": "Allyl group paired with NHAc substituent."
+    },
+    {
+      "id": "Alkenyl-NHAc",
+      "name": "Alkenyl-NHAc",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NHAc",
+      "description": "Alkenyl group paired with NHAc substituent."
+    },
+    {
+      "id": "Alkynyl-NHAc",
+      "name": "Alkynyl-NHAc",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NHAc",
+      "description": "Alkynyl group paired with NHAc substituent."
+    },
+    {
+      "id": "Acyl-OH",
+      "name": "Acyl-OH",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "OH",
+      "description": "Acyl group paired with OH."
+    },
+    {
+      "id": "Acyl-OR",
+      "name": "Acyl-OR",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "OR",
+      "description": "Acyl group paired with OR."
+    },
+    {
+      "id": "Acyl-NH2",
+      "name": "Acyl-NH2",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "NH2",
+      "description": "Acyl group paired with NH2."
+    },
+    {
+      "id": "Acyl-NHR",
+      "name": "Acyl-NHR",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "NHR",
+      "description": "Acyl group paired with NHR."
+    },
+    {
+      "id": "Acyl-NR2",
+      "name": "Acyl-NR2",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "NR2",
+      "description": "Acyl group paired with NR2."
+    },
+    {
+      "id": "Acyl-N3",
+      "name": "Acyl-N3",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "N3",
+      "description": "Acyl group paired with N3."
+    },
+    {
+      "id": "Acyl-F",
+      "name": "Acyl-F",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "F",
+      "description": "Acyl group paired with F."
+    },
+    {
+      "id": "Acyl-I",
+      "name": "Acyl-I",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "I",
+      "description": "Acyl group paired with I."
+    },
+    {
+      "id": "R-NBoc",
+      "name": "R-NBoc",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NBoc",
+      "description": "R group paired with NBoc substituent."
+    },
+    {
+      "id": "RCH2-NBoc",
+      "name": "RCH2-NBoc",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NBoc",
+      "description": "RCH2 group paired with NBoc substituent."
+    },
+    {
+      "id": "R2CH-NBoc",
+      "name": "R2CH-NBoc",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NBoc",
+      "description": "R2CH group paired with NBoc substituent."
+    },
+    {
+      "id": "R3C-NBoc",
+      "name": "R3C-NBoc",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NBoc",
+      "description": "R3C group paired with NBoc substituent."
+    },
+    {
+      "id": "Bn-NBoc",
+      "name": "Bn-NBoc",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NBoc",
+      "description": "Bn group paired with NBoc substituent."
+    },
+    {
+      "id": "Allyl-NBoc",
+      "name": "Allyl-NBoc",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NBoc",
+      "description": "Allyl group paired with NBoc substituent."
+    },
+    {
+      "id": "Alkenyl-NBoc",
+      "name": "Alkenyl-NBoc",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NBoc",
+      "description": "Alkenyl group paired with NBoc substituent."
+    },
+    {
+      "id": "Alkynyl-NBoc",
+      "name": "Alkynyl-NBoc",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NBoc",
+      "description": "Alkynyl group paired with NBoc substituent."
+    },
+    {
+      "id": "R-NAc",
+      "name": "R-NAc",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NAc",
+      "description": "R group paired with NAc substituent."
+    },
+    {
+      "id": "RCH2-NAc",
+      "name": "RCH2-NAc",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NAc",
+      "description": "RCH2 group paired with NAc substituent."
+    },
+    {
+      "id": "R2CH-NAc",
+      "name": "R2CH-NAc",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NAc",
+      "description": "R2CH group paired with NAc substituent."
+    },
+    {
+      "id": "R3C-NAc",
+      "name": "R3C-NAc",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NAc",
+      "description": "R3C group paired with NAc substituent."
+    },
+    {
+      "id": "Bn-NAc",
+      "name": "Bn-NAc",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NAc",
+      "description": "Bn group paired with NAc substituent."
+    },
+    {
+      "id": "Allyl-NAc",
+      "name": "Allyl-NAc",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NAc",
+      "description": "Allyl group paired with NAc substituent."
+    },
+    {
+      "id": "Alkenyl-NAc",
+      "name": "Alkenyl-NAc",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NAc",
+      "description": "Alkenyl group paired with NAc substituent."
+    },
+    {
+      "id": "Alkynyl-NAc",
+      "name": "Alkynyl-NAc",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NAc",
+      "description": "Alkynyl group paired with NAc substituent."
+    },
+    {
+      "id": "R-NHTs",
+      "name": "R-NHTs",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NHTs",
+      "description": "R group paired with NHTs substituent."
+    },
+    {
+      "id": "RCH2-NHTs",
+      "name": "RCH2-NHTs",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NHTs",
+      "description": "RCH2 group paired with NHTs substituent."
+    },
+    {
+      "id": "R2CH-NHTs",
+      "name": "R2CH-NHTs",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NHTs",
+      "description": "R2CH group paired with NHTs substituent."
+    },
+    {
+      "id": "R3C-NHTs",
+      "name": "R3C-NHTs",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NHTs",
+      "description": "R3C group paired with NHTs substituent."
+    },
+    {
+      "id": "Bn-NHTs",
+      "name": "Bn-NHTs",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NHTs",
+      "description": "Bn group paired with NHTs substituent."
+    },
+    {
+      "id": "Allyl-NHTs",
+      "name": "Allyl-NHTs",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NHTs",
+      "description": "Allyl group paired with NHTs substituent."
+    },
+    {
+      "id": "Alkenyl-NHTs",
+      "name": "Alkenyl-NHTs",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NHTs",
+      "description": "Alkenyl group paired with NHTs substituent."
+    },
+    {
+      "id": "Alkynyl-NHTs",
+      "name": "Alkynyl-NHTs",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NHTs",
+      "description": "Alkynyl group paired with NHTs substituent."
+    },
+    {
+      "id": "R-NTs",
+      "name": "R-NTs",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NTs",
+      "description": "R group paired with NTs substituent."
+    },
+    {
+      "id": "RCH2-NTs",
+      "name": "RCH2-NTs",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NTs",
+      "description": "RCH2 group paired with NTs substituent."
+    },
+    {
+      "id": "R2CH-NTs",
+      "name": "R2CH-NTs",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NTs",
+      "description": "R2CH group paired with NTs substituent."
+    },
+    {
+      "id": "R3C-NTs",
+      "name": "R3C-NTs",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NTs",
+      "description": "R3C group paired with NTs substituent."
+    },
+    {
+      "id": "Bn-NTs",
+      "name": "Bn-NTs",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NTs",
+      "description": "Bn group paired with NTs substituent."
+    },
+    {
+      "id": "Allyl-NTs",
+      "name": "Allyl-NTs",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NTs",
+      "description": "Allyl group paired with NTs substituent."
+    },
+    {
+      "id": "Alkenyl-NTs",
+      "name": "Alkenyl-NTs",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NTs",
+      "description": "Alkenyl group paired with NTs substituent."
+    },
+    {
+      "id": "Alkynyl-NTs",
+      "name": "Alkynyl-NTs",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NTs",
+      "description": "Alkynyl group paired with NTs substituent."
+    },
+    {
+      "id": "R-NHMs",
+      "name": "R-NHMs",
+      "template": "single_bond",
+      "A": "R",
+      "B": "NHMs",
+      "description": "R group paired with NHMs substituent."
+    },
+    {
+      "id": "RCH2-NHMs",
+      "name": "RCH2-NHMs",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "NHMs",
+      "description": "RCH2 group paired with NHMs substituent."
+    },
+    {
+      "id": "R2CH-NHMs",
+      "name": "R2CH-NHMs",
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "NHMs",
+      "description": "R2CH group paired with NHMs substituent."
+    },
+    {
+      "id": "R3C-NHMs",
+      "name": "R3C-NHMs",
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "NHMs",
+      "description": "R3C group paired with NHMs substituent."
+    },
+    {
+      "id": "Bn-NHMs",
+      "name": "Bn-NHMs",
+      "template": "single_bond",
+      "A": "Bn",
+      "B": "NHMs",
+      "description": "Bn group paired with NHMs substituent."
+    },
+    {
+      "id": "Allyl-NHMs",
+      "name": "Allyl-NHMs",
+      "template": "single_bond",
+      "A": "Allyl",
+      "B": "NHMs",
+      "description": "Allyl group paired with NHMs substituent."
+    },
+    {
+      "id": "Alkenyl-NHMs",
+      "name": "Alkenyl-NHMs",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "NHMs",
+      "description": "Alkenyl group paired with NHMs substituent."
+    },
+    {
+      "id": "Alkynyl-NHMs",
+      "name": "Alkynyl-NHMs",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "NHMs",
+      "description": "Alkynyl group paired with NHMs substituent."
     }
   ],
   "depends_on": {
