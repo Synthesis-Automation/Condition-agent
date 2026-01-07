@@ -5,7 +5,7 @@
   "groups": [
     {
       "id": "Any_Scaffold",
-      "name": "Any-",
+      "name": "*-",
       "kind": "scaffold",
       "priority": 0,
       "smarts": "[*:1]",
@@ -17,7 +17,7 @@
     },
     {
       "id": "Any_Substituent",
-      "name": "-Any",
+      "name": "-*",
       "kind": "substituent",
       "priority": 0,
       "smarts": "[*:2]",
@@ -267,6 +267,19 @@
       ]
     },
     {
+      "id": "CF3",
+      "name": "-CF3",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[CX4:2](F)(F)F",
+      "description": "Trifluoromethyl substituent (-CF3).",
+      "tags": [
+        "alkyl",
+        "fluorinated",
+        "ewg_strong"
+      ]
+    },
+    {
       "id": "H",
       "name": "-H",
       "kind": "substituent",
@@ -504,10 +517,11 @@
     },
     {
       "id": "Hydrazine",
-      "name": "-NHNH2",
+      "name": "-NHN<",
       "kind": "substituent",
-      "smarts": "[NX3;H1:2][NX3;H2]",
-      "description": "Hydrazine substituent (-NHNH2).",
+      "priority": 1,
+      "smarts": "[NX3:2][NX3]",
+      "description": "Hydrazine-like substituent (-NN unit); attach via nitrogen.",
       "tags": [
         "amine",
         "nucleophile",
@@ -554,6 +568,19 @@
       "description": "Ether substituent (-OR).",
       "tags": [
         "ether"
+      ]
+    },
+    {
+      "id": "OCF3",
+      "name": "-OCF3",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[OX2:2][CX4](F)(F)F",
+      "description": "Trifluoromethoxy substituent (-OCF3).",
+      "tags": [
+        "ether",
+        "fluorinated",
+        "ewg_moderate"
       ]
     },
     {
@@ -662,7 +689,7 @@
       ]
     },
     {
-      "id": "Ester",
+      "id": "CO2R",
       "name": "-CO2R",
       "kind": "substituent",
       "priority": 2,
@@ -711,11 +738,11 @@
     },
     {
       "id": "Hydrazide",
-      "name": "-CONHNH2",
+      "name": "-CONHNH<",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[CX3:2](=O)[NX3;H1][NX3;H2]",
-      "description": "Hydrazide core; attach via carbonyl carbon.",
+      "smarts": "[CX3:2](=O)[NX3][NX3]",
+      "description": "Hydrazide-like substituent (-CON-N unit); attach via carbonyl carbon.",
       "tags": [
         "hydrazide",
         "amide"
@@ -847,10 +874,10 @@
     },
     {
       "id": "Sulfamide",
-      "name": "-NHSO2NH2",
+      "name": "-NHSO2N<",
       "kind": "substituent",
-      "smarts": "[NX3;H1:2][SX4](=O)(=O)[NX3;H2]",
-      "description": "Sulfamide substituent (primary); attach via nitrogen.",
+      "smarts": "[NX3:2][SX4](=O)(=O)[NX3]",
+      "description": "Sulfamide-like substituent (-NSO2N unit); attach via nitrogen.",
       "tags": [
         "sulfamide",
         "nitrogen_group"
@@ -858,10 +885,10 @@
     },
     {
       "id": "Urea",
-      "name": "-NHCONH2",
+      "name": "-NHCON<",
       "kind": "substituent",
-      "smarts": "[NX3;H1:2][CX3](=O)[NX3;H2]",
-      "description": "Urea substituent (primary); attach via nitrogen.",
+      "smarts": "[NX3:2][CX3](=O)[NX3]",
+      "description": "Urea-like substituent (-NCON unit); attach via nitrogen.",
       "tags": [
         "urea",
         "nitrogen_group"
@@ -869,21 +896,35 @@
     },
     {
       "id": "Thiourea",
-      "name": "-NHCSNH2",
+      "name": "-NHCSN<",
       "kind": "substituent",
-      "smarts": "[NX3;H1:2][CX3](=S)[NX3;H2]",
-      "description": "Thiourea substituent (primary); attach via nitrogen.",
+      "smarts": "[NX3:2][CX3](=S)[NX3]",
+      "description": "Thiourea-like substituent (-NCSN unit); attach via nitrogen.",
       "tags": [
         "thiourea",
         "nitrogen_group"
       ]
     },
     {
-      "id": "Carbamate",
+      "id": "Carbamate_NH",
       "name": "-NHCO2R",
       "kind": "substituent",
+      "priority": 2,
       "smarts": "[NX3;H1:2][CX3](=O)[OX2][#6]",
-      "description": "Carbamate core; attach via nitrogen.",
+      "description": "Secondary carbamate core (N-H); attach via nitrogen.",
+      "tags": [
+        "carbamate",
+        "nitrogen_group",
+        "n_h_nucleophile"
+      ]
+    },
+    {
+      "id": "Carbamate_NR",
+      "name": "-NRCO2R",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3;H0:2]([#6])[CX3](=O)[OX2][#6]",
+      "description": "Tertiary carbamate core (N-R); attach via nitrogen.",
       "tags": [
         "carbamate",
         "nitrogen_group"
@@ -951,44 +992,68 @@
       ]
     },
     {
-      "id": "CCH",
+      "id": "Alkynyl_Terminal",
       "name": "-C#CH",
       "kind": "substituent",
-      "priority": 2,
+      "priority": 3,
       "smarts": "[C:2]#[C][H]",
-      "description": "Terminal alkyne substituent (-C#CH), attach via substituted sp carbon.",
+      "description": "Terminal alkyne substituent (-C#CH); attach via sp carbon.",
       "tags": [
         "alkyne",
         "terminal_alkyne"
       ]
     },
     {
-      "id": "CHCH2",
-      "name": "-CH=CH2",
+      "id": "Alkynyl_Internal",
+      "name": "-C#CR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[C:2]#[C][#6]",
+      "description": "Internal alkyne substituent (-C#CR); attach via sp carbon.",
+      "tags": [
+        "alkyne",
+        "internal_alkyne"
+      ]
+    },
+    {
+      "id": "Alkenyl_Terminal",
+      "name": "-C*=CH2",
       "kind": "substituent",
       "priority": 3,
-      "smarts": "[C:2]([H])=[C]([H])[H]",
-      "description": "Terminal alkene substituent (-CH=CH2), attach via substituted sp2 carbon (monosubstituted alkene).",
+      "smarts": "[CX3:2]([H])=[CX3]([H])[H]",
+      "description": "Terminal alkene substituent (vinyl group, -C*=CH2); attach via sp2 carbon.",
       "tags": [
         "alkene",
         "terminal_alkene"
       ]
     },
     {
-      "id": "CO",
-      "name": "-CO-",
+      "id": "Alkenyl_Internal",
+      "name": "-CH=CR2",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[CX3:2]=[CX3]",
+      "description": "Internal or substituted alkene substituent (e.g., -CH=CHR, -CR=CR2); attach via sp2 carbon.",
+      "tags": [
+        "alkene",
+        "internal_alkene"
+      ]
+    },
+    {
+      "id": "COR",
+      "name": "-COR",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[CX3:2](=O)[#6]",
-      "description": "Ketone core; attach via carbonyl carbon (-CO-R).",
+      "description": "Ketone core; attach via carbonyl carbon (-COR).",
       "tags": [
         "ketone",
         "ewg_moderate"
       ]
     },
     {
-      "id": "Lactam",
-      "name": "-Lactam",
+      "id": "LactamN",
+      "name": "-LactamN",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[NX3;r;H1,H0:2][CX3;r]=O",

@@ -29,7 +29,7 @@
     "LeavingGroup": {
       "name": "Leaving Group",
       "priority": 0,
-      "members": ["X", "Sulfonate", "SO2X", "COX"],
+      "members": ["X", "Sulfonate"],
       "description": "Combined halogens, sulfonates, and other common leaving groups."
     },
     "Amine_NH": {
@@ -49,8 +49,8 @@
     },
     "Amide_All": {
       "name": "Amide (All)",
-      "members": ["CONH2", "CONHR", "CONR2"],
-      "description": "Primary, secondary, and tertiary amides."
+      "members": ["CONH2", "CONHR", "CONR2", "LactamN"],
+      "description": "Primary, secondary, and tertiary amides including cyclic ones."
     },
     "Sulfonamide_NH": {
       "name": "Sulfonamide (N-H)",
@@ -71,6 +71,21 @@
       "name": "Thiol/Thioether",
       "members": ["SH", "SR"],
       "description": "Thiol and thioether groups."
+    },
+    "Carbamate_All": {
+      "name": "Carbamate (All)",
+      "members": ["Carbamate_NH", "Carbamate_NR"],
+      "description": "Secondary and tertiary carbamates."
+    },
+    "Fluorinated_Group": {
+      "name": "Fluorinated Group",
+      "members": ["F", "CF3", "OCF3"],
+      "description": "Functional groups containing fluorine."
+    },
+    "Carbonyl_Group": {
+      "name": "Carbonyl Group",
+      "members": ["CHO", "COR", "CO2H", "CO2R", "CONH2", "CONHR", "CONR2"],
+      "description": "General carbonyl-containing functional groups."
     },
     "sp2_Carbon": {
       "name": "sp2 Carbon Scaffold",
@@ -118,6 +133,16 @@
       "name": "Organometallic (All)",
       "members": ["Organoboron_Group", "Organotin_Group", "Organozinc_Group", "Organomagnesium_Group", "Organosilicon_Group", "Organometallic_Generic"],
       "description": "All organometallic and metalloid handles."
+    },
+    "Alkyne_All": {
+      "name": "Alkyne (All)",
+      "members": ["Alkynyl_Terminal", "Alkynyl_Internal"],
+      "description": "Terminal and internal alkynes."
+    },
+    "Alkenyl_All": {
+      "name": "Alkenyl (All)",
+      "members": ["Alkenyl_Terminal", "Alkenyl_Internal"],
+      "description": "Terminal and internal alkenes."
     }
   }
 }
