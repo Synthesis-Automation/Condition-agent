@@ -60,11 +60,15 @@ def _load_hte_database_cached(
             "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
             "Catalyst", "Ligand", "Base", "Solvent", "Additive",
             "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
-            "Reactant_A_Category", "Reactant_B_Category"
+            "Reactant_A_Category", "Reactant_B_Category", "Is_Intramolecular"
         ]
         for col in required_cols:
             if col not in df.columns:
-                df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
+                if col == "Is_Intramolecular":
+                    # Heuristic: if reactant_2 is empty, it's likely intramolecular
+                    df[col] = df["Reactant_B_Type"].isna() | (df["Reactant_B_Type"] == "")
+                else:
+                    df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
 
         if "Reactant_Types_Key" not in df.columns:
             df["Reactant_Types_Key"] = df.apply(
@@ -558,8 +562,9 @@ class HTERecommender:
             
             recommendations.append(rec)
         
-        # Sort by average z-score (primary metric), then confidence score
-        recommendations.sort(key=lambda x: (x.avg_z_score, x.confidence_score), reverse=True)
+        # Sort by match score (prioritizing intramolecular matches if query is intramolecular),
+        # then average z-score (primary performance metric), then confidence score.
+        recommendations.sort(key=lambda x: (x.match_score, x.avg_z_score, x.confidence_score), reverse=True)
         
         return recommendations[:top_k]
     
@@ -611,6 +616,7 @@ class HTERecommender:
         
         # Step 3: Match against database
         query_motifs = set(type_a) | set(type_b)
+        is_query_intramolecular = (reactant_b_smiles is None)
         
         scored_matches = []
         for db_key, group_df in self.transformation_indices.items():
@@ -618,7 +624,15 @@ class HTERecommender:
             if score > 0:
                 # Weight the z-score by the match score
                 temp_df = group_df.copy()
-                temp_df['match_score'] = score
+                
+                # Boost if intramolecular status matches
+                if 'Is_Intramolecular' in temp_df.columns:
+                    mask = (temp_df['Is_Intramolecular'] == is_query_intramolecular)
+                    temp_df.loc[mask, 'match_score'] = score * 1.2
+                    temp_df.loc[~mask, 'match_score'] = score
+                else:
+                    temp_df['match_score'] = score
+                    
                 scored_matches.append(temp_df)
         
         matched_df = None

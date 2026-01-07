@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Tuple, Iterable, Optional
 import numpy as np
 from functools import lru_cache
+import argparse
 
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
@@ -76,7 +77,7 @@ def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
         "Secondary Solvent": ""
     }
 
-def process_reaction_dataset(input_path: str, output_path: str):
+def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst: bool = True):
     """Convert reaction dataset to HTE-canonical CSV format."""
     input_path = Path(input_path)
     output_path = Path(output_path)
@@ -190,9 +191,12 @@ def process_reaction_dataset(input_path: str, output_path: str):
         type_b = ",".join(reactant_data[1]["motifs"]) if len(reactant_data) > 1 else ""
         
         reagents = extract_reagents(record)
-        
+        if drop_no_catalyst and not reagents.get("Catalyst"):
+            continue
+            
         row = {
             "Reaction_Type_Standardized": transformation_key,
+            "Is_Intramolecular": len(reactants) == 1,
             "Reactant_A_Type": type_a,
             "Reactant_B_Type": type_b,
             "Reactant_Types_Key": _reactant_key([type_a, type_b]),
@@ -230,8 +234,23 @@ def process_reaction_dataset(input_path: str, output_path: str):
     print(f"Successfully saved {len(df)} reactions to {output_path}")
 
 if __name__ == "__main__":
-    # Process the C-N Coupling dataset
-    process_reaction_dataset(
-        "data/reaction_dataset/C_N_Coupling.jsonl",
-        "data/HTE_db/C_N_Coupling_canonical.csv"
-    )
+    parser = argparse.ArgumentParser(description="Convert reaction dataset to HTE-canonical CSV format.")
+    parser.add_argument("--dataset", "-d", help="Name of the dataset (e.g., C_N_Coupling). If provided, processes 'data/reaction_dataset/{dataset}.jsonl' to 'data/HTE_db/{dataset}_canonical.csv'.")
+    parser.add_argument("--input", "-i", help="Direct path to input JSONL file.")
+    parser.add_argument("--output", "-o", help="Direct path to output CSV file.")
+    
+    args = parser.parse_args()
+    
+    if args.dataset:
+        input_file = f"data/reaction_dataset/{args.dataset}.jsonl"
+        output_file = f"data/HTE_db/{args.dataset}_canonical.csv"
+        process_reaction_dataset(input_file, output_file)
+    elif args.input and args.output:
+        process_reaction_dataset(args.input, args.output)
+    else:
+        # Default: Process known core datasets
+        datasets = ["C_N_Coupling", "C_O_Coupling"]
+        for ds in datasets:
+            input_file = f"data/reaction_dataset/{ds}.jsonl"
+            output_file = f"data/HTE_db/{ds}_canonical.csv"
+            process_reaction_dataset(input_file, output_file)
