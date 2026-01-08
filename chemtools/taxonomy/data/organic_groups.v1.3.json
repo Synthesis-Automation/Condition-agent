@@ -484,7 +484,7 @@
       "id": "SR",
       "name": "-SR",
       "kind": "substituent",
-      "smarts": "[S:2][#6]",
+      "smarts": "[S;H0;!$(S-[C,S,P]=O):2][#6]",
       "description": "Sulfide/thioether group (-SR).",
       "tags": [
         "sulfur",
@@ -505,6 +505,30 @@
       ]
     },
     {
+      "id": "OAr",
+      "name": "-OAr",
+      "kind": "substituent",
+      "priority": 10,
+      "smarts": "[O;H0;!$(O-[C,S,P]=O):2]c",
+      "description": "Aryloxy substituent (O-Ar).",
+      "tags": [
+        "ether",
+        "aryloxy"
+      ]
+    },
+    {
+      "id": "SAr",
+      "name": "-SAr",
+      "kind": "substituent",
+      "priority": 10,
+      "smarts": "[S;H0;!$(S-[C,S,P]=O):2]c",
+      "description": "Arylthio substituent (S-Ar).",
+      "tags": [
+        "thioether",
+        "arylthio"
+      ]
+    },
+    {
       "id": "NH2",
       "name": "-NH2",
       "kind": "substituent",
@@ -514,6 +538,30 @@
         "amine",
         "nucleophile",
         "n_h_nucleophile"
+      ]
+    },
+    {
+      "id": "NHAr",
+      "name": "-NHAr",
+      "kind": "substituent",
+      "priority": 10,
+      "smarts": "[N;H1:2]c",
+      "description": "Secondary diarylamine substituent (-NHAr).",
+      "tags": [
+        "amine",
+        "aryl"
+      ]
+    },
+    {
+      "id": "NAr2",
+      "name": "-NAr2",
+      "kind": "substituent",
+      "priority": 11,
+      "smarts": "[N;H0:2](c)c",
+      "description": "Tertiary triarylamine substituent (-NAr2).",
+      "tags": [
+        "amine",
+        "aryl"
       ]
     },
     {

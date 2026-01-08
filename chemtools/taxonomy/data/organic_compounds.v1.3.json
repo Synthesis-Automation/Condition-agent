@@ -1031,6 +1031,38 @@
       "description": "Aryl tertiary amine (NR2) (Ar-NR2)."
     },
     {
+      "id": "Ar-NHAr",
+      "name": "Ar-NHAr",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "NHAr",
+      "description": "Diaryl amine (Ar-NH-Ar)."
+    },
+    {
+      "id": "Ar-NAr2",
+      "name": "Ar-NAr2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "NAr2",
+      "description": "Triaryl amine (Ar-NAr2)."
+    },
+    {
+      "id": "Ar-OAr",
+      "name": "Ar-OAr",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "OAr",
+      "description": "Diaryl ether (Ar-O-Ar)."
+    },
+    {
+      "id": "Ar-SAr",
+      "name": "Ar-SAr",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "SAr",
+      "description": "Diaryl thioether (Ar-S-Ar)."
+    },
+    {
       "id": "Ar-AromN",
       "name": "Ar-AromN",
       "template": "single_bond",
