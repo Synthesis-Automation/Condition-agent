@@ -55,6 +55,13 @@ def _load_hte_database_cached(
         # Rename columns if they exist
         df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
         
+        # Standardize modern HTE format if present (Reaction_Key replaces legacy keys)
+        if "Reaction_Key" in df.columns:
+            if "Reaction_Type_Standardized" not in df.columns or not any(df["Reaction_Type_Standardized"]):
+                df["Reaction_Type_Standardized"] = df["Reaction_Key"]
+            if "Reactant_Types_Key" not in df.columns or not any(df["Reactant_Types_Key"]):
+                df["Reactant_Types_Key"] = df["Reaction_Key"]
+
         # Ensure missing columns are present
         required_cols = [
             "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",

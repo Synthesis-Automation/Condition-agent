@@ -189,14 +189,34 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
                 if rc > 0:
                     spectators_set.add(m)
         
-        # Construct the new informative key
-        # Format: [Reacted] -> [Formed] || [Spectators]
-        reacted_str = _reactant_key(list(reacted_set)) or "None"
-        formed_str = _reactant_key(list(formed_set)) or "None"
+        # Picking ONE motif for each reactant and product for the reaction_key
+        # For each reactant, pick the highest priority motif that actually reacted
+        primary_reacted_motifs = []
+        for r_info in reactant_data:
+            r_motifs = r_info["motifs"]
+            # Find which of these are in the reacted_set
+            reacted_here = [m for m in r_motifs if m in reacted_set]
+            if reacted_here:
+                # Pick the first one (highest priority)
+                primary_reacted_motifs.append(reacted_here[0])
+        
+        primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
+        
+        # For the product, pick the highest priority motif that was formed
+        formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
+        primary_formed_str = formed_here[0] if formed_here else "None"
+        
+        # Spectators (unchanged motifs)
         spectators_str = _reactant_key(list(spectators_set)) or "None"
         
-        transformation_key = f"{reacted_str} -> {formed_str} || {spectators_str}"
+        # Combined reaction key: A|B -> P || Unchanged
+        # This replaces Reaction_Type_Standardized and Reactant_Types_Key
+        reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
             
+        # All motifs for reference
+        all_reactant_motifs_str = "|".join(sorted(_dedupe_list(motif_ids)))
+        all_product_motifs_str = "|".join(sorted(_dedupe_list(product_motifs)))
+
         # Map to A and B slots (standard for HTE recommender)
         type_a = ",".join(reactant_data[0]["motifs"]) if len(reactant_data) > 0 else ""
         type_b = ",".join(reactant_data[1]["motifs"]) if len(reactant_data) > 1 else ""
@@ -207,12 +227,13 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             continue
             
         row = {
-            "Reaction_Type_Standardized": transformation_key,
+            "Reaction_Key": reaction_key,
             "Is_Intramolecular": len(reactants) == 1,
             "Reactant_A_Type": type_a,
             "Reactant_B_Type": type_b,
             "Product_Type": type_p,
-            "Reactant_Types_Key": _reactant_key([type_a, type_b]),
+            "All_Reactant_Motifs": all_reactant_motifs_str,
+            "All_Product_Motifs": all_product_motifs_str,
             "yield": record.get("yield", 0.0),
             "smiles": smiles,
             **reagents
@@ -229,7 +250,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
     df["z-Score"] = 0.0
     df["z-Score"] = df["z-Score"].astype(float)
     
-    for key, group in df.groupby("Reactant_Types_Key"):
+    for key, group in df.groupby("Reaction_Key"):
         if len(group) > 1:
             yields = group["yield"]
             mean = yields.mean()
