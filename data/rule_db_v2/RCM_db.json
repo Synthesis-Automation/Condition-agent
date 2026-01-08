@@ -27,7 +27,7 @@
     "notes": "Draft RCM rule derived to mirror the structure and intent of the C鈥揘 coupling rule file. Apply only when intramolecular alkene鈥揳lkene closure is plausible. Choose the first matching base_rule (top鈫抎own); if none match, use default_rule. Then apply any matching modifiers (tokens or plain鈥憈ext heuristics). Notes: Ru鈥揘HC Hoveyda/Grubbs catalysts are broadly tolerant; remove ethylene to drive equilibrium; high dilution/slow addition for medium/large rings; benzoquinone (BQ) suppresses Ru鈥揾ydride isomerization; protect or attenuate strongly coordinating amines/thiols. Quench with ethyl Alkenyl ether at completion to deactivate Ru."
   },
   "applies_if": {
-    "expr": "Any-CHCH2 OR Ar-CHCH2 OR R-CHCH2"
+    "expr": "Any-C=CH2 OR Ar-C=CH2 OR R-C=CH2"
   },
   "default_rule": {
     "id": "DEF_RCM_general",
@@ -50,7 +50,7 @@
       "description": "Typical intramolecular diene closures to 5鈥? rings.",
       "reactant_features": {
         "any": [
-          "Any-CHCH2"
+          "Any-C=CH2"
         ]
       },
       "conditions": {
@@ -69,7 +69,7 @@
       "description": "Use faster鈥慽nitiating catalysts; dilution and slow addition reduce oligomerization.",
       "reactant_features": {
         "any": [
-          "Any-CHCH2"
+          "Any-C=CH2"
         ]
       },
       "conditions": {
@@ -113,7 +113,7 @@
       "description": "Use very fast鈥慽nitiating Ru catalysts; higher temperature and loadings are often needed.",
       "reactant_features": {
         "any": [
-          "Any-CHCH2"
+          "Any-C=CH2"
         ]
       },
       "conditions": {
@@ -132,7 +132,7 @@
       "id": "BR_RCM_enyne",
       "description": "Intramolecular alkene鈥揳lkyne closure to 1,3鈥慸iene products.",
       "reactant_features": {
-        "expr": "Any-CHCH2 AND Any-CCH"
+        "expr": "Any-C=CH2 AND Any-CCH"
       },
       "conditions": {
         "ru_catalyst": "Hoveyda鈥揋rubbs II (HG鈥慖I) or Grubbs II (G鈥慖I)",

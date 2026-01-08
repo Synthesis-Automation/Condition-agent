@@ -186,20 +186,20 @@
       "description": "Atomic oxygen oxidant placeholder."
     },
     {
-      "id": "Any-Diene",
-      "name": "Any-Diene",
+      "id": "Any-C=C-C=C",
+      "name": "Any-C=C-C=C",
       "smarts": "[CX3]=[CX3][CX3]=[CX3]",
       "description": "Conjugated diene motif (C=C-C=C)."
     },
     {
-      "id": "Any-Alkene",
-      "name": "Any-Alkene",
+      "id": "Motif-C=C",
+      "name": "Any-C=C",
       "smarts": "[CX3:1]=[CX3]",
       "description": "Generic alkene motif (C=C)."
     },
     {
-      "id": "Any-Alkyne",
-      "name": "Any-Alkyne",
+      "id": "Any-C#C",
+      "name": "Any-C#C",
       "smarts": "[CX2:1]#[CX2]",
       "description": "Generic alkyne motif (C#C).",
       "aliases": [
@@ -222,7 +222,7 @@
       "description": "Alkene motif for dienophiles (non-conjugated)."
     },
     {
-      "id": "Epoxide",
+      "id": "Motif-Epoxide",
       "name": "Epoxide",
       "smarts": "C1OC1",
       "description": "Epoxide (oxirane) ring motif."

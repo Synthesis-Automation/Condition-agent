@@ -121,12 +121,19 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
                 motifs = analysis.get("motifs", [])
                 
                 # Keep raw motifs for stoichiometry counts
-                r_motifs = [m.get("compound_id", "") for m in motifs if m.get("compound_id")]
+                current_r_motifs = []
+                for m in motifs:
+                    cid = m.get("compound_id", "")
+                    if cid:
+                        current_r_motifs.append(cid)
+                        # Include alternatives to ensure information is preserved across perspectives
+                        for alt_id in m.get("alt_compound_ids", []):
+                            current_r_motifs.append(alt_id)
                 
                 reactant_data.append({
-                    "motifs": _dedupe_list(r_motifs) # Dedupe for the per-reactant display
+                    "motifs": _dedupe_list(current_r_motifs)
                 })
-                motif_ids.extend(r_motifs)
+                motif_ids.extend(current_r_motifs)
             except Exception as e:
                 # Skip invalid SMILES or featurization errors
                 continue
@@ -139,7 +146,12 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
         try:
             p_analysis = cached_featurize(products_part)
             p_motifs = p_analysis.get("motifs", [])
-            product_motifs = [m.get("compound_id", "") for m in p_motifs if m.get("compound_id")]
+            for m in p_motifs:
+                cid = m.get("compound_id", "")
+                if cid:
+                    product_motifs.append(cid)
+                    for alt_id in m.get("alt_compound_ids", []):
+                        product_motifs.append(alt_id)
         except:
             pass
 
@@ -187,8 +199,8 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             
         # Map to A and B slots (standard for HTE recommender)
         type_a = ",".join(reactant_data[0]["motifs"]) if len(reactant_data) > 0 else ""
-        
         type_b = ",".join(reactant_data[1]["motifs"]) if len(reactant_data) > 1 else ""
+        type_p = ",".join(_dedupe_list(product_motifs))
         
         reagents = extract_reagents(record)
         if drop_no_catalyst and not reagents.get("Catalyst"):
@@ -199,6 +211,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             "Is_Intramolecular": len(reactants) == 1,
             "Reactant_A_Type": type_a,
             "Reactant_B_Type": type_b,
+            "Product_Type": type_p,
             "Reactant_Types_Key": _reactant_key([type_a, type_b]),
             "yield": record.get("yield", 0.0),
             "smiles": smiles,

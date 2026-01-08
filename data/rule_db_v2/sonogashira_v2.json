@@ -48,7 +48,7 @@
     "notes": "Electrophile reactivity: Ar-I 鈮?Alkenyl-OTf > Ar-Br > Ar-Cl. Aryl chlorides need stronger ligands (XPhos/SPhos, PtBu3, NHC) and higher temperatures. Copper-free variants available to reduce Glaser coupling."
   },
   "applies_if": {
-    "expr": "(Ar-CCH OR R-CCH) AND (Ar-Br OR Ar-Cl OR Ar-I OR Ar-OTf OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-I OR Alkenyl-OTf)"
+    "expr": "(Ar-C#CH OR R-C#CH) AND (Ar-Br OR Ar-Cl OR Ar-I OR Ar-OTf OR Alkenyl-Br OR Alkenyl-Cl OR Alkenyl-I OR Alkenyl-OTf)"
   },
   "default_rule": {
     "id": "DEF_sonogashira_general",
