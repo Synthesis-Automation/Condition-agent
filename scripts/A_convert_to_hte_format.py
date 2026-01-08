@@ -5,6 +5,13 @@ from typing import List, Dict, Any, Tuple, Iterable, Optional
 import numpy as np
 from functools import lru_cache
 import argparse
+import sys
+import os
+
+# Add project root to path
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
@@ -283,7 +290,7 @@ if __name__ == "__main__":
         process_reaction_dataset(args.input, args.output)
     else:
         # Default: Process known core datasets
-        datasets = ["C_N_Coupling", "C_O_Coupling"]
+        datasets = ["C_N_Coupling", "C_O_Coupling", "C_S_Coupling"]
         for ds in datasets:
             input_file = f"data/reaction_dataset/{ds}.jsonl"
             output_file = f"data/HTE_db/{ds}_canonical.csv"

@@ -101,10 +101,14 @@ def _hte_tags(row: Dict[str, str]) -> List[str]:
     if rxn_type:
         tags.add(f"rxn_type:{rxn_type}")
 
-    for key in ("Reactant_A_Type", "Reactant_B_Type", "Reactant_A", "Reactant_B"):
+    # Handle comma-separated lists or pipe-separated lists of motifs
+    for key in ("Reactant_A_Type", "Reactant_B_Type", "Reactant_A", "Reactant_B", "All_Reactant_Motifs", "All_Product_Motifs"):
         value = (row.get(key) or "").strip()
         if value:
-            tags.add(f"reactant:{value}")
+            # Split by comma or pipe
+            parts = [p.strip() for p in value.replace("|", ",").split(",") if p.strip()]
+            for p in parts:
+                tags.add(f"motif:{p}")
 
     for key in ("Reactant_A_Category", "Reactant_B_Category"):
         value = (row.get(key) or "").strip()
@@ -178,7 +182,7 @@ class UnifiedRecommendationIndexBuilder:
         self._load_reaction_dataset(entries, drfp_ids, drfp_fps)
         self._load_protocols(entries, drfp_ids, drfp_fps)
         if self.config.include_hte:
-            self._load_hte(entries)
+            self._load_hte(entries, drfp_ids, drfp_fps)
 
         self.stats.total_entries = len(entries)
         self.stats.tag_coverage = sum(1 for entry in entries if entry.get("tags"))
@@ -328,7 +332,7 @@ class UnifiedRecommendationIndexBuilder:
                 if local_count % _PROGRESS_EVERY == 0:
                     print(f"  ...loaded {local_count} protocol entries")
 
-    def _load_hte(self, entries: List[Dict[str, Any]]) -> None:
+    def _load_hte(self, entries: List[Dict[str, Any]], drfp_ids: List[str], drfp_fps: List[np.ndarray]) -> None:
         hte_dir = self.config.hte_dir
         if not hte_dir.exists():
             return
@@ -339,7 +343,7 @@ class UnifiedRecommendationIndexBuilder:
             preferred = [path for path in jsonl_paths if path.stem.lower() == "hte_0"]
             if preferred:
                 jsonl_paths = preferred
-            self._load_hte_jsonl(entries, jsonl_paths)
+            self._load_hte_jsonl(entries, jsonl_paths, drfp_ids, drfp_fps)
             return
 
         local_count = 0
@@ -363,6 +367,12 @@ class UnifiedRecommendationIndexBuilder:
                         "source_file": str(path),
                         "record_index": row_idx,
                     }
+
+                    # Check for SMILES to enable DRFP if available
+                    smiles = row.get("smiles") or row.get("Reaction_SMILES") or row.get("SMILES")
+                    if smiles:
+                        self._maybe_add_drfp(entry_id, smiles, drfp_ids, drfp_fps)
+
                     entries.append(entry)
                     self.stats.record_source("hte")
                     self.stats.total_entries += 1
@@ -370,7 +380,7 @@ class UnifiedRecommendationIndexBuilder:
                     if local_count % _PROGRESS_EVERY == 0:
                         print(f"  ...loaded {local_count} HTE entries")
 
-    def _load_hte_jsonl(self, entries: List[Dict[str, Any]], paths: List[Path]) -> None:
+    def _load_hte_jsonl(self, entries: List[Dict[str, Any]], paths: List[Path], drfp_ids: List[str], drfp_fps: List[np.ndarray]) -> None:
         local_count = 0
         for path in paths:
             print(f"  File: {path.name}")
@@ -401,6 +411,12 @@ class UnifiedRecommendationIndexBuilder:
                         "source_file": str(path),
                         "record_index": row_idx,
                     }
+
+                    # Check for SMILES to enable DRFP if available
+                    smiles = record.get("reaction_smiles") or record.get("smiles")
+                    if smiles:
+                        self._maybe_add_drfp(entry_id, smiles, drfp_ids, drfp_fps)
+
                     entries.append(entry)
                     self.stats.record_source("hte")
                     self.stats.total_entries += 1
