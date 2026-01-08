@@ -192,7 +192,7 @@
       "description": "Conjugated diene motif (C=C-C=C)."
     },
     {
-      "id": "Any-C=C",
+      "id": "Motif-C=C",
       "name": "Any-C=C",
       "smarts": "[CX3:1]=[CX3]",
       "description": "Generic alkene motif (C=C)."
@@ -222,7 +222,7 @@
       "description": "Alkene motif for dienophiles (non-conjugated)."
     },
     {
-      "id": "Epoxide",
+      "id": "Motif-Epoxide",
       "name": "Epoxide",
       "smarts": "C1OC1",
       "description": "Epoxide (oxirane) ring motif."

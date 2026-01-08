@@ -797,6 +797,14 @@
       "description": "Aryl trifluoroborate (Ar-BF3K)."
     },
     {
+      "id": "Alkenyl-BF3K",
+      "name": "Alkenyl-BF3K",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "BF3K",
+      "description": "Alkenyl trifluoroborate (Alkenyl-BF3K)."
+    },
+    {
       "id": "R-BF3K",
       "name": "R-BF3K",
       "template": "single_bond",
@@ -1250,7 +1258,7 @@
       "name": "Ar-Carbamate_NH",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Carbamate_NH",
+      "B": "NHCO2R",
       "description": "N-Aryl secondary carbamate (Ar-NHCO2R)."
     },
     {
@@ -1258,7 +1266,7 @@
       "name": "Ar-Carbamate_NR",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Carbamate_NR",
+      "B": "NRCO2R",
       "description": "N-Aryl tertiary carbamate (Ar-NRCO2R)."
     },
     {
@@ -2023,6 +2031,14 @@
       "description": "acid chloride functional group anywhere (generic)."
     },
     {
+      "id": "Any-COBr",
+      "name": "-COBr",
+      "template": "single_bond",
+      "A": "Any_Scaffold",
+      "B": "COBr",
+      "description": "Any acyl bromide on any scaffold."
+    },
+    {
       "id": "Any-CO2R",
       "name": "-Ester",
       "template": "single_bond",
@@ -2202,7 +2218,7 @@
       "name": "R-Carbamate_NH",
       "template": "single_bond",
       "A": "R",
-      "B": "Carbamate_NH",
+      "B": "NHCO2R",
       "description": "Alkyl secondary carbamate (R-NHCO2R)."
     },
     {
@@ -2210,7 +2226,7 @@
       "name": "R-Carbamate_NR",
       "template": "single_bond",
       "A": "R",
-      "B": "Carbamate_NR",
+      "B": "NRCO2R",
       "description": "Alkyl tertiary carbamate (R-NRCO2R)."
     },
     {
@@ -2218,7 +2234,7 @@
       "name": "-Carbamate_NH",
       "template": "single_bond",
       "A": "Any_Scaffold",
-      "B": "Carbamate_NH",
+      "B": "NHCO2R",
       "description": "Secondary carbamate group anywhere."
     },
     {
@@ -2226,7 +2242,7 @@
       "name": "-Carbamate_NR",
       "template": "single_bond",
       "A": "Any_Scaffold",
-      "B": "Carbamate_NR",
+      "B": "NRCO2R",
       "description": "Tertiary carbamate group anywhere."
     },
     {
@@ -2568,7 +2584,7 @@
       "name": "-Phosphonium",
       "template": "single_bond",
       "A": "Any_Scaffold",
-      "B": "Phosphonium",
+      "B": "PR3+",
       "description": "Phosphonium salt (Any-PR3+)."
     },
     {
@@ -2588,7 +2604,7 @@
       "name": "Ar-Phosphonium",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Phosphonium",
+      "B": "PR3+",
       "description": "Aryl phosphonium salt (Ar-PR3+)."
     },
     {
@@ -2596,7 +2612,7 @@
       "name": "-Imino",
       "template": "single_bond",
       "A": "Any_Scaffold",
-      "B": "Imino",
+      "B": "C=N",
       "description": "Imino functional group (Any-Imino)."
     },
     {
@@ -2604,7 +2620,7 @@
       "name": "Ar-Imino",
       "template": "single_bond",
       "A": "Ar",
-      "B": "Imino",
+      "B": "C=N",
       "description": "Aryl imino group (Ar-Imino)."
     },
     {

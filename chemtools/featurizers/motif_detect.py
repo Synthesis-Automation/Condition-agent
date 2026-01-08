@@ -96,15 +96,24 @@ def detect_motifs(
             
             if h1_atoms.issubset(h2_atoms):
                 if h1_atoms == h2_atoms:
-                    # Identical atom sets: use priority as tie-breaker
+                    # Identical atom sets: use priority, then status, then lexicographical tie-breaker
                     if h1["priority"] < h2["priority"]:
                         subsumed = True
                         break
                     elif h1["priority"] == h2["priority"]:
-                        # If priorities are equal, prefer documented over undocumented
                         if h1.get("undocumented") and not h2.get("undocumented"):
                             subsumed = True
                             break
+                        elif h1.get("undocumented") == h2.get("undocumented"):
+                            # Tie-breaker for identical atoms, priority, and status (e.g., symmetric groups)
+                            h1_key = (h1["compound_id"], h1["a_atom_idx"], h1["b_atom_idx"])
+                            h2_key = (h2["compound_id"], h2["a_atom_idx"], h2["b_atom_idx"])
+                            if h1_key > h2_key:
+                                subsumed = True
+                                # Record alternative scaffold for bidirectional groups
+                                if h1["compound_id"] == h2["compound_id"]:
+                                    h2.setdefault("alt_a_idxs", set()).add(h1["a_atom_idx"])
+                                break
                 else:
                     # h1 is a proper subset of h2. h2 is more specific.
                     subsumed = True
@@ -113,6 +122,33 @@ def detect_motifs(
             filtered_raw.append(h1)
     
     raw_hits = filtered_raw
+
+    # Pass 2: Centric deduplication (for symmetric/multi-attach groups like Amines)
+    # If multiple hits have the same compound_id and b_atom_idx, they are often 
+    # different attachments/perspectives of the same functional group center.
+    centric_filtered = []
+    centric_map = {} # (compound_id, b_atom_idx) -> primary_hit
+    for h in raw_hits:
+        key = (h["compound_id"], h["b_atom_idx"])
+        if key not in centric_map:
+            centric_map[key] = h
+            centric_filtered.append(h)
+        else:
+            primary = centric_map[key]
+            if h["a_atom_idx"] != primary["a_atom_idx"]:
+                primary.setdefault("alt_a_idxs", set()).add(h["a_atom_idx"])
+            if "alt_a_idxs" in h:
+                primary.setdefault("alt_a_idxs", set()).update(h["alt_a_idxs"])
+            
+            if h["bond"] != primary["bond"]:
+                primary.setdefault("alt_bonds", set()).add(h["bond"])
+            if h.get("alt_bonds"):
+                primary.setdefault("alt_bonds", set()).update(h["alt_bonds"])
+            
+            # Merge atoms set so the hit covers the whole functional group unit
+            primary["atoms"].update(h["atoms"])
+
+    raw_hits = centric_filtered
 
     # Filter by substituent atom and scaffold atom: 
     # keep only highest priority per (functional group, scaffold) pair.
@@ -153,6 +189,13 @@ def detect_motifs(
             final_hits.extend(documented_best)
         else:
             final_hits.extend(best_hits)
+    
+    # Clean up alternative sets for serializability
+    for h in final_hits:
+        if "alt_a_idxs" in h:
+            h["alt_a_idxs"] = sorted(list(h["alt_a_idxs"]))
+        if "alt_bonds" in h:
+            h["alt_bonds"] = sorted(list(h["alt_bonds"]))
         
     return final_hits
 
@@ -276,7 +319,13 @@ def _add_undocumented(
     if compound_id in compound_map:
         return
     
-    # Avoid duplicates in hits
+    # Avoid duplicates in hits (including symmetric counterparts)
+    for h in hits:
+        if h["compound_id"] == compound_id and h["atoms"] == atoms:
+            # Already have a hit for this set of atoms and compound
+            return
+    
+    # Check if this exact direction is already in hits (legacy check)
     for h in hits:
         if h["compound_id"] == compound_id and h["a_atom_idx"] == a_idx and h["b_atom_idx"] == b_idx:
             return
