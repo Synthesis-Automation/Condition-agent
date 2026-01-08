@@ -29,25 +29,24 @@ def analyze_nearby_groups(
         if other.get("a_atom_idx") == center_ipso and other.get("b_atom_idx") == center_fg:
             continue
             
-        other_id = other["compound_id"]
-        other_a = other.get("a_atom_idx")
-        if other_a is None:
-            continue
+        # Collect all compound perspectives for this site
+        compound_ids = [other["compound_id"]] + other.get("alt_compound_ids", [])
         
-        group_id = _resolve_group_id(other_id, compound_map)
-        group_info = groups_dict.get(group_id, {}) if group_id else {}
-        label = group_info.get("name") or group_id or other_id
+        for cid in compound_ids:
+            group_id = _resolve_group_id(cid, compound_map)
+            group_info = groups_dict.get(group_id, {}) if group_id else {}
+            label = group_info.get("name") or group_id or cid
 
-        if group_id == "H" or label == "-H":
-            continue
+            if group_id == "H" or label == "-H":
+                continue
 
-        if label not in seen:
-            seen.add(label)
-            results.append({
-                "name": label,
-                "group_id": group_id,
-                "tags": group_info.get("tags", [])
-            })
+            if label not in seen:
+                seen.add(label)
+                results.append({
+                    "name": label,
+                    "group_id": group_id,
+                    "tags": group_info.get("tags", [])
+                })
 
     return sorted(results, key=lambda x: x["name"])
 

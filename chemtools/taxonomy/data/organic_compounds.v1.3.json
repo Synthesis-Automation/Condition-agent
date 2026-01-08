@@ -15,14 +15,6 @@
       ]
     },
     {
-      "id": "Any-H",
-      "name": "-H",
-      "template": "single_bond",
-      "A": "Any_Scaffold",
-      "B": "H",
-      "description": "Any C-H bond on any scaffold."
-    },
-    {
       "id": "Any-AromN",
       "name": "-AromN",
       "template": "single_bond",
@@ -45,18 +37,6 @@
       ]
     },
     {
-      "id": "R-H",
-      "name": "R-H",
-      "template": "single_bond",
-      "A": "R",
-      "B": "H",
-      "description": "Alkyl C-H bond.",
-      "aliases": [
-        "Alkyl-H",
-        "alkyl C-H"
-      ]
-    },
-    {
       "id": "R-H-acidic",
       "name": "R-H-acidic",
       "template": "single_bond",
@@ -67,14 +47,6 @@
         "Alkyl-H-acidic",
         "acidic C-H"
       ]
-    },
-    {
-      "id": "Alkenyl-H",
-      "name": "Alkenyl-H",
-      "template": "single_bond",
-      "A": "Alkenyl",
-      "B": "H",
-      "description": "Vinylic C-H bond."
     },
     {
       "id": "Alkynyl-H",

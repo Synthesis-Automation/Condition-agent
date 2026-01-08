@@ -96,23 +96,37 @@ def detect_motifs(
             
             if h1_atoms.issubset(h2_atoms):
                 if h1_atoms == h2_atoms:
-                    # Identical atom sets: use priority, then status, then lexicographical tie-breaker
-                    if h1["priority"] < h2["priority"]:
-                        subsumed = True
-                        break
-                    elif h1["priority"] == h2["priority"]:
-                        if h1.get("undocumented") and not h2.get("undocumented"):
+                    # Identical atom sets.
+                    # If they are the same compound type, deduplicate by priority/id.
+                    if h1["compound_id"] == h2["compound_id"]:
+                        if h1["priority"] < h2["priority"]:
                             subsumed = True
                             break
-                        elif h1.get("undocumented") == h2.get("undocumented"):
-                            # Tie-breaker for identical atoms, priority, and status (e.g., symmetric groups)
-                            h1_key = (h1["compound_id"], h1["a_atom_idx"], h1["b_atom_idx"])
-                            h2_key = (h2["compound_id"], h2["a_atom_idx"], h2["b_atom_idx"])
-                            if h1_key > h2_key:
+                        elif h1["priority"] == h2["priority"]:
+                            if h1.get("undocumented") and not h2.get("undocumented"):
                                 subsumed = True
-                                # Record alternative scaffold for bidirectional groups
-                                if h1["compound_id"] == h2["compound_id"]:
+                                break
+                            elif h1.get("undocumented") == h2.get("undocumented"):
+                                h1_key = (h1["a_atom_idx"], h1["b_atom_idx"])
+                                h2_key = (h2["a_atom_idx"], h2["b_atom_idx"])
+                                if h1_key > h2_key:
+                                    subsumed = True
                                     h2.setdefault("alt_a_idxs", set()).add(h1["a_atom_idx"])
+                                    break
+                    else:
+                        # Different compound types covering the same atoms (e.g., Ar-NH-R vs R-NH-Ar).
+                        # We keep the higher priority one, but record the other's ID.
+                        if h1["priority"] < h2["priority"]:
+                            h2.setdefault("alt_compound_ids", set()).add(h1["compound_id"])
+                            h2.setdefault("alt_a_idxs", set()).add(h1["a_atom_idx"])
+                            subsumed = True
+                            break
+                        elif h1["priority"] == h2["priority"]:
+                            # Tie-break by ID to be deterministic, but keep record
+                            if h1["compound_id"] > h2["compound_id"]:
+                                h2.setdefault("alt_compound_ids", set()).add(h1["compound_id"])
+                                h2.setdefault("alt_a_idxs", set()).add(h1["a_atom_idx"])
+                                subsumed = True
                                 break
                 else:
                     # h1 is a proper subset of h2. h2 is more specific.
@@ -147,6 +161,8 @@ def detect_motifs(
             
             # Merge atoms set so the hit covers the whole functional group unit
             primary["atoms"].update(h["atoms"])
+            if h.get("alt_compound_ids"):
+                primary.setdefault("alt_compound_ids", set()).update(h["alt_compound_ids"])
 
     raw_hits = centric_filtered
 
@@ -194,6 +210,8 @@ def detect_motifs(
     for h in final_hits:
         if "alt_a_idxs" in h:
             h["alt_a_idxs"] = sorted(list(h["alt_a_idxs"]))
+        if "alt_compound_ids" in h:
+            h["alt_compound_ids"] = sorted(list(h["alt_compound_ids"]))
         if "alt_bonds" in h:
             h["alt_bonds"] = sorted(list(h["alt_bonds"]))
         
