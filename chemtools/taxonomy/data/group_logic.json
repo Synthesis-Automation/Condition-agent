@@ -89,14 +89,14 @@
     },
     "sp2_Carbon": {
       "name": "sp2 Carbon Scaffold",
-      "priority": 0,
+      "priority": 4,
       "members": ["Ar", "Alkenyl"],
       "description": "Aromatic or alkenyl carbon attachment points."
     },
     "sp3_Carbon": {
       "name": "sp3 Carbon Scaffold",
       "priority": 0,
-      "members": ["R", "RCH2", "R2CH", "R3C", "Bn", "Allyl"],
+      "members": ["R", "CH3", "RCH2", "R2CH", "R3C", "Bn", "Allyl"],
       "description": "Alkyl (sp3 carbon) attachment points."
     },
     "Organoboron_Group": {

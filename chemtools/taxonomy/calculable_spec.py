@@ -23,7 +23,7 @@ _ORGANIC_COMPOUNDS_FILE = "organic_compounds.v1.3.json"
 _ORGANIC_GROUPS_FILE = "organic_groups.v1.3.json"
 
 _DEFAULT_TEMPLATES = {
-    "single_bond": "{A}{B}",
+    "single_bond": "{A}-{B}",
     "via_oxygen": "{A}O{B}",
 }
 

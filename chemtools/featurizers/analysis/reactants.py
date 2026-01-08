@@ -589,7 +589,31 @@ def get_reactant_category_matches(
     reactant_features = _calc.get_reactant_type_features(smiles)
     if not reactant_features:
         return []
-    return sorted(reactant_features.get("categories", []))
+    categories = reactant_features.get("categories", [])
+    if not categories:
+        return []
+
+    index = _calc._reactant_feature_index()
+    priorities: Dict[str, int] = {}
+    for member in index.get("members", []):
+        token = member.get("token")
+        category_id = member.get("category_id")
+        if not token or not category_id:
+            continue
+        if reactant_features.get(token, False):
+            priority = int(member.get("priority", 1))
+            if priority > priorities.get(category_id, -1):
+                priorities[category_id] = priority
+
+    for category_id, entry in index.get("categories", {}).items():
+        token = entry.get("token")
+        if token and reactant_features.get(token, False) and category_id not in priorities:
+            priorities[category_id] = 0
+
+    if not priorities:
+        return sorted(categories)
+
+    return [cid for cid, _ in sorted(priorities.items(), key=lambda kv: (-kv[1], kv[0]))]
 
 
 def get_all_reactant_matches(

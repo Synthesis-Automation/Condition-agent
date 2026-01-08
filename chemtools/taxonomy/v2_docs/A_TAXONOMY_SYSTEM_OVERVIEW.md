@@ -25,7 +25,7 @@ Purpose and scope
 
 - **Atoms over Labels**: We prefer structural evidence (SMARTS) over brittle string matching.
 - **Hierarchical Priority**: Chemical scaffolds are ranked (e.g., Aromatic > Aliphatic) to resolve ambiguity in polyfunctional molecules. This ensures a Carbon attached to both a Phenyl and an Ethyl group is correctly typed as "Aryl-X" rather than "Alkyl-X".
-- **Separation of Concerns**: SMARTS patterns define *identity*, Logic sets define *role*, and Templates define *connectivity*.
+- **Separation of Concerns**: SMARTS patterns define _identity_, Logic sets define _role_, and Templates define _connectivity_.
 - **Substituent-Level Deduplication**: The default filtering mode collapses matches at the substituent atom level (`site_filter="substituent"`). This prevents "label explosion" (e.g., getting both `Ar-NR2` and `RCH2-NR2` for the same nitrogen).
 - **Transformation-Awareness**: Reaction keys are represented as net-chemical changes: `[Reacted] -> [Formed] || [Spectators]`. This allows the system to distinguish between a pyridine that reacts (N-arylation) and a pyridine used as a base (spectator).
 - **Stateless & Deterministic**: The system relies on fixed rules and cached SMARTS compilation for 100% reproducibility.
@@ -45,11 +45,11 @@ Most organic molecules are modeled as `A-B` pairs:
 
 #### Design Consideration: Asymmetry vs Complexity (A-B vs A-L-B)
 
-There is an inherent asymmetry in this system: **Scaffolds** (A) have dozens of nuanced variations, while **Substituents** (B) are relatively monolithic. This reflects the reality of synthetic chemistry—we care deeply about the *environment* of a functional group (is it hindered? is it benzylic?).
+There is an inherent asymmetry in this system: **Scaffolds** (A) have dozens of nuanced variations, while **Substituents** (B) are relatively monolithic. This reflects the reality of synthetic chemistry—we care deeply about the _environment_ of a functional group (is it hindered? is it benzylic?).
 
 - **Why not make everything A-L-B?**: Introducing a universal Linker layer (e.g., treating `RCH2-` as `R-link(CH2)-`) would make the system more "symmetrical" but significantly more complex. It would turn a 2-layer hierarchy into a 3-layer one, requiring more complex templates and making SMARTS detection slower.
 - **The "Gestalt" Principle**: We treat `RCH2-` as a first-class Scaffold because "Primary Alkyl" is a holistic chemical concept. Breaking it down into components loses the semantic "Gestalt" that a researcher or a recommender engine expects (e.g., "This reaction works for primary alkyls").
-- **When to use Links**: Templates like `via_oxygen` are reserved for cases where the linking atom (O, S, NH) fundamentally changes the chemistry class (e.g., Sulfonate leaving groups) or where the "B" part is actually an entire fragment (e.g., `Ar-O-R`).
+- **When to use Links**: Templates like `via_oxygen` are reserved for future use (not now). E.g., in places where the linking atom (O, S, NH) fundamentally changes the chemistry class (e.g., Sulfonate leaving groups) or where the "B" part is actually an entire fragment (e.g., `Ar-O-R`).
 
 This modularity allows the system to generate thousands of motifs (e.g., `Ar-NH2`, `R-NH2`, `Acyl-NH2`) from a small set of primitive definitions.
 
@@ -70,9 +70,9 @@ To determine what happened in a reaction, we use raw motif counts from reactants
 1. **Count Reactant Motifs**: `Ar-Br: 1, Ar-NH2: 1, Pyridine: 1`
 2. **Count Product Motifs**: `Ar-NR2: 1, Pyridine: 1`
 3. **Net Change (Counter Math)**:
-    - `-1 Ar-Br`, `-1 Ar-NH2` (Reacted)
-    - `+1 Ar-NR2` (Formed)
-    - `Pyridine` (Spectator - count unchanged)
+   - `-1 Ar-Br`, `-1 Ar-NH2` (Reacted)
+   - `+1 Ar-NR2` (Formed)
+   - `Pyridine` (Spectator - count unchanged)
 4. **Persistent Spectators**: Common heterocycles (Pyridine, Quinoline) are mathematically protected. If they are present in the reactant but missing from the product (due to extraction noise), they are automatically re-assigned to the spectator slot.
 
 ---
@@ -212,6 +212,52 @@ Build or refresh unified recommendation index
 - Single source of truth: taxonomy JSON files in `chemtools/taxonomy/data`.
 - Deterministic, cacheable: SMARTS compilation uses `chemtools/util/smarts_cache.py`.
 - Canonical IDs only: detection outputs should resolve to taxonomy IDs.
+
+---
+
+## Feature schema draft (condition recommendation)
+
+Define a stable, versioned feature bundle so recommendation logic can rely on a
+consistent contract while taxonomy evolves.
+
+- **Schema ID**: `cond_features.v1`
+- **Feature groups**:
+  - `reaction_delta`: net motif changes (formed, reacted, spectator).
+  - `motif_context`: primary motif per site plus secondary context tags.
+  - `role_evidence`: reagent roles with confidence + provenance.
+  - `steric_overlay`: steric tags (ortho, hindered, bulky).
+  - `electronic_overlay`: EW/ED group tags, aromaticity, heteroaryl.
+  - `reaction_family`: canonical taxonomy ID + confidence.
+- **Confidence fields**:
+  - `reaction_delta.confidence`: penalize missing products, low mapping quality.
+  - `role_evidence.confidence`: based on name/SMARTS match strength.
+- **Evidence fields**:
+  - `reaction_delta.evidence`: motif counts and change rationale.
+  - `role_evidence.provenance`: `name_match`, `smarts_match`, `cas_match`.
+- **Versioning**:
+  - Change log in `chemtools/taxonomy/v2_docs/A_TAXONOMY_SYSTEM_OVERVIEW.md`.
+  - Bump schema ID on breaking changes only.
+
+---
+
+## Actionable TODO (near-term)
+
+- **Tie-breaker policy**: Define deterministic ordering within each priority
+  class (e.g., Aromatic > Acyl > Alkenyl) and document a secondary-label policy
+  for multi-context sites.
+- **Secondary context tags**: Allow a site to carry one primary motif plus
+  optional secondary tags (e.g., `N-arylated` + `benzylic_adjacent`) to preserve
+  condition-relevant context without label explosion.
+- **Spectator config**: Move the "persistent spectator" list to a named
+  taxonomy data file and document how it is used.
+- **Transformation quality score**: Add a scoring heuristic for net-change
+  reliability (missing products, mapping gaps, low motif coverage).
+- **SMARTS policy**: Make `compile_smarts()` the only allowed compilation
+  mechanism in examples and module docs.
+- **Dynamic compound typing workflow**: Define candidate -> validation ->
+  approval -> version bump steps, with rollback criteria.
+- **Coverage dashboards**: Track motif hit rate, family coverage, role coverage,
+  and unknown buckets to guide taxonomy expansion.
 
 ---
 

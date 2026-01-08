@@ -29,6 +29,33 @@
       ]
     },
     {
+      "id": "H_Scaffold",
+      "name": "H-",
+      "kind": "scaffold",
+      "priority": 0,
+      "smarts": "[H:1]",
+      "description": "Hydrogen scaffold attachment (H-).",
+      "tags": [
+        "scaffold",
+        "hydrogen",
+        "wildcard"
+      ]
+    },
+    {
+      "id": "CH3",
+      "name": "CH3-",
+      "kind": "scaffold",
+      "priority": 3,
+      "smarts": "[CX4H3:1]",
+      "description": "Methyl (0° alkyl) attachment point (CH3-).",
+      "tags": [
+        "scaffold",
+        "alkyl",
+        "sp3",
+        "methyl"
+      ]
+    },
+    {
       "id": "Any_Substituent",
       "name": "-",
       "kind": "substituent",
@@ -80,6 +107,19 @@
       ]
     },
     {
+      "id": "sp2_Carbon",
+      "name": "Csp2-",
+      "kind": "scaffold",
+      "priority": 4,
+      "smarts": "[$([c:1]),$([C;X3:1]=[C;X3])]",
+      "description": "Generic sp2 carbon scaffold (aryl or vinylic).",
+      "tags": [
+        "scaffold",
+        "sp2",
+        "generic"
+      ]
+    },
+    {
       "id": "R",
       "name": "R-",
       "kind": "scaffold",
@@ -97,8 +137,8 @@
       "name": "RCH2-",
       "kind": "scaffold",
       "priority": 3,
-      "smarts": "[CX4H2,CX4H3;!$(C([F,Cl,Br,I])[F,Cl,Br,I]);!$(C=O);!$(C#N):1]",
-      "description": "Primary alkyl (sp3 CH2 or CH3) attachment point (Clean Alkyl).",
+      "smarts": "[CX4H2;!$(C([F,Cl,Br,I])[F,Cl,Br,I]);!$(C=O);!$(C#N):1]",
+      "description": "Primary alkyl (sp3 CH2) attachment point (Clean Alkyl; excludes methyl).",
       "tags": [
         "scaffold",
         "alkyl",
@@ -502,6 +542,47 @@
         "aromatic",
         "heteroatom",
         "nitrogen_group"
+      ]
+    },
+    {
+      "id": "Ar_Subst",
+      "name": "-Ar",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[c:2]",
+      "description": "Aryl substituent (attachment via aromatic carbon, -Ar).",
+      "tags": [
+        "aromatic",
+        "sp2",
+        "substituent"
+      ]
+    },
+    {
+      "id": "Alkenyl_Subst",
+      "name": "-Alkenyl",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[C;X3:2]=[C;X3]",
+      "description": "Generic alkenyl substituent (vinylic, -C=C).",
+      "tags": [
+        "alkenyl",
+        "sp2",
+        "substituent",
+        "wildcard"
+      ]
+    },
+    {
+      "id": "R_Subst",
+      "name": "-R",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[CX4:2]",
+      "description": "Generic alkyl substituent (attachment via sp3 carbon, -R).",
+      "tags": [
+        "alkyl",
+        "sp3",
+        "substituent",
+        "wildcard"
       ]
     },
     {
