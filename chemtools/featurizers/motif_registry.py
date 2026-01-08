@@ -30,6 +30,7 @@ class CompoundPattern:
     group_b: str
     b_tags: List[str]
     priority: int = 1
+    complexity: int = 0
 
 
 def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[str, Any]:
@@ -96,6 +97,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
                     group_b=group_b,
                     b_tags=list(entry.get("tags") or []),
                     priority=priority,
+                    complexity=calculate_smarts_complexity(query),
                 )
                 compiled.append(pattern)
                 compound_map[compound_id] = pattern
@@ -141,6 +143,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
             group_b=group_b,
             b_tags=list(group_b_record.get("tags") or []),
             priority=priority,
+            complexity=calculate_smarts_complexity(query),
         )
         compiled.append(pattern)
         compound_map[compound_id] = pattern
@@ -148,8 +151,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
     # Re-sort compiled patterns by priority and complexity
     # Higher priority first. If priority tied, more complex (narrower) SMARTS first.
     def sort_key(p: CompoundPattern) -> tuple[int, int, str]:
-        complexity = calculate_smarts_complexity(p.query)
-        return (-p.priority, -complexity, p.compound_id)
+        return (-p.priority, -p.complexity, p.compound_id)
 
     compiled.sort(key=sort_key)
 
@@ -164,6 +166,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
                     "kind": group.get("kind"),
                     "query": query,
                     "priority": priorities.get(group_id, 1),
+                    "complexity": calculate_smarts_complexity(query),
                     "tags": list(group.get("tags") or []),
                 }
 
@@ -412,6 +415,7 @@ def calculate_smarts_complexity(query_mol: Any) -> int:
         
         # Parse SMARTS constraints for specificity
         smarts = atom.GetSmarts()
+        score += len(smarts)
         if "X" in smarts: score += 5  # Hybridization constraint
         if "R" in smarts or "r" in smarts: score += 5 # Ring constraint
         if "H" in smarts or "h" in smarts: score += 3 # Explicit H-count
@@ -422,9 +426,11 @@ def calculate_smarts_complexity(query_mol: Any) -> int:
     # Score bonds
     for bond in query_mol.GetBonds():
         score += 5 # Base bond
+        bond_smarts = bond.GetSmarts()
+        score += len(bond_smarts)
         if bond.GetBondTypeAsDouble() > 1:
             score += 3 # Multiple bonds are more specific
-        if bond.GetSmarts() and "@" in bond.GetSmarts():
+        if bond_smarts and "@" in bond_smarts:
             score += 5 # Stereochemical constraints
             
     return score

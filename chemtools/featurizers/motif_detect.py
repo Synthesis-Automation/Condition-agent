@@ -71,6 +71,7 @@ def detect_motifs(
                     "b_atom_idx": b_idx,
                     "bond": site_bond,
                     "priority": compound.priority,
+                    "complexity": compound.complexity,
                     "undocumented": False,
                     "atoms": set(match),
                 }
@@ -117,14 +118,14 @@ def detect_motifs(
                         # Different compound types covering the same atoms (e.g., Ar-NH-R vs R-NH-Ar).
                         # We keep the higher priority one, but record the other's ID.
                         if h1["priority"] < h2["priority"]:
-                            h2.setdefault("alt_compound_ids", set()).add(h1["compound_id"])
+                            h2.setdefault("_alt_hits", []).append(h1)
                             h2.setdefault("alt_a_idxs", set()).add(h1["a_atom_idx"])
                             subsumed = True
                             break
                         elif h1["priority"] == h2["priority"]:
-                            # Tie-break by ID to be deterministic, but keep record
-                            if h1["compound_id"] > h2["compound_id"]:
-                                h2.setdefault("alt_compound_ids", set()).add(h1["compound_id"])
+                            # Tie-break by complexity, then ID to be deterministic
+                            if (h1["complexity"], h1["compound_id"]) < (h2["complexity"], h2["compound_id"]):
+                                h2.setdefault("_alt_hits", []).append(h1)
                                 h2.setdefault("alt_a_idxs", set()).add(h1["a_atom_idx"])
                                 subsumed = True
                                 break
@@ -132,8 +133,8 @@ def detect_motifs(
                     # h1 is a proper subset of h2.
                     # We subsume h1 only if h2 has equal or higher priority.
                     # This prevents perspectival motifs (like H-SR) from eating core motifs (Alkyl-SH).
-                    if h1["priority"] <= h2["priority"]:
-                        h2.setdefault("alt_compound_ids", set()).add(h1["compound_id"])
+                    if (h1["priority"], h1["complexity"]) <= (h2["priority"], h2["complexity"]):
+                        h2.setdefault("_alt_hits", []).append(h1)
                         subsumed = True
                         break
         if not subsumed:
@@ -165,8 +166,8 @@ def detect_motifs(
             
             # Merge atoms set so the hit covers the whole functional group unit
             primary["atoms"].update(h["atoms"])
-            if h.get("alt_compound_ids"):
-                primary.setdefault("alt_compound_ids", set()).update(h["alt_compound_ids"])
+            if h.get("_alt_hits"):
+                primary.setdefault("_alt_hits", []).extend(h["_alt_hits"])
 
     raw_hits = centric_filtered
 
@@ -187,40 +188,64 @@ def detect_motifs(
     
     final_hits = []
     for site_hits in sites.values():
-        max_priority = max(h["priority"] for h in site_hits)
-        # Keep all hits that share the maximum priority for this site
-        best_hits = [h for h in site_hits if h["priority"] == max_priority]
+        # Sort by specificity (narrowest first)
+        site_hits.sort(key=lambda x: (-x["priority"], -x["complexity"], x["compound_id"]))
         
-        # Record lower-priority hits as alternatives
-        for best in best_hits:
-            for other in site_hits:
-                if other["compound_id"] != best["compound_id"]:
-                    best.setdefault("alt_compound_ids", set()).add(other["compound_id"])
+        # In most cases, we only want the absolute best (narrowest) winner.
+        # But for symmetric groups, we might have multiple "best" (e.g. Ar-NH-Ar has 2 hits).
+        # We group by compound_id to find the unique types.
+        max_priority = site_hits[0]["priority"]
+        max_complexity = site_hits[0]["complexity"]
         
-        # In substituent mode, if multiple bonds have the same priority,
-        # we still want to keep the unique compound_ids to avoid losing info,
-        # but deduplicate them to avoid "Ar-NR2 + Ar-NR2".
-        if site_filter == "substituent":
-            unique_best = []
-            seen_ids = set()
-            for h in sorted(best_hits, key=lambda x: (not x.get("undocumented"), x["compound_id"])):
-                if h["compound_id"] not in seen_ids:
-                    unique_best.append(h)
-                    seen_ids.add(h["compound_id"])
-            best_hits = unique_best
-
-        documented_best = [h for h in best_hits if not h.get("undocumented")]
-        if documented_best:
-            final_hits.extend(documented_best)
-        else:
-            final_hits.extend(best_hits)
+        # Winners are those sharing the top rank
+        winners = []
+        others = []
+        for h in site_hits:
+            if h["priority"] == max_priority and h["complexity"] == max_complexity:
+                winners.append(h)
+            else:
+                others.append(h)
+        
+        # If multiple winners (rare for one site unless same pattern), deduplicate by ID
+        unique_winners = []
+        seen_win_ids = set()
+        for w in winners:
+            if w["compound_id"] not in seen_win_ids:
+                unique_winners.append(w)
+                seen_win_ids.add(w["compound_id"])
+            else:
+                # Merge into existing winner
+                for prev in unique_winners:
+                    if prev["compound_id"] == w["compound_id"]:
+                        prev["atoms"].update(w["atoms"])
+                        break
+        
+        # Collect all alternatives for the winner(s)
+        # We want a single list of IDs ordered specific -> general
+        for best in unique_winners:
+            # Gather all alternatives: recorded from Pass 1 + others at this site
+            all_alts = best.get("_alt_hits", []) + others
+            
+            # Deduplicate alternatives and sort
+            alt_map = {}
+            for a in all_alts:
+                cid = a["compound_id"]
+                if cid == best["compound_id"]: continue
+                if cid not in alt_map:
+                    alt_map[cid] = a
+                else:
+                    if (a["priority"], a["complexity"]) > (alt_map[cid]["priority"], alt_map[cid]["complexity"]):
+                        alt_map[cid] = a
+            
+            sorted_alts = sorted(alt_map.values(), key=lambda x: (-x["priority"], -x["complexity"], x["compound_id"]))
+            best["alt_compound_ids"] = [a["compound_id"] for a in sorted_alts]
+            final_hits.append(best)
     
-    # Clean up alternative sets for serializability
+    # Final pass: clean up internal tracking fields
     for h in final_hits:
+        h.pop("_alt_hits", None)
         if "alt_a_idxs" in h:
             h["alt_a_idxs"] = sorted(list(h["alt_a_idxs"]))
-        if "alt_compound_ids" in h:
-            h["alt_compound_ids"] = sorted(list(h["alt_compound_ids"]))
         if "alt_bonds" in h:
             h["alt_bonds"] = sorted(list(h["alt_bonds"]))
         
@@ -358,6 +383,7 @@ def _add_undocumented(
             return
 
     priority = s["priority"] + sub["priority"]
+    complexity = s.get("complexity", 0) + sub.get("complexity", 0)
     hits.append({
         "compound_id": compound_id,
         "match_atom_map": {"1": a_idx, "2": b_idx},
@@ -365,6 +391,7 @@ def _add_undocumented(
         "b_atom_idx": b_idx,
         "bond": tuple(sorted(site_bond)),
         "priority": priority,
+        "complexity": complexity,
         "undocumented": True,
         "atoms": atoms,
         "note": "Undocumented combination (Risk: High)",

@@ -31,7 +31,8 @@ def _format_compound_id(entry: Dict[str, Any]) -> str:
     alt_ids = entry.get("alt_compound_ids")
     if alt_ids:
         if isinstance(alt_ids, (set, list)):
-            all_ids = [cid] + sorted(list(alt_ids))
+            # Use the provided order (pre-sorted by complexity/specificity)
+            all_ids = [cid] + list(alt_ids)
             cid = ", ".join(all_ids)
     if entry.get("undocumented"):
         cid += " [UNDOCUMENTED]"
@@ -209,10 +210,12 @@ def _parse_args() -> argparse.Namespace:
         help="Include Ar-H motifs even if other motifs are present.",
     )
     parser.add_argument(
-        "--discovery",
-        action="store_true",
-        help="Enable discovery mode for undocumented motifs.",
+        "--no-discovery",
+        action="store_false",
+        dest="discovery",
+        help="Disable discovery mode for undocumented motifs.",
     )
+    parser.set_defaults(discovery=True)
     parser.add_argument(
         "--target-groups",
         help="Focus on specific motifs (e.g., 'Br', 'H', 'CN'). Comma-separated.",

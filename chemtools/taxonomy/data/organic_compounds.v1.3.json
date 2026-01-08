@@ -1489,6 +1489,14 @@
       "description": "ketone functional group anywhere (generic)."
     },
     {
+      "id": "CH3-CN",
+      "name": "CH3-CN",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "CN",
+      "description": "Acetonitrile (CH3-CN)."
+    },
+    {
       "id": "RCH2-CN",
       "name": "RCH2-CN",
       "template": "single_bond",
@@ -1550,6 +1558,30 @@
       "A": "Any_Scaffold",
       "B": "NO2",
       "description": "nitro functional group anywhere (generic)."
+    },
+    {
+      "id": "CH3-NH2",
+      "name": "CH3-NH2",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "NH2",
+      "description": "Methyl primary amine (CH3-NH2)."
+    },
+    {
+      "id": "CH3-NHR",
+      "name": "CH3-NHR",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "NHR",
+      "description": "Methyl secondary amine (CH3-NHR)."
+    },
+    {
+      "id": "CH3-NR2",
+      "name": "CH3-NR2",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "NR2",
+      "description": "Methyl tertiary amine (CH3-NR2)."
     },
     {
       "id": "RCH2-NH2",
@@ -1845,6 +1877,22 @@
       ]
     },
     {
+      "id": "CH3-SH",
+      "name": "CH3-SH",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "SH",
+      "description": "Methanethiol (CH3-SH)."
+    },
+    {
+      "id": "CH3-SR",
+      "name": "CH3-SR",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "SR",
+      "description": "Methyl sulfide (CH3-SR)."
+    },
+    {
       "id": "RCH2-SH",
       "name": "RCH2-SH",
       "template": "single_bond",
@@ -1923,6 +1971,22 @@
       "A": "Any_Scaffold",
       "B": "M",
       "description": "organometallic functional group anywhere (generic)."
+    },
+    {
+      "id": "CH3-OH",
+      "name": "CH3-OH",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "OH",
+      "description": "Methanol (CH3-OH)."
+    },
+    {
+      "id": "CH3-OR",
+      "name": "CH3-OR",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "OR",
+      "description": "Methyl ether (CH3-OR)."
     },
     {
       "id": "RCH2-OH",
@@ -2019,6 +2083,46 @@
       "A": "R3C",
       "B": "CO2R",
       "description": "Tertiary alkyl ester (R3C-Ester)."
+    },
+    {
+      "id": "CH3-X",
+      "name": "CH3-X",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "X",
+      "description": "Methyl halide (CH3-X)."
+    },
+    {
+      "id": "CH3-Cl",
+      "name": "CH3-Cl",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "Cl",
+      "description": "Methyl chloride (CH3-Cl)."
+    },
+    {
+      "id": "CH3-Br",
+      "name": "CH3-Br",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "Br",
+      "description": "Methyl bromide (CH3-Br)."
+    },
+    {
+      "id": "CH3-I",
+      "name": "CH3-I",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "I",
+      "description": "Methyl iodide (CH3-I)."
+    },
+    {
+      "id": "CH3-F",
+      "name": "CH3-F",
+      "template": "single_bond",
+      "A": "CH3",
+      "B": "F",
+      "description": "Methyl fluoride (CH3-F)."
     },
     {
       "id": "RCH2-X",
