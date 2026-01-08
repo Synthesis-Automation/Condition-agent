@@ -171,7 +171,7 @@ def featurize_molecule(
         # Alkyl/Generic motifs
         elif compound_id.startswith((
             "R-", "Bn-", "Allyl-", "Any-", "RCH2-", "R2CH-", "R3C-", 
-            "Vinyl-", "Alkynyl-", "Acyl-", "Propargyl-"
+            "Vinyl-", "Alkynyl-", "Acyl-", "Propargyl-", "H-"
         )):
             steric = analyze_alkyl_steric(mol, hit)
             nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)

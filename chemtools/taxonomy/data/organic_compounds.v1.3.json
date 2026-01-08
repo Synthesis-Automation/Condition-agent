@@ -15,6 +15,42 @@
       ]
     },
     {
+      "id": "H-Cl",
+      "name": "HCl",
+      "template": "single_bond",
+      "A": "H",
+      "B": "Cl",
+      "priority": 10,
+      "description": "Hydrochloric acid (H-Cl)."
+    },
+    {
+      "id": "H-Br",
+      "name": "HBr",
+      "template": "single_bond",
+      "A": "H",
+      "B": "Br",
+      "priority": 10,
+      "description": "Hydrobromic acid (H-Br)."
+    },
+    {
+      "id": "H-I",
+      "name": "HI",
+      "template": "single_bond",
+      "A": "H",
+      "B": "I",
+      "priority": 10,
+      "description": "Hydroiodic acid (H-I)."
+    },
+    {
+      "id": "H-F",
+      "name": "HF",
+      "template": "single_bond",
+      "A": "H",
+      "B": "F",
+      "priority": 10,
+      "description": "Hydrofluoric acid (H-F)."
+    },
+    {
       "id": "Any-AromN",
       "name": "-AromN",
       "template": "single_bond",
@@ -1626,6 +1662,36 @@
       "A": "Any_Scaffold",
       "B": "NH2",
       "description": "primary amine functional group anywhere (generic)."
+    },
+    {
+      "id": "H-NH2",
+      "name": "H-NH2",
+      "template": "single_bond",
+      "A": "H",
+      "B": "NH2",
+      "smarts": "[H:1]-[N;H3;!$(N-[C,S,P]=O):2]",
+      "priority": 10,
+      "description": "Ammonia H-bond (H-NH2)."
+    },
+    {
+      "id": "H-NHR",
+      "name": "H-NHR",
+      "template": "single_bond",
+      "A": "H",
+      "B": "NHR",
+      "smarts": "[H:1]-[N;H2;!$(N-[C,S,P]=O):2]",
+      "priority": 10,
+      "description": "Primary amine H-bond (H-NHR)."
+    },
+    {
+      "id": "H-NR2",
+      "name": "H-NR2",
+      "template": "single_bond",
+      "A": "H",
+      "B": "NR2",
+      "smarts": "[H:1]-[N;H1;!$(N-[C,S,P]=O):2]",
+      "priority": 10,
+      "description": "Secondary amine H-bond (H-NR2)."
     },
     {
       "id": "Any-NHR",

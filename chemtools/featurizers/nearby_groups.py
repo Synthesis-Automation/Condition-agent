@@ -25,8 +25,9 @@ def analyze_nearby_groups(
     results: List[Dict[str, Any]] = []
 
     for other in all_motifs:
-        # Skip the current reaction center itself
-        if other.get("a_atom_idx") == center_ipso and other.get("b_atom_idx") == center_fg:
+        # Skip motifs that share the same functional group atom (B atom)
+        # to avoid self-counting or redundant perspectives of the same group.
+        if other.get("b_atom_idx") == center_fg and center_fg is not None:
             continue
             
         # Collect all compound perspectives for this site
