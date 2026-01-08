@@ -29,10 +29,10 @@
       ]
     },
     {
-      "id": "H",
+      "id": "H_Scaffold",
       "name": "H-",
       "kind": "scaffold",
-      "priority": 0,
+      "priority": 10,
       "smarts": "[H:1]",
       "description": "Hydrogen scaffold attachment (H-).",
       "tags": [
@@ -1048,124 +1048,39 @@
       ]
     },
     {
-      "id": "NHCO2R",
-      "name": "-NHCO2R",
+      "id": "NCO2R",
+      "name": "-N(R)CO2R",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[NX3;H1:2][CX3](=O)[OX2][#6]",
-      "description": "Secondary carbamate core (N-H); attach via nitrogen.",
-      "tags": [
-        "carbamate",
-        "nitrogen_group",
-        "n_h_nucleophile"
-      ]
-    },
-    {
-      "id": "NRCO2R",
-      "name": "-NRCO2R",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3;H0:2]([#6])[CX3](=O)[OX2][#6]",
-      "description": "Tertiary carbamate core (N-R); attach via nitrogen.",
+      "smarts": "[NX3;H1,H0:2][CX3](=O)[OX2][#6]",
+      "description": "Any carbamate core (N-H or N-R); attach via nitrogen.",
       "tags": [
         "carbamate",
         "nitrogen_group"
       ]
     },
     {
-      "id": "NHBoc",
-      "name": "-NHBoc",
+      "id": "NCOR",
+      "name": "-N(R)COR",
       "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H1:2][CX3](=O)OC(C)(C)C",
-      "description": "Boc-protected primary amine (-NHBoc).",
+      "priority": 2,
+      "smarts": "[NX3;H1,H0:2][CX3](=O)[#6]",
+      "description": "Any amide core (N-H or N-R) attached via nitrogen.",
       "tags": [
-        "protected_amine",
-        "boc"
+        "amide",
+        "nitrogen_group"
       ]
     },
     {
-      "id": "NBoc",
-      "name": "-NBoc",
+      "id": "NSO2R",
+      "name": "-N(R)SO2R",
       "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H0:2]([#6])[CX3](=O)OC(C)(C)C",
-      "description": "Boc-protected secondary amine (-NRBoc).",
+      "priority": 2,
+      "smarts": "[NX3;H1,H0:2][SX4](=O)(=O)[#6]",
+      "description": "Any sulfonamide core (N-H or N-R) attached via nitrogen.",
       "tags": [
-        "protected_amine",
-        "boc"
-      ]
-    },
-    {
-      "id": "NHAc",
-      "name": "-NHAc",
-      "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H1:2][CX3](=O)C",
-      "description": "Acetamide-protected primary amine (-NHAc).",
-      "tags": [
-        "protected_amine",
-        "acetamide"
-      ]
-    },
-    {
-      "id": "NAc",
-      "name": "-NAc",
-      "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H0:2]([#6])[CX3](=O)C",
-      "description": "Acetamide-protected secondary amine (-NRAc).",
-      "tags": [
-        "protected_amine",
-        "acetamide"
-      ]
-    },
-    {
-      "id": "NHCbz",
-      "name": "-NHCbz",
-      "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H1:2][CX3](=O)OCC1=CC=CC=C1",
-      "description": "Cbz-protected primary amine (-NHCbz).",
-      "tags": [
-        "protected_amine",
-        "cbz"
-      ]
-    },
-    {
-      "id": "NHTs",
-      "name": "-NHTs",
-      "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H1:2][SX4](=O)(=O)c1ccc(C)cc1",
-      "description": "Tosyl-protected primary amine (-NHTs).",
-      "tags": [
-        "protected_amine",
-        "tosyl"
-      ]
-    },
-    {
-      "id": "NTs",
-      "name": "-NTs",
-      "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H0:2]([#6])[SX4](=O)(=O)c1ccc(C)cc1",
-      "description": "Tosyl-protected secondary amine (-NRTs).",
-      "tags": [
-        "protected_amine",
-        "tosyl"
-      ]
-    },
-    {
-      "id": "NHMs",
-      "name": "-NHMs",
-      "kind": "substituent",
-      "priority": 5,
-      "smarts": "[NX3;H1:2][SX4](=O)(=O)C",
-      "description": "Mesyl-protected primary amine (-NHMs).",
-      "tags": [
-        "protected_amine",
-        "mesyl"
+        "sulfonamide",
+        "nitrogen_group"
       ]
     },
     {

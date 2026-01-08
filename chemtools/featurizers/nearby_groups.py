@@ -25,11 +25,13 @@ def analyze_nearby_groups(
     results: List[Dict[str, Any]] = []
 
     for other in all_motifs:
-        # Skip motifs that share the same functional group atom (B atom)
-        # to avoid self-counting or redundant perspectives of the same group.
-        if other.get("b_atom_idx") == center_fg and center_fg is not None:
+        if other is hit:
             continue
             
+        # Skip redundant hits on the same atom center (e.g. N-H and N-C on same N)
+        if other.get("b_atom_idx") == center_fg and center_fg is not None:
+            continue
+
         # Collect all compound perspectives for this site
         compound_ids = [other["compound_id"]] + other.get("alt_compound_ids", [])
         
