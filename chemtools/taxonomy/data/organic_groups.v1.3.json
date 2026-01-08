@@ -16,6 +16,18 @@
       ]
     },
     {
+      "id": "R",
+      "name": "R-",
+      "kind": "scaffold",
+      "priority": 0,
+      "smarts": "[!#1:1]",
+      "description": "Any non-hydrogen scaffold (Generic group).",
+      "tags": [
+        "scaffold",
+        "wildcard"
+      ]
+    },
+    {
       "id": "C_Any",
       "name": "C-",
       "kind": "scaffold",
@@ -32,7 +44,7 @@
       "id": "H_Scaffold",
       "name": "H-",
       "kind": "scaffold",
-      "priority": 10,
+      "priority": 0,
       "smarts": "[H:1]",
       "description": "Hydrogen scaffold attachment (H-).",
       "tags": [
@@ -62,6 +74,18 @@
       "priority": 0,
       "smarts": "[*:2]",
       "description": "Wildcard for any substituent attachment point (any atom).",
+      "tags": [
+        "substituent",
+        "wildcard"
+      ]
+    },
+    {
+      "id": "R_Subst",
+      "name": "-R",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[!#1:2]",
+      "description": "Any non-hydrogen substituent (Generic group).",
       "tags": [
         "substituent",
         "wildcard"
@@ -120,12 +144,12 @@
       ]
     },
     {
-      "id": "R",
-      "name": "R-",
+      "id": "Alkyl",
+      "name": "Alkyl-",
       "kind": "scaffold",
-      "priority": 1,
+      "priority": 3,
       "smarts": "[CX4:1]",
-      "description": "Alkyl (sp3 carbon) attachment point (R-).",
+      "description": "Alkyl (sp3 carbon) attachment point (Alkyl-).",
       "tags": [
         "scaffold",
         "alkyl",
@@ -572,12 +596,12 @@
       ]
     },
     {
-      "id": "R_Subst",
-      "name": "-R",
+      "id": "Alkyl_Subst",
+      "name": "-Alkyl",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[CX4:2]",
-      "description": "Generic alkyl substituent (attachment via sp3 carbon, -R).",
+      "description": "Generic alkyl substituent (attachment via sp3 carbon, -Alkyl).",
       "tags": [
         "alkyl",
         "sp3",

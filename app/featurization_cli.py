@@ -26,6 +26,18 @@ def _format_list(items: Iterable[str]) -> str:
     return "\n".join(f"  - {item}" for item in items)
 
 
+def _format_compound_id(entry: Dict[str, Any]) -> str:
+    cid = entry.get("compound_id", "unknown")
+    alt_ids = entry.get("alt_compound_ids")
+    if alt_ids:
+        if isinstance(alt_ids, (set, list)):
+            all_ids = [cid] + sorted(list(alt_ids))
+            cid = ", ".join(all_ids)
+    if entry.get("undocumented"):
+        cid += " [UNDOCUMENTED]"
+    return cid
+
+
 def _get_molecule_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
     if "molecule" in payload and isinstance(payload.get("molecule"), dict):
         return payload["molecule"]
@@ -48,15 +60,10 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
     if motifs:
         lines = []
         for motif in motifs:
-            compound_id = motif.get("compound_id", "unknown")
+            display_name = _format_compound_id(motif)
             a_idx = motif.get("a_atom_idx")
             b_idx = motif.get("b_atom_idx")
-            
-            # Highlight undocumented motifs
-            is_undocumented = motif.get("undocumented", False)
-            suffix = " [UNDOCUMENTED]" if is_undocumented else ""
-            
-            lines.append(f"{compound_id}{suffix} (a={a_idx}, b={b_idx})")
+            lines.append(f"{display_name} (a={a_idx}, b={b_idx})")
         print("Motifs:")
         print(_format_list(lines))
 
@@ -68,9 +75,7 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         entries = []
         for entry in aryl:
             result = entry.get("result", {})
-            cid = entry.get("compound_id", "unknown")
-            if entry.get("undocumented"):
-                cid += " [UNDOCUMENTED]"
+            cid = _format_compound_id(entry)
             entries.append(
                 f"{cid}: score={result.get('score_0_10')}, "
                 f"ortho_subs={result.get('ortho_substituent_count')}"
@@ -81,9 +86,7 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         entries = []
         for entry in alkyl:
             result = entry.get("result", {})
-            cid = entry.get("compound_id", "unknown")
-            if entry.get("undocumented"):
-                cid += " [UNDOCUMENTED]"
+            cid = _format_compound_id(entry)
             entries.append(
                 f"{cid}: score={result.get('score_0_10')}"
             )
@@ -96,9 +99,7 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         entries = []
         for entry in aryl_elec:
             result = entry.get("result", {})
-            cid = entry.get("compound_id", "unknown")
-            if entry.get("undocumented"):
-                cid += " [UNDOCUMENTED]"
+            cid = _format_compound_id(entry)
             include_score = result.get("including_group_score_0_10")
             suffix = f", including_group={include_score}" if include_score is not None else ""
             entries.append(
@@ -111,16 +112,14 @@ def _print_molecule_summary(payload: Dict[str, Any]) -> None:
         print("Nearby Groups (per motif):")
         entries = []
         for entry in nearby:
-            compound_id = entry.get("compound_id", "unknown")
-            if entry.get("undocumented"):
-                compound_id += " [UNDOCUMENTED]"
+            cid = _format_compound_id(entry)
             groups = entry.get("result") or []
             if groups:
                 # groups is a list of dicts with 'name' key
                 group_names = [g.get("name", "unknown") if isinstance(g, dict) else str(g) for g in groups]
-                entries.append(f"{compound_id}: {', '.join(group_names)}")
+                entries.append(f"{cid}: {', '.join(group_names)}")
             else:
-                entries.append(f"{compound_id}: none")
+                entries.append(f"{cid}: none")
         print(_format_list(entries))
 
     snar = molecule.get("snar_feasibility")

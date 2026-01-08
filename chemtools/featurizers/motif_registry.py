@@ -75,8 +75,10 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         if group_a and group_b:
             combination_map[(group_a, group_b)] = compound_id
 
-        # Calculate priority: Priority(A) + Priority(B)
-        priority = priorities.get(group_a, 1) + priorities.get(group_b, 1)
+        # Calculate priority: Priority(A) + Priority(B), unless overridden
+        priority = entry.get("priority")
+        if priority is None:
+            priority = priorities.get(group_a, 1) + priorities.get(group_b, 1)
 
         smarts_list = _extract_compound_smarts(entry)
         if smarts_list:
@@ -142,6 +144,14 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         )
         compiled.append(pattern)
         compound_map[compound_id] = pattern
+
+    # Re-sort compiled patterns by priority and complexity
+    # Higher priority first. If priority tied, more complex (narrower) SMARTS first.
+    def sort_key(p: CompoundPattern) -> tuple[int, int, str]:
+        complexity = calculate_smarts_complexity(p.query)
+        return (-p.priority, -complexity, p.compound_id)
+
+    compiled.sort(key=sort_key)
 
     compiled_groups: Dict[str, Dict[str, Any]] = {}
     for group_id, group in groups.items():
@@ -301,11 +311,13 @@ def choose_best_compound_hit(
         # Fallback to alphabetical if no map provided
         return sorted(hits_list)[0]
 
-    def score_rank(hit: str) -> tuple[int, int, str]:
+    def score_rank(hit: str) -> tuple[int, int, int, str]:
         pattern = compound_map.get(hit)
         priority = pattern.priority if pattern else 0
-        # Higher priority first, then longer ID as tie-breaker, then alphabetical
-        return (-priority, -len(hit), hit)
+        complexity = calculate_smarts_complexity(pattern.query) if pattern else 0
+        # Higher priority first, then higher complexity (narrower), 
+        # then longer ID as tie-breaker, then alphabetical
+        return (-priority, -complexity, -len(hit), hit)
 
     return sorted(hits_list, key=score_rank)[0]
 
@@ -378,6 +390,44 @@ def _validate_compound_templates(
     if missing:
         joined = ", ".join(sorted(missing))
         raise ValueError(f"Compound templates missing from registry: {joined}")
+
+
+def calculate_smarts_complexity(query_mol: Any) -> int:
+    """
+    Calculate a structural complexity score for a SMARTS query molecule.
+    Higher scores indicate more specific patterns.
+    """
+    if not query_mol:
+        return 0
+    score = 0
+    # Score atoms
+    for atom in query_mol.GetAtoms():
+        score += 10 # Base atom
+        symbol = atom.GetSymbol()
+        # Non-wildcard/Non-H atoms are more specific
+        if symbol != "*" and symbol != "H":
+            score += 10 # Heavy atom bonus
+        if symbol != "*":
+            score += 5 # Explicit element
+        
+        # Parse SMARTS constraints for specificity
+        smarts = atom.GetSmarts()
+        if "X" in smarts: score += 5  # Hybridization constraint
+        if "R" in smarts or "r" in smarts: score += 5 # Ring constraint
+        if "H" in smarts or "h" in smarts: score += 3 # Explicit H-count
+        if "!" in smarts: score += 2 # Negations
+        score += smarts.count(";") * 2 # AND connections
+        score -= smarts.count(",") * 2 # OR connections (Genericness)
+
+    # Score bonds
+    for bond in query_mol.GetBonds():
+        score += 5 # Base bond
+        if bond.GetBondTypeAsDouble() > 1:
+            score += 3 # Multiple bonds are more specific
+        if bond.GetSmarts() and "@" in bond.GetSmarts():
+            score += 5 # Stereochemical constraints
+            
+    return score
 
 
 def _default_registry_paths() -> Dict[str, Path]:

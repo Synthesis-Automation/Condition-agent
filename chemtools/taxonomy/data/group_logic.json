@@ -96,7 +96,7 @@
     "sp3_Carbon": {
       "name": "sp3 Carbon Scaffold",
       "priority": 0,
-      "members": ["R", "CH3", "RCH2", "R2CH", "R3C", "Bn", "Allyl"],
+      "members": ["Alkyl", "CH3", "RCH2", "R2CH", "R3C", "Bn", "Allyl"],
       "description": "Alkyl (sp3 carbon) attachment points."
     },
     "Organoboron_Group": {

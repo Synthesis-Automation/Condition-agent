@@ -39,9 +39,17 @@ Purpose and scope
 
 Most organic molecules are modeled as `A-B` pairs:
 
-- **A (Scaffold)**: The core framework (Ar, R, Alkenyl, etc.). These are intentionally "Variety-Heavy" to capture local steric and electronic environments (e.g., distinguishing primary `RCH2-` from tertiary `R3C-`).
+- **A (Scaffold)**: The core framework (Ar, Alkyl, Alkenyl, etc.). These are intentionally "Variety-Heavy" to capture local steric and electronic environments (e.g., distinguishing primary `RCH2-` from tertiary `R3C-`).
 - **B (Substituent)**: The functional group (Br, NH2, B(OH)2, etc.). These are "Interface-Heavy," defining the actual chemical transformation.
 - **Link**: The bond connecting them (single, double, via oxygen, etc.).
+
+#### Naming Convention: R vs Alkyl
+
+To ensure chemical clarity, we distinguish between generic wildcards and specific alkyl groups:
+
+- **Alkyl**: Specifically refers to an $sp^3$ carbon scaffold (e.g., `Alkyl-Br`).
+- **R**: A generic wildcard representing any non-hydrogen group or atom.
+- **Hybrid Cases**: In names like `RCH2` (Primary Alkyl), `R2CH` (Secondary), and `R3C` (Tertiary), the `R` represents "any non-H substituent" attached to the central alkyl carbon. These names are preserved as they accurately describe the degree of substitution.
 
 #### Design Consideration: Asymmetry vs Complexity (A-B vs A-L-B)
 
@@ -59,7 +67,8 @@ When multiple scaffolds claim the same functional group atom, we apply a priorit
 
 1. **Priority 5 (Aromatic/Acyl)**: `Ar`, `AromN`, `Acyl`, `Alkenyl`.
 2. **Priority 3 (Aliphatic)**: `RCH2`, `R2CH`, `R3C`.
-3. **Priority 1 (Generic)**: `Any_Scaffold`.
+3. **Priority 1 (Specific/Generic)**: `Alkyl`.
+4. **Priority 0 (Wildcards)**: `R` (non-H), `Any_Scaffold` (any atom).
 
 This hierarchy ensures that chemical "intent" is preserved—aromaticity and unsaturation always take precedence over simple alkyl chains during classification.
 
@@ -81,11 +90,11 @@ To determine what happened in a reaction, we use raw motif counts from reactants
 
 - `organic_groups.v1.3.json`
   - Canonical organic groups (scaffold/substituent) with attachpoints in SMARTS.
-  - Examples (scaffold): `Ar` (aryl attachment), `R` (alkyl attachment), `Alkenyl`.
+  - Examples (scaffold): `Ar` (aryl), `Alkyl` ($sp^3$ carbon), `R` (non-H wildcard), `Alkenyl`.
   - Examples (substituent): `Br`, `Cl`, `NH2`, `OH`, `B(OH)2`.
 - `organic_compounds.v1.3.json`
   - Compound motifs built from group templates or direct SMARTS.
-  - Examples: `Ar-Br` (Aryl Bromide), `Ar-AromN` (N-Aryl Heterocycle), `R-OH` (Alcohol).
+  - Examples: `Ar-Br` (Aryl Bromide), `Ar-AromN` (N-Aryl Heterocycle), `Alkyl-OH` (Alcohol).
 - `scaffold_motifs.v1.3.json`
   - Direct SMARTS motifs for whole-molecule spectators or complex cores that do not fit simple A-B templates.
   - Examples: `Pyridine`, `Quinoline`, `THF`, `DMF`.

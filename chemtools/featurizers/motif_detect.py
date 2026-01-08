@@ -129,9 +129,13 @@ def detect_motifs(
                                 subsumed = True
                                 break
                 else:
-                    # h1 is a proper subset of h2. h2 is more specific.
-                    subsumed = True
-                    break
+                    # h1 is a proper subset of h2.
+                    # We subsume h1 only if h2 has equal or higher priority.
+                    # This prevents perspectival motifs (like H-SR) from eating core motifs (Alkyl-SH).
+                    if h1["priority"] <= h2["priority"]:
+                        h2.setdefault("alt_compound_ids", set()).add(h1["compound_id"])
+                        subsumed = True
+                        break
         if not subsumed:
             filtered_raw.append(h1)
     
@@ -185,8 +189,13 @@ def detect_motifs(
     for site_hits in sites.values():
         max_priority = max(h["priority"] for h in site_hits)
         # Keep all hits that share the maximum priority for this site
-        # If multiple hits have same priority, prefer documented ones
         best_hits = [h for h in site_hits if h["priority"] == max_priority]
+        
+        # Record lower-priority hits as alternatives
+        for best in best_hits:
+            for other in site_hits:
+                if other["compound_id"] != best["compound_id"]:
+                    best.setdefault("alt_compound_ids", set()).add(other["compound_id"])
         
         # In substituent mode, if multiple bonds have the same priority,
         # we still want to keep the unique compound_ids to avoid losing info,

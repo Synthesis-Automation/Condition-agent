@@ -73,8 +73,8 @@
       ]
     },
     {
-      "id": "R-H-acidic",
-      "name": "R-H-acidic",
+      "id": "Alkyl-H-acidic",
+      "name": "Alkyl-H-acidic",
       "template": "single_bond",
       "A": "R_acidic",
       "B": "H",
@@ -384,7 +384,7 @@
       "name": "Aryl-Alkyl",
       "template": "single_bond",
       "A": "Ar",
-      "B": "R_Subst",
+      "B": "Alkyl_Subst",
       "description": "Aryl-Alkyl bond (e.g., toluene, ethylbenzene).",
       "aliases": [
         "alkyl-arene"
@@ -813,77 +813,77 @@
       "description": "Alkenyl trifluoroborate (Alkenyl-BF3K)."
     },
     {
-      "id": "R-BF3K",
-      "name": "R-BF3K",
+      "id": "Alkyl-BF3K",
+      "name": "Alkyl-BF3K",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "BF3K",
-      "description": "Alkyl trifluoroborate (R-BF3K).",
+      "description": "Alkyl trifluoroborate (Alkyl-BF3K).",
       "aliases": [
         "Alkyl-BF3K"
       ]
     },
     {
-      "id": "R-B(OH)2",
-      "name": "R-B(OH)2",
+      "id": "Alkyl-B(OH)2",
+      "name": "Alkyl-B(OH)2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "B(OH)2",
-      "description": "Alkyl boronic acid (R-B(OH)2)."
+      "description": "Alkyl boronic acid (Alkyl-B(OH)2)."
     },
     {
-      "id": "R-Bpin",
-      "name": "R-Bpin",
+      "id": "Alkyl-Bpin",
+      "name": "Alkyl-Bpin",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Bpin",
-      "description": "Alkyl boronate (Bpin) (R-Bpin)."
+      "description": "Alkyl boronate (Bpin) (Alkyl-Bpin)."
     },
     {
-      "id": "R-Sn",
-      "name": "R-Sn",
+      "id": "Alkyl-Sn",
+      "name": "Alkyl-Sn",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Sn",
-      "description": "Alkyl stannane (R-SnR3).",
+      "description": "Alkyl stannane (Alkyl-SnR3).",
       "aliases": [
         "RSnR3"
       ]
     },
     {
-      "id": "R-Si",
-      "name": "R-Si",
+      "id": "Alkyl-Si",
+      "name": "Alkyl-Si",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Si",
-      "description": "Alkyl silane (R-SiR3)."
+      "description": "Alkyl silane (Alkyl-SiR3)."
     },
     {
-      "id": "R-Zn",
-      "name": "R-Zn",
+      "id": "Alkyl-Zn",
+      "name": "Alkyl-Zn",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Zn",
-      "description": "Alkyl zincate (R-ZnX)."
+      "description": "Alkyl zincate (Alkyl-ZnX)."
     },
     {
-      "id": "R-M",
-      "name": "R-M",
+      "id": "Alkyl-M",
+      "name": "Alkyl-M",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "M",
-      "description": "Alkyl organometallic (R-M).",
+      "description": "Alkyl organometallic (Alkyl-M).",
       "aliases": [
         "Alkyl-M"
       ]
     },
     {
-      "id": "R-Mg",
-      "name": "R-Mg",
+      "id": "Alkyl-Mg",
+      "name": "Alkyl-Mg",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Mg",
-      "description": "Alkyl Grignard (R-MgX)."
+      "description": "Alkyl Grignard (Alkyl-MgX)."
     },
     {
       "id": "Alkynyl-Si",
@@ -1624,34 +1624,34 @@
       "description": "Tertiary alkyl tertiary amine (R3C-NR2)."
     },
     {
-      "id": "R-NH2",
-      "name": "R-NH2",
+      "id": "Alkyl-NH2",
+      "name": "Alkyl-NH2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "NH2",
-      "description": "Generic alkyl primary amine (R-NH2)."
+      "description": "Generic alkyl primary amine (Alkyl-NH2)."
     },
     {
-      "id": "R-NHR",
-      "name": "R-NHR",
+      "id": "Alkyl-NHR",
+      "name": "Alkyl-NHR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "NHR",
-      "description": "Generic alkyl secondary amine (R-NHR)."
+      "description": "Generic alkyl secondary amine (Alkyl-NHR)."
     },
     {
-      "id": "R-NR2",
-      "name": "R-NR2",
+      "id": "Alkyl-NR2",
+      "name": "Alkyl-NR2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "NR2",
-      "description": "Generic alkyl tertiary amine (R-NR2)."
+      "description": "Generic alkyl tertiary amine (Alkyl-NR2)."
     },
     {
-      "id": "R-AromN",
-      "name": "R-AromN",
+      "id": "Alkyl-AromN",
+      "name": "Alkyl-AromN",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "AromN_Subst",
       "description": "Alkyl-substituted aromatic nitrogen (e.g., N-methylpyrrole)."
     },
@@ -1670,7 +1670,7 @@
       "A": "H_Scaffold",
       "B": "NH2",
       "smarts": "[H:1]-[N;H3;!$(N-[C,S,P]=O):2]",
-      "priority": 10,
+      "priority": 0,
       "description": "Ammonia H-bond (H-NH2)."
     },
     {
@@ -1680,7 +1680,7 @@
       "A": "H_Scaffold",
       "B": "NHR",
       "smarts": "[H:1]-[N;H2;!$(N-[C,S,P]=O):2]",
-      "priority": 10,
+      "priority": 0,
       "description": "Primary amine H-bond (H-NHR)."
     },
     {
@@ -1690,7 +1690,7 @@
       "A": "H_Scaffold",
       "B": "NR2",
       "smarts": "[H:1]-[N;H1;!$(N-[C,S,P]=O):2]",
-      "priority": 10,
+      "priority": 0,
       "description": "Secondary amine H-bond (H-NR2)."
     },
     {
@@ -1700,7 +1700,7 @@
       "A": "H_Scaffold",
       "B": "OH",
       "smarts": "[H:1]-[O;H2;!$(O-[C,S,P]=O):2]",
-      "priority": 10,
+      "priority": 0,
       "description": "Water H-bond (H-OH)."
     },
     {
@@ -1710,7 +1710,7 @@
       "A": "H_Scaffold",
       "B": "OR",
       "smarts": "[H:1]-[O;H1;!$(O-[C,S,P]=O):2][#6]",
-      "priority": 10,
+      "priority": 0,
       "description": "Alcohol/Phenol H-bond (H-OR)."
     },
     {
@@ -1720,7 +1720,7 @@
       "A": "H_Scaffold",
       "B": "SH",
       "smarts": "[H:1]-[S;H2;!$(S-[C,S,P]=O):2]",
-      "priority": 10,
+      "priority": 0,
       "description": "H2S H-bond (H-SH)."
     },
     {
@@ -1730,7 +1730,7 @@
       "A": "H_Scaffold",
       "B": "SR",
       "smarts": "[H:1]-[S;H1;!$(S-[C,S,P]=O):2][#6]",
-      "priority": 10,
+      "priority": 0,
       "description": "Thiol H-bond (H-SR)."
     },
     {
@@ -1740,7 +1740,7 @@
       "A": "H_Scaffold",
       "B": "AromN_Subst",
       "smarts": "[H:1]-[n;H1:2]",
-      "priority": 10,
+      "priority": 0,
       "description": "Aromatic N-H bond (H-AromN)."
     },
     {
@@ -1750,7 +1750,7 @@
       "A": "H_Scaffold",
       "B": "LactamN",
       "smarts": "[H:1]-[NX3;r;H1:2][CX3;r]=O",
-      "priority": 10,
+      "priority": 0,
       "description": "Lactam N-H bond (H-LactamN)."
     },
     {
@@ -1760,7 +1760,7 @@
       "A": "H_Scaffold",
       "B": "NCO2R",
       "smarts": "[H:1]-[NX3;H1:2][CX3](=O)[OX2][#6]",
-      "priority": 10,
+      "priority": 0,
       "description": "Carbamate N-H bond (H-Carbamate)."
     },
     {
@@ -1770,7 +1770,7 @@
       "A": "H_Scaffold",
       "B": "NCOR",
       "smarts": "[H:1]-[NX3;H1:2][CX3](=O)[#6]",
-      "priority": 10,
+      "priority": 0,
       "description": "Amide N-H bond (H-Amide)."
     },
     {
@@ -2321,12 +2321,12 @@
       ]
     },
     {
-      "id": "R-Hydrazine",
-      "name": "R-NHN<",
+      "id": "Alkyl-Hydrazine",
+      "name": "Alkyl-NHN<",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Hydrazine",
-      "description": "Alkyl hydrazine (R-N-N subunit)."
+      "description": "Alkyl hydrazine (Alkyl-N-N subunit)."
     },
     {
       "id": "Ar-Hydrazine",
@@ -2348,12 +2348,12 @@
       ]
     },
     {
-      "id": "R-Hydrazide",
-      "name": "R-CONHNH<",
+      "id": "Alkyl-Hydrazide",
+      "name": "Alkyl-CONHNH<",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Hydrazide",
-      "description": "Alkyl hydrazide (R-CONHNH2)."
+      "description": "Alkyl hydrazide (Alkyl-CONHNH2)."
     },
     {
       "id": "Ar-Hydrazide",
@@ -2364,20 +2364,20 @@
       "description": "Aryl hydrazide (Ar-CONHNH2)."
     },
     {
-      "id": "R-Carbamate",
-      "name": "R-Carbamate",
+      "id": "Alkyl-Carbamate",
+      "name": "Alkyl-Carbamate",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "NCO2R",
-      "description": "Alkyl carbamate (R-N(R)CO2R)."
+      "description": "Alkyl carbamate (Alkyl-N(R)CO2R)."
     },
     {
-      "id": "R-Amide",
-      "name": "R-Amide",
+      "id": "Alkyl-Amide",
+      "name": "Alkyl-Amide",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "NCOR",
-      "description": "Alkyl amide (R-N(R)COR)."
+      "description": "Alkyl amide (Alkyl-N(R)COR)."
     },
     {
       "id": "Any-Carbamate",
@@ -2419,226 +2419,226 @@
       ]
     },
     {
-      "id": "R-Cl",
-      "name": "R-Cl",
+      "id": "Alkyl-Cl",
+      "name": "Alkyl-Cl",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Cl",
-      "description": "Alkyl chloride (R-Cl).",
+      "description": "Alkyl chloride (Alkyl-Cl).",
       "aliases": [
         "RCl",
         "alkyl chloride"
       ]
     },
     {
-      "id": "R-Br",
-      "name": "R-Br",
+      "id": "Alkyl-Br",
+      "name": "Alkyl-Br",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "Br",
-      "description": "Alkyl bromide (R-Br).",
+      "description": "Alkyl bromide (Alkyl-Br).",
       "aliases": [
         "RBr",
         "alkyl bromide"
       ]
     },
     {
-      "id": "R-I",
-      "name": "R-I",
+      "id": "Alkyl-I",
+      "name": "Alkyl-I",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "I",
-      "description": "Alkyl iodide (R-I).",
+      "description": "Alkyl iodide (Alkyl-I).",
       "aliases": [
         "RI",
         "alkyl iodide"
       ]
     },
     {
-      "id": "R-F",
-      "name": "R-F",
+      "id": "Alkyl-F",
+      "name": "Alkyl-F",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "F",
-      "description": "Alkyl fluoride (R-F).",
+      "description": "Alkyl fluoride (Alkyl-F).",
       "aliases": [
         "RF",
         "alkyl fluoride"
       ]
     },
     {
-      "id": "R-CF3",
-      "name": "R-CF3",
+      "id": "Alkyl-CF3",
+      "name": "Alkyl-CF3",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CF3",
-      "description": "Alkyl trifluoromethyl (R-CF3).",
+      "description": "Alkyl trifluoromethyl (Alkyl-CF3).",
       "aliases": [
         "alkyl CF3"
       ]
     },
     {
-      "id": "R-X",
-      "name": "R-X",
+      "id": "Alkyl-X",
+      "name": "Alkyl-X",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "X",
-      "description": "Alkyl halide (R-X).",
+      "description": "Alkyl halide (Alkyl-X).",
       "aliases": [
         "RX",
         "alkyl halide"
       ]
     },
     {
-      "id": "R-OTf",
-      "name": "R-OTf",
+      "id": "Alkyl-OTf",
+      "name": "Alkyl-OTf",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "OTf",
-      "description": "Alkyl triflate (R-OTf, i.e., R-O-SO2CF3).",
+      "description": "Alkyl triflate (Alkyl-OTf, i.e., R-O-SO2CF3).",
       "aliases": [
         "ROTf",
         "alkyl triflate"
       ]
     },
     {
-      "id": "R-OTs",
-      "name": "R-OTs",
+      "id": "Alkyl-OTs",
+      "name": "Alkyl-OTs",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "OTs",
-      "description": "Alkyl tosylate (R-OTs, i.e., R-O-SO2Ar).",
+      "description": "Alkyl tosylate (Alkyl-OTs, i.e., R-O-SO2Ar).",
       "aliases": [
         "ROTs",
         "alkyl tosylate"
       ]
     },
     {
-      "id": "R-OMs",
-      "name": "R-OMs",
+      "id": "Alkyl-OMs",
+      "name": "Alkyl-OMs",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "OMs",
-      "description": "Alkyl mesylate (R-OMs, i.e., R-O-SO2Me).",
+      "description": "Alkyl mesylate (Alkyl-OMs, i.e., R-O-SO2Me).",
       "aliases": [
         "ROMs",
         "alkyl mesylate"
       ]
     },
     {
-      "id": "R-OSO2R",
-      "name": "R-OSO2R",
+      "id": "Alkyl-OSO2R",
+      "name": "Alkyl-OSO2R",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "OSO2R",
-      "description": "Alkyl sulfonate (R-OSO2R).",
+      "description": "Alkyl sulfonate (Alkyl-OSO2R).",
       "aliases": [
         "Alkyl-OSO2R"
       ]
     },
     {
-      "id": "R-C#CH",
-      "name": "R-C#CH",
+      "id": "Alkyl-C#CH",
+      "name": "Alkyl-C#CH",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "-C#CH",
-      "description": "Alkyl terminal alkyne (R-C#CH).",
+      "description": "Alkyl terminal alkyne (Alkyl-C#CH).",
       "aliases": [
         "RCCH",
         "terminal alkyne"
       ]
     },
     {
-      "id": "R-C#C",
-      "name": "R-C#C",
+      "id": "Alkyl-C#C",
+      "name": "Alkyl-C#C",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "-C#C",
-      "description": "Alkyl internal alkyne (R-C#C).",
+      "description": "Alkyl internal alkyne (Alkyl-C#C).",
       "aliases": [
         "RCCR",
         "internal alkyne"
       ]
     },
     {
-      "id": "R-OH",
-      "name": "R-OH",
+      "id": "Alkyl-OH",
+      "name": "Alkyl-OH",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "OH",
-      "description": "Alkyl alcohol (R-OH)."
+      "description": "Alkyl alcohol (Alkyl-OH)."
     },
     {
-      "id": "R-SH",
-      "name": "R-SH",
+      "id": "Alkyl-SH",
+      "name": "Alkyl-SH",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "SH",
-      "description": "Alkyl thiol (R-SH)."
+      "description": "Alkyl thiol (Alkyl-SH)."
     },
     {
-      "id": "R-CN",
-      "name": "R-CN",
+      "id": "Alkyl-CN",
+      "name": "Alkyl-CN",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CN",
-      "description": "Alkyl nitrile (R-CN)."
+      "description": "Alkyl nitrile (Alkyl-CN)."
     },
     {
-      "id": "R-CO2H",
-      "name": "R-CO2H",
+      "id": "Alkyl-CO2H",
+      "name": "Alkyl-CO2H",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CO2H",
-      "description": "Alkyl carboxylic acid (R-CO2H)."
+      "description": "Alkyl carboxylic acid (Alkyl-CO2H)."
     },
     {
-      "id": "R-CHO",
-      "name": "R-CHO",
+      "id": "Alkyl-CHO",
+      "name": "Alkyl-CHO",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CHO",
-      "description": "Alkyl aldehyde (R-CHO)."
+      "description": "Alkyl aldehyde (Alkyl-CHO)."
     },
     {
-      "id": "R-COR",
-      "name": "R-COR",
+      "id": "Alkyl-COR",
+      "name": "Alkyl-COR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "COR",
-      "description": "Alkyl ketone (R-COR)."
+      "description": "Alkyl ketone (Alkyl-COR)."
     },
     {
-      "id": "R-Ester",
-      "name": "R-Ester",
+      "id": "Alkyl-Ester",
+      "name": "Alkyl-Ester",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CO2R",
-      "description": "Alkyl ester (R-CO2R)."
+      "description": "Alkyl ester (Alkyl-CO2R)."
     },
     {
-      "id": "R-CONH2",
-      "name": "R-CONH2",
+      "id": "Alkyl-CONH2",
+      "name": "Alkyl-CONH2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CONH2",
-      "description": "Alkyl primary amide (R-CONH2)."
+      "description": "Alkyl primary amide (Alkyl-CONH2)."
     },
     {
-      "id": "R-CONHR",
-      "name": "R-CONHR",
+      "id": "Alkyl-CONHR",
+      "name": "Alkyl-CONHR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CONHR",
-      "description": "Alkyl secondary amide (R-CONHR)."
+      "description": "Alkyl secondary amide (Alkyl-CONHR)."
     },
     {
-      "id": "R-CONR2",
-      "name": "R-CONR2",
+      "id": "Alkyl-CONR2",
+      "name": "Alkyl-CONR2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "CONR2",
-      "description": "Alkyl tertiary amide (R-CONR2)."
+      "description": "Alkyl tertiary amide (Alkyl-CONR2)."
     },
     {
       "id": "Ar-C=CH2",
@@ -2666,24 +2666,24 @@
       ]
     },
     {
-      "id": "R-C=CH2",
-      "name": "R-C=CH2",
+      "id": "Alkyl-C=CH2",
+      "name": "Alkyl-C=CH2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "-C=CH2",
-      "description": "Alkyl terminal alkene (R-C=CH2).",
+      "description": "Alkyl terminal alkene (Alkyl-C=CH2).",
       "aliases": [
         "RCHCH2",
         "terminal alkene"
       ]
     },
     {
-      "id": "R-C=C",
-      "name": "R-C=C",
+      "id": "Alkyl-C=C",
+      "name": "Alkyl-C=C",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "-C=C",
-      "description": "Alkyl general alkene (R-C=C).",
+      "description": "Alkyl general alkene (Alkyl-C=C).",
       "aliases": [
         "RCHCR2",
         "internal alkene"
@@ -2822,50 +2822,50 @@
       "description": "Aryl azide (Ar-N3)."
     },
     {
-      "id": "R-OR",
-      "name": "R-OR",
+      "id": "Alkyl-OR",
+      "name": "Alkyl-OR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "OR",
-      "description": "Alkyl ether (R-OR)."
+      "description": "Alkyl ether (Alkyl-OR)."
     },
     {
-      "id": "R-SO2Cl",
-      "name": "R-SO2Cl",
+      "id": "Alkyl-SO2Cl",
+      "name": "Alkyl-SO2Cl",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "SO2Cl",
-      "description": "Alkyl sulfonyl chloride (R-SO2Cl)."
+      "description": "Alkyl sulfonyl chloride (Alkyl-SO2Cl)."
     },
     {
-      "id": "R-SO2NR2",
-      "name": "R-SO2NR2",
+      "id": "Alkyl-SO2NR2",
+      "name": "Alkyl-SO2NR2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "SO2NR2",
-      "description": "Alkyl tertiary sulfonamide (R-SO2NR2)."
+      "description": "Alkyl tertiary sulfonamide (Alkyl-SO2NR2)."
     },
     {
-      "id": "R-SO2NHR",
-      "name": "R-SO2NHR",
+      "id": "Alkyl-SO2NHR",
+      "name": "Alkyl-SO2NHR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "SO2NHR",
-      "description": "Alkyl secondary sulfonamide (R-SO2NHR)."
+      "description": "Alkyl secondary sulfonamide (Alkyl-SO2NHR)."
     },
     {
-      "id": "R-SO2NH2",
-      "name": "R-SO2NH2",
+      "id": "Alkyl-SO2NH2",
+      "name": "Alkyl-SO2NH2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "SO2NH2",
-      "description": "Alkyl primary sulfonamide (R-SO2NH2)."
+      "description": "Alkyl primary sulfonamide (Alkyl-SO2NH2)."
     },
     {
-      "id": "R-N3",
-      "name": "R-N3",
+      "id": "Alkyl-N3",
+      "name": "Alkyl-N3",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "N3",
       "description": "R group paired with N3 substituent."
     },
@@ -3174,10 +3174,10 @@
       "description": "Alkynyl group paired with CN substituent."
     },
     {
-      "id": "R-NO2",
-      "name": "R-NO2",
+      "id": "Alkyl-NO2",
+      "name": "Alkyl-NO2",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "NO2",
       "description": "R group paired with NO2 substituent."
     },
@@ -3238,10 +3238,10 @@
       "description": "Alkynyl group paired with OR substituent."
     },
     {
-      "id": "R-SR",
-      "name": "R-SR",
+      "id": "Alkyl-SR",
+      "name": "Alkyl-SR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "SR",
       "description": "R group paired with SR substituent."
     },
@@ -3302,10 +3302,10 @@
       "description": "Alkynyl group paired with SR substituent."
     },
     {
-      "id": "R-SO2R",
-      "name": "R-SO2R",
+      "id": "Alkyl-SO2R",
+      "name": "Alkyl-SO2R",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "SO2R",
       "description": "R group paired with SO2R substituent."
     },
@@ -3582,10 +3582,10 @@
       "description": "Alkynyl group paired with F substituent."
     },
     {
-      "id": "R-LactamN",
-      "name": "R-LactamN",
+      "id": "Alkyl-LactamN",
+      "name": "Alkyl-LactamN",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "LactamN",
       "description": "R group paired with LactamN substituent."
     },
@@ -3652,7 +3652,7 @@
       "A": "H_Scaffold",
       "B": "NSO2R",
       "smarts": "[H:1]-[NX3;H1:2][SX4](=O)(=O)[#6]",
-      "priority": 11,
+      "priority": 0,
       "description": "Sulfonamide N-H bond (H-Sulfonamide)."
     },
     {
@@ -3689,12 +3689,12 @@
       "description": "N-Aryl sulfonamide (Ar-N(R)SO2R)."
     },
     {
-      "id": "R-Sulfonamide",
-      "name": "R-Sulfonamide",
+      "id": "Alkyl-Sulfonamide",
+      "name": "Alkyl-Sulfonamide",
       "template": "single_bond",
-      "A": "R",
+      "A": "Alkyl",
       "B": "NSO2R",
-      "description": "Alkyl sulfonamide (R-N(R)SO2R)."
+      "description": "Alkyl sulfonamide (Alkyl-N(R)SO2R)."
     },
     {
       "id": "Any-Sulfonamide",

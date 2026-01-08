@@ -27,7 +27,7 @@
     "notes": "Draft RCM rule derived to mirror the structure and intent of the C鈥揘 coupling rule file. Apply only when intramolecular alkene鈥揳lkene closure is plausible. Choose the first matching base_rule (top鈫抎own); if none match, use default_rule. Then apply any matching modifiers (tokens or plain鈥憈ext heuristics). Notes: Ru鈥揘HC Hoveyda/Grubbs catalysts are broadly tolerant; remove ethylene to drive equilibrium; high dilution/slow addition for medium/large rings; benzoquinone (BQ) suppresses Ru鈥揾ydride isomerization; protect or attenuate strongly coordinating amines/thiols. Quench with ethyl Alkenyl ether at completion to deactivate Ru."
   },
   "applies_if": {
-    "expr": "Any-C=CH2 OR Ar-C=CH2 OR R-C=CH2"
+    "expr": "Any-C=CH2 OR Ar-C=CH2 OR Alkyl-C=CH2"
   },
   "default_rule": {
     "id": "DEF_RCM_general",

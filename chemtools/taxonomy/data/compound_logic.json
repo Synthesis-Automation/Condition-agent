@@ -5,114 +5,233 @@
     "sp2_electrophiles": {
       "name": "sp2 Electrophiles",
       "members": [
-        "Ar-I", "Ar-Br", "Ar-Cl", "Ar-OTf", "Ar-OMs", "Ar-OTs",
-        "Alkenyl-I", "Alkenyl-Br", "Alkenyl-Cl", "Alkenyl-OTf", "Alkenyl-OMs", "Alkenyl-OTs"
+        "Ar-I",
+        "Ar-Br",
+        "Ar-Cl",
+        "Ar-OTf",
+        "Ar-OMs",
+        "Ar-OTs",
+        "Alkenyl-I",
+        "Alkenyl-Br",
+        "Alkenyl-Cl",
+        "Alkenyl-OTf",
+        "Alkenyl-OMs",
+        "Alkenyl-OTs"
       ]
     },
     "organoboron": {
       "name": "Organoboron",
       "members": [
-        "Ar-B(OH)2", "Ar-Bpin", "Ar-BF3K", "Ar-B(OR)2",
-        "Alkenyl-B(OH)2", "Alkenyl-Bpin", "Alkenyl-BF3K", "Alkenyl-B(OR)2"
+        "Ar-B(OH)2",
+        "Ar-Bpin",
+        "Ar-BF3K",
+        "Ar-B(OR)2",
+        "Alkenyl-B(OH)2",
+        "Alkenyl-Bpin",
+        "Alkenyl-BF3K",
+        "Alkenyl-B(OR)2"
       ]
     },
     "organozinc": {
       "name": "Organozinc",
-      "members": ["Ar-Zn", "Alkenyl-Zn", "R-Zn"]
+      "members": [
+        "Ar-Zn",
+        "Alkenyl-Zn",
+        "Alkyl-Zn"
+      ]
     },
     "organotin": {
       "name": "Organotin",
-      "members": ["Ar-Sn", "Alkenyl-Sn", "R-Sn"]
+      "members": [
+        "Ar-Sn",
+        "Alkenyl-Sn",
+        "Alkyl-Sn"
+      ]
     },
     "organomagnesium": {
       "name": "Organomagnesium",
-      "members": ["Ar-Mg", "Alkenyl-Mg", "R-Mg"]
+      "members": [
+        "Ar-Mg",
+        "Alkenyl-Mg",
+        "Alkyl-Mg"
+      ]
     },
     "organosilicon": {
       "name": "Organosilicon",
-      "members": ["Ar-Si", "Alkenyl-Si"]
+      "members": [
+        "Ar-Si",
+        "Alkenyl-Si"
+      ]
     },
     "amines_nh": {
       "name": "Amines (N-H)",
       "members": [
-        "Ar-NH2", "Ar-NHR", "Any-NH2", "Any-NHR", "Bn-NH2", "Bn-NHR",
-        "Indole", "Pyrrole", "Imidazole", "Pyrazole", "Triazole", "Tetrazole", "Benzimidazole", "Purine",
-        "H-NH2", "H-NHR", "H-NR2", "H-AromN", "H-LactamN", "H-Carbamate", "H-Amide", "H-Sulfonamide"
+        "Ar-NH2",
+        "Ar-NHR",
+        "Any-NH2",
+        "Any-NHR",
+        "Bn-NH2",
+        "Bn-NHR",
+        "Indole",
+        "Pyrrole",
+        "Imidazole",
+        "Pyrazole",
+        "Triazole",
+        "Tetrazole",
+        "Benzimidazole",
+        "Purine",
+        "H-NH2",
+        "H-NHR",
+        "H-NR2",
+        "H-AromN",
+        "H-LactamN",
+        "H-Carbamate",
+        "H-Amide",
+        "H-Sulfonamide"
       ]
     },
     "alcohols_oh": {
       "name": "Alcohols (O-H)",
       "members": [
-        "Ar-OH", "Any-OH", "Bn-OH", "H-OH", "H-OR"
+        "Ar-OH",
+        "Any-OH",
+        "H-OH",
+        "H-OR"
       ]
     },
     "carboxylic_acids": {
       "name": "Carboxylic Acids",
       "members": [
-        "Ar-CO2H", "Any-CO2H", "H-Acid"
+        "Any-CO2H"
       ]
     },
     "acyl_halides": {
       "name": "Acyl Halides",
       "members": [
-        "Ar-COCl", "Ar-COBr", "Any-COCl", "Any-COBr"
+        "Ar-COCl",
+        "Ar-COBr",
+        "Any-COCl",
+        "Any-COBr"
       ]
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
-      "members": ["Ar-C#CH", "R-C#CH", "H-Alkynyl", "Alkynyl-H"]
+      "members": [
+        "Ar-C#CH",
+        "Alkyl-C#CH",
+        "H-Alkynyl",
+        "Alkynyl-H"
+      ]
     },
     "terminal_alkenes": {
       "name": "Terminal Alkenes",
-      "members": ["Ar-C=CH2", "R-C=CH2", "Any-C=CH2", "Alkenyl-H", "H-Alkenyl"]
+      "members": [
+        "Ar-C=CH2",
+        "Alkyl-C=CH2",
+        "Any-C=CH2",
+        "Alkenyl-H",
+        "H-Alkenyl"
+      ]
     },
     "carbonyls": {
       "name": "Carbonyls",
       "members": [
-        "Ar-CHO", "Any-CHO", "Any-COR"
+        "Ar-CHO",
+        "Any-CHO",
+        "Any-COR"
       ]
     },
     "aromatic_halides": {
       "name": "Aromatic Halides",
-      "members": ["Ar-F", "Ar-Cl", "Ar-Br", "Ar-I"]
+      "members": [
+        "Ar-F",
+        "Ar-Cl",
+        "Ar-Br",
+        "Ar-I"
+      ]
     },
     "aromatic_activators": {
       "name": "Aromatic Activators (SNAr)",
-      "members": ["Ar-NO2", "Ar-CN", "Pyridine", "Pyrimidine"]
+      "members": [
+        "Ar-NO2",
+        "Ar-CN",
+        "Pyridine",
+        "Pyrimidine"
+      ]
     },
     "nitro_compounds": {
       "name": "Nitro Compounds",
-      "members": ["Ar-NO2", "R-NO2"]
+      "members": [
+        "Ar-NO2",
+        "Alkyl-NO2"
+      ]
     },
     "azides": {
       "name": "Azides",
-      "members": ["Ar-N3", "R-N3"]
+      "members": [
+        "Ar-N3",
+        "Alkyl-N3"
+      ]
     },
     "esters": {
       "name": "Esters",
-      "members": ["Ar-CO2R", "Any-CO2R"]
+      "members": [
+        "Ar-CO2R",
+        "Any-CO2R"
+      ]
     },
     "amides": {
       "name": "Amides",
-      "members": ["Any-CONH2", "Any-CONHR", "Any-CONR2", "Ar-CONH2", "Ar-CONHR", "Ar-CONR2"]
+      "members": [
+        "Any-CONH2",
+        "Any-CONHR",
+        "Any-CONR2",
+        "Ar-CONH2",
+        "Ar-CONHR",
+        "Ar-CONR2"
+      ]
     },
     "hydrogenation_substrates": {
       "name": "Hydrogenation Substrates",
-      "members": ["Ar-C#CH", "R-C#CH", "Ar-C=CH2", "R-C=CH2", "Any-C=C"]
+      "members": [
+        "Ar-C#CH",
+        "Alkyl-C#CH",
+        "Ar-C=CH2",
+        "Alkyl-C=CH2",
+        "Any-C=C"
+      ]
     },
     "cross_coupling_products": {
       "name": "Cross-Coupling Products",
-      "members": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl", "Ar-C#C"],
+      "members": [
+        "Ar-Ar",
+        "Ar-C=CH2",
+        "Alkenyl-Alkenyl",
+        "Ar-C#C"
+      ],
       "description": "Common products of C-C cross-coupling reactions."
     },
     "aryl_amines": {
       "name": "Aryl Amines",
-      "members": ["Ar-NH2", "Ar-NHR", "Ar-NR2", "Ar-AromN", "Ar-Amide", "Ar-Carbamate", "Ar-Sulfonamide", "Ar-NHAr", "Ar-NAr2"],
+      "members": [
+        "Ar-NH2",
+        "Ar-NHR",
+        "Ar-NR2",
+        "Ar-AromN",
+        "Ar-Amide",
+        "Ar-Carbamate",
+        "Ar-Sulfonamide",
+        "Ar-NHAr",
+        "Ar-NAr2"
+      ],
       "description": "Products of C-N coupling."
     },
     "aryl_ethers": {
       "name": "Aryl Ethers",
-      "members": ["Ar-OR", "Ar-OAr"],
+      "members": [
+        "Ar-OR",
+        "Ar-OAr"
+      ],
       "description": "Products of C-O coupling."
     }
   }

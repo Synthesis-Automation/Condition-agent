@@ -161,6 +161,7 @@ def featurize_molecule(
             analyses.append(
                 {
                     "compound_id": compound_id,
+                    "alt_compound_ids": hit.get("alt_compound_ids", set()),
                     "center": {"ipso": hit["a_atom_idx"], "bond": hit["bond"]},
                     "steric": steric,
                     "electronic": electronic,
@@ -178,6 +179,7 @@ def featurize_molecule(
             analyses.append(
                 {
                     "compound_id": compound_id,
+                    "alt_compound_ids": hit.get("alt_compound_ids", set()),
                     "center": {"alpha_c": hit["a_atom_idx"], "bond": hit["bond"]},
                     "steric": steric,
                     "nearby_groups": nearby,
@@ -189,8 +191,10 @@ def featurize_molecule(
     electronic_payload = {"aryl": []}
     nearby_payload = []
     for analysis in analyses:
+        alt_ids = analysis.get("alt_compound_ids", set())
         steric_entry = {
             "compound_id": analysis.get("compound_id"),
+            "alt_compound_ids": list(alt_ids) if isinstance(alt_ids, set) else alt_ids,
             "center": analysis.get("center"),
             "result": analysis.get("steric"),
             "undocumented": analysis.get("undocumented", False),
@@ -203,6 +207,7 @@ def featurize_molecule(
             electronic_payload["aryl"].append(
                 {
                     "compound_id": analysis.get("compound_id"),
+                    "alt_compound_ids": list(alt_ids) if isinstance(alt_ids, set) else alt_ids,
                     "center": analysis.get("center"),
                     "result": analysis.get("electronic"),
                     "undocumented": analysis.get("undocumented", False),
@@ -212,6 +217,7 @@ def featurize_molecule(
             nearby_payload.append(
                 {
                     "compound_id": analysis.get("compound_id"),
+                    "alt_compound_ids": list(alt_ids) if isinstance(alt_ids, set) else alt_ids,
                     "center": analysis.get("center"),
                     "result": analysis.get("nearby_groups"),
                     "undocumented": analysis.get("undocumented", False),

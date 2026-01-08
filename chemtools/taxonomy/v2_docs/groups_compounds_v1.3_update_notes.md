@@ -4,12 +4,24 @@ Purpose: keep the definition JSONs **simple to maintain**, while still making **
 
 ---
 
+## 0) Naming System Overhaul (R vs Alkyl)
+
+As of version 1.3, we have refined the naming of generic groups and alkyl groups:
+
+- **Alkyl**: Now specifically refers to an $sp^3$ carbon scaffold (`[CX4:1]`).
+- **R**: Redefined as a generic wildcard for **any non-hydrogen group/atom** (`[!#1:1]` for scaffold, `[!#1:2]` for substituent).
+- **RCH2, R2CH, R3C**: Maintained with the "R" prefix because these refer to the degree of substitution on a central alkyl carbon (where R = anything except H).
+
+This ensures that `Alkyl-X` specifically means a saturated carbon linkage, while `R-X` is the most generic non-H classification.
+
+---
+
 ## 1) Key design decision
 
 **Attachpoint is encoded only via atom-mapping inside `group.smarts`.**  
 No extra fields are needed.
 
-- **Scaffold groups** (e.g., `Ar`, `Vinyl`, `R`): attach atom is mapped as `:1`
+- **Scaffold groups** (e.g., `Ar`, `Vinyl`, `Alkyl`): attach atom is mapped as `:1`
   - Example: `Ar.smarts = "[c:1]"`
 
 - **Substituent groups** (e.g., `Br`, `Cl`, `OTf`, `B(OH)2`, `CHO`, `CO2H`, `NH2`): attach atom is mapped as `:2`
@@ -28,6 +40,11 @@ Removed fields (no longer present):
 - `attach_points`
 - `attach_labels`
 
+ID Changes:
+
+- The old `R` ID (which matched `[CX4]`) has been renamed to `Alkyl`.
+- A new `R` ID has been created as the generic non-hydrogen wildcard.
+
 New expectation:
 
 - Every attachable group must have its attach atom mapped in `smarts`:
@@ -35,6 +52,11 @@ New expectation:
   - `:2` for substituent groups
 
 ### 2.2 `organic_compounds`
+
+Renamed IDs:
+
+- Motifs previously using `R-` as a prefix for alkyl groups have been renamed to `Alkyl-` (e.g., `R-Br` -> `Alkyl-Br`).
+- Motifs using `RCH2`, `R2CH`, `R3C`, or `R_acidic` are NOT renamed.
 
 Removed field where it was redundant:
 
@@ -86,6 +108,9 @@ Examples (unchanged mapping behavior, but legacy fields removed):
 - `CHO.smarts = "[CX3H1:2](=O)"`
 - `CO2H.smarts = "[C:2](=O)O"`
 - `NH2.smarts = "[NH2:2]"`
+- `Alkyl.smarts = "[CX4:1]"` (formerly `R`)
+- `R.smarts = "[!#1:1]"` (new generic wildcard)
+- `R_Subst.smarts = "[!#1:2]"` (new generic substituent wildcard)
 
 ---
 

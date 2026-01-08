@@ -108,7 +108,7 @@ Typical precedence heuristics:
 
 1) optionally prefer direct SMARTS motifs (e.g., `Pyridine`) when present
 2) prefer longer/more specific motif IDs
-3) prefer context prefixes (`Ar-*`, `Vinyl-*`, `R-*`) over `Any-*` when both appear
+3) prefer context prefixes (`Ar-*`, `Vinyl-*`, `Alkyl-*`, `R-*`) over `Any-*` when both appear
 
 ---
 
@@ -182,7 +182,7 @@ def choose_best(hits: list[str]) -> str | None:
     if not hits:
         return None
     for h in hits:
-        if h.startswith(("Ar-", "Vinyl-", "R-", "Bn-", "Allyl-")):
+        if h.startswith(("Ar-", "Vinyl-", "Alkyl-", "R-", "Bn-", "Allyl-")):
             return h
     return hits[0]
 ```
