@@ -182,6 +182,17 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
         return set(key.split("|")), set(), set()
 
 
+def _derive_query_sets(
+    reactant_motifs: Set[str],
+    product_motifs: Set[str],
+) -> Tuple[Set[str], Set[str], Set[str]]:
+    """Derive reacted/formed/spectator motifs from reactant/product sets."""
+    reacted = reactant_motifs - product_motifs
+    formed = product_motifs - reactant_motifs
+    spectators = reactant_motifs & product_motifs
+    return reacted, formed, spectators
+
+
 def _load_hte_jsonl(path: Path) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as handle:
@@ -258,16 +269,23 @@ class HTERecommendationResult:
     """Complete recommendation result with ranked conditions"""
     reactant_a_smiles: str
     reactant_b_smiles: Optional[str]
+    product_smiles: Optional[str] = None
     
     # Detected types
     reactant_a_type: Optional[str] = None
     reactant_b_type: Optional[str] = None
     reactant_a_category: Optional[str] = None
     reactant_b_category: Optional[str] = None
+    product_type: Optional[str] = None
     
     # Predicted reaction type
     predicted_reaction_type: Optional[str] = None
     reaction_type_confidence: float = 0.0
+
+    # Pre-eval motif splits (when product is provided)
+    reacted_motifs: Optional[Tuple[str, ...]] = None
+    formed_motifs: Optional[Tuple[str, ...]] = None
+    spectator_motifs: Optional[Tuple[str, ...]] = None
     
     # Recommendations
     recommendations: List[ConditionRecommendation] = field(default_factory=list)
@@ -326,6 +344,23 @@ class HTERecommender:
         category = analysis.get("motifs", [{}])[0].get("category", "Unknown") if analysis.get("motifs") else "Unknown"
         
         return motifs, category
+
+    def _detect_motif_set(self, smiles: str) -> Set[str]:
+        """Detect motifs for a SMILES string (supports multi-part SMILES)."""
+        if not smiles:
+            return set()
+
+        motifs: List[str] = []
+        for part in smiles.split("."):
+            part = part.strip()
+            if not part:
+                continue
+            analysis = featurize_molecule(part)
+            motifs.extend(
+                [m.get("compound_id", "") for m in analysis.get("motifs", []) if m.get("compound_id")]
+            )
+
+        return set(_dedupe_list(motifs))
     
     def _filter_by_catalyst(self, df: pd.DataFrame, catalyst_filter: str) -> pd.DataFrame:
         """
@@ -403,7 +438,9 @@ class HTERecommender:
     def _score_transformation_match(
         self, 
         query_motifs: Set[str], 
-        db_key: str
+        db_key: str,
+        query_reacted: Optional[Set[str]] = None,
+        query_spectators: Optional[Set[str]] = None
     ) -> float:
         """
         Score how well a database entry matches the query motifs.
@@ -416,11 +453,13 @@ class HTERecommender:
         reacted, formed, spectators = _parse_transformation_key(db_key)
         
         # 1. Core match: query must contain all 'reacted' motifs
-        if not reacted or not reacted.issubset(query_motifs):
+        core_set = query_reacted if query_reacted is not None else query_motifs
+        if not reacted or not reacted.issubset(core_set):
             return 0.0
             
         # 2. Spectator match
-        query_spectators = query_motifs - reacted
+        if query_spectators is None:
+            query_spectators = query_motifs - reacted
         
         if not spectators and not query_spectators:
             spectator_score = 1.0
@@ -579,6 +618,7 @@ class HTERecommender:
         self,
         reactant_a_smiles: str,
         reactant_b_smiles: Optional[str] = None,
+        product_smiles: Optional[str] = None,
         top_k: int = 10,
         min_experiments: int = 2,
         reaction_type_filter: Optional[str] = None,
@@ -590,6 +630,7 @@ class HTERecommender:
         Args:
             reactant_a_smiles: SMILES of first reactant
             reactant_b_smiles: SMILES of second reactant (optional)
+            product_smiles: Optional product SMILES to pre-evaluate spectator motifs
             top_k: Number of recommendations to return
             min_experiments: Minimum experiments for a condition to be recommended
             reaction_type_filter: Optional filter for specific reaction type
@@ -600,7 +641,8 @@ class HTERecommender:
         """
         result = HTERecommendationResult(
             reactant_a_smiles=reactant_a_smiles,
-            reactant_b_smiles=reactant_b_smiles
+            reactant_b_smiles=reactant_b_smiles,
+            product_smiles=product_smiles
         )
         
         # Step 1: Detect reactant types
@@ -620,6 +662,22 @@ class HTERecommender:
         # If no type detected, return empty
         if not type_a:
             return result
+
+        # Pre-eval: use product motifs to identify reacted vs spectator motifs
+        query_reacted = None
+        query_spectators = None
+        if product_smiles:
+            product_motifs = self._detect_motif_set(product_smiles)
+            result.product_type = ",".join(sorted(product_motifs))
+
+            reactant_set = set(type_a) | set(type_b)
+            reacted_set, formed_set, spectator_set = _derive_query_sets(reactant_set, product_motifs)
+            query_reacted = reacted_set
+            query_spectators = spectator_set
+
+            result.reacted_motifs = tuple(sorted(reacted_set))
+            result.formed_motifs = tuple(sorted(formed_set))
+            result.spectator_motifs = tuple(sorted(spectator_set))
         
         # Step 3: Match against database
         query_motifs = set(type_a) | set(type_b)
@@ -627,7 +685,12 @@ class HTERecommender:
         
         scored_matches = []
         for db_key, group_df in self.transformation_indices.items():
-            score = self._score_transformation_match(query_motifs, db_key)
+            score = self._score_transformation_match(
+                query_motifs,
+                db_key,
+                query_reacted=query_reacted,
+                query_spectators=query_spectators,
+            )
             if score > 0:
                 # Weight the z-score by the match score
                 temp_df = group_df.copy()
@@ -928,7 +991,10 @@ def format_result(result: HTERecommendationResult) -> str:
             f"Reactant B: {result.reactant_b_smiles}",
             f"  Type: {result.reactant_b_type} ({result.reactant_b_category})"
         ])
-    
+
+    if result.product_smiles:
+        lines.append(f"Product: {result.product_smiles}")
+
     lines.extend([
         f"",
         f"🎯 PREDICTED REACTION TYPE: {result.predicted_reaction_type}",

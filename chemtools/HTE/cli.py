@@ -43,6 +43,11 @@ Examples:
         help='SMILES string for second reactant (optional)'
     )
     parser.add_argument(
+        '--reaction-smiles',
+        type=str,
+        help='Full reaction SMILES (A.B>>P). Overrides -a/-b and infers product.'
+    )
+    parser.add_argument(
         '--batch',
         type=str,
         help='File with reactant pairs (format: SMILES_A SMILES_B per line)'
@@ -133,13 +138,25 @@ Examples:
             )
         
         # Single query
-        if not args.reactant_a:
+        if not args.reactant_a and not args.reaction_smiles:
             parser.print_help()
             return 1
-        
+        product_smiles = None
+        reactant_a = args.reactant_a
+        reactant_b = args.reactant_b
+        if args.reaction_smiles:
+            if ">>" not in args.reaction_smiles:
+                print("Error: --reaction-smiles must include '>>' to separate reactants and product.", file=sys.stderr)
+                return 1
+            reactants_part, product_smiles = args.reaction_smiles.split(">>", 1)
+            reactants = [r for r in reactants_part.split(".") if r]
+            reactant_a = reactants[0] if reactants else ""
+            reactant_b = ".".join(reactants[1:]) if len(reactants) > 1 else None
+
         result = recommender.recommend(
-            reactant_a_smiles=args.reactant_a,
-            reactant_b_smiles=args.reactant_b,
+            reactant_a_smiles=reactant_a,
+            reactant_b_smiles=reactant_b,
+            product_smiles=product_smiles,
             top_k=args.top_k,
             min_experiments=args.min_exp,
             reaction_type_filter=args.reaction,
@@ -257,6 +274,13 @@ def result_to_dict(result) -> dict:
             'type': result.reactant_b_type,
             'category': result.reactant_b_category
         } if result.reactant_b_smiles else None,
+        'product': {
+            'smiles': result.product_smiles,
+            'type': result.product_type,
+            'reacted_motifs': result.reacted_motifs,
+            'formed_motifs': result.formed_motifs,
+            'spectator_motifs': result.spectator_motifs,
+        } if result.product_smiles else None,
         'predicted_reaction': {
             'type': result.predicted_reaction_type,
             'confidence': result.reaction_type_confidence

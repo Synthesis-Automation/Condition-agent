@@ -85,7 +85,7 @@ def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
     }
 
 def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst: bool = True):
-    """Convert reaction dataset to HTE-canonical CSV format."""
+    """Convert reaction dataset to HTE-canonical CSV format with extra metadata."""
     input_path = Path(input_path)
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -215,6 +215,18 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
         
         # Spectators (unchanged motifs)
         spectators_str = _reactant_key(list(spectators_set)) or "None"
+
+        # Primary motif per reactant (fallback to first motif if none reacted)
+        primary_reactant_motifs = []
+        for r_info in reactant_data:
+            r_motifs = r_info["motifs"]
+            reacted_here = [m for m in r_motifs if m in reacted_set]
+            if reacted_here:
+                primary_reactant_motifs.append(reacted_here[0])
+            elif r_motifs:
+                primary_reactant_motifs.append(r_motifs[0])
+            else:
+                primary_reactant_motifs.append("")
         
         # Combined reaction key: A|B -> P || Unchanged
         # This replaces Reaction_Type_Standardized and Reactant_Types_Key
@@ -224,9 +236,12 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
         all_reactant_motifs_str = "|".join(sorted(_dedupe_list(motif_ids)))
         all_product_motifs_str = "|".join(sorted(_dedupe_list(product_motifs)))
 
-        # Map to A and B slots (standard for HTE recommender)
-        type_a = ",".join(reactant_data[0]["motifs"]) if len(reactant_data) > 0 else ""
-        type_b = ",".join(reactant_data[1]["motifs"]) if len(reactant_data) > 1 else ""
+        reacted_motifs_str = _reactant_key(list(reacted_set)) or "None"
+        formed_motifs_str = _reactant_key(list(formed_set)) or "None"
+        
+        # Map to A and B slots (canonical for HTE recommender)
+        type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
+        type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
         type_p = ",".join(_dedupe_list(product_motifs))
         
         reagents = extract_reagents(record)
@@ -234,16 +249,40 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             continue
             
         row = {
-            "Reaction_Key": reaction_key,
-            "Is_Intramolecular": len(reactants) == 1,
-            "Reactant_A_Type": type_a,
-            "Reactant_B_Type": type_b,
-            "Product_Type": type_p,
-            "All_Reactant_Motifs": all_reactant_motifs_str,
-            "All_Product_Motifs": all_product_motifs_str,
+            # HTE canonical columns (lowercase with underscores)
+            "reaction_type": reaction_key,
             "yield": record.get("yield", 0.0),
+            "z_score": 0.0,
+            "reactant_1": type_a,
+            "reactant_2": type_b,
+            "catalyst": reagents.get("Catalyst", ""),
+            "ligand": reagents.get("Ligand", ""),
+            "base": reagents.get("Base", ""),
+            "solvent": reagents.get("Solvent", ""),
+            "additive": reagents.get("Additive", ""),
+
+            # Extra metadata for downstream analysis
+            "reaction_smiles": smiles,
             "smiles": smiles,
-            **reagents
+            "reactant_smiles": reactants_part,
+            "product_smiles": products_part,
+            "reaction_key": reaction_key,
+            "reactant_types_key": _reactant_key([type_a, type_b]),
+            "product_type": type_p,
+            "reactant_a_all_motifs": ",".join(reactant_data[0]["motifs"]) if len(reactant_data) > 0 else "",
+            "reactant_b_all_motifs": ",".join(reactant_data[1]["motifs"]) if len(reactant_data) > 1 else "",
+            "all_reactant_motifs": all_reactant_motifs_str,
+            "all_product_motifs": all_product_motifs_str,
+            "reacted_motifs": reacted_motifs_str,
+            "formed_motifs": formed_motifs_str,
+            "spectator_motifs": spectators_str,
+            "is_intramolecular": len(reactants) == 1,
+            "coupling_reagent": reagents.get("Coupling Reagent", ""),
+            "secondary_solvent": reagents.get("Secondary Solvent", ""),
+            "catalytic_system": record.get("catalytic_system", ""),
+            "condition_core": record.get("condition_core", ""),
+            "raw_reagents": json.dumps(record.get("reagents", []), ensure_ascii=True),
+            "raw_solvents": json.dumps(record.get("solvents", []), ensure_ascii=True),
         }
         rows.append(row)
         
@@ -254,23 +293,30 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
     
     # Calculate Pseudo Z-Score based on motif groups
     print("Calculating Pseudo Z-Scores...")
-    df["z-Score"] = 0.0
-    df["z-Score"] = df["z-Score"].astype(float)
+    df["z_score"] = 0.0
+    df["z_score"] = df["z_score"].astype(float)
     
-    for key, group in df.groupby("Reaction_Key"):
+    for key, group in df.groupby("reaction_type"):
         if len(group) > 1:
             yields = group["yield"]
             mean = yields.mean()
             std = yields.std()
             if std > 0:
-                df.loc[group.index, "z-Score"] = (yields - mean) / std
+                df.loc[group.index, "z_score"] = (yields - mean) / std
             else:
                 # If all yields are same, Z-score is 0
-                df.loc[group.index, "z-Score"] = 0.0
+                df.loc[group.index, "z_score"] = 0.0
         else:
             # Single experiment in group
-            df.loc[group.index, "z-Score"] = 0.0
-            
+            df.loc[group.index, "z_score"] = 0.0
+
+    canonical_cols = [
+        "reaction_type", "yield", "z_score", "reactant_1", "reactant_2",
+        "catalyst", "ligand", "base", "solvent", "additive"
+    ]
+    extra_cols = [col for col in df.columns if col not in canonical_cols]
+    df = df[canonical_cols + extra_cols]
+
     df.to_csv(output_path, index=False)
     print(f"Successfully saved {len(df)} reactions to {output_path}")
 
