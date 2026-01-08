@@ -36,19 +36,20 @@
       "name": "Amines (N-H)",
       "members": [
         "Ar-NH2", "Ar-NHR", "Any-NH2", "Any-NHR", "Bn-NH2", "Bn-NHR",
-        "Indole", "Pyrrole", "Imidazole", "Pyrazole", "Triazole", "Tetrazole", "Benzimidazole", "Purine"
+        "Indole", "Pyrrole", "Imidazole", "Pyrazole", "Triazole", "Tetrazole", "Benzimidazole", "Purine",
+        "H-NH2", "H-NHR", "H-NR2", "H-AromN", "H-LactamN", "H-Carbamate", "H-Amide", "H-Sulfonamide"
       ]
     },
     "alcohols_oh": {
       "name": "Alcohols (O-H)",
       "members": [
-        "Ar-OH", "Any-OH", "Bn-OH"
+        "Ar-OH", "Any-OH", "Bn-OH", "H-OH", "H-OR"
       ]
     },
     "carboxylic_acids": {
       "name": "Carboxylic Acids",
       "members": [
-        "Ar-CO2H", "Any-CO2H"
+        "Ar-CO2H", "Any-CO2H", "H-Acid"
       ]
     },
     "acyl_halides": {
@@ -59,11 +60,11 @@
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
-      "members": ["Ar-C#CH", "R-C#CH"]
+      "members": ["Ar-C#CH", "R-C#CH", "H-Alkynyl", "Alkynyl-H"]
     },
     "terminal_alkenes": {
       "name": "Terminal Alkenes",
-      "members": ["Ar-C=CH2", "R-C=CH2", "Any-C=CH2", "Alkenyl-H"]
+      "members": ["Ar-C=CH2", "R-C=CH2", "Any-C=CH2", "Alkenyl-H", "H-Alkenyl"]
     },
     "carbonyls": {
       "name": "Carbonyls",
@@ -106,12 +107,12 @@
     },
     "aryl_amines": {
       "name": "Aryl Amines",
-      "members": ["Ar-NH2", "Ar-NHR", "Ar-NR2", "Ar-AromN"],
+      "members": ["Ar-NH2", "Ar-NHR", "Ar-NR2", "Ar-AromN", "Ar-Amide", "Ar-Carbamate", "Ar-Sulfonamide", "Ar-NHAr", "Ar-NAr2"],
       "description": "Products of C-N coupling."
     },
     "aryl_ethers": {
       "name": "Aryl Ethers",
-      "members": ["Ar-OR"],
+      "members": ["Ar-OR", "Ar-OAr"],
       "description": "Products of C-O coupling."
     }
   }

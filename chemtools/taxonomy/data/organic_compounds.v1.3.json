@@ -3656,6 +3656,31 @@
       "description": "Sulfonamide N-H bond (H-Sulfonamide)."
     },
     {
+      "id": "H-Acid",
+      "name": "H-Acid",
+      "smarts": "[H:1]-[OX2][CX3:2]=O",
+      "priority": 11,
+      "description": "Carboxylic acid O-H bond (H-Acid)."
+    },
+    {
+      "id": "H-Alkynyl",
+      "name": "H-Alkynyl",
+      "template": "single_bond",
+      "A": "H_Scaffold",
+      "B": "-C#C",
+      "priority": 11,
+      "description": "Terminal alkyne H bond (H-Alkynyl)."
+    },
+    {
+      "id": "H-Alkenyl",
+      "name": "H-Alkenyl",
+      "template": "single_bond",
+      "A": "H_Scaffold",
+      "B": "-C=C",
+      "priority": 11,
+      "description": "Terminal alkene H bond (H-Alkenyl)."
+    },
+    {
       "id": "Ar-Sulfonamide",
       "name": "Ar-Sulfonamide",
       "template": "single_bond",
