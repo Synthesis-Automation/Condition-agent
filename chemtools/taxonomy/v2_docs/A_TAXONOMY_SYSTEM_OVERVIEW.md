@@ -228,6 +228,7 @@ Notes
 ## Canonicalization and naming alignment
 
 - Reaction type labels must map to taxonomy IDs.
+  - Dataset fields should store the taxonomy `id`; `name` is display-only and resolved via aliases.
   - Aliases resolved in `chemtools/taxonomy/reaction_catalog.py`.
   - Legacy names mapped in `chemtools/featurizers/analysis/reactions.py`.
 - Dataset naming guidance is in `docs/NAMING_CONVENTION.md`.

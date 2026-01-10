@@ -6,20 +6,30 @@
       "id": "suzuki_miyaura",
       "name": "Suzuki-Miyaura",
       "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organoboron"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
+        "product": [
+          "Ar-Ar",
+          "Ar-C=CH2",
+          "Alkenyl-Alkenyl"
+        ]
       },
-      "catalysts": ["Pd"],
-      "examples": ["Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"]
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+      ]
     },
     {
-      "id": "buchwald_hartwig",
-      "name": "Buchwald-Hartwig",
+      "id": "buchwald_hartwig_cn",
+      "name": "Buchwald-Hartwig C-N",
       "category": "C-N Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@amines_nh"
@@ -27,27 +37,18 @@
       "products": {
         "product": "@aryl_amines"
       },
-      "catalysts": ["Pd"],
-      "examples": ["Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"]
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+      ]
     },
     {
-      "id": "chan_lam_cn",
-      "name": "Chan-Lam C-N",
-      "category": "C-N Coupling",
-      "reactants": {
-        "electrophile": "@organoboron",
-        "nucleophile": "@amines_nh"
-      },
-      "products": {
-        "product": "@aryl_amines"
-      },
-      "catalysts": ["Cu"],
-      "examples": ["c1ccccc1B(O)O.Nc1ccccc1>>c1ccccc1Nc1ccccc1"]
-    },
-    {
-      "id": "ullmann_ether",
-      "name": "Ullmann Ether Synthesis",
+      "id": "buchwald_hartwig_co",
+      "name": "Buchwald-Hartwig C-O",
       "category": "C-O Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@alcohols_oh"
@@ -55,97 +56,239 @@
       "products": {
         "product": "@aryl_ethers"
       },
-      "catalysts": ["Cu", "Pd"],
-      "examples": ["Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1"]
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Clc1ccccc1.CCO>>CCOc1ccccc1"
+      ]
+    },
+    {
+      "id": "chan_lam_cn",
+      "name": "Chan-Lam C-N",
+      "category": "C-N Coupling",
+      "mechanism": "oxidative coupling",
+      "reactants": {
+        "electrophile": "@organoboron",
+        "nucleophile": "@amines_nh"
+      },
+      "products": {
+        "product": "@aryl_amines"
+      },
+      "catalysts": [
+        "Cu"
+      ],
+      "examples": [
+        "c1ccccc1B(O)O.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
+      ]
+    },
+    {
+      "id": "ullmann_co",
+      "name": "Ullmann C-O",
+      "category": "C-O Coupling",
+      "mechanism": "cross-coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "@alcohols_oh"
+      },
+      "products": {
+        "product": "@aryl_ethers"
+      },
+      "catalysts": [
+        "Cu",
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1"
+      ]
+    },
+    {
+      "id": "ullmann_cs",
+      "name": "Ullmann C-S",
+      "category": "C-S Coupling",
+      "mechanism": "cross-coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "@thiols_sh"
+      },
+      "products": {
+        "product": [
+          "Ar-SR",
+          "Ar-SAr"
+        ]
+      },
+      "catalysts": [
+        "Cu"
+      ],
+      "examples": [
+        "Brc1ccccc1.CS>>c1ccccc1SC"
+      ]
+    },
+    {
+      "id": "buchwald_hartwig_cs",
+      "name": "Buchwald-Hartwig C-S",
+      "category": "C-S Coupling",
+      "mechanism": "cross-coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "@thiols_sh"
+      },
+      "products": {
+        "product": [
+          "Ar-SR",
+          "Ar-SAr"
+        ]
+      },
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.CS>>c1ccccc1SC"
+      ]
     },
     {
       "id": "sonogashira",
       "name": "Sonogashira",
       "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@terminal_alkynes"
       },
       "products": {
-        "product": ["Ar-C#C"]
+        "product": [
+          "Ar-C#C"
+        ]
       },
-      "catalysts": ["Pd", "Cu"],
-      "examples": ["Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1"]
+      "catalysts": [
+        "Pd",
+        "Cu"
+      ],
+      "examples": [
+        "Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1"
+      ]
     },
     {
       "id": "heck",
       "name": "Heck",
       "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@terminal_alkenes"
       },
       "products": {
-        "product": ["Ar-C=CH2", "Alkenyl-Alkenyl"]
+        "product": [
+          "Ar-C=CH2",
+          "Alkenyl-Alkenyl"
+        ]
       },
-      "catalysts": ["Pd"],
-      "examples": ["Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1"]
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1"
+      ]
     },
     {
       "id": "negishi",
       "name": "Negishi",
       "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organozinc"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
+        "product": [
+          "Ar-Ar",
+          "Ar-C=CH2",
+          "Alkenyl-Alkenyl"
+        ]
       },
-      "catalysts": ["Pd", "Ni"],
-      "examples": ["Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1"]
+      "catalysts": [
+        "Pd",
+        "Ni"
+      ],
+      "examples": [
+        "Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1"
+      ]
     },
     {
       "id": "stille",
       "name": "Stille",
       "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organotin"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
+        "product": [
+          "Ar-Ar",
+          "Ar-C=CH2",
+          "Alkenyl-Alkenyl"
+        ]
       },
-      "catalysts": ["Pd"],
-      "examples": ["Brc1ccccc1.c1ccc(Sn(C)C)cc1>>c1ccc(-c2ccccc2)cc1"]
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.c1ccc(Sn(C)C)cc1>>c1ccc(-c2ccccc2)cc1"
+      ]
     },
     {
       "id": "kumada",
       "name": "Kumada",
       "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organomagnesium"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
+        "product": [
+          "Ar-Ar",
+          "Ar-C=CH2",
+          "Alkenyl-Alkenyl"
+        ]
       },
-      "catalysts": ["Ni", "Pd"],
-      "examples": ["Brc1ccccc1.c1ccc(MgBr)cc1>>c1ccc(-c2ccccc2)cc1"]
+      "catalysts": [
+        "Ni",
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.c1ccc(MgBr)cc1>>c1ccc(-c2ccccc2)cc1"
+      ]
     },
     {
       "id": "hiyama",
       "name": "Hiyama",
       "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organosilicon"
       },
       "products": {
-        "product": ["Ar-Ar", "Ar-C=CH2", "Alkenyl-Alkenyl"]
+        "product": [
+          "Ar-Ar",
+          "Ar-C=CH2",
+          "Alkenyl-Alkenyl"
+        ]
       },
-      "catalysts": ["Pd"],
-      "examples": ["Brc1ccccc1.c1ccc(Si(OC)3)cc1>>c1ccc(-c2ccccc2)cc1"]
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.c1ccc(Si(OC)3)cc1>>c1ccc(-c2ccccc2)cc1"
+      ]
     },
     {
       "id": "snar_cn",
       "name": "SNAr C-N",
       "category": "C-N Coupling",
+      "mechanism": "nucleophilic aromatic substitution",
       "reactants": {
         "electrophile": "@aromatic_halides",
         "activator": "@aromatic_activators",
@@ -154,12 +297,15 @@
       "products": {
         "product": "@aryl_amines"
       },
-      "examples": ["Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1"]
+      "examples": [
+        "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1"
+      ]
     },
     {
       "id": "amide_coupling",
       "name": "Amide Coupling",
       "category": "Amide Formation",
+      "mechanism": "acylation",
       "reactants": {
         "acid": "@carboxylic_acids",
         "nucleophile": "@amines_nh"
@@ -167,12 +313,15 @@
       "products": {
         "product": "@amides"
       },
-      "examples": ["O=C(O)c1ccccc1.NCc1ccccc1>>O=C(NCc1ccccc1)c1ccccc1"]
+      "examples": [
+        "O=C(O)c1ccccc1.NCc1ccccc1>>O=C(NCc1ccccc1)c1ccccc1"
+      ]
     },
     {
       "id": "esterification",
       "name": "Esterification",
       "category": "Ester Formation",
+      "mechanism": "condensation",
       "reactants": {
         "acid": "@carboxylic_acids",
         "nucleophile": "@alcohols_oh"
@@ -180,12 +329,15 @@
       "products": {
         "product": "@esters"
       },
-      "examples": ["CC(=O)O.CCO>>CC(=O)OCC"]
+      "examples": [
+        "CC(=O)O.CCO>>CC(=O)OCC"
+      ]
     },
     {
       "id": "acylation_amide",
       "name": "Acylation (Amide)",
       "category": "Amide Formation",
+      "mechanism": "acylation",
       "reactants": {
         "electrophile": "@acyl_halides",
         "nucleophile": "@amines_nh"
@@ -193,25 +345,36 @@
       "products": {
         "product": "@amides"
       },
-      "examples": ["CC(=O)Cl.Nc1ccccc1>>CC(=O)Nc1ccccc1"]
+      "examples": [
+        "CC(=O)Cl.Nc1ccccc1>>CC(=O)Nc1ccccc1"
+      ]
     },
     {
       "id": "reductive_amination",
       "name": "Reductive Amination",
       "category": "C-N Coupling",
+      "mechanism": "reductive amination",
       "reactants": {
         "electrophile": "@carbonyls",
         "nucleophile": "@amines_nh"
       },
       "products": {
-        "product": ["Any-NHR", "Any-NR2", "Ar-NHR", "Ar-NR2"]
+        "product": [
+          "Any-NHR",
+          "Any-NR2",
+          "Ar-NHR",
+          "Ar-NR2"
+        ]
       },
-      "examples": ["c1ccccc1C=O.NCC>>c1ccccc1CNCC"]
+      "examples": [
+        "c1ccccc1C=O.NCC>>c1ccccc1CNCC"
+      ]
     },
     {
       "id": "ring_closing_metathesis",
       "name": "Ring-Closing Metathesis",
       "category": "C-C Coupling",
+      "mechanism": "metathesis",
       "reactants": {
         "alkene": "@terminal_alkenes"
       },
@@ -219,33 +382,46 @@
         "min_hits": 2,
         "min_reactants": 1
       },
-      "examples": ["C=CCCC=C>>C1=CCCC1"]
+      "examples": [
+        "C=CCCC=C>>C1=CCCC1"
+      ]
     },
     {
       "id": "hydrogenation",
       "name": "Hydrogenation",
       "category": "Reduction",
+      "mechanism": "hydrogenation",
       "reactants": {
         "substrate": "@hydrogenation_substrates",
-        "reagent": ["H2"]
+        "reagent": [
+          "H2"
+        ]
       },
-      "examples": ["C=C.[H][H]>>CC"]
+      "examples": [
+        "C=C.[H][H]>>CC"
+      ]
     },
     {
       "id": "click_cuaac",
       "name": "Click (CuAAC)",
       "category": "Cycloaddition",
+      "mechanism": "cycloaddition",
       "reactants": {
         "alkyne": "@terminal_alkynes",
         "azide": "@azides"
       },
-      "catalysts": ["Cu"],
-      "examples": ["C#Cc1ccccc1.CN=[N+]=[N-]>>Cn1cc(-c2ccccc2)nn1"]
+      "catalysts": [
+        "Cu"
+      ],
+      "examples": [
+        "C#Cc1ccccc1.CN=[N+]=[N-]>>Cn1cc(-c2ccccc2)nn1"
+      ]
     },
     {
       "id": "acylation_ester",
       "name": "Acylation (Ester)",
       "category": "Ester Formation",
+      "mechanism": "acylation",
       "reactants": {
         "electrophile": "@acyl_halides",
         "nucleophile": "@alcohols_oh"
@@ -253,67 +429,97 @@
       "products": {
         "product": "@esters"
       },
-      "examples": ["CC(=O)Cl.CCO>>CC(=O)OCC"]
+      "examples": [
+        "CC(=O)Cl.CCO>>CC(=O)OCC"
+      ]
     },
     {
       "id": "oxidation_alcohol",
       "name": "Alcohol Oxidation",
       "category": "Oxidation",
+      "mechanism": "oxidation",
       "reactants": {
         "substrate": "@alcohols_oh"
       },
       "products": {
-        "product": ["@carbonyls", "@carboxylic_acids"]
+        "product": [
+          "@carbonyls",
+          "@carboxylic_acids"
+        ]
       },
-      "examples": ["c1ccccc1CO>>c1ccccc1C=O"]
+      "examples": [
+        "c1ccccc1CO>>c1ccccc1C=O"
+      ]
     },
     {
       "id": "reduction_nitro",
       "name": "Nitro Reduction",
       "category": "Reduction",
+      "mechanism": "reduction",
       "reactants": {
         "substrate": "@nitro_compounds"
       },
       "products": {
-        "product": ["Ar-NH2", "Any-NH2"]
+        "product": [
+          "Ar-NH2",
+          "Any-NH2"
+        ]
       },
-      "examples": ["c1ccccc1[N+](=O)[O-]>>c1ccccc1N"]
+      "examples": [
+        "c1ccccc1[N+](=O)[O-]>>c1ccccc1N"
+      ]
     },
     {
       "id": "halogenation_aromatic",
       "name": "Aromatic Halogenation",
       "category": "Halogenation",
+      "mechanism": "electrophilic aromatic substitution",
       "reactants": {
-        "substrate": ["Ar-H"]
+        "substrate": [
+          "Ar-H"
+        ]
       },
       "products": {
         "product": "@aromatic_halides"
       },
-      "examples": ["c1ccccc1.ClCl>>c1ccccc1Cl"]
+      "examples": [
+        "c1ccccc1.ClCl>>c1ccccc1Cl"
+      ]
     },
     {
       "id": "epoxidation",
       "name": "Epoxidation",
       "category": "Oxidation",
+      "mechanism": "oxidation",
       "reactants": {
-        "substrate": ["@terminal_alkenes", "Any-C=C"]
+        "substrate": [
+          "@terminal_alkenes",
+          "Any-C=C"
+        ]
       },
       "products": {
-        "product": ["Epoxide"]
+        "product": [
+          "Epoxide"
+        ]
       },
-      "examples": ["C=C.OO>>C1OC1"]
+      "examples": [
+        "C=C.OO>>C1OC1"
+      ]
     },
     {
       "id": "claisen_condensation",
       "name": "Claisen Condensation",
       "category": "Carbonyl Reactions",
+      "mechanism": "condensation",
       "reactants": {
         "ester": "@esters"
       },
       "constraints": {
         "min_hits": 2
       },
-      "examples": ["CCOC(=O)C.CCOC(=O)C>>CC(=O)CC(=O)OCC"]
+      "examples": [
+        "CCOC(=O)C.CCOC(=O)C>>CC(=O)CC(=O)OCC"
+      ]
     }
   ]
 }

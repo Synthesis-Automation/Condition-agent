@@ -126,6 +126,23 @@
         "H-OR"
       ]
     },
+    "thiols_sh": {
+      "name": "Thiols (S-H)",
+      "members": [
+        "Ar-SH",
+        "Any-SH",
+        "Alkenyl-SH",
+        "Alkyl-SH",
+        "Alkynyl-SH",
+        "Allyl-SH",
+        "Bn-SH",
+        "CH3-SH",
+        "RCH2-SH",
+        "R2CH-SH",
+        "R3C-SH",
+        "H-SH"
+      ]
+    },
     "carboxylic_acids": {
       "name": "Carboxylic Acids",
       "members": [
