@@ -8,11 +8,13 @@ Provides analytical functions to explore and understand the HTE database:
 - Statistical summaries and coverage analysis
 """
 
-from typing import List, Dict, Optional, Tuple, Any
+from typing import List, Dict, Optional, Tuple, Any, Iterable, Set
 from collections import defaultdict, Counter
+from functools import lru_cache
 import json
 import pandas as pd
 from pathlib import Path
+import re
 
 
 def _ensure_list(values: Any) -> List[str]:
@@ -43,6 +45,73 @@ def _dedupe_list(values: List[str]) -> List[str]:
 def _format_list(values: Any) -> str:
     items = _dedupe_list(_ensure_list(values))
     return " / ".join(items)
+
+
+_MOTIF_SPLIT_RE = re.compile(r"[|,]")
+_COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
+
+
+@lru_cache(maxsize=1)
+def _load_motif_sets() -> Dict[str, List[str]]:
+    if not _COMPOUND_LOGIC_FILE.exists():
+        return {}
+    try:
+        with _COMPOUND_LOGIC_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+    raw_sets = payload.get("motif_sets") or {}
+    motif_sets: Dict[str, List[str]] = {}
+    for name, entry in raw_sets.items():
+        members: List[str] = []
+        if isinstance(entry, dict):
+            members = entry.get("members") or []
+        elif isinstance(entry, list):
+            members = entry
+        motif_sets[name] = [str(m).strip() for m in members if str(m).strip()]
+    return motif_sets
+
+
+def _split_motif_tokens(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, float) and pd.isna(value):
+        return []
+    text = str(value).strip()
+    if not text or text.lower() == "nan":
+        return []
+    return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
+
+
+def _expand_macro_token(token: str, motif_sets: Dict[str, List[str]]) -> List[str]:
+    token = token.strip()
+    if token.startswith("@"):
+        set_name = token[1:]
+        members = motif_sets.get(set_name) or []
+        if members:
+            return members
+    return [token]
+
+
+def _expand_motif_tokens(tokens: Iterable[str], motif_sets: Dict[str, List[str]]) -> List[str]:
+    expanded: List[str] = []
+    for token in tokens:
+        expanded.extend(_expand_macro_token(token, motif_sets))
+    return _dedupe_list(expanded)
+
+
+def _normalize_query_tokens(value: Optional[str], motif_sets: Dict[str, List[str]]) -> Set[str]:
+    tokens = _split_motif_tokens(value)
+    return set(_expand_motif_tokens(tokens, motif_sets))
+
+
+def _field_matches_query(value: Any, query_tokens: Set[str], motif_sets: Dict[str, List[str]]) -> bool:
+    if not query_tokens:
+        return True
+    field_tokens = set(_expand_motif_tokens(_split_motif_tokens(value), motif_sets))
+    if not field_tokens:
+        return False
+    return bool(field_tokens & query_tokens)
 
 
 def _load_hte_jsonl(path: Path) -> pd.DataFrame:
@@ -253,14 +322,17 @@ class HTEAnalytics:
                 - Reaction_Types (list of reaction types using this catalyst)
         """
         df = self.df.copy()
+        motif_sets = _load_motif_sets()
         
         # Apply filters
         if reaction_type:
             df = df[df['Reaction_Type_Standardized'].str.contains(reaction_type, case=False, na=False)]
         if reactant_a_type:
-            df = df[df['Reactant_A_Type'] == reactant_a_type]
+            query_a = _normalize_query_tokens(reactant_a_type, motif_sets)
+            df = df[df['Reactant_A_Type'].apply(lambda value: _field_matches_query(value, query_a, motif_sets))]
         if reactant_b_type:
-            df = df[df['Reactant_B_Type'] == reactant_b_type]
+            query_b = _normalize_query_tokens(reactant_b_type, motif_sets)
+            df = df[df['Reactant_B_Type'].apply(lambda value: _field_matches_query(value, query_b, motif_sets))]
         
         # Extract metal from catalyst name
         def extract_metal(catalyst_name):
@@ -400,9 +472,12 @@ class HTEAnalytics:
             DataFrame of similar reactant pairs with their statistics
         """
         # Find the query pair
+        motif_sets = _load_motif_sets()
+        query_a = _normalize_query_tokens(reactant_a_type, motif_sets)
+        query_b = _normalize_query_tokens(reactant_b_type, motif_sets)
         query_df = self.df[
-            (self.df['Reactant_A_Type'] == reactant_a_type) &
-            (self.df['Reactant_B_Type'] == reactant_b_type)
+            self.df['Reactant_A_Type'].apply(lambda value: _field_matches_query(value, query_a, motif_sets))
+            & self.df['Reactant_B_Type'].apply(lambda value: _field_matches_query(value, query_b, motif_sets))
         ]
         
         if len(query_df) == 0:
@@ -439,8 +514,10 @@ class HTEAnalytics:
         
         # Exclude the query pair itself
         similar_df = similar_df[
-            ~((similar_df['Reactant_A_Type'] == reactant_a_type) &
-              (similar_df['Reactant_B_Type'] == reactant_b_type))
+            ~(
+                similar_df['Reactant_A_Type'].apply(lambda value: _field_matches_query(value, query_a, motif_sets))
+                & similar_df['Reactant_B_Type'].apply(lambda value: _field_matches_query(value, query_b, motif_sets))
+            )
         ]
         
         # Group by reactant pairs
@@ -480,6 +557,7 @@ class HTEAnalytics:
             Number of experiments exported
         """
         df = self.df.copy()
+        motif_sets = _load_motif_sets()
         
         # Apply filters
         if reaction_type:
@@ -489,10 +567,12 @@ class HTEAnalytics:
             df = self._filter_by_catalyst_type(df, catalyst_filter)
         
         if reactant_a_type:
-            df = df[df['Reactant_A_Type'] == reactant_a_type]
+            query_a = _normalize_query_tokens(reactant_a_type, motif_sets)
+            df = df[df['Reactant_A_Type'].apply(lambda value: _field_matches_query(value, query_a, motif_sets))]
         
         if reactant_b_type:
-            df = df[df['Reactant_B_Type'] == reactant_b_type]
+            query_b = _normalize_query_tokens(reactant_b_type, motif_sets)
+            df = df[df['Reactant_B_Type'].apply(lambda value: _field_matches_query(value, query_b, motif_sets))]
         
         if min_yield is not None:
             df = df[df['AREA_TOTAL_REDUCED'] >= min_yield]

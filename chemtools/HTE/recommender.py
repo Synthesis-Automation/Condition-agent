@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple, Any, Iterable, Set
 from collections import defaultdict, Counter
 from functools import lru_cache
+import itertools
+import re
 import pandas as pd
 from pathlib import Path
 import json
@@ -90,9 +92,25 @@ def _load_hte_database_cached(
 
     print("Building reactant type indices...")
 
-    df["Reactant_Types_Key"] = df["Reactant_Types_Key"].fillna("")
-    grouped = df.groupby("Reactant_Types_Key")
-    for key, group_df in grouped:
+    motif_sets = _load_motif_sets()
+    key_to_indices: Dict[str, Set[int]] = defaultdict(set)
+    for row in df.itertuples(index=True):
+        keys = _expand_reactant_keys(
+            getattr(row, "Reactant_A_Type", ""),
+            getattr(row, "Reactant_B_Type", ""),
+            motif_sets,
+        )
+        if not keys:
+            key = _reactant_key([getattr(row, "Reactant_A_Type", ""), getattr(row, "Reactant_B_Type", "")])
+            if key:
+                keys = [key]
+        for key in keys:
+            key_to_indices[key].add(row.Index)
+
+    for key, indices in key_to_indices.items():
+        if not indices:
+            continue
+        group_df = df.loc[sorted(indices)]
         indexed_data[key] = group_df
 
         rxn_types = group_df["Reaction_Type_Standardized"].value_counts()
@@ -143,6 +161,87 @@ def _reactant_key(values: Iterable[Optional[str]]) -> str:
     return "|".join(sorted(items))
 
 
+_MOTIF_SPLIT_RE = re.compile(r"[|,]")
+_COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
+
+
+@lru_cache(maxsize=1)
+def _load_motif_sets() -> Dict[str, List[str]]:
+    if not _COMPOUND_LOGIC_FILE.exists():
+        return {}
+    try:
+        with _COMPOUND_LOGIC_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+    raw_sets = payload.get("motif_sets") or {}
+    motif_sets: Dict[str, List[str]] = {}
+    for name, entry in raw_sets.items():
+        members: List[str] = []
+        if isinstance(entry, dict):
+            members = entry.get("members") or []
+        elif isinstance(entry, list):
+            members = entry
+        motif_sets[name] = [str(m).strip() for m in members if str(m).strip()]
+    return motif_sets
+
+
+def _split_motif_tokens(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, float) and pd.isna(value):
+        return []
+    text = str(value).strip()
+    if not text or text.lower() == "nan":
+        return []
+    return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
+
+
+def _expand_macro_token(token: str, motif_sets: Dict[str, List[str]]) -> List[str]:
+    token = token.strip()
+    if token.startswith("@"):
+        set_name = token[1:]
+        members = motif_sets.get(set_name) or []
+        if members:
+            return members
+    return [token]
+
+
+def _expand_motif_tokens(tokens: Iterable[str], motif_sets: Dict[str, List[str]]) -> List[str]:
+    expanded: List[str] = []
+    for token in tokens:
+        expanded.extend(_expand_macro_token(token, motif_sets))
+    return _dedupe_list(expanded)
+
+
+def _expand_reactant_field(value: Any, motif_sets: Dict[str, List[str]]) -> List[str]:
+    tokens = _split_motif_tokens(value)
+    if not tokens:
+        return [""]
+    options = [_expand_macro_token(token, motif_sets) for token in tokens]
+    expanded_values: List[str] = []
+    for combo in itertools.product(*options):
+        cleaned = _dedupe_list([item.strip() for item in combo if item and str(item).strip()])
+        expanded_values.append(",".join(cleaned))
+    return _dedupe_list([item for item in expanded_values if item or item == ""])
+
+
+def _expand_reactant_keys(
+    reactant_a: Any,
+    reactant_b: Any,
+    motif_sets: Dict[str, List[str]],
+) -> List[str]:
+    expanded_a = _expand_reactant_field(reactant_a, motif_sets)
+    expanded_b = _expand_reactant_field(reactant_b, motif_sets)
+    keys: List[str] = []
+    for a_value in expanded_a:
+        for b_value in expanded_b:
+            key = _reactant_key([a_value, b_value])
+            if key:
+                keys.append(key)
+    return _dedupe_list(keys)
+
+
 def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
     """
     Parse transformation key format: [Reacted] -> [Formed] || [Spectators]
@@ -152,7 +251,9 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
     """
     if " -> " not in key or " || " not in key:
         # Fallback for old flat keys (treat all as reacted)
-        return set(key.split("|")), set(), set()
+        tokens = _split_motif_tokens(key)
+        expanded = _expand_motif_tokens(tokens, _load_motif_sets())
+        return set(expanded), set(), set()
     
     try:
         parts = key.split(" || ")
@@ -164,11 +265,9 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
             # Remove brackets if present
             if p.startswith("[") and p.endswith("]"):
                 p = p[1:-1]
-            # Split by either | or ,
-            if "|" in p:
-                return set(item.strip() for item in p.split("|") if item.strip())
-            else:
-                return set(item.strip() for item in p.split(",") if item.strip())
+            tokens = _split_motif_tokens(p)
+            expanded = _expand_motif_tokens(tokens, _load_motif_sets())
+            return set(expanded)
 
         spectators = parse_part(parts[1])
         
@@ -179,7 +278,9 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
         return reacted, formed, spectators
     except:
         # Robust fallback
-        return set(key.split("|")), set(), set()
+        tokens = _split_motif_tokens(key)
+        expanded = _expand_motif_tokens(tokens, _load_motif_sets())
+        return set(expanded), set(), set()
 
 
 def _derive_query_sets(

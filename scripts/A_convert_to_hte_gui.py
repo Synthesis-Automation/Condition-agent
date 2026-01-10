@@ -134,7 +134,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
             
         name = self.dataset_dropdown.currentText()
         input_path = PROJECT_ROOT / "data" / "reaction_dataset" / f"{name}.jsonl"
-        output_path = PROJECT_ROOT / "data" / "HTE_db" / f"{name}_canonical.csv"
+        output_path = PROJECT_ROOT / "data" / "HTE_db" / "datasets" / f"{name}_canonical.csv"
         
         self.input_edit.setText(str(input_path))
         self.output_edit.setText(str(output_path))
