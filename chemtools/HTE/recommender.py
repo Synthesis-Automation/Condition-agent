@@ -25,6 +25,31 @@ import json
 
 from chemtools.featurizers.structural import featurize_molecule
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _infer_source_group(source_path: Optional[Path]) -> str:
+    if not source_path:
+        return "unknown"
+    parts = [part.lower() for part in source_path.parts]
+    for part in parts:
+        if part == "datasets":
+            return "datasets"
+        if part == "rules":
+            return "rules"
+        if part in ("experiments", "experiment", "experiements"):
+            return "experiments"
+    return "other"
+
+
+def _format_source_path(source_path: Optional[Path]) -> str:
+    if not source_path:
+        return ""
+    try:
+        return source_path.resolve().relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return str(source_path)
+
 
 def _collect_hte_files(db_path: Path) -> List[Path]:
     if db_path.is_file():
@@ -54,7 +79,7 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
     return ordered
 
 
-def _normalize_hte_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = None) -> pd.DataFrame:
     df = df.copy()
 
     column_mapping = {
@@ -83,11 +108,14 @@ def _normalize_hte_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         "Catalyst", "Ligand", "Base", "Solvent", "Additive",
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
         "Reactant_A_Category", "Reactant_B_Category", "Is_Intramolecular",
+        "Source_File", "Source_Group",
     ]
     for col in required_cols:
         if col not in df.columns:
             if col == "Is_Intramolecular":
                 df[col] = df["Reactant_B_Type"].isna() | (df["Reactant_B_Type"] == "")
+            elif col in ("Source_File", "Source_Group"):
+                df[col] = ""
             else:
                 df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
 
@@ -96,6 +124,10 @@ def _normalize_hte_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             lambda row: _reactant_key([row.get("Reactant_A_Type"), row.get("Reactant_B_Type")]),
             axis=1,
         )
+
+    if source_path is not None:
+        df["Source_File"] = _format_source_path(source_path)
+        df["Source_Group"] = _infer_source_group(source_path)
 
     return df
 
@@ -119,7 +151,7 @@ def _load_hte_database_cached(
             frame = _load_hte_jsonl(path)
         else:
             frame = pd.read_csv(path)
-        frame = _normalize_hte_dataframe(frame)
+        frame = _normalize_hte_dataframe(frame, source_path=path)
         frames.append(frame)
 
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()

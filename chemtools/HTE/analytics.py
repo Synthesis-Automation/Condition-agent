@@ -47,6 +47,60 @@ def _format_list(values: Any) -> str:
     return " / ".join(items)
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _collect_hte_files(db_path: Path) -> List[Path]:
+    if db_path.is_file():
+        return [db_path]
+    if not db_path.exists():
+        return []
+
+    candidates: List[Path] = []
+    candidates.extend(db_path.glob("*.csv"))
+    candidates.extend(db_path.glob("*.jsonl"))
+
+    for subdir in ("datasets", "rules", "experiments", "experiment", "experiements"):
+        sub_path = db_path / subdir
+        if not sub_path.exists():
+            continue
+        candidates.extend(sub_path.glob("*.csv"))
+        candidates.extend(sub_path.glob("*.jsonl"))
+
+    seen = set()
+    ordered: List[Path] = []
+    for path in sorted(candidates, key=lambda p: str(p)):
+        key = str(path.resolve())
+        if key in seen:
+            continue
+        seen.add(key)
+        ordered.append(path)
+    return ordered
+
+
+def _infer_source_group(source_path: Optional[Path]) -> str:
+    if not source_path:
+        return "unknown"
+    parts = [part.lower() for part in source_path.parts]
+    for part in parts:
+        if part == "datasets":
+            return "datasets"
+        if part == "rules":
+            return "rules"
+        if part in ("experiments", "experiment", "experiements"):
+            return "experiments"
+    return "other"
+
+
+def _format_source_path(source_path: Optional[Path]) -> str:
+    if not source_path:
+        return ""
+    try:
+        return source_path.resolve().relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return str(source_path)
+
+
 _MOTIF_SPLIT_RE = re.compile(r"[|,]")
 _COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
 
@@ -114,6 +168,43 @@ def _field_matches_query(value: Any, query_tokens: Set[str], motif_sets: Dict[st
     return bool(field_tokens & query_tokens)
 
 
+def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = None) -> pd.DataFrame:
+    df = df.copy()
+
+    column_mapping = {
+        "reaction_type": "Reaction_Type_Standardized",
+        "reactant_1": "Reactant_A_Type",
+        "reactant_2": "Reactant_B_Type",
+        "yield": "AREA_TOTAL_REDUCED",
+        "z_score": "z-Score",
+        "catalyst": "Catalyst",
+        "ligand": "Ligand",
+        "base": "Base",
+        "solvent": "Solvent",
+        "additive": "Additive",
+    }
+    df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
+
+    required_cols = [
+        "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
+        "Catalyst", "Ligand", "Base", "Solvent", "Additive",
+        "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
+        "Reactant_A_Category", "Reactant_B_Category", "Source_File", "Source_Group",
+    ]
+    for col in required_cols:
+        if col not in df.columns:
+            if col in ("Source_File", "Source_Group"):
+                df[col] = ""
+            else:
+                df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
+
+    if source_path is not None:
+        df["Source_File"] = _format_source_path(source_path)
+        df["Source_Group"] = _infer_source_group(source_path)
+
+    return df
+
+
 def _load_hte_jsonl(path: Path) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as handle:
@@ -165,7 +256,7 @@ class HTEAnalytics:
     - Statistical distributions
     """
     
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_canonical.csv"):
+    def __init__(self, hte_db_path: str = "data/HTE_db"):
         """Initialize analytics with HTE database"""
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
