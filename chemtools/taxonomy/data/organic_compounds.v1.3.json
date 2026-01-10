@@ -93,6 +93,14 @@
       "description": "Acetylenic C-H bond."
     },
     {
+      "id": "Alkenyl-H",
+      "name": "Alkenyl-H",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "H",
+      "description": "Vinylic C-H bond."
+    },
+    {
       "id": "Csp2-X",
       "name": "Csp2-X",
       "template": "single_bond",

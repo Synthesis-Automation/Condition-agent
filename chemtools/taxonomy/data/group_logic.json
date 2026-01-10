@@ -74,7 +74,7 @@
     },
     "Carbamate_All": {
       "name": "Carbamate (All)",
-      "members": ["NHCO2R", "NRCO2R"],
+      "members": ["NCO2R"],
       "description": "Secondary and tertiary carbamates."
     },
     "Fluorinated_Group": {

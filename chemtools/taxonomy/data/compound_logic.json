@@ -70,8 +70,25 @@
         "Ar-NHR",
         "Any-NH2",
         "Any-NHR",
+        "Alkenyl-NH2",
+        "Alkenyl-NHR",
+        "Alkyl-NH2",
+        "Alkyl-NHR",
+        "Alkynyl-NH2",
+        "Alkynyl-NHR",
+        "Allyl-NH2",
+        "Allyl-NHR",
         "Bn-NH2",
         "Bn-NHR",
+        "CH3-NH2",
+        "CH3-NHR",
+        "Propargyl-NH2",
+        "RCH2-NH2",
+        "RCH2-NHR",
+        "R2CH-NH2",
+        "R2CH-NHR",
+        "R3C-NH2",
+        "R3C-NHR",
         "Indole",
         "Pyrrole",
         "Imidazole",
@@ -95,6 +112,16 @@
       "members": [
         "Ar-OH",
         "Any-OH",
+        "Alkenyl-OH",
+        "Alkyl-OH",
+        "Alkynyl-OH",
+        "Allyl-OH",
+        "Bn-OH",
+        "CH3-OH",
+        "Propargyl-OH",
+        "RCH2-OH",
+        "R2CH-OH",
+        "R3C-OH",
         "H-OH",
         "H-OR"
       ]
@@ -102,7 +129,13 @@
     "carboxylic_acids": {
       "name": "Carboxylic Acids",
       "members": [
-        "Any-CO2H"
+        "Any-CO2H",
+        "Ar-CO2H",
+        "Alkenyl-CO2H",
+        "Alkyl-CO2H",
+        "RCH2-CO2H",
+        "R2CH-CO2H",
+        "R3C-CO2H"
       ]
     },
     "acyl_halides": {
@@ -138,7 +171,20 @@
       "members": [
         "Ar-CHO",
         "Any-CHO",
-        "Any-COR"
+        "Alkenyl-CHO",
+        "Alkyl-CHO",
+        "RCH2-CHO",
+        "R2CH-CHO",
+        "R3C-CHO",
+        "Any-COR",
+        "Ar-COR",
+        "Alkenyl-COR",
+        "Alkyl-COR",
+        "Allyl-COR",
+        "Bn-COR",
+        "RCH2-COR",
+        "R2CH-COR",
+        "R3C-COR"
       ]
     },
     "aromatic_halides": {
@@ -177,7 +223,15 @@
       "name": "Esters",
       "members": [
         "Ar-CO2R",
-        "Any-CO2R"
+        "Any-CO2R",
+        "Alkenyl-CO2R",
+        "Alkyl-Ester",
+        "Alkynyl-CO2R",
+        "Allyl-CO2R",
+        "Bn-CO2R",
+        "RCH2-CO2R",
+        "R2CH-CO2R",
+        "R3C-CO2R"
       ]
     },
     "amides": {
@@ -188,7 +242,31 @@
         "Any-CONR2",
         "Ar-CONH2",
         "Ar-CONHR",
-        "Ar-CONR2"
+        "Ar-CONR2",
+        "Alkenyl-CONH2",
+        "Alkenyl-CONHR",
+        "Alkenyl-CONR2",
+        "Alkyl-CONH2",
+        "Alkyl-CONHR",
+        "Alkyl-CONR2",
+        "Alkynyl-CONH2",
+        "Alkynyl-CONHR",
+        "Alkynyl-CONR2",
+        "Allyl-CONH2",
+        "Allyl-CONHR",
+        "Allyl-CONR2",
+        "Bn-CONH2",
+        "Bn-CONHR",
+        "Bn-CONR2",
+        "RCH2-CONH2",
+        "RCH2-CONHR",
+        "RCH2-CONR2",
+        "R2CH-CONH2",
+        "R2CH-CONHR",
+        "R2CH-CONR2",
+        "R3C-CONH2",
+        "R3C-CONHR",
+        "R3C-CONR2"
       ]
     },
     "hydrogenation_substrates": {
@@ -198,7 +276,10 @@
         "Alkyl-C#CH",
         "Ar-C=CH2",
         "Alkyl-C=CH2",
-        "Any-C=C"
+        "Any-C=C",
+        "Ar-C=C",
+        "Alkyl-C=C",
+        "H-Alkenyl"
       ]
     },
     "cross_coupling_products": {

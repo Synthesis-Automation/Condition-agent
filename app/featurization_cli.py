@@ -8,7 +8,7 @@ import json
 import sys
 from pathlib import Path
 import argparse
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List
 
 # Ensure repo root is on sys.path for direct execution.
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -22,8 +22,49 @@ def _print_json(payload: Dict[str, Any]) -> None:
     print(json.dumps(payload, indent=2, sort_keys=True))
 
 
-def _format_list(items: Iterable[str]) -> str:
-    return "\n".join(f"  - {item}" for item in items)
+def _format_list(items: Iterable[str], *, indent: int = 2) -> str:
+    prefix = " " * indent
+    return "\n".join(f"{prefix}- {item}" for item in items)
+
+
+def _format_value(value: Any) -> str:
+    if value is None:
+        return "none"
+    if isinstance(value, float):
+        return f"{value:.3f}".rstrip("0").rstrip(".")
+    if isinstance(value, list):
+        if not value:
+            return "none"
+        if all(isinstance(v, (str, int, float, bool)) for v in value):
+            return ", ".join(str(v) for v in value)
+        return json.dumps(value, sort_keys=True)
+    if isinstance(value, dict):
+        if not value:
+            return "none"
+        return json.dumps(value, sort_keys=True)
+    return str(value)
+
+
+def _format_kv_inline(data: Dict[str, Any]) -> str:
+    if not data:
+        return "none"
+    parts = []
+    for key in sorted(data):
+        parts.append(f"{key}={_format_value(data[key])}")
+    return ", ".join(parts)
+
+
+def _format_mapping_lines(data: Dict[str, Any], *, sort_keys: bool = True) -> List[str]:
+    if not data:
+        return []
+    keys = sorted(data) if sort_keys else data.keys()
+    lines = []
+    for key in keys:
+        value = data.get(key)
+        if value is None or value == "" or value == [] or value == {}:
+            continue
+        lines.append(f"{key}: {_format_value(value)}")
+    return lines
 
 
 def _format_compound_id(entry: Dict[str, Any]) -> str:
@@ -51,85 +92,329 @@ def _get_reaction_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
     return payload
 
 
-def _print_molecule_summary(payload: Dict[str, Any]) -> None:
+def _print_meta_section(title: str, meta: Dict[str, Any], *, indent: int = 0) -> None:
+    if not meta:
+        return
+    prefix = " " * indent
+    print(f"{prefix}{title}:")
+    lines = _format_mapping_lines(meta)
+    if lines:
+        print(_format_list(lines, indent=indent + 2))
+
+
+def _print_rdkit_props(props: Dict[str, Any], *, indent: int = 0) -> None:
+    if not props:
+        return
+    prefix = " " * indent
+    print(f"{prefix}RDKit Properties:")
+    lines = _format_mapping_lines(props)
+    if lines:
+        print(_format_list(lines, indent=indent + 2))
+
+
+def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
+    motifs_list = list(motifs or [])
+    if not motifs_list:
+        return
+    prefix = " " * indent
+    print(f"{prefix}Motifs ({len(motifs_list)}):")
+    lines = []
+    for motif in motifs_list:
+        display_name = _format_compound_id(motif)
+        a_idx = motif.get("a_atom_idx")
+        b_idx = motif.get("b_atom_idx")
+        bond = motif.get("bond")
+        details = []
+        if a_idx is not None:
+            details.append(f"a={a_idx}")
+        if b_idx is not None:
+            details.append(f"b={b_idx}")
+        if bond is not None:
+            details.append(f"bond={bond}")
+        if details:
+            lines.append(f"{display_name} ({', '.join(details)})")
+        else:
+            lines.append(display_name)
+    print(_format_list(lines, indent=indent + 2))
+
+
+def _print_nearby_groups(groups: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
+    prefix = " " * indent
+    group_list = list(groups or [])
+    if not group_list:
+        print(f"{prefix}nearby_groups: none")
+        return
+    print(f"{prefix}nearby_groups:")
+    for entry in group_list:
+        if not isinstance(entry, dict):
+            print(f"{prefix}  - {entry}")
+            continue
+        name = entry.get("name") or "unknown"
+        details = [name]
+        group_id = entry.get("group_id")
+        if group_id:
+            details.append(f"group_id={group_id}")
+        tags = entry.get("tags") or []
+        if tags:
+            details.append(f"tags={_format_value(tags)}")
+        print(f"{prefix}  - {'; '.join(details)}")
+
+
+def _print_motif_analyses(analyses: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
+    analysis_list = list(analyses or [])
+    if not analysis_list:
+        return
+    prefix = " " * indent
+    print(f"{prefix}Per-Motif Analysis ({len(analysis_list)}):")
+    for entry in analysis_list:
+        cid = _format_compound_id(entry)
+        print(f"{prefix}  - {cid}")
+        center = entry.get("center") or {}
+        if center:
+            print(f"{prefix}    center: {_format_kv_inline(center)}")
+        steric = entry.get("steric")
+        if steric:
+            if isinstance(steric, dict):
+                print(f"{prefix}    steric: {_format_kv_inline(steric)}")
+            else:
+                print(f"{prefix}    steric: {_format_value(steric)}")
+        electronic = entry.get("electronic")
+        if electronic is not None:
+            if isinstance(electronic, list):
+                print(f"{prefix}    electronic:")
+                for idx, e_entry in enumerate(electronic, start=1):
+                    if isinstance(e_entry, dict):
+                        formatted = _format_kv_inline(e_entry)
+                    else:
+                        formatted = _format_value(e_entry)
+                    print(f"{prefix}      - [{idx}] {formatted}")
+            elif isinstance(electronic, dict):
+                print(f"{prefix}    electronic: {_format_kv_inline(electronic)}")
+            else:
+                print(f"{prefix}    electronic: {_format_value(electronic)}")
+        if "nearby_groups" in entry:
+            _print_nearby_groups(entry.get("nearby_groups") or [], indent=indent + 4)
+
+
+def _print_snar_feasibility(items: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
+    snar_list = list(items or [])
+    if not snar_list:
+        return
+    prefix = " " * indent
+    print(f"{prefix}SNAr Feasibility:")
+    for item in snar_list:
+        status = "YES" if item.get("feasible") else "NO"
+        motif = item.get("motif") or "unknown"
+        confidence = item.get("confidence")
+        score = item.get("score")
+        details = [status]
+        if confidence is not None:
+            details.append(f"confidence={confidence}")
+        if score is not None:
+            details.append(f"score={score}")
+        print(f"{prefix}  - {motif}: {', '.join(details)}")
+        reason = item.get("reason")
+        if reason:
+            print(f"{prefix}    Reason: {reason}")
+
+
+def _print_molecule_detail(payload: Dict[str, Any], *, indent: int = 0) -> None:
     molecule = _get_molecule_payload(payload)
+    prefix = " " * indent
+    print(f"{prefix}SMILES: {molecule.get('smiles')}")
+    payload_schema = payload.get("schema_version") if "molecule" in payload else None
+    if payload_schema:
+        print(f"{prefix}Payload Schema: {payload_schema}")
+    schema_version = molecule.get("schema_version")
+    if schema_version:
+        print(f"{prefix}Schema: {schema_version}")
+
+    payload_meta = payload.get("meta") if "molecule" in payload else None
+    if payload_meta:
+        _print_meta_section("Payload Meta", payload_meta, indent=indent)
+    molecule_meta = molecule.get("meta")
+    if molecule_meta:
+        _print_meta_section("Molecule Meta", molecule_meta, indent=indent)
+
+    _print_rdkit_props(molecule.get("rdkit_props") or {}, indent=indent)
+    _print_motifs(molecule.get("motifs") or [], indent=indent)
+    _print_motif_analyses(molecule.get("analyses") or [], indent=indent)
+    _print_snar_feasibility(molecule.get("snar_feasibility") or [], indent=indent)
+
+
+def _print_molecule_summary(payload: Dict[str, Any]) -> None:
     print("\nSummary (Molecule)")
     print("-" * 72)
-    print(f"SMILES: {molecule.get('smiles')}")
+    _print_molecule_detail(payload, indent=0)
 
-    motifs = molecule.get("motifs") or []
-    if motifs:
-        lines = []
-        for motif in motifs:
-            display_name = _format_compound_id(motif)
-            a_idx = motif.get("a_atom_idx")
-            b_idx = motif.get("b_atom_idx")
-            lines.append(f"{display_name} (a={a_idx}, b={b_idx})")
-        print("Motifs:")
-        print(_format_list(lines))
 
-    steric = molecule.get("steric", {})
-    aryl = steric.get("aryl", []) if isinstance(steric, dict) else []
-    alkyl = steric.get("alkyl", []) if isinstance(steric, dict) else []
-    if aryl:
-        print("Aryl Steric:")
-        entries = []
-        for entry in aryl:
-            result = entry.get("result", {})
-            cid = _format_compound_id(entry)
-            entries.append(
-                f"{cid}: score={result.get('score_0_10')}, "
-                f"ortho_subs={result.get('ortho_substituent_count')}"
-            )
-        print(_format_list(entries))
-    if alkyl:
-        print("Alkyl Steric:")
-        entries = []
-        for entry in alkyl:
-            result = entry.get("result", {})
-            cid = _format_compound_id(entry)
-            entries.append(
-                f"{cid}: score={result.get('score_0_10')}"
-            )
-        print(_format_list(entries))
+def _print_normalized_entries(title: str, entries: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
+    entry_list = list(entries or [])
+    prefix = " " * indent
+    print(f"{prefix}{title} ({len(entry_list)}):")
+    if not entry_list:
+        print(f"{prefix}  - none")
+        return
+    for idx, entry in enumerate(entry_list, start=1):
+        label = (
+            entry.get("smiles_norm")
+            or entry.get("largest_smiles")
+            or entry.get("input")
+            or "unknown"
+        )
+        print(f"{prefix}  - [{idx}] {label}")
+        for key in ("input", "smiles_norm", "largest_smiles", "fragments", "error"):
+            value = entry.get(key)
+            if value is None or value == "" or value == []:
+                continue
+            formatted = _format_value(value) if key == "fragments" else value
+            print(f"{prefix}    {key}: {formatted}")
 
-    electronics = molecule.get("electronics", {})
-    aryl_elec = electronics.get("aryl", []) if isinstance(electronics, dict) else []
-    if aryl_elec:
-        print("Aryl Electronics:")
-        entries = []
-        for entry in aryl_elec:
-            result = entry.get("result", {})
-            cid = _format_compound_id(entry)
-            include_score = result.get("including_group_score_0_10")
-            suffix = f", including_group={include_score}" if include_score is not None else ""
-            entries.append(
-                f"{cid}: score={result.get('score_0_10')}{suffix}"
-            )
-        print(_format_list(entries))
 
-    nearby = molecule.get("nearby", [])
-    if nearby:
-        print("Nearby Groups (per motif):")
-        entries = []
-        for entry in nearby:
-            cid = _format_compound_id(entry)
-            groups = entry.get("result") or []
-            if groups:
-                # groups is a list of dicts with 'name' key
-                group_names = [g.get("name", "unknown") if isinstance(g, dict) else str(g) for g in groups]
-                entries.append(f"{cid}: {', '.join(group_names)}")
-            else:
-                entries.append(f"{cid}: none")
-        print(_format_list(entries))
+def _print_reaction_type(reaction_type: Dict[str, Any], *, indent: int = 0) -> None:
+    if not reaction_type:
+        return
+    prefix = " " * indent
+    print(f"{prefix}Reaction Type:")
+    lines = []
+    for key in ("reaction_type", "name", "category", "confidence"):
+        value = reaction_type.get(key)
+        if value is not None:
+            lines.append(f"{key}: {value}")
+    if lines:
+        print(_format_list(lines, indent=indent + 2))
+    slot_evidence = reaction_type.get("slot_evidence") or {}
+    if slot_evidence:
+        print(f"{prefix}  Slot Evidence:")
+        for slot in sorted(slot_evidence):
+            motifs = slot_evidence.get(slot) or []
+            print(f"{prefix}    - {slot}: {_format_value(motifs)}")
 
-    snar = molecule.get("snar_feasibility")
-    if snar:
-        print("SNAr Feasibility:")
-        for item in snar:
-            status = "YES" if item.get("feasible") else "NO"
-            print(f"  - {item.get('motif')}: {status} (confidence: {item.get('confidence')})")
-            print(f"    Reason: {item.get('reason')}")
+
+def _print_detection(detection: Dict[str, Any], *, indent: int = 0) -> None:
+    if not detection:
+        return
+    prefix = " " * indent
+    error = detection.get("error")
+    if error:
+        print(f"{prefix}Detection Error: {error}")
+    matches = detection.get("matches") or []
+    print(f"{prefix}Detection Matches ({len(matches)}):")
+    if not matches:
+        print(f"{prefix}  - none")
+        return
+    for match in matches:
+        name = match.get("name") or match.get("reaction_type") or "unknown"
+        category = match.get("category")
+        header = f"{name} ({category})" if category else name
+        print(f"{prefix}  - {header}")
+        slot_evidence = match.get("slot_evidence") or {}
+        for slot in sorted(slot_evidence):
+            motifs = slot_evidence.get(slot) or []
+            print(f"{prefix}    {slot}: {_format_value(motifs)}")
+
+
+def _print_roles_summary(roles: Dict[str, Any], *, indent: int = 0) -> None:
+    if not roles:
+        return
+    prefix = " " * indent
+    print(f"{prefix}Role Classification:")
+    lines = []
+    for key in (
+        "reaction_type",
+        "confidence",
+        "detection_method",
+        "num_reactants",
+        "has_multi_functional_substrates",
+    ):
+        value = roles.get(key)
+        if value is not None:
+            lines.append(f"{key}: {value}")
+    if lines:
+        print(_format_list(lines, indent=indent + 2))
+    reactants = roles.get("reactants") or []
+    if reactants:
+        print(f"{prefix}  Reactants:")
+        for reactant in reactants:
+            pos = reactant.get("position")
+            name = reactant.get("name") or reactant.get("category") or "unknown"
+            label = f"pos {pos}: {name}" if pos is not None else name
+            print(f"{prefix}    - {label}")
+            detail_parts = []
+            for key in ("category", "member_type", "role", "is_expected", "has_alternatives"):
+                value = reactant.get(key)
+                if value is not None:
+                    detail_parts.append(f"{key}={value}")
+            if detail_parts:
+                print(f"{prefix}      {', '.join(detail_parts)}")
+            alternatives = reactant.get("alternative_functional_groups") or []
+            if alternatives:
+                print(f"{prefix}      alternatives:")
+                for alt in alternatives:
+                    alt_label = alt.get("name") or alt.get("category") or "unknown"
+                    alt_parts = []
+                    for key in ("category", "member_type"):
+                        value = alt.get(key)
+                        if value is not None:
+                            alt_parts.append(f"{key}={value}")
+                    if alt_parts:
+                        alt_label = f"{alt_label} ({', '.join(alt_parts)})"
+                    print(f"{prefix}        - {alt_label}")
+
+
+def _print_agent_roles(agent_roles: Dict[str, Any], *, indent: int = 0) -> None:
+    if not agent_roles:
+        return
+    prefix = " " * indent
+    print(f"{prefix}Agent Roles:")
+    agent_count = agent_roles.get("agent_count")
+    if agent_count is not None:
+        print(f"{prefix}  - agent_count: {agent_count}")
+    for label in ("role_counts", "family_counts", "role_flags", "flags"):
+        data = agent_roles.get(label) or {}
+        if data:
+            print(f"{prefix}  - {label}:")
+            lines = _format_mapping_lines(data)
+            if lines:
+                print(_format_list(lines, indent=indent + 4))
+    agents = agent_roles.get("agents") or []
+    if agents:
+        print(f"{prefix}  Agents:")
+        for agent in agents:
+            label = agent.get("input") or agent.get("smiles") or "unknown"
+            print(f"{prefix}    - {label}")
+            details = []
+            for key in ("role_name", "family_name", "match_kind"):
+                value = agent.get(key)
+                if value:
+                    details.append(f"{key}={value}")
+            if details:
+                print(f"{prefix}      {', '.join(details)}")
+
+
+def _print_reaction_feasibility(feasibility: Dict[str, Any], *, indent: int = 0) -> None:
+    if not feasibility:
+        return
+    prefix = " " * indent
+    print(f"{prefix}Feasibility Analysis:")
+    status = "YES" if feasibility.get("feasible") else "NO"
+    confidence = feasibility.get("confidence")
+    score = feasibility.get("score")
+    details = [f"possible={status}"]
+    if confidence is not None:
+        details.append(f"confidence={confidence}")
+    if score is not None:
+        details.append(f"score={score}")
+    print(f"{prefix}  - {', '.join(details)}")
+    reason = feasibility.get("reason")
+    if reason:
+        print(f"{prefix}  - reason: {reason}")
+    extra = feasibility.get("details") or {}
+    if extra:
+        print(f"{prefix}  - details:")
+        lines = _format_mapping_lines(extra)
+        if lines:
+            print(_format_list(lines, indent=indent + 4))
 
 
 def _print_reaction_summary(payload: Dict[str, Any]) -> None:
@@ -137,35 +422,55 @@ def _print_reaction_summary(payload: Dict[str, Any]) -> None:
     print("\nSummary (Reaction)")
     print("-" * 72)
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
+    payload_schema = payload.get("schema_version") if "reaction" in payload else None
+    if payload_schema:
+        print(f"Payload Schema: {payload_schema}")
 
-    reaction_type = reaction.get("reaction_type") or {}
-    if isinstance(reaction_type, dict):
-        print(
-            "Reaction Type: "
-            f"{reaction_type.get('reaction_type') or reaction_type.get('name')}"
-            f" (confidence {reaction_type.get('confidence')})"
+    payload_meta = payload.get("meta") if "reaction" in payload else None
+    if payload_meta:
+        _print_meta_section("Payload Meta", payload_meta)
+
+    normalized = reaction.get("normalized") or {}
+    if normalized:
+        print("Normalization:")
+        normalization_lines = _format_mapping_lines(
+            {
+                "input": normalized.get("input"),
+                "normalized": normalized.get("normalized"),
+            }
         )
+        if normalization_lines:
+            print(_format_list(normalization_lines, indent=2))
+        errors = normalized.get("errors") or []
+        if errors:
+            print(_format_list([f"errors: {_format_value(errors)}"], indent=2))
+        _print_normalized_entries("Reactants", normalized.get("reactants") or [], indent=2)
+        _print_normalized_entries("Agents", normalized.get("agents") or [], indent=2)
+        _print_normalized_entries("Products", normalized.get("products") or [], indent=2)
 
-    detection = reaction.get("detection", {})
-    matches = detection.get("matches") if isinstance(detection, dict) else None
-    if matches:
-        print(f"Detection Matches: {len(matches)}")
-
-    reactants = reaction.get("reactants") or []
-    print(f"Reactants: {len(reactants)}")
+    _print_reaction_type(reaction.get("reaction_type") or {})
+    _print_detection(reaction.get("detection") or {})
 
     aggregates = reaction.get("aggregates") or {}
     if aggregates:
         print("Aggregates:")
-        for key, value in aggregates.items():
-            print(f"  - {key}: {value}")
+        lines = _format_mapping_lines(aggregates)
+        if lines:
+            print(_format_list(lines))
 
-    feasibility = reaction.get("feasibility")
-    if feasibility:
-        print("Feasibility Analysis:")
-        status = "YES" if feasibility.get("feasible") else "NO"
-        print(f"  - Possible: {status} (confidence: {feasibility.get('confidence')})")
-        print(f"  - Reason: {feasibility.get('reason')}")
+    _print_roles_summary(reaction.get("roles") or {})
+    _print_agent_roles(reaction.get("agent_roles") or {})
+
+    reactants = reaction.get("reactants") or []
+    print(f"Reactants ({len(reactants)}):")
+    if reactants:
+        for idx, reactant in enumerate(reactants, start=1):
+            print(f"  Reactant {idx}:")
+            _print_molecule_detail(reactant, indent=4)
+    else:
+        print("  - none")
+
+    _print_reaction_feasibility(reaction.get("feasibility") or {})
 
 
 def _print_readable(payload: Dict[str, Any]) -> None:
