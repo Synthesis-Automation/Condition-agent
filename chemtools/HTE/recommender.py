@@ -26,6 +26,80 @@ import json
 from chemtools.featurizers.structural import featurize_molecule
 
 
+def _collect_hte_files(db_path: Path) -> List[Path]:
+    if db_path.is_file():
+        return [db_path]
+    if not db_path.exists():
+        return []
+
+    candidates: List[Path] = []
+    candidates.extend(db_path.glob("*.csv"))
+    candidates.extend(db_path.glob("*.jsonl"))
+
+    for subdir in ("datasets", "rules", "experiments", "experiment", "experiements"):
+        sub_path = db_path / subdir
+        if not sub_path.exists():
+            continue
+        candidates.extend(sub_path.glob("*.csv"))
+        candidates.extend(sub_path.glob("*.jsonl"))
+
+    seen = set()
+    ordered: List[Path] = []
+    for path in sorted(candidates, key=lambda p: str(p)):
+        key = str(path.resolve())
+        if key in seen:
+            continue
+        seen.add(key)
+        ordered.append(path)
+    return ordered
+
+
+def _normalize_hte_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    column_mapping = {
+        "reaction_type": "Reaction_Type_Standardized",
+        "reactant_1": "Reactant_A_Type",
+        "reactant_2": "Reactant_B_Type",
+        "yield": "AREA_TOTAL_REDUCED",
+        "z_score": "z-Score",
+        "catalyst": "Catalyst",
+        "ligand": "Ligand",
+        "base": "Base",
+        "solvent": "Solvent",
+        "additive": "Additive",
+    }
+
+    df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
+
+    if "Reaction_Key" in df.columns:
+        if "Reaction_Type_Standardized" not in df.columns or not any(df["Reaction_Type_Standardized"]):
+            df["Reaction_Type_Standardized"] = df["Reaction_Key"]
+        if "Reactant_Types_Key" not in df.columns or not any(df["Reactant_Types_Key"]):
+            df["Reactant_Types_Key"] = df["Reaction_Key"]
+
+    required_cols = [
+        "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
+        "Catalyst", "Ligand", "Base", "Solvent", "Additive",
+        "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
+        "Reactant_A_Category", "Reactant_B_Category", "Is_Intramolecular",
+    ]
+    for col in required_cols:
+        if col not in df.columns:
+            if col == "Is_Intramolecular":
+                df[col] = df["Reactant_B_Type"].isna() | (df["Reactant_B_Type"] == "")
+            else:
+                df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
+
+    if "Reactant_Types_Key" not in df.columns:
+        df["Reactant_Types_Key"] = df.apply(
+            lambda row: _reactant_key([row.get("Reactant_A_Type"), row.get("Reactant_B_Type")]),
+            axis=1,
+        )
+
+    return df
+
+
 @lru_cache(maxsize=4)
 def _load_hte_database_cached(
     hte_db_path: str,
@@ -35,56 +109,21 @@ def _load_hte_database_cached(
     if not db_path.exists():
         raise FileNotFoundError(f"HTE database not found: {db_path}")
 
-    if db_path.suffix.lower() == ".jsonl":
-        df = _load_hte_jsonl(db_path)
-    else:
-        df = pd.read_csv(db_path)
-        
-        # Map new canonical CSV columns to internal standard names
-        column_mapping = {
-            "reaction_type": "Reaction_Type_Standardized",
-            "reactant_1": "Reactant_A_Type",
-            "reactant_2": "Reactant_B_Type",
-            "yield": "AREA_TOTAL_REDUCED",
-            "z_score": "z-Score",
-            "catalyst": "Catalyst",
-            "ligand": "Ligand",
-            "base": "Base",
-            "solvent": "Solvent",
-            "additive": "Additive"
-        }
-        
-        # Rename columns if they exist
-        df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
-        
-        # Standardize modern HTE format if present (Reaction_Key replaces legacy keys)
-        if "Reaction_Key" in df.columns:
-            if "Reaction_Type_Standardized" not in df.columns or not any(df["Reaction_Type_Standardized"]):
-                df["Reaction_Type_Standardized"] = df["Reaction_Key"]
-            if "Reactant_Types_Key" not in df.columns or not any(df["Reactant_Types_Key"]):
-                df["Reactant_Types_Key"] = df["Reaction_Key"]
+    file_paths = _collect_hte_files(db_path)
+    if not file_paths:
+        raise FileNotFoundError(f"No HTE CSV/JSONL files found under: {db_path}")
 
-        # Ensure missing columns are present
-        required_cols = [
-            "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
-            "Catalyst", "Ligand", "Base", "Solvent", "Additive",
-            "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
-            "Reactant_A_Category", "Reactant_B_Category", "Is_Intramolecular"
-        ]
-        for col in required_cols:
-            if col not in df.columns:
-                if col == "Is_Intramolecular":
-                    # Heuristic: if reactant_2 is empty, it's likely intramolecular
-                    df[col] = df["Reactant_B_Type"].isna() | (df["Reactant_B_Type"] == "")
-                else:
-                    df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
+    frames: List[pd.DataFrame] = []
+    for path in file_paths:
+        if path.suffix.lower() == ".jsonl":
+            frame = _load_hte_jsonl(path)
+        else:
+            frame = pd.read_csv(path)
+        frame = _normalize_hte_dataframe(frame)
+        frames.append(frame)
 
-        if "Reactant_Types_Key" not in df.columns:
-            df["Reactant_Types_Key"] = df.apply(
-                lambda row: _reactant_key([row.get("Reactant_A_Type"), row.get("Reactant_B_Type")]),
-                axis=1,
-            )
-    print(f"Loaded HTE database: {len(df)} experiments")
+    df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+    print(f"Loaded HTE database: {len(df)} experiments from {len(file_paths)} files")
 
     indexed_data: Dict[str, pd.DataFrame] = {}
     reaction_type_patterns: Dict[str, Counter] = {}
@@ -410,7 +449,7 @@ class HTERecommender:
     5. Return top-k recommendations
     """
     
-    def __init__(self, hte_db_path: str = "data/HTE_db/HTE_canonical.csv"):
+    def __init__(self, hte_db_path: str = "data/HTE_db"):
         """Initialize recommender with HTE database"""
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
@@ -803,42 +842,60 @@ class HTERecommender:
                     temp_df.loc[~mask, 'match_score'] = score
                 else:
                     temp_df['match_score'] = score
+
+                temp_df['match_priority'] = 1
                     
                 scored_matches.append(temp_df)
         
         matched_df = None
+        match_dfs: List[pd.DataFrame] = []
         if scored_matches:
-            matched_df = pd.concat(scored_matches)
-            result.is_fallback_match = False
+            match_dfs.extend(scored_matches)
             # Use the highest scoring transformation as the "matched motifs" for display
             best_key = max(scored_matches, key=lambda x: x['match_score'].iloc[0])['Reaction_Type_Standardized'].iloc[0]
             result.matched_motifs = (best_key, "")
-            result.total_matching_experiments = len(matched_df)
-        else:
-            # Fallback to old motif-based matching if no transformation match found
-            key = _reactant_key(list(type_a) + list(type_b))
-            if key in self.indexed_data:
-                matched_df = self.indexed_data[key].copy()
-                matched_df['match_score'] = 1.0
+
+        key = _reactant_key(list(type_a) + list(type_b))
+        direct_match: Optional[pd.DataFrame] = None
+        fallback_used = False
+        if key in self.indexed_data:
+            direct_match = self.indexed_data[key].copy()
+            direct_match['match_score'] = 1.0
+            direct_match['match_priority'] = 0
+            if not result.matched_motifs:
                 result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
-                result.total_matching_experiments = len(matched_df)
-            else:
-                list_a = type_a or [""]
-                list_b = type_b or [""]
-                for ma in list_a:
-                    for mb in list_b:
-                        if not ma and not mb:
-                            continue
-                        candidate = _reactant_key([ma, mb])
-                        if candidate in self.indexed_data:
-                            matched_df = self.indexed_data[candidate].copy()
-                            matched_df['match_score'] = 1.0
+        else:
+            list_a = type_a or [""]
+            list_b = type_b or [""]
+            for ma in list_a:
+                for mb in list_b:
+                    if not ma and not mb:
+                        continue
+                    candidate = _reactant_key([ma, mb])
+                    if candidate in self.indexed_data:
+                        direct_match = self.indexed_data[candidate].copy()
+                        direct_match['match_score'] = 1.0
+                        direct_match['match_priority'] = 0
+                        if not result.matched_motifs:
                             result.matched_motifs = (ma, mb)
-                            result.is_fallback_match = True
-                            result.total_matching_experiments = len(matched_df)
-                            break
-                    if matched_df is not None:
+                        fallback_used = True
                         break
+                if direct_match is not None:
+                    break
+
+        if direct_match is not None:
+            match_dfs.append(direct_match)
+
+        if match_dfs:
+            matched_df = pd.concat(match_dfs, axis=0)
+            if 'match_priority' in matched_df.columns:
+                matched_df = matched_df.sort_values(['match_priority', 'match_score'], ascending=False)
+            elif 'match_score' in matched_df.columns:
+                matched_df = matched_df.sort_values('match_score', ascending=False)
+            matched_df = matched_df[~matched_df.index.duplicated(keep="first")]
+            result.total_matching_experiments = len(matched_df)
+            if not scored_matches and fallback_used:
+                result.is_fallback_match = True
 
         if matched_df is None:
             return result
