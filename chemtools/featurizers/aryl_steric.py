@@ -13,36 +13,39 @@ _GROUP_BULK_CAP = 20
 _STERICS_METHOD = "ortho_bulk_scaffold_v1"
 
 
-def analyze_aryl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
+def analyze_aryl_steric(
+    mol: Any,
+    hit: Dict[str, Any],
+    *,
+    include_details: bool = False,
+) -> Dict[str, Any]:
     """
     Compute steric bulk around the ipso carbon for Ar-* motifs.
     """
+    def empty_result() -> Dict[str, Any]:
+        result: Dict[str, Any] = {
+            "score_0_10": 0.0,
+            "group_bulk_0_10": 0.0,
+            "description": "no steric",
+            "method": _STERICS_METHOD,
+        }
+        if include_details:
+            result["details"] = {
+                "scaffold_score_0_10": 0.0,
+                "ortho": [],
+                "ortho_position_count": 0,
+                "ortho_substituent_count": 0,
+            }
+        return result
+
     ipso = hit.get("a_atom_idx")
     x_root = hit.get("b_atom_idx")
     if ipso is None or x_root is None:
-        return {
-            "scaffold_score_0_10": 0.0,
-            "score_0_10": 0.0,
-            "group_bulk_0_10": 0.0,
-            "description": "no steric",
-            "method": _STERICS_METHOD,
-            "ortho": [],
-            "ortho_position_count": 0,
-            "ortho_substituent_count": 0,
-        }
+        return empty_result()
 
     ring_atoms = _find_aryl_ring(mol, ipso)
     if not ring_atoms:
-        return {
-            "scaffold_score_0_10": 0.0,
-            "score_0_10": 0.0,
-            "group_bulk_0_10": 0.0,
-            "description": "no steric",
-            "method": _STERICS_METHOD,
-            "ortho": [],
-            "ortho_position_count": 0,
-            "ortho_substituent_count": 0,
-        }
+        return empty_result()
 
     ortho_atoms = [
         nbr.GetIdx()
@@ -68,16 +71,20 @@ def analyze_aryl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
     else:
         desc = "highly steric"
 
-    return {
-        "scaffold_score_0_10": scaffold_score,
+    result: Dict[str, Any] = {
         "score_0_10": scaffold_score,
         "group_bulk_0_10": group_bulk,
         "description": desc,
         "method": _STERICS_METHOD,
-        "ortho": ortho_entries,
-        "ortho_position_count": len(ortho_entries),
-        "ortho_substituent_count": ortho_substituent_count,
     }
+    if include_details:
+        result["details"] = {
+            "scaffold_score_0_10": scaffold_score,
+            "ortho": ortho_entries,
+            "ortho_position_count": len(ortho_entries),
+            "ortho_substituent_count": ortho_substituent_count,
+        }
+    return result
 
 
 def _find_aryl_ring(mol: Any, ipso: int) -> Optional[Set[int]]:

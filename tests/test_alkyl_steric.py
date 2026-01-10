@@ -15,7 +15,7 @@ def _scaffold_score(smiles: str, prefix: str):
     result = featurize_molecule(smiles)
     analysis = _analysis_for_prefix(result, prefix)
     assert analysis is not None
-    return analysis["steric"]["scaffold_score_0_10"], analysis
+    return analysis["steric"]["score_0_10"], analysis
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="RDKit not available")
@@ -33,15 +33,16 @@ def test_alkyl_scaffold_trends():
 
 @pytest.mark.skipif(not rdkit_available(), reason="RDKit not available")
 def test_benzyl_ring_penalty():
-    result = featurize_molecule("c1ccccc1CBr")
+    result = featurize_molecule("c1ccccc1CBr", options={"include_steric_details": True})
     analysis = _analysis_for_prefix(result, "Bn-") or _analysis_for_prefix(result, "R-")
     assert analysis is not None
-    assert any(sub["has_ring"] for sub in analysis["steric"]["substituents"])
+    substituents = analysis["steric"]["details"]["substituents"]
+    assert any(sub["has_ring"] for sub in substituents)
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="RDKit not available")
 def test_allyl_flag():
-    result = featurize_molecule("C=CCBr")
+    result = featurize_molecule("C=CCBr", options={"include_steric_details": True})
     analysis = _analysis_for_prefix(result, "Allyl-") or _analysis_for_prefix(result, "R-")
     assert analysis is not None
-    assert analysis["steric"]["alpha"]["allylic"] is True
+    assert analysis["steric"]["details"]["alpha"]["allylic"] is True

@@ -14,23 +14,32 @@ _GROUP_BULK_CAP = 20
 _BASELINE = {"methyl": 0, "primary": 2, "secondary": 4, "tertiary": 7}
 
 
-def analyze_alkyl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
+def analyze_alkyl_steric(
+    mol: Any,
+    hit: Dict[str, Any],
+    *,
+    include_details: bool = False,
+) -> Dict[str, Any]:
     """
     Compute steric scaffold score around an alkyl alpha carbon.
     """
-    alpha = hit.get("a_atom_idx")
-    x_root = hit.get("b_atom_idx")
-    if alpha is None or x_root is None:
-        return {
-            "scaffold_score_0_10": 0.0,
+    def empty_result() -> Dict[str, Any]:
+        result: Dict[str, Any] = {
             "score_0_10": 0.0,
             "group_bulk_0_10": 0.0,
             "description": "no steric",
             "method": _METHOD,
             "classification": "unknown",
-            "alpha": {},
-            "substituents": [],
+            "beta_hydrogens": 0,
         }
+        if include_details:
+            result["details"] = {"alpha": {}, "substituents": []}
+        return result
+
+    alpha = hit.get("a_atom_idx")
+    x_root = hit.get("b_atom_idx")
+    if alpha is None or x_root is None:
+        return empty_result()
 
     alpha_atom = mol.GetAtomWithIdx(alpha)
     neighbors = list(alpha_atom.GetNeighbors())
@@ -41,6 +50,7 @@ def analyze_alkyl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
     benzylic = any(nbr.GetIsAromatic() for nbr in subs)
     allylic = _is_allylic(alpha_atom)
     has_beta_branching = _has_beta_branching(subs, alpha)
+    beta_hydrogens = _count_beta_hydrogens(mol, alpha, x_root)
 
     substituents = []
     bulk_total = 0
@@ -64,22 +74,28 @@ def analyze_alkyl_steric(mol: Any, hit: Dict[str, Any]) -> Dict[str, Any]:
     else:
         desc = "highly steric"
 
-    return {
-        "scaffold_score_0_10": scaffold_score,
+    result: Dict[str, Any] = {
         "score_0_10": scaffold_score,
         "group_bulk_0_10": group_bulk,
         "description": desc,
         "method": _METHOD,
         "classification": classification,
-        "alpha": {
-            "degree": alpha_atom.GetDegree(),
-            "carbon_subs": carbon_subs,
-            "benzylic": benzylic,
-            "allylic": allylic,
-            "has_beta_branching": has_beta_branching,
-        },
-        "substituents": substituents,
+        "beta_hydrogens": beta_hydrogens,
     }
+    if include_details:
+        result["details"] = {
+            "scaffold_score_0_10": scaffold_score,
+            "alpha": {
+                "degree": alpha_atom.GetDegree(),
+                "carbon_subs": carbon_subs,
+                "benzylic": benzylic,
+                "allylic": allylic,
+                "has_beta_branching": has_beta_branching,
+                "beta_hydrogens": beta_hydrogens,
+            },
+            "substituents": substituents,
+        }
+    return result
 
 
 def _count_carbon_subs(subs: List[Any]) -> int:
@@ -121,6 +137,22 @@ def _has_beta_branching(subs: List[Any], alpha_idx: int) -> bool:
         if len(heavy_neighbors) >= 2:
             return True
     return False
+
+
+def _count_beta_hydrogens(mol: Any, alpha_idx: int, x_root: int) -> int:
+    alpha_atom = mol.GetAtomWithIdx(alpha_idx)
+    total = 0
+    for nbr in alpha_atom.GetNeighbors():
+        n_idx = nbr.GetIdx()
+        if n_idx == x_root:
+            continue
+        if nbr.GetAtomicNum() != 6:
+            continue
+        if nbr.GetIsAromatic():
+            continue
+        explicit_h = sum(1 for h in nbr.GetNeighbors() if h.GetAtomicNum() == 1)
+        total += explicit_h + nbr.GetNumImplicitHs()
+    return total
 
 
 def _substituent_bulk(mol: Any, sub_idx: int, alpha_idx: int, x_root: int) -> Dict[str, Any]:

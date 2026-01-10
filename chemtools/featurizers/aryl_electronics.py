@@ -50,32 +50,40 @@ def analyze_aryl_electronics(
     *,
     include_ipso_group: bool = True,
     include_gasteiger: bool = False,
+    include_details: bool = False,
 ) -> Dict[str, Any]:
     """
     Compute tag-weighted electronics around the ipso carbon.
     """
+    if include_gasteiger:
+        include_details = True
+
+    def empty_result() -> Dict[str, Any]:
+        result: Dict[str, Any] = {
+            "score_0_10": 5.0,
+            "description": "neutral",
+            "method": _ELECTRONICS_METHOD,
+        }
+        if include_ipso_group:
+            result["including_group_score_0_10"] = 5.0
+        if include_details:
+            details: Dict[str, Any] = {
+                "scaffold_score_0_10": 5.0,
+                "contributions": [],
+            }
+            if include_ipso_group:
+                details["including_group_contributions"] = []
+            result["details"] = details
+        return result
+
     ipso = hit.get("a_atom_idx")
     x_root = hit.get("b_atom_idx")
     if ipso is None or x_root is None:
-        return {
-            "scaffold_score_0_10": 5.0,
-            "score_0_10": 5.0,
-            "description": "neutral",
-            "method": _ELECTRONICS_METHOD,
-            "including_group": include_ipso_group,
-            "contributions": [],
-        }
+        return empty_result()
 
     ring_atoms = _find_aryl_ring(mol, ipso)
     if not ring_atoms:
-        return {
-            "scaffold_score_0_10": 5.0,
-            "score_0_10": 5.0,
-            "description": "neutral",
-            "method": _ELECTRONICS_METHOD,
-            "including_group": include_ipso_group,
-            "contributions": [],
-        }
+        return empty_result()
 
     ring_dist = _ring_distances(mol, ring_atoms, ipso)
     group_by_atom = _map_group_matches(mol, groups_dict)
@@ -99,12 +107,9 @@ def analyze_aryl_electronics(
         desc = "neutral"
 
     result: Dict[str, Any] = {
-        "scaffold_score_0_10": scaffold_score,
         "score_0_10": scaffold_score,
         "description": desc,
         "method": _ELECTRONICS_METHOD,
-        "including_group": include_ipso_group,
-        "contributions": scaffold_contrib,
     }
 
     if include_ipso_group:
@@ -120,12 +125,19 @@ def analyze_aryl_electronics(
         )
         include_score = _clamp(round(5.0 + include_sum, 1), 0.0, 10.0)
         result["including_group_score_0_10"] = include_score
-        result["including_group_contributions"] = include_contrib
 
-    if include_gasteiger:
-        gasteiger = _gasteiger_charge(mol, ipso)
-        if gasteiger is not None:
-            result["optional"] = {"gasteiger": {"q_ipso": gasteiger}}
+    if include_details:
+        details: Dict[str, Any] = {
+            "scaffold_score_0_10": scaffold_score,
+            "contributions": scaffold_contrib,
+        }
+        if include_ipso_group:
+            details["including_group_contributions"] = include_contrib
+        if include_gasteiger:
+            gasteiger = _gasteiger_charge(mol, ipso)
+            if gasteiger is not None:
+                details["gasteiger"] = {"q_ipso": gasteiger}
+        result["details"] = details
 
     return result
 

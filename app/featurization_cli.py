@@ -67,6 +67,27 @@ def _format_mapping_lines(data: Dict[str, Any], *, sort_keys: bool = True) -> Li
     return lines
 
 
+_STERIC_SUMMARY_KEYS = (
+    "score_0_10",
+    "group_bulk_0_10",
+    "beta_hydrogens",
+    "description",
+    "classification",
+)
+_ELECTRONIC_SUMMARY_KEYS = ("score_0_10", "including_group_score_0_10", "description")
+
+
+def _format_summary(data: Dict[str, Any], keys: Iterable[str]) -> str:
+    summary: Dict[str, Any] = {}
+    for key in keys:
+        if key in data:
+            value = data.get(key)
+            if value is None or value == "" or value == [] or value == {}:
+                continue
+            summary[key] = value
+    return _format_kv_inline(summary) if summary else "none"
+
+
 def _format_compound_id(entry: Dict[str, Any]) -> str:
     cid = entry.get("compound_id", "unknown")
     alt_ids = entry.get("alt_compound_ids")
@@ -175,7 +196,8 @@ def _print_motif_analyses(analyses: Iterable[Dict[str, Any]], *, indent: int = 0
         steric = entry.get("steric")
         if steric:
             if isinstance(steric, dict):
-                print(f"{prefix}    steric: {_format_kv_inline(steric)}")
+                summary = _format_summary(steric, _STERIC_SUMMARY_KEYS)
+                print(f"{prefix}    steric: {summary}")
             else:
                 print(f"{prefix}    steric: {_format_value(steric)}")
         electronic = entry.get("electronic")
@@ -184,12 +206,13 @@ def _print_motif_analyses(analyses: Iterable[Dict[str, Any]], *, indent: int = 0
                 print(f"{prefix}    electronic:")
                 for idx, e_entry in enumerate(electronic, start=1):
                     if isinstance(e_entry, dict):
-                        formatted = _format_kv_inline(e_entry)
+                        formatted = _format_summary(e_entry, _ELECTRONIC_SUMMARY_KEYS)
                     else:
                         formatted = _format_value(e_entry)
                     print(f"{prefix}      - [{idx}] {formatted}")
             elif isinstance(electronic, dict):
-                print(f"{prefix}    electronic: {_format_kv_inline(electronic)}")
+                summary = _format_summary(electronic, _ELECTRONIC_SUMMARY_KEYS)
+                print(f"{prefix}    electronic: {summary}")
             else:
                 print(f"{prefix}    electronic: {_format_value(electronic)}")
         if "nearby_groups" in entry:
@@ -222,19 +245,6 @@ def _print_molecule_detail(payload: Dict[str, Any], *, indent: int = 0) -> None:
     molecule = _get_molecule_payload(payload)
     prefix = " " * indent
     print(f"{prefix}SMILES: {molecule.get('smiles')}")
-    payload_schema = payload.get("schema_version") if "molecule" in payload else None
-    if payload_schema:
-        print(f"{prefix}Payload Schema: {payload_schema}")
-    schema_version = molecule.get("schema_version")
-    if schema_version:
-        print(f"{prefix}Schema: {schema_version}")
-
-    payload_meta = payload.get("meta") if "molecule" in payload else None
-    if payload_meta:
-        _print_meta_section("Payload Meta", payload_meta, indent=indent)
-    molecule_meta = molecule.get("meta")
-    if molecule_meta:
-        _print_meta_section("Molecule Meta", molecule_meta, indent=indent)
 
     _print_rdkit_props(molecule.get("rdkit_props") or {}, indent=indent)
     _print_motifs(molecule.get("motifs") or [], indent=indent)
@@ -422,13 +432,6 @@ def _print_reaction_summary(payload: Dict[str, Any]) -> None:
     print("\nSummary (Reaction)")
     print("-" * 72)
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
-    payload_schema = payload.get("schema_version") if "reaction" in payload else None
-    if payload_schema:
-        print(f"Payload Schema: {payload_schema}")
-
-    payload_meta = payload.get("meta") if "reaction" in payload else None
-    if payload_meta:
-        _print_meta_section("Payload Meta", payload_meta)
 
     normalized = reaction.get("normalized") or {}
     if normalized:

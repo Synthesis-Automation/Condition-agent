@@ -9,6 +9,14 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 from .motif_registry import CompoundPattern
 
 
+_DISCOVERY_SKIP_SUBSTITUENTS = {
+    "Any_Substituent",
+    "R_Subst",
+    "Alkyl_Subst",
+    "Alkenyl_Subst",
+}
+
+
 def detect_motifs(
     mol: Any,
     compiled_compounds: Iterable[CompoundPattern],
@@ -265,7 +273,13 @@ def discover_undocumented_motifs(
     combination_map = registry.get("combination_map", {})
     
     scaffolds = [g for g in compiled_groups.values() if g["kind"] == "scaffold" and g["priority"] > 0]
-    substituents = [g for g in compiled_groups.values() if g["kind"] == "substituent" and g["priority"] > 0]
+    substituents = [
+        g
+        for g in compiled_groups.values()
+        if g["kind"] == "substituent"
+        and g["priority"] > 0
+        and g["id"] not in _DISCOVERY_SKIP_SUBSTITUENTS
+    ]
     
     # 1. Detect all scaffold atoms
     scaffold_atoms: Dict[int, List[Dict[str, Any]]] = {}

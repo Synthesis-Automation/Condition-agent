@@ -63,6 +63,16 @@ def featurize_molecule(
     options = options or {}
     include_gasteiger = bool(options.get("include_gasteiger", False))
     include_ipso_group = options.get("electronics_include_ipso_group", True)
+    include_analysis_details = bool(options.get("include_analysis_details", False))
+    include_steric_details = bool(
+        options.get("include_steric_details", include_analysis_details)
+    )
+    include_electronic_details = bool(
+        options.get(
+            "include_electronic_details",
+            include_analysis_details or include_gasteiger,
+        )
+    )
     max_hits = options.get("max_hits_per_compound")
     discovery_mode = bool(options.get("discovery_mode", False))
     site_filter = options.get("motif_site_filter", "bond")
@@ -131,7 +141,7 @@ def featurize_molecule(
             "Ar-", "AromN-", "Pyridine-", "Pyrimidine-", "Pyrrole-", "Indole-", 
             "Thiophene-", "Furan-", "Imidazole-", "Quinoline-", "Isoquinoline-"
         )):
-            steric = analyze_aryl_steric(mol, hit)
+            steric = analyze_aryl_steric(mol, hit, include_details=include_steric_details)
             if include_ipso_group == "both":
                 electronic = [
                     analyze_aryl_electronics(
@@ -140,6 +150,7 @@ def featurize_molecule(
                         groups,
                         include_ipso_group=True,
                         include_gasteiger=include_gasteiger,
+                        include_details=include_electronic_details,
                     ),
                     analyze_aryl_electronics(
                         mol,
@@ -147,6 +158,7 @@ def featurize_molecule(
                         groups,
                         include_ipso_group=False,
                         include_gasteiger=include_gasteiger,
+                        include_details=include_electronic_details,
                     ),
                 ]
             else:
@@ -156,6 +168,7 @@ def featurize_molecule(
                     groups,
                     include_ipso_group=bool(include_ipso_group),
                     include_gasteiger=include_gasteiger,
+                    include_details=include_electronic_details,
                 )
             nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)
             analyses.append(
@@ -174,7 +187,7 @@ def featurize_molecule(
             "R-", "Bn-", "Allyl-", "Any-", "RCH2-", "R2CH-", "R3C-", 
             "Vinyl-", "Alkynyl-", "Acyl-", "Propargyl-", "H-"
         )):
-            steric = analyze_alkyl_steric(mol, hit)
+            steric = analyze_alkyl_steric(mol, hit, include_details=include_steric_details)
             nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)
             analyses.append(
                 {
