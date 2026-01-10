@@ -1,4 +1,5 @@
 import csv
+import math
 import sys
 from dataclasses import asdict
 from pathlib import Path
@@ -59,6 +60,14 @@ def _format_float(value: Optional[float]) -> str:
         return f"{float(value):.2f}".rstrip("0").rstrip(".")
     except (TypeError, ValueError):
         return str(value)
+
+
+def _safe_text(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float) and math.isnan(value):
+        return ""
+    return str(value)
 
 
 def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
@@ -358,7 +367,12 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         for row_index, rec in enumerate(recs):
             rec_dict = asdict(rec)
             rec_dict["rank"] = row_index + 1
-            rec_dict["reactant_types"] = " + ".join(rec.reactant_types)
+            reactant_types = []
+            for item in list(getattr(rec, "reactant_types", []) or []):
+                text = _safe_text(item).strip()
+                if text:
+                    reactant_types.append(text)
+            rec_dict["reactant_types"] = " + ".join(reactant_types)
             for col_index, (_, key) in enumerate(columns):
                 value = rec_dict.get(key)
                 if isinstance(value, float):

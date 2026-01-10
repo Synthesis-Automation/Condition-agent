@@ -85,10 +85,11 @@ def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
     }
 
 def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst: bool = True):
-    """Convert reaction dataset to HTE-canonical CSV format with extra metadata."""
+    """Convert reaction dataset to a minimal HTE recommender CSV."""
     input_path = Path(input_path)
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    source_label = input_path.stem
     
     rows = []
     print(f"Reading {input_path}...")
@@ -232,17 +233,9 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
         # This replaces Reaction_Type_Standardized and Reactant_Types_Key
         reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
             
-        # All motifs for reference
-        all_reactant_motifs_str = "|".join(sorted(_dedupe_list(motif_ids)))
-        all_product_motifs_str = "|".join(sorted(_dedupe_list(product_motifs)))
-
-        reacted_motifs_str = _reactant_key(list(reacted_set)) or "None"
-        formed_motifs_str = _reactant_key(list(formed_set)) or "None"
-        
         # Map to A and B slots (canonical for HTE recommender)
         type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
         type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
-        type_p = ",".join(_dedupe_list(product_motifs))
         
         reagents = extract_reagents(record)
         if drop_no_catalyst and not reagents.get("Catalyst"):
@@ -250,7 +243,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             
         row = {
             # HTE canonical columns (lowercase with underscores)
-            "reaction_type": reaction_key,
+            "reaction_type": source_label,
             "yield": record.get("yield", 0.0),
             "z_score": 0.0,
             "reactant_1": type_a,
@@ -260,29 +253,11 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             "base": reagents.get("Base", ""),
             "solvent": reagents.get("Solvent", ""),
             "additive": reagents.get("Additive", ""),
-
-            # Extra metadata for downstream analysis
+            "Secondary Solvent": reagents.get("Secondary Solvent", ""),
+            "Coupling Reagent": reagents.get("Coupling Reagent", ""),
+            "Is_Intramolecular": len(reactants) == 1,
             "reaction_smiles": smiles,
-            "smiles": smiles,
-            "reactant_smiles": reactants_part,
-            "product_smiles": products_part,
-            "reaction_key": reaction_key,
-            "reactant_types_key": _reactant_key([type_a, type_b]),
-            "product_type": type_p,
-            "reactant_a_all_motifs": ",".join(reactant_data[0]["motifs"]) if len(reactant_data) > 0 else "",
-            "reactant_b_all_motifs": ",".join(reactant_data[1]["motifs"]) if len(reactant_data) > 1 else "",
-            "all_reactant_motifs": all_reactant_motifs_str,
-            "all_product_motifs": all_product_motifs_str,
-            "reacted_motifs": reacted_motifs_str,
-            "formed_motifs": formed_motifs_str,
-            "spectator_motifs": spectators_str,
-            "is_intramolecular": len(reactants) == 1,
-            "coupling_reagent": reagents.get("Coupling Reagent", ""),
-            "secondary_solvent": reagents.get("Secondary Solvent", ""),
-            "catalytic_system": record.get("catalytic_system", ""),
-            "condition_core": record.get("condition_core", ""),
-            "raw_reagents": json.dumps(record.get("reagents", []), ensure_ascii=True),
-            "raw_solvents": json.dumps(record.get("solvents", []), ensure_ascii=True),
+            "_reaction_key": reaction_key,
         }
         rows.append(row)
         
@@ -296,7 +271,12 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
     df["z_score"] = 0.0
     df["z_score"] = df["z_score"].astype(float)
     
-    for key, group in df.groupby("reaction_type"):
+    if "_reaction_key" in df.columns:
+        group_key = "_reaction_key"
+    else:
+        group_key = "reaction_type"
+
+    for key, group in df.groupby(group_key):
         if len(group) > 1:
             yields = group["yield"]
             mean = yields.mean()
@@ -312,10 +292,11 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
 
     canonical_cols = [
         "reaction_type", "yield", "z_score", "reactant_1", "reactant_2",
-        "catalyst", "ligand", "base", "solvent", "additive"
+        "catalyst", "ligand", "base", "solvent", "additive",
+        "Secondary Solvent", "Coupling Reagent", "Is_Intramolecular",
+        "reaction_smiles",
     ]
-    extra_cols = [col for col in df.columns if col not in canonical_cols]
-    df = df[canonical_cols + extra_cols]
+    df = df[canonical_cols]
 
     df.to_csv(output_path, index=False)
     print(f"Successfully saved {len(df)} reactions to {output_path}")
