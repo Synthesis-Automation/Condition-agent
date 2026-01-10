@@ -266,42 +266,24 @@ class HTEAnalytics:
         """Load HTE database"""
         if not self.db_path.exists():
             raise FileNotFoundError(f"HTE database not found: {self.db_path}")
-        
-        if self.db_path.suffix.lower() == ".jsonl":
-            self.df = _load_hte_jsonl(self.db_path)
-        else:
-            self.df = pd.read_csv(self.db_path)
-            
-            # Map new canonical CSV columns to internal standard names
-            column_mapping = {
-                "reaction_type": "Reaction_Type_Standardized",
-                "reactant_1": "Reactant_A_Type",
-                "reactant_2": "Reactant_B_Type",
-                "yield": "AREA_TOTAL_REDUCED",
-                "z_score": "z-Score",
-                "catalyst": "Catalyst",
-                "ligand": "Ligand",
-                "base": "Base",
-                "solvent": "Solvent",
-                "additive": "Additive"
-            }
-            
-            # Rename columns if they exist
-            self.df = self.df.rename(columns={k: v for k, v in column_mapping.items() if k in self.df.columns})
-            
-            # Ensure missing columns are present
-            required_cols = [
-                "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
-                "Catalyst", "Ligand", "Base", "Solvent", "Additive",
-                "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
-                "Reactant_A_Category", "Reactant_B_Category"
-            ]
-            for col in required_cols:
-                if col not in self.df.columns:
-                    self.df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
 
-        print(f"📊 Loaded HTE database: {len(self.df):,} experiments")
-    
+        file_paths = _collect_hte_files(self.db_path)
+        if not file_paths:
+            raise FileNotFoundError(f"No HTE CSV/JSONL files found under: {self.db_path}")
+
+        frames: List[pd.DataFrame] = []
+        for path in file_paths:
+            if path.suffix.lower() == ".jsonl":
+                frame = _load_hte_jsonl(path)
+            else:
+                frame = pd.read_csv(path)
+            frame = _normalize_hte_dataframe(frame, source_path=path)
+            frames.append(frame)
+
+        self.df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+        print(f"馃搳 Loaded HTE database: {len(self.df):,} experiments")
+
     def _filter_by_catalyst_type(self, df: pd.DataFrame, catalyst_filter: str) -> pd.DataFrame:
         if not catalyst_filter:
             return df

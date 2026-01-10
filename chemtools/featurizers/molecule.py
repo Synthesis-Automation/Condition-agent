@@ -184,7 +184,7 @@ def featurize_molecule(
             )
         # Alkyl/Generic motifs
         elif compound_id.startswith((
-            "R-", "Bn-", "Allyl-", "Any-", "RCH2-", "R2CH-", "R3C-", 
+            "R-", "Bn-", "Allyl-", "Alkyl-", "Alkenyl-", "Any-", "RCH2-", "R2CH-", "R3C-",
             "Vinyl-", "Alkynyl-", "Acyl-", "Propargyl-", "H-"
         )):
             steric = analyze_alkyl_steric(mol, hit, include_details=include_steric_details)

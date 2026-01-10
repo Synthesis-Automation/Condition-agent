@@ -8,6 +8,7 @@ import json
 import sys
 from pathlib import Path
 import argparse
+from functools import lru_cache
 from typing import Any, Dict, Iterable, List
 
 # Ensure repo root is on sys.path for direct execution.
@@ -101,6 +102,55 @@ def _format_compound_id(entry: Dict[str, Any]) -> str:
     return cid
 
 
+def _format_primary_compound_id(entry: Dict[str, Any]) -> str:
+    cid = entry.get("compound_id", "unknown")
+    if entry.get("undocumented"):
+        cid += " [UNDOCUMENTED]"
+    return cid
+
+
+@lru_cache(maxsize=1)
+def _load_compound_registry() -> Dict[str, Any]:
+    from chemtools.featurizers import motif_registry
+
+    return motif_registry.build_compound_registry(motif_registry._default_registry_paths())
+
+
+def _compound_specificity_key(compound_id: str) -> tuple[int, int, int, str] | None:
+    if not compound_id:
+        return None
+    try:
+        registry = _load_compound_registry()
+    except Exception:
+        return None
+    pattern = registry.get("compound_map", {}).get(compound_id)
+    if not pattern:
+        return None
+    return (pattern.complexity, pattern.priority, len(compound_id), compound_id)
+
+
+def _filter_most_specific_analyses(
+    analyses: Iterable[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    analysis_list = [entry for entry in analyses if isinstance(entry, dict)]
+    if len(analysis_list) <= 1:
+        return analysis_list
+
+    scored: List[tuple[tuple[int, int, int, str], Dict[str, Any]]] = []
+    for entry in analysis_list:
+        key = _compound_specificity_key(entry.get("compound_id", ""))
+        if key is None:
+            continue
+        scored.append((key, entry))
+
+    if not scored:
+        return analysis_list
+
+    max_key = max(key for key, _ in scored)
+    winners = [entry for key, entry in scored if key == max_key]
+    return winners or analysis_list
+
+
 def _get_molecule_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
     if "molecule" in payload and isinstance(payload.get("molecule"), dict):
         return payload["molecule"]
@@ -182,13 +232,13 @@ def _print_nearby_groups(groups: Iterable[Dict[str, Any]], *, indent: int = 0) -
 
 
 def _print_motif_analyses(analyses: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
-    analysis_list = list(analyses or [])
+    analysis_list = _filter_most_specific_analyses(analyses or [])
     if not analysis_list:
         return
     prefix = " " * indent
-    print(f"{prefix}Per-Motif Analysis ({len(analysis_list)}):")
+    print(f"{prefix}Per-Motif Analysis (most specific, {len(analysis_list)}):")
     for entry in analysis_list:
-        cid = _format_compound_id(entry)
+        cid = _format_primary_compound_id(entry)
         print(f"{prefix}  - {cid}")
         center = entry.get("center") or {}
         if center:
