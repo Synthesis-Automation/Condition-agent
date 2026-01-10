@@ -1,6 +1,6 @@
 # Organic Chemistry Taxonomy System Overview (Living Doc)
 
-Last updated: 2026-01-07
+Last updated: 2026-01-10
 Owner: Chemistry data platform team
 
 Chemistry introduction
@@ -18,8 +18,17 @@ Purpose and scope
 - Document how taxonomy data and code work together across typing, extraction, and recommendation.
 - Provide a single reference for extension and alignment decisions.
 - Cover reaction taxonomy, organic groups and compounds, reagent taxonomy, and downstream usage.
+- Clarify where the taxonomy ends and where external heuristics or ML models begin.
+- Provide guardrails for changes that can impact training data or downstream analytics.
 
 ---
+
+## System boundaries and non-goals
+
+- This taxonomy defines identity, roles, and reaction typing; it does not define kinetics, yields, or optimal conditions.
+- Free text or vendor labels are treated as inputs, not authoritative ground truth.
+- Model training or ranking logic lives outside the taxonomy; this system provides stable, interpretable features.
+- Inventory, purchasing, or safety compliance is out of scope except for basic reagent roles.
 
 ## Design philosophy
 
@@ -30,6 +39,13 @@ Purpose and scope
 - **Transformation-Awareness**: Reaction keys are represented as net-chemical changes: `[Reacted] -> [Formed] || [Spectators]`. This allows the system to distinguish between a pyridine that reacts (N-arylation) and a pyridine used as a base (spectator).
 - **Stateless & Deterministic**: The system relies on fixed rules and cached SMARTS compilation for 100% reproducibility.
 - **Machine-Ready Chemistry**: These tags make it easier for LLMs to access structured chemistry context and reason from well-defined signals instead of raw data such as smiles strings.
+
+### SMARTS compilation policy
+
+- Use `chemtools/util/smarts_cache.py` for all SMARTS compilation.
+- Prefer lazy compilation during detection rather than module import time.
+- Use `compile_smarts(..., validate=True)` only when introducing or auditing new patterns.
+- Avoid direct calls to RDKit `Chem.MolFromSmarts()` in taxonomy code.
 
 ---
 
@@ -60,6 +76,26 @@ There is an inherent asymmetry in this system: **Scaffolds** (A) have dozens of 
 - **When to use Links**: Templates like `via_oxygen` are reserved for future use (not now). E.g., in places where the linking atom (O, S, NH) fundamentally changes the chemistry class (e.g., Sulfonate leaving groups) or where the "B" part is actually an entire fragment (e.g., `Ar-O-R`).
 
 This modularity allows the system to generate thousands of motifs (e.g., `Ar-NH2`, `R-NH2`, `Acyl-NH2`) from a small set of primitive definitions.
+
+### Recommended feature layers (conditions recommendation, minimal maintenance)
+
+The goal is a small, stable feature stack that keeps chemistry signal high and
+cost low. Start with the core, then add overlays only if they improve model
+quality.
+
+- **Core (required)**:
+  - Motif delta (`reacted`, `formed`, `spectator`) with confidence.
+  - Reagent roles (`base`, `ligand`, `catalyst`, `solvent`) from v2 taxonomy.
+- **Lightweight overlays (recommended)**:
+  - Steric tags (e.g., `ortho`, `benzylic`, `hindered`).
+  - Electronic tags (e.g., `EWG`, `EDG`, `heteroaryl`).
+  - Scaffold spectators (e.g., `pyridine`, `dmf`) to prevent role confusion.
+- **Optional, low-maintenance extras**:
+  - Simple topology tags (ring count, heteroatom count, substitution degree).
+  - Basic physchem descriptors (MW, HBD/HBA, TPSA, logP) when RDKit is available.
+
+Avoid high-dimensional fingerprints or full graph descriptors unless accuracy
+gains justify the maintenance cost.
 
 ### Priority Hierarchy
 
@@ -116,6 +152,17 @@ Notes
 
 ---
 
+## End-to-end data flow (high level)
+
+1. **Input normalization**: Canonicalize reactant and product SMILES, map atoms when available.
+2. **Group detection**: Identify scaffold and substituent groups using SMARTS.
+3. **Compound synthesis**: Combine groups into motifs via templates and direct SMARTS.
+4. **Resolution**: Apply subsumption, priority, and site filtering to avoid duplicates.
+5. **Delta calculation**: Compute reacted, formed, and spectator motifs.
+6. **Reaction typing**: Match motif delta against reaction type slots and constraints.
+7. **Feature bundling**: Assemble condition features (motifs, roles, sterics, electronics).
+8. **Outputs**: Provide stable IDs to downstream recommenders, analytics, and LLM tools.
+
 ## How typing works (organic groups -> compounds -> reactions)
 
 1. **Primitive Detection**: Organic groups define scaffold/substituent SMARTS with attachpoint maps (`:1` for scaffold atom, `:2` for substituent atom).
@@ -130,6 +177,13 @@ Notes
    - **Transformation Match**: Checks the net change in motifs (delta-Counter).
    - **Role Evidence**: Uses reagents (bases, ligands) as supporting evidence if available.
    - Engine: `chemtools/featurizers/reaction_detection.py`.
+
+### Edge cases and safeguards
+
+- **Missing products**: If products are missing or unmapped, fall back to reactant-only motif profiles and lower confidence.
+- **Multi-site ambiguity**: Priority rules resolve overlapping scaffold assignments at the same site.
+- **Spectator protection**: Heterocycles like pyridine are protected from false-negative drops.
+- **RDKit optionality**: Feature extraction must degrade gracefully when RDKit is unavailable.
 
 ---
 
@@ -179,6 +233,11 @@ Notes
 - Dataset naming guidance is in `docs/NAMING_CONVENTION.md`.
 
 ---
+
+## Runtime contracts and schema alignment
+
+- Public outputs should align with `chemtools/contracts.py` and documented feature schemas.
+- Breaking changes require a schema version bump and an explicit changelog entry.
 
 ## Extension workflow (quick checklist)
 
@@ -294,7 +353,3 @@ consistent contract while taxonomy evolves.
 - Reaction typing coverage: expand motif sets as new families are added.
 
 ---
-
-## Changelog
-
-- YYYY-MM-DD: Initial living doc created.

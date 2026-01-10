@@ -5,12 +5,15 @@
 The `chem_assistant.planner.llm_agent_cli` has been enhanced with several improvements to make the agent more intelligent and provide better recommendations.
 
 ### 1. **Better Default Model** ✅ IMPLEMENTED
+
 - Changed from `gpt-4o-mini` → `gpt-4o`
 - `gpt-4o` has better reasoning capabilities and chemistry knowledge
 - Cost: ~15× more expensive but significantly better quality
 
 ### 2. **Enhanced System Prompt** ✅ IMPLEMENTED
+
 Added a comprehensive system prompt that:
+
 - Defines the agent's role as an expert chemistry assistant
 - Lists the knowledge sources it should consult
 - Provides a systematic methodology for analysis
@@ -18,13 +21,16 @@ Added a comprehensive system prompt that:
 - Requests clear explanations with evidence citations
 
 ### 3. **Improved User Query** ✅ IMPLEMENTED
+
 The user query now:
+
 - Breaks down the task into clear numbered steps
 - Requests specific information (quantities, conditions, rationale)
 - Asks for practical details a chemist can execute
 - Explicitly requests evidence-based reasoning
 
 ### 4. **New CLI Options** ✅ IMPLEMENTED
+
 ```bash
 --temperature FLOAT    # Control creativity (default: 0.0)
 --verbose             # Show agent reasoning process
@@ -33,6 +39,7 @@ The user query now:
 ## Additional Improvements You Can Make
 
 ### 5. **Use a More Capable Model**
+
 ```bash
 # For best quality (expensive but very intelligent)
 python -m chem_assistant.planner.llm_agent_cli \
@@ -51,6 +58,7 @@ python -m chem_assistant.planner.llm_agent_cli \
 ```
 
 ### 6. **Adjust Temperature**
+
 ```bash
 # Deterministic (recommended for chemistry)
 --temperature 0.0
@@ -242,7 +250,8 @@ agent = create_agent(
 
 ## Recommended Configuration
 
-### For Best Intelligence:
+### For Best Intelligence
+
 ```bash
 python -m chem_assistant.planner.llm_agent_cli \
   --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" \
@@ -253,7 +262,8 @@ python -m chem_assistant.planner.llm_agent_cli \
   --verbose
 ```
 
-### For Cost-Effective:
+### For Cost-Effective
+
 ```bash
 python -m chem_assistant.planner.llm_agent_cli \
   --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" \
@@ -263,7 +273,8 @@ python -m chem_assistant.planner.llm_agent_cli \
   --max-protocols 2
 ```
 
-### For Exploration:
+### For Exploration
+
 ```bash
 python -m chem_assistant.planner.llm_agent_cli \
   --reaction "Brc1ccccc1.N1CCOCC1>>Brc1ccccc1N1CCOCC1" \
@@ -276,7 +287,8 @@ python -m chem_assistant.planner.llm_agent_cli \
 
 ## Comparison: Before vs After
 
-### Before (gpt-4o-mini, basic prompt):
+### Before (gpt-4o-mini, basic prompt)
+
 ```
 ### Recommended Reaction Conditions
 Reaction Family: C–N Coupling
@@ -285,7 +297,8 @@ Confidence: 0.9
 [Basic recommendations with minimal reasoning]
 ```
 
-### After (gpt-4o, enhanced prompt):
+### After (gpt-4o, enhanced prompt)
+
 ```
 ### Reaction Analysis and Recommendations
 
@@ -323,6 +336,7 @@ The agent is now significantly more intelligent due to:
 5. ✅ **Practical focus** (specific quantities, safety, rationale)
 
 The improvements result in:
+
 - More detailed and accurate recommendations
 - Better synthesis of evidence from multiple sources
 - Clearer explanations with reasoning
