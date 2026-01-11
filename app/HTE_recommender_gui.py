@@ -1,4 +1,5 @@
 import csv
+import html
 import math
 import sys
 from dataclasses import asdict
@@ -87,15 +88,18 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
         ("Additive", "additive"),
     ]
     if data_type == "rules":
-        return base
+        return base + [("Reaction ID", "reaction_id")]
     reaction_label = "Reaction ID" if data_type == "datasets" else "Reaction Type"
-    return base + [
+    columns = base + [
         ("Secondary Solvent", "secondary_solvent"),
         ("Coupling Reagent", "coupling_reagent"),
         (reaction_label, "reaction_type"),
         ("Reactant Types", "reactant_types"),
         ("Match Score", "match_score"),
     ]
+    if data_type != "datasets":
+        columns.insert(len(base) + 2, ("Reaction ID", "reaction_id"))
+    return columns
 
 
 class RecommendationWorker(QtCore.QObject):
@@ -177,7 +181,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.run_button = QtWidgets.QPushButton("Run Recommendation")
         self.clear_button = QtWidgets.QPushButton("Clear Results")
 
-        self.summary = QtWidgets.QPlainTextEdit()
+        self.summary = QtWidgets.QTextEdit()
         self.summary.setReadOnly(True)
 
         self.results_tabs = QtWidgets.QTabWidget()
@@ -385,28 +389,32 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         cat_a = getattr(result, "reactant_a_category", "")
         type_b = getattr(result, "reactant_b_type", "")
         cat_b = getattr(result, "reactant_b_category", "")
-        detected = getattr(result, "matched_motifs", None)
-        detected_label = detected[0] if isinstance(detected, tuple) and detected else ""
-        predicted = getattr(result, "predicted_reaction_type", "")
+        predicted = getattr(result, "predicted_reaction_type", "") or "Unknown"
         confidence = getattr(result, "reaction_type_confidence", 0.0) * 100
+        detected = getattr(result, "matched_motifs", None)
+        detected_label = ""
+        if isinstance(detected, tuple):
+            detected_label = ", ".join([item for item in detected if item])
         matches = getattr(result, "total_matching_experiments", 0)
         coverage = getattr(result, "database_coverage", 0.0)
 
         summary_lines = [
-            (
-                f"Data: {data_type} | Matches: {matches} | Coverage: {coverage:.2f}% | "
-                f"Detected: {detected_label} | Pred: {predicted} ({confidence:.1f}%)"
+            html.escape(
+                f"Data: {data_type} | Matches: {matches} | Coverage: {coverage:.2f}%"
             ),
-            f"A: {reactant_a} | Type: {type_a} ({cat_a})",
-            f"B: {reactant_b} | Type: {type_b} ({cat_b})",
-            f"P: {product}",
+            (
+                f'<span style="color:#0066ff;">'
+                f'{html.escape(f"MATCHED: {detected_label or "None"} | PRED: {predicted} ({confidence:.1f}%)")}'
+                f"</span>"
+            ),
+            html.escape(f"A: {reactant_a} | Type: {type_a} ({cat_a})"),
+            html.escape(f"B: {reactant_b} | Type: {type_b} ({cat_b})"),
+            html.escape(f"P: {product}"),
         ]
-        if getattr(result, "matched_motifs", None):
-            summary_lines.append(f"Matched motifs: {getattr(result, 'matched_motifs')}")
         if stats:
             stats_line = " | ".join(f"{key}: {stats[key]}" for key in sorted(stats))
-            summary_lines.append(f"Stats: {stats_line}")
-        self.summary.setPlainText("\n".join(summary_lines))
+            summary_lines.append(html.escape(f"Stats: {stats_line}"))
+        self.summary.setHtml("<br>".join(summary_lines))
 
         recs = list(getattr(result, "recommendations", []) or [])
         source_map = getattr(result, "recommendations_by_source", {}) or {}

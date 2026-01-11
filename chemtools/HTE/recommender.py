@@ -245,6 +245,25 @@ def _format_list(values: Any) -> str:
     return " / ".join(items)
 
 
+def _clean_reaction_label(value: Optional[str]) -> str:
+    if value is None:
+        return ""
+    text = str(value).strip()
+    if not text or text.lower() in {"nan", "unknown"}:
+        return ""
+    return text
+
+
+def _format_reaction_id(reaction_type: Optional[str], reaction_category: Optional[str]) -> str:
+    type_text = _clean_reaction_label(reaction_type)
+    category_text = _clean_reaction_label(reaction_category)
+    if type_text and category_text:
+        if type_text.lower() == category_text.lower():
+            return type_text
+        return f"{type_text} / {category_text}"
+    return type_text or category_text
+
+
 def _reactant_key(values: Iterable[Optional[str]]) -> str:
     items = _dedupe_list([str(v).strip() for v in values if v])
     return "|".join(sorted(items))
@@ -253,6 +272,19 @@ def _reactant_key(values: Iterable[Optional[str]]) -> str:
 _MOTIF_SPLIT_RE = re.compile(r"[|,]")
 _COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
 _COMPOUND_SCOPE_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "organic_compounds.v1.3.json"
+_COMPOUND_GROUPS_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "organic_groups.v1.3.json"
+
+_MOTIF_TAG_WEIGHTS = {
+    "leaving_group": 40,
+    "leaving_group_weak": 25,
+    "sulfonate_leaving_group": 30,
+    "acyl_electrophile": 30,
+    "sulfonyl_halide": 30,
+    "nucleophile": 20,
+    "n_h_nucleophile": 22,
+    "o_h_nucleophile": 22,
+    "s_h_nucleophile": 22,
+}
 
 
 @lru_cache(maxsize=1)
@@ -316,6 +348,68 @@ def _load_scope_map() -> Dict[str, List[str]]:
         if children:
             scope_map[entry["id"]] = sorted(set(children))
     return scope_map
+
+
+@lru_cache(maxsize=1)
+def _load_group_tags() -> Dict[str, Set[str]]:
+    if not _COMPOUND_GROUPS_FILE.exists():
+        return {}
+    try:
+        with _COMPOUND_GROUPS_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+    groups = payload.get("groups") or []
+    tag_map: Dict[str, Set[str]] = {}
+    for entry in groups:
+        if not isinstance(entry, dict):
+            continue
+        gid = str(entry.get("id") or "").strip()
+        if not gid:
+            continue
+        tags = {str(tag).strip() for tag in (entry.get("tags") or []) if str(tag).strip()}
+        if tags:
+            tag_map[gid] = tags
+    return tag_map
+
+
+@lru_cache(maxsize=1)
+def _load_compound_tags() -> Dict[str, Set[str]]:
+    if not _COMPOUND_SCOPE_FILE.exists():
+        return {}
+    try:
+        with _COMPOUND_SCOPE_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+    group_tags = _load_group_tags()
+    compounds = payload.get("compounds") or []
+    tag_map: Dict[str, Set[str]] = {}
+    for entry in compounds:
+        if not isinstance(entry, dict):
+            continue
+        cid = str(entry.get("id") or "").strip()
+        if not cid:
+            continue
+        tags: Set[str] = set()
+        group_a = str(entry.get("A") or "").strip()
+        group_b = str(entry.get("B") or "").strip()
+        tags.update(group_tags.get(group_a, set()))
+        tags.update(group_tags.get(group_b, set()))
+        if tags:
+            tag_map[cid] = tags
+    return tag_map
+
+
+def _motif_tag_score(motif_id: str) -> int:
+    tags = _load_compound_tags().get(motif_id)
+    if not tags:
+        return 0
+    score = 0
+    for tag, weight in _MOTIF_TAG_WEIGHTS.items():
+        if tag in tags:
+            score += weight
+    return score
 
 
 def _split_motif_tokens(value: Any) -> List[str]:
@@ -447,8 +541,14 @@ def _prioritize_motifs(
     spectators: Optional[Set[str]],
 ) -> List[str]:
     ordered = [m for m in motifs if m]
-    if not ordered or (not reacted and not spectators):
+    if not ordered:
         return ordered
+    index_map = {m: idx for idx, m in enumerate(ordered)}
+    scores = {m: _motif_tag_score(m) for m in ordered}
+    def _sort_key(motif: str) -> Tuple[int, int]:
+        return (-scores.get(motif, 0), index_map.get(motif, 0))
+    if not reacted and not spectators:
+        return sorted(ordered, key=_sort_key)
     reacted = reacted or set()
     spectators = spectators or set()
     buckets = {0: [], 1: [], 2: []}
@@ -459,7 +559,11 @@ def _prioritize_motifs(
             buckets[2].append(motif)
         else:
             buckets[1].append(motif)
-    return buckets[0] + buckets[1] + buckets[2]
+    return (
+        sorted(buckets[0], key=_sort_key)
+        + sorted(buckets[1], key=_sort_key)
+        + sorted(buckets[2], key=_sort_key)
+    )
 
 
 def _load_hte_jsonl(path: Path) -> pd.DataFrame:
@@ -529,6 +633,8 @@ class ConditionRecommendation:
     
     # Metadata
     reaction_type: Optional[str] = None
+    reaction_category: Optional[str] = None
+    reaction_id: Optional[str] = None
     reactant_types: Tuple[str, str] = ("", "")
     z_score_range: Tuple[float, float] = (0.0, 0.0)
 
@@ -845,8 +951,12 @@ class HTERecommender:
                 avg_z_score, num_exp, avg_yield
             )
             
-            # Reaction type (most common)
+            # Reaction type/category (most common)
             reaction_type = group_df['Reaction_Type_Standardized'].mode().iloc[0] if not group_df['Reaction_Type_Standardized'].isna().all() else None
+            reaction_category = None
+            if "Reaction_Category" in group_df.columns and not group_df["Reaction_Category"].isna().all():
+                reaction_category = group_df["Reaction_Category"].mode().iloc[0]
+            reaction_id = _format_reaction_id(reaction_type, reaction_category)
             
             # Reactant types (from first row)
             reactant_types = (
@@ -872,6 +982,8 @@ class HTERecommender:
                 confidence_score=confidence,
                 match_score=match_score,
                 reaction_type=reaction_type,
+                reaction_category=reaction_category,
+                reaction_id=reaction_id,
                 reactant_types=reactant_types,
                 z_score_range=(z_min, z_max)
             )
@@ -1041,14 +1153,6 @@ class HTERecommender:
         if matched_df is None:
             return result
         
-        # Step 2: Predict reaction type (using matched motifs)
-        if result.matched_motifs and not result.predicted_reaction_type:
-            pred_rxn, rxn_conf = self._predict_reaction_type(
-                result.reactant_a_type, result.reactant_b_type
-            )
-            result.predicted_reaction_type = pred_rxn
-            result.reaction_type_confidence = rxn_conf
-        
         # Apply reaction type filter if specified
         if reaction_type_filter:
             type_filtered = matched_df[matched_df['Reaction_Type_Standardized'] == reaction_type_filter]
@@ -1059,6 +1163,22 @@ class HTERecommender:
         # Apply catalyst filter if specified
         if catalyst_filter:
             matched_df = self._filter_by_catalyst(matched_df, catalyst_filter)
+
+        # Step 2: Predict reaction type (using reactant patterns; fallback to match frequency)
+        if result.matched_motifs and not result.predicted_reaction_type:
+            pred_rxn, rxn_conf = self._predict_reaction_type(
+                result.reactant_a_type, result.reactant_b_type
+            )
+            result.predicted_reaction_type = pred_rxn
+            result.reaction_type_confidence = rxn_conf
+        if not result.predicted_reaction_type or result.predicted_reaction_type == "Unknown":
+            if "Reaction_Type_Standardized" in matched_df.columns:
+                type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                type_series = type_series[type_series != ""]
+                if not type_series.empty:
+                    counts = type_series.value_counts()
+                    result.predicted_reaction_type = counts.index[0]
+                    result.reaction_type_confidence = float(counts.iloc[0] / counts.sum())
         
         result.total_matching_experiments = len(matched_df)
         result.database_coverage = (len(matched_df) / len(self.df)) * 100.0
