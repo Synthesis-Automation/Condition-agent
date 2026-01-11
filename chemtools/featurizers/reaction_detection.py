@@ -25,11 +25,18 @@ class ReactionMatch:
     matched_slots: int
     required_slots: int
 
+    @property
+    def confidence(self) -> float:
+        if self.required_slots == 0:
+            return 0.0
+        return self.matched_slots / self.required_slots
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "reaction_type": self.reaction_type,
             "name": self.name,
             "category": self.category,
+            "confidence": self.confidence,
             "matched_slots": self.matched_slots,
             "required_slots": self.required_slots,
             "slot_evidence": {slot: list(values) for slot, values in self.slot_evidence.items()},
@@ -127,9 +134,21 @@ def detect_reaction_types_from_smiles(
         if match is not None:
             matches.append(match)
 
+    # Priority map to break ties between overlapping definitions (e.g., Suzuki vs C-H Arylation)
+    # Higher values come first.
+    _PRIORITIES = {
+        "suzuki_miyaura": 100,
+        "buchwald_hartwig_cn": 100,
+        "buchwald_hartwig_co": 100,
+        "amide_formation": 100,
+        "c_h_arylation": 10,
+        "arylation_acidic_c_h": 10,
+    }
+
     matches.sort(
         key=lambda m: (
             -m.matched_slots,
+            -_PRIORITIES.get(m.reaction_type, 50),
             -sum(len(v) for v in m.slot_evidence.values()),
             m.reaction_type,
         )

@@ -195,17 +195,28 @@ def _reaction_type_summary(detection: Any) -> Dict[str, Any]:
     matches = detection.matches if detection else []
     if not matches:
         return {"reaction_type": "Unknown", "confidence": 0.0, "slot_evidence": {}}
+    
     best = matches[0]
-    required = int(best.required_slots or 0)
-    matched = int(best.matched_slots or 0)
-    confidence = float(matched) / float(required) if required else 0.0
-    return {
+    result = {
         "reaction_type": best.reaction_type,
         "name": best.name,
         "category": best.category,
-        "confidence": confidence,
+        "confidence": best.confidence,
         "slot_evidence": {slot: list(values) for slot, values in best.slot_evidence.items()},
     }
+    
+    # Add alternatives if requested (top 3 total)
+    if len(matches) > 1:
+        alts = []
+        for alt in matches[1:3]:
+            alts.append({
+                "reaction_type": alt.reaction_type,
+                "name": alt.name,
+                "confidence": alt.confidence
+            })
+        result["alternatives"] = alts
+        
+    return result
 
 
 def _extract_scores(result: Any) -> List[float]:

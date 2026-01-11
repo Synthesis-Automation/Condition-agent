@@ -148,9 +148,12 @@ def resolve_to_taxonomy(
         "ullmann": "ullmann_cn",
         "chan-lam": "chan_lam",
         "chan lam": "chan_lam",
+        "chanlam": "chan_lam",
+        "chan": "chan_lam",
         "grignard": "grignard_addition",
         "kumada": "kumada",
         "amide": "amide_formation",
+        "amidation": "amide_formation",
         "snar": "snar",
         "s_nar": "snar",
         "aromatic nucleophilic": "snar",
@@ -165,6 +168,7 @@ def resolve_to_taxonomy(
         "wittig": "wittig",
         "reduction": "carbonyl_reduction",
         "oxidation": "alcohol_oxidation",
+        "click": "click_cuaac",
     }
     
     for keyword, family_id in keyword_map.items():
@@ -207,7 +211,7 @@ def resolve_to_taxonomy(
     # Handle generic "C-O coupling" predictions
     if any(term in lower_pred for term in ["c-o coupling", "c-o bond", "etherification"]):
         if "Cu" in catalysts:
-            return "ullmann_ether"
+            return "ullmann_co"
         return "co_coupling"
     
     # Handle generic "C-S coupling" predictions

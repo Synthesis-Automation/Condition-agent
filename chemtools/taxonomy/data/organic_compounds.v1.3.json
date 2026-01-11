@@ -1799,7 +1799,7 @@
       "template": "single_bond",
       "A": "H_Scaffold",
       "B": "NCO2R",
-      "smarts": "[H:1]-[NX3;H1:2][CX3](=O)[OX2][#6]",
+      "smarts": "[H:1]-[NX3;H1,H2:2][CX3](=O)[OX2][#6]",
       "priority": 0,
       "description": "Carbamate N-H bond (H-Carbamate)."
     },
@@ -1809,7 +1809,7 @@
       "template": "single_bond",
       "A": "H_Scaffold",
       "B": "NCOR",
-      "smarts": "[H:1]-[NX3;H1:2][CX3](=O)[#6]",
+      "smarts": "[H:1]-[NX3;H1,H2:2][CX3](=O)[#6]",
       "priority": 0,
       "description": "Amide N-H bond (H-Amide)."
     },
@@ -3763,7 +3763,7 @@
       "template": "single_bond",
       "A": "H_Scaffold",
       "B": "NSO2R",
-      "smarts": "[H:1]-[NX3;H1:2][SX4](=O)(=O)[#6]",
+      "smarts": "[H:1]-[NX3;H1,H2:2][SX4](=O)(=O)[#6]",
       "priority": 0,
       "description": "Sulfonamide N-H bond (H-Sulfonamide)."
     },

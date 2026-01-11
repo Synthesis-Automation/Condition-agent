@@ -340,9 +340,21 @@ def _print_reaction_type(reaction_type: Dict[str, Any], *, indent: int = 0) -> N
     for key in ("reaction_type", "name", "category", "confidence"):
         value = reaction_type.get(key)
         if value is not None:
-            lines.append(f"{key}: {value}")
+            if key == "confidence":
+                lines.append(f"{key}: {value:.4f}")
+            else:
+                lines.append(f"{key}: {value}")
     if lines:
         print(_format_list(lines, indent=indent + 2))
+    
+    alternatives = reaction_type.get("alternatives")
+    if alternatives:
+        print(f"{prefix}  Alternatives:")
+        for alt in alternatives:
+            alt_name = alt.get("name") or alt.get("reaction_type")
+            alt_conf = alt.get("confidence", 0.0)
+            print(f"{prefix}    - {alt_name} [Conf: {alt_conf:.4f}]")
+
     slot_evidence = reaction_type.get("slot_evidence") or {}
     if slot_evidence:
         print(f"{prefix}  Slot Evidence:")
@@ -359,14 +371,23 @@ def _print_detection(detection: Dict[str, Any], *, indent: int = 0) -> None:
     if error:
         print(f"{prefix}Detection Error: {error}")
     matches = detection.get("matches") or []
-    print(f"{prefix}Detection Matches ({len(matches)}):")
+    # Show top 3 matches by confidence
+    top_matches = matches[:3]
+    print(f"{prefix}Detection Matches (Showing top {len(top_matches)} of {len(matches)}):")
     if not matches:
         print(f"{prefix}  - none")
         return
-    for match in matches:
+    for match in top_matches:
         name = match.get("name") or match.get("reaction_type") or "unknown"
         category = match.get("category")
-        header = f"{name} ({category})" if category else name
+        confidence = match.get("confidence")
+        
+        header = name
+        if category:
+            header += f" ({category})"
+        if confidence is not None:
+            header += f" [Confidence: {confidence:.2f}]"
+            
         print(f"{prefix}  - {header}")
         slot_evidence = match.get("slot_evidence") or {}
         for slot in sorted(slot_evidence):
