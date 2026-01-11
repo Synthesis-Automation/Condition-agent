@@ -243,7 +243,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             
         row = {
             # HTE canonical columns (lowercase with underscores)
-            "reaction_type": source_label,
+            "reaction_id": source_label,
             "yield": record.get("yield", 0.0),
             "z_score": 0.0,
             "reactant_1": type_a,
@@ -274,7 +274,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
     if "_reaction_key" in df.columns:
         group_key = "_reaction_key"
     else:
-        group_key = "reaction_type"
+        group_key = "reaction_id"
 
     for key, group in df.groupby(group_key):
         if len(group) > 1:
@@ -291,7 +291,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             df.loc[group.index, "z_score"] = 0.0
 
     canonical_cols = [
-        "reaction_type", "yield", "z_score", "reactant_1", "reactant_2",
+        "reaction_id", "yield", "z_score", "reactant_1", "reactant_2",
         "catalyst", "ligand", "base", "solvent", "additive",
         "Secondary Solvent", "Coupling Reagent", "Is_Intramolecular",
         "reaction_smiles",

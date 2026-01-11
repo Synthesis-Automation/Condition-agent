@@ -79,11 +79,25 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
     return ordered
 
 
+def _read_hte_csv(path: Path) -> pd.DataFrame:
+    encodings = ("utf-8", "utf-8-sig", "cp1252", "latin-1")
+    last_exc: Optional[Exception] = None
+    for encoding in encodings:
+        try:
+            return pd.read_csv(path, encoding=encoding)
+        except Exception as exc:
+            last_exc = exc
+    if last_exc:
+        raise last_exc
+    return pd.read_csv(path)
+
+
 def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = None) -> pd.DataFrame:
     df = df.copy()
 
     column_mapping = {
         "reaction_type": "Reaction_Type_Standardized",
+        "reaction_category": "Reaction_Category",
         "reactant_1": "Reactant_A_Type",
         "reactant_2": "Reactant_B_Type",
         "yield": "AREA_TOTAL_REDUCED",
@@ -96,6 +110,8 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
     }
 
     df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
+    if "Reaction_Type_Standardized" not in df.columns and "reaction_id" in df.columns:
+        df = df.rename(columns={"reaction_id": "Reaction_Type_Standardized"})
 
     if "Reaction_Key" in df.columns:
         if "Reaction_Type_Standardized" not in df.columns or not any(df["Reaction_Type_Standardized"]):
@@ -107,7 +123,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
         "Catalyst", "Ligand", "Base", "Solvent", "Additive",
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
-        "Reactant_A_Category", "Reactant_B_Category", "Is_Intramolecular",
+        "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category", "Is_Intramolecular",
         "Source_File", "Source_Group",
     ]
     for col in required_cols:
@@ -150,7 +166,7 @@ def _load_hte_database_cached(
         if path.suffix.lower() == ".jsonl":
             frame = _load_hte_jsonl(path)
         else:
-            frame = pd.read_csv(path)
+            frame = _read_hte_csv(path)
         frame = _normalize_hte_dataframe(frame, source_path=path)
         frames.append(frame)
 
@@ -942,7 +958,10 @@ class HTERecommender:
         
         # Apply reaction type filter if specified
         if reaction_type_filter:
-            matched_df = matched_df[matched_df['Reaction_Type_Standardized'] == reaction_type_filter]
+            type_filtered = matched_df[matched_df['Reaction_Type_Standardized'] == reaction_type_filter]
+            if type_filtered.empty and "Reaction_Category" in matched_df.columns:
+                type_filtered = matched_df[matched_df["Reaction_Category"] == reaction_type_filter]
+            matched_df = type_filtered
         
         # Apply catalyst filter if specified
         if catalyst_filter:

@@ -46,6 +46,8 @@ def _detect_csv_type(path: Path) -> str:
     header_lower = [h.strip().lower() for h in header]
     if "reaction_type_standardized" in header_lower:
         return "datasets"
+    if "reaction_id" in header_lower:
+        return "datasets"
     if "temperature_c" in header_lower:
         return "rules"
     if "reactant_1" in header_lower and "reactant_2" in header_lower:
@@ -86,10 +88,11 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
     ]
     if data_type == "rules":
         return base
+    reaction_label = "Reaction ID" if data_type == "datasets" else "Reaction Type"
     return base + [
         ("Secondary Solvent", "secondary_solvent"),
         ("Coupling Reagent", "coupling_reagent"),
-        ("Reaction Type", "reaction_type"),
+        (reaction_label, "reaction_type"),
         ("Reactant Types", "reactant_types"),
         ("Match Score", "match_score"),
     ]
@@ -166,7 +169,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.min_exp_spin.setValue(1)
 
         self.reaction_filter_edit = QtWidgets.QLineEdit()
-        self.reaction_filter_edit.setPlaceholderText("Optional reaction type filter (e.g., Suzuki)")
+        self.reaction_filter_edit.setPlaceholderText("Optional reaction type/category filter (e.g., Suzuki)")
 
         self.catalyst_filter_edit = QtWidgets.QLineEdit()
         self.catalyst_filter_edit.setPlaceholderText("Optional catalyst filter (e.g., Pd, Cu)")

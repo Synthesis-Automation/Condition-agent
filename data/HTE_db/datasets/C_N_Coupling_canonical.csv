@@ -1,4 +1,4 @@
-reaction_type,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,solvent,additive,Secondary Solvent,Coupling Reagent,Is_Intramolecular,reaction_smiles
+reaction_id,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,solvent,additive,Secondary Solvent,Coupling Reagent,Is_Intramolecular,reaction_smiles
 C_N_Coupling,64.0,0.0,RCH2-OR,Ar-Cl,Pd(OAc)2,RuPhos,NaOtBu / NaOH,PhMe / water / Me2CO / EtOAc,NH4Cl,,,False,C1CC2(CCN1)OCCO2.Clc1ccc2sccc2c1>>O=C1CCN(c2ccc3sccc3c2)CC1
 C_N_Coupling,85.0,0.0,R2CH-NH2,Ar-OH,Pd2(dba)3,DavePhos,NaOtBu / Et3N,"1,4-Dioxane",,,,False,CC(C)(C)OC(=O)N1CCCC[C@H](N)C1.Oc1cc(Br)c2ccncc2c1.O=S(=O)(N(c1ccccc1)S(=O)(=O)C(F)(F)F)C(F)(F)F>>CC(C)(C)OC(=O)N1CCCC[C@H](Nc2cc(OS(=O)(=O)C(F)(F)F)cc3cnccc23)C1
 C_N_Coupling,57.0,0.0,Ar-NHR,R3C-Br,NiOAc2,229184-98-9,Dabco,MTBE / DCM,,,,False,COC(=O)CC1CNc2ccccc21.[N-]=[N+]=NCCC1(Br)C(=O)Nc2ccccc21>>COC(=O)Cc1cn([C@]2(CCN=[N+]=[N-])C(=O)Nc3ccccc32)c2ccccc12
