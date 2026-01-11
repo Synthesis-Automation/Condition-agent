@@ -73,6 +73,33 @@ def _safe_text(value: Any) -> str:
     return str(value)
 
 
+def _collect_reaction_nearby_groups(reaction_smiles: str) -> List[str]:
+    if not reaction_smiles:
+        return []
+    try:
+        from chemtools.featurizers.unified import featurize_reaction
+    except Exception:
+        return []
+
+    try:
+        payload = featurize_reaction(reaction_smiles)
+    except Exception:
+        return []
+
+    if not isinstance(payload, dict):
+        return []
+    reaction = payload.get("reaction")
+    if not isinstance(reaction, dict):
+        return []
+    aggregates = reaction.get("aggregates") or {}
+    groups = aggregates.get("nearby_groups_combined") or []
+    return [str(group).strip() for group in groups if str(group).strip()]
+
+
+def _format_nearby_groups(groups: List[str]) -> str:
+    return ", ".join(groups) if groups else "None"
+
+
 def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
     base = [
         ("Rank", "rank"),
@@ -397,6 +424,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             detected_label = ", ".join([item for item in detected if item])
         matches = getattr(result, "total_matching_experiments", 0)
         coverage = getattr(result, "database_coverage", 0.0)
+        reaction_smiles = self.reaction_smiles_edit.text().strip()
+        nearby_summary = _format_nearby_groups(
+            _collect_reaction_nearby_groups(reaction_smiles)
+        )
 
         summary_lines = [
             html.escape(
@@ -409,6 +440,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             ),
             html.escape(f"A: {reactant_a} | Type: {type_a} ({cat_a})"),
             html.escape(f"B: {reactant_b} | Type: {type_b} ({cat_b})"),
+            html.escape(f"Nearby Groups (All): {nearby_summary}"),
             html.escape(f"P: {product}"),
         ]
         if stats:

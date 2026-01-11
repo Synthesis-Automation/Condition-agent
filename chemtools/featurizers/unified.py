@@ -5,6 +5,7 @@ Unified feature bundles for molecules and reactions.
 from __future__ import annotations
 
 from functools import lru_cache
+import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -234,14 +235,56 @@ def _extract_scores(result: Any) -> List[float]:
     return scores
 
 
+def _motif_group_ids(motifs: Iterable[Dict[str, Any]]) -> set[str]:
+    group_ids: set[str] = set()
+    for motif in motifs:
+        if not isinstance(motif, dict):
+            continue
+        compound_id = str(motif.get("compound_id") or "").strip()
+        if not compound_id:
+            continue
+        if "-" in compound_id:
+            group_id = compound_id.split("-")[-1]
+        else:
+            group_id = compound_id
+        group_id = group_id.strip()
+        if group_id:
+            group_ids.add(group_id)
+    return group_ids
+
+
+@lru_cache(maxsize=1)
+def _load_scaffold_motif_ids() -> set[str]:
+    path = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
+    if not path.exists():
+        return set()
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    motifs = set()
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        motif_id = str(entry.get("id") or "").strip()
+        if motif_id:
+            motifs.add(motif_id)
+    return motifs
+
+
 def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
     reactant_list = list(reactants)
     aryl_scores: List[float] = []
     alkyl_scores: List[float] = []
     electronic_scores: List[float] = []
     motifs: set[str] = set()
+    nearby_groups: List[str] = []
+    nearby_seen: set[str] = set()
+    scaffold_ids = _load_scaffold_motif_ids()
 
     for reactant in reactant_list:
+        exclude_group_ids = _motif_group_ids(reactant.get("motifs", []))
         for entry in reactant.get("steric", {}).get("aryl", []):
             aryl_scores.extend(_extract_scores(entry.get("result")))
         for entry in reactant.get("steric", {}).get("alkyl", []):
@@ -251,7 +294,31 @@ def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[st
         for motif in reactant.get("motifs", []):
             compound_id = motif.get("compound_id")
             if compound_id:
-                motifs.add(str(compound_id))
+                compound_text = str(compound_id)
+                motifs.add(compound_text)
+                if compound_text in scaffold_ids and compound_text not in nearby_seen:
+                    nearby_seen.add(compound_text)
+                    nearby_groups.append(compound_text)
+        for entry in reactant.get("nearby", []) or []:
+            if not isinstance(entry, dict):
+                continue
+            for group in entry.get("result") or []:
+                if isinstance(group, dict):
+                    group_id = str(group.get("group_id") or "").strip()
+                    name = str(group.get("name") or group_id or "").strip()
+                else:
+                    group_id = ""
+                    name = str(group).strip()
+                if not name:
+                    continue
+                if group_id and group_id in exclude_group_ids:
+                    continue
+                if not group_id and name.lstrip("-") in exclude_group_ids:
+                    continue
+                if name in nearby_seen:
+                    continue
+                nearby_seen.add(name)
+                nearby_groups.append(name)
 
     avg_electronic = None
     if electronic_scores:
@@ -260,6 +327,7 @@ def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[st
     return {
         "reactant_count": len(reactant_list),
         "motif_ids": sorted(motifs),
+        "nearby_groups_combined": nearby_groups,
         "max_aryl_steric": max(aryl_scores) if aryl_scores else 0.0,
         "max_alkyl_steric": max(alkyl_scores) if alkyl_scores else 0.0,
         "avg_aryl_electronic": avg_electronic if avg_electronic is not None else 5.0,
