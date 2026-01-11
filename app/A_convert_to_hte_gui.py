@@ -59,6 +59,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
         
         # UI Elements
         self.dataset_dropdown = QtWidgets.QComboBox()
+        self.source_dir_edit = QtWidgets.QLineEdit()
+        self.source_dir_edit.setPlaceholderText("Source folder containing *.jsonl files")
         self.input_edit = QtWidgets.QLineEdit()
         self.output_edit = QtWidgets.QLineEdit()
         self.drop_catalyst_check = QtWidgets.QCheckBox("Drop reactions without a catalyst")
@@ -77,6 +79,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         
         # Connections
         self.dataset_dropdown.currentIndexChanged.connect(self._on_dataset_changed)
+        self.source_dir_edit.editingFinished.connect(self._load_datasets)
         self.btn_run.clicked.connect(self.run_processing)
         self.btn_quit.clicked.connect(self.close)
         
@@ -94,6 +97,14 @@ class HTEConverterWindow(QtWidgets.QWidget):
         
         form = QtWidgets.QFormLayout()
         
+        source_layout = QtWidgets.QHBoxLayout()
+        source_layout.addWidget(self.source_dir_edit)
+        source_browse_btn = QtWidgets.QPushButton("Browse")
+        source_browse_btn.setFixedWidth(80)
+        source_browse_btn.clicked.connect(self._choose_source_dir)
+        source_layout.addWidget(source_browse_btn)
+        form.addRow("Source Folder:", source_layout)
+
         # Dataset selector
         ds_layout = QtWidgets.QHBoxLayout()
         ds_layout.addWidget(self.dataset_dropdown)
@@ -121,23 +132,40 @@ class HTEConverterWindow(QtWidgets.QWidget):
 
     def _load_datasets(self):
         self.dataset_dropdown.clear()
-        self.dataset_dropdown.addItem("-- Select or enter custom path --")
-        
-        dataset_dir = PROJECT_ROOT / "data" / "reaction_dataset"
+        self.dataset_dropdown.addItem("-- Select or enter custom path --", None)
+
+        source_text = self.source_dir_edit.text().strip()
+        dataset_dir = Path(source_text) if source_text else PROJECT_ROOT / "data" / "reaction_dataset"
+        self.source_dir_edit.setText(str(dataset_dir))
+
         if dataset_dir.exists():
-            for f in dataset_dir.glob("*.jsonl"):
-                self.dataset_dropdown.addItem(f.stem)
+            files = sorted(p for p in dataset_dir.rglob("*.jsonl") if p.is_file())
+            for f in files:
+                self.dataset_dropdown.addItem(f.name, str(f))
 
     def _on_dataset_changed(self, index):
         if index <= 0:
             return
             
-        name = self.dataset_dropdown.currentText()
-        input_path = PROJECT_ROOT / "data" / "reaction_dataset" / f"{name}.jsonl"
-        output_path = PROJECT_ROOT / "data" / "HTE_db" / "datasets" / f"{name}_canonical.csv"
-        
+        data_path = self.dataset_dropdown.currentData()
+        if not data_path:
+            return
+
+        input_path = Path(data_path)
+        output_path = PROJECT_ROOT / "data" / "HTE_db" / "datasets" / f"{input_path.stem}_canonical.csv"
+
         self.input_edit.setText(str(input_path))
         self.output_edit.setText(str(output_path))
+
+    def _choose_source_dir(self):
+        path = QtWidgets.QFileDialog.getExistingDirectory(
+            self,
+            "Select Source Folder",
+            str(PROJECT_ROOT),
+        )
+        if path:
+            self.source_dir_edit.setText(path)
+            self._load_datasets()
 
     def log_msg(self, text: str):
         self.log.appendPlainText(text)
