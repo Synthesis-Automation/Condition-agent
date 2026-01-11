@@ -302,8 +302,8 @@
       ]
     },
     {
-      "id": "amide_coupling",
-      "name": "Amide Coupling",
+      "id": "amide_formation",
+      "name": "Amide Formation",
       "category": "Amide Formation",
       "mechanism": "acylation",
       "reactants": {
