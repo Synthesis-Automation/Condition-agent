@@ -285,6 +285,67 @@
       ]
     },
     {
+      "id": "cyanation_coupling",
+      "name": "Cyanation Coupling",
+      "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "CN-"
+      },
+      "products": {
+        "product": "Ar-CN"
+      },
+      "catalysts": [
+        "Pd",
+        "Cu",
+        "Ni"
+      ],
+      "examples": [
+        "Brc1ccccc1.[C-]#N>>N#Cc1ccccc1"
+      ]
+    },
+    {
+      "id": "arylation_acidic_c_h",
+      "name": "Arylation_Acidic_C_H",
+      "category": "C-C Coupling",
+      "mechanism": "cross-coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "nucleophile": "Alkyl-H-acidic"
+      },
+      "products": {
+        "product": "Ar-R"
+      },
+      "catalysts": [
+        "Pd",
+        "Ni"
+      ],
+      "examples": [
+        "Brc1ccccc1.CC(=O)C>>CC(=O)Cc1ccccc1"
+      ]
+    },
+    {
+      "id": "c_h_arylation",
+      "name": "C-H Arylation",
+      "category": "C-C Coupling",
+      "mechanism": "C-H activation",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "substrate": "Ar-H"
+      },
+      "products": {
+        "product": "Ar-Ar"
+      },
+      "catalysts": [
+        "Pd",
+        "Ni"
+      ],
+      "examples": [
+        "Brc1ccccc1.c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+      ]
+    },
+    {
       "id": "snar_cn",
       "name": "SNAr C-N",
       "category": "C-N Coupling",
