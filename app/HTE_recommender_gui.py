@@ -2,11 +2,12 @@ import csv
 import html
 import math
 import sys
+import time
 from dataclasses import asdict
 from pathlib import Path
 from typing import Optional, Tuple, Dict, Any, List
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -94,6 +95,25 @@ def _collect_reaction_nearby_groups(reaction_smiles: str) -> List[str]:
     aggregates = reaction.get("aggregates") or {}
     groups = aggregates.get("nearby_groups_combined") or []
     return [str(group).strip() for group in groups if str(group).strip()]
+
+
+def _reaction_image_path(prefix: str) -> Path:
+    output_dir = PROJECT_ROOT / "results" / "visualization"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir / f"{prefix}_{time.time_ns()}.png"
+
+
+def _scale_pixmap_half(pixmap: QtGui.QPixmap) -> QtGui.QPixmap:
+    if pixmap.isNull():
+        return pixmap
+    new_width = max(1, int(pixmap.width() * 0.5))
+    new_height = max(1, int(pixmap.height() * 0.5))
+    return pixmap.scaled(
+        new_width,
+        new_height,
+        QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+        QtCore.Qt.TransformationMode.SmoothTransformation,
+    )
 
 
 def _format_nearby_groups(groups: List[str]) -> str:
@@ -223,6 +243,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         self.thread: Optional[QtCore.QThread] = None
         self.worker: Optional[RecommendationWorker] = None
+        self._reaction_dialog: Optional[QtWidgets.QDialog] = None
 
     def _setup_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -327,6 +348,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.table = self._create_results_table()
         self.results_tabs.addTab(self.table, "All")
         self.status.setText("")
+        if self._reaction_dialog:
+            self._reaction_dialog.close()
+            self._reaction_dialog = None
 
     def _run_recommendation(self) -> None:
         db_path = self.db_path_edit.text().strip()
@@ -447,6 +471,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             stats_line = " | ".join(f"{key}: {stats[key]}" for key in sorted(stats))
             summary_lines.append(html.escape(f"Stats: {stats_line}"))
         self.summary.setHtml("<br>".join(summary_lines))
+        self._show_reaction_image(self.reaction_smiles_edit.text().strip())
 
         recs = list(getattr(result, "recommendations", []) or [])
         source_map = getattr(result, "recommendations_by_source", {}) or {}
@@ -466,6 +491,73 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             self._populate_table(group_table, group_recs, group_columns)
             label = (source_group or "unknown").replace("_", " ").title()
             self.results_tabs.addTab(group_table, label)
+
+    def _show_reaction_image(self, reaction_smiles: str) -> None:
+        if not reaction_smiles:
+            return
+        if self._reaction_dialog:
+            self._reaction_dialog.close()
+            self._reaction_dialog = None
+
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle("Reaction Preview")
+        dialog.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+
+        layout = QtWidgets.QVBoxLayout(dialog)
+        info_label = QtWidgets.QLabel("")
+        info_label.setWordWrap(True)
+        layout.addWidget(info_label)
+
+        images_widget = QtWidgets.QWidget()
+        images_layout = QtWidgets.QHBoxLayout(images_widget)
+        images_layout.setContentsMargins(0, 0, 0, 0)
+        images_layout.setSpacing(12)
+        layout.addWidget(images_widget)
+
+        try:
+            from chemtools.visualization import render_molecule_image, render_reaction_image
+        except Exception as exc:
+            info_label.setText(f"Visualization unavailable: {exc}")
+            dialog.show()
+            self._reaction_dialog = dialog
+            return
+
+        reactant_a, reactant_b, product = _parse_reaction_smiles(reaction_smiles)
+        if product:
+            info_label.setText("Reaction preview")
+            output_path = _reaction_image_path("reaction")
+            try:
+                render_reaction_image(reaction_smiles, output_path)
+                pixmap = _scale_pixmap_half(QtGui.QPixmap(str(output_path)))
+            except Exception as exc:
+                info_label.setText(f"Unable to render reaction image: {exc}")
+            else:
+                image_label = QtWidgets.QLabel()
+                image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                image_label.setPixmap(pixmap)
+                images_layout.addWidget(image_label)
+        else:
+            info_label.setText("Product SMILES missing; showing reactants only.")
+            for label, smiles in (("A", reactant_a), ("B", reactant_b)):
+                if not smiles:
+                    continue
+                output_path = _reaction_image_path(f"reactant_{label.lower()}")
+                try:
+                    render_molecule_image(smiles, output_path, legend=f"Reactant {label}")
+                    pixmap = _scale_pixmap_half(QtGui.QPixmap(str(output_path)))
+                except Exception as exc:
+                    info_label.setText(f"Unable to render reactant images: {exc}")
+                    break
+                image_label = QtWidgets.QLabel()
+                image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                image_label.setPixmap(pixmap)
+                images_layout.addWidget(image_label)
+
+        if dialog.layout():
+            dialog.layout().setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetFixedSize)
+        dialog.adjustSize()
+        dialog.show()
+        self._reaction_dialog = dialog
 
 
 def main() -> None:
