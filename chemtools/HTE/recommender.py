@@ -426,7 +426,7 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
     except:
         # Robust fallback
         tokens = _split_motif_tokens(key)
-        expanded = _expand_motif_tokens(tokens, _load_motif_sets())
+        expanded = _expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map())
         return set(expanded), set(), set()
 
 
@@ -439,6 +439,27 @@ def _derive_query_sets(
     formed = product_motifs - reactant_motifs
     spectators = reactant_motifs & product_motifs
     return reacted, formed, spectators
+
+
+def _prioritize_motifs(
+    motifs: Iterable[str],
+    reacted: Optional[Set[str]],
+    spectators: Optional[Set[str]],
+) -> List[str]:
+    ordered = [m for m in motifs if m]
+    if not ordered or (not reacted and not spectators):
+        return ordered
+    reacted = reacted or set()
+    spectators = spectators or set()
+    buckets = {0: [], 1: [], 2: []}
+    for motif in ordered:
+        if motif in reacted:
+            buckets[0].append(motif)
+        elif motif in spectators:
+            buckets[2].append(motif)
+        else:
+            buckets[1].append(motif)
+    return buckets[0] + buckets[1] + buckets[2]
 
 
 def _load_hte_jsonl(path: Path) -> pd.DataFrame:
@@ -967,15 +988,26 @@ class HTERecommender:
         key = _reactant_key(list(type_a) + list(type_b))
         direct_match: Optional[pd.DataFrame] = None
         fallback_used = False
+        reacted_set = query_reacted or set()
+        spectator_set = query_spectators or set()
+
         if key in self.indexed_data:
             direct_match = self.indexed_data[key].copy()
             direct_match['match_score'] = 1.0
             direct_match['match_priority'] = 0
             if not result.matched_motifs:
-                result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
+                pick_a = _prioritize_motifs(type_a, reacted_set, spectator_set)
+                pick_b = _prioritize_motifs(type_b, reacted_set, spectator_set)
+                if pick_a or pick_b:
+                    result.matched_motifs = (
+                        pick_a[0] if pick_a else "",
+                        pick_b[0] if pick_b else "",
+                    )
+                else:
+                    result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
         else:
-            list_a = type_a or [""]
-            list_b = type_b or [""]
+            list_a = _prioritize_motifs(type_a, reacted_set, spectator_set) or [""]
+            list_b = _prioritize_motifs(type_b, reacted_set, spectator_set) or [""]
             for ma in list_a:
                 for mb in list_b:
                     if not ma and not mb:

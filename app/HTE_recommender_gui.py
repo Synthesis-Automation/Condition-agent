@@ -378,24 +378,34 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
     def _render_result(self, result: object, stats: Dict[str, Any]) -> None:
         data_type = _detect_csv_type(Path(self.db_path_edit.text().strip()))
+        reactant_a = getattr(result, "reactant_a_smiles", "")
+        reactant_b = getattr(result, "reactant_b_smiles", "") or "None"
+        product = getattr(result, "product_smiles", "") or "None"
+        type_a = getattr(result, "reactant_a_type", "")
+        cat_a = getattr(result, "reactant_a_category", "")
+        type_b = getattr(result, "reactant_b_type", "")
+        cat_b = getattr(result, "reactant_b_category", "")
+        detected = getattr(result, "matched_motifs", None)
+        detected_label = detected[0] if isinstance(detected, tuple) and detected else ""
+        predicted = getattr(result, "predicted_reaction_type", "")
+        confidence = getattr(result, "reaction_type_confidence", 0.0) * 100
+        matches = getattr(result, "total_matching_experiments", 0)
+        coverage = getattr(result, "database_coverage", 0.0)
+
         summary_lines = [
-            f"Data type: {data_type}",
-            f"Reactant A: {getattr(result, 'reactant_a_smiles', '')}",
-            f"Reactant B: {getattr(result, 'reactant_b_smiles', '') or 'None'}",
-            f"Product: {getattr(result, 'product_smiles', '') or 'None'}",
-            f"Type A: {getattr(result, 'reactant_a_type', '')} ({getattr(result, 'reactant_a_category', '')})",
-            f"Type B: {getattr(result, 'reactant_b_type', '')} ({getattr(result, 'reactant_b_category', '')})",
-            f"Predicted: {getattr(result, 'predicted_reaction_type', '')} ({getattr(result, 'reaction_type_confidence', 0.0) * 100:.1f}%)",
-            f"Matches: {getattr(result, 'total_matching_experiments', 0)}",
-            f"Coverage: {getattr(result, 'database_coverage', 0.0):.2f}%",
+            (
+                f"Data: {data_type} | Matches: {matches} | Coverage: {coverage:.2f}% | "
+                f"Detected: {detected_label} | Pred: {predicted} ({confidence:.1f}%)"
+            ),
+            f"A: {reactant_a} | Type: {type_a} ({cat_a})",
+            f"B: {reactant_b} | Type: {type_b} ({cat_b})",
+            f"P: {product}",
         ]
         if getattr(result, "matched_motifs", None):
             summary_lines.append(f"Matched motifs: {getattr(result, 'matched_motifs')}")
         if stats:
-            summary_lines.append("")
-            summary_lines.append("Database stats:")
-            for key in sorted(stats):
-                summary_lines.append(f"  {key}: {stats[key]}")
+            stats_line = " | ".join(f"{key}: {stats[key]}" for key in sorted(stats))
+            summary_lines.append(f"Stats: {stats_line}")
         self.summary.setPlainText("\n".join(summary_lines))
 
         recs = list(getattr(result, "recommendations", []) or [])
