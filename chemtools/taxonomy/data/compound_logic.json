@@ -254,6 +254,9 @@
     "amides": {
       "name": "Amides",
       "members": [
+        "Any-Amide",
+        "Ar-Amide",
+        "Alkyl-Amide",
         "Any-CONH2",
         "Any-CONHR",
         "Any-CONR2",

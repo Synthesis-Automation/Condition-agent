@@ -11,7 +11,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from PyQt6 import QtWidgets, QtCore
-from scripts.A_convert_to_hte_format import process_reaction_dataset
+from app.A_convert_to_hte_format import process_reaction_dataset
 
 class ConversionWorker(QtCore.QObject):
     finished = QtCore.pyqtSignal(bool, str)

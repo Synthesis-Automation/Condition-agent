@@ -30,6 +30,8 @@ class ReactionMatch:
             "reaction_type": self.reaction_type,
             "name": self.name,
             "category": self.category,
+            "matched_slots": self.matched_slots,
+            "required_slots": self.required_slots,
             "slot_evidence": {slot: list(values) for slot, values in self.slot_evidence.items()},
         }
 
