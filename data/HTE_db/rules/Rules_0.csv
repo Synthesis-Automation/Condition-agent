@@ -2,5 +2,5 @@ reaction_type,reaction_category,yield,z_score,reactant_1,reactant_2,catalyst,lig
 buchwald_hartwig_cn,C-N Coupling,95,2,Any-NH2,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),tBuBrettPhos or BippyPhos,K3PO4 (aq) or Cs2CO3; alt: NaOtBu or KHMDS (strong),"MeCN, tBuOH, dioxane, toluene",,100
 buchwald_hartwig_cn,C-N Coupling,95,2,Any-NHR,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),"QPhos, XantPhos, or tBuBrettPhos",Cs2CO3 (weak); alt: KHMDS or NaOtBu (strong),"Dioxane, MeCN, or THF",,
 buchwald_hartwig_cn,C-N Coupling,95,2,AromN-H,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),"Josiphos SL-009, tBuBrettPhos, or XantPhos",K3PO4 (aq) or Cs2CO3; alt: NaOtBu,Dioxane or t鈥慉mOH,,
-buchwald_hartwig_cn,C-N Coupling,95,2,Any-CONH2,Any-CONHR,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),"tBuXPhos, tBuBrettPhos, or AlPhos",K3PO4 (aq) or Cs2CO3; alt: NaOtBu,Dioxane or t鈥慉mOH,,
-buchwald_hartwig_cn,C-N Coupling,95,2,@amines_nh,@sp2_electrophiles,Buchwald precatalyst (allyl/crotyl > G1鈥揋4 > LxPdCl2; avoid Pd2(dba)3),tBuBrettPhos-Class,"K3PO4 (aq, ~3.25 M) 3.0 equiv (or Cs2CO3)","MeCN, tBuOH, dioxane, toluene",,
+buchwald_hartwig_cn,C-N Coupling,95,2,@amides,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),"tBuXPhos, tBuBrettPhos, or AlPhos",K3PO4 (aq) or Cs2CO3; alt: NaOtBu,Dioxane or t鈥慉mOH,,
+buchwald_hartwig_cn,C-N Coupling,95,2,@amines_nh,@sp2_electrophiles,Buchwald precatalyst (allyl/crotyl > G1-4 > LxPdCl2; avoid Pd2(dba)3),tBuBrettPhos-Class,"K3PO4 (aq, ~3.25 M) 3.0 equiv (or Cs2CO3)","MeCN, tBuOH, dioxane, toluene",,
