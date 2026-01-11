@@ -477,6 +477,7 @@ class HTERecommendationResult:
     
     # Recommendations
     recommendations: List[ConditionRecommendation] = field(default_factory=list)
+    recommendations_by_source: Dict[str, List[ConditionRecommendation]] = field(default_factory=dict)
     
     # Metadata
     total_matching_experiments: int = 0
@@ -975,6 +976,14 @@ class HTERecommender:
             result.recommendations = self._aggregate_conditions(
                 matched_df, top_k, min_experiments
             )
+            if "Source_Group" in matched_df.columns:
+                by_source: Dict[str, List[ConditionRecommendation]] = {}
+                for group_name, group_df in matched_df.groupby("Source_Group"):
+                    label = group_name or "unknown"
+                    by_source[label] = self._aggregate_conditions(
+                        group_df, top_k, min_experiments
+                    )
+                result.recommendations_by_source = by_source
         
         return result
     

@@ -180,10 +180,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.summary = QtWidgets.QPlainTextEdit()
         self.summary.setReadOnly(True)
 
-        self.table = QtWidgets.QTableWidget(0, 0)
-        self.table.setSortingEnabled(True)
-        self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setAlternatingRowColors(True)
+        self.results_tabs = QtWidgets.QTabWidget()
+        self.table = self._create_results_table()
+        self.results_tabs.addTab(self.table, "All")
 
         self.status = QtWidgets.QLabel("")
 
@@ -240,7 +239,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel("Summary:"))
         layout.addWidget(self.summary, stretch=1)
         layout.addWidget(QtWidgets.QLabel("Recommendations:"))
-        layout.addWidget(self.table, stretch=3)
+        layout.addWidget(self.results_tabs, stretch=3)
         layout.addWidget(self.status)
 
     def _bind_signals(self) -> None:
@@ -284,10 +283,18 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         data_type = _detect_csv_type(path)
         self.data_type_label.setText(f"Data type: {data_type}")
 
+    def _create_results_table(self) -> QtWidgets.QTableWidget:
+        table = QtWidgets.QTableWidget(0, 0)
+        table.setSortingEnabled(True)
+        table.horizontalHeader().setStretchLastSection(True)
+        table.setAlternatingRowColors(True)
+        return table
+
     def _clear_results(self) -> None:
         self.summary.clear()
-        self.table.setRowCount(0)
-        self.table.setColumnCount(0)
+        self.results_tabs.clear()
+        self.table = self._create_results_table()
+        self.results_tabs.addTab(self.table, "All")
         self.status.setText("")
 
     def _run_recommendation(self) -> None:
@@ -339,6 +346,36 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.status.setText("Done")
         self._render_result(result, stats)
 
+    def _populate_table(
+        self,
+        table: QtWidgets.QTableWidget,
+        recs: List[Any],
+        columns: List[Tuple[str, str]],
+    ) -> None:
+        table.setColumnCount(len(columns))
+        table.setHorizontalHeaderLabels([label for label, _ in columns])
+        table.setRowCount(len(recs))
+
+        for row_index, rec in enumerate(recs):
+            rec_dict = asdict(rec)
+            rec_dict["rank"] = row_index + 1
+            reactant_types = []
+            for item in list(getattr(rec, "reactant_types", []) or []):
+                text = _safe_text(item).strip()
+                if text:
+                    reactant_types.append(text)
+            rec_dict["reactant_types"] = " + ".join(reactant_types)
+            for col_index, (_, key) in enumerate(columns):
+                value = rec_dict.get(key)
+                if isinstance(value, float):
+                    cell_text = _format_float(value)
+                else:
+                    cell_text = str(value) if value is not None else ""
+                item = QtWidgets.QTableWidgetItem(cell_text)
+                table.setItem(row_index, col_index, item)
+
+        table.resizeColumnsToContents()
+
     def _render_result(self, result: object, stats: Dict[str, Any]) -> None:
         data_type = _detect_csv_type(Path(self.db_path_edit.text().strip()))
         summary_lines = [
@@ -362,30 +399,23 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.summary.setPlainText("\n".join(summary_lines))
 
         recs = list(getattr(result, "recommendations", []) or [])
-        columns = _table_columns_for_type(data_type)
-        self.table.setColumnCount(len(columns))
-        self.table.setHorizontalHeaderLabels([label for label, _ in columns])
-        self.table.setRowCount(len(recs))
+        source_map = getattr(result, "recommendations_by_source", {}) or {}
+        self.results_tabs.clear()
 
-        for row_index, rec in enumerate(recs):
-            rec_dict = asdict(rec)
-            rec_dict["rank"] = row_index + 1
-            reactant_types = []
-            for item in list(getattr(rec, "reactant_types", []) or []):
-                text = _safe_text(item).strip()
-                if text:
-                    reactant_types.append(text)
-            rec_dict["reactant_types"] = " + ".join(reactant_types)
-            for col_index, (_, key) in enumerate(columns):
-                value = rec_dict.get(key)
-                if isinstance(value, float):
-                    cell_text = _format_float(value)
-                else:
-                    cell_text = str(value) if value is not None else ""
-                item = QtWidgets.QTableWidgetItem(cell_text)
-                self.table.setItem(row_index, col_index, item)
+        self.table = self._create_results_table()
+        self.results_tabs.addTab(self.table, "All")
+        all_columns = _table_columns_for_type(data_type)
+        self._populate_table(self.table, recs, all_columns)
 
-        self.table.resizeColumnsToContents()
+        base_groups = ["datasets", "rules", "experiments"]
+        extra_groups = [g for g in sorted(source_map) if g not in base_groups]
+        for source_group in base_groups + extra_groups:
+            group_recs = list(source_map.get(source_group) or [])
+            group_table = self._create_results_table()
+            group_columns = _table_columns_for_type(source_group)
+            self._populate_table(group_table, group_recs, group_columns)
+            label = (source_group or "unknown").replace("_", " ").title()
+            self.results_tabs.addTab(group_table, label)
 
 
 def main() -> None:
