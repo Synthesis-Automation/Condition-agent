@@ -403,7 +403,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                 f"Data: {data_type} | Matches: {matches} | Coverage: {coverage:.2f}%"
             ),
             (
-                f'<span style="color:#0066ff;">'
+                f'<span style="color:#ffeb3b; font-weight:700;">'
                 f'{html.escape(f"MATCHED: {detected_label or "None"} | PRED: {predicted} ({confidence:.1f}%)")}'
                 f"</span>"
             ),
