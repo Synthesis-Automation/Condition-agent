@@ -133,6 +133,7 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
         ("Base", "base"),
         ("Solvent", "solvent"),
         ("Additive", "additive"),
+        ("Nearby Groups", "nearby_groups"),
     ]
     if data_type == "rules":
         return base + [("Reaction ID", "reaction_id")]
@@ -244,6 +245,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.thread: Optional[QtCore.QThread] = None
         self.worker: Optional[RecommendationWorker] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
+        self._nearby_groups_summary: str = ""
 
     def _setup_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -348,6 +350,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.table = self._create_results_table()
         self.results_tabs.addTab(self.table, "All")
         self.status.setText("")
+        self._nearby_groups_summary = ""
         if self._reaction_dialog:
             self._reaction_dialog.close()
             self._reaction_dialog = None
@@ -421,7 +424,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                     reactant_types.append(text)
             rec_dict["reactant_types"] = " + ".join(reactant_types)
             for col_index, (_, key) in enumerate(columns):
-                value = rec_dict.get(key)
+                if key == "nearby_groups":
+                    value = self._nearby_groups_summary
+                else:
+                    value = rec_dict.get(key)
                 if isinstance(value, float):
                     cell_text = _format_float(value)
                 else:
@@ -452,6 +458,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         nearby_summary = _format_nearby_groups(
             _collect_reaction_nearby_groups(reaction_smiles)
         )
+        self._nearby_groups_summary = nearby_summary
 
         summary_lines = [
             html.escape(

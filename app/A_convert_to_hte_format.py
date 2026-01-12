@@ -7,6 +7,7 @@ from functools import lru_cache
 import argparse
 import sys
 import os
+from collections import Counter
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -24,6 +25,25 @@ def cached_featurize(smiles: str):
     options = {"motif_site_filter": "substituent"}
     return featurize_molecule(smiles, options=options)
 
+@lru_cache(maxsize=1)
+def _load_scaffold_motif_ids() -> set[str]:
+    path = PROJECT_ROOT / "chemtools" / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
+    if not path.exists():
+        return set()
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    motifs = set()
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        motif_id = str(entry.get("id") or "").strip()
+        if motif_id:
+            motifs.add(motif_id)
+    return motifs
+
 def _dedupe_list(values: Iterable[str]) -> List[str]:
     seen = set()
     out: List[str] = []
@@ -40,6 +60,56 @@ def _reactant_key(values: Iterable[Optional[str]]) -> str:
     """Generate a standardized key for reactant combinations."""
     items = _dedupe_list([str(v).strip() for v in values if v])
     return "|".join(sorted(items))
+
+def _motif_group_ids(values: Iterable[str]) -> set[str]:
+    group_ids: set[str] = set()
+    for value in values:
+        token = str(value).strip()
+        if not token:
+            continue
+        if "-" in token:
+            group_id = token.split("-")[-1]
+        else:
+            group_id = token
+        group_id = group_id.strip()
+        if group_id:
+            group_ids.add(group_id)
+    return group_ids
+
+def _combine_nearby_groups(reactant_data: List[Dict[str, Any]]) -> List[str]:
+    scaffold_ids = _load_scaffold_motif_ids()
+    combined: List[str] = []
+    seen = set()
+
+    for r_info in reactant_data:
+        motifs = r_info.get("motifs") or []
+        exclude_group_ids = _motif_group_ids(motifs)
+        for motif_id in motifs:
+            if motif_id in scaffold_ids and motif_id not in seen:
+                seen.add(motif_id)
+                combined.append(motif_id)
+        for entry in r_info.get("nearby", []) or []:
+            if not isinstance(entry, dict):
+                continue
+            for group in entry.get("result") or []:
+                if isinstance(group, dict):
+                    group_id = str(group.get("group_id") or "").strip()
+                    name = str(group.get("name") or group_id or "").strip()
+                else:
+                    group_id = ""
+                    name = str(group).strip()
+                if not name:
+                    continue
+                if group_id and group_id in exclude_group_ids:
+                    continue
+                if not group_id and name.lstrip("-") in exclude_group_ids:
+                    continue
+                if name in seen:
+                    continue
+                seen.add(name)
+                combined.append(name)
+
+    return combined
 
 def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
     """Extract and categorize reagents from the reaction record."""
@@ -139,7 +209,8 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
                             current_r_motifs.append(alt_id)
                 
                 reactant_data.append({
-                    "motifs": _dedupe_list(current_r_motifs)
+                    "motifs": _dedupe_list(current_r_motifs),
+                    "nearby": analysis.get("nearby", []),
                 })
                 motif_ids.extend(current_r_motifs)
             except Exception as e:
@@ -164,7 +235,6 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             pass
 
         # Transformation analysis using counts to handle motifs that exist in both
-        from collections import Counter
         r_counts = Counter(motif_ids)
         p_counts = Counter(product_motifs)
         
@@ -240,6 +310,8 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
         reagents = extract_reagents(record)
         if drop_no_catalyst and not reagents.get("Catalyst"):
             continue
+
+        nearby_groups = _combine_nearby_groups(reactant_data)
             
         row = {
             # HTE canonical columns (lowercase with underscores)
@@ -257,6 +329,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             "Coupling Reagent": reagents.get("Coupling Reagent", ""),
             "Is_Intramolecular": len(reactants) == 1,
             "reaction_smiles": smiles,
+            "nearby_groups": " / ".join(nearby_groups),
             "_reaction_key": reaction_key,
         }
         rows.append(row)
@@ -294,7 +367,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
         "reaction_id", "yield", "z_score", "reactant_1", "reactant_2",
         "catalyst", "ligand", "base", "solvent", "additive",
         "Secondary Solvent", "Coupling Reagent", "Is_Intramolecular",
-        "reaction_smiles",
+        "reaction_smiles", "nearby_groups",
     ]
     df = df[canonical_cols]
 

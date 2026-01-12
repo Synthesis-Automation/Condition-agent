@@ -116,6 +116,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         
         form.addRow("Input JSONL:", self.input_edit)
         form.addRow("Output CSV:", self.output_edit)
+        form.addRow("", QtWidgets.QLabel("Output includes nearby_groups column."))
         form.addRow("", self.drop_catalyst_check)
         
         layout.addLayout(form)
