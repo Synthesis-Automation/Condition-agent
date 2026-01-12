@@ -16,6 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
+from chemtools.smiles import normalize
 
 @lru_cache(maxsize=10000)
 def cached_featurize(smiles: str):
@@ -24,6 +25,79 @@ def cached_featurize(smiles: str):
     # also ensures that Aromatic scaffolds win over Aliphatic ones due to updated priorities.
     options = {"motif_site_filter": "substituent"}
     return featurize_molecule(smiles, options=options)
+
+@lru_cache(maxsize=1)
+def _list_reagent_types() -> List[str]:
+    reagent_dir = PROJECT_ROOT / "data" / "reagent_db"
+    if not reagent_dir.exists():
+        return []
+    return sorted(path.stem for path in reagent_dir.glob("*.json"))
+
+def _normalize_smiles(smiles: str) -> Optional[str]:
+    if not smiles:
+        return None
+    info = normalize(smiles)
+    return info.get("smiles_norm") or info.get("largest_smiles") or None
+
+def _split_reagent_names(value: str) -> List[str]:
+    if not value:
+        return []
+    parts = []
+    for token in value.replace(";", "/").split("/"):
+        for item in token.split(","):
+            name = item.strip()
+            if name:
+                parts.append(name)
+    return parts
+
+def _collect_reagent_smiles(record: Dict[str, Any]) -> set[str]:
+    try:
+        from chemtools.reagent.lookup import find_reagent
+    except Exception:
+        return set()
+
+    def normalize_entries(values: Any) -> List[Dict[str, Any]]:
+        if values is None:
+            return []
+        if isinstance(values, dict):
+            values = [values]
+        entries = []
+        for entry in values:
+            if isinstance(entry, dict):
+                entries.append(entry)
+            elif isinstance(entry, str):
+                entries.append({"name": entry})
+        return entries
+
+    reagent_names: List[str] = []
+    for entry in normalize_entries(record.get("reagents")):
+        name = entry.get("name")
+        if name:
+            reagent_names.extend(_split_reagent_names(str(name)))
+    for entry in normalize_entries(record.get("solvents")):
+        name = entry.get("name")
+        if name:
+            reagent_names.extend(_split_reagent_names(str(name)))
+
+    catalytic_system = record.get("catalytic_system") or ""
+    condition_core = record.get("condition_core") or ""
+    if catalytic_system:
+        reagent_names.extend(_split_reagent_names(str(catalytic_system)))
+    if condition_core:
+        reagent_names.extend(_split_reagent_names(str(condition_core)))
+
+    reagent_types = _list_reagent_types()
+    reagent_smiles = set()
+    for name in _dedupe_list(reagent_names):
+        for reagent_type in reagent_types:
+            hit = find_reagent(name, reagent_type)
+            if not hit:
+                continue
+            smiles = hit.get("smiles")
+            normalized = _normalize_smiles(smiles) if smiles else None
+            if normalized:
+                reagent_smiles.add(normalized)
+    return reagent_smiles
 
 @lru_cache(maxsize=1)
 def _load_scaffold_motif_ids() -> set[str]:
@@ -76,45 +150,69 @@ def _motif_group_ids(values: Iterable[str]) -> set[str]:
             group_ids.add(group_id)
     return group_ids
 
-def _combine_nearby_groups(reactant_data: List[Dict[str, Any]]) -> List[str]:
+_SPECTATOR_GROUP_STOPLIST = {
+    "Ar",
+    "R",
+    "Any",
+    "Alkyl",
+    "Alkenyl",
+    "Alkynyl",
+    "H",
+}
+
+def _group_id_from_motif_id(motif_id: str) -> str:
+    text = str(motif_id).strip()
+    if not text:
+        return ""
+    if "-" in text:
+        return text.split("-")[-1].strip()
+    return text
+
+def _collect_spectator_groups(
+    reactant_data: List[Dict[str, Any]],
+    spectators_set: set[str],
+) -> List[str]:
     scaffold_ids = _load_scaffold_motif_ids()
-    combined: List[str] = []
     seen = set()
+    groups: List[str] = []
 
     for r_info in reactant_data:
         motifs = r_info.get("motifs") or []
-        exclude_group_ids = _motif_group_ids(motifs)
         for motif_id in motifs:
-            if motif_id in scaffold_ids and motif_id not in seen:
-                seen.add(motif_id)
-                combined.append(motif_id)
-        for entry in r_info.get("nearby", []) or []:
-            if not isinstance(entry, dict):
+            if motif_id not in spectators_set:
                 continue
-            for group in entry.get("result") or []:
-                if isinstance(group, dict):
-                    group_id = str(group.get("group_id") or "").strip()
-                    name = str(group.get("name") or group_id or "").strip()
-                else:
-                    group_id = ""
-                    name = str(group).strip()
-                if not name:
-                    continue
-                if group_id and group_id in exclude_group_ids:
-                    continue
-                if not group_id and name.lstrip("-") in exclude_group_ids:
-                    continue
-                if name in seen:
-                    continue
-                seen.add(name)
-                combined.append(name)
+            group_id = _group_id_from_motif_id(motif_id)
+            if not group_id or group_id in _SPECTATOR_GROUP_STOPLIST:
+                continue
+            if group_id in seen:
+                continue
+            seen.add(group_id)
+            groups.append(group_id)
 
-    return combined
+    for motif_id in spectators_set:
+        if motif_id in scaffold_ids and motif_id not in seen:
+            seen.add(motif_id)
+            groups.append(motif_id)
+
+    return groups
 
 def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
     """Extract and categorize reagents from the reaction record."""
-    reagents = record.get("reagents", [])
-    solvents = record.get("solvents", [])
+    def normalize_entries(values: Any) -> List[Dict[str, Any]]:
+        if values is None:
+            return []
+        if isinstance(values, dict):
+            values = [values]
+        entries = []
+        for entry in values:
+            if isinstance(entry, dict):
+                entries.append(entry)
+            elif isinstance(entry, str):
+                entries.append({"name": entry})
+        return entries
+
+    reagents = normalize_entries(record.get("reagents"))
+    solvents = normalize_entries(record.get("solvents"))
     
     bases = [r["name"] for r in reagents if r.get("role") == "BASE"]
     additives = [r["name"] for r in reagents if r.get("role") == "ADDITIVE"]
@@ -154,7 +252,12 @@ def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
         "Secondary Solvent": ""
     }
 
-def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst: bool = True):
+def process_reaction_dataset(
+    input_path: str,
+    output_path: str,
+    drop_no_catalyst: bool = True,
+    drop_reagent_reactants: bool = True,
+):
     """Convert reaction dataset to a minimal HTE recommender CSV."""
     input_path = Path(input_path)
     output_path = Path(output_path)
@@ -188,6 +291,17 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             
         reactants_part, products_part = smiles.split(">>")
         reactants = reactants_part.split(".")
+        if drop_reagent_reactants:
+            reagent_smiles = _collect_reagent_smiles(record)
+            if reagent_smiles:
+                filtered = []
+                for r_smiles in reactants:
+                    norm = _normalize_smiles(r_smiles)
+                    if norm and norm in reagent_smiles:
+                        continue
+                    filtered.append(r_smiles)
+                if filtered:
+                    reactants = filtered
         
         motif_ids = []
         reactant_data = []
@@ -210,7 +324,6 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
                 
                 reactant_data.append({
                     "motifs": _dedupe_list(current_r_motifs),
-                    "nearby": analysis.get("nearby", []),
                 })
                 motif_ids.extend(current_r_motifs)
             except Exception as e:
@@ -311,7 +424,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
         if drop_no_catalyst and not reagents.get("Catalyst"):
             continue
 
-        nearby_groups = _combine_nearby_groups(reactant_data)
+        spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
             
         row = {
             # HTE canonical columns (lowercase with underscores)
@@ -329,7 +442,7 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             "Coupling Reagent": reagents.get("Coupling Reagent", ""),
             "Is_Intramolecular": len(reactants) == 1,
             "reaction_smiles": smiles,
-            "nearby_groups": " / ".join(nearby_groups),
+            "spectator_groups": " / ".join(spectator_groups),
             "_reaction_key": reaction_key,
         }
         rows.append(row)
@@ -363,11 +476,13 @@ def process_reaction_dataset(input_path: str, output_path: str, drop_no_catalyst
             # Single experiment in group
             df.loc[group.index, "z_score"] = 0.0
 
+    df["z_score"] = df["z_score"].round(2)
+
     canonical_cols = [
         "reaction_id", "yield", "z_score", "reactant_1", "reactant_2",
         "catalyst", "ligand", "base", "solvent", "additive",
         "Secondary Solvent", "Coupling Reagent", "Is_Intramolecular",
-        "reaction_smiles", "nearby_groups",
+        "reaction_smiles", "spectator_groups",
     ]
     df = df[canonical_cols]
 
@@ -379,19 +494,38 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", "-d", help="Name of the dataset (e.g., C_N_Coupling). If provided, processes 'data/reaction_dataset/{dataset}.jsonl' to 'data/HTE_db/{dataset}_canonical.csv'.")
     parser.add_argument("--input", "-i", help="Direct path to input JSONL file.")
     parser.add_argument("--output", "-o", help="Direct path to output CSV file.")
+    parser.add_argument(
+        "--keep-reagent-reactants",
+        action="store_true",
+        help="Keep reagent/solvent molecules in the reactant columns (default: drop).",
+    )
     
     args = parser.parse_args()
     
+    drop_reagent_reactants = not args.keep_reagent_reactants
+
     if args.dataset:
         input_file = f"data/reaction_dataset/{args.dataset}.jsonl"
         output_file = f"data/HTE_db/{args.dataset}_canonical.csv"
-        process_reaction_dataset(input_file, output_file)
+        process_reaction_dataset(
+            input_file,
+            output_file,
+            drop_reagent_reactants=drop_reagent_reactants,
+        )
     elif args.input and args.output:
-        process_reaction_dataset(args.input, args.output)
+        process_reaction_dataset(
+            args.input,
+            args.output,
+            drop_reagent_reactants=drop_reagent_reactants,
+        )
     else:
         # Default: Process known core datasets
         datasets = ["C_N_Coupling", "C_O_Coupling", "C_S_Coupling"]
         for ds in datasets:
             input_file = f"data/reaction_dataset/{ds}.jsonl"
             output_file = f"data/HTE_db/{ds}_canonical.csv"
-            process_reaction_dataset(input_file, output_file)
+            process_reaction_dataset(
+                input_file,
+                output_file,
+                drop_reagent_reactants=drop_reagent_reactants,
+            )

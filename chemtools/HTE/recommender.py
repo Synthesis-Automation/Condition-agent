@@ -107,6 +107,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "base": "Base",
         "solvent": "Solvent",
         "additive": "Additive",
+        "Spectator Groups": "spectator_groups",
     }
 
     df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
@@ -124,7 +125,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Catalyst", "Ligand", "Base", "Solvent", "Additive",
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
         "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category", "Is_Intramolecular",
-        "Source_File", "Source_Group",
+        "Source_File", "Source_Group", "spectator_groups",
     ]
     for col in required_cols:
         if col not in df.columns:
@@ -273,6 +274,7 @@ _MOTIF_SPLIT_RE = re.compile(r"[|,]")
 _COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
 _COMPOUND_SCOPE_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "organic_compounds.v1.3.json"
 _COMPOUND_GROUPS_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "organic_groups.v1.3.json"
+_SCAFFOLD_MOTIFS_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
 
 _MOTIF_TAG_WEIGHTS = {
     "leaving_group": 40,
@@ -284,6 +286,16 @@ _MOTIF_TAG_WEIGHTS = {
     "n_h_nucleophile": 22,
     "o_h_nucleophile": 22,
     "s_h_nucleophile": 22,
+}
+
+_SPECTATOR_GROUP_STOPLIST = {
+    "Ar",
+    "R",
+    "Any",
+    "Alkyl",
+    "Alkenyl",
+    "Alkynyl",
+    "H",
 }
 
 
@@ -374,6 +386,25 @@ def _load_group_tags() -> Dict[str, Set[str]]:
 
 
 @lru_cache(maxsize=1)
+def _load_scaffold_motif_ids() -> Set[str]:
+    if not _SCAFFOLD_MOTIFS_FILE.exists():
+        return set()
+    try:
+        with _SCAFFOLD_MOTIFS_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    motifs = set()
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        motif_id = str(entry.get("id") or "").strip()
+        if motif_id:
+            motifs.add(motif_id)
+    return motifs
+
+
+@lru_cache(maxsize=1)
 def _load_compound_tags() -> Dict[str, Set[str]]:
     if not _COMPOUND_SCOPE_FILE.exists():
         return {}
@@ -421,6 +452,56 @@ def _split_motif_tokens(value: Any) -> List[str]:
     if not text or text.lower() == "nan":
         return []
     return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
+
+
+def _split_group_tokens(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, float) and pd.isna(value):
+        return []
+    text = str(value).strip()
+    if not text or text.lower() == "nan":
+        return []
+    return [token.strip() for token in re.split(r"[|/,]", text) if token.strip()]
+
+
+def _group_id_from_motif_id(motif_id: str) -> str:
+    text = str(motif_id).strip()
+    if not text:
+        return ""
+    if "-" in text:
+        return text.split("-")[-1].strip()
+    return text
+
+
+def _spectator_groups_from_motifs(motif_ids: Iterable[str]) -> Set[str]:
+    groups: Set[str] = set()
+    scaffold_ids = _load_scaffold_motif_ids()
+    for motif_id in motif_ids:
+        text = str(motif_id).strip()
+        if not text:
+            continue
+        if text in scaffold_ids:
+            groups.add(text)
+            continue
+        group_id = _group_id_from_motif_id(text)
+        if group_id and group_id not in _SPECTATOR_GROUP_STOPLIST:
+            groups.add(group_id)
+    return groups
+
+
+def _spectator_similarity(query_groups: Set[str], row_groups: Set[str]) -> float:
+    if not query_groups and not row_groups:
+        return 1.0
+    if not query_groups:
+        return 0.7
+    if not row_groups:
+        return 0.3
+    intersection = query_groups & row_groups
+    union = query_groups | row_groups
+    if not union:
+        return 0.5
+    return len(intersection) / len(union)
 
 
 def _expand_macro_token(
@@ -601,6 +682,7 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
                 "Coupling Reagent": _format_list(conditions.get("coupling_reagent")),
                 "AREA_TOTAL_REDUCED": metrics.get("area_total_reduced"),
                 "z-Score": metrics.get("z_score"),
+                "spectator_groups": record.get("spectator_groups", ""),
             }
             rows.append(row)
 
@@ -964,7 +1046,7 @@ class HTERecommender:
                 group_df.iloc[0]['Reactant_B_Type']
             )
             
-            match_score = group_df['match_score'].iloc[0] if 'match_score' in group_df.columns else 1.0
+            match_score = group_df['match_score'].mean() if 'match_score' in group_df.columns else 1.0
             
             rec = ConditionRecommendation(
                 catalyst=catalyst if pd.notna(catalyst) else "",
@@ -1048,6 +1130,7 @@ class HTERecommender:
         # Pre-eval: use product motifs to identify reacted vs spectator motifs
         query_reacted = None
         query_spectators = None
+        query_spectator_groups: Set[str] = set()
         if product_smiles:
             product_motifs = self._detect_motif_set(product_smiles)
             result.product_type = ",".join(sorted(product_motifs))
@@ -1056,6 +1139,7 @@ class HTERecommender:
             reacted_set, formed_set, spectator_set = _derive_query_sets(reactant_set, product_motifs)
             query_reacted = reacted_set
             query_spectators = spectator_set
+            query_spectator_groups = _spectator_groups_from_motifs(spectator_set)
 
             result.reacted_motifs = tuple(sorted(reacted_set))
             result.formed_motifs = tuple(sorted(formed_set))
@@ -1163,6 +1247,19 @@ class HTERecommender:
         # Apply catalyst filter if specified
         if catalyst_filter:
             matched_df = self._filter_by_catalyst(matched_df, catalyst_filter)
+
+        # Apply spectator group weighting if available
+        if query_spectator_groups and "spectator_groups" in matched_df.columns:
+            row_group_sets = matched_df["spectator_groups"].apply(
+                lambda value: set(_split_group_tokens(value))
+            )
+            spectator_scores = row_group_sets.apply(
+                lambda row_groups: _spectator_similarity(query_spectator_groups, row_groups)
+            )
+            if "match_score" in matched_df.columns:
+                matched_df["match_score"] = matched_df["match_score"] * (0.7 + 0.3 * spectator_scores)
+            else:
+                matched_df["match_score"] = 0.7 + 0.3 * spectator_scores
 
         # Step 2: Predict reaction type (using reactant patterns; fallback to match frequency)
         if result.matched_motifs and not result.predicted_reaction_type:

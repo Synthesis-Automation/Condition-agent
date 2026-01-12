@@ -100,6 +100,12 @@ def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
     
     # Try exact match first
     for reagent in db:
+        if isinstance(reagent, str):
+            if normalize_name(reagent) == search_name:
+                return {"name": reagent}
+            continue
+        if not isinstance(reagent, dict):
+            continue
         if normalize_name(reagent.get('name', '')) == search_name:
             return reagent
         
@@ -119,6 +125,13 @@ def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
     
     # Try partial match
     for reagent in db:
+        if isinstance(reagent, str):
+            reagent_name = normalize_name(reagent)
+            if search_name in reagent_name or reagent_name in search_name:
+                return {"name": reagent}
+            continue
+        if not isinstance(reagent, dict):
+            continue
         reagent_name = normalize_name(reagent.get('name', ''))
         if search_name in reagent_name or reagent_name in search_name:
             return reagent

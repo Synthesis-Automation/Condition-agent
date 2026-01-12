@@ -74,7 +74,7 @@ def _safe_text(value: Any) -> str:
     return str(value)
 
 
-def _collect_reaction_nearby_groups(reaction_smiles: str) -> List[str]:
+def _collect_reaction_spectator_groups(reaction_smiles: str) -> List[str]:
     if not reaction_smiles:
         return []
     try:
@@ -93,7 +93,7 @@ def _collect_reaction_nearby_groups(reaction_smiles: str) -> List[str]:
     if not isinstance(reaction, dict):
         return []
     aggregates = reaction.get("aggregates") or {}
-    groups = aggregates.get("nearby_groups_combined") or []
+    groups = aggregates.get("spectator_groups_combined") or []
     return [str(group).strip() for group in groups if str(group).strip()]
 
 
@@ -133,7 +133,7 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
         ("Base", "base"),
         ("Solvent", "solvent"),
         ("Additive", "additive"),
-        ("Nearby Groups", "nearby_groups"),
+        ("Spectator Groups", "spectator_groups"),
     ]
     if data_type == "rules":
         return base + [("Reaction ID", "reaction_id")]
@@ -245,7 +245,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.thread: Optional[QtCore.QThread] = None
         self.worker: Optional[RecommendationWorker] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
-        self._nearby_groups_summary: str = ""
+        self._spectator_groups_summary: str = ""
 
     def _setup_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -350,7 +350,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.table = self._create_results_table()
         self.results_tabs.addTab(self.table, "All")
         self.status.setText("")
-        self._nearby_groups_summary = ""
+        self._spectator_groups_summary = ""
         if self._reaction_dialog:
             self._reaction_dialog.close()
             self._reaction_dialog = None
@@ -424,8 +424,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                     reactant_types.append(text)
             rec_dict["reactant_types"] = " + ".join(reactant_types)
             for col_index, (_, key) in enumerate(columns):
-                if key == "nearby_groups":
-                    value = self._nearby_groups_summary
+                if key == "spectator_groups":
+                    value = self._spectator_groups_summary
                 else:
                     value = rec_dict.get(key)
                 if isinstance(value, float):
@@ -455,10 +455,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         matches = getattr(result, "total_matching_experiments", 0)
         coverage = getattr(result, "database_coverage", 0.0)
         reaction_smiles = self.reaction_smiles_edit.text().strip()
-        nearby_summary = _format_nearby_groups(
-            _collect_reaction_nearby_groups(reaction_smiles)
+        spectator_summary = _format_nearby_groups(
+            _collect_reaction_spectator_groups(reaction_smiles)
         )
-        self._nearby_groups_summary = nearby_summary
+        self._spectator_groups_summary = spectator_summary
 
         summary_lines = [
             html.escape(
@@ -471,7 +471,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             ),
             html.escape(f"A: {reactant_a} | Type: {type_a} ({cat_a})"),
             html.escape(f"B: {reactant_b} | Type: {type_b} ({cat_b})"),
-            html.escape(f"Nearby Groups (All): {nearby_summary}"),
+            html.escape(f"Spectator Groups (All): {spectator_summary}"),
             html.escape(f"P: {product}"),
         ]
         if stats:

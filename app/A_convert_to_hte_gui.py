@@ -17,11 +17,18 @@ class ConversionWorker(QtCore.QObject):
     finished = QtCore.pyqtSignal(bool, str)
     progress = QtCore.pyqtSignal(str)
 
-    def __init__(self, input_path: str, output_path: str, drop_no_catalyst: bool):
+    def __init__(
+        self,
+        input_path: str,
+        output_path: str,
+        drop_no_catalyst: bool,
+        drop_reagent_reactants: bool,
+    ):
         super().__init__()
         self.input_path = input_path
         self.output_path = output_path
         self.drop_no_catalyst = drop_no_catalyst
+        self.drop_reagent_reactants = drop_reagent_reactants
 
     def run(self):
         try:
@@ -42,7 +49,8 @@ class ConversionWorker(QtCore.QObject):
                 process_reaction_dataset(
                     self.input_path, 
                     self.output_path, 
-                    drop_no_catalyst=self.drop_no_catalyst
+                    drop_no_catalyst=self.drop_no_catalyst,
+                    drop_reagent_reactants=self.drop_reagent_reactants,
                 )
                 self.finished.emit(True, f"Successfully processed {self.input_path}")
             finally:
@@ -65,6 +73,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.output_edit = QtWidgets.QLineEdit()
         self.drop_catalyst_check = QtWidgets.QCheckBox("Drop reactions without a catalyst")
         self.drop_catalyst_check.setChecked(True)
+        self.drop_reagent_reactants_check = QtWidgets.QCheckBox("Drop reagent/solvent reactants")
+        self.drop_reagent_reactants_check.setChecked(True)
         
         self.btn_run = QtWidgets.QPushButton("Start Conversion")
         self.btn_quit = QtWidgets.QPushButton("Quit")
@@ -116,8 +126,9 @@ class HTEConverterWindow(QtWidgets.QWidget):
         
         form.addRow("Input JSONL:", self.input_edit)
         form.addRow("Output CSV:", self.output_edit)
-        form.addRow("", QtWidgets.QLabel("Output includes nearby_groups column."))
+        form.addRow("", QtWidgets.QLabel("Output includes spectator_groups column."))
         form.addRow("", self.drop_catalyst_check)
+        form.addRow("", self.drop_reagent_reactants_check)
         
         layout.addLayout(form)
         
@@ -192,7 +203,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.worker = ConversionWorker(
             input_path, 
             output_path, 
-            self.drop_catalyst_check.isChecked()
+            self.drop_catalyst_check.isChecked(),
+            self.drop_reagent_reactants_check.isChecked(),
         )
         self.worker.moveToThread(self.thread)
         

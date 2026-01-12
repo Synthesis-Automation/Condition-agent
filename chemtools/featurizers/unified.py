@@ -4,6 +4,7 @@ Unified feature bundles for molecules and reactions.
 
 from __future__ import annotations
 
+from collections import Counter
 from functools import lru_cache
 import json
 from pathlib import Path
@@ -253,6 +254,44 @@ def _motif_group_ids(motifs: Iterable[Dict[str, Any]]) -> set[str]:
     return group_ids
 
 
+def _group_id_from_motif_id(motif_id: str) -> str:
+    text = str(motif_id).strip()
+    if not text:
+        return ""
+    if "-" in text:
+        return text.split("-")[-1].strip()
+    return text
+
+
+def _collect_motif_ids(motifs: Iterable[Dict[str, Any]]) -> List[str]:
+    ids: List[str] = []
+    for motif in motifs:
+        if not isinstance(motif, dict):
+            continue
+        cid = str(motif.get("compound_id") or "").strip()
+        if cid:
+            ids.append(cid)
+        alt_ids = motif.get("alt_compound_ids") or []
+        if isinstance(alt_ids, set):
+            alt_ids = list(alt_ids)
+        for alt_id in alt_ids:
+            alt_text = str(alt_id).strip()
+            if alt_text:
+                ids.append(alt_text)
+    return ids
+
+
+_SPECTATOR_GROUP_STOPLIST = {
+    "Ar",
+    "R",
+    "Any",
+    "Alkyl",
+    "Alkenyl",
+    "Alkynyl",
+    "H",
+}
+
+
 @lru_cache(maxsize=1)
 def _load_scaffold_motif_ids() -> set[str]:
     path = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
@@ -273,52 +312,58 @@ def _load_scaffold_motif_ids() -> set[str]:
     return motifs
 
 
-def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
+def _aggregate_reaction_features(
+    reactants: Iterable[Dict[str, Any]],
+    *,
+    product_motif_ids: Optional[List[str]] = None,
+) -> Dict[str, Any]:
     reactant_list = list(reactants)
     aryl_scores: List[float] = []
     alkyl_scores: List[float] = []
     electronic_scores: List[float] = []
     motifs: set[str] = set()
-    nearby_groups: List[str] = []
-    nearby_seen: set[str] = set()
+    reactant_motif_ids: List[str] = []
+    spectator_groups: List[str] = []
+    spectator_seen: set[str] = set()
     scaffold_ids = _load_scaffold_motif_ids()
 
     for reactant in reactant_list:
-        exclude_group_ids = _motif_group_ids(reactant.get("motifs", []))
         for entry in reactant.get("steric", {}).get("aryl", []):
             aryl_scores.extend(_extract_scores(entry.get("result")))
         for entry in reactant.get("steric", {}).get("alkyl", []):
             alkyl_scores.extend(_extract_scores(entry.get("result")))
         for entry in reactant.get("electronics", {}).get("aryl", []):
             electronic_scores.extend(_extract_scores(entry.get("result")))
-        for motif in reactant.get("motifs", []):
+        motif_entries = reactant.get("motifs", [])
+        for motif in motif_entries:
             compound_id = motif.get("compound_id")
             if compound_id:
-                compound_text = str(compound_id)
-                motifs.add(compound_text)
-                if compound_text in scaffold_ids and compound_text not in nearby_seen:
-                    nearby_seen.add(compound_text)
-                    nearby_groups.append(compound_text)
-        for entry in reactant.get("nearby", []) or []:
-            if not isinstance(entry, dict):
+                motifs.add(str(compound_id))
+        reactant_motif_ids.extend(_collect_motif_ids(motif_entries))
+
+    if product_motif_ids:
+        reactant_counts = Counter(reactant_motif_ids)
+        product_counts = Counter(product_motif_ids)
+        spectator_motifs = {
+            motif_id
+            for motif_id in reactant_counts
+            if product_counts.get(motif_id, 0) > 0
+        }
+        for motif_id in reactant_motif_ids:
+            if motif_id not in spectator_motifs:
                 continue
-            for group in entry.get("result") or []:
-                if isinstance(group, dict):
-                    group_id = str(group.get("group_id") or "").strip()
-                    name = str(group.get("name") or group_id or "").strip()
-                else:
-                    group_id = ""
-                    name = str(group).strip()
-                if not name:
-                    continue
-                if group_id and group_id in exclude_group_ids:
-                    continue
-                if not group_id and name.lstrip("-") in exclude_group_ids:
-                    continue
-                if name in nearby_seen:
-                    continue
-                nearby_seen.add(name)
-                nearby_groups.append(name)
+            group_id = _group_id_from_motif_id(motif_id)
+            if not group_id or group_id in _SPECTATOR_GROUP_STOPLIST:
+                continue
+            if group_id in spectator_seen:
+                continue
+            spectator_seen.add(group_id)
+            spectator_groups.append(group_id)
+
+        for motif_id in spectator_motifs:
+            if motif_id in scaffold_ids and motif_id not in spectator_seen:
+                spectator_seen.add(motif_id)
+                spectator_groups.append(motif_id)
 
     avg_electronic = None
     if electronic_scores:
@@ -327,7 +372,7 @@ def _aggregate_reaction_features(reactants: Iterable[Dict[str, Any]]) -> Dict[st
     return {
         "reactant_count": len(reactant_list),
         "motif_ids": sorted(motifs),
-        "nearby_groups_combined": nearby_groups,
+        "spectator_groups_combined": spectator_groups,
         "max_aryl_steric": max(aryl_scores) if aryl_scores else 0.0,
         "max_alkyl_steric": max(alkyl_scores) if alkyl_scores else 0.0,
         "avg_aryl_electronic": avg_electronic if avg_electronic is not None else 5.0,
@@ -371,7 +416,22 @@ def featurize_reaction(
         for smiles in reactant_smiles
     ]
 
-    aggregates = _aggregate_reaction_features(reactant_bundles)
+    product_smiles = [
+        item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
+        for item in (normalized.get("products") or [])
+    ]
+    product_smiles = [s for s in product_smiles if s]
+    product_motif_ids: List[str] = []
+    for smiles in product_smiles:
+        try:
+            analysis = _featurize_molecule(smiles, registry_paths=registry_paths, options=options)
+        except Exception:
+            continue
+        product_motif_ids.extend(_collect_motif_ids(analysis.get("motifs", [])))
+
+    aggregates = _aggregate_reaction_features(
+        reactant_bundles, product_motif_ids=product_motif_ids
+    )
 
     roles_summary = None
     if include_roles:
