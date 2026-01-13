@@ -223,6 +223,39 @@ Notes
   - Builder: `chemtools/recommend/index_builder.py`.
   - Recommender: `chemtools/recommend/unified.py`.
 
+## Spectator ranking system (HTE recommender)
+
+Spectator motifs and groups provide a secondary ranking signal for condition
+recommendation. This is separate from reaction typing and is only used for
+scoring and ranking matches.
+
+- **Spectator derivation**: Spectators are motifs that appear in both reactants
+  and products (net unchanged). When product SMILES is unavailable, spectators
+  default to query motifs minus reacted motifs from the transformation key.
+- **Spectator group extraction**: Convert spectator motifs to group IDs by
+  taking the suffix of motif IDs (e.g., `Ar-NH2` -> `NH2`) and include whole
+  scaffold motifs (e.g., `Pyridine`). A stoplist removes generic groups like
+  `Ar`, `R`, `Any`, `Alkyl`, `Alkenyl`, `Alkynyl`, and `H`.
+- **Transformation match score** (core + spectator):
+  - Require reacted motifs to be a subset of query motifs.
+  - `match_score = 0.5 + 0.5 * spectator_score`
+  - `spectator_score` uses Jaccard similarity for overlap, with fallbacks:
+    - both empty: 1.0
+    - query has spectators but DB does not: 0.3
+    - DB has spectators but query does not: 0.5
+- **Spectator group weighting** (when `spectator_groups` are present in HTE data):
+  - `match_score *= (0.7 + 0.3 * spectator_similarity)`
+  - `spectator_similarity` is Jaccard with empty-set fallbacks:
+    - both empty: 1.0
+    - query empty: 0.7
+    - DB empty: 0.3
+
+Evaluation snapshot (C-S coupling canonical dataset, `results/spectator_groups_eval.json`):
+
+- With spectator groups: hit@10 0.42, MRR 0.50, avg rank 3.43
+- Without spectator groups: hit@10 0.18, MRR 0.32, avg rank 5.16
+- Rank deltas: 107 improved, 23 worsened, 250 gained, 13 lost
+
 ---
 
 ## Canonicalization and naming alignment
