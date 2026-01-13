@@ -29,6 +29,7 @@ def cached_featurize(smiles: str):
     return featurize_molecule(smiles, options=options)
 
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
+CAS_INLINE_PATTERN = re.compile(r"\b\d{2,7}-\d{2}-\d\b")
 
 def _normalize_smiles(smiles: str) -> Optional[str]:
     if not smiles:
@@ -142,6 +143,8 @@ def _collect_reagent_smiles(
 
     for name in _dedupe_list(reagent_names):
         key = _normalize_reagent_text(name)
+        for match in CAS_INLINE_PATTERN.findall(key):
+            reagent_cas.append(match)
         for smiles in name_to_smiles.get(key, []):
             normalized = _normalize_smiles(smiles) if smiles else None
             if normalized:
@@ -159,7 +162,10 @@ def _write_new_reagents(path: Path, cas_values: set[str]) -> None:
                 cas = (row.get("cas") or "").strip()
                 if cas:
                     existing.add(cas)
-    merged = sorted(existing | cas_values)
+    new_only = {cas.strip() for cas in cas_values if cas.strip()} - existing
+    if not new_only:
+        return
+    merged = sorted(existing | new_only)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=["cas"])
@@ -370,17 +376,16 @@ def process_reaction_dataset(
             
         reactants_part, products_part = smiles.split(">>")
         reactants = reactants_part.split(".")
-        if drop_reagent_reactants:
-            reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
-            if reagent_smiles:
-                filtered = []
-                for r_smiles in reactants:
-                    norm = _normalize_smiles(r_smiles)
-                    if norm and norm in reagent_smiles:
-                        continue
-                    filtered.append(r_smiles)
-                if filtered:
-                    reactants = filtered
+        reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
+        if drop_reagent_reactants and reagent_smiles:
+            filtered = []
+            for r_smiles in reactants:
+                norm = _normalize_smiles(r_smiles)
+                if norm and norm in reagent_smiles:
+                    continue
+                filtered.append(r_smiles)
+            if filtered:
+                reactants = filtered
         
         motif_ids = []
         reactant_data = []
