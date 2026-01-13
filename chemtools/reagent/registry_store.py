@@ -1,5 +1,5 @@
 """
-Lightweight registry store for the flattened reagent database (data/reagent_db).
+Lightweight registry store for the flattened reagent database (data/reagent_db/reagents.csv).
 
 This mirrors the logic used by the reagent addition GUI but without any GUI
 dependencies so it can be reused by backend services and LangChain tools.
@@ -7,7 +7,7 @@ dependencies so it can be reused by backend services and LangChain tools.
 
 from __future__ import annotations
 
-import json
+import csv
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
@@ -30,47 +30,21 @@ def _canonical_role(role: str) -> str:
 # -----------------------------------------------------------------------------
 
 ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
-    "ligand": {
-        "filename": "ligand.json",
-        "default_family": "generic_ligands",
-    },
-    "metal_catalyst": {
-        "filename": "metal_catalyst.json",
-        "default_family": "pd_ii_salts",
-    },
-    "base": {
-        "filename": "base.json",
-        "default_family": "carbonates",
-    },
-    "acid": {
-        "filename": "acid.json",
-        "default_family": "triflic_acids",
-    },
-    "additive": {
-        "filename": "additive.json",
-        "default_family": "phase_transfer_catalysts",
-    },
-    "condensation_agent": {
-        "filename": "condensation_agent.json",
-        "default_family": "organophosphorus_anhydrides",
-    },
-    "oxidant": {
-        "filename": "oxidant.json",
-        "default_family": "peroxides",
-    },
-    "reductant": {
-        "filename": "reductant.json",
-        "default_family": "hydride_reductants",
-    },
-    "solvent": {
-        "filename": "solvent.json",
-        "default_family": "aprotic_polar",
-    },
-    "other_reagent": {
-        "filename": "other_reagent.json",
-        "default_family": "misc_reagents",
-    },
+    "ligand": {"default_family": "trialkyl_triaryl_phosphines"},
+    "metal_catalyst": {"default_family": "pd_ii_salts"},
+    "base": {"default_family": "tertiary_amines_aliphatic"},
+    "acid": {"default_family": "mineral_acids"},
+    "additive": {"default_family": "quaternary_ammonium_ptc"},
+    "condensation_agent": {"default_family": "carbodiimides"},
+    "oxidant": {"default_family": "o2_gas"},
+    "reductant": {"default_family": "metal_powders"},
+    "solvent": {"default_family": "hydrocarbons_aromatic"},
+    "other_reagent": {"default_family": "misc_general"},
+    "enzyme": {"default_family": None},
+    "organo_catalyst": {"default_family": None},
 }
+
+CSV_FIELDS = ("name", "abbreviation", "cas", "smile", "role", "family_id", "tag")
 
 ROLE_PAYLOAD_FIELDS: Dict[str, Sequence[str]] = {
     "additive": (),
@@ -141,6 +115,77 @@ def _has_long_digit_run(value: str) -> bool:
     return bool(NUMERIC_RUN_PATTERN.search(value))
 
 
+def _normalize_abbreviation(value: Any) -> str:
+    if isinstance(value, (list, tuple, set)):
+        for item in value:
+            if item:
+                return str(item).strip()
+        return ""
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def _row_to_entry(row: Dict[str, str]) -> Dict[str, Any]:
+    name = (row.get("name") or "").strip()
+    abbr = (row.get("abbreviation") or "").strip()
+    cas = (row.get("cas") or "").strip()
+    smile = (row.get("smile") or "").strip()
+    role = _canonical_role((row.get("role") or "").strip())
+    family_id = (row.get("family_id") or "").strip()
+    tag = (row.get("tag") or "").strip()
+
+    roles: Dict[str, Dict[str, Any]] = {}
+    if role:
+        roles[role] = {"families": [family_id] if family_id else []}
+
+    return {
+        "name": name,
+        "abbreviation": [abbr] if abbr else [],
+        "aliases": [],
+        "cas": cas,
+        "inchi_key": None,
+        "smiles": smile,
+        "role": role,
+        "family_id": family_id,
+        "tag": tag,
+        "roles": roles,
+    }
+
+
+def _entry_to_csv_row(entry: Dict[str, Any], role: Optional[str] = None) -> Dict[str, str]:
+    name = (entry.get("name") or "").strip()
+    cas = (entry.get("cas") or "").strip()
+    smile = (entry.get("smiles") or entry.get("smile") or "").strip()
+    abbr = _normalize_abbreviation(entry.get("abbreviation"))
+
+    if role is None:
+        role = entry.get("role")
+        if not role:
+            roles_payload = entry.get("roles") or {}
+            if isinstance(roles_payload, dict) and roles_payload:
+                role = next(iter(roles_payload.keys()))
+    role = _canonical_role(role or "")
+
+    family_id = (entry.get("family_id") or "").strip()
+    if not family_id and role:
+        role_payload = (entry.get("roles") or {}).get(role, {})
+        families = role_payload.get("families") or []
+        if families:
+            family_id = str(families[0]).strip()
+
+    tag = (entry.get("tag") or "").strip()
+
+    return {
+        "name": name,
+        "abbreviation": abbr,
+        "cas": cas,
+        "smile": smile,
+        "role": role,
+        "family_id": family_id,
+        "tag": tag,
+    }
+
 def infer_abbreviations(name: str, synonyms: Sequence[str]) -> List[str]:
     candidates: List[str] = []
     seen: Set[str] = set()
@@ -160,24 +205,6 @@ def infer_abbreviations(name: str, synonyms: Sequence[str]) -> List[str]:
     if all(candidate.lower() != name_key for candidate in candidates):
         candidates.append(name)
     return candidates
-
-
-def build_aliases(name: str, cas: str, abbreviations: Sequence[str], synonyms: Sequence[str]) -> List[str]:
-    name_key = name.lower()
-    cas_key = cas.lower()
-    abbr_keys = {abbr.lower() for abbr in abbreviations}
-    aliases: List[str] = []
-    seen: Set[str] = set()
-    for syn in synonyms:
-        clean = syn.strip()
-        if not clean or _has_long_digit_run(clean):
-            continue
-        key = clean.lower()
-        if key in seen or key == name_key or key == cas_key or key in abbr_keys:
-            continue
-        aliases.append(clean)
-        seen.add(key)
-    return aliases
 
 
 def _format_embedding_value(value: Any) -> str:
@@ -219,29 +246,31 @@ def build_embedding_text(role: str, family_entry: Dict[str, Any], entry: Dict[st
 
 def build_registry_entry(
     *,
-    entry_id: str,
     name: str,
-    abbreviations: Sequence[str],
-    aliases: Sequence[str],
+    abbreviation: Optional[str],
     cas: str,
-    smiles: Optional[str],
-    inchi_key: Optional[str],
+    smile: Optional[str],
     role: str,
-    role_payload: Dict[str, Any],
-    family_entry: Dict[str, Any],
-    synonyms: Sequence[str],
+    family_id: Optional[str],
+    tag: Optional[str] = None,
+    family_entry: Optional[Dict[str, Any]] = None,
+    synonyms: Optional[Sequence[str]] = None,
 ) -> Dict[str, Any]:
+    role = _canonical_role(role)
+    family_id = family_id or ""
     entry: Dict[str, Any] = {
-        "id": entry_id,
         "name": name,
-        "abbreviation": list(abbreviations),
-        "aliases": list(aliases),
+        "abbreviation": [abbreviation] if abbreviation else [],
+        "aliases": [],
         "cas": cas,
-        "inchi_key": inchi_key,
-        "smiles": smiles,
-        "roles": {role: role_payload},
+        "smiles": smile,
+        "role": role,
+        "family_id": family_id,
+        "tag": tag or "",
+        "roles": {role: {"families": [family_id] if family_id else []}},
     }
-    entry["embedding_text"] = build_embedding_text(role, family_entry, entry, synonyms)
+    if family_entry and synonyms is not None:
+        entry["embedding_text"] = build_embedding_text(role, family_entry, entry, synonyms)
     return entry
 
 
@@ -259,12 +288,14 @@ class RegistryStore:
         if not self.base_dir.exists():
             raise FileNotFoundError(f"Registry directory '{self.base_dir}' does not exist.")
 
+        self.registry_file = self.base_dir / "reagents.csv"
+        self.entries: List[Dict[str, Any]] = []
         self.role_entries: Dict[str, List[Dict[str, Any]]] = {}
         self.family_lookup: Dict[str, Tuple[str, Dict[str, Any]]] = {}
         self.family_tokens: Dict[Tuple[str, str], Set[str]] = {}
         self.family_examples: Dict[Tuple[str, str], Set[str]] = {}
         self.family_numeric_baseline: Dict[Tuple[str, str], Optional[Dict[str, Any]]] = {}
-        self.cas_index: Dict[str, Tuple[str, str, Dict[str, Any]]] = {}
+        self.cas_index: Dict[str, List[Tuple[str, str, Dict[str, Any]]]] = {}
 
         self._load_families()
         self._load_registry()
@@ -327,29 +358,23 @@ class RegistryStore:
             examples = {str(cas) for cas in entry.get("examples_pos", []) if cas}
             self.family_examples[key] = examples
     def _load_registry(self) -> None:
-        for role, cfg in ROLE_CONFIG.items():
-            filename = cfg.get("filename")
-            if not filename:
-                continue
-            path = self.base_dir / filename
-            if not path.exists():
-                self.role_entries[role] = []
-                continue
-            content = json.loads(path.read_text(encoding="utf-8"))
-            if not isinstance(content, list):
-                raise ValueError(f"Registry file '{path}' must contain a JSON list.")
-            self.role_entries[role] = content
-            for entry in content:
+        self.entries = []
+        self.role_entries = {}
+        self.cas_index = {}
+        if not self.registry_file.exists():
+            return
+        with self.registry_file.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                entry = _row_to_entry(row)
+                self.entries.append(entry)
+                role = entry.get("role")
+                if role:
+                    self.role_entries.setdefault(role, []).append(entry)
                 cas = entry.get("cas")
-                if not cas:
-                    continue
-                families = entry.get("roles", {}).get(role, {}).get("families", [])
-                family = families[0] if families else None
-                self.cas_index[str(cas)] = (role, family, entry)
-                if family and self.family_numeric_baseline.get((role, family)) is None:
-                    numeric = entry.get("numeric_features")
-                    if numeric:
-                        self.family_numeric_baseline[(role, family)] = deepcopy(numeric)
+                family = entry.get("family_id") or ""
+                if cas:
+                    self.cas_index.setdefault(str(cas), []).append((role or "", family, entry))
 
     def build_role_payload(self, role: str, family_id: str) -> Dict[str, Any]:
         role = _canonical_role(role)
@@ -384,10 +409,9 @@ class RegistryStore:
     # ------------------------------------------------------------------ queries
     def file_for_role(self, role: str) -> Path:
         role = _canonical_role(role)
-        cfg = ROLE_CONFIG.get(role)
-        if not cfg or not cfg.get("filename"):
+        if role and role not in ROLE_CONFIG:
             raise KeyError(f"Unknown or unsupported role '{role}'.")
-        return self.base_dir / cfg["filename"]
+        return self.registry_file
 
     def role_for_family(self, family_id: str) -> Optional[str]:
         data = self.family_lookup.get(family_id)
@@ -433,35 +457,58 @@ class RegistryStore:
         familial = self.family_tokens.get((role, family_id), set())
         return bool(familial & set(tokens))
 
-    def find_by_cas(self, cas: str) -> Optional[Tuple[str, str, Dict[str, Any]]]:
-        record = self.cas_index.get(cas)
-        if record:
-            role, family, entry = record
-            return role, family, entry
+    def find_by_cas(self, cas: str, role: Optional[str] = None) -> Optional[Tuple[str, str, Dict[str, Any]]]:
+        records = self.cas_index.get(cas, [])
+        role = _canonical_role(role) if role else None
+        for entry_role, family, entry in records:
+            if role and entry_role != role:
+                continue
+            return entry_role, family, entry
         return None
 
     # ------------------------------------------------------------------ updates
     def add_entry(self, role: str, entry: Dict[str, Any]) -> None:
         role = _canonical_role(role)
+        normalized = dict(entry)
+        normalized["role"] = role
+        if not normalized.get("family_id"):
+            families = normalized.get("roles", {}).get(role, {}).get("families", [])
+            if families:
+                normalized["family_id"] = families[0]
+
+        abbr = normalized.get("abbreviation")
+        if abbr and not isinstance(abbr, list):
+            normalized["abbreviation"] = [abbr]
+
         entries = self.role_entries.setdefault(role, [])
-        entries.append(entry)
+        entries.append(normalized)
         entries.sort(key=lambda item: (item.get("name") or "").lower())
-        cas = entry.get("cas")
-        families = entry.get("roles", {}).get(role, {}).get("families", [])
-        family = families[0] if families else None
+        self.entries.append(normalized)
+        cas = normalized.get("cas")
+        family = normalized.get("family_id") or ""
         if cas:
-            self.cas_index[str(cas)] = (role, family, entry)
-        tokens = tokenize_all([entry.get("name"), *entry.get("abbreviation", []), *entry.get("aliases", [])])
+            self.cas_index.setdefault(str(cas), []).append((role, family, normalized))
+        tokens = tokenize_all([normalized.get("name"), *normalized.get("abbreviation", [])])
         if family:
             self.family_tokens.setdefault((role, family), set()).update(tokens)
 
+    def save_registry(self) -> Path:
+        path = self.registry_file
+        path.parent.mkdir(parents=True, exist_ok=True)
+        rows = [_entry_to_csv_row(entry) for entry in self.entries]
+        rows = [row for row in rows if any(row.values())]
+        rows.sort(key=lambda row: (row.get("role", ""), row.get("name", "").lower(), row.get("cas", "")))
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(CSV_FIELDS))
+            writer.writeheader()
+            writer.writerows(rows)
+        return path
+
     def save_role(self, role: str) -> Path:
         role = _canonical_role(role)
-        path = self.file_for_role(role)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        entries = self.role_entries.get(role, [])
-        path.write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        return path
+        if role and role not in ROLE_CONFIG:
+            raise KeyError(f"Unknown or unsupported role '{role}'.")
+        return self.save_registry()
 
     # ------------------------------------------------------------------ heuristics
     def infer_family(self, role: str, tokens: Set[str]) -> Optional[Tuple[str, List[str]]]:

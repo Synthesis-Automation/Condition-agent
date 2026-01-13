@@ -444,7 +444,7 @@ class ReagentNamespace:
     """Reagent database lookup and enrichment.
     
     Stateless operations for finding and enriching reagent information
-    from the data/reagent_db/*.json databases.
+    from the data/reagent_db/reagents.csv registry.
     """
     
     @staticmethod

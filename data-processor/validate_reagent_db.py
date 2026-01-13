@@ -83,43 +83,34 @@ def main():
 def demo_single_entry_validation():
     """Demo: validate a single entry"""
     from chemtools.reagent import validate_entry
-    
+
     # Valid entry
     entry = {
-        "id": "ZEMZPXWZVTUONV-UHFFFAOYSA-N",
         "name": "DavePhos",
-        "abbreviation": ["DavePhos"],
-        "aliases": ["2-Dicyclohexylphosphino-2'-(dimethylamino)biphenyl"],
+        "abbreviation": "DavePhos",
         "cas": "213697-53-1",
-        "inchi_key": "ZEMZPXWZVTUONV-UHFFFAOYSA-N",
-        "smiles": None,
-        "roles": {
-            "ligand": {
-                "families": ["phosphine"],
-                "donors": ["P"],
-                "denticity": 1,
-            }
-        },
-        "embedding_text": "type: LIGAND | name: DavePhos",
+        "smile": "",
+        "role": "ligand",
+        "family_id": "trialkyl_triaryl_phosphines",
+        "tag": "",
     }
-    
+
     print("Validating example entry...")
     issues = validate_entry(entry, role="ligand")
-    
+
     if not issues:
-        print("✅ Entry is valid!")
+        print("OK: entry is valid.")
     else:
-        print("❌ Entry has issues:")
+        print("Entry has issues:")
         for issue in issues:
             print(f"  {issue['severity'].upper()}: {issue['field']} - {issue['message']}")
-    
+
     # Invalid entry (missing fields)
     print("\n\nValidating invalid entry...")
     bad_entry = {
         "name": "Test",
-        "roles": {"ligand": {}},  # Missing required fields
     }
-    
+
     issues = validate_entry(bad_entry, role="ligand")
     print(f"Found {len(issues)} issues:")
     for issue in issues:

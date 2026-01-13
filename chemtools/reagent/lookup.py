@@ -2,10 +2,10 @@
 Reagent database lookup utilities.
 
 Provides functions to enrich condition recommendations with detailed reagent information
-from the JSON databases in data/reagent_db/.
+from the CSV registry in data/reagent_db/reagents.csv.
 """
 
-import json
+import csv
 import os
 import re
 from pathlib import Path
@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional
 from functools import lru_cache
 
 
-# Cache loaded reagent databases
+# Cache loaded reagent databases (role -> entries)
 _REAGENT_CACHE: Dict[str, List[Dict[str, Any]]] = {}
 
 
@@ -23,10 +23,55 @@ def get_data_dir() -> Path:
     return module_dir / "data"
 
 
+def _reagent_csv_path() -> Path:
+    return get_data_dir() / "reagent_db" / "reagents.csv"
+
+
+def _row_to_reagent(row: Dict[str, str]) -> Dict[str, Any]:
+    name = (row.get("name") or "").strip()
+    abbreviation = (row.get("abbreviation") or "").strip()
+    cas = (row.get("cas") or "").strip()
+    smiles = (row.get("smile") or "").strip()
+    role = (row.get("role") or "").strip()
+    family_id = (row.get("family_id") or "").strip()
+    tag = (row.get("tag") or "").strip()
+
+    roles: Dict[str, Dict[str, Any]] = {}
+    if role:
+        roles[role] = {"families": [family_id] if family_id else []}
+
+    return {
+        "name": name,
+        "cas": cas,
+        "abbreviation": [abbreviation] if abbreviation else [],
+        "smiles": smiles,
+        "role": role,
+        "family_id": family_id,
+        "tag": tag,
+        "roles": roles,
+        "aliases": [],
+    }
+
+
+@lru_cache(maxsize=1)
+def _load_all_reagents() -> List[Dict[str, Any]]:
+    reagent_file = _reagent_csv_path()
+    if not reagent_file.exists():
+        return []
+
+    try:
+        with reagent_file.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            return [_row_to_reagent(row) for row in reader]
+    except Exception as exc:
+        print(f"Warning: Failed to load {reagent_file}: {exc}")
+        return []
+
+
 @lru_cache(maxsize=32)
 def load_reagent_database(reagent_type: str) -> List[Dict[str, Any]]:
     """
-    Load a reagent database JSON file.
+    Load reagent entries from the CSV registry.
     
     Args:
         reagent_type: Type of reagent (e.g., 'ligand', 'base', 'solvent', 'metal_catalyst')
@@ -37,19 +82,17 @@ def load_reagent_database(reagent_type: str) -> List[Dict[str, Any]]:
     if reagent_type in _REAGENT_CACHE:
         return _REAGENT_CACHE[reagent_type]
     
-    reagent_file = get_data_dir() / "reagent_db" / f"{reagent_type}.json"
-    
-    if not reagent_file.exists():
+    reagent_type = reagent_type.strip()
+    data = _load_all_reagents()
+    if not data:
         return []
-    
-    try:
-        with open(reagent_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            _REAGENT_CACHE[reagent_type] = data
-            return data
-    except Exception as e:
-        print(f"Warning: Failed to load {reagent_file}: {e}")
-        return []
+
+    if reagent_type == "*":
+        return data
+
+    filtered = [entry for entry in data if entry.get("role") == reagent_type]
+    _REAGENT_CACHE[reagent_type] = filtered
+    return filtered
 
 
 def normalize_name(name: str) -> str:
@@ -112,11 +155,6 @@ def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
         # Check abbreviations
         for abbr in reagent.get('abbreviation', []):
             if normalize_name(abbr) == search_name:
-                return reagent
-        
-        # Check aliases
-        for alias in reagent.get('aliases', []):
-            if normalize_name(alias) == search_name:
                 return reagent
         
         # Check CAS number
@@ -283,16 +321,9 @@ def format_reagent_for_display(reagent_info: Dict[str, Any], compact: bool = Fal
 
 def get_all_reagent_types() -> List[str]:
     """Get list of all available reagent database types."""
-    reagent_dir = get_data_dir() / "reagent_db"
-    if not reagent_dir.exists():
-        return []
-    
-    types = []
-    for file in reagent_dir.glob("*.json"):
-        if file.stem not in ['not_determined_reagents']:
-            types.append(file.stem)
-    
-    return sorted(types)
+    data = _load_all_reagents()
+    roles = sorted({entry.get("role") for entry in data if entry.get("role")})
+    return roles
 
 
 def get_all_reagents_by_type(reagent_type: str) -> List[Dict[str, Any]]:

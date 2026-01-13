@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 import sys
 from copy import deepcopy
@@ -132,86 +133,88 @@ except Exception as exc:  # pragma: no cover - optional dependency
     if not LLM_SUPPORT_ERROR:
         LLM_SUPPORT_ERROR = f"{exc.__class__.__name__}: {exc}"
 
+REGISTRY_FILENAME = "reagents.csv"
+
 ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
     "ligand": {
-        "filename": "ligand.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Ligand",
         "hint": "Ligands including phosphines, NHCs, diimines, and ancillary donor sets.",
         "priority": 0,
         "default_family": "trialkyl_triaryl_phosphines",
     },
     "metal_catalyst": {
-        "filename": "metal_catalyst.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Metal catalyst",
         "hint": "Metal salts or pre-ligated complexes that generate the active catalyst.",
         "priority": 1,
         "default_family": "pd_ii_salts",
     },
     "base": {
-        "filename": "base.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Base",
         "hint": "Bronsted/Lewis bases spanning amides, alkoxides, carbonates, superbases.",
         "priority": 3,
         "default_family": "tertiary_amines_aliphatic",
     },
     "acid": {
-        "filename": "acid.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Acid (Bronsted/Lewis)",
         "hint": "Mineral, sulfonic, and superacids used as activators or promoters.",
         "priority": 4,
         "default_family": "mineral_acids",
     },
     "condensation_agent": {
-        "filename": "condensation_agent.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Condensation agent",
         "hint": "Carbodiimides, uronium/phosphonium activators, and similar condensers.",
         "priority": 5,
         "default_family": "carbodiimides",
     },
     "oxidant": {
-        "filename": "oxidant.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Oxidant",
         "hint": "Terminal and co-oxidants (peroxides, hypervalent iodine, oxone, O2, etc.).",
         "priority": 6,
         "default_family": "o2_gas",
     },
     "reductant": {
-        "filename": "reductant.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Reductant",
         "hint": "Hydrides, silanes, metal reductants, and organic electron donors.",
         "priority": 7,
         "default_family": "metal_powders",
     },
     "additive": {
-        "filename": "additive.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Additive / Modulator",
         "hint": "Phase-transfer agents, halide scavengers, fluoride sources, and related modifiers.",
         "priority": 8,
         "default_family": "quaternary_ammonium_ptc",
     },
     "solvent": {
-        "filename": "solvent.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Solvent",
         "hint": "Reaction media categorized by polarity, coordinating ability, and safety profile.",
         "priority": 9,
         "default_family": "hydrocarbons_aromatic",
     },
     "organo_catalyst": {
-        "filename": "organo_catalyst.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Organo-catalyst",
         "hint": "Small-molecule catalysts (cinchona, phosphoric acids, NHCs) providing organocatalysis.",
         "priority": 10,
         "default_family": "cinchona_alkaloids",
     },
     "enzyme": {
-        "filename": "enzyme.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Enzyme",
         "hint": "Biocatalysts supplied as isolated enzymes or whole-cell systems.",
         "priority": 11,
         "default_family": "oxidoreductase_general",
     },
     "other_reagent": {
-        "filename": "other_reagent.json",
+        "filename": REGISTRY_FILENAME,
         "label": "Other Reagent",
         "hint": "Generic reagents or supports that do not fit existing roles.",
         "priority": 10,
@@ -277,12 +280,11 @@ class ReagentRegistryStore:
         self.base_dir = Path(base_dir)
         if not self.base_dir.exists():
             raise FileNotFoundError(f"Registry directory {self.base_dir} does not exist")
-        self.registry_files: Dict[str, Path] = {}
-        for role, cfg in ROLE_CONFIG.items():
-            filename = cfg.get("filename")
-            if not filename:
-                continue
-            self.registry_files[role] = self.base_dir / filename
+        self.registry_file = self.base_dir / REGISTRY_FILENAME
+        self.registry_files: Dict[str, Path] = {
+            role: self.registry_file for role in ROLE_CONFIG
+        }
+        self.entries: List[Dict[str, Any]] = []
         self.role_entries: Dict[str, List[Dict[str, Any]]] = {}
         self.cas_index: Dict[str, List[Tuple[str, Dict[str, Any]]]] = {}
         self.family_index: Dict[Tuple[str, str], Dict[str, Any]] = {}
@@ -315,25 +317,52 @@ class ReagentRegistryStore:
             self.family_examples[key] = examples
 
     def _load_registry(self) -> None:
-        for role, path in self.registry_files.items():
-            if not path.exists():
-                self.role_entries[role] = []
-                continue
-            content = json.loads(path.read_text(encoding="utf-8"))
-            if not isinstance(content, list):
-                raise ValueError(f"Registry file {path} must contain a list of entries.")
-            self.role_entries[role] = content
-            for entry in content:
-                cas = entry.get("cas")
-                if not cas:
-                    continue
-                self.cas_index.setdefault(str(cas), []).append((role, entry))
+        self.entries = []
+        self.role_entries = {}
+        self.cas_index = {}
+        if not self.registry_file.exists():
+            return
+
+        with self.registry_file.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                name = (row.get("name") or "").strip()
+                abbr = (row.get("abbreviation") or "").strip()
+                cas = (row.get("cas") or "").strip()
+                smile = (row.get("smile") or "").strip()
+                role = canonical_role((row.get("role") or "").strip())
+                family_id = (row.get("family_id") or "").strip()
+                tag = (row.get("tag") or "").strip()
+
+                roles_payload = {}
+                if role:
+                    roles_payload[role] = {"families": [family_id] if family_id else []}
+
+                entry = {
+                    "id": f"cas-{cas}" if cas else name,
+                    "name": name,
+                    "abbreviation": [abbr] if abbr else [],
+                    "aliases": [],
+                    "cas": cas,
+                    "inchi_key": None,
+                    "smiles": smile,
+                    "role": role,
+                    "family_id": family_id,
+                    "tag": tag,
+                    "roles": roles_payload,
+                }
+
+                self.entries.append(entry)
+                if role:
+                    self.role_entries.setdefault(role, []).append(entry)
+                if cas:
+                    self.cas_index.setdefault(str(cas), []).append((role, entry))
 
     def file_for_role(self, role: str) -> Path:
         cfg = ROLE_CONFIG.get(role)
         if not cfg or not cfg.get("filename"):
             raise KeyError(f"Unknown or unsupported role '{role}'")
-        return self.registry_files.get(role, self.base_dir / cfg["filename"])
+        return self.registry_file
 
     def family_entry(self, role: str, family_id: str) -> Optional[Dict[str, Any]]:
         return self.family_index.get((role, family_id))
@@ -411,17 +440,55 @@ class ReagentRegistryStore:
 
     def add_entry(self, role: str, entry: Dict[str, Any]) -> None:
         entries = self.role_entries.setdefault(role, [])
-        entries.append(entry)
+        normalized = dict(entry)
+        normalized["role"] = role
+        if not normalized.get("family_id"):
+            families = normalized.get("roles", {}).get(role, {}).get("families", [])
+            if families:
+                normalized["family_id"] = families[0]
+        if normalized.get("abbreviation") and not isinstance(normalized.get("abbreviation"), list):
+            normalized["abbreviation"] = [normalized.get("abbreviation")]
+        entries.append(normalized)
         entries.sort(key=lambda item: (item.get("name") or "").lower())
-        cas = entry.get("cas")
+        self.entries.append(normalized)
+        cas = normalized.get("cas")
         if cas:
-            self.cas_index.setdefault(str(cas), []).append((role, entry))
+            self.cas_index.setdefault(str(cas), []).append((role, normalized))
 
     def save_role(self, role: str) -> Path:
-        path = self.file_for_role(role)
+        path = self.registry_file
         path.parent.mkdir(parents=True, exist_ok=True)
-        entries = self.role_entries.get(role, [])
-        path.write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        rows: List[Dict[str, str]] = []
+        for entry in self.entries:
+            role_value = entry.get("role") or role
+            abbr = ""
+            abbr_val = entry.get("abbreviation")
+            if isinstance(abbr_val, list) and abbr_val:
+                abbr = str(abbr_val[0]).strip()
+            elif isinstance(abbr_val, str):
+                abbr = abbr_val.strip()
+            family_id = (entry.get("family_id") or "").strip()
+            if not family_id:
+                role_payload = (entry.get("roles") or {}).get(role_value, {})
+                families = role_payload.get("families") or []
+                if families:
+                    family_id = str(families[0]).strip()
+            row = {
+                "name": (entry.get("name") or "").strip(),
+                "abbreviation": abbr,
+                "cas": (entry.get("cas") or "").strip(),
+                "smile": (entry.get("smiles") or entry.get("smile") or "").strip(),
+                "role": role_value,
+                "family_id": family_id,
+                "tag": (entry.get("tag") or "").strip(),
+            }
+            rows.append(row)
+        rows = [row for row in rows if any(row.values())]
+        rows.sort(key=lambda r: (r.get("role", ""), r.get("name", "").lower(), r.get("cas", "")))
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=["name", "abbreviation", "cas", "smile", "role", "family_id", "tag"])
+            writer.writeheader()
+            writer.writerows(rows)
         return path
 
 

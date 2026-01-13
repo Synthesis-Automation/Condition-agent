@@ -37,7 +37,6 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
             "total_reagents": 383,
             "by_type": {"ligand": 155, "base": 47, ...},
             "total_with_cas": 350,
-            "total_with_inchikey": 200,
             "total_with_smiles": 100,
             "families_by_role": {...},
             "top_families": [...],
@@ -45,7 +44,7 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
         }
     """
     if registry_dir is None:
-        registry_dir = get_data_dir() / "reagents"
+        registry_dir = get_data_dir() / "reagent_db"
     else:
         registry_dir = Path(registry_dir)
     
@@ -54,17 +53,13 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
         "total_reagents": 0,
         "by_type": {},
         "total_with_cas": 0,
-        "total_with_inchikey": 0,
         "total_with_smiles": 0,
         "total_with_abbreviations": 0,
+        "total_with_family_id": 0,
+        "total_with_tag": 0,
         "families_by_role": defaultdict(list),
         "family_counts": Counter(),
         "top_families": [],
-        "id_format_stats": {
-            "inchikey": 0,
-            "cas": 0,
-            "other": 0
-        },
         "multi_role_reagents": 0,
         "roles_per_reagent": Counter(),
     }
@@ -89,24 +84,17 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
             if entry.get("cas"):
                 stats["total_with_cas"] += 1
             
-            if entry.get("inchi_key"):
-                stats["total_with_inchikey"] += 1
-            
             if entry.get("smiles"):
                 stats["total_with_smiles"] += 1
             
             if entry.get("abbreviation"):
                 stats["total_with_abbreviations"] += 1
             
-            # ID format analysis
-            entry_id = entry.get("id", "")
-            if entry_id:
-                if len(entry_id) == 27 and entry_id.count("-") == 2:
-                    stats["id_format_stats"]["inchikey"] += 1
-                elif "-" in entry_id and entry_id.replace("-", "").isdigit():
-                    stats["id_format_stats"]["cas"] += 1
-                else:
-                    stats["id_format_stats"]["other"] += 1
+            if entry.get("family_id"):
+                stats["total_with_family_id"] += 1
+            
+            if entry.get("tag"):
+                stats["total_with_tag"] += 1
             
             # Role and family analysis
             roles = entry.get("roles", {})
@@ -139,9 +127,10 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
     total = stats["total_reagents"]
     if total > 0:
         stats["percent_with_cas"] = (stats["total_with_cas"] / total) * 100
-        stats["percent_with_inchikey"] = (stats["total_with_inchikey"] / total) * 100
         stats["percent_with_smiles"] = (stats["total_with_smiles"] / total) * 100
         stats["percent_with_abbreviations"] = (stats["total_with_abbreviations"] / total) * 100
+        stats["percent_with_family_id"] = (stats["total_with_family_id"] / total) * 100
+        stats["percent_with_tag"] = (stats["total_with_tag"] / total) * 100
     
     return stats
 
@@ -167,7 +156,7 @@ def get_family_statistics(role: str, registry_dir: Optional[str | Path] = None) 
         }
     """
     if registry_dir is None:
-        registry_dir = get_data_dir() / "reagents"
+        registry_dir = get_data_dir() / "reagent_db"
     else:
         registry_dir = Path(registry_dir)
     
@@ -230,17 +219,16 @@ def get_missing_data_report(registry_dir: Optional[str | Path] = None) -> Dict[s
         {
             "by_field": {
                 "cas": {"missing": 33, "percent": 8.6},
-                "inchi_key": {"missing": 183, "percent": 47.8},
                 ...
             },
             "by_type": {
-                "ligand": {"missing_cas": 5, "missing_inchikey": 40, ...},
+                "ligand": {"missing_cas": 5, "missing_family_id": 40, ...},
                 ...
             }
         }
     """
     if registry_dir is None:
-        registry_dir = get_data_dir() / "reagents"
+        registry_dir = get_data_dir() / "reagent_db"
     else:
         registry_dir = Path(registry_dir)
     
@@ -249,10 +237,10 @@ def get_missing_data_report(registry_dir: Optional[str | Path] = None) -> Dict[s
     total_count = 0
     missing_by_field = {
         "cas": 0,
-        "inchi_key": 0,
         "smiles": 0,
         "abbreviation": 0,
-        "aliases": 0,
+        "family_id": 0,
+        "tag": 0,
     }
     
     missing_by_type = {}
@@ -264,20 +252,16 @@ def get_missing_data_report(registry_dir: Optional[str | Path] = None) -> Dict[s
         type_missing = {
             "total": len(db),
             "missing_cas": 0,
-            "missing_inchikey": 0,
             "missing_smiles": 0,
             "missing_abbreviation": 0,
-            "missing_aliases": 0,
+            "missing_family_id": 0,
+            "missing_tag": 0,
         }
         
         for entry in db:
             if not entry.get("cas"):
                 missing_by_field["cas"] += 1
                 type_missing["missing_cas"] += 1
-            
-            if not entry.get("inchi_key"):
-                missing_by_field["inchi_key"] += 1
-                type_missing["missing_inchikey"] += 1
             
             if not entry.get("smiles"):
                 missing_by_field["smiles"] += 1
@@ -287,9 +271,13 @@ def get_missing_data_report(registry_dir: Optional[str | Path] = None) -> Dict[s
                 missing_by_field["abbreviation"] += 1
                 type_missing["missing_abbreviation"] += 1
             
-            if not entry.get("aliases"):
-                missing_by_field["aliases"] += 1
-                type_missing["missing_aliases"] += 1
+            if not entry.get("family_id"):
+                missing_by_field["family_id"] += 1
+                type_missing["missing_family_id"] += 1
+            
+            if not entry.get("tag"):
+                missing_by_field["tag"] += 1
+                type_missing["missing_tag"] += 1
         
         missing_by_type[reagent_type] = type_missing
     
@@ -336,18 +324,10 @@ def print_database_summary(registry_dir: Optional[str | Path] = None) -> None:
     print("="*70)
     
     print(f"  CAS numbers:       {stats['total_with_cas']:4d} ({stats.get('percent_with_cas', 0):.1f}%)")
-    print(f"  InChIKeys:         {stats['total_with_inchikey']:4d} ({stats.get('percent_with_inchikey', 0):.1f}%)")
     print(f"  SMILES:            {stats['total_with_smiles']:4d} ({stats.get('percent_with_smiles', 0):.1f}%)")
     print(f"  Abbreviations:     {stats['total_with_abbreviations']:4d} ({stats.get('percent_with_abbreviations', 0):.1f}%)")
-    
-    print(f"\n{'='*70}")
-    print("ID FORMATS")
-    print("="*70)
-    
-    id_stats = stats["id_format_stats"]
-    print(f"  InChIKey format:   {id_stats['inchikey']:4d}")
-    print(f"  CAS format:        {id_stats['cas']:4d}")
-    print(f"  Other format:      {id_stats['other']:4d}")
+    print(f"  Family IDs:        {stats['total_with_family_id']:4d} ({stats.get('percent_with_family_id', 0):.1f}%)")
+    print(f"  Tags:              {stats['total_with_tag']:4d} ({stats.get('percent_with_tag', 0):.1f}%)")
     
     print(f"\n{'='*70}")
     print("MULTI-ROLE REAGENTS")
@@ -436,10 +416,10 @@ def print_missing_data_report(registry_dir: Optional[str | Path] = None) -> None
     for reagent_type, data in sorted(report["by_type"].items()):
         print(f"\n  {reagent_type.upper()} (total: {data['total']})")
         print(f"    Missing CAS:          {data['missing_cas']:3d}")
-        print(f"    Missing InChIKey:     {data['missing_inchikey']:3d}")
         print(f"    Missing SMILES:       {data['missing_smiles']:3d}")
         print(f"    Missing abbreviation: {data['missing_abbreviation']:3d}")
-        print(f"    Missing aliases:      {data['missing_aliases']:3d}")
+        print(f"    Missing family_id:    {data['missing_family_id']:3d}")
+        print(f"    Missing tag:          {data['missing_tag']:3d}")
     
     print(f"\n{'='*70}\n")
 

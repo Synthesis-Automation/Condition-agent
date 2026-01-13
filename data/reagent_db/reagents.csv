@@ -58,7 +58,7 @@ Sodium trifluoroacetate,NaTFA,2923-18-4,,additive,fluoride_sources_activators,fl
 TEMPO,,2564-83-2,,additive,radical_suppressors,radical suppressors
 Tetrabutylammonium bromide,TBAB,1643-19-2,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 Tetrabutylammonium chloride,TBACl,1112-67-0,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
-Tetrabutylammonium dibutyl phosphate,Tetrabutylammonium dibutyl phosphate,29536-33-2,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
+Tetrabutylammonium dibutyl phosphate,,29536-33-2,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 Tetrabutylammonium fluoride (anhydrous),TBAF,429-41-4,,additive,fluoride_sources_activators,fluoride sources activators
 Tetrabutylammonium Iodide,TBAI,311-28-4,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 Tetrabutylammonium Iodide,TBAI,311-28-4,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
@@ -132,7 +132,7 @@ Zinc acetate,Zn(OAc)₂,557-34-6,,base,inorg_carboxylates,weak base
 "1,1′‑Carbonyldiimidazole",CDI,530-62-1,,condensation_agent,imidazolide_formers,medium condensation agent
 BOP (legacy),BOP,56602-33-6,,condensation_agent,phosphonium_bt_at,high condensation agent
 BOP-Cl,BOP-Cl,68641-49-6,,condensation_agent,organophosphorus_chlorides_azides,strong condensation agent
-BTFFH,BTFFH,$btffh__e55c2dca,,condensation_agent,acyl_halide_fluoride_generators,high condensation agent
+"Fluoro-N,N,N′,N′-bis(tetramethylene)formamidinium hexafluorophosphate",BTFFH,164298-25-3,,condensation_agent,acyl_halide_fluoride_generators,high condensation agent
 CDMT (triazine additive/activator),CDMT,126851-73-0,,condensation_agent,triazine_non_halide,high condensation agent
 COMU (Oxyma‑based uronium),COMU,1075198-30-9,,condensation_agent,aminium_uronium_guanidinium,high condensation agent
 Dicyclohexylcarbodiimide,DCC,538-75-0,,condensation_agent,carbodiimides,medium condensation agent
@@ -140,7 +140,7 @@ Diethylchlorophosphate,DEPC,814-49-3,,condensation_agent,organophosphorus_chlori
 Diisopropylcarbodiimide,DIC,693-13-0,,condensation_agent,carbodiimides,medium condensation agent
 Diphenylphosphoryl azide,DPPA,26386-88-9,,condensation_agent,organophosphorus_chlorides_azides,high condensation agent
 Diphenylphosphoryl chloride,DPP‑Cl,1499-21-4,,condensation_agent,organophosphorus_chlorides_azides,high condensation agent
-DMTMM·Cl,DMTMM,$dmtmm_cl__8a8c7fa1,,condensation_agent,triazine_non_halide,high condensation agent
+"4-(4,6-Dimethoxy-1,3,5-triazin-2-yl)-4-methylmorpholinium chloride",DMTMM·Cl,3945-69-5,,condensation_agent,triazine_non_halide,high condensation agent
 EDC,EDC,107-06-2,,condensation_agent,carbodiimides,strong condensation agent
 EDC·HCl (1‑ethyl‑3‑(3‑dimethylaminopropyl)carbodiimide hydrochloride),EDCI·HCl,25952-53-8,,condensation_agent,carbodiimides,medium condensation agent
 EEDQ,EEDQ,4584-49-0,,condensation_agent,specialty_low_racemization,low condensation agent
@@ -150,11 +150,8 @@ HCTU,HCTU,330795-65-4,,condensation_agent,aminium_uronium_guanidinium,high conde
 IIDQ,IIDQ,18747-60-1,,condensation_agent,specialty_low_racemization,low condensation agent
 Isobutyl chloroformate,i‑BuOCOCl,543-27-1,,condensation_agent,mixed_anhydrides_chloroformates,medium condensation agent
 MsCl,MsCl,124-63-0,,condensation_agent,organophosphorus_chlorides_azides,strong condensation agent
-N‑Hydroxysuccinimide esters,NHS esters,$n_hydroxysuccinimide_esters__7476fb4d,,condensation_agent,activated_esters_isolable,medium condensation agent
-Pentafluorophenyl esters,Pfp esters,$pentafluorophenyl_esters__6484f96b,,condensation_agent,activated_esters_isolable,medium condensation agent
-PEP-K,PEP-K,4265-07-0,,condensation_agent,aminium_uronium_guanidinium,strong condensation agent
 PivCl,Piv-Cl,3282-30-2,,condensation_agent,organophosphorus_chlorides_azides,strong condensation agent
-POCl3,POC,10025-87-3,,condensation_agent,organophosphorus_chlorides_azides,strong condensation agent
+POCl3,,10025-87-3,,condensation_agent,organophosphorus_chlorides_azides,strong condensation agent
 PyAOP,PyAOP,128251-48-7,,condensation_agent,phosphonium_bt_at,high condensation agent
 PyBOP,PyBOP,128625-52-5,,condensation_agent,phosphonium_bt_at,high condensation agent
 PyBrOP,PyBrOP,132705-51-2,,condensation_agent,organophosphorus_anhydrides,strong condensation agent
@@ -167,7 +164,7 @@ TCFH,TCFH,207915-99-9,,condensation_agent,acyl_halide_fluoride_generators,strong
 Tetramethylfluoroformamidinium hexafluorophosphate,TFFH,164298-23-1,,condensation_agent,acyl_halide_fluoride_generators,high condensation agent
 Thionyl Chloride,SOCl2,7719-09-7,,condensation_agent,acyl_halide_fluoride_generators,strong condensation agent
 "Tris(2,2,2-trifluoroethyl) Borate",B(OCH2CF3)3,659-18-7,,condensation_agent,boron,moderate condensation agent
-Alcohol dehydrogenase,ADH,9001-22-3,,enzyme,oxidoreductase_general,oxidoreductase general
+Alcohol dehydrogenase,,9001-22-3,,enzyme,oxidoreductase_general,oxidoreductase general
 "(4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine",Amphos,932710-63-9,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 "(4-(N,N-Dimethylamino)phenyl)di-tert-butyl phosphine",Amphos,932710-63-9,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 "1,10-Phenanthroline",phen,66-71-7,,ligand,phenanthrolines,2 N ligand
@@ -212,14 +209,12 @@ BFMO,BFMO,69010-90-8,,ligand,phosphoramidites,1 P ligand
 BICAAC (generic),BICAAC,$bicaac_generic__abeec18b,,ligand,caac_carbenes,1 C(carbene) ligand
 BINAP,BINAP,2250-01-3,,ligand,bidentate_diphosphines,2 P ligand
 (+/-)Binap,(+/-)Binap,76189-55-4,,ligand,bidentate_diphosphines,2 P ligand
-BINOL-derived phosphoramidite,BINOL-Phosamidite,$binol_derived_phosphoramidite__9246cdb8,,ligand,phosphoramidites,1 P ligand
 BIPHEP,BIPHEP,58467-99-1,,ligand,bidentate_diphosphines,2 P ligand
 BippyPhos,BippyPhos,894086-00-1,,ligand,triazine_pnn_phosphines,3 P ligand
 Bis(diphenylphosphino)methane,DPPM,2071-20-7,,ligand,biphosphines,2 P ligand
 Bis(p-sulfonatophenyl)phenylphosphine dipotassium dihydrate,BSPP,151888-20-9,,ligand,bidentate_diphosphines,2 P ligand
 BrettPhos,BrettPhos,1070663-78-3,,ligand,dialkylbiaryl_phosphines,1 P ligand
 C3-TunePhos,C3-TunePhos,150992-96-0,,ligand,bidentate_diphosphines,2 P ligand
-CAAC (generic),CAAC,$caac_generic__288572db,,ligand,caac_carbenes,1 C(carbene) ligand
 cataCXium A,cataCXium A,321921-71-5,,ligand,catacxium_monophosphines,1 P ligand
 cataCXium AHI,cataCXium AHI,714951-87-8,,ligand,catacxium_monophosphines,1 P ligand
 cataCXium PCy,cataCXium PCy,672937-60-9,,ligand,catacxium_monophosphines,1 P ligand
@@ -241,9 +236,9 @@ DifluorPhos,DifluorPhos,156707-92-7,,ligand,bidentate_diphosphines,2 P ligand
 Dimethylphenylphosphine,PMe2Ph,672-66-2,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 Diphenyl-2-pyridylphosphine,PPh2Py,37943-90-1,,ligand,phosphine_pyridine_pn,2 P ligand
 Diphenylphosphine,HPPh2,829-85-6,,ligand,secondary_phosphines,1 P ligand
-DL-Proline,Pro,609-36-9,,ligand,diamines,2 N ligand
+DL-Proline,,609-36-9,,ligand,diamines,2 N ligand
 DM-SEGPHOS,DM-SEGPHOS,196868-63-0,,ligand,bidentate_diphosphines,2 P ligand
-DMEDA,DMEDA,$dmeda__71370c3d,,ligand,diamines,2 N ligand
+"N,N′-Dimethylethylenediamine",DMEDA,110-70-3,,ligand,diamines,2 N ligand
 DMPAO,DMPAO,2903-48-2,,ligand,phosphine_pyridine_pn,2 P ligand
 DPEphos,DPEPhos,166330-10-5,,ligand,bidentate_diphosphines,2 P ligand
 DPPB,DPPB,7688-25-7,,ligand,bidentate_diphosphines,2 P ligand
@@ -329,11 +324,11 @@ Tricyclohexylphosphine,PCy3,2622-14-2,,ligand,trialkyl_triaryl_phosphines,1 P li
 Tricyclohexylphosphine tetrafluoroborate,PCy3·HBF4,58656-04-5,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 Triethylphosphine,PEt3,554-70-1,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 triisobutylphosphatrane,TIBP,331465-71-5,,ligand,trialkyl_triaryl_phosphines,1 P ligand
-Triisopropyl phosphite,P(OiPr)3,$triisopropyl_phosphite__71dd388d,,ligand,phosphites,1 P ligand
+Triisopropyl phosphite,P(OiPr)3,116-17-6,,ligand,phosphites,1 P ligand
 Triisopropylphosphine,P(iPr)3,6476-36-4,,ligand,trialkyl_triaryl_phosphines,1 P ligand
-Trimethyl phosphite,P(OMe)3,$trimethyl_phosphite__a4af5428,,ligand,phosphites,1 P ligand
+Trimethyl phosphite,P(OMe)3,121-45-9,,ligand,phosphites,1 P ligand
 Trimethylphosphine,PMe3,594-09-2,,ligand,trialkyl_triaryl_phosphines,1 P ligand
-Triphenyl phosphite,P(OPh)3,$triphenyl_phosphite__dbe546c7,,ligand,phosphites,1 P ligand
+Triphenyl phosphite,P(OPh)3,101-02-0,,ligand,phosphites,1 P ligand
 Triphenylphosphine,PPh3,603-35-0,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 Triphos,Triphos,22031-12-5,,ligand,tridentate_triphos,3 P ligand
 Tris(2-furyl)phosphine,P(2-furyl)3,5518-52-5,,ligand,trialkyl_triaryl_phosphines,1 P ligand
@@ -353,7 +348,6 @@ TrixiePhos,TrixiePhos,255836-67-0,,ligand,dialkylbiaryl_phosphines,1 P ligand
 VPhos,VPhos,1848244-75-6,,ligand,dialkylbiaryl_phosphines,1 P ligand
 Xantphos,XantPhos,161265-03-8,,ligand,bidentate_diphosphines,2 P ligand
 XPhos,XPhos,564483-18-7,,ligand,dialkylbiaryl_phosphines,1 P ligand
-β-Diketiminate (generic),NacNac,$diketiminate_generic__f5485ca9,,ligand,beta_diketiminates_nacnac,2 N ligand
 "[2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane",XPhos Pd G2,1310584-14-5,,metal_catalyst,pd_phosphine_complexes,Pd(2) catalyst
 "[2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane",XPhos Pd G2,1310584-14-5,,metal_catalyst,pd_phosphine_complexes,Pd(2) catalyst
 "Bis(1,5-cyclooctadiene)nickel(0)",Ni(cod)2,1295-35-8,,metal_catalyst,ni_zero_sources,Ni(0) catalyst

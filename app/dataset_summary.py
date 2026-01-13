@@ -566,7 +566,7 @@ def generate_summary() -> None:
     print("Supporting databases:")
     print("- data/rule_db/ - Curated condition databases by reaction type")
     print("- data/protocol_db/ - Protocol-based recommendation database")
-    print("- data/reagent_db/ - Reagent taxonomy and classification")
+    print("- data/reagent_db/reagents.csv - Reagent registry (CSV)")
     print()
 
 

@@ -12,6 +12,7 @@ import sys
 import traceback
 import tempfile
 import re
+import csv
 import urllib.request
 import urllib.error
 import urllib.parse
@@ -71,7 +72,7 @@ CAS_NUMBER_RE = re.compile(r'\d{2,7}-\d{2}-\d')
 
 
 REGISTRY_FILE_EXCLUDES = {
-    "not_determined_reagents.json",
+    "new_reagents.csv",
 }
 
 
@@ -160,6 +161,13 @@ class _TaxonomyIndex:
         path = os.path.join(self.base_dir, filename)
         if not os.path.exists(path):
             return []
+        if filename.lower().endswith(".csv"):
+            try:
+                with open(path, "r", encoding="utf-8", newline="") as fh:
+                    reader = csv.DictReader(fh)
+                    return [row for row in reader]
+            except Exception:
+                return []
         try:
             with open(path, "r", encoding="utf-8") as fh:
                 data = _json.load(fh)
@@ -168,20 +176,10 @@ class _TaxonomyIndex:
         return data if isinstance(data, list) else []
 
     def _iter_registry_files(self) -> List[str]:
-        files: List[str] = []
-        try:
-            for entry in os.scandir(self.base_dir):
-                if not entry.is_file():
-                    continue
-                name = entry.name
-                if not name.lower().endswith('.json'):
-                    continue
-                if name in REGISTRY_FILE_EXCLUDES:
-                    continue
-                files.append(name)
-        except (FileNotFoundError, NotADirectoryError, OSError):
-            return []
-        return sorted(files)
+        csv_path = os.path.join(self.base_dir, "reagents.csv")
+        if os.path.exists(csv_path):
+            return ["reagents.csv"]
+        return []
 
     def _index_member(
         self,
@@ -282,63 +280,25 @@ class _TaxonomyIndex:
             for entry in entries:
                 cas = entry.get("cas")
                 name = entry.get("name")
-                abbr_field = entry.get("abbreviation") or []
-                if isinstance(abbr_field, str):
-                    abbr_list = [abbr_field.strip()] if abbr_field.strip() else []
-                elif isinstance(abbr_field, list):
-                    abbr_list = [str(a).strip() for a in abbr_field if a]
-                else:
-                    abbr_list = []
-                abbr = abbr_list[0] if abbr_list else ""
-                alias_field = entry.get("aliases") or []
-                if isinstance(alias_field, str):
-                    alias_list = [alias_field.strip()] if alias_field.strip() else []
-                elif isinstance(alias_field, list):
-                    alias_list = [str(a).strip() for a in alias_field if a]
-                else:
-                    alias_list = []
-                extra_synonyms = entry.get("synonyms")
-                if isinstance(extra_synonyms, list):
-                    extra_list = [str(a).strip() for a in extra_synonyms if a]
-                elif isinstance(extra_synonyms, str):
-                    extra_list = [extra_synonyms.strip()] if extra_synonyms.strip() else []
-                else:
-                    extra_list = []
-                role_map = entry.get("roles")
-                if not isinstance(role_map, dict):
-                    role_map = {}
-                if not role_map:
+                abbr = (entry.get("abbreviation") or "").strip()
+                canonical = canonical_role(entry.get("role") or "")
+                if not canonical:
                     continue
-                synonyms = abbr_list[1:] + alias_list + extra_list
-                for role_name, role_payload_raw in role_map.items():
-                    role_key = str(role_name).strip()
-                    if not role_key:
-                        continue
-                    role_payload = role_payload_raw if isinstance(role_payload_raw, dict) else {}
-                    canonical = canonical_role(role_key)
-                    role_code = REGISTRY_ROLE_CODE_MAP.get(canonical, canonical.upper())
-                    category_hint = REGISTRY_CATEGORY_HINT.get(canonical, canonical)
-                    families = role_payload.get("families") or []
-                    family_id = families[0] if families else None
-                    metal_val = role_payload.get("metal")
-                    if isinstance(metal_val, list):
-                        metal = next((str(m).strip() for m in metal_val if m), "")
-                    elif metal_val is None:
-                        metal = ""
-                    else:
-                        metal = str(metal_val).strip()
-                    generic_core = metal if canonical in CATALYST_ROLES else ""
-                    self._index_member(
-                        cas=cas,
-                        name=name,
-                        abbr=abbr,
-                        synonyms=synonyms,
-                        role=role_code,
-                        category_hint=category_hint,
-                        generic_core=generic_core,
-                        family_id=family_id,
-                        role_payload=role_payload,
-                    )
+                role_code = REGISTRY_ROLE_CODE_MAP.get(canonical, canonical.upper())
+                category_hint = REGISTRY_CATEGORY_HINT.get(canonical, canonical)
+                family_id = entry.get("family_id") or None
+                generic_core = ""  # CSV registry does not store metal-specific payloads.
+                self._index_member(
+                    cas=cas,
+                    name=name,
+                    abbr=abbr,
+                    synonyms=[],
+                    role=role_code,
+                    category_hint=category_hint,
+                    generic_core=generic_core,
+                    family_id=family_id,
+                    role_payload=None,
+                )
                     if family_id and metal:
                         self.family_metal.setdefault(family_id, metal)
 
@@ -1361,10 +1321,10 @@ class RDFWorker(QtCore.QObject):
         here = os.path.dirname(os.path.abspath(__file__))
         repo_root = os.path.dirname(here)
         target_dir = os.path.join(repo_root, "data", "reagent_db")
-        target_path = os.path.join(target_dir, "not_determined_reagents.json")
+        target_path = os.path.join(target_dir, "new_reagents.csv")
         legacy_path = os.path.join(here, "not_determined_reagents.json")
         if not os.path.exists(target_path) and os.path.exists(legacy_path):
-            self._emit("Note: using legacy not_determined_reagents.json from data-processor directory; it will be rewritten to data/reagent_db on save.")
+            self._emit("Note: using legacy not_determined_reagents.json from data-processor directory; it will be rewritten to data/reagent_db/new_reagents.csv on save.")
         self._undetermined_file_path_cache = target_path
         return target_path
 
@@ -1385,11 +1345,16 @@ class RDFWorker(QtCore.QObject):
             if not os.path.exists(candidate):
                 continue
             try:
-                with open(candidate, "r", encoding="utf-8") as f:
-                    data = _json.load(f)
+                if candidate.lower().endswith(".csv"):
+                    with open(candidate, "r", encoding="utf-8", newline="") as f:
+                        reader = csv.DictReader(f)
+                        data = [{"cas": (row.get("cas") or "").strip()} for row in reader]
+                else:
+                    with open(candidate, "r", encoding="utf-8") as f:
+                        data = _json.load(f)
                 break
             except Exception as exc:
-                self._emit(f"Note: could not load existing not_determined_reagents.json from {candidate}: {exc}")
+                self._emit(f"Note: could not load existing new_reagents.csv from {candidate}: {exc}")
                 data = None
         if data is None:
             return
@@ -1402,7 +1367,10 @@ class RDFWorker(QtCore.QObject):
                 cas = str(entry.get("cas") or "").strip()
                 name = str(entry.get("name") or "").strip()
                 base_key = self._make_undetermined_key(cas, name, taxonomy)
-                upgraded = self._upgrade_undetermined_entry(entry, taxonomy)
+                if set(entry.keys()) <= {"cas"}:
+                    upgraded = {"cas": cas, "name": name or cas, "role": "UNK"}
+                else:
+                    upgraded = self._upgrade_undetermined_entry(entry, taxonomy)
                 self._undetermined_existing_entries.append(upgraded)
                 new_cas = str(upgraded.get("cas") or "").strip()
                 new_name = str(upgraded.get("name") or "").strip()
@@ -1819,12 +1787,18 @@ class RDFWorker(QtCore.QObject):
             unique_new.setdefault((cas_key, name_key), entry)
         new_entries = sorted(unique_new.values(), key=lambda e: ((e.get("cas") or "").strip(), (e.get("name") or "").strip()))
         entries.extend(new_entries)
+        cas_values = sorted({str(entry.get("cas") or "").strip() for entry in entries if entry.get("cas")})
+        if not cas_values:
+            return
         try:
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "w", encoding="utf-8") as f:
-                _json.dump(entries, f, ensure_ascii=False, indent=2)
+            with open(path, "w", encoding="utf-8", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=["cas"])
+                writer.writeheader()
+                for cas in cas_values:
+                    writer.writerow({"cas": cas})
         except Exception as exc:
-            self._emit(f"Note: failed to write undetermined reagents: {exc}")
+            self._emit(f"Note: failed to write new reagents CSV: {exc}")
             return
         self._undetermined_existing_entries = entries
         self._undetermined_existing_map = {}
@@ -2331,7 +2305,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         self.btn_folder = QtWidgets.QPushButton("Browse Folder...")
         self.output_md_edit = QtWidgets.QLineEdit()
         self.btn_output_md = QtWidgets.QPushButton("Save As...")
-        self.unknowns_checkbox = QtWidgets.QCheckBox("Save unknown compounds to not_determined_reagents.json")
+        self.unknowns_checkbox = QtWidgets.QCheckBox("Save unknown compounds to new_reagents.csv")
         
         # File list display
         self.file_list = QtWidgets.QListWidget()

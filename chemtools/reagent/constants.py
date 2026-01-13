@@ -7,20 +7,23 @@ reagent management system.
 
 from typing import Dict, Tuple
 
-# Mapping of reagent roles to their registry JSON files
+# Registry CSV filename (single source for all roles)
+REGISTRY_CSV = "reagents.csv"
+
+# Mapping of reagent roles to the shared registry CSV
 ROLE_FILES: Dict[str, str] = {
-    "acid": "acid.json",
-    "additive": "additive.json",
-    "ligand": "ligand.json",
-    "metal_catalyst": "metal_catalyst.json",
-    "base": "base.json",
-    "condensation_agent": "condensation_agent.json",
-    "oxidant": "oxidant.json",
-    "reductant": "reductant.json",
-    "solvent": "solvent.json",
-    "other_reagent": "other_reagent.json",
-    "enzyme": "enzyme.json",
-    "organo_catalyst": "organo_catalyst.json",
+    "acid": REGISTRY_CSV,
+    "additive": REGISTRY_CSV,
+    "ligand": REGISTRY_CSV,
+    "metal_catalyst": REGISTRY_CSV,
+    "base": REGISTRY_CSV,
+    "condensation_agent": REGISTRY_CSV,
+    "oxidant": REGISTRY_CSV,
+    "reductant": REGISTRY_CSV,
+    "solvent": REGISTRY_CSV,
+    "other_reagent": REGISTRY_CSV,
+    "enzyme": REGISTRY_CSV,
+    "organo_catalyst": REGISTRY_CSV,
 }
 
 # Default family assignment when role is inferred but family cannot be determined

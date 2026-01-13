@@ -12,10 +12,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
 from .registry_store import (
-    ROLE_CONFIG as FLAT_ROLE_CONFIG,
     RegistryStore,
     build_registry_entry,
-    build_aliases,
     infer_abbreviations,
 )
 from .taxonomy_store import RoleHeuristics, TaxonomyStore
@@ -80,6 +78,7 @@ def add_reagent_entry(
     name: Optional[str] = None,
     synonyms: Optional[Sequence[str]] = None,
     abbreviation: Optional[str] = None,
+    tag: Optional[str] = None,
     role: Optional[str] = None,
     family_id: Optional[str] = None,
     smiles: Optional[str] = None,
@@ -98,6 +97,7 @@ def add_reagent_entry(
         name: Preferred reagent name. If omitted, an online resolver is used when permitted.
         synonyms: Optional list of synonyms/aliases.
         abbreviation: Explicit abbreviation override. Defaults to the reagent name.
+        tag: Optional short tag for additional notes.
         role: Reagent role (ligand, base, metal_catalyst, ...). When omitted, the role
             heuristics attempt to infer it.
         family_id: Target family identifier. When omitted, heuristics attempt to infer it
@@ -168,7 +168,7 @@ def add_reagent_entry(
         raise ReagentAdditionError(
             "Unable to determine reagent role. Provide it explicitly or supply additional synonyms."
         )
-    valid_roles = set(FLAT_ROLE_CONFIG.keys())
+    valid_roles = set(taxonomy.role_data.keys())
     if role not in valid_roles:
         raise ReagentAdditionError(f"Unsupported role '{role}'.")
 
@@ -212,7 +212,7 @@ def add_reagent_entry(
     if not family_entry:
         raise ReagentAdditionError(f"Family '{family_id}' not found for role '{role}'.")
 
-    existing = registry.find_by_cas(normalized_cas)
+    existing = registry.find_by_cas(normalized_cas, role=role)
     if existing:
         existing_role, existing_family, data = existing
         result = {
@@ -231,21 +231,16 @@ def add_reagent_entry(
         return result
 
     final_smiles = smiles or resolved_smiles
-    role_payload = registry.build_role_payload(role, family_id)
     abbreviations = infer_abbreviations(final_name, combined_synonyms)
-    aliases = build_aliases(final_name, normalized_cas, abbreviations, combined_synonyms)
-    inchi_key = resolved_identity.get("inchi_key") if resolved_identity else None
-    entry_id = inchi_key or f"cas-{normalized_cas}"
+    abbr_value = (abbreviation or (abbreviations[0] if abbreviations else "")).strip()
     entry = build_registry_entry(
-        entry_id=entry_id,
         name=final_name,
-        abbreviations=abbreviations,
-        aliases=aliases,
+        abbreviation=abbr_value,
         cas=normalized_cas,
-        smiles=final_smiles,
-        inchi_key=inchi_key,
+        smile=final_smiles,
         role=role,
-        role_payload=role_payload,
+        family_id=family_id,
+        tag=tag,
         family_entry=family_entry,
         synonyms=list(combined_synonyms),
     )
@@ -261,6 +256,8 @@ def add_reagent_entry(
         "used_default_family": used_default,
         "entry_preview": entry,
     }
+    if tag:
+        result["tag"] = tag
     if family_candidates:
         result["family_candidates"] = family_candidates
     if auto_resolve_source:

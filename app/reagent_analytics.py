@@ -87,16 +87,17 @@ def format_reagent(reagent_data: Dict[str, Any], compact: bool = False) -> str:
     if reagent_data.get('smiles'):
         lines.append(f"  {Fore.CYAN}SMILES:{Style.RESET_ALL} {Fore.GREEN}{reagent_data['smiles']}{Style.RESET_ALL}")
     
-    if reagent_data.get('inchi_key'):
-        lines.append(f"  {Fore.CYAN}InChIKey:{Style.RESET_ALL} {Fore.GREEN}{reagent_data['inchi_key']}{Style.RESET_ALL}")
+    role = reagent_data.get("role") or ", ".join(reagent_data.get("roles", {}).keys())
+    if role:
+        lines.append(f"  {Fore.CYAN}Role:{Style.RESET_ALL} {Fore.MAGENTA}{role}{Style.RESET_ALL}")
     
-    if reagent_data.get('aliases'):
-        aliases_str = ', '.join(reagent_data['aliases'][:3])
-        lines.append(f"  {Fore.CYAN}Aliases:{Style.RESET_ALL} {Fore.LIGHTBLACK_EX}{aliases_str}{Style.RESET_ALL}")
+    family_id = reagent_data.get("family_id")
+    if family_id:
+        lines.append(f"  {Fore.CYAN}Family:{Style.RESET_ALL} {Fore.BLUE}{family_id}{Style.RESET_ALL}")
     
-    if reagent_data.get('roles'):
-        roles_str = ', '.join(reagent_data['roles'].keys())
-        lines.append(f"  {Fore.CYAN}Roles:{Style.RESET_ALL} {Fore.MAGENTA}{roles_str}{Style.RESET_ALL}")
+    tag = reagent_data.get("tag")
+    if tag:
+        lines.append(f"  {Fore.CYAN}Tag:{Style.RESET_ALL} {Fore.LIGHTBLACK_EX}{tag}{Style.RESET_ALL}")
     
     return '\n'.join(lines)
 
@@ -137,14 +138,16 @@ def show_database_statistics():
         else: return Fore.RED
     
     cas_pct = stats.get('percent_with_cas', 0)
-    ink_pct = stats.get('percent_with_inchikey', 0)
     smi_pct = stats.get('percent_with_smiles', 0)
     abb_pct = stats.get('percent_with_abbreviations', 0)
+    fam_pct = stats.get('percent_with_family_id', 0)
+    tag_pct = stats.get('percent_with_tag', 0)
     
     print(f"  {Fore.CYAN}With CAS numbers:{Style.RESET_ALL}     {stats.get('total_with_cas', 0):4d} {coverage_color(cas_pct)}({cas_pct:.1f}%){Style.RESET_ALL}")
-    print(f"  {Fore.CYAN}With InChIKey:{Style.RESET_ALL}        {stats.get('total_with_inchikey', 0):4d} {coverage_color(ink_pct)}({ink_pct:.1f}%){Style.RESET_ALL}")
     print(f"  {Fore.CYAN}With SMILES:{Style.RESET_ALL}          {stats.get('total_with_smiles', 0):4d} {coverage_color(smi_pct)}({smi_pct:.1f}%){Style.RESET_ALL}")
     print(f"  {Fore.CYAN}With abbreviations:{Style.RESET_ALL}   {stats.get('total_with_abbreviations', 0):4d} {coverage_color(abb_pct)}({abb_pct:.1f}%){Style.RESET_ALL}")
+    print(f"  {Fore.CYAN}With family IDs:{Style.RESET_ALL}      {stats.get('total_with_family_id', 0):4d} {coverage_color(fam_pct)}({fam_pct:.1f}%){Style.RESET_ALL}")
+    print(f"  {Fore.CYAN}With tags:{Style.RESET_ALL}            {stats.get('total_with_tag', 0):4d} {coverage_color(tag_pct)}({tag_pct:.1f}%){Style.RESET_ALL}")
     
     # Show top families
     print_subsection("Top 10 Reagent Families")
