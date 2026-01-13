@@ -1086,7 +1086,8 @@ class HTERecommender:
         top_k: int = 10,
         min_experiments: int = 2,
         reaction_type_filter: Optional[str] = None,
-        catalyst_filter: Optional[str] = None
+        catalyst_filter: Optional[str] = None,
+        use_spectator_groups: bool = True,
     ) -> HTERecommendationResult:
         """
         Recommend conditions based on reactant SMILES.
@@ -1099,6 +1100,7 @@ class HTERecommender:
             min_experiments: Minimum experiments for a condition to be recommended
             reaction_type_filter: Optional filter for specific reaction type
             catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
+            use_spectator_groups: Whether to apply spectator group weighting when available
         
         Returns:
             HTERecommendationResult with ranked condition recommendations
@@ -1249,7 +1251,7 @@ class HTERecommender:
             matched_df = self._filter_by_catalyst(matched_df, catalyst_filter)
 
         # Apply spectator group weighting if available
-        if query_spectator_groups and "spectator_groups" in matched_df.columns:
+        if use_spectator_groups and query_spectator_groups and "spectator_groups" in matched_df.columns:
             row_group_sets = matched_df["spectator_groups"].apply(
                 lambda value: set(_split_group_tokens(value))
             )
