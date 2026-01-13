@@ -373,20 +373,12 @@ def validate_database(
     
     for role, filename in roles_to_check.items():
         file_path = registry_dir / filename
-        
-        # Try alternate naming convention if primary not found
         if not file_path.exists():
-            # Try simple name: "ligand.json" instead of "taxonomy_ligand.json"
-            simple_name = f"{role}.json"
-            alt_path = registry_dir / simple_name
-            if alt_path.exists():
-                file_path = alt_path
-            else:
-                result["by_role"][role] = {
-                    "error": f"File not found: {file_path} (also tried {alt_path})",
-                    "file": str(file_path),
-                }
-                continue
+            result["by_role"][role] = {
+                "error": f"File not found: {file_path}",
+                "file": str(file_path),
+            }
+            continue
         
         result["total_files"] += 1
         

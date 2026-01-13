@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
-from chemtools.taxonomy.reagent_v2 import (
+from chemtools.reagent.reagent_v2 import (
     DEFAULT_REAGENT_V2_DIR,
     ReagentFamilyV2,
     ReagentRoleV2,
@@ -184,7 +184,8 @@ def _family_entry_from_v2(role: ReagentRoleV2, family: ReagentFamilyV2) -> Dict[
         "definition": family.description or "",
         "precedence": family.precedence,
         "keywords": list(family.allowlists.keywords),
-        "notes": "",
+        "notes": family.notes or "",
+        "required_props": dict(family.required_props) if family.required_props else {},
         "examples_pos": [],
         "allowlists": {
             "cas": sorted(family.allowlists.cas),

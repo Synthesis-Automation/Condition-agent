@@ -794,7 +794,7 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         break
                 try:
                     from conditioncore_pairing_helper_for_ref_only import PairingHelper  # type: ignore
-                    cat_path = os.path.join(self.taxonomy.base_dir, "taxonomy_catalysts_precursor.json")
+                    cat_path = os.path.join(self.taxonomy.base_dir, "reagent_roles.v2.json")
                     ph = PairingHelper(cat_path)
                     if fam_id:
                         hint = (row.get("ReactionType") or "").strip() or None
@@ -1891,7 +1891,7 @@ class RDFWorker(QtCore.QObject):
         # Build PairingHelper once
         try:
             from conditioncore_pairing_helper_for_ref_only import PairingHelper  # type: ignore
-            cat_path = os.path.join(taxonomy.base_dir, 'taxonomy_catalysts_precursor.json')
+            cat_path = os.path.join(taxonomy.base_dir, 'reagent_roles.v2.json')
             ph = PairingHelper(cat_path)
         except Exception:
             ph = None  # type: ignore

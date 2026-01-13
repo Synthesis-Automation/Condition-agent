@@ -143,12 +143,13 @@ To determine what happened in a reaction, we use raw motif counts from reactants
   - Canonical reaction types with motif-slot constraints and aliases.
   - High-precision matching: `buchwald_hartwig` requires an electrophile slot AND a nucleophile slot to be occupied.
 - `reagent_roles.v2.json`
-  - Reagent roles and priorities (v2).
+  - Unified roles + families (v2). Roles define priorities/defaults; families
+    define allowlists and SMARTS detection.
 
 Notes
 
-- Reagent roles are defined in `reagent_roles.v2.json`. Family allowlists are
-  handled outside the v2 core (legacy registry and heuristics).
+- `reagent_roles.v2.json` is the single source for reagent roles and families.
+  Legacy registries only store reagent entries, not taxonomy definitions.
 
 ---
 
@@ -201,7 +202,7 @@ Notes
   - Generate calculable feature spec from organic compounds + overlays.
 - `chemtools/util/functional_groups.py`
   - Functional group detection sourced from calculable spec.
-- `chemtools/taxonomy/reagent_v2.py`
+- `chemtools/reagent/reagent_v2.py`
   - Reagent role classification (CAS -> SMARTS -> name, if families provided).
 - `chemtools/reagent/taxonomy_store.py`
   - Heuristics and registry helpers for reagent classification.
@@ -215,7 +216,7 @@ Notes
 ## Condition extraction and recommendation
 
 - Reagent roles for conditions come from the v2 taxonomy.
-  - Classifier: `chemtools/taxonomy/reagent_v2.py`.
+  - Classifier: `chemtools/reagent/reagent_v2.py`.
   - Heuristics: `chemtools/reagent/taxonomy_store.py`.
 - HTE recommender uses motif typing for reactant keying.
   - Engine: `chemtools/HTE/recommender.py`.

@@ -30,7 +30,7 @@ def main() -> None:
     startup_message = None
     try:
         from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
-        from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2
+        from chemtools.reagent.reagent_v2 import ReagentTaxonomyV2
 
         # Load new taxonomy v2
         rxn_defs, _ = load_reaction_catalog()

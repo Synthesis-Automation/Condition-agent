@@ -293,19 +293,12 @@ class ReagentRegistryStore:
 
     def _load_families(self) -> None:
         entries: List[Dict[str, Any]] = []
-        schema_path = self.base_dir / "reagent_schema" / "families_registry.json"
-
-        if schema_path.exists():
-            data = json.loads(schema_path.read_text(encoding="utf-8"))
-            entries = data.get("entries", [])
-        else:
-            try:
-                entries = load_families_registry_entries()
-            except FileNotFoundError as exc:
-                raise FileNotFoundError(
-                    f"Families registry not found in {self.base_dir / 'reagent_schema'} "
-                    f"and unable to load unified taxonomy: {exc}"
-                ) from exc
+        try:
+            entries = load_families_registry_entries()
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(
+                f"Unable to load unified reagent taxonomy: {exc}"
+            ) from exc
 
         for entry in entries:
             role = entry.get("role")

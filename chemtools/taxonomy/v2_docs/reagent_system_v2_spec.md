@@ -4,13 +4,25 @@
 
 Keep only the information required to (1) classify a reagent into a **family** and (2) assign a **role** for condition extraction and rule-matching.
 
-This v2 removes non-critical fields that were embedded in the old families: `examples_pos`, `examples_neg`, `notes`, and `required_props`.
+This v2 keeps only the fields needed for deterministic classification. Legacy metadata
+may be preserved in the taxonomy file but is not used by the classifier.
 
 ---
 
 ## Files
 
 ### 1) `reagent_roles.v2.json`
+
+Single taxonomy file containing both roles and families:
+
+```json
+{
+  "roles": [...],
+  "families": [...]
+}
+```
+
+#### `roles`
 
 Array of role objects.
 
@@ -23,7 +35,7 @@ Optional:
 - `default_family_id` (string): fallback family id when role is known but family is not
 - `description` (string)
 
-### 2) `reagent_families.v2.json`
+#### `families`
 
 Array of family objects.
 

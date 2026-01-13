@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 from chemtools.smiles import normalize_reaction
-from chemtools.taxonomy.reagent_v2 import ReagentTaxonomyV2
+from chemtools.reagent.reagent_v2 import ReagentTaxonomyV2
 from chemtools.util import rdkit_helpers
 
 from .analysis.reaction_context import classify_reactants_with_context, get_reactant_summary

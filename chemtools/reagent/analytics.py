@@ -22,7 +22,6 @@ from pathlib import Path
 from collections import Counter, defaultdict
 
 from .lookup import get_all_reagent_types, load_reagent_database, get_data_dir
-from .constants import ROLE_FILES
 
 
 def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[str, Any]:

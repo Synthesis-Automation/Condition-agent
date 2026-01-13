@@ -271,16 +271,11 @@ class RegistryStore:
 
     # ------------------------------------------------------------------ loading
     def _load_families(self) -> None:
-        schema_path = self.base_dir / "reagent_schema" / "families_registry.json"
         entries: List[Dict[str, Any]] = []
-        if schema_path.exists():
-            data = json.loads(schema_path.read_text(encoding="utf-8"))
-            entries = list(data.get("entries", []))
-        else:
-            try:
-                entries = list(load_families_registry_entries())
-            except FileNotFoundError:
-                entries = []
+        try:
+            entries = list(load_families_registry_entries())
+        except FileNotFoundError:
+            entries = []
         if not entries:
             def add_entry(role: str, family: str, definition: str, keywords: Sequence[str]) -> None:
                 role = _canonical_role(role)

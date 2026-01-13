@@ -1,73 +1,2628 @@
-[
-  {
-    "id": "ligand",
-    "name": "Ligand",
-    "priority": 0,
-    "default_family_id": "trialkyl_triaryl_phosphines"
-  },
-  {
-    "id": "metal_catalyst",
-    "name": "Metal Catalyst",
-    "priority": 1,
-    "description": "Unified role covering precursor salts and pre-formed catalyst complexes.",
-    "default_family_id": "pd_ii_salts"
-  },
-  {
-    "id": "base",
-    "name": "Base",
-    "priority": 2,
-    "default_family_id": "tertiary_amines_aliphatic"
-  },
-  {
-    "id": "acid",
-    "name": "Acid",
-    "priority": 3,
-    "default_family_id": "mineral_acids"
-  },
-  {
-    "id": "condensation_agent",
-    "name": "Condensation Agent",
-    "priority": 4,
-    "default_family_id": "carbodiimides"
-  },
-  {
-    "id": "oxidant",
-    "name": "Oxidant",
-    "priority": 5,
-    "default_family_id": "o2_gas"
-  },
-  {
-    "id": "reductant",
-    "name": "Reductant",
-    "priority": 6,
-    "default_family_id": "metal_powders"
-  },
-  {
-    "id": "additive",
-    "name": "Additive",
-    "priority": 7,
-    "default_family_id": "quaternary_ammonium_ptc"
-  },
-  {
-    "id": "solvent",
-    "name": "Solvent",
-    "priority": 8,
-    "default_family_id": "hydrocarbons_aromatic"
-  },
-  {
-    "id": "other_reagent",
-    "name": "Other Reagent",
-    "priority": 9,
-    "default_family_id": "misc_general"
-  },
-  {
-    "id": "enzyme",
-    "name": "Enzyme",
-    "priority": 100
-  },
-  {
-    "id": "organo_catalyst",
-    "name": "Organo Catalyst",
-    "priority": 100
-  }
-]
+{
+  "roles": [
+    {
+      "id": "ligand",
+      "name": "Ligand",
+      "priority": 0,
+      "default_family_id": "trialkyl_triaryl_phosphines"
+    },
+    {
+      "id": "metal_catalyst",
+      "name": "Metal Catalyst",
+      "priority": 1,
+      "description": "Unified role covering precursor salts and pre-formed catalyst complexes.",
+      "default_family_id": "pd_ii_salts"
+    },
+    {
+      "id": "base",
+      "name": "Base",
+      "priority": 2,
+      "default_family_id": "tertiary_amines_aliphatic"
+    },
+    {
+      "id": "acid",
+      "name": "Acid",
+      "priority": 3,
+      "default_family_id": "mineral_acids"
+    },
+    {
+      "id": "condensation_agent",
+      "name": "Condensation Agent",
+      "priority": 4,
+      "default_family_id": "carbodiimides"
+    },
+    {
+      "id": "oxidant",
+      "name": "Oxidant",
+      "priority": 5,
+      "default_family_id": "o2_gas"
+    },
+    {
+      "id": "reductant",
+      "name": "Reductant",
+      "priority": 6,
+      "default_family_id": "metal_powders"
+    },
+    {
+      "id": "additive",
+      "name": "Additive",
+      "priority": 7,
+      "default_family_id": "quaternary_ammonium_ptc"
+    },
+    {
+      "id": "solvent",
+      "name": "Solvent",
+      "priority": 8,
+      "default_family_id": "hydrocarbons_aromatic"
+    },
+    {
+      "id": "other_reagent",
+      "name": "Other Reagent",
+      "priority": 9,
+      "default_family_id": "misc_general"
+    },
+    {
+      "id": "enzyme",
+      "name": "Enzyme",
+      "priority": 100
+    },
+    {
+      "id": "organo_catalyst",
+      "name": "Organo Catalyst",
+      "priority": 100
+    }
+  ],
+  "families": [
+    {
+      "id": "beta_diketiminates_NacNac",
+      "role_id": "ligand",
+      "name": "beta diketiminates NacNac",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "beta",
+          "diketiminates",
+          "nacnac"
+        ]
+      }
+    },
+    {
+      "id": "bidentate_diphosphines",
+      "role_id": "ligand",
+      "name": "bidentate diphosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "bidentate",
+          "diphosphines"
+        ]
+      }
+    },
+    {
+      "id": "biphosphines",
+      "role_id": "ligand",
+      "name": "biphosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "biphosphines"
+        ]
+      }
+    },
+    {
+      "id": "bipyridine_ligands",
+      "role_id": "ligand",
+      "name": "bipyridine ligands",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "bipyridine",
+          "ligands"
+        ]
+      }
+    },
+    {
+      "id": "bipyridines",
+      "role_id": "ligand",
+      "name": "bipyridines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "bipyridines"
+        ]
+      }
+    },
+    {
+      "id": "bis_imino_pyridines_PDI",
+      "role_id": "ligand",
+      "name": "bis imino pyridines PDI",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "bis",
+          "imino",
+          "pyridines",
+          "pdi"
+        ]
+      }
+    },
+    {
+      "id": "bisoxazolines_BOX",
+      "role_id": "ligand",
+      "name": "bisoxazolines BOX",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "bisoxazolines",
+          "box"
+        ]
+      }
+    },
+    {
+      "id": "caac_carbenes",
+      "role_id": "ligand",
+      "name": "caac carbenes",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "caac",
+          "carbenes"
+        ]
+      }
+    },
+    {
+      "id": "catacxium_monophosphines",
+      "role_id": "ligand",
+      "name": "catacxium monophosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "catacxium",
+          "monophosphines"
+        ]
+      }
+    },
+    {
+      "id": "dalphos_PN",
+      "role_id": "ligand",
+      "name": "dalphos PN",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "dalphos",
+          "pn"
+        ]
+      }
+    },
+    {
+      "id": "dialkylbiaryl_phosphines",
+      "role_id": "ligand",
+      "name": "dialkylbiaryl phosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "dialkylbiaryl",
+          "phosphines"
+        ]
+      }
+    },
+    {
+      "id": "diamines",
+      "role_id": "ligand",
+      "name": "diamines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "diamines"
+        ]
+      }
+    },
+    {
+      "id": "diones",
+      "role_id": "ligand",
+      "name": "diones",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "diones"
+        ]
+      }
+    },
+    {
+      "id": "ligandless",
+      "role_id": "ligand",
+      "name": "ligandless",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ligandless"
+        ]
+      }
+    },
+    {
+      "id": "nhc_imidazolylidenes",
+      "role_id": "ligand",
+      "name": "nhc imidazolylidenes",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "nhc",
+          "imidazolylidenes"
+        ]
+      }
+    },
+    {
+      "id": "oxalamide",
+      "role_id": "ligand",
+      "name": "oxalamide",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "oxalamide"
+        ]
+      }
+    },
+    {
+      "id": "phenanthroline_ligands",
+      "role_id": "ligand",
+      "name": "phenanthroline ligands",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "phenanthroline",
+          "ligands"
+        ]
+      }
+    },
+    {
+      "id": "phenanthrolines",
+      "role_id": "ligand",
+      "name": "phenanthrolines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "phenanthrolines"
+        ]
+      }
+    },
+    {
+      "id": "phosphine_pyridine_PN",
+      "role_id": "ligand",
+      "name": "phosphine pyridine PN",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "phosphine",
+          "pyridine",
+          "pn"
+        ]
+      }
+    },
+    {
+      "id": "phosphites",
+      "role_id": "ligand",
+      "name": "phosphites",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "phosphites"
+        ]
+      }
+    },
+    {
+      "id": "phosphoramidites",
+      "role_id": "ligand",
+      "name": "phosphoramidites",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "phosphoramidites"
+        ]
+      }
+    },
+    {
+      "id": "phox_pn",
+      "role_id": "ligand",
+      "name": "phox pn",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "phox",
+          "pn"
+        ]
+      }
+    },
+    {
+      "id": "pincers_PNP_PCP_PNN_CNN",
+      "role_id": "ligand",
+      "name": "pincers PNP PCP PNN CNN",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "pincers",
+          "pnp",
+          "pcp",
+          "pnn",
+          "cnn"
+        ]
+      }
+    },
+    {
+      "id": "pyridine_oxazolines_PyOx",
+      "role_id": "ligand",
+      "name": "pyridine oxazolines PyOx",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "pyridine",
+          "oxazolines",
+          "pyox"
+        ]
+      }
+    },
+    {
+      "id": "quinolinol_NO_chelates",
+      "role_id": "ligand",
+      "name": "quinolinol NO chelates",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "quinolinol",
+          "no",
+          "chelates"
+        ]
+      }
+    },
+    {
+      "id": "salen_salophen",
+      "role_id": "ligand",
+      "name": "salen salophen",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "salen",
+          "salophen"
+        ]
+      }
+    },
+    {
+      "id": "secondary_phosphines",
+      "role_id": "ligand",
+      "name": "secondary phosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "secondary",
+          "phosphines"
+        ]
+      }
+    },
+    {
+      "id": "terpyridines",
+      "role_id": "ligand",
+      "name": "terpyridines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "terpyridines"
+        ]
+      }
+    },
+    {
+      "id": "trialkyl_triaryl_phosphines",
+      "role_id": "ligand",
+      "name": "trialkyl triaryl phosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "trialkyl",
+          "triaryl",
+          "phosphines"
+        ]
+      }
+    },
+    {
+      "id": "triazine_pnn_phosphines",
+      "role_id": "ligand",
+      "name": "triazine pnn phosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "triazine",
+          "pnn",
+          "phosphines"
+        ]
+      }
+    },
+    {
+      "id": "tridentate_triphos",
+      "role_id": "ligand",
+      "name": "tridentate triphos",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "tridentate",
+          "triphos"
+        ]
+      }
+    },
+    {
+      "id": "tris_2pyridylmethyl_amine_TPMA",
+      "role_id": "ligand",
+      "name": "tris 2pyridylmethyl amine TPMA",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "tris",
+          "2pyridylmethyl",
+          "amine",
+          "tpma"
+        ]
+      }
+    },
+    {
+      "id": "water_soluble_phosphines",
+      "role_id": "ligand",
+      "name": "water soluble phosphines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "water",
+          "soluble",
+          "phosphines"
+        ]
+      }
+    },
+    {
+      "id": "Ni metal",
+      "role_id": "metal_catalyst",
+      "name": "Ni metal",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ni metal"
+        ]
+      }
+    },
+    {
+      "id": "Ni salt",
+      "role_id": "metal_catalyst",
+      "name": "Ni salt",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ni salt"
+        ]
+      }
+    },
+    {
+      "id": "co_beta_diketonates",
+      "role_id": "metal_catalyst",
+      "name": "co beta diketonates",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "co",
+          "beta",
+          "diketonates"
+        ]
+      }
+    },
+    {
+      "id": "co_ii_halides",
+      "role_id": "metal_catalyst",
+      "name": "co ii halides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "co",
+          "ii",
+          "halides"
+        ]
+      }
+    },
+    {
+      "id": "copper salt",
+      "role_id": "metal_catalyst",
+      "name": "copper salt",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "copper salt"
+        ]
+      }
+    },
+    {
+      "id": "cu_i_halides",
+      "role_id": "metal_catalyst",
+      "name": "cu i halides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "cu",
+          "i",
+          "halides"
+        ]
+      }
+    },
+    {
+      "id": "cu_ii_salts",
+      "role_id": "metal_catalyst",
+      "name": "cu ii salts",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "cu",
+          "ii",
+          "salts"
+        ]
+      }
+    },
+    {
+      "id": "fe_acac",
+      "role_id": "metal_catalyst",
+      "name": "fe acac",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "fe",
+          "acac"
+        ]
+      }
+    },
+    {
+      "id": "fe_carbonyls",
+      "role_id": "metal_catalyst",
+      "name": "fe carbonyls",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "fe",
+          "carbonyls"
+        ]
+      }
+    },
+    {
+      "id": "fe_halides",
+      "role_id": "metal_catalyst",
+      "name": "fe halides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "fe",
+          "halides"
+        ]
+      }
+    },
+    {
+      "id": "ir_cod_dimers",
+      "role_id": "metal_catalyst",
+      "name": "ir cod dimers",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ir",
+          "cod",
+          "dimers"
+        ]
+      }
+    },
+    {
+      "id": "ni_ii_carboxylates",
+      "role_id": "metal_catalyst",
+      "name": "ni ii carboxylates",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ni",
+          "ii",
+          "carboxylates"
+        ]
+      }
+    },
+    {
+      "id": "ni_ii_glyme",
+      "role_id": "metal_catalyst",
+      "name": "ni ii glyme",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ni",
+          "ii",
+          "glyme"
+        ]
+      }
+    },
+    {
+      "id": "ni_ii_halides",
+      "role_id": "metal_catalyst",
+      "name": "ni ii halides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ni",
+          "ii",
+          "halides"
+        ]
+      }
+    },
+    {
+      "id": "ni_zero_sources",
+      "role_id": "metal_catalyst",
+      "name": "ni zero sources",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ni",
+          "zero",
+          "sources"
+        ]
+      }
+    },
+    {
+      "id": "pd_ii_salts",
+      "role_id": "metal_catalyst",
+      "name": "pd ii salts",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "pd",
+          "ii",
+          "salts"
+        ]
+      }
+    },
+    {
+      "id": "pd_phosphine_complexes",
+      "role_id": "metal_catalyst",
+      "name": "pd phosphine complexes",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "pd",
+          "phosphine",
+          "complexes"
+        ]
+      }
+    },
+    {
+      "id": "pd_zero_sources",
+      "role_id": "metal_catalyst",
+      "name": "pd zero sources",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "pd",
+          "zero",
+          "sources"
+        ]
+      }
+    },
+    {
+      "id": "pure metal",
+      "role_id": "metal_catalyst",
+      "name": "pure metal",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "pure metal"
+        ]
+      }
+    },
+    {
+      "id": "rh_carbonyl_precursors",
+      "role_id": "metal_catalyst",
+      "name": "rh carbonyl precursors",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "rh",
+          "carbonyl",
+          "precursors"
+        ]
+      }
+    },
+    {
+      "id": "rh_hydroformylation_toolkit",
+      "role_id": "metal_catalyst",
+      "name": "rh hydroformylation toolkit",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "rh",
+          "hydroformylation",
+          "toolkit"
+        ]
+      }
+    },
+    {
+      "id": "rh_hydrogenation_precursors",
+      "role_id": "metal_catalyst",
+      "name": "rh hydrogenation precursors",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "rh",
+          "hydrogenation",
+          "precursors"
+        ]
+      }
+    },
+    {
+      "id": "ru_arene_dimer",
+      "role_id": "metal_catalyst",
+      "name": "ru arene dimer",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ru",
+          "arene",
+          "dimer"
+        ]
+      }
+    },
+    {
+      "id": "ru_metathesis_grubbs",
+      "role_id": "metal_catalyst",
+      "name": "ru metathesis grubbs",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ru",
+          "metathesis",
+          "grubbs"
+        ]
+      }
+    },
+    {
+      "id": "alkoxides_hindered",
+      "role_id": "base",
+      "name": "alkoxides hindered",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "alkoxides",
+          "hindered"
+        ]
+      }
+    },
+    {
+      "id": "alkoxides_primary",
+      "role_id": "base",
+      "name": "alkoxides primary",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "alkoxides",
+          "primary"
+        ]
+      }
+    },
+    {
+      "id": "amidine_guanidine_bases",
+      "role_id": "base",
+      "name": "amidine guanidine bases",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "amidine",
+          "guanidine",
+          "bases"
+        ]
+      }
+    },
+    {
+      "id": "ammonia_aqueous",
+      "role_id": "base",
+      "name": "ammonia aqueous",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ammonia",
+          "aqueous"
+        ]
+      }
+    },
+    {
+      "id": "aromatic_tertiary_amines",
+      "role_id": "base",
+      "name": "aromatic tertiary amines",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "aromatic",
+          "tertiary",
+          "amines"
+        ]
+      }
+    },
+    {
+      "id": "diamine",
+      "role_id": "base",
+      "name": "diamine",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "diamine"
+        ]
+      }
+    },
+    {
+      "id": "fluoride",
+      "role_id": "base",
+      "name": "fluoride",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "fluoride"
+        ]
+      }
+    },
+    {
+      "id": "hydrides",
+      "role_id": "base",
+      "name": "hydrides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hydrides"
+        ]
+      }
+    },
+    {
+      "id": "hydroxides",
+      "role_id": "base",
+      "name": "hydroxides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hydroxides"
+        ]
+      }
+    },
+    {
+      "id": "inorg_carbonates_bicarbonate",
+      "role_id": "base",
+      "name": "inorg carbonates bicarbonate",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "inorg",
+          "carbonates",
+          "bicarbonate"
+        ]
+      }
+    },
+    {
+      "id": "inorg_carboxylates",
+      "role_id": "base",
+      "name": "inorg carboxylates",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "inorg",
+          "carboxylates"
+        ]
+      }
+    },
+    {
+      "id": "inorg_phosphates",
+      "role_id": "base",
+      "name": "inorg phosphates",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "inorg",
+          "phosphates"
+        ]
+      }
+    },
+    {
+      "id": "metal_amides_silylamides",
+      "role_id": "base",
+      "name": "metal amides silylamides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "metal",
+          "amides",
+          "silylamides"
+        ]
+      }
+    },
+    {
+      "id": "nucleophilic_catalyst_bases",
+      "role_id": "base",
+      "name": "nucleophilic catalyst bases",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "nucleophilic",
+          "catalyst",
+          "bases"
+        ]
+      }
+    },
+    {
+      "id": "organolithiums",
+      "role_id": "base",
+      "name": "organolithiums",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "organolithiums"
+        ]
+      }
+    },
+    {
+      "id": "secondary_amines_cyclic",
+      "role_id": "base",
+      "name": "secondary amines cyclic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "secondary",
+          "amines",
+          "cyclic"
+        ]
+      }
+    },
+    {
+      "id": "tertiary_amines_aliphatic",
+      "role_id": "base",
+      "name": "tertiary amines aliphatic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "tertiary",
+          "amines",
+          "aliphatic"
+        ]
+      }
+    },
+    {
+      "id": "acidic_clays_zeolites",
+      "role_id": "acid",
+      "name": "Acidic clays and zeolites (K\u201110, H\u2011Beta, H\u2011ZSM\u20115)",
+      "precedence": 50,
+      "description": "Acidic clays and zeolites (K\u201110, H\u2011Beta, H\u2011ZSM\u20115)",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "acidic",
+          "and",
+          "beta",
+          "clays",
+          "h",
+          "k",
+          "zeolites",
+          "zsm"
+        ]
+      }
+    },
+    {
+      "id": "aluminum_halides",
+      "role_id": "acid",
+      "name": "Aluminum halides",
+      "precedence": 50,
+      "description": "Aluminum halides",
+      "allowlists": {
+        "cas": [
+          "12138-52-0",
+          "7727-15-3"
+        ],
+        "names": [],
+        "keywords": [
+          "aluminum",
+          "halides"
+        ]
+      }
+    },
+    {
+      "id": "fluorinated_alcohol_media",
+      "role_id": "acid",
+      "name": "Fluorinated alcohol media (HFIP/TFE)",
+      "precedence": 50,
+      "description": "Fluorinated alcohol media (HFIP/TFE)",
+      "allowlists": {
+        "cas": [
+          "75-89-8",
+          "920-66-1"
+        ],
+        "names": [],
+        "keywords": [
+          "alcohol",
+          "fluorinated",
+          "hfip",
+          "media",
+          "tfe"
+        ]
+      }
+    },
+    {
+      "id": "hydrogen_halide_donors",
+      "role_id": "acid",
+      "name": "Hydrogen halide donors (HCl/dioxane, HBr/AcOH)",
+      "precedence": 50,
+      "description": "Hydrogen halide donors (HCl/dioxane, HBr/AcOH)",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "acoh",
+          "dioxane",
+          "donors",
+          "halide",
+          "hbr",
+          "hcl",
+          "hydrogen"
+        ]
+      }
+    },
+    {
+      "id": "magic_acid_systems",
+      "role_id": "acid",
+      "name": "Magic-acid systems (HSO3F/SbF5 mixtures)",
+      "precedence": 50,
+      "description": "Magic-acid systems (HSO3F/SbF5 mixtures)",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "acid",
+          "f",
+          "hso",
+          "magic",
+          "mixtures",
+          "sbf",
+          "systems"
+        ]
+      }
+    },
+    {
+      "id": "perfluorosulfonimide_acids",
+      "role_id": "acid",
+      "name": "Perfluorosulfonimide acids (e.g., HNTf2)",
+      "precedence": 50,
+      "description": "Perfluorosulfonimide acids (e.g., HNTf2)",
+      "allowlists": {
+        "cas": [
+          "82113-65-3"
+        ],
+        "names": [],
+        "keywords": [
+          "acids",
+          "e",
+          "g",
+          "hntf",
+          "perfluorosulfonimide"
+        ]
+      }
+    },
+    {
+      "id": "polyphosphoric_acids",
+      "role_id": "acid",
+      "name": "Polyphosphoric/Eaton\u2019s reagents",
+      "precedence": 50,
+      "description": "Polyphosphoric/Eaton\u2019s reagents",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "eaton",
+          "polyphosphoric",
+          "reagents",
+          "s"
+        ]
+      }
+    },
+    {
+      "id": "pyridinium_acids",
+      "role_id": "acid",
+      "name": "Pyridinium salts (e.g., PPTS)",
+      "precedence": 50,
+      "description": "Pyridinium salts (e.g., PPTS)",
+      "allowlists": {
+        "cas": [
+          "24057-28-1"
+        ],
+        "names": [],
+        "keywords": [
+          "e",
+          "g",
+          "ppts",
+          "pyridinium",
+          "salts"
+        ]
+      }
+    },
+    {
+      "id": "rare_earth_triflates",
+      "role_id": "acid",
+      "name": "Rare\u2011earth/metal triflates (Sc(OTf)3, Yb(OTf)3, Zn(OTf)2, Cu(OTf)2)",
+      "precedence": 50,
+      "description": "Rare\u2011earth/metal triflates (Sc(OTf)3, Yb(OTf)3, Zn(OTf)2, Cu(OTf)2)",
+      "allowlists": {
+        "cas": [
+          "42164-05-2",
+          "52093-26-6",
+          "54010-75-2"
+        ],
+        "names": [],
+        "keywords": [
+          "cu",
+          "earth",
+          "metal",
+          "otf",
+          "rare",
+          "sc",
+          "triflates",
+          "yb",
+          "zn"
+        ]
+      }
+    },
+    {
+      "id": "silyl_triflates",
+      "role_id": "acid",
+      "name": "Silyl triflates (TMSOTf/TBSOTf/TIPSOTf)",
+      "precedence": 50,
+      "description": "Silyl triflates (TMSOTf/TBSOTf/TIPSOTf)",
+      "allowlists": {
+        "cas": [
+          "25561-30-2",
+          "27607-77-8"
+        ],
+        "names": [],
+        "keywords": [
+          "silyl",
+          "tbsotf",
+          "tipsotf",
+          "tmsotf",
+          "triflates"
+        ]
+      }
+    },
+    {
+      "id": "solid_acid_resins",
+      "role_id": "acid",
+      "name": "Solid acid resins and perfluorinated polymers",
+      "precedence": 50,
+      "description": "Solid acid resins and perfluorinated polymers",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "acid",
+          "and",
+          "perfluorinated",
+          "polymers",
+          "resins",
+          "solid"
+        ]
+      }
+    },
+    {
+      "id": "superacids",
+      "role_id": "acid",
+      "name": "Superacids (non\u2011nucleophilic acids)",
+      "precedence": 50,
+      "description": "Superacids (non\u2011nucleophilic acids)",
+      "allowlists": {
+        "cas": [
+          "1493-13-6",
+          "7789-21-1"
+        ],
+        "names": [],
+        "keywords": [
+          "acids",
+          "non",
+          "nucleophilic",
+          "superacids"
+        ]
+      }
+    },
+    {
+      "id": "tin_halides",
+      "role_id": "acid",
+      "name": "Tin halides",
+      "precedence": 50,
+      "description": "Tin halides",
+      "allowlists": {
+        "cas": [
+          "7646-78-8"
+        ],
+        "names": [],
+        "keywords": [
+          "halides",
+          "tin"
+        ]
+      }
+    },
+    {
+      "id": "titanium_halides",
+      "role_id": "acid",
+      "name": "Titanium halides",
+      "precedence": 50,
+      "description": "Titanium halides",
+      "allowlists": {
+        "cas": [
+          "7550-45-0"
+        ],
+        "names": [],
+        "keywords": [
+          "halides",
+          "titanium"
+        ]
+      }
+    },
+    {
+      "id": "zinc_iron_halides",
+      "role_id": "acid",
+      "name": "Zinc/iron halides",
+      "precedence": 50,
+      "description": "Zinc/iron halides",
+      "allowlists": {
+        "cas": [
+          "7646-85-7",
+          "7705-08-0"
+        ],
+        "names": [],
+        "keywords": [
+          "halides",
+          "iron",
+          "zinc"
+        ]
+      }
+    },
+    {
+      "id": "halogenated_carboxylic_acids",
+      "role_id": "acid",
+      "name": "Halogenated carboxylic acids (TFA/TCA)",
+      "precedence": 70,
+      "description": "Halogenated carboxylic acids (TFA/TCA)",
+      "allowlists": {
+        "cas": [
+          "76-03-9",
+          "76-05-1"
+        ],
+        "names": [],
+        "keywords": [
+          "acids",
+          "carboxylic",
+          "halogenated",
+          "tca",
+          "tfa"
+        ]
+      },
+      "detect": {
+        "smarts": {
+          "any": [
+            "C(=O)O"
+          ],
+          "none": []
+        }
+      }
+    },
+    {
+      "id": "simple_carboxylic_acids",
+      "role_id": "acid",
+      "name": "Simple carboxylic acids (AcOH/PivOH/Benzoic acid)",
+      "precedence": 70,
+      "description": "Simple carboxylic acids (AcOH/PivOH/Benzoic acid)",
+      "allowlists": {
+        "cas": [
+          "64-19-7",
+          "75-98-9",
+          "98-98-6"
+        ],
+        "names": [],
+        "keywords": [
+          "acid",
+          "acids",
+          "acoh",
+          "benzoic",
+          "carboxylic",
+          "pivoh",
+          "simple"
+        ]
+      },
+      "detect": {
+        "smarts": {
+          "any": [
+            "C(=O)O"
+          ],
+          "none": []
+        }
+      }
+    },
+    {
+      "id": "boron_lewis_acids",
+      "role_id": "acid",
+      "name": "Boron Lewis acids",
+      "precedence": 75,
+      "description": "Boron Lewis acids",
+      "allowlists": {
+        "cas": [
+          "109-63-7",
+          "1109-15-5"
+        ],
+        "names": [],
+        "keywords": [
+          "acids",
+          "boron",
+          "lewis"
+        ]
+      },
+      "notes": "Lewis acids often metal halides; handled by name + metal."
+    },
+    {
+      "id": "sulfonic_acids",
+      "role_id": "acid",
+      "name": "Aryl/alkyl sulfonic acids (p\u2011TsOH/MsOH)",
+      "precedence": 80,
+      "description": "Aryl/alkyl sulfonic acids (p\u2011TsOH/MsOH)",
+      "allowlists": {
+        "cas": [
+          "104-15-4",
+          "6192-52-5",
+          "75-75-2"
+        ],
+        "names": [],
+        "keywords": [
+          "acids",
+          "alkyl",
+          "aryl",
+          "msoh",
+          "p",
+          "sulfonic",
+          "tsoh"
+        ]
+      },
+      "detect": {
+        "smarts": {
+          "any": [
+            "S(=O)(=O)O"
+          ],
+          "none": []
+        }
+      }
+    },
+    {
+      "id": "mineral_acids",
+      "role_id": "acid",
+      "name": "Mineral acids (H2SO4/HCl/H3PO4)",
+      "precedence": 85,
+      "description": "Mineral acids (H2SO4/HCl/H3PO4)",
+      "allowlists": {
+        "cas": [
+          "590-29-4",
+          "7647-01-0",
+          "7664-38-2",
+          "7664-93-9"
+        ],
+        "names": [],
+        "keywords": [
+          "acids",
+          "h",
+          "hcl",
+          "mineral",
+          "po",
+          "so"
+        ]
+      },
+      "notes": "HX, H2SO4, H3PO4; rely on name and formula."
+    },
+    {
+      "id": "activated_esters_isolable",
+      "role_id": "condensation_agent",
+      "name": "activated esters isolable",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "activated",
+          "esters",
+          "isolable"
+        ]
+      }
+    },
+    {
+      "id": "acyl_halide_fluoride_generators",
+      "role_id": "condensation_agent",
+      "name": "acyl halide fluoride generators",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "acyl",
+          "halide",
+          "fluoride",
+          "generators"
+        ]
+      }
+    },
+    {
+      "id": "aminium_uronium_guanidinium",
+      "role_id": "condensation_agent",
+      "name": "aminium uronium guanidinium",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "aminium",
+          "uronium",
+          "guanidinium"
+        ]
+      }
+    },
+    {
+      "id": "boron",
+      "role_id": "condensation_agent",
+      "name": "boron",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "boron"
+        ]
+      }
+    },
+    {
+      "id": "carbodiimides",
+      "role_id": "condensation_agent",
+      "name": "carbodiimides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "carbodiimides"
+        ]
+      }
+    },
+    {
+      "id": "imidazolide_formers",
+      "role_id": "condensation_agent",
+      "name": "imidazolide formers",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "imidazolide",
+          "formers"
+        ]
+      }
+    },
+    {
+      "id": "mixed_anhydrides_chloroformates",
+      "role_id": "condensation_agent",
+      "name": "mixed anhydrides chloroformates",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "mixed",
+          "anhydrides",
+          "chloroformates"
+        ]
+      }
+    },
+    {
+      "id": "organophosphorus_anhydrides",
+      "role_id": "condensation_agent",
+      "name": "organophosphorus anhydrides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "organophosphorus",
+          "anhydrides"
+        ]
+      }
+    },
+    {
+      "id": "organophosphorus_chlorides_azides",
+      "role_id": "condensation_agent",
+      "name": "organophosphorus chlorides azides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "organophosphorus",
+          "chlorides",
+          "azides"
+        ]
+      }
+    },
+    {
+      "id": "phosphonium_bt_at",
+      "role_id": "condensation_agent",
+      "name": "phosphonium bt at",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "phosphonium",
+          "bt",
+          "at"
+        ]
+      }
+    },
+    {
+      "id": "specialty_low_racemization",
+      "role_id": "condensation_agent",
+      "name": "specialty low racemization",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "specialty",
+          "low",
+          "racemization"
+        ]
+      }
+    },
+    {
+      "id": "triazine_non_halide",
+      "role_id": "condensation_agent",
+      "name": "triazine non halide",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "triazine",
+          "non",
+          "halide"
+        ]
+      }
+    },
+    {
+      "id": "hypervalent_iodine",
+      "role_id": "oxidant",
+      "name": "hypervalent iodine",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hypervalent",
+          "iodine"
+        ]
+      }
+    },
+    {
+      "id": "metal_salt_reoxidants",
+      "role_id": "oxidant",
+      "name": "metal salt reoxidants",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "metal",
+          "salt",
+          "reoxidants"
+        ]
+      }
+    },
+    {
+      "id": "mno2",
+      "role_id": "oxidant",
+      "name": "mno2",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "mno2"
+        ]
+      }
+    },
+    {
+      "id": "nitroxyl_radical_catalysts",
+      "role_id": "oxidant",
+      "name": "nitroxyl radical catalysts",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "nitroxyl",
+          "radical",
+          "catalysts"
+        ]
+      }
+    },
+    {
+      "id": "o2_gas",
+      "role_id": "oxidant",
+      "name": "o2 gas",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "o2",
+          "gas"
+        ]
+      }
+    },
+    {
+      "id": "oxone",
+      "role_id": "oxidant",
+      "name": "oxone",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "oxone"
+        ]
+      }
+    },
+    {
+      "id": "peroxides_hydroperoxides",
+      "role_id": "oxidant",
+      "name": "peroxides hydroperoxides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "peroxides",
+          "hydroperoxides"
+        ]
+      }
+    },
+    {
+      "id": "persulfates",
+      "role_id": "oxidant",
+      "name": "persulfates",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "persulfates"
+        ]
+      }
+    },
+    {
+      "id": "quinone_oxidants",
+      "role_id": "oxidant",
+      "name": "quinone oxidants",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "quinone",
+          "oxidants"
+        ]
+      }
+    },
+    {
+      "id": "complex_hydrides",
+      "role_id": "reductant",
+      "name": "complex hydrides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "complex",
+          "hydrides"
+        ]
+      }
+    },
+    {
+      "id": "hydrogen_gas",
+      "role_id": "reductant",
+      "name": "hydrogen gas",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hydrogen",
+          "gas"
+        ]
+      }
+    },
+    {
+      "id": "hydrosilanes",
+      "role_id": "reductant",
+      "name": "hydrosilanes",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hydrosilanes"
+        ]
+      }
+    },
+    {
+      "id": "metal_powders",
+      "role_id": "reductant",
+      "name": "metal powders",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "metal",
+          "powders"
+        ]
+      }
+    },
+    {
+      "id": "organic_reductants",
+      "role_id": "reductant",
+      "name": "organic reductants",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "organic",
+          "reductants"
+        ]
+      }
+    },
+    {
+      "id": "Al salt",
+      "role_id": "additive",
+      "name": "Al salt",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "al salt"
+        ]
+      }
+    },
+    {
+      "id": "amide_coupling_additives",
+      "role_id": "additive",
+      "name": "amide coupling additives",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "amide",
+          "coupling",
+          "additives"
+        ]
+      }
+    },
+    {
+      "id": "carboxylate_promoters_ch_activation",
+      "role_id": "additive",
+      "name": "carboxylate promoters ch activation",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "carboxylate",
+          "promoters",
+          "ch",
+          "activation"
+        ]
+      }
+    },
+    {
+      "id": "crown_ethers",
+      "role_id": "additive",
+      "name": "crown ethers",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "crown",
+          "ethers"
+        ]
+      }
+    },
+    {
+      "id": "fluoride_sources_activators",
+      "role_id": "additive",
+      "name": "fluoride sources activators",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "fluoride",
+          "sources",
+          "activators"
+        ]
+      }
+    },
+    {
+      "id": "iodide_promoters",
+      "role_id": "additive",
+      "name": "iodide promoters",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "iodide",
+          "promoters"
+        ]
+      }
+    },
+    {
+      "id": "lewis_acid_promoters",
+      "role_id": "additive",
+      "name": "lewis acid promoters",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "lewis",
+          "acid",
+          "promoters"
+        ]
+      }
+    },
+    {
+      "id": "lithium_halide_accelerants",
+      "role_id": "additive",
+      "name": "lithium halide accelerants",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "lithium",
+          "halide",
+          "accelerants"
+        ]
+      }
+    },
+    {
+      "id": "molecular_sieves",
+      "role_id": "additive",
+      "name": "molecular sieves",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "molecular",
+          "sieves"
+        ]
+      }
+    },
+    {
+      "id": "quaternary_ammonium_ptc",
+      "role_id": "additive",
+      "name": "quaternary ammonium ptc",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "quaternary",
+          "ammonium",
+          "ptc"
+        ]
+      }
+    },
+    {
+      "id": "radical_suppressors",
+      "role_id": "additive",
+      "name": "radical suppressors",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "radical",
+          "suppressors"
+        ]
+      }
+    },
+    {
+      "id": "silver_salts_halide_scavengers",
+      "role_id": "additive",
+      "name": "silver salts halide scavengers",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "silver",
+          "salts",
+          "halide",
+          "scavengers"
+        ]
+      }
+    },
+    {
+      "id": "Sulfolane",
+      "role_id": "solvent",
+      "name": "Sulfolane",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "sulfolane"
+        ]
+      }
+    },
+    {
+      "id": "alcohols_primary",
+      "role_id": "solvent",
+      "name": "alcohols primary",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "alcohols",
+          "primary"
+        ]
+      }
+    },
+    {
+      "id": "alcohols_secondary",
+      "role_id": "solvent",
+      "name": "alcohols secondary",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "alcohols",
+          "secondary"
+        ]
+      }
+    },
+    {
+      "id": "alcohols_tertiary",
+      "role_id": "solvent",
+      "name": "alcohols tertiary",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "alcohols",
+          "tertiary"
+        ]
+      }
+    },
+    {
+      "id": "amides_dipolar_aprotic",
+      "role_id": "solvent",
+      "name": "amides dipolar aprotic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "amides",
+          "dipolar",
+          "aprotic"
+        ]
+      }
+    },
+    {
+      "id": "amines_tertiary",
+      "role_id": "solvent",
+      "name": "amines tertiary",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "amines",
+          "tertiary"
+        ]
+      }
+    },
+    {
+      "id": "carboxylic_acids",
+      "role_id": "solvent",
+      "name": "carboxylic acids",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "carboxylic",
+          "acids"
+        ]
+      }
+    },
+    {
+      "id": "deuterated",
+      "role_id": "solvent",
+      "name": "deuterated",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "deuterated"
+        ]
+      }
+    },
+    {
+      "id": "esters_anhydrides",
+      "role_id": "solvent",
+      "name": "esters anhydrides",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "esters",
+          "anhydrides"
+        ]
+      }
+    },
+    {
+      "id": "ethers_acyclic",
+      "role_id": "solvent",
+      "name": "ethers acyclic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ethers",
+          "acyclic"
+        ]
+      }
+    },
+    {
+      "id": "ethers_cyclic_glymes",
+      "role_id": "solvent",
+      "name": "ethers cyclic glymes",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ethers",
+          "cyclic",
+          "glymes"
+        ]
+      }
+    },
+    {
+      "id": "fluorinated_alcohols",
+      "role_id": "solvent",
+      "name": "fluorinated alcohols",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "fluorinated",
+          "alcohols"
+        ]
+      }
+    },
+    {
+      "id": "glycol_ethers_polyols",
+      "role_id": "solvent",
+      "name": "glycol ethers polyols",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "glycol",
+          "ethers",
+          "polyols"
+        ]
+      }
+    },
+    {
+      "id": "halogenated_aliphatics",
+      "role_id": "solvent",
+      "name": "halogenated aliphatics",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "halogenated",
+          "aliphatics"
+        ]
+      }
+    },
+    {
+      "id": "halogenated_aromatics",
+      "role_id": "solvent",
+      "name": "halogenated aromatics",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "halogenated",
+          "aromatics"
+        ]
+      }
+    },
+    {
+      "id": "hydrocarbons_aliphatic_linear",
+      "role_id": "solvent",
+      "name": "hydrocarbons aliphatic linear",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hydrocarbons",
+          "aliphatic",
+          "linear"
+        ]
+      }
+    },
+    {
+      "id": "hydrocarbons_aromatic",
+      "role_id": "solvent",
+      "name": "hydrocarbons aromatic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hydrocarbons",
+          "aromatic"
+        ]
+      }
+    },
+    {
+      "id": "hydrocarbons_cycloaliphatic",
+      "role_id": "solvent",
+      "name": "hydrocarbons cycloaliphatic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "hydrocarbons",
+          "cycloaliphatic"
+        ]
+      }
+    },
+    {
+      "id": "ketones",
+      "role_id": "solvent",
+      "name": "ketones",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "ketones"
+        ]
+      }
+    },
+    {
+      "id": "nitriles",
+      "role_id": "solvent",
+      "name": "nitriles",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "nitriles"
+        ]
+      }
+    },
+    {
+      "id": "nitro_solvents",
+      "role_id": "solvent",
+      "name": "nitro solvents",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "nitro",
+          "solvents"
+        ]
+      }
+    },
+    {
+      "id": "sulfoxides_dipolar_aprotic",
+      "role_id": "solvent",
+      "name": "sulfoxides dipolar aprotic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "sulfoxides",
+          "dipolar",
+          "aprotic"
+        ]
+      }
+    },
+    {
+      "id": "water",
+      "role_id": "solvent",
+      "name": "water",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "water"
+        ]
+      }
+    },
+    {
+      "id": "misc_general",
+      "role_id": "other_reagent",
+      "name": "misc general",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "misc",
+          "general"
+        ]
+      }
+    },
+    {
+      "id": "cinchona_alkaloids",
+      "role_id": "organo_catalyst",
+      "name": "cinchona alkaloids",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "cinchona",
+          "alkaloids"
+        ]
+      }
+    },
+    {
+      "id": "oxidoreductase_general",
+      "role_id": "enzyme",
+      "name": "oxidoreductase general",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "oxidoreductase",
+          "general"
+        ]
+      }
+    },
+    {
+      "id": "photocatalysts_organic",
+      "role_id": "organo_catalyst",
+      "name": "photocatalysts organic",
+      "precedence": 100,
+      "description": "",
+      "allowlists": {
+        "cas": [],
+        "names": [],
+        "keywords": [
+          "photocatalysts",
+          "organic"
+        ]
+      }
+    }
+  ]
+}

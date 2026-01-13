@@ -21,10 +21,10 @@ Phase 0 â Current-State Recon
 - `data/reagent_db/*.json`
   - Per-role registries (`ligand.json`, `base.json`, `solvent.json`, etc.) describing concrete reagents with `id`, `name`, `aliases`, identifiers, role metadata.
   - Roles are implicit in filenames; metadata keys vary per file (e.g., ligands carry families/denticity, bases carry sterics/basicity).
-- `chemtools/reagent/reagent_schema/families_registry.json` (legacy copy â unified registry now supplies this data)
-  - Master mapping of reagent families per role; used to validate `reagent_db`.
+- `chemtools/taxonomy/data/reagent_roles.v2.json`
+  - Unified roles + families (single source of truth) used for classification and validation.
 - `chemtools/reagent/constants.py`
-  - Hard-coded mapping between role names and taxonomy filenames (`taxonomy_ligand.json`, etc.) plus default family fallbacks and role priority order.
+  - Default family fallbacks, role priority order, and registry file mapping for reagent entries.
 - `chemtools/reagent/taxonomy_store.py`, `taxonomy_utils.py`
   - Helpers for loading, caching, and searching reagent families (independent schema from reaction/reactant json).
 - `data-processor/HTE_data/*`

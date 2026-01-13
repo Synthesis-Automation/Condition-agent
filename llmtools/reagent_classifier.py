@@ -139,7 +139,7 @@ def classify_role(
 
 
 def _format_families_description(families: List[Dict[str, Any]]) -> str:
-    """Format family list for LLM prompt with rich metadata from families_registry.json."""
+    """Format family list for LLM prompt with metadata from unified taxonomy."""
     lines = []
     for fam in families:
         fam_id = fam.get("family", "")
@@ -349,27 +349,15 @@ def assign_fields(
             "error": "..." (if status=error)
         }
     """
-    # Load families for this role - prefer registry_dir override, fallback to unified taxonomy
+    # Load families for this role from unified taxonomy
     families_entries: List[Dict[str, Any]] = []
-    schema_path = registry_dir / "reagent_schema" / "families_registry.json"
-
-    if schema_path.exists():
-        try:
-            families_data = json.loads(schema_path.read_text(encoding="utf-8"))
-            families_entries = families_data.get("entries", [])
-        except Exception as exc:
-            return {
-                "status": "error",
-                "error": f"Failed to load families registry: {exc}",
-            }
-    else:
-        try:
-            families_entries = load_families_registry_entries()
-        except FileNotFoundError as exc:
-            return {
-                "status": "error",
-                "error": f"Families registry unavailable: {exc}",
-            }
+    try:
+        families_entries = load_families_registry_entries()
+    except FileNotFoundError as exc:
+        return {
+            "status": "error",
+            "error": f"Families registry unavailable: {exc}",
+        }
 
     role_families = [f for f in families_entries if f.get("role") == role]
     

@@ -274,12 +274,12 @@ for role in roles:
 import json
 from pathlib import Path
 
-families_path = Path("../data/reagent_db/reagent_schema/families_registry.json")
-families_data = json.loads(families_path.read_text(encoding="utf-8"))
+taxonomy_path = Path("../chemtools/taxonomy/data/reagent_roles.v2.json")
+families_data = json.loads(taxonomy_path.read_text(encoding="utf-8"))
 
 # Count families per role
 from collections import Counter
-role_counts = Counter(f["role"] for f in families_data["entries"])
+role_counts = Counter(f["role_id"] for f in families_data["families"])
 print("Families per role:", dict(role_counts))
 ```
 

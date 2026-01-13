@@ -8,12 +8,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import json
 import re
-from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from chemtools.util.rdkit_helpers import parse_smiles
 from chemtools.util.smarts_cache import compile_smarts
 
-DEFAULT_REAGENT_V2_DIR = Path(__file__).resolve().parent / "data"
+DEFAULT_REAGENT_V2_DIR = Path(__file__).resolve().parents[1] / "taxonomy" / "data"
 _ROLES_FILE = "reagent_roles.v2.json"
 
 _NAME_SANITIZE = re.compile(r"[^a-z0-9]+")
@@ -48,6 +48,8 @@ class ReagentFamilyV2:
     name: str
     precedence: int
     description: Optional[str] = None
+    notes: Optional[str] = None
+    required_props: Dict[str, Any] = field(default_factory=dict)
     allowlists: ReagentAllowlists = field(default_factory=ReagentAllowlists)
     detect: Optional[ReagentDetect] = None
 
@@ -77,8 +79,7 @@ class ReagentTaxonomyV2:
     @classmethod
     def from_path(cls, root: Optional[Path] = None) -> "ReagentTaxonomyV2":
         base = root or DEFAULT_REAGENT_V2_DIR
-        roles = _load_roles(base / _ROLES_FILE)
-        families: Dict[str, ReagentFamilyV2] = {}
+        roles, families = _load_taxonomy(base / _ROLES_FILE)
         return cls(roles=roles, families=families)
 
     def iter_roles(self) -> Iterable[ReagentRoleV2]:
@@ -99,15 +100,14 @@ class ReagentTaxonomyV2:
         return classify_reagent_v2(record, self.roles, self.families)
 
 
-def _read_json(path: Path) -> List[dict] | Dict[str, dict]:
+def _read_json(path: Path) -> Any:
     if not path.exists():
         raise FileNotFoundError(f"Reagent taxonomy file not found: {path}")
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
 
 
-def _load_roles(path: Path) -> Dict[str, ReagentRoleV2]:
-    payload = _read_json(path)
+def _parse_roles(payload: List[Dict[str, Any]]) -> Dict[str, ReagentRoleV2]:
     roles: Dict[str, ReagentRoleV2] = {}
     for entry in payload:
         role = ReagentRoleV2(
@@ -121,10 +121,7 @@ def _load_roles(path: Path) -> Dict[str, ReagentRoleV2]:
     return roles
 
 
-def _load_families(path: Path) -> Dict[str, ReagentFamilyV2]:
-    if not path.exists():
-        return {}
-    payload = _read_json(path)
+def _parse_families(payload: List[Dict[str, Any]]) -> Dict[str, ReagentFamilyV2]:
     families: Dict[str, ReagentFamilyV2] = {}
     for entry in payload:
         allowlists_raw = entry.get("allowlists") or {}
@@ -147,11 +144,28 @@ def _load_families(path: Path) -> Dict[str, ReagentFamilyV2]:
             name=entry.get("name", entry["id"]),
             precedence=int(entry.get("precedence", 100)),
             description=entry.get("description"),
+            notes=entry.get("notes"),
+            required_props=entry.get("required_props") or {},
             allowlists=allowlists,
             detect=detect,
         )
         families[family.id] = family
     return families
+
+
+def _load_taxonomy(path: Path) -> Tuple[Dict[str, ReagentRoleV2], Dict[str, ReagentFamilyV2]]:
+    payload = _read_json(path)
+    if isinstance(payload, list):
+        roles_payload = payload
+        families_payload: List[Dict[str, Any]] = []
+    elif isinstance(payload, dict):
+        roles_payload = payload.get("roles") or []
+        families_payload = payload.get("families") or []
+    else:
+        raise ValueError("Reagent taxonomy payload must be a list or object.")
+    roles = _parse_roles(roles_payload)
+    families = _parse_families(families_payload)
+    return roles, families
 
 
 

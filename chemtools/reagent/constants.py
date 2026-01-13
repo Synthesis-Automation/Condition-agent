@@ -7,17 +7,20 @@ reagent management system.
 
 from typing import Dict, Tuple
 
-# Mapping of reagent roles to their taxonomy JSON files
+# Mapping of reagent roles to their registry JSON files
 ROLE_FILES: Dict[str, str] = {
-    "acid": "taxonomy_acid.json",
-    "additive": "taxonomy_additive.json",
-    "ligand": "taxonomy_ligand.json",
-    "metal_catalyst": "taxonomy_catalysts_precursor.json",
-    "base": "taxonomy_base.json",
-    "condensation_agent": "taxonomy_condensation_agent.json",
-    "oxidant": "taxonomy_oxidant.json",
-    "reductant": "taxonomy_reductant.json",
-    "solvent": "taxonomy_solvent.json",
+    "acid": "acid.json",
+    "additive": "additive.json",
+    "ligand": "ligand.json",
+    "metal_catalyst": "metal_catalyst.json",
+    "base": "base.json",
+    "condensation_agent": "condensation_agent.json",
+    "oxidant": "oxidant.json",
+    "reductant": "reductant.json",
+    "solvent": "solvent.json",
+    "other_reagent": "other_reagent.json",
+    "enzyme": "enzyme.json",
+    "organo_catalyst": "organo_catalyst.json",
 }
 
 # Default family assignment when role is inferred but family cannot be determined
