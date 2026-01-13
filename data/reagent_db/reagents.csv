@@ -500,7 +500,7 @@ n-Pentane,Pent,109-66-0,,solvent,hydrocarbons_aliphatic_linear,very_low aprotic 
 Nitrobenzene,PhNO2,98-95-3,,solvent,nitro_solvents,high aprotic solvent
 Nitromethane,MeNO2,75-52-5,,solvent,nitro_solvents,high aprotic solvent
 NMI,NMI,7479-20-1,,solvent,amides_dipolar_aprotic,high aprotic solvent
-o-Xylene,o-Xyl,95-47-6,,solvent,hydrocarbons_aromatic,low aprotic solvent
+o-Xylene,,95-47-6,,solvent,hydrocarbons_aromatic,low aprotic solvent
 Octanoic acid,,124-07-2,,solvent,carboxylic_acids,medium acidic solvent
 p-Xylene,,106-42-3,,solvent,hydrocarbons_aromatic,low aprotic solvent
 Ph2O,,101-84-8,,solvent,ethers_acyclic,low aprotic solvent
