@@ -329,14 +329,40 @@ class ReagentRegistryStore:
                 name = (row.get("name") or "").strip()
                 abbr = (row.get("abbreviation") or "").strip()
                 cas = (row.get("cas") or "").strip()
-                smile = (row.get("smile") or "").strip()
-                role = canonical_role((row.get("role") or "").strip())
-                family_id = (row.get("family_id") or "").strip()
-                tag = (row.get("tag") or "").strip()
-
-                roles_payload = {}
-                if role:
-                    roles_payload[role] = {"families": [family_id] if family_id else []}
+                smile = (row.get("smiles") or row.get("smile") or "").strip()
+                roles_payload: Dict[str, Dict[str, Any]] = {}
+                primary_role = ""
+                primary_family = ""
+                primary_tag = ""
+                has_new_schema = any(
+                    key in row for key in ("role_1", "family_1", "tag_1", "role_2", "family_2", "tag_2")
+                )
+                if has_new_schema:
+                    for idx in (1, 2):
+                        role = canonical_role((row.get(f"role_{idx}") or "").strip())
+                        if not role:
+                            continue
+                        family_id = (row.get(f"family_{idx}") or "").strip()
+                        tag = (row.get(f"tag_{idx}") or "").strip()
+                        payload: Dict[str, Any] = {"families": [family_id] if family_id else []}
+                        if tag:
+                            payload["tag"] = tag
+                        roles_payload[role] = payload
+                        if not primary_role:
+                            primary_role = role
+                            primary_family = family_id
+                            primary_tag = tag
+                else:
+                    role = canonical_role((row.get("role") or "").strip())
+                    family_id = (row.get("family_id") or "").strip()
+                    tag = (row.get("tag") or "").strip()
+                    if role:
+                        roles_payload[role] = {"families": [family_id] if family_id else []}
+                        if tag:
+                            roles_payload[role]["tag"] = tag
+                        primary_role = role
+                        primary_family = family_id
+                        primary_tag = tag
 
                 entry = {
                     "id": f"cas-{cas}" if cas else name,
@@ -346,17 +372,19 @@ class ReagentRegistryStore:
                     "cas": cas,
                     "inchi_key": None,
                     "smiles": smile,
-                    "role": role,
-                    "family_id": family_id,
-                    "tag": tag,
+                    "role": primary_role,
+                    "family_id": primary_family,
+                    "tag": primary_tag,
                     "roles": roles_payload,
                 }
 
                 self.entries.append(entry)
-                if role:
-                    self.role_entries.setdefault(role, []).append(entry)
+                for role in roles_payload.keys():
+                    if role:
+                        self.role_entries.setdefault(role, []).append(entry)
                 if cas:
-                    self.cas_index.setdefault(str(cas), []).append((role, entry))
+                    for role in roles_payload.keys():
+                        self.cas_index.setdefault(str(cas), []).append((role, entry))
 
     def file_for_role(self, role: str) -> Path:
         cfg = ROLE_CONFIG.get(role)
@@ -460,33 +488,57 @@ class ReagentRegistryStore:
         path.parent.mkdir(parents=True, exist_ok=True)
         rows: List[Dict[str, str]] = []
         for entry in self.entries:
-            role_value = entry.get("role") or role
+            role_value = canonical_role((entry.get("role") or "").strip()) or role
             abbr = ""
             abbr_val = entry.get("abbreviation")
             if isinstance(abbr_val, list) and abbr_val:
                 abbr = str(abbr_val[0]).strip()
             elif isinstance(abbr_val, str):
                 abbr = abbr_val.strip()
-            family_id = (entry.get("family_id") or "").strip()
-            if not family_id:
-                role_payload = (entry.get("roles") or {}).get(role_value, {})
-                families = role_payload.get("families") or []
-                if families:
-                    family_id = str(families[0]).strip()
+            roles_payload = entry.get("roles") or {}
+            roles: List[str] = []
+            if role_value:
+                roles.append(role_value)
+            if isinstance(roles_payload, dict):
+                for role_key in roles_payload.keys():
+                    if role_key and role_key not in roles:
+                        roles.append(role_key)
+            if len(roles) > 2:
+                roles.sort(key=lambda key: (0 if key == role_value else 1, ROLE_CONFIG.get(key, {}).get("priority", 99), key))
+            role_1 = roles[0] if roles else ""
+            role_2 = roles[1] if len(roles) > 1 else ""
+
+            def role_payload(role_key: str) -> Tuple[str, str]:
+                payload = (entry.get("roles") or {}).get(role_key, {})
+                families = payload.get("families") or []
+                family_id = str(families[0]).strip() if families else ""
+                tag_val = (payload.get("tag") or "").strip()
+                if role_key == entry.get("role"):
+                    if not family_id:
+                        family_id = (entry.get("family_id") or "").strip()
+                    if not tag_val:
+                        tag_val = (entry.get("tag") or "").strip()
+                return family_id, tag_val
+
+            family_1, tag_1 = role_payload(role_1) if role_1 else ("", "")
+            family_2, tag_2 = role_payload(role_2) if role_2 else ("", "")
             row = {
                 "name": (entry.get("name") or "").strip(),
                 "abbreviation": abbr,
                 "cas": (entry.get("cas") or "").strip(),
-                "smile": (entry.get("smiles") or entry.get("smile") or "").strip(),
-                "role": role_value,
-                "family_id": family_id,
-                "tag": (entry.get("tag") or "").strip(),
+                "smiles": (entry.get("smiles") or entry.get("smile") or "").strip(),
+                "role_1": role_1,
+                "family_1": family_1,
+                "tag_1": tag_1,
+                "role_2": role_2,
+                "family_2": family_2,
+                "tag_2": tag_2,
             }
             rows.append(row)
         rows = [row for row in rows if any(row.values())]
-        rows.sort(key=lambda r: (r.get("role", ""), r.get("name", "").lower(), r.get("cas", "")))
+        rows.sort(key=lambda r: (r.get("role_1", ""), r.get("name", "").lower(), r.get("cas", "")))
         with path.open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=["name", "abbreviation", "cas", "smile", "role", "family_id", "tag"])
+            writer = csv.DictWriter(handle, fieldnames=["name", "abbreviation", "cas", "smiles", "role_1", "family_1", "tag_1", "role_2", "family_2", "tag_2"])
             writer.writeheader()
             writer.writerows(rows)
         return path

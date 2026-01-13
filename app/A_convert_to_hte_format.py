@@ -67,7 +67,7 @@ def _load_reagent_csv(path_str: str) -> Dict[str, Any]:
             name = _normalize_reagent_text(row.get("name", ""))
             abbr = _normalize_reagent_text(row.get("abbreviation", ""))
             cas = (row.get("cas") or "").strip()
-            smile = (row.get("smile") or "").strip()
+            smile = (row.get("smiles") or row.get("smile") or "").strip()
             if cas:
                 data["cas_set"].add(cas)
             if smile:

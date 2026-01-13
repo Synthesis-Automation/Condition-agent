@@ -13,8 +13,19 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 
-REQUIRED_FIELDS = {"name", "role"}
-OPTIONAL_FIELDS = {"abbreviation", "cas", "smile", "family_id", "tag"}
+REQUIRED_FIELDS = {"name"}
+ROLE_FIELDS = ("role_1", "role_2", "role")
+FAMILY_FIELDS = ("family_1", "family_2", "family_id")
+TAG_FIELDS = ("tag_1", "tag_2", "tag")
+SMILES_FIELDS = ("smiles", "smile")
+OPTIONAL_FIELDS = {
+    "abbreviation",
+    "cas",
+    *SMILES_FIELDS,
+    *FAMILY_FIELDS,
+    *TAG_FIELDS,
+    *ROLE_FIELDS,
+}
 
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
 FAMILY_ID_PATTERN = re.compile(r"^[a-z0-9_]+$")
@@ -26,6 +37,21 @@ def _load_csv_entries(path: Path) -> List[Dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         return [row for row in reader]
+
+
+def _entry_roles(entry: Dict[str, Any]) -> List[str]:
+    roles = []
+    for field in ROLE_FIELDS:
+        value = str(entry.get(field) or "").strip()
+        if value:
+            roles.append(value)
+    return roles
+
+
+def _entry_has_role(entry: Dict[str, Any], role: str) -> bool:
+    if not role:
+        return False
+    return role in _entry_roles(entry)
 
 
 def validate_entry(
@@ -46,11 +72,20 @@ def validate_entry(
                 "message": f"Missing required field '{field}'",
             })
 
-    if role and entry.get("role") and entry.get("role") != role:
+    roles = [str(entry.get(field) or "").strip() for field in ROLE_FIELDS]
+    roles = [value for value in roles if value]
+    if not roles:
         issues.append({
             "severity": "error",
-            "field": "role",
-            "message": f"Entry role '{entry.get('role')}' does not match expected '{role}'",
+            "field": "role_1",
+            "message": "Missing required field 'role_1' (or legacy 'role')",
+        })
+
+    if role and roles and role not in roles:
+        issues.append({
+            "severity": "error",
+            "field": "role_1",
+            "message": f"Entry roles {roles} do not include expected '{role}'",
         })
 
     if strict:
@@ -70,13 +105,14 @@ def validate_entry(
             "message": f"CAS '{cas}' is not in standard format",
         })
 
-    family_id = (entry.get("family_id") or "").strip()
-    if family_id and not FAMILY_ID_PATTERN.match(family_id):
-        issues.append({
-            "severity": "warning",
-            "field": "family_id",
-            "message": f"Family id '{family_id}' is not snake_case",
-        })
+    for field in FAMILY_FIELDS:
+        family_id = (entry.get(field) or "").strip()
+        if family_id and not FAMILY_ID_PATTERN.match(family_id):
+            issues.append({
+                "severity": "warning",
+                "field": field,
+                "message": f"Family id '{family_id}' is not snake_case",
+            })
 
     return issues
 
@@ -100,7 +136,7 @@ def _validate_entries(
 
     filtered = entries
     if role:
-        filtered = [entry for entry in entries if entry.get("role") == role]
+        filtered = [entry for entry in entries if _entry_has_role(entry, role)]
 
     result["total_entries"] = len(filtered)
 
@@ -145,7 +181,7 @@ def validate_database(
         }
 
     entries = _load_csv_entries(csv_path)
-    available_roles = sorted({entry.get("role") for entry in entries if entry.get("role")})
+    available_roles = sorted({role for entry in entries for role in _entry_roles(entry)})
     roles_to_check = roles or available_roles
 
     result = {

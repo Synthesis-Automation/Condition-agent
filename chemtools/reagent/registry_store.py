@@ -16,7 +16,7 @@ import re
 
 from .taxonomy_store import ROLE_KEYWORDS_RAW, load_families_registry_entries
 from .taxonomy_utils import tokenize_all
-from .constants import DEFAULT_FAMILY_BY_ROLE, ROLE_ALIASES
+from .constants import DEFAULT_FAMILY_BY_ROLE, ROLE_ALIASES, ROLE_PRIORITY
 
 
 
@@ -44,7 +44,18 @@ ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
     "organo_catalyst": {"default_family": None},
 }
 
-CSV_FIELDS = ("name", "abbreviation", "cas", "smile", "role", "family_id", "tag")
+CSV_FIELDS = (
+    "name",
+    "abbreviation",
+    "cas",
+    "smiles",
+    "role_1",
+    "family_1",
+    "tag_1",
+    "role_2",
+    "family_2",
+    "tag_2",
+)
 
 ROLE_PAYLOAD_FIELDS: Dict[str, Sequence[str]] = {
     "additive": (),
@@ -126,18 +137,51 @@ def _normalize_abbreviation(value: Any) -> str:
     return str(value).strip()
 
 
+def _extract_roles(row: Dict[str, str]) -> List[Tuple[str, str, str]]:
+    roles: List[Tuple[str, str, str]] = []
+    has_new_schema = any(
+        key in row for key in ("role_1", "family_1", "tag_1", "role_2", "family_2", "tag_2")
+    )
+    if has_new_schema:
+        for idx in (1, 2):
+            role = (row.get(f"role_{idx}") or "").strip()
+            if not role:
+                continue
+            role = _canonical_role(role)
+            family_id = (row.get(f"family_{idx}") or "").strip()
+            tag = (row.get(f"tag_{idx}") or "").strip()
+            roles.append((role, family_id, tag))
+        return roles
+
+    role = (row.get("role") or "").strip()
+    if role:
+        roles.append((
+            _canonical_role(role),
+            (row.get("family_id") or "").strip(),
+            (row.get("tag") or "").strip(),
+        ))
+    return roles
+
+
 def _row_to_entry(row: Dict[str, str]) -> Dict[str, Any]:
     name = (row.get("name") or "").strip()
     abbr = (row.get("abbreviation") or "").strip()
     cas = (row.get("cas") or "").strip()
-    smile = (row.get("smile") or "").strip()
-    role = _canonical_role((row.get("role") or "").strip())
-    family_id = (row.get("family_id") or "").strip()
-    tag = (row.get("tag") or "").strip()
+    smile = (row.get("smiles") or row.get("smile") or "").strip()
 
-    roles: Dict[str, Dict[str, Any]] = {}
-    if role:
-        roles[role] = {"families": [family_id] if family_id else []}
+    roles_payload: Dict[str, Dict[str, Any]] = {}
+    primary_role = ""
+    primary_family = ""
+    primary_tag = ""
+    for idx, (role, family_id, tag) in enumerate(_extract_roles(row)):
+        payload: Dict[str, Any] = {"families": [family_id] if family_id else []}
+        if tag:
+            payload["tag"] = tag
+        roles_payload[role] = payload
+        if idx == 0:
+            primary_role = role
+            primary_family = family_id
+            primary_tag = tag
 
     return {
         "name": name,
@@ -146,11 +190,24 @@ def _row_to_entry(row: Dict[str, str]) -> Dict[str, Any]:
         "cas": cas,
         "inchi_key": None,
         "smiles": smile,
-        "role": role,
-        "family_id": family_id,
-        "tag": tag,
-        "roles": roles,
+        "role": primary_role,
+        "family_id": primary_family,
+        "tag": primary_tag,
+        "roles": roles_payload,
     }
+
+
+def _role_payload_from_entry(entry: Dict[str, Any], role: str) -> Tuple[str, str]:
+    role_payload = (entry.get("roles") or {}).get(role, {})
+    families = role_payload.get("families") or []
+    family_id = str(families[0]).strip() if families else ""
+    tag = (role_payload.get("tag") or "").strip()
+    if role == entry.get("role"):
+        if not family_id:
+            family_id = (entry.get("family_id") or "").strip()
+        if not tag:
+            tag = (entry.get("tag") or "").strip()
+    return family_id, tag
 
 
 def _entry_to_csv_row(entry: Dict[str, Any], role: Optional[str] = None) -> Dict[str, str]:
@@ -158,32 +215,40 @@ def _entry_to_csv_row(entry: Dict[str, Any], role: Optional[str] = None) -> Dict
     cas = (entry.get("cas") or "").strip()
     smile = (entry.get("smiles") or entry.get("smile") or "").strip()
     abbr = _normalize_abbreviation(entry.get("abbreviation"))
+    roles_payload = entry.get("roles") or {}
+    roles: List[str] = []
+    primary = _canonical_role((entry.get("role") or "").strip())
+    if primary:
+        roles.append(primary)
+    if isinstance(roles_payload, dict):
+        for role_key in roles_payload.keys():
+            if role_key and role_key not in roles:
+                roles.append(role_key)
 
-    if role is None:
-        role = entry.get("role")
-        if not role:
-            roles_payload = entry.get("roles") or {}
-            if isinstance(roles_payload, dict) and roles_payload:
-                role = next(iter(roles_payload.keys()))
-    role = _canonical_role(role or "")
+    if role:
+        role = _canonical_role(role)
+        if role in roles:
+            roles.remove(role)
+        roles.insert(0, role)
 
-    family_id = (entry.get("family_id") or "").strip()
-    if not family_id and role:
-        role_payload = (entry.get("roles") or {}).get(role, {})
-        families = role_payload.get("families") or []
-        if families:
-            family_id = str(families[0]).strip()
-
-    tag = (entry.get("tag") or "").strip()
+    if len(roles) > 2:
+        roles.sort(key=lambda key: (0 if key == primary else 1, ROLE_PRIORITY.get(key, 99), key))
+    role_1 = roles[0] if roles else ""
+    role_2 = roles[1] if len(roles) > 1 else ""
+    family_1, tag_1 = _role_payload_from_entry(entry, role_1) if role_1 else ("", "")
+    family_2, tag_2 = _role_payload_from_entry(entry, role_2) if role_2 else ("", "")
 
     return {
         "name": name,
         "abbreviation": abbr,
         "cas": cas,
-        "smile": smile,
-        "role": role,
-        "family_id": family_id,
-        "tag": tag,
+        "smiles": smile,
+        "role_1": role_1,
+        "family_1": family_1,
+        "tag_1": tag_1,
+        "role_2": role_2,
+        "family_2": family_2,
+        "tag_2": tag_2,
     }
 
 def infer_abbreviations(name: str, synonyms: Sequence[str]) -> List[str]:
@@ -258,6 +323,9 @@ def build_registry_entry(
 ) -> Dict[str, Any]:
     role = _canonical_role(role)
     family_id = family_id or ""
+    role_payload: Dict[str, Any] = {"families": [family_id] if family_id else []}
+    if tag:
+        role_payload["tag"] = tag
     entry: Dict[str, Any] = {
         "name": name,
         "abbreviation": [abbreviation] if abbreviation else [],
@@ -267,7 +335,7 @@ def build_registry_entry(
         "role": role,
         "family_id": family_id,
         "tag": tag or "",
-        "roles": {role: {"families": [family_id] if family_id else []}},
+        "roles": {role: role_payload},
     }
     if family_entry and synonyms is not None:
         entry["embedding_text"] = build_embedding_text(role, family_entry, entry, synonyms)
@@ -368,13 +436,16 @@ class RegistryStore:
             for row in reader:
                 entry = _row_to_entry(row)
                 self.entries.append(entry)
-                role = entry.get("role")
-                if role:
-                    self.role_entries.setdefault(role, []).append(entry)
+                roles_payload = entry.get("roles") or {}
+                if isinstance(roles_payload, dict):
+                    for role in roles_payload.keys():
+                        if role:
+                            self.role_entries.setdefault(role, []).append(entry)
                 cas = entry.get("cas")
-                family = entry.get("family_id") or ""
                 if cas:
-                    self.cas_index.setdefault(str(cas), []).append((role or "", family, entry))
+                    for role in roles_payload.keys():
+                        family_id, _tag = _role_payload_from_entry(entry, role)
+                        self.cas_index.setdefault(str(cas), []).append((role or "", family_id, entry))
 
     def build_role_payload(self, role: str, family_id: str) -> Dict[str, Any]:
         role = _canonical_role(role)
@@ -480,14 +551,52 @@ class RegistryStore:
         if abbr and not isinstance(abbr, list):
             normalized["abbreviation"] = [abbr]
 
-        entries = self.role_entries.setdefault(role, [])
-        entries.append(normalized)
-        entries.sort(key=lambda item: (item.get("name") or "").lower())
-        self.entries.append(normalized)
         cas = normalized.get("cas")
-        family = normalized.get("family_id") or ""
+        existing_entry = None
         if cas:
-            self.cas_index.setdefault(str(cas), []).append((role, family, normalized))
+            existing_records = self.cas_index.get(str(cas), [])
+            if existing_records:
+                existing_entry = existing_records[0][2]
+
+        target = existing_entry or normalized
+        if existing_entry:
+            if not target.get("name"):
+                target["name"] = normalized.get("name")
+            if normalized.get("smiles") and not target.get("smiles"):
+                target["smiles"] = normalized.get("smiles")
+            if normalized.get("abbreviation"):
+                target_abbr = target.get("abbreviation") or []
+                for item in normalized.get("abbreviation") or []:
+                    if item and item not in target_abbr:
+                        target_abbr.append(item)
+                target["abbreviation"] = target_abbr
+            target_roles = target.setdefault("roles", {})
+            normalized_roles = normalized.get("roles") or {}
+            role_payload = normalized_roles.get(role) or {"families": [normalized.get("family_id") or ""] if normalized.get("family_id") else []}
+            if normalized.get("tag") and "tag" not in role_payload:
+                role_payload["tag"] = normalized.get("tag")
+            target_roles[role] = role_payload
+            if not target.get("role"):
+                target["role"] = role
+            if target.get("role") == role:
+                if not target.get("family_id"):
+                    target["family_id"] = normalized.get("family_id") or ""
+                if normalized.get("tag") and not target.get("tag"):
+                    target["tag"] = normalized.get("tag")
+        else:
+            self.entries.append(target)
+
+        entries = self.role_entries.setdefault(role, [])
+        if target not in entries:
+            entries.append(target)
+            entries.sort(key=lambda item: (item.get("name") or "").lower())
+
+        family = (normalized.get("family_id") or "").strip()
+        if cas:
+            family_id, _tag = _role_payload_from_entry(target, role)
+            existing_roles = {item[0] for item in self.cas_index.get(str(cas), [])}
+            if role not in existing_roles:
+                self.cas_index.setdefault(str(cas), []).append((role, family_id or family, target))
         tokens = tokenize_all([normalized.get("name"), *normalized.get("abbreviation", [])])
         if family:
             self.family_tokens.setdefault((role, family), set()).update(tokens)
@@ -497,7 +606,7 @@ class RegistryStore:
         path.parent.mkdir(parents=True, exist_ok=True)
         rows = [_entry_to_csv_row(entry) for entry in self.entries]
         rows = [row for row in rows if any(row.values())]
-        rows.sort(key=lambda row: (row.get("role", ""), row.get("name", "").lower(), row.get("cas", "")))
+        rows.sort(key=lambda row: (row.get("role_1", ""), row.get("name", "").lower(), row.get("cas", "")))
         with path.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=list(CSV_FIELDS))
             writer.writeheader()

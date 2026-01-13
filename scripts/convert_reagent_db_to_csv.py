@@ -12,7 +12,9 @@ import json
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+from chemtools.reagent.constants import ROLE_ALIASES, ROLE_PRIORITY
 
 
 BASE_DIR = Path("data/reagent_db")
@@ -25,10 +27,13 @@ CSV_FIELDS = [
     "name",
     "abbreviation",
     "cas",
-    "smile",
-    "role",
-    "family_id",
-    "tag",
+    "smiles",
+    "role_1",
+    "family_1",
+    "tag_1",
+    "role_2",
+    "family_2",
+    "tag_2",
 ]
 
 _SLUG_RE = re.compile(r"[^A-Za-z0-9]+")
@@ -50,16 +55,36 @@ def _slugify(text: Optional[str]) -> str:
     return slug.lower() or "unknown"
 
 
-def _pick_role(entry: Dict[str, Any], fallback_role: str) -> str:
-    roles = entry.get("roles")
-    if isinstance(roles, dict) and roles:
-        if fallback_role in roles:
-            return fallback_role
-        if len(roles) == 1:
-            return next(iter(roles))
-        return sorted(roles.keys())[0]
-    role = entry.get("role")
-    return str(role) if role else fallback_role
+def _canonical_role(role: Optional[str]) -> str:
+    return ROLE_ALIASES.get(role or "", role or "")
+
+
+def _ordered_roles(entry: Dict[str, Any], fallback_role: str) -> Tuple[str, str]:
+    roles_payload = entry.get("roles")
+    roles: List[str] = []
+    if isinstance(roles_payload, dict):
+        roles.extend(list(roles_payload.keys()))
+    if entry.get("role"):
+        roles.append(str(entry.get("role")))
+    if fallback_role:
+        roles.append(fallback_role)
+    unique: List[str] = []
+    for role in roles:
+        canonical = _canonical_role(role)
+        if canonical and canonical not in unique:
+            unique.append(canonical)
+    if not unique and fallback_role:
+        unique.append(_canonical_role(fallback_role))
+    primary = _canonical_role(entry.get("role") or fallback_role)
+    if primary in unique:
+        unique.remove(primary)
+        unique.sort(key=lambda key: ROLE_PRIORITY.get(key, 99))
+        unique.insert(0, primary)
+    else:
+        unique.sort(key=lambda key: ROLE_PRIORITY.get(key, 99))
+    role_1 = unique[0] if unique else ""
+    role_2 = unique[1] if len(unique) > 1 else ""
+    return role_1, role_2
 
 
 def _family_id(roles: Dict[str, Any], role: str) -> str:
@@ -162,13 +187,15 @@ def _row_from_entry(
     audit: Dict[str, Any],
 ) -> Dict[str, str]:
     roles = entry.get("roles") or {}
-    role = _pick_role(entry, fallback_role)
-    payload = roles.get(role, {}) if isinstance(roles, dict) else {}
+    role_1, role_2 = _ordered_roles(entry, fallback_role)
+    payload_1 = roles.get(role_1, {}) if isinstance(roles, dict) else {}
+    payload_2 = roles.get(role_2, {}) if isinstance(roles, dict) else {}
 
     entry_id = _first_value(entry.get("id"))
     name = _first_value(entry.get("name"))
     smiles = _first_value(entry.get("smiles"))
-    family_id = _family_id(roles, role)
+    family_1 = _family_id(roles, role_1)
+    family_2 = _family_id(roles, role_2)
 
     abbr = _first_value(entry.get("abbreviation"))
     if not abbr:
@@ -177,7 +204,7 @@ def _row_from_entry(
     cas = _first_value(entry.get("cas"))
     if not cas:
         audit["missing_cas"] += 1
-        cas = _artificial_cas(entry, role)
+        cas = _artificial_cas(entry, role_1 or fallback_role)
         cas = _ensure_unique_cas(cas, used_artificial_cas)
         audit["generated_cas"] += 1
 
@@ -185,21 +212,29 @@ def _row_from_entry(
         audit["missing_id"] += 1
         entry_id = f"cas-{cas}" if cas else f"name-{_slugify(name)}"
 
-    if not family_id:
+    if role_1 and not family_1:
+        audit["missing_family_id"] += 1
+    if role_2 and not family_2:
         audit["missing_family_id"] += 1
 
-    tag = _build_tag(role, family_id, payload)
-    if (not tag or tag == role.replace("_", " ")) and family_id:
-        tag = family_id.replace("_", " ")
+    tag_1 = _build_tag(role_1, family_1, payload_1) if role_1 else ""
+    if (not tag_1 or tag_1 == role_1.replace("_", " ")) and family_1:
+        tag_1 = family_1.replace("_", " ")
+    tag_2 = _build_tag(role_2, family_2, payload_2) if role_2 else ""
+    if (not tag_2 or tag_2 == role_2.replace("_", " ")) and family_2:
+        tag_2 = family_2.replace("_", " ")
 
     return {
         "name": name,
         "abbreviation": abbr,
         "cas": cas,
-        "smile": smiles,
-        "role": role,
-        "family_id": family_id,
-        "tag": tag,
+        "smiles": smiles,
+        "role_1": role_1,
+        "family_1": family_1,
+        "tag_1": tag_1,
+        "role_2": role_2,
+        "family_2": family_2,
+        "tag_2": tag_2,
     }
 
 
@@ -241,12 +276,17 @@ def main() -> None:
         audit["total_entries"] += len(entries)
         for entry in entries:
             row = _row_from_entry(entry, fallback_role, used_artificial_cas, audit)
-            audit["role_counts"][row["role"]] += 1
+            if row["role_1"]:
+                audit["role_counts"][row["role_1"]] += 1
+            if row["role_2"]:
+                audit["role_counts"][row["role_2"]] += 1
             rows.append(row)
-            if not row["family_id"] and len(audit["samples"]["missing_family_id"]) < 5:
+            if row["role_1"] and not row["family_1"] and len(audit["samples"]["missing_family_id"]) < 5:
+                audit["samples"]["missing_family_id"].append(row["name"])
+            if row["role_2"] and not row["family_2"] and len(audit["samples"]["missing_family_id"]) < 5:
                 audit["samples"]["missing_family_id"].append(row["name"])
 
-    rows.sort(key=lambda item: (item["role"], item["name"].lower(), item["cas"]))
+    rows.sort(key=lambda item: (item["role_1"], item["name"].lower(), item["cas"]))
 
     cas_counts = Counter(row["cas"] for row in rows if row["cas"])
     duplicates = {cas: count for cas, count in cas_counts.items() if count > 1}

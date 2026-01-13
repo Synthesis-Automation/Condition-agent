@@ -9,13 +9,44 @@ import csv
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from functools import lru_cache
+
+from .constants import ROLE_ALIASES
 
 
 # Cache loaded reagent databases (role -> entries)
 _REAGENT_CACHE: Dict[str, List[Dict[str, Any]]] = {}
 
+
+def _canonical_role(role: str) -> str:
+    return ROLE_ALIASES.get(role, role)
+
+
+def _extract_roles(row: Dict[str, str]) -> List[Tuple[str, str, str]]:
+    roles: List[Tuple[str, str, str]] = []
+    has_new_schema = any(
+        key in row for key in ("role_1", "family_1", "tag_1", "role_2", "family_2", "tag_2")
+    )
+    if has_new_schema:
+        for idx in (1, 2):
+            role = (row.get(f"role_{idx}") or "").strip()
+            if not role:
+                continue
+            role = _canonical_role(role)
+            family_id = (row.get(f"family_{idx}") or "").strip()
+            tag = (row.get(f"tag_{idx}") or "").strip()
+            roles.append((role, family_id, tag))
+        return roles
+
+    role = (row.get("role") or "").strip()
+    if role:
+        roles.append((
+            _canonical_role(role),
+            (row.get("family_id") or "").strip(),
+            (row.get("tag") or "").strip(),
+        ))
+    return roles
 
 def get_data_dir() -> Path:
     """Get the data directory path."""
@@ -31,26 +62,51 @@ def _row_to_reagent(row: Dict[str, str]) -> Dict[str, Any]:
     name = (row.get("name") or "").strip()
     abbreviation = (row.get("abbreviation") or "").strip()
     cas = (row.get("cas") or "").strip()
-    smiles = (row.get("smile") or "").strip()
-    role = (row.get("role") or "").strip()
-    family_id = (row.get("family_id") or "").strip()
-    tag = (row.get("tag") or "").strip()
-
+    smiles = (row.get("smiles") or row.get("smile") or "").strip()
     roles: Dict[str, Dict[str, Any]] = {}
-    if role:
-        roles[role] = {"families": [family_id] if family_id else []}
+    primary_role = ""
+    primary_family = ""
+    primary_tag = ""
+    for idx, (role, family_id, tag) in enumerate(_extract_roles(row)):
+        payload: Dict[str, Any] = {"families": [family_id] if family_id else []}
+        if tag:
+            payload["tag"] = tag
+        roles[role] = payload
+        if idx == 0:
+            primary_role = role
+            primary_family = family_id
+            primary_tag = tag
 
     return {
         "name": name,
         "cas": cas,
         "abbreviation": [abbreviation] if abbreviation else [],
         "smiles": smiles,
-        "role": role,
-        "family_id": family_id,
-        "tag": tag,
+        "role": primary_role,
+        "family_id": primary_family,
+        "tag": primary_tag,
         "roles": roles,
         "aliases": [],
     }
+
+
+def _entry_for_role(entry: Dict[str, Any], reagent_type: str) -> Dict[str, Any]:
+    role_payload = (entry.get("roles") or {}).get(reagent_type, {})
+    families = role_payload.get("families") or []
+    family_id = str(families[0]).strip() if families else ""
+    tag = (role_payload.get("tag") or "").strip()
+    if entry.get("role") == reagent_type:
+        if not family_id:
+            family_id = (entry.get("family_id") or "").strip()
+        if not tag:
+            tag = (entry.get("tag") or "").strip()
+    if entry.get("role") == reagent_type and entry.get("family_id") == family_id and entry.get("tag") == tag:
+        return entry
+    view = dict(entry)
+    view["role"] = reagent_type
+    view["family_id"] = family_id
+    view["tag"] = tag
+    return view
 
 
 @lru_cache(maxsize=1)
@@ -89,8 +145,12 @@ def load_reagent_database(reagent_type: str) -> List[Dict[str, Any]]:
 
     if reagent_type == "*":
         return data
-
-    filtered = [entry for entry in data if entry.get("role") == reagent_type]
+    reagent_type = _canonical_role(reagent_type)
+    filtered: List[Dict[str, Any]] = []
+    for entry in data:
+        roles_payload = entry.get("roles") or {}
+        if entry.get("role") == reagent_type or reagent_type in roles_payload:
+            filtered.append(_entry_for_role(entry, reagent_type))
     _REAGENT_CACHE[reagent_type] = filtered
     return filtered
 
@@ -322,8 +382,16 @@ def format_reagent_for_display(reagent_info: Dict[str, Any], compact: bool = Fal
 def get_all_reagent_types() -> List[str]:
     """Get list of all available reagent database types."""
     data = _load_all_reagents()
-    roles = sorted({entry.get("role") for entry in data if entry.get("role")})
-    return roles
+    roles: set[str] = set()
+    for entry in data:
+        role = entry.get("role")
+        if role:
+            roles.add(role)
+        roles_payload = entry.get("roles") or {}
+        if isinstance(roles_payload, dict):
+            roles.update({key for key in roles_payload.keys() if key})
+    roles = set(_canonical_role(role) for role in roles if role)
+    return sorted(roles)
 
 
 def get_all_reagents_by_type(reagent_type: str) -> List[Dict[str, Any]]:

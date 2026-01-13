@@ -89,10 +89,10 @@ def demo_single_entry_validation():
         "name": "DavePhos",
         "abbreviation": "DavePhos",
         "cas": "213697-53-1",
-        "smile": "",
-        "role": "ligand",
-        "family_id": "trialkyl_triaryl_phosphines",
-        "tag": "",
+        "smiles": "",
+        "role_1": "ligand",
+        "family_1": "trialkyl_triaryl_phosphines",
+        "tag_1": "",
     }
 
     print("Validating example entry...")

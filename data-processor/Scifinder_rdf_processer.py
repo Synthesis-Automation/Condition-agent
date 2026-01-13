@@ -281,12 +281,18 @@ class _TaxonomyIndex:
                 cas = entry.get("cas")
                 name = entry.get("name")
                 abbr = (entry.get("abbreviation") or "").strip()
-                canonical = canonical_role(entry.get("role") or "")
+                canonical = canonical_role(entry.get("role_1") or "")
+                family_id = entry.get("family_1") or None
+                if not canonical:
+                    canonical = canonical_role(entry.get("role_2") or "")
+                    family_id = entry.get("family_2") or None
+                if not canonical:
+                    canonical = canonical_role(entry.get("role") or "")
+                    family_id = entry.get("family_id") or None
                 if not canonical:
                     continue
                 role_code = REGISTRY_ROLE_CODE_MAP.get(canonical, canonical.upper())
                 category_hint = REGISTRY_CATEGORY_HINT.get(canonical, canonical)
-                family_id = entry.get("family_id") or None
                 generic_core = ""  # CSV registry does not store metal-specific payloads.
                 self._index_member(
                     cas=cas,
@@ -299,8 +305,6 @@ class _TaxonomyIndex:
                     family_id=family_id,
                     role_payload=None,
                 )
-                    if family_id and metal:
-                        self.family_metal.setdefault(family_id, metal)
 
         self._apply_fallback_entries()
 
