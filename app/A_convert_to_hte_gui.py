@@ -23,12 +23,16 @@ class ConversionWorker(QtCore.QObject):
         output_path: str,
         drop_no_catalyst: bool,
         drop_reagent_reactants: bool,
+        reagent_csv_path: str,
+        new_reagents_path: str,
     ):
         super().__init__()
         self.input_path = input_path
         self.output_path = output_path
         self.drop_no_catalyst = drop_no_catalyst
         self.drop_reagent_reactants = drop_reagent_reactants
+        self.reagent_csv_path = reagent_csv_path
+        self.new_reagents_path = new_reagents_path
 
     def run(self):
         try:
@@ -51,6 +55,8 @@ class ConversionWorker(QtCore.QObject):
                     self.output_path, 
                     drop_no_catalyst=self.drop_no_catalyst,
                     drop_reagent_reactants=self.drop_reagent_reactants,
+                    reagent_csv_path=self.reagent_csv_path,
+                    new_reagents_path=self.new_reagents_path,
                 )
                 self.finished.emit(True, f"Successfully processed {self.input_path}")
             finally:
@@ -205,6 +211,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
             output_path, 
             self.drop_catalyst_check.isChecked(),
             self.drop_reagent_reactants_check.isChecked(),
+            str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
+            str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
         )
         self.worker.moveToThread(self.thread)
         

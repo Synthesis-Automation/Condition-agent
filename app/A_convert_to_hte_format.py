@@ -1,4 +1,6 @@
+import csv
 import json
+import re
 import pandas as pd
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Iterable, Optional
@@ -7,7 +9,7 @@ from functools import lru_cache
 import argparse
 import sys
 import os
-from collections import Counter
+from collections import Counter, defaultdict
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -26,12 +28,7 @@ def cached_featurize(smiles: str):
     options = {"motif_site_filter": "substituent"}
     return featurize_molecule(smiles, options=options)
 
-@lru_cache(maxsize=1)
-def _list_reagent_types() -> List[str]:
-    reagent_dir = PROJECT_ROOT / "data" / "reagent_db"
-    if not reagent_dir.exists():
-        return []
-    return sorted(path.stem for path in reagent_dir.glob("*.json"))
+CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
 
 def _normalize_smiles(smiles: str) -> Optional[str]:
     if not smiles:
@@ -50,10 +47,43 @@ def _split_reagent_names(value: str) -> List[str]:
                 parts.append(name)
     return parts
 
-def _collect_reagent_smiles(record: Dict[str, Any]) -> set[str]:
-    try:
-        from chemtools.reagent.lookup import find_reagent
-    except Exception:
+def _normalize_reagent_text(value: str) -> str:
+    return " ".join(str(value).strip().lower().split())
+
+@lru_cache(maxsize=4)
+def _load_reagent_csv(path_str: str) -> Dict[str, Any]:
+    path = Path(path_str)
+    data = {
+        "name_to_smiles": defaultdict(set),
+        "cas_to_smiles": defaultdict(set),
+        "cas_set": set(),
+    }
+    if not path.exists():
+        return data
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            name = _normalize_reagent_text(row.get("name", ""))
+            abbr = _normalize_reagent_text(row.get("abbreviation", ""))
+            cas = (row.get("cas") or "").strip()
+            smile = (row.get("smile") or "").strip()
+            if cas:
+                data["cas_set"].add(cas)
+            if smile:
+                if name:
+                    data["name_to_smiles"][name].add(smile)
+                if abbr:
+                    data["name_to_smiles"][abbr].add(smile)
+                if cas:
+                    data["cas_to_smiles"][cas].add(smile)
+    return data
+
+def _collect_reagent_smiles(
+    record: Dict[str, Any],
+    reagent_db: Dict[str, Any],
+    unknown_cas: Optional[set[str]] = None,
+) -> set[str]:
+    if not reagent_db:
         return set()
 
     def normalize_entries(values: Any) -> List[Dict[str, Any]]:
@@ -70,14 +100,21 @@ def _collect_reagent_smiles(record: Dict[str, Any]) -> set[str]:
         return entries
 
     reagent_names: List[str] = []
+    reagent_cas: List[str] = []
     for entry in normalize_entries(record.get("reagents")):
         name = entry.get("name")
         if name:
             reagent_names.extend(_split_reagent_names(str(name)))
+        cas = entry.get("cas")
+        if cas:
+            reagent_cas.append(str(cas).strip())
     for entry in normalize_entries(record.get("solvents")):
         name = entry.get("name")
         if name:
             reagent_names.extend(_split_reagent_names(str(name)))
+        cas = entry.get("cas")
+        if cas:
+            reagent_cas.append(str(cas).strip())
 
     catalytic_system = record.get("catalytic_system") or ""
     condition_core = record.get("condition_core") or ""
@@ -86,18 +123,49 @@ def _collect_reagent_smiles(record: Dict[str, Any]) -> set[str]:
     if condition_core:
         reagent_names.extend(_split_reagent_names(str(condition_core)))
 
-    reagent_types = _list_reagent_types()
     reagent_smiles = set()
+    cas_set = reagent_db.get("cas_set", set())
+    cas_to_smiles = reagent_db.get("cas_to_smiles", {})
+    name_to_smiles = reagent_db.get("name_to_smiles", {})
+
+    unknown = unknown_cas if unknown_cas is not None else set()
+
+    for cas in _dedupe_list(reagent_cas):
+        if not cas or cas.startswith("$") or not CAS_PATTERN.match(cas):
+            continue
+        if cas not in cas_set:
+            unknown.add(cas)
+        for smiles in cas_to_smiles.get(cas, []):
+            normalized = _normalize_smiles(smiles) if smiles else None
+            if normalized:
+                reagent_smiles.add(normalized)
+
     for name in _dedupe_list(reagent_names):
-        for reagent_type in reagent_types:
-            hit = find_reagent(name, reagent_type)
-            if not hit:
-                continue
-            smiles = hit.get("smiles")
+        key = _normalize_reagent_text(name)
+        for smiles in name_to_smiles.get(key, []):
             normalized = _normalize_smiles(smiles) if smiles else None
             if normalized:
                 reagent_smiles.add(normalized)
     return reagent_smiles
+
+def _write_new_reagents(path: Path, cas_values: set[str]) -> None:
+    if not cas_values:
+        return
+    existing: set[str] = set()
+    if path.exists():
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                cas = (row.get("cas") or "").strip()
+                if cas:
+                    existing.add(cas)
+    merged = sorted(existing | cas_values)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["cas"])
+        writer.writeheader()
+        for cas in merged:
+            writer.writerow({"cas": cas})
 
 @lru_cache(maxsize=1)
 def _load_scaffold_motif_ids() -> set[str]:
@@ -257,12 +325,23 @@ def process_reaction_dataset(
     output_path: str,
     drop_no_catalyst: bool = True,
     drop_reagent_reactants: bool = True,
+    reagent_csv_path: Optional[str | Path] = None,
+    new_reagents_path: Optional[str | Path] = None,
 ):
     """Convert reaction dataset to a minimal HTE recommender CSV."""
     input_path = Path(input_path)
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     source_label = input_path.stem
+
+    reagent_csv = Path(reagent_csv_path) if reagent_csv_path else (
+        PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"
+    )
+    reagent_db = _load_reagent_csv(str(reagent_csv))
+    unknown_cas: set[str] = set()
+    new_reagents_csv = Path(new_reagents_path) if new_reagents_path else (
+        PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"
+    )
     
     rows = []
     print(f"Reading {input_path}...")
@@ -292,7 +371,7 @@ def process_reaction_dataset(
         reactants_part, products_part = smiles.split(">>")
         reactants = reactants_part.split(".")
         if drop_reagent_reactants:
-            reagent_smiles = _collect_reagent_smiles(record)
+            reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
             if reagent_smiles:
                 filtered = []
                 for r_smiles in reactants:
@@ -488,6 +567,9 @@ def process_reaction_dataset(
 
     df.to_csv(output_path, index=False)
     print(f"Successfully saved {len(df)} reactions to {output_path}")
+    if unknown_cas:
+        _write_new_reagents(new_reagents_csv, unknown_cas)
+        print(f"Saved {len(unknown_cas)} new reagent CAS entries to {new_reagents_csv}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert reaction dataset to HTE-canonical CSV format.")
@@ -498,6 +580,14 @@ if __name__ == "__main__":
         "--keep-reagent-reactants",
         action="store_true",
         help="Keep reagent/solvent molecules in the reactant columns (default: drop).",
+    )
+    parser.add_argument(
+        "--reagent-csv",
+        help="Path to reagent registry CSV (default: data/reagent_db/reagents.csv).",
+    )
+    parser.add_argument(
+        "--new-reagents",
+        help="Path to write missing reagent CAS list (default: data/reagent_db/new_reagents.csv).",
     )
     
     args = parser.parse_args()
@@ -511,12 +601,16 @@ if __name__ == "__main__":
             input_file,
             output_file,
             drop_reagent_reactants=drop_reagent_reactants,
+            reagent_csv_path=args.reagent_csv,
+            new_reagents_path=args.new_reagents,
         )
     elif args.input and args.output:
         process_reaction_dataset(
             args.input,
             args.output,
             drop_reagent_reactants=drop_reagent_reactants,
+            reagent_csv_path=args.reagent_csv,
+            new_reagents_path=args.new_reagents,
         )
     else:
         # Default: Process known core datasets
@@ -528,4 +622,6 @@ if __name__ == "__main__":
                 input_file,
                 output_file,
                 drop_reagent_reactants=drop_reagent_reactants,
+                reagent_csv_path=args.reagent_csv,
+                new_reagents_path=args.new_reagents,
             )
