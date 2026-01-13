@@ -429,7 +429,7 @@
       },
       "metal_catalyst": {
         "families": [
-          "pure metal"
+          "pure_metal"
         ],
         "metal": "Cu",
         "oxidation_states": [
@@ -501,7 +501,7 @@
     "roles": {
       "metal_catalyst": {
         "families": [
-          "copper salt"
+          "copper_salt"
         ],
         "metal": "Cu",
         "oxidation_states": [
@@ -509,7 +509,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Copper Salts (copper salt) | metal: Cu | ox_states: 1 | name: Copper oxide (Cu2O) | abbr: Cu2O | CAS: 1317-39-1"
+    "embedding_text": "member_embedding: type: CATALYST | family: Copper Salts (copper_salt) | metal: Cu | ox_states: 1 | name: Copper oxide (Cu2O) | abbr: Cu2O | CAS: 1317-39-1"
   },
   {
     "id": "KKCXRELNMOYFLS-UHFFFAOYSA-N",
@@ -1027,7 +1027,7 @@
     "roles": {
       "metal_catalyst": {
         "families": [
-          "Ni metal"
+          "ni_metal"
         ],
         "metal": "Ni",
         "oxidation_states": [
@@ -1035,7 +1035,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Nickel Metal (Ni metal) | metal: Ni | ox_states: 0 | name: Nickel | abbr: Nickel | CAS: 7440-02-0"
+    "embedding_text": "member_embedding: type: CATALYST | family: Nickel Metal (ni_metal) | metal: Ni | ox_states: 0 | name: Nickel | abbr: Nickel | CAS: 7440-02-0"
   },
   {
     "id": "cas-373-02-4",
@@ -1059,7 +1059,7 @@
     "roles": {
       "metal_catalyst": {
         "families": [
-          "Ni salt"
+          "ni_salt"
         ],
         "metal": "Ni",
         "oxidation_states": [
@@ -1067,7 +1067,7 @@
         ]
       }
     },
-    "embedding_text": "member_embedding: type: CATALYST | family: Nickel(II) Salts (Ni salt) | metal: Ni | ox_states: 2 | name: Nickel Acetate | abbr: NiOAc2 | CAS: 373-02-4"
+    "embedding_text": "member_embedding: type: CATALYST | family: Nickel(II) Salts (ni_salt) | metal: Ni | ox_states: 2 | name: Nickel Acetate | abbr: NiOAc2 | CAS: 373-02-4"
   },
   {
     "id": "R_c80231e28b30c0cd",

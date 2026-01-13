@@ -2,10 +2,9 @@ name,abbreviation,cas,smile,role,family_id,tag
 Boron tribromide,BBr3,10294-33-4,,acid,boron_lewis_acids,strong Lewis acid
 Boron Trichloride,BCl3,10294-34-5,,acid,boron_lewis_acids,strong Lewis acid
 Boron trifluoride etherate,BF3.Et2O,109-63-7,,acid,boron_lewis_acids,strong Lewis acid
-Boron trifluoride etherate,BF3·Et2O,109-63-7,,acid,boron_lewis_acids,strong Lewis acid
 Hydrochloric Acid,HCl,7647-01-0,,acid,mineral_acids,strong acid
 p-Toluenesulfonic acid,p-TsOH,104-15-4,,acid,sulfonic_acids,strong acid
-"1,5-Cyclooctadiene",,111-78-4,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
+"1,5-Cyclooctadiene",COD,111-78-4,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 1-Adamantane carboxylic acid,1-AdCO2H,3111-27-3,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
 1-Hydroxy-7-azabenzotriazole,HOAt,39968-33-7,,additive,amide_coupling_additives,amide coupling additives
 1-Hydroxybenzotriazole,HOBt,2592-95-2,,additive,amide_coupling_additives,amide coupling additives
@@ -13,18 +12,18 @@ p-Toluenesulfonic acid,p-TsOH,104-15-4,,acid,sulfonic_acids,strong acid
 15-Crown-5,15C5,33100-27-5,,additive,crown_ethers,crown ethers
 18-Crown-6,18C6,17455-13-9,,additive,crown_ethers,crown ethers
 "2,4,6-Trimethylbenzoic acid",MesCO2H,576-26-1,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
-2-dibromoethane,EDB,557-91-5,,additive,iodide_promoters,iodide promoters
+2-dibromoethane,,557-91-5,,additive,iodide_promoters,iodide promoters
 3 Å molecular sieves,MS 3Å,$3-a-molecular-sieves,,additive,molecular_sieves,molecular sieves
 4 Å molecular sieves,MS 4Å,$4-a-molecular-sieves,,additive,molecular_sieves,molecular sieves
 AcOH,HOAc,64-19-7,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
-Ammonium Bicarbonate,Al(HCO3)3,1066-33-7,,additive,Al salt,Al salt
+Ammonium Bicarbonate,Al(HCO3)3,1066-33-7,,additive,al_salt,Al salt
 Ammonium Chloride,NH4Cl,12125-02-9,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 amyl nitrite,,110-46-3,,additive,fluoride_sources_activators,fluoride sources activators
 B(OH)3,BA,10043-35-3,,additive,lewis_acid_promoters,lewis acid promoters
 B(OMe)3,TMB,121-43-7,,additive,lewis_acid_promoters,lewis acid promoters
 benzaldehyde oxime,BZOX,932-90-1,,additive,lewis_acid_promoters,lewis acid promoters
 BSA,BSA,132255-83-5,,additive,fluoride_sources_activators,fluoride sources activators
-BSTFA,BSTFA,25561-30-2,,additive,fluoride_sources_activators,fluoride sources activators
+"N,O-Bis(trimethylsilyl)trifluoroacetamide",BSTFA,25561-30-2,,additive,fluoride_sources_activators,fluoride sources activators
 Butylated hydroxytoluene,BHT,128-37-0,,additive,radical_suppressors,radical suppressors
 Cesium fluoride,CsF,13400-13-0,,additive,fluoride_sources_activators,fluoride sources activators
 DMAP,DMAP,1122-58-3,,additive,lewis_acid_promoters,lewis acid promoters
@@ -36,11 +35,11 @@ iPrOH,iPrOH,67-63-0,,additive,fluoride_sources_activators,fluoride sources activ
 KOAc,KOAc,127-08-2,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
 Lithium bromide,LiBr,7550-35-8,,additive,lithium_halide_accelerants,lithium halide accelerants
 Lithium chloride,LiCl,7447-41-8,,additive,lithium_halide_accelerants,lithium halide accelerants
-Lithium iodide,,10377-51-2,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
+Lithium iodide,LiI,10377-51-2,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 Lithium perchlorate,LiClO4,7791-03-9,,additive,lewis_acid_promoters,lewis acid promoters
 Magnesium chloride,MgCl2,7786-30-3,,additive,lithium_halide_accelerants,lithium halide accelerants
 MeOH,MeOH,67-56-1,,additive,molecular_sieves,molecular sieves
-Octanoic acid,C8,124-07-2,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
+Octanoic acid,,124-07-2,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
 Oxyma Pure,Oxyma,3849-21-6,,additive,amide_coupling_additives,amide coupling additives
 Pivalic acid,PivOH,75-98-9,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
 Potassium 2-ethylhexanoate,K 2-EHA,3164-85-0,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
@@ -50,8 +49,8 @@ Silver hexafluoroantimonate,AgSbF6,17026-41-2,,additive,silver_salts_halide_scav
 Silver oxide,Ag2O,20667-12-3,,additive,silver_salts_halide_scavengers,silver salts halide scavengers
 Silver sulfate,Silver sulfate,10294-26-5,,additive,silver_salts_halide_scavengers,silver salts halide scavengers
 Silver tetrafluoroborate,AgBF4,7775-27-1,,additive,silver_salts_halide_scavengers,silver salts halide scavengers
-Sodium Bromide,,7647-15-6,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
-Sodium Chloride,,7647-14-5,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
+Sodium Bromide,NaBr,7647-15-6,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
+Sodium Chloride,NaCl,7647-14-5,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 Sodium formate,HCOONa,141-53-7,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
 Sodium iodide,NaI,7681-82-5,,additive,iodide_promoters,iodide promoters
 Sodium octanoate,NaC8,1984-06-1,,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation
@@ -69,49 +68,47 @@ TFE,TFE,75-89-8,,additive,fluoride_sources_activators,fluoride sources activator
 TMEDA,TMEDA,110-18-9,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 TMSCl,TMSCI,75-77-4,,additive,fluoride_sources_activators,fluoride sources activators
 water,,7732-18-5,,additive,molecular_sieves,molecular sieves
-Zinc Acetate,,557-34-6,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
+Zinc Acetate,ZnOAc2,557-34-6,,additive,quaternary_ammonium_ptc,quaternary ammonium ptc
 Zinc chloride,ZnCl2,7646-85-7,,additive,lewis_acid_promoters,lewis acid promoters
 Zn,Zn,7440-66-6,,additive,lewis_acid_promoters,lewis acid promoters
 "1,1,3,3-Tetramethylguanidine",Tetramethylguanidine,80-70-6,,base,amidine_guanidine_bases,"strong base; hindered, non-nucleophilic"
 "1,5-Diazabicyclo[4.3.0]non-5-ene",DBN,3001-72-7,,base,amidine_guanidine_bases,"strong base; hindered, non-nucleophilic"
 "1,8-Diazabicyclo[5.4.0]undec-7-ene",DBU,6674-22-2,,base,amidine_guanidine_bases,"strong base; hindered, non-nucleophilic"
 "2,6-Lutidine",Lutidine,108-48-5,,base,aromatic_tertiary_amines,"moderate base; hindered, non-nucleophilic"
-"2-Propanol, 2-methyl-, lithium salt (1:1)",,1907-33-1,,base,alkoxides_hindered,strong base; bulky
-"2-tert-Butyl-1,1,3,3-tetramethylguanidine",,29166-72-1,,base,amidine_guanidine_bases,"strong base; hindered, non-nucleophilic"
+Lithium tert-butoxide,t-BuOLi,1907-33-1,,base,alkoxides_hindered,strong base; bulky
+"2-tert-Butyl-1,1,3,3-tetramethylguanidine",BTMG,29166-72-1,,base,amidine_guanidine_bases,"strong base; hindered, non-nucleophilic"
 4-(Dimethylamino)pyridine,DMAP,1122-58-3,,base,nucleophilic_catalyst_bases,moderate base
 4-Methylmorpholine (N-methylmorpholine),NMM,109-02-4,,base,tertiary_amines_aliphatic,moderate base; hindered
 "7-Methyl-1,5,7-triazabicyclo[4.4.0]dec-5-ene",MTBD,84030-20-6,,base,tertiary_amines_aliphatic,moderate base; hindered
 Ag2O,Silver oxide,11113-88-5,,base,hydroxides,moderate base
 AgOAc,AgOAc,563-63-3,,base,inorg_carboxylates,weak base
-Ammonium hydroxide (aqueous ammonia),NH4OH,1336-21-6,,base,hydroxides,strong base
+Ammonium hydroxide,NH4OH,1336-21-6,,base,hydroxides,strong base
 Barium hydroxide,,17194-00-2,,base,hydroxides,strong base
 Calcium Carbonate,,471-34-1,,base,inorg_carbonates_bicarbonate,moderate base; non-nucleophilic
 Cesium acetate,CsOAc,3396-11-0,,base,inorg_carboxylates,moderate base
 Cesium bicarbonate,,15519-28-5,,base,inorg_carbonates_bicarbonate,moderate base; non-nucleophilic
 Cesium carbonate,Cs2CO3,534-17-8,,base,inorg_carbonates_bicarbonate,moderate base; non-nucleophilic
-Cesium hydroxide,,35103-79-8,,base,hydroxides,strong base
-Dabco,,280-57-9,,base,tertiary_amines_aliphatic,moderate base; hindered
-K2HPO4,DKP,7758-11-4,,base,inorg_phosphates,weak base
+Cesium hydroxide,CsOH,35103-79-8,,base,hydroxides,strong base
+Dabco,DABCO,280-57-9,,base,tertiary_amines_aliphatic,moderate base; hindered
+K2HPO4,,7758-11-4,,base,inorg_phosphates,weak base
 KHMDS,KHMDS,40949-94-8,,base,metal_amides_silylamides,strong base; hindered
 Li2CO3,Lithium carbonate,554-13-2,,base,inorg_carbonates_bicarbonate,weak base
 Lithium acetate,,546-89-4,,base,inorg_carboxylates,moderate base; non-nucleophilic
 Lithium hexamethyldisilazide,LiHMDS,4039-32-1,,base,metal_amides_silylamides,"superbase base; bulky, non-nucleophilic"
-Lithium Hydroxide,,1310-65-2,,base,hydroxides,strong base
-Lithium hydroxide,LiOH,1310-66-3,,base,hydroxides,strong base
+Lithium Hydroxide,LiOH,1310-65-2,,base,hydroxides,strong base
 "N,N-Diisopropylethylamine",DIPEA,7087-68-5,,base,tertiary_amines_aliphatic,moderate base; hindered
 n-Butyllithium (in hexanes),n-BuLi,109-72-8,,base,organolithiums,superbase base
-NH3,NH4OH,7664-41-7,,base,ammonia_aqueous,weak base
-NMI,NMI,7479-20-1,,base,nucleophilic_catalyst_bases,moderate base
+NH3,,7664-41-7,,base,ammonia_aqueous,weak base
 "Phenol, 2,6-bis(1,1-dimethylethyl)-4-methyl-, sodium salt",BHT-Na,16654-89-0,,base,alkoxides_hindered,moderate base; hindered
 Piperidine,Pip,110-89-4,,base,secondary_amines_cyclic,strong base
 Potassium 2-ethylhexanoate,KOEtHex,3164-85-0,,base,inorg_carboxylates,weak base
 Potassium acetate,KOAc,127-08-2,,base,inorg_carboxylates,moderate base; non-nucleophilic
-Potassium Bicarbonate,,298-14-6,,base,inorg_carbonates_bicarbonate,moderate base; non-nucleophilic
+Potassium Bicarbonate,KHCO3,298-14-6,,base,inorg_carbonates_bicarbonate,moderate base; non-nucleophilic
 Potassium carbonate,K2CO3,584-08-7,,base,inorg_carbonates_bicarbonate,moderate base; non-nucleophilic
 Potassium Fluoride,Potassium Fluoride,7789-23-3,,base,fluoride,moderate base
-Potassium hydride,,7693-26-7,,base,hydrides,superbase base
+Potassium hydride,KH,7693-26-7,,base,hydrides,superbase base
 Potassium hydroxide,KOH,1310-58-3,,base,hydroxides,strong base
-Potassium phenoxide,,100-67-4,,base,tertiary_amines_aliphatic,moderate base; hindered
+Potassium phenoxide,KOPh,100-67-4,,base,tertiary_amines_aliphatic,moderate base; hindered
 Potassium tert-butoxide,KOtBu,865-47-4,,base,alkoxides_hindered,strong base; bulky
 Pyridine,Py,110-86-1,,base,aromatic_tertiary_amines,"moderate base; hindered, non-nucleophilic"
 Quinuclidine,,100-76-5,,base,tertiary_amines_aliphatic,moderate base; hindered
@@ -123,13 +120,13 @@ Sodium hydrogen carbonate,NaHCO3,144-55-8,,base,inorg_carbonates_bicarbonate,mod
 Sodium hydroxide,NaOH,1310-73-2,,base,hydroxides,strong base
 Sodium methoxide,NaOMe,124-41-4,,base,alkoxides_primary,strong base; hindered
 Sodium tert-butoxide,NaOtBu,865-48-5,,base,alkoxides_hindered,strong base; bulky
-Sodium trimethylsilanolate,,18027-10-6,,base,tertiary_amines_aliphatic,moderate base; hindered
+Sodium trimethylsilanolate,TMSONa,18027-10-6,,base,tertiary_amines_aliphatic,moderate base; hindered
 TMEDA,TMEDA,110-18-9,,base,tertiary_amines_aliphatic,moderate base; hindered
-TMSOK,TMSOK,10519-96-7,,base,alkoxides_primary,strong base
+Potassium trimethylsilanolate,TMSOK,10519-96-7,,base,alkoxides_primary,strong base
 "trans-N,N'-dimethyl-1,2-cyclohexanediamine",TMCD,67579-81-1,,base,diamine,moderate base
-Tributylamine,,102-82-9,,base,tertiary_amines_aliphatic,moderate base; hindered
+Tributylamine,Bu3N,102-82-9,,base,tertiary_amines_aliphatic,moderate base; hindered
 Triethylamine,Et3N,121-44-8,,base,tertiary_amines_aliphatic,moderate base; hindered
-Trimethylamine,,75-50-3,,base,hydroxides,strong base
+Trimethylamine,Me3N,75-50-3,,base,hydroxides,strong base
 Tripotassium phosphate,K3PO4,7778-53-2,,base,inorg_phosphates,"moderate base; hindered, non-nucleophilic"
 Zinc acetate,Zn(OAc)₂,557-34-6,,base,inorg_carboxylates,weak base
 "1,1′‑Carbonyldiimidazole",CDI,530-62-1,,condensation_agent,imidazolide_formers,medium condensation agent
@@ -164,11 +161,10 @@ PyBrOP,PyBrOP,132705-51-2,,condensation_agent,organophosphorus_anhydrides,strong
 PyClOP,PyClOP,133894-48-1,,condensation_agent,organophosphorus_chlorides_azides,strong condensation agent
 PyOxim,PyOxim,153433-21-7,,condensation_agent,organophosphorus_anhydrides,strong condensation agent
 sec‑Butyl chloroformate,s‑BuOCOCl,2837-76-5,,condensation_agent,mixed_anhydrides_chloroformates,medium condensation agent
-T3P (50% in EtOAc),T3P,68957-94-8,,condensation_agent,organophosphorus_anhydrides,medium condensation agent
+T3P,T3P,68957-94-8,,condensation_agent,organophosphorus_anhydrides,medium condensation agent
 TBTU,TBTU,125700-67-6,,condensation_agent,aminium_uronium_guanidinium,high condensation agent
 TCFH,TCFH,207915-99-9,,condensation_agent,acyl_halide_fluoride_generators,strong condensation agent
-TCFH (+ NMI),TCFH+NMI,$tcfh_nmi__dd7114c3,,condensation_agent,acyl_halide_fluoride_generators,high condensation agent
-TFFH,TFFH,$tffh__01c61d9c,,condensation_agent,acyl_halide_fluoride_generators,high condensation agent
+Tetramethylfluoroformamidinium hexafluorophosphate,TFFH,164298-23-1,,condensation_agent,acyl_halide_fluoride_generators,high condensation agent
 Thionyl Chloride,SOCl2,7719-09-7,,condensation_agent,acyl_halide_fluoride_generators,strong condensation agent
 "Tris(2,2,2-trifluoroethyl) Borate",B(OCH2CF3)3,659-18-7,,condensation_agent,boron,moderate condensation agent
 Alcohol dehydrogenase,ADH,9001-22-3,,enzyme,oxidoreductase_general,oxidoreductase general
@@ -189,11 +185,11 @@ Alcohol dehydrogenase,ADH,9001-22-3,,enzyme,oxidoreductase_general,oxidoreductas
 "2,2':6',2''-Terpyridine",terpy,$2_2_6_2_terpyridine__fe5af27b,,ligand,terpyridines,3 N ligand
 "2,2,6,6-Tetramethyl-3,5-heptanedione","2,2,6,6-Tetramethyl-3,5-heptanedione",1118-71-4,,ligand,diones,2 O ligand
 "2,4,6-Trimethoxy-2'-dicyclohexylphosphino biphenyl",TMXPhos,1000171-05-0,,ligand,dialkylbiaryl_phosphines,1 P ligand
-"2,6-Bis(arylimino)pyridine (generic)",PDI,$2_6_bis_arylimino_pyridine_generic__014a1a7c,,ligand,bis_imino_pyridines_PDI,3 N ligand
-"2,6-Bis[(2,6-diisopropylphenyl)imino]pyridine",DIPP-PDI,$2_6_bis_2_6_diisopropylphenyl_imino_pyridine__b867b4c4,,ligand,bis_imino_pyridines_PDI,3 N ligand
+"2,6-Bis(arylimino)pyridine",PDI,$2_6_bis_arylimino_pyridine_generic__014a1a7c,,ligand,bis_imino_pyridines_pdi,3 N ligand
+"2,6-Bis[(2,6-diisopropylphenyl)imino]pyridine",DIPP-PDI,$2_6_bis_2_6_diisopropylphenyl_imino_pyridine__b867b4c4,,ligand,bis_imino_pyridines_pdi,3 N ligand
 2-(Dicyclohexylphosphino)-2'-(dimethylamino)biphenyl,DavePhos,213697-53-1,,ligand,dialkylbiaryl_phosphines,1 P ligand
-2-(Diphenylphosphino)pyridine,PPh2Py,$2_diphenylphosphino_pyridine__8543461d,,ligand,phosphine_pyridine_PN,2 P ligand
-2-diamine,en,102494-87-1,,ligand,diamines,2 N ligand
+2-(Diphenylphosphino)pyridine,PPh2Py,37943-90-1,,ligand,phosphine_pyridine_pn,2 P ligand
+2-diaMine,,102494-87-1,,ligand,diamines,2 N ligand
 "3,4,7,8-Tetramethyl-1,10-phenanthroline",tmphen,1660-93-1,,ligand,phenanthrolines,2 N ligand
 "3,4,7,8-Tetramethyl-1,10-phenanthroline",tmphen,1660-93-1,,ligand,phenanthrolines,2 N ligand
 "4,4',4''-Tri-tert-butyl-2,2':6',2''-terpyridine",tBu3-terpy,115091-29-7,,ligand,terpyridines,3 N ligand
@@ -204,18 +200,18 @@ Alcohol dehydrogenase,ADH,9001-22-3,,enzyme,oxidoreductase_general,oxidoreductas
 "5,5'-Dimethyl-2,2'-bipyridine","5,5'-dmbpy",1762-34-1,,ligand,bipyridines,2 N ligand
 "6,6'-Dimethyl-2,2'-bipyridine",dmbpy,$6_6_dimethyl_2_2_bipyridine__8686361b,,ligand,bipyridines,2 N ligand
 6-DPPon,6-DPPon,64741-28-2,,ligand,triazine_pnn_phosphines,3 P ligand
-8-Hydroxyquinoline,Oxine,148-24-3,,ligand,quinolinol_NO_chelates,2 N ligand
-8-Quinolinol N-oxide,8-HQNO,1127-45-3,,ligand,quinolinol_NO_chelates,2 N ligand
+8-Hydroxyquinoline,Oxine,148-24-3,,ligand,quinolinol_no_chelates,2 N ligand
+8-Quinolinol N-oxide,8-HQNO,1127-45-3,,ligand,quinolinol_no_chelates,2 N ligand
 AdBrettPhos,AdBrettPhos,1160861-59-5,,ligand,dialkylbiaryl_phosphines,1 P ligand
 AdBrettPhos,AdBrettPhos,1160861-59-5,,ligand,dialkylbiaryl_phosphines,1 P ligand
 AlPhos,AlPhos,1447953-76-7,,ligand,dialkylbiaryl_phosphines,1 P ligand
 AmplPhos,AmplPhos,1374640-42-8,,ligand,dialkylbiaryl_phosphines,1 P ligand
-APhos,APhos,932710-63-9,,ligand,phosphine_pyridine_PN,2 P ligand
+APhos,APhos,932710-63-9,,ligand,phosphine_pyridine_pn,2 P ligand
 Bathophenanthroline,batho-phen,1662-01-7,,ligand,phenanthrolines,2 N ligand
 BFMO,BFMO,69010-90-8,,ligand,phosphoramidites,1 P ligand
 BICAAC (generic),BICAAC,$bicaac_generic__abeec18b,,ligand,caac_carbenes,1 C(carbene) ligand
 BINAP,BINAP,2250-01-3,,ligand,bidentate_diphosphines,2 P ligand
-"Binap, (A+-)-","Binap, (A+-)-",76189-55-4,,ligand,bidentate_diphosphines,2 P ligand
+(+/-)Binap,(+/-)Binap,76189-55-4,,ligand,bidentate_diphosphines,2 P ligand
 BINOL-derived phosphoramidite,BINOL-Phosamidite,$binol_derived_phosphoramidite__9246cdb8,,ligand,phosphoramidites,1 P ligand
 BIPHEP,BIPHEP,58467-99-1,,ligand,bidentate_diphosphines,2 P ligand
 BippyPhos,BippyPhos,894086-00-1,,ligand,triazine_pnn_phosphines,3 P ligand
@@ -234,7 +230,7 @@ CPhos,CPhos,1160556-64-8,,ligand,dialkylbiaryl_phosphines,1 P ligand
 Cyclohexyl JohnPhos,Cyclohexyl JohnPhos,247940-06-3,,ligand,dialkylbiaryl_phosphines,1 P ligand
 CyJohnPhos,CyJohnPhos,200001-74-9,,ligand,dialkylbiaryl_phosphines,1 P ligand
 DavePhos,DavePhos,213697-53-1,,ligand,dialkylbiaryl_phosphines,1 P ligand
-Di(1-adamantyl)-1-piperidinylphenylphosphine,Ad2P-pip-Ph,1237588-13-4,,ligand,dalphos_PN,2 P ligand
+Di(1-adamantyl)-1-piperidinylphenylphosphine,Ad2P-pip-Ph,1237588-13-4,,ligand,dalphos_pn,2 P ligand
 Di-1-adamantylphosphino biphenyl,DiAdPhos,224311-55-1,,ligand,dialkylbiaryl_phosphines,1 P ligand
 "Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane","Di-tert-butyl(1-methyl-2,2-diphenylcyclopropyl)phosphane",742103-27-1,,ligand,bidentate_diphosphines,2 P ligand
 Di-tert-butylphosphine,HP(t-Bu)2,819-19-2,,ligand,secondary_phosphines,1 P ligand
@@ -243,12 +239,12 @@ Dicyclohexyl(cyclopentyl)phosphane;iron,PCypCy2,146960-90-9,,ligand,trialkyl_tri
 Dicyclohexylphosphine,HPCy2,829-84-5,,ligand,secondary_phosphines,1 P ligand
 DifluorPhos,DifluorPhos,156707-92-7,,ligand,bidentate_diphosphines,2 P ligand
 Dimethylphenylphosphine,PMe2Ph,672-66-2,,ligand,trialkyl_triaryl_phosphines,1 P ligand
-Diphenyl-2-pyridylphosphine,PPh2Py,37943-90-1,,ligand,phosphine_pyridine_PN,2 P ligand
+Diphenyl-2-pyridylphosphine,PPh2Py,37943-90-1,,ligand,phosphine_pyridine_pn,2 P ligand
 Diphenylphosphine,HPPh2,829-85-6,,ligand,secondary_phosphines,1 P ligand
 DL-Proline,Pro,609-36-9,,ligand,diamines,2 N ligand
 DM-SEGPHOS,DM-SEGPHOS,196868-63-0,,ligand,bidentate_diphosphines,2 P ligand
 DMEDA,DMEDA,$dmeda__71370c3d,,ligand,diamines,2 N ligand
-DMPAO,DMPAO,2903-48-2,,ligand,phosphine_pyridine_PN,2 P ligand
+DMPAO,DMPAO,2903-48-2,,ligand,phosphine_pyridine_pn,2 P ligand
 DPEphos,DPEPhos,166330-10-5,,ligand,bidentate_diphosphines,2 P ligand
 DPPB,DPPB,7688-25-7,,ligand,bidentate_diphosphines,2 P ligand
 DPPE,DPPE,1663-45-2,,ligand,bidentate_diphosphines,2 P ligand
@@ -259,12 +255,12 @@ dtbpf,dtbpf,84680-95-5,,ligand,bidentate_diphosphines,2 P ligand
 EPhos,EPhos,2118959-55-8,,ligand,dialkylbiaryl_phosphines,1 P ligand
 GPhos,GPhos,2489243-29-8,,ligand,dialkylbiaryl_phosphines,1 P ligand
 H8-BINAP,H8-BINAP,117016-01-8,,ligand,bidentate_diphosphines,2 P ligand
-"HC[(CMeNAr)]2 (Ar = 2,6-iPr2C6H3)",Dipp-NacNac,$hc_cmenar_2_ar_2_6_ipr2c6h3__e37148fe,,ligand,beta_diketiminates_NacNac,2 N ligand
+"HC[(CMeNAr)]2 (Ar = 2,6-iPr2C6H3)",Dipp-NacNac,$hc_cmenar_2_ar_2_6_ipr2c6h3__e37148fe,,ligand,beta_diketiminates_nacnac,2 N ligand
 IMes,IMes,141556-45-8,,ligand,nhc_imidazolylidenes,1 C(carbene) ligand
 IPr,IPr,246047-72-3,,ligand,nhc_imidazolylidenes,1 C(carbene) ligand
-iPr-BOX,iPr-BOX,$ipr_box__e6c0f107,,ligand,bisoxazolines_BOX,2 N ligand
+iPr-BOX,iPr-BOX,$ipr_box__e6c0f107,,ligand,bisoxazolines_box,2 N ligand
 iPr-PHOX,iPrPHOX,$ipr_phox__2319163b,,ligand,phox_pn,2 P ligand
-iPr-substituted PyOx,iPr-PyOx,$ipr_substituted_pyox__c86da0aa,,ligand,pyridine_oxazolines_PyOx,2 N ligand
+iPr-substituted PyOx,iPr-PyOx,$ipr_substituted_pyox__c86da0aa,,ligand,pyridine_oxazolines_pyox,2 N ligand
 IPrCl,IPrCl,250285-32-6,,ligand,nhc_imidazolylidenes,1 C(carbene) ligand
 JackiePhos,JackiePhos,1160861-60-8,,ligand,dialkylbiaryl_phosphines,1 P ligand
 Jacobsen's salen,salen*,$jacobsen_s_salen__2f671ad3,,ligand,salen_salophen,4 N ligand
@@ -277,11 +273,10 @@ meCgPPh,meCgPhos,97739-46-3,,ligand,dialkylbiaryl_phosphines,1 P ligand
 MeO-BIPHEP,MeO-BIPHEP,52364-71-3,,ligand,bidentate_diphosphines,2 P ligand
 MePhos,MePhos,251320-86-2,,ligand,dialkylbiaryl_phosphines,1 P ligand
 Methyldiphenylphosphine,PMePh2,1486-28-8,,ligand,trialkyl_triaryl_phosphines,1 P ligand
-Milstein PNP-iPr,PNP-iPr,$milstein_pnp_ipr__1c690c50,,ligand,pincers_PNP_PCP_PNN_CNN,1 varies ligand
+Milstein PNP-iPr,PNP-iPr,$milstein_pnp_ipr__1c690c50,,ligand,pincers_pnp_pcp_pnn_cnn,1 varies ligand
 Mor-DalPhos,Mor-DalPhos,1237588-12-3,,ligand,dialkylbiaryl_phosphines,1 P ligand
 MorDalPhos,MorDalPhos,1447952-32-2,,ligand,dialkylbiaryl_phosphines,1 P ligand
-N,N/A,7727-37-9,,ligand,ligandless,0 ligand
-"N,N'-bis(2,4,6-trimethoxyphenyl)ethanediamide",,957476-07-2,,ligand,diamines,2 N ligand
+"N,N'-bis(2,4,6-trimethoxyphenyl)ethanediamide",BTMPO,957476-07-2,,ligand,diamines,2 N ligand
 "N,N'-bis(4-hydroxy-2,6-dimethylphenyl)ethanediamide",,1809288-95-6,,ligand,salen_salophen,2 N ligand
 "N,N'-Dibenzyloxamide",DBOA,3551-78-8,,ligand,diamines,2 N ligand
 "N,N'-Dimethylethylenediamine","N,N'-Dimethylethylenediamine",110-70-3,,ligand,diamines,2 N ligand
@@ -289,38 +284,36 @@ N,N/A,7727-37-9,,ligand,ligandless,0 ligand
 "N,N-Dimethylglycine","N,N-Dimethylglycine",1118-68-9,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 N-Methylglycine,Sarcosine,107-97-1,,ligand,diamines,2 N ligand
 N-XantPhos,XantPhos,261733-18-0,,ligand,dialkylbiaryl_phosphines,1 P ligand
-"N1,N2-bis(1-naphthalenylmethyl)ethanediamide",,2281918-10-1,,ligand,diamines,2 N ligand
+"N1,N2-bis(1-naphthalenylmethyl)ethanediamide",BNMO,2281918-10-1,,ligand,diamines,2 N ligand
 "N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide",,289708-48-1,,ligand,oxalamide,2 N ligand
 "N1,N2-Dimethylethanediamide",DMEDA,615-35-0,,ligand,diamines,2 N ligand
-NCN pincer,NCN,$ncn_pincer__2c08e833,,ligand,pincers_PNP_PCP_PNN_CNN,1 varies ligand
 "Neocuproine (2,9-dimethyl-1,10-phenanthroline)",neocuproine,484-11-7,,ligand,phenanthrolines,2 N ligand
-PCP-tBu (Buchwald-type pincer),PCP-tBu,$pcp_tbu_buchwald_type_pincer__0927e9d1,,ligand,pincers_PNP_PCP_PNN_CNN,1 varies ligand
+PCP-tBu (Buchwald-type pincer),PCP-tBu,$pcp_tbu_buchwald_type_pincer__0927e9d1,,ligand,pincers_pnp_pcp_pnn_cnn,1 varies ligand
 Ph-XPhos,Ph-XPhos,1185098-04-7,,ligand,dialkylbiaryl_phosphines,1 P ligand
 PhDavePhos,PhDavePhos,240417-00-9,,ligand,dialkylbiaryl_phosphines,1 P ligand
 Picolinic acid,98-98-6,98-98-6,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 PMPBO,PMPBO,1909333-82-9,,ligand,phox_pn,2 P ligand
-PyBOX (pyridine-bis(oxazoline)),PyBOX,$pybox_pyridine_bis_oxazoline__2eada5d5,,ligand,bisoxazolines_BOX,2 N ligand
-"Pyridine-bis(oxazoline), iPr-substituted",iPr-PyBOX,$pyridine_bis_oxazoline_ipr_substituted__c91418f0,,ligand,bisoxazolines_BOX,2 N ligand
-"Pyridine-bis(oxazoline), tBu-substituted",tBu-PyBOX,$pyridine_bis_oxazoline_tbu_substituted__7b428bbb,,ligand,bisoxazolines_BOX,2 N ligand
+PyBOX (pyridine-bis(oxazoline)),PyBOX,$pybox_pyridine_bis_oxazoline__2eada5d5,,ligand,bisoxazolines_box,2 N ligand
+"Pyridine-bis(oxazoline), iPr-substituted",iPr-PyBOX,$pyridine_bis_oxazoline_ipr_substituted__c91418f0,,ligand,bisoxazolines_box,2 N ligand
+"Pyridine-bis(oxazoline), tBu-substituted",tBu-PyBOX,$pyridine_bis_oxazoline_tbu_substituted__7b428bbb,,ligand,bisoxazolines_box,2 N ligand
 QPhos,QPhos,384347-21-1,,ligand,dialkylbiaryl_phosphines,1 P ligand
 rac-Binap,rac-BINAP,98327-87-8,,ligand,bidentate_diphosphines,2 P ligand
 RockPhos,RockPhos,1262046-34-3,,ligand,dialkylbiaryl_phosphines,1 P ligand
 RuPhos,RuPhos,787618-22-8,,ligand,dialkylbiaryl_phosphines,1 P ligand
 S-Binap,S-BINAP,76189-56-5,,ligand,bidentate_diphosphines,2 P ligand
-Salicylaldoxime,SAO,94-67-7,,ligand,quinolinol_NO_chelates,2 N ligand
+Salicylaldoxime,SAO,94-67-7,,ligand,quinolinol_no_chelates,2 N ligand
 Salophen,salophen,$salophen__c6a875d6,,ligand,salen_salophen,4 N ligand
 SEGPHOS,SEGPHOS,145854-69-9,,ligand,bidentate_diphosphines,2 P ligand
 SIMes,SIMes,141556-44-7,,ligand,nhc_imidazolylidenes,1 C(carbene) ligand
 SIPr,SIPr,343970-73-8,,ligand,nhc_imidazolylidenes,1 C(carbene) ligand
 SPhos,SPhos,657408-07-6,,ligand,dialkylbiaryl_phosphines,1 P ligand
 SSPhos,SSPhos,1049726-96-6,,ligand,dialkylbiaryl_phosphines,1 P ligand
-Sulfonated 8-hydroxyquinoline (generic),SO3-Oxine,$sulfonated_8_hydroxyquinoline_generic__f59fa1a1,,ligand,quinolinol_NO_chelates,2 N ligand
 SynPhos,SynPhos,205319-91-7,,ligand,bidentate_diphosphines,2 P ligand
 t-Bu)PhCPhos,t-BuPhCPhos,1660153-91-2,,ligand,dialkylbiaryl_phosphines,1 P ligand
 TADDOL-derived phosphoramidite,TADDOL-Phosamidite,$taddol_derived_phosphoramidite__ca07c850,,ligand,phosphoramidites,1 P ligand
-tBu-BOX,tBu-BOX,$tbu_box__533ea394,,ligand,bisoxazolines_BOX,2 N ligand
+tBu-BOX,tBu-BOX,$tbu_box__533ea394,,ligand,bisoxazolines_box,2 N ligand
 tBu-PHOX,tBuPHOX,$tbu_phox__98334760,,ligand,phox_pn,2 P ligand
-tBu-substituted PyOx,tBu-PyOx,$tbu_substituted_pyox__bd918479,,ligand,pyridine_oxazolines_PyOx,2 N ligand
+tBu-PyOx,tBu-PyOx,$tbu_substituted_pyox__bd918479,,ligand,pyridine_oxazolines_pyox,2 N ligand
 tBuBrettPhos,tBuBrettPhos,1160861-53-9,,ligand,dialkylbiaryl_phosphines,1 P ligand
 tBuDavePhos,tBuDavePhos,224311-49-3,,ligand,dialkylbiaryl_phosphines,1 P ligand
 tBuMePhos,tBuMePhos,255837-19-5,,ligand,dialkylbiaryl_phosphines,1 P ligand
@@ -344,7 +337,7 @@ Triphenyl phosphite,P(OPh)3,$triphenyl_phosphite__dbe546c7,,ligand,phosphites,1 
 Triphenylphosphine,PPh3,603-35-0,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 Triphos,Triphos,22031-12-5,,ligand,tridentate_triphos,3 P ligand
 Tris(2-furyl)phosphine,P(2-furyl)3,5518-52-5,,ligand,trialkyl_triaryl_phosphines,1 P ligand
-Tris(2-pyridylmethyl)amine,TPMA,16858-01-8,,ligand,tris_2pyridylmethyl_amine_TPMA,4 N ligand
+Tris(2-pyridylmethyl)amine,TPMA,16858-01-8,,ligand,tris_2pyridylmethyl_amine_tpma,4 N ligand
 Tris(mesityl)phosphine,P(mes)3,23897-15-6,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 Tris(n-octyl)phosphine,P(nOct)3,4731-53-7,,ligand,trialkyl_triaryl_phosphines,1 P ligand
 Tris(o-methoxyphenyl)phosphine,P(o-MeO-Ph)3,4731-65-1,,ligand,trialkyl_triaryl_phosphines,1 P ligand
@@ -360,7 +353,7 @@ TrixiePhos,TrixiePhos,255836-67-0,,ligand,dialkylbiaryl_phosphines,1 P ligand
 VPhos,VPhos,1848244-75-6,,ligand,dialkylbiaryl_phosphines,1 P ligand
 Xantphos,XantPhos,161265-03-8,,ligand,bidentate_diphosphines,2 P ligand
 XPhos,XPhos,564483-18-7,,ligand,dialkylbiaryl_phosphines,1 P ligand
-β-Diketiminate (generic),NacNac,$diketiminate_generic__f5485ca9,,ligand,beta_diketiminates_NacNac,2 N ligand
+β-Diketiminate (generic),NacNac,$diketiminate_generic__f5485ca9,,ligand,beta_diketiminates_nacnac,2 N ligand
 "[2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane",XPhos Pd G2,1310584-14-5,,metal_catalyst,pd_phosphine_complexes,Pd(2) catalyst
 "[2-(2-Aminophenyl)phenyl]-chloro-palladium dicyclohexyl-[2-(2,4,6-triisopropylphenyl)phenyl]phosphane",XPhos Pd G2,1310584-14-5,,metal_catalyst,pd_phosphine_complexes,Pd(2) catalyst
 "Bis(1,5-cyclooctadiene)nickel(0)",Ni(cod)2,1295-35-8,,metal_catalyst,ni_zero_sources,Ni(0) catalyst
@@ -375,9 +368,9 @@ Chlorodicarbonylrhodium(I) dimer,[Rh(CO)2Cl]2,14523-22-9,,metal_catalyst,rh_carb
 Cobalt(II) acetylacetonate,Co(acac)2,14024-48-7,,metal_catalyst,co_beta_diketonates,Co(2) catalyst
 Cobalt(II) bromide,CoBr2,7789-43-7,,metal_catalyst,co_ii_halides,Co(2) catalyst
 Cobalt(II) chloride,CoCl2,7646-79-9,,metal_catalyst,co_ii_halides,Co(2) catalyst
-Copper,Cu(0),7440-50-8,,metal_catalyst,pure metal,Cu(0) catalyst
+Copper,Cu(0),7440-50-8,,metal_catalyst,pure_metal,Cu(0) catalyst
 Copper bromide,CuBr2,7789-45-9,,metal_catalyst,cu_ii_salts,Cu(2) catalyst
-Copper oxide (Cu2O),Cu2O,1317-39-1,,metal_catalyst,copper salt,Cu(1) catalyst
+Copper oxide (Cu2O),Cu2O,1317-39-1,,metal_catalyst,copper_salt,Cu(1) catalyst
 Copper oxide (CuO),CuO,1317-38-0,,metal_catalyst,cu_ii_salts,Cu(2) catalyst
 Copper Sulfate,CuSO4,7758-98-7,,metal_catalyst,cu_ii_salts,Cu(2) catalyst
 Copper(I) bromide,CuBr,7787-70-4,,metal_catalyst,cu_i_halides,Cu(1) catalyst
@@ -396,8 +389,8 @@ Iron pentacarbonyl,Fe(CO)5,13463-40-6,,metal_catalyst,fe_carbonyls,Fe(0) catalys
 Iron(II) chloride,FeCl2,7758-94-3,,metal_catalyst,fe_halides,Fe(2) catalyst
 Iron(III) chloride,FeCl3,7705-08-0,,metal_catalyst,fe_halides,Fe(2) catalyst
 "Methoxy(1,5‑cyclooctadiene)iridium(I) dimer",[Ir(OMe)(cod)]2,12148-71-9,,metal_catalyst,ir_cod_dimers,Ir(1) catalyst
-Nickel,Nickel,7440-02-0,,metal_catalyst,Ni metal,Ni(0) catalyst
-Nickel Acetate,NiOAc2,373-02-4,,metal_catalyst,Ni salt,Ni(2) catalyst
+Nickel,Nickel,7440-02-0,,metal_catalyst,ni_metal,Ni(0) catalyst
+Nickel Acetate,NiOAc2,373-02-4,,metal_catalyst,ni_salt,Ni(2) catalyst
 Nickel ferrite,Nickel ferrite,12168-54-6,,metal_catalyst,ni_zero_sources,Ni(0) catalyst
 Nickel(II) acetate tetrahydrate,Ni(OAc)2·4H2O,6018-89-9,,metal_catalyst,ni_ii_carboxylates,Ni(2) catalyst
 Nickel(II) acetylacetonate,Ni(acac)2,3264-82-2,,metal_catalyst,ni_ii_carboxylates,Ni(2) catalyst
@@ -413,7 +406,7 @@ Palladium(II) chloride,PdCl2,7647-10-1,,metal_catalyst,pd_ii_salts,Pd(2) catalys
 Palladium(II) dichloride complex of Amphos,Pd(amphos)Cl2,887919-35-9,,metal_catalyst,pd_phosphine_complexes,Pd(2) catalyst
 Palladium(II) trifluoroacetate,Pd(TFA)2,42196-31-6,,metal_catalyst,pd_ii_salts,Pd(2) catalyst
 "Palladium, di-mu-chlorobis(eta3-2-propenyl)di-","Palladium, di-mu-chlorobis(eta3-2-propenyl)di-",12012-95-2,,metal_catalyst,pd_ii_salts,Pd(2) catalyst
-Pd(crotyl)Cl,Pd-170,1798782-02-1,,metal_catalyst,pd_zero_sources,Pd(0) catalyst
+Pd(crotyl)Cl,,1798782-02-1,,metal_catalyst,pd_zero_sources,Pd(0) catalyst
 Ruthenium(III) chloride hydrate,RuCl3·xH2O,14898-67-0,,metal_catalyst,ru_arene_dimer,Ru(2) catalyst
 tetrakis(acetonitrile)copper(I) hexafluorophosphate,tetrakis(acetonitrile)copper(I) hexafluorophosphate,64443-05-6,,metal_catalyst,pd_ii_salts,Cd(2) catalyst
 Tetrakis(acetonitrile)palladium(II) bis(tetrafluoroborate),Pd(MeCN)4(BF4)2,21797-13-7,,metal_catalyst,pd_ii_salts,Pd(2) catalyst
@@ -455,14 +448,14 @@ Zinc dust,Zn,7440-66-6,,reductant,metal_powders,high reductant
 "1,2-Dichloroethane",DCE,107-06-2,,solvent,halogenated_aliphatics,medium aprotic solvent
 "1,2-Dimethoxyethane",DME,110-71-4,,solvent,ethers_cyclic_glymes,medium aprotic solvent
 "1,3-Dimethyl-2-imidazolidinone",DMI,80-73-9,,solvent,amides_dipolar_aprotic,high aprotic solvent
-"1,4-Dioxane",,123-91-1,,solvent,ethers_cyclic_glymes,medium aprotic solvent
+"1,4-Dioxane",Dioxane,123-91-1,,solvent,ethers_cyclic_glymes,medium aprotic solvent
 1-Butanol,n-BuOH,71-36-3,,solvent,alcohols_primary,medium protic solvent
 1-Octanol,C8OH,111-87-5,,solvent,alcohols_primary,medium protic solvent
 1-Propanol,n-PrOH,71-23-8,,solvent,alcohols_primary,medium protic solvent
 "2,2,2-Trifluoroethanol",TFE,75-89-8,,solvent,fluorinated_alcohols,high acidic solvent
 2-Butanol,s-BuOH,78-92-2,,solvent,alcohols_secondary,medium protic solvent
-2-Ethoxyethanol,Ethyl cellosolve,110-80-5,,solvent,glycol_ethers_polyols,medium protic solvent
-2-Methoxyethanol,Methyl cellosolve,109-86-4,,solvent,glycol_ethers_polyols,medium protic solvent
+2-Ethoxyethanol,,110-80-5,,solvent,glycol_ethers_polyols,medium protic solvent
+2-Methoxyethanol,,109-86-4,,solvent,glycol_ethers_polyols,medium protic solvent
 2-Methyl-2-butanol,t-AmylOH,75-85-4,,solvent,alcohols_tertiary,medium protic solvent
 2-Methyltetrahydrofuran,MeTHF,96-47-9,,solvent,ethers_cyclic_glymes,medium aprotic solvent
 2-Propanol,i-PrOH,67-63-0,,solvent,alcohols_secondary,medium protic solvent
@@ -488,42 +481,42 @@ Diisopropyl ether,DIPE,108-20-3,,solvent,ethers_acyclic,low aprotic solvent
 Dimethyl sulfoxide,DMSO,67-68-5,,solvent,sulfoxides_dipolar_aprotic,very_high aprotic solvent
 Ethanol,EtOH,64-17-5,,solvent,alcohols_primary,medium protic solvent
 Ethyl acetate,EtOAc,141-78-6,,solvent,esters_anhydrides,medium aprotic solvent
-Ethylene glycol,EG,107-21-1,,solvent,glycol_ethers_polyols,medium protic solvent
+Ethylene glycol,,107-21-1,,solvent,glycol_ethers_polyols,medium protic solvent
 Hexafluoroisopropanol,HFIP,920-66-1,,solvent,fluorinated_alcohols,high acidic solvent
 Isobutanol,i-BuOH,78-83-1,,solvent,alcohols_primary,medium protic solvent
 Isopropyl acetate,iPrOAc,108-21-4,,solvent,esters_anhydrides,medium aprotic solvent
 m-Xylene,m-Xyl,108-38-3,,solvent,hydrocarbons_aromatic,low aprotic solvent
-Mesitylene,Mes,108-67-8,,solvent,hydrocarbons_aromatic,low aprotic solvent
+Mesitylene,,108-67-8,,solvent,hydrocarbons_aromatic,low aprotic solvent
 Methanol,MeOH,67-56-1,,solvent,alcohols_primary,medium protic solvent
 Methyl ethyl ketone,MEK,78-93-3,,solvent,ketones,medium aprotic solvent
 Methyl isobutyl ketone,MIBK,108-10-1,,solvent,ketones,medium aprotic solvent
 "N,N-Dimethylacetamide",DMAc,127-19-5,,solvent,amides_dipolar_aprotic,high aprotic solvent
 "N,N-Dimethylformamide",DMF,68-12-2,,solvent,amides_dipolar_aprotic,high aprotic solvent
 n-Butyl acetate,BuOAc,123-86-4,,solvent,esters_anhydrides,medium aprotic solvent
-n-Heptane,Hept,142-82-5,,solvent,hydrocarbons_aliphatic_linear,very_low aprotic solvent
-n-Hexane,Hex,110-54-3,,solvent,hydrocarbons_aliphatic_linear,very_low aprotic solvent
+n-Heptane,,142-82-5,,solvent,hydrocarbons_aliphatic_linear,very_low aprotic solvent
+n-Hexane,,110-54-3,,solvent,hydrocarbons_aliphatic_linear,very_low aprotic solvent
 N-Methyl-2-pyrrolidone,NMP,872-50-4,,solvent,amides_dipolar_aprotic,high aprotic solvent
 n-Pentane,Pent,109-66-0,,solvent,hydrocarbons_aliphatic_linear,very_low aprotic solvent
 Nitrobenzene,PhNO2,98-95-3,,solvent,nitro_solvents,high aprotic solvent
 Nitromethane,MeNO2,75-52-5,,solvent,nitro_solvents,high aprotic solvent
 NMI,NMI,7479-20-1,,solvent,amides_dipolar_aprotic,high aprotic solvent
 o-Xylene,o-Xyl,95-47-6,,solvent,hydrocarbons_aromatic,low aprotic solvent
-Octanoic acid,C8:0,124-07-2,,solvent,carboxylic_acids,medium acidic solvent
-p-Xylene,p-Xyl,106-42-3,,solvent,hydrocarbons_aromatic,low aprotic solvent
-Ph2O,DPE,101-84-8,,solvent,ethers_acyclic,low aprotic solvent
+Octanoic acid,,124-07-2,,solvent,carboxylic_acids,medium acidic solvent
+p-Xylene,,106-42-3,,solvent,hydrocarbons_aromatic,low aprotic solvent
+Ph2O,,101-84-8,,solvent,ethers_acyclic,low aprotic solvent
 Poly(ethylene glycol) 400,PEG-400,25322-68-3,,solvent,glycol_ethers_polyols,medium protic solvent
 Propionic acid,PrCO2H,79-09-4,,solvent,carboxylic_acids,medium acidic solvent
 Propionitrile,C2H5CN,107-12-0,,solvent,nitriles,high aprotic solvent
-propylene carbonate,PC,108-32-7,,solvent,esters_anhydrides,high aprotic solvent
-Pyridine,Py,110-86-1,,solvent,amines_tertiary,medium basic solvent
-Sulfolane,Sulfolane,126-33-0,,solvent,Sulfolane,high aprotic solvent
+propylene carbonate,,108-32-7,,solvent,esters_anhydrides,high aprotic solvent
+Pyridine,,110-86-1,,solvent,amines_tertiary,medium basic solvent
+Sulfolane,Sulfolane,126-33-0,,solvent,sulfolane,high aprotic solvent
 tert-Butanol,t-BuOH,75-65-0,,solvent,alcohols_tertiary,medium protic solvent
 tert-Butyl methyl ether,MTBE,1634-04-4,,solvent,ethers_acyclic,low aprotic solvent
-Tetrachloroethylene,PCE,127-18-4,,solvent,halogenated_aliphatics,medium aprotic solvent
+Tetrachloroethylene,,127-18-4,,solvent,halogenated_aliphatics,medium aprotic solvent
 Tetrahydrofuran,THF,109-99-9,,solvent,ethers_cyclic_glymes,medium aprotic solvent
 Toluene,PhMe,108-88-3,,solvent,hydrocarbons_aromatic,low aprotic solvent
 Triethylamine,Et3N,121-44-8,,solvent,amines_tertiary,medium basic solvent
 Trifluoroacetic acid,TFA,76-05-1,,solvent,carboxylic_acids,medium acidic solvent
 Trifluoromethylbenzene,PhCF3,98-08-8,,solvent,hydrocarbons_aromatic,low aprotic solvent
 Water,H2O,7732-18-5,,solvent,water,very_high protic solvent
-Xylenes (mixed isomers),Xylenes,1330-20-7,,solvent,hydrocarbons_aromatic,low aprotic solvent
+Xylenes,Xylenes,1330-20-7,,solvent,hydrocarbons_aromatic,low aprotic solvent

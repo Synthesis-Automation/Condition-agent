@@ -497,7 +497,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "bis_imino_pyridines_PDI"
+          "bis_imino_pyridines_pdi"
         ],
         "donors": [
           "N",
@@ -507,7 +507,7 @@
         "denticity": 3
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_PDI | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: PDI | CAS: null | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
+    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_pdi | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: PDI | CAS: null | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
   },
   {
     "id": "2_6_bis_2_6_diisopropylphenyl_imino_pyridine__b867b4c4",
@@ -522,7 +522,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "bis_imino_pyridines_PDI"
+          "bis_imino_pyridines_pdi"
         ],
         "donors": [
           "N",
@@ -532,7 +532,7 @@
         "denticity": 3
       }
     },
-    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_PDI | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: DIPP-PDI | CAS: null | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
+    "embedding_text": "role: ligand | family_label: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate) | family_id: bis_imino_pyridines_pdi | normalized_family: ligand_misc | donors: N,N,N | denticity: 3 | abbr: DIPP-PDI | CAS: null | family_def: Bis(imino)pyridines (PDI/BIP; N,N,N tridentate)"
   },
   {
     "id": "ZEMZPXWZVTUONV-UHFFFAOYSA-N",
@@ -587,7 +587,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "phosphine_pyridine_PN"
+          "phosphine_pyridine_pn"
         ],
         "donors": [
           "P",
@@ -596,7 +596,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: null | aliases: 2Diphenylphosphinopyridine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
+    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: null | aliases: 2Diphenylphosphinopyridine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
     "id": "AEVYOOWHCJTENF-UHFFFAOYSA-N",
@@ -945,7 +945,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "quinolinol_NO_chelates"
+          "quinolinol_no_chelates"
         ],
         "donors": [
           "N",
@@ -954,7 +954,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: 8-Quinolinol (oxine) N,O chelates | family_id: quinolinol_NO_chelates | normalized_family: ligand_misc | donors: N,O | denticity: 2 | abbr: Oxine | CAS: 148-24-3 | aliases: 8Hydroxyquinoline | family_def: 8-Quinolinol (oxine) N,O chelates"
+    "embedding_text": "role: ligand | family_label: 8-Quinolinol (oxine) N,O chelates | family_id: quinolinol_no_chelates | normalized_family: ligand_misc | donors: N,O | denticity: 2 | abbr: Oxine | CAS: 148-24-3 | aliases: 8Hydroxyquinoline | family_def: 8-Quinolinol (oxine) N,O chelates"
   },
   {
     "id": "FJKUOCCQEBLPNX-UHFFFAOYSA-N",
@@ -985,7 +985,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "quinolinol_NO_chelates"
+          "quinolinol_no_chelates"
         ],
         "donors": [
           "N",
@@ -1002,7 +1002,7 @@
         "_note": "LLM-suggested alternative role"
       }
     },
-    "embedding_text": "type: LIGAND | family: quinolinol_NO_chelates (quinolinol_NO_chelates) | denticity: 2 | name: 8-Quinolinol N-oxide | abbr: 8-HQNO | CAS: 1127-45-3 | synonyms: 8-Hydroxyquinoline N-oxide; 1127-45-3; 8-Hydroxyquinoline-N-oxide; 8-Hydroxyquinoline 1-oxide; 8-QUINOLINOL, N-OXIDE; NSC-21656; OXYQUINOLINE N-OXIDE; TMI4LD989P; DTXSID70150142; HYDROXYQUINOLINE 1-OXIDE, 8-; CCRIS 4451; EINECS 214-430-3; NSC 21656; UNII-TMI4LD989P; BRN 0128737; RefChem:107199; Oxine N-oxide"
+    "embedding_text": "type: LIGAND | family: quinolinol_no_chelates (quinolinol_no_chelates) | denticity: 2 | name: 8-Quinolinol N-oxide | abbr: 8-HQNO | CAS: 1127-45-3 | synonyms: 8-Hydroxyquinoline N-oxide; 1127-45-3; 8-Hydroxyquinoline-N-oxide; 8-Hydroxyquinoline 1-oxide; 8-QUINOLINOL, N-OXIDE; NSC-21656; OXYQUINOLINE N-OXIDE; TMI4LD989P; DTXSID70150142; HYDROXYQUINOLINE 1-OXIDE, 8-; CCRIS 4451; EINECS 214-430-3; NSC 21656; UNII-TMI4LD989P; BRN 0128737; RefChem:107199; Oxine N-oxide"
   },
   {
     "id": "adbrettphos__1160861-59-5",
@@ -1123,7 +1123,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "phosphine_pyridine_PN"
+          "phosphine_pyridine_pn"
         ],
         "donors": [
           "P",
@@ -1132,7 +1132,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: APhos | CAS: 932710-63-9 | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
+    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: APhos | CAS: 932710-63-9 | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
     "id": "bathophenanthroline__1662-01-7",
@@ -1750,7 +1750,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "dalphos_PN"
+          "dalphos_pn"
         ],
         "donors": [
           "P",
@@ -1759,7 +1759,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: DalPhos P,N chelates | family_id: dalphos_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: Ad2P-pip-Ph | CAS: 1237588-13-4 | aliases: Di1adamantyl1piperidinylphenylphosphine | family_def: DalPhos P,N chelates"
+    "embedding_text": "role: ligand | family_label: DalPhos P,N chelates | family_id: dalphos_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: Ad2P-pip-Ph | CAS: 1237588-13-4 | aliases: Di1adamantyl1piperidinylphenylphosphine | family_def: DalPhos P,N chelates"
   },
   {
     "id": "di_1_adamantylphosphino_biphenyl__224311-55-1",
@@ -2010,7 +2010,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "phosphine_pyridine_PN"
+          "phosphine_pyridine_pn"
         ],
         "donors": [
           "P",
@@ -2019,7 +2019,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_PN | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: 37943-90-1 | aliases: Diphenyl2pyridylphosphine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
+    "embedding_text": "role: ligand | family_label: Phosphine–pyridine (P,N) hemilabile ligands | family_id: phosphine_pyridine_pn | normalized_family: ligand_misc | donors: P,N | denticity: 2 | abbr: PPh2Py | CAS: 37943-90-1 | aliases: Diphenyl2pyridylphosphine | family_def: Phosphine–pyridine (P,N) hemilabile ligands"
   },
   {
     "id": "diphenylphosphine__829-85-6",
@@ -2175,7 +2175,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "phosphine_pyridine_PN"
+          "phosphine_pyridine_pn"
         ],
         "donors": [
           "P",
@@ -2192,7 +2192,7 @@
         "_note": "LLM-suggested alternative role"
       }
     },
-    "embedding_text": "type: LIGAND | family: phosphine_pyridine_PN (phosphine_pyridine_PN) | denticity: 2 | name: DMPAO | abbr: DMPAO | CAS: 2903-48-2 | synonyms: 2-(2,6-Dimethylphenylamino)-2-oxoacetic acid; RefChem:824202; 2903-48-2; [(2,6-dimethylphenyl)carbamoyl]formic acid; 2,6-Dimethylanilino(oxo)acetic acid; N-(2,6-Dimethylphenyl)oxamic acid; 2-(2,6-dimethylanilino)-2-oxoacetic acid; MFCD10018453; Acetic acid, 2-[(2,6-dimethylphenyl)amino]-2-oxo-; [(2,6-Dimethylphenyl)amino](oxo)acetic Acid; 2-((2,6-Dimethylphenyl)amino)-2-oxoacetic acid; Oxanilic acid, 2',6'-dimethyl-; CVT-2537; J7KKT84Z1Z; RS-89289; Acetic acid, 2-((2,6-dimethylphenyl)amino)-2-oxo-; 2-(Dimethylphosphino)pyridine N-oxide; 2-(Dimethylphosphanyl)pyridine 1-oxide"
+    "embedding_text": "type: LIGAND | family: phosphine_pyridine_pn (phosphine_pyridine_pn) | denticity: 2 | name: DMPAO | abbr: DMPAO | CAS: 2903-48-2 | synonyms: 2-(2,6-Dimethylphenylamino)-2-oxoacetic acid; RefChem:824202; 2903-48-2; [(2,6-dimethylphenyl)carbamoyl]formic acid; 2,6-Dimethylanilino(oxo)acetic acid; N-(2,6-Dimethylphenyl)oxamic acid; 2-(2,6-dimethylanilino)-2-oxoacetic acid; MFCD10018453; Acetic acid, 2-[(2,6-dimethylphenyl)amino]-2-oxo-; [(2,6-Dimethylphenyl)amino](oxo)acetic Acid; 2-((2,6-Dimethylphenyl)amino)-2-oxoacetic acid; Oxanilic acid, 2',6'-dimethyl-; CVT-2537; J7KKT84Z1Z; RS-89289; Acetic acid, 2-((2,6-dimethylphenyl)amino)-2-oxo-; 2-(Dimethylphosphino)pyridine N-oxide; 2-(Dimethylphosphanyl)pyridine 1-oxide"
   },
   {
     "id": "dpephos__166330-10-5",
@@ -2491,7 +2491,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "beta_diketiminates_NacNac"
+          "beta_diketiminates_nacnac"
         ],
         "donors": [
           "N",
@@ -2500,7 +2500,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: beta_diketiminates_NacNac | family_id: beta_diketiminates_NacNac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: Dipp-NacNac | CAS: null | family_def: beta_diketiminates_NacNac"
+    "embedding_text": "role: ligand | family_label: beta_diketiminates_nacnac | family_id: beta_diketiminates_nacnac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: Dipp-NacNac | CAS: null | family_def: beta_diketiminates_nacnac"
   },
   {
     "id": "imes__141556-45-8",
@@ -2563,7 +2563,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "bisoxazolines_BOX"
+          "bisoxazolines_box"
         ],
         "donors": [
           "N",
@@ -2572,7 +2572,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-BOX | CAS: null | aliases: iPrBOX | family_def: bisoxazolines_BOX"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_box | family_id: bisoxazolines_box | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-BOX | CAS: null | aliases: iPrBOX | family_def: bisoxazolines_box"
   },
   {
     "id": "ipr_phox__2319163b",
@@ -2613,7 +2613,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "pyridine_oxazolines_PyOx"
+          "pyridine_oxazolines_pyox"
         ],
         "donors": [
           "N",
@@ -2622,7 +2622,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: pyridine_oxazolines_PyOx | family_id: pyridine_oxazolines_PyOx | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-PyOx | CAS: null | aliases: iPrsubstitutedPyOx | family_def: pyridine_oxazolines_PyOx"
+    "embedding_text": "role: ligand | family_label: pyridine_oxazolines_pyox | family_id: pyridine_oxazolines_pyox | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-PyOx | CAS: null | aliases: iPrsubstitutedPyOx | family_def: pyridine_oxazolines_pyox"
   },
   {
     "id": "iprcl__250285-32-6",
@@ -2957,7 +2957,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "pincers_PNP_PCP_PNN_CNN"
+          "pincers_pnp_pcp_pnn_cnn"
         ],
         "donors": [
           "varies"
@@ -2965,7 +2965,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: pincers_PNP_PCP_PNN_CNN | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: PNP-iPr | CAS: null | aliases: MilsteinPNPiPr | family_def: pincers_PNP_PCP_PNN_CNN"
+    "embedding_text": "role: ligand | family_label: pincers_pnp_pcp_pnn_cnn | family_id: pincers_pnp_pcp_pnn_cnn | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: PNP-iPr | CAS: null | aliases: MilsteinPNPiPr | family_def: pincers_pnp_pcp_pnn_cnn"
   },
   {
     "id": "mor_dalphos__1237588-12-3",
@@ -3433,7 +3433,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND | family: bisoxazolines_BOX (bisoxazolines_BOX) | denticity: 2 | name: N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide | abbr: BOX | CAS: 289708-48-1 | synonyms: N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide; 289708-48-1; MFCD34182524; SCHEMBL4573808; AT25935; SY333648; N,N'-bis(2,5-dimethylpyrrol-1-yl)oxamide; B6291; N1,N2-Bis(2,5-dimethyl-1-pyrrolyl)oxalamide; N,N'-bis(2,5-dimethylpyrrol-1-yl)ethanediamide; N1,N2-Bis(2,5-dimethylpyrrol-1-yl)oxalamide"
+    "embedding_text": "type: LIGAND | family: bisoxazolines_box (bisoxazolines_box) | denticity: 2 | name: N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide | abbr: BOX | CAS: 289708-48-1 | synonyms: N1,N2-Bis(2,5-dimethyl-1H-pyrrol-1-YL)oxalamide; 289708-48-1; MFCD34182524; SCHEMBL4573808; AT25935; SY333648; N,N'-bis(2,5-dimethylpyrrol-1-yl)oxamide; B6291; N1,N2-Bis(2,5-dimethyl-1-pyrrolyl)oxalamide; N,N'-bis(2,5-dimethylpyrrol-1-yl)ethanediamide; N1,N2-Bis(2,5-dimethylpyrrol-1-yl)oxalamide"
   },
   {
     "id": "IPZCJUOJSODZNK-UHFFFAOYSA-N",
@@ -3495,7 +3495,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "pincers_PNP_PCP_PNN_CNN"
+          "pincers_pnp_pcp_pnn_cnn"
         ],
         "donors": [
           "varies"
@@ -3503,7 +3503,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: pincers_PNP_PCP_PNN_CNN | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: NCN | CAS: null | aliases: NCNpincer | family_def: pincers_PNP_PCP_PNN_CNN"
+    "embedding_text": "role: ligand | family_label: pincers_pnp_pcp_pnn_cnn | family_id: pincers_pnp_pcp_pnn_cnn | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: NCN | CAS: null | aliases: NCNpincer | family_def: pincers_pnp_pcp_pnn_cnn"
   },
   {
     "id": "neocuproine_2_9_dimethyl_1_10_phenanthroline__484-11-7",
@@ -3544,7 +3544,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "pincers_PNP_PCP_PNN_CNN"
+          "pincers_pnp_pcp_pnn_cnn"
         ],
         "donors": [
           "varies"
@@ -3552,7 +3552,7 @@
         "denticity": 1
       }
     },
-    "embedding_text": "role: ligand | family_label: pincers_PNP_PCP_PNN_CNN | family_id: pincers_PNP_PCP_PNN_CNN | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: PCP-tBu | CAS: null | aliases: PCPtBuBuchwaldtypepincer | family_def: pincers_PNP_PCP_PNN_CNN"
+    "embedding_text": "role: ligand | family_label: pincers_pnp_pcp_pnn_cnn | family_id: pincers_pnp_pcp_pnn_cnn | normalized_family: ligand_misc | donors: varies | denticity: 1 | abbr: PCP-tBu | CAS: null | aliases: PCPtBuBuchwaldtypepincer | family_def: pincers_pnp_pcp_pnn_cnn"
   },
   {
     "id": "ph_xphos__1185098-04-7",
@@ -3689,7 +3689,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "bisoxazolines_BOX"
+          "bisoxazolines_box"
         ],
         "donors": [
           "N",
@@ -3698,7 +3698,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: PyBOX | CAS: null | aliases: PyBOXpyridinebisoxazoline | family_def: bisoxazolines_BOX"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_box | family_id: bisoxazolines_box | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: PyBOX | CAS: null | aliases: PyBOXpyridinebisoxazoline | family_def: bisoxazolines_box"
   },
   {
     "id": "pyridine_bis_oxazoline_ipr_substituted__c91418f0",
@@ -3715,7 +3715,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "bisoxazolines_BOX"
+          "bisoxazolines_box"
         ],
         "donors": [
           "N",
@@ -3724,7 +3724,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-PyBOX | CAS: null | aliases: PyridinebisoxazolineiPrsubstituted | family_def: bisoxazolines_BOX"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_box | family_id: bisoxazolines_box | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: iPr-PyBOX | CAS: null | aliases: PyridinebisoxazolineiPrsubstituted | family_def: bisoxazolines_box"
   },
   {
     "id": "pyridine_bis_oxazoline_tbu_substituted__7b428bbb",
@@ -3741,7 +3741,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "bisoxazolines_BOX"
+          "bisoxazolines_box"
         ],
         "donors": [
           "N",
@@ -3750,7 +3750,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-PyBOX | CAS: null | aliases: PyridinebisoxazolinetBusubstituted | family_def: bisoxazolines_BOX"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_box | family_id: bisoxazolines_box | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-PyBOX | CAS: null | aliases: PyridinebisoxazolinetBusubstituted | family_def: bisoxazolines_box"
   },
   {
     "id": "qphos__384347-21-1",
@@ -3910,7 +3910,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "quinolinol_NO_chelates"
+          "quinolinol_no_chelates"
         ],
         "donors": [
           "N",
@@ -3919,7 +3919,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "type: LIGAND | family: quinolinol_NO_chelates (quinolinol_NO_chelates) | denticity: 2 | name: Salicylaldoxime | abbr: SAO | CAS: 94-67-7 | synonyms: Salicylaldoxime; 2-Hydroxybenzaldehyde oxime; 94-67-7; Saldox; o-Hydroxybenzaldoxime; 2-Hydroxybenzaldoxime; Salicylaldehydoxime; o-Hydroxybenzaldehyde oxime; Benzaldehyde, 2-hydroxy-, oxime; (2-Hydroxyphenylmethylene)azanol; 2-Formylphenol oxime; 2QTV2A0T5Q; NSC-5057; RefChem:180918; 202-353-8; 21013-96-7"
+    "embedding_text": "type: LIGAND | family: quinolinol_no_chelates (quinolinol_no_chelates) | denticity: 2 | name: Salicylaldoxime | abbr: SAO | CAS: 94-67-7 | synonyms: Salicylaldoxime; 2-Hydroxybenzaldehyde oxime; 94-67-7; Saldox; o-Hydroxybenzaldoxime; 2-Hydroxybenzaldoxime; Salicylaldehydoxime; o-Hydroxybenzaldehyde oxime; Benzaldehyde, 2-hydroxy-, oxime; (2-Hydroxyphenylmethylene)azanol; 2-Formylphenol oxime; 2QTV2A0T5Q; NSC-5057; RefChem:180918; 202-353-8; 21013-96-7"
   },
   {
     "id": "salophen__c6a875d6",
@@ -4078,7 +4078,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "quinolinol_NO_chelates"
+          "quinolinol_no_chelates"
         ],
         "donors": [
           "N",
@@ -4087,7 +4087,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: 8-Quinolinol (oxine) N,O chelates | family_id: quinolinol_NO_chelates | normalized_family: ligand_misc | donors: N,O | denticity: 2 | abbr: SO3-Oxine | CAS: null | aliases: Sulfonated8hydroxyquinolinegeneric | family_def: 8-Quinolinol (oxine) N,O chelates"
+    "embedding_text": "role: ligand | family_label: 8-Quinolinol (oxine) N,O chelates | family_id: quinolinol_no_chelates | normalized_family: ligand_misc | donors: N,O | denticity: 2 | abbr: SO3-Oxine | CAS: null | aliases: Sulfonated8hydroxyquinolinegeneric | family_def: 8-Quinolinol (oxine) N,O chelates"
   },
   {
     "id": "synphos__205319-91-7",
@@ -4193,7 +4193,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "bisoxazolines_BOX"
+          "bisoxazolines_box"
         ],
         "donors": [
           "N",
@@ -4202,7 +4202,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: bisoxazolines_BOX | family_id: bisoxazolines_BOX | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-BOX | CAS: null | aliases: tBuBOX | family_def: bisoxazolines_BOX"
+    "embedding_text": "role: ligand | family_label: bisoxazolines_box | family_id: bisoxazolines_box | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-BOX | CAS: null | aliases: tBuBOX | family_def: bisoxazolines_box"
   },
   {
     "id": "tbu_phox__98334760",
@@ -4243,7 +4243,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "pyridine_oxazolines_PyOx"
+          "pyridine_oxazolines_pyox"
         ],
         "donors": [
           "N",
@@ -4252,7 +4252,7 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: pyridine_oxazolines_PyOx | family_id: pyridine_oxazolines_PyOx | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-PyOx | CAS: null | aliases: tBusubstitutedPyOx | family_def: pyridine_oxazolines_PyOx"
+    "embedding_text": "role: ligand | family_label: pyridine_oxazolines_pyox | family_id: pyridine_oxazolines_pyox | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: tBu-PyOx | CAS: null | aliases: tBusubstitutedPyOx | family_def: pyridine_oxazolines_pyox"
   },
   {
     "id": "tbubrettphos__1160861-53-9",
@@ -4865,7 +4865,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "tris_2pyridylmethyl_amine_TPMA"
+          "tris_2pyridylmethyl_amine_tpma"
         ],
         "donors": [
           "N",
@@ -4876,7 +4876,7 @@
         "denticity": 4
       }
     },
-    "embedding_text": "role: ligand | family_label: tris_2pyridylmethyl_amine_TPMA | family_id: tris_2pyridylmethyl_amine_TPMA | normalized_family: ligand_misc | donors: N,N,N,N | denticity: 4 | abbr: TPMA | CAS: 16858-01-8 | aliases: Tris2pyridylmethylamine | family_def: tris_2pyridylmethyl_amine_TPMA"
+    "embedding_text": "role: ligand | family_label: tris_2pyridylmethyl_amine_tpma | family_id: tris_2pyridylmethyl_amine_tpma | normalized_family: ligand_misc | donors: N,N,N,N | denticity: 4 | abbr: TPMA | CAS: 16858-01-8 | aliases: Tris2pyridylmethylamine | family_def: tris_2pyridylmethyl_amine_tpma"
   },
   {
     "id": "tris_mesityl_phosphine__23897-15-6",
@@ -5284,7 +5284,7 @@
     "roles": {
       "ligand": {
         "families": [
-          "beta_diketiminates_NacNac"
+          "beta_diketiminates_nacnac"
         ],
         "donors": [
           "N",
@@ -5293,6 +5293,6 @@
         "denticity": 2
       }
     },
-    "embedding_text": "role: ligand | family_label: beta_diketiminates_NacNac | family_id: beta_diketiminates_NacNac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: NacNac | CAS: null | aliases: Diketiminategeneric | family_def: beta_diketiminates_NacNac"
+    "embedding_text": "role: ligand | family_label: beta_diketiminates_nacnac | family_id: beta_diketiminates_nacnac | normalized_family: ligand_misc | donors: N,N | denticity: 2 | abbr: NacNac | CAS: null | aliases: Diketiminategeneric | family_def: beta_diketiminates_nacnac"
   }
 ]

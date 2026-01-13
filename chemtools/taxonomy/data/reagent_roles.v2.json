@@ -74,7 +74,7 @@
   ],
   "families": [
     {
-      "id": "beta_diketiminates_NacNac",
+      "id": "beta_diketiminates_nacnac",
       "role_id": "ligand",
       "name": "beta diketiminates NacNac",
       "precedence": 100,
@@ -101,20 +101,6 @@
         "keywords": [
           "bidentate",
           "diphosphines"
-        ]
-      }
-    },
-    {
-      "id": "biphosphines",
-      "role_id": "ligand",
-      "name": "biphosphines",
-      "precedence": 100,
-      "description": "",
-      "allowlists": {
-        "cas": [],
-        "names": [],
-        "keywords": [
-          "biphosphines"
         ]
       }
     },
@@ -148,7 +134,7 @@
       }
     },
     {
-      "id": "bis_imino_pyridines_PDI",
+      "id": "bis_imino_pyridines_pdi",
       "role_id": "ligand",
       "name": "bis imino pyridines PDI",
       "precedence": 100,
@@ -165,7 +151,7 @@
       }
     },
     {
-      "id": "bisoxazolines_BOX",
+      "id": "bisoxazolines_box",
       "role_id": "ligand",
       "name": "bisoxazolines BOX",
       "precedence": 100,
@@ -210,7 +196,7 @@
       }
     },
     {
-      "id": "dalphos_PN",
+      "id": "dalphos_pn",
       "role_id": "ligand",
       "name": "dalphos PN",
       "precedence": 100,
@@ -340,7 +326,7 @@
       }
     },
     {
-      "id": "phosphine_pyridine_PN",
+      "id": "phosphine_pyridine_pn",
       "role_id": "ligand",
       "name": "phosphine pyridine PN",
       "precedence": 100,
@@ -399,7 +385,7 @@
       }
     },
     {
-      "id": "pincers_PNP_PCP_PNN_CNN",
+      "id": "pincers_pnp_pcp_pnn_cnn",
       "role_id": "ligand",
       "name": "pincers PNP PCP PNN CNN",
       "precedence": 100,
@@ -417,7 +403,7 @@
       }
     },
     {
-      "id": "pyridine_oxazolines_PyOx",
+      "id": "pyridine_oxazolines_pyox",
       "role_id": "ligand",
       "name": "pyridine oxazolines PyOx",
       "precedence": 100,
@@ -433,7 +419,7 @@
       }
     },
     {
-      "id": "quinolinol_NO_chelates",
+      "id": "quinolinol_no_chelates",
       "role_id": "ligand",
       "name": "quinolinol NO chelates",
       "precedence": 100,
@@ -540,7 +526,7 @@
       }
     },
     {
-      "id": "tris_2pyridylmethyl_amine_TPMA",
+      "id": "tris_2pyridylmethyl_amine_tpma",
       "role_id": "ligand",
       "name": "tris 2pyridylmethyl amine TPMA",
       "precedence": 100,
@@ -573,7 +559,7 @@
       }
     },
     {
-      "id": "Ni metal",
+      "id": "ni_metal",
       "role_id": "metal_catalyst",
       "name": "Ni metal",
       "precedence": 100,
@@ -582,12 +568,13 @@
         "cas": [],
         "names": [],
         "keywords": [
-          "ni metal"
+          "ni",
+          "metal"
         ]
       }
     },
     {
-      "id": "Ni salt",
+      "id": "ni_salt",
       "role_id": "metal_catalyst",
       "name": "Ni salt",
       "precedence": 100,
@@ -596,7 +583,8 @@
         "cas": [],
         "names": [],
         "keywords": [
-          "ni salt"
+          "ni",
+          "salt"
         ]
       }
     },
@@ -633,7 +621,7 @@
       }
     },
     {
-      "id": "copper salt",
+      "id": "copper_salt",
       "role_id": "metal_catalyst",
       "name": "copper salt",
       "precedence": 100,
@@ -642,7 +630,8 @@
         "cas": [],
         "names": [],
         "keywords": [
-          "copper salt"
+          "copper",
+          "salt"
         ]
       }
     },
@@ -852,7 +841,7 @@
       }
     },
     {
-      "id": "pure metal",
+      "id": "pure_metal",
       "role_id": "metal_catalyst",
       "name": "pure metal",
       "precedence": 100,
@@ -861,7 +850,8 @@
         "cas": [],
         "names": [],
         "keywords": [
-          "pure metal"
+          "pure",
+          "metal"
         ]
       }
     },
@@ -2032,7 +2022,7 @@
       }
     },
     {
-      "id": "Al salt",
+      "id": "al_salt",
       "role_id": "additive",
       "name": "Al salt",
       "precedence": 100,
@@ -2041,7 +2031,8 @@
         "cas": [],
         "names": [],
         "keywords": [
-          "al salt"
+          "al",
+          "salt"
         ]
       }
     },
@@ -2220,7 +2211,7 @@
       }
     },
     {
-      "id": "Sulfolane",
+      "id": "sulfolane",
       "role_id": "solvent",
       "name": "Sulfolane",
       "precedence": 100,
