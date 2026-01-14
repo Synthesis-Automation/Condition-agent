@@ -318,11 +318,13 @@ def extract_reagents(record: Dict[str, Any], csv_row: Optional[Dict[str, Any]] =
         
         if hit:
             role = hit.get('role', 'other_reagent')
-            name = hit.get('name', cas)
+            # Use abbreviation if available, otherwise use name
+            abbr_list = hit.get('abbreviation', [])
+            display_name = abbr_list[0] if abbr_list and abbr_list[0] else hit.get('name', cas)
             if role in role_items:
-                role_items[role].append(name)
+                role_items[role].append(display_name)
             else:
-                role_items['other_reagent'].append(name)
+                role_items['other_reagent'].append(display_name)
         else:
             # Not found - use CAS as-is
             role_items['other_reagent'].append(cas)
