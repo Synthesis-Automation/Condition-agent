@@ -11,7 +11,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from PyQt6 import QtWidgets, QtCore
-from app.A_convert_to_hte_format import process_reaction_dataset
+from app.A_convert_to_hte_format import process_reaction_dataset, enrich_reaction_dataset_cas
 
 class ConversionWorker(QtCore.QObject):
     finished = QtCore.pyqtSignal(bool, str)
@@ -48,6 +48,12 @@ class ConversionWorker(QtCore.QObject):
             sys.stdout = StdoutRedirector(self.progress)
             
             try:
+                # 1. Enrich CAS numbers first
+                print(f"Step 1: Enriching CAS numbers in {os.path.basename(self.input_path)}...")
+                enrich_reaction_dataset_cas(self.input_path)
+                
+                # 2. Process to HTE format
+                print(f"\nStep 2: Converting to HTE format...")
                 process_reaction_dataset(
                     self.input_path, 
                     self.output_path, 

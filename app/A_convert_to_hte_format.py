@@ -19,6 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
 from chemtools.smiles import normalize
+from chemtools.reagent.lookup import find_reagent
 
 @lru_cache(maxsize=10000)
 def cached_featurize(smiles: str):
@@ -59,41 +60,13 @@ def _split_csv_list(value: Any) -> List[str]:
 def _normalize_reagent_text(value: str) -> str:
     return " ".join(str(value).strip().lower().split())
 
-@lru_cache(maxsize=4)
-def _load_reagent_csv(path_str: str) -> Dict[str, Any]:
-    path = Path(path_str)
-    data = {
-        "name_to_smiles": defaultdict(set),
-        "cas_to_smiles": defaultdict(set),
-        "cas_set": set(),
-    }
-    if not path.exists():
-        return data
-    with path.open("r", encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle)
-        for row in reader:
-            name = _normalize_reagent_text(row.get("name", ""))
-            abbr = _normalize_reagent_text(row.get("abbreviation", ""))
-            cas = (row.get("cas") or "").strip()
-            smile = (row.get("smiles") or row.get("smile") or "").strip()
-            if cas:
-                data["cas_set"].add(cas)
-            if smile:
-                if name:
-                    data["name_to_smiles"][name].add(smile)
-                if abbr:
-                    data["name_to_smiles"][abbr].add(smile)
-                if cas:
-                    data["cas_to_smiles"][cas].add(smile)
-    return data
-
 def _collect_reagent_smiles(
     record: Dict[str, Any],
-    reagent_db: Dict[str, Any],
+    reagent_db: Optional[Dict[str, Any]] = None,
     unknown_cas: Optional[set[str]] = None,
 ) -> set[str]:
-    if not reagent_db:
-        return set()
+    reagent_names: List[str] = []
+    reagent_cas: List[str] = []
 
     def normalize_entries(values: Any) -> List[Dict[str, Any]]:
         if values is None:
@@ -108,8 +81,6 @@ def _collect_reagent_smiles(
                 entries.append({"name": entry})
         return entries
 
-    reagent_names: List[str] = []
-    reagent_cas: List[str] = []
     for entry in normalize_entries(record.get("reagents")):
         name = entry.get("name")
         if name:
@@ -117,6 +88,7 @@ def _collect_reagent_smiles(
         cas = entry.get("cas")
         if cas:
             reagent_cas.append(str(cas).strip())
+    
     for entry in normalize_entries(record.get("solvents")):
         name = entry.get("name")
         if name:
@@ -133,30 +105,58 @@ def _collect_reagent_smiles(
         reagent_names.extend(_split_reagent_names(str(condition_core)))
 
     reagent_smiles = set()
-    cas_set = reagent_db.get("cas_set", set())
-    cas_to_smiles = reagent_db.get("cas_to_smiles", {})
-    name_to_smiles = reagent_db.get("name_to_smiles", {})
-
     unknown = unknown_cas if unknown_cas is not None else set()
 
+    # Use the new reagent system for lookups
     for cas in _dedupe_list(reagent_cas):
         if not cas or cas.startswith("$") or not CAS_PATTERN.match(cas):
             continue
-        if cas not in cas_set:
+        
+        # Try finding by CAS in any role
+        hit = None
+        for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+            hit = find_reagent(cas, r_type)
+            if hit:
+                break
+        
+        if hit:
+            smiles = hit.get('smiles')
+            if smiles:
+                normalized = _normalize_smiles(smiles)
+                if normalized:
+                    reagent_smiles.add(normalized)
+        else:
             unknown.add(cas)
-        for smiles in cas_to_smiles.get(cas, []):
-            normalized = _normalize_smiles(smiles) if smiles else None
-            if normalized:
-                reagent_smiles.add(normalized)
 
     for name in _dedupe_list(reagent_names):
-        key = _normalize_reagent_text(name)
+        # Check for inline CAS
+        key = name.lower()
+        found_inline = False
         for match in CAS_INLINE_PATTERN.findall(key):
-            reagent_cas.append(match)
-        for smiles in name_to_smiles.get(key, []):
-            normalized = _normalize_smiles(smiles) if smiles else None
-            if normalized:
-                reagent_smiles.add(normalized)
+            found_inline = True
+            # Try finding by CAS
+            hit = None
+            for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+                hit = find_reagent(match, r_type)
+                if hit:
+                    break
+            if hit and hit.get('smiles'):
+                normalized = _normalize_smiles(hit['smiles'])
+                if normalized:
+                    reagent_smiles.add(normalized)
+        
+        if not found_inline:
+            # Try finding by name
+            hit = None
+            for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+                hit = find_reagent(name, r_type)
+                if hit:
+                    break
+            if hit and hit.get('smiles'):
+                normalized = _normalize_smiles(hit['smiles'])
+                if normalized:
+                    reagent_smiles.add(normalized)
+
     return reagent_smiles
 
 def _write_new_reagents(path: Path, cas_values: set[str]) -> None:
@@ -279,60 +279,149 @@ def _collect_spectator_groups(
     return groups
 
 def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
-    """Extract and categorize reagents from the reaction record."""
-    def normalize_entries(values: Any) -> List[Dict[str, Any]]:
-        if values is None:
-            return []
-        if isinstance(values, dict):
-            values = [values]
-        entries = []
-        for entry in values:
-            if isinstance(entry, dict):
-                entries.append(entry)
-            elif isinstance(entry, str):
-                entries.append({"name": entry})
-        return entries
-
-    reagents = normalize_entries(record.get("reagents"))
-    solvents = normalize_entries(record.get("solvents"))
+    """Extract and categorize reagents by role using the reagent system."""
+    # Collect all CAS numbers from the record
+    all_cas = []
     
-    bases = [r["name"] for r in reagents if r.get("role") == "BASE"]
-    additives = [r["name"] for r in reagents if r.get("role") == "ADDITIVE"]
-    coupling_reagents = [r["name"] for r in reagents if r.get("role") == "COUPLING_REAGENT"]
+    # From CSV columns
+    for cas in _split_csv_list(record.get("reagent_cas", "")):
+        all_cas.append(cas)
+    for cas in _split_csv_list(record.get("catalyst_cas", "")):
+        all_cas.append(cas)
+    for cas in _split_csv_list(record.get("solvent_cas", "")):
+        all_cas.append(cas)
     
-    solvent_names = [s["name"] for s in solvents]
+    # Classify each CAS by role
+    role_items = {
+        "metal_catalyst": [],
+        "ligand": [],
+        "base": [],
+        "additive": [],
+        "condensation_agent": [],
+        "other_reagent": [],
+        "solvent": [],
+    }
     
-    # Catalyst and Ligand extraction heuristics
-    catalytic_system = record.get("catalytic_system", "")
-    condition_core = record.get("condition_core", "")
-    
-    catalyst = ""
-    ligand = ""
-    
-    if catalytic_system:
-        parts = [p.strip() for p in catalytic_system.split(",")]
-        if len(parts) >= 1:
-            catalyst = parts[0]
-        if len(parts) >= 2:
-            ligand = parts[1]
-    elif condition_core and "/" in condition_core:
-        parts = [p.strip() for p in condition_core.split("/")]
-        # Heuristic: if first part looks like a metal
-        metals = ["Pd", "Ni", "Cu", "Ir", "Rh", "Ru", "Pt", "Au", "Ag", "Fe", "Co", "Zn"]
-        if any(m in parts[0] for m in metals):
-            catalyst = parts[0]
-            if len(parts) >= 2:
-                ligand = parts[1]
+    for cas in _dedupe_list(all_cas):
+        if not cas or not CAS_PATTERN.match(cas):
+            continue
+            
+        # Try to find this CAS in the reagent system
+        hit = None
+        for r_type in ['metal_catalyst', 'ligand', 'base', 'additive', 'condensation_agent', 'other_reagent', 'solvent', 'acid', 'oxidant']:
+            hit = find_reagent(cas, r_type)
+            if hit:
+                break
+        
+        if hit:
+            role = hit.get('role', 'other_reagent')
+            name = hit.get('name', cas)
+            if role in role_items:
+                role_items[role].append(name)
+            else:
+                role_items['other_reagent'].append(name)
+        else:
+            # Not found - use CAS as-is
+            role_items['other_reagent'].append(cas)
     
     return {
-        "Catalyst": catalyst,
-        "Ligand": ligand,
-        "Base": " / ".join(bases),
-        "Solvent": " / ".join(solvent_names),
-        "Additive": " / ".join(additives),
-        "Coupling Reagent": " / ".join(coupling_reagents),
-        "Secondary Solvent": ""
+        "catalyst": "/".join(role_items["metal_catalyst"]),
+        "ligand": "/".join(role_items["ligand"]),
+        "base": "/".join(role_items["base"]),
+        "additive": "/".join(role_items["additive"]),
+        "condensation_agent": "/".join(role_items["condensation_agent"]),
+        "other_reagent": "/".join(role_items["other_reagent"]),
+        "solvent": "/".join(role_items["solvent"]),
     }
+
+def enrich_reaction_dataset_cas(input_path: str | Path) -> None:
+    """
+    Enrich the source reaction dataset CSV with CAS numbers from names
+    using the new reagent system. Updates the input CSV file in place.
+    """
+    input_path = Path(input_path)
+    if not input_path.exists():
+        print(f"Error: {input_path} not found.")
+        return
+
+    print(f"Enriching CAS numbers in {input_path}...")
+    try:
+        df = pd.read_csv(input_path)
+    except Exception as e:
+        print(f"Error reading CSV: {e}")
+        return
+
+    # Mappings from name column to CAS column and reagent type
+    mappings = {
+        'reagent_amd': ('reagent_cas', None),
+        'catalyst_amd': ('catalyst_cas', 'metal_catalyst'),
+        'solvent_amd': ('solvent_cas', 'solvent'),
+    }
+
+    modified = False
+
+    def lookup_cas(name_str: Any, preferred_type: Optional[str] = None) -> List[str]:
+        if not name_str or pd.isna(name_str):
+            return []
+        
+        # Split by typical separators
+        names = _split_reagent_names(str(name_str))
+        found_cas = []
+        
+        for name in names:
+            # 1. Try preferred type if provided
+            hit = None
+            if preferred_type:
+                hit = find_reagent(name, preferred_type)
+            
+            # 2. Try common roles if not found or no preferred type
+            if not hit:
+                for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+                    hit = find_reagent(name, r_type)
+                    if hit:
+                        break
+            
+            if hit and hit.get('cas'):
+                found_cas.append(hit['cas'])
+        
+        return found_cas
+
+    for name_col, (cas_col, r_type) in mappings.items():
+        if name_col not in df.columns:
+            continue
+        
+        # If CAS column doesn't exist, create it
+        if cas_col not in df.columns:
+            df[cas_col] = ""
+
+        def process_row(row):
+            nonlocal modified
+            names = row[name_col]
+            existing_cas_str = str(row[cas_col]) if not pd.isna(row[cas_col]) else ""
+            
+            # Extract existing CAS
+            existing_cas = [c.strip() for c in existing_cas_str.split(',') if c.strip()]
+            
+            found_cas = lookup_cas(names, r_type)
+            if not found_cas:
+                return existing_cas_str
+
+            # Merge and deduplicate
+            all_cas = _dedupe_list(existing_cas + found_cas)
+            new_cas_str = ", ".join(all_cas)
+            
+            if new_cas_str != existing_cas_str:
+                modified = True
+                return new_cas_str
+            return existing_cas_str
+
+        df[cas_col] = df.apply(process_row, axis=1)
+
+    if modified:
+        df.to_csv(input_path, index=False)
+        print(f"Successfully updated CAS numbers in {input_path}")
+    else:
+        print(f"No changes needed for {input_path}")
 
 def process_reaction_dataset(
     input_path: str,
@@ -350,7 +439,8 @@ def process_reaction_dataset(
     reagent_csv = Path(reagent_csv_path) if reagent_csv_path else (
         PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"
     )
-    reagent_db = _load_reagent_csv(str(reagent_csv))
+    # The new system uses a centralized registry, so we don't need to load it here
+    # but we keep the variable for compatibility with the record collection
     unknown_cas: set[str] = set()
     new_reagents_csv = Path(new_reagents_path) if new_reagents_path else (
         PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"
@@ -403,7 +493,7 @@ def process_reaction_dataset(
                     continue
                 reactants_part, products_part = smiles.split(">>")
                 reactants = reactants_part.split(".")
-                _collect_reagent_smiles(record, reagent_db, unknown_cas)
+                _collect_reagent_smiles(record, None, unknown_cas)
 
                 motif_ids = []
                 reactant_data = []
@@ -515,13 +605,13 @@ def process_reaction_dataset(
                     "z_score": 0.0,
                     "reactant_1": type_a,
                     "reactant_2": type_b,
-                    "catalyst": reagents.get("Catalyst", ""),
-                    "ligand": reagents.get("Ligand", ""),
-                    "base": reagents.get("Base", ""),
-                    "solvent": reagents.get("Solvent", ""),
-                    "additive": reagents.get("Additive", ""),
-                    "Secondary Solvent": reagents.get("Secondary Solvent", ""),
-                    "Coupling Reagent": reagents.get("Coupling Reagent", ""),
+                    "catalyst": reagents.get("catalyst", ""),
+                    "ligand": reagents.get("ligand", ""),
+                    "base": reagents.get("base", ""),
+                    "additive": reagents.get("additive", ""),
+                    "condensation_agent": reagents.get("condensation_agent", ""),
+                    "other_reagent": reagents.get("other_reagent", ""),
+                    "solvent": reagents.get("solvent", ""),
                     "Is_Intramolecular": len(reactants) == 1,
                     "reaction_smiles": smiles,
                     "spectator_groups": " / ".join(spectator_groups),
@@ -550,7 +640,7 @@ def process_reaction_dataset(
 
             reactants_part, products_part = smiles.split(">>")
             reactants = reactants_part.split(".")
-            _collect_reagent_smiles(record, reagent_db, unknown_cas)
+            _collect_reagent_smiles(record, None, unknown_cas)
 
             motif_ids = []
             reactant_data = []
@@ -662,13 +752,13 @@ def process_reaction_dataset(
                 "z_score": 0.0,
                 "reactant_1": type_a,
                 "reactant_2": type_b,
-                "catalyst": reagents.get("Catalyst", ""),
-                "ligand": reagents.get("Ligand", ""),
-                "base": reagents.get("Base", ""),
-                "solvent": reagents.get("Solvent", ""),
-                "additive": reagents.get("Additive", ""),
-                "Secondary Solvent": reagents.get("Secondary Solvent", ""),
-                "Coupling Reagent": reagents.get("Coupling Reagent", ""),
+                "catalyst": reagents.get("catalyst", ""),
+                "ligand": reagents.get("ligand", ""),
+                "base": reagents.get("base", ""),
+                "additive": reagents.get("additive", ""),
+                "condensation_agent": reagents.get("condensation_agent", ""),
+                "other_reagent": reagents.get("other_reagent", ""),
+                "solvent": reagents.get("solvent", ""),
                 "Is_Intramolecular": len(reactants) == 1,
                 "reaction_smiles": smiles,
                 "spectator_groups": " / ".join(spectator_groups),
@@ -709,8 +799,8 @@ def process_reaction_dataset(
 
     canonical_cols = [
         "reaction_id", "yield", "z_score", "reactant_1", "reactant_2",
-        "catalyst", "ligand", "base", "solvent", "additive",
-        "Secondary Solvent", "Coupling Reagent", "Is_Intramolecular",
+        "catalyst", "ligand", "base", "additive", "condensation_agent",
+        "other_reagent", "solvent", "Is_Intramolecular",
         "reaction_smiles", "spectator_groups",
     ]
     df = df[canonical_cols]
