@@ -338,7 +338,6 @@ def process_reaction_dataset(
     input_path: str,
     output_path: str,
     drop_no_catalyst: bool = True,
-    drop_reagent_reactants: bool = True,
     reagent_csv_path: Optional[str | Path] = None,
     new_reagents_path: Optional[str | Path] = None,
 ):
@@ -404,16 +403,7 @@ def process_reaction_dataset(
                     continue
                 reactants_part, products_part = smiles.split(">>")
                 reactants = reactants_part.split(".")
-                reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
-                if drop_reagent_reactants and reagent_smiles:
-                    filtered = []
-                    for r_smiles in reactants:
-                        norm = _normalize_smiles(r_smiles)
-                        if norm and norm in reagent_smiles:
-                            continue
-                        filtered.append(r_smiles)
-                    if filtered:
-                        reactants = filtered
+                _collect_reagent_smiles(record, reagent_db, unknown_cas)
 
                 motif_ids = []
                 reactant_data = []
@@ -560,16 +550,7 @@ def process_reaction_dataset(
 
             reactants_part, products_part = smiles.split(">>")
             reactants = reactants_part.split(".")
-            reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
-            if drop_reagent_reactants and reagent_smiles:
-                filtered = []
-                for r_smiles in reactants:
-                    norm = _normalize_smiles(r_smiles)
-                    if norm and norm in reagent_smiles:
-                        continue
-                    filtered.append(r_smiles)
-                if filtered:
-                    reactants = filtered
+            _collect_reagent_smiles(record, reagent_db, unknown_cas)
 
             motif_ids = []
             reactant_data = []
@@ -746,11 +727,6 @@ if __name__ == "__main__":
     parser.add_argument("--input", "-i", help="Direct path to input JSONL file.")
     parser.add_argument("--output", "-o", help="Direct path to output CSV file.")
     parser.add_argument(
-        "--keep-reagent-reactants",
-        action="store_true",
-        help="Keep reagent/solvent molecules in the reactant columns (default: drop).",
-    )
-    parser.add_argument(
         "--reagent-csv",
         help="Path to reagent registry CSV (default: data/reagent_db/reagents.csv).",
     )
@@ -761,15 +737,12 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    drop_reagent_reactants = not args.keep_reagent_reactants
-
     if args.dataset:
         input_file = f"data/reaction_dataset/{args.dataset}.jsonl"
         output_file = f"data/HTE_db/{args.dataset}_canonical.csv"
         process_reaction_dataset(
             input_file,
             output_file,
-            drop_reagent_reactants=drop_reagent_reactants,
             reagent_csv_path=args.reagent_csv,
             new_reagents_path=args.new_reagents,
         )
@@ -777,7 +750,6 @@ if __name__ == "__main__":
         process_reaction_dataset(
             args.input,
             args.output,
-            drop_reagent_reactants=drop_reagent_reactants,
             reagent_csv_path=args.reagent_csv,
             new_reagents_path=args.new_reagents,
         )
@@ -790,7 +762,6 @@ if __name__ == "__main__":
             process_reaction_dataset(
                 input_file,
                 output_file,
-                drop_reagent_reactants=drop_reagent_reactants,
                 reagent_csv_path=args.reagent_csv,
                 new_reagents_path=args.new_reagents,
             )
