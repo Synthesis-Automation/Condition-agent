@@ -278,17 +278,20 @@ def _collect_spectator_groups(
 
     return groups
 
-def extract_reagents(record: Dict[str, Any]) -> Dict[str, str]:
+def extract_reagents(record: Dict[str, Any], csv_row: Optional[Dict[str, Any]] = None) -> Dict[str, str]:
     """Extract and categorize reagents by role using the reagent system."""
     # Collect all CAS numbers from the record
     all_cas = []
     
+    # Use raw CSV row if provided, otherwise try from record
+    source = csv_row if csv_row else record
+    
     # From CSV columns
-    for cas in _split_csv_list(record.get("reagent_cas", "")):
+    for cas in _split_csv_list(source.get("reagent_cas", "")):
         all_cas.append(cas)
-    for cas in _split_csv_list(record.get("catalyst_cas", "")):
+    for cas in _split_csv_list(source.get("catalyst_cas", "")):
         all_cas.append(cas)
-    for cas in _split_csv_list(record.get("solvent_cas", "")):
+    for cas in _split_csv_list(source.get("solvent_cas", "")):
         all_cas.append(cas)
     
     # Classify each CAS by role
@@ -593,8 +596,8 @@ def process_reaction_dataset(
                 type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
                 type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
 
-                reagents = extract_reagents(record)
-                if drop_no_catalyst and not reagents.get("Catalyst"):
+                reagents = extract_reagents(record, csv_row=row)
+                if drop_no_catalyst and not reagents.get("catalyst"):
                     continue
 
                 spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
@@ -741,7 +744,7 @@ def process_reaction_dataset(
             type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
 
             reagents = extract_reagents(record)
-            if drop_no_catalyst and not reagents.get("Catalyst"):
+            if drop_no_catalyst and not reagents.get("catalyst"):
                 continue
 
             spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
