@@ -5,486 +5,399 @@ Total reactions: 51
 ## Reaction 31-207-CAS-10834198
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Reagents: O2 (7782-44-7) [OXIDANT]
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
 - SMILES: Cc1ccc(C)cc1>>Cc1ccc(C(=O)O)cc1.Cc1ccc(C=O)cc1.Cc1ccc(CO)cc1.Cc1ccc(Cc2cc(C)ccc2C)cc1.Cc1ccc(COO)cc1.Cc1ccc(COC(=O)c2ccc(C)cc2)cc1.Cc1ccc(COCc2ccc(C)cc2)cc1
 
 ## Reaction 31-207-CAS-13070619
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Reagents: 110-83-8 (110-83-8) [UNK], O2 (7782-44-7) [OXIDANT]
+- Reagents: 110-83-8 (110-83-8) [UNK], 7782-44-7 (7782-44-7) [ADDITIVE]
 - SMILES: Cc1ccc(C)cc1>>Cc1ccc(C(=O)O)cc1.Cc1ccc(C=O)cc1.Cc1ccc(CO)cc1.Cc1ccc(COO)cc1
 
 ## Reaction 31-207-CAS-15199607
 
 - Type: Oxidation of Aromatic Side Chains
-- Catalytic System: 7782-42-5
 - SMILES: Cc1ccc(C)cc1>>Cc1ccc(C(=O)O)cc1.Cc1ccc(C=O)cc1.Cc1ccc(CO)cc1.Cc1ccc(COO)cc1
 
 ## Reaction 31-488-CAS-10933722
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 7782-42-5
-- Reagents: 110-83-8 (110-83-8) [UNK], O2 (7782-44-7) [OXIDANT]
+- Reagents: 110-83-8 (110-83-8) [UNK], 7782-44-7 (7782-44-7) [ADDITIVE]
 - SMILES: Cc1ccc(C)cc1>>Cc1ccc(C(=O)O)cc1.Cc1ccc(C=O)cc1.Cc1ccc(CO)cc1.Cc1ccc(COC(=O)c2ccc(C)cc2)cc1
 
 ## Reaction 31-488-CAS-11469892
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: Oxone
 - Yield %: 99
-- Reagents: 7758-02-3 (7758-02-3) [UNK], Oxone (37222-66-5) [OXIDANT], 7757-83-7 (7757-83-7) [UNK]
-- Solvents: DCM (75-09-2), water (7732-18-5)
+- Reagents: 7758-02-3 (7758-02-3) [UNK], 37222-66-5 (37222-66-5) [ADDITIVE], 7757-83-7 (7757-83-7) [ADDITIVE]
+- Solvents: 75-09-2 (75-09-2), 7732-18-5 (7732-18-5)
 - SMILES: Cc1ccc([N+](=O)[O-])cc1>>O=C(O)c1ccc([N+](=O)[O-])cc1
 
 ## Reaction 31-488-CAS-12208043
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: HCl/TBHP
-- Catalytic System: 10025-77-1
 - Yield %: 53
-- Reagents: TBHP (75-91-2) [OXIDANT], HCl (7647-01-0) [ACID]
-- Solvents: Py (110-86-1), water (7732-18-5)
+- Reagents: 75-91-2 (75-91-2) [UNK], 7647-01-0 (7647-01-0) [ADDITIVE]
+- Solvents: 110-86-1 (110-86-1), 7732-18-5 (7732-18-5)
 - SMILES: COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1
 
 ## Reaction 31-488-CAS-16599714
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: TBHP
-- Catalytic System: 10028-22-5
 - Yield %: 46
-- Reagents: TBHP (75-91-2) [OXIDANT], 151-21-3 (151-21-3) [UNK]
-- Solvents: water (7732-18-5)
+- Reagents: 75-91-2 (75-91-2) [UNK], 151-21-3 (151-21-3) [ADDITIVE]
+- Solvents: 7732-18-5 (7732-18-5)
 - SMILES: N#CCc1ccccc1>>O=C(O)c1ccccc1
 
 ## Reaction 31-488-CAS-4081608
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: Co/II
-- Catalytic System: Co(acac)2
 - Yield %: 55
-- Reagents: TBHP (75-91-2) [OXIDANT]
-- Solvents: Me2CO (67-64-1)
+- Reagents: 75-91-2 (75-91-2) [UNK]
+- Solvents: 67-64-1 (67-64-1)
 - SMILES: Cc1ccccc1C>>Cc1ccccc1C(=O)O
 
 ## Reaction 31-488-CAS-4494966
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: Oxone
 - Yield %: 99
-- Reagents: 7758-02-3 (7758-02-3) [UNK], Oxone (37222-66-5) [OXIDANT], 7757-83-7 (7757-83-7) [UNK]
-- Solvents: DCM (75-09-2), water (7732-18-5)
+- Reagents: 7758-02-3 (7758-02-3) [UNK], 37222-66-5 (37222-66-5) [ADDITIVE], 7757-83-7 (7757-83-7) [ADDITIVE]
+- Solvents: 75-09-2 (75-09-2), 7732-18-5 (7732-18-5)
 - SMILES: COC(=O)c1ccc(C)cc1>>COC(=O)c1ccc(C(=O)O)cc1
 
 ## Reaction 31-488-CAS-5454124
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: HCl/Py/TBHP/O2
-- Catalytic System: 13682-61-6
 - Yield %: 46
-- Reagents: TBHP (75-91-2) [OXIDANT], Py (110-86-1) [BASE], O2 (7782-44-7) [OXIDANT], HCl (7647-01-0) [ACID]
-- Solvents: Py (110-86-1), 124-18-5 (124-18-5), water (7732-18-5)
+- Reagents: 75-91-2 (75-91-2) [UNK], 110-86-1 (110-86-1) [ADDITIVE], 7782-44-7 (7782-44-7) [ADDITIVE], 7647-01-0 (7647-01-0) [ADDITIVE]
+- Solvents: 110-86-1 (110-86-1), 124-18-5 (124-18-5), 7732-18-5 (7732-18-5)
 - SMILES: c1ccc(CCc2ccccc2)cc1>>O=C(O)c1ccccc1
 
 ## Reaction 31-488-CAS-7179296
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: TBHP
-- Catalytic System: 1384190-41-3
 - Yield %: 64
-- Reagents: TBHP (75-91-2) [OXIDANT]
-- Solvents: water (7732-18-5)
+- Reagents: 75-91-2 (75-91-2) [UNK]
+- Solvents: 7732-18-5 (7732-18-5)
 - SMILES: COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1
 
 ## Reaction 31-488-CAS-7310967
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: HCl/Py/TBHP/O2
-- Catalytic System: 13682-61-6
 - Yield %: 58
-- Reagents: TBHP (75-91-2) [OXIDANT], Py (110-86-1) [BASE], O2 (7782-44-7) [OXIDANT], HCl (7647-01-0) [ACID]
-- Solvents: Py (110-86-1), 124-18-5 (124-18-5), water (7732-18-5)
+- Reagents: 75-91-2 (75-91-2) [UNK], 110-86-1 (110-86-1) [ADDITIVE], 7782-44-7 (7782-44-7) [ADDITIVE], 7647-01-0 (7647-01-0) [ADDITIVE]
+- Solvents: 110-86-1 (110-86-1), 124-18-5 (124-18-5), 7732-18-5 (7732-18-5)
 - SMILES: COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1
 
 ## Reaction 31-488-CAS-8756059
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: Oxone
 - Yield %: 99
-- Reagents: 7758-02-3 (7758-02-3) [UNK], Oxone (37222-66-5) [OXIDANT], 7757-83-7 (7757-83-7) [UNK]
-- Solvents: DCM (75-09-2), water (7732-18-5)
+- Reagents: 7758-02-3 (7758-02-3) [UNK], 37222-66-5 (37222-66-5) [ADDITIVE], 7757-83-7 (7757-83-7) [ADDITIVE]
+- Solvents: 75-09-2 (75-09-2), 7732-18-5 (7732-18-5)
 - SMILES: Cc1ccc(Cl)cc1>>O=C(O)c1ccc(Cl)cc1
 
 ## Reaction 31-488-CAS-9034326
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: Oxone
 - Yield %: 93
-- Reagents: 7758-02-3 (7758-02-3) [UNK], Oxone (37222-66-5) [OXIDANT], 7757-83-7 (7757-83-7) [UNK]
-- Solvents: DCM (75-09-2), water (7732-18-5)
+- Reagents: 7758-02-3 (7758-02-3) [UNK], 37222-66-5 (37222-66-5) [ADDITIVE], 7757-83-7 (7757-83-7) [ADDITIVE]
+- Solvents: 75-09-2 (75-09-2), 7732-18-5 (7732-18-5)
 - SMILES: Cc1cccc(Br)c1>>O=C(O)c1cccc(Br)c1
 
 ## Reaction 31-488-CAS-9304506
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: TBHP
-- Catalytic System: 1384190-41-3
 - Yield %: 41
-- Reagents: TBHP (75-91-2) [OXIDANT]
-- Solvents: water (7732-18-5)
+- Reagents: 75-91-2 (75-91-2) [UNK]
+- Solvents: 7732-18-5 (7732-18-5)
 - SMILES: Cc1ccc(Br)cc1>>O=C(O)c1ccc(Br)cc1.O=Cc1ccc(Br)cc1
 
 ## Reaction 31-488-CAS-955771
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 106-95-6
 - Yield %: 95
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: EtOAc (141-78-6)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 141-78-6 (141-78-6)
 - SMILES: COc1cc2c(cc1C)C(C)(C)CCC2(C)C>>COc1cc2c(cc1C(=O)O)C(C)(C)CCC2(C)C
 
 ## Reaction 31-614-CAS-33763331
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: Py/O2
 - Yield %: 7
-- Reagents: Py (110-86-1) [BASE], 505-07-7 (505-07-7) [UNK], O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8), DCM (75-09-2)
+- Reagents: 110-86-1 (110-86-1) [UNK], 505-07-7 (505-07-7) [ADDITIVE], 7782-44-7 (7782-44-7) [ADDITIVE]
+- Solvents: 75-05-8 (75-05-8), 75-09-2 (75-09-2)
 - SMILES: Cc1ccc(C(C)(C)C)cc1.O=C1c2ccccc2C(=O)N1O>>CC(C)(C)c1ccc(C(=O)O)cc1.CC(C)(C)c1ccc(C=O)cc1.CC(C)(C)c1ccc(CON2C(=O)c3ccccc3C2=O)cc1
 
 ## Reaction 31-614-CAS-33763334
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: Py/O2
 - Yield %: 8
-- Reagents: Py (110-86-1) [BASE], 505-07-7 (505-07-7) [UNK], O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8), DCM (75-09-2)
+- Reagents: 110-86-1 (110-86-1) [UNK], 505-07-7 (505-07-7) [ADDITIVE], 7782-44-7 (7782-44-7) [ADDITIVE]
+- Solvents: 75-05-8 (75-05-8), 75-09-2 (75-09-2)
 - SMILES: Cc1ccc(C(C)(C)C)cc1.O=C1c2ccccc2C(=O)N1O>>CC(C)(C)c1ccc(C(=O)O)cc1.CC(C)(C)c1ccc(C=O)cc1.CC(C)(C)c1ccc(CON2C(=O)c3ccccc3C2=O)cc1.CC(C)(C)c1ccc(Cn2oc(=O)c3ccccc3c2=O)cc1
 
 ## Reaction 31-614-CAS-33766772
 
 - Type: Oxidation of Aromatic Side Chains
 - Yield %: 80
-- Reagents: 1262958-39-3 (1262958-39-3) [UNK], 7757-83-7 (7757-83-7) [UNK]
-- Solvents: MeCN (75-05-8), water (7732-18-5)
+- Reagents: 1262958-39-3 (1262958-39-3) [UNK], 7757-83-7 (7757-83-7) [ADDITIVE]
+- Solvents: 75-05-8 (75-05-8), 7732-18-5 (7732-18-5)
 - SMILES: COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-33766774
 
 - Type: Oxidation of Aromatic Side Chains
 - Yield %: 85
-- Reagents: 1262958-39-3 (1262958-39-3) [UNK], 7757-83-7 (7757-83-7) [UNK]
-- Solvents: MeCN (75-05-8), water (7732-18-5)
+- Reagents: 1262958-39-3 (1262958-39-3) [UNK], 7757-83-7 (7757-83-7) [ADDITIVE]
+- Solvents: 75-05-8 (75-05-8), 7732-18-5 (7732-18-5)
 - SMILES: CCc1ccc(C)cc1>>CC(=O)c1ccc(C)cc1.CC(=O)c1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35034782
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: KOH
 - Yield %: 80
-- Reagents: KOH (1310-58-3) [BASE], 1450840-09-1 (1450840-09-1) [UNK], 7757-83-7 (7757-83-7) [UNK]
-- Solvents: water (7732-18-5), Pd(MeCN)2Cl2 (14592-56-4)
+- Reagents: 1310-58-3 (1310-58-3) [UNK], 1450840-09-1 (1450840-09-1) [ADDITIVE], 7757-83-7 (7757-83-7) [ADDITIVE]
+- Solvents: 7732-18-5 (7732-18-5), 14592-56-4 (14592-56-4)
 - SMILES: COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375706
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 91
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccccc1>>O=C(O)c1ccccc1
 
 ## Reaction 31-614-CAS-35375707
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 89
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(C(C)(C)C)cc1>>CC(C)(C)c1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375708
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 93
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(-c2ccccc2)cc1>>O=C(O)c1ccc(-c2ccccc2)cc1
 
 ## Reaction 31-614-CAS-35375709
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 95
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(Cl)cc1>>O=C(O)c1ccc(Cl)cc1
 
 ## Reaction 31-614-CAS-35375710
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 87
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375711
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 94
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(F)cc1>>O=C(O)c1ccc(F)cc1
 
 ## Reaction 31-614-CAS-35375712
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 90
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccccc1Cl>>O=C(O)c1ccccc1Cl
 
 ## Reaction 31-614-CAS-35375713
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 93
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(Br)cc1>>O=C(O)c1ccc(Br)cc1
 
 ## Reaction 31-614-CAS-35375714
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 87
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(F)c(F)c1>>O=C(O)c1ccc(F)c(F)c1
 
 ## Reaction 31-614-CAS-35375715
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 84
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(C#N)cc1>>N#Cc1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375716
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 90
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(F)cc1Cl>>O=C(O)c1ccc(F)cc1Cl
 
 ## Reaction 31-614-CAS-35375717
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 92
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(Cl)c(Cl)c1>>O=C(O)c1ccc(Cl)c(Cl)c1
 
 ## Reaction 31-614-CAS-35375718
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 90
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(C(F)(F)F)cc1>>O=C(O)c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-614-CAS-35375719
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 94
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: CC(=O)c1ccc(C)cc1>>CC(=O)c1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375720
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 80
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1cc(Cl)ccc1Cl>>O=C(O)c1cc(Cl)ccc1Cl
 
 ## Reaction 31-614-CAS-35375721
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 80
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(C)cc1>>O=C(O)c1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375722
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 83
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(F)cc1F>>O=C(O)c1ccc(F)cc1F
 
 ## Reaction 31-614-CAS-35375723
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 83
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: CC(=O)Nc1ccc(C)cc1>>CC(=O)Nc1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375724
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 82
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(Cl)cc1Cl>>O=C(O)c1ccc(Cl)cc1Cl
 
 ## Reaction 31-614-CAS-35375725
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 74
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1cc(Br)cs1>>O=C(O)c1cc(Br)cs1
 
 ## Reaction 31-614-CAS-35375726
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 74
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1cc2ccccc2o1>>O=C(O)c1cc2ccccc2o1
 
 ## Reaction 31-614-CAS-35375728
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 88
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1cccs1>>O=C(O)c1cccs1
 
 ## Reaction 31-614-CAS-35375730
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 84
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccccc1C>>O=C(O)c1ccccc1C(=O)O
 
 ## Reaction 31-614-CAS-35375732
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 57
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccco1>>O=C(O)c1ccco1
 
 ## Reaction 31-614-CAS-35375733
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 82
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(C(=O)O)cc1>>O=C(O)c1ccc(C(=O)O)cc1
 
 ## Reaction 31-614-CAS-35375734
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 86
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccc(OC(F)(F)F)cc1>>O=C(O)c1ccc(OC(F)(F)F)cc1
 
 ## Reaction 31-614-CAS-35375743
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 81
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: c1ccc2c(c1)CCC2>>O=C(O)c1ccccc1C(=O)O
 
 ## Reaction 31-614-CAS-35375744
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: HCl/O2
 - Yield %: 54
-- Reagents: HCl (7647-01-0) [ACID], O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7647-01-0 (7647-01-0) [UNK], 7782-44-7 (7782-44-7) [ADDITIVE]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: Cc1ccccc1>>O=C(O)c1ccccc1.ClCc1ccccc1
 
 ## Reaction 31-614-CAS-35375749
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 86
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: c1ccc(CCc2ccccc2)cc1>>O=C(O)c1ccccc1
 
 ## Reaction 31-614-CAS-35375751
 
 - Type: Oxidation of Aromatic Side Chains
-- Condition Core: O2
-- Catalytic System: 855785-75-0
 - Yield %: 78
-- Reagents: O2 (7782-44-7) [OXIDANT]
-- Solvents: MeCN (75-05-8)
+- Reagents: 7782-44-7 (7782-44-7) [UNK]
+- Solvents: 75-05-8 (75-05-8)
 - SMILES: c1ccc2c(c1)CCCC2>>O=C(O)c1ccccc1C(=O)O
 

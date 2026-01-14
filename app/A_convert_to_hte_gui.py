@@ -22,7 +22,6 @@ class ConversionWorker(QtCore.QObject):
         input_path: str,
         output_path: str,
         drop_no_catalyst: bool,
-        drop_reagent_reactants: bool,
         reagent_csv_path: str,
         new_reagents_path: str,
     ):
@@ -30,7 +29,6 @@ class ConversionWorker(QtCore.QObject):
         self.input_path = input_path
         self.output_path = output_path
         self.drop_no_catalyst = drop_no_catalyst
-        self.drop_reagent_reactants = drop_reagent_reactants
         self.reagent_csv_path = reagent_csv_path
         self.new_reagents_path = new_reagents_path
 
@@ -54,7 +52,6 @@ class ConversionWorker(QtCore.QObject):
                     self.input_path, 
                     self.output_path, 
                     drop_no_catalyst=self.drop_no_catalyst,
-                    drop_reagent_reactants=self.drop_reagent_reactants,
                     reagent_csv_path=self.reagent_csv_path,
                     new_reagents_path=self.new_reagents_path,
                 )
@@ -74,13 +71,11 @@ class HTEConverterWindow(QtWidgets.QWidget):
         # UI Elements
         self.dataset_dropdown = QtWidgets.QComboBox()
         self.source_dir_edit = QtWidgets.QLineEdit()
-        self.source_dir_edit.setPlaceholderText("Source folder containing *.jsonl files")
+        self.source_dir_edit.setPlaceholderText("Source folder containing *.csv files")
         self.input_edit = QtWidgets.QLineEdit()
         self.output_edit = QtWidgets.QLineEdit()
         self.drop_catalyst_check = QtWidgets.QCheckBox("Drop reactions without a catalyst")
         self.drop_catalyst_check.setChecked(True)
-        self.drop_reagent_reactants_check = QtWidgets.QCheckBox("Drop reagent/solvent reactants")
-        self.drop_reagent_reactants_check.setChecked(True)
         
         self.btn_run = QtWidgets.QPushButton("Start Conversion")
         self.btn_quit = QtWidgets.QPushButton("Quit")
@@ -130,11 +125,10 @@ class HTEConverterWindow(QtWidgets.QWidget):
         ds_layout.addWidget(refresh_btn)
         form.addRow("Available Datasets:", ds_layout)
         
-        form.addRow("Input JSONL:", self.input_edit)
+        form.addRow("Input CSV:", self.input_edit)
         form.addRow("Output CSV:", self.output_edit)
         form.addRow("", QtWidgets.QLabel("Output includes spectator_groups column."))
         form.addRow("", self.drop_catalyst_check)
-        form.addRow("", self.drop_reagent_reactants_check)
         
         layout.addLayout(form)
         
@@ -157,7 +151,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.source_dir_edit.setText(str(dataset_dir))
 
         if dataset_dir.exists():
-            files = sorted(p for p in dataset_dir.rglob("*.jsonl") if p.is_file())
+            files = sorted(p for p in dataset_dir.rglob("*.csv") if p.is_file())
             for f in files:
                 self.dataset_dropdown.addItem(f.name, str(f))
 
@@ -210,7 +204,6 @@ class HTEConverterWindow(QtWidgets.QWidget):
             input_path, 
             output_path, 
             self.drop_catalyst_check.isChecked(),
-            self.drop_reagent_reactants_check.isChecked(),
             str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
             str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
         )

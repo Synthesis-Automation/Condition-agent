@@ -699,6 +699,15 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
             'rgt_cas': [],
             'cat_cas': [],
             'sol_cas': [],
+            'rct_amd': [],
+            'pro_amd': [],
+            'rgt_amd': [],
+            'cat_amd': [],
+            'sol_amd': [],
+            'exp_proc': [],
+            'stages': None,
+            'steps': None,
+            'pro_yields': {},
             # capture CTAB/MOL blocks for SMILES extraction
             'rct_mol': [],
             'pro_mol': [],
@@ -815,18 +824,51 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
                 elif ':SOL(' in key and key.endswith('CAS_RN'):
                     if current_rid:
                         _ensure(current_rid)['sol_cas'].append(datum)
+                elif ':RCT(' in key and key.endswith(':AMD'):
+                    if current_rid:
+                        _ensure(current_rid)['rct_amd'].append(datum)
+                elif ':PRO(' in key and key.endswith(':AMD'):
+                    if current_rid:
+                        _ensure(current_rid)['pro_amd'].append(datum)
+                elif ':RGT(' in key and key.endswith(':AMD'):
+                    if current_rid:
+                        _ensure(current_rid)['rgt_amd'].append(datum)
+                elif ':CAT(' in key and key.endswith(':AMD'):
+                    if current_rid:
+                        _ensure(current_rid)['cat_amd'].append(datum)
+                elif ':SOL(' in key and key.endswith(':AMD'):
+                    if current_rid:
+                        _ensure(current_rid)['sol_amd'].append(datum)
                 elif ':RCT(' in key and (key.endswith(':CTAB') or key.endswith(':MOL')):
                     if current_rid:
                         _ensure(current_rid)['rct_mol'].append(datum)
                 elif ':PRO(' in key and (key.endswith(':CTAB') or key.endswith(':MOL')):
                     if current_rid:
                         _ensure(current_rid)['pro_mol'].append(datum)
-                elif key.endswith(':PRO(1):YIELD'):
+                elif ':PRO(' in key and key.endswith(':YIELD'):
                     if current_rid:
                         try:
-                            _ensure(current_rid)['yield_pct'] = int(float(datum))
+                            yield_val = int(float(datum))
                         except Exception:
-                            _ensure(current_rid)['yield_pct'] = None
+                            yield_val = None
+                        try:
+                            pro_idx = int(re.search(r':PRO\((\d+)\):YIELD$', key).group(1))  # type: ignore[union-attr]
+                        except Exception:
+                            pro_idx = None
+                        rec = _ensure(current_rid)
+                        if pro_idx is not None and yield_val is not None:
+                            rec['pro_yields'][pro_idx] = yield_val
+                        if rec.get('yield_pct') is None or pro_idx == 1:
+                            rec['yield_pct'] = yield_val
+                elif key.endswith(':EXP_PROC'):
+                    if current_rid:
+                        _ensure(current_rid)['exp_proc'].append(datum)
+                elif key.endswith(':STAGES'):
+                    if current_rid:
+                        _ensure(current_rid)['stages'] = datum
+                elif key.endswith(':STEPS'):
+                    if current_rid:
+                        _ensure(current_rid)['steps'] = datum
                 elif key.endswith(':REFERENCE(1):TITLE'):
                     if current_rid:
                         _ensure(current_rid)['title'] = datum
@@ -849,7 +891,11 @@ def parse_rdf(path: str) -> Dict[str, Dict[str, Any]]:
 
     # Deduplicate lists
     for rid, rec in reactions.items():
-        for k in ['rct_cas', 'pro_cas', 'rgt_cas', 'cat_cas', 'sol_cas', 'notes']:
+        for k in [
+            'rct_cas', 'pro_cas', 'rgt_cas', 'cat_cas', 'sol_cas',
+            'rct_amd', 'pro_amd', 'rgt_amd', 'cat_amd', 'sol_amd',
+            'exp_proc', 'notes',
+        ]:
             rec[k] = list(dict.fromkeys(rec.get(k, [])))
         # de-dupe mol blocks while preserving order
         for k in ['rct_mol', 'pro_mol']:

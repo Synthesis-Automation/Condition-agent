@@ -5,55 +5,43 @@ Total reactions: 232
 ## Reaction 31-049-CAS-12024113
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/I
-- Catalytic System: CuI
-- Reagents: DIPEA (7087-68-5) [BASE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK]
-- Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
+- Reagents: 7087-68-5 (7087-68-5) [UNK], 76-05-1 (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: C#CCCCCCC.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(OC(C)(C)C)cc1)C(=O)N1C[C@@H](N=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(=O)NC(c1ccccc1)(c1ccccc1)c1ccccc1)C(N)=O)[C@@H](C)OC(C)(C)C>>CCCCCCc1cn([C@H]2C[C@@H](C(=O)N[C@@H](CC(N)=O)C(N)=O)N(C(=O)[C@H](Cc3ccc(O)cc3)NC(=O)[C@@H](NC(C)=O)[C@@H](C)O)C2)nn1
 
 ## Reaction 31-049-CAS-3515181
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/I
-- Catalytic System: CuI
-- Reagents: DIPEA (7087-68-5) [BASE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK]
-- Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
+- Reagents: 7087-68-5 (7087-68-5) [UNK], 76-05-1 (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccccc1.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(OC(C)(C)C)cc1)C(=O)N1C[C@H](N=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(=O)NC(c1ccccc1)(c1ccccc1)c1ccccc1)C(N)=O)[C@@H](C)OC(C)(C)C>>CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@H](n2cc(-c3ccccc3)nn2)C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O
 
 ## Reaction 31-049-CAS-5637664
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/I
-- Catalytic System: CuI
-- Reagents: DIPEA (7087-68-5) [BASE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK]
-- Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
+- Reagents: 7087-68-5 (7087-68-5) [UNK], 76-05-1 (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccccc1.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(OC(C)(C)C)cc1)C(=O)N1C[C@@H](N=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(=O)NC(c1ccccc1)(c1ccccc1)c1ccccc1)C(N)=O)[C@@H](C)OC(C)(C)C>>CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@@H](n2cc(-c3ccccc3)nn2)C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O
 
 ## Reaction 31-049-CAS-5930434
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: TFA
-- Catalytic System: 92361-49-4
-- Reagents: TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK]
-- Solvents: THF (109-99-9), water (7732-18-5)
+- Reagents: 76-05-1 (76-05-1) [UNK], 6485-79-6 (6485-79-6) [ADDITIVE]
+- Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccccc1.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(OC(C)(C)C)cc1)C(=O)N1C[C@H](N=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(=O)NC(c1ccccc1)(c1ccccc1)c1ccccc1)C(N)=O)[C@@H](C)OC(C)(C)C>>CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@H](n2nncc2-c2ccccc2)C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O
 
 ## Reaction 31-049-CAS-8053865
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: TFA
-- Catalytic System: 92361-49-4
-- Reagents: TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK]
-- Solvents: THF (109-99-9), water (7732-18-5)
+- Reagents: 76-05-1 (76-05-1) [UNK], 6485-79-6 (6485-79-6) [ADDITIVE]
+- Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccccc1.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(OC(C)(C)C)cc1)C(=O)N1C[C@@H](N=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(=O)NC(c1ccccc1)(c1ccccc1)c1ccccc1)C(N)=O)[C@@H](C)OC(C)(C)C>>CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@@H](n2nncc2-c2ccccc2)C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O
 
 ## Reaction 31-049-CAS-9905030
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/I
-- Catalytic System: CuI
-- Reagents: DIPEA (7087-68-5) [BASE], TFA (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [UNK]
-- Solvents: DMF (68-12-2), THF (109-99-9), water (7732-18-5)
+- Reagents: 7087-68-5 (7087-68-5) [UNK], 76-05-1 (76-05-1) [ADDITIVE], 6485-79-6 (6485-79-6) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: C#CCCCCCC.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(OC(C)(C)C)cc1)C(=O)N1C[C@H](N=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(=O)NC(c1ccccc1)(c1ccccc1)c1ccccc1)C(N)=O)[C@@H](C)OC(C)(C)C>>CCCCCCc1cn([C@@H]2C[C@@H](C(=O)N[C@@H](CC(N)=O)C(N)=O)N(C(=O)[C@H](Cc3ccc(O)cc3)NC(=O)[C@@H](NC(C)=O)[C@@H](C)O)C2)nn1
 
 ## Reaction 31-111-CAS-17367801
@@ -76,14 +64,14 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 27
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: COC(=O)C#CC(=O)OC.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>COC(=O)C1=CCSC12C1CC3CC(C1)CC2C3.COC(=O)C1=C(C(=O)OC)C2(SC1)C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-1015661
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 87
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: N#C/C=C/C#N.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>N#C[C@@H]1[C@@H](C#N)CSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-10176242
@@ -94,9 +82,7 @@ Total reactions: 232
 ## Reaction 31-287-CAS-10176982
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/phen
-- Catalytic System: CuSO4, 134-03-2, phen
-- Solvents: DMSO (67-68-5), water (7732-18-5)
+- Solvents: 67-68-5 (67-68-5), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccccc1.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@H](OC(=O)CN=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O>>CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@H](OC(=O)Cn2cc(-c3ccccc3)nn2)C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O
 
 ## Reaction 31-287-CAS-10445330
@@ -107,15 +93,13 @@ Total reactions: 232
 ## Reaction 31-287-CAS-11709845
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4
 - SMILES: [N-]=[N+]=NCc1ccccn1.C#Cc1ccc2c(COC(=O)CCC(=O)O)cc(=O)oc2c1>>O=C(O)CCC(=O)OCc1cc(=O)oc2cc(-c3cn(Cc4ccccn4)nn3)ccc12
 
 ## Reaction 31-287-CAS-11936972
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 84
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: COC(=O)C(C(=O)OC)=C(C(=O)OC)C(=O)OC.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>COC(=O)C1(C(=O)OC)CSC2(C3CC4CC(C3)CC2C4)C1(C(=O)OC)C(=O)OC
 
 ## Reaction 31-287-CAS-11979051
@@ -128,14 +112,12 @@ Total reactions: 232
 ## Reaction 31-287-CAS-11988245
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4
 - SMILES: C#Cc1ccc2c(COC(=O)CCC(=O)O)cc(=O)oc2c1.COc1ccnc(CN=[N+]=[N-])c1>>COc1ccnc(Cn2cc(-c3ccc4c(COC(=O)CCC(=O)O)cc(=O)oc4c3)nn2)c1
 
 ## Reaction 31-287-CAS-1214556
 
 - Type: SPAAC (strain‑promoted click)
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C#Cc1ccccc1.[N-]=[N+]=NCc1ccccc1>>c1ccc(Cn2cc(-c3ccccc3)nn2)cc1
 
 ## Reaction 31-287-CAS-12255018
@@ -147,7 +129,7 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 82
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C=CC#N.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>N#CC1CCSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-12510314
@@ -160,7 +142,7 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 47
-- Solvents: Et2O (60-29-7)
+- Solvents: 60-29-7 (60-29-7)
 - SMILES: C1=C\CC/C=C\CC/1.C=[N+]=[N-]>>C1=CCC[C@@H]2N=NC[C@H]2CC1
 
 ## Reaction 31-287-CAS-1258577
@@ -171,10 +153,9 @@ Total reactions: 232
 ## Reaction 31-287-CAS-12606063
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: SOCl2
 - Yield %: 19
-- Reagents: SOCl2 (7719-09-7) [COUPLING_REAGENT], 12116-82-4 (12116-82-4) [UNK]
-- Solvents: DCM (75-09-2), 75-15-0 (75-15-0)
+- Reagents: 7719-09-7 (7719-09-7) [UNK], 12116-82-4 (12116-82-4) [ADDITIVE]
+- Solvents: 75-09-2 (75-09-2), 75-15-0 (75-15-0)
 - SMILES: C1=CC2CCC1C2>>C1CC2CC1C1SSSC21
 
 ## Reaction 31-287-CAS-1312650
@@ -186,14 +167,12 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 88
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: N#CC(C#N)=Cc1ccccc1.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>N#CC1(C#N)C(c2ccccc2)CSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-14118221
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4
 - Yield %: 34
 - SMILES: [N-]=[N+]=NCc1cc(Cl)ccn1.C#Cc1ccc2c(COC(=O)CCC(=O)O)cc(=O)oc2c1>>O=C(O)CCC(=O)OCc1cc(=O)oc2cc(-c3cn(Cc4cc(Cl)ccn4)nn3)ccc12
 
@@ -206,7 +185,7 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 89
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C=CC(=O)OC.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>COC(=O)C1CCSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-14653926
@@ -222,32 +201,31 @@ Total reactions: 232
 ## Reaction 31-287-CAS-15547046
 
 - Type: SPAAC (strain‑promoted click)
-- Solvents: MeOH (67-56-1), water (7732-18-5)
+- Solvents: 67-56-1 (67-56-1), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCc1ccccc1.NCCC(=O)N1Cc2ccccc2C#Cc2ccccc21>>NCCC(=O)N1Cc2ccccc2-c2nnn(Cc3ccccc3)c2-c2ccccc21.NCCC(=O)N1Cc2ccccc2-c2c(nnn2Cc2ccccc2)-c2ccccc21
 
 ## Reaction 31-287-CAS-15552943
 
 - Type: SPAAC (strain‑promoted click)
-- Solvents: MeCN (75-05-8), water (7732-18-5)
+- Solvents: 75-05-8 (75-05-8), 7732-18-5 (7732-18-5)
 - SMILES: [O-]c1c[n+](-c2ccccc2)no1.CN1C(=O)c2ccccc2C#Cc2ccccc21>>CN1C(=O)c2ccccc2-c2cn(-c3ccccc3)nc2-c2ccccc21.CN1C(=O)c2ccccc2-c2nn(-c3ccccc3)cc2-c2ccccc21
 
 ## Reaction 31-287-CAS-15559983
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 15956-28-2
 - Yield %: 44
 - SMILES: C1=CCOCOC1.COC(=O)C=[N+]=[N-]>>COC(=O)[C@H]1[C@@H]2COCOC[C@@H]21
 
 ## Reaction 31-287-CAS-15651044
 
 - Type: SPAAC (strain‑promoted click)
-- Solvents: MeOH (67-56-1), water (7732-18-5)
+- Solvents: 67-56-1 (67-56-1), 7732-18-5 (7732-18-5)
 - SMILES: [O-]c1c[n+](-c2ccccc2)no1.NCCC(=O)N1Cc2ccccc2C#Cc2ccccc21>>NCCC(=O)N1Cc2ccccc2-c2cn(-c3ccccc3)nc2-c2ccccc21.NCCC(=O)N1Cc2ccccc2-c2nn(-c3ccccc3)cc2-c2ccccc21
 
 ## Reaction 31-287-CAS-15656384
 
 - Type: SPAAC (strain‑promoted click)
-- Solvents: MeCN (75-05-8), water (7732-18-5)
+- Solvents: 75-05-8 (75-05-8), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCc1ccccc1.CN1C(=O)c2ccccc2C#Cc2ccccc21>>CN1C(=O)c2ccccc2-c2c(nnn2Cc2ccccc2)-c2ccccc21.CN1C(=O)c2ccccc2-c2nnn(Cc3ccccc3)c2-c2ccccc21
 
 ## Reaction 31-287-CAS-1630124
@@ -258,64 +236,55 @@ Total reactions: 232
 ## Reaction 31-287-CAS-16822511
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 154426-43-4
 - Yield %: 2
-- Solvents: DCM (75-09-2)
+- Solvents: 75-09-2 (75-09-2)
 - SMILES: C=Cc1ccccc1.CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)C=[N+]=[N-]>>CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)[C@@H]1C[C@@H]1c1ccccc1.CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)[C@@H]1C[C@H]1c1ccccc1
 
 ## Reaction 31-287-CAS-16822512
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 154426-43-4
-- Solvents: DCM (75-09-2)
+- Solvents: 75-09-2 (75-09-2)
 - SMILES: C=CCCCCC.CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)C=[N+]=[N-]>>CCCCC[C@@H]1C[C@H]1C(=O)O[C@@H]1C[C@H](C)CC[C@H]1C(C)C.CCCCC[C@H]1C[C@H]1C(=O)O[C@@H]1C[C@H](C)CC[C@H]1C(C)C
 
 ## Reaction 31-287-CAS-16822513
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 154426-43-4
-- Solvents: DCM (75-09-2)
+- Solvents: 75-09-2 (75-09-2)
 - SMILES: C=C(C)c1ccccc1.CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)C=[N+]=[N-]>>CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)[C@@H]1C[C@@]1(C)c1ccccc1.CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)[C@@H]1C[C@]1(C)c1ccccc1
 
 ## Reaction 31-287-CAS-16822514
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 154426-43-4
-- Solvents: DCM (75-09-2)
+- Solvents: 75-09-2 (75-09-2)
 - SMILES: C=CC=C(C)C.CC(C)[C@@H]1CC[C@@H](C)C[C@H]1OC(=O)C=[N+]=[N-]>>CC(C)=C[C@@H]1C[C@H]1C(=O)O[C@@H]1C[C@H](C)CC[C@H]1C(C)C.CC(C)=C[C@H]1C[C@H]1C(=O)O[C@@H]1C[C@H](C)CC[C@H]1C(C)C
 
 ## Reaction 31-287-CAS-16822515
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 154426-43-4
 - Yield %: 93
-- Solvents: DCM (75-09-2)
+- Solvents: 75-09-2 (75-09-2)
 - SMILES: [N-]=[N+]=CC(=O)OC/C=C/c1ccccc1>>O=C1OC[C@@H]2[C@H]1[C@H]2c1ccccc1
 
 ## Reaction 31-287-CAS-16822516
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: NaOH
-- Catalytic System: 154426-43-4, 2052-49-5
 - Yield %: 65
-- Reagents: NaOH (1310-73-2) [BASE], 7664-38-2 (7664-38-2) [UNK], 99306-87-3 (99306-87-3) [UNK]
-- Solvents: PhMe (108-88-3)
+- Reagents: 1310-73-2 (1310-73-2) [UNK], 7664-38-2 (7664-38-2) [ADDITIVE], 99306-87-3 (99306-87-3) [ADDITIVE]
+- Solvents: 108-88-3 (108-88-3)
 - SMILES: CCOC(=O)C=[N+]=[N-].C=Cc1cccc2c1CCO2>>O=C(O)[C@H]1C[C@@H]1c1cccc2c1CCO2
 
 ## Reaction 31-287-CAS-16822517
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 858681-18-2
 - Yield %: 82
-- Solvents: PhMe (108-88-3)
+- Solvents: 108-88-3 (108-88-3)
 - SMILES: CCOC(=O)C=[N+]=[N-].C=Cc1cn(S(=O)(=O)c2ccc(C)cc2)c2ccc(C#N)cc12>>CCOC(=O)[C@H]1C[C@@H]1c1cn(S(=O)(=O)c2ccc(C)cc2)c2ccc(C#N)cc12
 
 ## Reaction 31-287-CAS-16822518
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 154426-43-4
 - Yield %: 70
-- Solvents: DCM (75-09-2)
+- Solvents: 75-09-2 (75-09-2)
 - SMILES: C=Cc1ccccc1.CC(C)OP(=O)(C=[N+]=[N-])OC(C)C>>CC(C)OP(=O)(OC(C)C)[C@@H]1C[C@H]1c1ccccc1
 
 ## Reaction 31-287-CAS-16822977
@@ -737,24 +706,22 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 73
-- Solvents: Et2O (60-29-7)
+- Solvents: 60-29-7 (60-29-7)
 - SMILES: [N-]=[N+]=Nc1ccccc1.COC(=O)C#CC(=O)OC>>COC(=O)c1nnn(-c2ccccc2)c1C(=O)OC
 
 ## Reaction 31-287-CAS-17367806
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 99
-- Solvents: PhH (71-43-2)
+- Solvents: 71-43-2 (71-43-2)
 - SMILES: C=C(C)OCC.[N-]=[N+]=Nc1ccc([N+](=O)[O-])cc1>>CCOC1(C)CN=NN1c1ccc([N+](=O)[O-])cc1
 
 ## Reaction 31-287-CAS-17367858
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4
 - Yield %: 77
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: t-BuOH (75-65-0), water (7732-18-5)
+- Solvents: 75-65-0 (75-65-0), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=Nc1ccccc1.C#CC[C@@H](C)[C@H]1CC[C@H]2[C@@H](O[Si](CC)(CC)CC)CCC[C@]12C>>CC[Si](CC)(CC)O[C@H]1CCC[C@]2(C)[C@@H]([C@H](C)Cc3cn(-c4ccccc4)nn3)CC[C@@H]12
 
 ## Reaction 31-287-CAS-17367860
@@ -769,7 +736,7 @@ Total reactions: 232
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 96
 - Reagents: 925-90-6 (925-90-6) [UNK]
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C#Cc1ccccc1.[N-]=[N+]=Nc1ccccc1>>c1ccc(-c2cnnn2-c2ccccc2)cc1
 
 ## Reaction 31-287-CAS-17367862
@@ -782,30 +749,29 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 91
-- Solvents: DMF (68-12-2)
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: N#CSCc1ccccc1N=[N+]=[N-]>>c1ccc2c(c1)CSc1nnnn1-2
 
 ## Reaction 31-287-CAS-17367867
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 92
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: N#CBr.[N-]=[N+]=Nc1ccccc1N>>c1ccc2c(c1)nc1nn[nH]n12
 
 ## Reaction 31-287-CAS-17367869
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 92
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: N#CBr.[N-]=[N+]=Nc1ccccc1O>>c1ccc2c(c1)oc1nnnn12
 
 ## Reaction 31-287-CAS-17367871
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Dabco
 - Yield %: 87
-- Reagents: Dabco (280-57-9) [BASE]
-- Solvents: THF (109-99-9)
+- Reagents: 280-57-9 (280-57-9) [UNK]
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C=CC(=O)OC.[N-]=[N+]=Nc1ccccc1>>COC(=O)C1=NNC(CNc2ccccc2)(C(=O)OC)C1
 
 ## Reaction 31-287-CAS-17522776
@@ -818,8 +784,7 @@ Total reactions: 232
 ## Reaction 31-287-CAS-18347868
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 154426-43-4
-- Solvents: water (7732-18-5)
+- Solvents: 7732-18-5 (7732-18-5)
 - SMILES: C=Cc1ccccc1.CCOC(=O)C=[N+]=[N-]>>CCOC(=O)[C@@H]1C[C@@H]1c1ccccc1.CCOC(=O)[C@@H]1C[C@H]1c1ccccc1
 
 ## Reaction 31-287-CAS-18977183
@@ -884,20 +849,20 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 84
-- Solvents: DMF (68-12-2)
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: CC(=O)O[C@H]1[C@H](O[C@@H]2OC[C@@H](O)[C@H](O)[C@H]2O)[C@@H](O)[C@H](O[C@@H]2[C@H](O)[C@@H](O[C@@H]3O[C@@H](C)[C@H](O[C@@H]4OC[C@@H](O)[C@H](O[C@@H]5O[C@H](CO)[C@@H](O)[C@H](O)[C@H]5O)[C@H]4O)[C@@H](O)[C@H]3O)[C@H](OC(=O)[C@]34CCC(C)(C)C[C@H]3C3=CC[C@@H]5[C@@]6(C)CC[C@H](O[C@@H]7O[C@H](C(=O)O)[C@@H](O)[C@H](O[C@@H]8OC[C@@H](O)[C@H](O)[C@H]8O)[C@H]7O[C@@H]7O[C@H](CO)[C@H](O)[C@H](O)[C@H]7O)[C@@](C)(C=NNC(=O)CCOCCOCCOCCOCCN=[N+]=[N-])[C@@H]6CC[C@@]5(C)[C@]3(C)C[C@H]4O)O[C@@H]2C)O[C@@H]1C.O=C(CCC(=O)N1Cc2ccccc2C#Cc2ccccc21)NCCOCCOCCOCCN(CCOCCOCCOCCNC(=O)OC1CC/C=C\CCC1)C(=O)CCOCCOCCOCCOCCNC(=O)CCN1C(=O)C=CC1=O>>CC(=O)OC1C(C)OC(OC2C(C)OC(OC(=O)C34CCC(C)(C)CC3C3=CCC5C6(C)CCC(OC7OC(C(=O)O)C(O)C(OC8OCC(O)C(O)C8O)C7OC7OC(CO)C(O)C(O)C7O)C(C)(C=NNC(=O)CCOCCOCCOCCOCCn7nnc8c7-c7ccccc7N(C(=O)CCC(=O)NCCOCCOCCOCCN(CCOCCOCCOCCNC(=O)OC7CC/C=C\CCC7)C(=O)CCOCCOCCOCCOCCNC(=O)CCN7C(=O)C=CC7=O)Cc7ccccc7-8)C6CCC5(C)C3(C)CC4O)C(OC3OC(C)C(OC4OCC(O)C(OC5OC(CO)C(O)C(O)C5O)C4O)C(O)C3O)C2O)C(O)C1OC1OCC(O)C(O)C1O
 
 ## Reaction 31-287-CAS-3053883
 
 - Type: SPAAC (strain‑promoted click)
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: [N-]=[N+]=NCc1ccccc1.C1#CCCCCCC1>>c1ccc(Cn2nnc3c2CCCCCC3)cc1
 
 ## Reaction 31-287-CAS-3116160
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 90
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: COC(=O)/C=C/C(=O)OC.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>COC(=O)[C@H]1CSC2(C3CC4CC(C3)CC2C4)[C@@H]1C(=O)OC
 
 ## Reaction 31-287-CAS-3172551
@@ -909,7 +874,7 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 92
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: O=C1C=CC(=O)N1c1ccccc1.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>O=C1[C@@H]2[C@@H](CSC23C2CC4CC(C2)CC3C4)C(=O)N1c1ccccc1
 
 ## Reaction 31-287-CAS-3705778
@@ -926,7 +891,7 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 93
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: COC(=O)C(C#N)=Cc1ccccc1.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>COC(=O)[C@]1(C#N)[C@@H](c2ccccc2)CSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-5222304
@@ -938,14 +903,14 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 92
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: COC(=O)/C=C\C(=O)OC.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>COC(=O)[C@H]1CSC2(C3CC4CC(C3)CC2C4)[C@H]1C(=O)OC
 
 ## Reaction 31-287-CAS-5536127
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 94
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: N#CC(C#N)=C(C#N)C#N.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>N#CC1(C#N)CSC2(C3CC4CC(C3)CC2C4)C1(C#N)C#N
 
 ## Reaction 31-287-CAS-5577331
@@ -962,9 +927,7 @@ Total reactions: 232
 ## Reaction 31-287-CAS-5594810
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 134-03-2
-- Solvents: THF (109-99-9), water (7732-18-5)
+- Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCc1ccc(C(=O)O)cc1.C#Cc1ccc2c(COC(=O)CCC(=O)O)cc(=O)oc2c1>>O=C(O)CCC(=O)OCc1cc(=O)oc2cc(-c3cn(Cc4ccc(C(=O)O)cc4)nn3)ccc12
 
 ## Reaction 31-287-CAS-6188303
@@ -976,7 +939,7 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 91
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: N#CC(C#N)=Cc1ccc([N+](=O)[O-])cc1.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>N#CC1(C#N)C(c2ccc([N+](=O)[O-])cc2)CSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-7201096
@@ -989,44 +952,40 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 93
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C1N=NC2(S1)C1CC3CC(C1)CC2C3.COC(=O)C(C#N)=Cc1ccc([N+](=O)[O-])cc1>>COC(=O)[C@]1(C#N)[C@@H](c2ccc([N+](=O)[O-])cc2)CSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-7413567
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 95
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: O=C1C=CC(=O)O1.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>O=C1OC(=O)[C@@H]2CSC3(C4CC5CC(C4)CC3C5)[C@H]12
 
 ## Reaction 31-287-CAS-7683932
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 95
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C1N=NC2(S1)C1CC3CC(C1)CC2C3.COC(=O)/C(C#N)=C(\C#N)C(=O)OC>>COC(=O)[C@@]1(C#N)C2(SC[C@]1(C#N)C(=O)OC)C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-7726269
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 134-03-2
-- Solvents: DMSO (67-68-5), water (7732-18-5)
+- Solvents: 67-68-5 (67-68-5), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccc2c(COC(=O)CCC(=O)O)cc(=O)oc2c1.[N-]=[N+]=NCc1ccc(C(=O)O)cn1>>O=C(O)CCC(=O)OCc1cc(=O)oc2cc(-c3cn(Cc4ccc(C(=O)O)cn4)nn3)ccc12
 
 ## Reaction 31-287-CAS-7772901
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/phen
-- Catalytic System: CuSO4, 134-03-2, phen
-- Solvents: DMSO (67-68-5), water (7732-18-5)
+- Solvents: 67-68-5 (67-68-5), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccccc1.CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@@H](N=[N+]=[N-])C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O>>CC(=O)N[C@H](C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)N1C[C@@H](n2cc(-c3ccccc3)nn2)C[C@H]1C(=O)N[C@@H](CC(N)=O)C(N)=O)[C@@H](C)O
 
 ## Reaction 31-287-CAS-8009333
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 38
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C#CC(=O)OC.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>COC(=O)C1=CC2(SC1)C1CC3CC(C1)CC2C3.COC(=O)C1=CCSC12C1CC3CC(C1)CC2C3
 
 ## Reaction 31-287-CAS-8042822
@@ -1044,28 +1003,24 @@ Total reactions: 232
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 97
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: CN1C(=O)C=CC1=O.C1N=NC2(S1)C1CC3CC(C1)CC2C3>>CN1C(=O)[C@@H]2[C@@H](CSC23C2CC4CC(C2)CC3C4)C1=O
 
 ## Reaction 31-287-CAS-9580167
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4
 - SMILES: [N-]=[N+]=NCc1ccccc1.C#Cc1ccc2c(COC(=O)CCC(=O)O)cc(=O)oc2c1>>O=C(O)CCC(=O)OCc1cc(=O)oc2cc(-c3cn(Cc4ccccc4)nn3)ccc12
 
 ## Reaction 31-287-CAS-9813995
 
 - Type: SPAAC (strain‑promoted click)
 - Yield %: 3
-- Solvents: THF (109-99-9)
+- Solvents: 109-99-9 (109-99-9)
 - SMILES: C1N=NC2(S1)C1CC3CC(C1)CC2C3.COC(=O)/C(C#N)=C(/C#N)C(=O)OC>>COC(=O)[C@@]1(C#N)CSC2(C3CC4CC(C3)CC2C4)[C@@]1(C#N)C(=O)OC
 
 ## Reaction 31-287-CAS-9859030
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4
 - SMILES: COC(=O)c1ccc(CN=[N+]=[N-])nc1.C#Cc1ccc2c(COC(=O)CCC(=O)O)cc(=O)oc2c1>>COC(=O)c1ccc(Cn2cc(-c3ccc4c(COC(=O)CCC(=O)O)cc(=O)oc4c3)nn2)nc1
 
 ## Reaction 31-287-CAS-999590
@@ -1076,452 +1031,362 @@ Total reactions: 232
 ## Reaction 31-614-CAS-31132811
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 47
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](CF)[C@@H](O)[C@H](O)[C@H]1O.C#CCOc1ccc(-c2nncnn2)cc1>>O[C@@H]1[C@@H](O)[C@H](n2cc(COc3ccc(-c4nncnn4)cc3)nn2)O[C@H](CF)[C@H]1O
 
 ## Reaction 31-614-CAS-31132812
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 35
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCF.C#CCOc1ccc(-c2nncnn2)cc1>>FCCn1cc(COc2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132819
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 29
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCCF.C#CCOc1ccc(-c2nncnn2)cc1>>FCCOCCOCCOCCn1cc(COc2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132820
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 42
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCCF.C#CCOc1ccc(-c2nnc(C)nn2)cc1>>Cc1nnc(-c2ccc(OCc3cn(CCOCCOCCOCCF)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132821
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 40
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCF.C#CCOc1ccc(-c2nnc(C)nn2)cc1>>Cc1nnc(-c2ccc(OCc3cn(CCF)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132822
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 52746-49-3
 - Yield %: 45
-- Reagents: 134-03-2 (134-03-2) [UNK], CuSO4 (7758-98-7) [METAL_CATALYST]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Reagents: 134-03-2 (134-03-2) [UNK], 7758-98-7 (7758-98-7) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCCNC(=O)CN1CCN(CC(=O)O)CCN(CC(=O)O)CCN(CC(=O)O)CC1.C#CCOc1ccc(-c2nncnn2)cc1>>O=C(O)CN1CCN(CC(=O)O)CCN(CC(=O)NCCCn2cc(COc3ccc(-c4nncnn4)cc3)nn2)CCN(CC(=O)O)CC1
 
 ## Reaction 31-614-CAS-31132823
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 73
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](CF)[C@@H](O)[C@H](O)[C@H]1O.C#CCOc1ccc(-c2nnc(C)nn2)cc1>>Cc1nnc(-c2ccc(OCc3cn([C@@H]4O[C@H](CF)[C@@H](O)[C@H](O)[C@H]4O)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132824
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 52746-49-3
 - Yield %: 32
-- Reagents: 134-03-2 (134-03-2) [UNK], CuSO4 (7758-98-7) [METAL_CATALYST]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Reagents: 134-03-2 (134-03-2) [UNK], 7758-98-7 (7758-98-7) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCCNC(=O)CN1CCN(CC(=O)O)CCN(CC(=O)O)CCN(CC(=O)O)CC1.C#CCOc1ccc(-c2nnc(C)nn2)cc1>>Cc1nnc(-c2ccc(OCc3cn(CCCNC(=O)CN4CCN(CC(=O)O)CCN(CC(=O)O)CCN(CC(=O)O)CC4)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132831
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 52746-49-3
 - Yield %: 62
-- Reagents: 134-03-2 (134-03-2) [UNK], CuSO4 (7758-98-7) [METAL_CATALYST]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Reagents: 134-03-2 (134-03-2) [UNK], 7758-98-7 (7758-98-7) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCCNC(=O)CN1CCN(CC(=O)O)CCN(CC(=O)O)CCN(CC(=O)O)CC1.C#Cc1ccc(-c2nncnn2)cc1>>O=C(O)CN1CCN(CC(=O)O)CCN(CC(=O)NCCCn2cc(-c3ccc(-c4nncnn4)cc3)nn2)CCN(CC(=O)O)CC1
 
 ## Reaction 31-614-CAS-31132832
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 16
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](CF)[C@@H](O)[C@H](O)[C@H]1O.C#CCOc1ccc(-c2nnc(-c3ccccn3)nn2)cc1>>O[C@@H]1[C@@H](O)[C@H](n2cc(COc3ccc(-c4nnc(-c5ccccn5)nn4)cc3)nn2)O[C@H](CF)[C@H]1O
 
 ## Reaction 31-614-CAS-31132833
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 52746-49-3
 - Yield %: 13
-- Reagents: 134-03-2 (134-03-2) [UNK], CuSO4 (7758-98-7) [METAL_CATALYST]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Reagents: 134-03-2 (134-03-2) [UNK], 7758-98-7 (7758-98-7) [ADDITIVE]
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: Cc1nnc(-c2ccc(OCCOCCOCCOCCN=[N+]=[N-])cc2)nn1.C#CCC1CN2CCCN(CC(=O)O)CCN(CCCN(CC(=O)O)CC2)C1>>Cc1nnc(-c2ccc(OCCOCCOCCOCCn3cc(CC4CN5CCCN(CC(=O)O)CCN(CCCN(CC(=O)O)CC5)C4)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132837
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 38
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCF.C#CCOc1ccc(-c2nnc(-c3ccccn3)nn2)cc1>>FCCn1cc(COc2ccc(-c3nnc(-c4ccccn4)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132838
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/I
-- Catalytic System: CuI
 - Yield %: 49
-- Reagents: Et3N (121-44-8) [BASE]
-- Solvents: DMF (68-12-2)
+- Reagents: 121-44-8 (121-44-8) [UNK]
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCCF.C#Cc1ccc(-c2nncnn2)cc1>>FCCOCCOCCOCCn1cc(-c2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132839
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 20
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCCF.C#CCOc1ccc(-c2nnc(-c3ccccn3)nn2)cc1>>FCCOCCOCCOCCn1cc(COc2ccc(-c3nnc(-c4ccccn4)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132841
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 51
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccc(C(=O)O)cc1.[N-]=[N+]=NCCF>>O=C(O)c1ccc(-c2cn(CCF)nn2)cc1
 
 ## Reaction 31-614-CAS-31132842
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/I
-- Catalytic System: CuI
 - Yield %: 18
-- Reagents: Et3N (121-44-8) [BASE]
-- Solvents: DMF (68-12-2)
+- Reagents: 121-44-8 (121-44-8) [UNK]
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: [N-]=[N+]=NCCF.C#Cc1ccc(-c2nncnn2)cc1>>FCCn1cc(-c2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132844
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/I
-- Catalytic System: CuI
-- Reagents: Et3N (121-44-8) [BASE]
-- Solvents: DMF (68-12-2)
+- Reagents: 121-44-8 (121-44-8) [UNK]
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](CF)[C@@H](O)[C@H](O)[C@H]1O.C#Cc1ccc(-c2nncnn2)cc1>>O[C@@H]1[C@@H](O)[C@H](n2cc(-c3ccc(-c4nncnn4)cc3)nn2)O[C@H](CF)[C@H]1O.O[C@@H]1[C@@H](O)[C@@H](n2cc(-c3ccc(-c4nncnn4)cc3)nn2)O[C@H](CF)[C@H]1O
 
 ## Reaction 31-614-CAS-31132849
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 69
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccc(C(=O)O)cc1.[N-]=[N+]=NCCOCCOCCOCCF>>O=C(O)c1ccc(-c2cn(CCOCCOCCOCCF)nn2)cc1
 
 ## Reaction 31-614-CAS-31132852
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 84
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: C#Cc1ccc(C(=O)O)cc1.CC(=O)O[C@@H]1[C@@H](OC(C)=O)[C@H](N=[N+]=[N-])O[C@H](CF)[C@H]1OC(C)=O>>CC(=O)O[C@@H]1[C@@H](OC(C)=O)[C@H](n2cc(-c3ccc(C(=O)O)cc3)nn2)O[C@H](CF)[C@H]1OC(C)=O
 
 ## Reaction 31-614-CAS-31132873
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/II
-- Catalytic System: Cu(OAc)2
 - Yield %: 42
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: t-BuOH (75-65-0), water (7732-18-5)
+- Solvents: 75-65-0 (75-65-0), 7732-18-5 (7732-18-5)
 - SMILES: C#CCCC(=O)O.[N-]=[N+]=NCCOCCOCCOCCF>>O=C(O)CCc1cn(CCOCCOCCOCCF)nn1
 
 ## Reaction 31-614-CAS-31132875
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 46
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: C#CCCC(=O)O.[N-]=[N+]=NCCF>>O=C(O)CCc1cn(CCF)nn1
 
 ## Reaction 31-614-CAS-31132876
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), MeCN (75-05-8), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 75-05-8 (75-05-8), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCC[18F].C#Cc1ccc(C(=O)Nc2ccc(-c3nnc(-c4ccccn4)nn3)nc2)cc1>>O=C(Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1)c1ccc(-c2cn(CC[18F])nn2)cc1
 
 ## Reaction 31-614-CAS-31132879
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Yield %: 99
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: C#CCCC(=O)O.CC(=O)O[C@@H]1[C@@H](OC(C)=O)[C@H](N=[N+]=[N-])O[C@H](CF)[C@H]1OC(C)=O>>CC(=O)O[C@@H]1[C@@H](OC(C)=O)[C@H](n2cc(CCC(=O)O)nn2)O[C@H](CF)[C@H]1OC(C)=O
 
 ## Reaction 31-614-CAS-31132880
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCC[18F].C#CCOc1ccc(-c2nncnn2)cc1>>[18F]CCn1cc(COc2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132884
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCC[18F].C#CCOc1ccc(-c2nnc(C)nn2)cc1>>Cc1nnc(-c2ccc(OCc3cn(CC[18F])nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132886
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCC[18F].C#Cc1ccc(-c2nncnn2)cc1>>[18F]CCn1cc(-c2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132891
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCC[18F].C#CCOc1ccc(-c2nnc(-c3ccccn3)nn2)cc1>>[18F]CCn1cc(COc2ccc(-c3nnc(-c4ccccn4)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132893
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCC[18F].C#Cc1ccc(-c2nncnn2)cc1>>[18F]CCOCCOCCOCCn1cc(-c2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132894
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCC[18F].C#CCOc1ccc(-c2nnc(-c3ccccn3)nn2)cc1>>[18F]CCOCCOCCOCCn1cc(COc2ccc(-c3nnc(-c4ccccn4)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132896
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCC[18F].C#CCOc1ccc(-c2nnc(C)nn2)cc1>>Cc1nnc(-c2ccc(OCc3cn(CCOCCOCCOCC[18F])nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132897
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCC[18F].C#CCOc1ccc(-c2nncnn2)cc1>>[18F]CCOCCOCCOCCn1cc(COc2ccc(-c3nncnn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132898
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), MeCN (75-05-8), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 75-05-8 (75-05-8), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCC[18F].C#CCCC(=O)Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1>>O=C(CCc1cn(CC[18F])nn1)Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1
 
 ## Reaction 31-614-CAS-31132901
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]1O.C#CCOc1ccc(-c2nncnn2)cc1>>O[C@@H]1[C@@H](O)[C@H](n2cc(COc3ccc(-c4nncnn4)cc3)nn2)O[C@H](C[18F])[C@H]1O
 
 ## Reaction 31-614-CAS-31132902
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]1O.C#CCCC(=O)Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1>>O=C(CCc1cn([C@@H]2O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]2O)nn1)Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1
 
 ## Reaction 31-614-CAS-31132904
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]1O.C#CCOc1ccc(-c2nnc(C)nn2)cc1>>Cc1nnc(-c2ccc(OCc3cn([C@@H]4O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]4O)nn3)cc2)nn1
 
 ## Reaction 31-614-CAS-31132905
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]1O.C#CCOc1ccc(-c2nnc(-c3ccccn3)nn2)cc1>>O[C@@H]1[C@@H](O)[C@H](n2cc(COc3ccc(-c4nnc(-c5ccccn5)nn4)cc3)nn2)O[C@H](C[18F])[C@H]1O
 
 ## Reaction 31-614-CAS-31132906
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCC[18F].C#CCCC(=O)Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1>>O=C(CCc1cn(CCOCCOCCOCC[18F])nn1)Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1
 
 ## Reaction 31-614-CAS-31132909
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCC[18F].C#Cc1ccc(C(=O)Nc2ccc(-c3nnc(-c4ccccn4)nn3)nc2)cc1>>O=C(Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1)c1ccc(-c2cn(CCOCCOCCOCC[18F])nn2)cc1
 
 ## Reaction 31-614-CAS-31132910
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]1O.C#Cc1ccc(C(=O)Nc2ccc(-c3nnc(-c4ccccn4)nn3)nc2)cc1>>O=C(Nc1ccc(-c2nnc(-c3ccccn3)nn2)nc1)c1ccc(-c2cn([C@@H]3O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]3O)nn2)cc1
 
 ## Reaction 31-614-CAS-31132912
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 52746-49-3
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMF (68-12-2), water (7732-18-5)
+- Solvents: 68-12-2 (68-12-2), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=N[C@@H]1O[C@H](C[18F])[C@@H](O)[C@H](O)[C@H]1O.C#Cc1ccc(-c2nncnn2)cc1>>O[C@@H]1[C@@H](O)[C@H](n2cc(-c3ccc(-c4nncnn4)cc3)nn2)O[C@H](C[18F])[C@H]1O
 
 ## Reaction 31-614-CAS-32947982
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/II
-- Catalytic System: Cu(OAc)2
 - Yield %: 62
-- Reagents: NaOAc (127-09-3) [BASE]
-- Solvents: DMF (68-12-2), Cu(OAc)2 (142-71-2)
+- Reagents: 127-09-3 (127-09-3) [UNK]
+- Solvents: 68-12-2 (68-12-2), Copper(II) acetate (142-71-2)
 - SMILES: O=C(CBr)c1ccccc1.N#Cc1ccncc1.C=CC(=O)OCC>>CCOC(=O)c1cc(C(=O)c2ccccc2)n2ccc(C#N)cc12
 
 ## Reaction 31-614-CAS-32947985
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/II
-- Catalytic System: Cu(OAc)2
-- Reagents: NaOAc (127-09-3) [BASE]
-- Solvents: DMF (68-12-2)
+- Reagents: 127-09-3 (127-09-3) [UNK]
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: C=CC(=O)OCC.N#Cc1cc[n+](CC(=O)c2ccccc2)cc1.[Br-]>>CCOC(=O)c1cc(C(=O)c2ccccc2)n2ccc(C#N)cc12
 
 ## Reaction 31-614-CAS-32947987
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/II
-- Catalytic System: Cu(OAc)2
-- Reagents: NaOAc (127-09-3) [BASE]
-- Solvents: DMF (68-12-2)
+- Reagents: 127-09-3 (127-09-3) [UNK]
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: C=CC(=O)OCC.O=C(C[n+]1ccccc1)c1ccccc1.[Br-]>>CCOC(=O)c1cc(C(=O)c2ccccc2)n2ccccc12
 
 ## Reaction 31-614-CAS-32947990
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/II
-- Catalytic System: Cu(OAc)2
 - Yield %: 67
-- Reagents: NaOAc (127-09-3) [BASE]
-- Solvents: DMF (68-12-2), Cu(OAc)2 (142-71-2)
+- Reagents: 127-09-3 (127-09-3) [UNK]
+- Solvents: 68-12-2 (68-12-2), Copper(II) acetate (142-71-2)
 - SMILES: O=C(CBr)c1ccccc1.c1ccncc1.C=CC(=O)OCC>>CCOC(=O)c1cc(C(=O)c2ccccc2)n2ccccc12
 
 ## Reaction 31-614-CAS-32947997
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/II
-- Catalytic System: Cu(OAc)2
-- Reagents: NaOAc (127-09-3) [BASE]
-- Solvents: DMF (68-12-2)
+- Reagents: 127-09-3 (127-09-3) [UNK]
+- Solvents: 68-12-2 (68-12-2)
 - SMILES: C=CC(=O)OCC.N#Cc1ccc(C(=O)C[n+]2ccccc2)cc1.[Br-]>>CCOC(=O)c1cc(C(=O)c2ccc(C#N)cc2)n2ccccc12
 
 ## Reaction 31-614-CAS-32948008
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/II
-- Catalytic System: Cu(OAc)2
 - Yield %: 51
-- Reagents: NaOAc (127-09-3) [BASE]
-- Solvents: DMF (68-12-2), Cu(OAc)2 (142-71-2)
+- Reagents: 127-09-3 (127-09-3) [UNK]
+- Solvents: 68-12-2 (68-12-2), Copper(II) acetate (142-71-2)
 - SMILES: c1ccncc1.N#Cc1ccc(C(=O)CBr)cc1.C=CC(=O)OCC>>CCOC(=O)c1cc(C(=O)c2ccc(C#N)cc2)n2ccccc12
 
 ## Reaction 31-614-CAS-34832857
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 7758-99-8, 510758-28-8
 - Yield %: 73
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: DMSO (67-68-5), water (7732-18-5)
+- Solvents: 67-68-5 (67-68-5), 7732-18-5 (7732-18-5)
 - SMILES: C#CCCC(=O)NCCOCCOCCOCC(=O)N[C@@H](CCC(=O)OC(C)(C)C)C(=O)N[C@H](C(=O)N[C@@H](CCCNC(N)=O)C(=O)Nc1ccc(COC(=O)N(C)[C@H](C(=O)N[C@H](C(=O)N(C)[C@@H]([C@@H](C)CC)[C@@H](CC(=O)N2CCC[C@H]2[C@H](OC)[C@@H](C)C(=O)N[C@@H](Cc2ccccc2)C(=O)O)OC)C(C)C)C(C)C)cc1)C(C)C.CC[C@H](C)[C@@H]([C@@H](CC(=O)N1CCC[C@H]1[C@H](OC)[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)OC)N(C)C(=O)[C@@H](NC(=O)[C@H](C(C)C)N(C)C(=O)OCc1ccc(NC(=O)[C@H](CCCNC(N)=O)NC(=O)[C@@H](NC(=O)[C@H](CCC(=O)OC(C)(C)C)NC(=O)COCCOCCOCCNC(=O)[C@H](CCCCN=[N+]=[N-])NC(=O)OCC2c3ccccc3-c3ccccc32)C(C)C)cc1)C(C)C>>CC[C@H](C)[C@@H]([C@@H](CC(=O)N1CCC[C@H]1[C@H](OC)[C@@H](C)C(=O)N[C@@H](Cc1ccccc1)C(=O)O)OC)N(C)C(=O)[C@@H](NC(=O)[C@H](C(C)C)N(C)C(=O)OCc1ccc(NC(=O)[C@H](CCCNC(N)=O)NC(=O)[C@@H](NC(=O)[C@H](CCC(=O)OC(C)(C)C)NC(=O)COCCOCCOCCNC(=O)CCc2cn(CCCC[C@H](NC(=O)OCC3c4ccccc4-c4ccccc43)C(=O)NCCOCCOCCOCC(=O)N[C@@H](CCC(=O)OC(C)(C)C)C(=O)N[C@H](C(=O)N[C@@H](CCCNC(N)=O)C(=O)Nc3ccc(COC(=O)N(C)[C@H](C(=O)N[C@H](C(=O)N(C)[C@@H]([C@@H](C)CC)[C@@H](CC(=O)N4CCC[C@H]4[C@H](OC)[C@@H](C)C(=O)N[C@@H](Cc4ccccc4)C(=O)O)OC)C(C)C)C(C)C)cc3)C(C)C)nn2)C(C)C)cc1)C(C)C
 
 ## Reaction 31-614-CAS-35979683
 
 - Type: SPAAC (strain‑promoted click)
-- Catalytic System: 1239615-32-7, 1341215-17-5
 - Reagents: 134-03-2 (134-03-2) [UNK]
-- Solvents: t-BuOH (75-65-0), water (7732-18-5)
+- Solvents: 75-65-0 (75-65-0), 7732-18-5 (7732-18-5)
 - SMILES: C#CCOc1cc(OCC#C)cc(C(=O)NCOCCOCCOCCCNC(=O)OC(C)(C)C)c1.[N-]=[N+]=NCCCOCCOCCOCN>>CC(C)(C)OC(=O)NCCCOCCOCCOCNC(=O)c1cc(OCc2cn(CCCOCCOCCOCN)nn2)cc(OCc2cn(CCCOCCOCCOCN)nn2)c1
 
 ## Reaction 31-614-CAS-36471233
@@ -1533,8 +1398,6 @@ Total reactions: 232
 ## Reaction 31-614-CAS-44058710
 
 - Type: SPAAC (strain‑promoted click)
-- Condition Core: Cu/CopperSulfate
-- Catalytic System: CuSO4, 134-03-2
-- Solvents: THF (109-99-9), water (7732-18-5)
+- Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
 - SMILES: [N-]=[N+]=NCCOCCOCCOCCN.C#CCC(NC(=O)COCCOCCNC(=O)C[C@@H]1N=C(c2ccc(Cl)cc2)c2c(sc(C)c2C)-n2c(C)nnc21)C(=O)N[C@H](C(=O)N1C[C@H](O)C[C@H]1C(=O)NCc1ccc(-c2scnc2C)cc1)C(C)(C)C>>Cc1ncsc1-c1ccc(CNC(=O)[C@@H]2C[C@@H](O)CN2C(=O)[C@@H](NC(=O)C(Cc2cn(CCOCCOCCOCCN)nn2)NC(=O)COCCOCCNC(=O)C[C@@H]2N=C(c3ccc(Cl)cc3)c3c(sc(C)c3C)-n3c(C)nnc32)C(C)(C)C)cc1
 

@@ -10,14 +10,9 @@ from __future__ import annotations
 import os
 import sys
 import traceback
-import tempfile
 import re
 import csv
-import urllib.request
-import urllib.error
-import urllib.parse
 from typing import List, Optional, Dict, Any, Set, Tuple
-from collections import defaultdict
 from pathlib import Path
 
 # Add parent directory to path so we can import chemtools
@@ -42,21 +37,10 @@ else:  # pragma: no cover
 
 # Import processing functions from the existing modules
 try:
-    from process_reactions import parse_rdf, assemble_rows, load_cas_maps, build_condkey, build_condsig, build_famsig
+    from process_reactions import parse_rdf, assemble_rows
 except Exception as e:
     print(f"Error: Cannot import processing helpers: {e}")
     sys.exit(1)
-
-try:
-    from v2_processor_core import V2Processor
-except ImportError:
-    V2Processor = None
-
-try:
-    # We import but will prefer our taxonomy-aware generator for this GUI tool.
-    from reaction_markdown_generator import ReactionMarkdownGenerator as _ExternalReactionMarkdownGenerator  # type: ignore
-except Exception:
-    _ExternalReactionMarkdownGenerator = None  # type: ignore
 
 
 # ---------------------------- Taxonomy integration ----------------------------
@@ -64,16 +48,6 @@ except Exception:
 import json as _json
 from chemtools.reagent.constants import ROLE_ALIASES
 
-PUBCHEM_PUG_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
-PUBCHEM_VIEW_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound"
-PUBCHEM_USER_AGENT = "ConditionAgent/1.0 (SciFinder RDF Processor)"
-PUBCHEM_TIMEOUT = 10
-CAS_NUMBER_RE = re.compile(r'\d{2,7}-\d{2}-\d')
-
-
-REGISTRY_FILE_EXCLUDES = {
-    "new_reagents.csv",
-}
 
 
 FALLBACK_REGISTRY_ENTRIES = {
@@ -116,10 +90,6 @@ REGISTRY_CATEGORY_HINT: Dict[str, str] = {
     "other_reagent": "other",
     "organo_catalyst": "catalyst",
     "enzyme": "catalyst",
-}
-
-CATALYST_ROLES: Set[str] = {
-    "metal_catalyst",
 }
 
 def canonical_role(role: str) -> str:
@@ -414,6 +384,25 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
             return _json.loads(val or "[]")
         except Exception:
             return []
+
+    def _format_cas_list(self, items: Any) -> str:
+        if not items:
+            return ""
+        if isinstance(items, str):
+            return items.strip()
+        if not isinstance(items, list):
+            return str(items).strip()
+        seen: Set[str] = set()
+        out: List[str] = []
+        for item in items:
+            if item is None:
+                continue
+            val = str(item).strip()
+            if not val or val in seen:
+                continue
+            seen.add(val)
+            out.append(val)
+        return ", ".join(out)
 
     def _pair_to_obj(self, item: str):
         if "|" in item:
@@ -843,8 +832,6 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     full_system_list = self._collect_full_catalytic_system(row)
                     catalytic_system = self._join_names(full_system_list)
 
-                    disp_core = self._compute_condition_core(row, full_system_list)
-
                     T = row.get("Temperature_C", "")
                     t = row.get("Time_h", "")
                     y = row.get("Yield_%", "")
@@ -872,8 +859,6 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                     f.write(f"## Reaction {rid}\n\n")
                     if rtype:
                         f.write(f"- Type: {rtype}\n")
-                    if disp_core:
-                        f.write(f"- Condition Core: {disp_core}\n")
                     if catalytic_system:
                         f.write(f"- Catalytic System: {catalytic_system}\n")
                     if y != "":
@@ -892,93 +877,132 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
         except Exception:
             pass
 
-    def generate_jsonl_export(self, rows, output_path: str, source_folder: str):
-        """Generate simplified JSONL export matching the Markdown report structure."""
-        out_lines: List[str] = []
-        
-        for idx, row in enumerate(rows, 1):
-            rid = row.get("ReactionID", "")
-            rtype = row.get("ReactionType", "")
-            reag_list = self._safe_json_list(row.get("Reagent", "[]"))
-            role_list = self._safe_json_list(row.get("ReagentRole", "[]"))
-            solv_list = self._safe_json_list(row.get("Solvent", "[]"))
-            
-            full_system_list = self._collect_full_catalytic_system(row)
-            catalytic_system = self._join_names(full_system_list)
-            disp_core = self._compute_condition_core(row, full_system_list)
-            
-            y = row.get("Yield_%", "")
-            r_smi = row.get("ReactantSMILES", "")
-            p_smi = row.get("ProductSMILES", "")
-            
-            # Reagents with CAS and Role
-            reagents = []
-            for i, item in enumerate(reag_list):
-                obj = self._normalize_component(self._component_from_item(item))
-                role = (role_list[i] if i < len(role_list) else "").upper() or "ADDITIVE"
-                reagents.append({
-                    "name": obj.get("name", "?"),
-                    "cas": obj.get("cas", ""),
-                    "role": role
-                })
-                
-            # Solvents with CAS
-            solvents = []
-            for item in solv_list:
-                obj = self._normalize_component(self._component_from_item(item))
-                solvents.append({
-                    "name": obj.get("name", "?"),
-                    "cas": obj.get("cas", "")
-                })
-                
-            # Simplified Reference (Journal, Year, Pages)
-            citation = ""
-            raw_data_str = row.get("RawData", "{}")
-            try:
-                raw_data = _json.loads(raw_data_str)
-                # Try to get citation from txt block if available
-                citation = raw_data.get("txt", {}).get("citation", "")
-            except:
-                pass
-            
-            if not citation:
-                # Fallback: try to extract from Reference string
-                ref_str = row.get("Reference", "")
-                if ref_str:
-                    parts = [p.strip() for p in ref_str.split("|")]
-                    # Heuristic: citation usually has a year in parentheses and is not the DOI
-                    for p in parts:
-                        if "(" in p and ")" in p and not p.startswith("10."):
-                            citation = p
-                            break
-                    if not citation and len(parts) >= 3:
-                        citation = parts[2]
-            
-            entry = {
-                "reaction_id": rid,
-                "type": rtype,
-                "condition_core": disp_core,
-                "catalytic_system": catalytic_system,
-                "yield": y,
-                "reagents": reagents,
-                "solvents": solvents,
-                "smiles": f"{r_smi}>>{p_smi}" if r_smi or p_smi else "",
-                "reference": citation
-            }
-            
-            # Use separators with spaces to make it "less messy" while remaining valid JSONL
-            out_lines.append(_json.dumps(entry, ensure_ascii=False, separators=(', ', ': ')))
-            
-            if idx % 100 == 0:
-                print(f"  Processed {idx}/{len(rows)} reactions for JSONL...")
+    def generate_csv_export(self, rows, output_path: str, source_folder: str, rdf_map: Optional[Dict[str, Dict[str, Any]]] = None):
+        """Generate CSV export using CAS-only lists for components."""
+        fieldnames = [
+            "reaction_id",
+            "reaction_type",
+            "yield_pct",
+            "temperature_c",
+            "time_h",
+            "reaction_smiles",
+            "reference",
+            "reactant_cas",
+            "product_cas",
+            "reagent_cas",
+            "catalyst_cas",
+            "solvent_cas",
+            "reactant_amd",
+            "product_amd",
+            "reagent_amd",
+            "catalyst_amd",
+            "solvent_amd",
+            "experimental_procedure",
+            "stages",
+            "steps",
+            "product_yield_1",
+            "product_yield_2",
+            "product_yield_3",
+            "product_yield_4",
+            "product_yield_5",
+            "product_yield_6",
+            "product_yield_7",
+            "notes",
+        ]
 
-        # Write output file
+        def _format_notes(val: Any) -> str:
+            if not val:
+                return ""
+            if isinstance(val, list):
+                parts = [str(v).strip() for v in val if str(v).strip()]
+                return " | ".join(parts)
+            return str(val).strip()
+
+        def _extract_citation(row: Dict[str, Any], raw_data: Dict[str, Any]) -> str:
+            citation = ""
+            if isinstance(raw_data, dict):
+                txt_block = raw_data.get("txt") or {}
+                rdf_block = raw_data.get("rdf") or {}
+                citation = (txt_block.get("citation") or rdf_block.get("citation") or "").strip()
+            if citation:
+                return citation
+            ref_str = (row.get("Reference") or "").strip()
+            if not ref_str:
+                return ""
+            parts = [p.strip() for p in ref_str.split("|") if p.strip()]
+            for part in parts:
+                if "(" in part and ")" in part and not part.startswith("10."):
+                    return part
+            return ""
+
         try:
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write("\n".join(out_lines) + ("\n" if out_lines else ""))
-            print(f"  Successfully wrote {len(out_lines)} reactions to {output_path}")
+            with open(output_path, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                for idx, row in enumerate(rows, 1):
+                    rid = row.get("ReactionID", "")
+                    rtype = row.get("ReactionType", "")
+                    y = row.get("Yield_%", "")
+                    temp_c = row.get("Temperature_C", "")
+                    time_h = row.get("Time_h", "")
+                    r_smi = row.get("ReactantSMILES", "")
+                    p_smi = row.get("ProductSMILES", "")
+                    rxn_smi = f"{r_smi}>>{p_smi}" if r_smi or p_smi else ""
+
+                    raw_data_str = row.get("RawData", "{}")
+                    raw_data: Dict[str, Any] = {}
+                    try:
+                        raw_data = _json.loads(raw_data_str) if raw_data_str else {}
+                    except Exception:
+                        raw_data = {}
+                    if rdf_map and rid in rdf_map:
+                        rdf_data = rdf_map.get(rid, {})
+                    else:
+                        rdf_data = raw_data.get("rdf", {}) if isinstance(raw_data, dict) else {}
+                    pro_yields = rdf_data.get("pro_yields", {}) if isinstance(rdf_data, dict) else {}
+                    def _yield_at(idx: int) -> Any:
+                        if isinstance(pro_yields, dict):
+                            return pro_yields.get(idx) or pro_yields.get(str(idx)) or ""
+                        if isinstance(pro_yields, list) and len(pro_yields) >= idx:
+                            return pro_yields[idx - 1] or ""
+                        return ""
+
+                    entry = {
+                        "reaction_id": rid,
+                        "reaction_type": rtype,
+                        "yield_pct": y,
+                        "temperature_c": temp_c,
+                        "time_h": time_h,
+                        "reaction_smiles": rxn_smi,
+                        "reference": _extract_citation(row, raw_data),
+                        "reactant_cas": self._format_cas_list(rdf_data.get("rct_cas", [])),
+                        "product_cas": self._format_cas_list(rdf_data.get("pro_cas", [])),
+                        "reagent_cas": self._format_cas_list(rdf_data.get("rgt_cas", [])),
+                        "catalyst_cas": self._format_cas_list(rdf_data.get("cat_cas", [])),
+                        "solvent_cas": self._format_cas_list(rdf_data.get("sol_cas", [])),
+                        "reactant_amd": self._format_cas_list(rdf_data.get("rct_amd", [])),
+                        "product_amd": self._format_cas_list(rdf_data.get("pro_amd", [])),
+                        "reagent_amd": self._format_cas_list(rdf_data.get("rgt_amd", [])),
+                        "catalyst_amd": self._format_cas_list(rdf_data.get("cat_amd", [])),
+                        "solvent_amd": self._format_cas_list(rdf_data.get("sol_amd", [])),
+                        "experimental_procedure": _format_notes(rdf_data.get("exp_proc", "")),
+                        "stages": rdf_data.get("stages", "") or "",
+                        "steps": rdf_data.get("steps", "") or "",
+                        "product_yield_1": _yield_at(1),
+                        "product_yield_2": _yield_at(2),
+                        "product_yield_3": _yield_at(3),
+                        "product_yield_4": _yield_at(4),
+                        "product_yield_5": _yield_at(5),
+                        "product_yield_6": _yield_at(6),
+                        "product_yield_7": _yield_at(7),
+                        "notes": _format_notes(rdf_data.get("notes", "")),
+                    }
+                    writer.writerow(entry)
+                    if idx % 100 == 0:
+                        print(f"  Processed {idx}/{len(rows)} reactions for CSV...")
+            print(f"  Successfully wrote {len(rows)} reactions to {output_path}")
         except Exception as e:
-            print(f"Error writing JSONL: {e}")
+            print(f"Error writing CSV: {e}")
 
 # Detect RDKit availability
 try:
@@ -993,25 +1017,12 @@ class RDFWorker(QtCore.QObject):
     finished = Signal(bool, str) if Signal else None  # type: ignore[misc]
     progress = Signal(str) if Signal else None  # type: ignore[misc]
 
-    def __init__(self, folder_path: str, output_md_path: str, output_jsonl_path: str, process_unknowns: bool = False):
+    def __init__(self, folder_path: str, output_md_path: str, output_csv_path: str):
         super().__init__()
         self.folder_path = folder_path
         self.output_md_path = output_md_path
-        self.output_jsonl_path = output_jsonl_path
-        self.process_unknowns = process_unknowns
+        self.output_csv_path = output_csv_path
         self.rdf_files = []
-        self._undetermined_loaded = False
-        self._undetermined_existing_entries: List[Dict[str, Any]] = []
-        self._undetermined_existing_map: Dict[str, Dict[str, Any]] = {}
-        self._undetermined_new_map: Dict[str, Dict[str, Any]] = {}
-        self._undetermined_file_path_cache: Optional[str] = None
-        self._pubchem_cache_by_cas: Dict[str, Dict[str, Any]] = {}
-        self._pubchem_cache_by_name: Dict[str, Dict[str, Any]] = {}
-        self._pubchem_cache_by_cid: Dict[int, Dict[str, Any]] = {}
-        self._pubchem_failed_keys: Set[str] = set()
-        self._pubchem_error_count = 0
-        self._pubchem_offline = False
-        self._pubchem_last_error = ""
 
     def _emit(self, msg: str):
         """Emit progress message"""
@@ -1137,7 +1148,7 @@ class RDFWorker(QtCore.QObject):
                     f"Successful: {successful}\n"
                     f"Failed: {failed}\n\n"
                     f"Output files saved to:\n"
-                    f"  - data/reaction_dataset/<ReactionType>.jsonl\n"
+                    f"  - data/reaction_dataset/<ReactionType>.csv\n"
                     f"  - {self.folder_path}/<ReactionType>/<ReactionType>.md"
                 )
             else:
@@ -1158,7 +1169,7 @@ class RDFWorker(QtCore.QObject):
         
         try:
             # Find RDF files in this subfolder
-            self._emit(f"[1/7] Scanning for RDF files...")
+            self._emit(f"[1/5] Scanning for RDF files...")
             self.rdf_files = self._find_rdf_files()
             
             if not self.rdf_files:
@@ -1168,7 +1179,7 @@ class RDFWorker(QtCore.QObject):
             self._emit(f"      Found {len(self.rdf_files)} RDF files")
             
             # Process RDF files
-            self._emit(f"[2/7] Parsing RDF files...")
+            self._emit(f"[2/5] Parsing RDF files...")
             combined_rdf_map = self._process_rdf_files()
             
             if not combined_rdf_map:
@@ -1181,25 +1192,16 @@ class RDFWorker(QtCore.QObject):
             self._emit(f"      Parsed {len(combined_rdf_map)} reactions")
             self._emit(f"      MOL blocks: {rct_mol_count} reactants, {pro_mol_count} products")
             
-            # Load taxonomy if not already loaded
-            if not hasattr(self, '_taxonomy_index'):
-                self._emit(f"[3/7] Loading compound taxonomy (first run only)...")
-                taxonomy = self._load_taxonomy()
-                self._taxonomy_index = taxonomy
-                self._emit(f"      Loaded {len(taxonomy.cas_map)} compounds from registry")
-            else:
-                self._emit(f"[3/7] Using cached taxonomy (already loaded)")
-                taxonomy = self._taxonomy_index
-            
-            cas_map = taxonomy.cas_map
+            # Skip reagent registry lookups; export will be CAS-only
+            self._emit(f"[3/5] Preparing condition mappings (CAS-only)...")
+            cas_map: Dict[str, Dict[str, str]] = {}
             
             # Create minimal TXT map
-            self._emit(f"[4/7] Creating condition mappings...")
             txt_map = self._create_minimal_txt_map(combined_rdf_map)
             self._emit(f"      Mapped {len(txt_map)} reaction conditions")
             
             # Assemble rows
-            self._emit(f"[5/7] Assembling reaction data structures...")
+            self._emit(f"[4/5] Assembling reaction data structures...")
             rows = assemble_rows(txt_map, combined_rdf_map, cas_map, txt_preferred=False)
             self._emit(f"      Assembled {len(rows)} reaction records")
             
@@ -1211,29 +1213,8 @@ class RDFWorker(QtCore.QObject):
             for row in rows:
                 row['ReactionType'] = reaction_type
             
-            # Post-process reagent roles
-            self._emit(f"[6/7] Assigning reagent roles via taxonomy...")
-            self._reassign_reagent_roles_via_taxonomy(rows, taxonomy)
-            
-            # Count unknowns captured
-            if self.process_unknowns:
-                unknowns_before = len(self._undetermined_new_map)
-                self._persist_undetermined_reagents()
-                unknowns_added = len(self._undetermined_new_map) - unknowns_before
-                if unknowns_added > 0:
-                    self._emit(f"      Captured {unknowns_added} unknown reagents")
-            
-            # Inject suggested ligands
-            self._emit(f"      Suggesting ligands for catalyst systems...")
-            try:
-                n = self._inject_suggested_ligands_via_taxonomy(rows, taxonomy)
-                if n > 0:
-                    self._emit(f"      Added suggested ligands to {n} reactions")
-            except Exception as e:
-                self._emit(f"      Ligand suggestion skipped: {str(e)[:80]}")
-            
             # Calculate output paths for this reaction type
-            self._emit(f"[7/7] Generating output files...")
+            self._emit(f"[5/5] Generating output files...")
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
@@ -1242,31 +1223,30 @@ class RDFWorker(QtCore.QObject):
             import re as _re
             safe_name = _re.sub(r'[^A-Za-z0-9_-]+', '', _re.sub(r'\s+', '_', reaction_type))
             
-            output_jsonl = os.path.join(dataset_dir, f"{safe_name}.jsonl")
+            output_csv = os.path.join(dataset_dir, f"{safe_name}.csv")
             output_md = os.path.join(folder_path, f"{safe_name}.md")
             
             # Generate outputs
-            generator = ReactionMarkdownGenerator(taxonomy=taxonomy)
-            generator.cas_map = cas_map
+            generator = ReactionMarkdownGenerator()
             
             source_name = f"RDF_{reaction_type}"
             
             self._emit(f"      Generating Markdown report...")
             generator.generate_markdown_report(rows, output_md, source_name)
             
-            self._emit(f"      Generating JSONL export...")
-            generator.generate_jsonl_export(rows, output_jsonl, source_name)
+            self._emit(f"      Generating CSV export...")
+            generator.generate_csv_export(rows, output_csv, source_name, rdf_map=combined_rdf_map)
             
             # Show file sizes for verification
             try:
-                jsonl_size = os.path.getsize(output_jsonl) / 1024  # KB
+                csv_size = os.path.getsize(output_csv) / 1024  # KB
                 md_size = os.path.getsize(output_md) / 1024  # KB
                 self._emit(f"\n      ✓ Successfully saved {len(rows)} reactions:")
-                self._emit(f"        JSONL: {output_jsonl} ({jsonl_size:.1f} KB)")
+                self._emit(f"        CSV:  {output_csv} ({csv_size:.1f} KB)")
                 self._emit(f"        MD:    {output_md} ({md_size:.1f} KB)")
             except Exception:
                 self._emit(f"\n      ✓ Saved {len(rows)} reactions")
-                self._emit(f"        JSONL: {output_jsonl}")
+                self._emit(f"        CSV: {output_csv}")
                 self._emit(f"        MD: {output_md}")
             
             return True
@@ -1289,661 +1269,6 @@ class RDFWorker(QtCore.QObject):
             raise RuntimeError(f"Error scanning folder: {e}")
         
         return sorted(rdf_files)
-
-    def _load_default_cas_maps(self) -> Dict[str, Dict[str, str]]:
-        """Deprecated in this GUI workflow: use taxonomy-based mapping instead."""
-        return {}
-
-    def _load_taxonomy(self) -> _TaxonomyIndex:
-        """Load the reagent registry and build a CAS/name map for roles and tokens."""
-        # Default base dir relative to repo
-        here = os.path.dirname(os.path.abspath(__file__))
-        tax_dir = os.path.join(os.path.dirname(here), 'data', 'reagent_db')
-        if not os.path.exists(tax_dir):
-            # fallback to local data/reagent_db relative to this file
-            tax_dir = os.path.join(here, 'data', 'reagent_db')
-        try:
-            idx = _TaxonomyIndex(tax_dir)
-            return idx
-        except Exception as e:
-            raise RuntimeError(f"Failed to load taxonomy from {tax_dir}: {e}")
-
-    @staticmethod
-    def _normalize_name(value: str) -> str:
-        """Normalize a compound name for lookups."""
-        import re as _re
-        if not value:
-            return ""
-        normalized = value.strip().lower()
-        normalized = _re.sub(r"\s+", " ", normalized)
-        normalized = _re.sub(r"[^a-z0-9\+\-\.\(\)\[\]/']", "", normalized)
-        return normalized
-
-    def _undetermined_file_path(self) -> str:
-        if self._undetermined_file_path_cache:
-            return self._undetermined_file_path_cache
-        here = os.path.dirname(os.path.abspath(__file__))
-        repo_root = os.path.dirname(here)
-        target_dir = os.path.join(repo_root, "data", "reagent_db")
-        target_path = os.path.join(target_dir, "new_reagents.csv")
-        legacy_path = os.path.join(here, "not_determined_reagents.json")
-        if not os.path.exists(target_path) and os.path.exists(legacy_path):
-            self._emit("Note: using legacy not_determined_reagents.json from data-processor directory; it will be rewritten to data/reagent_db/new_reagents.csv on save.")
-        self._undetermined_file_path_cache = target_path
-        return target_path
-
-    def _ensure_undetermined_cache_loaded(self) -> None:
-        if self._undetermined_loaded:
-            return
-        self._undetermined_loaded = True
-        self._undetermined_existing_entries = []
-        self._undetermined_existing_map = {}
-        primary_path = self._undetermined_file_path()
-        load_paths = [primary_path]
-        here = os.path.dirname(os.path.abspath(__file__))
-        legacy_path = os.path.join(here, "not_determined_reagents.json")
-        if primary_path != legacy_path and os.path.exists(legacy_path):
-            load_paths.append(legacy_path)
-        data = None
-        for candidate in load_paths:
-            if not os.path.exists(candidate):
-                continue
-            try:
-                if candidate.lower().endswith(".csv"):
-                    with open(candidate, "r", encoding="utf-8", newline="") as f:
-                        reader = csv.DictReader(f)
-                        data = [{"cas": (row.get("cas") or "").strip()} for row in reader]
-                else:
-                    with open(candidate, "r", encoding="utf-8") as f:
-                        data = _json.load(f)
-                break
-            except Exception as exc:
-                self._emit(f"Note: could not load existing new_reagents.csv from {candidate}: {exc}")
-                data = None
-        if data is None:
-            return
-
-        taxonomy = getattr(self, "_taxonomy_index", None)
-        if isinstance(data, list):
-            for entry in data:
-                if not isinstance(entry, dict):
-                    continue
-                cas = str(entry.get("cas") or "").strip()
-                name = str(entry.get("name") or "").strip()
-                base_key = self._make_undetermined_key(cas, name, taxonomy)
-                if set(entry.keys()) <= {"cas"}:
-                    upgraded = {"cas": cas, "name": name or cas, "role": "UNK"}
-                else:
-                    upgraded = self._upgrade_undetermined_entry(entry, taxonomy)
-                self._undetermined_existing_entries.append(upgraded)
-                new_cas = str(upgraded.get("cas") or "").strip()
-                new_name = str(upgraded.get("name") or "").strip()
-                new_key = self._make_undetermined_key(new_cas, new_name, taxonomy)
-                keys = {k for k in (base_key, new_key) if k}
-                if not keys:
-                    continue
-                for k in keys:
-                    self._undetermined_existing_map[k] = upgraded
-
-    def _make_undetermined_key(self, cas: str, name: str, taxonomy: Optional[_TaxonomyIndex] = None) -> str:
-        cas_norm = (cas or "").strip()
-        if cas_norm:
-            return f"CAS::{cas_norm}"
-        basis = ""
-        if taxonomy is not None:
-            basis = taxonomy._norm_name(name or "")
-        else:
-            basis = self._normalize_name(name)
-        if not basis:
-            return ""
-        return f"NAME::{basis}"
-
-    def _record_pubchem_success(self) -> None:
-        self._pubchem_last_error = ""
-
-    def _record_pubchem_error(self, reason: str) -> None:
-        self._pubchem_error_count += 1
-        self._pubchem_last_error = reason
-        if self._pubchem_error_count >= 3 and not self._pubchem_offline:
-            self._pubchem_offline = True
-            self._emit(
-                f"Notice: PubChem service appears unavailable (last error: {reason}). Skipping further lookups for this run."
-            )
-
-    def _pubchem_json(self, url: str) -> Optional[Dict[str, Any]]:
-        if self._pubchem_offline:
-            return None
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": PUBCHEM_USER_AGENT})
-            with urllib.request.urlopen(req, timeout=PUBCHEM_TIMEOUT) as resp:
-                payload = resp.read()
-            self._record_pubchem_success()
-            return _json.loads(payload.decode("utf-8"))
-        except urllib.error.HTTPError as exc:
-            if exc.code == 404:
-                self._record_pubchem_success()
-                return None
-            self._emit(f"Note: PubChem request failed ({exc.code}): {url}")
-            self._record_pubchem_error(f"HTTP {exc.code}")
-        except Exception as exc:
-            self._emit(f"Note: PubChem request error: {exc}: {url}")
-            self._record_pubchem_error(str(exc))
-        return None
-
-    def _extract_cas_from_synonyms(self, synonyms: List[str]) -> str:
-        for syn in synonyms or []:
-            syn_stripped = (syn or "").strip()
-            if CAS_NUMBER_RE.fullmatch(syn_stripped):
-                return syn_stripped
-        return ""
-
-    def _choose_abbreviation(self, synonyms: List[str], canonical_name: str) -> str:
-        candidates = []
-        for syn in synonyms or []:
-            s = (syn or "").strip()
-            if not s:
-                continue
-            if CAS_NUMBER_RE.fullmatch(s):
-                continue
-            if len(s) <= 20:
-                candidates.append(s)
-        if candidates:
-            return candidates[0]
-        canonical = (canonical_name or "").strip()
-        if canonical and len(canonical) <= 24:
-            return canonical
-        return ""
-
-    def _extract_use_notes(self, record: Dict[str, Any]) -> str:
-        def walk_sections(sections: List[Dict[str, Any]]) -> List[str]:
-            snippets: List[str] = []
-            for section in sections or []:
-                heading = (section.get("TOCHeading") or "").lower()
-                if "use" in heading or "application" in heading or "function" in heading:
-                    for info in section.get("Information") or []:
-                        val = info.get("Value") or {}
-                        for item in val.get("StringWithMarkup") or []:
-                            txt = (item.get("String") or "").strip()
-                            if txt:
-                                snippets.append(txt)
-                child = walk_sections(section.get("Section") or [])
-                if child:
-                    snippets.extend(child)
-            return snippets
-        record_sections = record.get("Record", {}).get("Section") or []
-        pieces = walk_sections(record_sections)
-        unique: List[str] = []
-        seen: Set[str] = set()
-        for piece in pieces:
-            if piece in seen:
-                continue
-            seen.add(piece)
-            unique.append(piece)
-            if len(unique) >= 3:
-                break
-        return " ".join(unique)
-
-    def _fetch_pubchem_uses(self, cid: int) -> str:
-        url = f"{PUBCHEM_VIEW_BASE}/{cid}/JSON"
-        data = self._pubchem_json(url)
-        if not data:
-            return ""
-        return self._extract_use_notes(data)
-
-    def _fetch_pubchem_compound(self, *, cas: str = "", name: str = "") -> Dict[str, Any]:
-        cas = (cas or "").strip()
-        name = (name or "").strip()
-        if not cas and not name:
-            return {}
-        cid = None
-        if cas:
-            data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/xref/RN/{urllib.parse.quote(cas)}/JSON")
-            if data and data.get("PC_Compounds"):
-                cid = data["PC_Compounds"][0].get("id", {}).get("id", {}).get("cid")
-        if cid is None and name:
-            data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/name/{urllib.parse.quote(name)}/cids/JSON")
-            if data:
-                cid_list = data.get("IdentifierList", {}).get("CID") or []
-                if cid_list:
-                    cid = cid_list[0]
-        if cid is None:
-            return {}
-        if cid in self._pubchem_cache_by_cid:
-            return self._pubchem_cache_by_cid[cid]
-        prop_data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/cid/{cid}/property/IUPACName,MolecularFormula,MolecularWeight,CanonicalSMILES,IsomericSMILES/JSON")
-        synonyms_data = self._pubchem_json(f"{PUBCHEM_PUG_BASE}/compound/cid/{cid}/synonyms/JSON")
-        synonyms = []
-        if synonyms_data:
-            info_list = synonyms_data.get("InformationList", {}).get("Information") or []
-            if info_list:
-                synonyms = list(info_list[0].get("Synonym") or [])
-
-        props = {}
-        if prop_data:
-            prop_list = prop_data.get("PropertyTable", {}).get("Properties") or []
-            if prop_list:
-                props = prop_list[0]
-        canonical_name = str(props.get("IUPACName") or "").strip()
-        synonyms = [s for s in synonyms if s]
-        cas_candidate = cas or self._extract_cas_from_synonyms(synonyms)
-        abbreviation = self._choose_abbreviation(synonyms, canonical_name)
-        uses_text = self._fetch_pubchem_uses(cid)
-        info = {
-            "pubchem_cid": cid,
-            "cas": cas_candidate,
-            "name": canonical_name or (synonyms[1] if len(synonyms) > 1 else (synonyms[0] if synonyms else name or cas_candidate)),
-            "canonical_smiles": props.get("CanonicalSMILES"),
-            "isomeric_smiles": props.get("IsomericSMILES"),
-            "molecular_formula": props.get("MolecularFormula"),
-            "molecular_weight": props.get("MolecularWeight"),
-            "iupac_name": props.get("IUPACName"),
-            "synonyms": synonyms,
-            "abbreviation": abbreviation,
-            "typical_usage": uses_text,
-            "data_source": "PubChem",
-            "pubchem_url": f"https://pubchem.ncbi.nlm.nih.gov/compound/{cid}",
-        }
-        self._pubchem_cache_by_cid[cid] = info
-        if cas_candidate:
-            self._pubchem_cache_by_cas[cas_candidate] = info
-        if name:
-            norm_name = self._normalize_name(name)
-            if norm_name:
-                self._pubchem_cache_by_name[norm_name] = info
-        for syn in synonyms:
-            norm_syn = self._normalize_name(syn)
-            if norm_syn:
-                self._pubchem_cache_by_name.setdefault(norm_syn, info)
-        return info
-
-    def _lookup_compound_info(self, cas: str, name: str) -> Dict[str, Any]:
-        cas_norm = (cas or "").strip()
-        name_norm = (name or "").strip()
-        if cas_norm and cas_norm in self._pubchem_cache_by_cas:
-            return self._pubchem_cache_by_cas[cas_norm]
-        name_key = self._normalize_name(name_norm)
-        if name_key and name_key in self._pubchem_cache_by_name:
-            return self._pubchem_cache_by_name[name_key]
-        fail_keys = []
-        if cas_norm:
-            fail_key = f"cas:{cas_norm}"
-            if fail_key in self._pubchem_failed_keys:
-                cas_norm = ""
-            else:
-                fail_keys.append(fail_key)
-        if name_key:
-            fail_name = f"name:{name_key}"
-            if fail_name in self._pubchem_failed_keys:
-                name_key = ""
-            else:
-                fail_keys.append(fail_name)
-        info: Dict[str, Any] = {}
-        if cas_norm:
-            info = self._fetch_pubchem_compound(cas=cas_norm)
-        if not info and name_norm:
-            info = self._fetch_pubchem_compound(name=name_norm)
-        if info:
-            return info
-        for key in fail_keys:
-            self._pubchem_failed_keys.add(key)
-        return {}
-
-    def _sanitize_compound_value(self, value: Any):
-        if isinstance(value, str):
-            val = value.strip()
-            return val or None
-        if isinstance(value, (int, float, bool)):
-            return value
-        if isinstance(value, list):
-            cleaned = []
-            for item in value:
-                cleaned_item = self._sanitize_compound_value(item)
-                if cleaned_item not in (None, "", [], {}):
-                    cleaned.append(cleaned_item)
-            return cleaned or None
-        if isinstance(value, tuple):
-            cleaned = []
-            for item in value:
-                cleaned_item = self._sanitize_compound_value(item)
-                if cleaned_item not in (None, "", [], {}):
-                    cleaned.append(cleaned_item)
-            return cleaned or None
-        if isinstance(value, set):
-            cleaned = []
-            for item in value:
-                cleaned_item = self._sanitize_compound_value(item)
-                if cleaned_item not in (None, "", [], {}):
-                    cleaned.append(cleaned_item)
-            return cleaned or None
-        if isinstance(value, dict):
-            cleaned_dict = {}
-            for k, v in value.items():
-                cleaned_val = self._sanitize_compound_value(v)
-                if cleaned_val not in (None, "", [], {}):
-                    cleaned_dict[str(k)] = cleaned_val
-            return cleaned_dict or None
-        return value
-
-    def _build_undetermined_entry(self, *, cas: str, reported_name: str, role: str, info: Dict[str, Any], taxonomy: Optional[_TaxonomyIndex]) -> Dict[str, Any]:
-        entry: Dict[str, Any] = {}
-        cas_clean = (cas or "").strip()
-        reported = (reported_name or "").strip()
-        role_clean = (role or "UNK").strip().upper()
-        canonical_name = str(info.get("name") or "").strip()
-        display_name = canonical_name or reported or cas_clean
-        if cas_clean:
-            entry["cas"] = cas_clean
-        if display_name:
-            entry["name"] = display_name
-        if reported and reported != display_name:
-            entry["reported_name"] = reported
-        if role_clean:
-            entry["role"] = role_clean
-        abbr = info.get("abbreviation") or info.get("abbr")
-        if isinstance(abbr, str):
-            abbr = abbr.strip()
-        if abbr:
-            entry["abbreviation"] = abbr
-        synonyms = info.get("synonyms") or []
-        if isinstance(synonyms, (list, tuple, set)):
-            cleaned_syns = sorted({str(s).strip() for s in synonyms if str(s).strip()})[:5]
-            if cleaned_syns:
-                entry["synonyms"] = cleaned_syns
-        copy_keys = [
-            "compound_type",
-            "category_hint",
-            "generic_core",
-            "token",
-            "notes",
-            "usage",
-            "typical_usage",
-            "data_sources",
-            "sources",
-            "canonical_smiles",
-            "isomeric_smiles",
-            "molecular_formula",
-            "molecular_weight",
-            "iupac_name",
-            "pubchem_cid",
-            "pubchem_url",
-            "data_source",
-        ]
-        for key in copy_keys:
-            if key not in info:
-                continue
-            sanitized = self._sanitize_compound_value(info.get(key))
-            if sanitized not in (None, "", [], {}):
-                entry[key] = sanitized
-        smiles = info.get("smiles") or info.get("smile") or info.get("canonical_smiles") or info.get("isomeric_smiles")
-        if isinstance(smiles, str):
-            smiles = smiles.strip()
-        if smiles:
-            entry["smiles"] = smiles
-        typical_usage = entry.get("typical_usage") or entry.get("usage")
-        if isinstance(typical_usage, list):
-            typical_usage = ", ".join(str(x).strip() for x in typical_usage if str(x).strip())
-        elif isinstance(typical_usage, dict):
-            typical_usage = ", ".join(f"{k}: {v}" for k, v in typical_usage.items() if v not in (None, "", [], {}))
-        if not typical_usage:
-            fallback = [entry.get("category_hint"), entry.get("compound_type"), role_clean if role_clean and role_clean != "UNK" else None]
-            typical_usage = next((str(val).strip() for val in fallback if isinstance(val, str) and val.strip()), "")
-        if typical_usage:
-            entry["typical_usage"] = typical_usage
-        if entry.get("usage") == entry.get("typical_usage"):
-            entry.pop("usage", None)
-        if info:
-            entry["data_source"] = info.get("data_source") or "PubChem"
-        cleaned_entry: Dict[str, Any] = {}
-        for key, value in entry.items():
-            if key in {"cas", "name", "role"}:
-                cleaned_entry[key] = value
-                continue
-            if value in (None, "", [], {}):
-                continue
-            cleaned_entry[key] = value
-        if "reported_name" in entry and entry["reported_name"]:
-            cleaned_entry["reported_name"] = entry["reported_name"]
-        return cleaned_entry
-
-    def _upgrade_undetermined_entry(self, entry: Dict[str, Any], taxonomy: Optional[_TaxonomyIndex]) -> Dict[str, Any]:
-        cas = str(entry.get("cas") or "").strip()
-        reported = str(entry.get("reported_name") or entry.get("raw_name") or entry.get("name") or "").strip()
-        lookup_name = str(entry.get("name") or reported).strip()
-        role = (entry.get("role") or "UNK").strip().upper()
-        if entry.get("data_source"):
-            info = dict(entry)
-        else:
-            info = self._lookup_compound_info(cas, lookup_name)
-        if not cas:
-            cas_candidate = str((info or {}).get("cas") or "").strip()
-            if cas_candidate:
-                cas = cas_candidate
-        built = self._build_undetermined_entry(
-            cas=cas,
-            reported_name=reported or lookup_name,
-            role=role or "UNK",
-            info=info or {},
-            taxonomy=taxonomy
-        )
-        for key, value in entry.items():
-            if key in {"cas", "name", "role"}:
-                continue
-            if value in (None, "", [], {}):
-                continue
-            built.setdefault(key, value)
-        return built
-
-    def _is_missing_from_taxonomy(self, name: str, cas: str, taxonomy: _TaxonomyIndex) -> bool:
-        cas_norm = (cas or "").strip()
-        if cas_norm and cas_norm in taxonomy.cas_map:
-            return False
-        norm_name = taxonomy._norm_name(name or "")
-        if norm_name and norm_name in taxonomy.name_to_cas:
-            return False
-        return True
-
-    def _record_undetermined_reagent(self, *, name: str, cas: str, taxonomy: _TaxonomyIndex, role: str) -> None:
-        if not self.process_unknowns:
-            return
-        cas = (cas or "").strip()
-        reported = (name or "").strip()
-        if not cas and not reported:
-            return
-        info = self._lookup_compound_info(cas, reported)
-        if not cas:
-            cas_candidate = str((info or {}).get("cas") or "").strip()
-            if cas_candidate:
-                cas = cas_candidate
-        canonical_name = str((info or {}).get("name") or reported).strip()
-        candidate_keys = {
-            self._make_undetermined_key(cas, reported, taxonomy),
-            self._make_undetermined_key(cas, canonical_name, taxonomy),
-        }
-        candidate_keys = {k for k in candidate_keys if k}
-        if not candidate_keys:
-            return
-        self._ensure_undetermined_cache_loaded()
-        for key in candidate_keys:
-            if key in self._undetermined_existing_map or key in self._undetermined_new_map:
-                return
-        chosen_key = sorted(candidate_keys)[0]
-        entry = self._build_undetermined_entry(
-            cas=cas,
-            reported_name=reported,
-            role=role or "UNK",
-            info=info or {},
-            taxonomy=taxonomy
-        )
-        self._undetermined_new_map[chosen_key] = entry
-        for key in candidate_keys:
-            if key != chosen_key:
-                self._undetermined_new_map.setdefault(key, entry)
-
-    def _persist_undetermined_reagents(self) -> None:
-        if not self.process_unknowns or not self._undetermined_new_map:
-            return
-        path = self._undetermined_file_path()
-        entries = list(self._undetermined_existing_entries)
-        unique_new: Dict[Tuple[str, str], Dict[str, Any]] = {}
-        for entry in self._undetermined_new_map.values():
-            cas_key = str(entry.get("cas") or "").strip()
-            name_key = str(entry.get("name") or "").strip()
-            unique_new.setdefault((cas_key, name_key), entry)
-        new_entries = sorted(unique_new.values(), key=lambda e: ((e.get("cas") or "").strip(), (e.get("name") or "").strip()))
-        entries.extend(new_entries)
-        cas_values = sorted({str(entry.get("cas") or "").strip() for entry in entries if entry.get("cas")})
-        if not cas_values:
-            return
-        try:
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "w", encoding="utf-8", newline="") as f:
-                writer = csv.DictWriter(f, fieldnames=["cas"])
-                writer.writeheader()
-                for cas in cas_values:
-                    writer.writerow({"cas": cas})
-        except Exception as exc:
-            self._emit(f"Note: failed to write new reagents CSV: {exc}")
-            return
-        self._undetermined_existing_entries = entries
-        self._undetermined_existing_map = {}
-        taxonomy = getattr(self, "_taxonomy_index", None)
-        for entry in entries:
-            cas_val = str(entry.get("cas") or "").strip()
-            name_val = str(entry.get("name") or "").strip()
-            reported_val = str(entry.get("reported_name") or "").strip()
-            keys = {
-                self._make_undetermined_key(cas_val, name_val, taxonomy),
-                self._make_undetermined_key(cas_val, reported_val, taxonomy),
-            }
-            for key in keys:
-                if key:
-                    self._undetermined_existing_map[key] = entry
-        added = len(new_entries)
-        self._undetermined_new_map = {}
-        self._emit(f"Captured {added} undetermined reagents in {path}")
-
-    def _reassign_reagent_roles_via_taxonomy(self, rows: List[Dict[str, Any]], taxonomy: _TaxonomyIndex) -> None:
-        """Ensure ReagentRole aligns with Reagent list using taxonomy role lookup when possible."""
-        track_unknowns = self.process_unknowns
-        if track_unknowns:
-            self._ensure_undetermined_cache_loaded()
-        for row in rows or []:
-            try:
-                reag_json = row.get('Reagent') or '[]'
-                reag_list = []
-                try:
-                    reag_list = _json.loads(reag_json)
-                except Exception:
-                    reag_list = []
-                roles: List[str] = []
-                for item in reag_list:
-                    name, cas = '', ''
-                    if isinstance(item, str):
-                        if '|' in item:
-                            name, cas = (item.split('|', 1) + [''])[:2]
-                            name = (name or '').strip()
-                            cas = (cas or '').strip()
-                        else:
-                            name = item.strip()
-                    elif isinstance(item, dict):
-                        name = (item.get('name') or '').strip()
-                        cas = (item.get('cas') or '').strip()
-                    role = taxonomy.role_for(name, cas)
-                    if not role or role == 'UNK':
-                        if track_unknowns and self._is_missing_from_taxonomy(name, cas, taxonomy):
-                            self._record_undetermined_reagent(name=name, cas=cas, taxonomy=taxonomy, role=role or 'UNK')
-                        role = 'UNK'
-                    roles.append(role)
-                # Only write back if we can align 1:1
-                if roles and (len(roles) == len(reag_list)):
-                    row['ReagentRole'] = _json.dumps(roles, ensure_ascii=False)
-            except Exception:
-                continue
-
-    def _inject_suggested_ligands_via_taxonomy(self, rows: List[Dict[str, Any]], taxonomy: _TaxonomyIndex) -> int:
-        """Populate suggested ligand into row['Ligand'] (and FullCatalyticSystem) when missing.
-
-        Returns the count of rows updated.
-        """
-        updated = 0
-        # Build PairingHelper once
-        try:
-            from conditioncore_pairing_helper_for_ref_only import PairingHelper  # type: ignore
-            cat_path = os.path.join(taxonomy.base_dir, 'reagent_roles.v2.json')
-            ph = PairingHelper(cat_path)
-        except Exception:
-            ph = None  # type: ignore
-
-        for row in rows or []:
-            try:
-                # Skip if ligand already present
-                lig_list = []
-                try:
-                    lig_list = _json.loads(row.get('Ligand') or '[]')
-                except Exception:
-                    lig_list = []
-                if lig_list:
-                    continue
-
-                # Determine catalyst family from core CAS
-                core_pairs = []
-                try:
-                    core_pairs = _json.loads(row.get('CatalystCoreDetail') or '[]')
-                except Exception:
-                    core_pairs = []
-                fam_id = None
-                for p in core_pairs or []:
-                    if not isinstance(p, str):
-                        continue
-                    _, _, cs = p.partition('|')
-                    cs = cs.strip()
-                    if cs and cs in taxonomy.cas_to_family:
-                        fam_id = taxonomy.cas_to_family.get(cs)
-                        if fam_id:
-                            break
-
-                if not fam_id or not ph:
-                    continue
-
-                # Use reaction type as hint
-                hint = (row.get('ReactionType') or '').strip() or None
-                pick = ph.suggest_for(fam_id, None, hint)
-                if not pick:
-                    continue
-                abbr = ((pick.get('ligand') or {}).get('abbr') or '').strip()
-                if not abbr:
-                    continue
-
-                # Map abbr to CAS via taxonomy; fall back to name-only pair
-                cas = taxonomy.name_to_cas.get(taxonomy._norm_name(abbr), '')
-                pair = f"{abbr}|{cas}"
-
-                # Update Ligand list
-                new_lig = [pair]
-                row['Ligand'] = _json.dumps(new_lig, ensure_ascii=False)
-
-                # Update FullCatalyticSystem
-                full = []
-                try:
-                    full = _json.loads(row.get('FullCatalyticSystem') or '[]')
-                except Exception:
-                    full = []
-                if pair not in full:
-                    full.append(pair)
-                row['FullCatalyticSystem'] = _json.dumps(full, ensure_ascii=False)
-
-                # Recompute keys
-                try:
-                    row['CondKey'] = build_condkey(row)
-                    row['CondSig'] = build_condsig(row)
-                    row['FamSig'] = build_famsig(row)
-                except Exception:
-                    pass
-
-                updated += 1
-            except Exception:
-                continue
-        return updated
 
     def _create_minimal_txt_map(self, rdf_map: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
         """Create a minimal TXT map from RDF data (since we only have RDF)"""
@@ -2144,25 +1469,21 @@ class RDFWorker(QtCore.QObject):
         self._emit(f"      Total: {len(combined_rdf_map)} unique reactions from {total_files} files")
         return combined_rdf_map
 
-    def _generate_outputs(self, rows: List[Dict[str, Any]], cas_map: Dict[str, Dict[str, str]]) -> None:
-        """Generate Markdown and JSONL outputs using ReactionMarkdownGenerator"""
+    def _generate_outputs(self, rows: List[Dict[str, Any]], rdf_map: Optional[Dict[str, Dict[str, Any]]] = None) -> None:
+        """Generate Markdown and CSV outputs using ReactionMarkdownGenerator"""
         self._emit("Generating Markdown report...")
         
-        # Create taxonomy-aware generator instance
-        taxonomy = getattr(self, '_taxonomy_index', None)
-        generator = ReactionMarkdownGenerator(taxonomy=taxonomy)
-        generator.cas_map = cas_map or (taxonomy.cas_map if taxonomy else {})
+        generator = ReactionMarkdownGenerator()
         
         # Generate markdown report
         source_name = f"RDF_Folder_{os.path.basename(self.folder_path)}"
         generator.generate_markdown_report(rows, self.output_md_path, source_name)
         
-        # Generate JSONL export
-        self._emit("Generating JSONL export...")
-        generator.generate_jsonl_export(rows, self.output_jsonl_path, source_name)
+        # Generate CSV export
+        self._emit("Generating CSV export...")
+        generator.generate_csv_export(rows, self.output_csv_path, source_name, rdf_map=rdf_map)
         
-        # NOTE: No need to call export_jsonl_for_chemtools anymore
-        # We now save directly to data/reaction_dataset/ instead of copying
+        # NOTE: JSONL export is no longer used; CSV is saved directly to data/reaction_dataset/.
 
     @Slot() if Slot else (lambda f: f)
     def run(self):
@@ -2203,11 +1524,9 @@ class RDFWorker(QtCore.QObject):
             self._emit(f"RDF parsed. Reactions with reactant MOL blocks: {rct_mol_count}; with product MOL blocks: {pro_mol_count}")
             self._emit(f"RDKit available: {RDKIT_AVAILABLE}")
             
-            # Load CAS mappings
-            self._emit("Loading compound taxonomy (roles, ligands, catalysts)...")
-            taxonomy = self._load_taxonomy()
-            self._taxonomy_index = taxonomy
-            cas_map = taxonomy.cas_map
+            # Skip reagent registry lookups; export will be CAS-only
+            self._emit("Skipping reagent registry lookups (CAS-only export).")
+            cas_map: Dict[str, Dict[str, str]] = {}
             
             # Create minimal TXT map (since we only have RDF)
             self._emit("Creating minimal TXT mapping...")
@@ -2217,20 +1536,6 @@ class RDFWorker(QtCore.QObject):
             self._emit("Assembling reaction rows...")
             rows = assemble_rows(txt_map, combined_rdf_map, cas_map, txt_preferred=False)
             self._emit(f"Assembled {len(rows)} rows")
-
-            # Post-process reagent roles using taxonomy to improve role assignment
-            self._emit("Assigning reagent roles via taxonomy...")
-            self._reassign_reagent_roles_via_taxonomy(rows, taxonomy)
-            if self.process_unknowns:
-                self._persist_undetermined_reagents()
-
-            # Inject suggested ligands into rows where Ligand list is empty
-            self._emit("Suggesting and adding ligands for catalyst families lacking ligands...")
-            try:
-                n = self._inject_suggested_ligands_via_taxonomy(rows, taxonomy)
-                self._emit(f"Added suggested ligands to {n} reactions.")
-            except Exception as e:
-                self._emit(f"Ligand suggestion phase skipped due to error: {e}")
 
             # Override Temperature_C and Time_h from dataset/temp_time.md when available
             here = os.path.dirname(os.path.abspath(__file__))
@@ -2280,7 +1585,7 @@ class RDFWorker(QtCore.QObject):
                     self._emit("Warning: MOL blocks found and RDKit available, but SMILES are empty. MOL data may be malformed.")
             
             # Generate outputs
-            self._generate_outputs(rows, cas_map)
+            self._generate_outputs(rows, combined_rdf_map)
             
             if self.finished:
                 self.finished.emit(
@@ -2288,7 +1593,7 @@ class RDFWorker(QtCore.QObject):
                     (
                         f"Successfully processed {len(self.rdf_files)} RDF files with {len(rows)} reactions.\n\n"
                         f"Markdown (records): {self.output_md_path}\n"
-                        f"JSONL (chemtools): {self.output_jsonl_path}"
+                        f"CSV (reaction dataset): {self.output_csv_path}"
                     ),
                 )
                 
@@ -2309,7 +1614,6 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         self.btn_folder = QtWidgets.QPushButton("Browse Folder...")
         self.output_md_edit = QtWidgets.QLineEdit()
         self.btn_output_md = QtWidgets.QPushButton("Save As...")
-        self.unknowns_checkbox = QtWidgets.QCheckBox("Save unknown compounds to new_reagents.csv")
         
         # File list display
         self.file_list = QtWidgets.QListWidget()
@@ -2373,13 +1677,12 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         # Add note about file locations
         note_label = QtWidgets.QLabel(
             "Note: All RDF files in folder and subfolders will be combined\n"
-            "      JSONL ->data/reaction_dataset/{category}.jsonl\n"
+            "      CSV ->data/reaction_dataset/{category}.csv\n"
             "      Markdown ->selected folder/{category}.md"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
         form.addRow("", note_label)
         
-        form.addRow("Save unknowns:", self.unknowns_checkbox)
         
         layout.addLayout(form)
         
@@ -2501,7 +1804,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         self.log_msg("Starting RDF processing...")
         
         # Calculate output paths
-        # Name JSONL using folder hierarchy, e.g., C_N_Coupling/2020-2022 -> C_N_Coupling.jsonl
+        # Name CSV using folder hierarchy, e.g., C_N_Coupling/2020-2022 -> C_N_Coupling.csv
         try:
             folder_path = self.folder_edit.text().strip()
             norm_folder = os.path.normpath(folder_path)
@@ -2523,15 +1826,14 @@ class RDFProcessorWindow(QtWidgets.QWidget):
                 if idx + 1 < len(folder_parts):
                     category_name = folder_parts[idx + 1]
             
-            # JSONL: Save directly to data/reaction_dataset/ for chemtools consumption
+            # CSV: Save directly to data/reaction_dataset/
             # Use category name (all subfolders are automatically included)
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             
             final_name = _safe(category_name) or "dataset"
-            # Use simple category name for compatibility with chemtools
-            output_jsonl = os.path.join(dataset_dir, final_name + ".jsonl")
+            output_csv = os.path.join(dataset_dir, final_name + ".csv")
             
             # Markdown: Save to the selected folder (preserves subfolder structure)
             output_md = os.path.join(norm_folder, final_name + ".md")
@@ -2546,7 +1848,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
-            output_jsonl = os.path.join(dataset_dir, "dataset.jsonl")
+            output_csv = os.path.join(dataset_dir, "dataset.csv")
             
             # Markdown to original_dataset
             original_dataset_dir = os.path.join(
@@ -2560,8 +1862,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         self.worker = RDFWorker(
             folder_path=self.folder_edit.text().strip(),
             output_md_path=output_md,
-            output_jsonl_path=output_jsonl,
-            process_unknowns=self.unknowns_checkbox.isChecked()
+            output_csv_path=output_csv,
         )
         
         self.thread = QtCore.QThread(self)

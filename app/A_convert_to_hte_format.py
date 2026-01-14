@@ -48,6 +48,14 @@ def _split_reagent_names(value: str) -> List[str]:
                 parts.append(name)
     return parts
 
+def _split_csv_list(value: Any) -> List[str]:
+    if value is None:
+        return []
+    text = str(value).strip()
+    if not text:
+        return []
+    return [part.strip() for part in text.split(",") if part.strip()]
+
 def _normalize_reagent_text(value: str) -> str:
     return " ".join(str(value).strip().lower().split())
 
@@ -355,181 +363,337 @@ def process_reaction_dataset(
         print(f"Error: Input file {input_path} not found.")
         return
 
-    with open(input_path, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-    
-    total = len(lines)
-    print(f"Processing {total} reactions...")
-    
-    for i, line in enumerate(lines):
-        if i % 500 == 0:
-            print(f"Progress: {i}/{total} ({(i/total)*100:.1f}%)")
-            
-        try:
-            record = json.loads(line)
-        except:
-            continue
-            
-        smiles = record.get("smiles", "")
-        if ">>" not in smiles:
-            continue
-            
-        reactants_part, products_part = smiles.split(">>")
-        reactants = reactants_part.split(".")
-        reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
-        if drop_reagent_reactants and reagent_smiles:
-            filtered = []
-            for r_smiles in reactants:
-                norm = _normalize_smiles(r_smiles)
-                if norm and norm in reagent_smiles:
+    def _csv_row_to_record(row: Dict[str, Any]) -> Dict[str, Any]:
+        def _entries(cas_value: Any, amd_value: Any) -> List[Dict[str, str]]:
+            entries: List[Dict[str, str]] = []
+            for cas in _split_csv_list(cas_value):
+                entries.append({"name": cas, "cas": cas})
+            for name in _split_csv_list(amd_value):
+                entries.append({"name": name})
+            return entries
+
+        catalyst_amd = _split_csv_list(row.get("catalyst_amd", ""))
+        catalyst_cas = _split_csv_list(row.get("catalyst_cas", ""))
+        catalyst_parts = catalyst_amd or catalyst_cas
+        catalytic_system = ", ".join(catalyst_parts)
+
+        return {
+            "smiles": row.get("reaction_smiles") or row.get("smiles") or "",
+            "yield": row.get("yield_pct") or row.get("yield") or "",
+            "reagents": _entries(row.get("reagent_cas", ""), row.get("reagent_amd", "")),
+            "solvents": _entries(row.get("solvent_cas", ""), row.get("solvent_amd", "")),
+            "catalytic_system": catalytic_system,
+            "condition_core": "",
+        }
+
+    input_suffix = input_path.suffix.lower()
+    if input_suffix == ".csv":
+        with open(input_path, "r", encoding="utf-8", newline="") as f:
+            total = max(sum(1 for _ in f) - 1, 0)
+        print(f"Processing {total} reactions...")
+        with open(input_path, "r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            for i, row in enumerate(reader):
+                if total and i % 500 == 0:
+                    print(f"Progress: {i}/{total} ({(i/total)*100:.1f}%)")
+                record = _csv_row_to_record(row)
+                if not record.get("smiles"):
                     continue
-                filtered.append(r_smiles)
-            if filtered:
-                reactants = filtered
-        
-        motif_ids = []
-        reactant_data = []
-        
-        for r_smiles in reactants:
+                smiles = record.get("smiles", "")
+                if ">>" not in smiles:
+                    continue
+                reactants_part, products_part = smiles.split(">>")
+                reactants = reactants_part.split(".")
+                reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
+                if drop_reagent_reactants and reagent_smiles:
+                    filtered = []
+                    for r_smiles in reactants:
+                        norm = _normalize_smiles(r_smiles)
+                        if norm and norm in reagent_smiles:
+                            continue
+                        filtered.append(r_smiles)
+                    if filtered:
+                        reactants = filtered
+
+                motif_ids = []
+                reactant_data = []
+
+                for r_smiles in reactants:
+                    try:
+                        analysis = cached_featurize(r_smiles)
+                        motifs = analysis.get("motifs", [])
+
+                        current_r_motifs = []
+                        for m in motifs:
+                            cid = m.get("compound_id", "")
+                            if cid:
+                                current_r_motifs.append(cid)
+                                for alt_id in m.get("alt_compound_ids", []):
+                                    current_r_motifs.append(alt_id)
+
+                        reactant_data.append({
+                            "motifs": _dedupe_list(current_r_motifs),
+                        })
+                        motif_ids.extend(current_r_motifs)
+                    except Exception:
+                        continue
+
+                if not reactant_data:
+                    continue
+
+                product_motifs = []
+                try:
+                    p_analysis = cached_featurize(products_part)
+                    p_motifs = p_analysis.get("motifs", [])
+                    for m in p_motifs:
+                        cid = m.get("compound_id", "")
+                        if cid:
+                            product_motifs.append(cid)
+                            for alt_id in m.get("alt_compound_ids", []):
+                                product_motifs.append(alt_id)
+                except Exception:
+                    pass
+
+                r_counts = Counter(motif_ids)
+                p_counts = Counter(product_motifs)
+
+                PERSISTENT_HETEROCYCLES = {"Pyridine", "Quinoline", "Isoquinoline", "Pyrimidine", "Pyrazine", "Pyridazine"}
+                for h_id in PERSISTENT_HETEROCYCLES:
+                    if r_counts[h_id] > 0 and p_counts[h_id] < r_counts[h_id]:
+                        p_counts[h_id] = r_counts[h_id]
+
+                reacted_set = set()
+                formed_set = set()
+                spectators_set = set()
+
+                all_motifs = set(r_counts.keys()) | set(p_counts.keys())
+                for m in all_motifs:
+                    rc = r_counts.get(m, 0)
+                    pc = p_counts.get(m, 0)
+
+                    if pc > rc:
+                        formed_set.add(m)
+                        if rc > 0:
+                            spectators_set.add(m)
+                    elif pc < rc:
+                        reacted_set.add(m)
+                        if pc > 0:
+                            spectators_set.add(m)
+                    else:
+                        if rc > 0:
+                            spectators_set.add(m)
+
+                primary_reacted_motifs = []
+                for r_info in reactant_data:
+                    r_motifs = r_info["motifs"]
+                    reacted_here = [m for m in r_motifs if m in reacted_set]
+                    if reacted_here:
+                        primary_reacted_motifs.append(reacted_here[0])
+
+                primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
+
+                formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
+                primary_formed_str = formed_here[0] if formed_here else "None"
+
+                spectators_str = _reactant_key(list(spectators_set)) or "None"
+
+                primary_reactant_motifs = []
+                for r_info in reactant_data:
+                    r_motifs = r_info["motifs"]
+                    reacted_here = [m for m in r_motifs if m in reacted_set]
+                    if reacted_here:
+                        primary_reactant_motifs.append(reacted_here[0])
+                    elif r_motifs:
+                        primary_reactant_motifs.append(r_motifs[0])
+                    else:
+                        primary_reactant_motifs.append("")
+
+                reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
+
+                type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
+                type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
+
+                reagents = extract_reagents(record)
+                if drop_no_catalyst and not reagents.get("Catalyst"):
+                    continue
+
+                spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
+
+                row_out = {
+                    "reaction_id": source_label,
+                    "yield": record.get("yield", 0.0),
+                    "z_score": 0.0,
+                    "reactant_1": type_a,
+                    "reactant_2": type_b,
+                    "catalyst": reagents.get("Catalyst", ""),
+                    "ligand": reagents.get("Ligand", ""),
+                    "base": reagents.get("Base", ""),
+                    "solvent": reagents.get("Solvent", ""),
+                    "additive": reagents.get("Additive", ""),
+                    "Secondary Solvent": reagents.get("Secondary Solvent", ""),
+                    "Coupling Reagent": reagents.get("Coupling Reagent", ""),
+                    "Is_Intramolecular": len(reactants) == 1,
+                    "reaction_smiles": smiles,
+                    "spectator_groups": " / ".join(spectator_groups),
+                    "_reaction_key": reaction_key,
+                }
+                rows.append(row_out)
+    else:
+        with open(input_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        total = len(lines)
+        print(f"Processing {total} reactions...")
+
+        for i, line in enumerate(lines):
+            if i % 500 == 0:
+                print(f"Progress: {i}/{total} ({(i/total)*100:.1f}%)")
+
             try:
-                # Use cached featurization for speed
-                analysis = cached_featurize(r_smiles)
-                motifs = analysis.get("motifs", [])
-                
-                # Keep raw motifs for stoichiometry counts
-                current_r_motifs = []
-                for m in motifs:
-                    cid = m.get("compound_id", "")
-                    if cid:
-                        current_r_motifs.append(cid)
-                        # Include alternatives to ensure information is preserved across perspectives
-                        for alt_id in m.get("alt_compound_ids", []):
-                            current_r_motifs.append(alt_id)
-                
-                reactant_data.append({
-                    "motifs": _dedupe_list(current_r_motifs),
-                })
-                motif_ids.extend(current_r_motifs)
-            except Exception as e:
-                # Skip invalid SMILES or featurization errors
+                record = json.loads(line)
+            except:
                 continue
             
-        if not reactant_data:
-            continue
+            smiles = record.get("smiles", "")
+            if ">>" not in smiles:
+                continue
 
-        # Product motif analysis
-        product_motifs = []
-        try:
-            p_analysis = cached_featurize(products_part)
-            p_motifs = p_analysis.get("motifs", [])
-            for m in p_motifs:
-                cid = m.get("compound_id", "")
-                if cid:
-                    product_motifs.append(cid)
-                    for alt_id in m.get("alt_compound_ids", []):
-                        product_motifs.append(alt_id)
-        except:
-            pass
+            reactants_part, products_part = smiles.split(">>")
+            reactants = reactants_part.split(".")
+            reagent_smiles = _collect_reagent_smiles(record, reagent_db, unknown_cas)
+            if drop_reagent_reactants and reagent_smiles:
+                filtered = []
+                for r_smiles in reactants:
+                    norm = _normalize_smiles(r_smiles)
+                    if norm and norm in reagent_smiles:
+                        continue
+                    filtered.append(r_smiles)
+                if filtered:
+                    reactants = filtered
 
-        # Transformation analysis using counts to handle motifs that exist in both
-        r_counts = Counter(motif_ids)
-        p_counts = Counter(product_motifs)
-        
-        # Heuristic: certain common heterocycles often appear as reagents/bases/solvents
-        # and may be missing from the product SMILES even if they don't react.
-        # We treat them as persistent spectators if they disappear.
-        PERSISTENT_HETEROCYCLES = {"Pyridine", "Quinoline", "Isoquinoline", "Pyrimidine", "Pyrazine", "Pyridazine"}
-        for h_id in PERSISTENT_HETEROCYCLES:
-            if r_counts[h_id] > 0 and p_counts[h_id] < r_counts[h_id]:
-                p_counts[h_id] = r_counts[h_id]
+            motif_ids = []
+            reactant_data = []
 
-        reacted_set = set()
-        formed_set = set()
-        spectators_set = set()
-        
-        all_motifs = set(r_counts.keys()) | set(p_counts.keys())
-        for m in all_motifs:
-            rc = r_counts.get(m, 0)
-            pc = p_counts.get(m, 0)
-            
-            if pc > rc:
-                formed_set.add(m)
-                if rc > 0:
-                    spectators_set.add(m)
-            elif pc < rc:
-                reacted_set.add(m)
-                if pc > 0:
-                    spectators_set.add(m)
-            else:
-                if rc > 0:
-                    spectators_set.add(m)
-        
-        # Picking ONE motif for each reactant and product for the reaction_key
-        # For each reactant, pick the highest priority motif that actually reacted
-        primary_reacted_motifs = []
-        for r_info in reactant_data:
-            r_motifs = r_info["motifs"]
-            # Find which of these are in the reacted_set
-            reacted_here = [m for m in r_motifs if m in reacted_set]
-            if reacted_here:
-                # Pick the first one (highest priority)
-                primary_reacted_motifs.append(reacted_here[0])
-        
-        primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
-        
-        # For the product, pick the highest priority motif that was formed
-        formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
-        primary_formed_str = formed_here[0] if formed_here else "None"
-        
-        # Spectators (unchanged motifs)
-        spectators_str = _reactant_key(list(spectators_set)) or "None"
+            for r_smiles in reactants:
+                try:
+                    analysis = cached_featurize(r_smiles)
+                    motifs = analysis.get("motifs", [])
 
-        # Primary motif per reactant (fallback to first motif if none reacted)
-        primary_reactant_motifs = []
-        for r_info in reactant_data:
-            r_motifs = r_info["motifs"]
-            reacted_here = [m for m in r_motifs if m in reacted_set]
-            if reacted_here:
-                primary_reactant_motifs.append(reacted_here[0])
-            elif r_motifs:
-                primary_reactant_motifs.append(r_motifs[0])
-            else:
-                primary_reactant_motifs.append("")
-        
-        # Combined reaction key: A|B -> P || Unchanged
-        # This replaces Reaction_Type_Standardized and Reactant_Types_Key
-        reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
-            
-        # Map to A and B slots (canonical for HTE recommender)
-        type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
-        type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
-        
-        reagents = extract_reagents(record)
-        if drop_no_catalyst and not reagents.get("Catalyst"):
-            continue
+                    current_r_motifs = []
+                    for m in motifs:
+                        cid = m.get("compound_id", "")
+                        if cid:
+                            current_r_motifs.append(cid)
+                            for alt_id in m.get("alt_compound_ids", []):
+                                current_r_motifs.append(alt_id)
 
-        spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
-            
-        row = {
-            # HTE canonical columns (lowercase with underscores)
-            "reaction_id": source_label,
-            "yield": record.get("yield", 0.0),
-            "z_score": 0.0,
-            "reactant_1": type_a,
-            "reactant_2": type_b,
-            "catalyst": reagents.get("Catalyst", ""),
-            "ligand": reagents.get("Ligand", ""),
-            "base": reagents.get("Base", ""),
-            "solvent": reagents.get("Solvent", ""),
-            "additive": reagents.get("Additive", ""),
-            "Secondary Solvent": reagents.get("Secondary Solvent", ""),
-            "Coupling Reagent": reagents.get("Coupling Reagent", ""),
-            "Is_Intramolecular": len(reactants) == 1,
-            "reaction_smiles": smiles,
-            "spectator_groups": " / ".join(spectator_groups),
-            "_reaction_key": reaction_key,
-        }
-        rows.append(row)
+                    reactant_data.append({
+                        "motifs": _dedupe_list(current_r_motifs),
+                    })
+                    motif_ids.extend(current_r_motifs)
+                except Exception:
+                    continue
+
+            if not reactant_data:
+                continue
+
+            product_motifs = []
+            try:
+                p_analysis = cached_featurize(products_part)
+                p_motifs = p_analysis.get("motifs", [])
+                for m in p_motifs:
+                    cid = m.get("compound_id", "")
+                    if cid:
+                        product_motifs.append(cid)
+                        for alt_id in m.get("alt_compound_ids", []):
+                            product_motifs.append(alt_id)
+            except Exception:
+                pass
+
+            r_counts = Counter(motif_ids)
+            p_counts = Counter(product_motifs)
+
+            PERSISTENT_HETEROCYCLES = {"Pyridine", "Quinoline", "Isoquinoline", "Pyrimidine", "Pyrazine", "Pyridazine"}
+            for h_id in PERSISTENT_HETEROCYCLES:
+                if r_counts[h_id] > 0 and p_counts[h_id] < r_counts[h_id]:
+                    p_counts[h_id] = r_counts[h_id]
+
+            reacted_set = set()
+            formed_set = set()
+            spectators_set = set()
+
+            all_motifs = set(r_counts.keys()) | set(p_counts.keys())
+            for m in all_motifs:
+                rc = r_counts.get(m, 0)
+                pc = p_counts.get(m, 0)
+
+                if pc > rc:
+                    formed_set.add(m)
+                    if rc > 0:
+                        spectators_set.add(m)
+                elif pc < rc:
+                    reacted_set.add(m)
+                    if pc > 0:
+                        spectators_set.add(m)
+                else:
+                    if rc > 0:
+                        spectators_set.add(m)
+
+            primary_reacted_motifs = []
+            for r_info in reactant_data:
+                r_motifs = r_info["motifs"]
+                reacted_here = [m for m in r_motifs if m in reacted_set]
+                if reacted_here:
+                    primary_reacted_motifs.append(reacted_here[0])
+
+            primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
+
+            formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
+            primary_formed_str = formed_here[0] if formed_here else "None"
+
+            spectators_str = _reactant_key(list(spectators_set)) or "None"
+
+            primary_reactant_motifs = []
+            for r_info in reactant_data:
+                r_motifs = r_info["motifs"]
+                reacted_here = [m for m in r_motifs if m in reacted_set]
+                if reacted_here:
+                    primary_reactant_motifs.append(reacted_here[0])
+                elif r_motifs:
+                    primary_reactant_motifs.append(r_motifs[0])
+                else:
+                    primary_reactant_motifs.append("")
+
+            reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
+
+            type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
+            type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
+
+            reagents = extract_reagents(record)
+            if drop_no_catalyst and not reagents.get("Catalyst"):
+                continue
+
+            spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
+
+            row = {
+                "reaction_id": source_label,
+                "yield": record.get("yield", 0.0),
+                "z_score": 0.0,
+                "reactant_1": type_a,
+                "reactant_2": type_b,
+                "catalyst": reagents.get("Catalyst", ""),
+                "ligand": reagents.get("Ligand", ""),
+                "base": reagents.get("Base", ""),
+                "solvent": reagents.get("Solvent", ""),
+                "additive": reagents.get("Additive", ""),
+                "Secondary Solvent": reagents.get("Secondary Solvent", ""),
+                "Coupling Reagent": reagents.get("Coupling Reagent", ""),
+                "Is_Intramolecular": len(reactants) == 1,
+                "reaction_smiles": smiles,
+                "spectator_groups": " / ".join(spectator_groups),
+                "_reaction_key": reaction_key,
+            }
+            rows.append(row)
         
     df = pd.DataFrame(rows)
     
