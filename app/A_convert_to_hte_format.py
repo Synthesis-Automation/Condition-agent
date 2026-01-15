@@ -112,12 +112,16 @@ def _collect_reagent_smiles(
         if not cas or cas.startswith("$") or not CAS_PATTERN.match(cas):
             continue
         
-        # Try finding by CAS in any role
+        # Try finding by CAS in any role with exact CAS match verification
         hit = None
         for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
             hit = find_reagent(cas, r_type)
-            if hit:
+            if hit and hit.get('cas') == cas:
+                # Exact CAS match - use this
                 break
+            elif hit:
+                # Partial match (possibly due to normalization collision) - keep searching
+                hit = None
         
         if hit:
             smiles = hit.get('smiles')
@@ -134,12 +138,16 @@ def _collect_reagent_smiles(
         found_inline = False
         for match in CAS_INLINE_PATTERN.findall(key):
             found_inline = True
-            # Try finding by CAS
+            # Try finding by CAS with exact match verification
             hit = None
             for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
                 hit = find_reagent(match, r_type)
-                if hit:
+                if hit and hit.get('cas') == match:
+                    # Exact CAS match
                     break
+                elif hit:
+                    # Partial match - keep searching
+                    hit = None
             if hit and hit.get('smiles'):
                 normalized = _normalize_smiles(hit['smiles'])
                 if normalized:
@@ -310,17 +318,28 @@ def extract_reagents(record: Dict[str, Any], csv_row: Optional[Dict[str, Any]] =
             continue
             
         # Try to find this CAS in the reagent system
+        # Check by exact CAS match to avoid normalization issues
         hit = None
         for r_type in ['metal_catalyst', 'ligand', 'base', 'additive', 'condensation_agent', 'other_reagent', 'solvent', 'acid', 'oxidant']:
             hit = find_reagent(cas, r_type)
-            if hit:
+            if hit and hit.get('cas') == cas:
+                # Exact CAS match - use this
                 break
+            elif hit:
+                # Partial match (possibly due to normalization collision) - keep searching
+                hit = None
         
         if hit:
             role = hit.get('role', 'other_reagent')
-            # Use abbreviation if available, otherwise use name
+            # Use abbreviation if available, otherwise use name, then CAS
             abbr_list = hit.get('abbreviation', [])
-            display_name = abbr_list[0] if abbr_list and abbr_list[0] else hit.get('name', cas)
+            if abbr_list and abbr_list[0]:
+                display_name = abbr_list[0]
+            elif hit.get('name'):
+                display_name = hit.get('name')
+            else:
+                display_name = cas
+            
             if role in role_items:
                 role_items[role].append(display_name)
             else:
@@ -620,6 +639,7 @@ def process_reaction_dataset(
                     "Is_Intramolecular": len(reactants) == 1,
                     "reaction_smiles": smiles,
                     "spectator_groups": " / ".join(spectator_groups),
+                    "reference": row.get("reference", ""),
                     "_reaction_key": reaction_key,
                 }
                 rows.append(row_out)
@@ -767,10 +787,15 @@ def process_reaction_dataset(
                 "Is_Intramolecular": len(reactants) == 1,
                 "reaction_smiles": smiles,
                 "spectator_groups": " / ".join(spectator_groups),
+                "reference": record.get("reference", ""),
                 "_reaction_key": reaction_key,
             }
             rows.append(row)
         
+    if not rows:
+        print("Warning: No valid reactions were processed.")
+        return
+    
     df = pd.DataFrame(rows)
     
     # Ensure yield is numeric
@@ -806,7 +831,7 @@ def process_reaction_dataset(
         "reaction_id", "yield", "z_score", "reactant_1", "reactant_2",
         "catalyst", "ligand", "base", "additive", "condensation_agent",
         "other_reagent", "solvent", "Is_Intramolecular",
-        "reaction_smiles", "spectator_groups",
+        "reaction_smiles", "spectator_groups", "reference",
     ]
     df = df[canonical_cols]
 
