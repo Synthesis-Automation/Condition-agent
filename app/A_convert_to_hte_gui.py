@@ -19,15 +19,13 @@ class ConversionWorker(QtCore.QObject):
 
     def __init__(
         self,
-        input_path: str,
-        output_path: str,
+        jobs: List[tuple[str, str]],
         drop_no_catalyst: bool,
         reagent_csv_path: str,
         new_reagents_path: str,
     ):
         super().__init__()
-        self.input_path = input_path
-        self.output_path = output_path
+        self.jobs = jobs
         self.drop_no_catalyst = drop_no_catalyst
         self.reagent_csv_path = reagent_csv_path
         self.new_reagents_path = new_reagents_path
@@ -48,20 +46,27 @@ class ConversionWorker(QtCore.QObject):
             sys.stdout = StdoutRedirector(self.progress)
             
             try:
-                # 1. Enrich CAS numbers first
-                print(f"Step 1: Enriching CAS numbers in {os.path.basename(self.input_path)}...")
-                enrich_reaction_dataset_cas(self.input_path)
-                
-                # 2. Process to HTE format
-                print(f"\nStep 2: Converting to HTE format...")
-                process_reaction_dataset(
-                    self.input_path, 
-                    self.output_path, 
-                    drop_no_catalyst=self.drop_no_catalyst,
-                    reagent_csv_path=self.reagent_csv_path,
-                    new_reagents_path=self.new_reagents_path,
-                )
-                self.finished.emit(True, f"Successfully processed {self.input_path}")
+                total = len(self.jobs)
+                for idx, (input_path, output_path) in enumerate(self.jobs, start=1):
+                    print(
+                        f"Job {idx}/{total}: {os.path.basename(input_path)} -> "
+                        f"{os.path.basename(output_path)}"
+                    )
+                    # 1. Enrich CAS numbers first
+                    print(f"Step 1: Enriching CAS numbers in {os.path.basename(input_path)}...")
+                    enrich_reaction_dataset_cas(input_path)
+
+                    # 2. Process to HTE format
+                    print("Step 2: Converting to HTE format...")
+                    process_reaction_dataset(
+                        input_path,
+                        output_path,
+                        drop_no_catalyst=self.drop_no_catalyst,
+                        reagent_csv_path=self.reagent_csv_path,
+                        new_reagents_path=self.new_reagents_path,
+                    )
+                    print("")
+                self.finished.emit(True, f"Successfully processed {total} file(s).")
             finally:
                 sys.stdout = old_stdout
                 
@@ -79,6 +84,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.source_dir_edit = QtWidgets.QLineEdit()
         self.source_dir_edit.setPlaceholderText("Source folder containing *.csv files")
         self.input_edit = QtWidgets.QLineEdit()
+        self.input_edit.setPlaceholderText("Select one or more CSV files")
         self.output_edit = QtWidgets.QLineEdit()
         self.drop_catalyst_check = QtWidgets.QCheckBox("Drop reactions without a catalyst")
         self.drop_catalyst_check.setChecked(True)
@@ -97,12 +103,14 @@ class HTEConverterWindow(QtWidgets.QWidget):
         # Connections
         self.dataset_dropdown.currentIndexChanged.connect(self._on_dataset_changed)
         self.source_dir_edit.editingFinished.connect(self._load_datasets)
+        self.input_edit.textEdited.connect(self._on_input_edited)
         self.btn_run.clicked.connect(self.run_processing)
         self.btn_quit.clicked.connect(self.close)
         
         # Threading state
         self.thread = None
         self.worker = None
+        self.selected_input_paths: List[str] = []
 
     def _setup_layout(self):
         layout = QtWidgets.QVBoxLayout(self)
@@ -130,9 +138,16 @@ class HTEConverterWindow(QtWidgets.QWidget):
         refresh_btn.clicked.connect(self._load_datasets)
         ds_layout.addWidget(refresh_btn)
         form.addRow("Available Datasets:", ds_layout)
-        
-        form.addRow("Input CSV:", self.input_edit)
-        form.addRow("Output CSV:", self.output_edit)
+
+        input_layout = QtWidgets.QHBoxLayout()
+        input_layout.addWidget(self.input_edit)
+        input_browse_btn = QtWidgets.QPushButton("Select CSVs")
+        input_browse_btn.setFixedWidth(100)
+        input_browse_btn.clicked.connect(self._choose_input_files)
+        input_layout.addWidget(input_browse_btn)
+
+        form.addRow("Input CSV(s):", input_layout)
+        form.addRow("Output CSV/Folder:", self.output_edit)
         form.addRow("", QtWidgets.QLabel("Output includes spectator_groups column."))
         form.addRow("", self.drop_catalyst_check)
         
@@ -174,6 +189,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
 
         self.input_edit.setText(str(input_path))
         self.output_edit.setText(str(output_path))
+        self.selected_input_paths = [str(input_path)]
 
     def _choose_source_dir(self):
         path = QtWidgets.QFileDialog.getExistingDirectory(
@@ -185,18 +201,92 @@ class HTEConverterWindow(QtWidgets.QWidget):
             self.source_dir_edit.setText(path)
             self._load_datasets()
 
+    def _choose_input_files(self):
+        paths, _ = QtWidgets.QFileDialog.getOpenFileNames(
+            self,
+            "Select CSV Files",
+            str(PROJECT_ROOT),
+            "CSV Files (*.csv)",
+        )
+        if not paths:
+            return
+
+        self.dataset_dropdown.setCurrentIndex(0)
+        self.selected_input_paths = paths
+        self.input_edit.setText("; ".join(paths))
+
+        if len(paths) > 1:
+            default_out_dir = PROJECT_ROOT / "data" / "HTE_db" / "datasets"
+            self.output_edit.setText(str(default_out_dir))
+        else:
+            input_path = Path(paths[0])
+            output_path = PROJECT_ROOT / "data" / "HTE_db" / "datasets" / f"{input_path.stem}_canonical.csv"
+            self.output_edit.setText(str(output_path))
+
+    def _on_input_edited(self):
+        if self.dataset_dropdown.currentIndex() > 0:
+            self.dataset_dropdown.setCurrentIndex(0)
+        self.selected_input_paths = []
+
+    def _get_input_paths(self) -> List[str]:
+        if self.selected_input_paths:
+            return list(self.selected_input_paths)
+        text = self.input_edit.text().strip()
+        if not text:
+            return []
+        return [p.strip() for p in text.split(";") if p.strip()]
+
+    def _build_jobs(self, input_paths: List[str], output_text: str) -> List[tuple[str, str]]:
+        output_path = Path(output_text)
+        if len(input_paths) > 1:
+            if output_path.suffix.lower() == ".csv":
+                QtWidgets.QMessageBox.critical(
+                    self,
+                    "Error",
+                    "Output must be a folder when converting multiple CSV files.",
+                )
+                return []
+            output_path.mkdir(parents=True, exist_ok=True)
+            return [
+                (path, str(output_path / f"{Path(path).stem}_canonical.csv"))
+                for path in input_paths
+            ]
+
+        if output_path.suffix.lower() == ".csv" or (output_path.exists() and output_path.is_file()):
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            return [(input_paths[0], str(output_path))]
+
+        output_path.mkdir(parents=True, exist_ok=True)
+        return [
+            (input_paths[0], str(output_path / f"{Path(input_paths[0]).stem}_canonical.csv"))
+        ]
+
     def log_msg(self, text: str):
         self.log.appendPlainText(text)
 
     def run_processing(self):
-        input_path = self.input_edit.text().strip()
-        output_path = self.output_edit.text().strip()
-        
-        if not input_path or not os.path.exists(input_path):
-            QtWidgets.QMessageBox.critical(self, "Error", "Invalid input path.")
+        input_paths = self._get_input_paths()
+        output_text = self.output_edit.text().strip()
+
+        if not input_paths:
+            QtWidgets.QMessageBox.critical(self, "Error", "Input path is required.")
             return
-        if not output_path:
+
+        missing_paths = [path for path in input_paths if not os.path.exists(path)]
+        if missing_paths:
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Error",
+                f"Invalid input path: {missing_paths[0]}",
+            )
+            return
+
+        if not output_text:
             QtWidgets.QMessageBox.critical(self, "Error", "Output path is required.")
+            return
+
+        jobs = self._build_jobs(input_paths, output_text)
+        if not jobs:
             return
 
         self.setEnabled(False)
@@ -207,8 +297,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         # Start worker thread
         self.thread = QtCore.QThread()
         self.worker = ConversionWorker(
-            input_path, 
-            output_path, 
+            jobs,
             self.drop_catalyst_check.isChecked(),
             str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
             str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
