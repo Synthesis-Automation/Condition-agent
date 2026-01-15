@@ -114,7 +114,7 @@ def _collect_reagent_smiles(
         
         # Try finding by CAS in any role with exact CAS match verification
         hit = None
-        for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+        for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant', 'reductant']:
             hit = find_reagent(cas, r_type)
             if hit and hit.get('cas') == cas:
                 # Exact CAS match - use this
@@ -140,7 +140,7 @@ def _collect_reagent_smiles(
             found_inline = True
             # Try finding by CAS with exact match verification
             hit = None
-            for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+            for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant', 'reductant']:
                 hit = find_reagent(match, r_type)
                 if hit and hit.get('cas') == match:
                     # Exact CAS match
@@ -156,7 +156,7 @@ def _collect_reagent_smiles(
         if not found_inline:
             # Try finding by name
             hit = None
-            for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+            for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant', 'reductant']:
                 hit = find_reagent(name, r_type)
                 if hit:
                     break
@@ -307,6 +307,9 @@ def extract_reagents(record: Dict[str, Any], csv_row: Optional[Dict[str, Any]] =
         "metal_catalyst": [],
         "ligand": [],
         "base": [],
+        "acid": [],
+        "oxidant": [],
+        "reductant": [],
         "additive": [],
         "condensation_agent": [],
         "other_reagent": [],
@@ -320,7 +323,7 @@ def extract_reagents(record: Dict[str, Any], csv_row: Optional[Dict[str, Any]] =
         # Try to find this CAS in the reagent system
         # Check by exact CAS match to avoid normalization issues
         hit = None
-        for r_type in ['metal_catalyst', 'ligand', 'base', 'additive', 'condensation_agent', 'other_reagent', 'solvent', 'acid', 'oxidant']:
+        for r_type in ['metal_catalyst', 'ligand', 'base', 'acid', 'oxidant', 'reductant', 'additive', 'condensation_agent', 'other_reagent', 'solvent']:
             hit = find_reagent(cas, r_type)
             if hit and hit.get('cas') == cas:
                 # Exact CAS match - use this
@@ -352,6 +355,9 @@ def extract_reagents(record: Dict[str, Any], csv_row: Optional[Dict[str, Any]] =
         "catalyst": "/".join(role_items["metal_catalyst"]),
         "ligand": "/".join(role_items["ligand"]),
         "base": "/".join(role_items["base"]),
+        "acid": "/".join(role_items["acid"]),
+        "oxidant": "/".join(role_items["oxidant"]),
+        "reductant": "/".join(role_items["reductant"]),
         "additive": "/".join(role_items["additive"]),
         "condensation_agent": "/".join(role_items["condensation_agent"]),
         "other_reagent": "/".join(role_items["other_reagent"]),
@@ -400,7 +406,7 @@ def enrich_reaction_dataset_cas(input_path: str | Path) -> None:
             
             # 2. Try common roles if not found or no preferred type
             if not hit:
-                for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant']:
+                for r_type in ['metal_catalyst', 'ligand', 'base', 'solvent', 'additive', 'acid', 'oxidant', 'reductant']:
                     hit = find_reagent(name, r_type)
                     if hit:
                         break
@@ -641,6 +647,9 @@ def process_reaction_dataset(
                     "catalyst": reagents.get("catalyst", ""),
                     "ligand": reagents.get("ligand", ""),
                     "base": reagents.get("base", ""),
+                    "acid": reagents.get("acid", ""),
+                    "oxidant": reagents.get("oxidant", ""),
+                    "reductant": reagents.get("reductant", ""),
                     "additive": reagents.get("additive", ""),
                     "condensation_agent": reagents.get("condensation_agent", ""),
                     "other_reagent": reagents.get("other_reagent", ""),
@@ -803,6 +812,9 @@ def process_reaction_dataset(
                 "catalyst": reagents.get("catalyst", ""),
                 "ligand": reagents.get("ligand", ""),
                 "base": reagents.get("base", ""),
+                "acid": reagents.get("acid", ""),
+                "oxidant": reagents.get("oxidant", ""),
+                "reductant": reagents.get("reductant", ""),
                 "additive": reagents.get("additive", ""),
                 "condensation_agent": reagents.get("condensation_agent", ""),
                 "other_reagent": reagents.get("other_reagent", ""),
@@ -862,8 +874,9 @@ def process_reaction_dataset(
 
     canonical_cols = [
         "reaction_id", "yield", "z_score", "reactant_1", "reactant_2",
-        "catalyst", "ligand", "base", "additive", "condensation_agent",
-        "other_reagent", "solvent", "Is_Intramolecular",
+        "catalyst", "ligand", "base", "acid", "oxidant", "reductant",
+        "additive", "condensation_agent", "other_reagent", "solvent",
+        "Is_Intramolecular",
         "reaction_smiles", "spectator_groups", "reference",
     ]
     df = df[canonical_cols]
