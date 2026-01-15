@@ -1,0 +1,4 @@
+reaction_id,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,additive,condensation_agent,other_reagent,solvent,Is_Intramolecular,reaction_smiles,spectator_groups,reference
+Oxidation_of_Aromatic_Side_Chains,53,-0.71,Ar-R,,FeCl3,,Pyridine,,,TBHP/HCl,H2O,True,COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1,OR,"Advanced Synthesis & Catalysis (2007), 349(6), 861-864"
+Oxidation_of_Aromatic_Side_Chains,55,0.0,Ar-R,,Co(acac)2,,,,,TBHP,Me2CO,True,Cc1ccccc1C>>Cc1ccccc1C(=O)O,,"Synthesis (2013), 45(5), 615-620"
+Oxidation_of_Aromatic_Side_Chains,80,0.71,Ar-R,,Pd(MeCN)2Cl2,,KOH,,,1450840-09-1/Sodium sulfite,H2O,True,COc1ccc(C)cc1>>COc1ccc(C(=O)O)cc1,OR,"Synthetic Communications (2022), 52(24), 2301-2310"

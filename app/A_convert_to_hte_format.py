@@ -506,14 +506,22 @@ def process_reaction_dataset(
         print(f"Processing {total} reactions...")
         with open(input_path, "r", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
+            processed_count = 0
+            skipped_no_smiles = 0
+            skipped_no_arrow = 0
+            skipped_no_catalyst = 0
+            skipped_other = 0
+            
             for i, row in enumerate(reader):
                 if total and i % 500 == 0:
                     print(f"Progress: {i}/{total} ({(i/total)*100:.1f}%)")
                 record = _csv_row_to_record(row)
                 if not record.get("smiles"):
+                    skipped_no_smiles += 1
                     continue
                 smiles = record.get("smiles", "")
                 if ">>" not in smiles:
+                    skipped_no_arrow += 1
                     continue
                 reactants_part, products_part = smiles.split(">>")
                 reactants = reactants_part.split(".")
@@ -619,6 +627,7 @@ def process_reaction_dataset(
 
                 reagents = extract_reagents(record, csv_row=row)
                 if drop_no_catalyst and not reagents.get("catalyst"):
+                    skipped_no_catalyst += 1
                     continue
 
                 spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
@@ -643,12 +652,24 @@ def process_reaction_dataset(
                     "_reaction_key": reaction_key,
                 }
                 rows.append(row_out)
+                processed_count += 1
+            
+            print(f"Processing summary:")
+            print(f"  Processed: {processed_count}")
+            print(f"  Skipped - no SMILES: {skipped_no_smiles}")
+            print(f"  Skipped - no >>: {skipped_no_arrow}")
+            print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
     else:
         with open(input_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         total = len(lines)
         print(f"Processing {total} reactions...")
+        
+        processed_count = 0
+        skipped_no_smiles = 0
+        skipped_no_arrow = 0
+        skipped_no_catalyst = 0
 
         for i, line in enumerate(lines):
             if i % 500 == 0:
@@ -661,6 +682,7 @@ def process_reaction_dataset(
             
             smiles = record.get("smiles", "")
             if ">>" not in smiles:
+                skipped_no_arrow += 1
                 continue
 
             reactants_part, products_part = smiles.split(">>")
@@ -767,6 +789,7 @@ def process_reaction_dataset(
 
             reagents = extract_reagents(record)
             if drop_no_catalyst and not reagents.get("catalyst"):
+                skipped_no_catalyst += 1
                 continue
 
             spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
@@ -791,9 +814,19 @@ def process_reaction_dataset(
                 "_reaction_key": reaction_key,
             }
             rows.append(row)
+            processed_count += 1
+        
+        print(f"Processing summary:")
+        print(f"  Processed: {processed_count}")
+        print(f"  Skipped - no SMILES: {skipped_no_smiles}")
+        print(f"  Skipped - no >>: {skipped_no_arrow}")
+        print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
         
     if not rows:
         print("Warning: No valid reactions were processed.")
+        if skipped_no_catalyst > 0:
+            print(f"  {skipped_no_catalyst} reactions were skipped due to missing catalyst.")
+            print(f"  Consider running without --drop-no-catalyst or add catalyst information to the source data.")
         return
     
     df = pd.DataFrame(rows)
@@ -854,6 +887,11 @@ if __name__ == "__main__":
         "--new-reagents",
         help="Path to write missing reagent CAS list (default: data/reagent_db/new_reagents.csv).",
     )
+    parser.add_argument(
+        "--keep-no-catalyst",
+        action="store_true",
+        help="Keep reactions without a catalyst (by default, they are dropped).",
+    )
     
     args = parser.parse_args()
     
@@ -863,6 +901,7 @@ if __name__ == "__main__":
         process_reaction_dataset(
             input_file,
             output_file,
+            drop_no_catalyst=not args.keep_no_catalyst,
             reagent_csv_path=args.reagent_csv,
             new_reagents_path=args.new_reagents,
         )
@@ -870,6 +909,7 @@ if __name__ == "__main__":
         process_reaction_dataset(
             args.input,
             args.output,
+            drop_no_catalyst=not args.keep_no_catalyst,
             reagent_csv_path=args.reagent_csv,
             new_reagents_path=args.new_reagents,
         )
