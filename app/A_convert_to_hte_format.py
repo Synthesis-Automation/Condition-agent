@@ -18,6 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
+from chemtools.featurizers.unified import featurize_reaction
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
 
@@ -28,6 +29,35 @@ def cached_featurize(smiles: str):
     # also ensures that Aromatic scaffolds win over Aliphatic ones due to updated priorities.
     options = {"motif_site_filter": "substituent"}
     return featurize_molecule(smiles, options=options)
+
+
+@lru_cache(maxsize=20000)
+def _intramolecular_from_reaction(reaction_smiles: str) -> Optional[bool]:
+    if not reaction_smiles:
+        return None
+    try:
+        payload = featurize_reaction(
+            reaction_smiles,
+            options={
+                "include_agent_roles": False,
+                "include_rdkit_props": False,
+            },
+        )
+    except Exception:
+        return None
+    reaction = payload.get("reaction") if isinstance(payload, dict) else None
+    if not isinstance(reaction, dict):
+        return None
+    intramolecular = reaction.get("intramolecular")
+    if isinstance(intramolecular, dict):
+        flag = intramolecular.get("is_intramolecular")
+        if isinstance(flag, bool):
+            return flag
+    return None
+
+
+def _fallback_intramolecular(reactants: Iterable[str]) -> bool:
+    return len([r for r in reactants if r]) == 1
 
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
 CAS_INLINE_PATTERN = re.compile(r"\b\d{2,7}-\d{2}-\d\b")
@@ -657,6 +687,11 @@ def process_reaction_dataset(
 
                 spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
 
+                fallback_intramolecular = _fallback_intramolecular(reactants)
+                intramolecular_flag = _intramolecular_from_reaction(smiles)
+                if intramolecular_flag is None:
+                    intramolecular_flag = fallback_intramolecular
+
                 row_out = {
                     "reaction_id": source_label,
                     "yield": record.get("yield", 0.0),
@@ -674,7 +709,7 @@ def process_reaction_dataset(
                     "condensation_agent": reagents.get("condensation_agent", ""),
                     "other_reagent": reagents.get("other_reagent", ""),
                     "solvent": reagents.get("solvent", ""),
-                    "Is_Intramolecular": len(reactants) == 1,
+                    "Is_Intramolecular": intramolecular_flag,
                     "reaction_smiles": smiles,
                     "spectator_groups": " / ".join(spectator_groups),
                     "reference": row.get("reference", ""),
@@ -818,6 +853,11 @@ def process_reaction_dataset(
 
             spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
 
+            fallback_intramolecular = _fallback_intramolecular(reactants)
+            intramolecular_flag = _intramolecular_from_reaction(smiles)
+            if intramolecular_flag is None:
+                intramolecular_flag = fallback_intramolecular
+
             row = {
                 "reaction_id": source_label,
                 "yield": record.get("yield", 0.0),
@@ -835,7 +875,7 @@ def process_reaction_dataset(
                 "condensation_agent": reagents.get("condensation_agent", ""),
                 "other_reagent": reagents.get("other_reagent", ""),
                 "solvent": reagents.get("solvent", ""),
-                "Is_Intramolecular": len(reactants) == 1,
+                "Is_Intramolecular": intramolecular_flag,
                 "reaction_smiles": smiles,
                 "spectator_groups": " / ".join(spectator_groups),
                 "reference": record.get("reference", ""),

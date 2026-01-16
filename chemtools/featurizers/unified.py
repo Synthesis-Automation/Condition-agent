@@ -281,6 +281,95 @@ def _collect_motif_ids(motifs: Iterable[Dict[str, Any]]) -> List[str]:
     return ids
 
 
+def _element_counts(smiles_list: Iterable[str]) -> Optional[Counter[str]]:
+    counts: Counter[str] = Counter()
+    saw_any = False
+    for smiles in smiles_list:
+        if not smiles:
+            continue
+        mol = rdkit_helpers.parse_smiles(smiles)
+        if mol is None:
+            return None
+        saw_any = True
+        for atom in mol.GetAtoms():
+            counts[atom.GetSymbol()] += 1
+    if not saw_any:
+        return None
+    return counts
+
+
+def _product_atom_gain(
+    reactant_smiles: Iterable[str],
+    product_smiles: Iterable[str],
+) -> Optional[Dict[str, int]]:
+    reactant_counts = _element_counts(reactant_smiles)
+    product_counts = _element_counts(product_smiles)
+    if reactant_counts is None or product_counts is None:
+        return None
+    added: Dict[str, int] = {}
+    for element, count in product_counts.items():
+        delta = count - reactant_counts.get(element, 0)
+        if delta > 0:
+            added[element] = delta
+    return added
+
+
+def _infer_intramolecular(
+    reactant_smiles: List[str],
+    product_smiles: List[str],
+    roles_summary: Optional[Dict[str, Any]],
+) -> Dict[str, Any]:
+    reactant_count = len(reactant_smiles)
+    if reactant_count != 1:
+        return {
+            "is_intramolecular": False,
+            "reactant_count": reactant_count,
+            "multi_functional": None,
+            "product_added_atoms": None,
+            "method": "heuristic_v1",
+            "reason": "reactant_count != 1",
+        }
+
+    added_atoms = _product_atom_gain(reactant_smiles, product_smiles)
+    if added_atoms:
+        added_detail = ", ".join(
+            f"{element}+{count}" for element, count in sorted(added_atoms.items())
+        )
+        return {
+            "is_intramolecular": False,
+            "reactant_count": reactant_count,
+            "multi_functional": bool(roles_summary.get("has_multi_functional_substrates"))
+            if roles_summary
+            else None,
+            "product_added_atoms": added_atoms,
+            "method": "heuristic_v1",
+            "reason": f"product adds atoms: {added_detail}",
+        }
+
+    multi_functional = (
+        bool(roles_summary.get("has_multi_functional_substrates"))
+        if roles_summary is not None
+        else None
+    )
+    if multi_functional:
+        reason = "single reactant; multi-functional; no atom gain"
+        is_intramolecular = True
+    else:
+        reason = "single reactant but no multi-functional evidence"
+        if added_atoms is None:
+            reason += "; atom balance unavailable"
+        is_intramolecular = False
+
+    return {
+        "is_intramolecular": is_intramolecular,
+        "reactant_count": reactant_count,
+        "multi_functional": multi_functional,
+        "product_added_atoms": None if added_atoms is None else added_atoms,
+        "method": "heuristic_v1",
+        "reason": reason,
+    }
+
+
 _SPECTATOR_GROUP_STOPLIST = {
     "Ar",
     "R",
@@ -421,13 +510,15 @@ def featurize_reaction(
         for item in (normalized.get("products") or [])
     ]
     product_smiles = [s for s in product_smiles if s]
+    product_bundles: List[Dict[str, Any]] = []
     product_motif_ids: List[str] = []
     for smiles in product_smiles:
         try:
-            analysis = _featurize_molecule(smiles, registry_paths=registry_paths, options=options)
+            bundle = _molecule_bundle(smiles, registry_paths=registry_paths, options=options)
         except Exception:
             continue
-        product_motif_ids.extend(_collect_motif_ids(analysis.get("motifs", [])))
+        product_bundles.append(bundle)
+        product_motif_ids.extend(_collect_motif_ids(bundle.get("motifs", [])))
 
     aggregates = _aggregate_reaction_features(
         reactant_bundles, product_motif_ids=product_motif_ids
@@ -441,15 +532,19 @@ def featurize_reaction(
         except Exception:
             roles_summary = None
 
+    intramolecular = _infer_intramolecular(reactant_smiles, product_smiles, roles_summary)
+
     reaction = {
         "reaction_smiles": reaction_smiles,
         "normalized": normalized,
         "detection": detection_payload,
         "reaction_type": reaction_type,
         "reactants": reactant_bundles,
+        "products": product_bundles,
         "aggregates": aggregates,
         "roles": roles_summary,
         "agent_roles": agent_roles,
+        "intramolecular": intramolecular,
     }
 
     # Add feasibility analysis for specific reaction types

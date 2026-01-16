@@ -535,12 +535,28 @@ def _print_reaction_summary(payload: Dict[str, Any]) -> None:
     _print_roles_summary(reaction.get("roles") or {})
     _print_agent_roles(reaction.get("agent_roles") or {})
 
+    intramolecular = reaction.get("intramolecular") or {}
+    if intramolecular:
+        print("Intramolecular:")
+        lines = _format_mapping_lines(intramolecular)
+        if lines:
+            print(_format_list(lines, indent=2))
+
     reactants = reaction.get("reactants") or []
     print(f"Reactants ({len(reactants)}):")
     if reactants:
         for idx, reactant in enumerate(reactants, start=1):
             print(f"  Reactant {idx}:")
             _print_molecule_detail(reactant, indent=4)
+    else:
+        print("  - none")
+
+    products = reaction.get("products") or []
+    print(f"Products ({len(products)}):")
+    if products:
+        for idx, product in enumerate(products, start=1):
+            print(f"  Product {idx}:")
+            _print_molecule_detail(product, indent=4)
     else:
         print("  - none")
 
