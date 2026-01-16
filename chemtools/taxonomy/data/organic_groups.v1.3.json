@@ -4,18 +4,6 @@
   "notes": "Mapping-only attachpoint convention:\n- Scaffold groups (kind=scaffold): the attach atom is the atom mapped as :1 in `smarts`.\n- Substituent groups (kind=substituent): the attach atom is the atom mapped as :2 in `smarts`.\n- If a group has multiple attachpoints, it may contain both :1 and :2 (or multiple mapped atoms) in `smarts`.\nThe legacy fields `attach_points` and `attach_labels` were removed; attachpoints are inferred from atom-maps in `smarts`.",
   "groups": [
     {
-      "id": "Any_Scaffold",
-      "name": "-",
-      "kind": "scaffold",
-      "priority": 0,
-      "smarts": "[*:1]",
-      "description": "Wildcard for any scaffold attachment point (any atom).",
-      "tags": [
-        "scaffold",
-        "wildcard"
-      ]
-    },
-    {
       "id": "R",
       "name": "R-",
       "kind": "scaffold",
@@ -24,32 +12,6 @@
       "description": "Any non-hydrogen scaffold (Generic group).",
       "tags": [
         "scaffold",
-        "wildcard"
-      ]
-    },
-    {
-      "id": "C_Any",
-      "name": "C-",
-      "kind": "scaffold",
-      "priority": 0,
-      "smarts": "[#6:1]",
-      "description": "Any carbon scaffold (Ar, Alkyl, Alkenyl, Alkynyl).",
-      "tags": [
-        "scaffold",
-        "carbon",
-        "wildcard"
-      ]
-    },
-    {
-      "id": "H_Scaffold",
-      "name": "H-",
-      "kind": "scaffold",
-      "priority": 0,
-      "smarts": "[H:1]",
-      "description": "Hydrogen scaffold attachment (H-).",
-      "tags": [
-        "scaffold",
-        "hydrogen",
         "wildcard"
       ]
     },
