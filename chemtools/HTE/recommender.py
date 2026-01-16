@@ -898,6 +898,7 @@ class HTERecommender:
         query_motifs: Set[str], 
         db_key: str,
         query_reacted: Optional[Set[str]] = None,
+        query_formed: Optional[Set[str]] = None,
         query_spectators: Optional[Set[str]] = None
     ) -> float:
         """
@@ -906,7 +907,7 @@ class HTERecommender:
         Logic:
         1. Must match the 'reacted' core motifs.
         2. Higher score for matching 'spectator' motifs.
-        3. Penalty for query motifs not present in the database entry (potential interference).
+        3. If product motifs are available, softly prefer matching 'formed' motifs.
         """
         reacted, formed, spectators = _parse_transformation_key(db_key)
         
@@ -931,9 +932,26 @@ class HTERecommender:
             intersection = spectators & query_spectators
             union = spectators | query_spectators
             spectator_score = len(intersection) / len(union)
-            
-        # Final score: 0.5 (base for core match) + 0.5 * spectator_score
-        return 0.5 + (0.5 * spectator_score)
+
+        base_score = 0.5 + (0.5 * spectator_score)
+
+        if query_formed is None:
+            return base_score
+
+        if not formed and not query_formed:
+            return base_score
+        if not formed:
+            formed_score = 0.3
+        elif not query_formed:
+            formed_score = 0.6
+        else:
+            formed_union = formed | query_formed
+            if not formed_union:
+                formed_score = 0.5
+            else:
+                formed_score = len(formed & query_formed) / len(formed_union)
+
+        return base_score * (0.7 + 0.3 * formed_score)
     
     def _calculate_confidence_score(
         self,
@@ -1095,7 +1113,7 @@ class HTERecommender:
         Args:
             reactant_a_smiles: SMILES of first reactant
             reactant_b_smiles: SMILES of second reactant (optional)
-            product_smiles: Optional product SMILES to pre-evaluate spectator motifs
+            product_smiles: Optional product SMILES to refine reacted/formed motifs in scoring
             top_k: Number of recommendations to return
             min_experiments: Minimum experiments for a condition to be recommended
             reaction_type_filter: Optional filter for specific reaction type
@@ -1131,6 +1149,7 @@ class HTERecommender:
 
         # Pre-eval: use product motifs to identify reacted vs spectator motifs
         query_reacted = None
+        query_formed = None
         query_spectators = None
         query_spectator_groups: Set[str] = set()
         if product_smiles:
@@ -1140,6 +1159,7 @@ class HTERecommender:
             reactant_set = set(type_a) | set(type_b)
             reacted_set, formed_set, spectator_set = _derive_query_sets(reactant_set, product_motifs)
             query_reacted = reacted_set
+            query_formed = formed_set
             query_spectators = spectator_set
             query_spectator_groups = _spectator_groups_from_motifs(spectator_set)
 
@@ -1157,6 +1177,7 @@ class HTERecommender:
                 query_motifs,
                 db_key,
                 query_reacted=query_reacted,
+                query_formed=query_formed,
                 query_spectators=query_spectators,
             )
             if score > 0:

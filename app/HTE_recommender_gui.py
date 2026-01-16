@@ -503,12 +503,16 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         if not reaction_smiles:
             return
         if self._reaction_dialog:
-            self._reaction_dialog.close()
+            try:
+                self._reaction_dialog.close()
+            except RuntimeError:
+                pass
             self._reaction_dialog = None
 
         dialog = QtWidgets.QDialog(self)
         dialog.setWindowTitle("Reaction Preview")
         dialog.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        dialog.destroyed.connect(lambda: setattr(self, "_reaction_dialog", None))
 
         layout = QtWidgets.QVBoxLayout(dialog)
         info_label = QtWidgets.QLabel("")
