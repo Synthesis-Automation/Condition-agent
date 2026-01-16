@@ -1216,12 +1216,12 @@
       ]
     },
     {
-      "id": "Phosphino",
-      "name": "-PR2",
+      "id": "PR2",
+      "name": "PR2",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[PX3:2]([#6])[#6]",
-      "description": "Phosphino group (-PR2); attach via phosphorus.",
+      "description": "Phosphino group (PR2); attach via phosphorus.",
       "tags": [
         "phosphorus",
         "ligand"

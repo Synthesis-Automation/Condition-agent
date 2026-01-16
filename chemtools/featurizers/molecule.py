@@ -114,7 +114,7 @@ def featurize_molecule(
             motifs = filtered_motifs
 
     # Identify background motifs (H-motifs)
-    background_ids = {"Ar-H", "R-H", "Any-H", "Alkenyl-H", "Alkynyl-H"}
+    background_ids = {"Ar-H", "R-H", "Any-H", "Alkyl-H", "Alkenyl-H", "Alkynyl-H"}
     
     # Determine which motifs were explicitly requested via target_groups
     requested_ids = set()
@@ -132,6 +132,18 @@ def featurize_molecule(
         if non_bg_motifs:
             # Keep non-background motifs + any background motifs that were explicitly requested
             motifs = [m for m in motifs if m.get("compound_id") not in background_ids or m.get("compound_id") in requested_ids]
+    # Collapse duplicate background motifs (e.g., Alkyl-H per C-H bond).
+    if motifs:
+        seen_background = set()
+        deduped = []
+        for m in motifs:
+            cid = m.get("compound_id")
+            if cid in background_ids:
+                if cid in seen_background:
+                    continue
+                seen_background.add(cid)
+            deduped.append(m)
+        motifs = deduped
 
     analyses = []
     for hit in motifs:

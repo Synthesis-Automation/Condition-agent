@@ -291,7 +291,7 @@
       "members": [
         "Any-Amide",
         "Ar-Amide",
-        "Alkyl-Amide",
+        "Alkyl-NCOR",
         "Any-CONH2",
         "Any-CONHR",
         "Any-CONR2",

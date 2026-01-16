@@ -18,6 +18,18 @@
       ]
     },
     {
+      "id": "Alkyl-H",
+      "name": "Alkyl-H",
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "H",
+      "description": "Aliphatic sp3 C-H bond.",
+      "aliases": [
+        "alkane",
+        "aliphatic C-H"
+      ]
+    },
+    {
       "id": "Alkyl-H-acidic",
       "name": "Alkyl-H-acidic",
       "template": "single_bond",
@@ -369,6 +381,14 @@
         "arom. NH",
         "arom-NH"
       ]
+    },
+    {
+      "id": "AromN-OH",
+      "name": "AromN-OH",
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "OH",
+      "description": "Aromatic N-OH (e.g., N-hydroxy azoles) (AromN-OH)."
     },
     {
       "id": "Ar-F",
@@ -1951,8 +1971,8 @@
       "description": "Alkyl carbamate (Alkyl-N(R)CO2R)."
     },
     {
-      "id": "Alkyl-Amide",
-      "name": "Alkyl-Amide",
+      "id": "Alkyl-NCOR",
+      "name": "Alkyl-NCOR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NCOR",
@@ -2267,6 +2287,22 @@
       "A": "Ar",
       "B": "PR3+",
       "description": "Aryl phosphonium salt (Ar-PR3+)."
+    },
+    {
+      "id": "Ar-PR2",
+      "name": "Ar-PR2",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "PR2",
+      "description": "Aryl phosphine (Ar-PR2)."
+    },
+    {
+      "id": "Alkyl-PR2",
+      "name": "Alkyl-PR2",
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "PR2",
+      "description": "Alkyl phosphine (Alkyl-PR2)."
     },
     {
       "id": "Ar-Imino",
@@ -3115,13 +3151,6 @@
       "A": "Alkynyl",
       "B": "LactamN",
       "description": "Alkynyl group paired with LactamN substituent."
-    },
-    {
-      "id": "H-Acid",
-      "name": "H-Acid",
-      "smarts": "[H:1]-[OX2][CX3:2]=O",
-      "priority": 11,
-      "description": "Carboxylic acid O-H bond (H-Acid)."
     },
     {
       "id": "Ar-Sulfonamide",
