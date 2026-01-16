@@ -225,6 +225,30 @@ def _reactant_key(values: Iterable[Optional[str]]) -> str:
     items = _dedupe_list([str(v).strip() for v in values if v])
     return "|".join(sorted(items))
 
+def _select_primary_reactant_motifs(
+    reactant_data: List[Dict[str, Any]],
+    reacted_set: set[str],
+) -> List[str]:
+    primary: List[str] = []
+    for r_info in reactant_data:
+        r_motifs = r_info.get("motifs") or []
+        reacted_here = [m for m in r_motifs if m in reacted_set]
+        if reacted_here:
+            primary.append(reacted_here[0])
+        elif r_motifs:
+            primary.append(r_motifs[0])
+        else:
+            primary.append("")
+    if len(reactant_data) == 1:
+        r_motifs = reactant_data[0].get("motifs") or []
+        reacted_here = [m for m in r_motifs if m in reacted_set]
+        candidates = _dedupe_list(reacted_here + [m for m in r_motifs if m not in reacted_here])
+        if candidates:
+            primary = [candidates[0], candidates[1] if len(candidates) > 1 else ""]
+        else:
+            primary = ["", ""]
+    return primary
+
 def _motif_group_ids(values: Iterable[str]) -> set[str]:
     group_ids: set[str] = set()
     for value in values:
@@ -615,21 +639,16 @@ def process_reaction_dataset(
 
                 spectators_str = _reactant_key(list(spectators_set)) or "None"
 
-                primary_reactant_motifs = []
-                for r_info in reactant_data:
-                    r_motifs = r_info["motifs"]
-                    reacted_here = [m for m in r_motifs if m in reacted_set]
-                    if reacted_here:
-                        primary_reactant_motifs.append(reacted_here[0])
-                    elif r_motifs:
-                        primary_reactant_motifs.append(r_motifs[0])
-                    else:
-                        primary_reactant_motifs.append("")
+                primary_reactant_motifs = _select_primary_reactant_motifs(
+                    reactant_data,
+                    reacted_set,
+                )
 
                 reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
 
                 type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
                 type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
+                type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
 
                 reagents = extract_reagents(record, csv_row=row)
                 if drop_no_catalyst and not reagents.get("catalyst"):
@@ -644,6 +663,7 @@ def process_reaction_dataset(
                     "z_score": 0.0,
                     "reactant_1": type_a,
                     "reactant_2": type_b,
+                    "reactant_3": type_c,
                     "catalyst": reagents.get("catalyst", ""),
                     "ligand": reagents.get("ligand", ""),
                     "base": reagents.get("base", ""),
@@ -780,21 +800,16 @@ def process_reaction_dataset(
 
             spectators_str = _reactant_key(list(spectators_set)) or "None"
 
-            primary_reactant_motifs = []
-            for r_info in reactant_data:
-                r_motifs = r_info["motifs"]
-                reacted_here = [m for m in r_motifs if m in reacted_set]
-                if reacted_here:
-                    primary_reactant_motifs.append(reacted_here[0])
-                elif r_motifs:
-                    primary_reactant_motifs.append(r_motifs[0])
-                else:
-                    primary_reactant_motifs.append("")
+            primary_reactant_motifs = _select_primary_reactant_motifs(
+                reactant_data,
+                reacted_set,
+            )
 
             reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
 
             type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
             type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
+            type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
 
             reagents = extract_reagents(record)
             if drop_no_catalyst and not reagents.get("catalyst"):
@@ -809,6 +824,7 @@ def process_reaction_dataset(
                 "z_score": 0.0,
                 "reactant_1": type_a,
                 "reactant_2": type_b,
+                "reactant_3": type_c,
                 "catalyst": reagents.get("catalyst", ""),
                 "ligand": reagents.get("ligand", ""),
                 "base": reagents.get("base", ""),
@@ -873,7 +889,7 @@ def process_reaction_dataset(
     df["z_score"] = df["z_score"].round(2)
 
     canonical_cols = [
-        "reaction_id", "yield", "z_score", "reactant_1", "reactant_2",
+        "reaction_id", "yield", "z_score", "reactant_1", "reactant_2", "reactant_3",
         "catalyst", "ligand", "base", "acid", "oxidant", "reductant",
         "additive", "condensation_agent", "other_reagent", "solvent",
         "Is_Intramolecular",
