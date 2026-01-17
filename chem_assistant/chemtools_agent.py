@@ -111,6 +111,7 @@ You have access to the following tools (featurization/analysis only):
 - calculable_classify_reactant_smiles: calculable-based reactant classification
 - hte_recommend_conditions: HTE-based condition recommendations
 - hte_database_stats: HTE database summary statistics
+- rag_search: retrieve curated knowledge base snippets (RAG)
 
 Tool selection rubric:
 - Molecule question -> unified_featurize_molecule first. Add motif_featurize_molecule or calculable_* only if asked.
@@ -121,6 +122,7 @@ Tool selection rubric:
 - Only use detection_* tools when the user asks for reaction typing without full featurization.
 - HTE data or condition screening -> hte_recommend_conditions (use reaction_smiles when available).
 - HTE database questions -> hte_database_stats.
+- If the user asks for specific protocols, rules, or literature-style guidance, call rag_search and cite the snippets.
 
 Consistency checks for reactions:
 - Compare unified_featurize_reaction.reaction.reaction_type with analysis_analyze_reaction.family.canonical_id.

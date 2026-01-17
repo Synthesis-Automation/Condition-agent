@@ -18,3 +18,5 @@ Tool categories:
 - Motif-based featurizers
 - Reaction-pair featurizers
 - Calculable features
+- HTE recommendations
+- Knowledge base retrieval (RAG)

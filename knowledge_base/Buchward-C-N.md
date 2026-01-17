@@ -1,3 +1,11 @@
+---
+id: Buchwald_Hartwig_CN
+title: Buchwald-Hartwig C-N Coupling
+tags: C-N, Buchwald, Pd, amination
+scope: aryl/heteroaryl halide + amine
+source: Internal notes; AbbVie HTE SI Tables S1, S4
+---
+
 # Reaction Family: Buchwald_Hartwig_CN - Buchwald-Hartwig C-N Coupling
 
 ## Summary
@@ -23,7 +31,16 @@
 
 ## HTE Insights
 
-- Not available yet.
+- AbbVie HTE SI (Table S1) reports C-N coupling success rate: 67% (313 runs).
+- Top conditions for 5-membered heterocyclic halides (Table S4):
+
+| Catalyst | Ligand | Base | Solvent | In Top 10 |
+| --- | --- | --- | --- | --- |
+| RuPhos Pd G3 | RuPhos | LiHMDS | dioxane | Yes |
+| Pd2(dba)3 | Me4tBuXPhos | LiHMDS | t-amyl alcohol | Yes |
+| BrettPhos Pd G3 | BrettPhos | Cs2CO3 | dioxane | Yes |
+| tBuXPhos Pd G3 | tBuXPhos | P2-Et | DMSO | No |
+| TrixiePhos Pd G3 | TrixiePhos | Cs2CO3 | dioxane | No |
 
 ## Safety / Handling
 
@@ -32,3 +49,4 @@
 ## References
 
 - Internal notes (user-provided).
+- AbbVie HTE SI: "The Design and Implementation of a High Throughput Experimentation Platform to Accelerate Drug Discovery" (Tables S1, S4).

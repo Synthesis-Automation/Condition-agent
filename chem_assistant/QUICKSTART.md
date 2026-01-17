@@ -37,6 +37,8 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - Detection: reaction type detection and motif ids
 - Featurizers: unified bundles, motif-based features, reaction-pair features
 - Calculable: feature tokens for reactant types
+- HTE: condition recommendations from the HTE database
+- RAG: knowledge base snippets from `knowledge_base/`
 
 ## Notes
 

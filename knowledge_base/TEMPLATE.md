@@ -1,3 +1,11 @@
+---
+id: <REACTION_ID>
+title: <CANONICAL_NAME>
+tags: <TAG1>, <TAG2>
+scope: <SHORT_SCOPE>
+source: <SOURCE_NOTE>
+---
+
 # Reaction Family: <REACTION_ID> - <CANONICAL_NAME>
 
 ## Summary

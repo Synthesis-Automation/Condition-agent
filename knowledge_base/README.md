@@ -15,7 +15,12 @@ Formatting tips:
 
 - One topic per file.
 - Use clear headings.
-- Include the reaction family ID and canonical name.
+- Add a short metadata header block at the top:
+  - id: Reaction family ID
+  - title: Canonical name
+  - tags: Comma-separated tags
+  - scope: Short substrate/reaction scope
+  - source: Document/source reference
 - Prefer tables or bullet lists for conditions.
 
 See `TEMPLATE.md` for a starting point.
