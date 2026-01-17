@@ -13,7 +13,6 @@ from pydantic import BaseModel, Field
 
 from chemtools.featurizers import analysis as analysis_tools
 from chemtools.featurizers import calculable as calculable_tools
-from chemtools.featurizers import molpipeline as molpipeline_tools
 from chemtools.featurizers import molecule as motif_molecule
 from chemtools.featurizers import reaction as motif_reaction
 from chemtools.featurizers import reaction_detection as reaction_detection_tools
@@ -645,46 +644,6 @@ def calculable_classify_reactant_smiles(smiles: str) -> Dict[str, Any]:
         return _error_response("Failed to classify reactant via calculable features.", {"details": str(exc)})
 
 
-@tool(args_schema=MolpipelineMorganInput)
-def molpipeline_morgan_fingerprint(
-    smiles: Union[str, List[str]],
-    n_bits: int = 2048,
-    radius: int = 2,
-    n_jobs: int = 1,
-    return_sparse: bool = False,
-) -> Dict[str, Any]:
-    """Return Morgan fingerprints via MolPipeline."""
-    try:
-        fingerprint = molpipeline_tools.morgan_fingerprint(
-            smiles,
-            n_bits=n_bits,
-            radius=radius,
-            n_jobs=n_jobs,
-            return_sparse=return_sparse,
-        )
-        return _success_response(_to_jsonable(fingerprint))
-    except Exception as exc:
-        return _error_response("MolPipeline Morgan fingerprint failed.", {"details": str(exc)})
-
-
-@tool(args_schema=MolpipelinePhyschemInput)
-def molpipeline_physchem_features(
-    smiles: Union[str, List[str]],
-    descriptor_list: Optional[List[str]] = None,
-    n_jobs: int = 1,
-) -> Dict[str, Any]:
-    """Return physchem descriptors via MolPipeline."""
-    try:
-        features = molpipeline_tools.physchem_features(
-            smiles,
-            descriptor_list=descriptor_list,
-            n_jobs=n_jobs,
-        )
-        return _success_response(_to_jsonable(features))
-    except Exception as exc:
-        return _error_response("MolPipeline physchem features failed.", {"details": str(exc)})
-
-
 # ============================================================================
 # Tool registry and helpers
 # ============================================================================
@@ -719,9 +678,7 @@ CHEMTOOLS_TOOLS = [
     reaction_pair_featurize_flat,
     calculable_detect_all_features,
     calculable_get_reactant_type_features,
-    calculable_classify_reactant_smiles,
-    molpipeline_morgan_fingerprint,
-    molpipeline_physchem_features,
+    calculable_classify_reactant_smiles
 ]
 
 
