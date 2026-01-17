@@ -3,7 +3,7 @@ id: Buchwald_Hartwig_CN
 title: Buchwald-Hartwig C-N Coupling
 tags: C-N, Buchwald, Pd, amination
 scope: aryl/heteroaryl halide + amine
-source: Internal notes; AbbVie HTE SI Tables S1, S4
+source: Internal notes; AbbVie HTE Perspective Table 4; AbbVie HTE SI Tables S1, S4
 ---
 
 # Reaction Family: Buchwald_Hartwig_CN - Buchwald-Hartwig C-N Coupling
@@ -32,6 +32,28 @@ source: Internal notes; AbbVie HTE SI Tables S1, S4
 ## HTE Insights
 
 - AbbVie HTE SI (Table S1) reports C-N coupling success rate: 67% (313 runs).
+
+### Top conditions overall (AbbVie HTE Perspective Table 4)
+
+| Rank | Catalyst | Ligand | Base | Solvent | Total Top-1 Hits | Total Top-3 Hits |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | RuPhos Pd G3 | RuPhos | LiHMDS | dioxane | 10 | 18 |
+| 2 | BrettPhos Pd G3 | BrettPhos | Cs2CO3 | dioxane | 10 | 15 |
+| 3 | BrettPhos Pd G3 | BrettPhos | LiHMDS | dioxane | 8 | 15 |
+| 4 | BrettPhos Pd G3 | n/a | Cs2CO3 | dioxane | 5 | 15 |
+| 5 | Pd2(dba)3 | Me4tBuXPhos | LiHMDS | t-amylOH | 7 | 14 |
+| 6 | BrettPhos Pd G3 | RuPhos | K3PO4 | t-amylOH/DMA | 4 | 11 |
+| 7 | BrettPhos Pd G3 | BrettPhos | K3PO4 | t-amylOH | 2 | 10 |
+| 8 | BINAP Pd G3 | n/a | Cs2CO3 | dioxane | 6 | 9 |
+| 9 | RuPhos Pd G3 | n/a | Cs2CO3 | dioxane | 3 | 9 |
+| 10 | XPhos Pd G3 | n/a | Cs2CO3 | dioxane | 5 | 8 |
+
+Notes:
+
+- Subscripts restored from the PDF text (e.g., Cs2CO3, K3PO4).
+- Pd2(dba)3 and Me4tBuXPhos are reported without subscripts in the PDF text.
+- Ligands are listed as shown in the PDF; some rows omit a ligand entry.
+
 - Top conditions for 5-membered heterocyclic halides (Table S4):
 
 | Catalyst | Ligand | Base | Solvent | In Top 10 |

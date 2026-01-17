@@ -3,7 +3,7 @@ id: Suzuki_CC
 title: Suzuki-Miyaura Coupling
 tags: Suzuki, C-C, Pd, boronate
 scope: aryl/heteroaryl halide + boronate
-source: AbbVie HTE SI Tables S1-S3
+source: AbbVie HTE Perspective Table 3; AbbVie HTE SI Tables S1-S3
 ---
 
 # Reaction Family: Suzuki_CC - Suzuki-Miyaura Coupling
@@ -28,6 +28,25 @@ source: AbbVie HTE SI Tables S1-S3
 
 - AbbVie HTE SI (Table S1) reports Suzuki coupling success rate: 78% (208 runs).
 - Solvent trend: dioxane/H2O (4:1) dominates top conditions.
+
+### Top conditions overall (AbbVie HTE Perspective Table 3)
+
+| Rank | Catalyst | Base | Solvent | Total Top-1 Hits | Total Top-3 Hits |
+| --- | --- | --- | --- | --- | --- |
+| 1 | PdCl2(dtbpf) | K3PO4 | dioxane/H2O (4:1) | 10 | 24 |
+| 2 | P(tBu)3 Pd G3 | K3PO4 | dioxane/H2O (4:1) | 12 | 20 |
+| 3 | XPhos Pd G3 | K3PO4 | dioxane/H2O (4:1) | 9 | 20 |
+| 4 | PdCl2(dtbpf) | Cs2CO3 | dioxane/H2O (4:1) | 7 | 18 |
+| 5 | CataCXium A Pd G3 | Cs2CO3 | dioxane/H2O (4:1) | 5 | 18 |
+| 6 | Pd(Amphos)Cl2 | K2CO3 | dioxane/H2O (4:1) | 4 | 17 |
+| 7 | PdCl2(PPh3)2 | Cs2CO3 | dioxane/H2O (4:1) | 8 | 15 |
+| 8 | PdCl2(dtbpf) | K2CO3 | dioxane/H2O (4:1) | 2 | 15 |
+| 9 | Pd(dppf)Cl2-CH2Cl2 | K2CO3 | dioxane/H2O (4:1) | 6 | 14 |
+| 10 | Pd(dppf)Cl2-CH2Cl2 | Cs2CO3 | dioxane/H2O (4:1) | 3 | 14 |
+
+Notes:
+
+- Subscripts restored from the PDF text (e.g., K3PO4, Cs2CO3, H2O).
 
 ### Top conditions by halide substructure (Table S2)
 
