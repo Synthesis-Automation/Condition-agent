@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
+from chemtools.util.smarts_cache import compile_smarts
 
 from .alkyl_steric import analyze_alkyl_steric
 from .aryl_electronics import analyze_aryl_electronics
@@ -15,6 +16,25 @@ from .aryl_steric import analyze_aryl_steric
 from .nearby_groups import analyze_nearby_groups
 from .motif_detect import detect_motifs
 from .motif_registry import build_compound_registry, _default_registry_paths
+
+_INORGANIC_SMARTS = (
+    "O=C=O",
+    "[CX3](=O)([O-])[O-]",
+    "[CX3](=O)([O-])O",
+    "[CX3](=O)(O)O",
+    "[OX2H]C(=O)[O-]",
+)
+
+
+def _is_inorganic_molecule(mol: Any) -> bool:
+    has_carbon = any(atom.GetAtomicNum() == 6 for atom in mol.GetAtoms())
+    if not has_carbon:
+        return True
+    for smarts in _INORGANIC_SMARTS:
+        pattern = compile_smarts(smarts, validate=False)
+        if pattern and mol.HasSubstructMatch(pattern):
+            return True
+    return False
 
 
 def featurize_molecule(
@@ -45,6 +65,17 @@ def featurize_molecule(
             "schema_version": "v2",
             "smiles": smiles,
             "motifs": [],
+            "steric": {"aryl": [], "alkyl": []},
+            "electronics": {"aryl": []},
+            "analyses": [],
+            "meta": meta,
+        }
+
+    if _is_inorganic_molecule(mol):
+        return {
+            "schema_version": "v2",
+            "smiles": smiles,
+            "motifs": [{"compound_id": "Inorganic"}],
             "steric": {"aryl": [], "alkyl": []},
             "electronics": {"aryl": []},
             "analyses": [],

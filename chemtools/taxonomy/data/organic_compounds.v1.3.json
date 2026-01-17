@@ -727,6 +727,14 @@
       ]
     },
     {
+      "id": "Ar-B",
+      "name": "Ar-B",
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "B_Any",
+      "description": "Aryl boron substituent (generic organoboron)."
+    },
+    {
       "id": "Ar-B(OH)2",
       "name": "Ar-B(OH)2",
       "template": "single_bond",
