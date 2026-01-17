@@ -80,6 +80,8 @@ def detect_motifs(
                     "bond": site_bond,
                     "priority": compound.priority,
                     "complexity": compound.complexity,
+                    "group_b": compound.group_b,
+                    "reactivity_weight": compound.reactivity_weight,
                     "undocumented": False,
                     "atoms": set(match),
                 }

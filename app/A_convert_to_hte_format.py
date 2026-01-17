@@ -677,6 +677,17 @@ def process_reaction_dataset(
 
                 reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
 
+                fallback_intramolecular = _fallback_intramolecular(reactants)
+                intramolecular_flag = _intramolecular_from_reaction(smiles)
+                if intramolecular_flag is None:
+                    intramolecular_flag = fallback_intramolecular
+
+                if len(reactants) == 1:
+                    if intramolecular_flag:
+                        primary_reactant_motifs = primary_reactant_motifs[:2]
+                    else:
+                        primary_reactant_motifs = primary_reactant_motifs[:1]
+
                 type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
                 type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
                 type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
@@ -687,11 +698,6 @@ def process_reaction_dataset(
                     continue
 
                 spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
-
-                fallback_intramolecular = _fallback_intramolecular(reactants)
-                intramolecular_flag = _intramolecular_from_reaction(smiles)
-                if intramolecular_flag is None:
-                    intramolecular_flag = fallback_intramolecular
 
                 row_out = {
                     "reaction_id": source_label,
@@ -843,6 +849,17 @@ def process_reaction_dataset(
 
             reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
 
+            fallback_intramolecular = _fallback_intramolecular(reactants)
+            intramolecular_flag = _intramolecular_from_reaction(smiles)
+            if intramolecular_flag is None:
+                intramolecular_flag = fallback_intramolecular
+
+            if len(reactants) == 1:
+                if intramolecular_flag:
+                    primary_reactant_motifs = primary_reactant_motifs[:2]
+                else:
+                    primary_reactant_motifs = primary_reactant_motifs[:1]
+
             type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
             type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
             type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
@@ -853,11 +870,6 @@ def process_reaction_dataset(
                 continue
 
             spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
-
-            fallback_intramolecular = _fallback_intramolecular(reactants)
-            intramolecular_flag = _intramolecular_from_reaction(smiles)
-            if intramolecular_flag is None:
-                intramolecular_flag = fallback_intramolecular
 
             row = {
                 "reaction_id": source_label,

@@ -100,6 +100,8 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "reaction_category": "Reaction_Category",
         "reactant_1": "Reactant_A_Type",
         "reactant_2": "Reactant_B_Type",
+        "reactant_3": "Reactant_C_Type",
+        "reactant_3_type": "Reactant_C_Type",
         "yield": "AREA_TOTAL_REDUCED",
         "z_score": "z-Score",
         "catalyst": "Catalyst",
@@ -122,6 +124,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
 
     required_cols = [
         "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
+        "Reactant_C_Type",
         "Catalyst", "Ligand", "Base", "Solvent", "Additive",
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
         "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category", "Is_Intramolecular",
@@ -136,11 +139,26 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
             else:
                 df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
 
-    if "Reactant_Types_Key" not in df.columns:
-        df["Reactant_Types_Key"] = df.apply(
-            lambda row: _reactant_key([row.get("Reactant_A_Type"), row.get("Reactant_B_Type")]),
-            axis=1,
+    def _normalize_reactants_row(row: pd.Series) -> pd.Series:
+        a_val, b_val, c_val, cleaned = _normalize_reactant_values(
+            [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
         )
+        row["Reactant_A_Type"] = a_val
+        row["Reactant_B_Type"] = b_val
+        row["Reactant_C_Type"] = c_val
+        row["_reactant_count"] = len(cleaned)
+        return row
+
+    df = df.apply(_normalize_reactants_row, axis=1)
+    df["Is_Intramolecular"] = df["_reactant_count"] <= 1
+    df = df.drop(columns=["_reactant_count"])
+
+    df["Reactant_Types_Key"] = df.apply(
+        lambda row: _reactant_key(
+            [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
+        ),
+        axis=1,
+    )
 
     if source_path is not None:
         df["Source_File"] = _format_source_path(source_path)
@@ -268,6 +286,24 @@ def _format_reaction_id(reaction_type: Optional[str], reaction_category: Optiona
 def _reactant_key(values: Iterable[Optional[str]]) -> str:
     items = _dedupe_list([str(v).strip() for v in values if v])
     return "|".join(sorted(items))
+
+
+def _clean_reactant_value(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    if text.lower() == "inorganic":
+        return ""
+    return text
+
+
+def _normalize_reactant_values(values: Iterable[Any]) -> Tuple[str, str, str, List[str]]:
+    cleaned = [_clean_reactant_value(v) for v in values]
+    cleaned = [v for v in cleaned if v]
+    a_val = cleaned[0] if len(cleaned) > 0 else ""
+    b_val = cleaned[1] if len(cleaned) > 1 else ""
+    c_val = cleaned[2] if len(cleaned) > 2 else ""
+    return a_val, b_val, c_val, cleaned
 
 
 _MOTIF_SPLIT_RE = re.compile(r"[|,]")
@@ -660,6 +696,7 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
                 continue
 
             reactant_types = _ensure_list(record.get("reactant_types"))
+            a_type, b_type, c_type, cleaned = _normalize_reactant_values(reactant_types)
             reactant_categories = _ensure_list(record.get("reactant_categories"))
             catalyst_types = _ensure_list(record.get("catalyst_type"))
             conditions = record.get("conditions") or {}
@@ -667,11 +704,12 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
 
             row = {
                 "Reaction_Type_Standardized": record.get("reaction_type") or "Unknown",
-                "Reactant_A_Type": reactant_types[0] if len(reactant_types) > 0 else "",
-                "Reactant_B_Type": reactant_types[1] if len(reactant_types) > 1 else "",
+                "Reactant_A_Type": a_type,
+                "Reactant_B_Type": b_type,
+                "Reactant_C_Type": c_type,
                 "Reactant_A_Category": reactant_categories[0] if len(reactant_categories) > 0 else "",
                 "Reactant_B_Category": reactant_categories[1] if len(reactant_categories) > 1 else "",
-                "Reactant_Types_Key": _reactant_key(reactant_types),
+                "Reactant_Types_Key": _reactant_key(cleaned),
                 "Catalyst_Type": _format_list(catalyst_types),
                 "Catalyst": _format_list(conditions.get("catalyst")),
                 "Ligand": _format_list(conditions.get("ligand")),
@@ -683,6 +721,7 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
                 "AREA_TOTAL_REDUCED": metrics.get("area_total_reduced"),
                 "z-Score": metrics.get("z_score"),
                 "spectator_groups": record.get("spectator_groups", ""),
+                "Is_Intramolecular": len(cleaned) <= 1,
             }
             rows.append(row)
 

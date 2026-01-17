@@ -4,6 +4,8 @@ Motif-based steric and electronic analysis using organic compound motifs.
 
 from __future__ import annotations
 
+from functools import lru_cache
+import json
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -37,6 +39,85 @@ def _is_inorganic_molecule(mol: Any) -> bool:
     return False
 
 
+_ORGANOMETAL_B_GROUPS = {
+    "B_Any",
+    "B(OH)2",
+    "B(OR)2",
+    "Bpin",
+    "BF3K",
+    "Zn",
+    "Mg",
+    "Sn",
+    "Si",
+}
+_ORGANOMETAL_REACTIVITY_BONUS = 4.0
+_REACTANT_MOTIF_BONUS = 2.0
+
+
+@lru_cache(maxsize=1)
+def _load_reaction_reactant_motifs() -> set[str]:
+    base = Path(__file__).resolve().parents[1] / "taxonomy" / "data"
+    rt_path = base / "reaction_types.v4.0.json"
+    logic_path = base / "compound_logic.json"
+    if not rt_path.exists() or not logic_path.exists():
+        return set()
+    try:
+        with rt_path.open("r", encoding="utf-8") as handle:
+            reaction_types = json.load(handle).get("reaction_types", []) or []
+        with logic_path.open("r", encoding="utf-8") as handle:
+            logic_data = json.load(handle)
+    except Exception:
+        return set()
+    motif_sets = logic_data.get("motif_sets", {}) or {}
+    out: set[str] = set()
+
+    def add_value(value: Any) -> None:
+        if not value:
+            return
+        if isinstance(value, str):
+            if value.startswith("@"):
+                set_name = value[1:]
+                members = motif_sets.get(set_name, {}).get("members", []) or []
+                for member in members:
+                    if member:
+                        out.add(str(member))
+            else:
+                out.add(value)
+            return
+        if isinstance(value, list):
+            for item in value:
+                add_value(item)
+            return
+        if isinstance(value, dict):
+            for item in value.values():
+                add_value(item)
+
+    for entry in reaction_types:
+        if not isinstance(entry, dict):
+            continue
+        reactants = entry.get("reactants")
+        if isinstance(reactants, dict):
+            for item in reactants.values():
+                add_value(item)
+        else:
+            add_value(reactants)
+
+    return out
+
+
+def _motif_rank_score(hit: Dict[str, Any]) -> float:
+    reactivity = float(hit.get("reactivity_weight") or 0.0)
+    group_b = hit.get("group_b")
+    if group_b in _ORGANOMETAL_B_GROUPS:
+        reactivity += _ORGANOMETAL_REACTIVITY_BONUS
+    compound_id = hit.get("compound_id")
+    if compound_id and compound_id in _load_reaction_reactant_motifs():
+        reactivity += _REACTANT_MOTIF_BONUS
+    priority = int(hit.get("priority") or 0)
+    complexity = int(hit.get("complexity") or 0)
+    return (reactivity * 100.0) + (priority * 10.0) + complexity
+
+
 def featurize_molecule(
     smiles: str,
     registry_paths: Optional[Dict[str, str | Path]] = None,
@@ -52,6 +133,7 @@ def featurize_molecule(
             "schema_version": "v2",
             "smiles": smiles,
             "motifs": [],
+            "ranked_motifs": [],
             "steric": {"aryl": [], "alkyl": []},
             "electronics": {"aryl": []},
             "analyses": [],
@@ -65,6 +147,7 @@ def featurize_molecule(
             "schema_version": "v2",
             "smiles": smiles,
             "motifs": [],
+            "ranked_motifs": [],
             "steric": {"aryl": [], "alkyl": []},
             "electronics": {"aryl": []},
             "analyses": [],
@@ -76,6 +159,7 @@ def featurize_molecule(
             "schema_version": "v2",
             "smiles": smiles,
             "motifs": [{"compound_id": "Inorganic"}],
+            "ranked_motifs": ["Inorganic"],
             "steric": {"aryl": [], "alkyl": []},
             "electronics": {"aryl": []},
             "analyses": [],
@@ -175,6 +259,13 @@ def featurize_molecule(
                 seen_background.add(cid)
             deduped.append(m)
         motifs = deduped
+
+    ranked_motifs = []
+    if motifs:
+        for m in motifs:
+            m["rank_score"] = _motif_rank_score(m)
+        motifs.sort(key=lambda m: (m.get("rank_score", 0.0), m.get("compound_id", "")), reverse=True)
+        ranked_motifs = [m.get("compound_id") for m in motifs if m.get("compound_id")]
 
     analyses = []
     for hit in motifs:
@@ -284,6 +375,7 @@ def featurize_molecule(
         "schema_version": "v2",
         "smiles": smiles,
         "motifs": motifs,
+        "ranked_motifs": ranked_motifs,
         "steric": steric_payload,
         "electronics": electronic_payload,
         "nearby": nearby_payload,

@@ -231,8 +231,8 @@
       "name": "Acyl-",
       "kind": "scaffold",
       "priority": 5,
-      "smarts": "[CX3:1](=O)",
-      "description": "Acyl carbon attachment point (Acyl-), used for acyl electrophiles/features.",
+      "smarts": "[CX3H0,H1:1](=O)",
+      "description": "Acyl carbon attachment point (Acyl-, including formyl HCO-), used for acyl electrophiles/features.",
       "tags": [
         "scaffold",
         "acyl",

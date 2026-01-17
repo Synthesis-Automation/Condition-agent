@@ -195,6 +195,7 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
         a_idx = motif.get("a_atom_idx")
         b_idx = motif.get("b_atom_idx")
         bond = motif.get("bond")
+        rank_score = motif.get("rank_score")
         details = []
         if a_idx is not None:
             details.append(f"a={a_idx}")
@@ -202,6 +203,8 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
             details.append(f"b={b_idx}")
         if bond is not None:
             details.append(f"bond={bond}")
+        if isinstance(rank_score, (int, float)):
+            details.append(f"rank={float(rank_score):.2f}")
         if details:
             lines.append(f"{display_name} ({', '.join(details)})")
         else:
@@ -298,6 +301,10 @@ def _print_molecule_detail(payload: Dict[str, Any], *, indent: int = 0) -> None:
 
     _print_rdkit_props(molecule.get("rdkit_props") or {}, indent=indent)
     _print_motifs(molecule.get("motifs") or [], indent=indent)
+    ranked = molecule.get("ranked_motifs") or []
+    if ranked:
+        print(f"{prefix}Ranked Motifs:")
+        print(_format_list([str(item) for item in ranked], indent=indent + 2))
     _print_motif_analyses(molecule.get("analyses") or [], indent=indent)
     _print_snar_feasibility(molecule.get("snar_feasibility") or [], indent=indent)
 

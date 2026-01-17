@@ -31,6 +31,7 @@ class CompoundPattern:
     b_tags: List[str]
     priority: int = 1
     complexity: int = 0
+    reactivity_weight: float = 0.0
 
 
 def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[str, Any]:
@@ -80,6 +81,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         priority = entry.get("priority")
         if priority is None:
             priority = priorities.get(group_a, 1) + priorities.get(group_b, 1)
+        reactivity_weight = float(entry.get("reactivity_weight") or 0.0)
 
         smarts_list = _extract_compound_smarts(entry)
         if smarts_list:
@@ -98,6 +100,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
                     b_tags=list(entry.get("tags") or []),
                     priority=priority,
                     complexity=calculate_smarts_complexity(query),
+                    reactivity_weight=reactivity_weight,
                 )
                 compiled.append(pattern)
                 compound_map[compound_id] = pattern
@@ -144,6 +147,7 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
             b_tags=list(group_b_record.get("tags") or []),
             priority=priority,
             complexity=calculate_smarts_complexity(query),
+            reactivity_weight=reactivity_weight,
         )
         compiled.append(pattern)
         compound_map[compound_id] = pattern

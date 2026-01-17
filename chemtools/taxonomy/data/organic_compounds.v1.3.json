@@ -318,6 +318,7 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Alkyl_Subst",
+      "priority": 0,
       "description": "Aryl-Alkyl bond (e.g., toluene, ethylbenzene).",
       "aliases": [
         "alkyl-arene"
@@ -332,7 +333,8 @@
       "description": "Aryl halide (Ar-X).",
       "aliases": [
         "aryl halide"
-      ]
+      ],
+      "reactivity_weight": 2.0
     },
     {
       "id": "Ar-Cl",
@@ -344,7 +346,8 @@
       "aliases": [
         "ArCl",
         "aryl chloride"
-      ]
+      ],
+      "reactivity_weight": 1.5
     },
     {
       "id": "Ar-Br",
@@ -356,7 +359,8 @@
       "aliases": [
         "ArBr",
         "aryl bromide"
-      ]
+      ],
+      "reactivity_weight": 2.5
     },
     {
       "id": "Ar-I",
@@ -368,7 +372,8 @@
       "aliases": [
         "ArI",
         "aryl iodide"
-      ]
+      ],
+      "reactivity_weight": 3.0
     },
     {
       "id": "AromN-H",
@@ -400,7 +405,8 @@
       "aliases": [
         "ArF",
         "aryl fluoride"
-      ]
+      ],
+      "reactivity_weight": 1.0
     },
     {
       "id": "Ar-CF3",
@@ -603,7 +609,8 @@
       "description": "Aryl triflate (Ar-OTf); Aryl-O-triflate motif.",
       "aliases": [
         "ArOTf"
-      ]
+      ],
+      "reactivity_weight": 2.5
     },
     {
       "id": "Ar-OTs",
@@ -614,7 +621,8 @@
       "description": "Aryl tosylate (Ar-OTs); Aryl-O-tosylate motif.",
       "aliases": [
         "ArOTs"
-      ]
+      ],
+      "reactivity_weight": 2.0
     },
     {
       "id": "Ar-OMs",
@@ -625,7 +633,8 @@
       "description": "Aryl mesylate (Ar-OMs); Aryl-O-mesylate motif.",
       "aliases": [
         "ArOMs"
-      ]
+      ],
+      "reactivity_weight": 1.8
     },
     {
       "id": "Ar-OSO2R",
@@ -732,7 +741,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "B_Any",
-      "description": "Aryl boron substituent (generic organoboron)."
+      "description": "Aryl boron substituent (generic organoboron).",
+      "reactivity_weight": 2.5
     },
     {
       "id": "Ar-B(OH)2",
@@ -743,7 +753,8 @@
       "description": "Aryl boronic acid (Ar-B(OH)2).",
       "aliases": [
         "ArB(OH)2"
-      ]
+      ],
+      "reactivity_weight": 2.0
     },
     {
       "id": "Ar-BF3K",
@@ -751,7 +762,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "BF3K",
-      "description": "Aryl trifluoroborate (Ar-BF3K)."
+      "description": "Aryl trifluoroborate (Ar-BF3K).",
+      "reactivity_weight": 2.0
     },
     {
       "id": "Alkenyl-BF3K",
@@ -859,7 +871,8 @@
       "description": "Aryl boronate (Bpin) (Ar-Bpin).",
       "aliases": [
         "ArBpin"
-      ]
+      ],
+      "reactivity_weight": 2.0
     },
     {
       "id": "Alkenyl-B(OH)2",
@@ -901,7 +914,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Sn",
-      "description": "Aryl stannane (generic Ar-SnR3)."
+      "description": "Aryl stannane (generic Ar-SnR3).",
+      "reactivity_weight": 2.0
     },
     {
       "id": "Ar-Si*",
@@ -909,7 +923,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Si",
-      "description": "Aryl silane (generic Ar-SiR3)."
+      "description": "Aryl silane (generic Ar-SiR3).",
+      "reactivity_weight": 1.5
     },
     {
       "id": "Ar-Zn*",
@@ -917,7 +932,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Zn",
-      "description": "Aryl zincate (generic Ar-ZnX)."
+      "description": "Aryl zincate (generic Ar-ZnX).",
+      "reactivity_weight": 2.5
     },
     {
       "id": "Ar-Mg*",
@@ -925,7 +941,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "Mg",
-      "description": "Aryl Grignard (generic Ar-MgX)."
+      "description": "Aryl Grignard (generic Ar-MgX).",
+      "reactivity_weight": 2.5
     },
     {
       "id": "Alkenyl-Sn",
@@ -965,7 +982,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CHO",
-      "description": "Aryl aldehyde (Ar-CHO)."
+      "description": "Aryl aldehyde (Ar-CHO).",
+      "reactivity_weight": 3.0
     },
     {
       "id": "Ar-COR",
@@ -1072,7 +1090,8 @@
       "description": "Aryl ether (Ar-OR).",
       "aliases": [
         "aryl ether"
-      ]
+      ],
+      "reactivity_weight": 1.0
     },
     {
       "id": "Ar-SH",
@@ -1088,7 +1107,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "CO2H",
-      "description": "Aryl carboxylic acid (Ar-CO2H)."
+      "description": "Aryl carboxylic acid (Ar-CO2H).",
+      "reactivity_weight": 1.5
     },
     {
       "id": "Ar-COCl",
@@ -2326,7 +2346,8 @@
       "template": "single_bond",
       "A": "Ar",
       "B": "B(OR)2",
-      "description": "Aryl boronate ester (Ar-B(OR)2)."
+      "description": "Aryl boronate ester (Ar-B(OR)2).",
+      "reactivity_weight": 2.0
     },
     {
       "id": "Ar-N3",
