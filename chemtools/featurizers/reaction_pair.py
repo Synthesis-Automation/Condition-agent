@@ -25,17 +25,6 @@ except Exception:  # pragma: no cover
     _HAS_ROLE_FEATS = False
 
 
-_MOLPIPELINE_SENTINEL = object()
-_MOLPIPELINE_HELPERS: Any = _MOLPIPELINE_SENTINEL  # type: ignore[misc]
-_DEFAULT_MOLPIPELINE_DESCRIPTOR_LIST = [
-    "HeavyAtomMolWt",
-    "TPSA",
-    "MolLogP",
-    "MolMR",
-    "NumHAcceptors",
-    "NumHDonors",
-]
-
 _HALOGEN_GROUPS: Tuple[Tuple[str, Tuple[str, ...]], ...] = (
     ("I", ("aryl_iodide", "vinyl_iodide", "alkyl_iodide", "iodide")),
     ("Br", ("aryl_bromide", "vinyl_bromide", "alkyl_bromide")),
@@ -64,87 +53,6 @@ def _get_env_bool(name: str, default: bool = False) -> bool:
     if v is None:
         return default
     return v.strip().lower() in {"1", "true", "yes", "on"}
-
-
-def _env_int(name: str, default: int) -> int:
-    try:
-        value = int(os.environ.get(name, str(default)))
-    except Exception:
-        return default
-    return value if value > 0 else default
-
-
-def _maybe_import_molpipeline():
-    global _MOLPIPELINE_HELPERS
-    if _MOLPIPELINE_HELPERS is None:
-        return None
-    if _MOLPIPELINE_HELPERS is _MOLPIPELINE_SENTINEL:
-        try:
-            from . import molpipeline as _mp_helpers  # type: ignore
-        except Exception:
-            _MOLPIPELINE_HELPERS = None
-            return None
-        _MOLPIPELINE_HELPERS = _mp_helpers
-    return _MOLPIPELINE_HELPERS
-
-
-def _to_float_list(arr: Any) -> Optional[List[float]]:
-    if arr is None:
-        return None
-    try:
-        import numpy as np
-
-        return np.asarray(arr, dtype=float).ravel().tolist()
-    except Exception:
-        try:
-            return [float(x) for x in arr]  # type: ignore[arg-type]
-        except Exception:
-            return None
-
-
-def _molpipeline_vectors(smiles: str) -> Optional[Dict[str, Any]]:
-    helpers = _maybe_import_molpipeline()
-    if helpers is None:
-        return None
-    settings = {
-        "morgan_bits": _env_int("CHEMTOOLS_MOLPIPE_MORGAN_BITS", 1024),
-        "morgan_radius": _env_int("CHEMTOOLS_MOLPIPE_MORGAN_RADIUS", 2),
-        "physchem_descriptors": _DEFAULT_MOLPIPELINE_DESCRIPTOR_LIST,
-    }
-    descriptor_env = os.environ.get("CHEMTOOLS_MOLPIPE_PHYS_DESC")
-    if descriptor_env:
-        parsed = [part.strip() for part in descriptor_env.split(",") if part.strip()]
-        if parsed:
-            settings["physchem_descriptors"] = parsed
-
-    try:
-        morgan = helpers.morgan_fingerprint(
-            smiles,
-            n_bits=settings["morgan_bits"],
-            radius=settings["morgan_radius"],
-            return_sparse=False,
-        )
-        morgan_list = _to_float_list(morgan)
-        physchem = helpers.physchem_features(
-            smiles,
-            descriptor_list=settings["physchem_descriptors"],
-        )
-        physchem_list = _to_float_list(physchem)
-    except Exception:
-        return None
-
-    result: Dict[str, Any] = {}
-    if morgan_list is not None:
-        result["morgan_fp"] = morgan_list
-    if physchem_list is not None:
-        descriptor_names = settings.get("physchem_descriptors", [])
-        result["physchem"] = physchem_list
-        if descriptor_names and len(descriptor_names) == len(physchem_list):
-            result["physchem_map"] = dict(zip(descriptor_names, physchem_list))
-    if not result:
-        return None
-    result["_settings"] = settings
-    return result
 
 
 def _maybe_structural(smiles: str) -> Optional[Dict[str, Any]]:
@@ -434,7 +342,6 @@ def featurize_flat(
     electrophile: str,
     nucleophile: str,
     *,
-    include_molpipeline: Optional[bool] = None,
     include_calculable: Optional[bool] = None,
 ) -> Dict[str, Any]:
     """Return the legacy flat feature dictionary for a reactant pair."""
@@ -471,35 +378,6 @@ def featurize_flat(
         except Exception:
             pass
 
-    if include_molpipeline is None:
-        include_molpipeline = _get_env_bool(
-            "CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES",
-            _maybe_import_molpipeline() is not None,
-        )
-    if include_molpipeline:
-        molpipeline_data: Dict[str, Any] = {}
-        settings_snapshot: Optional[Dict[str, Any]] = None
-
-        elec_vec = _molpipeline_vectors(electrophile) if electrophile else None
-        if elec_vec is not None:
-            settings_snapshot = dict(elec_vec.pop("_settings", {}))
-            molpipeline_data["electrophile"] = elec_vec
-
-        nuc_vec = _molpipeline_vectors(nucleophile) if nucleophile else None
-        if nuc_vec is not None:
-            nuc_settings = dict(nuc_vec.pop("_settings", {}))
-            if settings_snapshot is None:
-                settings_snapshot = nuc_settings
-            else:
-                for key, value in nuc_settings.items():
-                    settings_snapshot.setdefault(key, value)
-            molpipeline_data["nucleophile"] = nuc_vec
-
-        if molpipeline_data:
-            if settings_snapshot is not None:
-                molpipeline_data["settings"] = settings_snapshot
-            out["molpipeline"] = molpipeline_data
-
     # Standardized substrate-tag tokens (expandable).
     ortho = out.get("ortho_count")
     if isinstance(ortho, str):
@@ -530,7 +408,6 @@ def featurize_pair(
     electrophile: str,
     nucleophile: str,
     *,
-    include_molpipeline: Optional[bool] = None,
     include_calculable: Optional[bool] = None,
     include_structural: Optional[bool] = None,
 ) -> Dict[str, Any]:
@@ -542,16 +419,12 @@ def featurize_pair(
     flat = featurize_flat(
         electrophile,
         nucleophile,
-        include_molpipeline=include_molpipeline,
         include_calculable=include_calculable,
     )
 
     if include_structural is None:
         include_structural = _get_env_bool("CHEMTOOLS_INCLUDE_STRUCTURAL_FEATURES", False)
 
-    resolved_include_molpipeline = (
-        include_molpipeline if include_molpipeline is not None else ("molpipeline" in flat)
-    )
     resolved_include_calculable = (
         include_calculable if include_calculable is not None else ("calculable" in flat)
     )
@@ -572,7 +445,6 @@ def featurize_pair(
         "steric_alpha": flat.get("steric_alpha"),
     }
 
-    molpipeline_block = flat.get("molpipeline")
     calculable_block = flat.get("calculable")
     role_aware_block = flat.get("role_aware")
 
@@ -584,14 +456,6 @@ def featurize_pair(
         "smiles": nucleophile,
         "features": nuc_features,
     }
-
-    if isinstance(molpipeline_block, dict):
-        elec_mp = molpipeline_block.get("electrophile")
-        nuc_mp = molpipeline_block.get("nucleophile")
-        if elec_mp:
-            elec_payload["molpipeline"] = elec_mp
-        if nuc_mp:
-            nuc_payload["molpipeline"] = nuc_mp
 
     if isinstance(calculable_block, dict):
         elec_calc = calculable_block.get("electrophile")
@@ -638,7 +502,6 @@ def featurize_pair(
             "rdkit_available": rdkit_available(),
             "errors": errors,
             "options": {
-                "include_molpipeline": resolved_include_molpipeline,
                 "include_calculable": resolved_include_calculable,
                 "include_structural": include_structural,
             },
@@ -650,7 +513,6 @@ def featurize(
     electrophile: str,
     nucleophile: str,
     *,
-    include_molpipeline: Optional[bool] = None,
     include_calculable: Optional[bool] = None,
     include_structural: Optional[bool] = None,
 ) -> Dict[str, Any]:
@@ -658,7 +520,6 @@ def featurize(
     return featurize_pair(
         electrophile,
         nucleophile,
-        include_molpipeline=include_molpipeline,
         include_calculable=include_calculable,
         include_structural=include_structural,
     )

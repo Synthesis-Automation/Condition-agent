@@ -15,7 +15,6 @@ from .loader import _load, _load_selective
 from .core_utils import _family_text, _proto_family_id, _parse_bin, _parse_core_tokens, _norm_family
 from .catalyst import _row_catalyst_class, _match_catalyst_class
 from .similarity import _similarity
-from .integrations import _attach_molpipeline_features
 
 # Configure logging for performance tracking
 logger = logging.getLogger(__name__)
@@ -173,13 +172,9 @@ def knn(family: str | None, features: Dict[str, Any], k: int = 50, relax: Dict[s
     if family is None or (isinstance(family, str) and family.lower() in ["all", "none", ""]):
         relax_dict["selective_loading"] = False
     
-    molpipeline_cfg = relax_dict.pop('molpipeline', None)
     family_key = family if family is not None else "__ALL__"  # Use special key for caching
     out = _knn_cached(family_key, _as_kv(features or {}), int(k), _as_kv(relax_dict))
-    pack = {**out}
-    if molpipeline_cfg:
-        pack = _attach_molpipeline_features(pack, molpipeline_cfg)
-    return pack
+    return {**out}
 
 
 def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: Dict[str, Any] | None = None) -> Dict[str, Any]:

@@ -1,8 +1,8 @@
 # Chem Assistant Summary (Featurization/Analysis)
 
 This package exposes ChemTools featurization and analysis tools with a minimal
-LangGraph agent and CLI. Recommendation, protocol, HTE, and reagent tooling are
-intentionally removed.
+LangGraph agent and CLI. Protocol and reagent tooling are intentionally removed;
+HTE recommendations are now available via the agent tool set.
 
 Key modules:
 
@@ -18,4 +18,3 @@ Tool categories:
 - Motif-based featurizers
 - Reaction-pair featurizers
 - Calculable features
-- MolPipeline descriptors

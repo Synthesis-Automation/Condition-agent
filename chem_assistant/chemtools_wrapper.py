@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
@@ -57,6 +57,47 @@ def _error_response(message: str, extra: Optional[Dict[str, Any]] = None) -> Dic
     if extra:
         payload.update(_to_jsonable(extra))
     return payload
+
+
+def _extract_smiles_from_normalized(items: List[Dict[str, Any]]) -> List[str]:
+    smiles_list: List[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        for key in ("smiles_norm", "largest_smiles", "input"):
+            value = item.get(key)
+            if value:
+                smiles_list.append(str(value).strip())
+                break
+    return [smiles for smiles in smiles_list if smiles]
+
+
+def _resolve_hte_inputs(
+    reaction_smiles: Optional[str],
+    reactant_a_smiles: Optional[str],
+    reactant_b_smiles: Optional[str],
+    product_smiles: Optional[str],
+) -> tuple[str, Optional[str], Optional[str]]:
+    if reaction_smiles:
+        try:
+            from chemtools.smiles import normalize_reaction
+        except Exception:
+            normalize_reaction = None
+        if normalize_reaction:
+            normalized = normalize_reaction(reaction_smiles)
+            reactants = _extract_smiles_from_normalized(normalized.get("reactants", []))
+            products = _extract_smiles_from_normalized(normalized.get("products", []))
+            if not reactant_a_smiles and reactants:
+                reactant_a_smiles = reactants[0]
+            if reactant_b_smiles is None and len(reactants) > 1:
+                reactant_b_smiles = reactants[1]
+            if product_smiles is None and products:
+                product_smiles = products[0]
+
+    reactant_a_smiles = (reactant_a_smiles or "").strip()
+    reactant_b_smiles = (reactant_b_smiles or "").strip() or None
+    product_smiles = (product_smiles or "").strip() or None
+    return reactant_a_smiles, reactant_b_smiles, product_smiles
 
 
 # ============================================================================
@@ -215,9 +256,6 @@ class ReactionPairInput(BaseModel):
 
     electrophile: str = Field(..., description="Electrophile SMILES string.")
     nucleophile: str = Field(..., description="Nucleophile SMILES string.")
-    include_molpipeline: Optional[bool] = Field(
-        None, description="Include MolPipeline descriptors when available."
-    )
     include_calculable: Optional[bool] = Field(
         None, description="Include calculable features when available."
     )
@@ -231,40 +269,51 @@ class ReactionPairFlatInput(BaseModel):
 
     electrophile: str = Field(..., description="Electrophile SMILES string.")
     nucleophile: str = Field(..., description="Nucleophile SMILES string.")
-    include_molpipeline: Optional[bool] = Field(
-        None, description="Include MolPipeline descriptors when available."
-    )
     include_calculable: Optional[bool] = Field(
         None, description="Include calculable features when available."
     )
 
 
-class MolpipelineMorganInput(BaseModel):
-    """Schema for Morgan fingerprints via MolPipeline."""
+class HTERecommendInput(BaseModel):
+    """Schema for HTE recommender queries."""
 
-    smiles: Union[str, List[str]] = Field(
-        ..., description="SMILES string or list of SMILES strings."
-    )
-    n_bits: int = Field(2048, ge=128, le=4096, description="Fingerprint size.")
-    radius: int = Field(2, ge=1, le=6, description="Morgan radius.")
-    n_jobs: int = Field(1, ge=1, le=32, description="Parallel worker count.")
-    return_sparse: bool = Field(
-        False,
-        description="Return sparse matrices (default False to keep JSON-friendly output).",
-    )
-
-
-class MolpipelinePhyschemInput(BaseModel):
-    """Schema for MolPipeline physchem descriptors."""
-
-    smiles: Union[str, List[str]] = Field(
-        ..., description="SMILES string or list of SMILES strings."
-    )
-    descriptor_list: Optional[List[str]] = Field(
+    reaction_smiles: Optional[str] = Field(
         None,
-        description="Optional list of descriptor names (default MolPipeline set).",
+        description="Optional reaction SMILES (A.B>>P) to parse reactants from.",
     )
-    n_jobs: int = Field(1, ge=1, le=32, description="Parallel worker count.")
+    reactant_a_smiles: Optional[str] = Field(
+        None, description="Reactant A SMILES string."
+    )
+    reactant_b_smiles: Optional[str] = Field(
+        None, description="Optional reactant B SMILES string."
+    )
+    product_smiles: Optional[str] = Field(
+        None, description="Optional product SMILES string."
+    )
+    top_k: int = Field(10, ge=1, le=200, description="Number of conditions to return.")
+    min_experiments: int = Field(
+        1, ge=1, le=200, description="Minimum experiments per condition."
+    )
+    reaction_type_filter: Optional[str] = Field(
+        None, description="Optional reaction type/category filter."
+    )
+    catalyst_filter: Optional[str] = Field(
+        None, description="Optional catalyst metal/name filter."
+    )
+    hte_db_path: Optional[str] = Field(
+        None, description="Path to HTE database folder or file."
+    )
+    use_spectator_groups: bool = Field(
+        True, description="Apply spectator group weighting when available."
+    )
+
+
+class HTEStatsInput(BaseModel):
+    """Schema for HTE database statistics."""
+
+    hte_db_path: Optional[str] = Field(
+        None, description="Path to HTE database folder or file."
+    )
 
 
 # ============================================================================
@@ -577,7 +626,6 @@ def motif_featurize_reaction(
 def reaction_pair_featurize_pair(
     electrophile: str,
     nucleophile: str,
-    include_molpipeline: Optional[bool] = None,
     include_calculable: Optional[bool] = None,
     include_structural: Optional[bool] = None,
 ) -> Dict[str, Any]:
@@ -587,7 +635,6 @@ def reaction_pair_featurize_pair(
             reaction_pair_tools.featurize_pair(
                 electrophile,
                 nucleophile,
-                include_molpipeline=include_molpipeline,
                 include_calculable=include_calculable,
                 include_structural=include_structural,
             )
@@ -600,7 +647,6 @@ def reaction_pair_featurize_pair(
 def reaction_pair_featurize_flat(
     electrophile: str,
     nucleophile: str,
-    include_molpipeline: Optional[bool] = None,
     include_calculable: Optional[bool] = None,
 ) -> Dict[str, Any]:
     """Return flat electrophile/nucleophile feature dictionary."""
@@ -609,7 +655,6 @@ def reaction_pair_featurize_flat(
             reaction_pair_tools.featurize_flat(
                 electrophile,
                 nucleophile,
-                include_molpipeline=include_molpipeline,
                 include_calculable=include_calculable,
             )
         )
@@ -642,6 +687,76 @@ def calculable_classify_reactant_smiles(smiles: str) -> Dict[str, Any]:
         return _success_response(calculable_tools.classify_reactant_smiles(smiles))
     except Exception as exc:
         return _error_response("Failed to classify reactant via calculable features.", {"details": str(exc)})
+
+
+# ============================================================================
+# HTE recommendation tools
+# ============================================================================
+
+@tool(args_schema=HTERecommendInput)
+def hte_recommend_conditions(
+    reaction_smiles: Optional[str] = None,
+    reactant_a_smiles: Optional[str] = None,
+    reactant_b_smiles: Optional[str] = None,
+    product_smiles: Optional[str] = None,
+    top_k: int = 10,
+    min_experiments: int = 1,
+    reaction_type_filter: Optional[str] = None,
+    catalyst_filter: Optional[str] = None,
+    hte_db_path: Optional[str] = None,
+    use_spectator_groups: bool = True,
+) -> Dict[str, Any]:
+    """Recommend conditions from the HTE database."""
+    try:
+        from chemtools.HTE import HTERecommender
+
+        reactant_a, reactant_b, product = _resolve_hte_inputs(
+            reaction_smiles,
+            reactant_a_smiles,
+            reactant_b_smiles,
+            product_smiles,
+        )
+        if not reactant_a:
+            return _error_response(
+                "HTE recommendation requires at least one reactant SMILES.",
+                {"details": "Provide reaction_smiles or reactant_a_smiles."},
+            )
+
+        recommender = HTERecommender(hte_db_path or "data/HTE_db")
+        result = recommender.recommend(
+            reactant_a_smiles=reactant_a,
+            reactant_b_smiles=reactant_b,
+            product_smiles=product,
+            top_k=top_k,
+            min_experiments=min_experiments,
+            reaction_type_filter=reaction_type_filter or None,
+            catalyst_filter=catalyst_filter or None,
+            use_spectator_groups=use_spectator_groups,
+        )
+        payload = _to_jsonable(result)
+        payload["hte_stats"] = recommender.get_statistics()
+        payload["input"] = {
+            "reaction_smiles": reaction_smiles,
+            "reactant_a_smiles": reactant_a,
+            "reactant_b_smiles": reactant_b,
+            "product_smiles": product,
+        }
+        return _success_response(payload)
+    except Exception as exc:
+        return _error_response("HTE recommendation failed.", {"details": str(exc)})
+
+
+@tool(args_schema=HTEStatsInput)
+def hte_database_stats(hte_db_path: Optional[str] = None) -> Dict[str, Any]:
+    """Return summary statistics for the HTE database."""
+    try:
+        from chemtools.HTE import HTERecommender
+
+        recommender = HTERecommender(hte_db_path or "data/HTE_db")
+        stats = recommender.get_statistics()
+        return _success_response({"hte_stats": stats})
+    except Exception as exc:
+        return _error_response("Failed to read HTE database stats.", {"details": str(exc)})
 
 
 # ============================================================================
@@ -678,7 +793,10 @@ CHEMTOOLS_TOOLS = [
     reaction_pair_featurize_flat,
     calculable_detect_all_features,
     calculable_get_reactant_type_features,
-    calculable_classify_reactant_smiles
+    calculable_classify_reactant_smiles,
+    # HTE recommendations
+    hte_recommend_conditions,
+    hte_database_stats,
 ]
 
 

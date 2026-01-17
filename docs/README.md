@@ -6,8 +6,8 @@ ChemTools is a deterministic toolkit for reaction-condition design and analysis,
 
 ## Key Capabilities
 
-- **Reaction normalization** – canonicalize SMILES/reaction SMILES with graceful fallbacks when RDKit is absent. Automatically leverages MolPipeline’s `AutoToMol` reader when available.
-- **Molecular feature extraction** – fingerprint/descriptor generation for electrophile–nucleophile pairs with optional MolPipeline-backed vectors (`include_molpipeline=True`).
+- **Reaction normalization** – canonicalize SMILES/reaction SMILES with graceful fallbacks when RDKit is absent.
+- **Molecular feature extraction** – fingerprint/descriptor generation for electrophile–nucleophile pairs.
 - **Unified recommendations** – DRFP + feature-tag similarity over reaction datasets, protocols, and HTE screens.
 - **Protocol & taxonomy utilities** – curated reagent registries, taxonomy schemas, and protocol discovery/SMARTS tooling for experimental planning.
 - **LLM extensions** – chemistry-aware agent orchestration with multi-provider support (OpenAI, Aliyun/DeepSeek) via `llmtools`.
@@ -31,20 +31,6 @@ pip install -r requirements-dev.txt
 pytest -q
 ```
 
-### Optional MolPipeline Integration
-
-```bash
-pip install molpipeline
-```
-
-With MolPipeline present:
-
-- `chemtools.smiles.normalize` accepts broader formats (InChI, SDF, binary) before falling back to legacy heuristics.
-- `chemtools.featurizers.reaction_pair.featurize_pair(..., include_molpipeline=True)` appends Morgan fingerprints and RDKit phys-chem descriptors per reactant (returned both as lists and descriptor-name maps). The structured output includes a `flat` block for legacy feature vectors. Enabled automatically when MolPipeline is present; set `CHEMTOOLS_INCLUDE_MOLPIPELINE_FEATURES=0` to opt out globally.
-- `scripts/showcase_molpipeline_features.py` prints an enriched feature bundle for any substrate pair.
-
----
-
 ## Repository Layout
 
 ```text
@@ -52,7 +38,7 @@ With MolPipeline present:
 ├─ app/                      # FastAPI application wiring & Gradio demo UI
 ├─ chemtools/                # Core deterministic libraries
 │  ├─ analysis/              # SMILES & reaction normalization helpers
-│  ├─ featurizers/           # Molecular featurization (with MolPipeline adapters)
+│  ├─ featurizers/           # Molecular featurization
 │  ├─ precedent/             # DRFP-based precedent search
 │  ├─ protocol/              # Protocol recommendation & SMARTS tools
 │  ├─ recommend/             # Condition recommendation engines
@@ -61,7 +47,6 @@ With MolPipeline present:
 ├─ data/                     # Sample datasets (registry, reactions, HTE)
 ├─ docs/                     # Project documentation (this README)
 ├─ llmtools/                 # LLM client integrations and prompt assets
-├─ MolPipeline/              # Vendored MolPipeline package (optional extras)
 ├─ scripts/                  # Developer utilities & showcases
 ├─ tests/                    # Pytest suite with fixtures
 └─ requirements*.txt         # Dependency manifests
@@ -78,10 +63,6 @@ uvicorn app.main:app --reload --port 8000
 # query rule-based registry from CLI
 python -m chemtools.rule.cli "Toluene"
 
-# display MolPipeline feature bundle
-python scripts/showcase_molpipeline_features.py \
-    --electrophile Brc1ccccc1 \
-    --nucleophile Nc1ccccc1
 ```
 
-ChemTools is fully deterministic by default, with optional higher-level integrations (ML re-ranking, LLM agents, MolPipeline fingerprints) activated as your workflow requires.***
+ChemTools is fully deterministic by default, with optional higher-level integrations (ML re-ranking, LLM agents) activated as your workflow requires.

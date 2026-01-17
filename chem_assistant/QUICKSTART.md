@@ -37,9 +37,7 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - Detection: reaction type detection and motif ids
 - Featurizers: unified bundles, motif-based features, reaction-pair features
 - Calculable: feature tokens for reactant types
-- MolPipeline: optional fingerprints and physchem descriptors
 
 ## Notes
 
 - RDKit is required for SMARTS-driven detection and RDKit properties.
-- MolPipeline tools require the optional molpipeline integration.

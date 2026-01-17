@@ -7,7 +7,6 @@ __all__ = [
     "analysis",
     "calculable",
     "molecule",
-    "molpipeline",
     "reaction",
     "reaction_detection",
     "reaction_pair",

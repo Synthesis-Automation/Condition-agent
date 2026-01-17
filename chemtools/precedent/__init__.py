@@ -5,7 +5,6 @@ Split from monolithic precedent.py into focused submodules:
 - core_utils: Family name normalization and parsing utilities
 - catalyst: Catalyst class detection and matching
 - similarity: Feature similarity calculations
-- integrations: MolPipeline integration
 - search: Main k-NN search and core-based lookup
 
 Public API (backward compatible):

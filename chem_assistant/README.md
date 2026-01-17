@@ -57,13 +57,13 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - calculable_get_reactant_type_features
 - calculable_classify_reactant_smiles
 
-### MolPipeline (optional)
+### HTE recommendations
 
-- molpipeline_morgan_fingerprint
-- molpipeline_physchem_features
+- hte_recommend_conditions
+- hte_database_stats
 
 ## Notes
 
 - RDKit is required for SMARTS-driven detection and descriptor computation.
-- MolPipeline-based tools require the optional molpipeline integration.
-- This package intentionally excludes recommendation, protocol, HTE, and reagent tools.
+- This package focuses on featurization/analysis; protocol and reagent tools remain out of scope.
+- HTE recommendation tools are available when the HTE database is present.
