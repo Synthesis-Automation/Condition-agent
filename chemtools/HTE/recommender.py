@@ -894,10 +894,30 @@ class HTERecommender:
             
         analysis = featurize_molecule(smiles)
         
-        # Extract motif IDs (e.g., "Ar-Br")
-        motifs = _dedupe_list(
-            [m.get("compound_id", "") for m in analysis.get("motifs", []) if m.get("compound_id")]
-        )
+        # Extract motif IDs (e.g., "Ar-Br") and include alternate IDs when available.
+        motifs: List[str] = []
+        for hit in analysis.get("motifs", []):
+            compound_id = hit.get("compound_id", "")
+            if compound_id:
+                motifs.append(compound_id)
+            for alt_id in hit.get("alt_compound_ids", []) or []:
+                if alt_id and alt_id != compound_id:
+                    motifs.append(alt_id)
+        motifs = _dedupe_list(motifs)
+
+        if motifs:
+            alias_map = {
+                "RCH2-NH2": ["Alkyl-NH2", "R2CH-NH2"],
+                "RCH2-NHR": ["Alkyl-NHR", "R2CH-NHR"],
+                "RCH2-NR2": ["Alkyl-NR2", "R2CH-NR2"],
+            }
+            compound_ids = _load_compound_ids()
+            expanded = list(motifs)
+            for motif in motifs:
+                for alias in alias_map.get(motif, []):
+                    if alias in compound_ids:
+                        expanded.append(alias)
+            motifs = _dedupe_list(expanded)
         
         # Use the first motif's category as a general category
         category = analysis.get("motifs", [{}])[0].get("category", "Unknown") if analysis.get("motifs") else "Unknown"
@@ -1308,12 +1328,14 @@ class HTERecommender:
 
         key = _reactant_key(list(type_a) + list(type_b))
         direct_match: Optional[pd.DataFrame] = None
+        direct_key: Optional[str] = None
         fallback_used = False
         reacted_set = query_reacted or set()
         spectator_set = query_spectators or set()
 
         if key in self.indexed_data:
             direct_match = self.indexed_data[key].copy()
+            direct_key = key
             direct_match['match_score'] = 1.0
             direct_match['match_priority'] = 0
             if not result.matched_motifs:
@@ -1336,6 +1358,7 @@ class HTERecommender:
                     candidate = _reactant_key([ma, mb])
                     if candidate in self.indexed_data:
                         direct_match = self.indexed_data[candidate].copy()
+                        direct_key = candidate
                         direct_match['match_score'] = 1.0
                         direct_match['match_priority'] = 0
                         if not result.matched_motifs:
@@ -1346,9 +1369,16 @@ class HTERecommender:
                     break
         
         fallback_match: Optional[pd.DataFrame] = None
+        expand_for_coverage = False
+        if direct_match is not None and self.df is not None and "Source_Group" in direct_match.columns:
+            direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
+            available_groups = {g for g in self.df["Source_Group"].unique() if str(g).strip()}
+            if available_groups and direct_groups and not (available_groups <= direct_groups):
+                expand_for_coverage = True
+
         should_expand = direct_match is None or (
             direct_match is not None and len(direct_match) < min_experiments
-        )
+        ) or expand_for_coverage
         if should_expand:
             list_a = _build_fallback_motif_list(type_a, reacted_set, spectator_set)
             list_b = _build_fallback_motif_list(type_b, reacted_set, spectator_set)
@@ -1357,8 +1387,16 @@ class HTERecommender:
                     if not ma and not mb:
                         continue
                     candidate = _reactant_key([ma, mb])
+                    if direct_key and candidate == direct_key:
+                        continue
                     if candidate in self.indexed_data:
                         fallback_match = self.indexed_data[candidate].copy()
+                        if expand_for_coverage and "Source_Group" in fallback_match.columns and direct_match is not None:
+                            direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
+                            candidate_groups = {g for g in fallback_match["Source_Group"].unique() if str(g).strip()}
+                            if not (candidate_groups - direct_groups):
+                                fallback_match = None
+                                continue
                         if direct_match is None:
                             fallback_match['match_score'] = 1.0
                             fallback_match['match_priority'] = 0
