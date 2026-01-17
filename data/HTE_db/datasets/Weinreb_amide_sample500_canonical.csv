@@ -1,0 +1,2 @@
+reaction_id,yield,z_score,reactant_1,reactant_2,reactant_3,catalyst,ligand,base,acid,oxidant,reductant,additive,condensation_agent,other_reagent,solvent,Is_Intramolecular,reaction_smiles,spectator_groups,reference
+Weinreb_amide_sample500,94,0.0,Ar-I,Acyl-Cl,,Copper(I) cyanide,,,,,,NH4Cl/LiCl,,745038-86-2,THF/H2O,False,CC[Si](CC)(CC)c1cc(Br)cc(I)c1F.CC(C)(C)C(=O)Cl>>CC[Si](CC)(CC)c1cc(Br)cc(C(=O)C(C)(C)C)c1F,Si* / Si / X / Br / F,"Angewandte Chemie, International Edition (2019), 58(6), 1838-1841"
