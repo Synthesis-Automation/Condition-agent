@@ -1263,6 +1263,14 @@
       "description": "Aryl urea (Ar-Urea)."
     },
     {
+      "id": "R-Thiourea",
+      "name": "R-Thiourea",
+      "template": "single_bond",
+      "A": "R",
+      "B": "Thiourea",
+      "description": "Generic thiourea substituent (R-Thiourea)."
+    },
+    {
       "id": "Ar-Carbamate",
       "name": "Ar-Carbamate",
       "template": "single_bond",
@@ -1823,6 +1831,14 @@
       "description": "Primary alkyl halide (RCH2-X)."
     },
     {
+      "id": "RCH2-PR3+",
+      "name": "RCH2-PR3+",
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "PR3+",
+      "description": "Primary alkyl phosphonium salt (RCH2-PR3+)."
+    },
+    {
       "id": "RCH2-Cl",
       "name": "RCH2-Cl",
       "template": "single_bond",
@@ -2218,6 +2234,14 @@
       "A": "Alkyl",
       "B": "COR",
       "description": "Alkyl ketone (Alkyl-COR)."
+    },
+    {
+      "id": "R-COR",
+      "name": "R-COR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "COR",
+      "description": "Generic ketone (R-COR)."
     },
     {
       "id": "Alkyl-Ester",
@@ -2780,6 +2804,14 @@
       "A": "Alkyl",
       "B": "SR",
       "description": "R group paired with SR substituent."
+    },
+    {
+      "id": "R-OCSSR",
+      "name": "R-OCSSR",
+      "template": "single_bond",
+      "A": "R",
+      "B": "OCSSR",
+      "description": "O-thiocarbonate substituent (R-OCSSR)."
     },
     {
       "id": "RCH2-SR",

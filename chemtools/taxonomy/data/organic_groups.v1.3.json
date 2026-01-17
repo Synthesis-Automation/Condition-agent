@@ -699,6 +699,18 @@
       ]
     },
     {
+      "id": "OCSSR",
+      "name": "-OCSSR",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[O:2]C(=S)S[#6]",
+      "description": "O-thiocarbonate substituent (-OCSSR).",
+      "tags": [
+        "thiocarbonate",
+        "xanthate"
+      ]
+    },
+    {
       "id": "OCF3",
       "name": "-OCF3",
       "kind": "substituent",

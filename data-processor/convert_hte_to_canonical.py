@@ -78,6 +78,7 @@ _COMPOUND_MAPPING = {
     "r2nh-a-branch": "R2CH-NHR",
     "rnh2a-branch": "R2CH-NH2",
     "r2nha-branch": "R2CH-NHR",
+    "r2cnr": "R2CH-NHR",
     "rnhnh2": "R-Hydrazine",
     "rconh2": "R-CONH2",
     "rconhr": "R-CONHR",
@@ -86,6 +87,7 @@ _COMPOUND_MAPPING = {
     "roconr2": "R-Carbamate",
     "roc(o)nr2": "R-Carbamate",
     "urea": "Any-Urea",
+    "thiourea": "R-Thiourea",
     
     # Oxygen/Sulfur
     "aroh": "Ar-OH",
@@ -99,9 +101,11 @@ _COMPOUND_MAPPING = {
     "rco2horm": "R-CO2H",
     "rco2r": "R-Ester",
     "rcho": "R-CHO",
+    "r2co": "R-COR",
     "rsh": "R-SH",
     "rso2cl": "R-SO2Cl",
     "rsnr3": "R-Sn",
+    "rocssr": "R-OCSSR",
     
     # Hydrocarbons
     "arh": "Ar-H",
@@ -114,6 +118,7 @@ _COMPOUND_MAPPING = {
     # Others
     "alkyl-m": "R-Mg",
     "rcn": "R-CN",
+    "rch2pph3x": "RCH2-PR3+",
 }
 
 def normalize_token(token: str) -> str:
