@@ -727,8 +727,8 @@
       ]
     },
     {
-      "id": "Ar-B",
-      "name": "Ar-B",
+      "id": "Ar-B*",
+      "name": "Ar-B*",
       "template": "single_bond",
       "A": "Ar",
       "B": "B_Any",
@@ -896,36 +896,36 @@
       ]
     },
     {
-      "id": "Ar-Sn",
-      "name": "Ar-Sn",
+      "id": "Ar-Sn*",
+      "name": "Ar-Sn*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Sn",
-      "description": "Aryl stannane (Ar-SnR3)."
+      "description": "Aryl stannane (generic Ar-SnR3)."
     },
     {
-      "id": "Ar-Si",
-      "name": "Ar-Si",
+      "id": "Ar-Si*",
+      "name": "Ar-Si*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Si",
-      "description": "Aryl silane (Ar-SiR3)."
+      "description": "Aryl silane (generic Ar-SiR3)."
     },
     {
-      "id": "Ar-Zn",
-      "name": "Ar-Zn",
+      "id": "Ar-Zn*",
+      "name": "Ar-Zn*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Zn",
-      "description": "Aryl zincate (Ar-ZnX)."
+      "description": "Aryl zincate (generic Ar-ZnX)."
     },
     {
-      "id": "Ar-Mg",
-      "name": "Ar-Mg",
+      "id": "Ar-Mg*",
+      "name": "Ar-Mg*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Mg",
-      "description": "Aryl Grignard (Ar-MgX)."
+      "description": "Aryl Grignard (generic Ar-MgX)."
     },
     {
       "id": "Alkenyl-Sn",

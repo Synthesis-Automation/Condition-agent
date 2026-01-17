@@ -35,7 +35,7 @@
     "organozinc": {
       "name": "Organozinc",
       "members": [
-        "Ar-Zn",
+        "Ar-Zn*",
         "Alkenyl-Zn",
         "Alkyl-Zn"
       ]
@@ -43,7 +43,7 @@
     "organotin": {
       "name": "Organotin",
       "members": [
-        "Ar-Sn",
+        "Ar-Sn*",
         "Alkenyl-Sn",
         "Alkyl-Sn"
       ]
@@ -51,7 +51,7 @@
     "organomagnesium": {
       "name": "Organomagnesium",
       "members": [
-        "Ar-Mg",
+        "Ar-Mg*",
         "Alkenyl-Mg",
         "Alkyl-Mg"
       ]
@@ -59,7 +59,7 @@
     "organosilicon": {
       "name": "Organosilicon",
       "members": [
-        "Ar-Si",
+        "Ar-Si*",
         "Alkenyl-Si"
       ]
     },
