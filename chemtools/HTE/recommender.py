@@ -333,6 +333,12 @@ _SPECTATOR_GROUP_STOPLIST = {
     "Alkynyl",
     "H",
 }
+_GENERIC_FALLBACK_MOTIFS = {
+    "Ar-R",
+    "Ar-H",
+    "Alkyl-H",
+}
+_HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 
 
 @lru_cache(maxsize=1)
@@ -468,6 +474,26 @@ def _load_compound_tags() -> Dict[str, Set[str]]:
     return tag_map
 
 
+@lru_cache(maxsize=1)
+def _load_compound_ids() -> Set[str]:
+    if not _COMPOUND_SCOPE_FILE.exists():
+        return set()
+    try:
+        with _COMPOUND_SCOPE_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    compounds = payload.get("compounds") or []
+    ids = set()
+    for entry in compounds:
+        if not isinstance(entry, dict):
+            continue
+        cid = str(entry.get("id") or "").strip()
+        if cid:
+            ids.add(cid)
+    return ids
+
+
 def _motif_tag_score(motif_id: str) -> int:
     tags = _load_compound_tags().get(motif_id)
     if not tags:
@@ -477,6 +503,42 @@ def _motif_tag_score(motif_id: str) -> int:
         if tag in tags:
             score += weight
     return score
+
+
+def _filter_generic_motifs(motifs: Iterable[str]) -> List[str]:
+    return [m for m in motifs if m and m not in _GENERIC_FALLBACK_MOTIFS]
+
+
+def _expand_parent_motifs(motifs: Iterable[str]) -> List[str]:
+    compound_ids = _load_compound_ids()
+    expanded = list(motifs)
+    for motif in motifs:
+        text = str(motif).strip()
+        if "-" not in text:
+            continue
+        prefix, suffix = text.rsplit("-", 1)
+        if suffix in _HALIDE_SUFFIXES:
+            candidate = f"{prefix}-X"
+            if candidate in compound_ids:
+                expanded.append(candidate)
+    return _dedupe_list(expanded)
+
+
+def _build_fallback_motif_list(
+    motifs: Iterable[str],
+    reacted: Optional[Set[str]],
+    spectators: Optional[Set[str]],
+) -> List[str]:
+    base = _dedupe_list([m for m in motifs if m])
+    if base:
+        filtered = _filter_generic_motifs(base)
+        if filtered:
+            base = filtered
+        else:
+            base = []
+    expanded = _expand_parent_motifs(base) if base else []
+    prioritized = _prioritize_motifs(expanded or base, reacted, spectators)
+    return prioritized or [""]
 
 
 def _split_motif_tokens(value: Any) -> List[str]:
@@ -990,7 +1052,8 @@ class HTERecommender:
             else:
                 formed_score = len(formed & query_formed) / len(formed_union)
 
-        return base_score * (0.7 + 0.3 * formed_score)
+        formed_multiplier = 1.0 + (0.1 * formed_score)
+        return base_score * (0.7 + 0.3 * formed_score) * formed_multiplier
     
     def _calculate_confidence_score(
         self,
@@ -1281,9 +1344,38 @@ class HTERecommender:
                         break
                 if direct_match is not None:
                     break
+        
+        fallback_match: Optional[pd.DataFrame] = None
+        should_expand = direct_match is None or (
+            direct_match is not None and len(direct_match) < min_experiments
+        )
+        if should_expand:
+            list_a = _build_fallback_motif_list(type_a, reacted_set, spectator_set)
+            list_b = _build_fallback_motif_list(type_b, reacted_set, spectator_set)
+            for ma in list_a:
+                for mb in list_b:
+                    if not ma and not mb:
+                        continue
+                    candidate = _reactant_key([ma, mb])
+                    if candidate in self.indexed_data:
+                        fallback_match = self.indexed_data[candidate].copy()
+                        if direct_match is None:
+                            fallback_match['match_score'] = 1.0
+                            fallback_match['match_priority'] = 0
+                        else:
+                            fallback_match['match_score'] = 0.85
+                            fallback_match['match_priority'] = 1
+                        if not result.matched_motifs:
+                            result.matched_motifs = (ma, mb)
+                        fallback_used = True
+                        break
+                if fallback_match is not None:
+                    break
 
         if direct_match is not None:
             match_dfs.append(direct_match)
+        if fallback_match is not None:
+            match_dfs.append(fallback_match)
 
         if match_dfs:
             matched_df = pd.concat(match_dfs, axis=0)
@@ -1344,16 +1436,29 @@ class HTERecommender:
         
         # Step 4: Aggregate and rank conditions
         if len(matched_df) > 0:
-            result.recommendations = self._aggregate_conditions(
-                matched_df, top_k, min_experiments
+            pool_size = max(top_k * 3, top_k)
+            candidates = self._aggregate_conditions(
+                matched_df, pool_size, min_experiments
             )
+            if top_k > 0 and len(candidates) > top_k:
+                result.recommendations = self._select_diverse_conditions(
+                    candidates, top_k, prioritize_performance=True
+                )
+            else:
+                result.recommendations = candidates
             if "Source_Group" in matched_df.columns:
                 by_source: Dict[str, List[ConditionRecommendation]] = {}
                 for group_name, group_df in matched_df.groupby("Source_Group"):
                     label = group_name or "unknown"
-                    by_source[label] = self._aggregate_conditions(
-                        group_df, top_k, min_experiments
+                    group_candidates = self._aggregate_conditions(
+                        group_df, pool_size, min_experiments
                     )
+                    if top_k > 0 and len(group_candidates) > top_k:
+                        by_source[label] = self._select_diverse_conditions(
+                            group_candidates, top_k, prioritize_performance=True
+                        )
+                    else:
+                        by_source[label] = group_candidates
                 result.recommendations_by_source = by_source
         
         return result
