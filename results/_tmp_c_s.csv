@@ -487,7 +487,7 @@ C-S_Coupling,73.0,-0.4824506406770077,Ar-SH,Ar-NH2,CuI,L-Proline,K2CO3,Methyl ce
 C-S_Coupling,87.0,-0.11046537537012062,Ar-SH,Ar-I,CuI,,Cs2CO3,NMP,,,,False,CC(C)(C)c1ccc(S)cc1.CC(C)(C)c1ccc(I)cc1>>CC(C)(C)c1ccc(Sc2ccc(C(C)(C)C)cc2)cc1,
 C-S_Coupling,88.0,0.12192448976680521,Ar-Br,Ar-SH,Pd(OAc)2,950982-61-3,NaOtBu,DME,,,,False,Cc1ccccc1Br.CC(C)c1ccccc1S>>Cc1ccccc1Sc1ccccc1C(C)C,
 C-S_Coupling,98.0,0.0,R3C-SH,Ar-Cl,Pd(OAc)2,158923-11-6,NaOtBu,DME,,,,False,CC(C)(C)S.NC(=O)c1cccc(Cl)c1>>CC(C)(C)Sc1cccc(C(N)=O)c1,CONH2 / Amide
-C-S_Coupling,90.0,-0.7071067811865475,Ar-SH,Ar-Si,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Sc1ccccc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>c1ccc(Cn2nncc2Sc2ccccc2)cc1,AromN
+C-S_Coupling,90.0,-0.7071067811865475,Ar-SH,Ar-Si*,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Sc1ccccc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>c1ccc(Cn2nncc2Sc2ccccc2)cc1,AromN
 C-S_Coupling,79.0,-0.6635096029356308,Ar-SH,Ar-I,CuI,1802981-58-3,KOH,56-81-5,,,,False,Sc1ccccc1.COc1ccccc1I>>COc1ccccc1Sc1ccccc1,OR
 C-S_Coupling,85.0,0.0,RCH2-SH,Ar-Br,Pd2(dba)3,50595-38-5,K2CO3,PhMe / water,,,,False,CCOC(=O)CCS.COc1cccc(-c2ccccc2F)c1Br>>CCOC(=O)CCSc1c(OC)cccc1-c1ccccc1F,CO2R / Ester / acidic / OR / X / F
 C-S_Coupling,99.0,0.763373436046922,Bn-SH,Ar-I,1166386-67-9,,"2-Propanol,2-methyl-,lithiumsalt(1:1)","1,4-Dioxane",,,,False,SCc1ccccc1.COc1ccc(I)cc1>>COc1ccc(SCc2ccccc2)cc1,OR
@@ -928,7 +928,7 @@ C-S_Coupling,89.0,0.12786789057748993,Ar-SH,Ar-I,Cu(0),Fe,K2CO3,DMF,,,,False,Sc1
 C-S_Coupling,97.0,0.5848976518656018,Ar-Br,R2CH-SH,1454680-44-4,,KOtBu,"1,4-Dioxane",water,,,False,Cc1cc(C)c(Br)c(C)c1.CC(C)S.[K]>>Cc1cc(C)c(SC(C)C)c(C)c1,
 C-S_Coupling,99.0,0.907248009405466,Ar-SH,Ar-Br,Pd2(dba)3,DPPF,DIPEA,PhMe,water,,,False,Sc1ccccc1.Cc1cc(C)cc(Br)c1>>Cc1cc(C)cc(Sc2ccccc2)c1,
 C-S_Coupling,90.0,0.0,RCH2-SH,Ar-R,14221-01-3,,Na2CO3,THF,,,,False,CCS.CC1=CC=C([I+]C2=CC=C(C)C=C2)C=C1.[F-][B+3]([F-])([F-])[F-]>>CCSc1ccc(C)cc1,
-C-S_Coupling,87.0,0.0,Ar-SH,Ar-Si,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Sc1ccc(Br)cc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>Brc1ccc(Sc2cnnn2Cc2ccccc2)cc1,Br / X / AromN
+C-S_Coupling,87.0,0.0,Ar-SH,Ar-Si*,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Sc1ccc(Br)cc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>Brc1ccc(Sc2cnnn2Cc2ccccc2)cc1,Br / X / AromN
 C-S_Coupling,93.0,0.783081925438966,Ar-SH,Ar-Cl,1627340-22-0,,NaOH,DMF,,,,False,Sc1ccccc1.N#Cc1ccc(Cl)cc1>>N#Cc1ccc(Sc2ccccc2)cc1,CN
 C-S_Coupling,91.0,0.0,R3C-SH,Ar-Cl,Pd(OAc)2,158923-11-6,NaOtBu,DME,,,,False,CC(C)(C)S.Oc1ccc(Cl)cc1>>CC(C)(C)Sc1ccc(O)cc1,OH / OR
 C-S_Coupling,74.0,-0.9927108644188382,RCH2-SH,Ar-X,Cu(0),1344-28-1,K2CO3,DMF,,,,False,CCCCS.Brc1ccc(I)cc1>>CCCCSc1ccc(Br)cc1,Br / X
@@ -3499,7 +3499,7 @@ C-S_Coupling,97.0,0.7088631196736682,Ar-SH,Ar-I,1623804-71-6,,NaOtBu,DMF,,,,Fals
 C-S_Coupling,89.0,-0.6882472016116852,Ar-I,Ar-SH,Cu(0),1344-28-1,K2CO3,DMF,,,,False,O=C(O)c1ccccc1I.Sc1ccc(Cl)cc1>>O=C(O)c1ccccc1Sc1ccc(Cl)cc1,Acid / CO2H / X / Cl
 C-S_Coupling,98.0,0.5369717479970104,RCH2-SH,Ar-Cl,Pd(OAc)2,158923-11-6,NaOtBu,DME,,,,False,CCCCCCCCS.COc1ccc(Cl)cc1>>CCCCCCCCSc1ccc(OC)cc1,OR
 C-S_Coupling,99.0,0.0,Ar-SH,Ar-X,Cu(0),,KOH,water,,,,False,Sc1ccccc1.O=C(O)c1ccc(Cl)cc1I>>O=C(O)c1ccc(Cl)cc1Sc1ccccc1,Acid / CO2H / Cl / X
-C-S_Coupling,88.0,0.0,Ar-SH,Ar-Si,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Sc1ccc(Cl)cc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>Clc1ccc(Sc2cnnn2Cc2ccccc2)cc1,Cl / X / AromN
+C-S_Coupling,88.0,0.0,Ar-SH,Ar-Si*,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Sc1ccc(Cl)cc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>Clc1ccc(Sc2cnnn2Cc2ccccc2)cc1,Cl / X / AromN
 C-S_Coupling,95.0,0.6528416465991987,Ar-SH,Ar-Cl,7758-89-6,,,water,,,,False,Sc1ccccc1.CC(=O)c1ccccc1Cl>>CC(=O)c1ccccc1Sc1ccccc1,COR / acidic
 C-S_Coupling,94.0,0.5502827732060748,Ar-Br,Ar-SH,34775-39-8,,Py,MeCN,Zn,,,False,Cc1ccc(Br)cc1.Sc1ccccc1>>Cc1ccc(Sc2ccccc2)cc1,
 C-S_Coupling,92.0,1.0854000673889934,Ar-SH,Ar-Br,1317-61-9,7631-86-9,KOH,DMSO,,,,False,Cc1ccc(S)cc1.Brc1ccccn1>>Cc1ccc(Sc2ccccn2)cc1,Pyridine
@@ -4282,7 +4282,7 @@ C-S_Coupling,91.0,0.0,R3C-SH,Ar-Cl,Pd(OAc)2,158923-11-6,Cs2CO3,DME,,,,False,CC(C
 C-S_Coupling,89.0,-0.03628249356641355,Ar-I,Ar-SH,Cu(0),,KOH,water,,,,False,O=C(O)c1ccccc1I.COc1ccc(S)cc1OC>>COc1ccc(Sc2ccccc2C(=O)O)cc1OC,Acid / CO2H / OR
 C-S_Coupling,88.0,0.08106889985009445,Ar-SH,Ar-I,CuI,,Cs2CO3,NMP,,,,False,COc1ccc(S)cc1.CC(C)(C)c1ccc(I)cc1>>COc1ccc(Sc2ccc(C(C)(C)C)cc2)cc1,OR
 C-S_Coupling,80.0,-0.7198780759992405,Ar-SH,Ar-I,CuI,,K2CO3,NMP,,,,False,Sc1ccccc1.Ic1cccc(I)c1>>c1ccc(Sc2cccc(Sc3ccccc3)c2)cc1,
-C-S_Coupling,91.0,0.7071067811865475,Ar-SH,Ar-Si,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Cc1ccc(S)cc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>Cc1ccc(Sc2cnnn2Cc2ccccc2)cc1,AromN
+C-S_Coupling,91.0,0.7071067811865475,Ar-SH,Ar-Si*,CuBr,1655-07-8,Cs2CO3,MeCN,TBAF,,,False,Cc1ccc(S)cc1.C[Si](C)(C)c1nnn(Cc2ccccc2)c1I>>Cc1ccc(Sc2cnnn2Cc2ccccc2)cc1,AromN
 C-S_Coupling,91.0,-1.0502100630210074,Alkyl-SH,,CuBr,phen,,MeCN,,,,False,FC(F)(F)S.[Ag].Cc1ccnc(-c2cc(C)c(C)cc2Br)c1>>Cc1ccnc(-c2cc(C)c(C)cc2SC(F)(F)F)c1,F / X / Pyridine
 C-S_Coupling,71.0,-1.999778837791923,Ar-SH,Ar-I,Pd2(dba)3,DPPF,KOtBu,PhMe,,,,False,Sc1ccc(Br)cc1.Ic1ccc(I)cc1>>Brc1ccc(Sc2ccc(Sc3ccc(Br)cc3)cc2)cc1,Br / X
 C-S_Coupling,91.0,0.33691262108117803,Ar-Br,Ar-SH,Pd(OAc)2,1265918-89-5,,DMSO,,,,False,Brc1ccc(-c2ccccc2)cc1.Sc1ccccc1>>c1ccc(Sc2ccc(-c3ccccc3)cc2)cc1,

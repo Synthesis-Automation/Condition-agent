@@ -178,7 +178,7 @@ additions = {
     "R-NHNH2": ("[CX4][NH][NH2]", "Add to Nucleophiles"),
     "formamide": ("[H][CX3](=O)[NX3]", "Add to Amide-type"),
     "R3Sn": ("[#6][Sn]([#6])([#6])[#6]", "Add to Organometallic"),
-    "Ar-Sn": ("c[Sn]([#6])([#6])[#6]", "Add to Organometallic"),
+    "Ar-Sn*": ("c[Sn]([#6])([#6])[#6]", "Add to Organometallic"),
 }
 
 for name, (smarts, category) in additions.items():

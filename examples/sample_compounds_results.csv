@@ -96,9 +96,9 @@ index,name,smiles,detected_motifs,motif_count
 94,4-Ethynylpyridine,C#Cc1ccncc1,Ar-Alkyne|Ar-CCH,2
 95,Phenylmagnesium bromide,[Mg]Brc1ccccc1,Ar-Br,1
 96,Ethylmagnesium bromide,CC[Mg]Br,R-Mg,1
-97,Phenylzinc chloride,Cl[Zn]c1ccccc1,Ar-Zn,1
+97,Phenylzinc chloride,Cl[Zn]c1ccccc1,Ar-Zn*,1
 98,Ethylzinc bromide,CC[Zn]Br,R-Zn,1
-99,Phenyltrimethylstannane,c1ccc([Sn](C)(C)C)cc1,Ar-Sn,1
+99,Phenyltrimethylstannane,c1ccc([Sn](C)(C)C)cc1,Ar-Sn*,1
 100,Vinyltrimethylstannane,C=C[Sn](C)(C)C,Alkenyl-Sn,1
 101,4-Bromophenylboronic acid,Brc1ccc(B(O)O)cc1,Ar-B(OH)2|Ar-Br,2
 102,4-Bromoaniline,Brc1ccc(N)cc1,Ar-Br|Ar-NH2,2
