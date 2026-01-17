@@ -202,7 +202,7 @@ def _write_new_reagents(path: Path, cas_values: set[str]) -> None:
         return
     existing: set[str] = set()
     if path.exists():
-        with path.open("r", encoding="utf-8", newline="") as handle:
+        with path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
             reader = csv.DictReader(handle)
             for row in reader:
                 cas = (row.get("cas") or "").strip()
@@ -225,7 +225,7 @@ def _load_scaffold_motif_ids() -> set[str]:
     if not path.exists():
         return set()
     try:
-        with path.open("r", encoding="utf-8") as handle:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
             payload = json.load(handle)
     except Exception:
         return set()
@@ -430,7 +430,8 @@ def enrich_reaction_dataset_cas(input_path: str | Path) -> None:
 
     print(f"Enriching CAS numbers in {input_path}...")
     try:
-        df = pd.read_csv(input_path)
+        with open(input_path, "r", encoding="utf-8", errors="replace", newline="") as handle:
+            df = pd.read_csv(handle)
     except Exception as e:
         print(f"Error reading CSV: {e}")
         return
@@ -561,10 +562,10 @@ def process_reaction_dataset(
 
     input_suffix = input_path.suffix.lower()
     if input_suffix == ".csv":
-        with open(input_path, "r", encoding="utf-8", newline="") as f:
+        with open(input_path, "r", encoding="utf-8", errors="replace", newline="") as f:
             total = max(sum(1 for _ in f) - 1, 0)
         print(f"Processing {total} reactions...")
-        with open(input_path, "r", encoding="utf-8", newline="") as f:
+        with open(input_path, "r", encoding="utf-8", errors="replace", newline="") as f:
             reader = csv.DictReader(f)
             processed_count = 0
             skipped_no_smiles = 0
@@ -724,7 +725,7 @@ def process_reaction_dataset(
             print(f"  Skipped - no >>: {skipped_no_arrow}")
             print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
     else:
-        with open(input_path, "r", encoding="utf-8") as f:
+        with open(input_path, "r", encoding="utf-8", errors="replace") as f:
             lines = f.readlines()
 
         total = len(lines)
