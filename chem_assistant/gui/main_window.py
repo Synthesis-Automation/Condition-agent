@@ -198,9 +198,9 @@ class ChemAssistantWindow(QMainWindow):
     def _apply_default_font(self) -> None:
         font = QFont(self.font())
         if font.pointSize() > 0:
-            font.setPointSize(font.pointSize() + 2)
+            font.setPointSize(font.pointSize() + 1)
         else:
-            font.setPointSize(12)
+            font.setPointSize(11)
         self.setFont(font)
 
     def _build_ui(self) -> None:
