@@ -2,6 +2,7 @@ import csv
 import html
 import math
 import sys
+import tempfile
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -534,35 +535,37 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             return
 
         reactant_a, reactant_b, product = _parse_reaction_smiles(reaction_smiles)
-        if product:
-            info_label.setText("Reaction preview")
-            output_path = _reaction_image_path("reaction")
-            try:
-                render_reaction_image(reaction_smiles, output_path)
-                pixmap = _scale_pixmap_half(QtGui.QPixmap(str(output_path)))
-            except Exception as exc:
-                info_label.setText(f"Unable to render reaction image: {exc}")
-            else:
-                image_label = QtWidgets.QLabel()
-                image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                image_label.setPixmap(pixmap)
-                images_layout.addWidget(image_label)
-        else:
-            info_label.setText("Product SMILES missing; showing reactants only.")
-            for label, smiles in (("A", reactant_a), ("B", reactant_b)):
-                if not smiles:
-                    continue
-                output_path = _reaction_image_path(f"reactant_{label.lower()}")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            if product:
+                info_label.setText("Reaction preview")
+                output_path = temp_path / "reaction.png"
                 try:
-                    render_molecule_image(smiles, output_path, legend=f"Reactant {label}")
+                    render_reaction_image(reaction_smiles, output_path)
                     pixmap = _scale_pixmap_half(QtGui.QPixmap(str(output_path)))
                 except Exception as exc:
-                    info_label.setText(f"Unable to render reactant images: {exc}")
-                    break
-                image_label = QtWidgets.QLabel()
-                image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                image_label.setPixmap(pixmap)
-                images_layout.addWidget(image_label)
+                    info_label.setText(f"Unable to render reaction image: {exc}")
+                else:
+                    image_label = QtWidgets.QLabel()
+                    image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                    image_label.setPixmap(pixmap)
+                    images_layout.addWidget(image_label)
+            else:
+                info_label.setText("Product SMILES missing; showing reactants only.")
+                for label, smiles in (("A", reactant_a), ("B", reactant_b)):
+                    if not smiles:
+                        continue
+                    output_path = temp_path / f"reactant_{label.lower()}.png"
+                    try:
+                        render_molecule_image(smiles, output_path, legend=f"Reactant {label}")
+                        pixmap = _scale_pixmap_half(QtGui.QPixmap(str(output_path)))
+                    except Exception as exc:
+                        info_label.setText(f"Unable to render reactant images: {exc}")
+                        break
+                    image_label = QtWidgets.QLabel()
+                    image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                    image_label.setPixmap(pixmap)
+                    images_layout.addWidget(image_label)
 
         if dialog.layout():
             dialog.layout().setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetFixedSize)
