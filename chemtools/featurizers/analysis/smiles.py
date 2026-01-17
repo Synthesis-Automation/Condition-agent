@@ -32,35 +32,12 @@ def _neutralize_carboxylates(smiles: str) -> str:
     return smiles
 
 
-_AUTO_TO_MOL_SENTINEL = object()
-_TRY_AUTO_TO_MOL = _AUTO_TO_MOL_SENTINEL
-
-
-def _maybe_try_auto_to_mol(value: str):
-    global _TRY_AUTO_TO_MOL
-    if _TRY_AUTO_TO_MOL is None:
-        return None
-    if _TRY_AUTO_TO_MOL is _AUTO_TO_MOL_SENTINEL:
-        try:
-            from ..integrations.molpipeline import try_auto_to_mol as _try
-        except Exception:
-            _TRY_AUTO_TO_MOL = None
-            return None
-        _TRY_AUTO_TO_MOL = _try
-    try:
-        return _TRY_AUTO_TO_MOL(value)  # type: ignore[operator]
-    except Exception:
-        return None
-
-
 def normalize(smi: str) -> Dict[str, Any]:
     """Normalize a SMILES string with RDKit when available."""
     s = (smi or "").strip()
     frags_text = _split_fragments_text(s)
 
-    mol = _maybe_try_auto_to_mol(s) if s else None
-    if mol is None:
-        mol = parse_smiles(s)
+    mol = parse_smiles(s) if s else None
     if mol is None:
         # If RDKit is unavailable, fallback to heuristics and do not error
         if not rdkit_available():

@@ -27,7 +27,7 @@ def main() -> None:
     """Launch the Qt application."""
     app = QApplication(sys.argv)
 
-    startup_message = None
+    startup_parts = []
     try:
         from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
         from chemtools.reagent.reagent_v2 import ReagentTaxonomyV2
@@ -39,14 +39,22 @@ def main() -> None:
         rxn_count = len(rxn_defs)
         reagent_count = len(list(reagent_tax.iter_families()))
 
-        startup_message = (
-            f"Taxonomy v2 | "
-            f"Reactions: {rxn_count} | "
-            f"Reagent Families: {reagent_count}"
+        startup_parts.append(
+            f"Taxonomy v2 | Reactions: {rxn_count} | Reagent Families: {reagent_count}"
         )
     except Exception as exc:
-        startup_message = f"Taxonomy v2 unavailable: {exc}"
+        startup_parts.append(f"Taxonomy v2 unavailable: {exc}")
 
+    try:
+        from chem_assistant.chemtools_wrapper import CHEMTOOLS_TOOLS
+
+        tool_names = {tool.name for tool in CHEMTOOLS_TOOLS}
+        hte_status = "HTE tools: ready" if "hte_recommend_conditions" in tool_names else "HTE tools: missing"
+        startup_parts.append(hte_status)
+    except Exception as exc:
+        startup_parts.append(f"HTE tools unavailable: {exc}")
+
+    startup_message = " | ".join(startup_parts).strip() or None
     window = ChemAssistantWindow(startup_message=startup_message)
     window.show()
     sys.exit(app.exec())
