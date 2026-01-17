@@ -228,12 +228,6 @@
       "description": "Epoxide (oxirane) ring motif."
     },
     {
-      "id": "Cyclohexene",
-      "name": "Cyclohexene",
-      "smarts": "[C;R]=[C;R]",
-      "description": "Ring alkene motif (Diels-Alder product proxy)."
-    },
-    {
       "id": "Any-CO2M",
       "name": "Any-CO2M",
       "smarts": "[CX3](=O)[O-]",
