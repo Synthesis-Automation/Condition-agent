@@ -299,7 +299,7 @@ Add a new reaction type
 
 Add or update reagent families
 
-1. Update legacy reagent registry files under `data/reagent_db`.
+1. Update the reagent registry CSV under `data/reagent_db`.
 2. Keep role IDs aligned with `reagent_roles.v2.json`.
 3. Confirm name normalization and SMARTS are compatible with classifier rules.
 
@@ -382,8 +382,8 @@ consistent contract while taxonomy evolves.
 
 ## Open questions and risks
 
-- Reagent coverage depends on legacy registry content and heuristic patterns; CAS
-  data lives in files such as `data/reagent_db/condensation_agent.json`.
+- Reagent coverage depends on registry content and heuristic patterns; CAS
+  data lives in `data/reagent_db/reagents.csv`.
 - Motif overlap: confirm priority rules are consistent for ambiguous sites.
 - Reaction typing coverage: expand motif sets as new families are added.
 

@@ -877,7 +877,7 @@ def generate_taxonomy_entry_llm(
             **fields_result.get("fields", {})
         }
         
-        # Build entry following reagent_schema.json structure
+        # Build entry for the flattened CSV registry schema
         entry = {
             "id": resolved_identity.get("inchi_key") or normalized_cas,  # prefer InChIKey; else CAS
             "name": resolved_identity.get("name"),

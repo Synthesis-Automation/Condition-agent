@@ -44,7 +44,38 @@ ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
     "organo_catalyst": {"default_family": None},
 }
 
-CSV_FIELDS = (
+DEFAULT_CSV_FIELDS = (
+    "name",
+    "abbreviation",
+    "cas",
+    "smiles",
+    "formula",
+    "type",
+    "density",
+    "mw",
+    "bp",
+    "mp",
+    "volatile",
+    "viscose",
+    "role_1",
+    "family_1",
+    "tag_1",
+    "role_2",
+    "family_2",
+    "tag_2",
+)
+_LEGACY_FIELDS = {"role", "family_id", "tag", "smile"}
+_PROPERTY_FIELDS = {
+    "formula",
+    "type",
+    "density",
+    "mw",
+    "bp",
+    "mp",
+    "volatile",
+    "viscose",
+}
+_BASE_FIELDS = {
     "name",
     "abbreviation",
     "cas",
@@ -55,7 +86,8 @@ CSV_FIELDS = (
     "role_2",
     "family_2",
     "tag_2",
-)
+}
+_KNOWN_FIELDS = _BASE_FIELDS | _PROPERTY_FIELDS | _LEGACY_FIELDS
 
 ROLE_PAYLOAD_FIELDS: Dict[str, Sequence[str]] = {
     "additive": (),
@@ -139,27 +171,14 @@ def _normalize_abbreviation(value: Any) -> str:
 
 def _extract_roles(row: Dict[str, str]) -> List[Tuple[str, str, str]]:
     roles: List[Tuple[str, str, str]] = []
-    has_new_schema = any(
-        key in row for key in ("role_1", "family_1", "tag_1", "role_2", "family_2", "tag_2")
-    )
-    if has_new_schema:
-        for idx in (1, 2):
-            role = (row.get(f"role_{idx}") or "").strip()
-            if not role:
-                continue
-            role = _canonical_role(role)
-            family_id = (row.get(f"family_{idx}") or "").strip()
-            tag = (row.get(f"tag_{idx}") or "").strip()
-            roles.append((role, family_id, tag))
-        return roles
-
-    role = (row.get("role") or "").strip()
-    if role:
-        roles.append((
-            _canonical_role(role),
-            (row.get("family_id") or "").strip(),
-            (row.get("tag") or "").strip(),
-        ))
+    for idx in (1, 2):
+        role = (row.get(f"role_{idx}") or "").strip()
+        if not role:
+            continue
+        role = _canonical_role(role)
+        family_id = (row.get(f"family_{idx}") or "").strip()
+        tag = (row.get(f"tag_{idx}") or "").strip()
+        roles.append((role, family_id, tag))
     return roles
 
 
@@ -168,6 +187,22 @@ def _row_to_entry(row: Dict[str, str]) -> Dict[str, Any]:
     abbr = (row.get("abbreviation") or "").strip()
     cas = (row.get("cas") or "").strip()
     smile = (row.get("smiles") or row.get("smile") or "").strip()
+    properties: Dict[str, Any] = {}
+    for key in _PROPERTY_FIELDS:
+        value = row.get(key)
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            properties[key] = text
+    for key, value in row.items():
+        if not key or key in _KNOWN_FIELDS:
+            continue
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            properties[key] = text
 
     roles_payload: Dict[str, Dict[str, Any]] = {}
     primary_role = ""
@@ -194,6 +229,7 @@ def _row_to_entry(row: Dict[str, str]) -> Dict[str, Any]:
         "family_id": primary_family,
         "tag": primary_tag,
         "roles": roles_payload,
+        "properties": properties,
     }
 
 
@@ -238,7 +274,7 @@ def _entry_to_csv_row(entry: Dict[str, Any], role: Optional[str] = None) -> Dict
     family_1, tag_1 = _role_payload_from_entry(entry, role_1) if role_1 else ("", "")
     family_2, tag_2 = _role_payload_from_entry(entry, role_2) if role_2 else ("", "")
 
-    return {
+    row = {
         "name": name,
         "abbreviation": abbr,
         "cas": cas,
@@ -250,6 +286,13 @@ def _entry_to_csv_row(entry: Dict[str, Any], role: Optional[str] = None) -> Dict
         "family_2": family_2,
         "tag_2": tag_2,
     }
+    properties = entry.get("properties") or {}
+    if isinstance(properties, dict):
+        for key, value in properties.items():
+            if not key or key in _LEGACY_FIELDS:
+                continue
+            row[key] = str(value).strip() if value is not None else ""
+    return row
 
 def infer_abbreviations(name: str, synonyms: Sequence[str]) -> List[str]:
     candidates: List[str] = []
@@ -364,6 +407,7 @@ class RegistryStore:
         self.family_examples: Dict[Tuple[str, str], Set[str]] = {}
         self.family_numeric_baseline: Dict[Tuple[str, str], Optional[Dict[str, Any]]] = {}
         self.cas_index: Dict[str, List[Tuple[str, str, Dict[str, Any]]]] = {}
+        self.csv_fields: List[str] = list(DEFAULT_CSV_FIELDS)
 
         self._load_families()
         self._load_registry()
@@ -433,6 +477,9 @@ class RegistryStore:
             return
         with self.registry_file.open("r", encoding="utf-8", newline="") as handle:
             reader = csv.DictReader(handle)
+            header = [field for field in (reader.fieldnames or []) if field and field not in _LEGACY_FIELDS]
+            extras = [field for field in header if field not in DEFAULT_CSV_FIELDS]
+            self.csv_fields = list(DEFAULT_CSV_FIELDS) + extras
             for row in reader:
                 entry = _row_to_entry(row)
                 self.entries.append(entry)
@@ -592,6 +639,11 @@ class RegistryStore:
             entries.sort(key=lambda item: (item.get("name") or "").lower())
 
         family = (normalized.get("family_id") or "").strip()
+        properties = normalized.get("properties") or {}
+        if isinstance(properties, dict):
+            for key in properties.keys():
+                if key and key not in self.csv_fields and key not in _LEGACY_FIELDS:
+                    self.csv_fields.append(key)
         if cas:
             family_id, _tag = _role_payload_from_entry(target, role)
             existing_roles = {item[0] for item in self.cas_index.get(str(cas), [])}
@@ -608,9 +660,11 @@ class RegistryStore:
         rows = [row for row in rows if any(row.values())]
         rows.sort(key=lambda row: (row.get("role_1", ""), row.get("name", "").lower(), row.get("cas", "")))
         with path.open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=list(CSV_FIELDS))
+            writer = csv.DictWriter(handle, fieldnames=list(self.csv_fields))
             writer.writeheader()
-            writer.writerows(rows)
+            for row in rows:
+                normalized = {field: row.get(field, "") for field in self.csv_fields}
+                writer.writerow(normalized)
         return path
 
     def save_role(self, role: str) -> Path:

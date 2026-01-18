@@ -18,9 +18,9 @@ Phase 0 â Current-State Recon
 - `chemtools/reagent/data/reaction_types.json`
   - Nested dict grouped by coarse category (`C-C_bond_formation`, `C-N_bond_formation`, â¦) with `reactions` list carrying fields (`id`, `name`, `aliases`, `description`, `reactants`, `typical_catalysts`, `typical_conditions`).
   - Reactant references are arrays of reactant tokens (e.g., `["ArX*"]`, `["ArNH2"]`); no enforcement that tokens exist in `reactant_types.json`.
-- `data/reagent_db/*.json`
-  - Per-role registries (`ligand.json`, `base.json`, `solvent.json`, etc.) describing concrete reagents with `id`, `name`, `aliases`, identifiers, role metadata.
-  - Roles are implicit in filenames; metadata keys vary per file (e.g., ligands carry families/denticity, bases carry sterics/basicity).
+- `data/reagent_db/reagents.csv`
+  - Flattened registry for all roles with `role_1`/`role_2` columns; stores concrete reagents with `name`, `abbreviation`, identifiers, and role metadata.
+  - Role-specific metadata is stored in the shared CSV rather than per-role JSON files.
 - `chemtools/taxonomy/data/reagent_roles.v2.json`
   - Unified roles + families (single source of truth) used for classification and validation.
 - `chemtools/reagent/constants.py`
