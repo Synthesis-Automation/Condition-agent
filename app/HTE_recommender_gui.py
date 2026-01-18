@@ -151,14 +151,13 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
         ("Base", "base"),
         ("Solvent", "solvent"),
         ("Additive", "additive"),
+        ("Condensation Agent", "coupling_reagent"),
         ("Spectator Groups", "spectator_groups"),
     ]
     if data_type == "rules":
         return base + [("Reaction ID", "reaction_id")]
     reaction_label = "Reaction ID" if data_type == "literature" else "Reaction Type"
     columns = base + [
-        ("Secondary Solvent", "secondary_solvent"),
-        ("Coupling Reagent", "coupling_reagent"),
         (reaction_label, "reaction_type"),
         ("Reactant Types", "reactant_types"),
         ("Match Score", "match_score"),
