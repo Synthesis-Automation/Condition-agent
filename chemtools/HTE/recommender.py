@@ -24,6 +24,7 @@ from pathlib import Path
 import json
 
 from chemtools.featurizers.structural import featurize_molecule
+from chemtools.smiles import normalize_reaction
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -306,6 +307,182 @@ def _filter_source_group(
     return df[series == label]
 
 
+def _iter_motif_ids(motifs: Iterable[Any]) -> Iterable[str]:
+    for motif in motifs:
+        if isinstance(motif, dict):
+            cid = motif.get("compound_id")
+            if cid:
+                yield str(cid)
+            for alt in motif.get("alt_compound_ids") or []:
+                if alt:
+                    yield str(alt)
+        elif motif:
+            yield str(motif)
+
+
+def _is_aryl_halide_motif(cid: str) -> bool:
+    if not cid:
+        return False
+    if cid in _ARYL_HALIDE_MOTIFS:
+        return True
+    if cid.startswith("Ar-"):
+        suffix = cid.split("-", 1)[-1]
+        return suffix in _HALIDE_SUFFIXES or suffix == "X"
+    return False
+
+
+def _is_aryl_boronate_motif(cid: str) -> bool:
+    if not cid:
+        return False
+    return cid.startswith("Ar-B")
+
+
+def _extract_score_values(result: Any) -> List[float]:
+    values: List[float] = []
+    if isinstance(result, dict):
+        score = result.get("score_0_10")
+        if isinstance(score, (int, float)):
+            values.append(float(score))
+    elif isinstance(result, list):
+        for entry in result:
+            if isinstance(entry, dict):
+                score = entry.get("score_0_10")
+                if isinstance(score, (int, float)):
+                    values.append(float(score))
+    return values
+
+
+def _extract_aryl_scores(analysis: Dict[str, Any]) -> Tuple[Optional[float], Optional[float]]:
+    steric_scores: List[float] = []
+    electronic_scores: List[float] = []
+
+    for entry in analysis.get("steric", {}).get("aryl", []) or []:
+        if isinstance(entry, dict):
+            steric_scores.extend(_extract_score_values(entry.get("result")))
+
+    for entry in analysis.get("electronics", {}).get("aryl", []) or []:
+        if isinstance(entry, dict):
+            electronic_scores.extend(_extract_score_values(entry.get("result")))
+
+    steric = round(sum(steric_scores) / len(steric_scores), 2) if steric_scores else None
+    electronic = (
+        round(sum(electronic_scores) / len(electronic_scores), 2)
+        if electronic_scores
+        else None
+    )
+    return steric, electronic
+
+
+@lru_cache(maxsize=4096)
+def _aryl_role_scores_for_smiles(smiles: str) -> Dict[str, Dict[str, Optional[float]]]:
+    if not smiles:
+        return {}
+    analysis = featurize_molecule(smiles)
+    motifs = analysis.get("motifs", []) or []
+    roles: List[str] = []
+    for cid in _iter_motif_ids(motifs):
+        if _is_aryl_halide_motif(cid):
+            roles.append("aryl_halide")
+        if _is_aryl_boronate_motif(cid):
+            roles.append("aryl_boronate")
+    if not roles:
+        return {}
+    steric, electronic = _extract_aryl_scores(analysis)
+    if steric is None and electronic is None:
+        return {}
+    return {
+        role: {"steric": steric, "electronic": electronic}
+        for role in sorted(set(roles))
+    }
+
+
+def _merge_role_scores(
+    role_maps: Iterable[Dict[str, Dict[str, Optional[float]]]]
+) -> Dict[str, Dict[str, Optional[float]]]:
+    buckets: Dict[str, Dict[str, List[float]]] = {}
+    for role_map in role_maps:
+        for role, scores in role_map.items():
+            bucket = buckets.setdefault(role, {"steric": [], "electronic": []})
+            steric = scores.get("steric")
+            electronic = scores.get("electronic")
+            if isinstance(steric, (int, float)):
+                bucket["steric"].append(float(steric))
+            if isinstance(electronic, (int, float)):
+                bucket["electronic"].append(float(electronic))
+
+    merged: Dict[str, Dict[str, Optional[float]]] = {}
+    for role, values in buckets.items():
+        steric_values = values["steric"]
+        electronic_values = values["electronic"]
+        merged[role] = {
+            "steric": round(sum(steric_values) / len(steric_values), 2)
+            if steric_values
+            else None,
+            "electronic": round(sum(electronic_values) / len(electronic_values), 2)
+            if electronic_values
+            else None,
+        }
+    return merged
+
+
+@lru_cache(maxsize=2048)
+def _aryl_role_scores_for_reaction(reaction_smiles: str) -> Dict[str, Dict[str, Optional[float]]]:
+    if not reaction_smiles:
+        return {}
+    normalized = normalize_reaction(reaction_smiles)
+    reactants = normalized.get("reactants") or []
+    role_maps: List[Dict[str, Dict[str, Optional[float]]]] = []
+    for entry in reactants:
+        if not isinstance(entry, dict):
+            continue
+        smi = entry.get("smiles_norm") or entry.get("largest_smiles") or entry.get("input")
+        if not smi:
+            continue
+        role_maps.append(_aryl_role_scores_for_smiles(smi))
+    return _merge_role_scores(role_maps)
+
+
+def _similarity_from_scores(
+    query_scores: Dict[str, Optional[float]],
+    row_scores: Dict[str, Optional[float]],
+) -> Optional[float]:
+    parts: List[float] = []
+    for key in ("steric", "electronic"):
+        q_val = query_scores.get(key)
+        r_val = row_scores.get(key)
+        if isinstance(q_val, (int, float)) and isinstance(r_val, (int, float)):
+            delta = abs(float(q_val) - float(r_val))
+            parts.append(max(0.0, min(1.0, 1.0 - (delta / 10.0))))
+    if not parts:
+        return None
+    return sum(parts) / len(parts)
+
+
+def _aryl_similarity_weight(
+    query_roles: Dict[str, Dict[str, Optional[float]]],
+    row_roles: Dict[str, Dict[str, Optional[float]]],
+) -> float:
+    if not query_roles or not row_roles:
+        return 1.0
+    scores: List[float] = []
+    for role, q_scores in query_roles.items():
+        r_scores = row_roles.get(role)
+        if not r_scores:
+            continue
+        similarity = _similarity_from_scores(q_scores, r_scores)
+        if similarity is None:
+            continue
+        scores.append(similarity)
+    if not scores:
+        return 1.0
+    combined = sum(scores) / len(scores)
+    return 0.7 + (0.3 * combined)
+
+
+def _iter_smiles_parts(smiles: str) -> List[str]:
+    return [part.strip() for part in str(smiles or "").split(".") if part.strip()]
+
+
 def _filter_by_reactant_types(
     df: pd.DataFrame,
     reactant_types: Optional[Iterable[str]],
@@ -392,6 +569,7 @@ _GENERIC_FALLBACK_MOTIFS = {
     "Alkyl-H",
 }
 _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
+_ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 
 
 @lru_cache(maxsize=1)
@@ -1354,6 +1532,7 @@ class HTERecommender:
         reaction_type_filter: Optional[str] = None,
         catalyst_filter: Optional[str] = None,
         source_group: Optional[str] = None,
+        use_aryl_steric_electronic_weighting: bool = False,
         use_spectator_groups: bool = True,
     ) -> HTERecommendationResult:
         """
@@ -1368,6 +1547,7 @@ class HTERecommender:
             reaction_type_filter: Optional filter for specific reaction type
             catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
             source_group: Optional source group filter (datasets, rules, experiments)
+            use_aryl_steric_electronic_weighting: Apply aryl steric/electronic weighting when available
             use_spectator_groups: Whether to apply spectator group weighting when available
         
         Returns:
@@ -1627,6 +1807,30 @@ class HTERecommender:
                 matched_df["match_score"] = matched_df["match_score"] * (0.7 + 0.3 * spectator_scores)
             else:
                 matched_df["match_score"] = 0.7 + 0.3 * spectator_scores
+
+        if use_aryl_steric_electronic_weighting:
+            rsmi_col = None
+            if "reaction_smiles" in matched_df.columns:
+                rsmi_col = "reaction_smiles"
+            elif "Reaction_SMILES" in matched_df.columns:
+                rsmi_col = "Reaction_SMILES"
+            if rsmi_col:
+                query_parts = _iter_smiles_parts(reactant_a_smiles)
+                query_parts.extend(_iter_smiles_parts(reactant_b_smiles or ""))
+                query_role_maps = [_aryl_role_scores_for_smiles(part) for part in query_parts]
+                query_roles = _merge_role_scores(query_role_maps)
+                if query_roles:
+                    weights = [
+                        _aryl_similarity_weight(query_roles, _aryl_role_scores_for_reaction(rsmi))
+                        if rsmi
+                        else 1.0
+                        for rsmi in matched_df[rsmi_col].fillna("").astype(str)
+                    ]
+                    weight_series = pd.Series(weights, index=matched_df.index)
+                    if "match_score" in matched_df.columns:
+                        matched_df["match_score"] = matched_df["match_score"] * weight_series
+                    else:
+                        matched_df["match_score"] = weight_series
 
         # Step 2: Predict reaction type (using reactant patterns; fallback to match frequency)
         if result.matched_motifs and not result.predicted_reaction_type:

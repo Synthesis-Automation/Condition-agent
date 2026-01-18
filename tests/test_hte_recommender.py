@@ -47,6 +47,18 @@ def _make_summary_df() -> pd.DataFrame:
     return pd.concat([base, alt], ignore_index=True)
 
 
+def _make_weighted_df() -> pd.DataFrame:
+    base = _make_min_hte_df()
+    base["Reactant_A_Type"] = ["Ar-Cl"]
+    base["Reactant_B_Type"] = ["Ar-B(OH)2"]
+    base["Catalyst"] = ["Pd"]
+    base["reaction_smiles"] = ["rxn_good"]
+    alt = base.copy()
+    alt["Catalyst"] = ["Ni"]
+    alt["reaction_smiles"] = ["rxn_bad"]
+    return pd.concat([base, alt], ignore_index=True)
+
+
 def test_fallback_tiers_order() -> None:
     tiers = hte._build_fallback_tiers(["Ar-Br", "Ar-X", "Ar-R"], set(), set())
     assert tiers
@@ -139,3 +151,71 @@ def test_summarize_conditions_filters(monkeypatch) -> None:
     recs = payload["recommendations"]
     assert recs
     assert recs[0].catalyst == "Ni"
+
+
+def test_aryl_weighting_adjusts_match_score(monkeypatch) -> None:
+    df = _make_weighted_df()
+    key = hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "Cl" in smiles:
+            return ["Ar-Cl"], "Aryl Halide"
+        return ["Ar-B(OH)2"], "Aryl Boronate"
+
+    def fake_normalize_reaction(rsmi: str):
+        mapping = {
+            "rxn_good": {
+                "reactants": [
+                    {"smiles_norm": "ArCl_good"},
+                    {"smiles_norm": "ArB_good"},
+                ]
+            },
+            "rxn_bad": {
+                "reactants": [
+                    {"smiles_norm": "ArCl_bad"},
+                    {"smiles_norm": "ArB_good"},
+                ]
+            },
+        }
+        return mapping.get(rsmi, {"reactants": []})
+
+    def fake_featurize(smiles: str):
+        payload = {
+            "motifs": [],
+            "steric": {"aryl": [], "alkyl": []},
+            "electronics": {"aryl": []},
+        }
+        if "ArCl" in smiles or "Ar-Cl" in smiles:
+            payload["motifs"] = [{"compound_id": "Ar-Cl"}]
+            score = 2.0 if "good" in smiles or "query" in smiles else 8.0
+            payload["steric"]["aryl"] = [{"result": {"score_0_10": score}}]
+            payload["electronics"]["aryl"] = [{"result": {"score_0_10": 6.0 if "good" in smiles or "query" in smiles else 2.0}}]
+        elif "ArB" in smiles or "Ar-B" in smiles:
+            payload["motifs"] = [{"compound_id": "Ar-B(OH)2"}]
+            payload["steric"]["aryl"] = [{"result": {"score_0_10": 1.0}}]
+            payload["electronics"]["aryl"] = [{"result": {"score_0_10": 5.0}}]
+        return payload
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(hte, "normalize_reaction", fake_normalize_reaction)
+    monkeypatch.setattr(hte, "featurize_molecule", fake_featurize)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="ArCl_query",
+        reactant_b_smiles="ArB_query",
+        top_k=2,
+        min_experiments=1,
+        use_aryl_steric_electronic_weighting=True,
+    )
+
+    assert len(result.recommendations) == 2
+    assert result.recommendations[0].catalyst == "Pd"
+    assert result.recommendations[0].match_score > result.recommendations[1].match_score

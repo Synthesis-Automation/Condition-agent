@@ -392,6 +392,10 @@ class HTERecommendInput(BaseModel):
         None,
         description="Optional source group filter (datasets, experiments, rules).",
     )
+    use_aryl_steric_electronic_weighting: bool = Field(
+        False,
+        description="Apply aryl steric/electronic similarity weighting.",
+    )
     hte_db_path: Optional[str] = Field(
         None, description="Path to HTE database folder or file."
     )
@@ -900,6 +904,7 @@ def hte_recommend_conditions(
     reaction_type_filter: Optional[str] = None,
     catalyst_filter: Optional[str] = None,
     source_group: Optional[str] = None,
+    use_aryl_steric_electronic_weighting: bool = False,
     hte_db_path: Optional[str] = None,
     use_spectator_groups: bool = True,
 ) -> Dict[str, Any]:
@@ -929,6 +934,7 @@ def hte_recommend_conditions(
             reaction_type_filter=reaction_type_filter or None,
             catalyst_filter=catalyst_filter or None,
             source_group=source_group or None,
+            use_aryl_steric_electronic_weighting=use_aryl_steric_electronic_weighting,
             use_spectator_groups=use_spectator_groups,
         )
         payload = _to_jsonable(result)
@@ -951,6 +957,7 @@ def hte_recommend_conditions(
             "reactant_b_smiles": reactant_b,
             "product_smiles": product,
             "source_group": source_group,
+            "use_aryl_steric_electronic_weighting": use_aryl_steric_electronic_weighting,
         }
         return _success_response(payload)
     except Exception as exc:
