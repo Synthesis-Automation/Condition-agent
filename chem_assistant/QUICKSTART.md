@@ -1,4 +1,4 @@
-# Chem Assistant Quickstart (Featurization/Analysis)
+# Chem Assistant Quickstart (Featurization/Analysis/Reagents)
 
 ## Install
 
@@ -38,6 +38,7 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - Featurizers: unified bundles, motif-based features, reaction-pair features
 - Calculable: feature tokens for reactant types
 - HTE: condition recommendations from the HTE database
+- Reagents: lookup and inventory from the reagent registry
 - RAG: knowledge base snippets from `knowledge_base/`
 
 ## Notes
