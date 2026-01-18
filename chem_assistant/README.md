@@ -72,6 +72,7 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 ### Knowledge base (RAG)
 
 - rag_search
+- kb_recommend_conditions
 
 ## Notes
 

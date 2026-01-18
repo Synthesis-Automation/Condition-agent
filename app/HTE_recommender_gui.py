@@ -163,6 +163,7 @@ class RecommendationWorker(QtCore.QObject):
         min_exp: int,
         reaction_filter: str,
         catalyst_filter: str,
+        source_group: str,
     ) -> None:
         super().__init__()
         self.db_path = db_path
@@ -171,6 +172,7 @@ class RecommendationWorker(QtCore.QObject):
         self.min_exp = min_exp
         self.reaction_filter = reaction_filter
         self.catalyst_filter = catalyst_filter
+        self.source_group = source_group
 
     def run(self) -> None:
         try:
@@ -192,6 +194,7 @@ class RecommendationWorker(QtCore.QObject):
                 min_experiments=self.min_exp,
                 reaction_type_filter=self.reaction_filter or None,
                 catalyst_filter=self.catalyst_filter or None,
+                source_group=self.source_group or None,
             )
             stats = recommender.get_statistics()
             self.finished.emit(True, result, "OK", stats)
@@ -227,6 +230,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.catalyst_filter_edit = QtWidgets.QLineEdit()
         self.catalyst_filter_edit.setPlaceholderText("Optional catalyst filter (e.g., Pd, Cu)")
 
+        self.source_group_combo = QtWidgets.QComboBox()
+        self.source_group_combo.addItems(["All", "datasets", "experiments", "rules"])
+        self.source_group_combo.setToolTip("Filter results to a specific HTE source group.")
+
         self.run_button = QtWidgets.QPushButton("Run Recommendation")
         self.clear_button = QtWidgets.QPushButton("Clear Results")
 
@@ -247,6 +254,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.worker: Optional[RecommendationWorker] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
         self._spectator_groups_summary: str = ""
+        self._source_group_label: str = "All"
 
     def _setup_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -283,6 +291,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         form.addRow("Reaction Filter:", self.reaction_filter_edit)
         form.addRow("Catalyst Filter:", self.catalyst_filter_edit)
+        form.addRow("Source Group:", self.source_group_combo)
         layout.addLayout(form)
 
         button_row = QtWidgets.QHBoxLayout()
@@ -372,6 +381,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.summary.clear()
         self.status.setText("Working...")
         self.run_button.setEnabled(False)
+        self._source_group_label = self.source_group_combo.currentText().strip()
 
         self.thread = QtCore.QThread()
         self.worker = RecommendationWorker(
@@ -381,6 +391,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             min_exp=self.min_exp_spin.value(),
             reaction_filter=self.reaction_filter_edit.text().strip(),
             catalyst_filter=self.catalyst_filter_edit.text().strip(),
+            source_group="" if self._source_group_label == "All" else self._source_group_label,
         )
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
@@ -461,9 +472,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         )
         self._spectator_groups_summary = spectator_summary
 
+        source_group = self._source_group_label or "All"
         summary_lines = [
             html.escape(
-                f"Data: {data_type} | Matches: {matches} | Coverage: {coverage:.2f}%"
+                f"Data: {data_type} | Source: {source_group} | Matches: {matches} | Coverage: {coverage:.2f}%"
             ),
             (
                 f'<span style="color:#ffeb3b; font-weight:700;">'

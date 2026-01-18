@@ -135,6 +135,7 @@ Tool selection rubric:
 - Electrophile/nucleophile pair -> reaction_pair_featurize_pair (or reaction_pair_featurize_flat for compact output).
 - Only use detection_* tools when the user asks for reaction typing without full featurization.
 - HTE data or condition screening -> hte_recommend_conditions (use reaction_smiles when available).
+- If the user wants dataset-only HTE results, set source_group="datasets" in hte_recommend_conditions.
 - HTE database questions -> hte_database_stats.
 - Reagent lookup or validation -> reagent_lookup (optionally set role or include_all).
 - Reagent inventory -> reagent_list_roles or reagent_list_by_role.
@@ -214,6 +215,27 @@ class ConditionRecommendationItem(BaseModel):
     reaction_id: Optional[str]
     reactant_types: List[str]
     z_score_range: List[float]
+
+class KBConditionItem(BaseModel):
+    rank: int
+    context: str
+    catalyst: str
+    ligand: str
+    base: str
+    solvent: str
+    secondary_solvent: Optional[str]
+    additive: Optional[str]
+    coupling_reagent: Optional[str]
+    temperature_c: Optional[str]
+    time_h: Optional[str]
+    notes: Optional[str]
+    reaction_id: Optional[str]
+    reaction_type: Optional[str]
+    score: float
+    source_doc: Optional[str]
+    source_path: Optional[str]
+    tags: List[str]
+    extras: Dict[str, str]
 
 class ConditionRecommendationResponse(BaseModel):
     query: str
@@ -707,7 +729,24 @@ class ChemToolsAgent:
                 result.get("messages", []), "hte_recommend_conditions"
             )
             if structured_payload is not None:
-                structured_response = _build_condition_response(query, structured_payload)
+                kb_payload = None
+                try:
+                    from chem_assistant.chemtools_wrapper import kb_recommend_conditions
+
+                    diagnostics = structured_payload.get("diagnostics") or {}
+                    predicted = (
+                        structured_payload.get("predicted_reaction_type")
+                        or diagnostics.get("predicted_reaction_type")
+                    )
+                    kb_query = query
+                    if predicted and predicted.lower() not in (query or "").lower():
+                        kb_query = f"{query} {predicted}"
+                    kb_payload = kb_recommend_conditions.invoke({"query": kb_query})
+                except Exception:
+                    kb_payload = None
+                structured_response = _build_condition_response(
+                    query, structured_payload, kb_payload
+                )
                 if _wants_human_readable(query) and not _wants_json(query):
                     return _format_condition_summary(structured_response)
                 return structured_response.model_dump_json(indent=2)

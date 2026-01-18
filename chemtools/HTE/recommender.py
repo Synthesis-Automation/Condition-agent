@@ -288,6 +288,24 @@ def _reactant_key(values: Iterable[Optional[str]]) -> str:
     return "|".join(sorted(items))
 
 
+def _normalize_source_group(value: Optional[str]) -> str:
+    if value is None:
+        return ""
+    return str(value).strip().lower()
+
+
+def _filter_source_group(
+    df: pd.DataFrame, source_group: Optional[str]
+) -> pd.DataFrame:
+    if not source_group or "Source_Group" not in df.columns:
+        return df
+    label = _normalize_source_group(source_group)
+    if not label:
+        return df
+    series = df["Source_Group"].fillna("").astype(str).str.strip().str.lower()
+    return df[series == label]
+
+
 def _clean_reactant_value(value: Any) -> str:
     text = str(value or "").strip()
     if not text:
@@ -1300,6 +1318,7 @@ class HTERecommender:
         min_experiments: int = 2,
         reaction_type_filter: Optional[str] = None,
         catalyst_filter: Optional[str] = None,
+        source_group: Optional[str] = None,
         use_spectator_groups: bool = True,
     ) -> HTERecommendationResult:
         """
@@ -1313,6 +1332,7 @@ class HTERecommender:
             min_experiments: Minimum experiments for a condition to be recommended
             reaction_type_filter: Optional filter for specific reaction type
             catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
+            source_group: Optional source group filter (datasets, rules, experiments)
             use_spectator_groups: Whether to apply spectator group weighting when available
         
         Returns:
@@ -1378,6 +1398,10 @@ class HTERecommender:
             if score > 0:
                 # Weight the z-score by the match score
                 temp_df = group_df.copy()
+                if source_group:
+                    temp_df = _filter_source_group(temp_df, source_group)
+                    if temp_df.empty:
+                        continue
                 
                 # Boost if intramolecular status matches
                 if 'Is_Intramolecular' in temp_df.columns:
@@ -1409,19 +1433,25 @@ class HTERecommender:
         if key in self.indexed_data:
             direct_match = self.indexed_data[key].copy()
             direct_key = key
-            direct_match['match_score'] = 1.0
-            direct_match['match_priority'] = 0
-            if not result.matched_motifs:
-                pick_a = _prioritize_motifs(type_a, reacted_set, spectator_set)
-                pick_b = _prioritize_motifs(type_b, reacted_set, spectator_set)
-                if pick_a or pick_b:
-                    result.matched_motifs = (
-                        pick_a[0] if pick_a else "",
-                        pick_b[0] if pick_b else "",
-                    )
-                else:
-                    result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
-        else:
+            if source_group:
+                direct_match = _filter_source_group(direct_match, source_group)
+                if direct_match.empty:
+                    direct_match = None
+                    direct_key = None
+            if direct_match is not None:
+                direct_match['match_score'] = 1.0
+                direct_match['match_priority'] = 0
+                if not result.matched_motifs:
+                    pick_a = _prioritize_motifs(type_a, reacted_set, spectator_set)
+                    pick_b = _prioritize_motifs(type_b, reacted_set, spectator_set)
+                    if pick_a or pick_b:
+                        result.matched_motifs = (
+                            pick_a[0] if pick_a else "",
+                            pick_b[0] if pick_b else "",
+                        )
+                    else:
+                        result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
+        if direct_match is None:
             list_a = _prioritize_motifs(type_a, reacted_set, spectator_set) or [""]
             list_b = _prioritize_motifs(type_b, reacted_set, spectator_set) or [""]
             for ma in list_a:
@@ -1432,6 +1462,12 @@ class HTERecommender:
                     if candidate in self.indexed_data:
                         direct_match = self.indexed_data[candidate].copy()
                         direct_key = candidate
+                        if source_group:
+                            direct_match = _filter_source_group(direct_match, source_group)
+                            if direct_match.empty:
+                                direct_match = None
+                                direct_key = None
+                                continue
                         direct_match['match_score'] = 1.0
                         direct_match['match_priority'] = 0
                         if not result.matched_motifs:
@@ -1443,7 +1479,12 @@ class HTERecommender:
         
         fallback_match: Optional[pd.DataFrame] = None
         expand_for_coverage = False
-        if direct_match is not None and self.df is not None and "Source_Group" in direct_match.columns:
+        if (
+            direct_match is not None
+            and self.df is not None
+            and "Source_Group" in direct_match.columns
+            and not source_group
+        ):
             direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
             available_groups = {g for g in self.df["Source_Group"].unique() if str(g).strip()}
             if available_groups and direct_groups and not (available_groups <= direct_groups):
@@ -1471,9 +1512,26 @@ class HTERecommender:
                             continue
                         if candidate in self.indexed_data:
                             fallback_match = self.indexed_data[candidate].copy()
-                            if expand_for_coverage and "Source_Group" in fallback_match.columns and direct_match is not None:
-                                direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
-                                candidate_groups = {g for g in fallback_match["Source_Group"].unique() if str(g).strip()}
+                            if source_group:
+                                fallback_match = _filter_source_group(fallback_match, source_group)
+                                if fallback_match.empty:
+                                    fallback_match = None
+                                    continue
+                            if (
+                                expand_for_coverage
+                                and "Source_Group" in fallback_match.columns
+                                and direct_match is not None
+                            ):
+                                direct_groups = {
+                                    g
+                                    for g in direct_match["Source_Group"].unique()
+                                    if str(g).strip()
+                                }
+                                candidate_groups = {
+                                    g
+                                    for g in fallback_match["Source_Group"].unique()
+                                    if str(g).strip()
+                                }
                                 if not (candidate_groups - direct_groups):
                                     fallback_match = None
                                     continue
@@ -1552,7 +1610,13 @@ class HTERecommender:
                     result.reaction_type_confidence = float(counts.iloc[0] / counts.sum())
         
         result.total_matching_experiments = len(matched_df)
-        result.database_coverage = (len(matched_df) / len(self.df)) * 100.0
+        coverage_df = self.df
+        if source_group and self.df is not None and "Source_Group" in self.df.columns:
+            coverage_df = _filter_source_group(self.df, source_group)
+        if coverage_df is not None and len(coverage_df) > 0:
+            result.database_coverage = (len(matched_df) / len(coverage_df)) * 100.0
+        else:
+            result.database_coverage = 0.0
         
         # Step 4: Aggregate and rank conditions
         if len(matched_df) > 0:

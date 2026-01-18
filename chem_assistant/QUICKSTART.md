@@ -40,6 +40,7 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - HTE: condition recommendations from the HTE database
 - Reagents: lookup and inventory from the reagent registry
 - RAG: knowledge base snippets from `data/knowledge_base/`
+- KB conditions: summary tables via `kb_recommend_conditions`
 
 ## Notes
 

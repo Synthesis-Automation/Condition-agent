@@ -388,6 +388,10 @@ class HTERecommendInput(BaseModel):
     catalyst_filter: Optional[str] = Field(
         None, description="Optional catalyst metal/name filter."
     )
+    source_group: Optional[str] = Field(
+        None,
+        description="Optional source group filter (datasets, experiments, rules).",
+    )
     hte_db_path: Optional[str] = Field(
         None, description="Path to HTE database folder or file."
     )
@@ -869,6 +873,7 @@ def hte_recommend_conditions(
     min_experiments: int = 1,
     reaction_type_filter: Optional[str] = None,
     catalyst_filter: Optional[str] = None,
+    source_group: Optional[str] = None,
     hte_db_path: Optional[str] = None,
     use_spectator_groups: bool = True,
 ) -> Dict[str, Any]:
@@ -897,6 +902,7 @@ def hte_recommend_conditions(
             min_experiments=min_experiments,
             reaction_type_filter=reaction_type_filter or None,
             catalyst_filter=catalyst_filter or None,
+            source_group=source_group or None,
             use_spectator_groups=use_spectator_groups,
         )
         payload = _to_jsonable(result)
@@ -918,6 +924,7 @@ def hte_recommend_conditions(
             "reactant_a_smiles": reactant_a,
             "reactant_b_smiles": reactant_b,
             "product_smiles": product,
+            "source_group": source_group,
         }
         return _success_response(payload)
     except Exception as exc:
