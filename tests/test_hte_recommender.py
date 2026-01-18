@@ -25,7 +25,7 @@ def _make_min_hte_df() -> pd.DataFrame:
             "Reaction_Category": [""],
             "Is_Intramolecular": [False],
             "Source_File": ["tests"],
-            "Source_Group": ["datasets"],
+            "Source_Group": ["literature"],
             "spectator_groups": [""],
         }
     )
@@ -95,7 +95,7 @@ def test_recommend_falls_back_when_direct_key_missing(monkeypatch) -> None:
 
     assert result.is_fallback_match is True
     assert len(result.recommendations) == 1
-    assert "datasets" in result.recommendations_by_source
+    assert "literature" in result.recommendations_by_source
     assert result.total_matching_experiments >= 1
     assert "Ar-X" in (result.matched_motifs or ())
 
@@ -142,7 +142,7 @@ def test_summarize_conditions_filters(monkeypatch) -> None:
     payload = recommender.summarize_conditions(
         reaction_type_filter="suzuki_miyaura",
         reactant_type_filters=["Ar-Cl"],
-        source_group="datasets",
+        source_group="literature",
         top_k=3,
         min_experiments=1,
     )

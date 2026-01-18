@@ -137,7 +137,7 @@ Tool selection rubric:
 - Only use detection_* tools when the user asks for reaction typing without full featurization.
 - HTE data or condition screening -> hte_recommend_conditions (use reaction_smiles when available).
 - HTE dataset insights (e.g., top conditions for aryl chlorides) -> hte_dataset_summary.
-- If the user wants dataset-only HTE results, set source_group="datasets" in hte_recommend_conditions.
+- If the user wants literature-only HTE results, set source_group="literature" in hte_recommend_conditions.
 - HTE database questions -> hte_database_stats.
 - Reagent lookup or validation -> reagent_lookup (optionally set role or include_all).
 - Reagent inventory -> reagent_list_roles or reagent_list_by_role.

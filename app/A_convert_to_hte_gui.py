@@ -185,7 +185,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
             return
 
         input_path = Path(data_path)
-        output_path = PROJECT_ROOT / "data" / "HTE_db" / "datasets" / f"{input_path.stem}_canonical.csv"
+        output_path = PROJECT_ROOT / "data" / "HTE_db" / "literature" / f"{input_path.stem}_canonical.csv"
 
         self.input_edit.setText(str(input_path))
         self.output_edit.setText(str(output_path))
@@ -216,11 +216,11 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.input_edit.setText("; ".join(paths))
 
         if len(paths) > 1:
-            default_out_dir = PROJECT_ROOT / "data" / "HTE_db" / "datasets"
+            default_out_dir = PROJECT_ROOT / "data" / "HTE_db" / "literature"
             self.output_edit.setText(str(default_out_dir))
         else:
             input_path = Path(paths[0])
-            output_path = PROJECT_ROOT / "data" / "HTE_db" / "datasets" / f"{input_path.stem}_canonical.csv"
+            output_path = PROJECT_ROOT / "data" / "HTE_db" / "literature" / f"{input_path.stem}_canonical.csv"
             self.output_edit.setText(str(output_path))
 
     def _on_input_edited(self):

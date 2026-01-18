@@ -184,7 +184,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--input",
-        default="data/HTE_db/datasets/C-S Coupling_canonical.csv",
+        default="data/HTE_db/literature/C-S Coupling_canonical.csv",
         help="Path to HTE CSV file with spectator_groups (default: C-S coupling).",
     )
     parser.add_argument(

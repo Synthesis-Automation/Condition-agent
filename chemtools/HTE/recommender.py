@@ -34,8 +34,8 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
         return "unknown"
     parts = [part.lower() for part in source_path.parts]
     for part in parts:
-        if part == "datasets":
-            return "datasets"
+        if part in ("literature", "datasets", "dataset"):
+            return "literature"
         if part == "rules":
             return "rules"
         if part in ("experiments", "experiment", "experiements"):
@@ -62,7 +62,7 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
     candidates.extend(db_path.glob("*.csv"))
     candidates.extend(db_path.glob("*.jsonl"))
 
-    for subdir in ("datasets", "rules", "experiments", "experiment", "experiements"):
+    for subdir in ("literature", "datasets", "rules", "experiments", "experiment", "experiements"):
         sub_path = db_path / subdir
         if not sub_path.exists():
             continue
@@ -292,7 +292,18 @@ def _reactant_key(values: Iterable[Optional[str]]) -> str:
 def _normalize_source_group(value: Optional[str]) -> str:
     if value is None:
         return ""
-    return str(value).strip().lower()
+    if isinstance(value, float) and pd.isna(value):
+        return ""
+    label = str(value).strip().lower()
+    if not label or label == "nan":
+        return ""
+    if label in ("literature", "datasets", "dataset", "lit"):
+        return "literature"
+    if label in ("experiments", "experiment", "experiements"):
+        return "experiments"
+    if label == "rules":
+        return "rules"
+    return label
 
 
 def _filter_source_group(
@@ -303,7 +314,7 @@ def _filter_source_group(
     label = _normalize_source_group(source_group)
     if not label:
         return df
-    series = df["Source_Group"].fillna("").astype(str).str.strip().str.lower()
+    series = df["Source_Group"].apply(_normalize_source_group)
     return df[series == label]
 
 
@@ -1494,8 +1505,8 @@ class HTERecommender:
         total_available = sum(len(items) for items in by_source.values())
         limit = total_available if top_k <= 0 else min(top_k, total_available)
 
-        weight_map = {"experiments": 3, "datasets": 2, "rules": 1}
-        priority_map = {"experiments": 0, "datasets": 1, "rules": 2, "other": 3, "unknown": 4}
+        weight_map = {"experiments": 3, "literature": 2, "datasets": 2, "rules": 1}
+        priority_map = {"experiments": 0, "literature": 1, "datasets": 1, "rules": 2, "other": 3, "unknown": 4}
         sources = sorted(by_source.keys(), key=lambda s: (priority_map.get(str(s), 5), str(s)))
 
         schedule: List[str] = []
@@ -1546,7 +1557,7 @@ class HTERecommender:
             min_experiments: Minimum experiments for a condition to be recommended
             reaction_type_filter: Optional filter for specific reaction type
             catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
-            source_group: Optional source group filter (datasets, rules, experiments)
+            source_group: Optional source group filter (literature, rules, experiments)
             use_aryl_steric_electronic_weighting: Apply aryl steric/electronic weighting when available
             use_spectator_groups: Whether to apply spectator group weighting when available
         
@@ -1783,6 +1794,10 @@ class HTERecommender:
 
         if matched_df is None:
             return result
+
+        if "Source_Group" in matched_df.columns:
+            matched_df = matched_df.copy()
+            matched_df["Source_Group"] = matched_df["Source_Group"].apply(_normalize_source_group)
         
         # Apply reaction type filter if specified
         if reaction_type_filter:

@@ -35,8 +35,12 @@ def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Op
 
 def _detect_csv_type(path: Path) -> str:
     parts = [part.lower() for part in path.parts]
-    for label in ("rules", "datasets", "experiments", "experiment", "experiements"):
+    for label in ("rules", "literature", "datasets", "experiments", "experiment", "experiements"):
         if label in parts:
+            if label in ("literature", "datasets"):
+                return "literature"
+            if label in ("experiments", "experiment", "experiements"):
+                return "experiments"
             return label
     if path.is_dir():
         return "directory"
@@ -48,14 +52,27 @@ def _detect_csv_type(path: Path) -> str:
         return "unknown"
     header_lower = [h.strip().lower() for h in header]
     if "reaction_type_standardized" in header_lower:
-        return "datasets"
+        return "literature"
     if "reaction_id" in header_lower:
-        return "datasets"
+        return "literature"
     if "temperature_c" in header_lower:
         return "rules"
     if "reactant_1" in header_lower and "reactant_2" in header_lower:
         return "experiments"
     return "unknown"
+
+
+def _normalize_source_group_label(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    if not text or text == "nan":
+        return "unknown"
+    if text in ("literature", "datasets", "dataset", "lit"):
+        return "literature"
+    if text in ("experiments", "experiment", "experiements"):
+        return "experiments"
+    if text == "rules":
+        return "rules"
+    return text
 
 
 def _format_float(value: Optional[float]) -> str:
@@ -138,7 +155,7 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
     ]
     if data_type == "rules":
         return base + [("Reaction ID", "reaction_id")]
-    reaction_label = "Reaction ID" if data_type == "datasets" else "Reaction Type"
+    reaction_label = "Reaction ID" if data_type == "literature" else "Reaction Type"
     columns = base + [
         ("Secondary Solvent", "secondary_solvent"),
         ("Coupling Reagent", "coupling_reagent"),
@@ -146,7 +163,7 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
         ("Reactant Types", "reactant_types"),
         ("Match Score", "match_score"),
     ]
-    if data_type != "datasets":
+    if data_type != "literature":
         columns.insert(len(base) + 2, ("Reaction ID", "reaction_id"))
     return columns
 
@@ -234,7 +251,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.catalyst_filter_edit.setPlaceholderText("Optional catalyst filter (e.g., Pd, Cu)")
 
         self.source_group_combo = QtWidgets.QComboBox()
-        self.source_group_combo.addItems(["All", "datasets", "experiments", "rules"])
+        self.source_group_combo.addItems(["All", "literature", "experiments", "rules"])
         self.source_group_combo.setToolTip("Filter results to a specific HTE source group.")
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
@@ -506,6 +523,11 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         recs = list(getattr(result, "recommendations", []) or [])
         source_map = getattr(result, "recommendations_by_source", {}) or {}
+        normalized_map: Dict[str, List[Any]] = {}
+        for key, items in source_map.items():
+            normalized_key = _normalize_source_group_label(key)
+            normalized_map.setdefault(normalized_key, []).extend(items)
+        source_map = normalized_map
         self.results_tabs.clear()
 
         self.table = self._create_results_table()
@@ -513,7 +535,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         all_columns = _table_columns_for_type(data_type)
         self._populate_table(self.table, recs, all_columns)
 
-        base_groups = ["datasets", "rules", "experiments"]
+        base_groups = ["literature", "rules", "experiments"]
         extra_groups = [g for g in sorted(source_map) if g not in base_groups]
         for source_group in base_groups + extra_groups:
             group_recs = list(source_map.get(source_group) or [])
