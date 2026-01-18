@@ -28,6 +28,13 @@ source: AbbVie HTE Perspective Table 3; AbbVie HTE SI Tables S1-S3
 
 - AbbVie HTE SI (Table S1) reports Suzuki coupling success rate: 78% (208 runs).
 - Solvent trend: dioxane/H2O (4:1) dominates top conditions.
+- 3 equiv aq Base, 8mol% cat, 10vol solvent, start at 60°C
+- Rule of thumb: match solvent and substrate polarity
+- Don’t use Pd(PPh3)4, start with dtbpfPdCl2, dioxane, aq K3PO4(aq, 3.25M)
+- dppf: K3PO4(aq), Amphos: K2CO3(aq)
+- Hydrodehalogenation: Add 0.5-1 equiv TBAB
+- Lots of boronate Dimer: Exclude air more thoroughly and use less catalyst
+- FGs sensitive to aq base: use weaker/less/more concentrated base, less polar co-solvent, - lower temperatur, consider neop-Boronates with KOTMS as base
 
 ### Top conditions overall (AbbVie HTE Perspective Table 3)
 
