@@ -99,6 +99,67 @@ def _canonical_reagent_roles() -> List[str]:
         return []
 
 
+def _is_reagent_exact_match(query_norm: str, entry: Dict[str, Any]) -> bool:
+    if not query_norm:
+        return False
+    from chemtools import reagent as reagent_tools
+
+    name_norm = reagent_tools.normalize_name(entry.get("name", ""))
+    if name_norm and name_norm == query_norm:
+        return True
+    for abbr in entry.get("abbreviation", []) or []:
+        if not abbr:
+            continue
+        abbr_norm = reagent_tools.normalize_name(str(abbr))
+        if abbr_norm == query_norm:
+            return True
+    cas = entry.get("cas")
+    if cas:
+        cas_norm = reagent_tools.normalize_name(str(cas))
+        if cas_norm == query_norm:
+            return True
+    return False
+
+
+def _is_reagent_partial_match(query_norm: str, entry: Dict[str, Any]) -> bool:
+    if not query_norm:
+        return False
+    from chemtools import reagent as reagent_tools
+
+    name_norm = reagent_tools.normalize_name(entry.get("name", ""))
+    if name_norm and (query_norm in name_norm or name_norm in query_norm):
+        return True
+    for abbr in entry.get("abbreviation", []) or []:
+        if not abbr:
+            continue
+        abbr_norm = reagent_tools.normalize_name(str(abbr))
+        if abbr_norm and (query_norm in abbr_norm or abbr_norm in query_norm):
+            return True
+    return False
+
+
+def _build_reagent_info(entry: Dict[str, Any], role: str, match_kind: str) -> Dict[str, Any]:
+    abbr = None
+    abbreviations = entry.get("abbreviation") or []
+    if isinstance(abbreviations, list) and abbreviations:
+        abbr = abbreviations[0]
+    elif isinstance(abbreviations, str):
+        abbr = abbreviations
+    return {
+        "name": entry.get("name"),
+        "type": role,
+        "cas": entry.get("cas"),
+        "abbreviation": abbr,
+        "smiles": entry.get("smiles"),
+        "inchi_key": entry.get("inchi_key"),
+        "aliases": entry.get("aliases", []),
+        "roles": entry.get("roles", {}),
+        "properties": entry.get("properties", {}),
+        "found": True,
+        "match_kind": match_kind,
+    }
+
+
 def _resolve_hte_inputs(
     reaction_smiles: Optional[str],
     reactant_a_smiles: Optional[str],
@@ -829,6 +890,18 @@ def hte_recommend_conditions(
             use_spectator_groups=use_spectator_groups,
         )
         payload = _to_jsonable(result)
+        payload["diagnostics"] = {
+            "reactant_a_type": result.reactant_a_type,
+            "reactant_b_type": result.reactant_b_type,
+            "reactant_a_category": result.reactant_a_category,
+            "reactant_b_category": result.reactant_b_category,
+            "matched_motifs": result.matched_motifs,
+            "predicted_reaction_type": result.predicted_reaction_type,
+            "reaction_type_confidence": result.reaction_type_confidence,
+            "total_matching_experiments": result.total_matching_experiments,
+            "database_coverage": result.database_coverage,
+            "is_fallback_match": result.is_fallback_match,
+        }
         payload["hte_stats"] = recommender.get_statistics()
         payload["input"] = {
             "reaction_smiles": reaction_smiles,
@@ -873,9 +946,28 @@ def reagent_lookup(
         if not query:
             return _error_response("Reagent lookup requires a non-empty query.")
 
+        query_norm = reagent_tools.normalize_name(query)
+        roles = _canonical_reagent_roles() or reagent_tools.get_all_reagent_types()
+
+        def search_role(role_name: str, allow_partial: bool) -> Optional[Dict[str, Any]]:
+            db = reagent_tools.load_reagent_database(role_name)
+            for entry in db:
+                if not isinstance(entry, dict):
+                    continue
+                if _is_reagent_exact_match(query_norm, entry):
+                    return _build_reagent_info(entry, role_name, "exact")
+            if not allow_partial:
+                return None
+            for entry in db:
+                if not isinstance(entry, dict):
+                    continue
+                if _is_reagent_partial_match(query_norm, entry):
+                    return _build_reagent_info(entry, role_name, "partial")
+            return None
+
         if role:
-            info = reagent_tools.enrich_reagent_info(query, role)
-            matches = [info] if info.get("found") else []
+            match = search_role(role, allow_partial=True)
+            matches = [match] if match else []
             return _success_response({
                 "query": query,
                 "role": role,
@@ -883,22 +975,30 @@ def reagent_lookup(
                 "searched_roles": [role],
             })
 
-        types = _canonical_reagent_roles() or reagent_tools.get_all_reagent_types()
         matches: List[Dict[str, Any]] = []
-        for reagent_type in types:
-            info = reagent_tools.enrich_reagent_info(query, reagent_type)
-            if not info.get("found"):
-                continue
-            matches.append(info)
-            if not include_all:
-                break
-            if len(matches) >= max_results:
-                break
+        for reagent_type in roles:
+            match = search_role(reagent_type, allow_partial=False)
+            if match:
+                matches.append(match)
+                if not include_all:
+                    break
+                if len(matches) >= max_results:
+                    break
+
+        if not matches:
+            for reagent_type in roles:
+                match = search_role(reagent_type, allow_partial=True)
+                if match:
+                    matches.append(match)
+                    if not include_all:
+                        break
+                    if len(matches) >= max_results:
+                        break
 
         return _success_response({
             "query": query,
             "matches": matches,
-            "searched_roles": types,
+            "searched_roles": roles,
         })
     except Exception as exc:
         return _error_response("Reagent lookup failed.", {"details": str(exc)})
