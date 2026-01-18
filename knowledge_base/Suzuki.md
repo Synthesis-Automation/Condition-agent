@@ -118,4 +118,5 @@ Notes:
 
 ## References
 
-- AbbVie HTE SI: "The Design and Implementation of a High Throughput Experimentation Platform to Accelerate Drug Discovery" (Tables S1-S3).
+- doi: 10.1021/acs.jmedchem.5c00814
+    AbbVie HTE SI: "The Design and Implementation of a High Throughput Experimentation Platform to Accelerate Drug Discovery" (Tables S1-S3).
