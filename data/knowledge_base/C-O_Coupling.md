@@ -42,4 +42,4 @@ Notes:
 
 ## References
 
-- doi: 10.1021/acs.jmedchem.5c00814 ;AbbVie HTE Perspective (Table 5) from `AbbVie-HTE.pdf`.
+- doi: 10.1021/acs.jmedchem.5c00814 ;AbbVie HTE Perspective (Table 5).
