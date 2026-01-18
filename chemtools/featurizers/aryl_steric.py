@@ -65,7 +65,7 @@ def analyze_aryl_steric(
     ortho_substituent_count = sum(1 for entry in ortho_entries if entry.get("bulk", 0) > 0)
 
     if scaffold_score < 1.0:
-        desc = "no steric"
+        desc = "mild steric" if ortho_substituent_count > 0 else "no steric"
     elif scaffold_score < 3.0:
         desc = "moderately steric"
     else:

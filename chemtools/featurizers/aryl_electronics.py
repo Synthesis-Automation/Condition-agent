@@ -11,8 +11,27 @@ from chemtools.util.smarts_cache import compile_smarts
 
 _ELECTRONICS_METHOD = "tag_weighted_v1"
 _ELECTRONIC_GROUP_IDS = [
-    "NO2", "CN", "CHO", "CO2R", "CO2H", "CONHR",
-    "NR2", "NHR", "NH2", "OR", "OH", "F", "Cl", "Br", "I"
+    "NO2",
+    "CN",
+    "CHO",
+    "CO2R",
+    "CO2H",
+    "CONHR",
+    "NR2",
+    "NHR",
+    "NH2",
+    "OR",
+    "OH",
+    "F",
+    "Cl",
+    "Br",
+    "I",
+    "Alkyl_Subst",
+    "CH3",
+    "Alkyl",
+    "RCH2",
+    "R2CH",
+    "R3C",
 ]
 _WEIGHTS = {"ortho": 1.0, "meta": 0.6, "para": 1.2, "ipso": 1.0}
 _STRENGTHS = {
@@ -40,6 +59,12 @@ _GROUP_STRENGTH_MAP = {
     "NH2": "edg_strong",
     "OR": "edg_moderate",
     "OH": "edg_moderate",
+    "Alkyl_Subst": "edg_weak",
+    "CH3": "edg_weak",
+    "Alkyl": "edg_weak",
+    "RCH2": "edg_weak",
+    "R2CH": "edg_weak",
+    "R3C": "edg_weak",
 }
 
 
@@ -99,19 +124,7 @@ def analyze_aryl_electronics(
     )
     scaffold_score = _clamp(round(5.0 + scaffold_sum, 1), 0.0, 10.0)
 
-    if scaffold_score > 5.2:
-        desc = "electron poor"
-    elif scaffold_score < 4.8:
-        desc = "electron rich"
-    else:
-        desc = "neutral"
-
-    result: Dict[str, Any] = {
-        "score_0_10": scaffold_score,
-        "description": desc,
-        "method": _ELECTRONICS_METHOD,
-    }
-
+    include_score = None
     if include_ipso_group:
         include_sum, include_contrib = _compute_electronics(
             mol,
@@ -124,6 +137,22 @@ def analyze_aryl_electronics(
             include_ipso_group=True,
         )
         include_score = _clamp(round(5.0 + include_sum, 1), 0.0, 10.0)
+
+    desc_score = include_score if include_score is not None else scaffold_score
+    if desc_score > 5.2:
+        desc = "electron poor"
+    elif desc_score < 4.8:
+        desc = "electron rich"
+    else:
+        desc = "neutral"
+
+    result: Dict[str, Any] = {
+        "score_0_10": scaffold_score,
+        "description": desc,
+        "method": _ELECTRONICS_METHOD,
+    }
+
+    if include_score is not None:
         result["including_group_score_0_10"] = include_score
 
     if include_details:

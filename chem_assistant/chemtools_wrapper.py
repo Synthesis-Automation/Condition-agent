@@ -316,6 +316,26 @@ class HTEStatsInput(BaseModel):
     )
 
 
+class RagSearchInput(BaseModel):
+    """Schema for knowledge base RAG search."""
+
+    query: str = Field(..., description="Natural language query to search.")
+    top_k: int = Field(3, ge=1, le=10, description="Number of results to return.")
+    root: Optional[str] = Field(
+        None, description="Optional knowledge base root path override."
+    )
+    include_text: bool = Field(True, description="Include chunk text in results.")
+    max_chars: int = Field(
+        1200, ge=200, le=5000, description="Max characters per chunk text."
+    )
+    chunk_size: int = Field(
+        300, ge=50, le=800, description="Approximate words per chunk."
+    )
+    chunk_overlap: int = Field(
+        40, ge=0, le=200, description="Approximate overlap between chunks."
+    )
+
+
 # ============================================================================
 # Analysis tools
 # ============================================================================
@@ -760,6 +780,38 @@ def hte_database_stats(hte_db_path: Optional[str] = None) -> Dict[str, Any]:
 
 
 # ============================================================================
+# RAG tools
+# ============================================================================
+
+@tool(args_schema=RagSearchInput)
+def rag_search(
+    query: str,
+    top_k: int = 3,
+    root: Optional[str] = None,
+    include_text: bool = True,
+    max_chars: int = 1200,
+    chunk_size: int = 300,
+    chunk_overlap: int = 40,
+) -> Dict[str, Any]:
+    """Search the curated knowledge base for relevant snippets."""
+    try:
+        from chem_assistant.rag import search_knowledge_base
+
+        payload = search_knowledge_base(
+            query,
+            top_k=top_k,
+            root=root,
+            include_text=include_text,
+            max_chars=max_chars,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+        )
+        return _success_response(payload)
+    except Exception as exc:
+        return _error_response("RAG search failed.", {"details": str(exc)})
+
+
+# ============================================================================
 # Tool registry and helpers
 # ============================================================================
 
@@ -797,6 +849,8 @@ CHEMTOOLS_TOOLS = [
     # HTE recommendations
     hte_recommend_conditions,
     hte_database_stats,
+    # RAG
+    rag_search,
 ]
 
 

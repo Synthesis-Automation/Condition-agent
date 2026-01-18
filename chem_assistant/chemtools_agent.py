@@ -2,13 +2,15 @@
 LangGraph agent for ChemTools featurization and analysis.
 """
 
+import json
 import os
 import re
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
 
 from .chemtools_wrapper import CHEMTOOLS_TOOLS
 
@@ -111,6 +113,14 @@ You have access to the following tools (featurization/analysis only):
 - calculable_classify_reactant_smiles: calculable-based reactant classification
 - hte_recommend_conditions: HTE-based condition recommendations
 - hte_database_stats: HTE database summary statistics
+- rag_search: retrieve curated knowledge base snippets (RAG)
+
+Workflow (stepwise, always follow):
+1) Identify the task type and required inputs.
+2) Call the minimum necessary tools. Do not guess tool outputs.
+3) Extract evidence from tool outputs (fields + metrics + provenance).
+4) Respond with evidence first, then interpretations tied to the evidence.
+5) If inputs are missing, ask for them explicitly and stop.
 
 Tool selection rubric:
 - Molecule question -> unified_featurize_molecule first. Add motif_featurize_molecule or calculable_* only if asked.
@@ -121,6 +131,7 @@ Tool selection rubric:
 - Only use detection_* tools when the user asks for reaction typing without full featurization.
 - HTE data or condition screening -> hte_recommend_conditions (use reaction_smiles when available).
 - HTE database questions -> hte_database_stats.
+- If the user asks for specific protocols, rules, or literature-style guidance, call rag_search and cite the snippets.
 
 Consistency checks for reactions:
 - Compare unified_featurize_reaction.reaction.reaction_type with analysis_analyze_reaction.family.canonical_id.
@@ -128,20 +139,67 @@ Consistency checks for reactions:
 
 Response templates:
 - Molecule:
+  - Evidence: list tool fields + values used (cite tool name)
   - Input: <smiles>
   - Highlights: motifs, nearby groups, key RDKit props
   - Workflow: render workflow.steps from the tool output in order with data (no paraphrasing)
   - Notes: any errors or assumptions
 - Reaction:
+  - Evidence: list tool fields + values used (cite tool name)
   - Input: <reaction_smiles>
   - Type: unified reaction_type + analysis family (and confidence)
   - Reactants: key roles or categories
   - Aggregates: max steric/electronic summary
   - Notes: disagreements or edge cases
 - Pair:
+  - Evidence: list tool fields + values used (cite tool name)
   - Input: electrophile + nucleophile
   - Pair features: LG, nuc_class, sterics
   - Flags: any key tags or calculable signals
+
+Condition recommendations (HTE) output MUST be structured JSON only (no extra text).
+Use this Pydantic response format and populate only from tool outputs:
+
+class ConditionEvidence(BaseModel):
+    source: str  # "hte_recommend_conditions"
+    reaction_smiles: Optional[str]
+    reactant_a_smiles: Optional[str]
+    reactant_b_smiles: Optional[str]
+    product_smiles: Optional[str]
+    predicted_reaction_type: Optional[str]
+    reaction_type_confidence: float
+    total_matching_experiments: int
+    database_coverage: float
+    is_fallback_match: bool
+    matched_motifs: Optional[List[str]]
+
+class ConditionRecommendationItem(BaseModel):
+    rank: int
+    catalyst: str
+    ligand: str
+    base: str
+    solvent: str
+    secondary_solvent: Optional[str]
+    additive: Optional[str]
+    coupling_reagent: Optional[str]
+    success_rate: float
+    avg_yield: float
+    median_yield: float
+    num_experiments: int
+    avg_z_score: float
+    confidence_score: float
+    match_score: float
+    reaction_type: Optional[str]
+    reaction_category: Optional[str]
+    reaction_id: Optional[str]
+    reactant_types: List[str]
+    z_score_range: List[float]
+
+class ConditionRecommendationResponse(BaseModel):
+    query: str
+    evidence: ConditionEvidence
+    recommendations: List[ConditionRecommendationItem]
+    warnings: List[str]
 
 Guidelines:
 - Use unified_featurize_molecule/reaction as the primary entry points.
@@ -150,6 +208,204 @@ Guidelines:
 - Keep answers concise and focused on the analysis output.
 - When workflow.steps is available, output it with the actual data (or a clearly labeled, truncated subset). Do not narrate or invent details.
 """
+
+
+class ConditionEvidence(BaseModel):
+    """Structured evidence for HTE condition recommendations."""
+
+    source: str = Field(default="hte_recommend_conditions")
+    reaction_smiles: Optional[str] = None
+    reactant_a_smiles: Optional[str] = None
+    reactant_b_smiles: Optional[str] = None
+    product_smiles: Optional[str] = None
+    predicted_reaction_type: Optional[str] = None
+    reaction_type_confidence: float = 0.0
+    total_matching_experiments: int = 0
+    database_coverage: float = 0.0
+    is_fallback_match: bool = False
+    matched_motifs: Optional[List[str]] = None
+
+
+class ConditionRecommendationItem(BaseModel):
+    """Structured single-condition recommendation."""
+
+    rank: int
+    catalyst: str
+    ligand: str
+    base: str
+    solvent: str
+    secondary_solvent: Optional[str] = None
+    additive: Optional[str] = None
+    coupling_reagent: Optional[str] = None
+    success_rate: float = 0.0
+    avg_yield: float = 0.0
+    median_yield: float = 0.0
+    num_experiments: int = 0
+    avg_z_score: float = 0.0
+    confidence_score: float = 0.0
+    match_score: float = 0.0
+    reaction_type: Optional[str] = None
+    reaction_category: Optional[str] = None
+    reaction_id: Optional[str] = None
+    reactant_types: List[str] = Field(default_factory=list)
+    z_score_range: List[float] = Field(default_factory=list)
+
+
+class ConditionRecommendationResponse(BaseModel):
+    """Structured response for HTE condition recommendations."""
+
+    query: str
+    evidence: ConditionEvidence
+    recommendations: List[ConditionRecommendationItem] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)
+
+
+def _safe_json_loads(value: str) -> Optional[Dict[str, Any]]:
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return None
+
+
+def _coerce_list(value: Any) -> List[Any]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return list(value)
+    return [value]
+
+
+def _to_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _to_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _extract_tool_payload(
+    messages: List[BaseMessage],
+    tool_name: str,
+) -> Optional[Dict[str, Any]]:
+    call_map: Dict[str, str] = {}
+    for message in messages:
+        if isinstance(message, AIMessage):
+            for call in getattr(message, "tool_calls", []) or []:
+                call_id = call.get("id") or call.get("tool_call_id")
+                name = call.get("name")
+                if call_id and name:
+                    call_map[str(call_id)] = name
+
+    for message in reversed(messages):
+        tool_call_id = getattr(message, "tool_call_id", None)
+        if not tool_call_id:
+            continue
+        if call_map.get(str(tool_call_id)) != tool_name:
+            continue
+        artifact = getattr(message, "artifact", None)
+        if isinstance(artifact, dict):
+            return artifact
+        content = getattr(message, "content", None)
+        if isinstance(content, dict):
+            return content
+        if isinstance(content, list):
+            if len(content) == 1 and isinstance(content[0], dict):
+                return content[0]
+            joined = "".join(str(item) for item in content)
+            payload = _safe_json_loads(joined)
+            if payload is not None:
+                return payload
+        if isinstance(content, str):
+            payload = _safe_json_loads(content)
+            if payload is not None:
+                return payload
+    return None
+
+
+def _build_condition_response(
+    query: str,
+    tool_payload: Dict[str, Any],
+) -> ConditionRecommendationResponse:
+    warnings: List[str] = []
+    success = bool(tool_payload.get("success", True))
+    if not success:
+        error = tool_payload.get("error") or {}
+        detail = error.get("details") if isinstance(error, dict) else None
+        warnings.append("hte_recommend_conditions failed.")
+        if detail:
+            warnings.append(str(detail))
+
+    input_block = tool_payload.get("input") or {}
+    evidence = ConditionEvidence(
+        reaction_smiles=input_block.get("reaction_smiles"),
+        reactant_a_smiles=input_block.get("reactant_a_smiles")
+        or tool_payload.get("reactant_a_smiles"),
+        reactant_b_smiles=input_block.get("reactant_b_smiles")
+        or tool_payload.get("reactant_b_smiles"),
+        product_smiles=input_block.get("product_smiles")
+        or tool_payload.get("product_smiles"),
+        predicted_reaction_type=tool_payload.get("predicted_reaction_type"),
+        reaction_type_confidence=_to_float(
+            tool_payload.get("reaction_type_confidence"), 0.0
+        ),
+        total_matching_experiments=_to_int(
+            tool_payload.get("total_matching_experiments"), 0
+        ),
+        database_coverage=_to_float(tool_payload.get("database_coverage"), 0.0),
+        is_fallback_match=bool(tool_payload.get("is_fallback_match", False)),
+        matched_motifs=[str(v) for v in _coerce_list(tool_payload.get("matched_motifs"))]
+        or None,
+    )
+
+    if evidence.is_fallback_match:
+        warnings.append("Fallback match used; similarity may be weak.")
+
+    recommendations: List[ConditionRecommendationItem] = []
+    for idx, rec in enumerate(_coerce_list(tool_payload.get("recommendations")), start=1):
+        if not isinstance(rec, dict):
+            continue
+        recommendations.append(
+            ConditionRecommendationItem(
+                rank=idx,
+                catalyst=str(rec.get("catalyst") or ""),
+                ligand=str(rec.get("ligand") or ""),
+                base=str(rec.get("base") or ""),
+                solvent=str(rec.get("solvent") or ""),
+                secondary_solvent=rec.get("secondary_solvent") or None,
+                additive=rec.get("additive") or None,
+                coupling_reagent=rec.get("coupling_reagent") or None,
+                success_rate=_to_float(rec.get("success_rate"), 0.0),
+                avg_yield=_to_float(rec.get("avg_yield"), 0.0),
+                median_yield=_to_float(rec.get("median_yield"), 0.0),
+                num_experiments=_to_int(rec.get("num_experiments"), 0),
+                avg_z_score=_to_float(rec.get("avg_z_score"), 0.0),
+                confidence_score=_to_float(rec.get("confidence_score"), 0.0),
+                match_score=_to_float(rec.get("match_score"), 0.0),
+                reaction_type=rec.get("reaction_type"),
+                reaction_category=rec.get("reaction_category"),
+                reaction_id=rec.get("reaction_id"),
+                reactant_types=[str(v) for v in _coerce_list(rec.get("reactant_types"))],
+                z_score_range=[
+                    _to_float(v, 0.0) for v in _coerce_list(rec.get("z_score_range"))
+                ],
+            )
+        )
+
+    if not recommendations:
+        warnings.append("No condition recommendations returned.")
+
+    return ConditionRecommendationResponse(
+        query=query,
+        evidence=evidence,
+        recommendations=recommendations,
+        warnings=warnings,
+    )
 
 
 class ChemToolsAgent:
@@ -193,6 +449,12 @@ class ChemToolsAgent:
                 {"messages": messages},
                 config={"recursion_limit": recursion_limit},
             )
+            structured_payload = _extract_tool_payload(
+                result.get("messages", []), "hte_recommend_conditions"
+            )
+            if structured_payload is not None:
+                structured_response = _build_condition_response(query, structured_payload)
+                return structured_response.model_dump_json(indent=2)
             final_message = result["messages"][-1]
             if isinstance(final_message, AIMessage):
                 return final_message.content

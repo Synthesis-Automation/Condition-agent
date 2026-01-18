@@ -1,0 +1,5 @@
+{"query": "Top Suzuki conditions for 6-membered aryl halides in HTE?", "expected_doc": "knowledge_base/Suzuki.md", "expected_tags": ["Suzuki"]}
+{"query": "Suzuki solvent trend from AbbVie HTE SI", "expected_doc": "knowledge_base/Suzuki.md", "expected_tags": ["Suzuki"]}
+{"query": "C-N coupling success rate in AbbVie HTE SI", "expected_doc": "knowledge_base/Buchward-C-N.md", "expected_tags": ["C-N"]}
+{"query": "Top C-N coupling conditions for 5-membered heterocyclic halides", "expected_doc": "knowledge_base/Buchward-C-N.md", "expected_tags": ["Buchwald"]}
+{"query": "Buchwald-Hartwig base and solvent guidance", "expected_doc": "knowledge_base/Buchward-C-N.md", "expected_tags": ["C-N"]}

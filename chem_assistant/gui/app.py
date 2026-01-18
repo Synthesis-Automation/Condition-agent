@@ -49,10 +49,17 @@ def main() -> None:
         from chem_assistant.chemtools_wrapper import CHEMTOOLS_TOOLS
 
         tool_names = {tool.name for tool in CHEMTOOLS_TOOLS}
-        hte_status = "HTE tools: ready" if "hte_recommend_conditions" in tool_names else "HTE tools: missing"
+        hte_status = (
+            "HTE tools: ready"
+            if "hte_recommend_conditions" in tool_names
+            else "HTE tools: missing"
+        )
         startup_parts.append(hte_status)
+        kb_root = Path(__file__).resolve().parents[2] / "knowledge_base"
+        rag_ready = "rag_search" in tool_names and kb_root.exists()
+        startup_parts.append("RAG KB: ready" if rag_ready else "RAG KB: missing")
     except Exception as exc:
-        startup_parts.append(f"HTE tools unavailable: {exc}")
+        startup_parts.append(f"Agent tools unavailable: {exc}")
 
     startup_message = " | ".join(startup_parts).strip() or None
     window = ChemAssistantWindow(startup_message=startup_message)
