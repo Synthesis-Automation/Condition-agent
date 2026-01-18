@@ -39,7 +39,7 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - Calculable: feature tokens for reactant types
 - HTE: condition recommendations from the HTE database
 - Reagents: lookup and inventory from the reagent registry
-- RAG: knowledge base snippets from `knowledge_base/`
+- RAG: knowledge base snippets from `data/knowledge_base/`
 
 ## Notes
 

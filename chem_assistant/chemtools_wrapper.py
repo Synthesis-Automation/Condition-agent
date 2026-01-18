@@ -472,6 +472,16 @@ class RagSearchInput(BaseModel):
     )
 
 
+class KBConditionSearchInput(BaseModel):
+    """Schema for knowledge base condition summaries."""
+
+    query: str = Field(..., description="Natural language query to match summary tables.")
+    top_k: int = Field(5, ge=1, le=20, description="Number of condition rows to return.")
+    root: Optional[str] = Field(
+        None, description="Optional knowledge base root path override."
+    )
+
+
 # ============================================================================
 # Analysis tools
 # ============================================================================
@@ -1090,6 +1100,28 @@ def reagent_list_by_family(
 # RAG tools
 # ============================================================================
 
+@tool(args_schema=KBConditionSearchInput)
+def kb_recommend_conditions(
+    query: str,
+    top_k: int = 5,
+    root: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Return condition summary rows extracted from the knowledge base."""
+    try:
+        from chem_assistant.kb_conditions import search_condition_summaries
+
+        payload = search_condition_summaries(
+            query,
+            top_k=top_k,
+            root=root,
+        )
+        return _success_response(payload)
+    except Exception as exc:
+        return _error_response(
+            "Knowledge base condition lookup failed.", {"details": str(exc)}
+        )
+
+
 @tool(args_schema=RagSearchInput)
 def rag_search(
     query: str,
@@ -1163,6 +1195,7 @@ CHEMTOOLS_TOOLS = [
     reagent_list_by_family,
     # RAG
     rag_search,
+    kb_recommend_conditions,
 ]
 
 

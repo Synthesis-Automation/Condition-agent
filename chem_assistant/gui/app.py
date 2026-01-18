@@ -55,7 +55,7 @@ def main() -> None:
             else "HTE tools: missing"
         )
         startup_parts.append(hte_status)
-        kb_root = Path(__file__).resolve().parents[2] / "knowledge_base"
+        kb_root = Path(__file__).resolve().parents[2] / "data" / "knowledge_base"
         rag_ready = "rag_search" in tool_names and kb_root.exists()
         startup_parts.append("RAG KB: ready" if rag_ready else "RAG KB: missing")
     except Exception as exc:

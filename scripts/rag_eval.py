@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Lightweight RAG evaluation against knowledge_base chunks.
+Lightweight RAG evaluation against data/knowledge_base chunks.
 """
 
 from __future__ import annotations
@@ -49,12 +49,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Evaluate simple RAG retrieval.")
     parser.add_argument(
         "--root",
-        default="knowledge_base",
+        default="data/knowledge_base",
         help="Knowledge base root folder.",
     )
     parser.add_argument(
         "--queries",
-        default="knowledge_base/eval_queries.jsonl",
+        default="data/knowledge_base/eval_queries.jsonl",
         help="Path to JSONL queries file.",
     )
     parser.add_argument(

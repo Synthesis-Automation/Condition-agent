@@ -118,6 +118,7 @@ You have access to the following tools (featurization/analysis/reagent registry)
 - reagent_list_by_role: list reagents for a role (supports limit)
 - reagent_list_by_family: list reagents for a role/family
 - rag_search: retrieve curated knowledge base snippets (RAG)
+- kb_recommend_conditions: extract summary condition tables from the knowledge base
 
 Workflow (stepwise, always follow):
 1) Identify the task type and required inputs.
@@ -139,6 +140,7 @@ Tool selection rubric:
 - Reagent inventory -> reagent_list_roles or reagent_list_by_role.
 - Reagent family queries -> reagent_list_by_family.
 - If the user asks for specific protocols, rules, or literature-style guidance, call rag_search and cite the snippets.
+- If the user asks for condition summaries or top conditions, call kb_recommend_conditions.
 
 HTE explanation guidance:
 - If asked to explain why conditions were chosen, cite the HTE metrics (avg_z_score, match_score, num_experiments).
@@ -217,6 +219,7 @@ class ConditionRecommendationResponse(BaseModel):
     query: str
     evidence: ConditionEvidence
     recommendations: List[ConditionRecommendationItem]
+    knowledge_base: List["KBConditionItem"]
     warnings: List[str]
 
 Guidelines:
@@ -269,12 +272,37 @@ class ConditionRecommendationItem(BaseModel):
     z_score_range: List[float] = Field(default_factory=list)
 
 
+class KBConditionItem(BaseModel):
+    """Knowledge base condition summary row."""
+
+    rank: int
+    context: str = ""
+    catalyst: str = ""
+    ligand: str = ""
+    base: str = ""
+    solvent: str = ""
+    secondary_solvent: Optional[str] = None
+    additive: Optional[str] = None
+    coupling_reagent: Optional[str] = None
+    temperature_c: Optional[str] = None
+    time_h: Optional[str] = None
+    notes: Optional[str] = None
+    reaction_id: Optional[str] = None
+    reaction_type: Optional[str] = None
+    score: float = 0.0
+    source_doc: Optional[str] = None
+    source_path: Optional[str] = None
+    tags: List[str] = Field(default_factory=list)
+    extras: Dict[str, str] = Field(default_factory=dict)
+
+
 class ConditionRecommendationResponse(BaseModel):
     """Structured response for HTE condition recommendations."""
 
     query: str
     evidence: ConditionEvidence
     recommendations: List[ConditionRecommendationItem] = Field(default_factory=list)
+    knowledge_base: List[KBConditionItem] = Field(default_factory=list)
     warnings: List[str] = Field(default_factory=list)
 
 
@@ -369,6 +397,7 @@ def _extract_tool_payload(
 def _build_condition_response(
     query: str,
     tool_payload: Dict[str, Any],
+    kb_payload: Optional[Dict[str, Any]] = None,
 ) -> ConditionRecommendationResponse:
     warnings: List[str] = []
     success = bool(tool_payload.get("success", True))
@@ -467,10 +496,45 @@ def _build_condition_response(
                 "Reactant motifs could not be detected; verify SMILES or provide neutral forms."
             )
 
+    knowledge_base: List[KBConditionItem] = []
+    if kb_payload:
+        kb_success = bool(kb_payload.get("success", True))
+        if not kb_success:
+            warnings.append("kb_recommend_conditions failed.")
+        for item in _coerce_list(kb_payload.get("results")):
+            if not isinstance(item, dict):
+                continue
+            condition = item.get("condition") or {}
+            extras = item.get("extras") or {}
+            knowledge_base.append(
+                KBConditionItem(
+                    rank=_to_int(item.get("rank"), len(knowledge_base) + 1),
+                    context=str(item.get("context") or ""),
+                    catalyst=str(condition.get("catalyst") or ""),
+                    ligand=str(condition.get("ligand") or ""),
+                    base=str(condition.get("base") or ""),
+                    solvent=str(condition.get("solvent") or ""),
+                    secondary_solvent=condition.get("secondary_solvent") or None,
+                    additive=condition.get("additive") or None,
+                    coupling_reagent=condition.get("coupling_reagent") or None,
+                    temperature_c=condition.get("temperature_c") or None,
+                    time_h=condition.get("time_h") or None,
+                    notes=condition.get("notes") or None,
+                    reaction_id=condition.get("reaction_id") or None,
+                    reaction_type=condition.get("reaction_type") or None,
+                    score=_to_float(item.get("score"), 0.0),
+                    source_doc=str(item.get("doc_id") or ""),
+                    source_path=str(item.get("path") or ""),
+                    tags=[str(tag) for tag in _coerce_list(item.get("tags"))],
+                    extras={str(k): str(v) for k, v in extras.items()},
+                )
+            )
+
     return ConditionRecommendationResponse(
         query=query,
         evidence=evidence,
         recommendations=recommendations,
+        knowledge_base=knowledge_base,
         warnings=warnings,
     )
 
@@ -529,6 +593,21 @@ def _format_condition_summary(response: ConditionRecommendationResponse) -> str:
 
     if not response.recommendations:
         lines.append("No condition recommendations available.")
+        if not response.knowledge_base:
+            return "\n".join(lines)
+        lines.append("")
+        lines.append("**Knowledge Base Summaries**")
+        for item in response.knowledge_base:
+            lines.append(f"- {item.context or 'summary'}")
+            lines.append(
+                "  "
+                f"Catalyst={item.catalyst or 'n/a'}; "
+                f"Ligand={item.ligand or 'n/a'}; "
+                f"Base={item.base or 'n/a'}; "
+                f"Solvent={item.solvent or 'n/a'}"
+            )
+            if item.notes:
+                lines.append(f"  Notes: {item.notes}")
         return "\n".join(lines)
 
     lines.append("Conditions:")
@@ -558,6 +637,27 @@ def _format_condition_summary(response: ConditionRecommendationResponse) -> str:
         lines.append(f"- solvent: {_format_reagent_detail(rec.solvent, 'solvent')}")
         lines.append(f"- additive: {_format_reagent_detail(rec.additive or '', 'additive')}")
         lines.append(f"- coupling reagent: {_format_reagent_detail(rec.coupling_reagent or '', 'other_reagent')}")
+
+    if response.knowledge_base:
+        lines.append("")
+        lines.append("**Knowledge Base Summaries**")
+        for item in response.knowledge_base:
+            lines.append(f"- {item.context or 'summary'}")
+            lines.append(
+                "  "
+                f"Catalyst={item.catalyst or 'n/a'}; "
+                f"Ligand={item.ligand or 'n/a'}; "
+                f"Base={item.base or 'n/a'}; "
+                f"Solvent={item.solvent or 'n/a'}"
+            )
+            if item.temperature_c or item.time_h:
+                lines.append(
+                    "  "
+                    f"Temp={item.temperature_c or 'n/a'}; "
+                    f"Time={item.time_h or 'n/a'}"
+                )
+            if item.notes:
+                lines.append(f"  Notes: {item.notes}")
 
     return "\n".join(lines)
 

@@ -78,4 +78,4 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - RDKit is required for SMARTS-driven detection and descriptor computation.
 - This package focuses on featurization/analysis; protocol tools remain out of scope.
 - HTE recommendation tools are available when the HTE database is present.
-- RAG search reads curated notes from `knowledge_base/`.
+- RAG search reads curated notes from `data/knowledge_base/`.

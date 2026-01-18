@@ -2,7 +2,7 @@
 """
 Index the curated knowledge base folder for RAG.
 
-This script reads files under knowledge_base/ and emits a lightweight JSON
+This script reads files under data/knowledge_base/ and emits a lightweight JSON
 summary for downstream retrieval pipelines.
 """
 
@@ -198,11 +198,11 @@ def build_index(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Index knowledge_base folder.")
+    parser = argparse.ArgumentParser(description="Index data/knowledge_base folder.")
     parser.add_argument(
         "--root",
-        default="knowledge_base",
-        help="Root folder to index (default: knowledge_base).",
+        default="data/knowledge_base",
+        help="Root folder to index (default: data/knowledge_base).",
     )
     parser.add_argument(
         "--out",

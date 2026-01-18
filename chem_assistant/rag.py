@@ -1,5 +1,5 @@
 """
-Lightweight RAG utilities over the curated knowledge_base folder.
+Lightweight RAG utilities over the curated data/knowledge_base folder.
 """
 
 from __future__ import annotations
@@ -113,7 +113,7 @@ def search_knowledge_base(
         return {"query": query, "results": []}
 
     repo_root = Path(__file__).resolve().parents[1]
-    kb_root = Path(root) if root else (repo_root / "knowledge_base")
+    kb_root = Path(root) if root else (repo_root / "data" / "knowledge_base")
     if not kb_root.exists():
         raise FileNotFoundError(f"Knowledge base not found: {kb_root}")
 
