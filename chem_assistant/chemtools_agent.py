@@ -1,5 +1,5 @@
 """
-LangGraph agent for ChemTools featurization and analysis.
+LangGraph agent for ChemTools featurization, analysis, and reagent registry access.
 """
 
 import json
@@ -80,7 +80,7 @@ def get_llm_client(
 
 CHEMISTRY_SYSTEM_PROMPT = """You are ChemBot, an expert chemistry assistant focused on featurization and analysis.
 
-You have access to the following tools (featurization/analysis only):
+You have access to the following tools (featurization/analysis/reagent registry):
 
 - analysis_normalize_smiles: normalize SMILES strings
 - analysis_normalize_reaction: normalize reaction SMILES
@@ -113,6 +113,10 @@ You have access to the following tools (featurization/analysis only):
 - calculable_classify_reactant_smiles: calculable-based reactant classification
 - hte_recommend_conditions: HTE-based condition recommendations
 - hte_database_stats: HTE database summary statistics
+- reagent_lookup: lookup reagent by name, abbreviation, or CAS
+- reagent_list_roles: list available reagent roles (with counts)
+- reagent_list_by_role: list reagents for a role (supports limit)
+- reagent_list_by_family: list reagents for a role/family
 - rag_search: retrieve curated knowledge base snippets (RAG)
 
 Workflow (stepwise, always follow):
@@ -131,7 +135,15 @@ Tool selection rubric:
 - Only use detection_* tools when the user asks for reaction typing without full featurization.
 - HTE data or condition screening -> hte_recommend_conditions (use reaction_smiles when available).
 - HTE database questions -> hte_database_stats.
+- Reagent lookup or validation -> reagent_lookup (optionally set role or include_all).
+- Reagent inventory -> reagent_list_roles or reagent_list_by_role.
+- Reagent family queries -> reagent_list_by_family.
 - If the user asks for specific protocols, rules, or literature-style guidance, call rag_search and cite the snippets.
+
+HTE explanation guidance:
+- If asked to explain why conditions were chosen, cite the HTE metrics (avg_z_score, match_score, num_experiments).
+- If no recommendations were returned, explain that no HTE matches exist and cite diagnostics
+  (reactant types/categories, matched motifs, database coverage) plus next steps.
 
 Consistency checks for reactions:
 - Compare unified_featurize_reaction.reaction.reaction_type with analysis_analyze_reaction.family.canonical_id.
@@ -156,9 +168,15 @@ Response templates:
   - Input: electrophile + nucleophile
   - Pair features: LG, nuc_class, sterics
   - Flags: any key tags or calculable signals
+- Reagent:
+  - Evidence: list tool fields + values used (cite tool name)
+  - Query: <name or CAS>
+  - Result: matched role, name, CAS, and key fields
+  - Notes: multiple matches or missing entries
 
-Condition recommendations (HTE) output MUST be structured JSON only (no extra text).
-Use this Pydantic response format and populate only from tool outputs:
+Condition recommendations (HTE) output should be structured JSON by default.
+If the user explicitly asks for a human-readable summary, return a readable summary instead of JSON.
+Use this Pydantic response format and populate only from tool outputs when returning JSON:
 
 class ConditionEvidence(BaseModel):
     source: str  # "hte_recommend_conditions"
@@ -275,6 +293,26 @@ def _coerce_list(value: Any) -> List[Any]:
     return [value]
 
 
+def _wants_human_readable(query: str) -> bool:
+    text = (query or "").lower()
+    triggers = [
+        "easier to read",
+        "readable",
+        "human",
+        "explain",
+        "why",
+        "summary",
+        "format",
+        "table",
+    ]
+    return any(trigger in text for trigger in triggers)
+
+
+def _wants_json(query: str) -> bool:
+    text = (query or "").lower()
+    return "json" in text or "raw" in text
+
+
 def _to_float(value: Any, default: float = 0.0) -> float:
     try:
         return float(value)
@@ -342,6 +380,7 @@ def _build_condition_response(
             warnings.append(str(detail))
 
     input_block = tool_payload.get("input") or {}
+    diagnostics = tool_payload.get("diagnostics") or {}
     evidence = ConditionEvidence(
         reaction_smiles=input_block.get("reaction_smiles"),
         reactant_a_smiles=input_block.get("reactant_a_smiles")
@@ -350,15 +389,25 @@ def _build_condition_response(
         or tool_payload.get("reactant_b_smiles"),
         product_smiles=input_block.get("product_smiles")
         or tool_payload.get("product_smiles"),
-        predicted_reaction_type=tool_payload.get("predicted_reaction_type"),
+        predicted_reaction_type=tool_payload.get("predicted_reaction_type")
+        or diagnostics.get("predicted_reaction_type"),
         reaction_type_confidence=_to_float(
-            tool_payload.get("reaction_type_confidence"), 0.0
+            tool_payload.get("reaction_type_confidence")
+            or diagnostics.get("reaction_type_confidence"),
+            0.0,
         ),
         total_matching_experiments=_to_int(
-            tool_payload.get("total_matching_experiments"), 0
+            tool_payload.get("total_matching_experiments")
+            or diagnostics.get("total_matching_experiments"),
+            0,
         ),
-        database_coverage=_to_float(tool_payload.get("database_coverage"), 0.0),
-        is_fallback_match=bool(tool_payload.get("is_fallback_match", False)),
+        database_coverage=_to_float(
+            tool_payload.get("database_coverage") or diagnostics.get("database_coverage"),
+            0.0,
+        ),
+        is_fallback_match=bool(
+            tool_payload.get("is_fallback_match", diagnostics.get("is_fallback_match", False))
+        ),
         matched_motifs=[str(v) for v in _coerce_list(tool_payload.get("matched_motifs"))]
         or None,
     )
@@ -399,6 +448,24 @@ def _build_condition_response(
 
     if not recommendations:
         warnings.append("No condition recommendations returned.")
+        reactant_a_type = diagnostics.get("reactant_a_type") or ""
+        reactant_b_type = diagnostics.get("reactant_b_type") or ""
+        reactant_a_category = diagnostics.get("reactant_a_category") or ""
+        reactant_b_category = diagnostics.get("reactant_b_category") or ""
+        if reactant_a_type or reactant_b_type:
+            warnings.append(
+                "No HTE matches for reactant types: "
+                f"{reactant_a_type or 'unknown'} / {reactant_b_type or 'unknown'}."
+            )
+        elif reactant_a_category or reactant_b_category:
+            warnings.append(
+                "No HTE matches for reactant categories: "
+                f"{reactant_a_category or 'unknown'} / {reactant_b_category or 'unknown'}."
+            )
+        else:
+            warnings.append(
+                "Reactant motifs could not be detected; verify SMILES or provide neutral forms."
+            )
 
     return ConditionRecommendationResponse(
         query=query,
@@ -406,6 +473,93 @@ def _build_condition_response(
         recommendations=recommendations,
         warnings=warnings,
     )
+
+
+def _split_condition_items(value: Optional[str]) -> List[str]:
+    if not value:
+        return []
+    parts = re.split(r"[,/;]+", value)
+    return [part.strip() for part in parts if part and part.strip()]
+
+
+def _format_reagent_detail(name: str, role: str) -> str:
+    from chemtools import reagent as reagent_tools
+
+    if not name:
+        return "not specified"
+
+    details: List[str] = []
+    for item in _split_condition_items(name):
+        info = reagent_tools.enrich_reagent_info(item, role)
+        if not info.get("found"):
+            details.append(f"{item} (not found)")
+            continue
+        role_payload = (info.get("roles") or {}).get(role, {})
+        families = role_payload.get("families") or []
+        family_id = families[0] if families else None
+        tag = role_payload.get("tag") or None
+        pieces = [info.get("name") or item]
+        cas = info.get("cas")
+        if cas:
+            pieces.append(f"CAS {cas}")
+        if family_id:
+            pieces.append(f"family {family_id}")
+        if tag:
+            pieces.append(f"tag {tag}")
+        details.append(" | ".join(pieces))
+    return "; ".join(details) if details else "not specified"
+
+
+def _format_condition_summary(response: ConditionRecommendationResponse) -> str:
+    evidence = response.evidence
+    lines = [
+        "**HTE Conditions**",
+        f"Reaction: {evidence.reaction_smiles or 'unknown'}",
+        "Evidence:",
+        f"- predicted reaction type: {evidence.predicted_reaction_type or 'unknown'} (confidence {evidence.reaction_type_confidence:.2f})",
+        f"- matched motifs: {', '.join(evidence.matched_motifs or []) or 'none'}",
+        f"- total matching experiments: {evidence.total_matching_experiments}",
+        f"- database coverage: {evidence.database_coverage:.2f}%",
+        f"- fallback match: {'yes' if evidence.is_fallback_match else 'no'}",
+    ]
+    if response.warnings:
+        lines.append("Warnings:")
+        for warning in response.warnings:
+            lines.append(f"- {warning}")
+
+    if not response.recommendations:
+        lines.append("No condition recommendations available.")
+        return "\n".join(lines)
+
+    lines.append("Conditions:")
+    for rec in response.recommendations:
+        lines.append(f"Condition {rec.rank}:")
+        lines.append(f"Catalyst: {rec.catalyst or 'not specified'}")
+        lines.append(f"Ligand: {rec.ligand or 'not specified'}")
+        lines.append(f"Base: {rec.base or 'not specified'}")
+        lines.append(f"Solvent: {rec.solvent or 'not specified'}")
+        lines.append(f"Secondary solvent: {rec.secondary_solvent or 'not specified'}")
+        lines.append(f"Additive: {rec.additive or 'not specified'}")
+        lines.append(f"Coupling reagent: {rec.coupling_reagent or 'not specified'}")
+        lines.append(
+            "Metrics: "
+            f"avg_z_score={rec.avg_z_score:.2f}, "
+            f"success_rate={rec.success_rate:.1f}%, "
+            f"avg_yield={rec.avg_yield:.1f}%, "
+            f"median_yield={rec.median_yield:.1f}%, "
+            f"num_experiments={rec.num_experiments}, "
+            f"match_score={rec.match_score:.2f}, "
+            f"confidence_score={rec.confidence_score:.2f}"
+        )
+        lines.append("Reagent lookup:")
+        lines.append(f"- catalyst: {_format_reagent_detail(rec.catalyst, 'metal_catalyst')}")
+        lines.append(f"- ligand: {_format_reagent_detail(rec.ligand, 'ligand')}")
+        lines.append(f"- base: {_format_reagent_detail(rec.base, 'base')}")
+        lines.append(f"- solvent: {_format_reagent_detail(rec.solvent, 'solvent')}")
+        lines.append(f"- additive: {_format_reagent_detail(rec.additive or '', 'additive')}")
+        lines.append(f"- coupling reagent: {_format_reagent_detail(rec.coupling_reagent or '', 'other_reagent')}")
+
+    return "\n".join(lines)
 
 
 class ChemToolsAgent:
@@ -454,6 +608,8 @@ class ChemToolsAgent:
             )
             if structured_payload is not None:
                 structured_response = _build_condition_response(query, structured_payload)
+                if _wants_human_readable(query) and not _wants_json(query):
+                    return _format_condition_summary(structured_response)
                 return structured_response.model_dump_json(indent=2)
             final_message = result["messages"][-1]
             if isinstance(final_message, AIMessage):

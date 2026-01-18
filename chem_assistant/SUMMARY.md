@@ -1,7 +1,7 @@
 # Chem Assistant Summary (Featurization/Analysis)
 
-This package exposes ChemTools featurization and analysis tools with a minimal
-LangGraph agent and CLI. Protocol and reagent tooling are intentionally removed;
+This package exposes ChemTools featurization, analysis, and reagent registry tools
+with a minimal LangGraph agent and CLI. Protocol tooling is intentionally removed;
 HTE recommendations are now available via the agent tool set.
 
 Key modules:
@@ -19,4 +19,5 @@ Tool categories:
 - Reaction-pair featurizers
 - Calculable features
 - HTE recommendations
+- Reagent registry lookup
 - Knowledge base retrieval (RAG)

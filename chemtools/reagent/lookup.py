@@ -18,6 +18,16 @@ from .constants import ROLE_ALIASES
 # Cache loaded reagent databases (role -> entries)
 _REAGENT_CACHE: Dict[str, List[Dict[str, Any]]] = {}
 
+_CORE_FIELDS = {"name", "abbreviation", "cas", "smiles", "smile"}
+_ROLE_FIELDS = {
+    "role_1",
+    "family_1",
+    "tag_1",
+    "role_2",
+    "family_2",
+    "tag_2",
+}
+
 
 def _canonical_role(role: str) -> str:
     return ROLE_ALIASES.get(role, role)
@@ -25,27 +35,14 @@ def _canonical_role(role: str) -> str:
 
 def _extract_roles(row: Dict[str, str]) -> List[Tuple[str, str, str]]:
     roles: List[Tuple[str, str, str]] = []
-    has_new_schema = any(
-        key in row for key in ("role_1", "family_1", "tag_1", "role_2", "family_2", "tag_2")
-    )
-    if has_new_schema:
-        for idx in (1, 2):
-            role = (row.get(f"role_{idx}") or "").strip()
-            if not role:
-                continue
-            role = _canonical_role(role)
-            family_id = (row.get(f"family_{idx}") or "").strip()
-            tag = (row.get(f"tag_{idx}") or "").strip()
-            roles.append((role, family_id, tag))
-        return roles
-
-    role = (row.get("role") or "").strip()
-    if role:
-        roles.append((
-            _canonical_role(role),
-            (row.get("family_id") or "").strip(),
-            (row.get("tag") or "").strip(),
-        ))
+    for idx in (1, 2):
+        role = (row.get(f"role_{idx}") or "").strip()
+        if not role:
+            continue
+        role = _canonical_role(role)
+        family_id = (row.get(f"family_{idx}") or "").strip()
+        tag = (row.get(f"tag_{idx}") or "").strip()
+        roles.append((role, family_id, tag))
     return roles
 
 def get_data_dir() -> Path:
@@ -63,6 +60,15 @@ def _row_to_reagent(row: Dict[str, str]) -> Dict[str, Any]:
     abbreviation = (row.get("abbreviation") or "").strip()
     cas = (row.get("cas") or "").strip()
     smiles = (row.get("smiles") or row.get("smile") or "").strip()
+    properties: Dict[str, Any] = {}
+    for key, value in row.items():
+        if not key or key in _CORE_FIELDS or key in _ROLE_FIELDS:
+            continue
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            properties[key] = text
     roles: Dict[str, Dict[str, Any]] = {}
     primary_role = ""
     primary_family = ""
@@ -87,6 +93,7 @@ def _row_to_reagent(row: Dict[str, str]) -> Dict[str, Any]:
         "tag": primary_tag,
         "roles": roles,
         "aliases": [],
+        "properties": properties,
     }
 
 
@@ -278,6 +285,7 @@ def enrich_reagent_info(name: str, reagent_type: str) -> Dict[str, Any]:
             "inchi_key": reagent.get('inchi_key'),
             "aliases": reagent.get('aliases', []),
             "roles": reagent.get('roles', {}),
+            "properties": reagent.get("properties", {}),
             "found": True,
         })
     

@@ -28,7 +28,7 @@ from llmtools.prompts import (
 )
 from llmtools.reagent_review import _strip_markdown_fences
 
-from chemtools.reagent import load_families_registry_entries
+from chemtools.reagent import RegistryStore, load_families_registry_entries
 
 
 # Valid roles - must match ROLE_CONFIG in reagent_taxonomy_qt.py
@@ -171,18 +171,7 @@ def _format_families_description(families: List[Dict[str, Any]]) -> str:
 
 
 def _load_schema_for_role(role: str, registry_dir: Path) -> Dict[str, Any]:
-    """Load the reagent schema and extract field definitions for a specific role."""
-    # Try registry_dir first
-    schema_path = registry_dir / "reagent_schema" / "reagent_schema.json"
-    
-    if not schema_path.exists():
-        # Fallback to chemtools package location
-        import chemtools.reagent
-        package_path = Path(chemtools.reagent.__file__).parent / "reagent_schema" / "reagent_schema.json"
-        if package_path.exists():
-            schema_path = package_path
-    
-    # Default schema fallback
+    """Return field definitions for a specific role."""
     default_schemas = {
         "base": {
             "basicity": ["weak", "moderate", "strong", "superbase"],
@@ -230,24 +219,7 @@ def _load_schema_for_role(role: str, registry_dir: Path) -> Dict[str, Any]:
         "additive": {},  # No required fields beyond families
         "other_reagent": {}  # No required fields beyond families
     }
-    
-    # Try to load actual schema
-    if schema_path.exists():
-        try:
-            import re
-            schema_text = schema_path.read_text(encoding="utf-8")
-            # Remove comments (JSON doesn't support comments natively)
-            schema_text = re.sub(r'//.*', '', schema_text)
-            schema_data = json.loads(schema_text)
-            
-            if "roles" in schema_data and role in schema_data["roles"]:
-                role_schema = schema_data["roles"][role]
-                # Extract field definitions (skip 'families' which is always present)
-                fields = {k: v for k, v in role_schema.items() if k != "families"}
-                return fields if fields else default_schemas.get(role, {})
-        except Exception:
-            pass  # Fall back to defaults
-    
+
     return default_schemas.get(role, {})
 
 
@@ -282,22 +254,17 @@ def _format_fields_schema(role: str, registry_dir: Path) -> str:
 def _get_example_entries(role: str, family: Optional[str], registry_dir: Path, limit: int = 2) -> str:
     """Get example entries from existing registry."""
     try:
-        role_file = registry_dir / f"{role}.json"
-        if not role_file.exists():
-            return "No examples available"
-        
-        entries = json.loads(role_file.read_text(encoding="utf-8"))
-        if not isinstance(entries, list):
-            return "No examples available"
-        
-        # Filter by family if specified
+        store = RegistryStore(registry_dir)
+        entries = store.role_entries.get(role, [])
         if family:
-            entries = [e for e in entries if family in e.get("roles", {}).get(role, {}).get("families", [])]
-        
+            entries = [
+                entry
+                for entry in entries
+                if family in entry.get("roles", {}).get(role, {}).get("families", [])
+            ]
         if not entries:
             return "No examples available"
-        
-        # Take first few examples
+
         examples = []
         for entry in entries[:limit]:
             role_payload = entry.get("roles", {}).get(role, {})
@@ -306,14 +273,12 @@ def _get_example_entries(role: str, family: Optional[str], registry_dir: Path, l
                 "cas": entry.get("cas"),
                 "families": role_payload.get("families", []),
             }
-            # Add role-specific fields
             for key, val in role_payload.items():
                 if key != "families":
                     ex[key] = val
             examples.append(json.dumps(ex, indent=2))
-        
+
         return "\n\n".join(examples)
-        
     except Exception:
         return "No examples available"
 
@@ -370,7 +335,7 @@ def assign_fields(
     # Format prompt components
     families_desc = _format_families_description(role_families)
     
-    # Get field schema from actual reagent_schema.json
+    # Get field schema from defaults
     fields_schema = _format_fields_schema(role, registry_dir)
     
     examples = _get_example_entries(role, None, registry_dir, limit=2)

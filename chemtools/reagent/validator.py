@@ -14,14 +14,22 @@ from typing import Any, Dict, List, Optional
 
 
 REQUIRED_FIELDS = {"name"}
-ROLE_FIELDS = ("role_1", "role_2", "role")
-FAMILY_FIELDS = ("family_1", "family_2", "family_id")
-TAG_FIELDS = ("tag_1", "tag_2", "tag")
-SMILES_FIELDS = ("smiles", "smile")
+ROLE_FIELDS = ("role_1", "role_2")
+FAMILY_FIELDS = ("family_1", "family_2")
+TAG_FIELDS = ("tag_1", "tag_2")
+SMILES_FIELDS = ("smiles",)
 OPTIONAL_FIELDS = {
     "abbreviation",
     "cas",
     *SMILES_FIELDS,
+    "formula",
+    "type",
+    "density",
+    "mw",
+    "bp",
+    "mp",
+    "volatile",
+    "viscose",
     *FAMILY_FIELDS,
     *TAG_FIELDS,
     *ROLE_FIELDS,
@@ -78,7 +86,7 @@ def validate_entry(
         issues.append({
             "severity": "error",
             "field": "role_1",
-            "message": "Missing required field 'role_1' (or legacy 'role')",
+            "message": "Missing required field 'role_1'",
         })
 
     if role and roles and role not in roles:

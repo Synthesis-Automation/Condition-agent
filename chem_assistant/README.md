@@ -1,7 +1,7 @@
-# Chem Assistant (Featurization/Analysis)
+# Chem Assistant (Featurization/Analysis/Reagents)
 
-This package exposes ChemTools featurization and analysis functions as LangChain tools
-and provides a lightweight agent + CLI for interactive use.
+This package exposes ChemTools featurization, analysis, and reagent registry
+functions as LangChain tools and provides a lightweight agent + CLI for interactive use.
 
 ## Quick start
 
@@ -62,6 +62,13 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - hte_recommend_conditions
 - hte_database_stats
 
+### Reagent registry
+
+- reagent_lookup
+- reagent_list_roles
+- reagent_list_by_role
+- reagent_list_by_family
+
 ### Knowledge base (RAG)
 
 - rag_search
@@ -69,6 +76,6 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 ## Notes
 
 - RDKit is required for SMARTS-driven detection and descriptor computation.
-- This package focuses on featurization/analysis; protocol and reagent tools remain out of scope.
+- This package focuses on featurization/analysis; protocol tools remain out of scope.
 - HTE recommendation tools are available when the HTE database is present.
 - RAG search reads curated notes from `knowledge_base/`.

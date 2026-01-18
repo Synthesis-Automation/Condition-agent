@@ -528,9 +528,10 @@ def _build_fallback_motif_list(
     motifs: Iterable[str],
     reacted: Optional[Set[str]],
     spectators: Optional[Set[str]],
+    allow_generic: bool = False,
 ) -> List[str]:
     base = _dedupe_list([m for m in motifs if m])
-    if base:
+    if base and not allow_generic:
         filtered = _filter_generic_motifs(base)
         if filtered:
             base = filtered
@@ -539,6 +540,34 @@ def _build_fallback_motif_list(
     expanded = _expand_parent_motifs(base) if base else []
     prioritized = _prioritize_motifs(expanded or base, reacted, spectators)
     return prioritized or [""]
+
+
+def _build_fallback_tiers(
+    motifs: Iterable[str],
+    reacted: Optional[Set[str]],
+    spectators: Optional[Set[str]],
+) -> List[List[str]]:
+    base = _dedupe_list([m for m in motifs if m])
+    if not base:
+        return [[""]]
+    tier_specific = _build_fallback_motif_list(base, reacted, spectators, allow_generic=False)
+    tier_generic = _build_fallback_motif_list(base, reacted, spectators, allow_generic=True)
+    tiers: List[List[str]] = []
+    if tier_specific == [""] and tier_generic != [""]:
+        tiers.extend([tier_generic, tier_specific])
+    else:
+        tiers.append(tier_specific)
+        if tier_generic != tier_specific:
+            tiers.append(tier_generic)
+    deduped: List[List[str]] = []
+    seen: Set[Tuple[str, ...]] = set()
+    for tier in tiers:
+        key = tuple(tier)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(tier)
+    return deduped or [[""]]
 
 
 def _split_motif_tokens(value: Any) -> List[str]:
@@ -1217,6 +1246,50 @@ class HTERecommender:
         recommendations.sort(key=lambda x: (x.match_score, x.avg_z_score, x.confidence_score), reverse=True)
         
         return recommendations[:top_k]
+
+    def _combine_recommendations_by_source(
+        self,
+        recommendations_by_source: Dict[str, List[ConditionRecommendation]],
+        top_k: int,
+    ) -> List[ConditionRecommendation]:
+        """Interleave per-source recommendations into a combined list."""
+        if not recommendations_by_source:
+            return []
+
+        by_source = {k: v for k, v in recommendations_by_source.items() if v}
+        if not by_source:
+            return []
+
+        total_available = sum(len(items) for items in by_source.values())
+        limit = total_available if top_k <= 0 else min(top_k, total_available)
+
+        weight_map = {"experiments": 3, "datasets": 2, "rules": 1}
+        priority_map = {"experiments": 0, "datasets": 1, "rules": 2, "other": 3, "unknown": 4}
+        sources = sorted(by_source.keys(), key=lambda s: (priority_map.get(str(s), 5), str(s)))
+
+        schedule: List[str] = []
+        for source in sources:
+            weight = weight_map.get(str(source), 1)
+            schedule.extend([source] * max(weight, 1))
+        if not schedule:
+            schedule = sources
+
+        indices = {source: 0 for source in sources}
+        combined: List[ConditionRecommendation] = []
+        while len(combined) < limit:
+            progressed = False
+            for source in schedule:
+                idx = indices[source]
+                items = by_source[source]
+                if idx < len(items):
+                    combined.append(items[idx])
+                    indices[source] = idx + 1
+                    progressed = True
+                    if len(combined) >= limit:
+                        break
+            if not progressed:
+                break
+        return combined
     
     def recommend(
         self,
@@ -1380,32 +1453,41 @@ class HTERecommender:
             direct_match is not None and len(direct_match) < min_experiments
         ) or expand_for_coverage
         if should_expand:
-            list_a = _build_fallback_motif_list(type_a, reacted_set, spectator_set)
-            list_b = _build_fallback_motif_list(type_b, reacted_set, spectator_set)
-            for ma in list_a:
-                for mb in list_b:
-                    if not ma and not mb:
-                        continue
-                    candidate = _reactant_key([ma, mb])
-                    if direct_key and candidate == direct_key:
-                        continue
-                    if candidate in self.indexed_data:
-                        fallback_match = self.indexed_data[candidate].copy()
-                        if expand_for_coverage and "Source_Group" in fallback_match.columns and direct_match is not None:
-                            direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
-                            candidate_groups = {g for g in fallback_match["Source_Group"].unique() if str(g).strip()}
-                            if not (candidate_groups - direct_groups):
-                                fallback_match = None
-                                continue
-                        if direct_match is None:
-                            fallback_match['match_score'] = 1.0
-                            fallback_match['match_priority'] = 0
-                        else:
-                            fallback_match['match_score'] = 0.85
-                            fallback_match['match_priority'] = 1
-                        if not result.matched_motifs:
-                            result.matched_motifs = (ma, mb)
-                        fallback_used = True
+            tiers_a = _build_fallback_tiers(type_a, reacted_set, spectator_set)
+            tiers_b = _build_fallback_tiers(type_b, reacted_set, spectator_set)
+            tier_pairs: List[Tuple[int, int, int, List[str], List[str]]] = []
+            for idx_a, list_a in enumerate(tiers_a):
+                for idx_b, list_b in enumerate(tiers_b):
+                    tier_pairs.append((idx_a + idx_b, idx_a, idx_b, list_a, list_b))
+            tier_pairs.sort(key=lambda item: (item[0], item[1], item[2]))
+
+            for _, idx_a, idx_b, list_a, list_b in tier_pairs:
+                for ma in list_a:
+                    for mb in list_b:
+                        if not ma and not mb:
+                            continue
+                        candidate = _reactant_key([ma, mb])
+                        if direct_key and candidate == direct_key:
+                            continue
+                        if candidate in self.indexed_data:
+                            fallback_match = self.indexed_data[candidate].copy()
+                            if expand_for_coverage and "Source_Group" in fallback_match.columns and direct_match is not None:
+                                direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
+                                candidate_groups = {g for g in fallback_match["Source_Group"].unique() if str(g).strip()}
+                                if not (candidate_groups - direct_groups):
+                                    fallback_match = None
+                                    continue
+                            if direct_match is None:
+                                fallback_match['match_score'] = 1.0
+                                fallback_match['match_priority'] = idx_a + idx_b
+                            else:
+                                fallback_match['match_score'] = 0.85
+                                fallback_match['match_priority'] = 1 + idx_a + idx_b
+                            if not result.matched_motifs:
+                                result.matched_motifs = (ma, mb)
+                            fallback_used = True
+                            break
+                    if fallback_match is not None:
                         break
                 if fallback_match is not None:
                     break
@@ -1475,19 +1557,12 @@ class HTERecommender:
         # Step 4: Aggregate and rank conditions
         if len(matched_df) > 0:
             pool_size = max(top_k * 3, top_k)
-            candidates = self._aggregate_conditions(
-                matched_df, pool_size, min_experiments
-            )
-            if top_k > 0 and len(candidates) > top_k:
-                result.recommendations = self._select_diverse_conditions(
-                    candidates, top_k, prioritize_performance=True
-                )
-            else:
-                result.recommendations = candidates
             if "Source_Group" in matched_df.columns:
                 by_source: Dict[str, List[ConditionRecommendation]] = {}
                 for group_name, group_df in matched_df.groupby("Source_Group"):
-                    label = group_name or "unknown"
+                    label = str(group_name).strip()
+                    if not label or label.lower() == "nan":
+                        label = "unknown"
                     group_candidates = self._aggregate_conditions(
                         group_df, pool_size, min_experiments
                     )
@@ -1498,6 +1573,17 @@ class HTERecommender:
                     else:
                         by_source[label] = group_candidates
                 result.recommendations_by_source = by_source
+                result.recommendations = self._combine_recommendations_by_source(by_source, top_k)
+            else:
+                candidates = self._aggregate_conditions(
+                    matched_df, pool_size, min_experiments
+                )
+                if top_k > 0 and len(candidates) > top_k:
+                    result.recommendations = self._select_diverse_conditions(
+                        candidates, top_k, prioritize_performance=True
+                    )
+                else:
+                    result.recommendations = candidates
         
         return result
     
