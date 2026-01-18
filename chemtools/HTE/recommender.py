@@ -306,6 +306,41 @@ def _filter_source_group(
     return df[series == label]
 
 
+def _filter_by_reactant_types(
+    df: pd.DataFrame,
+    reactant_types: Optional[Iterable[str]],
+    match_all: bool = False,
+) -> pd.DataFrame:
+    if not reactant_types:
+        return df
+    cols = [col for col in ("Reactant_A_Type", "Reactant_B_Type", "Reactant_C_Type") if col in df.columns]
+    if not cols:
+        return df
+
+    tokens = [str(t).strip() for t in reactant_types if str(t).strip()]
+    if not tokens:
+        return df
+
+    masks: List[pd.Series] = []
+    for token in tokens:
+        pattern = re.escape(token)
+        col_mask = None
+        for col in cols:
+            series = df[col].fillna("").astype(str)
+            mask = series.str.contains(pattern, case=False, na=False)
+            col_mask = mask if col_mask is None else (col_mask | mask)
+        if col_mask is not None:
+            masks.append(col_mask)
+
+    if not masks:
+        return df
+
+    combined = masks[0]
+    for mask in masks[1:]:
+        combined = combined & mask if match_all else combined | mask
+    return df[combined]
+
+
 def _clean_reactant_value(value: Any) -> str:
     text = str(value or "").strip()
     if not text:
@@ -1650,6 +1685,74 @@ class HTERecommender:
                     result.recommendations = candidates
         
         return result
+
+    def summarize_conditions(
+        self,
+        *,
+        reaction_type_filter: Optional[str] = None,
+        reactant_type_filters: Optional[Iterable[str]] = None,
+        match_all_reactants: bool = False,
+        source_group: Optional[str] = None,
+        top_k: int = 10,
+        min_experiments: int = 2,
+    ) -> Dict[str, Any]:
+        """Summarize top conditions for filtered dataset slices."""
+        if self.df is None:
+            return {
+                "total_matching_experiments": 0,
+                "database_coverage": 0.0,
+                "recommendations": [],
+            }
+
+        filtered = self.df.copy()
+        if source_group:
+            filtered = _filter_source_group(filtered, source_group)
+
+        if reaction_type_filter:
+            type_filtered = filtered[
+                filtered["Reaction_Type_Standardized"] == reaction_type_filter
+            ]
+            if type_filtered.empty and "Reaction_Category" in filtered.columns:
+                type_filtered = filtered[
+                    filtered["Reaction_Category"] == reaction_type_filter
+                ]
+            filtered = type_filtered
+
+        filtered = _filter_by_reactant_types(
+            filtered, reactant_type_filters, match_all=match_all_reactants
+        )
+
+        coverage_df = self.df
+        if source_group:
+            coverage_df = _filter_source_group(self.df, source_group)
+
+        total_matches = len(filtered)
+        coverage = (
+            (total_matches / len(coverage_df)) * 100.0
+            if coverage_df is not None and len(coverage_df) > 0
+            else 0.0
+        )
+
+        if total_matches == 0:
+            return {
+                "total_matching_experiments": 0,
+                "database_coverage": coverage,
+                "recommendations": [],
+            }
+
+        candidates = self._aggregate_conditions(
+            filtered, max(top_k * 3, top_k), min_experiments
+        )
+        recommendations = (
+            self._select_diverse_conditions(candidates, top_k, prioritize_performance=True)
+            if top_k > 0 and len(candidates) > top_k
+            else candidates
+        )
+        return {
+            "total_matching_experiments": total_matches,
+            "database_coverage": coverage,
+            "recommendations": recommendations,
+        }
     
     def generate_screening_set(
         self,

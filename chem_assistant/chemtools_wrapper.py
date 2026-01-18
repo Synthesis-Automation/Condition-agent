@@ -400,6 +400,32 @@ class HTERecommendInput(BaseModel):
     )
 
 
+class HTEDatasetSummaryInput(BaseModel):
+    """Schema for HTE dataset summary queries."""
+
+    reaction_type_filter: Optional[str] = Field(
+        None, description="Reaction type/category filter (e.g., suzuki_miyaura)."
+    )
+    reactant_type_filters: Optional[List[str]] = Field(
+        None,
+        description="Reactant motif filters (e.g., ['Ar-Cl']).",
+    )
+    match_all_reactants: bool = Field(
+        False, description="Require all reactant_type_filters to be present."
+    )
+    source_group: Optional[str] = Field(
+        "datasets",
+        description="Source group filter (datasets, experiments, rules).",
+    )
+    top_k: int = Field(10, ge=1, le=200, description="Number of conditions to return.")
+    min_experiments: int = Field(
+        2, ge=1, le=200, description="Minimum experiments per condition."
+    )
+    hte_db_path: Optional[str] = Field(
+        None, description="Path to HTE database folder or file."
+    )
+
+
 class HTEStatsInput(BaseModel):
     """Schema for HTE database statistics."""
 
@@ -931,6 +957,34 @@ def hte_recommend_conditions(
         return _error_response("HTE recommendation failed.", {"details": str(exc)})
 
 
+@tool(args_schema=HTEDatasetSummaryInput)
+def hte_dataset_summary(
+    reaction_type_filter: Optional[str] = None,
+    reactant_type_filters: Optional[List[str]] = None,
+    match_all_reactants: bool = False,
+    source_group: Optional[str] = "datasets",
+    top_k: int = 10,
+    min_experiments: int = 2,
+    hte_db_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Summarize top conditions from a filtered HTE dataset slice."""
+    try:
+        from chemtools.HTE import HTERecommender
+
+        recommender = HTERecommender(hte_db_path or "data/HTE_db")
+        payload = recommender.summarize_conditions(
+            reaction_type_filter=reaction_type_filter or None,
+            reactant_type_filters=reactant_type_filters,
+            match_all_reactants=match_all_reactants,
+            source_group=source_group or None,
+            top_k=top_k,
+            min_experiments=min_experiments,
+        )
+        return _success_response(_to_jsonable(payload))
+    except Exception as exc:
+        return _error_response("HTE dataset summary failed.", {"details": str(exc)})
+
+
 @tool(args_schema=HTEStatsInput)
 def hte_database_stats(hte_db_path: Optional[str] = None) -> Dict[str, Any]:
     """Return summary statistics for the HTE database."""
@@ -1194,6 +1248,7 @@ CHEMTOOLS_TOOLS = [
     calculable_classify_reactant_smiles,
     # HTE recommendations
     hte_recommend_conditions,
+    hte_dataset_summary,
     hte_database_stats,
     # Reagent registry
     reagent_lookup,

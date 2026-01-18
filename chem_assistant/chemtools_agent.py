@@ -112,6 +112,7 @@ You have access to the following tools (featurization/analysis/reagent registry)
 - calculable_get_reactant_type_features: reactant type features
 - calculable_classify_reactant_smiles: calculable-based reactant classification
 - hte_recommend_conditions: HTE-based condition recommendations
+- hte_dataset_summary: dataset-level condition summaries (filtered by reaction/ reactant types)
 - hte_database_stats: HTE database summary statistics
 - reagent_lookup: lookup reagent by name, abbreviation, or CAS
 - reagent_list_roles: list available reagent roles (with counts)
@@ -135,6 +136,7 @@ Tool selection rubric:
 - Electrophile/nucleophile pair -> reaction_pair_featurize_pair (or reaction_pair_featurize_flat for compact output).
 - Only use detection_* tools when the user asks for reaction typing without full featurization.
 - HTE data or condition screening -> hte_recommend_conditions (use reaction_smiles when available).
+- HTE dataset insights (e.g., top conditions for aryl chlorides) -> hte_dataset_summary.
 - If the user wants dataset-only HTE results, set source_group="datasets" in hte_recommend_conditions.
 - HTE database questions -> hte_database_stats.
 - Reagent lookup or validation -> reagent_lookup (optionally set role or include_all).

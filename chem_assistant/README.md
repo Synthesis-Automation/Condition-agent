@@ -60,6 +60,7 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 ### HTE recommendations
 
 - hte_recommend_conditions
+- hte_dataset_summary
 - hte_database_stats
 
 ### Reagent registry

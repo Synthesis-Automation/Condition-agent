@@ -38,6 +38,7 @@ print(agent.run("Featurize molecule: c1ccccc1O"))
 - Featurizers: unified bundles, motif-based features, reaction-pair features
 - Calculable: feature tokens for reactant types
 - HTE: condition recommendations from the HTE database
+- HTE dataset: top condition summaries from dataset slices
 - Reagents: lookup and inventory from the reagent registry
 - RAG: knowledge base snippets from `data/knowledge_base/`
 - KB conditions: summary tables via `kb_recommend_conditions`

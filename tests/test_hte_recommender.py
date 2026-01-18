@@ -39,6 +39,14 @@ def _make_source_group_df() -> pd.DataFrame:
     return pd.concat([base, rules], ignore_index=True)
 
 
+def _make_summary_df() -> pd.DataFrame:
+    base = _make_min_hte_df()
+    alt = base.copy()
+    alt["Reactant_A_Type"] = ["Ar-Cl"]
+    alt["Catalyst"] = ["Ni"]
+    return pd.concat([base, alt], ignore_index=True)
+
+
 def test_fallback_tiers_order() -> None:
     tiers = hte._build_fallback_tiers(["Ar-Br", "Ar-X", "Ar-R"], set(), set())
     assert tiers
@@ -106,3 +114,28 @@ def test_recommend_source_group_filter(monkeypatch) -> None:
     assert result.total_matching_experiments == 1
     assert len(result.recommendations) == 1
     assert result.recommendations[0].catalyst == "Pd"
+
+
+def test_summarize_conditions_filters(monkeypatch) -> None:
+    df = _make_summary_df()
+    indexed_data = {"Ar-X": df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    payload = recommender.summarize_conditions(
+        reaction_type_filter="suzuki_miyaura",
+        reactant_type_filters=["Ar-Cl"],
+        source_group="datasets",
+        top_k=3,
+        min_experiments=1,
+    )
+
+    assert payload["total_matching_experiments"] == 1
+    recs = payload["recommendations"]
+    assert recs
+    assert recs[0].catalyst == "Ni"
