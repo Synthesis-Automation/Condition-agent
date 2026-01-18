@@ -7,7 +7,7 @@ from __future__ import annotations
 from functools import lru_cache
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
 from chemtools.util.smarts_cache import compile_smarts
@@ -118,6 +118,113 @@ def _motif_rank_score(hit: Dict[str, Any]) -> float:
     return (reactivity * 100.0) + (priority * 10.0) + complexity
 
 
+@lru_cache(maxsize=1)
+def _load_heterocycle_scaffold_ids() -> set[str]:
+    path = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
+    if not path.exists():
+        return set()
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    heterocycles: set[str] = set()
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        desc = str(entry.get("description") or "").lower()
+        if "heteroaromatic" not in desc:
+            continue
+        motif_id = str(entry.get("id") or "").strip()
+        if motif_id:
+            heterocycles.add(motif_id)
+    return heterocycles
+
+
+def _iter_motif_ids(motif: Dict[str, Any]) -> List[str]:
+    ids: List[str] = []
+    if not isinstance(motif, dict):
+        return ids
+    cid = str(motif.get("compound_id") or "").strip()
+    if cid:
+        ids.append(cid)
+    alt_ids = motif.get("alt_compound_ids") or []
+    if isinstance(alt_ids, set):
+        alt_ids = list(alt_ids)
+    for alt_id in alt_ids:
+        alt_text = str(alt_id).strip()
+        if alt_text:
+            ids.append(alt_text)
+    return ids
+
+
+def _collect_heterocycle_types(motifs: List[Dict[str, Any]]) -> List[str]:
+    scaffold_ids = _load_heterocycle_scaffold_ids()
+    if not scaffold_ids:
+        return []
+    hits: set[str] = set()
+    for motif in motifs:
+        for motif_id in _iter_motif_ids(motif):
+            if motif_id in scaffold_ids:
+                hits.add(motif_id)
+    return sorted(hits)
+
+
+def _aryl_ring_metrics(mol: Any) -> Dict[str, Any]:
+    ring_info = mol.GetRingInfo()
+    ring_sizes: List[int] = []
+    ring_size_counts: Dict[int, int] = {}
+    hetero_counts = {"N": 0, "O": 0, "S": 0}
+    hetero_ring_sizes: List[int] = []
+    aromatic_rings = 0
+
+    for ring in ring_info.AtomRings():
+        if not ring:
+            continue
+        atoms = [mol.GetAtomWithIdx(idx) for idx in ring]
+        if not atoms or not all(atom.GetIsAromatic() for atom in atoms):
+            continue
+        aromatic_rings += 1
+        size = len(ring)
+        ring_sizes.append(size)
+        ring_size_counts[size] = ring_size_counts.get(size, 0) + 1
+        ring_heteros = {"N": 0, "O": 0, "S": 0}
+        for atom in atoms:
+            atomic_num = atom.GetAtomicNum()
+            if atomic_num == 7:
+                ring_heteros["N"] += 1
+            elif atomic_num == 8:
+                ring_heteros["O"] += 1
+            elif atomic_num == 16:
+                ring_heteros["S"] += 1
+        if sum(ring_heteros.values()) > 0:
+            hetero_ring_sizes.append(size)
+        for key, value in ring_heteros.items():
+            hetero_counts[key] += value
+
+    return {
+        "aromatic_ring_count": aromatic_rings,
+        "ring_sizes": sorted(set(ring_sizes)),
+        "ring_size_counts": {str(size): count for size, count in sorted(ring_size_counts.items())},
+        "heteroaromatic": bool(hetero_ring_sizes),
+        "hetero_ring_sizes": sorted(set(hetero_ring_sizes)),
+        "hetero_counts": hetero_counts,
+    }
+
+
+def _empty_aryl_analysis() -> Dict[str, Any]:
+    return {
+        "is_heterocycle": False,
+        "heterocycle_types": [],
+        "aromatic_ring_count": 0,
+        "ring_sizes": [],
+        "ring_size_counts": {},
+        "heteroaromatic": False,
+        "hetero_ring_sizes": [],
+        "hetero_counts": {"N": 0, "O": 0, "S": 0},
+    }
+
+
 def featurize_molecule(
     smiles: str,
     registry_paths: Optional[Dict[str, str | Path]] = None,
@@ -136,6 +243,7 @@ def featurize_molecule(
             "ranked_motifs": [],
             "steric": {"aryl": [], "alkyl": []},
             "electronics": {"aryl": []},
+            "aryl_analysis": _empty_aryl_analysis(),
             "analyses": [],
             "meta": meta,
         }
@@ -150,6 +258,7 @@ def featurize_molecule(
             "ranked_motifs": [],
             "steric": {"aryl": [], "alkyl": []},
             "electronics": {"aryl": []},
+            "aryl_analysis": _empty_aryl_analysis(),
             "analyses": [],
             "meta": meta,
         }
@@ -162,6 +271,7 @@ def featurize_molecule(
             "ranked_motifs": ["Inorganic"],
             "steric": {"aryl": [], "alkyl": []},
             "electronics": {"aryl": []},
+            "aryl_analysis": _empty_aryl_analysis(),
             "analyses": [],
             "meta": meta,
         }
@@ -201,6 +311,13 @@ def featurize_molecule(
         site_filter=site_filter,
     )
     motifs = list(all_motifs)
+    heterocycle_types = _collect_heterocycle_types(motifs)
+    ring_metrics = _aryl_ring_metrics(mol)
+    aryl_analysis = {
+        "is_heterocycle": bool(heterocycle_types) or ring_metrics.get("heteroaromatic", False),
+        "heterocycle_types": heterocycle_types,
+        **ring_metrics,
+    }
 
     # Filter by target groups if provided
     target_groups = options.get("target_groups")
@@ -379,6 +496,7 @@ def featurize_molecule(
         "steric": steric_payload,
         "electronics": electronic_payload,
         "nearby": nearby_payload,
+        "aryl_analysis": aryl_analysis,
         "analyses": analyses,
         "meta": meta,
     }
