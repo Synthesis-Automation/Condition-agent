@@ -182,6 +182,7 @@
       "name": "Carboxylic Acids",
       "members": [
         "Any-CO2H",
+        "Acyl-CO2H",
         "Ar-CO2H",
         "Alkenyl-CO2H",
         "Alkyl-CO2H",

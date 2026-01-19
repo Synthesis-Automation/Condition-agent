@@ -1111,6 +1111,14 @@
       "reactivity_weight": 1.5
     },
     {
+      "id": "Acyl-CO2H",
+      "name": "Acyl-CO2H",
+      "template": "single_bond",
+      "A": "Acyl",
+      "B": "CO2H",
+      "description": "Acyl carboxylic acid (Acyl-CO2H), e.g., alpha-keto acids."
+    },
+    {
       "id": "Ar-COCl",
       "name": "Ar-COCl",
       "template": "single_bond",

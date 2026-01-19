@@ -346,6 +346,61 @@
       ]
     },
     {
+      "id": "minisci_alkylation",
+      "name": "Minisci Alkylation",
+      "category": "C-C Coupling",
+      "mechanism": "radical addition",
+      "reactants": {
+        "substrate": "Ar-H",
+        "acid": [
+          "Alkyl-CO2H",
+          "RCH2-CO2H",
+          "R2CH-CO2H",
+          "R3C-CO2H"
+        ]
+      },
+      "products": {
+        "product": "Ar-R"
+      },
+      "aliases": [
+        "Minisci",
+        "Minisci reaction",
+        "Minisci alkylation"
+      ],
+      "description": "Alkyl carboxylic acids add to aromatic C-H sites (often electron-deficient heteroarenes such as pyridine).",
+      "examples": [
+        "O=C(O)C1CCCCC1.Cc1ccnc2ccccc12>>Cc1cc(C2CCCCC2)nc2ccccc12"
+      ]
+    },
+    {
+      "id": "minisci_acylation",
+      "name": "Minisci Acylation",
+      "category": "C-C Coupling",
+      "mechanism": "radical addition",
+      "reactants": {
+        "substrate": "Ar-H",
+        "acid": [
+          "Acyl-CO2H",
+          "Ar-CHO",
+          "Alkyl-CHO",
+          "RCH2-CHO",
+          "R2CH-CHO",
+          "R3C-CHO"
+        ]
+      },
+      "products": {
+        "product": "Ar-COR"
+      },
+      "aliases": [
+        "Minisci acylation",
+        "Minisci acylation (keto acids)"
+      ],
+      "description": "Alpha-keto acids add to aromatic C-H sites to form aryl ketones (Minisci acylation).",
+      "examples": [
+        "c1cnccn1.O=C(O)C(=O)c1ccccc1>>O=C(c1ccccc1)c1cnccn1"
+      ]
+    },
+    {
       "id": "snar_cn",
       "name": "SNAr C-N",
       "category": "C-N Coupling",
