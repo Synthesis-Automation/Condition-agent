@@ -414,6 +414,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
         reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
         precedents.append({
             "reaction_id": r.get("reaction_id"),
+            "dataset_reaction_id": r.get("dataset_reaction_id"),
             "reaction_smiles": rsmi,
             "reactants_smiles": reactants_smi,
             "products_smiles": products_smi,
@@ -426,6 +427,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             "rxn_type": r.get("rxn_type"),  # Include reaction family/type for dataset identification
             "reagents": r.get("reagents"),
             "solvents": r.get("solvents"),
+            "source_file": r.get("source_file"),
             "reference": r.get("reference"),
             "conditions": r.get("conditions"),
             "catalyst": r.get("catalyst"),
@@ -459,6 +461,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                 reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
                 precedents.append({
                     "reaction_id": r.get("reaction_id"),
+                    "dataset_reaction_id": r.get("dataset_reaction_id"),
                     "reaction_smiles": rsmi,
                     "reactants_smiles": reactants_smi,
                     "products_smiles": products_smi,
@@ -471,6 +474,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                     "rxn_type": r.get("rxn_type"),  # Include reaction family/type for dataset identification
                     "reagents": r.get("reagents"),
                     "solvents": r.get("solvents"),
+                    "source_file": r.get("source_file"),
                     "reference": r.get("reference"),
                     "conditions": r.get("conditions"),
                     "catalyst": r.get("catalyst"),

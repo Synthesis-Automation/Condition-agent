@@ -21,6 +21,12 @@ def _family_text(family: str) -> str:
         "c_n_coupling_ni",
     }:
         return "C_N_Coupling"
+    if fl in {"c-n coupling", "c_n coupling", "c n coupling", "c-n-coupling"}:
+        return "C_N_Coupling"
+    if fl in {"c-o coupling", "c_o coupling", "c o coupling", "c-o-coupling"}:
+        return "C_O_Coupling"
+    if fl in {"c-s coupling", "c_s coupling", "c s coupling", "c-s-coupling"}:
+        return "C_S_Coupling"
     if fl == "suzuki_miyaura":
         return "Suzuki"
     if fl == "sonogashira":

@@ -139,6 +139,19 @@ def _format_nearby_groups(groups: List[str]) -> str:
 
 
 def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
+    if data_type == "precedent":
+        return [
+            ("Rank", "rank"),
+            ("Similarity", "match_score"),
+            ("Yield", "avg_yield"),
+            ("Catalyst", "catalyst"),
+            ("Ligand", "ligand"),
+            ("Base", "base"),
+            ("Solvent", "solvent"),
+            ("Additive", "additive"),
+            ("Reaction Type", "reaction_type"),
+            ("Reaction ID", "reaction_id"),
+        ]
     base = [
         ("Rank", "rank"),
         ("Avg Z-Score", "avg_z_score"),
@@ -534,7 +547,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         all_columns = _table_columns_for_type(data_type)
         self._populate_table(self.table, recs, all_columns)
 
-        base_groups = ["literature", "rules", "experiments"]
+        base_groups = ["literature", "rules", "experiments", "precedent"]
         extra_groups = [g for g in sorted(source_map) if g not in base_groups]
         for source_group in base_groups + extra_groups:
             group_recs = list(source_map.get(source_group) or [])

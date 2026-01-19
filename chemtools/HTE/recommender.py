@@ -494,6 +494,20 @@ def _iter_smiles_parts(smiles: str) -> List[str]:
     return [part.strip() for part in str(smiles or "").split(".") if part.strip()]
 
 
+def _build_reaction_smiles(
+    reactant_a_smiles: str,
+    reactant_b_smiles: Optional[str],
+    product_smiles: Optional[str],
+) -> str:
+    reactants = [reactant_a_smiles]
+    if reactant_b_smiles:
+        reactants.append(reactant_b_smiles)
+    reactant_text = ".".join([part for part in reactants if part])
+    if product_smiles:
+        return f"{reactant_text}>>{product_smiles}"
+    return reactant_text
+
+
 def _filter_by_reactant_types(
     df: pd.DataFrame,
     reactant_types: Optional[Iterable[str]],
@@ -1532,6 +1546,105 @@ class HTERecommender:
             if not progressed:
                 break
         return combined
+
+    def _build_precedent_recommendations(
+        self,
+        reactant_a_smiles: str,
+        reactant_b_smiles: Optional[str],
+        product_smiles: Optional[str],
+        reaction_type: Optional[str],
+        top_k: int,
+    ) -> List[ConditionRecommendation]:
+        try:
+            from chemtools import precedent
+            from chemtools.featurizers import reaction_pair as feat_pair
+            from chemtools.recommend.utils import pick_electrophile_nucleophile
+        except Exception:
+            return []
+
+        reaction_smiles = _build_reaction_smiles(
+            reactant_a_smiles,
+            reactant_b_smiles,
+            product_smiles,
+        )
+        use_drfp = bool(product_smiles and reaction_smiles)
+
+        reactant_pool: List[str] = []
+        if ">" in reaction_smiles:
+            normalized = normalize_reaction(reaction_smiles)
+            for entry in normalized.get("reactants", []) or []:
+                if not isinstance(entry, dict):
+                    continue
+                smi = entry.get("smiles_norm") or entry.get("largest_smiles") or entry.get("input")
+                if smi:
+                    reactant_pool.append(smi)
+        if not reactant_pool:
+            reactant_pool = [reactant_a_smiles]
+            if reactant_b_smiles:
+                reactant_pool.append(reactant_b_smiles)
+
+        elec, nuc = pick_electrophile_nucleophile(reactant_pool)
+        features = feat_pair.featurize_pair(elec, nuc).get("flat", {}) if (elec or nuc) else {}
+
+        relax = {
+            "use_drfp": use_drfp,
+            "reaction_smiles": reaction_smiles if use_drfp else "",
+            "filter_by_reagent_database": False,
+        }
+
+        family = reaction_type or None
+        pack = precedent.knn(family=family, features=features, k=max(top_k, 10), relax=relax)
+        precedents = list(pack.get("precedents", []) or [])
+
+        def _condition_value(conditions: Dict[str, Any], key: str, fallback: Optional[str]) -> str:
+            raw = conditions.get(key) if conditions else None
+            if not raw:
+                return fallback or ""
+            return _format_list(raw)
+
+        deduped: Dict[Tuple[str, str, str, str, str], ConditionRecommendation] = {}
+        for prec in precedents:
+            conditions = prec.get("conditions") or {}
+            catalyst = _condition_value(conditions, "catalyst", None)
+            ligand = _condition_value(conditions, "ligand", None)
+            base = _condition_value(conditions, "base", prec.get("base_uid"))
+            solvent = _condition_value(conditions, "solvent", prec.get("solvent_uid"))
+            additive = _condition_value(conditions, "additive", None) or None
+            coupling_reagent = _condition_value(conditions, "condensation_agent", None) or None
+
+            similarity = float(prec.get("similarity") or 0.0)
+            yield_val = prec.get("yield")
+            avg_yield = float(yield_val) if isinstance(yield_val, (int, float)) else 0.0
+            success_rate = 100.0 if avg_yield >= 50.0 else 0.0
+
+            rec = ConditionRecommendation(
+                catalyst=catalyst,
+                ligand=ligand,
+                base=base,
+                solvent=solvent,
+                additive=additive,
+                coupling_reagent=coupling_reagent,
+                success_rate=success_rate,
+                avg_yield=avg_yield,
+                median_yield=avg_yield,
+                num_experiments=1,
+                avg_z_score=similarity,
+                confidence_score=similarity * 100.0,
+                match_score=similarity,
+                reaction_type=prec.get("dataset_reaction_id") or prec.get("rxn_type"),
+                reaction_id=prec.get("reaction_id"),
+                reactant_types=("", ""),
+                z_score_range=(similarity, similarity),
+            )
+
+            key = (rec.catalyst, rec.ligand, rec.base, rec.solvent, rec.additive or "")
+            existing = deduped.get(key)
+            if existing is None or rec.match_score > existing.match_score:
+                deduped[key] = rec
+
+        results = list(deduped.values())
+        results.sort(key=lambda item: item.match_score, reverse=True)
+        return results[:top_k]
     
     def recommend(
         self,
@@ -1902,7 +2015,17 @@ class HTERecommender:
                     )
                 else:
                     result.recommendations = candidates
-        
+        if (source_group or "").lower() in {"", "literature", "datasets", "dataset"}:
+            precedent_recs = self._build_precedent_recommendations(
+                reactant_a_smiles,
+                reactant_b_smiles,
+                product_smiles,
+                reaction_type_filter or result.predicted_reaction_type,
+                top_k,
+            )
+            if precedent_recs:
+                result.recommendations_by_source["precedent"] = precedent_recs
+
         return result
 
     def summarize_conditions(
