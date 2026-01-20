@@ -93,6 +93,11 @@
       "members": ["Ar", "Alkenyl"],
       "description": "Aromatic or alkenyl carbon attachment points."
     },
+    "R": {
+      "name": "R Group",
+      "members": ["Ar", "Alkyl", "Alkenyl", "Alkynyl"],
+      "description": "Generic carbon-based scaffolds (aryl, alkyl, alkenyl, alkynyl)."
+    },
     "sp3_Carbon": {
       "name": "sp3 Carbon Scaffold",
       "priority": 0,

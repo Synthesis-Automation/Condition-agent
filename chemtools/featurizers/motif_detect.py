@@ -10,7 +10,6 @@ from .motif_registry import CompoundPattern
 
 
 _DISCOVERY_SKIP_SUBSTITUENTS = {
-    "R_Subst",
     "Alkyl_Subst",
     "Alkenyl_Subst",
 }

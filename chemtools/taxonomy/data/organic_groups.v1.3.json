@@ -4,47 +4,17 @@
   "notes": "Mapping-only attachpoint convention:\n- Scaffold groups (kind=scaffold): the attach atom is the atom mapped as :1 in `smarts`.\n- Substituent groups (kind=substituent): the attach atom is the atom mapped as :2 in `smarts`.\n- If a group has multiple attachpoints, it may contain both :1 and :2 (or multiple mapped atoms) in `smarts`.\nThe legacy fields `attach_points` and `attach_labels` were removed; attachpoints are inferred from atom-maps in `smarts`.",
   "groups": [
     {
-      "id": "R",
-      "name": "R-",
-      "kind": "scaffold",
-      "priority": 0,
-      "smarts": "[$([CX4:1]),$([c:1]),$([C;X3:1]=[C;X3]),$([#6:1]#[#6])]",
-      "description": "Any alkyl, aryl, alkenyl, or alkynyl group.",
-      "tags": [
-        "scaffold",
-        "alkyl",
-        "aromatic",
-        "alkenyl",
-        "alkynyl",
-        "sp2",
-        "sp",
-        "wildcard"
-      ]
-    },
-    {
       "id": "CH3",
       "name": "CH3-",
       "kind": "scaffold",
       "priority": 3,
       "smarts": "[CX4H3:1]",
-      "description": "Methyl (0° alkyl) attachment point (CH3-).",
+      "description": "Methyl (0\u00b0 alkyl) attachment point (CH3-).",
       "tags": [
         "scaffold",
         "alkyl",
         "sp3",
         "methyl"
-      ]
-    },
-    {
-      "id": "R_Subst",
-      "name": "-R",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[!#1:2]",
-      "description": "Any non-hydrogen substituent (Generic group).",
-      "tags": [
-        "substituent",
-        "wildcard"
       ]
     },
     {
@@ -84,19 +54,6 @@
         "scaffold",
         "alkenyl",
         "sp2"
-      ]
-    },
-    {
-      "id": "sp2_Carbon",
-      "name": "Csp2-",
-      "kind": "scaffold",
-      "priority": 4,
-      "smarts": "[$([c:1]),$([C;X3:1]=[C;X3])]",
-      "description": "Generic sp2 carbon scaffold (aryl or vinylic).",
-      "tags": [
-        "scaffold",
-        "sp2",
-        "generic"
       ]
     },
     {
@@ -231,20 +188,6 @@
         "scaffold",
         "acyl",
         "carbonyl"
-      ]
-    },
-    {
-      "id": "X",
-      "name": "-X",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[F,Cl,Br,I:2]",
-      "description": "Generic halide substituent (-X).",
-      "tags": [
-        "halide",
-        "x_group",
-        "leaving_group",
-        "wildcard"
       ]
     },
     {
@@ -393,19 +336,6 @@
       ]
     },
     {
-      "id": "B_Any",
-      "name": "-B(R)2",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[B:2]",
-      "description": "Generic boron substituent (-B(R)2).",
-      "tags": [
-        "boron_handle",
-        "organoboron",
-        "wildcard"
-      ]
-    },
-    {
       "id": "B(OH)2",
       "name": "-B(OH)2",
       "kind": "substituent",
@@ -475,18 +405,6 @@
       "tags": [
         "organometallic",
         "magnesium"
-      ]
-    },
-    {
-      "id": "M",
-      "name": "-M",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[Li,Na,K,Mg,Zn,Cu,Ag:2]",
-      "description": "Generic organometallic substituent (-M).",
-      "tags": [
-        "organometallic",
-        "wildcard"
       ]
     },
     {
@@ -679,7 +597,10 @@
       "kind": "substituent",
       "smarts": "[O;R1]1[C;R1][C;R1:2]1",
       "description": "Epoxide (oxirane) ring substituent.",
-      "tags": ["epoxide", "oxirane"]
+      "tags": [
+        "epoxide",
+        "oxirane"
+      ]
     },
     {
       "id": "OR",
@@ -754,20 +675,6 @@
         "sulfonic_acid",
         "acid",
         "ewg_strong"
-      ]
-    },
-    {
-      "id": "COX",
-      "name": "-COX",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[CX3:2](=O)[F,Cl,Br,I]",
-      "description": "Generic acyl halide substituent (-COX).",
-      "tags": [
-        "acyl_electrophile",
-        "leaving_group",
-        "carbonyl",
-        "wildcard"
       ]
     },
     {
@@ -931,20 +838,6 @@
       ]
     },
     {
-      "id": "SO2X",
-      "name": "-SO2X",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[SX4:2](=O)(=O)[F,Cl,Br,I]",
-      "description": "Generic sulfonyl halide substituent (-SO2X).",
-      "tags": [
-        "sulfonyl_halide",
-        "leaving_group",
-        "ewg_strong",
-        "wildcard"
-      ]
-    },
-    {
       "id": "SO2Cl",
       "name": "-SO2Cl",
       "kind": "substituent",
@@ -1073,19 +966,6 @@
       "tags": [
         "sulfonamide",
         "nitrogen_group"
-      ]
-    },
-    {
-      "id": "Sulfonate",
-      "name": "-OSO2R",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[S:2](=O)(=O)O",
-      "description": "Generic sulfonate substituent (-OSO2R).",
-      "tags": [
-        "sulfonate_leaving_group",
-        "leaving_group",
-        "wildcard"
       ]
     },
     {

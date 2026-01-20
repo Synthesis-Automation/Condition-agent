@@ -58,33 +58,6 @@
       "description": "Vinylic C-H bond."
     },
     {
-      "id": "Csp2-X",
-      "name": "Csp2-X",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "X",
-      "description": "Aryl or vinyl halide (F, Cl, Br, I).",
-      "aliases": [
-        "sp2 halide"
-      ]
-    },
-    {
-      "id": "Csp2-Sulfonate",
-      "name": "Csp2-Sulfonate",
-      "template": "via_oxygen",
-      "A": "sp2_Carbon",
-      "B": "Sulfonate",
-      "description": "Aryl or vinyl sulfonate leaving group."
-    },
-    {
-      "id": "Csp2-B(OR)2",
-      "name": "Csp2-B(OR)2",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "B(OR)2",
-      "description": "Aryl or vinyl boronate ester."
-    },
-    {
       "id": "RCH2-B(OR)2",
       "name": "RCH2-B(OR)2",
       "template": "single_bond",
@@ -107,14 +80,6 @@
       "A": "R3C",
       "B": "B(OR)2",
       "description": "Tertiary alkyl boronate ester (R3C-B(OR)2)."
-    },
-    {
-      "id": "Csp2-B(OH)2",
-      "name": "Csp2-B(OH)2",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "B(OH)2",
-      "description": "Aryl or vinyl boronic acid."
     },
     {
       "id": "RCH2-B(OH)2",
@@ -141,14 +106,6 @@
       "description": "Tertiary alkyl boronic acid (R3C-B(OH)2)."
     },
     {
-      "id": "Csp2-Sn",
-      "name": "Csp2-Sn",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "Sn",
-      "description": "Aryl or vinyl stannane."
-    },
-    {
       "id": "RCH2-Sn",
       "name": "RCH2-Sn",
       "template": "single_bond",
@@ -171,14 +128,6 @@
       "A": "R3C",
       "B": "Sn",
       "description": "Tertiary alkyl stannane (R3C-Sn)."
-    },
-    {
-      "id": "Csp2-Zn",
-      "name": "Csp2-Zn",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "Zn",
-      "description": "Aryl or vinyl zincate."
     },
     {
       "id": "RCH2-Zn",
@@ -205,14 +154,6 @@
       "description": "Tertiary alkyl zincate (R3C-Zn)."
     },
     {
-      "id": "Csp2-Mg",
-      "name": "Csp2-Mg",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "Mg",
-      "description": "Aryl or vinyl Grignard."
-    },
-    {
       "id": "RCH2-Mg",
       "name": "RCH2-Mg",
       "template": "single_bond",
@@ -235,22 +176,6 @@
       "A": "R3C",
       "B": "Mg",
       "description": "Tertiary alkyl Grignard (R3C-Mg)."
-    },
-    {
-      "id": "Csp2-Si",
-      "name": "Csp2-Si",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "Si",
-      "description": "Aryl or vinyl silane."
-    },
-    {
-      "id": "Csp2-M",
-      "name": "Csp2-M",
-      "template": "single_bond",
-      "A": "sp2_Carbon",
-      "B": "M",
-      "description": "Aryl or vinyl organometallic (Li, Na, K, Mg, Zn, Cu, Ag)."
     },
     {
       "id": "Ar-Ar",
@@ -323,18 +248,6 @@
       "aliases": [
         "alkyl-arene"
       ]
-    },
-    {
-      "id": "Ar-X",
-      "name": "Ar-X",
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "X",
-      "description": "Aryl halide (Ar-X).",
-      "aliases": [
-        "aryl halide"
-      ],
-      "reactivity_weight": 2.0
     },
     {
       "id": "Ar-Cl",
@@ -569,12 +482,28 @@
       "description": "Propargylic triflate (Propargyl-OTf)."
     },
     {
-      "id": "Propargyl-Sulfonate",
-      "name": "Propargyl-Sulfonate",
+      "id": "Propargyl-OTs",
+      "name": "Propargyl-OTs",
       "template": "via_oxygen",
       "A": "Propargyl",
-      "B": "Sulfonate",
-      "description": "Propargylic sulfonate (OTf, OTs, OMs)."
+      "B": "OTs",
+      "description": "Propargylic tosylate (Propargyl-OTs)."
+    },
+    {
+      "id": "Propargyl-OMs",
+      "name": "Propargyl-OMs",
+      "template": "via_oxygen",
+      "A": "Propargyl",
+      "B": "OMs",
+      "description": "Propargylic mesylate (Propargyl-OMs)."
+    },
+    {
+      "id": "Propargyl-OSO2R",
+      "name": "Propargyl-OSO2R",
+      "template": "via_oxygen",
+      "A": "Propargyl",
+      "B": "OSO2R",
+      "description": "Propargylic sulfonate (Propargyl-OSO2R)."
     },
     {
       "id": "Alkynyl-Cl",
@@ -670,6 +599,14 @@
       ]
     },
     {
+      "id": "Alkenyl-OSO2R",
+      "name": "Alkenyl-OSO2R",
+      "template": "via_oxygen",
+      "A": "Alkenyl",
+      "B": "OSO2R",
+      "description": "Vinyl/alkenyl sulfonate (Alkenyl-OSO2R)."
+    },
+    {
       "id": "Bn-OTf",
       "name": "Bn-OTf",
       "template": "single_bond",
@@ -734,15 +671,6 @@
       "aliases": [
         "AllylOMs"
       ]
-    },
-    {
-      "id": "Ar-B*",
-      "name": "Ar-B*",
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "B_Any",
-      "description": "Aryl boron substituent (generic organoboron).",
-      "reactivity_weight": 2.5
     },
     {
       "id": "Ar-B(OH)2",
@@ -826,17 +754,6 @@
       "A": "Alkyl",
       "B": "Zn",
       "description": "Alkyl zincate (Alkyl-ZnX)."
-    },
-    {
-      "id": "Alkyl-M",
-      "name": "Alkyl-M",
-      "template": "single_bond",
-      "A": "Alkyl",
-      "B": "M",
-      "description": "Alkyl organometallic (Alkyl-M).",
-      "aliases": [
-        "Alkyl-M"
-      ]
     },
     {
       "id": "Alkyl-Mg",
@@ -1151,14 +1068,6 @@
       "description": "Aryl acid iodide (Ar-COI)."
     },
     {
-      "id": "Ar-COX",
-      "name": "Ar-COX",
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "COX",
-      "description": "Aryl acyl halide (Ar-COX)."
-    },
-    {
       "id": "Ar-CO2R",
       "name": "Ar-CO2R",
       "template": "single_bond",
@@ -1247,14 +1156,6 @@
       "description": "Aryl sulfonyl iodide (Ar-SO2I)."
     },
     {
-      "id": "Ar-SO2X",
-      "name": "Ar-SO2X",
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "SO2X",
-      "description": "Aryl sulfonyl halide (Ar-SO2X)."
-    },
-    {
       "id": "Ar-Sulfamide",
       "name": "Ar-NHSO2N<",
       "template": "single_bond",
@@ -1271,12 +1172,36 @@
       "description": "Aryl urea (Ar-Urea)."
     },
     {
-      "id": "R-Thiourea",
-      "name": "R-Thiourea",
+      "id": "Ar-Thiourea",
+      "name": "Ar-Thiourea",
       "template": "single_bond",
-      "A": "R",
+      "A": "Ar",
       "B": "Thiourea",
-      "description": "Generic thiourea substituent (R-Thiourea)."
+      "description": "Aryl thiourea (Ar-Thiourea)."
+    },
+    {
+      "id": "Alkyl-Thiourea",
+      "name": "Alkyl-Thiourea",
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "Thiourea",
+      "description": "Alkyl thiourea (Alkyl-Thiourea)."
+    },
+    {
+      "id": "Alkenyl-Thiourea",
+      "name": "Alkenyl-Thiourea",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "Thiourea",
+      "description": "Alkenyl thiourea (Alkenyl-Thiourea)."
+    },
+    {
+      "id": "Alkynyl-Thiourea",
+      "name": "Alkynyl-Thiourea",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "Thiourea",
+      "description": "Alkynyl thiourea (Alkynyl-Thiourea)."
     },
     {
       "id": "Ar-Carbamate",
@@ -1791,14 +1716,6 @@
       "description": "Tertiary alkyl ester (R3C-Ester)."
     },
     {
-      "id": "CH3-X",
-      "name": "CH3-X",
-      "template": "single_bond",
-      "A": "CH3",
-      "B": "X",
-      "description": "Methyl halide (CH3-X)."
-    },
-    {
       "id": "CH3-Cl",
       "name": "CH3-Cl",
       "template": "single_bond",
@@ -1829,14 +1746,6 @@
       "A": "CH3",
       "B": "F",
       "description": "Methyl fluoride (CH3-F)."
-    },
-    {
-      "id": "RCH2-X",
-      "name": "RCH2-X",
-      "template": "single_bond",
-      "A": "RCH2",
-      "B": "X",
-      "description": "Primary alkyl halide (RCH2-X)."
     },
     {
       "id": "RCH2-PR3+",
@@ -1879,14 +1788,6 @@
       "description": "Primary alkyl fluoride (RCH2-F)."
     },
     {
-      "id": "R2CH-X",
-      "name": "R2CH-X",
-      "template": "single_bond",
-      "A": "R2CH",
-      "B": "X",
-      "description": "Secondary alkyl halide (R2CH-X)."
-    },
-    {
       "id": "R2CH-Cl",
       "name": "R2CH-Cl",
       "template": "single_bond",
@@ -1917,14 +1818,6 @@
       "A": "R2CH",
       "B": "F",
       "description": "Secondary alkyl fluoride (R2CH-F)."
-    },
-    {
-      "id": "R3C-X",
-      "name": "R3C-X",
-      "template": "single_bond",
-      "A": "R3C",
-      "B": "X",
-      "description": "Tertiary alkyl halide (R3C-X)."
     },
     {
       "id": "R3C-Cl",
@@ -2113,18 +2006,6 @@
       ]
     },
     {
-      "id": "Alkyl-X",
-      "name": "Alkyl-X",
-      "template": "single_bond",
-      "A": "Alkyl",
-      "B": "X",
-      "description": "Alkyl halide (Alkyl-X).",
-      "aliases": [
-        "RX",
-        "alkyl halide"
-      ]
-    },
-    {
       "id": "Alkyl-OTf",
       "name": "Alkyl-OTf",
       "template": "single_bond",
@@ -2242,14 +2123,6 @@
       "A": "Alkyl",
       "B": "COR",
       "description": "Alkyl ketone (Alkyl-COR)."
-    },
-    {
-      "id": "R-COR",
-      "name": "R-COR",
-      "template": "single_bond",
-      "A": "R",
-      "B": "COR",
-      "description": "Generic ketone (R-COR)."
     },
     {
       "id": "Alkyl-Ester",
@@ -2814,12 +2687,36 @@
       "description": "R group paired with SR substituent."
     },
     {
-      "id": "R-OCSSR",
-      "name": "R-OCSSR",
+      "id": "Ar-OCSSR",
+      "name": "Ar-OCSSR",
       "template": "single_bond",
-      "A": "R",
+      "A": "Ar",
       "B": "OCSSR",
-      "description": "O-thiocarbonate substituent (R-OCSSR)."
+      "description": "Aryl O-thiocarbonate (Ar-OCSSR)."
+    },
+    {
+      "id": "Alkyl-OCSSR",
+      "name": "Alkyl-OCSSR",
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "OCSSR",
+      "description": "Alkyl O-thiocarbonate (Alkyl-OCSSR)."
+    },
+    {
+      "id": "Alkenyl-OCSSR",
+      "name": "Alkenyl-OCSSR",
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "OCSSR",
+      "description": "Alkenyl O-thiocarbonate (Alkenyl-OCSSR)."
+    },
+    {
+      "id": "Alkynyl-OCSSR",
+      "name": "Alkynyl-OCSSR",
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "OCSSR",
+      "description": "Alkynyl O-thiocarbonate (Alkynyl-OCSSR)."
     },
     {
       "id": "RCH2-SR",
