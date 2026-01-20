@@ -55,6 +55,8 @@ def detect_reaction(
     reaction_smiles: str,
     use_ml: bool = True,
     use_taxonomy_smarts: bool = True,
+    use_bond_changes: bool = False,
+    bond_change_threshold: float = 0.4,
 ) -> Dict[str, Any]:
     """
     Detect reaction family from reaction SMILES using taxonomy v2.
@@ -63,13 +65,19 @@ def detect_reaction(
         reaction_smiles: Full reaction SMILES (reactants>>products).
         use_ml: Ignored (kept for compatibility with old API).
         use_taxonomy_smarts: Ignored (kept for compatibility with old API).
+        use_bond_changes: If True, try atom-mapped bond-change detection first.
+        bond_change_threshold: Minimum similarity for bond-change matches.
 
     Returns:
         Dict with ``family``, ``confidence``, ``method``, and slot evidence
         metadata under ``details``.
     """
     _ = use_ml, use_taxonomy_smarts
-    result = detect_reaction_types(reaction_smiles)
+    result = detect_reaction_types(
+        reaction_smiles,
+        use_bond_changes=use_bond_changes,
+        bond_change_threshold=bond_change_threshold,
+    )
     matches = [match.to_dict() for match in result.matches]
     best = matches[0] if matches else None
     return _build_result(matches=matches, best=best, error=result.error)

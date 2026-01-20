@@ -204,9 +204,10 @@ def load_reaction_catalog(
         conditions = entry.get("conditions")
         metadata = dict(entry.get("metadata") or {})
         constraints = dict(entry.get("constraints") or {})
-        reference_reactions = [
-            str(r) for r in (entry.get("reference_reactions") or []) if isinstance(r, str)
-        ]
+        raw_references = entry.get("reference_reactions")
+        if not raw_references:
+            raw_references = entry.get("examples") or []
+        reference_reactions = [str(r) for r in raw_references if isinstance(r, str)]
         notes = entry.get("notes")
 
         definitions[rxn_id] = ReactionTypeDefinition(

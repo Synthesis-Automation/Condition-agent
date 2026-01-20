@@ -30,18 +30,6 @@
       ]
     },
     {
-      "id": "Any_Substituent",
-      "name": "-",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[*:2]",
-      "description": "Wildcard for any substituent attachment point (any atom).",
-      "tags": [
-        "substituent",
-        "wildcard"
-      ]
-    },
-    {
       "id": "R_Subst",
       "name": "-R",
       "kind": "substituent",
