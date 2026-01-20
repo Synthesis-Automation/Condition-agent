@@ -578,7 +578,7 @@
       "products": {
         "product": [
           "Ar-NH2",
-          "Any-NH2"
+          "NH2"
         ]
       },
       "examples": [
@@ -610,7 +610,7 @@
       "reactants": {
         "substrate": [
           "@terminal_alkenes",
-          "Any-C=C"
+          "C=C"
         ]
       },
       "products": {

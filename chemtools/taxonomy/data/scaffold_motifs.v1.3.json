@@ -186,20 +186,20 @@
       "description": "Atomic oxygen oxidant placeholder."
     },
     {
-      "id": "Any-C=C-C=C",
-      "name": "Any-C=C-C=C",
+      "id": "C=C-C=C",
+      "name": "C=C-C=C",
       "smarts": "[CX3]=[CX3][CX3]=[CX3]",
       "description": "Conjugated diene motif (C=C-C=C)."
     },
     {
       "id": "Motif-C=C",
-      "name": "Any-C=C",
+      "name": "C=C",
       "smarts": "[CX3:1]=[CX3]",
       "description": "Generic alkene motif (C=C)."
     },
     {
-      "id": "Any-C#C",
-      "name": "Any-C#C",
+      "id": "C#C",
+      "name": "C#C",
       "smarts": "[CX2:1]#[CX2]",
       "description": "Generic alkyne motif (C#C).",
       "aliases": [
@@ -207,8 +207,8 @@
       ]
     },
     {
-      "id": "Any-EnolEther",
-      "name": "Any-EnolEther",
+      "id": "EnolEther",
+      "name": "EnolEther",
       "smarts": "[CX3:1]=[CX3][OX2][#6]",
       "description": "Enol ether motif (C=C-O-R).",
       "aliases": [
@@ -216,8 +216,8 @@
       ]
     },
     {
-      "id": "Any-Dienophile",
-      "name": "Any-Dienophile",
+      "id": "Dienophile",
+      "name": "Dienophile",
       "smarts": "[CX3:1]=[CX3]",
       "description": "Alkene motif for dienophiles (non-conjugated)."
     },
@@ -228,8 +228,8 @@
       "description": "Epoxide (oxirane) ring motif."
     },
     {
-      "id": "Any-CO2M",
-      "name": "Any-CO2M",
+      "id": "CO2M",
+      "name": "CO2M",
       "smarts": "[CX3](=O)[O-]",
       "description": "Carboxylate (deprotonated carboxylic acid)."
     }

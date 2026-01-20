@@ -68,8 +68,8 @@
       "members": [
         "Ar-NH2",
         "Ar-NHR",
-        "Any-NH2",
-        "Any-NHR",
+        "NH2",
+        "NHR",
         "Alkenyl-NH2",
         "Alkenyl-NHR",
         "Alkyl-NH2",
@@ -106,8 +106,8 @@
         "H-Carbamate",
         "H-Amide",
         "H-Sulfonamide",
-        "Any-CONH2",
-        "Any-CONHR",
+        "CONH2",
+        "CONHR",
         "Ar-CONH2",
         "Ar-CONHR",
         "Alkenyl-CONH2",
@@ -126,18 +126,18 @@
         "R2CH-CONHR",
         "R3C-CONH2",
         "R3C-CONHR",
-        "Any-Carbamate",
+        "Carbamate",
         "Ar-Carbamate",
         "Alkyl-Carbamate",
-        "Any-Sulfonamide",
+        "Sulfonamide",
         "Ar-Sulfonamide",
         "Alkyl-Sulfonamide",
-        "Any-Urea",
+        "Urea",
         "Ar-Urea",
-        "Any-Hydrazide",
+        "Hydrazide",
         "Ar-Hydrazide",
         "Alkyl-Hydrazide",
-        "Any-Hydrazine",
+        "Hydrazine",
         "Ar-Hydrazine",
         "Alkyl-Hydrazine"
       ]
@@ -146,7 +146,7 @@
       "name": "Alcohols (O-H)",
       "members": [
         "Ar-OH",
-        "Any-OH",
+        "OH",
         "Alkenyl-OH",
         "Alkyl-OH",
         "Alkynyl-OH",
@@ -165,7 +165,7 @@
       "name": "Thiols (S-H)",
       "members": [
         "Ar-SH",
-        "Any-SH",
+        "SH",
         "Alkenyl-SH",
         "Alkyl-SH",
         "Alkynyl-SH",
@@ -181,7 +181,7 @@
     "carboxylic_acids": {
       "name": "Carboxylic Acids",
       "members": [
-        "Any-CO2H",
+        "CO2H",
         "Acyl-CO2H",
         "Ar-CO2H",
         "Alkenyl-CO2H",
@@ -196,8 +196,8 @@
       "members": [
         "Ar-COCl",
         "Ar-COBr",
-        "Any-COCl",
-        "Any-COBr"
+        "COCl",
+        "COBr"
       ]
     },
     "terminal_alkynes": {
@@ -214,7 +214,7 @@
       "members": [
         "Ar-C=CH2",
         "Alkyl-C=CH2",
-        "Any-C=CH2",
+        "C=CH2",
         "Alkenyl-H",
         "H-Alkenyl"
       ]
@@ -223,13 +223,13 @@
       "name": "Carbonyls",
       "members": [
         "Ar-CHO",
-        "Any-CHO",
+        "CHO",
         "Alkenyl-CHO",
         "Alkyl-CHO",
         "RCH2-CHO",
         "R2CH-CHO",
         "R3C-CHO",
-        "Any-COR",
+        "COR",
         "Ar-COR",
         "Alkenyl-COR",
         "Alkyl-COR",
@@ -276,7 +276,7 @@
       "name": "Esters",
       "members": [
         "Ar-CO2R",
-        "Any-CO2R",
+        "CO2R",
         "Alkenyl-CO2R",
         "Alkyl-Ester",
         "Alkynyl-CO2R",
@@ -290,12 +290,12 @@
     "amides": {
       "name": "Amides",
       "members": [
-        "Any-Amide",
+        "Amide",
         "Ar-Amide",
         "Alkyl-NCOR",
-        "Any-CONH2",
-        "Any-CONHR",
-        "Any-CONR2",
+        "CONH2",
+        "CONHR",
+        "CONR2",
         "Ar-CONH2",
         "Ar-CONHR",
         "Ar-CONR2",
@@ -332,7 +332,7 @@
         "Alkyl-C#CH",
         "Ar-C=CH2",
         "Alkyl-C=CH2",
-        "Any-C=C",
+        "C=C",
         "Ar-C=C",
         "Alkyl-C=C",
         "H-Alkenyl"

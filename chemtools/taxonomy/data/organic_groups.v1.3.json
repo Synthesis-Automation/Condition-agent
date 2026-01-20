@@ -8,10 +8,16 @@
       "name": "R-",
       "kind": "scaffold",
       "priority": 0,
-      "smarts": "[!#1:1]",
-      "description": "Any non-hydrogen scaffold (Generic group).",
+      "smarts": "[$([CX4:1]),$([c:1]),$([C;X3:1]=[C;X3]),$([#6:1]#[#6])]",
+      "description": "Any alkyl, aryl, alkenyl, or alkynyl group.",
       "tags": [
         "scaffold",
+        "alkyl",
+        "aromatic",
+        "alkenyl",
+        "alkynyl",
+        "sp2",
+        "sp",
         "wildcard"
       ]
     },
