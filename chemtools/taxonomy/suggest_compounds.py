@@ -164,7 +164,6 @@ class CompoundSuggester:
                 
                 suggestion = {
                     "id": compound_id,
-                    "name": compound_name,
                     "template": template,
                     "A": scaffold,
                     "B": substituent,
@@ -204,7 +203,6 @@ class CompoundSuggester:
         for suggestion in suggestions:
             compound = {
                 "id": suggestion["id"],
-                "name": suggestion["name"],
                 "template": suggestion["template"],
                 "A": suggestion["A"],
                 "B": suggestion["B"],

@@ -5,7 +5,6 @@
   "compounds": [
     {
       "id": "Ar-H",
-      "name": "Ar-H",
       "template": "single_bond",
       "A": "Ar",
       "B": "H",
@@ -19,7 +18,6 @@
     },
     {
       "id": "Alkyl-H",
-      "name": "Alkyl-H",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "H",
@@ -31,7 +29,6 @@
     },
     {
       "id": "Alkyl-H-acidic",
-      "name": "Alkyl-H-acidic",
       "template": "single_bond",
       "A": "R_acidic",
       "B": "H",
@@ -43,7 +40,6 @@
     },
     {
       "id": "Alkynyl-H",
-      "name": "Alkynyl-H",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "H",
@@ -51,7 +47,6 @@
     },
     {
       "id": "Alkenyl-H",
-      "name": "Alkenyl-H",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "H",
@@ -59,7 +54,6 @@
     },
     {
       "id": "RCH2-B(OR)2",
-      "name": "RCH2-B(OR)2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "B(OR)2",
@@ -67,7 +61,6 @@
     },
     {
       "id": "R2CH-B(OR)2",
-      "name": "R2CH-B(OR)2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "B(OR)2",
@@ -75,7 +68,6 @@
     },
     {
       "id": "R3C-B(OR)2",
-      "name": "R3C-B(OR)2",
       "template": "single_bond",
       "A": "R3C",
       "B": "B(OR)2",
@@ -83,7 +75,6 @@
     },
     {
       "id": "RCH2-B(OH)2",
-      "name": "RCH2-B(OH)2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "B(OH)2",
@@ -91,7 +82,6 @@
     },
     {
       "id": "R2CH-B(OH)2",
-      "name": "R2CH-B(OH)2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "B(OH)2",
@@ -99,7 +89,6 @@
     },
     {
       "id": "R3C-B(OH)2",
-      "name": "R3C-B(OH)2",
       "template": "single_bond",
       "A": "R3C",
       "B": "B(OH)2",
@@ -107,7 +96,6 @@
     },
     {
       "id": "RCH2-Sn",
-      "name": "RCH2-Sn",
       "template": "single_bond",
       "A": "RCH2",
       "B": "Sn*",
@@ -115,7 +103,6 @@
     },
     {
       "id": "R2CH-Sn",
-      "name": "R2CH-Sn",
       "template": "single_bond",
       "A": "R2CH",
       "B": "Sn*",
@@ -123,7 +110,6 @@
     },
     {
       "id": "R3C-Sn",
-      "name": "R3C-Sn",
       "template": "single_bond",
       "A": "R3C",
       "B": "Sn*",
@@ -131,7 +117,6 @@
     },
     {
       "id": "RCH2-Zn",
-      "name": "RCH2-Zn",
       "template": "single_bond",
       "A": "RCH2",
       "B": "Zn*",
@@ -139,7 +124,6 @@
     },
     {
       "id": "R2CH-Zn",
-      "name": "R2CH-Zn",
       "template": "single_bond",
       "A": "R2CH",
       "B": "Zn*",
@@ -147,7 +131,6 @@
     },
     {
       "id": "R3C-Zn",
-      "name": "R3C-Zn",
       "template": "single_bond",
       "A": "R3C",
       "B": "Zn*",
@@ -155,7 +138,6 @@
     },
     {
       "id": "RCH2-Mg",
-      "name": "RCH2-Mg",
       "template": "single_bond",
       "A": "RCH2",
       "B": "Mg*",
@@ -163,7 +145,6 @@
     },
     {
       "id": "R2CH-Mg",
-      "name": "R2CH-Mg",
       "template": "single_bond",
       "A": "R2CH",
       "B": "Mg*",
@@ -171,7 +152,6 @@
     },
     {
       "id": "R3C-Mg",
-      "name": "R3C-Mg",
       "template": "single_bond",
       "A": "R3C",
       "B": "Mg*",
@@ -179,7 +159,6 @@
     },
     {
       "id": "Ar-Ar",
-      "name": "Ar-Ar",
       "template": "single_bond",
       "A": "Ar",
       "B": "Ar_Subst",
@@ -191,7 +170,6 @@
     },
     {
       "id": "Ar-Alkenyl",
-      "name": "Ar-Alkenyl",
       "template": "single_bond",
       "A": "Ar",
       "B": "Alkenyl_Subst",
@@ -204,7 +182,6 @@
     },
     {
       "id": "Alkenyl-Alkenyl",
-      "name": "Alkenyl-Alkenyl",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Alkenyl_Subst",
@@ -217,7 +194,6 @@
     },
     {
       "id": "Ar-C#CH",
-      "name": "Ar-C#CH",
       "template": "single_bond",
       "A": "Ar",
       "B": "-C#CH",
@@ -230,7 +206,6 @@
     },
     {
       "id": "Ar-C#C",
-      "name": "Ar-C#C",
       "template": "single_bond",
       "A": "Ar",
       "B": "-C#C",
@@ -243,7 +218,6 @@
     },
     {
       "id": "Ar-R",
-      "name": "Ar-R",
       "template": "single_bond",
       "A": "Ar",
       "B": "Alkyl_Subst",
@@ -256,7 +230,6 @@
     },
     {
       "id": "Ar-Cl",
-      "name": "Ar-Cl",
       "template": "single_bond",
       "A": "Ar",
       "B": "Cl",
@@ -269,7 +242,6 @@
     },
     {
       "id": "Ar-Br",
-      "name": "Ar-Br",
       "template": "single_bond",
       "A": "Ar",
       "B": "Br",
@@ -282,7 +254,6 @@
     },
     {
       "id": "Ar-I",
-      "name": "Ar-I",
       "template": "single_bond",
       "A": "Ar",
       "B": "I",
@@ -295,7 +266,6 @@
     },
     {
       "id": "AromN-H",
-      "name": "AromN-H",
       "template": "single_bond",
       "A": "AromN",
       "B": "H",
@@ -307,7 +277,6 @@
     },
     {
       "id": "AromN-OH",
-      "name": "AromN-OH",
       "template": "single_bond",
       "A": "AromN",
       "B": "OH",
@@ -315,7 +284,6 @@
     },
     {
       "id": "Ar-F",
-      "name": "Ar-F",
       "template": "single_bond",
       "A": "Ar",
       "B": "F",
@@ -328,7 +296,6 @@
     },
     {
       "id": "Ar-CF3",
-      "name": "Ar-CF3",
       "template": "single_bond",
       "A": "Ar",
       "B": "CF3",
@@ -339,7 +306,6 @@
     },
     {
       "id": "Ar-OCF3",
-      "name": "Ar-OCF3",
       "template": "single_bond",
       "A": "Ar",
       "B": "OCF3",
@@ -350,7 +316,6 @@
     },
     {
       "id": "Alkenyl-Cl",
-      "name": "Alkenyl-Cl",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Cl",
@@ -358,7 +323,6 @@
     },
     {
       "id": "Alkenyl-Br",
-      "name": "Alkenyl-Br",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Br",
@@ -369,7 +333,6 @@
     },
     {
       "id": "Alkenyl-I",
-      "name": "Alkenyl-I",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "I",
@@ -380,7 +343,6 @@
     },
     {
       "id": "Alkenyl-OTf",
-      "name": "Alkenyl-OTf",
       "template": "via_oxygen",
       "A": "Alkenyl",
       "B": "OTf",
@@ -388,7 +350,6 @@
     },
     {
       "id": "Alkenyl-F",
-      "name": "Alkenyl-F",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "F",
@@ -400,7 +361,6 @@
     },
     {
       "id": "Bn-Cl",
-      "name": "Bn-Cl",
       "template": "single_bond",
       "A": "Bn",
       "B": "Cl",
@@ -408,7 +368,6 @@
     },
     {
       "id": "Bn-Br",
-      "name": "Bn-Br",
       "template": "single_bond",
       "A": "Bn",
       "B": "Br",
@@ -416,7 +375,6 @@
     },
     {
       "id": "Bn-I",
-      "name": "Bn-I",
       "template": "single_bond",
       "A": "Bn",
       "B": "I",
@@ -424,7 +382,6 @@
     },
     {
       "id": "Allyl-Cl",
-      "name": "Allyl-Cl",
       "template": "single_bond",
       "A": "Allyl",
       "B": "Cl",
@@ -432,7 +389,6 @@
     },
     {
       "id": "Allyl-Br",
-      "name": "Allyl-Br",
       "template": "single_bond",
       "A": "Allyl",
       "B": "Br",
@@ -440,7 +396,6 @@
     },
     {
       "id": "Allyl-I",
-      "name": "Allyl-I",
       "template": "single_bond",
       "A": "Allyl",
       "B": "I",
@@ -448,7 +403,6 @@
     },
     {
       "id": "Propargyl-Cl",
-      "name": "Propargyl-Cl",
       "template": "single_bond",
       "A": "Propargyl",
       "B": "Cl",
@@ -456,7 +410,6 @@
     },
     {
       "id": "Propargyl-Br",
-      "name": "Propargyl-Br",
       "template": "single_bond",
       "A": "Propargyl",
       "B": "Br",
@@ -464,7 +417,6 @@
     },
     {
       "id": "Propargyl-I",
-      "name": "Propargyl-I",
       "template": "single_bond",
       "A": "Propargyl",
       "B": "I",
@@ -472,7 +424,6 @@
     },
     {
       "id": "Propargyl-H",
-      "name": "Propargyl-H",
       "template": "single_bond",
       "A": "Propargyl",
       "B": "H",
@@ -480,7 +431,6 @@
     },
     {
       "id": "Propargyl-OTf",
-      "name": "Propargyl-OTf",
       "template": "via_oxygen",
       "A": "Propargyl",
       "B": "OTf",
@@ -488,7 +438,6 @@
     },
     {
       "id": "Propargyl-OTs",
-      "name": "Propargyl-OTs",
       "template": "via_oxygen",
       "A": "Propargyl",
       "B": "OTs",
@@ -496,7 +445,6 @@
     },
     {
       "id": "Propargyl-OMs",
-      "name": "Propargyl-OMs",
       "template": "via_oxygen",
       "A": "Propargyl",
       "B": "OMs",
@@ -504,7 +452,6 @@
     },
     {
       "id": "Propargyl-OSO2R",
-      "name": "Propargyl-OSO2R",
       "template": "via_oxygen",
       "A": "Propargyl",
       "B": "OSO2R",
@@ -512,7 +459,6 @@
     },
     {
       "id": "Alkynyl-Cl",
-      "name": "Alkynyl-Cl",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Cl",
@@ -520,7 +466,6 @@
     },
     {
       "id": "Alkynyl-Br",
-      "name": "Alkynyl-Br",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Br",
@@ -528,7 +473,6 @@
     },
     {
       "id": "Alkynyl-I",
-      "name": "Alkynyl-I",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "I",
@@ -536,7 +480,6 @@
     },
     {
       "id": "Ar-OTf",
-      "name": "Ar-OTf",
       "template": "via_oxygen",
       "A": "Ar",
       "B": "OTf",
@@ -548,7 +491,6 @@
     },
     {
       "id": "Ar-OTs",
-      "name": "Ar-OTs",
       "template": "via_oxygen",
       "A": "Ar",
       "B": "OTs",
@@ -560,7 +502,6 @@
     },
     {
       "id": "Ar-OMs",
-      "name": "Ar-OMs",
       "template": "via_oxygen",
       "A": "Ar",
       "B": "OMs",
@@ -572,7 +513,6 @@
     },
     {
       "id": "Ar-OSO2R",
-      "name": "Ar-OSO2R",
       "template": "via_oxygen",
       "A": "Ar",
       "B": "OSO2R",
@@ -583,7 +523,6 @@
     },
     {
       "id": "Alkenyl-OTs",
-      "name": "Alkenyl-OTs",
       "template": "via_oxygen",
       "A": "Alkenyl",
       "B": "OTs",
@@ -594,7 +533,6 @@
     },
     {
       "id": "Alkenyl-OMs",
-      "name": "Alkenyl-OMs",
       "template": "via_oxygen",
       "A": "Alkenyl",
       "B": "OMs",
@@ -605,7 +543,6 @@
     },
     {
       "id": "Alkenyl-OSO2R",
-      "name": "Alkenyl-OSO2R",
       "template": "via_oxygen",
       "A": "Alkenyl",
       "B": "OSO2R",
@@ -613,7 +550,6 @@
     },
     {
       "id": "Bn-OTf",
-      "name": "Bn-OTf",
       "template": "single_bond",
       "A": "Bn",
       "B": "OTf",
@@ -624,7 +560,6 @@
     },
     {
       "id": "Bn-OTs",
-      "name": "Bn-OTs",
       "template": "single_bond",
       "A": "Bn",
       "B": "OTs",
@@ -635,7 +570,6 @@
     },
     {
       "id": "Bn-OMs",
-      "name": "Bn-OMs",
       "template": "single_bond",
       "A": "Bn",
       "B": "OMs",
@@ -646,7 +580,6 @@
     },
     {
       "id": "Allyl-OTf",
-      "name": "Allyl-OTf",
       "template": "single_bond",
       "A": "Allyl",
       "B": "OTf",
@@ -657,7 +590,6 @@
     },
     {
       "id": "Allyl-OTs",
-      "name": "Allyl-OTs",
       "template": "single_bond",
       "A": "Allyl",
       "B": "OTs",
@@ -668,7 +600,6 @@
     },
     {
       "id": "Allyl-OMs",
-      "name": "Allyl-OMs",
       "template": "single_bond",
       "A": "Allyl",
       "B": "OMs",
@@ -679,7 +610,6 @@
     },
     {
       "id": "Ar-B(OH)2",
-      "name": "Ar-B(OH)2",
       "template": "single_bond",
       "A": "Ar",
       "B": "B(OH)2",
@@ -691,7 +621,6 @@
     },
     {
       "id": "Ar-BF3K",
-      "name": "Ar-BF3K",
       "template": "single_bond",
       "A": "Ar",
       "B": "BF3K",
@@ -700,7 +629,6 @@
     },
     {
       "id": "Alkenyl-BF3K",
-      "name": "Alkenyl-BF3K",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "BF3K",
@@ -708,7 +636,6 @@
     },
     {
       "id": "Alkyl-BF3K",
-      "name": "Alkyl-BF3K",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "BF3K",
@@ -719,7 +646,6 @@
     },
     {
       "id": "Alkyl-B(OH)2",
-      "name": "Alkyl-B(OH)2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "B(OH)2",
@@ -727,7 +653,6 @@
     },
     {
       "id": "Alkyl-Bpin",
-      "name": "Alkyl-Bpin",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Bpin",
@@ -735,7 +660,6 @@
     },
     {
       "id": "Alkyl-Sn*",
-      "name": "Alkyl-Sn*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Sn*",
@@ -746,7 +670,6 @@
     },
     {
       "id": "Alkyl-Si*",
-      "name": "Alkyl-Si*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Si*",
@@ -754,7 +677,6 @@
     },
     {
       "id": "Alkyl-Zn*",
-      "name": "Alkyl-Zn*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Zn*",
@@ -762,7 +684,6 @@
     },
     {
       "id": "Alkyl-Mg*",
-      "name": "Alkyl-Mg*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Mg*",
@@ -770,7 +691,6 @@
     },
     {
       "id": "Alkynyl-Si*",
-      "name": "Alkynyl-Si*",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Si*",
@@ -778,7 +698,6 @@
     },
     {
       "id": "Ar-SR",
-      "name": "Ar-SR",
       "template": "single_bond",
       "A": "Ar",
       "B": "SR",
@@ -786,7 +705,6 @@
     },
     {
       "id": "Ar-Bpin",
-      "name": "Ar-Bpin",
       "template": "single_bond",
       "A": "Ar",
       "B": "Bpin",
@@ -798,7 +716,6 @@
     },
     {
       "id": "Alkenyl-B(OH)2",
-      "name": "Alkenyl-B(OH)2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "B(OH)2",
@@ -809,7 +726,6 @@
     },
     {
       "id": "Alkenyl-Bpin",
-      "name": "Alkenyl-Bpin",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Bpin",
@@ -820,7 +736,6 @@
     },
     {
       "id": "Alkenyl-B(OR)2",
-      "name": "Alkenyl-B(OR)2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "B(OR)2",
@@ -832,7 +747,6 @@
     },
     {
       "id": "Ar-Sn*",
-      "name": "Ar-Sn*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Sn*",
@@ -841,7 +755,6 @@
     },
     {
       "id": "Ar-Si*",
-      "name": "Ar-Si*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Si*",
@@ -850,7 +763,6 @@
     },
     {
       "id": "Ar-Zn*",
-      "name": "Ar-Zn*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Zn*",
@@ -859,7 +771,6 @@
     },
     {
       "id": "Ar-Mg*",
-      "name": "Ar-Mg*",
       "template": "single_bond",
       "A": "Ar",
       "B": "Mg*",
@@ -868,7 +779,6 @@
     },
     {
       "id": "Alkenyl-Sn*",
-      "name": "Alkenyl-Sn*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Sn*",
@@ -876,7 +786,6 @@
     },
     {
       "id": "Alkenyl-Si*",
-      "name": "Alkenyl-Si*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Si*",
@@ -884,7 +793,6 @@
     },
     {
       "id": "Alkenyl-Zn*",
-      "name": "Alkenyl-Zn*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Zn*",
@@ -892,7 +800,6 @@
     },
     {
       "id": "Alkenyl-Mg*",
-      "name": "Alkenyl-Mg*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Mg*",
@@ -900,7 +807,6 @@
     },
     {
       "id": "Ar-CHO",
-      "name": "Ar-CHO",
       "template": "single_bond",
       "A": "Ar",
       "B": "CHO",
@@ -909,7 +815,6 @@
     },
     {
       "id": "Ar-COR",
-      "name": "Ar-COR",
       "template": "single_bond",
       "A": "Ar",
       "B": "COR",
@@ -917,7 +822,6 @@
     },
     {
       "id": "Ar-CN",
-      "name": "Ar-CN",
       "template": "single_bond",
       "A": "Ar",
       "B": "CN",
@@ -925,7 +829,6 @@
     },
     {
       "id": "Ar-NO2",
-      "name": "Ar-NO2",
       "template": "single_bond",
       "A": "Ar",
       "B": "NO2",
@@ -933,7 +836,6 @@
     },
     {
       "id": "Ar-NH2",
-      "name": "Ar-NH2",
       "template": "single_bond",
       "A": "Ar",
       "B": "NH2",
@@ -941,7 +843,6 @@
     },
     {
       "id": "Ar-NHR",
-      "name": "Ar-NHR",
       "template": "single_bond",
       "A": "Ar",
       "B": "NHR",
@@ -949,7 +850,6 @@
     },
     {
       "id": "Ar-NR2",
-      "name": "Ar-NR2",
       "template": "single_bond",
       "A": "Ar",
       "B": "NR2",
@@ -957,7 +857,6 @@
     },
     {
       "id": "Ar-NHAr",
-      "name": "Ar-NHAr",
       "template": "single_bond",
       "A": "Ar",
       "B": "NHAr",
@@ -965,7 +864,6 @@
     },
     {
       "id": "Ar-NAr2",
-      "name": "Ar-NAr2",
       "template": "single_bond",
       "A": "Ar",
       "B": "NAr2",
@@ -973,7 +871,6 @@
     },
     {
       "id": "Ar-OAr",
-      "name": "Ar-OAr",
       "template": "single_bond",
       "A": "Ar",
       "B": "OAr",
@@ -981,7 +878,6 @@
     },
     {
       "id": "Ar-SAr",
-      "name": "Ar-SAr",
       "template": "single_bond",
       "A": "Ar",
       "B": "SAr",
@@ -989,7 +885,6 @@
     },
     {
       "id": "Ar-AromN",
-      "name": "Ar-AromN",
       "template": "single_bond",
       "A": "Ar",
       "B": "AromN_Subst",
@@ -997,7 +892,6 @@
     },
     {
       "id": "Ar-OH",
-      "name": "Ar-OH",
       "template": "single_bond",
       "A": "Ar",
       "B": "OH",
@@ -1005,7 +899,6 @@
     },
     {
       "id": "Ar-OR",
-      "name": "Ar-OR",
       "template": "single_bond",
       "A": "Ar",
       "B": "OR",
@@ -1018,7 +911,6 @@
     },
     {
       "id": "Ar-SH",
-      "name": "Ar-SH",
       "template": "single_bond",
       "A": "Ar",
       "B": "SH",
@@ -1026,7 +918,6 @@
     },
     {
       "id": "Ar-CO2H",
-      "name": "Ar-CO2H",
       "template": "single_bond",
       "A": "Ar",
       "B": "CO2H",
@@ -1035,7 +926,6 @@
     },
     {
       "id": "Acyl-CO2H",
-      "name": "Acyl-CO2H",
       "template": "single_bond",
       "A": "Acyl",
       "B": "CO2H",
@@ -1043,7 +933,6 @@
     },
     {
       "id": "Ar-COCl",
-      "name": "Ar-COCl",
       "template": "single_bond",
       "A": "Ar",
       "B": "COCl",
@@ -1051,7 +940,6 @@
     },
     {
       "id": "Ar-COF",
-      "name": "Ar-COF",
       "template": "single_bond",
       "A": "Ar",
       "B": "COF",
@@ -1059,7 +947,6 @@
     },
     {
       "id": "Ar-COBr",
-      "name": "Ar-COBr",
       "template": "single_bond",
       "A": "Ar",
       "B": "COBr",
@@ -1067,7 +954,6 @@
     },
     {
       "id": "Ar-COI",
-      "name": "Ar-COI",
       "template": "single_bond",
       "A": "Ar",
       "B": "COI",
@@ -1075,7 +961,6 @@
     },
     {
       "id": "Ar-CO2R",
-      "name": "Ar-CO2R",
       "template": "single_bond",
       "A": "Ar",
       "B": "CO2R",
@@ -1083,7 +968,6 @@
     },
     {
       "id": "Ar-CONH2",
-      "name": "Ar-CONH2",
       "template": "single_bond",
       "A": "Ar",
       "B": "CONH2",
@@ -1091,7 +975,6 @@
     },
     {
       "id": "Ar-CONHR",
-      "name": "Ar-CONHR",
       "template": "single_bond",
       "A": "Ar",
       "B": "CONHR",
@@ -1099,7 +982,6 @@
     },
     {
       "id": "Ar-CONR2",
-      "name": "Ar-CONR2",
       "template": "single_bond",
       "A": "Ar",
       "B": "CONR2",
@@ -1107,7 +989,6 @@
     },
     {
       "id": "Ar-SO2NH2",
-      "name": "Ar-SO2NH2",
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2NH2",
@@ -1115,7 +996,6 @@
     },
     {
       "id": "Ar-SO2NHR",
-      "name": "Ar-SO2NHR",
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2NHR",
@@ -1123,7 +1003,6 @@
     },
     {
       "id": "Ar-SO2NR2",
-      "name": "Ar-SO2NR2",
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2NR2",
@@ -1131,7 +1010,6 @@
     },
     {
       "id": "Ar-SO2Cl",
-      "name": "Ar-SO2Cl",
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2Cl",
@@ -1139,7 +1017,6 @@
     },
     {
       "id": "Ar-SO2F",
-      "name": "Ar-SO2F",
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2F",
@@ -1147,7 +1024,6 @@
     },
     {
       "id": "Ar-SO2Br",
-      "name": "Ar-SO2Br",
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2Br",
@@ -1155,7 +1031,6 @@
     },
     {
       "id": "Ar-SO2I",
-      "name": "Ar-SO2I",
       "template": "single_bond",
       "A": "Ar",
       "B": "SO2I",
@@ -1163,7 +1038,6 @@
     },
     {
       "id": "Ar-Sulfamide",
-      "name": "Ar-Sulfamide",
       "template": "single_bond",
       "A": "Ar",
       "B": "Sulfamide",
@@ -1174,7 +1048,6 @@
     },
     {
       "id": "Ar-Urea",
-      "name": "Ar-Urea",
       "template": "single_bond",
       "A": "Ar",
       "B": "Urea",
@@ -1185,7 +1058,6 @@
     },
     {
       "id": "Ar-Thiourea",
-      "name": "Ar-Thiourea",
       "template": "single_bond",
       "A": "Ar",
       "B": "Thiourea",
@@ -1193,7 +1065,6 @@
     },
     {
       "id": "Alkyl-Thiourea",
-      "name": "Alkyl-Thiourea",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Thiourea",
@@ -1201,7 +1072,6 @@
     },
     {
       "id": "Alkenyl-Thiourea",
-      "name": "Alkenyl-Thiourea",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Thiourea",
@@ -1209,7 +1079,6 @@
     },
     {
       "id": "Alkynyl-Thiourea",
-      "name": "Alkynyl-Thiourea",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Thiourea",
@@ -1217,7 +1086,6 @@
     },
     {
       "id": "Ar-Carbamate",
-      "name": "Ar-Carbamate",
       "template": "single_bond",
       "A": "Ar",
       "B": "NCO2R",
@@ -1225,7 +1093,6 @@
     },
     {
       "id": "Ar-Amide",
-      "name": "Ar-Amide",
       "template": "single_bond",
       "A": "Ar",
       "B": "NCOR",
@@ -1233,7 +1100,6 @@
     },
     {
       "id": "Alkenyl-CHO",
-      "name": "Alkenyl-CHO",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "CHO",
@@ -1241,7 +1107,6 @@
     },
     {
       "id": "Alkenyl-COR",
-      "name": "Alkenyl-COR",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "COR",
@@ -1249,7 +1114,6 @@
     },
     {
       "id": "Alkenyl-CN",
-      "name": "Alkenyl-CN",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "CN",
@@ -1257,7 +1121,6 @@
     },
     {
       "id": "Alkenyl-NO2",
-      "name": "Alkenyl-NO2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "NO2",
@@ -1265,7 +1128,6 @@
     },
     {
       "id": "Alkenyl-NH2",
-      "name": "Alkenyl-NH2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "NH2",
@@ -1273,7 +1135,6 @@
     },
     {
       "id": "Alkenyl-OH",
-      "name": "Alkenyl-OH",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "OH",
@@ -1281,7 +1142,6 @@
     },
     {
       "id": "Alkenyl-CO2H",
-      "name": "Alkenyl-CO2H",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "CO2H",
@@ -1289,7 +1149,6 @@
     },
     {
       "id": "Alkenyl-CO2R",
-      "name": "Alkenyl-CO2R",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "CO2R",
@@ -1297,7 +1156,6 @@
     },
     {
       "id": "Bn-OH",
-      "name": "Bn-OH",
       "template": "single_bond",
       "A": "Bn",
       "B": "OH",
@@ -1305,7 +1163,6 @@
     },
     {
       "id": "Bn-NH2",
-      "name": "Bn-NH2",
       "template": "single_bond",
       "A": "Bn",
       "B": "NH2",
@@ -1313,7 +1170,6 @@
     },
     {
       "id": "Bn-NHR",
-      "name": "Bn-NHR",
       "template": "single_bond",
       "A": "Bn",
       "B": "NHR",
@@ -1321,7 +1177,6 @@
     },
     {
       "id": "Bn-NR2",
-      "name": "Bn-NR2",
       "template": "single_bond",
       "A": "Bn",
       "B": "NR2",
@@ -1329,7 +1184,6 @@
     },
     {
       "id": "Bn-CN",
-      "name": "Bn-CN",
       "template": "single_bond",
       "A": "Bn",
       "B": "CN",
@@ -1337,7 +1191,6 @@
     },
     {
       "id": "Allyl-OH",
-      "name": "Allyl-OH",
       "template": "single_bond",
       "A": "Allyl",
       "B": "OH",
@@ -1345,7 +1198,6 @@
     },
     {
       "id": "Allyl-NH2",
-      "name": "Allyl-NH2",
       "template": "single_bond",
       "A": "Allyl",
       "B": "NH2",
@@ -1353,7 +1205,6 @@
     },
     {
       "id": "Propargyl-OH",
-      "name": "Propargyl-OH",
       "template": "single_bond",
       "A": "Propargyl",
       "B": "OH",
@@ -1361,7 +1212,6 @@
     },
     {
       "id": "Propargyl-NH2",
-      "name": "Propargyl-NH2",
       "template": "single_bond",
       "A": "Propargyl",
       "B": "NH2",
@@ -1369,7 +1219,6 @@
     },
     {
       "id": "Allyl-NHR",
-      "name": "Allyl-NHR",
       "template": "single_bond",
       "A": "Allyl",
       "B": "NHR",
@@ -1377,7 +1226,6 @@
     },
     {
       "id": "Allyl-NR2",
-      "name": "Allyl-NR2",
       "template": "single_bond",
       "A": "Allyl",
       "B": "NR2",
@@ -1385,7 +1233,6 @@
     },
     {
       "id": "Allyl-CN",
-      "name": "Allyl-CN",
       "template": "single_bond",
       "A": "Allyl",
       "B": "CN",
@@ -1393,7 +1240,6 @@
     },
     {
       "id": "CH3-CN",
-      "name": "CH3-CN",
       "template": "single_bond",
       "A": "CH3",
       "B": "CN",
@@ -1401,7 +1247,6 @@
     },
     {
       "id": "RCH2-CN",
-      "name": "RCH2-CN",
       "template": "single_bond",
       "A": "RCH2",
       "B": "CN",
@@ -1409,7 +1254,6 @@
     },
     {
       "id": "R2CH-CN",
-      "name": "R2CH-CN",
       "template": "single_bond",
       "A": "R2CH",
       "B": "CN",
@@ -1417,7 +1261,6 @@
     },
     {
       "id": "R3C-CN",
-      "name": "R3C-CN",
       "template": "single_bond",
       "A": "R3C",
       "B": "CN",
@@ -1425,7 +1268,6 @@
     },
     {
       "id": "CH3-NH2",
-      "name": "CH3-NH2",
       "template": "single_bond",
       "A": "CH3",
       "B": "NH2",
@@ -1433,7 +1275,6 @@
     },
     {
       "id": "CH3-NHR",
-      "name": "CH3-NHR",
       "template": "single_bond",
       "A": "CH3",
       "B": "NHR",
@@ -1441,7 +1282,6 @@
     },
     {
       "id": "CH3-NR2",
-      "name": "CH3-NR2",
       "template": "single_bond",
       "A": "CH3",
       "B": "NR2",
@@ -1449,7 +1289,6 @@
     },
     {
       "id": "RCH2-NH2",
-      "name": "RCH2-NH2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "NH2",
@@ -1457,7 +1296,6 @@
     },
     {
       "id": "R2CH-NH2",
-      "name": "R2CH-NH2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "NH2",
@@ -1465,7 +1303,6 @@
     },
     {
       "id": "R3C-NH2",
-      "name": "R3C-NH2",
       "template": "single_bond",
       "A": "R3C",
       "B": "NH2",
@@ -1473,7 +1310,6 @@
     },
     {
       "id": "RCH2-NHR",
-      "name": "RCH2-NHR",
       "template": "single_bond",
       "A": "RCH2",
       "B": "NHR",
@@ -1481,7 +1317,6 @@
     },
     {
       "id": "R2CH-NHR",
-      "name": "R2CH-NHR",
       "template": "single_bond",
       "A": "R2CH",
       "B": "NHR",
@@ -1489,7 +1324,6 @@
     },
     {
       "id": "R3C-NHR",
-      "name": "R3C-NHR",
       "template": "single_bond",
       "A": "R3C",
       "B": "NHR",
@@ -1497,7 +1331,6 @@
     },
     {
       "id": "RCH2-NR2",
-      "name": "RCH2-NR2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "NR2",
@@ -1505,7 +1338,6 @@
     },
     {
       "id": "R2CH-NR2",
-      "name": "R2CH-NR2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "NR2",
@@ -1513,7 +1345,6 @@
     },
     {
       "id": "R3C-NR2",
-      "name": "R3C-NR2",
       "template": "single_bond",
       "A": "R3C",
       "B": "NR2",
@@ -1521,7 +1352,6 @@
     },
     {
       "id": "Alkyl-NH2",
-      "name": "Alkyl-NH2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NH2",
@@ -1529,7 +1359,6 @@
     },
     {
       "id": "Alkyl-NHR",
-      "name": "Alkyl-NHR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NHR",
@@ -1537,7 +1366,6 @@
     },
     {
       "id": "Alkyl-NR2",
-      "name": "Alkyl-NR2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NR2",
@@ -1545,7 +1373,6 @@
     },
     {
       "id": "Alkyl-AromN",
-      "name": "Alkyl-AromN",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "AromN_Subst",
@@ -1553,7 +1380,6 @@
     },
     {
       "id": "RCH2-OR",
-      "name": "RCH2-OR",
       "template": "single_bond",
       "A": "RCH2",
       "B": "OR",
@@ -1561,7 +1387,6 @@
     },
     {
       "id": "R2CH-OR",
-      "name": "R2CH-OR",
       "template": "single_bond",
       "A": "R2CH",
       "B": "OR",
@@ -1569,7 +1394,6 @@
     },
     {
       "id": "R3C-OR",
-      "name": "R3C-OR",
       "template": "single_bond",
       "A": "R3C",
       "B": "OR",
@@ -1577,7 +1401,6 @@
     },
     {
       "id": "CH3-SH",
-      "name": "CH3-SH",
       "template": "single_bond",
       "A": "CH3",
       "B": "SH",
@@ -1585,7 +1408,6 @@
     },
     {
       "id": "CH3-SR",
-      "name": "CH3-SR",
       "template": "single_bond",
       "A": "CH3",
       "B": "SR",
@@ -1593,7 +1415,6 @@
     },
     {
       "id": "RCH2-SH",
-      "name": "RCH2-SH",
       "template": "single_bond",
       "A": "RCH2",
       "B": "SH",
@@ -1601,7 +1422,6 @@
     },
     {
       "id": "R2CH-SH",
-      "name": "R2CH-SH",
       "template": "single_bond",
       "A": "R2CH",
       "B": "SH",
@@ -1609,7 +1429,6 @@
     },
     {
       "id": "R3C-SH",
-      "name": "R3C-SH",
       "template": "single_bond",
       "A": "R3C",
       "B": "SH",
@@ -1617,7 +1436,6 @@
     },
     {
       "id": "CH3-OH",
-      "name": "CH3-OH",
       "template": "single_bond",
       "A": "CH3",
       "B": "OH",
@@ -1625,7 +1443,6 @@
     },
     {
       "id": "CH3-OR",
-      "name": "CH3-OR",
       "template": "single_bond",
       "A": "CH3",
       "B": "OR",
@@ -1633,7 +1450,6 @@
     },
     {
       "id": "RCH2-OH",
-      "name": "RCH2-OH",
       "template": "single_bond",
       "A": "RCH2",
       "B": "OH",
@@ -1641,7 +1457,6 @@
     },
     {
       "id": "R2CH-OH",
-      "name": "R2CH-OH",
       "template": "single_bond",
       "A": "R2CH",
       "B": "OH",
@@ -1649,7 +1464,6 @@
     },
     {
       "id": "R3C-OH",
-      "name": "R3C-OH",
       "template": "single_bond",
       "A": "R3C",
       "B": "OH",
@@ -1657,7 +1471,6 @@
     },
     {
       "id": "RCH2-CO2H",
-      "name": "RCH2-CO2H",
       "template": "single_bond",
       "A": "RCH2",
       "B": "CO2H",
@@ -1665,7 +1478,6 @@
     },
     {
       "id": "R2CH-CO2H",
-      "name": "R2CH-CO2H",
       "template": "single_bond",
       "A": "R2CH",
       "B": "CO2H",
@@ -1673,7 +1485,6 @@
     },
     {
       "id": "R3C-CO2H",
-      "name": "R3C-CO2H",
       "template": "single_bond",
       "A": "R3C",
       "B": "CO2H",
@@ -1681,7 +1492,6 @@
     },
     {
       "id": "RCH2-CHO",
-      "name": "RCH2-CHO",
       "template": "single_bond",
       "A": "RCH2",
       "B": "CHO",
@@ -1689,7 +1499,6 @@
     },
     {
       "id": "R2CH-CHO",
-      "name": "R2CH-CHO",
       "template": "single_bond",
       "A": "R2CH",
       "B": "CHO",
@@ -1697,7 +1506,6 @@
     },
     {
       "id": "R3C-CHO",
-      "name": "R3C-CHO",
       "template": "single_bond",
       "A": "R3C",
       "B": "CHO",
@@ -1705,7 +1513,6 @@
     },
     {
       "id": "RCH2-CO2R",
-      "name": "RCH2-CO2R",
       "template": "single_bond",
       "A": "RCH2",
       "B": "CO2R",
@@ -1713,7 +1520,6 @@
     },
     {
       "id": "R2CH-CO2R",
-      "name": "R2CH-CO2R",
       "template": "single_bond",
       "A": "R2CH",
       "B": "CO2R",
@@ -1721,7 +1527,6 @@
     },
     {
       "id": "R3C-CO2R",
-      "name": "R3C-CO2R",
       "template": "single_bond",
       "A": "R3C",
       "B": "CO2R",
@@ -1729,7 +1534,6 @@
     },
     {
       "id": "CH3-Cl",
-      "name": "CH3-Cl",
       "template": "single_bond",
       "A": "CH3",
       "B": "Cl",
@@ -1737,7 +1541,6 @@
     },
     {
       "id": "CH3-Br",
-      "name": "CH3-Br",
       "template": "single_bond",
       "A": "CH3",
       "B": "Br",
@@ -1745,7 +1548,6 @@
     },
     {
       "id": "CH3-I",
-      "name": "CH3-I",
       "template": "single_bond",
       "A": "CH3",
       "B": "I",
@@ -1753,7 +1555,6 @@
     },
     {
       "id": "CH3-F",
-      "name": "CH3-F",
       "template": "single_bond",
       "A": "CH3",
       "B": "F",
@@ -1761,7 +1562,6 @@
     },
     {
       "id": "RCH2-PR3+",
-      "name": "RCH2-PR3+",
       "template": "single_bond",
       "A": "RCH2",
       "B": "PR3+",
@@ -1769,7 +1569,6 @@
     },
     {
       "id": "RCH2-Cl",
-      "name": "RCH2-Cl",
       "template": "single_bond",
       "A": "RCH2",
       "B": "Cl",
@@ -1777,7 +1576,6 @@
     },
     {
       "id": "RCH2-Br",
-      "name": "RCH2-Br",
       "template": "single_bond",
       "A": "RCH2",
       "B": "Br",
@@ -1785,7 +1583,6 @@
     },
     {
       "id": "RCH2-I",
-      "name": "RCH2-I",
       "template": "single_bond",
       "A": "RCH2",
       "B": "I",
@@ -1793,7 +1590,6 @@
     },
     {
       "id": "RCH2-F",
-      "name": "RCH2-F",
       "template": "single_bond",
       "A": "RCH2",
       "B": "F",
@@ -1801,7 +1597,6 @@
     },
     {
       "id": "R2CH-Cl",
-      "name": "R2CH-Cl",
       "template": "single_bond",
       "A": "R2CH",
       "B": "Cl",
@@ -1809,7 +1604,6 @@
     },
     {
       "id": "R2CH-Br",
-      "name": "R2CH-Br",
       "template": "single_bond",
       "A": "R2CH",
       "B": "Br",
@@ -1817,7 +1611,6 @@
     },
     {
       "id": "R2CH-I",
-      "name": "R2CH-I",
       "template": "single_bond",
       "A": "R2CH",
       "B": "I",
@@ -1825,7 +1618,6 @@
     },
     {
       "id": "R2CH-F",
-      "name": "R2CH-F",
       "template": "single_bond",
       "A": "R2CH",
       "B": "F",
@@ -1833,7 +1625,6 @@
     },
     {
       "id": "R3C-Cl",
-      "name": "R3C-Cl",
       "template": "single_bond",
       "A": "R3C",
       "B": "Cl",
@@ -1841,7 +1632,6 @@
     },
     {
       "id": "R3C-Br",
-      "name": "R3C-Br",
       "template": "single_bond",
       "A": "R3C",
       "B": "Br",
@@ -1849,7 +1639,6 @@
     },
     {
       "id": "R3C-I",
-      "name": "R3C-I",
       "template": "single_bond",
       "A": "R3C",
       "B": "I",
@@ -1857,7 +1646,6 @@
     },
     {
       "id": "R3C-F",
-      "name": "R3C-F",
       "template": "single_bond",
       "A": "R3C",
       "B": "F",
@@ -1865,7 +1653,6 @@
     },
     {
       "id": "RCH2-NO2",
-      "name": "RCH2-NO2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "NO2",
@@ -1873,7 +1660,6 @@
     },
     {
       "id": "R2CH-NO2",
-      "name": "R2CH-NO2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "NO2",
@@ -1881,7 +1667,6 @@
     },
     {
       "id": "R3C-NO2",
-      "name": "R3C-NO2",
       "template": "single_bond",
       "A": "R3C",
       "B": "NO2",
@@ -1889,7 +1674,6 @@
     },
     {
       "id": "Alkyl-Hydrazine",
-      "name": "Alkyl-Hydrazine",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Hydrazine",
@@ -1900,7 +1684,6 @@
     },
     {
       "id": "Ar-Hydrazine",
-      "name": "Ar-Hydrazine",
       "template": "single_bond",
       "A": "Ar",
       "B": "Hydrazine",
@@ -1911,7 +1694,6 @@
     },
     {
       "id": "Alkyl-Hydrazide",
-      "name": "Alkyl-Hydrazide",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Hydrazide",
@@ -1922,7 +1704,6 @@
     },
     {
       "id": "Ar-Hydrazide",
-      "name": "Ar-Hydrazide",
       "template": "single_bond",
       "A": "Ar",
       "B": "Hydrazide",
@@ -1933,7 +1714,6 @@
     },
     {
       "id": "Alkyl-Carbamate",
-      "name": "Alkyl-Carbamate",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NCO2R",
@@ -1941,7 +1721,6 @@
     },
     {
       "id": "Alkyl-NCOR",
-      "name": "Alkyl-NCOR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NCOR",
@@ -1949,7 +1728,6 @@
     },
     {
       "id": "Acyl-Cl",
-      "name": "Acyl-Cl",
       "template": "single_bond",
       "A": "Acyl",
       "B": "Cl",
@@ -1961,7 +1739,6 @@
     },
     {
       "id": "Acyl-Br",
-      "name": "Acyl-Br",
       "template": "single_bond",
       "A": "Acyl",
       "B": "Br",
@@ -1972,7 +1749,6 @@
     },
     {
       "id": "Alkyl-Cl",
-      "name": "Alkyl-Cl",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Cl",
@@ -1984,7 +1760,6 @@
     },
     {
       "id": "Alkyl-Br",
-      "name": "Alkyl-Br",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Br",
@@ -1996,7 +1771,6 @@
     },
     {
       "id": "Alkyl-I",
-      "name": "Alkyl-I",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "I",
@@ -2008,7 +1782,6 @@
     },
     {
       "id": "Alkyl-F",
-      "name": "Alkyl-F",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "F",
@@ -2020,7 +1793,6 @@
     },
     {
       "id": "Alkyl-CF3",
-      "name": "Alkyl-CF3",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CF3",
@@ -2031,7 +1803,6 @@
     },
     {
       "id": "Alkyl-OTf",
-      "name": "Alkyl-OTf",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "OTf",
@@ -2043,7 +1814,6 @@
     },
     {
       "id": "Alkyl-OTs",
-      "name": "Alkyl-OTs",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "OTs",
@@ -2055,7 +1825,6 @@
     },
     {
       "id": "Alkyl-OMs",
-      "name": "Alkyl-OMs",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "OMs",
@@ -2067,7 +1836,6 @@
     },
     {
       "id": "Alkyl-OSO2R",
-      "name": "Alkyl-OSO2R",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "OSO2R",
@@ -2078,7 +1846,6 @@
     },
     {
       "id": "Alkyl-C#CH",
-      "name": "Alkyl-C#CH",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "-C#CH",
@@ -2090,7 +1857,6 @@
     },
     {
       "id": "Alkyl-C#C",
-      "name": "Alkyl-C#C",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "-C#C",
@@ -2102,7 +1868,6 @@
     },
     {
       "id": "Alkyl-OH",
-      "name": "Alkyl-OH",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "OH",
@@ -2110,7 +1875,6 @@
     },
     {
       "id": "Alkyl-SH",
-      "name": "Alkyl-SH",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "SH",
@@ -2118,7 +1882,6 @@
     },
     {
       "id": "Alkyl-CN",
-      "name": "Alkyl-CN",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CN",
@@ -2126,7 +1889,6 @@
     },
     {
       "id": "Alkyl-CO2H",
-      "name": "Alkyl-CO2H",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CO2H",
@@ -2134,7 +1896,6 @@
     },
     {
       "id": "Alkyl-CHO",
-      "name": "Alkyl-CHO",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CHO",
@@ -2142,7 +1903,6 @@
     },
     {
       "id": "Alkyl-COR",
-      "name": "Alkyl-COR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "COR",
@@ -2150,7 +1910,6 @@
     },
     {
       "id": "Alkyl-Ester",
-      "name": "Alkyl-Ester",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CO2R",
@@ -2158,7 +1917,6 @@
     },
     {
       "id": "Alkyl-CONH2",
-      "name": "Alkyl-CONH2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CONH2",
@@ -2166,7 +1924,6 @@
     },
     {
       "id": "Alkyl-CONHR",
-      "name": "Alkyl-CONHR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CONHR",
@@ -2174,7 +1931,6 @@
     },
     {
       "id": "Alkyl-CONR2",
-      "name": "Alkyl-CONR2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "CONR2",
@@ -2182,7 +1938,6 @@
     },
     {
       "id": "Ar-C=CH2",
-      "name": "Ar-C=CH2",
       "template": "single_bond",
       "A": "Ar",
       "B": "-C=CH2",
@@ -2195,7 +1950,6 @@
     },
     {
       "id": "Ar-C=C",
-      "name": "Ar-C=C",
       "template": "single_bond",
       "A": "Ar",
       "B": "-C=C",
@@ -2207,7 +1961,6 @@
     },
     {
       "id": "Alkyl-C=CH2",
-      "name": "Alkyl-C=CH2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "-C=CH2",
@@ -2219,7 +1972,6 @@
     },
     {
       "id": "Alkyl-C=C",
-      "name": "Alkyl-C=C",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "-C=C",
@@ -2231,7 +1983,6 @@
     },
     {
       "id": "Ar-LactamN",
-      "name": "Ar-LactamN",
       "template": "single_bond",
       "A": "Ar",
       "B": "LactamN",
@@ -2239,7 +1990,6 @@
     },
     {
       "id": "Ar-Phosphonium",
-      "name": "Ar-Phosphonium",
       "template": "single_bond",
       "A": "Ar",
       "B": "PR3+",
@@ -2247,7 +1997,6 @@
     },
     {
       "id": "Ar-PR2",
-      "name": "Ar-PR2",
       "template": "single_bond",
       "A": "Ar",
       "B": "PR2",
@@ -2255,7 +2004,6 @@
     },
     {
       "id": "Alkyl-PR2",
-      "name": "Alkyl-PR2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "PR2",
@@ -2263,7 +2011,6 @@
     },
     {
       "id": "Ar-Imino",
-      "name": "Ar-Imino",
       "template": "single_bond",
       "A": "Ar",
       "B": "C=N",
@@ -2271,7 +2018,6 @@
     },
     {
       "id": "Ar-B(OR)2",
-      "name": "Ar-B(OR)2",
       "template": "single_bond",
       "A": "Ar",
       "B": "B(OR)2",
@@ -2280,7 +2026,6 @@
     },
     {
       "id": "Ar-N3",
-      "name": "Ar-N3",
       "template": "single_bond",
       "A": "Ar",
       "B": "N3",
@@ -2288,7 +2033,6 @@
     },
     {
       "id": "Alkyl-OR",
-      "name": "Alkyl-OR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "OR",
@@ -2296,7 +2040,6 @@
     },
     {
       "id": "Alkyl-SO2Cl",
-      "name": "Alkyl-SO2Cl",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "SO2Cl",
@@ -2304,7 +2047,6 @@
     },
     {
       "id": "Alkyl-SO2NR2",
-      "name": "Alkyl-SO2NR2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "SO2NR2",
@@ -2312,7 +2054,6 @@
     },
     {
       "id": "Alkyl-SO2NHR",
-      "name": "Alkyl-SO2NHR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "SO2NHR",
@@ -2320,7 +2061,6 @@
     },
     {
       "id": "Alkyl-SO2NH2",
-      "name": "Alkyl-SO2NH2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "SO2NH2",
@@ -2328,7 +2068,6 @@
     },
     {
       "id": "Alkyl-N3",
-      "name": "Alkyl-N3",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "N3",
@@ -2336,7 +2075,6 @@
     },
     {
       "id": "RCH2-N3",
-      "name": "RCH2-N3",
       "template": "single_bond",
       "A": "RCH2",
       "B": "N3",
@@ -2344,7 +2082,6 @@
     },
     {
       "id": "R2CH-N3",
-      "name": "R2CH-N3",
       "template": "single_bond",
       "A": "R2CH",
       "B": "N3",
@@ -2352,7 +2089,6 @@
     },
     {
       "id": "R3C-N3",
-      "name": "R3C-N3",
       "template": "single_bond",
       "A": "R3C",
       "B": "N3",
@@ -2360,7 +2096,6 @@
     },
     {
       "id": "Bn-N3",
-      "name": "Bn-N3",
       "template": "single_bond",
       "A": "Bn",
       "B": "N3",
@@ -2368,7 +2103,6 @@
     },
     {
       "id": "Allyl-N3",
-      "name": "Allyl-N3",
       "template": "single_bond",
       "A": "Allyl",
       "B": "N3",
@@ -2376,7 +2110,6 @@
     },
     {
       "id": "Alkenyl-N3",
-      "name": "Alkenyl-N3",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "N3",
@@ -2384,7 +2117,6 @@
     },
     {
       "id": "Alkynyl-N3",
-      "name": "Alkynyl-N3",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "N3",
@@ -2392,7 +2124,6 @@
     },
     {
       "id": "RCH2-CONHR",
-      "name": "RCH2-CONHR",
       "template": "single_bond",
       "A": "RCH2",
       "B": "CONHR",
@@ -2400,7 +2131,6 @@
     },
     {
       "id": "R2CH-CONHR",
-      "name": "R2CH-CONHR",
       "template": "single_bond",
       "A": "R2CH",
       "B": "CONHR",
@@ -2408,7 +2138,6 @@
     },
     {
       "id": "R3C-CONHR",
-      "name": "R3C-CONHR",
       "template": "single_bond",
       "A": "R3C",
       "B": "CONHR",
@@ -2416,7 +2145,6 @@
     },
     {
       "id": "Bn-CONHR",
-      "name": "Bn-CONHR",
       "template": "single_bond",
       "A": "Bn",
       "B": "CONHR",
@@ -2424,7 +2152,6 @@
     },
     {
       "id": "Allyl-CONHR",
-      "name": "Allyl-CONHR",
       "template": "single_bond",
       "A": "Allyl",
       "B": "CONHR",
@@ -2432,7 +2159,6 @@
     },
     {
       "id": "Alkenyl-CONHR",
-      "name": "Alkenyl-CONHR",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "CONHR",
@@ -2440,7 +2166,6 @@
     },
     {
       "id": "Alkynyl-CONHR",
-      "name": "Alkynyl-CONHR",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "CONHR",
@@ -2448,7 +2173,6 @@
     },
     {
       "id": "RCH2-CONH2",
-      "name": "RCH2-CONH2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "CONH2",
@@ -2456,7 +2180,6 @@
     },
     {
       "id": "R2CH-CONH2",
-      "name": "R2CH-CONH2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "CONH2",
@@ -2464,7 +2187,6 @@
     },
     {
       "id": "R3C-CONH2",
-      "name": "R3C-CONH2",
       "template": "single_bond",
       "A": "R3C",
       "B": "CONH2",
@@ -2472,7 +2194,6 @@
     },
     {
       "id": "Bn-CONH2",
-      "name": "Bn-CONH2",
       "template": "single_bond",
       "A": "Bn",
       "B": "CONH2",
@@ -2480,7 +2201,6 @@
     },
     {
       "id": "Allyl-CONH2",
-      "name": "Allyl-CONH2",
       "template": "single_bond",
       "A": "Allyl",
       "B": "CONH2",
@@ -2488,7 +2208,6 @@
     },
     {
       "id": "Alkenyl-CONH2",
-      "name": "Alkenyl-CONH2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "CONH2",
@@ -2496,7 +2215,6 @@
     },
     {
       "id": "Alkynyl-CONH2",
-      "name": "Alkynyl-CONH2",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "CONH2",
@@ -2504,7 +2222,6 @@
     },
     {
       "id": "RCH2-CONR2",
-      "name": "RCH2-CONR2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "CONR2",
@@ -2512,7 +2229,6 @@
     },
     {
       "id": "R2CH-CONR2",
-      "name": "R2CH-CONR2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "CONR2",
@@ -2520,7 +2236,6 @@
     },
     {
       "id": "R3C-CONR2",
-      "name": "R3C-CONR2",
       "template": "single_bond",
       "A": "R3C",
       "B": "CONR2",
@@ -2528,7 +2243,6 @@
     },
     {
       "id": "Bn-CONR2",
-      "name": "Bn-CONR2",
       "template": "single_bond",
       "A": "Bn",
       "B": "CONR2",
@@ -2536,7 +2250,6 @@
     },
     {
       "id": "Allyl-CONR2",
-      "name": "Allyl-CONR2",
       "template": "single_bond",
       "A": "Allyl",
       "B": "CONR2",
@@ -2544,7 +2257,6 @@
     },
     {
       "id": "Alkenyl-CONR2",
-      "name": "Alkenyl-CONR2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "CONR2",
@@ -2552,7 +2264,6 @@
     },
     {
       "id": "Alkynyl-CONR2",
-      "name": "Alkynyl-CONR2",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "CONR2",
@@ -2560,7 +2271,6 @@
     },
     {
       "id": "Bn-CO2R",
-      "name": "Bn-CO2R",
       "template": "single_bond",
       "A": "Bn",
       "B": "CO2R",
@@ -2568,7 +2278,6 @@
     },
     {
       "id": "Allyl-CO2R",
-      "name": "Allyl-CO2R",
       "template": "single_bond",
       "A": "Allyl",
       "B": "CO2R",
@@ -2576,7 +2285,6 @@
     },
     {
       "id": "Alkynyl-CO2R",
-      "name": "Alkynyl-CO2R",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "CO2R",
@@ -2584,7 +2292,6 @@
     },
     {
       "id": "RCH2-COR",
-      "name": "RCH2-COR",
       "template": "single_bond",
       "A": "RCH2",
       "B": "COR",
@@ -2592,7 +2299,6 @@
     },
     {
       "id": "R2CH-COR",
-      "name": "R2CH-COR",
       "template": "single_bond",
       "A": "R2CH",
       "B": "COR",
@@ -2600,7 +2306,6 @@
     },
     {
       "id": "R3C-COR",
-      "name": "R3C-COR",
       "template": "single_bond",
       "A": "R3C",
       "B": "COR",
@@ -2608,7 +2313,6 @@
     },
     {
       "id": "Bn-COR",
-      "name": "Bn-COR",
       "template": "single_bond",
       "A": "Bn",
       "B": "COR",
@@ -2616,7 +2320,6 @@
     },
     {
       "id": "Allyl-COR",
-      "name": "Allyl-COR",
       "template": "single_bond",
       "A": "Allyl",
       "B": "COR",
@@ -2624,7 +2327,6 @@
     },
     {
       "id": "Alkynyl-COR",
-      "name": "Alkynyl-COR",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "COR",
@@ -2632,7 +2334,6 @@
     },
     {
       "id": "Alkynyl-CN",
-      "name": "Alkynyl-CN",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "CN",
@@ -2640,7 +2341,6 @@
     },
     {
       "id": "Alkyl-NO2",
-      "name": "Alkyl-NO2",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NO2",
@@ -2648,7 +2348,6 @@
     },
     {
       "id": "Bn-NO2",
-      "name": "Bn-NO2",
       "template": "single_bond",
       "A": "Bn",
       "B": "NO2",
@@ -2656,7 +2355,6 @@
     },
     {
       "id": "Allyl-NO2",
-      "name": "Allyl-NO2",
       "template": "single_bond",
       "A": "Allyl",
       "B": "NO2",
@@ -2664,7 +2362,6 @@
     },
     {
       "id": "Alkynyl-NO2",
-      "name": "Alkynyl-NO2",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "NO2",
@@ -2672,7 +2369,6 @@
     },
     {
       "id": "Bn-OR",
-      "name": "Bn-OR",
       "template": "single_bond",
       "A": "Bn",
       "B": "OR",
@@ -2680,7 +2376,6 @@
     },
     {
       "id": "Allyl-OR",
-      "name": "Allyl-OR",
       "template": "single_bond",
       "A": "Allyl",
       "B": "OR",
@@ -2688,7 +2383,6 @@
     },
     {
       "id": "Alkenyl-OR",
-      "name": "Alkenyl-OR",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "OR",
@@ -2696,7 +2390,6 @@
     },
     {
       "id": "Alkynyl-OR",
-      "name": "Alkynyl-OR",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "OR",
@@ -2704,7 +2397,6 @@
     },
     {
       "id": "Alkyl-SR",
-      "name": "Alkyl-SR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "SR",
@@ -2712,7 +2404,6 @@
     },
     {
       "id": "Ar-OCSSR",
-      "name": "Ar-OCSSR",
       "template": "single_bond",
       "A": "Ar",
       "B": "OCSSR",
@@ -2720,7 +2411,6 @@
     },
     {
       "id": "Alkyl-OCSSR",
-      "name": "Alkyl-OCSSR",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "OCSSR",
@@ -2728,7 +2418,6 @@
     },
     {
       "id": "Alkenyl-OCSSR",
-      "name": "Alkenyl-OCSSR",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "OCSSR",
@@ -2736,7 +2425,6 @@
     },
     {
       "id": "Alkynyl-OCSSR",
-      "name": "Alkynyl-OCSSR",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "OCSSR",
@@ -2744,7 +2432,6 @@
     },
     {
       "id": "RCH2-SR",
-      "name": "RCH2-SR",
       "template": "single_bond",
       "A": "RCH2",
       "B": "SR",
@@ -2752,7 +2439,6 @@
     },
     {
       "id": "R2CH-SR",
-      "name": "R2CH-SR",
       "template": "single_bond",
       "A": "R2CH",
       "B": "SR",
@@ -2760,7 +2446,6 @@
     },
     {
       "id": "R3C-SR",
-      "name": "R3C-SR",
       "template": "single_bond",
       "A": "R3C",
       "B": "SR",
@@ -2768,7 +2453,6 @@
     },
     {
       "id": "Bn-SR",
-      "name": "Bn-SR",
       "template": "single_bond",
       "A": "Bn",
       "B": "SR",
@@ -2776,7 +2460,6 @@
     },
     {
       "id": "Allyl-SR",
-      "name": "Allyl-SR",
       "template": "single_bond",
       "A": "Allyl",
       "B": "SR",
@@ -2784,7 +2467,6 @@
     },
     {
       "id": "Alkenyl-SR",
-      "name": "Alkenyl-SR",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "SR",
@@ -2792,7 +2474,6 @@
     },
     {
       "id": "Alkynyl-SR",
-      "name": "Alkynyl-SR",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "SR",
@@ -2800,7 +2481,6 @@
     },
     {
       "id": "Alkyl-SO2R",
-      "name": "Alkyl-SO2R",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "SO2R",
@@ -2808,7 +2488,6 @@
     },
     {
       "id": "RCH2-SO2R",
-      "name": "RCH2-SO2R",
       "template": "single_bond",
       "A": "RCH2",
       "B": "SO2R",
@@ -2816,7 +2495,6 @@
     },
     {
       "id": "R2CH-SO2R",
-      "name": "R2CH-SO2R",
       "template": "single_bond",
       "A": "R2CH",
       "B": "SO2R",
@@ -2824,7 +2502,6 @@
     },
     {
       "id": "R3C-SO2R",
-      "name": "R3C-SO2R",
       "template": "single_bond",
       "A": "R3C",
       "B": "SO2R",
@@ -2832,7 +2509,6 @@
     },
     {
       "id": "Bn-SO2R",
-      "name": "Bn-SO2R",
       "template": "single_bond",
       "A": "Bn",
       "B": "SO2R",
@@ -2840,7 +2516,6 @@
     },
     {
       "id": "Allyl-SO2R",
-      "name": "Allyl-SO2R",
       "template": "single_bond",
       "A": "Allyl",
       "B": "SO2R",
@@ -2848,7 +2523,6 @@
     },
     {
       "id": "Alkenyl-SO2R",
-      "name": "Alkenyl-SO2R",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "SO2R",
@@ -2856,7 +2530,6 @@
     },
     {
       "id": "Alkynyl-SO2R",
-      "name": "Alkynyl-SO2R",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "SO2R",
@@ -2864,7 +2537,6 @@
     },
     {
       "id": "RCH2-SO2NHR",
-      "name": "RCH2-SO2NHR",
       "template": "single_bond",
       "A": "RCH2",
       "B": "SO2NHR",
@@ -2872,7 +2544,6 @@
     },
     {
       "id": "R2CH-SO2NHR",
-      "name": "R2CH-SO2NHR",
       "template": "single_bond",
       "A": "R2CH",
       "B": "SO2NHR",
@@ -2880,7 +2551,6 @@
     },
     {
       "id": "R3C-SO2NHR",
-      "name": "R3C-SO2NHR",
       "template": "single_bond",
       "A": "R3C",
       "B": "SO2NHR",
@@ -2888,7 +2558,6 @@
     },
     {
       "id": "Bn-SO2NHR",
-      "name": "Bn-SO2NHR",
       "template": "single_bond",
       "A": "Bn",
       "B": "SO2NHR",
@@ -2896,7 +2565,6 @@
     },
     {
       "id": "Allyl-SO2NHR",
-      "name": "Allyl-SO2NHR",
       "template": "single_bond",
       "A": "Allyl",
       "B": "SO2NHR",
@@ -2904,7 +2572,6 @@
     },
     {
       "id": "Alkenyl-SO2NHR",
-      "name": "Alkenyl-SO2NHR",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "SO2NHR",
@@ -2912,7 +2579,6 @@
     },
     {
       "id": "Alkynyl-SO2NHR",
-      "name": "Alkynyl-SO2NHR",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "SO2NHR",
@@ -2920,7 +2586,6 @@
     },
     {
       "id": "RCH2-SO2NR2",
-      "name": "RCH2-SO2NR2",
       "template": "single_bond",
       "A": "RCH2",
       "B": "SO2NR2",
@@ -2928,7 +2593,6 @@
     },
     {
       "id": "R2CH-SO2NR2",
-      "name": "R2CH-SO2NR2",
       "template": "single_bond",
       "A": "R2CH",
       "B": "SO2NR2",
@@ -2936,7 +2600,6 @@
     },
     {
       "id": "R3C-SO2NR2",
-      "name": "R3C-SO2NR2",
       "template": "single_bond",
       "A": "R3C",
       "B": "SO2NR2",
@@ -2944,7 +2607,6 @@
     },
     {
       "id": "Bn-SO2NR2",
-      "name": "Bn-SO2NR2",
       "template": "single_bond",
       "A": "Bn",
       "B": "SO2NR2",
@@ -2952,7 +2614,6 @@
     },
     {
       "id": "Allyl-SO2NR2",
-      "name": "Allyl-SO2NR2",
       "template": "single_bond",
       "A": "Allyl",
       "B": "SO2NR2",
@@ -2960,7 +2621,6 @@
     },
     {
       "id": "Alkenyl-SO2NR2",
-      "name": "Alkenyl-SO2NR2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "SO2NR2",
@@ -2968,7 +2628,6 @@
     },
     {
       "id": "Alkynyl-SO2NR2",
-      "name": "Alkynyl-SO2NR2",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "SO2NR2",
@@ -2976,7 +2635,6 @@
     },
     {
       "id": "Alkenyl-NHR",
-      "name": "Alkenyl-NHR",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "NHR",
@@ -2984,7 +2642,6 @@
     },
     {
       "id": "Alkynyl-NHR",
-      "name": "Alkynyl-NHR",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "NHR",
@@ -2992,7 +2649,6 @@
     },
     {
       "id": "Alkynyl-NH2",
-      "name": "Alkynyl-NH2",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "NH2",
@@ -3000,7 +2656,6 @@
     },
     {
       "id": "Alkenyl-NR2",
-      "name": "Alkenyl-NR2",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "NR2",
@@ -3008,7 +2663,6 @@
     },
     {
       "id": "Alkynyl-NR2",
-      "name": "Alkynyl-NR2",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "NR2",
@@ -3016,7 +2670,6 @@
     },
     {
       "id": "Alkynyl-OH",
-      "name": "Alkynyl-OH",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "OH",
@@ -3024,7 +2677,6 @@
     },
     {
       "id": "Bn-SH",
-      "name": "Bn-SH",
       "template": "single_bond",
       "A": "Bn",
       "B": "SH",
@@ -3032,7 +2684,6 @@
     },
     {
       "id": "Allyl-SH",
-      "name": "Allyl-SH",
       "template": "single_bond",
       "A": "Allyl",
       "B": "SH",
@@ -3040,7 +2691,6 @@
     },
     {
       "id": "Alkenyl-SH",
-      "name": "Alkenyl-SH",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "SH",
@@ -3048,7 +2698,6 @@
     },
     {
       "id": "Alkynyl-SH",
-      "name": "Alkynyl-SH",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "SH",
@@ -3056,7 +2705,6 @@
     },
     {
       "id": "Bn-F",
-      "name": "Bn-F",
       "template": "single_bond",
       "A": "Bn",
       "B": "F",
@@ -3064,7 +2712,6 @@
     },
     {
       "id": "Allyl-F",
-      "name": "Allyl-F",
       "template": "single_bond",
       "A": "Allyl",
       "B": "F",
@@ -3072,7 +2719,6 @@
     },
     {
       "id": "Alkynyl-F",
-      "name": "Alkynyl-F",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "F",
@@ -3080,7 +2726,6 @@
     },
     {
       "id": "Alkyl-LactamN",
-      "name": "Alkyl-LactamN",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "LactamN",
@@ -3088,7 +2733,6 @@
     },
     {
       "id": "RCH2-LactamN",
-      "name": "RCH2-LactamN",
       "template": "single_bond",
       "A": "RCH2",
       "B": "LactamN",
@@ -3096,7 +2740,6 @@
     },
     {
       "id": "R2CH-LactamN",
-      "name": "R2CH-LactamN",
       "template": "single_bond",
       "A": "R2CH",
       "B": "LactamN",
@@ -3104,7 +2747,6 @@
     },
     {
       "id": "R3C-LactamN",
-      "name": "R3C-LactamN",
       "template": "single_bond",
       "A": "R3C",
       "B": "LactamN",
@@ -3112,7 +2754,6 @@
     },
     {
       "id": "Bn-LactamN",
-      "name": "Bn-LactamN",
       "template": "single_bond",
       "A": "Bn",
       "B": "LactamN",
@@ -3120,7 +2761,6 @@
     },
     {
       "id": "Allyl-LactamN",
-      "name": "Allyl-LactamN",
       "template": "single_bond",
       "A": "Allyl",
       "B": "LactamN",
@@ -3128,7 +2768,6 @@
     },
     {
       "id": "Alkenyl-LactamN",
-      "name": "Alkenyl-LactamN",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "LactamN",
@@ -3136,7 +2775,6 @@
     },
     {
       "id": "Alkynyl-LactamN",
-      "name": "Alkynyl-LactamN",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "LactamN",
@@ -3144,7 +2782,6 @@
     },
     {
       "id": "Ar-Sulfonamide",
-      "name": "Ar-Sulfonamide",
       "template": "single_bond",
       "A": "Ar",
       "B": "NSO2R",
@@ -3152,7 +2789,6 @@
     },
     {
       "id": "Alkyl-Sulfonamide",
-      "name": "Alkyl-Sulfonamide",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "NSO2R",

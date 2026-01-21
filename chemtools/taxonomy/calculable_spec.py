@@ -131,7 +131,7 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
         compound_id = entry.get("id") or ""
         if not compound_id:
             continue
-        compound_name = entry.get("name") or compound_id
+        compound_name = compound_id  # Name is same as ID (simplified system)
         compound_desc = entry.get("description") or ""
         group_a = entry.get("A")
         group_b = entry.get("B")

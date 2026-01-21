@@ -96,26 +96,30 @@ class TaxonomyValidator:
         return valid_refs, missing_refs
     
     def validate_naming_consistency(self) -> List[Dict[str, Any]]:
-        """Check if compound names match their IDs"""
-        mismatches = []
+        """Check if any compounds still have redundant name field"""
+        issues = []
         
         for compound in self.compounds_list:
             comp_id = compound.get('id', '')
-            comp_name = compound.get('name', '')
             
-            if comp_id != comp_name:
-                mismatches.append({
+            # Check if redundant 'name' field exists
+            if 'name' in compound:
+                comp_name = compound.get('name', '')
+                issues.append({
                     'id': comp_id,
-                    'current_name': comp_name,
-                    'expected_name': comp_id,
+                    'name': comp_name,
                     'compound': compound
                 })
-                self.warnings.append(
-                    f"Compound '{comp_id}': name='{comp_name}' should be '{comp_id}' "
-                    f"(use --fix to auto-correct)"
-                )
+                if comp_name == comp_id:
+                    self.warnings.append(
+                        f"Compound '{comp_id}': has redundant 'name' field (same as ID) - consider removing"
+                    )
+                else:
+                    self.errors.append(
+                        f"Compound '{comp_id}': has 'name'='{comp_name}' that differs from ID"
+                    )
         
-        return mismatches
+        return issues
     
     def validate_id_format(self) -> None:
         """Warn about compound IDs that don't follow A-B pattern"""
@@ -169,37 +173,31 @@ class TaxonomyValidator:
                 group = self.groups[group_id]
                 print(f"    - {group_id:20s} ({group.get('name', 'N/A')})")
     
-    def fix_naming_mismatches(self, mismatches: List[Dict[str, Any]]) -> None:
-        """Auto-fix compounds where name != id"""
-        if not mismatches:
+    def fix_naming_mismatches(self, issues: List[Dict[str, Any]]) -> None:
+        """Remove redundant name fields from compounds"""
+        if not issues:
             return
         
         print(f"\n{'='*70}")
-        print(f"Fixing {len(mismatches)} naming mismatches...")
+        print(f"Removing {len(issues)} redundant 'name' fields...")
         
-        for mismatch in mismatches:
-            compound = mismatch['compound']
-            old_name = compound['name']
-            new_name = mismatch['expected_name']
+        for issue in issues:
+            compound = issue['compound']
+            comp_id = issue['id']
             
-            # Update name to match id
-            compound['name'] = new_name
-            
-            # Preserve old name in aliases if not already there
-            aliases = compound.get('aliases', [])
-            if old_name not in aliases and old_name != new_name:
-                aliases.append(old_name)
-                compound['aliases'] = aliases
+            # Remove redundant name field
+            if 'name' in compound:
+                del compound['name']
             
             self.fixes_applied.append(
-                f"  ✓ {mismatch['id']}: '{old_name}' → '{new_name}' (old name preserved in aliases)"
+                f"  ✓ {comp_id}: removed redundant 'name' field"
             )
         
         # Save the updated compounds file
         try:
             with open(self.compounds_file, 'w', encoding='utf-8') as f:
                 json.dump(self.compounds_data, f, indent=2, ensure_ascii=False)
-            print(f"\n✓ Updated {self.compounds_file.name} with {len(mismatches)} fixes")
+            print(f"\n✓ Updated {self.compounds_file.name} with {len(issues)} fixes")
         except Exception as e:
             self.errors.append(f"Failed to save fixes: {e}")
     
@@ -220,15 +218,15 @@ class TaxonomyValidator:
         else:
             print(f"  ✓ All group references are valid")
         
-        # 2. Check naming consistency
-        print("\n2. Validating naming consistency (name == id)...")
-        mismatches = self.validate_naming_consistency()
-        if mismatches:
-            print(f"  ⚠ Found {len(mismatches)} naming mismatches")
+        # 2. Check for redundant name fields
+        print("\n2. Checking for redundant 'name' fields...")
+        issues = self.validate_naming_consistency()
+        if issues:
+            print(f"  ⚠ Found {len(issues)} compounds with redundant 'name' field")
             if fix_mode:
-                self.fix_naming_mismatches(mismatches)
+                self.fix_naming_mismatches(issues)
         else:
-            print(f"  ✓ All compound names match their IDs")
+            print(f"  ✓ No redundant 'name' fields (using ID-only system)")
         
         # 3. Check ID format
         print("\n3. Validating compound ID formats...")
