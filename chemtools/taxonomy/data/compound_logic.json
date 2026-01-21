@@ -97,12 +97,7 @@
         "Tetrazole",
         "Benzimidazole",
         "Purine",
-        "H-AromN",
         "AromN-H",
-        "H-LactamN",
-        "H-Carbamate",
-        "H-Amide",
-        "H-Sulfonamide",
         "CONH2",
         "CONHR",
         "Ar-CONH2",
@@ -153,9 +148,7 @@
         "Propargyl-OH",
         "RCH2-OH",
         "R2CH-OH",
-        "R3C-OH",
-        "H-OH",
-        "H-OR"
+        "R3C-OH"
       ]
     },
     "thiols_sh": {
@@ -171,8 +164,7 @@
         "CH3-SH",
         "RCH2-SH",
         "R2CH-SH",
-        "R3C-SH",
-        "H-SH"
+        "R3C-SH"
       ]
     },
     "carboxylic_acids": {
@@ -202,7 +194,6 @@
       "members": [
         "Ar-C#CH",
         "Alkyl-C#CH",
-        "H-Alkynyl",
         "Alkynyl-H"
       ]
     },
@@ -212,8 +203,7 @@
         "Ar-C=CH2",
         "Alkyl-C=CH2",
         "C=CH2",
-        "Alkenyl-H",
-        "H-Alkenyl"
+        "Alkenyl-H"
       ]
     },
     "carbonyls": {
@@ -331,9 +321,7 @@
         "Alkyl-C=CH2",
         "C=C",
         "Ar-C=C",
-        "Alkyl-C=C",
-        "H-Alkenyl"
-      ]
+        "Alkyl-C=C"      ]
     },
     "cross_coupling_products": {
       "name": "Cross-Coupling Products",
