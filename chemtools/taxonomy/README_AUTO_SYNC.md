@@ -18,6 +18,7 @@ When you update organic_groups (add new groups, change IDs, modify SMARTS), the 
 Validates the taxonomy and optionally fixes naming issues.
 
 **Usage:**
+
 ```bash
 # Validate only (show warnings/errors)
 python chemtools/taxonomy/validate_and_sync.py
@@ -30,6 +31,7 @@ python chemtools/taxonomy/validate_and_sync.py --check-only
 ```
 
 **What it checks:**
+
 - ✅ All A/B group references exist in organic_groups
 - ✅ Compound names match their IDs (simplified naming)
 - ✅ Compound IDs follow A-B pattern
@@ -37,6 +39,7 @@ python chemtools/taxonomy/validate_and_sync.py --check-only
 - ✅ Which groups are used/unused
 
 **Example output:**
+
 ```
 ✓ Loaded 92 organic groups
 ✓ Loaded 364 organic compounds
@@ -51,6 +54,7 @@ python chemtools/taxonomy/validate_and_sync.py --check-only
 Suggests new compound definitions for unused or new groups.
 
 **Usage:**
+
 ```bash
 # Show suggestions for all unused groups
 python chemtools/taxonomy/suggest_compounds.py
@@ -69,6 +73,7 @@ python chemtools/taxonomy/suggest_compounds.py --scaffold Bn --substituent NCS
 ```
 
 **Example output:**
+
 ```
 ✓ Loaded 92 groups (14 scaffolds, 78 substituents)
 ✓ Loaded 364 existing compounds
@@ -103,6 +108,7 @@ One-time fix for organometallic group references (Sn, Zn, Mg, Si → Sn*, Zn*, M
 When you add new groups to `organic_groups.v1.3.json`:
 
 ### Step 1: Add groups
+
 Edit `data/organic_groups.v1.3.json` and add your new groups:
 
 ```json
@@ -118,6 +124,7 @@ Edit `data/organic_groups.v1.3.json` and add your new groups:
 ```
 
 ### Step 2: Validate
+
 Run validation to see what breaks:
 
 ```bash
@@ -125,6 +132,7 @@ python chemtools/taxonomy/validate_and_sync.py
 ```
 
 If you see errors like:
+
 ```
 ✗ Compound 'Ar-MyNewGroup': Group B='MyNewGroup' not found
 ```
@@ -132,6 +140,7 @@ If you see errors like:
 That means compounds reference the old group ID. Fix them manually or with a script.
 
 ### Step 3: Generate compound suggestions
+
 See what compounds should be added for the new group:
 
 ```bash
@@ -145,6 +154,7 @@ python chemtools/taxonomy/suggest_compounds.py
 ```
 
 ### Step 4: Add compounds
+
 Copy the suggested JSON and add to `organic_compounds.v1.3.json`:
 
 ```json
@@ -159,6 +169,7 @@ Copy the suggested JSON and add to `organic_compounds.v1.3.json`:
 ```
 
 ### Step 5: Re-validate
+
 Confirm everything is consistent:
 
 ```bash
@@ -166,6 +177,7 @@ python chemtools/taxonomy/validate_and_sync.py
 ```
 
 Should see:
+
 ```
 ✓ Validation PASSED - Taxonomy is consistent!
 ```
@@ -181,6 +193,7 @@ Add to your CI pipeline to prevent inconsistencies:
 ```
 
 This will fail the build if:
+
 - Compounds reference non-existent groups
 - Naming conventions are violated
 - Dependencies are incorrect
@@ -188,11 +201,13 @@ This will fail the build if:
 ## Naming Convention
 
 After simplification, the system follows:
+
 - **Compound ID** = `{A}-{B}` using exact group IDs
 - **Compound name** = Same as ID (simplified)
 - **Old names** = Preserved in `aliases` array
 
 Examples:
+
 - `Ar-Ar` (was "Biaryl", now in aliases)
 - `Ar-Cl` (was already consistent)
 - `Ar-OR` (was "Aryl-Ether", now in aliases)
