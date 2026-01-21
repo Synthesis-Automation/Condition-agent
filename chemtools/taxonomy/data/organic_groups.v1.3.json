@@ -94,6 +94,7 @@
       "smarts": "[#6]#[#6:1]",
       "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal)."
     },
+    
     {
       "id": "Acyl",
       "kind": "scaffold",
@@ -537,34 +538,6 @@
       "priority": 1,
       "smarts": "[S:2](=O)(=O)[#6]",
       "description": "Generic sulfonate substituent via oxygen linker (-OSO2R)."
-    },
-    {
-      "id": "-C#CH",
-      "kind": "substituent",
-      "priority": 3,
-      "smarts": "[C:2]#[C][H]",
-      "description": "Terminal alkyne substituent (-C#CH); attach via sp carbon."
-    },
-    {
-      "id": "-C#C",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[C:2]#[C]",
-      "description": "General alkyne substituent; attach via sp carbon."
-    },
-    {
-      "id": "-C=CH2",
-      "kind": "substituent",
-      "priority": 3,
-      "smarts": "[CX3:2]([H])=[CX3]([H])[H]",
-      "description": "Terminal alkene substituent (vinyl group, -C=CH2); attach via sp2 carbon."
-    },
-    {
-      "id": "-C=C",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX3:2]=[CX3]",
-      "description": "General alkene substituent; attach via sp2 carbon."
     },
     {
       "id": "-COR",
