@@ -126,7 +126,7 @@
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-Ar",
+      "B": "Ar",
       "description": "Biaryl (Ar-Ar) bond."
     },
     {
@@ -646,7 +646,7 @@
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-AromN",
+      "B": "AromN",
       "description": "Aryl-substituted aromatic nitrogen (e.g., N-phenylpyrrole)."
     },
     {
@@ -1056,7 +1056,7 @@
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-AromN",
+      "B": "AromN",
       "description": "Alkyl-substituted aromatic nitrogen (e.g., N-methylpyrrole)."
     },
     {

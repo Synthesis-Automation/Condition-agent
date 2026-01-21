@@ -240,34 +240,6 @@
       "description": "Sulfide/thioether group (-SR)."
     },
     {
-      "id": "-AromN",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[n:2]",
-      "description": "Aromatic nitrogen substituent (e.g., in N-aryl pyrroles, indoles) (-AromN)."
-    },
-    {
-      "id": "-Ar",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[c:2]",
-      "description": "Aryl substituent (attachment via aromatic carbon, -Ar)."
-    },
-    {
-      "id": "-Alkenyl",
-      "kind": "substituent",
-      "priority": 0,
-      "smarts": "[C;X3:2]=[C;X3]",
-      "description": "Generic alkenyl substituent (vinylic, -C=C)."
-    },
-    {
-      "id": "-Alkyl",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX4:2]",
-      "description": "Generic alkyl substituent (attachment via sp3 carbon, -Alkyl)."
-    },
-    {
       "id": "-OAr",
       "kind": "substituent",
       "priority": 10,
