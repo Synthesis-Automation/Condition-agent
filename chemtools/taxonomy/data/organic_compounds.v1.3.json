@@ -729,8 +729,8 @@
       "description": "Alkyl boronate (Bpin) (Alkyl-Bpin)."
     },
     {
-      "id": "Alkyl-Sn",
-      "name": "Alkyl-Sn",
+      "id": "Alkyl-Sn*",
+      "name": "Alkyl-Sn*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Sn",
@@ -740,32 +740,32 @@
       ]
     },
     {
-      "id": "Alkyl-Si",
-      "name": "Alkyl-Si",
+      "id": "Alkyl-Si*",
+      "name": "Alkyl-Si*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Si",
       "description": "Alkyl silane (Alkyl-SiR3)."
     },
     {
-      "id": "Alkyl-Zn",
-      "name": "Alkyl-Zn",
+      "id": "Alkyl-Zn*",
+      "name": "Alkyl-Zn*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Zn",
       "description": "Alkyl zincate (Alkyl-ZnX)."
     },
     {
-      "id": "Alkyl-Mg",
-      "name": "Alkyl-Mg",
+      "id": "Alkyl-Mg*",
+      "name": "Alkyl-Mg*",
       "template": "single_bond",
       "A": "Alkyl",
       "B": "Mg",
       "description": "Alkyl Grignard (Alkyl-MgX)."
     },
     {
-      "id": "Alkynyl-Si",
-      "name": "Alkynyl-Si",
+      "id": "Alkynyl-Si*",
+      "name": "Alkynyl-Si*",
       "template": "single_bond",
       "A": "Alkynyl",
       "B": "Si",
@@ -862,32 +862,32 @@
       "reactivity_weight": 2.5
     },
     {
-      "id": "Alkenyl-Sn",
-      "name": "Alkenyl-Sn",
+      "id": "Alkenyl-Sn*",
+      "name": "Alkenyl-Sn*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Sn",
       "description": "Vinyl/alkenyl stannane (Alkenyl-SnR3)."
     },
     {
-      "id": "Alkenyl-Si",
-      "name": "Alkenyl-Si",
+      "id": "Alkenyl-Si*",
+      "name": "Alkenyl-Si*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Si",
       "description": "Vinyl/alkenyl silane (Alkenyl-SiR3)."
     },
     {
-      "id": "Alkenyl-Zn",
-      "name": "Alkenyl-Zn",
+      "id": "Alkenyl-Zn*",
+      "name": "Alkenyl-Zn*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Zn",
       "description": "Vinyl/alkenyl zincate (Alkenyl-ZnX)."
     },
     {
-      "id": "Alkenyl-Mg",
-      "name": "Alkenyl-Mg",
+      "id": "Alkenyl-Mg*",
+      "name": "Alkenyl-Mg*",
       "template": "single_bond",
       "A": "Alkenyl",
       "B": "Mg",

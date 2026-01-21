@@ -360,8 +360,8 @@
       ]
     },
     {
-      "id": "Sn",
-      "name": "-SnR3",
+      "id": "Sn*",
+      "name": "-Sn*",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[Sn:2]",
@@ -372,8 +372,8 @@
       ]
     },
     {
-      "id": "Si",
-      "name": "-SiR3",
+      "id": "Si*",
+      "name": "-Si*",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[Si:2]",
@@ -384,8 +384,8 @@
       ]
     },
     {
-      "id": "Zn",
-      "name": "-ZnX",
+      "id": "Zn*",
+      "name": "-Zn*",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[Zn:2]",
@@ -396,8 +396,8 @@
       ]
     },
     {
-      "id": "Mg",
-      "name": "-MgX",
+      "id": "Mg*",
+      "name": "-Mg*",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[Mg:2]",
@@ -456,8 +456,8 @@
       ]
     },
     {
-      "id": "Alkenyl_Subst",
-      "name": "-Alkenyl",
+      "id": "Alkene",
+      "name": "-Alkene",
       "kind": "substituent",
       "priority": 0,
       "smarts": "[C;X3:2]=[C;X3]",
@@ -470,12 +470,12 @@
       ]
     },
     {
-      "id": "Alkyl_Subst",
-      "name": "-Alkyl",
+      "id": "Alkane",
+      "name": "-Alkane",
       "kind": "substituent",
       "priority": 1,
       "smarts": "[CX4:2]",
-      "description": "Generic alkyl substituent (attachment via sp3 carbon, -Alkyl).",
+      "description": "Generic alkyl substituent (attachment via sp3 carbon, -Alkane).",
       "tags": [
         "alkyl",
         "sp3",
