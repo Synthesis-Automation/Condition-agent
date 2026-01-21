@@ -95,47 +95,31 @@ class TaxonomyValidator:
         
         return valid_refs, missing_refs
     
-    def validate_naming_consistency(self) -> List[Dict[str, Any]]:
-        """Check if any compounds still have redundant name field"""
-        issues = []
+    def check_explicit_id_fields(self) -> int:
+        """Check for explicit 'id' fields (should be auto-generated from A-B)"""
+        explicit_count = 0
         
         for compound in self.compounds_list:
-            comp_id = compound.get('id', '')
-            
-            # Check if redundant 'name' field exists
-            if 'name' in compound:
-                comp_name = compound.get('name', '')
-                issues.append({
-                    'id': comp_id,
-                    'name': comp_name,
-                    'compound': compound
-                })
-                if comp_name == comp_id:
+            if 'id' in compound:
+                explicit_count += 1
+                comp_id = compound.get('id', '')
+                a_ref = compound.get('A', '')
+                b_ref = compound.get('B', '')
+                
+                # Check if explicit ID matches A-B pattern
+                expected_id = f"{a_ref}-{b_ref}" if a_ref and b_ref else None
+                if expected_id and comp_id != expected_id:
                     self.warnings.append(
-                        f"Compound '{comp_id}': has redundant 'name' field (same as ID) - consider removing"
-                    )
-                else:
-                    self.errors.append(
-                        f"Compound '{comp_id}': has 'name'='{comp_name}' that differs from ID"
+                        f"Compound has explicit ID '{comp_id}' that differs from auto-generated '{expected_id}'"
                     )
         
-        return issues
+        return explicit_count
     
     def validate_id_format(self) -> None:
-        """Warn about compound IDs that don't follow A-B pattern"""
-        for compound in self.compounds_list:
-            comp_id = compound.get('id', '')
-            a_ref = compound.get('A', '')
-            b_ref = compound.get('B', '')
-            
-            # Expected format: A-B
-            expected_id = f"{a_ref}-{b_ref}" if a_ref and b_ref else None
-            
-            if expected_id and comp_id != expected_id:
-                self.warnings.append(
-                    f"Compound '{comp_id}': ID doesn't match A-B pattern "
-                    f"(expected '{expected_id}' from A='{a_ref}', B='{b_ref}')"
-                )
+        """Check that compounds don't have explicit ID fields (should be auto-generated)"""
+        # With auto-generation, we don't need to validate ID format
+        # IDs are generated as f"{A}-{B}" when compounds are loaded
+        pass
     
     def validate_dependencies(self) -> None:
         """Check version dependencies"""
@@ -218,15 +202,15 @@ class TaxonomyValidator:
         else:
             print(f"  ✓ All group references are valid")
         
-        # 2. Check for redundant name fields
-        print("\n2. Checking for redundant 'name' fields...")
-        issues = self.validate_naming_consistency()
-        if issues:
-            print(f"  ⚠ Found {len(issues)} compounds with redundant 'name' field")
-            if fix_mode:
-                self.fix_naming_mismatches(issues)
+        # 2. Check for explicit 'id' fields
+        print("\n2. Checking for explicit 'id' fields...")
+        explicit_count = self.check_explicit_id_fields()
+        if explicit_count == 0:
+            print(f"  ✓ No explicit 'id' fields (using auto-generated A-B system)")
         else:
-            print(f"  ✓ No redundant 'name' fields (using ID-only system)")
+            print(f"  ℹ Found {explicit_count} compounds with explicit 'id' fields")
+            if fix_mode:
+                print(f"    Run with --remove-ids to clean up explicit IDs")
         
         # 3. Check ID format
         print("\n3. Validating compound ID formats...")

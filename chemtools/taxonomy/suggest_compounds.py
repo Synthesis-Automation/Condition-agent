@@ -197,12 +197,11 @@ class CompoundSuggester:
             print()
     
     def generate_compound_json(self, suggestions: List[Dict[str, Any]]) -> str:
-        """Generate JSON array for suggested compounds"""
+        """Generate JSON array for suggested compounds (ID auto-generated from A-B)"""
         compounds_json = []
         
         for suggestion in suggestions:
             compound = {
-                "id": suggestion["id"],
                 "template": suggestion["template"],
                 "A": suggestion["A"],
                 "B": suggestion["B"],
