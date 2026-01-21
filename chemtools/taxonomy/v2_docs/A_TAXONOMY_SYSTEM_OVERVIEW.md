@@ -1,6 +1,6 @@
 # Organic Chemistry Taxonomy System Overview (Living Doc)
 
-Last updated: 2026-01-10
+Last updated: 2026-01-21
 Owner: Chemistry data platform team
 
 Chemistry introduction
@@ -126,16 +126,24 @@ To determine what happened in a reaction, we use raw motif counts from reactants
 
 - `organic_groups.v1.3.json`
   - Canonical organic groups (scaffold/substituent) with attachpoints in SMARTS.
+  - **Structure**: Each group has `id`, `kind`, `priority`, `smarts`, and `description`.
+  - **Naming convention**: Scaffolds use base names (e.g., `Ar`, `Alkyl`), substituents use `-` prefix (e.g., `-Cl`, `-NH2`, `-B(OH)2`).
   - Examples (scaffold): `Ar` (aryl), `Alkyl` ($sp^3$ carbon), `R` (non-H wildcard), `Alkenyl`.
-  - Examples (substituent): `Br`, `Cl`, `NH2`, `OH`, `B(OH)2`.
+  - Examples (substituent): `-Cl`, `-Br`, `-NH2`, `-OH`, `-B(OH)2`, `-Ar` (aryl substituent).
+  - **Note**: Organometallic groups use `*` suffix (e.g., `-Sn*`, `-Zn*`, `-Mg*`, `-Si*`).
 - `organic_compounds.v1.3.json`
-  - Compound motifs built from group templates or direct SMARTS.
-  - Examples: `Ar-Br` (Aryl Bromide), `Ar-AromN` (N-Aryl Heterocycle), `Alkyl-OH` (Alcohol).
+  - Compound motifs built from group templates.
+  - **Structure**: Each compound has `template`, `A`, `B`, and `description`. No explicit `id` field—IDs are auto-generated as `A+B` (e.g., `Ar+-Cl` = `"Ar-Cl"`).
+  - Examples: `Ar-Cl` (Aryl Chloride), `Ar-AromN` (N-Aryl Heterocycle), `Alkyl-OH` (Alcohol).
+  - **No name field**: Display names are generated from IDs (replace underscores with spaces, title case).
 - `scaffold_motifs.v1.3.json`
   - Direct SMARTS motifs for whole-molecule spectators or complex cores that do not fit simple A-B templates.
-  - Examples: `Pyridine`, `Quinoline`, `THF`, `DMF`.
+  - **Structure**: Each motif has `id`, `smarts`, `description`, and optional `aliases`.
+  - Examples: `Indole`, `Pyridine`, `Quinoline`, `Motif-C=C` (alias: `C=C`), `Motif-Epoxide` (alias: `Epoxide`).
+  - **No name field**: Display names use ID directly.
 - `group_logic.json`
-  - Group sets and priorities (e.g., `X = {Cl, Br, I, OTf}`, `LeavingGroup`).
+  - Group sets and priorities (e.g., `X = {-Cl, -Br, -I}`, `LeavingGroup`).
+  - **Updated**: All group references now use the simplified naming convention with `-` prefix for substituents.
 - `compound_logic.json`
   - Motif sets for reaction typing.
   - Examples: `@sp2_electrophiles` (includes `Ar-X`, `Alkenyl-X`), `@amine_nucleophiles`.
@@ -143,13 +151,20 @@ To determine what happened in a reaction, we use raw motif counts from reactants
   - Canonical reaction types with motif-slot constraints and aliases.
   - High-precision matching: `buchwald_hartwig` requires an electrophile slot AND a nucleophile slot to be occupied.
 - `reagent_roles.v2.json`
-  - Unified roles + families (v2). Roles define priorities/defaults; families
-    define allowlists and SMARTS detection.
+  - Unified roles + families (v2). Roles define priorities/defaults; families define SMARTS detection.
+  - **Structure**: Roles have `id`, `priority`, `default_family_id`, optional `description`. Families have `id`, `role_id`, `precedence`, optional `description`, `notes`, `detect` (SMARTS patterns), and optional `aliases`.
+  - **Simplified**: No `name` fields (IDs serve as names with automatic formatting). No `allowlists` (empty structure, CAS numbers preserved in descriptions).
 
 Notes
 
-- `reagent_roles.v2.json` is the single source for reagent roles and families.
-  Legacy registries only store reagent entries, not taxonomy definitions.
+- `reagent_roles.v2.json` is the single source for reagent roles and families. Legacy registries only store reagent entries, not taxonomy definitions.
+- **Simplification (2026-01-21)**: Removed 1,331 redundant fields across all 5 taxonomy files:
+  - `organic_groups.v1.3.json`: Removed 92 `name` + 92 `tags` fields. Added `-` prefix to 78 substituent IDs.
+  - `organic_compounds.v1.3.json`: Removed 364 `id` + 364 `name` fields. IDs now auto-generated as `A+B`.
+  - `scaffold_motifs.v1.3.json`: Removed 29 `name` fields (2 preserved as aliases).
+  - `group_logic.json`: Updated 62 group references to match new ID naming.
+  - `reagent_roles.v2.json`: Removed 170 `name` + 158 `allowlists` objects (31 CAS numbers preserved in descriptions).
+- **Display name fallback**: Code uses `.get("name", entry["id"])` pattern, auto-formatting IDs as display names when needed.
 
 ---
 
@@ -286,10 +301,15 @@ Evaluation snapshot (C-S coupling canonical dataset, `results/spectator_groups_e
 Add or update organic groups and compounds
 
 1. Add group SMARTS to `chemtools/taxonomy/data/organic_groups.v1.3.json`.
+   - Use `-` prefix for substituents (e.g., `-SO2Cl`).
+   - Use base names for scaffolds (e.g., `Alkynyl`).
+   - Include only: `id`, `kind`, `priority`, `smarts`, `description`.
 2. Add compound motifs to `chemtools/taxonomy/data/organic_compounds.v1.3.json`.
-3. Update set logic in `chemtools/taxonomy/data/group_logic.json` or
-   `chemtools/taxonomy/data/compound_logic.json` as needed.
-4. Re-run detection tests and spot-check motifs.
+   - Do NOT add `id` or `name` fields—IDs are auto-generated as `A+B`.
+   - Include only: `template`, `A`, `B`, `description`.
+3. Update set logic in `chemtools/taxonomy/data/group_logic.json` to use simplified group IDs with `-` prefix.
+4. Use `chemtools/taxonomy/validate_and_sync.py` to validate changes.
+5. Use `chemtools/taxonomy/suggest_compounds.py` to auto-suggest new compound combinations.
 
 Add a new reaction type
 
@@ -299,9 +319,13 @@ Add a new reaction type
 
 Add or update reagent families
 
-1. Update the reagent registry CSV under `data/reagent_db`.
-2. Keep role IDs aligned with `reagent_roles.v2.json`.
-3. Confirm name normalization and SMARTS are compatible with classifier rules.
+1. Add or update families in `chemtools/taxonomy/data/reagent_roles.v2.json`.
+   - Do NOT add `name` fields—IDs serve as names with automatic formatting.
+   - Do NOT add `allowlists`—they are deprecated (classification now relies on SMARTS `detect` patterns).
+   - Include only: `id`, `role_id`, `precedence`, optional `description`, `notes`, `detect`, `aliases`.
+   - For CAS numbers, add them to the `description` field (e.g., "Aluminum halides (CAS: 12138-52-0, 7727-15-3)").
+2. Update the reagent registry CSV under `data/reagent_db`.
+3. Keep role IDs aligned with the 12 roles defined in `reagent_roles.v2.json`.
 
 Build or refresh unified recommendation index
 
