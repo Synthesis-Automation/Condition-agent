@@ -212,13 +212,15 @@ def _load_compounds(path: Path) -> List[Dict[str, Any]]:
             continue
         if "anchors" not in entry:
             entry["anchors"] = {"scaffold": "A", "substituent": "B"}
-        # Auto-generate compound ID from A+B (no separator needed)
+        # Auto-generate compound ID from A+B
         if "id" not in entry:
             group_a = str(entry.get("A") or "")
             group_b = str(entry.get("B") or "")
             if group_a and group_b:
-                # Simple concatenation: A+B (substituents already have "-" prefix)
-                entry["id"] = f"{group_a}{group_b}"
+                # Add hyphen separator if B doesn't already start with "-"
+                # Substituents have "-" prefix (e.g., "-Cl"), scaffolds don't (e.g., "Alkenyl")
+                separator = "" if group_b.startswith("-") else "-"
+                entry["id"] = f"{group_a}{separator}{group_b}"
     return compounds
 
 
