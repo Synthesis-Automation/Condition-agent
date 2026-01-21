@@ -5,148 +5,257 @@
     "X": {
       "name": "Halogen",
       "priority": 0,
-      "members": ["F", "Cl", "Br", "I"],
+      "members": [
+        "-F",
+        "-Cl",
+        "-Br",
+        "-I"
+      ],
       "description": "Common halogen substituents (F, Cl, Br, I)."
     },
     "SO2X": {
       "name": "Sulfonyl Halide",
       "priority": 0,
-      "members": ["SO2F", "SO2Cl", "SO2Br", "SO2I"],
+      "members": [
+        "-SO2F",
+        "-SO2Cl",
+        "-SO2Br",
+        "-SO2I"
+      ],
       "description": "Sulfonyl halides (F, Cl, Br, I)."
     },
     "COX": {
       "name": "Acyl Halide",
       "priority": 0,
-      "members": ["COF", "COCl", "COBr", "COI"],
+      "members": [
+        "-COF",
+        "-COCl",
+        "-COBr",
+        "-COI"
+      ],
       "description": "Acyl halides (F, Cl, Br, I)."
     },
     "Sulfonate": {
       "name": "Sulfonate",
       "priority": 0,
-      "members": ["OTf", "OTs", "OMs", "OSO2R"],
+      "members": [
+        "-OTf",
+        "-OTs",
+        "-OMs",
+        "-OSO2R"
+      ],
       "description": "Sulfonate leaving groups (Triflate, Tosylate, Mesylate, etc.)."
     },
     "LeavingGroup": {
       "name": "Leaving Group",
       "priority": 0,
-      "members": ["X", "Sulfonate"],
+      "members": [
+        "X",
+        "Sulfonate"
+      ],
       "description": "Combined halogens, sulfonates, and other common leaving groups."
     },
     "Amine_NH": {
       "name": "Amine (N-H)",
-      "members": ["NH2", "NHR"],
+      "members": [
+        "-NH2",
+        "-NHR"
+      ],
       "description": "Primary and secondary amines."
     },
     "Amine_All": {
       "name": "Amine (All)",
-      "members": ["NH2", "NHR", "NR2"],
+      "members": [
+        "-NH2",
+        "-NHR",
+        "-NR2"
+      ],
       "description": "Primary, secondary, and tertiary amines."
     },
     "Amide_NH": {
       "name": "Amide (N-H)",
-      "members": ["CONH2", "CONHR"],
+      "members": [
+        "-CONH2",
+        "-CONHR"
+      ],
       "description": "Primary and secondary amides."
     },
     "Amide_All": {
       "name": "Amide (All)",
-      "members": ["CONH2", "CONHR", "CONR2", "LactamN"],
+      "members": [
+        "-CONH2",
+        "-CONHR",
+        "-CONR2",
+        "-LactamN"
+      ],
       "description": "Primary, secondary, and tertiary amides including cyclic ones."
     },
     "Sulfonamide_NH": {
       "name": "Sulfonamide (N-H)",
-      "members": ["SO2NH2", "SO2NHR"],
+      "members": [
+        "-SO2NH2",
+        "-SO2NHR"
+      ],
       "description": "Primary and secondary sulfonamides."
     },
     "Sulfonamide_All": {
       "name": "Sulfonamide (All)",
-      "members": ["SO2NH2", "SO2NHR", "SO2NR2"],
+      "members": [
+        "-SO2NH2",
+        "-SO2NHR",
+        "-SO2NR2"
+      ],
       "description": "Primary, secondary, and tertiary sulfonamides."
     },
     "Alcohol_Ether": {
       "name": "Alcohol/Ether",
-      "members": ["OH", "OR"],
+      "members": [
+        "-OH",
+        "-OR"
+      ],
       "description": "Hydroxy and ether groups."
     },
     "Thiol_Thioether": {
       "name": "Thiol/Thioether",
-      "members": ["SH", "SR"],
+      "members": [
+        "-SH",
+        "-SR"
+      ],
       "description": "Thiol and thioether groups."
     },
     "Carbamate_All": {
       "name": "Carbamate (All)",
-      "members": ["NCO2R"],
+      "members": [
+        "-NCO2R"
+      ],
       "description": "Secondary and tertiary carbamates."
     },
     "Fluorinated_Group": {
       "name": "Fluorinated Group",
-      "members": ["F", "CF3", "OCF3"],
+      "members": [
+        "-F",
+        "-CF3",
+        "-OCF3"
+      ],
       "description": "Functional groups containing fluorine."
     },
     "Carbonyl_Group": {
       "name": "Carbonyl Group",
-      "members": ["CHO", "COR", "CO2H", "CO2R", "CONH2", "CONHR", "CONR2"],
+      "members": [
+        "-CHO",
+        "-COR",
+        "-CO2H",
+        "-CO2R",
+        "-CONH2",
+        "-CONHR",
+        "-CONR2"
+      ],
       "description": "General carbonyl-containing functional groups."
     },
     "sp2_Carbon": {
       "name": "sp2 Carbon Scaffold",
       "priority": 4,
-      "members": ["Ar", "Alkenyl"],
+      "members": [
+        "Ar",
+        "Alkenyl"
+      ],
       "description": "Aromatic or alkenyl carbon attachment points."
     },
     "R": {
       "name": "R Group",
-      "members": ["Ar", "Alkyl", "Alkenyl", "Alkynyl"],
+      "members": [
+        "Ar",
+        "Alkyl",
+        "Alkenyl",
+        "Alkynyl"
+      ],
       "description": "Generic carbon-based scaffolds (aryl, alkyl, alkenyl, alkynyl)."
     },
     "sp3_Carbon": {
       "name": "sp3 Carbon Scaffold",
       "priority": 0,
-      "members": ["Alkyl", "CH3", "RCH2", "R2CH", "R3C", "Bn", "Allyl"],
+      "members": [
+        "Alkyl",
+        "-CH3",
+        "-RCH2",
+        "-R2CH",
+        "-R3C",
+        "-Bn",
+        "-Allyl"
+      ],
       "description": "Alkyl (sp3 carbon) attachment points."
     },
     "Organoboron_Group": {
       "name": "Organoboron Group",
-      "members": ["B(OH)2", "Bpin", "B(OR)2", "BF3K"],
+      "members": [
+        "-B(OH)2",
+        "-Bpin",
+        "-B(OR)2",
+        "-BF3K"
+      ],
       "description": "Common organoboron functional groups (boronic acids, esters, trifluoroborates)."
     },
     "Organotin_Group": {
       "name": "Organotin Group",
-      "members": ["Sn"],
+      "members": [
+        "-Sn*"
+      ],
       "description": "Organotin functional groups (stannanes)."
     },
     "Organozinc_Group": {
       "name": "Organozinc Group",
-      "members": ["Zn"],
+      "members": [
+        "-Zn*"
+      ],
       "description": "Organozinc functional groups."
     },
     "Organomagnesium_Group": {
       "name": "Organomagnesium Group",
-      "members": ["Mg"],
+      "members": [
+        "-Mg*"
+      ],
       "description": "Organomagnesium functional groups (Grignard reagents)."
     },
     "Organosilicon_Group": {
       "name": "Organosilicon Group",
-      "members": ["Si"],
+      "members": [
+        "-Si*"
+      ],
       "description": "Organosilicon functional groups (silanes)."
     },
     "Organometallic_Generic": {
       "name": "Generic Organometallic",
-      "members": ["M"],
+      "members": [
+        "-M*"
+      ],
       "description": "Generic organometallic groups (Li, Na, K, Mg, Zn, Cu, Ag)."
     },
     "Organometallic_All": {
       "name": "Organometallic (All)",
-      "members": ["Organoboron_Group", "Organotin_Group", "Organozinc_Group", "Organomagnesium_Group", "Organosilicon_Group", "Organometallic_Generic"],
+      "members": [
+        "Organoboron_Group",
+        "Organotin_Group",
+        "Organozinc_Group",
+        "Organomagnesium_Group",
+        "Organosilicon_Group",
+        "Organometallic_Generic"
+      ],
       "description": "All organometallic and metalloid handles."
     },
     "Alkyne_All": {
       "name": "Alkyne (All)",
-      "members": ["-C#CH", "-C#C"],
+      "members": [
+        "-C#CH",
+        "-C#C"
+      ],
       "description": "Terminal and internal alkynes."
     },
     "Alkenyl_All": {
       "name": "Alkenyl (All)",
-      "members": ["-C=CH2", "-C=C"],
+      "members": [
+        "-C=CH2",
+        "-C=C"
+      ],
       "description": "Terminal and general alkenes."
     }
   }

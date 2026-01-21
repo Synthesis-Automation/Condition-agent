@@ -3,18 +3,23 @@
 ## Changes Made (January 21, 2026)
 
 ### 1. Simplified Group IDs
+
 **Before:**
+
 - Scaffolds: `Ar`, `Alkyl`, `RCH2`, etc. (no prefix)
 - Substituents: `Cl`, `Br`, `NH2`, `OH`, etc. (no prefix)
 - Special variants: `Ar_Subst`, `AromN_Subst` (ugly suffixes)
 
 **After:**
+
 - Scaffolds: `Ar`, `Alkyl`, `RCH2`, etc. (unchanged)
 - Substituents: `-Cl`, `-Br`, `-NH2`, `-OH`, etc. (all have `-` prefix)
 - Clean variants: `-Ar`, `-AromN`, `-Alkenyl`, `-Alkyl` (no `_Subst` suffix)
 
 ### 2. Removed "name" Field
+
 **Before:** Each group had both `id` and `name` fields (redundant)
+
 ```json
 {
   "id": "Cl",
@@ -25,6 +30,7 @@
 ```
 
 **After:** Only `id` field needed (serves as display name)
+
 ```json
 {
   "id": "-Cl",
@@ -34,7 +40,9 @@
 ```
 
 ### 3. Simplified Compound ID Generation
+
 **Before:** Complex logic with `-` insertion and `_Subst` stripping
+
 ```python
 display_a = group_a.replace("_Subst", "")
 display_b = group_b.replace("_Subst", "")
@@ -42,6 +50,7 @@ entry["id"] = f"{display_a}-{display_b}"
 ```
 
 **After:** Simple concatenation (dash already in substituent ID)
+
 ```python
 entry["id"] = f"{group_a}{group_b}"  # Just A+B!
 ```
@@ -49,6 +58,7 @@ entry["id"] = f"{group_a}{group_b}"  # Just A+B!
 ### 4. Example Compound Structures
 
 **Biaryl (your original question):**
+
 ```json
 {
   "A": "Ar",
@@ -56,24 +66,29 @@ entry["id"] = f"{group_a}{group_b}"  # Just A+B!
   "description": "Biaryl (Ar-Ar) bond."
 }
 ```
+
 → Auto-generated ID: **`Ar-Ar`** ✓
 
 **Aryl chloride:**
+
 ```json
 {
   "A": "Ar",
   "B": "-Cl"
 }
 ```
+
 → Auto-generated ID: **`Ar-Cl`** ✓
 
 **Alkyl alcohol:**
+
 ```json
 {
   "A": "Alkyl",
   "B": "-OH"
 }
 ```
+
 → Auto-generated ID: **`Alkyl-OH`** ✓
 
 ## Benefits
@@ -112,6 +127,7 @@ entry["id"] = f"{group_a}{group_b}"  # Just A+B!
 ## Migration Notes
 
 If you have external code referencing group IDs:
+
 - Update substituent references: `"Cl"` → `"-Cl"`, `"Ar_Subst"` → `"-Ar"`
 - Scaffold IDs unchanged: `"Ar"`, `"Alkyl"` stay the same
 - Compound IDs remain the same (e.g., `"Ar-Cl"` is still `"Ar-Cl"`)
