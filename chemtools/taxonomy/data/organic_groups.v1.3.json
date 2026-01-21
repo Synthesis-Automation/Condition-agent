@@ -18,6 +18,13 @@
       "description": "Aryl attachment via aromatic carbon (Ar-)."
     },
     {
+      "id": "HeteroAr",
+      "kind": "scaffold",
+      "priority": 5,
+      "smarts": "[c;$(c:a:[n,o,s,p]),$(c:a:a:[n,o,s,p]),$(c:a:a:a:[n,o,s,p]):1]",
+      "description": "Heteroaryl attachment via aromatic carbon in a heteroaromatic ring (e.g., pyridine-C, furan-C, thiophene-C) (HeteroAr-)."
+    },
+    {
       "id": "AromN",
       "kind": "scaffold",
       "priority": 5,
@@ -93,6 +100,13 @@
       "priority": 5,
       "smarts": "[#6]#[#6:1]",
       "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal)."
+    },
+    {
+      "id": "Alkynyl_terminal",
+      "kind": "scaffold",
+      "priority": 5,
+      "smarts": "[C]#[CH:1]",
+      "description": "Terminal alkynyl attachment at the terminal sp carbon (R-C≡C-H)."
     },
     
     {

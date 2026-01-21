@@ -36,31 +36,31 @@
       "name": "Organozinc",
       "members": [
         "Ar-Zn*",
-        "Alkenyl-Zn",
-        "Alkyl-Zn"
+        "Alkenyl-Zn*",
+        "Alkyl-Zn*"
       ]
     },
     "organotin": {
       "name": "Organotin",
       "members": [
         "Ar-Sn*",
-        "Alkenyl-Sn",
-        "Alkyl-Sn"
+        "Alkenyl-Sn*",
+        "Alkyl-Sn*"
       ]
     },
     "organomagnesium": {
       "name": "Organomagnesium",
       "members": [
         "Ar-Mg*",
-        "Alkenyl-Mg",
-        "Alkyl-Mg"
+        "Alkenyl-Mg*",
+        "Alkyl-Mg*"
       ]
     },
     "organosilicon": {
       "name": "Organosilicon",
       "members": [
         "Ar-Si*",
-        "Alkenyl-Si"
+        "Alkenyl-Si*"
       ]
     },
     "amines_nh": {
@@ -97,9 +97,6 @@
         "Tetrazole",
         "Benzimidazole",
         "Purine",
-        "H-NH2",
-        "H-NHR",
-        "H-NR2",
         "H-AromN",
         "AromN-H",
         "H-LactamN",
