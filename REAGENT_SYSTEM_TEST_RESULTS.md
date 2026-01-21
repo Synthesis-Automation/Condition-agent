@@ -1,9 +1,11 @@
 # Reagent System Test Results
 
 ## Summary
+
 ✅ **The reagent system works perfectly after taxonomy simplification!**
 
 ## Changes Made to `reagent_roles.v2.json`
+
 1. **Removed 170 `name` fields** (all were redundant, just title_case of id)
 2. **Removed 158 `allowlists` objects** (all had empty `cas`, `names`, and redundant `keywords`)
 3. **Preserved 31 CAS numbers** from 15 families (moved to `description` field)
@@ -13,6 +15,7 @@
 ## Test Results
 
 ### 1. ReagentTaxonomyV2
+
 - ✅ Successfully loads 12 roles from JSON
 - ✅ Successfully loads 158 families from JSON
 - ✅ All roles have names (using `id` as fallback when `name` missing)
@@ -21,6 +24,7 @@
 - ✅ Classification still works (1/3 test records matched via SMARTS)
 
 ### 2. TaxonomyStore
+
 - ✅ Initializes successfully
 - ✅ Loads 158 families
 - ✅ Exports allowlists structure in family data (empty but valid)
@@ -28,6 +32,7 @@
 - ✅ Role inference works: "Palladium acetate" → "metal_catalyst"
 
 ### 3. Reagent Analytics App
+
 - ✅ Database statistics load correctly
 - ✅ Shows 27,387 reagents across all roles
 - ✅ Role distribution displays correctly
@@ -35,22 +40,27 @@
 ## Why It Works
 
 ### Defensive Coding Patterns
+
 The codebase already had defensive patterns that handle missing fields:
 
-1. **Name fallback**: `entry.get("name", entry["id"])` 
+1. **Name fallback**: `entry.get("name", entry["id"])`
 2. **Allowlists fallback**: `entry.get("allowlists") or {}`
 3. **Empty collections**: `allowlists_raw.get("cas", [])` returns empty list
 4. **Safe checks**: `if allowlists.names and normalized_name in allowlists.names:`
 
 ### Classification Logic
+
 The classification logic checks allowlists but gracefully handles empty sets/lists:
+
 - `if cas and cas in allowlists.cas:` → False when cas set is empty
 - `if allowlists.names and normalized_name in allowlists.names:` → Skipped when names is empty
 - `if allowlists.keywords:` → Skipped when keywords list is empty
 - Falls back to SMARTS pattern matching when available
 
 ### CAS Numbers Preserved
+
 The 31 CAS numbers from 15 families were preserved in the `description` field:
+
 - `aluminum_halides`: "Aluminum halides (CAS: 12138-52-0, 7727-15-3)"
 - `mineral_acids`: "Mineral acids (H2SO4/HCl/H3PO4) (CAS: 590-29-4, 7647-01-0, ...)"
 - etc.
@@ -68,7 +78,9 @@ Across **all 5 taxonomy files**:
 **Grand total: 1,331 redundant fields eliminated across the entire taxonomy!**
 
 ## Conclusion
+
 The reagent system is **fully operational** and **more maintainable** after simplification. All redundant data has been removed while preserving functionality through:
+
 - Automatic name generation from IDs
 - Empty but valid allowlist structures
 - Preserved CAS numbers in descriptions
