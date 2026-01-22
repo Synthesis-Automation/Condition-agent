@@ -9,8 +9,7 @@ This module separates business logic from API routing, making the code:
 Services:
 - matching_service: SMILES normalization, family detection, reaction type detection
 - featurization_service: Molecular and role-aware featurization
-- recommendation_service: ML-based and rule-based recommendation
-- rule_matching_service: SCDB rule matching
+- recommendation_service: Unified condition recommendations
 - precedent_service: Precedent search, core management
 """
 
@@ -22,6 +21,5 @@ __all__ = [
     "matching_service",
     "featurization_service",
     "recommendation_service",
-    "rule_matching_service",
     "precedent_service",
 ]

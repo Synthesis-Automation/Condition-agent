@@ -325,25 +325,6 @@ class ConditionRecommendation:
 
 ## Integration with Existing Systems
 
-### Complementary to Rule-Based Systems
-
-```python
-# Hybrid approach: combine HTE + rule-based
-from chemtools.recommend.unified import recommend_conditions_unified
-from chemtools.HTE import HTERecommender
-
-# Get rule-based recommendations
-rule_recs = recommend_conditions_unified(
-    reaction_smiles="c1ccc(Br)cc1.CCN>>c1ccc(NCC)cc1"
-)
-
-# Get HTE recommendations
-hte = HTERecommender()
-hte_recs = hte.recommend("c1ccc(Br)cc1", "CCN")
-
-# Compare/combine results
-```
-
 ### CLI Integration
 
 Create `chemtools/HTE/cli.py` for command-line access (see Implementation section).

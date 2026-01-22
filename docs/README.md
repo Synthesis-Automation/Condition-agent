@@ -60,9 +60,6 @@ pytest -q
 # run API locally
 uvicorn app.main:app --reload --port 8000
 
-# query rule-based registry from CLI
-python -m chemtools.rule.cli "Toluene"
-
 ```
 
 ChemTools is fully deterministic by default, with optional higher-level integrations (ML re-ranking, LLM agents) activated as your workflow requires.

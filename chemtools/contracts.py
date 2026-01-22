@@ -23,7 +23,7 @@ class RecommendFromReactionRequest(BaseModel):
     k: int = 25
     relax: Optional[Dict[str, Any]] = None
     constraints: Optional[Dict[str, Any]] = None
-    rerank_strategy: str = 'rule'  # 'rule', 'analytics', or 'none'
+    rerank_strategy: str = 'analytics'  # 'analytics' or 'none'
     filter_unknown_reagents: bool = False
     search_all_families: bool = False  # Enable cross-family search
     reaction_type_threshold: float = 0.15  # Min representation for reaction type filtering (15%)
@@ -58,13 +58,6 @@ class RoleAwareMolRequest(BaseModel):
 
 class RoleAwareReactionRequest(BaseModel):
     reaction: str
-
-
-class SchemeMatchRequest(BaseModel):
-    reaction: str
-    db: Optional[str] = None
-    include_trace: bool = True
-    relax: Optional[Dict[str, Any]] = None  # For catalyst_class filtering
 
 
 # Core search (by condition core, e.g., 'Pd/XPhos')

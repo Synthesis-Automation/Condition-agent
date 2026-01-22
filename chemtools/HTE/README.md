@@ -403,23 +403,6 @@ result = classify_reactant_smiles("c1ccc(Br)cc1")
 
 Detection coverage: **98.7%** on common substrates
 
-### With Rule-Based System
-
-Complementary approach:
-
-- **Rule-based**: Requires reaction SMILES, uses templates
-- **HTE-based**: Only needs reactants, uses experimental data
-
-Can combine for validation:
-
-```python
-# Get both
-rule_recs = recommend_conditions_unified("rxn_smiles")
-hte_recs = hte_recommender.recommend(smiles_a, smiles_b)
-
-# Compare for confidence
-```
-
 ---
 
 ## ⚠️ Limitations

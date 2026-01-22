@@ -382,7 +382,7 @@ class RecommendNamespace:
     def conditions(self, reaction: str, reaction_type: Optional[str] = None,
                    k: int = 5, limit: int = 10, relax: Optional[Dict] = None,
                    constraints: Optional[Dict] = None, 
-                   rerank_strategy: str = 'rule',
+                   rerank_strategy: str = 'analytics',
                    filter_unknown_reagents: bool = False,
                    search_all_families: bool = False,
                    **kwargs) -> Dict[str, Any]:
@@ -497,135 +497,6 @@ class ReagentNamespace:
         """
         from . import reagent as _reagent
         return _reagent.get_all_reagent_types()
-
-
-class RuleNamespace:
-    """Rule-based scheme matching for reaction conditions.
-    
-    Provides deterministic SMARTS-based matching against curated
-    reaction schemes and selector rules.
-    
-    Example:
-        >>> from chemtools import chem
-        >>> db = chem.rules.load_database("C_N_Coupling_Pd_db.json")
-        >>> result = chem.rules.match(db, reaction)
-        >>> print(result.conditions)
-    """
-    
-    def __init__(self):
-        """Initialize with empty database cache."""
-        self._databases: Dict[str, Any] = {}
-    
-    def load_database(
-        self, 
-        path: str,
-        cache: bool = True
-    ) -> Any:
-        """Load a scheme database from JSON file.
-        
-        Args:
-            path: Path to database JSON file. Can be:
-                  - Absolute path: "/full/path/to/db.json"
-                  - Relative to data/rule_db/: "C_N_Coupling_Pd_db.json"
-                  - Relative to CWD: "path/to/db.json"
-            cache: Whether to cache the loaded database (default: True)
-            
-        Returns:
-            SchemeConditionDB or SelectorRuleDB instance
-            
-        Example:
-            >>> db = chem.rules.load_database("C_N_Coupling_Pd_db.json")
-            >>> db = chem.rules.load_database("data/rule_db/Suzuki_db.json")
-            >>> db = chem.rules.load_database("/absolute/path/db.json")
-        """
-        from .rule import load_db
-        from pathlib import Path
-        
-        # Normalize path
-        p = Path(path)
-        if not p.is_absolute():
-            # Try relative to data/rule_db/ first
-            candidate = Path("data/rule_db") / path
-            if candidate.exists():
-                p = candidate.resolve()
-            else:
-                # Fall back to relative to CWD
-                p = Path(path).resolve()
-        else:
-            p = p.resolve()
-        
-        path_str = str(p)
-        
-        # Check cache
-        if cache and path_str in self._databases:
-            return self._databases[path_str]
-        
-        # Load database
-        db = load_db(path_str)
-        
-        # Cache if requested
-        if cache:
-            self._databases[path_str] = db
-        
-        return db
-    
-    def match(
-        self,
-        db: Any,
-        reaction: str = None,
-        *,
-        features: Dict[str, Any] = None
-    ) -> Any:
-        """Match a reaction against a rule database.
-        
-        Args:
-            db: Loaded database from load_database()
-            reaction: Reaction SMILES (required for SchemeConditionDB)
-            features: Feature dict (required for SelectorRuleDB)
-            
-        Returns:
-            MatchResult with conditions, trace, and metadata
-            
-        Example:
-            >>> db = chem.rules.load_database("C_N_Coupling_Pd_db.json")
-            >>> result = chem.rules.match(db, "c1ccccc1Br.Nc1ccccc1>>c1ccccc1Nc1ccccc1")
-            >>> print(result.conditions)
-            >>> print(result.entry_name)
-            >>> print(result.match_type)
-        """
-        from .rule import match
-        return match(db, reaction, features=features)
-    
-    def list_databases(self) -> List[str]:
-        """List available databases in data/rule_db/.
-        
-        Returns:
-            List of database filenames
-            
-        Example:
-            >>> databases = chem.rules.list_databases()
-            >>> print(databases)
-            ['Amide_formation_db.json', 'C_N_Coupling_Cu_db.json', ...]
-        """
-        from pathlib import Path
-        db_dir = Path("data/rule_db")
-        if db_dir.exists():
-            return sorted([f.name for f in db_dir.glob("*.json")])
-        return []
-    
-    def clear_cache(self) -> int:
-        """Clear cached databases to free memory.
-        
-        Returns:
-            Number of databases cleared from cache
-            
-        Example:
-            >>> count = chem.rules.clear_cache()
-            >>> print(f"Cleared {count} databases from cache")
-        """
-        count = len(self._databases)
-        self._databases.clear()
-        return count
 
 
 class ExplainNamespace:
@@ -1015,7 +886,6 @@ class ChemTools:
         self.constraints = ConstraintsNamespace()
         self.functional_groups = FunctionalGroupsNamespace()  # Functional group detection
         self.reagent = ReagentNamespace()  # Reagent database access
-        self.rules = RuleNamespace()       # Rule-based scheme matching
         self.analytics = DatasetAnalyticsNamespace()  # Dataset analytics
         
         # Data operations (stateful, context-aware)

@@ -1,9 +1,8 @@
 """
 Simplified Precedent-Centric Recommendation
 
-Strategy: Use precedents as primary source, then rerank by either:
-1. Rule-based reranking: Boost precedents matching rule patterns
-2. Analytics-based reranking: Boost precedents using popular reagents
+Strategy: Use precedents as primary source, then optionally rerank by
+dataset analytics (popular reagents).
 
 This is much simpler than the full fusion approach.
 """
@@ -11,161 +10,6 @@ This is much simpler than the full fusion approach.
 from typing import Dict, List, Any, Optional, Tuple
 from collections import Counter
 import warnings
-
-
-def rerank_by_rules(
-    precedents: List[dict],
-    similarities: List[float],
-    reaction_smiles: str,
-    family: str
-) -> Tuple[List[dict], List[float], List[str]]:
-    """
-    Rerank precedents by rule matching.
-    
-    Strategy:
-    - Load rule database for reaction family
-    - Match reaction against rules
-    - Boost precedents whose conditions match the rule result
-    
-    Args:
-        precedents: List of precedent reactions
-        similarities: DRFP similarity scores (0-1)
-        reaction_smiles: Query reaction SMILES
-        family: Reaction family name
-    
-    Returns:
-        (reranked_precedents, reranked_scores, reasoning_messages)
-    """
-    from chemtools import chem
-    
-    reasoning = []
-    
-    # Map family names to database files
-    family_to_db = {
-        # C-N couplings
-        'Ullmann_CN': 'C_N_Coupling_Cu_db.json',
-        'Buchwald_CN': 'C_N_Coupling_Pd_db.json',
-        'C_N_Coupling_Pd': 'C_N_Coupling_Pd_db.json',
-        'C_N_Coupling_Cu': 'C_N_Coupling_Cu_db.json',
-        'C_N_Coupling_Ni': 'C_N_Coupling_Ni_db.json',
-        'c_n_cross_coupling': 'C_N_Coupling_Pd_db.json',
-        # Suzuki
-        'Suzuki': 'Suzuki_db.json',
-        'Suzuki_CC': 'Suzuki_db.json',
-        'Suzuki_Miyaura': 'Suzuki_db.json',
-        'suzuki_miyaura': 'Suzuki_db.json',
-        # Amide formation
-        'Amide_Formation': 'amide_formation_db.json',
-        'Amide_Coupling': 'amide_formation_db.json',
-        'amide_coupling': 'amide_formation_db.json',
-    }
-    
-    db_file = family_to_db.get(family)
-    
-    if not db_file:
-        reasoning.append(f"No rule database for family '{family}' - using similarity only")
-        # Return precedents sorted by similarity only
-        sorted_pairs = sorted(
-            zip(precedents, similarities),
-            key=lambda x: x[1],
-            reverse=True
-        )
-        return (
-            [p for p, _ in sorted_pairs],
-            [s for _, s in sorted_pairs],
-            reasoning
-        )
-    
-    try:
-        # Load and match rules
-        rule_db = chem.rules.load_database(db_file, cache=True)
-        match_result = chem.rules.match(rule_db, reaction_smiles)
-        
-        if not match_result or not match_result.conditions:
-            reasoning.append("No rule match found - using similarity only")
-            sorted_pairs = sorted(
-                zip(precedents, similarities),
-                key=lambda x: x[1],
-                reverse=True
-            )
-            return (
-                [p for p, _ in sorted_pairs],
-                [s for _, s in sorted_pairs],
-                reasoning
-            )
-        
-        # Extract rule-recommended reagents
-        rule_reagents = match_result.reagents if match_result.reagents else []
-        rule_base = None
-        rule_solvent = None
-        rule_catalyst = None
-        
-        for reagent in rule_reagents:
-            role = reagent.get('role', '').lower()
-            if 'base' in role:
-                rule_base = reagent.get('cas') or reagent.get('name')
-            elif 'solvent' in role:
-                rule_solvent = reagent.get('cas') or reagent.get('name')
-            elif 'catalyst' in role or 'cat' in role:
-                rule_catalyst = reagent.get('name')
-        
-        reasoning.append(f"Rule match found: catalyst={rule_catalyst}, base={rule_base}, solvent={rule_solvent}")
-        
-        # Score each precedent by rule alignment
-        boosted_scores = []
-        for prec, sim in zip(precedents, similarities):
-            boost = 0.0
-            
-            # Check catalyst/core match
-            prec_core = prec.get('core', '')
-            if rule_catalyst and prec_core:
-                if rule_catalyst.lower() in prec_core.lower() or prec_core.lower() in rule_catalyst.lower():
-                    boost += 0.3
-            
-            # Check base match
-            prec_base = prec.get('base_uid', '')
-            if rule_base and prec_base:
-                if str(rule_base) == str(prec_base):
-                    boost += 0.2
-            
-            # Check solvent match
-            prec_solvent = prec.get('solvent_uid', '')
-            if rule_solvent and prec_solvent:
-                if str(rule_solvent) == str(prec_solvent):
-                    boost += 0.2
-            
-            # Combine similarity with rule boost
-            # Formula: similarity * (1 + boost) to preserve relative order while boosting matches
-            combined_score = sim * (1.0 + boost)
-            boosted_scores.append(combined_score)
-        
-        # Sort by combined score
-        sorted_triples = sorted(
-            zip(precedents, boosted_scores, similarities),
-            key=lambda x: x[1],
-            reverse=True
-        )
-        
-        reranked_prec = [p for p, _, _ in sorted_triples]
-        reranked_scores = [s for _, _, s in sorted_triples]  # Return original similarity scores
-        
-        reasoning.append(f"Reranked {len(precedents)} precedents by rule alignment")
-        
-        return reranked_prec, reranked_scores, reasoning
-        
-    except Exception as e:
-        warnings.warn(f"Rule-based reranking failed: {e}")
-        reasoning.append(f"Rule reranking error: {e} - using similarity only")
-        sorted_pairs = sorted(
-            zip(precedents, similarities),
-            key=lambda x: x[1],
-            reverse=True
-        )
-        return (
-            [p for p, _ in sorted_pairs],
-            [s for _, s in sorted_pairs],
-            reasoning
-        )
 
 
 def rerank_by_analytics(
@@ -265,7 +109,7 @@ def recommend_simple(
     reaction_smiles: str,
     family: str,
     k: int = 50,
-    rerank_strategy: str = 'rule',  # 'rule', 'analytics', or 'none'
+    rerank_strategy: str = 'analytics',  # 'analytics' or 'none'
     relax: Optional[Dict] = None,
     filter_unknown_reagents: bool = False
 ) -> Dict[str, Any]:
@@ -275,14 +119,14 @@ def recommend_simple(
     Workflow:
     1. Find k similar precedents by DRFP similarity
     2. Optionally filter precedents with unknown reagents
-    3. Optionally rerank by rule matching OR dataset analytics
+    3. Optionally rerank by dataset analytics
     4. Extract top conditions from reranked precedents
     
     Args:
         reaction_smiles: Reaction SMILES string
         family: Reaction family name
         k: Number of precedents to retrieve
-        rerank_strategy: 'rule' (match rules), 'analytics' (popular reagents), or 'none' (similarity only)
+        rerank_strategy: 'analytics' (popular reagents) or 'none' (similarity only)
         relax: Precedent search parameters
         filter_unknown_reagents: If True, remove precedents with unknown base/solvent reagents
             Note: Only filters base and solvent, not catalyst cores (cores are complex "Metal/Ligand" strings)
@@ -357,12 +201,7 @@ def recommend_simple(
             reasoning.append(f"Reagent filtering error: {e} - using all precedents")
     
     # Step 3: Rerank precedents (optional)
-    if rerank_strategy == 'rule':
-        precs, similarities, rerank_reasons = rerank_by_rules(
-            precs, similarities, reaction_smiles, family
-        )
-        reasoning.extend(rerank_reasons)
-    elif rerank_strategy == 'analytics':
+    if rerank_strategy == 'analytics':
         precs, similarities, rerank_reasons = rerank_by_analytics(
             precs, similarities, family
         )

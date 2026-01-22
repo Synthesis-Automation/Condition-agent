@@ -23,7 +23,7 @@ def format_meta(
     Format metadata section.
     
     Args:
-        model_type: Type of model used (ML-precedent-knn, Rule-based, etc.)
+        model_type: Type of model used (ML-precedent-knn, Fusion-hybrid, etc.)
         status: Execution status (success, error)
         processing_time_ms: Processing time in milliseconds
         request_id: Optional unique request identifier

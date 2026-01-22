@@ -93,13 +93,3 @@ class ParseError(ChemToolsError):
     pass
 
 
-# Legacy exception compatibility
-# Keep for backward compatibility with existing code
-class SchemeConditionDBError(ChemToolsError):
-    """Legacy exception for SchemeConditionDB errors.
-    
-    Deprecated: Use ValidationError or ProcessingError instead.
-    This is kept for backward compatibility with the former ``chemtools.rule_scdb_matcher``
-    module (now ``chemtools.rule``).
-    """
-    pass

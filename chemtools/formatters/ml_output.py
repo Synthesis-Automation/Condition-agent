@@ -34,7 +34,7 @@ def build_standard_output(
     standard output format.
     
     Args:
-        model_type: Model identifier (ML-precedent-knn, Rule-based-SCDB, etc.)
+        model_type: Model identifier (ML-precedent-knn, Fusion-hybrid, etc.)
         reaction_smiles: Input reaction SMILES
         requested_type: User-requested reaction type
         detected_type: Auto-detected reaction type
@@ -189,54 +189,6 @@ def format_ml_output(
     )
 
 
-def format_rule_output(
-    reaction_smiles: str,
-    requested_type: Optional[str],
-    detected_type: Optional[str],
-    recommendations_data: Any,
-    database_name: str,
-    processing_time_ms: Optional[float] = None,
-) -> Dict[str, Any]:
-    """
-    Format rule-based recommendation output in the improved format.
-    
-    Args:
-        reaction_smiles: Input reaction SMILES
-        requested_type: User-requested reaction type
-        detected_type: Auto-detected reaction type
-        recommendations_data: List of recommendation data dicts or match result dict
-        database_name: Name of rule database used
-        processing_time_ms: Processing time in milliseconds
-    
-    Returns:
-        Complete formatted output dictionary
-    """
-    # Import here to avoid circular dependency
-    from .rule_output import convert_rule_match_to_recommendations
-    
-    # If recommendations_data is a dict (match_result), convert it first
-    if isinstance(recommendations_data, dict):
-        from . import format_rule_match_result
-        return format_rule_match_result(
-            reaction_smiles=reaction_smiles,
-            match_result=recommendations_data,
-            requested_type=requested_type,
-            database_name=database_name,
-            processing_time_ms=processing_time_ms,
-        )
-    
-    return build_standard_output(
-        model_type=f"Rule-based-{database_name}",
-        reaction_smiles=reaction_smiles,
-        requested_type=requested_type,
-        detected_type=detected_type or requested_type,
-        detection_confidence=1.0 if recommendations_data else None,
-        detection_method="pattern-match",
-        recommendations_data=recommendations_data,
-        processing_time_ms=processing_time_ms,
-    )
-
-
 def format_fusion_output(
     reaction_smiles: str,
     requested_type: Optional[str],
@@ -298,48 +250,3 @@ def format_fusion_output(
     )
 
 
-def format_rule_match_result(
-    reaction_smiles: str,
-    match_result: Dict[str, Any],
-    requested_type: Optional[str] = None,
-    database_name: Optional[str] = None,
-    processing_time_ms: Optional[float] = None,
-) -> Dict[str, Any]:
-    """
-    Format raw SCDB match results into the canonical output schema.
-    
-    Args:
-        reaction_smiles: Input reaction SMILES
-        match_result: Raw SCDB match result dictionary
-        requested_type: User-requested reaction type
-        database_name: Database name
-        processing_time_ms: Processing time in milliseconds
-        
-    Returns:
-        Formatted match result dictionary
-    """
-    from .rule_output import convert_rule_match_to_recommendations
-    
-    recommendations_data = convert_rule_match_to_recommendations(reaction_smiles, match_result)
-    detected_type = (
-        match_result.get("reaction_type")
-        or match_result.get("family")
-        or requested_type
-    )
-    if not detected_type and database_name:
-        detected_type = database_name
-    extras = {
-        "match": match_result,
-    }
-    model_label = f"Rule-based-{database_name}" if database_name else "Rule-based"
-    return build_standard_output(
-        model_type=model_label,
-        reaction_smiles=reaction_smiles,
-        requested_type=requested_type,
-        detected_type=detected_type,
-        detection_confidence=1.0 if recommendations_data else None,
-        detection_method="pattern-match",
-        recommendations_data=recommendations_data,
-        processing_time_ms=processing_time_ms,
-        extras=extras,
-    )

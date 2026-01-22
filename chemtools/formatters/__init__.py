@@ -7,7 +7,6 @@ recommendation outputs in standardized JSON formats.
 Modules:
     base: Core formatting for metadata, input, and detection sections
     normalization: Normalization helpers for chemicals, conditions, recommendations
-    rule_output: Rule-based output formatting (SCDB)
     ml_output: ML output formatting and standard builders
     utils: Utility functions for reagent enrichment and condition formatting
 """
@@ -32,20 +31,12 @@ from chemtools.formatters.normalization import (
     normalize_rule_string_value,
 )
 
-# From rule_output.py
-from chemtools.formatters.rule_output import (
-    starting_material_entries,
-    convert_rule_match_to_recommendations,
-)
-
 # From ml_output.py
 from chemtools.formatters.ml_output import (
     build_standard_output,
     ensure_standard_output,
     format_ml_output,
-    format_rule_output,
     format_fusion_output,
-    format_rule_match_result,
 )
 
 # From rule_to_protocol.py
@@ -76,17 +67,11 @@ __all__ = [
     "parse_amount_to_equivalents",
     "normalize_rule_string_value",
     
-    # Rule output
-    "starting_material_entries",
-    "convert_rule_match_to_recommendations",
-    
     # ML output
     "build_standard_output",
     "ensure_standard_output",
     "format_ml_output",
-    "format_rule_output",
     "format_fusion_output",
-    "format_rule_match_result",
     
     # Utils
     "enrich_reagent",

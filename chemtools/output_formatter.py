@@ -8,7 +8,6 @@ REFACTORED: The original 1,398-line monolithic file has been split into
 logical modules in chemtools/formatters/:
     - base.py: Core formatting (metadata, input, detection)
     - normalization.py: Normalization helpers for chemicals and conditions
-    - rule_output.py: Rule-based output formatting (SCDB)
     - ml_output.py: ML output formatting and standard builders
     - utils.py: Reagent enrichment and condition formatting utilities
 
@@ -32,17 +31,11 @@ from chemtools.formatters import (
     parse_amount_to_equivalents,
     normalize_rule_string_value,
     
-    # Rule-based output formatting
-    starting_material_entries,
-    convert_rule_match_to_recommendations,
-    
     # ML output and standard builders
     build_standard_output,
     ensure_standard_output,
     format_ml_output,
-    format_rule_output,
     format_fusion_output,
-    format_rule_match_result,
     
     # Utility functions
     enrich_reagent,
@@ -66,17 +59,11 @@ __all__ = [
     "parse_amount_to_equivalents",
     "normalize_rule_string_value",
     
-    # Rule output
-    "starting_material_entries",
-    "convert_rule_match_to_recommendations",
-    
     # ML output
     "build_standard_output",
     "ensure_standard_output",
     "format_ml_output",
-    "format_rule_output",
     "format_fusion_output",
-    "format_rule_match_result",
     
     # Utils
     "enrich_reagent",
