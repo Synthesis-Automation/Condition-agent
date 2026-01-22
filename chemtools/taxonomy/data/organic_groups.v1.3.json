@@ -39,6 +39,13 @@
       "description": "Alkenyl (vinylic) attachment at an sp2 carbon."
     },
     {
+      "id": "Alkenyl_terminal",
+      "kind": "scaffold",
+      "priority": 7,
+      "smarts": "[CH:1]=[CH2]",
+      "description": "Terminal alkenyl attachment (R-CH=CH2), attached at the internal carbon."
+    },
+    {
       "id": "Alkyl",
       "kind": "scaffold",
       "priority": 3,
@@ -529,29 +536,29 @@
       "id": "-OTf",
       "kind": "substituent",
       "priority": 4,
-      "smarts": "[S:2](=O)(=O)C(F)(F)F",
-      "description": "Triflate substituent for Ar-OTf/Alkenyl-OTf via oxygen linker."
+      "smarts": "[O:2]S(=O)(=O)C(F)(F)F",
+      "description": "Triflate ester substituent (Ar-OTf/Alkenyl-OTf)."
     },
     {
       "id": "-OTs",
       "kind": "substituent",
       "priority": 3,
-      "smarts": "[S:2](=O)(=O)c1ccc(C)cc1",
-      "description": "Tosylate substituent via oxygen linker."
+      "smarts": "[O:2]S(=O)(=O)c1ccc(C)cc1",
+      "description": "Tosylate ester substituent."
     },
     {
       "id": "-OMs",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[S:2](=O)(=O)C",
-      "description": "Mesylate substituent via oxygen linker."
+      "smarts": "[O:2]S(=O)(=O)C",
+      "description": "Mesylate ester substituent."
     },
     {
       "id": "-OSO2R",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[S:2](=O)(=O)[#6]",
-      "description": "Generic sulfonate substituent via oxygen linker (-OSO2R)."
+      "smarts": "[O:2]S(=O)(=O)[#6]",
+      "description": "Generic sulfonate ester substituent (-OSO2R)."
     },
     {
       "id": "-COR",

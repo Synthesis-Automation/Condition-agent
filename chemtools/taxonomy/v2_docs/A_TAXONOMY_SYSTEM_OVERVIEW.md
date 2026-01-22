@@ -145,8 +145,11 @@ To determine what happened in a reaction, we use raw motif counts from reactants
   - Group sets and priorities (e.g., `X = {-Cl, -Br, -I}`, `LeavingGroup`).
   - **Updated**: All group references now use the simplified naming convention with `-` prefix for substituents.
 - `compound_logic.json`
-  - Motif sets for reaction typing.
-  - Examples: `@sp2_electrophiles` (includes `Ar-X`, `Alkenyl-X`), `@amine_nucleophiles`.
+  - Motif sets for reaction typing (8 essential sets, 72 members).
+  - **Structure**: Each set has `set_id`, `name`, `description`, `members` (array of compound IDs), and `usage`.
+  - **Active sets**: `sp2_electrophiles` (14), `organoboron` (8), `amines_nh` (22), `alcohols_oh` (12), `thiols_sh` (10), `terminal_alkynes` (2), `aryl_amines` (4), `aryl_ethers` (1).
+  - **Removed legacy sets**: organozinc, organotin, organomagnesium, organosilicon, carboxylic_acids, acyl_halides, terminal_alkenes, carbonyls, esters, amides, aromatic_halides, aromatic_activators, nitro_compounds, azides, hydrogenation_substrates, cross_coupling_products (unused).
+  - Examples: `@sp2_electrophiles` (includes `Ar-Cl`, `Alkenyl-Br`), `@organoboron` (includes `Ar-B(OH)2`, `Alkenyl-B(OH)2`).
 - `reaction_types.v4.0.json`
   - Canonical reaction types with motif-slot constraints and aliases.
   - High-precision matching: `buchwald_hartwig` requires an electrophile slot AND a nucleophile slot to be occupied.
@@ -158,6 +161,7 @@ To determine what happened in a reaction, we use raw motif counts from reactants
 Notes
 
 - `reagent_roles.v2.json` is the single source for reagent roles and families. Legacy registries only store reagent entries, not taxonomy definitions.
+- **Compound Logic Rebuild (2026-01-22)**: Rebuilt `compound_logic.json` from 24 sets (232 members, 98.7% invalid) to 8 essential sets (72 members, 100% valid). Fixed formatting errors (double-dash → single-dash) and updated `terminal_alkynes` to use scaffold+scaffold approach (`Ar-Alkynyl_terminal`, `Alkyl-Alkynyl_terminal`).
 - **Simplification (2026-01-21)**: Removed 1,331 redundant fields across all 5 taxonomy files:
   - `organic_groups.v1.3.json`: Removed 92 `name` + 92 `tags` fields. Added `-` prefix to 78 substituent IDs.
   - `organic_compounds.v1.3.json`: Removed 364 `id` + 364 `name` fields. IDs now auto-generated as `A+B`.
@@ -207,6 +211,7 @@ Notes
 
 - `chemtools/featurizers/motif_registry.py`
   - Build compound motif registry from groups + compounds + templates.
+  - **Auto-generates compound IDs**: When compounds lack explicit `id` fields (v1.3 format), IDs are computed as `f"{A}{B}"` from scaffold+substituent pairs.
 - `chemtools/featurizers/motif_detect.py`
   - SMARTS detection, subsumption filtering, priority tie-breaks.
 - `chemtools/featurizers/reaction_detection.py`

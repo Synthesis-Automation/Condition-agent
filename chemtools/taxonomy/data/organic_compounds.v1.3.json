@@ -137,21 +137,33 @@
     },
     {
       "template": "single_bond",
+      "A": "Ar",
+      "B": "Alkenyl_terminal",
+      "description": "Aryl-terminal alkenyl bond (e.g., styrene with terminal vinyl)."
+    },
+    {
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "Alkenyl",
       "description": "Alkenyl-Alkenyl bond (1,3-diene)."
     },
     {
       "template": "single_bond",
-      "A": "Ar",
-      "B": "-C#CH",
-      "description": "Aryl terminal alkyne (Ar-C#CH)."
+      "A": "Alkenyl_terminal",
+      "B": "Alkenyl_terminal",
+      "description": "Terminal alkenyl-terminal alkenyl bond (1,3-butadiene)."
     },
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-C#C",
-      "description": "Aryl internal alkyne (Ar-C#C)."
+      "B": "Alkynyl_terminal",
+      "description": "Aryl terminal alkyne (Ar-Alkynyl_terminal, e.g., phenylacetylene)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "Alkynyl",
+      "description": "Aryl alkyne (Ar-Alkynyl, general)."
     },
     {
       "template": "single_bond",
@@ -231,7 +243,7 @@
       "description": "Vinyl iodide (Alkenyl-I)."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OTf",
       "description": "Vinyl triflate (Alkenyl-OTf)."
@@ -303,25 +315,25 @@
       "description": "Propargylic C-H bond."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OTf",
       "description": "Propargylic triflate (Propargyl-OTf)."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OTs",
       "description": "Propargylic tosylate (Propargyl-OTs)."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OMs",
       "description": "Propargylic mesylate (Propargyl-OMs)."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OSO2R",
       "description": "Propargylic sulfonate (Propargyl-OSO2R)."
@@ -345,46 +357,46 @@
       "description": "Alkynyl iodide (Alkynyl-I)."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Ar",
       "B": "-OTf",
       "description": "Aryl triflate (Ar-OTf); Aryl-O-triflate motif.",
       "reactivity_weight": 2.5
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Ar",
       "B": "-OTs",
       "description": "Aryl tosylate (Ar-OTs); Aryl-O-tosylate motif.",
       "reactivity_weight": 2.0
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Ar",
       "B": "-OMs",
       "description": "Aryl mesylate (Ar-OMs); Aryl-O-mesylate motif.",
       "reactivity_weight": 1.8
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Ar",
       "B": "-OSO2R",
       "description": "Aryl sulfonate (Ar-OSO2R)."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OTs",
       "description": "Vinyl/alkenyl tosylate (Alkenyl-OTs); Vinyl/alkenyl-O-tosylate motif."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OMs",
       "description": "Vinyl/alkenyl mesylate (Alkenyl-OMs); Vinyl/alkenyl-O-mesylate motif."
     },
     {
-      "template": "via_oxygen",
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OSO2R",
       "description": "Vinyl/alkenyl sulfonate (Alkenyl-OSO2R)."
@@ -1416,14 +1428,14 @@
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-C#CH",
-      "description": "Alkyl terminal alkyne (Alkyl-C#CH)."
+      "B": "Alkynyl_terminal",
+      "description": "Alkyl terminal alkyne (Alkyl-Alkynyl_terminal)."
     },
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-C#C",
-      "description": "Alkyl internal alkyne (Alkyl-C#C)."
+      "B": "Alkynyl",
+      "description": "Alkyl alkyne (Alkyl-Alkynyl, general)."
     },
     {
       "template": "single_bond",

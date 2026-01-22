@@ -69,11 +69,15 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
 
     for entry in compounds:
         compound_id = entry.get("id")
-        if not compound_id:
-            continue
-        
         group_a = str(entry.get("A") or "")
         group_b = str(entry.get("B") or "")
+        
+        # Auto-generate ID as A+B when missing (v1.3 simplified format)
+        if not compound_id:
+            if group_a and group_b:
+                compound_id = f"{group_a}{group_b}"
+            else:
+                continue
         if group_a and group_b:
             combination_map[(group_a, group_b)] = compound_id
 

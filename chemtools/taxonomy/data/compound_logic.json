@@ -1,26 +1,39 @@
 {
-  "version": "2.0",
-  "description": "Centralized logic combinations for compound motifs. Single source of truth for reaction typing.",
+  "version": "2.1",
+  "description": "Compound motif sets for reaction typing. Rebuilt for v1.3 - only includes actively used sets.",
+  "notes": "Compound IDs match v1.3 format: scaffold + substituent (e.g., Ar + -NH2 = 'Ar-NH2'). All members validated against organic_compounds.v1.3.json.",
   "motif_sets": {
     "sp2_electrophiles": {
       "name": "sp2 Electrophiles",
+      "description": "Aryl and vinyl halides/sulfonates for cross-coupling.",
       "members": [
         "Ar-I",
         "Ar-Br",
         "Ar-Cl",
+        "Ar-F",
         "Ar-OTf",
         "Ar-OMs",
         "Ar-OTs",
         "Alkenyl-I",
         "Alkenyl-Br",
         "Alkenyl-Cl",
+        "Alkenyl-F",
         "Alkenyl-OTf",
         "Alkenyl-OMs",
         "Alkenyl-OTs"
+      ],
+      "usage": [
+        "suzuki_miyaura",
+        "buchwald_hartwig_cn",
+        "buchwald_hartwig_co",
+        "ullmann_co",
+        "ullmann_cs",
+        "sonogashira"
       ]
     },
     "organoboron": {
-      "name": "Organoboron",
+      "name": "Organoboron Reagents",
+      "description": "Boronic acids, esters, trifluoroborates for Suzuki coupling.",
       "members": [
         "Ar-B(OH)2",
         "Ar-Bpin",
@@ -30,46 +43,18 @@
         "Alkenyl-Bpin",
         "Alkenyl-BF3K",
         "Alkenyl-B(OR)2"
-      ]
-    },
-    "organozinc": {
-      "name": "Organozinc",
-      "members": [
-        "Ar-Zn*",
-        "Alkenyl-Zn*",
-        "Alkyl-Zn*"
-      ]
-    },
-    "organotin": {
-      "name": "Organotin",
-      "members": [
-        "Ar-Sn*",
-        "Alkenyl-Sn*",
-        "Alkyl-Sn*"
-      ]
-    },
-    "organomagnesium": {
-      "name": "Organomagnesium",
-      "members": [
-        "Ar-Mg*",
-        "Alkenyl-Mg*",
-        "Alkyl-Mg*"
-      ]
-    },
-    "organosilicon": {
-      "name": "Organosilicon",
-      "members": [
-        "Ar-Si*",
-        "Alkenyl-Si*"
+      ],
+      "usage": [
+        "suzuki_miyaura",
+        "chan_lam_coupling"
       ]
     },
     "amines_nh": {
-      "name": "Amines (N-H)",
+      "name": "N-H Amines",
+      "description": "Primary/secondary amines and N-H heterocycles for C-N coupling.",
       "members": [
         "Ar-NH2",
         "Ar-NHR",
-        "NH2",
-        "NHR",
         "Alkenyl-NH2",
         "Alkenyl-NHR",
         "Alkyl-NH2",
@@ -89,56 +74,20 @@
         "R2CH-NHR",
         "R3C-NH2",
         "R3C-NHR",
-        "Indole",
-        "Pyrrole",
-        "Imidazole",
-        "Pyrazole",
-        "Triazole",
-        "Tetrazole",
-        "Benzimidazole",
-        "Purine",
-        "AromN-H",
-        "CONH2",
-        "CONHR",
-        "Ar-CONH2",
-        "Ar-CONHR",
-        "Alkenyl-CONH2",
-        "Alkenyl-CONHR",
-        "Alkyl-CONH2",
-        "Alkyl-CONHR",
-        "Alkynyl-CONH2",
-        "Alkynyl-CONHR",
-        "Allyl-CONH2",
-        "Allyl-CONHR",
-        "Bn-CONH2",
-        "Bn-CONHR",
-        "RCH2-CONH2",
-        "RCH2-CONHR",
-        "R2CH-CONH2",
-        "R2CH-CONHR",
-        "R3C-CONH2",
-        "R3C-CONHR",
-        "Carbamate",
-        "Ar-Carbamate",
-        "Alkyl-Carbamate",
-        "Sulfonamide",
-        "Ar-Sulfonamide",
-        "Alkyl-Sulfonamide",
-        "Urea",
-        "Ar-Urea",
-        "Hydrazide",
-        "Ar-Hydrazide",
-        "Alkyl-Hydrazide",
-        "Hydrazine",
-        "Ar-Hydrazine",
-        "Alkyl-Hydrazine"
+        "AromN-H"
+      ],
+      "usage": [
+        "buchwald_hartwig_cn",
+        "chan_lam_coupling",
+        "ullmann_cn"
       ]
     },
     "alcohols_oh": {
-      "name": "Alcohols (O-H)",
+      "name": "Alcohols & Phenols",
+      "description": "O-H nucleophiles for C-O coupling.",
       "members": [
         "Ar-OH",
-        "OH",
+        "AromN-OH",
         "Alkenyl-OH",
         "Alkyl-OH",
         "Alkynyl-OH",
@@ -149,13 +98,17 @@
         "RCH2-OH",
         "R2CH-OH",
         "R3C-OH"
+      ],
+      "usage": [
+        "buchwald_hartwig_co",
+        "ullmann_co"
       ]
     },
     "thiols_sh": {
-      "name": "Thiols (S-H)",
+      "name": "Thiols",
+      "description": "S-H nucleophiles for C-S coupling.",
       "members": [
         "Ar-SH",
-        "SH",
         "Alkenyl-SH",
         "Alkyl-SH",
         "Alkynyl-SH",
@@ -165,196 +118,44 @@
         "RCH2-SH",
         "R2CH-SH",
         "R3C-SH"
-      ]
-    },
-    "carboxylic_acids": {
-      "name": "Carboxylic Acids",
-      "members": [
-        "CO2H",
-        "Acyl-CO2H",
-        "Ar-CO2H",
-        "Alkenyl-CO2H",
-        "Alkyl-CO2H",
-        "RCH2-CO2H",
-        "R2CH-CO2H",
-        "R3C-CO2H"
-      ]
-    },
-    "acyl_halides": {
-      "name": "Acyl Halides",
-      "members": [
-        "Ar-COCl",
-        "Ar-COBr",
-        "COCl",
-        "COBr"
+      ],
+      "usage": [
+        "ullmann_cs"
       ]
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
+      "description": "Terminal alkynes (C≡C-H) for Sonogashira coupling.",
       "members": [
-        "Ar-C#CH",
-        "Alkyl-C#CH",
-        "Alkynyl-H"
-      ]
-    },
-    "terminal_alkenes": {
-      "name": "Terminal Alkenes",
-      "members": [
-        "Ar-C=CH2",
-        "Alkyl-C=CH2",
-        "C=CH2",
-        "Alkenyl-H"
-      ]
-    },
-    "carbonyls": {
-      "name": "Carbonyls",
-      "members": [
-        "Ar-CHO",
-        "CHO",
-        "Alkenyl-CHO",
-        "Alkyl-CHO",
-        "RCH2-CHO",
-        "R2CH-CHO",
-        "R3C-CHO",
-        "COR",
-        "Ar-COR",
-        "Alkenyl-COR",
-        "Alkyl-COR",
-        "Allyl-COR",
-        "Bn-COR",
-        "RCH2-COR",
-        "R2CH-COR",
-        "R3C-COR"
-      ]
-    },
-    "aromatic_halides": {
-      "name": "Aromatic Halides",
-      "members": [
-        "Ar-F",
-        "Ar-Cl",
-        "Ar-Br",
-        "Ar-I"
-      ]
-    },
-    "aromatic_activators": {
-      "name": "Aromatic Activators (SNAr)",
-      "members": [
-        "Ar-NO2",
-        "Ar-CN",
-        "Pyridine",
-        "Pyrimidine"
-      ]
-    },
-    "nitro_compounds": {
-      "name": "Nitro Compounds",
-      "members": [
-        "Ar-NO2",
-        "Alkyl-NO2"
-      ]
-    },
-    "azides": {
-      "name": "Azides",
-      "members": [
-        "Ar-N3",
-        "Alkyl-N3"
-      ]
-    },
-    "esters": {
-      "name": "Esters",
-      "members": [
-        "Ar-CO2R",
-        "CO2R",
-        "Alkenyl-CO2R",
-        "Alkyl-Ester",
-        "Alkynyl-CO2R",
-        "Allyl-CO2R",
-        "Bn-CO2R",
-        "RCH2-CO2R",
-        "R2CH-CO2R",
-        "R3C-CO2R"
-      ]
-    },
-    "amides": {
-      "name": "Amides",
-      "members": [
-        "Amide",
-        "Ar-Amide",
-        "Alkyl-NCOR",
-        "CONH2",
-        "CONHR",
-        "CONR2",
-        "Ar-CONH2",
-        "Ar-CONHR",
-        "Ar-CONR2",
-        "Alkenyl-CONH2",
-        "Alkenyl-CONHR",
-        "Alkenyl-CONR2",
-        "Alkyl-CONH2",
-        "Alkyl-CONHR",
-        "Alkyl-CONR2",
-        "Alkynyl-CONH2",
-        "Alkynyl-CONHR",
-        "Alkynyl-CONR2",
-        "Allyl-CONH2",
-        "Allyl-CONHR",
-        "Allyl-CONR2",
-        "Bn-CONH2",
-        "Bn-CONHR",
-        "Bn-CONR2",
-        "RCH2-CONH2",
-        "RCH2-CONHR",
-        "RCH2-CONR2",
-        "R2CH-CONH2",
-        "R2CH-CONHR",
-        "R2CH-CONR2",
-        "R3C-CONH2",
-        "R3C-CONHR",
-        "R3C-CONR2"
-      ]
-    },
-    "hydrogenation_substrates": {
-      "name": "Hydrogenation Substrates",
-      "members": [
-        "Ar-C#CH",
-        "Alkyl-C#CH",
-        "Ar-C=CH2",
-        "Alkyl-C=CH2",
-        "C=C",
-        "Ar-C=C",
-        "Alkyl-C=C"      ]
-    },
-    "cross_coupling_products": {
-      "name": "Cross-Coupling Products",
-      "members": [
-        "Ar-Ar",
-        "Ar-C=CH2",
-        "Alkenyl-Alkenyl",
-        "Ar-C#C"
+        "Ar-Alkynyl_terminal",
+        "Alkyl-Alkynyl_terminal"
       ],
-      "description": "Common products of C-C cross-coupling reactions."
+      "usage": [
+        "sonogashira"
+      ]
     },
     "aryl_amines": {
       "name": "Aryl Amines",
+      "description": "C-N coupling products.",
       "members": [
         "Ar-NH2",
         "Ar-NHR",
         "Ar-NR2",
-        "Ar-AromN",
-        "Ar-Amide",
-        "Ar-Carbamate",
-        "Ar-Sulfonamide",
-        "Ar-NHAr",
-        "Ar-NAr2"
+        "Ar-AromN"
       ],
-      "description": "Products of C-N coupling."
+      "usage": [
+        "buchwald_hartwig_cn"
+      ]
     },
     "aryl_ethers": {
       "name": "Aryl Ethers",
+      "description": "C-O coupling products.",
       "members": [
-        "Ar-OR",
-        "Ar-OAr"
+        "Ar-Ar"
       ],
-      "description": "Products of C-O coupling."
+      "usage": [
+        "buchwald_hartwig_co"
+      ]
     }
   }
 }
