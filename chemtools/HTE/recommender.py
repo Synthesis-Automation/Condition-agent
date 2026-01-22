@@ -1154,7 +1154,11 @@ class HTERecommender:
     """
     
     def __init__(self, hte_db_path: str = "data/HTE_db"):
-        """Initialize recommender with HTE database"""
+        """Initialize recommender with HTE database.
+
+        Rule-derived screens should live under `data/HTE_db/rules` so they are
+        loaded alongside literature and experimental sources.
+        """
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
         self.indexed_data: Dict[Tuple[str, str], pd.DataFrame] = {}

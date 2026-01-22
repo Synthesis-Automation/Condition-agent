@@ -264,7 +264,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         self.source_group_combo = QtWidgets.QComboBox()
         self.source_group_combo.addItems(["All", "literature", "experiments", "rules"])
-        self.source_group_combo.setToolTip("Filter results to a specific HTE source group.")
+        self.source_group_combo.setToolTip(
+            "Filter results to a specific HTE source group (rules live in data/HTE_db/rules)."
+        )
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
         self.aryl_weighting_check.setToolTip("Reweight matches by aryl steric/electronic similarity (when available).")

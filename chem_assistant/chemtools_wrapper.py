@@ -390,7 +390,7 @@ class HTERecommendInput(BaseModel):
     )
     source_group: Optional[str] = Field(
         None,
-        description="Optional source group filter (literature, experiments, rules).",
+        description="Optional source group filter (literature, experiments, rules under data/HTE_db/rules).",
     )
     use_aryl_steric_electronic_weighting: bool = Field(
         False,
@@ -419,7 +419,7 @@ class HTEDatasetSummaryInput(BaseModel):
     )
     source_group: Optional[str] = Field(
         "literature",
-        description="Source group filter (literature, experiments, rules).",
+        description="Source group filter (literature, experiments, rules under data/HTE_db/rules).",
     )
     top_k: int = Field(10, ge=1, le=200, description="Number of conditions to return.")
     min_experiments: int = Field(

@@ -257,7 +257,10 @@ class HTEAnalytics:
     """
     
     def __init__(self, hte_db_path: str = "data/HTE_db"):
-        """Initialize analytics with HTE database"""
+        """Initialize analytics with HTE database.
+
+        Rule-derived screens are expected under `data/HTE_db/rules`.
+        """
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
         self._load_database()
