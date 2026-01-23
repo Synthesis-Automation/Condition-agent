@@ -597,226 +597,103 @@ class IntegrationsNamespace:
 
 
 class DatasetAnalyticsNamespace:
-    """Dataset analytics for reaction condition analysis.
-    
-    Provides statistical analysis of reaction datasets including:
-    - Common catalysts, ligands, bases, solvents, and reagents (with ranking)
-    - Temperature, time, and yield distributions
-    - Plate design recommendations based on frequency and success
-    - Condition combination analysis
-    
-    This is useful for:
-    - Data-driven condition recommendations
-    - High-throughput experimentation (HTE) plate design
-    - Understanding chemical space coverage
-    - Identifying successful condition patterns
-    
-    Example:
-        >>> from chemtools import chem
-        >>> stats = chem.analytics.get_stats("Suzuki")
-        >>> print(f"Total reactions: {stats['total_reactions']}")
-        >>> 
-        >>> # Get top catalysts with yield data
-        >>> catalysts = chem.analytics.get_common_catalysts("Suzuki", top_n=10)
-        >>> for name, count, avg_yield in catalysts:
-        ...     print(f"{name}: {count} reactions, {avg_yield:.1f}% avg yield")
-        >>> 
-        >>> # Get plate recommendations for HTE
-        >>> plate = chem.analytics.get_plate_recommendations("C_N_Coupling_Pd", n_conditions=96)
-        >>> print(f"Generated {len(plate)} conditions for 96-well plate")
+    """HTE dataset analytics (CSV/JSONL).
+
+    This replaces the legacy dataset_analytics module with the newer
+    chemtools.HTE.analytics.HTEAnalytics backend.
     """
-    
-    @staticmethod
-    def get_stats(family: str) -> Dict[str, Any]:
-        """Get basic statistics for a reaction dataset.
-        
-        Args:
-            family: Reaction family name (e.g., "Suzuki", "C_N_Coupling_Pd")
-            
-        Returns:
-            Dictionary with dataset statistics including:
-            - total_reactions: Total number of reactions
-            - unique_condition_cores, unique_solvents, unique_bases, unique_catalysts
-            - yield_stats: {count, min, max, mean, median}
-            - temperature_stats: {count, min, max, mean, median}
-            - time_stats: {count, min, max, mean, median}
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_dataset_stats(family)
-    
-    @staticmethod
-    def get_common_catalysts(family: str, top_n: int = 10, min_yield: Optional[float] = None) -> List[Tuple[str, int, float]]:
-        """Get most common catalysts with frequency and average yield.
-        
-        Args:
-            family: Reaction family name
-            top_n: Number of top catalysts to return (default: 10)
-            min_yield: Optional minimum yield filter (0-100)
-            
-        Returns:
-            List of tuples: (catalyst_name, count, avg_yield)
-            Sorted by count (descending)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_common_catalysts(family, top_n, min_yield)
-    
-    @staticmethod
-    def get_common_ligands(family: str, top_n: int = 10, min_yield: Optional[float] = None) -> List[Tuple[str, int, float]]:
-        """Get most common ligands with frequency and average yield.
-        
-        Args:
-            family: Reaction family name
-            top_n: Number of top ligands to return (default: 10)
-            min_yield: Optional minimum yield filter (0-100)
-            
-        Returns:
-            List of tuples: (ligand_name, count, avg_yield)
-            Sorted by count (descending)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_common_ligands(family, top_n, min_yield)
-    
-    @staticmethod
-    def get_common_catalytic_systems(family: str, top_n: int = 10, min_yield: Optional[float] = None) -> List[Tuple[str, int, float]]:
-        """Get most common catalytic systems (complete catalyst + ligand combinations) with frequency and average yield.
-        
-        Analyzes catalytic_system as complete units (e.g., "Pd(OAc)2 + RuPhos") rather than individual components.
-        This preserves the important relationship between catalysts and ligands used together.
-        
-        Args:
-            family: Reaction family name
-            top_n: Number of top catalytic systems to return (default: 10)
-            min_yield: Optional minimum yield filter (0-100)
-            
-        Returns:
-            List of tuples: (system_string, count, avg_yield)
-            System string format: "Component1 + Component2 + ..."
-            Sorted by count (descending)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_common_catalytic_systems(family, top_n, min_yield)
-    
-    @staticmethod
-    def get_common_bases(family: str, top_n: int = 10, min_yield: Optional[float] = None) -> List[Tuple[str, int, float]]:
-        """Get most common bases with frequency and average yield.
-        
-        Args:
-            family: Reaction family name
-            top_n: Number of top bases to return (default: 10)
-            min_yield: Optional minimum yield filter (0-100)
-            
-        Returns:
-            List of tuples: (base_name, count, avg_yield)
-            Sorted by count (descending)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_common_bases(family, top_n, min_yield)
-    
-    @staticmethod
-    def get_common_solvents(family: str, top_n: int = 10, min_yield: Optional[float] = None) -> List[Tuple[str, int, float]]:
-        """Get most common solvents with frequency and average yield.
-        
-        Args:
-            family: Reaction family name
-            top_n: Number of top solvents to return (default: 10)
-            min_yield: Optional minimum yield filter (0-100)
-            
-        Returns:
-            List of tuples: (solvent_name, count, avg_yield)
-            Sorted by count (descending)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_common_solvents(family, top_n, min_yield)
-    
-    @staticmethod
-    def get_common_reagents(family: str, role: Optional[str] = None, top_n: int = 10, min_yield: Optional[float] = None) -> List[Tuple[str, str, int, float]]:
-        """Get most common reagents with frequency and average yield.
-        
-        Args:
-            family: Reaction family name
-            role: Optional role filter (e.g., 'BASE', 'ACID', 'OXIDANT', 'CONDENSATION_AGENT')
-            top_n: Number of top reagents to return (default: 10)
-            min_yield: Optional minimum yield filter (0-100)
-            
-        Returns:
-            List of tuples: (reagent_name, role, count, avg_yield)
-            Sorted by count (descending)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_common_reagents(family, role, top_n, min_yield)
-    
-    @staticmethod
-    def get_condition_cores(family: str, top_n: int = 10, min_yield: Optional[float] = None) -> List[Tuple[str, int, float]]:
-        """Get most common condition cores with frequency and average yield.
-        
-        Args:
-            family: Reaction family name
-            top_n: Number of top cores to return (default: 10)
-            min_yield: Optional minimum yield filter (0-100)
-            
-        Returns:
-            List of tuples: (core_string, count, avg_yield)
-            Sorted by count (descending)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_condition_cores(family, top_n, min_yield)
-    
-    @staticmethod
-    def get_plate_recommendations(
-        family: str,
-        n_conditions: int = 96,
-        min_yield: float = 60.0,
-        optimize_for: str = 'diversity'
-    ) -> List[Dict[str, Any]]:
-        """Generate high-throughput plate recommendations.
-        
-        Recommends N conditions for a reaction plate based on:
-        - Most frequent successful conditions
-        - Yield performance
-        - Chemical diversity (optional)
-        
-        Args:
-            family: Reaction family name
-            n_conditions: Number of conditions to recommend (default: 96 for 96-well plate)
-            min_yield: Minimum yield threshold 0-100 (default: 60.0)
-            optimize_for: Strategy - 'diversity', 'frequency', or 'yield' (default: 'diversity')
-            
-        Returns:
-            List of recommended conditions, each with:
-            - condition_id: Unique identifier
-            - catalyst: Catalyst name
-            - ligand: Ligand name (if applicable)
-            - base: Base name
-            - solvent: Solvent name (or mix)
-            - temperature_c: Temperature
-            - time_h: Reaction time
-            - avg_yield: Average historical yield
-            - frequency: Number of precedents
-            - score: Recommendation score (0-100)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_plate_recommendations(family, n_conditions, min_yield, optimize_for)
-    
-    @staticmethod
-    def get_all_families() -> List[str]:
-        """Get list of all available reaction families.
-        
-        Returns:
-            List of family names (JSONL file basenames)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.get_all_families()
-    
-    @staticmethod
-    def print_summary(family: str, top_n: int = 10):
-        """Print a comprehensive analytics summary for a reaction family.
-        
-        Args:
-            family: Reaction family name
-            top_n: Number of top items to display (default: 10)
-        """
-        from . import dataset_analytics as _analytics
-        return _analytics.print_analytics_summary(family, top_n)
+
+    def __init__(self, hte_db_path: str = "data/HTE_db") -> None:
+        self._hte_db_path = hte_db_path
+        self._analytics = None
+
+    def _get_analytics(self):
+        if self._analytics is None:
+            from .HTE.analytics import HTEAnalytics
+            self._analytics = HTEAnalytics(self._hte_db_path)
+        return self._analytics
+
+    def get_stats(self, reaction_type: str) -> Dict[str, Any]:
+        analytics = self._get_analytics()
+        summary = analytics.get_reaction_type_summary()
+        if summary.empty:
+            return {"total_reactions": 0}
+        row = summary[summary["Reaction_Type"].str.contains(reaction_type, case=False, na=False)]
+        if row.empty:
+            return {"total_reactions": 0}
+        data = row.iloc[0].to_dict()
+        return {
+            "total_reactions": int(data.get("Num_Experiments", 0) or 0),
+            "avg_yield": float(data.get("Avg_Yield", 0.0) or 0.0),
+            "success_rate": float(data.get("Success_Rate", 0.0) or 0.0),
+            "num_catalysts": int(data.get("Num_Catalysts", 0) or 0),
+            "num_reactant_pairs": int(data.get("Num_Reactant_Pairs", 0) or 0),
+            "top_catalyst": data.get("Top_Catalyst") or "",
+            "top_reactant_pair": data.get("Top_Reactant_Pair") or "",
+        }
+
+    def list_reactant_pairs(
+        self,
+        reaction_type: Optional[str] = None,
+        catalyst_filter: Optional[str] = None,
+        min_experiments: int = 1,
+        sort_by: str = "count",
+    ):
+        return self._get_analytics().list_reactant_pairs(
+            reaction_type=reaction_type,
+            catalyst_filter=catalyst_filter,
+            min_experiments=min_experiments,
+            sort_by=sort_by,
+        )
+
+    def get_catalyst_stats(
+        self,
+        reaction_type: Optional[str] = None,
+        reactant_a_type: Optional[str] = None,
+        reactant_b_type: Optional[str] = None,
+    ):
+        return self._get_analytics().get_catalyst_stats(
+            reaction_type=reaction_type,
+            reactant_a_type=reactant_a_type,
+            reactant_b_type=reactant_b_type,
+        )
+
+    def get_reaction_type_summary(self):
+        return self._get_analytics().get_reaction_type_summary()
+
+    def analyze_metal_usage(self) -> Dict[str, Any]:
+        return self._get_analytics().analyze_metal_usage()
+
+    def export_subset(
+        self,
+        output_path: str,
+        reaction_type: Optional[str] = None,
+        catalyst_filter: Optional[str] = None,
+        reactant_a_type: Optional[str] = None,
+        reactant_b_type: Optional[str] = None,
+        min_yield: Optional[float] = None,
+    ) -> int:
+        return self._get_analytics().export_subset(
+            output_path=output_path,
+            reaction_type=reaction_type,
+            catalyst_filter=catalyst_filter,
+            reactant_a_type=reactant_a_type,
+            reactant_b_type=reactant_b_type,
+            min_yield=min_yield,
+        )
+
+    def get_all_families(self) -> List[str]:
+        analytics = self._get_analytics()
+        df = analytics.df
+        if df is None or df.empty:
+            return []
+        return sorted({str(v) for v in df["Reaction_Type_Standardized"].dropna().unique() if str(v).strip()})
+
+    def print_summary(self, reaction_type: str) -> None:
+        stats = self.get_stats(reaction_type)
+        print(f"HTE Analytics Summary: {reaction_type}")
+        for key, value in stats.items():
+            print(f"  {key}: {value}")
 
 
 # ============================================================================
