@@ -822,13 +822,13 @@
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-NCO2R",
+      "B": "-N(R)CO2R",
       "description": "N-Aryl carbamate (Ar-N(R)CO2R)."
     },
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-NCOR",
+      "B": "-N(R)COR",
       "description": "N-Aryl amide (Ar-N(R)COR)."
     },
     {
@@ -1350,13 +1350,13 @@
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-NCO2R",
+      "B": "-N(R)CO2R",
       "description": "Alkyl carbamate (Alkyl-N(R)CO2R)."
     },
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-NCOR",
+      "B": "-N(R)COR",
       "description": "Alkyl amide (Alkyl-N(R)COR)."
     },
     {
@@ -1496,30 +1496,6 @@
       "A": "Alkyl",
       "B": "-CONR2",
       "description": "Alkyl tertiary amide (Alkyl-CONR2)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "-C=CH2",
-      "description": "Aryl terminal alkene (Ar-C=CH2)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "-C=C",
-      "description": "Aryl general alkene (Ar-C=C)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Alkyl",
-      "B": "-C=CH2",
-      "description": "Alkyl terminal alkene (Alkyl-C=CH2)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Alkyl",
-      "B": "-C=C",
-      "description": "Alkyl general alkene (Alkyl-C=C)."
     },
     {
       "template": "single_bond",
@@ -2209,13 +2185,13 @@
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-NSO2R",
+      "B": "-N(R)SO2R",
       "description": "N-Aryl sulfonamide (Ar-N(R)SO2R)."
     },
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-NSO2R",
+      "B": "-N(R)SO2R",
       "description": "Alkyl sulfonamide (Alkyl-N(R)SO2R)."
     }
   ],

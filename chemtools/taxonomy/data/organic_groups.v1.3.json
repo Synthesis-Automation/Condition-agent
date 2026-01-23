@@ -115,7 +115,6 @@
       "smarts": "[C]#[CH:1]",
       "description": "Terminal alkynyl attachment at the terminal sp carbon (R-C≡C-H)."
     },
-    
     {
       "id": "Acyl",
       "kind": "scaffold",
@@ -256,30 +255,29 @@
       "description": "Trifluoroborate substituent (-BF3K)."
     },
     {
+      "id": "-SH",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[S;H1;!$(S-[C,S,P]=O):2]",
+      "description": "Thiol substituent (-SH)."
+    },
+    {
       "id": "-SR",
       "kind": "substituent",
       "smarts": "[S;H0;!$(S-[C,S,P]=O):2][#6]",
       "description": "Sulfide/thioether group (-SR)."
     },
     {
-      "id": "-OAr",
-      "kind": "substituent",
-      "priority": 10,
-      "smarts": "[O;H0;!$(O-[C,S,P]=O):2]c",
-      "description": "Aryloxy substituent (O-Ar)."
-    },
-    {
-      "id": "-SAr",
-      "kind": "substituent",
-      "priority": 10,
-      "smarts": "[S;H0;!$(S-[C,S,P]=O):2]c",
-      "description": "Arylthio substituent (S-Ar)."
-    },
-    {
       "id": "-NH2",
       "kind": "substituent",
       "smarts": "[N;H2;!$(N-[C,S,P]=O):2]",
       "description": "Primary amine N substituent (-NH2)."
+    },
+    {
+      "id": "-NHR",
+      "kind": "substituent",
+      "smarts": "[N;H1;!$(N-[C,S,P]=O):2]",
+      "description": "Secondary amine N substituent with one N-H (-NHR)."
     },
     {
       "id": "-NHAr",
@@ -296,10 +294,10 @@
       "description": "Tertiary triarylamine substituent (-NAr2)."
     },
     {
-      "id": "-NHR",
+      "id": "-NR2",
       "kind": "substituent",
-      "smarts": "[N;H1;!$(N-[C,S,P]=O):2]",
-      "description": "Secondary amine N substituent with one N-H (-NHR)."
+      "smarts": "[NX3;H0;!$(N-[C,S,P]=O):2]",
+      "description": "Tertiary amine N core, no N-H (-NR2)."
     },
     {
       "id": "-Hydrazine",
@@ -309,22 +307,10 @@
       "description": "Hydrazine-like substituent (-NN unit); attach via nitrogen."
     },
     {
-      "id": "-NR2",
-      "kind": "substituent",
-      "smarts": "[NX3;H0;!$(N-[C,S,P]=O):2]",
-      "description": "Tertiary amine N core, no N-H (-NR2)."
-    },
-    {
       "id": "-OH",
       "kind": "substituent",
       "smarts": "[O;H1;!$(O-[C,S,P]=O):2]",
       "description": "Hydroxy substituent (-OH)."
-    },
-    {
-      "id": "-Epoxide_Group",
-      "kind": "substituent",
-      "smarts": "[O;R1]1[C;R1][C;R1:2]1",
-      "description": "Epoxide (oxirane) ring substituent."
     },
     {
       "id": "-OR",
@@ -334,11 +320,18 @@
       "description": "Ether substituent (-OR)."
     },
     {
-      "id": "-OCSSR",
+      "id": "-OAr",
       "kind": "substituent",
-      "priority": 1,
-      "smarts": "[O:2]C(=S)S[#6]",
-      "description": "O-thiocarbonate substituent (-OCSSR)."
+      "priority": 10,
+      "smarts": "[O;H0;!$(O-[C,S,P]=O):2]c",
+      "description": "Aryloxy substituent (O-Ar)."
+    },
+    {
+      "id": "-SAr",
+      "kind": "substituent",
+      "priority": 10,
+      "smarts": "[S;H0;!$(S-[C,S,P]=O):2]c",
+      "description": "Arylthio substituent (S-Ar)."
     },
     {
       "id": "-OCF3",
@@ -348,11 +341,17 @@
       "description": "Trifluoromethoxy substituent (-OCF3)."
     },
     {
-      "id": "-SH",
+      "id": "-Epoxide_Group",
+      "kind": "substituent",
+      "smarts": "[O;R1]1[C;R1][C;R1:2]1",
+      "description": "Epoxide (oxirane) ring substituent."
+    },
+    {
+      "id": "-OCSSR",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[S;H1;!$(S-[C,S,P]=O):2]",
-      "description": "Thiol substituent (-SH)."
+      "smarts": "[O:2]C(=S)S[#6]",
+      "description": "O-thiocarbonate substituent (-OCSSR)."
     },
     {
       "id": "-CO2H",
@@ -360,6 +359,13 @@
       "priority": 2,
       "smarts": "[C:2](=O)O[H]",
       "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon."
+    },
+    {
+      "id": "-CO2R",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[CX3:2](=O)O[#6]",
+      "description": "Ester substituent (-CO2R), attach via carbonyl carbon."
     },
     {
       "id": "-SO3H",
@@ -395,13 +401,6 @@
       "priority": 1,
       "smarts": "[CX3:2](=O)I",
       "description": "Acyl iodide substituent (-COI), attach via carbonyl carbon."
-    },
-    {
-      "id": "-CO2R",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[CX3:2](=O)O[#6]",
-      "description": "Ester substituent (-CO2R), attach via carbonyl carbon."
     },
     {
       "id": "-CONH2",
@@ -512,21 +511,21 @@
       "description": "Thiourea-like substituent (-NCSN unit); attach via nitrogen."
     },
     {
-      "id": "-NCO2R",
+      "id": "-N(R)CO2R",
       "kind": "substituent",
       "priority": 2,
       "smarts": "[NX3;H1,H0:2][CX3](=O)[OX2][#6]",
       "description": "Any carbamate core (N-H or N-R); attach via nitrogen."
     },
     {
-      "id": "-NCOR",
+      "id": "-N(R)COR",
       "kind": "substituent",
       "priority": 2,
       "smarts": "[NX3;H1,H0:2][CX3](=O)[#6]",
       "description": "Any amide core (N-H or N-R) attached via nitrogen."
     },
     {
-      "id": "-NSO2R",
+      "id": "-N(R)SO2R",
       "kind": "substituent",
       "priority": 2,
       "smarts": "[NX3;H1,H0:2][SX4](=O)(=O)[#6]",
