@@ -1,0 +1,2 @@
+reaction_type,reaction_category,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,solvent,additive,temperature_C
+C-O Coupling,C-O Coupling,95,2,@sp2_electrophiles,"Ar-OH, Alkyl-OH",Buchwald-type precatalyst,RockPhos or BippyPhos or tBuXPhos,Cs2CO3 (3.0 equiv),toluene,,80
