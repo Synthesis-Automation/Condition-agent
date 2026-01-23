@@ -266,6 +266,16 @@ def _format_list(values: Any) -> str:
     return " / ".join(items)
 
 
+def _aggregate_spectator_groups(values: pd.Series) -> str:
+    if values is None:
+        return ""
+    series = values.fillna("").astype(str).str.strip()
+    series = series[series != ""]
+    if series.empty:
+        return ""
+    return str(series.value_counts().index[0]).strip()
+
+
 def _clean_reaction_label(value: Optional[str]) -> str:
     if value is None:
         return ""
@@ -596,6 +606,7 @@ _GENERIC_FALLBACK_MOTIFS = {
 }
 _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
+_SPECTATOR_MATCH_WEIGHT = 0.7
 
 
 @lru_cache(maxsize=1)
@@ -1091,6 +1102,8 @@ class ConditionRecommendation:
     secondary_solvent: Optional[str] = None
     additive: Optional[str] = None
     coupling_reagent: Optional[str] = None
+    spectator_groups: Optional[str] = None
+    spectator_score: float = 0.0
     
     # Statistics
     success_rate: float = 0.0  # % of experiments with yield > 50
@@ -1476,6 +1489,15 @@ class HTERecommender:
                 group_df.iloc[0]['Reactant_A_Type'],
                 group_df.iloc[0]['Reactant_B_Type']
             )
+
+            spectator_groups = ""
+            if "spectator_groups" in group_df.columns:
+                spectator_groups = _aggregate_spectator_groups(group_df["spectator_groups"])
+            spectator_score = (
+                float(group_df["spectator_score"].mean())
+                if "spectator_score" in group_df.columns
+                else 0.0
+            )
             
             match_score = group_df['match_score'].mean() if 'match_score' in group_df.columns else 1.0
             
@@ -1498,14 +1520,19 @@ class HTERecommender:
                 reaction_category=reaction_category,
                 reaction_id=reaction_id,
                 reactant_types=reactant_types,
-                z_score_range=(z_min, z_max)
+                z_score_range=(z_min, z_max),
+                spectator_groups=spectator_groups,
+                spectator_score=spectator_score,
             )
             
             recommendations.append(rec)
         
         # Sort by match score (prioritizing intramolecular matches if query is intramolecular),
         # then average z-score (primary performance metric), then confidence score.
-        recommendations.sort(key=lambda x: (x.match_score, x.avg_z_score, x.confidence_score), reverse=True)
+        recommendations.sort(
+            key=lambda x: (x.match_score, x.spectator_score, x.avg_z_score, x.confidence_score),
+            reverse=True,
+        )
         
         return recommendations[:top_k]
 
@@ -1630,6 +1657,7 @@ class HTERecommender:
                 solvent=solvent,
                 additive=additive,
                 coupling_reagent=coupling_reagent,
+                spectator_groups=prec.get("spectator_groups") or None,
                 success_rate=success_rate,
                 avg_yield=avg_yield,
                 median_yield=avg_yield,
@@ -1940,10 +1968,12 @@ class HTERecommender:
             spectator_scores = row_group_sets.apply(
                 lambda row_groups: _spectator_similarity(query_spectator_groups, row_groups)
             )
+            matched_df["spectator_score"] = spectator_scores
+            weight = (1.0 - _SPECTATOR_MATCH_WEIGHT) + (_SPECTATOR_MATCH_WEIGHT * spectator_scores)
             if "match_score" in matched_df.columns:
-                matched_df["match_score"] = matched_df["match_score"] * (0.7 + 0.3 * spectator_scores)
+                matched_df["match_score"] = matched_df["match_score"] * weight
             else:
-                matched_df["match_score"] = 0.7 + 0.3 * spectator_scores
+                matched_df["match_score"] = weight
 
         if use_aryl_steric_electronic_weighting:
             rsmi_col = None

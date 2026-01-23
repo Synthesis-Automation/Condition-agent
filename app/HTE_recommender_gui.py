@@ -524,10 +524,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                     reactant_types.append(text)
             rec_dict["reactant_types"] = " + ".join(reactant_types)
             for col_index, (_, key) in enumerate(columns):
-                if key == "spectator_groups":
-                    value = self._spectator_groups_summary
-                else:
-                    value = rec_dict.get(key)
+                value = rec_dict.get(key)
                 if isinstance(value, float):
                     cell_text = _format_float(value)
                 else:
