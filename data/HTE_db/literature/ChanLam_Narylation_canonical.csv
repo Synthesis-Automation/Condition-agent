@@ -453,7 +453,7 @@ ChanLam_Narylation,49.0,0.14,AromN-H,Ar-B(OH)2,,Cu2S,TMEDA,,,,,,,,DMF,False,O=c1
 ChanLam_Narylation,73.0,0.15,Ar-B(OH)2,Alkenyl-NH2,,Cu(OAc)2,,Et3N,,,,,,,DCE,False,OB(O)c1cccc(Cl)c1.N/C(=C\C(=O)c1ccccc1)c1ccccc1>>O=C(/C=C(\Nc1cccc(Cl)c1)c1ccccc1)c1ccccc1,Cl / COR,"Tetrahedron Letters (2018), 59(47), 4187-4190"
 ChanLam_Narylation,90.0,0.65,AromN-H,Ar-B(OH)2,,Cu2S,TMEDA,,,,,,,,MeOH,False,c1ccc2[nH]cnc2c1.COc1ccc2cc(B(O)O)ccc2c1>>COc1ccc2cc(-n3cnc4ccccc43)ccc2c1,OR,"Tetrahedron (2018), 74(5), 606-617"
 ChanLam_Narylation,72.0,-0.23,AromN-H,Ar-B(OH)2,,Cu2S,TMEDA,,,,,,,,MeOH,False,c1ccc2[nH]cnc2c1.COc1cccc(OC)c1B(O)O>>COc1cccc(OC)c1-n1cnc2ccccc21,OR,"Tetrahedron (2018), 74(5), 606-617"
-ChanLam_Narylation,69.0,0.0,R2CH-NH2,Inorganic,Ar-B(OH)2,Cu(acac)2,,Lutidine,,O2,,,,9049-93-8/60804-74-2,MeCN/PhMe,False,COC(=O)[C@@H](N)Cc1ccccc1.Cl.OB(O)c1ccc(Cl)cc1>>COC(=O)[C@H](Cc1ccccc1)Nc1ccc(Cl)cc1,CO2R / Cl,"ChemRxiv (2019), 1-29"
+ChanLam_Narylation,69.0,0.0,R2CH-NH2,Inorganic,Ar-B(OH)2,Cu(acac)2,,Lutidine,,O2,,,,9049-93-8/60804-74-2,MeCN/PhMe,False,,CO2R / Cl,"ChemRxiv (2019), 1-29"
 ChanLam_Narylation,73.0,0.18,Ar-NH2,Ar-B(OH)2,,Cu(acac)2,,Lutidine,,O2,,,,60804-74-2,MeCN/PhMe,False,Nc1ccc(Cl)cc1.OB(O)c1ccc(Cl)nc1>>Clc1ccc(Nc2ccc(Cl)nc2)cc1,Cl,"ChemRxiv (2019), 1-29"
 ChanLam_Narylation,86.0,0.71,Ar-B(OH)2,AromN-H,,Cu(OAc)2,,,,O2,,,,,DMSO,False,OB(O)c1ccc(Cl)cc1.Clc1ccc(-c2n[nH]nc2Cl)cc1>>Clc1ccc(-c2nn(-c3ccc(Cl)cc3)nc2Cl)cc1,Cl,"Tetrahedron (2018), 74(28), 3897-3903"
 ChanLam_Narylation,77.0,0.0,Ar-B(OH)2,AromN-H,,Cu(OAc)2,,,,O2,,,,,DMSO,False,OB(O)c1ccc(Cl)cc1.Clc1ccc(-c2n[nH]nc2Br)cc1>>Clc1ccc(-c2nn(-c3ccc(Cl)cc3)nc2Br)cc1,Cl / Br,"Tetrahedron (2018), 74(28), 3897-3903"
