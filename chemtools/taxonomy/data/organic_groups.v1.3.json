@@ -280,20 +280,6 @@
       "description": "Secondary amine N substituent with one N-H (-NHR)."
     },
     {
-      "id": "-NHAr",
-      "kind": "substituent",
-      "priority": 10,
-      "smarts": "[N;H1:2]c",
-      "description": "Secondary diarylamine substituent (-NHAr)."
-    },
-    {
-      "id": "-NAr2",
-      "kind": "substituent",
-      "priority": 11,
-      "smarts": "[N;H0:2](c)c",
-      "description": "Tertiary triarylamine substituent (-NAr2)."
-    },
-    {
       "id": "-NR2",
       "kind": "substituent",
       "smarts": "[NX3;H0;!$(N-[C,S,P]=O):2]",
@@ -318,20 +304,6 @@
       "priority": 1,
       "smarts": "[O;H0;!$(O-[C,S,P]=O):2][#6]",
       "description": "Ether substituent (-OR)."
-    },
-    {
-      "id": "-OAr",
-      "kind": "substituent",
-      "priority": 10,
-      "smarts": "[O;H0;!$(O-[C,S,P]=O):2]c",
-      "description": "Aryloxy substituent (O-Ar)."
-    },
-    {
-      "id": "-SAr",
-      "kind": "substituent",
-      "priority": 10,
-      "smarts": "[S;H0;!$(S-[C,S,P]=O):2]c",
-      "description": "Arylthio substituent (S-Ar)."
     },
     {
       "id": "-OCF3",

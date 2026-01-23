@@ -634,30 +634,6 @@
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-NHAr",
-      "description": "Diaryl amine (Ar-NH-Ar)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "-NAr2",
-      "description": "Triaryl amine (Ar-NAr2)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "-OAr",
-      "description": "Diaryl ether (Ar-O-Ar)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Ar",
-      "B": "-SAr",
-      "description": "Diaryl thioether (Ar-S-Ar)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Ar",
       "B": "AromN",
       "description": "Aryl-substituted aromatic nitrogen (e.g., N-phenylpyrrole)."
     },

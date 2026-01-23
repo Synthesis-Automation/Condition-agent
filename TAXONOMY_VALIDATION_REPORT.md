@@ -91,13 +91,11 @@ All 86 SMARTS patterns are **syntactically valid** (verified with RDKit):
 
 #### Nitrogen Functions
 - `-NH2`, `-NHR`, `-NR2`: Amine series - ✅ correct H-count logic
-- `-NHAr`, `-NAr2`: Aryl-specific amines - ✅ priority 10/11 (more specific)
 - `-CONH2`, `-CONHR`, `-CONR2`: Amide series - ✅ correct
 - `-SO2NH2`, `-SO2NHR`, `-SO2NR2`: Sulfonamide series - ✅ correct
 
 #### Oxygen Functions
 - `-OH`, `-OR`: Alcohol/ether - ✅ correct, excludes C/S/P=O
-- `-OAr`, `-SAr`: Aryl ethers/thioethers - ✅ priority 10 (specific)
 - `-OCF3`: Trifluoromethoxy - ✅ correct
 
 #### Carbonyl Derivatives
