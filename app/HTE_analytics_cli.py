@@ -20,6 +20,143 @@ if str(REPO_ROOT) not in sys.path:
 from chemtools.HTE.analytics import HTEAnalytics
 
 
+def _prompt(text: str, default: str | None = None) -> str:
+    if default:
+        prompt = f"{text} [{default}]: "
+    else:
+        prompt = f"{text}: "
+    value = input(prompt).strip()
+    return value if value else (default or "")
+
+
+def _prompt_int(text: str, default: int) -> int:
+    value = _prompt(text, str(default))
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
+def _prompt_float(text: str, default: float | None = None) -> float | None:
+    value = _prompt(text, "" if default is None else str(default))
+    if not value:
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
+def _prompt_yes_no(text: str, default: bool = False) -> bool:
+    suffix = "Y/n" if default else "y/N"
+    value = _prompt(f"{text} ({suffix})", "y" if default else "n").lower()
+    if value in {"y", "yes"}:
+        return True
+    if value in {"n", "no"}:
+        return False
+    return default
+
+
+def _run_default_summary(db_path: str) -> int:
+    args_reactions = argparse.Namespace(
+        db_path=db_path,
+        top=10,
+        compact=True,
+        output=None,
+    )
+    args_metals = argparse.Namespace(
+        db_path=db_path,
+        detailed=False,
+        output=None,
+    )
+    cmd_reactions(args_reactions)
+    cmd_metals(args_metals)
+    return 0
+
+
+def _run_wizard(db_path: str) -> int:
+    print("\nInteractive HTE Analytics Wizard")
+    print("=" * 40)
+    db_path = _prompt("HTE database path", db_path)
+
+    menu = (
+        "\nChoose a command:\n"
+        "  1) List reactant pairs\n"
+        "  2) Analyze catalysts\n"
+        "  3) Reaction type summary\n"
+        "  4) Metal usage\n"
+        "  5) Export filtered dataset\n"
+        "  q) Quit\n"
+    )
+    while True:
+        choice = _prompt(menu, "1").lower()
+        if choice in {"q", "quit", "exit"}:
+            return 0
+        if choice == "1":
+            args = argparse.Namespace(
+                db_path=db_path,
+                reaction=_prompt("Reaction type filter", ""),
+                catalyst=_prompt("Catalyst filter", ""),
+                min_experiments=_prompt_int("Minimum experiments", 1),
+                sort=_prompt("Sort by (count/success_rate)", "count"),
+                top=_prompt_int("Top N results", 20),
+                compact=_prompt_yes_no("Compact output", True),
+                output=_prompt("Save CSV to (optional)", ""),
+            )
+            if not args.output:
+                args.output = None
+            cmd_list_pairs(args)
+        elif choice == "2":
+            args = argparse.Namespace(
+                db_path=db_path,
+                reaction=_prompt("Reaction type filter", ""),
+                reactant_a=_prompt("Reactant A type", ""),
+                reactant_b=_prompt("Reactant B type", ""),
+                top=_prompt_int("Top N results", 20),
+                compact=_prompt_yes_no("Compact output", True),
+                output=_prompt("Save CSV to (optional)", ""),
+            )
+            if not args.output:
+                args.output = None
+            cmd_catalysts(args)
+        elif choice == "3":
+            args = argparse.Namespace(
+                db_path=db_path,
+                top=_prompt_int("Top N results", 20),
+                compact=_prompt_yes_no("Compact output", True),
+                output=_prompt("Save CSV to (optional)", ""),
+            )
+            if not args.output:
+                args.output = None
+            cmd_reactions(args)
+        elif choice == "4":
+            args = argparse.Namespace(
+                db_path=db_path,
+                detailed=_prompt_yes_no("Detailed breakdown", False),
+                output=_prompt("Save CSV to (optional)", ""),
+            )
+            if not args.output:
+                args.output = None
+            cmd_metals(args)
+        elif choice == "5":
+            output = _prompt("Output CSV path", "")
+            if not output:
+                print("Output path is required.")
+                continue
+            args = argparse.Namespace(
+                db_path=db_path,
+                output=output,
+                reaction=_prompt("Reaction type filter", ""),
+                catalyst=_prompt("Catalyst filter", ""),
+                reactant_a=_prompt("Reactant A type", ""),
+                reactant_b=_prompt("Reactant B type", ""),
+                min_yield=_prompt_float("Minimum yield", None),
+            )
+            cmd_export(args)
+        else:
+            print("Invalid choice. Try again.")
+
+
 def cmd_list_pairs(args):
     """List reactant pairs command"""
     analytics = HTEAnalytics(args.db_path)
@@ -81,6 +218,7 @@ def cmd_list_pairs(args):
 def cmd_catalysts(args):
     """Analyze catalysts command"""
     analytics = HTEAnalytics(args.db_path)
+    import pandas as pd
     
     print("\n" + "="*80)
     print("⚗️  CATALYST ANALYSIS")
@@ -248,6 +386,9 @@ def cmd_export(args):
 
 
 def main():
+    if len(sys.argv) == 1:
+        return _run_default_summary("data/HTE_db")
+
     parser = argparse.ArgumentParser(
         description="HTE Database Analytics Tools",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -274,6 +415,11 @@ Examples:
         '--db-path',
         default='data/HTE_db',
         help='Path to HTE database CSV/JSONL or directory (default: data/HTE_db)'
+    )
+    parser.add_argument(
+        '--interactive',
+        action='store_true',
+        help='Run interactive wizard mode'
     )
     
     subparsers = parser.add_subparsers(dest='command', help='Analytics command')
@@ -328,6 +474,9 @@ Examples:
     
     args = parser.parse_args()
     
+    if args.interactive:
+        return _run_wizard(args.db_path)
+
     if not args.command:
         parser.print_help()
         return 1
