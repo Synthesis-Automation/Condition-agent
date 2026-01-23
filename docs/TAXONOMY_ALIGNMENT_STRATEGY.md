@@ -89,9 +89,11 @@ reaction_type_detector.py       │   │       └─ Validation
 
 ## 🔧 Implementation Steps
 
-### Step 1: Create Taxonomy Mapping Helper
+### Step 1: Create Taxonomy Mapping Helper (Removed)
 
-**New file: `chemtools/detection_mapper.py`**
+**Note:** `chemtools/detection_mapper.py` was removed during cleanup. If taxonomy
+mapping is reintroduced, define the helper within `chemtools/taxonomy` or
+`chemtools/featurizers/analysis/reactions.py` to avoid a new top-level module.
 
 ```python
 """
@@ -299,7 +301,7 @@ class _DetectionEngine:
 **Keep only:**
 ✅ `chemtools/taxonomy/data/reaction_types.json` - canonical source
 ✅ `chemtools/analysis/reactions.canonical_family_label()` - uses taxonomy
-✅ `chemtools/detection_mapper.resolve_to_taxonomy()` - centralized resolver
+❌ `chemtools/detection_mapper.resolve_to_taxonomy()` - removed during cleanup
 
 ---
 
@@ -478,7 +480,8 @@ resolve_to_taxonomy("Buchwald-Hartwig") → "buchwald_hartwig_c_n" ✅
 ## 📝 Migration Checklist
 
 ### Phase 1: Infrastructure
-- [ ] Create `chemtools/detection_mapper.py` with `resolve_to_taxonomy()`
+- [ ] Create a centralized resolver (prefer placing in `chemtools/taxonomy` or
+      `chemtools/featurizers/analysis/reactions.py`)
 - [ ] Add validation functions using `TaxonomyRegistry`
 - [ ] Write comprehensive test suite for taxonomy alignment
 
