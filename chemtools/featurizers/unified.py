@@ -18,6 +18,7 @@ from .analysis.reaction_context import classify_reactants_with_context, get_reac
 from .analysis.feasibility import analyze_snar_feasibility, analyze_molecule_snar_feasibility
 from .molecule import featurize_molecule as _featurize_molecule
 from .reaction_detection import detect_reaction_types
+from .spectator_rank import rank_spectator_groups
 
 _AGENT_ROLE_FLAGS = (
     "metal_catalyst",
@@ -465,6 +466,7 @@ def _aggregate_reaction_features(
         "reactant_count": len(reactant_list),
         "motif_ids": sorted(motifs),
         "spectator_groups_combined": spectator_groups,
+        "spectator_groups_ranked": rank_spectator_groups(spectator_groups),
         "max_aryl_steric": max(aryl_scores) if aryl_scores else 0.0,
         "max_alkyl_steric": max(alkyl_scores) if alkyl_scores else 0.0,
         "avg_aryl_electronic": avg_electronic if avg_electronic is not None else 5.0,

@@ -24,6 +24,7 @@ from pathlib import Path
 import json
 
 from chemtools.featurizers.structural import featurize_molecule
+from chemtools.featurizers.spectator_rank import weighted_spectator_similarity
 from chemtools.smiles import normalize_reaction
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -874,17 +875,7 @@ def _spectator_groups_from_motifs(motif_ids: Iterable[str]) -> Set[str]:
 
 
 def _spectator_similarity(query_groups: Set[str], row_groups: Set[str]) -> float:
-    if not query_groups and not row_groups:
-        return 1.0
-    if not query_groups:
-        return 0.7
-    if not row_groups:
-        return 0.3
-    intersection = query_groups & row_groups
-    union = query_groups | row_groups
-    if not union:
-        return 0.5
-    return len(intersection) / len(union)
+    return weighted_spectator_similarity(query_groups, row_groups)
 
 
 def _expand_macro_token(

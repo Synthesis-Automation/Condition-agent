@@ -1,0 +1,2 @@
+reaction_id,yield,z_score,reactant_1,reactant_2,reactant_3,catalyst,ligand,base,acid,oxidant,reductant,additive,condensation_agent,other_reagent,solvent,Is_Intramolecular,reaction_smiles,spectator_groups,reference
+test,82,0.0,Ar-Cl,Ar-NH2,,CuCl,"2,2,6,6-Tetramethyl-3,5-heptanedione",Cs2CO3,HCl,,,,,,NMP/H2O,False,Cc1cnc(Cl)nc1-c1cnn(C)c1.Nc1ccc2c(c1)CCN2S(=O)(=O)c1ccc(C(F)(F)F)cc1>>Cc1cnc(Nc2ccc3c(c2)CCN3S(=O)(=O)c2ccc(C(F)(F)F)cc2)nc1-c1cnn(C)c1,AromN / NSO2R / SO2NR2 / CF3 / F / Pyrimidine,"Chemistry - A European Journal (2017), 23(69), 17576-17583"

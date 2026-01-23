@@ -19,6 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
 from chemtools.featurizers.unified import featurize_reaction
+from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
 
@@ -595,6 +596,7 @@ def process_reaction_dataset(
                     try:
                         analysis = cached_featurize(r_smiles)
                         motifs = analysis.get("motifs", [])
+                        context_motifs = analysis.get("context_motifs", [])
 
                         current_r_motifs = []
                         for m in motifs:
@@ -604,10 +606,19 @@ def process_reaction_dataset(
                                 for alt_id in m.get("alt_compound_ids", []):
                                     current_r_motifs.append(alt_id)
 
+                        context_ids = []
+                        for m in context_motifs:
+                            cid = m.get("compound_id", "")
+                            if cid:
+                                context_ids.append(cid)
+                                for alt_id in m.get("alt_compound_ids", []):
+                                    context_ids.append(alt_id)
+
                         reactant_data.append({
                             "motifs": _dedupe_list(current_r_motifs),
                         })
                         motif_ids.extend(current_r_motifs)
+                        motif_ids.extend(context_ids)
                     except Exception:
                         continue
 
@@ -618,7 +629,14 @@ def process_reaction_dataset(
                 try:
                     p_analysis = cached_featurize(products_part)
                     p_motifs = p_analysis.get("motifs", [])
+                    p_context = p_analysis.get("context_motifs", [])
                     for m in p_motifs:
+                        cid = m.get("compound_id", "")
+                        if cid:
+                            product_motifs.append(cid)
+                            for alt_id in m.get("alt_compound_ids", []):
+                                product_motifs.append(alt_id)
+                    for m in p_context:
                         cid = m.get("compound_id", "")
                         if cid:
                             product_motifs.append(cid)
@@ -697,7 +715,9 @@ def process_reaction_dataset(
                     skipped_no_catalyst += 1
                     continue
 
-                spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
+                spectator_groups = rank_spectator_groups(
+                    _collect_spectator_groups(reactant_data, spectators_set)
+                )
 
                 row_out = {
                     "reaction_id": source_label,
@@ -767,6 +787,7 @@ def process_reaction_dataset(
                 try:
                     analysis = cached_featurize(r_smiles)
                     motifs = analysis.get("motifs", [])
+                    context_motifs = analysis.get("context_motifs", [])
 
                     current_r_motifs = []
                     for m in motifs:
@@ -776,10 +797,19 @@ def process_reaction_dataset(
                             for alt_id in m.get("alt_compound_ids", []):
                                 current_r_motifs.append(alt_id)
 
+                    context_ids = []
+                    for m in context_motifs:
+                        cid = m.get("compound_id", "")
+                        if cid:
+                            context_ids.append(cid)
+                            for alt_id in m.get("alt_compound_ids", []):
+                                context_ids.append(alt_id)
+
                     reactant_data.append({
                         "motifs": _dedupe_list(current_r_motifs),
                     })
                     motif_ids.extend(current_r_motifs)
+                    motif_ids.extend(context_ids)
                 except Exception:
                     continue
 
@@ -790,7 +820,14 @@ def process_reaction_dataset(
             try:
                 p_analysis = cached_featurize(products_part)
                 p_motifs = p_analysis.get("motifs", [])
+                p_context = p_analysis.get("context_motifs", [])
                 for m in p_motifs:
+                    cid = m.get("compound_id", "")
+                    if cid:
+                        product_motifs.append(cid)
+                        for alt_id in m.get("alt_compound_ids", []):
+                            product_motifs.append(alt_id)
+                for m in p_context:
                     cid = m.get("compound_id", "")
                     if cid:
                         product_motifs.append(cid)
@@ -869,7 +906,9 @@ def process_reaction_dataset(
                 skipped_no_catalyst += 1
                 continue
 
-            spectator_groups = _collect_spectator_groups(reactant_data, spectators_set)
+            spectator_groups = rank_spectator_groups(
+                _collect_spectator_groups(reactant_data, spectators_set)
+            )
 
             row = {
                 "reaction_id": source_label,

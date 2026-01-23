@@ -1,6 +1,7 @@
 import csv
 import html
 import math
+import os
 import sys
 import tempfile
 import time
@@ -111,8 +112,12 @@ def _collect_reaction_spectator_groups(reaction_smiles: str) -> List[str]:
     if not isinstance(reaction, dict):
         return []
     aggregates = reaction.get("aggregates") or {}
-    groups = aggregates.get("spectator_groups_combined") or []
-    return [str(group).strip() for group in groups if str(group).strip()]
+    groups = aggregates.get("spectator_groups_ranked") or aggregates.get("spectator_groups_combined") or []
+    cleaned = [str(group).strip() for group in groups if str(group).strip()]
+    if os.environ.get("HTE_DEBUG_SPECTATORS") == "1":
+        print(f"[HTE_DEBUG] reaction_smiles={reaction_smiles}")
+        print(f"[HTE_DEBUG] spectator_groups_combined={cleaned}")
+    return cleaned
 
 
 def _reaction_image_path(prefix: str) -> Path:
@@ -238,7 +243,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("HTE Recommender (Qt6)")
-        self.resize(1100, 700)
+        self.resize(1300, 850)
 
         self.db_path_edit = QtWidgets.QLineEdit()
         self.db_path_edit.setPlaceholderText("Select a CSV/JSONL or a folder like data/HTE_db")
@@ -278,8 +283,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.summary.setReadOnly(True)
 
         self.results_tabs = QtWidgets.QTabWidget()
-        self.table = self._create_results_table()
-        self.results_tabs.addTab(self.table, "All")
+        self._initialize_result_tabs()
 
         self.status = QtWidgets.QLabel("")
 
@@ -393,11 +397,17 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         table.setAlternatingRowColors(True)
         return table
 
-    def _clear_results(self) -> None:
-        self.summary.clear()
+    def _initialize_result_tabs(self) -> None:
         self.results_tabs.clear()
         self.table = self._create_results_table()
         self.results_tabs.addTab(self.table, "All")
+        for label in ("Literature", "Rules", "Experiments", "Precedent"):
+            group_table = self._create_results_table()
+            self.results_tabs.addTab(group_table, label)
+
+    def _clear_results(self) -> None:
+        self.summary.clear()
+        self._initialize_result_tabs()
         self.status.setText("")
         self._spectator_groups_summary = ""
         if self._reaction_dialog:
