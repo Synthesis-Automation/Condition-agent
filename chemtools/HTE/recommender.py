@@ -550,7 +550,7 @@ def _clean_reactant_value(value: Any) -> str:
         return ""
     if text.lower() == "inorganic":
         return ""
-    return text
+    return _collapse_motif_field(text)
 
 
 def _normalize_reactant_values(values: Iterable[Any]) -> Tuple[str, str, str, List[str]]:
@@ -836,6 +836,17 @@ def _split_motif_tokens(value: Any) -> List[str]:
     if not text or text.lower() == "nan":
         return []
     return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
+
+
+def _collapse_motif_tokens(tokens: Iterable[str]) -> str:
+    cleaned = _dedupe_list([str(token).strip() for token in tokens if str(token).strip()])
+    if not cleaned:
+        return ""
+    return ",".join(sorted(cleaned))
+
+
+def _collapse_motif_field(value: Any) -> str:
+    return _collapse_motif_tokens(_split_motif_tokens(value))
 
 
 def _split_group_tokens(value: Any) -> List[str]:
@@ -1680,17 +1691,20 @@ class HTERecommender:
         
         # Step 1: Detect reactant types
         type_a, cat_a = self._detect_reactant_types(reactant_a_smiles)
-        result.reactant_a_type = ",".join(type_a) if type_a else ""
+        collapsed_a = _collapse_motif_tokens(type_a) if type_a else ""
+        result.reactant_a_type = collapsed_a
         result.reactant_a_category = cat_a
         
         if reactant_b_smiles:
             type_b, cat_b = self._detect_reactant_types(reactant_b_smiles)
-            result.reactant_b_type = ",".join(type_b) if type_b else ""
+            collapsed_b = _collapse_motif_tokens(type_b) if type_b else ""
+            result.reactant_b_type = collapsed_b
             result.reactant_b_category = cat_b
         else:
             type_b, cat_b = [], ""
             result.reactant_b_type = ""
             result.reactant_b_category = ""
+            collapsed_b = ""
         
         # If no type detected, return empty
         if not type_a:
@@ -1757,7 +1771,7 @@ class HTERecommender:
             best_key = max(scored_matches, key=lambda x: x['match_score'].iloc[0])['Reaction_Type_Standardized'].iloc[0]
             result.matched_motifs = (best_key, "")
 
-        key = _reactant_key(list(type_a) + list(type_b))
+        key = _reactant_key([collapsed_a, collapsed_b])
         direct_match: Optional[pd.DataFrame] = None
         direct_key: Optional[str] = None
         fallback_used = False

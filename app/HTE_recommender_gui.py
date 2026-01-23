@@ -278,6 +278,20 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         self.run_button = QtWidgets.QPushButton("Run Recommendation")
         self.clear_button = QtWidgets.QPushButton("Clear Results")
+        self.run_button.setMinimumSize(160, 34)
+        self.clear_button.setMinimumSize(140, 34)
+        self.run_button.setStyleSheet(
+            "QPushButton {"
+            " background-color: #2b6cb0;"
+            " color: white;"
+            " font-weight: 600;"
+            " border-radius: 4px;"
+            " padding: 4px 10px;"
+            "}"
+            "QPushButton:hover { background-color: #2c5282; }"
+            "QPushButton:pressed { background-color: #2a4365; }"
+            "QPushButton:disabled { background-color: #9bb7d6; color: #f2f2f2; }"
+        )
 
         self.summary = QtWidgets.QTextEdit()
         self.summary.setReadOnly(True)
@@ -286,6 +300,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._initialize_result_tabs()
 
         self.status = QtWidgets.QLabel("")
+        self.progress_bar = QtWidgets.QProgressBar()
+        self.progress_bar.setVisible(False)
+        self.progress_bar.setMinimumWidth(160)
 
         self._setup_layout()
         self._bind_signals()
@@ -331,23 +348,35 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         options_row.addStretch()
         form.addRow("Options:", options_row)
 
-        form.addRow("Reaction Filter:", self.reaction_filter_edit)
-        form.addRow("Catalyst Filter:", self.catalyst_filter_edit)
-        form.addRow("Source Group:", self.source_group_combo)
+        filters_row = QtWidgets.QHBoxLayout()
+        filters_row.addWidget(QtWidgets.QLabel("Reaction:"))
+        filters_row.addWidget(self.reaction_filter_edit)
+        filters_row.addSpacing(12)
+        filters_row.addWidget(QtWidgets.QLabel("Catalyst:"))
+        filters_row.addWidget(self.catalyst_filter_edit)
+        filters_row.addSpacing(12)
+        filters_row.addWidget(QtWidgets.QLabel("Source:"))
+        filters_row.addWidget(self.source_group_combo)
+        filters_row.addStretch()
+        form.addRow("Filters:", filters_row)
         form.addRow("Weighting:", self.aryl_weighting_check)
         layout.addLayout(form)
 
         button_row = QtWidgets.QHBoxLayout()
-        button_row.addStretch()
         button_row.addWidget(self.run_button)
         button_row.addWidget(self.clear_button)
+        button_row.addStretch()
         layout.addLayout(button_row)
 
         layout.addWidget(QtWidgets.QLabel("Summary:"))
         layout.addWidget(self.summary, stretch=1)
         layout.addWidget(QtWidgets.QLabel("Recommendations:"))
         layout.addWidget(self.results_tabs, stretch=3)
-        layout.addWidget(self.status)
+        status_row = QtWidgets.QHBoxLayout()
+        status_row.addWidget(self.progress_bar)
+        status_row.addWidget(self.status)
+        status_row.addStretch()
+        layout.addLayout(status_row)
 
     def _bind_signals(self) -> None:
         self.run_button.clicked.connect(self._run_recommendation)
@@ -410,6 +439,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._initialize_result_tabs()
         self.status.setText("")
         self._spectator_groups_summary = ""
+        self.run_button.setEnabled(True)
+        self.run_button.setText("Run Recommendation")
+        self.progress_bar.setVisible(False)
         if self._reaction_dialog:
             self._reaction_dialog.close()
             self._reaction_dialog = None
@@ -430,6 +462,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.summary.clear()
         self.status.setText("Working...")
         self.run_button.setEnabled(False)
+        self.run_button.setText("Running...")
+        self.progress_bar.setRange(0, 0)
+        self.progress_bar.setVisible(True)
         self._source_group_label = self.source_group_combo.currentText().strip()
         self._aryl_weighting_enabled = bool(self.aryl_weighting_check.isChecked())
 
@@ -458,6 +493,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             self.thread.quit()
             self.thread.wait()
         self.run_button.setEnabled(True)
+        self.run_button.setText("Run Recommendation")
+        self.progress_bar.setVisible(False)
 
         if not success:
             self.status.setText("Error")

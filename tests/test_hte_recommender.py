@@ -219,3 +219,37 @@ def test_aryl_weighting_adjusts_match_score(monkeypatch) -> None:
     assert len(result.recommendations) == 2
     assert result.recommendations[0].catalyst == "Pd"
     assert result.recommendations[0].match_score > result.recommendations[1].match_score
+
+
+def test_multi_motif_reactant_key_matches(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    df["Reactant_A_Type"] = ["Ar-Br|Ar-SH"]
+    df["Reactant_B_Type"] = ["RCH2-NHR"]
+
+    key = hte._reactant_key([hte._collapse_motif_field("Ar-Br|Ar-SH"), "RCH2-NHR"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "NHR" in smiles:
+            return ["RCH2-NHR"], "Amine"
+        return ["Ar-Br", "Ar-SH"], "Aryl Halide"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Sc1ccccc1Br",
+        reactant_b_smiles="NHR_substrate",
+        top_k=1,
+        min_experiments=1,
+    )
+
+    assert result.total_matching_experiments == 1
+    assert result.is_fallback_match is False
+    assert result.recommendations[0].catalyst == "Pd"
