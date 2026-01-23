@@ -118,6 +118,53 @@ def _motif_rank_score(hit: Dict[str, Any]) -> float:
     return (reactivity * 100.0) + (priority * 10.0) + complexity
 
 
+def _motif_rank_breakdown(hit: Dict[str, Any]) -> Dict[str, Any]:
+    compound_id = hit.get("compound_id")
+    group_b = hit.get("group_b")
+    base_reactivity = float(hit.get("reactivity_weight") or 0.0)
+    organometal_bonus = _ORGANOMETAL_REACTIVITY_BONUS if group_b in _ORGANOMETAL_B_GROUPS else 0.0
+    reactant_bonus = 0.0
+    if compound_id and compound_id in _load_reaction_reactant_motifs():
+        reactant_bonus = _REACTANT_MOTIF_BONUS
+    reactivity_total = base_reactivity + organometal_bonus + reactant_bonus
+    priority = int(hit.get("priority") or 0)
+    complexity = int(hit.get("complexity") or 0)
+    score = (reactivity_total * 100.0) + (priority * 10.0) + complexity
+    return {
+        "compound_id": compound_id,
+        "group_b": group_b,
+        "base_reactivity": base_reactivity,
+        "organometal_bonus": organometal_bonus,
+        "reactant_bonus": reactant_bonus,
+        "reactivity_total": reactivity_total,
+        "priority": priority,
+        "complexity": complexity,
+        "score": score,
+    }
+
+
+def print_motif_rank_breakdown(motifs: List[Dict[str, Any]]) -> None:
+    """
+    Print a scoring breakdown for each motif hit.
+    """
+    if not motifs:
+        print("No motifs to score.")
+        return
+    for idx, hit in enumerate(motifs, start=1):
+        breakdown = _motif_rank_breakdown(hit)
+        compound_id = breakdown["compound_id"] or "Unknown"
+        group_b = breakdown["group_b"] or "?"
+        print(
+            f"[{idx}] {compound_id} (group_b={group_b}) "
+            f"score={breakdown['score']:.2f} "
+            f"reactivity={breakdown['reactivity_total']:.2f} "
+            f"(base={breakdown['base_reactivity']:.2f} "
+            f"+ organometal={breakdown['organometal_bonus']:.2f} "
+            f"+ reactant={breakdown['reactant_bonus']:.2f}) "
+            f"priority={breakdown['priority']} complexity={breakdown['complexity']}"
+        )
+
+
 @lru_cache(maxsize=1)
 def _load_heterocycle_scaffold_ids() -> set[str]:
     path = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
@@ -139,6 +186,20 @@ def _load_heterocycle_scaffold_ids() -> set[str]:
         if motif_id:
             heterocycles.add(motif_id)
     return heterocycles
+
+
+def _strip_scaffold_registry_paths(registry_paths: Dict[str, str | Path]) -> Dict[str, str | Path]:
+    return {k: v for k, v in registry_paths.items() if k != "scaffold_motifs"}
+
+
+def _scaffold_only_registry_paths(
+    registry_paths: Dict[str, str | Path],
+) -> Optional[Dict[str, str | Path]]:
+    scaffold_path = registry_paths.get("scaffold_motifs")
+    groups_path = registry_paths.get("groups")
+    if not scaffold_path or not groups_path:
+        return None
+    return {"groups": groups_path, "compounds": scaffold_path}
 
 
 def _iter_motif_ids(motif: Dict[str, Any]) -> List[str]:
@@ -280,7 +341,8 @@ def featurize_molecule(
     mol = Chem.AddHs(mol)
 
     registry_paths = registry_paths or _default_registry_paths()
-    registry = build_compound_registry(registry_paths)
+    core_registry_paths = _strip_scaffold_registry_paths(registry_paths)
+    registry = build_compound_registry(core_registry_paths)
     compiled = registry["compiled_compounds"]
     groups = registry["groups"]
     compound_map = registry.get("compound_map", {})
@@ -311,7 +373,22 @@ def featurize_molecule(
         site_filter=site_filter,
     )
     motifs = list(all_motifs)
-    heterocycle_types = _collect_heterocycle_types(motifs)
+    context_motifs: List[Dict[str, Any]] = []
+    if options.get("include_scaffold_motifs", True):
+        scaffold_paths = _scaffold_only_registry_paths(registry_paths)
+        if scaffold_paths:
+            scaffold_registry = build_compound_registry(scaffold_paths)
+            scaffold_compiled = scaffold_registry["compiled_compounds"]
+            context_motifs = detect_motifs(
+                mol,
+                scaffold_compiled,
+                max_hits_per_compound=max_hits,
+                registry=scaffold_registry,
+                discovery_mode=discovery_mode,
+                site_filter=site_filter,
+            )
+    all_context_motifs = motifs + context_motifs
+    heterocycle_types = _collect_heterocycle_types(all_context_motifs)
     ring_metrics = _aryl_ring_metrics(mol)
     aryl_analysis = {
         "is_heterocycle": bool(heterocycle_types) or ring_metrics.get("heteroaromatic", False),
@@ -421,7 +498,7 @@ def featurize_molecule(
                     include_gasteiger=include_gasteiger,
                     include_details=include_electronic_details,
                 )
-            nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)
+            nearby = analyze_nearby_groups(mol, hit, all_context_motifs, groups, compound_map)
             analyses.append(
                 {
                     "compound_id": compound_id,
@@ -439,7 +516,7 @@ def featurize_molecule(
             "Vinyl-", "Alkynyl-", "Acyl-", "Propargyl-", "H-"
         )):
             steric = analyze_alkyl_steric(mol, hit, include_details=include_steric_details)
-            nearby = analyze_nearby_groups(mol, hit, all_motifs, groups, compound_map)
+            nearby = analyze_nearby_groups(mol, hit, all_context_motifs, groups, compound_map)
             analyses.append(
                 {
                     "compound_id": compound_id,
@@ -492,6 +569,7 @@ def featurize_molecule(
         "schema_version": "v2",
         "smiles": smiles,
         "motifs": motifs,
+        "context_motifs": context_motifs,
         "ranked_motifs": ranked_motifs,
         "steric": steric_payload,
         "electronics": electronic_payload,
@@ -511,4 +589,4 @@ def analyze_smiles(
     return featurize_molecule(smiles, registry_paths=registry_paths, options=options)
 
 
-__all__ = ["featurize_molecule", "analyze_smiles"]
+__all__ = ["featurize_molecule", "analyze_smiles", "print_motif_rank_breakdown"]

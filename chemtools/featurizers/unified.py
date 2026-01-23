@@ -424,11 +424,14 @@ def _aggregate_reaction_features(
         for entry in reactant.get("electronics", {}).get("aryl", []):
             electronic_scores.extend(_extract_scores(entry.get("result")))
         motif_entries = reactant.get("motifs", [])
+        context_entries = reactant.get("context_motifs", [])
         for motif in motif_entries:
             compound_id = motif.get("compound_id")
             if compound_id:
                 motifs.add(str(compound_id))
         reactant_motif_ids.extend(_collect_motif_ids(motif_entries))
+        if context_entries:
+            reactant_motif_ids.extend(_collect_motif_ids(context_entries))
 
     if product_motif_ids:
         reactant_counts = Counter(reactant_motif_ids)
@@ -519,6 +522,7 @@ def featurize_reaction(
             continue
         product_bundles.append(bundle)
         product_motif_ids.extend(_collect_motif_ids(bundle.get("motifs", [])))
+        product_motif_ids.extend(_collect_motif_ids(bundle.get("context_motifs", [])))
 
     aggregates = _aggregate_reaction_features(
         reactant_bundles, product_motif_ids=product_motif_ids
