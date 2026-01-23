@@ -263,21 +263,13 @@ def _select_primary_reactant_motifs(
     primary: List[str] = []
     for r_info in reactant_data:
         r_motifs = r_info.get("motifs") or []
-        reacted_here = [m for m in r_motifs if m in reacted_set]
+        reacted_here = _dedupe_list([m for m in r_motifs if m in reacted_set])
         if reacted_here:
-            primary.append(reacted_here[0])
+            primary.append("|".join(reacted_here))
         elif r_motifs:
             primary.append(r_motifs[0])
         else:
             primary.append("")
-    if len(reactant_data) == 1:
-        r_motifs = reactant_data[0].get("motifs") or []
-        reacted_here = [m for m in r_motifs if m in reacted_set]
-        candidates = _dedupe_list(reacted_here + [m for m in r_motifs if m not in reacted_here])
-        if candidates:
-            primary = [candidates[0], candidates[1] if len(candidates) > 1 else ""]
-        else:
-            primary = ["", ""]
     return primary
 
 def _motif_group_ids(values: Iterable[str]) -> set[str]:
@@ -603,16 +595,12 @@ def process_reaction_dataset(
                             cid = m.get("compound_id", "")
                             if cid:
                                 current_r_motifs.append(cid)
-                                for alt_id in m.get("alt_compound_ids", []):
-                                    current_r_motifs.append(alt_id)
 
                         context_ids = []
                         for m in context_motifs:
                             cid = m.get("compound_id", "")
                             if cid:
                                 context_ids.append(cid)
-                                for alt_id in m.get("alt_compound_ids", []):
-                                    context_ids.append(alt_id)
 
                         reactant_data.append({
                             "motifs": _dedupe_list(current_r_motifs),
@@ -634,14 +622,10 @@ def process_reaction_dataset(
                         cid = m.get("compound_id", "")
                         if cid:
                             product_motifs.append(cid)
-                            for alt_id in m.get("alt_compound_ids", []):
-                                product_motifs.append(alt_id)
                     for m in p_context:
                         cid = m.get("compound_id", "")
                         if cid:
                             product_motifs.append(cid)
-                            for alt_id in m.get("alt_compound_ids", []):
-                                product_motifs.append(alt_id)
                 except Exception:
                     pass
 
@@ -701,10 +685,7 @@ def process_reaction_dataset(
                     intramolecular_flag = fallback_intramolecular
 
                 if len(reactants) == 1:
-                    if intramolecular_flag:
-                        primary_reactant_motifs = primary_reactant_motifs[:2]
-                    else:
-                        primary_reactant_motifs = primary_reactant_motifs[:1]
+                    primary_reactant_motifs = primary_reactant_motifs[:1]
 
                 type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
                 type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
@@ -794,16 +775,12 @@ def process_reaction_dataset(
                         cid = m.get("compound_id", "")
                         if cid:
                             current_r_motifs.append(cid)
-                            for alt_id in m.get("alt_compound_ids", []):
-                                current_r_motifs.append(alt_id)
 
                     context_ids = []
                     for m in context_motifs:
                         cid = m.get("compound_id", "")
                         if cid:
                             context_ids.append(cid)
-                            for alt_id in m.get("alt_compound_ids", []):
-                                context_ids.append(alt_id)
 
                     reactant_data.append({
                         "motifs": _dedupe_list(current_r_motifs),
@@ -825,14 +802,10 @@ def process_reaction_dataset(
                     cid = m.get("compound_id", "")
                     if cid:
                         product_motifs.append(cid)
-                        for alt_id in m.get("alt_compound_ids", []):
-                            product_motifs.append(alt_id)
                 for m in p_context:
                     cid = m.get("compound_id", "")
                     if cid:
                         product_motifs.append(cid)
-                        for alt_id in m.get("alt_compound_ids", []):
-                            product_motifs.append(alt_id)
             except Exception:
                 pass
 
@@ -892,10 +865,7 @@ def process_reaction_dataset(
                 intramolecular_flag = fallback_intramolecular
 
             if len(reactants) == 1:
-                if intramolecular_flag:
-                    primary_reactant_motifs = primary_reactant_motifs[:2]
-                else:
-                    primary_reactant_motifs = primary_reactant_motifs[:1]
+                primary_reactant_motifs = primary_reactant_motifs[:1]
 
             type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
             type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
