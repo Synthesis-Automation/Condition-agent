@@ -253,3 +253,11 @@ def test_multi_motif_reactant_key_matches(monkeypatch) -> None:
     assert result.total_matching_experiments == 1
     assert result.is_fallback_match is False
     assert result.recommendations[0].catalyst == "Pd"
+
+
+def test_scaffold_alias_expands_to_aromn_h() -> None:
+    motif_sets = hte._load_motif_sets()
+    scope_map = hte._load_scope_map()
+    expanded = hte._expand_reactant_field("Pyrazole", motif_sets, scope_map)
+    assert "Pyrazole" in expanded
+    assert "AromN-H" in expanded

@@ -239,6 +239,45 @@ def _load_scaffold_motif_ids() -> set[str]:
             motifs.add(motif_id)
     return motifs
 
+
+@lru_cache(maxsize=1)
+def _load_nh_heterocycle_scaffolds() -> set[str]:
+    path = PROJECT_ROOT / "chemtools" / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
+    if not path.exists():
+        return set()
+    try:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    motifs: set[str] = set()
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        motif_id = str(entry.get("id") or "").strip()
+        description = str(entry.get("description") or "").lower()
+        if motif_id and "nh-heteroaromatic" in description:
+            motifs.add(motif_id)
+    return motifs
+
+
+def _apply_aromn_scaffold_override(
+    motifs: List[str],
+    context_scaffolds: List[str],
+) -> List[str]:
+    if "AromN-H" not in motifs or not context_scaffolds:
+        return motifs
+    nh_scaffolds = _load_nh_heterocycle_scaffolds()
+    scaffold = next((cid for cid in context_scaffolds if cid in nh_scaffolds), "")
+    if not scaffold:
+        return motifs
+    idx = motifs.index("AromN-H")
+    filtered = [m for m in motifs if m != "AromN-H"]
+    if scaffold not in filtered:
+        insert_at = min(idx, len(filtered))
+        filtered.insert(insert_at, scaffold)
+    return filtered
+
 def _dedupe_list(values: Iterable[str]) -> List[str]:
     seen = set()
     out: List[str] = []
@@ -597,11 +636,17 @@ def process_reaction_dataset(
                                 current_r_motifs.append(cid)
 
                         context_ids = []
+                        context_scaffolds: List[str] = []
                         for m in context_motifs:
                             cid = m.get("compound_id", "")
                             if cid:
                                 context_ids.append(cid)
+                                context_scaffolds.append(cid)
 
+                        current_r_motifs = _apply_aromn_scaffold_override(
+                            current_r_motifs,
+                            context_scaffolds,
+                        )
                         reactant_data.append({
                             "motifs": _dedupe_list(current_r_motifs),
                         })
@@ -777,11 +822,17 @@ def process_reaction_dataset(
                             current_r_motifs.append(cid)
 
                     context_ids = []
+                    context_scaffolds: List[str] = []
                     for m in context_motifs:
                         cid = m.get("compound_id", "")
                         if cid:
                             context_ids.append(cid)
+                            context_scaffolds.append(cid)
 
+                    current_r_motifs = _apply_aromn_scaffold_override(
+                        current_r_motifs,
+                        context_scaffolds,
+                    )
                     reactant_data.append({
                         "motifs": _dedupe_list(current_r_motifs),
                     })

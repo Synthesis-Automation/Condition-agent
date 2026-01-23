@@ -608,6 +608,8 @@ _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 _SPECTATOR_MATCH_WEIGHT = 0.7
 
+_NH_HETEROCYCLE_TAG = "nh-heteroaromatic"
+
 
 @lru_cache(maxsize=1)
 def _load_motif_sets() -> Dict[str, List[str]]:
@@ -715,6 +717,31 @@ def _load_scaffold_motif_ids() -> Set[str]:
 
 
 @lru_cache(maxsize=1)
+def _load_nh_heterocycle_scaffolds() -> Set[str]:
+    if not _SCAFFOLD_MOTIFS_FILE.exists():
+        return set()
+    try:
+        with _SCAFFOLD_MOTIFS_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    motifs: Set[str] = set()
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        motif_id = str(entry.get("id") or "").strip()
+        description = str(entry.get("description") or "").lower()
+        if motif_id and _NH_HETEROCYCLE_TAG in description:
+            motifs.add(motif_id)
+    return motifs
+
+
+@lru_cache(maxsize=1)
+def _load_scaffold_alias_map() -> Dict[str, List[str]]:
+    return {cid: ["AromN-H"] for cid in _load_nh_heterocycle_scaffolds()}
+
+
+@lru_cache(maxsize=1)
 def _load_compound_tags() -> Dict[str, Set[str]]:
     if not _COMPOUND_SCOPE_FILE.exists():
         return {}
@@ -780,8 +807,12 @@ def _filter_generic_motifs(motifs: Iterable[str]) -> List[str]:
 def _expand_parent_motifs(motifs: Iterable[str]) -> List[str]:
     compound_ids = _load_compound_ids()
     expanded = list(motifs)
+    alias_map = _load_scaffold_alias_map()
     for motif in motifs:
         text = str(motif).strip()
+        aliases = alias_map.get(text) or []
+        if aliases:
+            expanded.extend(aliases)
         if "-" not in text:
             continue
         prefix, suffix = text.rsplit("-", 1)
@@ -911,9 +942,14 @@ def _expand_macro_token(
         members = motif_sets.get(set_name) or []
         if members:
             return members
+    expanded = [token]
     if token in scope_map:
-        return [token] + scope_map[token]
-    return [token]
+        expanded = [token] + scope_map[token]
+    alias_map = _load_scaffold_alias_map()
+    aliases = alias_map.get(token) or []
+    if aliases:
+        expanded = _dedupe_list(expanded + aliases)
+    return expanded
 
 
 def _expand_motif_tokens(
@@ -1208,6 +1244,20 @@ class HTERecommender:
                 if alt_id and alt_id != compound_id:
                     motifs.append(alt_id)
         motifs = _dedupe_list(motifs)
+
+        context_scaffolds: List[str] = []
+        nh_scaffolds = _load_nh_heterocycle_scaffolds()
+        for entry in analysis.get("context_motifs", []) or []:
+            cid = entry.get("compound_id")
+            if cid and cid in nh_scaffolds:
+                context_scaffolds.append(cid)
+
+        if "AromN-H" in motifs and context_scaffolds:
+            scaffold = context_scaffolds[0]
+            idx = motifs.index("AromN-H")
+            motifs = [m for m in motifs if m != "AromN-H"]
+            if scaffold not in motifs:
+                motifs.insert(min(idx, len(motifs)), scaffold)
 
         if motifs:
             alias_map = {
