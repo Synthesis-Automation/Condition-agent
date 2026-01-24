@@ -123,6 +123,61 @@
         "ullmann_cs"
       ]
     },
+    "carboxylic_acids": {
+      "name": "Carboxylic Acids",
+      "description": "Carboxylic acid reactants and products.",
+      "members": [
+        "Acyl-CO2H",
+        "Alkenyl-CO2H",
+        "Alkyl-CO2H",
+        "Ar-CO2H",
+        "R2CH-CO2H",
+        "R3C-CO2H",
+        "RCH2-CO2H"
+      ],
+      "usage": [
+        "amide_formation",
+        "esterification",
+        "oxidation_alcohol"
+      ]
+    },
+    "amides": {
+      "name": "Amides",
+      "description": "Amide products (primary/secondary/tertiary).",
+      "members": [
+        "Alkenyl-CONH2",
+        "Alkenyl-CONHR",
+        "Alkenyl-CONR2",
+        "Alkyl-CONH2",
+        "Alkyl-CONHR",
+        "Alkyl-CONR2",
+        "Alkynyl-CONH2",
+        "Alkynyl-CONHR",
+        "Alkynyl-CONR2",
+        "Allyl-CONH2",
+        "Allyl-CONHR",
+        "Allyl-CONR2",
+        "Ar-CONH2",
+        "Ar-CONHR",
+        "Ar-CONR2",
+        "Bn-CONH2",
+        "Bn-CONHR",
+        "Bn-CONR2",
+        "R2CH-CONH2",
+        "R2CH-CONHR",
+        "R2CH-CONR2",
+        "R3C-CONH2",
+        "R3C-CONHR",
+        "R3C-CONR2",
+        "RCH2-CONH2",
+        "RCH2-CONHR",
+        "RCH2-CONR2"
+      ],
+      "usage": [
+        "amide_formation",
+        "acylation_amide"
+      ]
+    },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
       "description": "Terminal alkynes (C≡C-H) for Sonogashira coupling.",
