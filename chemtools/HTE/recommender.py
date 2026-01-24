@@ -129,14 +129,12 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Reactant_C_Type",
         "Catalyst", "Ligand", "Base", "Solvent", "Additive",
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
-        "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category", "Is_Intramolecular",
+        "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category",
         "Source_File", "Source_Group", "spectator_groups",
     ]
     for col in required_cols:
         if col not in df.columns:
-            if col == "Is_Intramolecular":
-                df[col] = df["Reactant_B_Type"].isna() | (df["Reactant_B_Type"] == "")
-            elif col in ("Source_File", "Source_Group"):
+            if col in ("Source_File", "Source_Group"):
                 df[col] = ""
             else:
                 df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
@@ -152,7 +150,16 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         return row
 
     df = df.apply(_normalize_reactants_row, axis=1)
-    df["Is_Intramolecular"] = df["_reactant_count"] <= 1
+    df["Intramolecular_Likely"] = df.apply(
+        lambda row: _intramolecular_likely_from_fields(
+            row.get("Reactant_A_Type"),
+            row.get("Reactant_B_Type"),
+            row.get("Reactant_C_Type"),
+        ),
+        axis=1,
+    )
+    if "Is_Intramolecular" not in df.columns:
+        df["Is_Intramolecular"] = df["Intramolecular_Likely"]
     df = df.drop(columns=["_reactant_count"])
 
     df["Reactant_Types_Key"] = df.apply(
@@ -607,6 +614,7 @@ _GENERIC_FALLBACK_MOTIFS = {
 _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 _SPECTATOR_MATCH_WEIGHT = 0.7
+_INTRAMOLECULAR_MATCH_BOOST = 1.2
 
 _NH_HETEROCYCLE_TAG = "nh-heteroaromatic"
 
@@ -880,6 +888,37 @@ def _split_motif_tokens(value: Any) -> List[str]:
     return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
 
 
+def _intramolecular_likely_from_fields(
+    reactant_a: Any,
+    reactant_b: Any,
+    reactant_c: Any,
+) -> bool:
+    tokens_a = _split_motif_tokens(reactant_a)
+    tokens_b = _split_motif_tokens(reactant_b)
+    tokens_c = _split_motif_tokens(reactant_c)
+    reactant_tokens = [tokens for tokens in (tokens_a, tokens_b, tokens_c) if tokens]
+    if len(reactant_tokens) != 1:
+        return False
+    return len(reactant_tokens[0]) > 1
+
+
+def _apply_intramolecular_boost(
+    df: pd.DataFrame,
+    query_intramolecular_likely: bool,
+) -> None:
+    if not query_intramolecular_likely or df is None or df.empty:
+        return
+    if "Intramolecular_Likely" in df.columns:
+        col = "Intramolecular_Likely"
+    elif "Is_Intramolecular" in df.columns:
+        col = "Is_Intramolecular"
+    else:
+        return
+    mask = df[col].fillna(False).astype(bool)
+    if "match_score" in df.columns:
+        df.loc[mask, "match_score"] = df.loc[mask, "match_score"] * _INTRAMOLECULAR_MATCH_BOOST
+
+
 def _collapse_motif_tokens(tokens: Iterable[str]) -> str:
     cleaned = _dedupe_list([str(token).strip() for token in tokens if str(token).strip()])
     if not cleaned:
@@ -1117,7 +1156,6 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
                 "AREA_TOTAL_REDUCED": metrics.get("area_total_reduced"),
                 "z-Score": metrics.get("z_score"),
                 "spectator_groups": record.get("spectator_groups", ""),
-                "Is_Intramolecular": len(cleaned) <= 1,
             }
             rows.append(row)
 
@@ -1810,7 +1848,11 @@ class HTERecommender:
         
         # Step 3: Match against database
         query_motifs = set(type_a) | set(type_b)
-        is_query_intramolecular = (reactant_b_smiles is None)
+        query_intramolecular_likely = _intramolecular_likely_from_fields(
+            collapsed_a,
+            collapsed_b,
+            "",
+        )
         
         scored_matches = []
         for db_key, group_df in self.transformation_indices.items():
@@ -1829,13 +1871,8 @@ class HTERecommender:
                     if temp_df.empty:
                         continue
                 
-                # Boost if intramolecular status matches
-                if 'Is_Intramolecular' in temp_df.columns:
-                    mask = (temp_df['Is_Intramolecular'] == is_query_intramolecular)
-                    temp_df.loc[mask, 'match_score'] = score * 1.2
-                    temp_df.loc[~mask, 'match_score'] = score
-                else:
-                    temp_df['match_score'] = score
+                temp_df['match_score'] = score
+                _apply_intramolecular_boost(temp_df, query_intramolecular_likely)
 
                 temp_df['match_priority'] = 1
                     
@@ -1867,6 +1904,7 @@ class HTERecommender:
             if direct_match is not None:
                 direct_match['match_score'] = 1.0
                 direct_match['match_priority'] = 0
+                _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
                 if not result.matched_motifs:
                     pick_a = _prioritize_motifs(type_a, reacted_set, spectator_set)
                     pick_b = _prioritize_motifs(type_b, reacted_set, spectator_set)
@@ -1896,6 +1934,7 @@ class HTERecommender:
                                 continue
                         direct_match['match_score'] = 1.0
                         direct_match['match_priority'] = 0
+                        _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
                         if not result.matched_motifs:
                             result.matched_motifs = (ma, mb)
                         fallback_used = True
@@ -1967,6 +2006,7 @@ class HTERecommender:
                             else:
                                 fallback_match['match_score'] = 0.85
                                 fallback_match['match_priority'] = 1 + idx_a + idx_b
+                            _apply_intramolecular_boost(fallback_match, query_intramolecular_likely)
                             if not result.matched_motifs:
                                 result.matched_motifs = (ma, mb)
                             fallback_used = True
