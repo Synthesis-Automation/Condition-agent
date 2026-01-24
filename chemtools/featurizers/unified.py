@@ -416,6 +416,9 @@ def _aggregate_reaction_features(
     spectator_groups: List[str] = []
     spectator_seen: set[str] = set()
     scaffold_ids = _load_scaffold_motif_ids()
+    reacted_motifs: List[str] = []
+    formed_motifs: List[str] = []
+    spectator_motifs: List[str] = []
 
     for reactant in reactant_list:
         for entry in reactant.get("steric", {}).get("aryl", []):
@@ -437,11 +440,27 @@ def _aggregate_reaction_features(
     if product_motif_ids:
         reactant_counts = Counter(reactant_motif_ids)
         product_counts = Counter(product_motif_ids)
+        reacted_set: set[str] = set()
+        formed_set: set[str] = set()
         spectator_motifs = {
             motif_id
             for motif_id in reactant_counts
             if product_counts.get(motif_id, 0) > 0
         }
+        for motif_id in set(reactant_counts) | set(product_counts):
+            rc = reactant_counts.get(motif_id, 0)
+            pc = product_counts.get(motif_id, 0)
+            if pc > rc:
+                formed_set.add(motif_id)
+                if rc > 0:
+                    spectator_motifs.add(motif_id)
+            elif pc < rc:
+                reacted_set.add(motif_id)
+                if pc > 0:
+                    spectator_motifs.add(motif_id)
+            else:
+                if rc > 0:
+                    spectator_motifs.add(motif_id)
         for motif_id in reactant_motif_ids:
             if motif_id not in spectator_motifs:
                 continue
@@ -457,6 +476,9 @@ def _aggregate_reaction_features(
             if motif_id in scaffold_ids and motif_id not in spectator_seen:
                 spectator_seen.add(motif_id)
                 spectator_groups.append(motif_id)
+        reacted_motifs = sorted(reacted_set)
+        formed_motifs = sorted(formed_set)
+        spectator_motifs = sorted(spectator_motifs)
 
     avg_electronic = None
     if electronic_scores:
@@ -465,6 +487,9 @@ def _aggregate_reaction_features(
     return {
         "reactant_count": len(reactant_list),
         "motif_ids": sorted(motifs),
+        "reacted_motifs": reacted_motifs,
+        "formed_motifs": formed_motifs,
+        "spectator_motifs": spectator_motifs,
         "spectator_groups_combined": spectator_groups,
         "spectator_groups_ranked": rank_spectator_groups(spectator_groups),
         "max_aryl_steric": max(aryl_scores) if aryl_scores else 0.0,

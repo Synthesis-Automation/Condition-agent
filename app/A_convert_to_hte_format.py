@@ -18,6 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
+from chemtools.featurizers.reaction_detection import detect_reaction_types
 from chemtools.featurizers.unified import featurize_reaction
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
@@ -55,6 +56,20 @@ def _intramolecular_from_reaction(reaction_smiles: str) -> Optional[bool]:
         if isinstance(flag, bool):
             return flag
     return None
+
+
+@lru_cache(maxsize=20000)
+def _detect_reaction_type(reaction_smiles: str) -> str:
+    if not reaction_smiles:
+        return ""
+    try:
+        detection = detect_reaction_types(reaction_smiles)
+    except Exception:
+        return ""
+    matches = getattr(detection, "matches", None) or []
+    if not matches:
+        return ""
+    return matches[0].reaction_type or ""
 
 
 def _fallback_intramolecular(reactants: Iterable[str]) -> bool:
@@ -714,6 +729,7 @@ def process_reaction_dataset(
 
                 formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
                 primary_formed_str = formed_here[0] if formed_here else "None"
+                formed_motifs_str = _reactant_key(list(formed_set)) or "None"
 
                 spectators_str = _reactant_key(list(spectators_set)) or "None"
 
@@ -744,9 +760,11 @@ def process_reaction_dataset(
                 spectator_groups = rank_spectator_groups(
                     _collect_spectator_groups(reactant_data, spectators_set)
                 )
+                detected_reaction_type = _detect_reaction_type(smiles)
 
                 row_out = {
                     "reaction_id": source_label,
+                    "detected_reaction_type": detected_reaction_type,
                     "yield": record.get("yield", 0.0),
                     "z_score": 0.0,
                     "reactant_1": type_a,
@@ -764,6 +782,7 @@ def process_reaction_dataset(
                     "solvent": reagents.get("solvent", ""),
                     "Is_Intramolecular": intramolecular_flag,
                     "reaction_smiles": smiles,
+                    "formed_motifs": formed_motifs_str,
                     "spectator_groups": " / ".join(spectator_groups),
                     "reference": row.get("reference", ""),
                     "_reaction_key": reaction_key,
@@ -900,6 +919,7 @@ def process_reaction_dataset(
 
             formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
             primary_formed_str = formed_here[0] if formed_here else "None"
+            formed_motifs_str = _reactant_key(list(formed_set)) or "None"
 
             spectators_str = _reactant_key(list(spectators_set)) or "None"
 
@@ -930,9 +950,11 @@ def process_reaction_dataset(
             spectator_groups = rank_spectator_groups(
                 _collect_spectator_groups(reactant_data, spectators_set)
             )
+            detected_reaction_type = _detect_reaction_type(smiles)
 
             row = {
                 "reaction_id": source_label,
+                "detected_reaction_type": detected_reaction_type,
                 "yield": record.get("yield", 0.0),
                 "z_score": 0.0,
                 "reactant_1": type_a,
@@ -950,6 +972,7 @@ def process_reaction_dataset(
                 "solvent": reagents.get("solvent", ""),
                 "Is_Intramolecular": intramolecular_flag,
                 "reaction_smiles": smiles,
+                "formed_motifs": formed_motifs_str,
                 "spectator_groups": " / ".join(spectator_groups),
                 "reference": record.get("reference", ""),
                 "_reaction_key": reaction_key,
@@ -1002,11 +1025,11 @@ def process_reaction_dataset(
     df["z_score"] = df["z_score"].round(2)
 
     canonical_cols = [
-        "reaction_id", "yield", "z_score", "reactant_1", "reactant_2", "reactant_3",
+        "reaction_id", "detected_reaction_type", "reaction_smiles", "yield", "z_score", "reactant_1", "reactant_2", "reactant_3",
         "catalyst", "ligand", "base", "acid", "oxidant", "reductant",
         "additive", "condensation_agent", "other_reagent", "solvent",
         "Is_Intramolecular",
-        "reaction_smiles", "spectator_groups", "reference",
+        "formed_motifs", "spectator_groups", "reference",
     ]
     df = df[canonical_cols]
 

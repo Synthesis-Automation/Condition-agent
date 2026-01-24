@@ -304,6 +304,26 @@
       ]
     },
     {
+      "id": "azide_coupling",
+      "name": "Azide Coupling",
+      "category": "C-N Coupling",
+      "mechanism": "cross-coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles"
+      },
+      "products": {
+        "product": "Ar-N3"
+      },
+      "catalysts": [
+        "Pd",
+        "Cu",
+        "Ni"
+      ],
+      "examples": [
+        "Brc1ccccc1.[N-]=[N+]=[N-]>>N=[N+]=[N-]c1ccccc1"
+      ]
+    },
+    {
       "id": "arylation_acidic_c_h",
       "name": "Arylation_Acidic_C_H",
       "category": "C-C Coupling",

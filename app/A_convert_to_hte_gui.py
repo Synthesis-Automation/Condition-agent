@@ -148,7 +148,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
 
         form.addRow("Input CSV(s):", input_layout)
         form.addRow("Output CSV/Folder:", self.output_edit)
-        form.addRow("", QtWidgets.QLabel("Output includes spectator_groups and reactant_3 columns."))
+        form.addRow("", QtWidgets.QLabel("Output includes formed_motifs, spectator_groups, and reactant_3 columns."))
         form.addRow("", self.drop_catalyst_check)
         
         layout.addLayout(form)
