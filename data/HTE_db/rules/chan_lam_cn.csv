@@ -1,2 +1,2 @@
-reaction_type,reaction_category,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,solvent,additive,temperature_C
-chan_lam_cn,C-N Coupling,95,2,@sp2_electrophiles,@organoboron,Cu(OAc)2 10%,dtbpf,pyridine/Et3N,DCM/MeOH,O2,25
+reaction_type,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,solvent,additive,temperature_C
+Chan_Lam_C_N_Coupling,95,2,@sp2_electrophiles,@organoboron,Cu(OAc)2 10%,dtbpf,pyridine/Et3N,DCM/MeOH,O2,25

@@ -1,6 +1,6 @@
-reaction_type,reaction_category,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,solvent,additive,temperature_C
-buchwald_hartwig_cn,C-N Coupling,95,2,R-NH2,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),tBuBrettPhos / BippyPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu/ KHMDS,"MeCN, tBuOH, dioxane, toluene",,100
-buchwald_hartwig_cn,C-N Coupling,95,2,R-NHR,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),QPhos / XantPhos / tBuBrettPhos,Cs2CO3/ KHMDS / NaOtBu,"Dioxane, MeCN, or THF",,
-buchwald_hartwig_cn,C-N Coupling,95,2,AromN-H,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),Josiphos SL-009 / tBuBrettPhos / XantPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu,"Dioxane, tAmOH",,
-buchwald_hartwig_cn,C-N Coupling,95,2,@amides,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),tBuXPhos / tBuBrettPhos / AlPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu,"Dioxane, tAmOH",,
-buchwald_hartwig_cn,C-N Coupling,95,2,@amines_nh,@sp2_electrophiles,Buchwald precatalyst (allyl/crotyl > G1-4 > LxPdCl2; avoid Pd2(dba)3),tBuBrettPhos-Class,"K3PO4 (aq, ~3.25 M) / Cs2CO3","MeCN, tAmOH, dioxane, toluene",,
+reaction_type,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,solvent,additive,temperature_C
+C_N_Coupling,95,2,R-NH2,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),tBuBrettPhos / BippyPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu/ KHMDS,"MeCN, tBuOH, dioxane, toluene",,100
+C_N_Coupling,95,2,R-NHR,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),QPhos / XantPhos / tBuBrettPhos,Cs2CO3/ KHMDS / NaOtBu,"Dioxane, MeCN, or THF",,
+C_N_Coupling,95,2,AromN-H,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),Josiphos SL-009 / tBuBrettPhos / XantPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu,"Dioxane, tAmOH",,
+C_N_Coupling,95,2,@amides,@sp2_electrophiles,Buchwald (allyl/crotyl or G-series),tBuXPhos / tBuBrettPhos / AlPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu,"Dioxane, tAmOH",,
+C_N_Coupling,95,2,@amines_nh,@sp2_electrophiles,Buchwald precatalyst (allyl/crotyl > G1-4 > LxPdCl2; avoid Pd2(dba)3),tBuBrettPhos-Class,"K3PO4 (aq, ~3.25 M) / Cs2CO3","MeCN, tAmOH, dioxane, toluene",,
