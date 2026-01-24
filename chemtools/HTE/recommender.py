@@ -27,6 +27,11 @@ from chemtools.featurizers.structural import featurize_molecule
 from chemtools.featurizers.spectator_rank import weighted_spectator_similarity
 from chemtools.smiles import normalize_reaction
 
+try:
+    from chemtools.taxonomy import reaction_catalog as _reaction_catalog
+except Exception:
+    _reaction_catalog = None
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -138,6 +143,14 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                 df[col] = ""
             else:
                 df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
+
+    df["Reaction_Type_Standardized"] = (
+        df["Reaction_Type_Standardized"]
+        .fillna("")
+        .astype(str)
+        .apply(_resolve_reaction_type_label)
+    )
+    df["Reaction_Type_Standardized"] = df["Reaction_Type_Standardized"].replace("", "Unknown")
 
     def _normalize_reactants_row(row: pd.Series) -> pd.Series:
         a_val, b_val, c_val, cleaned = _normalize_reactant_values(
@@ -293,23 +306,39 @@ def _aggregate_spectator_groups(values: pd.Series) -> str:
     return str(series.value_counts().index[0]).strip()
 
 
-def _clean_reaction_label(value: Optional[str]) -> str:
+def _normalize_reaction_type_value(value: Any) -> str:
     if value is None:
         return ""
+    if isinstance(value, float) and pd.isna(value):
+        return ""
     text = str(value).strip()
-    if not text or text.lower() in {"nan", "unknown"}:
+    if not text or text.lower() == "nan":
         return ""
     return text
 
 
+def _clean_reaction_label(value: Optional[str]) -> str:
+    text = _normalize_reaction_type_value(value)
+    if not text or text.lower() == "unknown":
+        return ""
+    return text
+
+
+def _resolve_reaction_type_label(label: Optional[str]) -> str:
+    text = _normalize_reaction_type_value(label)
+    if not text:
+        return ""
+    if _reaction_catalog is None:
+        return text
+    resolved = _reaction_catalog.resolve_reaction_type(text)
+    return resolved or text
+
+
 def _format_reaction_id(reaction_type: Optional[str], reaction_category: Optional[str]) -> str:
     type_text = _clean_reaction_label(reaction_type)
-    category_text = _clean_reaction_label(reaction_category)
-    if type_text and category_text:
-        if type_text.lower() == category_text.lower():
-            return type_text
-        return f"{type_text} / {category_text}"
-    return type_text or category_text
+    if type_text:
+        return type_text
+    return _clean_reaction_label(reaction_category)
 
 
 def _reactant_key(values: Iterable[Optional[str]]) -> str:
@@ -1147,8 +1176,10 @@ def _load_hte_jsonl(path: Path) -> pd.DataFrame:
             conditions = record.get("conditions") or {}
             metrics = record.get("metrics") or {}
 
+            raw_reaction_type = record.get("reaction_type") or "Unknown"
+            resolved_reaction_type = _resolve_reaction_type_label(raw_reaction_type) or "Unknown"
             row = {
-                "Reaction_Type_Standardized": record.get("reaction_type") or "Unknown",
+                "Reaction_Type_Standardized": resolved_reaction_type,
                 "Reactant_A_Type": a_type,
                 "Reactant_B_Type": b_type,
                 "Reactant_C_Type": c_type,
@@ -1575,11 +1606,19 @@ class HTERecommender:
                 avg_z_score, num_exp, avg_yield
             )
             
-            # Reaction type/category (most common)
-            reaction_type = group_df['Reaction_Type_Standardized'].mode().iloc[0] if not group_df['Reaction_Type_Standardized'].isna().all() else None
+            # Reaction type/category (most common, ignoring blanks)
+            reaction_type = None
+            if "Reaction_Type_Standardized" in group_df.columns:
+                type_series = group_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                type_series = type_series[type_series != ""]
+                if not type_series.empty:
+                    reaction_type = type_series.mode().iloc[0]
             reaction_category = None
-            if "Reaction_Category" in group_df.columns and not group_df["Reaction_Category"].isna().all():
-                reaction_category = group_df["Reaction_Category"].mode().iloc[0]
+            if "Reaction_Category" in group_df.columns:
+                category_series = group_df["Reaction_Category"].fillna("").astype(str).str.strip()
+                category_series = category_series[category_series != ""]
+                if not category_series.empty:
+                    reaction_category = category_series.mode().iloc[0]
             reaction_id = _format_reaction_id(reaction_type, reaction_category)
             
             # Reactant types (from first row)
@@ -1814,6 +1853,11 @@ class HTERecommender:
             reactant_b_smiles=reactant_b_smiles,
             product_smiles=product_smiles
         )
+
+        if reaction_type_filter:
+            resolved_filter = _resolve_reaction_type_label(reaction_type_filter)
+            if resolved_filter:
+                reaction_type_filter = resolved_filter
         
         # Step 1: Detect reactant types
         type_a, cat_a = self._detect_reactant_types(reactant_a_smiles)
@@ -2056,10 +2100,7 @@ class HTERecommender:
         
         # Apply reaction type filter if specified
         if reaction_type_filter:
-            type_filtered = matched_df[matched_df['Reaction_Type_Standardized'] == reaction_type_filter]
-            if type_filtered.empty and "Reaction_Category" in matched_df.columns:
-                type_filtered = matched_df[matched_df["Reaction_Category"] == reaction_type_filter]
-            matched_df = type_filtered
+            matched_df = matched_df[matched_df['Reaction_Type_Standardized'] == reaction_type_filter]
         
         # Apply catalyst filter if specified
         if catalyst_filter:
@@ -2190,19 +2231,19 @@ class HTERecommender:
                 "recommendations": [],
             }
 
+        if reaction_type_filter:
+            resolved_filter = _resolve_reaction_type_label(reaction_type_filter)
+            if resolved_filter:
+                reaction_type_filter = resolved_filter
+
         filtered = self.df.copy()
         if source_group:
             filtered = _filter_source_group(filtered, source_group)
 
         if reaction_type_filter:
-            type_filtered = filtered[
+            filtered = filtered[
                 filtered["Reaction_Type_Standardized"] == reaction_type_filter
             ]
-            if type_filtered.empty and "Reaction_Category" in filtered.columns:
-                type_filtered = filtered[
-                    filtered["Reaction_Category"] == reaction_type_filter
-                ]
-            filtered = type_filtered
 
         filtered = _filter_by_reactant_types(
             filtered, reactant_type_filters, match_all=match_all_reactants
