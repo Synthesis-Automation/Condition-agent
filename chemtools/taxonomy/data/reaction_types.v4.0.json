@@ -11,7 +11,7 @@
       "products": {
         "product": [
           "Ar-Ar",
-          "Ar-C=CH2",
+          "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -197,7 +197,7 @@
       },
       "products": {
         "product": [
-          "Ar-C=CH2",
+          "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -220,7 +220,7 @@
       "products": {
         "product": [
           "Ar-Ar",
-          "Ar-C=CH2",
+          "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -244,7 +244,7 @@
       "products": {
         "product": [
           "Ar-Ar",
-          "Ar-C=CH2",
+          "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -267,7 +267,7 @@
       "products": {
         "product": [
           "Ar-Ar",
-          "Ar-C=CH2",
+          "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -291,7 +291,7 @@
       "products": {
         "product": [
           "Ar-Ar",
-          "Ar-C=CH2",
+          "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -643,8 +643,8 @@
       "id": "Epoxidation",
       "reactants": {
         "substrate": [
-          "@terminal_alkenes",
-          "C=C"
+          "Ar-Alkenyl",
+          "Alkenyl-Alkenyl"
         ]
       },
       "products": {
