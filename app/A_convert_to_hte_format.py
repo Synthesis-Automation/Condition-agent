@@ -750,6 +750,7 @@ def process_reaction_dataset(
                     "formed_motifs": formed_motifs_str,
                     "spectator_groups": " / ".join(spectator_groups),
                     "reference": row.get("reference", ""),
+                    "Reaction_Key": reaction_key,
                     "_reaction_key": reaction_key,
                 }
                 rows.append(row_out)
@@ -934,6 +935,7 @@ def process_reaction_dataset(
                 "formed_motifs": formed_motifs_str,
                 "spectator_groups": " / ".join(spectator_groups),
                 "reference": record.get("reference", ""),
+                "Reaction_Key": reaction_key,
                 "_reaction_key": reaction_key,
             }
             rows.append(row)
@@ -984,10 +986,11 @@ def process_reaction_dataset(
     df["z_score"] = df["z_score"].round(2)
 
     canonical_cols = [
-        "reaction_id", "detected_reaction_type", "reaction_smiles", "yield", "z_score", "reactant_1", "reactant_2", "reactant_3",
+        "reaction_id", "detected_reaction_type", "reaction_smiles", "yield", "z_score",
+        "reactant_1", "reactant_2", "reactant_3", "formed_motifs",
         "catalyst", "ligand", "base", "acid", "oxidant", "reductant",
         "additive", "condensation_agent", "other_reagent", "solvent",
-        "formed_motifs", "spectator_groups", "reference",
+        "spectator_groups", "reference", "Reaction_Key",
     ]
     df = df[canonical_cols]
 

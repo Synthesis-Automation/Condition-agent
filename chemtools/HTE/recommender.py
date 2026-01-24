@@ -233,11 +233,21 @@ def _load_hte_database_cached(
         rxn_types = group_df["Reaction_Type_Standardized"].value_counts()
         reaction_type_patterns[key] = Counter(rxn_types.to_dict())
     
-    # Build transformation-aware index
+    # Build transformation-aware index (Reaction_Key preferred when available)
     df["Reaction_Type_Standardized"] = df["Reaction_Type_Standardized"].fillna("Unknown")
-    grouped_rxn = df.groupby("Reaction_Type_Standardized")
-    for key, group_df in grouped_rxn:
-        transformation_indices[key] = group_df
+    if "Reaction_Key" in df.columns:
+        df["Reaction_Key"] = df["Reaction_Key"].fillna("").astype(str).str.strip()
+        keyed_df = df[df["Reaction_Key"] != ""]
+        for key, group_df in keyed_df.groupby("Reaction_Key"):
+            transformation_indices[key] = group_df
+        unkeyed_df = df[df["Reaction_Key"] == ""]
+        if not unkeyed_df.empty:
+            for key, group_df in unkeyed_df.groupby("Reaction_Type_Standardized"):
+                transformation_indices[key] = group_df
+    else:
+        grouped_rxn = df.groupby("Reaction_Type_Standardized")
+        for key, group_df in grouped_rxn:
+            transformation_indices[key] = group_df
 
     print(f"Indexed {len(indexed_data)} reactant combinations and {len(transformation_indices)} transformation types")
     return df, indexed_data, reaction_type_patterns, transformation_indices
@@ -1872,6 +1882,7 @@ class HTERecommender:
                         continue
                 
                 temp_df['match_score'] = score
+                temp_df['_transformation_key'] = db_key
                 _apply_intramolecular_boost(temp_df, query_intramolecular_likely)
 
                 temp_df['match_priority'] = 1
@@ -1883,7 +1894,11 @@ class HTERecommender:
         if scored_matches:
             match_dfs.extend(scored_matches)
             # Use the highest scoring transformation as the "matched motifs" for display
-            best_key = max(scored_matches, key=lambda x: x['match_score'].iloc[0])['Reaction_Type_Standardized'].iloc[0]
+            best_match = max(scored_matches, key=lambda x: x['match_score'].iloc[0])
+            if "_transformation_key" in best_match.columns:
+                best_key = best_match["_transformation_key"].iloc[0]
+            else:
+                best_key = best_match["Reaction_Type_Standardized"].iloc[0]
             result.matched_motifs = (best_key, "")
 
         key = _reactant_key([collapsed_a, collapsed_b])
