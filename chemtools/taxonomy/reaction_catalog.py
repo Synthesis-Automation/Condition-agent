@@ -80,6 +80,31 @@ def _dedupe(values: Iterable[str]) -> List[str]:
     return result
 
 
+def format_reaction_id_display(reaction_id: str) -> str:
+    """Return a display-friendly string for a reaction id."""
+    if not reaction_id:
+        return ""
+    tokens = reaction_id.split("_")
+    if len(tokens) == 1:
+        return reaction_id[:1].upper() + reaction_id[1:]
+    formatted: List[str] = []
+    for idx, token in enumerate(tokens):
+        if not token:
+            formatted.append(token)
+            continue
+        if len(token) == 1:
+            formatted.append(token.upper())
+            continue
+        if token.isupper():
+            formatted.append(token)
+            continue
+        if idx == 0:
+            formatted.append(token[:1].upper() + token[1:])
+        else:
+            formatted.append(token)
+    return "_".join(formatted)
+
+
 def _expand_reactant_slot(
     values: Any,
     motif_sets: Mapping[str, Iterable[str]],
@@ -194,7 +219,8 @@ def load_reaction_catalog(
         rxn_id = str(entry.get("id") or "").strip()
         if not rxn_id:
             continue
-        name = str(entry.get("name") or rxn_id)
+        raw_name = entry.get("name")
+        name = str(raw_name) if raw_name else format_reaction_id_display(rxn_id)
         category = str(entry.get("category") or "")
         aliases = [str(a) for a in (entry.get("aliases") or []) if isinstance(a, str)]
         description = entry.get("description")
@@ -243,7 +269,13 @@ def get_reaction_type(reaction_id: str) -> Optional[ReactionTypeDefinition]:
     if not reaction_id:
         return None
     definitions, _ = load_reaction_catalog()
-    return definitions.get(reaction_id)
+    definition = definitions.get(reaction_id)
+    if definition:
+        return definition
+    resolved = resolve_reaction_type(reaction_id)
+    if resolved:
+        return definitions.get(resolved)
+    return None
 
 
 def resolve_reaction_type(label: Optional[str]) -> Optional[str]:
@@ -251,3 +283,12 @@ def resolve_reaction_type(label: Optional[str]) -> Optional[str]:
         return None
     _, alias_map = load_reaction_catalog()
     return alias_map.get(label.strip().lower())
+
+
+__all__ = [
+    "format_reaction_id_display",
+    "load_reaction_catalog",
+    "list_reaction_type_ids",
+    "get_reaction_type",
+    "resolve_reaction_type",
+]

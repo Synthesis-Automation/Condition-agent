@@ -15,7 +15,7 @@ Usage:
     python app/reaction_types_analytics.py --search "suzuki"  # Search by name/alias
     python app/reaction_types_analytics.py --category c_c     # Filter by category
     python app/reaction_types_analytics.py --smarts           # Show only types with SMARTS
-    python app/reaction_types_analytics.py --id suzuki_miyaura # Show details for specific ID
+    python app/reaction_types_analytics.py --id Suzuki_miyaura # Show details for specific ID
 """
 
 import sys
@@ -48,6 +48,7 @@ try:
     from chemtools.taxonomy import reaction_catalog as _reaction_catalog
     DEFAULT_REACTION_TYPES_PATH = _reaction_catalog.REACTION_TYPES_FILE
 except Exception:
+    _reaction_catalog = None
     DEFAULT_REACTION_TYPES_PATH = (
         Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data" / "reaction_types.v4.0.json"
     )
@@ -129,8 +130,13 @@ def print_subsection(title: str, color=None):
 
 def format_reaction_type(rtype: Dict[str, Any], compact: bool = False) -> str:
     """Format reaction type information for display with colors."""
-    name = rtype.get('name', 'Unknown')
     rid = rtype.get('id', 'no-id')
+    if rtype.get('name'):
+        name = rtype.get('name')
+    elif _reaction_catalog is not None:
+        name = _reaction_catalog.format_reaction_id_display(rid)
+    else:
+        name = rid
     category = rtype.get('category', 'uncategorized')
     aliases = rtype.get('aliases', [])
     aliases_str = f" {Fore.LIGHTBLUE_EX}({', '.join(aliases[:2])}){Style.RESET_ALL}" if aliases else ""
@@ -280,9 +286,14 @@ def show_reactions_by_category(reaction_types: List[Dict[str, Any]], filter_cate
         category_display = category.replace('_', ' ').title()
         print_subsection(f"{category_display} ({len(reactions)} types)", Fore.LIGHTMAGENTA_EX)
         
-        for r in sorted(reactions, key=lambda x: x.get('name', '')):
-            name = r.get('name', 'Unknown')
+        for r in sorted(reactions, key=lambda x: x.get('name') or x.get('id', '')):
             rid = r.get('id', 'no-id')
+            if r.get('name'):
+                name = r.get('name')
+            elif _reaction_catalog is not None:
+                name = _reaction_catalog.format_reaction_id_display(rid)
+            else:
+                name = rid
             has_smarts = "Y" if r.get('smarts') else "N"
             smarts_color = Fore.GREEN if r.get('smarts') else Fore.RED
             aliases = r.get('aliases', [])
@@ -300,8 +311,13 @@ def show_smarts_coverage(reaction_types: List[Dict[str, Any]]):
     
     print_subsection(f"Reaction Types WITH SMARTS ({len(with_smarts)})", Fore.GREEN)
     for r in sorted(with_smarts, key=lambda x: x.get('category', '')):
-        name = r.get('name', 'Unknown')
         rid = r.get('id', 'no-id')
+        if r.get('name'):
+            name = r.get('name')
+        elif _reaction_catalog is not None:
+            name = _reaction_catalog.format_reaction_id_display(rid)
+        else:
+            name = rid
         category = r.get('category', 'uncategorized')
         smarts = r.get('smarts', '')
         # Truncate long SMARTS
@@ -315,7 +331,12 @@ def show_smarts_coverage(reaction_types: List[Dict[str, Any]]):
         cat = r.get('category', 'uncategorized')
         if cat not in by_cat:
             by_cat[cat] = []
-        by_cat[cat].append(r.get('name', 'Unknown'))
+        if r.get('name'):
+            by_cat[cat].append(r.get('name'))
+        elif _reaction_catalog is not None:
+            by_cat[cat].append(_reaction_catalog.format_reaction_id_display(r.get('id', 'Unknown')))
+        else:
+            by_cat[cat].append(r.get('id', 'Unknown'))
     
     for cat in sorted(by_cat.keys()):
         names = by_cat[cat]
@@ -338,7 +359,10 @@ def search_reaction_types(reaction_types: List[Dict[str, Any]], query: str):
             matches.append((r, 'id'))
             continue
         # Search in name
-        if query_lower in r.get('name', '').lower():
+        name_value = r.get('name')
+        if not name_value and _reaction_catalog is not None:
+            name_value = _reaction_catalog.format_reaction_id_display(r.get('id', ''))
+        if query_lower in (name_value or r.get('id', '')).lower():
             matches.append((r, 'name'))
             continue
         # Search in aliases
@@ -406,7 +430,10 @@ def export_summary(reaction_types: List[Dict[str, Any]], output_file: str):
             summary["by_category"][cat] = []
         summary["by_category"][cat].append({
             "id": r.get('id'),
-            "name": r.get('name'),
+            "name": (
+                r.get('name')
+                or (_reaction_catalog.format_reaction_id_display(r.get('id', '')) if _reaction_catalog is not None else r.get('id'))
+            ),
             "has_smarts": bool(r.get('smarts')),
             "aliases": r.get('aliases', [])
         })
@@ -434,7 +461,7 @@ Examples:
   python app/reaction_types_analytics.py --search suzuki     # Search by name
   python app/reaction_types_analytics.py --category c_c      # Filter by category
   python app/reaction_types_analytics.py --smarts            # Show SMARTS coverage
-  python app/reaction_types_analytics.py --id buchwald_hartwig_c_n  # Show details
+  python app/reaction_types_analytics.py --id C_N_Coupling  # Show details
   python app/reaction_types_analytics.py --export summary.json
         """
     )

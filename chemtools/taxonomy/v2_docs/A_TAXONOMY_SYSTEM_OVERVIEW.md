@@ -148,11 +148,11 @@ To determine what happened in a reaction, we use raw motif counts from reactants
   - Motif sets for reaction typing (8 essential sets, 72 members).
   - **Structure**: Each set has `set_id`, `name`, `description`, `members` (array of compound IDs), and `usage`.
   - **Active sets**: `sp2_electrophiles` (14), `organoboron` (8), `amines_nh` (22), `alcohols_oh` (12), `thiols_sh` (10), `terminal_alkynes` (2), `aryl_amines` (4), `aryl_ethers` (1).
-  - **Removed legacy sets**: organozinc, organotin, organomagnesium, organosilicon, carboxylic_acids, acyl_halides, terminal_alkenes, carbonyls, esters, amides, aromatic_halides, aromatic_activators, nitro_compounds, azides, hydrogenation_substrates, cross_coupling_products (unused).
+  - **Removed legacy sets**: organozinc, organotin, organomagnesium, organosilicon, carboxylic_acids, acyl_halides, terminal_alkenes, carbonyls, esters, amides, aromatic_halides, aromatic_activators, nitro_compounds, azides, Hydrogenation_substrates, cross_coupling_products (unused).
   - Examples: `@sp2_electrophiles` (includes `Ar-Cl`, `Alkenyl-Br`), `@organoboron` (includes `Ar-B(OH)2`, `Alkenyl-B(OH)2`).
 - `reaction_types.v4.0.json`
   - Canonical reaction types with motif-slot constraints and aliases.
-  - High-precision matching: `buchwald_hartwig` requires an electrophile slot AND a nucleophile slot to be occupied.
+- High-precision matching: `C_N_Coupling` requires an electrophile slot AND a nucleophile slot to be occupied.
 - `reagent_roles.v2.json`
   - Unified roles + families (v2). Roles define priorities/defaults; families define SMARTS detection.
   - **Structure**: Roles have `id`, `priority`, `default_family_id`, optional `description`. Families have `id`, `role_id`, `precedence`, optional `description`, `notes`, `detect` (SMARTS patterns), and optional `aliases`.
@@ -194,7 +194,7 @@ Notes
    - **Priority**: Aromatic scaffolds win over alkyl ones at the same attachment site.
    - **Site Filtering**: Controlled by `site_filter`. The "substituent" mode ensures each Nitrogen, Oxygen, or Carbon center gets exactly one classification.
 4. **Reaction Assignment**: Matches motif profiles against reaction type slot requirements.
-   - **Transformation Match**: Checks the net change in motifs (delta-Counter).
+   - **Transformation Match**: CHecks the net change in motifs (delta-Counter).
    - **Role Evidence**: Uses reagents (bases, ligands) as supporting evidence if available.
    - Engine: `chemtools/featurizers/reaction_detection.py`.
 
@@ -294,7 +294,7 @@ Evaluation snapshot (C-S coupling canonical dataset, `results/spectator_groups_e
 - Public outputs should align with `chemtools/contracts.py` and documented feature schemas.
 - Breaking changes require a schema version bump and an explicit changelog entry.
 
-## Extension workflow (quick checklist)
+## Extension workflow (quick cHecklist)
 
 ### Adding a new Chemical Motif
 

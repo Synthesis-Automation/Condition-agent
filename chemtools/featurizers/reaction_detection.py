@@ -303,12 +303,13 @@ def detect_reaction_types_from_smiles(
     # Priority map to break ties between overlapping definitions (e.g., Suzuki vs C-H Arylation)
     # Higher values come first.
     _PRIORITIES = {
-        "suzuki_miyaura": 100,
-        "buchwald_hartwig_cn": 100,
-        "buchwald_hartwig_co": 100,
-        "amide_formation": 100,
-        "c_h_arylation": 10,
-        "arylation_acidic_c_h": 10,
+        "Suzuki_miyaura": 100,
+        "C_N_Coupling": 100,
+        "C_O_Coupling": 100,
+        "C_S_Coupling": 100,
+        "Amide_formation": 100,
+        "C_H_arylation": 10,
+        "Arylation_acidic_C_H": 10,
     }
 
     matches.sort(
@@ -489,7 +490,7 @@ def _match_reaction_definition(
     if definition.reactants and not apply_requirements(definition.reactants, detected_motifs):
         return None
     
-    # Only check products if they were provided in the input
+    # Only cHeck products if they were provided in the input
     if definition.products and detected_products is not None:
         if not apply_requirements(definition.products, detected_products, slot_prefix="product:"):
             return None

@@ -23,12 +23,11 @@
         "Alkenyl-OTs"
       ],
       "usage": [
-        "suzuki_miyaura",
-        "buchwald_hartwig_cn",
-        "buchwald_hartwig_co",
-        "ullmann_co",
-        "ullmann_cs",
-        "sonogashira"
+        "Suzuki_miyaura",
+        "C_N_Coupling",
+        "C_O_Coupling",
+        "C_S_Coupling",
+        "Sonogashira"
       ]
     },
     "organoboron": {
@@ -45,8 +44,8 @@
         "Alkenyl-B(OR)2"
       ],
       "usage": [
-        "suzuki_miyaura",
-        "chan_lam_coupling"
+        "Suzuki_miyaura",
+        "Chan_lam_cn"
       ]
     },
     "amines_nh": {
@@ -77,9 +76,8 @@
         "AromN-H"
       ],
       "usage": [
-        "buchwald_hartwig_cn",
-        "chan_lam_coupling",
-        "ullmann_cn"
+        "C_N_Coupling",
+        "Chan_lam_cn"
       ]
     },
     "alcohols_oh": {
@@ -100,8 +98,7 @@
         "R3C-OH"
       ],
       "usage": [
-        "buchwald_hartwig_co",
-        "ullmann_co"
+        "C_O_Coupling"
       ]
     },
     "thiols_sh": {
@@ -120,7 +117,7 @@
         "R3C-SH"
       ],
       "usage": [
-        "ullmann_cs"
+        "C_S_Coupling"
       ]
     },
     "carboxylic_acids": {
@@ -136,9 +133,9 @@
         "RCH2-CO2H"
       ],
       "usage": [
-        "amide_formation",
-        "esterification",
-        "oxidation_alcohol"
+        "Amide_formation",
+        "Esterification",
+        "Oxidation_alcohol"
       ]
     },
     "amides": {
@@ -174,19 +171,19 @@
         "RCH2-CONR2"
       ],
       "usage": [
-        "amide_formation",
-        "acylation_amide"
+        "Amide_formation",
+        "Acylation_amide"
       ]
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
-      "description": "Terminal alkynes (C≡C-H) for Sonogashira coupling.",
+      "description": "Terminal alkynes (C\u2261C-H) for Sonogashira coupling.",
       "members": [
         "Ar-Alkynyl_terminal",
         "Alkyl-Alkynyl_terminal"
       ],
       "usage": [
-        "sonogashira"
+        "Sonogashira"
       ]
     },
     "aryl_amines": {
@@ -199,7 +196,7 @@
         "Ar-AromN"
       ],
       "usage": [
-        "buchwald_hartwig_cn"
+        "C_N_Coupling"
       ]
     },
     "aryl_ethers": {
@@ -209,7 +206,7 @@
         "Ar-Ar"
       ],
       "usage": [
-        "buchwald_hartwig_co"
+        "C_O_Coupling"
       ]
     }
   }
