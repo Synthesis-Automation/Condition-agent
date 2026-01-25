@@ -22120,7 +22120,7 @@ Methylphenylsulfoxide,,1193-82-4,CS(=O)C1=CC=CC=C1,C7H8OS,powder,,140.203,139,26
 Methylphosphonicbis(dimethylamide),,2511-17-3,CN(C)P(=O)(C)N(C)C,C5H15N2OP,liquid,1.024,150.159,230,,,,organic_compound,,,,,
 Methylphthalicanhydride,,4792-30-7,CC1=C2C(=CC=C1)C(=O)OC2=O,C9H6O3,powder,1.5,162.142,315.6,114,,,organic_compound,,,,,
 Methylpicolinate,,7/6/2459,COC(=O)C1=CC=CC=N1,C7H7NO2,liquid,1.2,137.14,227.4,18.7,,,organic_compound,,,,,
-Methylpiperidine,,109-05-7,C(CC(=O)O)CC(=O)O,C6H13N,liquid,0.9,99.174,118.8,-4,,,organic_compound,,,,,
+Methylpiperidine,2-Methylpiperidine,109-05-7,C(CC(=O)O)CC(=O)O,C6H13N,liquid,0.9,99.174,118.8,-4,,,organic_compound,,,base,secondary_amines_cyclic,
 Methylpiperidine-3-methanol,,7583-53-1,CN1CCCC(C1)CO,C7H15NO,liquid,1,129.2,142.5,,,,organic_compound,,,,,
 Methylpropiolate,,922-67-8,COC(=O)C#C,C4H4O2,liquid,1.1,84.073,104,,,,organic_compound,,,,,
 Methylpyrazine-2-carboxylate,,6164-79-0,COC(=O)C1=NC=CN=C1,C6H6N2O2,powder,1.3,138.124,220.4,57,,,organic_compound,,,,,
