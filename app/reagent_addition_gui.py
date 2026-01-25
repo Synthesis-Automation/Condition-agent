@@ -337,7 +337,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
                 self._show_error(f"Unexpected error: {exc}")
                 return
             self._populate_preview_table(result)
-            self.status_label.setText(f"Status: {result.get('status', 'ok')}")
+            self.status_label.setText(self._format_status(result, prefix="Saved"))
             self.save_button.setEnabled(False)
             return
 
@@ -352,7 +352,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
             return
 
         self._populate_preview_table(result)
-        self.status_label.setText(f"Status: {result.get('status', 'ok')}")
+        self.status_label.setText(self._format_status(result, prefix="Saved"))
         self.save_button.setEnabled(False)
 
     def _on_clear(self) -> None:
@@ -444,6 +444,18 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         desired = total_height + base
         if desired > self.height():
             self.resize(self.width(), desired)
+
+    def _format_status(self, result: Dict[str, Any], *, prefix: str = "Status") -> str:
+        status = result.get("status", "ok")
+        name = None
+        entry = result.get("entry_preview")
+        if isinstance(entry, dict):
+            name = entry.get("name")
+        if not name:
+            name = result.get("name")
+        if name:
+            return f"{prefix}: {name} ({status})"
+        return f"{prefix}: {status}"
 
     def _show_error(self, message: str) -> None:
         QtWidgets.QMessageBox.warning(self, "Reagent addition", message)

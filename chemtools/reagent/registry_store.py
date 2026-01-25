@@ -8,6 +8,7 @@ dependencies so it can be reused by backend services and LangChain tools.
 from __future__ import annotations
 
 import csv
+import io
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
@@ -432,42 +433,7 @@ class RegistryStore:
         except FileNotFoundError:
             entries = []
         if not entries:
-            def add_entry(role: str, family: str, definition: str, keywords: Sequence[str]) -> None:
-                role = _canonical_role(role)
-                entries.append({
-                    "role": role,
-                    "family": family,
-                    "label": definition,
-                    "definition": definition,
-                    "notes": "",
-                    "keywords": list(keywords),
-                    "required_props": {},
-                    "examples_pos": [],
-                })
-
-            for role, cfg in ROLE_CONFIG.items():
-                default_family = cfg.get("default_family") or f"{role}_general"
-                add_entry(role, default_family, f"Auto-generated family for {role}", [])
-
-            # Additional common ligand scaffolds for better suggestions.
-            add_entry(
-                "ligand",
-                "trialkyl_triaryl_phosphines",
-                "Auto family for phosphine ligands",
-                ["phosphine", "phosphorus", "pr3", "ph3"],
-            )
-            add_entry(
-                "ligand",
-                "bipyridine_ligands",
-                "Auto family for bipyridine ligands",
-                ["bipyridine", "bipy", "bpy", "diimine"],
-            )
-            add_entry(
-                "ligand",
-                "phenanthroline_ligands",
-                "Auto family for phenanthroline ligands",
-                ["phenanthroline", "phen", "phenanthroline"],
-            )
+            entries = []
         for entry in entries:
             role = entry.get("role")
             family = entry.get("family")
@@ -487,24 +453,40 @@ class RegistryStore:
         self.cas_index = {}
         if not self.registry_file.exists():
             return
-        with self.registry_file.open("r", encoding="utf-8", newline="") as handle:
+        rows: List[Dict[str, str]] = []
+        fieldnames: List[str] = []
+        for encoding in ("utf-8", "utf-8-sig", "latin-1"):
+            try:
+                with self.registry_file.open("r", encoding=encoding, newline="") as handle:
+                    reader = csv.DictReader(handle)
+                    fieldnames = list(reader.fieldnames or [])
+                    rows = [row for row in reader]
+                break
+            except UnicodeDecodeError:
+                continue
+        if not rows and not fieldnames:
+            text = self.registry_file.read_text(encoding="utf-8", errors="replace")
+            handle = io.StringIO(text, newline="")
             reader = csv.DictReader(handle)
-            header = [field for field in (reader.fieldnames or []) if field and field not in _LEGACY_FIELDS]
-            extras = [field for field in header if field not in DEFAULT_CSV_FIELDS]
-            self.csv_fields = list(DEFAULT_CSV_FIELDS) + extras
-            for row in reader:
-                entry = _row_to_entry(row)
-                self.entries.append(entry)
-                roles_payload = entry.get("roles") or {}
-                if isinstance(roles_payload, dict):
-                    for role in roles_payload.keys():
-                        if role:
-                            self.role_entries.setdefault(role, []).append(entry)
-                cas = entry.get("cas")
-                if cas:
-                    for role in roles_payload.keys():
-                        family_id, _tag = _role_payload_from_entry(entry, role)
-                        self.cas_index.setdefault(str(cas), []).append((role or "", family_id, entry))
+            fieldnames = list(reader.fieldnames or [])
+            rows = [row for row in reader]
+
+        header = [field for field in fieldnames if field and field not in _LEGACY_FIELDS]
+        extras = [field for field in header if field not in DEFAULT_CSV_FIELDS]
+        self.csv_fields = list(DEFAULT_CSV_FIELDS) + extras
+        for row in rows:
+            entry = _row_to_entry(row)
+            self.entries.append(entry)
+            roles_payload = entry.get("roles") or {}
+            if isinstance(roles_payload, dict):
+                for role in roles_payload.keys():
+                    if role:
+                        self.role_entries.setdefault(role, []).append(entry)
+            cas = entry.get("cas")
+            if cas:
+                for role in roles_payload.keys():
+                    family_id, _tag = _role_payload_from_entry(entry, role)
+                    self.cas_index.setdefault(str(cas), []).append((role or "", family_id, entry))
 
     def build_role_payload(self, role: str, family_id: str) -> Dict[str, Any]:
         role = _canonical_role(role)
@@ -565,10 +547,7 @@ class RegistryStore:
     def default_family(self, role: str) -> Optional[str]:
         role = _canonical_role(role)
         default = _role_default_family(role)
-        if default:
-            return default
-        cfg = ROLE_CONFIG.get(role)
-        return cfg.get("default_family") if cfg else None
+        return default
 
     def list_families(self) -> List[Dict[str, Any]]:
         items: List[Dict[str, Any]] = []

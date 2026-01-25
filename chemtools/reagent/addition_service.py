@@ -280,6 +280,11 @@ class ReagentAdditionService:
 
         identity["name"] = (name or resolved.get("name") or "").strip()
         if not identity["name"]:
+            if auto_resolve:
+                raise ReagentAdditionError(
+                    f"AI-assist could not auto-resolve a name for CAS {normalized_cas}. "
+                    "Provide a name or check the CAS/connection."
+                )
             raise ReagentAdditionError("AI-assist needs a name. Provide it or enable auto-resolve.")
         identity["smiles"] = (smiles or resolved.get("smiles") or "").strip() or None
         resolved_synonyms = resolved.get("synonyms") or []
