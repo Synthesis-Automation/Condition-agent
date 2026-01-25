@@ -25,7 +25,7 @@ Architecture:
     │
     ├── Data Operations (stateful, lazy-loaded through context)
     │   ├── precedent - Precedent reaction search
-    │   ├── recommend - ML-based condition recommendations
+    │   ├── recommend - HTE-based condition recommendations
     │   └── explain - Explanation generation
     │
     └── Advanced Operations (optional dependencies)
@@ -371,9 +371,9 @@ class PrecedentNamespace:
 
 
 class RecommendNamespace:
-    """Unified condition recommendations.
+    """HTE-backed condition recommendations.
 
-    Stateful operations that use the unified recommendation index.
+    Stateful operations that use the HTE recommender as the primary backend.
     """
     
     def __init__(self, context: 'ChemTools'):

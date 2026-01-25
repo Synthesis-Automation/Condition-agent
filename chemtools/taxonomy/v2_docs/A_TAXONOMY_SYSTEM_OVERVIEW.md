@@ -240,9 +240,7 @@ Notes
   - Heuristics: `chemtools/reagent/taxonomy_store.py`.
 - HTE recommender uses motif typing for reactant keying.
   - Engine: `chemtools/HTE/recommender.py`.
-- Unified recommendation index merges protocols, datasets, and HTE.
-  - Builder: `chemtools/recommend/index_builder.py`.
-  - Recommender: `chemtools/recommend/unified.py`.
+- Unified recommendation index (dataset + protocol + HTE) has been removed.
 
 ## Spectator ranking system (HTE recommender)
 
@@ -334,8 +332,7 @@ Add or update reagent families
 
 Build or refresh unified recommendation index
 
-1. Standardize datasets (see `data-processor/convert_hte_to_canonical.py`).
-2. Run `python data-processor/build_unified_recommendation_index.py`.
+- Removed. Use HTE recommender directly.
 
 ---
 

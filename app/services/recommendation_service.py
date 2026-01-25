@@ -1,8 +1,8 @@
 """
-Recommendation Service - unified condition recommendations.
+Recommendation Service - HTE condition recommendations.
 
 This service handles:
-- Unified dataset/protocol/HTE recommendations
+- HTE-based recommendations (primary backend)
 - Recommendation formatting and post-processing
 """
 
@@ -21,7 +21,7 @@ def recommend_conditions(req: RecommendConditionsRequest) -> Dict[str, Any]:
     """
     Get ML-based condition recommendations.
 
-    Returns a unified recommendation payload with DRFP + feature-tag matches.
+    Returns an HTE-backed recommendation payload.
     """
     if not req.reaction or not req.reaction.strip():
         raise ValidationError("Reaction SMILES cannot be empty")
@@ -40,7 +40,7 @@ def recommend_conditions(req: RecommendConditionsRequest) -> Dict[str, Any]:
 
 def recommend_from_reaction(req: RecommendFromReactionRequest) -> Dict[str, Any]:
     """
-    Get unified recommendations from a reaction.
+    Get HTE-backed recommendations from a reaction.
 
     Args:
         req: RecommendFromReactionRequest with reaction and parameters

@@ -38,7 +38,7 @@ Phase 0 â Current-State Recon
 - **Core APIs**: `chemtools.reagent.types`, `chemtools.reagent.lookup`, `chemtools.reagent.analytics`, `chemtools.reagent.validator` load taxonomy files directly.
 - **Recommendation stack**: `chemtools/recommend/modules/recommender.py`, `structured.py`, `utils.py`, `precedent` package rely on family strings and reactant tokens defined in the JSON.
 - **Router/detection**: `chemtools/router.py` and `chemtools/context.ChemTools.detect_family` reference alias strings and manually detect reactant categories (e.g., aryl halide).
-- **Protocol tooling**: `chemtools/protocol/*`, `data-processor/build_unified_recommendation_index.py`, `show_protocol_format.py` expect family IDs aligned with precedent datasets.
+- **Protocol tooling**: `chemtools/protocol/*`, `show_protocol_format.py` expect family IDs aligned with precedent datasets.
 - **CLI/UI**: `app/local_recommendation_cli.py`, `app/cross_family_recommendation_cli.py`, `app/web_recommendation_cli.py`, plus supporting docs, accept family override names that mirror the current taxonomy.
 - **LLM integrations**: `llmtools/agents.py`, `llmtools/prompts.py`, `llmtools/README.md` embed current family tokens (`Buchwald_CN`, `Suzuki`) in examples.
 - **Data-processing scripts**: `data-processor/HTE_data/*.py`, `generate_dataset_summary.py`, `show_protocol_format.py`, etc., parse or generate fields referencing the existing JSON structure.

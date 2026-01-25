@@ -1,22 +1,43 @@
 """
 Reaction condition recommendation package.
 
-The unified recommender combines reaction datasets, literature protocols,
-and HTE screens into a single DRFP + feature-tag similarity engine.
+Primary backend: chemtools.HTE (High-Throughput Experimentation).
 """
 
-from .unified import (
-    UnifiedRecommender,
-    RecommendationResult,
-    recommend_from_reaction,
-    recommend_conditions_structured,
-)
-from .index_builder import build_unified_recommendation_index
+from __future__ import annotations
+
+from typing import Any
+
+from .hte_adapter import recommend_from_reaction, recommend_conditions_structured
+
+_HTE_EXPORTS = {
+    "HTERecommender",
+    "HTERecommendationResult",
+    "ConditionRecommendation",
+    "format_recommendation",
+    "format_result",
+    "HTEAnalytics",
+}
+
+
+def __getattr__(name: str) -> Any:
+    if name in _HTE_EXPORTS:
+        from chemtools import HTE as _hte
+        return getattr(_hte, name)
+    raise AttributeError(f"module 'chemtools.recommend' has no attribute {name!r}")
+
+
+def __dir__() -> list[str]:
+    return sorted(list(globals().keys()) + list(_HTE_EXPORTS))
+
 
 __all__ = [
-    "UnifiedRecommender",
-    "RecommendationResult",
     "recommend_from_reaction",
     "recommend_conditions_structured",
-    "build_unified_recommendation_index",
+    "HTERecommender",
+    "HTERecommendationResult",
+    "ConditionRecommendation",
+    "format_recommendation",
+    "format_result",
+    "HTEAnalytics",
 ]
