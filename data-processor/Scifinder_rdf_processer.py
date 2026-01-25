@@ -1470,16 +1470,11 @@ class RDFWorker(QtCore.QObject):
         return combined_rdf_map
 
     def _generate_outputs(self, rows: List[Dict[str, Any]], rdf_map: Optional[Dict[str, Dict[str, Any]]] = None) -> None:
-        """Generate Markdown and CSV outputs using ReactionMarkdownGenerator"""
-        self._emit("Generating Markdown report...")
-        
+        """Generate CSV output using ReactionMarkdownGenerator."""
         generator = ReactionMarkdownGenerator()
-        
-        # Generate markdown report
         source_name = f"RDF_Folder_{os.path.basename(self.folder_path)}"
-        generator.generate_markdown_report(rows, self.output_md_path, source_name)
-        
-        # Generate CSV export
+
+        # Generate CSV export only (Markdown disabled)
         self._emit("Generating CSV export...")
         generator.generate_csv_export(rows, self.output_csv_path, source_name, rdf_map=rdf_map)
         
@@ -1592,7 +1587,6 @@ class RDFWorker(QtCore.QObject):
                     True,
                     (
                         f"Successfully processed {len(self.rdf_files)} RDF files with {len(rows)} reactions.\n\n"
-                        f"Markdown (records): {self.output_md_path}\n"
                         f"CSV (reaction dataset): {self.output_csv_path}"
                     ),
                 )
@@ -1612,8 +1606,6 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         # Input controls
         self.folder_edit = QtWidgets.QLineEdit()
         self.btn_folder = QtWidgets.QPushButton("Browse Folder...")
-        self.output_md_edit = QtWidgets.QLineEdit()
-        self.btn_output_md = QtWidgets.QPushButton("Save As...")
         
         # File list display
         self.file_list = QtWidgets.QListWidget()
@@ -1633,7 +1625,6 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         
         # Connect signals
         self.btn_folder.clicked.connect(self.pick_folder)
-        self.btn_output_md.clicked.connect(self.pick_output)
         self.btn_run.clicked.connect(self.run_processing)
         self.btn_quit.clicked.connect(self.close)
         
@@ -1668,17 +1659,11 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         form.addRow("RDF Folder:", folder_box)
         form.addRow("", folder_hint)
         
-        # Output file selection
-        output_box = QtWidgets.QHBoxLayout()
-        output_box.addWidget(self.output_md_edit)
-        output_box.addWidget(self.btn_output_md)
-        form.addRow("Output Markdown:", output_box)
-        
         # Add note about file locations
         note_label = QtWidgets.QLabel(
             "Note: All RDF files in folder and subfolders will be combined\n"
             "      CSV ->data/reaction_dataset/{category}.csv\n"
-            "      Markdown ->selected folder/{category}.md"
+            "      Markdown output is disabled"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
         form.addRow("", note_label)
@@ -1722,23 +1707,6 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             self.folder_edit.setText(path)
             self._update_file_list()
             
-            # Suggest default output file
-            if not self.output_md_edit.text().strip():
-                default_output = os.path.join(path, "rdf_reactions_rich.md")
-                self.output_md_edit.setText(default_output)
-
-    def pick_output(self):
-        """Select output markdown file location"""
-        path, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self,
-            "Save Markdown Report As",
-            os.getcwd(),
-            "Markdown files (*.md);;All files (*.*)"
-        )
-        if path:
-            if not path.lower().endswith('.md'):
-                path += '.md'
-            self.output_md_edit.setText(path)
 
     def _update_file_list(self):
         """Update the list of RDF files found in the selected folder and subfolders"""
@@ -1778,13 +1746,8 @@ class RDFProcessorWindow(QtWidgets.QWidget):
     def validate_inputs(self) -> Optional[str]:
         """Validate user inputs"""
         folder = self.folder_edit.text().strip()
-        output_md = self.output_md_edit.text().strip()
-        
         if not folder or not os.path.isdir(folder):
             return "Please select a valid folder containing RDF files."
-        
-        if not output_md:
-            return "Please specify an output Markdown file location."
         
         if not self.rdf_files:
             return "No RDF files found in the selected folder."
@@ -1835,14 +1798,8 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             final_name = _safe(category_name) or "dataset"
             output_csv = os.path.join(dataset_dir, final_name + ".csv")
             
-            # Markdown: Save to the selected folder (preserves subfolder structure)
-            output_md = os.path.join(norm_folder, final_name + ".md")
-            
-            try:
-                # Reflect the computed Markdown path back into the UI
-                self.output_md_edit.setText(output_md)
-            except Exception:
-                pass
+            # Markdown output disabled.
+            output_md = ""
         except Exception:
             # Fallback: use default paths
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1850,13 +1807,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             os.makedirs(dataset_dir, exist_ok=True)
             output_csv = os.path.join(dataset_dir, "dataset.csv")
             
-            # Markdown to original_dataset
-            original_dataset_dir = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "original_dataset"
-            )
-            os.makedirs(original_dataset_dir, exist_ok=True)
-            output_md = os.path.join(original_dataset_dir, "dataset.md")
+            output_md = ""
         
         # Create worker and thread
         self.worker = RDFWorker(
