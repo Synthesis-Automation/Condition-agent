@@ -108,6 +108,18 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
     features: list[dict[str, Any]] = []
     derived_shortcuts: list[dict[str, Any]] = []
 
+    def derive_compound_id(entry: dict[str, Any]) -> str:
+        compound_id = entry.get("id")
+        if compound_id:
+            return str(compound_id)
+        group_a = entry.get("A")
+        group_b = entry.get("B")
+        if not group_a or not group_b:
+            return ""
+        if isinstance(group_b, str) and group_b.startswith("-"):
+            return f"{group_a}{group_b}"
+        return f"{group_a}-{group_b}"
+
     def get_group_smarts(group_id: str) -> str:
         if group_id in groups:
             return groups[group_id].get("smarts") or ""
@@ -128,7 +140,7 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
         return ""
 
     for entry in compounds:
-        compound_id = entry.get("id") or ""
+        compound_id = derive_compound_id(entry)
         if not compound_id:
             continue
         compound_name = compound_id  # Name is same as ID (simplified system)

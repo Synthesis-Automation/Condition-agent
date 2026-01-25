@@ -325,13 +325,13 @@
       "smarts": "[O:2]C(=S)S[#6]",
       "description": "O-thiocarbonate substituent (-OCSSR)."
     },
-      {
-        "id": "-CO2H",
-        "kind": "substituent",
-        "priority": 2,
-        "smarts": "[C:2](=O)[OX2H]",
-        "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon."
-      },
+    {
+      "id": "-CO2H",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[C:2](=O)[OX2H]",
+      "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon."
+    },
     {
       "id": "-CO2R",
       "kind": "substituent",
@@ -490,11 +490,18 @@
       "description": "Any carbamate core (N-H or N-R); attach via nitrogen."
     },
     {
-      "id": "-N(R)COR",
+      "id": "-NHCOR",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[NX3;H1,H0:2][CX3](=O)[#6]",
-      "description": "Any amide core (N-H or N-R) attached via nitrogen."
+      "smarts": "[NX3;H1:2][CX3](=O)[#6]",
+      "description": "Amide N-H core (N-H) attached via nitrogen."
+    },
+    {
+      "id": "-NRCOR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3;H0:2][CX3](=O)[#6]",
+      "description": "Amide N-R core (N-alkyl/aryl) attached via nitrogen."
     },
     {
       "id": "-N(R)SO2R",

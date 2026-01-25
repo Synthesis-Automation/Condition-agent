@@ -804,8 +804,14 @@
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-N(R)COR",
-      "description": "N-Aryl amide (Ar-N(R)COR)."
+      "B": "-NHCOR",
+      "description": "N-Aryl amide (Ar-NHCOR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-NRCOR",
+      "description": "N-Aryl amide (Ar-NRCOR)."
     },
     {
       "template": "single_bond",
@@ -1332,8 +1338,14 @@
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-N(R)COR",
-      "description": "Alkyl amide (Alkyl-N(R)COR)."
+      "B": "-NHCOR",
+      "description": "Alkyl amide (Alkyl-NHCOR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-NRCOR",
+      "description": "Alkyl amide (Alkyl-NRCOR)."
     },
     {
       "template": "single_bond",
