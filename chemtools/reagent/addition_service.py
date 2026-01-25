@@ -283,8 +283,23 @@ class ReagentAdditionService:
             raise ReagentAdditionError("AI-assist needs a name. Provide it or enable auto-resolve.")
         identity["smiles"] = (smiles or resolved.get("smiles") or "").strip() or None
         resolved_synonyms = resolved.get("synonyms") or []
+        resolved_formula = resolved.get("molecular_formula")
+        resolved_mw = resolved.get("molecular_weight")
+        resolved_density = resolved.get("density")
+        resolved_bp = resolved.get("boiling_point")
+        resolved_mp = resolved.get("melting_point")
         provided_synonyms = dedupe_synonyms(list(synonyms or []))
         identity["synonyms"] = dedupe_synonyms([*provided_synonyms, *resolved_synonyms])
+        if resolved_formula:
+            identity["molecular_formula"] = resolved_formula
+        if resolved_mw is not None:
+            identity["molecular_weight"] = resolved_mw
+        if resolved_density:
+            identity["density"] = resolved_density
+        if resolved_bp:
+            identity["boiling_point"] = resolved_bp
+        if resolved_mp:
+            identity["melting_point"] = resolved_mp
 
         provider = (llm_provider or os.getenv("LLM_PROVIDER") or "openai").strip().lower()
         model = (llm_model or os.getenv("LLM_MODEL") or "").strip() or None
@@ -302,8 +317,11 @@ class ReagentAdditionService:
         if not llm_role:
             role_result = classify_role(identity, llm_client)
             if role_result.get("status") != "success":
-                raise ReagentAdditionError(role_result.get("error") or "AI role classification failed.")
-            llm_role = role_result.get("role")
+                llm_role = "other_reagent"
+            else:
+                llm_role = role_result.get("role")
+        if not llm_role:
+            llm_role = "other_reagent"
 
         llm_family = family_id
         if not llm_family:
@@ -317,6 +335,11 @@ class ReagentAdditionService:
             taxonomy_dir=self.taxonomy_dir,
             registry_dir=self.registry_dir,
             name=identity.get("name"),
+            formula=identity.get("molecular_formula"),
+            molecular_weight=identity.get("molecular_weight"),
+            density=identity.get("density"),
+            boiling_point=identity.get("boiling_point"),
+            melting_point=identity.get("melting_point"),
             synonyms=identity.get("synonyms"),
             abbreviation=abbreviation,
             tag=tag,

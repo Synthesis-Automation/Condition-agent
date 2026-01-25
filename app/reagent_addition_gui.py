@@ -66,7 +66,9 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         self.preview_table = QtWidgets.QTableWidget()
         self.preview_table.setColumnCount(2)
         self.preview_table.setHorizontalHeaderLabels(["Field", "Value"])
-        self.preview_table.horizontalHeader().setStretchLastSection(True)
+        header = self.preview_table.horizontalHeader()
+        header.setStretchLastSection(True)
+        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.preview_table.verticalHeader().setVisible(False)
         self.preview_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.preview_table.setEditTriggers(
