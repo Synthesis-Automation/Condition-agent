@@ -1,4 +1,5 @@
 import csv
+import json
 import html
 import math
 import os
@@ -274,8 +275,11 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         self.run_button = QtWidgets.QPushButton("Run Recommendation")
         self.clear_button = QtWidgets.QPushButton("Clear Results")
+        self.export_json_button = QtWidgets.QPushButton("Export JSON")
         self.run_button.setMinimumSize(160, 34)
         self.clear_button.setMinimumSize(140, 34)
+        self.export_json_button.setMinimumSize(140, 34)
+        self.export_json_button.setEnabled(False)
         self.run_button.setStyleSheet(
             "QPushButton {"
             " background-color: #2b6cb0;"
@@ -362,6 +366,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         button_row = QtWidgets.QHBoxLayout()
         button_row.addWidget(self.run_button)
         button_row.addWidget(self.clear_button)
+        button_row.addWidget(self.export_json_button)
         button_row.addStretch()
         layout.addLayout(button_row)
 
@@ -378,6 +383,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
     def _bind_signals(self) -> None:
         self.run_button.clicked.connect(self._run_recommendation)
         self.clear_button.clicked.connect(self._clear_results)
+        self.export_json_button.clicked.connect(self._export_json_output)
         self.db_path_edit.textChanged.connect(self._update_data_type)
 
     def _set_default_path(self) -> None:
@@ -436,6 +442,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._initialize_result_tabs()
         self.status.setText("")
         self._spectator_groups_summary = ""
+        self._all_json_output = None
+        self.export_json_button.setEnabled(False)
         self.run_button.setEnabled(True)
         self.run_button.setText("Run Recommendation")
         self.progress_bar.setVisible(False)
@@ -598,6 +606,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             )
         except Exception:
             self._all_json_output = None
+        self.export_json_button.setEnabled(bool(self._all_json_output))
         self.results_tabs.clear()
 
         self.table = self._create_results_table()
@@ -614,6 +623,24 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             self._populate_table(group_table, group_recs, group_columns)
             label = (source_group or "unknown").replace("_", " ").title()
             self.results_tabs.addTab(group_table, label)
+
+    def _export_json_output(self) -> None:
+        if not self._all_json_output:
+            QtWidgets.QMessageBox.information(self, "Export JSON", "Run a recommendation first.")
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Export JSON",
+            str(PROJECT_ROOT),
+            "JSON Files (*.json);;All Files (*)",
+        )
+        if not path:
+            return
+        try:
+            with open(path, "w", encoding="utf-8") as handle:
+                json.dump(self._all_json_output, handle, indent=2, ensure_ascii=False)
+        except Exception as exc:
+            QtWidgets.QMessageBox.critical(self, "Export JSON", f"Failed to save JSON: {exc}")
 
     def _show_reaction_image(self, reaction_smiles: str) -> None:
         if not reaction_smiles:
