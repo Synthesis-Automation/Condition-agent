@@ -47,6 +47,7 @@ dist/
 *.egg-info/
 *.egg
 
+
 # PyInstaller
 *.manifest
 *.spec
@@ -159,3 +160,5 @@ data-processor/dataset/*.zip
 data-processor/dataset/*.gz
 
 
+*.pkl
+results/hte_cache/2bc707642657f69c/hte_cache.pkl

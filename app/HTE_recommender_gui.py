@@ -597,8 +597,12 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             from chemtools.formatters import format_hte_output
             reaction_filter = self.reaction_filter_edit.text().strip() or None
             catalyst_filter = self.catalyst_filter_edit.text().strip() or None
+            literature_recs = list(source_map.get("literature") or [])
+            if not literature_recs:
+                literature_recs = list(recs)
             self._all_json_output = format_hte_output(
                 result,
+                recommendations=literature_recs,
                 reaction_smiles=reaction_smiles,
                 reaction_type_filter=reaction_filter,
                 catalyst_filter=catalyst_filter,
@@ -680,7 +684,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             if product:
-                info_label.setText("Reaction preview")
+                info_label.setText("")
                 output_path = temp_path / "reaction.png"
                 try:
                     render_reaction_image(reaction_smiles, output_path)

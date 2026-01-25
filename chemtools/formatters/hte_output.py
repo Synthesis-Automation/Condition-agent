@@ -93,6 +93,7 @@ def _append_add_step(steps: List[Dict[str, Any]], chemical: Dict[str, Any]) -> N
 def format_hte_output(
     result: Any,
     *,
+    recommendations: Optional[List[Any]] = None,
     reaction_smiles: Optional[str] = None,
     reaction_type_filter: Optional[str] = None,
     catalyst_filter: Optional[str] = None,
@@ -139,8 +140,8 @@ def format_hte_output(
     reactant_a_smiles = _clean_text(getattr(result, "reactant_a_smiles", None))
     reactant_b_smiles = _clean_text(getattr(result, "reactant_b_smiles", None))
 
-    recommendations = list(getattr(result, "recommendations", []) or [])
-    for index, rec in enumerate(recommendations, start=1):
+    recs = list(recommendations or (getattr(result, "recommendations", []) or []))
+    for index, rec in enumerate(recs, start=1):
         steps: List[Dict[str, Any]] = []
 
         if reactant_a_smiles:
