@@ -490,7 +490,7 @@ class RoleHeuristics:
         data = self.store.role_data.get(role)
         if data and data.get("default_family_id"):
             return data.get("default_family_id")
-        return DEFAULT_FAMILY_BY_ROLE.get(role)
+        return None
 
     def _manual_match(self, texts: Sequence[str]) -> Optional[Tuple[str, str, List[str]]]:
         """Check manual patterns for exact matches."""
