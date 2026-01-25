@@ -97,7 +97,6 @@ Potential modules to extend:
 
 - `chemtools/HTE/recommender.py` for multi-source retrieval and scoring.
 - `chemtools/featurizers/unified.py` for product-aware features.
-- `recommend/unified.py` for shared DRFP similarity or caching.
 
 ## Next Steps
 
