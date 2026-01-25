@@ -47,17 +47,27 @@
       "default_family_id": "hydrocarbons_aromatic"
     },
     {
-      "id": "other_reagent",
-      "priority": 9,
-      "default_family_id": "misc_general"
+      "id": "organo_catalyst",
+      "priority": 9
     },
     {
       "id": "enzyme",
-      "priority": 100
+      "priority": 10
     },
     {
-      "id": "organo_catalyst",
-      "priority": 100
+      "id": "organic_compound",
+      "priority": 21,
+      "default_family_id": "misc_general"
+    },
+    {
+      "id": "inorganic_compound",
+      "priority": 22,
+      "default_family_id": "misc_general"
+    },
+    {
+      "id": "other_reagent",
+      "priority": 100,
+      "default_family_id": "misc_general"
     }
   ],
   "families": [
@@ -66,9 +76,7 @@
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "beta diketiminates NacNac"
-      ]
+      "aliases": ["beta diketiminates NacNac"]
     },
     {
       "id": "bidentate_diphosphines",
@@ -93,18 +101,14 @@
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "bis imino pyridines PDI"
-      ]
+      "aliases": ["bis imino pyridines PDI"]
     },
     {
       "id": "bisoxazolines_box",
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "bisoxazolines BOX"
-      ]
+      "aliases": ["bisoxazolines BOX"]
     },
     {
       "id": "caac_carbenes",
@@ -123,9 +127,7 @@
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "dalphos PN"
-      ]
+      "aliases": ["dalphos PN"]
     },
     {
       "id": "dialkylbiaryl_phosphines",
@@ -180,9 +182,7 @@
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "phosphine pyridine PN"
-      ]
+      "aliases": ["phosphine pyridine PN"]
     },
     {
       "id": "phosphites",
@@ -207,27 +207,21 @@
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "pincers PNP PCP PNN CNN"
-      ]
+      "aliases": ["pincers PNP PCP PNN CNN"]
     },
     {
       "id": "pyridine_oxazolines_pyox",
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "pyridine oxazolines PyOx"
-      ]
+      "aliases": ["pyridine oxazolines PyOx"]
     },
     {
       "id": "quinolinol_no_chelates",
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "quinolinol NO chelates"
-      ]
+      "aliases": ["quinolinol NO chelates"]
     },
     {
       "id": "salen_salophen",
@@ -270,9 +264,7 @@
       "role_id": "ligand",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "tris 2pyridylmethyl amine TPMA"
-      ]
+      "aliases": ["tris 2pyridylmethyl amine TPMA"]
     },
     {
       "id": "water_soluble_phosphines",
@@ -285,18 +277,14 @@
       "role_id": "metal_catalyst",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "Ni metal"
-      ]
+      "aliases": ["Ni metal"]
     },
     {
       "id": "ni_salt",
       "role_id": "metal_catalyst",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "Ni salt"
-      ]
+      "aliases": ["Ni salt"]
     },
     {
       "id": "co_beta_diketonates",
@@ -537,72 +525,56 @@
       "role_id": "acid",
       "precedence": 50,
       "description": "Acidic clays and zeolites (K‑10, H‑Beta, H‑ZSM‑5)",
-      "aliases": [
-        "Acidic clays and zeolites (K‑10, H‑Beta, H‑ZSM‑5)"
-      ]
+      "aliases": ["Acidic clays and zeolites (K‑10, H‑Beta, H‑ZSM‑5)"]
     },
     {
       "id": "aluminum_halides",
       "role_id": "acid",
       "precedence": 50,
       "description": "Aluminum halides (CAS: 12138-52-0, 7727-15-3)",
-      "aliases": [
-        "Aluminum halides"
-      ]
+      "aliases": ["Aluminum halides"]
     },
     {
       "id": "fluorinated_alcohol_media",
       "role_id": "acid",
       "precedence": 50,
       "description": "Fluorinated alcohol media (HFIP/TFE) (CAS: 75-89-8, 920-66-1)",
-      "aliases": [
-        "Fluorinated alcohol media (HFIP/TFE)"
-      ]
+      "aliases": ["Fluorinated alcohol media (HFIP/TFE)"]
     },
     {
       "id": "hydrogen_halide_donors",
       "role_id": "acid",
       "precedence": 50,
       "description": "Hydrogen halide donors (HCl/dioxane, HBr/AcOH)",
-      "aliases": [
-        "Hydrogen halide donors (HCl/dioxane, HBr/AcOH)"
-      ]
+      "aliases": ["Hydrogen halide donors (HCl/dioxane, HBr/AcOH)"]
     },
     {
       "id": "magic_acid_systems",
       "role_id": "acid",
       "precedence": 50,
       "description": "Magic-acid systems (HSO3F/SbF5 mixtures)",
-      "aliases": [
-        "Magic-acid systems (HSO3F/SbF5 mixtures)"
-      ]
+      "aliases": ["Magic-acid systems (HSO3F/SbF5 mixtures)"]
     },
     {
       "id": "perfluorosulfonimide_acids",
       "role_id": "acid",
       "precedence": 50,
       "description": "Perfluorosulfonimide acids (e.g., HNTf2) (CAS: 82113-65-3)",
-      "aliases": [
-        "Perfluorosulfonimide acids (e.g., HNTf2)"
-      ]
+      "aliases": ["Perfluorosulfonimide acids (e.g., HNTf2)"]
     },
     {
       "id": "polyphosphoric_acids",
       "role_id": "acid",
       "precedence": 50,
       "description": "Polyphosphoric/Eaton’s reagents",
-      "aliases": [
-        "Polyphosphoric/Eaton’s reagents"
-      ]
+      "aliases": ["Polyphosphoric/Eaton’s reagents"]
     },
     {
       "id": "pyridinium_acids",
       "role_id": "acid",
       "precedence": 50,
       "description": "Pyridinium salts (e.g., PPTS) (CAS: 24057-28-1)",
-      "aliases": [
-        "Pyridinium salts (e.g., PPTS)"
-      ]
+      "aliases": ["Pyridinium salts (e.g., PPTS)"]
     },
     {
       "id": "rare_earth_triflates",
@@ -618,54 +590,42 @@
       "role_id": "acid",
       "precedence": 50,
       "description": "Silyl triflates (TMSOTf/TBSOTf/TIPSOTf) (CAS: 25561-30-2, 27607-77-8)",
-      "aliases": [
-        "Silyl triflates (TMSOTf/TBSOTf/TIPSOTf)"
-      ]
+      "aliases": ["Silyl triflates (TMSOTf/TBSOTf/TIPSOTf)"]
     },
     {
       "id": "solid_acid_resins",
       "role_id": "acid",
       "precedence": 50,
       "description": "Solid acid resins and perfluorinated polymers",
-      "aliases": [
-        "Solid acid resins and perfluorinated polymers"
-      ]
+      "aliases": ["Solid acid resins and perfluorinated polymers"]
     },
     {
       "id": "superacids",
       "role_id": "acid",
       "precedence": 50,
       "description": "Superacids (non‑nucleophilic acids) (CAS: 1493-13-6, 7789-21-1)",
-      "aliases": [
-        "Superacids (non‑nucleophilic acids)"
-      ]
+      "aliases": ["Superacids (non‑nucleophilic acids)"]
     },
     {
       "id": "tin_halides",
       "role_id": "acid",
       "precedence": 50,
       "description": "Tin halides (CAS: 7646-78-8)",
-      "aliases": [
-        "Tin halides"
-      ]
+      "aliases": ["Tin halides"]
     },
     {
       "id": "titanium_halides",
       "role_id": "acid",
       "precedence": 50,
       "description": "Titanium halides (CAS: 7550-45-0)",
-      "aliases": [
-        "Titanium halides"
-      ]
+      "aliases": ["Titanium halides"]
     },
     {
       "id": "zinc_iron_halides",
       "role_id": "acid",
       "precedence": 50,
       "description": "Zinc/iron halides (CAS: 7646-85-7, 7705-08-0)",
-      "aliases": [
-        "Zinc/iron halides"
-      ]
+      "aliases": ["Zinc/iron halides"]
     },
     {
       "id": "halogenated_carboxylic_acids",
@@ -674,15 +634,11 @@
       "description": "Halogenated carboxylic acids (TFA/TCA) (CAS: 76-03-9, 76-05-1)",
       "detect": {
         "smarts": {
-          "any": [
-            "C(=O)O"
-          ],
+          "any": ["C(=O)O"],
           "none": []
         }
       },
-      "aliases": [
-        "Halogenated carboxylic acids (TFA/TCA)"
-      ]
+      "aliases": ["Halogenated carboxylic acids (TFA/TCA)"]
     },
     {
       "id": "simple_carboxylic_acids",
@@ -691,15 +647,11 @@
       "description": "Simple carboxylic acids (AcOH/PivOH/Benzoic acid) (CAS: 64-19-7, 75-98-9, 98-98-6)",
       "detect": {
         "smarts": {
-          "any": [
-            "C(=O)O"
-          ],
+          "any": ["C(=O)O"],
           "none": []
         }
       },
-      "aliases": [
-        "Simple carboxylic acids (AcOH/PivOH/Benzoic acid)"
-      ]
+      "aliases": ["Simple carboxylic acids (AcOH/PivOH/Benzoic acid)"]
     },
     {
       "id": "boron_lewis_acids",
@@ -707,9 +659,7 @@
       "precedence": 75,
       "description": "Boron Lewis acids",
       "notes": "Lewis acids often metal halides; handled by name + metal. CAS: 109-63-7, 1109-15-5",
-      "aliases": [
-        "Boron Lewis acids"
-      ]
+      "aliases": ["Boron Lewis acids"]
     },
     {
       "id": "sulfonic_acids",
@@ -718,15 +668,11 @@
       "description": "Aryl/alkyl sulfonic acids (p‑TsOH/MsOH) (CAS: 104-15-4, 6192-52-5, 75-75-2)",
       "detect": {
         "smarts": {
-          "any": [
-            "S(=O)(=O)O"
-          ],
+          "any": ["S(=O)(=O)O"],
           "none": []
         }
       },
-      "aliases": [
-        "Aryl/alkyl sulfonic acids (p‑TsOH/MsOH)"
-      ]
+      "aliases": ["Aryl/alkyl sulfonic acids (p‑TsOH/MsOH)"]
     },
     {
       "id": "mineral_acids",
@@ -734,9 +680,7 @@
       "precedence": 85,
       "description": "Mineral acids (H2SO4/HCl/H3PO4)",
       "notes": "HX, H2SO4, H3PO4; rely on name and formula. CAS: 590-29-4, 7647-01-0, 7664-38-2, 7664-93-9",
-      "aliases": [
-        "Mineral acids (H2SO4/HCl/H3PO4)"
-      ]
+      "aliases": ["Mineral acids (H2SO4/HCl/H3PO4)"]
     },
     {
       "id": "activated_esters_isolable",
@@ -899,9 +843,7 @@
       "role_id": "additive",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "Al salt"
-      ]
+      "aliases": ["Al salt"]
     },
     {
       "id": "amide_coupling_additives",
@@ -974,9 +916,7 @@
       "role_id": "solvent",
       "precedence": 100,
       "description": "",
-      "aliases": [
-        "Sulfolane"
-      ]
+      "aliases": ["Sulfolane"]
     },
     {
       "id": "alcohols_primary",

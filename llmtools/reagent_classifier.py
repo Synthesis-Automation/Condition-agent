@@ -29,23 +29,15 @@ from llmtools.prompts import (
 from llmtools.reagent_review import _strip_markdown_fences
 
 from chemtools.reagent import RegistryStore, load_families_registry_entries
+from chemtools.reagent.reagent_v2 import ReagentTaxonomyV2
 
 
-# Valid roles - must match ROLE_CONFIG in reagent_taxonomy_qt.py
-VALID_ROLES = {
-    "ligand",
-    "metal_catalyst",
-    "base",
-    "acid",
-    "condensation_agent",
-    "oxidant",
-    "reductant",
-    "additive",
-    "solvent",
-    "organo_catalyst",
-    "enzyme",
-    "other_reagent",
-}
+def _load_valid_roles() -> set[str]:
+    taxonomy = ReagentTaxonomyV2.from_path()
+    return set(taxonomy.roles.keys())
+
+
+VALID_ROLES = _load_valid_roles()
 
 
 def classify_role(

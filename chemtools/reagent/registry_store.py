@@ -16,7 +16,8 @@ import re
 
 from .taxonomy_store import ROLE_KEYWORDS_RAW, load_families_registry_entries
 from .taxonomy_utils import tokenize_all
-from .constants import DEFAULT_FAMILY_BY_ROLE, ROLE_ALIASES, ROLE_PRIORITY
+from .constants import ROLE_ALIASES
+from .reagent_v2 import ReagentTaxonomyV2
 
 
 
@@ -25,24 +26,35 @@ def _canonical_role(role: str) -> str:
     return ROLE_ALIASES.get(role, role)
 
 
-# -----------------------------------------------------------------------------
-# Role configuration for flattened registry schema
-# -----------------------------------------------------------------------------
+_ROLE_PRIORITY_CACHE: Optional[Dict[str, int]] = None
+_ROLE_DEFAULT_FAMILY_CACHE: Optional[Dict[str, Optional[str]]] = None
 
-ROLE_CONFIG: Dict[str, Dict[str, Any]] = {
-    "ligand": {"default_family": "trialkyl_triaryl_phosphines"},
-    "metal_catalyst": {"default_family": "pd_ii_salts"},
-    "base": {"default_family": "tertiary_amines_aliphatic"},
-    "acid": {"default_family": "mineral_acids"},
-    "additive": {"default_family": "quaternary_ammonium_ptc"},
-    "condensation_agent": {"default_family": "carbodiimides"},
-    "oxidant": {"default_family": "o2_gas"},
-    "reductant": {"default_family": "metal_powders"},
-    "solvent": {"default_family": "hydrocarbons_aromatic"},
-    "other_reagent": {"default_family": "misc_general"},
-    "enzyme": {"default_family": None},
-    "organo_catalyst": {"default_family": None},
-}
+
+def _load_role_metadata() -> Tuple[Dict[str, int], Dict[str, Optional[str]]]:
+    priorities: Dict[str, int] = {}
+    defaults: Dict[str, Optional[str]] = {}
+    try:
+        taxonomy = ReagentTaxonomyV2.from_path()
+    except Exception:
+        return priorities, defaults
+    for role in taxonomy.roles.values():
+        priorities[role.id] = int(role.priority)
+        defaults[role.id] = role.default_family_id
+    return priorities, defaults
+
+
+def _role_priority(role: str) -> int:
+    global _ROLE_PRIORITY_CACHE, _ROLE_DEFAULT_FAMILY_CACHE
+    if _ROLE_PRIORITY_CACHE is None or _ROLE_DEFAULT_FAMILY_CACHE is None:
+        _ROLE_PRIORITY_CACHE, _ROLE_DEFAULT_FAMILY_CACHE = _load_role_metadata()
+    return (_ROLE_PRIORITY_CACHE or {}).get(role, 99)
+
+
+def _role_default_family(role: str) -> Optional[str]:
+    global _ROLE_PRIORITY_CACHE, _ROLE_DEFAULT_FAMILY_CACHE
+    if _ROLE_PRIORITY_CACHE is None or _ROLE_DEFAULT_FAMILY_CACHE is None:
+        _ROLE_PRIORITY_CACHE, _ROLE_DEFAULT_FAMILY_CACHE = _load_role_metadata()
+    return (_ROLE_DEFAULT_FAMILY_CACHE or {}).get(role)
 
 DEFAULT_CSV_FIELDS = (
     "name",
@@ -268,7 +280,7 @@ def _entry_to_csv_row(entry: Dict[str, Any], role: Optional[str] = None) -> Dict
         roles.insert(0, role)
 
     if len(roles) > 2:
-        roles.sort(key=lambda key: (0 if key == primary else 1, ROLE_PRIORITY.get(key, 99), key))
+        roles.sort(key=lambda key: (0 if key == primary else 1, _role_priority(key), key))
     role_1 = roles[0] if roles else ""
     role_2 = roles[1] if len(roles) > 1 else ""
     family_1, tag_1 = _role_payload_from_entry(entry, role_1) if role_1 else ("", "")
@@ -526,9 +538,6 @@ class RegistryStore:
 
     # ------------------------------------------------------------------ queries
     def file_for_role(self, role: str) -> Path:
-        role = _canonical_role(role)
-        if role and role not in ROLE_CONFIG:
-            raise KeyError(f"Unknown or unsupported role '{role}'.")
         return self.registry_file
 
     def role_for_family(self, family_id: str) -> Optional[str]:
@@ -555,8 +564,11 @@ class RegistryStore:
 
     def default_family(self, role: str) -> Optional[str]:
         role = _canonical_role(role)
+        default = _role_default_family(role)
+        if default:
+            return default
         cfg = ROLE_CONFIG.get(role)
-        return cfg.get("default_family") if cfg else DEFAULT_FAMILY_BY_ROLE.get(role)
+        return cfg.get("default_family") if cfg else None
 
     def list_families(self) -> List[Dict[str, Any]]:
         items: List[Dict[str, Any]] = []
@@ -668,9 +680,6 @@ class RegistryStore:
         return path
 
     def save_role(self, role: str) -> Path:
-        role = _canonical_role(role)
-        if role and role not in ROLE_CONFIG:
-            raise KeyError(f"Unknown or unsupported role '{role}'.")
         return self.save_registry()
 
     def entry_to_csv_row(self, entry: Dict[str, Any], role: Optional[str] = None) -> Dict[str, str]:

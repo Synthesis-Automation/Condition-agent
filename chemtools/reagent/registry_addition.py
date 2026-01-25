@@ -352,6 +352,8 @@ def add_reagent_entry(
         mp_val = _coerce_temperature_float(melting_point or resolved_mp)
         bp_val = _coerce_temperature_float(boiling_point or resolved_bp)
         properties["type"] = _guess_reagent_type(mp_val, bp_val)
+    properties.setdefault("volatile", "0")
+    properties.setdefault("viscose", "0")
     if properties:
         entry["properties"] = properties
 
