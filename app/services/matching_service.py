@@ -159,16 +159,4 @@ def detect_reaction_type(req: DetectTypeRequest) -> Dict[str, Any]:
     return response
 
 
-def is_rxn_insight_available() -> bool:
-    """
-    Check if ML detection is available.
-    
-    Note: This is a legacy function. The new detect_reaction() API
-    automatically handles ML availability internally.
-    """
-    try:
-        from chemtools._ml_helpers import is_available
-        return is_available()
-    except ImportError:
-        return False
 

@@ -8,7 +8,8 @@ This service handles:
 
 from typing import Dict, Any, Optional
 import time
-from chemtools import chem, output_formatter
+from chemtools import chem
+from chemtools.formatters import ensure_standard_output
 from chemtools.contracts import (
     RecommendConditionsRequest,
     RecommendFromReactionRequest,
@@ -86,7 +87,7 @@ def recommend_from_reaction(req: RecommendFromReactionRequest) -> Dict[str, Any]
     formatted_source = raw_result.get("formatted") or raw_result
     
     # Ensure standard output format
-    standard = output_formatter.ensure_standard_output(
+    standard = ensure_standard_output(
         formatted_source,
         default_model="ML-precedent-knn",
         fallback_reaction_smiles=req.reaction,
