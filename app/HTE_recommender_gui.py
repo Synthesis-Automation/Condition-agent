@@ -172,16 +172,12 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
         ("Condensation Agent", "coupling_reagent"),
         ("Spectator Groups", "spectator_groups"),
     ]
-    if data_type == "rules":
-        return base + [("Reaction ID", "reaction_id")]
-    reaction_label = "Reaction ID" if data_type == "literature" else "Reaction Type"
     columns = base + [
-        (reaction_label, "reaction_type"),
+        ("Reaction Type", "reaction_type"),
+        ("Reaction ID", "reaction_id"),
         ("Reactant Types", "reactant_types"),
         ("Match Score", "match_score"),
     ]
-    if data_type != "literature":
-        columns.insert(len(base) + 2, ("Reaction ID", "reaction_id"))
     return columns
 
 
@@ -459,6 +455,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "Invalid path", "The data path does not exist.")
             return
 
+        self._show_reaction_image(reaction_smiles)
         self.summary.clear()
         self.status.setText("Working...")
         self.run_button.setEnabled(False)
@@ -536,6 +533,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
     def _render_result(self, result: object, stats: Dict[str, Any]) -> None:
         data_type = _detect_csv_type(Path(self.db_path_edit.text().strip()))
+        reaction_smiles = self.reaction_smiles_edit.text().strip()
+
         reactant_a = getattr(result, "reactant_a_smiles", "")
         reactant_b = getattr(result, "reactant_b_smiles", "") or "None"
         product = getattr(result, "product_smiles", "") or "None"
@@ -551,7 +550,6 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             detected_label = ", ".join([item for item in detected if item])
         matches = getattr(result, "total_matching_experiments", 0)
         coverage = getattr(result, "database_coverage", 0.0)
-        reaction_smiles = self.reaction_smiles_edit.text().strip()
         spectator_summary = _format_nearby_groups(
             _collect_reaction_spectator_groups(reaction_smiles)
         )
@@ -577,7 +575,6 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             stats_line = " | ".join(f"{key}: {stats[key]}" for key in sorted(stats))
             summary_lines.append(html.escape(f"Stats: {stats_line}"))
         self.summary.setHtml("<br>".join(summary_lines))
-        self._show_reaction_image(self.reaction_smiles_edit.text().strip())
 
         recs = list(getattr(result, "recommendations", []) or [])
         source_map = getattr(result, "recommendations_by_source", {}) or {}

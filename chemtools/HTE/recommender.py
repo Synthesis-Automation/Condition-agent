@@ -120,6 +120,8 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
     }
 
     df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
+    if "Source_Row" not in df.columns:
+        df["Source_Row"] = list(range(len(df)))
     if "Reaction_Type_Standardized" not in df.columns and "reaction_id" in df.columns:
         df = df.rename(columns={"reaction_id": "Reaction_Type_Standardized"})
 
@@ -135,7 +137,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Catalyst", "Ligand", "Base", "Solvent", "Additive",
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
         "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category",
-        "Source_File", "Source_Group", "spectator_groups",
+        "Source_File", "Source_Group", "Source_Row", "spectator_groups",
     ]
     for col in required_cols:
         if col not in df.columns:
@@ -339,6 +341,51 @@ def _format_reaction_id(reaction_type: Optional[str], reaction_category: Optiona
     if type_text:
         return type_text
     return _clean_reaction_label(reaction_category)
+
+
+def _format_source_reaction_ids(
+    group_df: pd.DataFrame,
+    *,
+    max_items: int = 5,
+) -> str:
+    if group_df is None or group_df.empty:
+        return ""
+
+    ids: List[str] = []
+    if "Source_File" in group_df.columns:
+        source_files = group_df["Source_File"].fillna("").astype(str).str.strip()
+    else:
+        source_files = pd.Series([""] * len(group_df), index=group_df.index)
+    if "Source_Row" in group_df.columns:
+        source_rows = group_df["Source_Row"]
+    else:
+        source_rows = pd.Series([None] * len(group_df), index=group_df.index)
+
+    for file_val, row_val in zip(source_files, source_rows):
+        file_text = str(file_val).strip()
+        if not file_text:
+            continue
+        file_name = Path(file_text).name if file_text else ""
+        row_text = ""
+        if row_val is not None and not (isinstance(row_val, float) and pd.isna(row_val)):
+            try:
+                row_text = str(int(row_val))
+            except (TypeError, ValueError):
+                row_text = str(row_val).strip()
+        if row_text:
+            ids.append(f"{file_name}:{row_text}")
+        else:
+            ids.append(file_name or file_text)
+
+    ids = _dedupe_list(ids)
+    if not ids and "reaction_id" in group_df.columns:
+        fallback = group_df["reaction_id"].fillna("").astype(str).str.strip()
+        ids = _dedupe_list([value for value in fallback if value])
+    if not ids:
+        return ""
+    if max_items > 0 and len(ids) > max_items:
+        return ", ".join(ids[:max_items]) + f" (+{len(ids) - max_items} more)"
+    return ", ".join(ids)
 
 
 def _reactant_key(values: Iterable[Optional[str]]) -> str:
@@ -1619,7 +1666,7 @@ class HTERecommender:
                 category_series = category_series[category_series != ""]
                 if not category_series.empty:
                     reaction_category = category_series.mode().iloc[0]
-            reaction_id = _format_reaction_id(reaction_type, reaction_category)
+            reaction_id = _format_source_reaction_ids(group_df)
             
             # Reactant types (from first row)
             reactant_types = (
