@@ -910,7 +910,7 @@ def hte_recommend_conditions(
 ) -> Dict[str, Any]:
     """Recommend conditions from the HTE database."""
     try:
-        from chemtools.HTE import HTERecommender
+        from chemtools.recommend import HTERecommender
 
         reactant_a, reactant_b, product = _resolve_hte_inputs(
             reaction_smiles,
@@ -976,7 +976,7 @@ def hte_dataset_summary(
 ) -> Dict[str, Any]:
     """Summarize top conditions from a filtered HTE dataset slice."""
     try:
-        from chemtools.HTE import HTERecommender
+        from chemtools.recommend import HTERecommender
 
         recommender = HTERecommender(hte_db_path or "data/HTE_db")
         payload = recommender.summarize_conditions(
@@ -996,7 +996,7 @@ def hte_dataset_summary(
 def hte_database_stats(hte_db_path: Optional[str] = None) -> Dict[str, Any]:
     """Return summary statistics for the HTE database."""
     try:
-        from chemtools.HTE import HTERecommender
+        from chemtools.recommend import HTERecommender
 
         recommender = HTERecommender(hte_db_path or "data/HTE_db")
         stats = recommender.get_statistics()

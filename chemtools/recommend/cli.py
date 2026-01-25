@@ -10,7 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from chemtools.HTE import HTERecommender, format_result
+from .recommender import HTERecommender, format_result
 
 
 def main():
@@ -20,19 +20,19 @@ def main():
         epilog="""
 Examples:
   # C-N Coupling
-  python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" -k 5
+  python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" -k 5
   
   # Suzuki Coupling with palladium catalysts only
-  python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki --catalyst Pd
+  python -m chemtools.recommend.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki --catalyst Pd
   
   # C-N Coupling with copper catalysts only
-  python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --catalyst copper
+  python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --catalyst copper
   
   # Single reactant
-  python -m chemtools.HTE.cli -a "c1ccc(Br)cc1"
+  python -m chemtools.recommend.cli -a "c1ccc(Br)cc1"
   
   # Batch processing from file
-  python -m chemtools.HTE.cli --batch queries.txt --output results.txt
+  python -m chemtools.recommend.cli --batch queries.txt --output results.txt
         """
     )
     

@@ -73,7 +73,7 @@ Returns HTE database summary stats.
 1) Backend wiring
    - Add new FastAPI routes in `app/main.py` (or a dedicated router module).
    - Create Pydantic schemas for request/response payloads.
-   - Reuse `chemtools.HTE.HTERecommender` for recommendation logic.
+   - Reuse `chemtools.recommend.HTERecommender` for recommendation logic.
    - Normalize results to JSON (consistent with GUI fields).
 
 2) Reaction image support

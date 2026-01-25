@@ -13,7 +13,7 @@ The HTE (High-Throughput Experimentation) module provides condition recommendati
 ## Architecture
 
 ```
-chemtools/HTE/
+chemtools/recommend/
 ├── __init__.py          # Package exports
 └── recommender.py       # Core recommendation engine
 
@@ -58,8 +58,8 @@ result_b = classify_reactant_smiles("CCN")  # RNH2 (RNH2/R2NH)
 
 On initialization, the recommender builds indices:
 
-- **By reactant type combination**: `(ArBr, RNH2)` → DataFrame subset
-- **Reaction type patterns**: `(ArBr, RNH2)` → `{C_N_Coupling: 1080, ...}`
+- **By reactant type combination**: `(ArBr, RNH2)` �?DataFrame subset
+- **Reaction type patterns**: `(ArBr, RNH2)` �?`{C_N_Coupling: 1080, ...}`
 
 This enables O(1) lookup by reactant types.
 
@@ -89,7 +89,7 @@ Conditions ranked by confidence score (descending), return top-k.
 ### Basic Usage
 
 ```python
-from chemtools.HTE import HTERecommender, format_result
+from chemtools.recommend import HTERecommender, format_result
 
 # Initialize (loads database, builds indices)
 recommender = HTERecommender()
@@ -305,8 +305,8 @@ class ConditionRecommendation:
 ## Limitations & Considerations
 
 1. **Reactant Type Dependency**: Recommendations only as good as type detection
-   - If reactant type not detected → no recommendations
-   - Rare type combinations → limited data
+   - If reactant type not detected �?no recommendations
+   - Rare type combinations �?limited data
 
 2. **No Reaction SMILES**: Cannot account for:
    - Substrate-specific effects (steric hindrance, electronics)
@@ -327,7 +327,7 @@ class ConditionRecommendation:
 
 ### CLI Integration
 
-Create `chemtools/HTE/cli.py` for command-line access (see Implementation section).
+Create `chemtools/recommend/cli.py` for command-line access (see Implementation section).
 
 ## Testing
 
@@ -337,7 +337,7 @@ python demo_hte_recommender.py
 
 # Test specific cases
 python -c "
-from chemtools.HTE import HTERecommender
+from chemtools.recommend import HTERecommender
 rec = HTERecommender()
 result = rec.recommend('c1ccc(Br)cc1', 'CCN', top_k=3)
 print(f'Found {len(result.recommendations)} recommendations')

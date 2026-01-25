@@ -15,10 +15,10 @@ The HTE Analytics module provides tools to:
 
 ## Installation
 
-The analytics tools are part of the `chemtools.HTE` module:
+The analytics tools are part of the `chemtools.recommend` module:
 
 ```python
-from chemtools.HTE import HTEAnalytics
+from chemtools.recommend import HTEAnalytics
 
 analytics = HTEAnalytics()
 ```
@@ -28,7 +28,7 @@ analytics = HTEAnalytics()
 ### Python API
 
 ```python
-from chemtools.HTE import HTEAnalytics
+from chemtools.recommend import HTEAnalytics
 
 # Initialize analytics
 analytics = HTEAnalytics()
@@ -57,19 +57,19 @@ metals = analytics.analyze_metal_usage()
 
 ```bash
 # List Suzuki reactant pairs with Pd catalysts
-python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10
+python -m chemtools.recommend.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10
 
 # Analyze Cu catalysts
-python -m chemtools.HTE.analytics_cli catalysts --reaction "C-N" --catalyst Cu --compact
+python -m chemtools.recommend.analytics_cli catalysts --reaction "C-N" --catalyst Cu --compact
 
 # View reaction type summary
-python -m chemtools.HTE.analytics_cli reactions --top 20
+python -m chemtools.recommend.analytics_cli reactions --top 20
 
 # Analyze metal usage
-python -m chemtools.HTE.analytics_cli metals --detailed
+python -m chemtools.recommend.analytics_cli metals --detailed
 
 # Export filtered dataset
-python -m chemtools.HTE.analytics_cli export suzuki_pd.csv --reaction Suzuki --catalyst Pd --min-yield 50
+python -m chemtools.recommend.analytics_cli export suzuki_pd.csv --reaction Suzuki --catalyst Pd --min-yield 50
 ```
 
 ## API Reference
@@ -349,7 +349,7 @@ print(f"Exported {count:,} experiments")
 #### `pairs` - List Reactant Pairs
 
 ```bash
-python -m chemtools.HTE.analytics_cli pairs [OPTIONS]
+python -m chemtools.recommend.analytics_cli pairs [OPTIONS]
 ```
 
 **Options:**
@@ -366,13 +366,13 @@ python -m chemtools.HTE.analytics_cli pairs [OPTIONS]
 
 ```bash
 # Top 10 Suzuki pairs with Pd catalysts
-python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10 --compact
+python -m chemtools.recommend.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10 --compact
 
 # All C-N coupling pairs with Cu, sorted by success rate
-python -m chemtools.HTE.analytics_cli pairs --reaction "C-N" --catalyst Cu --sort success_rate
+python -m chemtools.recommend.analytics_cli pairs --reaction "C-N" --catalyst Cu --sort success_rate
 
 # Export to CSV
-python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --catalyst Pd -o suzuki_pairs.csv
+python -m chemtools.recommend.analytics_cli pairs --reaction Suzuki --catalyst Pd -o suzuki_pairs.csv
 ```
 
 ---
@@ -380,7 +380,7 @@ python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --catalyst Pd -o s
 #### `catalysts` - Analyze Catalysts
 
 ```bash
-python -m chemtools.HTE.analytics_cli catalysts [OPTIONS]
+python -m chemtools.recommend.analytics_cli catalysts [OPTIONS]
 ```
 
 **Options:**
@@ -396,10 +396,10 @@ python -m chemtools.HTE.analytics_cli catalysts [OPTIONS]
 
 ```bash
 # Top Pd catalysts for Suzuki
-python -m chemtools.HTE.analytics_cli catalysts --reaction Suzuki --compact
+python -m chemtools.recommend.analytics_cli catalysts --reaction Suzuki --compact
 
 # Cu catalysts for ArBr + RNH2
-python -m chemtools.HTE.analytics_cli catalysts --reactant-a ArBr --reactant-b RNH2 --compact
+python -m chemtools.recommend.analytics_cli catalysts --reactant-a ArBr --reactant-b RNH2 --compact
 ```
 
 ---
@@ -407,7 +407,7 @@ python -m chemtools.HTE.analytics_cli catalysts --reactant-a ArBr --reactant-b R
 #### `reactions` - Analyze Reaction Types
 
 ```bash
-python -m chemtools.HTE.analytics_cli reactions [OPTIONS]
+python -m chemtools.recommend.analytics_cli reactions [OPTIONS]
 ```
 
 **Options:**
@@ -420,10 +420,10 @@ python -m chemtools.HTE.analytics_cli reactions [OPTIONS]
 
 ```bash
 # View top 15 reaction types
-python -m chemtools.HTE.analytics_cli reactions --top 15 --compact
+python -m chemtools.recommend.analytics_cli reactions --top 15 --compact
 
 # Export full summary
-python -m chemtools.HTE.analytics_cli reactions -o reaction_summary.csv
+python -m chemtools.recommend.analytics_cli reactions -o reaction_summary.csv
 ```
 
 ---
@@ -431,7 +431,7 @@ python -m chemtools.HTE.analytics_cli reactions -o reaction_summary.csv
 #### `metals` - Analyze Metal Usage
 
 ```bash
-python -m chemtools.HTE.analytics_cli metals [OPTIONS]
+python -m chemtools.recommend.analytics_cli metals [OPTIONS]
 ```
 
 **Options:**
@@ -443,10 +443,10 @@ python -m chemtools.HTE.analytics_cli metals [OPTIONS]
 
 ```bash
 # Basic metal distribution
-python -m chemtools.HTE.analytics_cli metals
+python -m chemtools.recommend.analytics_cli metals
 
 # Detailed breakdown by reaction
-python -m chemtools.HTE.analytics_cli metals --detailed
+python -m chemtools.recommend.analytics_cli metals --detailed
 ```
 
 ---
@@ -454,7 +454,7 @@ python -m chemtools.HTE.analytics_cli metals --detailed
 #### `export` - Export Filtered Dataset
 
 ```bash
-python -m chemtools.HTE.analytics_cli export OUTPUT_PATH [OPTIONS]
+python -m chemtools.recommend.analytics_cli export OUTPUT_PATH [OPTIONS]
 ```
 
 **Options:**
@@ -469,13 +469,13 @@ python -m chemtools.HTE.analytics_cli export OUTPUT_PATH [OPTIONS]
 
 ```bash
 # Export high-yield Suzuki data
-python -m chemtools.HTE.analytics_cli export suzuki_high.csv --reaction Suzuki --min-yield 80
+python -m chemtools.recommend.analytics_cli export suzuki_high.csv --reaction Suzuki --min-yield 80
 
 # Export Cu-catalyzed C-N coupling
-python -m chemtools.HTE.analytics_cli export cn_copper.csv --reaction "C-N" --catalyst Cu
+python -m chemtools.recommend.analytics_cli export cn_copper.csv --reaction "C-N" --catalyst Cu
 
 # Export specific substrate combination
-python -m chemtools.HTE.analytics_cli export arbr_arb.csv --reactant-a ArBr --reactant-b "ArB(OH)2"
+python -m chemtools.recommend.analytics_cli export arbr_arb.csv --reactant-a ArBr --reactant-b "ArB(OH)2"
 ```
 
 ---
@@ -487,7 +487,7 @@ python -m chemtools.HTE.analytics_cli export arbr_arb.csv --reactant-a ArBr --re
 **Goal:** Find the most successful Pd catalyst for ArCl + ArB(OH)2 Suzuki coupling.
 
 ```python
-from chemtools.HTE import HTEAnalytics
+from chemtools.recommend import HTEAnalytics
 
 analytics = HTEAnalytics()
 
@@ -531,7 +531,7 @@ for _, row in df.head(10).iterrows():
 
 ```bash
 # CLI: View top reactions
-python -m chemtools.HTE.analytics_cli reactions --top 15 --compact
+python -m chemtools.recommend.analytics_cli reactions --top 15 --compact
 ```
 
 Output:
@@ -557,7 +557,7 @@ Output:
 
 ```bash
 # Export filtered dataset
-python -m chemtools.HTE.analytics_cli export buchwald_pd_success.csv \
+python -m chemtools.recommend.analytics_cli export buchwald_pd_success.csv \
     --reaction "C-N" \
     --catalyst Pd \
     --min-yield 70
@@ -630,7 +630,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
 
    ```bash
    # Quick check
-   python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --top 5
+   python -m chemtools.recommend.analytics_cli pairs --reaction Suzuki --top 5
    
    # Automated analysis
    python my_analysis_script.py
@@ -639,7 +639,7 @@ The HTE database (`HTE_canonical.csv`) contains the following fields:
 3. **Export filtered datasets** for external analysis (Excel, R, etc.):
 
    ```bash
-   python -m chemtools.HTE.analytics_cli export my_data.csv --reaction Suzuki --catalyst Pd
+   python -m chemtools.recommend.analytics_cli export my_data.csv --reaction Suzuki --catalyst Pd
    ```
 
 ---

@@ -26,6 +26,7 @@ python test_llm_workflow.py
 ```
 
 **Expected output**:
+
 ```
 🧪 Testing LLM Workflow Implementation
 
@@ -142,15 +143,18 @@ else:  # "error"
 ## 🎯 Next Steps
 
 **Option 1: Test First** (recommended)
+
 ```bash
 python data-processor/test_llm_workflow.py
 ```
 
 **Option 2: Integrate with UI**
+
 - Ask me to add UI mode toggle
 - I'll connect the new workflow to the GUI
 
 **Option 3: Request Features**
+
 - Batch processing (multiple CAS)
 - Confidence thresholds
 - Multi-role support
@@ -159,11 +163,13 @@ python data-processor/test_llm_workflow.py
 ## 📚 Documentation
 
 **Quick Guides**:
+
 - `LLM_WORKFLOW_SUMMARY.md` - Executive summary (this is most important!)
 - `LLM_WORKFLOW_IMPLEMENTATION.md` - Technical deep dive
 - `LLM_QUICKSTART.md` - Previous quick start (old workflow)
 
 **Test Scripts**:
+
 - `test_llm_workflow.py` - Test new pure LLM workflow
 - `test_markdown_fix.py` - Test DeepSeek markdown parsing
 
@@ -185,11 +191,13 @@ python data-processor/test_llm_workflow.py
 ## 🐛 Troubleshooting
 
 **"LLM support not available"**:
+
 ```bash
 pip install openai  # or your LLM provider SDK
 ```
 
 **"Registry directory not found"**:
+
 ```bash
 # Make sure you're in the right directory
 cd Condition-agent
@@ -197,16 +205,19 @@ ls data/reagent_db  # Should exist
 ```
 
 **"No data from PubChem"**:
+
 - Check internet connection
 - Verify CAS number is valid
 - Try with `name_override` parameter
 
 **DeepSeek returns markdown fences**:
+
 - ✅ Already handled! The `_strip_markdown_fences()` function removes them
 
 ## 📞 Need Help?
 
 Just ask! I can:
+
 - Add UI integration
 - Create more test cases
 - Add batch processing

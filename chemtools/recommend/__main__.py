@@ -1,5 +1,5 @@
 """
-Make chemtools.HTE.cli executable as a module
+Make chemtools.recommend.cli executable as a module
 """
 from .cli import main
 

@@ -17,7 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from chemtools.HTE.analytics import HTEAnalytics
+from chemtools.recommend.analytics import HTEAnalytics
 
 
 def _prompt(text: str, default: str | None = None) -> str:
@@ -181,7 +181,7 @@ def cmd_list_pairs(args):
     )
     
     if len(df) == 0:
-        print("‚ùå No matching reactant pairs found")
+        print("‚ù?No matching reactant pairs found")
         return
     
     print(f"Found {len(df)} reactant pair combinations\n")
@@ -212,7 +212,7 @@ def cmd_list_pairs(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚úÖ Saved results to {args.output}")
+        print(f"\n‚ú?Saved results to {args.output}")
 
 
 def cmd_catalysts(args):
@@ -239,7 +239,7 @@ def cmd_catalysts(args):
     )
     
     if len(df) == 0:
-        print("‚ùå No catalysts found matching criteria")
+        print("‚ù?No catalysts found matching criteria")
         return
     
     print(f"Found {len(df)} catalysts\n")
@@ -267,7 +267,7 @@ def cmd_catalysts(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚úÖ Saved results to {args.output}")
+        print(f"\n‚ú?Saved results to {args.output}")
 
 
 def cmd_reactions(args):
@@ -308,7 +308,7 @@ def cmd_reactions(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚úÖ Saved results to {args.output}")
+        print(f"\n‚ú?Saved results to {args.output}")
 
 
 def cmd_metals(args):
@@ -334,7 +334,7 @@ def cmd_metals(args):
         metal = row['Metal']
         count = row['Num_Experiments']
         pct = row['Percentage']
-        bar = '‚ñà' * int(pct / 2)
+        bar = '‚ñ? * int(pct / 2)
         print(f"{metal:>4}: {bar:<35} {count:>6,} ({pct:>5.1f}%)")
     
     if args.detailed:
@@ -350,7 +350,7 @@ def cmd_metals(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚úÖ Saved metal distribution to {args.output}")
+        print(f"\n‚ú?Saved metal distribution to {args.output}")
 
 
 def cmd_export(args):
@@ -382,7 +382,7 @@ def cmd_export(args):
         min_yield=args.min_yield
     )
     
-    print(f"\n‚úÖ Export complete: {count:,} experiments")
+    print(f"\n‚ú?Export complete: {count:,} experiments")
 
 
 def main():
@@ -395,19 +395,19 @@ def main():
         epilog="""
 Examples:
   # List all Suzuki reactant pairs with Pd catalysts
-  python -m chemtools.HTE.analytics pairs --reaction Suzuki --catalyst Pd --top 10
+  python -m chemtools.recommend.analytics pairs --reaction Suzuki --catalyst Pd --top 10
   
   # Analyze Cu catalysts in C-N coupling
-  python -m chemtools.HTE.analytics catalysts --reaction "C-N" --catalyst Cu --compact
+  python -m chemtools.recommend.analytics catalysts --reaction "C-N" --catalyst Cu --compact
   
   # View reaction type summary
-  python -m chemtools.HTE.analytics reactions --top 20
+  python -m chemtools.recommend.analytics reactions --top 20
   
   # Analyze metal usage
-  python -m chemtools.HTE.analytics metals --detailed
+  python -m chemtools.recommend.analytics metals --detailed
   
   # Export Pd-catalyzed Suzuki data
-  python -m chemtools.HTE.analytics export suzuki_pd.csv --reaction Suzuki --catalyst Pd
+  python -m chemtools.recommend.analytics export suzuki_pd.csv --reaction Suzuki --catalyst Pd
         """
     )
     
@@ -494,7 +494,7 @@ Examples:
             cmd_export(args)
         return 0
     except Exception as e:
-        print(f"\n‚ùå Error: {e}", file=sys.stderr)
+        print(f"\n‚ù?Error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         return 1
