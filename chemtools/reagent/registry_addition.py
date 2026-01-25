@@ -24,6 +24,7 @@ from .taxonomy_utils import (
     resolve_identity_from_cas,
     tokenize_all,
 )
+import re
 
 DEFAULT_FLAT_REGISTRY_DIR = Path("data/reagent_db")
 
@@ -43,6 +44,69 @@ def _coerce_synonyms(values: Optional[Sequence[str]]) -> List[str]:
         if text and text not in cleaned:
             cleaned.append(text)
     return cleaned
+
+
+def _coerce_numeric(value: Optional[str | int | float]) -> Optional[str]:
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return str(value)
+    text = str(value).strip()
+    if not text:
+        return None
+    match = re.search(r"[-+]?\d+(?:\.\d+)?", text)
+    if not match:
+        return None
+    return match.group(0)
+
+
+def _coerce_float(value: Optional[str | int | float]) -> Optional[float]:
+    text = _coerce_numeric(value)
+    if text is None:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+def _coerce_temperature_c(value: Optional[str | int | float]) -> Optional[str]:
+    """Coerce a temperature value to Celsius as a numeric string."""
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return str(value)
+    text = str(value).strip()
+    if not text:
+        return None
+    number = _coerce_float(text)
+    if number is None:
+        return None
+    lower = text.lower()
+    if "fahrenheit" in lower or "°f" in lower or "deg f" in lower or "degree f" in lower:
+        number = (number - 32.0) * 5.0 / 9.0
+    return f"{number:.1f}"
+
+
+def _coerce_temperature_float(value: Optional[str | int | float]) -> Optional[float]:
+    text = _coerce_temperature_c(value)
+    if text is None:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+def _guess_reagent_type(mp: Optional[float], bp: Optional[float]) -> str:
+    """Best-effort phase guess at room temperature (25C)."""
+    if bp is not None and bp <= 25.0:
+        return "gas"
+    if mp is not None and mp <= 25.0:
+        return "liquid"
+    if bp is not None and bp <= 150.0 and (mp is None or mp <= 25.0):
+        return "liquid"
+    return "powder"
 
 
 def _resolve_identity(cas: str, *, enabled: bool, timeout: float) -> Dict[str, Any]:
@@ -77,6 +141,12 @@ def add_reagent_entry(
     taxonomy_dir: Optional[Path | str] = None,
     registry_dir: Optional[Path | str] = None,
     name: Optional[str] = None,
+    formula: Optional[str] = None,
+    molecular_weight: Optional[str] = None,
+    density: Optional[str] = None,
+    boiling_point: Optional[str] = None,
+    melting_point: Optional[str] = None,
+    reagent_type: Optional[str] = None,
     synonyms: Optional[Sequence[str]] = None,
     abbreviation: Optional[str] = None,
     tag: Optional[str] = None,
@@ -98,6 +168,12 @@ def add_reagent_entry(
         registry_dir: Optional path to the flattened reagent registry directory. When not supplied,
             the default data/reagent_db registry is used.
         name: Preferred reagent name. If omitted, an online resolver is used when permitted.
+        formula: Molecular formula override (e.g., C6H6).
+        molecular_weight: Molecular weight override (e.g., 78.11).
+        density: Density override (e.g., 0.867 g/mL).
+        boiling_point: Boiling point override (e.g., 110.6 C).
+        melting_point: Melting point override (e.g., -95 C).
+        reagent_type: Physical form hint (e.g., powder, liquid, gas).
         synonyms: Optional list of synonyms/aliases.
         abbreviation: Explicit abbreviation override. Defaults to the reagent name.
         tag: Optional short tag for additional notes.
@@ -132,6 +208,11 @@ def add_reagent_entry(
     resolved_name = resolved_identity.get("name")
     resolved_synonyms = _coerce_synonyms(resolved_identity.get("synonyms"))
     resolved_smiles = resolved_identity.get("smiles")
+    resolved_formula = resolved_identity.get("molecular_formula")
+    resolved_mw = resolved_identity.get("molecular_weight")
+    resolved_density = resolved_identity.get("density")
+    resolved_bp = resolved_identity.get("boiling_point")
+    resolved_mp = resolved_identity.get("melting_point")
     auto_resolve_source = resolved_identity.get("source")
 
     final_name = (name or resolved_name or "").strip()
@@ -248,6 +329,31 @@ def add_reagent_entry(
         family_entry=family_entry,
         synonyms=list(combined_synonyms),
     )
+    properties: Dict[str, Any] = {}
+    if formula or resolved_formula:
+        properties["formula"] = str(formula or resolved_formula).strip()
+    if molecular_weight is not None or resolved_mw is not None:
+        properties["mw"] = str(molecular_weight or resolved_mw).strip()
+    if density or resolved_density:
+        coerced = _coerce_numeric(density or resolved_density)
+        if coerced is not None:
+            properties["density"] = coerced
+    if boiling_point or resolved_bp:
+        coerced = _coerce_temperature_c(boiling_point or resolved_bp)
+        if coerced is not None:
+            properties["bp"] = coerced
+    if melting_point or resolved_mp:
+        coerced = _coerce_temperature_c(melting_point or resolved_mp)
+        if coerced is not None:
+            properties["mp"] = coerced
+    if reagent_type:
+        properties["type"] = str(reagent_type).strip()
+    else:
+        mp_val = _coerce_temperature_float(melting_point or resolved_mp)
+        bp_val = _coerce_temperature_float(boiling_point or resolved_bp)
+        properties["type"] = _guess_reagent_type(mp_val, bp_val)
+    if properties:
+        entry["properties"] = properties
 
     result: Dict[str, Any] = {
         "cas": normalized_cas,

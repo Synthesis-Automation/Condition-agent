@@ -123,6 +123,65 @@ def _http_get_text(session: Any, url: str, timeout: float) -> Optional[str]:
     return response.text
 
 
+def _extract_pugview_value(value: Any) -> Optional[str]:
+    if value is None:
+        return None
+    if isinstance(value, list):
+        for item in value:
+            text = _extract_pugview_value(item)
+            if text:
+                return text
+        return None
+    if isinstance(value, dict):
+        if "StringWithMarkup" in value:
+            parts = value.get("StringWithMarkup") or []
+            strings = [part.get("String") for part in parts if isinstance(part, dict)]
+            strings = [s for s in strings if s]
+            return " ".join(strings) if strings else None
+        if "Number" in value:
+            number = value.get("Number")
+            unit = value.get("Unit")
+            if number is None:
+                return None
+            if unit:
+                return f"{number} {unit}".strip()
+            return str(number)
+        if "String" in value:
+            text = value.get("String")
+            return str(text) if text is not None else None
+    if isinstance(value, (str, int, float)):
+        return str(value)
+    return None
+
+
+def _iter_pugview_sections(section: Dict[str, Any]) -> Iterable[Dict[str, Any]]:
+    yield section
+    for child in section.get("Section", []) or []:
+        if isinstance(child, dict):
+            yield from _iter_pugview_sections(child)
+
+
+def _extract_pugview_field(record: Dict[str, Any], heading_prefix: str) -> Optional[str]:
+    if not record:
+        return None
+    target = heading_prefix.lower()
+    for section in record.get("Section", []) or []:
+        if not isinstance(section, dict):
+            continue
+        for sub in _iter_pugview_sections(section):
+            heading = str(sub.get("TOCHeading") or "").strip()
+            if not heading:
+                continue
+            if heading.lower().startswith(target):
+                for info in sub.get("Information", []) or []:
+                    if not isinstance(info, dict):
+                        continue
+                    value = _extract_pugview_value(info.get("Value"))
+                    if value:
+                        return value
+    return None
+
+
 def _normalized_cas_tokens(synonyms: Sequence[str]) -> Set[str]:
     """Extract normalized CAS numbers from synonyms."""
     tokens: Set[str] = set()
@@ -185,7 +244,11 @@ def _pubchem_cid_rn_map(session: Any, cids: Sequence[Any], timeout: float) -> Di
 def _resolve_via_pubchem(session: Any, cas: str, timeout: float) -> Optional[Dict[str, Any]]:
     """Resolve reagent identity from CAS using PubChem API."""
     base = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/xref/RN/{quote(cas)}"
-    props_url = base + "/property/Title,IUPACName,IsomericSMILES,CanonicalSMILES,InChIKey/JSON"
+    props_url = (
+        base
+        + "/property/Title,IUPACName,IsomericSMILES,CanonicalSMILES,"
+        + "InChIKey,MolecularFormula,MolecularWeight/JSON"
+    )
     props = _http_get_json(session, props_url, timeout)
     entries = props.get("PropertyTable", {}).get("Properties", []) if props else []
     if not entries:
@@ -241,7 +304,21 @@ def _resolve_via_pubchem(session: Any, cas: str, timeout: float) -> Optional[Dic
 
     smiles = selected_record.get("IsomericSMILES") or selected_record.get("CanonicalSMILES")
     inchi_key = selected_record.get("InChIKey")
+    formula = selected_record.get("MolecularFormula")
+    molecular_weight = selected_record.get("MolecularWeight")
     primary_name = selected_record.get("Title") or selected_record.get("IUPACName")
+    density = None
+    boiling_point = None
+    melting_point = None
+
+    cid = selected_record.get("CID")
+    if cid is not None:
+        view_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON"
+        view_data = _http_get_json(session, view_url, timeout)
+        record = view_data.get("Record", {}) if isinstance(view_data, dict) else {}
+        density = _extract_pugview_field(record, "Density")
+        boiling_point = _extract_pugview_field(record, "Boiling Point")
+        melting_point = _extract_pugview_field(record, "Melting Point")
 
     raw: List[str] = []
     if primary_name:
@@ -256,7 +333,17 @@ def _resolve_via_pubchem(session: Any, cas: str, timeout: float) -> Optional[Dic
         deduped = deduped[:16]
 
     name = primary_name or deduped[0]
-    return {"name": name, "synonyms": deduped, "smiles": smiles, "inchi_key": inchi_key}
+    return {
+        "name": name,
+        "synonyms": deduped,
+        "smiles": smiles,
+        "inchi_key": inchi_key,
+        "molecular_formula": formula,
+        "molecular_weight": molecular_weight,
+        "density": density,
+        "boiling_point": boiling_point,
+        "melting_point": melting_point,
+    }
 
 
 def _resolve_via_cactus(session: Any, cas: str, timeout: float) -> Optional[Dict[str, Any]]:
@@ -271,9 +358,19 @@ def _resolve_via_cactus(session: Any, cas: str, timeout: float) -> Optional[Dict
         return None
     smiles_text = _http_get_text(session, base + "/smiles", timeout)
     smiles = (smiles_text.strip() if smiles_text else None) or None
+    formula_text = _http_get_text(session, base + "/formula", timeout)
+    formula = (formula_text.strip() if formula_text else None) or None
     if len(deduped) > 16:
         deduped = deduped[:16]
-    return {"name": deduped[0], "synonyms": deduped, "smiles": smiles}
+    return {
+        "name": deduped[0],
+        "synonyms": deduped,
+        "smiles": smiles,
+        "molecular_formula": formula,
+        "density": None,
+        "boiling_point": None,
+        "melting_point": None,
+    }
 
 
 def resolve_identity_from_cas(
@@ -293,7 +390,9 @@ def resolve_identity_from_cas(
         session: Optional requests session (creates one if None)
         
     Returns:
-        Dict with 'name', 'synonyms', 'smiles', 'source' or None
+        Dict with 'name', 'synonyms', 'smiles', 'molecular_formula',
+        'molecular_weight', 'density', 'boiling_point', 'melting_point',
+        'source' or None
         
     Example:
         >>> info = resolve_identity_from_cas("14221-01-3")
