@@ -75,6 +75,7 @@ def add_reagent_entry(
     *,
     cas: str,
     taxonomy_dir: Optional[Path | str] = None,
+    registry_dir: Optional[Path | str] = None,
     name: Optional[str] = None,
     synonyms: Optional[Sequence[str]] = None,
     abbreviation: Optional[str] = None,
@@ -94,6 +95,8 @@ def add_reagent_entry(
         cas: CAS registry identifier (required).
         taxonomy_dir: Optional path to the reagent taxonomy v2 directory. When not supplied,
             the packaged v2 taxonomy is used.
+        registry_dir: Optional path to the flattened reagent registry directory. When not supplied,
+            the default data/reagent_db registry is used.
         name: Preferred reagent name. If omitted, an online resolver is used when permitted.
         synonyms: Optional list of synonyms/aliases.
         abbreviation: Explicit abbreviation override. Defaults to the reagent name.
@@ -119,9 +122,10 @@ def add_reagent_entry(
 
     normalized_cas = normalize_cas(cas)
     taxonomy_path = Path(taxonomy_dir).expanduser() if taxonomy_dir else None
+    registry_path = Path(registry_dir).expanduser() if registry_dir else None
 
     taxonomy = _load_taxonomy(taxonomy_path)
-    registry = _load_registry(None)
+    registry = _load_registry(registry_path)
     heuristics = RoleHeuristics(taxonomy)
 
     resolved_identity = _resolve_identity(normalized_cas, enabled=auto_resolve, timeout=resolver_timeout)

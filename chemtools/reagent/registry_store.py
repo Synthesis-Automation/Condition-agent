@@ -673,6 +673,19 @@ class RegistryStore:
             raise KeyError(f"Unknown or unsupported role '{role}'.")
         return self.save_registry()
 
+    def entry_to_csv_row(self, entry: Dict[str, Any], role: Optional[str] = None) -> Dict[str, str]:
+        """Return a CSV row dict for a registry entry."""
+        return _entry_to_csv_row(entry, role=role)
+
+    def csv_header(self) -> List[str]:
+        """Return the ordered CSV header for the registry."""
+        return list(self.csv_fields)
+
+    def row_to_entry(self, row: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert a CSV row dict into a registry entry."""
+        normalized = {str(key): "" if value is None else str(value) for key, value in row.items()}
+        return _row_to_entry(normalized)
+
     # ------------------------------------------------------------------ heuristics
     def infer_family(self, role: str, tokens: Set[str]) -> Optional[Tuple[str, List[str]]]:
         role = _canonical_role(role)
