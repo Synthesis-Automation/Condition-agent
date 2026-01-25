@@ -310,6 +310,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._spectator_groups_summary: str = ""
         self._source_group_label: str = "All"
         self._aryl_weighting_enabled: bool = False
+        self._all_json_output: Optional[Dict[str, Any]] = None
 
     def _setup_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -583,6 +584,20 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             normalized_key = _normalize_source_group_label(key)
             normalized_map.setdefault(normalized_key, []).extend(items)
         source_map = normalized_map
+
+        try:
+            from chemtools.formatters import format_hte_output
+            reaction_filter = self.reaction_filter_edit.text().strip() or None
+            catalyst_filter = self.catalyst_filter_edit.text().strip() or None
+            self._all_json_output = format_hte_output(
+                result,
+                reaction_smiles=reaction_smiles,
+                reaction_type_filter=reaction_filter,
+                catalyst_filter=catalyst_filter,
+                explanation=None,
+            )
+        except Exception:
+            self._all_json_output = None
         self.results_tabs.clear()
 
         self.table = self._create_results_table()

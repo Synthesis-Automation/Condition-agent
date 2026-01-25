@@ -39,6 +39,11 @@ from chemtools.formatters.ml_output import (
     format_fusion_output,
 )
 
+# From hte_output.py
+from chemtools.formatters.hte_output import (
+    format_hte_output,
+)
+
 # From rule_to_protocol.py
 from chemtools.formatters.rule_to_protocol import (
     rule_conditions_to_reaction_setup,
@@ -72,6 +77,9 @@ __all__ = [
     "ensure_standard_output",
     "format_ml_output",
     "format_fusion_output",
+
+    # HTE output
+    "format_hte_output",
     
     # Utils
     "enrich_reagent",
