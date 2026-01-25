@@ -103,8 +103,14 @@ class ReagentTaxonomyV2:
 def _read_json(path: Path) -> Any:
     if not path.exists():
         raise FileNotFoundError(f"Reagent taxonomy file not found: {path}")
-    with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+    for encoding in ("utf-8", "utf-8-sig", "latin-1"):
+        try:
+            with path.open("r", encoding=encoding) as handle:
+                return json.load(handle)
+        except UnicodeDecodeError:
+            continue
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return json.loads(text)
 
 
 def _parse_roles(payload: List[Dict[str, Any]]) -> Dict[str, ReagentRoleV2]:
