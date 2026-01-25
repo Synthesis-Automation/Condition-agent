@@ -2,80 +2,93 @@
   "meta": {},
   "input": {
     "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
-    "user_reaction_type_filter": "C_N_Coupling",
+    "reaction_type_filter": "C_N_Coupling",
     "catalyst_filter": "Pd"
   },
   "detection": {
     "reaction_type": "C_N_Coupling",
     "confidence": 0.95
   },
-  "explaination": {
-    "text": "Why these condition were given .. "
+  "explanation": {
+    "text": "Why these conditions were given ..."
   },
   "recommended_conditions": [
     {
       "rank": 1,
-      "conditions": [
+      "steps": [
         {
-          "name": "reactant_1_from_reaction_smiles",
-          "cas": null,
-          "smiles": "Brc1ccccc1",
-          "equivalents": 1.0,
-          "role": "reactant",
-          "is_limiting_reactant": true
+          "action": "add",
+          "chemical": {
+            "name": "Bromobenzene",
+            "cas": null,
+            "smiles": "Brc1ccccc1",
+            "equivalents": 1.0,
+            "role": "reactant",
+            "is_limiting_reactant": true
+          }
         },
         {
-          "name": "reactant_2_from_reaction_smiles",
-          "cas": null,
-          "smiles": "Nc1ccccc1",
-          "equivalents": 1.5,
-          "role": "reactant"
+          "action": "add",
+          "chemical": {
+            "name": "Aniline",
+            "cas": null,
+            "smiles": "Nc1ccccc1",
+            "equivalents": 1.5,
+            "role": "reactant"
+          }
         },
-
         {
+          "action": "add",
+          "chemical": {
+            "name": "Sulfolane",
+            "cas": "126-33-0",
+            "smiles": null,
+            "equivalents": null,
+            "concentration_M": 0.2,
+            "role": "solvent"
+          }
+        },
+        {
+          "action": "condition",
           "name": "temperature_time",
           "temperature_C": 60,
-          "time_h": 2
-        },
-
-        {
-          "name": "Copper(I) iodide",
-          "abbreviation": "CuI",
-          "cas": "7681-65-4",
-          "smiles": null,
-          "equivalents": null,
-          "role": "metal_catalyst"
+          "time_h": 1
         },
         {
-          "name": "[Unknown ligand] CAS 2809369-03-5",
-          "abbreviation": null,
-          "cas": "2809369-03-5",
-          "smiles": null,
-          "equivalents": null,
-          "role": "ligand"
+          "action": "add",
+          "chemical": {
+            "name": "Copper(I) iodide",
+            "cas": "7681-65-4",
+            "smiles": null,
+            "equivalents": 0.05,
+            "role": "metal_catalyst"
+          }
         },
         {
-          "name": "Tripotassium phosphate",
-          "abbreviation": "K3PO4",
-          "cas": "7778-53-2",
-          "smiles": null,
-          "equivalents": null,
-          "role": "base"
+          "action": "add",
+          "chemical": {
+            "name": "N,N'-Dimethylethylenediamine",
+            "cas": "2809369-03-5",
+            "smiles": null,
+            "equivalents": 0.1,
+            "role": "ligand"
+          }
         },
         {
-          "name": "Sulfolane",
-          "abbreviation": "Sulfolane",
-          "cas": "126-33-0",
-          "smiles": null,
-          "equivalents": null,
-          "concentration_M": 0.2,
-          "role": "solvent"
+          "action": "add",
+          "chemical": {
+            "name": "Tripotassium phosphate",
+            "cas": "7778-53-2",
+            "smiles": null,
+            "equivalents": 2.0,
+            "role": "base"
+          }
         },
-
         {
+          "action": "condition",
           "name": "temperature_time",
           "temperature_C": 60,
-          "time_h": 2
+          "time_h": 1
         }
       ]
     }
