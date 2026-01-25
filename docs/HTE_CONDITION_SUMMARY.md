@@ -10,11 +10,11 @@ For a specific reactant pair (e.g., aryl bromide + aryl amine with copper cataly
 
 ```bash
 # Get all conditions with statistics
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
     --catalyst copper -k 20 --min-exp 1
 
 # Export all matching experiments to CSV
-python -m chemtools.HTE.analytics_cli export cu_cn_conditions.csv \
+python -m chemtools.recommend.analytics_cli export cu_cn_conditions.csv \
     --reaction "C_N" --catalyst Cu --reactant-a ArBr --reactant-b ArNH2
 ```
 
@@ -25,7 +25,7 @@ python -m chemtools.HTE.analytics_cli export cu_cn_conditions.csv \
 Get ranked condition recommendations with statistics:
 
 ```bash
-python -m chemtools.HTE.cli \
+python -m chemtools.recommend.cli \
     -a "SMILES_A" \
     -b "SMILES_B" \
     --catalyst Cu \
@@ -51,7 +51,7 @@ python -m chemtools.HTE.cli \
 Export all matching experiments to CSV for detailed analysis:
 
 ```bash
-python -m chemtools.HTE.analytics_cli export output.csv \
+python -m chemtools.recommend.analytics_cli export output.csv \
     --catalyst Cu \
     --reactant-a ArBr \
     --reactant-b ArNH2 \
@@ -75,7 +75,7 @@ python -m chemtools.HTE.analytics_cli export output.csv \
 #### Get Condition Recommendations
 
 ```python
-from chemtools.HTE import HTERecommender
+from chemtools.recommend import HTERecommender
 
 recommender = HTERecommender()
 result = recommender.recommend(
@@ -97,7 +97,7 @@ for rec in result.recommendations:
 #### Export and Analyze Data
 
 ```python
-from chemtools.HTE.analytics import HTEAnalytics
+from chemtools.recommend.analytics import HTEAnalytics
 import pandas as pd
 
 # Export filtered data
@@ -147,7 +147,7 @@ This comprehensive demo:
 
 ```bash
 # Get top conditions ranked by success rate
-python -m chemtools.HTE.cli -a "ArBr_SMILES" -b "ArNH2_SMILES" \
+python -m chemtools.recommend.cli -a "ArBr_SMILES" -b "ArNH2_SMILES" \
     --catalyst Cu -k 10 --min-exp 2
 ```
 
@@ -155,14 +155,14 @@ python -m chemtools.HTE.cli -a "ArBr_SMILES" -b "ArNH2_SMILES" \
 
 ```bash
 # Export all conditions for manual analysis
-python -m chemtools.HTE.analytics_cli export all_cu_cn.csv \
+python -m chemtools.recommend.analytics_cli export all_cu_cn.csv \
     --catalyst Cu --reaction "C_N"
 ```
 
 ### 3. Component Analysis
 
 ```python
-from chemtools.HTE.analytics import HTEAnalytics
+from chemtools.recommend.analytics import HTEAnalytics
 
 analytics = HTEAnalytics()
 
@@ -180,11 +180,11 @@ print(catalyst_stats)
 
 ```bash
 # Export copper conditions
-python -m chemtools.HTE.analytics_cli export cu_cn.csv \
+python -m chemtools.recommend.analytics_cli export cu_cn.csv \
     --catalyst Cu --reaction "C_N"
 
 # Export palladium conditions  
-python -m chemtools.HTE.analytics_cli export pd_cn.csv \
+python -m chemtools.recommend.analytics_cli export pd_cn.csv \
     --catalyst Pd --reaction "C_N"
 
 # Compare in Python/Excel
@@ -226,12 +226,12 @@ Avg Yield: 49.8% | Median: 49.8%
 
 ## Key Features
 
-âœ… **Supports all metal catalysts**: Cu, Pd, Ni, Ir, Rh, Ru, Pt, Au, Ag, Fe, Co, Zn  
-âœ… **Reactant type detection**: Automatic classification (ArBr, ArNH2, etc.)  
-âœ… **Statistical ranking**: Success rates, confidence scores, yield statistics  
-âœ… **Flexible filtering**: By reaction type, catalyst, reactant types, yield  
-âœ… **Multiple output formats**: Terminal display, JSON, CSV export  
-âœ… **Batch processing**: Process multiple reactant pairs from file  
+âœ?**Supports all metal catalysts**: Cu, Pd, Ni, Ir, Rh, Ru, Pt, Au, Ag, Fe, Co, Zn  
+âœ?**Reactant type detection**: Automatic classification (ArBr, ArNH2, etc.)  
+âœ?**Statistical ranking**: Success rates, confidence scores, yield statistics  
+âœ?**Flexible filtering**: By reaction type, catalyst, reactant types, yield  
+âœ?**Multiple output formats**: Terminal display, JSON, CSV export  
+âœ?**Batch processing**: Process multiple reactant pairs from file  
 
 ## Tips
 
@@ -250,13 +250,13 @@ Avg Yield: 49.8% | Median: 49.8%
 
 ## Related Tools
 
-- `chemtools.HTE.cli` - Condition recommendations
-- `chemtools.HTE.analytics_cli` - Database analytics
+- `chemtools.recommend.cli` - Condition recommendations
+- `chemtools.recommend.analytics_cli` - Database analytics
 - `demo_hte_condition_summary.py` - Comprehensive demo
-- `chemtools.HTE.analytics.HTEAnalytics` - Python API for analytics
+- `chemtools.recommend.analytics.HTEAnalytics` - Python API for analytics
 
 ## References
 
 - HTE database: `data/HTE_db/HTE_canonical.csv` (65,468 experiments)
 - Reactant detection: `chemtools.featurizers.analysis.reactants.classify_reactant_smiles`
-- Implementation: `chemtools/HTE/recommender.py`, `chemtools/HTE/analytics.py`
+- Implementation: `chemtools/recommend/recommender.py`, `chemtools/recommend/analytics.py`

@@ -1,7 +1,7 @@
 import pandas as pd
 
-from chemtools.HTE import recommender as hte
-from chemtools.HTE.recommender import HTERecommender
+from chemtools.recommend import recommender as hte
+from chemtools.recommend.recommender import HTERecommender
 
 
 def _make_min_hte_df() -> pd.DataFrame:

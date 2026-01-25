@@ -17,17 +17,17 @@ Usage:
 Architecture:
     ChemTools (master class)
     ├── Core Operations (stateless, always available)
-    │   ├── smiles - SMILES parsing and normalization
-    │   ├── router - Reaction family detection
-    │   ├── properties - Compound property lookup
-    │   ├── constraints - Constraint validation
-    │   └── functional_groups - Functional group detection
-    │
+    �?  ├── smiles - SMILES parsing and normalization
+    �?  ├── router - Reaction family detection
+    �?  ├── properties - Compound property lookup
+    �?  ├── constraints - Constraint validation
+    �?  └── functional_groups - Functional group detection
+    �?
     ├── Data Operations (stateful, lazy-loaded through context)
-    │   ├── precedent - Precedent reaction search
-    │   ├── recommend - HTE-based condition recommendations
-    │   └── explain - Explanation generation
-    │
+    �?  ├── precedent - Precedent reaction search
+    �?  ├── recommend - HTE-based condition recommendations
+    �?  └── explain - Explanation generation
+    �?
     └── Advanced Operations (optional dependencies)
         ├── featurizers - Molecular featurization
         ├── features - Role-aware features (if available)
@@ -600,7 +600,7 @@ class DatasetAnalyticsNamespace:
     """HTE dataset analytics (CSV/JSONL).
 
     This replaces the legacy dataset_analytics module with the newer
-    chemtools.HTE.analytics.HTEAnalytics backend.
+    chemtools.recommend.analytics.HTEAnalytics backend.
     """
 
     def __init__(self, hte_db_path: str = "data/HTE_db") -> None:
@@ -609,7 +609,7 @@ class DatasetAnalyticsNamespace:
 
     def _get_analytics(self):
         if self._analytics is None:
-            from .HTE.analytics import HTEAnalytics
+            from .recommend.analytics import HTEAnalytics
             self._analytics = HTEAnalytics(self._hte_db_path)
         return self._analytics
 

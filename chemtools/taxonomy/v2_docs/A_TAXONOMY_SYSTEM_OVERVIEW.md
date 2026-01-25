@@ -161,7 +161,7 @@ To determine what happened in a reaction, we use raw motif counts from reactants
 Notes
 
 - `reagent_roles.v2.json` is the single source for reagent roles and families. Legacy registries only store reagent entries, not taxonomy definitions.
-- **Compound Logic Rebuild (2026-01-22)**: Rebuilt `compound_logic.json` from 24 sets (232 members, 98.7% invalid) to 8 essential sets (72 members, 100% valid). Fixed formatting errors (double-dash â†’ single-dash) and updated `terminal_alkynes` to use scaffold+scaffold approach (`Ar-Alkynyl_terminal`, `Alkyl-Alkynyl_terminal`).
+- **Compound Logic Rebuild (2026-01-22)**: Rebuilt `compound_logic.json` from 24 sets (232 members, 98.7% invalid) to 8 essential sets (72 members, 100% valid). Fixed formatting errors (double-dash â†?single-dash) and updated `terminal_alkynes` to use scaffold+scaffold approach (`Ar-Alkynyl_terminal`, `Alkyl-Alkynyl_terminal`).
 - **Simplification (2026-01-21)**: Removed 1,331 redundant fields across all 5 taxonomy files:
   - `organic_groups.v1.3.json`: Removed 92 `name` + 92 `tags` fields. Added `-` prefix to 78 substituent IDs.
   - `organic_compounds.v1.3.json`: Removed 364 `id` + 364 `name` fields. IDs now auto-generated as `A+B`.
@@ -239,7 +239,7 @@ Notes
   - Classifier: `chemtools/reagent/reagent_v2.py`.
   - Heuristics: `chemtools/reagent/taxonomy_store.py`.
 - HTE recommender uses motif typing for reactant keying.
-  - Engine: `chemtools/HTE/recommender.py`.
+  - Engine: `chemtools/recommend/recommender.py`.
 - Unified recommendation index (dataset + protocol + HTE) has been removed.
 
 ## Spectator ranking system (HTE recommender)

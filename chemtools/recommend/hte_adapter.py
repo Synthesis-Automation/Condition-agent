@@ -2,7 +2,7 @@
 HTE-backed recommendation adapter.
 
 Provides recommend_from_reaction / recommend_conditions_structured
-using the chemtools.HTE recommender as the primary backend.
+using the chemtools.recommend recommender as the primary backend.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ def _get_default_recommender(hte_db_path: Optional[str] = None):
     global _DEFAULT_RECOMMENDER, _DEFAULT_DB_PATH
     path = hte_db_path or "data/HTE_db"
     if _DEFAULT_RECOMMENDER is None or _DEFAULT_DB_PATH != path:
-        from chemtools.HTE import HTERecommender
+        from .recommender import HTERecommender
         _DEFAULT_RECOMMENDER = HTERecommender(path)
         _DEFAULT_DB_PATH = path
     return _DEFAULT_RECOMMENDER

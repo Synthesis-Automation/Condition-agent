@@ -208,7 +208,7 @@ class RecommendationWorker(QtCore.QObject):
 
     def run(self) -> None:
         try:
-            from chemtools.HTE import HTERecommender
+            from chemtools.recommend import HTERecommender
 
             reactant_a, reactant_b, product = _parse_reaction_smiles(self.reaction_smiles)
             if not reactant_a:

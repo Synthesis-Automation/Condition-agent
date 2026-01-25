@@ -14,13 +14,13 @@ A production-ready system that recommends reaction conditions based on reactant 
 
 ```python
 # Already integrated - no installation needed!
-from chemtools.HTE import HTERecommender
+from chemtools.recommend import HTERecommender
 ```
 
 ### Basic Usage (30 seconds)
 
 ```python
-from chemtools.HTE import HTERecommender, format_result
+from chemtools.recommend import HTERecommender, format_result
 
 # Initialize
 recommender = HTERecommender()
@@ -59,23 +59,23 @@ Reactant B: RNH2 (RNH2/R2NH)
 
 ### Recommendation System
 
-âœ… **66,308 experimental results** across 41 reaction types  
-âœ… **Z-Score ranking** - conditions ranked by statistical performance (primary metric)  
-âœ… **Fast**: <100ms query time, O(1) lookup  
-âœ… **No reaction SMILES needed** - works with just reactants  
-âœ… **Statistical confidence** - success rates & sample sizes  
-âœ… **Multiple output formats** - Python API, CLI, JSON  
-âœ… **Batch processing** - process multiple queries at once  
-âœ… **Flexible filtering** - by reaction type, catalyst metal (Cu, Pd, Ni, etc.), confidence
+âœ?**66,308 experimental results** across 41 reaction types  
+âœ?**Z-Score ranking** - conditions ranked by statistical performance (primary metric)  
+âœ?**Fast**: <100ms query time, O(1) lookup  
+âœ?**No reaction SMILES needed** - works with just reactants  
+âœ?**Statistical confidence** - success rates & sample sizes  
+âœ?**Multiple output formats** - Python API, CLI, JSON  
+âœ?**Batch processing** - process multiple queries at once  
+âœ?**Flexible filtering** - by reaction type, catalyst metal (Cu, Pd, Ni, etc.), confidence
 
 ### Analytics Tools (NEW! ðŸŽ‰)
 
-âœ… **List reactant pairs** by reaction type and/or catalyst  
-âœ… **Analyze catalyst statistics** for specific reactions or substrates  
-âœ… **Summarize reaction types** in the database  
-âœ… **Analyze metal usage patterns** across reactions  
-âœ… **Find similar reactant pairs** based on reaction type or catalyst  
-âœ… **Export filtered datasets** for further analysis
+âœ?**List reactant pairs** by reaction type and/or catalyst  
+âœ?**Analyze catalyst statistics** for specific reactions or substrates  
+âœ?**Summarize reaction types** in the database  
+âœ?**Analyze metal usage patterns** across reactions  
+âœ?**Find similar reactant pairs** based on reaction type or catalyst  
+âœ?**Export filtered datasets** for further analysis
 
 ---
 
@@ -84,7 +84,7 @@ Reactant B: RNH2 (RNH2/R2NH)
 ### Python API
 
 ```python
-from chemtools.HTE import HTERecommender
+from chemtools.recommend import HTERecommender
 
 recommender = HTERecommender()
 
@@ -136,58 +136,58 @@ for i, rec in enumerate(result.recommendations, 1):
 
 ```bash
 # Basic query with reactant SMILES
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" -k 5
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" -k 5
 
 # Single reactant (will match any reaction with this reactant type)
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -k 5
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -k 5
 
 # Get top 10 recommendations with minimum 1 experiment per condition
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" -k 10 --min-exp 1
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" -k 10 --min-exp 1
 ```
 
 #### Filtering by Reaction Type
 
 ```bash
 # Filter Suzuki coupling reactions
-python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki
+python -m chemtools.recommend.cli -a "c1ccc(Cl)cc1" -b "c1ccc(B(O)O)cc1" --reaction Suzuki
 
 # Filter C-N coupling reactions
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --reaction C_N_Coupling
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --reaction C_N_Coupling
 
 # Filter amide formation reactions
-python -m chemtools.HTE.cli -a "c1ccccc1C(=O)O" -b "CCN" --reaction amide_formation
+python -m chemtools.recommend.cli -a "c1ccccc1C(=O)O" -b "CCN" --reaction amide_formation
 ```
 
 #### Filtering by Catalyst Type
 
 ```bash
 # Copper-catalyzed reactions only
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --catalyst Cu
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" --catalyst Cu
 
 # Palladium-catalyzed reactions only
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(B(O)O)cc1" --catalyst Pd
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(B(O)O)cc1" --catalyst Pd
 
 # Nickel-catalyzed reactions only
-python -m chemtools.HTE.cli -a "c1ccc(Cl)cc1" -b "CCN" --catalyst Ni
+python -m chemtools.recommend.cli -a "c1ccc(Cl)cc1" -b "CCN" --catalyst Ni
 
 # Use full catalyst name (case-insensitive)
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --catalyst copper
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --catalyst palladium
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" --catalyst copper
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" --catalyst palladium
 ```
 
 #### Combined Filters (Reaction Type + Catalyst)
 
 ```bash
 # Copper-catalyzed C-N coupling specifically
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
     --reaction C_N_Coupling --catalyst Cu -k 10 --min-exp 1
 
 # Palladium-catalyzed Suzuki coupling
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(B(O)O)cc1" \
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(B(O)O)cc1" \
     --reaction Suzuki --catalyst Pd -k 10
 
 # Nickel-catalyzed C-O coupling
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCO" \
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCO" \
     --reaction CO-Coupling --catalyst Ni
 ```
 
@@ -195,13 +195,13 @@ python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCO" \
 
 ```bash
 # Compact output (top condition only)
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --compact
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" --compact
 
 # JSON export
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --json -o output.json
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" --json -o output.json
 
 # JSON with filters
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
     --catalyst Cu --json -o cu_cn_results.json
 ```
 
@@ -209,10 +209,10 @@ python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "c1ccc(N)cc1" \
 
 ```bash
 # Process multiple queries from file
-python -m chemtools.HTE.cli --batch examples/hte_queries.txt -o results.txt
+python -m chemtools.recommend.cli --batch examples/hte_queries.txt -o results.txt
 
 # Batch with filters applied to all queries
-python -m chemtools.HTE.cli --batch examples/hte_queries.txt \
+python -m chemtools.recommend.cli --batch examples/hte_queries.txt \
     --catalyst Pd --reaction Suzuki -o suzuki_results.txt
 ```
 
@@ -220,7 +220,7 @@ python -m chemtools.HTE.cli --batch examples/hte_queries.txt \
 
 ```bash
 # Show database statistics
-python -m chemtools.HTE.cli --stats
+python -m chemtools.recommend.cli --stats
 ```
 
 #### Full Example with All Options
@@ -228,7 +228,7 @@ python -m chemtools.HTE.cli --stats
 ```bash
 # Get top 20 copper-catalyzed C-N coupling conditions
 # Include single-experiment conditions, output to JSON
-python -m chemtools.HTE.cli 
+python -m chemtools.recommend.cli 
     -a "c1ccc(Br)cc1" \
     -b "c1ccc(N)cc1" \
     --reaction C_N_Coupling \
@@ -253,7 +253,7 @@ c1ccc(Br)cc1 c1ccc(B(O)O)cc1
 Process:
 
 ```bash
-python -m chemtools.HTE.cli --batch examples/hte_queries.txt -o results.txt
+python -m chemtools.recommend.cli --batch examples/hte_queries.txt -o results.txt
 ```
 
 ---
@@ -291,15 +291,15 @@ python -m chemtools.HTE.cli --batch examples/hte_queries.txt -o results.txt
 
 ```
 Input: Reactant SMILES
-    â†“
+    â†?
 Detect Types (ArBr, RNH2, etc.) using chemtools
-    â†“
+    â†?
 Lookup in Indexed Database (71 type combinations)
-    â†“
+    â†?
 Aggregate Conditions & Calculate Statistics
-    â†“
+    â†?
 Rank by Confidence Score
-    â†“
+    â†?
 Return Top-K Recommendations
 ```
 
@@ -332,7 +332,7 @@ Balances:
 
 ---
 
-## âœ… Validation Results
+## âœ?Validation Results
 
 ### Test Case 1: C-N Coupling (ArBr + RNH2)
 
@@ -346,7 +346,7 @@ Balances:
 **Input**: Chlorobenzene + Aniline  
 **Match**: 2,009 experiments  
 **Top**: tBuBrettPhos Pd(allyl)OTf / K3PO4 / MeCN  
-**Success**: 90.9% (88 exp, 84.5% avg yield) â† High confidence!
+**Success**: 90.9% (88 exp, 84.5% avg yield) â†?High confidence!
 
 ### Test Case 3: Suzuki (ArCl + ArB(OH)2)
 
@@ -377,7 +377,7 @@ Balances:
 
 ---
 
-## âš¡ Performance
+## âš?Performance
 
 | Metric           | Value               |
 | ---------------- | ------------------- |
@@ -510,7 +510,7 @@ python quickstart_hte.py
 ### Try Your Own Query
 
 ```python
-from chemtools.HTE import HTERecommender, format_result
+from chemtools.recommend import HTERecommender, format_result
 
 recommender = HTERecommender()
 
@@ -528,7 +528,7 @@ print(format_result(result))
 
 ```bash
 # Replace with your SMILES
-python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --compact
+python -m chemtools.recommend.cli -a "c1ccc(Br)cc1" -b "CCN" --compact
 ```
 
 ---
@@ -536,7 +536,7 @@ python -m chemtools.HTE.cli -a "c1ccc(Br)cc1" -b "CCN" --compact
 ## ðŸ“¦ Files Structure
 
 ```
-chemtools/HTE/
+chemtools/recommend/
 â”œâ”€â”€ __init__.py          # Package exports
 â”œâ”€â”€ recommender.py       # Core engine (550 lines)
 â”œâ”€â”€ cli.py              # CLI interface (300 lines)
@@ -556,9 +556,9 @@ Demo scripts:
 
 ---
 
-## âœ… Status
+## âœ?Status
 
-**PRODUCTION READY** âœ…
+**PRODUCTION READY** âœ?
 
 - [x] Core functionality complete
 - [x] Python API working
@@ -575,12 +575,12 @@ Demo scripts:
 
 **A complete, production-ready HTE recommendation system that:**
 
-âœ… Works without reaction SMILES (unique capability)  
-âœ… Leverages 66K+ experimental results  
-âœ… Provides statistically-validated recommendations  
-âœ… Offers flexible usage (Python + CLI)  
-âœ… Integrates seamlessly with existing systems  
-âœ… Includes comprehensive documentation
+âœ?Works without reaction SMILES (unique capability)  
+âœ?Leverages 66K+ experimental results  
+âœ?Provides statistically-validated recommendations  
+âœ?Offers flexible usage (Python + CLI)  
+âœ?Integrates seamlessly with existing systems  
+âœ?Includes comprehensive documentation
 
 **Ready to use today!** ðŸš€
 
@@ -593,7 +593,7 @@ Demo scripts:
 New analytics tools for exploring and understanding the HTE database!
 
 ```python
-from chemtools.HTE import HTEAnalytics
+from chemtools.recommend import HTEAnalytics
 
 analytics = HTEAnalytics()
 
@@ -629,19 +629,19 @@ count = analytics.export_subset(
 
 ```bash
 # List Suzuki reactant pairs with Pd catalysts
-python -m chemtools.HTE.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10
+python -m chemtools.recommend.analytics_cli pairs --reaction Suzuki --catalyst Pd --top 10
 
 # Analyze Cu catalysts
-python -m chemtools.HTE.analytics_cli catalysts --reaction "C-N" --catalyst Cu --compact
+python -m chemtools.recommend.analytics_cli catalysts --reaction "C-N" --catalyst Cu --compact
 
 # View reaction type summary
-python -m chemtools.HTE.analytics_cli reactions --top 20
+python -m chemtools.recommend.analytics_cli reactions --top 20
 
 # Analyze metal usage
-python -m chemtools.HTE.analytics_cli metals --detailed
+python -m chemtools.recommend.analytics_cli metals --detailed
 
 # Export filtered dataset
-python -m chemtools.HTE.analytics_cli export suzuki_pd.csv --reaction Suzuki --catalyst Pd --min-yield 50
+python -m chemtools.recommend.analytics_cli export suzuki_pd.csv --reaction Suzuki --catalyst Pd --min-yield 50
 ```
 
 ### Example Output
@@ -690,13 +690,13 @@ Found 16 reactant pair combinations
 - **Documentation**: `docs/HTE_RECOMMENDER.md`
 - **Examples**: Run `python demo_hte_recommender.py`
 - **Quick Start**: Run `python quickstart_hte.py`
-- **CLI Help**: `python -m chemtools.HTE.cli --help`
+- **CLI Help**: `python -m chemtools.recommend.cli --help`
 
 ### Analytics Tools
 
 - **Documentation**: `docs/HTE_ANALYTICS.md`
 - **Demo**: Run `python demo_hte_analytics.py`
-- **CLI Help**: `python -m chemtools.HTE.analytics_cli --help`
+- **CLI Help**: `python -m chemtools.recommend.analytics_cli --help`
 
 ---
 
