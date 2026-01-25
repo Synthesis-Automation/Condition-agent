@@ -70,7 +70,7 @@
             "name": "N,N'-Dimethylethylenediamine",
             "cas": "2809369-03-5",
             "smiles": null,
-            "equivalents": 0.1,
+            "equivalents": 0.05,
             "role": "ligand"
           }
         },
