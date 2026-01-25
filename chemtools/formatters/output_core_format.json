@@ -1,0 +1,83 @@
+{
+  "meta": {},
+  "input": {
+    "reaction_smiles": "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+    "user_reaction_type_filter": "C_N_Coupling",
+    "catalyst_filter": "Pd"
+  },
+  "detection": {
+    "reaction_type": "C_N_Coupling",
+    "confidence": 0.95
+  },
+  "explaination": {
+    "text": "Why these condition were given .. "
+  },
+  "recommended_conditions": [
+    {
+      "rank": 1,
+      "conditions": [
+        {
+          "name": "reactant_1_from_reaction_smiles",
+          "cas": null,
+          "smiles": "Brc1ccccc1",
+          "equivalents": 1.0,
+          "role": "reactant",
+          "is_limiting_reactant": true
+        },
+        {
+          "name": "reactant_2_from_reaction_smiles",
+          "cas": null,
+          "smiles": "Nc1ccccc1",
+          "equivalents": 1.5,
+          "role": "reactant"
+        },
+
+        {
+          "name": "temperature_time",
+          "temperature_C": 60,
+          "time_h": 2
+        },
+
+        {
+          "name": "Copper(I) iodide",
+          "abbreviation": "CuI",
+          "cas": "7681-65-4",
+          "smiles": null,
+          "equivalents": null,
+          "role": "metal_catalyst"
+        },
+        {
+          "name": "[Unknown ligand] CAS 2809369-03-5",
+          "abbreviation": null,
+          "cas": "2809369-03-5",
+          "smiles": null,
+          "equivalents": null,
+          "role": "ligand"
+        },
+        {
+          "name": "Tripotassium phosphate",
+          "abbreviation": "K3PO4",
+          "cas": "7778-53-2",
+          "smiles": null,
+          "equivalents": null,
+          "role": "base"
+        },
+        {
+          "name": "Sulfolane",
+          "abbreviation": "Sulfolane",
+          "cas": "126-33-0",
+          "smiles": null,
+          "equivalents": null,
+          "concentration_M": 0.2,
+          "role": "solvent"
+        },
+
+        {
+          "name": "temperature_time",
+          "temperature_C": 60,
+          "time_h": 2
+        }
+      ]
+    }
+  ]
+}
