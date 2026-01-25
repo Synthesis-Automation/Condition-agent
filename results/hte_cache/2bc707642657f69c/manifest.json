@@ -1,0 +1,50 @@
+{
+  "files": [
+    {
+      "mtime_ns": 1769321838438450100,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\experiments\\HTE_canonical.csv",
+      "size": 5262636
+    },
+    {
+      "mtime_ns": 1769321838454674000,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\literature\\C-N Coupling_canonical.csv",
+      "size": 4059937
+    },
+    {
+      "mtime_ns": 1769321838459114700,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\literature\\C-O Coupling_canonical.csv",
+      "size": 1022300
+    },
+    {
+      "mtime_ns": 1769321838465129900,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\literature\\C-S Coupling_canonical.csv",
+      "size": 1277395
+    },
+    {
+      "mtime_ns": 1769321838466928900,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\literature\\Ullmann-CN_canonical.csv",
+      "size": 309398
+    },
+    {
+      "mtime_ns": 1769321838466928900,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\rules\\C-O Coupling.csv",
+      "size": 250
+    },
+    {
+      "mtime_ns": 1769321838468121300,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\rules\\buchwald_hartwig_cn.csv",
+      "size": 980
+    },
+    {
+      "mtime_ns": 1769321838468121300,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\rules\\chan_lam_cn.csv",
+      "size": 211
+    },
+    {
+      "mtime_ns": 1769321838468989000,
+      "path": "C:\\Git-softwares\\Condition-agent\\data\\HTE_db\\rules\\suzuki_miyaura.csv",
+      "size": 393
+    }
+  ],
+  "version": 1
+}

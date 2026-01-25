@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple, Any, Iterable, Set
 from collections import defaultdict, Counter
 from functools import lru_cache
+import hashlib
+import pickle
 import itertools
 import re
 import pandas as pd
@@ -84,6 +86,92 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
         seen.add(key)
         ordered.append(path)
     return ordered
+
+
+def _cache_key_for_path(path: Path) -> str:
+    resolved = str(path.resolve())
+    return hashlib.sha256(resolved.encode("utf-8")).hexdigest()[:16]
+
+
+def _hte_cache_dir(db_path: Path) -> Path:
+    cache_root = PROJECT_ROOT / "results" / "hte_cache"
+    cache_root.mkdir(parents=True, exist_ok=True)
+    return cache_root / _cache_key_for_path(db_path)
+
+
+def _compute_hte_manifest(file_paths: List[Path]) -> Dict[str, Any]:
+    entries = []
+    for path in file_paths:
+        try:
+            stat = path.stat()
+        except OSError:
+            continue
+        entries.append(
+            {
+                "path": str(path.resolve()),
+                "mtime_ns": stat.st_mtime_ns,
+                "size": stat.st_size,
+            }
+        )
+    entries.sort(key=lambda item: item["path"])
+    return {"version": 1, "files": entries}
+
+
+def _load_hte_cache(
+    cache_dir: Path,
+    manifest: Dict[str, Any],
+) -> Optional[
+    Tuple[pd.DataFrame, Dict[str, pd.DataFrame], Dict[str, Counter], Dict[str, pd.DataFrame]]
+]:
+    manifest_path = cache_dir / "manifest.json"
+    payload_path = cache_dir / "hte_cache.pkl"
+    if not manifest_path.exists() or not payload_path.exists():
+        return None
+    try:
+        stored_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if stored_manifest != manifest:
+        return None
+    try:
+        with payload_path.open("rb") as handle:
+            payload = pickle.load(handle)
+    except Exception:
+        return None
+    if not isinstance(payload, dict):
+        return None
+    df = payload.get("df")
+    indexed_data = payload.get("indexed_data")
+    reaction_type_patterns = payload.get("reaction_type_patterns")
+    transformation_indices = payload.get("transformation_indices")
+    if df is None or indexed_data is None or reaction_type_patterns is None or transformation_indices is None:
+        return None
+    return df, indexed_data, reaction_type_patterns, transformation_indices
+
+
+def _save_hte_cache(
+    cache_dir: Path,
+    manifest: Dict[str, Any],
+    df: pd.DataFrame,
+    indexed_data: Dict[str, pd.DataFrame],
+    reaction_type_patterns: Dict[str, Counter],
+    transformation_indices: Dict[str, pd.DataFrame],
+) -> None:
+    try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "df": df,
+            "indexed_data": indexed_data,
+            "reaction_type_patterns": reaction_type_patterns,
+            "transformation_indices": transformation_indices,
+        }
+        payload_path = cache_dir / "hte_cache.pkl"
+        with payload_path.open("wb") as handle:
+            pickle.dump(payload, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        manifest_path = cache_dir / "manifest.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+    except Exception:
+        return
 
 
 def _read_hte_csv(path: Path) -> pd.DataFrame:
@@ -204,6 +292,12 @@ def _load_hte_database_cached(
     if not file_paths:
         raise FileNotFoundError(f"No HTE CSV/JSONL files found under: {db_path}")
 
+    manifest = _compute_hte_manifest(file_paths)
+    cache_dir = _hte_cache_dir(db_path)
+    cached = _load_hte_cache(cache_dir, manifest)
+    if cached is not None:
+        return cached
+
     frames: List[pd.DataFrame] = []
     for path in file_paths:
         if path.suffix.lower() == ".jsonl":
@@ -265,6 +359,7 @@ def _load_hte_database_cached(
             transformation_indices[key] = group_df
 
     print(f"Indexed {len(indexed_data)} reactant combinations and {len(transformation_indices)} transformation types")
+    _save_hte_cache(cache_dir, manifest, df, indexed_data, reaction_type_patterns, transformation_indices)
     return df, indexed_data, reaction_type_patterns, transformation_indices
 
 
