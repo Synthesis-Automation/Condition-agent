@@ -9,6 +9,7 @@ from functools import lru_cache
 import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
+import re
 
 from chemtools.smiles import normalize_reaction
 from chemtools.reagent.reagent_v2 import ReagentTaxonomyV2
@@ -264,19 +265,28 @@ def _group_id_from_motif_id(motif_id: str) -> str:
     return text
 
 
+def _normalize_motif_id(motif_id: str) -> str:
+    text = str(motif_id).strip()
+    if not text:
+        return ""
+    if "--" in text:
+        text = re.sub(r"-{2,}", "-", text)
+    return text
+
+
 def _collect_motif_ids(motifs: Iterable[Dict[str, Any]]) -> List[str]:
     ids: List[str] = []
     for motif in motifs:
         if not isinstance(motif, dict):
             continue
-        cid = str(motif.get("compound_id") or "").strip()
+        cid = _normalize_motif_id(motif.get("compound_id") or "")
         if cid:
             ids.append(cid)
         alt_ids = motif.get("alt_compound_ids") or []
         if isinstance(alt_ids, set):
             alt_ids = list(alt_ids)
         for alt_id in alt_ids:
-            alt_text = str(alt_id).strip()
+            alt_text = _normalize_motif_id(alt_id)
             if alt_text:
                 ids.append(alt_text)
     return ids
@@ -430,7 +440,7 @@ def _aggregate_reaction_features(
         motif_entries = reactant.get("motifs", [])
         context_entries = reactant.get("context_motifs", [])
         for motif in motif_entries:
-            compound_id = motif.get("compound_id")
+            compound_id = _normalize_motif_id(motif.get("compound_id") or "")
             if compound_id:
                 motifs.add(str(compound_id))
         reactant_motif_ids.extend(_collect_motif_ids(motif_entries))
