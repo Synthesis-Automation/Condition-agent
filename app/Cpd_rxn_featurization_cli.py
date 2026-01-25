@@ -294,12 +294,18 @@ def _print_snar_feasibility(items: Iterable[Dict[str, Any]], *, indent: int = 0)
             print(f"{prefix}    Reason: {reason}")
 
 
-def _print_molecule_detail(payload: Dict[str, Any], *, indent: int = 0) -> None:
+def _print_molecule_detail(
+    payload: Dict[str, Any],
+    *,
+    indent: int = 0,
+    show_rdkit: bool = False,
+) -> None:
     molecule = _get_molecule_payload(payload)
     prefix = " " * indent
     print(f"{prefix}SMILES: {molecule.get('smiles')}")
 
-    _print_rdkit_props(molecule.get("rdkit_props") or {}, indent=indent)
+    if show_rdkit:
+        _print_rdkit_props(molecule.get("rdkit_props") or {}, indent=indent)
     _print_motifs(molecule.get("motifs") or [], indent=indent)
     ranked = molecule.get("ranked_motifs") or []
     if ranked:
@@ -309,10 +315,10 @@ def _print_molecule_detail(payload: Dict[str, Any], *, indent: int = 0) -> None:
     _print_snar_feasibility(molecule.get("snar_feasibility") or [], indent=indent)
 
 
-def _print_molecule_summary(payload: Dict[str, Any]) -> None:
+def _print_molecule_summary(payload: Dict[str, Any], *, show_rdkit: bool = False) -> None:
     print("\nSummary (Molecule)")
     print("-" * 72)
-    _print_molecule_detail(payload, indent=0)
+    _print_molecule_detail(payload, indent=0, show_rdkit=show_rdkit)
 
 
 def _print_normalized_entries(title: str, entries: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
@@ -505,7 +511,12 @@ def _print_reaction_feasibility(feasibility: Dict[str, Any], *, indent: int = 0)
             print(_format_list(lines, indent=indent + 4))
 
 
-def _print_reaction_summary(payload: Dict[str, Any]) -> None:
+def _print_reaction_summary(
+    payload: Dict[str, Any],
+    *,
+    show_roles: bool = False,
+    show_rdkit: bool = False,
+) -> None:
     reaction = _get_reaction_payload(payload)
     print("\nSummary (Reaction)")
     print("-" * 72)
@@ -539,8 +550,9 @@ def _print_reaction_summary(payload: Dict[str, Any]) -> None:
         if lines:
             print(_format_list(lines))
 
-    _print_roles_summary(reaction.get("roles") or {})
-    _print_agent_roles(reaction.get("agent_roles") or {})
+    if show_roles:
+        _print_roles_summary(reaction.get("roles") or {})
+        _print_agent_roles(reaction.get("agent_roles") or {})
 
     intramolecular = reaction.get("intramolecular") or {}
     if intramolecular:
@@ -554,7 +566,7 @@ def _print_reaction_summary(payload: Dict[str, Any]) -> None:
     if reactants:
         for idx, reactant in enumerate(reactants, start=1):
             print(f"  Reactant {idx}:")
-            _print_molecule_detail(reactant, indent=4)
+            _print_molecule_detail(reactant, indent=4, show_rdkit=show_rdkit)
     else:
         print("  - none")
 
@@ -563,19 +575,24 @@ def _print_reaction_summary(payload: Dict[str, Any]) -> None:
     if products:
         for idx, product in enumerate(products, start=1):
             print(f"  Product {idx}:")
-            _print_molecule_detail(product, indent=4)
+            _print_molecule_detail(product, indent=4, show_rdkit=show_rdkit)
     else:
         print("  - none")
 
     _print_reaction_feasibility(reaction.get("feasibility") or {})
 
 
-def _print_readable(payload: Dict[str, Any]) -> None:
+def _print_readable(
+    payload: Dict[str, Any],
+    *,
+    show_roles: bool = False,
+    show_rdkit: bool = False,
+) -> None:
     kind = payload.get("kind")
     if kind == "molecule":
-        _print_molecule_summary(payload)
+        _print_molecule_summary(payload, show_rdkit=show_rdkit)
     elif kind == "reaction":
-        _print_reaction_summary(payload)
+        _print_reaction_summary(payload, show_roles=show_roles, show_rdkit=show_rdkit)
     else:
         print("\nSummary")
         print("-" * 72)
@@ -621,6 +638,16 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--target-groups",
         help="Focus on specific motifs (e.g., 'Br', 'H', 'CN'). Comma-separated.",
+    )
+    parser.add_argument(
+        "--show-roles",
+        action="store_true",
+        help="Show agent roles and role classification in reaction summaries.",
+    )
+    parser.add_argument(
+        "--show-rdkit",
+        action="store_true",
+        help="Show RDKit properties in molecule summaries.",
     )
     return parser.parse_args()
 
@@ -672,7 +699,11 @@ def main() -> int:
             continue
 
         if args.format in {"summary", "both"}:
-            _print_readable(payload)
+            _print_readable(
+                payload,
+                show_roles=args.show_roles,
+                show_rdkit=args.show_rdkit,
+            )
         if args.format in {"full-json", "both"}:
             print("\nFull Payload")
             print("-" * 72)

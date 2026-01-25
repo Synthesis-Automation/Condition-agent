@@ -73,7 +73,9 @@
         "R2CH-NHR",
         "R3C-NH2",
         "R3C-NHR",
-        "AromN-H"
+        "AromN-H",
+        "Ar-NHCOR",
+        "Alkyl-NHCOR"
       ],
       "usage": [
         "C_N_Coupling",
@@ -177,7 +179,7 @@
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
-      "description": "Terminal alkynes (C\u2261C-H) for Sonogashira coupling.",
+      "description": "Terminal alkynes (C≡C-H) for Sonogashira coupling.",
       "members": [
         "Ar-Alkynyl_terminal",
         "Alkyl-Alkynyl_terminal"
@@ -207,6 +209,16 @@
       ],
       "usage": [
         "C_O_Coupling"
+      ]
+    },
+    "aryl_amides": {
+      "name": "Aryl Amides",
+      "description": "N-aryl amide products (N-acyl anilides).",
+      "members": [
+        "Ar-NRCOR"
+      ],
+      "usage": [
+        "C_N_Coupling"
       ]
     }
   }

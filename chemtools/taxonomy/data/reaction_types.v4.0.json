@@ -56,7 +56,10 @@
         "nucleophile": "@amines_nh"
       },
       "products": {
-        "product": "@aryl_amines"
+        "product": [
+          "@aryl_amines",
+          "@aryl_amides"
+        ]
       },
       "catalysts": [
         "Pd",
