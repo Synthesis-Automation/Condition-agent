@@ -162,7 +162,7 @@ def cmd_list_pairs(args):
     analytics = HTEAnalytics(args.db_path)
     
     print("\n" + "="*80)
-    print("üìã REACTANT PAIR ANALYSIS")
+    print("REACTANT PAIR ANALYSIS")
     print("="*80)
     
     if args.reaction:
@@ -181,7 +181,7 @@ def cmd_list_pairs(args):
     )
     
     if len(df) == 0:
-        print("‚ù?No matching reactant pairs found")
+        print("No matching reactant pairs found")
         return
     
     print(f"Found {len(df)} reactant pair combinations\n")
@@ -212,7 +212,7 @@ def cmd_list_pairs(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚ú?Saved results to {args.output}")
+        print(f"\nSaved results to {args.output}")
 
 
 def cmd_catalysts(args):
@@ -221,7 +221,7 @@ def cmd_catalysts(args):
     import pandas as pd
     
     print("\n" + "="*80)
-    print("‚öóÔ∏è  CATALYST ANALYSIS")
+    print("CATALYST ANALYSIS")
     print("="*80)
     
     if args.reaction:
@@ -239,7 +239,7 @@ def cmd_catalysts(args):
     )
     
     if len(df) == 0:
-        print("‚ù?No catalysts found matching criteria")
+        print("No catalysts found matching criteria")
         return
     
     print(f"Found {len(df)} catalysts\n")
@@ -267,7 +267,7 @@ def cmd_catalysts(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚ú?Saved results to {args.output}")
+        print(f"\nSaved results to {args.output}")
 
 
 def cmd_reactions(args):
@@ -275,7 +275,7 @@ def cmd_reactions(args):
     analytics = HTEAnalytics(args.db_path)
     
     print("\n" + "="*80)
-    print("üß™ REACTION TYPE SUMMARY")
+    print("REACTION TYPE SUMMARY")
     print("="*80)
     print()
     
@@ -308,7 +308,7 @@ def cmd_reactions(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚ú?Saved results to {args.output}")
+        print(f"\nSaved results to {args.output}")
 
 
 def cmd_metals(args):
@@ -316,7 +316,7 @@ def cmd_metals(args):
     analytics = HTEAnalytics(args.db_path)
     
     print("\n" + "="*80)
-    print("üî¨ METAL USAGE ANALYSIS")
+    print("METAL USAGE ANALYSIS")
     print("="*80)
     print()
     
@@ -334,7 +334,7 @@ def cmd_metals(args):
         metal = row['Metal']
         count = row['Num_Experiments']
         pct = row['Percentage']
-        bar = '‚ñ? * int(pct / 2)
+        bar = "#" * int(pct / 2)
         print(f"{metal:>4}: {bar:<35} {count:>6,} ({pct:>5.1f}%)")
     
     if args.detailed:
@@ -350,7 +350,7 @@ def cmd_metals(args):
     
     if args.output:
         df.to_csv(args.output, index=False)
-        print(f"\n‚ú?Saved metal distribution to {args.output}")
+        print(f"\nSaved metal distribution to {args.output}")
 
 
 def cmd_export(args):
@@ -358,7 +358,7 @@ def cmd_export(args):
     analytics = HTEAnalytics(args.db_path)
     
     print("\n" + "="*80)
-    print("üíæ EXPORT FILTERED DATASET")
+    print("EXPORT FILTERED DATASET")
     print("="*80)
     
     if args.reaction:
@@ -382,7 +382,7 @@ def cmd_export(args):
         min_yield=args.min_yield
     )
     
-    print(f"\n‚ú?Export complete: {count:,} experiments")
+    print(f"\nExport complete: {count:,} experiments")
 
 
 def main():
@@ -494,7 +494,7 @@ Examples:
             cmd_export(args)
         return 0
     except Exception as e:
-        print(f"\n‚ù?Error: {e}", file=sys.stderr)
+        print(f"\nError: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         return 1
