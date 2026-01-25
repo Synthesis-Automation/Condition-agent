@@ -22,6 +22,18 @@ _ROLE_TO_REAGENT_TYPE = {
     "coupling_reagent": "condensation_agent",
 }
 
+_DEFAULT_EQUIVALENTS_BY_ROLE = {
+    "metal_catalyst": 0.05,
+    "catalyst": 0.05,
+    "ligand": 0.05,
+    "base": 2.0,
+    "acid": 2.0,
+    "additive": 1.5,
+    "coupling_reagent": 1.5,
+}
+_DEFAULT_OTHER_EQUIVALENTS = 1.5
+_DEFAULT_SOLVENT_CONCENTRATION_M = 0.2
+
 
 def _clean_text(value: Optional[str]) -> Optional[str]:
     if value is None:
@@ -81,6 +93,16 @@ def _chemical_entry(
     }
     if extras:
         entry.update(extras)
+    if entry.get("equivalents") is None:
+        is_limiting = bool(entry.get("is_limiting_reactant"))
+        if role == "reactant":
+            entry["equivalents"] = 1.0 if is_limiting else 1.5
+        elif role != "solvent":
+            entry["equivalents"] = _DEFAULT_EQUIVALENTS_BY_ROLE.get(
+                role, _DEFAULT_OTHER_EQUIVALENTS
+            )
+    if role == "solvent" and entry.get("concentration_M") is None:
+        entry["concentration_M"] = _DEFAULT_SOLVENT_CONCENTRATION_M
     return entry
 
 
@@ -151,7 +173,7 @@ def format_hte_output(
                     name=None,
                     cas=None,
                     smiles=reactant_a_smiles,
-                    equivalents=1.0,
+                    equivalents=None,
                     role="reactant",
                     extras={"is_limiting_reactant": True},
                 ),
@@ -164,7 +186,7 @@ def format_hte_output(
                     name=None,
                     cas=None,
                     smiles=reactant_b_smiles,
-                    equivalents=1.0,
+                    equivalents=None,
                     role="reactant",
                 ),
             )
