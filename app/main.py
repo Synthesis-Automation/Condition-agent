@@ -11,6 +11,8 @@ import time
 from typing import Optional, Tuple, Dict, Any, List
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from chemtools.exceptions import ValidationError
@@ -21,6 +23,18 @@ from app.services.error_handlers import register_error_handlers
 
 app = FastAPI(title="ChemTools API", version="1.0.0")
 register_error_handlers(app)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/favicon.ico")
+def favicon() -> Response:
+    return Response(status_code=204)
 
 
 class HTERecommendationInput(BaseModel):

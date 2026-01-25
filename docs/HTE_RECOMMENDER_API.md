@@ -61,5 +61,25 @@ if ($null -eq $first) {
 # $response | ConvertTo-Json -Depth 10
 ```
 
+## Test with HTML (browser)
+
+Open `docs/HTE_RECOMMENDER_TESTER.html` in a browser and click **Send Request**.
+
+Note: If the API runs on a different host/port, update the endpoint field in the page.
+
 Expected: a JSON payload with `meta`, `input`, `detection`, and `recommended_conditions`, where
 `recommended_conditions[0].steps` interleaves `add` actions and `condition` actions.
+
+## Default equivalents and solvent concentration
+
+When the recommender output does not include `equivalents`, use these defaults:
+
+- First reactant: `1.0`
+- Other reactants: `1.5`
+- Catalyst or ligand: `0.05`
+- Base or acid: `2.0`
+- Other reagents: `1.5`
+
+When the output does not include solvent concentration, use:
+
+- `concentration_M`: `0.2`
