@@ -463,10 +463,16 @@ def enrich_reaction_dataset_cas(input_path: str | Path) -> None:
 
     modified = False
 
+    lookup_cache: Dict[Tuple[str, Optional[str]], List[str]] = {}
+
     def lookup_cas(name_str: Any, preferred_type: Optional[str] = None) -> List[str]:
         if not name_str or pd.isna(name_str):
             return []
-        
+        cache_key = (str(name_str).strip(), preferred_type)
+        cached = lookup_cache.get(cache_key)
+        if cached is not None:
+            return list(cached)
+
         # Split by typical separators
         names = _split_reagent_names(str(name_str))
         found_cas = []
@@ -486,8 +492,9 @@ def enrich_reaction_dataset_cas(input_path: str | Path) -> None:
             
             if hit and hit.get('cas'):
                 found_cas.append(hit['cas'])
-        
-        return found_cas
+
+        lookup_cache[cache_key] = found_cas
+        return list(found_cas)
 
     for name_col, (cas_col, r_type) in mappings.items():
         if name_col not in df.columns:
@@ -604,6 +611,10 @@ def process_reaction_dataset(
                     continue
                 reactants_part, products_part = smiles.split(">>")
                 reactants = reactants_part.split(".")
+                reagents = extract_reagents(record, csv_row=row)
+                if drop_no_catalyst and not reagents.get("catalyst"):
+                    skipped_no_catalyst += 1
+                    continue
                 _collect_reagent_smiles(record, None, unknown_cas)
 
                 motif_ids = []
@@ -718,11 +729,6 @@ def process_reaction_dataset(
                 type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
                 type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
 
-                reagents = extract_reagents(record, csv_row=row)
-                if drop_no_catalyst and not reagents.get("catalyst"):
-                    skipped_no_catalyst += 1
-                    continue
-
                 spectator_groups = rank_spectator_groups(
                     _collect_spectator_groups(reactant_data, spectators_set)
                 )
@@ -789,6 +795,10 @@ def process_reaction_dataset(
 
             reactants_part, products_part = smiles.split(">>")
             reactants = reactants_part.split(".")
+            reagents = extract_reagents(record)
+            if drop_no_catalyst and not reagents.get("catalyst"):
+                skipped_no_catalyst += 1
+                continue
             _collect_reagent_smiles(record, None, unknown_cas)
 
             motif_ids = []
@@ -902,11 +912,6 @@ def process_reaction_dataset(
             type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
             type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
             type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
-
-            reagents = extract_reagents(record)
-            if drop_no_catalyst and not reagents.get("catalyst"):
-                skipped_no_catalyst += 1
-                continue
 
             spectator_groups = rank_spectator_groups(
                 _collect_spectator_groups(reactant_data, spectators_set)

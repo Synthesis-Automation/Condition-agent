@@ -23,12 +23,14 @@ class ConversionWorker(QtCore.QObject):
         drop_no_catalyst: bool,
         reagent_csv_path: str,
         new_reagents_path: str,
+        skip_cas_enrichment: bool,
     ):
         super().__init__()
         self.jobs = jobs
         self.drop_no_catalyst = drop_no_catalyst
         self.reagent_csv_path = reagent_csv_path
         self.new_reagents_path = new_reagents_path
+        self.skip_cas_enrichment = skip_cas_enrichment
 
     def run(self):
         try:
@@ -53,8 +55,11 @@ class ConversionWorker(QtCore.QObject):
                         f"{os.path.basename(output_path)}"
                     )
                     # 1. Enrich CAS numbers first
-                    print(f"Step 1: Enriching CAS numbers in {os.path.basename(input_path)}...")
-                    enrich_reaction_dataset_cas(input_path)
+                    if self.skip_cas_enrichment:
+                        print("Step 1: Skipping CAS enrichment (fast mode).")
+                    else:
+                        print(f"Step 1: Enriching CAS numbers in {os.path.basename(input_path)}...")
+                        enrich_reaction_dataset_cas(input_path)
 
                     # 2. Process to HTE format
                     print("Step 2: Converting to HTE format...")
@@ -88,6 +93,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.output_edit = QtWidgets.QLineEdit()
         self.drop_catalyst_check = QtWidgets.QCheckBox("Drop reactions without a catalyst")
         self.drop_catalyst_check.setChecked(True)
+        self.skip_cas_check = QtWidgets.QCheckBox("Skip CAS enrichment (faster)")
         
         self.btn_run = QtWidgets.QPushButton("Start Conversion")
         self.btn_quit = QtWidgets.QPushButton("Quit")
@@ -150,6 +156,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         form.addRow("Output CSV/Folder:", self.output_edit)
         form.addRow("", QtWidgets.QLabel("Output includes formed_motifs, spectator_groups, and reactant_3 columns."))
         form.addRow("", self.drop_catalyst_check)
+        form.addRow("", self.skip_cas_check)
         
         layout.addLayout(form)
         
@@ -301,6 +308,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
             self.drop_catalyst_check.isChecked(),
             str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
             str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
+            self.skip_cas_check.isChecked(),
         )
         self.worker.moveToThread(self.thread)
         

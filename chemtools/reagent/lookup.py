@@ -187,6 +187,7 @@ def _split_reagent_name(name: str) -> List[str]:
     return [part.strip() for part in parts if part and part.strip()]
 
 
+@lru_cache(maxsize=16384)
 def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
     """
     Find a reagent by name in the specified database.
@@ -201,6 +202,7 @@ def find_reagent(name: str, reagent_type: str) -> Optional[Dict[str, Any]]:
     if not name:
         return None
     
+    reagent_type = _canonical_role(reagent_type.strip())
     db = load_reagent_database(reagent_type)
     if not db:
         return None
