@@ -36,6 +36,28 @@ def _strip_markdown_fences(text: str) -> str:
     return text.strip()
 
 
+def _starting_material_entries(reaction_smiles: str) -> List[Dict[str, Any]]:
+    """
+    Build starting material entries from reaction SMILES.
+    """
+    from chemtools.smiles import normalize_reaction
+    from chemtools.formatters import normalize_chemical_entry
+
+    normalized = normalize_reaction(reaction_smiles or "")
+    reactants = normalized.get("reactants") or []
+    entries: List[Dict[str, Any]] = []
+
+    for item in reactants:
+        if not isinstance(item, dict):
+            continue
+        smiles = item.get("smiles_norm") or item.get("largest_smiles") or item.get("input")
+        if not smiles:
+            continue
+        entries.append(normalize_chemical_entry({"role": "starting_material", "smiles": smiles}))
+
+    return entries
+
+
 def _format_conditions_for_llm(conditions: List[Dict[str, Any]], source_name: str) -> str:
     """
     Format conditions list into readable text for LLM prompt.
@@ -294,13 +316,11 @@ def convert_llm_synthesis_to_standard_format(
             ]
         }
     """
-    from chemtools.output_formatter import (
+    from chemtools.formatters import (
         format_meta,
         format_input,
         format_detection,
-        normalize_chemical_entry,
         normalize_conditions_block,
-        starting_material_entries,
     )
     
     if synthesis_result.get("status") != "success":
@@ -409,14 +429,10 @@ def _build_recommendation_from_llm(
     Returns:
         Standard recommendation dictionary
     """
-    from chemtools.output_formatter import (
-        normalize_chemical_entry,
-        starting_material_entries,
-        normalize_rule_string_value,
-    )
+    from chemtools.formatters import normalize_rule_string_value
     
     # Start with reactants
-    chemicals = starting_material_entries(reaction_smiles)
+    chemicals = _starting_material_entries(reaction_smiles)
     
     # Extract catalyst system from LLM output
     catalyst_name = condition_dict.get("catalyst")

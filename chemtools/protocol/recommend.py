@@ -35,12 +35,9 @@ import json
 
 from .indexer import ProtocolIndexer, ProtocolRecord
 from ..recommend.utils import friendly_family_label
+from ..formatters import format_meta, format_input, format_detection
 
-try:
-    from ..output_formatter import format_meta, format_input, format_detection
-    HAS_OUTPUT_FORMATTER = True
-except ImportError:
-    HAS_OUTPUT_FORMATTER = False
+HAS_OUTPUT_FORMATTER = True
 
 logger = logging.getLogger(__name__)
 

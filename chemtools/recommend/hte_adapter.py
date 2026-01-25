@@ -1,8 +1,8 @@
 """
 HTE-backed recommendation adapter.
 
-Provides the legacy recommend_from_reaction / recommend_conditions_structured
-API using the chemtools.HTE recommender as the primary backend.
+Provides recommend_from_reaction / recommend_conditions_structured
+using the chemtools.HTE recommender as the primary backend.
 """
 
 from __future__ import annotations

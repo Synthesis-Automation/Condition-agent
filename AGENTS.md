@@ -4,7 +4,7 @@
 
 - `app/main.py`: FastAPI app and route wiring (OpenAPI at `/docs`).
 - `chemtools/`: Core deterministic libraries (`smiles.py`, `router.py`, `properties.py`, `precedent.py`, `constraints.py`, `explain.py`).
-  - `condition_core.py` and `featurizers/molecular.py` for C-N coupling substrate features.
+  - `featurizers/molecular.py` for C-N coupling substrate features.
   - `util/functional_groups.py`: Comprehensive functional group detection (80+ groups) using SMARTS patterns.
   - `protocol/`: Protocol-based recommendation using DRFP similarity.
 - `chemtools/recommend/`: Primary HTE-based recommendation interface.

@@ -10,8 +10,6 @@ class Reagent(BaseModel):
     uid: str; role: str
     name: Optional[str] = None; token: Optional[str] = None
 
-class ConditionCoreParseRequest(BaseModel):
-    reagents: List[Reagent]; text: Optional[str] = None
 
 class PrecedentKNNRequest(BaseModel):
     family: str; features: Dict[str, Any]; k: int = 50; relax: Optional[Dict[str, Any]] = None
@@ -44,12 +42,6 @@ class PlateDesignRequest(BaseModel):
     relax: Optional[Dict[str, Any]] = None
     constraints: Optional[Dict[str, Any]] = None
 
-# Dev/validation: validate ConditionCore normalization on a JSONL dataset
-class ConditionCoreValidateRequest(BaseModel):
-    path: str
-    limit: int = 0
-    show_mismatches: int = 10
-    metal_only_ok: bool = True
 
 # Role-aware featurization
 class RoleAwareMolRequest(BaseModel):
