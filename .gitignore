@@ -159,6 +159,6 @@ data-processor/dataset/*.rdf
 data-processor/dataset/*.zip
 data-processor/dataset/*.gz
 
-
+# Cache files and large binary artifacts
 *.pkl
-results/hte_cache/2bc707642657f69c/hte_cache.pkl
+results/hte_cache/
