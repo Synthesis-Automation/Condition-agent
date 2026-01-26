@@ -663,6 +663,7 @@ def main() -> int:
         "include_ar_h": args.include_ar_h,
         "target_groups": target_groups,
         "discovery_mode": args.discovery,
+        "confirm_coupling_products": True,
     }
     print("ChemTools Featurization CLI")
     print("Enter 'q' to quit.")

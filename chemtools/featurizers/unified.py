@@ -522,9 +522,13 @@ def featurize_reaction(
     include_roles = _to_bool(options.get("include_roles"), default=True)
     include_agent_roles = _to_bool(options.get("include_agent_roles"), default=True)
 
+    confirm_suzuki_products = _to_bool(options.get("confirm_suzuki_products"), default=False)
+    confirm_coupling_products = _to_bool(options.get("confirm_coupling_products"), default=False)
     detection = detect_reaction_types(
         reaction_smiles,
         max_hits_per_compound=(options or {}).get("max_hits_per_compound"),
+        confirm_suzuki_products=confirm_suzuki_products,
+        confirm_coupling_products=confirm_coupling_products,
     )
     detection_payload = detection.to_dict()
     reaction_type = _reaction_type_summary(detection)
