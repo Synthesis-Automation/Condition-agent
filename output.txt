@@ -1,0 +1,4 @@
+Script start
+Query: O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3
+Recommendations Found: 0
+Script end

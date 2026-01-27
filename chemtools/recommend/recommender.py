@@ -50,9 +50,9 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
     for part in parts:
         if part in ("literature", "datasets", "dataset"):
             return "literature"
-        if part == "protocols":
+        if "protocol" in part:  # Matches protocols, protocol_db, etc.
             return "protocols"
-        if part == "rules":
+        if "rule" in part:      # Matches rules, rule_db
             return "rules"
         if part in ("experiments", "experiment", "experiements"):
             return "experiments"
@@ -76,14 +76,12 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
 
     candidates: List[Path] = []
     candidates.extend(db_path.glob("*.csv"))
-    candidates.extend(db_path.glob("*.jsonl"))
 
     for subdir in ("literature", "datasets", "protocols", "rules", "experiments", "experiment", "experiements"):
         sub_path = db_path / subdir
         if not sub_path.exists():
             continue
         candidates.extend(sub_path.glob("*.csv"))
-        candidates.extend(sub_path.glob("*.jsonl"))
 
     seen = set()
     ordered: List[Path] = []
@@ -221,6 +219,20 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
     if "Reaction_Type_Standardized" not in df.columns and "reaction_id" in df.columns:
         df = df.rename(columns={"reaction_id": "Reaction_Type_Standardized"})
 
+    # Generate Reaction_Key from SMILES for Protocol DB if missing
+    if "reaction_smiles" in df.columns and "Reaction_Key" not in df.columns:
+        if df["reaction_smiles"].astype(str).str.strip().any():
+            def _gen_rxn_key(smiles_val: Any) -> str:
+                s = str(smiles_val).strip()
+                if not s or s.lower() == "nan":
+                    return ""
+                try:
+                    context = featurize_reaction(s)
+                    return context.get("reaction", {}).get("reaction_key") or ""
+                except Exception:
+                    return ""
+            df["Reaction_Key"] = df["reaction_smiles"].apply(_gen_rxn_key)
+
     if "Reaction_Key" in df.columns:
         if "Reaction_Type_Standardized" not in df.columns or not any(df["Reaction_Type_Standardized"]):
             df["Reaction_Type_Standardized"] = df["Reaction_Key"]
@@ -243,17 +255,24 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                 df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
 
     df["Reaction_Type_Standardized"] = (
-        df["Reaction_Type_Standardized"]
-        .fillna("")
-        .astype(str)
-        .apply(_resolve_reaction_type_label)
+        df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
     )
-    df["Reaction_Type_Standardized"] = df["Reaction_Type_Standardized"].replace("", "Unknown")
 
     def _normalize_reactants_row(row: pd.Series) -> pd.Series:
-        a_val, b_val, c_val, cleaned = _normalize_reactant_values(
-            [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
-        )
+        raw = [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
+        cleaned: List[str] = []
+        for value in raw:
+            if value is None:
+                continue
+            if isinstance(value, float) and pd.isna(value):
+                continue
+            text = str(value).strip()
+            if not text or text.lower() == "nan":
+                continue
+            cleaned.append(text)
+        a_val = cleaned[0] if len(cleaned) > 0 else ""
+        b_val = cleaned[1] if len(cleaned) > 1 else ""
+        c_val = cleaned[2] if len(cleaned) > 2 else ""
         row["Reactant_A_Type"] = a_val
         row["Reactant_B_Type"] = b_val
         row["Reactant_C_Type"] = c_val
@@ -298,7 +317,7 @@ def _load_hte_database_cached(
 
     file_paths = _collect_hte_files(db_path)
     if not file_paths:
-        raise FileNotFoundError(f"No HTE CSV/JSONL files found under: {db_path}")
+        raise FileNotFoundError(f"No HTE CSV files found under: {db_path}")
 
     manifest = _compute_hte_manifest(file_paths)
     cache_dir = _hte_cache_dir(db_path)
@@ -308,10 +327,7 @@ def _load_hte_database_cached(
 
     frames: List[pd.DataFrame] = []
     for path in file_paths:
-        if path.suffix.lower() == ".jsonl":
-            frame = _load_hte_jsonl(path)
-        else:
-            frame = _read_hte_csv(path)
+        frame = _read_hte_csv(path)
         frame = _normalize_hte_dataframe(frame, source_path=path)
         frames.append(frame)
 
@@ -439,13 +455,6 @@ def _resolve_reaction_type_label(label: Optional[str]) -> str:
     return resolved or text
 
 
-def _format_reaction_id(reaction_type: Optional[str], reaction_category: Optional[str]) -> str:
-    type_text = _clean_reaction_label(reaction_type)
-    if type_text:
-        return type_text
-    return _clean_reaction_label(reaction_category)
-
-
 def _format_source_reaction_ids(
     group_df: pd.DataFrame,
     *,
@@ -506,6 +515,8 @@ def _normalize_source_group(value: Optional[str]) -> str:
         return ""
     if label in ("literature", "datasets", "dataset", "lit"):
         return "literature"
+    if label in ("protocols", "protocol"):
+        return "protocols"
     if label in ("experiments", "experiment", "experiements"):
         return "experiments"
     if label == "rules":
@@ -1307,52 +1318,6 @@ def _prioritize_motifs(
     )
 
 
-def _load_hte_jsonl(path: Path) -> pd.DataFrame:
-    rows: List[Dict[str, Any]] = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                record = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-
-            reactant_types = _ensure_list(record.get("reactant_types"))
-            a_type, b_type, c_type, cleaned = _normalize_reactant_values(reactant_types)
-            reactant_categories = _ensure_list(record.get("reactant_categories"))
-            catalyst_types = _ensure_list(record.get("catalyst_type"))
-            conditions = record.get("conditions") or {}
-            metrics = record.get("metrics") or {}
-
-            raw_reaction_type = record.get("reaction_type") or "Unknown"
-            resolved_reaction_type = _resolve_reaction_type_label(raw_reaction_type) or "Unknown"
-            row = {
-                "Reaction_Type_Standardized": resolved_reaction_type,
-                "Reactant_A_Type": a_type,
-                "Reactant_B_Type": b_type,
-                "Reactant_C_Type": c_type,
-                "Reactant_A_Category": reactant_categories[0] if len(reactant_categories) > 0 else "",
-                "Reactant_B_Category": reactant_categories[1] if len(reactant_categories) > 1 else "",
-                "Reactant_Types_Key": _reactant_key(cleaned),
-                "Catalyst_Type": _format_list(catalyst_types),
-                "Catalyst": _format_list(conditions.get("catalyst")),
-                "Ligand": _format_list(conditions.get("ligand")),
-                "Base": _format_list(conditions.get("base")),
-                "Solvent": _format_list(conditions.get("solvent")),
-                "Secondary Solvent": _format_list(conditions.get("secondary_solvent")),
-                "Additive": _format_list(conditions.get("additive")),
-                "Coupling Reagent": _format_list(conditions.get("coupling_reagent")),
-                "AREA_TOTAL_REDUCED": metrics.get("area_total_reduced"),
-                "z-Score": metrics.get("z_score"),
-                "spectator_groups": record.get("spectator_groups", ""),
-            }
-            rows.append(row)
-
-    return pd.DataFrame(rows)
-
-
 @dataclass
 class ConditionRecommendation:
     """Single condition recommendation with metadata
@@ -1618,6 +1583,14 @@ class HTERecommender:
         """
         reacted, formed, spectators = _parse_transformation_key(db_key)
         
+        # DEBUG
+        debug_mode = False
+        if debug_mode and "Ar-Br" in db_key:
+             print(f"DEBUG MATCH: {db_key}")
+             print(f"  Query Reacted: {query_reacted}")
+             print(f"  DB Reacted: {reacted}")
+             print(f"  Subset? {reacted.issubset(query_reacted if query_reacted else set())}")
+
         # 1. Core match: query must contain all 'reacted' motifs
         core_set = query_reacted if query_reacted is not None else query_motifs
         if not reacted or not reacted.issubset(core_set):
@@ -1722,7 +1695,19 @@ class HTERecommender:
         grouped = matched_df.groupby(condition_cols, dropna=False)
         
         for condition_tuple, group_df in grouped:
-            if len(group_df) < min_experiments:
+            # Protocol data (single curated conditions) should not need 2 experiments
+            current_min_exp = min_experiments
+            if 'Source_Group' in group_df.columns:
+                # Check for 'protocols' or raw path containing 'protocol'
+                is_protocol = (group_df['Source_Group'] == 'protocols').any()
+                if not is_protocol:
+                     # Fallback check if source_group wasn't normalized
+                     is_protocol = group_df['Source_Group'].astype(str).str.contains('protocol', case=False, na=False).any()
+                
+                if is_protocol:
+                    current_min_exp = 1
+            
+            if len(group_df) < current_min_exp:
                 continue
             
             # Extract condition components
@@ -2019,6 +2004,12 @@ class HTERecommender:
             reactant_b_smiles=reactant_b_smiles,
             product_smiles=product_smiles
         )
+
+        # Normalize source group and adjust min_experiments for protocols
+        if source_group:
+            source_group = _normalize_source_group(source_group)
+            if source_group == "protocols" and min_experiments > 1:
+                min_experiments = 1
 
         if reaction_type_filter:
             resolved_filter = _resolve_reaction_type_label(reaction_type_filter)
@@ -2337,7 +2328,22 @@ class HTERecommender:
         
         # Apply reaction type filter if specified
         if reaction_type_filter:
-            matched_df = matched_df[matched_df['Reaction_Type_Standardized'] == reaction_type_filter]
+            # Allow matches that:
+            # 1. Have matching Reaction_Type
+            # 2. Are key-based matches (presumed structural match) via _transformation_key or Reaction_Key
+            # 3. Have match_score > 0.9 (strong similarity match)
+            
+            cond_type = matched_df['Reaction_Type_Standardized'] == reaction_type_filter
+            
+            cond_key = pd.Series([False] * len(matched_df), index=matched_df.index)
+            if "_transformation_key" in matched_df.columns:
+                cond_key |= matched_df["_transformation_key"].notna()
+            
+            # If Result has query key, check for exact key match
+            if result.query_reaction_key and "Reaction_Key" in matched_df.columns:
+                 cond_key |= (matched_df["Reaction_Key"] == result.query_reaction_key)
+
+            matched_df = matched_df[cond_type | cond_key]
         
         # Apply catalyst filter if specified
         if catalyst_filter:
@@ -2418,15 +2424,28 @@ class HTERecommender:
             ):
                 # Apply detected reaction type as filter
                 if "Reaction_Type_Standardized" in matched_df.columns:
-                    type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
-                    detected_normalized = _resolve_reaction_type_label(result.predicted_reaction_type)
-                    type_mask = type_series.apply(
-                        lambda x: _resolve_reaction_type_label(x) == detected_normalized if x else False
-                    )
-                    filtered_df = matched_df[type_mask]
-                    if len(filtered_df) >= min_experiments:
-                        matched_df = filtered_df
-                        result.is_filtered_by_detected_type = True
+                    if result.query_reaction_key and "Reaction_Key" in matched_df.columns:
+                        key_series = matched_df["Reaction_Key"].fillna("").astype(str).str.strip()
+                        if not (key_series == result.query_reaction_key).any():
+                            type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                            detected_normalized = _resolve_reaction_type_label(result.predicted_reaction_type)
+                            type_mask = type_series.apply(
+                                lambda x: _resolve_reaction_type_label(x) == detected_normalized if x else False
+                            )
+                            filtered_df = matched_df[type_mask]
+                            if len(filtered_df) >= min_experiments:
+                                matched_df = filtered_df
+                                result.is_filtered_by_detected_type = True
+                    else:
+                        type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                        detected_normalized = _resolve_reaction_type_label(result.predicted_reaction_type)
+                        type_mask = type_series.apply(
+                            lambda x: _resolve_reaction_type_label(x) == detected_normalized if x else False
+                        )
+                        filtered_df = matched_df[type_mask]
+                        if len(filtered_df) >= min_experiments:
+                            matched_df = filtered_df
+                            result.is_filtered_by_detected_type = True
             
             pool_size = max(top_k * 3, top_k)
             if "Source_Group" in matched_df.columns:
