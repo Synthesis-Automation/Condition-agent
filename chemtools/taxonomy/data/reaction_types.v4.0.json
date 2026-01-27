@@ -406,7 +406,7 @@
       "description": "Arylation of C-H acidic compounds (alpha to carbonyl or other EWG) with aryl electrophiles."
     },
     {
-      "id": "Ar_H_arylation",
+      "id": "Arylation_Ar_H",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "substrate": "Ar-H"
