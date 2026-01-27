@@ -9,7 +9,6 @@ import time
 from dataclasses import asdict
 from pathlib import Path
 from typing import Optional, Tuple, Dict, Any, List
-
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
@@ -37,12 +36,14 @@ def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Op
 
 def _detect_csv_type(path: Path) -> str:
     parts = [part.lower() for part in path.parts]
-    for label in ("rules", "literature", "datasets", "experiments", "experiment", "experiements"):
+    for label in ("protocols", "rules", "literature", "datasets", "experiments", "experiment", "experiements"):
         if label in parts:
             if label in ("literature", "datasets"):
                 return "literature"
             if label in ("experiments", "experiment", "experiements"):
                 return "experiments"
+            if label == "protocols":
+                return "protocols"
             return label
     if path.is_dir():
         return "directory"
@@ -74,6 +75,8 @@ def _normalize_source_group_label(value: Any) -> str:
         return "experiments"
     if text == "rules":
         return "rules"
+    if text in ("protocols", "protocol"):
+        return "protocols"
     return text
 
 
@@ -268,9 +271,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.catalyst_filter_edit.setPlaceholderText("Optional catalyst filter (e.g., Pd, Cu)")
 
         self.source_group_combo = QtWidgets.QComboBox()
-        self.source_group_combo.addItems(["All", "literature", "experiments", "rules"])
+        self.source_group_combo.addItems(["All", "literature", "protocols", "experiments", "rules"])
         self.source_group_combo.setToolTip(
-            "Filter results to a specific HTE source group (rules live in data/HTE_db/rules)."
+            "Filter results to a specific HTE source group (protocols=curated literature with detailed procedures, rules live in data/HTE_db/rules)."
         )
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
@@ -436,7 +439,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.results_tabs.clear()
         self.table = self._create_results_table()
         self.results_tabs.addTab(self.table, "All")
-        for label in ("Literature", "Rules", "Experiments", "Precedent"):
+        for label in ("Literature", "Protocols", "Rules", "Experiments", "Precedent"):
             group_table = self._create_results_table()
             self.results_tabs.addTab(group_table, label)
 
@@ -621,7 +624,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         all_columns = _table_columns_for_type(data_type)
         self._populate_table(self.table, recs, all_columns)
 
-        base_groups = ["literature", "rules", "experiments", "precedent"]
+        base_groups = ["literature", "protocols", "rules", "experiments", "precedent"]
         extra_groups = [g for g in sorted(source_map) if g not in base_groups]
         for source_group in base_groups + extra_groups:
             group_recs = list(source_map.get(source_group) or [])

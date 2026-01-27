@@ -415,26 +415,42 @@ class HTEConverterWindow(QtWidgets.QWidget):
                     output_df = pd.read_csv(output_path)
                     print(f"Output loaded: {len(output_df)} rows, {len(output_df.columns)} columns")
                     
-                    # Restore reaction_id (process_reaction_dataset sets it to filename)
-                    if original_ids is not None and len(original_ids) == len(output_df):
-                        output_df['reaction_id'] = original_ids
-                        print(f"✓ Restored {len(original_ids)} original reaction IDs")
-                    elif has_reaction_id:
-                        print(f"⚠ Could not restore reaction_id: length mismatch ({len(original_ids)} vs {len(output_df)})")
-                    
-                    # Restore reference
-                    if reference_backup is not None and len(reference_backup) == len(output_df):
-                        output_df['reference'] = reference_backup
-                        print(f"✓ Restored reference information")
-                    elif has_reference:
-                        print(f"⚠ Could not restore reference: length mismatch ({len(reference_backup)} vs {len(output_df)})")
-                    
-                    # Add reaction_setup_json
-                    if setup_json_backup is not None and len(setup_json_backup) == len(output_df):
-                        output_df['reaction_setup_json'] = setup_json_backup
-                        print(f"✓ Added reaction_setup_json to {len(output_df)} rows")
-                    elif has_setup_json:
-                        print(f"⚠ Could not add reaction_setup_json: length mismatch ({len(setup_json_backup) if setup_json_backup is not None else 'None'} vs {len(output_df)})")
+                    if len(df_original) != len(output_df):
+                        print(f"⚠ Row count mismatch: input={len(df_original)}, output={len(output_df)}")
+                        print("  Some rows may have been filtered by processing pipeline (e.g., drop_no_catalyst)")
+                        print("  Mapping metadata by reaction_smiles...")
+                        
+                        # Create mapping dictionaries using reaction_smiles as key
+                        if original_ids is not None:
+                            id_map = dict(zip(df_original['reaction_smiles'], original_ids))
+                            output_df['reaction_id'] = output_df['reaction_smiles'].map(id_map)
+                            restored = output_df['reaction_id'].notna().sum()
+                            print(f"✓ Restored {restored}/{len(output_df)} reaction IDs by mapping")
+                        
+                        if reference_backup is not None:
+                            ref_map = dict(zip(df_original['reaction_smiles'], reference_backup))
+                            output_df['reference'] = output_df['reaction_smiles'].map(ref_map)
+                            restored = output_df['reference'].notna().sum()
+                            print(f"✓ Restored {restored}/{len(output_df)} references by mapping")
+                        
+                        if setup_json_backup is not None:
+                            setup_map = dict(zip(df_original['reaction_smiles'], setup_json_backup))
+                            output_df['reaction_setup_json'] = output_df['reaction_smiles'].map(setup_map)
+                            restored = output_df['reaction_setup_json'].notna().sum()
+                            print(f"✓ Added reaction_setup_json to {restored}/{len(output_df)} rows by mapping")
+                    else:
+                        # Same length - can use direct assignment
+                        if original_ids is not None:
+                            output_df['reaction_id'] = original_ids
+                            print(f"✓ Restored {len(original_ids)} original reaction IDs")
+                        
+                        if reference_backup is not None:
+                            output_df['reference'] = reference_backup
+                            print(f"✓ Restored reference information")
+                        
+                        if setup_json_backup is not None:
+                            output_df['reaction_setup_json'] = setup_json_backup
+                            print(f"✓ Added reaction_setup_json to {len(output_df)} rows")
                     
                     output_df.to_csv(output_path, index=False)
                     print(f"✓ Saved enhanced output with {len(output_df)} rows and {len(output_df.columns)} columns")
