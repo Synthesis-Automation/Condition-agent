@@ -720,7 +720,12 @@ def process_reaction_dataset(
                     reacted_set,
                 )
 
-                reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
+                # Use shared format_reaction_key function for consistency
+                reaction_key = format_reaction_key(
+                    primary_reacted_motifs,
+                    [primary_formed_str] if primary_formed_str != "None" else [],
+                    list(spectators_set)
+                )
 
                 if len(reactants) == 1:
                     primary_reactant_motifs = primary_reactant_motifs[:1]
@@ -904,7 +909,12 @@ def process_reaction_dataset(
                 reacted_set,
             )
 
-            reaction_key = f"{primary_reacted_str} -> {primary_formed_str} || {spectators_str}"
+            # Use shared format_reaction_key function for consistency
+            reaction_key = format_reaction_key(
+                primary_reacted_motifs,
+                [primary_formed_str] if primary_formed_str != "None" else [],
+                list(spectators_set)
+            )
 
             if len(reactants) == 1:
                 primary_reactant_motifs = primary_reactant_motifs[:1]

@@ -26,6 +26,7 @@ from pathlib import Path
 import json
 
 from chemtools.featurizers.structural import featurize_molecule
+from chemtools.featurizers.unified import featurize_reaction, format_reaction_key
 from chemtools.featurizers.spectator_rank import weighted_spectator_similarity
 from chemtools.smiles import normalize_reaction
 
@@ -1377,6 +1378,7 @@ class ConditionRecommendation:
     reaction_type: Optional[str] = None
     reaction_category: Optional[str] = None
     reaction_id: Optional[str] = None
+    reaction_key: Optional[str] = None
     reactant_types: Tuple[str, str] = ("", "")
     z_score_range: Tuple[float, float] = (0.0, 0.0)
 
@@ -1403,6 +1405,7 @@ class HTERecommendationResult:
     reacted_motifs: Optional[Tuple[str, ...]] = None
     formed_motifs: Optional[Tuple[str, ...]] = None
     spectator_motifs: Optional[Tuple[str, ...]] = None
+    query_reaction_key: Optional[str] = None  # Formatted Reaction_Key for the query
     
     # Recommendations
     recommendations: List[ConditionRecommendation] = field(default_factory=list)
@@ -1412,6 +1415,7 @@ class HTERecommendationResult:
     total_matching_experiments: int = 0
     database_coverage: float = 0.0  # % of database that matches this query
     is_fallback_match: bool = False
+    is_filtered_by_detected_type: bool = False  # Whether results were filtered by detected reaction type
     matched_motifs: Optional[Tuple[str, str]] = None
 
 
@@ -1763,6 +1767,18 @@ class HTERecommender:
                 category_series = category_series[category_series != ""]
                 if not category_series.empty:
                     reaction_category = category_series.mode().iloc[0]
+
+            reaction_key = None
+            if "_transformation_key" in group_df.columns:
+                key_series = group_df["_transformation_key"].fillna("").astype(str).str.strip()
+                key_series = key_series[key_series != ""]
+                if not key_series.empty:
+                    reaction_key = key_series.mode().iloc[0]
+            elif "Reaction_Key" in group_df.columns:
+                key_series = group_df["Reaction_Key"].fillna("").astype(str).str.strip()
+                key_series = key_series[key_series != ""]
+                if not key_series.empty:
+                    reaction_key = key_series.mode().iloc[0]
             reaction_id = _format_source_reaction_ids(group_df)
             
             # Reactant types (from first row)
@@ -1800,6 +1816,7 @@ class HTERecommender:
                 reaction_type=reaction_type,
                 reaction_category=reaction_category,
                 reaction_id=reaction_id,
+                reaction_key=reaction_key,
                 reactant_types=reactant_types,
                 z_score_range=(z_min, z_max),
                 spectator_groups=spectator_groups,
@@ -2024,13 +2041,57 @@ class HTERecommender:
         if not type_a:
             return result
 
+        # Step 1.5: Detect reaction type using full reaction SMILES (if available)
+        # This provides more accurate reaction type detection than pattern-based prediction
+        reaction_smiles = None
+        if reactant_b_smiles and product_smiles:
+            reaction_smiles = f"{reactant_a_smiles}.{reactant_b_smiles}>>{product_smiles}"
+        elif product_smiles:
+            reaction_smiles = f"{reactant_a_smiles}>>{product_smiles}"
+        elif reactant_b_smiles:
+            reaction_smiles = f"{reactant_a_smiles}.{reactant_b_smiles}"
+        else:
+            reaction_smiles = reactant_a_smiles
+        
         # Pre-eval: use product motifs to identify reacted vs spectator motifs
         query_reacted = None
         query_formed = None
         query_spectators = None
         query_spectator_groups: Set[str] = set()
+        product_motifs_from_rxn = set()
+        
+        if reaction_smiles and (">" in reaction_smiles or "." in reaction_smiles):
+            try:
+                rxn_features = featurize_reaction(reaction_smiles, options={"confirm_coupling_products": True})
+                reaction_data = rxn_features.get("reaction", {})
+                rxn_type_data = reaction_data.get("reaction_type", {})
+                detected_type = rxn_type_data.get("reaction_type")
+                detected_confidence = rxn_type_data.get("confidence", 0.0)
+                
+                if detected_type and detected_type != "Unknown" and detected_confidence > 0.5:
+                    result.predicted_reaction_type = detected_type
+                    result.reaction_type_confidence = detected_confidence
+                
+                # Extract product motifs from reaction featurization
+                if product_smiles:
+                    products = reaction_data.get("products", [])
+                    for prod in products:
+                        if isinstance(prod, dict):
+                            for motif in prod.get("motifs", []):
+                                if isinstance(motif, dict):
+                                    compound_id = motif.get("compound_id")
+                                    if compound_id:
+                                        product_motifs_from_rxn.add(compound_id)
+            except Exception:
+                # Fallback to pattern-based prediction if featurization fails
+                pass
+
         if product_smiles:
-            product_motifs = self._detect_motif_set(product_smiles)
+            # Use product motifs from reaction featurization if available, else detect separately
+            if product_motifs_from_rxn:
+                product_motifs = product_motifs_from_rxn
+            else:
+                product_motifs = self._detect_motif_set(product_smiles)
             result.product_type = ",".join(sorted(product_motifs))
 
             reactant_set = set(type_a) | set(type_b)
@@ -2043,6 +2104,7 @@ class HTERecommender:
             result.reacted_motifs = tuple(sorted(reacted_set))
             result.formed_motifs = tuple(sorted(formed_set))
             result.spectator_motifs = tuple(sorted(spectator_set))
+            result.query_reaction_key = format_reaction_key(reacted_set, formed_set, spectator_set)
         
         # Step 3: Match against database
         query_motifs = set(type_a) | set(type_b)
@@ -2316,6 +2378,25 @@ class HTERecommender:
         
         # Step 4: Aggregate and rank conditions
         if len(matched_df) > 0:
+            # Filter by detected reaction type if available and confidence is high
+            if (
+                result.predicted_reaction_type 
+                and result.predicted_reaction_type != "Unknown"
+                and result.reaction_type_confidence >= 0.5
+                and not reaction_type_filter  # Don't override explicit filter
+            ):
+                # Apply detected reaction type as filter
+                if "Reaction_Type_Standardized" in matched_df.columns:
+                    type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                    detected_normalized = _resolve_reaction_type_label(result.predicted_reaction_type)
+                    type_mask = type_series.apply(
+                        lambda x: _resolve_reaction_type_label(x) == detected_normalized if x else False
+                    )
+                    filtered_df = matched_df[type_mask]
+                    if len(filtered_df) >= min_experiments:
+                        matched_df = filtered_df
+                        result.is_filtered_by_detected_type = True
+            
             pool_size = max(top_k * 3, top_k)
             if "Source_Group" in matched_df.columns:
                 by_source: Dict[str, List[ConditionRecommendation]] = {}

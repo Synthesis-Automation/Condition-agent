@@ -344,12 +344,19 @@ def _print_normalized_entries(title: str, entries: Iterable[Dict[str, Any]], *, 
             print(f"{prefix}    {key}: {formatted}")
 
 
-def _print_reaction_type(reaction_type: Dict[str, Any], *, indent: int = 0) -> None:
+def _print_reaction_type(
+    reaction_type: Dict[str, Any],
+    *,
+    indent: int = 0,
+    reaction_key: str | None = None,
+) -> None:
     if not reaction_type:
         return
     prefix = " " * indent
     print(f"{prefix}Reaction Type:")
     lines = []
+    if reaction_key:
+        lines.append(f"reaction_key: {reaction_key}")
     for key in ("reaction_type", "name", "category", "confidence"):
         value = reaction_type.get(key)
         if value is not None:
@@ -521,26 +528,32 @@ def _print_reaction_summary(
     print("\nSummary (Reaction)")
     print("-" * 72)
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
+    reaction_key = reaction.get("reaction_key")
+    if reaction_key:
+        print(f"Reaction Key: {reaction_key}")
 
-    normalized = reaction.get("normalized") or {}
-    if normalized:
-        print("Normalization:")
-        normalization_lines = _format_mapping_lines(
-            {
-                "input": normalized.get("input"),
-                "normalized": normalized.get("normalized"),
-            }
-        )
-        if normalization_lines:
-            print(_format_list(normalization_lines, indent=2))
-        errors = normalized.get("errors") or []
-        if errors:
-            print(_format_list([f"errors: {_format_value(errors)}"], indent=2))
-        _print_normalized_entries("Reactants", normalized.get("reactants") or [], indent=2)
-        _print_normalized_entries("Agents", normalized.get("agents") or [], indent=2)
-        _print_normalized_entries("Products", normalized.get("products") or [], indent=2)
+    # normalized = reaction.get("normalized") or {}
+    # if normalized:
+    #     print("Normalization:")
+    #     normalization_lines = _format_mapping_lines(
+    #         {
+    #             "input": normalized.get("input"),
+    #             "normalized": normalized.get("normalized"),
+    #         }
+    #     )
+    #     if normalization_lines:
+    #         print(_format_list(normalization_lines, indent=2))
+    #     errors = normalized.get("errors") or []
+    #     if errors:
+    #         print(_format_list([f"errors: {_format_value(errors)}"], indent=2))
+    #     _print_normalized_entries("Reactants", normalized.get("reactants") or [], indent=2)
+    #     _print_normalized_entries("Agents", normalized.get("agents") or [], indent=2)
+    #     _print_normalized_entries("Products", normalized.get("products") or [], indent=2)
 
-    _print_reaction_type(reaction.get("reaction_type") or {})
+    _print_reaction_type(
+        reaction.get("reaction_type") or {},
+        reaction_key=reaction.get("reaction_key"),
+    )
     _print_detection(reaction.get("detection") or {})
 
     aggregates = reaction.get("aggregates") or {}

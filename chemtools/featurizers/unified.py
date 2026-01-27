@@ -21,6 +21,37 @@ from .molecule import featurize_molecule as _featurize_molecule
 from .reaction_detection import detect_reaction_types
 from .spectator_rank import rank_spectator_groups
 
+
+def format_reaction_key(
+    reacted: Iterable[str],
+    formed: Iterable[str],
+    spectators: Iterable[str]
+) -> str:
+    """
+    Format motif sets into standardized Reaction_Key string.
+    
+    Format: Reacted -> Formed || Spectators
+    Example: Ar-Br|R_acidic-H -> Ar-Alkyl || Ar-COR|RCH2-COR|R_acidic-H
+    
+    Args:
+        reacted: Motifs consumed in the reaction
+        formed: Motifs created in the product
+        spectators: Motifs present but unchanged
+    
+    Returns:
+        Formatted Reaction_Key string
+    """
+    reacted_list = sorted(reacted) if reacted else []
+    formed_list = sorted(formed) if formed else []
+    spectators_list = sorted(spectators) if spectators else []
+    
+    reacted_str = "|".join(reacted_list) if reacted_list else "[]"
+    formed_str = "|".join(formed_list) if formed_list else "[]"
+    spectators_str = "|".join(spectators_list) if spectators_list else "[]"
+    
+    return f"{reacted_str} -> {formed_str} || {spectators_str}"
+
+
 _AGENT_ROLE_FLAGS = (
     "metal_catalyst",
     "organo_catalyst",
@@ -579,6 +610,21 @@ def featurize_reaction(
 
     intramolecular = _infer_intramolecular(reactant_smiles, product_smiles, roles_summary)
 
+    # Generate Reaction_Key if product information is available
+    reaction_key = None
+    if product_bundles and reactant_bundles:
+        reactant_motifs = set()
+        for bundle in reactant_bundles:
+            reactant_motifs.update(_collect_motif_ids(bundle.get("motifs", [])))
+            reactant_motifs.update(_collect_motif_ids(bundle.get("context_motifs", [])))
+        
+        product_motifs = set(product_motif_ids)
+        reacted = reactant_motifs - product_motifs
+        formed = product_motifs - reactant_motifs
+        spectators = reactant_motifs & product_motifs
+        
+        reaction_key = format_reaction_key(reacted, formed, spectators)
+
     reaction = {
         "reaction_smiles": reaction_smiles,
         "normalized": normalized,
@@ -587,6 +633,7 @@ def featurize_reaction(
         "reactants": reactant_bundles,
         "products": product_bundles,
         "aggregates": aggregates,
+        "reaction_key": reaction_key,
         "roles": roles_summary,
         "agent_roles": agent_roles,
         "intramolecular": intramolecular,
@@ -609,4 +656,4 @@ def featurize_reaction(
     }
 
 
-__all__ = ["featurize_molecule", "featurize_reaction"]
+__all__ = ["featurize_molecule", "featurize_reaction", "format_reaction_key"]

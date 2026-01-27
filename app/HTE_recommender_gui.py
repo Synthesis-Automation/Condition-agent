@@ -163,6 +163,7 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
             ("Additive", "additive"),
             ("Reaction Type", "reaction_type"),
             ("Reaction ID", "reaction_id"),
+            ("Reaction Key", "reaction_key"),
         ]
     base = [
         ("Rank", "rank"),
@@ -182,6 +183,7 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
     columns = base + [
         ("Reaction Type", "reaction_type"),
         ("Reaction ID", "reaction_id"),
+        ("Reaction Key", "reaction_key"),
         ("Reactant Types", "reactant_types"),
         ("Match Score", "match_score"),
     ]
@@ -572,15 +574,25 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         source_group = self._source_group_label or "All"
         weighting_label = "on" if self._aryl_weighting_enabled else "off"
+        query_key = getattr(result, "query_reaction_key", None)
+        reacted_motifs = getattr(result, "reacted_motifs", None)
+        formed_motifs = getattr(result, "formed_motifs", None)
+        spectator_motifs = getattr(result, "spectator_motifs", None)
+
+        matched_text = f"MATCHED: {detected_label or 'None'} | PRED: {predicted} ({confidence:.1f}%)"
         summary_lines = [
             html.escape(
                 f"Data: {data_type} | Source: {source_group} | Aryl weighting: {weighting_label} | Matches: {matches} | Coverage: {coverage:.2f}%"
             ),
             (
                 f'<span style="color:#ffeb3b; font-weight:700;">'
-                f'{html.escape(f"MATCHED: {detected_label or "None"} | PRED: {predicted} ({confidence:.1f}%)")}'
+                f"{html.escape(matched_text)}"
                 f"</span>"
             ),
+            html.escape(f"Reaction Key: {query_key or 'None'}"),
+            html.escape(f"Reacted Motifs: {', '.join(reacted_motifs) if reacted_motifs else 'None'}"),
+            html.escape(f"Formed Motifs: {', '.join(formed_motifs) if formed_motifs else 'None'}"),
+            html.escape(f"Spectator Motifs: {', '.join(spectator_motifs) if spectator_motifs else 'None'}"),
             html.escape(f"A: {reactant_a} | Type: {type_a} ({cat_a})"),
             html.escape(f"B: {reactant_b} | Type: {type_b} ({cat_b})"),
             html.escape(f"Spectator Groups (All): {spectator_summary}"),
