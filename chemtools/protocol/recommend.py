@@ -36,6 +36,7 @@ import json
 from .indexer import ProtocolIndexer, ProtocolRecord
 from ..recommend.utils import friendly_family_label
 from ..formatters import format_meta, format_input, format_detection
+from ..reagent.constants import ROLE_ALIASES
 
 HAS_OUTPUT_FORMATTER = True
 
@@ -681,62 +682,100 @@ class ProtocolRecommender:
     
     def get_protocol_details(self, filename: str) -> Optional[Dict[str, Any]]:
         """
-        Load full protocol details from JSON file
+        Load full protocol details from CSV or JSON file
         
-        Handles both formats:
-        - Legacy: filename is the actual JSON file (e.g., 'Suzuki_protocols.json')
-        - New: filename includes index (e.g., 'Suzuki_protocols[0]')
+        Handles multiple formats:
+        - CSV: filename is the protocol_id (e.g., 'suzuki_001')
+        - Legacy JSON: filename is the actual JSON file (e.g., 'Suzuki_protocols.json')
+        - Array JSON: filename includes index (e.g., 'Suzuki_protocols[0]')
         
         Args:
-            filename: Protocol filename or identifier (e.g., 'Suzuki_protocols.json' or 'Suzuki_protocols[0]')
+            filename: Protocol filename or identifier
         
         Returns:
             Full protocol dictionary or None if not found
         """
-        # Parse filename to extract actual file and index
-        if '[' in filename and ']' in filename:
-            # New format: filename[index]
-            base_name = filename.split('[')[0]
-            index_str = filename.split('[')[1].split(']')[0]
-            try:
-                protocol_index = int(index_str)
-            except ValueError:
-                logger.error(f"Invalid protocol index in filename: {filename}")
-                return None
-            actual_filename = f"{base_name}.json"
-        else:
-            # Legacy format: just the filename
-            if not filename.endswith('.json'):
-                actual_filename = f"{filename}.json"
-            else:
-                actual_filename = filename
-            protocol_index = None
-        
-        protocol_path = self.protocol_dir / actual_filename
-        
-        if not protocol_path.exists():
-            logger.error(f"Protocol file not found: {actual_filename}")
+        # Check if we have the record in the index
+        record = self.indexer.records.get(filename)
+        if not record:
+            logger.error(f"Protocol not found in index: {filename}")
             return None
         
+        # Get the actual file path from the record
+        filepath = record.filepath
+        protocol_path = Path(filepath)
+        
+        # Make path absolute if relative
+        if not protocol_path.is_absolute():
+            protocol_path = self.protocol_dir.parent / filepath
+        
+        if not protocol_path.exists():
+            logger.error(f"Protocol file not found: {protocol_path}")
+            return None
+        
+        # Determine file type and load accordingly
+        file_ext = protocol_path.suffix.lower()
+        
         try:
-            with open(protocol_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # Handle both array and single protocol formats
-            if isinstance(data, list):
-                if protocol_index is not None:
-                    # Return specific protocol from array
-                    if 0 <= protocol_index < len(data):
-                        return data[protocol_index]
+            if file_ext == '.csv':
+                # Load from CSV file
+                from .csv_utils import read_protocol_csv
+                
+                protocols = read_protocol_csv(str(protocol_path))
+                
+                # Find the specific protocol by protocol_id
+                for protocol in protocols:
+                    metadata = protocol.get('metadata', {}) or {}
+                    protocol_id = metadata.get('id', '')
+                    if protocol_id == filename:
+                        return protocol
+                
+                # If no exact match, parse filename for index
+                if '[' in filename and ']' in filename:
+                    base_name = filename.split('[')[0]
+                    index_str = filename.split('[')[1].split(']')[0]
+                    try:
+                        protocol_index = int(index_str)
+                        if 0 <= protocol_index < len(protocols):
+                            return protocols[protocol_index]
+                    except (ValueError, IndexError):
+                        pass
+                
+                # Fall back to first protocol
+                return protocols[0] if protocols else None
+                
+            elif file_ext == '.json':
+                # Load from JSON file (legacy support)
+                with open(protocol_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                # Parse filename to extract index if present
+                protocol_index = None
+                if '[' in filename and ']' in filename:
+                    index_str = filename.split('[')[1].split(']')[0]
+                    try:
+                        protocol_index = int(index_str)
+                    except ValueError:
+                        pass
+                
+                # Handle both array and single protocol formats
+                if isinstance(data, list):
+                    if protocol_index is not None:
+                        # Return specific protocol from array
+                        if 0 <= protocol_index < len(data):
+                            return data[protocol_index]
+                        else:
+                            logger.error(f"Protocol index {protocol_index} out of range for {protocol_path.name}")
+                            return None
                     else:
-                        logger.error(f"Protocol index {protocol_index} out of range for {actual_filename} (has {len(data)} protocols)")
-                        return None
+                        # Return first protocol if no index specified
+                        return data[0] if data else None
                 else:
-                    # Return first protocol if no index specified
-                    return data[0] if data else None
+                    # Single protocol format (legacy)
+                    return data
             else:
-                # Single protocol format (legacy)
-                return data
+                logger.error(f"Unsupported protocol file format: {file_ext}")
+                return None
                 
         except Exception as e:
             logger.error(f"Error loading protocol {filename}: {e}")

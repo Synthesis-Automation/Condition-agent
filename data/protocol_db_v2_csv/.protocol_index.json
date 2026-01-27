@@ -1,0 +1,1121 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created_at": "2026-01-27T05:30:47.354544",
+    "updated_at": "2026-01-27T05:30:47.354544",
+    "num_protocols": 20,
+    "protocol_dir": "data\\protocol_db_v2_csv",
+    "has_drfp": true,
+    "drfp_storage": "npz"
+  },
+  "records": {
+    "synthesis_of_alkylboronic_esters_from_alkyl_iodide": {
+      "filename": "synthesis_of_alkylboronic_esters_from_alkyl_iodide",
+      "filepath": "protocol_db_v2_csv\\Alkyl_Iodide_Borylation.csv",
+      "file_hash": "bf033d06f98feb69c53f2063f0cffabe",
+      "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
+      "reaction_family": "Alkyl_Iodide_Borylation",
+      "tags": [
+        "borylation",
+        "alkyl iodide",
+        "B2pin2",
+        "LiOtBu",
+        "MeOH",
+        "OrgSyn v99p0015",
+        "Alkyl_Iodide_Borylation"
+      ],
+      "reaction_smarts": [
+        "IC.BB>>CB"
+      ],
+      "notes": "General LiOtBu/MeOH borylation of primary alkyl iodide with B2pin2 to give R–B(pin).",
+      "source_title": "Synthesis of Alkylboronic Esters from Alkyl Iodides",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2022,
+      "source_doi": "10.15227/orgsyn.099.0015",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v99p0015",
+      "canonical_reaction": "B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2.CCCCCCCCI>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
+      "reactants": [
+        "B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2",
+        "CCCCCCCCI"
+      ],
+      "products": [
+        "CCCCCCCCB1OC(C)(C)C(C)(C)O1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.131113"
+    },
+    "preparation_of_1h_indazole_3_carbonitrile": {
+      "filename": "preparation_of_1h_indazole_3_carbonitrile",
+      "filepath": "protocol_db_v2_csv\\Aryl_Iodide_Cyanation.csv",
+      "file_hash": "ee25d6faf360190865cb83dd399c17a2",
+      "reaction_smiles": "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43",
+      "reaction_family": "Aryl_Iodide_Cyanation",
+      "tags": [
+        "cyanation",
+        "aryl iodide",
+        "palladium",
+        "Xantphos",
+        "ferrocyanide",
+        "DMAc",
+        "OrgSyn v97p0314",
+        "Aryl_Iodide_Cyanation"
+      ],
+      "reaction_smarts": [
+        "I[c,n,o,s]>>N#C[c,n,o,s]"
+      ],
+      "notes": "Pd–Xantphos-catalyzed cyanation of 3-iodo-1H-indazole using K4[Fe(CN)6]·3H2O in DMAc/H2O under argon to give 1H-indazole-3-carbonitrile.",
+      "source_title": "Preparation of 1H-Indazole-3-carbonitrile",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2020,
+      "source_doi": "10.15227/orgsyn.097.0314",
+      "source_url": "https://orgsyn.org/demo.aspx?prep=v97p0314",
+      "canonical_reaction": "IC1=NNC2=C1C=CC=C2>>N#CC3=NNC4=CC=CC=C43",
+      "reactants": [
+        "IC1=NNC2=C1C=CC=C2"
+      ],
+      "products": [
+        "N#CC3=NNC4=CC=CC=C43"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.137902"
+    },
+    "copper_catalyzed_cyanation_of_alkenyl_iodides": {
+      "filename": "copper_catalyzed_cyanation_of_alkenyl_iodides",
+      "filepath": "protocol_db_v2_csv\\Cyanation_Cu_Alkenyl_Iodide.csv",
+      "file_hash": "cc6a94c5b43c0553b51cc2fcec90304a",
+      "reaction_smiles": "IC=CCCCCCC.CC(C)(O)C#N>>N#CC=CCCCCCC",
+      "reaction_family": "Cyanation_Cu_Alkenyl_Iodide",
+      "tags": [
+        "Cyanation, Cu, Copper, Alkenyl_Iodide, coupling",
+        "Cyanation_Cu_Alkenyl_Iodide"
+      ],
+      "reaction_smarts": [
+        "IC=C.CC(O)(C#N)C>>N#CC=C"
+      ],
+      "notes": "Step A only: (Z)-1-iodooct-1-ene + acetone cyanohydrin → (Z)-non-2-enenitrile using CuI/1,10-phenanthroline in DMF with tri-n-butylamine under Ar.",
+      "source_title": "Copper-catalyzed Cyanation of Alkenyl Iodides",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2016,
+      "source_doi": "10.15227/orgsyn.093.0163",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v93p0163",
+      "canonical_reaction": "CC(C)(O)C#N.IC=CCCCCCC>>N#CC=CCCCCCC",
+      "reactants": [
+        "CC(C)(O)C#N",
+        "IC=CCCCCCC"
+      ],
+      "products": [
+        "N#CC=CCCCCCC"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.144618"
+    },
+    "synthesis_of_aryl_ketones_via_the_nickel_catalyz": {
+      "filename": "synthesis_of_aryl_ketones_via_the_nickel_catalyz",
+      "filepath": "protocol_db_v2_csv\\Hydroacylation_Ni_aryl_alkene+acyl_fluoride.csv",
+      "file_hash": "d75d5ebeb9c2eb66ccc4960fba2212fb",
+      "reaction_smiles": "CC(=O)Oc1ccc(C=C)cc1.O=C(F)c2ccccc2>>CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1",
+      "reaction_family": "Hydroacylation_Ni_aryl_alkene+acyl_fluoride",
+      "tags": [
+        "Hydroacylation_Ni_aryl_alkene+acyl_fluoride"
+      ],
+      "reaction_smarts": [
+        "C=C.O=C(F)>>C(C)C(=O)"
+      ],
+      "notes": "NiCl2(dme) (15 mol%), K3PO4 (3.0 equiv), triethoxysilane (1.1 equiv) in DMF (37.5 mL), 21–22 °C, N2, 24 h; quenched with sat. NaHCO3 then extracted; purified by flash chromatography; 62% yield (two runs).",
+      "source_title": "Synthesis of α-Aryl Ketones via the Nickel-Catalyzed Hydroacylation of Aryl Alkenes with Aroyl Fluorides",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2025,
+      "source_doi": "10.15227/orgsyn.102.0367",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v102p0367",
+      "canonical_reaction": "CC(=O)Oc1ccc(C=C)cc1.O=C(F)c2ccccc2>>CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1",
+      "reactants": [
+        "CC(=O)Oc1ccc(C=C)cc1",
+        "O=C(F)c2ccccc2"
+      ],
+      "products": [
+        "CC(=O)Oc1ccc(C(C)C(=O)c2ccccc2)cc1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.156880"
+    },
+    "unspecified_mitsunobu_etherification_of_benzyl_al": {
+      "filename": "unspecified_mitsunobu_etherification_of_benzyl_al",
+      "filepath": "protocol_db_v2_csv\\Mitsunobu_etherification.csv",
+      "file_hash": "f314e4e468762ad6d48bda65cfaecf23",
+      "reaction_smiles": "OCc1ccccc1.O=Cc1ccc(O)cc1>>O=Cc1ccc(OCc2ccccc2)cc1",
+      "reaction_family": "Mitsunobu_etherification",
+      "tags": [
+        "Mitsunobu",
+        "etherification",
+        "phenol",
+        "DIAD",
+        "PPh3",
+        "THF",
+        "Mitsunobu_etherification"
+      ],
+      "reaction_smarts": [
+        "OC.[c,n,o,s]O>>[c,n,o,s]OC"
+      ],
+      "notes": "DIAD/PPh3 in dry THF at 0 °C under N2; DIAD added dropwise over 5 min; stirred 1 h until TLC shows full conversion. DIAD added dropwise over 5 min at 0 °C under N2 (separate addition step encoded).",
+      "source_title": "Unspecified (Mitsunobu etherification of benzyl alcohol with 4-hydroxybenzaldehyde)",
+      "source_journal": "Organic Letters",
+      "source_year": 2004,
+      "source_doi": "N/A",
+      "source_url": "N/A",
+      "canonical_reaction": "O=Cc1ccc(O)cc1.OCc1ccccc1>>O=Cc1ccc(OCc2ccccc2)cc1",
+      "reactants": [
+        "O=Cc1ccc(O)cc1",
+        "OCc1ccccc1"
+      ],
+      "products": [
+        "O=Cc1ccc(OCc2ccccc2)cc1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.167103"
+    },
+    "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h": {
+      "filename": "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h",
+      "filepath": "protocol_db_v2_csv\\Ni_Cross_Electrophile_Acylation.csv",
+      "file_hash": "cd4c3b97227a94fc71694fdd5b62ae90",
+      "reaction_smiles": "CCCCCCCCI.CCOC(=O)CC(=O)Cl>>CCOC(=O)CC(=O)CCCCCCCC",
+      "reaction_family": "Ni_Cross_Electrophile_Acylation",
+      "tags": [
+        "nickel",
+        "cross-electrophile",
+        "acylation",
+        "dtbbpy",
+        "Mn",
+        "DMAc",
+        "alkyl iodide",
+        "acid chloride",
+        "OrgSyn v93p0050",
+        "Ni_Cross_Electrophile_Acylation"
+      ],
+      "reaction_smarts": [
+        "CI.C(Cl)=O>>CC(C)=O"
+      ],
+      "notes": "NiCl2(dme)/dtbbpy with Mn powder in DMAc under N2 couples 1‑iodooctane and ethyl succinyl chloride to give ethyl 4‑oxododecanoate; 0–2 °C then rt.",
+      "source_title": "Nickel-Catalyzed Synthesis of Ketones from Alkyl Halides and Acid Chlorides: Preparation of Ethyl 4‑Oxododecanoate",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2016,
+      "source_doi": "10.15227/orgsyn.093.0050",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v93p0050",
+      "canonical_reaction": "CCCCCCCCI.CCOC(=O)CC(=O)Cl>>CCOC(=O)CC(=O)CCCCCCCC",
+      "reactants": [
+        "CCCCCCCCI",
+        "CCOC(=O)CC(=O)Cl"
+      ],
+      "products": [
+        "CCOC(=O)CC(=O)CCCCCCCC"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.176699"
+    },
+    "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl": {
+      "filename": "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl",
+      "filepath": "protocol_db_v2_csv\\Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH.csv",
+      "file_hash": "cb51c6f6346967c55983a544451d011f",
+      "reaction_smiles": "Brc1cncnc1.OB(O)c1ccoc1>>C1(C2=COC=C2)=CN=CN=C1",
+      "reaction_family": "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH",
+      "tags": [
+        "nickel",
+        "Suzuki–Miyaura",
+        "t-amyl alcohol",
+        "K3PO4",
+        "low-loading (0.5 mol %)",
+        "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH"
+      ],
+      "reaction_smarts": [
+        "[Br][c,n].[c,o]B>>"
+      ],
+      "notes": "Coupling of heterocyclic substrates with aryl boronic acids, NiCl2(PCy3)2-catalyzed Suzuki–Miyaura coupling of 5-bromopyrimidine with 3-furanylboronic acid in tert-amyl alcohol under nitrogen.",
+      "source_title": "Nickel-Catalyzed Suzuki-Miyaura Coupling in t-Amyl Alcohol for the Preparation of 5-(Furan-3-yl)pyrimidine",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2016,
+      "source_doi": "10.15227/orgsyn.093.0306",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v93p0306",
+      "canonical_reaction": "Brc1cncnc1.OB(O)c1ccoc1>>C1(C2=COC=C2)=CN=CN=C1",
+      "reactants": [
+        "Brc1cncnc1",
+        "OB(O)c1ccoc1"
+      ],
+      "products": [
+        "C1(C2=COC=C2)=CN=CN=C1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.185361"
+    },
+    "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro": {
+      "filename": "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro",
+      "filepath": "protocol_db_v2_csv\\Olefin_Metathesis_RCM.csv",
+      "file_hash": "64c2ef6f65c0696521ff514c58a66903",
+      "reaction_smiles": "CC(C)(C)OC(=O)N(CC=C)CC=C>>CC(C)(C)OC(=O)N1CCC=C1",
+      "reaction_family": "Olefin_Metathesis_RCM",
+      "tags": [
+        "RCM",
+        "Grubbs-1",
+        "ruthenium carbene",
+        "DCM",
+        "nitrogen",
+        "reflux",
+        "Olefin_Metathesis_RCM"
+      ],
+      "reaction_smarts": [
+        "C=C.C=C>>C=C"
+      ],
+      "notes": "Reaction SMILES are approximate; used to reflect diallylamine→3-pyrroline RCM transformation.",
+      "source_title": "RING-CLOSING METATHESIS SYNTHESIS OF N-Boc-3-PYRROLINE",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2003,
+      "source_doi": "10.15227/orgsyn.080.0085",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v80p0085",
+      "canonical_reaction": "CC(C)(C)OC(=O)N(CC=C)CC=C>>CC(C)(C)OC(=O)N1CCC=C1",
+      "reactants": [
+        "CC(C)(C)OC(=O)N(CC=C)CC=C"
+      ],
+      "products": [
+        "CC(C)(C)OC(=O)N1CCC=C1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.192917"
+    },
+    "palladium_catalyzed_acetylation_of_arylbromides": {
+      "filename": "palladium_catalyzed_acetylation_of_arylbromides",
+      "filepath": "protocol_db_v2_csv\\Pd_Acetylation_ArylBr_SilylEnol.csv",
+      "file_hash": "f4a71828183735ce06d6d8c3eef0a780",
+      "reaction_smiles": "BrC1=CC=CC=C1.CC([Si](C)(C)C)=O>>CC(C2=CC=CC=C2)=O",
+      "reaction_family": "Pd_Acetylation_ArylBr_SilylEnol",
+      "tags": [
+        "palladium",
+        "aryl bromide",
+        "acetylation",
+        "silyl enol",
+        "cesium fluoride",
+        "1,2-dichloroethane",
+        "argon",
+        "Pd_Acetylation_ArylBr_SilylEnol"
+      ],
+      "reaction_smarts": [
+        "[Br][c].CC([Si])=O>>CC([c])=O"
+      ],
+      "notes": "Step A only: acetylation of 6-bromobenzothiophene with acetyltrimethylsilane using Pd(PPh3)4 and CsF in 1,2-dichloroethane at 75 °C for 24 h under inert atmosphere.",
+      "source_title": "Palladium-Catalyzed Acetylation of Arylbromides",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2021,
+      "source_doi": "10.15227/orgsyn.098.0068",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v98p0068",
+      "canonical_reaction": "BrC1=CC=CC=C1.CC([Si](C)(C)C)=O>>CC(C2=CC=CC=C2)=O",
+      "reactants": [
+        "BrC1=CC=CC=C1",
+        "CC([Si](C)(C)C)=O"
+      ],
+      "products": [
+        "CC(C2=CC=CC=C2)=O"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.200133"
+    },
+    "palladium_catalyzed_buchwald_hartwig_amination_and": {
+      "filename": "palladium_catalyzed_buchwald_hartwig_amination_and",
+      "filepath": "protocol_db_v2_csv\\Suzuki_Miyaura_Cross_Coupling_OMs.csv",
+      "file_hash": "1373f47e298c93add01b25bd1d98e621",
+      "reaction_smiles": "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
+      "reaction_family": "Suzuki_Miyaura_Cross_Coupling_OMs",
+      "tags": [
+        "Suzuki",
+        "aryl mesylate",
+        "phenylboronic acid",
+        "Pd(OAc)2",
+        "CM-phos",
+        "K3PO4",
+        "tert-butanol",
+        "OrgSyn v92p0195 Step C",
+        "Suzuki_Miyaura_Cross_Coupling_OMs"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s]OS(=O)(=O)C.OB(O)[c,n,o,s]>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Step C only (Suzuki of aryl mesylate with phenylboronic acid). Pd(OAc)2/CM-phos with K3PO4 in tert-butanol; pre-activation in CH2Cl2/Et3N then solvent removal; N2 atmosphere; 120 °C, 24 h.",
+      "source_title": "Palladium-catalyzed Buchwald–Hartwig Amination and Suzuki–Miyaura Cross-coupling Reaction of Aryl Mesylates",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2015,
+      "source_doi": "10.15227/orgsyn.092.0195",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v92p0195",
+      "canonical_reaction": "B(O)(O)c2ccccc2.CC(C)(C)c1ccc(OS(=O)(=O)C)cc1>>CC(C)(C)c1ccc(-c2ccccc2)cc1",
+      "reactants": [
+        "B(O)(O)c2ccccc2",
+        "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1"
+      ],
+      "products": [
+        "CC(C)(C)c1ccc(-c2ccccc2)cc1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.341098"
+    },
+    "palladium_catalyzed_1_4_addition_of_terminal_alkyn": {
+      "filename": "palladium_catalyzed_1_4_addition_of_terminal_alkyn",
+      "filepath": "protocol_db_v2_csv\\Pd_Conjugate_Addition_Alkyne_to_Enone.csv",
+      "file_hash": "fd41c73067172de0216c62fe5c77463b",
+      "reaction_smiles": "C#Cc1ccccc1.CCC(=O)C=C>>CC(=O)CCC#CC1=CC=CC=C1",
+      "reaction_family": "Pd_Conjugate_Addition_Alkyne_to_Enone",
+      "tags": [
+        "palladium",
+        "conjugate addition",
+        "alkyne",
+        "enone",
+        "water",
+        "PMe3",
+        "biphasic",
+        "vigorous stirring",
+        "Pd_Conjugate_Addition_Alkyne_to_Enone"
+      ],
+      "reaction_smarts": [
+        "C#C.C(=O)C=C>>C(=O)CCC#C"
+      ],
+      "notes": "First step only: Pd(OAc)2/PMe3-catalyzed 1,4-addition of phenylacetylene to ethyl vinyl ketone in water; staged alkyne addition; 60 °C for 48 h.",
+      "source_title": "Palladium-catalyzed 1,4-Addition of Terminal Alkynes to Conjugated Enones",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2014,
+      "source_doi": "10.15227/orgsyn.091.0072",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v91p0072",
+      "canonical_reaction": "C#Cc1ccccc1.CCC(=O)C=C>>CC(=O)CCC#CC1=CC=CC=C1",
+      "reactants": [
+        "C#Cc1ccccc1",
+        "CCC(=O)C=C"
+      ],
+      "products": [
+        "CC(=O)CCC#CC1=CC=CC=C1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.221777"
+    },
+    "alpha_arylation_dong_v100p0099": {
+      "filename": "alpha_arylation_dong_v100p0099",
+      "filepath": "protocol_db_v2_csv\\Pd_Enamine_alpha_Arylation.csv",
+      "file_hash": "859975b66420827e8b5549d76c78a73a",
+      "reaction_smiles": "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
+      "reaction_family": "Pd_Enamine_alpha_Arylation",
+      "tags": [
+        "palladium",
+        "enamine",
+        "alpha-arylation",
+        "ketone",
+        "cyclopentanone",
+        "pressure-vessel",
+        "dioxane",
+        "argon",
+        "C-C-coupling"
+      ],
+      "reaction_smarts": [],
+      "notes": "Step A only (first step): α-arylation of cyclopentanone with p-bromoacetophenone under Pd/enamine cooperative catalysis in 1,4-dioxane. Heavy-walled pressure vessel required for 130°C reaction temperature.",
+      "source_title": "α-Arylation of Cyclopentanones by Palladium/Enamine Cooperative Catalysis",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2023,
+      "source_doi": "10.15227/orgsyn.100.0099",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v100p0099",
+      "canonical_reaction": "Brc2ccc(C(C)=O)cc2.O=C1CCCC1>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
+      "reactants": [
+        "Brc2ccc(C(C)=O)cc2",
+        "O=C1CCCC1"
+      ],
+      "products": [
+        "O=C(C)c3ccc(C4C(CCC4)=O)cc3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.231318"
+    },
+    "arylation_of_cyclopentanones_by_palladium_enamin": {
+      "filename": "arylation_of_cyclopentanones_by_palladium_enamin",
+      "filepath": "protocol_db_v2_csv\\Pd_Enamine_α-Arylation_C(sp3)-C(sp2).csv",
+      "file_hash": "261c3cb994a2eff45d36768b85efa3e4",
+      "reaction_smiles": "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
+      "reaction_family": "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)",
+      "tags": [
+        "palladium",
+        "enamine",
+        "α-arylation",
+        "ketone",
+        "cyclopentanone",
+        "pressure vessel",
+        "dioxane",
+        "argon",
+        "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)"
+      ],
+      "reaction_smarts": [
+        "O=C1CCCC1.Br[c,n,o,s]>>[c,n,o,s]C2C(CCC2)=O"
+      ],
+      "notes": "Step A only (first step): α-arylation of cyclopentanone with p-bromoacetophenone under Pd/enamine cooperative catalysis in 1,4-dioxane.",
+      "source_title": "α-Arylation of Cyclopentanones by Palladium/Enamine Cooperative Catalysis",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2023,
+      "source_doi": "10.15227/orgsyn.100.0099",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v100p0099",
+      "canonical_reaction": "Brc2ccc(C(C)=O)cc2.O=C1CCCC1>>O=C(C)c3ccc(C4C(CCC4)=O)cc3",
+      "reactants": [
+        "Brc2ccc(C(C)=O)cc2",
+        "O=C1CCCC1"
+      ],
+      "products": [
+        "O=C(C)c3ccc(C4C(CCC4)=O)cc3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.240954"
+    },
+    "n_carboxylated_2_substituted_indoles_and_2_3_disub": {
+      "filename": "n_carboxylated_2_substituted_indoles_and_2_3_disub",
+      "filepath": "protocol_db_v2_csv\\Sonogashira_Coupling.csv",
+      "file_hash": "05fd963e1c9f555111c94ad42b4da73d",
+      "reaction_smiles": "NC(=O)c1ccccc1I.C#CCCCC>>NC(=O)c1ccccc1C#CCCCC",
+      "reaction_family": "Sonogashira_Coupling",
+      "tags": [
+        "Sonogashira, Pd, Coupling",
+        "Sonogashira_Coupling"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s][Br,Cl,I].C#C>>[c,n,o,s]C#C"
+      ],
+      "notes": "Pd(OAc)₂ (1 mol%), CuI (1 mol%), PPh₃ (2 mol%) in DMF (40 mL) and Et₃N (120 mL); 1‑hexyne (1.3 equiv); 60 °C oil bath under N₂, 16 h; aqueous workup and silica gel chromatography; 90% yield (checkers: 91%).",
+      "source_title": "N‑Carboxylated‑2‑substituted Indoles and 2,3‑Disubstituted‑2,3‑dihydro‑4‑quinolones from 2‑Alkynylbenzamides — Step A: 2‑(1‑Hexynyl)benzamide",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2014,
+      "source_doi": "10.15227/orgsyn.091.0027",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v91p0027",
+      "canonical_reaction": "C#CCCCC.NC(=O)c1ccccc1I>>NC(=O)c1ccccc1C#CCCCC",
+      "reactants": [
+        "C#CCCCC",
+        "NC(=O)c1ccccc1I"
+      ],
+      "products": [
+        "NC(=O)c1ccccc1C#CCCCC"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.250809"
+    },
+    "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl": {
+      "filename": "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl",
+      "filepath": "protocol_db_v2_csv\\Suzuki_Coupling.csv",
+      "file_hash": "aacd28f7a0ed8d2e1c43cb02caab2b71",
+      "reaction_smiles": "O=C(OC(C)(C)C)NC1=C(Br)C=CC=C1.CC2=C(B3OC(C)(C)C(C)(C)O3)C=CC=C2>>O=C(OC(C)(C)C)NC4=C(C5=C(C)C=CC=C5)C=CC=C4",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl bromide",
+        "aryl boronate",
+        "Pd(PPh3)4",
+        "K2CO3",
+        "dioxane",
+        "water",
+        "nitrogen",
+        "Suzuki_Coupling"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s][#35,#53].[c,n,o,s]B(O[C])O[C]>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Aryl pinacol boronate as coupling partner.",
+      "source_title": "Suzuki coupling of aryl pinacol boronate with aryl bromide (Pd(PPh3)4/K2CO3 in dioxane/H2O)",
+      "source_journal": "",
+      "source_year": 0,
+      "source_doi": "",
+      "source_url": "",
+      "canonical_reaction": "CC2=C(B3OC(C)(C)C(C)(C)O3)C=CC=C2.O=C(OC(C)(C)C)NC1=C(Br)C=CC=C1>>O=C(OC(C)(C)C)NC4=C(C5=C(C)C=CC=C5)C=CC=C4",
+      "reactants": [
+        "CC2=C(B3OC(C)(C)C(C)(C)O3)C=CC=C2",
+        "O=C(OC(C)(C)C)NC1=C(Br)C=CC=C1"
+      ],
+      "products": [
+        "O=C(OC(C)(C)C)NC4=C(C5=C(C)C=CC=C5)C=CC=C4"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.269413"
+    },
+    "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f": {
+      "filename": "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "filepath": "protocol_db_v2_csv\\Suzuki_Coupling.csv",
+      "file_hash": "aacd28f7a0ed8d2e1c43cb02caab2b71",
+      "reaction_smiles": "BrC1=CC=C(C=C1)C(OC)=O.FC2=CC=C(C=C2)B(O)O>>FC3=CC=C(C4=CC=C(C=C4)C(OC)=O)C=C3",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl bromide",
+        "4-fluorophenylboronic acid",
+        "Pd(dppf)Cl2·CH2Cl2",
+        "Na2CO3",
+        "toluene",
+        "reflux",
+        "Suzuki_Coupling"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s][#35,#53].[c,n,o,s]B(O)O>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Pd(dppf)Cl2·CH2Cl2 pre-catalyst used; aqueous Na2CO3; toluene reflux.",
+      "source_title": "Suzuki coupling of methyl 4-bromobenzoate with 4-fluorophenylboronic acid (Pd(dppf)Cl2·CH2Cl2/Na2CO3 in toluene)",
+      "source_journal": "",
+      "source_year": 2002,
+      "source_doi": "",
+      "source_url": "",
+      "canonical_reaction": "BrC1=CC=C(C=C1)C(OC)=O.FC2=CC=C(C=C2)B(O)O>>FC3=CC=C(C4=CC=C(C=C4)C(OC)=O)C=C3",
+      "reactants": [
+        "BrC1=CC=C(C=C1)C(OC)=O",
+        "FC2=CC=C(C=C2)B(O)O"
+      ],
+      "products": [
+        "FC3=CC=C(C4=CC=C(C=C4)C(OC)=O)C=C3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.287532"
+    },
+    "suzuki_coupling_of_aryl_triflate_with_4_fluorophen": {
+      "filename": "suzuki_coupling_of_aryl_triflate_with_4_fluorophen",
+      "filepath": "protocol_db_v2_csv\\Suzuki_Coupling.csv",
+      "file_hash": "aacd28f7a0ed8d2e1c43cb02caab2b71",
+      "reaction_smiles": "CCC1=CC(C(OC)=O)=C(OS(=O)(=O)C(F)(F)F)C=C1.FC2=CC=C(B(O)O)C=C2>>CCC3=CC=C(C4=CC=C(F)C=C4)C(C(OC)=O)=C3",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl triflate",
+        "4-fluorophenylboronic acid",
+        "Pd(PPh3)4",
+        "Na2CO3",
+        "toluene",
+        "ethanol",
+        "90C",
+        "Suzuki_Coupling"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s]OS(=O)(C(F)(F)F)=O.[c,n,o,s]B(O)O>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Two-phase toluene/EtOH with aqueous Na2CO3; 90 °C for 12 h.",
+      "source_title": "Suzuki coupling of aryl triflate with 4-fluorophenylboronic acid (Pd(PPh3)4/Na2CO3 in toluene/EtOH)",
+      "source_journal": "",
+      "source_year": 2005,
+      "source_doi": "",
+      "source_url": "",
+      "canonical_reaction": "CCC1=CC(C(OC)=O)=C(OS(=O)(=O)C(F)(F)F)C=C1.FC2=CC=C(B(O)O)C=C2>>CCC3=CC=C(C4=CC=C(F)C=C4)C(C(OC)=O)=C3",
+      "reactants": [
+        "CCC1=CC(C(OC)=O)=C(OS(=O)(=O)C(F)(F)F)C=C1",
+        "FC2=CC=C(B(O)O)C=C2"
+      ],
+      "products": [
+        "CCC3=CC=C(C4=CC=C(F)C=C4)C(C(OC)=O)=C3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.304449"
+    },
+    "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf": {
+      "filename": "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf",
+      "filepath": "protocol_db_v2_csv\\Suzuki_Coupling.csv",
+      "file_hash": "aacd28f7a0ed8d2e1c43cb02caab2b71",
+      "reaction_smiles": "O=C(OC)/C=C/C1=CC=CC(Cl)=C1.OB(O)C2=CC=CC=C2>>O=C(OC)/C=C/C3=CC=CC(C4=CC=CC=C4)=C3",
+      "reaction_family": "Suzuki_Coupling",
+      "tags": [
+        "Suzuki",
+        "aryl chloride",
+        "phenylboronic acid",
+        "PdCl2(PCy3)2",
+        "CsF",
+        "NMP",
+        "100C",
+        "nitrogen",
+        "Suzuki_Coupling"
+      ],
+      "reaction_smarts": [
+        "[c,n,o,s]Cl.[c,n,o,s]B(O)O>>[c,n,o,s][c,n,o,s]"
+      ],
+      "notes": "Aryl chloride coupling with CsF in NMP at 100 °C.",
+      "source_title": "Suzuki coupling of aryl chloride (PdCl2(PCy3)2/CsF in NMP)",
+      "source_journal": "Tetrahedron Letters",
+      "source_year": 1997,
+      "source_doi": "",
+      "source_url": "",
+      "canonical_reaction": "O=C(OC)/C=C/C1=CC=CC(Cl)=C1.OB(O)C2=CC=CC=C2>>O=C(OC)/C=C/C3=CC=CC(C4=CC=CC=C4)=C3",
+      "reactants": [
+        "O=C(OC)/C=C/C1=CC=CC(Cl)=C1",
+        "OB(O)C2=CC=CC=C2"
+      ],
+      "products": [
+        "O=C(OC)/C=C/C3=CC=CC(C4=CC=CC=C4)=C3"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.318378"
+    },
+    "copper_catalyzed_suzuki_miyaura_coupling_of_unacti": {
+      "filename": "copper_catalyzed_suzuki_miyaura_coupling_of_unacti",
+      "filepath": "protocol_db_v2_csv\\Suzuki_Cu_alkyl_halide+aryl_boron.csv",
+      "file_hash": "33f474bf268c4a19b53c9852cd7db363",
+      "reaction_smiles": "BrC1CCCCC1.Clc2ccc(B(OC3(C)C)OC3(C)C)cc2>>Clc4ccc(C5CCCCC5)cc4",
+      "reaction_family": "Suzuki_Cu_alkyl_halide+aryl_boron",
+      "tags": [
+        "Suzuki, Cu, alkyl_halide, Coupling",
+        "Suzuki_Cu_alkyl_halide+aryl_boron"
+      ],
+      "reaction_smarts": [
+        "BrC.[c,n,o,s]B>>[c,n,o,s]C"
+      ],
+      "notes": "CuBr·SMe2 (5 mol%), bathophenanthroline (7.5 mol%), NaOtBu (1.5 equiv), toluene (20 mL), 80 °C, 24 h, air; combined 73% yield (65% + 8% from second collection).",
+      "source_title": "Copper-Catalyzed Suzuki-Miyaura Coupling of Unactivated Alkyl Halides with Arylborons",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2025,
+      "source_doi": "10.15227/orgsyn.102.0086",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v102p0086",
+      "canonical_reaction": "BrC1CCCCC1.Clc2ccc(B(OC3(C)C)OC3(C)C)cc2>>Clc4ccc(C5CCCCC5)cc4",
+      "reactants": [
+        "BrC1CCCCC1",
+        "Clc2ccc(B(OC3(C)C)OC3(C)C)cc2"
+      ],
+      "products": [
+        "Clc4ccc(C5CCCCC5)cc4"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.329183"
+    },
+    "visible_light_promoted_c_s_cross_coupling_reaction": {
+      "filename": "visible_light_promoted_c_s_cross_coupling_reaction",
+      "filepath": "protocol_db_v2_csv\\VisibleLight_C–S_Coupling_ArylBr+ArSH.csv",
+      "file_hash": "207e2bf33e4ecfd1da5d4c73732a4e19",
+      "reaction_smiles": "Brc1ccc(C(=O)C)cc1.Clc1ccccc1S>>CC(=O)c1ccc(S-c2ccccc2Cl)cc1",
+      "reaction_family": "VisibleLight_C–S_Coupling_ArylBr+ArSH",
+      "tags": [
+        "visible light",
+        "C–S coupling",
+        "aryl bromide",
+        "aryl thiol",
+        "cesium carbonate",
+        "DMSO",
+        "nitrogen",
+        "Kessil PR160",
+        "456 nm",
+        "VisibleLight_C–S_Coupling_ArylBr+ArSH"
+      ],
+      "reaction_smarts": [
+        "[#17,#35,#53][c,n,o,s].[c,n,o,s]S>>[c,n,o,s]S[c,n,o,s]"
+      ],
+      "notes": "Step A only: coupling of 4'-bromoacetophenone with 2-chlorobenzenethiol under blue light (456 nm) in DMSO with Cs2CO3 base; N2 atmosphere; 23 °C; 5 h.",
+      "source_title": "Visible-Light-Promoted C–S Cross-Coupling Reaction for Synthesis of Aromatic Thioethers",
+      "source_journal": "Organic Syntheses",
+      "source_year": 2023,
+      "source_doi": "10.15227/orgsyn.100.0234",
+      "source_url": "https://www.orgsyn.org/demo.aspx?prep=v100p0234",
+      "canonical_reaction": "Brc1ccc(C(=O)C)cc1.Clc1ccccc1S>>CC(=O)c1ccc(S-c2ccccc2Cl)cc1",
+      "reactants": [
+        "Brc1ccc(C(=O)C)cc1",
+        "Clc1ccccc1S"
+      ],
+      "products": [
+        "CC(=O)c1ccc(S-c2ccccc2Cl)cc1"
+      ],
+      "has_drfp": true,
+      "indexed_at": "2026-01-27T05:30:47.350924"
+    }
+  },
+  "family_index": {
+    "Alkyl_Iodide_Borylation": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide"
+    ],
+    "Aryl_Iodide_Cyanation": [
+      "preparation_of_1h_indazole_3_carbonitrile"
+    ],
+    "Cyanation_Cu_Alkenyl_Iodide": [
+      "copper_catalyzed_cyanation_of_alkenyl_iodides"
+    ],
+    "Hydroacylation_Ni_aryl_alkene+acyl_fluoride": [
+      "synthesis_of_aryl_ketones_via_the_nickel_catalyz"
+    ],
+    "Mitsunobu_etherification": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "Ni_Cross_Electrophile_Acylation": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "Ni_Suzuki_ArylHalide+BoronicAcid_tAmOH": [
+      "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl"
+    ],
+    "Olefin_Metathesis_RCM": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro"
+    ],
+    "Pd_Acetylation_ArylBr_SilylEnol": [
+      "palladium_catalyzed_acetylation_of_arylbromides"
+    ],
+    "Suzuki_Miyaura_Cross_Coupling_OMs": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "Pd_Conjugate_Addition_Alkyne_to_Enone": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "Pd_Enamine_alpha_Arylation": [
+      "alpha_arylation_dong_v100p0099"
+    ],
+    "Pd/Enamine_α-Arylation_C(sp3)-C(sp2)": [
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "Sonogashira_Coupling": [
+      "n_carboxylated_2_substituted_indoles_and_2_3_disub"
+    ],
+    "Suzuki_Coupling": [
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl",
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen",
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "Suzuki_Cu_alkyl_halide+aryl_boron": [
+      "copper_catalyzed_suzuki_miyaura_coupling_of_unacti"
+    ],
+    "VisibleLight_C–S_Coupling_ArylBr+ArSH": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ]
+  },
+  "tag_index": {
+    "borylation": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide"
+    ],
+    "alkyl iodide": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide",
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "b2pin2": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide"
+    ],
+    "liotbu": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide"
+    ],
+    "meoh": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide"
+    ],
+    "orgsyn v99p0015": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide"
+    ],
+    "alkyl_iodide_borylation": [
+      "synthesis_of_alkylboronic_esters_from_alkyl_iodide"
+    ],
+    "cyanation": [
+      "preparation_of_1h_indazole_3_carbonitrile"
+    ],
+    "aryl iodide": [
+      "preparation_of_1h_indazole_3_carbonitrile"
+    ],
+    "palladium": [
+      "preparation_of_1h_indazole_3_carbonitrile",
+      "palladium_catalyzed_acetylation_of_arylbromides",
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn",
+      "alpha_arylation_dong_v100p0099",
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "xantphos": [
+      "preparation_of_1h_indazole_3_carbonitrile"
+    ],
+    "ferrocyanide": [
+      "preparation_of_1h_indazole_3_carbonitrile"
+    ],
+    "dmac": [
+      "preparation_of_1h_indazole_3_carbonitrile",
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "orgsyn v97p0314": [
+      "preparation_of_1h_indazole_3_carbonitrile"
+    ],
+    "aryl_iodide_cyanation": [
+      "preparation_of_1h_indazole_3_carbonitrile"
+    ],
+    "cyanation, cu, copper, alkenyl_iodide, coupling": [
+      "copper_catalyzed_cyanation_of_alkenyl_iodides"
+    ],
+    "cyanation_cu_alkenyl_iodide": [
+      "copper_catalyzed_cyanation_of_alkenyl_iodides"
+    ],
+    "hydroacylation_ni_aryl_alkene+acyl_fluoride": [
+      "synthesis_of_aryl_ketones_via_the_nickel_catalyz"
+    ],
+    "mitsunobu": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "etherification": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "phenol": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "diad": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "pph3": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "thf": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "mitsunobu_etherification": [
+      "unspecified_mitsunobu_etherification_of_benzyl_al"
+    ],
+    "nickel": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h",
+      "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl"
+    ],
+    "cross-electrophile": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "acylation": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "dtbbpy": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "mn": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "acid chloride": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "orgsyn v93p0050": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "ni_cross_electrophile_acylation": [
+      "nickel_catalyzed_synthesis_of_ketones_from_alkyl_h"
+    ],
+    "suzuki–miyaura": [
+      "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl"
+    ],
+    "t-amyl alcohol": [
+      "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl"
+    ],
+    "k3po4": [
+      "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl",
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "low-loading (0.5 mol %)": [
+      "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl"
+    ],
+    "ni_suzuki_arylhalide+boronicacid_tamoh": [
+      "nickel_catalyzed_suzuki_miyaura_coupling_in_t_amyl"
+    ],
+    "rcm": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro"
+    ],
+    "grubbs-1": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro"
+    ],
+    "ruthenium carbene": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro"
+    ],
+    "dcm": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro"
+    ],
+    "nitrogen": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro",
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl",
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf",
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "reflux": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro",
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f"
+    ],
+    "olefin_metathesis_rcm": [
+      "ring_closing_metathesis_synthesis_of_n_boc_3_pyrro"
+    ],
+    "aryl bromide": [
+      "palladium_catalyzed_acetylation_of_arylbromides",
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl",
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "acetylation": [
+      "palladium_catalyzed_acetylation_of_arylbromides"
+    ],
+    "silyl enol": [
+      "palladium_catalyzed_acetylation_of_arylbromides"
+    ],
+    "cesium fluoride": [
+      "palladium_catalyzed_acetylation_of_arylbromides"
+    ],
+    "1,2-dichloroethane": [
+      "palladium_catalyzed_acetylation_of_arylbromides"
+    ],
+    "argon": [
+      "palladium_catalyzed_acetylation_of_arylbromides",
+      "alpha_arylation_dong_v100p0099",
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "pd_acetylation_arylbr_silylenol": [
+      "palladium_catalyzed_acetylation_of_arylbromides"
+    ],
+    "suzuki": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and",
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl",
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen",
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "aryl mesylate": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "phenylboronic acid": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and",
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "pd(oac)2": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "cm-phos": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "tert-butanol": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "orgsyn v92p0195 step c": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "suzuki_miyaura_cross_coupling_oms": [
+      "palladium_catalyzed_buchwald_hartwig_amination_and"
+    ],
+    "conjugate addition": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "alkyne": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "enone": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "water": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn",
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl"
+    ],
+    "pme3": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "biphasic": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "vigorous stirring": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "pd_conjugate_addition_alkyne_to_enone": [
+      "palladium_catalyzed_1_4_addition_of_terminal_alkyn"
+    ],
+    "enamine": [
+      "alpha_arylation_dong_v100p0099",
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "alpha-arylation": [
+      "alpha_arylation_dong_v100p0099"
+    ],
+    "ketone": [
+      "alpha_arylation_dong_v100p0099",
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "cyclopentanone": [
+      "alpha_arylation_dong_v100p0099",
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "pressure-vessel": [
+      "alpha_arylation_dong_v100p0099"
+    ],
+    "dioxane": [
+      "alpha_arylation_dong_v100p0099",
+      "arylation_of_cyclopentanones_by_palladium_enamin",
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl"
+    ],
+    "c-c-coupling": [
+      "alpha_arylation_dong_v100p0099"
+    ],
+    "α-arylation": [
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "pressure vessel": [
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "pd/enamine_α-arylation_c(sp3)-c(sp2)": [
+      "arylation_of_cyclopentanones_by_palladium_enamin"
+    ],
+    "sonogashira, pd, coupling": [
+      "n_carboxylated_2_substituted_indoles_and_2_3_disub"
+    ],
+    "sonogashira_coupling": [
+      "n_carboxylated_2_substituted_indoles_and_2_3_disub"
+    ],
+    "aryl boronate": [
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl"
+    ],
+    "pd(pph3)4": [
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl",
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen"
+    ],
+    "k2co3": [
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl"
+    ],
+    "suzuki_coupling": [
+      "suzuki_coupling_of_aryl_pinacol_boronate_with_aryl",
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen",
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "4-fluorophenylboronic acid": [
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen"
+    ],
+    "pd(dppf)cl2·ch2cl2": [
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f"
+    ],
+    "na2co3": [
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen"
+    ],
+    "toluene": [
+      "suzuki_coupling_of_methyl_4_bromobenzoate_with_4_f",
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen"
+    ],
+    "aryl triflate": [
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen"
+    ],
+    "ethanol": [
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen"
+    ],
+    "90c": [
+      "suzuki_coupling_of_aryl_triflate_with_4_fluorophen"
+    ],
+    "aryl chloride": [
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "pdcl2(pcy3)2": [
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "csf": [
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "nmp": [
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "100c": [
+      "suzuki_coupling_of_aryl_chloride_pdcl2_pcy3_2_csf"
+    ],
+    "suzuki, cu, alkyl_halide, coupling": [
+      "copper_catalyzed_suzuki_miyaura_coupling_of_unacti"
+    ],
+    "suzuki_cu_alkyl_halide+aryl_boron": [
+      "copper_catalyzed_suzuki_miyaura_coupling_of_unacti"
+    ],
+    "visible light": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "c–s coupling": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "aryl thiol": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "cesium carbonate": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "dmso": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "kessil pr160": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "456 nm": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ],
+    "visiblelight_c–s_coupling_arylbr+arsh": [
+      "visible_light_promoted_c_s_cross_coupling_reaction"
+    ]
+  }
+}
