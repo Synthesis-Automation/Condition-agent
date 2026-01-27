@@ -2127,11 +2127,15 @@ class HTERecommender:
                 primary_reacted = sorted(reacted_set)
 
             primary_formed = select_primary_formed_motif(product_motifs, formed_set)
-            result.query_reaction_key = format_reaction_key(
-                primary_reacted,
-                [primary_formed] if primary_formed else formed_set,
-                spectator_set,
-            )
+            result.query_reaction_key = None
+            if reaction_data and reaction_data.get("reaction_key"):
+                result.query_reaction_key = reaction_data.get("reaction_key")
+            else:
+                result.query_reaction_key = format_reaction_key(
+                    primary_reacted,
+                    [primary_formed] if primary_formed else formed_set,
+                    spectator_set,
+                )
         
         # Step 3: Match against database
         query_motifs = set(type_a) | set(type_b)

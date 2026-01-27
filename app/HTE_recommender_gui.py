@@ -589,14 +589,12 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                 f"{html.escape(matched_text)}"
                 f"</span>"
             ),
-            html.escape(f"Reaction Key: {query_key or 'None'}"),
+            html.escape(f"Query Reaction Key: {query_key or 'None'}"),
+            html.escape(f"Matched Reaction Key: {detected_label or 'None'}"),
             html.escape(f"Reacted Motifs: {', '.join(reacted_motifs) if reacted_motifs else 'None'}"),
             html.escape(f"Formed Motifs: {', '.join(formed_motifs) if formed_motifs else 'None'}"),
             html.escape(f"Spectator Motifs: {', '.join(spectator_motifs) if spectator_motifs else 'None'}"),
-            html.escape(f"A: {reactant_a} | Type: {type_a} ({cat_a})"),
-            html.escape(f"B: {reactant_b} | Type: {type_b} ({cat_b})"),
-            html.escape(f"Spectator Groups (All): {spectator_summary}"),
-            html.escape(f"P: {product}"),
+            html.escape(f"Reactant Types: A={type_a or 'None'} | B={type_b or 'None'}"),
         ]
         if stats:
             stats_line = " | ".join(f"{key}: {stats[key]}" for key in sorted(stats))
