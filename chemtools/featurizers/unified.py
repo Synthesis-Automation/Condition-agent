@@ -654,18 +654,40 @@ def featurize_reaction(
     # Generate Reaction_Key if product information is available
     reaction_key = None
     if product_bundles and reactant_bundles:
-        reactant_motifs = set()
+        reactant_primary: List[str] = []
         for bundle in reactant_bundles:
-            reactant_motifs.update(_collect_motif_ids(bundle.get("motifs", [])))
-            reactant_motifs.update(_collect_motif_ids(bundle.get("context_motifs", [])))
+            reactant_primary.extend(_extract_motif_ids(bundle.get("motifs", [])))
+            reactant_primary.extend(_extract_motif_ids(bundle.get("context_motifs", [])))
 
-        product_motifs = set(product_motif_ids)
-        reacted = reactant_motifs - product_motifs
-        formed = product_motifs - reactant_motifs
-        spectators = reactant_motifs & product_motifs
+        product_primary: List[str] = []
+        for bundle in product_bundles:
+            product_primary.extend(_extract_motif_ids(bundle.get("motifs", [])))
+            product_primary.extend(_extract_motif_ids(bundle.get("context_motifs", [])))
+
+        reactant_counts = Counter(reactant_primary)
+        product_counts = Counter(product_primary)
+
+        reacted: set[str] = set()
+        formed: set[str] = set()
+        spectators: set[str] = set()
+        all_motifs = set(reactant_counts.keys()) | set(product_counts.keys())
+        for motif in all_motifs:
+            rc = reactant_counts.get(motif, 0)
+            pc = product_counts.get(motif, 0)
+            if pc > rc:
+                formed.add(motif)
+                if rc > 0:
+                    spectators.add(motif)
+            elif pc < rc:
+                reacted.add(motif)
+                if pc > 0:
+                    spectators.add(motif)
+            else:
+                if rc > 0:
+                    spectators.add(motif)
 
         primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted)
-        primary_formed = select_primary_formed_motif(product_motif_ids, formed)
+        primary_formed = select_primary_formed_motif(product_primary, formed)
 
         reaction_key = format_reaction_key(
             primary_reacted if primary_reacted else reacted,

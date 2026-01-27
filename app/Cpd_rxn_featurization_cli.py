@@ -705,7 +705,9 @@ def main() -> int:
 
         try:
             if mode in {"reaction", "r"} or (mode == "auto" and ">" in smiles):
-                payload = featurize_reaction(smiles, options=current_options)
+                reaction_options = dict(current_options)
+                reaction_options.setdefault("motif_site_filter", "substituent")
+                payload = featurize_reaction(smiles, options=reaction_options)
             else:
                 payload = featurize_molecule(smiles, options=current_options)
         except Exception as exc:

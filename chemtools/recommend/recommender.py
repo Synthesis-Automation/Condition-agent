@@ -2068,8 +2068,14 @@ class HTERecommender:
         reaction_data = None
         if reaction_smiles and (">" in reaction_smiles or "." in reaction_smiles):
             try:
-                rxn_features = featurize_reaction(reaction_smiles, options={"confirm_coupling_products": True})
-            reaction_data = rxn_features.get("reaction", {})
+                rxn_features = featurize_reaction(
+                    reaction_smiles,
+                    options={
+                        "confirm_coupling_products": True,
+                        "motif_site_filter": "substituent",
+                    },
+                )
+                reaction_data = rxn_features.get("reaction", {})
                 rxn_type_data = reaction_data.get("reaction_type", {})
                 detected_type = rxn_type_data.get("reaction_type")
                 detected_confidence = rxn_type_data.get("confidence", 0.0)
