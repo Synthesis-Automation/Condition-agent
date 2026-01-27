@@ -94,6 +94,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.drop_catalyst_check = QtWidgets.QCheckBox("Drop reactions without a catalyst")
         self.drop_catalyst_check.setChecked(True)
         self.skip_cas_check = QtWidgets.QCheckBox("Skip CAS enrichment (faster)")
+        self.protocol_mode_check = QtWidgets.QCheckBox("Protocol CSV mode (skip enrichment, save to HTE_db/protocols)")
         
         self.btn_run = QtWidgets.QPushButton("Start Conversion")
         self.btn_quit = QtWidgets.QPushButton("Quit")
@@ -110,6 +111,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.dataset_dropdown.currentIndexChanged.connect(self._on_dataset_changed)
         self.source_dir_edit.editingFinished.connect(self._load_datasets)
         self.input_edit.textEdited.connect(self._on_input_edited)
+        self.protocol_mode_check.stateChanged.connect(self._on_protocol_mode_changed)
         self.btn_run.clicked.connect(self.run_processing)
         self.btn_quit.clicked.connect(self.close)
         
@@ -157,6 +159,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         form.addRow("", QtWidgets.QLabel("Output includes formed_motifs, spectator_groups, and reactant_3 columns."))
         form.addRow("", self.drop_catalyst_check)
         form.addRow("", self.skip_cas_check)
+        form.addRow("", self.protocol_mode_check)
         
         layout.addLayout(form)
         
@@ -235,6 +238,25 @@ class HTEConverterWindow(QtWidgets.QWidget):
             self.dataset_dropdown.setCurrentIndex(0)
         self.selected_input_paths = []
 
+    def _on_protocol_mode_changed(self):
+        """Update output path when protocol mode is toggled"""
+        if not self.protocol_mode_check.isChecked():
+            return
+        
+        # Auto-set output to protocols directory
+        input_paths = self._get_input_paths()
+        if input_paths:
+            if len(input_paths) > 1:
+                output_path = PROJECT_ROOT / "data" / "HTE_db" / "protocols"
+                self.output_edit.setText(str(output_path))
+            else:
+                input_path = Path(input_paths[0])
+                output_path = PROJECT_ROOT / "data" / "HTE_db" / "protocols" / f"{input_path.stem}_hte.csv"
+                self.output_edit.setText(str(output_path))
+        
+        # Enable skip CAS enrichment automatically
+        self.skip_cas_check.setChecked(True)
+
     def _get_input_paths(self) -> List[str]:
         if self.selected_input_paths:
             return list(self.selected_input_paths)
@@ -296,6 +318,11 @@ class HTEConverterWindow(QtWidgets.QWidget):
         if not jobs:
             return
 
+        # Check if protocol mode
+        if self.protocol_mode_check.isChecked():
+            self._run_protocol_conversion(jobs)
+            return
+
         self.setEnabled(False)
         self.log.clear()
         self.progress_bar.setVisible(True)
@@ -317,6 +344,121 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.worker.finished.connect(self.on_finished)
         
         self.thread.start()
+
+    def _run_protocol_conversion(self, jobs: List[tuple[str, str]]):
+        """Convert protocol CSV to HTE format with full processing"""
+        try:
+            self.log.clear()
+            self.log_msg("Protocol CSV Conversion Mode")
+            self.log_msg("="*50)
+            self.log_msg("Running full HTE processing pipeline:")
+            self.log_msg("  - Reaction type detection")
+            self.log_msg("  - Motif extraction")
+            self.log_msg("  - Spectator group ranking")
+            self.log_msg("")
+            
+            # Redirect stdout to capture processing logs
+            class StdoutRedirector:
+                def __init__(self, log_func):
+                    self.log_func = log_func
+                def write(self, text):
+                    if text.strip():
+                        self.log_func(text.strip())
+                def flush(self):
+                    pass
+            
+            old_stdout = sys.stdout
+            sys.stdout = StdoutRedirector(self.log_msg)
+            
+            try:
+                total = len(jobs)
+                for idx, (input_path, output_path) in enumerate(jobs, start=1):
+                    print(f"Job {idx}/{total}: {os.path.basename(input_path)} -> {os.path.basename(output_path)}")
+                    
+                    # Read protocol CSV and prepare for processing
+                    df_original = pd.read_csv(input_path)
+                    print(f"Loaded {len(df_original)} protocol rows")
+                    
+                    # Backup original columns to restore after processing
+                    has_reaction_id = 'reaction_id' in df_original.columns
+                    has_setup_json = 'reaction_setup_json' in df_original.columns
+                    has_reference = 'reference' in df_original.columns
+                    
+                    original_ids = None
+                    setup_json_backup = None
+                    reference_backup = None
+                    
+                    if has_reaction_id:
+                        original_ids = df_original['reaction_id'].copy()
+                        print(f"Preserving {len(original_ids)} original reaction IDs")
+                    
+                    if has_setup_json:
+                        setup_json_backup = df_original['reaction_setup_json'].copy()
+                        print(f"Preserving reaction_setup_json column ({len(setup_json_backup)} rows)")
+                    
+                    if has_reference:
+                        reference_backup = df_original['reference'].copy()
+                        print(f"Preserving reference column ({len(reference_backup)} rows)")
+                    
+                    # Process through full HTE pipeline
+                    print("Processing with full HTE pipeline...")
+                    process_reaction_dataset(
+                        input_path,
+                        output_path,
+                        drop_no_catalyst=self.drop_catalyst_check.isChecked(),
+                        reagent_csv_path=str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
+                        new_reagents_path=str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
+                    )
+                    
+                    # Restore original columns
+                    print("Restoring original protocol metadata...")
+                    output_df = pd.read_csv(output_path)
+                    print(f"Output loaded: {len(output_df)} rows, {len(output_df.columns)} columns")
+                    
+                    # Restore reaction_id (process_reaction_dataset sets it to filename)
+                    if original_ids is not None and len(original_ids) == len(output_df):
+                        output_df['reaction_id'] = original_ids
+                        print(f"✓ Restored {len(original_ids)} original reaction IDs")
+                    elif has_reaction_id:
+                        print(f"⚠ Could not restore reaction_id: length mismatch ({len(original_ids)} vs {len(output_df)})")
+                    
+                    # Restore reference
+                    if reference_backup is not None and len(reference_backup) == len(output_df):
+                        output_df['reference'] = reference_backup
+                        print(f"✓ Restored reference information")
+                    elif has_reference:
+                        print(f"⚠ Could not restore reference: length mismatch ({len(reference_backup)} vs {len(output_df)})")
+                    
+                    # Add reaction_setup_json
+                    if setup_json_backup is not None and len(setup_json_backup) == len(output_df):
+                        output_df['reaction_setup_json'] = setup_json_backup
+                        print(f"✓ Added reaction_setup_json to {len(output_df)} rows")
+                    elif has_setup_json:
+                        print(f"⚠ Could not add reaction_setup_json: length mismatch ({len(setup_json_backup) if setup_json_backup is not None else 'None'} vs {len(output_df)})")
+                    
+                    output_df.to_csv(output_path, index=False)
+                    print(f"✓ Saved enhanced output with {len(output_df)} rows and {len(output_df.columns)} columns")
+                    
+                    print("")
+                
+                print(f"✓ Successfully processed {total} file(s)")
+                
+            finally:
+                sys.stdout = old_stdout
+            
+            QtWidgets.QMessageBox.information(
+                self, 
+                "Success", 
+                f"Successfully processed {len(jobs)} protocol file(s) with full HTE pipeline"
+            )
+            
+        except Exception as e:
+            sys.stdout = old_stdout
+            error_msg = f"Error during protocol conversion: {str(e)}"
+            self.log_msg(f"\n✗ {error_msg}")
+            import traceback
+            self.log_msg(traceback.format_exc())
+            QtWidgets.QMessageBox.critical(self, "Error", error_msg)
 
     def on_finished(self, success: bool, message: str):
         self.thread.quit()
